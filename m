@@ -1,210 +1,195 @@
-Return-Path: <kvm+bounces-34260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D379F9BE5
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 22:25:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B78D49F9D7B
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 01:52:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 846C01885AC8
-	for <lists+kvm@lfdr.de>; Fri, 20 Dec 2024 21:25:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8AA116B7FA
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 00:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8321224B07;
-	Fri, 20 Dec 2024 21:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACDB29CEB;
+	Sat, 21 Dec 2024 00:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z/IY2db/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I7uJk11h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AD4157A48
-	for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 21:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33BD748A
+	for <kvm@vger.kernel.org>; Sat, 21 Dec 2024 00:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734729894; cv=none; b=tDEx5bs0BM97wi6NClD78JFobIYEiFOFPR0+yd+OFltxDF7qJ5dumpFr90gShSM0ltsNRM2nOHeS/UVUsIoLETqAelNW9Bj1a98R8nuCAzekr3xtfHrrji1iXzjnt9tK9gxtorFfTipdE8i1kq//AC27PgDi74Pj8luqhm1i6Mo=
+	t=1734742297; cv=none; b=lUfxOySGweeYveDiKzIrqSOhvaRsirVybskmgz/NiQgqaNR6j101xLdc8ksn3i/OTqpLnZrXVDFUuRGBrpPRz99sn6NkeZvsnOi7qgiTcmgYKobQ/eoQkL/y7k8UQlfeOV2pTljCT7lHHNUqDK9qpTH872pB3gxeaJ47DJkRqrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734729894; c=relaxed/simple;
-	bh=7eeLqFnzCXbq+xxHnkCScV5mqKqwOaZz6WykcyZRamA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KHzzZagRu6v/vHs1+ObIhG2zepKyS6CcH59V83e5dqcfUHyFynAaZ9MIdkwxS8uqmEmYrFXaVTJ/qiI7SNjHFmYF26uxdBhVJhfSUVlSXOAVhpxE3FoTNhH/JSo+t3c0/fMy1X2we4EKWdmhrU2GLbjGE1nY6Q3tQXNjO9sSpAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z/IY2db/; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1734742297; c=relaxed/simple;
+	bh=FRENkPdw5MsSuos6hv3KfxF0ISP2Qe0RZAlvdgY5Q+0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mZQy2Fq1++QZ8DfzPIka4VSWxfjE881r7Ni4o9/f9qtYwWGOB97E4HEHejCBPzifmBAiDecwLtgna0i2iXdjV1zWXXoYESrjsYU1+3NQPuYFIn68fq1OepByR/7ytHNaKZiAvmpPC0Fy8t4dK6dIwPl0YFjUp6+p6Co+oaf4Apg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I7uJk11h; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7eaa7b24162so2220657a12.1
-        for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 13:24:53 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-725eaaf8914so3166379b3a.1
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 16:51:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734729893; x=1735334693; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NKDL7WotRRznfzryExW5ZNK1jrrKZQRr226yPL5NSdw=;
-        b=Z/IY2db/fyR0RzClTOunJWfp1kW14qqEhz3DyrjZd+WZvVowvI0hZErCM1Pc1VMVMj
-         h0pK4DmCzKzRI/pg6vM/Gg8EE5FN3zyPi6SM2Hc++F0UbqwzQ3XsnQ6NsLikXwR5wVl9
-         p0JBwtPmi25GzNTG3W7D6RmRoy4RLh70fiCbNKre9j7k/l6AFrFkW8KXERGB/KaimYDu
-         7zzJPvREz03RUaMNaLJHu1b82z3mu/CGhrHsNajbAk54xeDCuANmVwkW6EtiR07DWaUG
-         Hf4F1AtCjwxg3QLEaEv+xP82mpHVOANDiFT9s78N2UdrNJhAmr8fkh0YGo7pkLNsfPgr
-         kRQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734729893; x=1735334693;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=google.com; s=20230601; t=1734742294; x=1735347094; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=NKDL7WotRRznfzryExW5ZNK1jrrKZQRr226yPL5NSdw=;
-        b=oErTONrRRC4aMPxx6JA/ViQ31dSyBZ8ugo3m70E84SNQeTBDtJuZn1VywhU1nTBaWv
-         VTkXx58v0fBvo+Llr/lOzIwwpaU6IYGG92Ro6/81YWnvSL2KK0b9MaXM1JL6PVDI625v
-         Bq28mo57nPRz7R2C0UrHNJIVYk5lmbDOd7TAkf6ikxdpwashF6p/O36bwmQiJzm6a4e0
-         IUotLs1qgwUArTOWQ9rIAWEiIJqqRmv9hJSuRwy8xWFTcd0OgHwG7YB6rpA+RuaFiuon
-         t1aH7/pcdEVwSTWaTdszZujPH4tz7rdIvidBd/0l7D6EFqg6c+xzAUxkGeTXEEs9D2oz
-         sZ3w==
-X-Gm-Message-State: AOJu0YzPvQOxlFaBSExkNeDX4tyw2Qe4tjfV7V7ZsSULvH1+qENIbNrs
-	x5RauL0/n4j9Cb0FHjy2uwJVynSocgIIGJxZC7RZ+4cD4husCftqksSFYqK/T4TwtCEbHiF8vPz
-	lCA==
-X-Google-Smtp-Source: AGHT+IFA3IucqYuK8Je92yPsNf5Lvo4xKTxSHfDp42LjOwnarj0UeQAojWvQZZZTM6tVIkpEGfcfJFs81NA=
-X-Received: from pfwz9.prod.google.com ([2002:a05:6a00:1d89:b0:72a:9fce:4f44])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a108:b0:1e1:9bc1:6d6d
- with SMTP id adf61e73a8af0-1e5e07ee6e4mr9686830637.31.1734729892856; Fri, 20
- Dec 2024 13:24:52 -0800 (PST)
-Date: Fri, 20 Dec 2024 13:24:51 -0800
-In-Reply-To: <Z2WZ091z8GmGjSbC@google.com>
+        bh=yJnN7ZrxN0wnWRniinuaZCCRmMgcnMSCXct+QU5IKEI=;
+        b=I7uJk11hWHysVG2cJjFu7N6jWbQ5FeiKh+AbvSgWnPEX1814KzGy4eFTyB6Y8X8lJD
+         gLMjT1G6Qi33skl92zvmuVC3jaguwy1c/jYV6nPfbAYqIjaEYJHNjr8p5j64jv022xV8
+         QoSitZAr4dQ86RJMyqjJe1nrn0010KuCF36JrWWsXNvQJFkGydPwZgSS126nyo7MzV5e
+         9kv0qO5KMijtB0cbccMjrXU808cjgs+FIgk+mDyJGVcgb+qsljSRQUi2by0edDU+tQKx
+         DCVeDVi8wfJbWydcgC6KhTHov2QELx3U24ZADAoj9m1rKeExKkNGdbaTEXSKGygapa7V
+         xnWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734742294; x=1735347094;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yJnN7ZrxN0wnWRniinuaZCCRmMgcnMSCXct+QU5IKEI=;
+        b=pHwAq4q762q8BjwVOFnFkY09pjsuQBkVgh0IsVjsbC2LUqIkwIjNOmDAa7CW+Nzjvd
+         ksCrhOcmddyhHl9Cgv/EWytjaDqwYNCf3GN9t0BkluyUmjlzQdFmP0sPfhETcCdUlksv
+         2ACj+hsFSxboNk+RDC0jGLPxttkPh8hMxgEnsXANR3nieo3Ex3KJWGaqPgWA/sy1mgJt
+         h2vIfD7vq490w5K6RyiLl32a9ghICsMaSuh7PE16TXVi39/h3rr7c4RD+RWV8mu02WS3
+         VlMNFAvBUK7+9kHCAnZJePeHWPHQhHgDXCLpz3sGOHA/DF+257tr61RZdcpgq7tytCAp
+         24SQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYSxw4YmdqEiuG0FZavGC9r3zcDqDuQVA/+zeJT1TtthCRjMUgPI8aPgLg67wHagAbEuo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHmPsQ+JHr/w/w0Pifl19fP/iBnVvQn0OsWlI46bLYvhVc8rPM
+	Y70GMZdymk1pdEUsYGPWVWcUCuQmXCRhQrwET+LJPd1+nNBNRu/jPbSu6kFkAF8lMbQHtMFP+5f
+	s4BynVjwIjZ9Z4MsPQHyfgw==
+X-Google-Smtp-Source: AGHT+IFPPx0YiYiLnd8xNfIIbmIMwDB+OM3W+mCwV2V7dSBNzPOeeDA2h35zKUR6WA/aeA9SZXl5yVBt8+4OkZfrCg==
+X-Received: from pfms15.prod.google.com ([2002:aa7:828f:0:b0:72a:bcc3:4c9a])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1311:b0:728:e81c:2bf4 with SMTP id d2e1a72fcca58-72abddb1958mr6921748b3a.11.1734742294312;
+ Fri, 20 Dec 2024 16:51:34 -0800 (PST)
+Date: Sat, 21 Dec 2024 00:42:31 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-5-adrian.hunter@intel.com> <Z0AbZWd/avwcMoyX@intel.com>
- <a42183ab-a25a-423e-9ef3-947abec20561@intel.com> <Z2GiQS_RmYeHU09L@google.com>
- <487a32e6-54cd-43b7-bfa6-945c725a313d@intel.com> <Z2WZ091z8GmGjSbC@google.com>
-Message-ID: <Z2Xgo3XwE6XrCMOM@google.com>
-Subject: PKEY syscall number for selftest? (was: [PATCH 4/7] KVM: TDX: restore
- host xsave state when exit from the guest TD)
-From: Sean Christopherson <seanjc@google.com>
-To: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241221004236.2629280-1-almasrymina@google.com>
+Subject: [PATCH RFC net-next v1 0/5] Device memory TCP TX
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, dw@davidwei.uk
+Content-Type: text/plain; charset="UTF-8"
 
-Switching topics, dropped everyone else except the list.
+The TX path had been dropped from the Device Memory TCP patch series
+post RFCv1 [1], to make that series slightly easier to review. This
+series rebases the implementation of the TX path on top of the
+net_iov/netmem framework agreed upon and merged. The motivation for
+the feature is thoroughly described in the docs & cover letter of the
+original proposal, so I don't repeat the lengthy descriptions here, but
+they are available in [1].
 
-On Fri, Dec 20, 2024, Sean Christopherson wrote:
->  arch/x86/kvm/x86.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4320647bd78a..9d5cece9260b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1186,7 +1186,7 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vc=
-pu)
->  	    vcpu->arch.pkru !=3D vcpu->arch.host_pkru &&
->  	    ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
->  	     kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE)))
-> -		write_pkru(vcpu->arch.pkru);
-> +		wrpkru(vcpu->arch.pkru);
->  }
->  EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
-> =20
-> @@ -1200,7 +1200,7 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcp=
-u)
->  	     kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE))) {
->  		vcpu->arch.pkru =3D rdpkru();
->  		if (vcpu->arch.pkru !=3D vcpu->arch.host_pkru)
-> -			write_pkru(vcpu->arch.host_pkru);
-> +			wrpkru(vcpu->arch.host_pkru);
->  	}
-> =20
->  	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
->=20
-> base-commit: 13e98294d7cec978e31138d16824f50556a62d17
-> --=20
+Sending this series as RFC as the winder closure is immenient. I plan on
+reposting as non-RFC once the tree re-opens, addressing any feedback
+I receive in the meantime.
 
-I tried to test this by running the mm/protection_keys selftest in a VM, bu=
-t it
-gives what are effectively false passes on x86-64 due to the selftest picki=
-ng up
-the generic syscall numbers, e.g. 289 for SYS_pkey_alloc, instead of the x8=
-6-64
-numbers.
+Full outline on usage of the TX path is detailed in the documentation
+added in the first patch.
 
-I was able to get the test to run by hacking tools/testing/selftests/mm/pke=
-y-x86.h
-to shove in the right numbers, but I can't imagine that's the intended beha=
-vior.
+Test example is available via the kselftest included in the series as well.
 
-If I omit the #undefs from pkey-x86.h, it shows that the test is grabbing t=
-he
-definitions from the generic usr/include/asm-generic/unistd.h header.
+The series is relatively small, as the TX path for this feature largely
+piggybacks on the existing MSG_ZEROCOPY implementation.
 
-Am I doing something stupid?
+Patch Overview:
+---------------
 
-Regardless of whether this is PEBKAC or working as intended, on x86, the te=
-st
-should ideally assert that "ospke" support in /proc/cpuinfo is consistent w=
-ith
-the result of sys_pkey_alloc(), e.g. so that an failure to allocate a pkey =
-on a
-system that work is reported as an error, not a pass.
+1. Documentation & tests to give high level overview of the feature
+   being added.
 
---
-diff --git a/tools/testing/selftests/mm/pkey-x86.h b/tools/testing/selftest=
-s/mm/pkey-x86.h
-index ac91777c8917..ccc3552e6b77 100644
---- a/tools/testing/selftests/mm/pkey-x86.h
-+++ b/tools/testing/selftests/mm/pkey-x86.h
-@@ -3,6 +3,10 @@
- #ifndef _PKEYS_X86_H
- #define _PKEYS_X86_H
-=20
-+#define __NR_pkey_mprotect     329
-+#define __NR_pkey_alloc                330
-+#define __NR_pkey_free         331
-+
- #ifdef __i386__
-=20
- #define REG_IP_IDX             REG_EIP
---
+2. Add netmem refcounting needed for the TX path.
 
-Yields:
+3. Devmem TX netlink API.
 
-$ ARCH=3Dx86_64 make protection_keys_64
-gcc -Wall -I /home/sean/go/src/kernel.org/linux/tools/testing/selftests/../=
-../..  -isystem /home/sean/go/src/kernel.org/linux/tools/testing/selftests/=
-../../../usr/include -isystem /home/sean/go/src/kernel.org/linux/tools/test=
-ing/selftests/../../../tools/include/uapi -no-pie -D_GNU_SOURCE=3D  -m64 -m=
-xsave  protection_keys.c vm_util.c thp_settings.c -lrt -lpthread -lm -lrt -=
-ldl -o /home/sean/go/src/kernel.org/linux/tools/testing/selftests/mm/protec=
-tion_keys_64
-In file included from pkey-helpers.h:102:0,
-                 from protection_keys.c:49:
-pkey-x86.h:6:0: warning: "__NR_pkey_mprotect" redefined
- #define __NR_pkey_mprotect 329
-=20
-In file included from protection_keys.c:45:0:
-/home/sean/go/src/kernel.org/linux/usr/include/asm-generic/unistd.h:693:0: =
-note: this is the location of the previous definition
- #define __NR_pkey_mprotect 288
-=20
-In file included from pkey-helpers.h:102:0,
-                 from protection_keys.c:49:
-pkey-x86.h:7:0: warning: "__NR_pkey_alloc" redefined
- #define __NR_pkey_alloc  330
-=20
-In file included from protection_keys.c:45:0:
-/home/sean/go/src/kernel.org/linux/usr/include/asm-generic/unistd.h:695:0: =
-note: this is the location of the previous definition
- #define __NR_pkey_alloc 289
-=20
-In file included from pkey-helpers.h:102:0,
-                 from protection_keys.c:49:
-pkey-x86.h:8:0: warning: "__NR_pkey_free" redefined
- #define __NR_pkey_free  331
-=20
-In file included from protection_keys.c:45:0:
-/home/sean/go/src/kernel.org/linux/usr/include/asm-generic/unistd.h:697:0: =
-note: this is the location of the previous definition
- #define __NR_pkey_free 290
-=20
+4. Devmem TX net stack implementation.
+
+Testing:
+--------
+
+Testing is very similar to devmem TCP RX path. The ncdevmem test used
+for the RX path is now augemented with client functionality to test TX
+path.
+
+* Test Setup:
+
+Kernel: net-next with this RFC and memory provider API cherry-picked
+locally.
+
+Hardware: Google Cloud A3 VMs.
+
+NIC: GVE with header split & RSS & flow steering support.
+
+Performance results are not included with this version, unfortunately.
+I'm having issues running the dma-buf exporter driver against the
+upstream kernel on my test setup. The issues are specific to that
+dma-buf exporter and do not affect this patch series. I plan to follow
+up this series with perf fixes if the tests point to issues once they're
+up and running.
+
+Special thanks to Stan who took a stab at rebasing the TX implementation
+on top of the netmem/net_iov framework merged. Parts of his proposal [2]
+that are reused as-is are forked off into their own patches to give full
+credit.
+
+[1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@google.com/
+[2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
+
+Cc: sdf@fomichev.me
+Cc: asml.silence@gmail.com
+Cc: dw@davidwei.uk
+
+
+Mina Almasry (4):
+  net: add devmem TCP TX documentation
+  selftests: ncdevmem: Implement devmem TCP TX
+  net: add get_netmem/put_netmem support
+  net: devmem: Implement TX path
+
+Stanislav Fomichev (1):
+  net: devmem TCP tx netlink api
+
+ Documentation/netlink/specs/netdev.yaml       |  12 +
+ Documentation/networking/devmem.rst           | 140 +++++++++-
+ include/linux/skbuff.h                        |  13 +-
+ include/linux/skbuff_ref.h                    |   4 +-
+ include/net/netmem.h                          |   3 +
+ include/net/sock.h                            |   2 +
+ include/uapi/linux/netdev.h                   |   1 +
+ include/uapi/linux/uio.h                      |   5 +
+ net/core/datagram.c                           |  40 ++-
+ net/core/devmem.c                             | 101 ++++++-
+ net/core/devmem.h                             |  51 +++-
+ net/core/netdev-genl-gen.c                    |  13 +
+ net/core/netdev-genl-gen.h                    |   1 +
+ net/core/netdev-genl.c                        |  67 ++++-
+ net/core/skbuff.c                             |  38 ++-
+ net/core/sock.c                               |   9 +
+ net/ipv4/tcp.c                                |  36 ++-
+ net/vmw_vsock/virtio_transport_common.c       |   4 +-
+ tools/include/uapi/linux/netdev.h             |   1 +
+ .../selftests/drivers/net/hw/ncdevmem.c       | 261 +++++++++++++++++-
+ 20 files changed, 764 insertions(+), 38 deletions(-)
+
+-- 
+2.47.1.613.gc27f4b7a9f-goog
 
 
