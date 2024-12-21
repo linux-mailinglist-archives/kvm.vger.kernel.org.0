@@ -1,132 +1,257 @@
-Return-Path: <kvm+bounces-34278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34279-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CF2D9F9FF5
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 10:57:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC6C9FA2A1
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 22:49:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92F9816865B
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 09:57:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4504188C0A6
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 21:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4161F190A;
-	Sat, 21 Dec 2024 09:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902951D5CDD;
+	Sat, 21 Dec 2024 21:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DXIavt0c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f9y2FsCZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9FA1EE7D9;
-	Sat, 21 Dec 2024 09:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED0D149C50;
+	Sat, 21 Dec 2024 21:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734775068; cv=none; b=W/OyvzrGGltXiIj6a9+zS2YduhC9EOzLSreolXyGuTZ2IdALOG3m74bmmEsWsMyUiIOu8wRPYXBTP+5FwrAjw+NYuJqteGGhH58XcKgl9HfkoVosWkZ+23CYayElLNv0gLJZTyKSyHxxTqdljXy0HKzsfu/KKxzlFRFE+dAA6VQ=
+	t=1734817739; cv=none; b=PDsy0nxWDlMGsD33t8d8lgdXAI1dPnf/spIL+La79XnjxZ+LNdRlGUZEMS2jK3x62HiCrVlVuZpFLTREqYfbRtrqqF92ObDGlVzM2A07Gd3ShOKEwjYFJvFFdt2noYpPSjVHNHRAReFqkC5SEhR5Irvr1+LkfW+e9RuDAsc+owo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734775068; c=relaxed/simple;
-	bh=cA6hokD0aqM2pcntllYiH12JP8LjCCMtE3OBF6ZIU2E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MUlj6t6Tb82WQjIbpDsmqQU5PjrgSGEaikqkmj9OYTBoLgTGfSrpzyP2XFutLeX+f4WJciY//e+W8rfI4j7hkh8PdvrjXKXxBr/rN8GAhr0CLkNFz2GLFijQ5JurB29v2Lf+MP/Uw5CmQhK6rGaiOn9rmS4tuI9xpHX4paEiWPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DXIavt0c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB42DC4CECE;
-	Sat, 21 Dec 2024 09:57:47 +0000 (UTC)
+	s=arc-20240116; t=1734817739; c=relaxed/simple;
+	bh=liSnJKHt137nDINsiNS8bBle3Cakfhe3aWwZ4NxRgcA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KVCaq2fDMPm8IZ/djQ6UV18tjOZvy8WDm4SiGneHkGpUokHvWCIg7qASEdDjB1QxSrDGjIKEqwu+0v+S0cZlJFjjBiOSntV8+CFrz5YmPYJYZwYo0M+EIno4irANbQGHOWFSu9VF5kJmPVcJBrol9LbT6Cu/dCsNtE/sIgxqL9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f9y2FsCZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDA08C4CECE;
+	Sat, 21 Dec 2024 21:48:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734775067;
-	bh=cA6hokD0aqM2pcntllYiH12JP8LjCCMtE3OBF6ZIU2E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DXIavt0ctCzoRX6EWaFKlPy82zEACQJDe+Dy1mSS0OhpFN+1N4KNG+FFMTl1+ADv3
-	 OhxofaFzqqou8Osw/eOxOX/YcfWtMpQe/+LoVXJLj1nRvvB2BYf/m0YzPXFMKytp1Y
-	 P1OmYOcAMAuxK/W0ypddKUw2tgSuv923hTIx0HYOb+BZJIMUHmaYgXlaspkPCG4RjW
-	 NqNKzvVNGRRdRRqIY1o6Yt7dG9upzA+w8nVJ4qiKTA4S2Pa/TDfgkl97xE1T7lfwp2
-	 POWK/P3oLwsWUn+iC5uA36EXyJ7oEIbSnMM2QJus3XD5+WWvhfKx7qvTHl4bQ8VrlV
-	 YyJLgGqsldSkQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tOwEz-005u3E-7c;
-	Sat, 21 Dec 2024 09:57:45 +0000
-Date: Sat, 21 Dec 2024 09:57:44 +0000
-Message-ID: <874j2xs6hz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Eric Auger <eauger@redhat.com>
-Subject: Re: [PATCH v2 01/12] KVM: arm64: nv: Add handling of EL2-specific timer registers
-In-Reply-To: <Z2Yb8BWnqpt441V-@linux.dev>
-References: <20241217142321.763801-1-maz@kernel.org>
-	<20241217142321.763801-2-maz@kernel.org>
-	<Z2Yb8BWnqpt441V-@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1734817739;
+	bh=liSnJKHt137nDINsiNS8bBle3Cakfhe3aWwZ4NxRgcA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=f9y2FsCZXSDafB5TbgOF65PJ7LnEv+LO6b/B2wnLgowdZ6Rzly5Ph9Gnu5IvLiwLr
+	 Cytt5GW/+3ZIlLFHNp2Ne6ZsmfOYsIPAX5hMhGJbIIK97SehoSLQaoiM/R2ZCUQ3cm
+	 XELo0Bt0XTaJR0dDn/VelQXxX4uf2TkbBZBGLg/qbnYRNSXsIgW9KHdTX6KpOeIIgY
+	 2AnjB8pwrt0wr97UXs0ymdOIft+CgjBpbx5hfXbdjsgzA3Hm7yufnoAB1ROPWOwMZh
+	 j2a+QU4yvoLiaM3vOHQ6x8sMcVdQM00CK2/aDqbJEs+QNpcTNHoLfoWMr9gI/Vdjqx
+	 PkqvYDjziUKwQ==
+From: Arnd Bergmann <arnd@kernel.org>
+To: kvm@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Alexander Graf <graf@amazon.com>,
+	Crystal Wood <crwood@redhat.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Paul Durrant <paul@xen.org>,
+	Marc Zyngier <maz@kernel.org>,
+	"A. Wilcox" <AWilcox@Wilcox-Tech.com>,
+	linux-kernel@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: [PATCH v2 0/5] KVM: drop 32-bit host support on all architectures
+Date: Sat, 21 Dec 2024 22:42:18 +0100
+Message-Id: <20241221214223.3046298-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, 21 Dec 2024 01:38:28 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Tue, Dec 17, 2024 at 02:23:09PM +0000, Marc Zyngier wrote:
-> > @@ -3879,9 +4020,11 @@ static const struct sys_reg_desc cp15_64_regs[] = {
-> >  	{ SYS_DESC(SYS_AARCH32_CNTPCT),	      access_arch_timer },
-> >  	{ Op1( 1), CRn( 0), CRm( 2), Op2( 0), access_vm_reg, NULL, TTBR1_EL1 },
-> >  	{ Op1( 1), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_ASGI1R */
-> > +	{ SYS_DESC(SYS_AARCH32_CNTVCT),	      access_arch_timer },
-> >  	{ Op1( 2), CRn( 0), CRm(12), Op2( 0), access_gic_sgi }, /* ICC_SGI0R */
-> >  	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
-> >  	{ SYS_DESC(SYS_AARCH32_CNTPCTSS),     access_arch_timer },
-> > +	{ SYS_DESC(SYS_AARCH32_CNTVCTSS),     access_arch_timer },
-> >  };
-> 
-> Huh. You know, I had always thought we hid 32-bit EL0 from nested
-> guests, but I now realize that isn't the case. Of course, we don't have
-> the necessary trap reflection for exits that came out of a 32-bit EL0,
-> nor should we bother.
-> 
-> Of the 4 NV2 implementations I'm aware of (Neoverse-V1, Neoverse-V2,
-> AmpereOne, M2) only Neoverse-V1 supports 32-bit userspace. And even
-> then, a lot of deployments of V1 have a broken NV2 implementation.
-> 
-> What do you think about advertising a 64-bit only EL0 for nested VMs?
+From: Arnd Bergmann <arnd@arndb.de>
 
-I'm completely OK with that.
+I've updated my RFC patches based on the feedback, changing mainly
+the powerpc code. 
 
-Actually, we already nuke the guest if exiting from 32bit context, no
-matter the EL (vcpu_mode_is_bad_32bit() is where this happens).  But
-we're missing the ID_AA64PFR0_EL1.EL0 sanitising, which is a bug. I'll
-send a patch shortly.
+I submitted a patch to remove KVM support for x86-32 hosts earlier
+this month, but there were still concerns that this might be useful for
+testing 32-bit host in general, as that remains supported on three other
+architectures. I have gone through those three now and prepared similar
+patches, as all of them seem to be equally obsolete.
 
-Now, for this particular patch, I still think we should gracefully
-handle access to the EL1 timer from a 32bit capable, non-NV guest.
-Just in case we end-up with a CPU with a broken CNTVOFF_EL2 *and*
-32bit capability.
+Support for 32-bit KVM host on Arm hardware was dropped back in 2020
+because of lack of users, despite Cortex-A7/A15/A17 based SoCs being
+much more widely deployed than the other virtualization capable 32-bit
+CPUs (Intel Core Duo/Silverthorne, PowerPC e300/e500/e600, MIPS P5600)
+combined.
 
-In the end, it doesn't cost us much to support this case, and it helps
-that we can verify that we handle all registers without exception.
+I hope this can get merged through the KVM tree as a whole series.
 
-Thoughts?
+      Arnd
 
-	M.
+---
+v2 changes:
+ - rebase to kvm #next branch
+ - improve changelog text for x86
+ - many updates for powerpc, thanks to Christophe Leroy for suggestions
+
+Link: https://lore.kernel.org/lkml/Z1B1phcpbiYWLgCD@google.com/
+Link: https://lore.kernel.org/lkml/20241212125516.467123-1-arnd@kernel.org/
+
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Huacai Chen <chenhuacai@kernel.org>
+Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Naveen N Rao <naveen@kernel.org>
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: Alexander Graf <graf@amazon.com>
+Cc: Crystal Wood <crwood@redhat.com>
+Cc: Anup Patel <anup@brainfault.org>
+Cc: Atish Patra <atishp@atishpatra.org>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: x86@kernel.org
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Paul Durrant <paul@xen.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: "A. Wilcox" <AWilcox@Wilcox-Tech.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-mips@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: kvm-riscv@lists.infradead.org
+Cc: linux-riscv@lists.infradead.org
+
+Arnd Bergmann (5):
+  mips: kvm: drop support for 32-bit hosts
+  riscv: kvm: drop 32-bit host support
+  powerpc: kvm: drop 32-bit booke
+  powerpc: kvm: drop 32-bit book3s
+  x86: kvm drop 32-bit host support
+
+ MAINTAINERS                                 |   2 +-
+ arch/mips/Kconfig                           |   3 -
+ arch/mips/include/asm/kvm_host.h            |   4 -
+ arch/mips/kvm/Kconfig                       |   1 +
+ arch/mips/kvm/emulate.c                     |   8 -
+ arch/mips/kvm/msa.S                         |  12 -
+ arch/mips/kvm/vz.c                          |  22 -
+ arch/powerpc/include/asm/kvm_book3s.h       |  17 -
+ arch/powerpc/include/asm/kvm_book3s_32.h    |  36 --
+ arch/powerpc/include/asm/kvm_book3s_asm.h   |  10 -
+ arch/powerpc/include/asm/kvm_booke.h        |   4 -
+ arch/powerpc/include/asm/kvm_booke_hv_asm.h |   2 -
+ arch/powerpc/include/asm/kvm_host.h         |   2 +-
+ arch/powerpc/include/asm/kvm_ppc.h          |   2 +-
+ arch/powerpc/include/asm/processor.h        |   3 -
+ arch/powerpc/kernel/asm-offsets.c           |  21 +-
+ arch/powerpc/kernel/head_32.h               |  10 -
+ arch/powerpc/kernel/head_85xx.S             |  14 -
+ arch/powerpc/kernel/head_book3s_32.S        |   5 -
+ arch/powerpc/kernel/head_booke.h            |  39 --
+ arch/powerpc/kvm/Kconfig                    |  44 +-
+ arch/powerpc/kvm/Makefile                   |  30 --
+ arch/powerpc/kvm/book3s.c                   |  18 -
+ arch/powerpc/kvm/book3s_32_mmu_host.c       | 396 --------------
+ arch/powerpc/kvm/book3s_emulate.c           |  37 --
+ arch/powerpc/kvm/book3s_interrupts.S        |  11 -
+ arch/powerpc/kvm/book3s_mmu_hpte.c          |  12 -
+ arch/powerpc/kvm/book3s_pr.c                | 122 +----
+ arch/powerpc/kvm/book3s_rmhandlers.S        | 110 ----
+ arch/powerpc/kvm/book3s_segment.S           |  30 +-
+ arch/powerpc/kvm/booke.c                    | 268 ----------
+ arch/powerpc/kvm/booke.h                    |   8 -
+ arch/powerpc/kvm/booke_emulate.c            |  44 --
+ arch/powerpc/kvm/booke_interrupts.S         | 535 -------------------
+ arch/powerpc/kvm/bookehv_interrupts.S       | 102 ----
+ arch/powerpc/kvm/e500.c                     | 553 --------------------
+ arch/powerpc/kvm/e500.h                     |  40 --
+ arch/powerpc/kvm/e500_emulate.c             | 100 ----
+ arch/powerpc/kvm/e500_mmu_host.c            |  54 --
+ arch/powerpc/kvm/e500mc.c                   |   5 +-
+ arch/powerpc/kvm/emulate.c                  |   2 -
+ arch/powerpc/kvm/powerpc.c                  |   2 -
+ arch/powerpc/kvm/trace_booke.h              |  14 -
+ arch/riscv/kvm/Kconfig                      |   2 +-
+ arch/riscv/kvm/aia.c                        | 105 ----
+ arch/riscv/kvm/aia_imsic.c                  |  34 --
+ arch/riscv/kvm/mmu.c                        |   8 -
+ arch/riscv/kvm/vcpu_exit.c                  |   4 -
+ arch/riscv/kvm/vcpu_insn.c                  |  12 -
+ arch/riscv/kvm/vcpu_sbi_pmu.c               |   8 -
+ arch/riscv/kvm/vcpu_sbi_replace.c           |   4 -
+ arch/riscv/kvm/vcpu_sbi_v01.c               |   4 -
+ arch/riscv/kvm/vcpu_timer.c                 |  20 -
+ arch/x86/kvm/Kconfig                        |   6 +-
+ arch/x86/kvm/Makefile                       |   4 +-
+ arch/x86/kvm/cpuid.c                        |   2 +-
+ arch/x86/kvm/emulate.c                      |  34 +-
+ arch/x86/kvm/fpu.h                          |   4 -
+ arch/x86/kvm/hyperv.c                       |   5 +-
+ arch/x86/kvm/i8254.c                        |   4 -
+ arch/x86/kvm/kvm_cache_regs.h               |   2 -
+ arch/x86/kvm/kvm_emulate.h                  |   8 -
+ arch/x86/kvm/lapic.c                        |   4 -
+ arch/x86/kvm/mmu.h                          |   4 -
+ arch/x86/kvm/mmu/mmu.c                      | 134 -----
+ arch/x86/kvm/mmu/mmu_internal.h             |   9 -
+ arch/x86/kvm/mmu/paging_tmpl.h              |   9 -
+ arch/x86/kvm/mmu/spte.h                     |   5 -
+ arch/x86/kvm/mmu/tdp_mmu.h                  |   4 -
+ arch/x86/kvm/smm.c                          |  19 -
+ arch/x86/kvm/svm/sev.c                      |   2 -
+ arch/x86/kvm/svm/svm.c                      |  23 +-
+ arch/x86/kvm/svm/vmenter.S                  |  20 -
+ arch/x86/kvm/trace.h                        |   4 -
+ arch/x86/kvm/vmx/main.c                     |   2 -
+ arch/x86/kvm/vmx/nested.c                   |  24 +-
+ arch/x86/kvm/vmx/vmcs.h                     |   2 -
+ arch/x86/kvm/vmx/vmenter.S                  |  25 +-
+ arch/x86/kvm/vmx/vmx.c                      | 117 +----
+ arch/x86/kvm/vmx/vmx.h                      |  23 +-
+ arch/x86/kvm/vmx/vmx_ops.h                  |   7 -
+ arch/x86/kvm/vmx/x86_ops.h                  |   2 -
+ arch/x86/kvm/x86.c                          |  74 +--
+ arch/x86/kvm/x86.h                          |   4 -
+ arch/x86/kvm/xen.c                          |  61 +--
+ 85 files changed, 66 insertions(+), 3536 deletions(-)
+ delete mode 100644 arch/powerpc/include/asm/kvm_book3s_32.h
+ delete mode 100644 arch/powerpc/kvm/book3s_32_mmu_host.c
+ delete mode 100644 arch/powerpc/kvm/booke_interrupts.S
+ delete mode 100644 arch/powerpc/kvm/e500.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.5
+
 
