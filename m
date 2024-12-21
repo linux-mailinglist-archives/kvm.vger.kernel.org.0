@@ -1,280 +1,129 @@
-Return-Path: <kvm+bounces-34267-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34268-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B42409F9D9E
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 02:08:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 352479F9DA5
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 02:17:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CE407A3FC2
-	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 01:07:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 421E11896DA8
+	for <lists+kvm@lfdr.de>; Sat, 21 Dec 2024 01:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516561BF37;
-	Sat, 21 Dec 2024 01:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 316D01F95A;
+	Sat, 21 Dec 2024 01:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SwRBBwSe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hIC+L3H2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0B525949D;
-	Sat, 21 Dec 2024 01:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063DF3C39
+	for <kvm@vger.kernel.org>; Sat, 21 Dec 2024 01:16:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734743262; cv=none; b=doYfLR0qeXSyqYUpx0U2TJsrPaqxPOrnFR/YeWUpwMOrD5VhGQzvtXbMKqVl3WfRoQ0EOKiWwb7RgQqoaI6+LDIzlV9QWQ42fs603g/VbAQ718Wd7nRKRswAz6UgiuBl5QADKVs1sE+NuUU7YHO75ESMiJjnK3yvVqIHMObhf/I=
+	t=1734743811; cv=none; b=pYcuBJpUXQmNHTUmxHkoZFTKD/GE4loGNqXrXg1xSuOIukwvtxRbFdBqUNHvnYE7J0Gb3B+Fprt+BwyCfzTw9Per7rzI7i1APFzvmnH8btrUz3o7k4LkgxQEVE5RuADCIrWuGw/RfH5vYnMK8hD8oadKjoWLk4bTfbAMFyR31k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734743262; c=relaxed/simple;
-	bh=OoAFMs8/w0JtEYYsXPcdE1fQ86+tcPR53L7qovIijFk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GGjoKKOESr9naSKvUfBnJkP8UyYtOih6f5TGelOvDeqj7UbfD9UtbUGFKfFt3L3lZTRaDycl6lyhoQeGadKMRNy79/Pvb4PCzDayLcX1bu05WL46EbIv1fI6UPP+inuXwVpKUKIWH4dE6zwGQdxT/won1V8Fw7WV1CThKTxHH9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SwRBBwSe; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734743260; x=1766279260;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=OoAFMs8/w0JtEYYsXPcdE1fQ86+tcPR53L7qovIijFk=;
-  b=SwRBBwSe3SURg/rNVmqC8kGwIF95PkDf+DJKgReASDV4j5LxT7kGRVDf
-   Yc4zFSm5ysHgWJFalARhpU11sv6+nphpEVAjkwLyguCdpFWx3zj96br5w
-   +M6VUy9pPU5tRx+ggpbjDDHwijbqeDAkrmESk+io+YgINyy4cp7+KhCWk
-   j6okVBJJNFPnbF+JMzwKQ0NjjqGPeXb3pr/6PKztCqfVhMAQ47ruTSihv
-   s6i589A9xBjGB0MVxdahGpCdBrfDjseS55RLQeqxgCllow549mCHV5jEa
-   JVVR3xFfegY1K2cE61klamAWyr5mfKaiOQd/9xAT6XE00WDUGhWAhBKvY
-   Q==;
-X-CSE-ConnectionGUID: tNNkUyklQlu7ZympQPxSQw==
-X-CSE-MsgGUID: aUqR4jLoSZiylxz3gtvkjA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="45793812"
-X-IronPort-AV: E=Sophos;i="6.12,252,1728975600"; 
-   d="scan'208";a="45793812"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 17:07:39 -0800
-X-CSE-ConnectionGUID: +AsPGPpyRPSX9Xs7YMJZrA==
-X-CSE-MsgGUID: s/TjREc5SFmaxihH6MuLdA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,252,1728975600"; 
-   d="scan'208";a="98863972"
-Received: from server.sh.intel.com ([10.239.53.23])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 17:07:35 -0800
-From: Kai Huang <kai.huang@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com
-Cc: rick.p.edgecombe@intel.com,
-	dave.hansen@intel.com,
-	yan.y.zhao@intel.com,
-	isaku.yamahata@intel.com,
-	kai.huang@intel.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	tony.lindgren@intel.com,
-	xiaoyao.li@intel.com,
-	reinette.chatre@intel.com
-Subject: [PATCH v2.1 03/25] x86/virt/tdx: Read essential global metadata for KVM
-Date: Sat, 21 Dec 2024 01:07:04 +0000
-Message-ID: <20241221010704.14155-1-kai.huang@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241030190039.77971-4-rick.p.edgecombe@intel.com>
-References: <20241030190039.77971-4-rick.p.edgecombe@intel.com>
+	s=arc-20240116; t=1734743811; c=relaxed/simple;
+	bh=2bJtEy9hohxLi3PqZ3yFRHo894cUkhEtBPA/D3mpois=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nrusftB3MbluZCn2ztmtx0w+gv0f2aNVDMe5I/W7AqgCLNj6nH7HyQUzNWuq4KySEnF3yJ6PjX0seisPQxU1xaoh46RO4SUzpucjLvCSYS9EUmw5skF6Tx7i/6AYWhhUYe5HpQryyV8KZdk3MRpYGp8xsQMSN7RJ4854OGVym/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hIC+L3H2; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef114d8346so2229011a91.0
+        for <kvm@vger.kernel.org>; Fri, 20 Dec 2024 17:16:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734743809; x=1735348609; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lk7/OTWzihL1uFGb1WDeYLCs6NEHxHWnZ5NsQOmorGM=;
+        b=hIC+L3H2OZDm3KBJPgXFtLDbwaN09OzUFDdLajdu/YyEkTQ5Gyz7ByUxrAjZZ521qy
+         AWFHC84OSIyCGCOLJ75KbKZ243kuPXyQ7fV7F8aR3vK2Zlaq6XjP4E8yZDJLfUJWUVOp
+         GkRuxkY3R0X9P0IIiK1z9u6obEYlP31TegmjYXXndWqNZn17j7lMJ/6s9tIiTdAR7ixK
+         hJXvhMbCimns2HIeBYDTt8R1vu365puYQr70lO5KB8xx0wApvvvwR9Grouxeauw/i2i8
+         yeYvadbphXsk9lDWdxrldRb3uKIX+oURn8mUeTqNtBW0buFZMuTcls+rxPoN1Z5rDWD1
+         yfgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734743809; x=1735348609;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lk7/OTWzihL1uFGb1WDeYLCs6NEHxHWnZ5NsQOmorGM=;
+        b=q5DYmddrKhtHC0LUyJuHjoaPim9tfub2Ne/L+kzkDBpukhHRegTVISiTjfYgs1gMU8
+         Lht3Sa4XNNoAY2omBxitmxDlkRsOJlTIzqZyNrhAUF9Qkdwz6d36tSy1Djvp6WFAV/Rs
+         U/5xvfg35MxktjrKU/UPxCFL++iEman85DThGZFnvNM0xmrBR0yaDm+KWJl1sDd8oFIm
+         p6ftNQY68asqb31xdb7fKKu2Yb7M8u7UKraai1LBvUbjdJB7KpqZ41fykwMKfTr2q2hx
+         pn7ngNhod04ch+c9d5tVvgvBz7tkgi/QHctmjZGLso2CnqAGl1LTz5c25/FBSrY4uwVa
+         hiPA==
+X-Gm-Message-State: AOJu0YyAIWNgIYVkg2XBlvrpJnitAu/8uxDSKGTzEWYq8MPRSPzgayRo
+	i4HaQMWW8qx55WGOIyl9T1U1jmTuEpF2SmT+ZWPmX6oyWRhjSCuSNx5NF0KmhS5syJkA/UpulcF
+	TbQ==
+X-Google-Smtp-Source: AGHT+IGXsM9D8HV0wWWAKtxadm++2dpAi9K783VlKHo8N3Es2Tl+vRTOoZxOgw8Vs5BtN9ZT7YnqzZSARgE=
+X-Received: from pjbse14.prod.google.com ([2002:a17:90b:518e:b0:2e5:8726:a956])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e0f:b0:2ee:db8a:29d0
+ with SMTP id 98e67ed59e1d1-2f452ec378bmr6563353a91.26.1734743809080; Fri, 20
+ Dec 2024 17:16:49 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 20 Dec 2024 17:16:47 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20241221011647.3747448-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Avoid double RDPKRU when loading host/guest PKRU
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Adrian Hunter <adrian.hunter@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-KVM needs two classes of global metadata to create and run TDX guests:
+Use the raw wrpkru() helper when loading the guest/host's PKRU on switch
+to/from guest context, as the write_pkru() wrapper incurs an unnecessary
+rdpkru().  In both paths, KVM is guaranteed to have performed RDPKRU since
+the last possible write, i.e. KVM has a fresh cache of the current value
+in hardware.
 
- - "TD Control Structures"
- - "TD Configurability"
+This effectively restores KVM's behavior to that of KVM prior to commit
+c806e88734b9 ("x86/pkeys: Provide *pkru() helpers"), which renamed the raw
+helper from __write_pkru() => wrpkru(), and turned __write_pkru() into a
+wrapper.  Commit 577ff465f5a6 ("x86/fpu: Only write PKRU if it is different
+from current") then added the extra RDPKRU to avoid an unnecessary WRPKRU,
+but completely missed that KVM already optimized away pointless writes.
 
-The first class contains the sizes of TDX guest per-VM and per-vCPU
-control structures.  KVM will need to use them to allocate enough space
-for those control structures.
-
-The second class contains info which reports things like which features
-are configurable to TDX guests.  KVM will need to use them to properly
-configure TDX guests.
-
-Read them for KVM TDX to use.
-
-Basically, the code change is auto-generated by adding below to the
-script in [1]:
-
-    "td_ctrl": [
-        "TDR_BASE_SIZE",
-        "TDCS_BASE_SIZE",
-        "TDVPS_BASE_SIZE",
-    ],
-    "td_conf": [
-        "ATTRIBUTES_FIXED0",
-        "ATTRIBUTES_FIXED1",
-        "XFAM_FIXED0",
-        "XFAM_FIXED1",
-        "NUM_CPUID_CONFIG",
-        "MAX_VCPUS_PER_TD",
-        "CPUID_CONFIG_LEAVES",
-        "CPUID_CONFIG_VALUES",
-    ],
-
-.. and re-running the script:
-
-  #python tdx_global_metadata.py global_metadata.json \
-  	tdx_global_metadata.h tdx_global_metadata.c
-
-.. but unfortunately with some tweaks:
-
-The "Intel TDX Module v1.5.09 ABI Definitions" JSON files[2], which
-describe the TDX module ABI to the kernel, were expected to maintain
-backward compatibility.  However, it turns out there are plans to change
-the JSON per module release.  Specifically, the maximum number of
-CPUID_CONFIGs, i.e., CPUID_CONFIG_{LEAVES|VALUES} is one of the fields
-expected to change.
-
-This is obviously problematic for the kernel, and needs to be addressed
-by the TDX Module team.  Negotiations on clarifying ABI boundary in the
-spec for future models are ongoing.  In the meantime, the TDX module
-team has agreed to not increase this specific field beyond 128 entries
-without an opt in.
-
-So for now just tweak the JSON to change "Num Fields" from 32 to 128 and
-generate a fixed-size (128) array for CPUID_CONFIG_{LEAVES|VALUES}.
-
-Also, due to all those ABI breakages (and module bugs), be paranoid by
-generating additional checks to make sure NUM_CPUID_CONFIG will never
-exceed the array size of CPUID_CONFIG_{LEAVES|VALUES} to protect the
-kernel from the module breakages.  With those checks, detecting a
-breakage will just result in module initialization failure.
-
-Link: https://lore.kernel.org/762a50133300710771337398284567b299a86f67.camel@intel.com/ [1]
-Link: https://cdrdv2.intel.com/v1/dl/getContent/795381 [2]
-Signed-off-by: Kai Huang <kai.huang@intel.com>
+Reported-by: Adrian Hunter <adrian.hunter@intel.com>
+Fixes: 577ff465f5a6 ("x86/fpu: Only write PKRU if it is different from current")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-v2 -> v2.1
- - Bump array size for CPUID_CONFIGs to 128
- - Add paranoid checks to protect against incorrect NUM_CPUID_CONFIG.
- - Update changelog accordingly.
-
- Note: this is based on kvm-coco-queue which has v7 of TDX host metadata
- series which has patches to read TDX module version and CMRs.  It will
- have conflicts to resolve when rebasing to the v9 patches currently
- queued in tip/x86/tdx.
-
-uAPI breakout v2:
- - New patch
-
----
- arch/x86/include/asm/tdx_global_metadata.h  | 19 ++++++++
- arch/x86/virt/vmx/tdx/tdx_global_metadata.c | 50 +++++++++++++++++++++
- 2 files changed, 69 insertions(+)
-
-diff --git a/arch/x86/include/asm/tdx_global_metadata.h b/arch/x86/include/asm/tdx_global_metadata.h
-index fde370b855f1..cfef9e5e4d93 100644
---- a/arch/x86/include/asm/tdx_global_metadata.h
-+++ b/arch/x86/include/asm/tdx_global_metadata.h
-@@ -32,11 +32,30 @@ struct tdx_sys_info_cmr {
- 	u64 cmr_size[32];
- };
- 
-+struct tdx_sys_info_td_ctrl {
-+	u16 tdr_base_size;
-+	u16 tdcs_base_size;
-+	u16 tdvps_base_size;
-+};
-+
-+struct tdx_sys_info_td_conf {
-+	u64 attributes_fixed0;
-+	u64 attributes_fixed1;
-+	u64 xfam_fixed0;
-+	u64 xfam_fixed1;
-+	u16 num_cpuid_config;
-+	u16 max_vcpus_per_td;
-+	u64 cpuid_config_leaves[128];
-+	u64 cpuid_config_values[128][2];
-+};
-+
- struct tdx_sys_info {
- 	struct tdx_sys_info_version version;
- 	struct tdx_sys_info_features features;
- 	struct tdx_sys_info_tdmr tdmr;
- 	struct tdx_sys_info_cmr cmr;
-+	struct tdx_sys_info_td_ctrl td_ctrl;
-+	struct tdx_sys_info_td_conf td_conf;
- };
- 
- #endif
-diff --git a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-index 2fe57e084453..d96dbfb43574 100644
---- a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-+++ b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-@@ -76,6 +76,54 @@ static int get_tdx_sys_info_cmr(struct tdx_sys_info_cmr *sysinfo_cmr)
- 	return ret;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4320647bd78a..9d5cece9260b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1186,7 +1186,7 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
+ 	    vcpu->arch.pkru != vcpu->arch.host_pkru &&
+ 	    ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
+ 	     kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE)))
+-		write_pkru(vcpu->arch.pkru);
++		wrpkru(vcpu->arch.pkru);
  }
+ EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
  
-+static int get_tdx_sys_info_td_ctrl(struct tdx_sys_info_td_ctrl *sysinfo_td_ctrl)
-+{
-+	int ret = 0;
-+	u64 val;
-+
-+	if (!ret && !(ret = read_sys_metadata_field(0x9800000100000000, &val)))
-+		sysinfo_td_ctrl->tdr_base_size = val;
-+	if (!ret && !(ret = read_sys_metadata_field(0x9800000100000100, &val)))
-+		sysinfo_td_ctrl->tdcs_base_size = val;
-+	if (!ret && !(ret = read_sys_metadata_field(0x9800000100000200, &val)))
-+		sysinfo_td_ctrl->tdvps_base_size = val;
-+
-+	return ret;
-+}
-+
-+static int get_tdx_sys_info_td_conf(struct tdx_sys_info_td_conf *sysinfo_td_conf)
-+{
-+	int ret = 0;
-+	u64 val;
-+	int i, j;
-+
-+	if (!ret && !(ret = read_sys_metadata_field(0x1900000300000000, &val)))
-+		sysinfo_td_conf->attributes_fixed0 = val;
-+	if (!ret && !(ret = read_sys_metadata_field(0x1900000300000001, &val)))
-+		sysinfo_td_conf->attributes_fixed1 = val;
-+	if (!ret && !(ret = read_sys_metadata_field(0x1900000300000002, &val)))
-+		sysinfo_td_conf->xfam_fixed0 = val;
-+	if (!ret && !(ret = read_sys_metadata_field(0x1900000300000003, &val)))
-+		sysinfo_td_conf->xfam_fixed1 = val;
-+	if (!ret && !(ret = read_sys_metadata_field(0x9900000100000004, &val)))
-+		sysinfo_td_conf->num_cpuid_config = val;
-+	if (!ret && !(ret = read_sys_metadata_field(0x9900000100000008, &val)))
-+		sysinfo_td_conf->max_vcpus_per_td = val;
-+	if (sysinfo_td_conf->num_cpuid_config > ARRAY_SIZE(sysinfo_td_conf->cpuid_config_leaves))
-+		return -EINVAL;
-+	for (i = 0; i < sysinfo_td_conf->num_cpuid_config; i++)
-+		if (!ret && !(ret = read_sys_metadata_field(0x9900000300000400 + i, &val)))
-+			sysinfo_td_conf->cpuid_config_leaves[i] = val;
-+	if (sysinfo_td_conf->num_cpuid_config > ARRAY_SIZE(sysinfo_td_conf->cpuid_config_values))
-+		return -EINVAL;
-+	for (i = 0; i < sysinfo_td_conf->num_cpuid_config; i++)
-+		for (j = 0; j < 2; j++)
-+			if (!ret && !(ret = read_sys_metadata_field(0x9900000300000500 + i * 2 + j, &val)))
-+				sysinfo_td_conf->cpuid_config_values[i][j] = val;
-+
-+	return ret;
-+}
-+
- static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
- {
- 	int ret = 0;
-@@ -84,6 +132,8 @@ static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
- 	ret = ret ?: get_tdx_sys_info_features(&sysinfo->features);
- 	ret = ret ?: get_tdx_sys_info_tdmr(&sysinfo->tdmr);
- 	ret = ret ?: get_tdx_sys_info_cmr(&sysinfo->cmr);
-+	ret = ret ?: get_tdx_sys_info_td_ctrl(&sysinfo->td_ctrl);
-+	ret = ret ?: get_tdx_sys_info_td_conf(&sysinfo->td_conf);
+@@ -1200,7 +1200,7 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
+ 	     kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE))) {
+ 		vcpu->arch.pkru = rdpkru();
+ 		if (vcpu->arch.pkru != vcpu->arch.host_pkru)
+-			write_pkru(vcpu->arch.host_pkru);
++			wrpkru(vcpu->arch.host_pkru);
+ 	}
  
- 	return ret;
- }
+ 	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
+
+base-commit: 13e98294d7cec978e31138d16824f50556a62d17
 -- 
-2.43.0
+2.47.1.613.gc27f4b7a9f-goog
 
 
