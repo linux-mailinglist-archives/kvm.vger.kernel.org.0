@@ -1,127 +1,139 @@
-Return-Path: <kvm+bounces-34324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34323-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3A09FA8A9
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 00:26:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D9379FA8A0
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 00:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CB6F1885F49
-	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2024 23:26:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 340AE7A1F36
+	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2024 23:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67E21957F4;
-	Sun, 22 Dec 2024 23:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3DB193067;
+	Sun, 22 Dec 2024 23:10:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from gate.crashing.org (gate.crashing.org [63.228.1.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56F07DA8C;
-	Sun, 22 Dec 2024 23:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.228.1.57
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B1618F2CF
+	for <kvm@vger.kernel.org>; Sun, 22 Dec 2024 23:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734909952; cv=none; b=YYhYsKnwH6WDcT495mzWWY2fiE2pMaD0UQkQ9YjKil7rXgqld0nTQ1/HPSDGUKNnEM+O0LyLhS/7RX1A7hJZ3Jl/Jun4xHXCbN2Am89C2aAlBaUY+iKiM9vLEx2jynnVMjolOw3KuoK/YxX1A4jZcnGAxSMGKE2ohhlc5M+IAbs=
+	t=1734909028; cv=none; b=d1uIkHJ9eDXK7OtFh7rLu3AO+HMDT39O7ot9Mviy6jxI54dUEndtnNhPK+VoPi0E2hcXMwXoUJEnXgr7vwRcd6SOtmgued4HXvoyqjKKX6kBo7FYUiK+Ab0BKZDNxj2dQcw1rB4DO7Rt5YAvQxiH0nKQyokYICqbkMCGdGAh/vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734909952; c=relaxed/simple;
-	bh=cYJm52fOi7VdT2pC9KcmwbCAbS1huo+9NeEG1VVSayM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Mime-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EjyF9zC0DsLtt9/hN5f8OS22ST2tdCcopsuCt/BBGh3Eb26Ue8As3nqwTMIZqKwIkcD60J6IUaLiee7/ILOnJtKeb9xFEorXsb7hlWxCZhW46CMavL2QHm5ut5uieuBn9WD7QGjxfM8xzjvbaCqqPk8ht5CJsdBqOiM908qH53I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org; spf=pass smtp.mailfrom=kernel.crashing.org; arc=none smtp.client-ip=63.228.1.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.crashing.org
-Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
-	by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 4BMMNW3F022029;
-	Sun, 22 Dec 2024 16:23:32 -0600
-Received: (from segher@localhost)
-	by gate.crashing.org (8.14.1/8.14.1/Submit) id 4BMMNR4S022013;
-	Sun, 22 Dec 2024 16:23:27 -0600
-X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
-Date: Sun, 22 Dec 2024 16:23:26 -0600
-From: Segher Boessenkool <segher@kernel.crashing.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: "A. Wilcox" <AWilcox@wilcox-tech.com>, Arnd Bergmann <arnd@kernel.org>,
-        kvm@vger.kernel.org, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Alexander Graf <graf@amazon.com>, Crystal Wood <crwood@redhat.com>,
-        Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
-        Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 4/5] powerpc: kvm: drop 32-bit book3s
-Message-ID: <20241222222325.GD20626@gate.crashing.org>
-References: <20241221214223.3046298-1-arnd@kernel.org> <20241221214223.3046298-5-arnd@kernel.org> <9B9E07F0-3373-4F59-BE4C-E6C425B3C36D@Wilcox-Tech.com> <6253307c-d3d6-485f-9d01-12787b457a99@app.fastmail.com>
+	s=arc-20240116; t=1734909028; c=relaxed/simple;
+	bh=RVm7jNBUUrHNTFNgINUmEkqp1qzYNHhAXPW+cKo6nLU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=mwaqlzomriKR11e3QHh5rsaf/oJAiKflBLLUKC6KZyDUb08y0ZQrq1xm6R0kp/wjQtYVc4BGAFuMhe4eLIO7nn3zNU6Iz10Sv7lysk0Ryeb5u4AyFolM23Vyes5X7vEPVlVTNBY/kCL7f/3r3AHuVjdjSkHy+N5bhuvcE2AB4q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a819a4e83dso37619445ab.1
+        for <kvm@vger.kernel.org>; Sun, 22 Dec 2024 15:10:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734909026; x=1735513826;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=71tl5pK598wl7Ium1IiibAaoLnjGY1ZCnhcKpC8zXtU=;
+        b=VBrIxcHQkcXeLiYC8782kurkcwIEC30Z3VkxIKW/p14xiOdzkwreoL3GLz7ZCwGuKH
+         X5fDer9iP3niSMQL705ZfiuORHI0r2OUPx8Z99WtlMS8hFjgL+aVuO+dLx1NwuUMpj9K
+         49evpcFxv2hjDDCBoKIeAG8WKMPgp+k990pdgZb1kmEnQn4kAZFWEZSDu34uRd8+1zxA
+         kroaJTnCI41LbhV51G8gPltE1cFy2eguO1f1qFrjT7ReLxwtgqfAoYXuR+QhHELFOrsD
+         o00rHFZcIXVDxv8LOdHZOti0eIusIGcGv3gwjWXpoVuUhy+RMTrAEfC/3ljoFOg1LpjY
+         MX6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWf95/wd+6Tp5Ie9qNd5cndeZrsNcgvFlBEotw9FtXzRHO+R6inV3hSnwDC7OVq5pfEpx8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWURk2EQIDh4gA3KvhwKp+Tq53gz1SvQmLGAHeNjVuhiSMqZ+l
+	vryBaOxgUJRQRgFzL28oRzRFaWc8tWig6VwmEP/B4ha+t/9QM/0CgGrnILhH1szT6UiWq0qc7rB
+	ZSntj+WMmuVjCpLfFQbOBv3PA0MxjE945LPAH+tRSqryQY8A2wVnxCKs=
+X-Google-Smtp-Source: AGHT+IERGq8zgv2rLFTEUytthEd2WLJ8gT9yzeFGaVtm2/jiGfdeP6y4I2po56TjkU90idpzX/FhCE1EcA2eDX/3kP8pQouSoWBA
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6253307c-d3d6-485f-9d01-12787b457a99@app.fastmail.com>
-User-Agent: Mutt/1.4.2.3i
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:2384:b0:3a7:fe8c:b014 with SMTP id
+ e9e14a558f8ab-3c2d5917533mr98929775ab.21.1734909026190; Sun, 22 Dec 2024
+ 15:10:26 -0800 (PST)
+Date: Sun, 22 Dec 2024 15:10:26 -0800
+In-Reply-To: <67598fb9.050a0220.17f54a.003b.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67689c62.050a0220.2f3838.000d.GAE@google.com>
+Subject: Re: [syzbot] [kvm?] WARNING in vmx_handle_exit (2)
+From: syzbot <syzbot+ac0bc3a70282b4d586cc@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
+	pbonzini@redhat.com, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
+	tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Dec 22, 2024 at 10:09:14PM +0100, Arnd Bergmann wrote:
-> On Sun, Dec 22, 2024, at 03:13, A. Wilcox wrote:
-> > On Dec 21, 2024, at 3:42 PM, Arnd Bergmann <arnd@kernel.org> wrote:
-> >
-> >     R0 .. R7           R8 .. R15         R16 .. R23         R24 .. R31
-> > 00000000014a1124   0000000000000000   000000000135b4ac   0000000000000000   
-> > 000000000dc70f30   ffffffffc0000000   000000000dc70fa4   000000000173600c   
-> > 0000000000000000   000000000e477010   0000000000000000   0000000000400000   
-> > ffffffff0141be4c   000000000149ab74   00000000ffffffff   0000000000000008   
-> > 00000000c0014b6c   0000000020000402   0000000040400000   00000000016f2000   
-> > ffffffff40400000   0000000000000000   0000000000000000   000000000dc70f60   
-> > 0000000000000000   0000000000000000   000000000e73d490   000000000149f000   
-> > 0000000000000000   000000000e756118   000000000dc70fa0   ffffffff40400000   
-> >
-> >     CR / XER           LR / CTR          SRR0 / SRR1        DAR / DSISR
-> >         80000402   00000000014a1124   00000000014a1128   ffffffff0141be4c   
-> > 0000000020040000   0000000000000000   8000000000003000           00000000   
-> >
-> >
-> > 2 > 
-> >
-> > Which is the same thing that happens if you boot a 32-bit Linux kernel
-> > on a physical 64-bit Power machine.  This is probably because KVM is
-> > so much more accurate than TCG for Power emulation :)
-> 
-> Did you ask kvm to emulate a 32-bit platform though? Since the
-> register dump shows 64-bit registers, my guess is that this is the
-> result of trying to load a 32-bit kernel on "-machine pseries
-> -cpu native", which is not supported by the guest kernel. I would
-> expect that you need at least a 32-bit machine type (mac99,
-> pegasos2) and likely also a 32-bit CPU (7447a, e600).
+syzbot has found a reproducer for the following issue on:
 
-SLOF always shows 64-bit registers; SLOF only ever runs as 64-bit
-program.  The *client* program can be 32-bit of course, but the dump
-of SRR1 here shows SF=1 (the top bit there).  No idea what was running
-at the time, but something in the kernel I guess?
+HEAD commit:    bcde95ce32b6 Merge tag 'devicetree-fixes-for-6.13-1' of gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10635fe8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4f1586bab1323870
+dashboard link: https://syzkaller.appspot.com/bug?extid=ac0bc3a70282b4d586cc
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=129c58c4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=134e5f30580000
 
-(To show the last set client state, use
-  ciregs .regs
-the thing exceptions print is via
-  eregs .regs
-so you'll probably figure out the format ;-) )
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-bcde95ce.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d1b2e8d294e3/vmlinux-bcde95ce.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/593ff4631acc/bzImage-bcde95ce.xz
 
-If the client program is a 32-bit ELF file, SLOF starts the client
-program with SF=0.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ac0bc3a70282b4d586cc@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 6008 at arch/x86/kvm/vmx/vmx.c:6480 __vmx_handle_exit arch/x86/kvm/vmx/vmx.c:6480 [inline]
+WARNING: CPU: 1 PID: 6008 at arch/x86/kvm/vmx/vmx.c:6480 vmx_handle_exit+0x40f/0x1f70 arch/x86/kvm/vmx/vmx.c:6637
+Modules linked in:
+CPU: 1 UID: 0 PID: 6008 Comm: syz-executor324 Not tainted 6.13.0-rc3-syzkaller-00301-gbcde95ce32b6 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:__vmx_handle_exit arch/x86/kvm/vmx/vmx.c:6480 [inline]
+RIP: 0010:vmx_handle_exit+0x40f/0x1f70 arch/x86/kvm/vmx/vmx.c:6637
+Code: 07 38 d0 7f 08 84 c0 0f 85 b1 11 00 00 44 0f b6 a5 49 99 00 00 31 ff 44 89 e6 e8 4c 86 68 00 45 84 e4 75 52 e8 62 84 68 00 90 <0f> 0b 90 48 8d bd 4a 99 00 00 c6 85 49 99 00 00 01 48 b8 00 00 00
+RSP: 0018:ffffc90003d17a58 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff888031ba0000 RCX: ffffffff81319144
+RDX: ffff8880230ea440 RSI: ffffffff8131914e RDI: 0000000000000001
+RBP: ffffc9000428c000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000080000021 R14: ffff888031ba02d8 R15: dffffc0000000000
+FS:  00007f4811d6b6c0(0000) GS:ffff88806a700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f4811d4ad58 CR3: 0000000030878000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ vcpu_enter_guest arch/x86/kvm/x86.c:11081 [inline]
+ vcpu_run+0x3047/0x4f50 arch/x86/kvm/x86.c:11242
+ kvm_arch_vcpu_ioctl_run+0x44a/0x1740 arch/x86/kvm/x86.c:11560
+ kvm_vcpu_ioctl+0x6ce/0x1520 virt/kvm/kvm_main.c:4340
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl fs/ioctl.c:892 [inline]
+ __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4811dbb649
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 1c 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f4811d6b168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f4811e3d348 RCX: 00007f4811dbb649
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000007
+RBP: 00007f4811e3d340 R08: 00007f4811d6b6c0 R09: 0000000000000000
+R10: 00007f4811d6b6c0 R11: 0000000000000246 R12: 00007f4811e3d34c
+R13: 0000000000000000 R14: 00007ffea79b5e30 R15: 00007ffea79b5f18
+ </TASK>
 
 
-Segher
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
