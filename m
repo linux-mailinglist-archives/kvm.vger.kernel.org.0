@@ -1,198 +1,138 @@
-Return-Path: <kvm+bounces-34317-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34319-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACAAD9FA7D2
-	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2024 20:41:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9F559FA7D4
+	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2024 20:42:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7F971885DD6
-	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2024 19:41:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D1C81885F81
+	for <lists+kvm@lfdr.de>; Sun, 22 Dec 2024 19:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225FA1C5499;
-	Sun, 22 Dec 2024 19:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B787718FDDF;
+	Sun, 22 Dec 2024 19:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ByTZ2qUL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAkveR+R"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781A41BDA99
-	for <kvm@vger.kernel.org>; Sun, 22 Dec 2024 19:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B7D13BC0C
+	for <kvm@vger.kernel.org>; Sun, 22 Dec 2024 19:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734896118; cv=none; b=BVIaIak32+MpopgLD3cp4qCoH352Hjqkdw4XSYnLo9lLnhsnfyChvUa9bUVGMvb7mojhKJfGgvFlq6XkDco2jtSt0O24XfqIdrX9Pipj0vCMdwwncHizK/NXi+5uMbC5/2jUcmSQZuS9yPVD2Wb9ib/7iEhuoSoEleCPqQgHXT0=
+	t=1734896551; cv=none; b=bMJicG2OvYVx93JSLeNIQazFmN+/iT2czMXpqFV0X2Ka0TusoO6Jz5A4HTaOPPJCNNtwDu551kv0dabJgSacmCt6CY8mEc8vFUFV1N3I7nzTJRyNZmTh+IujBlwZx/o8Cu2qp20vJIMQ83AKY3gMhsV8Tu9U9nVf5oa2K3zIMZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734896118; c=relaxed/simple;
-	bh=rRlBc+7v2v8hifJF8qslsmfm/NzfUgzTU9k6TgE0X6k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qYWdkb8/NY8Oe6W0jLnK4M9ytkXDq7SmvW38nKxS2msji8rNGtPhoqjwTTV/2iP7H7YBw3w5eMOVMFzGMFegHOiVmJCbehm8OsYWGFQzjAh8MEsn0FxCfPvonJbRl0n62bvEiYSUHPqf1qBstMEkZ73xy6SlrecJcrz5P2sq4r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ByTZ2qUL; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1734896551; c=relaxed/simple;
+	bh=f8iDfuqIet14sZp5fvgAd8361Fbn4MrjK/pLF4niuf8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TDp+HfEx5UOF5BlennH5QQRfICNt5tYkp3HySjhxlodECejbE8YNqP0sYH0sRwo8meFg7+68ZBincO9S55uSpsev/3HzFI9ZQM0ppJjIIMj793zQi4xq3wUDzlfqXEwRdE2W2E2SHpjZi0c/m26BQdC+3rvfCLpoeA5f8kuW7LY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KAkveR+R; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734896115;
+	s=mimecast20190719; t=1734896549;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GVTghMLA7kk2pt4g/7ZP3OjTkF4JURRo7QC+8yQ+ZP8=;
-	b=ByTZ2qULj2ILnIJ6xvoFYhqo/izASTZsVjPvbhOMXs8TSsV9sU6GMuHVogvRMARspMiyGC
-	rF+z6m2flw52SFIg8Kj6gi2uxd2HTR/e0N/KrzNKKz8pprJJXJJ5FDFE0mLGFAw1WiCpsE
-	1w+pZnl9ZL6Wd7R++5wbVkyklrzNpCE=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=O6b8d9MbHorREKWi3sDuGyBKBfuJguQtC2X1SibitFk=;
+	b=KAkveR+RsjfOmDXwwnFJlTd4BHgrY0FUWaKnvjFoLsMcfkWV6ydIz37eJDmlJCtascYSv0
+	wRtjUfxZqUqC3iWBIG+SbnFPlowFI9cYrqzw/F1u5M82845Y9D7Ua1jSXEmesdQ3lIosL0
+	0x8nLzfe2/0HgMNbQsLAJ/NEAAfTIhY=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-bMstr-c8NQaIGEkOQXQSiw-1; Sun,
- 22 Dec 2024 14:35:12 -0500
-X-MC-Unique: bMstr-c8NQaIGEkOQXQSiw-1
-X-Mimecast-MFC-AGG-ID: bMstr-c8NQaIGEkOQXQSiw
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-455-GuiB1y41MiKFNpAHLXrrew-1; Sun,
+ 22 Dec 2024 14:42:28 -0500
+X-MC-Unique: GuiB1y41MiKFNpAHLXrrew-1
+X-Mimecast-MFC-AGG-ID: GuiB1y41MiKFNpAHLXrrew
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CF83C19560B8;
-	Sun, 22 Dec 2024 19:35:10 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A5821956086;
+	Sun, 22 Dec 2024 19:42:27 +0000 (UTC)
 Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BC6DA19560AA;
-	Sun, 22 Dec 2024 19:35:09 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6A5BE3000706;
+	Sun, 22 Dec 2024 19:42:26 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
+To: torvalds@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Cc: yan.y.zhao@intel.com,
-	isaku.yamahata@intel.com,
-	binbin.wu@linux.intel.com,
-	rick.p.edgecombe@intel.com,
-	Sean Christopherson <seanjc@google.com>
-Subject: [PATCH v6 18/18] KVM: x86/mmu: Prevent aliased memslot GFNs
-Date: Sun, 22 Dec 2024 14:34:45 -0500
-Message-ID: <20241222193445.349800-19-pbonzini@redhat.com>
-In-Reply-To: <20241222193445.349800-1-pbonzini@redhat.com>
-References: <20241222193445.349800-1-pbonzini@redhat.com>
+Subject: [GIT PULL] KVM fixes for Linux 6.13-rc4 (or rc5)
+Date: Sun, 22 Dec 2024 14:42:25 -0500
+Message-ID: <20241222194225.355168-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Linus,
 
-Add a few sanity checks to prevent memslot GFNs from ever having alias bits
-set.
+The following changes since commit 78d4f34e2115b517bcbfe7ec0d018bbbb6f9b0b8:
 
-Like other Coco technologies, TDX has the concept of private and shared
-memory. For TDX the private and shared mappings are managed on separate
-EPT roots. The private half is managed indirectly though calls into a
-protected runtime environment called the TDX module, where the shared half
-is managed within KVM in normal page tables.
+  Linux 6.13-rc3 (2024-12-15 15:58:23 -0800)
 
-For TDX, the shared half will be mapped in the higher alias, with a "shared
-bit" set in the GPA. However, KVM will still manage it with the same
-memslots as the private half. This means memslot looks ups and zapping
-operations will be provided with a GFN without the shared bit set.
+are available in the Git repository at:
 
-If these memslot GFNs ever had the bit that selects between the two aliases
-it could lead to unexpected behavior in the complicated code that directs
-faulting or zapping operations between the roots that map the two aliases.
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-As a safety measure, prevent memslots from being set at a GFN range that
-contains the alias bit.
+for you to fetch changes up to 8afa5b10af9d748b055a43949f819d9991d63938:
 
-Also, check in the kvm_faultin_pfn() for the fault path. This later check
-does less today, as the alias bits are specifically stripped from the GFN
-being checked, however future code could possibly call in to the fault
-handler in a way that skips this stripping. Since kvm_faultin_pfn() now
-has many references to vcpu->kvm, extract it to local variable.
+  Merge tag 'kvm-x86-fixes-6.13-rcN' of https://github.com/kvm-x86/linux into HEAD (2024-12-22 12:07:16 -0500)
 
-Link: https://lore.kernel.org/kvm/ZpbKqG_ZhCWxl-Fc@google.com/
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Message-ID: <20240718211230.1492011-19-rick.p.edgecombe@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu.h     |  5 +++++
- arch/x86/kvm/mmu/mmu.c | 10 +++++++---
- arch/x86/kvm/x86.c     |  3 +++
- 3 files changed, 15 insertions(+), 3 deletions(-)
+----------------------------------------------------------------
+KVM x86 fixes for 6.13:
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index d1775a38ffd3..878061d0063e 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -313,4 +313,9 @@ static inline bool kvm_is_addr_direct(struct kvm *kvm, gpa_t gpa)
- 
- 	return !gpa_direct_bits || (gpa & gpa_direct_bits);
- }
-+
-+static inline bool kvm_is_gfn_alias(struct kvm *kvm, gfn_t gfn)
-+{
-+	return gfn & kvm_gfn_direct_bits(kvm);
-+}
- #endif
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1fac5971604f..4489d192162e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4391,8 +4391,12 @@ static int kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
- 			       struct kvm_page_fault *fault, unsigned int access)
- {
- 	struct kvm_memory_slot *slot = fault->slot;
-+	struct kvm *kvm = vcpu->kvm;
- 	int ret;
- 
-+	if (KVM_BUG_ON(kvm_is_gfn_alias(kvm, fault->gfn), kvm))
-+		return -EFAULT;
-+
- 	/*
- 	 * Note that the mmu_invalidate_seq also serves to detect a concurrent
- 	 * change in attributes.  is_page_fault_stale() will detect an
-@@ -4406,7 +4410,7 @@ static int kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
- 	 * Now that we have a snapshot of mmu_invalidate_seq we can check for a
- 	 * private vs. shared mismatch.
- 	 */
--	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
-+	if (fault->is_private != kvm_mem_is_private(kvm, fault->gfn)) {
- 		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
- 		return -EFAULT;
- 	}
-@@ -4468,7 +4472,7 @@ static int kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
- 	 * *guaranteed* to need to retry, i.e. waiting until mmu_lock is held
- 	 * to detect retry guarantees the worst case latency for the vCPU.
- 	 */
--	if (mmu_invalidate_retry_gfn_unsafe(vcpu->kvm, fault->mmu_seq, fault->gfn))
-+	if (mmu_invalidate_retry_gfn_unsafe(kvm, fault->mmu_seq, fault->gfn))
- 		return RET_PF_RETRY;
- 
- 	ret = __kvm_mmu_faultin_pfn(vcpu, fault);
-@@ -4488,7 +4492,7 @@ static int kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
- 	 * overall cost of failing to detect the invalidation until after
- 	 * mmu_lock is acquired.
- 	 */
--	if (mmu_invalidate_retry_gfn_unsafe(vcpu->kvm, fault->mmu_seq, fault->gfn)) {
-+	if (mmu_invalidate_retry_gfn_unsafe(kvm, fault->mmu_seq, fault->gfn)) {
- 		kvm_mmu_finish_page_fault(vcpu, fault, RET_PF_RETRY);
- 		return RET_PF_RETRY;
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ad3fc35703a8..1dffea9c3b11 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13010,6 +13010,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		if ((new->base_gfn + new->npages - 1) > kvm_mmu_max_gfn())
- 			return -EINVAL;
- 
-+		if (kvm_is_gfn_alias(kvm, new->base_gfn + new->npages - 1))
-+			return -EINVAL;
-+
- 		return kvm_alloc_memslot_metadata(kvm, new);
- 	}
- 
--- 
-2.43.5
+- Disable AVIC on SNP-enabled systems that don't allow writes to the virtual
+  APIC page, as such hosts will hit unexpected RMP #PFs in the host when
+  running VMs of any flavor.
+
+- Fix a WARN in the hypercall completion path due to KVM trying to determine
+  if a guest with protected register state is in 64-bit mode (KVM's ABI is to
+  assume such guests only make hypercalls in 64-bit mode).
+
+- Allow the guest to write to supported bits in MSR_AMD64_DE_CFG to fix a
+  regression with Windows guests, and because KVM's read-only behavior appears
+  to be entirely made up.
+
+- Treat TDP MMU faults as spurious if the faulting access is allowed given the
+  existing SPTE.  This fixes a benign WARN (other than the WARN itself) due to
+  unexpectedly replacing a writable SPTE with a read-only SPTE.
+
+- Emit a warning when KVM is configured with ignore_msrs=1 and also to hide the
+  MSRs that the guest is looking for from the kernel logs.  ignore_msrs can
+  trick guests into assuming that certain processor features are present, and
+  this in turn leads to bogus bug reports.
+
+----------------------------------------------------------------
+Paolo Bonzini (2):
+      KVM: x86: let it be known that ignore_msrs is a bad idea
+      Merge tag 'kvm-x86-fixes-6.13-rcN' of https://github.com/kvm-x86/linux into HEAD
+
+Sean Christopherson (3):
+      KVM: x86: Play nice with protected guests in complete_hypercall_exit()
+      KVM: SVM: Allow guest writes to set MSR_AMD64_DE_CFG bits
+      KVM: x86/mmu: Treat TDP MMU faults as spurious if access is already allowed
+
+Suravee Suthikulpanit (1):
+      KVM: SVM: Disable AVIC on SNP-enabled system without HvInUseWrAllowed feature
+
+Wolfram Sang (1):
+      KVM: VMX: don't include '<linux/find.h>' directly
+
+ arch/x86/include/asm/cpufeatures.h |  1 +
+ arch/x86/kvm/mmu/mmu.c             | 12 ------------
+ arch/x86/kvm/mmu/spte.h            | 17 +++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.c         |  5 +++++
+ arch/x86/kvm/svm/avic.c            |  6 ++++++
+ arch/x86/kvm/svm/svm.c             |  9 ---------
+ arch/x86/kvm/vmx/posted_intr.h     |  2 +-
+ arch/x86/kvm/x86.c                 |  9 ++++++++-
+ 8 files changed, 38 insertions(+), 23 deletions(-)
 
 
