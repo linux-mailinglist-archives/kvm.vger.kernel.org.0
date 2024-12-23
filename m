@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-34331-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34332-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12399FAB3C
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 08:41:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50F389FAB3E
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 08:42:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A334C18852E6
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 07:41:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAD3916442B
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 07:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077B318FC79;
-	Mon, 23 Dec 2024 07:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A82518F2FC;
+	Mon, 23 Dec 2024 07:41:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h+86XFVz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L1eoDlOB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A3F38385;
-	Mon, 23 Dec 2024 07:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74221632F3;
+	Mon, 23 Dec 2024 07:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734939695; cv=none; b=P+Vk1wtXE3n04zESt/4M+BVrL0fMiCDDK/36jsIj+SB1XryypVldv7hlAEdlOxgHuUfXqwdnVm6ysD4HrLQQgiSzsdzo28nObjDDoHNC8Sb4Usb1ZdMLDHU+DjMrLLvrPOGLeCg9v5uUyQjCBuXO0aegK9KgY+DExW96SY8v0gA=
+	t=1734939708; cv=none; b=D7EpdQtp7woFVIdGYuCSZxoYOOrIAPUqcnylXjkSiD21CRvh3Si0++FQVglAvlIAPHCLEeVOu7df4AqGB/cSfjsFrNkTKfdJRwMCo5ZIkn+9OGgdlnuNDkT2rDVV3rMaoQmZlGXUbn2m7MCB584D/YJ0DmubVA4xEvPk8OPUb4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734939695; c=relaxed/simple;
-	bh=PNBLci5V+1wxwc33eqYhL6fyiXoZscx2etUNk8y3ihg=;
+	s=arc-20240116; t=1734939708; c=relaxed/simple;
+	bh=2M1ZKDHj1ahtpOdevTF1TPstBMgTAUOSLTlSFITzBis=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ujs9VjN6XNBVLiLCfa9DzZfeg0qeLHdao7SGRrTwCppQnPKFALp1NeBQE0dTpKv9IU3NrHPRrbdpOYj6c4srokiOwrh/xCyRCkap/fsAWk8jm3g9l821mW8SfJq7BQgEOlaCgaB/jJ7CT5BAHK35y/Ez4xkqbhbCro8OUEr8/tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h+86XFVz; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=uL7GqMQ/lmNO0yeK/J1ktPqUaYI1uShRgB4U5gfquMmcNIhD652GXldTEkwbLUOJSQ1kFnw1nnYnfJTJDG5cGPysgfbvh/xP5fgUWgqRIo/9d0gDKnR27KR8REgMiv2lkUFDWlzlHfsxWouD0CHLSzHFfV7/S16atqjMTyeCBRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L1eoDlOB; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734939693; x=1766475693;
+  t=1734939706; x=1766475706;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PNBLci5V+1wxwc33eqYhL6fyiXoZscx2etUNk8y3ihg=;
-  b=h+86XFVzpGDlwykdncyXZxM3rjL72xIwXWvP7Nbt6NhRxbajCY4wuN9c
-   VUZFRz55ewozsof8mDLUFzCkK3c3SADjcOfdo6ExnXER3o+X3cvUGJ4Vy
-   4YKJxt3wCjJvcfUBvIkDNomTmsp7+NC2AM/L5Efz9qu8x/o5rDE/6b3v4
-   POp5cMOdzzlRRtVlodsRgXbpM0IK9W6kyUgdRHtbEJM+yXPVZdjbpdX4w
-   cbAxWUVrqXuzAhUrZh0wvNlGUjY/gHZZSRYyIBOY1rN2kmJpQB6LHR3DV
-   zQRtMxzGxbFx/FuefqOOpfBhhtwJbIwAtMjeUUg7yCSSEnqYc4zw5lHwL
+  bh=2M1ZKDHj1ahtpOdevTF1TPstBMgTAUOSLTlSFITzBis=;
+  b=L1eoDlOB6fdzwwUxJOr72KnN2TtzgA33VPyGG3/7NactDntFICAWPeaF
+   SnJmGy01HU7/eTGRFvTFVlSTnoXYCelusT5xVUeVzvHdu7BC8VzuAztvQ
+   82JDCPTGzhjXtMk7Kumgd3x1xqwha/XsUARVSnsECxTsQ1l7p0bsU5HEu
+   1LpzQoOlpTQamSndQsm9GGNUMp3utrKVfMa3MD7zBRQlmdjSQTkazbJAN
+   82144NNmpvxsLN/yuDs0Z3zeiiO8WWwuT0Qu3eAHs1TCYdx+Llm2iUHQT
+   Y4g8GpR6qwSY/zksSG0jQfx74VH6EWArP/wq6izWGL6oYGRBvy2Su7f57
    Q==;
-X-CSE-ConnectionGUID: 6vYzoHHLTN6zFqWea53EzA==
-X-CSE-MsgGUID: soC6/l/RTn6oKiGhVKFSxg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11294"; a="22988319"
+X-CSE-ConnectionGUID: JGDYq9wiRxufGQUPBj2Aug==
+X-CSE-MsgGUID: vYkuotzATrOKY3IL0SmSwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11294"; a="22988340"
 X-IronPort-AV: E=Sophos;i="6.12,256,1728975600"; 
-   d="scan'208";a="22988319"
+   d="scan'208";a="22988340"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2024 23:41:33 -0800
-X-CSE-ConnectionGUID: uUdgQf3aRWqxLpJyxOP6WQ==
-X-CSE-MsgGUID: 0qaY/0mQQo2URxKgh1HpHg==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2024 23:41:46 -0800
+X-CSE-ConnectionGUID: yIjm+G7ITQOZRJTiwa/HVg==
+X-CSE-MsgGUID: 9CkJw2V3T5y1Vhai9uV5MA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="103743300"
+   d="scan'208";a="103743309"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2024 23:41:29 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2024 23:41:42 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -66,9 +66,9 @@ Cc: peterx@redhat.com,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v2 1/2] KVM: Do not reset dirty GFNs in a memslot not enabling dirty tracking
-Date: Mon, 23 Dec 2024 15:07:12 +0800
-Message-ID: <20241223070712.29626-1-yan.y.zhao@intel.com>
+Subject: [PATCH v2 2/2] KVM: selftests: TDX: Test dirty ring on a gmemfd slot
+Date: Mon, 23 Dec 2024 15:07:24 +0800
+Message-ID: <20241223070724.29642-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20241223070427.29583-1-yan.y.zhao@intel.com>
 References: <20241223070427.29583-1-yan.y.zhao@intel.com>
@@ -80,55 +80,269 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Do not allow resetting dirty GFNs belonging to a memslot that does not
-enable dirty tracking.
+Slots with the KVM_MEM_GUEST_MEMFD flag do not support dirty bit tracking.
+However, it is still possible for userspace to trigger the resetting of the
+dirty ring, asking KVM to reset SPTEs in the mirror root by clearing the
+accessed bit or write bit.
 
-vCPUs' dirty rings are shared between userspace and KVM. After KVM sets
-dirtied entries in the dirty rings, userspace is responsible for
-harvesting/resetting the dirtied entries and calling the ioctl
-KVM_RESET_DIRTY_RINGS to inform KVM to advance the reset_index in the
-dirty rings and invoke kvm_arch_mmu_enable_log_dirty_pt_masked() to clear
-the SPTEs' dirty bits or perform write protection of GFNs.
-
-Although KVM does not set dirty entries for GFNs in a memslot that does not
-enable dirty tracking, userspace can write arbitrary data into the dirty
-ring. This makes it possible for misbehaving userspace to specify that it
-has harvested a GFN belonging to such a memslot. When this happens, KVM
-will be asked to clear dirty bits or perform write protection for GFNs in a
-memslot that does not enable dirty tracking, which is not desired.
-
-For TDX, this unexpected resetting of dirty GFNs could cause inconsistency
-between the mirror SPTE and the external SPTE in hardware (e.g., the mirror
-SPTE has no write bit while it is writable in the external SPTE in
-hardware). When kvm_dirty_log_manual_protect_and_init_set() is true and
-when huge pages are enabled in TDX, this could even lead to
-kvm_mmu_slot_gfn_write_protect() being called and the external SPTE being
-removed.
+Test this to ensure that TDs are not negatively impacted.
 
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- virt/kvm/dirty_ring.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/tdx_dirty_ring.c     | 231 ++++++++++++++++++
+ 2 files changed, 232 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_dirty_ring.c
 
-diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-index d14ffc7513ee..d52093b5ec73 100644
---- a/virt/kvm/dirty_ring.c
-+++ b/virt/kvm/dirty_ring.c
-@@ -66,7 +66,13 @@ static void kvm_reset_dirty_gfn(struct kvm *kvm, u32 slot, u64 offset, u64 mask)
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 46fd2194add3..46ee465a0443 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -157,6 +157,7 @@ TEST_GEN_PROGS_x86_64 += pre_fault_memory_test
+ TEST_GEN_PROGS_x86_64 += x86_64/tdx_vm_tests
+ TEST_GEN_PROGS_x86_64 += x86_64/tdx_shared_mem_test
+ TEST_GEN_PROGS_x86_64 += x86_64/tdx_upm_test
++TEST_GEN_PROGS_x86_64 += x86_64/tdx_dirty_ring
  
- 	memslot = id_to_memslot(__kvm_memslots(kvm, as_id), id);
- 
--	if (!memslot || (offset + __fls(mask)) >= memslot->npages)
+ # Compiled outputs used by test targets
+ TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
+diff --git a/tools/testing/selftests/kvm/x86_64/tdx_dirty_ring.c b/tools/testing/selftests/kvm/x86_64/tdx_dirty_ring.c
+new file mode 100644
+index 000000000000..ffeb0a2a70aa
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/tdx_dirty_ring.c
+@@ -0,0 +1,231 @@
++// SPDX-License-Identifier: GPL-2.0-only
++
++#include <signal.h>
++
++#include <asm/barrier.h>
++
++#include "kvm_util.h"
++#include "processor.h"
++#include "tdx/tdcall.h"
++#include "tdx/tdx.h"
++#include "tdx/tdx_util.h"
++#include "tdx/test_util.h"
++#include "test_util.h"
++
++#define TDX_TEST_DIRTY_RING_GPA (0xc0400000)
++#define TDX_TEST_DIRTY_RING_GVA (0x90400000)
++#define TDX_TEST_DIRTY_RING_REGION_SLOT 11
++#define TDX_TEST_DIRTY_RING_REGION_SIZE 0x200000
++
++#define TDX_TEST_DIRTY_RING_REPORT_PORT 0x50
++#define TDX_TEST_DIRTY_RING_REPORT_SIZE 4
++#define TDX_TEST_DIRTY_RING_COUNT 256
++#define TDX_TEST_DIRTY_RING_GUEST_WRITE_MAX_CNT 3
++
++static int reset_index;
++
++/*
++ * Write to a private GPA in a guest_memfd slot.
++ * Exit to host after each write to allow host to check dirty ring.
++ */
++void guest_code_dirty_gpa(void)
++{
++	uint64_t count = 0;
++
++	while (count <= TDX_TEST_DIRTY_RING_GUEST_WRITE_MAX_CNT) {
++		count++;
++		memset((void *)TDX_TEST_DIRTY_RING_GVA, 1, 8);
++		tdg_vp_vmcall_instruction_io(TDX_TEST_DIRTY_RING_REPORT_PORT,
++					     TDX_TEST_DIRTY_RING_REPORT_SIZE,
++					     TDG_VP_VMCALL_INSTRUCTION_IO_WRITE,
++					     &count);
++	}
++	tdx_test_success();
++}
++
++/*
++ * Verify that KVM_MEM_LOG_DIRTY_PAGES cannot be set on a memslot with flag
++ * KVM_MEM_GUEST_MEMFD.
++ */
++static void verify_turn_on_log_dirty_pages_flag(struct kvm_vcpu *vcpu)
++{
++	struct userspace_mem_region *region;
++	int ret;
++
++	region = memslot2region(vcpu->vm, TDX_TEST_DIRTY_RING_REGION_SLOT);
++	region->region.flags |= KVM_MEM_LOG_DIRTY_PAGES;
++
++	ret = __vm_ioctl(vcpu->vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
++
++	TEST_ASSERT(ret, "KVM_SET_USER_MEMORY_REGION2 incorrectly succeeds\n"
++		    "ret: %i errno: %i slot: %u new_flags: 0x%x",
++		    ret, errno, region->region.slot, region->region.flags);
++	region->region.flags &= ~KVM_MEM_LOG_DIRTY_PAGES;
++}
++
++static inline bool dirty_gfn_is_dirtied(struct kvm_dirty_gfn *gfn)
++{
++	return smp_load_acquire(&gfn->flags) == KVM_DIRTY_GFN_F_DIRTY;
++}
++
++static inline void dirty_gfn_set_collected(struct kvm_dirty_gfn *gfn)
++{
++	smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_RESET);
++}
++
++static bool dirty_ring_empty(struct kvm_vcpu *vcpu)
++{
++	struct kvm_dirty_gfn *dirty_gfns = vcpu_map_dirty_ring(vcpu);
++	struct kvm_dirty_gfn *cur;
++	int i;
++
++	for (i = 0; i < TDX_TEST_DIRTY_RING_COUNT; i++) {
++		cur = &dirty_gfns[i];
++
++		if (dirty_gfn_is_dirtied(cur))
++			return false;
++	}
++	return true;
++}
++
++/*
++ * Purposely reset the dirty ring incorrectly by resetting a dirty ring entry
++ * even when KVM does not report the entry as dirty.
++ *
++ * In the entry, a slot with flag KVM_MEM_GUEST_MEMFD (which does not allow
++ * dirty page tracking) is specified.
++ *
++ * This is to verify that userspace cannot do anything wrong to cause entries
++ * in private EPT get zapped (caused by incorrect write permission reduction).
++ */
++static void reset_dirty_ring(struct kvm_vcpu *vcpu)
++{
++	struct kvm_dirty_gfn *dirty_gfns = vcpu_map_dirty_ring(vcpu);
++	struct kvm_dirty_gfn *cur = &dirty_gfns[reset_index];
++	uint32_t cleared;
++
++	cur->slot = TDX_TEST_DIRTY_RING_REGION_SLOT;
++	cur->offset = 0;
++	dirty_gfn_set_collected(cur);
++	cleared = kvm_vm_reset_dirty_ring(vcpu->vm);
++	reset_index += cleared;
++
++	TEST_ASSERT(cleared == 1, "Unexpected cleared count %d\n", cleared);
++}
++
++/*
++ * The vCPU worker to loop vcpu_run(). After each vCPU access to a GFN, check if
++ * the dirty ring is empty and reset the dirty ring.
++ */
++static void reset_dirty_ring_worker(struct kvm_vcpu *vcpu)
++{
++	while (1) {
++		vcpu_run(vcpu);
++
++		if (vcpu->run->exit_reason == KVM_EXIT_IO &&
++		    vcpu->run->io.port == TDX_TEST_SUCCESS_PORT &&
++		    vcpu->run->io.size == TDX_TEST_SUCCESS_SIZE &&
++		    vcpu->run->io.direction == TDG_VP_VMCALL_INSTRUCTION_IO_WRITE)
++			break;
++
++		if (vcpu->run->exit_reason == KVM_EXIT_IO &&
++		    vcpu->run->io.port == TDX_TEST_DIRTY_RING_REPORT_PORT &&
++		    vcpu->run->io.size == TDX_TEST_DIRTY_RING_REPORT_SIZE &&
++		    vcpu->run->io.direction == TDG_VP_VMCALL_INSTRUCTION_IO_WRITE) {
++			TEST_ASSERT(dirty_ring_empty(vcpu),
++				    "Guest write on a gmemfd slot should not cause GFN dirty\n");
++			reset_dirty_ring(vcpu);
++		}
++	}
++	TDX_TEST_ASSERT_SUCCESS(vcpu);
++}
++
++void reset_dirty_ring_on_gmemfd_slot(bool manual_protect_and_init_set)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	vm = td_create();
++	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
++
++	vm_enable_dirty_ring(vm, TDX_TEST_DIRTY_RING_COUNT * sizeof(struct kvm_dirty_gfn));
++
 +	/*
-+	 * Userspace can write arbitrary data into the dirty ring, making it
-+	 * possible for misbehaving userspace to try to reset an out-of-memslot
-+	 * GFN or a GFN in a memslot that isn't being dirty-logged.
++	 * Let KVM detect that kvm_dirty_log_manual_protect_and_init_set() is
++	 * true in kvm_arch_mmu_enable_log_dirty_pt_masked() to check if
++	 * kvm_mmu_slot_gfn_write_protect() will be called on a memslot that
++	 * does not have dirty track enabled.
 +	 */
-+	if (!memslot || (offset + __fls(mask)) >= memslot->npages ||
-+	    !kvm_slot_dirty_track_enabled(memslot))
- 		return;
- 
- 	KVM_MMU_LOCK(kvm);
++	if (manual_protect_and_init_set) {
++		u64 manual_caps;
++
++		manual_caps = kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
++
++		manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
++				KVM_DIRTY_LOG_INITIALLY_SET);
++
++		if (!manual_caps)
++			return;
++
++		vm_enable_cap(vm, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, manual_caps);
++	}
++
++	vcpu = td_vcpu_add(vm, 0, guest_code_dirty_gpa);
++
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
++				    TDX_TEST_DIRTY_RING_GPA,
++				    TDX_TEST_DIRTY_RING_REGION_SLOT,
++				    TDX_TEST_DIRTY_RING_REGION_SIZE / getpagesize(),
++				    KVM_MEM_GUEST_MEMFD);
++	vm->memslots[MEM_REGION_TEST_DATA] = TDX_TEST_DIRTY_RING_REGION_SLOT;
++
++	____vm_vaddr_alloc(vm, TDX_TEST_DIRTY_RING_REGION_SIZE,
++			   TDX_TEST_DIRTY_RING_GVA,
++			   TDX_TEST_DIRTY_RING_GPA, MEM_REGION_TEST_DATA, true);
++	td_finalize(vm);
++
++	printf("Verifying reset dirty ring on gmemfd slot with dirty log initially %s:\n",
++	       manual_protect_and_init_set ? "set" : "unset");
++
++	verify_turn_on_log_dirty_pages_flag(vcpu);
++	reset_dirty_ring_worker(vcpu);
++
++	kvm_vm_free(vm);
++	printf("\t ... PASSED\n");
++}
++
++/*
++ * Test if resetting a GFN in a memslot with the KVM_MEM_GUEST_MEMFD flag in the
++ * dirty ring does not negatively impact TDs.
++ * (when manual protect and initially_set is off)
++ */
++void verify_reset_dirty_ring_config1(void)
++{
++	reset_dirty_ring_on_gmemfd_slot(false);
++}
++
++/*
++ * Test if resetting a GFN in a memslot with the KVM_MEM_GUEST_MEMFD flag in the
++ * dirty ring does not negatively impact TDs.
++ * (when manual protect and initially_set is on)
++ */
++void verify_reset_dirty_ring_config2(void)
++{
++	reset_dirty_ring_on_gmemfd_slot(true);
++}
++
++int main(int argc, char **argv)
++{
++	ksft_print_header();
++
++	if (!is_tdx_enabled())
++		ksft_exit_skip("TDX is not supported by the KVM. Exiting.\n");
++
++	ksft_set_plan(2);
++	ksft_test_result(!run_in_new_process(&verify_reset_dirty_ring_config1),
++			 "verify_reset_dirty_ring_config1\n");
++	ksft_test_result(!run_in_new_process(&verify_reset_dirty_ring_config2),
++			 "verify_reset_dirty_ring_config2\n");
++	ksft_finished();
++	return 0;
++}
 -- 
 2.43.2
 
