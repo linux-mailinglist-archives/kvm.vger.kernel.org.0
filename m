@@ -1,166 +1,213 @@
-Return-Path: <kvm+bounces-34346-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34347-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 429909FB2D1
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 17:26:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6909FB35F
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 17:59:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BC7718815D8
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 16:26:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE7F21884E24
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 16:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3D11B6D01;
-	Mon, 23 Dec 2024 16:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635931B3950;
+	Mon, 23 Dec 2024 16:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zf2ztV3L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YT82LOSv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A28415C14B
-	for <kvm@vger.kernel.org>; Mon, 23 Dec 2024 16:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF8786250
+	for <kvm@vger.kernel.org>; Mon, 23 Dec 2024 16:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734971158; cv=none; b=TewP9uQ1msuICazdLZAhNJe7mRcDi9MeWLfVaEllLxGaptM/23DTfiE1bsi8RBTM9y4KxWFdfsr0AYquUtDqi50/Bqdg1lTwmUM7vRQ45TkYM0t8MKG1/d6rKL8u2l/PqDuPYTfJzdiYVVGrC/ZrhhOY38kL/VUk8GXopMm6vho=
+	t=1734973154; cv=none; b=SvfGgdwO9krx+KjlSZlDv/qNFxcRTaBYmR1+mDrfYgfE5Bp8SI4fmSpyTUYEhBQcEBvq1vkHzTEIPM+Z/oZflrX84vo0b9gYz8hbh6kNHVw9VBZDrMkjWF3z6Eefx782/SEKnkrpEF+rKmvF58fiMswNCvSR3xXF5lOGj+Snkcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734971158; c=relaxed/simple;
-	bh=gLNTdqy53kOy7FEe0+XlSXCLL3TbieGqcMeBm4A4YK8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WdMPQ0QeaqzuxQO0TEn0wUhJ6MrFDLAHBouUHpbkGSmVWm/CSfrbbWHja0SPinZRMF74nptJzmaITgoGNFqr+GzpGlUNsN4Yqg1Q7BUGu1A+ePDZB2raHLCmDvmvH+hjS7p04vEfzdYUpPDTsUhZtMZraZdiG+flV1db5IilSC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zf2ztV3L; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1734973154; c=relaxed/simple;
+	bh=/eXm46f1zqFCIapOpV+LJv6AU7meQGgq4bWoJc1Vl4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aeQjVu41pirqgYflq8ess+UVZ9Lb74/R2PuTZ24yA3Wb3I6lLpVSWINc9qBZkFVUVFgnmyLYIHaJqSPVXda9oJd0MLjW8uagtQe19jcP7SCWM84vd6GfuFQCRQCHMGPTOZyNw/JV2Ain3N4MNLJ0SCQU1ls3SQymqgx2RH/qVow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YT82LOSv; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734971156;
+	s=mimecast20190719; t=1734973151;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Fjl9eR9cpIlUwJR3bzJjeDpMZWb8GNcfkZ63EEu1UXM=;
-	b=Zf2ztV3LLqlqLWm043pJXkHuRLtWL8OmpiacVmBj2Rwkil9KFEPzJITZnmEABSK2xq0erT
-	7UtDsbXOSu7gSiu2aO6FAIiss9NRP9wXBA8jwsbx5D5icCSo48gcfKbbbtwfyBCnt6D6Yj
-	s7+3vuDnsksKMR6NsTqUae5L5aExdw4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=vYhwmX9VYIzFjXFoGAhiV3rOfBz1b4KM/wduvPShNVk=;
+	b=YT82LOSvFSY5Ii/EF8dpDUr/76bjQ3/uAYK8+i+FPsmFYdBeHqrJ9EsDRAMEWLwGmgG7Qi
+	ZUBE25Aov4QhyKR1uV2/0DekDXnp9KaxOggKi/SxYV6B/i5k2ldSn4fd30Uq3MY8HrSiBN
+	wrI920jbUlCxpZBu/igstRRvliUnOKY=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-311-uunnNdoEP2qfs7pkl5EXGA-1; Mon, 23 Dec 2024 11:25:54 -0500
-X-MC-Unique: uunnNdoEP2qfs7pkl5EXGA-1
-X-Mimecast-MFC-AGG-ID: uunnNdoEP2qfs7pkl5EXGA
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3862e986d17so1917067f8f.3
-        for <kvm@vger.kernel.org>; Mon, 23 Dec 2024 08:25:54 -0800 (PST)
+ us-mta-692-Zw2H6JEoPDqcFDmedJ_09Q-1; Mon, 23 Dec 2024 11:59:10 -0500
+X-MC-Unique: Zw2H6JEoPDqcFDmedJ_09Q-1
+X-Mimecast-MFC-AGG-ID: Zw2H6JEoPDqcFDmedJ_09Q
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6d8edc021f9so73621216d6.3
+        for <kvm@vger.kernel.org>; Mon, 23 Dec 2024 08:59:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734971153; x=1735575953;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Fjl9eR9cpIlUwJR3bzJjeDpMZWb8GNcfkZ63EEu1UXM=;
-        b=dGUFTqL6oUkkS92ZZ1gKaKxnrUpFc0ZUtgd92rMoQmd3Azo+Th4hQO+i9Uu330W7ZI
-         Qs2PS45GAsp51H0GePe8HtlZ+xHNmrun46dCEQrruWWqbqdeqGDO2m9mN0FDKbOdfbOp
-         Nj/+YB8ZxqwOU628E64Fd9t9Glc01VmpuFcnnSmO7IcTwdiwP2HETOKPuXJh3DYFi3OX
-         DmkjBhqnD+1brfrXiEB2omIsZmsYC8KgrMCSoXRyJt9QN5m5K0ofKzmw7UJpGZHHf/Z6
-         lleRZ92npUtPod8+nVJRnQw6fbRfNKN4GZ8blvJ7ZW50sw5WWDHRYktjz3xsdRh7lY6f
-         u4RA==
-X-Forwarded-Encrypted: i=1; AJvYcCWRUsMCCoK75uSzAx3Q2kgCYLRAGVPvcvA4bCTbXfa7T9N93ljLe0Xxa5ZjQxud/ErskOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyalsYKdK6vGYFLE1dmdqt7nUOUNhKin9/7ACUaX3vw3z6oLmOV
-	nqXszTgJ3uY4t+Dl6K4CdJ2LOk9uti/2yVFodBW/U+FW4by+3SRYa9OrzNpJQ+8m5XPt3+SFgwl
-	qa0+TMRmziEMvUiIXzOx/fy+z17JCQZtpdYprqPtwQuEGR7Qaij0dfhNU5ypI+ISV3aIGqxrB2o
-	i/0D+ArVLuOSM1S9TRNRUufqfh
-X-Gm-Gg: ASbGncsoBS/L9QtYKFucHsGNIGN3xAYhumxSbEHyFd40YfFyQSBBKVqIELboyF+wSGW
-	97DTLubg1ulCzldCteuie/cZ5/D3o8eQF9JqRgA==
-X-Received: by 2002:a5d:6d83:0:b0:385:f249:c336 with SMTP id ffacd0b85a97d-38a223f5d01mr10934432f8f.45.1734971153343;
-        Mon, 23 Dec 2024 08:25:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHh+ax0lV6iyT21FHnDCzDOh8g/6t+77n2Z8HiMJ46IbE1My31c4oORTEe5AfDoiotldDZ1DoiP35dRFhB7jKM=
-X-Received: by 2002:a5d:6d83:0:b0:385:f249:c336 with SMTP id
- ffacd0b85a97d-38a223f5d01mr10934405f8f.45.1734971152957; Mon, 23 Dec 2024
- 08:25:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734973150; x=1735577950;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vYhwmX9VYIzFjXFoGAhiV3rOfBz1b4KM/wduvPShNVk=;
+        b=bDqNiyXsMVR3kx8ihYQmzIB+T8iPXVe4+TkKXHvlC2CTSxola+0VxN1lMVwcPFxVOW
+         2XIQH3zKHNBFI89yd4xvDEdUPDCgpZQBa4nI54UIecY4gf6OkufECrpWoejGzVwUSZNE
+         5SShTbdqYIvk0sFLBs3px4yIZiy5A2pm2V3Li22yGgDkjOBeysLSfCavP9XDxO7EUCPB
+         EzwSp/OocRSAmaYv05AMUhh10+6ld0dbEUO3q0CI9e7xuNmIzc6qbrd2mBU/4LDBvAmX
+         adPLqIzLkCFhNnuTQ8+/txKzm8TLHQAdwOFdG9tnBLzuWz0qBAKC0noJHWmxSFJItWaC
+         3vsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVoCxskBMzNtiBjBRjuASB3l8NtnAayAlPY+3/FwndrsWRFFfHpSfkJREC23OTUYhdGojM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybIV2zwJvqePjFiSUJ2twO9bENfbFo4NUswnDERK+zE4RdrGxz
+	JLpt9zFqZ6H2PlLqBlkS5+lBHsxFsSRoga7j7JdfyZ0jOWCuzk8AVQuHlv8iM922gJlQXsuYbGK
+	zw+f00XcedCx4zXDrV1MQADbKEF4swAFsrzLiUSc0yUGemrTfBw==
+X-Gm-Gg: ASbGncuwX5cfIaPJXJ8cdaRSLNZGaXa1JkSWzFL0hMCbuh/IcpiAdI+aKAEs1GDv/hJ
+	QIG+43O/avRqiCPtWqYBjajYvIffa5qa9U5zeYn3nvLR7F+EyqYzvi4Px1tzjttkBsLjumn0v4T
+	wMzb9u3/uJGBv0tiDDdpDrp/s/7Sx/YqtGuYNtiK21+fMpjJmBqpLEykGQ88Mfv5UKI2pNcZPpY
+	wHugOZsGwVwsBiF6xlqizzG+VSYfIPINvoC8ylBlqBvLkYDbrw164LvA/UB0g5Htlt737VdL94J
+	sRMVKIfIk3HY7L/EIg==
+X-Received: by 2002:a05:6214:27eb:b0:6d8:f612:e27d with SMTP id 6a1803df08f44-6dd2339ff38mr220808686d6.32.1734973149776;
+        Mon, 23 Dec 2024 08:59:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEiyg9xnnEYGXGK2rAB5forgSszecTTud5B0dq/EWmsMFf8C8vl0ZI9iiiIPpJtiZdzHVnwOw==
+X-Received: by 2002:a05:6214:27eb:b0:6d8:f612:e27d with SMTP id 6a1803df08f44-6dd2339ff38mr220808336d6.32.1734973149413;
+        Mon, 23 Dec 2024 08:59:09 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181c0fc5sm45137506d6.92.2024.12.23.08.59.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Dec 2024 08:59:08 -0800 (PST)
+Date: Mon, 23 Dec 2024 11:59:06 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Athul Krishna <athul.krishna.kr@protonmail.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Linux PCI <linux-pci@vger.kernel.org>,
+	"regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Subject: Re: [bugzilla-daemon@kernel.org: [Bug 219619] New: vfio-pci: screen
+ graphics artifacts after 6.12 kernel upgrade]
+Message-ID: <Z2mW2k8GfP7S0c5M@x1n>
+References: <20241222223604.GA3735586@bhelgaas>
+ <Hb6kvXlGizYbogNWGJcvhY3LsKeRwROtpRluHKsGqRcmZl68J35nP60YdzW1KSoPl5RO_dCxuL5x9mM13jPBbU414DEZE_0rUwDNvzuzyb8=@protonmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
-In-Reply-To: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 23 Dec 2024 17:25:40 +0100
-Message-ID: <CABgObfZsF+1YGTQO_+uF+pBPm-i08BrEGCfTG8_o824776c=6Q@mail.gmail.com>
-Subject: Re: [PATCH v2 00/25] TDX vCPU/VM creation
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: seanjc@google.com, yan.y.zhao@intel.com, isaku.yamahata@gmail.com, 
-	kai.huang@intel.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	tony.lindgren@linux.intel.com, xiaoyao.li@intel.com, 
-	reinette.chatre@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Hb6kvXlGizYbogNWGJcvhY3LsKeRwROtpRluHKsGqRcmZl68J35nP60YdzW1KSoPl5RO_dCxuL5x9mM13jPBbU414DEZE_0rUwDNvzuzyb8=@protonmail.com>
 
-On Wed, Oct 30, 2024 at 8:01=E2=80=AFPM Rick Edgecombe
-<rick.p.edgecombe@intel.com> wrote:
->
-> Hi,
->
-> Here is v2 of TDX VM/vCPU creation series. As discussed earlier, non-nits
-> from v1[0] have been applied and it=E2=80=99s ready to hand off to Paolo.=
- A few
-> items remain that may be worth further discussion:
->  - Disable CET/PT in tdx_get_supported_xfam(), as these features haven=E2=
-=80=99t
->    been been tested.
->  - The Retry loop around tdh_phymem_page_reclaim() in =E2=80=9CKVM: TDX:
->    create/destroy VM structure=E2=80=9D likely can be dropped.
->  - Drop support for TDX Module=E2=80=99s that don=E2=80=99t support
->    MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM. [1]
->  - Type-safety in to_vmx()/to_tdx(). [2]
+On Mon, Dec 23, 2024 at 07:37:46AM +0000, Athul Krishna wrote:
+> Can confirm. Reverting f9e54c3a2f5b from v6.13-rc1 fixed the problem.
 
-To sum up:
+I suppose Alex should have some more thoughts, probably after the holidays.
+Before that, one quick question to ask..
 
-removed:
-04 replaced by add wrapper functions for SEAMCALLs subseries
-06: not needed anymore, all logic for KeyID mgmt now in x86/virt/tdx
-10: tdx_capabilities dropped, replaced mostly by 02
-11: KVM_TDX_CAPABILITIES moved to patch 16
-19: not needed anymore
-20: was needed by patch 24
-22: folded in other patches
-24: left for later
-25: left for later/for userspace
+> 
+> -------- Original Message --------
+> On 23/12/24 04:06, Bjorn Helgaas <helgaas@kernel.org> wrote:
+> 
+> >  Forwarding since not everybody follows bugzilla.  Apparently bisected
+> >  to f9e54c3a2f5b ("vfio/pci: implement huge_fault support").
+> >  
+> >  Athul, f9e54c3a2f5b appears to revert cleanly from v6.13-rc1.  Can you
+> >  verify that reverting it is enough to avoid these artifacts?
+> >  
+> >  #regzbot introduced: f9e54c3a2f5b ("vfio/pci: implement huge_fault support")
+> >  
+> >  ----- Forwarded message from bugzilla-daemon@kernel.org -----
+> >  
+> >  Date: Sat, 21 Dec 2024 10:10:02 +0000
+> >  From: bugzilla-daemon@kernel.org
+> >  To: bjorn@helgaf9e54c3a2f5bas.com
+> >  Subject: [Bug 219619] New: vfio-pci: screen graphics artifacts after 6.12 kernel upgrade
+> >  Message-ID: <bug-219619-41252@https.bugzilla.kernel.org/>
+> >  
+> >  https://bugzilla.kernel.org/show_bug.cgi?id=219619
+> >  
+> >              Bug ID: 219619
+> >             Summary: vfio-pci: screen graphics artifacts after 6.12 kernel
+> >                      upgrade
+> >             Product: Drivers
+> >             Version: 2.5
+> >            Hardware: AMD
+> >                  OS: Linux
+> >              Status: NEW
+> >            Severity: normal
+> >            Priority: P3
+> >           Component: PCI
+> >            Assignee: drivers_pci@kernel-bugs.osdl.org
+> >            Reporter: athul.krishna.kr@protonmail.com
+> >          Regression: No
+> >  
+> >  Created attachment 307382
+> >    --> https://bugzilla.kernel.org/attachment.cgi?id=307382&action=edit
+> >  dmesg
 
-01/02:ok
-03: need to change 32 to 128
-04: ok
-05/06/07/08/09/10: replaced with
-https://lore.kernel.org/kvm/20241203010317.827803-2-rick.p.edgecombe@intel.=
-com/
-11: see the type safety comment above:
-> The ugly part here is the type-unsafety of to_vmx/to_tdx.  We probably
-> should add some "#pragma poison" of to_vmx/to_tdx: for example both can
-> be poisoned in pmu_intel.c after the definition of
-> vcpu_to_lbr_records(), while one of them can be poisoned in
-> sgx.c/posted_intr.c/vmx.c/tdx.c.
+vfio-pci 0000:03:00.0: vfio_bar_restore: reset recovery - restoring BARs
+pcieport 0000:00:01.1: AER: Multiple Uncorrectable (Non-Fatal) error message received from 0000:03:00.1
+vfio-pci 0000:03:00.0: PCIe Bus Error: severity=Uncorrectable (Non-Fatal), type=Transaction Layer, (Requester ID)
+vfio-pci 0000:03:00.0:   device [1002:73ef] error status/mask=00100000/00000000
+vfio-pci 0000:03:00.0:    [20] UnsupReq               (First)
+vfio-pci 0000:03:00.0: AER:   TLP Header: 60001004 000000ff 0000007d fe7eb000
+vfio-pci 0000:03:00.1: PCIe Bus Error: severity=Uncorrectable (Non-Fatal), type=Transaction Layer, (Requester ID)
+vfio-pci 0000:03:00.1:   device [1002:ab28] error status/mask=00100000/00000000
+vfio-pci 0000:03:00.1:    [20] UnsupReq               (First)
+vfio-pci 0000:03:00.1: AER:   TLP Header: 60001004 000000ff 0000007d fe7eb000
+vfio-pci 0000:03:00.1: AER:   Error of this Agent is reported first
+pcieport 0000:02:00.0: AER: broadcast error_detected message
+pcieport 0000:02:00.0: AER: broadcast mmio_enabled message
+pcieport 0000:02:00.0: AER: broadcast resume message
+pcieport 0000:02:00.0: AER: device recovery successful
+pcieport 0000:02:00.0: AER: broadcast error_detected message
+pcieport 0000:02:00.0: AER: broadcast mmio_enabled message
+pcieport 0000:02:00.0: AER: broadcast resume message
+pcieport 0000:02:00.0: AER: device recovery successful
 
-12/13/14/15: ok
-16/17: to review
-18: not sure why the check against num_present_cpus() is needed?
-19: ok
-20: ok
-21: ok
+> >  
+> >  Device: Asus Zephyrus GA402RJ
+> >  CPU: Ryzen 7 6800HS
+> >  GPU: RX 6700S
+> >  Kernel: 6.13.0-rc3-g8faabc041a00
+> >  
+> >  Problem:
+> >  Launching games or gpu bench-marking tools in qemu windows 11 vm will cause
+> >  screen artifacts, ultimately qemu will pause with unrecoverable error.
 
-22: missing review comment from v1
+Is there more information on what setup can reproduce it?
 
-> +     /* TDX only supports x2APIC, which requires an in-kernel local APIC=
-. */
-> +     if (!vcpu->arch.apic)
-> +             return -EINVAL;
+For example, does it only happen with Windows guests?  Does the GPU
+vendor/model matter?
 
-nit: Use kvm_apic_present()
+> >  
+> >  Commit:
+> >  f9e54c3a2f5b79ecc57c7bc7d0d3521e461a2101 is the first bad commit
+> >  commit f9e54c3a2f5b79ecc57c7bc7d0d3521e461a2101
+> >  Author: Alex Williamson <alex.williamson@redhat.com>
+> >  Date:   Mon Aug 26 16:43:53 2024 -0400
+> >  
+> >      vfio/pci: implement huge_fault support
 
-23: ok
+Personally I have no clue yet on how this could affect it.  I was initially
+worrying on any implicit cache mode changes on the mappings, but I don't
+think any of such was involved in this specific change.
 
-24: need to apply fix
+This commit majorly does two things: (1) allow 2M/1G mappings for BARs
+instead of small 4Ks always, and (2) always lazy faults rather than
+"install everything in the 1st fault".  Maybe one of the two could have
+some impact in some way.
 
--       if (sub_leaf & TDX_MD_UNREADABLE_LEAF_MASK ||
-+       if (leaf & TDX_MD_UNREADABLE_LEAF_MASK ||
+IIUC basic paths were covered and hopefully should work, so I wonder what's
+the specialty. Might be relevant to above questions on the reproduceable
+setups.
 
-25: ok
+Thanks,
+
+-- 
+Peter Xu
 
 
