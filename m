@@ -1,303 +1,241 @@
-Return-Path: <kvm+bounces-34339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823C49FABF7
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 10:28:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7082F9FAC06
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 10:37:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E4141885CF8
-	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 09:28:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 478D17A211D
+	for <lists+kvm@lfdr.de>; Mon, 23 Dec 2024 09:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940771922C6;
-	Mon, 23 Dec 2024 09:28:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LWg/3Qlv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A972A192D67;
+	Mon, 23 Dec 2024 09:37:21 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1EC4259489;
-	Mon, 23 Dec 2024 09:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734946093; cv=fail; b=Ri6HfArwfHF2KIfFTEMEtjqfpZPZc7EUFxQL22xhNoBEHjaJmn75HBy1rcQ1TL4dTCrXtEb/NA68RrU2eEFwTTXLi/s+op6FiZ89e70mRg4orZdgxXLPkGgQRKpfhzca5k0w2uu9ujH/TDd+XfdkGJ8VZy7sYDHGwKE3MRE1Kyw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734946093; c=relaxed/simple;
-	bh=TU/VbJV6OlSnQPelOrrb9NG4MPWHKTNJoumGsliTXRI=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nsdUq/1E0Or+1srjyOOz17z8EKSDrGfZLYUiE5LXY3PXeMASUO7HoUEOSsqmiuEgus6FuPPhzAe1/2o0GdVvPtvYYzmLsO7nUOXlYFTddHcntWo+rXEbtktxXfwx2XFRrTvDLS6mPFZ1h9ME9acYVGOeJp3OnOih4CkyCM1IaE4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LWg/3Qlv; arc=fail smtp.client-ip=40.107.244.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tVtLYErF0zNJwBq4dHGQPHkyOHYUs2R4GuZtsK1945oMoQUc43GoGN90I2Oaj0KS387s1AeNsayh0rPmNyy0LYKAPaw5DWbLsUPQwStoN9qvqycB6ZtNLxIKRk7P9BmbKoYKrI+48855+iGPhL6KqdfisYJ/1RmzwxV/Kg9OwFtyVQD8YxnpY5qKtvCkepjISM1tvf73OYnLU9AZu2i7MTKi6ft2EIf7I0ofAqr7As/YCK1q0N+ybhtdAPc2v8aSHE8Qy4oIBApJxaEQ+OxG0EI4/VdkLPpmv6jC6Qmt+MCLzTSDog5SIAvQpIIDqd4C1quj/NoX/Oby7Ct2ljl/vg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1MrhfO20fQVa/eLzOs64VOtzd2eu/wpef0IrPwJ9otA=;
- b=eWK+2yobTtQKZL2BAvOruMX7WuU9v9BtGBARiotSc9j7Tt2QbJutzPKjPL43kEv5N24JWQCV7WryGcGus2SS87DYQhF9YJ9Js6YwpchmY99PEwqIc2MhUSee7fEi4Lt5Iu3ZgDOCaIhw29W26pf/XH+XGr1zGvHix50WbfosfeTCWM2dgyKSieAR+9pjAal3i9Af9nqOdM1G8/Car1AKmNsI0g7Sk7s3g3imfYpdkZQcY8KnGPNgG+A7QttiYem+2bgePiR++3BTOVmoHlw4wKwwnGq2ITGkOZLFm4O3c9q/bNYnQREpDR/wmmThNF4ks/xQy1Hjizn6VZM0EzeUwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1MrhfO20fQVa/eLzOs64VOtzd2eu/wpef0IrPwJ9otA=;
- b=LWg/3QlvSznR+jeRfvOA2KFYk37xCMUAxSV53B9ScenIffvukSZf1XClxBG+6fSUpPzRlWvVM5COGs/LTseORpOMGPKNVdF0fVY7ktOp/mPkMhdCgrLLBtOvMsK7etPYOxxdmJjmXWTK8A1vpK+mXkbTVwn33jltn3NY1Z2Kzrg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- BL1PR12MB5828.namprd12.prod.outlook.com (2603:10b6:208:397::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.20; Mon, 23 Dec
- 2024 09:28:05 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb%4]) with mapi id 15.20.8272.013; Mon, 23 Dec 2024
- 09:28:05 +0000
-Message-ID: <ae033096-c596-460e-ba4e-68fdb5a3abf9@amd.com>
-Date: Mon, 23 Dec 2024 14:57:57 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/4] Add support for the Idle HLT intercept feature
-From: Manali Shukla <manali.shukla@amd.com>
-To: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, nikunj@amd.com,
- thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de,
- babu.moger@amd.com
-References: <20241022054810.23369-1-manali.shukla@amd.com>
- <5331cf45-230d-4d27-abc9-e5d92e5a6c11@amd.com>
- <dc3a3dc9-c6d6-449d-a1ec-d6c6879eb8db@amd.com>
- <47700dc4-c194-4a3c-a1e7-3d5e5a6ea6dd@amd.com>
-Content-Language: en-US
-In-Reply-To: <47700dc4-c194-4a3c-a1e7-3d5e5a6ea6dd@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN2P287CA0015.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:21b::14) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E331922CC;
+	Mon, 23 Dec 2024 09:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734946641; cv=none; b=Hla29l82Qf0/QmDYSDofR4kt1OjhOrucLGwcCcHRqwTRY0q5VzP1ZboAzJNedLbD688T6zuZQcW4p2EfASkqEK462WjJgRyfxNAqkA+4tNOftb0vG4SosmYIiSZytyekspRNsy/+H4TAkb1oXSOsSDr9qR9bPIvG+FUKaTJnZ7k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734946641; c=relaxed/simple;
+	bh=GlZwnMnJIhET0Viu1CLEuU5FN+q6iIGTSeXaUX63rso=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=cWNXe+r4oD/O4xswrhXiG7uWUQN6VuwY4UEA/Zc/YENZ3vqKlL8YT3Y/oFvNAdwtndaXjhkE/3rDwLYWLJ693iUmAEolTPtopVPiExr2SJRY1ECJpcbauYGyvv7dlJCSzNBEwkTUM0qTGgFt3EHUNVoHN9td0Cdy3NuSmxeVeZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8BxYa9JL2lnQbJZAA--.46021S3;
+	Mon, 23 Dec 2024 17:37:13 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMCx78dFL2ln1aUGAA--.36524S3;
+	Mon, 23 Dec 2024 17:37:11 +0800 (CST)
+Subject: Re: [PATCH] LoongArch: KVM: Add hypercall service support for
+ usermode VMM
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20241223084212.34822-1-maobibo@loongson.cn>
+ <CAAhV-H73CaNYFtgDfM+SOXYmwUhzr1w7JC4D+t2aASyUBxxTrA@mail.gmail.com>
+ <d186408c-f083-2404-de60-2ec3c8b528cf@loongson.cn>
+ <CAAhV-H42D4Rybzkc9YVsjo+GEQwiq4LTdjtmWyOzaqmuW6x8CQ@mail.gmail.com>
+From: bibo mao <maobibo@loongson.cn>
+Message-ID: <8f0aae2f-f8ba-818b-8faf-08b24d448080@loongson.cn>
+Date: Mon, 23 Dec 2024 17:36:26 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|BL1PR12MB5828:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f93abfb-4bf6-425d-7f9f-08dd23341ae6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UXVibERvM3ZOYVQ1dE00RVJ2QVE3T2c5VFNxVGw2bk1KbS9UMHZjSmxaV2Fz?=
- =?utf-8?B?R1MySTVJRSt4ZUk4NTRhQlZqcTlVcjdEOWRISkx1NVVJeXh6aS94dVFuL3NY?=
- =?utf-8?B?TG9DM1JjQnM2ZS92RjUreDVxUFRjZE02WXVjN1paSE0rdExRcmI3UUczMDNB?=
- =?utf-8?B?eTZTRks4Q2pXaUpQdkMwendXMXJFM3VKTEd2eVpENGkxVUJ3TEczMURYdWpX?=
- =?utf-8?B?dTJzWDRkWkRZNjJLZ3NnZXIzMjA1SmppUDJ2U1lydmQyc1NKZXo0UXNQWERG?=
- =?utf-8?B?VU1rWHdXOVVUNHJLbUJLVUZ2MHJSUWlNUFVCYzJBUEV0SktGcjRnb1JDd0dF?=
- =?utf-8?B?UWZtTWRCK3E4NENxcjJhTksxUzFFUHdaelg3Q0s5Y2hIcFpQcHl6WGs0Y2Vj?=
- =?utf-8?B?Q2RZdDB2bys1V2J2VHFPNFREUGVWb2pqWTh4QVRIcWM3Q0o4aVUyMzJXcnUv?=
- =?utf-8?B?dWtZRDk1YzdtTU5oQnNaZWNqSHZJdmNYZEdEWWZLUDhGc3ZQT2JNbzhqNGpw?=
- =?utf-8?B?SXlxTXdCbkNoR2NGTXVsRjNZbStXVXBYcFlJM2xZUlBwZm9oaFdSVC9PMUh0?=
- =?utf-8?B?Q016aFVKSFc3TGR4RS8xOVdiTGFLOE5WblNxb3EwUElYMEJUQnA4VkM4ZzRw?=
- =?utf-8?B?c3dvcXBweXpDOEZHa0tIVzdJQkR3TzJSSjdSeEVIdWZFWWp3b1pzUnVZT0VI?=
- =?utf-8?B?QXRLbk1ncmUwT0h0anNPZVZjc1lhd2pUN0pBRXFIS3lRV0g5MzFNNC8wLzMr?=
- =?utf-8?B?a0ZPVDg5ZlltVHNpMng2VlB3azJDVDg4RmVkSnJZM0hwM2JoVlhoSTlHNHA0?=
- =?utf-8?B?Qlo3c3dJY2t2RWlKWi9GNXVFSmprSFFndnVHLzlWblBiUVNXSTZ3OWszSUFB?=
- =?utf-8?B?TWo2aFNzcWNVM3RUaDhVOXdsbmkvN01YN3NhSG1DN2hZTzZYbTVjY085cFkx?=
- =?utf-8?B?b0EwTm9zUWtTZlNnejNCUVp1cEJzS0dsaURKNE1EVFU5U002Wis5QjlLM1NB?=
- =?utf-8?B?YW1zUnV5QkRDYkpwYUE0M1BFc0xsNkdiZzR1R2I0VXpsV1UrWlprVU9tTGlq?=
- =?utf-8?B?b3NRb2VuWHVaaVZTKzZ0ZkxMRkVPSkZad00raGYwaTZkK2FwdDV6ZU5TeEVC?=
- =?utf-8?B?MjFBbWdvYXFpT0ZZR1F4SitKYjVWeCtDWTg5UDdMQlByMzZrdHFpVk0vV2N4?=
- =?utf-8?B?dytxRmVQNnBBK2tuTjNHT3JEUXJaR25uM3JXWHJNR3hpaGtSNUwzWFpOc09a?=
- =?utf-8?B?RVR4NkJHSG8zRzN4cWtENzVid2ZpRGlHS1lmWFl1OTVQVHFzUFlRQWpZRmd0?=
- =?utf-8?B?YnY1OGVhVmtIYnFBc2hNcEY1c0xrWlV4TmFjbUVqZ3pGd1l3b3hBSzhxNnND?=
- =?utf-8?B?TVpKN0NjUGQ1MEc3ZU96d2hPOS9Vc0M5SVJ3KzIvbHk5QXFVNm41eXVQVjhw?=
- =?utf-8?B?V2RIdGJQalpsUWtDNGJEcTRHdGRiYktVN2loVEw3UlVxYUJsU3REd2luTjBi?=
- =?utf-8?B?OXJESUxCRFppcXcveDdzUGQ3aS9weVVRTUlFM0hDOEdnRTR0T2RHeTQzU01q?=
- =?utf-8?B?YzhUK2N1TE05aDhaS0RoQmtiSU9UZDNZZ3gzK0dhZmxzc0JuTzNLdEZvODcz?=
- =?utf-8?B?SDIwblJTcldqZTIvYnJFR0M5OC9nS0dLblZHa3ZuQ3BzSm9mcUQxanVIWHpG?=
- =?utf-8?B?SkRRQ0hUZGhFQ1I0SWZBL0ZSU0lMSlEyeWNkbjE2VEliSnhmczl4ampvNXFx?=
- =?utf-8?B?WUhxdjBMTXB1Y014dkRPWHNJS2k2OFh5M01QQW5KaEtsYm1IQ1JsSVZ2dVc4?=
- =?utf-8?B?bGYzM2lJVUhxZlp0VEFZQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cTl4UmhhNnRzbTU4TEU0S1hqUm04a3BkcG0rWS82eC9JOVo2SnJaQW9yY2xE?=
- =?utf-8?B?Y1VhVTUvV2V4amJmMjhMRXRsZzQyK0ZJVkNINkZZcStja2IwczVHT3ZhZVI2?=
- =?utf-8?B?NnlES243RlorYlNKWDVmZFZrK1RFcTh0OUhNWUl4OE93aVN0SzYrVzB1YS9G?=
- =?utf-8?B?WEN0djVwQ1JVSHVKb2pCOHJSMGhTUy9XY3lLcEVjSThJbGxKRWZhbUJ1bGV0?=
- =?utf-8?B?MjJKdG5ibGladS9aWXUrSUdTbVNvMFVLdk1EM3ptc2pjTWNmM0NFUWRZMmRh?=
- =?utf-8?B?UW9oaXNWU2FKOFhsUG5TR1M0K0oyTmtGTVI4ZkpQNERUMDRGN0NlamFwMzhG?=
- =?utf-8?B?V2xZMGV5cjZmcUFVU1FSQkYvWlYzYXpTemNXQU5ibDZUUktwQ3kyVVg4akZR?=
- =?utf-8?B?WFVYdTdjbngzRUdnMkRIeUxYZ09kelBHanZRajhYL1o4ZVYxR3VMN0tab0VW?=
- =?utf-8?B?MEdTVjhCcVZMcWdXV0o4RHp6VWpWMWJaU2pRSjdWZS9nZWR5TVp6aHVwZDN3?=
- =?utf-8?B?alpzZU5hT09jZFhZdnB1M05RWW82RGpGV3NBb0ZXWUZaWGxRM0JXY1dOMU9v?=
- =?utf-8?B?TjV1VHZLcjdMbFNNVW16QWt1cnpVTFVBT0NGTlZQOFpKYzVPNUxza1dkV1Ay?=
- =?utf-8?B?cndITWRUS21KRFUwNXVqNWhsMXJSRThGaGJEK2FVMzN6V1h6ZENjNWU0VjBB?=
- =?utf-8?B?MnNYRVRLalM4ZjAyaXdSOUUzRFF1Ti9WRUJhVW5YZG1KQ1k5NFZkVW0reXZK?=
- =?utf-8?B?cldTdnE5cUo2L1dlYkVhamtkbElqcFhrOEIySnFnbzBqMUJJc3VqMFVDUjdM?=
- =?utf-8?B?SE1GWVphWVBkdnJRWGRBV0piTjV6SzFIdElMbFAwdVV4eEIvQ1pRci9Zam5a?=
- =?utf-8?B?YVRsK3l3eUlsS2RoU1FvbExFZkdQUUxVeXBRVDh0ZXRod3ZIcGJJUmsvNHEw?=
- =?utf-8?B?OXFucXJON3NPa2RERGxzZWVyejUyRHlhUDRHdzV3OHJucVRTdnhnM2hnVktY?=
- =?utf-8?B?aFUzZmRsSnlIa3JOT3I1RDZXQ2F1U1BWWGhlMkdsVWIvTCtQa1hSWFlLOGdP?=
- =?utf-8?B?VEFLUGMwVnpoOElkMkZ4YTJNOHozMXVyTWFQSDNvUlRUbEMzRFdGampvZUky?=
- =?utf-8?B?TXIwOHEzT3ZGWE5pZU9MaGs2VitsNjBBSklkYmltakdPdElyU1J3bDhiTEQ0?=
- =?utf-8?B?cTFzU3REclp4UEhLMG9CKy84anBYZFRRUFFtcTVNL0RDbk9KOFVJT29IZmRS?=
- =?utf-8?B?VFF4NjlyQzJLRDE1KzZGM3Yzb1BXRHhqNW5uVkJaeHgyYWY5SXFIUUMzUVBx?=
- =?utf-8?B?OG1ZOXBsZ0NaUE0zdHpJdFVDaVkzSk9RNkpScUx6TWlDelU1dHhkVmFJVm9D?=
- =?utf-8?B?VnFmRm9vNXJSRTNPUEtIVmVRa0dqZzcrSkhpUjkrdm9DdVhYRUFXVi9rT2Jw?=
- =?utf-8?B?OVpwNzV0REovUDMvUzA0azh6TU8ycUZWYi9lVWJzVnNRZHRYZUtHaXJSd25V?=
- =?utf-8?B?bEhpRjQwV0xSa1hraUZoUWpFSTMraE80WUloWU5JS2sxbC9URUdWTFZiZkdB?=
- =?utf-8?B?OG0wanAzOTZoanJ5aTJ0c1dSYnVEdzlvVEdzbXYxM1dNb2FjYnBSOStVcVA3?=
- =?utf-8?B?d3RGZzFFREtwU3kzL1p6OFFCeUhmd0xVcjRDaFRkZm1sUUpJb3BxNHA1blhU?=
- =?utf-8?B?a24vT3dyL2hVT1NSTEw0UXBjc2J5dGQ2Z0JoMmJIeDFXZUY2TnYwUzJKNXA2?=
- =?utf-8?B?djJwaXRqaEN0OFpVQk11bTJuZm9YWktpQkd0Ukd3V3JOZ3A1a0tPc1BKbWdN?=
- =?utf-8?B?UjAwTlZqalQ2Q2Q4cGpIQ0c3dVBwM0pLcnFFTkNnWHVVRmRRT2xwNW9NRjJX?=
- =?utf-8?B?OHlDMGJRK2hKYXlTanBWTEFBUTFuRTZkdTNhNmRoTU1WNnJsN1Vkakxqa1pt?=
- =?utf-8?B?QklGRTBhSU9CZzE4c0IwRmN5aUlmNHRMVjRIMk05ZXdNeHVvQjdueWJSVURD?=
- =?utf-8?B?Tjdob3AwOXdMMTNxOTRsT2VCNVNIcnFoL042U2xISjgrUTFmeFVROGZGVWNr?=
- =?utf-8?B?ZHhtSXhNWk9wM3FsSGRnSndhTnBjTlRqYkdsZHB4dFowTVVielRybnFYVVI1?=
- =?utf-8?Q?og1/Y99dP3HdBRphsIc2shIrp?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f93abfb-4bf6-425d-7f9f-08dd23341ae6
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Dec 2024 09:28:05.6924
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RlUX6iDkCv/57zOc7EAt0lDcul7G8fvSeWNEPkzJUz1SCQB5tx4+X8NmHT8js6ZCUr20Fewk+r7B0qimNMhBnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5828
+In-Reply-To: <CAAhV-H42D4Rybzkc9YVsjo+GEQwiq4LTdjtmWyOzaqmuW6x8CQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCx78dFL2ln1aUGAA--.36524S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxKryUWw4kKF1xAr4fGr18tFc_yoWxWFy8pr
+	yUAF1kCrW5Kr4fC3s2vwn09r92gr4kKr1Ig3WUKFWakrnIv3Z3Jr48Kr98CF98Xw1kXF10
+	vF9Ygw13uF15t3cCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
+	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C2
+	67AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI
+	8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWU
+	CwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r
+	1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsG
+	vfC2KfnxnUUI43ZEXa7IU8j-e5UUUUU==
 
-On 12/23/2024 2:43 PM, Manali Shukla wrote:
-> On 12/12/2024 10:07 PM, Manali Shukla wrote:
->> On 11/28/2024 8:39 PM, Manali Shukla wrote:
->>> On 10/22/2024 11:18 AM, Manali Shukla wrote:
->>>> The upcoming new Idle HLT Intercept feature allows for the HLT
->>>> instruction execution by a vCPU to be intercepted by the hypervisor
->>>> only if there are no pending V_INTR and V_NMI events for the vCPU.
->>>> When the vCPU is expected to service the pending V_INTR and V_NMI
->>>> events, the Idle HLT intercept won’t trigger. The feature allows the
->>>> hypervisor to determine if the vCPU is actually idle and reduces
->>>> wasteful VMEXITs.
->>>>
->>>> The idle HLT intercept feature is used for enlightened guests who wish
->>>> to securely handle the events. When an enlightened guest does a HLT
->>>> while an interrupt is pending, hypervisor will not have a way to
->>>> figure out whether the guest needs to be re-entered or not. The Idle
->>>> HLT intercept feature allows the HLT execution only if there are no
->>>> pending V_INTR and V_NMI events.
->>>>
->>>> Presence of the Idle HLT Intercept feature is indicated via CPUID
->>>> function Fn8000_000A_EDX[30].
->>>>
->>>> Document for the Idle HLT intercept feature is available at [1].
->>>>
->>>> This series is based on kvm-next/next (64dbb3a771a1) + [2].
->>>>
->>>> Experiments done:
->>>> ----------------
->>>>
->>>> kvm_amd.avic is set to '0' for this experiment.
->>>>
->>>> The below numbers represent the average of 10 runs.
->>>>
->>>> Normal guest (L1)
->>>> The below netperf command was run on the guest with smp = 1 (pinned).
->>>>
->>>> netperf -H <host ip> -t TCP_RR -l 60
->>>> ----------------------------------------------------------------
->>>> |with Idle HLT(transactions/Sec)|w/o Idle HLT(transactions/Sec)|
->>>> ----------------------------------------------------------------
->>>> |         25645.7136            |        25773.2796            |
->>>> ----------------------------------------------------------------
->>>>
->>>> Number of transactions/sec with and without idle HLT intercept feature
->>>> are almost same.
->>>>
->>>> Nested guest (L2)
->>>> The below netperf command was run on L2 guest with smp = 1 (pinned).
->>>>
->>>> netperf -H <host ip> -t TCP_RR -l 60
->>>> ----------------------------------------------------------------
->>>> |with Idle HLT(transactions/Sec)|w/o Idle HLT(transactions/Sec)|
->>>> ----------------------------------------------------------------
->>>> |          5655.4468            |          5755.2189           |
->>>> ----------------------------------------------------------------
->>>>
->>>> Number of transactions/sec with and without idle HLT intercept feature
->>>> are almost same.
->>>>
->>>> Testing Done:
->>>> - Tested the functionality for the Idle HLT intercept feature
->>>>   using selftest svm_idle_hlt_test.
->>>> - Tested SEV and SEV-ES guest for the Idle HLT intercept functionality.
->>>> - Tested the Idle HLT intercept functionality on nested guest.
->>>>
->>>> v3 -> v4
->>>> - Drop the patches to add vcpu_get_stat() into a new series [2].
->>>> - Added nested Idle HLT intercept support.
->>>>
->>>> v2 -> v3
->>>> - Incorporated Andrew's suggestion to structure vcpu_stat_types in
->>>>   a way that each architecture can share the generic types and also
->>>>   provide its own.
->>>>
->>>> v1 -> v2
->>>> - Done changes in svm_idle_hlt_test based on the review comments from Sean.
->>>> - Added an enum based approach to get binary stats in vcpu_get_stat() which
->>>>   doesn't use string to get stat data based on the comments from Sean.
->>>> - Added self_halt() and cli() helpers based on the comments from Sean.
->>>>
->>>> [1]: AMD64 Architecture Programmer's Manual Pub. 24593, April 2024,
->>>>      Vol 2, 15.9 Instruction Intercepts (Table 15-7: IDLE_HLT).
->>>>      https://bugzilla.kernel.org/attachment.cgi?id=306250
->>>>
->>>> [2]: https://lore.kernel.org/kvm/20241021062226.108657-1-manali.shukla@amd.com/T/#t
->>>>
->>>> Manali Shukla (4):
->>>>   x86/cpufeatures: Add CPUID feature bit for Idle HLT intercept
->>>>   KVM: SVM: Add Idle HLT intercept support
->>>>   KVM: nSVM: implement the nested idle halt intercept
->>>>   KVM: selftests: KVM: SVM: Add Idle HLT intercept test
->>>>
->>>>  arch/x86/include/asm/cpufeatures.h            |  1 +
->>>>  arch/x86/include/asm/svm.h                    |  1 +
->>>>  arch/x86/include/uapi/asm/svm.h               |  2 +
->>>>  arch/x86/kvm/governed_features.h              |  1 +
->>>>  arch/x86/kvm/svm/nested.c                     |  7 ++
->>>>  arch/x86/kvm/svm/svm.c                        | 15 +++-
->>>>  tools/testing/selftests/kvm/Makefile          |  1 +
->>>>  .../selftests/kvm/include/x86_64/processor.h  |  1 +
->>>>  .../selftests/kvm/x86_64/svm_idle_hlt_test.c  | 89 +++++++++++++++++++
->>>>  9 files changed, 115 insertions(+), 3 deletions(-)
->>>>  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_idle_hlt_test.c
->>>>
->>>>
->>>> base-commit: c8d430db8eec7d4fd13a6bea27b7086a54eda6da
->>>> prerequisite-patch-id: ca912571db5c004f77b70843b8dd35517ff1267f
->>>> prerequisite-patch-id: 164ea3b4346f9e04bc69819278d20f5e1b5df5ed
->>>> prerequisite-patch-id: 90d870f426ebc2cec43c0dd89b701ee998385455
->>>> prerequisite-patch-id: 45812b799c517a4521782a1fdbcda881237e1eda
->>>
->>> A gentle reminder.
->>>
->>> -Manali
->>
->> A Gentle reminder.
->>
->> -Manali
->>
+
+
+On 2024/12/23 下午5:05, Huacai Chen wrote:
+> I also tried to port an untested version, but I think your version is
+> a tested one.
+> https://github.com/chenhuacai/linux/commit/e6596b0e45c80756794aba74ac086c5c0e0306eb
 > 
-> A Gentle reminder.
+> And I have some questions:
+> 1, "user service" is not only for syscall, so you rename it?
+yes, it is not only for private vmm, it can be used for qemu also if 
+there is requirement in future.
+
+> 2, Why 4.19 doesn't need something like "vcpu->run->hypercall.args[0]
+> = kvm_read_reg(vcpu, LOONGARCH_GPR_A0);"
+The private vmm and private kernel uses stack to pass to parameter, 
+which are private interface.
+
+For KVM hypercall specification, at most six registers can be used for 
+input parameter and one register A0 used for output parameter.
+
+> 3, I think my version about "vcpu->run->exit_reason =
+> KVM_EXIT_HYPERCALL;" and "update_pc()" is a little better than yours,
+> so you can improve them.
+yes, will do in this way.
+
+Regards
+Bibo Mao
 > 
-> -Manali
+> Huacai
+> 
+> On Mon, Dec 23, 2024 at 4:54 PM bibo mao <maobibo@loongson.cn> wrote:
+>>
+>>
+>>
+>> On 2024/12/23 下午4:50, Huacai Chen wrote:
+>>> Hi, Bibo,
+>>>
+>>> Is this patch trying to do the same thing as "LoongArch: add hypcall
+>>> to emulate syscall in kvm" in 4.19?
+>> yes, it is to do so -:)
+>>
+>> Regards
+>> Bibo Mao
+>>>
+>>> Huacai
+>>>
+>>> On Mon, Dec 23, 2024 at 4:42 PM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>
+>>>> Some VMMs provides special hypercall service in usermode, KVM need
+>>>> not handle the usermode hypercall service and pass it to VMM and
+>>>> let VMM handle it.
+>>>>
+>>>> Here new code KVM_HCALL_CODE_USER is added for user-mode hypercall
+>>>> service, KVM loads all six registers to VMM.
+>>>>
+>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>>> ---
+>>>>    arch/loongarch/include/asm/kvm_host.h      |  1 +
+>>>>    arch/loongarch/include/asm/kvm_para.h      |  2 ++
+>>>>    arch/loongarch/include/uapi/asm/kvm_para.h |  1 +
+>>>>    arch/loongarch/kvm/exit.c                  | 22 ++++++++++++++++++++++
+>>>>    arch/loongarch/kvm/vcpu.c                  |  3 +++
+>>>>    5 files changed, 29 insertions(+)
+>>>>
+>>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+>>>> index 7b8367c39da8..590982cd986e 100644
+>>>> --- a/arch/loongarch/include/asm/kvm_host.h
+>>>> +++ b/arch/loongarch/include/asm/kvm_host.h
+>>>> @@ -162,6 +162,7 @@ enum emulation_result {
+>>>>    #define LOONGARCH_PV_FEAT_UPDATED      BIT_ULL(63)
+>>>>    #define LOONGARCH_PV_FEAT_MASK         (BIT(KVM_FEATURE_IPI) |         \
+>>>>                                            BIT(KVM_FEATURE_STEAL_TIME) |  \
+>>>> +                                        BIT(KVM_FEATURE_USER_HCALL) |  \
+>>>>                                            BIT(KVM_FEATURE_VIRT_EXTIOI))
+>>>>
+>>>>    struct kvm_vcpu_arch {
+>>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/include/asm/kvm_para.h
+>>>> index c4e84227280d..d3c00de484f6 100644
+>>>> --- a/arch/loongarch/include/asm/kvm_para.h
+>>>> +++ b/arch/loongarch/include/asm/kvm_para.h
+>>>> @@ -13,12 +13,14 @@
+>>>>
+>>>>    #define KVM_HCALL_CODE_SERVICE         0
+>>>>    #define KVM_HCALL_CODE_SWDBG           1
+>>>> +#define KVM_HCALL_CODE_USER            2
+>>>>
+>>>>    #define KVM_HCALL_SERVICE              HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_SERVICE)
+>>>>    #define  KVM_HCALL_FUNC_IPI            1
+>>>>    #define  KVM_HCALL_FUNC_NOTIFY         2
+>>>>
+>>>>    #define KVM_HCALL_SWDBG                        HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_SWDBG)
+>>>> +#define KVM_HCALL_USER_SERVICE         HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_USER)
+>>>>
+>>>>    /*
+>>>>     * LoongArch hypercall return code
+>>>> diff --git a/arch/loongarch/include/uapi/asm/kvm_para.h b/arch/loongarch/include/uapi/asm/kvm_para.h
+>>>> index b0604aa9b4bb..76d802ef01ce 100644
+>>>> --- a/arch/loongarch/include/uapi/asm/kvm_para.h
+>>>> +++ b/arch/loongarch/include/uapi/asm/kvm_para.h
+>>>> @@ -17,5 +17,6 @@
+>>>>    #define  KVM_FEATURE_STEAL_TIME                2
+>>>>    /* BIT 24 - 31 are features configurable by user space vmm */
+>>>>    #define  KVM_FEATURE_VIRT_EXTIOI       24
+>>>> +#define  KVM_FEATURE_USER_HCALL                25
+>>>>
+>>>>    #endif /* _UAPI_ASM_KVM_PARA_H */
+>>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+>>>> index a7893bd01e73..1a85cd4fb6a5 100644
+>>>> --- a/arch/loongarch/kvm/exit.c
+>>>> +++ b/arch/loongarch/kvm/exit.c
+>>>> @@ -873,6 +873,28 @@ static int kvm_handle_hypercall(struct kvm_vcpu *vcpu)
+>>>>                   vcpu->stat.hypercall_exits++;
+>>>>                   kvm_handle_service(vcpu);
+>>>>                   break;
+>>>> +       case KVM_HCALL_USER_SERVICE:
+>>>> +               if (!kvm_guest_has_pv_feature(vcpu, KVM_FEATURE_USER_HCALL)) {
+>>>> +                       kvm_write_reg(vcpu, LOONGARCH_GPR_A0, KVM_HCALL_INVALID_CODE);
+>>>> +                       break;
+>>>> +               }
+>>>> +
+>>>> +               vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
+>>>> +               vcpu->run->hypercall.nr = KVM_HCALL_USER_SERVICE;
+>>>> +               vcpu->run->hypercall.args[0] = kvm_read_reg(vcpu, LOONGARCH_GPR_A0);
+>>>> +               vcpu->run->hypercall.args[1] = kvm_read_reg(vcpu, LOONGARCH_GPR_A1);
+>>>> +               vcpu->run->hypercall.args[2] = kvm_read_reg(vcpu, LOONGARCH_GPR_A2);
+>>>> +               vcpu->run->hypercall.args[3] = kvm_read_reg(vcpu, LOONGARCH_GPR_A3);
+>>>> +               vcpu->run->hypercall.args[4] = kvm_read_reg(vcpu, LOONGARCH_GPR_A4);
+>>>> +               vcpu->run->hypercall.args[5] = kvm_read_reg(vcpu, LOONGARCH_GPR_A5);
+>>>> +               vcpu->run->hypercall.flags = 0;
+>>>> +               /*
+>>>> +                * Set invalid return value by default
+>>>> +                * Need user-mode VMM modify it
+>>>> +                */
+>>>> +               vcpu->run->hypercall.ret = KVM_HCALL_INVALID_CODE;
+>>>> +               ret = RESUME_HOST;
+>>>> +               break;
+>>>>           case KVM_HCALL_SWDBG:
+>>>>                   /* KVM_HCALL_SWDBG only in effective when SW_BP is enabled */
+>>>>                   if (vcpu->guest_debug & KVM_GUESTDBG_SW_BP_MASK) {
+>>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>>>> index d18a4a270415..8c46ad1872ee 100644
+>>>> --- a/arch/loongarch/kvm/vcpu.c
+>>>> +++ b/arch/loongarch/kvm/vcpu.c
+>>>> @@ -1735,6 +1735,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>>>>           if (run->exit_reason == KVM_EXIT_LOONGARCH_IOCSR) {
+>>>>                   if (!run->iocsr_io.is_write)
+>>>>                           kvm_complete_iocsr_read(vcpu, run);
+>>>> +       } else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
+>>>> +               kvm_write_reg(vcpu, LOONGARCH_GPR_A0, run->hypercall.ret);
+>>>> +               update_pc(&vcpu->arch);
+>>>>           }
+>>>>
+>>>>           if (!vcpu->wants_to_run)
+>>>>
+>>>> base-commit: 48f506ad0b683d3e7e794efa60c5785c4fdc86fa
+>>>> --
+>>>> 2.39.3
+>>>>
+>>
+>>
 
-Sorry. I just realized that you have already reviewed the patches. 
-Please ignore the reminder.
-
-- Manali
 
