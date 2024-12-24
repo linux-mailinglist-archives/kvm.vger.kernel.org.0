@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-34362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34363-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C2EE9FBFD3
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 16:55:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C93289FBFDD
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 17:01:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4088D7A1EEE
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 15:54:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C119165D4F
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 16:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92EA1D79B3;
-	Tue, 24 Dec 2024 15:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60A51D63DE;
+	Tue, 24 Dec 2024 16:01:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0jbxoKx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtRZJj6r"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A5B8836
-	for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 15:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072141B0F1E
+	for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 16:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735055690; cv=none; b=N862CGD4dhJud3hq/4rAUchf3gxVirMlrIKzrfzttL5hey/iB6iRu6czuq5VTfsL/PSHEuin/4T7iEFUbPmtAgxLqKXpRkQZjU82xSfQQvvL+ph4RxchrOx5Kk8VHGEVYtHaDFA3nqPbYlE+S1I3ZxVo4Io34GyOweHrzO2iW/M=
+	t=1735056075; cv=none; b=tuiBScS3Q2KcjlxnPqgFqmKWg52Iun3DMqWaA0SC3C/nVz+vs2Yr7gvvduPj67rlva+dMgtInBgZrWz1U5xO3y1BnRQ+Pfff9Fj+qiEVQ9Bi8fYVix5NIMGRRfiwZU56tNxcgzSYuuYRD/RJLkyvRJgUkAsmlKAoVUZZW+ZuokU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735055690; c=relaxed/simple;
-	bh=2wTlXP8fR0Ybm0G7Y4TnNqEDVkel59WBciWf4E9XnoI=;
+	s=arc-20240116; t=1735056075; c=relaxed/simple;
+	bh=2uOcXTp7pHWaq/BEnjbF8VjooiBCvkYCL6DCeEMyMI0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FnNKCrf7ytmp7Y0X1PouSPboYVGPw61lM0wqO6p9dJjiBkEdsm/mdETCsf4MCH/1HcNc6wjCvkVZ19dJJvaqsb/proebQQY2i5FC4Djuochcr5RLxPICvozI/CUL8/tGuTZNGEooYkAyuMWH22OzmyiJwJE++rFuOsqfiOkXy9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C0jbxoKx; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=eRkE0efx1LH/ibBhLbenyztRk/jC5KYYx6GeQfJnUIku27DIwBb+ssgZckI1molL41Q3ekp6Qo3qyAdJnI3RgUxTAKykRNd9+C9901seKSzoh1CNxX8opD/gkbCCVMn5AndRn357NCqM5TowCOTFUfBgdszHXW5+lTKIyGQ7kFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gtRZJj6r; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735055686;
+	s=mimecast20190719; t=1735056071;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=pQPQBK3F62z6akTtDMAEGfDEtkQU09o6OnOmv2Ax/wE=;
-	b=C0jbxoKxxhjAZVEnTaYaHEpLU8tD7uuRMlrwJaxnI7lym2oWqvbLP8mKpZ417p6dcyuXOA
-	nXq7tJzQ99h1RzhbAn43Wnr3EMNIPR9WypRUwAxIrOJ4cjaz+9ECgeK7jFLXpuxL7POPWw
-	UdSi4M5vijZl9yCIWdP2rRaSsFIkiW8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=i/ex+YEgFBQKbbutLwCLbMm2eOqg4ZA3JWMufpN6EJw=;
+	b=gtRZJj6rKj5tw4nIVRAT4fKRdjdAXDts7v1tpfwjs+ndQm9LXF9T5eASF1Kwdt6ivlbrX9
+	itmdrYaIbmzb09mbFTmxwhUkBNH5BZpECtvwe4XaodWl4BlxK/yFcEP9B95xYMlV5z2r+X
+	JjVwb6FEvKi3LmOU0DXuWu9rAlukLzM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-ERnKmNWONB6jetAKyyFsWg-1; Tue, 24 Dec 2024 10:54:45 -0500
-X-MC-Unique: ERnKmNWONB6jetAKyyFsWg-1
-X-Mimecast-MFC-AGG-ID: ERnKmNWONB6jetAKyyFsWg
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385fdff9db5so1954980f8f.0
-        for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 07:54:45 -0800 (PST)
+ us-mta-115-dm5E6yFnMzGwM3B7dPPMng-1; Tue, 24 Dec 2024 11:01:10 -0500
+X-MC-Unique: dm5E6yFnMzGwM3B7dPPMng-1
+X-Mimecast-MFC-AGG-ID: dm5E6yFnMzGwM3B7dPPMng
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-385d6ee042eso2764127f8f.0
+        for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 08:01:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735055684; x=1735660484;
+        d=1e100.net; s=20230601; t=1735056069; x=1735660869;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pQPQBK3F62z6akTtDMAEGfDEtkQU09o6OnOmv2Ax/wE=;
-        b=jRsWvu/uzBiW0QeV/tXwKheFFkfJpvSQEuJ/6fGRU8M3jg2SvsqyY6o8jM9DbCq+4S
-         1qBzNEMZFptlDQPzIMN3cyAdutswUa8oF6UKgkDBuYnrv6TZ2Uy398JlDSPTmJmp3Ty1
-         b3x8J+y33j3vk3ObQG8qHNrDta4xydStDKqv5J88YsL2GVxp0KiaA5wTdHkjF7XQnMd1
-         Yo0de11uTaSGwOgYjVNXITfQThwyZdMgvwqDPU7p5vln9HeyH4zDD5ayZ6J271j/hOuz
-         xPNP1h4Jzqv79GOJZPT28il+DUbPbDSigFf65Gwj4Wczjko8MAeftwLCL47MQpV/6fSc
-         cCog==
-X-Forwarded-Encrypted: i=1; AJvYcCUL7krpRShzvRaDoq6GWlKrRsQpByiedNWdZmKWxZB6cePAUeqFmEIYrQ3kBy0JD8UxzA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMg2BWvpATQSMdlFUKCLKWb2Pq302xxVnE5mxlEJV+iCvYFEzZ
-	3T2V4FlvT7/dWDILDYHFHPI6veGJ7lLnQx4FZc9vXvXPsg1gMTVpCB4BcHYkJtNmGgknliaMbqx
-	v/pVXiu+ActScgOpF/7G81Y4gQq9kMghUS8Mb6U78oFV9Km+u2w==
-X-Gm-Gg: ASbGncuEKlpjASu/3GpcD/Tv133QZ1KQj+hDhKlHDJNa7xUuZACe5YjIjcwFK60ysCk
-	RL1wmRIX7lwDbz58Xl0rX96IdR3GiQ5iyKoBaV7GoOXKtZRIMEH6ncknCemWBL39vQifkY0i2wt
-	NaP+ys48SUmaL3HS6eZ9+3ssAA63Ngx97SO0esfpCT3/tiWTt0WIt++1cfUqtifG7Y3sr13BK/y
-	cfw3Mzm60mxhixoue/c7T54z7DFzYL3B2WIIc1kz/LB+aoOsRxyOBV/3Jy7
-X-Received: by 2002:a05:6000:18a4:b0:385:cf9d:2720 with SMTP id ffacd0b85a97d-38a221fb1b4mr13707796f8f.23.1735055684159;
-        Tue, 24 Dec 2024 07:54:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFiJ6dOOb2ZXcY8eI4jxEc9RtVJ0acqzKGJNNsIjsvrgCxL/LV/rbybZ2Hmp8mx3SwrhmxD5g==
-X-Received: by 2002:a05:6000:18a4:b0:385:cf9d:2720 with SMTP id ffacd0b85a97d-38a221fb1b4mr13707776f8f.23.1735055683785;
-        Tue, 24 Dec 2024 07:54:43 -0800 (PST)
+        bh=i/ex+YEgFBQKbbutLwCLbMm2eOqg4ZA3JWMufpN6EJw=;
+        b=KPIz5PdfDi/02XSEGsFf0VUq5ojPTTStqvwCZ4q1TC6eQvVAh3WljRnx59gnmoDgTc
+         7goMkR2CIJYTq2/zgCL48dZdXzSOkREJw5BUkx1WFm7oYcDugSsEY3uQfrvFDJcTgL8U
+         9hB67pBj0gRKmd9fGZldqnFygkMJvR4AgFE6+Ns7eeKCEMoYoRY0dar3+5wrLcqDodc0
+         J1EDsUejg8PBOXk7r4iyokx7XouVQbHV50UfqzwBX9LqLwgC+YbRYbBaTTcL+YPVP/Qf
+         3FVDwjk+mcFI1i4cVV/3qOq3MDWCzeAjJF5M4j5GAepBN6EQKqmzpP5qxRoapdFq4kbC
+         OGuA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2XUkq6Bjpss9TLJJ2yLU/HrL5J6GNEZnm4xsfzPnB/xGHwluzvFAG4TtcnnMCXW6hgyI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVT8VWHw/sUYGHiaO+8ukGBPD2QMhiCyLRHHroBoTZy9w4UTEt
+	HN6idZ0faJXqjCT+Et1qWYzNRIA/fL+Xe9zezKd7lC5W5ONHDyngA0Fip+4p0PU7HEKkED+ywGr
+	5uIMueYnw2p/Ho6Z391SHs+qaAOxi+1K3LxlMglSlmiDCL7xzzQ==
+X-Gm-Gg: ASbGncvgoRyMgMohTYPUEuX6eE0Wq5JEF4yRSho0vmoVts7iDkLtu92z1pH7eqh0Olh
+	89sPJ2TOQizodZx071dvUJH2rEQTONJ0WE2bdtkAGffGGGiGHTeTmojCv1Syuh+ooIwRG3fHzDI
+	+YH2Ie2LVLp0BYQq6Zq3rgcL8v9PhULP1Y9ND5Ec/aSVrqZL9wduLd9TtjftH5L+uWUjbu0XVfE
+	HwK9ic65uUTEkWdTSODyBaR5x10bY2BiG3yYYPyZtwe/EJfmpDgj42HrpN2
+X-Received: by 2002:a05:6000:154f:b0:382:3efc:c6d8 with SMTP id ffacd0b85a97d-38a221ed2fdmr13709804f8f.12.1735056068832;
+        Tue, 24 Dec 2024 08:01:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGlVVigMON3+v7GZf0Wd8e9A4bsNkgxk/ClDcoTANwHbuOSynV5cwu4x+Ht3c++w6w0CeHixQ==
+X-Received: by 2002:a05:6000:154f:b0:382:3efc:c6d8 with SMTP id ffacd0b85a97d-38a221ed2fdmr13709747f8f.12.1735056068308;
+        Tue, 24 Dec 2024 08:01:08 -0800 (PST)
 Received: from [192.168.10.27] ([151.62.105.73])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38a1c832e69sm14302199f8f.35.2024.12.24.07.54.42
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38a1c847513sm14570673f8f.49.2024.12.24.08.01.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Dec 2024 07:54:43 -0800 (PST)
-Message-ID: <5463356b-827f-4c9f-a76e-02cd580fe885@redhat.com>
-Date: Tue, 24 Dec 2024 16:54:41 +0100
+        Tue, 24 Dec 2024 08:01:07 -0800 (PST)
+Message-ID: <9bb6ea4b-dd40-446d-887d-4878d180c2a5@redhat.com>
+Date: Tue, 24 Dec 2024 17:01:05 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,8 +88,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 11/11] target/i386/kvm: Replace
- ARRAY_SIZE(msr_handlers) with KVM_MSR_FILTER_MAX_RANGES
+Subject: Re: [PATCH v5 00/11] i386: miscellaneous cleanup
 To: Zhao Liu <zhao1.liu@intel.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Eduardo Habkost <eduardo@habkost.net>, "Michael S . Tsirkin"
@@ -98,7 +97,6 @@ To: Zhao Liu <zhao1.liu@intel.com>,
 Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Pankaj Gupta <pankaj.gupta@amd.com>,
  Zide Chen <zide.chen@intel.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 References: <20241106030728.553238-1-zhao1.liu@intel.com>
- <20241106030728.553238-12-zhao1.liu@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -136,65 +134,72 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20241106030728.553238-12-zhao1.liu@intel.com>
+In-Reply-To: <20241106030728.553238-1-zhao1.liu@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/6/24 04:07, Zhao Liu wrote:
-> kvm_install_msr_filters() uses KVM_MSR_FILTER_MAX_RANGES as the bound
-> when traversing msr_handlers[], while other places still compute the
-> size by ARRAY_SIZE(msr_handlers).
+> Hi Paolo and all,
 > 
-> In fact, msr_handlers[] is an array with the fixed size
-> KVM_MSR_FILTER_MAX_RANGES, so there is no difference between the two
-> ways.
+> Is it necessary to include the first patch (AVX10 cleanup/fix) in v9.2?
 > 
-> For the code consistency and to avoid additional computational overhead,
-> use KVM_MSR_FILTER_MAX_RANGES instead of ARRAY_SIZE(msr_handlers).
+> Others are for v10.0.
+> 
+> Compared with v4 [1],
+>   * patch 1 (AVX10 fix) and patch 9 (RAPL cleanup) are newly added.
+>   * rebased on commit 9a7b0a8618b1 ("Merge tag 'pull-aspeed-20241104' of
+>     https://github.com/legoater/qemu into staging").
 
-I agree with the consistency but I'd go the other direction.
+Removed patches 5 and 11, fixed patch 4 to include CPUID_KVM_CLOCK2, and 
+queued - thanks!
 
 Paolo
 
-> Suggested-by: Zide Chen <zide.chen@intel.com>
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> Reviewed-by: Zide Chen <zide.chen@intel.com>
-> ---
-> v4: new commit.
-> ---
->   target/i386/kvm/kvm.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 013c0359acbe..501873475255 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -5885,7 +5885,7 @@ static int kvm_filter_msr(KVMState *s, uint32_t msr, QEMURDMSRHandler *rdmsr,
->   {
->       int i, ret;
->   
-> -    for (i = 0; i < ARRAY_SIZE(msr_handlers); i++) {
-> +    for (i = 0; i < KVM_MSR_FILTER_MAX_RANGES; i++) {
->           if (!msr_handlers[i].msr) {
->               msr_handlers[i] = (KVMMSRHandlers) {
->                   .msr = msr,
-> @@ -5911,7 +5911,7 @@ static int kvm_handle_rdmsr(X86CPU *cpu, struct kvm_run *run)
->       int i;
->       bool r;
->   
-> -    for (i = 0; i < ARRAY_SIZE(msr_handlers); i++) {
-> +    for (i = 0; i < KVM_MSR_FILTER_MAX_RANGES; i++) {
->           KVMMSRHandlers *handler = &msr_handlers[i];
->           if (run->msr.index == handler->msr) {
->               if (handler->rdmsr) {
-> @@ -5931,7 +5931,7 @@ static int kvm_handle_wrmsr(X86CPU *cpu, struct kvm_run *run)
->       int i;
->       bool r;
->   
-> -    for (i = 0; i < ARRAY_SIZE(msr_handlers); i++) {
-> +    for (i = 0; i < KVM_MSR_FILTER_MAX_RANGES; i++) {
->           KVMMSRHandlers *handler = &msr_handlers[i];
->           if (run->msr.index == handler->msr) {
->               if (handler->wrmsr) {
+> Background and Introduction
+> ===========================
+> 
+> This series picks cleanup from my previous kvmclock [2] (as other
+> renaming attempts were temporarily put on hold).
+> 
+> In addition, this series also include the cleanup on a historically
+> workaround, recent comment of coco interface [3] and error handling
+> corner cases in kvm_arch_init().
+> 
+> Avoiding the fragmentation of these misc cleanups, I consolidated them
+> all in one series and was able to tackle them in one go!
+> 
+> [1]: https://lore.kernel.org/qemu-devel/20240716161015.263031-1-zhao1.liu@intel.com/
+> [2]: https://lore.kernel.org/qemu-devel/20240329101954.3954987-1-zhao1.liu@linux.intel.com/
+> [3]: https://lore.kernel.org/qemu-devel/2815f0f1-9e20-4985-849c-d74c6cdc94ae@intel.com/
+> 
+> Thanks and Best Regards,
+> Zhao
+> ---
+> Zhao Liu (11):
+>    i386/cpu: Mark avx10_version filtered when prefix is NULL
+>    target/i386/kvm: Add feature bit definitions for KVM CPUID
+>    target/i386/kvm: Remove local MSR_KVM_WALL_CLOCK and
+>      MSR_KVM_SYSTEM_TIME definitions
+>    target/i386/kvm: Only save/load kvmclock MSRs when kvmclock enabled
+>    target/i386/kvm: Save/load MSRs of kvmclock2
+>      (KVM_FEATURE_CLOCKSOURCE2)
+>    target/i386/kvm: Drop workaround for KVM_X86_DISABLE_EXITS_HTL typo
+>    target/i386/confidential-guest: Fix comment of
+>      x86_confidential_guest_kvm_type()
+>    target/i386/kvm: Clean up return values of MSR filter related
+>      functions
+>    target/i386/kvm: Return -1 when kvm_msr_energy_thread_init() fails
+>    target/i386/kvm: Clean up error handling in kvm_arch_init()
+>    target/i386/kvm: Replace ARRAY_SIZE(msr_handlers) with
+>      KVM_MSR_FILTER_MAX_RANGES
+> 
+>   hw/i386/kvm/clock.c              |   5 +-
+>   target/i386/confidential-guest.h |   2 +-
+>   target/i386/cpu.c                |   6 +-
+>   target/i386/cpu.h                |  25 ++++
+>   target/i386/kvm/kvm.c            | 211 +++++++++++++++++--------------
+>   5 files changed, 145 insertions(+), 104 deletions(-)
+> 
 
 
