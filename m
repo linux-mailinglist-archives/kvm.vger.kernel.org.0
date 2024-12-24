@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-34359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 608D79FBFAA
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 16:31:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036ED9FBFAE
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 16:33:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B6A61884951
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 15:31:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C6F018847C0
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 15:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3F11C5482;
-	Tue, 24 Dec 2024 15:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA871D6DCC;
+	Tue, 24 Dec 2024 15:32:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpBS6w/U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gn0l3NUS"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D7A14287
-	for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 15:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C46F1BC3C
+	for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 15:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735054298; cv=none; b=eJCuYgeJdDlrYzS8h7oCBjwMMr6iGUqUXA67k30oltGWCC5103vMj2WZ9latf1LfJbC5mpn0if2M/qCdsvroBc2bsH19NkKNFoOKY9KphP7jIa1cGl8pMdDoH9zK101QfmETI8Cw0cavjU1UPBHbbSh7N6JweZzyLi0U5S732gc=
+	t=1735054370; cv=none; b=MnLn2LfN/jAh3Zydr6m6QzQ3j1pyp+Cb5NbB3D9GbcRgvlJW2oRZRr8ctlbYBbaUUV5gqzgDd4rrL38lXdWsWIjcqPQUpuQZmIIirar+pHbP9xya+E813icRI2sTEJl5NiRBLbHgpsGqIJ0Ce6k4SHjQFU/XHYMLQiQkoZ2I2Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735054298; c=relaxed/simple;
-	bh=Wg31Gf3NmvgcYcUO+WAXDMYCTIUvodKz27RIL0bSJPI=;
+	s=arc-20240116; t=1735054370; c=relaxed/simple;
+	bh=f8EHThXwKBmopgCY/8jxW1vrXnhRUWkAQkiOpWaMbas=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ttvsJwqkJZtJjLrKni0OW3QDHRRPnC88fduK+DZ92I/fKCwgT+kMgAuYplTqPW+4xfxUzoleTHGrC0sQogmPrIwlAxdJ2v//iEdbxJ2icZ1bfa6oL7tgzCiQAGcW284A9ImhXvo1issESUvu/4c3Lsp2nRPlPlzp+RdUOHhWUm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hpBS6w/U; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=k6Cyivwop5UicAN7WpmhVZ1hzfAcegcAqwV8eaXlt6HkZ/m8iiMxT4VZu9JrR3L9CFJzGPT8RqlwjmTrdBshQRdln7ZLjD+v1RbOjefGNYgZd/9zkB1pE9No/qkswucECwVqfjdcUGWEJGvSkot+0YnfiAeQdmQDOazDhjB3Pw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gn0l3NUS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735054295;
+	s=mimecast20190719; t=1735054367;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=sttA86JlVJRPGR1pZfidlTi6I1TCvbAFziqdjrjC9pk=;
-	b=hpBS6w/U396GkCa4jjI+ojdGx9IaLauhzEaF8J+Tvv3XPjuK2UgMxKkboACPCxJe8M4b2+
-	oE8s4LXu9KuUl4X4E9WqQF+O+eMFmDMqrIVTaAOV7WQjqd/orY7gQgItxFw2Jf3IyHiGiD
-	qDMCX6jEXiTKpy6180IRBN23loXz4Xg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LsjkuRBBttKS5dDHbwtUybu0HEbtAQyKBO1ZZH89czU=;
+	b=gn0l3NUSFbspXzLgz3RQVjhjP+DWgQzDJ+OLbgtM+4SIKO3m67/uogFK5XpGhFYJb5eEHm
+	PKQN3blSE4vlxZs/YtBSSAy68K8UpU5eZOxNQW1AdfYbMtPldo8Krrd8B21G42pXz4yyJ+
+	FE9Mqf6R4M9j1HIG1SsH5vrHCHNGd5A=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-457ObTcBOG-6zbKaKcGFMg-1; Tue, 24 Dec 2024 10:31:33 -0500
-X-MC-Unique: 457ObTcBOG-6zbKaKcGFMg-1
-X-Mimecast-MFC-AGG-ID: 457ObTcBOG-6zbKaKcGFMg
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3860bc1d4f1so2978661f8f.2
-        for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 07:31:33 -0800 (PST)
+ us-mta-83-Z27boLORNe-0PCQ325YWBA-1; Tue, 24 Dec 2024 10:32:46 -0500
+X-MC-Unique: Z27boLORNe-0PCQ325YWBA-1
+X-Mimecast-MFC-AGG-ID: Z27boLORNe-0PCQ325YWBA
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-385e3cbf308so2202749f8f.2
+        for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 07:32:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735054292; x=1735659092;
+        d=1e100.net; s=20230601; t=1735054365; x=1735659165;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=sttA86JlVJRPGR1pZfidlTi6I1TCvbAFziqdjrjC9pk=;
-        b=DB9nX2ujOZdlw0yEsXJw9EeyjE5AWmYn6DCpYBRSsI1iDvWoqgf/qvPS5dkfZ1ulFZ
-         6SugSjn/elAWwFGWZkF8t/8pwqxc3atAztw26yE6LaHAaRah3MEb0hL85kgnFqI/+Rfv
-         QQFNq0AcPtyQcxkbdnr9h6QOxyMYit8gXn+3mwaqEhKCa0/nKdeYHcBl0+2yOK16e2J2
-         UvcafwkonKlGdDxUaXvY4GzHiQLlMCcN1vgvUVR0dT6pYeltKNiwp3sf+qLYmK19A2C0
-         C+wtes+ZCuSnas0SmBW5mXnCncvr8K3aaFSD/SX6qhki7SXlmJR9y5bDhXoOtCobxLEv
-         ttmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUfIErwoj/C/wFA2P5Wc0HFmU9zEpG+pH2iv13QI+x3s63no+bmWYk7gXQ59Wdj/cjGifQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOVziK89CUiSIObJQSP36EBSoiC7HZ+bkxCh8k8pWaDtGG4PY5
-	Zy2PkWG9KX6TkwgW2aa8gaDGTeTj3i6wJpghb+zPOgHJJtHQAJZ2uGsEZz4hjIv4K1xVctyOM79
-	EM0rWTy++E4sU/nto2v6z84/OiuXNjqeHStKIkNZgiK/ZtmRp+A==
-X-Gm-Gg: ASbGncsi5yvzg7BYECt5CJKcLx+pMGURbo1PlUcMyQ8CMa79+0PNPIZEAKlwZYcwPNi
-	PzU6pnncYGgqgG32fim/kQRDOG2PS4nGmp42CicVUm6aIH8cfYg7MBsOR9ILI3RdqSlzaWtnY75
-	L49odtkAkQd57lUZm/dPBq+eWYa0tTjrrAUy2KbbxO909CPzwxlD7/5X5fgEKe1TJFkyw1cnxYF
-	AeigvsctKrSx4TGEFwX6DY3MQOZCYnrEFxg8Eq/Wwt8rzQTKGvuTo7T/fuO
-X-Received: by 2002:adf:a453:0:b0:38a:2b39:679d with SMTP id ffacd0b85a97d-38a2b396927mr5880324f8f.32.1735054292546;
-        Tue, 24 Dec 2024 07:31:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGjDev92cI1a9hEfMDA+fr2hM4oSjxKaQxdL1upD0q+0U/fRFDrGLeO5ylm0YCPlcX6RSvckQ==
-X-Received: by 2002:adf:a453:0:b0:38a:2b39:679d with SMTP id ffacd0b85a97d-38a2b396927mr5880306f8f.32.1735054292219;
-        Tue, 24 Dec 2024 07:31:32 -0800 (PST)
+        bh=LsjkuRBBttKS5dDHbwtUybu0HEbtAQyKBO1ZZH89czU=;
+        b=bWHa2XlqHNhePO0a4I5hKiVMIDGZU5PRPoe4077+kKigEutGT7yZl12rFBW2Kg0Gs4
+         /NLI2lUj3p+Vt/YdfzY/IDbO1y3KyBhrSoXB0lL+LKJ6bZlqZ0ct9O0x69sPTd2g8OxB
+         o47KcK6E1cjJiA/L16vFGn9MAZRRx05Of1tZzTpwRXjshUzTcBTNYENKZYuw2x1nU3Fd
+         Qs+1+F3LGEdQlMrjGchOxmFkIMJqFkrxPjm4jYRSGRymopqxHGzclOLU991KQdzWq48p
+         9zCGMKdHdJUXMm2n8sno/FYZNkXv+JBMnO4c4DATnZLiZphk+8n7QH1m/TUTT8QkbGnM
+         oykQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSjNwVpWte1AUO7fhm9qlMY7Dv9TLIsioXCkuF/I5DKqX54zuvLHiHCbaJ+m5JUrHdMa8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCFQY7RGq/M3tnqaB+7Ii8jxlHaYsuX4ODgW/eN2NzytAhKhAu
+	gqXdB4uwY2vJdt9SKEgriEGhUoL8N9fzDLI9b5q0zvQAi8S+3o6U8YA6msmbU65o89cQanGn4H0
+	uTM9FHEIPdbFHYN1K8Ogu5owPNooeVXw/Gw5VxqNfZCJTcvbHQA==
+X-Gm-Gg: ASbGncsDYwtr/hf328pqmksrW7YBEJZQSM4EpYRaj4Js2k/M17TCCRTr1ISDK3vYkO7
+	rAlzpprpk+XxRwJWZ/zsKTcX8SjXx7q77OfkFiQgBeYUsaCpScbu1ump+8J/fcU5tvnUbRl+zqd
+	oXuI5/FFerEkUgndPl/TvkTrNCvgcFWwfmHM4fGxTXthUZ0N1X0Pnsyh5sIx3kMf3tqmpQiABtt
+	5+WZvqvv35XFtl4uqu0WAa+mvK/E9+8phrZEKqTzqzHhyUnE8yYFi40vomO
+X-Received: by 2002:a05:6000:1a8f:b0:386:4034:f9a8 with SMTP id ffacd0b85a97d-38a223f5c51mr13366128f8f.38.1735054365363;
+        Tue, 24 Dec 2024 07:32:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHlR74QyzljNtLsUN0ihDUjhjueo7tcl12nKKAV/Fnd3xM7HvzOKCgCsRZ+z3U6rI8bhnooxg==
+X-Received: by 2002:a05:6000:1a8f:b0:386:4034:f9a8 with SMTP id ffacd0b85a97d-38a223f5c51mr13366109f8f.38.1735054365065;
+        Tue, 24 Dec 2024 07:32:45 -0800 (PST)
 Received: from [192.168.10.27] ([151.81.118.45])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38a1c8292adsm14314648f8f.19.2024.12.24.07.31.30
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38a1c828989sm14463909f8f.18.2024.12.24.07.32.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Dec 2024 07:31:31 -0800 (PST)
-Message-ID: <9d60933c-4713-4d61-b11f-64d4bb667e04@redhat.com>
-Date: Tue, 24 Dec 2024 16:31:28 +0100
+        Tue, 24 Dec 2024 07:32:44 -0800 (PST)
+Message-ID: <af13d0c9-1d73-4cdd-8fd0-eff86a5711d3@redhat.com>
+Date: Tue, 24 Dec 2024 16:32:42 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,8 +88,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 04/11] target/i386/kvm: Only save/load kvmclock MSRs
- when kvmclock enabled
+Subject: Re: [PATCH v5 05/11] target/i386/kvm: Save/load MSRs of kvmclock2
+ (KVM_FEATURE_CLOCKSOURCE2)
 To: Zhao Liu <zhao1.liu@intel.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Eduardo Habkost <eduardo@habkost.net>, "Michael S . Tsirkin"
@@ -98,7 +98,7 @@ To: Zhao Liu <zhao1.liu@intel.com>,
 Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Pankaj Gupta <pankaj.gupta@amd.com>,
  Zide Chen <zide.chen@intel.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 References: <20241106030728.553238-1-zhao1.liu@intel.com>
- <20241106030728.553238-5-zhao1.liu@intel.com>
+ <20241106030728.553238-6-zhao1.liu@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -136,26 +136,18 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20241106030728.553238-5-zhao1.liu@intel.com>
+In-Reply-To: <20241106030728.553238-6-zhao1.liu@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/6/24 04:07, Zhao Liu wrote:
-> MSR_KVM_SYSTEM_TIME and MSR_KVM_WALL_CLOCK are attached with the (old)
-> kvmclock feature (KVM_FEATURE_CLOCKSOURCE).
+> MSR_KVM_SYSTEM_TIME_NEW and MSR_KVM_WALL_CLOCK_NEW are bound to
+> kvmclock2 (KVM_FEATURE_CLOCKSOURCE2).
 > 
-> So, just save/load them only when kvmclock (KVM_FEATURE_CLOCKSOURCE) is
-> enabled.
-> 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> 
+> Add the save/load support for these 2 MSRs just like kvmclock MSRs.
 
-The MSRs contains the same values as the "new" pair; QEMU only has to 
-save/restore one of them but the code should be active for both feature 
-bits and thus use
-
-+        if (env->env.features[FEAT_KVM] & (CPUID_KVM_CLOCK |
-+                                           CPUID_KVM_CLOCK2)) {
+As mentioned in the previous patch, this is not necessary.  If it was 
+needed, you'd have to also add VMSTATE fields in machine.c
 
 Paolo
 
