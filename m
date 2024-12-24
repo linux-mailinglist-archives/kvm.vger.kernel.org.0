@@ -1,221 +1,212 @@
-Return-Path: <kvm+bounces-34350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1C1F9FB8D1
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 04:05:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 768CD9FB92F
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 05:22:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F62A16549C
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 03:05:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E736D18851B7
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 04:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C9A433A0;
-	Tue, 24 Dec 2024 03:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7491487E1;
+	Tue, 24 Dec 2024 04:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="LRz9+u4g"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="SE9ofQqf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2080.outbound.protection.outlook.com [40.107.244.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F959C2C8
-	for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 03:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735009509; cv=none; b=NZRotTWWwRJK0YrwxQuNg+yNkBydN0zx60OpokBd2mV7jD7gdH0DyL6t4c+60a1SxEeN21ZW76Ag0IN7UPYz1jzJuuP5OZFZEIFqRKf54husv9yTCGgRSow/jwksCRs3b+hyq5NTHR4y97asMScEkNn7s7dSr8ywVzUKfcEKumo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735009509; c=relaxed/simple;
-	bh=Nqf0fUa4C1KnyWxg6h3152NiqINFnunHzcYgljTpZRM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g4xTZ6Z1ANIb88ktV5D3RgD3j6G8R4cJOOus/unN8qNbDAgxqrV7NE0C+3+j1DRahllenBKXdCv6OpbJRwLebxoAP/AK1QLH3KKKasoIjmHC1cFq3H3ubCLMnd/vwTRmDg4T8edLNQXiNbv30c9L3qeVqhvPpUFXxuL4StOoI4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=LRz9+u4g; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-3003943288bso52749391fa.0
-        for <kvm@vger.kernel.org>; Mon, 23 Dec 2024 19:05:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1735009505; x=1735614305; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zV2swasXPvMAVlP5f3jr8oXory5QX9BeYa7Q0nFqvZs=;
-        b=LRz9+u4gjz5hM//EGa6VkbF3I78LGgoK9yq9MX+caO07A7PQWSxLSzDV7pXb6NDZaU
-         PC/LcPgagYS+ZC5Eiv6qpfxlEBSXAhcTXnMlgC6Fl3EcC74dC2hWqt3BdVhYyIJVtuSW
-         JclCWm544c42eglf6RGJMWfZRdoo9MuL6VIKaiIE6ysk/ildGEFaW8lnEqd2pCIFyb5i
-         yrW3vusr5CNk7luc7Ju95V4QLW/D6HBJXtCyV5fL1A6EOgfJ9/4VB6WCptylcG9Xms49
-         L1T61kjFwUz04PDOFRuh2ZBnJOkZM2GSkUUUAfFivh5E/WYpsifkoT6sGaB37ln8/ZCH
-         2szg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735009505; x=1735614305;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zV2swasXPvMAVlP5f3jr8oXory5QX9BeYa7Q0nFqvZs=;
-        b=d93lnyoBjq7XLXEQuSn9DcnkMUmF/ScthvqfsFog4cKOv6yyKKvvTxuA6HUX68DuPW
-         4fKDaMWgq8Hy38X+uFKm1z3Ir50CV5uVVKLgtyJkH6tUTgObGCE7GoBOZKzweFzdSVmg
-         YfDSanVJBZTqABfTo8PSROarx400xKouZKv/Yi2H0FWpBY3gANbl7ZnqY3YmTj2tedYx
-         wUL7juxIVw/cam2wcrqorJ82H0KikmJUTAYxvNNaTYGklu6FZtb8M5h/UDt/c5hBowMV
-         1ObX0lv5bl4tIKeVquCw7Wo91HSKhpPmLwBRWuHn+PO5cmgsyeECp6m77bEvkGZ7hXQA
-         cvsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuW0FYQKy4xWREpQ9EbGiqdjJdmMaHCuh96/zx4Gdt9SlwgfYmCP5J4eJJU6rlH6KGZDQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSQViJHjLq6DQprdTSFTla5USohcXWzNkmf+5QcyWeTCMUg4gB
-	0rFvVTYwYFwA8SEK/EEzkvA1KD9xFdS1v5mgX/TCvKo3rQL/uSdnLF4n7TR+PjX/zQEyWCIhYLV
-	Aob+f6BMr8SIYxFavmRxXlxVaENMdZC/T3BrVbg==
-X-Gm-Gg: ASbGncuIFVJNR/TgXvYQ/cxZLC8NBpkAGUiMEeFhnhMA+SwUU9Jis0Zoi1TrrmgRZ/y
-	Uz9KWfW0N2N9rLssXpNlZWB8fpe2kFLCQZ1XbnSMT
-X-Google-Smtp-Source: AGHT+IHETOY6VFgnZtw5FYGpJ+VNB/mTZqQvaj9A7za3YSjBjYMJMn+409HJt1Vwowo3742LZINWLlVQDCSZtPlp0us=
-X-Received: by 2002:a05:6512:6d3:b0:542:1137:611a with SMTP id
- 2adb3069b0e04-54229533db1mr5786359e87.17.1735009505466; Mon, 23 Dec 2024
- 19:05:05 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9951392
+	for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 04:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735014128; cv=fail; b=PQCH1lJx24PSw3L0gi26wammmnrf+g2nSMoOWiNz1Mn9zrJ7bGrUvOPyNGLsQ3eE8phDeobMxewNaFdBNySWq9+fUhQXO0F/0kkQyhNYxIRQ1jjgrk34djA6WQJTSMNL7eAy8TbDk8ad7Vp2kK8iR+4PdWUg8cj42TT9C61ezT0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735014128; c=relaxed/simple;
+	bh=y8bdq+hgCzllMV7zsyFnU7qgGE8PZxtwGXJXrmDc/9I=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=e6Ewro5+mlww9aRkWDhoQ38Nk22x7gsDA36qct9od2RfOAf0pvSwyAt9WlPWlvC9Vh4wzry0mDWYq6swYEK8si8K14ck34uGeB5PFKV2CkoZz+iSsKuEQ9Tj/L8Bah3X5mx2WWRHmnfMI431CNlamNhLJWqJis+MzgJV3B6B/u8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=SE9ofQqf; arc=fail smtp.client-ip=40.107.244.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iAqFSLZTJJEYkur5JV3VmYUwJNxrQq0Wi8I2oovmPuGSZmPgvGdsMUBnEvFnOn42cCCtGtCrV8wAAwYiIRPXQbSK6UfgHHuDUqU5YvUoQSVN0hYdaoreupcueTgwn+ZXdaheFOZZnZWWN+IGKPoOVkBiWHkYNus/7Tt71O+KVzrpQjMnPaK43VLHfgs93nuYEXdbdTgft9HX4GFPcocAW3dEZkVxPE6Xo+M+Wz1OXpos0MoxbOFBaqWy4OZ+H6sTS813hPOHzz/iScKoTE6WpZVvtn1QDjzZzO2JRbN5H6NBtwcvUhXGfohFloyW+Q96Qk1PuyKqRz+/A5lYQny7AA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bfpD86FvXIqOLny6mnGQ6CVkJBU7Vtk2SsF9mGMTF0E=;
+ b=jbIhvd6IT1gpl6b40Jo81dILTxcpd9y6wuKSsmT0qbb2n8UvGBLOMW4zuXBwhDyRld2EdktI4xqJJrl/mOFqGgk0sZ4Taaj9TKUOqe3t9bJLLPMa0m8jSoE5R+9w46xQGK1eJoUnMjwR8tPXDgDHgWxCNl9ukascYgHGctu9Fz2ZbTtq8kCW3F/vEsVzpC3xezPXDqe/1B6MdISTqt6iY/UEN7hawvaeBTIScuFgh0qJnLaX7iIKxOXgynbjUlp53dDvPRMf2StRN9/6M7VWeGt8CBtFhRIOrLpzj6kuXmpooCFV9hlWIVOD7wKp54DGhJ1RUuoK3DVR/9sX2ABfhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bfpD86FvXIqOLny6mnGQ6CVkJBU7Vtk2SsF9mGMTF0E=;
+ b=SE9ofQqfwfdB5H6i8ljlEggp5w1I6LBbeWFeFXOCSomFg4rsZtG6vY7dBJYtQ7EZjcIcyXQIta7WD6lGsE6nYWdOVI+DfhGaQ9TpuHJdKS93mQZuW1YA0KhAwv0aZTfspeb2rx/6CknAtMr2ur+4yq95RJ7NZYheG8E1b/strUM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by PH8PR12MB6723.namprd12.prod.outlook.com (2603:10b6:510:1ce::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.20; Tue, 24 Dec
+ 2024 04:22:00 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%7]) with mapi id 15.20.8272.013; Tue, 24 Dec 2024
+ 04:22:00 +0000
+Message-ID: <d6b74ccd-47d3-4fd6-96e7-3027dd13faa0@amd.com>
+Date: Tue, 24 Dec 2024 15:21:54 +1100
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [Invitation] bi-weekly guest_memfd upstream call on 2024-11-14
+Content-Language: en-US
+To: Chao Gao <chao.gao@intel.com>, David Hildenbrand <david@redhat.com>
+Cc: linux-coco@lists.linux.dev, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ KVM <kvm@vger.kernel.org>
+References: <6f2bfac2-d9e7-4e4a-9298-7accded16b4f@redhat.com>
+ <ZzRBzGJJJoezCge8@intel.com>
+ <08602ef7-6d28-471d-89c0-be3d29eb92a9@redhat.com>
+ <ZzVgFGBEUO7sU3E4@intel.com>
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <ZzVgFGBEUO7sU3E4@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SY5PR01CA0010.ausprd01.prod.outlook.com
+ (2603:10c6:10:1fa::19) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241212-kvm_guest_stat-v1-0-d1a6d0c862d5@rivosinc.com>
- <20241212-kvm_guest_stat-v1-3-d1a6d0c862d5@rivosinc.com> <CAAhSdy24K3pkOR25Rbcvw6pRWXrKXdy0CH9CLeG77EqQRZTDnQ@mail.gmail.com>
- <CAHBxVyH3eX0o66398+L09RKriudDC90M_7wzsRrQZ+42f4JOVQ@mail.gmail.com>
-In-Reply-To: <CAHBxVyH3eX0o66398+L09RKriudDC90M_7wzsRrQZ+42f4JOVQ@mail.gmail.com>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Tue, 24 Dec 2024 08:34:53 +0530
-Message-ID: <CAK9=C2WwD+RMUmO8SR-bBMfEJLGfd4pMswQx19URLng20Mui-g@mail.gmail.com>
-Subject: Re: [PATCH 3/3] RISC-V: KVM: Add new exit statstics for redirected traps
-To: Atish Kumar Patra <atishp@rivosinc.com>
-Cc: Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|PH8PR12MB6723:EE_
+X-MS-Office365-Filtering-Correlation-Id: 17a2ecea-eddb-4463-107d-08dd23d282b6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?L1dCYWhXclJ3MmNTSFEzaEY4Rjg4VFpmN3VpdGVISmNrNUpzUVJmVmRJUTBM?=
+ =?utf-8?B?MjZ5VzZ0eUJjanNCR3Q2VjNwTllYWmZNbEJOeUtTcEhtNnByV1VZZ2RMVk5o?=
+ =?utf-8?B?dXVFb2RQOTJuT0I0OFNGWUVaV1Z3V0xwZXFuU2F2dWlZRGk5a3d4M00ydWlJ?=
+ =?utf-8?B?QjNHbVFRU1RRL3c0Si8xNVp6V0k2SE1Ga3RKVytnM0hlS2dzaDhhU3hVODVz?=
+ =?utf-8?B?RGgvVVBjclBlMEZrL01ETCtobWtzMzZkUGlZSS92dWtUTzFROEVGdiszb28x?=
+ =?utf-8?B?SFBmeG1lRFlta1pzY0dGeWFySXAwWFlZMHdJTS9RR2c2Q083TTlVRFR6RG8v?=
+ =?utf-8?B?U1FDbXBsd0VLRmhLRHJPcllWQkw5NmhmZ1duaEY3WmVHQ2cyVmNIanYwMW9K?=
+ =?utf-8?B?MDZsMjFhN2FoNlhtNjdCY1hZckJRbVd6NWRzcHlLQ29ocHh3RHl6QzR4MHBk?=
+ =?utf-8?B?ZlgrR25OaEl2MWhIOFJiRGxteFl6SjZIdkRoM0dOTDFJSHpZQ2xRY0dHZytr?=
+ =?utf-8?B?M1BYbkY3UGxTN1IvS3VvVk5BQU9mZGNaS2tHcHZIVzNsVWtUakRGdDUzR1lV?=
+ =?utf-8?B?ZUFtR204TUZiYU9zOWNSSVFhV0tkVkxSWGtpQWRobkZraWdMZmwxY1FJeU56?=
+ =?utf-8?B?dnJjek8xWUVYc1I4elNBRURLeTFyU01MeGlIaWM1blJTUDRWZkdxUG9jN2dW?=
+ =?utf-8?B?eDVyNjBZTDRtQlVZQXNyUEVCWnAvUTNSQ0VVUlQ0RDh5eUJPUjBPWnVuZ3NG?=
+ =?utf-8?B?SmVhdy9zQkUrbHMvZzhNK1dnemNocHNHa3F3SVVqdlVQVFVJQXBrVE5XVG9G?=
+ =?utf-8?B?S2tkRlV4bWxPM2FYRTh0UWM2VVk0ajBXU3N5MlNxVVRWVEZRL1NkcFBITlla?=
+ =?utf-8?B?RGdPRlcvdlhBakhGdEFPQXh6RzVtdzRMcTk0ZlI3Kzd4aTdWYXEwL3JpbWg0?=
+ =?utf-8?B?VVRsbW1HL2FGKzNYYUErMFZyWXA2UVRZU3BzM1p0NlJrWGFxcERqbytGeWZT?=
+ =?utf-8?B?STB3eFRCM2kzMkY1NVUrU0JySDUyenNZNC9CZFJzQ1psSVFFL01kVm1YTWM2?=
+ =?utf-8?B?RVpHVjJOa29VdkphZzBHclF1N3NkT202bFBQWVRmS2plelViQ2lmNW9KeVds?=
+ =?utf-8?B?T1krNUxyZkdGc0V2UENFZytlUk5aWkp5RkZFK0J6ZGRFak5uUUVGRkNxdWl6?=
+ =?utf-8?B?MExSM1MxdnY1Mm1lNFdiMnFKRGR6c0QxOGV2NFNxYm8wUnBkdFVVSVBtUVZ5?=
+ =?utf-8?B?SFJDSWtkRCtFUE5TN1hWVWRXblgzWllVN2FjdmVRb2hhWkVCNlRiOElpTnoz?=
+ =?utf-8?B?My9kQnY4cGVyZmp3TW1yK3BUUU50RDhib1AvbS9VS25TcTYvRVNWci95OWN4?=
+ =?utf-8?B?RStEcHo0Q0RCQ21VaFI1VlJKMUh6bjVYQmFEZ0ZQQ0pzK2ZCZ0ZEeUNsZjJu?=
+ =?utf-8?B?R29uVTV1am53MlhlbVhxM1BRUjBVdXBSdW42T1Jia0FaY3I4WlRKdjBpZ0k5?=
+ =?utf-8?B?MGEwVitPVzJQOURJQU5xaG03ODdxYWRPQTJlSDdtbENwanhkaHBmTjNOYTVS?=
+ =?utf-8?B?MjhYVEhTM1JTWGpsTmdLdlpSd2IwbC9GdFV5T0wyZDJBV0JoYzM0ZytYVlhK?=
+ =?utf-8?B?S1Y1YzFORXhvNURLNU5Kam0vWHhWV2RqRFk1T0FsS1ljbUpKa3dPVXk5M3JK?=
+ =?utf-8?B?YTd3T3Y4b0hNMlRCVkczSytyOG8rdnlMTGNMSitHUHcxYmJYNDhPYllDYmow?=
+ =?utf-8?B?NWRCMlBRUzB3ZS8za29YRmhUNU5pWldVMER2K3FlVGthOStMbGpvazJJNG94?=
+ =?utf-8?B?bU1meUJ1U2V3dkZhN2RDc2lMYXdwazhvb1Y1eXhMcVZoWXh0ZlpmdUU0RXZU?=
+ =?utf-8?Q?RdMk1qD+juLDt?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OGNCZXVrbmN3SzlZMVpERWZYM3RCcHNUUU1sSXNhVFNtMXkvU1BvN3g1SVJL?=
+ =?utf-8?B?NlRwZUd2QnRENE1SS1lOdmg3czNJSHJLbW5qRU8yYlordE5hTGx5aTNGN0xk?=
+ =?utf-8?B?enhiQXdoUmpyRFQwdHQ2dU5LMTVMUHZhcXJzL2gvMGsxZ3JvRnhGK2s1bnBR?=
+ =?utf-8?B?b0dReDZoWlpPeVdmaWczS3Nvb2NzcllMeWU1aXJzOTRsRmg3NkRJUFJMeDli?=
+ =?utf-8?B?QWdaUlluTi9vbHlmZSsxVWUzNG42ckdhT1FKZlpVanNtcTBtWmlVcm16bEpS?=
+ =?utf-8?B?N2xwczhodHZGYUV6dXp2eHh3SnBoRHBFSG9tVkJSVkhZZ2ZPOFVDVE84UHJp?=
+ =?utf-8?B?OXVHdzlmM3dqTG9yT2lTV1VzVzd3RlZ3Nm44dkVhWUdFU1hoK05pdURaTlZQ?=
+ =?utf-8?B?MHBicWpQaVRWMXBvRjl0dTdZaW1IazZrM0VIZVhYb051N2NsMnhoUWU0Mis2?=
+ =?utf-8?B?eUQvejJGcHVIZXhLQlRxWkhwUktKYzlUUysyN3ZNdGFzTFk4Z3pkWlRQRFVx?=
+ =?utf-8?B?R0QrejhtRlJOZ1IvSmo3K0N5dDJjK2hpQysxMDBJRnovdWRZT1N0VGFtTGlu?=
+ =?utf-8?B?SnJ3elowTnF1Uzl4bnpBdGlXZG1VWlVYUlZldUEzZ0k1amc2eHhNRlpuc2Zz?=
+ =?utf-8?B?b1JXcHIrUkFyZTNYNjR6TEdvdm9FUlRlTDdYeVRNMkI1enUvNmxIbm1oK2hl?=
+ =?utf-8?B?UXl2dEpBQ1h6eDBwajM2NkdQQ0FoVGNLTEd0SUF2eGlXaHZoOUZCeXphR2c1?=
+ =?utf-8?B?cjdHZEk3SExRM0J2dEt4Uld0ekFpMG1mOXA2MFhib2FaU2wyc2tHc1lSRXBU?=
+ =?utf-8?B?c095NFM3Um5JRjFvTU1KaXFJaG9JZmJKckt5UUhlY0hkS2V6SXFQcnB5VUIx?=
+ =?utf-8?B?LzdxU3V0VGYwckR2T2tJQTBJK09WV1Eva1lLTmxWNTRHQjJYdkl1My83dWR4?=
+ =?utf-8?B?ODNLUjEvckFUTk83MGhuWTd0QWdmc3F2a1VCVjQrTGZQNkxrRGpmV3g5aThj?=
+ =?utf-8?B?eWJUWGJqMDl6UkJwRHdYL0k4TjhIUjI2YWUveFhwMkppemFPUjhUM3JVRjh1?=
+ =?utf-8?B?bFZCOUxNaEFMdCsyS29aVHMzTnhoNEM2dGRTMUhxTnZWQndKeVA5dm9Vc3g2?=
+ =?utf-8?B?T240bmxXQ1Y5SHRzVG5IQ1FlMnhSUjR3bGxhVkk1RjEzbGZLS0VDeEJ0cWFn?=
+ =?utf-8?B?UTRwZllucTlMSHYrS0lTaGtWZHRod21IQUllT1lGZTFSWVJoUTFRRTBndmg1?=
+ =?utf-8?B?NzFwaWkrK084Ti9kRCtVWmxQNHNSSVpURWJwWS8yc0V3UzltVjlxUnlZREZt?=
+ =?utf-8?B?NlY3RFN4RUpZS2dXU2Q4NWFXRnl2d0xNaE1PaTZZSUgzV0dtanV1bTd5N08v?=
+ =?utf-8?B?OEk4SVFxMGFvKzY5b3piNU1mZFJsMVBoRXdnYzd0Vk9nQU9FcXliU1NDRlRz?=
+ =?utf-8?B?OFBTdTBwL2xqNnBwdXBJaWZqYXE5R0FJS3kwQ1NPTDZQWURRaXpzQlJSWVNR?=
+ =?utf-8?B?RzlNMlhZK0I0NStIZExVZ2JKV2VEZ1B4cEp2ZTR5RzBvR1lWTENnRXdZY2lk?=
+ =?utf-8?B?b2xCL01YM3JZdWExZmFoRWZJWWttUjEvRmVmZENKRm9CWk5sa1I2d1djVWtO?=
+ =?utf-8?B?aXE4eENzUFRjQkxzdWhTT0hBRWJWeGRRVk5YVm9nK3B2SW1VVTF1dFZHQm9Y?=
+ =?utf-8?B?RTNDeVJ3V2xSTHNxNlBTNmhNSXpwV3VVRGlzNmgzb0JkYktVUlZzSTZVTUhG?=
+ =?utf-8?B?OVdyWTAwWFMzU3pVb1BqZFU4d1EwRVZ6OURtZ0lZRzNTMFI5ODgxSkJOUHlR?=
+ =?utf-8?B?UlkwMEhLVy92MHgzbmkvTjhCNjVKVnA0SkFjV1cwSEYydHhaNy9iYS9PT3NV?=
+ =?utf-8?B?U1U2NXFnZVRKQjBOU0tuamZFTXdjckVMUUFFUHIzMzVoMDJZVlBkbGFpRXpX?=
+ =?utf-8?B?MVI0OHl3ODh4M3U1VzFWdy9TeHB5TVhFTG16Rk93NDVCbFdNL3JFWXVEeU5Z?=
+ =?utf-8?B?T0gzVDFYMnUxNHFaZXRsYmVkMGZ0aWlpZTNtRnNNNUVBc0Vjb2FkUmlGT055?=
+ =?utf-8?B?dTNFN3dDeTIrcW9YSTQ3ZmVmclVrYlRpQkhSdjdFQlhlSjhETklMYVJmOGFQ?=
+ =?utf-8?Q?9b5YBW4v+tFrIe9wZFfIKtWEh?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17a2ecea-eddb-4463-107d-08dd23d282b6
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Dec 2024 04:22:00.5148
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /0+MqXVGdo5oMk02TQvZ0Y7/bE0m7WohqUkVy1vlg7US5GE3b/HHxO55uWuY8/awHp03r7uAxs718AAos/rP3g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6723
 
-On Tue, Dec 24, 2024 at 6:58=E2=80=AFAM Atish Kumar Patra <atishp@rivosinc.=
-com> wrote:
->
-> On Mon, Dec 23, 2024 at 6:19=E2=80=AFAM Anup Patel <anup@brainfault.org> =
-wrote:
-> >
-> > On Fri, Dec 13, 2024 at 2:27=E2=80=AFAM Atish Patra <atishp@rivosinc.co=
-m> wrote:
-> > >
-> > > Currently, kvm doesn't delegate the few traps such as misaligned
-> > > load/store, illegal instruction and load/store access faults because =
-it
-> > > is not expected to occur in the guest very frequent. Thus, kvm gets a
-> > > chance to act upon it or collect statstics about it before redirectin=
-g
-> > > the traps to the guest.
-> > >
-> > > We can collect both guest and host visible statistics during the trap=
-s.
-> > > Enable them so that both guest and host can collect the stats about
-> > > them if required.
-> >
-> > s/We can collect .../Collect .../
-> >
->
-> Let me know if I should send a v2. I noticed a couple of other typos
-> in the commit text as well.
+On 14/11/24 13:27, Chao Gao wrote:
+>>> With in-place conversion, QEMU can map shared memory and supply the virtual
+>>> address to VFIO to set up DMA mappings. From this perspective, in-place
+>>> conversion doesn't change or require any changes to the way QEMU interacts
+>>> with VFIO. So, the key for device assignment remains updating DMA mappings
+>>> accordingly during shared/private conversions. It seems that whether in-place
+>>> conversion is in use (i.e., whether shared memory is managed by guest_memfd or
+>>> not) doesn't require big changes to that proposal. Not sure if anyone thinks
+>>> otherwise. We want to align with you on the direction for device assignment
+>>> support for guest_memfd.
+>>> (I set aside the idea of letting KVM manage the IOMMU page table in the above
+>>>    analysis because we probably won't get that support in the near future)
+>>
+>> Right. So devices would also only be to access "shared" memory.
+> 
+> Yes, this is the situation without TDX-Connect support. Even when TDX-Connect
+> comes into play, devices will initially be attached in shared mode and later
+> converted to private mode. From this perspective, TDX-Connect will be built on
+> this shared device assignment proposal.
+> 
+>>
+>>>
+>>> Could you please add this topic to the agenda?
+>>
+>> Will do. But I'm afraid the agenda for tomorrow is pretty packed, so we might
+>> not get to talk about it in more detail before the meeting in 2 weeks.
+> 
+> Understood. is there any QEMU patch available for in-place conversion? we would
+> like to play with it and also do some experiments w/ assigned devices. This
+> might help us identify more potential issues for discussion.
 
-Yes, please send v2.
 
-Regards,
-Anup
+Have you found out if there are patches, somewhere? I am interested too. 
+Thanks,
+-- 
+Alexey
 
->
-> > >
-> > > Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> >
-> > Otherwise, it looks good to me.
-> >
-> > Reviewed-by: Anup Patel <anup@brainfault.org>
-> >
-> > Regards,
-> > Anup
-> >
-> > > ---
-> > >  arch/riscv/include/asm/kvm_host.h | 5 +++++
-> > >  arch/riscv/kvm/vcpu.c             | 7 ++++++-
-> > >  arch/riscv/kvm/vcpu_exit.c        | 5 +++++
-> > >  3 files changed, 16 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/a=
-sm/kvm_host.h
-> > > index 35eab6e0f4ae..cc33e35cd628 100644
-> > > --- a/arch/riscv/include/asm/kvm_host.h
-> > > +++ b/arch/riscv/include/asm/kvm_host.h
-> > > @@ -87,6 +87,11 @@ struct kvm_vcpu_stat {
-> > >         u64 csr_exit_kernel;
-> > >         u64 signal_exits;
-> > >         u64 exits;
-> > > +       u64 instr_illegal_exits;
-> > > +       u64 load_misaligned_exits;
-> > > +       u64 store_misaligned_exits;
-> > > +       u64 load_access_exits;
-> > > +       u64 store_access_exits;
-> > >  };
-> > >
-> > >  struct kvm_arch_memory_slot {
-> > > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > > index e048dcc6e65e..60d684c76c58 100644
-> > > --- a/arch/riscv/kvm/vcpu.c
-> > > +++ b/arch/riscv/kvm/vcpu.c
-> > > @@ -34,7 +34,12 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[]=
- =3D {
-> > >         STATS_DESC_COUNTER(VCPU, csr_exit_user),
-> > >         STATS_DESC_COUNTER(VCPU, csr_exit_kernel),
-> > >         STATS_DESC_COUNTER(VCPU, signal_exits),
-> > > -       STATS_DESC_COUNTER(VCPU, exits)
-> > > +       STATS_DESC_COUNTER(VCPU, exits),
-> > > +       STATS_DESC_COUNTER(VCPU, instr_illegal_exits),
-> > > +       STATS_DESC_COUNTER(VCPU, load_misaligned_exits),
-> > > +       STATS_DESC_COUNTER(VCPU, store_misaligned_exits),
-> > > +       STATS_DESC_COUNTER(VCPU, load_access_exits),
-> > > +       STATS_DESC_COUNTER(VCPU, store_access_exits),
-> > >  };
-> > >
-> > >  const struct kvm_stats_header kvm_vcpu_stats_header =3D {
-> > > diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> > > index acdcd619797e..6e0c18412795 100644
-> > > --- a/arch/riscv/kvm/vcpu_exit.c
-> > > +++ b/arch/riscv/kvm/vcpu_exit.c
-> > > @@ -195,22 +195,27 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, =
-struct kvm_run *run,
-> > >         switch (trap->scause) {
-> > >         case EXC_INST_ILLEGAL:
-> > >                 kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ILLEGAL_I=
-NSN);
-> > > +               vcpu->stat.instr_illegal_exits++;
-> > >                 ret =3D vcpu_redirect(vcpu, trap);
-> > >                 break;
-> > >         case EXC_LOAD_MISALIGNED:
-> > >                 kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_MISALIGNE=
-D_LOAD);
-> > > +               vcpu->stat.load_misaligned_exits++;
-> > >                 ret =3D vcpu_redirect(vcpu, trap);
-> > >                 break;
-> > >         case EXC_STORE_MISALIGNED:
-> > >                 kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_MISALIGNE=
-D_STORE);
-> > > +               vcpu->stat.store_misaligned_exits++;
-> > >                 ret =3D vcpu_redirect(vcpu, trap);
-> > >                 break;
-> > >         case EXC_LOAD_ACCESS:
-> > >                 kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ACCESS_LO=
-AD);
-> > > +               vcpu->stat.load_access_exits++;
-> > >                 ret =3D vcpu_redirect(vcpu, trap);
-> > >                 break;
-> > >         case EXC_STORE_ACCESS:
-> > >                 kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ACCESS_ST=
-ORE);
-> > > +               vcpu->stat.store_access_exits++;
-> > >                 ret =3D vcpu_redirect(vcpu, trap);
-> > >                 break;
-> > >         case EXC_INST_ACCESS:
-> > >
-> > > --
-> > > 2.34.1
-> > >
->
 
