@@ -1,184 +1,226 @@
-Return-Path: <kvm+bounces-34369-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34370-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D6559FC27A
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 22:05:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BBD89FC27D
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 22:07:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB8037A0F89
-	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 21:05:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E4D9162D20
+	for <lists+kvm@lfdr.de>; Tue, 24 Dec 2024 21:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4CED2135A4;
-	Tue, 24 Dec 2024 21:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD78212D67;
+	Tue, 24 Dec 2024 21:07:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="2cXJ4suo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CplfYiCc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36A5191F6A
-	for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 21:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31823EA76
+	for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 21:07:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735074303; cv=none; b=pY3c20OMY6rHaNO7dHKP2kghCaQiN3bpG8e1WjNtUaKSGJRmO38sH7W3OyoxGPd0uh85yZP3NG9oQ06LKq3Jp7jJjid54ZE8RINjWBjEdavH0iiSiJzQyXjC0rX4pp0HmNYhZnec2vJGj54a+kCHyOg+RZpyKbv9gsnQe9W89Jc=
+	t=1735074466; cv=none; b=Usdac5uriWUHdRBJGQBq5ozNADIzPWKkzLue8x2a9r2O4RDXivnh+MNfGg6fJIkNnbhIhPR5l4I0NgzRW9ZrZK19w5pN2WGAaoCfrgLbZRC1OwPxpHnU3l5NLSFoxp5yjthhCvShBO9OHkRnRA+LtGu3Hc9BCwUm/DwY9Ja4Rnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735074303; c=relaxed/simple;
-	bh=gObRHf7nO/muFv+WFkNrw+716r/n4euNFqf4Yqsnx7A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tGTa8rDP3VepYv6+0l5QZiD5m+rQLFZYUeYeyqWUwRJXLGZzx8QCuotZysUKrHCmbO2/etwA3vbXck8DA1wP7KM4IuBNRsgVnGp4WzH+wiG8mzNanJZMDczYbGa0JoUjw5HAm8mK9KRoedjIFU2clGh5yb+5wYR25VZOwndY1nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=2cXJ4suo; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-216634dd574so40264295ad.2
-        for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 13:05:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1735074301; x=1735679101; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JlUmPcZY4TN/RdMqQ8PaLtNf3W/Wbsw1dLdhHB5EEeA=;
-        b=2cXJ4suoHepRRVOoXVz+o684aHnCR9Clrq1UaccPnclA9db+2iw4QrJWq58BeiGHNB
-         hpaHeL9Kdk+x09i+8SiVKR5cJnTwIo9F4ZGnfKDPOuubxa+rgoXqiAF3TOGy6TLYCM5D
-         8FR5RgTT5/o9TkJ0fXFey8g9bI9/yZuN1j3y/J2n/9o53Unca+tX1e4ngpmnSe249SrY
-         TiM50EZe6C/fHePLl6TTTHpPSNIHkzWdfLZgziVNDVUVkOobvYG7ll7H4ACaJlNp/bIY
-         A1czJDvP21+QYfrM4uZm0RHkgAsFqWzDXqVh439uDHmA9MMqWtyjGt0CmpurIOT+cNjl
-         2pzA==
+	s=arc-20240116; t=1735074466; c=relaxed/simple;
+	bh=cu8feJKg9gSJ6HmweoHxeTuCpE8orjL+HPupLligW6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IsAKKoFmjJa5p5emZ+jTFKY+PQOor0Um2LZp4VAtY27PHFCc5A6gLTsKVXvaJEpyXk7Zwjzg2qY4jiIe8B88mkAOFWO7FGkrc1sgaE6zvVJRx5B31RR1wOn8QUABHfS65cW5xwir78qEaqFOkJEHXAqg2DoJf2J3l1+WxHpZqYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CplfYiCc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735074463;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sZs6YfEI3/l5tOpZdRufVPmaqDWxkIbDThpOmOAjfL0=;
+	b=CplfYiCcpsQ4mScETrvJjvnZznQtM+dCkpDaGGGB0/zejpvunna5mvyRYUhdrqpPo5QDbg
+	bh+Wp6k83dB5T4oqWfEA1OdLnFO9HyPD6DWBbz+yNay1TghCjTH8RNWfPY4a0F+EykrKd9
+	I27oUTvypBFhPGKVwmyhdhu53oJORCc=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-97-4oYYAqa9OAyr9ku-Ot_jTA-1; Tue, 24 Dec 2024 16:07:41 -0500
+X-MC-Unique: 4oYYAqa9OAyr9ku-Ot_jTA-1
+X-Mimecast-MFC-AGG-ID: 4oYYAqa9OAyr9ku-Ot_jTA
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7b35758d690so1081196885a.1
+        for <kvm@vger.kernel.org>; Tue, 24 Dec 2024 13:07:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735074301; x=1735679101;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JlUmPcZY4TN/RdMqQ8PaLtNf3W/Wbsw1dLdhHB5EEeA=;
-        b=Ed0K+uBIdTVskzGjOaH1XuZ9DxgN0cfiaz+qsyHZFJ2Zo4m3SbgMkkBHAdv0ZQgs1M
-         dvJ8OKr5VaRbsagiqHg5xOVvjtRp3joMdEF0Jiiy0D5CsCTg3/s2+JJgt9Z+IQTokDtb
-         dIPVuT3DL1Jg2ES2UpFT8YkA5dnqsEn2geQoDTj7mcLcImVT7gDcl7sGb27ClYCSCKMr
-         ONRSnFTChBNXEukssoPdzXfJHGICnx97w75seDeZ3uUHwYlcGAq2RbKXcA6GoqO+OkNg
-         w91lsRJMPmSB+GXB6O4WUE4iKBwSKJPfYTx8eQnMXS6ayknEIIjQKAN3/6geujN3ueT+
-         vvlQ==
-X-Gm-Message-State: AOJu0Yzsx939+EDuP5Yc5WlEg/iln1tMCSJfKjDoAq5AtoUaejgrI5CS
-	yFTttl5fZJPt49HcKnGCfDFVqQl+ZKyVQoqsZbCATDXKgHL+SerZAxZGVndNucU=
-X-Gm-Gg: ASbGncuba9IkZReyi8dje9+FH8aRoXVgFE4mIUhkLf8Sg0wLQtUNaBjzNELpjR8xe11
-	Tg6Pe9Fy6bBNlBjZu+UKWnbM8ausrOuc1F6eVwtjOIsDT97BSlGviuFYP3RVBJ86pqylxvlskHF
-	FPkUSyGUjinE/qJKWds/W2AKg3lyaAs2kBfgGCE7cbWr9opaPkBpQSmkFOVDY9/seroxccP6+qy
-	pV2D6txahScUS5x9c4zWflDGW4q53pGxl+0F6xawG13MKcq3E67qydRsgUCyjGj8qKOQg==
-X-Google-Smtp-Source: AGHT+IFkAvBUy0y2QznmiDw5xGryBuSrbox2rOO+r9dXtaG1Z1Twj1tRDQZutMEwjnEXldms1wIZJA==
-X-Received: by 2002:a05:6a20:a121:b0:1db:ebf4:2cb8 with SMTP id adf61e73a8af0-1e5e081c839mr30524444637.38.1735074301156;
-        Tue, 24 Dec 2024 13:05:01 -0800 (PST)
-Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad90c344sm10445925b3a.186.2024.12.24.13.05.00
+        d=1e100.net; s=20230601; t=1735074461; x=1735679261;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sZs6YfEI3/l5tOpZdRufVPmaqDWxkIbDThpOmOAjfL0=;
+        b=XuCtFWUKaq1c3FtAJcH3oskh9RAp6lrygE7r9RohTh641U+1vDWEq908cc66HzyHPf
+         XCXgkqH6Y0WWloF39wP1clXVOeTQ36oOP/1YlEvlZdv6USy66/Nw2mnMZ36IQJotG3KJ
+         NxAVhlCTvf12KSrIreXTZ+pNZFI5Hz3Ll5wJGwwKFK0AVDeLiCz7x6ufZBseluXyqOvE
+         /C++SMH1XiGZDHl+5nPa5ZQoRtzo7oIzqMR3/XPMuMH1cs4sX47h10uQ+jpRG6Y801DO
+         IU+J1ejLXzvcY6RTInFzqP8Q1UzpFiby6L2xOuHyWd2TdQLi/SXaaD9D2iJjpvYHMerS
+         QuBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWIOhJLqo5RK21/ZwyFFOMWAvYjbriXQD6OKPnH1TuCp1yjYGsrIzJC1iJ3I7CcF2DtWw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJy/OCqA/omriD7mervLSjoANMWP+N4PssaH5tFDZNck2YWlxz
+	zRki1R6ziWiaagCMAOtdVRxH0m75ONMCPI6MV6F1yWsclnkVXME9py9b9b2ZKjpAsAEy98D2S+v
+	peuh2ZO/B65pzK/EZdNPgDJhbR5DIcACLts6+cgzQAgNaBI5w+A==
+X-Gm-Gg: ASbGnctTnVtodz56/w6+7frBR8ApVwaRq9Ajj5mbolmhlZRbtbMvgutyQpNESUJVvVp
+	yDfpmykbREel7GtUdWCIaRmcy0bz8N+bbfkKCUVs3nZiRQ/FDXqDMesc5I0/fBoGhn9CJIPrhmV
+	RYY2iKqU2xZroFoyuAz387VfMLKfnzLgLKe1fenpF2uOTAkOZUu8sD+4HIS/KKE/l7MFEZC/FnT
+	BpZQtxn2GNu02Hw57nPSyQ3ecNJ5M5g+rzVFOyJFt1ocXB9dQpD0FWkkdrzdoP3EjgxCTtffxIB
+	96HItbGGL9agV67nIg==
+X-Received: by 2002:a05:620a:4113:b0:7b8:626b:7ab with SMTP id af79cd13be357-7b9ba75eccdmr2798803285a.19.1735074460862;
+        Tue, 24 Dec 2024 13:07:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFnN/zY/woHUhG5osGnG+exxCB/UJU+6pyhc9ubSIWO3+84Rcn5ofakxvIKipqBFvygMHhkKw==
+X-Received: by 2002:a05:620a:4113:b0:7b8:626b:7ab with SMTP id af79cd13be357-7b9ba75eccdmr2798800285a.19.1735074460495;
+        Tue, 24 Dec 2024 13:07:40 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3e676f26sm56608011cf.19.2024.12.24.13.07.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Dec 2024 13:05:00 -0800 (PST)
-From: Atish Patra <atishp@rivosinc.com>
-Date: Tue, 24 Dec 2024 13:04:55 -0800
-Subject: [PATCH v2 3/3] RISC-V: KVM: Add new exit statstics for redirected
- traps
+        Tue, 24 Dec 2024 13:07:39 -0800 (PST)
+Date: Tue, 24 Dec 2024 16:07:36 -0500
+From: Peter Xu <peterx@redhat.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Yan Zhao <yan.y.zhao@intel.com>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Anish Moorthy <amoorthy@google.com>,
+	Peter Gonda <pgonda@google.com>,
+	David Matlack <dmatlack@google.com>, Wang@google.com,
+	Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v1 00/13] KVM: Introduce KVM Userfault
+Message-ID: <Z2simHWeYbww90OZ@x1n>
+References: <20241204191349.1730936-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241224-kvm_guest_stat-v2-3-08a77ac36b02@rivosinc.com>
-References: <20241224-kvm_guest_stat-v2-0-08a77ac36b02@rivosinc.com>
-In-Reply-To: <20241224-kvm_guest_stat-v2-0-08a77ac36b02@rivosinc.com>
-To: Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Atish Patra <atishp@rivosinc.com>
-X-Mailer: b4 0.15-dev-13183
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241204191349.1730936-1-jthoughton@google.com>
 
-Currently, kvm doesn't delegate the few traps such as misaligned
-load/store, illegal instruction and load/store access faults because it
-is not expected to occur in the guest very frequently. Thus, kvm gets a
-chance to act upon it or collect statistics about it before redirecting
-the traps to the guest.
+James,
 
-Collect both guest and host visible statistics during the traps.
-Enable them so that both guest and host can collect the stats about
-them if required.
+On Wed, Dec 04, 2024 at 07:13:35PM +0000, James Houghton wrote:
+> This is a continuation of the original KVM Userfault RFC[1] from July.
+> It contains the simplifications we talked about at LPC[2].
+> 
+> Please see the RFC[1] for the problem description. In summary,
+> guest_memfd VMs have no mechanism for doing post-copy live migration.
+> KVM Userfault provides such a mechanism. Today there is no upstream
+> mechanism for installing memory into a guest_memfd, but there will
+> be one soon (e.g. [3]).
+> 
+> There is a second problem that KVM Userfault solves: userfaultfd-based
+> post-copy doesn't scale very well. KVM Userfault when used with
+> userfaultfd can scale much better in the common case that most post-copy
+> demand fetches are a result of vCPU access violations. This is a
+> continuation of the solution Anish was working on[4]. This aspect of
+> KVM Userfault is important for userfaultfd-based live migration when
+> scaling up to hundreds of vCPUs with ~30us network latency for a
+> PAGE_SIZE demand-fetch.
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
- arch/riscv/include/asm/kvm_host.h | 5 +++++
- arch/riscv/kvm/vcpu.c             | 7 ++++++-
- arch/riscv/kvm/vcpu_exit.c        | 5 +++++
- 3 files changed, 16 insertions(+), 1 deletion(-)
+I think it would be clearer to nail down the goal of the feature.  If it's
+a perf-oriented feature we don't need to mention gmem, but maybe it's not.
 
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 35eab6e0f4ae..cc33e35cd628 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -87,6 +87,11 @@ struct kvm_vcpu_stat {
- 	u64 csr_exit_kernel;
- 	u64 signal_exits;
- 	u64 exits;
-+	u64 instr_illegal_exits;
-+	u64 load_misaligned_exits;
-+	u64 store_misaligned_exits;
-+	u64 load_access_exits;
-+	u64 store_access_exits;
- };
- 
- struct kvm_arch_memory_slot {
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index e048dcc6e65e..60d684c76c58 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -34,7 +34,12 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, csr_exit_user),
- 	STATS_DESC_COUNTER(VCPU, csr_exit_kernel),
- 	STATS_DESC_COUNTER(VCPU, signal_exits),
--	STATS_DESC_COUNTER(VCPU, exits)
-+	STATS_DESC_COUNTER(VCPU, exits),
-+	STATS_DESC_COUNTER(VCPU, instr_illegal_exits),
-+	STATS_DESC_COUNTER(VCPU, load_misaligned_exits),
-+	STATS_DESC_COUNTER(VCPU, store_misaligned_exits),
-+	STATS_DESC_COUNTER(VCPU, load_access_exits),
-+	STATS_DESC_COUNTER(VCPU, store_access_exits),
- };
- 
- const struct kvm_stats_header kvm_vcpu_stats_header = {
-diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-index acdcd619797e..6e0c18412795 100644
---- a/arch/riscv/kvm/vcpu_exit.c
-+++ b/arch/riscv/kvm/vcpu_exit.c
-@@ -195,22 +195,27 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	switch (trap->scause) {
- 	case EXC_INST_ILLEGAL:
- 		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ILLEGAL_INSN);
-+		vcpu->stat.instr_illegal_exits++;
- 		ret = vcpu_redirect(vcpu, trap);
- 		break;
- 	case EXC_LOAD_MISALIGNED:
- 		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_MISALIGNED_LOAD);
-+		vcpu->stat.load_misaligned_exits++;
- 		ret = vcpu_redirect(vcpu, trap);
- 		break;
- 	case EXC_STORE_MISALIGNED:
- 		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_MISALIGNED_STORE);
-+		vcpu->stat.store_misaligned_exits++;
- 		ret = vcpu_redirect(vcpu, trap);
- 		break;
- 	case EXC_LOAD_ACCESS:
- 		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ACCESS_LOAD);
-+		vcpu->stat.load_access_exits++;
- 		ret = vcpu_redirect(vcpu, trap);
- 		break;
- 	case EXC_STORE_ACCESS:
- 		kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_ACCESS_STORE);
-+		vcpu->stat.store_access_exits++;
- 		ret = vcpu_redirect(vcpu, trap);
- 		break;
- 	case EXC_INST_ACCESS:
+> 
+> The implementation in this series is version than the RFC[1]. It adds...
+>  1. a new memslot flag is added: KVM_MEM_USERFAULT,
+>  2. a new parameter, userfault_bitmap, into struct kvm_memory_slot,
+>  3. a new KVM_RUN exit reason: KVM_MEMORY_EXIT_FLAG_USERFAULT,
+>  4. a new KVM capability KVM_CAP_USERFAULT.
+> 
+> KVM Userfault does not attempt to catch KVM's own accesses to guest
+> memory. That is left up to userfaultfd.
+
+I assume it means this is an "perf optimization" feature then?  As it
+doesn't work for remote-fault processes like firecracker, or
+remote-emulated processes like QEMU's vhost-user?
+
+Even though it could still 100% cover x86_64's setup if it's not as
+complicated as above?  I mean, I assumed above sentence was for archs like
+ARM that I remember having no-vcpu-context accesses so things like that is
+not covered too.  Perhaps x86_64 is the goal?  If so, would also be good to
+mention some details.
+
+> 
+> When enabling KVM_MEM_USERFAULT for a memslot, the second-stage mappings
+> are zapped, and new faults will check `userfault_bitmap` to see if the
+> fault should exit to userspace.
+> 
+> When KVM_MEM_USERFAULT is enabled, only PAGE_SIZE mappings are
+> permitted.
+> 
+> When disabling KVM_MEM_USERFAULT, huge mappings will be reconstructed
+> (either eagerly or on-demand; the architecture can decide).
+> 
+> KVM Userfault is not compatible with async page faults. Nikita has
+> proposed a new implementation of async page faults that is more
+> userspace-driven that *is* compatible with KVM Userfault[5].
+> 
+> Performance
+> ===========
+> 
+> The takeaways I have are:
+> 
+> 1. For cases where lock contention is not a concern, there is a
+>    discernable win because KVM Userfault saves the trip through the
+>    userfaultfd poll/read/WAKE cycle.
+> 
+> 2. Using a single userfaultfd without KVM Userfault gets very slow as
+>    the number of vCPUs increases, and it gets even slower when you add
+>    more reader threads. This is due to contention on the userfaultfd
+>    wait_queue locks. This is the contention that KVM Userfault avoids.
+>    Compare this to the multiple-userfaultfd runs; they are much faster
+>    because the wait_queue locks are sharded perfectly (1 per vCPU).
+>    Perfect sharding is only possible because the vCPUs are configured to
+>    touch only their own chunk of memory.
+
+I'll try to spend some more time after holidays on this perf issue. But
+will still be after the 1g support on !coco gmem if it would work out. As
+the 1g function is still missing in QEMU, so that one has higher priority
+comparing to either perf or downtime (e.g. I'll also need to measure
+whether QEMU will need minor fault, or stick with missing as of now).
+
+Maybe I'll also start to explore a bit on [g]memfd support on userfault,
+I'm not sure whether anyone started working on some generic solution before
+for CoCo / gmem postcopy - we need to still have a solution for either
+firecrackers or OVS/vhost-user.  I feel like we need that sooner or later,
+one way or another.  I think I'll start without minor faults support until
+justified, and if I'll ever be able to start it at all in a few months next
+year..
+
+Let me know if there's any comment on above thoughts.
+
+I guess this feauture might be useful to QEMU too, but QEMU always needs
+uffd or something similar, then we need to measure and justify this one
+useful in a real QEMU setup.  For example, need to see how the page
+transfer overhead compares with lock contentions when there're, say, 400
+vcpus.  If some speedup on userfault + the transfer overhead is close to
+what we can get with vcpu exits, then QEMU may still stick with a simple
+model.  But not sure.
+
+When integrated with this feature, it also means some other overheads at
+least to QEMU.  E.g., trap / resolve page fault needs two ops now (uffd and
+the bitmap).  Meanwhile even if vcpu can get rid of uffd's one big
+spinlock, it may contend again in userspace, either on page resolution or
+on similar queuing.  I think I mentioned it previously but I guess it's
+nontrivial to justify.  In all cases, I trust that you should have better
+judgement on this.  It's just that QEMU can at least behave differently, so
+not sure how it'll go there.
+
+Happy holidays. :)
+
+Thanks,
 
 -- 
-2.34.1
+Peter Xu
 
 
