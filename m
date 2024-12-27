@@ -1,293 +1,207 @@
-Return-Path: <kvm+bounces-34395-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34396-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AEA19FD30A
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 11:36:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF5D69FD506
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 14:44:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 069471883A93
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 10:36:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42727161AF2
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 13:44:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8711F130D;
-	Fri, 27 Dec 2024 10:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD5B1F4269;
+	Fri, 27 Dec 2024 13:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tFI5jSS4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRzyLXVm"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070.outbound.protection.outlook.com [40.107.94.70])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76AC5156886;
-	Fri, 27 Dec 2024 10:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735295793; cv=fail; b=mW70f4kvKMvsQrcSRZzF6KWcReDN6KobU40J8dqaWZ7xbviMVvG/HLyQSbPXKOFtYVQbwqf3393ckLCCzvQc3H3Gg4jVAo/sjL5t6AGcFzMAHDtiXGmkAn9l/ACsbAA/Y47FnQF3o75b2j5b3mRFAYhgmkcR2eN5RuvA8Eu8BGc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735295793; c=relaxed/simple;
-	bh=2FzMPH7EU8mUrSrsNXeVIj7+3s4gH+bOGxAh9y6r51Y=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=W/4l0Jm9ZR6rPBurFQfI1lbM4dsiezSEf3kLtf1kidohlDaP6PaDDeL9gdSwkD9n7yaaorTM/lbYJFTZ12CstM6WYruJfPnCwZ1HRROzJdDuGoe0q+7CuIndW5U7WplYlUYepE0ZAPCC8jpAGL55VbQoyxoLuvB2w7mhC8IjJgo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tFI5jSS4; arc=fail smtp.client-ip=40.107.94.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IQsqaBRwniYZ3hQeEfWuh/dAeuHmHg3287EQEh4qYBWCB02Cbyi9gocoafgJR8/bzS0vm7aJB1IceVVAfr1vZI53CahABOWsSs66pWtSPedbR+HL+OQkatnN8ZnB9BmSlYNviYERQA3pMDb0+5wfZs98ZPLS+sxk419cJT+/j9mrm7pYqwn92Z4O/qxYnyE1hTa0hZWoOuMO3O8zahgFvL5Ko6smnAjX/Eqp3eSmNXKtuabkwcQvITFLfcLaEhZuFCEIlcPJsneRjBr8gTYjJbVTruX6B/YXd89sn30vHl8Fk5TpVrQhswukmlCB/aMAdudWgIqOpHKm9t0du152ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mugPGxV6vwcJTn303VlhYLleh78qHVHyv/m7xqUZlXA=;
- b=VtaL7BHAp0uzPyT0snjxEajs7r+7+YGUwH8gOZE8npuU0cdJQXNm0M8IytJdTwp2r8k8z5/QZ1CX7nz8+arXD9Na4HhN9qtyptqNrTpKxR0SyDvthW9voojOacT+LbgI5OTJ5fqbR05LPLsRm+RGYCdlZfiGjrtfdS0MLF+mZIg83XUTyUf1O4R/giq95K/Oatpiykyi/7qPhpv6813bIRIUnyyTdpis7oepd6oidgTIZi0ytH9HzEuDB2i5WkqY/K9Hryvw24k33rim1ePic9zePRssvOIwMglH7UGDaBgHuZ8niUtPPnHi0rBhfLbcI+V3PSwVY3k60lJ6qNYuLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mugPGxV6vwcJTn303VlhYLleh78qHVHyv/m7xqUZlXA=;
- b=tFI5jSS40Ld90SKsba0in/Mo8PExB1uEP0TEWHgyvd4fpS9p1PnE6DLnt01vxXBTu0gWRE/bAo901GFOFXWGaLJ/iVUp7cA3xDV15R7J9w5rvh0yrJ6GS75FkghDw8ESt6ZVxZswDS2BluLMBvHR15e3IVXmqGso2rsuKeI0Pvg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by PH0PR12MB7816.namprd12.prod.outlook.com (2603:10b6:510:28c::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.20; Fri, 27 Dec
- 2024 10:36:23 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f%4]) with mapi id 15.20.8293.000; Fri, 27 Dec 2024
- 10:36:22 +0000
-Message-ID: <eaf008d6-87ec-45b4-9ace-6d499afd140a@amd.com>
-Date: Fri, 27 Dec 2024 21:36:13 +1100
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 8/9] KVM: SVM: Add support to initialize SEV/SNP
- functionality in KVM
-Content-Language: en-US
-To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au,
- davem@davemloft.net
-Cc: michael.roth@amd.com, dionnaglaze@google.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-coco@lists.linux.dev
-References: <cover.1734392473.git.ashish.kalra@amd.com>
- <bc82a369d20b82177c3aac97fc5df0d9018c9fbc.1734392473.git.ashish.kalra@amd.com>
-From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <bc82a369d20b82177c3aac97fc5df0d9018c9fbc.1734392473.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SY5P300CA0065.AUSP300.PROD.OUTLOOK.COM
- (2603:10c6:10:247::29) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E79D1F3D2A
+	for <kvm@vger.kernel.org>; Fri, 27 Dec 2024 13:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735307065; cv=none; b=MmVOKKt10vupANcNcX5HzegAVVVDY2scPSwcFz2BIyLuJ4bn7O3sSyq16JL6beOTolyMRnqveh5s5xIrM5kRcW4jRJSwroLHMCvbjdnjOkZZsNfbY2IbCS7xQ98izaevs54GFDYuwy3QL9VFP+ugsxcntzZl1YsZkrz1I5tIYE0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735307065; c=relaxed/simple;
+	bh=4zzYeNm0G4x5an1ENK8T8ax8KmpB59TZG1+p2SFmR4U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IYjtKatAmyDHuCDflrv88k3KGHGtH740xWRtl13t0cYoBX2v297VC0JrzNRWrEVxLYQ6obiwkfbxRqiBiebt4FwJmxc6mANHx6B8kwPHGKqRyGmKgqbnCzUewmUybZbpn4ZsnayxUt2Q1mlg+ROV5boBsaqjhIDfXB8nzit+L8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DRzyLXVm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735307062;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pkRABZZKzYakdwICymJuZ/C6pfybaqvIa9Xu1kFl1Eo=;
+	b=DRzyLXVm9nHJ1cWKWQ3XH+Nkvoo1BsvpzNFGfmGzAdeNtCcVvI5V/6auBefCkDVERWvmpb
+	KrYe0St3udSRaOLoLOtRHhiee8AvjTvs4BTtfL3B4Cp4t6Ad9dsv7V1yKfWcXBGoEBMEV6
+	r0oBd26GvU+sSK3WSZc48lH8aWlVvGs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-20-ZzlUp7kJNbiMX0ShLeq-Ag-1; Fri, 27 Dec 2024 08:44:21 -0500
+X-MC-Unique: ZzlUp7kJNbiMX0ShLeq-Ag-1
+X-Mimecast-MFC-AGG-ID: ZzlUp7kJNbiMX0ShLeq-Ag
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-436723db6c4so37116845e9.3
+        for <kvm@vger.kernel.org>; Fri, 27 Dec 2024 05:44:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735307060; x=1735911860;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pkRABZZKzYakdwICymJuZ/C6pfybaqvIa9Xu1kFl1Eo=;
+        b=u2Hq4mmBUEX2IwbCRgKA1y8Ehql9LA/XE4zEVHE3gSEJkYFpJzNKdqR+nlBUn/yOkF
+         poo0Pi6qqLwigUFxbsSlwSKsWpVt+1ImlTOsTLC6abbfUsCtiPUAilH4PPocTJC0iTCT
+         M561O/TdOg4RsfRHCIU3MOw/KB+Nzs5jPmrTqJUWX5k/oJxIV4+GnbsoSv3U3dWYYQ+/
+         v/ujIb2jQ2FkLptPlcoFbjf9AzvS0qGOsqP7Hnm49R6AJL7HO3lV68wk9V09SlaXtyvt
+         iEdVdTKZ38fYzmX+gNbpzSYYt0rMDRwYZCd32uR/Irqv7+9bhc53rexcskzQRQtEXBlu
+         2p5w==
+X-Forwarded-Encrypted: i=1; AJvYcCWI28jcy+1AIguUDGK4f1H+Zn/M3TRgRU2W2qP1OFGq2NMF+hCb6DkA1+YhhbqGqLN0LhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpCUbMsz9YvAUuUJyxe1KL5TKr5PVN93dx3MCqJvVGzbNK384f
+	xVCw6IgRCgj5W34/a5xBNHhuEcgsLyBKCgATVk/JygaEn4ZCBNHqcEr7x472ZVPmYV9KT/0bhGr
+	uSUudALxmEfBJIWtpVmDenQkmkrevtifJm7hKAtrrXI2syRvBog==
+X-Gm-Gg: ASbGnctlqoD/sTHF87gc33bYGlTl7UT1xlr5PktaBJpph8mOh6vlhAy3QKsNkD8PbRn
+	wMgiG2OSE7PkE/FJUK9RldJndDzoJ2Te9ZccfeR7BtEq/HakugmjtoFyZrE21bjyuSO5WN23wY9
+	yR0sielQ/VgAagEg07VtXZhBCm+7Y7nmsXx45CwDAtozOCpAVBtxezO6+v4teDf+Nzc29jG07B6
+	LrQVlkTOXq6zYKsmLpnSAaEtiqoMmWyORNkS8IsVWVwIFYYTZA=
+X-Received: by 2002:a05:600c:350c:b0:434:a5d1:9905 with SMTP id 5b1f17b1804b1-43668b78641mr208446355e9.26.1735307059837;
+        Fri, 27 Dec 2024 05:44:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHMBCH5XUAoqBvte6a9jZzUG4oYDe/byrgsu79u/bNlDM1cNL3Mq9Ew3V/u/ELxCrULVT1bWQ==
+X-Received: by 2002:a05:600c:350c:b0:434:a5d1:9905 with SMTP id 5b1f17b1804b1-43668b78641mr208446135e9.26.1735307059443;
+        Fri, 27 Dec 2024 05:44:19 -0800 (PST)
+Received: from redhat.com ([2a02:14f:1ef:ad82:417b:4826:408d:ef87])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366127c4d7sm265112715e9.34.2024.12.27.05.44.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Dec 2024 05:44:18 -0800 (PST)
+Date: Fri, 27 Dec 2024 08:44:13 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost/net: Set num_buffers for virtio 1.0
+Message-ID: <20241227084256-mutt-send-email-mst@kernel.org>
+References: <20240915-v1-v1-1-f10d2cb5e759@daynix.com>
+ <20241106035029-mutt-send-email-mst@kernel.org>
+ <CACGkMEt0spn59oLyoCwcJDdLeYUEibePF7gppxdVX1YvmAr72Q@mail.gmail.com>
+ <20241226064215-mutt-send-email-mst@kernel.org>
+ <CACGkMEug-83KTBQjJBEKuYsVY86-mCSMpuGgj-BfcL=m2VFfvA@mail.gmail.com>
+ <cd4a2384-33e9-4efd-915a-dd6fee752638@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|PH0PR12MB7816:EE_
-X-MS-Office365-Filtering-Correlation-Id: f626db96-9fa4-4aeb-c7d5-08dd26624ea4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|366016|7416014|1800799024|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?L0kxWEppZ2h3c3ltMkhOS2NleHpOclBLMUpPRXVhNUNKcGFtamF2Z05HZXZs?=
- =?utf-8?B?cXVGdEErWGpUSnFOTHZkWXQzL0QyWUxaUENHaXZTdFZ4eFdPcElveWtxOVcr?=
- =?utf-8?B?c0Q3ckx1aWFJK3JhdjJGanNsbS9qM3l3RmIydjdOYnR2eUs4STgyUzR2b2Rx?=
- =?utf-8?B?OUlORTBlMTBJS1B5MHBYZHBsSVBaWEtNZHplU2x4YW8rMjJHUk9rT1IzWTZi?=
- =?utf-8?B?NjkvWkIyeEQ1RElFY0RpK0NhY1FCOWpJMzRsL1YraENKaC9zMWhORkdUa2Jt?=
- =?utf-8?B?U3BQa1FRcHIvNWNkQzBoVHVCMWtESWdReWh6MmUySkxzQk00aFFKYlVNN21R?=
- =?utf-8?B?WWVxcDI1VjgxamRlSG1BTUlJeFhMUzVOS1laOUNENUZERXBiNDlhTHMvdDlw?=
- =?utf-8?B?a1VaSEQ3ampmcVVzb1BFRUlJYUxHODJKamRHTWhYeVVUTHJQUkhvYTA3aTZi?=
- =?utf-8?B?ZTFPSjF5TC8zS2ZyUkhEWm01UWZHRmhYZ3hmaHRyTEJhZTY0RTRocFVmZ1px?=
- =?utf-8?B?VzlRTmpHL2xyNGhHUTI1U2RiRmZudkVTbkREWDYwT0lvRlJOODB0azVEU0Vo?=
- =?utf-8?B?Z1BVYldCL1NCWkNCVXpkVllqZS9zc2s3Y2Q1RDMxb1VvanJlUjd0Tks5cUJO?=
- =?utf-8?B?U3BKMVRaNXVkNzZIQVZtckxETWYrTzU0ZTViUmp4TEw0TVlwK2tZOG1aR1lZ?=
- =?utf-8?B?V2tnejBHM0FrbkpLanhaNUlIM0QwZEdnOWhwTGdJcHNZVk1hZFo5aTJHN0xk?=
- =?utf-8?B?NDMrUlJRVXdIM1N1clg5WVp4bDBTT1JEMXBnSm1zRW5ZcU9Xemk2TW1mWkdy?=
- =?utf-8?B?cGxxQUN5eVBGUlVVMktybzFvRXdGOWtkVDVpQU80alNJdHNlOGt0UDVCa0Rv?=
- =?utf-8?B?dWo3S1RyeUovbVBPcW1HUi9YRHhEN2NHak1OcWgvSmR3VWliaGZweW9TQ2hp?=
- =?utf-8?B?emRMODRoNzAzMUQ0T3J6Vk1qVlorZ2VCcHUzc0hCejJrbHhaL24wUnZMYVN4?=
- =?utf-8?B?U3ZCMWkvRDNUY01ZU3k5SVpPcnRxMm1GVjEwSThKZS9Gb2hVVnBXRFQweXhX?=
- =?utf-8?B?dkNhNnVXYU9kQ0V1Sm9yV21hWFRsWVYya1hFb2NGcnBudHZOcVNJNXdpTUlY?=
- =?utf-8?B?dnlyU3BkMWhtUEUyNlBsMytCQkl6YjZNeHRWMFE0blY0US9MaFRtUTFCSjhU?=
- =?utf-8?B?ODVTL0JSYjJKcGZuL2Q3aFZYYi9nM0x1NC9aRVRYSGtXZ291M2x4bUxRZTN1?=
- =?utf-8?B?azZJWU95WXlTck9iK0lpQlExQTdTYmZLalVHRktZZWFEWkRIUVJodDU4aVV5?=
- =?utf-8?B?c25mc3c0dmVJRTJMZzhVbC9iSkplMXVIZEFGa3gwWEhpUVE5dGp6dlpjUGNP?=
- =?utf-8?B?MVVVSnF3elFxREtFc0puYW9FbWMzN2Z1UG1yWnhFTDUyVXA1TzJXMFZSL3ND?=
- =?utf-8?B?WEJNRnplUFFpcXlMOVMzNUtvbHhXMlhCRDN4UGJzaE1FSzJsd0d2K05SYVFr?=
- =?utf-8?B?VjUrbVBhUFlvb2daNVZTQ3FTTDRPY2lISWUzbUtFV1ZoT1R3aEpmOHo0TkF2?=
- =?utf-8?B?bTR5TnpjSjlEdGJoQUVEaU5JTUtFSzlaTmltOXp3NXhWV3Joak8rd3YwK3gw?=
- =?utf-8?B?NXR2UVZ2T01wZGtWTUgwZEkrOTU0REFUL015anhORlZoUjRLRE1INTI5N2tt?=
- =?utf-8?B?eHBrN0szRHBnYkxhNUdBZGphQ241RFZSRTRJQXd1VUJtMHpnOTBVNlBqRmhu?=
- =?utf-8?B?SDJpbUVjTWdqNXdtUUhPei8rcFI0dko5b1ZCVzN0clZvUFVKRDE0U0d5TmVy?=
- =?utf-8?B?RkF5WWw5enhnbHlMSUM2bG1jb2pzOWt3TGlpc01PY09JcGNYTkxNTGVmZk9B?=
- =?utf-8?B?ZmpCeGk0RzQvcXo3Rk9jdmpBZzJjVkdoTzJuZ3o4SjZrRVFzN3RkMnlreFBI?=
- =?utf-8?Q?EEQ/qGj74gc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UkNYU2QvU080WTlvY2xXZm54dDdwOHhmbWdWL1RkNkprZ0NUQmV4WWlUTlJ1?=
- =?utf-8?B?elAyMlpnY2w0VkV6TWdyOU5ac2hJSHdCaDR0UHYwVTlTN0t1cHhJR1lMM0xK?=
- =?utf-8?B?WkJDeEg4OWRwK3dqZytuT092T2lvbDkvL1VQVkpqWnNoVSttc2ZjSjZqSGVG?=
- =?utf-8?B?UDFjbzRRUENKeGJ5SE85Zlhmd2hLbFVOZWhaSzZ1MFJZZGpzdFdNNGkzV0dH?=
- =?utf-8?B?UFp6ZVNsYmhEZjV0MUZzbG1Lb1pjK0x3M1BDeUt1SFVSc0NwWnFlT0sza2gw?=
- =?utf-8?B?dUU1aU5rMU1sclBZRk9MVVJ1U1I5a2IvSGhiaDczZU5sUHQ5eXgrSUlSd1dl?=
- =?utf-8?B?TEdhNkF3d1FRSzNIWWdnMCswbE50RGlvdUp1cUZSb1FFaEhkeTRPcElUZVA4?=
- =?utf-8?B?N1IzdXhnL2NOcEE5YkZycWhQNDFta2tJbjRTTzJTbDFCZEZxZStCYTVYbkI3?=
- =?utf-8?B?K05KdldqRW5ia09Iem1JUVI0Q3dPcXMvWExzVFY2cVlwRkxiT0ZoTi9FM0hY?=
- =?utf-8?B?d2p3eXh6TEtsSnVrYmJ1ZUNCcGp2NmFaUHQweitydjJERFlCMHIyVlk2dVpY?=
- =?utf-8?B?bE9nMUEzc05BemIxS3NNVERiZ2FZV1Fndm9aZFpLdmljbml5QUtUTmRZSnRm?=
- =?utf-8?B?d28wV1IwelJDM1pTSGdWT3NTOXg2Ujg1aDdxeUVsdTY5anczajJyK1dFNkph?=
- =?utf-8?B?eURPdlZnZXhKYjhTMjFrdmlINGlWZjJtcy9XRVF1UlhCYU0zMStmRkNVZnVx?=
- =?utf-8?B?WFBCL0R1TEo1Rk5leWV5YTZVOWVjcGNxUTBRQ3pNYk4za1Y1ZWxlcEVPbVNV?=
- =?utf-8?B?U1NsWmNWNjkwTEFveEp0c0M5QThOaWtxY0xOM1lFN3JGZG9PVTBIeU1UUTk2?=
- =?utf-8?B?V1NBQlZtTDB4QTJsbk5aZEtQVTZZMDFNRWNXOENKc3lIUmVlUEwxbmFCb3Zn?=
- =?utf-8?B?THE3aXRwU1I1WktUazk5K2tXSXFjdmlZTGlKOTRjUDZwWDhYNjh2Lzg4OThr?=
- =?utf-8?B?Q3ZHbGxsTC9xOTd1NTFBTXZuOS9tdUhFcjZIeGlIOEQ2K3RXK1ltUWNoN2VT?=
- =?utf-8?B?ZGVCa0pGSURDNTdyakZvRk85Wm9ubjdaUjN5dlFESi9nNzRPYVRMWW1pMysy?=
- =?utf-8?B?UXoya0RCU0MvUTBscDFlWHlhNUk0dHN0dHVFbEsvc0tveWJuZmNDNjdKTTM2?=
- =?utf-8?B?ZER1WlcrckZSNzN0U1g3NjdKQjkwM0JabkhUVmE5SVl2a01GMStFQmRnMFFF?=
- =?utf-8?B?dFhCYVhHQWlPOEVRZ2tocTV0ajdKczl0QVVzOFN5MkhqZm9zc29pZEpabW5B?=
- =?utf-8?B?QmcvTU5ZNjB2U3Z0VVVQRlRLekIzVEpzS3h5cHpvemlTblVIbDBiUmlkbVJt?=
- =?utf-8?B?Z3orcjBPcGxnbFlaekdlVk9idkk1Y0QzVEkrY0tlUnU5cjYrMHN5MmdBM28r?=
- =?utf-8?B?RTdoNTF4TEpEZW0zMGhhazh0R0x3WWlGc2pKdFFwaVZqSlBVRDBOTG1IK0px?=
- =?utf-8?B?b3FwRzYxTXdQL05LUTZ6dk5sVmJwR0pCay9JdW95R1hzdVQ5T2hSM1dFL0FG?=
- =?utf-8?B?VGpZcWRKS3VZZy80Y2diaDRtbm82aXZtbGExUkFzenlTVUVQcnc3ZzA3Zmpl?=
- =?utf-8?B?bU1IdSsyYXRsOHFnaHpycmR5T2JYaDNDamdueFZoN29ZcFQxMzJYem5mbFNN?=
- =?utf-8?B?OHltdDRtR2JTYlRiVFJuR3dKYlF1SDJ1ckUzMFdtWWhJSmlyMGlielRuZkdy?=
- =?utf-8?B?c2pzdS9vclhZK1VCYnZzdTJQdzlKQ1ozRzdCeFlpZ2hxb2ZlNllTcHcvRmV0?=
- =?utf-8?B?UElWUzJYeG9FeGNCSW9wN2NyVE1YWnQ3SmFVa3gvNDRtYzYya0RMNGZiUnFY?=
- =?utf-8?B?U2w5czZnM3pnU0FWNWJybzZHbXNHSkdUaUpPdFR3RHViZFo1YmF0Qlp2aGNB?=
- =?utf-8?B?dDI4WFZna1FGQzlQaEMzRWVlMWtXdmNNVnArRHBEazd3aW5YKzROWUpQaVNi?=
- =?utf-8?B?aHJJMWJlVWtkRzVmODdFOFZDM0liVXhxZW1HdjBxbWs1cGxobWw1WU0rcHBY?=
- =?utf-8?B?OWQ3VGVPMWxaS1d3V2RXQnVpSkZQZk1Wdy9Ga1FqU2JCUUNJZERBSlh0NWFk?=
- =?utf-8?Q?+A6tMUzvbmBn1zEmFmqKPoXNy?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f626db96-9fa4-4aeb-c7d5-08dd26624ea4
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Dec 2024 10:36:22.7583
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3Q7sJnKSq4N/xhvvKFLatKrN2lc5yMAqLgRrvicMpw2ZgwyO8x9tMQXODxFZOCPInyl4TtWgKrCPVmXKPz+RWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7816
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cd4a2384-33e9-4efd-915a-dd6fee752638@daynix.com>
 
-On 17/12/24 10:59, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On Fri, Dec 27, 2024 at 01:34:10PM +0900, Akihiko Odaki wrote:
+> On 2024/12/27 10:29, Jason Wang wrote:
+> > 
+> > 
+> > On Thu, Dec 26, 2024 at 7:54 PM Michael S. Tsirkin <mst@redhat.com
+> > <mailto:mst@redhat.com>> wrote:
+> > 
+> >     On Mon, Nov 11, 2024 at 09:27:45AM +0800, Jason Wang wrote:
+> >      > On Wed, Nov 6, 2024 at 4:54 PM Michael S. Tsirkin <mst@redhat.com
+> >     <mailto:mst@redhat.com>> wrote:
+> >      > >
+> >      > > On Sun, Sep 15, 2024 at 10:35:53AM +0900, Akihiko Odaki wrote:
+> >      > > > The specification says the device MUST set num_buffers to 1 if
+> >      > > > VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+> >      > > >
+> >      > > > Fixes: 41e3e42108bc ("vhost/net: enable virtio 1.0")
+> >      > > > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com
+> >     <mailto:akihiko.odaki@daynix.com>>
+> >      > >
+> >      > > True, this is out of spec. But, qemu is also out of spec :(
+> >      > >
+> >      > > Given how many years this was out there, I wonder whether
+> >      > > we should just fix the spec, instead of changing now.
+> >      > >
+> >      > > Jason, what's your take?
+> >      >
+> >      > Fixing the spec (if you mean release the requirement) seems to be
+> >     less risky.
+> >      >
+> >      > Thanks
+> > 
+> >     I looked at the latest spec patch.
+> >     Issue is, if we relax the requirement in the spec,
+> >     it just might break some drivers.
+> > 
+> >     Something I did not realize at the time.
+> > 
+> >     Also, vhost just leaves it uninitialized so there really is no chance
+> >     some driver using vhost looks at it and assumes 0.
+> > >
+> > So it also has no chance to assume it for anything specific value.
 > 
-> Remove platform initialization of SEV/SNP from PSP driver probe time and
-> move it to KVM module load time so that KVM can do SEV/SNP platform
-> initialization explicitly if it actually wants to use SEV/SNP
-> functionality.
+> Theoretically, there could be a driver written according to the
+> specification and tested with other device implementations that set
+> num_buffers to one.
 > 
-> With this patch, KVM will explicitly call into the PSP driver at load time
-> to initialize SNP by default while SEV initialization is done on-demand
-> when SEV/SEV-ES VMs are being launched.
+> Practically, I will be surprised if there is such a driver in reality.
 > 
-> Additionally do SEV platform shutdown when all SEV/SEV-ES VMs have been
-> destroyed to support SEV firmware hotloading and do full SEV and SNP
-> platform shutdown during KVM module unload time.
+> But I also see few reasons to relax the device requirement now; if we used
+> to say it should be set to one and there is no better alternative value, why
+> don't stick to one?
 > 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->   arch/x86/kvm/svm/sev.c | 33 +++++++++++++++++++++++++++++----
->   1 file changed, 29 insertions(+), 4 deletions(-)
+> I sent v2 for the virtio-spec change that retains the device requirement so
+> please tell me what you think about it:
+> https://lore.kernel.org/virtio-comment/20241227-reserved-v2-1-de9f9b0a808d@daynix.com/T/#u
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 72674b8825c4..d55e281ac798 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -86,6 +86,7 @@ unsigned int max_sev_asid;
->   static unsigned int min_sev_asid;
->   static unsigned long sev_me_mask;
->   static unsigned int nr_asids;
-> +static unsigned int nr_sev_vms_active;
->   static unsigned long *sev_asid_bitmap;
->   static unsigned long *sev_reclaim_asid_bitmap;
->   
-> @@ -444,10 +445,16 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
->   	if (ret)
->   		goto e_no_asid;
->   
-> -	init_args.probe = false;
-> -	ret = sev_platform_init(&init_args);
-> -	if (ret)
-> -		goto e_free;
-> +	if ((vm_type == KVM_X86_SEV_VM) ||
-> +	    (vm_type == KVM_X86_SEV_ES_VM)) {
-> +		down_write(&sev_deactivate_lock);
-> +		ret = sev_platform_init(&init_args);
-> +		if (!ret)
-> +			++nr_sev_vms_active;
-> +		up_write(&sev_deactivate_lock);
-> +		if (ret)
-> +			goto e_free;
-> +	}
->   
->   	/* This needs to happen after SEV/SNP firmware initialization. */
->   	if (vm_type == KVM_X86_SNP_VM) {
-> @@ -2942,6 +2949,10 @@ void sev_vm_destroy(struct kvm *kvm)
->   			return;
->   	} else {
->   		sev_unbind_asid(kvm, sev->handle);
-> +		down_write(&sev_deactivate_lock);
-> +		if (--nr_sev_vms_active == 0)
-> +			sev_platform_shutdown();
-> +		up_write(&sev_deactivate_lock);
->   	}
->   
->   	sev_asid_free(sev);
-> @@ -2966,6 +2977,7 @@ void __init sev_set_cpu_caps(void)
->   void __init sev_hardware_setup(void)
->   {
->   	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
-> +	struct sev_platform_init_args init_args = {0};
+> > 
+> > 
+> >     There is another thing out of spec with vhost at the moment:
+> >     it is actually leaving this field in the buffer
+> >     uninitialized. Which is out of spec, length supplied by device
+> >     must be initialized by device.
+> > 
+> > 
+> > What do you mean by "length" here?
+> > 
+> > 
+> > 
+> >     We generally just ask everyone to follow spec.
+> > 
+> > 
+> > Spec can't cover all the behaviour, so there would be some leftovers.
+> > 
+> >        So now I'm inclined to fix
+> >     it, and make a corresponding qemu change.
+> > 
+> > 
+> >     Now, about how to fix it - besides a risk to non-VM workloads, I dislike
+> >     doing an extra copy to user into buffer. So maybe we should add an ioctl
+> >     to teach tun to set num bufs to 1.
+> >     This way userspace has control.
+> > 
+> > 
+> > I'm not sure I will get here. TUN has no knowledge of the mergeable
+> > buffers if I understand it correctly.
+> 
+> I rather want QEMU and other vhost_net users automatically fixed instead of
+> opting-in the fix.
 
-{} (without '0') should do the trick too.
+qemu can be automatic. kernel I am not sure.
 
->   	bool sev_snp_supported = false;
->   	bool sev_es_supported = false;
->   	bool sev_supported = false;
-> @@ -3082,6 +3094,16 @@ void __init sev_hardware_setup(void)
->   	sev_supported_vmsa_features = 0;
->   	if (sev_es_debug_swap_enabled)
->   		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
-> +
-> +	if (!sev_enabled)
-> +		return;
-> +
-> +	/*
-> +	 * NOTE: Always do SNP INIT regardless of sev_snp_supported
-> +	 * as SNP INIT has to be done to launch legacy SEV/SEV-ES
-> +	 * VMs in case SNP is enabled system-wide.
+> The extra copy overhead can be almost eliminated if we initialize the field
+> in TUN/TAP; they already writes other part of the header so we can simply
+> add two bytes there. But I wonder if it's worthwhile.
 
-Out of curiosity - is not SNP INIT what "enables SNP system-wide"? What 
-is that thing which SNP INIT does to allow SEV VMs to run? Thanks,
+Try?
 
-
-> +	 */
-> +	sev_snp_platform_init(&init_args);
->   }
->   
->   void sev_hardware_unsetup(void)
-> @@ -3097,6 +3119,9 @@ void sev_hardware_unsetup(void)
->   
->   	misc_cg_set_capacity(MISC_CG_RES_SEV, 0);
->   	misc_cg_set_capacity(MISC_CG_RES_SEV_ES, 0);
-> +
-> +	/* Do SEV and SNP Shutdown */
-> +	sev_snp_platform_shutdown();
->   }
->   
->   int sev_cpu_init(struct svm_cpu_data *sd)
-
--- 
-Alexey
+> Regards,
+> Akihiko Odaki
 
 
