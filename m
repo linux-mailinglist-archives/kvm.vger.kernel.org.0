@@ -1,234 +1,332 @@
-Return-Path: <kvm+bounces-34386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49EFD9FD109
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 08:24:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 413749FD15A
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 08:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C42F418829BA
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 07:24:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D279F163B0B
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 07:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB674145B16;
-	Fri, 27 Dec 2024 07:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9923D1487C5;
+	Fri, 27 Dec 2024 07:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OKeTQRuM"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B5B143C63;
-	Fri, 27 Dec 2024 07:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9571AD21;
+	Fri, 27 Dec 2024 07:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735284270; cv=none; b=jHPuMuBnb2LTCedyD7vzfRd1YJYDS1lwtTtqFN2ktqmIlXEhmSZtPhEJRnMntOVgfnA/hllLmLIqlEf3WPbqf7hszLqw+92PjessG/Bp9WbvA5zksgfKJUGYH3oUkyBEsjCuO+iVjIip0VfCTT1cuDefo3FyJWUuMJJe9KYkZyk=
+	t=1735284645; cv=none; b=a4WfJB6sg29n6g2fn4kfgtQ0Robr71nDcTXxU0I6u+p7aem6Sc7aGNOnVS53VS862KbxdIVmcVhmqvTcaMaFuxjWXpiI0qPl0jQNn2wbZpo+X7fTDIQ52Jgp67iYhglCP25u+7e5X0Cp/GkEQEUHz+EflAqk4M8ue5OBLSWsAf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735284270; c=relaxed/simple;
-	bh=A2m5yJlhJLjVopIYv1a74LbGWcVvFAGS9/Gfqzru4Fs=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=jcYd0fDh7knDMzDpKACS8YX+c5bQM50DitxkcFvgBCxyxT6rJyjM8gkYxEFy1sPVvU4AaVekv0vYYNh+afuy48QK59yi4M0Whc0SHrfAzdewsCQGTplz0heN0oLoiSwpbYzfwrWkxJ43EZcuxg4ArTqZMm5RhQLbIhzUE8qtq9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YKH3846LVzxWlq;
-	Fri, 27 Dec 2024 15:20:52 +0800 (CST)
-Received: from dggemv704-chm.china.huawei.com (unknown [10.3.19.47])
-	by mail.maildlp.com (Postfix) with ESMTPS id F362C140381;
-	Fri, 27 Dec 2024 15:24:18 +0800 (CST)
-Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 27 Dec 2024 15:24:18 +0800
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemn100017.china.huawei.com (7.202.194.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 27 Dec 2024 15:24:18 +0800
-Subject: Re: [PATCH v2 1/5] hisi_acc_vfio_pci: fix XQE dma address error
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-References: <20241219091800.41462-1-liulongfang@huawei.com>
- <20241219091800.41462-2-liulongfang@huawei.com>
- <099e0e1215f34d64a4ae698b90ee372c@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <73fbb369-1bd7-db91-9868-a8ac42f5dd68@huawei.com>
-Date: Fri, 27 Dec 2024 15:24:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1735284645; c=relaxed/simple;
+	bh=+vj3FYbukl5Pvzm4y9/gm4TgOOVamzZoYEOp9/OlbXE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=Z1Y0q4PsIpiJTVC+Gq/QqyNhGYJQ6qLGR6MCxX1OKbq/wF6sDEe8Y/nxq0czoL+IGv+/LZP7xDhJpeuAEoeeBSU3lpElHOP3k4Y4Dj+g70YnuCZRYEbKCXtWkBp9m4xig1/XMKqAmyybmUvYRmRVLqHnnDgpbj1x88dLw1Id+QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OKeTQRuM; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1735284639; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=usSELyODZ1alEsRTFRW1ZTNvatNfFp763mepPQuF1SU=;
+	b=OKeTQRuMJvw52/ccmMX3gNzLIC7xCRCgL7667hfKhpDBsBC0/e8h8+KG4LhVtH5rewuq3AUtJRPfamfIkA3+YIqZpLCjqXWH0IYwe7B540FukSNLuYTlBmNEHU+4Eem5Zen7GCE5lCmApNMu6ox6SxFCu5ybBH4yRGr20pl235U=
+Received: from 192.168.117.78(mailfrom:zijie.wei@linux.alibaba.com fp:SMTPD_---0WMKRAcr_1735284636 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 27 Dec 2024 15:30:38 +0800
+Message-ID: <b29a499f-36d3-476a-a1bb-99402ef6be2a@linux.alibaba.com>
+Date: Fri, 27 Dec 2024 15:30:36 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <099e0e1215f34d64a4ae698b90ee372c@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemn100017.china.huawei.com (7.202.194.122)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86: ioapic: Optimize EOI handling to reduce
+ unnecessary VM exits
+To: Sean Christopherson <seanjc@google.com>
+References: <20241121065039.183716-1-zijie.wei@linux.alibaba.com>
+ <Z2IDkWPz2rhDLD0P@google.com>
+From: wzj <zijie.wei@linux.alibaba.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xuyun_xy.xy@linux.alibaba.com
+In-Reply-To: <Z2IDkWPz2rhDLD0P@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2024/12/19 18:01, Shameerali Kolothum Thodi wrote:
-> 
-> 
->> -----Original Message-----
->> From: liulongfang <liulongfang@huawei.com>
->> Sent: Thursday, December 19, 2024 9:18 AM
->> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
->> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
->> <jonathan.cameron@huawei.com>
->> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
->> Subject: [PATCH v2 1/5] hisi_acc_vfio_pci: fix XQE dma address error
+
+On December 18, 2024, Sean Christopherson wrote:
+> On Thu, Nov 21, 2024, weizijie wrote:
+>> Address performance issues caused by a vector being reused by a
+>> non-IOAPIC source.
 >>
->> The dma addresses of EQE and AEQE are wrong after migration and
->> results in guest kernel-mode encryption services  failure.
->> Comparing the definition of hardware registers, we found that
->> there was an error when the data read from the register was
->> combined into an address. Therefore, the address combination
->> sequence needs to be corrected.
+>> commit 0fc5a36dd6b3
+>> ("KVM: x86: ioapic: Fix level-triggered EOI and IOAPIC reconfigure race")
+>> addressed the issues related to EOI and IOAPIC reconfiguration races.
+>> However, it has introduced some performance concerns:
 >>
->> Even after fixing the above problem, we still have an issue
->> where the Guest from an old kernel can get migrated to
->> new kernel and may result in wrong data.
+>> Configuring IOAPIC interrupts while an interrupt request (IRQ) is
+>> already in service can unintentionally trigger a VM exit for other
+>> interrupts that normally do not require one, due to the settings of
+>> `ioapic_handled_vectors`. If the IOAPIC is not reconfigured during
+>> runtime, this issue persists, continuing to adversely affect
+>> performance.
 >>
->> In order to ensure that the address is correct after migration,
->> if an old magic number is detected, the dma address needs to be
->> updated.
+>> Simple Fix Proposal:
+>> A straightforward solution is to record the vector that is pending at
+>> the time of injection. Then, upon the next guest exit, clean up the
+>> ioapic_handled_vectors corresponding to the vector number that was
+>> pending. This ensures that interrupts are properly handled and prevents
+>> performance issues.
 >>
->> Fixes:b0eed085903e("hisi_acc_vfio_pci: Add support for VFIO live
->> migration")
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 34 +++++++++++++++----
->>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  9 ++++-
->>  2 files changed, 36 insertions(+), 7 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> index 451c639299eb..8518efea3a52 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> @@ -350,6 +350,27 @@ static int vf_qm_func_stop(struct hisi_qm *qm)
->>  	return hisi_qm_mb(qm, QM_MB_CMD_PAUSE_QM, 0, 0, 0);
->>  }
->>
->> +static int vf_qm_magic_check(struct acc_vf_data *vf_data)
->> +{
->> +	switch (vf_data->acc_magic) {
->> +	case ACC_DEV_MAGIC_V2:
->> +		break;
->> +	case ACC_DEV_MAGIC_V1:
->> +		/* Correct dma address */
->> +		vf_data->eqe_dma = vf_data-
->>> qm_eqc_dw[QM_XQC_ADDR_HIGH];
->> +		vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
->> +		vf_data->eqe_dma |= vf_data-
->>> qm_eqc_dw[QM_XQC_ADDR_LOW];
->> +		vf_data->aeqe_dma = vf_data-
->>> qm_aeqc_dw[QM_XQC_ADDR_HIGH];
->> +		vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
->> +		vf_data->aeqe_dma |= vf_data-
->>> qm_aeqc_dw[QM_XQC_ADDR_LOW];
->> +		break;
->> +	default:
->> +		return -EINVAL;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  static int vf_qm_check_match(struct hisi_acc_vf_core_device
->> *hisi_acc_vdev,
->>  			     struct hisi_acc_vf_migration_file *migf)
->>  {
->> @@ -363,7 +384,8 @@ static int vf_qm_check_match(struct
->> hisi_acc_vf_core_device *hisi_acc_vdev,
->>  	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev-
->>> match_done)
->>  		return 0;
->>
->> -	if (vf_data->acc_magic != ACC_DEV_MAGIC) {
->> +	ret = vf_qm_magic_check(vf_data);
->> +	if (ret) {
->>  		dev_err(dev, "failed to match ACC_DEV_MAGIC\n");
->>  		return -EINVAL;
->>  	}
->> @@ -418,7 +440,7 @@ static int vf_qm_get_match_data(struct
->> hisi_acc_vf_core_device *hisi_acc_vdev,
->>  	int vf_id = hisi_acc_vdev->vf_id;
->>  	int ret;
->>
->> -	vf_data->acc_magic = ACC_DEV_MAGIC;
->> +	vf_data->acc_magic = ACC_DEV_MAGIC_V2;
->>  	/* Save device id */
->>  	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
->>
->> @@ -496,12 +518,12 @@ static int vf_qm_read_data(struct hisi_qm
->> *vf_qm, struct acc_vf_data *vf_data)
->>  		return -EINVAL;
->>
->>  	/* Every reg is 32 bit, the dma address is 64 bit. */
->> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
->> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
->>  	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
->> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
->> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
->> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
->> +	vf_data->aeqe_dma = vf_data-
->>> qm_aeqc_dw[QM_XQC_ADDR_HIGH];
->>  	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
->> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
->> +	vf_data->aeqe_dma |= vf_data-
->>> qm_aeqc_dw[QM_XQC_ADDR_LOW];
->>
->>  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
->>  	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> index 245d7537b2bc..2afce68f5a34 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->> @@ -39,6 +39,9 @@
->>  #define QM_REG_ADDR_OFFSET	0x0004
->>
->>  #define QM_XQC_ADDR_OFFSET	32U
->> +#define QM_XQC_ADDR_LOW	0x1
->> +#define QM_XQC_ADDR_HIGH	0x2
->> +
->>  #define QM_VF_AEQ_INT_MASK	0x0004
->>  #define QM_VF_EQ_INT_MASK	0x000c
->>  #define QM_IFC_INT_SOURCE_V	0x0020
->> @@ -50,10 +53,14 @@
->>  #define QM_EQC_DW0		0X8000
->>  #define QM_AEQC_DW0		0X8020
->>
->> +enum acc_magic_num {
->> +	ACC_DEV_MAGIC_V1 = 0XCDCDCDCDFEEDAACC,
->> +	ACC_DEV_MAGIC_V2 = 0xAACCFEEDDECADEDE,
-> 
-> 
-> I think we have discussed this before that having some kind of 
-> version info embed into magic_num will be beneficial going 
-> forward. ie, may be use the last 4 bytes for denoting version.
-> 
-> ACC_DEV_MAGIC_V2 = 0xAACCFEEDDECA0002
+>> Signed-off-by: weizijie <zijie.wei@linux.alibaba.com>
+>> Signed-off-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+> Your SoB should be last, and assuming Xuyun is a co-author, they need to be
+> credited via Co-developed-by.  See Documentation/process/submitting-patches.rst
+> for details.
+
+I'm sincerely apologize, that was my oversight. I will add 
+Co-developed-by and move my SoB to the end.
+
 >
+>> ---
+>>   arch/x86/include/asm/kvm_host.h |  1 +
+>>   arch/x86/kvm/ioapic.c           | 11 +++++++++--
+>>   arch/x86/kvm/vmx/vmx.c          | 10 ++++++++++
+>>   3 files changed, 20 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index e159e44a6a1b..b008c933d2ab 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1041,6 +1041,7 @@ struct kvm_vcpu_arch {
+>>   #if IS_ENABLED(CONFIG_HYPERV)
+>>   	hpa_t hv_root_tdp;
+>>   #endif
+>> +	DECLARE_BITMAP(ioapic_pending_vectors, 256);
+>>   };
+>>   
+>>   struct kvm_lpage_info {
+>> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+>> index 995eb5054360..6f5a88dc63da 100644
+>> --- a/arch/x86/kvm/ioapic.c
+>> +++ b/arch/x86/kvm/ioapic.c
+>> @@ -284,6 +284,8 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, ulong *ioapic_handled_vectors)
+> The split IRQ chip mode should have the same enhancement.
 
-OK, so the subsequent magic number no longer needs a random value,
-but a predictable and certain value.
+You are absolutely right; the split IRQ has the same issue.
 
-Thanks,
-Longfang.
+We will apply the same enhancement here as will.
 
-> The reason being, otherwise we have to come up with a random
-> magic each time when a fix like this is required in future.
-> 
-> Thanks,
-> Shameer
-> 
-> .
-> 
+>
+>>   	spin_lock(&ioapic->lock);
+>>   
+>> +	bitmap_zero(vcpu->arch.ioapic_pending_vectors, 256);
+> Rather than use a bitmap, what does performance look like if this is a single u8
+> that tracks the highest in-service IRQ at the time of the last scan?  And then
+> when that IRQ is EOI'd, do a full KVM_REQ_SCAN_IOAPIC instead of
+> KVM_REQ_LOAD_EOI_EXITMAP?  Having multiple interrupts in-flight at the time of
+> scan should be quite rare.
+>
+> I like the idea, but burning 32 bytes for an edge case of an edge case seems
+> unnecessary.
+
+This is truly an excellent modification suggestion. Your comprehensive 
+consideration is impressive. Using just a u8 to record highest 
+in-service IRQ and only redoing a full KVM_REQ_SCAN_IOAPIC when the 
+recorded IRQ is EOI'd not only avoids impacting other interrupts that 
+should cause a vm exit, but also saves space.
+
+>   
+>> +
+>>   	/* Make sure we see any missing RTC EOI */
+>>   	if (test_bit(vcpu->vcpu_id, dest_map->map))
+>>   		__set_bit(dest_map->vectors[vcpu->vcpu_id],
+>> @@ -297,10 +299,15 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, ulong *ioapic_handled_vectors)
+>>   			u16 dm = kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
+>>   
+>>   			if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+>> -						e->fields.dest_id, dm) ||
+>> -			    kvm_apic_pending_eoi(vcpu, e->fields.vector))
+>> +						e->fields.dest_id, dm))
+>> +				__set_bit(e->fields.vector,
+>> +					  ioapic_handled_vectors);
+>> +			else if (kvm_apic_pending_eoi(vcpu, e->fields.vector)) {
+>>   				__set_bit(e->fields.vector,
+>>   					  ioapic_handled_vectors);
+>> +				__set_bit(e->fields.vector,
+>> +					  vcpu->arch.ioapic_pending_vectors);
+>> +			}
+>>   		}
+>>   	}
+>>   	spin_unlock(&ioapic->lock);
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 0f008f5ef6f0..572e6f9b8602 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -5710,6 +5710,16 @@ static int handle_apic_eoi_induced(struct kvm_vcpu *vcpu)
+>>   
+>>   	/* EOI-induced VM exit is trap-like and thus no need to adjust IP */
+>>   	kvm_apic_set_eoi_accelerated(vcpu, vector);
+>> +
+>> +	/* When there are instances where ioapic_handled_vectors is
+>> +	 * set due to pending interrupts, clean up the record and the
+>> +	 * corresponding bit after the interrupt is completed.
+>> +	 */
+>> +	if (test_bit(vector, vcpu->arch.ioapic_pending_vectors)) {
+> This belongs in common code, probably kvm_ioapic_send_eoi().
+We make the code on the common path as simple as possible.
+>> +		clear_bit(vector, vcpu->arch.ioapic_pending_vectors);
+>> +		clear_bit(vector, vcpu->arch.ioapic_handled_vectors);
+>> +		kvm_make_request(KVM_REQ_LOAD_EOI_EXITMAP, vcpu);
+>> +	}
+>>   	return 1;
+>>   }
+>>   
+KVM: x86: ioapic: Optimize EOI handling to reduce
+  unnecessary VM exits
+
+Address performance issues caused by a vector being reused by a
+non-IOAPIC source.
+
+commit 0fc5a36dd6b3
+("KVM: x86: ioapic: Fix level-triggered EOI and IOAPIC reconfigure race")
+addressed the issues related to EOI and IOAPIC reconfiguration races.
+However, it has introduced some performance concerns:
+
+Configuring IOAPIC interrupts while an interrupt request (IRQ) is
+already in service can unintentionally trigger a VM exit for other
+interrupts that normally do not require one, due to the settings of
+`ioapic_handled_vectors`. If the IOAPIC is not reconfigured during
+runtime, this issue persists, continuing to adversely affect
+performance.
+
+Simple Fix Proposal:
+A straightforward solution is to record highest in-service IRQ that
+is pending at the time of the last scan. Then, upon the next guest
+exit, do a full KVM_REQ_SCAN_IOAPIC. This ensures that a re-scan of
+the ioapic occurs only when the recorded vector is EOI'd, and
+subsequently, the extra bit in the eoi_exit_bitmap are cleared,
+avoiding unnecessary VM exits.
+
+Co-developed-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+Signed-off-by: xuyun <xuyun_xy.xy@linux.alibaba.com>
+Signed-off-by: weizijie <zijie.wei@linux.alibaba.com>
+---
+v1 -> v2
+
+* Move my SoB to the end and add Co-developed-by for Xuyun
+
+* Use a u8 type to record a pending IRQ during the ioapic scan process
+
+* Made the same changes for the split IRQ chip mode
+
+arch/x86/include/asm/kvm_host.h |  1 +
+  arch/x86/kvm/ioapic.c           | 10 ++++++++--
+  arch/x86/kvm/irq_comm.c         |  9 +++++++--
+  arch/x86/kvm/vmx/vmx.c          |  9 +++++++++
+  4 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h 
+b/arch/x86/include/asm/kvm_host.h
+index e159e44a6a1b..f84a4881afa4 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1041,6 +1041,7 @@ struct kvm_vcpu_arch {
+  #if IS_ENABLED(CONFIG_HYPERV)
+         hpa_t hv_root_tdp;
+  #endif
++       u8 last_pending_vector;
+  };
+
+  struct kvm_lpage_info {
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index 995eb5054360..40252a800897 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -297,10 +297,16 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, 
+ulong *ioapic_handled_vectors)
+                         u16 dm = 
+kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
+
+                         if (kvm_apic_match_dest(vcpu, NULL, 
+APIC_DEST_NOSHORT,
+- e->fields.dest_id, dm) ||
+-                           kvm_apic_pending_eoi(vcpu, e->fields.vector))
++ e->fields.dest_id, dm))
+                                 __set_bit(e->fields.vector,
+                                           ioapic_handled_vectors);
++                       else if (kvm_apic_pending_eoi(vcpu, 
+e->fields.vector)) {
++                               __set_bit(e->fields.vector,
++                                         ioapic_handled_vectors);
++                               vcpu->arch.last_pending_vector = 
+e->fields.vector >
++ vcpu->arch.last_pending_vector ? e->fields.vector :
++ vcpu->arch.last_pending_vector;
++                       }
+                 }
+         }
+         spin_unlock(&ioapic->lock);
+diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+index 8136695f7b96..1d23c52576e1 100644
+--- a/arch/x86/kvm/irq_comm.c
++++ b/arch/x86/kvm/irq_comm.c
+@@ -426,9 +426,14 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
+
+                         if (irq.trig_mode &&
+                             (kvm_apic_match_dest(vcpu, NULL, 
+APIC_DEST_NOSHORT,
+-                                                irq.dest_id, 
+irq.dest_mode) ||
+-                            kvm_apic_pending_eoi(vcpu, irq.vector)))
++                                                irq.dest_id, 
+irq.dest_mode)))
+                                 __set_bit(irq.vector, 
+ioapic_handled_vectors);
++                       else if (kvm_apic_pending_eoi(vcpu, irq.vector)) {
++                               __set_bit(irq.vector, 
+ioapic_handled_vectors);
++                               vcpu->arch.last_pending_vector = 
+irq.vector >
++ vcpu->arch.last_pending_vector ? irq.vector :
++ vcpu->arch.last_pending_vector;
++                       }
+                 }
+         }
+         srcu_read_unlock(&kvm->irq_srcu, idx);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 893366e53732..cd0db1496ce7 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5702,6 +5702,15 @@ static int handle_apic_eoi_induced(struct 
+kvm_vcpu *vcpu)
+
+         /* EOI-induced VM exit is trap-like and thus no need to adjust 
+IP */
+         kvm_apic_set_eoi_accelerated(vcpu, vector);
++
++       /* When there are instances where ioapic_handled_vectors is
++        * set due to pending interrupts, clean up the record and do
++        * a full KVM_REQ_SCAN_IOAPIC.
++        */
++       if (vcpu->arch.last_pending_vector == vector) {
++               vcpu->arch.last_pending_vector = 0;
++               kvm_make_request(KVM_REQ_SCAN_IOAPIC, vcpu);
++       }
+         return 1;
+  }
+
+>> -- 
+>> 2.43.5
+>>
 
