@@ -1,193 +1,170 @@
-Return-Path: <kvm+bounces-34384-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34385-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B83F9FD031
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 05:34:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485619FD0FD
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 08:21:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A49E11883743
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 04:34:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD9CE3A05B3
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 07:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6CF12A177;
-	Fri, 27 Dec 2024 04:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="Xstp4uhf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF8D1459F6;
+	Fri, 27 Dec 2024 07:21:23 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAC5442F
-	for <kvm@vger.kernel.org>; Fri, 27 Dec 2024 04:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064C01DA4E;
+	Fri, 27 Dec 2024 07:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735274055; cv=none; b=PjoAVZor9aKtASqYgS/nGrhd67jPc9n73j7KHrVjDAcRResikBEZ0ABkOtPWjyrKovltD9IWyaX9bC32AmcrH/p4OzN0VT9hCcZOKuvOvxv6pTN4uWN7P13n6Jv4XfVQ2OCLhSdahSbfwACdByH7Tv/joAvRamohfF9NRLAXBn8=
+	t=1735284082; cv=none; b=Kf8jTZTThB95gBcB+vFEh6R9iJ1aTnEoLal/5YmxheI9t8gkvtaQI4AaKVbbN/e1xSTWflAuZG16wksoNwwgdVOWG/y6QT/EmP0osKfo3hrejise5N/hL9461DHXRin2tl5WsStX7dCUmXexOvEKXUVZBVgwAHEflLhx6MLekPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735274055; c=relaxed/simple;
-	bh=FVW7XNY64xuydDmLofP+sTKTUNUDp24hB/HXdgDSItk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m1RvIrMcEjf4ZqP2RJMIIXBU4fOQ+BoLo3eTmvNKYhh/0Kns3D6jWmEU2rhsuPopG4srTy/mRFmuq+EsvbzWbMbmds1zZJXHmnEpslOBvnbDUwm7Ol6xkIAKFhDQAJXN8T1wFMyxSFjSg0M7gWcBv0B8BGnyPAsm+0vsf8fETyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=Xstp4uhf; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ee51f8c47dso6531629a91.1
-        for <kvm@vger.kernel.org>; Thu, 26 Dec 2024 20:34:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1735274053; x=1735878853; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hwCjjlIrKBk+YtuDMOqh5H8o6TB/HNBq181H/Zb/guw=;
-        b=Xstp4uhfh13NkilnzVcowH4103wj2tYBtgE78Ll3pLRMwB6JCyZoKElGgUgo4pfupO
-         uYwRll+Nnp+2oEtUV+lrT1tOLjaka5cchaR2KlxilAIfgJ8TTLtbcou4ENqmmCoHTQrE
-         ReA4XGFR41vl0NIVSvGiXFV+KcyKC/dSbSff8Oed4BrNebgxPkRkBvghc7/IDKds7BWb
-         vXVJrHG1dc1Q+fFX9M1r0dExRn4ONqlBbiS0dceMKREn8kCQz8scqOPcwECOsh6iy0JW
-         I1YGRDEm8Xp0Nu2UR1KAChpvDJo88qLKy0278pfU809hQzYqzPCIeyK5/vQijsISmFwy
-         nXMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735274053; x=1735878853;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hwCjjlIrKBk+YtuDMOqh5H8o6TB/HNBq181H/Zb/guw=;
-        b=ieDSGuN/RsB+vju9XEuyAwDRPAAg4Sxw1uThmPZeEPegOyMEGSDxx/mEICuCwm2xPK
-         bWo/0dsQHrK06i6c5R1FD50tFE9vgElvFh0J2ShfKPsPD3Q73sgKjpmQpMZJ9ADXfmEu
-         DpZnXItjaPHpRcuE4+FulqE2V6HV+edCthI6OmUir83uqzRsC9HKrzOZG29g0GoeLVdg
-         sV5xwm/erZF2G9F/GzZostxoom0VHdeNkgAh/ssGQBkLXy7GPrYDqWRp/v07ObXxvqkg
-         U0qAiZ4OMf0aP2l0M+tu0oXMKhr468HibjtizI1uGXXB8UOJOBD9qJMshLKBHdJ8GsLe
-         yQ7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXi2+t8AurzVOta9hCZfdy48DetZ6B9CFSFW0CmxAEB++RReYoHbiewkBjTJBIyxp5w9FM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyaon8i7Xzw+jXVr61NEBSD0kGV7Il6qGRe3brDox77caIYC4FE
-	EmqEKRfDBwNO2XeD2JAOvo1+GTkII1t0476CkZZEmLmhU+qAjyDCQXV1Z5cosUg=
-X-Gm-Gg: ASbGncu8SwJCmNnKqEqEN1ZTS0NfmdGx+dBikAGd6I8rSGQB8E3ZnmxtEkBWhqYdqMF
-	bLM/YXQm2ZqRIbsoom4fbfYqcnOtseMf4QmVhmfRE9v9U4a64uR8yk0LOC8BPRJmdfIVnS2Sq9d
-	rtmioSh+X0mE80RXG0h1mPJc4TxWBWPTy6a+XpW6l4DU5JZaO8JMPvBypHAf3l9pjh9s1OMg5Fv
-	pAe5SiKpr/oBjwARlf61k+Rp8G7oTFonEP2Nfk5UyaTiDbng+2wHc7OM5UgAHxILRy+0A==
-X-Google-Smtp-Source: AGHT+IHbpgq5016PFvFeTeZ6RoKGAfu8Cv7iPr2JE4+A0XviJrDeYl5kAk/GomPB/LPyZ9Od5C0lCQ==
-X-Received: by 2002:a17:90a:c2ce:b0:2ee:4513:f1d1 with SMTP id 98e67ed59e1d1-2f452eb24b8mr34814458a91.23.1735274053570;
-        Thu, 26 Dec 2024 20:34:13 -0800 (PST)
-Received: from [157.82.207.107] ([157.82.207.107])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f4478a92absm14894900a91.44.2024.12.26.20.34.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Dec 2024 20:34:13 -0800 (PST)
-Message-ID: <cd4a2384-33e9-4efd-915a-dd6fee752638@daynix.com>
-Date: Fri, 27 Dec 2024 13:34:10 +0900
+	s=arc-20240116; t=1735284082; c=relaxed/simple;
+	bh=7CWKJG4AHNNfDG0iusfHb1mnElQ7DxjIwM03c7fgCvs=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=r6dWLQ9hyKwRU/7icWBY0alyhkoJ6ZNBaukyDBoB99Cy76azJ8+V30ci24sAYVdF9vDoXMWD/sgxqUCqW/hvRkHlhPPTmaH4BdHPFyFgJOCMeN6c6g1sE7OrIUJLOUdW9777F8C0sNByySmDY1Bj/aDTnS6ahxYLSUoz4lKxf3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4YKH0J4ysTz1kwwM;
+	Fri, 27 Dec 2024 15:18:24 +0800 (CST)
+Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
+	by mail.maildlp.com (Postfix) with ESMTPS id 793741A0188;
+	Fri, 27 Dec 2024 15:21:10 +0800 (CST)
+Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 27 Dec 2024 15:21:10 +0800
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemn100017.china.huawei.com (7.202.194.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 27 Dec 2024 15:21:09 +0800
+Subject: Re: [PATCH v2 5/5] hisi_acc_vfio_pci: bugfix live migration function
+ without VF device driver
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
+References: <20241219091800.41462-1-liulongfang@huawei.com>
+ <20241219091800.41462-6-liulongfang@huawei.com>
+ <a39f57190a46497e816eefa6b649b583@huawei.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <98722fb2-fd84-9c2f-b080-31c1bb8f9aea@huawei.com>
+Date: Fri, 27 Dec 2024 15:20:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vhost/net: Set num_buffers for virtio 1.0
-To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240915-v1-v1-1-f10d2cb5e759@daynix.com>
- <20241106035029-mutt-send-email-mst@kernel.org>
- <CACGkMEt0spn59oLyoCwcJDdLeYUEibePF7gppxdVX1YvmAr72Q@mail.gmail.com>
- <20241226064215-mutt-send-email-mst@kernel.org>
- <CACGkMEug-83KTBQjJBEKuYsVY86-mCSMpuGgj-BfcL=m2VFfvA@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEug-83KTBQjJBEKuYsVY86-mCSMpuGgj-BfcL=m2VFfvA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <a39f57190a46497e816eefa6b649b583@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemn100017.china.huawei.com (7.202.194.122)
 
-On 2024/12/27 10:29, Jason Wang wrote:
+On 2024/12/19 18:02, Shameerali Kolothum Thodi wrote:
 > 
 > 
-> On Thu, Dec 26, 2024 at 7:54 PM Michael S. Tsirkin <mst@redhat.com 
-> <mailto:mst@redhat.com>> wrote:
+>> -----Original Message-----
+>> From: liulongfang <liulongfang@huawei.com>
+>> Sent: Thursday, December 19, 2024 9:18 AM
+>> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
+>> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>
+>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
+>> Subject: [PATCH v2 5/5] hisi_acc_vfio_pci: bugfix live migration function
+>> without VF device driver
+>>
+>> If the driver of the VF device is not loaded in the Guest OS,
+>> then perform device data migration. The migrated data address will
+>> be NULL.
+>> The live migration recovery operation on the destination side will
+>> access a null address value, which will cause access errors.
+>>
+>> Therefore, live migration of VMs without added VF device drivers
+>> does not require device data migration.
+>> In addition, when the queue address data obtained by the destination
+>> is empty, device queue recovery processing will not be performed.
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 > 
->     On Mon, Nov 11, 2024 at 09:27:45AM +0800, Jason Wang wrote:
->      > On Wed, Nov 6, 2024 at 4:54 PM Michael S. Tsirkin <mst@redhat.com
->     <mailto:mst@redhat.com>> wrote:
->      > >
->      > > On Sun, Sep 15, 2024 at 10:35:53AM +0900, Akihiko Odaki wrote:
->      > > > The specification says the device MUST set num_buffers to 1 if
->      > > > VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
->      > > >
->      > > > Fixes: 41e3e42108bc ("vhost/net: enable virtio 1.0")
->      > > > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com
->     <mailto:akihiko.odaki@daynix.com>>
->      > >
->      > > True, this is out of spec. But, qemu is also out of spec :(
->      > >
->      > > Given how many years this was out there, I wonder whether
->      > > we should just fix the spec, instead of changing now.
->      > >
->      > > Jason, what's your take?
->      >
->      > Fixing the spec (if you mean release the requirement) seems to be
->     less risky.
->      >
->      > Thanks
-> 
->     I looked at the latest spec patch.
->     Issue is, if we relax the requirement in the spec,
->     it just might break some drivers.
-> 
->     Something I did not realize at the time.
-> 
->     Also, vhost just leaves it uninitialized so there really is no chance
->     some driver using vhost looks at it and assumes 0.
- > >
-> So it also has no chance to assume it for anything specific value.
+> Why this doesn't need a Fixes tag?
+>
 
-Theoretically, there could be a driver written according to the 
-specification and tested with other device implementations that set 
-num_buffers to one.
+If we need to synchronize to the stable branch, we can add the Fixes tag here.
 
-Practically, I will be surprised if there is such a driver in reality.
+>> ---
+>>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 18 ++++++++++++++++++
+>>  1 file changed, 18 insertions(+)
+>>
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index 8d9e07ebf4fd..9a5f7e9bc695 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -436,6 +436,7 @@ static int vf_qm_get_match_data(struct
+>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  				struct acc_vf_data *vf_data)
+>>  {
+>>  	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
+>> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+>>  	struct device *dev = &pf_qm->pdev->dev;
+>>  	int vf_id = hisi_acc_vdev->vf_id;
+>>  	int ret;
+>> @@ -460,6 +461,13 @@ static int vf_qm_get_match_data(struct
+>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  		return ret;
+>>  	}
+>>
+>> +	/* Get VF driver insmod state */
+>> +	ret = qm_read_regs(vf_qm, QM_VF_STATE, &vf_data->vf_qm_state,
+>> 1);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to read QM_VF_STATE!\n");
+>> +		return ret;
+>> +	}
+>> +
+>>  	return 0;
+>>  }
+>>
+>> @@ -499,6 +507,12 @@ static int vf_qm_load_data(struct
+>> hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	qm->qp_base = vf_data->qp_base;
+>>  	qm->qp_num = vf_data->qp_num;
+>>
+>> +	if (!vf_data->eqe_dma || !vf_data->aeqe_dma ||
+>> +	    !vf_data->sqc_dma || !vf_data->cqc_dma) {
+>> +		dev_err(dev, "resume dma addr is NULL!\n");
+>> +		return -EINVAL;
+>> +	}
+>> +
+> 
+> So this is to cover the corner case where the Guest has loaded the driver
+> (QM_READY set) but not configured the DMA address? When this will happen?
+> I thought we are setting QM_READY in guest after all configurations.
+>
 
-But I also see few reasons to relax the device requirement now; if we 
-used to say it should be set to one and there is no better alternative 
-value, why don't stick to one?
+When performing remote live migration, there are abnormal scenarios where the dma
+value received through the network is empty.
+The driver needs to prevent this null DMA address data from being sent to the hardware.
 
-I sent v2 for the virtio-spec change that retains the device requirement 
-so please tell me what you think about it:
-https://lore.kernel.org/virtio-comment/20241227-reserved-v2-1-de9f9b0a808d@daynix.com/T/#u
+Thanks.
+Longfang.
 
+> Thanks,
+> Shameer
 > 
 > 
->     There is another thing out of spec with vhost at the moment:
->     it is actually leaving this field in the buffer
->     uninitialized. Which is out of spec, length supplied by device
->     must be initialized by device.
+> .
 > 
-> 
-> What do you mean by "length" here?
-> 
-> 
-> 
->     We generally just ask everyone to follow spec.
-> 
-> 
-> Spec can't cover all the behaviour, so there would be some leftovers.
-> 
->        So now I'm inclined to fix
->     it, and make a corresponding qemu change.
-> 
-> 
->     Now, about how to fix it - besides a risk to non-VM workloads, I dislike
->     doing an extra copy to user into buffer. So maybe we should add an ioctl
->     to teach tun to set num bufs to 1.
->     This way userspace has control.
-> 
-> 
-> I'm not sure I will get here. TUN has no knowledge of the mergeable 
-> buffers if I understand it correctly.
-
-I rather want QEMU and other vhost_net users automatically fixed instead 
-of opting-in the fix.
-
-The extra copy overhead can be almost eliminated if we initialize the 
-field in TUN/TAP; they already writes other part of the header so we can 
-simply add two bytes there. But I wonder if it's worthwhile.
-
-Regards,
-Akihiko Odaki
 
