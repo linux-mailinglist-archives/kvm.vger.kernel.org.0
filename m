@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-34393-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34394-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC819FD2FA
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 11:25:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29F189FD302
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 11:30:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAB0C1632B6
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 10:25:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB47A3A0769
+	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 10:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1F61DD874;
-	Fri, 27 Dec 2024 10:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B87D1DE4EA;
+	Fri, 27 Dec 2024 10:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="M/gd5PTO"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="o8HowwWp"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2069.outbound.protection.outlook.com [40.107.236.69])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2045.outbound.protection.outlook.com [40.107.236.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4011482F5;
-	Fri, 27 Dec 2024 10:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A115D1DE3DD;
+	Fri, 27 Dec 2024 10:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735295135; cv=fail; b=eV0ZUZG4Y2MR+Pu6nK7i9fepzqRnW9SsZUAgFZ/UOKrpv4GgAVZS1y9470YyeoayD/l0djODvRV8A8m9s8lI79SvK/xZBCrbwSBEhmjjnp07LMr3V3pYh3TruiBOUD6c4Lb4cKrhK4lhFWPJTrxbofc00SfbCqbmO7WW9KH9fso=
+	t=1735295420; cv=fail; b=IUQsD435tfYEUDoCHXS0DiKYVpakjjh0T2cdp8CUfyw9tuh70p+ZZ4PFN+gLtilslkKJ+PZHLQZlRqhw6wabumb2f18OwAU0rg8BrRIjzEMnHyCcRorCbQzz8fVk3ZlyiOmEGHsk4xBJyaKuCi+z8O+5diXFV8Y9U3gFLlEungo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735295135; c=relaxed/simple;
-	bh=FvkVtm5TRttbgRxwgVmnqPTEatf6khDfVtT1hOtvvVs=;
+	s=arc-20240116; t=1735295420; c=relaxed/simple;
+	bh=UPqGYEHmMcifN7fomhe6NyruzzJgTamhFhzJgA9qWqg=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=I3NLey4tpvAC2mpiwJA9pAZ5noycfJHZYpg8BdwU0YPu0b+rHrYI39oQDOWVtd/SKN3tMYuYBoKVks6Xn8tU4HOPbhcg8PAgrQGBobk3MR+zlKzdpt6U5LVD+0YPn1hONhnLsdcu+xhyeB2LMYDdepLhF+VFnwJ4KPDaEzJtf1s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=M/gd5PTO; arc=fail smtp.client-ip=40.107.236.69
+	 Content-Type:MIME-Version; b=JkYGXrItjG4JcN9/EzxkyWQyLqYtiybL/dn+2gljoawu2EeGnHaeNLaWhepw8uT0TL+WVBp+jZ+DbFGTIB2uEkz+IVzhPqzjvLtYnVeN3vlyKkLVS9+z61XlJ1UfamnnKEHjA+WM3NuUnXz8qYBs+01uHBoKFQ1cb25to8Oa0sg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=o8HowwWp; arc=fail smtp.client-ip=40.107.236.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cOk5hHtsB6nY6IwTjR7FFEw9RDYXRPzZwiG67z6X/cpuE1BqTnmlKpr/DK9UKbVvy9KsVdfNJg/pwp8jtpKOQp3rMI8WXjtRwKsfGF03WoD1rCk91wiGET2XtO4uN+Q0iemOWTwqx4573iDe2tbvKLyhQlh7soinJ4NKld5pdXZiEb8aAJmPViHR/VYgGLBYO7IllgH8OZK1qTuNnA1tKQ9v8XMsyeWElhFQe3NV+N1WqQaiEbeljtEz8A3py1kFhK3s54PwgOQ3w/TAfgetULexdk/JzgS2ppTJTPndF9Piw/B1HX7LpitFUnsFKQRGXCaYx0xoU+uTTA9jR3iZ9Q==
+ b=k2S3bz/w5ldmhsr4ldmdZKNxDAXmBM2qRFoJ0GtUusNlVPOLPZ1cXyOluaLqVdxVhn2R6K+Qq5P6d/VtNiKkk5/r+z8Y6W0JTkiOriX0ao3foobhl9Gf//z4j4SnXyRh9qLU0Yd2WX9P+Qd1arUAftl8iLei+c743fZ+bKAsPAHunYreJ1oXMYTXdklTiqDwDONhbLOsrUjl4WpBBRwHn52+SGuHSrKJ6cUqoc0VAPXQ0IJwIDRY+2h6O83oinEKmcE93dWBzY37fs1LDGHM69VLpoVU6vgMnoUazpo1WAarGrhEbfYtAXrJwn/p/laaru6RY93T0v8camP06bFLzw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hJUKTjmzmWDPHjTFUKF0bwORl+qHTgMjfMEVyoNfV6c=;
- b=F3EtklsoT/0yIy5zKhPMrQg468e4g2LKGdvPgnc34FaMAwLcmLBvfRVZlaulmcJ+p/lYTAjnuBMwUwsuyfx4U0CVWK7DY95I2WAR+a1Mez6x+j/gtgrKydgXWUxbDtiruftX2Kxa88dGBr622CYgtEmHSzerrua5lnLj3u18JNnCQgbRBxojvE9RZHdCZx+PJgIc8yACfl6x58QDnY2z0bYcbW9VEz2iRjXmwru9tVor8PdwfvNbE0+BLYBDeDMfNOOV0g6Q4Jl3HLuWNyI3a3qBhNtHyUt5FtA0AaHubtl9xTMRK5qGsqwnLLziJGtcrEJvsi+AH3pB2MDLgC/kxQ==
+ bh=7Me/aw13L8EVauAggUcltALASqG6HUue7s1mqlfz9rQ=;
+ b=df7cXfxP/C0R1BaYK8zcvAwMJMhIeuq0+LLa1NzrmGGHjLhyWxbjX01fNn9dK4jx6wvU1Nab3PZIRe9lTlHgD/+NyxezeVj5zf7v9+HlgVrmlLFPavXwFWZWNTcJhpSqnLcCMgskE5zjpvXIZ6d5RgANyoaFaaVSNxWI+1WZvRpMSoK6EEXk8s5K1jEwtkOO/eu0WShDe7CdyOocILibcRAVkrxj+yzSE/JGnTKV3t4gVKKisNk365HhPUabRvXOiBS/oVYuatXCaXc1bmi1kTtVbMtd7RrKD71U1JzyKv9I0lhR3K+pp3IZ55ELRbU7UqhnpOm1sz8Gz3kJrT6ACQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hJUKTjmzmWDPHjTFUKF0bwORl+qHTgMjfMEVyoNfV6c=;
- b=M/gd5PTORtkX/hkArRa95kPQiD+oqduZogK9IK139LQDR65SMaKwrAGGn3H3DcmL3oNN/bew9/tMiiTd5uw9iqkscrh8ZdxscfksjT9ziBHMFXNIH8V45/eZ8hBNNfoI580ypok9lRWlT5aBaEe9TtYfRibgOy5c5Ia4paOCSYU=
+ bh=7Me/aw13L8EVauAggUcltALASqG6HUue7s1mqlfz9rQ=;
+ b=o8HowwWpCmzJrNF7+oQHDy8QYdU4PxtFGfYQJ447hNDe+VN4GDKmjeq3G9PAuF8ZIbrpT3S19tw27vYn9NUa1k8G8Y1FmYzaxZ+6RfpkIMYayGbtAOzqe/KvNC44yk9EaOoLZkltcw1lnmK8g8i5zLlDJZyvfTzC6BVE+6aNHvo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
  by SA1PR12MB7246.namprd12.prod.outlook.com (2603:10b6:806:2bc::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.14; Fri, 27 Dec
- 2024 10:25:27 +0000
+ 2024 10:30:12 +0000
 Received: from CH3PR12MB9194.namprd12.prod.outlook.com
  ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
  ([fe80::53fb:bf76:727f:d00f%4]) with mapi id 15.20.8293.000; Fri, 27 Dec 2024
- 10:25:27 +0000
-Message-ID: <2cbe9026-ce18-42c6-b8fd-750c55dde5a3@amd.com>
-Date: Fri, 27 Dec 2024 21:25:12 +1100
+ 10:30:12 +0000
+Message-ID: <03e684da-c465-45f8-95df-8d70980a83e8@amd.com>
+Date: Fri, 27 Dec 2024 21:29:59 +1100
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 7/9] crypto: ccp: Add new SEV/SNP platform
- initialization API
+Subject: Re: [PATCH v2 9/9] crypto: ccp: Move SEV/SNP Platform initialization
+ to KVM
 Content-Language: en-US
 To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
  pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
@@ -71,13 +71,13 @@ Cc: michael.roth@amd.com, dionnaglaze@google.com, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
  linux-coco@lists.linux.dev
 References: <cover.1734392473.git.ashish.kalra@amd.com>
- <a6e6bb0d16e70be61c1ecb2460c90803b937d42a.1734392473.git.ashish.kalra@amd.com>
+ <f7129ef82e622ce52b194ab017fee9b1881b0cc8.1734392473.git.ashish.kalra@amd.com>
 From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <a6e6bb0d16e70be61c1ecb2460c90803b937d42a.1734392473.git.ashish.kalra@amd.com>
+In-Reply-To: <f7129ef82e622ce52b194ab017fee9b1881b0cc8.1734392473.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TPYP295CA0002.TWNP295.PROD.OUTLOOK.COM
- (2603:1096:7d0:9::11) To CH3PR12MB9194.namprd12.prod.outlook.com
+X-ClientProxiedBy: TP0P295CA0018.TWNP295.PROD.OUTLOOK.COM
+ (2603:1096:910:5::16) To CH3PR12MB9194.namprd12.prod.outlook.com
  (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -87,186 +87,246 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|SA1PR12MB7246:EE_
-X-MS-Office365-Filtering-Correlation-Id: d2192f63-7574-41dd-7440-08dd2660c7d1
+X-MS-Office365-Filtering-Correlation-Id: 9ee131ec-2326-4f90-1953-08dd266171b9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WUEycEVUc2tNUyt3Wk5QZVBMcjA5SlV5dVhoWHJFdnVxSlpuV3g2N2E1SXVK?=
- =?utf-8?B?ZWlDMk9UQTBwMDNMQ09mZllmNmlxeFd2R2FSeFl1Wk1hTDNTcER3U0lkUUx0?=
- =?utf-8?B?MnB5N1BSa21YeXJDU09rRW9KUml4Z1daN2JTTExPbTJsNTRicGI4TklvVjY3?=
- =?utf-8?B?ZmhGZ2Ztdjg3YjV6cDU0MjZ5b2s5NHEvYkhYWXU1ZUhSK1VZRzBvUVR5UGFP?=
- =?utf-8?B?WUlPRWFHY25Fc2s0Q00xWnFZYTJzYXUzOXhsNFp5ak44eHcyM1NrYlhOaXJF?=
- =?utf-8?B?K0orMjV3MDBXbVBsQnJUclVXK0I4K2JsSGVIcUZhRFBBZ1V4djkzSHNwK2pO?=
- =?utf-8?B?Sk0yWCt6UGZpUnNxT1ZLQk5YYVovMUlZQlpWUVpKV3dPM2VRaTJ5bkdVWTBS?=
- =?utf-8?B?MmwwbDlybWtEWFczNDh2Q25wbGVWTVdTTDBTMVZScmdEV3o3OTZXb05meng2?=
- =?utf-8?B?ajhtVjhjY242M3o2ZzNhWnU5NGdkejBRKzFJbWxVOGlmekJXalFwR01PYlFz?=
- =?utf-8?B?MW5qWU5FSDROV3R6UDlZM2pvcVhqRFVHVWhITU44TldnZkhJandCc2MvVWtl?=
- =?utf-8?B?M2pUUEZiZjhrMWc0SHl2anVUUDRLQkhKT2dWYU80cGN5MDdLakd2bURJVytW?=
- =?utf-8?B?SFpubEc5azkzV0V4OU5QemlCNVlQOERLc1N6azV4eXlhMFhnSlJJNjF5Znk3?=
- =?utf-8?B?bkRwaFNRSUpQSzlZNVlwc2pDWW8yUUVXSXA5TGlNTXAwc0hXV0NoYzMxeXJC?=
- =?utf-8?B?cGF1YWRPclRFOXZRNTdacVFQYkxvYlhmQ1BOOHJYK2x3d2RBVlVZaTJlL29M?=
- =?utf-8?B?VWxHSkJMZHlRekt4ZjJZNjdaMC9rVjVaRWhTVkkzWlk1UnZZUEFZMXE1cUFH?=
- =?utf-8?B?eEJaODM0aTF2ODB6UElqRlBweGtwUXBMVlFlRGc0OFlCajgvN2wvN01GR1ZS?=
- =?utf-8?B?WkNwUGJSTVRyV0Y4TS9zbUVoYTVIQjg3d1JPN3hLS2F2a2FEK3FlSURZK3NT?=
- =?utf-8?B?WlFodEpGY1JqV0lKVnhOdTRITEJQaUM2NGFTR1IwZllVeFh2MUZUd2xYclJ2?=
- =?utf-8?B?SUpXMlh3MUhvRmNmQ1dhV1VWbjBmYUlMdmxFTE83ZVBITEFCSFVYajJDM1JM?=
- =?utf-8?B?VmQ4OXRvUjhGUU9QcUdxL1c2SjY5YWhCSkgvTnZ3UlZ5ZklCNXRKcllwekZ6?=
- =?utf-8?B?WlZLRGJqajZ6bnFpZW9Takd2ZUZJMVBuNGhzYjhIQ0pXeXBtU1NnczhDT0JZ?=
- =?utf-8?B?RS9EdEtXQkowcTdMM2U4RUZFL3lBOGFGWmRnbE0rbFl2dnBkTUx0cHVNckJt?=
- =?utf-8?B?MFl4NUNQZHFpd3BIU3Y1MGoyWG9jRjdTQUlEMkczL2dlR2tvTG1zYzdxWVRt?=
- =?utf-8?B?c3J3dzFzVThDWHJNVXQzMUk2QUZNZnMzclNmaEJJTDBiUkQwdUpSWFlhbnMv?=
- =?utf-8?B?TWtDcWxTMk5aYTdFdmp4YzVHMEcvYzZOSVFXbVYvbFN5Yk9GaGlTS0NjTlI4?=
- =?utf-8?B?U0dRM1VhR1FYYkZPNFRqemQ0V1Q5UVhqbGg3d3hHcy84RW53bXdZVDRXeUpn?=
- =?utf-8?B?Skh4NzFwelp3T2kzV3JUSGR3OXIwN0pBaTVTRU5NYWp0Tll5L1kwaklIU3po?=
- =?utf-8?B?NFVHUjVrOGtESDlSK0grR0tyUmg4cVFLckNDb2N0NzZWc04zdEhsYVdQOWZi?=
- =?utf-8?B?ZWFET3VJREEzaXhsSWRLL2d5U2dRS2JGTXJUanRlV3prSlVLUHZaekZnTlhw?=
- =?utf-8?B?NW5WRkJNUTc1VkplUVorUmtKbXR1THRoNi9Mc2pHb2sxMXdtdUFxOFZhZytY?=
- =?utf-8?B?dXVNQlVFZWRnSEVoMUJpVzUrNURCZmZ2MFF0TEkwVEVCVUkrY3R2SkRvVDUw?=
- =?utf-8?B?ekVPSDRjVXUvcVRkMC8rbUlHTjE4MGx3Z1piWmZud0kvNFlQVFZ4eUZwd2Ir?=
- =?utf-8?Q?AvRBttZdz5Y=3D?=
+	=?utf-8?B?Rm11ekEvWUFSWHpRRXhheGhuSFdyaG9ENXR4U1BWdjRhL3JRRDRYT0gxM1Nt?=
+ =?utf-8?B?WHJpOWpaYWRvaTFIRDNDWDhKYTFBa25pekFtamhrNFkvNEQ1aGFJS1huVUE5?=
+ =?utf-8?B?eWI3SzJzNmVlYkdBTE1zMEhJODM2MHJveUZESWMxU0lvdGVCQkdhc0kybVlM?=
+ =?utf-8?B?YitkMmFudnhyenJyQ1hhWmVmSWpqd1JReVdaeGszTHFXb3BUYi9uVjRidDhW?=
+ =?utf-8?B?WldIbkdHMmR2ZmNMelAvYjJDamVGRHJ2dnA4V0tKRFh0V29OU1pQb2RrTllw?=
+ =?utf-8?B?eVZBZVB3cURtZEc2SUdLQnJpOGx0aU5kS21SNndPTHltUVBXdThFYS9CR0VJ?=
+ =?utf-8?B?TTZOTjhsTTdNU21Ta2dFZ3hRVDcrZ0sxSXpKNjZEQmFXT1BISjk3c0ZPVW9O?=
+ =?utf-8?B?eHVISTlaSkN4dWlUNkVPcmlGQUZOMXh5MVVGL2Z5d3grbVVTWTY1cnpGNnNw?=
+ =?utf-8?B?RDk5ajdPSVlIaWgxUEI2c2grZUZtSWVnUWhFelRiSUVTeDk4SHJIeS91UEd1?=
+ =?utf-8?B?SFJVdGxySHNiNzFoNmhqRDlNc3VaVUlmM21KT0lzT1MrckppMmFyZVJkVWtr?=
+ =?utf-8?B?TVpKRkV0OXhGZXZTbHVmVG96UjZrM2VzZ2REMkQ4TCtSQmdhYXJXcDA3Y0py?=
+ =?utf-8?B?YXlNUmNVREJZZFBHUi8rN2I4U3NVWG9qREkwOC9Cek1ZbmRrbHRuR0lxVnp3?=
+ =?utf-8?B?ZHMrUExma3I2OTFaUitxS0JZbVJKN3IzMjFGb3cyVlhsU3BDOE1rcTYvOE9W?=
+ =?utf-8?B?UjdwQjBTRFo0ZjBPR0VIeDMxS3A4bDBkdW5ZM2s1blBNWG9qTS9YREo0RkVh?=
+ =?utf-8?B?RkYvaHpqdGx2QnVYYzZBRFl3a0JmUkZ5OWVlSVhibFBFM0xEZjI0a1NKU01S?=
+ =?utf-8?B?SlcyRzZDbzRYaStMWGRTVm9ZelIwSFliaUJ1dFhmdFRORGFoNFI5NXZaSHBB?=
+ =?utf-8?B?TjNFcUY5WUNUWit2Rjh3T1psK3kwSWZlYWJ5RkluRWYvSGhxMkM2V3FnUldZ?=
+ =?utf-8?B?SGRQQk5kSWIxZmJ6K3ZITmxiaHZ0SGpWcENMTVdSM2ZnRjVFNVNYWm1oam1U?=
+ =?utf-8?B?c1BzbTlabkR3dEJlWm1GU2VrZklTY2Q1TXpxNSt3VW9pMTdqNXBLY3F5VVFT?=
+ =?utf-8?B?N0hsSjk4S0pYY1ZDUWszTmxIUUlwaktiRWtxY1RiTHI3M1djZWQvZ2lwZFFD?=
+ =?utf-8?B?OWNFdVg0anFWYVJYRzVWMERVZVovU3BLZ2NrRFpUV0xQYi9majlNaGF6eXhz?=
+ =?utf-8?B?NUFwOUFWcENZd092dlN4N0hPdWFYMzVKQnRMcmZjMXFKUkZvTUovV2d5UFVz?=
+ =?utf-8?B?dGk5RERtaFNYYzNnSnFxQWk5UEVTMkVUa1oxVlBrTXQ5b1plcHVZYUFLNlMv?=
+ =?utf-8?B?ckEraFc3Z3NQTkNyZ0tBRDdYMFd3SXZVZ0ZWVWZyVFV6NU9DamJpbHhwN1du?=
+ =?utf-8?B?c0NnT1RTaWhEUFVrSWJSdmNEUDNoZ2k3K3pDVE5lTXZMNkUxVXVLaTdyQ2hV?=
+ =?utf-8?B?RG1JOEp6b0J6UURmbktRemxBNERrbzB4emtWTW9vMFBvdzlxOWNaSCtKcnZQ?=
+ =?utf-8?B?dGJoeWNTZFM2Z0grSFBMYVF4NDdScEJISnoyVld5Q1p2cjlnYTZkS0U2T0k5?=
+ =?utf-8?B?c0Q1enVGNnA5akdXazBYT3h1MnhadVRWSTdvTktLa05RL2drQkRIam5EUGc5?=
+ =?utf-8?B?eExnTjAySkJINU4xdCtnUCs2THNzaXB2YmUwOVlpYnhBQlN1YVpQYXljenRi?=
+ =?utf-8?B?Sm1sKzdkcEpCczM0akdRUUdZRDhiZ0kxYTI3RUlCSi9NOHM0RkxIcGF6MzhG?=
+ =?utf-8?B?ZmVBa3ZaNGlRQWlrZisweitSS0JaR3g4ZEp5Y2Vka2lsNi9xc0Uya09HRElG?=
+ =?utf-8?B?UlBXd29XSFVDY1UyNVdEczh3UGYrcG1zNkJyMzd5ZU9pQXJFMFIxSWdMdm5x?=
+ =?utf-8?Q?4aKknSEx1R0=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Y25NSkRBTi95VWErL1lBWVdOYzBmNlYxV29tM2x3T0tkWHRvREFqb1o0bk4y?=
- =?utf-8?B?amM2UFk1OEdob01YeEtMRUFZaHdURDA1TVVRVE1tbjk1cmN0UU1JMUdJbHgz?=
- =?utf-8?B?Q0V2UUF6eEdraW9xQ0V4Q0luSkJJMHpERzlDSFV0dmxDMlRnOHozemw5UVNs?=
- =?utf-8?B?NjJwblc0SWdkK2MwOVZZWWdOS0RUSGhYMXVjblEyRVpnS0tUNzRVWlJjQXdE?=
- =?utf-8?B?b3Rkckp2UGJQU1QyWDZMbFpSazVDS253Z0dWbFE4SHFHYTd1bEtYRUxGbVYx?=
- =?utf-8?B?NjRkVTVyZG85WVo0OEFpQ2tQWnIxaEo2UHJ6NEdCMnlnYXd5ZHlLUmpPNHhn?=
- =?utf-8?B?d25nYlFOSkc3amJJa20zazN4U20rbTVyREpHZlNKR3c3REpIbHJuM2VKTG9J?=
- =?utf-8?B?aDRGakZnd1JqYUVuaDMrTzRCSFVWMFVpQ01hQTdjMGJuMTRIbnRBdVlhQlN3?=
- =?utf-8?B?dnhud1RvVHVkbjJoeGU3cStvb1ZEQW9PT1daWGRhV3drQS84bUFLRWU1QWVO?=
- =?utf-8?B?Z253VGJDaVR0bWplYTlKZ2ZDSUZ3R2dlVXJjQURVOG5GMWtlWWVjWWp2U3Bw?=
- =?utf-8?B?eDJzd2x3T051Mm1FZzBHTDNYMVVlMEt0Uk1yWkhBQTdyTnRLSFBJaUJHM04x?=
- =?utf-8?B?aHNjaVNsZzA2N0dMdndiUldwdnVGUnU3cVBNSDkyd1M3NXdSY2VGZmNoeWFB?=
- =?utf-8?B?SkFlVElLdW9hMFFySlFWWEJXVEZGUGZxeFJiWE9uQjdCNGhTeDBJdHRVTDRx?=
- =?utf-8?B?NDBsdlMyTFpTb3QrYi9qR1hPV1V5RE03VVVERVkydWVSckovSTdvTGI2Qytn?=
- =?utf-8?B?V3F2RzJPUVNHQmJiOCttbGNwQit4VmdIRkdIS2o1L2pMY0lweWNEMW55Z2lv?=
- =?utf-8?B?UWxOTnJlaDlSckxxT2U4Rm1NdytONk5pQlZnUEdEV3NMOXNTeGNCa0xlMTlQ?=
- =?utf-8?B?ZFlINUpHdUdaUzY3T3BnUExhYXk3YjVLSllabkVUbzRTcW84dFRSeE81bkNS?=
- =?utf-8?B?MU5rTTJ3MUJHZm9PMDdTQmh4ZnM0WlFPdCtaTXNETTU0K1ozbktvL1JMY1NN?=
- =?utf-8?B?SEpuTXZ1YjF6emRzaElMcVU0cktRdnNISStMc2dIU1prb25Zc2hQYUhGTldG?=
- =?utf-8?B?VHFPTG9mam5zTVcvem1MT0pqR0RwM3VUZzJDcDJPZ05UTU1BdXpBYnU0VWxh?=
- =?utf-8?B?L3lxWkxvdWxvYnkxSUZNbGJMdy9FaGVjODRhaXRFdjlCNmdIUkp2MU9QQ3Qx?=
- =?utf-8?B?OHJKSzljSDFHREVWN2tUaGZmNGQ2b29wc0FCNWJ4UzVqVW9UbmlCbWhwMmZs?=
- =?utf-8?B?eGF0Ky8wK2dqRklNZnNISmg4THlYUE5Ba0k4Tkt6a1ZwNUEvWEV6ckZoK28r?=
- =?utf-8?B?REVXMVpRMm5OUktSUlRodktYY3VVVTBLTEpwT2ZBcmJUazg5NGM3V2F4RFI1?=
- =?utf-8?B?b242WXhPRENxZTJGNjZZdmdaRlk5TmJJTVNsMWZQeDJ0c0RsOHRJV05TMmF6?=
- =?utf-8?B?U00rWDd5c0RNK3FRMVY4R1J6TVh2WUpjQmlOVHZaTmJEYm84NjFTaEYwSXBj?=
- =?utf-8?B?OGdlc2puM09iZVJUSjlySFBEOGxrMjR5T29OazBFRGNaZWNSdmx5d1hGVEQ1?=
- =?utf-8?B?NVdTTnVnUitIR1JwdTlTZW1TVUFGVVZNWWpqdVo3cFR6UktwK0lSbTRDWi9i?=
- =?utf-8?B?YWlBVTdDNmpCU3c2bzZtYm1EWjNqL3g3RGhCUzRaWVN1cVNuSWl3M3VNU1Iy?=
- =?utf-8?B?Tmg3Q0l2K1JrN2NaNnJYQ0xVa1IxZC9LWEdhT1BDaFppRVZ4QkFYbDJVVTVK?=
- =?utf-8?B?ZjJheTB6KzlqOSs1YnpZR1g0cU81Y3h3cjhzUk5sV3BBY0lPUGJ3MWpqMFpv?=
- =?utf-8?B?SHFVdFFaUmN4eFczQ1pTZzk2Z0o4ZGp0UmdKd2IvYzJNaytmWit6NXMyQmwz?=
- =?utf-8?B?ODVRMXp3a2xoTVNPUm9jdXFwcFVXR05pS0NNMmlqc1dCZ3NrL3dXQlViWmJE?=
- =?utf-8?B?UDIwMnB4NTBURGJrdGFNbWJmeURxTFE0MWNkUndMQk1hL2Vlem8rNDU0cXdm?=
- =?utf-8?B?OEJMQ1JCdldPMEs3TE5HTDd1TnZ3T0NJWW9GQnNGTzEzNGhMWmhNdjl4YUNr?=
- =?utf-8?Q?DrSNQuWuRmIS1PbBguTqmYIzc?=
+	=?utf-8?B?MjZxcXZ2L3hvY0lTZHpDK0ZRYXRSY0hJVzZOL2tJdTBHaXJkSjlKanoxem01?=
+ =?utf-8?B?MjgzYjh3M1dMWUdGVmJ1d3Qya1JvK0tPNWY0aDVvdVA4Zm80bVRyZWRZdmNO?=
+ =?utf-8?B?dW5nMmhtMVViVkg3b3lUK0lzd0V3b3hkQ3JQZnhuZy85enRVSzNHWHgyY2Z6?=
+ =?utf-8?B?SS9XKzl5TlZ2VG41VFBQd2dpZG9oRDFMRi8wdEFwWjd2aGM2K0I5Z21QRXhB?=
+ =?utf-8?B?TDlzWXlDZDkwWUxWSDNLYXcwSkx1ck1qTDRYZXNDd2xPd0FpUjV4TGpBY1h4?=
+ =?utf-8?B?ZGpaQXFYUmtjZHlBdjlwZm14cFQyQzlUUjdDelBVVzNOOGVDTFVpU2trL1E1?=
+ =?utf-8?B?Q1VwVWh3dDJ3d3YvcFZZM2pzQkswaGpFdmVGbTVKdVQrSW51SDFhZS9YMjE1?=
+ =?utf-8?B?c3JDTDV3T1VGOFdWVXk2a1Y1UWRRRVR6NStSWEd1OGFRRVBadEMrMVpJdkNK?=
+ =?utf-8?B?Q09EY2llTzdsQlJJaG0zTjluK20yOHUycXNQL0pBOUYwNG5iaFhRR0gyOWlk?=
+ =?utf-8?B?ejdlYnlheXFwZGUwVFB5d2ZBdUlNaEc3SU1ONWtiRHdXTnQ4SHRXbmdJTlZt?=
+ =?utf-8?B?RnpWMXkrazFUZFNtRVJlWkRua2FrK2hUUFgzUVZkS3JEck9EdzlvLy9HaDl0?=
+ =?utf-8?B?M0VNNmVLdmoybG9EMklyWHM1azljWUEvR09uckVNYjhnMGQ2UW5Felc0SlZD?=
+ =?utf-8?B?RnI3UlpxbGN4a2F4Q3NsOGlOeU9xb0cwMFZ4ZE1Dd2tGZXdFRkR0alBOYlJC?=
+ =?utf-8?B?REtYalNlL0pTdDNZVWZ1dWJPeFJoZjFSaDA5QWpOTWcydlJsVnJUY3FZSFkz?=
+ =?utf-8?B?bzVnVXFiVHByRWdYQzR2QisyVVdPWUwrS0NSQ2FzdjY0dDJDUnBNNXdOK05G?=
+ =?utf-8?B?aVJrWG1tb1hub3FkbkpZRW14cytNQ2VmbUpPR0Z5dDZ2TnRSVU5IOXZVTGpW?=
+ =?utf-8?B?bEthQWpKNVZVeU9OTWYwQkxTV2dtUllGbm5PZGdFSzFCY3ZMalBMcnJRcWsy?=
+ =?utf-8?B?YlQ5WjdQUTRVU0pjR2dIelE4WElYRHQxYWVOaVFOeHVuSCtDa3BwTHluQnN5?=
+ =?utf-8?B?V0dDSFMrSUxsRjZ2RENiYUJacGpWcUVPTlhLVzZuREhRK2k3MVd0MFpuZG9V?=
+ =?utf-8?B?dWszWWFDZWprZEYrTFpOcEY0M3BKT2IrclpGc1B6NkJCd3VxV2RxdmhRenU0?=
+ =?utf-8?B?T1daOUM2Y0kzc2M0dTZYT25sOGszcVlDMENDRGY1cHY3NjRVLzZXQXFPTkFa?=
+ =?utf-8?B?d282aFJZSktKNTI5WUJ0U2p5UUpocWdrQVgwYVgvMHdPajB0STVUQkJjSGgr?=
+ =?utf-8?B?aFlWNlBhV1RWNHRCekdoMWFFdmtHQ1FiMDF3M3lycFB4U0ZnU0ZyNXZ0MnBk?=
+ =?utf-8?B?VG00QjBSRVVKS0w4blVicFc1WUxmT2tZaVBEL2JBNElRQVpCVi9rcEtMVU44?=
+ =?utf-8?B?aWZ1U0NEOTk1dGtOcEtjSVJOMElWZlVyMWFZV3c0YWF2c3lrbHZ4S0pGQkJt?=
+ =?utf-8?B?VG1TNlRRVU4xZ1lUWW5Nd0lrajJyb2Y1L3dwSUlVT1Z3eFdhWkx2WlNNT0hC?=
+ =?utf-8?B?bkYyRVlWWEpNNHR3M0ZCQmJ5QkkvUGpiWkIrYVZVaEdwU2ZuaEtNTHN2dFlZ?=
+ =?utf-8?B?UUNLeFFIemZBdXRoNTYzaFFqbkxHc2ZEWldnaHRIZHozbUpUaUhHL1dwc3Ny?=
+ =?utf-8?B?T01kSzNYNXVadmNRY0lzWmZNRlB0RG5JKzgyWG56VStmV2FicGU3SXY5YnlP?=
+ =?utf-8?B?RmJiWWlGVml3MTcyMEIxUHF3NzdaQmxLbERkYzIxSElHYmNHK1pzcnVGSGc4?=
+ =?utf-8?B?SzdteTdPMFkxNnVqZ1V1NFNLNjlMWUhZWTA1ZmxSZ0thQWplMlhQQWpFZG5S?=
+ =?utf-8?B?ZDBBZ0p0UG5zK3pRano3MkZkc3A1OVVxTkpHTVJSMlgwd2g4dTJmU0dMcFhj?=
+ =?utf-8?B?cHN5ekRpMkFKN0JjZkt5cWUzbDhYQkJOM09KVDBZM2dFelVDVUdlajhYVFAy?=
+ =?utf-8?B?eVh0TlBTWk50TzJCcXVTUFMxeXV4V2tQOW8yM1RHKzFLNzFTcHVBaDA1WThy?=
+ =?utf-8?B?Ry9nNmJ4OGxxaHcydEhzazJCbGJOS21Nb2x1UE1sZFJPbEdLZmkvbGZId3Zw?=
+ =?utf-8?Q?sZ+L+FN/Q3nnX3kpITEnfDS2D?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2192f63-7574-41dd-7440-08dd2660c7d1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ee131ec-2326-4f90-1953-08dd266171b9
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Dec 2024 10:25:27.1094
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Dec 2024 10:30:12.1218
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 22jQSALR/Q9SdGxbbOsqRMIj78L2m7WqRg73JvA/Ndf6F4U7QFU0w4uFKnZvNGJLI8LwOYQUxRrvGwc1dBY2Rw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: rSvOW9PwU0xL9B2B/coreHIcyA5P4Br3/CZLZfz4jKus3AL7ZOWsv8F97l/u3WwYehcwGlTtEJY5qdfM387RbA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7246
 
-On 17/12/24 10:59, Ashish Kalra wrote:
+On 17/12/24 11:00, Ashish Kalra wrote:
 > From: Ashish Kalra <ashish.kalra@amd.com>
 > 
-> Add new SNP platform initialization API to allow separate SEV and SNP
-> initialization.
+> SNP initialization is forced during PSP driver probe purely because SNP
+> can't be initialized if VMs are running.  But the only in-tree user of
+> SEV/SNP functionality is KVM, and KVM depends on PSP driver for the same.
+> Forcing SEV/SNP initialization because a hypervisor could be running
+> legacy non-confidential VMs make no sense.
+> 
+> This patch removes SEV/SNP initialization from the PSP driver probe
+> time and moves the requirement to initialize SEV/SNP functionality
+> to KVM if it wants to use SEV/SNP.
+> 
+> Remove the psp_init_on_probe parameter as it not used anymore.
+> Remove the probe field from struct sev_platform_init_args as it is
+> not used anymore.
+> Remove _sev_platform_init_locked() as it not used anymore and to
+> support separate SNP and SEV initialization sev_platform_init() is
+> now modified to do only SEV initialization and call
+> __sev_platform_init_locked() directly.
 > 
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
->   drivers/crypto/ccp/sev-dev.c | 15 +++++++++++++++
->   include/linux/psp-sev.h      | 17 +++++++++++++++++
->   2 files changed, 32 insertions(+)
+>   drivers/crypto/ccp/sev-dev.c | 55 +-----------------------------------
+>   include/linux/psp-sev.h      |  4 ---
+>   2 files changed, 1 insertion(+), 58 deletions(-)
 > 
 > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 001e7a401a6d..53c438b2b712 100644
+> index 53c438b2b712..fbae688e4b7d 100644
 > --- a/drivers/crypto/ccp/sev-dev.c
 > +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1375,6 +1375,21 @@ int sev_platform_init(struct sev_platform_init_args *args)
->   }
->   EXPORT_SYMBOL_GPL(sev_platform_init);
+> @@ -69,10 +69,6 @@ static char *init_ex_path;
+>   module_param(init_ex_path, charp, 0444);
+>   MODULE_PARM_DESC(init_ex_path, " Path for INIT_EX data; if set try INIT_EX");
 >   
-> +int sev_snp_platform_init(struct sev_platform_init_args *args)
-> +{
-> +	int rc;
-> +
-> +	if (!psp_master || !psp_master->sev_data)
-> +		return -ENODEV;
-> +
-> +	mutex_lock(&sev_cmd_mutex);
-
-
-I'm told that in 2024 we should use guard(mutex)(&sev_cmd_mutex) and 
-drop explicit mutex_unlock(). I'm not a huge fan but there is a point :)
-
-
-> +	rc = __sev_snp_init_locked(&args->error);
-> +	mutex_unlock(&sev_cmd_mutex);
-> +
-> +	return rc;
-> +}
-> +EXPORT_SYMBOL_GPL(sev_snp_platform_init);
-> +
->   static int __sev_platform_shutdown_locked(int *error)
+> -static bool psp_init_on_probe = true;
+> -module_param(psp_init_on_probe, bool, 0444);
+> -MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
+> -
+>   MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
+>   MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
+>   MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
+> @@ -1329,46 +1325,12 @@ static int __sev_platform_init_locked(int *error)
+>   	return rc;
+>   }
+>   
+> -static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+> -{
+> -	struct sev_device *sev;
+> -	int rc;
+> -
+> -	if (!psp_master || !psp_master->sev_data)
+> -		return -ENODEV;
+> -
+> -	sev = psp_master->sev_data;
+> -
+> -	if (sev->state == SEV_STATE_INIT)
+> -		return 0;
+> -
+> -	/*
+> -	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
+> -	 * so perform SEV-SNP initialization at probe time.
+> -	 */
+> -	rc = __sev_snp_init_locked(&args->error);
+> -	if (rc && rc != -ENODEV) {
+> -		/*
+> -		 * Don't abort the probe if SNP INIT failed,
+> -		 * continue to initialize the legacy SEV firmware.
+> -		 */
+> -		dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n",
+> -			rc, args->error);
+> -	}
+> -
+> -	/* Defer legacy SEV/SEV-ES support if allowed by caller/module. */
+> -	if (args->probe && !psp_init_on_probe)
+> -		return 0;
+> -
+> -	return __sev_platform_init_locked(&args->error);
+> -}
+> -
+>   int sev_platform_init(struct sev_platform_init_args *args)
 >   {
->   	struct psp_device *psp = psp_master;
+>   	int rc;
+>   
+>   	mutex_lock(&sev_cmd_mutex);
+> -	rc = _sev_platform_init_locked(args);
+> +	rc = __sev_platform_init_locked(&args->error);
+>   	mutex_unlock(&sev_cmd_mutex);
+>   
+>   	return rc;
+> @@ -2556,9 +2518,7 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+>   void sev_pci_init(void)
+>   {
+>   	struct sev_device *sev = psp_master->sev_data;
+> -	struct sev_platform_init_args args = {0};
+>   	u8 api_major, api_minor, build;
+> -	int rc;
+>   
+>   	if (!sev)
+>   		return;
+> @@ -2581,16 +2541,6 @@ void sev_pci_init(void)
+>   			 api_major, api_minor, build,
+>   			 sev->api_major, sev->api_minor, sev->build);
+>   
+> -	/* Initialize the platform */
+> -	args.probe = true;
+> -	rc = sev_platform_init(&args);
+> -	if (rc)
+> -		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+> -			args.error, rc);
+> -
+> -	dev_info(sev->dev, "SEV%s API:%d.%d build:%d\n", sev->snp_initialized ?
+> -		"-SNP" : "", sev->api_major, sev->api_minor, sev->build);
+> -
+>   	return;
+>   
+>   err:
+> @@ -2605,7 +2555,4 @@ void sev_pci_exit(void)
+>   
+>   	if (!sev)
+>   		return;
+
+Can remove the above 4 lines too. Otherwise
+
+Reviewed-by: Alexey Kardashevskiy <aik@amd.com>
+
+
+> -
+> -	sev_firmware_shutdown(sev);
+> -
+>   }
 > diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 335b29b31457..e50643aef8a9 100644
+> index e50643aef8a9..dec89fc0b356 100644
 > --- a/include/linux/psp-sev.h
 > +++ b/include/linux/psp-sev.h
-> @@ -828,6 +828,21 @@ struct sev_data_snp_commit {
->    */
->   int sev_platform_init(struct sev_platform_init_args *args);
->   
-> +/**
-> + * sev_snp_platform_init - perform SNP INIT command
-> + *
-> + * @args: struct sev_platform_init_args to pass in arguments
-> + *
-> + * Returns:
-> + * 0 if the SEV successfully processed the command
-> + * -%ENODEV    if the SNP support is not enabled
-> + * -%ENOMEM    if the SNP range list allocation failed
-> + * -%E2BIG     if the HV_Fixed list is too big
-> + * -%ETIMEDOUT if the SEV command timed out
-> + * -%EIO       if the SEV returned a non-zero return code
-
-The only caller ignores these, may be drop the returning value and print 
-the errors inside sev_snp_platform_init() (if whatever 
-__sev_snp_init_locked() already prints is not enough)?
-
-Also, looks like 5/9 6/9 7/9 can be squashed into one patch, they touch 
-the same files, equally do nothing until later patches, pretty straight 
-forward. Thanks,
-
-
-> + */
-> +int sev_snp_platform_init(struct sev_platform_init_args *args);
-> +
->   /**
->    * sev_platform_status - perform SEV PLATFORM_STATUS command
+> @@ -794,13 +794,9 @@ struct sev_data_snp_shutdown_ex {
+>    * struct sev_platform_init_args
 >    *
-> @@ -955,6 +970,8 @@ sev_platform_status(struct sev_user_data_status *status, int *error) { return -E
+>    * @error: SEV firmware error code
+> - * @probe: True if this is being called as part of CCP module probe, which
+> - *  will defer SEV_INIT/SEV_INIT_EX firmware initialization until needed
+> - *  unless psp_init_on_probe module param is set
+>    */
+>   struct sev_platform_init_args {
+>   	int error;
+> -	bool probe;
+>   };
 >   
->   static inline int sev_platform_init(struct sev_platform_init_args *args) { return -ENODEV; }
->   
-> +static inline int sev_snp_platform_init(struct sev_platform_init_args *args) { return -ENODEV; }
-> +
->   static inline int
->   sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { return -ENODEV; }
->   
+>   /**
 
 -- 
 Alexey
