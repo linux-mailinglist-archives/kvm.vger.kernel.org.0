@@ -1,207 +1,102 @@
-Return-Path: <kvm+bounces-34396-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34397-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5D69FD506
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 14:44:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BBB89FDC21
+	for <lists+kvm@lfdr.de>; Sat, 28 Dec 2024 20:28:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42727161AF2
-	for <lists+kvm@lfdr.de>; Fri, 27 Dec 2024 13:44:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D18571882C12
+	for <lists+kvm@lfdr.de>; Sat, 28 Dec 2024 19:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD5B1F4269;
-	Fri, 27 Dec 2024 13:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1FA41990C1;
+	Sat, 28 Dec 2024 19:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRzyLXVm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p97DZ0Nx"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E79D1F3D2A
-	for <kvm@vger.kernel.org>; Fri, 27 Dec 2024 13:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B292744D;
+	Sat, 28 Dec 2024 19:28:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735307065; cv=none; b=MmVOKKt10vupANcNcX5HzegAVVVDY2scPSwcFz2BIyLuJ4bn7O3sSyq16JL6beOTolyMRnqveh5s5xIrM5kRcW4jRJSwroLHMCvbjdnjOkZZsNfbY2IbCS7xQ98izaevs54GFDYuwy3QL9VFP+ugsxcntzZl1YsZkrz1I5tIYE0=
+	t=1735414095; cv=none; b=rlzgu8HbAchGabDdIFuHwiZQkGSnZkCBRrhGPXLPxHdvZcq0BPP7W84sLypjHwf50MTsWV+PFeU6TRme82LJV3dW1tjpUOwtkJ4GHmHkCTJJRZhlvw02pb/M/u3mJgYzRFJORJnK6pfGpOA9/wyC9+INFqcyvCO+2sjKE5gH7Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735307065; c=relaxed/simple;
-	bh=4zzYeNm0G4x5an1ENK8T8ax8KmpB59TZG1+p2SFmR4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IYjtKatAmyDHuCDflrv88k3KGHGtH740xWRtl13t0cYoBX2v297VC0JrzNRWrEVxLYQ6obiwkfbxRqiBiebt4FwJmxc6mANHx6B8kwPHGKqRyGmKgqbnCzUewmUybZbpn4ZsnayxUt2Q1mlg+ROV5boBsaqjhIDfXB8nzit+L8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DRzyLXVm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735307062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pkRABZZKzYakdwICymJuZ/C6pfybaqvIa9Xu1kFl1Eo=;
-	b=DRzyLXVm9nHJ1cWKWQ3XH+Nkvoo1BsvpzNFGfmGzAdeNtCcVvI5V/6auBefCkDVERWvmpb
-	KrYe0St3udSRaOLoLOtRHhiee8AvjTvs4BTtfL3B4Cp4t6Ad9dsv7V1yKfWcXBGoEBMEV6
-	r0oBd26GvU+sSK3WSZc48lH8aWlVvGs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-20-ZzlUp7kJNbiMX0ShLeq-Ag-1; Fri, 27 Dec 2024 08:44:21 -0500
-X-MC-Unique: ZzlUp7kJNbiMX0ShLeq-Ag-1
-X-Mimecast-MFC-AGG-ID: ZzlUp7kJNbiMX0ShLeq-Ag
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-436723db6c4so37116845e9.3
-        for <kvm@vger.kernel.org>; Fri, 27 Dec 2024 05:44:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735307060; x=1735911860;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pkRABZZKzYakdwICymJuZ/C6pfybaqvIa9Xu1kFl1Eo=;
-        b=u2Hq4mmBUEX2IwbCRgKA1y8Ehql9LA/XE4zEVHE3gSEJkYFpJzNKdqR+nlBUn/yOkF
-         poo0Pi6qqLwigUFxbsSlwSKsWpVt+1ImlTOsTLC6abbfUsCtiPUAilH4PPocTJC0iTCT
-         M561O/TdOg4RsfRHCIU3MOw/KB+Nzs5jPmrTqJUWX5k/oJxIV4+GnbsoSv3U3dWYYQ+/
-         v/ujIb2jQ2FkLptPlcoFbjf9AzvS0qGOsqP7Hnm49R6AJL7HO3lV68wk9V09SlaXtyvt
-         iEdVdTKZ38fYzmX+gNbpzSYYt0rMDRwYZCd32uR/Irqv7+9bhc53rexcskzQRQtEXBlu
-         2p5w==
-X-Forwarded-Encrypted: i=1; AJvYcCWI28jcy+1AIguUDGK4f1H+Zn/M3TRgRU2W2qP1OFGq2NMF+hCb6DkA1+YhhbqGqLN0LhM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpCUbMsz9YvAUuUJyxe1KL5TKr5PVN93dx3MCqJvVGzbNK384f
-	xVCw6IgRCgj5W34/a5xBNHhuEcgsLyBKCgATVk/JygaEn4ZCBNHqcEr7x472ZVPmYV9KT/0bhGr
-	uSUudALxmEfBJIWtpVmDenQkmkrevtifJm7hKAtrrXI2syRvBog==
-X-Gm-Gg: ASbGnctlqoD/sTHF87gc33bYGlTl7UT1xlr5PktaBJpph8mOh6vlhAy3QKsNkD8PbRn
-	wMgiG2OSE7PkE/FJUK9RldJndDzoJ2Te9ZccfeR7BtEq/HakugmjtoFyZrE21bjyuSO5WN23wY9
-	yR0sielQ/VgAagEg07VtXZhBCm+7Y7nmsXx45CwDAtozOCpAVBtxezO6+v4teDf+Nzc29jG07B6
-	LrQVlkTOXq6zYKsmLpnSAaEtiqoMmWyORNkS8IsVWVwIFYYTZA=
-X-Received: by 2002:a05:600c:350c:b0:434:a5d1:9905 with SMTP id 5b1f17b1804b1-43668b78641mr208446355e9.26.1735307059837;
-        Fri, 27 Dec 2024 05:44:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHMBCH5XUAoqBvte6a9jZzUG4oYDe/byrgsu79u/bNlDM1cNL3Mq9Ew3V/u/ELxCrULVT1bWQ==
-X-Received: by 2002:a05:600c:350c:b0:434:a5d1:9905 with SMTP id 5b1f17b1804b1-43668b78641mr208446135e9.26.1735307059443;
-        Fri, 27 Dec 2024 05:44:19 -0800 (PST)
-Received: from redhat.com ([2a02:14f:1ef:ad82:417b:4826:408d:ef87])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366127c4d7sm265112715e9.34.2024.12.27.05.44.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Dec 2024 05:44:18 -0800 (PST)
-Date: Fri, 27 Dec 2024 08:44:13 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/net: Set num_buffers for virtio 1.0
-Message-ID: <20241227084256-mutt-send-email-mst@kernel.org>
-References: <20240915-v1-v1-1-f10d2cb5e759@daynix.com>
- <20241106035029-mutt-send-email-mst@kernel.org>
- <CACGkMEt0spn59oLyoCwcJDdLeYUEibePF7gppxdVX1YvmAr72Q@mail.gmail.com>
- <20241226064215-mutt-send-email-mst@kernel.org>
- <CACGkMEug-83KTBQjJBEKuYsVY86-mCSMpuGgj-BfcL=m2VFfvA@mail.gmail.com>
- <cd4a2384-33e9-4efd-915a-dd6fee752638@daynix.com>
+	s=arc-20240116; t=1735414095; c=relaxed/simple;
+	bh=VSUk2RevzgoLpoKkPtxfiydxyc1+Qk/NEc9zjGax7Xk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P9ZvzaK5I8aGnSHHzO8l78JQx4uBNWFk5xBa/txVpHLhrd6dggDdP3PWcpk4y3pk9YnAumcp5D8fcLaar4bKtT/oNwqsbWUAB96mWmUGyDlQnwVlNannDb9eX0c6nmfjRBNPUTKrAiWRbkbawjrZBUYJZBST9p2bCSAu6EcDm3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p97DZ0Nx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5591C4CECD;
+	Sat, 28 Dec 2024 19:28:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735414095;
+	bh=VSUk2RevzgoLpoKkPtxfiydxyc1+Qk/NEc9zjGax7Xk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=p97DZ0NxPjGkbuXixh57qRqbuQKgJZPDSIGYm/BKzAvRZnVo5XPlJeD7IlSZPK28N
+	 MWU+h4Bf8EnSUeV7GmbAfRmCkUYFI4NdO0FRojFFpZZCbPXEvqeZDcuo+M6V0PyThr
+	 rgQYj2aKj9bq49LOrMhNDyn7N6SULRxmi42Akcwb4h3BmP0I9TNb0JBo/az9tNlWDl
+	 DuCYfNJWALOAaSvw6Nl9/62rb9uSR01ECmkTKNp3py1oP937PV7gmWulCyF59Qnp7C
+	 ZrDPKZtHQvPinLaUX2u6zAEfj0PlMpCk3yGq5vodrFz3yE7NeQAX2eiv2HkTwhexae
+	 pEMyZr2EGOM1g==
+Message-ID: <6b2b5cf5-6988-4860-bda5-742dffce0db2@kernel.org>
+Date: Sat, 28 Dec 2024 13:28:11 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cd4a2384-33e9-4efd-915a-dd6fee752638@daynix.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Kaiyuan Zhang <kaiyuanz@google.com>, Pavel Begunkov
+ <asml.silence@gmail.com>, Willem de Bruijn <willemb@google.com>,
+ Samiullah Khawaja <skhawaja@google.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, dw@davidwei.uk
+References: <20241221004236.2629280-1-almasrymina@google.com>
+ <20241221004236.2629280-6-almasrymina@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20241221004236.2629280-6-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 27, 2024 at 01:34:10PM +0900, Akihiko Odaki wrote:
-> On 2024/12/27 10:29, Jason Wang wrote:
-> > 
-> > 
-> > On Thu, Dec 26, 2024 at 7:54 PM Michael S. Tsirkin <mst@redhat.com
-> > <mailto:mst@redhat.com>> wrote:
-> > 
-> >     On Mon, Nov 11, 2024 at 09:27:45AM +0800, Jason Wang wrote:
-> >      > On Wed, Nov 6, 2024 at 4:54 PM Michael S. Tsirkin <mst@redhat.com
-> >     <mailto:mst@redhat.com>> wrote:
-> >      > >
-> >      > > On Sun, Sep 15, 2024 at 10:35:53AM +0900, Akihiko Odaki wrote:
-> >      > > > The specification says the device MUST set num_buffers to 1 if
-> >      > > > VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
-> >      > > >
-> >      > > > Fixes: 41e3e42108bc ("vhost/net: enable virtio 1.0")
-> >      > > > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com
-> >     <mailto:akihiko.odaki@daynix.com>>
-> >      > >
-> >      > > True, this is out of spec. But, qemu is also out of spec :(
-> >      > >
-> >      > > Given how many years this was out there, I wonder whether
-> >      > > we should just fix the spec, instead of changing now.
-> >      > >
-> >      > > Jason, what's your take?
-> >      >
-> >      > Fixing the spec (if you mean release the requirement) seems to be
-> >     less risky.
-> >      >
-> >      > Thanks
-> > 
-> >     I looked at the latest spec patch.
-> >     Issue is, if we relax the requirement in the spec,
-> >     it just might break some drivers.
-> > 
-> >     Something I did not realize at the time.
-> > 
-> >     Also, vhost just leaves it uninitialized so there really is no chance
-> >     some driver using vhost looks at it and assumes 0.
-> > >
-> > So it also has no chance to assume it for anything specific value.
-> 
-> Theoretically, there could be a driver written according to the
-> specification and tested with other device implementations that set
-> num_buffers to one.
-> 
-> Practically, I will be surprised if there is such a driver in reality.
-> 
-> But I also see few reasons to relax the device requirement now; if we used
-> to say it should be set to one and there is no better alternative value, why
-> don't stick to one?
-> 
-> I sent v2 for the virtio-spec change that retains the device requirement so
-> please tell me what you think about it:
-> https://lore.kernel.org/virtio-comment/20241227-reserved-v2-1-de9f9b0a808d@daynix.com/T/#u
-> 
-> > 
-> > 
-> >     There is another thing out of spec with vhost at the moment:
-> >     it is actually leaving this field in the buffer
-> >     uninitialized. Which is out of spec, length supplied by device
-> >     must be initialized by device.
-> > 
-> > 
-> > What do you mean by "length" here?
-> > 
-> > 
-> > 
-> >     We generally just ask everyone to follow spec.
-> > 
-> > 
-> > Spec can't cover all the behaviour, so there would be some leftovers.
-> > 
-> >        So now I'm inclined to fix
-> >     it, and make a corresponding qemu change.
-> > 
-> > 
-> >     Now, about how to fix it - besides a risk to non-VM workloads, I dislike
-> >     doing an extra copy to user into buffer. So maybe we should add an ioctl
-> >     to teach tun to set num bufs to 1.
-> >     This way userspace has control.
-> > 
-> > 
-> > I'm not sure I will get here. TUN has no knowledge of the mergeable
-> > buffers if I understand it correctly.
-> 
-> I rather want QEMU and other vhost_net users automatically fixed instead of
-> opting-in the fix.
+On 12/20/24 5:42 PM, Mina Almasry wrote:
+> diff --git a/include/uapi/linux/uio.h b/include/uapi/linux/uio.h
+> index 649739e0c404..41490cde95ad 100644
+> --- a/include/uapi/linux/uio.h
+> +++ b/include/uapi/linux/uio.h
+> @@ -38,6 +38,11 @@ struct dmabuf_token {
+>  	__u32 token_count;
+>  };
+>  
+> +struct dmabuf_tx_cmsg {
+> +	__u32 dmabuf_id;
 
-qemu can be automatic. kernel I am not sure.
+I believe you need to make sure the u64 is properly aligned:
 
-> The extra copy overhead can be almost eliminated if we initialize the field
-> in TUN/TAP; they already writes other part of the header so we can simply
-> add two bytes there. But I wonder if it's worthwhile.
+	__u32 unused;  // and verify it is set to 0
 
-Try?
-
-> Regards,
-> Akihiko Odaki
+> +	__u64 dmabuf_offset;
+> +};
+> +
+>  /*
+>   *	UIO_MAXIOV shall be at least 16 1003.1g (5.4.1.1)
+>   */
 
 
