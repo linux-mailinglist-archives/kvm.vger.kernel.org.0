@@ -1,80 +1,77 @@
-Return-Path: <kvm+bounces-34409-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34410-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D8BE9FE592
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 12:15:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DE039FE5A3
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 12:29:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E90ED3A22DB
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 11:15:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2140A18824FE
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 11:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A55E1A7ADD;
-	Mon, 30 Dec 2024 11:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF43A1A83E2;
+	Mon, 30 Dec 2024 11:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Ptc9l48z"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="QAlEtTIR"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59B02594BB;
-	Mon, 30 Dec 2024 11:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275A42594BB;
+	Mon, 30 Dec 2024 11:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735557318; cv=none; b=GoFiDKHXUjwyZCu4T6TehEzPksP7DJTLvWL67XkOHKBCYuujn3FRtSvlKMwEkGLIeL7K0Ao0lZIk9h6NfqJ5HTBoK8a2ZEt1IHcTmHRkJE1rBJthmxi7Fl4HDBgFibKraHe886i0S9E//TKMfsmYbwIAEheArykl6nmeb034ugg=
+	t=1735558164; cv=none; b=Vcl7t1t++41S/cKGBrDNSg6OwtSdhRO8tynRLgJMQHVy3CpvL7OLwGIHAKqhAEpRcmhSMp0hr6Q+WGbDsKXsZekrARA9qjQo5FKIGHNd9Oj8Uk8iam17pg5CiyWx/34dXceSN7SrPyD7ogHGHE3w9vg4Nv60zqpkHqsNPtdAOh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735557318; c=relaxed/simple;
-	bh=rESYI4E0hG6V+qz1lVj/ETyHW/hbboGNas0IysUHG0g=;
+	s=arc-20240116; t=1735558164; c=relaxed/simple;
+	bh=eFHzAqqIqdvwT7orCl8moUolC/85ycBRCvKpk2qxJNI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hvXACAnW4v+KuT2e9IHqday28VCaT2+Zk5YSJongFKIrlB82CUMOm414D5+dOUfD6iy0c0wyvQplf5m/pWADqX5WJ/G8vxD82RAVBvLJK3PpgGq8MnjXOhuYUML8xh/N8Xe7Vun3kmRH2uvnPttK/afDU6EpcVuPljmuC9wOcWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Ptc9l48z; arc=none smtp.client-ip=65.109.113.108
+	 Content-Type:Content-Disposition:In-Reply-To; b=kF3GGMf0f0svjPoYXgnwZSs7398C3yILMg3e/by1eEui1pOlbw2fZNGT9nvFIKpFf/7JG45Z78i3RaFw50/2UHo0fHgEJVwZe9dg/1EeOQaflnfiCuc5jnnUcBSN/rWjymoWLqpLKTw9WotzOzojMF6F6gFrf4V2EJwQK3Zluqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=QAlEtTIR; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6E58140E02C1;
-	Mon, 30 Dec 2024 11:15:13 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id DC8B540E02C0;
+	Mon, 30 Dec 2024 11:29:20 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id kRfvsqAmQ8kO; Mon, 30 Dec 2024 11:15:10 +0000 (UTC)
+	with ESMTP id 4CGu9SNyAqfi; Mon, 30 Dec 2024 11:29:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1735557309; bh=fhpeqpLevvt7f+j18oYOAVbDvwS05XQNhKOJwaf76ic=;
+	t=1735558156; bh=m//ao9qrCYpV4aUcQOoew8wuEo4I7gde9kOL+bsHqUg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ptc9l48zXw34QfWsw/RnscuP3Thpk+GGL2VMq6dRMbsqZFitcWs2qb1kpWhlZWqGy
-	 7jM2XOOL0a2CFtNRVclglRYfR8+cZnhQVPptM7up+b+Ic1e64LHKoLbdEswht3fuLh
-	 7lNmwRas5WS81LFaCDEBIToYuC2UcxY31bMEBLmy5zbRZknLhgLlvVSbICixmZwGlb
-	 JnHCUz4niChAZCwLcLQUjY1qAuMWpB7Ji4Ha4B7KHH0Ch1BtQHQnXvNZfVc+qBW9xV
-	 Wx3qBgzrgAZgcP1s3u/lKyJOKVliRiWRXH34KnNLgpdKbXn2inL1ZI8kmmpLa0TtRL
-	 9GInoLQhHe3XDEQafjiZDAYtvVmRFwmdU1YJK0lSyayiC3gzDEOqshJ0NN4rvvtes3
-	 a7TYMJeEyxN1bDYFXjwX5LsqMzQ8hkeJCVdY43rcqiWCxrrXw79Xvs08WWaJDRKoQ1
-	 NAAn51TlzEmbWfyOC/L+4g5wl7sgdrrkKW6oGPfPYIdOTRvq1+QrXtzlW59WCb09T7
-	 z34YGpu12eSno2Et8xsFC7rpxThqvFK5nK6l59gOUM9QxM3ohw87fuK7/r38HXOZnu
-	 h8mTB4NdGOaTnIU5qg9nuQwHtHPc97YKYlQarr0A0QphV5yL19jzOH2HD6OnnI5xkl
-	 Mdwq07tWi9N/DzO9xzFR18mk=
+	b=QAlEtTIRvXGTt8K/9l3o1oqG6YwThJto1ke2Px+vHtD/pDaUHyty/62DUXxVPe/IW
+	 xnypeaOOtzf5GeTmlT+8sRLIIdM+g98OjXup9XWbTwmSp7aQcOkWdet9+DSkKKCWyy
+	 aoPSCxzAOAZNm6myz5jPrufXIEzI3u+V4s7zdq7ce6gBntX8iFTtqqYWiLHCldpBEx
+	 yS1xkTJmBAQ7OD+7gpxdZ8IoKZUhMhRF95ssMap2fj6yMlPfuKQqjEvkUQBZY0GiDo
+	 mtQ0D4411vD4paLs+enp9PoksRt8lSv0LHG2ipnQ6c8jTjRIQ/IEFEsQqPy6cDkSNr
+	 HHPDCM2cGW5dfz73DRY0pu2U+q2IIFlS9cZUlp+eNykQrl+991D3Btpd94llfCbCYs
+	 YW+9U7Qi7KFVIFavRJPZokfQAH09OQGhSUjV+dEmsiaDig8i6t1U4CcN24XnDSI9E2
+	 0opIKFCFDqEFIROR07xHu6PDQbtzv2sxHmkq53nb2vNe4SPst3vSRcQizj+HTT/I6e
+	 CrewS7Nbtai/kW7W1oWh3Hi3QqD/dW+0zEXGGpdYi0gLB2D7ZBjn3kVHerAYlXv3YP
+	 xC3v6o5hEev0Hsv9EdVCfebirUrSW1Iw4jz1Arz8X0T99v1XfN5nQxVAO7aXki8Bxp
+	 cNnpANuw58SXMcKjrUERLvT8=
 Received: from zn.tnic (pd953008e.dip0.t-ipconnect.de [217.83.0.142])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8BC8640E02C0;
-	Mon, 30 Dec 2024 11:15:01 +0000 (UTC)
-Date: Mon, 30 Dec 2024 12:14:56 +0100
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7BBB740E02C4;
+	Mon, 30 Dec 2024 11:29:05 +0000 (UTC)
+Date: Mon, 30 Dec 2024 12:29:04 +0100
 From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 3/4] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
-References: <20241202120416.6054-1-bp@kernel.org>
- <20241202120416.6054-4-bp@kernel.org>
- <Z1oR3qxjr8hHbTpN@google.com>
- <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
- <Z2B2oZ0VEtguyeDX@google.com>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v15 09/13] tsc: Use the GUEST_TSC_FREQ MSR for
+ discovering TSC frequency
+Message-ID: <20241230112904.GJZ3KEAAcU5m2hDuwD@fat_crate.local>
+References: <20241203090045.942078-1-nikunj@amd.com>
+ <20241203090045.942078-10-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,153 +80,76 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z2B2oZ0VEtguyeDX@google.com>
+In-Reply-To: <20241203090045.942078-10-nikunj@amd.com>
 
-On Mon, Dec 16, 2024 at 10:51:13AM -0800, Sean Christopherson wrote:
-> @@ -1547,6 +1542,11 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->             (!boot_cpu_has(X86_FEATURE_V_TSC_AUX) || !sev_es_guest(vcpu->kvm)))
->                 kvm_set_user_return_msr(tsc_aux_uret_slot, svm->tsc_aux, -1ull);
+On Tue, Dec 03, 2024 at 02:30:41PM +0530, Nikunj A Dadhania wrote:
+> Subject: Re: [PATCH v15 09/13] tsc: Use the GUEST_TSC_FREQ MSR for...
+
+The tip tree preferred format for patch subject prefixes is
+'subsys/component:', e.g. 'x86/apic:', 'x86/mm/fault:', 'sched/fair:',
+'genirq/core:'. Please do not use file names or complete file paths as
+prefix. 'git log path/to/file' should give you a reasonable hint in most
+cases.
+
+Audit your whole set pls.
+
+> +void __init snp_secure_tsc_init(void)
+> +{
+> +	x86_platform.calibrate_cpu = securetsc_get_tsc_khz;
+> +	x86_platform.calibrate_tsc = securetsc_get_tsc_khz;
+
+The fact that you assign the same function to two different function ptrs
+already hints at some sort of improper functionality split.
+
+> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+> index 67aeaba4ba9c..c0eef924b84e 100644
+> --- a/arch/x86/kernel/tsc.c
+> +++ b/arch/x86/kernel/tsc.c
+> @@ -30,6 +30,7 @@
+>  #include <asm/i8259.h>
+>  #include <asm/topology.h>
+>  #include <asm/uv/uv.h>
+> +#include <asm/sev.h>
 >  
-> +       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-> +               kvm_set_user_return_msr(zen4_bp_cfg_uret_slot,
-> +                                       MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT,
-> +                                       MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+>  unsigned int __read_mostly cpu_khz;	/* TSC clocks / usec, not used here */
+>  EXPORT_SYMBOL(cpu_khz);
+> @@ -1515,6 +1516,10 @@ void __init tsc_early_init(void)
+>  	/* Don't change UV TSC multi-chassis synchronization */
+>  	if (is_early_uv_system())
+>  		return;
+> +
+> +	if (cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC))
+> +		snp_secure_tsc_init();
 
-I think this needs to be:
-
-       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-               kvm_set_user_return_msr(zen4_bp_cfg_uret_slot,
-                                        BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT),
-                                        BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT));
-
-I.e., value and mask are both the 4th bit: (1 << 4)
-
->         svm->guest_state_loaded = true;
->  }
->  
-> @@ -5313,6 +5313,14 @@ static __init int svm_hardware_setup(void)
->  
->         tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
->  
-> +       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX)) {
-> +               zen4_bp_cfg_uret_slot = kvm_add_user_return_msr(MSR_ZEN4_BP_CFG);
-> +               if (WARN_ON_ONCE(zen4_bp_cfg_uret_slot) < 0) {
-> +                       r = -EIO;
-> +                       goto err;
-> +               }
-
-And this needs to be:
-
-       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX)) {
-               zen4_bp_cfg_uret_slot = kvm_add_user_return_msr(MSR_ZEN4_BP_CFG);
-               if (WARN_ON_ONCE(zen4_bp_cfg_uret_slot < 0)) {
-                       r = -EIO;
-                       goto err;
-               }
-       }
-
-
-Note the WARN_ON_ONCE bracketing. But I know you're doing this on purpose - to
-see if I'm paying attention and not taking your patch blindly :-P
-
-With that fixed, this approach still doesn't look sane to me: before I start
-the guest I have all SPEC_REDUCE bits correctly clear:
-
-# rdmsr -a 0xc001102e | uniq -c 
-    128 420000
-
-... start a guest, shut it down cleanly, qemu exits properly...
-
-# rdmsr -a 0xc001102e | uniq -c 
-      1 420010
-      6 420000
-      1 420010
-      3 420000
-      1 420010
-      3 420000
-      1 420010
-      1 420000
-      1 420010
-      6 420000
-      1 420010
-      1 420000
-      1 420010
-      6 420000
-      1 420010
-      5 420000
-      1 420010
-     18 420000
-      1 420010
-      5 420000
-      1 420010
-      6 420000
-      1 420010
-      3 420000
-      1 420010
-      3 420000
-      1 420010
-      1 420000
-      1 420010
-      6 420000
-      1 420010
-      1 420000
-      1 420010
-      6 420000
-      1 420010
-      5 420000
-      1 420010
-     18 420000
-      1 420010
-      5 420000
-
-so SPEC_REDUCE remains set on some cores. Not good since I'm not running VMs
-anymore.
-
-# rmmod kvm_amd kvm
-# rdmsr -a 0xc001102e | uniq -c 
-    128 420000
-
-that looks more like it.
-
-Also, this user-return MSR toggling does show up higher in the profile:
-
-   4.31%  qemu-system-x86  [kvm]                    [k] 0x000000000000d23f
-   2.44%  qemu-system-x86  [kernel.kallsyms]        [k] read_tsc
-   1.66%  qemu-system-x86  [kernel.kallsyms]        [k] native_write_msr
-   1.50%  qemu-system-x86  [kernel.kallsyms]        [k] native_write_msr_safe
-
-vs
-
-   1.01%  qemu-system-x86  [kernel.kallsyms]        [k] native_write_msr
-   0.81%  qemu-system-x86  [kernel.kallsyms]        [k] native_write_msr_safe
-
-so it really is noticeable.
-
-So I wanna say, let's do the below and be done with it. My expectation is that
-this won't be needed in the future anymore either so it'll be a noop on most
-machines...
-
----
-@@ -609,6 +609,9 @@ static void svm_disable_virtualization_cpu(void)
-        kvm_cpu_svm_disable();
+diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+index aac066d798ef..24e7c6cf3e29 100644
+--- a/arch/x86/coco/sev/core.c
++++ b/arch/x86/coco/sev/core.c
+@@ -3287,6 +3287,9 @@ static unsigned long securetsc_get_tsc_khz(void)
  
-        amd_pmu_disable_virt();
+ void __init snp_secure_tsc_init(void)
+ {
++	if (!cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC))
++		return;
 +
-+       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-+               msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+ 	x86_platform.calibrate_cpu = securetsc_get_tsc_khz;
+ 	x86_platform.calibrate_tsc = securetsc_get_tsc_khz;
  }
+diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+index c0eef924b84e..0864b314c26a 100644
+--- a/arch/x86/kernel/tsc.c
++++ b/arch/x86/kernel/tsc.c
+@@ -1517,8 +1517,7 @@ void __init tsc_early_init(void)
+ 	if (is_early_uv_system())
+ 		return;
  
- static int svm_enable_virtualization_cpu(void)
-@@ -686,6 +689,9 @@ static int svm_enable_virtualization_cpu(void)
-                rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
-        }
+-	if (cc_platform_has(CC_ATTR_GUEST_SNP_SECURE_TSC))
+-		snp_secure_tsc_init();
++	snp_secure_tsc_init();
  
-+       if (cpu_feature_enabled(X86_FEATURE_SRSO_MSR_FIX))
-+               msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-+
-        return 0;
- }
- 
+ 	if (!determine_cpu_tsc_frequencies(true))
+ 		return;
+
 -- 
 Regards/Gruss,
     Boris.
