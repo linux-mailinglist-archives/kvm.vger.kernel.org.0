@@ -1,210 +1,254 @@
-Return-Path: <kvm+bounces-34402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34403-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325199FE318
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 08:04:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA709FE31D
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 08:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7DE161C69
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 07:04:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42730161B89
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 07:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FB319EEC2;
-	Mon, 30 Dec 2024 07:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30D819EEC2;
+	Mon, 30 Dec 2024 07:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Yz6kdZ7d"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mBjVfUYt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2089.outbound.protection.outlook.com [40.107.244.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D492F44;
-	Mon, 30 Dec 2024 07:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735542255; cv=none; b=ZkCaHWSvYm1iKMcjOsEAL6fyTjzBwYmKCTSkaZGEZTSy4iucZYfFyf3KY0XpDhSORdsVAshdXEltSgnWKYZeI/UMjt+VnzYeEgGnicGJddNXSKp48Uph+5/2Ytgxt+DhI3vp1mRdhfqZ4cjC5W7gGK+GfoJNtzO8Q4ueFYo4cb4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735542255; c=relaxed/simple;
-	bh=hUBZxO3udcy2ZV80XHefHiKxRLTwPCiAJ35DVuSBUpA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o8uomIL15tOk6oLkf6P04CD5kdicwSi6gwZisqJYespwU+8ekkCtigLQPm1/XAX06IdKKi85Hv1ZHWeboARXBqmcT43gqQRgftfM6mSTzA4S2TZSuNpFC8yWWsG7vnvXrd/el9fIPw4WtHDROqd6CHY/sHLzuVUhW0PNmhsy6cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Yz6kdZ7d; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BTNbTC9025760;
-	Mon, 30 Dec 2024 07:03:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=xUSMbY89H5WSfPtVNMoAeMf0ZXSlFH
-	MT/P3toWiTG7Y=; b=Yz6kdZ7d8OJnuSEXeE8/raCurL/g9unqwyaSjf9DhsbEH9
-	yxcuG8VFKJwpoJp6kQMQbLXXaK1a+eG9u8/BAAsSo6j6Yhl1e6gkr78J4gqkQi2O
-	q4lPShUsxxU8cjiu86arYOoVYze9qJyXD7O0kIugVuzltS1F0Dl53QWCvOCS2NBL
-	NgSYvXww2KpK04SIiCITsj7WYPPWcGDZ4r3RT/8mrK0dSX7DiVNGELZ5GXfpGPlK
-	lUtnmNAJyLfkPL8QwO2tRObit+heZRBX2ue2JOYR0RIvCZcX8YdebfgZx0BjlRqU
-	vG8SpRSZzPq3i8MCIe6dHGKLA8/o6/99f5HgtFDA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ug8a10rv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Dec 2024 07:03:59 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BU73wxA012671;
-	Mon, 30 Dec 2024 07:03:59 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ug8a10rr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Dec 2024 07:03:58 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BU5Z8VL014022;
-	Mon, 30 Dec 2024 07:03:58 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43tv1xvmqa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Dec 2024 07:03:58 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BU73sAE19529986
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Dec 2024 07:03:54 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4FC4B20040;
-	Mon, 30 Dec 2024 07:03:54 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B23020043;
-	Mon, 30 Dec 2024 07:03:51 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.39.28.22])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 30 Dec 2024 07:03:51 +0000 (GMT)
-Date: Mon, 30 Dec 2024 12:33:42 +0530
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: Vaibhav Jain <vaibhav@linux.ibm.com>
-Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-doc@vger.kernel.org,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, kconsul@linux.ibm.com, amachhiw@linux.ibm.com
-Subject: Re: [PATCH 1/6] [DOC] powerpc: Document APIv2 KVM hcall spec for
- Hostwide counters
-Message-ID: <fimq6f367gj3ypuke2slogz4i3zt4jfst4kwnrlzps3xinkoh5@arkajtap562s>
-References: <20241222140247.174998-1-vaibhav@linux.ibm.com>
- <20241222140247.174998-2-vaibhav@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696392F44;
+	Mon, 30 Dec 2024 07:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735542352; cv=fail; b=U6F5us5Cm4499pMyYrkghqzPlFKpi6rEFqtY09eVzBeS1FFv8Dhe8DQzQf/t6XGN0dW6Qhp3DDB7JDMfyTkXVY3fyUx4cAjQ76OmJrl67i+3OCehzbgPNhrao4m+GuvCQnZOCaGmRivla9kMj6HNbgT2Nmn5jEOGk4vv2Uoq0WE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735542352; c=relaxed/simple;
+	bh=VKXKSoM0ZyKS15s0raINdxXOTNEmsiZPZd3bTmoWSLU=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kaZxfsvS1TS1ujE2Hs60NlLFWG6KFz1lvlgATaK2guLjXW7X4/BIIwe38TcAJQq8Gftm034iprGvuho+1xFMkKunRykEb8ovNAuiuvJ/Pta++C3/wtMCW/Gt4Hml0F7+BzvIGfLc40OSPIGANaElqLYl3wqnDVF08945N0aOfW8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mBjVfUYt; arc=fail smtp.client-ip=40.107.244.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XRwHV/kamNjh+lijh2MYf86jBro6HK6BVF7MQw0h4rY006EsJ+GWo66X79O8RDe1JKo/wGcfqTHLcH9A6ckTGsTUDVJZFWAetqFSbdWK+NnhzS1mZKHz/OXs8dNFTIOgCHl6xznBCt2k9BnKtqEgopYTyM+YT4+w1a9lZr9vY/IhL2JcdFbTPonlGUHaN6LSADAFivOtIKkOwSOSK6k5yqrjEV/j8EaLKG4S7+tOr8bdIJcWrtQH3W1jMmy3SfbKqdMMf25+02HEPWUpshmO+Zxq9OvSdwdEQBkpbmr7W5SPYIb9HSu3iq7nFASzPQ0ZlfY+kBJT3TDhg8TIrezT6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Kps982/FxyH/3kuujZ6ICT4A+Ja/J4vpjicZL4uD/XI=;
+ b=fnme0FE4R3XKlQUQufv4LhtiH6KfUYJ3AsLGb5ocIlbdo2ep97M53W7szkZdr6GpgR7KP0PDrFXQ1DLPLnqraLE/bNDclcZdFdlVQQZMF9VmKauCr0dQINoB4L7PhwjKJDGz4dy5PoYadSs5wNUXaXvZW78TyiJRs6ablCLiJ/LZfXgSaGU5U1ikKqdnmQpQvoNglaiBcHxqTBieZaGMUUl37tSh/pwXNZIf9i5MV4JK/77UACDkte9JPwUGC4/TFQ8cFqUC0iGcd+V4Ap0GgKnuL11HrBZRRdFZ4nUjfgVL5nVuRHrN1sVD7PlcwbO4K68Ajy+El+HYdT7I3Adonw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Kps982/FxyH/3kuujZ6ICT4A+Ja/J4vpjicZL4uD/XI=;
+ b=mBjVfUYtGUhDKX9d8JR4ejkhYAQBfU5RxZPEUvrWx1+flLPkykElVd+fqUw6QDTTe13lKAanx+PROSdLtrTg5ggHeopL0fEVlQFhja9i7wa7ERQ/qoDHjb2T5Ga09C7dAPZd4VRzXf2cl6dvX6bRIa7Ry8gjoTs1mCo1MgK4rHY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
+ SJ0PR12MB6832.namprd12.prod.outlook.com (2603:10b6:a03:47e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.19; Mon, 30 Dec
+ 2024 07:05:43 +0000
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::17e6:16c7:6bc1:26fb%4]) with mapi id 15.20.8293.000; Mon, 30 Dec 2024
+ 07:05:43 +0000
+Message-ID: <c43cd283-554f-4d1d-8ce7-e786a137ed33@amd.com>
+Date: Mon, 30 Dec 2024 12:35:34 +0530
+User-Agent: Mozilla Thunderbird
+From: Manali Shukla <manali.shukla@amd.com>
+Subject: Re: [PATCH v4 3/4] KVM: nSVM: implement the nested idle halt
+ intercept
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ pbonzini@redhat.com, shuah@kernel.org, nikunj@amd.com,
+ thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de,
+ babu.moger@amd.com
+References: <20241022054810.23369-1-manali.shukla@amd.com>
+ <20241022054810.23369-4-manali.shukla@amd.com> <Z2TB94Ux5mOlds3b@google.com>
+Content-Language: en-US
+In-Reply-To: <Z2TB94Ux5mOlds3b@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0187.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:e8::14) To DS7PR12MB6214.namprd12.prod.outlook.com
+ (2603:10b6:8:96::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241222140247.174998-2-vaibhav@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: d6aAhfS7Z7wGfRoxHAP5oyfsVoACgzBP
-X-Proofpoint-ORIG-GUID: Q8_Tw7QByTCwtHvkwxcqqr37KD7uI3Yt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=971 bulkscore=0 mlxscore=0 adultscore=0 priorityscore=1501
- clxscore=1011 spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412300058
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|SJ0PR12MB6832:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9ebb0893-e19d-491d-d618-08dd28a0601f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZG16TEN3L1dhSWhrT0s0cFNTR090a0p2a1V6RGs4dklTc3Qxdm5CdXZ1VCtz?=
+ =?utf-8?B?UG1hMDQwMVJrMndiWmd3NFl1T3pjRTRJQmxXWENNOVh6NDJ2WDRabmJlYVAr?=
+ =?utf-8?B?dHNXNTNSMEwrZzZKaVY5Uk5ROGFWZzA2SU1lODkvV2g5Syt6L1JHbjF6QWhS?=
+ =?utf-8?B?cFVtTTBFVkN0UzRCeHV2SFAyU1d4a3Y3OEhnZlJGVVY1K0t5YUk5MXhlbDY0?=
+ =?utf-8?B?Z1BNWnhrVDFxQnZ1aE1JTVFNV3ZVVjhKUjNTeFBqMnE3Nm9yMmVRTFUwYThk?=
+ =?utf-8?B?Nm9uSHd4RFVqUGdFcVRUZ1lGQkY3UzFIVyt5dWJxNEtEa0FWeXVrVzdhSUs2?=
+ =?utf-8?B?Y08xTFYvR1czYXI1SWVHVUFTRFFoNVR3ZHlEcEJWUGMxNkV4WG1NdUdQbmNK?=
+ =?utf-8?B?YS9VUUx5NkJ5T0UyUWhjSnE1Qk1UZC9VZDZ0K3RzNnpsdzEvM1V1R1JRUTIz?=
+ =?utf-8?B?bWZsTVJoWWRwQmRNZW9FTVh2dlZadWRRZGpNbXNxdVB2SFYwdUlmNVYxc2Fv?=
+ =?utf-8?B?ODNSZmJJMWg4NmhhRFdMdWVLdFZZN0NtcFJzajZGRHJGamFWTUcvK3VsaEts?=
+ =?utf-8?B?enY5cmw4bVZYdDljZmJVVzZpYXBJeG1WK2RFL0o1MzE2NjYzcWR0SHRXQ2VI?=
+ =?utf-8?B?WHRsQXFtUG9WT3ZkNmNpdEZpNW1rcFhlNG1mejZnVnNrbGVRUzZpOURYWmpD?=
+ =?utf-8?B?QndKWi9FTmhhTTBzNTFsaXlxMFU2bGFSVVV3S0I0dytBSTdXYjNRZlBYTFpp?=
+ =?utf-8?B?WGlZU3E1TG4zVzhoUFNQVE5UYjlpMVh4QnZqcXJlQjc0LzVpNHZiZEptdnJW?=
+ =?utf-8?B?cS9MK3A0MDhkOVpZU1k2eC9XUFlyZHc3M0dVWjVBZUc0OU1oVWZpZWo3enZS?=
+ =?utf-8?B?MEZFZk1UdGNJeXdHemJJaUROWmM0TkhMaUVrRmdGNndMb1BSWHdPME5PMnE1?=
+ =?utf-8?B?dXp4K09LTVhXcnpGbjlUU0VMUUgxcXR5bW50MnlNaGgya0VpdExWaTI1ZFFY?=
+ =?utf-8?B?YWQ3ODlkL2ttdGNuNXZFU0hIV1hBRDQ3T3ExcTNnU0UyN05HaXk1WEYvTmZL?=
+ =?utf-8?B?OG56dEt6cStpaytSSU1Id3JOOHM1c3crbEM4dFpGc3hlR3dkSjBSajN6T2ph?=
+ =?utf-8?B?VWxJOHovTjNPNW1weFoxakg1Uk5MV0NHSVl6WnhyQndLQ0hkbG5IKzZpWDBL?=
+ =?utf-8?B?NUQxY0p0L3B1bHJjQW1WTlN6OGVpS2tOdHpGQVNkcG9tempSK1lkZ2RnbE5H?=
+ =?utf-8?B?RlgxbWRCRENjZUNqTkxQTVN4Yk9PRkl3MDhXRTFTRTdaU0UyTy9mZGJlcDRE?=
+ =?utf-8?B?REhLMllwWjlROW16WXJYdy8wSnI5QmhyNUhXdWI0RExCTGRUNy9yTGxOTEhm?=
+ =?utf-8?B?aGpjZGhsZWZpY0VlODVvNUpPMjUwUjFLVHBhZ3ZFdEdYZDg0ZXdoVUVsdCtj?=
+ =?utf-8?B?V0ErM2JCTkRjNlMxbFpWVEZFc0pteVB4ZnhVSTlyQlJLNmhLREVRUFYvYkpS?=
+ =?utf-8?B?ZXpTOHBnT0Q1OVdYb3A1clpjSjFseEVUd2RCU2V6RU80bW5nYnhvWm9TelF1?=
+ =?utf-8?B?QkFQQmo2T1UwZ3V6NnVpalQ3ZUs4dXBKSm0wMGRzN1VGNzJKYnRJNTdIKzk0?=
+ =?utf-8?B?cjdMdGVzY2lFZTlTSlRCbm51QTdwQW5MbEQ1SU9hZjRtSnQ1aFpuTWdyWE8w?=
+ =?utf-8?B?d2NXK0tvUzcvQ1FYTmRjb0hxbVI4MysrMlhudzAwWWZDcVZHS2Q3a29HOTBQ?=
+ =?utf-8?B?aVRReHM4bzEwWmlPUVY5MmJiYUprSnNFdWRXQmJlLzZuRU1OWE5Ma1lDUjZV?=
+ =?utf-8?B?NkFPU1A4L2hBV2haR0N1R01ZMnBVblRtSm5yTmJJeHZpYW80V0FCc1M1ZFFo?=
+ =?utf-8?Q?DSs6ynkvEEIgU?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TzVJS3FVdmlJYnVLQk5LbXZDSmI4KzlLbEVvajRiRHBPcU9RdXBWZnJNMC9Q?=
+ =?utf-8?B?VkZTWGJhQUdpZzI1UUVtR1JWQ1V4TFRxK0lnM0N6NmZiY3pKemg4cVhPZjQ4?=
+ =?utf-8?B?cFZFVVhRTkVPOCsraENFaS9ia1FMeFdNWm40aFRWTDF6UlFXWVRldWVLcFpR?=
+ =?utf-8?B?UlQwaUpydVFOWElHQTR6OS9NNWdvQ1NiaDZPRDlyWEU2V0hRMFdTdVFSTWJY?=
+ =?utf-8?B?Y3pOL1NteTE1OEl0N2E5SXNTNzdCZjMrbS85b0M0VGVPT3JDRklIckhBbUhH?=
+ =?utf-8?B?WGc5enBuTXZta2lKYVBFYUxsMTYxTWk1bCsrVFVCaHg2Q01YSkk2WmErMUhh?=
+ =?utf-8?B?bTJ1U0dwSjR0bFVYM0JQRkd5a3lMU2w1c2FmRndnUFNWNUpUM2tUSGJuNGVC?=
+ =?utf-8?B?Mmx1SFdTcmh0ODU2VnpQN1ZtS3dBNzNtaE45WWp0bEpFSVZ3cUhuTElnL1o4?=
+ =?utf-8?B?L0d6c1c5TFhpckN1Qm41N29wR0hwdHExRjRsbWxweHZuemFKamszZkI4RHNk?=
+ =?utf-8?B?cmU1K2NQeHY1RkJQL0RobWxVbmRWai9wdEFlSG0wcEZjRXcveXRwQ0xrZk85?=
+ =?utf-8?B?NzlVYWR5VzZnOCtXbXdhdVlLSnM3T0JWb1IrR0gwNWNwUDB6bVEwMC9WSWVk?=
+ =?utf-8?B?TFg4Z2pQRlNMY0J5NUJyaUhORnR4RGF6YTRZSzNKdTRwU01pdHgwcVJCVE50?=
+ =?utf-8?B?L0krQm1vOHJKU1lhS3l1Z2hoNHJpaUxhbUlpU3VtMnVVVzFRNjBtcHFCUFhy?=
+ =?utf-8?B?S3RTazRQS2FUY0JDaWtTUUdsbjFxcUlwTmM2ZjdJWDNSdTFYZWlZZlRkMjVh?=
+ =?utf-8?B?ZlNuUWZlTlZwL1ovTll5Z2VaYUZacUVvTjQwSVo3alRtazRnQitLNkxmeWhj?=
+ =?utf-8?B?dHlVM0FnSTg3TVoxWmFhalNFVG5TMWpMMzJYNWlSZzNiRzZUVk9rL3QrYzBV?=
+ =?utf-8?B?Ry9OZTdCTUhxQkJ2YlpLSmZabW1HOVRPQ0ZhK3I2akNUc1RPM0ttMU5peUUr?=
+ =?utf-8?B?RzNVbHAyaXk4STZPSjRUZS9BODREWTZlb0R3UzFzZjBpNHYybXAvaGtSUUlW?=
+ =?utf-8?B?dEdBVzhVaWhCdTkzY21UQUJoWU9McVBWYW1lbXJqTXBvNFh0OGJWUHJrdXBW?=
+ =?utf-8?B?MFl3OEZlRjNLWFF0OUxrU1hzeWMwREFaUHQyUjFPeUljOC9OL2hEbUJ4Qk5m?=
+ =?utf-8?B?QjF4WGQ4amRjYS9xYzFOWVhCa0M0Z2JEVUhUSEtLR1lIZ0tRZXJkNWx3RlVX?=
+ =?utf-8?B?bFd1R1MwNWJ1MUJNaWMvUDZ6RTJQY1JpQkM3MnpBR2t4elAzeWhzSk9PV1hX?=
+ =?utf-8?B?emIwSmZaM0J1aWlBM2RvRk4waElKcVFKSUNUS3kxQkNXa2Y1Y3I2eXgrVUV5?=
+ =?utf-8?B?YmpLYjBoZjRPKzE5K0VadmNSZDRRODNUbjlTN2hQSmRxeXZHMlhYN1R0NlNE?=
+ =?utf-8?B?ZGpiUk10OHhsQkl5QmdNMmxLanMyUnVyNW9QMmU4L0VTSk84ODltMVBrNHBp?=
+ =?utf-8?B?SGM3eTVIMjdNTTE4YTg0bVdKdEJLRUhXQ0VrWTlRbGExTUI2c2xNdUc4ZFFK?=
+ =?utf-8?B?UGdTTFY5c3JqbG1pbGtkOXhIdVg2OU1NUFpHVXRRN2RrSWl4NWZZUFZ1V0lE?=
+ =?utf-8?B?cThnMlZNYVI5OFcvS3M3bUVzU2hiS25lb0NhOHFsZGhvUU5kWEE3T2wrYWNv?=
+ =?utf-8?B?NzlNNkxqU3lmM0Z3c0E3YllwWi8ycTFLbFVmcGZZL3MzNGlrdi9XWkRJRkpX?=
+ =?utf-8?B?VTREODI0dmxWTjh5RTRjZFVxTjA0RmpxZ1pqRWpvV0J1QnhsS0I5UlNpSGha?=
+ =?utf-8?B?ZWx5UDgySHoyeFh6K0dmazhRMlVPa0UyTDNtcjJ1d2JQVG5VZGJubWc5Qi9Y?=
+ =?utf-8?B?aG1pSHNLZE5GVGpvQUZQTVpUTVlFcURCa1J1bmgvYnB2WXJWK1dwb2hIQzha?=
+ =?utf-8?B?K2xZSlpwdzdVTUlINXMraE1wSzBvenFKSG1pcndqUHhHWE1FRHB3b1IvbE1K?=
+ =?utf-8?B?MGJ4MytQU2hSUXVGL0ZtaWFWQ2NFVVBQUzRUTHdjQW52aDkwamhraVJZNzI3?=
+ =?utf-8?B?TUNyMk16MmZZd0p6RnV2OFVFeHBuZkZucVZDQVdVK2FML3hRT2hHNmlaV0lo?=
+ =?utf-8?Q?JoAkH9IVa4TWQsmAnMx7apOZi?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ebb0893-e19d-491d-d618-08dd28a0601f
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2024 07:05:43.3253
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X41bQoCMcVK5qIKmOR1Wz7Prd4S6yU7jazJM11YcOLfA9rW+y1A+v6WD0qrLjyPqdZX95jGmzs6zZ8VUB/tQnQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6832
 
-On Sun, Dec 22, 2024 at 07:32:29PM +0530, Vaibhav Jain wrote:
-> Update kvm-nested APIv2 documentation to include five new
-> Guest-State-Elements to fetch the hostwide counters. These counters are
-> per L1-Lpar and indicate the amount of Heap/Page-table memory allocated,
-> available and Page-table memory reclaimed for all L2-Guests active
-> instances
+Hi Sean,
+
+Thank you for reviewing my patches.
+
+On 12/20/2024 6:31 AM, Sean Christopherson wrote:
+> On Tue, Oct 22, 2024, Manali Shukla wrote:
+>> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+>> index d5314cb7dff4..feb241110f1a 100644
+>> --- a/arch/x86/kvm/svm/nested.c
+>> +++ b/arch/x86/kvm/svm/nested.c
+>> @@ -178,6 +178,14 @@ void recalc_intercepts(struct vcpu_svm *svm)
+>>  	} else {
+>>  		WARN_ON(!(c->virt_ext & VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK));
+>>  	}
+>> +
+>> +	/*
+>> +	 * Clear the HLT intercept for L2 guest when the Idle HLT intercept feature
+>> +	 * is enabled on the platform and the guest can use the Idle HLT intercept
+>> +	 * feature.
+>> +	 */
+>> +	if (guest_can_use(&svm->vcpu, X86_FEATURE_IDLE_HLT))
+>> +		vmcb_clr_intercept(c, INTERCEPT_HLT);
 > 
-> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
-> ---
->  Documentation/arch/powerpc/kvm-nested.rst | 40 ++++++++++++++++-------
->  1 file changed, 29 insertions(+), 11 deletions(-)
+> This is wrong.  KVM needs to honor the intercept of vmcb12.  If L1 wants to
+> intercept HLT, then KVM needs to configure vmcb02 to intercept HLT, regradless
+> of whether or not L1 is utilizing INTERCEPT_IDLE_HLT.
 > 
-> diff --git a/Documentation/arch/powerpc/kvm-nested.rst b/Documentation/arch/powerpc/kvm-nested.rst
-> index 5defd13cc6c1..c506192f3f98 100644
-> --- a/Documentation/arch/powerpc/kvm-nested.rst
-> +++ b/Documentation/arch/powerpc/kvm-nested.rst
-> @@ -208,13 +208,9 @@ associated values for each ID in the GSB::
->        flags:
->           Bit 0: getGuestWideState: Request state of the Guest instead
->             of an individual VCPU.
-> -         Bit 1: takeOwnershipOfVcpuState Indicate the L1 is taking
-> -           over ownership of the VCPU state and that the L0 can free
-> -           the storage holding the state. The VCPU state will need to
-> -           be returned to the Hypervisor via H_GUEST_SET_STATE prior
-> -           to H_GUEST_RUN_VCPU being called for this VCPU. The data
-> -           returned in the dataBuffer is in a Hypervisor internal
-> -           format.
-> +         Bit 1: getHostWideState: Request stats of the Host. This causes
-> +           the guestId and vcpuId parameters to be ignored and attempting
-> +           to get the VCPU/Guest state will cause an error.
-
-s/Request stats/Request state
-
->           Bits 2-63: Reserved
->        guestId: ID obtained from H_GUEST_CREATE
->        vcpuId: ID of the vCPU pass to H_GUEST_CREATE_VCPU
-> @@ -402,13 +398,14 @@ GSB element:
->  
->  The ID in the GSB element specifies what is to be set. This includes
->  archtected state like GPRs, VSRs, SPRs, plus also some meta data about
-> -the partition like the timebase offset and partition scoped page
-> +the partition and  like the timebase offset and partition scoped page
->  table information.
-
-The statement that is already there looks correct IMO.
-
->  
->  +--------+-------+----+--------+----------------------------------+
-> -|   ID   | Size  | RW | Thread | Details                          |
-> -|        | Bytes |    | Guest  |                                  |
-> -|        |       |    | Scope  |                                  |
-> +|   ID   | Size  | RW |(H)ost  | Details                          |
-> +|        | Bytes |    |(G)uest |                                  |
-> +|        |       |    |(T)hread|                                  |
-> +|        |       |    |Scope   |                                  |
->  +========+=======+====+========+==================================+
->  | 0x0000 |       | RW |   TG   | NOP element                      |
->  +--------+-------+----+--------+----------------------------------+
-> @@ -434,6 +431,27 @@ table information.
->  |        |       |    |        |- 0x8 Table size.                 |
->  +--------+-------+----+--------+----------------------------------+
->  | 0x0007-|       |    |        | Reserved                         |
-> +| 0x07FF |       |    |        |                                  |
-> ++--------+-------+----+--------+----------------------------------+
-> +| 0x0800 | 0x08  | R  |   H    | Current usage in bytes of the    |
-> +|        |       |    |        | L0's Guest Management Space      |
-> ++--------+-------+----+--------+----------------------------------+
-> +| 0x0801 | 0x08  | R  |   H    | Max bytes available in the       |
-> +|        |       |    |        | L0's Guest Management Space      |
-> ++--------+-------+----+--------+----------------------------------+
-> +| 0x0802 | 0x08  | R  |   H    | Current usage in bytes of the    |
-> +|        |       |    |        | L0's Guest Page Table Management |
-> +|        |       |    |        | Space                            |
-> ++--------+-------+----+--------+----------------------------------+
-> +| 0x0803 | 0x08  | R  |   H    | Max bytes available in the L0's  |
-> +|        |       |    |        | Guest Page Table Management      |
-> +|        |       |    |        | Space                            |
-> ++--------+-------+----+--------+----------------------------------+
-> +| 0x0804 | 0x08  | R  |   H    | Amount of reclaimed L0 Guest's   |
-> +|        |       |    |        | Page Table Management Space due  |
-> +|        |       |    |        | to overcommit                    |
-
-I think it would be more clear to specify "... Management space for L1
-..." in the details of all above entries.
-
-> ++--------+-------+----+--------+----------------------------------+
-> +| 0x0805-|       |    |        | Reserved                         |
->  | 0x0BFF |       |    |        |                                  |
->  +--------+-------+----+--------+----------------------------------+
->  | 0x0C00 | 0x10  | RW |   T    |Run vCPU Input Buffer:            |
-> -- 
-
-Also, the row 2 of this table mentions the 'takeOwnershipOfVcpuState' flag
-which is no longer supported. You can remove that as well.
-
-> 2.47.1
+> Given how KVM currently handles intercepts for nested SVM, I'm pretty sure you
+> can simply do nothing.  recalc_intercepts() starts with KVM's intercepts (from
+> vmcb01), and adds in L1's intercepts.  So unless there is a special case, the
+> default behavior should Just Work.
 > 
+> 	for (i = 0; i < MAX_INTERCEPT; i++)
+> 		c->intercepts[i] = h->intercepts[i];
+> 
+> 	...
+> 
+> 	for (i = 0; i < MAX_INTERCEPT; i++)
+> 		c->intercepts[i] |= g->intercepts[i];
+> 
+> KVM's approach creates all kinds of virtualization holes, e.g. L1 can utilize
+> IDLE_HLT even if the feature isn't advertised to L1.  But that's true for quite
+> literally all feature-based intercepts, so for better or worse, I don't think
+> it makes sense to try and change that approach for this feature.
+> 
+
+Yeah. Makes sense. I will remove the above condition from V5, so that intercept of
+vmcb12 is honored.
+
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index e86b79e975d3..38d546788fc6 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -4425,6 +4425,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_PFTHRESHOLD);
+>>  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VGIF);
+>>  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VNMI);
+>> +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_IDLE_HLT);
+>>  
+>>  	svm_recalc_instruction_intercepts(vcpu, svm);
+>>  
+>> @@ -5228,6 +5229,9 @@ static __init void svm_set_cpu_caps(void)
+>>  		if (vnmi)
+>>  			kvm_cpu_cap_set(X86_FEATURE_VNMI);
+>>  
+>> +		if (cpu_feature_enabled(X86_FEATURE_IDLE_HLT))
+>> +			kvm_cpu_cap_set(X86_FEATURE_IDLE_HLT);
+> 
+> kvm_cpu_cap_check_and_set() does this for you.
+> 
+>> +
+>>  		/* Nested VM can receive #VMEXIT instead of triggering #GP */
+>>  		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
+>>  	}
+>> -- 
+>> 2.34.1
+>>
+- Manali
 
