@@ -1,211 +1,410 @@
-Return-Path: <kvm+bounces-34405-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34406-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2912E9FE328
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 08:14:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8599FE346
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 08:32:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEDA1161B58
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 07:14:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 060513A1BFB
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 07:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F5419F111;
-	Mon, 30 Dec 2024 07:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2458319F422;
+	Mon, 30 Dec 2024 07:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="S1pvzUwV"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bDsif3ny"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2074.outbound.protection.outlook.com [40.107.220.74])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807DB158858;
-	Mon, 30 Dec 2024 07:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735542871; cv=fail; b=TfrrynhMy644RTAGre52+ie7DyXizdMIuXtRZOYpzyIX3N3skoC4KNkpiZAd1Z4+D16KvOFTJlreSRaLK5u31X7NS+n1qwYLgyl+Y4LeXKGTKdpgywaQ8sAaRe74UMN0yJX5WMWsPZT8yQ3T4pARkoYrBsPGcaTBTYGJJnCN6Qw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735542871; c=relaxed/simple;
-	bh=AD7EVuAAu6Aol3gibCE5Txs7VZRZh4PVOTNZbz4v5bM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UWqytR+asz99zTpDEDef23Pj/kqJitICPaXnpVucMQJXvejHIvSDbMy7pZ4iaB0OEpMmPAw4X4JDfDxeMIyIFQU9keExvaJV3idoFE7Pjdj1KC222qYfPSkMyz6KIgVBx2aVYHtmsICdau+mdxwc5Dq7gA0LLY1728U9+xwC1SA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=S1pvzUwV; arc=fail smtp.client-ip=40.107.220.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YQPlst2NaKEGKc4u+yP7hQnp2r9TvSMaxchNO3T54A5gEALE1CYKa30bPAZB4Si028JajntgHHgQ/HQFaNv0ET1VOC3tKSYzckyLpjW6b7HDtJyc0yu45BsODMFD9ei627/wpQXI2gNvHQGXRDTN0C1wq5th6pJeWTyLQ30XwzdXd/PZbBVo8+iyMnUoM2JQVGwYgdOwfVhCFB73aXtQ3beXwhXfDJWBpD2n1yFEWMneZRzOQ/kQFNwLoBdbh+/8PckMLHHbL5pouDajCyoFGdqA8cv4IZJLGbxI3QMut7/Yk6GbkXsNiM1AQK190B9QzajfQrnXrjQHQGEfPKhqkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jJvF1vVAo0JYtJtRimdBDvzgOoqbRXC/TSQw0GWyNQ4=;
- b=mLMPA9OK2DZa11Iev7CWzNQi5SjhAMqkZ27skCENr7ihCWE/mftt6SOYjJO1OQ6Z0bnaNl7R4pD/NA5YeE1w2t3Gu5SCs/aS6jcNHs/7YixD4iNViZj0rtueM6PYzSLZkUUqBY2agoynH8xKG3ecFfu413bpvydAA3oHsGfES+t1Id62sOBIwL/ZbehxTXXc8mrUuU4tsObZIbpm0tt035FHzThP/+lU+ufhurTS23ODPmXExfLV0/d5NxiZjYenNnaRwoG9RH5aEcU1B+KgWejeplg51wevNsVIZeyMFV/NecGSi9igY3iDaWmsEFdDFPFS3aMOJiI1xW1Lld8Jug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jJvF1vVAo0JYtJtRimdBDvzgOoqbRXC/TSQw0GWyNQ4=;
- b=S1pvzUwVAxTrr3Jll6IEQrPQY71g4T1eUEyBQ232rJRL4cH4DOr61RvVs9w6F4Ksn0HDqh31gRR22Ea9+nOpgRkzp/GZDZXFu/gxIMvgwmgkAE3Q8hbtIp3nycDSs1Y7M8h3mznr+QrkvKaTkCHNZ+OJIh/s2HXVBXopqi6ccCI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- SN7PR12MB6742.namprd12.prod.outlook.com (2603:10b6:806:26e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.16; Mon, 30 Dec
- 2024 07:14:23 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb%4]) with mapi id 15.20.8293.000; Mon, 30 Dec 2024
- 07:14:23 +0000
-Message-ID: <212c4adf-1443-42f3-b4cf-161154039174@amd.com>
-Date: Mon, 30 Dec 2024 12:44:15 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/4] KVM: nSVM: implement the nested idle halt
- intercept
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- pbonzini@redhat.com, shuah@kernel.org, nikunj@amd.com,
- thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de,
- babu.moger@amd.com
-References: <20241022054810.23369-1-manali.shukla@amd.com>
- <20241022054810.23369-4-manali.shukla@amd.com> <Z2TB94Ux5mOlds3b@google.com>
-Content-Language: en-US
-From: Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <Z2TB94Ux5mOlds3b@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PNYP287CA0007.INDP287.PROD.OUTLOOK.COM
- (2603:1096:c01:23d::12) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6992215B99E;
+	Mon, 30 Dec 2024 07:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735543939; cv=none; b=gRiAYSGNLrgN+0f2XRF8ekQb+Nl3hGOiR1SDvGM9F3YJjnqOtrv07OvcaMQBT0HeMdBigOpogKpKwcMnjaCVysSzKCQbyaZf+BCOY/fVutNK/fOZPIk38TJSzpVFNRqRc0b/mtjtHvukKpyGZ+teqTzSxvM9+rNyABOsQUmtevs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735543939; c=relaxed/simple;
+	bh=Zwca8o8L3aWYLNxewOvq04jxsi/3h/GjjaU0phri/mk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JOU3WxDHAH+raZMcG1E3aJb/n4PgQU0FFA4J2X+YGq7J0Tyb+ZCYGO5C96ObLFYjJgWMZwN9fjYnzPgcX4lsizC2OpTGoW6889MIkMKd91b9mknwVarhUOFI9RF3uz70ebqQCjWxh2pg8+AcZz0cx8Tx6L2xbrf5XJKxz0QUNPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bDsif3ny; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BU2sQtc019213;
+	Mon, 30 Dec 2024 07:32:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=EDKrW0WZv11mE2tA8WQFTeRUoHq51Z
+	KK3Y/aMdjhsrs=; b=bDsif3nyeathQmh8fq6mvtGXZVjL9WMx4mnIDKR5p/884S
+	Wd+pXA0o1oSyf1F7uvpgZanhPYMyTvOAMLaVrr1X+ByHnHyvvqcXL4znBpdEtLcQ
+	SSW8vMn/1GlERMj1jVrvamaglv6lYEDcz3e5dWRF050DD5vN7vS9LR3xKHFU0987
+	sDymjkW/EjaFhiEIXIxJxsDDzg6OyRPyy7TKXV1oFGmJ/yR/SZKff1zPgRvf7Nsr
+	Az38pkYFaBnMpbgbhzbP2qtbsVhWt6eJYiNBqImSGyhvuwKXzX3/dDqStD57TAb4
+	Uvs59DaouEQVGv6aeRuYcf9qecaumpu1khfDp1TA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ug8a13gv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Dec 2024 07:32:06 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BU7UbBa003477;
+	Mon, 30 Dec 2024 07:32:05 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ug8a13gt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Dec 2024 07:32:05 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BU2Vmm7027055;
+	Mon, 30 Dec 2024 07:32:05 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43txc1ma9s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Dec 2024 07:32:04 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BU7W1Cp45416774
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 30 Dec 2024 07:32:01 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B6B32004B;
+	Mon, 30 Dec 2024 07:32:01 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B63BA20040;
+	Mon, 30 Dec 2024 07:31:58 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.39.28.22])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 30 Dec 2024 07:31:58 +0000 (GMT)
+Date: Mon, 30 Dec 2024 13:01:54 +0530
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        sbhat@linux.ibm.com, kconsul@linux.ibm.com, amachhiw@linux.ibm.com
+Subject: Re: [PATCH 5/6] powerpc/book3s-hv-pmu: Implement GSB message-ops for
+ hostwide counters
+Message-ID: <kazedttv45jj2yk227ybz4ngv6cpk7bujcfo47xvzrpn3an3i4@phv7hew4hfy6>
+References: <20241222140247.174998-1-vaibhav@linux.ibm.com>
+ <20241222140247.174998-6-vaibhav@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|SN7PR12MB6742:EE_
-X-MS-Office365-Filtering-Correlation-Id: bab89057-8a85-4a65-ab8b-08dd28a1961c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dHZLbENKVjdVTFpHOWwrMnRDU2VFU2hIalJuMXRYa2EvS0Q3bmhwREI3Zyt1?=
- =?utf-8?B?cmxSWXRIY2pPRGFiS3ZCa3FCYTgxOWw4OXdocnpadk1mT1R4OFRBRFJWanJC?=
- =?utf-8?B?VXMwVjFZcUJidXdody82R0EwOTFsRmlkU2ZqNGxacmluNnFhVGxuc1hUYjJt?=
- =?utf-8?B?eFJEb1FXR3E0SHVGQitSUm1JSHRsdksrQmZhOFpUb2JDSWVWSjY2UFNGdnVu?=
- =?utf-8?B?OVA0N1BxZmlhb1VTbnBoVC82QlVtSlNicURwYmV1Uks5aDNWWFNCUUE3WDNM?=
- =?utf-8?B?UnozN2I2a0pna0JZN1NWMldvbU9EWTJmTzVpbE0yNDljZUp1TnJXZGNvaysy?=
- =?utf-8?B?M2hTNVZXeUpCY0JaRlh4UWdZZFNBVWd1VHg4R25LcWMwT3BqbG5nN1VqOGY2?=
- =?utf-8?B?bXRxRWZsRUg2cEVzdjBmTEtwR1F2ZkJVMEpWdU5YV1oxSEtMM1ZHRWo0NzdN?=
- =?utf-8?B?dUFPNUFlbmdqNUt0WWxLVDRCQ0dJMUtZNVY4Mi9pMm5sMHZtSzdaMVZ4VFJm?=
- =?utf-8?B?RkpmS3pmZ1hjVXk4UW1JNEdNV3RmeS82NHI0Q21XSXREN25rd1ljQ2F1cGZV?=
- =?utf-8?B?cllBaVFKWVlPYVhtSXFMZ2FwTU01UW9ueEJOU2piL2VBNmUzNXJsRjBQdXJh?=
- =?utf-8?B?NUNHcUZwcWJ4Z1N0c0IrWUZ2TUxkSUhieW1WcDNtOTVBNDNpdmVpVktIMTZZ?=
- =?utf-8?B?VmZ0R0VqeElaU0Y5TnUwbUtLUnVpY01CdWhwVXVxME1ZdG12TEtTcWhZZGgz?=
- =?utf-8?B?L1k3WXlqS05DdTBGWHhDOGU2aFBmdENzVXJ5Z1JXM3QvYnRlK3A2em02YlF3?=
- =?utf-8?B?SzNaeEplN2JKQzhjZ2FtUjk4WmJEYmlPcmFERXFONURJRGFqVzVvUk0rdjVh?=
- =?utf-8?B?YXUwL2ZWRnVFUG9uOVVXeUp5QTVSSGpEVXF4SzJ4dkowbXhYclF6MFF2c3U0?=
- =?utf-8?B?V2lDQWVPQ2orVkhCR3VKWVY2ang5OHlBUkI1Z0dBOHB3T1ZFS3M4Z21mMnBD?=
- =?utf-8?B?eC9PRHdaYm1QZnpoWXVrNjRHWlIzaUVXQzV5WnV6Wi9ubmhlOEFZYWpHdTQv?=
- =?utf-8?B?THRBcG9aM3Z4QkxEYk5DZEcxRTBxUlRsTFRZT2RsL2E3V0ZQSEdJZG9vbE9Y?=
- =?utf-8?B?UllCb09PaGNCSkRxSFdKRlNJaEF5cUtONnF6Z1ZWU2J3dmxzT0s5TlJheURW?=
- =?utf-8?B?ZUE2YjFhbTN3VVAxWHZTcG1RSHc5M3ZSOFY2Nkl0LzlRVkF2bndWL2pZcS9r?=
- =?utf-8?B?YU1Kdkh5N2t6QW55Z2FSVVlZS0ZYaEVkQlZoY0RobUpOSHlTY3VpUG93cEVJ?=
- =?utf-8?B?V05mcXQxc3BBUm5zd25wWVpnSmpHLzBwQUJDSW9JRjV2SFZsM3V4Wi9EUkEw?=
- =?utf-8?B?eGJ5UTE4bDJyVVU1dmExczBTejVJRUJnTi9rem9QQ3diLy9KVFYwMTVjaStE?=
- =?utf-8?B?NmlSRmR2cTBIeUxLZzdCTGRrWGM2dndHNDZNemRMU3lTUlIyellUZzZ0eTZa?=
- =?utf-8?B?TnZxTGkwVEw0aXBVWkthQjJLQVN0Mzh4ZWFvSFdXa2VrVEpoSWJiREZNT2k5?=
- =?utf-8?B?K3loVUV3Z25XeEVUWFFYcG8vK0FWRTFnSEprR0hKcm9hNlhDc2l4dFJOZ2tr?=
- =?utf-8?B?VTNjZmJWdU1Pb084MzBvazV2UW9mVWVvM0JQRDdITTFYNDR5SWxaUDc1UnVl?=
- =?utf-8?B?d2FnaDNta1NwaklBcGVTMy9PM0NhMGFWeVJpaEZZUjZhOGpieGZWaVk0SHBZ?=
- =?utf-8?B?OUh5Nzhrc2hGWjlRcTlpSkMrQnVaZDBxQjcxSExmY2k1TW1tNVEyUVN5TUV1?=
- =?utf-8?B?MjQzQWhRbDlodkNYWU1qNWtONHVtYkxNdnovV0crSnRqYXRyTGlMdUMzTHBo?=
- =?utf-8?Q?NlsdtHgo2dBNm?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cjNBOVBaWHo4Q2Ryb25XS0FjcHdXd2tkZmloeEJENmFXcWlQWUhNYWR5eTk0?=
- =?utf-8?B?cVlBWXJEVWwrT2JiKzhaY2wrNXhnMS9Ya2IxdkR3NFJiU1djcTdYU21mcGt4?=
- =?utf-8?B?dThWL09Yak1RcXhMa3RYY24wUWRCZ3NhdENjeUZyT0grY1QrRXcwZzEyZjFa?=
- =?utf-8?B?Wi9xMldCU3lkNTJuZnp4MlppdjJuUHkxdVpWYjdyRmc3aEYwRnZ6aGNRMGYv?=
- =?utf-8?B?NGMzZEhINkJrR1IrN2ZlbmdnTW4xSG91ZE1LQnFqblFORXY3OTJKd3VsWUV0?=
- =?utf-8?B?N2dlNnBSOE91ZXUzZDRSY2pzK3BFdHBFT1NZVDJDUTJpeVFlOXR3SWxZZlZC?=
- =?utf-8?B?K2w1dUVSQ0x0QlduN2NVSlM4NHArU2ZMakRsdFprRlFIYU1IWUtISlpSZlF0?=
- =?utf-8?B?V0tUalVCbi95THJDc1E4K25uK1BSa1pqaXdJTHdyb1Z2bHd1aHNvWk85eVEx?=
- =?utf-8?B?NGQwa1BMN0FZWkNBeENkVURqMjlIZHFOc2gwcnBRQXpqT3BLdFEvQXdPVHp4?=
- =?utf-8?B?WlZRZFhzUEFmRVgrTVNDNlJveDhRMk5LWURiZ2RsTE91NTRqME05K0MvMEtv?=
- =?utf-8?B?bkZwMVpkUVUwWEpNNDh6c0FaaGN5aVFENkZhUjJvS094Tzc5bFBoQUZkdFc2?=
- =?utf-8?B?SUQyM0JuMDBEUHRNVTd4b1F0YndHaW05YllIZFNJbjBnclF0cGJ1U1Z5NXNI?=
- =?utf-8?B?Yk1BVXROZSsrdnU1L3djQS9DdXVqUHZqRThXMG5oTExKSk53QWtHS3o5NERw?=
- =?utf-8?B?QnJrei96c2NIU3FFazFrM29POTdSN1ZqWWkwUnpPa25zbm5YTE5XWEVKZDdM?=
- =?utf-8?B?YUhtQk1seUtpK25WMkIwaW1Yb0Nja09tSjlDSE1TTHp1S3J1bXlpUHNlRnVI?=
- =?utf-8?B?dCtXOHMyYTZWZ3RwWFFyTEdsSjViZ2FYQlpISVdFMnYvc09DMDNtU2JpQkx6?=
- =?utf-8?B?b2oxV2xCYnFtTUR2VGowYWNodWw0MWMyQzYzZUpEaXRqZllpYitGYk1IbSs4?=
- =?utf-8?B?emFGbC9uTHhjd1dLNHdZRXY1RjZyVmw0MWpVYklXdmNPSEFMTjE2WHBpbGZk?=
- =?utf-8?B?aDdLbW1TQ1l1THY1dk93YUpuclpyQ3RwRkZnS3kwRnpPNCtycjQ2M2RxaXNL?=
- =?utf-8?B?ODhGNGRNTE9CQWxSQ1d4MGpFVTVZRHhNSG1HTnU0YkN1Q2VQMENoT0VTSlRh?=
- =?utf-8?B?ckFTVEpkd1BVTDltVlNFWnhoWlFQSkppRlBLazVGMTU1Y1dGek9LOTlTaEMw?=
- =?utf-8?B?eXFpZnVYaTVYcVFwcTBlNXp0KzhXWUx0MitFbFhjQWU4SVl5NGNZamh2d3Vr?=
- =?utf-8?B?dXBhMTQzdGk0VGlUY1Jud1VVa1lBSXZ3R0cxaHJIN1RUNUxiVkxObnd4RVdT?=
- =?utf-8?B?aCt3RjlYZ2pPSDRlY3BFeEt1dVVSbkNUVWVJYnNGNmwxSXdNRjVxOVd0eXdY?=
- =?utf-8?B?bTJwUGRScTgwb2pSMVNkSmtpSU00OHZVdmVrcjNFZ0h2KzVqNjNhWVlwdkk4?=
- =?utf-8?B?MDZ5aUF6dCtPQm1aUmpQNW5iYzg5ZVcyMVcwTXUwd3lNd2lUSERzMHdLM3Z3?=
- =?utf-8?B?RU5RNGo5L25aQm5GV3U5ajQvRWpKNWU1ZWRlNTNLOVF2OEVpUUFjMmZ2T0Vq?=
- =?utf-8?B?R3JBc2RZdHU2SVRiVkpEU0RYSzhINTNhaEZBRlpSRHMrQ25zZUpWUHFTUCtN?=
- =?utf-8?B?U0hOZEQwOGg3OHBzRkRrWXQ3UlZtS3BuVzdvSThKUW1qa2lFRnJJUmlrMVow?=
- =?utf-8?B?MTRGWHc3S2dnbFBxYmloQmk3b1UxR0lFalRDdVBBQzBENTUya1hNT1g2Wm1n?=
- =?utf-8?B?VFdCQnhJMCtUVEJLSGZGZHVpTFNvV0lUZzJSV1JRTWlWSnRPNkFXZURIZWt2?=
- =?utf-8?B?NFFnNXRTVkJVSGRGYVg1TnY5ZC9aaGxnOHJOLzdHWGl4eENFUmZDa0xZS0Na?=
- =?utf-8?B?ck94WisxaXY3OVJxQTRqTHM5eUxtMmFkWVRDaytydTl3elRqQW5XcnhIK2dp?=
- =?utf-8?B?ZEFtRG1na2NxU3diN1FmeUhuaDdoUUtTZFpyUFZtTHFIYzZWZ3BGOWRQcVpW?=
- =?utf-8?B?SFFKT2d4c0xQUit3SG9hbzB3K2praUpSVm9hV2dRNlRvNDIrQWhpMlJYc2x4?=
- =?utf-8?Q?WfzU3DCgFIai4Mj/PJIMy7l1F?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bab89057-8a85-4a65-ab8b-08dd28a1961c
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2024 07:14:23.3387
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0cRgN3cpDdCU9YHRAsFplCW1FUk/MeWFVNe0XngTO8TRCf7z6C0Qr0rKheJed7kN16VVPTF1ye2i7qaa654rEw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6742
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241222140247.174998-6-vaibhav@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: tEdoYdRdhbQDKEc7cCBtIuWlTbZ1qh-4
+X-Proofpoint-ORIG-GUID: fqdQQeyUqtZIlq_TNfouIEijkpQQLOAg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 bulkscore=0 mlxscore=0 adultscore=1 priorityscore=1501
+ clxscore=1015 spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412300063
 
-On 12/20/2024 6:31 AM, Sean Christopherson wrote:
-
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index e86b79e975d3..38d546788fc6 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -4425,6 +4425,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->>  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_PFTHRESHOLD);
->>  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VGIF);
->>  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VNMI);
->> +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_IDLE_HLT);
->>  
->>  	svm_recalc_instruction_intercepts(vcpu, svm);
->>  
->> @@ -5228,6 +5229,9 @@ static __init void svm_set_cpu_caps(void)
->>  		if (vnmi)
->>  			kvm_cpu_cap_set(X86_FEATURE_VNMI);
->>  
->> +		if (cpu_feature_enabled(X86_FEATURE_IDLE_HLT))
->> +			kvm_cpu_cap_set(X86_FEATURE_IDLE_HLT);
+On Sun, Dec 22, 2024 at 07:32:33PM +0530, Vaibhav Jain wrote:
+> Implement and setup necessary structures to send a prepolulated
+> Guest-State-Buffer(GSB) requesting hostwide counters to L0-PowerVM and have
+> the returned GSB holding the values of these counters parsed. This is done
+> via existing GSB implementation and with the newly added support of
+> Hostwide elements in GSB.
 > 
-> kvm_cpu_cap_check_and_set() does this for you.
+> The request to L0-PowerVM to return Hostwide counters is done using a
+> pre-allocated GSB named 'gsb_l0_stats'. To be able to populate this GSB
+> with the needed Guest-State-Elements (GSIDs) a instance of 'struct
+> kvmppc_gs_msg' named 'gsm_l0_stats' is introduced. The 'gsm_l0_stats' is
+> tied to an instance of 'struct kvmppc_gs_msg_ops' named  'gsb_ops_l0_stats'
+> which holds various callbacks to be compute the size ( hostwide_get_size()
+> ), populate the GSB ( hostwide_fill_info() ) and
+> refresh ( hostwide_refresh_info() ) the contents of
+> 'l0_stats' that holds the Hostwide counters returned from L0-PowerVM.
 > 
+> To protect these structures from simultaneous access a spinlock
+> 'lock_l0_stats' has been introduced. The allocation and initialization of
+> the above structures is done in newly introduced kvmppc_init_hostwide() and
+> similarly the cleanup is performed in newly introduced
+> kvmppc_cleanup_hostwide().
+> 
+> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+> ---
+>  arch/powerpc/kvm/book3s_hv_pmu.c | 189 +++++++++++++++++++++++++++++++
+>  1 file changed, 189 insertions(+)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_hv_pmu.c b/arch/powerpc/kvm/book3s_hv_pmu.c
+> index e72542d5e750..f7fd5190ecf7 100644
+> --- a/arch/powerpc/kvm/book3s_hv_pmu.c
+> +++ b/arch/powerpc/kvm/book3s_hv_pmu.c
+> @@ -27,10 +27,31 @@
+>  #include <asm/plpar_wrappers.h>
+>  #include <asm/firmware.h>
+>  
+> +#include "asm/guest-state-buffer.h"
+> +
+>  enum kvmppc_pmu_eventid {
+>  	KVMPPC_EVENT_MAX,
+>  };
+>  
+> +#define KVMPPC_PMU_EVENT_ATTR(_name, _id) \
+> +	PMU_EVENT_ATTR_ID(_name, power_events_sysfs_show, _id)
+> +
+> +/* Holds the hostwide stats */
+> +static struct kvmppc_hostwide_stats {
+> +	u64 guest_heap;
+> +	u64 guest_heap_max;
+> +	u64 guest_pgtable_size;
+> +	u64 guest_pgtable_size_max;
+> +	u64 guest_pgtable_reclaim;
+> +} l0_stats;
+> +
+> +/* Protect access to l0_stats */
+> +static DEFINE_SPINLOCK(lock_l0_stats);
+> +
+> +/* GSB related structs needed to talk to L0 */
+> +static struct kvmppc_gs_msg *gsm_l0_stats;
+> +static struct kvmppc_gs_buff *gsb_l0_stats;
+> +
+>  static struct attribute *kvmppc_pmu_events_attr[] = {
+>  	NULL,
+>  };
+> @@ -90,6 +111,167 @@ static void kvmppc_pmu_read(struct perf_event *event)
+>  {
+>  }
+>  
+> +/* Return the size of the needed guest state buffer */
+> +static size_t hostwide_get_size(struct kvmppc_gs_msg *gsm)
+> +
+> +{
+> +	size_t size = 0;
+> +	const u16 ids[] = {
+> +		KVMPPC_GSID_L0_GUEST_HEAP,
+> +		KVMPPC_GSID_L0_GUEST_HEAP_MAX,
+> +		KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE,
+> +		KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX,
+> +		KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM
+> +	};
+> +
+> +	for (int i = 0; i < ARRAY_SIZE(ids); i++)
+> +		size += kvmppc_gse_total_size(kvmppc_gsid_size(ids[i]));
+> +	return size;
+> +}
+> +
+> +/* Populate the request guest state buffer */
+> +static int hostwide_fill_info(struct kvmppc_gs_buff *gsb,
+> +			      struct kvmppc_gs_msg *gsm)
+> +{
+> +	struct kvmppc_hostwide_stats  *stats = gsm->data;
+> +
+> +	/*
+> +	 * It doesn't matter what values are put into request buffer as
+> +	 * they are going to be overwritten anyways. But for the sake of
+> +	 * testcode and symmetry contents of existing stats are put
+> +	 * populated into the request guest state buffer.
+> +	 */
+> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_HEAP))
+> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_HEAP,
+> +				   stats->guest_heap);
+> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_HEAP_MAX))
+> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_HEAP_MAX,
+> +				   stats->guest_heap_max);
+> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE))
+> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE,
+> +				   stats->guest_pgtable_size);
+> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX))
+> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX,
+> +				   stats->guest_pgtable_size_max);
+> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM))
+> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM,
+> +				   stats->guest_pgtable_reclaim);
+> +
+> +	return 0;
+> +}
 
-Sure. I will use kvm_cpu_cap_check_and_set() in V5.
+kvmppc_gse_put_u64() can return an error. I think we can handle it just
+like gs_msg_ops_vcpu_fill_info()
 
->> +
->>  		/* Nested VM can receive #VMEXIT instead of triggering #GP */
->>  		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
->>  	}
->> -- 
->> 2.34.1
->>
+> +
+> +/* Parse and update the host wide stats from returned gsb */
+> +static int hostwide_refresh_info(struct kvmppc_gs_msg *gsm,
+> +				 struct kvmppc_gs_buff *gsb)
+> +{
+> +	struct kvmppc_gs_parser gsp = { 0 };
+> +	struct kvmppc_hostwide_stats *stats = gsm->data;
+> +	struct kvmppc_gs_elem *gse;
+> +	int rc;
+> +
+> +	rc = kvmppc_gse_parse(&gsp, gsb);
+> +	if (rc < 0)
+> +		return rc;
+> +
+> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_HEAP);
+> +	if (gse)
+> +		stats->guest_heap = kvmppc_gse_get_u64(gse);
+> +
+> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_HEAP_MAX);
+> +	if (gse)
+> +		stats->guest_heap_max = kvmppc_gse_get_u64(gse);
+> +
+> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE);
+> +	if (gse)
+> +		stats->guest_pgtable_size = kvmppc_gse_get_u64(gse);
+> +
+> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX);
+> +	if (gse)
+> +		stats->guest_pgtable_size_max = kvmppc_gse_get_u64(gse);
+> +
+> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM);
+> +	if (gse)
+> +		stats->guest_pgtable_reclaim = kvmppc_gse_get_u64(gse);
+> +
+> +	return 0;
+> +}
+> +
+> +/* gsb-message ops for setting up/parsing */
+> +static struct kvmppc_gs_msg_ops gsb_ops_l0_stats = {
+> +	.get_size = hostwide_get_size,
+> +	.fill_info = hostwide_fill_info,
+> +	.refresh_info = hostwide_refresh_info,
+> +};
+> +
+> +static int kvmppc_init_hostwide(void)
+> +{
+> +	int rc = 0;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&lock_l0_stats, flags);
+> +
+> +	/* already registered ? */
+> +	if (gsm_l0_stats) {
+> +		rc = 0;
+> +		goto out;
+> +	}
+> +
+> +	/* setup the Guest state message/buffer to talk to L0 */
+> +	gsm_l0_stats = kvmppc_gsm_new(&gsb_ops_l0_stats, &l0_stats,
+> +				      GSM_SEND, GFP_KERNEL);
+> +	if (!gsm_l0_stats) {
+> +		rc = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	/* Populate the Idents */
+> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_HEAP);
+> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_HEAP_MAX);
+> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE);
+> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX);
+> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM);
+> +
+> +	/* allocate GSB. Guest/Vcpu Id is ignored */
+> +	gsb_l0_stats = kvmppc_gsb_new(kvmppc_gsm_size(gsm_l0_stats), 0, 0,
+> +				      GFP_KERNEL);
+> +	if (!gsb_l0_stats) {
+> +		rc = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	/* ask the ops to fill in the info */
+> +	rc = kvmppc_gsm_fill_info(gsm_l0_stats, gsb_l0_stats);
+> +	if (rc)
+> +		goto out;
+> +out:
+> +	if (rc) {
+> +		if (gsm_l0_stats)
+> +			kvmppc_gsm_free(gsm_l0_stats);
+> +		if (gsb_l0_stats)
+> +			kvmppc_gsb_free(gsb_l0_stats);
+> +		gsm_l0_stats = NULL;
+> +		gsb_l0_stats = NULL;
+> +	}
+> +	spin_unlock_irqrestore(&lock_l0_stats, flags);
+> +	return rc;
+> +}
 
-- Manali
+The error handling can probably be simplified to avoid multiple ifs:
+
+<snip>
+
+     /* allocate GSB. Guest/Vcpu Id is ignored */
+     gsb_l0_stats = kvmppc_gsb_new(kvmppc_gsm_size(gsm_l0_stats), 0, 0,
+                                   GFP_KERNEL);
+     if (!gsb_l0_stats) {
+             rc = -ENOMEM;
+             goto err_gsm;
+     }
+
+     /* ask the ops to fill in the info */
+     rc = kvmppc_gsm_fill_info(gsm_l0_stats, gsb_l0_stats);
+     if (!rc)
+             goto out;
+
+err_gsb:
+     kvmppc_gsb_free(gsb_l0_stats);
+     gsb_l0_stats = NULL;
+
+err_gsm:
+     kvmppc_gsm_free(gsm_l0_stats);
+     gsm_l0_stats = NULL;
+
+out:
+     spin_unlock_irqrestore(&lock_l0_stats, flags);
+     return rc;
+}
+
+> +
+> +static void kvmppc_cleanup_hostwide(void)
+> +{
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&lock_l0_stats, flags);
+> +
+> +	if (gsm_l0_stats)
+> +		kvmppc_gsm_free(gsm_l0_stats);
+> +	if (gsb_l0_stats)
+> +		kvmppc_gsb_free(gsb_l0_stats);
+> +	gsm_l0_stats = NULL;
+> +	gsb_l0_stats = NULL;
+> +
+> +	spin_unlock_irqrestore(&lock_l0_stats, flags);
+> +}
+> +
+>  /* L1 wide counters PMU */
+>  static struct pmu kvmppc_pmu = {
+>  	.task_ctx_nr = perf_sw_context,
+> @@ -108,6 +290,10 @@ int kvmppc_register_pmu(void)
+>  
+>  	/* only support events for nestedv2 right now */
+>  	if (kvmhv_is_nestedv2()) {
+> +		rc = kvmppc_init_hostwide();
+> +		if (rc)
+> +			goto out;
+> +
+>  		/* Setup done now register the PMU */
+>  		pr_info("Registering kvm-hv pmu");
+>  
+> @@ -117,6 +303,7 @@ int kvmppc_register_pmu(void)
+>  					       -1) : 0;
+>  	}
+>  
+> +out:
+>  	return rc;
+>  }
+>  EXPORT_SYMBOL_GPL(kvmppc_register_pmu);
+> @@ -124,6 +311,8 @@ EXPORT_SYMBOL_GPL(kvmppc_register_pmu);
+>  void kvmppc_unregister_pmu(void)
+>  {
+>  	if (kvmhv_is_nestedv2()) {
+> +		kvmppc_cleanup_hostwide();
+> +
+>  		if (kvmppc_pmu.type != -1)
+>  			perf_pmu_unregister(&kvmppc_pmu);
+>  
+> -- 
+> 2.47.1
+> 
 
