@@ -1,256 +1,210 @@
-Return-Path: <kvm+bounces-34401-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34402-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA7829FE1D9
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 03:13:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 325199FE318
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 08:04:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A0D83A1A65
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 02:13:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7DE161C69
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 07:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177E015FD13;
-	Mon, 30 Dec 2024 02:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FB319EEC2;
+	Mon, 30 Dec 2024 07:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Yz6kdZ7d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00198126C13;
-	Mon, 30 Dec 2024 02:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D492F44;
+	Mon, 30 Dec 2024 07:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735524788; cv=none; b=KJUnKuYqDcnKuhfRMmpLSZ1LFBbrYAiw7n+UtmRxzS5EWWxRUbtDRX7LFy0+c60LA8DrPekc+Bc41KPZfWW+NbPu4/6Mx5sj2+RMUkxh/fymnXP7bankulXhgWHv7Wnl6beSukmnhat2uhE7kX6CvjcRWaClx1cs9YQhE+bMyfg=
+	t=1735542255; cv=none; b=ZkCaHWSvYm1iKMcjOsEAL6fyTjzBwYmKCTSkaZGEZTSy4iucZYfFyf3KY0XpDhSORdsVAshdXEltSgnWKYZeI/UMjt+VnzYeEgGnicGJddNXSKp48Uph+5/2Ytgxt+DhI3vp1mRdhfqZ4cjC5W7gGK+GfoJNtzO8Q4ueFYo4cb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735524788; c=relaxed/simple;
-	bh=DvHZL78QKW56ozJMObsH+DUnaP5GgpKGZeMe8Wi9WU0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=PvQiI6CfzsMRBCnv1ptneilbFRqzimaI551PB51xPCzP0xrqr223a6pTb/JgoP3K/5dyPEJIR72inWiJVLh8sVP8knMD3VozGf0j3yA0w5oWy+vbiX1k5DrM7gt6PI4nYXficSsMEqy/M8N83QB3KDPWVO8OgfWCPtm8IIRMEJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Bx++GuAXJnUKVbAA--.48678S3;
-	Mon, 30 Dec 2024 10:13:02 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMDxfceqAXJn3k8NAA--.2756S3;
-	Mon, 30 Dec 2024 10:13:01 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: Add hypercall service support for
- usermode VMM
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20241223084212.34822-1-maobibo@loongson.cn>
- <CAAhV-H73CaNYFtgDfM+SOXYmwUhzr1w7JC4D+t2aASyUBxxTrA@mail.gmail.com>
- <d186408c-f083-2404-de60-2ec3c8b528cf@loongson.cn>
- <CAAhV-H42D4Rybzkc9YVsjo+GEQwiq4LTdjtmWyOzaqmuW6x8CQ@mail.gmail.com>
-From: bibo mao <maobibo@loongson.cn>
-Message-ID: <521ca7c6-64a2-53fa-5cff-b366ae73f600@loongson.cn>
-Date: Mon, 30 Dec 2024 10:12:10 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1735542255; c=relaxed/simple;
+	bh=hUBZxO3udcy2ZV80XHefHiKxRLTwPCiAJ35DVuSBUpA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o8uomIL15tOk6oLkf6P04CD5kdicwSi6gwZisqJYespwU+8ekkCtigLQPm1/XAX06IdKKi85Hv1ZHWeboARXBqmcT43gqQRgftfM6mSTzA4S2TZSuNpFC8yWWsG7vnvXrd/el9fIPw4WtHDROqd6CHY/sHLzuVUhW0PNmhsy6cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Yz6kdZ7d; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BTNbTC9025760;
+	Mon, 30 Dec 2024 07:03:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=xUSMbY89H5WSfPtVNMoAeMf0ZXSlFH
+	MT/P3toWiTG7Y=; b=Yz6kdZ7d8OJnuSEXeE8/raCurL/g9unqwyaSjf9DhsbEH9
+	yxcuG8VFKJwpoJp6kQMQbLXXaK1a+eG9u8/BAAsSo6j6Yhl1e6gkr78J4gqkQi2O
+	q4lPShUsxxU8cjiu86arYOoVYze9qJyXD7O0kIugVuzltS1F0Dl53QWCvOCS2NBL
+	NgSYvXww2KpK04SIiCITsj7WYPPWcGDZ4r3RT/8mrK0dSX7DiVNGELZ5GXfpGPlK
+	lUtnmNAJyLfkPL8QwO2tRObit+heZRBX2ue2JOYR0RIvCZcX8YdebfgZx0BjlRqU
+	vG8SpRSZzPq3i8MCIe6dHGKLA8/o6/99f5HgtFDA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ug8a10rv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Dec 2024 07:03:59 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BU73wxA012671;
+	Mon, 30 Dec 2024 07:03:59 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ug8a10rr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Dec 2024 07:03:58 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BU5Z8VL014022;
+	Mon, 30 Dec 2024 07:03:58 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43tv1xvmqa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Dec 2024 07:03:58 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BU73sAE19529986
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 30 Dec 2024 07:03:54 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4FC4B20040;
+	Mon, 30 Dec 2024 07:03:54 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6B23020043;
+	Mon, 30 Dec 2024 07:03:51 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.39.28.22])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 30 Dec 2024 07:03:51 +0000 (GMT)
+Date: Mon, 30 Dec 2024 12:33:42 +0530
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-doc@vger.kernel.org,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        sbhat@linux.ibm.com, kconsul@linux.ibm.com, amachhiw@linux.ibm.com
+Subject: Re: [PATCH 1/6] [DOC] powerpc: Document APIv2 KVM hcall spec for
+ Hostwide counters
+Message-ID: <fimq6f367gj3ypuke2slogz4i3zt4jfst4kwnrlzps3xinkoh5@arkajtap562s>
+References: <20241222140247.174998-1-vaibhav@linux.ibm.com>
+ <20241222140247.174998-2-vaibhav@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H42D4Rybzkc9YVsjo+GEQwiq4LTdjtmWyOzaqmuW6x8CQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMDxfceqAXJn3k8NAA--.2756S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3AF4fZw4fJF13Kw4DXr1kJFc_yoWxtw13pr
-	yUAF4kCrWrKr4fC3sIqwn09r9FgrWkKr1Ig3WUKFWayrnIv3Z3Jr48tr98CF98Xwn5XF1I
-	vF9Ygw13uF15t3cCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
-	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8j-e5UU
-	UUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241222140247.174998-2-vaibhav@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: d6aAhfS7Z7wGfRoxHAP5oyfsVoACgzBP
+X-Proofpoint-ORIG-GUID: Q8_Tw7QByTCwtHvkwxcqqr37KD7uI3Yt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=971 bulkscore=0 mlxscore=0 adultscore=0 priorityscore=1501
+ clxscore=1011 spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412300058
 
-Hi Huacai,
-
-On 2024/12/23 下午5:05, Huacai Chen wrote:
-> I also tried to port an untested version, but I think your version is
-> a tested one.
-> https://github.com/chenhuacai/linux/commit/e6596b0e45c80756794aba74ac086c5c0e0306eb
+On Sun, Dec 22, 2024 at 07:32:29PM +0530, Vaibhav Jain wrote:
+> Update kvm-nested APIv2 documentation to include five new
+> Guest-State-Elements to fetch the hostwide counters. These counters are
+> per L1-Lpar and indicate the amount of Heap/Page-table memory allocated,
+> available and Page-table memory reclaimed for all L2-Guests active
+> instances
 > 
-> And I have some questions:
-> 1, "user service" is not only for syscall, so you rename it?
-> 2, Why 4.19 doesn't need something like "vcpu->run->hypercall.args[0]
-> = kvm_read_reg(vcpu, LOONGARCH_GPR_A0);"
-> 3, I think my version about "vcpu->run->exit_reason =
-> KVM_EXIT_HYPERCALL;" and "update_pc()" is a little better than yours,
-> so you can improve them.
-After a second thought, update_pc() before return to user may be not 
-strictly right, since user VMM can dump registers including pc which is 
-advanced already.
-
-How about adding function kvm_complete_hypercall() like 
-kvm_complete_mmio_read(), such as:
---- a/arch/loongarch/kvm/exit.c
-+++ b/arch/loongarch/kvm/exit.c
-+int kvm_complete_hypercall(struct kvm_vcpu *vcpu, struct kvm_run *run)
-+{
-+       update_pc(&vcpu->arch);
-+       kvm_write_reg(vcpu, LOONGARCH_GPR_A0, run->hypercall.ret);
-+}
-+
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -1736,8 +1736,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-                 if (!run->iocsr_io.is_write)
-                         kvm_complete_iocsr_read(vcpu, run);
-         } else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
--               kvm_write_reg(vcpu, LOONGARCH_GPR_A0, run->hypercall.ret);
--               update_pc(&vcpu->arch);
-+               kvm_complete_hypercall(vcpu, run);
-+               run->exit_reason = KVM_EXIT_UNKNOWN;
-         }
-
-Regards
-Bibo Mao
+> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+> ---
+>  Documentation/arch/powerpc/kvm-nested.rst | 40 ++++++++++++++++-------
+>  1 file changed, 29 insertions(+), 11 deletions(-)
 > 
-> Huacai
-> 
-> On Mon, Dec 23, 2024 at 4:54 PM bibo mao <maobibo@loongson.cn> wrote:
->>
->>
->>
->> On 2024/12/23 下午4:50, Huacai Chen wrote:
->>> Hi, Bibo,
->>>
->>> Is this patch trying to do the same thing as "LoongArch: add hypcall
->>> to emulate syscall in kvm" in 4.19?
->> yes, it is to do so -:)
->>
->> Regards
->> Bibo Mao
->>>
->>> Huacai
->>>
->>> On Mon, Dec 23, 2024 at 4:42 PM Bibo Mao <maobibo@loongson.cn> wrote:
->>>>
->>>> Some VMMs provides special hypercall service in usermode, KVM need
->>>> not handle the usermode hypercall service and pass it to VMM and
->>>> let VMM handle it.
->>>>
->>>> Here new code KVM_HCALL_CODE_USER is added for user-mode hypercall
->>>> service, KVM loads all six registers to VMM.
->>>>
->>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>>> ---
->>>>    arch/loongarch/include/asm/kvm_host.h      |  1 +
->>>>    arch/loongarch/include/asm/kvm_para.h      |  2 ++
->>>>    arch/loongarch/include/uapi/asm/kvm_para.h |  1 +
->>>>    arch/loongarch/kvm/exit.c                  | 22 ++++++++++++++++++++++
->>>>    arch/loongarch/kvm/vcpu.c                  |  3 +++
->>>>    5 files changed, 29 insertions(+)
->>>>
->>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
->>>> index 7b8367c39da8..590982cd986e 100644
->>>> --- a/arch/loongarch/include/asm/kvm_host.h
->>>> +++ b/arch/loongarch/include/asm/kvm_host.h
->>>> @@ -162,6 +162,7 @@ enum emulation_result {
->>>>    #define LOONGARCH_PV_FEAT_UPDATED      BIT_ULL(63)
->>>>    #define LOONGARCH_PV_FEAT_MASK         (BIT(KVM_FEATURE_IPI) |         \
->>>>                                            BIT(KVM_FEATURE_STEAL_TIME) |  \
->>>> +                                        BIT(KVM_FEATURE_USER_HCALL) |  \
->>>>                                            BIT(KVM_FEATURE_VIRT_EXTIOI))
->>>>
->>>>    struct kvm_vcpu_arch {
->>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/include/asm/kvm_para.h
->>>> index c4e84227280d..d3c00de484f6 100644
->>>> --- a/arch/loongarch/include/asm/kvm_para.h
->>>> +++ b/arch/loongarch/include/asm/kvm_para.h
->>>> @@ -13,12 +13,14 @@
->>>>
->>>>    #define KVM_HCALL_CODE_SERVICE         0
->>>>    #define KVM_HCALL_CODE_SWDBG           1
->>>> +#define KVM_HCALL_CODE_USER            2
->>>>
->>>>    #define KVM_HCALL_SERVICE              HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_SERVICE)
->>>>    #define  KVM_HCALL_FUNC_IPI            1
->>>>    #define  KVM_HCALL_FUNC_NOTIFY         2
->>>>
->>>>    #define KVM_HCALL_SWDBG                        HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_SWDBG)
->>>> +#define KVM_HCALL_USER_SERVICE         HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_USER)
->>>>
->>>>    /*
->>>>     * LoongArch hypercall return code
->>>> diff --git a/arch/loongarch/include/uapi/asm/kvm_para.h b/arch/loongarch/include/uapi/asm/kvm_para.h
->>>> index b0604aa9b4bb..76d802ef01ce 100644
->>>> --- a/arch/loongarch/include/uapi/asm/kvm_para.h
->>>> +++ b/arch/loongarch/include/uapi/asm/kvm_para.h
->>>> @@ -17,5 +17,6 @@
->>>>    #define  KVM_FEATURE_STEAL_TIME                2
->>>>    /* BIT 24 - 31 are features configurable by user space vmm */
->>>>    #define  KVM_FEATURE_VIRT_EXTIOI       24
->>>> +#define  KVM_FEATURE_USER_HCALL                25
->>>>
->>>>    #endif /* _UAPI_ASM_KVM_PARA_H */
->>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
->>>> index a7893bd01e73..1a85cd4fb6a5 100644
->>>> --- a/arch/loongarch/kvm/exit.c
->>>> +++ b/arch/loongarch/kvm/exit.c
->>>> @@ -873,6 +873,28 @@ static int kvm_handle_hypercall(struct kvm_vcpu *vcpu)
->>>>                   vcpu->stat.hypercall_exits++;
->>>>                   kvm_handle_service(vcpu);
->>>>                   break;
->>>> +       case KVM_HCALL_USER_SERVICE:
->>>> +               if (!kvm_guest_has_pv_feature(vcpu, KVM_FEATURE_USER_HCALL)) {
->>>> +                       kvm_write_reg(vcpu, LOONGARCH_GPR_A0, KVM_HCALL_INVALID_CODE);
->>>> +                       break;
->>>> +               }
->>>> +
->>>> +               vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
->>>> +               vcpu->run->hypercall.nr = KVM_HCALL_USER_SERVICE;
->>>> +               vcpu->run->hypercall.args[0] = kvm_read_reg(vcpu, LOONGARCH_GPR_A0);
->>>> +               vcpu->run->hypercall.args[1] = kvm_read_reg(vcpu, LOONGARCH_GPR_A1);
->>>> +               vcpu->run->hypercall.args[2] = kvm_read_reg(vcpu, LOONGARCH_GPR_A2);
->>>> +               vcpu->run->hypercall.args[3] = kvm_read_reg(vcpu, LOONGARCH_GPR_A3);
->>>> +               vcpu->run->hypercall.args[4] = kvm_read_reg(vcpu, LOONGARCH_GPR_A4);
->>>> +               vcpu->run->hypercall.args[5] = kvm_read_reg(vcpu, LOONGARCH_GPR_A5);
->>>> +               vcpu->run->hypercall.flags = 0;
->>>> +               /*
->>>> +                * Set invalid return value by default
->>>> +                * Need user-mode VMM modify it
->>>> +                */
->>>> +               vcpu->run->hypercall.ret = KVM_HCALL_INVALID_CODE;
->>>> +               ret = RESUME_HOST;
->>>> +               break;
->>>>           case KVM_HCALL_SWDBG:
->>>>                   /* KVM_HCALL_SWDBG only in effective when SW_BP is enabled */
->>>>                   if (vcpu->guest_debug & KVM_GUESTDBG_SW_BP_MASK) {
->>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->>>> index d18a4a270415..8c46ad1872ee 100644
->>>> --- a/arch/loongarch/kvm/vcpu.c
->>>> +++ b/arch/loongarch/kvm/vcpu.c
->>>> @@ -1735,6 +1735,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>>>           if (run->exit_reason == KVM_EXIT_LOONGARCH_IOCSR) {
->>>>                   if (!run->iocsr_io.is_write)
->>>>                           kvm_complete_iocsr_read(vcpu, run);
->>>> +       } else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
->>>> +               kvm_write_reg(vcpu, LOONGARCH_GPR_A0, run->hypercall.ret);
->>>> +               update_pc(&vcpu->arch);
->>>>           }
->>>>
->>>>           if (!vcpu->wants_to_run)
->>>>
->>>> base-commit: 48f506ad0b683d3e7e794efa60c5785c4fdc86fa
->>>> --
->>>> 2.39.3
->>>>
->>
->>
+> diff --git a/Documentation/arch/powerpc/kvm-nested.rst b/Documentation/arch/powerpc/kvm-nested.rst
+> index 5defd13cc6c1..c506192f3f98 100644
+> --- a/Documentation/arch/powerpc/kvm-nested.rst
+> +++ b/Documentation/arch/powerpc/kvm-nested.rst
+> @@ -208,13 +208,9 @@ associated values for each ID in the GSB::
+>        flags:
+>           Bit 0: getGuestWideState: Request state of the Guest instead
+>             of an individual VCPU.
+> -         Bit 1: takeOwnershipOfVcpuState Indicate the L1 is taking
+> -           over ownership of the VCPU state and that the L0 can free
+> -           the storage holding the state. The VCPU state will need to
+> -           be returned to the Hypervisor via H_GUEST_SET_STATE prior
+> -           to H_GUEST_RUN_VCPU being called for this VCPU. The data
+> -           returned in the dataBuffer is in a Hypervisor internal
+> -           format.
+> +         Bit 1: getHostWideState: Request stats of the Host. This causes
+> +           the guestId and vcpuId parameters to be ignored and attempting
+> +           to get the VCPU/Guest state will cause an error.
 
+s/Request stats/Request state
+
+>           Bits 2-63: Reserved
+>        guestId: ID obtained from H_GUEST_CREATE
+>        vcpuId: ID of the vCPU pass to H_GUEST_CREATE_VCPU
+> @@ -402,13 +398,14 @@ GSB element:
+>  
+>  The ID in the GSB element specifies what is to be set. This includes
+>  archtected state like GPRs, VSRs, SPRs, plus also some meta data about
+> -the partition like the timebase offset and partition scoped page
+> +the partition and  like the timebase offset and partition scoped page
+>  table information.
+
+The statement that is already there looks correct IMO.
+
+>  
+>  +--------+-------+----+--------+----------------------------------+
+> -|   ID   | Size  | RW | Thread | Details                          |
+> -|        | Bytes |    | Guest  |                                  |
+> -|        |       |    | Scope  |                                  |
+> +|   ID   | Size  | RW |(H)ost  | Details                          |
+> +|        | Bytes |    |(G)uest |                                  |
+> +|        |       |    |(T)hread|                                  |
+> +|        |       |    |Scope   |                                  |
+>  +========+=======+====+========+==================================+
+>  | 0x0000 |       | RW |   TG   | NOP element                      |
+>  +--------+-------+----+--------+----------------------------------+
+> @@ -434,6 +431,27 @@ table information.
+>  |        |       |    |        |- 0x8 Table size.                 |
+>  +--------+-------+----+--------+----------------------------------+
+>  | 0x0007-|       |    |        | Reserved                         |
+> +| 0x07FF |       |    |        |                                  |
+> ++--------+-------+----+--------+----------------------------------+
+> +| 0x0800 | 0x08  | R  |   H    | Current usage in bytes of the    |
+> +|        |       |    |        | L0's Guest Management Space      |
+> ++--------+-------+----+--------+----------------------------------+
+> +| 0x0801 | 0x08  | R  |   H    | Max bytes available in the       |
+> +|        |       |    |        | L0's Guest Management Space      |
+> ++--------+-------+----+--------+----------------------------------+
+> +| 0x0802 | 0x08  | R  |   H    | Current usage in bytes of the    |
+> +|        |       |    |        | L0's Guest Page Table Management |
+> +|        |       |    |        | Space                            |
+> ++--------+-------+----+--------+----------------------------------+
+> +| 0x0803 | 0x08  | R  |   H    | Max bytes available in the L0's  |
+> +|        |       |    |        | Guest Page Table Management      |
+> +|        |       |    |        | Space                            |
+> ++--------+-------+----+--------+----------------------------------+
+> +| 0x0804 | 0x08  | R  |   H    | Amount of reclaimed L0 Guest's   |
+> +|        |       |    |        | Page Table Management Space due  |
+> +|        |       |    |        | to overcommit                    |
+
+I think it would be more clear to specify "... Management space for L1
+..." in the details of all above entries.
+
+> ++--------+-------+----+--------+----------------------------------+
+> +| 0x0805-|       |    |        | Reserved                         |
+>  | 0x0BFF |       |    |        |                                  |
+>  +--------+-------+----+--------+----------------------------------+
+>  | 0x0C00 | 0x10  | RW |   T    |Run vCPU Input Buffer:            |
+> -- 
+
+Also, the row 2 of this table mentions the 'takeOwnershipOfVcpuState' flag
+which is no longer supported. You can remove that as well.
+
+> 2.47.1
+> 
 
