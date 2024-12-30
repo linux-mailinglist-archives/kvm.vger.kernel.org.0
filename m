@@ -1,147 +1,256 @@
-Return-Path: <kvm+bounces-34400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34401-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F05C89FDFFE
-	for <lists+kvm@lfdr.de>; Sun, 29 Dec 2024 18:04:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA7829FE1D9
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 03:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC577161D31
-	for <lists+kvm@lfdr.de>; Sun, 29 Dec 2024 17:04:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A0D83A1A65
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 02:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB3619340D;
-	Sun, 29 Dec 2024 17:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KnKBqdx2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177E015FD13;
+	Mon, 30 Dec 2024 02:13:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f67.google.com (mail-pj1-f67.google.com [209.85.216.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCE5C147;
-	Sun, 29 Dec 2024 17:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.67
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00198126C13;
+	Mon, 30 Dec 2024 02:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735491857; cv=none; b=KQQOqmq3EU1Ge+e+MFZbgfYTSQvYWGEvsnNsmktnLOSz4O6DsQVHQfBz2X5IqDsDDg5sjcFH2LavrUNJNF7N1d1t8gJN/+P5eDZAcEr1MVCeUd6j7b8Xn8bqyzo2X2gnT9phoQhi02DY2RVpTVrZEO0h2PcN38mE/sYHHYqetSw=
+	t=1735524788; cv=none; b=KJUnKuYqDcnKuhfRMmpLSZ1LFBbrYAiw7n+UtmRxzS5EWWxRUbtDRX7LFy0+c60LA8DrPekc+Bc41KPZfWW+NbPu4/6Mx5sj2+RMUkxh/fymnXP7bankulXhgWHv7Wnl6beSukmnhat2uhE7kX6CvjcRWaClx1cs9YQhE+bMyfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735491857; c=relaxed/simple;
-	bh=zUlQwo28UDkn+uy0HtJYLKiZuDOQ8q+VCAacyUSyp9U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fkf+alT7FigqRQvQLUZ1jdvPwlj0yAus1VBpJN1L6/CHujqSwbFAMkrtDjv2v7LgLVBcA4SRfd2snYJWoYMXBIYkW10/ormZAS/wIkagnxm4NAsiUGnzHsGG3H+cm2deCT902Uf3703paPnX8oWtlt9ZpsfiZX74L3ftblZ1mPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KnKBqdx2; arc=none smtp.client-ip=209.85.216.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f67.google.com with SMTP id 98e67ed59e1d1-2ee8e8e29f6so9101635a91.0;
-        Sun, 29 Dec 2024 09:04:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735491856; x=1736096656; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ko1sX/DQdfKvmikz83llEmH8ZwnYb3PAj/37irHgOUE=;
-        b=KnKBqdx2jkPfFeUKpLClwz8LAVzK4B9Fj8opeRoUuzbqr6LrRWK2thcp4OUxRiOwNJ
-         m6bYYdiJKzZmaXNY+DVkJF15qVaCAAjcHRBcOX+r9BYXQ0sw0m1BOimHeZOwsiwweNVb
-         cgcVQpyQP4/Zt4eQ+fEvklbUkC0At4dcGTo6c2sAVRiHCB5jr3rmmzPr6ydAGqKgwh9v
-         rP9nzv798Glys/3nfb8SZlv4u9O/5F1hM5XJIEymAhZ8I++ZZ4dN9EsugSBHa9Q4gXvx
-         iVhljQd0I1KqbHpKam49EDKKmHR7FcKui1RoSCshK5BlQxE/uL3VYP18KTrUWGkLLn11
-         H2qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735491856; x=1736096656;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ko1sX/DQdfKvmikz83llEmH8ZwnYb3PAj/37irHgOUE=;
-        b=XH1EwvyU8UFdPBWCdYunXy4RTlG0cuMgBi2+GXMUCjcapV4Go9VInJMiX6w/zP7J2I
-         qSOrZ2T3+9+RtSqyvzA81yTThdeXIxg8IS/wM18p0ZEhmzJMHUJOxBZ/wt1lDCUdNmo1
-         s9P/X4TbCsbo7a22jfYTJEqlUPlr2NYe4C6obAvoyabtQn702DF857fp0bMmEoFbUaMz
-         nipZG/v5RSpDnSodklia1TEOkJaW35hkycvX3t8dzp2g0c8emKScHM/G/1CppQQ0gFkJ
-         bbruYlrd4tEVrjmaLTTjq1GI94tQwmEAsBpsNrZP9qA06YY3Fz5SUVtc4qU+qKx422e9
-         9HNw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3KYDTFcE4uh8UKbb8tT7/C3z8bvVSDPkF+p7aH//aPSloOH7UYcExEPlk9k9bLOgEHLVMe9dOvnaaaAE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8DER9b1pPADbmFNeLcW2qpgWfCtEY9T4HgjzKCp/16g9N1HFf
-	qeScB/oi3XJaaVzaGkPYDPS9xC05sZ2Lx3uN8VV0BqbqPnXHPsI=
-X-Gm-Gg: ASbGncs7Ohs2UHwn70USgxDmXBCtnMLQ2kK5c4dq3qVKEh4q4tL5BHkM+5eN87aalDM
-	2f53jruBJEYSE5hGyI+OVlwt1aEs3agHbXvQqFQH1RtXNVWR2lGOkEIsQbMqXQQAeJtDg0oxmTu
-	zWjJ5OYiU0rISyKrUAGJEEQv6znhOI3SuBv3IcTftIYmqYneGJTIU8RaHXCViRD6FAX3n3MI2HT
-	LERpSf2YS+V8J/h+Opy8qdysbHwhR4a9/OaqnN8Xj7vhhb9dZaXzG3l2Gm5VQ==
-X-Google-Smtp-Source: AGHT+IGEH+3uB18r/9+6Ynl3bLT6XQKgUxdN6GFyolQQOdtOsQ5v0hJR9RYwvzbbju24/Im2aEZB9Q==
-X-Received: by 2002:a17:90b:2d4c:b0:2ee:aed2:c15c with SMTP id 98e67ed59e1d1-2f452ec376amr44362389a91.28.1735491855620;
-        Sun, 29 Dec 2024 09:04:15 -0800 (PST)
-Received: from [192.168.0.163] ([58.38.120.107])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2ed644816sm21026443a91.25.2024.12.29.09.04.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Dec 2024 09:04:15 -0800 (PST)
-Message-ID: <85002952-bae6-4e35-9af7-db28a593d458@gmail.com>
-Date: Mon, 30 Dec 2024 01:04:13 +0800
+	s=arc-20240116; t=1735524788; c=relaxed/simple;
+	bh=DvHZL78QKW56ozJMObsH+DUnaP5GgpKGZeMe8Wi9WU0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=PvQiI6CfzsMRBCnv1ptneilbFRqzimaI551PB51xPCzP0xrqr223a6pTb/JgoP3K/5dyPEJIR72inWiJVLh8sVP8knMD3VozGf0j3yA0w5oWy+vbiX1k5DrM7gt6PI4nYXficSsMEqy/M8N83QB3KDPWVO8OgfWCPtm8IIRMEJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Bx++GuAXJnUKVbAA--.48678S3;
+	Mon, 30 Dec 2024 10:13:02 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMDxfceqAXJn3k8NAA--.2756S3;
+	Mon, 30 Dec 2024 10:13:01 +0800 (CST)
+Subject: Re: [PATCH] LoongArch: KVM: Add hypercall service support for
+ usermode VMM
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20241223084212.34822-1-maobibo@loongson.cn>
+ <CAAhV-H73CaNYFtgDfM+SOXYmwUhzr1w7JC4D+t2aASyUBxxTrA@mail.gmail.com>
+ <d186408c-f083-2404-de60-2ec3c8b528cf@loongson.cn>
+ <CAAhV-H42D4Rybzkc9YVsjo+GEQwiq4LTdjtmWyOzaqmuW6x8CQ@mail.gmail.com>
+From: bibo mao <maobibo@loongson.cn>
+Message-ID: <521ca7c6-64a2-53fa-5cff-b366ae73f600@loongson.cn>
+Date: Mon, 30 Dec 2024 10:12:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vfio/pci: update igd matching conditions
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241229155140.7434-1-tomitamoeko@gmail.com>
- <20241229092600.00ffa55f.alex.williamson@redhat.com>
+In-Reply-To: <CAAhV-H42D4Rybzkc9YVsjo+GEQwiq4LTdjtmWyOzaqmuW6x8CQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-From: Tomita Moeko <tomitamoeko@gmail.com>
-In-Reply-To: <20241229092600.00ffa55f.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDxfceqAXJn3k8NAA--.2756S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3AF4fZw4fJF13Kw4DXr1kJFc_yoWxtw13pr
+	yUAF4kCrWrKr4fC3sIqwn09r9FgrWkKr1Ig3WUKFWayrnIv3Z3Jr48tr98CF98Xwn5XF1I
+	vF9Ygw13uF15t3cCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
+	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
+	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
+	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
+	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8j-e5UU
+	UUU==
 
-On 12/30/24 00:26, Alex Williamson wrote:
-> On Sun, 29 Dec 2024 23:51:40 +0800
-> Tomita Moeko <tomitamoeko@gmail.com> wrote:
+Hi Huacai,
+
+On 2024/12/23 下午5:05, Huacai Chen wrote:
+> I also tried to port an untested version, but I think your version is
+> a tested one.
+> https://github.com/chenhuacai/linux/commit/e6596b0e45c80756794aba74ac086c5c0e0306eb
 > 
->> igd device can either expose as a VGA controller or display controller
->> depending on whether it is configured as the primary display device in
->> BIOS. In both cases, the OpRegion may be present. Also checks if the
->> device is at bdf 00:02.0 to avoid setting up igd-specific regions on
->> Intel discrete GPUs.
+> And I have some questions:
+> 1, "user service" is not only for syscall, so you rename it?
+> 2, Why 4.19 doesn't need something like "vcpu->run->hypercall.args[0]
+> = kvm_read_reg(vcpu, LOONGARCH_GPR_A0);"
+> 3, I think my version about "vcpu->run->exit_reason =
+> KVM_EXIT_HYPERCALL;" and "update_pc()" is a little better than yours,
+> so you can improve them.
+After a second thought, update_pc() before return to user may be not 
+strictly right, since user VMM can dump registers including pc which is 
+advanced already.
+
+How about adding function kvm_complete_hypercall() like 
+kvm_complete_mmio_read(), such as:
+--- a/arch/loongarch/kvm/exit.c
++++ b/arch/loongarch/kvm/exit.c
++int kvm_complete_hypercall(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++       update_pc(&vcpu->arch);
++       kvm_write_reg(vcpu, LOONGARCH_GPR_A0, run->hypercall.ret);
++}
++
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -1736,8 +1736,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+                 if (!run->iocsr_io.is_write)
+                         kvm_complete_iocsr_read(vcpu, run);
+         } else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
+-               kvm_write_reg(vcpu, LOONGARCH_GPR_A0, run->hypercall.ret);
+-               update_pc(&vcpu->arch);
++               kvm_complete_hypercall(vcpu, run);
++               run->exit_reason = KVM_EXIT_UNKNOWN;
+         }
+
+Regards
+Bibo Mao
+> 
+> Huacai
+> 
+> On Mon, Dec 23, 2024 at 4:54 PM bibo mao <maobibo@loongson.cn> wrote:
 >>
->> Signed-off-by: Tomita Moeko <tomitamoeko@gmail.com>
->> ---
->>  drivers/vfio/pci/vfio_pci.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
 >>
->> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
->> index e727941f589d..051ef4ad3f43 100644
->> --- a/drivers/vfio/pci/vfio_pci.c
->> +++ b/drivers/vfio/pci/vfio_pci.c
->> @@ -111,9 +111,11 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
->>  	if (ret)
->>  		return ret;
->>  
->> -	if (vfio_pci_is_vga(pdev) &&
->> +	if (IS_ENABLED(CONFIG_VFIO_PCI_IGD) &&
->>  	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
->> -	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
->> +	    ((pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA ||
-> 
-> The above is vfio_pci_is_vga(pdev), maybe below should have a similar
-> helper.
-
-There isn't, shall I create a new helper function? or just keep it as
-the match only happens here.
- 
->> +	     (pdev->class >> 8) == PCI_CLASS_DISPLAY_OTHER) &&
->> +	    pdev == pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(2, 0))) {
-> 
-> This increments the reference count on the device:
-> 
->  * Given a PCI domain, bus, and slot/function number, the desired PCI
->  * device is located in the list of PCI devices. If the device is
->  * found, its reference count is increased and this function returns a
->  * pointer to its data structure.  The caller must decrement the
->  * reference count by calling pci_dev_put().
-
-Sorry I missed that, will fix in v2.
-
->>  		ret = vfio_pci_igd_init(vdev);
->>  		if (ret && ret != -ENODEV) {
->>  			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
-> 
+>>
+>> On 2024/12/23 下午4:50, Huacai Chen wrote:
+>>> Hi, Bibo,
+>>>
+>>> Is this patch trying to do the same thing as "LoongArch: add hypcall
+>>> to emulate syscall in kvm" in 4.19?
+>> yes, it is to do so -:)
+>>
+>> Regards
+>> Bibo Mao
+>>>
+>>> Huacai
+>>>
+>>> On Mon, Dec 23, 2024 at 4:42 PM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>
+>>>> Some VMMs provides special hypercall service in usermode, KVM need
+>>>> not handle the usermode hypercall service and pass it to VMM and
+>>>> let VMM handle it.
+>>>>
+>>>> Here new code KVM_HCALL_CODE_USER is added for user-mode hypercall
+>>>> service, KVM loads all six registers to VMM.
+>>>>
+>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>>> ---
+>>>>    arch/loongarch/include/asm/kvm_host.h      |  1 +
+>>>>    arch/loongarch/include/asm/kvm_para.h      |  2 ++
+>>>>    arch/loongarch/include/uapi/asm/kvm_para.h |  1 +
+>>>>    arch/loongarch/kvm/exit.c                  | 22 ++++++++++++++++++++++
+>>>>    arch/loongarch/kvm/vcpu.c                  |  3 +++
+>>>>    5 files changed, 29 insertions(+)
+>>>>
+>>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+>>>> index 7b8367c39da8..590982cd986e 100644
+>>>> --- a/arch/loongarch/include/asm/kvm_host.h
+>>>> +++ b/arch/loongarch/include/asm/kvm_host.h
+>>>> @@ -162,6 +162,7 @@ enum emulation_result {
+>>>>    #define LOONGARCH_PV_FEAT_UPDATED      BIT_ULL(63)
+>>>>    #define LOONGARCH_PV_FEAT_MASK         (BIT(KVM_FEATURE_IPI) |         \
+>>>>                                            BIT(KVM_FEATURE_STEAL_TIME) |  \
+>>>> +                                        BIT(KVM_FEATURE_USER_HCALL) |  \
+>>>>                                            BIT(KVM_FEATURE_VIRT_EXTIOI))
+>>>>
+>>>>    struct kvm_vcpu_arch {
+>>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/include/asm/kvm_para.h
+>>>> index c4e84227280d..d3c00de484f6 100644
+>>>> --- a/arch/loongarch/include/asm/kvm_para.h
+>>>> +++ b/arch/loongarch/include/asm/kvm_para.h
+>>>> @@ -13,12 +13,14 @@
+>>>>
+>>>>    #define KVM_HCALL_CODE_SERVICE         0
+>>>>    #define KVM_HCALL_CODE_SWDBG           1
+>>>> +#define KVM_HCALL_CODE_USER            2
+>>>>
+>>>>    #define KVM_HCALL_SERVICE              HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_SERVICE)
+>>>>    #define  KVM_HCALL_FUNC_IPI            1
+>>>>    #define  KVM_HCALL_FUNC_NOTIFY         2
+>>>>
+>>>>    #define KVM_HCALL_SWDBG                        HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_SWDBG)
+>>>> +#define KVM_HCALL_USER_SERVICE         HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_USER)
+>>>>
+>>>>    /*
+>>>>     * LoongArch hypercall return code
+>>>> diff --git a/arch/loongarch/include/uapi/asm/kvm_para.h b/arch/loongarch/include/uapi/asm/kvm_para.h
+>>>> index b0604aa9b4bb..76d802ef01ce 100644
+>>>> --- a/arch/loongarch/include/uapi/asm/kvm_para.h
+>>>> +++ b/arch/loongarch/include/uapi/asm/kvm_para.h
+>>>> @@ -17,5 +17,6 @@
+>>>>    #define  KVM_FEATURE_STEAL_TIME                2
+>>>>    /* BIT 24 - 31 are features configurable by user space vmm */
+>>>>    #define  KVM_FEATURE_VIRT_EXTIOI       24
+>>>> +#define  KVM_FEATURE_USER_HCALL                25
+>>>>
+>>>>    #endif /* _UAPI_ASM_KVM_PARA_H */
+>>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+>>>> index a7893bd01e73..1a85cd4fb6a5 100644
+>>>> --- a/arch/loongarch/kvm/exit.c
+>>>> +++ b/arch/loongarch/kvm/exit.c
+>>>> @@ -873,6 +873,28 @@ static int kvm_handle_hypercall(struct kvm_vcpu *vcpu)
+>>>>                   vcpu->stat.hypercall_exits++;
+>>>>                   kvm_handle_service(vcpu);
+>>>>                   break;
+>>>> +       case KVM_HCALL_USER_SERVICE:
+>>>> +               if (!kvm_guest_has_pv_feature(vcpu, KVM_FEATURE_USER_HCALL)) {
+>>>> +                       kvm_write_reg(vcpu, LOONGARCH_GPR_A0, KVM_HCALL_INVALID_CODE);
+>>>> +                       break;
+>>>> +               }
+>>>> +
+>>>> +               vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
+>>>> +               vcpu->run->hypercall.nr = KVM_HCALL_USER_SERVICE;
+>>>> +               vcpu->run->hypercall.args[0] = kvm_read_reg(vcpu, LOONGARCH_GPR_A0);
+>>>> +               vcpu->run->hypercall.args[1] = kvm_read_reg(vcpu, LOONGARCH_GPR_A1);
+>>>> +               vcpu->run->hypercall.args[2] = kvm_read_reg(vcpu, LOONGARCH_GPR_A2);
+>>>> +               vcpu->run->hypercall.args[3] = kvm_read_reg(vcpu, LOONGARCH_GPR_A3);
+>>>> +               vcpu->run->hypercall.args[4] = kvm_read_reg(vcpu, LOONGARCH_GPR_A4);
+>>>> +               vcpu->run->hypercall.args[5] = kvm_read_reg(vcpu, LOONGARCH_GPR_A5);
+>>>> +               vcpu->run->hypercall.flags = 0;
+>>>> +               /*
+>>>> +                * Set invalid return value by default
+>>>> +                * Need user-mode VMM modify it
+>>>> +                */
+>>>> +               vcpu->run->hypercall.ret = KVM_HCALL_INVALID_CODE;
+>>>> +               ret = RESUME_HOST;
+>>>> +               break;
+>>>>           case KVM_HCALL_SWDBG:
+>>>>                   /* KVM_HCALL_SWDBG only in effective when SW_BP is enabled */
+>>>>                   if (vcpu->guest_debug & KVM_GUESTDBG_SW_BP_MASK) {
+>>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>>>> index d18a4a270415..8c46ad1872ee 100644
+>>>> --- a/arch/loongarch/kvm/vcpu.c
+>>>> +++ b/arch/loongarch/kvm/vcpu.c
+>>>> @@ -1735,6 +1735,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>>>>           if (run->exit_reason == KVM_EXIT_LOONGARCH_IOCSR) {
+>>>>                   if (!run->iocsr_io.is_write)
+>>>>                           kvm_complete_iocsr_read(vcpu, run);
+>>>> +       } else if (run->exit_reason == KVM_EXIT_HYPERCALL) {
+>>>> +               kvm_write_reg(vcpu, LOONGARCH_GPR_A0, run->hypercall.ret);
+>>>> +               update_pc(&vcpu->arch);
+>>>>           }
+>>>>
+>>>>           if (!vcpu->wants_to_run)
+>>>>
+>>>> base-commit: 48f506ad0b683d3e7e794efa60c5785c4fdc86fa
+>>>> --
+>>>> 2.39.3
+>>>>
+>>
+>>
 
 
