@@ -1,128 +1,98 @@
-Return-Path: <kvm+bounces-34413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 506B79FE8EF
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 17:11:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3C69FE957
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 18:05:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D596D1882AF5
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 16:11:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD648161344
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 17:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BCC1ACEA5;
-	Mon, 30 Dec 2024 16:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ED41ACEDF;
+	Mon, 30 Dec 2024 17:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JkzAr1V1"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="cE2BrNWm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF5F1AA1F1;
-	Mon, 30 Dec 2024 16:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C9533C9;
+	Mon, 30 Dec 2024 17:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735575072; cv=none; b=hot08KhED9xGc8Ry4TC8h4knJp4yRfXCDSYW0Yo+etzZQBKJEvRFEZ4KdmSVdy0KmOLg1g1eeanTnoUhgLwTmD3XbAvnNgc0mq5RNuMB1XWIblVTUjMe3FU40kgdEO4M/K998tGVAbLc5xOifuDMFXqEz0FjpsQ4t9TgPNs/ovQ=
+	t=1735578322; cv=none; b=PLaFAVVAgnIXtcMot1y0j6Lu95tYrlea7pZw85AglkfX/WnS+amoIUxxDiSzArrkTN09+b3Hu0Wc+yIf8qzMtFH3g3+k3j4X3Nb0Sq3gApv86dPAGc0liPgg7sHqHRFQBGZNtTerbrbiqg9izdfGqA4F+xH0LjTdav7PXjw7cC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735575072; c=relaxed/simple;
-	bh=1AVPAYoXslvavTPivZNky0rzLp0dAJkxcuVUsczJU78=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OB5wprLY2B3f6OaGLw6qoywWmiXTZFCFUyKCN/Nz+P/zMqpaKl7e7jqyXAeFkd/IERQjpCFVyqspiwmYLD6Oq9XQWrDm8l3mVmK64FkH0Bcw83IgS08H1Yyi19grdoosGjppK9w718IBrHWM72KmeeRF8yiT2VhnkyVYdj0JKC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JkzAr1V1; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-21a1e6fd923so66155075ad.1;
-        Mon, 30 Dec 2024 08:11:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735575070; x=1736179870; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ETJHS6ckaBqe0qYPt6TMRIUqoDCklxygA6Q1jLCfsZc=;
-        b=JkzAr1V1sUkQGIpJA3MAl3578Itp0/ZH4Z5QqN0lgtu8igyGw1TYvTKMOBZLl/qZD5
-         TuMr5BkFDtKYa07Dp8DoxgvUaiQqdXeYJdwD48E+Qm2+s2TRH57Khh6sioH5R9AfiPMf
-         JV8fDWl3qz4N/ogXo0qOQxz1odsF8qK3F8DurpNLml/RFEnGhx2kEK2tFjThroFplYvR
-         tiU6OCnwk2GZHabsAaps4t2OHuiOR8d6+XmU5dijZP954lvC8coJWUOL81BPGk13+nm6
-         fEKUByF2S5sZtWVa6H63cTgkLvMe/fkvqo/9Cj1YhQRgvRHfLbPTBMcbPeOWzbThY1+R
-         QkQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735575070; x=1736179870;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ETJHS6ckaBqe0qYPt6TMRIUqoDCklxygA6Q1jLCfsZc=;
-        b=FgA3jvhLxG7hvhdfBPMXvYVlCKg5qK4SHsjHXEYa5jBLJtHM6iSlSAl/weYSfwnrEG
-         dLa0ap3Jxm86NSSonZuPfGOcjgxShhaCJaC0YWeGv/fZwmtPgeGP52lNV2EnM03Bn0pF
-         oZ8D/49D8wtf9piP91nR02qvbhy5Li5+BhyPvpVm7ED85Q5CZSgRCsXR3iJUurYqEp8K
-         sbIEsgzmdqwzKO/qL8WhUyvO0m9yBMktfEZIhfDFTCFzW4KA1XwAGbJA8acJiAqaLMzK
-         xBOmVp8iYGz6pZnikF+d3qoCOeL+xUoSSnDT2onVUZA1/v7pMUl3VdJtUzKvKE37v2nl
-         Ti7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUXt+jUrzXsGWt7A8zVjM+KFAj8DJZFYDZd+uyhITwBkv1sdVKUvOfLjJxdYpoIdb7QWyE=@vger.kernel.org, AJvYcCWJMTEMDEDv0ayuNt5wCzUxqQj6bi7pJ5XLmr1NnMU4t1yUSEKSDhHcraV1K663l/JLFBMBCgk7sMcdSQXi@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyH7y/5Gd7sUBIh8H4gxiu9yb7l/kCHwhJIAYAVLgnkOVRMSew
-	6/FAK9nNwb4yG8KbtpqlQK1M/mZYmtakVVa2yjkuTKOQ7QI4fk8=
-X-Gm-Gg: ASbGncsELX0n8/w/Z0lUaanFQhNITMHO39AEiJk8Iib6Dn7yvFxMwtG7B3gdQvkQK6G
-	DttOQpZ2CCNqIKrV5/Mguzw0mqnm1QxVl3iuIiSx5/hGmCfxsWDShtUj4Z7cqe3YvTgxAE5CxW/
-	qcb4JTYq4fZYQb1997KxmQSoJw3E9w1PVDb/QlKRnPM6uSvre7SAAhwg+tztUYdBt32KjXwQ6BX
-	XtCv99t1NIfHbEmJW1g71rKMt2XlwXUh7GpncJMI8sjYdHH5vf1W718Ax8UikD+NM6hEw==
-X-Google-Smtp-Source: AGHT+IEA3RYx7YTGeV2m6sPtIvxG+ypNTltHJtyioUG+H0d09tfNsyz8a/qWRkiBgGNqv7Jl+FbfDQ==
-X-Received: by 2002:a05:6a00:1144:b0:72a:8b8f:a0f1 with SMTP id d2e1a72fcca58-72abde8462dmr55616347b3a.20.1735575070361;
-        Mon, 30 Dec 2024 08:11:10 -0800 (PST)
-Received: from localhost.localdomain ([58.38.120.107])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad90c149sm19389389b3a.191.2024.12.30.08.11.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Dec 2024 08:11:10 -0800 (PST)
-From: Tomita Moeko <tomitamoeko@gmail.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Tomita Moeko <tomitamoeko@gmail.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] vfio/pci: update igd matching conditions
-Date: Tue, 31 Dec 2024 00:10:54 +0800
-Message-ID: <20241230161054.3674-2-tomitamoeko@gmail.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1735578322; c=relaxed/simple;
+	bh=YFXlJ8TPHvpk7Wpcpd2POrH7any0wx+iPgUzOMNZgfo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mrCrGxgVIDp8gjVr7Jb5e2QihvVt05oXMXmaSQm444T8Q09goyWyLHe6JHqqWTd8Ueik4U/tY+9CtGxrHPVj4QPqNG64hO8m+ZYCrFuoNS/SCSTJ8C43/JtlpiYxlApZGQSkZUE04HErzvpOFAyRR55UmzInB11DgiOfWGRR2FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=cE2BrNWm; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A9D6240E0266;
+	Mon, 30 Dec 2024 17:05:17 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id W6SVJr85_Uuh; Mon, 30 Dec 2024 17:05:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1735578313; bh=xv6cXaOYuLb9VTHT6jtpP6pWUGRVRwxk3B4YsspGCCA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cE2BrNWmJdqb5YT/V1EAnvosos0IsY/1TCujEtCebfcOkdQKPn2fgYA5nHZAPxnF5
+	 dip7hI9xquQFxWrUlAsFTWTfRmpJjtuktk6We0VQzuT4ngowcXKwPD3EGoc6v2CSAB
+	 ln8kvHPVSQ7xIwGTlQpK26deuI+LItE5TBSYJ3M8rD+fD5wb0kO2BKH1PM5nucLNwW
+	 9q1Tajf88ICd/+wXsn2sYe5TLDNxeoq67WU2VQuQ42O5TfXG2wLDx5Edohp6KppIEl
+	 QRwKOXaY0cphwYVroFVoG9gIFLSq4breKRIs2oHPRW3eG6M+ItMZQ5ky6NVBTaGYbp
+	 CR9wOd87tTIKztEBlckpUL2n62LOwf3mgLErG+kyTL5/Mii6AhisnNQPLqyvcazpxp
+	 HB/d3lATqeAIi9syDjQlsRanf+t0D2tDtH3Cai6TDKqC7mW9lUnejiJBD5YlkWaCFb
+	 EhwEixMj3pZRzfp4Q1Qc/a1qQ3dkhnbt3/F1fcXoPDV9fuF5gyTchxRPD6XoUDGLOS
+	 2l6zQ+fYzRsPwEm48m1c0UEhqABfICSJHkOWoFo5ByNUN3PED1a4m5MygH15DBETYY
+	 lUwcA8DcXPRH1NP6kdn1skEqG1hpuXNX518h3t6D0XkdREyVmWf+PA5ka67X1NRKYb
+	 j4jkppoxgCPFK8lPNtietI6E=
+Received: from zn.tnic (pd953008e.dip0.t-ipconnect.de [217.83.0.142])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CBA6F40E02C0;
+	Mon, 30 Dec 2024 17:05:01 +0000 (UTC)
+Date: Mon, 30 Dec 2024 18:04:53 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v15 12/13] x86/kvmclock: Abort SecureTSC enabled guest
+ when kvmclock is selected
+Message-ID: <20241230170453.GLZ3LStTw_bXGeiLnR@fat_crate.local>
+References: <20241203090045.942078-1-nikunj@amd.com>
+ <20241203090045.942078-13-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241203090045.942078-13-nikunj@amd.com>
 
-igd device can either expose as a VGA controller or display controller
-depending on whether it is configured as the primary display device in
-BIOS. In both cases, the OpRegion may be present. Also checks if the
-device is at bdf 00:02.0 to avoid setting up igd-specific regions on
-Intel discrete GPUs.
+On Tue, Dec 03, 2024 at 02:30:44PM +0530, Nikunj A Dadhania wrote:
+> SecureTSC enabled guests should use TSC as the only clock source, terminate
+> the guest with appropriate code when clock source switches to hypervisor
+> controlled kvmclock.
 
-Signed-off-by: Tomita Moeko <tomitamoeko@gmail.com>
----
-Changelog:
-v2:
-Fix misuse of pci_get_domain_bus_and_slot(), now only compares bdf
-without touching device reference count.
-Link: https://lore.kernel.org/all/20241229155140.7434-1-tomitamoeko@gmail.com/
+This looks silly. Why not prevent kvm_register_clock() from succeeding simply
+on a secure-TSC guest?
 
- drivers/vfio/pci/vfio_pci.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index e727941f589d..906a1db46d15 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -111,9 +111,11 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
- 	if (ret)
- 		return ret;
- 
--	if (vfio_pci_is_vga(pdev) &&
--	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
--	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
-+	if (IS_ENABLED(CONFIG_VFIO_PCI_IGD) &&
-+	    (pdev->vendor == PCI_VENDOR_ID_INTEL) &&
-+	    (((pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA) ||
-+	     ((pdev->class >> 8) == PCI_CLASS_DISPLAY_OTHER)) &&
-+	    (pci_dev_id(pdev) == PCI_DEVID(0, PCI_DEVFN(2, 0)))) {
- 		ret = vfio_pci_igd_init(vdev);
- 		if (ret && ret != -ENODEV) {
- 			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
 -- 
-2.45.2
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
