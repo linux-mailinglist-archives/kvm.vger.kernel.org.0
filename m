@@ -1,410 +1,110 @@
-Return-Path: <kvm+bounces-34406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB8599FE346
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 08:32:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 266D89FE365
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 08:44:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 060513A1BFB
-	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 07:32:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0724C1882234
+	for <lists+kvm@lfdr.de>; Mon, 30 Dec 2024 07:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2458319F422;
-	Mon, 30 Dec 2024 07:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DE61A01B0;
+	Mon, 30 Dec 2024 07:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bDsif3ny"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U25UNh6U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6992215B99E;
-	Mon, 30 Dec 2024 07:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C067519F13B;
+	Mon, 30 Dec 2024 07:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735543939; cv=none; b=gRiAYSGNLrgN+0f2XRF8ekQb+Nl3hGOiR1SDvGM9F3YJjnqOtrv07OvcaMQBT0HeMdBigOpogKpKwcMnjaCVysSzKCQbyaZf+BCOY/fVutNK/fOZPIk38TJSzpVFNRqRc0b/mtjtHvukKpyGZ+teqTzSxvM9+rNyABOsQUmtevs=
+	t=1735544656; cv=none; b=ZdAUt0BHZu4Otb+VNx2rDSk8csWU9l/Ao5MxLmDZlPZGKHgmQ4m8461tCrcAKBG0DZHw5DRPSdnMnp4XrxX/YGz/d9ESt6aZAPpj3H3sHNRwz4+x15Q59GRhm5kd1qRkJryeiVPTmbDMd9W6+32ocnvS+1ryWFiNaI+Ct1lZzJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735543939; c=relaxed/simple;
-	bh=Zwca8o8L3aWYLNxewOvq04jxsi/3h/GjjaU0phri/mk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JOU3WxDHAH+raZMcG1E3aJb/n4PgQU0FFA4J2X+YGq7J0Tyb+ZCYGO5C96ObLFYjJgWMZwN9fjYnzPgcX4lsizC2OpTGoW6889MIkMKd91b9mknwVarhUOFI9RF3uz70ebqQCjWxh2pg8+AcZz0cx8Tx6L2xbrf5XJKxz0QUNPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bDsif3ny; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BU2sQtc019213;
-	Mon, 30 Dec 2024 07:32:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=EDKrW0WZv11mE2tA8WQFTeRUoHq51Z
-	KK3Y/aMdjhsrs=; b=bDsif3nyeathQmh8fq6mvtGXZVjL9WMx4mnIDKR5p/884S
-	Wd+pXA0o1oSyf1F7uvpgZanhPYMyTvOAMLaVrr1X+ByHnHyvvqcXL4znBpdEtLcQ
-	SSW8vMn/1GlERMj1jVrvamaglv6lYEDcz3e5dWRF050DD5vN7vS9LR3xKHFU0987
-	sDymjkW/EjaFhiEIXIxJxsDDzg6OyRPyy7TKXV1oFGmJ/yR/SZKff1zPgRvf7Nsr
-	Az38pkYFaBnMpbgbhzbP2qtbsVhWt6eJYiNBqImSGyhvuwKXzX3/dDqStD57TAb4
-	Uvs59DaouEQVGv6aeRuYcf9qecaumpu1khfDp1TA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ug8a13gv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Dec 2024 07:32:06 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BU7UbBa003477;
-	Mon, 30 Dec 2024 07:32:05 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43ug8a13gt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Dec 2024 07:32:05 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BU2Vmm7027055;
-	Mon, 30 Dec 2024 07:32:05 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 43txc1ma9s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Dec 2024 07:32:04 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BU7W1Cp45416774
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Dec 2024 07:32:01 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B6B32004B;
-	Mon, 30 Dec 2024 07:32:01 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B63BA20040;
-	Mon, 30 Dec 2024 07:31:58 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.39.28.22])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 30 Dec 2024 07:31:58 +0000 (GMT)
-Date: Mon, 30 Dec 2024 13:01:54 +0530
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: Vaibhav Jain <vaibhav@linux.ibm.com>
-Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, kconsul@linux.ibm.com, amachhiw@linux.ibm.com
-Subject: Re: [PATCH 5/6] powerpc/book3s-hv-pmu: Implement GSB message-ops for
- hostwide counters
-Message-ID: <kazedttv45jj2yk227ybz4ngv6cpk7bujcfo47xvzrpn3an3i4@phv7hew4hfy6>
-References: <20241222140247.174998-1-vaibhav@linux.ibm.com>
- <20241222140247.174998-6-vaibhav@linux.ibm.com>
+	s=arc-20240116; t=1735544656; c=relaxed/simple;
+	bh=AJ0EaeodhN80IPWocXNwPfRlfgCqAvCvMqgYRl1s1WU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=rfffxFh4gHDNU62/YgdufvWqNibB2DADxO8R9aViSL9oYOZdqzcUb17aY7Wmdwhk7mdviQG3nJotQzqx+1UzcPWca7UB0/x/3iR37hYHYlRAXSOMIMg7286i9kppw28yihZOFPY7OxjgxcrzQL7hSFwJMR0zcf/7BmWvNLp2YMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U25UNh6U; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa6c0d1833eso1861040366b.1;
+        Sun, 29 Dec 2024 23:44:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735544652; x=1736149452; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4PJMRBrMux8wVhfMava1Cnw6QgCPmCLdCAi2La2GbI8=;
+        b=U25UNh6U21Lvw3yoys5hjE/e7T5oZqL/LTjoaX2ybEw+cnRe9yE8u4/tTX1wbQg6P2
+         Vqx4qo6oTOexqEEamDFeDtTdi36Ngi8VVZR/dViIA6eg4qXoq5WsBPnQYUebR/UOEZcD
+         LWy/4vYyv3Xajzq44lfELjLhCVMY6UDfMf5BXxJNB0PjLVtRY/3QZ2FgKNlu97Aovobo
+         VN9IfeSL02Gz/3JGH3+Rrh+h95y6Ga6URjG7+ZK/GpGCz3291s/V9HRwAhAhqzEw1r5b
+         xgHymnctT7+sjBZmmLvyVj7e04imP+ZVquSfuWafX5WC7BX1tmtAFtptTKHLFJ8d5yaP
+         RtBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735544652; x=1736149452;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4PJMRBrMux8wVhfMava1Cnw6QgCPmCLdCAi2La2GbI8=;
+        b=acSX96qiFq9HcYB8fBqBDP4UVyg6rWcpR7DvH5/XhmtNjQ4Wm1Ta/Z8jH2OmDD8DVY
+         0CBoUzNuYee65TLN2yU0YlYPcPVzjH4coXe8XRR2726l2y5+NiSEJPOMreRc8zaFzk4j
+         pzu8PPsl5+PMniO5UyQx+EACRESRx+p0SeS63lzhQyT5MHuKdzBDknYkpyDE0KUST4i1
+         K5KxZW2attS38+1hqXICiml/N09/XnXQbZguH6wDUZLB9DxDHEPlyoYj3pOrVizw/4El
+         892n3HfaVJGzFJiu071cadEg51MIB7L55+RpBuLuZ7AZ1uQ2pTNLGbQPG6d4J5QnqVGK
+         JbnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVKB3JIVLgE4D6Cg7u7Vcd28qZ7Z2CP/zJhPu+jvLb4nLHpOysn/OJoGT+3Ooa47DNtOPt49y5mnbGUbFI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHmEw6kvzxZyiNiSPSE8lWbagElH0vdOW076axsApIaJe3+EID
+	ZlJkLVwdN6IxIQqJimlV6ITiNQEScLGSgw/ckzSzDRUlIfPYTcHQZNy3t2+tQ8T24g9SHchWgRo
+	WsqnOymbzd1rJMsi9uc60RGpNsNcXX1yoq3E=
+X-Gm-Gg: ASbGncu+cQ6flCTcOBZlkORq4B7eY9laNGwhNItm8Q1maGxmIECncFaI/M3MK94IVfo
+	HbjOc/UwVq7f4IP6JSH/rIty55NeX1fPNOeFr
+X-Google-Smtp-Source: AGHT+IG0x9sJ9DYdSGOp1ukR23tSO8ERSKrqqY9dGWaOdrAV92LGQZCfuUfWf+YU7oFbSqtaZxM9Gs7JQ7kSg9b3gqQ=
+X-Received: by 2002:a17:907:7f0b:b0:aab:dc3e:1c84 with SMTP id
+ a640c23a62f3a-aac2b0a56b6mr3044190766b.17.1735544652234; Sun, 29 Dec 2024
+ 23:44:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241222140247.174998-6-vaibhav@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tEdoYdRdhbQDKEc7cCBtIuWlTbZ1qh-4
-X-Proofpoint-ORIG-GUID: fqdQQeyUqtZIlq_TNfouIEijkpQQLOAg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 bulkscore=0 mlxscore=0 adultscore=1 priorityscore=1501
- clxscore=1015 spamscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412300063
+From: Liam Ni <zhiguangni01@gmail.com>
+Date: Mon, 30 Dec 2024 15:44:01 +0800
+Message-ID: <CACZJ9cUY9ovqkazdcNCtJf=JPbwOO7+sqL2Xp6rBi_Jn1kx1bQ@mail.gmail.com>
+Subject: Subject: [PATCH] x86: kvmclock: Clean up the usage of the
+ apic_lvt_mask array.
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Dec 22, 2024 at 07:32:33PM +0530, Vaibhav Jain wrote:
-> Implement and setup necessary structures to send a prepolulated
-> Guest-State-Buffer(GSB) requesting hostwide counters to L0-PowerVM and have
-> the returned GSB holding the values of these counters parsed. This is done
-> via existing GSB implementation and with the newly added support of
-> Hostwide elements in GSB.
-> 
-> The request to L0-PowerVM to return Hostwide counters is done using a
-> pre-allocated GSB named 'gsb_l0_stats'. To be able to populate this GSB
-> with the needed Guest-State-Elements (GSIDs) a instance of 'struct
-> kvmppc_gs_msg' named 'gsm_l0_stats' is introduced. The 'gsm_l0_stats' is
-> tied to an instance of 'struct kvmppc_gs_msg_ops' named  'gsb_ops_l0_stats'
-> which holds various callbacks to be compute the size ( hostwide_get_size()
-> ), populate the GSB ( hostwide_fill_info() ) and
-> refresh ( hostwide_refresh_info() ) the contents of
-> 'l0_stats' that holds the Hostwide counters returned from L0-PowerVM.
-> 
-> To protect these structures from simultaneous access a spinlock
-> 'lock_l0_stats' has been introduced. The allocation and initialization of
-> the above structures is done in newly introduced kvmppc_init_hostwide() and
-> similarly the cleanup is performed in newly introduced
-> kvmppc_cleanup_hostwide().
-> 
-> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_hv_pmu.c | 189 +++++++++++++++++++++++++++++++
->  1 file changed, 189 insertions(+)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_pmu.c b/arch/powerpc/kvm/book3s_hv_pmu.c
-> index e72542d5e750..f7fd5190ecf7 100644
-> --- a/arch/powerpc/kvm/book3s_hv_pmu.c
-> +++ b/arch/powerpc/kvm/book3s_hv_pmu.c
-> @@ -27,10 +27,31 @@
->  #include <asm/plpar_wrappers.h>
->  #include <asm/firmware.h>
->  
-> +#include "asm/guest-state-buffer.h"
-> +
->  enum kvmppc_pmu_eventid {
->  	KVMPPC_EVENT_MAX,
->  };
->  
-> +#define KVMPPC_PMU_EVENT_ATTR(_name, _id) \
-> +	PMU_EVENT_ATTR_ID(_name, power_events_sysfs_show, _id)
-> +
-> +/* Holds the hostwide stats */
-> +static struct kvmppc_hostwide_stats {
-> +	u64 guest_heap;
-> +	u64 guest_heap_max;
-> +	u64 guest_pgtable_size;
-> +	u64 guest_pgtable_size_max;
-> +	u64 guest_pgtable_reclaim;
-> +} l0_stats;
-> +
-> +/* Protect access to l0_stats */
-> +static DEFINE_SPINLOCK(lock_l0_stats);
-> +
-> +/* GSB related structs needed to talk to L0 */
-> +static struct kvmppc_gs_msg *gsm_l0_stats;
-> +static struct kvmppc_gs_buff *gsb_l0_stats;
-> +
->  static struct attribute *kvmppc_pmu_events_attr[] = {
->  	NULL,
->  };
-> @@ -90,6 +111,167 @@ static void kvmppc_pmu_read(struct perf_event *event)
->  {
->  }
->  
-> +/* Return the size of the needed guest state buffer */
-> +static size_t hostwide_get_size(struct kvmppc_gs_msg *gsm)
-> +
-> +{
-> +	size_t size = 0;
-> +	const u16 ids[] = {
-> +		KVMPPC_GSID_L0_GUEST_HEAP,
-> +		KVMPPC_GSID_L0_GUEST_HEAP_MAX,
-> +		KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE,
-> +		KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX,
-> +		KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM
-> +	};
-> +
-> +	for (int i = 0; i < ARRAY_SIZE(ids); i++)
-> +		size += kvmppc_gse_total_size(kvmppc_gsid_size(ids[i]));
-> +	return size;
-> +}
-> +
-> +/* Populate the request guest state buffer */
-> +static int hostwide_fill_info(struct kvmppc_gs_buff *gsb,
-> +			      struct kvmppc_gs_msg *gsm)
-> +{
-> +	struct kvmppc_hostwide_stats  *stats = gsm->data;
-> +
-> +	/*
-> +	 * It doesn't matter what values are put into request buffer as
-> +	 * they are going to be overwritten anyways. But for the sake of
-> +	 * testcode and symmetry contents of existing stats are put
-> +	 * populated into the request guest state buffer.
-> +	 */
-> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_HEAP))
-> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_HEAP,
-> +				   stats->guest_heap);
-> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_HEAP_MAX))
-> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_HEAP_MAX,
-> +				   stats->guest_heap_max);
-> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE))
-> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE,
-> +				   stats->guest_pgtable_size);
-> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX))
-> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX,
-> +				   stats->guest_pgtable_size_max);
-> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM))
-> +		kvmppc_gse_put_u64(gsb, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM,
-> +				   stats->guest_pgtable_reclaim);
-> +
-> +	return 0;
-> +}
+Clean up the usage of the apic_lvt_mask array.
+Use LVT_TIMER instead of the number 0.
 
-kvmppc_gse_put_u64() can return an error. I think we can handle it just
-like gs_msg_ops_vcpu_fill_info()
+Signed-off-by: liamni <zhiguangni01@gmail.com>
+---
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +
-> +/* Parse and update the host wide stats from returned gsb */
-> +static int hostwide_refresh_info(struct kvmppc_gs_msg *gsm,
-> +				 struct kvmppc_gs_buff *gsb)
-> +{
-> +	struct kvmppc_gs_parser gsp = { 0 };
-> +	struct kvmppc_hostwide_stats *stats = gsm->data;
-> +	struct kvmppc_gs_elem *gse;
-> +	int rc;
-> +
-> +	rc = kvmppc_gse_parse(&gsp, gsb);
-> +	if (rc < 0)
-> +		return rc;
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_HEAP);
-> +	if (gse)
-> +		stats->guest_heap = kvmppc_gse_get_u64(gse);
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_HEAP_MAX);
-> +	if (gse)
-> +		stats->guest_heap_max = kvmppc_gse_get_u64(gse);
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE);
-> +	if (gse)
-> +		stats->guest_pgtable_size = kvmppc_gse_get_u64(gse);
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX);
-> +	if (gse)
-> +		stats->guest_pgtable_size_max = kvmppc_gse_get_u64(gse);
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM);
-> +	if (gse)
-> +		stats->guest_pgtable_reclaim = kvmppc_gse_get_u64(gse);
-> +
-> +	return 0;
-> +}
-> +
-> +/* gsb-message ops for setting up/parsing */
-> +static struct kvmppc_gs_msg_ops gsb_ops_l0_stats = {
-> +	.get_size = hostwide_get_size,
-> +	.fill_info = hostwide_fill_info,
-> +	.refresh_info = hostwide_refresh_info,
-> +};
-> +
-> +static int kvmppc_init_hostwide(void)
-> +{
-> +	int rc = 0;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&lock_l0_stats, flags);
-> +
-> +	/* already registered ? */
-> +	if (gsm_l0_stats) {
-> +		rc = 0;
-> +		goto out;
-> +	}
-> +
-> +	/* setup the Guest state message/buffer to talk to L0 */
-> +	gsm_l0_stats = kvmppc_gsm_new(&gsb_ops_l0_stats, &l0_stats,
-> +				      GSM_SEND, GFP_KERNEL);
-> +	if (!gsm_l0_stats) {
-> +		rc = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	/* Populate the Idents */
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_HEAP);
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_HEAP_MAX);
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE);
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX);
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM);
-> +
-> +	/* allocate GSB. Guest/Vcpu Id is ignored */
-> +	gsb_l0_stats = kvmppc_gsb_new(kvmppc_gsm_size(gsm_l0_stats), 0, 0,
-> +				      GFP_KERNEL);
-> +	if (!gsb_l0_stats) {
-> +		rc = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	/* ask the ops to fill in the info */
-> +	rc = kvmppc_gsm_fill_info(gsm_l0_stats, gsb_l0_stats);
-> +	if (rc)
-> +		goto out;
-> +out:
-> +	if (rc) {
-> +		if (gsm_l0_stats)
-> +			kvmppc_gsm_free(gsm_l0_stats);
-> +		if (gsb_l0_stats)
-> +			kvmppc_gsb_free(gsb_l0_stats);
-> +		gsm_l0_stats = NULL;
-> +		gsb_l0_stats = NULL;
-> +	}
-> +	spin_unlock_irqrestore(&lock_l0_stats, flags);
-> +	return rc;
-> +}
-
-The error handling can probably be simplified to avoid multiple ifs:
-
-<snip>
-
-     /* allocate GSB. Guest/Vcpu Id is ignored */
-     gsb_l0_stats = kvmppc_gsb_new(kvmppc_gsm_size(gsm_l0_stats), 0, 0,
-                                   GFP_KERNEL);
-     if (!gsb_l0_stats) {
-             rc = -ENOMEM;
-             goto err_gsm;
-     }
-
-     /* ask the ops to fill in the info */
-     rc = kvmppc_gsm_fill_info(gsm_l0_stats, gsb_l0_stats);
-     if (!rc)
-             goto out;
-
-err_gsb:
-     kvmppc_gsb_free(gsb_l0_stats);
-     gsb_l0_stats = NULL;
-
-err_gsm:
-     kvmppc_gsm_free(gsm_l0_stats);
-     gsm_l0_stats = NULL;
-
-out:
-     spin_unlock_irqrestore(&lock_l0_stats, flags);
-     return rc;
-}
-
-> +
-> +static void kvmppc_cleanup_hostwide(void)
-> +{
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&lock_l0_stats, flags);
-> +
-> +	if (gsm_l0_stats)
-> +		kvmppc_gsm_free(gsm_l0_stats);
-> +	if (gsb_l0_stats)
-> +		kvmppc_gsb_free(gsb_l0_stats);
-> +	gsm_l0_stats = NULL;
-> +	gsb_l0_stats = NULL;
-> +
-> +	spin_unlock_irqrestore(&lock_l0_stats, flags);
-> +}
-> +
->  /* L1 wide counters PMU */
->  static struct pmu kvmppc_pmu = {
->  	.task_ctx_nr = perf_sw_context,
-> @@ -108,6 +290,10 @@ int kvmppc_register_pmu(void)
->  
->  	/* only support events for nestedv2 right now */
->  	if (kvmhv_is_nestedv2()) {
-> +		rc = kvmppc_init_hostwide();
-> +		if (rc)
-> +			goto out;
-> +
->  		/* Setup done now register the PMU */
->  		pr_info("Registering kvm-hv pmu");
->  
-> @@ -117,6 +303,7 @@ int kvmppc_register_pmu(void)
->  					       -1) : 0;
->  	}
->  
-> +out:
->  	return rc;
->  }
->  EXPORT_SYMBOL_GPL(kvmppc_register_pmu);
-> @@ -124,6 +311,8 @@ EXPORT_SYMBOL_GPL(kvmppc_register_pmu);
->  void kvmppc_unregister_pmu(void)
->  {
->  	if (kvmhv_is_nestedv2()) {
-> +		kvmppc_cleanup_hostwide();
-> +
->  		if (kvmppc_pmu.type != -1)
->  			perf_pmu_unregister(&kvmppc_pmu);
->  
-> -- 
-> 2.47.1
-> 
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 3c83951c619e..949473e2cad8 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2357,7 +2357,7 @@ static int kvm_lapic_reg_write(struct kvm_lapic
+*apic, u32 reg, u32 val)
+        case APIC_LVTT:
+                if (!kvm_apic_sw_enabled(apic))
+                        val |= APIC_LVT_MASKED;
+-               val &= (apic_lvt_mask[0] | apic->lapic_timer.timer_mode_mask);
++               val &= (apic_lvt_mask[LVT_TIMER] |
+apic->lapic_timer.timer_mode_mask);
+                kvm_lapic_set_reg(apic, APIC_LVTT, val);
+                apic_update_lvtt(apic);
+                break;
+--
+2.34.1
 
