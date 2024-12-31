@@ -1,53 +1,53 @@
-Return-Path: <kvm+bounces-34425-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 887D99FF0A9
-	for <lists+kvm@lfdr.de>; Tue, 31 Dec 2024 17:27:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0AFE9FF0AA
+	for <lists+kvm@lfdr.de>; Tue, 31 Dec 2024 17:27:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 474FC1622FD
-	for <lists+kvm@lfdr.de>; Tue, 31 Dec 2024 16:27:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1892A3A25EB
+	for <lists+kvm@lfdr.de>; Tue, 31 Dec 2024 16:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA8419E7D3;
-	Tue, 31 Dec 2024 16:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57A619E7D3;
+	Tue, 31 Dec 2024 16:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7b52l+a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PsXCt73y"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5D918BC0F
-	for <kvm@vger.kernel.org>; Tue, 31 Dec 2024 16:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A0018BC0F
+	for <kvm@vger.kernel.org>; Tue, 31 Dec 2024 16:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735662432; cv=none; b=SuoF3z+u1oqUnCNoAYH++tUpwaO4fYdWwry1Bp3PbJiQyuEiLxSme5AaqjeVeiWpK1DvmUgBoVZEsCiJLHvMyoIRxZjd7h4K9LT+Ch6pZeoN/HrAwopD03/N0kKg69IyNo1XlHEsKwMnwZJ3axjn/HEW7mveg793T2YlWX4miRY=
+	t=1735662455; cv=none; b=TCGj8gUsddmxRSI06h2GEnOTTpYw1GH25IWlSHrMhwJTciMjytXfxX7npHg80Kmavz9OYK3Hd2xP6kIB70PtPuN85KP4H3MLfsOnVUMnln3Me3+5IJV2vFUKObjXpUhZIajEitnRFAqxpRAcHkP7qdhOwFWmqlvLYD19hQFPT34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735662432; c=relaxed/simple;
-	bh=3w2wDM72+ACLeJKmrlrBjb/7g6fYbYsQJXJIoSzp6GU=;
+	s=arc-20240116; t=1735662455; c=relaxed/simple;
+	bh=TR4SxjoOT0eIweh1Uui6So3pnk0Xwn3GddkK8U9aC7Y=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qeBxVwVjPIgUFswYPNp0BkRI0ie3sP1RLeXliaVAdSLkimTQ1dwE36Ny5/a2qKV4QqkHdAqWcP/MypQ/VqA3xewfZ6an6maGu/iw6MiDzaZMqvDEFvU/Qo3jbfdGoIYCDCBbkz2SiQys0E8aFK39ZQDROnmbu8kDxUAqxiIO1lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7b52l+a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E9816C4CEDE
-	for <kvm@vger.kernel.org>; Tue, 31 Dec 2024 16:27:11 +0000 (UTC)
+	 Content-Type:MIME-Version; b=CixmpsMp6m0hj0PsXfrCJv33yRZn4ZdLRyQQJfuwtdqKsV4r7tnV3EpSAfDg1kcPWJzUV3W7pmm0kFFT+Ks7G2fDA4lnyGycf7+tNxE82GtoQpAqAN8uFjucYTZ2D+yh2CUJrvSM/ZV9L9YUDfRBDMbKcDKWBE6wkMlUv968mkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PsXCt73y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8E564C4CEDE
+	for <kvm@vger.kernel.org>; Tue, 31 Dec 2024 16:27:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735662431;
-	bh=3w2wDM72+ACLeJKmrlrBjb/7g6fYbYsQJXJIoSzp6GU=;
+	s=k20201202; t=1735662454;
+	bh=TR4SxjoOT0eIweh1Uui6So3pnk0Xwn3GddkK8U9aC7Y=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=X7b52l+aEG5V+cBFiVHgFVPCbuxycW7LjLS+aDfyDnARz7oxA1vnHL71iuXGgBjaI
-	 +/aXBuuHnV+eLZ0ZbRPYwvFjPH4P2gWappRocDShjY1to8MpdqEohjqf4Z1RyL6vQ5
-	 dQgdMNBL/DB+NXlHrGR6EwdFSJy0s8O/KoRX7VPEi6geAiKgNfWFU+P3VXCJ5SJMRb
-	 SxIkSjEHEHedY0YE48cwK8Fv28Bc0npaX6prGgA4YthyOIlG0tBzhDDLZQIIR6+8xC
-	 NWegqSaGDhdOjgUOS1cW/Ky7MZBiV7zJ+fXVzdlR94O3g/uJfBcrZNvFHsUha2Lb7X
-	 U86q9Miy1j3Ng==
+	b=PsXCt73yxeyqlYtsnXb2EN6HDyc5dcXCYX5BtQ5uBXbRJBBmQgl14QK2ReLrbHFMA
+	 h4uplsNVRj+llK8I5PL8DJbuEtieq3DMY8eGF8siUMigPBMnW2Hicr6q/2rwygfJKO
+	 niLmCQ8g32f4cPHG5hoEPCJi7qL+IwJmNTg1GOByQQn9eI+ecK4mC/TynWiElZAshv
+	 qowk5T6zBrh58mpSQkdB9jId0PNJuBriMxrPDUdwfDk9I9O299y2/b6yWk5ZnhnsRe
+	 0vxniatqQzOebGozVYu+pdWB4GF0Msa1EwGg109hwoaDYwRaizefoA23j0CNTL3SWV
+	 ILv1dbbxTpuEg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id DDDAAC41614; Tue, 31 Dec 2024 16:27:11 +0000 (UTC)
+	id 88B0AC41614; Tue, 31 Dec 2024 16:27:34 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
-Subject: [Bug 219618] [REGRESSION, BISECTED] qemu cannot not start with -cpu
- hypervisor=off parameter
-Date: Tue, 31 Dec 2024 16:27:11 +0000
+Subject: [Bug 219618] [SOLVED] qemu cannot not start with -cpu hypervisor=off
+ parameter
+Date: Tue, 31 Dec 2024 16:27:34 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -62,8 +62,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219618-28872-WOcZb48TR8@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: short_desc
+Message-ID: <bug-219618-28872-0mo2TUe4H5@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219618-28872@https.bugzilla.kernel.org/>
 References: <bug-219618-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -79,8 +79,14 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219618
 
---- Comment #1 from Athul Krishna K R (athul.krishna.kr@protonmail.com) ---
-working in qemu 9.2.0, issue resolved
+Athul Krishna K R (athul.krishna.kr@protonmail.com) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+            Summary|[REGRESSION, BISECTED] qemu |[SOLVED] qemu cannot not
+                   |cannot not start with -cpu  |start with -cpu
+                   |hypervisor=3Doff parameter    |hypervisor=3Doff paramet=
+er
 
 --=20
 You may reply to this email to add a comment.
