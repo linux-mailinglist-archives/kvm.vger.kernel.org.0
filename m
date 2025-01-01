@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-34439-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34440-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAAE89FF34C
-	for <lists+kvm@lfdr.de>; Wed,  1 Jan 2025 08:33:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 040889FF34E
+	for <lists+kvm@lfdr.de>; Wed,  1 Jan 2025 08:34:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EB0B7A0673
-	for <lists+kvm@lfdr.de>; Wed,  1 Jan 2025 07:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 119163A14CA
+	for <lists+kvm@lfdr.de>; Wed,  1 Jan 2025 07:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B97D5190052;
-	Wed,  1 Jan 2025 07:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2980219258A;
+	Wed,  1 Jan 2025 07:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ag0obyix"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tk2tpL71"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23CE618E023
-	for <kvm@vger.kernel.org>; Wed,  1 Jan 2025 07:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB1C190049
+	for <kvm@vger.kernel.org>; Wed,  1 Jan 2025 07:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735716672; cv=none; b=Lg9ZZNG9oyCfaZrdGVQgKqTUd7lrsnbgSDlMZYJSN8pBYHODRQ79VjtewOWECaBrxb6XPZ1ah/IlSIWitNKp7DiC6J4Rg+aJCU51DZ/6Cw2WbKDdeUe580z7eLI/jmIP+wIkrJqqSgn34Pz8IDNwV4wTLyNjw+b3v6URDa6as2s=
+	t=1735716675; cv=none; b=p3YfDvrq6mtDALyZI+E+6z8I57J4HkBUZSxQ/+wCUyEllmL6BRun8FFnrRawnJgNRXfTN57v2ZPk/N+y5xMXIeEzowHZ0lmQUT7mT1aKvz5NcCHSldaLlYDCTxjwQohi5msGaEfgLidvKGsz49zO2GPaw0dox6cYvQTiFZ18dyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735716672; c=relaxed/simple;
-	bh=InEhIdFVD6YGV/vftyDrSYHI1N/K9cisZDKeF1BFe+I=;
+	s=arc-20240116; t=1735716675; c=relaxed/simple;
+	bh=du0QNeQ7E/PuNdbtbhZa1hL4jaD35sRJAZMZsQMuqNk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d9c5oFiDaWY97+12Mn2BBeUVw678Ib0ZlEx+i3mtvtBlQD0TRoOhQkU/7JzFet+tSkpzUKJoLUogyxbtdX5FsKUHN8Pghik8NuMyNdF8xvsTnd1LIUEjbnTIibDtx3cjE3L+i8MUFGG9fkypthNMiDkbQmfsHulHbs+FSqPVDtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ag0obyix; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=Q1T2jsrwexdFX+WCc+xC389hOPQuA1jDIIu+34A9YcO/Td3Nrs8wGkWlICZStSv/wAk/BVt6Pr+aIYf2ED7mybmYr4nH/xp8j0tCRqveqObwZ3TFisYxJ/Qu5dzEBcSUrJQEthtWy3OLBdLnKbsba48vF5DXAFw1po0+5CVxAWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tk2tpL71; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1735716670;
+	s=mimecast20190719; t=1735716672;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=a+rZIXtGrNPaLZnxdKxHeu8ntmAe+0fKTwisqh3vDWU=;
-	b=Ag0obyixcbL5zEVqrZunglLr8sOfPmDY+wvVA1MZbZAGwLUqIkBn5d3pRJ9vS86YSdjgxg
-	hqnveYE3hEzNv8MG53yLdtMDeBOS0m1azU06LOzcYDZJJAL/gUI/SYxS/zDPHsQEWbpznW
-	x87RxsAIP7mxPajd6lo7umbLr8oRzp0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Ffnt+9olmQvvF82DGWqsFbJ9s1bu/zdt90IVfcQ2uns=;
+	b=Tk2tpL71FWphn6x+AAIescRDyLZ36daAiFyzWO7NUz2Q0oals20gcLfRqNrpFhN4KSDT5e
+	W9rHM6ld4Z+pxRWZug/Kn9gjww/Wu/+jYaF5xIdmDccle+5YQT4Y66Kvf7heA6fnnHnIF2
+	8hmZhdm5FxFFobDVqDsaEO3X06AUfIE=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-m5xaGr0XNjCbCz53aWXQ6w-1; Wed,
- 01 Jan 2025 02:31:07 -0500
-X-MC-Unique: m5xaGr0XNjCbCz53aWXQ6w-1
-X-Mimecast-MFC-AGG-ID: m5xaGr0XNjCbCz53aWXQ6w
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-693-TG6bIsHqPcCrO9Jp3ndw0Q-1; Wed,
+ 01 Jan 2025 02:31:08 -0500
+X-MC-Unique: TG6bIsHqPcCrO9Jp3ndw0Q-1
+X-Mimecast-MFC-AGG-ID: TG6bIsHqPcCrO9Jp3ndw0Q
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C56FA19560AB;
-	Wed,  1 Jan 2025 07:31:05 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2F6E619560A3;
+	Wed,  1 Jan 2025 07:31:07 +0000 (UTC)
 Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 97DA91956052;
-	Wed,  1 Jan 2025 07:31:04 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 037381956052;
+	Wed,  1 Jan 2025 07:31:05 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
@@ -66,9 +66,9 @@ Cc: kai.huang@intel.com,
 	yan.y.zhao@intel.com,
 	Isaku Yamahata <isaku.yamahata@intel.com>,
 	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH 10/11] x86/virt/tdx: Add SEAMCALL wrappers to remove a TD private page
-Date: Wed,  1 Jan 2025 02:30:46 -0500
-Message-ID: <20250101073047.402099-11-pbonzini@redhat.com>
+Subject: [PATCH 11/11] x86/virt/tdx: Add SEAMCALL wrappers for TD measurement of initial contents
+Date: Wed,  1 Jan 2025 02:30:47 -0500
+Message-ID: <20250101073047.402099-12-pbonzini@redhat.com>
 In-Reply-To: <20250101073047.402099-1-pbonzini@redhat.com>
 References: <20250101073047.402099-1-pbonzini@redhat.com>
 Precedence: bulk
@@ -83,40 +83,33 @@ X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX architecture introduces the concept of private GPA vs shared GPA,
-depending on the GPA.SHARED bit. The TDX module maintains a single Secure
-EPT (S-EPT or SEPT) tree per TD to translate TD's private memory accessed
-using a private GPA. Wrap the SEAMCALL TDH.MEM.PAGE.REMOVE with
-tdh_mem_page_remove() and TDH_PHYMEM_PAGE_WBINVD with
-tdh_phymem_page_wbinvd_hkid() to unmap a TD private page from the SEPT,
-remove the TD private page from the TDX module and flush cache lines to
-memory after removal of the private page.
+The TDX module measures the TD during the build process and saves the
+measurement in TDCS.MRTD to facilitate TD attestation of the initial
+contents of the TD. Wrap the SEAMCALL TDH.MR.EXTEND with tdh_mr_extend()
+and TDH.MR.FINALIZE with tdh_mr_finalize() to enable the host kernel to
+assist the TDX module in performing the measurement.
 
-Callers should specify "GPA" and "level" when calling tdh_mem_page_remove()
-to indicate to the TDX module which TD private page to unmap and remove.
+The measurement in TDCS.MRTD is a SHA-384 digest of the build process.
+SEAMCALLs TDH.MNG.INIT and TDH.MEM.PAGE.ADD initialize and contribute to
+the MRTD digest calculation.
 
-TDH.MEM.PAGE.REMOVE may fail, and the caller of tdh_mem_page_remove() can
-check the function return value and retrieve extended error information
-from the function output parameters. Follow the TLB tracking protocol
-before calling tdh_mem_page_remove() to remove a TD private page to avoid
-SEAMCALL failure.
+The caller of tdh_mr_extend() should break the TD private page into chunks
+of size TDX_EXTENDMR_CHUNKSIZE and invoke tdh_mr_extend() to add the page
+content into the digest calculation. Failures are possible with
+TDH.MR.EXTEND (e.g., due to SEPT walking). The caller of tdh_mr_extend()
+can check the function return value and retrieve extended error information
+from the function output parameters.
 
-After removing a TD's private page, the TDX module does not write back and
-invalidate cache lines associated with the page and the page's keyID (i.e.,
-the TD's guest keyID). Therefore, provide tdh_phymem_page_wbinvd_hkid() to
-allow the caller to pass in the TD's guest keyID and invoke
-TDH_PHYMEM_PAGE_WBINVD to perform this action.
+Calling tdh_mr_finalize() completes the measurement. The TDX module then
+turns the TD into the runnable state. Further TDH.MEM.PAGE.ADD and
+TDH.MR.EXTEND calls will fail.
 
-Before reusing the page, the host kernel needs to map the page with keyID 0
-and invoke movdir64b() to convert the TD private page to a normal shared
-page.
-
-TDH.MEM.PAGE.REMOVE and TDH_PHYMEM_PAGE_WBINVD may meet contentions inside
-the TDX module for TDX's internal resources. To avoid staying in SEAM mode
-for too long, TDX module will return a BUSY error code to the kernel
-instead of spinning on the locks. The caller may need to handle this error
-in specific ways (e.g., retry). The wrappers return the SEAMCALL error code
-directly to the caller. Don't attempt to handle it in the core kernel.
+TDH.MR.FINALIZE may fail due to errors such as the TD having no vCPUs or
+contentions. Check function return value when calling tdh_mr_finalize() to
+determine the exact reason for failure. Take proper locks on the caller's
+side to avoid contention failures, or handle the BUSY error in specific
+ways (e.g., retry). Return the SEAMCALL error code directly to the caller.
+Do not attempt to handle it in the core kernel.
 
 [Kai: Switched from generic seamcall export]
 [Yan: Re-wrote the changelog]
@@ -126,85 +119,79 @@ Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20241112073658.22157-1-yan.y.zhao@intel.com>
+Message-ID: <20241112073709.22171-1-yan.y.zhao@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
  arch/x86/include/asm/tdx.h  |  2 ++
  arch/x86/virt/vmx/tdx/tdx.c | 27 +++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.h |  1 +
- 3 files changed, 30 insertions(+)
+ arch/x86/virt/vmx/tdx/tdx.h |  2 ++
+ 3 files changed, 31 insertions(+)
 
 diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 381a0f4aeefc..5a38d28a0f7b 100644
+index 5a38d28a0f7b..337432a61e40 100644
 --- a/arch/x86/include/asm/tdx.h
 +++ b/arch/x86/include/asm/tdx.h
-@@ -148,8 +148,10 @@ u64 tdh_vp_wr(struct tdx_vp *vp, u64 field, u64 data, u64 mask);
- u64 tdh_vp_init_apicid(struct tdx_vp *vp, u64 initial_rcx, u32 x2apicid);
- u64 tdh_phymem_page_reclaim(hpa_t page, u64 *page_type, u64 *page_owner, u64 *page_size);
- u64 tdh_mem_track(struct tdx_td *tdr);
-+u64 tdh_mem_page_remove(struct tdx_td *td, u64 gpa, u64 level, u64 *rcx, u64 *rdx);
- u64 tdh_phymem_cache_wb(bool resume);
- u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td);
-+u64 tdh_phymem_page_wbinvd_hkid(u64 hpa, u64 hkid);
- #else
- static inline void tdx_init(void) { }
- static inline int tdx_cpu_enable(void) { return -ENODEV; }
+@@ -138,6 +138,8 @@ u64 tdh_mng_key_config(struct tdx_td *td);
+ u64 tdh_mng_create(struct tdx_td *td, hpa_t hkid);
+ u64 tdh_vp_create(struct tdx_td *td, struct tdx_vp *vp);
+ u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data);
++u64 tdh_mr_extend(struct tdx_td *td, u64 gpa, u64 *rcx, u64 *rdx);
++u64 tdh_mr_finalize(struct tdx_td *td);
+ u64 tdh_vp_flush(struct tdx_vp *vp);
+ u64 tdh_mng_vpflushdone(struct tdx_td *td);
+ u64 tdh_mng_key_freeid(struct tdx_td *td);
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 58b2e24179ba..0f202faa0530 100644
+index 0f202faa0530..1c3347f2f33c 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1745,6 +1745,23 @@ u64 tdh_mem_track(struct tdx_td *td)
+@@ -1618,6 +1618,33 @@ u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data)
  }
- EXPORT_SYMBOL_GPL(tdh_mem_track);
+ EXPORT_SYMBOL_GPL(tdh_mng_rd);
  
-+u64 tdh_mem_page_remove(struct tdx_td *td, u64 gpa, u64 level, u64 *rcx, u64 *rdx)
++u64 tdh_mr_extend(struct tdx_td *td, u64 gpa, u64 *rcx, u64 *rdx)
 +{
 +	struct tdx_module_args args = {
-+		.rcx = gpa | level,
++		.rcx = gpa,
 +		.rdx = td->tdr,
 +	};
 +	u64 ret;
 +
-+	ret = seamcall_ret(TDH_MEM_PAGE_REMOVE, &args);
++	ret = seamcall_ret(TDH_MR_EXTEND, &args);
 +
 +	*rcx = args.rcx;
 +	*rdx = args.rdx;
 +
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(tdh_mem_page_remove);
++EXPORT_SYMBOL_GPL(tdh_mr_extend);
 +
- u64 tdh_phymem_cache_wb(bool resume)
++u64 tdh_mr_finalize(struct tdx_td *td)
++{
++	struct tdx_module_args args = {
++		.rcx = td->tdr,
++	};
++
++	return seamcall(TDH_MR_FINALIZE, &args);
++}
++EXPORT_SYMBOL_GPL(tdh_mr_finalize);
++
+ u64 tdh_vp_flush(struct tdx_vp *vp)
  {
  	struct tdx_module_args args = {
-@@ -1764,3 +1781,13 @@ u64 tdh_phymem_page_wbinvd_tdr(struct tdx_td *td)
- 	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
- }
- EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_tdr);
-+
-+u64 tdh_phymem_page_wbinvd_hkid(u64 hpa, u64 hkid)
-+{
-+	struct tdx_module_args args = {};
-+
-+	args.rcx = hpa | (hkid << boot_cpu_data.x86_phys_bits);
-+
-+	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
-+}
-+EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_hkid);
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 4b0ad536afd9..d49cdd9b0577 100644
+index d49cdd9b0577..a1e34773bab7 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -33,6 +33,7 @@
- #define TDH_PHYMEM_PAGE_RDMD		24
- #define TDH_VP_RD			26
- #define TDH_PHYMEM_PAGE_RECLAIM		28
-+#define TDH_MEM_PAGE_REMOVE		29
- #define TDH_SYS_KEY_CONFIG		31
- #define TDH_SYS_INIT			33
- #define TDH_SYS_RD			34
+@@ -24,6 +24,8 @@
+ #define TDH_MNG_KEY_CONFIG		8
+ #define TDH_MNG_CREATE			9
+ #define TDH_MNG_RD			11
++#define TDH_MR_EXTEND			16
++#define TDH_MR_FINALIZE			17
+ #define TDH_VP_FLUSH			18
+ #define TDH_MNG_VPFLUSHDONE		19
+ #define TDH_VP_CREATE			10
 -- 
 2.43.5
-
 
 
