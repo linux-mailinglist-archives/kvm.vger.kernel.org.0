@@ -1,173 +1,235 @@
-Return-Path: <kvm+bounces-34491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A1A9FFB17
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 16:43:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B849FFC04
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 17:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28860162559
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 15:43:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CB71163366
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 16:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49CF1B3949;
-	Thu,  2 Jan 2025 15:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE05717E019;
+	Thu,  2 Jan 2025 16:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YFRTs9X4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S5b11ZkC"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2074.outbound.protection.outlook.com [40.107.101.74])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8F11A4E9E
-	for <kvm@vger.kernel.org>; Thu,  2 Jan 2025 15:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735832612; cv=fail; b=A6zyRYJi4mHhyBn0dw1Gy7UHUtDT14UpZhTVgaHdSPWk3kmaDUETMUiiTJKCvDOC17VJtEYQvBMOd0C0PMeFPpyveopgKkg8HGfY89K1214ZQvybzuKTW89o8szvFa6xShQKBqkPibCOUTZViGZ0Qk1yXJKt7Ii8O1Ef6gLl5Gc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735832612; c=relaxed/simple;
-	bh=dv3MXhq0kvgaqfRs6qEtzA98yxnjxoWE8lbYk1CyrSU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OxVTCRMq8u56kOoBxk0ZNoABpcqRLJjSrDIZJVhOp4IdQZDhB/SPQ55Pf8FS8+bXGUxAFQoob72r8e7VB2Hcjq61pdKHf3qlsyNC3ZCEFReEkzCjyvKw3xCe+vJ7lHpvh7iMZGD5TeJdFaSXA9dAs46TsT32N1errF931cyFrZE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YFRTs9X4; arc=fail smtp.client-ip=40.107.101.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jrP9iIzxyzM7usX3NO7li75kCtOEvPl8ovL6IYeK4lY3TwB5xFdt3ol/MmhhK0UNrMmJCOgFo1b4ZK93OItuDVerdKxlps1ow4SBJMVaVLZ2koN8oAkBkmMerBS+F3JriSeH+5jQsLGModeKwcOH14kDocNjFo/klbkiDcc3mmSbL95DpZkmBpW765hOdKHqDDD1hgJDp6YQRMCgTuUtybxt8PoO1T3+LpRZrz5WPUJq6SGrw8rWs4ScYjEjJ/Qb1MFghl8j13CQUABxOWoK/oHqfvhg/lb4ga8h0oShGSRrL6LqlCbMOxIqXMZshFuTsHU90K20VA1L29mv6SAydw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eNjsWHD8bHtUm7QaW+5IVh6bkCvL9Bx8KL5kgwmUTiA=;
- b=vR4BsPfd4OAuviDx7BMBIU6RMeE9YmPL5l2BZW0ueH5Miril+HKSIqlndezdznUhiAK/HIaA1vmFG69OESZiCVNJvjcF4eS/fFpyds7mRzKgb+vyEA4rx9XK/p0QSvZ11uSAcjCcQavHAB/hEKViqx21rJjrEjQ5xw5Mod+3djLJb2A7UOniqUsjROtce4wKhuf+yEElHNJ2vbnsEJtkMOwoTrTUKbG3r55Py/BJDR32k5Jt859M0or7YvnZwZX1vOChUqASGOxnpwHOTyfua9ZpxlVVVptCSqLthpTFeSoIauCpYOpao/ok/54TZiRa4tQfbh0OcECe4lwcUj3FTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eNjsWHD8bHtUm7QaW+5IVh6bkCvL9Bx8KL5kgwmUTiA=;
- b=YFRTs9X4gDqbVaVpQbFKx8RKqJVV5w6zDUANbKvT4C7HnbbEBZefJAWqRIE4h2oCxXjQqAtrxgIzfPs9WiCzWBZBsmBtfz+u01A5W4upx5VpUMKa2tDdH/mvXyEEcE0qTMd+JdKJ5cxR4u9pSOSfMgDnyyiZByXX8rNraDtTSbo=
-Received: from BY1P220CA0013.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:59d::17)
- by DM4PR12MB7621.namprd12.prod.outlook.com (2603:10b6:8:10a::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.19; Thu, 2 Jan
- 2025 15:43:23 +0000
-Received: from SJ1PEPF00001CE2.namprd05.prod.outlook.com
- (2603:10b6:a03:59d:cafe::24) by BY1P220CA0013.outlook.office365.com
- (2603:10b6:a03:59d::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8314.14 via Frontend Transport; Thu,
- 2 Jan 2025 15:43:22 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF00001CE2.mail.protection.outlook.com (10.167.242.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8314.11 via Frontend Transport; Thu, 2 Jan 2025 15:43:22 +0000
-Received: from MIKCARGYRIS01.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 2 Jan
- 2025 09:43:20 -0600
-From: Costas Argyris <costas.argyris@amd.com>
-To: KVM <kvm@vger.kernel.org>
-CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Tom Lendacky
-	<thomas.lendacky@amd.com>
-Subject: [PATCH] KVM: VMX: Reinstate __exit attribute for vmx_exit
-Date: Thu, 2 Jan 2025 15:40:50 +0000
-Message-ID: <20250102154050.2403-1-costas.argyris@amd.com>
-X-Mailer: git-send-email 2.45.2.windows.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47B214293
+	for <kvm@vger.kernel.org>; Thu,  2 Jan 2025 16:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735835971; cv=none; b=WRAAmVQnbnNsRhQYUVeSn2lFVjNMk5FxgVCNbkAgmQjOLUkm4PgUeT/OiHiwyaGQQBLki5Yf66SvtllkbOF4h4bmBxsKIm5EBqIiGH9mtXbYjKJO8V3OrjzFoMr+SM+hGgJ5OjljRP0Gqlw9ZPs3xAq64ikarCf7yOMkPe1cITo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735835971; c=relaxed/simple;
+	bh=5q+8JjcrKKOdHbLWvobmytsVYQr6L7Z9RV1Q/0kwrS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QkYPA+Scak8gUBHJXfGdjgK+2j9eTWP/NaIBp9zoY6nJUt0jUdtC6s8C5cYvpIlTfMome2sbSfWFL4/fV1Qauk9tVaOyfY97iyILW6i7VbpQIB961H3LwlI0M2UjMKtq5gxhiv4oMpwu1QF2QMniZ+ezDs4Lh195wvLtzu4Ggls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S5b11ZkC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735835968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l6mSaAhcXBA0YnKtRWFvg7xIGQvscrbfSodX8i2/8vE=;
+	b=S5b11ZkCBbalKddsJGO4gfHNog3CJ8um6OmRcL8myiV6ER3HXICB4TKUesHjxDUenv7GX4
+	DHF897vbgSG4iTspKguzjZwblwKz1ZUu5HLg9SZ8sqRMaQh33i+bATXXbkvbNhN6XaWQbn
+	uqG94M7QbblUGcfCy4PJncBNSp+TsVw=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-235-Acy1X84nPr27-yFGdjvbwg-1; Thu, 02 Jan 2025 11:39:27 -0500
+X-MC-Unique: Acy1X84nPr27-yFGdjvbwg-1
+X-Mimecast-MFC-AGG-ID: Acy1X84nPr27-yFGdjvbwg
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4678f97242fso65508531cf.0
+        for <kvm@vger.kernel.org>; Thu, 02 Jan 2025 08:39:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735835967; x=1736440767;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l6mSaAhcXBA0YnKtRWFvg7xIGQvscrbfSodX8i2/8vE=;
+        b=qfVNDaFlOrHgOYk6CD5R+TnBe+1ioX7doEllWTQoQdmg71DnJqJbdhiHdRcKcvY+hm
+         9qTp5EVsVPzHFrylabclixJcF9lkcUvW3wSb5KGXfO9bNmxv2uDA1UhoOGsigO6QU0M+
+         42FbU0ZnT8+RAinsIeX7R5UrzitTQHtZwq8MBc4ubLN4aW+9AJozEE+66RbU4qJyH3FP
+         +F3AcHLpA/HRaChUy3WVNf/a2MxOfx0Tam89/RztR4P0x7qtHvNWboK7QQxOT3OgzJdP
+         aHMN5VQ2xa39qPbigJ83Pe+ps++FZUZYyFZuMz8KkTII09GNIl4AfEptfJlCzZmNZT4L
+         hnYA==
+X-Forwarded-Encrypted: i=1; AJvYcCUye+MPn2owfgwqy8XbSwd/B0i7pwsuDasSYMXWwBl4Cvur1N7UHyJJV8lrin3KXUfrbro=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBKp10rLiHmdAi9OypN5uykUTZi2m+656q7McgVf49a9qLh5Ha
+	rQi7lE5DIqjvfIqmZy7pxsEtHtREU2Tg/TDAPULX/4mz5Y02H7oHvejSY74eq/3RWlmzkRRsCxF
+	ipLrM7yJ4B3OWha5JTgk1rEoOIyO/WhJ0W+13fU/7LGucTrf9Lg==
+X-Gm-Gg: ASbGncu+T1FQaE4BOU+FevAI7SAQYOwZTmozRX8gQSybB/b8QgnBrtvWyWSB+uklln/
+	klNYaePBBvvwCE8t540ozfHAAvxnr3H84irVs4wCkaiYtyVJT/ipDrNdE87BV19SUJsnw1ly/Dz
+	P8tyGSlO7iU1kWJVeOM9vOXcewForM+VIwSlpE5TGC1BPAXwqA/jRTG+bTEuNawHn9irOAu0r4f
+	3Hbh45Thfzd0/lswxmUFHsqbHFObVHAWkekBswuh1Bntwwv6GZblr21w9Wx4ORZoCRk4Pt+pfZ9
+	NU7rLsp8AjhM7p2d1A==
+X-Received: by 2002:ac8:7f94:0:b0:466:85eb:6118 with SMTP id d75a77b69052e-46a4a8dcd5fmr716740511cf.16.1735835967007;
+        Thu, 02 Jan 2025 08:39:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEGr9oTZZCQq3x5f41Tw7snp0cWem1xv5LNFxJYZtqcjHbXo2XyK5xC3eV3tnF5YwhDfssKtQ==
+X-Received: by 2002:ac8:7f94:0:b0:466:85eb:6118 with SMTP id d75a77b69052e-46a4a8dcd5fmr716740141cf.16.1735835966665;
+        Thu, 02 Jan 2025 08:39:26 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3eb175eesm137500911cf.55.2025.01.02.08.39.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 08:39:25 -0800 (PST)
+Date: Thu, 2 Jan 2025 11:39:23 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Precific <precification@posteo.de>,
+	Athul Krishna <athul.krishna.kr@protonmail.com>,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Linux PCI <linux-pci@vger.kernel.org>,
+	"regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Subject: Re: [bugzilla-daemon@kernel.org: [Bug 219619] New: vfio-pci: screen
+ graphics artifacts after 6.12 kernel upgrade]
+Message-ID: <Z3bBOxFaCyizcxmx@x1n>
+References: <20241222223604.GA3735586@bhelgaas>
+ <Hb6kvXlGizYbogNWGJcvhY3LsKeRwROtpRluHKsGqRcmZl68J35nP60YdzW1KSoPl5RO_dCxuL5x9mM13jPBbU414DEZE_0rUwDNvzuzyb8=@protonmail.com>
+ <Z2mW2k8GfP7S0c5M@x1n>
+ <16ea1922-c9ce-4d73-b9b6-8365ca3fcf32@posteo.de>
+ <20241230182737.154cd33a.alex.williamson@redhat.com>
+ <bba03a61-9504-40d0-9b2c-115b4f70e8ca@posteo.de>
+ <20241231090733.5cc5504a.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE2:EE_|DM4PR12MB7621:EE_
-X-MS-Office365-Filtering-Correlation-Id: 04f8177c-2128-4255-d5e9-08dd2b44307d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?7Pxm7S6ZQu/AKtmqkt5HbkPU+nfSBGCsJgfBDJLw6dtAU6PKyAw3xlLdTifr?=
- =?us-ascii?Q?XrW1mhzJdTScSecriHzc9F/e/aqoEss/2DZ5Dk3H2Ep1Ursq9zmBcY2T7iqE?=
- =?us-ascii?Q?enXB50QHs25wYCBJVDFsnk78uXvyA57w5m5G5uAmU2wEO/ueKuGnFcPOnsN7?=
- =?us-ascii?Q?4/9LHqK2SYro1R+TIyiyrqzsy797qrL5SxUeNlTlXUQTmIfC5b55AMWftvP5?=
- =?us-ascii?Q?UOO09B4fTA2iln8MCnrFSNcS+8Vi38R+NxdzHr/UEOORFIhsgVMYWWk33J0V?=
- =?us-ascii?Q?ftN09XX2Lq18Ht04kRaTryUoYgsOK8VaYqN2NxKt5cnGO8N8YOLEFT64pGTf?=
- =?us-ascii?Q?ouXVQM90tCoeUDYnqfEDB1Z5xxXP5ZpNxz3Qw5YjIei90MNH7RyS9Hyd1hFP?=
- =?us-ascii?Q?l65bEU03hrrVm1e3x7zfnGJkeO89umdB1Ybp4yAbDLwkTuRQbA+sdHcCdLIs?=
- =?us-ascii?Q?7B0HtBw/ghkSVnI+uWW6pGi7e3Eu/HsN2/GHARCiZhVoSRvd+0+yaw5ReVqC?=
- =?us-ascii?Q?vZboYaYkEftdlaSI+wXeda51sfSItG9IpVH5AOFlEU8sQ7dcYPMXoqSYZgbS?=
- =?us-ascii?Q?OX5tsTihO85g7MVvEDJ8Pdqj+3nRtwUo/em1+5dlv9CzdDovwJ0uTvdu26NK?=
- =?us-ascii?Q?8Dv+gMLzsPMErPg8dIyAuKikO2aajU8lmrphgrpsgmWQ/2iAHSpYAimpuKbb?=
- =?us-ascii?Q?ZiFGaf69r2ZVCpLEjwsQmrHnX347B/pIumvTR3A2EkQQTVbOwNAEegLQPqgx?=
- =?us-ascii?Q?Z1u18WbW2GETkFBjeFmWPYFzgoLD8kAyfGYrIe5zFT9PfObQKRWlp3EPPfob?=
- =?us-ascii?Q?aslBkOTPoP91wcFDKsWJFv99u5OeLmiaxkNkNZYfZrOZ8LfTT1h4ccK+7SIp?=
- =?us-ascii?Q?IZ3DAKR+/mTzAW4t7x7UlFaYnNeC8WhwtJzeaKuJJbMl+QUmon8Tp9AHIwFm?=
- =?us-ascii?Q?XYk7CIiPc85F5Cfq5ZqCEMVN8ca+cemy+jmelWHaFwplxLkl0ZG2Nnw+d71E?=
- =?us-ascii?Q?4W9KeeCyHLuYVxNlG+c+l+0Zubk2X15YAN07grRq23MgFhGH9JhxfqpwImpu?=
- =?us-ascii?Q?DuYhRGTpmhgjKqzGE/nNcVmlXotBUEobYW4UtMQ/nAwZqdsK5kk8MZwLAIMQ?=
- =?us-ascii?Q?qsuRybL3mlUrfE022VEOJh+nXcuQOJ7LAKgr7VYl1qZxXf9Xto/7zMdqgdGO?=
- =?us-ascii?Q?P1gFBk/sdPBqNDB03PMnzmAyvQLuWwhcLIslztXYqeRz+j7As/iW4L5PljIk?=
- =?us-ascii?Q?xDIVLG02xCYfP2I2JCCQiPL7IY1HZhMMRXQjtEEVRiqlunW+vdRjhtTx+buB?=
- =?us-ascii?Q?skfLFF0Cu0tlw8ziIhe6T3HDxqJ9QQoxzRr8vY//QcGSvq/JXNuIJvWQ+aVz?=
- =?us-ascii?Q?KcvdhlXnj0StxWFclOVtgvjYkCeV3uAU/kh0dr+xr2TR/19tDecRyopomv7S?=
- =?us-ascii?Q?u6enrHBOUHG0lxjUE+Au+hBVFuFA5GA0we42894l+ur42zNJjkeCfF+bPDR2?=
- =?us-ascii?Q?ajTqw0xoQ28vTFc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2025 15:43:22.6239
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04f8177c-2128-4255-d5e9-08dd2b44307d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE2.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7621
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241231090733.5cc5504a.alex.williamson@redhat.com>
 
-Commit a7b9020b06ec ("x86/l1tf: Handle EPT disabled state proper",
-2018-07-13) dropped the "__exit" attribute from vmx_exit because
-vmx_init was changed to call vmx_exit.
+On Tue, Dec 31, 2024 at 09:07:33AM -0700, Alex Williamson wrote:
+> On Tue, 31 Dec 2024 15:44:13 +0000
+> Precific <precification@posteo.de> wrote:
+> 
+> > On 31.12.24 02:27, Alex Williamson wrote:
+> > > On Mon, 30 Dec 2024 21:03:30 +0000
+> > > Precific <precification@posteo.de> wrote:
+> > >   
+> > >> In my case, commenting out (1) the huge_fault callback assignment from
+> > >> f9e54c3a2f5b suffices for GPU initialization in the guest, even if (2)
+> > >> the 'install everything' loop is still removed.
+> > >>
+> > >> I have uploaded host kernel logs with vfio-pci-core debugging enabled
+> > >> (one log with stock sources, one large log with vfio-pci-core's
+> > >> huge_fault handler patched out):
+> > >> https://bugzilla.kernel.org/show_bug.cgi?id=219619#c1
+> > >> I'm not sure if the logs of handled faults say much about what
+> > >> specifically goes wrong here, though.
+> > >>
+> > >> The dmesg portion attached to my mail is of a Linux guest failing to
+> > >> initialize the GPU (BAR 0 size 16GB with 12GB of VRAM).  
+> > > 
+> > > Thanks for the logs with debugging enabled.  Would you be able to
+> > > repeat the test with QEMU 9.2?  There's a patch in there that aligns
+> > > the mmaps, which should avoid mixing 1G and 2MB pages for huge faults.
+> > > With this you should only see order 18 mappings for BAR0.
+> > > 
+> > > Also, in a different direction, it would be interesting to run tests
+> > > disabling 1G huge pages and 2MB huge pages independently.  The
+> > > following would disable 1G pages:
+> > > 
+> > > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> > > index 1ab58da9f38a..dd3b748f9d33 100644
+> > > --- a/drivers/vfio/pci/vfio_pci_core.c
+> > > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> > > @@ -1684,7 +1684,7 @@ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+> > >   							     PFN_DEV), false);
+> > >   		break;
+> > >   #endif
+> > > -#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+> > > +#if 0
+> > >   	case PUD_ORDER:
+> > >   		ret = vmf_insert_pfn_pud(vmf, __pfn_to_pfn_t(pfn + pgoff,
+> > >   							     PFN_DEV), false);
+> > > 
+> > > This should disable 2M pages:
+> > > 
+> > > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> > > index 1ab58da9f38a..d7dd359e19bb 100644
+> > > --- a/drivers/vfio/pci/vfio_pci_core.c
+> > > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> > > @@ -1678,7 +1678,7 @@ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+> > >   	case 0:
+> > >   		ret = vmf_insert_pfn(vma, vmf->address, pfn + pgoff);
+> > >   		break;
+> > > -#ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
+> > > +#if 0
+> > >   	case PMD_ORDER:
+> > >   		ret = vmf_insert_pfn_pmd(vmf, __pfn_to_pfn_t(pfn + pgoff,
+> > >   							     PFN_DEV), false);
+> > > 
+> > > And applying both together should be functionally equivalent to
+> > > pre-v6.12.  Thanks,
+> > > 
+> > > Alex
+> > >   
+> > 
+> > Logs with QEMU 9.1.2 vs. 9.2.0, all huge_page sizes/1G only/2M only: 
+> > https://bugzilla.kernel.org/show_bug.cgi?id=219619#c3
+> > 
+> > You're right, I was still using QEMU 9.1.2. With 9.2.0, the 
+> > passed-through GPU works fine indeed with both Linux and Windows guests.
+> > 
+> > The huge_fault calls are aligned nicely with QEMU 9.2.0. Only the lower 
+> > 16MB of BAR 0 see repeated calls at 2M/4K page sizes but no misalignment.
+> > The QEMU 9.1.2 'stock' log shows a misalignment with 1G faults (order 
+> > 18), e.g., huge_faulting 0x40000 pages at page offset 0 and later 
+> > 0x4000. I'm not sure if that is a problem, or if the offsets are simply 
+> > masked off to the correct alignment.
+> > QEMU 9.1.2 also works with 1G pages disabled. Perhaps coincidentally, 
+> > the offsets are aligned properly for order 9 (0x200 'page offset' 
+> > increments) from what I've seen.
+> 
+> Thank you so much for your testing, this is immensely helpful!  This
+> all suggests to me we're dealing with an alignment issue for 1GB pages.
+> We're getting 2MB alignment on the mmap by default, so that's working
+> everywhere.  QEMU 9.2 provides us with proper 1GB alignment, but it
+> seems we need to filter alignment more strictly when that's not present.
+> Please give this a try with QEMU 9.1.x and an otherwise stock v6.12.x:
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 1ab58da9f38a..bdfdc8ee4c2b 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1661,7 +1661,8 @@ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+>  	unsigned long pfn, pgoff = vmf->pgoff - vma->vm_pgoff;
+>  	vm_fault_t ret = VM_FAULT_SIGBUS;
+>  
+> -	if (order && (vmf->address & ((PAGE_SIZE << order) - 1) ||
+> +	if (order && (pgoff & ((1 << order) - 1) ||
+> +		      vmf->address & ((PAGE_SIZE << order) - 1) ||
+>  		      vmf->address + (PAGE_SIZE << order) > vma->vm_end)) {
+>  		ret = VM_FAULT_FALLBACK;
+>  		goto out;
 
-However, commit e32b120071ea (KVM: VMX: Do _all_ initialization
-before exposing /dev/kvm to userspace, 2022-11-30) changed vmx_init
-to call __vmx_exit instead of vmx_exit. This made it possible to
-mark vmx_exit as "__exit" again, as it originally was, and enjoy
-the benefits that it provides (the function can be discarded from
-memory in situations where it cannot be called, like the module
-being built-in or module unloading being disabled in the kernel).
+That's a great finding..  I wish we could have some sanity check in things
+like pud_mkhuge() on the pfns at least for x86: SDM says the rest bits for
+a huge pfn must be zero (for example, bit 29-13 for 1G), but didn't say
+what if not. I assume that could panic at the right place if such check
+ever existed.
 
-Signed-off-by: Costas Argyris <costas.argyris@amd.com>
----
- arch/x86/kvm/vmx/vmx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+OTOH, a pure question here is whether we should check pfn+pgoff instead of
+pgoff alone.  I have no idea how firmware would allocate BAR resources,
+especially on start address alignments.  I assume that needs to be somehow
+relevant to the max size of the bar, probably the start address should
+always be aligned to that max bar size?  If so, there should have no
+functional difference checking either pfn+pgoff or pgoff.  It could be a
+matter of readability in that case, saying that the limitation is about pfn
+(of pgtable) rather than directly relevant to the offset of the bar.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 893366e53732..b98174b44b89 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8597,7 +8597,7 @@ static void __vmx_exit(void)
- 	vmx_cleanup_l1d_flush();
- }
- 
--static void vmx_exit(void)
-+static void __exit vmx_exit(void)
- {
- 	kvm_exit();
- 	__vmx_exit();
+Thanks,
+
 -- 
-2.39.5
+Peter Xu
 
 
