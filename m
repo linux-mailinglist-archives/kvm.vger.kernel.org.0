@@ -1,145 +1,141 @@
-Return-Path: <kvm+bounces-34496-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34497-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D849FFD58
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 19:02:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60AC49FFE96
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 19:38:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C3DD162D7D
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 18:02:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 523AB3A2246
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 18:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080A21ACEAC;
-	Thu,  2 Jan 2025 18:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E231BD00A;
+	Thu,  2 Jan 2025 18:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DGJq1cig"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A377B2114
-	for <kvm@vger.kernel.org>; Thu,  2 Jan 2025 18:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1291BC066
+	for <kvm@vger.kernel.org>; Thu,  2 Jan 2025 18:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735840925; cv=none; b=roj2j1yCV+BxwJFq249JSNeGv1jADEMdhTbp5NZs4PjvqDTv7H1B4y38BUykjYe/EA/UiNjQxtWC/VGcHdf17Zzi7vjrDsb7J5XsEmoRTyj1AKlbQUTQmPn7NUJf2jadXaHNrpk7OLvLK2zXc0FuWxDykvpAyXo6Bym5T2PQDs4=
+	t=1735842902; cv=none; b=mWdqifYeY4K5DrcQYQCr+EpG8zjO7vFw8jg0nXb12LNmY5D+HLJ234SXJYo0Z/YTXyPdjACatHKqaTtxuDxAA+0InUWOfoQOBDIwNrAk4JD3PD0xiY4qG4zWG5ARWckKu6uIu8sVLQFjjmk0yBDSoXzBblvqjg7mN8qO+MjsEeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735840925; c=relaxed/simple;
-	bh=vjUAhDzLrUvvwL8mPhugwy0Y7GG76xYAozDrj5ln//w=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lvyYdWB7i+Rf5Bo07kNiEgKdfrMYxUAZNwnn4rJ5Nqpssp+TtTz0LVAjQTeuZmPhBn3TvDa4f/fZfqPEdixYlhENdLEKAItopj4KizOJ4R19PMn1VAF3Bbh/dIRY/WQ3GJIr/0uhVMFcMzNywpaA4a62dSH1O3bUH6OKD5EjQM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YPDv76kFvz6K9j9;
-	Fri,  3 Jan 2025 01:57:39 +0800 (CST)
-Received: from frapeml500003.china.huawei.com (unknown [7.182.85.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id 42F9B140A77;
-	Fri,  3 Jan 2025 02:01:59 +0800 (CST)
-Received: from localhost (10.47.74.74) by frapeml500003.china.huawei.com
- (7.182.85.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 2 Jan
- 2025 19:01:57 +0100
-Date: Thu, 2 Jan 2025 18:01:41 +0000
-From: Alireza Sanaee <alireza.sanaee@huawei.com>
-To: Rob Herring <robh@kernel.org>
-CC: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	"Daniel P . =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>, "Igor
- Mammedov" <imammedo@redhat.com>, Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Philippe =?ISO-8859-1?Q?Ma?=
- =?ISO-8859-1?Q?thieu-Daud=E9?= <philmd@linaro.org>, Yanan Wang
-	<wangyanan55@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>, "Richard
- Henderson" <richard.henderson@linaro.org>, Jonathan Cameron
-	<Jonathan.Cameron@huawei.com>, Sia Jee Heng <jeeheng.sia@starfivetech.com>,
-	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v6 0/4] i386: Support SMP Cache Topology
-Message-ID: <20250102180141.00000647@huawei.com>
-In-Reply-To: <CAL_JsqKeA4dSwO40VgARVAiVM=w1PU8Go8GJYv4v8Wri64UFbw@mail.gmail.com>
-References: <20241219083237.265419-1-zhao1.liu@intel.com>
-	<44212226-3692-488b-8694-935bd5c3a333@redhat.com>
-	<Z2t2DuMBYb2mioB0@intel.com>
-	<20250102145708.0000354f@huawei.com>
-	<CAL_JsqKeA4dSwO40VgARVAiVM=w1PU8Go8GJYv4v8Wri64UFbw@mail.gmail.com>
-Organization: Huawei
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1735842902; c=relaxed/simple;
+	bh=zWluJE6IPTN0HImP1m8yrrAHZK9xXqdLQSdp85zrd3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R1OFv2iZCYn+rp3FaDgXATU05u0OdbQC6UussJbZMG2D6MscJCyLYuZML9pHHwz96A2xDn1JWxuABecWhgeHhGRDjJgdCfjobmyvJbGgDTFToJQ0nun8nDmsjWskKkbMn+9YD7WDCAF9ryQzbu1zPkE9MzYJooBPGLk4P9gRmmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DGJq1cig; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735842898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SHGdteiFmyxgI9gM7hyE7ge15QwlPvkhjCfqci3h5EU=;
+	b=DGJq1cigb71d8+DBUnNLO80oTLqC+CRtPyVOtNLOwr42MF311SwQrqUAxboeNxdIzlaIMX
+	/Yafr6bOBzpPWXL+fYvontFfdR/7eHW66FKPRZE0j1wsdEeVf1GkmkxCx42P2B9ZCugG1t
+	U2/qbzQng9z+6wgDPXRZ4tono6BMDUA=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-371-mC7X7BDHOTylluFaUq3weA-1; Thu,
+ 02 Jan 2025 13:34:56 -0500
+X-MC-Unique: mC7X7BDHOTylluFaUq3weA-1
+X-Mimecast-MFC-AGG-ID: mC7X7BDHOTylluFaUq3weA
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 243F619560B9;
+	Thu,  2 Jan 2025 18:34:55 +0000 (UTC)
+Received: from omen.home.shazbot.org (unknown [10.22.64.38])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CD24D1956088;
+	Thu,  2 Jan 2025 18:34:52 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+To: alex.williamson@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	peterx@redhat.com,
+	precification@posteo.de,
+	athul.krishna.kr@protonmail.com,
+	regressions@lists.linux.dev
+Subject: [PATCH] vfio/pci: Fallback huge faults for unaligned pfn
+Date: Thu,  2 Jan 2025 11:32:54 -0700
+Message-ID: <20250102183416.1841878-1-alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- frapeml500003.china.huawei.com (7.182.85.28)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Thu, 2 Jan 2025 11:09:51 -0600
-Rob Herring <robh@kernel.org> wrote:
+The PFN must also be aligned to the fault order to insert a huge
+pfnmap.  Test the alignment and fallback when unaligned.
 
-> On Thu, Jan 2, 2025 at 8:57=E2=80=AFAM Alireza Sanaee
-> <alireza.sanaee@huawei.com> wrote:
-> >
-> > On Wed, 25 Dec 2024 11:03:42 +0800
-> > Zhao Liu <zhao1.liu@intel.com> wrote:
-> > =20
-> > > > > About smp-cache
-> > > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > >
-> > > > > The API design has been discussed heavily in [3].
-> > > > >
-> > > > > Now, smp-cache is implemented as a array integrated in
-> > > > > -machine. Though -machine currently can't support JSON
-> > > > > format, this is the one of the directions of future.
-> > > > >
-> > > > > An example is as follows:
-> > > > >
-> > > > > smp_cache=3Dsmp-cache.0.cache=3Dl1i,smp-cache.0.topology=3Dcore,s=
-mp-cache.1.cache=3Dl1d,smp-cache.1.topology=3Dcore,smp-cache.2.cache=3Dl2,s=
-mp-cache.2.topology=3Dmodule,smp-cache.3.cache=3Dl3,smp-cache.3.topology=3D=
-die
-> > > > >
-> > > > > "cache" specifies the cache that the properties will be
-> > > > > applied on. This field is the combination of cache level and
-> > > > > cache type. Now it supports "l1d" (L1 data cache), "l1i" (L1
-> > > > > instruction cache), "l2" (L2 unified cache) and "l3" (L3
-> > > > > unified cache).
-> > > > >
-> > > > > "topology" field accepts CPU topology levels including
-> > > > > "thread", "core", "module", "cluster", "die", "socket",
-> > > > > "book", "drawer" and a special value "default". =20
-> > > >
-> > > > Looks good; just one thing, does "thread" make sense?  I think
-> > > > that it's almost by definition that threads within a core share
-> > > > all caches, but maybe I'm missing some hardware configurations.
-> > > > =20
-> > >
-> > > Hi Paolo, merry Christmas. Yes, AFAIK, there's no hardware has
-> > > thread level cache. =20
-> >
-> > Hi Zhao and Paolo,
-> >
-> > While the example looks OK to me, and makes sense. But would be
-> > curious to know more scenarios where I can legitimately see benefit
-> > there.
-> >
-> > I am wrestling with this point on ARM too. If I were to
-> > have device trees describing caches in a way that threads get their
-> > own private caches then this would not be possible to be
-> > described via device tree due to spec limitations (+CCed Rob) if I
-> > understood correctly. =20
->=20
-> You asked me for the opposite though, and I described how you can
-> share the cache. If you want a cache per thread, then you probably
-> want a node per thread.
->=20
-> Rob
->=20
+Fixes: f9e54c3a2f5b ("vfio/pci: implement huge_fault support")
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=219619
+Reported-by: Athul Krishna <athul.krishna.kr@protonmail.com>
+Reported-by: Precific <precification@posteo.de>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ drivers/vfio/pci/vfio_pci_core.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-Hi Rob,
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 1ab58da9f38a..1a4ed5a357d3 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1661,14 +1661,15 @@ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+ 	unsigned long pfn, pgoff = vmf->pgoff - vma->vm_pgoff;
+ 	vm_fault_t ret = VM_FAULT_SIGBUS;
+ 
+-	if (order && (vmf->address & ((PAGE_SIZE << order) - 1) ||
++	pfn = vma_to_pfn(vma) + pgoff;
++
++	if (order && (pfn & ((1 << order) - 1) ||
++		      vmf->address & ((PAGE_SIZE << order) - 1) ||
+ 		      vmf->address + (PAGE_SIZE << order) > vma->vm_end)) {
+ 		ret = VM_FAULT_FALLBACK;
+ 		goto out;
+ 	}
+ 
+-	pfn = vma_to_pfn(vma);
+-
+ 	down_read(&vdev->memory_lock);
+ 
+ 	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
+@@ -1676,18 +1677,18 @@ static vm_fault_t vfio_pci_mmap_huge_fault(struct vm_fault *vmf,
+ 
+ 	switch (order) {
+ 	case 0:
+-		ret = vmf_insert_pfn(vma, vmf->address, pfn + pgoff);
++		ret = vmf_insert_pfn(vma, vmf->address, pfn);
+ 		break;
+ #ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
+ 	case PMD_ORDER:
+-		ret = vmf_insert_pfn_pmd(vmf, __pfn_to_pfn_t(pfn + pgoff,
+-							     PFN_DEV), false);
++		ret = vmf_insert_pfn_pmd(vmf,
++					 __pfn_to_pfn_t(pfn, PFN_DEV), false);
+ 		break;
+ #endif
+ #ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+ 	case PUD_ORDER:
+-		ret = vmf_insert_pfn_pud(vmf, __pfn_to_pfn_t(pfn + pgoff,
+-							     PFN_DEV), false);
++		ret = vmf_insert_pfn_pud(vmf,
++					 __pfn_to_pfn_t(pfn, PFN_DEV), false);
+ 		break;
+ #endif
+ 	default:
+-- 
+2.47.1
 
-That's right, I made the mistake in my prior message, and you recalled
-correctly. I wanted shared caches between two threads, though I have
-missed your answer before, just found it.
-
-Thanks,
-Alireza
 
