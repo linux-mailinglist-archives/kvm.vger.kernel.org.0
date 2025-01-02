@@ -1,127 +1,114 @@
-Return-Path: <kvm+bounces-34503-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34504-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 981499FFF61
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 20:25:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A07D9FFF6A
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 20:29:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44BD07A1982
-	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 19:25:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 816733A2A90
+	for <lists+kvm@lfdr.de>; Thu,  2 Jan 2025 19:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9892B1B4238;
-	Thu,  2 Jan 2025 19:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C431B4255;
+	Thu,  2 Jan 2025 19:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nOco+yHX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwHl1Brz"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B1786250;
-	Thu,  2 Jan 2025 19:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0592187342
+	for <kvm@vger.kernel.org>; Thu,  2 Jan 2025 19:29:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735845923; cv=none; b=cfZRrX3UUaqQc0WkGl1N3ADVj0JI9kecJLomQGraNQAE5e0VC1anGtuNVLqnzzUCJbaMlkTKI0O4O4Mjpsdl5AtA/47tL3K5+PC66fGLuq9+wb+qJqGq0Qv1kYAamFVTsKp6Z3ndRnUF9LxPuy5+mPI6uoJcaQ3WAobfCKgt9aE=
+	t=1735846149; cv=none; b=bfMoIVY5ygXeaDgsAtUFSKNkdz1m1HrkOS/5Shety/MnDXidkDvGiHwDUB2KWJkeroQyLLb4SQuoSDZ/XusECLiBccQ8+8t73+XVrf8fb51bBoY1hNZ8X0AyXZc403Oem/pG+m6R7nIOhgvRuSVd1KXqetO989bPWqF2NN2cLrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735845923; c=relaxed/simple;
-	bh=KUMIyjQ4nZZlXB09ywwBTfalUhusJhQ+ekMU5Ns2Kms=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eEhSxbJfCGZZQtfFpFUQvNOIoIT3ehWXiY86nrjOWRfSBCqtvdlL/dNQRPar5K3eDIe5KkJ5X71kZX1T1DeFTuNyxC1VJKrMEBdA+vvB3gk7PaylP5r+IBPCJKxQJaE08w8Vy0oKs1Zdb9qoPtM6e7uHJM0daka7EdUzw8nqluE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nOco+yHX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 444CDC4CED0;
-	Thu,  2 Jan 2025 19:25:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735845923;
-	bh=KUMIyjQ4nZZlXB09ywwBTfalUhusJhQ+ekMU5Ns2Kms=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nOco+yHXIBJL9y5HUEX/ZV5LCUhWE92rAY/QEoemcZFS9byEy1MQnvYZ1OQm7zdmk
-	 9XypXaN0gbl5+Ek+tNOjv56jY5a7mrkGiXJsMfZWryTFEx9W8V2FrJfOlZXCgEU+RX
-	 XvGbTxMaHtwEteHzi/55fLNQ0zbC0aGm4Ys2fKkrURMgEYBszwKPmtjjQacaT+wk3t
-	 smKvkl2qhk18iS1KDnaxQi0q2B4srGhNVogsNl4eQc0cc5kB+wK4+V4Kmx3Y2jwlBf
-	 bizg9b71KVa4Qnr5udHOcA+UeWOInx75yn+2GyKL+RuPmbbMhWILse5dp8amxzBfIa
-	 0WbfNBJ+5VmvA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tTQor-008Vst-2S;
-	Thu, 02 Jan 2025 19:25:21 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Eric Auger <eauger@redhat.com>
-Subject: Re: [PATCH v2 00/12] KVM: arm64: Add NV timer support
-Date: Thu,  2 Jan 2025 19:25:17 +0000
-Message-Id: <173584591101.1567893.2047112696934752500.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20241217142321.763801-1-maz@kernel.org>
-References: <20241217142321.763801-1-maz@kernel.org>
+	s=arc-20240116; t=1735846149; c=relaxed/simple;
+	bh=GWdEuXg3WUDZDGjGFdNsNR/oBNnu0D17oPDtWlVfFM0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ugwCIIN3aFqpZKNV1+i2eXow2afLwb2LOKin/if7ydakyyYRQc9QaNm2PEh9iomoi2Ip57kMMro1ZsUXmsqoE86DJTUcCQxgNTvrukV2juwh2z9K0L6Fass5LnVKaFFFiclVRZUL3TzEPZDSzJwi5rT3xlXc48L19umLrqP6ivM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwHl1Brz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1735846145;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PqrnXD3+1RR06iBvi9uXmFy/HWAjf6sbg1PXAd5cQdI=;
+	b=fwHl1BrzAaAO04umyYju+L7+TCrfOXtJB6RN1q7hhPkANI7ZgQTOVlgMkwxpsB/A1QpxTO
+	BmX55VkVjGuGM0PlLkJ4H46Chwm7Qnuk580kcg0lta1mWmd6fgkD/BAKx0q5qlppxaOwZF
+	FR6HvZ6ItPARuVCZKEGv4yR/g4BNmnE=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-136-5BLO6u_dNm6-XQrhSJEIug-1; Thu, 02 Jan 2025 14:29:04 -0500
+X-MC-Unique: 5BLO6u_dNm6-XQrhSJEIug-1
+X-Mimecast-MFC-AGG-ID: 5BLO6u_dNm6-XQrhSJEIug
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6d87efed6c4so190945226d6.1
+        for <kvm@vger.kernel.org>; Thu, 02 Jan 2025 11:29:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735846144; x=1736450944;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PqrnXD3+1RR06iBvi9uXmFy/HWAjf6sbg1PXAd5cQdI=;
+        b=EYWdZuR1GAqQU7GXae/55P2NjXmqDivxdox7qslUTFERmBGKZ+cP73D3JUCyMbsimI
+         oNAqIo0NvAgQRS7KQfdzt66pdkeVIAsrtZVd6ZMbRPY4jKmDC/VcY5KEn0+5ZcmQQV/M
+         kL5qdxliV6al/Z2V/RzOp/E8thCN5nS9lDMoBJlHhrKTHE4BgXb6+DL8yN4SJGjOP47a
+         Fgl6incVFmCI96tYs6IVI5/f88ELvOTe9+xC+ypNvsuTvvuHoXU8wX/Gp06YLG+QtDq9
+         yVH1tN0Gpj4j8k3k1bwIgiNbajJBSw1CpEvjt/WDSU36+78Mz1bo+Z2bYqIKWOIxNiQa
+         0k0w==
+X-Gm-Message-State: AOJu0YwpRGhWRaOw9Ef6HQ5YGLP+TDgG6SOSiRY4pUieMsnwqaOivbrO
+	VyEX/L20f6WOiFQbEuaa7kHbeH6YnmdfPwt4Ju9bKDC6/RqrQJc7ObPG50yu8vGesCIjKpJxAu1
+	d1c6V1nSxgZnblULz1hD1UTw/KhDCPNFEtyHnBn0gOpBR3JNYsA==
+X-Gm-Gg: ASbGncveeN2gBnq14xy5tnER/uQ7Rtqdv+GXlnWE5YqZLKwtUvB1nyfgB1mvpMnmuTd
+	D7ReH2W1jJSYlrRECWivEkurGnKOgQneAcCrZznI6RRamHPJQojvEnTHc9p4YNGxCfp/RZfRy7f
+	NBkM4gudCfzTSzF0cm7aoQI8YFjOR4GF6l3UIJbyn2qIsFWSxvVxceBUrPWUws10Ckeh9xkfBZK
+	//rIjEYaGOO50eaFZ5CdRenKZJ4cBD54THux+y+LgkRj96BfarKg8nT4+95J6ZN5r7RPoxjT3Qk
+	EihY4d642yJFhMITeg==
+X-Received: by 2002:a05:6214:dca:b0:6d8:aa04:9a5d with SMTP id 6a1803df08f44-6dd2330bad3mr754637406d6.4.1735846144015;
+        Thu, 02 Jan 2025 11:29:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFpdC/2YXkIAOTi4K3SggAQlhXdABeSiWVvsv/qQ0FgTGnzpIL/OI93lXM53tLkNbD4XLXwkg==
+X-Received: by 2002:a05:6214:dca:b0:6d8:aa04:9a5d with SMTP id 6a1803df08f44-6dd2330bad3mr754637166d6.4.1735846143772;
+        Thu, 02 Jan 2025 11:29:03 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd4194937bsm100205756d6.95.2025.01.02.11.29.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 11:29:03 -0800 (PST)
+Date: Thu, 2 Jan 2025 14:29:01 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, precification@posteo.de,
+	athul.krishna.kr@protonmail.com, regressions@lists.linux.dev
+Subject: Re: [PATCH] vfio/pci: Fallback huge faults for unaligned pfn
+Message-ID: <Z3bo_TNnwweOH5cp@x1n>
+References: <20250102183416.1841878-1-alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250102183416.1841878-1-alex.williamson@redhat.com>
 
-On Tue, 17 Dec 2024 14:23:08 +0000, Marc Zyngier wrote:
-> Here's another version of the series initially posted at [1], which
-> implements support for timers in NV context.
+On Thu, Jan 02, 2025 at 11:32:54AM -0700, Alex Williamson wrote:
+> The PFN must also be aligned to the fault order to insert a huge
+> pfnmap.  Test the alignment and fallback when unaligned.
 > 
-> From v1:
-> 
-> - Repainted EL0->EL1 when rambling about the timers
-> 
-> [...]
+> Fixes: f9e54c3a2f5b ("vfio/pci: implement huge_fault support")
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=219619
+> Reported-by: Athul Krishna <athul.krishna.kr@protonmail.com>
+> Reported-by: Precific <precification@posteo.de>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-Applied to next, thanks!
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-[01/12] KVM: arm64: nv: Add handling of EL2-specific timer registers
-        commit: b59dbb91f7636a89b54ab8fff756afe320ba6549
-[02/12] KVM: arm64: nv: Sync nested timer state with FEAT_NV2
-        commit: 4bad3068cfa9fc38dd767441871e0edab821105b
-[03/12] KVM: arm64: nv: Publish emulated timer interrupt state in the in-memory state
-        commit: cc45963cbf6334d2b9078f06efef9864639cddd0
-[04/12] KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
-        commit: 2cd2a77f9c32f1eaf599fb72cbcd0394938a8b58
-[05/12] KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV in use
-        commit: 338f8ea51944d02ea29eadb3d5fa9196e74a100d
-[06/12] KVM: arm64: nv: Accelerate EL0 counter accesses from hypervisor context
-        commit: 9b3b2f00291e1abd54bff345761a7fadd8df4daa
-[07/12] KVM: arm64: Handle counter access early in non-HYP context
-        commit: b86fc215dc26d8e1bb274f0a7990b5deab740ac8
-[08/12] KVM: arm64: nv: Add trap routing for CNTHCTL_EL2.EL1{NVPCT,NVVCT,TVT,TVCT}
-        commit: c271269e3570766724820bcb76a144125dead272
-[09/12] KVM: arm64: nv: Propagate CNTHCTL_EL2.EL1NV{P,V}CT bits
-        commit: 479428cc3dc99bbe28954b62b053b22accbfd1fd
-[10/12] KVM: arm64: nv: Sanitise CNTHCTL_EL2
-        commit: d1e37a50e1d781201768c89314532f6ab87e5a42
-[11/12] KVM: arm64: Work around x1e's CNTVOFF_EL2 bogosity
-        commit: 0bc9a9e85fcf4ffb69846b961273fde4eb0d03ab
-[12/12] KVM: arm64: nv: Document EL2 timer API
-        commit: affd1c83e090133a3d1750916c7911b20f8911c0
-
-Cheers,
-
-	M.
 -- 
-Without deviation from the norm, progress is not possible.
-
+Peter Xu
 
 
