@@ -1,105 +1,82 @@
-Return-Path: <kvm+bounces-34525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2324FA00905
-	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2025 13:07:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E75A00979
+	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2025 13:48:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFEAB3A10D0
-	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2025 12:07:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A50FF7A1D3A
+	for <lists+kvm@lfdr.de>; Fri,  3 Jan 2025 12:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05AD1F9ECE;
-	Fri,  3 Jan 2025 12:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305121FA141;
+	Fri,  3 Jan 2025 12:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="UE0raoxV"
+	dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b="G/wY73s8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E40417BB32;
-	Fri,  3 Jan 2025 12:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6384D81ACA
+	for <kvm@vger.kernel.org>; Fri,  3 Jan 2025 12:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735906015; cv=none; b=SsNKhPflJZFypktEsUysJKA8LdVkZ0qvvmIkp9ckTydlruepaSWKYYJ3ODoKk4MQk/eQ8qptoXnzjy77mwcEyfHmYSaSTcqKcK3+zZkKApvBH27oi9O4O6xxuiCr1anNxVGpmcrxAn1y/xZvjp1NjzYzyx4EeDq+gSFNTgfNBfA=
+	t=1735908512; cv=none; b=EIpLEe3HCtjV+y1RL7eWX38e0OGMHu3mZVDl44taaZ81yEY/nxPg+V041us0OVxOJWCFmW0jiAZ/UzMtApVWJkuNKtQfEqqVNDXe5WJve1e6GM7TqlRnGedb5Zk2zbXoBxb3Nq+h54J2Yf2tszTR5/pIJ9yitrXsLXARO9TDxYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735906015; c=relaxed/simple;
-	bh=1+ZENZ35MHANOaJm46OQhl93mrdvoUfHZlSCvHdc3X0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FyMk5SSpYrApkFQjg1DFIx5oHrvDcAbZvTP9fCEcXiu+8i1V61dPnSYEfdpBLG45uDsZbDdgusx6NYvocbgllUMZDWnqUCh+Rl8QJruSsv7s04xzLxaU10jJb0eLqLNT8psTVX5UI3nCEmUV58e1cm/e84bWKNbo8PYuoLXKYuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=UE0raoxV; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6492C40E021D;
-	Fri,  3 Jan 2025 12:06:51 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id oX53FHeXWJlz; Fri,  3 Jan 2025 12:06:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1735906007; bh=GF7MqXMHjglrzvnKq07eQV25mhpyMs/NyLbc+v2Pmi0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UE0raoxVELM/CCUQH7YhD3CUN6MSWfht9KFYk5avkQKizrGAdyMk0qXFDgEkoNaku
-	 HzTUvBZ6hdxJVOnPW3CN985xhmGKEx2PK7+84QQedQmrnjbzhg/YQC62Kt2ZPsJbY8
-	 kxnKo09xVMAah3aUAVPl5cqv6chk6gvot7HftSFkUDyuutXFPoxTuEVVtNyxEODmdw
-	 8epE34KkCDE7BNe+dO+jvfJgFa6NSUnhyc2zamRDWelnv94NCdvWuVGNxTj/d0HICb
-	 voSn9gS2aDG2990M20SDFWAJ5kn6YW7ToFc6tH3luV1vkPcQf0eq75goPDoKSIRenu
-	 O22k5+2KsnVBziWEJ4bf8WA70oijgB8Hg+52+38q4B5A76j1xT8ZhIIJxmqZY+S/Hi
-	 1Kos0YcEeMC9HEkWQXNRwkKzNDI0ia4iJO9O0WMLJOTnAkXvCgpUnXRJj2/16OUy2T
-	 RRERtq9blCngbQ8+CMFFp/gN/wtGxWpxrTuHNfzNrVW6mnIM9MGzzmbzo55z0xmItI
-	 TjtGtiJ9iB8YEB/BuddhFV1kT0JH6ysCZiV8QuPONtC4BAhINQ7B8rKUpEdmuz6AVX
-	 8lKGFD7LYazZ+CyP4ucwZGOBDU3Y0u/qszUyAZyU6gyv7ZrIcnlRA3HwgbWGzzE0Uj
-	 2I44yAw/OSvp90PGSfhYZEhk=
-Received: from zn.tnic (p200300eA971f93bA329C23FFfEA6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:93ba:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 49F4840E01C5;
-	Fri,  3 Jan 2025 12:06:33 +0000 (UTC)
-Date: Fri, 3 Jan 2025 13:06:32 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: tglx@linutronix.de, linux-kernel@vger.kernel.org,
-	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-	mingo@redhat.com, dave.hansen@linux.intel.com, pgonda@google.com,
-	seanjc@google.com, pbonzini@redhat.com,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Juergen Gross <jgross@suse.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH v15 10/13] tsc: Upgrade TSC clocksource rating
-Message-ID: <20250103120632.GCZ3fSyMiODH8-XBC4@fat_crate.local>
-References: <20241203090045.942078-1-nikunj@amd.com>
- <20241203090045.942078-11-nikunj@amd.com>
- <20241230113611.GKZ3KFq-Xm_5W40P2M@fat_crate.local>
- <984b7761-acf8-4275-9dcc-ca0539c2d922@amd.com>
- <20250102093237.GEZ3ZdNa-zuiyC9LUQ@fat_crate.local>
- <2139da61-d03e-49b3-9c7c-08c137bcf22c@amd.com>
+	s=arc-20240116; t=1735908512; c=relaxed/simple;
+	bh=Gx2tBk5b5iiiVDk5sGoYvRMPKAo2Jskn32iHs1ldREI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=otkrriCcXxtTkuqE02aS38a30NG1OYJo4MkFbic0ilTTDZlB403svmN1Eg0mBscKz60f2uVc0yPynqWqBi7nufeD6WW9Jgvmwsg4PrGyGO6bhisS0z2CKhPgSkJv3i0X1e9crqaR32sLjplguz8MaYPn3bfRFbNB7Qvs+4W/TlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de; spf=pass smtp.mailfrom=posteo.de; dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b=G/wY73s8; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.de
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 93B2A240103
+	for <kvm@vger.kernel.org>; Fri,  3 Jan 2025 13:48:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.de; s=2017;
+	t=1735908502; bh=Gx2tBk5b5iiiVDk5sGoYvRMPKAo2Jskn32iHs1ldREI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:Content-Type:
+	 Content-Transfer-Encoding:From;
+	b=G/wY73s8tteF8dQ5OHyZ0AG2IAIkfS6ko1dXyyV5klNvJNJljeZ5u8OAeWxqg6KOr
+	 RqUl71SLbwmZqE+99KgOFwQ/HbLXiGbmxoQnryss1X0/IwCJOoPaRlLvpUIVOKjKqh
+	 uVpYBLvK4L63/6m9Rby59nHojHzL9Vpyn5a11d1iSQ0vil9orXZ/FzmXfcdmTapzY7
+	 ROu9rbQgN9dE+UvH61NPlumrvfXkh1rIT1FBJULqKeExjfyTT1+a52YFk8hKCfvhtN
+	 1ptqHcQpVJWHa/VDiw1Ii+xhWB02nWJ80vyDgaGGSveANNUZUTULrVsH3iu6Tz/AFB
+	 XJOAGxhreu5CQ==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4YPjzn5DTTz6twV;
+	Fri,  3 Jan 2025 13:48:21 +0100 (CET)
+Message-ID: <83b8a4d8-6b8d-449d-9bbc-8f7af1ed0048@posteo.de>
+Date: Fri,  3 Jan 2025 12:48:06 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2139da61-d03e-49b3-9c7c-08c137bcf22c@amd.com>
+Subject: Re: [PATCH] vfio/pci: Fallback huge faults for unaligned pfn
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, peterx@redhat.com,
+ athul.krishna.kr@protonmail.com, regressions@lists.linux.dev
+References: <20250102183416.1841878-1-alex.williamson@redhat.com>
+Content-Language: en-US
+From: Precific <precification@posteo.de>
+In-Reply-To: <20250102183416.1841878-1-alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 03, 2025 at 03:39:56PM +0530, Nikunj A. Dadhania wrote:
-> Right, let me limit this only to virtualized environments as part of 
-> CONFIG_PARAVIRT.
+On Thu, Jan 02, 2025 at 19:32:54 +0100, Alex Williamson wrote:
+> The PFN must also be aligned to the fault order to insert a huge
+> pfnmap.  Test the alignment and fallback when unaligned.
+> 
+> Fixes: f9e54c3a2f5b ("vfio/pci: implement huge_fault support")
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=219619
+> Reported-by: Athul Krishna <athul.krishna.kr@protonmail.com>
+> Reported-by: Precific <precification@posteo.de>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-That's not what you do below - you check whether you're running as a guest.
+Tested-by: Precific <precification@posteo.de>
 
-And that's not sufficient as I just said. I think the only somewhat reliable
-thing you can do is when you're running as a STSC guest.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
