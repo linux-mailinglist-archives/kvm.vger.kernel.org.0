@@ -1,119 +1,151 @@
-Return-Path: <kvm+bounces-34554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33C9CA013F1
-	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 11:29:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02BFDA01523
+	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 15:05:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10E86163C9D
-	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 10:28:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 569437A1C58
+	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 14:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03C01B2186;
-	Sat,  4 Jan 2025 10:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6641E1B87C6;
+	Sat,  4 Jan 2025 14:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="QUEk8gh1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uBxpycDE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6781E507;
-	Sat,  4 Jan 2025 10:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 863FF156C6A;
+	Sat,  4 Jan 2025 14:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735986529; cv=none; b=Wv8Nc+URT7Y5YEQcvsGCTRYSBxwgDmxB7XXFlj351EvxmfgdeQxls1TD9zcEPfiUm/5wgLqzSANCsQtkSrrxbb2WjdWVIvL7M6y3fFvL9CqF8apA0dgq+33H/KFmHBaABHHwJgCGN9WsOFcD2DfE7j2p6aMA7lBJuD3Qx0ERV+4=
+	t=1735999493; cv=none; b=lj15c4p665Juvn/XYGJlUZkIjErcOrPeK8CsQGZjLNA7njIKshz8pwG43IQwDHC0GVV+RVxzLvBEpoIhDown/CcJ5L/bsZAMNy1Ynaui2xcW+Q0yNfJMfLLwYx61Hhd0YifDpUOt6B3ZxfThlvP7cqYCysNS9HxJzdIpplrUe1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735986529; c=relaxed/simple;
-	bh=HP3qbsW87D/czU/pikRnm3xM9eTORn7/FvZMtnOTP10=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HCah+vq7OVYnoyD3zjGAV7TJ8zQPIv/Tfs6y8n6r3fBIdaucHym4YKuRdmfFPuICf26sxTtqPYB5+fCMLZfEdZRqyYFESa+dT9SOAVnXy1+ea2ZxBIV3l8uK9wndQLnwjPcUkg3+fMyVoyzYPcPgq9Fpo0gWIFHKDm59jE5Tp24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=QUEk8gh1; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0314B40E021C;
-	Sat,  4 Jan 2025 10:28:43 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Zw_bx9hD-E3t; Sat,  4 Jan 2025 10:28:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1735986519; bh=KYKdFtclxiG2u2EcksDGWyKLHqfEP3rK81fRVDwUvlc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QUEk8gh1wURMrMEZLtJWbDalZ/hbwbI2ettYWhZf9GLdA0jwz92tK8WSYR1qVCzdq
-	 iNoC4DqD6U0VGSXHYBT72fDJoJVLyEPU7LwCMoqGLHz6Ge0+okti9/aW/w/7x3tDNe
-	 o+j0mtGY4KwkdpUewYUinJguH9snuAa4iZVy346ZVV/2lEiMmZd45786BHfE8n+77h
-	 pge0gdfNTI9tFdZyoCtFovET5cerBWy+hD9Vvf7T7rTC8EzISeLsTXzohS1Z3EvOVS
-	 ZecVJb5qK/FPjNNZ15KMZqVLwRpl+VDthyUCUyLlomimErwSQP5HPTNlvHznkURTAq
-	 vl2iwiDQhz8ZiEdBK0ks6ro0m4O/tTz4UaNl0hByuFx/sDh2Ckvd3ncxeX5mAVeLPj
-	 iv/SQLTh5WyLgSU3+M1o1SzOjPREx22LotxqYlQ0yENSHoQhZNCaxtYwDwNZ7MAiJ0
-	 NaYpjJuOLhE7smdXP/7gCLw4npUzRkJ9n5LEugiBt2JTCQIhvyl5lIN1TN6itUx2bO
-	 zWe98KF4AGcfGUoviHA4X7eBE7ttw/Nec1EZr8fZnG8YVTVnKAHTK3eBE0ffyeULix
-	 FKLLHaDLOG0bAILNnj0OBOeLMUNxhwOZjxqRbGJa2YwPotlJWexgOMVMzw0AZabsrl
-	 b5s6bm3P1Kq3FwEqcb3A6YgY=
-Received: from zn.tnic (p200300eA971f93Ba329C23FfFea6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:93ba:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EDDE940E015F;
-	Sat,  4 Jan 2025 10:28:27 +0000 (UTC)
-Date: Sat, 4 Jan 2025 11:28:21 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: thomas.lendacky@amd.com, linux-kernel@vger.kernel.org, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v15 09/13] tsc: Use the GUEST_TSC_FREQ MSR for
- discovering TSC frequency
-Message-ID: <20250104102821.GAZ3kNRWbxFGY-q56N@fat_crate.local>
-References: <20241230112904.GJZ3KEAAcU5m2hDuwD@fat_crate.local>
- <343bfd4c-97b2-45f5-8a6a-5dbe0a809af3@amd.com>
- <20250101161537.GCZ3VqKY9GNlVVH647@fat_crate.local>
- <a978259b-355b-4271-ad54-43bb013e5704@amd.com>
- <20250102091722.GCZ3ZZosVREObWSfX_@fat_crate.local>
- <cc8acb94-04e7-4ef3-a5a7-12e62a6c0b3d@amd.com>
- <20250102104519.GFZ3ZuPx8z57jowOWr@fat_crate.local>
- <061b675d-529b-4175-93bc-67e4fa670cd3@amd.com>
- <20250103120406.GBZ3fSNnQ5vnkvkHKo@fat_crate.local>
- <8c3cc8a5-1b85-48b3-9361-523f27fb312a@amd.com>
+	s=arc-20240116; t=1735999493; c=relaxed/simple;
+	bh=KYmyLdM4eK3NJuL/D9J9sGWeFSSBEfPKQ86wmsTb92s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SywTe0ZIn+fgO5qSb7rTFwgIr5J6s8A3fWioQyAIeQ8ucTESQVXPeoBfmXFCbRjqbFXDB4Yy7H6vf6SuNNxRbYZFnlPGgisac4plh0mag+0YrMi3Xzeb16oVwFfu8d8Jml2QgcZO538OO4Xcw5WWjiakAJxJA+8u4qm1MYXvCh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uBxpycDE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ED6DC4CED1;
+	Sat,  4 Jan 2025 14:04:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735999493;
+	bh=KYmyLdM4eK3NJuL/D9J9sGWeFSSBEfPKQ86wmsTb92s=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=uBxpycDEIG79sXSfNEcQEyBreshROi3jEkpt3SJLYlOruXjN9/HZ3HmK1ucS/Kqrv
+	 KhWXREMqWwH/qMHSsNqai++xCTVQ0/tQBbiZnLeMaCs+XOOItlebApwZh2dlZJAooi
+	 6OcPlLXcLzXfVLI9O06Wa6r3nO9gF/RlGhX1epmXpmRral4BFgURk0Cz/esFJnd5Kp
+	 3fiLek5U1YsyVzwTsjUGe4s5w1St0J4k3htQKw8C7ZQXE0dMDY43VH0T/Yq8ZYMFI7
+	 47V5WYx0I/4uIe8H/IfZRNNKy3G4bgiNPxmEi8LZhSS0FaCN02d7rNZ2mW65/Z1/h5
+	 UvPOpuU9PG5KQ==
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d4e2aa7ea9so24322379a12.2;
+        Sat, 04 Jan 2025 06:04:53 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV+X+gbvf6yCZDS8tWdnxcocpFjvySCRkybB05jEvJhXgIOraU+7E500kY/9ppAHk8ZPPQ=@vger.kernel.org, AJvYcCXERu9JZ78RVaAeOqlJizjFWIBVfQS+XlSzfkyDXs7y5tbYxAMPkLa9mKliObjXZqcHXpaYErKv2+Quh2AJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZz+Aa71WQ69QQZ38zJaj14rC1I4Y2Yw9DnGgnpFoBWJGBKLB9
+	fyGmwW9mr8HZtCqzZF9XOSYj2oBXE11qEeXM6SfhS8JallDD3zUR0zdA7nsDVPSgoiIPDrRva3R
+	AFN/4JgGUSdnlnwhuBFCqZMsDXGY=
+X-Google-Smtp-Source: AGHT+IE7eaiNLP8/CVkaV15LbcX2f8QDKfQ+WeBBb0Gd4pKtD9SZTUULOuHHfGeCOVy2gLiZWePDtz6XgNayapI3PeI=
+X-Received: by 2002:a17:907:9805:b0:aaf:117f:1918 with SMTP id
+ a640c23a62f3a-aaf117f1d51mr3134184466b.5.1735999491616; Sat, 04 Jan 2025
+ 06:04:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8c3cc8a5-1b85-48b3-9361-523f27fb312a@amd.com>
+References: <20250102083625.2577378-1-maobibo@loongson.cn>
+In-Reply-To: <20250102083625.2577378-1-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sat, 4 Jan 2025 22:04:38 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H705XKtA0CrvWU5pneHcOST7WFWS=JTSc3oESDwvjxG-w@mail.gmail.com>
+X-Gm-Features: AbW1kvYuv0xuOTS1EoqQW6oulAkjt_am5x2Mn1kJKws-8T1S3xFKhRWfRg40M7Q
+Message-ID: <CAAhV-H705XKtA0CrvWU5pneHcOST7WFWS=JTSc3oESDwvjxG-w@mail.gmail.com>
+Subject: Re: [PATCH] LoongArch: KVM: Clear LLBCTL if secondary mmu mapping is changed
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 03, 2025 at 07:29:10PM +0530, Nikunj A. Dadhania wrote:
-> That was my understanding and implementation in v11, where Sean suggested that
-> VMs running on CPUs supporting stable and always running TSC, should switch over
-> to TSC properly[1] and [2], in a generic way.
+Queued, thanks.
 
-Sure, you can do that. But that doesn't get rid of the fact that until the HV
-is safely blocked from touching the TSC MSRs, you cannot trust it fully. IOW, only
-Secure TSC can give you that, I don't know what provisions TDX has about that.
+Huacai
 
-And then, even if you can get the HV out of the picture, the underlying hw is
-not guaranteed either. That's why I keep returning to TSC watchdog disable
-logic in check_system_tsc_reliable() - only then you can somewhat trust the
-TSC hardware.
-
-> That is not right, if non-secure guest is booted with TscInvariant bit set,
-> guest will start using TSC as the clocksource, unfortunately sched clock
-> keeps on using kvm-clock :(
-
-Again: you can switch to the TSC as much as you want to but until the
-hypervisor is out of the picture, you can't really trust it.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+On Thu, Jan 2, 2025 at 4:36=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrote=
+:
+>
+> Register LLBCTL is separated CSR register from host, host exception
+> eret instruction will clear host LLBCTL CSR register, guest
+> exception will clear guest LLBCTL CSR register.
+>
+> VCPU0 atomic64_fetch_add_unless     VCPU1 atomic64_fetch_add_unless
+>      ll.d    %[p],  %[c]
+>      beq     %[p],  %[u], 1f
+> Here secondary mmu mapping is changed, host hpa page is replaced
+> with new page. And VCPU1 executed atomic instruction on new
+> page.
+>                                        ll.d    %[p],  %[c]
+>                                        beq     %[p],  %[u], 1f
+>                                        add.d   %[rc], %[p], %[a]
+>                                        sc.d    %[rc], %[c]
+>      add.d   %[rc], %[p], %[a]
+>      sc.d    %[rc], %[c]
+> LLBCTL is set on VCPU0 and it represents the memory is not modified
+> bt other VCPUs, sc.d will modify the memory directly.
+>
+> Here clear guest LLBCTL_WCLLB register when mapping is the changed.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>  arch/loongarch/kvm/main.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+>
+> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+> index 396fed2665a5..7566fa85f8e7 100644
+> --- a/arch/loongarch/kvm/main.c
+> +++ b/arch/loongarch/kvm/main.c
+> @@ -245,6 +245,24 @@ void kvm_check_vpid(struct kvm_vcpu *vcpu)
+>                 trace_kvm_vpid_change(vcpu, vcpu->arch.vpid);
+>                 vcpu->cpu =3D cpu;
+>                 kvm_clear_request(KVM_REQ_TLB_FLUSH_GPA, vcpu);
+> +
+> +               /*
+> +                * LLBCTL is separated CSR register from host, general ex=
+ception
+> +                * eret instruction in host mode clears host LLBCTL regis=
+ter,
+> +                * and clears guest register in guest mode. eret in refil=
+l
+> +                * exception does not clear LLBCTL register.
+> +                *
+> +                * When second mmu mapping is changed, guest OS does not =
+know
+> +                * even if the content is changed after mapping is change=
+d
+> +                *
+> +                * Here clear guest LLBCTL register when mapping is chang=
+ed,
+> +                * else if mapping is changed when guest is executing
+> +                * LL/SC pair, LL loads with old address and set LLBCTL f=
+lag,
+> +                * SC checks LLBCTL flag and store new address successful=
+ly
+> +                * since LLBCTL_WCLLB is on, even if memory with new addr=
+ess is
+> +                * changed on other VCPUs.
+> +                */
+> +               set_gcsr_llbctl(CSR_LLBCTL_WCLLB);
+>         }
+>
+>         /* Restore GSTAT(0x50).vpid */
+>
+> base-commit: fc033cf25e612e840e545f8d5ad2edd6ba613ed5
+> --
+> 2.39.3
+>
+>
 
