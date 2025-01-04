@@ -1,122 +1,162 @@
-Return-Path: <kvm+bounces-34557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B287A01527
-	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 15:10:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A431A015B2
+	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 17:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA083163B09
-	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 14:10:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 230D73A2A63
+	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 16:09:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E170E1BBBE5;
-	Sat,  4 Jan 2025 14:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF231CBE87;
+	Sat,  4 Jan 2025 16:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PuAjSWAI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wiz8RAWR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8943E49D;
-	Sat,  4 Jan 2025 14:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794147E105;
+	Sat,  4 Jan 2025 16:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735999811; cv=none; b=VHdyF9ApxBgtBkyRFaq/z7B8ZZkybI3PNnx+XQ1aXnlOMONJq0IGGWbgjjSu4f5sSEDfphfg2CpQr6d6Gn04MyLJtBIm7kqh3QBPx74e/wd0bdkY1ond6l/BOUGShmxlscgNidcV4GAyKtQr9zu+TuoBP249K4AUMpmtayVpg8M=
+	t=1736006978; cv=none; b=C0DkgSvAsiU25SVUMehLkrbxmh/iWpeTnUqPl1kEsBsjPKWe5V5Wic+Ebh/PLKkVsObfr9SDt2qgeVV8wigq0vSRZ65upJtoT1IyP2U1Gwygg/lIZu0dFhT6G4xQOlYawZzJ/fgwYqgMI9vbE0aRFTu/xzJzW+qmsoG2MIUPiqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735999811; c=relaxed/simple;
-	bh=fs3FvyWEIAFcio0I/rqtVktB2z6mJR2z4FXr5zEbDvE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pusi0H5fp4YBfKtjzj58baXEBc2RWPX9TDk5yGyf5fi7O+KPBy8cF4U9HaiTzvgBWk+2A+mCxfEUjMTmKRfePEZ5qEJgUlNadnj8JV+jzzFVEgFZS9Ifvjv06u1STUXfyjRpYjtg0w+t5FZRi1WS1AK69pNvY1lxEQMxpgFsad0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PuAjSWAI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB707C4CED2;
-	Sat,  4 Jan 2025 14:10:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735999810;
-	bh=fs3FvyWEIAFcio0I/rqtVktB2z6mJR2z4FXr5zEbDvE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=PuAjSWAIo63JM17TQic7Ka4b8Uet8/EbAjLhgz0cMkmF1j8fXy60tDieOBlTCZOoP
-	 YqS+Up/47IthGQiFipDXSJT6HTPC3OwyOphE7ciosEuwU/AlWWU02kjpYZ2ns5Fy7P
-	 RtZfi0hgwf25ZdzLi6yrtakxXp4zOOdrwm+wwhb1Von11THnJhVhK8TkUs3p1t7DaF
-	 LjHcji1TygbYFdpaD8BzLTsMKxtIQAVfdAAYV4Bky89kXndd4zdFeaj3jEPgmbP9zj
-	 8it5HNEtKXk4rHZx1cZovBC3HAQRrVLc9t6zCk+eDA3QG4LsoSqPTFK6x31b0EEHMn
-	 AVjW3+p+tZtaQ==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9e44654ae3so2154290266b.1;
-        Sat, 04 Jan 2025 06:10:10 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW0PxDOV3t4DbHsST80/F5Q8YYtkNAbOTvpIT0I1hyYNNx08QiFGCzFip21S8LRCnI8PGU=@vger.kernel.org, AJvYcCWPejhEM+vMdjPZM4Ow+EPaBRWar3WLCxud1+DJyp2tAlCnX7p52kLio951m17dyCjaesU1Mu2K+adsaeMN@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbHb7Wy9SkYCw4DO35FUeIBfFYZXV3pm7n3hlpQ1VNoYlYLKWI
-	Y0r2PIpRYhjM4144bxhvzr0v4/3gonOpKzNTbNH+5KhcBuXr4BDAuzq+gtLMEQawxjvR9zprpLZ
-	pXuwXF6QE6nLdGIp8B3G+GxE8v5Y=
-X-Google-Smtp-Source: AGHT+IHEjE6qukOyUl9kRjLC/5p8LJL6zAhmw7b/Y6RtBW/u7JLrN+Z7jJ5jgS1D8cWty0yr1F6mOHguXbHU/fndcv8=
-X-Received: by 2002:a17:907:2cc2:b0:aa6:b1b3:2b82 with SMTP id
- a640c23a62f3a-aac27038e0cmr4220332066b.3.1735999809301; Sat, 04 Jan 2025
- 06:10:09 -0800 (PST)
+	s=arc-20240116; t=1736006978; c=relaxed/simple;
+	bh=qm+2f5dLYhjmuzeGdRkcNb9ur7HDx9UEZ1JTL7Nm0nM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qtjv2O+7rXNwZfpjCw2AQa6BhkXl/gteT+PSDOeERFS9TKqIl7gGJeBXAfaXSkqCmFp3BiUXk8YekciZ8KO/uRpmG3GVNHtS2CLTN91F2lNIW9b3a/zkJY4H/TxWeub2P4fsb6zJxbGAowNGptq0UP5M4Q9wcKYqPcxcPt9AHE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wiz8RAWR; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-216634dd574so122288805ad.2;
+        Sat, 04 Jan 2025 08:09:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736006976; x=1736611776; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IiasTFv+3QwOoYd+VowJl7+2vMF8wVn3O99tcE5rB0g=;
+        b=Wiz8RAWRnWW1rMpPJtFV2CkRzz7i4bga5EIRFmWcjzuw1TH89Yt8aysIBOdWWCTGvR
+         Y43PI4Df0xNqpG7xeQH8hWDNTxjX1HcJW+dRIW+sdBvAimlvfm30mA3hfwYxh64qQfri
+         F7jfvGfKkVKx8ITblg6IM2Pbkab2Tzhwn9hxJ9w/4Mql72WWgmRtroeKioagRokrHsgQ
+         5QWr+Ht1kTo05X5XtVkhwEdtmxHqrwSNYdeUEfgZEDKjWrJ26X0jDrg2ipGhvPb83wcS
+         KQeWrLyelV8HoAlnypIdhNQf6B9SlvjSFYqf78wtsPRyOVdMLl3IAFexBsQk3Sb/gcu5
+         HDYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736006976; x=1736611776;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IiasTFv+3QwOoYd+VowJl7+2vMF8wVn3O99tcE5rB0g=;
+        b=L4g35PMF4MigWB5j+kiiDr/+wJscxT6XZyqMfpGyJKJwU+Os3XO0QDF04B/WZ60lfY
+         QdZ+xBrmbXCAenz9ZP0fSN9NjG093u+wGrUhMPPO0cpF/XhHQLKPo75IzqikTPtzRKfR
+         BOvAPJx0DG6aByMWj37ERpJ5j2j7v3QWDA1iFCAeeUUbeAWsOI7IaECaE+5Vb6YO3XBw
+         5nQWQj3XnrzHDLD8gPLgDX/Wr3cdQM35NoYPbJ1rXklfVY/ySjLJPNLbebI2TECQEfB+
+         bKzlWVu8Ji/VpyAc1yf2WuccjAFauueIvcgjUyJUJRqQTa/a0vop8/nYV0m780v+6LNu
+         X/ww==
+X-Forwarded-Encrypted: i=1; AJvYcCVFpDSisxHA5cKS8f0fNRsM15VqftdT+NksTlJckSw9cHfD6Ofo8BNTLeAqNyecRcP1CLWG02pQrA3C95Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAgFy9mBrtqlZiF5r8CeMaoR5311l7957+FVSlYzfpCB0xrSDc
+	g3ZsYa8BQheK6fRredJFhnN8WInbQjuR6hO2M/7j4t95YiZYZM3CH/NfTmx3ujji
+X-Gm-Gg: ASbGncu7eFM759ojpiCkWmS4T9EFd4ekKYhwreUYUC6Rj3GEYVsURTe6z+ULPD9eG+T
+	UHjYE1vCQwu9yiq1bC08VjK//rZBsboD3xKd8pneDBWsd/nB2puuuAWrLMNqg1k8X0mxkZbq2KU
+	b27tJefxkDQ9Ifp0B25ki0D5Ywyoal1TXcZ2qV8+6iH//ozDfzL1kkHeJ7LY6h8Mtyj3t0GBLwD
+	7+hiqg47ue3xUY6i7MA4RW7sRygoSZ/eAIpBYQ9o1Yol/ANO1BKQnJ8qLxcaw==
+X-Google-Smtp-Source: AGHT+IGaBPXRmCg2ZqGpWdfiLW4ewlVS148Dpms/02/GM0fFZks218NOlHV5ocglWdMPW6m+2NkNtQ==
+X-Received: by 2002:a17:902:cccf:b0:215:9d58:6f35 with SMTP id d9443c01a7336-219e6e8bb1dmr908318695ad.1.1736006975869;
+        Sat, 04 Jan 2025 08:09:35 -0800 (PST)
+Received: from [192.168.0.163] ([58.38.120.107])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc96eb8esm262348375ad.64.2025.01.04.08.09.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 04 Jan 2025 08:09:35 -0800 (PST)
+Message-ID: <69970c12-3ceb-4109-a5ed-ce2546faaaff@gmail.com>
+Date: Sun, 5 Jan 2025 00:09:33 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113031727.2815628-1-maobibo@loongson.cn>
-In-Reply-To: <20241113031727.2815628-1-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sat, 4 Jan 2025 22:09:56 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5VH0k6byAX4U0e4rv4tdjtzTSrokXt3tjqpSFRzpU7gg@mail.gmail.com>
-X-Gm-Features: AbW1kvaN7VNips6Y6pyj8sUCqLC-DsRpv4v9W0qelWhp8vHSgfPNuDaxt1BeaVg
-Message-ID: <CAAhV-H5VH0k6byAX4U0e4rv4tdjtzTSrokXt3tjqpSFRzpU7gg@mail.gmail.com>
-Subject: Re: [RFC 0/5] LoongArch: KVM: Add separate vmid support
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] vfio/pci: update igd matching conditions
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241230161054.3674-2-tomitamoeko@gmail.com>
+ <20250103104427.55f1c73b.alex.williamson@redhat.com>
+Content-Language: en-US
+From: Tomita Moeko <tomitamoeko@gmail.com>
+In-Reply-To: <20250103104427.55f1c73b.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi, Bibo,
+On 1/4/25 01:44, Alex Williamson wrote:
+> On Tue, 31 Dec 2024 00:10:54 +0800
+> Tomita Moeko <tomitamoeko@gmail.com> wrote:
+> 
+>> igd device can either expose as a VGA controller or display controller
+>> depending on whether it is configured as the primary display device in
+>> BIOS. In both cases, the OpRegion may be present. Also checks if the
+>> device is at bdf 00:02.0 to avoid setting up igd-specific regions on
+>> Intel discrete GPUs.
+>>
+>> Signed-off-by: Tomita Moeko <tomitamoeko@gmail.com>
+>> ---
+>> Changelog:
+>> v2:
+>> Fix misuse of pci_get_domain_bus_and_slot(), now only compares bdf
+>> without touching device reference count.
+>> Link: https://lore.kernel.org/all/20241229155140.7434-1-tomitamoeko@gmail.com/
+>>
+>>  drivers/vfio/pci/vfio_pci.c | 8 +++++---
+>>  1 file changed, 5 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+>> index e727941f589d..906a1db46d15 100644
+>> --- a/drivers/vfio/pci/vfio_pci.c
+>> +++ b/drivers/vfio/pci/vfio_pci.c
+>> @@ -111,9 +111,11 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
+>>  	if (ret)
+>>  		return ret;
+>>  
+>> -	if (vfio_pci_is_vga(pdev) &&
+>> -	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
+>> -	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
+>> +	if (IS_ENABLED(CONFIG_VFIO_PCI_IGD) &&
+>> +	    (pdev->vendor == PCI_VENDOR_ID_INTEL) &&
+>> +	    (((pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA) ||
+>> +	     ((pdev->class >> 8) == PCI_CLASS_DISPLAY_OTHER)) &&
+>> +	    (pci_dev_id(pdev) == PCI_DEVID(0, PCI_DEVFN(2, 0)))) {
+> 
+> Sorry I wasn't available to reply on previous thread before v2 was
+> posted, but given that we have vfio_pci_is_vga() we should use it
+> rather than duplicate the contents.  I think that suggests we should
+> create a similar helper for display_other.  Alternatively we should
+> maybe consider if it's sufficient to use just the base class.
 
-Any update on this?
+I think using the base class is okay here. AFAIK intel doesn't has
+any devices reported as XGA or 3D controller.
 
-Huacai
+> The DEVID of course does not include the domain, which make it a rather
+> suspect check already.  What do the discrete cards report at 0xfc in
+> config space?  If it's zero or -1 or points to something that we can't
+> memremap() or points to contents that doesn't include the opregion
+> signature, then we'll already exit out of vfio_pci_igd_init().  Is
+> there actually a case that we're actually configuring IGD specific
+> regions for a discrete card?  Thanks,
+>
+> Alex
 
-On Wed, Nov 13, 2024 at 11:17=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wro=
-te:
->
-> LoongArch KVM hypervisor supports two-level MMU, vpid index is used
-> for stage1 MMU and vmid index is used for stage2 MMU.
->
-> On 3A5000, vmid must be the same with vpid. On 3A6000 platform vmid
-> may separate from vpid. There are such advantages if separate vpid
-> is supported.
->   1. One VM uses one vmid, vCPUs on the same VM can share the same vmid.
->   2. If one vCPU switch between different physical CPU, old vmid can be
->      still usefil if old vmid is not expired
->   3. For remote tlb flush, only vmid need update and vpid need not
-> update.
->
-> Here add separate vmid feature support, vmid feature detecting method
-> is not implemented since it depends on HW implementation, detecting
-> method will be added when HW is ready.
->
-> ---
-> Bibo Mao (5):
->   LoongArch: KVM: Add vmid support for stage2 MMU
->   LoongArch: KVM: Add separate vmid feature support
->   LoongArch: KVM: implement vmid updating logic
->   LoongArch: KVM: Add remote tlb flushing support
->   LoongArch: KVM: Enable separate vmid feature
->
->  arch/loongarch/include/asm/kvm_host.h  | 10 ++++
->  arch/loongarch/include/asm/loongarch.h |  2 +
->  arch/loongarch/kernel/asm-offsets.c    |  1 +
->  arch/loongarch/kvm/main.c              | 76 ++++++++++++++++++++++++--
->  arch/loongarch/kvm/mmu.c               | 17 ++++++
->  arch/loongarch/kvm/switch.S            |  5 +-
->  arch/loongarch/kvm/tlb.c               | 19 ++++++-
->  arch/loongarch/kvm/vcpu.c              |  7 ++-
->  8 files changed, 128 insertions(+), 9 deletions(-)
->
->
-> base-commit: 2d5404caa8c7bb5c4e0435f94b28834ae5456623
-> --
-> 2.39.3
->
+Checking (pci_domain_nr(pdev->bus) == 0) seems okay. I tried on a
+discrate Arc A770, there is 0 at 0xFC, so vfio_pci_igd_init() returns
+with -NODEV and the device is skipped. Shall I remove the BDF check?
+It seems to be unnecessary, my intention is to ensure it is really an
+igd since it can only be at 0000:00:02.0.
+ 
+>>  		ret = vfio_pci_igd_init(vdev);
+>>  		if (ret && ret != -ENODEV) {
+>>  			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
+> 
+
 
