@@ -1,162 +1,120 @@
-Return-Path: <kvm+bounces-34558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34559-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A431A015B2
-	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 17:09:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC566A0167E
+	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 20:06:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 230D73A2A63
-	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 16:09:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B65A7A1C51
+	for <lists+kvm@lfdr.de>; Sat,  4 Jan 2025 19:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF231CBE87;
-	Sat,  4 Jan 2025 16:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6D61D5175;
+	Sat,  4 Jan 2025 19:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wiz8RAWR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kD44+Csw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794147E105;
-	Sat,  4 Jan 2025 16:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88841A8F61;
+	Sat,  4 Jan 2025 19:06:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736006978; cv=none; b=C0DkgSvAsiU25SVUMehLkrbxmh/iWpeTnUqPl1kEsBsjPKWe5V5Wic+Ebh/PLKkVsObfr9SDt2qgeVV8wigq0vSRZ65upJtoT1IyP2U1Gwygg/lIZu0dFhT6G4xQOlYawZzJ/fgwYqgMI9vbE0aRFTu/xzJzW+qmsoG2MIUPiqs=
+	t=1736017580; cv=none; b=UZkEs9znT/W6Ij03wOazow4sgoEnqs2NK+y33HzKNHDPMKA8AwXuhes73G8IkzEImB165UCW47sS1305AOAB39yP8J/bPSG9+/U2MWHcwjn6NlmzrZCiR/2FgBFp5230NodgJlSbvO/Ob62RV30N5kn0G1EudLIYJMdjncHjsLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736006978; c=relaxed/simple;
-	bh=qm+2f5dLYhjmuzeGdRkcNb9ur7HDx9UEZ1JTL7Nm0nM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qtjv2O+7rXNwZfpjCw2AQa6BhkXl/gteT+PSDOeERFS9TKqIl7gGJeBXAfaXSkqCmFp3BiUXk8YekciZ8KO/uRpmG3GVNHtS2CLTN91F2lNIW9b3a/zkJY4H/TxWeub2P4fsb6zJxbGAowNGptq0UP5M4Q9wcKYqPcxcPt9AHE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wiz8RAWR; arc=none smtp.client-ip=209.85.214.195
+	s=arc-20240116; t=1736017580; c=relaxed/simple;
+	bh=1MDbs7kBgFOcRSqyfUJD8ynLlivydoMrJtUh7cqEKgc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
+	 MIME-Version; b=riagfneFjR6O86ohO26nRTqZ0aB4vqHHcGdF+HUjRpkAOnip2Kzf3KYCP0HIARV8HYcgaVXYV7pGQ9Yv1GYclOAV83Vou+mKSxOIommA5+PPgFj9RAaLW+J4ICcAcodUVV4VmFWDQpACl1vs5yP9QdZlpz4q2efbPYXzA8wEKxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kD44+Csw; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-216634dd574so122288805ad.2;
-        Sat, 04 Jan 2025 08:09:36 -0800 (PST)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aa689a37dd4so2105813466b.3;
+        Sat, 04 Jan 2025 11:06:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736006976; x=1736611776; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IiasTFv+3QwOoYd+VowJl7+2vMF8wVn3O99tcE5rB0g=;
-        b=Wiz8RAWRnWW1rMpPJtFV2CkRzz7i4bga5EIRFmWcjzuw1TH89Yt8aysIBOdWWCTGvR
-         Y43PI4Df0xNqpG7xeQH8hWDNTxjX1HcJW+dRIW+sdBvAimlvfm30mA3hfwYxh64qQfri
-         F7jfvGfKkVKx8ITblg6IM2Pbkab2Tzhwn9hxJ9w/4Mql72WWgmRtroeKioagRokrHsgQ
-         5QWr+Ht1kTo05X5XtVkhwEdtmxHqrwSNYdeUEfgZEDKjWrJ26X0jDrg2ipGhvPb83wcS
-         KQeWrLyelV8HoAlnypIdhNQf6B9SlvjSFYqf78wtsPRyOVdMLl3IAFexBsQk3Sb/gcu5
-         HDYw==
+        d=gmail.com; s=20230601; t=1736017577; x=1736622377; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K9HcD+bpC3rMFg/91MXQZLjlNjY0q1Lmocb7XgBKhy4=;
+        b=kD44+CswrGBrKTnW9G94nPQ+LDR0PnCqlc0azjdNbwT0pszv8YTbL7f0btrSnXGMVI
+         CDSyDVI1Kce8EYumkRRuEc4QEBKaiVljqzcOrhPvJdXBQCCupfWlmxv69/fhmzZK8qu+
+         UFjyVtIU1Nx43BcrXRyegZxhEjs620VBBQ56s7XgPbsA8m2LAOS/fU1hYD2lkULcsZjS
+         iTLFT++Y7JfVSbNfIKIhBBrEIgS7OmA7MgfD4lXEHGyq8ORauKyOyLzhvCdsyy0p947J
+         jM3HIZk42jjsWytHSSAxPMP3fNB3h/Isj05YoucL78Vbq9jJFseYvZJXBfBGV7YQokIf
+         Fs6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736006976; x=1736611776;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IiasTFv+3QwOoYd+VowJl7+2vMF8wVn3O99tcE5rB0g=;
-        b=L4g35PMF4MigWB5j+kiiDr/+wJscxT6XZyqMfpGyJKJwU+Os3XO0QDF04B/WZ60lfY
-         QdZ+xBrmbXCAenz9ZP0fSN9NjG093u+wGrUhMPPO0cpF/XhHQLKPo75IzqikTPtzRKfR
-         BOvAPJx0DG6aByMWj37ERpJ5j2j7v3QWDA1iFCAeeUUbeAWsOI7IaECaE+5Vb6YO3XBw
-         5nQWQj3XnrzHDLD8gPLgDX/Wr3cdQM35NoYPbJ1rXklfVY/ySjLJPNLbebI2TECQEfB+
-         bKzlWVu8Ji/VpyAc1yf2WuccjAFauueIvcgjUyJUJRqQTa/a0vop8/nYV0m780v+6LNu
-         X/ww==
-X-Forwarded-Encrypted: i=1; AJvYcCVFpDSisxHA5cKS8f0fNRsM15VqftdT+NksTlJckSw9cHfD6Ofo8BNTLeAqNyecRcP1CLWG02pQrA3C95Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAgFy9mBrtqlZiF5r8CeMaoR5311l7957+FVSlYzfpCB0xrSDc
-	g3ZsYa8BQheK6fRredJFhnN8WInbQjuR6hO2M/7j4t95YiZYZM3CH/NfTmx3ujji
-X-Gm-Gg: ASbGncu7eFM759ojpiCkWmS4T9EFd4ekKYhwreUYUC6Rj3GEYVsURTe6z+ULPD9eG+T
-	UHjYE1vCQwu9yiq1bC08VjK//rZBsboD3xKd8pneDBWsd/nB2puuuAWrLMNqg1k8X0mxkZbq2KU
-	b27tJefxkDQ9Ifp0B25ki0D5Ywyoal1TXcZ2qV8+6iH//ozDfzL1kkHeJ7LY6h8Mtyj3t0GBLwD
-	7+hiqg47ue3xUY6i7MA4RW7sRygoSZ/eAIpBYQ9o1Yol/ANO1BKQnJ8qLxcaw==
-X-Google-Smtp-Source: AGHT+IGaBPXRmCg2ZqGpWdfiLW4ewlVS148Dpms/02/GM0fFZks218NOlHV5ocglWdMPW6m+2NkNtQ==
-X-Received: by 2002:a17:902:cccf:b0:215:9d58:6f35 with SMTP id d9443c01a7336-219e6e8bb1dmr908318695ad.1.1736006975869;
-        Sat, 04 Jan 2025 08:09:35 -0800 (PST)
-Received: from [192.168.0.163] ([58.38.120.107])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc96eb8esm262348375ad.64.2025.01.04.08.09.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Jan 2025 08:09:35 -0800 (PST)
-Message-ID: <69970c12-3ceb-4109-a5ed-ce2546faaaff@gmail.com>
-Date: Sun, 5 Jan 2025 00:09:33 +0800
+        d=1e100.net; s=20230601; t=1736017577; x=1736622377;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=K9HcD+bpC3rMFg/91MXQZLjlNjY0q1Lmocb7XgBKhy4=;
+        b=m1HWFdHM7hzEjwOr1Bnd7+a/goowJcOO9v7738owGLc0rvh3++pitn0gFmFJcRVUeI
+         Rp5Ext2X1z80Of6Fo1OGV3rk+FxsjOB1il//pgFWdhhCAbLbNlIXX3qI6WFBe4ekqwfK
+         udfI7v1jXbDd/iCHRgeuKMnQ3VP1K4bcFo1oFQbeCendE2yiuJXMV5T1WmhTpyn2HSS3
+         0KkzJoeVW+h4my0RBs86bOSvAy7kgWJqoAlovd13CasFJJoenM0xhI2GoX/Wme4R7W17
+         Lc5cmWop1KSazHe5+heyC3yeMbPivjIZqgtXCybLyD3gOR5pq4wS1FnEy4PvHWCNUcVt
+         SRLw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8YQaocms3rfixDXjE2+bcEf6Al/pkVR3cTPnJ7l7S3gPHW//GYZY82ecSaWQ43NORjiNPKbhQxask3UC6@vger.kernel.org, AJvYcCUESUHAGSVO5rwnce7a/7vGIAL5StBUz7DhPPZlNHXmgdwgTTiyTRthv60r39wGz+x4Dpw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPh8UtzgqzcR0mWh+uZ5ZR774zdLgaAXOmo5OiwK1XA7O/WVF5
+	g06PztV6nj/Nhc5x77Brp6/2IBwsbFwapkB/o0xebXPm3L24iS/z
+X-Gm-Gg: ASbGncsrJJ3dmIrnedrj3Rboed4HWgNJHLqNzuFvPPc8blpK+ViMw68hvGsAyf9Vojl
+	lk8MExtdapunzuKW1+QBOEjhhiFHvYOhkvUIyOsqsob3rudOuIoNLc8wM4zw1p0q5Gy+P6/XjMa
+	NMJRgQR+YSvKhYE4jLxtHRr/zUGtO00+4L3eW6z3g0gn7AR9zyhdKohocNWgXjjQoeF6TjDSO6D
+	/GnCaNt7jY0sgwQ9qqoxOxuBNsX/TzvGsAJSt8zIpuOT73eRYSzM/EsdEonYTXQOaHH+1rv55d8
+	bne8NIoLl3VYtpZ4s+V26tgLsnuECXW9z8Fd5w==
+X-Google-Smtp-Source: AGHT+IF7FRi6/Fa1k2aXZFEKOXUvXaIASk+vEezgzfV/+OPtHo0VltYJpCfRbgZYL+xD+q+BrL1hxA==
+X-Received: by 2002:a17:906:9c96:b0:aaf:117c:e929 with SMTP id a640c23a62f3a-aaf117cef2bmr3315138266b.57.1736017576955;
+        Sat, 04 Jan 2025 11:06:16 -0800 (PST)
+Received: from ?IPv6:2001:b07:5d29:f42d:5a35:63fc:d663:ba76? ([2001:b07:5d29:f42d:5a35:63fc:d663:ba76])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d80676f074sm21580014a12.25.2025.01.04.11.06.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Jan 2025 11:06:15 -0800 (PST)
+Message-ID: <4c49a713c6c13fc0faef039ab5ef6b38090c20f6.camel@gmail.com>
+Subject: Re: [PATCH v15 01/13] x86/sev: Carve out and export SNP guest
+ messaging init routines
+From: Francesco Lavra <francescolavra.fl@gmail.com>
+To: nikunj@amd.com
+Cc: bp@alien8.de, dave.hansen@linux.intel.com, kvm@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com, 
+ pgonda@google.com, seanjc@google.com, tglx@linutronix.de,
+ thomas.lendacky@amd.com,  x86@kernel.org
+Date: Sat, 04 Jan 2025 20:06:14 +0100
+In-Reply-To: <20241203090045.942078-2-nikunj@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] vfio/pci: update igd matching conditions
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241230161054.3674-2-tomitamoeko@gmail.com>
- <20250103104427.55f1c73b.alex.williamson@redhat.com>
-Content-Language: en-US
-From: Tomita Moeko <tomitamoeko@gmail.com>
-In-Reply-To: <20250103104427.55f1c73b.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 1/4/25 01:44, Alex Williamson wrote:
-> On Tue, 31 Dec 2024 00:10:54 +0800
-> Tomita Moeko <tomitamoeko@gmail.com> wrote:
-> 
->> igd device can either expose as a VGA controller or display controller
->> depending on whether it is configured as the primary display device in
->> BIOS. In both cases, the OpRegion may be present. Also checks if the
->> device is at bdf 00:02.0 to avoid setting up igd-specific regions on
->> Intel discrete GPUs.
->>
->> Signed-off-by: Tomita Moeko <tomitamoeko@gmail.com>
->> ---
->> Changelog:
->> v2:
->> Fix misuse of pci_get_domain_bus_and_slot(), now only compares bdf
->> without touching device reference count.
->> Link: https://lore.kernel.org/all/20241229155140.7434-1-tomitamoeko@gmail.com/
->>
->>  drivers/vfio/pci/vfio_pci.c | 8 +++++---
->>  1 file changed, 5 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
->> index e727941f589d..906a1db46d15 100644
->> --- a/drivers/vfio/pci/vfio_pci.c
->> +++ b/drivers/vfio/pci/vfio_pci.c
->> @@ -111,9 +111,11 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
->>  	if (ret)
->>  		return ret;
->>  
->> -	if (vfio_pci_is_vga(pdev) &&
->> -	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
->> -	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
->> +	if (IS_ENABLED(CONFIG_VFIO_PCI_IGD) &&
->> +	    (pdev->vendor == PCI_VENDOR_ID_INTEL) &&
->> +	    (((pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA) ||
->> +	     ((pdev->class >> 8) == PCI_CLASS_DISPLAY_OTHER)) &&
->> +	    (pci_dev_id(pdev) == PCI_DEVID(0, PCI_DEVFN(2, 0)))) {
-> 
-> Sorry I wasn't available to reply on previous thread before v2 was
-> posted, but given that we have vfio_pci_is_vga() we should use it
-> rather than duplicate the contents.  I think that suggests we should
-> create a similar helper for display_other.  Alternatively we should
-> maybe consider if it's sufficient to use just the base class.
+On 2024-12-03 at 9:00, Nikunj A Dadhania wrote:
 
-I think using the base class is okay here. AFAIK intel doesn't has
-any devices reported as XGA or 3D controller.
+> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+> index c5b0148b8c0a..3cc741eefd06 100644
+> --- a/arch/x86/coco/sev/core.c
+> +++ b/arch/x86/coco/sev/core.c
+...
+> +void snp_msg_free(struct snp_msg_desc *mdesc)
+> +{
+> +	if (!mdesc)
+> +		return;
+> +
+> +	mdesc->vmpck =3D NULL;
+> +	mdesc->os_area_msg_seqno =3D NULL;
+> +	kfree(mdesc->ctx);
+> +
+> +	free_shared_pages(mdesc->response, sizeof(struct
+> snp_guest_msg));
+> +	free_shared_pages(mdesc->request, sizeof(struct
+> snp_guest_msg));
+> +	iounmap((__force void __iomem *)mdesc->secrets);
+> +	kfree(mdesc);
 
-> The DEVID of course does not include the domain, which make it a rather
-> suspect check already.  What do the discrete cards report at 0xfc in
-> config space?  If it's zero or -1 or points to something that we can't
-> memremap() or points to contents that doesn't include the opregion
-> signature, then we'll already exit out of vfio_pci_igd_init().  Is
-> there actually a case that we're actually configuring IGD specific
-> regions for a discrete card?  Thanks,
->
-> Alex
-
-Checking (pci_domain_nr(pdev->bus) == 0) seems okay. I tried on a
-discrate Arc A770, there is 0 at 0xFC, so vfio_pci_igd_init() returns
-with -NODEV and the device is skipped. Shall I remove the BDF check?
-It seems to be unnecessary, my intention is to ensure it is really an
-igd since it can only be at 0000:00:02.0.
- 
->>  		ret = vfio_pci_igd_init(vdev);
->>  		if (ret && ret != -ENODEV) {
->>  			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
-> 
-
+This is leaking mdesc->certs_data.
 
