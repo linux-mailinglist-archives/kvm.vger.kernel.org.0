@@ -1,156 +1,124 @@
-Return-Path: <kvm+bounces-34601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34602-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8888A0272C
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 14:55:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D8CA0285C
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 15:46:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CB7418856D5
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 13:55:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4286D165798
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 14:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762A21DDC2D;
-	Mon,  6 Jan 2025 13:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88591DDC3C;
+	Mon,  6 Jan 2025 14:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="RB6Ycofn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xp31HB3j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC1273451
-	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 13:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6881DE8AF
+	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 14:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736171717; cv=none; b=XcVH92lXIGWm/fzNv3sc+XDKs//KnGcfp/rEAkaGz2veZH4CJxoA2Ap7iT66uXhIw2FgYj7zI5dh+iEh0L2lfXkklo5pR2zA2gOZCva7/CFanmIzAspFH1IDzARr1J26XHFonL4LzoNdH+j2uXUYQlCfsXBGaUJ0KGL/h2thoQw=
+	t=1736174671; cv=none; b=OECak/vniPD4qbrLU5hEZ12yOaolqsCN7ERfuc3anq/WulVX4iy4k7/JaK1yJ11oWvNOhXx/60GD/yxGhFQ6STKcXrlo7yuNYIrT8XyRjqrJ7a96F0t9yVe1K2dE5ak4Io4yaOwz/KQKoAx4Zh0reLiC0vcKc9HQKpTW5y6aZQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736171717; c=relaxed/simple;
-	bh=qE+kGC9QGLF1Nj1+UwT88o2V+6quGha0QvhC+2q+RXg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DLBjOdXMa5GFmqFTBdkBJ/3J4gt8ORBhcx1v+YxzN+w2ypvKrtcFvSs6Cczr2+g9U4XgakfLDHGZ8tZze3FDXydKpJbD48EfaCH+L+lf8hJdNSxFIUX5gR3v5sncJoLI0Tsr9xi+GOY8RXqhjIhx4l3KNbgQqNT1v7ZpgCjEXac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=RB6Ycofn; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-38633b5dbcfso13849374f8f.2
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 05:55:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1736171714; x=1736776514; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+PtiW3OqUvs8CS+s0qiIMYN9i+4vbOFKlpELD3NbBK0=;
-        b=RB6YcofnSnBt/iyKMbjM7+aLBinONL+FtgX+AM3RUSpPIq6n5f7c7c6XuSslaymfLw
-         UpnT4A5+7qopZMzMkNtPIe7D+81yPxHXr3DM/PAD+9bNgtR+73iaZt+6lZMawkEfyHOK
-         seZsRlVml7QouNk4iHpvsQdf/P+H3HLVp9NqCAjw2PGaRr1/nBTZI4Le5knU1t+IGkIC
-         QPKcYpYnmI5PBWv1FbirFbAMNhSJ8izavH3o6/JPPql2aZ68Omm1MGxr/AIs/XlvNJbK
-         NswLXS99S5DuN/wZsoWJzy3F7g4UKFWlajJsD26uS01sXug1+x22mW47BzgbQyke3Uft
-         Mrqw==
+	s=arc-20240116; t=1736174671; c=relaxed/simple;
+	bh=nBsYJbiXYIY9ywBtlWFfHXN7kk9ZlfhgY7EYBx6MQ2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=qRTC3wcnl/7kD9PzVkIQgLWxReLYvQE1CsrkfqmTwKpMtSTCV6qbuNmyAyn2EgJ5nsEVMrthFKyIVCa/dvwmAUyJJ9qmV3SAeabaMeeEBPFMAnVMWRVOAXxidV+4m8cNzYMY9gyaEaK1vCQOCErt7t+VtF1xdJaTCtiT5HjXrck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xp31HB3j; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736174668;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FUH3DFdlL6ZUk3YpgcJ4VUOICW4X9z+8QLMCyb4jShE=;
+	b=Xp31HB3jQ/kzEK/dPMPa+nYvCsdxe/YgWOtWaT9cfXRHElxxsrvKJeMEHKORc6oZp1rGtx
+	PIw6Og6+YkYYAV90kIfvHhkq36Fdl/hkbWRRWAzlnxnfMBBsk6rNK6ggmO5TCk4Z8cx+wA
+	RYaM1gA5Ui6CMElfJrDzWpsl69tWx94=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-9-cgPtAKY_Mu-gW3M_eNHxxg-1; Mon, 06 Jan 2025 09:44:25 -0500
+X-MC-Unique: cgPtAKY_Mu-gW3M_eNHxxg-1
+X-Mimecast-MFC-AGG-ID: cgPtAKY_Mu-gW3M_eNHxxg
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-849e7868f6eso28665939f.0
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 06:44:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736171714; x=1736776514;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+PtiW3OqUvs8CS+s0qiIMYN9i+4vbOFKlpELD3NbBK0=;
-        b=TnHDx7rmRVOvbV9o0J0Cp8M3m6YlVBRuD6eLYObVQEMcUHfY/0hKZ+USBSsFWs+Tpf
-         art74r3Fs7AZGfVnYPnfUlAvfsv2iproOXNFzg3q9BC36Kz9s23RJ8CGHlFZAiw6Jesz
-         PPNSGHo8vzqcI48qU6jT/DqeRHnKAg3iKPNncfu7NlpErAmuXtTEcG2I6yNKrNXca8kc
-         SXSp3iVqaRxhYvsJC6a8pEiWkoAGQ0rwYVH36iRwgGuWLtI7Jsb9ul+qNncpGbgm2BPW
-         iI/v7FDSQW9sOuX7aCza/lwdQu4Y+0j5qtcjYQq0PzuJFtQLnfPizPaAGqBVDqUDXoz0
-         Do4A==
-X-Gm-Message-State: AOJu0Yz1d8PDnLVmnn2OWOTw+WMpBb2z2hjgpTdfC2/aL3mT0axhLtJl
-	PApBe+K+wZrE+xiOqr9S25WOpohugGXkQAcxSDoVYlfsx4FZ1cFIsJomsMu2AZ8=
-X-Gm-Gg: ASbGncvNqDL4k5vV+AwSKm/CuUhyyCZHUwsMzUC4pMaof6Um0ZgoFmTIw2rdahljWZo
-	J6kvULofrYaNg3oLXHrkeZ5kS/WH27lsHw4LBG9j7DiRN2EPbyPyk8eK1/DAmPvgeKR2y8urgXl
-	EggvYPwxrLS/qCjTqCWdXJ0vHwNHuiAwqhPCcmA8dbi93Gb5Cv6ae8ZbBeSDYkmTumxleSudyVP
-	G6reiV5OZFNKbyvtG+eLgv7+DNblgWpa1+vEfixz7wBFpiADLGhUodEx+1HtNW1Df4b5Bgk0ZWG
-	e6PrLMNJB6aKAVDuYT252Uq/XOhsy3towv3+TUO0Bw==
-X-Google-Smtp-Source: AGHT+IFQZoFcZKpFUlkMbtP7vcuqEf3/c5Y2lSqVd0PkAXjcMdYLjO4gBwMH3anWvN0fYtFvBl8CtQ==
-X-Received: by 2002:adf:a445:0:b0:38a:2b39:9205 with SMTP id ffacd0b85a97d-38a2b3993dfmr38095742f8f.33.1736171713973;
-        Mon, 06 Jan 2025 05:55:13 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c832a90sm47386140f8f.28.2025.01.06.05.55.13
+        d=1e100.net; s=20230601; t=1736174665; x=1736779465;
+        h=content-transfer-encoding:mime-version:organization:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FUH3DFdlL6ZUk3YpgcJ4VUOICW4X9z+8QLMCyb4jShE=;
+        b=WypNfSjinNiW76RQrKgHxy08eTMwv2rtokvZ6qlSWviEABaMsUEtsYTuS6G7F3i9rk
+         EUpnRtYVHjRnjLh5GkfXFcOzx6TNvUdvNEUCeR/PICPfiYNmZsfNEa+su7Ut8NtCUyyy
+         yb5BawhV5v2Cs5LY7FjfK+70+BlBv92/eMAWpc2hEb0h3Z84pyGY3G8Wi40B98LP91tB
+         tvxXApO0N6pHx9FIk24Bc4jHL0AnlsREpHfBthpbOa30y2O24PZPfqwYx6piN/ntD2DC
+         0DrhJalAByvX9PoaB7BTToBh+Dpp7ZEwZezZg+4HWU2sCey0WDMDFIQq48zMbBC8T3lW
+         p3UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeyJhw+fiFhi3NSprhZOodVMzBlevyaF4dZ4s5pCOIf1urQGfhkmCLCm5ipJ0WSphZ78c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynydB+62NSRY0USTLiwzTzMrrLR/wgQMzF/kF8Gvyb6W9T844c
+	M/3UfO2rlJi5/pzbNwEMy43LSl43+EOuWcy82/BE1XzFsGRtrpv1rTipHHcsO+aj5gD3smyrfBH
+	HIdE80vRvHWitDQowARQ1i3N/tDyYxXNlMs+pSgGKJHjBNXFOsQ==
+X-Gm-Gg: ASbGnculKdFt18wtvGsnJCqsdlMg6fPXBAhLa8cfiGyGsTFSt3IZQEuGUNJmjUL9c4x
+	+q7pVcmnG8j/o/ESQXf+4zIZU4xnLFKGScdgGLM1C3mzk13TVairijlaBl07MX/RUZqOdqGlVXg
+	aKVjEeKr08RY8DirOG0uGUoUiiTrP7PFhMsYc2Qm3Ct8Nfqct/ckTUtsbhCtxr6h7C9enoV7BCK
+	K2D6KYKlFxjDwVFqUSzKH9atnaKfFeVWoN78Eo/Q3y/LrDaXTYuRzwl+4lz
+X-Received: by 2002:a05:6e02:1a48:b0:3a7:c041:6666 with SMTP id e9e14a558f8ab-3c2d5928ec6mr129759835ab.6.1736174664709;
+        Mon, 06 Jan 2025 06:44:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGafXrLACV5MeycD5XeRwqejObpLz/sq3AgN/WfDwm0ae2VRSm7hSiK4Gv9MSAfAxEDyj4qWg==
+X-Received: by 2002:a05:6e02:1a48:b0:3a7:c041:6666 with SMTP id e9e14a558f8ab-3c2d5928ec6mr129759805ab.6.1736174664444;
+        Mon, 06 Jan 2025 06:44:24 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3c0deae6a1csm99722175ab.23.2025.01.06.06.44.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 05:55:13 -0800 (PST)
-Date: Mon, 6 Jan 2025 14:55:12 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Anup Patel <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH v4 0/5] riscv: add SBI SSE extension tests
-Message-ID: <20250106-daa8e0da7de4e560f17b4d38@orel>
-References: <20241125162200.1630845-1-cleger@rivosinc.com>
- <ada1c6da-d91c-4177-9173-9a7cdb0af2fb@rivosinc.com>
+        Mon, 06 Jan 2025 06:44:23 -0800 (PST)
+Date: Mon, 6 Jan 2025 09:44:19 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO fixes for v6.13-rc7
+Message-ID: <20250106094419.66067d1c.alex.williamson@redhat.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ada1c6da-d91c-4177-9173-9a7cdb0af2fb@rivosinc.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 06, 2025 at 11:11:42AM +0100, Clément Léger wrote:
-> Gentle ping ?
+Hi Linus,
 
-Thanks for the reminder. I'll try to get to it this week.
+The following changes since commit fc033cf25e612e840e545f8d5ad2edd6ba613ed5:
 
-drew
+  Linux 6.13-rc5 (2024-12-29 13:15:45 -0800)
 
-> 
-> Thanks,
-> 
-> Clément
-> 
-> On 25/11/2024 17:21, Clément Léger wrote:
-> > This series adds an individual test for SBI SSE extension as well as
-> > needed infrastructure for SSE support. It also adds test specific
-> > asm-offsets generation to use custom OFFSET and DEFINE from the test
-> > directory.
-> > 
-> > ---
-> > 
-> > V4:
-> >  - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
-> >  - Add proper asm-offset generation for tests
-> >  - Move SSE specific file from lib/riscv to riscv/
-> > 
-> > V3:
-> >  - Add -deps variable for test specific dependencies
-> >  - Fix formatting errors/typo in sbi.h
-> >  - Add missing double trap event
-> >  - Alphabetize sbi-sse.c includes
-> >  - Fix a6 content after unmasking event
-> >  - Add SSE HART_MASK/UNMASK test
-> >  - Use mv instead of move
-> >  - move sbi_check_sse() definition in sbi.c
-> >  - Remove sbi_sse test from unitests.cfg
-> > 
-> > V2:
-> >  - Rebased on origin/master and integrate it into sbi.c tests
-> > 
-> > Clément Léger (5):
-> >   kbuild: allow multiple asm-offsets file to be generated
-> >   riscv: use asm-offsets to generate SBI_EXT_HSM values
-> >   riscv: Add "-deps" handling for tests
-> >   riscv: lib: Add SBI SSE extension definitions
-> >   riscv: sbi: Add SSE extension tests
-> > 
-> >  scripts/asm-offsets.mak  |   22 +-
-> >  riscv/Makefile           |   10 +-
-> >  lib/riscv/asm/csr.h      |    2 +
-> >  lib/riscv/asm/sbi.h      |   83 +++
-> >  riscv/sbi-tests.h        |   12 +
-> >  riscv/sbi-asm.S          |   96 +++-
-> >  riscv/asm-offsets-test.c |   19 +
-> >  riscv/sbi-sse.c          | 1043 ++++++++++++++++++++++++++++++++++++++
-> >  riscv/sbi.c              |    3 +
-> >  riscv/.gitignore         |    1 +
-> >  10 files changed, 1278 insertions(+), 13 deletions(-)
-> >  create mode 100644 riscv/asm-offsets-test.c
-> >  create mode 100644 riscv/sbi-sse.c
-> >  create mode 100644 riscv/.gitignore
-> > 
-> 
+are available in the Git repository at:
+
+  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.13-rc7
+
+for you to fetch changes up to 09dfc8a5f2ce897005a94bf66cca4f91e4e03700:
+
+  vfio/pci: Fallback huge faults for unaligned pfn (2025-01-03 08:49:05 -0700)
+
+----------------------------------------------------------------
+VFIO fixes for v6.13-rc7
+
+ - Fix a missed order alignment requirement of the pfn when inserting
+   mappings through the new huge fault handler introduced in v6.12.
+   (Alex Williamson)
+
+----------------------------------------------------------------
+Alex Williamson (1):
+      vfio/pci: Fallback huge faults for unaligned pfn
+
+ drivers/vfio/pci/vfio_pci_core.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
 
