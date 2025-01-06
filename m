@@ -1,177 +1,241 @@
-Return-Path: <kvm+bounces-34614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4211CA02CEB
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 16:59:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38EA2A02DC0
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 17:28:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B61243A64C9
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 15:57:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D6F53A59B7
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 16:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F525145A03;
-	Mon,  6 Jan 2025 15:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8637B1DDC3A;
+	Mon,  6 Jan 2025 16:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b="Y8e8CbWq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="V3b0V13M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2080.outbound.protection.outlook.com [40.107.223.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E8D81728
-	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 15:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736179041; cv=none; b=WqoxBYt8G9dFXV0bHIvKSPKWMnBGJ7M/vVUeA2kfqsbKtLGoK/J5yIo7CbNuNveL9ZVticSHsD/DXq+Yfzq/GY/7V17groxG4hB1+14flQB5C8afgIu+9OMYvuVSGVwUWDTFWUw+pfNHRQxIh1GxjYfcK9+iO4LXiQsCUgM/TwE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736179041; c=relaxed/simple;
-	bh=tRUrB/r/tfuAL3vK8alFSNvMMIzwYjh6k3RMYJWmOB0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FqXgC+e9D5DJvTQH688Cjwsfl3K8IOi5XeeJda3qii5K8NRNlZaAoK079Hq1BRC8SZf4xFTLavJe6PnxFvHc7j5cRtFaq8PGZvmtQhIUIf98w7ryY7Hg0DODSlDG+l+Q+V0ME3zamvnF+QpXcur/NxFwYXH5lNmpk9G3iN0ZNoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sslab.ics.keio.ac.jp; spf=none smtp.mailfrom=sslab.ics.keio.ac.jp; dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b=Y8e8CbWq; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sslab.ics.keio.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sslab.ics.keio.ac.jp
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2163dc5155fso206347315ad.0
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 07:57:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sslab.ics.keio.ac.jp; s=google; t=1736179036; x=1736783836; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=N93vSe2DAsJuZgTNRjIV6wR3t9pWSfA7zyzPq7fk4Oo=;
-        b=Y8e8CbWqpdhd6kjX8+uJBECPai7fY9m1ISKoorqYU52wAz2MI5lkQc8wMZFrYZPr+o
-         3tV0z2N3PJElnNxj0aUr2cBLbFsdeQd9fRd62+NBKQJwh2zUVPQ1Jan8zlKvv0RHoZDa
-         UmUPFViswByZSiX2CTG2auSWr4FdMD1mEaPcU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736179036; x=1736783836;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N93vSe2DAsJuZgTNRjIV6wR3t9pWSfA7zyzPq7fk4Oo=;
-        b=tqXB7c2yliLUZOrBtTy0gIEeFaXJIfQXQeogK2vcg5FU4vMKUeNvQGjSznuQwU0CQi
-         e0s3EofArK8mnsOVqSPmALwdpD27yfMDqQ2ibpZXX06TRguR7WWOUGgs1MUUFSyfZOEt
-         3OODWn33OBLqiN9M/wVGFBwlg2OrXSUmHaaS4NnRjjeiAikngOmPA+uYGQ5OBCGMrWMO
-         fcMfpNw5a8nNTP20KgxunP5RM8+NLMOYuLG8gSaKfJCE1nX17kDr35paOte+5u1UAYxA
-         juLlrBq4KJEPhK067pbZWaI3E+Fkc1rnfFHr0Y2iw4eOVSpSdKjkNMgGcfZ+ctW0p829
-         If3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWrLvsCGtVc8JmATgdnhUrr90Qpir/TATgF6GJtLFknslwEI01QHBeqoKkkVU56YCrb/lc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzx0z3Clb10Q0A9vtI8Tg/9KvR7DMByEjgj0yXVe2xdmQNFEKSg
-	QHpJO1EApSgZvwDzklIHKbKyU5bdjuw4YhS1u5d33NlfbxfM9Len05K8w6jqp0o=
-X-Gm-Gg: ASbGncvykYUF8PN/VdYGETAoUjv4Wqxmblo5vzpddjSiUxzjp/1+Njp8ZAd5UsV/uC6
-	fKaHNp7s6SeEVFpRWivwl4Kdw3EnUgUQQO+NBU4awC0vCEJOF4w9EqhNScqoh/+X45NQU/olJ05
-	ENJ5X8sjGZn7GeZgaMOGPSb+O+yjaYtgpQXq3YQHxCIpSgNhCzCiVPHqFGcoNZzVS+iHY/xxX7y
-	20xQqDfjvr9qgApxvMaZ5EvCkxtyZZOTJMhfXk+VqmLKOgiuPw7gXmcbZ5T/WG4loU5tP9mJRbQ
-	byUCzwg54LqnSEveAQ==
-X-Google-Smtp-Source: AGHT+IG4VxobKTRMfWHkqOEB5k1ZQenI6Eqz1wsYpfOBXX86fzC91fIpukWV2YSzC8s+9RmcrhJ6JQ==
-X-Received: by 2002:a17:902:e542:b0:212:1ebf:9a03 with SMTP id d9443c01a7336-219e6e8c4fdmr861763075ad.2.1736179035024;
-        Mon, 06 Jan 2025 07:57:15 -0800 (PST)
-Received: from saraba.tapir-shark.ts.net ([131.113.100.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dca025desm294122405ad.256.2025.01.06.07.57.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 07:57:14 -0800 (PST)
-From: Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
-To: pbonzini@redhat.com,
-	kvm@vger.kernel.org
-Cc: vkuznets@redhat.com,
-	Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
-Subject: [RFC] Para-virtualized TLB flush for PV-waiting vCPUs
-Date: Tue,  7 Jan 2025 00:56:52 +0900
-Message-Id: <20250106155652.484001-1-kentaishiguro@sslab.ics.keio.ac.jp>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1069F86352;
+	Mon,  6 Jan 2025 16:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736180889; cv=fail; b=Tyh+Ds8K72bmj1C1GzyyqmM79qEpKP6wNJbSI30q8nIdzXFIe5kHSIl/r38LasbXgc61pBeuX7gwGcZm0bUufW0eASaLa0faDvEqA9IZf4ufIcsbCJgzIJeO7jqz0TcDquf9hzrkOgNJiasftifO2QqL6iMvSDwYZ+Jq1bYteCI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736180889; c=relaxed/simple;
+	bh=xKep/5dR4uPvDq5vUgmErCtkBc322m64/7mUCGnpNRM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=JXqmg7sJMjlyy7lOAcfdeT9WB+1LcUTo9w171ZQIPuxKGloFLLkmd4CWyfMZEjHQ43AFu6X0MSEPn9HemOP8roI4uadvOLV42DSR/AyUxHm3vccdtJhemQ/ifkersE43XHlFwYEbUgtwsJRjVSdo2xk+OewyLu6j2sIA3QkmuwE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=V3b0V13M; arc=fail smtp.client-ip=40.107.223.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=u38o/BPaTYl9boRhzDQ9pEMhf5IJ5ey1TC4LebR4ApqpKu7FnHQ4tFlggPA74y3Vv3G/cW5FLt9V8NuvVINJ1hrChkcMaDyj6uXq2IRxUnORst0NUNLvhN6ywSLdnLvKkfdKbdsa9ZO0xfE2Rd/zk+LmIN5RBE7rpDvv+tRvo/1kl0hsFs32gxojc5yu5GiQX6pjY5Ng2I4p0FaniZUpHKm+iL+YsExGv5eVdP4wdPSPpo4XD5V+3Nqnu72nMxfUZyrOhAM3c3ELhxTfrP6gw6iJI5Ty7eWfMhupbgXs6Xh2tO35gkFae2VN0/S/no23Q8ti/1R5tdiJsqVWcyCPYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2WSrbi6D11G8VYI94BeDOUnWLQJc9xaHXsYvdaHVnck=;
+ b=FBj+SC2TLsICjTXfGtkeqUXX6Tu4rlDKXR5Xzjp0wpGDliuOVzAEqwOhCtypOY2pG5UBmAdXyjH1cfvLhz4j/9UUSpKlAGcVD15q4qgLipyr4mF97joIN2k23xXFNWvqLLzUpB6ENUnrvmE9h+T+pnhbcJSJ3p3UrXqtM7aLtK3WnayW9qwMqTZ9YpgayUPs7us34VYWsTpFJb4X5WBqZlBrCMrEcYOec3u47WosWMwvYIkn0mgWqHPEE2QOj+dJfZWP3Vzow2ZVLAC7gFPijt2AtECZXxi4psqV8dTmlew/qPbekrcKARKM3MAmyY9v3OmjtkRtmm6sKW0+dbzEkQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2WSrbi6D11G8VYI94BeDOUnWLQJc9xaHXsYvdaHVnck=;
+ b=V3b0V13MxxEXCptzalCCGHP9xoXrhb39PrRJ+mAIobc85+jDxbwEp54fm7sb3O5YT+rEsG4J9Vngtz6K1t8fHliDaCwvR5BqcXL86UGvu2QGqqUXgkEG8xHMu7mhMZmbuVXo8Xi7cr5+GfFdMu18MTjCCo7YHh23RfW8b5v3+htiq/WnA4I+lLdfNKtAnp+zfjerQ2DShbX2BUxyX33YAhzNfXoTtat7+ACZLy8mDtOzCYvqbAKqllKLMDrNMOQuiVVk2SKKtGfJn3G9R2+elW7qmx8CMneFAtftYhr0pbhakIYFEYW451AcCKPxvyrLGXOxTcQnvI+oovRcAQx1zw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by LV3PR12MB9438.namprd12.prod.outlook.com (2603:10b6:408:212::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.16; Mon, 6 Jan
+ 2025 16:27:59 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8314.015; Mon, 6 Jan 2025
+ 16:27:58 +0000
+Date: Mon, 6 Jan 2025 12:27:57 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Simona Vetter <simona.vetter@ffwll.ch>
+Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
+	Wei Lin Guay <wguay@meta.com>, Keith Busch <kbusch@kernel.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Dag Moxnes <dagmoxnes@meta.com>,
+	Nicolaas Viljoen <nviljoen@meta.com>,
+	Oded Gabbay <ogabbay@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Maor Gottlieb <maorg@nvidia.com>
+Subject: Re: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
+ through dmabuf
+Message-ID: <20250106162757.GH5556@nvidia.com>
+References: <Z2BbPKvbxm7jvJL9@kbusch-mbp.dhcp.thefacebook.com>
+ <0f207bf8-572a-4d32-bd24-602a0bf02d90@amd.com>
+ <C369F330-5BAD-4AC6-A13C-EEABD29F2F08@meta.com>
+ <e8759159-b141-410b-be08-aad54eaed41f@amd.com>
+ <IA0PR11MB7185D0E4EE2DA36A87AE6EACF8052@IA0PR11MB7185.namprd11.prod.outlook.com>
+ <0c7ab6c9-9523-41de-91e9-602cbcaa1c68@amd.com>
+ <IA0PR11MB71855CFE176047053A4E6D07F8062@IA0PR11MB7185.namprd11.prod.outlook.com>
+ <0843cda7-6f33-4484-a38a-1f77cbc9d250@amd.com>
+ <20250102133951.GB5556@nvidia.com>
+ <Z3vG9JNOaQMfDZAY@phenom.ffwll.local>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z3vG9JNOaQMfDZAY@phenom.ffwll.local>
+X-ClientProxiedBy: BN0PR04CA0119.namprd04.prod.outlook.com
+ (2603:10b6:408:ec::34) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|LV3PR12MB9438:EE_
+X-MS-Office365-Filtering-Correlation-Id: 34ed0fe6-030a-4a06-825c-08dd2e6f14fa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|7416014|366016|556444022;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bzV3S2dhalljZHMzM3RiQmtBb3BMZS9tZERXQitQcTQ2b1FYRzJvVitGalR2?=
+ =?utf-8?B?RmxMV0grRTRNMkYvdS9EYTJjbHhIU0FHYzd3clM3aW5hbUxUR1BVbVlqTXVQ?=
+ =?utf-8?B?MHF4citqWlFJcVRKb2FMdTE0bEUwZks2eTBMcXRXS0pkcHNjelNLNkdlNTdM?=
+ =?utf-8?B?TjRlcHhRam5BQm5xZXRlU0hKaXFwNmFqQmo5Z0g0QjFWdUNWcFJxRXZnMFhN?=
+ =?utf-8?B?elQrNURIdFhobHRiT1hYVnRaN1FzL3VuR1JSakFPdGNlMGdPWW9MN2Q5ZDhx?=
+ =?utf-8?B?c3JPVm1oS21UZlZIUk1DUzBtTVdOOW9NNWhUTS93VlBpUU0vaGdDcGZRZHBB?=
+ =?utf-8?B?ekgvOWNmcjZIRUlYT05aMy85c0RySno4OWlhRlhUcjB6UGdKMmdyclI0UHlZ?=
+ =?utf-8?B?cHNRSDBmZTh1U3NCQzBOaUlvcytKNWluTFZ6b3NMWEZQbXhjZ1JNaW9vWDlB?=
+ =?utf-8?B?Z0dDUTdxcFZIRXpCUm5aa1dGOThXK2ZsM3dkdXBQTHdoMEkvbllqbWxudmRi?=
+ =?utf-8?B?VG5YbzgyUStMZkNJZHdFM2JacW4vVFJjSzIwTHNWL2JDbWh5cmh0YTBuYUtu?=
+ =?utf-8?B?ZVBVMFVDbVF2YWRKZXM4RGhkeUlaRm15WVBXVExIZzdIc0dvMHBKa0RCZEZk?=
+ =?utf-8?B?dFIwTjFWVVN5c0pRanE5Uk1BUUUwSkJtUWRlanhYQ0tmQXFwc2pMeGEzbjVZ?=
+ =?utf-8?B?RlJYNXJLWEhwRzMvUE5mc2RMTnVzR01jdTYrYmNQa3JhTFY4QUkxQ1pMVVF5?=
+ =?utf-8?B?bml4ZURJTXBXVkVCL3BubURkWGtPekswUjh2Zyt3NlJydGc1K3poVStBZG1s?=
+ =?utf-8?B?VUZyVWwvV2NWZmUzVFRkWWFha1NWamx1a2ZJeldPRFJ4SmtWM1JmOGt4dkxE?=
+ =?utf-8?B?Qkh2QkdwdE9QbmhWY05BN2ZCdWRXclJWckNLNWdKNnVOTGhCNlI3ODZoSXZM?=
+ =?utf-8?B?bzhoNWt0NWhlTUdsM3NPcEM3eEEzQy92ZjNpWS9ZT0hFVUNUNWNpM3JhRUxG?=
+ =?utf-8?B?VitEUFRCZ1ZidkZsTU4zdDVYMWViNXFpVFZUUUljTU1qaWRuVm44ZDFjdThR?=
+ =?utf-8?B?eDBiZGFselEySTNaUGxTNGMrQnViMlVqb3dPYkNzN2RXL0FTMWxvVDg4ZDlH?=
+ =?utf-8?B?dVlIQlhpQ1Iyb2tpM2hNenZsellWSGJ6dWxEemM0VW5TczQxRUtydG9WSGxk?=
+ =?utf-8?B?NGJzaXdQakYrbnMxdkdBdHNJZWROcnQwYXZTYXZUa0ptYVQyTU12TklQNXBO?=
+ =?utf-8?B?Z0JzYmRHU3d0amJTK0cwWElVaXhza3Q2T0Mxemh1Y3dHMk0wK0ZxYldReXN5?=
+ =?utf-8?B?Ty85VEpVdEFlUnQzT3VHWUNmTzVaT29OOGVTQWk3VW1sUGR0ZndvWjVKYis2?=
+ =?utf-8?B?c1BNbmRQS3JPMER2RktQQXN2UzBYTlBqU0hLKzM5a3R2OTRhUXJmQWpIY1gx?=
+ =?utf-8?B?VWMyT200QTZsYVBJTExpS0hDR0NqWWxCMXBoUDRIZ1d0RzVYT3ZLanNyRFFV?=
+ =?utf-8?B?ZWVjVFBhTjRZay95eVdrZW9SV2UyZ1Z1UHRYYUtOSXZEVnJYcHoyTmc0cXRR?=
+ =?utf-8?B?dFE3YjBRdjlobys0UjEwczdQdnNjaTlZUU5uSjZ5NldRSk9kYnBtdllyWU9u?=
+ =?utf-8?B?S2ZtdVpSZG01c3RMSmRXWUdqeG4ydW91SkZVM2Q1dWx4SG51WTBoZ2lhTE5v?=
+ =?utf-8?B?dENRdkpqRkh0dkx2UGdIRk5oZjlIOFQ2cTZ5RllzOGRLZlIrbVNFb2RidEc5?=
+ =?utf-8?B?VndjYmt6V2UyV2dMSjh3YnRJU1BJV01nNXVpQm56d3ZNK1EwL3VlTWZYWU1T?=
+ =?utf-8?B?anJPN3ZQaEtkbUlDWURJdUJvZkVmWFVFWnJYZ2RZSUhzc2pqSkZ6U0JOejdo?=
+ =?utf-8?B?b1dlanVkWnR4b3lMcHJ5ODhpTTlJRzVZT1JueXFUR0JnZFhNNE5VVHdNNjNu?=
+ =?utf-8?Q?N4mlV5Uro1/yAu0vv9NTUOd4Id+yaxfL?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(556444022);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eDdQRnV5ZG1ENXB3NmNMSFFHc1Mva2FtcWdURHF1M3hGR2E3TUJyY0NKVk40?=
+ =?utf-8?B?OFNoZjg5RkRnUklCREF2MUR5aVhwL0NUMDNRVEk0aVNRZVNNd2xTWTBhWmg1?=
+ =?utf-8?B?c05iTzBkS0xHdWpER1RReHp2cUZUMktWMFNxODNPb04vQXFTYmt2N0hVNHJa?=
+ =?utf-8?B?TmNFekRuTndyTnI2WmJZQXZmeGFSNzU2RzZmNTg3YXhpUmRrRklWNUVtODlx?=
+ =?utf-8?B?Z0JDaUJPZm52YjY2bDFnNm9YK0xSMHdZK1VXcDhrZVNFWVo3RlVHRzd4bzB1?=
+ =?utf-8?B?UlY4aFhwNnJIWk1LNnBPMGRMMEVVN0dENlJkck1iN1hXZ2I3WWJFQXFSN2VF?=
+ =?utf-8?B?SkpEVzlWR2xvdDJOUXR2YkhaODNRNWR3UU9OR0xyZW90RFBFcmk4S09yT2p3?=
+ =?utf-8?B?SVhiRDRHOTY4ZTI0N2FIR2MvQjlmZTJDRSt2QjVLa3BGSXg4TzAzMnc2eEZi?=
+ =?utf-8?B?YUxFTWFPYlkzaHVxTHhYZDhpK0ppSHVOOEFRVTBJSlR3cjl2c0RsNXBocEVh?=
+ =?utf-8?B?eFZsblVVV2g2VTBsc3c4clJqQXIwYi9pZmtMRi9FWS9qbHNGeU5ndHJ5djlJ?=
+ =?utf-8?B?WVduWUZVTkpsZ1oyeUh1UHo0RTA5bWNWejRJQ0ZhRzhuTGJSb2htSjZzMkZD?=
+ =?utf-8?B?ajJEOTlhZ25pVXZJWGZ1RmhYYWlpMXFtdHhtbkVMS2dvc1lyRU5ONFJDcnho?=
+ =?utf-8?B?MkdQSmo3Wi9uTE10NnZ5enR2TGpUY2hRQUM3di9rRmtTSks0dkxmc0xrZ1lw?=
+ =?utf-8?B?dHZ1eTJURHN3T2xsTlVtNFpaWnl4RXhLZkR6SDNyTW0wRFpXU0RublpQNmY5?=
+ =?utf-8?B?d3I2STlBWmUrcTFKWHVqSVNjcmRGTzh5dmE3RXQzOEZjMzU0RWNHa1QzRmhm?=
+ =?utf-8?B?d3Q1b1J4aXFPb3NSa1I4cXliUFM5TndQbGVDRm41UHl5alVsVldVMEFkT3l0?=
+ =?utf-8?B?bW9EYnplK1RoVVlDMW5rL25zOVZhWitqYWhXRG1teW9Rc0ZXVVcwbXlzWnlV?=
+ =?utf-8?B?THRoNHJWSTZnc2JiMEZzd3BGd3ZRcnhCTkRjOXpnT0l4MklWTVFtOFl0TzRj?=
+ =?utf-8?B?OEpWWThTbnRtUGZLUG9vSlFWZHNIcExMNzd2a3VydFRyZXFLNXhoVXdYUFA1?=
+ =?utf-8?B?VkxCK0ZnSG1KUmlJQXVmZTZmczg1elVhaWFiY2J4Q3Naa3kzaDF4NGZ5dWF2?=
+ =?utf-8?B?c3RJSThNQUdZdjNGY3FWOHJoTDBQaHM5Z3VhVk8yNzlrdVZ6QlZSSnUyaXRO?=
+ =?utf-8?B?WmNFQllwTFFHV29lcEc2QXZxeXFnOEs2Wm83ZUpnSjFMMHZrSlg0SkdxaTVD?=
+ =?utf-8?B?YkJlbFJQR1VDeGhQSTBxbm96ODZmLzJ5a2ljeXpZeXg3THZraVp0UTAydkpL?=
+ =?utf-8?B?RVliT1pyQmhITkQ2VWFNSEx3Tm5hU1pVTmxUcmxCOUY0MUZlbk1EanplZzFS?=
+ =?utf-8?B?U28xTlRKN3kwWVJCRmhMWmw5dmFhZER4VXpvbVBFOUF2SXhtcGVpc3pHWVo3?=
+ =?utf-8?B?dU9SNHROakZPRGxFWHJUQU5wUzhoVzhyanlaUlh2YjBFOFlVVUhjZFZibFJL?=
+ =?utf-8?B?L1RCdUEzWDVkdWRocjAxUm1uRE4rUkhlblZ1NkpyK2hEVEMxWVFsR1JtSUtn?=
+ =?utf-8?B?ckVOM1RVSHBQN09mcDJNd09paldMZllsYmxKd29xK0xSdVRsYVNvVUFCT2pV?=
+ =?utf-8?B?RFo3SFg4cEYyWFlCdUhKUWc0UzVvMExCWmt2c0luVm5uUHUwVytyeFRDL3RC?=
+ =?utf-8?B?VDdvL1BYblNFM2xHSVN4ZjBJaFFJOVRSblRYZ29LbGM5ZjJUeVRod2FsNmZG?=
+ =?utf-8?B?T0hhZitPTnVVYURzQzhJSUlUcmJNWms3K2JMQmVUemRpSHFoaEp5NUxlMDlQ?=
+ =?utf-8?B?Uy9SRjU0SG1sUzdlYzNLbzBRNEdTaWxybGxyYVFtUEs2SDZUOXVRbXI2Y1ZR?=
+ =?utf-8?B?alNBUklVVVV4bDQvMXJXOFFackhtSTI4ZXRBdHlFMHc5WW56Zm5QMnVjbDFT?=
+ =?utf-8?B?eXZCdUVBdXNSeDZjWEp0TDVTK25xZHBBbGd5Q0FYYkRyVUtRZlN3Wm90VDJU?=
+ =?utf-8?B?bDMrNWZSMDd3RjdPbTFhQk1BcEYzSHVybHNqTjI4QXdJQWpXMC9aV29tdTB2?=
+ =?utf-8?Q?PinU=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34ed0fe6-030a-4a06-825c-08dd2e6f14fa
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2025 16:27:58.6644
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Nfsmu0RX7vkFPPWHQ1zdnGqfp6gkVB3TvUO9q1ZtnYfB+4K/PvBBtn1UfR7bAXIz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9438
 
-In oversubscribed environments, the latency of flushing the remote TLB can
-become significant when the destination virtual CPU (vCPU) is the waiter
-of a para-virtualized queued spinlock that halts with interrupts disabled.
-This occurs because the waiter does not respond to remote function call
-requests until it releases the spinlock. As a result, the source vCPU
-wastes CPU time performing busy-waiting for a response from the
-destination vCPU.
+On Mon, Jan 06, 2025 at 01:05:08PM +0100, Simona Vetter wrote:
+> On Thu, Jan 02, 2025 at 09:39:51AM -0400, Jason Gunthorpe wrote:
+> > On Thu, Dec 19, 2024 at 11:04:54AM +0100, Christian König wrote:
+> > 
+> > > > Based on all the above, I think we can conclude that since dma_buf_put()
+> > > > does not directly (or synchronously) call the f_op->release() handler, a
+> > > > deadlock is unlikely to occur in the scenario you described.
+> > 
+> > Right, there is no deadlock here, and there is nothing inhernetly
+> > wrong with using try_get like this. The locking here is ugly ugly
+> > ugly, I forget why, but this was the best I came up with to untangle
+> > it without deadlocks or races.
+> 
+> Yeah, imo try_get is perfectly fine pattern. With that sorted my only
+> request is to make the try_get specific to the dma_ops, because it only
+> works if both ->release and the calling context of try_get follow the same
+> rules, which by necessity are exporter specific.
 
-To mitigate this issue, this patch extends the target of the PV TLB flush
-to include vCPUs that are halting to wait on the PV qspinlock. Since the
-PV qspinlock waiters voluntarily yield before being preempted by KVM,
-their state does not get preempted, and the current PV TLB flush overlooks
-them. This change allows vCPUs to bypass waiting for PV qspinlock waiters
-during TLB shootdowns.
+We already know the fd is a dma_ops one because it is on an internal
+list and it could not get there otherwise.
 
-This enhancement improves the throughput of the ebizzy workload, which
-intensively causes spinlock contention and TLB shootdowns, in
-oversubscribed environments. The following experimental setup was used to
-evaluate the performance impact:
+The pointer cannot become invalid and freed back to the type safe RCU
+while on the list, meaning the try_get is safe as is.
 
-Host Machine: Dell R760, Intel(R) Xeon(R) Platinum 8468 (48C/96T), 256GB
-memory
-VM0: ebizzy -M, 96 vCPUs, 32GB memory
-VM1: busy-loop, 96 vCPUs, 32GB memory
-Experiments Conducted: 10 iterations
+I think Christian's original advice to just open code it is the best
+option.
 
-Results:
-- Without Patch: 7702.4 records/second (standard deviation: 295.5)
-- With Patch: 9110.9 records/second (standard deviation: 528.6)
+> In full generality as a dma_buf.c interface it's just busted and there's
+> no way to make it work, unless we inflict that locking ugliness on
+> absolutely every exporter.
 
-Signed-off-by: Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
----
- arch/x86/include/uapi/asm/kvm_para.h |  1 +
- arch/x86/kernel/kvm.c                | 13 +++++++++++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
+I'm not sure about that, the struct file code has special logic to
+accommodate the type safe RCU trick. I didn't try to digest it fully,
+but I expect there are ways to use it safely without the locking on
+release.
 
-diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-index a1efa7907a0b..db26e167a707 100644
---- a/arch/x86/include/uapi/asm/kvm_para.h
-+++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -70,6 +70,7 @@ struct kvm_steal_time {
- 
- #define KVM_VCPU_PREEMPTED          (1 << 0)
- #define KVM_VCPU_FLUSH_TLB          (1 << 1)
-+#define KVM_VCPU_IN_PVWAIT          (1 << 2)
- 
- #define KVM_CLOCK_PAIRING_WALLCLOCK 0
- struct kvm_clock_pairing {
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 21e9e4845354..f17057b7d263 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -668,7 +668,8 @@ static void kvm_flush_tlb_multi(const struct cpumask *cpumask,
- 		 */
- 		src = &per_cpu(steal_time, cpu);
- 		state = READ_ONCE(src->preempted);
--		if ((state & KVM_VCPU_PREEMPTED)) {
-+		if ((state & KVM_VCPU_PREEMPTED) ||
-+		    (state & KVM_VCPU_IN_PVWAIT)) {
- 			if (try_cmpxchg(&src->preempted, &state,
- 					state | KVM_VCPU_FLUSH_TLB))
- 				__cpumask_clear_cpu(cpu, flushmask);
-@@ -1045,6 +1046,9 @@ static void kvm_kick_cpu(int cpu)
- 
- static void kvm_wait(u8 *ptr, u8 val)
- {
-+	u8 state;
-+	struct kvm_steal_time *src;
-+
- 	if (in_nmi())
- 		return;
- 
-@@ -1054,8 +1058,13 @@ static void kvm_wait(u8 *ptr, u8 val)
- 	 * in irq spinlock slowpath and no spurious interrupt occur to save us.
- 	 */
- 	if (irqs_disabled()) {
--		if (READ_ONCE(*ptr) == val)
-+		if (READ_ONCE(*ptr) == val) {
-+			src = this_cpu_ptr(&steal_time);
-+			state = READ_ONCE(src->preempted);
-+			try_cmpxchg(&src->preempted, &state,
-+				    state | KVM_VCPU_IN_PVWAIT);
- 			halt();
-+		}
- 	} else {
- 		local_irq_disable();
- 
--- 
-2.25.1
+> > IIRC it was changed a while back because call chains were getting kind of
+> > crazy long with the file release functions and stack overflow was a
+> > problem in some cases.
+> 
+> Hm I thought it was also a "oh fuck deadlocks" moment, because usually
+> most of the very deep fput calls are for temporary reference and not the
+> final one.
 
+That sounds motivating too, but I've also seen cases of being careful
+to unlock before fputting things..
+
+Jason
 
