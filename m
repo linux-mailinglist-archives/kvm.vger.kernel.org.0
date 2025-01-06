@@ -1,98 +1,195 @@
-Return-Path: <kvm+bounces-34630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34631-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75BC8A030DD
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 20:48:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1E0CA03103
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 21:03:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F269318861BF
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 19:48:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D56B9161783
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 20:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F611A3AA8;
-	Mon,  6 Jan 2025 19:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84881DF24B;
+	Mon,  6 Jan 2025 20:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b="BTF9JbDr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pbh92jEU"
 X-Original-To: kvm@vger.kernel.org
-Received: from raptorengineering.com (mail.raptorengineering.com [23.155.224.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FCBCA64
-	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 19:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.155.224.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366271DD9A6
+	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 20:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736192875; cv=none; b=i2++j9ITnbj+14DK4hPZGja57fsnUjzAZuaQwGN3lnsvwC60voNFnajJOs/puWyvH+2a1xiOoae8JoqTfkCpotLlfTRIAgTq7CXcgNWxt7wQjFOlrVu2hwqHcfyzMEu7g/M8ihx9bgTv0U71TYKo/GJCXIPsJF+/DeYoacQB5Zk=
+	t=1736193787; cv=none; b=mmGifAMuP3gqGWRmzSVVKZDkzc07uEGKHmadNTPyLBMNnov1on7yNvFp+A65+e97Yu9GyVN9+pooDWj2vqOL59rjvznEhdZlJthrmy4HToJZXi+LhWaBfP5Ztq6CcPsbIWJP5bFcnAMfRMSSB0cpGqw0PJNO/boTmaeJkEsTolI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736192875; c=relaxed/simple;
-	bh=KcRnOliVbPNnDerGTJx1m+xAYvr2alYi62GnOrQGtCY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=OOITiq0LvtGhBKl/W4dCuYIn2TkEUryggn3Luu7QYrO45c/5V8SJQKT3PoESv29HIK0LMNTPolqIWxttFYX3pgolroNoqh5oQYOBDCJsnajhOks+rhEektpiPNKkCG3/ESui2n9Dl6Sg8Q/LlSffWEyPXcDkQF90y4UPZP0hTUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com; spf=pass smtp.mailfrom=raptorengineering.com; dkim=pass (1024-bit key) header.d=raptorengineering.com header.i=@raptorengineering.com header.b=BTF9JbDr; arc=none smtp.client-ip=23.155.224.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raptorengineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raptorengineering.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id 6E109828840C;
-	Mon,  6 Jan 2025 13:47:52 -0600 (CST)
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id uM6_vjIp4ZJe; Mon,  6 Jan 2025 13:47:51 -0600 (CST)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rptsys.com (Postfix) with ESMTP id C584A828840D;
-	Mon,  6 Jan 2025 13:47:51 -0600 (CST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rptsys.com C584A828840D
+	s=arc-20240116; t=1736193787; c=relaxed/simple;
+	bh=BNHpS4glZyoiXUMHz6FKIlmB1PYCsfVOgxZrMXfj3Ms=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g9Q/SixpJkgMpgCIZ6t/am1NdDUY6zeih7kDLrwCVTn/Tn/umSQK/ar9wOD3inCVWfcYoqwzWgTXMvbnkJBwi6tNwJOJOKP0DnUeng22ChlijrSGbd21UbWI2Jwhiv7A9UgmC7JwB7bA/SbrMMGX5AgU6AAmhq8pvCSFXiUPOgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Pbh92jEU; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-436281c8a38so105989715e9.3
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 12:03:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=raptorengineering.com; s=B8E824E6-0BE2-11E6-931D-288C65937AAD;
-	t=1736192871; bh=KcRnOliVbPNnDerGTJx1m+xAYvr2alYi62GnOrQGtCY=;
-	h=Message-ID:Date:MIME-Version:From:To;
-	b=BTF9JbDrbhsfSd5jo7qDUIra0f0GDGdKbLW7dxP/+19MbewFHIYHPL0KUzK0aDbR0
-	 NyrZKXdpV7myVytWc8H742fp4E/gVctbpQ1Yw4n2AJrzkMFJOJsSn9rJpPLReKHQmU
-	 Ru5YDu5qr852s06HasKdo0CL7mUk4McMtfNiaAfk=
-X-Virus-Scanned: amavisd-new at rptsys.com
-Received: from mail.rptsys.com ([127.0.0.1])
-	by localhost (vali.starlink.edu [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id eXzVAU9ak-L2; Mon,  6 Jan 2025 13:47:51 -0600 (CST)
-Received: from [10.11.0.2] (5.edge.rptsys.com [23.155.224.38])
-	by mail.rptsys.com (Postfix) with ESMTPSA id 4C15A828840C;
-	Mon,  6 Jan 2025 13:47:51 -0600 (CST)
-Message-ID: <8dd4546a-bb03-4727-a8c1-02a26301d1ad@raptorengineering.com>
-Date: Mon, 6 Jan 2025 13:47:50 -0600
+        d=linaro.org; s=google; t=1736193783; x=1736798583; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IVQDyU0aZGqnbGo58WYklNw0MeL8aFrKkG5Vri/XHzI=;
+        b=Pbh92jEUeUYTsixLKUpcvfQeib7I8BSrZZ7YVeR4Jc5AwD/8ZatcatrLUjJgwB0KvV
+         5eWuGVRGJpJwxkZe5AQuNKtpLhsi7VCtN7lNDAaZAKE8lVhCN9SMapkna8Atun4Dolst
+         qs+RSegHvNNTunkT5wWcYdrYn+5Jltqv4PWLzPsyh0OWV13GEDGqvutSpnUG7BcG9EIY
+         CAfrkRGspBd8Az8ImUl1547TQaG+DIGZ9UvA4u4X8Gdbc9YJuQpDKBmjNrrhKZz/0lUa
+         bs9I4LWUK5j36W5wnXl0hxmSc7vDDPq8FiOi/ZRAPAX4Z7OjdJHZMyxBvUQ1Rbg7DtPT
+         5c5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736193783; x=1736798583;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IVQDyU0aZGqnbGo58WYklNw0MeL8aFrKkG5Vri/XHzI=;
+        b=ONCncTSkl8/Zl0MJzhy8IZpN4biashC8O1wFCtrlmf0cSAPusTp3ATQVJ3nfLvoUmM
+         DmKVbL69km9nPqGCB7EC/MZOIXWGrDUcalOhXTnSxbrSBoRGhXm7o5Q6XPiYA/nYDQjj
+         L4W40hM8mkvsS4cFoQnhpXFUodIqUnivvYg3K9q0cbP5jbqw+bXiPqkFdHesxCAmc/Zf
+         ufsW+pwTB+x6jgXZP9JoRqRelSYAXivEHFG0UYpCr0ccUlAC8lPeuvQ5nR2RFOYUkzeM
+         5Ma0VDPxSD9WwzLpw4ienvdIer0sNCBevD1lLNfEoCdJsMR0c5Sn3xkYgGFvBPljwRvk
+         QQuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVi3R7nnVPNm/3p3puQk6ii4tjUdc/UT2a75nj6Y8WPzj4y7uf4Fbj0oyWVQfX2Pr8SxJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp8l/3sCRBXpiKq1qqiypmDp5A1jJmt5BGJYivar1zWYFC5BE/
+	Ww1so4Zgz0S9R0UCjZktZDoqqi3pYPpTZtT0fFhYHWo9u5D0x/EPwojrAy3AaTE=
+X-Gm-Gg: ASbGncupAQS/uT8boZTJgEDdQqjp1cQ5FyranbR60+gUP/QvDyXqcQyWUx3TzLS+5mZ
+	d075qshguYTG/BTrRVTI9k0ZIAXSUcekrKT033Binn68n3p2zhbKnKfytUjopzaUEclyuLBlRUb
+	FqtmWzyYKaNMNiw8fZoLHgx7+kM4UNgmw2POSz99Mzt/FTMkdcKk8MCRXgsuSYPbjE0LevQvpM0
+	LCiJZ9wiY3og60N8+IrFgyBDd2HkndPsLCrXwN3m3Q/iK1DCDD1lRC1QgX3eyBfN8XXqER4dcas
+	XLnJGX6XVmsqzVvsBN37SZLX1tx+HKw=
+X-Google-Smtp-Source: AGHT+IEvY1dOIYQWFga9MrJsSFG0JoKzIh1x57mMzgTfD/hBdAZ0c+WqLtNl81G5solsww92cOjYAA==
+X-Received: by 2002:a05:600c:450f:b0:434:fb65:ebbb with SMTP id 5b1f17b1804b1-436686461cbmr539399575e9.17.1736193783280;
+        Mon, 06 Jan 2025 12:03:03 -0800 (PST)
+Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43656b3b2a4sm611962245e9.27.2025.01.06.12.02.59
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 06 Jan 2025 12:03:01 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	=?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Barrat?= <fbarrat@linux.ibm.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Cameron Esfahani <dirty@apple.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org,
+	Alexander Graf <agraf@csgraf.de>,
+	Paul Durrant <paul@xen.org>,
+	David Hildenbrand <david@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	xen-devel@lists.xenproject.org,
+	qemu-arm@nongnu.org,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@redhat.com>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Reinoud Zandijk <reinoud@netbsd.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	qemu-s390x@nongnu.org,
+	Riku Voipio <riku.voipio@iki.fi>,
+	Anthony PERARD <anthony@xenproject.org>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Sunil Muthuswamy <sunilmut@microsoft.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	"Edgar E . Iglesias" <edgar.iglesias@amd.com>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Phil Dennis-Jordan <phil@philjordan.eu>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Harsh Prateek Bora <harshpb@linux.ibm.com>,
+	Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	qemu-ppc@nongnu.org,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Anton Johansson <anjo@rev.ng>
+Subject: [RFC PATCH 0/7] accel: Add per-accelerator vCPUs queue
+Date: Mon,  6 Jan 2025 21:02:51 +0100
+Message-ID: <20250106200258.37008-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Shawn Anastasio <sanastasio@raptorengineering.com>
-Subject: Raptor Engineering dedicating resources to KVM on PowerNV + KVM CI/CD
-To: kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc: Timothy Pearson <tpearson@raptorengineering.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi all,
+Hi,
 
-Just wanted to check in and let the community know that Raptor
-Engineering will be officially dedicating development resources towards
-maintaining, developing, and testing the existing Linux KVM facilities
-for PowerNV machines.
+Currently we register all vCPUs to the global 'cpus_queue' queue,
+however we can not discriminate per accelerator or per target
+architecture (which might happen in a soon future).
 
-To this end, we have developed a publicly-accessible CI/CD system[1]
-that performs bi-hourly automated KVM smoke tests on PowerNV, as well as
-some more advanced tests involving PCIe passthrough of various graphics
-cards through VFIO on a POWER9/PowerNV system. Access can also be
-provided upon request to any kernel developers that wish to use the test
-system for development/testing against their own trees.
+This series tries to add an accelerator discriminator, so
+accelerator specific code can iterate on its own vCPUs. This
+is required to run a pair of HW + SW accelerators like the
+(HVF, TCG) or (KVM, TCG) combinations. Otherwise, i.e. the
+HVF core code could iterate on TCG vCPUs...
+To keep it simple and not refactor heavily the code base,
+we introduce the CPU_FOREACH_TCG/HVF/KVM() macros, only
+defined for each accelerator.
 
-If anybody has any questions about the test system, or any insights
-about outstanding work items regarding KVM on PowerNV that might need
-attention, please feel free to reach out.
+This is just a RFC to get some thoughts whether this is
+heading in the correct direction or not ;)
 
-Thanks,
-Shawn
+Regards,
 
-[1]
-https://gitlab.raptorengineering.com/raptor-engineering-public/kernel/kernel-developers-ci-cd-access/linux/-/pipelines/1075
+Phil.
+
+Philippe Mathieu-Daudé (7):
+  cpus: Restrict CPU_FOREACH_SAFE() to user emulation
+  cpus: Introduce AccelOpsClass::get_cpus_queue()
+  accel/tcg: Implement tcg_get_cpus_queue()
+  accel/tcg: Use CPU_FOREACH_TCG()
+  accel/hw: Implement hw_accel_get_cpus_queue()
+  accel/hvf: Use CPU_FOREACH_HVF()
+  accel/kvm: Use CPU_FOREACH_KVM()
+
+ accel/tcg/tcg-accel-ops.h         | 10 ++++++++++
+ include/hw/core/cpu.h             | 11 +++++++++++
+ include/system/accel-ops.h        |  6 ++++++
+ include/system/hvf_int.h          |  4 ++++
+ include/system/hw_accel.h         |  9 +++++++++
+ include/system/kvm_int.h          |  3 +++
+ accel/accel-system.c              |  8 ++++++++
+ accel/hvf/hvf-accel-ops.c         |  9 +++++----
+ accel/kvm/kvm-accel-ops.c         |  1 +
+ accel/kvm/kvm-all.c               | 14 +++++++-------
+ accel/tcg/cputlb.c                |  7 ++++---
+ accel/tcg/monitor.c               |  3 ++-
+ accel/tcg/tb-maint.c              |  7 ++++---
+ accel/tcg/tcg-accel-ops-rr.c      | 10 +++++-----
+ accel/tcg/tcg-accel-ops.c         | 16 ++++++++++++----
+ accel/tcg/user-exec-stub.c        |  5 +++++
+ accel/xen/xen-all.c               |  1 +
+ cpu-common.c                      | 10 ++++++++++
+ hw/i386/kvm/clock.c               |  3 ++-
+ hw/intc/spapr_xive_kvm.c          |  5 +++--
+ hw/intc/xics_kvm.c                |  5 +++--
+ system/cpus.c                     |  5 +++++
+ target/arm/hvf/hvf.c              |  4 ++--
+ target/i386/kvm/kvm.c             |  4 ++--
+ target/i386/kvm/xen-emu.c         |  2 +-
+ target/i386/nvmm/nvmm-accel-ops.c |  1 +
+ target/i386/whpx/whpx-accel-ops.c |  1 +
+ target/s390x/kvm/kvm.c            |  2 +-
+ target/s390x/kvm/stsi-topology.c  |  3 ++-
+ 29 files changed, 130 insertions(+), 39 deletions(-)
+
+-- 
+2.47.1
 
 
