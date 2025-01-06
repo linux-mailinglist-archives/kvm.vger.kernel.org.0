@@ -1,136 +1,204 @@
-Return-Path: <kvm+bounces-34571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D3FAA01CFA
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 02:13:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AC9FA01D18
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 02:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B316A1883946
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 01:13:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A90C07A169A
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 01:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C93370811;
-	Mon,  6 Jan 2025 01:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044F182D98;
+	Mon,  6 Jan 2025 01:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="joAW3Inu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EDE179C8;
-	Mon,  6 Jan 2025 01:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A225F78F5D;
+	Mon,  6 Jan 2025 01:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736126024; cv=none; b=NqT/+UNeu9W0yzsdW1UxhBbcZ7TBgcMAVayYxasfysT+Us6idsysGjstbNHx444fk5f46Fb5gI2wW/2sdscnnGjvP3Jv9x3EIs08Afhg9WT3gBNCeeolD2B9dtoPlDGKT5tTXMShUrVarATSuVoslhcYT+hXXv/OCCUNmxkmpXw=
+	t=1736127981; cv=none; b=jhecFWQcTwdna0q1N6sIuOtlYZYBvG417QJBdWfgPhlAO2dbmQZ6kY8+KGoevrSaXFmi+rZVz45ydiroJBv6NqiQ5W8KGjjJdFw5D2F8P9xUKJ2Fy7Af/hBrRMM9R82yhrqMbJ215hfZIcQs0ebto1+zkDbXuT9mCSyI4U+HhDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736126024; c=relaxed/simple;
-	bh=XxeqAeEo5wpYu4CkQPF8l6eADs8tZ2fdC5Oc++KTmtM=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=T8N9Qg4VR6R1n5pUZIYB6DpKuiLHBaYtUL18vud39t41F0Ct1aAshTIR7U09EnveNFlm9TTFNAFAuyJNBLgEgcKZlvAmiWp0hSARnK/Mmmm2QvaMxA9JSyDLEJf0YxMIBPaxTKLTYbT9+vL8dqlQBsQAMgEPF1Cpcnk3VDEH7f8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8DxK6xALntnvnReAA--.366S3;
-	Mon, 06 Jan 2025 09:13:36 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMCxncU9Lntnt9QVAA--.30125S3;
-	Mon, 06 Jan 2025 09:13:34 +0800 (CST)
-Subject: Re: [RFC 0/5] LoongArch: KVM: Add separate vmid support
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20241113031727.2815628-1-maobibo@loongson.cn>
- <CAAhV-H5VH0k6byAX4U0e4rv4tdjtzTSrokXt3tjqpSFRzpU7gg@mail.gmail.com>
-From: bibo mao <maobibo@loongson.cn>
-Message-ID: <ac42e531-26b1-0d4f-60e5-2fbb6ac92c17@loongson.cn>
-Date: Mon, 6 Jan 2025 09:12:46 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1736127981; c=relaxed/simple;
+	bh=tnz17dAtahKXWac/b6u2llXxMbK/9NIYhqczyce3OLo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MrO3HWQm1ncHeOhc6EDhipqUjxCUydLvPAwbk3Z2VyDZosmZBcuZYCGGjnC+STzBbRg0a2usHGHPXVm+709i+DM0BXDO75fqn2z2bwWeO2Q+pgKp/MBVWUEOJTs3oiJxqd1CRSSFwOOyR6yp4sJ+mLDL6ieLnVrAjKfr3VNusPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=joAW3Inu; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736127980; x=1767663980;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tnz17dAtahKXWac/b6u2llXxMbK/9NIYhqczyce3OLo=;
+  b=joAW3InuELB8HO76KqYPYIV75VfJRafwBu5WHOtHMb2UCHcc4JJ8cn/d
+   KX6vyHpaPO8gcyIYsgnRrHvUokj/O8sG+B2vhjFIVo0vYuZRuB35znPn1
+   6V0zhWNc8Uek7bDSLTtBX4mQBN7zSzueLHnFcohyBAuO5e6XEEQMYYa6B
+   5Hq0QsJZUPXyVo8Hnc+esCv7hF1I87gE697CTNF0urTWLoXy2sQ4PKJTM
+   XcyfF37t6IfjDRusbOXCzzio5wief/GcD+mp3svdr3i8RLk1pn0j80shT
+   6mgZbYuPrYZhlejm2MTw+pfnIIyHCusMRfh6fstIV53k0ap3I8DOY7NHP
+   Q==;
+X-CSE-ConnectionGUID: T3HQiGetTryGHWvFS56aYA==
+X-CSE-MsgGUID: R5uF+jlERHKKKRHrw7eqbg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11306"; a="47689184"
+X-IronPort-AV: E=Sophos;i="6.12,291,1728975600"; 
+   d="scan'208";a="47689184"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2025 17:46:19 -0800
+X-CSE-ConnectionGUID: cogdm6AqSQaVw1krgfM2EQ==
+X-CSE-MsgGUID: zxGiEHEyTW+52aWkpmzV2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,291,1728975600"; 
+   d="scan'208";a="107276708"
+Received: from unknown (HELO [10.238.1.62]) ([10.238.1.62])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2025 17:46:15 -0800
+Message-ID: <fc6294b7-f648-4daa-842d-0b74211f8c3a@linux.intel.com>
+Date: Mon, 6 Jan 2025 09:46:12 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H5VH0k6byAX4U0e4rv4tdjtzTSrokXt3tjqpSFRzpU7gg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/16] KVM: TDX: Inhibit APICv for TDX guest
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, isaku.yamahata@intel.com,
+ yan.y.zhao@intel.com, chao.gao@intel.com, linux-kernel@vger.kernel.org,
+ Binbin Wu <binbin.wu@linux.intel.com>
+References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
+ <20241209010734.3543481-13-binbin.wu@linux.intel.com>
+ <CAGtprH9UBZe64zay0HjZRg5f--xM85Yt+jYijKZw=sfxRH=2Ow@mail.gmail.com>
 Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <CAGtprH9UBZe64zay0HjZRg5f--xM85Yt+jYijKZw=sfxRH=2Ow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCxncU9Lntnt9QVAA--.30125S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7tw1UJF4UXw1kZryDJw17XFc_yoW8ZF1fpa
-	y7uFn5Gr4kGrsFy3sIqwnrXrn5tw18GFWSqa4ayryFkF1qqw1UJrWkXrWkuF98X3yfJFyI
-	qF1rKF9F9a1UAacCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
-	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8xuctUU
-	UUU==
 
-Huacai,
 
-On 2025/1/4 下午10:09, Huacai Chen wrote:
-> Hi, Bibo,
-> 
-> Any update on this?
-Sorry for not update it in time.
 
-This patch is basic memory relative, it is only test on 3A6000 with 4 
-cores. I hope it is fully tested on 3C6000 servers with numa support. 
-When new machines arrive and the test is done, I will refresh the patch.
 
-Regards
-Bibo Mao
-> 
-> Huacai
-> 
-> On Wed, Nov 13, 2024 at 11:17 AM Bibo Mao <maobibo@loongson.cn> wrote:
+On 1/4/2025 5:59 AM, Vishal Annapurve wrote:
+> On Sun, Dec 8, 2024 at 5:11 PM Binbin Wu <binbin.wu@linux.intel.com> wrote:
+>> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >>
->> LoongArch KVM hypervisor supports two-level MMU, vpid index is used
->> for stage1 MMU and vmid index is used for stage2 MMU.
+>> Inhibit APICv for TDX guest in KVM since TDX doesn't support APICv accesses
+>> from host VMM.
 >>
->> On 3A5000, vmid must be the same with vpid. On 3A6000 platform vmid
->> may separate from vpid. There are such advantages if separate vpid
->> is supported.
->>    1. One VM uses one vmid, vCPUs on the same VM can share the same vmid.
->>    2. If one vCPU switch between different physical CPU, old vmid can be
->>       still usefil if old vmid is not expired
->>    3. For remote tlb flush, only vmid need update and vpid need not
->> update.
+>> Follow how SEV inhibits APICv.  I.e, define a new inhibit reason for TDX, set
+>> it on TD initialization, and add the flag to kvm_x86_ops.required_apicv_inhibits.
 >>
->> Here add separate vmid feature support, vmid feature detecting method
->> is not implemented since it depends on HW implementation, detecting
->> method will be added when HW is ready.
->>
+>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 >> ---
->> Bibo Mao (5):
->>    LoongArch: KVM: Add vmid support for stage2 MMU
->>    LoongArch: KVM: Add separate vmid feature support
->>    LoongArch: KVM: implement vmid updating logic
->>    LoongArch: KVM: Add remote tlb flushing support
->>    LoongArch: KVM: Enable separate vmid feature
+>> TDX interrupts breakout:
+>> - Removed WARN_ON_ONCE(kvm_apicv_activated(vcpu->kvm)) in
+>>    tdx_td_vcpu_init(). (Rick)
+>> - Change APICV -> APICv in changelog for consistency.
+>> - Split the changelog to 2 paragraphs.
+>> ---
+>>   arch/x86/include/asm/kvm_host.h | 12 +++++++++++-
+>>   arch/x86/kvm/vmx/main.c         |  3 ++-
+>>   arch/x86/kvm/vmx/tdx.c          |  3 +++
+>>   3 files changed, 16 insertions(+), 2 deletions(-)
 >>
->>   arch/loongarch/include/asm/kvm_host.h  | 10 ++++
->>   arch/loongarch/include/asm/loongarch.h |  2 +
->>   arch/loongarch/kernel/asm-offsets.c    |  1 +
->>   arch/loongarch/kvm/main.c              | 76 ++++++++++++++++++++++++--
->>   arch/loongarch/kvm/mmu.c               | 17 ++++++
->>   arch/loongarch/kvm/switch.S            |  5 +-
->>   arch/loongarch/kvm/tlb.c               | 19 ++++++-
->>   arch/loongarch/kvm/vcpu.c              |  7 ++-
->>   8 files changed, 128 insertions(+), 9 deletions(-)
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index 32c7d58a5d68..df535f08e004 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1281,6 +1281,15 @@ enum kvm_apicv_inhibit {
+>>           */
+>>          APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED,
 >>
+>> +       /*********************************************************/
+>> +       /* INHIBITs that are relevant only to the Intel's APICv. */
+>> +       /*********************************************************/
+>> +
+>> +       /*
+>> +        * APICv is disabled because TDX doesn't support it.
+>> +        */
+>> +       APICV_INHIBIT_REASON_TDX,
+>> +
+>>          NR_APICV_INHIBIT_REASONS,
+>>   };
 >>
->> base-commit: 2d5404caa8c7bb5c4e0435f94b28834ae5456623
+>> @@ -1299,7 +1308,8 @@ enum kvm_apicv_inhibit {
+>>          __APICV_INHIBIT_REASON(IRQWIN),                 \
+>>          __APICV_INHIBIT_REASON(PIT_REINJ),              \
+>>          __APICV_INHIBIT_REASON(SEV),                    \
+>> -       __APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED)
+>> +       __APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED),     \
+>> +       __APICV_INHIBIT_REASON(TDX)
+>>
+>>   struct kvm_arch {
+>>          unsigned long n_used_mmu_pages;
+>> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+>> index 7f933f821188..13a0ab0a520c 100644
+>> --- a/arch/x86/kvm/vmx/main.c
+>> +++ b/arch/x86/kvm/vmx/main.c
+>> @@ -445,7 +445,8 @@ static int vt_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+>>           BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |                   \
+>>           BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |        \
+>>           BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |           \
+>> -        BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED))
+>> +        BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED) |         \
+>> +        BIT(APICV_INHIBIT_REASON_TDX))
+>>
+>>   struct kvm_x86_ops vt_x86_ops __initdata = {
+>>          .name = KBUILD_MODNAME,
+>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>> index b0f525069ebd..b51d2416acfb 100644
+>> --- a/arch/x86/kvm/vmx/tdx.c
+>> +++ b/arch/x86/kvm/vmx/tdx.c
+>> @@ -2143,6 +2143,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+>>                  goto teardown;
+>>          }
+>>
+>> +       kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_TDX);
+>> +
+>>          return 0;
+>>
+>>          /*
+>> @@ -2528,6 +2530,7 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+>>                  return -EIO;
+>>          }
+>>
+>> +       vcpu->arch.apic->apicv_active = false;
+> With this setting, apic_timer_expired[1] will always cause timer
+> interrupts to be pending without injecting them right away. Injecting
+> it after VM exit [2] could cause unbounded delays to timer interrupt
+> injection.
+
+When apic->apicv_active is false, it will fallback to increasing the
+apic->lapic_timer.pending and request KVM_REQ_UNBLOCK.
+If apic_timer_expired() is called from timer function, the target vCPU
+will be kicked out immediately.
+So there is no unbounded delay to timer interrupt injection.
+
+In a previous PUCK session, Sean suggested apic->apicv_active should be
+set to true to align with the hardware setting because TDX module always
+enables apicv for TDX guests.
+Will send a write up about changing apicv to active later.
+
+>
+> [1] https://git.kernel.org/pub/scm/virt/kvm/kvm.git/tree/arch/x86/kvm/lapic.c?h=kvm-coco-queue#n1922
+> [2] https://git.kernel.org/pub/scm/virt/kvm/kvm.git/tree/arch/x86/kvm/x86.c?h=kvm-coco-queue#n11263
+>
+>>          vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>>
+>>          return 0;
 >> --
->> 2.39.3
+>> 2.46.0
+>>
 >>
 
 
