@@ -1,241 +1,150 @@
-Return-Path: <kvm+bounces-34615-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34616-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38EA2A02DC0
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 17:28:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 675B4A02DC5
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 17:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D6F53A59B7
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 16:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55A8C163A19
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 16:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8637B1DDC3A;
-	Mon,  6 Jan 2025 16:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0031DDC30;
+	Mon,  6 Jan 2025 16:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="V3b0V13M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="blNbyse9"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2080.outbound.protection.outlook.com [40.107.223.80])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1069F86352;
-	Mon,  6 Jan 2025 16:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736180889; cv=fail; b=Tyh+Ds8K72bmj1C1GzyyqmM79qEpKP6wNJbSI30q8nIdzXFIe5kHSIl/r38LasbXgc61pBeuX7gwGcZm0bUufW0eASaLa0faDvEqA9IZf4ufIcsbCJgzIJeO7jqz0TcDquf9hzrkOgNJiasftifO2QqL6iMvSDwYZ+Jq1bYteCI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736180889; c=relaxed/simple;
-	bh=xKep/5dR4uPvDq5vUgmErCtkBc322m64/7mUCGnpNRM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=JXqmg7sJMjlyy7lOAcfdeT9WB+1LcUTo9w171ZQIPuxKGloFLLkmd4CWyfMZEjHQ43AFu6X0MSEPn9HemOP8roI4uadvOLV42DSR/AyUxHm3vccdtJhemQ/ifkersE43XHlFwYEbUgtwsJRjVSdo2xk+OewyLu6j2sIA3QkmuwE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=V3b0V13M; arc=fail smtp.client-ip=40.107.223.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u38o/BPaTYl9boRhzDQ9pEMhf5IJ5ey1TC4LebR4ApqpKu7FnHQ4tFlggPA74y3Vv3G/cW5FLt9V8NuvVINJ1hrChkcMaDyj6uXq2IRxUnORst0NUNLvhN6ywSLdnLvKkfdKbdsa9ZO0xfE2Rd/zk+LmIN5RBE7rpDvv+tRvo/1kl0hsFs32gxojc5yu5GiQX6pjY5Ng2I4p0FaniZUpHKm+iL+YsExGv5eVdP4wdPSPpo4XD5V+3Nqnu72nMxfUZyrOhAM3c3ELhxTfrP6gw6iJI5Ty7eWfMhupbgXs6Xh2tO35gkFae2VN0/S/no23Q8ti/1R5tdiJsqVWcyCPYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2WSrbi6D11G8VYI94BeDOUnWLQJc9xaHXsYvdaHVnck=;
- b=FBj+SC2TLsICjTXfGtkeqUXX6Tu4rlDKXR5Xzjp0wpGDliuOVzAEqwOhCtypOY2pG5UBmAdXyjH1cfvLhz4j/9UUSpKlAGcVD15q4qgLipyr4mF97joIN2k23xXFNWvqLLzUpB6ENUnrvmE9h+T+pnhbcJSJ3p3UrXqtM7aLtK3WnayW9qwMqTZ9YpgayUPs7us34VYWsTpFJb4X5WBqZlBrCMrEcYOec3u47WosWMwvYIkn0mgWqHPEE2QOj+dJfZWP3Vzow2ZVLAC7gFPijt2AtECZXxi4psqV8dTmlew/qPbekrcKARKM3MAmyY9v3OmjtkRtmm6sKW0+dbzEkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2WSrbi6D11G8VYI94BeDOUnWLQJc9xaHXsYvdaHVnck=;
- b=V3b0V13MxxEXCptzalCCGHP9xoXrhb39PrRJ+mAIobc85+jDxbwEp54fm7sb3O5YT+rEsG4J9Vngtz6K1t8fHliDaCwvR5BqcXL86UGvu2QGqqUXgkEG8xHMu7mhMZmbuVXo8Xi7cr5+GfFdMu18MTjCCo7YHh23RfW8b5v3+htiq/WnA4I+lLdfNKtAnp+zfjerQ2DShbX2BUxyX33YAhzNfXoTtat7+ACZLy8mDtOzCYvqbAKqllKLMDrNMOQuiVVk2SKKtGfJn3G9R2+elW7qmx8CMneFAtftYhr0pbhakIYFEYW451AcCKPxvyrLGXOxTcQnvI+oovRcAQx1zw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by LV3PR12MB9438.namprd12.prod.outlook.com (2603:10b6:408:212::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.16; Mon, 6 Jan
- 2025 16:27:59 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8314.015; Mon, 6 Jan 2025
- 16:27:58 +0000
-Date: Mon, 6 Jan 2025 12:27:57 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Simona Vetter <simona.vetter@ffwll.ch>
-Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
-	Wei Lin Guay <wguay@meta.com>, Keith Busch <kbusch@kernel.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	Dag Moxnes <dagmoxnes@meta.com>,
-	Nicolaas Viljoen <nviljoen@meta.com>,
-	Oded Gabbay <ogabbay@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Maor Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
- through dmabuf
-Message-ID: <20250106162757.GH5556@nvidia.com>
-References: <Z2BbPKvbxm7jvJL9@kbusch-mbp.dhcp.thefacebook.com>
- <0f207bf8-572a-4d32-bd24-602a0bf02d90@amd.com>
- <C369F330-5BAD-4AC6-A13C-EEABD29F2F08@meta.com>
- <e8759159-b141-410b-be08-aad54eaed41f@amd.com>
- <IA0PR11MB7185D0E4EE2DA36A87AE6EACF8052@IA0PR11MB7185.namprd11.prod.outlook.com>
- <0c7ab6c9-9523-41de-91e9-602cbcaa1c68@amd.com>
- <IA0PR11MB71855CFE176047053A4E6D07F8062@IA0PR11MB7185.namprd11.prod.outlook.com>
- <0843cda7-6f33-4484-a38a-1f77cbc9d250@amd.com>
- <20250102133951.GB5556@nvidia.com>
- <Z3vG9JNOaQMfDZAY@phenom.ffwll.local>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z3vG9JNOaQMfDZAY@phenom.ffwll.local>
-X-ClientProxiedBy: BN0PR04CA0119.namprd04.prod.outlook.com
- (2603:10b6:408:ec::34) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B562C86354
+	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 16:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736180933; cv=none; b=A/7yongDMlNjr7BbY1qnkmwYN3Kd2OQGCae9l1zjnlE7yvNyDW0EkonoiZq7UqSRx6vMeiaiNWsCJx/HSiNBymB+09X1SRjXSylJDz9RICNENnqa3FIUjZeVPk6NYfpv6Djtq4+RSNbepfA3TDqwq0iA5EDxD0IRKc8LLQF2Lbs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736180933; c=relaxed/simple;
+	bh=bqA1UybnyzZGHI20admmSzA4zWOEjPM4b0uF7KYKxt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qGVrkfyOloGLE468AS+IcWWweP/WFkIodtiUjuex5EYpY3+FXhRUa05ERpIHCFgn3fwTEUFpN2HrBGxlEUic1EETVdtn4g69lQSQcNvSuDULuFK13K+dqJIh9LpAOAUYRxw2EdNctGaMZkykLOv+GO7fTrWqaNnQoa/ORFvrHzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=blNbyse9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736180930;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iTSPijXcjiAMCVDWekBe6V30dPAU6QGdX7quKRrwsHs=;
+	b=blNbyse9Ddg9Ek8xxItBx+0vlfPxP16YBTHK/YiNIn174ISRZr3GMPIouCCHdLGZe8ArYc
+	YwJbDLX15Fu5l8XN7mTDFTO9s6HYgJSZ+E80AF5u5w2w+46QoIBhGW5EzndHeoyliFDkPq
+	5k2PwRIvjJ9lrCGui/IFvzrP0p3YjuU=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-169-Wu5BprnoMSW5JVIkvItXPQ-1; Mon, 06 Jan 2025 11:28:49 -0500
+X-MC-Unique: Wu5BprnoMSW5JVIkvItXPQ-1
+X-Mimecast-MFC-AGG-ID: Wu5BprnoMSW5JVIkvItXPQ
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-84cd123df74so630839f.3
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 08:28:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736180926; x=1736785726;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iTSPijXcjiAMCVDWekBe6V30dPAU6QGdX7quKRrwsHs=;
+        b=r/D+ftUKQcFkUw2jErmjcSP82Q2GMssCt9JzURr4VtZ8yHp03aEgMJN8IuRW1eexmq
+         UKb3koiyu+gzOgKhwZfN0wtTMzK1bpo934GJHw53Mql9znXR0oagrHcJG+DPfzrPDj0J
+         dB7IlmaXOT8OirShker+pPAffg6vAmIAYHRAF9G+77nStkOYaeDGj9W6lE/XSBwpHRvD
+         A7rKprgT7XpOB6wJETGIageYyBIZunNJqYmjPFWQsHBZYoSwxwYxXR5UM40jT9Fx8I5q
+         FMrlMDvzuHpjlMf7tr+/t+30MjMRXWoPiuJI9s9+ioW2idxH/2zP6V87HiScqMmn60Ns
+         DtLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRkqZULH26hn1xWLmkW/BMXBCjFMnoQ77ateO573aBW04eikqqoaVPFCvZCrb181M65BY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYxOBhFwLSt9dgSx4JPXqd3SMEEbM88eNHnqIVxveJp5U9SEGm
+	wXWjbpIbZLZUVrrgnZztNKvgzZXqelpDWhTSjJwejHkNIKm4AkXAZZHK/yS3bAEueOqJzFK8hEE
+	gBWXKaXRiUK93s8XrAWce37OueynzbdbQTl6mHOsOGEKIDhEyug==
+X-Gm-Gg: ASbGncvSyfqRDxedWjLdVPRbLjqtDMSOLA0KBpShahrVPLp8FIAk0G9NFVLK0oKbdyK
+	VVTudPmrMNaH8WsjnHBViv4qvr8EBkfirmj3UHZ/yggxbYGoLvdIfF2tC/AFroHzrEnbjUVc9+X
+	JNDWJ/Ch/9CMClDMBYMrQzhtwChtqD8grx+AyQagK9Xo3k13+3YGJ20KF40Y3OKcl5uT/fJLKL+
+	dn2eaeJpg5fTCCm4MCda6GIIpdaV1/7aAvrgnOBT0sYg5qcM6VQjd/pu03T
+X-Received: by 2002:a05:6602:2dc2:b0:847:5b61:636c with SMTP id ca18e2360f4ac-8499e4c8cf8mr1605757039f.2.1736180926527;
+        Mon, 06 Jan 2025 08:28:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFhi2SYCIWSDt6cklfzahC0bZr7S4U+xeNewvxNt7RadojvE0j28xssj9KSgjAMXq4it3yS9g==
+X-Received: by 2002:a05:6602:2dc2:b0:847:5b61:636c with SMTP id ca18e2360f4ac-8499e4c8cf8mr1605755939f.2.1736180926206;
+        Mon, 06 Jan 2025 08:28:46 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8498d8eb32asm891093239f.42.2025.01.06.08.28.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jan 2025 08:28:45 -0800 (PST)
+Date: Mon, 6 Jan 2025 11:28:40 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Ramesh Thomas <ramesh.thomas@intel.com>
+Cc: jgg@ziepe.ca, schnelle@linux.ibm.com, gbayer@linux.ibm.com,
+ kvm@vger.kernel.org, linux-s390@vger.kernel.org, ankita@nvidia.com,
+ yishaih@nvidia.com, pasic@linux.ibm.com, julianr@linux.ibm.com,
+ bpsegal@us.ibm.com, kevin.tian@intel.com, cho@microsoft.com
+Subject: Re: [PATCH v3 0/2]  Extend 8-byte PCI load/store support to x86
+ arch
+Message-ID: <20250106112840.423340ae.alex.williamson@redhat.com>
+In-Reply-To: <20241210131938.303500-1-ramesh.thomas@intel.com>
+References: <20241210131938.303500-1-ramesh.thomas@intel.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|LV3PR12MB9438:EE_
-X-MS-Office365-Filtering-Correlation-Id: 34ed0fe6-030a-4a06-825c-08dd2e6f14fa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|7416014|366016|556444022;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bzV3S2dhalljZHMzM3RiQmtBb3BMZS9tZERXQitQcTQ2b1FYRzJvVitGalR2?=
- =?utf-8?B?RmxMV0grRTRNMkYvdS9EYTJjbHhIU0FHYzd3clM3aW5hbUxUR1BVbVlqTXVQ?=
- =?utf-8?B?MHF4citqWlFJcVRKb2FMdTE0bEUwZks2eTBMcXRXS0pkcHNjelNLNkdlNTdM?=
- =?utf-8?B?TjRlcHhRam5BQm5xZXRlU0hKaXFwNmFqQmo5Z0g0QjFWdUNWcFJxRXZnMFhN?=
- =?utf-8?B?elQrNURIdFhobHRiT1hYVnRaN1FzL3VuR1JSakFPdGNlMGdPWW9MN2Q5ZDhx?=
- =?utf-8?B?c3JPVm1oS21UZlZIUk1DUzBtTVdOOW9NNWhUTS93VlBpUU0vaGdDcGZRZHBB?=
- =?utf-8?B?ekgvOWNmcjZIRUlYT05aMy85c0RySno4OWlhRlhUcjB6UGdKMmdyclI0UHlZ?=
- =?utf-8?B?cHNRSDBmZTh1U3NCQzBOaUlvcytKNWluTFZ6b3NMWEZQbXhjZ1JNaW9vWDlB?=
- =?utf-8?B?Z0dDUTdxcFZIRXpCUm5aa1dGOThXK2ZsM3dkdXBQTHdoMEkvbllqbWxudmRi?=
- =?utf-8?B?VG5YbzgyUStMZkNJZHdFM2JacW4vVFJjSzIwTHNWL2JDbWh5cmh0YTBuYUtu?=
- =?utf-8?B?ZVBVMFVDbVF2YWRKZXM4RGhkeUlaRm15WVBXVExIZzdIc0dvMHBKa0RCZEZk?=
- =?utf-8?B?dFIwTjFWVVN5c0pRanE5Uk1BUUUwSkJtUWRlanhYQ0tmQXFwc2pMeGEzbjVZ?=
- =?utf-8?B?RlJYNXJLWEhwRzMvUE5mc2RMTnVzR01jdTYrYmNQa3JhTFY4QUkxQ1pMVVF5?=
- =?utf-8?B?bml4ZURJTXBXVkVCL3BubURkWGtPekswUjh2Zyt3NlJydGc1K3poVStBZG1s?=
- =?utf-8?B?VUZyVWwvV2NWZmUzVFRkWWFha1NWamx1a2ZJeldPRFJ4SmtWM1JmOGt4dkxE?=
- =?utf-8?B?Qkh2QkdwdE9QbmhWY05BN2ZCdWRXclJWckNLNWdKNnVOTGhCNlI3ODZoSXZM?=
- =?utf-8?B?bzhoNWt0NWhlTUdsM3NPcEM3eEEzQy92ZjNpWS9ZT0hFVUNUNWNpM3JhRUxG?=
- =?utf-8?B?VitEUFRCZ1ZidkZsTU4zdDVYMWViNXFpVFZUUUljTU1qaWRuVm44ZDFjdThR?=
- =?utf-8?B?eDBiZGFselEySTNaUGxTNGMrQnViMlVqb3dPYkNzN2RXL0FTMWxvVDg4ZDlH?=
- =?utf-8?B?dVlIQlhpQ1Iyb2tpM2hNenZsellWSGJ6dWxEemM0VW5TczQxRUtydG9WSGxk?=
- =?utf-8?B?NGJzaXdQakYrbnMxdkdBdHNJZWROcnQwYXZTYXZUa0ptYVQyTU12TklQNXBO?=
- =?utf-8?B?Z0JzYmRHU3d0amJTK0cwWElVaXhza3Q2T0Mxemh1Y3dHMk0wK0ZxYldReXN5?=
- =?utf-8?B?Ty85VEpVdEFlUnQzT3VHWUNmTzVaT29OOGVTQWk3VW1sUGR0ZndvWjVKYis2?=
- =?utf-8?B?c1BNbmRQS3JPMER2RktQQXN2UzBYTlBqU0hLKzM5a3R2OTRhUXJmQWpIY1gx?=
- =?utf-8?B?VWMyT200QTZsYVBJTExpS0hDR0NqWWxCMXBoUDRIZ1d0RzVYT3ZLanNyRFFV?=
- =?utf-8?B?ZWVjVFBhTjRZay95eVdrZW9SV2UyZ1Z1UHRYYUtOSXZEVnJYcHoyTmc0cXRR?=
- =?utf-8?B?dFE3YjBRdjlobys0UjEwczdQdnNjaTlZUU5uSjZ5NldRSk9kYnBtdllyWU9u?=
- =?utf-8?B?S2ZtdVpSZG01c3RMSmRXWUdqeG4ydW91SkZVM2Q1dWx4SG51WTBoZ2lhTE5v?=
- =?utf-8?B?dENRdkpqRkh0dkx2UGdIRk5oZjlIOFQ2cTZ5RllzOGRLZlIrbVNFb2RidEc5?=
- =?utf-8?B?VndjYmt6V2UyV2dMSjh3YnRJU1BJV01nNXVpQm56d3ZNK1EwL3VlTWZYWU1T?=
- =?utf-8?B?anJPN3ZQaEtkbUlDWURJdUJvZkVmWFVFWnJYZ2RZSUhzc2pqSkZ6U0JOejdo?=
- =?utf-8?B?b1dlanVkWnR4b3lMcHJ5ODhpTTlJRzVZT1JueXFUR0JnZFhNNE5VVHdNNjNu?=
- =?utf-8?Q?N4mlV5Uro1/yAu0vv9NTUOd4Id+yaxfL?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(556444022);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eDdQRnV5ZG1ENXB3NmNMSFFHc1Mva2FtcWdURHF1M3hGR2E3TUJyY0NKVk40?=
- =?utf-8?B?OFNoZjg5RkRnUklCREF2MUR5aVhwL0NUMDNRVEk0aVNRZVNNd2xTWTBhWmg1?=
- =?utf-8?B?c05iTzBkS0xHdWpER1RReHp2cUZUMktWMFNxODNPb04vQXFTYmt2N0hVNHJa?=
- =?utf-8?B?TmNFekRuTndyTnI2WmJZQXZmeGFSNzU2RzZmNTg3YXhpUmRrRklWNUVtODlx?=
- =?utf-8?B?Z0JDaUJPZm52YjY2bDFnNm9YK0xSMHdZK1VXcDhrZVNFWVo3RlVHRzd4bzB1?=
- =?utf-8?B?UlY4aFhwNnJIWk1LNnBPMGRMMEVVN0dENlJkck1iN1hXZ2I3WWJFQXFSN2VF?=
- =?utf-8?B?SkpEVzlWR2xvdDJOUXR2YkhaODNRNWR3UU9OR0xyZW90RFBFcmk4S09yT2p3?=
- =?utf-8?B?SVhiRDRHOTY4ZTI0N2FIR2MvQjlmZTJDRSt2QjVLa3BGSXg4TzAzMnc2eEZi?=
- =?utf-8?B?YUxFTWFPYlkzaHVxTHhYZDhpK0ppSHVOOEFRVTBJSlR3cjl2c0RsNXBocEVh?=
- =?utf-8?B?eFZsblVVV2g2VTBsc3c4clJqQXIwYi9pZmtMRi9FWS9qbHNGeU5ndHJ5djlJ?=
- =?utf-8?B?WVduWUZVTkpsZ1oyeUh1UHo0RTA5bWNWejRJQ0ZhRzhuTGJSb2htSjZzMkZD?=
- =?utf-8?B?ajJEOTlhZ25pVXZJWGZ1RmhYYWlpMXFtdHhtbkVMS2dvc1lyRU5ONFJDcnho?=
- =?utf-8?B?MkdQSmo3Wi9uTE10NnZ5enR2TGpUY2hRQUM3di9rRmtTSks0dkxmc0xrZ1lw?=
- =?utf-8?B?dHZ1eTJURHN3T2xsTlVtNFpaWnl4RXhLZkR6SDNyTW0wRFpXU0RublpQNmY5?=
- =?utf-8?B?d3I2STlBWmUrcTFKWHVqSVNjcmRGTzh5dmE3RXQzOEZjMzU0RWNHa1QzRmhm?=
- =?utf-8?B?d3Q1b1J4aXFPb3NSa1I4cXliUFM5TndQbGVDRm41UHl5alVsVldVMEFkT3l0?=
- =?utf-8?B?bW9EYnplK1RoVVlDMW5rL25zOVZhWitqYWhXRG1teW9Rc0ZXVVcwbXlzWnlV?=
- =?utf-8?B?THRoNHJWSTZnc2JiMEZzd3BGd3ZRcnhCTkRjOXpnT0l4MklWTVFtOFl0TzRj?=
- =?utf-8?B?OEpWWThTbnRtUGZLUG9vSlFWZHNIcExMNzd2a3VydFRyZXFLNXhoVXdYUFA1?=
- =?utf-8?B?VkxCK0ZnSG1KUmlJQXVmZTZmczg1elVhaWFiY2J4Q3Naa3kzaDF4NGZ5dWF2?=
- =?utf-8?B?c3RJSThNQUdZdjNGY3FWOHJoTDBQaHM5Z3VhVk8yNzlrdVZ6QlZSSnUyaXRO?=
- =?utf-8?B?WmNFQllwTFFHV29lcEc2QXZxeXFnOEs2Wm83ZUpnSjFMMHZrSlg0SkdxaTVD?=
- =?utf-8?B?YkJlbFJQR1VDeGhQSTBxbm96ODZmLzJ5a2ljeXpZeXg3THZraVp0UTAydkpL?=
- =?utf-8?B?RVliT1pyQmhITkQ2VWFNSEx3Tm5hU1pVTmxUcmxCOUY0MUZlbk1EanplZzFS?=
- =?utf-8?B?U28xTlRKN3kwWVJCRmhMWmw5dmFhZER4VXpvbVBFOUF2SXhtcGVpc3pHWVo3?=
- =?utf-8?B?dU9SNHROakZPRGxFWHJUQU5wUzhoVzhyanlaUlh2YjBFOFlVVUhjZFZibFJL?=
- =?utf-8?B?L1RCdUEzWDVkdWRocjAxUm1uRE4rUkhlblZ1NkpyK2hEVEMxWVFsR1JtSUtn?=
- =?utf-8?B?ckVOM1RVSHBQN09mcDJNd09paldMZllsYmxKd29xK0xSdVRsYVNvVUFCT2pV?=
- =?utf-8?B?RFo3SFg4cEYyWFlCdUhKUWc0UzVvMExCWmt2c0luVm5uUHUwVytyeFRDL3RC?=
- =?utf-8?B?VDdvL1BYblNFM2xHSVN4ZjBJaFFJOVRSblRYZ29LbGM5ZjJUeVRod2FsNmZG?=
- =?utf-8?B?T0hhZitPTnVVYURzQzhJSUlUcmJNWms3K2JMQmVUemRpSHFoaEp5NUxlMDlQ?=
- =?utf-8?B?Uy9SRjU0SG1sUzdlYzNLbzBRNEdTaWxybGxyYVFtUEs2SDZUOXVRbXI2Y1ZR?=
- =?utf-8?B?alNBUklVVVV4bDQvMXJXOFFackhtSTI4ZXRBdHlFMHc5WW56Zm5QMnVjbDFT?=
- =?utf-8?B?eXZCdUVBdXNSeDZjWEp0TDVTK25xZHBBbGd5Q0FYYkRyVUtRZlN3Wm90VDJU?=
- =?utf-8?B?bDMrNWZSMDd3RjdPbTFhQk1BcEYzSHVybHNqTjI4QXdJQWpXMC9aV29tdTB2?=
- =?utf-8?Q?PinU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34ed0fe6-030a-4a06-825c-08dd2e6f14fa
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2025 16:27:58.6644
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Nfsmu0RX7vkFPPWHQ1zdnGqfp6gkVB3TvUO9q1ZtnYfB+4K/PvBBtn1UfR7bAXIz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9438
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 06, 2025 at 01:05:08PM +0100, Simona Vetter wrote:
-> On Thu, Jan 02, 2025 at 09:39:51AM -0400, Jason Gunthorpe wrote:
-> > On Thu, Dec 19, 2024 at 11:04:54AM +0100, Christian König wrote:
-> > 
-> > > > Based on all the above, I think we can conclude that since dma_buf_put()
-> > > > does not directly (or synchronously) call the f_op->release() handler, a
-> > > > deadlock is unlikely to occur in the scenario you described.
-> > 
-> > Right, there is no deadlock here, and there is nothing inhernetly
-> > wrong with using try_get like this. The locking here is ugly ugly
-> > ugly, I forget why, but this was the best I came up with to untangle
-> > it without deadlocks or races.
+On Tue, 10 Dec 2024 05:19:36 -0800
+Ramesh Thomas <ramesh.thomas@intel.com> wrote:
+
+> This patch series extends the recently added 8-byte PCI load/store
+> support to the x86 architecture. 
 > 
-> Yeah, imo try_get is perfectly fine pattern. With that sorted my only
-> request is to make the try_get specific to the dma_ops, because it only
-> works if both ->release and the calling context of try_get follow the same
-> rules, which by necessity are exporter specific.
-
-We already know the fd is a dma_ops one because it is on an internal
-list and it could not get there otherwise.
-
-The pointer cannot become invalid and freed back to the type safe RCU
-while on the list, meaning the try_get is safe as is.
-
-I think Christian's original advice to just open code it is the best
-option.
-
-> In full generality as a dma_buf.c interface it's just busted and there's
-> no way to make it work, unless we inflict that locking ugliness on
-> absolutely every exporter.
-
-I'm not sure about that, the struct file code has special logic to
-accommodate the type safe RCU trick. I didn't try to digest it fully,
-but I expect there are ways to use it safely without the locking on
-release.
-
-> > IIRC it was changed a while back because call chains were getting kind of
-> > crazy long with the file release functions and stack overflow was a
-> > problem in some cases.
+> Refer patch series adding above support:
+> https://lore.kernel.org/all/20240522150651.1999584-1-gbayer@linux.ibm.com/
 > 
-> Hm I thought it was also a "oh fuck deadlocks" moment, because usually
-> most of the very deep fput calls are for temporary reference and not the
-> final one.
+> The 8-byte implementations are enclosed inside #ifdef checks of the
+> macros "ioread64" and "iowrite64". These macros don't get defined if
+> CONFIG_GENERIC_IOMAP is defined. CONFIG_GENERIC_IOMAP gets defined for
+> x86 and hence the macros are undefined. Due to this the 8-byte support
+> was not enabled for x86 architecture.
+> 
+> To resolve this, include the header file io-64-nonatomic-lo-hi.h that
+> maps the ioread64 and iowrite64 macros to a generic implementation in
+> lib/iomap.c. This was the intention of defining CONFIG_GENERIC_IOMAP.
+> 
+> Tested using a pass-through PCI device bound to vfio-pci driver and
+> doing BAR reads and writes that trigger calls to
+> vfio_pci_core_do_io_rw() that does the 8-byte reads and writes.
+> 
+> Patch history:
+> v3: Do not add the check for CONFIG_64BIT and only remove the checks for
+> ioread64 and iowrite64.
+> 
+> v2: Based on Jason's feedback moved #include io-64-nonatomic-lo-hi.h
+> to vfio_pci_rdwr.c and replaced #ifdef checks of iowrite64 and ioread64
+> macros with checks for CONFIG_64BIT.
+> 
+> https://lore.kernel.org/all/20240522232125.548643-1-ramesh.thomas@intel.com/
+> https://lore.kernel.org/all/20240524140013.GM69273@ziepe.ca/
+> https://lore.kernel.org/all/bfb273b2-fc5e-4a8b-a40d-56996fc9e0af@intel.com/
+> 
+> Ramesh Thomas (2):
+>   vfio/pci: Enable iowrite64 and ioread64 for vfio pci
+>   vfio/pci: Remove #ifdef iowrite64 and #ifdef ioread64
+> 
+>  drivers/vfio/pci/vfio_pci_rdwr.c | 13 +------------
+>  1 file changed, 1 insertion(+), 12 deletions(-)
+> 
 
-That sounds motivating too, but I've also seen cases of being careful
-to unlock before fputting things..
+Applied to vfio next branch for v6.14.  Thanks,
 
-Jason
+Alex
+
 
