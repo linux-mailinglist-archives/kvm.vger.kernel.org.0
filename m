@@ -1,128 +1,161 @@
-Return-Path: <kvm+bounces-34622-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34623-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85B2AA02FC2
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 19:29:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37A07A03003
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 19:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DC427A1C50
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 18:29:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A59993A3FD4
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 18:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3001DEFE8;
-	Mon,  6 Jan 2025 18:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6831DF724;
+	Mon,  6 Jan 2025 18:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rtYFuW8N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QR4TK6y0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E756CFBF6
-	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 18:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED771DE3CA
+	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 18:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736188169; cv=none; b=eV4rlMb8ljn3dPj3BbOkssxbco+oItpFNlCARD2zXquhMBdxBVRhDMNMqNsNXSnpY/Qt/pHslZdSl3APNjWcl3U1mlN7KzNs539L0WGnxRTIAANwDN4QoG6+UVzayLdXaC+/C8fH0h3cV8IGHzTbm6lkdskW9TWWjBRZ1Q1GYvw=
+	t=1736189876; cv=none; b=H0kPzv78P5SXqdL6KAfaOTQF2/Z+C1SyHG8wJDg9FYjZ3+cqpyOuJKSYd9fcEPnGku2XXKCEoL4f1n5mD8LF+VWwmPcPML9UdTQZRIdcb8h2ubM0ny+F0RqBichWz1beUY7OBHc6sFLG4Z8HK76Dy/bwKoZg8seq4M4tnC5RXeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736188169; c=relaxed/simple;
-	bh=aC5pxjlHoVfpis0kfg0Ph6v/kLOiex21gcAR0w4n5V4=;
+	s=arc-20240116; t=1736189876; c=relaxed/simple;
+	bh=2OZKrS1dUkLlPuhPdhwGi7QnWZ+8XGoT1QDIIrdkEpI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N77QQ9xYw9sZ4loCmcZvHaHq4FQ7eQuSPAZP6/4eHOHQYwDdOUXzJIriIrT4bmsRRcsPOJBCC0LNZYpIzihP/thlRmmiCEZGZ9defc0MqWUh10n3CwCtYAygiyScUkG2KwNHJOKwj9876GEvqyoGZWoWwKQtprE05bBA22wByQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rtYFuW8N; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=SkQYYZcv1L+7d/n7nwCeq9bjYmQ4EDwsMBRrYqPSPc0E8HhDfnuqW5HQruhAzwgKm17FTJRFkgj4jSFBm7NX8SJsG1b2e0cKQwX6u1w+0YyfRg5XcUv0+g1nXWZN/4PqYrp1W36r3y6SQBIEIHWVggriCbJDDkXO8S/Fi3deZH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QR4TK6y0; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9e38b0cfso20404387a91.0
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 10:29:27 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2161d185f04so153175875ad.3
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 10:57:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736188167; x=1736792967; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iqJahD05CoKM1P+9hzduA76fyhopabrf40U3rdXLaF4=;
-        b=rtYFuW8NULBGVh/EDl/YVKbDzNUEhwuprZDejX5T4iWyDh9/DHtD1p7f7rGXmJzxpw
-         AGGThn3ZuzDtu58rxpnPjYTn4xb2V44LT3JI1XsgzJ+eaFYPQK8ZyMfEM0QcKY4VMG2T
-         KhDPPt9LZQDb+wM9TWUgy08Jx0yi5ACGlqKoK6LbBOpTKeh4fZvO2c3M6VZnnQy6IbLZ
-         yWGYmJp5LmUAkkm2aOjmp8B+/bdev096/+CMAJtKrhA22xbV0P8gcoDKiYxRlF85UAJj
-         OJ3QxenVXs3ptdaT4kFcAcSRKYa2yCAK9UOUmC2aM1keo6hTyaWYomkli+X7fRiAYNHC
-         JKTQ==
+        d=google.com; s=20230601; t=1736189874; x=1736794674; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/aNADIekx2j0/enI87SMjtmQjX7teTUCuYI/dNHjl3o=;
+        b=QR4TK6y0Qy0ZduGMCFwtPrdZwwEv46yflW88CuxZEuVghrJdVaEZsNQromlJaeW9X5
+         LqFkZr/RTVLO3QiG6mw/Pxrr9OHVIw1aTlzjaWeRQgKOcU/NXzH64o9/xFN34mn1D5Mg
+         rHpjVRR40CDlpxeEQ1qXa0QVQpaoSKXTKGcLwTBGASa0InbIBUCZxD49IgVMb5jeyW/C
+         gvKNq/+aclsH97g5pwBoKBhIXu3jC0ralbDQb4B2k8newfJi64TAr2x3OE2079y0FWw+
+         /JbVv1AubaMTmTOxdT3fhfAZZetyNf/ojiCUwT8iZelu/TaRbGymbUoYxyEvn59wm0jm
+         HnMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736188167; x=1736792967;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iqJahD05CoKM1P+9hzduA76fyhopabrf40U3rdXLaF4=;
-        b=sMxj/2Sq9fhXhZ2GUbgv2Zb17HIr+kbHA56yfVf5JzSQ2zrqons1uhHjIsoh/Cl+7+
-         MH4E/3qzaUobk7WkuUMbFvCXdj83eHu0Ny8b5oZdd1QgEyNJLP99MHFvkyKkc8MfpmI1
-         oS8HKazErFtjLdtrOovTH3Wc+a8JoTq7o5ho0wx1wme09wHVQUiCXsq7hNhUQKr66PAE
-         wRJ6jFvuogc9xPcy1IS/jTJEcYdxEhxnzS8qmTKqwHeqLRDiSDo8eH4wmuXqgyAP3IYF
-         nvO1Q28uN5NqkB5ITTxESnK4Gax9vFx6uNdA/61LGej48a4OEUIAzmybsFz6JH81xC8f
-         pnug==
-X-Forwarded-Encrypted: i=1; AJvYcCVKrSVtZjer8w00oMAUzDxWyySZPg0zVW4OCYCKmW1L5l3JHRs0V47fc1emnBC1EvoZPik=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaVOjfFsoFW9ZEPEv/Wit8R/6blxA0fo3lMcRl7b+f9skX8GAm
-	FphN7Ph1UPA8OxfJaUX6XhABrOuJX8Ffl2c/EXTqEmQgIPeqV48BJfrs0ZTFbp08A6gvFCTjpn3
-	0hQ==
-X-Google-Smtp-Source: AGHT+IG36Tj1MEd1do7PTJpeYtiE0FYql983/qkYoONMBWTQeV01lDzjCo5AiSoGdXiaTtk8/FahyMrvRfg=
-X-Received: from pjbsd5.prod.google.com ([2002:a17:90b:5145:b0:2ef:8055:93d9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3cc6:b0:2ee:aa95:6de9
- with SMTP id 98e67ed59e1d1-2f452eed7e1mr90148916a91.33.1736188167401; Mon, 06
- Jan 2025 10:29:27 -0800 (PST)
-Date: Mon, 6 Jan 2025 10:29:25 -0800
-In-Reply-To: <CAG48ez3aLwOW+jpJbLB-vXGudLQnDLCYs=Ao3eNikv6QiTc1Fw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1736189874; x=1736794674;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/aNADIekx2j0/enI87SMjtmQjX7teTUCuYI/dNHjl3o=;
+        b=rpPNuR48JaR4LiehEQ3pD/rjtEALJ7VIWshnemzGWLrQgeX/JMrjx3dlKF1ZY23Xh9
+         jMcGr/64cBjuCfCGQV/Kv2NVpk/WAriMnN6gHuehl+Oa3NTFzvhGZiszBJeoAtvDp2GW
+         4iWHnWu8QgyKvw6fXHil8xqpcX6H02WHsc3SeECZV/8dBx5n1jqy3GdCCsoQ5oQR8zzX
+         V3yPwb7eguQfSEIfNhDjRLuZgbZMp56jeEM9oxnnTQYXwyviDxmqxrhWWVvCTiDh1CXV
+         JkO/c11XdYcfKtOW94cwrt/k54BMBxV/4V1bX7Y15PXWGetOdYe+Cri0XIqj/TKgIYiP
+         7CDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/jIOyz1ReAD+DCr9tIfDImYlElveIG9VpEe5snEm2vG43PJOJCdfl3TZvo3FGdSrVQIs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw32Bs5DVeKyk385voBo/hc7azg8Sb8FrFq3B9W1gYXLDOV2po/
+	JG5qSZRVAHKWoIpMdv/EXJ9NI9oNHlcRfjGrUGuNirXelaMMBeV0ePB+8QklHjPuUBW48n1dwbl
+	yHA==
+X-Google-Smtp-Source: AGHT+IFTUQyqLv9XSGGLv1fnVkWYgSUL4cT3Eg9R6oafiMKaRGpJd6axUPFHZbm1bK48Dbcs7JdFs6gpXoI=
+X-Received: from pgbcv4.prod.google.com ([2002:a05:6a02:4204:b0:7fd:4d08:df94])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:8412:b0:1e1:b727:1801
+ with SMTP id adf61e73a8af0-1e5e07a55e8mr87767148637.27.1736189874330; Mon, 06
+ Jan 2025 10:57:54 -0800 (PST)
+Date: Mon, 6 Jan 2025 10:57:53 -0800
+In-Reply-To: <20250101064928.389504-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241230175550.4046587-1-riel@surriel.com> <20241230175550.4046587-12-riel@surriel.com>
- <CAG48ez1nW7a+cHa4FDrri4SEZOWby9HbW+81JW7sY=CLZt98Tw@mail.gmail.com>
- <287e8a60e302929588eaf095584838fa745d69ac.camel@surriel.com> <CAG48ez3aLwOW+jpJbLB-vXGudLQnDLCYs=Ao3eNikv6QiTc1Fw@mail.gmail.com>
-Message-ID: <Z3whBeRiq7M-86M6@google.com>
-Subject: Re: [PATCH 11/12] x86/mm: enable AMD translation cache extensions
+References: <20250101064928.389504-1-pbonzini@redhat.com>
+Message-ID: <Z3wnsQQ67GBf1Vsb@google.com>
+Subject: Re: [PATCH] KVM: allow NULL writable argument to __kvm_faultin_pfn
 From: Sean Christopherson <seanjc@google.com>
-To: Jann Horn <jannh@google.com>
-Cc: Rik van Riel <riel@surriel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	KVM list <kvm@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-team@meta.com, 
-	dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com, 
-	akpm@linux-foundation.org, nadav.amit@gmail.com, zhengqi.arch@bytedance.com, 
-	linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Christian Zigotzky <chzigotzky@xenosoft.de>, linuxppc-dev@lists.ozlabs.org, 
+	regressions@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jan 06, 2025, Jann Horn wrote:
-> +KVM/SVM folks in case they know more about how enabling CPU features
-> interacts with virtualization; original patch is at
-> https://lore.kernel.org/all/20241230175550.4046587-12-riel@surriel.com/
->=20
-> On Sat, Jan 4, 2025 at 4:08=E2=80=AFAM Rik van Riel <riel@surriel.com> wr=
-ote:
-> > On Fri, 2025-01-03 at 18:49 +0100, Jann Horn wrote:
-> > > On Mon, Dec 30, 2024 at 6:53=E2=80=AFPM Rik van Riel <riel@surriel.co=
-m>
-> > > > only those upper-level entries that lead to the target PTE in
-> > > > the page table hierarchy, leaving unrelated upper-level entries
-> > > > intact.
-> > >
-> > > How does this patch interact with KVM SVM guests?
-> > > In particular, will this patch cause TLB flushes performed by guest
-> > > kernels to behave differently?
+On Wed, Jan 01, 2025, Paolo Bonzini wrote:
+> kvm_follow_pfn() is able to work with NULL in the .map_writable field
+> of the homonymous struct.  But __kvm_faultin_pfn() rejects the combo
+> despite KVM for e500 trying to use it.  Indeed .map_writable is not
+> particularly useful if the flags include FOLL_WRITE and readonly
+> guest memory is not supported, so add support to __kvm_faultin_pfn()
+> for this case.
 
-No.  EFER is context switched by hardware on VMRUN and #VMEXIT, i.e. the gu=
-est
-runs with its own EFER, and thus will get the targeted flushes if and only =
-if
-the hypervisor virtualizes EFER.TCE *and* the guest explicitly enables EFER=
-.TCE.
+I would prefer to keep the sanity check to minimize the risk of a page fault
+handler not supporting opportunistic write mappings.  e500 is definitely the
+odd one out here.
 
-> > That is a good question.
-> >
-> > A Linux guest should be fine, since Linux already flushes the parts of =
-the
-> > TLB where page tables are being freed.
-> >
-> > I don't know whether this could potentially break some non-Linux guests=
-,
-> > though.
+What about adding a dedicated wrapper for getting a writable PFN?  E.g. (untested)
+
+---
+ arch/powerpc/kvm/e500_mmu_host.c | 2 +-
+ arch/x86/kvm/vmx/vmx.c           | 3 +--
+ include/linux/kvm_host.h         | 8 ++++++++
+ 3 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
+index e5a145b578a4..2251bb30b8ec 100644
+--- a/arch/powerpc/kvm/e500_mmu_host.c
++++ b/arch/powerpc/kvm/e500_mmu_host.c
+@@ -444,7 +444,7 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
+ 
+ 	if (likely(!pfnmap)) {
+ 		tsize_pages = 1UL << (tsize + 10 - PAGE_SHIFT);
+-		pfn = __kvm_faultin_pfn(slot, gfn, FOLL_WRITE, NULL, &page);
++		pfn = kvm_faultin_writable_pfn(slot, gfn, &page);
+ 		if (is_error_noslot_pfn(pfn)) {
+ 			if (printk_ratelimit())
+ 				pr_err("%s: real page not found for gfn %lx\n",
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 893366e53732..7012b583f2e8 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6800,7 +6800,6 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
+ 	struct page *refcounted_page;
+ 	unsigned long mmu_seq;
+ 	kvm_pfn_t pfn;
+-	bool writable;
+ 
+ 	/* Defer reload until vmcs01 is the current VMCS. */
+ 	if (is_guest_mode(vcpu)) {
+@@ -6836,7 +6835,7 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
+ 	 * controls the APIC-access page memslot, and only deletes the memslot
+ 	 * if APICv is permanently inhibited, i.e. the memslot won't reappear.
+ 	 */
+-	pfn = __kvm_faultin_pfn(slot, gfn, FOLL_WRITE, &writable, &refcounted_page);
++	pfn = kvm_faultin_writable_pfn(slot, gfn, &refcounted_page);
+ 	if (is_error_noslot_pfn(pfn))
+ 		return;
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index c788d0bd952a..b0af7c7f99da 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1287,6 +1287,14 @@ static inline kvm_pfn_t kvm_faultin_pfn(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 				 write ? FOLL_WRITE : 0, writable, refcounted_page);
+ }
+ 
++static inline kvm_pfn_t kvm_faultin_writable_pfn(const struct kvm_memory_slot *slot,
++						 gfn_t gfn, struct page **refcounted_page)
++{
++	bool writable;
++
++	return __kvm_faultin_pfn(slot, gfn, FOLL_WRITE, &writable, refcounted_page);
++}
++
+ int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
+ 			int len);
+ int kvm_read_guest(struct kvm *kvm, gpa_t gpa, void *data, unsigned long len);
+
+base-commit: 2c3412e999738bfd60859c493ff47f5c268814a3
+-- 
 
