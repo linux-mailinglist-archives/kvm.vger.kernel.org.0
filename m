@@ -1,151 +1,215 @@
-Return-Path: <kvm+bounces-34579-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34580-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D362AA022B5
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 11:12:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D82A0236C
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 11:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FD91188430E
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 10:12:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97B29188550D
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 10:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF67D1D8DF6;
-	Mon,  6 Jan 2025 10:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="D4f46Chq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0DF1DC1A7;
+	Mon,  6 Jan 2025 10:49:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127CA1CEAC2
-	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 10:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567631DACBE;
+	Mon,  6 Jan 2025 10:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736158316; cv=none; b=LEnPsD6nem+jFAX/0pEdj0ido2PxVF5vm6yD7O4gMhnwpWcR8T1PReu9Lv5gsNwJCKzIAq07wISsUjnzqahzdXWvzIFZLH983yVmquxkkOlOD0sPW5q5fV017An2e0JFJfOu9onMxNR+U52/C+h0njyvB3fNgtB6tunQsMQK4i0=
+	t=1736160585; cv=none; b=IcfqyuVMnV9gxWgfvGYgvfYzb9PWxvSKPiJiKLTMthwnJ6K+fJUXm2WikcTpVcf/todoCuKzSW8orOfFJOuzEvyblzUW2NSqKmwVk2SarVRpei9p4AfqNT3lv4RHC/FHSgAyKppk3FDRMje1dcQ0afgWRUzd029MqAAUEw2P71U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736158316; c=relaxed/simple;
-	bh=EvNMV41fdHlsyOMzdqJDRZdBlAAk6fqcfgwEqQ/4ppQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tRx6KZQd4Ftofwjko1kBwhXbBqNqCbNhdwuP7vze7pBivGD3zwGh6dR4SHk3N1h3A1YqQILsQ/ONZGASC/82/aWp/WUmmzr2Qp4jbKRTegOS6S6QEGXDi3QJbUrofxjgqDYCdFejdnudbOA8kW09GLuic8TFVdai075B2+BQ0Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=D4f46Chq; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2163b0c09afso199986155ad.0
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 02:11:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736158313; x=1736763113; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7nNzXHvCvx5cfEB7aLBAj3zATBDNr4fPLoierC9e9z0=;
-        b=D4f46ChqQKsauOnB35AVetaZ2atkoiQl2G2L8QhwvL28wN8+7X8VN1a75jZEQ1Ak/Y
-         7keH1erXnW9+qKBUSXNDk32BMRt1HVjzLbHRiXD5HlzhfYWa0DwIuCBKgRjyG6XsLaAa
-         y6QRdkMCg1xjzHoGwW9/PTu/E5PxBT020evFf+hvIiE5HmzQHwLH9htb5WVqI/CpGzh/
-         zfUNnQR+9fiJQOqvLKnZK91oahLhiMty0qbppTN3gNDU2a81xieX9oiSvzv04P8MGsYX
-         Kgck0wEYIT4o9PKDUDnhjScS9xugeU4n2QhQARqZinXeysnv2Wuy5ZHHWRDUR1LcAGOt
-         IVQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736158313; x=1736763113;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7nNzXHvCvx5cfEB7aLBAj3zATBDNr4fPLoierC9e9z0=;
-        b=W3ne3agxAeNw6adprmofHOhxskKEkXLVeNV4+ecwXh+QC9n27PKQwYCCPDOhFr8qmd
-         FpQ7a5oDZkrX/t94JxEjfhLXmTOonlG2+uJd4B9mfFbxXEREaXRJ12ibVnnhNVaXFgcW
-         R+kZb6TEnMf9jKPwSwWjR62YX2ja3P86d8EDyZpkIcinHsoky4qpkMzFQJra17swFAwP
-         yN7qcYw21hq3Foj3MCbt40xYsbo6nZ/HK/4ZUeuJeSpWVbIeKkfKaXKbWWOrfpUEkUyB
-         ZWTg+7263zBEyCS+XJOtFZg5xZFbGKcd0Rkckdl9vXhQVLDhcfCRBrQCEaTjzJvco8l4
-         VQeA==
-X-Gm-Message-State: AOJu0Yyv83qr8vfFOWrkpRkZFWMM/04djJmKEEcaqYpROJQCLPqH60C+
-	CRu09S2x78IG83mEQ2GnfxyoIed52f85bTGmDL/y73xPJ1ZC+cGHZwBLnfF8YeKauGmyG2fnqTY
-	U
-X-Gm-Gg: ASbGnctRNziNX6QLofsMK/a4WqPLYWOy2ji3RWvHNFx8oC7aNcPCcc57iDCd0ytHnJP
-	RIShlkG8zfvBBJ18xafheg7BaS3BZY9J9TerVg10Bs1fM2ANIhpQzowOSlHQXUo2X+xqh6SieVU
-	06QtRz5A+f/f6hfhuqFwEtgD6yLEcBfY8CFKYkVMDrtaBgDvuAqv+J3a+xE6Mq5o5UGtv6MVos9
-	n3lMdtiI5bR5QwBGN0Mk9iC1oF+UclS79CIBBkSxClMZTvNDvJSPyW0wgutY5rnXdCDrETwqEtE
-	DAQ88q7I8P4CpqrXzxXNtZNY+g==
-X-Google-Smtp-Source: AGHT+IFO+37IN1wvmUy/LvYiiE5d0fjJX5//1AkKi+DZydWL7qBtX1lnxZ9O36lro7vlSKtbDgpLuQ==
-X-Received: by 2002:a17:902:da81:b0:211:fcad:d6ea with SMTP id d9443c01a7336-219e6f108b5mr688405345ad.45.1736158312840;
-        Mon, 06 Jan 2025 02:11:52 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9cde37sm290040905ad.131.2025.01.06.02.11.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jan 2025 02:11:52 -0800 (PST)
-Message-ID: <ada1c6da-d91c-4177-9173-9a7cdb0af2fb@rivosinc.com>
-Date: Mon, 6 Jan 2025 11:11:42 +0100
+	s=arc-20240116; t=1736160585; c=relaxed/simple;
+	bh=gMY7P4vJuP3BE3MB28YsOxXzHsou17iRneDjojqeXsA=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=tpyDREagER50gQuLF69MwSXB3SuA2pN25xJAS0U7J4v6wRPc+zDQLAPabdQNiW0fIyTSF9WUaMTW3PHcieK5qmxiil+Q1lP9K+PjpMvGQuROrZ/rBI61o0NbiZzDHBlwbH8n7HF6cuLkpdm0w/bYCV3toLxRkBfqhHhWi1igWr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4YRW7v07STz2Dk4S;
+	Mon,  6 Jan 2025 18:46:35 +0800 (CST)
+Received: from dggemv711-chm.china.huawei.com (unknown [10.1.198.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id DCFF0140135;
+	Mon,  6 Jan 2025 18:49:33 +0800 (CST)
+Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 6 Jan 2025 18:49:33 +0800
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemn100017.china.huawei.com (7.202.194.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 6 Jan 2025 18:49:32 +0800
+Subject: Re: [PATCH v3 1/5] hisi_acc_vfio_pci: fix XQE dma address error
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+References: <20250102030729.34115-1-liulongfang@huawei.com>
+ <20250102030729.34115-2-liulongfang@huawei.com>
+ <20250102153545.5dce8d1e.alex.williamson@redhat.com>
+From: liulongfang <liulongfang@huawei.com>
+Message-ID: <e0069844-eca5-78e7-8d56-2fddd7981bf4@huawei.com>
+Date: Mon, 6 Jan 2025 18:49:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 0/5] riscv: add SBI SSE extension tests
-To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Cc: Andrew Jones <ajones@ventanamicro.com>,
- Anup Patel <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
-References: <20241125162200.1630845-1-cleger@rivosinc.com>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20241125162200.1630845-1-cleger@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250102153545.5dce8d1e.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemn100017.china.huawei.com (7.202.194.122)
 
-Gentle ping ?
+On 2025/1/3 6:35, Alex Williamson wrote:
+> On Thu, 2 Jan 2025 11:07:25 +0800
+> Longfang Liu <liulongfang@huawei.com> wrote:
+> 
+>> The dma addresses of EQE and AEQE are wrong after migration and
+>> results in guest kernel-mode encryption services  failure.
+>> Comparing the definition of hardware registers, we found that
+>> there was an error when the data read from the register was
+>> combined into an address. Therefore, the address combination
+>> sequence needs to be corrected.
+>>
+>> Even after fixing the above problem, we still have an issue
+>> where the Guest from an old kernel can get migrated to
+>> new kernel and may result in wrong data.
+>>
+>> In order to ensure that the address is correct after migration,
+>> if an old magic number is detected, the dma address needs to be
+>> updated.
+>>
+>> Fixes:b0eed085903e("hisi_acc_vfio_pci: Add support for VFIO live migration")
+> 
+> Please use the proper Fixes: tag layout throughout.
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst#n145
+> 
+> (spaces are missing between fields)
+>
 
-Thanks,
+OK.
 
-Clément
+Thanks.
+Longfang.
 
-On 25/11/2024 17:21, Clément Léger wrote:
-> This series adds an individual test for SBI SSE extension as well as
-> needed infrastructure for SSE support. It also adds test specific
-> asm-offsets generation to use custom OFFSET and DEFINE from the test
-> directory.
+> Thanks,
+> Alex
 > 
-> ---
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 34 +++++++++++++++----
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  9 ++++-
+>>  2 files changed, 36 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index 451c639299eb..8518efea3a52 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -350,6 +350,27 @@ static int vf_qm_func_stop(struct hisi_qm *qm)
+>>  	return hisi_qm_mb(qm, QM_MB_CMD_PAUSE_QM, 0, 0, 0);
+>>  }
+>>  
+>> +static int vf_qm_magic_check(struct acc_vf_data *vf_data)
+>> +{
+>> +	switch (vf_data->acc_magic) {
+>> +	case ACC_DEV_MAGIC_V2:
+>> +		break;
+>> +	case ACC_DEV_MAGIC_V1:
+>> +		/* Correct dma address */
+>> +		vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
+>> +		vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> +		vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
+>> +		vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
+>> +		vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> +		vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
+>> +		break;
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  			     struct hisi_acc_vf_migration_file *migf)
+>>  {
+>> @@ -363,7 +384,8 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev->match_done)
+>>  		return 0;
+>>  
+>> -	if (vf_data->acc_magic != ACC_DEV_MAGIC) {
+>> +	ret = vf_qm_magic_check(vf_data);
+>> +	if (ret) {
+>>  		dev_err(dev, "failed to match ACC_DEV_MAGIC\n");
+>>  		return -EINVAL;
+>>  	}
+>> @@ -418,7 +440,7 @@ static int vf_qm_get_match_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	int vf_id = hisi_acc_vdev->vf_id;
+>>  	int ret;
+>>  
+>> -	vf_data->acc_magic = ACC_DEV_MAGIC;
+>> +	vf_data->acc_magic = ACC_DEV_MAGIC_V2;
+>>  	/* Save device id */
+>>  	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
+>>  
+>> @@ -496,12 +518,12 @@ static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data *vf_data)
+>>  		return -EINVAL;
+>>  
+>>  	/* Every reg is 32 bit, the dma address is 64 bit. */
+>> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
+>> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
+>>  	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
+>> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
+>> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
+>> +	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
+>>  	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
+>> +	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
+>>  
+>>  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
+>>  	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> index 245d7537b2bc..d26eb751fb82 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> @@ -39,6 +39,9 @@
+>>  #define QM_REG_ADDR_OFFSET	0x0004
+>>  
+>>  #define QM_XQC_ADDR_OFFSET	32U
+>> +#define QM_XQC_ADDR_LOW	0x1
+>> +#define QM_XQC_ADDR_HIGH	0x2
+>> +
+>>  #define QM_VF_AEQ_INT_MASK	0x0004
+>>  #define QM_VF_EQ_INT_MASK	0x000c
+>>  #define QM_IFC_INT_SOURCE_V	0x0020
+>> @@ -50,10 +53,14 @@
+>>  #define QM_EQC_DW0		0X8000
+>>  #define QM_AEQC_DW0		0X8020
+>>  
+>> +enum acc_magic_num {
+>> +	ACC_DEV_MAGIC_V1 = 0XCDCDCDCDFEEDAACC,
+>> +	ACC_DEV_MAGIC_V2 = 0xAACCFEEDDECA0002,
+>> +};
+>> +
+>>  struct acc_vf_data {
+>>  #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
+>>  	/* QM match information */
+>> -#define ACC_DEV_MAGIC	0XCDCDCDCDFEEDAACC
+>>  	u64 acc_magic;
+>>  	u32 qp_num;
+>>  	u32 dev_id;
 > 
-> V4:
->  - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
->  - Add proper asm-offset generation for tests
->  - Move SSE specific file from lib/riscv to riscv/
 > 
-> V3:
->  - Add -deps variable for test specific dependencies
->  - Fix formatting errors/typo in sbi.h
->  - Add missing double trap event
->  - Alphabetize sbi-sse.c includes
->  - Fix a6 content after unmasking event
->  - Add SSE HART_MASK/UNMASK test
->  - Use mv instead of move
->  - move sbi_check_sse() definition in sbi.c
->  - Remove sbi_sse test from unitests.cfg
+> .
 > 
-> V2:
->  - Rebased on origin/master and integrate it into sbi.c tests
-> 
-> Clément Léger (5):
->   kbuild: allow multiple asm-offsets file to be generated
->   riscv: use asm-offsets to generate SBI_EXT_HSM values
->   riscv: Add "-deps" handling for tests
->   riscv: lib: Add SBI SSE extension definitions
->   riscv: sbi: Add SSE extension tests
-> 
->  scripts/asm-offsets.mak  |   22 +-
->  riscv/Makefile           |   10 +-
->  lib/riscv/asm/csr.h      |    2 +
->  lib/riscv/asm/sbi.h      |   83 +++
->  riscv/sbi-tests.h        |   12 +
->  riscv/sbi-asm.S          |   96 +++-
->  riscv/asm-offsets-test.c |   19 +
->  riscv/sbi-sse.c          | 1043 ++++++++++++++++++++++++++++++++++++++
->  riscv/sbi.c              |    3 +
->  riscv/.gitignore         |    1 +
->  10 files changed, 1278 insertions(+), 13 deletions(-)
->  create mode 100644 riscv/asm-offsets-test.c
->  create mode 100644 riscv/sbi-sse.c
->  create mode 100644 riscv/.gitignore
-> 
-
 
