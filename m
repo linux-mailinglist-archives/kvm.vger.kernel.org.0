@@ -1,360 +1,177 @@
-Return-Path: <kvm+bounces-34613-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34614-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45636A02CA7
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 16:56:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4211CA02CEB
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 16:59:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 907B53A6FC6
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 15:53:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B61243A64C9
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 15:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B448158525;
-	Mon,  6 Jan 2025 15:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F525145A03;
+	Mon,  6 Jan 2025 15:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="vqxnTuU/"
+	dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b="Y8e8CbWq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989C913BC39
-	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 15:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E8D81728
+	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 15:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736178832; cv=none; b=fHo/FQtQAQTCav1BUY8lyp0zCh+DTIfFvbm1mlEsN5lvct2xza7frKmrache98dG0WzvcGrN61Zs+w5uXzqyQ3gAEsXGe9l5EHDVjkT1LILHNmPjDbMXY9GGSg96iHblizMoJ0RUEa/Ttwdg5sqEOiGXR3EmMqHL9l3QVe7Kd0s=
+	t=1736179041; cv=none; b=WqoxBYt8G9dFXV0bHIvKSPKWMnBGJ7M/vVUeA2kfqsbKtLGoK/J5yIo7CbNuNveL9ZVticSHsD/DXq+Yfzq/GY/7V17groxG4hB1+14flQB5C8afgIu+9OMYvuVSGVwUWDTFWUw+pfNHRQxIh1GxjYfcK9+iO4LXiQsCUgM/TwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736178832; c=relaxed/simple;
-	bh=fMAMk7yDvGWunGZgStqZdz9gK7htkALQbc8cvBZf7T0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h8PD6gSEfoYpZSAIItDLIzp0URDlquc+8d+/YQqToA1jvBsvNu7d0pp68MbC6gBwVTAg6XeskfFV+zt60hKLUxfhdR1aKTpabeC7LQRyWmNJpUdbwHDOCwGbpJwRDXRfvk4nAhcp5MXebGwxdqisBpujP5509HWDfa2nYcWWi8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=vqxnTuU/; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21634338cfdso11263915ad.2
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 07:53:50 -0800 (PST)
+	s=arc-20240116; t=1736179041; c=relaxed/simple;
+	bh=tRUrB/r/tfuAL3vK8alFSNvMMIzwYjh6k3RMYJWmOB0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FqXgC+e9D5DJvTQH688Cjwsfl3K8IOi5XeeJda3qii5K8NRNlZaAoK079Hq1BRC8SZf4xFTLavJe6PnxFvHc7j5cRtFaq8PGZvmtQhIUIf98w7ryY7Hg0DODSlDG+l+Q+V0ME3zamvnF+QpXcur/NxFwYXH5lNmpk9G3iN0ZNoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sslab.ics.keio.ac.jp; spf=none smtp.mailfrom=sslab.ics.keio.ac.jp; dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b=Y8e8CbWq; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sslab.ics.keio.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sslab.ics.keio.ac.jp
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2163dc5155fso206347315ad.0
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 07:57:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736178829; x=1736783629; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E/ViT1gefkshRNrQJ4/dNFDRxngEPyJOOTs3jTGg9tk=;
-        b=vqxnTuU/H1eUpkcnKrzP0SDAJ3npHjqDb7XB/ae5TiBMr+CmpUWl1yxQkVZX39U2Bh
-         TrKwJyzR8rha2KwnLz6610p6eS07kw3HadW02ToIzVXJixx1+XjoXELW4s4BZFio+XZK
-         5EWO1p4UbW7bjc7VsTv3fXO4J/cBKWxolwVAdfw/KBaJEeKp3KHLL1B6QHH3Akcvd2mY
-         BtrTFSxMqLMatkx5kQL3VoOHVzaU3vd6bKPYSnx9XS5S8FkZwypxhWNU2hXnFrRUy7BZ
-         LdNMqLqScsm62NhX/fWLITxOad/Ej0RZAA5Nyep0txGX7JomhfhG91gWXXHRGIGflmaE
-         nuYw==
+        d=sslab.ics.keio.ac.jp; s=google; t=1736179036; x=1736783836; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N93vSe2DAsJuZgTNRjIV6wR3t9pWSfA7zyzPq7fk4Oo=;
+        b=Y8e8CbWqpdhd6kjX8+uJBECPai7fY9m1ISKoorqYU52wAz2MI5lkQc8wMZFrYZPr+o
+         3tV0z2N3PJElnNxj0aUr2cBLbFsdeQd9fRd62+NBKQJwh2zUVPQ1Jan8zlKvv0RHoZDa
+         UmUPFViswByZSiX2CTG2auSWr4FdMD1mEaPcU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736178829; x=1736783629;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E/ViT1gefkshRNrQJ4/dNFDRxngEPyJOOTs3jTGg9tk=;
-        b=BlngAL7c9M3bT2BBMXuTGPZf4ulzXVcEwaB3BKhM/Hwn7MHJ2wEeBe9g2y3lp3rpiJ
-         rQmpZvSXqcuqV8x8tL3BKEuBxAtfvdDQwDOHa4Gohr9hSSnLPIJzPtP/WlBi0Bpc8H0L
-         FjlB/y4TVL/wYMcVtKxEmXYBJHoPDh1BbCX8IbRjlYcbqCIwiPRSi1W9QYX6XS94gIb3
-         YxAiEUsYtXsX5sr8rlFQpFvD+PZL6W7jh+V53YnTKJG5pxj3QmIsOi++NCXp7LMcD9CD
-         aZVTklpO45hXZS4kotEYeGB06snv3RS4XLbfJlm3pNm3Bfu4cHa6gxfrINF1gkqwy0nH
-         9S8w==
-X-Gm-Message-State: AOJu0Yw2pR5GCEmvFCXncwsZCIDfeFQRvSnwrAFmfKQN56G2/ZFgoopm
-	dpyn6ff0jAx8qJsQRVL+Vkh+L+oeb+WiKGO4be76LxtMZTp4slBazDw4jjURYhu1BBk74DbDeFb
-	F
-X-Gm-Gg: ASbGncv4539/6ITVt609eqYv1Xo9nqyyqtuaQouYlE0zO0GuPZ7xi7JOCgqKJCbIIs8
-	pur925Kb+8AVZt+e1rqbyjtcbDvxN12tvEe06LzPERAJoqAGvHa7qN+48BsSUZm0advCwSMBz12
-	/55VdLXEc8j57LlAmb+lhjDrB0O2EIInvv/MGcsWb9pGLv4B9Avi6kyT10zjAWDhm1fwu/I6GzA
-	uhF8glPclGx4cFu7O2Re4TzeaXkZY7hMjHuiBz12ZlWED1VqyDmhWp46g==
-X-Google-Smtp-Source: AGHT+IFwx3Bye5GMLDp92fK7LcgEnFE3NPjMHj7cTO1S9Dp8qSV+ymbPozkUpxgwu4DvznFVu34FOQ==
-X-Received: by 2002:a05:6a21:789b:b0:1e1:a75e:690b with SMTP id adf61e73a8af0-1e5e0815b11mr90022286637.44.1736178829475;
-        Mon, 06 Jan 2025 07:53:49 -0800 (PST)
-Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-842b8e867ccsm28950200a12.47.2025.01.06.07.53.44
+        d=1e100.net; s=20230601; t=1736179036; x=1736783836;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N93vSe2DAsJuZgTNRjIV6wR3t9pWSfA7zyzPq7fk4Oo=;
+        b=tqXB7c2yliLUZOrBtTy0gIEeFaXJIfQXQeogK2vcg5FU4vMKUeNvQGjSznuQwU0CQi
+         e0s3EofArK8mnsOVqSPmALwdpD27yfMDqQ2ibpZXX06TRguR7WWOUGgs1MUUFSyfZOEt
+         3OODWn33OBLqiN9M/wVGFBwlg2OrXSUmHaaS4NnRjjeiAikngOmPA+uYGQ5OBCGMrWMO
+         fcMfpNw5a8nNTP20KgxunP5RM8+NLMOYuLG8gSaKfJCE1nX17kDr35paOte+5u1UAYxA
+         juLlrBq4KJEPhK067pbZWaI3E+Fkc1rnfFHr0Y2iw4eOVSpSdKjkNMgGcfZ+ctW0p829
+         If3g==
+X-Forwarded-Encrypted: i=1; AJvYcCWrLvsCGtVc8JmATgdnhUrr90Qpir/TATgF6GJtLFknslwEI01QHBeqoKkkVU56YCrb/lc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzx0z3Clb10Q0A9vtI8Tg/9KvR7DMByEjgj0yXVe2xdmQNFEKSg
+	QHpJO1EApSgZvwDzklIHKbKyU5bdjuw4YhS1u5d33NlfbxfM9Len05K8w6jqp0o=
+X-Gm-Gg: ASbGncvykYUF8PN/VdYGETAoUjv4Wqxmblo5vzpddjSiUxzjp/1+Njp8ZAd5UsV/uC6
+	fKaHNp7s6SeEVFpRWivwl4Kdw3EnUgUQQO+NBU4awC0vCEJOF4w9EqhNScqoh/+X45NQU/olJ05
+	ENJ5X8sjGZn7GeZgaMOGPSb+O+yjaYtgpQXq3YQHxCIpSgNhCzCiVPHqFGcoNZzVS+iHY/xxX7y
+	20xQqDfjvr9qgApxvMaZ5EvCkxtyZZOTJMhfXk+VqmLKOgiuPw7gXmcbZ5T/WG4loU5tP9mJRbQ
+	byUCzwg54LqnSEveAQ==
+X-Google-Smtp-Source: AGHT+IG4VxobKTRMfWHkqOEB5k1ZQenI6Eqz1wsYpfOBXX86fzC91fIpukWV2YSzC8s+9RmcrhJ6JQ==
+X-Received: by 2002:a17:902:e542:b0:212:1ebf:9a03 with SMTP id d9443c01a7336-219e6e8c4fdmr861763075ad.2.1736179035024;
+        Mon, 06 Jan 2025 07:57:15 -0800 (PST)
+Received: from saraba.tapir-shark.ts.net ([131.113.100.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dca025desm294122405ad.256.2025.01.06.07.57.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2025 07:53:48 -0800 (PST)
-From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <apatel@ventanamicro.com>,
-	Atish Patra <atishp@rivosinc.com>
-Subject: [kvm-unit-tests PATCH 2/2] riscv: Add tests for SBI FWFT extension
-Date: Mon,  6 Jan 2025 16:53:20 +0100
-Message-ID: <20250106155321.1109586-3-cleger@rivosinc.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250106155321.1109586-1-cleger@rivosinc.com>
-References: <20250106155321.1109586-1-cleger@rivosinc.com>
+        Mon, 06 Jan 2025 07:57:14 -0800 (PST)
+From: Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
+To: pbonzini@redhat.com,
+	kvm@vger.kernel.org
+Cc: vkuznets@redhat.com,
+	Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
+Subject: [RFC] Para-virtualized TLB flush for PV-waiting vCPUs
+Date: Tue,  7 Jan 2025 00:56:52 +0900
+Message-Id: <20250106155652.484001-1-kentaishiguro@sslab.ics.keio.ac.jp>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This commit add tests for a the FWFT SBI extension. Currently, only
-the reserved range as well as the misaligned exception delegation.
+In oversubscribed environments, the latency of flushing the remote TLB can
+become significant when the destination virtual CPU (vCPU) is the waiter
+of a para-virtualized queued spinlock that halts with interrupts disabled.
+This occurs because the waiter does not respond to remote function call
+requests until it releases the spinlock. As a result, the source vCPU
+wastes CPU time performing busy-waiting for a response from the
+destination vCPU.
 
-Signed-off-by: Clément Léger <cleger@rivosinc.com>
+To mitigate this issue, this patch extends the target of the PV TLB flush
+to include vCPUs that are halting to wait on the PV qspinlock. Since the
+PV qspinlock waiters voluntarily yield before being preempted by KVM,
+their state does not get preempted, and the current PV TLB flush overlooks
+them. This change allows vCPUs to bypass waiting for PV qspinlock waiters
+during TLB shootdowns.
+
+This enhancement improves the throughput of the ebizzy workload, which
+intensively causes spinlock contention and TLB shootdowns, in
+oversubscribed environments. The following experimental setup was used to
+evaluate the performance impact:
+
+Host Machine: Dell R760, Intel(R) Xeon(R) Platinum 8468 (48C/96T), 256GB
+memory
+VM0: ebizzy -M, 96 vCPUs, 32GB memory
+VM1: busy-loop, 96 vCPUs, 32GB memory
+Experiments Conducted: 10 iterations
+
+Results:
+- Without Patch: 7702.4 records/second (standard deviation: 295.5)
+- With Patch: 9110.9 records/second (standard deviation: 528.6)
+
+Signed-off-by: Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
 ---
- riscv/Makefile      |   2 +-
- lib/riscv/asm/sbi.h |  31 +++++++++
- riscv/sbi-fwft.c    | 153 ++++++++++++++++++++++++++++++++++++++++++++
- riscv/sbi.c         |   3 +
- 4 files changed, 188 insertions(+), 1 deletion(-)
- create mode 100644 riscv/sbi-fwft.c
+ arch/x86/include/uapi/asm/kvm_para.h |  1 +
+ arch/x86/kernel/kvm.c                | 13 +++++++++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/riscv/Makefile b/riscv/Makefile
-index 5b5e157c..52718f3f 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -17,7 +17,7 @@ tests += $(TEST_DIR)/sieve.$(exe)
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index a1efa7907a0b..db26e167a707 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -70,6 +70,7 @@ struct kvm_steal_time {
  
- all: $(tests)
+ #define KVM_VCPU_PREEMPTED          (1 << 0)
+ #define KVM_VCPU_FLUSH_TLB          (1 << 1)
++#define KVM_VCPU_IN_PVWAIT          (1 << 2)
  
--$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o
-+$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o $(TEST_DIR)/sbi-fwft.o
+ #define KVM_CLOCK_PAIRING_WALLCLOCK 0
+ struct kvm_clock_pairing {
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 21e9e4845354..f17057b7d263 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -668,7 +668,8 @@ static void kvm_flush_tlb_multi(const struct cpumask *cpumask,
+ 		 */
+ 		src = &per_cpu(steal_time, cpu);
+ 		state = READ_ONCE(src->preempted);
+-		if ((state & KVM_VCPU_PREEMPTED)) {
++		if ((state & KVM_VCPU_PREEMPTED) ||
++		    (state & KVM_VCPU_IN_PVWAIT)) {
+ 			if (try_cmpxchg(&src->preempted, &state,
+ 					state | KVM_VCPU_FLUSH_TLB))
+ 				__cpumask_clear_cpu(cpu, flushmask);
+@@ -1045,6 +1046,9 @@ static void kvm_kick_cpu(int cpu)
  
- # When built for EFI sieve needs extra memory, run with e.g. '-m 256' on QEMU
- $(TEST_DIR)/sieve.$(exe): AUXFLAGS = 0x1
-diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-index 98a9b097..27e6fcdb 100644
---- a/lib/riscv/asm/sbi.h
-+++ b/lib/riscv/asm/sbi.h
-@@ -11,6 +11,9 @@
- #define SBI_ERR_ALREADY_AVAILABLE	-6
- #define SBI_ERR_ALREADY_STARTED		-7
- #define SBI_ERR_ALREADY_STOPPED		-8
-+#define SBI_ERR_NO_SHMEM		-9
-+#define SBI_ERR_INVALID_STATE		-10
-+#define SBI_ERR_BAD_RANGE		-11
- 
- #ifndef __ASSEMBLY__
- #include <cpumask.h>
-@@ -23,6 +26,7 @@ enum sbi_ext_id {
- 	SBI_EXT_SRST = 0x53525354,
- 	SBI_EXT_DBCN = 0x4442434E,
- 	SBI_EXT_SUSP = 0x53555350,
-+	SBI_EXT_FWFT = 0x46574654,
- };
- 
- enum sbi_ext_base_fid {
-@@ -71,6 +75,33 @@ enum sbi_ext_dbcn_fid {
- 	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
- };
- 
-+/* SBI function IDs for FW feature extension */
-+#define SBI_EXT_FWFT_SET		0x0
-+#define SBI_EXT_FWFT_GET		0x1
-+
-+enum sbi_fwft_feature_t {
-+	SBI_FWFT_MISALIGNED_EXC_DELEG		= 0x0,
-+	SBI_FWFT_LANDING_PAD			= 0x1,
-+	SBI_FWFT_SHADOW_STACK			= 0x2,
-+	SBI_FWFT_DOUBLE_TRAP			= 0x3,
-+	SBI_FWFT_PTE_AD_HARDWARE_UPDATE		= 0x4,
-+	SBI_FWFT_POINTER_MASKING_PMLEN		= 0x5,
-+	SBI_FWFT_LOCAL_RESERVED_START		= 0x6,
-+	SBI_FWFT_LOCAL_RESERVED_END		= 0x3fffffff,
-+	SBI_FWFT_LOCAL_PLATFORM_START		= 0x40000000,
-+	SBI_FWFT_LOCAL_PLATFORM_END		= 0x7fffffff,
-+
-+	SBI_FWFT_GLOBAL_RESERVED_START		= 0x80000000,
-+	SBI_FWFT_GLOBAL_RESERVED_END		= 0xbfffffff,
-+	SBI_FWFT_GLOBAL_PLATFORM_START		= 0xc0000000,
-+	SBI_FWFT_GLOBAL_PLATFORM_END		= 0xffffffff,
-+};
-+
-+#define SBI_FWFT_PLATFORM_FEATURE_BIT		(1 << 30)
-+#define SBI_FWFT_GLOBAL_FEATURE_BIT		(1 << 31)
-+
-+#define SBI_FWFT_SET_FLAG_LOCK			(1 << 0)
-+
- struct sbiret {
- 	long error;
- 	long value;
-diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
-new file mode 100644
-index 00000000..8a7f2070
---- /dev/null
-+++ b/riscv/sbi-fwft.c
-@@ -0,0 +1,153 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * SBI verification
-+ *
-+ * Copyright (C) 2024, Rivos Inc., Clément Léger <cleger@rivosinc.com>
-+ */
-+#include <libcflat.h>
-+#include <stdlib.h>
-+
-+#include <asm/csr.h>
-+#include <asm/processor.h>
-+#include <asm/ptrace.h>
-+#include <asm/sbi.h>
-+
-+void check_fwft(void);
-+
-+static int fwft_set(unsigned long feature_id, unsigned long value,
-+		       unsigned long flags)
-+{
-+	struct sbiret ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_SET,
-+				      feature_id, value, flags, 0, 0, 0);
-+
-+	return ret.error;
-+}
-+
-+static int fwft_get(unsigned long feature_id, unsigned long *value)
-+{
-+	struct sbiret ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_GET,
-+				      feature_id, 0, 0, 0, 0, 0);
-+
-+	*value = ret.value;
-+
-+	return ret.error;
-+}
-+
-+static void fwft_check_reserved(unsigned long id)
-+{
-+	int ret;
-+	bool pass = true;
-+	unsigned long value;
-+
-+	ret = fwft_get(id, &value);
-+	if (ret != SBI_ERR_DENIED)
-+		pass = false;
-+
-+	ret = fwft_set(id, 1, 0);
-+	if (ret != SBI_ERR_DENIED)
-+		pass = false;
-+
-+	report(pass, "get/set reserved feature 0x%lx error == SBI_ERR_DENIED", id);
-+}
-+
-+static void fwft_check_denied(void)
-+{
-+	fwft_check_reserved(SBI_FWFT_LOCAL_RESERVED_START);
-+	fwft_check_reserved(SBI_FWFT_LOCAL_RESERVED_END);
-+	fwft_check_reserved(SBI_FWFT_GLOBAL_RESERVED_START);
-+	fwft_check_reserved(SBI_FWFT_GLOBAL_RESERVED_END);
-+}
-+
-+static bool misaligned_handled;
-+
-+static void misaligned_handler(struct pt_regs *regs)
-+{
-+	misaligned_handled = true;
-+	regs->epc += 4;
-+}
-+
-+static void fwft_check_misaligned(void)
-+{
-+	int ret;
-+	unsigned long value;
-+
-+	report_prefix_push("misaligned_deleg");
-+
-+	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
-+	if (ret == SBI_ERR_NOT_SUPPORTED) {
-+		report_skip("SBI_FWFT_MISALIGNED_EXC_DELEG is not supported");
-+		return;
-+	}
-+	report(!ret, "Get misaligned deleg feature no error");
-+	if (ret)
-+		return;
-+
-+	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 2, 0);
-+	report(ret == SBI_ERR_INVALID_PARAM, "Set misaligned deleg feature invalid value error");
-+	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 0xFFFFFFFF, 0);
-+	report(ret == SBI_ERR_INVALID_PARAM, "Set misaligned deleg feature invalid value error");
-+
-+	/* Set to 0 and check after with get */
-+	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 0, 0);
-+	report(!ret, "Set misaligned deleg feature value no error");
-+	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
-+	if (ret)
-+		report_fail("Get misaligned deleg feature after set");
-+	else
-+		report(value == 0, "Set misaligned deleg feature value 0");
-+
-+	/* Set to 1 and check after with get */
-+	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 1, 0);
-+	report(!ret, "Set misaligned deleg feature value no error");
-+	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
-+	if (ret)
-+		report_fail("Get misaligned deleg feature after set");
-+	else
-+		report(value == 1, "Set misaligned deleg feature value 1");
-+
-+	install_exception_handler(EXC_LOAD_MISALIGNED, misaligned_handler);
-+
-+	asm volatile (
-+		".option norvc\n"
-+		"lw %[val], 1(%[val_addr])"
-+		: [val] "+r" (value)
-+		: [val_addr] "r" (&value)
-+		: "memory");
-+
-+	if (!misaligned_handled)
-+		report_skip("Verify misaligned load exception trap in supervisor");
-+	else
-+		report_pass("Verify misaligned load exception trap in supervisor");
-+
-+	install_exception_handler(EXC_LOAD_MISALIGNED, NULL);
-+
-+	report_prefix_pop();
-+}
-+
-+void check_fwft(void)
-+{
-+	struct sbiret ret;
-+
-+	report_prefix_push("fwft");
-+
-+	if (!sbi_probe(SBI_EXT_FWFT)) {
-+		report_skip("FWFT extension not available");
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_PROBE_EXT, SBI_EXT_FWFT, 0, 0, 0, 0, 0);
-+	report(!ret.error, "FWFT extension probing no error");
-+	if (ret.error)
-+		goto done;
-+
-+	if (ret.value == 0) {
-+		report_skip("FWFT extension is not present");
-+		goto done;
-+	}
-+
-+	fwft_check_denied();
-+	fwft_check_misaligned();
-+done:
-+	report_prefix_pop();
-+}
-diff --git a/riscv/sbi.c b/riscv/sbi.c
-index 6f4ddaf1..8600e38e 100644
---- a/riscv/sbi.c
-+++ b/riscv/sbi.c
-@@ -32,6 +32,8 @@
- 
- #define	HIGH_ADDR_BOUNDARY	((phys_addr_t)1 << 32)
- 
-+void check_fwft(void);
-+
- static long __labs(long a)
+ static void kvm_wait(u8 *ptr, u8 val)
  {
- 	return __builtin_labs(a);
-@@ -1451,6 +1453,7 @@ int main(int argc, char **argv)
- 	check_hsm();
- 	check_dbcn();
- 	check_susp();
-+	check_fwft();
++	u8 state;
++	struct kvm_steal_time *src;
++
+ 	if (in_nmi())
+ 		return;
  
- 	return report_summary();
- }
+@@ -1054,8 +1058,13 @@ static void kvm_wait(u8 *ptr, u8 val)
+ 	 * in irq spinlock slowpath and no spurious interrupt occur to save us.
+ 	 */
+ 	if (irqs_disabled()) {
+-		if (READ_ONCE(*ptr) == val)
++		if (READ_ONCE(*ptr) == val) {
++			src = this_cpu_ptr(&steal_time);
++			state = READ_ONCE(src->preempted);
++			try_cmpxchg(&src->preempted, &state,
++				    state | KVM_VCPU_IN_PVWAIT);
+ 			halt();
++		}
+ 	} else {
+ 		local_irq_disable();
+ 
 -- 
-2.47.1
+2.25.1
 
 
