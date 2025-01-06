@@ -1,79 +1,80 @@
-Return-Path: <kvm+bounces-34640-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34641-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1761A03142
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 21:19:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 993CBA0316B
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 21:33:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B2251886348
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 20:19:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E799164EB6
+	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 20:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CFD1DF741;
-	Mon,  6 Jan 2025 20:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406ED1DED79;
+	Mon,  6 Jan 2025 20:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="LKeDUIsT"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="VT4AHBEo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FA870811
-	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 20:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4C21C69D
+	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 20:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736194758; cv=none; b=qMJYRfAr1tGloKYLEMFPyT+6gm5jurysU1DzCzSv7RlnFANPqPxGWpZi1qI/2kPApLXtnjn1irPWfxziZ/ZZtOLn+tP+Hc0X2S6enUC/MMte9iEcJQo48D0JXP3+WnBzmMNy3AV9Us7LuVgML2MqiJg9/9HIEPaeL5SQAXiXxEU=
+	t=1736195606; cv=none; b=YyErpk84Qv3xj2SMnUAnKYn3CnxarRr9oDyY1H7OO64cDDPtaXKRiss1YJ4UYsF57JTzJ6UTmJqZ4KdBUUOt6EnIILW758SI0nF83IqzBlEsurtadCmy4iGlL3lDVZsFdcIywMDINe663gyKyhLtpHJ+nuH+rlQNQVXPlyS+ayM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736194758; c=relaxed/simple;
-	bh=M7fH3j7Cp8+Bx4ooqSEnVvpi3MR62uMBv0pz4A1YeRQ=;
+	s=arc-20240116; t=1736195606; c=relaxed/simple;
+	bh=4b/pSyVLztAmTQ0fAHNYwyMUCzcMxQbBpEzygfmO2rg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QStbi2UCdAhYGdetvoEhfpvGdqECKWqzKbf8Zcxo2+fUwsfO4QonTzB5S43bHq0qvfkc6EivR3Gh1LudZs4FKOvsmob1vFyk87RoKgeAgKDzjj5YnmmLgwSC8U6j8QsxHd8Dye5qEjrpuIXCe6MgrMAAkqMHgoERPWhGKEVaWAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=LKeDUIsT; arc=none smtp.client-ip=209.85.216.49
+	 In-Reply-To:Content-Type; b=dRYY03oUyqHljdJbsdD0lp4WIKZ4DYLcSEEVvvXwOU1KquS+Q2gFVT7GlfBgljhA6PzP+txx+Y8sTwz0xyQpzHZD82Re2eMLw3XhQbjWKYJayS57vMN9Yfy2/GEp9WZrwQEPokmi4VUZMRaI25mdR1Ext0wG5kBoieovHfYH4hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=VT4AHBEo; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2efded08c79so16903895a91.0
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 12:19:16 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21683192bf9so210867215ad.3
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 12:33:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1736194756; x=1736799556; darn=vger.kernel.org;
+        d=ventanamicro.com; s=google; t=1736195604; x=1736800404; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=a9p8hjeIMnEMUpmW04h0W7NoiD5E5c5Q5zI/Al9/E30=;
-        b=LKeDUIsTljc6o7YmZBph6xkNXBmVTTgIwj9/ezJMGLtrBG5maeTplObpNDZdN+xmHs
-         vHUNS7NIacSx6idQ8PjnttOw1aLjuZhavMWvXjKYlZgi+9qI1PK3lLlVyht54oQvipV0
-         zESwiwWSfdVEXp1F8yvxGl8Eo88M9SK0Yh1n50V75OuuTedgVqBxvTh3040TRUnWtTI+
-         hXd0/wyiE7pcVv20Cqpzyt4LNJfylsB2xMiM78cuEVlNj+pJ76cZz1yuesQYAqA4DJWv
-         t4Ak83Ia1m25Mpfz+0fL4Ja7ExabMc7DhtZ6HgNG79fThOiXf7eau5PxqoZIrK3QRX54
-         Ffew==
+        bh=tRChKa/6ydnGwRW0eNjgRJAJvFNapuIamBmUVRUNy3A=;
+        b=VT4AHBEoEqWt/qiIX7v3i5dcaxGpg8NDIgGfPyEmWkxymJf8OMv3x6jgAAvPVromtD
+         oK6+OI807GZpThktuzcDJUT+K+ftgNc2p0kGF3cI5z7FCtncHzjK4Mxib92Do0Y2qruM
+         qMIMdtbYQRHmAsO5N2IC1VxrUjXOi19rXuF++5UjOeGXhynsH+Z8GmqDlZT5ZXqnolvn
+         iIXK9Vmu5oT+AQtfTydnYwTfeOYFMFd6IfJbzx2pgM63x3eBiCnQhVvhAdwVgTqXM6r0
+         q5JPr7EmVwgLX0hR8PJXnNJsvECIXG+f/7qQwDDVSJFVMO2jJMf1KLZgCwQJOPUMrkae
+         UQRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736194756; x=1736799556;
+        d=1e100.net; s=20230601; t=1736195604; x=1736800404;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a9p8hjeIMnEMUpmW04h0W7NoiD5E5c5Q5zI/Al9/E30=;
-        b=jrKrOF58+DiS0j9BFWO9WfrYaAQr1eFqYS1+BvKzEV7Em+bHpM0lpSOJhiAP4iZftF
-         Ga0RbbzjGF8w6gWv4iClFeWjd1e8VZ6ckRtvsJftiS/b3UL09xvT6UG1vWQsfqOGr7OM
-         KAg2UngiKR1svuJgknVIntz6ZFUIVS3vXLGONXHaqs0NbATLN8CDYrsgxnsmNRIc03nd
-         iWxDli9pGlZfdFy991lL/HH9QVqvUzEWmh25Txya7L+qMIAjPodcQorXTDNzBHGEcI2s
-         PTUeMCH94QhMmRYVNJN/YdeEaWQLpXsY4P2unB+KVBpXqf9kYjV4b+7f0oHbluu2WtUw
-         Iw7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXaQxw7B0MD2HQsHqTwPoVlSR+gsU29lGoB3cQnbcsLu4O+Q2DpFy2bk/mEhl57PiwFU6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBvDZlxQnpAIrZ/eOrg1Be2RW9gX/1UZziw4U0+h3raO7F/Fab
-	3ni6lw9pJcukwYTTPzPPiZPs5z+AjIs4+/Cg6v0gEasNEc4jkvArBU5tRvFRHEM=
-X-Gm-Gg: ASbGncta06MqfHqb5Qugoo6UiKYe91QjLnyU/nkZpn23BWcDBhOzJvAXec4nsscwqMU
-	+8ouusonlvS9fytdI40z6xL86/Z1/nTgV1xis/GGhICG1v3s1dviOrt0px+y3Ltl7uFi+N/9IZi
-	yR7ISiW3l1RA4S+PG5EGODZgKruqGhlXjpR9wqwiQo+OxU981A2mRx85doFqb1UILxIUOukcB8t
-	aWHaX9H4DQh3C4lc9rlI2qQmJhmpLVzDnLX+eZb4GNw7/8yXk4Y9GhNIKV8VYcyX//JkM4kJ+1i
-	O8TYIb10u78FPLyeSsk4DQ1Gmif1pETQbv8=
-X-Google-Smtp-Source: AGHT+IEdi1WeRPTrXeJrhazkx/sBhP2RZVeyTSKqrV/o+q5vpCxn6bBHpDXsADAKiAGaa0ShcqYeAQ==
-X-Received: by 2002:a17:90b:51c2:b0:2ee:ab29:1a57 with SMTP id 98e67ed59e1d1-2f452def211mr85711065a91.2.1736194756055;
-        Mon, 06 Jan 2025 12:19:16 -0800 (PST)
+        bh=tRChKa/6ydnGwRW0eNjgRJAJvFNapuIamBmUVRUNy3A=;
+        b=TVYIVnxqCM0GOCUTuTn2y8oqjX+FZS4/ZAp+WqNjq4xVoX7ZfpJ5WxZPrckV+nh3MA
+         Ft4kP557+9Zl7clBPz6/eVRtNiHmVCM9YFfM35zuDCtR07+gPUHvLqBsPBOMK17vyN0o
+         v1BGAulNY+iZ45qNvDkEuN4QNBKNdyQuehoR6exYP0gKwCjG91ma6IGrBB4d1Okpgf99
+         S44nTX+NSFBasuZajC5sYmMUMv6DSG2PDNzdfw/4F/cS18s8klKVdo4Lb59uFVY2xP9s
+         jVc9l473qj1S5TukJzLjibc14qfPhYvFw6S5iycioKTtL/2BkM2mrtOSRR88JA/lhFhe
+         Oi7A==
+X-Forwarded-Encrypted: i=1; AJvYcCXOAfiQwwaNtlcw9YRijeUjzMn8vg+4OzA5WHMSVlnYhsGYde14lOD8+AObF8BYN97jXmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzszDfSCA/AD7tzxJOJRCb6c6rkQ7Y4C1ZaIipYYnX8eNiVkrBP
+	va5iBR2FqPAjJkpQdXlL40WCZNHJGXlK7vn7wirj7iUsYZnh8mwkgdinq2DMoCjiiAJNKIaSDfw
+	6yT8=
+X-Gm-Gg: ASbGnctt5knl1s8EwpBJ9SupvNOZI8iuWxUBXqZy92JDBVsSiH0K4bfz/wrqceNvCD6
+	TJtqAJnuRSxzyLgXfPNc4wvHYNJrOQ0/hFmszlRJgLXNyouxjjPgNw5yUlJWTXkB6LHYxGbNXHX
+	JMAUYu66LEJuuy7c1kVf9Woy/Fe2s/KOxam3UWd06xJxfN2zWqZkCFYoaqLCVBl5CGZpwPTK9UC
+	NnF8Glfattdz543jyqcEkkd3mPJmppUQOXD9oScPv/0ggUOHBQCA6MckhdgJPvQAFHr12KCowz/
+	eKWqtpjRIAgeBWbS9JBqjplUfkN30em4Kmk=
+X-Google-Smtp-Source: AGHT+IGIo280ucsBcngxguAyG9JQ9T3VFgxxJUPO1hVz/7EWXjloduoiThjDr/f0vbWxM4+ikOS8ZQ==
+X-Received: by 2002:a17:903:2384:b0:216:5cbd:5449 with SMTP id d9443c01a7336-219e6e9e8c5mr891272455ad.13.1736195604239;
+        Mon, 06 Jan 2025 12:33:24 -0800 (PST)
 Received: from ?IPV6:2804:7f0:bdcd:fb00:6501:2693:db52:c621? ([2804:7f0:bdcd:fb00:6501:2693:db52:c621])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f2ee26b125sm39870772a91.43.2025.01.06.12.19.06
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9cde66sm296704655ad.145.2025.01.06.12.33.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Jan 2025 12:19:15 -0800 (PST)
-Message-ID: <69e79cef-214d-4795-b3ce-032529c9f7d6@ventanamicro.com>
-Date: Mon, 6 Jan 2025 17:19:04 -0300
+        Mon, 06 Jan 2025 12:33:23 -0800 (PST)
+Message-ID: <bd8168fe-c774-4f75-8a94-1a67ec31e38d@ventanamicro.com>
+Date: Mon, 6 Jan 2025 17:33:12 -0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,8 +82,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/7] cpus: Restrict CPU_FOREACH_SAFE() to user
- emulation
+Subject: Re: [RFC PATCH 6/7] accel/hvf: Use CPU_FOREACH_HVF()
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: =?UTF-8?B?RnLDqWTDqXJpYyBCYXJyYXQ=?= <fbarrat@linux.ibm.com>,
@@ -114,40 +114,122 @@ Cc: =?UTF-8?B?RnLDqWTDqXJpYyBCYXJyYXQ=?= <fbarrat@linux.ibm.com>,
  Daniel Henrique Barboza <danielhb413@gmail.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, Anton Johansson <anjo@rev.ng>
 References: <20250106200258.37008-1-philmd@linaro.org>
- <20250106200258.37008-2-philmd@linaro.org>
+ <20250106200258.37008-7-philmd@linaro.org>
 Content-Language: en-US
 From: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-In-Reply-To: <20250106200258.37008-2-philmd@linaro.org>
+In-Reply-To: <20250106200258.37008-7-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Perhaps add in the commit msg something like "it's only being used in
-bsd-user and linux-user code"
+
 
 On 1/6/25 5:02 PM, Philippe Mathieu-Daudé wrote:
+> Only iterate over HVF vCPUs when running HVF specific code.
+> 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
-
-Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-
->   include/hw/core/cpu.h | 3 +++
->   1 file changed, 3 insertions(+)
+>   include/system/hvf_int.h  | 4 ++++
+>   accel/hvf/hvf-accel-ops.c | 9 +++++----
+>   target/arm/hvf/hvf.c      | 4 ++--
+>   3 files changed, 11 insertions(+), 6 deletions(-)
 > 
-> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> index c3ca0babcb3..48d90f50a71 100644
-> --- a/include/hw/core/cpu.h
-> +++ b/include/hw/core/cpu.h
-> @@ -594,8 +594,11 @@ extern CPUTailQ cpus_queue;
->   #define first_cpu        QTAILQ_FIRST_RCU(&cpus_queue)
->   #define CPU_NEXT(cpu)    QTAILQ_NEXT_RCU(cpu, node)
->   #define CPU_FOREACH(cpu) QTAILQ_FOREACH_RCU(cpu, &cpus_queue, node)
+> diff --git a/include/system/hvf_int.h b/include/system/hvf_int.h
+> index 42ae18433f0..3cf64faabd1 100644
+> --- a/include/system/hvf_int.h
+> +++ b/include/system/hvf_int.h
+> @@ -11,6 +11,8 @@
+>   #ifndef HVF_INT_H
+>   #define HVF_INT_H
+>   
+> +#include "system/hw_accel.h"
 > +
-> +#if defined(CONFIG_USER_ONLY)
->   #define CPU_FOREACH_SAFE(cpu, next_cpu) \
->       QTAILQ_FOREACH_SAFE_RCU(cpu, &cpus_queue, node, next_cpu)
-> +#endif
+>   #ifdef __aarch64__
+>   #include <Hypervisor/Hypervisor.h>
+>   typedef hv_vcpu_t hvf_vcpuid;
+> @@ -74,4 +76,6 @@ int hvf_put_registers(CPUState *);
+>   int hvf_get_registers(CPUState *);
+>   void hvf_kick_vcpu_thread(CPUState *cpu);
 >   
->   extern __thread CPUState *current_cpu;
+> +#define CPU_FOREACH_HVF(cpu) CPU_FOREACH_HWACCEL(cpu)
+
+
+Cosmetic comment: given that this is HVF specific code and we only support one hw
+accelerator at a time, I'd skip this alias and use CPU_FOREACH_HWACCEL(cpu) directly.
+It would make it easier when grepping to see where and how the macro is being used.
+Same thing in the next patch with CPU_FOREACH_KVM().
+
+
+LGTM otherwise. Thanks,
+
+Daniel
+
+
+> +
+>   #endif
+> diff --git a/accel/hvf/hvf-accel-ops.c b/accel/hvf/hvf-accel-ops.c
+> index 945ba720513..bbbe2f8d45b 100644
+> --- a/accel/hvf/hvf-accel-ops.c
+> +++ b/accel/hvf/hvf-accel-ops.c
+> @@ -504,7 +504,7 @@ static int hvf_insert_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len)
+>           }
+>       }
 >   
+> -    CPU_FOREACH(cpu) {
+> +    CPU_FOREACH_HVF(cpu) {
+>           err = hvf_update_guest_debug(cpu);
+>           if (err) {
+>               return err;
+> @@ -543,7 +543,7 @@ static int hvf_remove_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len)
+>           }
+>       }
+>   
+> -    CPU_FOREACH(cpu) {
+> +    CPU_FOREACH_HVF(cpu) {
+>           err = hvf_update_guest_debug(cpu);
+>           if (err) {
+>               return err;
+> @@ -560,7 +560,7 @@ static void hvf_remove_all_breakpoints(CPUState *cpu)
+>       QTAILQ_FOREACH_SAFE(bp, &hvf_state->hvf_sw_breakpoints, entry, next) {
+>           if (hvf_arch_remove_sw_breakpoint(cpu, bp) != 0) {
+>               /* Try harder to find a CPU that currently sees the breakpoint. */
+> -            CPU_FOREACH(tmpcpu)
+> +            CPU_FOREACH_HVF(tmpcpu)
+>               {
+>                   if (hvf_arch_remove_sw_breakpoint(tmpcpu, bp) == 0) {
+>                       break;
+> @@ -572,7 +572,7 @@ static void hvf_remove_all_breakpoints(CPUState *cpu)
+>       }
+>       hvf_arch_remove_all_hw_breakpoints();
+>   
+> -    CPU_FOREACH(cpu) {
+> +    CPU_FOREACH_HVF(cpu) {
+>           hvf_update_guest_debug(cpu);
+>       }
+>   }
+> @@ -581,6 +581,7 @@ static void hvf_accel_ops_class_init(ObjectClass *oc, void *data)
+>   {
+>       AccelOpsClass *ops = ACCEL_OPS_CLASS(oc);
+>   
+> +    ops->get_cpus_queue = hw_accel_get_cpus_queue;
+>       ops->create_vcpu_thread = hvf_start_vcpu_thread;
+>       ops->kick_vcpu_thread = hvf_kick_vcpu_thread;
+>   
+> diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
+> index 0afd96018e0..13400ff0d5f 100644
+> --- a/target/arm/hvf/hvf.c
+> +++ b/target/arm/hvf/hvf.c
+> @@ -2269,10 +2269,10 @@ static void hvf_arch_set_traps(void)
+>   
+>       /* Check whether guest debugging is enabled for at least one vCPU; if it
+>        * is, enable exiting the guest on all vCPUs */
+> -    CPU_FOREACH(cpu) {
+> +    CPU_FOREACH_HVF(cpu) {
+>           should_enable_traps |= cpu->accel->guest_debug_enabled;
+>       }
+> -    CPU_FOREACH(cpu) {
+> +    CPU_FOREACH_HVF(cpu) {
+>           /* Set whether debug exceptions exit the guest */
+>           r = hv_vcpu_set_trap_debug_exceptions(cpu->accel->fd,
+>                                                 should_enable_traps);
 
 
