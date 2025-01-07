@@ -1,133 +1,106 @@
-Return-Path: <kvm+bounces-34668-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34669-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F04BAA0395E
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 09:09:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 491E0A03CB4
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 11:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 358A97A23D9
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 08:09:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E51F16101C
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 10:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946701DFE29;
-	Tue,  7 Jan 2025 08:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911831E500C;
+	Tue,  7 Jan 2025 10:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="anq/c82a"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GLh4nNbj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CC41DDA2D;
-	Tue,  7 Jan 2025 08:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117074C9D;
+	Tue,  7 Jan 2025 10:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736237373; cv=none; b=fRqHwu1Y5y3FEDME7rCldJAu2bVziFCKewOKRQ/QlkmHvf85J5HzvnXV8bTqHg7rDS+C1NzWzTb2rvJZKA1QP8vk2QakKo3d3NT6sg/4BIyDCqQmKVWOz0Pvzu7Ph7Fl0hGV725sMcHgEHF4EnJkq/LAPTX7h7t3UjngweZiTkQ=
+	t=1736246578; cv=none; b=Kkn/UtGJ+i6By5EP4N4egqn6IqkJt9PpkK1KKZEGUSYqi3jwYZ5RxvgikGuz9OAFDUQTHCVaU6E5fD5nCoZOK+UISjlV//raPm5iZlqoCraOA3OAMoHRbxUpxEEjwedGqGr3/ANife/Hz14Qnunvv/Ln0YmeFiOvRzssJxiYS5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736237373; c=relaxed/simple;
-	bh=QIM/sWV7ZOnj6KBpVYEahXewHQYEMzzrUfpQzc/48Mc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ir+j7hrJuJtzMn9bJdXe/MGieA1lOX8Pws4ztoChk6jhqs2I/DY7rPvrhbgZFoxWvo7t6UZ+FtBfPZr9L4QrofEEAHPxrOgziEsmYBjWvZ2YfD6OFbx663ekFSOwkhgfu1ZsrjXqDP/uf0AFRQotUqnoJ9bM3cMP06AxCUSX0rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=anq/c82a; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736237372; x=1767773372;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=QIM/sWV7ZOnj6KBpVYEahXewHQYEMzzrUfpQzc/48Mc=;
-  b=anq/c82a6uc2dYHw70D7OFJ786yzfC1ZWW9Xr7fTeD51DeY5smXoPD6y
-   +V2kaq7Ohq/hIhGVASVA7UVYrs/2+zjOAmKe7GsYyuPaA99sP9qGkEYIq
-   XiRxpEvBnU1URkX0pYC/51+5/Dn8fUqfE4ai31KoYKMQx2YTdSiiu9OtB
-   zYqrijnUJIHmw8wf2SQCsaWsd80l1ZxC2KQy33lcL+LI+jQZq9aooNADZ
-   axdrCCRwhdt0ywe3VDPQl9KJlsOOL1ia43H6oWjUgRE2H23ScIzBG6+9b
-   GPEn/PzhICIHqgh1rB1rq0HpdIXXjm0Cmgi6SNFee7gSpykZxYUYWygaF
-   A==;
-X-CSE-ConnectionGUID: jIHBJlzkTLmhoBkyBHObrA==
-X-CSE-MsgGUID: SolkQR8dSPCyRW5esEOeHg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11307"; a="36302192"
-X-IronPort-AV: E=Sophos;i="6.12,295,1728975600"; 
-   d="scan'208";a="36302192"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 00:09:31 -0800
-X-CSE-ConnectionGUID: FkpwPXMOQo+7wsmKgvhgIw==
-X-CSE-MsgGUID: QEUsvA6kQVKVTe/Il0l1pA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="107319156"
-Received: from unknown (HELO [10.238.1.62]) ([10.238.1.62])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 00:09:27 -0800
-Message-ID: <ef29512a-2ca0-47c4-8b6e-6553bce1e273@linux.intel.com>
-Date: Tue, 7 Jan 2025 16:09:25 +0800
+	s=arc-20240116; t=1736246578; c=relaxed/simple;
+	bh=ToQSwTQShmPorM8Uvs5zDG/uK4jQ2rSTdK3g7WMF9vI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VYIS1fLhA5GUG9ol8APCIEET9BkfswcRDIQmjfDDqqRFfypFUsacbvGh22PYmGWpG/Qf+5TvJ6wxytuGr1epOVrpTXC5kGPD00+90wP7C7pQ1+QtC3mN3GRp4TnrsNdW+7JZ+tmdMfa38abX0NnxModh7yZ5NczDt6FcAlpp4rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GLh4nNbj; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id ACFDA40E0266;
+	Tue,  7 Jan 2025 10:42:53 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id W45F-y7Nlb7p; Tue,  7 Jan 2025 10:42:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1736246565; bh=OhFg4vgi2p2BTMdB2hA5Ldsw3l33CNvIWxuc+0XlQDw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GLh4nNbjTKruo3pRaAOXNJlcADaBosHY4g7ndTLQTQkzUzfkHIUZYWzLuUO6uPOnS
+	 nVQVejYQEBVBgcyWLwd2F6GR5T1aRi7UkW1ROVRfVelJnQGW4JJ/b3+SMytlUy+QUB
+	 Q4veydIqz53/KV0EvgdcD/UAwu0Ju29QlpaWLGs33f2SVGW3+/7Bv3a90iXTd6ohp/
+	 jpBtnyDUSed4bSb62txt4BenMYo0Cz3QNZY1tvugRHoQlALQustQG+hmOmMREo2yuY
+	 1+fbmtSNWJ++QFx+7q6jBBeBkljY+5x51fu+SowOTQ7DvfFe7M+9x7yOVGQx3tlROw
+	 rb0rp32sSWdXNCK2lwo097Jrbkqy34U1mpVOW3uXl4GbT5iEdQx6gjnO6lG3w7jYF+
+	 FBrp3jwnD5YBo4Fru3uAVPyQ59nS5XtC/oftjHTM40pjrxnHaEdMFRry0xzyz29BEj
+	 cWCXPslCl4QtzIuVUu+hcoWcWaRp519E10iosDbepGAwtneA3sA5UNfdDpBeYLHPcw
+	 P/HZuLbsWYxB53DvFXnyMXNcF0zFR7ZKuitd47bjSMX1d+vBlDxWwruKxHDkayuWcO
+	 zM9fxzGXC16D7N3HRUkJEEjGRIvTHqbh6nlG+/9TpHObObnvaLA9hVJAtHPXn2E2P0
+	 vOnHR0KSlgiP1g3AvQ0sQfVI=
+Received: from zn.tnic (p200300ea971F93E8329c23ffFEa6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:93e8:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 963D440E0163;
+	Tue,  7 Jan 2025 10:42:33 +0000 (UTC)
+Date: Tue, 7 Jan 2025 11:42:27 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com, francescolavra.fl@gmail.com
+Subject: Re: [PATCH v16 05/13] x86/sev: Add Secure TSC support for SNP guests
+Message-ID: <20250107104227.GEZ30FE1kUWP2ArRkD@fat_crate.local>
+References: <20250106124633.1418972-1-nikunj@amd.com>
+ <20250106124633.1418972-6-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/16] KVM: TDX: Inhibit APICv for TDX guest
-To: Chao Gao <chao.gao@intel.com>, Sean Christopherson <seanjc@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>, pbonzini@redhat.com,
- kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com,
- adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@linux.intel.com, isaku.yamahata@intel.com,
- yan.y.zhao@intel.com, linux-kernel@vger.kernel.org
-References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
- <20241209010734.3543481-13-binbin.wu@linux.intel.com>
- <CAGtprH9UBZe64zay0HjZRg5f--xM85Yt+jYijKZw=sfxRH=2Ow@mail.gmail.com>
- <fc6294b7-f648-4daa-842d-0b74211f8c3a@linux.intel.com>
- <CAGtprH_JYQvBimSLkb3qgshPbrUE+Z2dTz8vEvEwV1v+OMD6Mg@mail.gmail.com>
- <Z3xqBpIgU6-OGWaj@google.com> <Z3yeWvg+JZ//wbLZ@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <Z3yeWvg+JZ//wbLZ@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250106124633.1418972-6-nikunj@amd.com>
 
+On Mon, Jan 06, 2025 at 06:16:25PM +0530, Nikunj A Dadhania wrote:
+> diff --git a/arch/x86/coco/core.c b/arch/x86/coco/core.c
+> index 0f81f70aca82..715c2c09582f 100644
+> --- a/arch/x86/coco/core.c
+> +++ b/arch/x86/coco/core.c
+> @@ -97,6 +97,10 @@ static bool noinstr amd_cc_platform_has(enum cc_attr attr)
+>  	case CC_ATTR_GUEST_SEV_SNP:
+>  		return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
+>  
+> +	case CC_ATTR_GUEST_SNP_SECURE_TSC:
+> +		return (sev_status & MSR_AMD64_SEV_SNP_ENABLED) &&
 
+This is new here?
 
+> +			(sev_status & MSR_AMD64_SNP_SECURE_TSC);
+> +
 
-On 1/7/2025 11:24 AM, Chao Gao wrote:
->> Note, kvm_use_posted_timer_interrupt() uses a heuristic of HLT/MWAIT interception
->> being disabled to detect that it's worth trying to post a timer interrupt, but off
->> the top of my head I'm pretty sure that's unnecessary and pointless.  The
-> Commit 1714a4eb6fb0 gives an explanation:
->
->    if only some guests isolated and others not, they would not
->    have any benefit from posted timer interrupts, and at the same time lose
->    VMX preemption timer fast paths because kvm_can_post_timer_interrupt()
->    returns true and therefore forces kvm_can_use_hv_timer() to false.
-Userspace uses KVM_CAP_X86_DISABLE_EXITS to enable mwait_in_guest or/and
-hlt_in_guest for non TDX guest. The code doesn't work for TDX guests.
-- Whether mwait in guest is allowed for TDX depends on the cpuid
-   configuration in TD_PARAMS, not the capability of physical cpu checked by
-   kvm_can_mwait_in_guest().
-- hlt for TDX is via TDVMCALL, i.e. hlt_in_guest should always be false
-   for TDX guests.
+-- 
+Regards/Gruss,
+    Boris.
 
-For TDX guests, not sure if it worths to fix kvm_{mwait,hlt}_in_guest()
-or add special handling (i.e., skip checking mwait/hlt in guest) because
-VMX preemption timer can't be used anyway, in order to allow housekeeping
-CPU to post timer interrupt for TDX vCPUs when nohz_full is configured
-after changing APICv active to true.
-
-
->
->> "vcpu->mode == IN_GUEST_MODE" is super cheap, and I can't think of any harm in
->> posting the time interrupt if the target vCPU happens to be in guest mode even
->> if the host wasn't configured just so.
->>
->>> Another scenario I was thinking of was hrtimer expiry during vcpu exit
->>> being handled in KVM/userspace, which will cause timer interrupt
->>> injection after the next exit [1] delaying timer interrupt to guest.
->> No, the IRQ won't be delayed.  Expiration from the hrtimer callback will set
->> KVM_REQ_UNBLOCK, which will prevent actually entering the guest (see the call
->> to kvm_request_pending() in kvm_vcpu_exit_request()).
->>
->>> This scenario is not specific to TDX VMs though.
->>>
->>> [1] https://git.kernel.org/pub/scm/virt/kvm/kvm.git/tree/arch/x86/kvm/x86.c?h=kvm-coco-queue#n11263
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
