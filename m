@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-34656-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34657-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7BCBA036FF
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 05:26:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B75A1A03700
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 05:26:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AF087A2375
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 04:26:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BF021883E3B
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 04:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30C519DF8B;
-	Tue,  7 Jan 2025 04:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808421DDC06;
+	Tue,  7 Jan 2025 04:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GuiObUEM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B9Ibbhai"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8700198E63
-	for <kvm@vger.kernel.org>; Tue,  7 Jan 2025 04:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7621D90D7
+	for <kvm@vger.kernel.org>; Tue,  7 Jan 2025 04:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736223965; cv=none; b=Di9INZr+/C+TFe6Cy3qZbgRwJy4Pi4/YuFhcdaLhPI6zExy3aggFNr96u2E0Q/PVo7Oo59XydCI/11ONFY/ncNUzqsxh5qRLsLFs6E7uELeu5AdWgsYdvc0HgpCuuuXt35T3RKyIhzIN9HH0fVOf5ZdWOQg+J5V+hC9mtaDJEYU=
+	t=1736223968; cv=none; b=nOU5OiG5Ej00+fbZp/LEjZCCpnVOEILrHe4AUYZvxygM+vebrj+go4iT4MXrvImEflCoCdQq0yeqWzEJPlIRlJ/JgIvuElnh+szlSI87U6UEhK29EQuwNI/R9Kz0rGP2fKgMmagthizwV7kt/Zs8uBAnYk51WvS/uHuc4XahHis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736223965; c=relaxed/simple;
-	bh=8ueD4jWvDQYZmXFbiwtcz9JxzGlg99ZnxpkF4nuFXeQ=;
+	s=arc-20240116; t=1736223968; c=relaxed/simple;
+	bh=Oo5Czc4SbZT4Ha1Gp+D2fmjEvq65Mb4ymvqBOVaBP1U=;
 	h=Date:In-Reply-To:Message-Id:Mime-Version:References:Subject:From:
-	 To:Cc:Content-Type; b=tBzeq2G9ilmkwk6EhgXLqx1eeUK9Q7iblf6xh7zXI7hYPk7ZDA7wQFzdefWjKCEpf9d4zo7P71lVNyXY+U4aAUkfrvVMYT0G4gaZqHcwZ45Mi0879XnatqR3XSWFG4jP1wS7FKGSlRk1TlqcoNgw/vOB7kPuhr/DbVzpAMQO/jI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GuiObUEM; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=qnhjEGvNPExTu3EA6cvRLLPB7XMau3N2JE6eWpe61UOVDFjXCM62hT0CnXvobIa9XRaXSoagJ0PqP4Cn72vCCuiQgTlFBsYaUl6MRoxTOtVPwg6IHPLou1Zo822vZI1Zra7HX/iTMDhLwGbLPpkzCBz9EGveg+XUgCZUcIUUnjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B9Ibbhai; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--suleiman.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e3988f71863so34182235276.0
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 20:26:03 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e4bed6c9151so30921441276.0
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 20:26:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736223963; x=1736828763; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736223966; x=1736828766; darn=vger.kernel.org;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NA213tAcZh4I3DpXocCWo8NBOW1Vq5W1/tV9hgW9Pn8=;
-        b=GuiObUEMuXhsqCtqJBvJCbY7GEz/yrUmWM+UudZcSei5x6T97n2Doujt2PTmjkPBpv
-         G6mR71BBicIOVwbtn+6Xs2u5JVMIqBfVvO4jEDvNZL5oj+5QfVgF1Uw4mUK8marFjqt6
-         VpjSAM8UL+00HrwEEWIenfWUEimV10v+VIuvHpOacifXfxOkMg3olsA+4Q+eOD+SOzpR
-         Gh+f8RXKH5kialHV1IOEc6ZwFkP4q7pNhc4+4zvKLkzYxnw+3WOCS9AFW4Em5JKRyBMJ
-         UoJ90W5vnV25QoUXcDRbuSyZq1djM35xhf/I7VTGoRl3x7cdTkWgD+hxnTpRhbrNLnUe
-         Dh6A==
+        bh=+THoeasM42BCk1KQnN9W/5urUBLqOEIVbbKevhlfFUk=;
+        b=B9IbbhainZOCLYfcktnDFj6i+G/u01ldv/s4fDXGRoocHp65x19GyjwJCpCFnt+1XN
+         6uSWPEj3feEAbYjnQDrBJLFq/fRc/X8rKm5On5rR24+UeX6Twh0LmEud0KE1icZDjJnH
+         fPAM9MiWug8cuGaFAjL49DdinacsYP5Mn3d4eUT5FIOaRvDSLy1ZF1ST8fgZxa0LKk6c
+         IyrWL0OdIIWKgJML0hKr6UKhUpCUtz9JWeEeq3mlMsfaAkU61ftF8NyHkyuoRIWKhsEU
+         3K/403V7uhj6u4U9427AfJaLSdUSGCW89lPPcS5OXoqVph3MX0AOus3tKnAEkBmfLsyn
+         ickg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736223963; x=1736828763;
+        d=1e100.net; s=20230601; t=1736223966; x=1736828766;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NA213tAcZh4I3DpXocCWo8NBOW1Vq5W1/tV9hgW9Pn8=;
-        b=jZIhhs+pYiKJonDb7KFQsVOUzbX5aLqcdT2I6sOgWqUDHqKxgmXQSQwwUxF2KOHAf4
-         8lKqLYU+BqdK+v3M+ixeVQFO1Fp5w5eBysMAfBS4AQp+xSRqt2/GyRATeMSyZ5MBokTL
-         Ee56hZ2JjnIbfbQYh4rIL/TK1FAjU/9UA7f19MfvJkmRor0Gs/X/qzfrRVJ/ysQLkqfa
-         CEgICg0bTr81HLSq3tUoDQPJw71q5t0+uOPiZpV0czW5+5FPqR/jG0r1qnJmlItZm943
-         SvydKXQKmoo5I+sbCqB+nrUOIeJNrNQkzmGNgydql8qk2XejqDfoCa07BSandgbVTs+P
-         SBWA==
-X-Forwarded-Encrypted: i=1; AJvYcCWf62wb/iYwWW8ZdN138vD3IqJGq+P26lZPI3C7BnJnoeKGvDK3Qk0h0FvzatmrgT3TsT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXx56/vn9YyeGZgRaSFyZXZ5fSOyTXjT1mQe0rom/sSKIlLIeI
-	Ls5MQ28H9PEchcF9bxYT62R0dcgmZqbqO2ivxNIJVpaF8xldFyVQsAqTSlsRx/X28u+s3Y/xTRv
-	T2yt0LVMVpg==
-X-Google-Smtp-Source: AGHT+IGkMfbK8LFTyqa2WHNChhrC1EmxtYD81Q8wDfhlgq+6CGJjihWtDqxm7J7NyHBHnty4sQQAhU3Kr/hDiQ==
+        bh=+THoeasM42BCk1KQnN9W/5urUBLqOEIVbbKevhlfFUk=;
+        b=oRLFp0b0jrYvYYrn3NnMqLytp//qs4UUdnh41ISacBm1H6APl626rln3PnUvGbaIlf
+         B/kyxSoasHktyaejyqawH1FRtnaRoE4rAMoYnSWfzKQ2K9qGafdDeo8uFHaqS9qnNuix
+         keowdPtTrXb7P6vjWqVT5OwOeNHIz49GVpjw/d2Wz7KMEorfpU0sbeU33yNfDgH/C3o8
+         C7s7HIZw8o0Pbg3d2vuTC8nqjNx9jWwwpR6ROwMEBiCx7tNmY4B9fcOv0XrnfqH00hci
+         lpPSiHgI6n9ZmJENnPZHSsc/IuGkrTTTiMLRJxNPxKd93cjEOhZ/0NXRm9IK5CRZVhe7
+         LbUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVabE2jGRo9Bha41+tKdtZiKzXLbKWnspk8qV2URretGgwkKaMKZpKP9N3wMhryyxqwsbY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztZJDU4EhIVlsD0bsyOQFSatCfDQD+Qn2iCQnS+PHQEDm5GySO
+	t4f8GAk7NVrU6ThR8GUNkejfu8qiNbysFXnZCpRRNcpKHgHEKupxCP7k1odM1M+KmSMiptwuaT0
+	o+0/EI7Gg0w==
+X-Google-Smtp-Source: AGHT+IGgNdDXJm39KCxJUsMtCDg+NtjT+Tuiwe+F9K1F2HLuSWB3gCkqA0t3EFGQwF6paadenujiL1dh4Z+w5A==
 X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:66b9:6412:4213:e30a])
- (user=suleiman job=sendgmr) by 2002:a05:690c:201a:b0:6e3:f32:5fc8 with SMTP
- id 00721157ae682-6f3f80cd036mr1676287b3.1.1736223962893; Mon, 06 Jan 2025
- 20:26:02 -0800 (PST)
-Date: Tue,  7 Jan 2025 13:21:59 +0900
+ (user=suleiman job=sendgmr) by 2002:a05:690c:3392:b0:6ee:4d97:9091 with SMTP
+ id 00721157ae682-6f3f8261c62mr1692887b3.7.1736223966172; Mon, 06 Jan 2025
+ 20:26:06 -0800 (PST)
+Date: Tue,  7 Jan 2025 13:22:00 +0900
 In-Reply-To: <20250107042202.2554063-1-suleiman@google.com>
-Message-Id: <20250107042202.2554063-2-suleiman@google.com>
+Message-Id: <20250107042202.2554063-3-suleiman@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,7 +75,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250107042202.2554063-1-suleiman@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Subject: [PATCH v3 1/3] kvm: Introduce kvm_total_suspend_ns().
+Subject: [PATCH v3 2/3] KVM: x86: Include host suspended time in steal time.
 From: Suleiman Souhlal <suleiman@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
@@ -85,71 +85,82 @@ Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borisl
 	ssouhlal@freebsd.org, Suleiman Souhlal <suleiman@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-It returns the cumulative nanoseconds that the host has been suspended.
-It is intended to be used for reporting host suspend time to the guest.
+When the host resumes from a suspend, the guest thinks any task
+that was running during the suspend ran for a long time, even though
+the effective run time was much shorter, which can end up having
+negative effects with scheduling. This can be particularly noticeable
+if the guest task was RT, as it can end up getting throttled for a
+long time.
 
-Change-Id: I8f644c9fbdb2c48d2c99dd9efaa5c85a83a14c2a
+To mitigate this issue, we include the time that the host was
+suspended in steal time, which lets the guest can subtract the
+duration from the tasks' runtime.
+
+Note that the case of a suspend happening during a VM migration
+might not be accounted.
+
+Change-Id: I18d1d17d4d0d6f4c89b312e427036e052c47e1fa
 Signed-off-by: Suleiman Souhlal <suleiman@google.com>
 ---
- include/linux/kvm_host.h |  2 ++
- virt/kvm/kvm_main.c      | 26 ++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/x86.c              | 11 ++++++++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 401439bb21e3e6..cf926168b30820 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2553,4 +2553,6 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
- 				    struct kvm_pre_fault_memory *range);
- #endif
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index e159e44a6a1b61..01d44d527a7f88 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -897,6 +897,7 @@ struct kvm_vcpu_arch {
+ 		u8 preempted;
+ 		u64 msr_val;
+ 		u64 last_steal;
++		u64 last_suspend_ns;
+ 		struct gfn_to_hva_cache cache;
+ 	} st;
  
-+u64 kvm_total_suspend_ns(void);
-+
- #endif
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index de2c11dae23163..d5ae237df76d0d 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -889,13 +889,39 @@ static int kvm_init_mmu_notifier(struct kvm *kvm)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c8160baf383851..12439edc36f83a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3650,7 +3650,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 	struct kvm_steal_time __user *st;
+ 	struct kvm_memslots *slots;
+ 	gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
+-	u64 steal;
++	u64 steal, suspend_ns;
+ 	u32 version;
  
- #endif /* CONFIG_KVM_GENERIC_MMU_NOTIFIER */
+ 	if (kvm_xen_msr_enabled(vcpu->kvm)) {
+@@ -3677,6 +3677,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 			return;
+ 	}
  
-+static u64 last_suspend;
-+static u64 total_suspend_ns;
-+
-+u64 kvm_total_suspend_ns(void)
-+{
-+	return total_suspend_ns;
-+}
-+
-+
- #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
-+static int kvm_pm_notifier(struct kvm *kvm, unsigned long state)
-+{
-+	switch (state) {
-+	case PM_HIBERNATION_PREPARE:
-+	case PM_SUSPEND_PREPARE:
-+		last_suspend = ktime_get_boottime_ns();
-+	case PM_POST_HIBERNATION:
-+	case PM_POST_SUSPEND:
-+		total_suspend_ns += ktime_get_boottime_ns() - last_suspend;
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
- static int kvm_pm_notifier_call(struct notifier_block *bl,
- 				unsigned long state,
- 				void *unused)
- {
- 	struct kvm *kvm = container_of(bl, struct kvm, pm_notifier);
++	suspend_ns = kvm_total_suspend_ns();
+ 	st = (struct kvm_steal_time __user *)ghc->hva;
+ 	/*
+ 	 * Doing a TLB flush here, on the guest's behalf, can avoid
+@@ -3731,6 +3732,13 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 	steal += current->sched_info.run_delay -
+ 		vcpu->arch.st.last_steal;
+ 	vcpu->arch.st.last_steal = current->sched_info.run_delay;
++	/*
++	 * Include the time that the host was suspended in steal time.
++	 * Note that the case of a suspend happening during a VM migration
++	 * might not be accounted.
++	 */
++	steal += suspend_ns - vcpu->arch.st.last_suspend_ns;
++	vcpu->arch.st.last_suspend_ns = suspend_ns;
+ 	unsafe_put_user(steal, &st->steal, out);
  
-+	if (kvm_pm_notifier(kvm, state) != NOTIFY_DONE)
-+		return NOTIFY_BAD;
-+
- 	return kvm_arch_pm_notifier(kvm, state);
- }
+ 	version += 1;
+@@ -12299,6 +12307,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	if (r)
+ 		goto free_guest_fpu;
  
++	vcpu->arch.st.last_suspend_ns = kvm_total_suspend_ns();
+ 	kvm_xen_init_vcpu(vcpu);
+ 	vcpu_load(vcpu);
+ 	kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
