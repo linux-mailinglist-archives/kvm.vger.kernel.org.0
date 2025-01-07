@@ -1,203 +1,159 @@
-Return-Path: <kvm+bounces-34697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47D3BA04859
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 18:34:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4314A048A3
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 18:52:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27EBC16679E
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 17:34:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBFA61887BD9
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 17:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A16518C937;
-	Tue,  7 Jan 2025 17:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E061F37D5;
+	Tue,  7 Jan 2025 17:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="CrTIJKr1"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Qxk5oIAg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F14017B50A
-	for <kvm@vger.kernel.org>; Tue,  7 Jan 2025 17:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300431898ED;
+	Tue,  7 Jan 2025 17:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736271245; cv=none; b=YvQKWukNeoIAy6hN6QdOsksiw0McprM03r9DSiajLAnCo1jCjKhVF505kmjvU7L+pl+ANM4mGKdo2p+xOQmvFu3d/e8LM2IX57DQPmpOHMoKX4GSfinCzCWsSvLhS2y0tvspNJwrCPk08FKNX4QDRKMRx1hKCkHV8IWRUu6y33o=
+	t=1736272327; cv=none; b=n5LCj6cRTiCg9z8hKwQsRbRDShrPSFsCiz6psOf1ihiobkplMrIG+IDdkatGusqIJCFpvDKKUDIlPLrKRpv3KL4OWzwLQc6Fant73pO/c/eVlJZJYjmj8WGVoU8uiu7b7LZH7+wZ7LlBpi5UZbxREKwyvknDHWDDf7OHyKMfHzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736271245; c=relaxed/simple;
-	bh=jYD/h+7/PVZpFneHxt5z3FjHMvmjPEaWESJq2DdJ6jk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RF85p8jHFyl3LWV8jR5P9pS3laApNv+QBBbUTokIKqFR8bElemAni4aTfxxbKU8jdeuU0Hra8GgKsua19lOY7H3W8BA9u5ez6NDCWCSHYHa1eOetmH9Y4lM0QVYHVx8gh+7+djktuWZX3SYqubLm64cQ/eXOfuPBOeO/8bxklTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=CrTIJKr1; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ee397a82f6so23548983a91.2
-        for <kvm@vger.kernel.org>; Tue, 07 Jan 2025 09:34:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736271241; x=1736876041; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8chiWn8PHgcoyJVQOgate9PsARC7jUqDb+rR2Mrr+VA=;
-        b=CrTIJKr1y6sXduaPThaMHtVhGG/oqVRy+ZWsLFBjdTHB5ymHWwvkI7bbwTHarL3ak+
-         vrdBxwCkCazGDXGe4gIlevCEuJmPi1OTAV+usFS5/bsZmNvgeVHYPDkuhRBrLWcx+igO
-         KeACPLergJ9yb4IyY+RGyBlaJJNx4YYM8nQIALT8ug51bJyMKmrEdqGg9MF5bCUuVpjM
-         lbYjBhgfjT32Bfu0J5E96pS9Ckpoyr+QQEKxs7M+O0ve6pX7jTmNc1A/ftw7/oX8kQiV
-         4VWhzESW3L5hHQHUrxUo4eQALsmy/x5LzsfiWbQQWy8580H0A3q/gy4r99qRIIC57Gfa
-         Ejow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736271241; x=1736876041;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8chiWn8PHgcoyJVQOgate9PsARC7jUqDb+rR2Mrr+VA=;
-        b=K4S++KNZspZZXWcRrWy2OLxElpg/8uNY+Qy080Vm1kCf8Vf9SO2OGVernw0JO/bnvg
-         3D4y77cqWOrM+7vpfPod5F43/MRDZPZLbexjIWlYmvk6Oo3Bq+rpCarFc/knjFa7NiAo
-         pZv39IEvq1j/GyokMXf/FGJl9+YgQnE/V3DeCb8G5hwwpScTvt71xgnRH+Y2xgMoFGbo
-         nv0xIgx4uxv5HKvSrGFLWhYfv07GjRGI7gstcd2/jjBN1TARYqnI46zqQVa5RUnpaezj
-         myGXeoDI2BD1cWgf0FzwTl0+UeuKoZrWCzeWJ0MtlWkVW6UvFra7iHdKDlRBHV9O29VX
-         vCjQ==
-X-Gm-Message-State: AOJu0Yyfij77tc1GVUzN45EPab8r07NrLWHZvlBAkEyth/Ne8QJnu/17
-	e8zqCOB4KIMaoQ9UNeAh2dp3MinZcGjZAsMz45qAkjaTJGHaqkJk6N/OGGbVgyc=
-X-Gm-Gg: ASbGnctlq/v7MQiI91dv8yD9Ksfa8zIY1joKBO949Ovxk6/rRpn69vUHCY4KSI2z/8U
-	Ru4eKtRY/Mehp9tkWDGyLqXMhR2sjBYC4q65hillSdeg2ikbCfjBzRAdEbestHP4a4jndZOzZ/i
-	gHVPqUVF+ahbqz6rA/2ukJ7L9Q7LqCtP+3wMR0eteNw2FzP92ExsBtapvpdFNJQsNuBJytJVvyE
-	qbCfcSZgIkb6qhuFUMYqUy1ou+1YnXlJfACqo36suZeGwqMuMf4RSqWvzNTsdPQYw6hBNSeRlzM
-	bZbqKz+uUKVQhMbcVDuMjl3hxw==
-X-Google-Smtp-Source: AGHT+IGpFaqKxwP+asxFbBD1Yj7PsO+fRwK1mkugnP7ZKu1AjJHchKThe8xppLAgUTKIrZ/vqEzIiA==
-X-Received: by 2002:a17:90b:2c84:b0:2ea:a25d:3baa with SMTP id 98e67ed59e1d1-2f452dfa40bmr97211846a91.5.1736271240898;
-        Tue, 07 Jan 2025 09:34:00 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f4478ac7dbsm36191474a91.50.2025.01.07.09.33.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2025 09:34:00 -0800 (PST)
-Message-ID: <25e8e0c6-c9d4-4c98-ae02-284db0175d82@rivosinc.com>
-Date: Tue, 7 Jan 2025 18:33:45 +0100
+	s=arc-20240116; t=1736272327; c=relaxed/simple;
+	bh=+Mp+CVfXYaKYkoaaxH4hDrZpPAYKNDklHY2BWRaWwXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qop6jUNujYuhI4p258slwRI1/txY05aoeYf9SeRj3BRQAXXG3RZMHQvESCTIuocQeFkOYQu3LNjRoHREj7QLmKg/FVeMwz6FehbZ2vDG+q/lliPtTUV7UhkGdavmOJdV+kDn9nhJj/DuVnkKVjT7dTwiylaOBO67IcubRnDp8Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Qxk5oIAg; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id B940B40E021E;
+	Tue,  7 Jan 2025 17:52:00 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id qsskCgeDaNS5; Tue,  7 Jan 2025 17:51:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1736272310; bh=Wrh8ZBeNM3GdfNBaIOBA9IbIdUenkVCIhMBjTrwJRqE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qxk5oIAg1WNOeD4sl8Sbtu4WJqzmLwQtJpCFiue+UBHFKXplckV/3m2jl22TQXj4X
+	 rV8UjvNTa68/BL2hNBnNyMZZHiHTxr6U8rTdkciGihxm4dfN4HQHdSOuLIvHKzL/B5
+	 bKb71NjiZZTZhasXhxItj82s+AhkyKqXh94l9kLH/tWliSgnDDUFURtkCPzsQp9fxu
+	 8mG9y8P4mofSDibKjovimbxX57P2njY3GJOmIYVXzAWf7DlPmIYOP5ayfxh6a4Cob0
+	 grmJA3Y2rRLmhHp8uEicQalesgVZjQzanLxsff5fE9d7N3Y9Sciq9G8fTCHeokPnLR
+	 RVwGT6/sNOH2t3stippbO6ul2wbDoHtIwBgTc0HoO+hswQyCV7kBWyG1psPyWHFnuB
+	 BvMeDzk/1bxvq4ubm5KEBkvuUSKTt7uyZUtyyWTZ9h4K4/rywI8rzA2H5l5kNtWemo
+	 cKSOcMXttP9gkEamWQcMh/tK1llP1fo2GkuABSIpeL/bLqix3e+cPP+OgdcfOefwiV
+	 69B5JcDT3yn6oJSQC0sLLKd9/1qTe43t4V6DBgsS55uagjzR4WhRVPFTgIrUx1wbMf
+	 RUTsEGQ2+tBogj9yhYw15LOhOp/TzVdMhgUslYKLs90H70z5rTI5aNil8roIegDu9O
+	 ylrFmf3RRlpvyMSTSYJZPIHQ=
+Received: from zn.tnic (p200300ea971F9314329C23fffeA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:9314:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C6B9040E01C5;
+	Tue,  7 Jan 2025 17:51:34 +0000 (UTC)
+Date: Tue, 7 Jan 2025 18:51:28 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com, francescolavra.fl@gmail.com,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Juergen Gross <jgross@suse.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Subject: Re: [PATCH v16 11/13] x86/tsc: Upgrade TSC clocksource rating for
+ guests
+Message-ID: <20250107175128.GGZ31poPrKk2E_k-H3@fat_crate.local>
+References: <20250106124633.1418972-1-nikunj@amd.com>
+ <20250106124633.1418972-12-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v4 2/5] riscv: use asm-offsets to generate
- SBI_EXT_HSM values
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel
- <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
-References: <20241125162200.1630845-1-cleger@rivosinc.com>
- <20241125162200.1630845-3-cleger@rivosinc.com>
- <20250107-feb21efc4c0815bd3ed7b173@orel>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20250107-feb21efc4c0815bd3ed7b173@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250106124633.1418972-12-nikunj@amd.com>
 
-
-
-On 07/01/2025 18:27, Andrew Jones wrote:
-> On Mon, Nov 25, 2024 at 05:21:51PM +0100, Clément Léger wrote:
->> Replace hardcoded values with generated ones using asm-offset. This
->> allows to directly use ASM_SBI_EXT_HSM and ASM_SBI_EXT_HSM_START in
+On Mon, Jan 06, 2025 at 06:16:31PM +0530, Nikunj A Dadhania wrote:
+> Hypervisor platform setup (x86_hyper_init::init_platform) routines register
+> their own PV clock sources (KVM, HyperV, and Xen) at different clock
+> ratings, resulting in PV clocksource being selected even when a stable TSC
+> clocksource is available. Upgrade the clock rating of the TSC early and
+> regular clocksource to prefer TSC over PV clock sources when TSC is
+> invariant, non-stop, and stable
 > 
-> ASM_SBI_EXT_HSM_HART_STOP
-> 
->> assembly.
->>
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> ---
->>  riscv/Makefile           |  2 +-
->>  riscv/sbi-asm.S          |  6 ++++--
->>  riscv/asm-offsets-test.c | 12 ++++++++++++
->>  riscv/.gitignore         |  1 +
->>  4 files changed, 18 insertions(+), 3 deletions(-)
->>  create mode 100644 riscv/asm-offsets-test.c
->>  create mode 100644 riscv/.gitignore
->>
->> diff --git a/riscv/Makefile b/riscv/Makefile
->> index 28b04156..a01ff8a3 100644
->> --- a/riscv/Makefile
->> +++ b/riscv/Makefile
->> @@ -86,7 +86,7 @@ CFLAGS += -ffreestanding
->>  CFLAGS += -O2
->>  CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib -I $(SRCDIR)/riscv
->>  
->> -asm-offsets = lib/riscv/asm-offsets.h
->> +asm-offsets = lib/riscv/asm-offsets.h riscv/asm-offsets-test.h
->>  include $(SRCDIR)/scripts/asm-offsets.mak
->>  
->>  %.aux.o: $(SRCDIR)/lib/auxinfo.c
->> diff --git a/riscv/sbi-asm.S b/riscv/sbi-asm.S
->> index 923c2cec..193d9606 100644
->> --- a/riscv/sbi-asm.S
->> +++ b/riscv/sbi-asm.S
->> @@ -7,6 +7,8 @@
->>  #define __ASSEMBLY__
->>  #include <asm/asm.h>
->>  #include <asm/csr.h>
->> +#include <asm/asm-offsets.h>
->> +#include <generated/asm-offsets-test.h>
->>  
->>  #include "sbi-tests.h"
->>  
->> @@ -58,8 +60,8 @@ sbi_hsm_check:
->>  7:	lb	t0, 0(t1)
->>  	pause
->>  	beqz	t0, 7b
->> -	li	a7, 0x48534d	/* SBI_EXT_HSM */
->> -	li	a6, 1		/* SBI_EXT_HSM_HART_STOP */
->> +	li	a7, ASM_SBI_EXT_HSM
->> +	li	a6, ASM_SBI_EXT_HSM_HART_STOP
->>  	ecall
->>  8:	pause
->>  	j	8b
->> diff --git a/riscv/asm-offsets-test.c b/riscv/asm-offsets-test.c
->> new file mode 100644
->> index 00000000..116fe497
->> --- /dev/null
->> +++ b/riscv/asm-offsets-test.c
->> @@ -0,0 +1,12 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +#include <kbuild.h>
->> +#include <asm/sbi.h>
->> +#include "sbi-tests.h"
->> +
->> +int main(void)
->> +{
->> +	DEFINE(ASM_SBI_EXT_HSM, SBI_EXT_HSM);
->> +	DEFINE(ASM_SBI_EXT_HSM_HART_STOP, SBI_EXT_HSM_HART_STOP);
->> +
->> +	return 0;
->> +}
->> diff --git a/riscv/.gitignore b/riscv/.gitignore
->> new file mode 100644
->> index 00000000..91713581
->> --- /dev/null
->> +++ b/riscv/.gitignore
->> @@ -0,0 +1 @@
->> +/asm-offsets-test.[hs]
->> -- 
->> 2.45.2
->>
-> 
-> I like this and I should probably rework stuff to replace all the _IDX
-> macros in riscv/sbi-tests.h. I think we should call it sbi-asm-offsets.c,
-> though, and then change the Makefile and .gitignore changes to refer to
-> riscv/*-asm-offsets.h. That would allow us to keep test-specific asm-
-> offsets separate and avoid the name "asm-offsets-test" or similar which,
-> to me, conveys it's for testing asm-offsets.
+> Cc: Alexey Makhalov <alexey.makhalov@broadcom.com>
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> ---
+>  arch/x86/kernel/tsc.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 
-Yes indeed, that will be clearer. I'll take care of updating the file
-name as well as the gitignore in this series.
+This needs to make it perfectly clear that it is about virt and not in
+general:
 
-Thanks,
+diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+index e98b7e585c1c..3741d097d925 100644
+--- a/arch/x86/kernel/tsc.c
++++ b/arch/x86/kernel/tsc.c
+@@ -276,14 +276,16 @@ bool using_native_sched_clock(void)
+ 
+ /*
+  * Upgrade the clock rating for TSC early and regular clocksource when the
+- * underlying platform provides non-stop, invariant, and stable TSC. TSC
++ * underlying guest is provided a non-stop, invariant, and stable TSC. TSC
+  * early/regular clocksource will be preferred over other PV clock sources.
+  */
+-static void __init upgrade_clock_rating(struct clocksource *tsc_early,
+-					struct clocksource *tsc)
++static void __init virt_upgrade_clock_rating(struct clocksource *tsc_early,
++					     struct clocksource *tsc)
+ {
+-	if (cpu_feature_enabled(X86_FEATURE_HYPERVISOR) &&
+-	    cpu_feature_enabled(X86_FEATURE_CONSTANT_TSC) &&
++	if (!cpu_feature_enabled(X86_FEATURE_HYPERVISOR))
++		return;
++
++	if (cpu_feature_enabled(X86_FEATURE_CONSTANT_TSC) &&
+ 	    cpu_feature_enabled(X86_FEATURE_NONSTOP_TSC) &&
+ 	    !tsc_unstable) {
+ 		tsc_early->rating = 449;
+@@ -295,7 +297,7 @@ u64 sched_clock_noinstr(void) __attribute__((alias("native_sched_clock")));
+ 
+ bool using_native_sched_clock(void) { return true; }
+ 
+-static void __init upgrade_clock_rating(struct clocksource *tsc_early, struct clocksource *tsc) { }
++static void __init virt_upgrade_clock_rating(struct clocksource *tsc_early, struct clocksource *tsc) { }
+ #endif
+ 
+ notrace u64 sched_clock(void)
+@@ -1584,7 +1586,7 @@ void __init tsc_init(void)
+ 	if (tsc_clocksource_reliable || no_tsc_watchdog)
+ 		tsc_disable_clocksource_watchdog();
+ 
+-	upgrade_clock_rating(&clocksource_tsc_early, &clocksource_tsc);
++	virt_upgrade_clock_rating(&clocksource_tsc_early, &clocksource_tsc);
+ 
+ 	clocksource_register_khz(&clocksource_tsc_early, tsc_khz);
+ 	detect_art();
 
-Clément
 
-> 
-> Thanks,
-> drew
+-- 
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
