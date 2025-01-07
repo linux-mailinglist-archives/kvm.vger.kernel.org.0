@@ -1,126 +1,173 @@
-Return-Path: <kvm+bounces-34648-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34649-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E72B9A03389
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 00:49:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81219A03431
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 01:53:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C1983A06D4
-	for <lists+kvm@lfdr.de>; Mon,  6 Jan 2025 23:49:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DF2E163907
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 00:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED98E1E2317;
-	Mon,  6 Jan 2025 23:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54026A33B;
+	Tue,  7 Jan 2025 00:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TirlTpII"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjYSN5f+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFA91E1A28
-	for <kvm@vger.kernel.org>; Mon,  6 Jan 2025 23:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B205F1CAA4
+	for <kvm@vger.kernel.org>; Tue,  7 Jan 2025 00:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736207383; cv=none; b=VxrF81Z42HuKgONfrTNnM6f5VHBvNimzAFOvIrnV40mkZBeNUdRxpByZXnvTQ/PQnW3auy1reV/qhQbMJz/IyV+j6j422i7TwQ0C2OeO/VpO5Wpt3iPqh9kxGNridBvYtLCHNUWGEHfwKt2sr0t7ohEVqNDtf5h/O3Ys0W4eVg0=
+	t=1736211200; cv=none; b=f1Gut0tsoHY4mVw58HVejW+qcRq5iSIlagr/U4UcEEPG1ZEwB17XccebOFp45pmJwxWVngB6Ikz/dKwUOBZV0oXRUfcRkmS658tnO6zfLZioqWFUsBBGLK2K85rN4QDyOVZEEVP8sdq/oPBIx6EXS3e/do/n6euX4TWH9Q61UEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736207383; c=relaxed/simple;
-	bh=LeksPA2aHWOWxkjOZmohp5++dprnR2b8TpT1nllhgtA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rbyHNZIZHvmbqoRRa4BclqcGpTw8vqh0DdmuRfSu/dAsVXv98LfXJqIpsbMQvgggsfcBGEM0pNb/nKCC6MSWQHVjCfcSjhJqMMJ1D11a5AzCc2vwQ6s4PIOBTxQX/+80QjsQWqH0G972WIEgKqx0AaPnmlZUURhZ2079cdxXZYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TirlTpII; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef7fbd99a6so20788843a91.1
-        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 15:49:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736207381; x=1736812181; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P8KvKEJrNmwb2uW1NJHV/ldlGxsuuLV7shvQVTGfzPc=;
-        b=TirlTpIImxSKb7Wldh6ZCcPrt9VqWvicuL6CHxla21nKluilpBTPF/F1UV7LLn0p0J
-         61FwlZwAk/9ssW9P+AaZxS6Wlpkf33Voq7smtVkRE7fiECGbaREjR/MPoOSOeqfnfCRf
-         oG3GnBOzXUzqvzbSe99/0Nceaba+K2Ni2kOBXkkTtWhG2FEre0chKDBoFDhJTZeNKLHi
-         3sSL2FwLBBXVPqfKZIZUoVVhegTTKlnPlavdMkl1CUK8y/Ao38HOAQyvZgqnh/WATu16
-         gyPUX7rUBIkPu28ce9kDvy2GK0z5qXVR/fkOW09VsugO++Xq9PX9U5F8nrZSE6wBAX/V
-         ym/A==
+	s=arc-20240116; t=1736211200; c=relaxed/simple;
+	bh=c3Gsli1t6Qs5m45O8lq5F4Uh3ZhkcWazXHBcYZPmIQg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Ejeb7tfcS3t6RIqJdMjJ7APvI3xBjHX5QWbuWuIaW8RsF7DHkAGU+9vDkOuE9o2EDC6uJB8/FkcfIWFsCOZE9g7lwFaGvmDzJ9icCV/ldvjTKnthQeVRRsTomyKj6I+BHDf8jDeV/XcWuDOm7/6Zln7M8FWQTlKiM5uSFBTUCrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WjYSN5f+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736211195;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CtbBZcEWixSx8WxKTGxxVe9YGJddjHivheFuJ/OEl4U=;
+	b=WjYSN5f+y7bmupS5LASENbcmq6uWr1zwhaNHqTOWPRjvciYxq+TP+VhRGI/rZf4sxTPp38
+	4vU8OngTRcn88F4AKwhLReMNOQy8X17IxqM72466Rdcv4A+JVubJrk79nId6eRmSN4hk+L
+	HcD3MhWH+JGk0SHXeLzbxpH/CgUp/GU=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-266-kUlRJl_aMkS6r9SrUZ-nIw-1; Mon, 06 Jan 2025 19:53:13 -0500
+X-MC-Unique: kUlRJl_aMkS6r9SrUZ-nIw-1
+X-Mimecast-MFC-AGG-ID: kUlRJl_aMkS6r9SrUZ-nIw
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b6ecd22efbso2965641785a.0
+        for <kvm@vger.kernel.org>; Mon, 06 Jan 2025 16:53:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736207381; x=1736812181;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=P8KvKEJrNmwb2uW1NJHV/ldlGxsuuLV7shvQVTGfzPc=;
-        b=oLPaM+dD/ZjXklTRTCu96VgOzbdb1TIxEgwB91XZzpy9YQDSj8mPBDBVkM4M/Bijq4
-         JhnR7lBbJqVDoOjStgBURUWeQwoy9B/4mYOJsjvaj1p12sUdvBMV1Swfsxd+f7D0VSSz
-         sQXgOh38H64Zz/EtRAgO0V+iyE+NGbt0oeCYXSYZVP2tXpBJEZPQyoZY7A9S09iMqPnP
-         jX6q5b/1YuiNQ2wCiy/TwloQFm6hDjIo7Guqh3faLb531hLEBoSZIeg92SwlvNLrTZ4u
-         3yNY6hZX0I//W/q63zngmaIfDwHMGvFBfF3mKVDTOYt96tq+jOTdOtN1KvAtqLjordZo
-         VHJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4e0u43CZRzBtgkSl7SqAKC1wEiTzsvDXKjNKxnGInaJQKP15uqht5jhBkqc6erChj7WQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqKESTogcPr1cYLSEqAQRI/g/1Eb8lpzhaqb5I6jwXwRpo1r+9
-	3tLbooo6GrLlP5UkiH79qaKqZ99Mb6jM1w3ZrbScvhdvvnqsD7bb1TxsN/Be58OQYGPrF39Lm1O
-	WNQ==
-X-Google-Smtp-Source: AGHT+IET+V1UyyJB/gcqviFhIXxdjhULmPls+67Q2bSntTN1ooNqI9R4PqjKGEgEJoLJGTnVCIoD7oDU85w=
-X-Received: from pfbay10.prod.google.com ([2002:a05:6a00:300a:b0:728:f1bf:72ad])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:7187:b0:1e5:f930:c6e8
- with SMTP id adf61e73a8af0-1e5f930c7efmr71092337637.4.1736207380808; Mon, 06
- Jan 2025 15:49:40 -0800 (PST)
-Date: Mon, 6 Jan 2025 15:49:39 -0800
-In-Reply-To: <Z2kp11RuI1zJe2t0@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1736211193; x=1736815993;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CtbBZcEWixSx8WxKTGxxVe9YGJddjHivheFuJ/OEl4U=;
+        b=mSe0SiACsUR0QnJd4U7z6S9RAQDL0u07wIlvhuV5MFvUjQdI01dzXEuabandGdiWbk
+         YI3M1QE+U1VSMn7e3iyCVbSQssF74OSI1OfgT6JwUESK2pHgkLOgTd42wLW+cXpWwK6p
+         j3Ey/AgPKJh6i/lz3OqxT13V7qcjHRAW/v9YvZiyl3V4H5EpJmjKTurttIy97nQP7L3l
+         uOsmhu3jRQYAaq2F5tjK/zlXdtMgiU6ifxBCWoIu0/hEJ+dIGezsW8CWmSacWdvY0Aya
+         7orbJR/gJx0mLbxEJUSHtbonJTdyJKRW0LiGmuU5J4ckKi+MkN6ip8XZHGo/bP0qIcsm
+         1Hhw==
+X-Forwarded-Encrypted: i=1; AJvYcCWBO5NIDTJqEdS4n16OkkbaoTmXKMcHLQ/Im5VBmABatTHHUDPeeQx+dd2al4m2LDDAbTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCEr1lXosvjQz7kD0sG5U62sUX8I+nKscwK22EZogLTonQFmIw
+	uYZc1JE+vJ1dhhtFbg/z2e0mvxN5WOvn/vsZxVmiTxkJey3fcROu5u+KKDKAq9e4xwe0NV2wgw3
+	04peHmQGwc4mCo91xz6vAyx+3LZweWwrwIWt1H6uacyT6Xxqxrw==
+X-Gm-Gg: ASbGncvm8JRhQdjHYEuGvXFd3sJggo4mNuThIGYV+hbnvTHVjX9FpBFk9MHy0TarHgJ
+	Dgkkh4lmj/EwMZdL+ng1tGri25GYgp4rjdcRw122szrTGLTEG6NNLzlJrE3JLRazRnhAOIGe+dm
+	TxSRYni36u7cLs7l2KO4dORkB/xsV5dY6OJab5pFAPgJWgFdwTp7RMUNCcu3CT0I4JEh1YG+a+P
+	Uf+SZ51UJLap6vHkWtNMnjv5hsNhtAxz4KCu5TO12EBzYDwkL7ZKvCNWoT17LB+JUkr70bER00K
+	qMSA9zkTp17txSADJN4wQK/3guEoYPtK16ZnDQmKt3rWBA==
+X-Received: by 2002:a05:620a:4391:b0:7b1:5545:7104 with SMTP id af79cd13be357-7bb90248f5emr233294685a.2.1736211193458;
+        Mon, 06 Jan 2025 16:53:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGH3zXukWoOxxE9GTC98eC7YuZVzhkxHUhqQrhYMYf+Tp1nGh3nJP16xZ6Vg5mME8zl35azTw==
+X-Received: by 2002:a05:620a:4391:b0:7b1:5545:7104 with SMTP id af79cd13be357-7bb90248f5emr233291885a.2.1736211193119;
+        Mon, 06 Jan 2025 16:53:13 -0800 (PST)
+Received: from crwood-thinkpadp16vgen1.minnmso.csb (syn-050-074-019-099.biz.spectrum.com. [50.74.19.99])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac4cd95fsm1549579385a.103.2025.01.06.16.53.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jan 2025 16:53:12 -0800 (PST)
+Message-ID: <e7972ba881ed8c0ed8c82379c4e9a2e88cd94ceb.camel@redhat.com>
+Subject: Re: [PATCH v2 3/5] powerpc: kvm: drop 32-bit booke
+From: Crystal Wood <crwood@redhat.com>
+To: Arnd Bergmann <arnd@kernel.org>, kvm@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Thomas Bogendoerfer
+ <tsbogend@alpha.franken.de>, Huacai Chen <chenhuacai@kernel.org>, Jiaxun
+ Yang <jiaxun.yang@flygoat.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Alexander Graf <graf@amazon.com>, Anup
+ Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, Paul
+ Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, David Woodhouse
+ <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, Marc Zyngier
+ <maz@kernel.org>,  "A. Wilcox" <AWilcox@Wilcox-Tech.com>,
+ linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+ linux-riscv@lists.infradead.org
+Date: Mon, 06 Jan 2025 19:53:11 -0500
+In-Reply-To: <20241221214223.3046298-4-arnd@kernel.org>
+References: <20241221214223.3046298-1-arnd@kernel.org>
+	 <20241221214223.3046298-4-arnd@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241115084600.12174-1-yan.y.zhao@intel.com> <CABgObfbukWu5srwDGA-orsd35VRk-ZGmqbMzoCfwQvN-HMHDnw@mail.gmail.com>
- <Z2kp11RuI1zJe2t0@yzhao56-desk.sh.intel.com>
-Message-ID: <Z3xsE_ixvNiSC4ij@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Only zap valid non-mirror roots in kvm_zap_gfn_range()
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, rick.p.edgecombe@intel.com, 
-	binbin.wu@linux.intel.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 
-On Mon, Dec 23, 2024, Yan Zhao wrote:
-> On Sun, Dec 22, 2024 at 08:28:56PM +0100, Paolo Bonzini wrote:
-> > On Fri, Nov 15, 2024 at 9:50=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com>=
- wrote:
-> > > Sean also suggested making the self-snoop feature a hard dependency f=
-or
-> > > enabling TDX [2].
-> > >
-> > > That is because
-> > > - TDX shared EPT is able to reuse the memory type specified in VMX's =
-code
-> > >   as long as guest MTRRs are not referenced.
-> > > - KVM does not call kvm_zap_gfn_range() when attaching/detaching
-> > >   non-coherent DMA devices when the CPU have feature self-snoop. [3]
-> > >
-> > > However, [3] cannot be guaranteed after commit 9d70f3fec144 ("Revert =
-"KVM:
-> > > VMX: Always honor guest PAT on CPUs that support self-snoop"), which =
-was
-> > > due to a regression with the bochsdrm driver.
-> >=20
-> > I think we should treat honoring of guest PAT like zap-memslot-only,
-> > and make it a quirk that TDX disables.  Making it a quirk adds a bit of
-> > complexity, but it documents why the code exists and it makes it easy f=
-or
-> > TDX to disable it.
+On Sat, 2024-12-21 at 22:42 +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>=20
+> KVM on PowerPC BookE was introduced in 2008 and supported IBM 44x,
+> Freescale e500v2 (32-bit mpc85xx, QuorIQ P1/P2), e500mc (32bit QorIQ
+> P2/P3/P4), e5500 (64-bit QorIQ P5/T1) and e6500 (64-bit QorIQ T2/T4).
+>=20
+> Support for 44x was dropped in 2014 as it was seeing very little use,
+> but e500v2 and e500mc are still supported as most of the code is shared
+> with the 64-bit e5500/e6500 implementation.
+>=20
+> The last of those 32-bit chips were introduced in 2010 but not widely
+> adopted when the following 64-bit PowerPC and Arm variants ended up
+> being more successful.
+>=20
+> The 64-bit e5500/e6500 are still known to be used with KVM, but I could
+> not find any evidence of continued use of the 32-bit ones, so drop
+> discontinue those in order to simplify the implementation.
+> The changes are purely mechanical, dropping all #ifdef checks for
+> CONFIG_64BIT, CONFIG_KVM_E500V2, CONFIG_KVM_E500MC, CONFIG_KVM_BOOKE_HV,
+> CONFIG_PPC_85xx, CONFIG_PPC_FPU, CONFIG_SPE and CONFIG_SPE_POSSIBLE,
+> which are all known on e5500/e6500.
+>=20
+> Support for 64-bit hosts remains unchanged, for both 32-bit and
+> 64-bit guests.
+>=20
+> Link: https://lore.kernel.org/lkml/Z1B1phcpbiYWLgCD@google.com/
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  arch/powerpc/include/asm/kvm_book3s_32.h    |  36 --
+>  arch/powerpc/include/asm/kvm_booke.h        |   4 -
+>  arch/powerpc/include/asm/kvm_booke_hv_asm.h |   2 -
+>  arch/powerpc/kernel/head_85xx.S             |  14 -
+>  arch/powerpc/kernel/head_booke.h            |  39 --
+>  arch/powerpc/kvm/Kconfig                    |  22 +-
+>  arch/powerpc/kvm/Makefile                   |  15 -
+>  arch/powerpc/kvm/book3s_32_mmu_host.c       | 396 --------------
 
-Belated +1.  Adding a quirk for honoring guest PAT was on my todo list.  A =
-quirk
-also allows setups that don't provide a Bochs device to honor guest PAT, wh=
-ich
-IIRC is needed for virtio-gpu with a non-snooping graphics device.
+Why are book3s files removed by this patch?
 
-> Thanks! Will do in this way after the new year.
+> @@ -228,23 +176,16 @@ static inline void kvmppc_save_guest_altivec(struct=
+ kvm_vcpu *vcpu)
+>  static void kvmppc_vcpu_sync_debug(struct kvm_vcpu *vcpu)
+>  {
+>  	/* Synchronize guest's desire to get debug interrupts into shadow MSR *=
+/
+> -#ifndef CONFIG_KVM_BOOKE_HV
+>  	vcpu->arch.shadow_msr &=3D ~MSR_DE;
+>  	vcpu->arch.shadow_msr |=3D vcpu->arch.shared->msr & MSR_DE;
+> -#endif
 
-Nice!  One oddity to keep in mind when documenting the quirk is that KVM al=
-ways
-honors guest PAT when running on AMD.  :-/
+This is an ifndef... the contents should be removed.
+
+-Crystal
+
 
