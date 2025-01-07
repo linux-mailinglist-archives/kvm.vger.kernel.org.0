@@ -1,241 +1,258 @@
-Return-Path: <kvm+bounces-34691-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34692-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21607A0450B
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 16:44:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 022DBA046EA
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 17:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0265316660D
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 15:44:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 860BC1664A6
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 16:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF251EE7BB;
-	Tue,  7 Jan 2025 15:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FF71F76AF;
+	Tue,  7 Jan 2025 16:43:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gh2HxaTb"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="k85sfnsI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2DC1F427A
-	for <kvm@vger.kernel.org>; Tue,  7 Jan 2025 15:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736264640; cv=none; b=RdSgiRQBXgsCoYEQTqmA4Vuu9WA7rPaWpdvd5El0/XFXwAhQd5ZL2F5hvR4rAt4UgNWDGKCgADuiRGCpQUQBdLqEFNbofHjtlMscnWmoYYs3ct6dgLXc67YfkgmYwU6lNkJB7cxMdXR5eoLs9haserqax1qqkiX8TfNEHePghDg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736264640; c=relaxed/simple;
-	bh=0QXPE+eXFXyIB0uillW17Lfw0Fpu3Su9RoFjQWDKyq0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Aqs1ea+WNl7z8GocBAc0FaD71Ac3miWDIP6Rbh1uIPWhBNIuXqplplyAs1Rkld9vsG/nRlvTGRxjZCAazSVfveYS7PIoqsUWXq743aTBEVswZv+T+MfLUHlieeqacPn0lNRy86PzQtvc3fAUBjR02Ave7dr/y+WnSg2CcgXAnOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gh2HxaTb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736264637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ksT98VQdUhSv0luDz3yS7GKqTDZHnvkmGgkAuI3OBoQ=;
-	b=gh2HxaTbvX2RmcOD0cGRsm99yTJR+wFWr79bjfkjI0Xitop66qz5zBnLjAXYnbbfQpEk9o
-	UMQa94fk0lNIkiLScfQrTyaFSwklIj6PcDidAenQX1ZfZH4jliGKZuyKp2KWY6Kluy6hE+
-	qqz6BiOrIMTveJocEnWdb6dnIetXnvk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-220-1Ku-wcibMKKrlkbd2WND_A-1; Tue, 07 Jan 2025 10:43:56 -0500
-X-MC-Unique: 1Ku-wcibMKKrlkbd2WND_A-1
-X-Mimecast-MFC-AGG-ID: 1Ku-wcibMKKrlkbd2WND_A
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385ded5e92aso2969801f8f.3
-        for <kvm@vger.kernel.org>; Tue, 07 Jan 2025 07:43:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736264635; x=1736869435;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ksT98VQdUhSv0luDz3yS7GKqTDZHnvkmGgkAuI3OBoQ=;
-        b=Db4aKVejYEXAuK12DZMdJspXbd1teT6gTUeX9EOYV+WLHi891cqiR9rGroOTcd55/i
-         BQzcZ5faFABMmxST+ac3NtyXJdBkA6B4JQbD+TQTjHLM0uHGIday2TMcewaAitjpSv4d
-         JLE4TXE+0JmMuDTlyPAEak750m7xiLsxKQ1fyNwdtNmLyadw+SBDN7l2XeNniZfrFuaw
-         Akv+P7bqYIbcwhyv0egk78sBuA7pfcRb8+pAdd2WXFQNO3BbswNTV5i+/uLuPdOLyqE0
-         zzOK5kmkniPCyTNQJVxk9dFx6r82b57EiJ+0vdTp1HHwltvTLXX2rqXXTjvbdEW1D4uj
-         jXaA==
-X-Gm-Message-State: AOJu0YwFtZ8wCsKAnZdIEZpabrjFcWGOEEgo5YhmdPf03mXa6jMcnLqD
-	blUro3w/wXHH6ue00SrJaX31hTEqyNk2wJTqKQW99XSNzXmrNG/wzk2f0PbXUJix99QlobZG96d
-	IHV/N0oXTpT0YkeV7YXxAmk9vFthOnfmFGP/UVeLhpfbo49OFJQ==
-X-Gm-Gg: ASbGncvxPdNyN2gcLF/t7/3IbOj8ArJS0C6+ZHBEE+xPjcSGVTILCXPvSSOmFNggFPI
-	1iNziuel1RyXHAqvhxOZe1PtRgr57z4sC3IJROA708SVTd+3ZXossWKPZzBurqmkNTBxYlCBU2Q
-	csngSDMx9JZywgDMMqdQqnevHDgqtWGqmQPs9vOl0b/brcdtnfK25FyAfdWUIi+b0N/bBC2s4z5
-	GY1LM+PW9rRvK5M8irLrLv3h0r1aHRF/H/Uvv8gzukPL/hxTOj738lEV+8neX7mUKmGdO/iXuVK
-	9CNs6oEPZFQ6PrDQLo93MFwxfnNa/t8xh0mxRhuZ3A==
-X-Received: by 2002:a5d:6486:0:b0:386:5b2:a9d9 with SMTP id ffacd0b85a97d-38a22408e42mr60678370f8f.53.1736264634920;
-        Tue, 07 Jan 2025 07:43:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHsk0AvacnGYBFNBBsM2kiGWVAG8AyisJBhvtUsieGfaJb05XpWAWuK2N6//5cFbq49Bs8eag==
-X-Received: by 2002:a5d:6486:0:b0:386:5b2:a9d9 with SMTP id ffacd0b85a97d-38a22408e42mr60678347f8f.53.1736264634544;
-        Tue, 07 Jan 2025 07:43:54 -0800 (PST)
-Received: from localhost (p200300cbc719170056dc6a88b509d3f3.dip0.t-ipconnect.de. [2003:cb:c719:1700:56dc:6a88:b509:d3f3])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-38a2432e587sm46830028f8f.95.2025.01.07.07.43.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2025 07:43:54 -0800 (PST)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	David Hildenbrand <david@redhat.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Huth <thuth@redhat.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>
-Subject: [PATCH v1 4/4] KVM: s390: vsie: stop using "struct page" for vsie page
-Date: Tue,  7 Jan 2025 16:43:44 +0100
-Message-ID: <20250107154344.1003072-5-david@redhat.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250107154344.1003072-1-david@redhat.com>
-References: <20250107154344.1003072-1-david@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0811F4739;
+	Tue,  7 Jan 2025 16:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736268188; cv=fail; b=aWXxfAt1PyGyu0yx/Q+y6RJUyY4qiouoaBKRVdYpk5iWmb4YSqPmS/tvULYVBKLy5tcuAkJDpqzdhTz3+pzKIMJ3OVPnb9Q8BYCz7qOYEC1ZVOlFfnSPFANj3A/AVlTuWFINrPYTai1G6Kl6uMIegFl6fQAUtyEKGaN+TE8aEmE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736268188; c=relaxed/simple;
+	bh=L8Qi3YGP9NOMRyQcT4J8w5AqA/JzoTLphDRPvv4XDW0=;
+	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=RGttu3ZIh8DR/IoNXiA2hhVfEPiXibVPKkna1PjhuyKHVXFz8OvKJycROAlnt2Xjv2oRLbJGpcRKuTLFc/GNdhhQJPC7yPeYXTa2FRpUzylPCxFmknXNVODBxa1NkaUbRLnyT6fdxRWPQvoONynDMXPrZZnhKsmU4ypALi8hu8g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=k85sfnsI; arc=fail smtp.client-ip=40.107.220.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ccoTN9tRHe4NDYunYxjCD1W6DfgYuYWOwaFGel9Miq2FWsKnVJhoTA7PsFH9Ytq/I8rBjcWqjc8fDD5AXjAM9XTLvml4+qodPqwr9baacXQhtiegkquiEbykJI3emL2o040jqWxEDdGzLIL38LbW2t4XbWyfDQ6EH3cvGfJlWsLdcwVtAGP0sfJoqordn5kYzHESkPYnvFeBFwk8Lqli5mgF73cRp1bnFgQRG+OzgV79bRiultz/knIf10OKZCDapL+pfDNB7UG1iX2SYBuj8opPeMrULuNIfs+FOuPY1hLUGGjgPjsQ3Yv+H199l8rClgCO8TYUSVB68ppOA2nrFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vBx/x9FuMWMGztHI6FMrYfQlI3suypVfeYddQib1H6c=;
+ b=IDFCmXcCPKtJnx5+AjXSHgc4ULHeoCsiOCSLys688mDlD0DZnKglRLDf1wXr7QP2/6JMkF7ZMfPVIAq/awH56/0JAgf7Q7b1OIYnIFhdT5agdtTcjlMFnd6hprraOvP5yQzA+Tmqxdqy6bwLiF+OsqvoI99TUa55cwyezupapNEOUqjbJHc0UP76hr9kg+2afGWa5lUGR0pyFMf5uSUSa8pN6odAAEf4gNNJk0538xNfijlF4HttYuhTpgmIgNOXkfy7TALUxIMUm/DMHFCLu5KGN4KFjRWg/nWxwcbAjDyoJqw2xAQT1wIo6e2O5qfkdfmpoZx4fQpLJ9rLCI+c0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vBx/x9FuMWMGztHI6FMrYfQlI3suypVfeYddQib1H6c=;
+ b=k85sfnsIAUnxaXaw1BdMZd4DhrXnOlGUCO8045UJBpfyPKUxa8ivQEJ6Mo0DEZt8wZ/B9bw7zdnGvmUMcMi1MvjYH/m9f6Q6i89ibDVHGaHVvxsTf67ptdhhHVaJ4jdVkPc5B+nGcBC1/DCvIv+UVsPCylvaPOYqJ9ZWQ/s8kgQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by SA1PR12MB9247.namprd12.prod.outlook.com (2603:10b6:806:3af::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.16; Tue, 7 Jan
+ 2025 16:42:58 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8335.010; Tue, 7 Jan 2025
+ 16:42:58 +0000
+Message-ID: <6241f868-98ee-592b-9475-7e6cec09d977@amd.com>
+Date: Tue, 7 Jan 2025 10:42:55 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: michael.roth@amd.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-coco@lists.linux.dev
+References: <cover.1735931639.git.ashish.kalra@amd.com>
+ <14f97f58d6150c6784909261db7f9a05d8d32566.1735931639.git.ashish.kalra@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v3 6/7] KVM: SVM: Add support to initialize SEV/SNP
+ functionality in KVM
+In-Reply-To: <14f97f58d6150c6784909261db7f9a05d8d32566.1735931639.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0501CA0026.namprd05.prod.outlook.com
+ (2603:10b6:803:40::39) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|SA1PR12MB9247:EE_
+X-MS-Office365-Filtering-Correlation-Id: 087f8c3f-397f-48b6-417d-08dd2f3a5790
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SHNTMmdLc2NyTC9pYkdtckc5bGlvTHZwdWovbWhEMG1OZzEyRW1uQUJOSVdu?=
+ =?utf-8?B?TEJKL0Y4UEp5ZktWWnY3K2ZFTVg1NkhqYnQrMmNOSExuNkk5MFloZnlKcGYy?=
+ =?utf-8?B?NVNLZ2labFRmdTBqVXl0UlkvUHRzNG1UaXExbUhqTkxaTHFKa3FVTWxLbUdp?=
+ =?utf-8?B?dEdRS0NBOVBLL0VidGJIM1NqM2cyU3YyQ1R6SEE4S1dybW5CUHh3ZGhiK0xh?=
+ =?utf-8?B?dDhLTTkzNkF4Qy90cmYxM0RUelUwZFVNQWlIVnZmakZjVmp1WmErZFF6WE1t?=
+ =?utf-8?B?Qm1zNTFISHRHN3E5c2dWaGt1NE43UVZXYzJ4ekV3VTFTdzlRamlIOVNXNXZm?=
+ =?utf-8?B?Tm41UFRGVlJ3YTBleUV3WnM4elNVT1hld1RBL2pxd2dTYXRJSTY2WVdheFhE?=
+ =?utf-8?B?bVZpYko4QVhJUWQ3QlAwVk9QL1pWa2xiOUtCbTRFeXBxMTJwZVN4NzdxYUtP?=
+ =?utf-8?B?N0h1K1N0SEdYd1FBaXZKNDVrWVBnL09oRzdBWWN2c0p6QUYyUitSL3FrT0xF?=
+ =?utf-8?B?OGg5ejhVMGI0YmVsTGczOXJzNXNScyt1bkU4ZjEwbXQyOW90WnJhTndvZXBG?=
+ =?utf-8?B?T01JY010dUI2bEtueFhHaVJKYXRFSHUzWHFoK25MM01LQ2Q4TldMN1pyNzB1?=
+ =?utf-8?B?ZzQ0dEFqR1cxY3lrR1FvSndMR0tEYnFoTHdHUjQxUm1WR3pJdzFQYmYwMGtz?=
+ =?utf-8?B?a0xOUHhDZlYzSURLOGVlZUErd001ZnJyM1QxajZGL0JVL2xrWFp5Ni9VL0oy?=
+ =?utf-8?B?Tmg0SnR4NFM3NURacHMwYURuSTBKeHh5TzJiZVpCMmwrRXMvK2dLUVdzN0NG?=
+ =?utf-8?B?ekdaYVFpemhjaGtOaDdxdHg4RzBTTTRsNk1vWmc3anRZV1NRSkpRYUliTytM?=
+ =?utf-8?B?SVFGb05oK3haK29EWm9OYitmc2pFbE5TcmZ6YytCQkdkbFRLSlk3ZnlSem9w?=
+ =?utf-8?B?TmQ3VVMyVzUxVmJqdGFJZnphenA3dTRYL2JadnEyUll3ZEtFcklmekI4Vks4?=
+ =?utf-8?B?TWNxaWZaVkZQaUdCT2Y1SjhrQjhMUDRTTHVOMnhwVit0dU9NZzVJWnIzN2Yx?=
+ =?utf-8?B?MGxwNXJycHFBb1FjUWlLVEpkY0wwZTB0aWV6blp3TXFLa3JjaytsYVJmQUxD?=
+ =?utf-8?B?Y3M3T1RoVm9pelhjVEJXNjEzWGtLa3cyVjJnQk9jaUZBam5DZWROVXFsaHhx?=
+ =?utf-8?B?U3FMNVFpYlRtbFVreVZlN1FWSThVanY2MDVFQTVKUWEzdDNaYWt2YlJna2Jz?=
+ =?utf-8?B?eFlXRkt4U2J6N3daOHRtaU53eXBPYVFZaTBNcHdnOW5TelhTdVhNM0hIZG5V?=
+ =?utf-8?B?bjFNcVBOTHFLK2g5M0tEa2FtbWFaMFovbC9mY29obEIxeVBYcU9HSUIzZlpo?=
+ =?utf-8?B?VWJzL09sMDJHL1creERFMjZWMlNLb2UvVi9GcGlJTkNoVTRVdGh6aEtxNFhT?=
+ =?utf-8?B?bjVhRGhXY1hxM01ZaVdGR1BYVU1rbjJqeHBER2llV3FHQkUvUFJONkhhRitq?=
+ =?utf-8?B?ZEtSTjY0N0VjTlB3WmxXT2Jnd0FIWkVINmxaUVlRYU9iZG5lQVZNajEydVMz?=
+ =?utf-8?B?eDhtekhrUzREKzQ0Q0xLcUZzNXRkbXkva0IvT3BCWE5QM2dpaVlNbG44OFBx?=
+ =?utf-8?B?ck9ONy9FVGp3VFNkR1ZjMEZhZFBhNzRSLzk3Szh4S05hUVJNTGZsVG5qVGFH?=
+ =?utf-8?B?V21IZjJVRnZNb3MzY0xjNFY0QXY4RFZsOFF4eHlhdnhqZ01SWitLRXZ5bkpE?=
+ =?utf-8?B?UkNrb0xBTGlDNkVNYWF2WVpmUUptaHAyU2w5c2ZQZFZKU1k0cm9RajBGeFR3?=
+ =?utf-8?B?bkU1ZkxEakhIVzBsNXZhVWZKeG9ZYWtydTd3MkNsOTB1elhpYmRvZzllQlR2?=
+ =?utf-8?B?a20rZEgyaDF3RklEM05hc0cyNmVVWGZpZHhqalFQUUpIdk9lZHNOUnhYVWw1?=
+ =?utf-8?Q?xnbHbyz/Arw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?K3JHa1JadTMrRWcwUk5EUnVjWFVQanlhL21qNGlNNFRSM245YmFtODgrSUls?=
+ =?utf-8?B?TUErdngyN3h4TFJSd1c4OHdvckhVSUJqbVEyTkNMSDBVT21LRGdkRWVOd095?=
+ =?utf-8?B?aHN1Yi9oOUdhL1hRVHFkazh1NmtBQjZaY2xkRTgyVnBjalg0THcxUURES3o5?=
+ =?utf-8?B?SStNODZEc29ieG9VdTcxM3hSVzVUOC9IMFgxTjlwQXJVYkZ1SlZBZjloWnZF?=
+ =?utf-8?B?UXVYSWtUMzI3Y2hId0xlMStwazNRWXR6b2lXejVPTVFFYzVwTS9ReDRzUXdz?=
+ =?utf-8?B?eVZyVlJqaHdPRTBJWTd6d2lTNXYrZHEreTM5eEIwRGZCRzZwWGdjNXM0M0sx?=
+ =?utf-8?B?UisvVENNMENzeTBSMnprdkthTFJaMjkrSzN5OUlKMnNwT1RoTEl2RHhxbFNx?=
+ =?utf-8?B?bTV6cnJnd0wvRGJ5eTBVSWRDNDF5U2lWV0JyUWJJZDdoczQxL3ZDSUxoY2pp?=
+ =?utf-8?B?L3JQYm5xd0dMT0tUYkFsbm9BM04waHJ0b3VWRWhrNFpFQ0s3aURDaEtMR09x?=
+ =?utf-8?B?cVNnT0ZCTU8yenQ3bHlEVStyaXU2eXdsTG5NRzhHVnVBUHNTUWZPRWJEVXNv?=
+ =?utf-8?B?dVM0K1NINGlPdkxULzJ3MDRBcGovWWJ0SitaVGJPcGl4cU0xWmRjR1p0UWlI?=
+ =?utf-8?B?TG5nM1pRNFRMVG5zaGY5bzVHRWhVMDNKazI5djFNT01Sa0JzUzlEdHU5NnpU?=
+ =?utf-8?B?N3pkZ1BUWlZzTSs1Ymtkc0VYenRFeTFDTDZLTDd4RTBpUHhpcU1tYVo2NkhV?=
+ =?utf-8?B?THJEdUd4d05VVENyTDcwZ1VSREdOQVI1OXNPa1YzUk1HazVEOFdPSzBpL2ZU?=
+ =?utf-8?B?SjRySXlCSXlSM2xWSExGOWFYbjVEQlZQaFJoNU9yZXhPWjBGdTZJWkRIdkZv?=
+ =?utf-8?B?c082NU4rZVBiTjJyR3luaEl5UFE2K2ZCREtBa0I1V0NXZjRTbE5OMktibElx?=
+ =?utf-8?B?TW5iU1pQTXpXQ1h2Ly9iZ0R5b1NidThEa0M0UkFYNTZHMGEyQnU4WWU2dFVj?=
+ =?utf-8?B?aDNXamxIMGVZUUN0dnVGQWh2NTArMlFZVXNZdUJ6Wk5Na2Y0T1NTQUt5OVgw?=
+ =?utf-8?B?b1N1N1crUjM5RGozbGlwcFRqNVUwTXV2NGsveG9CL3RxMEcrdkRIb2Q0S2kz?=
+ =?utf-8?B?QXd4S1p0UDh0WEtSdlgxWFR4RUNuZC9rK3hwbUxYNG1qdnc5akUzRDV4d1FS?=
+ =?utf-8?B?eXh1M21HblBnV1hzM1pqT003QnJmQm5sR0dCb1d6Z0lEZUxZU2JwSUg1M2tR?=
+ =?utf-8?B?VXQzUGxkUlg2U1NKbURYdFJpUWc1cWlmNjMxZUdqcWtYV3grNzJOQU94VDJI?=
+ =?utf-8?B?bG1yNXFWSmluMFRidVNDS05RcUpyYS9HbUg3MndqNHJ1YS9ISmVMTUNtYVVi?=
+ =?utf-8?B?K3NvQXVONEhZenpWUFpjUFdUYW5ZZVkvMk5sSTUxVi9GMVFvVEU4TDhFUmhn?=
+ =?utf-8?B?RVNnZE4rVXFVMmZWQ0ovdTV1SzlLeU1NRG5lWERDSEVYTzNublJmSjJpbHF5?=
+ =?utf-8?B?U3FZSWRPeVZyNkNvRjJqby9tb3Y3Um5FclVwNmRESXpzMkVpbHN1S3lBL2lU?=
+ =?utf-8?B?L1dJb1lrSEtRcDd3WWp4ZEltZHVnNjhLb1YzclFYN2pDbmc5Q3JKc0p6c0Fm?=
+ =?utf-8?B?VExVV2NORE1NWXBvYWx4aXg4NzAzZnJuNGJESmtmSW1JNWRvRUR5SGZFK3Np?=
+ =?utf-8?B?UFJVYnZ6Q2lucGZhYjFydzJ3SkZmNVQ3MXZxU0tiSmdBOFpIQUtGM2lLbW1M?=
+ =?utf-8?B?SGdaN2xEZ0plNFRUOEc3dVNKL2pMREIvM1l1SFUxcDVUZ2VERzRrSEk2YzVk?=
+ =?utf-8?B?cXJDOU8wbUN4Zkp6ckt6Z1Y2b2YySFNtbjFqQTZzWVhBcHpUdVVVcnRTWlE5?=
+ =?utf-8?B?c01KMm1FdVBiZnpuUjNLRlJxdjFvYUc2V1lQVk5WTWtucEMvTnJwMDl2MFEr?=
+ =?utf-8?B?OCtkY2J0bHhXeXg2WnFCZDN2NXdTUm9DR3JkUkFndmNydTA3d1J6QmRPV0xM?=
+ =?utf-8?B?ajFKK0ZJRHRjeXlTWXp2S1N0SE92RHNvMW96S1RtU0d0WjdUR2pGSnlsYUcy?=
+ =?utf-8?B?NUlMa1M3MG9YUHVRSzBaeEM0UWVqM3dKNnQwTFpmWnNsaTJZNzhadkM4Rk0r?=
+ =?utf-8?Q?8XN6Q1YfjpFX7V6OvuqEVaVLG?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 087f8c3f-397f-48b6-417d-08dd2f3a5790
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2025 16:42:58.2319
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sxcDkD8Y2iGFHuCaGn/8UO0q5is5BjQ/Hj5vGddZ9qSIlj9QBXiREDBmSxAkPCw0QLFt/C32ML6Y9BEXXXQY8A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9247
 
-Now that we no longer use page->index and the page refcount explicitly,
-let's avoid messing with "struct page" completely.
+On 1/3/25 14:01, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Remove platform initialization of SEV/SNP from PSP driver probe time and
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- arch/s390/include/asm/kvm_host.h |  4 +++-
- arch/s390/kvm/vsie.c             | 31 ++++++++++++-------------------
- 2 files changed, 15 insertions(+), 20 deletions(-)
+Actually, you're not removing it, yet...
 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 97c7c81275434..4581388411b71 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -931,12 +931,14 @@ struct sie_page2 {
- 	u8 reserved928[0x1000 - 0x928];			/* 0x0928 */
- };
- 
-+struct vsie_page;
-+
- struct kvm_s390_vsie {
- 	struct mutex mutex;
- 	struct radix_tree_root addr_to_page;
- 	int page_count;
- 	int next;
--	struct page *pages[KVM_MAX_VCPUS];
-+	struct vsie_page *pages[KVM_MAX_VCPUS];
- };
- 
- struct kvm_s390_gisa_iam {
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index 29fdffeab635d..22643f4ae4455 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -599,7 +599,6 @@ void kvm_s390_vsie_gmap_notifier(struct gmap *gmap, unsigned long start,
- 	struct kvm *kvm = gmap->private;
- 	struct vsie_page *cur;
- 	unsigned long prefix;
--	struct page *page;
- 	int i;
- 
- 	if (!gmap_is_shadow(gmap))
-@@ -609,10 +608,9 @@ void kvm_s390_vsie_gmap_notifier(struct gmap *gmap, unsigned long start,
- 	 * therefore we can safely reference them all the time.
- 	 */
- 	for (i = 0; i < kvm->arch.vsie.page_count; i++) {
--		page = READ_ONCE(kvm->arch.vsie.pages[i]);
--		if (!page)
-+		cur = READ_ONCE(kvm->arch.vsie.pages[i]);
-+		if (!cur)
- 			continue;
--		cur = page_to_virt(page);
- 		if (READ_ONCE(cur->gmap) != gmap)
- 			continue;
- 		prefix = cur->scb_s.prefix << GUEST_PREFIX_SHIFT;
-@@ -1384,14 +1382,12 @@ static void put_vsie_page(struct vsie_page *vsie_page)
- static struct vsie_page *get_vsie_page(struct kvm *kvm, unsigned long addr)
- {
- 	struct vsie_page *vsie_page;
--	struct page *page;
- 	int nr_vcpus;
- 
- 	rcu_read_lock();
--	page = radix_tree_lookup(&kvm->arch.vsie.addr_to_page, addr >> 9);
-+	vsie_page = radix_tree_lookup(&kvm->arch.vsie.addr_to_page, addr >> 9);
- 	rcu_read_unlock();
--	if (page) {
--		vsie_page = page_to_virt(page);
-+	if (vsie_page) {
- 		if (try_get_vsie_page(vsie_page)) {
- 			if (vsie_page->scb_gpa == addr)
- 				return vsie_page;
-@@ -1411,20 +1407,18 @@ static struct vsie_page *get_vsie_page(struct kvm *kvm, unsigned long addr)
- 
- 	mutex_lock(&kvm->arch.vsie.mutex);
- 	if (kvm->arch.vsie.page_count < nr_vcpus) {
--		page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | GFP_DMA);
--		if (!page) {
-+		vsie_page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO | GFP_DMA);
-+		if (!vsie_page) {
- 			mutex_unlock(&kvm->arch.vsie.mutex);
- 			return ERR_PTR(-ENOMEM);
- 		}
--		vsie_page = page_to_virt(page);
- 		__set_bit(VSIE_PAGE_IN_USE, &vsie_page->flags);
--		kvm->arch.vsie.pages[kvm->arch.vsie.page_count] = page;
-+		kvm->arch.vsie.pages[kvm->arch.vsie.page_count] = vsie_page;
- 		kvm->arch.vsie.page_count++;
- 	} else {
- 		/* reuse an existing entry that belongs to nobody */
- 		while (true) {
--			page = kvm->arch.vsie.pages[kvm->arch.vsie.next];
--			vsie_page = page_to_virt(page);
-+			vsie_page = kvm->arch.vsie.pages[kvm->arch.vsie.next];
- 			if (try_get_vsie_page(vsie_page))
- 				break;
- 			kvm->arch.vsie.next++;
-@@ -1438,7 +1432,8 @@ static struct vsie_page *get_vsie_page(struct kvm *kvm, unsigned long addr)
- 	vsie_page->scb_gpa = ULONG_MAX;
- 
- 	/* Double use of the same address or allocation failure. */
--	if (radix_tree_insert(&kvm->arch.vsie.addr_to_page, addr >> 9, page)) {
-+	if (radix_tree_insert(&kvm->arch.vsie.addr_to_page, addr >> 9,
-+			      vsie_page)) {
- 		put_vsie_page(vsie_page);
- 		mutex_unlock(&kvm->arch.vsie.mutex);
- 		return NULL;
-@@ -1519,20 +1514,18 @@ void kvm_s390_vsie_init(struct kvm *kvm)
- void kvm_s390_vsie_destroy(struct kvm *kvm)
- {
- 	struct vsie_page *vsie_page;
--	struct page *page;
- 	int i;
- 
- 	mutex_lock(&kvm->arch.vsie.mutex);
- 	for (i = 0; i < kvm->arch.vsie.page_count; i++) {
--		page = kvm->arch.vsie.pages[i];
-+		vsie_page = kvm->arch.vsie.pages[i];
- 		kvm->arch.vsie.pages[i] = NULL;
--		vsie_page = page_to_virt(page);
- 		release_gmap_shadow(vsie_page);
- 		/* free the radix tree entry */
- 		if (vsie_page->scb_gpa != ULONG_MAX)
- 			radix_tree_delete(&kvm->arch.vsie.addr_to_page,
- 					  vsie_page->scb_gpa >> 9);
--		__free_page(page);
-+		free_page((unsigned long)vsie_page);
- 	}
- 	kvm->arch.vsie.page_count = 0;
- 	mutex_unlock(&kvm->arch.vsie.mutex);
--- 
-2.47.1
+> move it to KVM module load time so that KVM can do SEV/SNP platform
+> initialization explicitly if it actually wants to use SEV/SNP
+> functionality.
+> 
+> With this patch, KVM will explicitly call into the PSP driver at load time
+> to initialize SEV/SNP by default but this behavior can be altered with KVM
+> module parameters to not do SEV/SNP platform initialization at module load
+> time if required. Additionally SEV/SNP platform shutdown is invoked during
+> KVM module unload time.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 943bd074a5d3..0dc8294582c6 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -444,7 +444,6 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>  	if (ret)
+>  		goto e_no_asid;
+>  
+> -	init_args.probe = false;
+>  	ret = sev_platform_init(&init_args);
+>  	if (ret)
+>  		goto e_free;
+> @@ -2953,6 +2952,7 @@ void __init sev_set_cpu_caps(void)
+>  void __init sev_hardware_setup(void)
+>  {
+>  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
+> +	struct sev_platform_init_args init_args = {0};
 
+Will this cause issues if KVM is built-in and INIT_EX is being used
+(init_ex_path ccp parameter)? The probe parameter is used for
+initialization done before the filesystem is available.
+
+Thanks,
+Tom
+
+>  	bool sev_snp_supported = false;
+>  	bool sev_es_supported = false;
+>  	bool sev_supported = false;
+> @@ -3069,6 +3069,16 @@ void __init sev_hardware_setup(void)
+>  	sev_supported_vmsa_features = 0;
+>  	if (sev_es_debug_swap_enabled)
+>  		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
+> +
+> +	if (!sev_enabled)
+> +		return;
+> +
+> +	/*
+> +	 * NOTE: Always do SNP INIT regardless of sev_snp_supported
+> +	 * as SNP INIT has to be done to launch legacy SEV/SEV-ES
+> +	 * VMs in case SNP is enabled system-wide.
+> +	 */
+> +	sev_platform_init(&init_args);
+>  }
+>  
+>  void sev_hardware_unsetup(void)
+> @@ -3084,6 +3094,9 @@ void sev_hardware_unsetup(void)
+>  
+>  	misc_cg_set_capacity(MISC_CG_RES_SEV, 0);
+>  	misc_cg_set_capacity(MISC_CG_RES_SEV_ES, 0);
+> +
+> +	/* Do SEV and SNP Shutdown */
+> +	sev_platform_shutdown();
+>  }
+>  
+>  int sev_cpu_init(struct svm_cpu_data *sd)
 
