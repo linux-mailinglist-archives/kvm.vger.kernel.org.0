@@ -1,133 +1,106 @@
-Return-Path: <kvm+bounces-34673-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34674-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3370A03F53
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 13:35:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6053AA03F68
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 13:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C7FF3A02F8
-	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 12:35:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 032FA18874DF
+	for <lists+kvm@lfdr.de>; Tue,  7 Jan 2025 12:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8D51E47C8;
-	Tue,  7 Jan 2025 12:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E0B1E9B3E;
+	Tue,  7 Jan 2025 12:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="X68KFNeR"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Rr25qKON"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6D928E37;
-	Tue,  7 Jan 2025 12:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06484FC0E;
+	Tue,  7 Jan 2025 12:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736253338; cv=none; b=M0gpgkpQeFWT5njZdkUAkU0W/CeIAeD0OQhr9Xc29OAmYBEEiWEZX2W284qZEk07tp0dXW7gr7amJOT2aIytLjy5JDqfGNa1znb2ySt7CoE90qFqTLua7PC+AxxYElxDHe+nbWov8Q4rN0uCYkgGUNSelefd+Sv1yhtMPEtSX9U=
+	t=1736253465; cv=none; b=p8GtXNP/t5TI7scz1yrJfE4g+PeManHzCuKaIQE8j2seWqyh6meZEf4NiR4mxnvn2uUyUMILz3/2S/LdNCZEwys0VuNu6oFE2x0IkEcDGVnvdrvy3VoBZnMPQUc2xL/QMYeZO4WFeO9s/Hi/ftqSebCFrkuQJ+WItCiNVYEYYd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736253338; c=relaxed/simple;
-	bh=0O311cBlJrQ2gPJ2KwNJEGoVZEQemESwgik+5DVRZ6M=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=TTpTfE9pVyRBFW+k2eVRzxa9YXvkYbWdYaz6KiLrmKvjY3MARJ0cNEIPZxQKYB2oz3VdcTzfIm7QokJWAT/CLKfz5yNoQFt6dQay17buPhgwKNMXz+Pw2MLZNZDNA7H04H/omCnlNDHWCP/DSpVOgoEjHGtgrERae7uxLIPBsfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=X68KFNeR; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5073t59o021223;
-	Tue, 7 Jan 2025 12:35:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=QIcVh6
-	cB7rM/VTSdrWxFMHfyScByyJD3LhZyhlO4RVM=; b=X68KFNeRUdj3xqWnJyajUx
-	lCROUQmMUN8WufnUEGSnoRjdF0nkElYtPtpei01ePZU6juwlXEnix6/qagAuCq6K
-	tXwp/k9hdXA0Zg2YYZUipGfufuF5D1hqNDUSJ95ShA4J2rim9EFeyIOaAlCrxwlU
-	GWX0ttLRw9OKf+sxuy4+i0Y3iAQWS0j43RignS82YU5+m/DNZ/k0iBfE75KqPc3R
-	OheNAAVmZEH5TYrg/zsPYgM/0rsDu/RtLP4FCWS2P1S2Mlgc2Lh1phBPqOdluQF/
-	Y1Y/RFy26tSJf2Cf/n1vcoDmGD3R7lmLigmlnXxUVgKpI/bynCty6qEvg0X1a5ww
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 440s0aaqum-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 12:35:27 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 507COwxO008851;
-	Tue, 7 Jan 2025 12:35:26 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43yfpythsb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 Jan 2025 12:35:26 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 507CZK9H55640424
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 Jan 2025 12:35:20 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 67F7A20049;
-	Tue,  7 Jan 2025 12:35:20 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 46A3A20040;
-	Tue,  7 Jan 2025 12:35:20 +0000 (GMT)
-Received: from darkmoore (unknown [9.171.31.59])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  7 Jan 2025 12:35:20 +0000 (GMT)
+	s=arc-20240116; t=1736253465; c=relaxed/simple;
+	bh=3CHsslgHpJpawee/gvsUvCHadiF1wWhSK1n06g4WblQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=goO0GQ3En15dNxQAFO2uQiuYMkYZhYbBT8BqRLA3odv+lsAT6vm3tw4s9vrXGIG5sj+DHrgoHXziLf4+mTzqel/52oVyZZjE73xr5zv32n0ngdlZFA4mTf2y0IgiGcJIegUIhBlE8xwb4vlFb90ndhg3JWvb0bSvjWg6x0LY8OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Rr25qKON; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id EBA2F40E0163;
+	Tue,  7 Jan 2025 12:37:40 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id XSzZzGf8wPkp; Tue,  7 Jan 2025 12:37:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1736253448; bh=ISji3lVCWeh5JUXkN/3WOm1xt+5joVQtVcCRL5EuvzU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rr25qKONzTxSP7kYtQE/nX6ewQ4YxZtcDsw0JiP6J3JzmQg273UUx49rpriD6bh94
+	 Go9DA+f/AnjaRTQ9ugQN0/uekCq4VgQ+7lDeD5Cr2wYNpPBFhw6oH0kDhKIa4cql2h
+	 BGB8JCgSbZ+Dgw8+FKZhqW6mWfteHxU1UaXivEzOkjjvc6PHti1CpHGTfCRku1O4Ht
+	 c0iXGhT0No9zcVahejZMbC8Vja09ue8jH4C9/ZDDb2u1ZX4WyEBdUZYBJdhL654O/K
+	 a2zE6yoaQXT23GrQQt+doHPSatOYejr/rGzmK9fB0pR4rEnBq/wCQYK7QSfGRlnBQG
+	 o1pCwtjWSAV4aWPuGQPvu3s9XQWRSs9l5NO55jUfpEYIr85JyemYwtSKtXzTiWOJrl
+	 9EWjlRtlP1ufCXRsxBq4XRZboSqoIRPWS/q454UGheh3FoTc+RObc1xMJyevgVYVsb
+	 MwSseHsUcDqXSJRf1bagFbYsksVvB+664lXn5EbD4e30m2aYsBryL7jiytB9nWomY9
+	 56K2Ha0EozV58ZqsbwrahUyRdPu9cjVres7RgubXvOZN+5cSeCnC6M8CVfeLCUVQ5i
+	 4hW5VqTkDGg6b7lnGZYJXXo1QXrrXUZF7nkwZTujjc8kfThqmqslQf4YmlQxVGR63T
+	 cnIpy/hKFlydi463EAG0Ah9I=
+Received: from zn.tnic (p200300ea971f9314329C23FFfea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:9314:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B97AE40E0266;
+	Tue,  7 Jan 2025 12:37:16 +0000 (UTC)
+Date: Tue, 7 Jan 2025 13:37:11 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com, francescolavra.fl@gmail.com
+Subject: Re: [PATCH v16 05/13] x86/sev: Add Secure TSC support for SNP guests
+Message-ID: <20250107123711.GEZ30f9_OzOcJSF10o@fat_crate.local>
+References: <20250106124633.1418972-1-nikunj@amd.com>
+ <20250106124633.1418972-6-nikunj@amd.com>
+ <20250107104227.GEZ30FE1kUWP2ArRkD@fat_crate.local>
+ <465c5636-d535-453b-b1ea-4610a0227715@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 07 Jan 2025 13:35:15 +0100
-Message-Id: <D6VUFLL8PPTQ.1VZ6VWPZWRVTD@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "Linux Kernel Mailing List"
- <linux-kernel@vger.kernel.org>,
-        "Linux Next Mailing List"
- <linux-next@vger.kernel.org>
-To: "Stephen Rothwell" <sfr@canb.auug.org.au>,
-        "Christian Borntraeger"
- <borntraeger@de.ibm.com>,
-        "Janosch Frank" <frankja@linux.ibm.com>, "KVM"
- <kvm@vger.kernel.org>,
-        "S390" <linux-s390@vger.kernel.org>
-Subject: Re: linux-next: Fixes tag needs some work in the kvms390-fixes tree
-X-Mailer: aerc 0.18.2
-References: <20250106064232.3c34fdb1@canb.auug.org.au>
-In-Reply-To: <20250106064232.3c34fdb1@canb.auug.org.au>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Cf8xlSbxDmbr82tg_VUuzZ8-ujP5302K
-X-Proofpoint-ORIG-GUID: Cf8xlSbxDmbr82tg_VUuzZ8-ujP5302K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
- phishscore=0 mlxlogscore=654 lowpriorityscore=0 impostorscore=0
- malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501070105
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <465c5636-d535-453b-b1ea-4610a0227715@amd.com>
 
-On Sun Jan 5, 2025 at 8:42 PM CET, Stephen Rothwell wrote:
-> Hi all,
->
-> In commit
->
->   6c2b70cc4887 ("selftests: kvm: s390: Streamline uc_skey test to issue i=
-ske after sske")
->
-> Fixes tag
->
->   Fixes: 7d900f8ac191 ("selftests: kvm: s390: Add uc_skey VM test case")
->
-> has these problem(s):
->
->   - Target SHA1 does not exist
->
-> Maybe you meant
->
-> Fixes: 0185fbc6a2d3 ("KVM: s390: selftests: Add uc_skey VM test case")
+On Tue, Jan 07, 2025 at 05:13:03PM +0530, Nikunj A. Dadhania wrote:
+> >> +	case CC_ATTR_GUEST_SNP_SECURE_TSC:
+> >> +		return (sev_status & MSR_AMD64_SEV_SNP_ENABLED) &&
+> > 
+> > This is new here?
+> 
+> Yes, this was suggested by Tom here [1]
 
-Yes, I double checked. Your proposal is the correct hash / commit on the ma=
-ster
-branch.
-Sorry for the mixup.
+Either of you care to explain why this is needed?
+
+> >> +			(sev_status & MSR_AMD64_SNP_SECURE_TSC);
+
+I would strongly assume that whatever sets MSR_AMD64_SNP_SECURE_TSC will have
+checked/set MSR_AMD64_SEV_SNP_ENABLED already.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
