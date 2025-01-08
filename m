@@ -1,314 +1,138 @@
-Return-Path: <kvm+bounces-34797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A635A06011
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 16:26:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7199A0602C
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 16:35:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AE83166962
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 15:26:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C364D167085
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 15:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E201FCCEF;
-	Wed,  8 Jan 2025 15:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D16519C54A;
+	Wed,  8 Jan 2025 15:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nog92lPj"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="fpBdyc4G"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2083.outbound.protection.outlook.com [40.107.220.83])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4097919F133;
-	Wed,  8 Jan 2025 15:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736349969; cv=fail; b=WNb/B49sIvql4cJJ3+2TWTrM2+cPE+HaWXuhVWPB9TZlsI2znd58iDEXuSTikr2MujUV+vGy3ocdQUOeMt2VMb74yE0yoHbrxUAJXtUhB1im35p4ziz39D+PvO0+w5PyB+ELKFJoXxSudKg4A5nEL3TaPdJN8jIaxln8NpyFKc8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736349969; c=relaxed/simple;
-	bh=wDiPlSEqf4/tCGXVMbMdzh8Eoe8o7kqtbJghMSf7WAU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FgVsIYQEaQXrwgMJJ1PMTvgT29GO+TeQuNajl0IeQPGx1TH1OlEmlSe9ty9QA5h3DYb0h6Lrz1T9QxGW121tJmFf60nJiTBQ6Wu3Zc/3ufY2qx87ePDxXWZ2so4KnEv741p88rKq1aP/MEKqP7MXhMruN9IQD/VJvA+UZRrR2TE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=nog92lPj; arc=fail smtp.client-ip=40.107.220.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cdW08KipcwwTlPRkGQArqsiLj/rt63QNaUZOMYfg61vfeSuBBbQtozlxe4tagEXxC4HpodVb/ftNfzEN2jnk67LSnuph6PdiCjWfnf3uOxCNbnKRLg6mnFnnjiNOZDOjSaTm/xnLQ35udm9wcM2szoAoWGajWpUlsJF5EjTG/ginBF92N9MoDcaiqnyojN4IbY32C9gcvzzqgo+jhOVeUbl7i0kaE40J2D+dVajoj6eKGknfjtzN9OFPERJG9FYQuFBxw3dl14q7fElpL13/K+GXsF5OmL8cZ59Rq+QwwbZzf2Fzscfb7qiJvXgPSm/TTSnPMgJadai63nOdp1uPQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W5rkTErMfe8CC5GxlunhDeU1Bpr371i9i8RsZwoFEkg=;
- b=nEAQ9x6AEwPBXjwtHZRRSGaR4N6qcKjvygI+dspoOz3xl2T5atkOWNO2hKVyu4i+5JyWLZ8W/BYIkwXL3bhbmNNTqptB3JlShJ4FndRfik/nfocvwMiwL8TgE2V808d1g6Bj2El/qJraBy+4u7HH+i6DvZWJYGWp5p7YeGgZfyEG/nvoPZsgHpJs2K9H6Dgx2gOpG6Y78FdlC+qKIjlAQi1nmrAlpuSTBvubllGnw3e4I/bJMiG4hbBDDVRmwg0agEHWnnnQV1YjtE7kBNcmwHFnAF8zRXLlPMT9a/GXt/zJkuu8VHqBx9WNkrtVCsAgIkpymX+8/QRhL7qks/dX6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W5rkTErMfe8CC5GxlunhDeU1Bpr371i9i8RsZwoFEkg=;
- b=nog92lPjyQ331vxwT4f0ncODzInFODdNL1xm4cLhA77uBlSfRF+JsNSVlMli0H5rG5Pa9NT/+9tX1y+csG/tihYpBgGRA/D3KR9fIoeikQ0V+OgvSLLNqUDQt1KnsKJMWOzqjBTt9j08NSg5NddSEUAweHSz63abLBpWT0uCOa8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by DM6PR12MB4041.namprd12.prod.outlook.com (2603:10b6:5:210::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.12; Wed, 8 Jan
- 2025 15:26:03 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::46fb:96f2:7667:7ca5%5]) with mapi id 15.20.8335.010; Wed, 8 Jan 2025
- 15:26:03 +0000
-Message-ID: <5a858e00-6fea-4a7a-93be-f23b66e00835@amd.com>
-Date: Wed, 8 Jan 2025 16:25:54 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
- kAPI
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
- Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
- pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
- vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
- yilun.xu@intel.com, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
- daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
- zhenzhong.duan@intel.com, tao1.su@intel.com
-References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
- <20250107142719.179636-2-yilun.xu@linux.intel.com>
- <b1f3c179-31a9-4592-a35b-b96d2e8e8261@amd.com>
- <20250108132358.GP5556@nvidia.com>
- <f3748173-2bbc-43fa-b62e-72e778999764@amd.com>
- <20250108145843.GR5556@nvidia.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20250108145843.GR5556@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR5P281CA0029.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f1::13) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75B3259497;
+	Wed,  8 Jan 2025 15:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736350497; cv=none; b=LWi9lMieNUtDjx0WgcZH6NZfo925uJRnb9yGjUVvSfcp/3CRGojp+k/4CwomS96+GNboho9DplE0wOTKEm7HPKeibBmDh72RVnV8p6pD9K93Z9IhrT5hejXnWL6n+KnQmDUserOB6DQEU9g1kFcM6jpIiBYTgF6xY1sGCQgRaXw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736350497; c=relaxed/simple;
+	bh=c6foYZWTWGibcQwi7eM9+/xWsNY3OAJzuVT0qO5cYyo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sU3Sm7c1gHB7To1CO//mJaw+pRbxBjSl35guVh77vx/mHykpP7unCQHkOqlF8XfwSiXB+By+60BmNo28Ofn4yTxLQvNcNzAyaIrTdFFH/FudbYWKI9MMoA+njo4o0agbwU/YgMPPqswE3beubIq5hlyKqyUGCSk0wabmrfj7MnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=fpBdyc4G; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 44D4D40E01F9;
+	Wed,  8 Jan 2025 15:34:45 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id G6gYDZTv7eJ9; Wed,  8 Jan 2025 15:34:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1736350481; bh=ixTpklzRZPQg5q92zkLvTslst/mfYfhB2antGONDcn8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fpBdyc4G/mMEXhDUqBBfEMyUEKJSgBF2JDGkQLFHJQEo5ssBbZgDAEm/KtD3Lkfbx
+	 iF8+i4TLtL1NN8/AS+23fhi1oiFnnwhHVjDbY77raJZejwEZO3EhQ6BxHhn73eFyti
+	 71UQXBjY2q19QyGjUTNF9mPltlYjLVPtAYHIYM7fSiHDsr7rVdLrX5dwZe/tbB72nN
+	 /qIl94Sj6YLmHVtE+P9eErs/bVL5zuw4aIAwhaZfm6EIuUwQ2wci/msi8e1TVmqZ3o
+	 b5toBaeAi3jANmriyQXVDzzYfUWrRRzoAjO3F/K5bXcxq5JVv85WVB5bXt9VSLZg5i
+	 kXr3G85Kim4v8Q4OmAdbX2AOAcTwQ1AtnGN2Co3l/VLN993jQhCzRrY0doexbjdzoi
+	 pA2iNBBvWaDA+ZDTosZsoW3gIZ1qGBoH+/7EJrmqrC16XZoCP06ul0cmGp5O6JbZa6
+	 xo7qXpsMxEC8Ui3yIUBgI3MZ+X0gyKlCuGq9/KHFm2gfhnxkMz94sGmWQzlCZX9x7L
+	 K+awXlF8EiGu2KkJLXE+jyvXGurAFVhzsTbITYRGhTMxhuD+8H9zR4okogqFBeGa+z
+	 YKzHypHRW+Z63vavD7ltAbc3Q0MSVbGBS2X3wAC+0IMpMTHfXj2FF7ElWgoKFe/rRF
+	 rG83jPIZkSQwUeLhcqDbEtRE=
+Received: from zn.tnic (p200300eA971f938F329C23FffEa6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:938f:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 092BA40E0277;
+	Wed,  8 Jan 2025 15:34:25 +0000 (UTC)
+Date: Wed, 8 Jan 2025 16:34:20 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+	pgonda@google.com, pbonzini@redhat.com, francescolavra.fl@gmail.com,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Juergen Gross <jgross@suse.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
+Message-ID: <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
+References: <20250106124633.1418972-1-nikunj@amd.com>
+ <20250106124633.1418972-13-nikunj@amd.com>
+ <20250107193752.GHZ32CkNhBJkx45Ug4@fat_crate.local>
+ <3acfbef7-8786-4033-ab99-a97e971f5bd9@amd.com>
+ <20250108082221.GBZ341vUyxrBPHgTg3@fat_crate.local>
+ <4b68ee6e-a6b2-4d41-b58f-edcceae3c689@amd.com>
+ <cd6c18f3-538a-494e-9e60-2caedb1f53c2@amd.com>
+ <Z36FG1nfiT5kKsBr@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|DM6PR12MB4041:EE_
-X-MS-Office365-Filtering-Correlation-Id: ad192753-616f-43ee-acbb-08dd2ff8c34d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RUcxT1V5dWczTnVTWmNLK3pqSCtGaGJHbFE4RmpKVDhhdjBRQm52a0E0YmxY?=
- =?utf-8?B?OWJYQjhCaWR3UGpUTTg0WTMzd05UenBJUGU1UUFENFYxZ2d0eFlCNmFUODJ1?=
- =?utf-8?B?WSsvSjM4bGxlSEx3RGZhclpuaG55R1kxWkZzZ25WOHdvbE83bDRCWXhIS0l3?=
- =?utf-8?B?djVhd0kxalI2RS9qNFYrWDU1MnVPTnd4NGtUNTQ1Vm85U3A4VmoyTGZ3MVJv?=
- =?utf-8?B?QWtpWDRwbG5QamQ5aFNkeDVmUWltTFJ1WG5HKzFhNmh5VGZyZWRNU25mdUlq?=
- =?utf-8?B?MEx6eEswRDZINFdVcE1vTHNaWUZycGdhSGVQaCs3cGRJaklaUDRrQTVVRE01?=
- =?utf-8?B?M1FKWVpIL1RSaTIvR0IvVUlCZHl3TlA0YmpmZFRuRU9pdEg3T1JpS2tjTjV4?=
- =?utf-8?B?OXV6bURBNGlmRHI1TVhTQWFHZ0NnNkVaWEdZMWFWWUFGWDFpYW1LV0NKV01D?=
- =?utf-8?B?UUNNWjJJNjB2VlNvQW5QSDVkTm9UV21DdVluZGVZZHVSdFdIbFZGeEYzR0lI?=
- =?utf-8?B?V01LSlNneG8vWkY4blFGQlc3N3Y2dnNhZzk0d0N0V2JJYmRuVVNsSEl2K0Nk?=
- =?utf-8?B?cUhqR0VUOTNjeGFJYk41T0lWcGlpK29PTXA4T0JaVndRUFVJWG9WeC9TN0RR?=
- =?utf-8?B?VTJJT1F6TzJaYTc3eEZwV1ozTUk1UWJISmgyZjd0QkpBUnR2bDl1NzNleUhx?=
- =?utf-8?B?QlZNa280c2VRMGMzMEp0R3dqejFnbVFWTjdidUwxRlVaMStGSzQ2dXJpU0lC?=
- =?utf-8?B?YmY4TVZXV1NHOEEzNUpEZE9zQTBUUVpoK09Qb3VyeldsWThFSUN3QVA3ckl0?=
- =?utf-8?B?SE5uK1NBZGx0djVFNXFKS1hFaWdjQUdPaE1WODRwcCtBaVVzOEZOcXc3SElm?=
- =?utf-8?B?ZHkwRkVwbnVsbmRXaXlNMHRYSnl5MUZreitheUcrZWVXMzZTT3VJMmluR2gz?=
- =?utf-8?B?VmR1bkpOZ005aFFpQ0MrQ1NodnlJSFlQQk5mZFBvRFNuRnRqR3RjZ0crcHkr?=
- =?utf-8?B?S2V4aVF2UDA1dFpERGpNeWUxMk1jYzZOSzZhUXRzN25UQ3MvYXFkbE5oS0pN?=
- =?utf-8?B?SHM1aHZ6WXRPcXJFRW9uS2NZbUVnT3RPN1VSNUdsbFFMckZOOGdsVUlrQlBI?=
- =?utf-8?B?R3Iwam04N3F3QXFqV09pOE8zeXVPWFlKS1kzQ2paZE5sekdvUjB2QmszeG44?=
- =?utf-8?B?OUtJZ0ZCMmw4WmovRXVTSGN1OGJYcEErdFpwMkpyWGRtd3BFRENBR2NndVZU?=
- =?utf-8?B?MFh3QUc3d3VLaVlnanIwSFVGWCtSS3o0NGM2SFl5ZWtDZnFYTmVpYW51dXdU?=
- =?utf-8?B?Wm0vVGRvTU9OOSs1MHVvMGlJRmhZcStQVUdMOUM0RVJ3aDd2ekR0VFpTb1hG?=
- =?utf-8?B?aC8zTFd2cEtGYWE0cTlrUUUzTzBUL1BQeFVVOFZRS2FmWGlycHRoZnhvZDhR?=
- =?utf-8?B?cVQ0RDRwaForeEFLL0gyVVFEdjcrd2xZMzE2bWdqZkdqZ0VKK0MrOHJ1QU5X?=
- =?utf-8?B?OS94dDAzSkM3cDhqNmZ1ZFMybDQ2ejF6S1VzOUpEUC9zaG5INFgrRDUzWE5r?=
- =?utf-8?B?UjVNNHZ6QjdzeU1pYTFjT0ltSHUxVDlKbG1SOW5mVTFwTzZlUDVCY1RQOWRt?=
- =?utf-8?B?bEVWM1Rwb2tvY01yNzh4YUM0bXRoN1dNUk1qSGdHY3Y3dHNGdmJWV2ZEZGVx?=
- =?utf-8?B?cGwrdkNmTmhqWERIQUJJa0pVaUF1NUFIVExQdmZZTDVQTEk5dE5vTTYwdHZk?=
- =?utf-8?B?MUNRV3hYbnV2UzczWTBqd1pDSDFDaFp1VGIvVXlxRWlTRjZIV3lzZktEQity?=
- =?utf-8?B?N2FENEpFMjVIQWZjUzVTM1g3ZFcrd21La1cyNG5mZjlCNVJBbm15UmwyVlgv?=
- =?utf-8?Q?UfI7V+r6sXg7t?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Wk1HdTAzcXVFdThMRWZGUGdWT3FNZ29PT0d4d2pxRzRyQncwYjdIT3dxWjQz?=
- =?utf-8?B?SFFRYW9xWmNuSEhRa3A5VkJhOHBFSG8xQjFQUGtWZUh0cEZ2VVZNMVRPSkhz?=
- =?utf-8?B?aFBSVzhTM1I2N2ZNeTRzYmNOdUh2TjdRRDJvakZhTjBuZS81VjNDb2xDcUtk?=
- =?utf-8?B?M054NzhDcnpvcTZka0VpMVVCQ2VHS0hadE5RR09RL1pOc3dpQVVpUnR4TFVU?=
- =?utf-8?B?OFNuSWp0QnF5Um83UWRoSE9wMVk5Y1NudmdBM0F2a0FUSjRuWmowb0xOdXR0?=
- =?utf-8?B?OFRTMXh5cndmejdTNkhxYnhBSjROQk1LcHQzOXNxV2VoRFFIQjVlZmphS3dK?=
- =?utf-8?B?V29QWDNkZllMeEFIR054aXNIdDhaUEVHaHFHWFl4QjlLWU1VeEsvNjFDeGUr?=
- =?utf-8?B?OXI4MEVJN3NTc2Z3a1AxaWd2emhFTlN1Qm5ENDkxSDFxa0xjNXZhRDBNeUM3?=
- =?utf-8?B?RDZ0eFpRbHpJUnVIMFZsVC9wSG5FbmxoMFVlQjdlYWg1Mml4NTVBdmpSbzNm?=
- =?utf-8?B?NHFhWFBvN3ZIVUhoSUIwY1Z3ZmdDTC9lTVFvUVk5Q3krQzB1aURHd1F0STR1?=
- =?utf-8?B?dGw4cVhDN3c5RTM4ZWk4eU1vSFQ3eXhXa2FUUWhmZCtIRmZqMmFjZkR6R2hB?=
- =?utf-8?B?MGIrTENySWZKbytRRytRUi82cFAwdVdNMXZjVnVSVUl3L1JNYjd1cC8wR0Fx?=
- =?utf-8?B?SllOd0FKSVF6MWl2ZytWcFBtSTZFS0VsTFBNd016Z1AyV3NRb0hvbkxKRWl0?=
- =?utf-8?B?Tk1hdFBsVmxtNkxlQ2pLelRwMTQ2N0hLa2RnWnNUQ1FkU0VsRUk2aWNvZGNW?=
- =?utf-8?B?Vjd2SE11czFybkRBMnJQYVJydTlzV0hzMUtuaGZnVmVkd3NETnhKWG51YmVS?=
- =?utf-8?B?YzBuWER0M2VwVUNHa05Pa0FvQTc1MjNQNDM4RkhFckpMT1c0SFZMQ09JK3Zz?=
- =?utf-8?B?MTJMUVloR1QwYzhGWndFZzROZ2FCVU1Ba2ZFejI4R0ZWUTJjN2ZtRWpaay9v?=
- =?utf-8?B?OGdUcnczMkk3Z1NxK1NEcHVaUzhVeFJMUEFlbVI1VmlxYzNzUnk2RTNCU25P?=
- =?utf-8?B?VlhoRXhxNmo0cnJpYzFwVmhNZmEwdzZWNHlqejU1K3hpZm5Tc1NvWGxYMGhu?=
- =?utf-8?B?RHpjUDNWY0Nab1FEYkg1SGZ3YXJDRHpsZ1VEdGlWZCtRL05rcDRZbEN5YU5n?=
- =?utf-8?B?bkVmcUZLMDlnUng3NElFWEttOGRLa3I4VUJqTWx3TEdyNU1Ja2ZKSHpTRHcz?=
- =?utf-8?B?aGRSa0pKcHMydzUyc1JwK1pSY0hFV3JJSlNXRW9Qc0haK2tXcW9XdHJkUWhv?=
- =?utf-8?B?MEh5bWJNbnFwV0dVdlF0cU5PdWgwbFBwSGp5bVhjZDFSM0ltSnNjUWNoRk1B?=
- =?utf-8?B?SnQ3RWRMNTQ2dzVCQVNXdTdDU09Vb1QvNkcyUlFya1pZeHRzNHA1WmVGNXZ4?=
- =?utf-8?B?YUhGTHp2OGJUd2xaMTBXQW90NzNuSFBDR05GcUhXVnBYb3A1S2IwcFZnZlNw?=
- =?utf-8?B?alB4N09yTkc0ZzFaemFvOXdva01wNVNVdUdreGpLeDdKNnppNnhwWnB0MVpr?=
- =?utf-8?B?aXBLK09zWHhmYnR0cHYvRWJVRjgxd2szZ0IwY010V1Iya2Z2WC8ra1F3M1Zy?=
- =?utf-8?B?U1hUb0NCUElUT1Y5bEJoR0tWMjJyYVM0MGFaUUgyZ1J2MVdXTTlYeDJyOGFF?=
- =?utf-8?B?ZzUyM3J0VUoxRzA4UGFhUnNGY21SQnNvUUljVW11M1kyWU5rTnlmVmsvWkZq?=
- =?utf-8?B?L0ZNcitldUZCTTlTbnFrbVNXVEF4VkhhNGlVT1piTjRycTVUck9tWTMrSmc3?=
- =?utf-8?B?d3dqNVFhaHhWUmI5NGxyenptdjJNVDdGREdDTFZwekd1dEViS0NKTDNZVjJk?=
- =?utf-8?B?cWY3Q3NOeTdTZ1hCOHZNN3ZoaW45SUVVU2pDK25qZDFUbXl4dmFDWWRxcVNi?=
- =?utf-8?B?S0tsTFBydi95VlVwSXlJNThWNUp4WmVuRFQ2QUYxUk9mNzZpQUlmU0hWZTVo?=
- =?utf-8?B?dCtJZzZING83TzRoUmViQ1NDN1ZUVjdCYkZtaTczcFE4U0wwaDdRNWlwTTk1?=
- =?utf-8?B?dEtrVVNWMlMwdENJaWdZRUpUbGZGSHZXWTcreE5uVkRhMWhoWkhZSUxieTht?=
- =?utf-8?Q?6LxV1RKd/ztOzTqc9PfIevguJ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad192753-616f-43ee-acbb-08dd2ff8c34d
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2025 15:26:03.2780
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2KoFYhWyaoGl6vniW8wwJLyPcXqPO87p/jqTs5KBI6nejjwhDEE+/bPRSwboYkXJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4041
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z36FG1nfiT5kKsBr@google.com>
 
-Am 08.01.25 um 15:58 schrieb Jason Gunthorpe:
-> On Wed, Jan 08, 2025 at 02:44:26PM +0100, Christian König wrote:
->
->>> Having the importer do the mapping is the correct way to operate the
->>> DMA API and the new API that Leon has built to fix the scatterlist
->>> abuse in dmabuf relies on importer mapping as part of it's
->>> construction.
->> Exactly on that I strongly disagree on.
->>
->> DMA-buf works by providing DMA addresses the importer can work with and
->> *NOT* the underlying location of the buffer.
-> The expectation is that the DMA API will be used to DMA map (most)
-> things, and the DMA API always works with a physaddr_t/pfn
-> argument. Basically, everything that is not a private address space
-> should be supported by improving the DMA API. We are on course for
-> finally getting all the common cases like P2P and MMIO solved
-> here. That alone will take care of alot.
+On Wed, Jan 08, 2025 at 06:00:59AM -0800, Sean Christopherson wrote:
+> This still misses my point. 
 
-Well, from experience the DMA API has failed more often than it actually 
-worked in the way required by drivers.
+Oh I got it, no worries.
 
-Especially that we tried to hide architectural complexity in there 
-instead of properly expose limitations to drivers is not something I 
-consider a good design approach.
+> Ditto for the "x86/tsc: Switch Secure TSC guests away from kvm-clock".
+> 
+> I object to singling out kvmclock.  It's weird and misleading, because handling
+> only kvmclock suggests that other PV clocks are somehow trusted/ok, when in
+> reality the only reason kvmclock is getting singled out is (presumably) because
+> it's what Nikunj and the other folks enabling KVM SNP test on.
 
-So I see putting even more into that extremely critical.
+Presumably.
 
-> For P2P cases we are going toward (PFN + P2P source information) as
-> input to the DMA API. The additional "P2P source information" provides
-> a good way for co-operating drivers to represent private address
-> spaces as well. Both importer and exporter can have full understanding
-> what is being mapped and do the correct things, safely.
+> What I care most about is having a sane, consistent policy throughout the kernel.
+> E.g. so that a user/reader walks away with an understanding PV clocks are a
+> theoretical host attack vector and so should be avoided when Secure TSC is
+> available.
 
-I can say from experience that this is clearly not going to work for all 
-use cases.
+Yap, agreed.
 
-It would mean that we have to pull a massive amount of driver specific 
-functionality into the DMA API.
+> Ideally, if the TSC is the preferred clocksource, then the scheduler will use the
+> TSC and not a PV clock irrespective of STSC.  But I 100% agree with Boris that
+> it needs buy-in from other maintainers (including Paolo), because it's entirely
+> possible (likely, even) that there's an angle to scheduling I'm not considering.
 
-Things like programming access windows for PCI BARs is completely driver 
-specific and as far as I can see can't be part of the DMA API without 
-things like callbacks.
+That's exactly why I wanted to have this taken care of only for the STSC side
+of things now and temporarily. So that we can finally land those STSC patches
+- they've been pending for waaay too long.
 
-With that in mind the DMA API would become a mid layer between different 
-drivers and that is really not something you are suggesting, isn't it?
+And then ask Nikunj nicely to clean up this whole pv clock gunk, potentially
+kill some of those old clocksources which probably don't matter anymore.
 
-> So, no, we don't loose private address space support when moving to
-> importer mapping, in fact it works better because the importer gets
-> more information about what is going on.
+But your call how/when you wanna do this.
 
-Well, sounds like I wasn't able to voice my concern. Let me try again:
+If you want the cleanup first, I'll take only a subset of the STSC set so that
+I can unload some of that set upstream.
 
-We should not give importers information they don't need. Especially not 
-information about the backing store of buffers.
+Thx.
 
-So that importers get more information about what's going on is a bad thing.
+-- 
+Regards/Gruss,
+    Boris.
 
-> I have imagined a staged approach were DMABUF gets a new API that
-> works with the new DMA API to do importer mapping with "P2P source
-> information" and a gradual conversion.
-
-To make it clear as maintainer of that subsystem I would reject such a 
-step with all I have.
-
-We have already gone down that road and it didn't worked at all and was 
-a really big pain to pull people back from it.
-
-> Exporter mapping falls down in too many cases already:
->
-> 1) Private addresses spaces don't work fully well because many devices
-> need some indication what address space is being used and scatter list
-> can't really properly convey that. If the DMABUF has a mixture of CPU
-> and private it becomes a PITA
-
-Correct, yes. That's why I said that scatterlist was a bad choice for 
-the interface.
-
-But exposing the backing store to importers and then let them do 
-whatever they want with it sounds like an even worse idea.
-
-> 2) Multi-path PCI can require the importer to make mapping decisions
-> unique to the device and program device specific information for the
-> multi-path. We are doing this in mlx5 today and have hacks because
-> DMABUF is destroying the information the importer needs to choose the
-> correct PCI path.
-
-That's why the exporter gets the struct device of the importer so that 
-it can plan how those accesses are made. Where exactly is the problem 
-with that?
-
-When you have an use case which is not covered by the existing DMA-buf 
-interfaces then please voice that to me and other maintainers instead of 
-implementing some hack.
-
-> 3) Importing devices need to know if they are working with PCI P2P
-> addresses during mapping because they need to do things like turn on
-> ATS on their DMA. As for multi-path we have the same hacks inside mlx5
-> today that assume DMABUFs are always P2P because we cannot determine
-> if things are P2P or not after being DMA mapped.
-
-Why would you need ATS on PCI P2P and not for system memory accesses?
-
-> 4) TPH bits needs to be programmed into the importer device but are
-> derived based on the NUMA topology of the DMA target. The importer has
-> no idea what the DMA target actually was because the exporter mapping
-> destroyed that information.
-
-Yeah, but again that is completely intentional.
-
-I assume you mean TLP processing hints when you say TPH and those should 
-be part of the DMA addresses provided by the exporter.
-
-That an importer tries to look behind the curtain and determines the 
-NUMA placement and topology themselves is clearly a no-go from the 
-design perspective.
-
-> 5) iommufd and kvm are both using CPU addresses without DMA. No
-> exporter mapping is possible
-
-We have customers using both KVM and XEN with DMA-buf, so I can clearly 
-confirm that this isn't true.
-
-Regards,
-Christian.
-
->
-> Jason
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
