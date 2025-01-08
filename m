@@ -1,238 +1,252 @@
-Return-Path: <kvm+bounces-34769-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34770-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5F1A05A69
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 12:51:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92CF1A05AF9
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 13:04:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB54F3A1187
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 11:51:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D61483A2A10
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 12:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AEF1F8AE0;
-	Wed,  8 Jan 2025 11:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988961F8F17;
+	Wed,  8 Jan 2025 12:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nL/OIILr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/6/g6AX"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2083.outbound.protection.outlook.com [40.107.244.83])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB8D1FA178;
-	Wed,  8 Jan 2025 11:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736337042; cv=fail; b=j4k9/NaYQ6JW+RXDlHlnB8MkukZUICt7UTkMWPloV/IKkyrTsyGcZFXTDYXdEbMlYeYccj15c5F/Uk82tJ5mTLyC2dyTmY/4SOKM1ruEHNvhhtcAcp0EKfbQppMkkM9Z3ipDDaqJEi9Gcfoa0XIEJPq8btg7hv6ErKpS4jKpoUM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736337042; c=relaxed/simple;
-	bh=Nm4NYgsunH2umHHAOUp6uvwqpYK8qZ8KIjx8SE0iEo0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y8Wwu1A5L7ObwMG1mqxQ7tggRzrJsjgcFTr26y/Kx2efjrH2IXlX7MdgA4UZvznn2Dh+EEFKwkgtOjL1EcuBlHe/oUBK6uaUKlECL18kpXBEu1By3XUmkOh45miSY5k+Kpe2ESuc/HaJ4OooIYJBuWp6NOVM6CFFeAN8NAmRm3Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=nL/OIILr; arc=fail smtp.client-ip=40.107.244.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UQI6va1wX+aqK/Uk/j3i5rUj3inEGX2IGpNORtR/P7olQYZxIrLW3N+sPuEs12F1ODdfNrY+OOITSSZqXP6dODBWrAjZRoiAy9dd5UMGxfnlYFvf/0ZOtqy9auH+Iriiwy8a7Hv0zBgKc3V7SPXomkq015G0PzAs4SvrHpwn4PXLb+igPuYRGTm8ca5A7pnqZoAaNHwadnv4Mt97Toa2Z/tH+abH8/19GyNJnF45Yw/YpGBMjq/TUQv+fiheFrxw+uvwFn/4TWOrwAnkPDT4pF2Vzstss1lDxYN+pasqvEPfkLhGPKcON0RS41S+wbGw7Cw0Fo53jVZpkp0xSUoRHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Nm4NYgsunH2umHHAOUp6uvwqpYK8qZ8KIjx8SE0iEo0=;
- b=SoxOYabPWJEKvSKKqcBXa7mrNUKdCXtA7kKqboQlHjpD93HN2EQf2j4m1VygRTmif5Vz0h3yQB0zNEzI/J0tXJ4ij/maoYBhXYBQ/v4Wgcp4hwXcTYuYGNBiOHK1XTh4bJCCWH9L6egtbuclke0FiPUAeXPNlwbgOCNKcZS06kNbmLw/SGBVWRDHTs+6crVMfdvfXxXEy/caKcjsaB2IRAFQKDxr2bFfnm+mxgPMBdnZ5bGF4k2H1gXOustyhjQqQaCIR+CrAJqv8CMSgJPUc3YVmJOOnXQL4nhaz0lNtkO7MaJiQaC0x3YuGJZGm5yUAxvy9LLxGYbRn9ugFb7WmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Nm4NYgsunH2umHHAOUp6uvwqpYK8qZ8KIjx8SE0iEo0=;
- b=nL/OIILrblFXshCeBzIyI7t7rZaxNTN7vF6EdY0/K8EiY4sDMX5JGMVNO2lEHkohm9Df6YT9xXabPiC1RBIimNSMuPGE44RqwlVlijE24aDRWMsxeg5Jxz5jJx8f/vLT5C3LgFK00ywR5Wx2yMeXk84PCcV1Ef1L2IFJZHPNufI=
-Received: from SA1PR12MB6945.namprd12.prod.outlook.com (2603:10b6:806:24c::16)
- by PH7PR12MB5975.namprd12.prod.outlook.com (2603:10b6:510:1da::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.10; Wed, 8 Jan
- 2025 11:50:38 +0000
-Received: from SA1PR12MB6945.namprd12.prod.outlook.com
- ([fe80::67ef:31cd:20f6:5463]) by SA1PR12MB6945.namprd12.prod.outlook.com
- ([fe80::67ef:31cd:20f6:5463%4]) with mapi id 15.20.8314.015; Wed, 8 Jan 2025
- 11:50:38 +0000
-From: "Shah, Amit" <Amit.Shah@amd.com>
-To: "jpoimboe@kernel.org" <jpoimboe@kernel.org>, "x86@kernel.org"
-	<x86@kernel.org>
-CC: "corbet@lwn.net" <corbet@lwn.net>, "pawan.kumar.gupta@linux.intel.com"
-	<pawan.kumar.gupta@linux.intel.com>, "kai.huang@intel.com"
-	<kai.huang@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "Lendacky,
- Thomas" <Thomas.Lendacky@amd.com>, "daniel.sneddon@linux.intel.com"
-	<daniel.sneddon@linux.intel.com>, "boris.ostrovsky@oracle.com"
-	<boris.ostrovsky@oracle.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"mingo@redhat.com" <mingo@redhat.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>, "Moger,
- Babu" <Babu.Moger@amd.com>, "Das1, Sandipan" <Sandipan.Das@amd.com>,
-	"dwmw@amazon.co.uk" <dwmw@amazon.co.uk>, "amit@kernel.org" <amit@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>, "peterz@infradead.org"
-	<peterz@infradead.org>, "bp@alien8.de" <bp@alien8.de>, "Kaplan, David"
-	<David.Kaplan@amd.com>
-Subject: Re: [PATCH v2 2/2] x86/bugs: Don't fill RSB on context switch with
- eIBRS
-Thread-Topic: [PATCH v2 2/2] x86/bugs: Don't fill RSB on context switch with
- eIBRS
-Thread-Index: AQHbPFEFmhn1AaOfa0iqMfWlRJj4srLYY1aAgAAWbACAAXNgAIAzIUyA
-Date: Wed, 8 Jan 2025 11:50:38 +0000
-Message-ID: <5175b163a3736ca5fd01cedf406735636c99a7e5.camel@amd.com>
-References: <cover.1732219175.git.jpoimboe@kernel.org>
-	 <d6b0c08000aa96221239ace37dd53e3f1919926c.1732219175.git.jpoimboe@kernel.org>
-	 <20241205233245.4xaicvusl5tfp2oi@jpoimboe>
-	 <20241206005300.b4uzyhtaabrrhrlx@jpoimboe>
-	 <20241206230212.whcnkib4icz4aabx@jpoimboe>
-In-Reply-To: <20241206230212.whcnkib4icz4aabx@jpoimboe>
-Accept-Language: en-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR12MB6945:EE_|PH7PR12MB5975:EE_
-x-ms-office365-filtering-correlation-id: 23dbd4f6-1a6e-4393-e7e7-08dd2fdaaba6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?WDc4T1Rya0hybnRyaFNHVlhORDNQeTk5Wi9WY0xWeTZ1elNEaCtURlRla2FI?=
- =?utf-8?B?Q2ZSVDJtaXY5SmMwOUJ3NXV3c0VoME14YU15dkc0ZUx4NzBMT1ViT25rN00v?=
- =?utf-8?B?NEFxczdJcklrd3RweEhCaElTdjBDMzNneWJGc2poTnRyTVhrZWFnUFpISGZy?=
- =?utf-8?B?ZlU5cGJSNXcyc2lKd0lmMGFZYW1rVXBmbFVsVDRVUHlHeVRVM3BZN05ub3BB?=
- =?utf-8?B?YmtWZml6ZEpra0UwUFdBNUJNR2d6ZXM2U3VNTHpDSW9pTE9rekwzMDU4dEhp?=
- =?utf-8?B?ZEp2MFduanh0aUZyeEhkQ3I4VDZPQWFuT3MrRDVjaS9qNFQxRWhQQzFjQkV5?=
- =?utf-8?B?S3ZVb3hnWHhXOEI1Z0JCSjJ3cXhucVVWbWc0WE1MRDFDTFFjNHhlY3BLVnJ6?=
- =?utf-8?B?c3I3R3M4d0Y2Z1JqOGxOSDZlSFFRa0FOYXh1d3F0TFl1T3RuVnpmUTI3VjFn?=
- =?utf-8?B?OGNYTE9jeHU2SGNjMEpiZWNtV1l0OFBvV2ZDeGwxd0JkMEl2aTB0M2FIb081?=
- =?utf-8?B?aFJQcG1vbklVYXZTR3B6ai90bDZhajJ5ZGZpeXFsaUhPWDBtbWNHTXZSNGlt?=
- =?utf-8?B?NlYvL2xTMEM4K1VTZ2puQWNyaEQ3ekpDZFZkdWt5N2VUY2N2cXhnWDBHZnRJ?=
- =?utf-8?B?VTNRUDFOTEFpa1R3ak02K05JTmN2bGh0RWdhV1JEQksreUJ6M2JaU1ZWTW0x?=
- =?utf-8?B?bHp1a2RVbmRSNWhNcXcvYXN6NWM3U3ovNXF5V0N2YmZKMEdzS1N2Yi9nc09p?=
- =?utf-8?B?cmVoVlphVkIzQTJuTTI1NUg2ZktRWXUzQVNOQ2p3eTZRMy9ZN2pVTnhvL2V2?=
- =?utf-8?B?N2U5dFdWTFIwZkM1aklNdkZQMTQ2TDF2S3kzWlJwRGFTQUMxUDg5Y2tLVGJm?=
- =?utf-8?B?aGpHNUROWEZ0dTk2R2tMN2RFYmd0V241Ymh5ZWphaGFMckQ4ckdSWE9vZ3R1?=
- =?utf-8?B?WWRmMkRadFZuM3Nsc1VVWDg3YitNRmtVR0F2UjcwUU95M3Y0N3RPKzlkblFa?=
- =?utf-8?B?NUJRWUFoeXJEc2IwRnNSRnFSWVkvRmMra3RPNk1ucWVwcW9rc1FxeUZoSEpk?=
- =?utf-8?B?b3RieUVQakR3N0RFVTMxOFBYdGc3Zlh6TnF3b2J3YzgrUXM5NFA1RFN3VHhG?=
- =?utf-8?B?WkVxK0FrTVRMQlJ5dlhVN0dnMWkzZ1BaOTROMlZUREFXb0lHbExwRGJQSnZn?=
- =?utf-8?B?VjJkeUkxc0tadUw2Mkt1TFFQTnVHWmFrTEVxeEJBRzhmOUtHeHZqaGFQWUc3?=
- =?utf-8?B?OUNsTWdmWlBhaGNTMXU5NEdhTWZnWjlLTkIzdllyL3RWaXdaQ3NzNElpbDBh?=
- =?utf-8?B?WnR6azNqcnRIZ0theUpFOU9Cb1FIcEFnZkM5QWJNUXJBaUtqR09YSzJJNS9S?=
- =?utf-8?B?cTZOZ1FrZUR4cVlPaytwVkxkZ05LR0MzYll1eittK05RVmpQR1R0KzVVdDBM?=
- =?utf-8?B?NnZ6YjBRS3c3a2xqYXhHeFBQUlVvT1NHM203bUFPQ1lDdkYrazZSdVFOdjh1?=
- =?utf-8?B?Z0hmN09wd0pQYTMwT2VGSUVmS0VobHQ3SGlPcmIxaEtiSmtENitVb0xIR2JN?=
- =?utf-8?B?WjY1ejRpRUVXWVhqZXNpYk50UXZKb0RpWVRidWRXeUpIckJtTUtraHVIc2dv?=
- =?utf-8?B?MFVVdjJ5K2E4bmg4K0Q0d0RnaUpqOXovV0lNb0pWWGp5TC9GbFo0Y2dsaVZn?=
- =?utf-8?B?eGRGQWFXbjBTTVFCTEJTVHZtZnIrc2lnRFZnbnBVK0hydnF2NGN3cWFoOEdC?=
- =?utf-8?B?V3Z4NXNOL0crVDBJOWNncHliT2hpZzVtQW9Id2I1d2dPUmV6MEJGekNWVjIr?=
- =?utf-8?B?TUdocE9wZzNhMEt1dUIrVG44RlJYSjdSc3F1ak4yUWZ0MnF4ZTYwdEwxazdI?=
- =?utf-8?B?UlY4SlJ1TjdESWhzZnl5aU5yWlAzd1g2OCtmWTRLRHNQVWhLcWgxdERTMm5Y?=
- =?utf-8?Q?7uL0vlCc6X07zILDlBvjD8LD8K/7SXXR?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB6945.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Vlptb3BQbkdKTWtGOU1NZHVZTHVPMFZlSnkrRDhteElHVGd0WUJ5bUk2TU9P?=
- =?utf-8?B?cHVQbzdIUTg5cEN3elBmTk5kVmIrSHBlMEFMamlpcUxMVkh1K0hCaVY2UDhr?=
- =?utf-8?B?THdYNlJFdHdjVStZQlpCeGtFclN0N2J4ejU4dHJHQWNhYnNaa1IwQkw5MEEy?=
- =?utf-8?B?d2RwRlJlY3RDWU55Y3BjbFdPQmt5aUlROFlydlRPNVFWMzhJYUt5aEh5N2hM?=
- =?utf-8?B?ZWNzZVBMck45WndTUm1tWGRPblFHUzA4dzBkUHh2VlNrRVBtblVLbE9QWW1H?=
- =?utf-8?B?dVc5ZTcvOUt3KzB6c2hsaEVPS0tUT1lEZittejdnNkJwcTVDUlZkdDhnR1p6?=
- =?utf-8?B?NXlDempvZEpCdU55bUN5YytnWFBueThlUDNNcVhvNDhLU2FoK0EvdjhsTUVj?=
- =?utf-8?B?bnljcERIUkp3Z093SFQrdGlHWVZGczFvZERabEc1eHFkVkJPMGtROTduZ1ZG?=
- =?utf-8?B?UXRUbHJRRFR6YUF0QUk4cEN4UDNMSmVKaG4weGRYWU9xNktsTEc0KzVydWdv?=
- =?utf-8?B?NTJtTHpybnU0YWRPdThZTWhDN1R6R2s0MEJqcUVtS0F5ODJreFdrKzJLcXRF?=
- =?utf-8?B?TXhvRWQ4NkUvaG5oRGp6L3lKMm9WZEVpUjh5TmxWckVNbDhFaktlNU1DcUxT?=
- =?utf-8?B?aXlsNi9zcEx0aFJ3bWFFdEREdS9ab0I2NW94L0NKbDRVTDY0K245d0p1cUor?=
- =?utf-8?B?Uk1CNkY3TUlic092Y1pjaUUyOWZYY0c5MHpXSUxPZkF0NG9aUG9HTzZvYnVh?=
- =?utf-8?B?UFd1dXU3U2xmVVd0SGRQcjI4V1B6cHRMMHlLaUc4Q2hoSzByRlk2ZXZWQzZz?=
- =?utf-8?B?OFdYWGtXckRsdzEySm5JQ0d4bm5mM0pEam9EYVpPVGpQU05MbWxyZlNCbldN?=
- =?utf-8?B?c1BSaCt0VUU3UXMwYkpKbVJyQktMQXlkVXVJSE4vWCsza0VFVDBCaHk1SmV4?=
- =?utf-8?B?RGhVaUZMaEpYOExMNFpIYTFXM3BCdGJmSnNwUEoxMTU4UDhwUlFXaHZHQmZO?=
- =?utf-8?B?cGxtUVh0UTB5ZHo4MmVQMGMrRC9FdERuS1Zvb1N6ZGtnUVJLZGkzMEIwVFk2?=
- =?utf-8?B?WWM1d3pYMElldzAwMkxjNTg5MHpKdGpVa0M5QU9YbmNXbXNvVGxlQkFPWUw5?=
- =?utf-8?B?YUtESUF2U2swT3FMdkZZTHg0USt1cFpHb2l0WjFJNlhTUGJkaklOamFKSEJE?=
- =?utf-8?B?aFJPUlBVdGYvcGtCTDVjSERhUTdGVkgxY01TUlNoMEcwMkxqaUxTeGh0REcr?=
- =?utf-8?B?TzZBcHVHOW5vRXE3M0hOVytsY01pK2syUlNaeEcxcnI0bnJKMGx6NktoKzVY?=
- =?utf-8?B?NFBJS3JNZjlrRFJ1bmRJdVYwakRkTkpuano1b3BtZkRFS3JtNGdJVWdNZFFQ?=
- =?utf-8?B?c0crN3FYZlE4N3lOMTB1aUx2c3ZOSXdiVDNucVB1aGhUOFdlcy84MjVsSSt1?=
- =?utf-8?B?UU83ZkswbkQ1QjNheXBUU0tBREhYQXNkRnBkblp2bnBCTVZhQzduU2t3VDF2?=
- =?utf-8?B?czZkMlJZZDhkT3FyMWR2ck85SnJKSlNYL0cwWlJrMXFQWEVnM2F6ek1sNi94?=
- =?utf-8?B?bGY4QnV4VUdsZFZQRnQ5dElidit2YUgxL09RNlF2OUd0QVYvNDZNZnVoVCtI?=
- =?utf-8?B?K0VCWHAvR1ZrcGUyeVZnYTBiWG9scVRuMjBPa1psNGluQ2Qyck9SQVhMZkRl?=
- =?utf-8?B?U2tpWkY0cjF1K3E1elFUMDNNSnlzekVtbUQ5YU9EMmQxcDZiOFh0VE56ZHlQ?=
- =?utf-8?B?L09RTHRLVFR4VCtvc2puV1dtdy9sdndZOFlhYXQ4MDlXMzZoeDV1M1pqQ2pT?=
- =?utf-8?B?aVF1VlFidUpmajRaeW1xVFBQcVNzUis5U1lJY3EzY1E0R2h4Q3MyUHpianFP?=
- =?utf-8?B?bHZ6Qnlya2xMemllRFp2ZEhTbzBLa0x1SFNabmR3NEVBL1dRVVBxbmpJMEpT?=
- =?utf-8?B?T01oU0RkV0FCY3dySUFoRDhTeGsyUlJGNnI3RnJnNlZzdFg1bzVQRk9yRTBI?=
- =?utf-8?B?YklaNG1CZW56YkZjbWRTUnhxVHFjNmpYRlNhRHp1cG8vbDFaQ2Y5NVIwbzZT?=
- =?utf-8?B?N1V3T3FpclhqUDVGblJuRm9BYVpVaHV2LzBReEJkUm9aSTl6dXkzSTE3azhj?=
- =?utf-8?Q?ijOkYMkzoNmfj2RsD44W6FuaF?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <89504A153E20424A9FEB06A4700DB200@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E751A23A7
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 12:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736337874; cv=none; b=LxU7vroTc9B/VTl7ubZMPXO+C3B4HPN+nbnSjs0k1OfpB49I7Qc7MQShf/byNVvccdpdS2DFJe0auO2iBG/IkXADd/dhqmxWS9CbxqcSYSn9rwbOiV7+EcJjsQGDsJaFJ3gSKO5hNP03u7XQm1fS5VPL7jHusxEGe5Jlygkmk2A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736337874; c=relaxed/simple;
+	bh=113mJZlj7lrmpmGDuKQWu73sMEvYBfWYxx3E+OaCMQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=POgLAUzXzBy1PityPr6CC6PABNbTmdg7A05i1TjtKyqyi8XGYDRdA4PgImj1+twMxXAqicf+CvLkgJJBD10ooAHQt29TzAgNKFhRghUelC8IbImHaTRvqRvyR4J6xMidUVZcrT5Gn+NwFxTufhER3XSi1v7C1gY9vYbtkTift5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z/6/g6AX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736337872;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=erQix5YBM/Y/uEtirG3GeKXgXkkPiaihYorhESefFJA=;
+	b=Z/6/g6AX54ptMQMDmjIQK3YqN1Nz7W5o30nePrqHSICVzUaKtGQv6ISoP1Drxnr0+EUwDj
+	7/0Qd7mo2nlBDHfNqc0a+n6VLKQNl73MmFakEarrH+z5b2EnSnFhUtlbSdBVr09bQHktV3
+	KX8OJ5aF+5El25kB9EbN2QW13DFgQq8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-493-YJ-Y66GfOLuGLhFKR-IR8Q-1; Wed, 08 Jan 2025 07:04:30 -0500
+X-MC-Unique: YJ-Y66GfOLuGLhFKR-IR8Q-1
+X-Mimecast-MFC-AGG-ID: YJ-Y66GfOLuGLhFKR-IR8Q
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436328fcfeeso120671095e9.1
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 04:04:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736337870; x=1736942670;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=erQix5YBM/Y/uEtirG3GeKXgXkkPiaihYorhESefFJA=;
+        b=WE7RQidJinTbLdwND0Qx54JdvSfISHfxQfIIoa5ubRAUGWAC9axhX3/vBpL3d+Vnj9
+         hUOwKOP4pkoIrXkHeBbUqTXZ76OMmxpUst4ZzUcHuAJIglyuTA9yr1QTJSrgQ3dLrXD2
+         xr0HMgF9ZrvD8H1lWXGofqpHJMSu8F/PsYx4v5RfRbApkZzoKxoiR/PEdnp85IqOh5e/
+         Lj5Taq0T4vjeQggoDp5BUJbyso2vk43rQCoelTW3XBdTrjKhuooCztqULpk1PL96hbee
+         OcqaMfTdPa93whz8v9qbglPSEbWzRtRo8FHPH1by/tav97Zt9YnV8k/0MVYdr1kwWwzK
+         Pmng==
+X-Forwarded-Encrypted: i=1; AJvYcCVLKWWj5KSWEuGpQPyVcXPwWy+OnFEERngsX23IEYu10n73g4M1in9G7lJEvNbEi47z78Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQEIxmgHrfpgHHNrejIYksa593i6jvrVBhvKsHrBlNzOh3lbXP
+	dMsg3CwwjumPVSGTBZGRvT4iHjeyAQD3yn1vnDKER7U/dytJtouwNi8qtaNX6bRzvluVqROhP0k
+	/x/MMFohx9t6owDjdFe1m994hPxG/cK2YsTLxt7sQhLKWH1dQyQ==
+X-Gm-Gg: ASbGncvumLbQe6UAE56kqQIDfGNDlHWcGSOoTfY2e7MMeTuQmAs7bYBPvqu5ogniNza
+	/7Pgaqwmf3OaoNoyC3ObDpo9mFZCEqrKgA8lOPBaShRiUAV8ikLjhKI75ul6rJEJJFh9JWN3v7o
+	0cgL8xEmMpkus80QgroTNy9rbi86/statbKki5xqPYrOSrgdjhQ4Mee33tBDdV4rr6JycUin7KO
+	hwCDPBRi1bHDyTPcH30fkLSGq0BwqD8OmWfBXTo8zKlMLTRfdk=
+X-Received: by 2002:a05:600c:5251:b0:434:f4f9:8104 with SMTP id 5b1f17b1804b1-436e2700050mr18200075e9.33.1736337869673;
+        Wed, 08 Jan 2025 04:04:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFUR05pl8seK2xsW/qB5D6saVHw6QWnqhWJEnho0PIwlVj0Pr14aAjP/a/iJR8rsa6d05BmGw==
+X-Received: by 2002:a05:600c:5251:b0:434:f4f9:8104 with SMTP id 5b1f17b1804b1-436e2700050mr18199815e9.33.1736337869281;
+        Wed, 08 Jan 2025 04:04:29 -0800 (PST)
+Received: from redhat.com ([2a02:14f:175:d62d:93ef:d7e2:e7da:ed72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2e8bea5sm18342805e9.31.2025.01.08.04.04.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2025 04:04:28 -0800 (PST)
+Date: Wed, 8 Jan 2025 07:04:23 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	kexec@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Baoquan He <bhe@redhat.com>, Vivek Goyal <vgoyal@redhat.com>,
+	Dave Young <dyoung@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2 00/12] fs/proc/vmcore: kdump support for virtio-mem on
+ s390
+Message-ID: <20250108070407-mutt-send-email-mst@kernel.org>
+References: <20241204125444.1734652-1-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB6945.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23dbd4f6-1a6e-4393-e7e7-08dd2fdaaba6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2025 11:50:38.5320
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nLvOGCBussGhaTBdmTqcF3Xizdapntpiv/0gm9X53rf9RyDFiY771SgAuWEsv7999KbbcsDxsBZ0saFTKcN5iA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5975
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241204125444.1734652-1-david@redhat.com>
 
-T24gRnJpLCAyMDI0LTEyLTA2IGF0IDE1OjAyIC0wODAwLCBKb3NoIFBvaW1ib2V1ZiB3cm90ZToN
-Cj4gT24gVGh1LCBEZWMgMDUsIDIwMjQgYXQgMDQ6NTM6MDNQTSAtMDgwMCwgSm9zaCBQb2ltYm9l
-dWYgd3JvdGU6DQo+ID4gT24gVGh1LCBEZWMgMDUsIDIwMjQgYXQgMDM6MzI6NDdQTSAtMDgwMCwg
-Sm9zaCBQb2ltYm9ldWYgd3JvdGU6DQo+ID4gPiBPbiBUaHUsIE5vdiAyMSwgMjAyNCBhdCAxMjow
-NzoxOVBNIC0wODAwLCBKb3NoIFBvaW1ib2V1ZiB3cm90ZToNCj4gPiA+ID4gVXNlci0+dXNlciBT
-cGVjdHJlIHYyIGF0dGFja3MgKGluY2x1ZGluZyBSU0IpIGFjcm9zcyBjb250ZXh0DQo+ID4gPiA+
-IHN3aXRjaGVzDQo+ID4gPiA+IGFyZSBhbHJlYWR5IG1pdGlnYXRlZCBieSBJQlBCIGluIGNvbmRf
-bWl0aWdhdGlvbigpLCBpZiBlbmFibGVkDQo+ID4gPiA+IGdsb2JhbGx5DQo+ID4gPiA+IG9yIGlm
-IGVpdGhlciB0aGUgcHJldiBvciB0aGUgbmV4dCB0YXNrIGhhcyBvcHRlZCBpbiB0bw0KPiA+ID4g
-PiBwcm90ZWN0aW9uLsKgIFJTQg0KPiA+ID4gPiBmaWxsaW5nIHdpdGhvdXQgSUJQQiBzZXJ2ZXMg
-bm8gcHVycG9zZSBmb3IgcHJvdGVjdGluZyB1c2VyDQo+ID4gPiA+IHNwYWNlLCBhcw0KPiA+ID4g
-PiBpbmRpcmVjdCBicmFuY2hlcyBhcmUgc3RpbGwgdnVsbmVyYWJsZS4NCj4gPiA+IA0KPiA+ID4g
-UXVlc3Rpb24gZm9yIEludGVsL0FNRCBmb2xrczogd2hlcmUgaXMgaXQgZG9jdW1lbnRlZCB0aGF0
-IElCUEINCj4gPiA+IGNsZWFycw0KPiA+ID4gdGhlIFJTQj/CoCBJIHRob3VnaHQgSSdkIHNlZW4g
-dGhpcyBzb21ld2hlcmUgYnV0IEkgY2FuJ3Qgc2VlbSB0bw0KPiA+ID4gZmluZCBpdC4NCj4gPiAN
-Cj4gPiBGb3IgSW50ZWwsIEkgZm91bmQgdGhpczoNCj4gPiANCj4gPiDCoA0KPiA+IGh0dHBzOi8v
-d3d3LmludGVsLmNvbS9jb250ZW50L3d3dy91cy9lbi9kZXZlbG9wZXIvYXJ0aWNsZXMvdGVjaG5p
-Y2FsL3NvZnR3YXJlLXNlY3VyaXR5LWd1aWRhbmNlL2Fkdmlzb3J5LWd1aWRhbmNlL3Bvc3QtYmFy
-cmllci1yZXR1cm4tc3RhY2stYnVmZmVyLXByZWRpY3Rpb25zLmh0bWwNCj4gPiANCj4gPiDCoCAi
-U29mdHdhcmUgdGhhdCBleGVjdXRlZCBiZWZvcmUgdGhlIElCUEIgY29tbWFuZCBjYW5ub3QgY29u
-dHJvbA0KPiA+IHRoZQ0KPiA+IMKgIHByZWRpY3RlZCB0YXJnZXRzIG9mIGluZGlyZWN0IGJyYW5j
-aGVzIGV4ZWN1dGVkIGFmdGVyIHRoZSBjb21tYW5kDQo+ID4gb24NCj4gPiDCoCB0aGUgc2FtZSBs
-b2dpY2FsIHByb2Nlc3Nvci4gVGhlIHRlcm0gaW5kaXJlY3QgYnJhbmNoIGluIHRoaXMNCj4gPiBj
-b250ZXh0DQo+ID4gwqAgaW5jbHVkZXMgbmVhciByZXR1cm4gaW5zdHJ1Y3Rpb25zLCBzbyB0aGVz
-ZSBwcmVkaWN0ZWQgdGFyZ2V0cyBtYXkNCj4gPiBjb21lDQo+ID4gwqAgZnJvbSB0aGUgUlNCLg0K
-PiA+IA0KPiA+IMKgIFRoaXMgYXJ0aWNsZSB1c2VzIHRoZSB0ZXJtIFJTQi1iYXJyaWVyIHRvIHJl
-ZmVyIHRvIGVpdGhlciBhbiBJQlBCDQo+ID4gwqAgY29tbWFuZCBldmVudCwgb3IgKG9uIHByb2Nl
-c3NvcnMgd2hpY2ggc3VwcG9ydCBlbmhhbmNlZCBJQlJTKQ0KPiA+IGVpdGhlciBhDQo+ID4gwqAg
-Vk0gZXhpdCB3aXRoIElCUlMgc2V0IHRvIDEgb3Igc2V0dGluZyBJQlJTIHRvIDEgYWZ0ZXIgYSBW
-TSBleGl0LiINCj4gPiANCj4gPiBJIGhhdmVuJ3Qgc2VlbiBhbnl0aGluZyB0aGF0IGV4cGxpY2l0
-IGZvciBBTUQuDQo+IA0KPiBGb3VuZCBpdC7CoCBBcyBBbmRyZXcgbWVudGlvbmVkIGVhcmxpZXIs
-IEFNRCBJQlBCIG9ubHkgY2xlYXJzIFJTQiBpZg0KPiB0aGUNCj4gSUJQQl9SRVQgQ1BVSUQgYml0
-IGlzIHNldC7CoCBGcm9tIEFQTSB2b2wgMzoNCj4gDQo+IENQVUlEIEZuODAwMF8wMDA4X0VCWCBF
-eHRlbmRlZCBGZWF0dXJlIElkZW50aWZpZXJzOg0KPiANCj4gMzAJSUJQQl9SRVQJVGhlIHByb2Nl
-c3NvciBjbGVhcnMgdGhlIHJldHVybiBhZGRyZXNzDQo+IAkJCXByZWRpY3RvciB3aGVuIE1TUiBQ
-UkVEX0NNRC5JQlBCIGlzIHdyaXR0ZW4NCj4gdG8gMS4NCj4gDQo+IFdlIGNoZWNrIHRoYXQgYWxy
-ZWFkeSBmb3IgdGhlIElCUEIgZW50cnkgbWl0aWdhdGlvbiwgYnV0IG5vdyB3ZSdsbA0KPiBhbHNv
-DQo+IG5lZWQgdG8gZG8gc28gZm9yIHRoZSBjb250ZXh0IHN3aXRjaCBJQlBCLg0KPiANCj4gUXVl
-c3Rpb24gZm9yIEFNRCwgZG9lcyBTQlBCIGJlaGF2ZSB0aGUgc2FtZSB3YXksIGkuZS4gZG9lcyBp
-dCBjbGVhcg0KPiBSU0INCj4gaWYgSUJQQl9SRVQ/DQoNClRoYXQncyBjb3JyZWN0IC0gU0JQQiBj
-bGVhcnMgdGhlIFJTQiBvbmx5IHdoZW4gSUJQQl9SRVQgaXMgc2V0Lg0KDQoJCUFtaXQNCg0K
+On Wed, Dec 04, 2024 at 01:54:31PM +0100, David Hildenbrand wrote:
+> The only "different than everything else" thing about virtio-mem on s390
+> is kdump: The crash (2nd) kernel allocates+prepares the elfcore hdr
+> during fs_init()->vmcore_init()->elfcorehdr_alloc(). Consequently, the
+> kdump kernel must detect memory ranges of the crashed kernel to
+> include via PT_LOAD in the vmcore.
+> 
+> On other architectures, all RAM regions (boot + hotplugged) can easily be
+> observed on the old (to crash) kernel (e.g., using /proc/iomem) to create
+> the elfcore hdr.
+> 
+> On s390, information about "ordinary" memory (heh, "storage") can be
+> obtained by querying the hypervisor/ultravisor via SCLP/diag260, and
+> that information is stored early during boot in the "physmem" memblock
+> data structure.
+> 
+> But virtio-mem memory is always detected by as device driver, which is
+> usually build as a module. So in the crash kernel, this memory can only be
+> properly detected once the virtio-mem driver started up.
+> 
+> The virtio-mem driver already supports the "kdump mode", where it won't
+> hotplug any memory but instead queries the device to implement the
+> pfn_is_ram() callback, to avoid reading unplugged memory holes when reading
+> the vmcore.
+> 
+> With this series, if the virtio-mem driver is included in the kdump
+> initrd -- which dracut already takes care of under Fedora/RHEL -- it will
+> now detect the device RAM ranges on s390 once it probes the devices, to add
+> them to the vmcore using the same callback mechanism we already have for
+> pfn_is_ram().
+> 
+> To add these device RAM ranges to the vmcore ("patch the vmcore"), we will
+> add new PT_LOAD entries that describe these memory ranges, and update
+> all offsets vmcore size so it is all consistent.
+> 
+> My testing when creating+analyzing crash dumps with hotplugged virtio-mem
+> memory (incl. holes) did not reveal any surprises.
+> 
+> Patch #1 -- #7 are vmcore preparations and cleanups
+> Patch #8 adds the infrastructure for drivers to report device RAM
+> Patch #9 + #10 are virtio-mem preparations
+> Patch #11 implements virtio-mem support to report device RAM
+> Patch #12 activates it for s390, implementing a new function to fill
+>           PT_LOAD entry for device RAM
+
+Who is merging this?
+virtio parts:
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+> v1 -> v2:
+> * "fs/proc/vmcore: convert vmcore_cb_lock into vmcore_mutex"
+>  -> Extend patch description
+> * "fs/proc/vmcore: replace vmcoredd_mutex by vmcore_mutex"
+>  -> Extend patch description
+> * "fs/proc/vmcore: disallow vmcore modifications while the vmcore is open"
+>  -> Disallow modifications only if it is currently open, but warn if it
+>     was already open and got closed again.
+>  -> Track vmcore_open vs. vmcore_opened
+>  -> Extend patch description
+> * "fs/proc/vmcore: prefix all pr_* with "vmcore:""
+>  -> Added
+> * "fs/proc/vmcore: move vmcore definitions out if kcore.h"
+>  -> Call it "vmcore_range"
+>  -> Place vmcoredd_node into vmcore.c
+>  -> Adjust patch subject + description
+> * "fs/proc/vmcore: factor out allocating a vmcore range and adding it to a
+>    list"
+>  -> Adjust to "vmcore_range"
+> * "fs/proc/vmcore: factor out freeing a list of vmcore ranges"
+>  -> Adjust to "vmcore_range"
+> * "fs/proc/vmcore: introduce PROC_VMCORE_DEVICE_RAM to detect device RAM
+>    ranges in 2nd kernel"
+>  -> Drop PROVIDE_PROC_VMCORE_DEVICE_RAM for now
+>  -> Simplify Kconfig a bit
+>  -> Drop "Kdump:" from warnings/errors
+>  -> Perform Elf64 check first
+>  -> Add regions also if the vmcore was opened, but got closed again. But
+>     warn in any case, because it is unexpected.
+>  -> Adjust patch description
+> * "virtio-mem: support CONFIG_PROC_VMCORE_DEVICE_RAM"
+>  -> "depends on VIRTIO_MEM" for PROC_VMCORE_DEVICE_RAM
+> 
+> 
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Cc: Sven Schnelle <svens@linux.ibm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Cc: "Eugenio Pérez" <eperezma@redhat.com>
+> Cc: Baoquan He <bhe@redhat.com>
+> Cc: Vivek Goyal <vgoyal@redhat.com>
+> Cc: Dave Young <dyoung@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Eric Farman <farman@linux.ibm.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> 
+> David Hildenbrand (12):
+>   fs/proc/vmcore: convert vmcore_cb_lock into vmcore_mutex
+>   fs/proc/vmcore: replace vmcoredd_mutex by vmcore_mutex
+>   fs/proc/vmcore: disallow vmcore modifications while the vmcore is open
+>   fs/proc/vmcore: prefix all pr_* with "vmcore:"
+>   fs/proc/vmcore: move vmcore definitions out of kcore.h
+>   fs/proc/vmcore: factor out allocating a vmcore range and adding it to
+>     a list
+>   fs/proc/vmcore: factor out freeing a list of vmcore ranges
+>   fs/proc/vmcore: introduce PROC_VMCORE_DEVICE_RAM to detect device RAM
+>     ranges in 2nd kernel
+>   virtio-mem: mark device ready before registering callbacks in kdump
+>     mode
+>   virtio-mem: remember usable region size
+>   virtio-mem: support CONFIG_PROC_VMCORE_DEVICE_RAM
+>   s390/kdump: virtio-mem kdump support (CONFIG_PROC_VMCORE_DEVICE_RAM)
+> 
+>  arch/s390/Kconfig             |   1 +
+>  arch/s390/kernel/crash_dump.c |  39 ++++-
+>  drivers/virtio/virtio_mem.c   | 103 ++++++++++++-
+>  fs/proc/Kconfig               |  19 +++
+>  fs/proc/vmcore.c              | 283 ++++++++++++++++++++++++++--------
+>  include/linux/crash_dump.h    |  41 +++++
+>  include/linux/kcore.h         |  13 --
+>  7 files changed, 407 insertions(+), 92 deletions(-)
+> 
+> 
+> base-commit: feffde684ac29a3b7aec82d2df850fbdbdee55e4
+> -- 
+> 2.47.1
+
 
