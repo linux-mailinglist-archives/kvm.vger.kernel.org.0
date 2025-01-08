@@ -1,183 +1,128 @@
-Return-Path: <kvm+bounces-34803-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19F7A06293
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 17:49:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD7B8A062EC
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:03:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35FAA167820
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 16:48:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96012188AF17
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 17:03:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14FD1FFC78;
-	Wed,  8 Jan 2025 16:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2813B202C4A;
+	Wed,  8 Jan 2025 17:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="P+dMSXpw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1zAdsskX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6A71FF601
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 16:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D0C200120
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 17:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736354917; cv=none; b=Q6xB2w0uuUsb5FM/ycBajAOCzOLYKKYQ7o1nqhHx6pmCahBO8YmfsJxiduFpFWDIu/OzNttSfCGEKuuUaJZu/BIT6lzFXpPfjJtMsEKPzzmeN2cOCmWT5IklqqFwyzpa+c37s5Q8GvEhvEm4omb5ksXL4M2iH3MMsAcb5qj0678=
+	t=1736355758; cv=none; b=p3bUO4DrXfN+zHYWNEE8l3vCv7uq5pLNs7TnbJOyPwfPaLW6oWtTGr9aDKtGHJsrqP3VDb7Q12d30c7Bec+9DmTc8XiulR4JABXImul3Bk4/iJwZidnKx6jCWSUvtYYa6NE1nPZROaZo61sMfo3d5xEzCgU3s7IXVRV8jvfwSGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736354917; c=relaxed/simple;
-	bh=gffYnheyHmQirnOLrLWnuXR/bCkBh259lAiuaWxaIbE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PAVjRPwIkbZAsRBQmQ7SX/SOcLbutcP6DZwSyRTJiZ0FSeSmPcLm5y7vdx2bpRwCSMzNBbU+BLYFdARS7+BUi9CEZVcBAnHz2XYG3EH9jJ13NkoyWjoUaZmjrjEWNvj2wcxOGsNbzXY7/H+fGtnGu0LVQrChd4dnIAwykeubkZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=P+dMSXpw; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43624b2d453so348755e9.2
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 08:48:35 -0800 (PST)
+	s=arc-20240116; t=1736355758; c=relaxed/simple;
+	bh=0F437mfJ2df9Auz0w1t3X7ooZON62mJ6dJ3m6Z9w3bQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=N47yL1QoKRtjwf5AhVFgHiCwyuLtiezZno4zQynqCdjeN/oi5/M1CAtZdfdjS/UlMMXKUc5eQzpC5fo5PVRMJAtITFH5H9XlgEkYrjieXCeZgxo6P6UlqKunsKJuPCA5X7f6Ek1yFcrOGAvUgS8/8QnbUl5fQo59uk9TWR2/tXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1zAdsskX; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef909597d9so45980a91.3
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 09:02:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google; t=1736354914; x=1736959714; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0UT5umqpvXzX+OHEo2z2rTpWOE07qIe9i0VrPSb4y5A=;
-        b=P+dMSXpwUa4kqEohgFGZ1o55U5BQIhDc1U41dSLrjRAMb0zcJok2n+wX7N8Joenb9m
-         MEo9h4u0N17hQiz1qbtDGg6HmfdpV5/9xSET7TXtOULJh5Ix18nHoyueVNSuXteEHKVF
-         XtYm9wRgTvgVtx94jPVzBxR6pNBbzKQrPmSeY=
+        d=google.com; s=20230601; t=1736355756; x=1736960556; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oWGOfJXeBpA+hYoCim4Gl4TweVde5GBvuzvE6PWPJug=;
+        b=1zAdsskXhxqNZzcwrDMjXjhnNCmoezlyblZsdF08l/G2Q1QPy3Vg676v59+0LVThs0
+         fJ08qB1JnNmnaAJgCuZIkgh9b3kpnBAx9giX0ya1ep+e8Nb5OJa/wtTPL9EyA4IPctQH
+         sKM9pCBtocXbdCotW2qOhJlRptnbcSgDptNa3tD9XklWm3RmpptH6ES2UyiPw/QXykWC
+         AcELj1xWDmdqda5zsNYbD3S7V8Pjyl6whow5NXnSpWiZ7qO0ANe7zvmK0R5UWU82JaYJ
+         KGoxODb532CH0ck7gUSShSpmbfRdCCv6VqO7COy0jwDWb3za/Hn1cyZndyru41t5/ox+
+         DiwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736354914; x=1736959714;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0UT5umqpvXzX+OHEo2z2rTpWOE07qIe9i0VrPSb4y5A=;
-        b=Fb613j/S6qLFdunaa0N/igVNA6+BCjKMvfXbLKXvLix7+EJ5HhXx4hJCleT9JgGqGV
-         2uXVXlIThoRWONhXFxsfBU32Vr5JjogXnZOA1ihDeQGGvwSPbsBSxKiqtJLx6UTc1z4n
-         UEWBSQC9RNpFskP4MIwYVtq63dLhTuAeIIoPSvevG0XsOaOdY4OqQ2GqWcmI/JJyu0W1
-         8pQ8O8Otxk46pqW91OwzIIuRnz9Ul1uCdbJ61hVcrOt1vDPW8FoBjc6YhgrL4yaCQTGr
-         UkOhuqqMuo5aS6E1Nvoem5f3gDqWeya+aTTrdQsujfu/XfelPvP4hd9VSpoGdt16BN6j
-         epFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXpuuypjchW8YB5zohGzPXDrDFs1Bjun3XBCFrOON0MueJk7EZMDsgMV4R6qLpksqCyZ9g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKdVS9qJ6IS5h1xT/cfzL16XhCypvQkjFjpGGxEUmZminfZSo5
-	khAHuLbgumDQgxVYDWZZ1c47Leq716X77Xzz5t/aAg++Dbj309rf2kya118Uf5A=
-X-Gm-Gg: ASbGncthCLyaP34cB5MNz3+zkZ5CsRiQrGqvU7ZENWMNOsBG2B+btXJwveJZl66+662
-	Bm1hgAF6JXYTDEvmPrO/uh8SeEVlve4FN14nx9GN9TbbgkK877FcBqSQtCHWPVb28oH92nBKV9s
-	X8eEy747b9mXP+ZKlxxJ/LNDJRkzD1pH4Vv9paAi5/GpEnXbyPROPuf362Dc5NDaIqmi2EuTmGZ
-	kkzij6kHL+4NfhKg70c/LTOJWDI0T7xEj5J8SHkOtthR15WfSgRn9PfpufCd6x4HKTZ
-X-Google-Smtp-Source: AGHT+IEu1vDzbKs7I7Y2fxV73AUw4WocoWZ3S+yonWf2wLofuc/3i9UvSC6dX6IXU9yETNGe3ZMUpQ==
-X-Received: by 2002:a05:600c:444b:b0:434:f586:7520 with SMTP id 5b1f17b1804b1-436e2679a31mr29981125e9.6.1736354914223;
-        Wed, 08 Jan 2025 08:48:34 -0800 (PST)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:5485:d4b2:c087:b497])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2ddefcbsm26275945e9.22.2025.01.08.08.48.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 08:48:33 -0800 (PST)
-Date: Wed, 8 Jan 2025 17:48:31 +0100
-From: Simona Vetter <simona.vetter@ffwll.ch>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Simona Vetter <simona.vetter@ffwll.ch>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
-	Wei Lin Guay <wguay@meta.com>, Keith Busch <kbusch@kernel.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	Dag Moxnes <dagmoxnes@meta.com>,
-	Nicolaas Viljoen <nviljoen@meta.com>,
-	Oded Gabbay <ogabbay@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Maor Gottlieb <maorg@nvidia.com>
-Subject: Re: [PATCH 0/4] cover-letter: Allow MMIO regions to be exported
- through dmabuf
-Message-ID: <Z36sXzCpRhh_WXMY@phenom.ffwll.local>
-References: <0f207bf8-572a-4d32-bd24-602a0bf02d90@amd.com>
- <C369F330-5BAD-4AC6-A13C-EEABD29F2F08@meta.com>
- <e8759159-b141-410b-be08-aad54eaed41f@amd.com>
- <IA0PR11MB7185D0E4EE2DA36A87AE6EACF8052@IA0PR11MB7185.namprd11.prod.outlook.com>
- <0c7ab6c9-9523-41de-91e9-602cbcaa1c68@amd.com>
- <IA0PR11MB71855CFE176047053A4E6D07F8062@IA0PR11MB7185.namprd11.prod.outlook.com>
- <0843cda7-6f33-4484-a38a-1f77cbc9d250@amd.com>
- <20250102133951.GB5556@nvidia.com>
- <Z3vG9JNOaQMfDZAY@phenom.ffwll.local>
- <20250106162757.GH5556@nvidia.com>
+        d=1e100.net; s=20230601; t=1736355756; x=1736960556;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oWGOfJXeBpA+hYoCim4Gl4TweVde5GBvuzvE6PWPJug=;
+        b=SbuTXWIq1FA1G7kvT8OO358RdsxvCOkj7xw2xek1YM7+p5PBTtR989qLcxjPTj9IoZ
+         mutvU8/9gqmBwNqGmmwhHpEa3ETpCybrtzbazfsJjwK286isbYRuCrwLiEyKRhAMZ41n
+         Ea2HmbwkZn7Sr7JepFVbLMt9o4b0Ptom43mwnKoJKRWsKErxImzKbydBYYCVVAO3SRZB
+         a4GM/cLE6f8hAGW3aNn8MjMtPjvwOwhuzN9dkxryzuI1OxJQgepw6Qj7dJzQg4zEVQMQ
+         LFSJZ90goZEKOMaHm0OtWx0nyxFcBppXG+cT2pRCCMFR1VfQp2EElkv76DRv1vLTMvr1
+         NWUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXovqwgGDIk1pr23hdJBA/Ppf/hC6P1wNcwA2RNeBxxW35kp5xPvhLFzWBDY0QwsDQSvx8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyToY7jx2NducigTzfgtr2z53WXXLIUBXaYDMUut6syfYo6e8aB
+	LwyVPry1/ZJCNDN2GOP+tFdG58tllzO2bfH+jHKN9sE73HSwSv4Fk/sRcHFOCiQdStJGKLhA1es
+	IVQ==
+X-Google-Smtp-Source: AGHT+IFcMiWpr8ThIWscW+O4xOSlH1bKgP0p8hoq8VvU3k6Dn6eFdDHwNuDtTPplzGCT/zn8pa5ZsKmc/FU=
+X-Received: from pfbf6.prod.google.com ([2002:a05:6a00:ad86:b0:725:e76f:1445])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:35c7:b0:725:ef4d:c1bd
+ with SMTP id d2e1a72fcca58-72d21fcec0fmr4923399b3a.19.1736355756132; Wed, 08
+ Jan 2025 09:02:36 -0800 (PST)
+Date: Wed, 8 Jan 2025 09:02:34 -0800
+In-Reply-To: <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250106162757.GH5556@nvidia.com>
-X-Operating-System: Linux phenom 6.12.3-amd64 
+Mime-Version: 1.0
+References: <20250106124633.1418972-1-nikunj@amd.com> <20250106124633.1418972-13-nikunj@amd.com>
+ <20250107193752.GHZ32CkNhBJkx45Ug4@fat_crate.local> <3acfbef7-8786-4033-ab99-a97e971f5bd9@amd.com>
+ <20250108082221.GBZ341vUyxrBPHgTg3@fat_crate.local> <4b68ee6e-a6b2-4d41-b58f-edcceae3c689@amd.com>
+ <cd6c18f3-538a-494e-9e60-2caedb1f53c2@amd.com> <Z36FG1nfiT5kKsBr@google.com> <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
+Message-ID: <Z36vqqTgrZp5Y3ab@google.com>
+Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
+From: Sean Christopherson <seanjc@google.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, 
+	x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de, 
+	dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com, 
+	francescolavra.fl@gmail.com, Alexey Makhalov <alexey.makhalov@broadcom.com>, 
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jan 06, 2025 at 12:27:57PM -0400, Jason Gunthorpe wrote:
-> On Mon, Jan 06, 2025 at 01:05:08PM +0100, Simona Vetter wrote:
-> > On Thu, Jan 02, 2025 at 09:39:51AM -0400, Jason Gunthorpe wrote:
-> > > On Thu, Dec 19, 2024 at 11:04:54AM +0100, Christian König wrote:
-> > > 
-> > > > > Based on all the above, I think we can conclude that since dma_buf_put()
-> > > > > does not directly (or synchronously) call the f_op->release() handler, a
-> > > > > deadlock is unlikely to occur in the scenario you described.
-> > > 
-> > > Right, there is no deadlock here, and there is nothing inhernetly
-> > > wrong with using try_get like this. The locking here is ugly ugly
-> > > ugly, I forget why, but this was the best I came up with to untangle
-> > > it without deadlocks or races.
-> > 
-> > Yeah, imo try_get is perfectly fine pattern. With that sorted my only
-> > request is to make the try_get specific to the dma_ops, because it only
-> > works if both ->release and the calling context of try_get follow the same
-> > rules, which by necessity are exporter specific.
+On Wed, Jan 08, 2025, Borislav Petkov wrote:
+> On Wed, Jan 08, 2025 at 06:00:59AM -0800, Sean Christopherson wrote:
+> > Ideally, if the TSC is the preferred clocksource, then the scheduler will use the
+> > TSC and not a PV clock irrespective of STSC.  But I 100% agree with Boris that
+> > it needs buy-in from other maintainers (including Paolo), because it's entirely
+> > possible (likely, even) that there's an angle to scheduling I'm not considering.
 > 
-> We already know the fd is a dma_ops one because it is on an internal
-> list and it could not get there otherwise.
+> That's exactly why I wanted to have this taken care of only for the STSC side
+> of things now and temporarily. So that we can finally land those STSC patches
+> - they've been pending for waaay too long.
 > 
-> The pointer cannot become invalid and freed back to the type safe RCU
-> while on the list, meaning the try_get is safe as is.
+> And then ask Nikunj nicely to clean up this whole pv clock gunk, potentially
+> kill some of those old clocksources which probably don't matter anymore.
 > 
-> I think Christian's original advice to just open code it is the best
-> option.
+> But your call how/when you wanna do this.
 
-Yeah open coding in vfio is imo best, agreed on that.
+I'm okay starting with just TDX and SNP guests, but I don't want to special case
+SNP's Secure TSC anywhere in kvmclock or common TSC/sched code.
 
-> > In full generality as a dma_buf.c interface it's just busted and there's
-> > no way to make it work, unless we inflict that locking ugliness on
-> > absolutely every exporter.
-> 
-> I'm not sure about that, the struct file code has special logic to
-> accommodate the type safe RCU trick. I didn't try to digest it fully,
-> but I expect there are ways to use it safely without the locking on
-> release.
+For TDX guests, the TSC is _always_ "secure".  So similar to singling out kvmclock,
+handling SNP's STSC but not the TDX case again leaves the kernel in an inconsistent
+state.  Which is why I originally suggested[*] fixing the sched_clock mess in a
+generically; doing so would avoid the need to special case SNP or TDX in code
+that doesn't/shouldn't care about SNP or TDX.
 
-Hm yes, if you use a write barrier when set your file pointer and clear it
-in release, then you can use get_file_rcu with just rcu_read_lock on the
-read side. But you have to directly use your own struct file * pointer
-since it needs to reload that in a loop, you can't use dma_buf->file.
+[*] https://lore.kernel.org/all/ZurCbP7MesWXQbqZ@google.com
 
-At that point you're already massively peeking behind the dma_buf
-abstraction that just directly using get_file_rcu is imo better.
+> If you want the cleanup first, I'll take only a subset of the STSC set so that
+> I can unload some of that set upstream.
 
-And for anything else, whether it's rcu or plain locks, it's all subsystem
-specific anyway that I think a dma_buf.c wrapper
+My vote is to apply through "x86/sev: Mark Secure TSC as reliable clocksource",
+and then split "x86/tsc: Switch Secure TSC guests away from kvm-clock" to grab
+only the snp_secure_tsc_init() related changes (which is how that patch should
+be constructed no matter what; adding support for MSR_AMD64_GUEST_TSC_FREQ has
+nothing to do with kvmclock).
 
-Not entirely sure, but for the dma_buf_try_get wrapper you have to put a
-full lock acquisition or rcu_sychnronize into your ->release callback,
-otherwise I don't think it's safe to use.
-
-> > > IIRC it was changed a while back because call chains were getting kind of
-> > > crazy long with the file release functions and stack overflow was a
-> > > problem in some cases.
-> > 
-> > Hm I thought it was also a "oh fuck deadlocks" moment, because usually
-> > most of the very deep fput calls are for temporary reference and not the
-> > final one.
-> 
-> That sounds motivating too, but I've also seen cases of being careful
-> to unlock before fputting things..
-
-Yeah I think knowledge about this issue was very uneven in different
-subsystems.
--Sima
--- 
-Simona Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+And then figure out how to wrangle clocksource and sched_clock in a way that is
+sane and consistent.
 
