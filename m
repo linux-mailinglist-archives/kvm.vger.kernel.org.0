@@ -1,171 +1,208 @@
-Return-Path: <kvm+bounces-34849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34850-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5F18A067A7
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 22:58:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E882A0693E
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 00:06:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6C223A7089
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 21:58:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85CB53A7388
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 23:06:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 545872040B0;
-	Wed,  8 Jan 2025 21:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D7D204C2A;
+	Wed,  8 Jan 2025 23:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Itl/xZvR"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="miMBigcr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BD51A8411
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 21:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8558D2040BD
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 23:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736373495; cv=none; b=R8Pf9A/J9NBh4/ca6lO778NfSyZ9dXdV5RWn5rRcvWVZaaoUc9LfYRMYoqK70Z8sXLQMph01F2ZVqfst2uBtBEr3jQ37sEnhiEaPk5YuXeqdHwetJV1XMIfOsqDl6xg2VLSNjk7az8VDyQA+/YOIgIrHEHIL84BYgsfEvC0UTHQ=
+	t=1736377600; cv=none; b=Xb85LqQHUiWIr2RwqysShs5b1tahkIpqb/Kw5WNpi4jmuOAZLfMPSZ5Z4eAPlW34BKEeWGBq/1hhiPFPV9MB8qmvk2I5Q5SGqiJDQWoqpa7ClOC/Y/egQiKFtiogbpCpFSrQO6q7PpQGWWcwv0fRtcIhjKr6rMXvUSRK9PUeXFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736373495; c=relaxed/simple;
-	bh=VFxS6IVlzinJoQmrxhhGmMY2lTuIipJb30aOmBNZ2Rk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KRtugOpWgMQ3l3PI1MZ78N72ENMTWgLsumFmRFkO/BgdSTR+F0/ljg4ChY2Rvd0AYDmQYnkxAJCLlA/AJ/taFxiWa8UoyuCOW3xk1q50waYzHAZ8JsS8z2bKXAqsQGvCleIXUCIAWE22B/KUX5//mJ48z+k3/YIPtr15yAjSsCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Itl/xZvR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736373492;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VZT12k8zyiJJctayBGmmsPk5QVebozGKzATCMYJ680I=;
-	b=Itl/xZvRXLgOpVlc34UUzRg7EQ5cHEQVAdBMdTvpDDyTdDwioV/T8bCoxP1OtaIpBN9tvM
-	Z8XhHaCRyU//aeHPsS9TTu40glCe6jmu1glvio6X1TFttb0LPOKV8djZ79OBFItsfmSFZY
-	Ho8z4R1n+xpOhcDBirl+XVd7DOp/8Is=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-249-fdES6T1UNKGIR2nF5kh7Gg-1; Wed, 08 Jan 2025 16:58:11 -0500
-X-MC-Unique: fdES6T1UNKGIR2nF5kh7Gg-1
-X-Mimecast-MFC-AGG-ID: fdES6T1UNKGIR2nF5kh7Gg
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385dcae001fso86908f8f.1
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 13:58:11 -0800 (PST)
+	s=arc-20240116; t=1736377600; c=relaxed/simple;
+	bh=aB0CXxIokhvkC57xHWo5H49NtK4Hw4Lwfh2W3E5LB10=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D1gMTiPP+ILzC52gbJEykqdKh7fdcG1ydCbQt2ZYlnQY+c6UpW+OviDMgVJ7dh4no4uGjIV+uqw2zocxJVwf3gvWkbOHKPA8dKLcmqNTpoZFF+egALLYAm+g5WNEpkNiIrxGXrgQptorC8QFYPWmyzxCT3rQPinfv84JGhqiCSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=miMBigcr; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id BF618400AF
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 23:06:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1736377590;
+	bh=/2uznUkAqjnP0Z9uvgDXWb7hJkSM5A3/75TWvET5IXg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=miMBigcrD3fFtlmW5l4x+mPzcnGsQu/dwz25p4iaMHBvmQ5CzAdSeZ8JYcC2KLa4O
+	 AQqy9zWAkzkyATgpPQZP9kEaqiZ391MpOT+gJu3EbzfyumLSK6ktzjhEpUTDwvuXoO
+	 7rJi0f8rsmAD5wTC/5pB2fwYUoFlQb0fnZBpXnCyiQEvZCs8BpxvHFuRDuqTIvaQhj
+	 0swAMUTR3xKSVKy4kMGJwaacPPQ/a9K1GzoTnH6w3IJA3lIcCAg+4J/Dv8lcBJ3Kg+
+	 kLCgq5t4KUwQ7smfE44OLdhCyIKOaniCK4QK+tuIQrtpqB0HlzqDvnmMeT8BFYqwC/
+	 dxOJ+GMyNIMww==
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aa6a6dcf9a3so23067666b.0
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 15:06:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736373490; x=1736978290;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VZT12k8zyiJJctayBGmmsPk5QVebozGKzATCMYJ680I=;
-        b=VtCjGd8Yyn6oI3E3agqIXoiWfqt/6BGFxNrK1rbr6TEDmjmHEA8DIgVJOPTakrpOOC
-         4iqEfQAzl8llnB9ftfsY3qsXRmSLK1VpzsKBcscLY3kSG1xNC55zUWc/UDGegvXaVZwu
-         fT0rV0J/sIHyDr7GXASZCbzNXjvD5kYn7khqsRyGNSNb4YYIabM42tXue0EVMxUFtAHe
-         y+lJJ0T+TPXLV2XcDbPkg2hP+7IcliMMJAmQO4CR7lYcJGpPLlPf6BPQ5TZHM7Do/p96
-         ZleaYbo/mW/8BnCZHPZ7SG6Iqdqi7guk9AOs3KK72Ft4G5rYu2cY8AD4suoHNk+6mUYg
-         jbzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWaHiDzenp93Ipsn4byAGF0oqWIX582t4ZPs8I7kXCQyq940ldeF+EP03ANvHxsqh2tR0M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+3AYGwACsmJcs9qwMULozFVHD24Gtl/O1ai2QCmHoFYpGZ8Ls
-	Zc+3G1rOjDLEr6oZxp6zCGI+NL03oCxVVguKMoE2dooaJPpr9MRJkkaQQqvwiOmROb/GfEUYyWU
-	z2I4UYCZOaQgBN+pAm44wNuwAw/GDRcn+HPkO7K4Q/ZUN3QUZWGb/5f4YkkcL
-X-Gm-Gg: ASbGncsIfehtFr/N5RjbIK9an+l+t/wjiIB5ozxaONMXa6RII84wXXTNM1TofTU2LRD
-	KHsQoQCJLByzB5TLYl2itZqqXjDlyDNtBHCrnVj2e8a03OjzwiI3BDPCt0POEc1ig2H5pIQgvNw
-	QUOqppJ0mJLRZiJi3xnaRdO77oPMUwFBwmdqmQHWx3BXpTtga7RtHvloUtIF1JVjvkwpg0/GyAC
-	pM6uwxp7klRV8T8vOZNxaGtq9SnqtHqqBUMaIWa8JgFt97qI1HJ0cj7qPLfXEjzRkFePRVwBBE8
-	rYjMQGwSvcPpCNX5UWe+PTQ5xdb0epuT0V+n1B5Fgh6ZEx72KY88YTbSoq507b0xsdeRjLJmAIl
-	mswlJLw==
-X-Received: by 2002:a05:6000:4022:b0:386:459e:655d with SMTP id ffacd0b85a97d-38a87306d7bmr3618361f8f.20.1736373490403;
-        Wed, 08 Jan 2025 13:58:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IED5L3QNm0ccYZa2iABw/WSGCd6JNXqhK/014y/yN+xNteWP/agfFRhwV9pFvl4fnOZ7FGBhQ==
-X-Received: by 2002:a05:6000:4022:b0:386:459e:655d with SMTP id ffacd0b85a97d-38a87306d7bmr3618347f8f.20.1736373490093;
-        Wed, 08 Jan 2025 13:58:10 -0800 (PST)
-Received: from ?IPV6:2003:cb:c70d:3a00:d73c:6a8:ca9f:1df7? (p200300cbc70d3a00d73c06a8ca9f1df7.dip0.t-ipconnect.de. [2003:cb:c70d:3a00:d73c:6a8:ca9f:1df7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9a51bbbsm729705e9.39.2025.01.08.13.58.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jan 2025 13:58:09 -0800 (PST)
-Message-ID: <5e2a7936-498a-4f65-923c-353f7ca1ab17@redhat.com>
-Date: Wed, 8 Jan 2025 22:58:08 +0100
+        d=1e100.net; s=20230601; t=1736377590; x=1736982390;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/2uznUkAqjnP0Z9uvgDXWb7hJkSM5A3/75TWvET5IXg=;
+        b=dy4kJ7EJgi1clEmpji6uMtDF3BF/pNHcDKEDPSJ5YRjwY1ruqJDomQmg6cgAaCMPk2
+         e6iZw3WXt1stoDg2hBUd1FqpvrXtD1bYecA/Q6gSO9A/w+63C5gixLCX2Lr7ystHeksr
+         JruXFj594e+YNgU4ZLLXE3RRNDKLIxTCb3ZiJ/P4kQLua7EV192NoSCfu7lBVzKB++oc
+         oIxodBy2xtd7jMdrQnecnEVk0wsYRSeEbzGLD2FtCiMzFtBKvIcv+52nxg/gz631GB5N
+         /IVAUoNNvV6+mwQST5jdE74qhrxN9kWnWkHtwbuok2x6BTvlw/xDjoTWAVbrupJMVZJG
+         VQcg==
+X-Forwarded-Encrypted: i=1; AJvYcCXZ8EX2crCCR9oP+dl4jCCUNDSepmhzmV4rnrW0eXE1RF+sngFLHIAQ1CgJwiRoK57n6t0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrChe1KU0or5vi7dcFvSJ5+mn7CfvT/bWpeTeZjJwslMiuQUIa
+	4wNYDywSwkNo4gTyTDIX1nNzQzTDba1RbIiwiHihScXgweYd5eslUsQYxOiI+RmGgE41AmnP/Sf
+	90QMuA1l2dEMXZXNEIOVq1Jx+JTQkkCeRvgvwXFbfihQHDmVyuXS8u2X9wt0vrcAPyezZFnKMlK
+	SoC2rzDMWZYjY0blN8QuWD+4jS6G+tZIwRUJEAdIGD
+X-Gm-Gg: ASbGncuq54uSk1+A3u3p1ctJ3kDITHWo0kWs6p+SwGXFaaNzcptP2e3KTQlUdettoG4
+	aEj02nZN8OAWyHC90jqMuY1yefi4Vi/0b/tDn
+X-Received: by 2002:a17:907:7e83:b0:aa6:9eac:4b8e with SMTP id a640c23a62f3a-ab2abc6de91mr392176866b.41.1736377590076;
+        Wed, 08 Jan 2025 15:06:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFvwWlclDYYEbYBSiP/WDt5laFXGS8tFE0XxhvZP2Qfrj+WPfVMinCdtVnOxEdQ+WpwgE1q+7FaQZAki91ik/4=
+X-Received: by 2002:a17:907:7e83:b0:aa6:9eac:4b8e with SMTP id
+ a640c23a62f3a-ab2abc6de91mr392175966b.41.1736377589723; Wed, 08 Jan 2025
+ 15:06:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/7] hostmem: Factor out applying settings
-To: =?UTF-8?Q?=E2=80=9CWilliam_Roche?= <william.roche@oracle.com>,
- kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
- philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
- imammedo@redhat.com, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
- wangyanan55@huawei.com, zhao1.liu@intel.com, joao.m.martins@oracle.com
-References: <cf587c8b-3894-4589-bfea-be5db70e81f3@redhat.com>
- <20241214134555.440097-1-william.roche@oracle.com>
- <20241214134555.440097-6-william.roche@oracle.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20241214134555.440097-6-william.roche@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CAHTA-uYp07FgM6T1OZQKqAdSA5JrZo0ReNEyZgQZub4mDRrV5w@mail.gmail.com>
+ <20241126103427.42d21193.alex.williamson@redhat.com> <CAHTA-ubXiDePmfgTdPbg144tHmRZR8=2cNshcL5tMkoMXdyn_Q@mail.gmail.com>
+ <20241126154145.638dba46.alex.williamson@redhat.com> <CAHTA-uZp-bk5HeE7uhsR1frtj9dU+HrXxFZTAVeAwFhPen87wA@mail.gmail.com>
+ <20241126170214.5717003f.alex.williamson@redhat.com> <CAHTA-uY3pyDLH9-hy1RjOqrRR+OU=Ko6hJ4xWmMTyoLwHhgTOQ@mail.gmail.com>
+ <20241127102243.57cddb78.alex.williamson@redhat.com> <CAHTA-uaGZkQ6rEMcRq6JiZn8v9nZPn80NyucuSTEXuPfy+0ccw@mail.gmail.com>
+ <20241203122023.21171712.alex.williamson@redhat.com> <CAHTA-uZWGmoLr0R4L608xzvBAxnr7zQPMDbX0U4MTfN3BAsfTQ@mail.gmail.com>
+ <20241203150620.15431c5c.alex.williamson@redhat.com> <CAHTA-uZD5_TAZQkxdJRt48T=aPNAKg+x1tgpadv8aDbX5f14vA@mail.gmail.com>
+ <20241203163045.3e068562.alex.williamson@redhat.com> <CAHTA-ua5g2ygX_1T=YV7Nf1pRzO8TuqS==CCEpK51Gez9Q5woA@mail.gmail.com>
+In-Reply-To: <CAHTA-ua5g2ygX_1T=YV7Nf1pRzO8TuqS==CCEpK51Gez9Q5woA@mail.gmail.com>
+From: Mitchell Augustin <mitchell.augustin@canonical.com>
+Date: Wed, 8 Jan 2025 17:06:18 -0600
+X-Gm-Features: AbW1kvaRQ-oa_KJM1tWVzxUFSIUJcSVrhNBaTG5oM6r7TSvw5QWEt2Pk6CXw7pQ
+Message-ID: <CAHTA-uZtRzFOuo7vZCjoLF3_n0CCy3+0U0r_deB3jFF0cPivnw@mail.gmail.com>
+Subject: Re: drivers/pci: (and/or KVM): Slow PCI initialization during VM boot
+ with passthrough of large BAR Nvidia GPUs on DGX H100
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-pci@vger.kernel.org, kvm@vger.kernel.org, 
+	Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 14.12.24 14:45, “William Roche wrote:
-> From: David Hildenbrand <david@redhat.com>
-> 
-> We want to reuse the functionality when remapping or resizing RAM.
+Hi Alex,
 
-We should drop the "or resizing of RAM." part, as that does no longer apply.
+While waiting for
+https://lore.kernel.org/all/20241218224258.2225210-1-mitchell.augustin@cano=
+nical.com/
+to be reviewed, I was thinking more about the slowness of
+pci_write_config_<size>() itself in my use case.
 
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: William Roche <william.roche@oracle.com>
-> ---
+You mentioned this earlier in the thread:
 
--- 
-Cheers,
+> It doesn't take into account that toggling the command register bit is no=
+t a trivial operation in a virtualized environment.
 
-David / dhildenb
+The thing that I don't understand about this is why the speed for this
+toggle (an individual pci_write_config_*() call) would be different
+for one passed-through GPU than for another. On one of my other
+machines with a different GPU, I didn't see any PCI config register
+write slowness during boot with passthrough. Notably, that other GPU
+does have much less VRAM (and is not an Nvidia GPU). While scaling
+issues due to larger GPU memory space would make sense to me if the
+slowdown was in some function whose number of operations was bound by
+device memory, it is unclear to me if that is relevant here, since as
+far as I can tell, no such relationship exists in pci_write_config_*()
+itself since it is just writing a single value to a single
+configuration register regardless of the underlying platform. (It
+appears entirely atomic, and only bound by how long it takes to
+acquire the lock around the register.)  All I can hypothesize is that
+maybe that lock acquisition needs to wait for some
+hardware-implemented operation whose runtime is bound by memory size,
+but that is just my best guess.
 
+Is there anything you can think of that is triggered by the
+pci_write_config_*() alone that you think might cause device-dependent
+behavior here, or is this likely something that I will just need to
+raise with Nvidia?
+
+Thanks,
+Mitchell Augustin
+
+On Thu, Dec 5, 2024 at 6:09=E2=80=AFPM Mitchell Augustin
+<mitchell.augustin@canonical.com> wrote:
+>
+> I submitted a patch that addresses this issue that I want to link to
+> in this thread:
+> https://lore.kernel.org/all/20241206000351.884656-1-mitchell.augustin@can=
+onical.com/
+> - everything looks good with it on my end.
+>
+> -Mitchell Augustin
+>
+>
+> On Tue, Dec 3, 2024 at 5:30=E2=80=AFPM Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+> >
+> > On Tue, 3 Dec 2024 17:09:07 -0600
+> > Mitchell Augustin <mitchell.augustin@canonical.com> wrote:
+> >
+> > > Thanks for the suggestions!
+> > >
+> > > > The calling convention of __pci_read_base() is already changing if =
+we're having the caller disable decoding
+> > >
+> > > The way I implemented that in my initial patch draft[0] still allows
+> > > for __pci_read_base() to be called independently, as it was
+> > > originally, since (as far as I understand) the encode disable/enable
+> > > is just a mask - so I didn't need to remove the disable/enable inside
+> > > __pci_read_base(), and instead just added an extra one in
+> > > pci_read_bases(), turning the __pci_read_base() disable/enable into a
+> > > no-op when called from pci_read_bases(). In any case...
+> > >
+> > > > I think maybe another alternative that doesn't hold off the console=
+ would be to split the BAR sizing and resource processing into separate ste=
+ps.
+> > >
+> > > This seems like a potentially better option, so I'll dig into that ap=
+proach.
+> > >
+> > >
+> > > Providing some additional info you requested last week, just for more=
+ context:
+> > >
+> > > > Do you have similar logs from that [hotplug] operation
+> > >
+> > > Attached [1] is the guest boot output (boot was quick, since no GPUs
+> > > were attached at boot time)
+> >
+> > I think what's happening here is that decode is already disabled on the
+> > hot-added device (vs enabled by the VM firmware on cold-plug), so in
+> > practice it's similar to your nested disable solution.  Thanks,
+> >
+> > Alex
+> >
+>
+>
+> --
+> Mitchell Augustin
+> Software Engineer - Ubuntu Partner Engineering
+
+
+
+--=20
+Mitchell Augustin
+Software Engineer - Ubuntu Partner Engineering
 
