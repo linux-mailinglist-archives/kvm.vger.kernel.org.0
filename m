@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-34767-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51434A05A2E
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 12:42:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 758D0A05A31
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 12:42:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C8AB3A4B9A
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 11:42:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 936BC1888406
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 11:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A891FAC23;
-	Wed,  8 Jan 2025 11:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DB11F8AE5;
+	Wed,  8 Jan 2025 11:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="zM1czloq"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="QEvNFzbk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035621FA273
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 11:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BF91F8F16
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 11:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736336476; cv=none; b=f0CYPPdld8fB8pj9neg2A5QrlMjYmBdGYHpgTCr/GyEhDhYi9K1XuMPJLGgLUraHf5sM9X2HsKUGY3pvdVK9QBZEEh317EjcpYCInM4WRMQMGsZj4mXrJSJTzbrvvCyOVFVTDuRwvM3PxutMwZu6lwZs7t4AdoVm1Ze7fU/+Xfg=
+	t=1736336484; cv=none; b=F4yQNEx58nmL1BybEUYErwpo7jtlQB4P/kJ9mRd3nYMTDSB9oHJpj1q+8I3IaL52v0cS2lPkwENFHJAPoHqhxAhKWP2SDntixbtaiqtKdH1qxOo9occCRZUgnUiLee6129CrXb2wf8KWWwPMqbwtZYzyKW1wwiUV13imBtpRMRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736336476; c=relaxed/simple;
-	bh=3se5b6ZtcapIk1Hj4cssqIsg8szJXXkbOptd2HkOcvc=;
+	s=arc-20240116; t=1736336484; c=relaxed/simple;
+	bh=tHg7EPO4d3vZqqXSE/ljdfB56DasxRR2R5V/3PeBYA8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=O8BJkJF8/fswoOxHrIe6s/I0GhwGdFstNmRPyGLHcgXwBigUlPaN3IZck6zyjb1vqBD0mi/cCtFuDpVNyMIitanPcLqDpCJoOFtkp1U/uQkSB/CAzCCCIlI2Td2RZ9lC/NGFf17NR+hophzxoOQut+9vb+euBuvhFAsdDGvbdv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=zM1czloq; arc=none smtp.client-ip=209.85.214.176
+	 In-Reply-To:To; b=ejAxqssRzXiqdbOFmqB+FrUBPmdiOqpU9p35wu8vsMO9xKURjOikIuWdIF/Ps+pt191Jn53TWS0veWt5N/uYdskuCh+QVESSm+ap9sU/qGFXOR6Pm7BiTvbfmWkW5BpDwWNAFCJRxO/p7kvipQjdgtS6dEiiZFnLe7+JBjkj3ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=QEvNFzbk; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21619108a6bso230436045ad.3
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 03:41:14 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2166022c5caso219114995ad.2
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 03:41:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736336474; x=1736941274; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736336482; x=1736941282; darn=vger.kernel.org;
         h=to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=O/vBDwZ1bg1e1swp4oqyRL1d2OsnyaZOIbrFToORcQk=;
-        b=zM1czloqv0UV/90fK2rdkrxN+ZY60mhHl/ZYSJ9rHeQiW4eyOpA1E+thUrTj6zioWc
-         s598jUHvTxuWkXw6pmtfxEF2bE2fSIiHEEzYPEJt9bN48jNUidJ1avW81VhCOkJOfFwg
-         UvVgmYc02uOgVB4VrXfldtlls2Q/S5vl7/wA8+LPHyV6PlKe5W9cXjG+AZ33K5DX8vEe
-         Ljw/up4z1U73PQTs6zLkxaGZg1BcE/DgXhBElV7rs6HAIOvNn3nfKn20B7AngL/ceUX1
-         3FMADKRwpaf7hw4/4D4rb4UlFQNF7RnJlzRrfIWbGf25ji7LoXxAfAaMYPK3Y9eolHPX
-         p/OQ==
+        bh=uJZDjcdc8pRQt88Qkq7qezR/3EGVIB2MIrkBFIywvoM=;
+        b=QEvNFzbkxUh6GXNYjhp4RBCXkxuPwTZO894Fo4dyv/JkBvASDufuL9PhudcluGxKly
+         ooN7uZVpOrhEuzP+aqd5vEg7PtA3X6sDRQDTC5JHnzcbMdpqiyl9mgfFmEAqome5rsQS
+         Fxub58XCwfjzBVe9hZC9tmyNUruwjEN5de+Dn5utLmx9fP3ClzAhBmE9dCGS6vNSgbis
+         B4vxArO7kd6NwnJ8m6u4Rn38KzC0hn5cDqkxQ9OKDwwMRnswwNQSddPwU4Q6YH4ahVG7
+         b44cp2qZ4QVepcXvt8gyT5vkkVVuljK/w3BXhWUt1d/n7BEveLVA3GZst+ZzpWgjYPdO
+         o6Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736336474; x=1736941274;
+        d=1e100.net; s=20230601; t=1736336482; x=1736941282;
         h=to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=O/vBDwZ1bg1e1swp4oqyRL1d2OsnyaZOIbrFToORcQk=;
-        b=gLgMVY1xuy5AlL6hiW/U3CfqFldbRxDJ15DRdbYb6ae/ngMw598KMB7dptulEoQ4so
-         RhBKP2kxXrOF3nTyRrsK9DJXkZ2efJ3rGtSInrUBGPUcGN07yTZy9Y0Ybon5M4dv8TNH
-         lz04yeoFwM+5DsCMzjtRzDED57ok97tfCKP8P3rB456+WJlzi6PZ++/FIvau7g1jyvJC
-         cVlacPCTd3+Uv6mu7Y0l392QasE3OBOBBh+gsEJO8lgEX3+PAGEkYbJYGgbJk+Hm5yWK
-         NJnCMHkzCuIH/rB4lxaLKSrPEUZ472A3TEfakLH+wqYJnEky7+xnHJ2WihrNrPjTR2if
-         B5zw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxwJ9kxrG9K48Z4GBoRjEi7Shs1eaxefbSVCkpnyQKS67gi7uzvvBxmH696A2J0mnLhA8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvZFUrLEtkuRTJl22v3pV3pdh8eqybAemqR8PTjhBzbQrbjlyO
-	Yup2A58gGoXekmD6mWT5TjtiZWHE1iTNBpMlO5Ru7q6EF/SVT7EMuKSQeoC7NBI=
-X-Gm-Gg: ASbGnctZuRU7c/WVrhX1FWf9klPbN5bH4p8q4PRK7uCY/qzwH/eGu9dcrVxJbR+EcHg
-	Xne34Mk6gGJ6pmxV3Z4hcYR54D5yQYFFrC1nTzVHMC32aunJDPRuGPPcFKLIXt4oZ6dqnAYtjs4
-	HX8zLQuwbcn3mfon16+1kD9bGcuI2ltXn4NxJT1kiGZ9AQ95c7JiV0daIrQvtRpOPjSDjqNCj9N
-	Y0W0M2aoixgl+O3/MSbkRUR+aq8uQz/pxQ1LW+T6diUiYpqeHopJLjcDrk=
-X-Google-Smtp-Source: AGHT+IEF8qMJ7NIeisRWLUDr1vgbLpWM1JpUxFEsueCBmq3r2f5ah2dV4+8clMjFEVU+QatbWr90SA==
-X-Received: by 2002:a17:90b:5484:b0:2ee:b8ac:73b4 with SMTP id 98e67ed59e1d1-2f548f4265emr3092055a91.36.1736336474242;
-        Wed, 08 Jan 2025 03:41:14 -0800 (PST)
+        bh=uJZDjcdc8pRQt88Qkq7qezR/3EGVIB2MIrkBFIywvoM=;
+        b=cHGEqpCLA9TqzI6D+E8NHNZzNWA1tG5QPh426koj24askIV6aaMVgt+2CvJbc6B2JE
+         EIEYKLxXor5zGzD4SDPWBWkxrjd9lUmHPtJqNlx4pvBcBiMWpm/T8voMLTt+EG46Kk/B
+         2y+zuvg5v8Etbx0MZxb1MFA3hJRMCxj9dGoAQ0KUZJVznzQ36EH1secWGE5wNw0clUa9
+         c2hnFcEousJlaiA988qs1oF1bADyQOGjSaPqDOBkRPQPhxd3RIHVfssamgTZCx2bRe+9
+         WwUKunMwWBoZuaTlvjyzHdHH5UosUZUDulzr/qLtN1htI3a23l7IUb20y4yNWDPCxByd
+         ttSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAzc22aQhOVC9R8G0H0nVv/nJ7p1w9y/pHhrrK5lhlNDxPVg3oeWGTJS2E+2d+rgKqdUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFJoT8Qod3dm7Ttag8rf+7RcNbzQAusFjoQtIlv7DJhE63O7PK
+	KSFXillMen6jdt6VtZU9u2QoQYtG52qH2OmflzKUp31aWyD+cUKj3osZnek8z+E=
+X-Gm-Gg: ASbGncsN2fwgLj5UWnKi4Xshbv9OcGpulyxQjnZno/qpR1QOVrWoyU+hLPalCyaij4n
+	Q0UQKIfezEb0Iz/hqV9atY8QH1G3XoIil8G2EyrGcBBxxM14dtY0iu4zI6MezCgEbSeFB+cyKYL
+	ytUZoQfoDDl93enVxPbUeskN8tFUVLoTqHQ2dOC9mrZC/jjTTa4yhqIAGg3BIpGV9Y2+91lRgGn
+	gFxWMH2xFFzIx8a98ev8OFVpq1dbWCVsVyTCTOVfJ3WOS4vsrYOnNk7iEE=
+X-Google-Smtp-Source: AGHT+IGZASTQqlbIXu/5lZbeo0etu1KHnAZzoaUJLTqYhE6bCTImvJlbR5ZtQox21lD/Cy5M8tQ6Cw==
+X-Received: by 2002:a17:903:2308:b0:216:779a:d5f3 with SMTP id d9443c01a7336-21a83f546c3mr40688775ad.14.1736336482042;
+        Wed, 08 Jan 2025 03:41:22 -0800 (PST)
 Received: from localhost ([157.82.203.37])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2f54a36a5adsm1383037a91.49.2025.01.08.03.41.09
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-219dc970c8fsm326235045ad.60.2025.01.08.03.41.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jan 2025 03:41:13 -0800 (PST)
+        Wed, 08 Jan 2025 03:41:21 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Wed, 08 Jan 2025 20:40:12 +0900
-Subject: [PATCH 2/3] tun: Pad virtio header with zero
+Date: Wed, 08 Jan 2025 20:40:13 +0900
+Subject: [PATCH 3/3] tun: Set num_buffers for virtio 1.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,7 +82,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250108-tun-v1-2-67d784b34374@daynix.com>
+Message-Id: <20250108-tun-v1-3-67d784b34374@daynix.com>
 References: <20250108-tun-v1-0-67d784b34374@daynix.com>
 In-Reply-To: <20250108-tun-v1-0-67d784b34374@daynix.com>
 To: Jonathan Corbet <corbet@lwn.net>, 
@@ -100,38 +100,120 @@ To: Jonathan Corbet <corbet@lwn.net>,
  devel@daynix.com, Akihiko Odaki <akihiko.odaki@daynix.com>
 X-Mailer: b4 0.14-dev-fd6e3
 
-tun used to simply advance iov_iter when it needs to pad virtio header,
-which leaves the garbage in the buffer as is. This is especially
-problematic when tun starts to allow enabling the hash reporting
-feature; even if the feature is enabled, the packet may lack a hash
-value and may contain a hole in the virtio header because the packet
-arrived before the feature gets enabled or does not contain the
-header fields to be hashed. If the hole is not filled with zero, it is
-impossible to tell if the packet lacks a hash value.
-
-In theory, a user of tun can fill the buffer with zero before calling
-read() to avoid such a problem, but leaving the garbage in the buffer is
-awkward anyway so fill the buffer in tun.
+The specification says the device MUST set num_buffers to 1 if
+VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- drivers/net/tun_vnet.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/tap.c      |  2 +-
+ drivers/net/tun.c      |  4 ++--
+ drivers/net/tun_vnet.c | 14 +++++++++-----
+ drivers/net/tun_vnet.h |  4 ++--
+ 4 files changed, 14 insertions(+), 10 deletions(-)
 
+diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+index 60804855510b..fe9554ee5b8b 100644
+--- a/drivers/net/tap.c
++++ b/drivers/net/tap.c
+@@ -713,7 +713,7 @@ static ssize_t tap_put_user(struct tap_queue *q,
+ 	int total;
+ 
+ 	if (q->flags & IFF_VNET_HDR) {
+-		struct virtio_net_hdr vnet_hdr;
++		struct virtio_net_hdr_v1 vnet_hdr;
+ 
+ 		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
+ 
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index dbf0dee92e93..ec6f4ae655fb 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1991,7 +1991,7 @@ static ssize_t tun_put_user_xdp(struct tun_struct *tun,
+ 	size_t total;
+ 
+ 	if (tun->flags & IFF_VNET_HDR) {
+-		struct virtio_net_hdr gso = { 0 };
++		struct virtio_net_hdr_v1 gso = { .num_buffers = 1 };
+ 
+ 		vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
+ 		ret = tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
+@@ -2044,7 +2044,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 	}
+ 
+ 	if (vnet_hdr_sz) {
+-		struct virtio_net_hdr gso;
++		struct virtio_net_hdr_v1 gso;
+ 
+ 		ret = tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, &gso);
+ 		if (ret < 0)
 diff --git a/drivers/net/tun_vnet.c b/drivers/net/tun_vnet.c
-index fe842df9e9ef..ffb2186facd3 100644
+index ffb2186facd3..a7a7989fae56 100644
 --- a/drivers/net/tun_vnet.c
 +++ b/drivers/net/tun_vnet.c
-@@ -138,7 +138,8 @@ int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
- 	if (copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr))
+@@ -130,15 +130,17 @@ int tun_vnet_hdr_get(int sz, unsigned int flags, struct iov_iter *from,
+ EXPORT_SYMBOL_GPL(tun_vnet_hdr_get);
+ 
+ int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
+-		     const struct virtio_net_hdr *hdr)
++		     const struct virtio_net_hdr_v1 *hdr)
+ {
++	int content_sz = MIN(sizeof(*hdr), sz);
++
+ 	if (iov_iter_count(iter) < sz)
+ 		return -EINVAL;
+ 
+-	if (copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr))
++	if (copy_to_iter(hdr, content_sz, iter) != content_sz)
  		return -EFAULT;
  
--	iov_iter_advance(iter, sz - sizeof(*hdr));
-+	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
-+		return -EFAULT;
+-	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
++	if (iov_iter_zero(sz - content_sz, iter) != sz - content_sz)
+ 		return -EFAULT;
  
  	return 0;
+@@ -154,11 +156,11 @@ EXPORT_SYMBOL_GPL(tun_vnet_hdr_to_skb);
+ 
+ int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
+ 			  const struct sk_buff *skb,
+-			  struct virtio_net_hdr *hdr)
++			  struct virtio_net_hdr_v1 *hdr)
+ {
+ 	int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
+ 
+-	if (virtio_net_hdr_from_skb(skb, hdr,
++	if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)hdr,
+ 				    tun_vnet_is_little_endian(flags), true,
+ 				    vlan_hlen)) {
+ 		struct skb_shared_info *sinfo = skb_shinfo(skb);
+@@ -176,6 +178,8 @@ int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
+ 		return -EINVAL;
+ 	}
+ 
++	hdr->num_buffers = 1;
++
+ 	return 0;
  }
+ EXPORT_SYMBOL_GPL(tun_vnet_hdr_from_skb);
+diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
+index 2dfdbe92bb24..d8fd94094227 100644
+--- a/drivers/net/tun_vnet.h
++++ b/drivers/net/tun_vnet.h
+@@ -12,13 +12,13 @@ int tun_vnet_hdr_get(int sz, unsigned int flags, struct iov_iter *from,
+ 		     struct virtio_net_hdr *hdr);
+ 
+ int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
+-		     const struct virtio_net_hdr *hdr);
++		     const struct virtio_net_hdr_v1 *hdr);
+ 
+ int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
+ 			const struct virtio_net_hdr *hdr);
+ 
+ int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
+ 			  const struct sk_buff *skb,
+-			  struct virtio_net_hdr *hdr);
++			  struct virtio_net_hdr_v1 *hdr);
+ 
+ #endif /* TUN_VNET_H */
 
 -- 
 2.47.1
