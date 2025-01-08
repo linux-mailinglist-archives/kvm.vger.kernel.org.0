@@ -1,160 +1,236 @@
-Return-Path: <kvm+bounces-34827-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC04A0643D
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:21:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACBF9A0648E
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:35:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 572B118896D5
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:21:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40AB41886157
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474A0201026;
-	Wed,  8 Jan 2025 18:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7A6202C4D;
+	Wed,  8 Jan 2025 18:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MHlJxmO/"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="jrpseMxo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE5615853B;
-	Wed,  8 Jan 2025 18:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84D1202C47
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 18:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736360498; cv=none; b=pzQarMeVKC4NivZoYJs/1lV5PL5M+0Pr2Eam4n9b5Vb7cl9N8SG0ogXtcu+Jk03kl+BcJzO+67tVqA4O8bhCTu4OhRRYVgtWafS3ij8M0WvOwC+wh6Q7F67c0shsBnoIRDH6tekpoWTuLta7z7ZTTfPfsBn94T1NKDUoyNj0Ie0=
+	t=1736361263; cv=none; b=X+kpMuJdZpVap8Cw6I4VeYSctLhNT7xhMDqVUmz0JOT5TG0dNIlKWcNR7KHrGAzu+8QP8Mem9P/877KnQp64Bg44cQ5D1Kk3UgiWWrDwuSza22aHO3fUIZMIhHCx0XWCJY5boMB2aZ7HEYzTB3/xGfsLHHqJ9zCWITBvIxhHCDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736360498; c=relaxed/simple;
-	bh=j+ztVDrhcjGb3Iwq6kcC1Bao+mzRSURbi1fiHkFG54c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ftZu+zInkd7Ag28ukarxNZ2/UXVsreYc5EHnjLtTm+1Z9wRaUnZY5KOpUuMUa//7orxECrkLusgJWt9gJ3ksMdav3jLSVX1+ASg5wi1x5MIVxUA5yG9PQMSEIvFPKn3wY8GANM9862vkqhPbHSeb7BohX82aH3kpUQAX38H/VZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MHlJxmO/; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 508E6qht001197;
-	Wed, 8 Jan 2025 18:21:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=kR5aJI
-	SqarhpAbqLVoEBu63M39K0V0j2eLP4X9Jisms=; b=MHlJxmO/+T90YFLW6eUrO5
-	zqBUs/y4FgwRdsjwpwt4xn8DYL6qyMDD9B8AzNznYEZQhur/IeOSvC/VMPUNZhdp
-	vTFUZPEx847fwp0cQn3vGqbGgfw0lFoIEhse92ac84RC5xYhevZ+bM6DgDzg5F4X
-	xexF3aY8Q0NlV8Ydxa//fP4o07RmJ38fnCZgVp0I+JmrshT5GguLaSgyG6dWkXaw
-	Zs4lSeKiQjIEG45GxDI+lguf9o9uGRjZWkkQ8pYPvgcxI7qgwWVzXevATHFRyuSc
-	odCt+XT09Vn2Mq3bf+4ONwgVj1UO8q4oU6EuEjOL+0F6LXqqy0Z73Os8DiWol8xg
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441tu5h4gu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Jan 2025 18:21:32 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 508GHaLG003630;
-	Wed, 8 Jan 2025 18:21:31 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yfat9amh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Jan 2025 18:21:31 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 508ILRmf35979668
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Jan 2025 18:21:27 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BD46B20043;
-	Wed,  8 Jan 2025 18:21:27 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8B53820040;
-	Wed,  8 Jan 2025 18:21:27 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Jan 2025 18:21:27 +0000 (GMT)
-Date: Wed, 8 Jan 2025 19:21:17 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko
- Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander
- Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-        "Matthew Wilcox (Oracle)"
- <willy@infradead.org>
-Subject: Re: [PATCH v1 0/4] KVM: s390: vsie: vsie page handling fixes +
- rework
-Message-ID: <20250108192117.51a2d2cb@p-imbrenda>
-In-Reply-To: <20250107154344.1003072-1-david@redhat.com>
-References: <20250107154344.1003072-1-david@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1736361263; c=relaxed/simple;
+	bh=qnX46omGjPjC/q+gyDkJa+35YULFw89vPSSIZ7CduEc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RrZNVvyt8nq0ohY2Z0O6sI4wD/1K6c0xPaKSoxBpYsmOgzSiRIJPJ0hozrh+h7f1H4OPAVOLBaFW4/inS9FpmU69NYpAuo8JaTw+0WsHekbdaHP91wLaIo+41z6tvduW8eJZEb/OrwF8fEuoedh7KEuw3c2Pdz4LMwoQtujharM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=jrpseMxo; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2164b662090so600885ad.1
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 10:34:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736361260; x=1736966060; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DqnnjKkSHwAf9hrNplxrEhAq6xbb+daTfv8Q2VG5nP8=;
+        b=jrpseMxoaVpRH8UJzjKdSlJwC/Bgqs9Dd7r8ux6xPvPMTWKR74QzAD9fUm8pU9qgFk
+         +/IcQ9L+kr8xC8zO+uSDuquLbJzWokxaPoT+4LhN8E8nyka1alAejXBXjRGF5+I2SWHT
+         GKtvdWWq9YaNnuRpo+hOGUoHWuN+Jt01uj/bC9sCSAMwpStFKzHk4R8CEUAra8JMEQOe
+         /+58DqgvQLO0zaBYzA/5EHb8R0S7Q96F8JN29ZQCBeWsSN1qY0jxNyo3RTKUU9TLOsz+
+         sH0gsGeZZk8ZYggIR6ReVkv6Swq6gwynZVbFYKO3XxHOxGen+BWSLOxc49PsiRMw5qdr
+         n2Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736361260; x=1736966060;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DqnnjKkSHwAf9hrNplxrEhAq6xbb+daTfv8Q2VG5nP8=;
+        b=r03HOiNVT0VmcKy5TiA124WS2+QIHCzgDDlb6aVl+W/hpvogaxHj1HESOAw2V1TdPh
+         ldV2xaGxRSLUm+1X2Vitu1uQ9I8/XomaOtUx6CaNcz6RgQULJWE2esOrLTqpfONDddGD
+         HYSiuNaZJdtQmZdYPEOa1Uw5Oj8mW0E/6TAKsM76ZW5WxmGDBAxBaEGxfr3Tly0K7p+J
+         K7B2/kasCLzLaHaAZKZ4HyLdvgZAER6GQqnvaPSx2SXsydSgxuoP7Lj07Kgc8HZ05GZ2
+         m7Y3yCYF/avhFL1NMsEkZvx+ge47zCuvoR38WqNscfeqT/1WA3FuA+B8qMCMUo4Ulp18
+         WB1w==
+X-Forwarded-Encrypted: i=1; AJvYcCUzw9DR0UdmaPoZydBGdTXLRcyM14fnJ8h5EQA9MqSC+779PEUjREohY9eoP7z90oZ6a8k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziS0prrFiESI+wgfkX31L+bYF71n7PiWdhW8S2OQ35hXlVFQgi
+	C/IZJkwFd495t5S46lybjPo7OBEyvaR2wfeMzWd0EHFXsAux3VoZXtmnR2I4Q/i/20x5BGarFTr
+	0aEoH4jRjorUTp4f1LiiV/scVEdrSNoldQR3xFw==
+X-Gm-Gg: ASbGnctgXXMSeJ9sDoU7PTCTa99RW72wGY4tjyMShLk1vQR8umiF+qxl4KPWzGaguBP
+	kqaLkV7VTl0eSUjfy37E6vrPYvg7G0HsMGnK0
+X-Google-Smtp-Source: AGHT+IHrzWD8hTKku+GnLUtLP/hFjQfbmE46eCWViow6nW8eTsYbms9nLnRbfU/2hi06gNkDgVP3C23j9Wgkgv5GB2I=
+X-Received: by 2002:a05:6a00:6f0b:b0:725:e4b9:a600 with SMTP id
+ d2e1a72fcca58-72d22048bf7mr4941908b3a.16.1736361260107; Wed, 08 Jan 2025
+ 10:34:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qebmI22e_lbCs6QB3HgM9s1cLBzTsZh0
-X-Proofpoint-ORIG-GUID: qebmI22e_lbCs6QB3HgM9s1cLBzTsZh0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- mlxlogscore=729 adultscore=0 bulkscore=0 impostorscore=0 clxscore=1015
- suspectscore=0 phishscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501080148
+References: <20241125162200.1630845-1-cleger@rivosinc.com> <20241125162200.1630845-5-cleger@rivosinc.com>
+ <20250108-522f238cc21ce59e16134c79@orel>
+In-Reply-To: <20250108-522f238cc21ce59e16134c79@orel>
+From: Atish Kumar Patra <atishp@rivosinc.com>
+Date: Wed, 8 Jan 2025 10:34:09 -0800
+X-Gm-Features: AbW1kvbKSIv8-fUX5pU5qDFEV3fgG-ZWJzHG9jd_bOk35dA9MC94SWhC5KY9vxA
+Message-ID: <CAHBxVyFuuNpHjEgozfJxKS3RPoEqkHK=xFhouEsQ-eo_9kiptw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v4 4/5] riscv: lib: Add SBI SSE extension definitions
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue,  7 Jan 2025 16:43:40 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Wed, Jan 8, 2025 at 5:03=E2=80=AFAM Andrew Jones <andrew.jones@linux.dev=
+> wrote:
+>
+> On Mon, Nov 25, 2024 at 05:21:53PM +0100, Cl=C3=A9ment L=C3=A9ger wrote:
+> > Add SBI SSE extension definitions in sbi.h
+> >
+> > Signed-off-by: Cl=C3=A9ment L=C3=A9ger <cleger@rivosinc.com>
+> > ---
+> >  lib/riscv/asm/sbi.h | 83 +++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 83 insertions(+)
+> >
+> > diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> > index 98a9b097..a751d0c3 100644
+> > --- a/lib/riscv/asm/sbi.h
+> > +++ b/lib/riscv/asm/sbi.h
+> > @@ -11,6 +11,11 @@
+> >  #define SBI_ERR_ALREADY_AVAILABLE    -6
+> >  #define SBI_ERR_ALREADY_STARTED              -7
+> >  #define SBI_ERR_ALREADY_STOPPED              -8
+> > +#define SBI_ERR_NO_SHMEM             -9
+> > +#define SBI_ERR_INVALID_STATE                -10
+> > +#define SBI_ERR_BAD_RANGE            -11
+> > +#define SBI_ERR_TIMEOUT                      -12
+> > +#define SBI_ERR_IO                   -13
+> >
+> >  #ifndef __ASSEMBLY__
+> >  #include <cpumask.h>
+> > @@ -23,6 +28,7 @@ enum sbi_ext_id {
+> >       SBI_EXT_SRST =3D 0x53525354,
+> >       SBI_EXT_DBCN =3D 0x4442434E,
+> >       SBI_EXT_SUSP =3D 0x53555350,
+> > +     SBI_EXT_SSE =3D 0x535345,
+> >  };
+> >
+> >  enum sbi_ext_base_fid {
+> > @@ -71,6 +77,83 @@ enum sbi_ext_dbcn_fid {
+> >       SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
+> >  };
+> >
+> > +enum sbi_ext_sse_fid {
+> > +     SBI_EXT_SSE_READ_ATTRS =3D 0,
+> > +     SBI_EXT_SSE_WRITE_ATTRS,
+> > +     SBI_EXT_SSE_REGISTER,
+> > +     SBI_EXT_SSE_UNREGISTER,
+> > +     SBI_EXT_SSE_ENABLE,
+> > +     SBI_EXT_SSE_DISABLE,
+> > +     SBI_EXT_SSE_COMPLETE,
+> > +     SBI_EXT_SSE_INJECT,
+> > +     SBI_EXT_SSE_HART_UNMASK,
+> > +     SBI_EXT_SSE_HART_MASK,
+> > +};
+> > +
+> > +/* SBI SSE Event Attributes. */
+> > +enum sbi_sse_attr_id {
+> > +     SBI_SSE_ATTR_STATUS             =3D 0x00000000,
+> > +     SBI_SSE_ATTR_PRIORITY           =3D 0x00000001,
+> > +     SBI_SSE_ATTR_CONFIG             =3D 0x00000002,
+> > +     SBI_SSE_ATTR_PREFERRED_HART     =3D 0x00000003,
+> > +     SBI_SSE_ATTR_ENTRY_PC           =3D 0x00000004,
+> > +     SBI_SSE_ATTR_ENTRY_ARG          =3D 0x00000005,
+> > +     SBI_SSE_ATTR_INTERRUPTED_SEPC   =3D 0x00000006,
+> > +     SBI_SSE_ATTR_INTERRUPTED_FLAGS  =3D 0x00000007,
+> > +     SBI_SSE_ATTR_INTERRUPTED_A6     =3D 0x00000008,
+> > +     SBI_SSE_ATTR_INTERRUPTED_A7     =3D 0x00000009,
+> > +};
+> > +
+> > +#define SBI_SSE_ATTR_STATUS_STATE_OFFSET     0
+> > +#define SBI_SSE_ATTR_STATUS_STATE_MASK               0x3
+> > +#define SBI_SSE_ATTR_STATUS_PENDING_OFFSET   2
+> > +#define SBI_SSE_ATTR_STATUS_INJECT_OFFSET    3
+> > +
+> > +#define SBI_SSE_ATTR_CONFIG_ONESHOT  (1 << 0)
+>
+> BIT(0)
+>
+> > +
+> > +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP   BIT(0)
+> > +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPIE  BIT(1)
+> > +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV   BIT(2)
+> > +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP  BIT(3)
+> > +
+> > +enum sbi_sse_state {
+> > +     SBI_SSE_STATE_UNUSED            =3D 0,
+> > +     SBI_SSE_STATE_REGISTERED        =3D 1,
+> > +     SBI_SSE_STATE_ENABLED           =3D 2,
+> > +     SBI_SSE_STATE_RUNNING           =3D 3,
+> > +};
+> > +
+> > +/* SBI SSE Event IDs. */
+> > +#define SBI_SSE_EVENT_LOCAL_RAS                      0x00000000
+> > +#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP              0x00000001
+> > +#define SBI_SSE_EVENT_LOCAL_PLAT_0_START     0x00004000
+> > +#define SBI_SSE_EVENT_LOCAL_PLAT_0_END               0x00007fff
+> > +
+> > +#define SBI_SSE_EVENT_GLOBAL_RAS             0x00008000
+> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_START    0x0000c000
+> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_END              0x0000ffff
+> > +
+> > +#define SBI_SSE_EVENT_LOCAL_PMU                      0x00010000
+> > +#define SBI_SSE_EVENT_LOCAL_PLAT_1_START     0x00014000
+> > +#define SBI_SSE_EVENT_LOCAL_PLAT_1_END               0x00017fff
+> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_START    0x0001c000
+> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_END              0x0001ffff
+> > +
+> > +#define SBI_SSE_EVENT_LOCAL_PLAT_2_START     0x00024000
+> > +#define SBI_SSE_EVENT_LOCAL_PLAT_2_END               0x00027fff
+> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_START    0x0002c000
+> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_END              0x0002ffff
+>
+> The above four don't appear to be in the spec anymore.
+>
+> > +
+> > +#define SBI_SSE_EVENT_LOCAL_SOFTWARE         0xffff0000
+> > +#define SBI_SSE_EVENT_LOCAL_PLAT_3_START     0xffff4000
+> > +#define SBI_SSE_EVENT_LOCAL_PLAT_3_END               0xffff7fff
+> > +#define SBI_SSE_EVENT_GLOBAL_SOFTWARE                0xffff8000
+> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_START    0xffffc000
+> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_END              0xffffffff
+> > +
+> > +#define SBI_SSE_EVENT_PLATFORM_BIT           (1 << 14)
+> > +#define SBI_SSE_EVENT_GLOBAL_BIT             (1 << 15)
+>
+> BIT(14)
+> BIT(15)
+>
+> I think other changes are coming to these event IDs from a series Atish
+> recently posted too.
+>
 
-> We want to get rid of page->index, so let's make vsie code stop using it
-> for the vsie page.
-> 
-> While at it, also remove the usage of page refcount, so we can stop messing
-> with "struct page" completely.
-> 
-> ... of course, looking at this code after quite some years, I found some
-> corner cases that should be fixed.
-> 
-> Briefly sanity tested with kvm-unit-tests running inside a KVM VM, and
-> nothing blew up.
+Yeah. As per Anup's suggestion and ARC feedback, we have modified the
+segments a little bit.
 
-I like this! (aside from a very tiny nit in patch 4)
+PTAL: https://github.com/riscv-non-isa/riscv-sbi-doc/blob/master/src/ext-ss=
+e.adoc
 
-if a v2 is not needed, I'll put the split line in patch 4 back together
-myself when picking, no need to send a v2 just for that.
-
-whole series:
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> 
-> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Cc: Janosch Frank <frankja@linux.ibm.com>
-> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> Cc: Sven Schnelle <svens@linux.ibm.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-> 
-> David Hildenbrand (4):
->   KVM: s390: vsie: fix some corner-cases when grabbing vsie pages
->   KVM: s390: vsie: stop using page->index
->   KVM: s390: vsie: stop messing with page refcount
->   KVM: s390: vsie: stop using "struct page" for vsie page
-> 
->  arch/s390/include/asm/kvm_host.h |   4 +-
->  arch/s390/kvm/vsie.c             | 104 ++++++++++++++++++++-----------
->  2 files changed, 69 insertions(+), 39 deletions(-)
-> 
-> 
-> base-commit: fbfd64d25c7af3b8695201ebc85efe90be28c5a3
-
+> > +
+> >  struct sbiret {
+> >       long error;
+> >       long value;
+> > --
+> > 2.45.2
+> >
+>
+> Thanks,
+> drew
 
