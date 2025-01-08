@@ -1,203 +1,226 @@
-Return-Path: <kvm+bounces-34773-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34774-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93A82A05C52
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 14:03:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8EC4A05CB7
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 14:24:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E463A3A162F
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 13:03:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D6523A4FEB
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 13:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE511FBE89;
-	Wed,  8 Jan 2025 13:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380711FBEBE;
+	Wed,  8 Jan 2025 13:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wDRxyQh1"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HgUvY9tP"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBF21FC0FE
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 13:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736341413; cv=none; b=XmcHpS+JTZcTGbty39qB0LhJRJuG9+xn+gNjP6/xkoQRR7q2j4eiw69AcTLv3rj7FWk2eA3OK9YLpQxf54VrRxJ8NPPFR/0PVFfJ7LYp8/rfpLDgw6czsXKhDq8451TRGIgoRuFfIaPq980fCNxnUe1Fxp/wM9p5yv9Ms7winTU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736341413; c=relaxed/simple;
-	bh=loGPcyrQHBM7bGYATTThXr+F+QbiBqRYqkJLRC5WoQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tbcqjj+aOO2/nCGRoBZSXKkQ8AwV8j3n64SL1Gy53+FcIE6hKNAFUFOm7NWmHSN/X1dnMt5Cpj1FYxxQlZ7RmtgYDnhQciHPunlvYN3cADv+JXDP1nIbgYwWZ2vUv2fWwgMxp0WYw7TSBax3bl5+M0J0RGqBoulxBLlmpoeYq94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wDRxyQh1; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 8 Jan 2025 14:03:14 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736341407;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O/uqjgTJv39fxY5Kjsx2QGRWfI206q33hQLFzQUJTbc=;
-	b=wDRxyQh1XPzEL8dPJ83p/8jCs4uAr3IiYRAfeDTY7Z24KQoIrYbK+NoWqBjW69LEvcN9kz
-	XKJgcvyPOf+uynNUNwIMLrbkXlHpDuaJToD/o4lotF+zi93XliV1OZoDFUzELGrQBzuVhp
-	rabbskhD6g9fy/Y+3Bo69FJlCR0b1a8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH v4 4/5] riscv: lib: Add SBI SSE extension
- definitions
-Message-ID: <20250108-522f238cc21ce59e16134c79@orel>
-References: <20241125162200.1630845-1-cleger@rivosinc.com>
- <20241125162200.1630845-5-cleger@rivosinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18711F2C44;
+	Wed,  8 Jan 2025 13:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736342644; cv=fail; b=Yv5qzCj9yxnV2SFFu2mlUFR3j4rvc7u1uYw2Y6Dg/xWHIVgU4lTD9nAPIbMh9GM/kGIpEZyz/h2WvLODO4WsNSUMmfEWenX6YCZUC1ghQJ3RLxtkdrIV7ZDByMFZayPRLTj3KqsB5USySokpb0gE8bisczF827YI41XNHnXnmuU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736342644; c=relaxed/simple;
+	bh=/um49MXhKeYncXmHOujIRbU+w43XtXjiMBY+4pTUbaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=u85wzqSjFWbtzFiw6RkJD8hBiwa4Q+NhIc7P2xeehEPa1nDIgYdg0iIrDPyxGKQtwng5r1/cNsJES7jvPIdb5Y6aFKZ9biq8BfRQIioW/9Tvd7D4Y52cQ8xsHnwhGlCQBu9dFeH7Y472ehaZIsT1XHEuFMAXJ+M/DZmCWttgzzw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HgUvY9tP; arc=fail smtp.client-ip=40.107.220.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GhVSm46zr8mTBT2fSnSsC136ybbMaobOQA7rhyUj9swbQLYA2IFiiR8QyetgpBx2dxrBHg4YgwT8x9cYAyYgZ+xQoJSZVYAPHOW531qktjLS8Y3Vi8oFpBrWCxY0mntJCfZS7h+jbG5vdRFKDaPZqbcBzhkkkqn9710H20e7VugwF1LTRRVls3NT9pvanCc+h3Q69yFw6RvxRd3C9+EtvGi4wXnugR0qMQDH2HM6EEdN5W9M/1uS28mrS4z33iI9FZSGMveSPnPxmjUcv86zn1A/Fw/hKxMuszb3zuMM3zgZgTPlyJQ3oWMSkzzOyxLr1fmbQeriS3hBgiKtaKH/kQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5+ykCuqe/n8BsRDVoZVSfG2+0a3v/sSx/fhXnr6WOao=;
+ b=HlcH0XVIZfrKujlWYpibZUbmtBjUi3rSkjRfJGJ9wa8gBjg0u6Ax/vG+zUmotH2/iK+eKhZf/BzNti71gHkk7jKj/ti6xH+NnJzIoMGRVLtVCPZrlaLMUpOvY2vANc4ITI2ev7kyH3DMS28vaMLjaNze/ZsVu6HMV4KOms/I0UKkfM//cyaoYnlSDHOfWZ5ddCWwAHKSyPD5ofq7ZtIk6f0A2oDRNZr9OyZ+Znak50x+lHeHsIKItpQhq4YO0mWdz+MGCJE1wO45QulZWBKVxEy1OkzR0myy3wHzVrNDNTXoFnKeuP7U6H+2lX4SdeClJPIjpAhwURTVa0+pBgAxGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5+ykCuqe/n8BsRDVoZVSfG2+0a3v/sSx/fhXnr6WOao=;
+ b=HgUvY9tP3Z1M1+YkYL0Kl3Z4PTDAgQWtfFjGK8tqMvI73+HzT1O9upPYm00tEDYYixpinOnLI+BheaovdSpJUlzG33iNR3JrE6LIDdAmc109l1GVaaNG/WEeA72Lv2rVXv79rn1TqwRz7ZU7JiSsW1O9BXgJpQmM7pPQ6WQmqLt6C7bo5Y0SlLun40moI7t18DTujhs70yIErSJ6DBrTraRNl7nufQNW79a507E7RVm55K4Au7ofMdIfj6+grb9ovaP7GclZf2wJ+x+qfYc7INqo9vudU9a19aV9okSn9oiX/oKzY+JWM66Gg1ZATsxYQ4JLKY9ajaL3KGEO3yvtxA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by PH0PR12MB7886.namprd12.prod.outlook.com (2603:10b6:510:26e::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.15; Wed, 8 Jan
+ 2025 13:24:00 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8314.015; Wed, 8 Jan 2025
+ 13:23:59 +0000
+Date: Wed, 8 Jan 2025 09:23:58 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
+	zhenzhong.duan@intel.com, tao1.su@intel.com
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+Message-ID: <20250108132358.GP5556@nvidia.com>
+References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
+ <20250107142719.179636-2-yilun.xu@linux.intel.com>
+ <b1f3c179-31a9-4592-a35b-b96d2e8e8261@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b1f3c179-31a9-4592-a35b-b96d2e8e8261@amd.com>
+X-ClientProxiedBy: BN9PR03CA0221.namprd03.prod.outlook.com
+ (2603:10b6:408:f8::16) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241125162200.1630845-5-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|PH0PR12MB7886:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a0dee02-c885-433f-2def-08dd2fe7b61d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TkI0SzdhSkY3MVdSNnB5YU5hazlHbXcvcHpLTGRsNXpHOEpyamliOTIrQm5L?=
+ =?utf-8?B?Q1pENHYzSjhaR1NOd2NRL0Jtc1l6c0JoSkErcXB3Tm03bmxmK3NmakJzWnlS?=
+ =?utf-8?B?VDYyZVBzUU5TUGNlL2NkNUpvaE9NalNqWFdkc3JEbEJLWVdzVGRDaEppV2dt?=
+ =?utf-8?B?QU1Uc2JkMkRVL1lFRlQyZGtiZWVTeUJpbHZtSGFsSjNBM1lkRUYyRmZTOFEx?=
+ =?utf-8?B?cGxYM0N1TERtVnVsWDNMUHZ6QUY4V1VTMnF4WGhGL1J0NEgwNHBkMGxsWWxF?=
+ =?utf-8?B?YU1IdFMydUlNK0xXQWlHRzhMK2pJQ0hscGdIeURCN0RiQThzWXpmcUt6K1pD?=
+ =?utf-8?B?R1N6WmxIcXZxdzNMTzFuQ3pDb0ZYNmpRTFU0T0NIdWJUb2dWeUd5dGN0emF1?=
+ =?utf-8?B?SnlySUVmUk9NaTI2L2lBeWxZQjdaeFlXYUNjTG1rWmNPYmRLU3VMOHRuZ1l3?=
+ =?utf-8?B?aG8ybk5velFRd2QyRnY4UFNKVWhBMTVGaVZRZXBsTWNiNytpeVYwQ0pwOW1m?=
+ =?utf-8?B?YnBjNFFxTElaMHJKWVBQSU1DMGlkWklMRk1vSFdxbEZxNHhJanNYOFdjUk1L?=
+ =?utf-8?B?WEZPTm9vM2FMUDg2anZzdnJXZ0liQVR3ZVJHRVhCclNGbmNGZlhGUWtsbmVu?=
+ =?utf-8?B?czlZRS9PQUlCU2NjNlh1am1rMzJWK1Rkby9nMFc5aFZ2NGN6MXljdWNNSytX?=
+ =?utf-8?B?SGlzNElXTHRuZEJwR3BnajJacW93V1ltdXJoNVZia0xaUnA2S1FHR0hCZUdZ?=
+ =?utf-8?B?V0dwSHhFVWNGQVlqWUdCOVQwMWFDdEMxMXpndmZkSEJqMStHbmlWc3N6MStR?=
+ =?utf-8?B?eEVVdzQwUmlsVUtZQXBoU1huOXh4YW9FRjhmQUJXalJHUjY1QmFRM0hmNzBH?=
+ =?utf-8?B?cVo5RXJFUWxFYnpLQWZjeXRLUGNYN1p6aGs2NHMyNHdiVTJZOE1iWTVGV1ZS?=
+ =?utf-8?B?dE53WCtaMEk3MHY4QlBoWFlGcWhaZ3o0OHJBQnY3ZHhkTFNwUTk5T0NqSERm?=
+ =?utf-8?B?UDJkNWZ3YjhkWUJ5Qmx5QjBaQjIybklHUGo4dy9SSFJpMWdVeTk4QkFGbkZ0?=
+ =?utf-8?B?V2ZsOWExc3V4UWRDcnNJb01NNmtDaERWZG9KVXorOGRoc2RVV01lTXVaMjRt?=
+ =?utf-8?B?empyZW4weHlwWkJQTmhiMlI0S3Erdkp0K1lhS3hVakRKd1U3Q0tSZ2pSL2I0?=
+ =?utf-8?B?cW91c0plNW9TMy8vbUdSNkhtaGZURVBDMm9uYlp4cFFNd2dIUnpPV0NDUW9L?=
+ =?utf-8?B?b2I5ZklnY2w4a05GeE1MUWcvYm9TUnBnelVoWHYwVFFlRWxPWTVMaXN2WHhW?=
+ =?utf-8?B?UGNDY0UvUS9CcGJQVzdXeGJnRzczUUVhNCs5UE9KZ0lZOCszSEp6ZFZTYUdi?=
+ =?utf-8?B?U0NtK3VBL0YwVnQ2dlQyQTkrUWREMnltRy85R2EyTjZ6ZEt5YkxMekowaDVo?=
+ =?utf-8?B?TXA5alZ3NktldEsvNS8vcmRNUjZoRGVOT3Q2L0NxTTBnaUxJQ3hXQUJ6OGZS?=
+ =?utf-8?B?UU1Ra0NlcEZudWpxSlI2QjJWcHdMTERCL0JRQnlKVWN2akhsQlZ2NGRkTXhy?=
+ =?utf-8?B?S3E3WGtWWDBVbWRTS2hZbXkxWXRIODJrcitGMFVKd0FCSkRKTUhyMUVWVm9L?=
+ =?utf-8?B?V013TG1sWVBDeFI1dExndy9uV25FQk52ejdWS2U0UU5oN0FXNDA1YWZUQ0da?=
+ =?utf-8?B?eDRoNHZ4d3dBQUtiS0lLQXNrQUdnTzBnbFRzMXlqSnRFakJmRitERWpJZUti?=
+ =?utf-8?B?MitIRG96eHNtRDFHSHZRYjFhYkRvQW42ZnFEUWo4M1dCOVcvcE1EZE53SDQy?=
+ =?utf-8?B?dkhQNm1mcVFiQzh4U2lUeGRWWTZPaGh5NzZYaGpvMTVSaThnRm1MNzBpcXdY?=
+ =?utf-8?Q?2hS0vPvk/MYiE?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aVJWbnhZdjVEWFBXM282V01SRUEzVVVNdU9weXprK2xZZmtJU1ZJOHJsSDQ1?=
+ =?utf-8?B?RkNsMUE4a1BlUHpDbzhuUHhXRXVvU3NQaVNpWEpiK252TzQwVS9iNkhmQkVQ?=
+ =?utf-8?B?Rm9va0JTMlI5VEM4aTJUU0haSjc4bzNRYVh3K3ZDZXRobVo0VCtMQjQ2dW92?=
+ =?utf-8?B?TDhLcFNLZmp0RDN6dVI2QXdVbEZtRG9LVW5rQytVdDJLZFIycktoZ3VCVVpi?=
+ =?utf-8?B?ZmthYUMwOWxraHp2TnRtdTFBY2FLdTBQWjRUc212TFlzcVEyRkVBM1BnT2dy?=
+ =?utf-8?B?ek1tcE9TRzhxTmJuSGYrQWdmR3JEYUpDYzVoN2JRZWROdjJtcnZjeEplbW1D?=
+ =?utf-8?B?YVhkd0grd3F4VEVBRGtHbHJ5bERGcS9RTlZlOXNpNkpBY29yMmZyL0NVQjYz?=
+ =?utf-8?B?MWNTYldzc1BFcERxK3ZTUkRhSVNQdG1CS3ZNUFJ6U2ZwSEpzMU04RTFKaDJY?=
+ =?utf-8?B?TGh3bitrdFdJUjlQdTZJbFZ2NmExNFBpVFJSWUUyc3ZZZEpiV214VUtFU1lk?=
+ =?utf-8?B?Vk5MTThoSHQzaE43WDIxQlJQMnBhVmJWMHNyRUdNZThNa0VVSTB0VDhvKzJT?=
+ =?utf-8?B?akZLWWJIM2dVNjBEbkZmbVoxLzA5alNPOHRRL29pU0NqQ2VqYlNHZVQzNks3?=
+ =?utf-8?B?dTlUT3VhQTRvMG9jbFl6STBhNU1VYTZ0Tm9pODE3UmJqNXlMMWhwTDU3bHdF?=
+ =?utf-8?B?Nm9mZmFNNHlsbTZYMFh3cG9HdlFkMWh4TlRsWHdxUXdUK2h4ZzNHb1JWZGhC?=
+ =?utf-8?B?M1R5Smp3eHNKQjJrOU5ScTJrclhuT1Vqd0syS2U2blNNMXNwdE1rZHF3T0xa?=
+ =?utf-8?B?ZXk0aGhBTTh4dEVxeFQ2dmV4NERRMGx4THJFUkJhZFYzd1J6eWZnelp4QlJh?=
+ =?utf-8?B?dzRDYTBmbHZ3VW9UZEN6bDFHSEFVckl3eG1za0hYMm9OUFRGZUphU1c3OVYw?=
+ =?utf-8?B?SzJaZ0ZOSnpMdTlNTk0vei9KczRwckQ4cU1pZVBYb3hpdklaTksrT2M0bnNt?=
+ =?utf-8?B?SlRrOC9hbjlXYzJWcmNWRHFzOFVHU1FRM1o0andyQVpiNVR2SXZIOVhDTXZG?=
+ =?utf-8?B?eHBpOUE0NkxEOVJQSlduQm9LbGhnMkZzZTJSV2diRzZvRHA5WlhOK1UrVlVL?=
+ =?utf-8?B?Q1pzQko5MHhMdFV6TXMraldlWjQxZE1ncUdKWEkvRjc1aFVLRkU1TitZZldp?=
+ =?utf-8?B?bHYreTBSS01pTEY4cEM2aWl2ckFTeWV6WGNuUjZsTG43WlNNMFJIbXViVlRq?=
+ =?utf-8?B?cVllaVdhVDI1TTh5a0k1OEQ5RVhISU0xU05ESlVUanE4ckx0bWR3OXRwWEN6?=
+ =?utf-8?B?amdnd2VBZTh3TXg3RFlFTStEeE9JWmxJWVhtNVRXMlZJdnZVbEVGeFhFekZj?=
+ =?utf-8?B?QnExOVlXSGNuVENESjFqcXNESm9QV3pFN091WXhBOHo4aDlwaWdzRlFNRk9N?=
+ =?utf-8?B?cXlxbnB1bFNPblhod0J3ckhYa0pJWU5Eb0ZoRXhCQm1IUk5RemNZYVdEYjJ5?=
+ =?utf-8?B?UU1sbm1tRTVMeDRXRGZDaC9uR1VYcjdDcjlVOS9aT0JXeW5Ed1Noc2NYOFRK?=
+ =?utf-8?B?QkRoUGdmWXpLQ3MrcUhrcjI1M2Z2ejRQbTZJc0hINDgyR1hoVjErV0FMZzY4?=
+ =?utf-8?B?bW9OSXcwTTFaaGVCOHZwdE54MXVjS1ZCZUJJVkpSWmpoSm51NXU0d1pWL1RR?=
+ =?utf-8?B?VXMySTV3bFduTWY2NTQwNEFESVRhNThxc0V2WDc4MlB0NDdFMStMclNRTTI3?=
+ =?utf-8?B?Q3JCdGt2OW9kV1kveCtYU3FYTjJTc2xndmJRV3VPQXVLbHlveDZGUXZRdnFI?=
+ =?utf-8?B?dkdMeGVwQ0o4QTdvTU5FYmdFa2dhVXpXdjlLL1dIRVdVT1h0NFphc3M4L2hw?=
+ =?utf-8?B?bkpDMGtmYzhManlyNENJN2xqUkFYdFZjZHBZRVBHMG5SUXRpRlhyaFVLUnZm?=
+ =?utf-8?B?YWJiak9lWHFOM1duYlllNXh6YzBGb1grMmtTZmVseVJUaDNJSXpWV0hDNExO?=
+ =?utf-8?B?UCtIcGpoS0VrdUZBVEg0VGJiUm1Zb3dPdGRkZ3VpS1QzVzRMcTk4UjdGWFU3?=
+ =?utf-8?B?SkJjeGZxa1NhNk1peXl2amJ1NFFNM3Q5ZFV2a013a3hraEliVzdNdUh6bkpF?=
+ =?utf-8?Q?FmcRhqBK5cG63W16xiaWcDjyd?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a0dee02-c885-433f-2def-08dd2fe7b61d
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2025 13:23:59.7407
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: plUh1amnM/PYEi2nqfsvVCNr7/Dok4NKFLtiGixSRKwUyixggdUo9PbslCsSK77M
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7886
 
-On Mon, Nov 25, 2024 at 05:21:53PM +0100, Clément Léger wrote:
-> Add SBI SSE extension definitions in sbi.h
+On Wed, Jan 08, 2025 at 09:01:46AM +0100, Christian KÃ¶nig wrote:
+> Am 07.01.25 um 15:27 schrieb Xu Yilun:
+> > Introduce a new API for dma-buf importer, also add a dma_buf_ops
+> > callback for dma-buf exporter. This API is for subsystem importers who
+> > map the dma-buf to some user defined address space, e.g. for IOMMUFD to
+> > map the dma-buf to userspace IOVA via IOMMU page table, or for KVM to
+> > map the dma-buf to GPA via KVM MMU (e.g. EPT).
+> > 
+> > Currently dma-buf is only used to get DMA address for device's default
+> > domain by using kernel DMA APIs. But for these new use-cases, importers
+> > only need the pfn of the dma-buf resource to build their own mapping
+> > tables.
 > 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> ---
->  lib/riscv/asm/sbi.h | 83 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 83 insertions(+)
+> As far as I can see I have to fundamentally reject this whole approach.
 > 
-> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> index 98a9b097..a751d0c3 100644
-> --- a/lib/riscv/asm/sbi.h
-> +++ b/lib/riscv/asm/sbi.h
-> @@ -11,6 +11,11 @@
->  #define SBI_ERR_ALREADY_AVAILABLE	-6
->  #define SBI_ERR_ALREADY_STARTED		-7
->  #define SBI_ERR_ALREADY_STOPPED		-8
-> +#define SBI_ERR_NO_SHMEM		-9
-> +#define SBI_ERR_INVALID_STATE		-10
-> +#define SBI_ERR_BAD_RANGE		-11
-> +#define SBI_ERR_TIMEOUT			-12
-> +#define SBI_ERR_IO			-13
->  
->  #ifndef __ASSEMBLY__
->  #include <cpumask.h>
-> @@ -23,6 +28,7 @@ enum sbi_ext_id {
->  	SBI_EXT_SRST = 0x53525354,
->  	SBI_EXT_DBCN = 0x4442434E,
->  	SBI_EXT_SUSP = 0x53555350,
-> +	SBI_EXT_SSE = 0x535345,
->  };
->  
->  enum sbi_ext_base_fid {
-> @@ -71,6 +77,83 @@ enum sbi_ext_dbcn_fid {
->  	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
->  };
->  
-> +enum sbi_ext_sse_fid {
-> +	SBI_EXT_SSE_READ_ATTRS = 0,
-> +	SBI_EXT_SSE_WRITE_ATTRS,
-> +	SBI_EXT_SSE_REGISTER,
-> +	SBI_EXT_SSE_UNREGISTER,
-> +	SBI_EXT_SSE_ENABLE,
-> +	SBI_EXT_SSE_DISABLE,
-> +	SBI_EXT_SSE_COMPLETE,
-> +	SBI_EXT_SSE_INJECT,
-> +	SBI_EXT_SSE_HART_UNMASK,
-> +	SBI_EXT_SSE_HART_MASK,
-> +};
-> +
-> +/* SBI SSE Event Attributes. */
-> +enum sbi_sse_attr_id {
-> +	SBI_SSE_ATTR_STATUS		= 0x00000000,
-> +	SBI_SSE_ATTR_PRIORITY		= 0x00000001,
-> +	SBI_SSE_ATTR_CONFIG		= 0x00000002,
-> +	SBI_SSE_ATTR_PREFERRED_HART	= 0x00000003,
-> +	SBI_SSE_ATTR_ENTRY_PC		= 0x00000004,
-> +	SBI_SSE_ATTR_ENTRY_ARG		= 0x00000005,
-> +	SBI_SSE_ATTR_INTERRUPTED_SEPC	= 0x00000006,
-> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS	= 0x00000007,
-> +	SBI_SSE_ATTR_INTERRUPTED_A6	= 0x00000008,
-> +	SBI_SSE_ATTR_INTERRUPTED_A7	= 0x00000009,
-> +};
-> +
-> +#define SBI_SSE_ATTR_STATUS_STATE_OFFSET	0
-> +#define SBI_SSE_ATTR_STATUS_STATE_MASK		0x3
-> +#define SBI_SSE_ATTR_STATUS_PENDING_OFFSET	2
-> +#define SBI_SSE_ATTR_STATUS_INJECT_OFFSET	3
-> +
-> +#define SBI_SSE_ATTR_CONFIG_ONESHOT	(1 << 0)
+> It's intentional DMA-buf design that we don't expose struct pages nor PFNs
+> to the importer. Essentially DMA-buf only transports DMA addresses.
+> 
+> In other words the mapping is done by the exporter and *not* the importer.
+> 
+> What we certainly can do is to annotate those DMA addresses to a better
+> specify in which domain they are applicable, e.g. if they are PCIe bus
+> addresses or some inter device bus addresses etc...
+> 
+> But moving the functionality to map the pages/PFNs to DMA addresses into the
+> importer is an absolutely clear NO-GO.
 
-BIT(0)
+Oh?
 
-> +
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP	BIT(0)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPIE	BIT(1)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV	BIT(2)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP	BIT(3)
-> +
-> +enum sbi_sse_state {
-> +	SBI_SSE_STATE_UNUSED		= 0,
-> +	SBI_SSE_STATE_REGISTERED	= 1,
-> +	SBI_SSE_STATE_ENABLED		= 2,
-> +	SBI_SSE_STATE_RUNNING		= 3,
-> +};
-> +
-> +/* SBI SSE Event IDs. */
-> +#define SBI_SSE_EVENT_LOCAL_RAS			0x00000000
-> +#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP		0x00000001
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_0_START	0x00004000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_0_END		0x00007fff
-> +
-> +#define SBI_SSE_EVENT_GLOBAL_RAS		0x00008000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_START	0x0000c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_END		0x0000ffff
-> +
-> +#define SBI_SSE_EVENT_LOCAL_PMU			0x00010000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_1_START	0x00014000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_1_END		0x00017fff
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_START	0x0001c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_END		0x0001ffff
-> +
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_2_START	0x00024000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_2_END		0x00027fff
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_START	0x0002c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_END		0x0002ffff
+Having the importer do the mapping is the correct way to operate the
+DMA API and the new API that Leon has built to fix the scatterlist
+abuse in dmabuf relies on importer mapping as part of it's
+construction.
 
-The above four don't appear to be in the spec anymore.
+Why on earth do you want the exporter to map? That is completely
+backwards and unworkable in many cases. The disfunctional P2P support
+in dmabuf is like that principally because of this.
 
-> +
-> +#define SBI_SSE_EVENT_LOCAL_SOFTWARE		0xffff0000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_3_START	0xffff4000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_3_END		0xffff7fff
-> +#define SBI_SSE_EVENT_GLOBAL_SOFTWARE		0xffff8000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_START	0xffffc000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_END		0xffffffff
-> +
-> +#define SBI_SSE_EVENT_PLATFORM_BIT		(1 << 14)
-> +#define SBI_SSE_EVENT_GLOBAL_BIT		(1 << 15)
+That said, I don't think get_pfn() is an especially good interface,
+but we will need to come with something that passes the physical pfn
+out.
 
-BIT(14)
-BIT(15)
-
-I think other changes are coming to these event IDs from a series Atish
-recently posted too.
-
-> +
->  struct sbiret {
->  	long error;
->  	long value;
-> -- 
-> 2.45.2
->
-
-Thanks,
-drew
+Jason
 
