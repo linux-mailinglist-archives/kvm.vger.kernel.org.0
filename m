@@ -1,311 +1,239 @@
-Return-Path: <kvm+bounces-34735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34717-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACA11A050D3
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 03:32:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F62DA04E91
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 02:14:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E58E1685C6
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 02:32:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 997661887365
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 01:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749601AAA2C;
-	Wed,  8 Jan 2025 02:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7977618EB0;
+	Wed,  8 Jan 2025 01:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZJ9eokF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CQjoTq+9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2291AA795;
-	Wed,  8 Jan 2025 02:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736303371; cv=none; b=fJOUw6CDmuzigWrMmW4bITb7KGCeNI+WjS8WzJndJ5/+Am/1zwx9Um/IIk78k1w3S+RqSx6WXO4EL/IUQou3OpkoZ+/xmPS0aEEf2/Q3451i5Yry9UN47/8FCljnjE6sMZpg6HRIu8t1JK9bwI6ooqv/xViTVb5qL5/SwYMoEGM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736303371; c=relaxed/simple;
-	bh=wVHrkI8pTk7m0SmAt5vONTuphWS7jc5OHQuJjOSNwbI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=n3Gicfd3uqYlHs8RtAe6XCj+P3SMfZJpDNvFj7GOoRwtYntwk3t5tW24M6VMuYViiuuHB6EKgYTpiDcHJfzb7FYyabf8xyyWygy2UR50dLDNDN5Jhwd6MM/qzkx/LVTX068CjqeKEIjwOaeC5LR78I19inz8mx2fyvbdK8CmPx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eZJ9eokF; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF54478F24;
+	Wed,  8 Jan 2025 01:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736298852; cv=fail; b=JOFm0b0OBAJwVWJ0Qv+11alWdYjzQ5UaYYlMh/rQPsY2EiSX7JOXD3rqGnAsUU67fbqFPB9gWOiJKcB/qcZtDXkvpME6fNFixD90NIcOpE6HGS85LMseqsILS2XS9hjuOXmCnWcUpcxF16N8mGlRhBQdmKMe/mbdgP2/L5NHr5E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736298852; c=relaxed/simple;
+	bh=9mj8nD7Fyr/6PzHurGZBjKW64y5PoD5ulYsanv908BI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=peyDV0jOGBAsHTrlKqk+6ZqjNMegeTY+6MrJ2D2G1TXmLOL6BtUfkB/YcYB7b0g6AEwB7zSGFv/GuV57xkOYSiWRAIP7mSjX3+jXj0N15gaP2Mqn2+DZWtRknMYMUAd1acE17BBGJSS+fyyHT5yjO4a1z3JU4w4+FxFWazgqPIY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CQjoTq+9; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736303371; x=1767839371;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wVHrkI8pTk7m0SmAt5vONTuphWS7jc5OHQuJjOSNwbI=;
-  b=eZJ9eokF5biqXp7Psuwftgn7SuymIPdWcuqlFBohXOjLabhNTMKUNSv+
-   PLB/kSsK/MehXlbjN78ogLTrVCENKrsSGle+eDxyjKFOi86VOpha3IITv
-   XMrXKUgSqeGzb8NAyiWR2j5HbD2rNABtI7jw9D6n9ZuypT/BpVvuEuJEj
-   TaQH6dqi2joquG7J/O4yqVclyyu7guZ+1JlmX2qGvLd5yRlkxklSQU9EG
-   glFvU26LIDVjOcjim4+0g1n2B3dHWBExdsDDG0EerC0qt9+pKPmjTllqz
-   wGWwVnWy+kR8MDCkBA0mh6R+PsY6xU8gDQzqbL1oQshs3vpFEa5oTLMGH
-   g==;
-X-CSE-ConnectionGUID: QjECWk3wRImeSg9TQKpcTw==
-X-CSE-MsgGUID: jFWvoXMSSamDsKGlI19vSw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="47010654"
+  t=1736298851; x=1767834851;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=9mj8nD7Fyr/6PzHurGZBjKW64y5PoD5ulYsanv908BI=;
+  b=CQjoTq+9WDbh4g0J3lFeUyBu3hkxoyq9clWQOPQgAPvL6nHw6F+yoEPR
+   BKMCRQEkov+kUS1Zw/MEtL3XkoxtQdmezxwZzdxDdWZpwoSqeCioB+9VX
+   zsEDRhlHJZyQ78kPhdzf6ZKs6IRfc+wp3xhN+/zQHegEGfJeHzlNHYeS4
+   cx1uAkIgQbMns/aBViMP2+FbFGGeC6FcCX1pIO0oejI6P5CwPzMxC3xys
+   s4z0kCEa3b/J+cCrATBNpHy+0NvdGOWI90fyGJXHKZXMQ89xry2TP+ubm
+   RT8eRXNoSsPOLpg0AhKzHXi5EyZFDjzINwJPAqbSt3+/yDjRXMCyKrrxK
+   w==;
+X-CSE-ConnectionGUID: WHhrhW2IRX+qAKdY2UjVGg==
+X-CSE-MsgGUID: ryZWNHmKS6GQZMMACMOLyw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="36723428"
 X-IronPort-AV: E=Sophos;i="6.12,296,1728975600"; 
-   d="scan'208";a="47010654"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 18:29:30 -0800
-X-CSE-ConnectionGUID: 0kj8MQWETA+EgGm5i13+zw==
-X-CSE-MsgGUID: YyKlmcGyQiKuexj+KBRfVA==
+   d="scan'208";a="36723428"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 17:14:08 -0800
+X-CSE-ConnectionGUID: TXf3rPfsSq+aT1Y2bJuU5A==
+X-CSE-MsgGUID: VAZb2eUhQ7ux+W9BdHPGmw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="103793902"
-Received: from yilunxu-optiplex-7050.sh.intel.com ([10.239.159.165])
-  by orviesa008.jf.intel.com with ESMTP; 07 Jan 2025 18:29:25 -0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: kvm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org,
-	christian.koenig@amd.com,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	vivek.kasireddy@intel.com,
-	dan.j.williams@intel.com,
-	aik@amd.com
-Cc: yilun.xu@intel.com,
-	yilun.xu@linux.intel.com,
-	linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	lukas@wunner.de,
-	yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch,
-	leon@kernel.org,
-	baolu.lu@linux.intel.com,
-	zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: [RFC PATCH 12/12] KVM: TDX: Implement TDX specific private MMIO map/unmap for SEPT
-Date: Tue,  7 Jan 2025 22:27:19 +0800
-Message-Id: <20250107142719.179636-13-yilun.xu@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250107142719.179636-1-yilun.xu@linux.intel.com>
-References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
+X-IronPort-AV: E=Sophos;i="6.12,296,1728975600"; 
+   d="scan'208";a="103001114"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Jan 2025 17:14:08 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 7 Jan 2025 17:14:07 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Tue, 7 Jan 2025 17:14:07 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.43) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 7 Jan 2025 17:14:06 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HdT3Iv12uclwKQtaEXo7a8rDrPaOOx2c30EkLC/mPYGNdtGiw356fFPBXj7rwKWnJcoYOszYunnYPyJwOmJIZsppLmuxul971b9tA0+B9PtbQZgbV7ikwH+XgQ4Ck5cItzklo02xVkFYKAwz+lKFd2R8epkg7G5FpSk/ZlyX78bNQnCNKX/hwYdSlrwjVwLw54qokJ7sz4UUpLCZJyRfHweGviRV0u+ZWEV6kgkTviz+OjS1J0UML5ezTuyx75c7sBV4UKI5e/06HeBARmph46O9ThLUfbwsj1L44nwNTeodShBEqPj840BCOWBKRD7Ih4YZPYBCiB0ULsP3DQa9SQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tJwOcDBREV2GwDA+KqI9F0wvjRtTxEtWPDveiuVRS94=;
+ b=WMl+fVo+X3MI9NNawZEo1mnm/0zzFYYtP7SS0uv1+9tnymmSiOk1vNcJBMCWN2J2HyYtI5vzdkHrdGSPC1IvSkCS0UXDMsbG0WJMAoHxTFva2p5FuVO5yznc1t+B9+wrljD9bxIFNCOY7vn2c92GIZkAgwD+tokN+q9mh87V3UKjhL/lO/v+jClJSFqI9oKtrnqz1pCClnuVQHEAyQYkHir4odqloVcGZxZ1XqdxreQ635R/3wJ2IEZgf7qgT5JXUdIWgxfRKJaNOk003ZLG6OMG3oXswB6qiwW5lnmeR4mYwydUzxq8zBanR9jqezhYr1ym4ytwFUAjgJQDQcehOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ SJ2PR11MB7648.namprd11.prod.outlook.com (2603:10b6:a03:4d3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Wed, 8 Jan
+ 2025 01:13:28 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%4]) with mapi id 15.20.8335.010; Wed, 8 Jan 2025
+ 01:13:27 +0000
+Date: Wed, 8 Jan 2025 09:12:31 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+CC: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>, "Huang,
+ Kai" <kai.huang@intel.com>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Subject: Re: [PATCH 07/13] x86/virt/tdx: Add SEAMCALL wrapper
+ tdh_mem_sept_add() to add SEPT pages
+Message-ID: <Z33Q/4piC/QMdPFQ@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250101074959.412696-1-pbonzini@redhat.com>
+ <20250101074959.412696-8-pbonzini@redhat.com>
+ <b27448f5fc3bc96ae4c166e6eb4886e2ff8b4f90.camel@intel.com>
+ <753cd9f1-5eb7-480f-ae4f-d263aaecdd6c@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <753cd9f1-5eb7-480f-ae4f-d263aaecdd6c@intel.com>
+X-ClientProxiedBy: SG2PR01CA0188.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::10) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SJ2PR11MB7648:EE_
+X-MS-Office365-Filtering-Correlation-Id: 96071f8d-4200-454b-8790-08dd2f81a842
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Hc+eSLiqqKKCs+6Fdd4Qudl/gZAytqTJEsqTA8y6fF5wlcEPRT9k4nfp8cBW?=
+ =?us-ascii?Q?VGwAaJJV45MzShVo1lsZhFMzncFwYi7PqFT9xAAtmapBvvGzPrXu3b8T/xLC?=
+ =?us-ascii?Q?UsdpigJDk7ng7ixEv0jYubBVnIv3NpmVhtkoN3elZdvOFGFQR3iYU2fUganc?=
+ =?us-ascii?Q?tFGioTB9h7zH6Mr7CmsXIhroBb4n7Zmagks+XO6ypv/j/h0H9PasdRs348a5?=
+ =?us-ascii?Q?rGbofZNN7GJGHYrA6lVbTBnojLYDdRWOyllKiNwR4T520HL6W5as5hBfgpNR?=
+ =?us-ascii?Q?tQT5Cww0eJ/GX1CKZhV4t2CJ+16IAlG1I9wuPjCguaCcRPqTDWg9hkN2HMU+?=
+ =?us-ascii?Q?ulu45MfXrfEwZJr69mirNIE2gigoxDzCkdbDmYR1VWlhTHn0QucVhnNbvuV3?=
+ =?us-ascii?Q?J/m/T8If3XfR3s6mHZf8qam7Ff8LdqIgOeeaaQj4BDcmNRtGksD+tX/y4lLN?=
+ =?us-ascii?Q?/oRibm5ofrv83+acNELB8v9JWEB9yhfL3O3WIMIR699/SXi7BCo95P/uDxp7?=
+ =?us-ascii?Q?Nv8qOsIPIMxwDCi0FMPimHfv8guxrSH5OPxMDIpn+6bug8k/Cbfg9AyCNhmD?=
+ =?us-ascii?Q?7coAVTdEr1wFxrDaKZh//i1eyXZvpvw+1P2tcfIHrV+EXzUu/SQw11R+txxY?=
+ =?us-ascii?Q?t44OJn3MgSXCi2fOTuC5wGeUr2YlaVyQMxgyQwWh3HwsK/dvc8bJxuZLbLyM?=
+ =?us-ascii?Q?oCh19kLUflaXCNVHiiFNuyuURp8vjz8SC8T1jCCmontz68b3itTXTdBLtKZF?=
+ =?us-ascii?Q?aynub1KfYRu1CRcl5hAs00MLy+4mTj3DJBPnwxqZGKURD4+Goa2ZAzQydghJ?=
+ =?us-ascii?Q?bbLz2oOwVS63rOyPmQJz+O31VPLQUv7KDBg++Y8wsuDOGkyQmHLsn1pLizfH?=
+ =?us-ascii?Q?fgjHKGIp6tnj4ITZydqnbIO8wnco7euWYu2JoExk6mG0NGfDqpeYdAVo777V?=
+ =?us-ascii?Q?SWxqB3Omylvkd4iPdmtnXbcyudBa6bZvmXPPp6FsdwBnPxihGYOR1y8b1t4J?=
+ =?us-ascii?Q?2OJChi2yRoX+fNE7lIENw2m6oPm3GQYy0gzmE50CqglbMRH2CmxVgk53zA4K?=
+ =?us-ascii?Q?H5dYp6pLfV1n63y62WtXfBcQG+6ytmN0GgaFfQm7FMNxPJRwnw8bq04CnM5E?=
+ =?us-ascii?Q?QDkEhaDuScM81kjwFhkGqqjRD9PfwyIYxUe30KvZmScbkdWeELij677W6HJC?=
+ =?us-ascii?Q?msI0xQFKD5BaEMYRCg7V1oIDLEKA6018fxt2jnpiIzXCK1lauYE9j2zquPB0?=
+ =?us-ascii?Q?YW8IrIGascx0nOYDA9quFsDGKAy7ElnXLsLJ2ca9+nbghHWa0QO1nPSSXDSb?=
+ =?us-ascii?Q?kc+vt1xIKaj5pZ0BUOHl2bUqKJQUrL6ZEo5ikMBs0GFPkCZv203FnevuMR/Y?=
+ =?us-ascii?Q?dP6xH+zS61N9LYRlk/UPvoGXdrO9?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?s913oVWDRQx17soYXj8kMxyYQ59HGw5FQ9dO2pA4/b/yZRz2Qchyl1jtzHDe?=
+ =?us-ascii?Q?62uELEJtCJJ96itW8EoManq2VujJu21CvVET7aMFM8IIBcVKepXv6yYr5tpl?=
+ =?us-ascii?Q?yynJVkeBaXg78xkxtek+60RGuO1t5xBnX/F5UxgvqRqvt9oUmzg9FTuYs53A?=
+ =?us-ascii?Q?fPuQFtdrAiD0i5FOG1dff3I0X8Fz+l3lFqMTP42HA3EhpeLejwan/Iyc+H/u?=
+ =?us-ascii?Q?r/aUJCm7oko2WP/ZpOwPbkv7LfBAqfWsZ59TP0rQZbGq/O2k+M7jIodhvlEA?=
+ =?us-ascii?Q?F627zXezq4FAKKt4xCESehQuabrL0/VhASw1Zc5lUNVP537/qm3lwjzko7rI?=
+ =?us-ascii?Q?Pcfu11FWaDkyV3eaI95UB3E2iGLiecUBOqW/PBXeAb2qWYSjgSgo5p6ZWv4H?=
+ =?us-ascii?Q?waIkkW+W5fiu/AkCJURy7KBHkEuIwN8iWIrHEuDcOoVisILcC1Eqbnz3xi5j?=
+ =?us-ascii?Q?UwGQsxWbRvqu2Bu8qh+y1nSNUdy2OA8A9kn27iil4rc8Xvk3xRq75sNUYOAA?=
+ =?us-ascii?Q?+uDrcfGDe6e8aEEdYkxsPH3/Q6QEDpY/xoqXGpYx19Fin05mZlKG20BvA+tC?=
+ =?us-ascii?Q?ALwI+myN96MW4NT6EF8Ts/wy7JwOEFixS0T498kbU9NR5whw3rAl34uFeaYv?=
+ =?us-ascii?Q?cBovXSaavBwf9AGQKulufRFIVISxtVhzbpQJWdTZHHa79qucHjzZeAP+d+gm?=
+ =?us-ascii?Q?d3Vck4Jw/7sraVxuR2qriDSjUnI96D3AgClppBSiyO2ZK26RvLkTczfHxSwk?=
+ =?us-ascii?Q?ZLbOZs4avsH80sru5PUg912YLrFGvERtRoTeURL786sPAzdIh8gZf3xk+D9a?=
+ =?us-ascii?Q?4wmMR4h9MFeDTHrRiL3Sw+YN4p9ZOj/rqzK9pnQQNHCsifT18JXBxYbe9pgq?=
+ =?us-ascii?Q?n7/pzPGBGPyo6qvVwNrFNqUenVnfisgDV9d/MrkDjORAHHxaNVQWJcW/1qjy?=
+ =?us-ascii?Q?aNPKxhAw0FjlqU59Jft/cmMbsC8lMV9khdfxBrzoBY7FypAqVftk/Od+Rmiq?=
+ =?us-ascii?Q?OfdCKHF6ZkJReqRCFl4dTK30kb9OT8s5mZASwtOeCIRhFAqR0H/nzxy1AJZd?=
+ =?us-ascii?Q?BW0q33JIgEX2eJsvfJQamT69pRvpU1KHB/n2KEqF7u/aeKzW3jR7foHrPqQi?=
+ =?us-ascii?Q?k6Nf5J2xLfGxXs0RVAwmF99R5D+JkO14sQWti0DIxTlxyFYURztFIDMwm5oj?=
+ =?us-ascii?Q?ti7sja8Oss/YvFB4mnhdOxCuF+re+LNVLj/LX3xKHSPosCwacOA18KFB+qtK?=
+ =?us-ascii?Q?4o69X9eJu77OQbuSckbdMaIMTRKgx4ZHNi4eKVJIMMSXRpnakdQvi4VOCZK5?=
+ =?us-ascii?Q?wbAAeNHwsXjb5W6GMI34rP679S4c4yhoUGuyVBnOvl/7zBjQaLPlQPlA1mrx?=
+ =?us-ascii?Q?zSivWOcoz21SlggKc8Nq/r7C80TlriN3ZI3KnExr0Uy0huc/FGXytBPR9kwx?=
+ =?us-ascii?Q?/pqCS0/Fi80gXKExqAGFQH48Jaqwfw3T86Jxg4GVAtEcTl+u1WPWoTkdtZ/6?=
+ =?us-ascii?Q?vPJjmsX83QsDJY8SXwP9BEVedXtVDHgqMgGhKTamLFA8oMaZQtBzoY62uAlI?=
+ =?us-ascii?Q?YzHH9vlSCzc1TP8EqEzvDlFC2NTmtfokFuP8wM0LAtVz1Rv0Dlyd9LMY6c4Y?=
+ =?us-ascii?Q?FA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96071f8d-4200-454b-8790-08dd2f81a842
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2025 01:13:27.8024
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lWMqsQPOQCod25MNvslL1q6UNdYBzAfN85XsebtVlH1K3YoyZaHjrmWEt1kNN1AZpIR9brnYWEvT/Dld6nE1SA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7648
+X-OriginatorOrg: intel.com
 
-Implement TDX specific private MMIO map/unmap in existing TDP MMU hooks.
+On Tue, Jan 07, 2025 at 11:48:12AM -0800, Dave Hansen wrote:
+> On 1/2/25 13:59, Edgecombe, Rick P wrote:
+> > union tdx_sept_gpa_mapping_info {
+> > 	struct {
+> > 		u64 level	: 3;
+> > 		u64 reserved1	: 9;
+> > 		u64 gfn		: 40;
+> > 		u64 reserved2	: 12;
+> > 	};
+> > 	u64 full;
+> > };
+> 
+> This is functionally OK, but seeing bitfields on a value that's probably
+> going to get shifted around makes me nervous because of:
+This is defined according to the TDX spec.
+e.g. in TDH.MEM.SEPT.ADD:
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Signed-off-by: Xu Yilun <yilun.xu@linux.intel.com>
+RCX | EPT mapping information:
+----|---------------------------------------------------------------------------
+    | Bits |  Name    | Description
+    |------|----------|---------------------------------------------------------
+    | 2:0  |  Level   | Level of the non-leaf Secure EPT entry that will map the
+    |      |          | new Secure EPT page - see 3.6.1
+    |      |          | Level must between 1 and 3 for a 4-level EPT or between
+    |      |          | 1 and 4 for a 5-level EPT.
+    |------|----------|---------------------------------------------------------
+    | 11:3 | Reserved | Reserved: must be 0
+    |------|----------|---------------------------------------------------------
+    | 51:12|   GPA    | Bits 51:12 of the guest physical address of to be mapped
+    |      |          | for the new Secure EPT page Depending on the level, the
+    |      |          | following least significant bits must be 0:
+    |      |          | Level 1 (EPT): Bits 20:12
+    |      |          | Level 2 (EPD): Bits 29:12
+    |      |          | Level 3 (EPDPT): Bits 38:12
+    |      |          | Level 4 (EPML4): Bits 47:12
+    |------|----------|---------------------------------------------------------
+    | 63:52| Reserved | Reserved: must be 0
 
----
-TODO: This patch is still based on the earlier kvm-coco-queue version
-(v6.13-rc2). Will follow up the latest SEAMCALL wrapper change. [1]
 
-[1] https://lore.kernel.org/all/20250101074959.412696-1-pbonzini@redhat.com/
----
- arch/x86/include/asm/tdx.h  |  3 ++
- arch/x86/kvm/vmx/tdx.c      | 57 +++++++++++++++++++++++++++++++++++--
- arch/x86/virt/vmx/tdx/tdx.c | 52 +++++++++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.h |  3 ++
- 4 files changed, 113 insertions(+), 2 deletions(-)
+So, why does this bitfields definition make things worse?
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 01409a59224d..7d158bbf79f4 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -151,6 +151,9 @@ u64 tdh_mem_page_remove(u64 tdr, u64 gpa, u64 level, u64 *rcx, u64 *rdx);
- u64 tdh_phymem_cache_wb(bool resume);
- u64 tdh_phymem_page_wbinvd_tdr(u64 tdr);
- u64 tdh_phymem_page_wbinvd_hkid(u64 hpa, u64 hkid);
-+u64 tdh_mmio_map(u64 tdr, u64 gpa, u64 level, u64 hpa, u64 *rcx, u64 *rdx);
-+u64 tdh_mmio_block(u64 tdr, u64 gpa, u64 level, u64 *rcx, u64 *rdx);
-+u64 tdh_mmio_unmap(u64 tdr, u64 gpa, u64 level, u64 *rcx, u64 *rdx);
- #else
- static inline void tdx_init(void) { }
- static inline int tdx_cpu_enable(void) { return -ENODEV; }
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 69ef9c967fbf..9b43a2ee2203 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1576,6 +1576,29 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
- 	return 0;
- }
- 
-+static int tdx_mmio_map(struct kvm *kvm, gfn_t gfn,
-+			enum pg_level level, kvm_pfn_t pfn)
-+{
-+	int tdx_level = pg_level_to_tdx_sept_level(level);
-+	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-+	hpa_t hpa = pfn_to_hpa(pfn);
-+	gpa_t gpa = gfn_to_gpa(gfn);
-+	u64 entry, level_state;
-+	u64 err;
-+
-+	err = tdh_mmio_map(kvm_tdx->tdr_pa, gpa, tdx_level, hpa,
-+			   &entry, &level_state);
-+	if (unlikely(err & TDX_OPERAND_BUSY))
-+		return -EBUSY;
-+
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error_2(TDH_MMIO_MAP, err, entry, level_state);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * KVM_TDX_INIT_MEM_REGION calls kvm_gmem_populate() to get guest pages and
-  * tdx_gmem_post_populate() to premap page table pages into private EPT.
-@@ -1610,6 +1633,9 @@ int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
- 		return -EINVAL;
- 
-+	if (kvm_is_mmio_pfn(pfn))
-+		return tdx_mmio_map(kvm, gfn, level, pfn);
-+
- 	/*
- 	 * Because guest_memfd doesn't support page migration with
- 	 * a_ops->migrate_folio (yet), no callback is triggered for KVM on page
-@@ -1647,6 +1673,20 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (KVM_BUG_ON(!is_hkid_assigned(kvm_tdx), kvm))
- 		return -EINVAL;
- 
-+	if (kvm_is_mmio_pfn(pfn)) {
-+		do {
-+			err = tdh_mmio_unmap(kvm_tdx->tdr_pa, gpa, tdx_level,
-+					     &entry, &level_state);
-+		} while (unlikely(err == TDX_ERROR_SEPT_BUSY));
-+
-+		if (KVM_BUG_ON(err, kvm)) {
-+			pr_tdx_error_2(TDH_MMIO_UNMAP, err, entry, level_state);
-+			return -EIO;
-+		}
-+
-+		return 0;
-+	}
-+
- 	do {
- 		/*
- 		 * When zapping private page, write lock is held. So no race
-@@ -1715,7 +1755,7 @@ int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
- }
- 
- static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
--				     enum pg_level level)
-+				     enum pg_level level, kvm_pfn_t pfn)
- {
- 	int tdx_level = pg_level_to_tdx_sept_level(level);
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-@@ -1725,6 +1765,19 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
- 	/* For now large page isn't supported yet. */
- 	WARN_ON_ONCE(level != PG_LEVEL_4K);
- 
-+	if (kvm_is_mmio_pfn(pfn)) {
-+		err = tdh_mmio_block(kvm_tdx->tdr_pa, gpa, tdx_level,
-+				     &entry, &level_state);
-+		if (unlikely(err == TDX_ERROR_SEPT_BUSY))
-+			return -EAGAIN;
-+		if (KVM_BUG_ON(err, kvm)) {
-+			pr_tdx_error_2(TDH_MMIO_BLOCK, err, entry, level_state);
-+			return -EIO;
-+		}
-+
-+		return 0;
-+	}
-+
- 	err = tdh_mem_range_block(kvm_tdx->tdr_pa, gpa, tdx_level, &entry, &level_state);
- 	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
- 		return -EAGAIN;
-@@ -1816,7 +1869,7 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (KVM_BUG_ON(!is_hkid_assigned(to_kvm_tdx(kvm)), kvm))
- 		return -EINVAL;
- 
--	ret = tdx_sept_zap_private_spte(kvm, gfn, level);
-+	ret = tdx_sept_zap_private_spte(kvm, gfn, level, pfn);
- 	if (ret)
- 		return ret;
- 
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 57195cf0d832..3b2109877a39 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1951,3 +1951,55 @@ u64 tdh_phymem_page_wbinvd_hkid(u64 hpa, u64 hkid)
- 	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &args);
- }
- EXPORT_SYMBOL_GPL(tdh_phymem_page_wbinvd_hkid);
-+
-+u64 tdh_mmio_map(u64 tdr, u64 gpa, u64 level, u64 hpa, u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args args = {
-+		.rcx = gpa | level,
-+		.rdx = tdr,
-+		.r8 = hpa,
-+	};
-+	u64 ret;
-+
-+	ret = tdx_seamcall_sept(TDH_MMIO_MAP, &args);
-+
-+	*rcx = args.rcx;
-+	*rdx = args.rdx;
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(tdh_mmio_map);
-+
-+u64 tdh_mmio_block(u64 tdr, u64 gpa, u64 level, u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args args = {
-+		.rcx = gpa | level,
-+		.rdx = tdr,
-+	};
-+	u64 ret;
-+
-+	ret = tdx_seamcall_sept(TDH_MMIO_BLOCK, &args);
-+
-+	*rcx = args.rcx;
-+	*rdx = args.rdx;
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(tdh_mmio_block);
-+
-+u64 tdh_mmio_unmap(u64 tdr, u64 gpa, u64 level, u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args args = {
-+		.rcx = gpa | level,
-+		.rdx = tdr,
-+	};
-+	u64 ret;
-+
-+	ret = tdx_seamcall_sept(TDH_MMIO_UNMAP, &args);
-+
-+	*rcx = args.rcx;
-+	*rdx = args.rdx;
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(tdh_mmio_unmap);
-diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index 58d5754dcb4d..a83a90a043a5 100644
---- a/arch/x86/virt/vmx/tdx/tdx.h
-+++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -49,6 +49,9 @@
- #define TDH_VP_WR			43
- #define TDH_PHYMEM_PAGE_WBINVD		41
- #define TDH_SYS_CONFIG			45
-+#define TDH_MMIO_MAP			158
-+#define TDH_MMIO_BLOCK			159
-+#define TDH_MMIO_UNMAP			160
- 
- /*
-  * SEAMCALL leaf:
--- 
-2.25.1
-
+> > https://lore.kernel.org/lkml/20231111020019.553664-1-michael.roth@amd.com/
+> I wouldn't NAK it just for this, but it's also not how I would code it up.
 
