@@ -1,127 +1,143 @@
-Return-Path: <kvm+bounces-34753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56EEA05531
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 09:23:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE92A0554F
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 09:27:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A02B37A2530
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 08:22:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 838503A1F1A
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 08:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18E61E0B96;
-	Wed,  8 Jan 2025 08:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1BA1E1A2B;
+	Wed,  8 Jan 2025 08:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="cz32t/Mv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YyCZ9rh/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9590513B288;
-	Wed,  8 Jan 2025 08:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FBC1B0433;
+	Wed,  8 Jan 2025 08:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736324571; cv=none; b=hCBirCsazJaxLsGJrSzh+SDWZuk33k4NFKvECixDFCcr1tU4OPsuOAZRmRObV2BLOMQdBKKDg0TQcDD6wuHKJpNdeyIGOjFNMitp9Y9Afa75ZLlcj3WGuOxfVB/gxeq3ogdkkx8FobQbN5i3muZqP35folS95b7yWF+Vt0ZZkjc=
+	t=1736324858; cv=none; b=Uprp5Bk5zdp7O1OaLTq65OZsxk1D+XdTv0tvX+R/c8JpZ0QxFZ5laCcsVWqm4qToLuzggQstw+td687U2NsvUX5CjtZwNZ9WWOeCM064Hm9851DAl/ynkC758lzY8VXAZU6Uic7S3QnQErZ58AT3arRDwN++kvArPKsVNrtBF10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736324571; c=relaxed/simple;
-	bh=RSNZwaEEfmOnQgVr07DlVfG3QNVlLshsQgNWKqbA9f0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MrvimwnB0t3L/FZj89Bpw0LRpbVCN8iygr5QjkAkdudWvt8Csnlak19jECvw8meBqzZWA9f0rdArKcLaV1SE7/Y4VHlaDlK+VzUG3KvIdBb2bz9694lHwGaxw/G784NGdvnYzAPcL+SMuQOs7IMYmHZoCIlOVp1YTPjEbrpX0mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=cz32t/Mv; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 1A81640E0269;
-	Wed,  8 Jan 2025 08:22:47 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id FlDDmeWFgDWE; Wed,  8 Jan 2025 08:22:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1736324563; bh=cB9+0Ue/NA2ab0Bs46sOO2KuTiD3MfhQ5A0yyPKrpHE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cz32t/Mvja9vA1RptNZ47qpxYHRobsQCfynqN7HJbMTIV0/B/XqX7LCMMDgRbfvf6
-	 UkbSFKP2mIan2q+dWmk0le1ZzC//FFEh00LeBStjJSfDptIQddyfCHvf/sD0EUdQiE
-	 sRDbh6ZKybKgRaIW97R2H5J4A3eTyHF/H6I9CpSWOaLyj7TPSq5ILTBb3B6ae6Eh+t
-	 tCMpiSzeS+wPFhE9mZYUDT+ssGnly/eAGnavyg4u4G26ETHlhX2QfxFYG0coP/gB4F
-	 OUVKrGLHgEeAGKcn8cGjT6ZFo1zYatZPKC/LNVKrwyH8sKUninUJM2QjSdSwdvmVO4
-	 QQKd9EO21fusX0scKB4VKmiWShlR3w/Upj54WD6TYgb9penBKrF804GdmSxLq0ix81
-	 LtTg+HpBdenMDV/o1y4B/Woj76fypKqOnT4+Qzdgy3ICmvyIYp5ehfdiAIuBO6BrFr
-	 0JhxdJceT6rS8hH6AsaTToXSgv+3716Iv6bG9A1P2SoExejtqiLQIeN2N5Hh3RlFH1
-	 KaZ17tgh/Zr6gmwWNpKd2j+wHAlbk0o6PJsxuI1V2/icwFo8ESMLj3mrH2PIGwrZF/
-	 f2qyi++4sq5ofVICbcc4sRPA405n9Nsd+zlF9JnfFuamMR2hx55XzX4Ojv+ZYItds0
-	 DV0QDPHBDgbNSNbQKwQUJNtE=
-Received: from zn.tnic (p200300eA971F9314329C23fFfeA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:9314:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D79BE40E016C;
-	Wed,  8 Jan 2025 08:22:27 +0000 (UTC)
-Date: Wed, 8 Jan 2025 09:22:21 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com, francescolavra.fl@gmail.com,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Juergen Gross <jgross@suse.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
-Message-ID: <20250108082221.GBZ341vUyxrBPHgTg3@fat_crate.local>
-References: <20250106124633.1418972-1-nikunj@amd.com>
- <20250106124633.1418972-13-nikunj@amd.com>
- <20250107193752.GHZ32CkNhBJkx45Ug4@fat_crate.local>
- <3acfbef7-8786-4033-ab99-a97e971f5bd9@amd.com>
+	s=arc-20240116; t=1736324858; c=relaxed/simple;
+	bh=6z56hOhGs7RA1JlAlzTmWzZJD+rp5GBOOiWJE93mRnM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=YvJg6JAnzYt5kfyxOs+0or1Y1gp87CSQvY1/ocOMIa4dNsu7UzelleGSx89oMlZVL4pDQydRD2GZm5ZlIaylnKbA/cVEX0iAcNuAmV3Jo3OD9sUA0okVKmZX4G9S62Dc1W21WC1FLVLjZxHwiwOcNgfpLgaAAUbkNs1Cvw7feNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YyCZ9rh/; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5083qeT0015976;
+	Wed, 8 Jan 2025 08:27:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=6z56hO
+	hGs7RA1JlAlzTmWzZJD+rp5GBOOiWJE93mRnM=; b=YyCZ9rh/oj3XkQiiw/mz+p
+	LMVPh4/MfJE+FmqHGzYo+GJU7SaM6z/FQLeQrL1rnR9m1JlEsqjhPB2uoo1fR1i/
+	XeahgJp5Yh4BlGcU8eh0gnEyglz+n4ON2LvytefdawSnhSQEZrYZfDQWPB7lIBQd
+	rW88chUsXV87o5h1X0qwxrYPRpCXK724e+gEC1IZKHZW6qbvAjtRP1BLzI4mocoi
+	3F8nfbI6YcXDqWPbJZzaancbQoyEPDygQyeeOtlBO4MCyPkdb1XYp0Pu3OBNF7Oo
+	tULVXDcynfHiytO8SiwUclpggEOoy942gsdGZTBb0xWYmLL/w1KoHNAhaYvgazPg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441huc12q3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 08:27:28 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 5088RRkp024375;
+	Wed, 8 Jan 2025 08:27:27 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441huc12q0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 08:27:27 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5084oh62008861;
+	Wed, 8 Jan 2025 08:27:26 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43yfpyxwj4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 08:27:26 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5088RMTL57016684
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Jan 2025 08:27:22 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B09F62004B;
+	Wed,  8 Jan 2025 08:27:22 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 456FE20040;
+	Wed,  8 Jan 2025 08:27:21 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.24.235])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  8 Jan 2025 08:27:21 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3acfbef7-8786-4033-ab99-a97e971f5bd9@amd.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 08 Jan 2025 09:27:20 +0100
+Message-Id: <D6WJSC67OTP3.2QL240O0BQNGK@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 4/6] s390x: Add library functions for
+ exiting from snippet
+From: "Nico Boehr" <nrb@linux.ibm.com>
+To: "Nina Schoetterl-Glausch" <nsg@linux.ibm.com>,
+        "Claudio Imbrenda"
+ <imbrenda@linux.ibm.com>,
+        "Thomas Huth" <thuth@redhat.com>,
+        "Janosch Frank"
+ <frankja@linux.ibm.com>
+Cc: "David Hildenbrand" <david@redhat.com>, <kvm@vger.kernel.org>,
+        "Nicholas
+ Piggin" <npiggin@gmail.com>, <linux-s390@vger.kernel.org>
+X-Mailer: aerc 0.18.2
+References: <20241016180320.686132-1-nsg@linux.ibm.com>
+ <20241016180320.686132-5-nsg@linux.ibm.com>
+ <D67Y11RRNUJ4.3U17EAZFWQR6M@linux.ibm.com>
+ <fcc8d46283daa6922c90328a1a8a36b528530166.camel@linux.ibm.com>
+In-Reply-To: <fcc8d46283daa6922c90328a1a8a36b528530166.camel@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: AEPIsKA2Ns_lm0_AOx9CAmhJbjkFgwRz
+X-Proofpoint-GUID: DuAEOOGuEV6gKyPS4V8lc84UPMUZYZ9P
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ spamscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0 mlxlogscore=727
+ bulkscore=0 mlxscore=0 malwarescore=0 adultscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501080064
 
-On Wed, Jan 08, 2025 at 10:50:13AM +0530, Nikunj A. Dadhania wrote:
-> All guests(including STSC) running on KVM or other hypervisors like Xen/VMWare
-> uses the regular TSC when the guest is booted with TscInvariant bit set. But it
-> doesn't switch the sched clock to use TSC which it should have, pointed here[1]
-> by Sean:
+On Thu Dec 12, 2024 at 4:33 PM CET, Nina Schoetterl-Glausch wrote:
+> On Tue, 2024-12-10 at 11:20 +0100, Nico Boehr wrote:
+> > On Wed Oct 16, 2024 at 8:03 PM CEST, Nina Schoetterl-Glausch wrote:
+> > > It is useful to be able to force an exit to the host from the snippet=
+,
+> > > as well as do so while returning a value.
+> > > Add this functionality, also add helper functions for the host to che=
+ck
+> > > for an exit and get or check the value.
+> > > Use diag 0x44 and 0x9c for this.
+> > > Add a guest specific snippet header file and rename snippet.h to refl=
+ect
+> > > that it is host specific.
+> > >=20
+> > > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> >=20
+> > Hi Nina,
+> >=20
+> > would you mind if I fix this up like this?
+>
+> Looks good to me.
+> Thanks!
 
-Well, that paravirt_set_sched_clock() thing is there for a reason and all the
-different guest types which call it perhaps have their reasons.
-
-Now, if you think it would make sense to use the TSC in every guest type if
-the TSC is this and that, then I'd need to see a patch or even a patchset
-which explains why it is ok to do so on every guest type and then tested on
-every guest type and then each patch would convert a single guest type and
-properly explain why.
-
-And your patch doesn't have that at all. I know Sean thinks it is a good idea
-and perhaps it is but without proper justification and acks from the other
-guest type maintainers, I simply won't take such a patch(-set).
-
-And even if it is good, you need to solve it another way - not with this
-delayed-work hackery.
-
-IOW, this switching the paravirt clock crap to use TSC when the TSC is this
-and that and the HV tells you so, should be a wholly separate patchset with
-reviews and acks and the usual shebang.
-
-If you want to take care only of STSC now, I'd take a patch which is known
-good and tested properly. And that should happen very soon because the merge
-window is closing in. Otherwise, there's always another merge window and
-rushing things doesn't do any good anyway, as I keep preaching...
-
-Your call.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Alright, thanks. It's now in the CI for coverage. When no issues come up, I=
+ will pick it.
 
