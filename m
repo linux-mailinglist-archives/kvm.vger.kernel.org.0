@@ -1,235 +1,107 @@
-Return-Path: <kvm+bounces-34833-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34834-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47599A064ED
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:54:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AA6EA06520
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 20:15:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39277166E51
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:54:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A697167E5A
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84D2201249;
-	Wed,  8 Jan 2025 18:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03ED320371A;
+	Wed,  8 Jan 2025 19:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R5eZ4TbQ"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="InMCQvq2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E449A2594BE
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 18:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B728C200116;
+	Wed,  8 Jan 2025 19:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736362458; cv=none; b=Gzp6r6Stf1tr2VR+c+MUFSk93skSIu6HUqYvfQmL7f6iiBfiPFyU8fA31JWrWYqrT5w7NOskhZ15TCp/2vpfKI3I0nvd93qPWWeei1SZISe3wQk/GhvOYRxFKzJC/ItHCBQGa44P+Wutvai3rCKsjphE5BtO0ay1eXwXk1OIbYU=
+	t=1736363711; cv=none; b=e6u/lioS3TZleHXrFxSZzxqyuN6PG1CEHTgM+uyxDsC7qb71ocnMOcbwSyk0cBI5v3WDP7LmfSB8PXP6XwrL7R3TNGWSHls6gYInbdywznhYiLXhH4yEs7fdFB381mTFDZ9u7/69Dv1qo1SXyYf3x6PHiAN2ObVH8N3UCxWWWeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736362458; c=relaxed/simple;
-	bh=AcVycJIocmS3y50l07pvSeJqPJHazZxtgt2mtF6OBDg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DE4Y16SVAa2XxBBqTQ4FZxoyjYWzatFEdeCrZTys1pioRQvhC/UhenB1xnZebMuuMW3SqehXLcEc/m8xrQOwjwhmtQb3w5sS8Qu91jmYyV/tGftKbIIUyhywzifCZVHGibejLH9XvvPdUDKfNA6XxGjsl7ma84Ys4yathuUeydU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R5eZ4TbQ; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-216430a88b0so1005975ad.0
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 10:54:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736362456; x=1736967256; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZNYwFqiLmIGAf+fusGGqqOFq5iSUUqWqbZflZR0K0F8=;
-        b=R5eZ4TbQjshqq705eWc43ugS9UGmDtItJfU6SRId77v/l1BOMMz8hQsAJ70AcvfKah
-         DPUxSlvqNVbTNSmMmeHS9DM4b9D8E3isCHFxW7U4FXIOyBle4czX26SkST+rCOYDrzk0
-         friOxGgVG/NFlgy/Hh9IwS8P484NYkwv6u4p6xAJZ31Caq2y9GcQKgxLu0nx/lkix9ZP
-         g8ICZwLAjtw1/4p6Yt0y5onwSSpAkVhqKDATdYDU8nKXVVTba6d0STscMBdp+wxmwFZy
-         B5d3+7MQIV516ub1jwUnhvDKSL52uXj1lQVlGnnvPD2tUNa4JNyBRh+LwEculDAz/IGz
-         UxjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736362456; x=1736967256;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZNYwFqiLmIGAf+fusGGqqOFq5iSUUqWqbZflZR0K0F8=;
-        b=YtHFvQjiHCFbqBbwWwsSeYUnW1T6ld5Al8MDx3QaUSSq36UO9Hx5jAplp2JrAoaKyc
-         sbmv8kUF4JmwjAmEGicGfdHEFYGeP2yEsTTtCyv8X6Uh0gQB3ZEtJmISGMyxCpecQdXB
-         wNm9/rvc2p4RP9CErD2WZwJ+XFnjvhKraYl2BM+b011D5OsC9WvmLPZOhbVjzYajNX9O
-         9wRuQ1gHMg/SieFproW23BVZnuOAFlEos3F8uG565QcpfL8rZ5mkJ6kHduoOgf3rfFBn
-         WzCOGLZCmWwzsBxs0j9QbWOCW/WqGma3XWWc2yIn8AfxJj2YSa/GQypwjJId9WR1HmbX
-         aqTw==
-X-Gm-Message-State: AOJu0YyLJRcOM4ELQj6K+5zH7/wIxAbBGlVLtmjQRCa9yQtFOyRatUnW
-	FHQCZpXgAEK+E/zsmfXIh3VAtssKnuyXIeVEpWSdE0Bzl2cGtQ1Xm+lq5FoSL3vvEfqyFsUmno0
-	b6Q==
-X-Google-Smtp-Source: AGHT+IHnxAFvFj+MGeqlu1xSXDBMWH63mKHYA6+8mB/CLGdjPoIwLmG8Yu0pqxb54p9+diw19jhP45w5mlI=
-X-Received: from pghm1.prod.google.com ([2002:a63:f601:0:b0:7fd:de44:ec7d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:230c:b0:208:d856:dbb7
- with SMTP id d9443c01a7336-21a83fe460bmr55071765ad.39.1736362456204; Wed, 08
- Jan 2025 10:54:16 -0800 (PST)
-Date: Wed, 8 Jan 2025 10:54:14 -0800
-In-Reply-To: <20240918205319.3517569-5-coltonlewis@google.com>
+	s=arc-20240116; t=1736363711; c=relaxed/simple;
+	bh=v/YbEBNRH3UQUfdtG1CwjGMkkVuEIbYA/DKsN1OMOq8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ivfAY25F8xvXMGezu2Yfu6xdpAOzEy7FLip7V+os3dA2+9ftA7RlrtbtecVYq1heU/QVxjSAbmz9wTOG261w/vyiPfC96S7vRJQ/uEf+Rxt6cA7ANv+DzBdwoQOVV5sNfkZB4GvYgJP/8u64UtifHBYpkMGJiitsrBgdyYFBDTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=InMCQvq2; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A7E1940E0288;
+	Wed,  8 Jan 2025 19:15:06 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id zsGelwC2IRIp; Wed,  8 Jan 2025 19:15:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1736363702; bh=diu1H08q1pNWSKEXVlf+R2FSk4U5O6ex7UW4HCKvE7g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=InMCQvq2i6KGDFSDH5aCAgCUxut4BpK7ufCICqDYakZPI5vuYqnkiTkGEvc67gDFb
+	 wf2j85LQiI+XmTvFMYp6n/EB3Pb0cFtgTq/qMWFz2JsyuYojFDsbI3rvEdO9orcEC+
+	 uCh09woNHDUoqKDlg61pHnVq64dn6qmvzpDnffeTX53cJ/dDSq70+r5cZLnA0SvyB1
+	 08P+ebzbR01xAHrxavzUrsuXbr2JCi0373qkOMtnbdNEqf1wSRzk/SaSgcHdigHYVL
+	 l1frS4ZrlMnZzscmIC1VvevkiImZqzEyom6FuWsop7I6HumVP1FijKJIbLjGk/T5mT
+	 PxrG+vrgBO32zIM8Vbr55GgPztt5kdi2enNSmdVwxrsyDzeUf22xkl08km63T8rOhW
+	 9ovFSGXnfS8qBRrmGWCOwL+F7AtPK2SxUV60mUNCYbRscxul5EmTipSLlPpXe1yuQi
+	 mCrGgFYyIVqQAkGDzysB92N5/uhbdN+8dG08JzD36x5uNcsruZPJHDFJXcBfkFKwl8
+	 vg318uHDl7PoShReGKxQrNL4U1IEwQ7aC1o5+etrTMqOiTyBKr4RUhX0mLsJKcu0vu
+	 uu+3rs3dl2aIYa1X3+MAO/Fa2wDgoK5mkFuVxePhxJ5OYZTagnMwoPWaMxL1qUhoT5
+	 oHo0r0xLb1FtgDBgSidHNIrg=
+Received: from zn.tnic (p200300ea971f938F329C23FfFEA6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:938f:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7D30740E0286;
+	Wed,  8 Jan 2025 19:14:53 +0000 (UTC)
+Date: Wed, 8 Jan 2025 20:14:47 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Jim Mattson <jmattson@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 3/4] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250108191447.GHZ37Op2mdA5Zu6aKM@fat_crate.local>
+References: <20241202120416.6054-4-bp@kernel.org>
+ <Z1oR3qxjr8hHbTpN@google.com>
+ <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
+ <Z2B2oZ0VEtguyeDX@google.com>
+ <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
+ <Z35_34GTLUHJTfVQ@google.com>
+ <20250108154901.GFZ36ebXAZMFZJ7D8t@fat_crate.local>
+ <Z36zWVBOiBF4g-mW@google.com>
+ <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
+ <CALMp9eTwao7qWsmVTDgqW_KdjMKeRBYp1JpfN2Xyj+qVyLwHbA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240918205319.3517569-1-coltonlewis@google.com> <20240918205319.3517569-5-coltonlewis@google.com>
-Message-ID: <Z37J1jJCTBZk-0cs@google.com>
-Subject: Re: [PATCH v2 4/6] KVM: x86: selftests: Test read/write core counters
-From: Sean Christopherson <seanjc@google.com>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
-	Jinrong Liang <ljr.kernel@gmail.com>, Jim Mattson <jmattson@google.com>, 
-	Aaron Lewis <aaronlewis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CALMp9eTwao7qWsmVTDgqW_KdjMKeRBYp1JpfN2Xyj+qVyLwHbA@mail.gmail.com>
 
-On Wed, Sep 18, 2024, Colton Lewis wrote:
-> Run a basic test to ensure we can write an arbitrary value to the core
-> counters and read it back.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  .../selftests/kvm/x86_64/pmu_counters_test.c  | 54 +++++++++++++++++++
->  1 file changed, 54 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> index 5b240585edc5..79ca7d608e00 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> @@ -641,11 +641,65 @@ static uint8_t nr_core_counters(void)
->  		return AMD_NR_CORE_EXT_COUNTERS;
->  
->  	return AMD_NR_CORE_COUNTERS;
-> +}
-> +
-> +static uint8_t guest_nr_core_counters(void)
-> +{
-> +	uint8_t nr_counters = this_cpu_property(X86_PROPERTY_NUM_PERF_CTR_CORE);
-> +	bool core_ext = this_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+On Wed, Jan 08, 2025 at 10:37:57AM -0800, Jim Mattson wrote:
+> Surely, IBPB-on-VMexit is worse for performance than safe-RET?!?
 
-For both this and nr_core_counters(), there's no need to read PERF_CTR_EXT_CORE
-if nr_counters is non-zero, and then no need to capture it in a local variable.
-> +
-> +	if (nr_counters != 0)
-> +		return nr_counters;
-> +
-> +	if (core_ext)
-> +		return AMD_NR_CORE_EXT_COUNTERS;
-> +
-> +	return AMD_NR_CORE_COUNTERS;
+We don't need safe-RET with SRSO_USER_KERNEL_NO=1. And there's no safe-RET for
+virt only. So IBPB-on-VMEXIT is the next best thing. The good thing is, those
+machines have BpSpecReduce too so you won't be doing IBPB-on-VMEXIT either but
+what we're talking about here - BpSpecReduce.
 
-This is *painfully* similar to nr_core_counters().  It actually took me almost
-a minute of staring to see the difference.  One option would be to add a helper
-to dedup the if-statements, but while somewhat gross, I actually think a macro
-is the way to go.
+-- 
+Regards/Gruss,
+    Boris.
 
-#define nr_core_counters(scope)								\
-({											\
-	uint8_t nr_counters = scope##_cpu_property(X86_PROPERTY_NR_PERFCTR_CORE);	\
-											\
-	if (!nr_counters) {								\
-		if (scope##_cpu_has(X86_FEATURE_PERFCTR_CORE))				\
-			nr_counters = AMD_NR_CORE_EXT_COUNTERS;				\
-		else									\
-			nr_counters = AMD_NR_CORE_COUNTERS;				\
-	}										\
-	nr_counters;									\
-})
-
-static uint8_t kvm_nr_core_counters(void)
-{
-	return nr_core_counters(kvm);
-}
-
-static uint8_t guest_nr_core_counters(void)
-{
-	return nr_core_counters(this);
-
-}
-
-> +
-
-Unnecessary newline.
-
-> +}
->  
-> +static void guest_test_rdwr_core_counters(void)
-> +{
-> +	bool core_ext = this_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
-> +	uint8_t nr_counters = guest_nr_core_counters();
-> +	uint8_t i;
-> +	uint32_t esel_msr_base = core_ext ? MSR_F15H_PERF_CTL : MSR_K7_EVNTSEL0;
-
-Please don't concoct new abbreviations.  "esel" isn't used anywhere in KVM, and
-AFAICT it's not used in perf either.
-
-I would also prefer to have consistent naming between the Intel and AMD tests
-(the Intel test uses base_<name>_msr).
-
-base_eventsel_msr is all of four characters more.
-
-> +	uint32_t cnt_msr_base = core_ext ? MSR_F15H_PERF_CTR : MSR_K7_PERFCTR0;
-
-For better or worse, the Intel version uses "base_pmc_msr".  I see no reason to
-diverage from that.
-
-
-> +	uint32_t msr_step = core_ext ? 2 : 1;
-> +
-> +	for (i = 0; i < AMD_NR_CORE_EXT_COUNTERS; i++) {
-> +		uint64_t test_val = 0xffff;
-> +		uint32_t esel_msr = esel_msr_base + msr_step * i;
-> +		uint32_t cnt_msr = cnt_msr_base + msr_step * i;
-
-And then
-		uint32_t eventsel_msr = ...;
-		uint32_t pmc_msr = ...;
-
-> +		bool expect_gp = !(i < nr_counters);
-
-Uh, isn't that just a weird way of writing:
-
-		bool expect_gp = i >= nr_counters;
-
-> +		uint8_t vector;
-> +		uint64_t val;
-> +
-> +		/* Test event selection register. */
-
-This is pretty obvious if the MSR is named eventsel_msr. 
-
-> +		vector = wrmsr_safe(esel_msr, test_val);
-> +		GUEST_ASSERT_PMC_MSR_ACCESS(WRMSR, esel_msr, expect_gp, vector);
-> +
-> +		vector = rdmsr_safe(esel_msr, &val);
-> +		GUEST_ASSERT_PMC_MSR_ACCESS(RDMSR, esel_msr, expect_gp, vector);
-> +
-> +		if (!expect_gp)
-> +			GUEST_ASSERT_PMC_VALUE(RDMSR, esel_msr, val, test_val);
-> +
-> +		/* Test counter register. */
-
-Same thing here.  If there is novel information/behavior, then by all means add
-a comment.
-
-> +		vector = wrmsr_safe(cnt_msr, test_val);
-> +		GUEST_ASSERT_PMC_MSR_ACCESS(WRMSR, cnt_msr, expect_gp, vector);
-> +
-> +		vector = rdmsr_safe(cnt_msr, &val);
-> +		GUEST_ASSERT_PMC_MSR_ACCESS(RDMSR, cnt_msr, expect_gp, vector);
-> +
-> +		if (!expect_gp)
-> +			GUEST_ASSERT_PMC_VALUE(RDMSR, cnt_msr, val, test_val);
-> +	}
->  }
->  
->  static void guest_test_core_counters(void)
->  {
-> +	guest_test_rdwr_core_counters();
->  	GUEST_DONE();
->  }
->  
-> -- 
-> 2.46.0.662.g92d0881bb0-goog
-> 
+https://people.kernel.org/tglx/notes-about-netiquette
 
