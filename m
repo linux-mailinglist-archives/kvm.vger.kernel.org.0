@@ -1,230 +1,203 @@
-Return-Path: <kvm+bounces-34772-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34773-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6330EA05B44
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 13:17:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93A82A05C52
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 14:03:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74F9B3A6A2D
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 12:16:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E463A3A162F
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 13:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D051F9A80;
-	Wed,  8 Jan 2025 12:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE511FBE89;
+	Wed,  8 Jan 2025 13:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VTYGgtYN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wDRxyQh1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A36F1F8EFA
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 12:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBF21FC0FE
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 13:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736338471; cv=none; b=oGp2MP4PRHn0VUxfjJaT/RZlTvbycH6/E0qVClWAw8skdEr59H1aspYa6U0x3j5UbP6SmerGFdeAzGIkMC+sp59+veBe1mW1DL4pc4Z4gQBdubilsdiT1k0dU5jglx1hzarZcVxKnPZFnSZWh/KWPTXqfp4OvFYYBmuR5GX5+gg=
+	t=1736341413; cv=none; b=XmcHpS+JTZcTGbty39qB0LhJRJuG9+xn+gNjP6/xkoQRR7q2j4eiw69AcTLv3rj7FWk2eA3OK9YLpQxf54VrRxJ8NPPFR/0PVFfJ7LYp8/rfpLDgw6czsXKhDq8451TRGIgoRuFfIaPq980fCNxnUe1Fxp/wM9p5yv9Ms7winTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736338471; c=relaxed/simple;
-	bh=AbAMklZDKkmgBrce1wQNnGkf1NudHIybtXPcqdjSd2c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fR/NoPzd5e7+N1lqOHE+zAWK13FfkmUzYKvG29naPby7jaw9QFpLQ0ut/J44jY/Q4E1ixQDSBhrePGoXZTqCiyy7G0eRjj7XvrYRXbZ3iN+DtpF+4k4xcg4kCOfvmO3X8wjHaR+kaIrIIG0TJJH1DttNRnuTSqCFnJjq4cNWzUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VTYGgtYN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736338468;
+	s=arc-20240116; t=1736341413; c=relaxed/simple;
+	bh=loGPcyrQHBM7bGYATTThXr+F+QbiBqRYqkJLRC5WoQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tbcqjj+aOO2/nCGRoBZSXKkQ8AwV8j3n64SL1Gy53+FcIE6hKNAFUFOm7NWmHSN/X1dnMt5Cpj1FYxxQlZ7RmtgYDnhQciHPunlvYN3cADv+JXDP1nIbgYwWZ2vUv2fWwgMxp0WYw7TSBax3bl5+M0J0RGqBoulxBLlmpoeYq94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wDRxyQh1; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 8 Jan 2025 14:03:14 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736341407;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=i7q07UpxqItN5/CbDvEBg89xcdarz8dNPCMF232L7BQ=;
-	b=VTYGgtYNkjtVkX1M2XXzrHmCoeet/o9oiZEGGmVY/lR3QgG7m5YHdkJXYfbuCbryVmHjfQ
-	kKZwsLAVGzBscN78t1MkgBeoye5hjMhqz/VmEA0x6lsGkjZFuXhZK7jV3qieLxbpasJUH2
-	CKhhiEeVvgRwswhYc+8+hoAScDzK0/8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-KDlFzBjyOcWeu6yi_7EvXA-1; Wed, 08 Jan 2025 07:14:27 -0500
-X-MC-Unique: KDlFzBjyOcWeu6yi_7EvXA-1
-X-Mimecast-MFC-AGG-ID: KDlFzBjyOcWeu6yi_7EvXA
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38a684a0971so2294024f8f.2
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 04:14:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736338466; x=1736943266;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=i7q07UpxqItN5/CbDvEBg89xcdarz8dNPCMF232L7BQ=;
-        b=rk3y1kMZr9UjfpfrUio1TUm7brYfd1nKLZd6x/T2Aa9m5YvTrnwuwxMtV2y0Si6g7p
-         ThU0rGiChh3H/CnCFfQJ3CBUpr+81Uy8jYWeekvjVNdabx2xaw7rNjJakJHgEyyc29/w
-         a+xh15M3gyzg2U0iWbKOTnE/0U9yaz86kzYj1wfPKWznN/RVJyN8nrJ90ue4RXzyKo22
-         QfshBgcIPjb5SNFIdVrfj7DTmei+Sl6Z7/3lco3isIrdEQ8JPptXPZ+OI5zy202Er4Ln
-         jVBrlMr9mjVCqAhSHW3hgclCDFB0GO6x+7fB9Jv5Vor0NcT2S/Y/2pChhgd76SPcy2tw
-         kpHA==
-X-Forwarded-Encrypted: i=1; AJvYcCXo9SUFJhqdbFv0iVZ/+cIIb3qyNmOTqI4HkU84t8HzkmUCQMNoYZG0nu6+SUcgxVpppPs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHWySRHpMUE2pVzrcA2y4xq3y2SgW4t0sK8G+3vdSyIGtcIO55
-	nvo/QCJ5WkIJn3m2HfDM4PqHktNaXcYNG2GJvs63NDWzoTQKG9faq/06wq6CIy8PkkQWLYsE8v7
-	ZInGHRQvLwMUHU4urd7DaqJPlUWylrquSufhklaYrp4ygq4rhRQ==
-X-Gm-Gg: ASbGncthIPKNaDtUe2XbBYYNwVdV9mWsnXsn8yN8jrSAtYRucoh2fvzcEbHXMT+RATj
-	S5PK8DrIUnGkaNZCGr/G1sd9a4RGGy1WLG6Y1qD+E7SelUB5hg5gxIj/MUW1/WNFX2ow2OiWJrl
-	v0qkzRLbi+xak9dKtLxeVW43DEzSJIKdAKdjvHIbRj+QXtPKXgeKswMbDKTq5Oo2CNgLbvp826p
-	hv+5aMbXAIt9g0wQbshJIPV290T/zhgomEbSdb0HhkBfZMqI4VieL6DYyLNTTQw0/aTs1XY6u74
-	oslCSzGkbxG1j4t+1a+GsU6S+6NEcM8KmW1VnqtqPn9KFnC5J/bTEybIAerAW4X5fD//AN9SPuc
-	b2CpbMQ==
-X-Received: by 2002:a05:6000:1567:b0:386:3cfa:62ad with SMTP id ffacd0b85a97d-38a872f6970mr2227409f8f.1.1736338466460;
-        Wed, 08 Jan 2025 04:14:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG7arOIchse9o494js1Tab5nOKasKdGhG0D/75m9o3epafPGRuC3YbVQ6l4Ror1ppOwwQPlTw==
-X-Received: by 2002:a05:6000:1567:b0:386:3cfa:62ad with SMTP id ffacd0b85a97d-38a872f6970mr2227363f8f.1.1736338466073;
-        Wed, 08 Jan 2025 04:14:26 -0800 (PST)
-Received: from ?IPV6:2003:cb:c70d:3a00:d73c:6a8:ca9f:1df7? (p200300cbc70d3a00d73c06a8ca9f1df7.dip0.t-ipconnect.de. [2003:cb:c70d:3a00:d73c:6a8:ca9f:1df7])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c828a8dsm53157942f8f.2.2025.01.08.04.14.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jan 2025 04:14:24 -0800 (PST)
-Message-ID: <29278ec5-a7ec-4935-94e2-0b56e601f385@redhat.com>
-Date: Wed, 8 Jan 2025 13:14:22 +0100
+	 in-reply-to:in-reply-to:references:references;
+	bh=O/uqjgTJv39fxY5Kjsx2QGRWfI206q33hQLFzQUJTbc=;
+	b=wDRxyQh1XPzEL8dPJ83p/8jCs4uAr3IiYRAfeDTY7Z24KQoIrYbK+NoWqBjW69LEvcN9kz
+	XKJgcvyPOf+uynNUNwIMLrbkXlHpDuaJToD/o4lotF+zi93XliV1OZoDFUzELGrQBzuVhp
+	rabbskhD6g9fy/Y+3Bo69FJlCR0b1a8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
+	Atish Patra <atishp@rivosinc.com>
+Subject: Re: [kvm-unit-tests PATCH v4 4/5] riscv: lib: Add SBI SSE extension
+ definitions
+Message-ID: <20250108-522f238cc21ce59e16134c79@orel>
+References: <20241125162200.1630845-1-cleger@rivosinc.com>
+ <20241125162200.1630845-5-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/12] fs/proc/vmcore: kdump support for virtio-mem on
- s390
-To: Heiko Carstens <hca@linux.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- kexec@lists.infradead.org, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Baoquan He <bhe@redhat.com>,
- Vivek Goyal <vgoyal@redhat.com>, Dave Young <dyoung@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Eric Farman
- <farman@linux.ibm.com>, Andrew Morton <akpm@linux-foundation.org>
-References: <20241204125444.1734652-1-david@redhat.com>
- <20250108070407-mutt-send-email-mst@kernel.org>
- <20250108121043.7704-I-hca@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250108121043.7704-I-hca@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241125162200.1630845-5-cleger@rivosinc.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 08.01.25 13:10, Heiko Carstens wrote:
-> On Wed, Jan 08, 2025 at 07:04:23AM -0500, Michael S. Tsirkin wrote:
->> On Wed, Dec 04, 2024 at 01:54:31PM +0100, David Hildenbrand wrote:
->>> The only "different than everything else" thing about virtio-mem on s390
->>> is kdump: The crash (2nd) kernel allocates+prepares the elfcore hdr
->>> during fs_init()->vmcore_init()->elfcorehdr_alloc(). Consequently, the
->>> kdump kernel must detect memory ranges of the crashed kernel to
->>> include via PT_LOAD in the vmcore.
->>>
->>> On other architectures, all RAM regions (boot + hotplugged) can easily be
->>> observed on the old (to crash) kernel (e.g., using /proc/iomem) to create
->>> the elfcore hdr.
->>>
->>> On s390, information about "ordinary" memory (heh, "storage") can be
->>> obtained by querying the hypervisor/ultravisor via SCLP/diag260, and
->>> that information is stored early during boot in the "physmem" memblock
->>> data structure.
->>>
->>> But virtio-mem memory is always detected by as device driver, which is
->>> usually build as a module. So in the crash kernel, this memory can only be
->>> properly detected once the virtio-mem driver started up.
->>>
->>> The virtio-mem driver already supports the "kdump mode", where it won't
->>> hotplug any memory but instead queries the device to implement the
->>> pfn_is_ram() callback, to avoid reading unplugged memory holes when reading
->>> the vmcore.
->>>
->>> With this series, if the virtio-mem driver is included in the kdump
->>> initrd -- which dracut already takes care of under Fedora/RHEL -- it will
->>> now detect the device RAM ranges on s390 once it probes the devices, to add
->>> them to the vmcore using the same callback mechanism we already have for
->>> pfn_is_ram().
->>>
->>> To add these device RAM ranges to the vmcore ("patch the vmcore"), we will
->>> add new PT_LOAD entries that describe these memory ranges, and update
->>> all offsets vmcore size so it is all consistent.
->>>
->>> My testing when creating+analyzing crash dumps with hotplugged virtio-mem
->>> memory (incl. holes) did not reveal any surprises.
->>>
->>> Patch #1 -- #7 are vmcore preparations and cleanups
->>> Patch #8 adds the infrastructure for drivers to report device RAM
->>> Patch #9 + #10 are virtio-mem preparations
->>> Patch #11 implements virtio-mem support to report device RAM
->>> Patch #12 activates it for s390, implementing a new function to fill
->>>            PT_LOAD entry for device RAM
->>
->> Who is merging this?
->> virtio parts:
->>
->> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+On Mon, Nov 25, 2024 at 05:21:53PM +0100, Clément Léger wrote:
+> Add SBI SSE extension definitions in sbi.h
 > 
-> I guess this series should go via Andrew Morton. Andrew?
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> ---
+>  lib/riscv/asm/sbi.h | 83 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 83 insertions(+)
 > 
-> Acked-by: Heiko Carstens <hca@linux.ibm.com> # s390
-> 
+> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> index 98a9b097..a751d0c3 100644
+> --- a/lib/riscv/asm/sbi.h
+> +++ b/lib/riscv/asm/sbi.h
+> @@ -11,6 +11,11 @@
+>  #define SBI_ERR_ALREADY_AVAILABLE	-6
+>  #define SBI_ERR_ALREADY_STARTED		-7
+>  #define SBI_ERR_ALREADY_STOPPED		-8
+> +#define SBI_ERR_NO_SHMEM		-9
+> +#define SBI_ERR_INVALID_STATE		-10
+> +#define SBI_ERR_BAD_RANGE		-11
+> +#define SBI_ERR_TIMEOUT			-12
+> +#define SBI_ERR_IO			-13
+>  
+>  #ifndef __ASSEMBLY__
+>  #include <cpumask.h>
+> @@ -23,6 +28,7 @@ enum sbi_ext_id {
+>  	SBI_EXT_SRST = 0x53525354,
+>  	SBI_EXT_DBCN = 0x4442434E,
+>  	SBI_EXT_SUSP = 0x53555350,
+> +	SBI_EXT_SSE = 0x535345,
+>  };
+>  
+>  enum sbi_ext_base_fid {
+> @@ -71,6 +77,83 @@ enum sbi_ext_dbcn_fid {
+>  	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
+>  };
+>  
+> +enum sbi_ext_sse_fid {
+> +	SBI_EXT_SSE_READ_ATTRS = 0,
+> +	SBI_EXT_SSE_WRITE_ATTRS,
+> +	SBI_EXT_SSE_REGISTER,
+> +	SBI_EXT_SSE_UNREGISTER,
+> +	SBI_EXT_SSE_ENABLE,
+> +	SBI_EXT_SSE_DISABLE,
+> +	SBI_EXT_SSE_COMPLETE,
+> +	SBI_EXT_SSE_INJECT,
+> +	SBI_EXT_SSE_HART_UNMASK,
+> +	SBI_EXT_SSE_HART_MASK,
+> +};
+> +
+> +/* SBI SSE Event Attributes. */
+> +enum sbi_sse_attr_id {
+> +	SBI_SSE_ATTR_STATUS		= 0x00000000,
+> +	SBI_SSE_ATTR_PRIORITY		= 0x00000001,
+> +	SBI_SSE_ATTR_CONFIG		= 0x00000002,
+> +	SBI_SSE_ATTR_PREFERRED_HART	= 0x00000003,
+> +	SBI_SSE_ATTR_ENTRY_PC		= 0x00000004,
+> +	SBI_SSE_ATTR_ENTRY_ARG		= 0x00000005,
+> +	SBI_SSE_ATTR_INTERRUPTED_SEPC	= 0x00000006,
+> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS	= 0x00000007,
+> +	SBI_SSE_ATTR_INTERRUPTED_A6	= 0x00000008,
+> +	SBI_SSE_ATTR_INTERRUPTED_A7	= 0x00000009,
+> +};
+> +
+> +#define SBI_SSE_ATTR_STATUS_STATE_OFFSET	0
+> +#define SBI_SSE_ATTR_STATUS_STATE_MASK		0x3
+> +#define SBI_SSE_ATTR_STATUS_PENDING_OFFSET	2
+> +#define SBI_SSE_ATTR_STATUS_INJECT_OFFSET	3
+> +
+> +#define SBI_SSE_ATTR_CONFIG_ONESHOT	(1 << 0)
 
-Yes, it's in mm-unstable already for quite a while.
+BIT(0)
 
-Thanks for the acks!
+> +
+> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP	BIT(0)
+> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPIE	BIT(1)
+> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV	BIT(2)
+> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP	BIT(3)
+> +
+> +enum sbi_sse_state {
+> +	SBI_SSE_STATE_UNUSED		= 0,
+> +	SBI_SSE_STATE_REGISTERED	= 1,
+> +	SBI_SSE_STATE_ENABLED		= 2,
+> +	SBI_SSE_STATE_RUNNING		= 3,
+> +};
+> +
+> +/* SBI SSE Event IDs. */
+> +#define SBI_SSE_EVENT_LOCAL_RAS			0x00000000
+> +#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP		0x00000001
+> +#define SBI_SSE_EVENT_LOCAL_PLAT_0_START	0x00004000
+> +#define SBI_SSE_EVENT_LOCAL_PLAT_0_END		0x00007fff
+> +
+> +#define SBI_SSE_EVENT_GLOBAL_RAS		0x00008000
+> +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_START	0x0000c000
+> +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_END		0x0000ffff
+> +
+> +#define SBI_SSE_EVENT_LOCAL_PMU			0x00010000
+> +#define SBI_SSE_EVENT_LOCAL_PLAT_1_START	0x00014000
+> +#define SBI_SSE_EVENT_LOCAL_PLAT_1_END		0x00017fff
+> +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_START	0x0001c000
+> +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_END		0x0001ffff
+> +
+> +#define SBI_SSE_EVENT_LOCAL_PLAT_2_START	0x00024000
+> +#define SBI_SSE_EVENT_LOCAL_PLAT_2_END		0x00027fff
+> +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_START	0x0002c000
+> +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_END		0x0002ffff
 
--- 
-Cheers,
+The above four don't appear to be in the spec anymore.
 
-David / dhildenb
+> +
+> +#define SBI_SSE_EVENT_LOCAL_SOFTWARE		0xffff0000
+> +#define SBI_SSE_EVENT_LOCAL_PLAT_3_START	0xffff4000
+> +#define SBI_SSE_EVENT_LOCAL_PLAT_3_END		0xffff7fff
+> +#define SBI_SSE_EVENT_GLOBAL_SOFTWARE		0xffff8000
+> +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_START	0xffffc000
+> +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_END		0xffffffff
+> +
+> +#define SBI_SSE_EVENT_PLATFORM_BIT		(1 << 14)
+> +#define SBI_SSE_EVENT_GLOBAL_BIT		(1 << 15)
 
+BIT(14)
+BIT(15)
+
+I think other changes are coming to these event IDs from a series Atish
+recently posted too.
+
+> +
+>  struct sbiret {
+>  	long error;
+>  	long value;
+> -- 
+> 2.45.2
+>
+
+Thanks,
+drew
 
