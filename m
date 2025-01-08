@@ -1,107 +1,206 @@
-Return-Path: <kvm+bounces-34834-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34835-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AA6EA06520
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 20:15:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 457CBA06563
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 20:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A697167E5A
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:15:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22BEE7A35CD
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03ED320371A;
-	Wed,  8 Jan 2025 19:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9730C202C3E;
+	Wed,  8 Jan 2025 19:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="InMCQvq2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bP4zn/lp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B728C200116;
-	Wed,  8 Jan 2025 19:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550A41CF5C6
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 19:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736363711; cv=none; b=e6u/lioS3TZleHXrFxSZzxqyuN6PG1CEHTgM+uyxDsC7qb71ocnMOcbwSyk0cBI5v3WDP7LmfSB8PXP6XwrL7R3TNGWSHls6gYInbdywznhYiLXhH4yEs7fdFB381mTFDZ9u7/69Dv1qo1SXyYf3x6PHiAN2ObVH8N3UCxWWWeI=
+	t=1736364669; cv=none; b=LTvhHdqMy6rbY1U5zCDMIdyi9TAnB/0bcQGBItLpMQgJc/8OrFo1IMLg3n5mVCfugv6oxZ8qXVMLY1BspY2J+jDkPiixw+zm7T9x6cdCamUEQjcAMep17TVrYhHL7E3Uy0lO1JImfLYJ3EUNMHxinADDXc+oM1R0AR+sxgEZWHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736363711; c=relaxed/simple;
-	bh=v/YbEBNRH3UQUfdtG1CwjGMkkVuEIbYA/DKsN1OMOq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ivfAY25F8xvXMGezu2Yfu6xdpAOzEy7FLip7V+os3dA2+9ftA7RlrtbtecVYq1heU/QVxjSAbmz9wTOG261w/vyiPfC96S7vRJQ/uEf+Rxt6cA7ANv+DzBdwoQOVV5sNfkZB4GvYgJP/8u64UtifHBYpkMGJiitsrBgdyYFBDTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=InMCQvq2; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A7E1940E0288;
-	Wed,  8 Jan 2025 19:15:06 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id zsGelwC2IRIp; Wed,  8 Jan 2025 19:15:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1736363702; bh=diu1H08q1pNWSKEXVlf+R2FSk4U5O6ex7UW4HCKvE7g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=InMCQvq2i6KGDFSDH5aCAgCUxut4BpK7ufCICqDYakZPI5vuYqnkiTkGEvc67gDFb
-	 wf2j85LQiI+XmTvFMYp6n/EB3Pb0cFtgTq/qMWFz2JsyuYojFDsbI3rvEdO9orcEC+
-	 uCh09woNHDUoqKDlg61pHnVq64dn6qmvzpDnffeTX53cJ/dDSq70+r5cZLnA0SvyB1
-	 08P+ebzbR01xAHrxavzUrsuXbr2JCi0373qkOMtnbdNEqf1wSRzk/SaSgcHdigHYVL
-	 l1frS4ZrlMnZzscmIC1VvevkiImZqzEyom6FuWsop7I6HumVP1FijKJIbLjGk/T5mT
-	 PxrG+vrgBO32zIM8Vbr55GgPztt5kdi2enNSmdVwxrsyDzeUf22xkl08km63T8rOhW
-	 9ovFSGXnfS8qBRrmGWCOwL+F7AtPK2SxUV60mUNCYbRscxul5EmTipSLlPpXe1yuQi
-	 mCrGgFYyIVqQAkGDzysB92N5/uhbdN+8dG08JzD36x5uNcsruZPJHDFJXcBfkFKwl8
-	 vg318uHDl7PoShReGKxQrNL4U1IEwQ7aC1o5+etrTMqOiTyBKr4RUhX0mLsJKcu0vu
-	 uu+3rs3dl2aIYa1X3+MAO/Fa2wDgoK5mkFuVxePhxJ5OYZTagnMwoPWaMxL1qUhoT5
-	 oHo0r0xLb1FtgDBgSidHNIrg=
-Received: from zn.tnic (p200300ea971f938F329C23FfFEA6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:938f:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7D30740E0286;
-	Wed,  8 Jan 2025 19:14:53 +0000 (UTC)
-Date: Wed, 8 Jan 2025 20:14:47 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Jim Mattson <jmattson@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 3/4] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <20250108191447.GHZ37Op2mdA5Zu6aKM@fat_crate.local>
-References: <20241202120416.6054-4-bp@kernel.org>
- <Z1oR3qxjr8hHbTpN@google.com>
- <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
- <Z2B2oZ0VEtguyeDX@google.com>
- <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
- <Z35_34GTLUHJTfVQ@google.com>
- <20250108154901.GFZ36ebXAZMFZJ7D8t@fat_crate.local>
- <Z36zWVBOiBF4g-mW@google.com>
- <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
- <CALMp9eTwao7qWsmVTDgqW_KdjMKeRBYp1JpfN2Xyj+qVyLwHbA@mail.gmail.com>
+	s=arc-20240116; t=1736364669; c=relaxed/simple;
+	bh=j8Lp5ED8JKW0YShHaZyKoSTKpSj2NUc/6Fr7W0m9S8w=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bBRM5yd80WphI6gelBu5LG/BYjpcObQyHAFXPg1S5JWPnBEU5MPiyu3SiDkDBfr7Cp2YrJpwtttjqQw4Fd5WZPW6Em06VdusMa+q211d9ZoqlGAe7BG9wag378eEUHRo7niIw9AILyFrUxMulI8oN4jHAQs4EJvF/nl9Bhj89fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bP4zn/lp; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21638389f63so886285ad.1
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 11:31:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736364667; x=1736969467; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8QSU9WBtVajX3qFErB85rNsWVoVpkqgMri6VMcSJZxE=;
+        b=bP4zn/lpDXwJPr4oIJkIMLaeJcL7shODw1/XJ56WquJ3x0t/ZwG/E+pFM+Hczwt28L
+         TKNcNqPhSgVoFocA1FyG884oo/PBo1oQdxlCtc7lV6z17Jugohu5+Wn+E+5EDdFdRAUe
+         bku9KoSCEZ47bKrw5CDYCnRXupmp7Invr3jIgrkMeupRATf82n7kmeAuiPjBGAedIYqK
+         fSuZGfSzo1g/oJJweojVgrKueD4GI6JiYp+dc1/0hLzVhEqru1ugsURz/WOr3SXsCIZh
+         99pJ4WrJ18tWEnX865wVE9FQRQahrfd7MRdyD++MTeyFmWv0GHVVUqsaf0f19YpmPqXm
+         YF9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736364667; x=1736969467;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8QSU9WBtVajX3qFErB85rNsWVoVpkqgMri6VMcSJZxE=;
+        b=J7jbDsyYt4bchvhXazhc6VY4lNZFMYKMANqqMJb/6fnSkFsT8TtLovZn3AVETsmkDS
+         MAkbcRQ0Z5ylsZRpSjXjS7hXdpes79cEcBl7mw0+EACaZnMcaYeJvry3U8hdFLz84yyV
+         f/o/OYsiZoGOPbAkgeExIgu3Ni1xMM69uFvrDWBftzsx++mc3h+wP2bdd/0b6/IS2iLi
+         pjFOeEuAjM+YH472Egcm28fY7v6zDiVxRJ5SGO4dCoGwP7EF7eLRXAzX7Yld/t8Hm0DJ
+         VgL780gEo63N7Hw+b8gnJZpTd5nqR2UFib7pqoPCDYrwpgURjbPcZ2aTQ8iT67Ypa38+
+         B8DQ==
+X-Gm-Message-State: AOJu0Yz7alSyxPppxf7nGuiBb6U1DwhP4IaiU2Ws7AYrwSzu/RP2BmRB
+	4cAZVkkd0x3h85XHpNOfOWNcYcgzButAzD/j6kpcJQ0iEW+ji6c4D6kfsBufPM3JAZNEmsV8/qH
+	iGQ==
+X-Google-Smtp-Source: AGHT+IEqs6N7PPsng94De5dx3mkquV1TM1SYIb1HlxfQlEumNRj6VcGiC4B0xcwZFGnydYIZent9HBZlEJA=
+X-Received: from pfwo12.prod.google.com ([2002:a05:6a00:1bcc:b0:72b:ccb:c99b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:c89b:b0:1e1:dd97:7881
+ with SMTP id adf61e73a8af0-1e88d12745bmr6952244637.23.1736364667587; Wed, 08
+ Jan 2025 11:31:07 -0800 (PST)
+Date: Wed, 8 Jan 2025 11:31:06 -0800
+In-Reply-To: <20240918205319.3517569-6-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CALMp9eTwao7qWsmVTDgqW_KdjMKeRBYp1JpfN2Xyj+qVyLwHbA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20240918205319.3517569-1-coltonlewis@google.com> <20240918205319.3517569-6-coltonlewis@google.com>
+Message-ID: <Z37Seos1zVHk0-p7@google.com>
+Subject: Re: [PATCH v2 5/6] KVM: x86: selftests: Test core events
+From: Sean Christopherson <seanjc@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
+	Jinrong Liang <ljr.kernel@gmail.com>, Jim Mattson <jmattson@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 08, 2025 at 10:37:57AM -0800, Jim Mattson wrote:
-> Surely, IBPB-on-VMexit is worse for performance than safe-RET?!?
+On Wed, Sep 18, 2024, Colton Lewis wrote:
+> Test events on core counters by iterating through every combination of
+> events in amd_pmu_zen_events with every core counter.
+> 
+> For each combination, calculate the appropriate register addresses for
+> the event selection/control register and the counter register. The
+> base addresses and layout schemes change depending on whether we have
+> the CoreExt feature.
+> 
+> To do the testing, reuse GUEST_TEST_EVENT to run a standard known
+> workload. Decouple it from guest_assert_event_count (now
+> guest_assert_intel_event_count) to generalize to AMD.
+> 
+> Then assert the most specific detail that can be reasonably known
+> about the counter result. Exact count is defined and known for some
+> events and for other events merely asserted to be nonzero.
+> 
+> Note on exact counts: AMD counts one more branch than Intel for the
+> same workload. Though I can't confirm a reason, the only thing it
+> could be is the boundary of the loop instruction being counted
+> differently. Presumably, when the counter reaches 0 and execution
+> continues to the next instruction, AMD counts this as a branch and
+> Intel doesn't
 
-We don't need safe-RET with SRSO_USER_KERNEL_NO=1. And there's no safe-RET for
-virt only. So IBPB-on-VMEXIT is the next best thing. The good thing is, those
-machines have BpSpecReduce too so you won't be doing IBPB-on-VMEXIT either but
-what we're talking about here - BpSpecReduce.
+IIRC, VMRUN is counted as a branch instruction for the guest.  Assuming my memory
+is correct, that means this test is going to be flaky as an asynchronous exit,
+e.g. due to a host IRQ, during the measurement loop will inflate the count.  I'm
+not entirely sure what to do about that :-(
 
--- 
-Regards/Gruss,
-    Boris.
+> +static void __guest_test_core_event(uint8_t event_idx, uint8_t counter_idx)
+> +{
+> +	/* One fortunate area of actual compatibility! This register
 
-https://people.kernel.org/tglx/notes-about-netiquette
+	/*
+	 * This is the proper format for multi-line comments.  We are not the
+	 * crazy net/ folks.
+	 */
+
+> +	 * layout is the same for both AMD and Intel.
+
+It's not, actually.  There are differences in the layout, it just so happens that
+the differences don't throw a wrench in things.
+
+The comments in tools/testing/selftests/kvm/include/x86_64/pmu.h document this
+fairly well, I don't see any reason to have a comment here.
+
+> +	 */
+> +	uint64_t eventsel = ARCH_PERFMON_EVENTSEL_OS |
+> +		ARCH_PERFMON_EVENTSEL_ENABLE |
+> +		amd_pmu_zen_events[event_idx];
+
+Align the indentation.
+
+	uint64_t eventsel = ARCH_PERFMON_EVENTSEL_OS |
+			    ARCH_PERFMON_EVENTSEL_ENABLE |
+			    amd_pmu_zen_events[event_idx];
+
+> +	bool core_ext = this_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+> +	uint64_t esel_msr_base = core_ext ? MSR_F15H_PERF_CTL : MSR_K7_EVNTSEL0;
+> +	uint64_t cnt_msr_base = core_ext ? MSR_F15H_PERF_CTR : MSR_K7_PERFCTR0;
+> +	uint64_t msr_step = core_ext ? 2 : 1;
+> +	uint64_t esel_msr = esel_msr_base + msr_step * counter_idx;
+> +	uint64_t cnt_msr = cnt_msr_base + msr_step * counter_idx;
+
+This pattern of code is copy+pasted in three functions.  Please add macros and/or
+helpers to consolidate things.  These should also be uint32_t, not 64.
+
+It's a bit evil, but one approach would be to add a macro to iterate over all
+PMU counters.  Eating the VM-Exit for the CPUID to get X86_FEATURE_PERF_CTR_EXT_CORE
+each time is unfortunate, but I doubt/hope it's not problematic in practice.  If
+the cost is meaningful, we could figure out a way to cache the info, e.g. something
+awful like this might work:
+
+	/* Note, this relies on guest state being recreated between each test. */
+	static int has_perfctr_core = -1;
+
+	if (has_perfctr_core == -1)
+		has_perfctr_core = this_cpu_has(X86_FEATURE_PERFCTR_CORE);
+
+	if (has_perfctr_core) {
+
+static bool get_pmu_counter_msrs(int idx, uint32_t *eventsel, uint32_t *pmc)
+{
+	if (this_cpu_has(X86_FEATURE_PERFCTR_CORE)) {
+		*eventsel = MSR_F15H_PERF_CTL + idx * 2;
+		*pmc = MSR_F15H_PERF_CTR + idx * 2;
+	} else {
+		*eventsel = MSR_K7_EVNTSEL0 + idx;
+		*pmc = MSR_K7_PERFCTR0 + idx;
+	}
+	return true;
+}
+
+#define for_each_pmu_counter(_i, _nr_counters, _eventsel, _pmc)		\
+	for (_i = 0; i < _nr_counters; _i++)				\
+		if (get_pmu_counter_msrs(_i, &_eventsel, _pmc))		\
+
+static void guest_test_core_events(void)
+{
+	uint8_t nr_counters = guest_nr_core_counters();
+	uint32_t eventsel_msr, pmc_msr;
+	int i, j;
+
+	for (i = 0; i < NR_AMD_ZEN_EVENTS; i++) {
+		for_each_pmu_counter(j, nr_counters, eventsel_msr, pmc_msr) {
+			uint64_t eventsel = ARCH_PERFMON_EVENTSEL_OS |
+					    ARCH_PERFMON_EVENTSEL_ENABLE |
+					    amd_pmu_zen_events[event_idx];
+
+			GUEST_TEST_EVENT(pmc_msr, eventsel_msr, eventsel, "");
+			guest_assert_amd_event_count(i, j, pmc_msr);
+
+			if (!is_forced_emulation_enabled)
+				continue;
+
+			GUEST_TEST_EVENT(pmc_msr, eventsel_msr, eventsel, KVM_FEP);
+			guest_assert_amd_event_count(i, j, pmc_msr);
+		}
+	}
+}
 
