@@ -1,181 +1,185 @@
-Return-Path: <kvm+bounces-34837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C43D9A0657D
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 20:38:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6C8A06585
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 20:42:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13A493A72B8
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:38:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 618C01887FD5
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:42:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9E3202C55;
-	Wed,  8 Jan 2025 19:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1B9202F61;
+	Wed,  8 Jan 2025 19:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="PVk4KKtF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n3JR1924"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA221FCCF1
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 19:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB871FCCF1
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 19:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736365085; cv=none; b=FsvpW7CtIJlUK3hT53NIWjR0jy/MZeGFa4LGMfrYToJj/rr1o3IQP75su7RCf8Nu9PdsH1cXm+J+35uc35vU11dLLv/7B87YSm+sBF1xzsDVs2g1WCWw8yikfDyHE2HgLTwBV9AEs2Vb6nV4FaSWCfkYhVX+PgoTX1LhT0BjOl8=
+	t=1736365367; cv=none; b=skY7Sq2HcN9W3nWShllAUpIFDIWhdaHALuNSQSwY21LpO4g+9sVbfo26YEdAMlg3c2Y6ccgo5fihHMXGnf9UPLAgGYRSGCsa3/SbXUH+ylUZteAOzap09HfnaN1Y6LLPAGTO7z1xtR8Qj+AIILPXn65vn30iPhTn6efclS2CLc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736365085; c=relaxed/simple;
-	bh=TkDjLYrvFP4NOwyE1riU2Pn0PTqQ0huroqDV7gYV8F4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZpXqeUXjkCJJzdpajo3cnycauS3YTgkPgYIKt9q+ljo1aZnPwlfy2ZovJN2pKLA/dSvseAYK9JQMrNF+Py/zWek+omXtoj6vk9TxuIUb+QPo0SIYTks02L0CvJIe2X5DdPL9O6/bBeTx6tGDtYWBKMHnQ8tMWtolMNtwTZy3e5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io; spf=pass smtp.mailfrom=theori.io; dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b=PVk4KKtF; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theori.io
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2ee397a82f6so283933a91.2
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 11:38:03 -0800 (PST)
+	s=arc-20240116; t=1736365367; c=relaxed/simple;
+	bh=rI9lTDj/3xxLUWxNoP3YMHHFvTPK0kaPZCUPe7dFjSo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YJq5K/1yegGO4dP2l7+DtjR7e3Uh6TKPo+1rjznlS5318U9KYc6Oh9zt/HCP06SO8zw4AOPHNIT5rtiUMHSkFIrIKT0CqGaETfe8ctmcMy0glJJzBjz8sPtUB6uUTTcXiUHM6kLXH08/l43D4CEbbrBCAM9RlQT+DpA9JV9b3hU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n3JR1924; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-216728b170cso1353065ad.2
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 11:42:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1736365083; x=1736969883; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G0bUS8Q56VQu+k4FgEf+CVIurLS+XfSNtyOspvh+PYM=;
-        b=PVk4KKtFXjAJ49RCv/OtLG2zDEr5KfQXCOxCLwGc8HyhEIUZkMr67CNMOglSmCGtAQ
-         sAc1UsjQHGvWdVW8fsUDGNZ13sJTleYVvC02O7DwzlQHioNTpZc+ufH3i+rLMshYkZcb
-         /gLhSqvEfEnUPi01knyG1MMNFfemY2V0S80/g=
+        d=google.com; s=20230601; t=1736365365; x=1736970165; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OcqngNRH0rXYoEBfqi4ViOp0zgRPrk+QzEEBCgGh8d4=;
+        b=n3JR1924KPqo57ghqKcmieNP7c7568cZlnNS81AfssFPtz6iXEq9Dd+b7az/E+nUwq
+         9vXvMeSTnsg6Lnox8dzEs3a+udSgxQYUipFPMAo6IH/wRuZ1+Di/ftpnGjqIN3xOdbXo
+         0i9F8kOeSQ19QZDRwb77jOmQqu0jnRbNdpqcrwxU/eGTCOb8HUl7zW6w2UiLm2xUarb7
+         l7KGnjJFKQvyQfzo6jmvNj1Nacn7OsTN+VKAckuZl8JD9Q49oYZZi4ffpZG0Z/8xyePB
+         xXJGa40u3TpZWsQfHysbYi5c31wQ2VvlA1BSu+T9rzKFGXG5nzxp0fgSnZc6E9GznoYH
+         yk3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736365083; x=1736969883;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G0bUS8Q56VQu+k4FgEf+CVIurLS+XfSNtyOspvh+PYM=;
-        b=ESsWzSC9POxRsjLgnlBUt7gDO851iROBru0d4VvjilKXf+nhG3QNIs+sux9yBwQ7x2
-         2tf9oQCO3rGx5s6u3dMIYHvnfAQ2vIk62YuXUCk+ZeSmacw9Fm/EQK98oG15Bkfk4ydj
-         7tcWyzXWIGyTvlwGYLPuWFfNVoCB5inpTNIanFb8nAEWEed3TfWEVr+m9I77NByHtRxQ
-         CluWbH13l81y7i3rcL+HS8Rg/Wnw/91jUuugksDqvFetRRwUtcR61SgZZ/OJHjTNVScD
-         P11Sgp0fck1vViOkIpAzTIF2tzQKxc+Ba2Fzlur0rsysBOozhP5UHbc8IkvYV7nlB3UK
-         Z3EA==
-X-Forwarded-Encrypted: i=1; AJvYcCWfb690SJ4gNGktGDcdnpUiqJ5PJU+QVHGNYQuNp1sBJk0gNGNyZFUiWxV8GpUwycEvGZQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygARQFe39nIkfAoewARGM5dHQVpYfpbx4KWVRG93LjfLGE2A3g
-	fdI4kHupxAVh1f+fWI5CinZJ82hWyTgY3mPalVtV4+0QCnnlhOgmHU0yK6H2d8o=
-X-Gm-Gg: ASbGncvx77Ume1BFoSNV6tFY5+4AZ8YQC6cC9TLcQDKbQ8RjkEKWU7N8Sl8iUCGmhxE
-	Wwf1BtfM1Is5ysKn337hwAvf5l2G373G+PmTQMAD5EBo43EbvGIit0+k7UKiPoiwjsXYSXt93mY
-	+ujK/wPvT8VVcrl74p3wq/lx0bFg1tx2l+Q3vYK+wxgD5ImUysSw6YfxpyQfTpNq9/F3fuejZXI
-	ISj3ubHjKjJC5JdXeTnrJbzlaRw2mV2G0T7F7gkKkIerI5x5SB2pmj/7YyagU19aFiRDA==
-X-Google-Smtp-Source: AGHT+IHl+1LPadgc/i7lkTvjE2CfNzpvljiLkJJSgQloH84BYhz9+osKoceYZDM+dwTOSZKMzh86qg==
-X-Received: by 2002:a17:90b:3904:b0:2ea:b564:4b31 with SMTP id 98e67ed59e1d1-2f548f64240mr5502673a91.19.1736365083357;
-        Wed, 08 Jan 2025 11:38:03 -0800 (PST)
-Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f54a2872a3sm1963200a91.16.2025.01.08.11.37.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 11:38:03 -0800 (PST)
-Date: Wed, 8 Jan 2025 14:37:55 -0500
-From: Hyunwoo Kim <v4bel@theori.io>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wongi Lee <qwerty@theori.io>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	virtualization@lists.linux.dev,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Luigi Leonardi <leonardi@redhat.com>, bpf@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Michal Luczaj <mhal@rbox.co>,
-	kvm@vger.kernel.org, v4bel@theori.io, imv4bel@gmail.com
-Subject: Re: [PATCH net 2/2] vsock/bpf: return early if transport is not
- assigned
-Message-ID: <Z37UE0Kv3iWobO/9@v4bel-B760M-AORUS-ELITE-AX>
-References: <20250108180617.154053-1-sgarzare@redhat.com>
- <20250108180617.154053-3-sgarzare@redhat.com>
+        d=1e100.net; s=20230601; t=1736365365; x=1736970165;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OcqngNRH0rXYoEBfqi4ViOp0zgRPrk+QzEEBCgGh8d4=;
+        b=IwCus6E+o1lQN/lRTPxs1e/y0aWZJSjInr64ap8IPkz/q82enJGpJjOV3bFFS6mUvE
+         BPS6OhMC7q1RVvQiflZyL47lFGTGFrVLZ1buRPiAGULp6xX1Pbx3RNPazlPFEGOubhAa
+         uKuOI+1hn/pdkOZTxfYEVZKu0zPW7NaSJeXMqyadwioiruK0WdI9fWOJ8x7tvItaj+3F
+         PNYt8Hf77Z4kE0RXTqxqHs+KibjuEksyDXkq4C9mK0qtHdBmC0nA6eYjGr7L9Q/juYDa
+         4c9fj82U3yjsz03UhlSTl+0Uxxf9e7UpRU63YNCaZoLEP2yid8LsXdPsJPfpc3w3QEIk
+         Hftw==
+X-Gm-Message-State: AOJu0YwnFW0DXYNjEQYz+rh35T1Dy5+5nfLXoFcpqVLXHYyJxHJfZoB0
+	i/1UbnemJO2eLSqA+cqzt5UjYNYDCw+S1CwqBlyB/jJ0I2LahBG/lxuwgYU5BL0MK8Ils+7Ut27
+	lww==
+X-Google-Smtp-Source: AGHT+IGNfKCZ8Q2VCeggXdXbou0bzD5z1DgxcTPhkKTSHTkFCJPodqXfpK8DgQ73ma5DxN7hfHcC0Lc1R+c=
+X-Received: from pfbf7.prod.google.com ([2002:a05:6a00:ad87:b0:725:c96b:b1db])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d81a:b0:1e3:e6f3:6372
+ with SMTP id adf61e73a8af0-1e88d132ef8mr6644654637.27.1736365365004; Wed, 08
+ Jan 2025 11:42:45 -0800 (PST)
+Date: Wed, 8 Jan 2025 11:42:43 -0800
+In-Reply-To: <20240918205319.3517569-7-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108180617.154053-3-sgarzare@redhat.com>
+Mime-Version: 1.0
+References: <20240918205319.3517569-1-coltonlewis@google.com> <20240918205319.3517569-7-coltonlewis@google.com>
+Message-ID: <Z37VMzbCZEKkDOmP@google.com>
+Subject: Re: [PATCH v2 6/6] KVM: x86: selftests: Test PerfMonV2
+From: Sean Christopherson <seanjc@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
+	Jinrong Liang <ljr.kernel@gmail.com>, Jim Mattson <jmattson@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 08, 2025 at 07:06:17PM +0100, Stefano Garzarella wrote:
-> Some of the core functions can only be called if the transport
-> has been assigned.
+On Wed, Sep 18, 2024, Colton Lewis wrote:
+> Test PerfMonV2, which defines global registers to enable multiple
+> performance counters with a single MSR write, in its own function.
 > 
-> As Michal reported, a socket might have the transport at NULL,
-> for example after a failed connect(), causing the following trace:
+> If the feature is available, ensure the global control register has
+> the ability to start and stop the performance counters and the global
+> status register correctly flags an overflow by the associated counter.
 > 
->     BUG: kernel NULL pointer dereference, address: 00000000000000a0
->     #PF: supervisor read access in kernel mode
->     #PF: error_code(0x0000) - not-present page
->     PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
->     Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
->     CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
->     RIP: 0010:vsock_connectible_has_data+0x1f/0x40
->     Call Trace:
->      vsock_bpf_recvmsg+0xca/0x5e0
->      sock_recvmsg+0xb9/0xc0
->      __sys_recvfrom+0xb3/0x130
->      __x64_sys_recvfrom+0x20/0x30
->      do_syscall_64+0x93/0x180
->      entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> So we need to check the `vsk->transport` in vsock_bpf_recvmsg(),
-> especially for connected sockets (stream/seqpacket) as we already
-> do in __vsock_connectible_recvmsg().
-> 
-> Fixes: 634f1a7110b4 ("vsock: support sockmap")
-> Reported-by: Michal Luczaj <mhal@rbox.co>
-> Closes: https://lore.kernel.org/netdev/5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co/
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
->  net/vmw_vsock/vsock_bpf.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  .../selftests/kvm/x86_64/pmu_counters_test.c  | 53 +++++++++++++++++++
+>  1 file changed, 53 insertions(+)
 > 
-> diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
-> index 4aa6e74ec295..f201d9eca1df 100644
-> --- a/net/vmw_vsock/vsock_bpf.c
-> +++ b/net/vmw_vsock/vsock_bpf.c
-> @@ -77,6 +77,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  			     size_t len, int flags, int *addr_len)
->  {
->  	struct sk_psock *psock;
-> +	struct vsock_sock *vsk;
->  	int copied;
->  
->  	psock = sk_psock_get(sk);
-> @@ -84,6 +85,13 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  		return __vsock_recvmsg(sk, msg, len, flags);
->  
->  	lock_sock(sk);
-> +	vsk = vsock_sk(sk);
-> +
-> +	if (!vsk->transport) {
-> +		copied = -ENODEV;
-> +		goto out;
-> +	}
-> +
->  	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
->  		release_sock(sk);
->  		sk_psock_put(sk, psock);
-> @@ -108,6 +116,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  		copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> index cf2941cc7c4c..a90df8b67a19 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> @@ -763,10 +763,63 @@ static void guest_test_core_events(void)
 >  	}
+>  }
 >  
-> +out:
->  	release_sock(sk);
->  	sk_psock_put(sk, psock);
+> +static void guest_test_perfmon_v2(void)
+> +{
+> +	uint64_t i;
+> +	uint64_t eventsel = ARCH_PERFMON_EVENTSEL_OS |
+> +		ARCH_PERFMON_EVENTSEL_ENABLE |
+> +		AMD_ZEN_CORE_CYCLES;
+
+Hmm.  I like the extra coverage, but I think the guts of this test belong is
+common code, because the core logic is the same across Intel and AMD (I think),
+only the MSRs are different.
+
+Maybe a library helper that takes in the MSRs as parameters?  Not sure.
+
+I suspect it'll take some back and forth to figure out how best to validate these
+more "advanced" behaviors, so maybe skip this patch for the next version?  I.e.
+land basic AMD coverage and then we can figure out how to test global control and
+status.
+
+> +	bool core_ext = this_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+> +	uint64_t sel_msr_base = core_ext ? MSR_F15H_PERF_CTL : MSR_K7_EVNTSEL0;
+> +	uint64_t cnt_msr_base = core_ext ? MSR_F15H_PERF_CTR : MSR_K7_PERFCTR0;
+> +	uint64_t msr_step = core_ext ? 2 : 1;
+> +	uint8_t nr_counters = guest_nr_core_counters();
+> +	bool perfmon_v2 = this_cpu_has(X86_FEATURE_PERFMON_V2);
+
+Zero reason to capture this in a local variable.
+
+> +	uint64_t sel_msr;
+> +	uint64_t cnt_msr;
+> +
+> +	if (!perfmon_v2)
+> +		return;
+> +
+> +	for (i = 0; i < nr_counters; i++) {
+> +		sel_msr = sel_msr_base + msr_step * i;
+> +		cnt_msr = cnt_msr_base + msr_step * i;
+> +
+> +		/* Ensure count stays 0 when global register disables counter. */
+> +		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
+> +		wrmsr(sel_msr, eventsel);
+> +		wrmsr(cnt_msr, 0);
+> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_LOOPS}));
+> +		GUEST_ASSERT(!_rdpmc(i));
+> +
+> +		/* Ensure counter is >0 when global register enables counter. */
+> +		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, BIT_ULL(i));
+> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_LOOPS}));
+> +		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
+> +		GUEST_ASSERT(_rdpmc(i));
+> +
+> +		/* Ensure global status register flags a counter overflow. */
+> +		wrmsr(cnt_msr, -1);
+> +		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, 0xff);
+> +		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, BIT_ULL(i));
+> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_LOOPS}));
+> +		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
+> +		GUEST_ASSERT(rdmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS) &
+> +			     BIT_ULL(i));
+> +
+> +		/* Ensure global status register flag is cleared correctly. */
+> +		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, BIT_ULL(i));
+> +		GUEST_ASSERT(!(rdmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS) &
+> +			     BIT_ULL(i)));
+> +	}
+> +}
+> +
+> +
+>  static void guest_test_core_counters(void)
+>  {
+>  	guest_test_rdwr_core_counters();
+>  	guest_test_core_events();
+> +	guest_test_perfmon_v2();
+>  	GUEST_DONE();
+>  }
 >  
 > -- 
-> 2.47.1
+> 2.46.0.662.g92d0881bb0-goog
 > 
-
-Looks good to me.
-
-Reviewed-by: Hyunwoo Kim <v4bel@theori.io>
-
-
-Regards,
-Hyunwoo Kim
 
