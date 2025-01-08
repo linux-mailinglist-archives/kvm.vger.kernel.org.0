@@ -1,206 +1,253 @@
-Return-Path: <kvm+bounces-34835-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34836-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457CBA06563
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 20:31:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF73CA06567
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 20:31:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22BEE7A35CD
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:31:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66D5E3A55AA
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:31:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9730C202C3E;
-	Wed,  8 Jan 2025 19:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207911CF5C6;
+	Wed,  8 Jan 2025 19:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bP4zn/lp"
+	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="EjdWt7UK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550A41CF5C6
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 19:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C8A1AAA15
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 19:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736364669; cv=none; b=LTvhHdqMy6rbY1U5zCDMIdyi9TAnB/0bcQGBItLpMQgJc/8OrFo1IMLg3n5mVCfugv6oxZ8qXVMLY1BspY2J+jDkPiixw+zm7T9x6cdCamUEQjcAMep17TVrYhHL7E3Uy0lO1JImfLYJ3EUNMHxinADDXc+oM1R0AR+sxgEZWHM=
+	t=1736364690; cv=none; b=MA7Ql0wXZKAZMYOM8QQdeuozaOrMM2o4BaFvjSv5FTY6tTXhQqAJOgdnzKcnhJp2wObGzsBe4UssJNAK0xmpF3kAbXEwWWo5dzXdXb8IXzSKlQ3zHICS/5u8kWLkJWFybgndfr4Yne2nX+gVnnOB/XEo0dtiaZA0nJ5ApXDc2sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736364669; c=relaxed/simple;
-	bh=j8Lp5ED8JKW0YShHaZyKoSTKpSj2NUc/6Fr7W0m9S8w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bBRM5yd80WphI6gelBu5LG/BYjpcObQyHAFXPg1S5JWPnBEU5MPiyu3SiDkDBfr7Cp2YrJpwtttjqQw4Fd5WZPW6Em06VdusMa+q211d9ZoqlGAe7BG9wag378eEUHRo7niIw9AILyFrUxMulI8oN4jHAQs4EJvF/nl9Bhj89fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bP4zn/lp; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21638389f63so886285ad.1
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 11:31:08 -0800 (PST)
+	s=arc-20240116; t=1736364690; c=relaxed/simple;
+	bh=5b1MJ0amuIx6mkoE9SwD4e2ebV7znRTHvoH2P67Bib8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jc2f8jojkOoM3BGn1cdpCujpFXJK7G/T51dnqfiD8+sWnygBVi21wRVFYJL1+nXZWJ/agDn6XBWA2Nt6KiVqXEzwhLxToPL04gTNo2fqkL6VcNGRgnVKq/mqUZWSq36rl4l+AuRnhQCi76jt6ylweuyOZWJf6bpnCQVl6N0c9zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io; spf=pass smtp.mailfrom=theori.io; dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b=EjdWt7UK; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theori.io
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2166f1e589cso1572115ad.3
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 11:31:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736364667; x=1736969467; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8QSU9WBtVajX3qFErB85rNsWVoVpkqgMri6VMcSJZxE=;
-        b=bP4zn/lpDXwJPr4oIJkIMLaeJcL7shODw1/XJ56WquJ3x0t/ZwG/E+pFM+Hczwt28L
-         TKNcNqPhSgVoFocA1FyG884oo/PBo1oQdxlCtc7lV6z17Jugohu5+Wn+E+5EDdFdRAUe
-         bku9KoSCEZ47bKrw5CDYCnRXupmp7Invr3jIgrkMeupRATf82n7kmeAuiPjBGAedIYqK
-         fSuZGfSzo1g/oJJweojVgrKueD4GI6JiYp+dc1/0hLzVhEqru1ugsURz/WOr3SXsCIZh
-         99pJ4WrJ18tWEnX865wVE9FQRQahrfd7MRdyD++MTeyFmWv0GHVVUqsaf0f19YpmPqXm
-         YF9Q==
+        d=theori.io; s=google; t=1736364687; x=1736969487; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Jtvo4ir8kxjljq7eka2U506iji5/r9yiGfObZJA9Hk=;
+        b=EjdWt7UK2dCH98wTukK4CTeGQYayGHZLKvnNk31xsL26juOnQefnWXIVGMzhQnG1Hi
+         Ki01tbNSWvC3vgSMxuxBVGoUUuF++z9IdYxMF7kQeUmD+EgHHCSMNCKLBboBtWEJuJcZ
+         wRoz6yo9wqWrGatWpZUaiqaNN98ozbttAVusY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736364667; x=1736969467;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8QSU9WBtVajX3qFErB85rNsWVoVpkqgMri6VMcSJZxE=;
-        b=J7jbDsyYt4bchvhXazhc6VY4lNZFMYKMANqqMJb/6fnSkFsT8TtLovZn3AVETsmkDS
-         MAkbcRQ0Z5ylsZRpSjXjS7hXdpes79cEcBl7mw0+EACaZnMcaYeJvry3U8hdFLz84yyV
-         f/o/OYsiZoGOPbAkgeExIgu3Ni1xMM69uFvrDWBftzsx++mc3h+wP2bdd/0b6/IS2iLi
-         pjFOeEuAjM+YH472Egcm28fY7v6zDiVxRJ5SGO4dCoGwP7EF7eLRXAzX7Yld/t8Hm0DJ
-         VgL780gEo63N7Hw+b8gnJZpTd5nqR2UFib7pqoPCDYrwpgURjbPcZ2aTQ8iT67Ypa38+
-         B8DQ==
-X-Gm-Message-State: AOJu0Yz7alSyxPppxf7nGuiBb6U1DwhP4IaiU2Ws7AYrwSzu/RP2BmRB
-	4cAZVkkd0x3h85XHpNOfOWNcYcgzButAzD/j6kpcJQ0iEW+ji6c4D6kfsBufPM3JAZNEmsV8/qH
-	iGQ==
-X-Google-Smtp-Source: AGHT+IEqs6N7PPsng94De5dx3mkquV1TM1SYIb1HlxfQlEumNRj6VcGiC4B0xcwZFGnydYIZent9HBZlEJA=
-X-Received: from pfwo12.prod.google.com ([2002:a05:6a00:1bcc:b0:72b:ccb:c99b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:c89b:b0:1e1:dd97:7881
- with SMTP id adf61e73a8af0-1e88d12745bmr6952244637.23.1736364667587; Wed, 08
- Jan 2025 11:31:07 -0800 (PST)
-Date: Wed, 8 Jan 2025 11:31:06 -0800
-In-Reply-To: <20240918205319.3517569-6-coltonlewis@google.com>
+        d=1e100.net; s=20230601; t=1736364687; x=1736969487;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Jtvo4ir8kxjljq7eka2U506iji5/r9yiGfObZJA9Hk=;
+        b=KTfKoOSODgrFAgLIHEY5olx/eAmL8WQn92XeYlIvPV5h8rFbQ4sBN0r288CF+D8l7M
+         OrxGcVvcm0cldAcXLQjEn6RpvYTpzsbz2Xp9ngE/u3eK2PqTJa7sMiJth+soICjgLhwC
+         +zWKTFJM9FDSwcWiMEW2zu+zWo9oHwM69+kBn9UoX8eGUvwKIqgx3QIfxGTGmsxOJwZJ
+         2NMsnH6dQMpK+LvbJNvDAryIykZXVK761Ut9wHgO293Mq5zTZKXwJTYNf+vFTLASCd75
+         HQyflF5a9OpAA8l/W+gmNj+/samr5++YFJESDG1UctSBfhYEiK5AHQccBSwt3SAAQhaR
+         KhEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUhk/Es6UNdXjRzBBUjRvJuylPkC4Q/bApbQYdw717uzKdb1ONGjLEpGBhfLILnfTtq12g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3dADtoE3rUy+xoljJJF8WvFkXewEqpI0Jy13lFyfMsUVN0SXN
+	RWyyNoCvyeuRmx8kJJq+Grdemot/5OxWkAjs6nCIaxoqVbqLAvBR7A0wUSZsKVU=
+X-Gm-Gg: ASbGncsgCsHUo//l7o6695ludIQrOcwDuXi6rdCXvfE7I/SCzd3PubPXuSb8iGXmbJ6
+	jDNhkY0JHxS1PXD+VjfhFCPct0Y9zLYssyx27tSIgqk0aVcbgGDQugaP26DlhyiOm7V9c6YshSz
+	zeR2Xd+ZzVGKcomgJ8uASIaOJbHa2qUAHIdlt1wZZNqfkOY9JPYxsvML4WyRhbzQVQUKXySvdxM
+	7yuMgxt+6rX+/0HLMVYofsB/zLzqTlewC3BIjIbv4ng7RIIp7xWeeGVx/1/HqeKHNBULA==
+X-Google-Smtp-Source: AGHT+IF6d1lxbSLuWO/THk+x8aSRyMXzHsLrJNMSbGKpqc+WLXQkKiPlHLgXRv3O4vL92v4Ati9bOw==
+X-Received: by 2002:a05:6a21:398:b0:1e1:ae83:ad04 with SMTP id adf61e73a8af0-1e88d134c3emr6681500637.27.1736364686950;
+        Wed, 08 Jan 2025 11:31:26 -0800 (PST)
+Received: from v4bel-B760M-AORUS-ELITE-AX ([211.219.71.65])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8dbbabsm37006185b3a.101.2025.01.08.11.31.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2025 11:31:26 -0800 (PST)
+Date: Wed, 8 Jan 2025 14:31:19 -0500
+From: Hyunwoo Kim <v4bel@theori.io>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Wongi Lee <qwerty@theori.io>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>,
+	virtualization@lists.linux.dev,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Luigi Leonardi <leonardi@redhat.com>, bpf@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Michal Luczaj <mhal@rbox.co>,
+	kvm@vger.kernel.org, v4bel@theori.io, imv4bel@gmail.com
+Subject: Re: [PATCH net 1/2] vsock/virtio: discard packets if the transport
+ changes
+Message-ID: <Z37Sh+utS+iV3+eb@v4bel-B760M-AORUS-ELITE-AX>
+References: <20250108180617.154053-1-sgarzare@redhat.com>
+ <20250108180617.154053-2-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240918205319.3517569-1-coltonlewis@google.com> <20240918205319.3517569-6-coltonlewis@google.com>
-Message-ID: <Z37Seos1zVHk0-p7@google.com>
-Subject: Re: [PATCH v2 5/6] KVM: x86: selftests: Test core events
-From: Sean Christopherson <seanjc@google.com>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
-	Jinrong Liang <ljr.kernel@gmail.com>, Jim Mattson <jmattson@google.com>, 
-	Aaron Lewis <aaronlewis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250108180617.154053-2-sgarzare@redhat.com>
 
-On Wed, Sep 18, 2024, Colton Lewis wrote:
-> Test events on core counters by iterating through every combination of
-> events in amd_pmu_zen_events with every core counter.
+On Wed, Jan 08, 2025 at 07:06:16PM +0100, Stefano Garzarella wrote:
+> If the socket has been de-assigned or assigned to another transport,
+> we must discard any packets received because they are not expected
+> and would cause issues when we access vsk->transport.
 > 
-> For each combination, calculate the appropriate register addresses for
-> the event selection/control register and the counter register. The
-> base addresses and layout schemes change depending on whether we have
-> the CoreExt feature.
+> A possible scenario is described by Hyunwoo Kim in the attached link,
+> where after a first connect() interrupted by a signal, and a second
+> connect() failed, we can find `vsk->transport` at NULL, leading to a
+> NULL pointer dereference.
 > 
-> To do the testing, reuse GUEST_TEST_EVENT to run a standard known
-> workload. Decouple it from guest_assert_event_count (now
-> guest_assert_intel_event_count) to generalize to AMD.
+> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+> Reported-by: Hyunwoo Kim <v4bel@theori.io>
+> Reported-by: Wongi Lee <qwerty@theori.io>
+> Closes: https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 > 
-> Then assert the most specific detail that can be reasonably known
-> about the counter result. Exact count is defined and known for some
-> events and for other events merely asserted to be nonzero.
-> 
-> Note on exact counts: AMD counts one more branch than Intel for the
-> same workload. Though I can't confirm a reason, the only thing it
-> could be is the boundary of the loop instruction being counted
-> differently. Presumably, when the counter reaches 0 and execution
-> continues to the next instruction, AMD counts this as a branch and
-> Intel doesn't
-
-IIRC, VMRUN is counted as a branch instruction for the guest.  Assuming my memory
-is correct, that means this test is going to be flaky as an asynchronous exit,
-e.g. due to a host IRQ, during the measurement loop will inflate the count.  I'm
-not entirely sure what to do about that :-(
-
-> +static void __guest_test_core_event(uint8_t event_idx, uint8_t counter_idx)
-> +{
-> +	/* One fortunate area of actual compatibility! This register
-
-	/*
-	 * This is the proper format for multi-line comments.  We are not the
-	 * crazy net/ folks.
-	 */
-
-> +	 * layout is the same for both AMD and Intel.
-
-It's not, actually.  There are differences in the layout, it just so happens that
-the differences don't throw a wrench in things.
-
-The comments in tools/testing/selftests/kvm/include/x86_64/pmu.h document this
-fairly well, I don't see any reason to have a comment here.
-
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 9acc13ab3f82..51a494b69be8 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -1628,8 +1628,11 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+>  
+>  	lock_sock(sk);
+>  
+> -	/* Check if sk has been closed before lock_sock */
+> -	if (sock_flag(sk, SOCK_DONE)) {
+> +	/* Check if sk has been closed or assigned to another transport before
+> +	 * lock_sock (note: listener sockets are not assigned to any transport)
 > +	 */
-> +	uint64_t eventsel = ARCH_PERFMON_EVENTSEL_OS |
-> +		ARCH_PERFMON_EVENTSEL_ENABLE |
-> +		amd_pmu_zen_events[event_idx];
+> +	if (sock_flag(sk, SOCK_DONE) ||
+> +	    (sk->sk_state != TCP_LISTEN && vsk->transport != &t->transport)) {
 
-Align the indentation.
+If a race scenario with vsock_listen() is added to the existing 
+race scenario, the patch can be bypassed.
 
-	uint64_t eventsel = ARCH_PERFMON_EVENTSEL_OS |
-			    ARCH_PERFMON_EVENTSEL_ENABLE |
-			    amd_pmu_zen_events[event_idx];
+In addition to the existing scenario:
+```
+                     cpu0                                                      cpu1
 
-> +	bool core_ext = this_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
-> +	uint64_t esel_msr_base = core_ext ? MSR_F15H_PERF_CTL : MSR_K7_EVNTSEL0;
-> +	uint64_t cnt_msr_base = core_ext ? MSR_F15H_PERF_CTR : MSR_K7_PERFCTR0;
-> +	uint64_t msr_step = core_ext ? 2 : 1;
-> +	uint64_t esel_msr = esel_msr_base + msr_step * counter_idx;
-> +	uint64_t cnt_msr = cnt_msr_base + msr_step * counter_idx;
+                                                               socket(A)
 
-This pattern of code is copy+pasted in three functions.  Please add macros and/or
-helpers to consolidate things.  These should also be uint32_t, not 64.
+                                                               bind(A, {cid: VMADDR_CID_LOCAL, port: 1024})
+                                                                 vsock_bind()
 
-It's a bit evil, but one approach would be to add a macro to iterate over all
-PMU counters.  Eating the VM-Exit for the CPUID to get X86_FEATURE_PERF_CTR_EXT_CORE
-each time is unfortunate, but I doubt/hope it's not problematic in practice.  If
-the cost is meaningful, we could figure out a way to cache the info, e.g. something
-awful like this might work:
+                                                               listen(A)
+                                                                 vsock_listen()
+  socket(B)
 
-	/* Note, this relies on guest state being recreated between each test. */
-	static int has_perfctr_core = -1;
+  connect(B, {cid: VMADDR_CID_LOCAL, port: 1024})
+    vsock_connect()
+      lock_sock(sk);
+      virtio_transport_connect()
+        virtio_transport_connect()
+          virtio_transport_send_pkt_info()
+            vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_REQUEST)
+              queue_work(vsock_loopback_work)
+      sk->sk_state = TCP_SYN_SENT;
+      release_sock(sk);
+                                                               vsock_loopback_work()
+                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_REQUEST)
+                                                                   sk = vsock_find_bound_socket(&dst);
+                                                                   virtio_transport_recv_listen(sk, skb)
+                                                                     child = vsock_create_connected(sk);
+                                                                     vsock_assign_transport()
+                                                                       vvs = kzalloc(sizeof(*vvs), GFP_KERNEL);
+                                                                     vsock_insert_connected(vchild);
+                                                                       list_add(&vsk->connected_table, list);
+                                                                     virtio_transport_send_response(vchild, skb);
+                                                                       virtio_transport_send_pkt_info()
+                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RESPONSE)
+                                                                           queue_work(vsock_loopback_work)
 
-	if (has_perfctr_core == -1)
-		has_perfctr_core = this_cpu_has(X86_FEATURE_PERFCTR_CORE);
+                                                               vsock_loopback_work()
+                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RESPONSE)
+                                                                   sk = vsock_find_bound_socket(&dst);
+                                                                   lock_sock(sk);
+                                                                   case TCP_SYN_SENT:
+                                                                   virtio_transport_recv_connecting()
+                                                                     sk->sk_state = TCP_ESTABLISHED;
+                                                                   release_sock(sk);
 
-	if (has_perfctr_core) {
+                                                               kill(connect(B));
+      lock_sock(sk);
+      if (signal_pending(current)) {
+      sk->sk_state = sk->sk_state == TCP_ESTABLISHED ? TCP_CLOSING : TCP_CLOSE;
+      sock->state = SS_UNCONNECTED;    // [1]
+      release_sock(sk);
 
-static bool get_pmu_counter_msrs(int idx, uint32_t *eventsel, uint32_t *pmc)
-{
-	if (this_cpu_has(X86_FEATURE_PERFCTR_CORE)) {
-		*eventsel = MSR_F15H_PERF_CTL + idx * 2;
-		*pmc = MSR_F15H_PERF_CTR + idx * 2;
-	} else {
-		*eventsel = MSR_K7_EVNTSEL0 + idx;
-		*pmc = MSR_K7_PERFCTR0 + idx;
-	}
-	return true;
-}
+  connect(B, {cid: VMADDR_CID_HYPERVISOR, port: 1024})
+    vsock_connect(B)
+      lock_sock(sk);
+      vsock_assign_transport()
+        virtio_transport_release()
+          virtio_transport_close()
+            if (!(sk->sk_state == TCP_ESTABLISHED || sk->sk_state == TCP_CLOSING))
+            virtio_transport_shutdown()
+              virtio_transport_send_pkt_info()
+                vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
+                  queue_work(vsock_loopback_work)
+            schedule_delayed_work(&vsk->close_work, VSOCK_CLOSE_TIMEOUT);	// [5]
+        vsock_deassign_transport()
+          vsk->transport = NULL;
+        return -ESOCKTNOSUPPORT;
+      release_sock(sk);
+                                                               vsock_loopback_work()
+                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
+                                                                   virtio_transport_recv_connected()
+                                                                     virtio_transport_reset()
+                                                                       virtio_transport_send_pkt_info()
+                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RST)
+                                                                           queue_work(vsock_loopback_work)
+  listen(B)
+    vsock_listen()
+      if (sock->state != SS_UNCONNECTED)    // [2]
+      sk->sk_state = TCP_LISTEN;    // [3]
 
-#define for_each_pmu_counter(_i, _nr_counters, _eventsel, _pmc)		\
-	for (_i = 0; i < _nr_counters; _i++)				\
-		if (get_pmu_counter_msrs(_i, &_eventsel, _pmc))		\
+                                                               vsock_loopback_work()
+                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RST)
+								   if ((sk->sk_state != TCP_LISTEN && vsk->transport != &t->transport)) {    // [4]
+								   ...
+							       
+  virtio_transport_close_timeout()
+    virtio_transport_do_close()
+      vsock_stream_has_data()
+        return vsk->transport->stream_has_data(vsk);    // null-ptr-deref 
 
-static void guest_test_core_events(void)
-{
-	uint8_t nr_counters = guest_nr_core_counters();
-	uint32_t eventsel_msr, pmc_msr;
-	int i, j;
+```
+(Yes, This is quite a crazy scenario, but it can actually be induced)
 
-	for (i = 0; i < NR_AMD_ZEN_EVENTS; i++) {
-		for_each_pmu_counter(j, nr_counters, eventsel_msr, pmc_msr) {
-			uint64_t eventsel = ARCH_PERFMON_EVENTSEL_OS |
-					    ARCH_PERFMON_EVENTSEL_ENABLE |
-					    amd_pmu_zen_events[event_idx];
+Since sock->state is set to SS_UNCONNECTED during the first connect()[1], 
+it can pass the sock->state check[2] in vsock_listen() and set 
+sk->sk_state to TCP_LISTEN[3].
+If this happens, the check in the patch with 
+`sk->sk_state != TCP_LISTEN` will pass[4], and a null-ptr-deref can 
+still occur.
 
-			GUEST_TEST_EVENT(pmc_msr, eventsel_msr, eventsel, "");
-			guest_assert_amd_event_count(i, j, pmc_msr);
+More specifically, because the sk_state has changed to TCP_LISTEN, 
+virtio_transport_recv_disconnecting() will not be called by the 
+loopback worker. However, a null-ptr-deref may occur in 
+virtio_transport_close_timeout(), which is scheduled by 
+virtio_transport_close() called in the flow of the second connect()[5].
+(The patch no longer cancels the virtio_transport_close_timeout() worker)
 
-			if (!is_forced_emulation_enabled)
-				continue;
-
-			GUEST_TEST_EVENT(pmc_msr, eventsel_msr, eventsel, KVM_FEP);
-			guest_assert_amd_event_count(i, j, pmc_msr);
-		}
-	}
-}
+And even if the `sk->sk_state != TCP_LISTEN` check is removed from the 
+patch, it seems that a null-ptr-deref will still occur due to 
+virtio_transport_close_timeout(). 
+It might be necessary to add worker cancellation at the 
+appropriate location.
 
