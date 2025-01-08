@@ -1,145 +1,197 @@
-Return-Path: <kvm+bounces-34788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24310A05F85
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 16:01:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12105A05F37
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 15:45:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DD823A6D1B
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 15:01:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA26D1889072
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 14:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907051FCFF5;
-	Wed,  8 Jan 2025 15:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAD319B586;
+	Wed,  8 Jan 2025 14:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wTKCtLEm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GgZig/2L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615FF15350B
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 15:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4AF1FCCF6
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 14:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736348464; cv=none; b=t1g16yNCwjvzt7BdYnoh5SS7i4zKKBP42AXTKkl56gfrS1lYDo5KimdbvEAfubZPjqb1tKVmfrn98Kwx6Mw8kku3xeEkbqfvtJ/UZuKN27A33jBYkvlWu6WL1SKD9T4gFGbFzw4+/2SVlIn/hVYuIVhAlAZEtgny05SeQQUeFzY=
+	t=1736347395; cv=none; b=i7HxA5MLfgKC67dD32PZCf12I5g1WeXDglJzc7TA5lUe/ZWdBzSjQoZX3Lr0otN+FvgXTVP4XQz//qE1rXaSLKnAmjd6ZfabF2ywVzqvhjKYyuNw91jOkoWvGtzUdDsDcUirOdydGxQnoxXypOMyNdWhe/xaC9AkigyE+f6tYz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736348464; c=relaxed/simple;
-	bh=nyV2yl3XmNDhQ40W7YYCBaBWCDclqEByPJGKII1QDBA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nfat2+xKRBQRSgYbpoeas3z74EfZF4ZwL97Ukd7EEny2ioIeNcMQFEIvACG/gi55URJCySCDdSc5f9MNckwt3XlwoH6j5x5cWAD5ydM0NWdkXI/lO3l5LUSWP+W6Hfo6scuBWy5agy4KAs9i7bR/2L/p8kzIlHKJfw9NaJfRUDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wTKCtLEm; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2efc3292021so38942462a91.1
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 07:01:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736348463; x=1736953263; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/BxpHeQa6+oVcHk1D5x+DCISdWdWpyOX6w9TVx4KjZs=;
-        b=wTKCtLEmrkvOllL+NbJrzl5JdEYnqCasorgC26rk+s9Edr/zfpzvGqGv6bfRs6zTmQ
-         w/O/weH//g9a2zUwA8vyCGV0g182INkzpgilen5s05iPmOIxvOq4CtIAz2DiFd6z28LZ
-         bXHq/TjMLM40a0OO6yA3lASpJPaDZasSYjKC82+xfaElrdPCM7UgjcNIThZXYj6UA2BI
-         T7dVSg2BAz+EgxZFr7YzE0og91ZG2CWR2z1UqjTZ1kLPhIKzJmYNsMvdJMsvUilNI0+8
-         4M6hmw5mzeU3zFMrf9AKdUWKFaaV/uktoal+eUu5GDaJSigZmycO2sARmUgwN1guuP5z
-         IRdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736348463; x=1736953263;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/BxpHeQa6+oVcHk1D5x+DCISdWdWpyOX6w9TVx4KjZs=;
-        b=CSFNJ7xWE8PMe9vaHGAsp9nCV9QvpQtFpH8yJtmnA/q0AMIdAaBSe4MY5UBPUDcVBa
-         3zM+n0wEvLUzruCADtQjpma8WPMlpyORTsbXZkj+YicZRb2FU3pJUhkfFhAs+ND+0p2q
-         ggxTh1CFUywPOpKzewmURyo7LDIa3aalRfIGIp7Cq+4E3fdHdYo7oPfVKL2C8HFXCckc
-         Vx11Dh12ksnrvf38iq4Pkoj/CdRDJWqGZGuq6A3hZz60orTtzRNwHC9r8+n9L/tzNqIK
-         z78Vvx9OwkYa0S/aaM4rTqDT8Vh1KOTh1BaC8+YfB9mNYFmVCFrsQGenuJZSfFD9TkWZ
-         lLxg==
-X-Forwarded-Encrypted: i=1; AJvYcCX8Wk2zHX+IA2XXzQZfNub3S/d6zN9B27Pt1precq2byWgID/gaykggFPzL37+MxpbA+dI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNnQVQf0XSL8EnPK+ftujGmzc4L0tgx8LXH50oNYBVH4IX7OAs
-	S3QcvKE0CBWTaymXgVzkZ1UPaVhBYIrkLF1LkfSBcmAjlwQuo4m4ZSGd5Si2wUZBjtaOG9L05F0
-	63Q==
-X-Google-Smtp-Source: AGHT+IHPEwOjIRpY3qflTXtWlCZWrnzWqpeJtMdMBn2fUt52cnKKWya/HJRk3WY+oGQFCmrz/1mIlOBmAf0=
-X-Received: from pfbcv10.prod.google.com ([2002:a05:6a00:44ca:b0:725:e60b:1e4f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:178e:b0:725:f4c6:6b81
- with SMTP id d2e1a72fcca58-72d21f459e8mr4979296b3a.2.1736348462619; Wed, 08
- Jan 2025 07:01:02 -0800 (PST)
-Date: Wed, 8 Jan 2025 07:01:01 -0800
-In-Reply-To: <Z34NGyZL7G_j716N@tlindgre-MOBL1>
+	s=arc-20240116; t=1736347395; c=relaxed/simple;
+	bh=8HbL3R0maWyTV35bsO/QEjd/9N1bmV+pEYCDDGAK5iA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N6d1gQFFxi27QhfiDiWddum/G6ktdgy54/6mw5OMv5J96fpSrn+3a5RE7VjqVwcKRztAYIOVM5m9R6IOCfgENa6DP7vW4BGX/aAaxPzHbtrmgOXwD5SKWTv2dPFJxfLo1eJ4SI+DcGycQ/1VAUWXQ2S2WYNFT3sVF1OdFl+36tY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GgZig/2L; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736347394; x=1767883394;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8HbL3R0maWyTV35bsO/QEjd/9N1bmV+pEYCDDGAK5iA=;
+  b=GgZig/2LreakVxcdX4Grmrbi/JcLnK0k09Ss0rR3d8bPyCEi4LoU+Clr
+   KDzCXmhFTwb9XkkIMsJShxe31X+2Q3EzH7hwVm+5n5zrE7Hj4nIW7gP0Q
+   dAG0YiFMveERAuV6/mldPnxdwjpRhP3gd7//L2UfhK4j2ZX+ytiZ5GX0E
+   prAmD9PKeZchvU82KOmc4JBMTiSM/8FJasb0z2HZRZJ00evCTo7rOqvq5
+   a6WVl6PFKumfy5htQ1ATiSlH8uTvEnC2nC1uYjwmS9tOkob9cDckTMR8r
+   Ux0KCyP8Husy8+scTvv3Hh9X1CkNqWF0zY0soqEZRuKUTLIBnvbpJIdzF
+   w==;
+X-CSE-ConnectionGUID: sjkDJEaaQtWlPuERyUjuUA==
+X-CSE-MsgGUID: 39M4sf9pQNaYZ3HjarqfDA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="36737331"
+X-IronPort-AV: E=Sophos;i="6.12,298,1728975600"; 
+   d="scan'208";a="36737331"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 06:43:13 -0800
+X-CSE-ConnectionGUID: gEa0wccwQR23jwx9YNum2Q==
+X-CSE-MsgGUID: QmPF3t3GQnSNNwgQ+iEEkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="103969384"
+Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
+  by orviesa008.jf.intel.com with ESMTP; 08 Jan 2025 06:43:09 -0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Alireza Sanaee <alireza.sanaee@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>
+Cc: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v7 0/5] i386: Support SMP Cache Topology
+Date: Wed,  8 Jan 2025 23:01:45 +0800
+Message-Id: <20250108150150.1258529-1-zhao1.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
- <CABgObfZsF+1YGTQO_+uF+pBPm-i08BrEGCfTG8_o824776c=6Q@mail.gmail.com>
- <94e37a815632447d4d16df0a85f3ec2e346fca49.camel@intel.com>
- <Z3zZw2jYII2uhoFx@tlindgre-MOBL1> <7f8d0beb-cc02-467d-ae2a-10e22571e5cf@suse.com>
- <Z34NGyZL7G_j716N@tlindgre-MOBL1>
-Message-ID: <Z36TLcX1kOe1ltjp@google.com>
-Subject: Re: [PATCH v2 00/25] TDX vCPU/VM creation
-From: Sean Christopherson <seanjc@google.com>
-To: Tony Lindgren <tony.lindgren@linux.intel.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, Kai Huang <kai.huang@intel.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, Reinette Chatre <reinette.chatre@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 08, 2025, Tony Lindgren wrote:
-> On Tue, Jan 07, 2025 at 02:41:51PM +0200, Nikolay Borisov wrote:
-> > On 7.01.25 =D0=B3. 9:37 =D1=87., Tony Lindgren wrote:
-> > > --- a/arch/x86/kvm/lapic.c
-> > > +++ b/arch/x86/kvm/lapic.c
-> > > @@ -139,6 +139,8 @@ __read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noa=
-pic_vcpu);
-> > >   EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
-> > >   __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_hw_disabled, HZ=
-);
-> > > +EXPORT_SYMBOL_GPL(apic_hw_disabled);
-> >=20
-> > Is it really required to expose this symbol? apic_hw_disabled is define=
-d as
-> > static inline in the header?
+Hi folks,
 
-No, apic_hw_disabled can't be "static inline", because it's a variable, not=
- a
-function.
+This is my v7.
 
-> For loadable modules yes, otherwise we'll get:
->=20
-> ERROR: modpost: "apic_hw_disabled" [arch/x86/kvm/kvm-intel.ko] undefined!
->=20
-> This is similar to the EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu) already
-> there.
+Compared with v6 [1], v7 dropped the "thread" level cache topology
+(cache per thread):
 
-Heh, which is a hint that you're using the wrong helper.  TDX should check
-lapic_in_kernel(), not kvm_apic_present().  The former verifies that local =
-APIC
-emulation/virtualization is handed in-kernel, i.e. by KVM.  The latter chec=
-ks
-that the local APIC is in-kernel *and* that the vCPU's local APIC is hardwa=
-re
-enabled, and checking that the local APIC is hardware enabled is unnecessar=
-y
-and only works by sheer dumb luck.
+ - Patch 1 is the new patch to reject "thread" parameter for smp-cache.
+ - Ptach 2 dropped cache per thread support.
+ (Others remain unchanged.)
 
-The only reason kvm_create_lapic() stuffs the enable bit is to avoid toggli=
-ng
-the static key, which incurs costly IPIs to patch kernel text.  If
-apic_hw_disabled were to be removed (which is somewhat seriously being cons=
-idered),
-this code would be deleted and TDX would break.
+There're several reasons:
 
-	/*
-	 * Stuff the APIC ENABLE bit in lieu of temporarily incrementing
-	 * apic_hw_disabled; the full RESET value is set by kvm_lapic_reset().
-	 */
-	vcpu->arch.apic_base =3D MSR_IA32_APICBASE_ENABLE;
+ * Currently, neither i386 nor ARM have real hardware support for per-
+   thread cache.
+ * Supporting this special cache topology on ARM requires extra effort
+   [2].
+
+So it is unnecessary to support it at this moment, even though per-
+thread cache might have potential scheduling benefits for VMs without
+CPU affinity.
+
+In the future, if there is a clear demand for this feature, the correct
+approach would be to add a new control field in MachineClass.smp_props
+and enable it only for the machines that require it.
+
+
+This series is based on the master branch at commit aa3a285b5bc5 ("Merge
+tag 'mem-2024-12-21' of https://github.com/davidhildenbrand/qemu into
+staging").
+
+Smp-cache support of ARM side can be found at [3].
+
+
+Background
+==========
+
+The x86 and ARM (RISCV) need to allow user to configure cache properties
+(current only topology):
+ * For x86, the default cache topology model (of max/host CPU) does not
+   always match the Host's real physical cache topology. Performance can
+   increase when the configured virtual topology is closer to the
+   physical topology than a default topology would be.
+ * For ARM, QEMU can't get the cache topology information from the CPU
+   registers, then user configuration is necessary. Additionally, the
+   cache information is also needed for MPAM emulation (for TCG) to
+   build the right PPTT. (Originally from Jonathan)
+
+
+About smp-cache
+===============
+
+The API design has been discussed heavily in [4].
+
+Now, smp-cache is implemented as a array integrated in -machine. Though
+-machine currently can't support JSON format, this is the one of the
+directions of future.
+
+An example is as follows:
+
+smp_cache=smp-cache.0.cache=l1i,smp-cache.0.topology=core,smp-cache.1.cache=l1d,smp-cache.1.topology=core,smp-cache.2.cache=l2,smp-cache.2.topology=module,smp-cache.3.cache=l3,smp-cache.3.topology=die
+
+"cache" specifies the cache that the properties will be applied on. This
+field is the combination of cache level and cache type. Now it supports
+"l1d" (L1 data cache), "l1i" (L1 instruction cache), "l2" (L2 unified
+cache) and "l3" (L3 unified cache).
+
+"topology" field accepts CPU topology levels including "core", "module",
+"cluster", "die", "socket", "book", "drawer" and a special value
+"default". (Note, now, in v7, smp-cache doesn't support "thread".)
+
+The "default" is introduced to make it easier for libvirt to set a
+default parameter value without having to care about the specific
+machine (because currently there is no proper way for machine to
+expose supported topology levels and caches).
+
+If "default" is set, then the cache topology will follow the
+architecture's default cache topology model. If other CPU topology level
+is set, the cache will be shared at corresponding CPU topology level.
+
+
+[1]: Patch v6: https://lore.kernel.org/qemu-devel/20241219083237.265419-1-zhao1.liu@intel.com/
+[2]: Gap of cache per thread for ARM: https://lore.kernel.org/qemu-devel/Z3efFsigJ6SxhqMf@intel.com/#t
+[3]: ARM smp-cache: https://lore.kernel.org/qemu-devel/20250102152012.1049-1-alireza.sanaee@huawei.com/
+[4]: API disscussion: https://lore.kernel.org/qemu-devel/8734ndj33j.fsf@pond.sub.org/
+
+Thanks and Best Regards,
+Zhao
+---
+Alireza Sanaee (1):
+  i386/cpu: add has_caches flag to check smp_cache configuration
+
+Zhao Liu (4):
+  hw/core/machine: Reject thread level cache
+  i386/cpu: Support module level cache topology
+  i386/cpu: Update cache topology with machine's configuration
+  i386/pc: Support cache topology in -machine for PC machine
+
+ hw/core/machine-smp.c |  9 ++++++
+ hw/i386/pc.c          |  4 +++
+ include/hw/boards.h   |  3 ++
+ qemu-options.hx       | 30 +++++++++++++++++-
+ target/i386/cpu.c     | 71 ++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 115 insertions(+), 2 deletions(-)
+
+-- 
+2.34.1
+
 
