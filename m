@@ -1,295 +1,173 @@
-Return-Path: <kvm+bounces-34905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34907-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54F1CA07404
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 11:59:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 577E4A07434
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 12:08:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14BF6162F7C
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 10:59:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D73B3165F6A
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 11:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F2C2165FB;
-	Thu,  9 Jan 2025 10:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9A82165E8;
+	Thu,  9 Jan 2025 11:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M+T7hHue"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yu8QvwhI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E51215F4C
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 10:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E9A204C3C;
+	Thu,  9 Jan 2025 11:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736420374; cv=none; b=WjyI8JntOdTsPsIl7GeopJxHLcHxvJzf1IapgelglW6E/aspGYoDbC2Vjl32N7cRdZwYiEE9Ba+n3OT7D1IqmKbm4P/s+aseyj+Qgltnn3aC7goo3nIWk3tRmLc5NhfgsbbDXsKPcCe8wXowVqDr6iXpDhJGdh2Ov9yKWuon8eA=
+	t=1736420878; cv=none; b=Pb1kYg2E1aybsr1AxjJKXVZZvacoMiOBvWG+tc+L67BxD2O0DOqOhCPSxZ7dm/iMXHUMyQrMW9d03iNjog/MJ43cgJWzS+NovXcEdm95Z+EqJ/LTB61LU8sOzB5EzZB8+3ICX0i+Vkzsg2p7pXSQlKxoVLafKMfPBrndQUxRk7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736420374; c=relaxed/simple;
-	bh=8gTxMeuerEWpQWjnJQBfXbFvuDIGI6pIRCOcuKQzVF4=;
+	s=arc-20240116; t=1736420878; c=relaxed/simple;
+	bh=+rokNR1TBRe3TqEAQHJ6WAVWiY++bf7dkHnY6VnhOIw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mz7un4NnjlfW83Tzm7XdIH5Et0CCqkPD71DvU4ywIwXCKbbjY1p6ok3gcRKL6IS2c6umhYBDev1oGC6uLdM1rso8uUwByf2dkBwIr8fzRoFG9Ln9iKuZH5pKNGybKbLWDnEcK5bPASzWeReTjgYcXoohUBgL7brCEK2UVJdPOd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M+T7hHue; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736420371;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bBjt704Q5NUC3thmEpPZtPuoZ1c7o5TcD6pXJ6D3qsk=;
-	b=M+T7hHueD510YjD1Zv0v3WcMLBL/w3YH3/ZJeH+08VhYYlTLtmpZGbtX8h/n6yLWM08Ruu
-	JIs7YERLfEM5k7NqRoJaC9fsjnIQYcobVUJQTHsCQIRMoy+JzkGsbsRy+0FoU10EA6x3Xh
-	8q0s8CYdmNkxClVj1Z0yYa8956SzjXc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-yPyQC0G3NAirNeLhdXf4qQ-1; Thu, 09 Jan 2025 05:59:30 -0500
-X-MC-Unique: yPyQC0G3NAirNeLhdXf4qQ-1
-X-Mimecast-MFC-AGG-ID: yPyQC0G3NAirNeLhdXf4qQ
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-aa691c09772so77931566b.1
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 02:59:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736420369; x=1737025169;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bBjt704Q5NUC3thmEpPZtPuoZ1c7o5TcD6pXJ6D3qsk=;
-        b=Ki7kteZmBMwBsTkF/FDmQ9L49lph/aqQ98ksc+tYvgj8/e+IzCy47OlYcGAwXWKubf
-         mcaT+NdftIueD9XUEDnftPdLLZZMhCnXJP3VBZ9y8W7Bm/g2LcmCtrtmj6H7aKooXDsx
-         FWUMxKWEtH04TsMJQRbmyfwgP4hJz4oBQywAZt8CVvcGZsULT1226KbP/9vZpCVJJyrZ
-         /nRVWQtmuzV1UAma98hE7uieTZr0sl+/yXWFPGvBSV7B2TIn4G0WBNdCLuBst4QkT4gg
-         KmJQ77k2yXpjshG18pZ0pN8+DlMM7x2m7wth3S5R4+fVAXTHqkCA50+ql9DIRw4K5zdD
-         rmTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/aMqlownPKV19U2YwfcLAmL5NTvA/o5x4Jd5cVTCKclGmXlc6BD8d2D6JbI4+7WdRJjw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKDxr6lAsg+1HyNQzXQH/y+wv4kBZCn8Ioxf6v3lcAwC6Dxr/8
-	atvKmB6KFDY78ylz7+MZ+sDTyTk+ZS40Pcw42NLTB1tpZuorLsvGXwOEk5rBKDSqtGPt5f1oj/t
-	c2ileHQQvs3CENtjpZaUyQsjatj2DhVFSdAIwOxjGtGn6TR6ILQ==
-X-Gm-Gg: ASbGncu7LQnX3wXmPBZXI1rLG/cUTekFr5RVYt7gAO++bvKXaZcwX2ysgoxWor4FCjB
-	gyn8ryjYqqT6M9yg8tP5TDOr4+jLV7slTzOFras4EGCARVxUKKleTv3sm1idgAIgQzEvbu4MFEs
-	avoq3p692gEp8WIpHPe0Ky3XiCv4Y/qt7yI0YtmbR5CoIM9f6Dj+Axv8YB9EkSEVJFP+1QRbuCB
-	TRZERiiMKANOS/tmj4Gg8jRQKlua359cq/bGxCY9HSnO3oay+eWcEW1gjU=
-X-Received: by 2002:a17:907:720f:b0:aa6:691f:20a9 with SMTP id a640c23a62f3a-ab2ab66dd04mr524978566b.4.1736420368681;
-        Thu, 09 Jan 2025 02:59:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGrT5EksSyWrHn723GTlT0TpsOhz9cpWIfw9mWd3UiShHT9qOMymVSjg8KppWEZVOo07fXQ5w==
-X-Received: by 2002:a17:907:720f:b0:aa6:691f:20a9 with SMTP id a640c23a62f3a-ab2ab66dd04mr524973966b.4.1736420367896;
-        Thu, 09 Jan 2025 02:59:27 -0800 (PST)
-Received: from sgarzare-redhat ([5.77.115.218])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c9563ae8sm59395266b.129.2025.01.09.02.59.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 02:59:27 -0800 (PST)
-Date: Thu, 9 Jan 2025 11:59:21 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Hyunwoo Kim <v4bel@theori.io>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>, 
-	virtualization@lists.linux.dev, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Luigi Leonardi <leonardi@redhat.com>, bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org, 
-	imv4bel@gmail.com
-Subject: Re: [PATCH net 1/2] vsock/virtio: discard packets if the transport
- changes
-Message-ID: <x3gyqgbor4syfy56j5qolppiec3du4hbkywncmlipt2sw6bp46@vtk4apoy7w3o>
-References: <20250108180617.154053-1-sgarzare@redhat.com>
- <20250108180617.154053-2-sgarzare@redhat.com>
- <Z37Sh+utS+iV3+eb@v4bel-B760M-AORUS-ELITE-AX>
- <77plpkw3mp4r3ue4ubmh4yhqfo777koiu65dqfqfxmjgc5uq57@aifi6mhtgtuj>
- <Z3+TSNfTJr2X8oQV@v4bel-B760M-AORUS-ELITE-AX>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RF+iIrWXS7HHBc7Ax2C05DYifstAsCKNKcXvSC1zoBg3lZSJNOnrFyDPI60nU/QodTpt0XXKT5VrJ5Gp65Q87BRRimdFz8EKTeeqLrxBuWJdNUgux2ZN6J+nP8po3LUAXq0gp76GaEvHCuMsuU6oGWZq70yCJXThxzi1sssB4Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yu8QvwhI; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736420876; x=1767956876;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+rokNR1TBRe3TqEAQHJ6WAVWiY++bf7dkHnY6VnhOIw=;
+  b=Yu8QvwhIklD6R96Mo7/pLl+Thr9iUG/xh7+neZft4Dg3puHijwxlPlNN
+   Bed5JeIu0qiiZv8VCsTogUZDgpVots6HFfjl79N5sMt3AJ3z4SPX5xliG
+   Q7nLLoTfA5+N+lh2LnWKZpd64i099vsXdA8lI33iP8uT7h31TLzo85r2H
+   XJ9klZSxB5u5EkMHi8xQhCCYxuZw88wOZkgmqxxtgRv10mgRJk2+ZcG4S
+   b6I4Q2puj+jVLXKExq6S4lQwEkcx2fkjz5nAaZNHq8KanC27TaMSiYsbW
+   bHbPgA+S693JnVqTB/GSXy8Bh9Ls4HMv33tG4FetKmmggp5hP3TKR9Qg1
+   w==;
+X-CSE-ConnectionGUID: QPRw3ZLcQZyEvJpsoJb1+Q==
+X-CSE-MsgGUID: WpvkjXsrTgyXi2cmGU5e0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="48090745"
+X-IronPort-AV: E=Sophos;i="6.12,301,1728975600"; 
+   d="scan'208";a="48090745"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 03:07:56 -0800
+X-CSE-ConnectionGUID: JZV1fD2DSIei0Kb+5rkS+Q==
+X-CSE-MsgGUID: U75bsEzcRwOUOMGJwatAdA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="108432058"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa003.jf.intel.com with ESMTP; 09 Jan 2025 03:07:51 -0800
+Date: Thu, 9 Jan 2025 07:06:48 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>,
+	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+Message-ID: <Z38FCOPE7WPprYhx@yilunxu-OptiPlex-7050>
+References: <20250107142719.179636-2-yilun.xu@linux.intel.com>
+ <b1f3c179-31a9-4592-a35b-b96d2e8e8261@amd.com>
+ <20250108132358.GP5556@nvidia.com>
+ <f3748173-2bbc-43fa-b62e-72e778999764@amd.com>
+ <20250108145843.GR5556@nvidia.com>
+ <5a858e00-6fea-4a7a-93be-f23b66e00835@amd.com>
+ <20250108162227.GT5556@nvidia.com>
+ <Z37HpvHAfB0g9OQ-@phenom.ffwll.local>
+ <Z37QaIDUgiygLh74@yilunxu-OptiPlex-7050>
+ <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z3+TSNfTJr2X8oQV@v4bel-B760M-AORUS-ELITE-AX>
+In-Reply-To: <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
 
-On Thu, Jan 09, 2025 at 04:13:44AM -0500, Hyunwoo Kim wrote:
->On Thu, Jan 09, 2025 at 10:01:31AM +0100, Stefano Garzarella wrote:
->> On Wed, Jan 08, 2025 at 02:31:19PM -0500, Hyunwoo Kim wrote:
->> > On Wed, Jan 08, 2025 at 07:06:16PM +0100, Stefano Garzarella wrote:
->> > > If the socket has been de-assigned or assigned to another transport,
->> > > we must discard any packets received because they are not expected
->> > > and would cause issues when we access vsk->transport.
->> > >
->> > > A possible scenario is described by Hyunwoo Kim in the attached link,
->> > > where after a first connect() interrupted by a signal, and a second
->> > > connect() failed, we can find `vsk->transport` at NULL, leading to a
->> > > NULL pointer dereference.
->> > >
->> > > Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
->> > > Reported-by: Hyunwoo Kim <v4bel@theori.io>
->> > > Reported-by: Wongi Lee <qwerty@theori.io>
->> > > Closes: https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
->> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> > > ---
->> > >  net/vmw_vsock/virtio_transport_common.c | 7 +++++--
->> > >  1 file changed, 5 insertions(+), 2 deletions(-)
->> > >
->> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> > > index 9acc13ab3f82..51a494b69be8 100644
->> > > --- a/net/vmw_vsock/virtio_transport_common.c
->> > > +++ b/net/vmw_vsock/virtio_transport_common.c
->> > > @@ -1628,8 +1628,11 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
->> > >
->> > >  	lock_sock(sk);
->> > >
->> > > -	/* Check if sk has been closed before lock_sock */
->> > > -	if (sock_flag(sk, SOCK_DONE)) {
->> > > +	/* Check if sk has been closed or assigned to another transport before
->> > > +	 * lock_sock (note: listener sockets are not assigned to any transport)
->> > > +	 */
->> > > +	if (sock_flag(sk, SOCK_DONE) ||
->> > > +	    (sk->sk_state != TCP_LISTEN && vsk->transport != &t->transport)) {
->> >
->> > If a race scenario with vsock_listen() is added to the existing
->> > race scenario, the patch can be bypassed.
->> >
->> > In addition to the existing scenario:
->> > ```
->> >                     cpu0                                                      cpu1
->> >
->> >                                                               socket(A)
->> >
->> >                                                               bind(A, {cid: VMADDR_CID_LOCAL, port: 1024})
->> >                                                                 vsock_bind()
->> >
->> >                                                               listen(A)
->> >                                                                 vsock_listen()
->> >  socket(B)
->> >
->> >  connect(B, {cid: VMADDR_CID_LOCAL, port: 1024})
->> >    vsock_connect()
->> >      lock_sock(sk);
->> >      virtio_transport_connect()
->> >        virtio_transport_connect()
->> >          virtio_transport_send_pkt_info()
->> >            vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_REQUEST)
->> >              queue_work(vsock_loopback_work)
->> >      sk->sk_state = TCP_SYN_SENT;
->> >      release_sock(sk);
->> >                                                               vsock_loopback_work()
->> >                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_REQUEST)
->> >                                                                   sk = vsock_find_bound_socket(&dst);
->> >                                                                   virtio_transport_recv_listen(sk, skb)
->> >                                                                     child = vsock_create_connected(sk);
->> >                                                                     vsock_assign_transport()
->> >                                                                       vvs = kzalloc(sizeof(*vvs), GFP_KERNEL);
->> >                                                                     vsock_insert_connected(vchild);
->> >                                                                       list_add(&vsk->connected_table, list);
->> >                                                                     virtio_transport_send_response(vchild, skb);
->> >                                                                       virtio_transport_send_pkt_info()
->> >                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RESPONSE)
->> >                                                                           queue_work(vsock_loopback_work)
->> >
->> >                                                               vsock_loopback_work()
->> >                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RESPONSE)
->> >                                                                   sk = vsock_find_bound_socket(&dst);
->> >                                                                   lock_sock(sk);
->> >                                                                   case TCP_SYN_SENT:
->> >                                                                   virtio_transport_recv_connecting()
->> >                                                                     sk->sk_state = TCP_ESTABLISHED;
->> >                                                                   release_sock(sk);
->> >
->> >                                                               kill(connect(B));
->> >      lock_sock(sk);
->> >      if (signal_pending(current)) {
->> >      sk->sk_state = sk->sk_state == TCP_ESTABLISHED ? TCP_CLOSING : TCP_CLOSE;
->> >      sock->state = SS_UNCONNECTED;    // [1]
->> >      release_sock(sk);
->> >
->> >  connect(B, {cid: VMADDR_CID_HYPERVISOR, port: 1024})
->> >    vsock_connect(B)
->> >      lock_sock(sk);
->> >      vsock_assign_transport()
->> >        virtio_transport_release()
->> >          virtio_transport_close()
->> >            if (!(sk->sk_state == TCP_ESTABLISHED || sk->sk_state == TCP_CLOSING))
->> >            virtio_transport_shutdown()
->> >              virtio_transport_send_pkt_info()
->> >                vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
->> >                  queue_work(vsock_loopback_work)
->> >            schedule_delayed_work(&vsk->close_work, VSOCK_CLOSE_TIMEOUT);	// [5]
->> >        vsock_deassign_transport()
->> >          vsk->transport = NULL;
->> >        return -ESOCKTNOSUPPORT;
->> >      release_sock(sk);
->> >                                                               vsock_loopback_work()
->> >                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_SHUTDOWN)
->> >                                                                   virtio_transport_recv_connected()
->> >                                                                     virtio_transport_reset()
->> >                                                                       virtio_transport_send_pkt_info()
->> >                                                                         vsock_loopback_send_pkt(VIRTIO_VSOCK_OP_RST)
->> >                                                                           queue_work(vsock_loopback_work)
->> >  listen(B)
->> >    vsock_listen()
->> >      if (sock->state != SS_UNCONNECTED)    // [2]
->> >      sk->sk_state = TCP_LISTEN;    // [3]
->> >
->> >                                                               vsock_loopback_work()
->> >                                                                 virtio_transport_recv_pkt(VIRTIO_VSOCK_OP_RST)
->> > 								   if ((sk->sk_state != TCP_LISTEN && vsk->transport != &t->transport)) {    // [4]
->> > 								   ...
->> > 							
->> >  virtio_transport_close_timeout()
->> >    virtio_transport_do_close()
->> >      vsock_stream_has_data()
->> >        return vsk->transport->stream_has_data(vsk);    // null-ptr-deref
->> >
->> > ```
->> > (Yes, This is quite a crazy scenario, but it can actually be induced)
->> >
->> > Since sock->state is set to SS_UNCONNECTED during the first connect()[1],
->> > it can pass the sock->state check[2] in vsock_listen() and set
->> > sk->sk_state to TCP_LISTEN[3].
->> > If this happens, the check in the patch with
->> > `sk->sk_state != TCP_LISTEN` will pass[4], and a null-ptr-deref can
->> > still occur.)
->> >
->> > More specifically, because the sk_state has changed to TCP_LISTEN,
->> > virtio_transport_recv_disconnecting() will not be called by the
->> > loopback worker. However, a null-ptr-deref may occur in
->> > virtio_transport_close_timeout(), which is scheduled by
->> > virtio_transport_close() called in the flow of the second connect()[5].
->> > (The patch no longer cancels the virtio_transport_close_timeout() worker)
->> >
->> > And even if the `sk->sk_state != TCP_LISTEN` check is removed from the
->> > patch, it seems that a null-ptr-deref will still occur due to
->> > virtio_transport_close_timeout().
->> > It might be necessary to add worker cancellation at the
->> > appropriate location.
->>
->> Thanks for the analysis!
->>
->> Do you have time to cook a proper patch to cover this scenario?
->> Or we should mix this fix together with your patch (return 0 in
->> vsock_stream_has_data()) while we investigate a better handling?
->
->For now, it seems better to merge them together.
+>  So I guess my first question is, which locking rules do you want here for
+>  pfn importers?
+> 
+>  follow_pfn() is unwanted for private MMIO, so dma_resv_lock.
+> 
+>    As Sima explained you either have follow_pfn() and mmu_notifier or you
+>    have DMA addresses and dma_resv lock / dma_fence.
+> 
+>    Just giving out PFNs without some lifetime associated with them is one of
+>    the major problems we faced before and really not something you can do.
 
-Okay, since both you and Michael agree on that, I'll include your 
-changes in this series, but adding a warning message, since it should 
-not happen.
+I'm trying to make exporter give out PFN with lifetime control via
+move_notify() in this series. May not be conceptually correct but seems
+possible.
 
-Is that fine with you?
+> 
+> 
+>  If mmu notifiers is fine, then I think the current approach of follow_pfn
+>  should be ok. But if you instead dma_resv_lock rules (or the cpu mmap
+>  somehow is an issue itself), then I think the clean design is create a new
+> 
+>  cpu mmap() is an issue, this series is aimed to eliminate userspace
+>  mapping for private MMIO resources.
+> 
+>    Why?
 
->
->It seems that covering this scenario will require more analysis and 
->testing.
+OK, I can start from here.
 
-Yeah, scheduling a task during the release is tricky, especially when we 
-are changing the transport, so I think we should handle that better.
+It is about the Secure guest, or CoCo VM. The memory and MMIOs assigned
+to this kind of guest is unaccessable to host itself, by leveraging HW
+encryption & access control technology (e.g. Intel TDX, AMD SEV-SNP ...).
+This is to protect the tenant data being stolen by CSP itself.
 
-One idea that I have it to cancel delayed works in 
-virtio_transport_destruct(), I'll test it a bit and add a patch for that 
-in the next version of this series.
+The impact is when host accesses the encrypted region, bad things
+happen to system, e.g. memory corruption, MCE. Kernel is trying to
+mitigate most of the impact by alloc and assign user unmappable memory
+resources (private memory) to guest, which prevents userspace
+accidents. guest_memfd is the private memory provider that only allows
+for KVM to position the page/pfn by fd + offset and create secondary
+page table (EPT, NPT...), no host mapping, no VMA, no mmu_notifier. But
+the lifecycle of the private memory is still controlled by guest_memfd.
+When fallocate(fd, PUNCH_HOLE), the memory resource is revoked and KVM
+is notified to unmap corresponding EPT.
 
-We also need to reset SOCK_DONE after changing the transports.
+The further thought is guest_memfd is also suitable for normal guest.
+It makes no sense VMM must build host mapping table before guest access.
+
+Now I'm trying to seek a similar way for private MMIO. A MMIO resource
+provider that is exported as an fd. It controls the lifecycle of the
+MMIO resource and notify KVM when revoked. dma-buf seems to be a good
+provider which have done most of the work, only need to extend the
+memory resource seeking by fd + offset.
+
+> 
+>  separate access mechanism just for that. It would be the 5th or so (kernel
+>  vmap, userspace mmap, dma_buf_attach and driver private stuff like
+>  virtio_dma_buf.c where you access your buffer with a uuid), so really not
+>  a big deal.
+> 
+>  OK, will think more about that.
+> 
+>    Please note that we have follow_pfn() + mmu_notifier working for KVM/XEN
+
+Folow_pfn & mmu_notifier won't work here, cause no VMA, no host mapping
+table.
 
 Thanks,
-Stefano
-
+Yilun
+>    with MMIO mappings and P2P. And that required exactly zero DMA-buf changes
+>    :)
+> 
+>    I don't fully understand your use case, but I think it's quite likely that
+>    we already have that working.
+> 
+>    Regards,
+>    Christian.
 
