@@ -1,187 +1,128 @@
-Return-Path: <kvm+bounces-34811-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B359A063FE
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:07:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30C3EA0640D
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:15:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06F093A6CCC
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:07:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2064A1678E6
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10BE200BB2;
-	Wed,  8 Jan 2025 18:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F0220103D;
+	Wed,  8 Jan 2025 18:14:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bc1qGnB3"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="BwPiIO4C"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834FC202C55
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 18:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47B71F4E32;
+	Wed,  8 Jan 2025 18:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736359597; cv=none; b=E/LgquOJnDaYPLLXYNrpWnUzR1NYKVOPzTnwxrtMGMiQuxvPjxOLwM3sOnjTIefc+F8MGmFbVcofOrGx51x0wDm0s1cEOThXGah+0S/75djgJVJmsFH39DlYZhhM+t3e6vDGgz/G5DsHvu22N/MnbLejmYrNiwujW+yWsKZQPcI=
+	t=1736360098; cv=none; b=lYZP9chjnn41VK/eKKI1sZsJ7I1SApJaBrdKgjNJQTmAbjJOm84HfgXoqSmc8+HsDw397q/3TOvqwhd5hnsFkVoZHyjoIauZRQYSZZr7Ntfk3R0TNzgQBxyj0M0+pfZcijznroy6YL8reKHvQKq2kX9MeivsdEgAXBRo1xVBEaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736359597; c=relaxed/simple;
-	bh=NW1NN64WPOb8zvTk9pQc9y9wJMAUw7k5KI4tbn3qy4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lFvfe4vdFbasSkJ7vNlE33T2CeSXwtltb9jKpP9B+ocNNKTFLDi1lxwDa+/gbsiZSLwPOsZzqB2iOcW1BV0lS0S7w9StuzWNNNthQIZyGjLYhrPfIMEyblZCXWgLFtrM8grzDzL+0NfIKHgkhxcCcZiTXu8LdjJywkiaC1IX+0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bc1qGnB3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736359594;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xTpnjYdFe65i9cQrDrcRqhmpYDaSR/fVnChURrprIX4=;
-	b=bc1qGnB3bW6W0rYY89SyhwbWMM/ahLBNdXr2GQO6uG6SYN8HHNUl6Rnonz7kEhh1MqChEt
-	yVCoTEPT1pPX15jQbSqgFZg22CI3SsoRvOSZthh2ypsAR113lIXnAupD0EqX4dLaQjgziX
-	lv/3zT9M2BZIrz1DvTTLH9XhPtaItfU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-73-nxFy9cTrPt6rY7Ik9LvCEg-1; Wed, 08 Jan 2025 13:06:33 -0500
-X-MC-Unique: nxFy9cTrPt6rY7Ik9LvCEg-1
-X-Mimecast-MFC-AGG-ID: nxFy9cTrPt6rY7Ik9LvCEg
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436379713baso476505e9.2
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 10:06:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736359592; x=1736964392;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xTpnjYdFe65i9cQrDrcRqhmpYDaSR/fVnChURrprIX4=;
-        b=siu3UcOtqMqR6Vfh1gAuNZsZrN1MWQhkFYm2yVw9GeXXGiXPx5E4o2Hv5ZMJheq/Tr
-         1z7CQhzmLAHpcAz1SNm9eTRKvOMX4KXdg+QyiDCkCRtUHPPXnwz+Gjl65PaMiSXD75sn
-         GNGsOD/JnelRcYxKUl52tHIFG3dorpfYGGRF+WA1eJP/L50ocvYsYDV7rJyl/qlvW/5K
-         gccDVJfmb58eIN9z6P6jmarQRbItaZDmh2J7zkm1p/b4sk4JbJpeBKFonNF58dLFKgd1
-         z3I6WiRIodeMkwf7q7QHYN77nGaM3ZFMyZuIucDut1R9JJT/1r2PdfACMDDP0qncVQRI
-         GuxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXxIyLQAKf+zNeQLGVcbXyK+3dRYp2JYD5zioyfqY7/MSXCQtZtm5Ixh0Hp6Vrlsz/CU6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyANb5qpXPNjqdhQIMAys1GwnsK+mOJyE8uqLtQcjG7r6epEUY
-	X4hIJiVyW7+TYPTk3d+hcXtGS4GQ1Fh23KewoXfD8emA5bSENfHZIyMdOMGUWJVGKnvIpTv21Ic
-	txNl+p2kYnzC8WRX6Pf8eYhUw/oyxgjIPM6FJ4o1FpYKZ9D70oQ==
-X-Gm-Gg: ASbGnctnJIBr7nSyn6vx7su3dfgzHo3YBmtldb9Z5f+9ctUc5/UPcX2s6a3Db7K7dzk
-	DgpZiolsth886xuuI6u6WlhvWZISV7KFNp1SN3JkiUrVRTvL+Z5jGRQEeTRTV2/Pjq3PAIQvFHw
-	b6QWa42cURjitvsKqTBFwnRCUyrnxqJXLbmAW+8rlucCUcJ7XC4meMbKnZo4UKRDYJzSxnT0opF
-	4FqyVZqqLYx9XhRQlY/y/RmEbDty0QoUEc5HQQ4ybJ7Efg=
-X-Received: by 2002:a05:600c:1d14:b0:436:5fc9:309d with SMTP id 5b1f17b1804b1-436e26f6d80mr37371025e9.30.1736359591819;
-        Wed, 08 Jan 2025 10:06:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHTv/Bx6C2k5LOcLLY/XN2JmilQSz5qyKDCjlMy44PV1BJ3rFBTpqkU5iqtg5HftWkhRLAW+A==
-X-Received: by 2002:a05:600c:1d14:b0:436:5fc9:309d with SMTP id 5b1f17b1804b1-436e26f6d80mr37370685e9.30.1736359591257;
-        Wed, 08 Jan 2025 10:06:31 -0800 (PST)
-Received: from step1.. ([5.77.93.126])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2e89fc3sm28849325e9.30.2025.01.08.10.06.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 10:06:30 -0800 (PST)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wongi Lee <qwerty@theori.io>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	virtualization@lists.linux.dev,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Luigi Leonardi <leonardi@redhat.com>,
-	bpf@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Hyunwoo Kim <v4bel@theori.io>,
-	Michal Luczaj <mhal@rbox.co>,
-	kvm@vger.kernel.org
-Subject: [PATCH net 2/2] vsock/bpf: return early if transport is not assigned
-Date: Wed,  8 Jan 2025 19:06:17 +0100
-Message-ID: <20250108180617.154053-3-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250108180617.154053-1-sgarzare@redhat.com>
-References: <20250108180617.154053-1-sgarzare@redhat.com>
+	s=arc-20240116; t=1736360098; c=relaxed/simple;
+	bh=1piCdTXARUyAQZTugfblzOdBQAiS14dIYXHBFb20FgY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PNr09n9w4hArpYivoK2VURaAUahaevtTYLun76F++aQbyQ777WQsRktpkZS28YzLDJzikAvXK5IaNDPjvig3tHyRJ0WaNlIR7BgQZhWAYo24OY06UXzeDXMEyylDbfkEiqiEhnZXwmQ+49Jscyr3uh/bDrKwsw7K7cS4SDXtFZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=BwPiIO4C; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A64C940E0286;
+	Wed,  8 Jan 2025 18:14:52 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 7DuWarOuj-vD; Wed,  8 Jan 2025 18:14:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1736360089; bh=xNYiKlwa3kj8BpqIAS4B0qWDplcNM2XhSUe24FD5yJQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BwPiIO4CGdFN140zwNgH04L3L+gE7b2N2ctJMOA7tPXp+TjRxO4N92fgpRRfjrxqU
+	 ozl1qcF+VggHBELxtozFjRkcBTDbbh4RNgVSCGX2FGPS8JrYLC/cXErFpob6HO0oNy
+	 Dx1/I+NC4BNV3RGIHWanF3gSQ8D+cgM36U0akHSFIGj2uKdc8TNqHp53uChLf9wJRW
+	 kNMSaLqOYVMs61s+C50uFoc6HqKjMNmaTuu3ZnK9qOcYcCMQusS303glYLXY2vHTk8
+	 wHSp5FUKZZ1JfQLAn6NYhnM9d/kFGFoVw8Kva4Lk+kNcMIrhT6amEkY45+A8zr7lpI
+	 xXrTBqZBGJB8WKDHegyLduaabsZmj3cw3ipsmRXuVFwdZVW09dGhPLZN8TwHgDgNhd
+	 TnCuHLW5PbS6LsxuHJyeumuH0Nv9P298xNRjptlNzPuMrWLH+6IVmz24HpHUQfqWni
+	 nif5lf3UiZWiEY1GYRTTF0YV0WXefmmLLm6MP30jKUMo/4FQQe0Hq6i+9RhNfzyJlI
+	 E3PpMKsn2Pdj6i+VQhMIUogNFO29neGuCXKAHShDpOv7dx+EHmivCriF6rvs0fq1/O
+	 OT/Eptcj/W8HtUnvvjasH6/Qq35q/G0TLxPRVtTYxdYWuULespAf4Zrpv3NOQVzjpX
+	 gMS65JQ5bG65pOXjJljRHKeE=
+Received: from zn.tnic (p200300ea971f938F329C23FFFeA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:938f:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CB02A40E01F9;
+	Wed,  8 Jan 2025 18:14:40 +0000 (UTC)
+Date: Wed, 8 Jan 2025 19:14:34 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 3/4] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
+References: <20241202120416.6054-1-bp@kernel.org>
+ <20241202120416.6054-4-bp@kernel.org>
+ <Z1oR3qxjr8hHbTpN@google.com>
+ <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
+ <Z2B2oZ0VEtguyeDX@google.com>
+ <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
+ <Z35_34GTLUHJTfVQ@google.com>
+ <20250108154901.GFZ36ebXAZMFZJ7D8t@fat_crate.local>
+ <Z36zWVBOiBF4g-mW@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z36zWVBOiBF4g-mW@google.com>
 
-Some of the core functions can only be called if the transport
-has been assigned.
+On Wed, Jan 08, 2025 at 09:18:17AM -0800, Sean Christopherson wrote:
+> then my vote is to go with the user_return approach.  It's unfortunate that
+> restoring full speculation may be delayed until a CPU exits to userspace or KVM
+> is unloaded, but given that enable_virt_at_load is enabled by default, in practice
+> it's likely still far better than effectively always running the host with reduced
+> speculation.
 
-As Michal reported, a socket might have the transport at NULL,
-for example after a failed connect(), causing the following trace:
+I guess. Kaplan just said something to that effect so I guess we can start
+with that and then see who complains and address it if she cries loud enough.
+:-P
 
-    BUG: kernel NULL pointer dereference, address: 00000000000000a0
-    #PF: supervisor read access in kernel mode
-    #PF: error_code(0x0000) - not-present page
-    PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
-    Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-    CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
-    RIP: 0010:vsock_connectible_has_data+0x1f/0x40
-    Call Trace:
-     vsock_bpf_recvmsg+0xca/0x5e0
-     sock_recvmsg+0xb9/0xc0
-     __sys_recvfrom+0xb3/0x130
-     __x64_sys_recvfrom+0x20/0x30
-     do_syscall_64+0x93/0x180
-     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> No?  svm_vcpu_load() emits IBPB when switching VMCBs, i.e. when switching between
 
-So we need to check the `vsk->transport` in vsock_bpf_recvmsg(),
-especially for connected sockets (stream/seqpacket) as we already
-do in __vsock_connectible_recvmsg().
+Bah, nevermind. I got confused by our own whitepaper. /facepalm.
 
-Fixes: 634f1a7110b4 ("vsock: support sockmap")
-Reported-by: Michal Luczaj <mhal@rbox.co>
-Closes: https://lore.kernel.org/netdev/5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co/
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/vsock_bpf.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+So here's the deal:
 
-diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
-index 4aa6e74ec295..f201d9eca1df 100644
---- a/net/vmw_vsock/vsock_bpf.c
-+++ b/net/vmw_vsock/vsock_bpf.c
-@@ -77,6 +77,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
- 			     size_t len, int flags, int *addr_len)
- {
- 	struct sk_psock *psock;
-+	struct vsock_sock *vsk;
- 	int copied;
- 
- 	psock = sk_psock_get(sk);
-@@ -84,6 +85,13 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
- 		return __vsock_recvmsg(sk, msg, len, flags);
- 
- 	lock_sock(sk);
-+	vsk = vsock_sk(sk);
-+
-+	if (!vsk->transport) {
-+		copied = -ENODEV;
-+		goto out;
-+	}
-+
- 	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
- 		release_sock(sk);
- 		sk_psock_put(sk, psock);
-@@ -108,6 +116,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
- 		copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
- 	}
- 
-+out:
- 	release_sock(sk);
- 	sk_psock_put(sk, psock);
- 
+The machine has SRSO_USER_KERNEL_NO=1. Which means, you don't need safe-RET.
+So we fallback to ibpb-on-vmexit.
+
+Now, if the machine sports BpSpecReduce, we do that and that covers all the
+vectors. Otherwise, IBPB-on-VMEXIT it is.
+
+The VM/VM attack vector the paper is talking about and having to IBPB is for
+the Spectre v2 side of things. Not SRSO.
+
+Yeah, lemme document that while it is fresh in my head. This is exactly why
+I wanted Josh to start mitigation documentation - exactly for such nasties.
+
+Thx.
+
 -- 
-2.47.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
