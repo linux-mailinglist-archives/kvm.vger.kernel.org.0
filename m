@@ -1,83 +1,83 @@
-Return-Path: <kvm+bounces-34810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47769A063F5
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:07:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B359A063FE
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:07:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 153153A66E8
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:06:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06F093A6CCC
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99633201271;
-	Wed,  8 Jan 2025 18:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10BE200BB2;
+	Wed,  8 Jan 2025 18:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LxuBkGJG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bc1qGnB3"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6F7201270
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 18:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834FC202C55
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 18:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736359592; cv=none; b=OBLxhCj0OzieSFFv7gYtee/0h2JugX75CAiDYXfZSXosp/DRqMBqhNZHGQQFSON+Qjm7l1eubq0CaVw7TI58ff5XDErS9G2t00Mo1boAFRXl3FObzyBtqHxpY42JLNrBTv1f2BUq4tcOVRFjKNsz2eo9yFeYl1S6uXBKHc9mYeU=
+	t=1736359597; cv=none; b=E/LgquOJnDaYPLLXYNrpWnUzR1NYKVOPzTnwxrtMGMiQuxvPjxOLwM3sOnjTIefc+F8MGmFbVcofOrGx51x0wDm0s1cEOThXGah+0S/75djgJVJmsFH39DlYZhhM+t3e6vDGgz/G5DsHvu22N/MnbLejmYrNiwujW+yWsKZQPcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736359592; c=relaxed/simple;
-	bh=XhT2B/XMcI2q+vQQF0C3xrDtTRflQwJMsW4aCd7eL48=;
+	s=arc-20240116; t=1736359597; c=relaxed/simple;
+	bh=NW1NN64WPOb8zvTk9pQc9y9wJMAUw7k5KI4tbn3qy4c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FhWnEsJZEWP0+tFXSA5+cPcMFRCjLj0RbwQWA07B2iWPaDQoijQml6V8+n37nG5C+oeRa/9p0kIcslUS2ohlkVMYRP4NHG1hjbD+BS6Z2yLnOuzCcmFYHgKnF61Lt/hVLcsPqLCTU6LUjEMxDGl0pehL5O8njE6ZQs5hCYMw2nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LxuBkGJG; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=lFvfe4vdFbasSkJ7vNlE33T2CeSXwtltb9jKpP9B+ocNNKTFLDi1lxwDa+/gbsiZSLwPOsZzqB2iOcW1BV0lS0S7w9StuzWNNNthQIZyGjLYhrPfIMEyblZCXWgLFtrM8grzDzL+0NfIKHgkhxcCcZiTXu8LdjJywkiaC1IX+0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bc1qGnB3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736359590;
+	s=mimecast20190719; t=1736359594;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=P81z0YmLvdT8m64Ix0hrS5vpO81KiskzyN+gGNFCQNI=;
-	b=LxuBkGJGO2dzjgcQsryGFfqvRyWIt+q3CfwpTMt6LqzV6UScCHpE7cI0NXpnY+5BGH2l+T
-	9+82CKERC2FkA6/8F/5HYSzOtaYrtiDtmz/yewgCtIkraD6k8AFQx89P60vqgENZvx7NMr
-	OvhpyhQ4LYPewvITBoLg5/GOqmySTLc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=xTpnjYdFe65i9cQrDrcRqhmpYDaSR/fVnChURrprIX4=;
+	b=bc1qGnB3bW6W0rYY89SyhwbWMM/ahLBNdXr2GQO6uG6SYN8HHNUl6Rnonz7kEhh1MqChEt
+	yVCoTEPT1pPX15jQbSqgFZg22CI3SsoRvOSZthh2ypsAR113lIXnAupD0EqX4dLaQjgziX
+	lv/3zT9M2BZIrz1DvTTLH9XhPtaItfU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-MdLpB7FqPfy2sD8EyVIeQg-1; Wed, 08 Jan 2025 13:06:28 -0500
-X-MC-Unique: MdLpB7FqPfy2sD8EyVIeQg-1
-X-Mimecast-MFC-AGG-ID: MdLpB7FqPfy2sD8EyVIeQg
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3862b364578so525320f8f.1
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 10:06:27 -0800 (PST)
+ us-mta-73-nxFy9cTrPt6rY7Ik9LvCEg-1; Wed, 08 Jan 2025 13:06:33 -0500
+X-MC-Unique: nxFy9cTrPt6rY7Ik9LvCEg-1
+X-Mimecast-MFC-AGG-ID: nxFy9cTrPt6rY7Ik9LvCEg
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436379713baso476505e9.2
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 10:06:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736359586; x=1736964386;
+        d=1e100.net; s=20230601; t=1736359592; x=1736964392;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=P81z0YmLvdT8m64Ix0hrS5vpO81KiskzyN+gGNFCQNI=;
-        b=MoomgCD2CUc5ynQ3ArEJzFs+5bKgtxPKBc1JKlowlT/t/Jt8oZM1JB7vgUy3IqK2z8
-         FgOLdVY1IE31UDgJmw+pOlhRbFUXx+3D8ofgb1H45so/AKFrQfNQS0ZzyIp5SUhoodGM
-         eEtT9m/RWIVE6JQmGPvE9LqfFq01/j/UJR+Guq4lXHFwZBR6V5715Ov1oXKYNCBG4Z5V
-         CYcwqeezoi5JNYXDNHqpvzJhyFehQUdNJIh0wYHRWiJTJ6aU33j0NdGiwT5go5dQmo9e
-         Uq4y7ac8TOsmopWhEsjqpxWgB3oVaYnoi5G/Op8ZDJAYSOM20pU2isWQfnAJOxqE7hrW
-         xF7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXUpVFfjbFWgSBjdX+GIndKuywvNHqPu8HP2xS1WMDOmh/sKVoaO1YFDoOlNMKUDBGaRsQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO56LYFwLAn/1MHOITTqP03p+jmAiwOoh6yPH1UWxxgkA7Wfjt
-	0AKnSY1mbC96jbhULonBHOBr95sBpQUQiArzKQCH1HHWyPeEhfjdbjbBGUTH5zvi4WDJoEaCyVd
-	sNYjWu4PI6j6GtgpEFzxJgY1D2HlP9QmPH+EParQlX+pG6jehvRYqrh5M6q57
-X-Gm-Gg: ASbGncsHAikAI6HU/BWnA7/cCCElKGJsw//Ga0Qg/wQUR6CoOLdyj9vS+E6ED3Qjdb8
-	+KP9eMmq2ws4XLCMoDuiQQnguxIE7qUFxBnfnuEXepPqf9Acw3b/WJdQnHeX0MAVX/V1U9uouuC
-	6qMY5wnUvkBttWtbdPc9YodKf3a0FQhbqpo7TJD+/grvZtgjhObYpU4W6pbb3LHlpwSokdh2l+B
-	Kvso4Lefhf5ouy43M5TFGL4i8iUPxc/MfjcDIYmH3bRIzw=
-X-Received: by 2002:a5d:64af:0:b0:386:1ab3:11f0 with SMTP id ffacd0b85a97d-38a8b0fa39dmr213699f8f.28.1736359586605;
-        Wed, 08 Jan 2025 10:06:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHyImssYlGKFMwIIkelKFtn5EBvRpRzebX/KbLVJOoRVPg+AYW6dhCm61RcqZ/eZtr4R9nAwQ==
-X-Received: by 2002:a5d:64af:0:b0:386:1ab3:11f0 with SMTP id ffacd0b85a97d-38a8b0fa39dmr213656f8f.28.1736359585987;
-        Wed, 08 Jan 2025 10:06:25 -0800 (PST)
+        bh=xTpnjYdFe65i9cQrDrcRqhmpYDaSR/fVnChURrprIX4=;
+        b=siu3UcOtqMqR6Vfh1gAuNZsZrN1MWQhkFYm2yVw9GeXXGiXPx5E4o2Hv5ZMJheq/Tr
+         1z7CQhzmLAHpcAz1SNm9eTRKvOMX4KXdg+QyiDCkCRtUHPPXnwz+Gjl65PaMiSXD75sn
+         GNGsOD/JnelRcYxKUl52tHIFG3dorpfYGGRF+WA1eJP/L50ocvYsYDV7rJyl/qlvW/5K
+         gccDVJfmb58eIN9z6P6jmarQRbItaZDmh2J7zkm1p/b4sk4JbJpeBKFonNF58dLFKgd1
+         z3I6WiRIodeMkwf7q7QHYN77nGaM3ZFMyZuIucDut1R9JJT/1r2PdfACMDDP0qncVQRI
+         GuxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXxIyLQAKf+zNeQLGVcbXyK+3dRYp2JYD5zioyfqY7/MSXCQtZtm5Ixh0Hp6Vrlsz/CU6c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyANb5qpXPNjqdhQIMAys1GwnsK+mOJyE8uqLtQcjG7r6epEUY
+	X4hIJiVyW7+TYPTk3d+hcXtGS4GQ1Fh23KewoXfD8emA5bSENfHZIyMdOMGUWJVGKnvIpTv21Ic
+	txNl+p2kYnzC8WRX6Pf8eYhUw/oyxgjIPM6FJ4o1FpYKZ9D70oQ==
+X-Gm-Gg: ASbGnctnJIBr7nSyn6vx7su3dfgzHo3YBmtldb9Z5f+9ctUc5/UPcX2s6a3Db7K7dzk
+	DgpZiolsth886xuuI6u6WlhvWZISV7KFNp1SN3JkiUrVRTvL+Z5jGRQEeTRTV2/Pjq3PAIQvFHw
+	b6QWa42cURjitvsKqTBFwnRCUyrnxqJXLbmAW+8rlucCUcJ7XC4meMbKnZo4UKRDYJzSxnT0opF
+	4FqyVZqqLYx9XhRQlY/y/RmEbDty0QoUEc5HQQ4ybJ7Efg=
+X-Received: by 2002:a05:600c:1d14:b0:436:5fc9:309d with SMTP id 5b1f17b1804b1-436e26f6d80mr37371025e9.30.1736359591819;
+        Wed, 08 Jan 2025 10:06:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHTv/Bx6C2k5LOcLLY/XN2JmilQSz5qyKDCjlMy44PV1BJ3rFBTpqkU5iqtg5HftWkhRLAW+A==
+X-Received: by 2002:a05:600c:1d14:b0:436:5fc9:309d with SMTP id 5b1f17b1804b1-436e26f6d80mr37370685e9.30.1736359591257;
+        Wed, 08 Jan 2025 10:06:31 -0800 (PST)
 Received: from step1.. ([5.77.93.126])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a1c8292f4sm54344839f8f.3.2025.01.08.10.06.23
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2e89fc3sm28849325e9.30.2025.01.08.10.06.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 10:06:25 -0800 (PST)
+        Wed, 08 Jan 2025 10:06:30 -0800 (PST)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Simon Horman <horms@kernel.org>,
@@ -100,9 +100,9 @@ Cc: Simon Horman <horms@kernel.org>,
 	Hyunwoo Kim <v4bel@theori.io>,
 	Michal Luczaj <mhal@rbox.co>,
 	kvm@vger.kernel.org
-Subject: [PATCH net 1/2] vsock/virtio: discard packets if the transport changes
-Date: Wed,  8 Jan 2025 19:06:16 +0100
-Message-ID: <20250108180617.154053-2-sgarzare@redhat.com>
+Subject: [PATCH net 2/2] vsock/bpf: return early if transport is not assigned
+Date: Wed,  8 Jan 2025 19:06:17 +0100
+Message-ID: <20250108180617.154053-3-sgarzare@redhat.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250108180617.154053-1-sgarzare@redhat.com>
 References: <20250108180617.154053-1-sgarzare@redhat.com>
@@ -114,42 +114,73 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the socket has been de-assigned or assigned to another transport,
-we must discard any packets received because they are not expected
-and would cause issues when we access vsk->transport.
+Some of the core functions can only be called if the transport
+has been assigned.
 
-A possible scenario is described by Hyunwoo Kim in the attached link,
-where after a first connect() interrupted by a signal, and a second
-connect() failed, we can find `vsk->transport` at NULL, leading to a
-NULL pointer dereference.
+As Michal reported, a socket might have the transport at NULL,
+for example after a failed connect(), causing the following trace:
 
-Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
-Reported-by: Hyunwoo Kim <v4bel@theori.io>
-Reported-by: Wongi Lee <qwerty@theori.io>
-Closes: https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
+    BUG: kernel NULL pointer dereference, address: 00000000000000a0
+    #PF: supervisor read access in kernel mode
+    #PF: error_code(0x0000) - not-present page
+    PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
+    Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+    CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
+    RIP: 0010:vsock_connectible_has_data+0x1f/0x40
+    Call Trace:
+     vsock_bpf_recvmsg+0xca/0x5e0
+     sock_recvmsg+0xb9/0xc0
+     __sys_recvfrom+0xb3/0x130
+     __x64_sys_recvfrom+0x20/0x30
+     do_syscall_64+0x93/0x180
+     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+So we need to check the `vsk->transport` in vsock_bpf_recvmsg(),
+especially for connected sockets (stream/seqpacket) as we already
+do in __vsock_connectible_recvmsg().
+
+Fixes: 634f1a7110b4 ("vsock: support sockmap")
+Reported-by: Michal Luczaj <mhal@rbox.co>
+Closes: https://lore.kernel.org/netdev/5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co/
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- net/vmw_vsock/virtio_transport_common.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ net/vmw_vsock/vsock_bpf.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 9acc13ab3f82..51a494b69be8 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -1628,8 +1628,11 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
+index 4aa6e74ec295..f201d9eca1df 100644
+--- a/net/vmw_vsock/vsock_bpf.c
++++ b/net/vmw_vsock/vsock_bpf.c
+@@ -77,6 +77,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+ 			     size_t len, int flags, int *addr_len)
+ {
+ 	struct sk_psock *psock;
++	struct vsock_sock *vsk;
+ 	int copied;
+ 
+ 	psock = sk_psock_get(sk);
+@@ -84,6 +85,13 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+ 		return __vsock_recvmsg(sk, msg, len, flags);
  
  	lock_sock(sk);
- 
--	/* Check if sk has been closed before lock_sock */
--	if (sock_flag(sk, SOCK_DONE)) {
-+	/* Check if sk has been closed or assigned to another transport before
-+	 * lock_sock (note: listener sockets are not assigned to any transport)
-+	 */
-+	if (sock_flag(sk, SOCK_DONE) ||
-+	    (sk->sk_state != TCP_LISTEN && vsk->transport != &t->transport)) {
- 		(void)virtio_transport_reset_no_sock(t, skb);
++	vsk = vsock_sk(sk);
++
++	if (!vsk->transport) {
++		copied = -ENODEV;
++		goto out;
++	}
++
+ 	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
  		release_sock(sk);
- 		sock_put(sk);
+ 		sk_psock_put(sk, psock);
+@@ -108,6 +116,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+ 		copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+ 	}
+ 
++out:
+ 	release_sock(sk);
+ 	sk_psock_put(sk, psock);
+ 
 -- 
 2.47.1
 
