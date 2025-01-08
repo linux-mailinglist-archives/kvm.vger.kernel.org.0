@@ -1,236 +1,243 @@
-Return-Path: <kvm+bounces-34829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACBF9A0648E
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:35:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91D76A064B1
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 19:36:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40AB41886157
-	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:35:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AB5E168041
+	for <lists+kvm@lfdr.de>; Wed,  8 Jan 2025 18:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7A6202C4D;
-	Wed,  8 Jan 2025 18:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AC92036F6;
+	Wed,  8 Jan 2025 18:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="jrpseMxo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tSf/Xrbu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84D1202C47
-	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 18:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1413819AD8C
+	for <kvm@vger.kernel.org>; Wed,  8 Jan 2025 18:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736361263; cv=none; b=X+kpMuJdZpVap8Cw6I4VeYSctLhNT7xhMDqVUmz0JOT5TG0dNIlKWcNR7KHrGAzu+8QP8Mem9P/877KnQp64Bg44cQ5D1Kk3UgiWWrDwuSza22aHO3fUIZMIhHCx0XWCJY5boMB2aZ7HEYzTB3/xGfsLHHqJ9zCWITBvIxhHCDM=
+	t=1736361316; cv=none; b=fytbHtjQ8g7jTAOAuShNn6kyPr3sm8jAG7arlYpDf1ArebTQHk95SwNEFh7Nc9AEramFJZCa6sAfkTSAB+4EW6ClCfJbsj1Q0UHms5qVxc5o50aSY6hr52pizoqW6piPsg8CKNvSvbpqnJqWWT2RqoOEu4VOQTgBf5jEhJnuCRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736361263; c=relaxed/simple;
-	bh=qnX46omGjPjC/q+gyDkJa+35YULFw89vPSSIZ7CduEc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RrZNVvyt8nq0ohY2Z0O6sI4wD/1K6c0xPaKSoxBpYsmOgzSiRIJPJ0hozrh+h7f1H4OPAVOLBaFW4/inS9FpmU69NYpAuo8JaTw+0WsHekbdaHP91wLaIo+41z6tvduW8eJZEb/OrwF8fEuoedh7KEuw3c2Pdz4LMwoQtujharM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=jrpseMxo; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2164b662090so600885ad.1
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 10:34:20 -0800 (PST)
+	s=arc-20240116; t=1736361316; c=relaxed/simple;
+	bh=2NVPFhLkeqohReHa5lOei9tnSr0humarNaSbYGs/bSU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=b0vNFHnFA/MHRdAUc4d0NPvyLrJZ8ePo3SCKNtqcxoI8Xus3WIyg1/sG7/+9El/5iAPhtHjnBqKIDFC8zjaIquF3xUKeC7scR8VYswGTc6TPGbatC6sbNnc9of998f+HaC39U2lGL6A8Rn0b3ndN+Ma0hvwhi1X7oiivOwVX05o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tSf/Xrbu; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2165433e229so531495ad.1
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 10:35:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736361260; x=1736966060; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DqnnjKkSHwAf9hrNplxrEhAq6xbb+daTfv8Q2VG5nP8=;
-        b=jrpseMxoaVpRH8UJzjKdSlJwC/Bgqs9Dd7r8ux6xPvPMTWKR74QzAD9fUm8pU9qgFk
-         +/IcQ9L+kr8xC8zO+uSDuquLbJzWokxaPoT+4LhN8E8nyka1alAejXBXjRGF5+I2SWHT
-         GKtvdWWq9YaNnuRpo+hOGUoHWuN+Jt01uj/bC9sCSAMwpStFKzHk4R8CEUAra8JMEQOe
-         /+58DqgvQLO0zaBYzA/5EHb8R0S7Q96F8JN29ZQCBeWsSN1qY0jxNyo3RTKUU9TLOsz+
-         sH0gsGeZZk8ZYggIR6ReVkv6Swq6gwynZVbFYKO3XxHOxGen+BWSLOxc49PsiRMw5qdr
-         n2Qg==
+        d=google.com; s=20230601; t=1736361314; x=1736966114; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2bukfER009F+Z1ZXzjnWoHkM4/fO5m2gvqsvHWzsBrU=;
+        b=tSf/XrbuzUusxMWKylUumZb3sZ5I+D1GYvv2mq74e2Ny4qi8AIlCsv+Az2oJM1xAs5
+         ba/6sV6U90DOBjUbNDASteEL+gXzv1LRBkBltzsG8qUYVZHCwqKZL03+MnoJN2VjsfBq
+         sMpLRvK2+kRuliGwuEGuIitnvQzpN9uu266e0yfa5yHw8UOVydq8EMnbbe3EdJAcJCw7
+         3jscfdu647GDt6Z0RMvmvivPc/BzsdMtm5Q/h5JNy0WbOmbxj+foUGybSzTpEsjOKuKH
+         F570pqi5LyaBSOYPBaGpTKWHiqp8iFJG519j6zMoUdVXYg5UX5rqFVwsZG+pUnJoNHiy
+         9UTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736361260; x=1736966060;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DqnnjKkSHwAf9hrNplxrEhAq6xbb+daTfv8Q2VG5nP8=;
-        b=r03HOiNVT0VmcKy5TiA124WS2+QIHCzgDDlb6aVl+W/hpvogaxHj1HESOAw2V1TdPh
-         ldV2xaGxRSLUm+1X2Vitu1uQ9I8/XomaOtUx6CaNcz6RgQULJWE2esOrLTqpfONDddGD
-         HYSiuNaZJdtQmZdYPEOa1Uw5Oj8mW0E/6TAKsM76ZW5WxmGDBAxBaEGxfr3Tly0K7p+J
-         K7B2/kasCLzLaHaAZKZ4HyLdvgZAER6GQqnvaPSx2SXsydSgxuoP7Lj07Kgc8HZ05GZ2
-         m7Y3yCYF/avhFL1NMsEkZvx+ge47zCuvoR38WqNscfeqT/1WA3FuA+B8qMCMUo4Ulp18
-         WB1w==
-X-Forwarded-Encrypted: i=1; AJvYcCUzw9DR0UdmaPoZydBGdTXLRcyM14fnJ8h5EQA9MqSC+779PEUjREohY9eoP7z90oZ6a8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziS0prrFiESI+wgfkX31L+bYF71n7PiWdhW8S2OQ35hXlVFQgi
-	C/IZJkwFd495t5S46lybjPo7OBEyvaR2wfeMzWd0EHFXsAux3VoZXtmnR2I4Q/i/20x5BGarFTr
-	0aEoH4jRjorUTp4f1LiiV/scVEdrSNoldQR3xFw==
-X-Gm-Gg: ASbGnctgXXMSeJ9sDoU7PTCTa99RW72wGY4tjyMShLk1vQR8umiF+qxl4KPWzGaguBP
-	kqaLkV7VTl0eSUjfy37E6vrPYvg7G0HsMGnK0
-X-Google-Smtp-Source: AGHT+IHrzWD8hTKku+GnLUtLP/hFjQfbmE46eCWViow6nW8eTsYbms9nLnRbfU/2hi06gNkDgVP3C23j9Wgkgv5GB2I=
-X-Received: by 2002:a05:6a00:6f0b:b0:725:e4b9:a600 with SMTP id
- d2e1a72fcca58-72d22048bf7mr4941908b3a.16.1736361260107; Wed, 08 Jan 2025
- 10:34:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736361314; x=1736966114;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2bukfER009F+Z1ZXzjnWoHkM4/fO5m2gvqsvHWzsBrU=;
+        b=c4muL4zhTtdxpV2HrUS2pg6ohlAoAsyiKhJqODhCRsRSSrJvg8cXyxvJnH64zURDv/
+         4OvixbRF0Xt/fVNdf888SS1sR/ssJoFhWOnu8W7t9K8NhDGYg14nco5vUJahjHh3r3yR
+         LYxvcml/O+lwE2fkC+QROX8i7xdQNC4NxqTvs2tRdlV9nWQ6yXaBHz/V9/6pNb5cXS6y
+         pIWFF5Lg8m3gYqEZASLUYwCemPkySifHkvgu7f3wIJIRTMS6pMcFhEYyHBSU3CV0zaNy
+         wXv3FJreQMEK/M+1IUzBudHoaJQNMqwlGbXWy2tita7jdZNv6D2SzFFIQVnLnoqqddIk
+         KM1A==
+X-Gm-Message-State: AOJu0YxfoS+CTL1ZK92EoC16RLbB4SZXkqPghFMD9EN/0dGudD8whV0N
+	qxq0VH/QwgawHStwzn2fJ81xOPdEYeAPBs2RpdKH1jQ3/sxM+qElRDHCyHsTiUCR56JOfSkq63a
+	xGQ==
+X-Google-Smtp-Source: AGHT+IGFDkOY+8jnbMKX9qsqgyAmbRtxiAKHGzQrfUdVnvF6We8zNlv5NEixK2AddpqdQYShlzGaUUV/XjQ=
+X-Received: from pghm11.prod.google.com ([2002:a63:f60b:0:b0:7fe:5385:5c99])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:4393:b0:1e0:c56f:7db4
+ with SMTP id adf61e73a8af0-1e88d0e0be1mr6542295637.2.1736361314442; Wed, 08
+ Jan 2025 10:35:14 -0800 (PST)
+Date: Wed, 8 Jan 2025 10:35:13 -0800
+In-Reply-To: <20240918205319.3517569-4-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241125162200.1630845-1-cleger@rivosinc.com> <20241125162200.1630845-5-cleger@rivosinc.com>
- <20250108-522f238cc21ce59e16134c79@orel>
-In-Reply-To: <20250108-522f238cc21ce59e16134c79@orel>
-From: Atish Kumar Patra <atishp@rivosinc.com>
-Date: Wed, 8 Jan 2025 10:34:09 -0800
-X-Gm-Features: AbW1kvbKSIv8-fUX5pU5qDFEV3fgG-ZWJzHG9jd_bOk35dA9MC94SWhC5KY9vxA
-Message-ID: <CAHBxVyFuuNpHjEgozfJxKS3RPoEqkHK=xFhouEsQ-eo_9kiptw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v4 4/5] riscv: lib: Add SBI SSE extension definitions
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240918205319.3517569-1-coltonlewis@google.com> <20240918205319.3517569-4-coltonlewis@google.com>
+Message-ID: <Z37FYUU4ppiZsa68@google.com>
+Subject: Re: [PATCH v2 3/6] KVM: x86: selftests: Set up AMD VM in pmu_counters_test
+From: Sean Christopherson <seanjc@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
+	Jinrong Liang <ljr.kernel@gmail.com>, Jim Mattson <jmattson@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jan 8, 2025 at 5:03=E2=80=AFAM Andrew Jones <andrew.jones@linux.dev=
-> wrote:
->
-> On Mon, Nov 25, 2024 at 05:21:53PM +0100, Cl=C3=A9ment L=C3=A9ger wrote:
-> > Add SBI SSE extension definitions in sbi.h
-> >
-> > Signed-off-by: Cl=C3=A9ment L=C3=A9ger <cleger@rivosinc.com>
-> > ---
-> >  lib/riscv/asm/sbi.h | 83 +++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 83 insertions(+)
-> >
-> > diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> > index 98a9b097..a751d0c3 100644
-> > --- a/lib/riscv/asm/sbi.h
-> > +++ b/lib/riscv/asm/sbi.h
-> > @@ -11,6 +11,11 @@
-> >  #define SBI_ERR_ALREADY_AVAILABLE    -6
-> >  #define SBI_ERR_ALREADY_STARTED              -7
-> >  #define SBI_ERR_ALREADY_STOPPED              -8
-> > +#define SBI_ERR_NO_SHMEM             -9
-> > +#define SBI_ERR_INVALID_STATE                -10
-> > +#define SBI_ERR_BAD_RANGE            -11
-> > +#define SBI_ERR_TIMEOUT                      -12
-> > +#define SBI_ERR_IO                   -13
-> >
-> >  #ifndef __ASSEMBLY__
-> >  #include <cpumask.h>
-> > @@ -23,6 +28,7 @@ enum sbi_ext_id {
-> >       SBI_EXT_SRST =3D 0x53525354,
-> >       SBI_EXT_DBCN =3D 0x4442434E,
-> >       SBI_EXT_SUSP =3D 0x53555350,
-> > +     SBI_EXT_SSE =3D 0x535345,
-> >  };
-> >
-> >  enum sbi_ext_base_fid {
-> > @@ -71,6 +77,83 @@ enum sbi_ext_dbcn_fid {
-> >       SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
-> >  };
-> >
-> > +enum sbi_ext_sse_fid {
-> > +     SBI_EXT_SSE_READ_ATTRS =3D 0,
-> > +     SBI_EXT_SSE_WRITE_ATTRS,
-> > +     SBI_EXT_SSE_REGISTER,
-> > +     SBI_EXT_SSE_UNREGISTER,
-> > +     SBI_EXT_SSE_ENABLE,
-> > +     SBI_EXT_SSE_DISABLE,
-> > +     SBI_EXT_SSE_COMPLETE,
-> > +     SBI_EXT_SSE_INJECT,
-> > +     SBI_EXT_SSE_HART_UNMASK,
-> > +     SBI_EXT_SSE_HART_MASK,
-> > +};
-> > +
-> > +/* SBI SSE Event Attributes. */
-> > +enum sbi_sse_attr_id {
-> > +     SBI_SSE_ATTR_STATUS             =3D 0x00000000,
-> > +     SBI_SSE_ATTR_PRIORITY           =3D 0x00000001,
-> > +     SBI_SSE_ATTR_CONFIG             =3D 0x00000002,
-> > +     SBI_SSE_ATTR_PREFERRED_HART     =3D 0x00000003,
-> > +     SBI_SSE_ATTR_ENTRY_PC           =3D 0x00000004,
-> > +     SBI_SSE_ATTR_ENTRY_ARG          =3D 0x00000005,
-> > +     SBI_SSE_ATTR_INTERRUPTED_SEPC   =3D 0x00000006,
-> > +     SBI_SSE_ATTR_INTERRUPTED_FLAGS  =3D 0x00000007,
-> > +     SBI_SSE_ATTR_INTERRUPTED_A6     =3D 0x00000008,
-> > +     SBI_SSE_ATTR_INTERRUPTED_A7     =3D 0x00000009,
-> > +};
-> > +
-> > +#define SBI_SSE_ATTR_STATUS_STATE_OFFSET     0
-> > +#define SBI_SSE_ATTR_STATUS_STATE_MASK               0x3
-> > +#define SBI_SSE_ATTR_STATUS_PENDING_OFFSET   2
-> > +#define SBI_SSE_ATTR_STATUS_INJECT_OFFSET    3
-> > +
-> > +#define SBI_SSE_ATTR_CONFIG_ONESHOT  (1 << 0)
->
-> BIT(0)
->
-> > +
-> > +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP   BIT(0)
-> > +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPIE  BIT(1)
-> > +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV   BIT(2)
-> > +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP  BIT(3)
-> > +
-> > +enum sbi_sse_state {
-> > +     SBI_SSE_STATE_UNUSED            =3D 0,
-> > +     SBI_SSE_STATE_REGISTERED        =3D 1,
-> > +     SBI_SSE_STATE_ENABLED           =3D 2,
-> > +     SBI_SSE_STATE_RUNNING           =3D 3,
-> > +};
-> > +
-> > +/* SBI SSE Event IDs. */
-> > +#define SBI_SSE_EVENT_LOCAL_RAS                      0x00000000
-> > +#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP              0x00000001
-> > +#define SBI_SSE_EVENT_LOCAL_PLAT_0_START     0x00004000
-> > +#define SBI_SSE_EVENT_LOCAL_PLAT_0_END               0x00007fff
-> > +
-> > +#define SBI_SSE_EVENT_GLOBAL_RAS             0x00008000
-> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_START    0x0000c000
-> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_END              0x0000ffff
-> > +
-> > +#define SBI_SSE_EVENT_LOCAL_PMU                      0x00010000
-> > +#define SBI_SSE_EVENT_LOCAL_PLAT_1_START     0x00014000
-> > +#define SBI_SSE_EVENT_LOCAL_PLAT_1_END               0x00017fff
-> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_START    0x0001c000
-> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_END              0x0001ffff
-> > +
-> > +#define SBI_SSE_EVENT_LOCAL_PLAT_2_START     0x00024000
-> > +#define SBI_SSE_EVENT_LOCAL_PLAT_2_END               0x00027fff
-> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_START    0x0002c000
-> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_END              0x0002ffff
->
-> The above four don't appear to be in the spec anymore.
->
-> > +
-> > +#define SBI_SSE_EVENT_LOCAL_SOFTWARE         0xffff0000
-> > +#define SBI_SSE_EVENT_LOCAL_PLAT_3_START     0xffff4000
-> > +#define SBI_SSE_EVENT_LOCAL_PLAT_3_END               0xffff7fff
-> > +#define SBI_SSE_EVENT_GLOBAL_SOFTWARE                0xffff8000
-> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_START    0xffffc000
-> > +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_END              0xffffffff
-> > +
-> > +#define SBI_SSE_EVENT_PLATFORM_BIT           (1 << 14)
-> > +#define SBI_SSE_EVENT_GLOBAL_BIT             (1 << 15)
->
-> BIT(14)
-> BIT(15)
->
-> I think other changes are coming to these event IDs from a series Atish
-> recently posted too.
->
+On Wed, Sep 18, 2024, Colton Lewis wrote:
+> Branch in main() depending on if the CPU is Intel or AMD. They are
+> subject to vastly different requirements because the AMD PMU lacks
+> many properties defined by the Intel PMU including the entire CPUID
+> 0xa function where Intel stores all the PMU properties. AMD lacks this
+> as well as any consistent notion of PMU versions as Intel does. Every
+> feature is a separate flag and they aren't the same features as Intel.
+> 
+> Set up a VM for testing core AMD counters and ensure proper CPUID
+> features are set.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  .../selftests/kvm/x86_64/pmu_counters_test.c  | 104 ++++++++++++++----
+>  1 file changed, 83 insertions(+), 21 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> index 0e305e43a93b..5b240585edc5 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> @@ -30,10 +30,21 @@
+>  #define NUM_INSNS_RETIRED		(NUM_LOOPS * NUM_INSNS_PER_LOOP + NUM_EXTRA_INSNS)
+>  
+>  
+> +/*
+> + * Limit testing to MSRs that are actually defined by Intel (in the SDM).  MSRs
+> + * that aren't defined counter MSRs *probably* don't exist, but there's no
+> + * guarantee that currently undefined MSR indices won't be used for something
+> + * other than PMCs in the future.
+> + */
+> +#define MAX_NR_GP_COUNTERS	8
+> +#define MAX_NR_FIXED_COUNTERS	3
+> +#define AMD_NR_CORE_COUNTERS	4
+> +#define AMD_NR_CORE_EXT_COUNTERS	6
+> +
+>  static uint8_t kvm_pmu_version;
+>  static bool kvm_has_perf_caps;
+>  
+> -static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
+> +static struct kvm_vm *intel_pmu_vm_create(struct kvm_vcpu **vcpu,
+>  						  void *guest_code,
 
-Yeah. As per Anup's suggestion and ARC feedback, we have modified the
-segments a little bit.
+When renaming things, please fixup the alignment as needed.  Yes, it's more
+churn, but one-time pain is preferable to living indefinitely with funky formatting.
 
-PTAL: https://github.com/riscv-non-isa/riscv-sbi-doc/blob/master/src/ext-ss=
-e.adoc
+I also don't like renaming just one symbol.  E.g. the above MAX_NR_GP_COUNTERS
+and MAX_NR_FIXED_COUNTERS #defines are Intel specific, but that's not at all
+clear from the code.  Ditto for guest_rd_wr_counters() vs.
+guest_test_rdwr_core_counters().
 
-> > +
-> >  struct sbiret {
-> >       long error;
-> >       long value;
-> > --
-> > 2.45.2
-> >
->
-> Thanks,
-> drew
+Given how little code is actually shared between Intel and AMD, I think it makes
+sense to have the bulk of the code live in separate .c files.  Since
+tools/testing/selftests/kvm/lib/x86/pmu.c is already a thing, the best option is
+probably to rename pmu_counters_test.c to intel_pmu_counters_test.c, and then
+extract the common bits to lib/x86/pmu.c (or include/x86/pmu.h as appropriate).
+
+>  						  uint8_t pmu_version,
+>  						  uint64_t perf_capabilities)
+> +static void test_core_counters(void)
+> +{
+> +	uint8_t nr_counters = nr_core_counters();
+> +	bool core_ext = kvm_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+> +	bool perfmon_v2 = kvm_cpu_has(X86_FEATURE_PERFMON_V2);
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_vm *vm;
+> +
+> +	for (uint8_t ce = 0; ce <= core_ext; ce++) {
+
+Kernel style is to not declared variables inside for-loops.
+
+> +		for (uint8_t pm = 0; pm <= perfmon_v2; pm++) {
+
+Iterating over booleans is decidedly odd, the indentation levels are painful and
+will only get worse as more features are added, and the "ce" and "pm" variables
+aren't all that intuitive.  More below.
+
+> +			for (uint8_t nc = 0; nc <= nr_counters; nc++) {
+
+I also find "nc" to be unintuitive.  Either use a fully descriptive name, or
+make it obvious that the variables is an iterator.  E.g. either
+
+	uint8_t max_nr_counters = nr_core_counters();
+
+	...
+
+		for (nr_counters = 0; nr_counters < max_nr_counters; nr_counters++) {
+
+
+or
+
+		for (j = 0; j < nr_counters; j++) {
+
+
+'j' is obviously not descriptive, but when reading the usage, it's more obvious
+that it's a loop iterator (if you choose
+
+> +				vm = vm_create_with_one_vcpu(&vcpu, guest_test_core_counters);
+> +
+> +				if (nc)
+
+Is '0' not a legal number of counters?
+
+> +					vcpu_set_cpuid_property(
+
+Google3!  (Never, ever wrap immediately after the opening paranethesis).
+
+> +						vcpu, X86_PROPERTY_NUM_PERF_CTR_CORE, nc);
+> +				if (ce)
+> +					vcpu_set_cpuid_feature(
+> +						vcpu, X86_FEATURE_PERF_CTR_EXT_CORE);
+
+This likely doesn't do what you want.  By default, vm_arch_vcpu_add() initializes
+CPUID to KVM's supported CPUID.  So only _setting_ the feature means that that
+the test is likely only ever running with the full set of supported features.
+
+Jumping back to my complaints with the for-loops, if the features to interate on
+are collected in an array, then the test can generate a mask of all possible
+combinations and iterate over that (plus the array itself).  That keeps the
+indentation bounded and eliminates the copy+paste needed to add a new feature.
+The only downside is that the test is limited to 64 features, but we'll run into
+run time issues long before that limit is reached.
+
+	const struct kvm_x86_cpu_feature pmu_features[] = {
+		X86_FEATURE_PERF_CTR_EXT_CORE,
+		X86_FEATURE_PERFMON_V2,
+	};
+
+	const u64 pmu_features_mask = BIT_ULL(ARRAY_SIZE(pmu_features)) - 1;
+
+	for (mask = 0; mask <= pmu_features_mask; mask++) {
+		for (nr_counters = 0; nr_counters < max_nr_counters; nr_counters++) {
+			vm = vm_create_with_one_vcpu(&vcpu, guest_test_core_counters);
+
+			vcpu_set_cpuid_property(vcpu, X86_PROPERTY_NUM_PERF_CTR_CORE,
+						nr_counters);
+
+			/* Comment goes here */
+			for (i = 0; i < ARRAY_SIZE(pmu_features); i++)
+				vcpu_set_or_clear_cpuid_feature(vcpu, pmu_features[i],
+								mask & BIT_ULL(i));
+
+			...			
+	}	
+
+> +				if (pm)
+> +					vcpu_set_cpuid_feature(
+> +						vcpu, X86_FEATURE_PERFMON_V2);
+> +
+> +				pr_info("Testing core counters: CoreExt = %u, PerfMonV2 = %u, NumCounters = %u\n",
+> +					ce, pm, nc);
+> +				run_vcpu(vcpu);
+> +
+> +				kvm_vm_free(vm);
+> +			}
+> +		}
+> +	}
+> +}
 
