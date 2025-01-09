@@ -1,107 +1,108 @@
-Return-Path: <kvm+bounces-34941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34942-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA90A080C0
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:48:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA7ACA080C3
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:48:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13BE21650A8
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:48:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F073D165168
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:48:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11F11F9428;
-	Thu,  9 Jan 2025 19:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6481FDE18;
+	Thu,  9 Jan 2025 19:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jmwdko+A"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WJ/G8WBP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FC31991A1
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D481ACEDF
+	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736452080; cv=none; b=B+QIfVIWWOjYaww1kgvRAMLPIDovDvswLyWTK9yMbJnSsQTQST8zMlEVBXJrVCos39XUF0Yg0BLm9R1TGiPCFBAaFlpOmx3Rh5xhkjCUO//lVwPzmT5qHWojzWZ3dSYIp+/uKBZyHw/pXUB5mrdL5mkBQ9ICp4ax7ZUQJOSTDRs=
+	t=1736452089; cv=none; b=FZ3BAxD7uOm+PfJP+TN328Cd2BMejFYqS/fkuQ4Omyy/nF6BSr0QTSjTXH54QqP9hkkwpuum3nos5DJDCrD0EGErSlmjdh3D3jvCm3FOp/W58JXwg62SFntN9FsRa6zzqBL2nGxniUlNrPwq2JHgtoZNcUjnem4SjECe29JiWwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736452080; c=relaxed/simple;
-	bh=4G5KOGfyI1W0W+ESTWGPRTsIZpX++5YDvRwegRcrWZk=;
+	s=arc-20240116; t=1736452089; c=relaxed/simple;
+	bh=9oXz7eNeGbveESkmF9yrda7YeYxpiiir+vwUJjOgpZg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tCj2b76AJMkPJHUu1z7P0/57dAQzcP/CMytB7Qf6RZlOTInCVaSQbn7Ur1jBkt3o3ApKuQ5hfm0XdRgzD2tiKisd+jG+iieblWUyYDK7XibvuSZOhs5PfYIEACAtgSYGMNF7LdsTizOcK+tyICdWAMWJk5nRwzCL5jxoSWAD7jM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jmwdko+A; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=NslvuxwRoejbyzFVPn3way7loXBVo/ZWGoHNMD0q5Xuat27Qp/2/dW86hjEfplJQdSHI558knVEnlthuHdpPSDElxGoJcSqDAe1rfWa4FDQ8o6XO8hxnZ6NcsyZHNQXrjZZN7L0KWjIwOCQbrvcAMEnxrZePFpAFk6bGCBO6afQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WJ/G8WBP; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef728e36d5so2322949a91.3
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:47:58 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so3241613a91.3
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:48:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736452078; x=1737056878; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736452088; x=1737056888; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gtZDgWcR5BTPffyrCA5vpGVMGGdsrnvXv0W7Drd/iAg=;
-        b=jmwdko+ABgzsukTZyZUUfcoDp7aruy6rtSIbgFdrpK4oGkNRxObViiKdZLJjk7RU1U
-         UA77OPgwYsEcy8c55bAW9Ndy5n1IaaY1ShAIRAdlFzdXbwPbsoQAY9l4NAoxctMJBHy3
-         gJ79XPgLErjAGbCZzDY6KTh6xLAA4TjRAoSiBCtLbRL4LajG0qYCUx9xzmGKqBgUamxq
-         nzb3CwLnYiErXhrh4PYygEGAdjM7mllnplM+eeATjmV4z7ngdV6Cu3NEhJHch9AG7/aT
-         /uYzp6sdhWOlC5O6Jf8kLTF7Q7uqbyaPCnL9ClZBEIDIi0OzEkub7BwbdynCvWyJ+0f5
-         R6Tw==
+        bh=ioFLEvIQ3l2mrG5QyAprCujKthc9WsXf5JYkZUGRwr4=;
+        b=WJ/G8WBPIebAUxWyt+4t17NXcdAIOT76VGlM4W3tVo97gh7UVPZRl/KVIj3/nLX4J4
+         jlleu0NZnorip+fpLKLBPaadchlKCyXoEVDB2p+i3nWOv5BvC3+Uht79f7iOW4IQ2UbH
+         6N5nanXzmep/8b3356bcC0yiezgDFIAZYYELlePUEGdEbKUIyJrFYppTUV3HF8HKxzqN
+         1rJ7aV+AnuXySI3WjbXodEoDBAfgqlO5yIGGmYYe2Mr2jNpNiGm87PFsNdih9M3VnGB3
+         Z62uz/epehcwIkVIJhTmUEkEuOp5LRw2MKQNieepc/JZICgVm9K2jJXWZHkrrDdaEwtg
+         T/Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736452078; x=1737056878;
+        d=1e100.net; s=20230601; t=1736452088; x=1737056888;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gtZDgWcR5BTPffyrCA5vpGVMGGdsrnvXv0W7Drd/iAg=;
-        b=ID0B7H2Y5VyHDpHaVi5DFe6oEsWlyt3tsL0CEY3tYF2/qe6ZmwabxJAtRE7eFpPebp
-         lEt86u5dGLDlOkd4hFo/87btGBfwcwkNNW6eOF/wVhDarsAXDNzQvStOtK5TZt6KykC9
-         mya3BO1r3ckNVYDBc6GwLUunp0OR+Y0CraZoduc9gP7xehhusLzcMl9HxPkEs8eGZ/8i
-         xv5WTZlmuGnMHz848IjDfMZA8z/RfFdKMMr6qiav/k3ireI5IiMjCReBSDo3aMOKHEI7
-         SzRDrHyzDqP7ntTWkfsw1x9sxM4P29nLAaVvYvo5adJ99K4V4De/nwDOu7e9bWj1vARd
-         r70g==
-X-Forwarded-Encrypted: i=1; AJvYcCWCo32m7ls7ySEMZsMsFQ27jgHw+hBC7oWNFW8CvEotqkFDPXSm/Yy5bn+5OB+skbmACNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNWEWE+nEsy9cfzGwQ7k0OLrBBmOJimSg/iRVCH68CYKLyGiYH
-	M7apTHtnNtIZblq5XkabNYVfhFLigDl+9zg6zBtAILCt8pc1whjd+3p2muHDAVmJhKCqd8i4m5M
-	Cmw==
-X-Google-Smtp-Source: AGHT+IHAdB8TmFSBg1BojPtAS8zkyJspipKBZHemqIP+a1ITsYpE3gEPS1+ctCKQv+9HebxZGXTXqOzAEn4=
-X-Received: from pjbqi4.prod.google.com ([2002:a17:90b:2744:b0:2ef:7af4:5e8e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a0e:b0:2ee:45fe:63b5
- with SMTP id 98e67ed59e1d1-2f548e98716mr11254063a91.3.1736452078080; Thu, 09
- Jan 2025 11:47:58 -0800 (PST)
-Date: Thu,  9 Jan 2025 11:47:05 -0800
-In-Reply-To: <CACZJ9cUY9ovqkazdcNCtJf=JPbwOO7+sqL2Xp6rBi_Jn1kx1bQ@mail.gmail.com>
+        bh=ioFLEvIQ3l2mrG5QyAprCujKthc9WsXf5JYkZUGRwr4=;
+        b=IlmXnXRUhzoGEA2vYQItvtK7n44BHsWS/ixTE4HXYzH1rt1+MHyhQBELQfeLpeyot6
+         1G5lMkCKaaGJYgLiMNA7ACVgMMdLHSvyRtVMPaeXmhKWuOA7leeyVkj+py6t36eF83na
+         lAGOfIJlDfvS0ZkSYLGv4PgGbnjvQdloSMrVuh3Hisn6i4Rfv9jmpzZoxYsMeMabFnJM
+         nYhnUkg9tOifU1zaU/5jLjf24vyX6BTFDeLs7se04+fgIA8KVqYyBrIbOB3yrGSn04Au
+         829mT1Lc2CzKlqRwuyyFe9JC2EUgOMrJANOayJAZxdHYP7zIwL3CITZ0gws9cr03Au1L
+         MBUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSpG1l1frT19no7N19JTrDALlZ1RCLbBD1/p65hIZvQMcqqBciiIpGPu0SggI1Sy5WEuE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyCR5tli0eRM6TSdIj/llP8B3IvDDDC1JwSCNsIFjUKuFK0/1Q
+	RwKGn7af8lGiW5NuraiuR3dBc6rOD68e3JR2q+1h2zP76halsRob7amCvxSBXYTAH84eRcJOEIP
+	/jA==
+X-Google-Smtp-Source: AGHT+IEd6fPtUqOmLIFErIg79PiIK5Ek8YRAIMNBoDdQl6kKMsPbTLRjJCSKEEwcQMrDs/N3knvGrLDfTw8=
+X-Received: from pjbov12.prod.google.com ([2002:a17:90b:258c:b0:2ea:5c73:542c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2747:b0:2f2:a664:df1a
+ with SMTP id 98e67ed59e1d1-2f548e9c9bcmr12165669a91.2.1736452087892; Thu, 09
+ Jan 2025 11:48:07 -0800 (PST)
+Date: Thu,  9 Jan 2025 11:47:07 -0800
+In-Reply-To: <20240918205319.3517569-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <CACZJ9cUY9ovqkazdcNCtJf=JPbwOO7+sqL2Xp6rBi_Jn1kx1bQ@mail.gmail.com>
+References: <20240918205319.3517569-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173645146811.887246.17460857836499712646.b4-ty@google.com>
-Subject: Re: Subject: [PATCH] x86: kvmclock: Clean up the usage of the
- apic_lvt_mask array.
+Message-ID: <173645110935.884997.7060671564225875763.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/6] Extend pmu_counters_test to AMD CPUs
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Liam Ni <zhiguangni01@gmail.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Cc: Mingwei Zhang <mizhang@google.com>, Jinrong Liang <ljr.kernel@gmail.com>, 
+	Jim Mattson <jmattson@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-The shortlog scope is wrong, this has nothing to do with kvmclock.  It should be:
+On Wed, 18 Sep 2024 20:53:13 +0000, Colton Lewis wrote:
+> Extend pmu_counters_test to AMD CPUs.
+> 
+> As the AMD PMU is quite different from Intel with different events and
+> feature sets, this series introduces a new code path to test it,
+> specifically focusing on the core counters including the
+> PerfCtrExtCore and PerfMonV2 features. Northbridge counters and cache
+> counters exist, but are not as important and can be deferred to a
+> later series.
+> 
+> [...]
 
-KVM: x86:
+Applied 1 and a modified version of 2 to kvm-x86 selftests, thanks!
 
-On Mon, 30 Dec 2024 15:44:01 +0800, Liam Ni wrote:
-> Clean up the usage of the apic_lvt_mask array.
-> Use LVT_TIMER instead of the number 0.
-
-Your mail client is broken.  The subject repeats "Subject: ", and the patch is
-whitespace damaged.  I manually recreated the patch because it's a no-brainer and
-trivial, but in most cases I won't put in the effort for patches that don't apply.
-Please fix your setup.
-
-With that said, applied to kvm-x86 misc.  Thanks!
-
-[1/1] KVM: x86: Use LVT_TIMER instead of an open coded literal
-      https://github.com/kvm-x86/linux/commit/d6470627f584
+[1/6] KVM: x86: selftests: Fix typos in macro variable use
+      https://github.com/kvm-x86/linux/commit/97d0d1655ea8
+[2/6] KVM: x86: selftests: Define AMD PMU CPUID leaves
+      https://github.com/kvm-x86/linux/commit/c76a92382805
 
 --
 https://github.com/kvm-x86/linux/tree/next
