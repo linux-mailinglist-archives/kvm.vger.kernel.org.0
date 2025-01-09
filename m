@@ -1,152 +1,153 @@
-Return-Path: <kvm+bounces-34914-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34915-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B956A07786
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 14:35:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 518F2A07821
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 14:49:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21EE11603FC
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 13:34:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2F393A78F7
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 13:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DEC218E82;
-	Thu,  9 Jan 2025 13:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D67122068E;
+	Thu,  9 Jan 2025 13:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="dPeu0oXw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DNGP0CYY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC6F2185B2;
-	Thu,  9 Jan 2025 13:34:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9685921E0BE
+	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 13:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736429686; cv=none; b=FlF5O0RjANvnStjyOzVwjLcodwvgNL1mlGdKjSKg2L1SNoLS5/ZWQF4LkGwL/2dqt2kb30VnRP0RFVUvVAjmotLX0XWzHo31llbXgQuh5wH+QztleO3/Hmi1ETYc7i/pAZYU+DMqgRHtl4yVKu28jwClllGz8autNHj0dC5VWKg=
+	t=1736429906; cv=none; b=LACuvyGp8LGYqvGXi16SGGnAFSbhwvBpx1DXklFrca0uZ+77777EMsNFOnhtunojYl5DGDt0ReS0PwgJXckwYSmkLdYWX2Um9B9luRSh82zxA/CzPanyCrpqv37vBTfM1R2Syq5M5LT8IEGOMfyMndN41mQMXwc8ppV/ajML9YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736429686; c=relaxed/simple;
-	bh=2iOVx27y8FWIvxdxYvHRDO2A/7X5KLbji8GiY5iP4HE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fQXh8wchHW59YPYeT4cSVgax5W6WoAcPEsqbD4Gm4ufBefawKTpwdR79/y2GZn7C9e8i3tNwYmYQOWiOG1s7XOY0ZAyeLBKqoGKWKxGBZbPy6nVaTJUXwGbDPNTuGWEqsN2bIfm/q7q2csM/qq1/MjGHpvh4NZmTpukC3RXSVEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=dPeu0oXw; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tVsgD-00305I-SD; Thu, 09 Jan 2025 14:34:33 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=w1/9gczPFPtb52AVap22ovoMq0pU+nsu8ng9Iwts42I=; b=dPeu0oXwrUl7zzbPhKigqr74+4
-	vQMAkuk363gZiWpmLVjGFes/MI9NAT5EDa2sXOWXEcH4sjrMQ74AW4hpMn12BloZ2Xu0gBGHgs+yh
-	2sjDk/M+IwHonhz+fzexA59U79RrqLjmBYWXWAkF9nqxm6i9yG6gsIuz5u8Fj9nMClfkGfZMD1DeU
-	QnHHar22KkbMoyxh4uonqaoTki9ObYh5nRmZn3+0G/lde2IMcQWxflWHApo/dYWoljXwmWtHHybQQ
-	gtJBy+uteaBMQ8mkOpjfX2VN40FAJzytCzKEIgkXBuJkQ5XLCmEhKqOqCq9bC9CCkWcUzULb2BNL2
-	3qfCyXtA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tVsgC-0004nq-Nj; Thu, 09 Jan 2025 14:34:32 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tVsgA-006cIo-Fi; Thu, 09 Jan 2025 14:34:30 +0100
-Message-ID: <2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co>
-Date: Thu, 9 Jan 2025 14:34:28 +0100
+	s=arc-20240116; t=1736429906; c=relaxed/simple;
+	bh=tj0EaTI4xDK9nr89rwD+fHqfvdYzjn0WO9cVa0FoTrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GUR52Z+sueK9MBeoLc1BroLCdRNmbu7GZPmviVIeeKwoCWlA8lwCXIGVzCrSnnsWGITJeDYKyYBmvMtIqJRmZNcII+hiNxpfVVReI4UA5Ty/Ti7eqE0KE8kRKbsyNO6+fK+XOVObb36ZGmf4bBQDgzLW8Cf3KfWWNbRhy4Fjsz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DNGP0CYY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736429902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uldQPwdfE7L9Dk1HaWI6s1M7Pg4/zwkf9XHa0qYWEsU=;
+	b=DNGP0CYYKZfQVZ0z1Rej1SAUJC+K7bSaqMF9TJWDQg++woy8Vf1St60JRNYKfJTVGGgb0Y
+	/A/Z1v6DN6Xrxy7XPvNhCZEozMBG2CS1ZFIfOL8+rv4srL3VVfj5aDZVisDggydPlT8qc+
+	bW0QvOyX9AEC0zEYbF04WDthpZEmi4Q=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-354-KLEaowzUNqmQV6YAm45aJg-1; Thu, 09 Jan 2025 08:38:21 -0500
+X-MC-Unique: KLEaowzUNqmQV6YAm45aJg-1
+X-Mimecast-MFC-AGG-ID: KLEaowzUNqmQV6YAm45aJg
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aaf9d0f4e0eso84049366b.3
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 05:38:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736429900; x=1737034700;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uldQPwdfE7L9Dk1HaWI6s1M7Pg4/zwkf9XHa0qYWEsU=;
+        b=STn2y0BOlsEcUk5mLpvuMvqOCARv8iL6myZbOkFOAGrJB9ADNfmMp1UgiQA72PPICI
+         xIOCwSfWd64UpG2UY8lSFu5oQ6lrJQGZ1DRdbBA8HXB9/pyUnbkoC50rlLiFn02sHytI
+         UnUYclEQLX1x07CwUp0Lc+0z9Vojr0LCAf+SQ3QHXGVZURI+r1cRbl2lIiIpBYRxj34r
+         Milx5pXL9Fy5/m3asM9LYyG1IToFAa47peEA1fXOg34cq4loQQtYT9NMTqzUWdkubYK2
+         0JWbTyxNhrQRp7oFhysRHuYRui/nmXqawYmeTKyLxX29CH0z9hiIMSWm/hhnlx99o7RW
+         AVFA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKdtBLVejdnI8k12ubNoIq4dE3RgWltTEbiibPvVisO86CG345jzIcobnvTrPzZ4vabfc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwJwUtyfgfMAz+HvbliFOm3YovEbbgCCJ4IlrxSejcj0+hzSrz
+	C4Zz/TEteH9H9mhmFt2GnKHlbm44TpwODC76HQBU63XAgSBQLVSgnITblkurWiJgNB266a6xQv9
+	wphkAweKTtleS4pZGnOS9EiM1ykLRYa8/jGCH4z8IaPjPUmtAAg==
+X-Gm-Gg: ASbGncsoPGzb6DbWw3m38sTmwls0S8UY357ayUxo11pfGsZS1ITITNQ51i7wLLbF7CO
+	0yfjIRGFUF8CUcDgol8Pzc1VKClQG+i6FhlfQ0MUeusDL8T0vNAT++t9JbIYitfwy3S9r9GJpnQ
+	UxUM/X+L4Y3Ze/TO4EX6dYFWQBbf99hNCpcEeYX0/BNcnDobOhfgGiwRz0Sn/L/lYoKZuHC8gcl
+	ZWz/sKaPO6uxDHx+bIGjvlDuGOzEdqDWnjpKjmev6vartbjtORTF90/ftBD
+X-Received: by 2002:a17:907:36c8:b0:aa6:4494:e354 with SMTP id a640c23a62f3a-ab2abc92570mr698464866b.42.1736429900053;
+        Thu, 09 Jan 2025 05:38:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGidjwN/yFK9ZauIimr2u7AiwN7b2XDO8B6ecoGAlxpK3GFkQSMXGdYvA9XVkfNkK6maNXm2Q==
+X-Received: by 2002:a17:907:36c8:b0:aa6:4494:e354 with SMTP id a640c23a62f3a-ab2abc92570mr698462166b.42.1736429899595;
+        Thu, 09 Jan 2025 05:38:19 -0800 (PST)
+Received: from [192.168.10.47] ([151.62.105.73])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d9904a5277sm591739a12.80.2025.01.09.05.38.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 05:38:19 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: oliver.upton@linux.dev,
+	Will Deacon <will@kernel.org>,
+	Anup Patel <apatel@ventanamicro.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	seanjc@google.com,
+	linuxppc-dev@lists.ozlabs.org,
+	regressions@lists.linux.dev
+Subject: [PATCH 0/5] KVM: e500: map readonly host pages for read, and cleanup
+Date: Thu,  9 Jan 2025 14:38:12 +0100
+Message-ID: <20250109133817.314401-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net 1/2] vsock/virtio: discard packets if the transport
- changes
-To: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Bobby Eshleman <bobby.eshleman@bytedance.com>,
- virtualization@lists.linux.dev, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Luigi Leonardi <leonardi@redhat.com>,
- bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Hyunwoo Kim <v4bel@theori.io>,
- kvm@vger.kernel.org
-References: <20250108180617.154053-1-sgarzare@redhat.com>
- <20250108180617.154053-2-sgarzare@redhat.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20250108180617.154053-2-sgarzare@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/8/25 19:06, Stefano Garzarella wrote:
-> If the socket has been de-assigned or assigned to another transport,
-> we must discard any packets received because they are not expected
-> and would cause issues when we access vsk->transport.
-> 
-> A possible scenario is described by Hyunwoo Kim in the attached link,
-> where after a first connect() interrupted by a signal, and a second
-> connect() failed, we can find `vsk->transport` at NULL, leading to a
-> NULL pointer dereference.
-> 
-> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
-> Reported-by: Hyunwoo Kim <v4bel@theori.io>
-> Reported-by: Wongi Lee <qwerty@theori.io>
-> Closes: https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 9acc13ab3f82..51a494b69be8 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -1628,8 +1628,11 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
->  
->  	lock_sock(sk);
->  
-> -	/* Check if sk has been closed before lock_sock */
-> -	if (sock_flag(sk, SOCK_DONE)) {
-> +	/* Check if sk has been closed or assigned to another transport before
-> +	 * lock_sock (note: listener sockets are not assigned to any transport)
-> +	 */
-> +	if (sock_flag(sk, SOCK_DONE) ||
-> +	    (sk->sk_state != TCP_LISTEN && vsk->transport != &t->transport)) {
->  		(void)virtio_transport_reset_no_sock(t, skb);
->  		release_sock(sk);
->  		sock_put(sk);
+[Oliver/Will/Anup/Andrew, you're Cc'd because of an observation below
+ on VM_PFNMAP mappings. - Paolo]
 
-FWIW, I've tried simplifying Hyunwoo's repro to toy with some tests. Ended
-up with
+The new __kvm_faultin_pfn() function is upset by the fact that e500
+KVM ignores host page permissions - __kvm_faultin requires a "writable"
+outgoing argument, but e500 KVM is passing NULL.
 
-```
-from threading import *
-from socket import *
-from signal import *
+While a simple fix would be possible that simply allows writable to
+be NULL, it is quite ugly to have e500 KVM ignore completely the host
+permissions and map readonly host pages as guest-writable.  A more
+complete fix is present in the second to fourth patches (the first is
+an independent bugfix, Cc'd to stable).
 
-def listener(tid):
-	while True:
-		s = socket(AF_VSOCK, SOCK_SEQPACKET)
-		s.bind((1, 1234))
-		s.listen()
-		pthread_kill(tid, SIGUSR1)
+The last one removes the VMA-based attempts at building huge shadow TLB
+entries, in favor of using a PTE lookup similar to what is done for x86.
+This special casing of VM_PFNMAP does not work well with remap_pfn_range()
+as it assumes that VM_PFNMAP areas are contiguous.  Note that the same
+incorrect logic is there in ARM's get_vma_page_shift() and RISC-V's
+kvm_riscv_gstage_ioremap().
 
-signal(SIGUSR1, lambda *args: None)
-Thread(target=listener, args=[get_ident()]).start()
+Fortunately, for e500 most of the code is already there; it just has to
+be changed to compute the range from find_linux_pte()'s output rather
+than find_vma().  The new code works for both VM_PFNMAP and hugetlb
+mappings, so the latter is removed.
 
-while True:
-	c = socket(AF_VSOCK, SOCK_SEQPACKET)
-	c.connect_ex((1, 1234))
-	c.connect_ex((42, 1234))
-```
+If this does not work out I'll go for something like
+https://lore.kernel.org/kvm/Z3wnsQQ67GBf1Vsb@google.com/, but
+with the helper in arch/powerpc/kvm/e500_mmu_host.c.
 
-which gives me splats with or without this patch.
+The series is compile-tested only.  Christian, please test
+this as we do not have e500 hardware readily availabe.
 
-That said, when I apply this patch, but drop the `sk->sk_state !=
-TCP_LISTEN &&`: no more splats.
+Thanks,
+
+Paolo
+
+Supersedes: <20250101064928.389504-1-pbonzini@redhat.com>
+
+Paolo Bonzini (5):
+  KVM: e500: retry if no memslot is found
+  KVM: e500: use shadow TLB entry as witness for writability
+  KVM: e500: track host-writability of pages
+  KVM: e500: map readonly host pages for read
+  KVM: e500: perform hugepage check after looking up the PFN
+
+ arch/powerpc/kvm/e500.h          |   2 +
+ arch/powerpc/kvm/e500_mmu_host.c | 202 +++++++++++++------------------
+ 2 files changed, 89 insertions(+), 115 deletions(-)
+
+-- 
+2.47.1
+
 
