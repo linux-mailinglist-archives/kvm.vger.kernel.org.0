@@ -1,160 +1,161 @@
-Return-Path: <kvm+bounces-34933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34934-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42774A07F1D
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 18:44:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FB03A08056
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:00:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33C967A32F1
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 17:44:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A15018884DB
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7541F37D6;
-	Thu,  9 Jan 2025 17:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7C01B423A;
+	Thu,  9 Jan 2025 19:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bxWUW9gU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fgmIlYsh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C082192D7E;
-	Thu,  9 Jan 2025 17:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8651ACEB2
+	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736444568; cv=none; b=rmHNHkMROaOsnkx9/5fvS2yXBw9BKLhogSIv4FKpf6qmtpdq45QCov+QDRT89C3wgC7i+i66WBqgiqKTDo7g2nSOSmfBnyGNm/RKzwAhZLtIKGWafBkhyLhr59V4xWQZjXxd/9Ix7Gp4HUxir0JZ+g5NaPAIeLgeC8lm76uy5js=
+	t=1736449204; cv=none; b=uJFcbuUm2dBWCvkOdBPKhtf9LmDBMb9euNCKrMzKx125wW0OmT9U7QLD97yzkLvC714Ct2D6akh+DvoIuBUGESkOrxaLQ7o3jeBr2cJXqlhMg9ZFEF4CamBlOG2+4NUjsrxq8EHpBw5kmMr3hH55mq688OWtzKJEIqdSQFrsgt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736444568; c=relaxed/simple;
-	bh=dgToOXb8BvN4dra1Kh0zNZ6JczMXJPb/z/Obr2XcVuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FGXWCRQhFM79APAq3FdX6/6fwSjRhrzi1IDLsDDwg2KTG8L8si/fr6Qra7lwtsPcPZZKwjnwolepPWJ480hrCwIQLwcIw0ELAX7GQJzEhXbAeGeHq6xp7AqLwCUAdzlP3D1KXB5jhXokCUJ5P/AYOJ+0wA1hJfdDBZDTMdwllPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bxWUW9gU; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736444567; x=1767980567;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dgToOXb8BvN4dra1Kh0zNZ6JczMXJPb/z/Obr2XcVuo=;
-  b=bxWUW9gUn4Q3H3cNa7LGSfTsm6cZ6vesi4focjJ8Sl0f/W9TWKIFGPnS
-   jTUcOO2eiaaj51LTI/kao4wSd7vj5O/6j4rtNnJKLSF8o6gFEIGTOErxy
-   dKdYERlUvJ7pqW01ZjKCC3jxbuNsZP6D/k7Doa5JxsBhwuOTmuarNigUh
-   ruYemTIBpoQ3Wh7p8ElNuHDSKi85v6YNWlVawAnT8r8H0/QLNcfVD/uXi
-   WvdpX5UmXcWOlTI5H40Jpt4mS9oqPO67C3mEgj2CYY/6xqH7Ir6faqYV/
-   SlOSCyZbN1CkrFruOepFdUi9/WP1C2gM8KBWL5KE60UvoL3sYHCu/s4mE
-   Q==;
-X-CSE-ConnectionGUID: oxHwX3eaQCOUii8uJcr+LA==
-X-CSE-MsgGUID: AESLZacDQD2wJgMX8ijUnQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="36602372"
-X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
-   d="scan'208";a="36602372"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 09:42:47 -0800
-X-CSE-ConnectionGUID: k1Q/oHnYS2u8SlDT98Hsog==
-X-CSE-MsgGUID: pQYon3DlSXaJlOBIOZEk9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="126759244"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 09 Jan 2025 09:42:43 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tVwYL-000HwX-16;
-	Thu, 09 Jan 2025 17:42:41 +0000
-Date: Fri, 10 Jan 2025 01:42:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, linux-s390@vger.kernel.org,
-	frankja@linux.ibm.com, borntraeger@de.ibm.com,
-	schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
-	hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-	gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
-Subject: Re: [PATCH v1 04/13] KVM: s390: move pv gmap functions into kvm
-Message-ID: <202501100045.U1NGK9qJ-lkp@intel.com>
-References: <20250108181451.74383-5-imbrenda@linux.ibm.com>
+	s=arc-20240116; t=1736449204; c=relaxed/simple;
+	bh=BBqs3szBxL4esre0332Pv3td2KRryfSW/KpLMasw1tc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VPbNW05+H1W6tbUeZ81dEmkf5HK7gv8Spv0GEN5hbxrDV19hbsgRZKBO5593Dli7OkMQj6gQSWTQFo5yI97AIM9K74XRDJaoXtqtTTy9ocvcitCSEQhX8edw3VPAaWSryyZUPhGRp7Ixc9sQOMqNp5MVGcYPBS8Kvkgiu3d2D/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fgmIlYsh; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2162259a5dcso32229735ad.3
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:00:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736449202; x=1737054002; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=haLW7l47J5rMTEJ8zSACBng3wk1nv637cJFnGsiAO+w=;
+        b=fgmIlYsh/q6Gv55SG/prqOlprWQW9ZP6G/z/PgU6qS4B+mfOkZx6C37xxOI7ZrBe5C
+         BzMwI65LDU6ru1Ot5Wru+GgpF1zMbSV3hKGyhshSpQ5k6h6iYQnI9br+VDaPsHODzbeD
+         TnYtoToraETwg5HxtJVRge6G1EE3O0jFU8uBf2VU3Ji/dDIyLxIdIJ6Uxi78n/9fY9f1
+         4HtC8lT3q607ppugTYols2v0U8Uzy82USUDgK6p1pNrYH/YsP6MLV/9FqK3DMtJQZsGf
+         JNm3ah9BxKqJzzznRH7/W+3u2wjznCAea82ndFD7K/jd9+lr4/oGtRypmb1ixpspf9PZ
+         03LQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736449202; x=1737054002;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=haLW7l47J5rMTEJ8zSACBng3wk1nv637cJFnGsiAO+w=;
+        b=p1jxJ1nu1p7Gcvqmo0PnxLaTYcZSnLfgqjlf80hkZ0Iml5XaeydPvBioVPvwMkGrdX
+         RxV1f2blmYJbD5erwnRQj6aTOwRfgTFaEboJCQsGy/G3a612hQNgJa1Gayqt1f7MuHJb
+         aQZ5/A8Ak4f5GKjwt1ORJufV0v8dBmYXL/KmpWB1Ys3FrjnYS728WxwLhXJkoL7dxyDg
+         RzGx7rvhGpk8x2M+CiVLrdWNnn92jQw27ntMxyThUPzsSlxuFL64Cb/+pDgH9R75zQdn
+         NMXNsPEAeeh0vQOvPWy5MSo+imkCmQqbP+T5zVvr/CLfqhYVaHWjeJnPN0OScDDC0TEw
+         8N0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVPRkXh0aPeuUtO2t1DjN4Hmm3BhGCBA8MSBSXhX5Xm7FEGmJRrMN6eQJYkhe/a+pw1hi4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKm8FWkwQ7yv7TJ32VIQRNV9k2gTCAHQdXaj7Ae+YVSEU/V0by
+	+LmZX950LFCFWsvo2evLdTMq+zwmww5s50aKRQXQFwa2KM/QCu86cH0cHtoiotCxOVUJqk2VjED
+	62g==
+X-Google-Smtp-Source: AGHT+IGGyRrFtOiXTLX0QGUwtIUWJLQiVZ+xflS3X78Pqi0jjnUrRHfKUFCx6IqJaMIjpIbZnthCmIRTyvc=
+X-Received: from pgak9.prod.google.com ([2002:a63:3d09:0:b0:7fd:432d:551a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db06:b0:216:725c:a12c
+ with SMTP id d9443c01a7336-21a83f46a4dmr117318665ad.9.1736449202497; Thu, 09
+ Jan 2025 11:00:02 -0800 (PST)
+Date: Thu, 9 Jan 2025 11:00:01 -0800
+In-Reply-To: <20250109133817.314401-2-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108181451.74383-5-imbrenda@linux.ibm.com>
+Mime-Version: 1.0
+References: <20250109133817.314401-1-pbonzini@redhat.com> <20250109133817.314401-2-pbonzini@redhat.com>
+Message-ID: <Z4Acsese_-Kh1GPr@google.com>
+Subject: Re: [PATCH 1/5] KVM: e500: retry if no memslot is found
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, oliver.upton@linux.dev, 
+	Will Deacon <will@kernel.org>, Anup Patel <apatel@ventanamicro.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, linuxppc-dev@lists.ozlabs.org, 
+	regressions@lists.linux.dev, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Claudio,
+On Thu, Jan 09, 2025, Paolo Bonzini wrote:
+> Avoid a NULL pointer dereference if the memslot table changes between the
+> exit and the call to kvmppc_e500_shadow_map().
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/powerpc/kvm/e500_mmu_host.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
+> index e5a145b578a4..732335444d68 100644
+> --- a/arch/powerpc/kvm/e500_mmu_host.c
+> +++ b/arch/powerpc/kvm/e500_mmu_host.c
+> @@ -349,6 +349,11 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
+>  	 * pointer through from the first lookup.
+>  	 */
+>  	slot = gfn_to_memslot(vcpu_e500->vcpu.kvm, gfn);
+> +	if (!slot) {
+> +		ret = -EAGAIN;
+> +		goto out;
+> +	}
 
-kernel test robot noticed the following build warnings:
+This is unnecessary, __gfn_to_hva_many() checks for a NULL @slot.
 
-[auto build test WARNING on s390/features]
-[also build test WARNING on kvm/queue kvm/next mst-vhost/linux-next linus/master v6.13-rc6 next-20250109]
-[cannot apply to kvms390/next kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+  static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slot, gfn_t gfn,
+				       gfn_t *nr_pages, bool write)
+  {
+	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+		return KVM_HVA_ERR_BAD;
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Claudio-Imbrenda/KVM-s390-wrapper-for-KVM_BUG/20250109-021808
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git features
-patch link:    https://lore.kernel.org/r/20250108181451.74383-5-imbrenda%40linux.ibm.com
-patch subject: [PATCH v1 04/13] KVM: s390: move pv gmap functions into kvm
-config: s390-randconfig-001-20250109 (https://download.01.org/0day-ci/archive/20250110/202501100045.U1NGK9qJ-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250110/202501100045.U1NGK9qJ-lkp@intel.com/reproduce)
+	if (memslot_is_readonly(slot) && write)
+		return KVM_HVA_ERR_RO_BAD;
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501100045.U1NGK9qJ-lkp@intel.com/
+	if (nr_pages)
+		*nr_pages = slot->npages - (gfn - slot->base_gfn);
 
-All warnings (new ones prefixed by >>):
+	return __gfn_to_hva_memslot(slot, gfn);
+  }
 
->> arch/s390/kvm/gmap.c:144: warning: Function parameter or struct member 'page' not described in '__gmap_destroy_page'
->> arch/s390/kvm/gmap.c:144: warning: expecting prototype for gmap_destroy_page(). Prototype was for __gmap_destroy_page() instead
+  unsigned long gfn_to_hva_memslot(struct kvm_memory_slot *slot,
+					gfn_t gfn)
+  {
+	return gfn_to_hva_many(slot, gfn, NULL);
+  }
+
+Not checking the return value and doing a VMA lookup on hva=-1 when tlbsel==1 is
+gross, but it should be functionally safe.
+
+Returning -EAGAIN is nicer (kvmppc_e500_shadow_map() will inevitably return -EINVAL),
+but in practice it doesn't matter because all callers ultimately ignore the return
+value.
+
+Since there's a ratelimited printk that yells if there's no slot, it's probably
+best to let sleeping dogs lie.
+
+	if (likely(!pfnmap)) {
+		tsize_pages = 1UL << (tsize + 10 - PAGE_SHIFT);
+		pfn = __kvm_faultin_pfn(slot, gfn, FOLL_WRITE, NULL, &page);
+		if (is_error_noslot_pfn(pfn)) {
+			if (printk_ratelimit())
+				pr_err("%s: real page not found for gfn %lx\n",
+				       __func__, (long)gfn);
+			return -EINVAL;
+		}
 
 
-vim +144 arch/s390/kvm/gmap.c
 
-   133	
-   134	/**
-   135	 * gmap_destroy_page - Destroy a guest page.
-   136	 * @gmap: the gmap of the guest
-   137	 * @gaddr: the guest address to destroy
-   138	 *
-   139	 * An attempt will be made to destroy the given guest page. If the attempt
-   140	 * fails, an attempt is made to export the page. If both attempts fail, an
-   141	 * appropriate error is returned.
-   142	 */
-   143	static int __gmap_destroy_page(struct gmap *gmap, struct page *page)
- > 144	{
-   145		struct folio *folio = page_folio(page);
-   146		int rc;
-   147	
-   148		/*
-   149		 * See gmap_make_secure(): large folios cannot be secure. Small
-   150		 * folio implies FW_LEVEL_PTE.
-   151		 */
-   152		if (folio_test_large(folio))
-   153			return -EFAULT;
-   154	
-   155		rc = uv_destroy_folio(folio);
-   156		/*
-   157		 * Fault handlers can race; it is possible that two CPUs will fault
-   158		 * on the same secure page. One CPU can destroy the page, reboot,
-   159		 * re-enter secure mode and import it, while the second CPU was
-   160		 * stuck at the beginning of the handler. At some point the second
-   161		 * CPU will be able to progress, and it will not be able to destroy
-   162		 * the page. In that case we do not want to terminate the process,
-   163		 * we instead try to export the page.
-   164		 */
-   165		if (rc)
-   166			rc = uv_convert_from_secure_folio(folio);
-   167	
-   168		return rc;
-   169	}
-   170	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> +
+>  	hva = gfn_to_hva_memslot(slot, gfn);
+>  
+>  	if (tlbsel == 1) {
+> -- 
+> 2.47.1
+> 
 
