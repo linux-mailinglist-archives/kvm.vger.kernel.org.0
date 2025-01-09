@@ -1,215 +1,229 @@
-Return-Path: <kvm+bounces-34879-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34872-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDA63A06F02
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 08:23:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D91FCA06EBC
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 08:14:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 023263A601B
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 07:23:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C436E167941
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 07:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D2D2147FE;
-	Thu,  9 Jan 2025 07:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E761474A9;
+	Thu,  9 Jan 2025 07:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VbJ391R6"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="eUC9z/QX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F76201039;
-	Thu,  9 Jan 2025 07:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3103A201039
+	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 07:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736407407; cv=none; b=OdXASFDyi9kdfwWuKCnLk7t98G2LanH10c9EukOva2MYcqCDzfl3QEqdzWuUch2qOTH6FQrD3rnoiaP+vZFqO8Sgl4q5zGf6rect3viuiI+dUNSbDDtzykMIiSQ7N7zp2MOWIBVJPuqQ5dARiHMjIZ4qSyTHeNxaDYWLcUl98Qw=
+	t=1736406850; cv=none; b=sLnwRPcpHjuiGoiptiWNXCWejlLwbkvIy4HnC6Dv3qld80RiD9Q92nif5Tj4AWm0qc19DiUrkVkuOu975CzXWsn2ITTbttJymcOGSkBFF7z61VrO2oNtpTwrjdPmH2PmIu4hoT/QNSpFrpFV0935CNVmv6w0dAF37Z1/nBpMCvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736407407; c=relaxed/simple;
-	bh=5RtwYatc7XhYn22UVzvrAmXoefZVhRa51czG3ToYe9M=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Txk4mYDVgySIQzRr2QYNDWt56ylK608Nlq2CEkCZ0ycAh3mBORafNqPSw7sh5LxCBvRpA8Guqg7RLgUysULgr9+LTv4+gfhGuSQD+AnjocISMKEleb3fHPzwtpmUzEVLkE4lxBy/cQzdZOFR+q5jpCSfFOGvf1vq3fZotNZ/1R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VbJ391R6; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736407405; x=1767943405;
-  h=date:from:to:subject:message-id:references:mime-version:
-   content-transfer-encoding:in-reply-to;
-  bh=5RtwYatc7XhYn22UVzvrAmXoefZVhRa51czG3ToYe9M=;
-  b=VbJ391R6EGtk+igehPwDG1/AkRzOlVGThIFC4uJRim+CTFX8s2WEH9J0
-   mk14TedrJdUiZgw247WGneOg370pjMnajKVHFP7cBLjYFNBkHLEJ+BGtt
-   lrqmgMg+E+gbU9mO9kVjjvD81sg0b4WxJk+RiOtjYHlwaPYhv/xfk9K7g
-   2qrrZrIQOKvhf74l2IOkpi+xgErTjUiqoXdpzMVuFVMXgL+1YVu0iqkUR
-   NKI0FO3hfRnuJPhMh75O3tDU3YxcuLIBKXnEr/tSY50xBiwrNNF7djrzR
-   5hAEcwL2G9W6diW86zvacpXVPAjIDfR5Q2FBuGNkgll4TFuhf/pzBXL1/
-   A==;
-X-CSE-ConnectionGUID: BHK9w8uCSXyVfU3SrvKY9Q==
-X-CSE-MsgGUID: sFYgzrPzS4G46ByyGFTiXQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="36881452"
-X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
-   d="scan'208";a="36881452"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 23:23:24 -0800
-X-CSE-ConnectionGUID: 61UpxkwVSgaeTrD6q7mOEA==
-X-CSE-MsgGUID: h27PgmbLToehe3kcn8ABVA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="108431421"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa005.jf.intel.com with ESMTP; 08 Jan 2025 23:23:19 -0800
-Date: Thu, 9 Jan 2025 03:22:16 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, pbonzini@redhat.com, seanjc@google.com,
-	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
-	dan.j.williams@intel.com, aik@amd.com, yilun.xu@intel.com,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, yan.y.zhao@intel.com, leon@kernel.org,
-	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
- kAPI
-Message-ID: <Z37QaIDUgiygLh74@yilunxu-OptiPlex-7050>
-References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
- <20250107142719.179636-2-yilun.xu@linux.intel.com>
- <b1f3c179-31a9-4592-a35b-b96d2e8e8261@amd.com>
- <20250108132358.GP5556@nvidia.com>
- <f3748173-2bbc-43fa-b62e-72e778999764@amd.com>
- <20250108145843.GR5556@nvidia.com>
- <5a858e00-6fea-4a7a-93be-f23b66e00835@amd.com>
- <20250108162227.GT5556@nvidia.com>
- <Z37HpvHAfB0g9OQ-@phenom.ffwll.local>
+	s=arc-20240116; t=1736406850; c=relaxed/simple;
+	bh=LqvxA5ftiyTpqtyco60E1+2R8PkBLlpmDEhHjtL9mxY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To; b=rLwmaRaH9xVmytt2ajpRqax+PxdoHZa1ING2Ai1FVgpYSXOi6GKKC3nN7s9ffjrfyuQO/8bgbuWr2iDJBohiA4QEOsVB6UYOrqeqKwwiqK9MWrrntXoZyKFLhewbtRo/svBzBpTzjZNypI0d5r/aWAvxfrv132TgNmdDjr8oA+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=eUC9z/QX; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ef8c012913so784720a91.3
+        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 23:14:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736406847; x=1737011647; darn=vger.kernel.org;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ja/03/V9ZzSisHs2kOKIjRXGVbNIxLyyvnfSlbsG0Y=;
+        b=eUC9z/QXatG3ZBxGA8FcBWGGYdLDZGlIBAJ0J819pD3x1FxqUGlg3zgFLfHZ2D5jLl
+         PDhA8iMOSw6mQdgjUHTGmLWjQgWrljWdQJsnfxhL9Zo2Sh5Tm23PYGiTXjYr7EqljkZH
+         Zf2QVefem2456U5gg2X+ZWfIHM6zGdvvjqrQsfekFikdqnpE+Wjwg3I8OuGmYDuO+r38
+         JP1RM5J8wGFVWOkHTwR+U43EBUEfZlenCEsQeYnsNHJsCornNuIxpd0fUyV0gP8FZwEJ
+         VbBLGpUpSn/fnC/ZQUYFvbfOrTF3+ZYVKjQT9zr3fwb3SMlgqKfkCT8PSCwuTcQBrOl4
+         +R4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736406847; x=1737011647;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ja/03/V9ZzSisHs2kOKIjRXGVbNIxLyyvnfSlbsG0Y=;
+        b=HE+vRmKHTbXHkfRevnBQplhZ/QkFH+T46RJFH/vf0OwffVatfa4vJ9fuezzK6NAUsy
+         l4+fXqUU7gvcjynr5Qxbxctok4Psyx1rHfNGo2BcLJrB5gscnP5E5cVHeV8YodK20hLX
+         JhW7KmzE9H/C9otIHmj+C5QFiC6y80g/v6panSHYZ4IV4Vn/HFtMD8+FRfBCYQwwFSHu
+         j6j/FxLLrJMN2/KRC6S/CqgehGpGmUoS489qvsuPi4Z3F1PC/JAw5Cx8T/K/4AzlocdD
+         H3lWBJ1b0e297ye0s9nWk9+qpyIDixu0wijSdFAsNKo+g9XvgWe1Flrko48kXOqdPhVJ
+         eqkg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIU74vaGxMxLJSGKq+Bl3VsFNgupJ3yZoPFVk48p+TQOrtVErFWbxw/L4Eb0QW1QcHwHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrpK+rg5m3J4F98Zn2i2+snWpAiW/bnW21YBeP0NfP458nRPZ2
+	Dfl23TTF8ZXeuRLZ6AcpjldqIoZh/pqA+Zu8QXmvmYCshEs7WjnyjssgcqxS7pg4ZeGtmGGUxQl
+	cHOU=
+X-Gm-Gg: ASbGncsptmXHHuuYIn9syYYalJDIwIx/Z8ZyD9A4vY2tN0TqE/namTYhRWVmqZvj6kT
+	6USnRAGJ/zVl2Ww9YOYXv3zGzD2EvMADjJnu35jubNrB3nGZWPrO2x7pRrnyxGzMbGa+YP6Ucco
+	noU7QfOXQj1JQZfjCi6ck6LoEql980O/MqZLJv2wU/LzgGgJQLnF+uTq1gSCg6o00cX2f2728gX
+	eODjlxH7/Piy4+NMytnOy/vBiVfJ4otpBUqDVxRamLxqKG6ntoKhmz4d4A=
+X-Google-Smtp-Source: AGHT+IFJUP6kT2nk/Shr8HhgnublEXClAdP2xLMbF7YF7Q3uJCPF52tP7YCh+wLuw1haRrn273Yx8A==
+X-Received: by 2002:a17:90b:540f:b0:2ee:48bf:7dc3 with SMTP id 98e67ed59e1d1-2f548eb321emr9251390a91.15.1736406847130;
+        Wed, 08 Jan 2025 23:14:07 -0800 (PST)
+Received: from localhost ([157.82.203.37])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2f559404c43sm633599a91.16.2025.01.08.23.14.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jan 2025 23:14:06 -0800 (PST)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH v6 0/6] tun: Introduce virtio-net hashing feature
+Date: Thu, 09 Jan 2025 16:13:38 +0900
+Message-Id: <20250109-rss-v6-0-b1c90ad708f6@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z37HpvHAfB0g9OQ-@phenom.ffwll.local>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACJ3f2cC/4XQQW7DIBAF0KtYrIs1wBiwV71H1QWGoUFR7dY4V
+ qIody+21TZVFt0xiPeBf2WZpkSZddWVTbSknMahDPqpYv7ghjfiKZSZSZAICIpPOXMyygTbUnT
+ GsHLyY6KYzlvKy2uZDynP43TZQhex7q5eCQALjRQgaoGIUnLB3TEd0nGsx1BWz8FdhnSu/fjO1
+ pxF3lnRCBQasZYaNOp/rfq2CK1otncvigP3WkEJCz1Y+YDwDkncERZkkVolyQNp/4CaH7T+cEd
+ NQVH5qG2IAE34g257ZxN9nkrh817cb99dtWVJBXw+DVxrEuCw7cGbrlRScO8y8RL1nuauansZo
+ 9MCbS8IsdwINhoCMqSM8Ki8822MVO69fQE99LhV8AEAAA==
+To: Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+X-Mailer: b4 0.14-dev-fd6e3
 
-On Wed, Jan 08, 2025 at 07:44:54PM +0100, Simona Vetter wrote:
-> On Wed, Jan 08, 2025 at 12:22:27PM -0400, Jason Gunthorpe wrote:
-> > On Wed, Jan 08, 2025 at 04:25:54PM +0100, Christian König wrote:
-> > > Am 08.01.25 um 15:58 schrieb Jason Gunthorpe:
-> > > > I have imagined a staged approach were DMABUF gets a new API that
-> > > > works with the new DMA API to do importer mapping with "P2P source
-> > > > information" and a gradual conversion.
-> > > 
-> > > To make it clear as maintainer of that subsystem I would reject such a step
-> > > with all I have.
-> > 
-> > This is unexpected, so you want to just leave dmabuf broken? Do you
-> > have any plan to fix it, to fix the misuse of the DMA API, and all
-> > the problems I listed below? This is a big deal, it is causing real
-> > problems today.
-> > 
-> > If it going to be like this I think we will stop trying to use dmabuf
-> > and do something simpler for vfio/kvm/iommufd :(
-> 
-> As the gal who help edit the og dma-buf spec 13 years ago, I think adding
-> pfn isn't a terrible idea. By design, dma-buf is the "everything is
-> optional" interface. And in the beginning, even consistent locking was
-> optional, but we've managed to fix that by now :-/
-> 
-> Where I do agree with Christian is that stuffing pfn support into the
-> dma_buf_attachment interfaces feels a bit much wrong.
+This series depends on: "[PATCH v2 0/3] tun: Unify vnet implementation
+and fill full vnet header"
+https://lore.kernel.org/r/20250109-tun-v2-0-388d7d5a287a@daynix.com
 
-So it could a dmabuf interface like mmap/vmap()? I was also wondering
-about that. But finally I start to use dma_buf_attachment interface
-because of leveraging existing buffer pin and move_notify.
+virtio-net have two usage of hashes: one is RSS and another is hash
+reporting. Conventionally the hash calculation was done by the VMM.
+However, computing the hash after the queue was chosen defeats the
+purpose of RSS.
 
-> 
-> > > We have already gone down that road and it didn't worked at all and
-> > > was a really big pain to pull people back from it.
-> > 
-> > Nobody has really seriously tried to improve the DMA API before, so I
-> > don't think this is true at all.
-> 
-> Aside, I really hope this finally happens!
-> 
-> > > > 3) Importing devices need to know if they are working with PCI P2P
-> > > > addresses during mapping because they need to do things like turn on
-> > > > ATS on their DMA. As for multi-path we have the same hacks inside mlx5
-> > > > today that assume DMABUFs are always P2P because we cannot determine
-> > > > if things are P2P or not after being DMA mapped.
-> > > 
-> > > Why would you need ATS on PCI P2P and not for system memory accesses?
-> > 
-> > ATS has a significant performance cost. It is mandatory for PCI P2P,
-> > but ideally should be avoided for CPU memory.
-> 
-> Huh, I didn't know that. And yeah kinda means we've butchered the pci p2p
-> stuff a bit I guess ...
-> 
-> > > > 5) iommufd and kvm are both using CPU addresses without DMA. No
-> > > > exporter mapping is possible
-> > > 
-> > > We have customers using both KVM and XEN with DMA-buf, so I can clearly
-> > > confirm that this isn't true.
-> > 
-> > Today they are mmaping the dma-buf into a VMA and then using KVM's
-> > follow_pfn() flow to extract the CPU pfn from the PTE. Any mmapable
-> > dma-buf must have a CPU PFN.
-> > 
-> > Here Xu implements basically the same path, except without the VMA
-> > indirection, and it suddenly not OK? Illogical.
-> 
-> So the big difference is that for follow_pfn() you need mmu_notifier since
-> the mmap might move around, whereas with pfn smashed into
-> dma_buf_attachment you need dma_resv_lock rules, and the move_notify
-> callback if you go dynamic.
-> 
-> So I guess my first question is, which locking rules do you want here for
-> pfn importers?
+Another approach is to use eBPF steering program. This approach has
+another downside: it cannot report the calculated hash due to the
+restrictive nature of eBPF.
 
-follow_pfn() is unwanted for private MMIO, so dma_resv_lock.
+Introduce the code to compute hashes to the kernel in order to overcome
+thse challenges.
 
-> 
-> If mmu notifiers is fine, then I think the current approach of follow_pfn
-> should be ok. But if you instead dma_resv_lock rules (or the cpu mmap
-> somehow is an issue itself), then I think the clean design is create a new
+An alternative solution is to extend the eBPF steering program so that it
+will be able to report to the userspace, but it is based on context
+rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+and vhost_net).
 
-cpu mmap() is an issue, this series is aimed to eliminate userspace
-mapping for private MMIO resources.
+The patches for QEMU to use this new feature was submitted as RFC and
+is available at:
+https://patchew.org/QEMU/20240915-hash-v3-0-79cb08d28647@daynix.com/
 
-> separate access mechanism just for that. It would be the 5th or so (kernel
-> vmap, userspace mmap, dma_buf_attach and driver private stuff like
-> virtio_dma_buf.c where you access your buffer with a uuid), so really not
-> a big deal.
+This work was presented at LPC 2024:
+https://lpc.events/event/18/contributions/1963/
 
-OK, will think more about that.
+V1 -> V2:
+  Changed to introduce a new BPF program type.
 
-Thanks,
-Yilun
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+---
+Changes in v6:
+- Extracted changes to fill vnet header holes into another series.
+- Squashed patches "skbuff: Introduce SKB_EXT_TUN_VNET_HASH", "tun:
+  Introduce virtio-net hash reporting feature", and "tun: Introduce
+  virtio-net RSS" into patch "tun: Introduce virtio-net hash feature".
+- Dropped the RFC tag.
+- Link to v5: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
 
-> 
-> And for non-contrived exporters we might be able to implement the other
-> access methods in terms of the pfn method generically, so this wouldn't
-> even be a terrible maintenance burden going forward. And meanwhile all the
-> contrived exporters just keep working as-is.
-> 
-> The other part is that cpu mmap is optional, and there's plenty of strange
-> exporters who don't implement. But you can dma map the attachment into
-> plenty devices. This tends to mostly be a thing on SoC devices with some
-> very funky memory. But I guess you don't care about these use-case, so
-> should be ok.
-> 
-> I couldn't come up with a good name for these pfn users, maybe
-> dma_buf_pfn_attachment? This does _not_ have a struct device, but maybe
-> some of these new p2p source specifiers (or a list of those which are
-> allowed, no idea how this would need to fit into the new dma api).
-> 
-> Cheers, Sima
-> -- 
-> Simona Vetter
-> Software Engineer, Intel Corporation
-> http://blog.ffwll.ch
+Changes in v5:
+- Fixed a compilation error with CONFIG_TUN_VNET_CROSS_LE.
+- Optimized the calculation of the hash value according to:
+  https://git.dpdk.org/dpdk/commit/?id=3fb1ea032bd6ff8317af5dac9af901f1f324cab4
+- Added patch "tun: Unify vnet implementation".
+- Dropped patch "tap: Pad virtio header with zero".
+- Added patch "selftest: tun: Test vnet ioctls without device".
+- Reworked selftests to skip for older kernels.
+- Documented the case when the underlying device is deleted and packets
+  have queue_mapping set by TC.
+- Reordered test harness arguments.
+- Added code to handle fragmented packets.
+- Link to v4: https://lore.kernel.org/r/20240924-rss-v4-0-84e932ec0e6c@daynix.com
+
+Changes in v4:
+- Moved tun_vnet_hash_ext to if_tun.h.
+- Renamed virtio_net_toeplitz() to virtio_net_toeplitz_calc().
+- Replaced htons() with cpu_to_be16().
+- Changed virtio_net_hash_rss() to return void.
+- Reordered variable declarations in virtio_net_hash_rss().
+- Removed virtio_net_hdr_v1_hash_from_skb().
+- Updated messages of "tap: Pad virtio header with zero" and
+  "tun: Pad virtio header with zero".
+- Fixed vnet_hash allocation size.
+- Ensured to free vnet_hash when destructing tun_struct.
+- Link to v3: https://lore.kernel.org/r/20240915-rss-v3-0-c630015db082@daynix.com
+
+Changes in v3:
+- Reverted back to add ioctl.
+- Split patch "tun: Introduce virtio-net hashing feature" into
+  "tun: Introduce virtio-net hash reporting feature" and
+  "tun: Introduce virtio-net RSS".
+- Changed to reuse hash values computed for automq instead of performing
+  RSS hashing when hash reporting is requested but RSS is not.
+- Extracted relevant data from struct tun_struct to keep it minimal.
+- Added kernel-doc.
+- Changed to allow calling TUNGETVNETHASHCAP before TUNSETIFF.
+- Initialized num_buffers with 1.
+- Added a test case for unclassified packets.
+- Fixed error handling in tests.
+- Changed tests to verify that the queue index will not overflow.
+- Rebased.
+- Link to v2: https://lore.kernel.org/r/20231015141644.260646-1-akihiko.odaki@daynix.com
+
+---
+Akihiko Odaki (6):
+      virtio_net: Add functions for hashing
+      net: flow_dissector: Export flow_keys_dissector_symmetric
+      tun: Introduce virtio-net hash feature
+      selftest: tun: Test vnet ioctls without device
+      selftest: tun: Add tests for virtio-net hashing
+      vhost/net: Support VIRTIO_NET_F_HASH_REPORT
+
+ Documentation/networking/tuntap.rst  |   7 +
+ drivers/net/Kconfig                  |   1 +
+ drivers/net/tap.c                    |  50 ++-
+ drivers/net/tun.c                    |  93 ++++--
+ drivers/net/tun_vnet.c               | 167 +++++++++-
+ drivers/net/tun_vnet.h               |  33 +-
+ drivers/vhost/net.c                  |  16 +-
+ include/linux/if_tap.h               |   2 +
+ include/linux/skbuff.h               |   3 +
+ include/linux/virtio_net.h           | 188 +++++++++++
+ include/net/flow_dissector.h         |   1 +
+ include/uapi/linux/if_tun.h          |  75 +++++
+ net/core/flow_dissector.c            |   3 +-
+ net/core/skbuff.c                    |   4 +
+ tools/testing/selftests/net/Makefile |   2 +-
+ tools/testing/selftests/net/tun.c    | 630 ++++++++++++++++++++++++++++++++++-
+ 16 files changed, 1224 insertions(+), 51 deletions(-)
+---
+base-commit: 9b2ffa6148b1e4468d08f7e0e7e371c43cac9ffe
+change-id: 20240403-rss-e737d89efa77
+prerequisite-change-id: 20241230-tun-66e10a49b0c7:v2
+prerequisite-patch-id: 057e888c371f2ce750064b7c40c2cc6abbdf6819
+prerequisite-patch-id: 22d53dd3443a2c72496bffb90f19d429972550a3
+prerequisite-patch-id: 1520f0c1f7b11559d0898bea556f745f6b8914ac
+
+Best regards,
+-- 
+Akihiko Odaki <akihiko.odaki@daynix.com>
+
 
