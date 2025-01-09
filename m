@@ -1,95 +1,102 @@
-Return-Path: <kvm+bounces-34943-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34944-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C3CA080C7
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:49:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A08EA080C9
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:49:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A16C6188BD31
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:48:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61E913A91CF
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593461FFC7D;
-	Thu,  9 Jan 2025 19:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C891F4293;
+	Thu,  9 Jan 2025 19:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bX6tzLeR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bIxAaGbs"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174571F9ED1
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09D51FC7EE
+	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736452098; cv=none; b=b+Wv29MG8hT1kkoDhm0lDI0SkLmf/ilYIvZp4avaDBmQSLt3CNRo6s/aEFdd+pE6ZMvN2ZJeo2mrZlPzwvSsjX8FTUBVcLrjum18rTJ9WAELTjfvhybdIYNyQf4rRNUo3vcqJ/39CWHS1UsIabDCg1G3+lAS9yxIDMQBA9MMBHY=
+	t=1736452104; cv=none; b=gHMu19xcjo05WtuwlUfmp9S4gIh/fFpdCd+GEOXbgST1pWFutzqPd9sDfZIShtBjOLFdFocUQtBuBqaYGXFf1JWCryLOBW4OQvfNZOrDMWPWJl9gKyradGdP+pwCAKAaSF5pUawl6dwCPY+38/zZnE78w/IZg1TuEUmIQmSm+qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736452098; c=relaxed/simple;
-	bh=k8uxNpfANbzKsnKB+ekR2JS8wirwWWhv9ItGKdM7sXo=;
+	s=arc-20240116; t=1736452104; c=relaxed/simple;
+	bh=i3rDKA0F09JEJTZwLo+zdVEcG4ixuVm35C+F41EWN9U=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mf45w/eipBXLVuM3GbKteJFgIoRlWdA2+LZQJOPBHMjcHe7pAEnWVORnHP/FH2ATMpaoKw27IMoK7hCsyKu6gC7cdN0bvwTMh1BshAFtvsoH1M1ffZJuCmyN+zgwQjLmZOIeeG0o3v1w+3BR84Kn44BmIgXadFPQlnaZwBaUva0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bX6tzLeR; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=FBUKYiBO2c5hZwbltoI0n89Qz+MABcuLVNnI7x9ySKEQ7IF0q+rrQ71SOfUJL0p6hM1Tvqonatkj8+wztzJOWv0oz5/QwWliSzwFIeF+kxqYXNCMi3KBAhcvKYpaNygr4vQpb0bThODglmOHAA3p4fOMC/E2VPmn2ZbCELMYzMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bIxAaGbs; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2162f80040aso20415405ad.1
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:48:15 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21640607349so26823825ad.0
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:48:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736452095; x=1737056895; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736452102; x=1737056902; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FOcpJVT6JUs2fS6zWLpYYaWH6+NENFaeQy0VEEx51Wo=;
-        b=bX6tzLeRg2gS5qlZgXJQ383hDyXdnsQ73jnB3uIiYEDREeGqKPRKMotkzEjJrCZIBd
-         01Z/JPNIZ15+KYzZ6Uq0SUrdtjbIb8SZwYXdlmGK4Sfwmo3oOy1Vq9sWFIp7Co07fdQp
-         F6UhnbX25MdiVBBetHXjnRiqx5A5O+8+yGZJ2vdhGUyfYaygWEkHo65nTaCTqKmx4LCn
-         z/4XG0BoWV3GVn+NQMv5eE5BSed3yyZUot1ZRoXC2h10rgTQRaNXcjHg0MGT/r3eow5B
-         U8vrLVikodIIu6VaZ7PWOAv3Y4Gc1ntd7Dm5vD9L7QYTYy6Mx9XkHOXnJkOjd2fhwBKc
-         QUcQ==
+        bh=tEYk3UMg30Ej09kAh2ThRZhDb6n/cWhL70JOK9UY+H0=;
+        b=bIxAaGbs91iMVDc3ULgyllXc5jGubLz14coJPVlIF3kWpDs3wOfsBCqh1XHi4GTa6p
+         LaWYedZ04fMYYp0SVGzkIEOMXrbd6jM6kpK6zvdmByf6rrNousTo2m/bAPaUrrtxuEQ9
+         5WptqLkIyh9YRckG64U8Xe9oaso7eK0q02Ux4Lgp4A1UTTblEUEH1CUfP1SW5Ax923k3
+         /d+qufQsvSBc3Q8NLq1OO6lqA+goMl3BRARNDhX6OxyXTCQBzKM7faLkHbMrik2vfEYx
+         ABrRB4aKukWZoFIYqLGfDeaslo0vPZBrk8FNL3es6pmvywUDkXl2bq8G7uMnk1aIbksR
+         vZHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736452095; x=1737056895;
+        d=1e100.net; s=20230601; t=1736452102; x=1737056902;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FOcpJVT6JUs2fS6zWLpYYaWH6+NENFaeQy0VEEx51Wo=;
-        b=QAPwIxCWs8rKqmfvLdRpktzJ1J/xFRT7Xdu4qytbjtvBb+W0AOEcPDq/SwJPqsdtr9
-         22g0tQjzv6YtIEMVHLGaiDjpqFOuSCn6V4JZWbZS7RiQpI0wPQ2+Mx/+stMEk8KsocE9
-         aWF1DJnc1G2pMpKNJoUOgcoQILKo6SIY9JBHNzKwQkDzrq+wUpWRUXcOSghZGxe5SdJ6
-         oaiKG2oT4xXxEOVLUjFg68/W8BMa1p9POmP5TPXWWhJZF59xE/T+V25vfwvwquxM8ltv
-         K7G90NvV1rtkkAuW/i0EjinQqVGE8hLmLo8P5xJpHmjstT8LqZFMzPKQdSXLWwARV2/R
-         rRyg==
-X-Gm-Message-State: AOJu0Yz35h8WE/l3/0Zo5egDZGLEfnHn6FRNHTPYs69YKJQmqg7xdox4
-	1B2MrjpJMTPH+zkWj/nursAAmHdHHqm4RuqioneUMfOkeUYsO8S8VL1pIs0tHzg2hcXPRpdvsdd
-	o1w==
-X-Google-Smtp-Source: AGHT+IHIoPZ4ucYCoPUYYx2GOGZ10INnArviJx+sPHDKqU2AKoNdglR8M3Kw5/djPOvCilHPuCQeiuGWKEk=
-X-Received: from pfbha18.prod.google.com ([2002:a05:6a00:8512:b0:728:aad0:33a4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:748b:b0:1e1:a0b6:9861
- with SMTP id adf61e73a8af0-1e88d0e21dbmr13169470637.12.1736452095505; Thu, 09
- Jan 2025 11:48:15 -0800 (PST)
-Date: Thu,  9 Jan 2025 11:47:09 -0800
-In-Reply-To: <20241126073744.453434-1-nichen@iscas.ac.cn>
+        bh=tEYk3UMg30Ej09kAh2ThRZhDb6n/cWhL70JOK9UY+H0=;
+        b=CgwGNqQWSx2+zfZBKiiQevRV1/jKlYP6cSeFHiKwtkVdtJ7qbasdfJd92ZLQqREu70
+         f9UE63u7obbt5CqsxM71CrN4MQ0IS9GHLKQfdAbcWsf1pU2InDTEw/QUMyLH6x3+jQ0D
+         eyPT6fkt7i/p9KcjaS32N5Q0oycXk0Al7WgwbVFhjWnayPvEwEJQuS/fI4U2qqH8a1wK
+         RfVhgdAZjMikoJ7cB5AnNSdeUWwgy3taYHk5WZGoWkwJY5LsjFViEXUhgGM8ndlzFuuM
+         MV3mKcn/nA87JCAGWeH/P/m61TupwmTHePDjkmp1+KZRgzG8XX/FplRpOJBdBw2Ol3Um
+         bgoA==
+X-Forwarded-Encrypted: i=1; AJvYcCXt27kBNZ9+XrlQNyAPjbxWO3AGPSsotIPMvIGC6ajZzlyExUWVtoyW4EC95sPDkdvSOO0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNLU0lP5TYwjh+iIXJi5k0Q+B+WA7pLGTvmWvDwsO+1wNVM+1P
+	EgSwOtYeNobVzkzYMT7D/8dt6VXyZVbiFu1LPiZMZ0Om0JaTsA6U7aJD0SrO0BKuO6pRYiQ6cnw
+	3BQ==
+X-Google-Smtp-Source: AGHT+IEZS3ENK2nghLtlyDpbzxyRo1u1A41iwyMmacck2Wt5ESSVJoxAMFXh7M0PfZVSXCbHm38vIILs4Ck=
+X-Received: from plce17.prod.google.com ([2002:a17:902:f1d1:b0:216:1a56:4a31])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db06:b0:216:725c:a12c
+ with SMTP id d9443c01a7336-21a83f46a4dmr119296495ad.9.1736452102127; Thu, 09
+ Jan 2025 11:48:22 -0800 (PST)
+Date: Thu,  9 Jan 2025 11:47:11 -0800
+In-Reply-To: <898ec01580f6f4af5655805863239d6dce0d3fb3.1734128510.git.reinette.chatre@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241126073744.453434-1-nichen@iscas.ac.cn>
+References: <898ec01580f6f4af5655805863239d6dce0d3fb3.1734128510.git.reinette.chatre@intel.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173645116029.885224.17841818686309710089.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: selftests: Remove unneeded semicolon
+Message-ID: <173645119179.885604.11668508135105687384.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: selftests: Add printf attribute to _no_printf()
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, shuah@kernel.org, 
-	Chen Ni <nichen@iscas.ac.cn>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+	Reinette Chatre <reinette.chatre@intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Tue, 26 Nov 2024 15:37:44 +0800, Chen Ni wrote:
-> Remove unnecessary semicolons reported by Coccinelle/coccicheck and the
-> semantic patch at scripts/coccinelle/misc/semicolon.cocci.
+On Fri, 13 Dec 2024 14:30:00 -0800, Reinette Chatre wrote:
+> Annotate the KVM selftests' _no_printf() with the printf format attribute
+> so that the compiler can help check parameters provided to pr_debug() and
+> pr_info() irrespective of DEBUG and QUIET being defined.
+> 
+> [reinette: move attribute right after storage class, rework changelog]
+> 
+> 
+> [...]
 
 Applied to kvm-x86 selftests, thanks!
 
-[1/1] KVM: selftests: Remove unneeded semicolon
-      https://github.com/kvm-x86/linux/commit/3cd19f150ac6
+[1/1] KVM: selftests: Add printf attribute to _no_printf()
+      https://github.com/kvm-x86/linux/commit/bd7791078ac2
 
 --
 https://github.com/kvm-x86/linux/tree/next
