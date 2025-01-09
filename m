@@ -1,145 +1,152 @@
-Return-Path: <kvm+bounces-34913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35DF5A0773A
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 14:22:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B956A07786
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 14:35:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E62162772
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 13:22:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21EE11603FC
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 13:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A962B218821;
-	Thu,  9 Jan 2025 13:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DEC218E82;
+	Thu,  9 Jan 2025 13:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O41+eNVw"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="dPeu0oXw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFB4218AC6;
-	Thu,  9 Jan 2025 13:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC6F2185B2;
+	Thu,  9 Jan 2025 13:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736428906; cv=none; b=PL3Wru/RclgfT/dzdGjLclNYLbpc45lyCBGnfZYZMkdcWAz4yX1pdDkefiavs1EQS2HByUm1CRXyRFJ4qbU9XegEF1uHT+9dAg24yxNJT3lS4mLlO0uuB2+mJdqdRlVqGN+koqtGTPt4npMFrBnc2NjkKHRNxodCEUyuvjZR2GY=
+	t=1736429686; cv=none; b=FlF5O0RjANvnStjyOzVwjLcodwvgNL1mlGdKjSKg2L1SNoLS5/ZWQF4LkGwL/2dqt2kb30VnRP0RFVUvVAjmotLX0XWzHo31llbXgQuh5wH+QztleO3/Hmi1ETYc7i/pAZYU+DMqgRHtl4yVKu28jwClllGz8autNHj0dC5VWKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736428906; c=relaxed/simple;
-	bh=uA1KoJ0EVn4JPa8fEqid30FHAIr6fqP4vqAv435NFUE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Du+mHZ9ET3nuNQytTKa23EiGOf8cKGzhXEc6ABQ20PWEV9cK29IinadhvtKmzW5UwWLozSfAnYUIuWLxsEHC/RhaydL5bk1K97wf0xU7EYZpJS1RXV19miAUeu0zKhjTk8GOkVvOvxbZQ4UOkmw65fXaJ7a5GmvrfPg//XurPxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O41+eNVw; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5090abXX000770;
-	Thu, 9 Jan 2025 13:21:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=PIYv3HT1t7t/RxD2CzYvxMvKNpNRTsobx9e1PcdHI
-	4Q=; b=O41+eNVwrjnbtCpkyRE2aGtUtngxpY51WzYFvlZQgEYCEIM/sAyJJ5TfD
-	JWKJGeUodawGaNpBvTJzaOnJJyvJAsskDLBsYFYfxaFd0GvARVTImtEEkTzTa/Xw
-	yHRC0Z2VsxEait13k/A9XLOmmzPzKyOVQ7IOpbEEv3Yx8x//d74jJxXzo4NYXFci
-	3/f0DxUbfIyRgwT/GOz6KCJb947Na1pnZIT4lyihZ5hdCxD/gLDqQdJVh2punLkG
-	5DCZP5lxiC340r1RFlJND+sQlHYdFDUk1HUdQvfG3LRpFKElM3uPH6olsUsh6VSf
-	7tyZya6e6NQfybnRbd0/tdx6doxQA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441tu5n7e1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Jan 2025 13:21:26 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 509DFhi6008704;
-	Thu, 9 Jan 2025 13:21:25 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441tu5n7dx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Jan 2025 13:21:25 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 509BNhsI003601;
-	Thu, 9 Jan 2025 13:21:25 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yfatdedn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Jan 2025 13:21:24 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 509DLLnI15073628
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 9 Jan 2025 13:21:21 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4637A20043;
-	Thu,  9 Jan 2025 13:21:21 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4CE5320040;
-	Thu,  9 Jan 2025 13:21:18 +0000 (GMT)
-Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com.com (unknown [9.124.223.189])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  9 Jan 2025 13:21:18 +0000 (GMT)
-From: Amit Machhiwal <amachhiw@linux.ibm.com>
-To: Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Cc: Amit Machhiwal <amachhiw@linux.ibm.com>,
-        Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH] KVM: PPC: Enable CAP_SPAPR_TCE_VFIO on pSeries KVM guests
-Date: Thu,  9 Jan 2025 18:50:53 +0530
-Message-ID: <20250109132053.158436-1-amachhiw@linux.ibm.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736429686; c=relaxed/simple;
+	bh=2iOVx27y8FWIvxdxYvHRDO2A/7X5KLbji8GiY5iP4HE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=fQXh8wchHW59YPYeT4cSVgax5W6WoAcPEsqbD4Gm4ufBefawKTpwdR79/y2GZn7C9e8i3tNwYmYQOWiOG1s7XOY0ZAyeLBKqoGKWKxGBZbPy6nVaTJUXwGbDPNTuGWEqsN2bIfm/q7q2csM/qq1/MjGHpvh4NZmTpukC3RXSVEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=dPeu0oXw; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tVsgD-00305I-SD; Thu, 09 Jan 2025 14:34:33 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=w1/9gczPFPtb52AVap22ovoMq0pU+nsu8ng9Iwts42I=; b=dPeu0oXwrUl7zzbPhKigqr74+4
+	vQMAkuk363gZiWpmLVjGFes/MI9NAT5EDa2sXOWXEcH4sjrMQ74AW4hpMn12BloZ2Xu0gBGHgs+yh
+	2sjDk/M+IwHonhz+fzexA59U79RrqLjmBYWXWAkF9nqxm6i9yG6gsIuz5u8Fj9nMClfkGfZMD1DeU
+	QnHHar22KkbMoyxh4uonqaoTki9ObYh5nRmZn3+0G/lde2IMcQWxflWHApo/dYWoljXwmWtHHybQQ
+	gtJBy+uteaBMQ8mkOpjfX2VN40FAJzytCzKEIgkXBuJkQ5XLCmEhKqOqCq9bC9CCkWcUzULb2BNL2
+	3qfCyXtA==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tVsgC-0004nq-Nj; Thu, 09 Jan 2025 14:34:32 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tVsgA-006cIo-Fi; Thu, 09 Jan 2025 14:34:30 +0100
+Message-ID: <2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co>
+Date: Thu, 9 Jan 2025 14:34:28 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hvpgz_N-ryofrwSI8xwElybReki8Q0Ff
-X-Proofpoint-ORIG-GUID: GT_WvY8RHmULRGyFL4N4ZliWEMN7eZqS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- mlxlogscore=808 adultscore=0 bulkscore=0 impostorscore=0 clxscore=1011
- suspectscore=0 phishscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501090104
+User-Agent: Mozilla Thunderbird
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH net 1/2] vsock/virtio: discard packets if the transport
+ changes
+To: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ virtualization@lists.linux.dev, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Luigi Leonardi <leonardi@redhat.com>,
+ bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Hyunwoo Kim <v4bel@theori.io>,
+ kvm@vger.kernel.org
+References: <20250108180617.154053-1-sgarzare@redhat.com>
+ <20250108180617.154053-2-sgarzare@redhat.com>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <20250108180617.154053-2-sgarzare@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Currently, on book3s-hv, the capability KVM_CAP_SPAPR_TCE_VFIO is only
-available for KVM Guests running on PowerNV and not for the KVM guests
-running on pSeries hypervisors. This prevents a pSeries hypervisor from
-leveraging the in-kernel acceleration for H_PUT_TCE_INDIRECT and
-H_STUFF_TCE hcalls that results in slow startup times for large memory
-guests.
+On 1/8/25 19:06, Stefano Garzarella wrote:
+> If the socket has been de-assigned or assigned to another transport,
+> we must discard any packets received because they are not expected
+> and would cause issues when we access vsk->transport.
+> 
+> A possible scenario is described by Hyunwoo Kim in the attached link,
+> where after a first connect() interrupted by a signal, and a second
+> connect() failed, we can find `vsk->transport` at NULL, leading to a
+> NULL pointer dereference.
+> 
+> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+> Reported-by: Hyunwoo Kim <v4bel@theori.io>
+> Reported-by: Wongi Lee <qwerty@theori.io>
+> Closes: https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 9acc13ab3f82..51a494b69be8 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -1628,8 +1628,11 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+>  
+>  	lock_sock(sk);
+>  
+> -	/* Check if sk has been closed before lock_sock */
+> -	if (sock_flag(sk, SOCK_DONE)) {
+> +	/* Check if sk has been closed or assigned to another transport before
+> +	 * lock_sock (note: listener sockets are not assigned to any transport)
+> +	 */
+> +	if (sock_flag(sk, SOCK_DONE) ||
+> +	    (sk->sk_state != TCP_LISTEN && vsk->transport != &t->transport)) {
+>  		(void)virtio_transport_reset_no_sock(t, skb);
+>  		release_sock(sk);
+>  		sock_put(sk);
 
-Fix this by enabling the CAP_SPAPR_TCE_VFIO on the pSeries hosts for the
-nested PAPR guests.
+FWIW, I've tried simplifying Hyunwoo's repro to toy with some tests. Ended
+up with
 
-Fixes: f431a8cde7f1 ("powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries")
-Cc: stable@vger.kernel.org
-Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
----
- arch/powerpc/kvm/powerpc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+from threading import *
+from socket import *
+from signal import *
 
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index ce1d91eed231..9c479c7381e4 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -554,7 +554,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = 1;
- 		break;
- 	case KVM_CAP_SPAPR_TCE_VFIO:
--		r = !!cpu_has_feature(CPU_FTR_HVMODE);
-+		r = !!cpu_has_feature(CPU_FTR_HVMODE) || is_kvmppc_hv_enabled(kvm);
- 		break;
- 	case KVM_CAP_PPC_RTAS:
- 	case KVM_CAP_PPC_FIXUP_HCALL:
+def listener(tid):
+	while True:
+		s = socket(AF_VSOCK, SOCK_SEQPACKET)
+		s.bind((1, 1234))
+		s.listen()
+		pthread_kill(tid, SIGUSR1)
 
-base-commit: eea6e4b4dfb8859446177c32961c96726d0117be
--- 
-2.47.1
+signal(SIGUSR1, lambda *args: None)
+Thread(target=listener, args=[get_ident()]).start()
 
+while True:
+	c = socket(AF_VSOCK, SOCK_SEQPACKET)
+	c.connect_ex((1, 1234))
+	c.connect_ex((42, 1234))
+```
+
+which gives me splats with or without this patch.
+
+That said, when I apply this patch, but drop the `sk->sk_state !=
+TCP_LISTEN &&`: no more splats.
 
