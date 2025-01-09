@@ -1,112 +1,103 @@
-Return-Path: <kvm+bounces-34949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F12CA080DD
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:51:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41AB4A080DF
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:51:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50981188BA70
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:51:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C74188434F
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F651D5AAC;
-	Thu,  9 Jan 2025 19:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F4C1FCCF3;
+	Thu,  9 Jan 2025 19:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QzgVOYTQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="13erquFF"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CB21369A8
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FE11F8F08
+	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:51:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736452274; cv=none; b=LpwLyDzb8URQy2YL10859rR7zf7xt7gOp4LMEURHFvVdoWBKhUR2VrTdHFTnPHzywUXKqmUFKfF6/S/FJNimRMgD+mNOL7bXyCgwOPZeUxpG3MslffPUfBNxVDRBvoyLn5LLS2fcHspnhOktalYVrVCG24rle2A3qIoMY9kRnZQ=
+	t=1736452285; cv=none; b=bMiNhVVGW32p4e0IkykTMZuHM+IHyGVpN+GHbDzEPzeMnWZ2EGn4C0kTNVz9JGQHUpijWcAj3IFKzRK++Ko+m6I4+HESSmfQar3K0iWLZsU2N6aotWZKq0CptBqC0pqOpyNjsAhONoNhCIIX6cE3llYQgtvAGpc9nlGUOghFq3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736452274; c=relaxed/simple;
-	bh=59Kf6+9iHujWqGctn8tshp/+Ti5aIhScybbzNjywegg=;
+	s=arc-20240116; t=1736452285; c=relaxed/simple;
+	bh=MdodIniv1E57aryMr3ZvoafrGD5cSo648TrJJMZCMSY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PguelNcfvpRu7whyY5duhH4CgbYA3pgIFE0S/OvvxElJ3PElH6bXxi3UaXZlCUVH1tX25vQbMdYpj69/+exm03xhR74ZuBHf+wEgrT/sxYrwDuXorUgY5X3+b9JALYB05TWvgLQtiAKC3yvSided5CIIg0crjBL1KBXQj990jho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QzgVOYTQ; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=q+6oHkl8pGSljA5gnnmIbphxBk/YgpMITP4z3KdH9gB71vokMlx+l09/qKWSVG4LxRzFr0uXL2d64vqHv+gsvZo8RfEFeiD4qeiuFdytrRlh7ucWViFIo9OEo2pQps7wfVJNxW2Igz2pIwUzyuI/8vvPFVc/If12uhSG9KesW9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=13erquFF; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2166464e236so36729615ad.1
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:51:12 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21640607349so26875065ad.0
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:51:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736452272; x=1737057072; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736452283; x=1737057083; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EvPG0G6xKcg0MqMzcRlcJeOjrQih65ooq8F4nj7UQQo=;
-        b=QzgVOYTQisbTlTVMmQvZAki+h+ncPTtDXu/hrvqiUp1K1AunVSnEU3lqnjvN+NfLJq
-         /4ECKg/sLsROrH11cIN2Bu4Ouk5GT/pswpAVPQkvjvvbTTJ1VbgP3reSpPQAWyahvc4+
-         Sh/x2tzuTBS8h8rbIsitn6KZLq9j56tlvlyo9nBMApWoMUKr285vdgtYArH5T4qJQYvJ
-         5XcJ+G3KQWWU8uQvTAyLBN/4F3s/8OYR4PvCGVBlJP2cYAPxEW65LCBXATw2APtWYBYb
-         wJCdJxZ8AAZgZ+BIoGE5ykjtDhhNYUtaBJTLCtdbWC/tZ2bhb4EpIplML5j/H7+H1lFn
-         OWOA==
+        bh=P6s/398TzelSMmGJDSt9MXWMZ6WtDv11apSqpmsXFts=;
+        b=13erquFFQihzSRvYfk8hSgbJolwrxIkQf8ylwsYpmoXNfZ9J5eNEBFww0Vt8NEZm8F
+         wulEfJAwnnZeEnwFv7B7TJ0aRDjt79A6tuD4vEy1VrNeoOMIsjFGCZyrlpvuIOrnrRig
+         VKh2oJvqU07NCm6xEK8Znk4wMTT/PmiMZlXuTx30i35iadVfOtTAG8SxX+/u9j0j08Gu
+         bF/a4NMx8ay2O76HiDzDlOZexo6SOb2pvX6QNbyNTlkm1Xox6S9TEUCRHcGiVDYDeFz3
+         HxKZV0E0XZlIR7aFCUtoGlzYS925PugA+U7yxMYHy2whTbxHcWpdDLhS/un06ckyR+Eq
+         WDEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736452272; x=1737057072;
+        d=1e100.net; s=20230601; t=1736452283; x=1737057083;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EvPG0G6xKcg0MqMzcRlcJeOjrQih65ooq8F4nj7UQQo=;
-        b=g7w1DobG9Z5tzv0k114lFyjyYEe4RMBvPRDh+y0cCLiCp3N5/jwfMFG34UaLqNmSU2
-         y1SeJG7Ndlet4MNLCL5qMkm3TNuL020rqrHnEea3/T9QAAP70zEkvkqjOd6YgsOpD1r0
-         dID3JdwRyQUKtzqf3jGeqj9JYJwyFNdiUiL8ZhW8QUSK3dXtV/XPogFW0NYWVPnreWO/
-         UZX73N6W6Eocl99Ia2cBUFtFeZ2UcxYF9Z/mrl9jA3GCGNqLbSuCi1+FTUPyD72EzttG
-         TwFa1ciqJyC18VFqtiluFAaQ0ZK36FgHnA5fPDK10D8LsvcgPCFQwK4jvTiY0rafnhJh
-         85HQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWCOupGgXARFTKIcKWlSCfnEG5Fhp8smdfh6oA+K93zfx/Ymm+cV+dJZ3+oxeJJmiOE5Uc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBf0knOdGe/61Uggv6iaFLtmuy1X9m2td5VXCjPmkiOLE0eygX
-	V0ocZUPcm1vOxVQ7jtjsFs/XkU1nO/WIkslk/2IWGju4hoWCe0xTIry86M1N4CmT0bEc+saFz1l
-	C+A==
-X-Google-Smtp-Source: AGHT+IG7ANgsCvabmL6+miyctYRU7rbNdH5/lzRmjbrNPiz77Fdh18Ta8lKqNezxbuLI/0vR/j0Hf8oacAc=
-X-Received: from plox12.prod.google.com ([2002:a17:902:8ecc:b0:216:3737:abb8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f68b:b0:216:32c4:f807
- with SMTP id d9443c01a7336-21a83fdea82mr118602615ad.45.1736452272036; Thu, 09
- Jan 2025 11:51:12 -0800 (PST)
-Date: Thu,  9 Jan 2025 11:47:21 -0800
-In-Reply-To: <20250102154050.2403-1-costas.argyris@amd.com>
+        bh=P6s/398TzelSMmGJDSt9MXWMZ6WtDv11apSqpmsXFts=;
+        b=aACwSJNjiEHqTIdWkhbCBF1Fc5kDbcT133eVAhPBNa1sAHLZPiJtk6aai28hFC5Te2
+         HmV3G4GHyKF67BGTBxZWWwTDcAuKgrcJdzt9qyVDOrjC/vKI9yZWwCQv4fX8rpZo1/Vt
+         HErJ1lBeuBDEcphIhSFiQMrEts97jRB2l3rG7wHdTr76eZanvyTMoeeodvfJ8ERFpO01
+         9TfCBf7B6hI7SZZrkez33ZXXlAgd+DslrTcY/UNG3t2SO3H0qw1OntEiPhM03VrWY2T8
+         kdu2Pvy2y3UUsoUdJR0368at4FhNMjQNBRGbRA2bzUOGKBgKrl9oVg76XfGRLm7oWIWA
+         Shhw==
+X-Gm-Message-State: AOJu0Yysi8gLdxBEXnRDuNa2y3kFXIQV99xFGBn5iVt1O0P9IrIfufh0
+	rIGfYxdbBrNxM3BJB4ZoRrkZUCzPJwk+EN0iqkdpIfbK89L0dXcxOD0ithAhGAwol5+XoS8R4gG
+	zGA==
+X-Google-Smtp-Source: AGHT+IGTokLpYpcB3WqB1NOn/4yPGBLwh39ztD5jlILIvm08a89UWMzXWXUyfPiSyqXcG4HOAYyFgpLkdm4=
+X-Received: from pgpt3.prod.google.com ([2002:a65:4083:0:b0:7fd:5739:a1e2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:c890:b0:1e1:a647:8a3f
+ with SMTP id adf61e73a8af0-1e88d1d5a8dmr14946790637.22.1736452283302; Thu, 09
+ Jan 2025 11:51:23 -0800 (PST)
+Date: Thu,  9 Jan 2025 11:47:23 -0800
+In-Reply-To: <20250103153814.73903-1-gaoshiyuan@baidu.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250102154050.2403-1-costas.argyris@amd.com>
+References: <20250103153814.73903-1-gaoshiyuan@baidu.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173645181620.889176.12566428191805200464.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: VMX: Reinstate __exit attribute for vmx_exit
+Message-ID: <173645183550.889475.2249096799180200711.b4-ty@google.com>
+Subject: Re: [PATCH 1/1] KVM: VMX: Fix comment of handle_vmx_instruction
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, KVM <kvm@vger.kernel.org>, 
-	Costas Argyris <costas.argyris@amd.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Tom Lendacky <thomas.lendacky@amd.com>
+To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, mingo@redhat.com, 
+	dave.hansen@linux.intel.com, Gao Shiyuan <gaoshiyuan@baidu.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 02 Jan 2025 15:40:50 +0000, Costas Argyris wrote:
-> Commit a7b9020b06ec ("x86/l1tf: Handle EPT disabled state proper",
-> 2018-07-13) dropped the "__exit" attribute from vmx_exit because
+On Fri, 03 Jan 2025 23:38:14 +0800, Gao Shiyuan wrote:
+> There is no nested_vmx_setup function.
 
-Uber nit, the preferred format for referencing commits is:
+When referencing function, add parantheses, e.g. nested_vmx_setup(), so that it's
+super obvious that you're talking about a function.
 
-  a7b9020b06ec ("x86/l1tf: Handle EPT disabled state proper")
+> It should be nested_vmx_hardware_setup overwrite the VMX emulate handler
+> when nested=1.
 
-> vmx_init was changed to call vmx_exit.
-> 
-> However, commit e32b120071ea (KVM: VMX: Do _all_ initialization
-> before exposing /dev/kvm to userspace, 2022-11-30) changed vmx_init
-> to call __vmx_exit instead of vmx_exit. This made it possible to
-> mark vmx_exit as "__exit" again, as it originally was, and enjoy
-> the benefits that it provides (the function can be discarded from
-> memory in situations where it cannot be called, like the module
-> being built-in or module unloading being disabled in the kernel).
-> 
-> [...]
+Embarassingly, the comment was always wrong.  I added a paragraph to the changelog
+to explain as much, e.g. so that we aren't as tempted to try and reword the comment
+to avoid explicitly referencing function names so that it can't become stale.
 
 Applied to kvm-x86 vmx, thanks!
 
-[1/1] KVM: VMX: Reinstate __exit attribute for vmx_exit
-      https://github.com/kvm-x86/linux/commit/b5fd06847320
+[1/1] KVM: VMX: Fix comment of handle_vmx_instruction
+      https://github.com/kvm-x86/linux/commit/4d141e444e26
 
 --
 https://github.com/kvm-x86/linux/tree/next
