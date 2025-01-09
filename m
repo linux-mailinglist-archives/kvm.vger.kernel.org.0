@@ -1,159 +1,145 @@
-Return-Path: <kvm+bounces-34923-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B2A9A07842
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 14:55:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35DF5A0773A
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 14:22:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F2867A273F
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 13:55:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E62162772
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 13:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B33219A8F;
-	Thu,  9 Jan 2025 13:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A962B218821;
+	Thu,  9 Jan 2025 13:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="SLpARO5/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O41+eNVw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4526B218EA8;
-	Thu,  9 Jan 2025 13:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFB4218AC6;
+	Thu,  9 Jan 2025 13:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736430925; cv=none; b=hzgbs75Fn63SCqfMHRX1NHOuFxnTLd1oeqK7FfhdP3LhqUZIqKnG2eG0ZO7ncSLaGBoq4DRZteBWXAKZJiBVmShXum04b0V1GOK+hpDjpsRUOFjhbnL753Vnyrlk4+Cx1RCOd7UopR7mU7qJBfodH9ABcgR4pTD0dGzc79lZFFM=
+	t=1736428906; cv=none; b=PL3Wru/RclgfT/dzdGjLclNYLbpc45lyCBGnfZYZMkdcWAz4yX1pdDkefiavs1EQS2HByUm1CRXyRFJ4qbU9XegEF1uHT+9dAg24yxNJT3lS4mLlO0uuB2+mJdqdRlVqGN+koqtGTPt4npMFrBnc2NjkKHRNxodCEUyuvjZR2GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736430925; c=relaxed/simple;
-	bh=+t6xL6aUUlHqw/1BySaYl0XfaP/8IBcJEMltDRiNodQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TGZG9ZIwSacPYCWy+lgG91gFwcJW9BOIXbMMrExe/fSBxnwUAw3hszbwIXQ0ygWJTi3VULArYTNUMnH9JShhm4VPXMOopUnnKqJku2ELrUF5/e3hij8uPm784pcsf9kw5dkS9dcYViJmVcAfvqyRetpKbFTigkT2EjAG8jJslNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=SLpARO5/; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tVsN6-002xng-0t; Thu, 09 Jan 2025 14:14:48 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=3cUkymQJSJr9t9+pyatWi8KGoJKjDsSNQ5WB+gYAx38=; b=SLpARO5/+f9xc+MCY3o5+fIY4m
-	n/M0P0FembpPsxfv9pfCtkC2FqUGFZiWj+C2EqMgYv3ugkDKr8SL+zMlIODzoulXcQ++9O5c2oT1V
-	M8J46X3fy2lezu3dn//tLXmZ+8KUQMfqqp+gRH3IDzN8KgpIdVO3Z1R6R+oswEDviWYo8vEqbifnZ
-	iNyPVXpvMdCc4Up545J2klv1IRx54+ot1HzuX20VrN1wbEsS1m9K46NjGeSxoRaXFvhz5cIWDF0xU
-	x9dWdU9YdVeXKtw3QnsSemb4NXO3Ulia30lbX2GzC/fwTNMwN9Bm6niVIixwJgEvPJTTHWaJCIRMB
-	ZDvo98Ow==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tVsN4-0003CP-FR; Thu, 09 Jan 2025 14:14:46 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tVsMw-006OkQ-0S; Thu, 09 Jan 2025 14:14:38 +0100
-Message-ID: <c0896f6a-d8b8-4db5-804d-0e4b35827a62@rbox.co>
-Date: Thu, 9 Jan 2025 14:14:35 +0100
+	s=arc-20240116; t=1736428906; c=relaxed/simple;
+	bh=uA1KoJ0EVn4JPa8fEqid30FHAIr6fqP4vqAv435NFUE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Du+mHZ9ET3nuNQytTKa23EiGOf8cKGzhXEc6ABQ20PWEV9cK29IinadhvtKmzW5UwWLozSfAnYUIuWLxsEHC/RhaydL5bk1K97wf0xU7EYZpJS1RXV19miAUeu0zKhjTk8GOkVvOvxbZQ4UOkmw65fXaJ7a5GmvrfPg//XurPxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O41+eNVw; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5090abXX000770;
+	Thu, 9 Jan 2025 13:21:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=PIYv3HT1t7t/RxD2CzYvxMvKNpNRTsobx9e1PcdHI
+	4Q=; b=O41+eNVwrjnbtCpkyRE2aGtUtngxpY51WzYFvlZQgEYCEIM/sAyJJ5TfD
+	JWKJGeUodawGaNpBvTJzaOnJJyvJAsskDLBsYFYfxaFd0GvARVTImtEEkTzTa/Xw
+	yHRC0Z2VsxEait13k/A9XLOmmzPzKyOVQ7IOpbEEv3Yx8x//d74jJxXzo4NYXFci
+	3/f0DxUbfIyRgwT/GOz6KCJb947Na1pnZIT4lyihZ5hdCxD/gLDqQdJVh2punLkG
+	5DCZP5lxiC340r1RFlJND+sQlHYdFDUk1HUdQvfG3LRpFKElM3uPH6olsUsh6VSf
+	7tyZya6e6NQfybnRbd0/tdx6doxQA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441tu5n7e1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Jan 2025 13:21:26 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 509DFhi6008704;
+	Thu, 9 Jan 2025 13:21:25 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441tu5n7dx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Jan 2025 13:21:25 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 509BNhsI003601;
+	Thu, 9 Jan 2025 13:21:25 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yfatdedn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Jan 2025 13:21:24 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 509DLLnI15073628
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 9 Jan 2025 13:21:21 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4637A20043;
+	Thu,  9 Jan 2025 13:21:21 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4CE5320040;
+	Thu,  9 Jan 2025 13:21:18 +0000 (GMT)
+Received: from li-e7e2bd4c-2dae-11b2-a85c-bfd29497117c.ibm.com.com (unknown [9.124.223.189])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  9 Jan 2025 13:21:18 +0000 (GMT)
+From: Amit Machhiwal <amachhiw@linux.ibm.com>
+To: Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Cc: Amit Machhiwal <amachhiw@linux.ibm.com>,
+        Vaibhav Jain <vaibhav@linux.ibm.com>,
+        Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH] KVM: PPC: Enable CAP_SPAPR_TCE_VFIO on pSeries KVM guests
+Date: Thu,  9 Jan 2025 18:50:53 +0530
+Message-ID: <20250109132053.158436-1-amachhiw@linux.ibm.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] vsock/bpf: return early if transport is not
- assigned
-To: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Bobby Eshleman <bobby.eshleman@bytedance.com>,
- virtualization@lists.linux.dev, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Luigi Leonardi <leonardi@redhat.com>,
- bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Hyunwoo Kim <v4bel@theori.io>,
- kvm@vger.kernel.org
-References: <20250108180617.154053-1-sgarzare@redhat.com>
- <20250108180617.154053-3-sgarzare@redhat.com>
-From: Michal Luczaj <mhal@rbox.co>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20250108180617.154053-3-sgarzare@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hvpgz_N-ryofrwSI8xwElybReki8Q0Ff
+X-Proofpoint-ORIG-GUID: GT_WvY8RHmULRGyFL4N4ZliWEMN7eZqS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ mlxlogscore=808 adultscore=0 bulkscore=0 impostorscore=0 clxscore=1011
+ suspectscore=0 phishscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501090104
 
-On 1/8/25 19:06, Stefano Garzarella wrote:
-> Some of the core functions can only be called if the transport
-> has been assigned.
-> 
-> As Michal reported, a socket might have the transport at NULL,
-> for example after a failed connect(), causing the following trace:
-> 
->     BUG: kernel NULL pointer dereference, address: 00000000000000a0
->     #PF: supervisor read access in kernel mode
->     #PF: error_code(0x0000) - not-present page
->     PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
->     Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
->     CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
->     RIP: 0010:vsock_connectible_has_data+0x1f/0x40
->     Call Trace:
->      vsock_bpf_recvmsg+0xca/0x5e0
->      sock_recvmsg+0xb9/0xc0
->      __sys_recvfrom+0xb3/0x130
->      __x64_sys_recvfrom+0x20/0x30
->      do_syscall_64+0x93/0x180
->      entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> So we need to check the `vsk->transport` in vsock_bpf_recvmsg(),
-> especially for connected sockets (stream/seqpacket) as we already
-> do in __vsock_connectible_recvmsg().
-> 
-> Fixes: 634f1a7110b4 ("vsock: support sockmap")
-> Reported-by: Michal Luczaj <mhal@rbox.co>
-> Closes: https://lore.kernel.org/netdev/5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co/
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Currently, on book3s-hv, the capability KVM_CAP_SPAPR_TCE_VFIO is only
+available for KVM Guests running on PowerNV and not for the KVM guests
+running on pSeries hypervisors. This prevents a pSeries hypervisor from
+leveraging the in-kernel acceleration for H_PUT_TCE_INDIRECT and
+H_STUFF_TCE hcalls that results in slow startup times for large memory
+guests.
 
-Tested-by: Michal Luczaj <mhal@rbox.co>
+Fix this by enabling the CAP_SPAPR_TCE_VFIO on the pSeries hosts for the
+nested PAPR guests.
 
+Fixes: f431a8cde7f1 ("powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries")
+Cc: stable@vger.kernel.org
+Signed-off-by: Amit Machhiwal <amachhiw@linux.ibm.com>
+---
+ arch/powerpc/kvm/powerpc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->  net/vmw_vsock/vsock_bpf.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
-> index 4aa6e74ec295..f201d9eca1df 100644
-> --- a/net/vmw_vsock/vsock_bpf.c
-> +++ b/net/vmw_vsock/vsock_bpf.c
-> @@ -77,6 +77,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  			     size_t len, int flags, int *addr_len)
->  {
->  	struct sk_psock *psock;
-> +	struct vsock_sock *vsk;
->  	int copied;
->  
->  	psock = sk_psock_get(sk);
-> @@ -84,6 +85,13 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  		return __vsock_recvmsg(sk, msg, len, flags);
->  
->  	lock_sock(sk);
-> +	vsk = vsock_sk(sk);
-> +
-> +	if (!vsk->transport) {
-> +		copied = -ENODEV;
-> +		goto out;
-> +	}
-> +
->  	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
->  		release_sock(sk);
->  		sk_psock_put(sk, psock);
-> @@ -108,6 +116,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
->  		copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
->  	}
->  
-> +out:
->  	release_sock(sk);
->  	sk_psock_put(sk, psock);
->  
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index ce1d91eed231..9c479c7381e4 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -554,7 +554,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SPAPR_TCE_VFIO:
+-		r = !!cpu_has_feature(CPU_FTR_HVMODE);
++		r = !!cpu_has_feature(CPU_FTR_HVMODE) || is_kvmppc_hv_enabled(kvm);
+ 		break;
+ 	case KVM_CAP_PPC_RTAS:
+ 	case KVM_CAP_PPC_FIXUP_HCALL:
+
+base-commit: eea6e4b4dfb8859446177c32961c96726d0117be
+-- 
+2.47.1
 
 
