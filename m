@@ -1,188 +1,160 @@
-Return-Path: <kvm+bounces-34932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 413D3A07DAF
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 17:35:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42774A07F1D
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 18:44:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 723BF3A6574
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 16:35:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33C967A32F1
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 17:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790BC22257F;
-	Thu,  9 Jan 2025 16:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7541F37D6;
+	Thu,  9 Jan 2025 17:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YFSXa7bN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bxWUW9gU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E174E22256E
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 16:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C082192D7E;
+	Thu,  9 Jan 2025 17:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736440523; cv=none; b=u4RTK/EoMD/t0CYU3FhFyeI4V36Rf3VU+QT4eTxlk2Ma6vX/8m30R38cs9eDPXIo6pQnUVtlR99YXZKcWIKQPsxKOYNneZ7oc80S+33ERNoR3MeY1MOXs55/Oi++KL4ZhzHBjLxT3Z5MKs74g756LpibxEp6/ToLt0AVDyKvwMk=
+	t=1736444568; cv=none; b=rmHNHkMROaOsnkx9/5fvS2yXBw9BKLhogSIv4FKpf6qmtpdq45QCov+QDRT89C3wgC7i+i66WBqgiqKTDo7g2nSOSmfBnyGNm/RKzwAhZLtIKGWafBkhyLhr59V4xWQZjXxd/9Ix7Gp4HUxir0JZ+g5NaPAIeLgeC8lm76uy5js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736440523; c=relaxed/simple;
-	bh=CXQv/d/ryKD1V15TOdPA3c2hC2cQSek84MTW/PXYPlU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e6Et5dQdBDkm69EWICQZDDrVzvNEXmFYEjpdubzeIchKv210zyKQy+7aU2Y0gHJTmZEAGjElmGZnMxT/LGPiNMvOKIr4IYvKc1u7GrSTwqxNa6em0IZeVA01zjDMdodax1bAS7C3AlYq+6boyMzEGhNacD1pSuZFOnw0FrV5U+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YFSXa7bN; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-435b0df5dbdso65365e9.0
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 08:35:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736440519; x=1737045319; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=baUKr168OOAaPISTC82PBM16R+vBD3PnUmTKM1n0mko=;
-        b=YFSXa7bNloFvqpFYe+KqsAHHd9nHG5OaYb5RkhGXTObxeFiYwAkhhNl58weotRn3G3
-         WOIN+n7BqwKMimciCra/oLvN4nLY7U8qajV71u1Q8mNTDHAHIt2Ee9/8XlvjgG8SqUaZ
-         /D2HlfnPKAX3IyDCRGP10mxZXkGx9m5vFYiTyAxBhKp4ha4k4zfbuuNQQhTnREU5095A
-         jJUQnqTxFe9vU5OtRhpC/keudpLOK1FeuG+D7LgtVMTyA5zXslby5yJCt19/kV0Yg0U1
-         ptDagc+dHGu8jfO7/m+kEbEuEymgEj67zjd+9mFh3LL/+0ThA1yR42MpYYi2/qgfy5Ry
-         yf5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736440519; x=1737045319;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=baUKr168OOAaPISTC82PBM16R+vBD3PnUmTKM1n0mko=;
-        b=jF6j6HMw9y6zaVLwB2RxWohsG8Vv4Hipia3HhF+IZbHe4UcdvliEcELs2UocSXwTaf
-         OJRMSvxzgw24y4RcHWrpw9sABJKaf2nmWPf4F6G97moXiOXXlCGHLX+OyP1TiKJuP3Sy
-         0x5t98I1grf4tu+AAu1sO/MdBx87z+e7uO39f775bhs+4pIwoI1t8GgvRUGTnMCVe9Ib
-         OOnntEqHLDvV8ER1AzKTWjwtd+jBED1u4xM4zAasbYC0lYyLMvkQNcuPgA0YGRDLItN9
-         1uC2py5yWhu2u02iDlLwxUM8Tjg8CltSe/xeS9IMfWfQnIjuXejtJAu4892wYNA0OR9i
-         Dvqg==
-X-Gm-Message-State: AOJu0YxDPWZ45bVz1POPy2CgQxFJIFsstEKn2fB8UB3K77N4YaAIXlCy
-	B9727/sHFVnEJorxtLSnp34TJjZTGSlpVNtkp2kUp3jLKuPue5BrFZkQXnABKgVzfoQl2wAY1bT
-	U0xZ/TThU8oZZZNra6AdCiYVtLDwBiTtpLlgO84C+VcOv1AdGJUR1oKc=
-X-Gm-Gg: ASbGnctCGPMejBKmS1E8SQM/2pkJ28xQZMwSH/Ic8fbWisHKVzTXDR5tVdaVEeSXuz9
-	NYZRPsg97eKdiGs1t8Ql3wcy0aZjHtdmERhjK
-X-Google-Smtp-Source: AGHT+IFv0P2PeWbqF1YSBzg+TWGRgPHYK/TQ1vBRRVO50fQW5HLnFqB94TvYMz9y+LQS6PAgTWSV97KjtJt4QPa3b+U=
-X-Received: by 2002:a05:600c:1c89:b0:436:51cf:285b with SMTP id
- 5b1f17b1804b1-436e8e34745mr1290225e9.4.1736440519033; Thu, 09 Jan 2025
- 08:35:19 -0800 (PST)
+	s=arc-20240116; t=1736444568; c=relaxed/simple;
+	bh=dgToOXb8BvN4dra1Kh0zNZ6JczMXJPb/z/Obr2XcVuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FGXWCRQhFM79APAq3FdX6/6fwSjRhrzi1IDLsDDwg2KTG8L8si/fr6Qra7lwtsPcPZZKwjnwolepPWJ480hrCwIQLwcIw0ELAX7GQJzEhXbAeGeHq6xp7AqLwCUAdzlP3D1KXB5jhXokCUJ5P/AYOJ+0wA1hJfdDBZDTMdwllPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bxWUW9gU; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736444567; x=1767980567;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dgToOXb8BvN4dra1Kh0zNZ6JczMXJPb/z/Obr2XcVuo=;
+  b=bxWUW9gUn4Q3H3cNa7LGSfTsm6cZ6vesi4focjJ8Sl0f/W9TWKIFGPnS
+   jTUcOO2eiaaj51LTI/kao4wSd7vj5O/6j4rtNnJKLSF8o6gFEIGTOErxy
+   dKdYERlUvJ7pqW01ZjKCC3jxbuNsZP6D/k7Doa5JxsBhwuOTmuarNigUh
+   ruYemTIBpoQ3Wh7p8ElNuHDSKi85v6YNWlVawAnT8r8H0/QLNcfVD/uXi
+   WvdpX5UmXcWOlTI5H40Jpt4mS9oqPO67C3mEgj2CYY/6xqH7Ir6faqYV/
+   SlOSCyZbN1CkrFruOepFdUi9/WP1C2gM8KBWL5KE60UvoL3sYHCu/s4mE
+   Q==;
+X-CSE-ConnectionGUID: oxHwX3eaQCOUii8uJcr+LA==
+X-CSE-MsgGUID: AESLZacDQD2wJgMX8ijUnQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="36602372"
+X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
+   d="scan'208";a="36602372"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 09:42:47 -0800
+X-CSE-ConnectionGUID: k1Q/oHnYS2u8SlDT98Hsog==
+X-CSE-MsgGUID: pQYon3DlSXaJlOBIOZEk9A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="126759244"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 09 Jan 2025 09:42:43 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tVwYL-000HwX-16;
+	Thu, 09 Jan 2025 17:42:41 +0000
+Date: Fri, 10 Jan 2025 01:42:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-s390@vger.kernel.org,
+	frankja@linux.ibm.com, borntraeger@de.ibm.com,
+	schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+	hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+	gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
+Subject: Re: [PATCH v1 04/13] KVM: s390: move pv gmap functions into kvm
+Message-ID: <202501100045.U1NGK9qJ-lkp@intel.com>
+References: <20250108181451.74383-5-imbrenda@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241213164811.2006197-1-tabba@google.com>
-In-Reply-To: <20241213164811.2006197-1-tabba@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 9 Jan 2025 16:34:42 +0000
-X-Gm-Features: AbW1kvYn98mIpWwaDWDfzqXeleucds2C1o-ePw1uKVi8SN1keW_ixb8bDBYEyig
-Message-ID: <CA+EHjTzcx=eXSERSANMByhcgRRAbUL3kPAYkeu-uUgd0nPBPPA@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 00/14] KVM: Restricted mapping of guest_memfd at
- the host and arm64 support
-To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250108181451.74383-5-imbrenda@linux.ibm.com>
 
-Hi,
+Hi Claudio,
 
-As mentioned in the guest_memfd sync (2025-01-09), below is the state
-diagram that uses the new states in this patch series, and how they
-would interact with sharing/unsharing in pKVM:
+kernel test robot noticed the following build warnings:
 
-https://lpc.events/event/18/contributions/1758/attachments/1457/3699/Guestmemfd%20folio%20state%20page_type.pdf
+[auto build test WARNING on s390/features]
+[also build test WARNING on kvm/queue kvm/next mst-vhost/linux-next linus/master v6.13-rc6 next-20250109]
+[cannot apply to kvms390/next kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-This patch series doesn't necessarily impose all these transitions,
-many of them would be a matter of policy. This just happens to be the
-current way I've done it with pKVM/arm64.
+url:    https://github.com/intel-lab-lkp/linux/commits/Claudio-Imbrenda/KVM-s390-wrapper-for-KVM_BUG/20250109-021808
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git features
+patch link:    https://lore.kernel.org/r/20250108181451.74383-5-imbrenda%40linux.ibm.com
+patch subject: [PATCH v1 04/13] KVM: s390: move pv gmap functions into kvm
+config: s390-randconfig-001-20250109 (https://download.01.org/0day-ci/archive/20250110/202501100045.U1NGK9qJ-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250110/202501100045.U1NGK9qJ-lkp@intel.com/reproduce)
 
-Cheers,
-/fuad
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501100045.U1NGK9qJ-lkp@intel.com/
 
-On Fri, 13 Dec 2024 at 16:48, Fuad Tabba <tabba@google.com> wrote:
->
-> This series adds restricted mmap() support to guest_memfd, as
-> well as support for guest_memfd on arm64. It is based on Linux
-> 6.13-rc2.  Please refer to v3 for the context [1].
->
-> Main changes since v3:
-> - Added a new folio type for guestmem, used to register a
->   callback when a folio's reference count reaches 0 (Matthew
->   Wilcox, DavidH) [2]
-> - Introduce new mappability states for folios, where a folio can
-> be mappable by the host and the guest, only the guest, or by no
-> one (transient state)
-> - Rebased on Linux 6.13-rc2
-> - Refactoring and tidying up
->
-> Cheers,
-> /fuad
->
-> [1] https://lore.kernel.org/all/20241010085930.1546800-1-tabba@google.com/
-> [2] https://lore.kernel.org/all/20241108162040.159038-1-tabba@google.com/
->
-> Ackerley Tng (2):
->   KVM: guest_memfd: Make guest mem use guest mem inodes instead of
->     anonymous inodes
->   KVM: guest_memfd: Track mappability within a struct kvm_gmem_private
->
-> Fuad Tabba (12):
->   mm: Consolidate freeing of typed folios on final folio_put()
->   KVM: guest_memfd: Introduce kvm_gmem_get_pfn_locked(), which retains
->     the folio lock
->   KVM: guest_memfd: Folio mappability states and functions that manage
->     their transition
->   KVM: guest_memfd: Handle final folio_put() of guestmem pages
->   KVM: guest_memfd: Allow host to mmap guest_memfd() pages when shared
->   KVM: guest_memfd: Add guest_memfd support to
->     kvm_(read|/write)_guest_page()
->   KVM: guest_memfd: Add KVM capability to check if guest_memfd is host
->     mappable
->   KVM: guest_memfd: Add a guest_memfd() flag to initialize it as
->     mappable
->   KVM: guest_memfd: selftests: guest_memfd mmap() test when mapping is
->     allowed
->   KVM: arm64: Skip VMA checks for slots without userspace address
->   KVM: arm64: Handle guest_memfd()-backed guest page faults
->   KVM: arm64: Enable guest_memfd private memory when pKVM is enabled
->
->  Documentation/virt/kvm/api.rst                |   4 +
->  arch/arm64/include/asm/kvm_host.h             |   3 +
->  arch/arm64/kvm/Kconfig                        |   1 +
->  arch/arm64/kvm/mmu.c                          | 119 +++-
->  include/linux/kvm_host.h                      |  75 +++
->  include/linux/page-flags.h                    |  22 +
->  include/uapi/linux/kvm.h                      |   2 +
->  include/uapi/linux/magic.h                    |   1 +
->  mm/debug.c                                    |   1 +
->  mm/swap.c                                     |  28 +-
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../testing/selftests/kvm/guest_memfd_test.c  |  64 +-
->  virt/kvm/Kconfig                              |   4 +
->  virt/kvm/guest_memfd.c                        | 579 +++++++++++++++++-
->  virt/kvm/kvm_main.c                           | 229 ++++++-
->  15 files changed, 1074 insertions(+), 59 deletions(-)
->
->
-> base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
-> --
-> 2.47.1.613.gc27f4b7a9f-goog
->
+All warnings (new ones prefixed by >>):
+
+>> arch/s390/kvm/gmap.c:144: warning: Function parameter or struct member 'page' not described in '__gmap_destroy_page'
+>> arch/s390/kvm/gmap.c:144: warning: expecting prototype for gmap_destroy_page(). Prototype was for __gmap_destroy_page() instead
+
+
+vim +144 arch/s390/kvm/gmap.c
+
+   133	
+   134	/**
+   135	 * gmap_destroy_page - Destroy a guest page.
+   136	 * @gmap: the gmap of the guest
+   137	 * @gaddr: the guest address to destroy
+   138	 *
+   139	 * An attempt will be made to destroy the given guest page. If the attempt
+   140	 * fails, an attempt is made to export the page. If both attempts fail, an
+   141	 * appropriate error is returned.
+   142	 */
+   143	static int __gmap_destroy_page(struct gmap *gmap, struct page *page)
+ > 144	{
+   145		struct folio *folio = page_folio(page);
+   146		int rc;
+   147	
+   148		/*
+   149		 * See gmap_make_secure(): large folios cannot be secure. Small
+   150		 * folio implies FW_LEVEL_PTE.
+   151		 */
+   152		if (folio_test_large(folio))
+   153			return -EFAULT;
+   154	
+   155		rc = uv_destroy_folio(folio);
+   156		/*
+   157		 * Fault handlers can race; it is possible that two CPUs will fault
+   158		 * on the same secure page. One CPU can destroy the page, reboot,
+   159		 * re-enter secure mode and import it, while the second CPU was
+   160		 * stuck at the beginning of the handler. At some point the second
+   161		 * CPU will be able to progress, and it will not be able to destroy
+   162		 * the page. In that case we do not want to terminate the process,
+   163		 * we instead try to export the page.
+   164		 */
+   165		if (rc)
+   166			rc = uv_convert_from_secure_folio(folio);
+   167	
+   168		return rc;
+   169	}
+   170	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
