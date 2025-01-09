@@ -1,222 +1,181 @@
-Return-Path: <kvm+bounces-34870-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34871-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E998A06E89
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 08:00:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E52B7A06E95
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 08:04:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5415F167996
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 07:00:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7602D7A116E
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 07:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26CD21506E;
-	Thu,  9 Jan 2025 06:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74E22036F4;
+	Thu,  9 Jan 2025 07:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="2gLmysC9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PMKdCn2V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B0921505C
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 06:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E67C37160;
+	Thu,  9 Jan 2025 07:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736405964; cv=none; b=lJm6LYbX5IFqNmXivB72AuBI1auiLHVinpvI5VQCqV9JoWuf7i5H0eeKZyKaCilRdPmZkUiplr83iQqZwwNTpQdo+n5thyKHk4hZrxiPkxEmZSJW3XnFXqZrbJUWFX7tqwLem+cYZPDYf+XOe0LTwQrCIZ4CGLqKpGPkpIIwr8M=
+	t=1736406275; cv=none; b=o3RtoVElc3kPUrN4ErjJp1ZMruyqjr+kcsGogvScwiFjbh4hfwneUJWVhvhx4PRwaW9v6b8Yyu45lrTSD5zjRGENnhAHQavnL2V/HiAmVDkD/iiEUync5d9pDxi9gQvC5PtYp8jpXKdfwta7ldPol0gQnCkbgXwRhNr3gDx9cok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736405964; c=relaxed/simple;
-	bh=j9JT4BCL5ue3sxQx0JMGybwFg69W5Wt0V1JljWQGcRA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=mw0WfadJQyUWhYV8tDLEpgqYB6iXPCSO5+2NCg9/LRAw5D65MZo1fg2FrfzR92ZCJqYRkXziryBGw7zhTbHNZ74WUmqAgh4sc3o7nNPJSB+yyaTvkc/2RRZh5JbDpfQ9IbPEtaEE8hYaD025cL8ejpljO5FQKiFQtTu7QYEISL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=2gLmysC9; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-216395e151bso6953925ad.0
-        for <kvm@vger.kernel.org>; Wed, 08 Jan 2025 22:59:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736405962; x=1737010762; darn=vger.kernel.org;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LcMFqPOnaXF/Vbm6gaswrNROks4WBDypVrONtYlYR6g=;
-        b=2gLmysC9/Ia9v0W4wp1PVTCW9QB3MDDSB5JTdeHBtXbtC3MsVIWwsMe9np8SJ871Zh
-         qb9Y97NflonPdPvU0yVRM1UGodmdvuR/GVfZRr4cEOa9oSxWWnKFWuDuWKfe4TQyLIxf
-         GHLSnaVEJM3ci5JPtH7Nuhaj+uskIdPmU1M6JD05AH12Rqx5+77jN/ol3Twe23AvXD2z
-         /YY1SBfvzT5vqTKZyvYjGm11fVRp1YPVbnTrP0/XGigynHRgZqBLGWGOFZxXC79h0sX4
-         maEPLoYZ5bFchr6brfQ41iM+jlmn4dxkhnEuzCUbQG1300kmNJY6u//FZLQr+vaCMSTH
-         xFfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736405962; x=1737010762;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LcMFqPOnaXF/Vbm6gaswrNROks4WBDypVrONtYlYR6g=;
-        b=vIy/Xtf5OsTHPo/IxrgwvT6ElU4D3wxDuPDtnRnuRwKyqUrAvDBU9GJwdnezcqagYe
-         V//qyDwePS/D2Zutr/ZzGNfUSJQEX4roKYi1M2x3+gMjbd59kmP1xtbWlBCTUvSCKAd+
-         8skx9uRjhtoEB9IgdiOSXIWMfvDYND5Pb3CqFz7p1PC+8NnHoqmZSpANE24H9veCl5GK
-         qLcFOYyizc7mKLbDElkVhHPecvKxGzxTU1B8a80zUa/yP3+pDRxeBhkDhsVnM4cuOXui
-         sP6naLA7gvgf7N6DRsvtI6kUjjM4JAAZG/wYu4+Td+k8wtCuT9+I0rdkhKtArj8x676E
-         o0sw==
-X-Forwarded-Encrypted: i=1; AJvYcCWRgfumcInK8C6+exs2c5JWcMn7ASIZGz5FraGdi2yNdWsOZpEP7+JdtYSn8G5l1l5O4Eo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDLLgaEoDGwHR+V2BH9UerwNUS20BXmsVag5QEXzTzJ0PkBxD4
-	rVeOqsNVPI8Y76F7EMYxEPudUHSAveZH/TvB4x+GvQLs5jZfMWOGyNE2YlH+wMU=
-X-Gm-Gg: ASbGncvzn+P8Se31zHb9XtDYYQy+AbkqY/IUIw3HHFEtSor1YtzPvOfYgXoSFi84WIG
-	4PVt7ZDwvecPzpAH7KKLrcVGF1Fli4o8/btdo6D8VuWY3S8M1h6vw9+J3O77jrW9OT1XbVdqT5D
-	xwYH+LP4ZrS55rR8jfHksDF8k0nuOB/W1oCf1pRkbtBMe+wWozHCZAYNcF/pu/SIm7liFTPg7t0
-	Yk8ivuOEW7XyyVP5XjxiBWm8l058FYK1DTTdVotwJ3z4mDVuLhIGWOzhsU=
-X-Google-Smtp-Source: AGHT+IEJP35PzzPUa5d42ylaSKRGrOzMFsCH1VQGbqQMF8wzgrB57rbB+fwdI4blxhYKLVyvTAVjLQ==
-X-Received: by 2002:a17:902:fc84:b0:216:84f0:e33c with SMTP id d9443c01a7336-21a8d6c7b93mr34039715ad.20.1736405961688;
-        Wed, 08 Jan 2025 22:59:21 -0800 (PST)
-Received: from localhost ([157.82.203.37])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-219dca02589sm338316855ad.257.2025.01.08.22.59.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jan 2025 22:59:21 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Thu, 09 Jan 2025 15:58:45 +0900
-Subject: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
+	s=arc-20240116; t=1736406275; c=relaxed/simple;
+	bh=HKSYTcRYhknUo25TNo0OahISsZXCy/+IkrcIX0iOc4o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YWuQUSRTUdUzOmeKy0TQolN1nN5uVwHQUq09lYYBR5gG6/b4qxe2vayPe9aGzOcFW4nDNZ6atMGQJ9avBxaqlXbVIyz40l4GCM9d4ee+hl+sjWS8tMFkFuX06Nz5seahWaXSzUTrnWLq0Sozf53muQ3ne6/eMpMiuV6JZfdmAAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PMKdCn2V; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736406274; x=1767942274;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=HKSYTcRYhknUo25TNo0OahISsZXCy/+IkrcIX0iOc4o=;
+  b=PMKdCn2ViH48ZCOhSmoHAoR7j4Aq1SFsC1SICmrvm5600nS9ii8u7HCV
+   EWLvmidIrFTcepoQeJLFq944TcDyGdF93tNnxJA/diwrR6vtP8zHwU4HA
+   Wi+/h/9pbzaDIC1DSIISwJ1ImtJi3E3NbEeLh8TrXMlCilWgsQhb40Zv2
+   J1Cfg2vB4IO1QmIRiiLqcTvC6Sq3CiCM4/1FWGR6MFZr3ks4dMV01fzhJ
+   +Rw/yEUryg72eQxpCweGTkT9QwCI81KhHXdQ0VJo/7+Bo0JWlpCIB5kId
+   II9IfKWKdO8gPjhJJ6zUmNuBNeQ/8aT8ljtg/aSsXTFekrl70EzCpDuBL
+   g==;
+X-CSE-ConnectionGUID: Vp0yz5uHSOOE9AIAkiUbaA==
+X-CSE-MsgGUID: UTsnJ8cASrSgkAWjL/2MIg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="36535691"
+X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
+   d="scan'208";a="36535691"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 23:04:33 -0800
+X-CSE-ConnectionGUID: GUJCCsf8SKKgx6F602cVgw==
+X-CSE-MsgGUID: A5Y1HkxTTZGMaRoSjt/jvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
+   d="scan'208";a="103291986"
+Received: from lfiedoro-mobl.ger.corp.intel.com (HELO localhost) ([10.245.246.189])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 23:04:28 -0800
+Date: Thu, 9 Jan 2025 09:04:22 +0200
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Nikolay Borisov <nik.borisov@suse.com>,
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Yan Y Zhao <yan.y.zhao@intel.com>,
+	Reinette Chatre <reinette.chatre@intel.com>
+Subject: Re: [PATCH v2 00/25] TDX vCPU/VM creation
+Message-ID: <Z3909uubxHn8mk0Q@tlindgre-MOBL1>
+References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
+ <CABgObfZsF+1YGTQO_+uF+pBPm-i08BrEGCfTG8_o824776c=6Q@mail.gmail.com>
+ <94e37a815632447d4d16df0a85f3ec2e346fca49.camel@intel.com>
+ <Z3zZw2jYII2uhoFx@tlindgre-MOBL1>
+ <7f8d0beb-cc02-467d-ae2a-10e22571e5cf@suse.com>
+ <Z34NGyZL7G_j716N@tlindgre-MOBL1>
+ <Z36TLcX1kOe1ltjp@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250109-tun-v2-3-388d7d5a287a@daynix.com>
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
-In-Reply-To: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
-To: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
- devel@daynix.com, Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14-dev-fd6e3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z36TLcX1kOe1ltjp@google.com>
 
-The specification says the device MUST set num_buffers to 1 if
-VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+On Wed, Jan 08, 2025 at 07:01:01AM -0800, Sean Christopherson wrote:
+> On Wed, Jan 08, 2025, Tony Lindgren wrote:
+> > On Tue, Jan 07, 2025 at 02:41:51PM +0200, Nikolay Borisov wrote:
+> > > On 7.01.25 г. 9:37 ч., Tony Lindgren wrote:
+> > > > --- a/arch/x86/kvm/lapic.c
+> > > > +++ b/arch/x86/kvm/lapic.c
+> > > > @@ -139,6 +139,8 @@ __read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
+> > > >   EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
+> > > >   __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_hw_disabled, HZ);
+> > > > +EXPORT_SYMBOL_GPL(apic_hw_disabled);
+> > > 
+> > > Is it really required to expose this symbol? apic_hw_disabled is defined as
+> > > static inline in the header?
+> 
+> No, apic_hw_disabled can't be "static inline", because it's a variable, not a
+> function.
+> 
+> > For loadable modules yes, otherwise we'll get:
+> > 
+> > ERROR: modpost: "apic_hw_disabled" [arch/x86/kvm/kvm-intel.ko] undefined!
+> > 
+> > This is similar to the EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu) already
+> > there.
+> 
+> Heh, which is a hint that you're using the wrong helper.  TDX should check
+> lapic_in_kernel(), not kvm_apic_present().  The former verifies that local APIC
+> emulation/virtualization is handed in-kernel, i.e. by KVM.  The latter checks
+> that the local APIC is in-kernel *and* that the vCPU's local APIC is hardware
+> enabled, and checking that the local APIC is hardware enabled is unnecessary
+> and only works by sheer dumb luck.
 
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+OK makes sense :)
+
+> The only reason kvm_create_lapic() stuffs the enable bit is to avoid toggling
+> the static key, which incurs costly IPIs to patch kernel text.  If
+> apic_hw_disabled were to be removed (which is somewhat seriously being considered),
+> this code would be deleted and TDX would break.
+> 
+> 	/*
+> 	 * Stuff the APIC ENABLE bit in lieu of temporarily incrementing
+> 	 * apic_hw_disabled; the full RESET value is set by kvm_lapic_reset().
+> 	 */
+> 	vcpu->arch.apic_base = MSR_IA32_APICBASE_ENABLE;
+
+Thanks for the clarification. Updated patch below for reference in
+case it's still needed.
+
+Regards,
+
+Tony
+
+8< ----------------------
+From 1e4b72fe4a69f0bdd7c8379315b97be79fb6cf8a Mon Sep 17 00:00:00 2001
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+Date: Mon, 2 Sep 2024 13:52:20 +0300
+Subject: [PATCH 1/1] KVM/TDX: Use lapic_in_kernel() in tdx_vcpu_create()
+
+Use lapic_in_kernel() in tdx_vcpu_create().
+
+Suggested-by: Nikolay Borisov <nik.borisov@suse.com>
+Signed-off-by: Tony Lindgren <tony.lindgren@linux.intel.com>
 ---
- drivers/net/tap.c      |  2 +-
- drivers/net/tun.c      |  6 ++++--
- drivers/net/tun_vnet.c | 14 +++++++++-----
- drivers/net/tun_vnet.h |  4 ++--
- 4 files changed, 16 insertions(+), 10 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 60804855510b..fe9554ee5b8b 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -713,7 +713,7 @@ static ssize_t tap_put_user(struct tap_queue *q,
- 	int total;
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index d0dc3200fa37..b905a7c9e2ff 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -8,6 +8,7 @@
+ #include "capabilities.h"
+ #include "mmu.h"
+ #include "x86_ops.h"
++#include "lapic.h"
+ #include "tdx.h"
+ #include "vmx.h"
+ #include "mmu/spte.h"
+@@ -674,7 +675,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+ 		return -EIO;
  
- 	if (q->flags & IFF_VNET_HDR) {
--		struct virtio_net_hdr vnet_hdr;
-+		struct virtio_net_hdr_v1 vnet_hdr;
- 
- 		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
- 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index dbf0dee92e93..f211d0580887 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1991,7 +1991,9 @@ static ssize_t tun_put_user_xdp(struct tun_struct *tun,
- 	size_t total;
- 
- 	if (tun->flags & IFF_VNET_HDR) {
--		struct virtio_net_hdr gso = { 0 };
-+		struct virtio_net_hdr_v1 gso = {
-+			.num_buffers = __virtio16_to_cpu(true, 1)
-+		};
- 
- 		vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
- 		ret = tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
-@@ -2044,7 +2046,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 	}
- 
- 	if (vnet_hdr_sz) {
--		struct virtio_net_hdr gso;
-+		struct virtio_net_hdr_v1 gso;
- 
- 		ret = tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, &gso);
- 		if (ret < 0)
-diff --git a/drivers/net/tun_vnet.c b/drivers/net/tun_vnet.c
-index ffb2186facd3..a7a7989fae56 100644
---- a/drivers/net/tun_vnet.c
-+++ b/drivers/net/tun_vnet.c
-@@ -130,15 +130,17 @@ int tun_vnet_hdr_get(int sz, unsigned int flags, struct iov_iter *from,
- EXPORT_SYMBOL_GPL(tun_vnet_hdr_get);
- 
- int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
--		     const struct virtio_net_hdr *hdr)
-+		     const struct virtio_net_hdr_v1 *hdr)
- {
-+	int content_sz = MIN(sizeof(*hdr), sz);
-+
- 	if (iov_iter_count(iter) < sz)
+ 	/* TDX only supports x2APIC, which requires an in-kernel local APIC. */
+-	if (!vcpu->arch.apic)
++	if (!lapic_in_kernel(vcpu))
  		return -EINVAL;
  
--	if (copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr))
-+	if (copy_to_iter(hdr, content_sz, iter) != content_sz)
- 		return -EFAULT;
- 
--	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
-+	if (iov_iter_zero(sz - content_sz, iter) != sz - content_sz)
- 		return -EFAULT;
- 
- 	return 0;
-@@ -154,11 +156,11 @@ EXPORT_SYMBOL_GPL(tun_vnet_hdr_to_skb);
- 
- int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
- 			  const struct sk_buff *skb,
--			  struct virtio_net_hdr *hdr)
-+			  struct virtio_net_hdr_v1 *hdr)
- {
- 	int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
- 
--	if (virtio_net_hdr_from_skb(skb, hdr,
-+	if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)hdr,
- 				    tun_vnet_is_little_endian(flags), true,
- 				    vlan_hlen)) {
- 		struct skb_shared_info *sinfo = skb_shinfo(skb);
-@@ -176,6 +178,8 @@ int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
- 		return -EINVAL;
- 	}
- 
-+	hdr->num_buffers = 1;
-+
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(tun_vnet_hdr_from_skb);
-diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
-index 2dfdbe92bb24..d8fd94094227 100644
---- a/drivers/net/tun_vnet.h
-+++ b/drivers/net/tun_vnet.h
-@@ -12,13 +12,13 @@ int tun_vnet_hdr_get(int sz, unsigned int flags, struct iov_iter *from,
- 		     struct virtio_net_hdr *hdr);
- 
- int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
--		     const struct virtio_net_hdr *hdr);
-+		     const struct virtio_net_hdr_v1 *hdr);
- 
- int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
- 			const struct virtio_net_hdr *hdr);
- 
- int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
- 			  const struct sk_buff *skb,
--			  struct virtio_net_hdr *hdr);
-+			  struct virtio_net_hdr_v1 *hdr);
- 
- #endif /* TUN_VNET_H */
-
+ 	fpstate_set_confidential(&vcpu->arch.guest_fpu);
 -- 
 2.47.1
 
