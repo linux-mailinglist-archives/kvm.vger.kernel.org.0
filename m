@@ -1,204 +1,108 @@
-Return-Path: <kvm+bounces-34929-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34930-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7534A0797D
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 15:41:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C52A07BF1
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 16:28:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43B416900F
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 14:41:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 293121633C9
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 15:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB3921B8E7;
-	Thu,  9 Jan 2025 14:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFE921E08A;
+	Thu,  9 Jan 2025 15:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="i4GKBVB6"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="YsIG8cgA"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2061.outbound.protection.outlook.com [40.107.100.61])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B20D21B907;
-	Thu,  9 Jan 2025 14:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736433657; cv=fail; b=u0slen7XKXrUWt54gCnOGBesWYbRIMzGin83u0Bb6S3510FaypOb+BNkLbokLTNtGzyPWYcJW2pcY8qVsgB3699pAzlSqY43qLR3Q1G1MiQKi3+ixK6GxK4vfc+3Lm5mRHYnUhmrAkqKo77pbThMJkyK4gvzgm6bQf1/fi2C6o8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736433657; c=relaxed/simple;
-	bh=S3+fRmJkiqg4oVhVxEVOiNxc7XpcMAdygNE2LaIzjUU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=h7oIIsG1KvxJ+R60I39/DwvDPnP0II8TiljDxXs8Gzjqz4tZ7S5vLLBOiu4bihf/XJXvp5tE2V5cOvkmv4hoQFW+wy9UEMCpf5bYso0BWfisJi6bZ2X/FMsy7kU1+83p4w09mGVq6QbeuvIOrL7M6/fUpLHSAfb0OA+mJ9eF9yg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=i4GKBVB6; arc=fail smtp.client-ip=40.107.100.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ThvcghVpKnM5FwgyiBjAXDv7YVXV3LmXBfkvTOi4F03KQvn6uoM6mvZbQMjQu37i3S7Hsv88fX9yOnS97PR5EYI9VnrlBqb/Px3JIeiAsuN+6jqu5Y0FrK34LKc9Qr4fN+B0d/8Pta2aQ9CcNGWz5pRS7Qz44eVHo4Nnz8faGFBHBJdszWLtHXdOCe8JySqKcTHHEPMAA2bUX6HKo4DT+/d+skjC7lAnzCare3KMiHmRfIFXfRNJHydhfU9Esiin6h6Qm2vh/6wTaUEdJ1R55/yLte44PqfR2FNia8Gv7JumjgmLUAZ43ftBLFxCNaSAIRS4t49G/1R1B+UBkYp79g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+ITzwfueWfHqqcCarUI2h81nBJtROCWTrFLad1zgmx0=;
- b=bk/33JvXl9/dxqtg6NaqJHqDaU5Hdau09gXpS+0KKgIt3j1hEDgdC1UlmDRJuZyg6mn6EawNrosYNcpsXDb/f+OdzWxSNXOcdl3zFv3tYMLX93zVlaC+AwkYMklHs6yld5rRY/OpNaS6BXJawjnYrOK4DQ3ieqivzQcEA4NmhNj/MNpddRVQiIePDRYR3zT4Ezgb7iWCT6dBKVQZ3wW3j1613pM4HB+k5rSixbIObqt1kTZDbKqeMI1uObzP6Uv3eNGTQ89ifAJ1xNX23oAzJRvMkeNOR0/DnEwuho9vx8YInDAlAPsHNlihZg19PYkoUjRK7r7b2gLJslj8RInJ3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+ITzwfueWfHqqcCarUI2h81nBJtROCWTrFLad1zgmx0=;
- b=i4GKBVB6cg+NJFM0c7akuUDFVkL1T4oCLMbZkPvSTfsxmAU0Xh639scHMztriWrWe+J+hC8nwiLPFMTX0Yb+53xaYh/c3oUeAlhq+fx6RkUWGdGpiv7do1jBZyZyXYUlLSiO4xj1MlBcV1g2o056mB469EI4jnkAKKqCCgwLzLZ/QwP0+h0DHWN5uS+miLXXmbrZaz3V+jGqYpndtnXutJuiefWpP9WEwDOQrPioCmqa7an50747TvQ3ESX7aNgzKpwr/NafQJyeAptYqkSA8bv3TuRJvJxF8+LtFpLN+eX1OELsWl2Cm0/lQrMqFS60HZ+nWX+SKh/xqSGNUqHzUg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by PH7PR12MB6537.namprd12.prod.outlook.com (2603:10b6:510:1f2::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.10; Thu, 9 Jan
- 2025 14:40:53 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8314.015; Thu, 9 Jan 2025
- 14:40:53 +0000
-Date: Thu, 9 Jan 2025 10:40:51 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
-	yilun.xu@intel.com, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
-	zhenzhong.duan@intel.com, tao1.su@intel.com
-Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
- private device
-Message-ID: <20250109144051.GX5556@nvidia.com>
-References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
- <20250107142719.179636-9-yilun.xu@linux.intel.com>
- <20250108133026.GQ5556@nvidia.com>
- <Z36ulpCoJAllp4fP@yilunxu-OptiPlex-7050>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z36ulpCoJAllp4fP@yilunxu-OptiPlex-7050>
-X-ClientProxiedBy: BL1PR13CA0378.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::23) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBE721CA1D;
+	Thu,  9 Jan 2025 15:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736436504; cv=none; b=A11wen0Sg23cbixBkEtwVdohRtNpHxwN9yjEvIiTPtlr760cnmpm/CdKAuB2Kc7RZRxwOw90xjTK9bq6DXR9dIN59siqpXmPbfRxA5J9uNbv9jiDzul+EfhZK2V99o447zIwaomTzIjMGybzXGx8N9i6wVB9cwQPxum0cc/Hcv8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736436504; c=relaxed/simple;
+	bh=Spu51y9HfZuOxHXPfsEWvCmRgGJgzXcQUPYrBwwbc4Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IDjF8cMKJJlUFj6MSRkdC8Hfu7k3n4cawGoN5456/Cgnra789F7Ew885djdVAL+eWxytS/2TtfKmOhUclsVEEOzRqYqSaVChtbe3CIpIml/+sgs2/fyTpZL6j1HfnmlrvjW7Jg8mI6aSvOr8PJ1mjNoGXxe56rxFVuzBXHy8CrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=YsIG8cgA; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tVuSA-0038cU-IX; Thu, 09 Jan 2025 16:28:10 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=NnAJ9ysjnx9++5Tx4kBs7NCrt44ysPVsN78x25Ia93U=; b=YsIG8cgAFFi8vjxD/YzvpAyj9G
+	oQlYlT08oJ3QDe3lvIYyOnGCJW8m96RaXXVSKTAZL3GfkdyVRQa2+Zzxhk1J+2B2HSLhuM9if6E1i
+	Uzpya8zCKO9JlMrVpkrlgOwFkjgYEPDw05neTBPiVcOCCY1YdQsOgb3hcYj3hLBkb/z1cP5FQ4Wng
+	F07tDkAFG9W5RlGoOmL+ijIUCGK2mEvdXiYG6H+ue+BymTN+IS6FOScwjVHFd9GUb6TkeMjr9cCE8
+	gmari1ZpangqHiEeSU8bHfOGCd5LuvF79YLJsgXu0IVUTlp3vS6jw/Qc/IANUsQXRCRnR1h5+2WEV
+	65jdyx+g==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tVuS9-0004qn-2n; Thu, 09 Jan 2025 16:28:09 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tVuRs-006wNO-LY; Thu, 09 Jan 2025 16:27:52 +0100
+Message-ID: <05c8648c-d6ca-419b-a4ec-6b305f4ca19f@rbox.co>
+Date: Thu, 9 Jan 2025 16:27:51 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|PH7PR12MB6537:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1e2ed80-2db7-4fb8-093f-08dd30bb9e39
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?jMAlcqrXLM/nzF1z6ns228jo3gkfIdkrQ5kzgTJPoruYK4wGO0NCeCdES/2p?=
- =?us-ascii?Q?oGlfpScW4I5C3/QUi/82n1ZVyQc5ZlbsZJ2PiUnr4wfuhdiiDR7U95SBuOO+?=
- =?us-ascii?Q?ClgQM5U7DbsZVrEZ/2osGsE2y/pyTyzx8t2YORsracb4EVeN74gnMnv783NH?=
- =?us-ascii?Q?+esAE4T5s9/0Bwxx3c2V21/JAun4yhRifJYWwcmp50b8GubkoEbAClML7hiQ?=
- =?us-ascii?Q?+ifKfHqzM4OHAWw9ko1RN9vOk/gknA1dNas9uwjJO+Th5oSYHriR+w9LssFE?=
- =?us-ascii?Q?pb15grm1jpYFBuRZU20hxn4TlUivkMvz8aGTJwNk8D3jYyca4gM8XEJiV7jB?=
- =?us-ascii?Q?pgQ2j/AsOAsjm7YRWvDXb0Ipgycs19QH03rH96fvSe4TLLbczAGwPJHgpeI6?=
- =?us-ascii?Q?q04c8Jt35Zw0+dviPSDkrTBtRpZvrJ4bMaUXbfzwFz2cNVIT0k+I2E2EeuZP?=
- =?us-ascii?Q?YQ0U6nurawDINrIXsV0F0BYYbUYdCeSAFQTBYYDhetLlv76QZDuASb524kVu?=
- =?us-ascii?Q?wIR27UUXhbUtcgoBTN0/cz6s1kqYb6xvAsTtMYJDMPnsF2DQ3L1P3p2wfgCp?=
- =?us-ascii?Q?SROBF3n0ogiMbvVf8dEzVq+aSOZp+yeDRgzvTNb0CMnXzzTuPFoj82IPf7KL?=
- =?us-ascii?Q?RUh9smQsgXkK06NRLnk1cAVFlIp7rPdi1JhjicqugUwcAOGrix2Pg9fWu2mn?=
- =?us-ascii?Q?70d9yptyBqfdwA68lw/fVDG6kbucya8K9JtXOCdIR5Be2/uu4r9FBXgWfumj?=
- =?us-ascii?Q?HVH0TXtSBCVnO3z+kKGBPUID6oCqkn55Hy2wFbaXg0YH/be0W+Swix8yBCwb?=
- =?us-ascii?Q?NcGpzin5VJgYitKYywnoAFhP/ahIOFSIslyz1xOOyjGa7ZTgQ+EwiNFXKpkA?=
- =?us-ascii?Q?/K45/phX428tnBDzomIDhx4wolKc/szSyskmgeClwMykQfTR72V8yYfk6DJW?=
- =?us-ascii?Q?wt2g3+JaXmHkF1tBMyQ+4iHqV2psmNMbgCXe7N/nVdc/467so+ZslRaqoyEK?=
- =?us-ascii?Q?G1pxCyO1ryLsz8bfGON6wRGMxKVAJsUAoYnNWYLZkIfM4b5KRQbwkNvEBUwE?=
- =?us-ascii?Q?Xj8MWaFIEU/Uq2N3jpGuijaXnGnNH8kwvfpDBhEIVcFSNi4Vr/eHSVPcmfZE?=
- =?us-ascii?Q?lmBvw4V9w8ZGur6mQXqhNckXgpRUMC5OEMN3TUK/33doO/3kMvMXkIBWMp8u?=
- =?us-ascii?Q?a+9pByUTzmU32p5xaq8Kw6pzCy7eDX8Imh8Dwe//bavw6P1cJB4mzqOFsQEd?=
- =?us-ascii?Q?8/yUBxNNt8Da3HJCk6rWJsPxvtxoWQVKMtR2txqo6AxCdTkBwJGLSEbJzxS0?=
- =?us-ascii?Q?+Xw/XrNouYvRXglto/mvOXZXpLb3u7xuUmjVC7TD/3m6+q3EaIMTl/2oTQ5X?=
- =?us-ascii?Q?5v2mN2kSRdNOrAGTGIojcfwSopL1?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?UKpdUrS3G2my27E8NGEAhApb+6/wHhOrqdKusnvn4oJWQxAe8ibBupyiyRgY?=
- =?us-ascii?Q?Ar3IhpexW7/UsZUfsxRX+R1D0eABAnF8iEQ7Mb9ktUW7kPSEYn5g0lEd286x?=
- =?us-ascii?Q?yaJvZuRGN/zRPIKdUWahF2NYd00aei5pde1lwVNduBBF+MqcAAEkop0lwDBF?=
- =?us-ascii?Q?2jmAeMn5cTWCvhJJcZYg468uNQQyuHMogDGTHvBx8zY4wQGugJWSsqPJSVev?=
- =?us-ascii?Q?iZiSq9c3gs70D5H3idQt9UvfQt98ZjWP3tjpH7tqkEo1MWgtVb+XFwdTHqav?=
- =?us-ascii?Q?7WMUfayFkQOlhgfwCPlPhvMIfkAB0Qw0GswWd6FmpwdqaDte7aOHvbktOeoq?=
- =?us-ascii?Q?KENWn2JWIsji1uMs/fp2OYJ3T+awMJRuh3FkdsWrA1wbaCy7n1uqouBcMuyy?=
- =?us-ascii?Q?6JI/1DAxvSo1hAOBbcgVR2adCmMRlU3lNnsZAJ2zxMZoTumDpmG8YGPtqsSi?=
- =?us-ascii?Q?ONDJkZNKMmk2LoPNTgPA7nBzZrRyZemPmRnKBO8nHk86aoGzk6znWxHrfJgA?=
- =?us-ascii?Q?Vo6oNyNTiOCi4+JiDxorwvvgo3/c8pcEQ2CUHIGqQzN9gApkGH8hyrbUT4Ya?=
- =?us-ascii?Q?PVmO6k+H2mJ6tVppW8TYCP2ezfoDcKhvyj6WeNabF+JRZbYudKlniKVHAC/3?=
- =?us-ascii?Q?4WN62UxnoQvugY0xmHHoK73Kf4Mfzh7+8Vo9LkqTapCCIth+IuTED4XkITbX?=
- =?us-ascii?Q?uHD25g4oaV4JxTevQrUW2bWVcBZzn5GuX+XOF+fd1b2ETjL/RxYv2/nueXT1?=
- =?us-ascii?Q?d4p1x0ium0mGcMer0mOOoRVm2bctAfUP1XH7iRzPGOWbh9H78vMl2Iymbgc0?=
- =?us-ascii?Q?ob1oXh7Kp7qZxBFzJNuY99ywFdAvk4mVVVz5JInKVQGhwlhPduB7N3I7QwWF?=
- =?us-ascii?Q?Bepgqj9h2kPFHISsWDSte9fbOvZzvKoOum4WkqaoeI+gSOQs5ak9pyR+7g9m?=
- =?us-ascii?Q?hpNW/bImw7optLtQgtNgIOUpv1tD1+xMvHATQPpeLJMHhT+8tO3S1p71qufC?=
- =?us-ascii?Q?XUC78GyH6ce82ZHctq7aD25JC0Im/hNnvzIWf5xJfdFrar/ZSGlZ0xQE/fZs?=
- =?us-ascii?Q?CB/1IO9U4qcyqtKaacO1MQCgfzx7GG1GMPKtpR5V0bxcxnyAY11oh3ib41rS?=
- =?us-ascii?Q?O86pyIsApdmCHBubvJywncNm1OG/L7pXqx+c/qzf5iqd8wB6+p4JnpdngcxW?=
- =?us-ascii?Q?A2WHFFTXnwdnhmo83HHUfqTZZNNCVwe7MofSWS+otrgivJ1PT6z+2bI13A4W?=
- =?us-ascii?Q?2zMPqMQNa6ATvflpWMS2RUJ1rrgXIF5ERlh7i6bLtBtVKm4JOvZtDutmgoj+?=
- =?us-ascii?Q?fNt5WruN8OfoNgHxqZXRqENpAf8REaRQARjjgVFrndNJArQ2TPe4ycr43HMM?=
- =?us-ascii?Q?Kf14+ThBMznR96Zha+m7fXgTybfnvPn923MKyCmSP+rrPrWDFIU6hElECqq9?=
- =?us-ascii?Q?i8WwX4ckVAJbIf5E9fGjGaCReGH5PfAr/b173mwT3u6jKLUp2Lu+hW2ys0HZ?=
- =?us-ascii?Q?2L34+TeGLxxLfOlPRhXaIXWNPk7Ru6LSVh83jAggq3v1Rt/+nDs1v4PTEP2K?=
- =?us-ascii?Q?Uh3cA0L5Ft1Y5qKioNeL9atYgBfNuCOyrqjzaWNs?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1e2ed80-2db7-4fb8-093f-08dd30bb9e39
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2025 14:40:52.9306
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: k5kjeqJhmJ/LfZ+5EIPrbHrYxLMqPeEeHUBbhemrOLGuee3ohxrll+TSDLmBlBFY
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6537
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] vsock/virtio: discard packets if the transport
+ changes
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Wongi Lee <qwerty@theori.io>, "David S. Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ virtualization@lists.linux.dev, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Luigi Leonardi <leonardi@redhat.com>,
+ bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Hyunwoo Kim <v4bel@theori.io>,
+ kvm@vger.kernel.org
+References: <20250108180617.154053-1-sgarzare@redhat.com>
+ <20250108180617.154053-2-sgarzare@redhat.com>
+ <2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co>
+ <wix5cx7uhthr6imrpsliysktyae6xwuzpvg77uscswyqwszzfb@ms5osa4ckdcm>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <wix5cx7uhthr6imrpsliysktyae6xwuzpvg77uscswyqwszzfb@ms5osa4ckdcm>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 09, 2025 at 12:57:58AM +0800, Xu Yilun wrote:
-> On Wed, Jan 08, 2025 at 09:30:26AM -0400, Jason Gunthorpe wrote:
-> > On Tue, Jan 07, 2025 at 10:27:15PM +0800, Xu Yilun wrote:
-> > > Add a flag for ioctl(VFIO_DEVICE_BIND_IOMMUFD) to mark a device as
-> > > for private assignment. For these private assigned devices, disallow
-> > > host accessing their MMIO resources.
-> > 
-> > Why? Shouldn't the VMM simply not call mmap? Why does the kernel have
-> > to enforce this?
+On 1/9/25 14:42, Stefano Garzarella wrote:
+> On Thu, Jan 09, 2025 at 02:34:28PM +0100, Michal Luczaj wrote:
+>> ...
+>> That said, when I apply this patch, but drop the `sk->sk_state !=
+>> TCP_LISTEN &&`: no more splats.
 > 
-> MM.. maybe I should not say 'host', instead 'userspace'.
+> We can't drop `sk->sk_state != TCP_LISTEN &&` because listener socket 
+> doesn't have any transport (vsk->transport == NULL), so every connection 
+> request will receive an error, so maybe this is the reason of no splats.
+
+Bah, sorry, I didn't run the test suit.
+
+> I'm cooking some more patches to fix Hyunwoo's scenario handling better 
+> the close work when the virtio destructor is called.
 > 
-> I think the kernel part VMM (KVM) has the responsibility to enforce the
-> correct behavior of the userspace part VMM (QEMU). QEMU has no way to
-> touch private memory/MMIO intentionally or accidently. IIUC that's one
-> of the initiative guest_memfd is introduced for private memory. Private
-> MMIO follows.
+> I'll run your reproduces to test it, thanks for that!
+> 
+> Stefano
+> 
 
-Okay, but then why is it a flag like that? I'm expecting a much
-broader system here to make the VFIO device into a confidential device
-(like setup the TDI) where we'd have to enforce the private things,
-communicate with some secure world to assign it, and so on.
-
-I want to see a fuller solution to the CC problem in VFIO before we
-can be sure what is the correct UAPI. In other words, make the
-VFIO device into a CC device should also prevent mmaping it and so on.
-
-So, I would take this out and defer VFIO enforcment to a series which
-does fuller CC enablement of VFIO.
-
-The precursor work should just be avoiding requiring a VMA when
-installing VFIO MMIO into the KVM and IOMMU stage 2 mappings. Ie by
-using a FD to get the CPU pfns into iommufd and kvm as you are
-showing.
-
-This works just fine for non-CC devices anyhow and is the necessary
-building block for making a TDI interface in VFIO.
-
-Jason
 
