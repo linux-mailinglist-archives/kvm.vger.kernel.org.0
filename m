@@ -1,119 +1,94 @@
-Return-Path: <kvm+bounces-34886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34888-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1A2FA06F6D
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 08:54:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0E72A06FBD
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 09:10:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1703D3A407C
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 07:53:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 151FB3A6F89
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 08:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9993E43169;
-	Thu,  9 Jan 2025 07:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B946214A99;
+	Thu,  9 Jan 2025 08:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G+1MGxQZ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NdN/ARTC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2065.outbound.protection.outlook.com [40.107.93.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C388D202C31
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 07:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B31C10A3E;
+	Thu,  9 Jan 2025 08:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736409177; cv=fail; b=CzrbrNWFUTYUTH7Fuf+8wL17swf6U0CgRo/bkPKNrBbU2HPZl2IGHl6RW3ECxvDF1iBHsiYZH/JD5/k75S354ZdtUep9ezIfbGpvKRPUujonkLqX5N47jfTMlGMHQn/6cBGWzcau5DyMXW6Ew79xya29VrdEIfPh8gE1RKqzg60=
+	t=1736410200; cv=fail; b=Ul6ElSrDXY/V07UtyK475qFe3XQUlsxmHJv5BnbN3JZL45NW4Jj2FmLkB0pvPzoBvO+/IAY73HOa9DDVl6odjIqSOse4F/xdcz8s25dQP9c0eJPPFLF/mJS+OezGZ70bUkCagFZea0mNRr1dVQnxk2sATP3ur7imjf0tgN55+BQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736409177; c=relaxed/simple;
-	bh=K03OVT706panyDqqeOvt1dcyUn6rJABt70fJI5wtjcA=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=bqrLPtNkTdUSINDMgYlulNxiPF+WzLAviXMpLCoxp2r0V7ycoWDbCvegsjh1IwEQ9Vq5w3QhJ+O+7+1y9mqlKsphaicSjyfx5B+iWCPsL7KTY39dgkbv4jJj57o2bD7edl5idajsgy11o5GZsY792L/0VbIlsgh4whm84isNvrY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G+1MGxQZ; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736409176; x=1767945176;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=K03OVT706panyDqqeOvt1dcyUn6rJABt70fJI5wtjcA=;
-  b=G+1MGxQZPQHdUEBjHv+NXA0cu7oJWlvyh6FZpnUgk5Epj8H0FPL2yc1F
-   LOHQgnK9qh1kcM21KXuQvguwjRKKuzqVieewckLrFNiDGJmlotgmGirxD
-   E28cykIxi1jZ43NbMylt6rRm5xZD+vv7cARE8XJiR9TY7fvErKbpOA93M
-   lm+EcY2EFhShMjWjMB9YhqLsYYhafGK2pi/XDkzwvT1nsau4GGT/u6Zew
-   LAMo2U3uJXzdiq0olqslb61vYuLkeoDzNrB3E+iwM7quHJV38nP4Wh4bQ
-   zxfc886oT5zmm6Rvxym2J85PTD1M0zIe7avr3Iv1oxnqT1TOVQnCctzH6
-   A==;
-X-CSE-ConnectionGUID: Fv7LUt6SRsyTibLXsBRwZQ==
-X-CSE-MsgGUID: OJ0m56ZXQb6A2e9hauRhSw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="47154568"
-X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
-   d="scan'208";a="47154568"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 23:52:55 -0800
-X-CSE-ConnectionGUID: rYHQ2KmnTQqjQNcjA+QRmg==
-X-CSE-MsgGUID: EA4toFVHTc25JjfG+J7qwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
-   d="scan'208";a="103138174"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Jan 2025 23:52:55 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 8 Jan 2025 23:52:54 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 8 Jan 2025 23:52:54 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 8 Jan 2025 23:52:52 -0800
+	s=arc-20240116; t=1736410200; c=relaxed/simple;
+	bh=LtSCF7VAYVmUxWre1a2bt/3xkO4iBlf33+fc8Uk9Q7M=;
+	h=Message-ID:Date:Subject:From:To:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Kbz7sleir3in1nsKM7U67RY056hLDOxomA2kaCqnSPvZttK3VK72Ih4Ay0hguXN5zHwBsP12bM9NBnWt6Hd8yIZJcp7k9hi7ZvY9q27v4DXwh6uaOncAGSsWh+TQJOaPhthXRF5clNbik/WebW+LmZWphtolpPLf7rZ4B09mxjw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NdN/ARTC; arc=fail smtp.client-ip=40.107.93.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cA5WResk1FcfTyqgIe1EeEYtO3k4urE9kOA9v5srXmtG86QzZwJpTIN5+6iBgZ3jAyOnoMfzhCWSjUhfFjt4txiIqdvG7uwoZTxhyxduA5MNhU1jq4q8n2j5dwuLPLzKCxKKKbyrOl0U/YRZETM2jFiqUUen+IANCd/VAU0DrQUqoLNDl1lGbCHTVLq/NsuCgzYRCtj77G7UqxgdbigqhSv8ciZB4BnKwQERUAoqzqaGVxnYvSF3i1MsbFyAvYzVVSF3qT3JO0PFlppdcSeU1PjJ3wzXwmz3eOOrbOfjFjPmwZDIwqCDMufbtmZQLcpBzlZPMazgNnzQAzV6Sm+KMQ==
+ b=XrL55YsF4WlTSflZ6GXFXCDrjuHSKHe16YxgLHExQdbVDlTF6+vL39fFt2nXCLqBQGiLrKYeHNdFJVDS8P27dXGgCJtpgFr7HXCjwH01RoYKTjqdeS+Wz/6ekH94+J58sR5Fm4+Xf7kx2uDgPe8CRRtNPXeJaZPoTYvkUe4qfBvBO+3OS3gO8d9usZkuBUtMYFKs4/lDxikw+GU8m3IfpBEcdMXp/cCi58Xo6JueFKte4KibwWczOzPbS33SKP+bbcIwRLHkVaHO0ty+FtueFmyo22qCW+A2E+cH1JiUzpAAhvpxqKoD2Z0ixAsD6mIOa+o03WeNplEsyhKNf1ISiQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qkjWNbisX8f76H2aa3uIaOSBX+lY7kpvs7F82Ys3b/I=;
- b=R5/Nm4LQt+D1kPvq92ChQROoB++3EcqT20ZDS4dXDmPLvnIB5mXJwLeGUJPV8peqCVe/Url9sxRHazgl8Xo6HqCVqeIwtEPGle6K5lPxHPJxyo6awy6OQMiKWdDP27M42ZzdkHl5K1vl7MBi3fZb4oJBh7JA3ufUa9pJYmOEIyBSkGUPmYEIvpiXK2xPXgaVA9gaCJE6TXvFBMYsIFo4fDZtxT/DNvLj/yxwJRte93Szzls7zpycr+/tInbbbOJzPOc45pCXlB9MEEm4izkDRkmbwCKgUMS7zmfi60VFSOf1V8hKiA7uw3ip/I0+FX2/xbqVIbOOCg4w5iV/9kaiqw==
+ bh=5VlMeftaCoOgHP26z/lG7BxBebTX/5t1H4OpB6Znyd4=;
+ b=OlQgYARem1sVxB1NV2VptJx//TBcwBqNfuKqE191kz9CzF3qwV6FBwnT/wGUz+oOJG9f2noMaQPhDBG0gHnjKpNUWgvuESzyI6w2aRDS/lejUT16mbB0SUUn8oUk6rq1Zjzy0/qEQSHsyqbR6TW9ut1kFk90tNHcmod1i5HLJkud7iK+JjRdES0QyWAh9/KME1o1yOhpPUlYFccaBab1Dig0mK3eV5KvtMFimOu2ekOWMmWHO1iVYAqY3ja+C0lPKU7h3/CYUcIn8SFTtUwSaJsVbkPP4VpyqcJD7w99yU7lwl5LRriezl/1Ie/4cVbDN3ZtAzCt4OUYWo/0nbsETQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5VlMeftaCoOgHP26z/lG7BxBebTX/5t1H4OpB6Znyd4=;
+ b=NdN/ARTCSKhTTpL0yUBmKkuKb3wMJZTi/FuTbR+H+lRftQy3k0mUoTLe1XflxIQvajnDD0wvC/rXkzbgfSCJ7EMLs1dHugjSUiEVccDg4AQNJYc4QCh2vz2lOOFMApcftzjS0PVpspKa/5lC80SHV6IdFTEaMSELChUWk6IjqTM=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CYXPR11MB8729.namprd11.prod.outlook.com (2603:10b6:930:dc::17)
- by CH3PR11MB7819.namprd11.prod.outlook.com (2603:10b6:610:125::20) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by SN7PR12MB8057.namprd12.prod.outlook.com (2603:10b6:806:34a::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.10; Thu, 9 Jan
- 2025 07:52:50 +0000
-Received: from CYXPR11MB8729.namprd11.prod.outlook.com
- ([fe80::680a:a5bc:126d:fdfb]) by CYXPR11MB8729.namprd11.prod.outlook.com
- ([fe80::680a:a5bc:126d:fdfb%7]) with mapi id 15.20.8335.011; Thu, 9 Jan 2025
- 07:52:50 +0000
-Message-ID: <8f953ffc-6408-4546-a439-d11354b26665@intel.com>
-Date: Thu, 9 Jan 2025 15:52:42 +0800
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.11; Thu, 9 Jan
+ 2025 08:09:56 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5%5]) with mapi id 15.20.8335.010; Thu, 9 Jan 2025
+ 08:09:56 +0000
+Message-ID: <c823f70c-9b70-441c-b046-71058c315857@amd.com>
+Date: Thu, 9 Jan 2025 09:09:46 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/7] Enable shared device assignment
-To: Alexey Kardashevskiy <aik@amd.com>, David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>, Michael Roth
-	<michael.roth@amd.com>
-CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Williams Dan J
-	<dan.j.williams@intel.com>, Peng Chao P <chao.p.peng@intel.com>, Gao Chao
-	<chao.gao@intel.com>, Xu Yilun <yilun.xu@intel.com>
-References: <20241213070852.106092-1-chenyi.qiang@intel.com>
- <2737cca7-ef2d-4e73-8b5a-67698c835e77@amd.com>
- <8457e035-40b0-4268-866e-baa737b6be27@intel.com>
- <6ac5ddea-42d8-40f2-beec-be490f6f289c@amd.com>
-From: Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
+ kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ sumit.semwal@linaro.org, pbonzini@redhat.com, seanjc@google.com,
+ alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+ dan.j.williams@intel.com, aik@amd.com, yilun.xu@intel.com,
+ linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, lukas@wunner.de,
+ yan.y.zhao@intel.com, leon@kernel.org, baolu.lu@linux.intel.com,
+ zhenzhong.duan@intel.com, tao1.su@intel.com
+References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
+ <20250107142719.179636-2-yilun.xu@linux.intel.com>
+ <b1f3c179-31a9-4592-a35b-b96d2e8e8261@amd.com>
+ <20250108132358.GP5556@nvidia.com>
+ <f3748173-2bbc-43fa-b62e-72e778999764@amd.com>
+ <20250108145843.GR5556@nvidia.com>
+ <5a858e00-6fea-4a7a-93be-f23b66e00835@amd.com>
+ <20250108162227.GT5556@nvidia.com> <Z37HpvHAfB0g9OQ-@phenom.ffwll.local>
+ <Z37QaIDUgiygLh74@yilunxu-OptiPlex-7050>
+ <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
 Content-Language: en-US
-In-Reply-To: <6ac5ddea-42d8-40f2-beec-be490f6f289c@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR01CA0052.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::11) To CYXPR11MB8729.namprd11.prod.outlook.com
- (2603:10b6:930:dc::17)
+X-ClientProxiedBy: FR5P281CA0029.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f1::13) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -121,249 +96,244 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CYXPR11MB8729:EE_|CH3PR11MB7819:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9919b682-0854-47dc-9612-08dd30829d6e
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SN7PR12MB8057:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d81a712-e97f-48e6-c2ad-08dd308500b4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Sy93c3BGMDd4QUpWTm5ScDc3ZUFmS0IrNVJVdk9Fd2NlR0E1bmpYS1NLbEly?=
- =?utf-8?B?dDlSeUI0bnBSQ2hEOEMrQUUxOHJjUGNKd01jZ0NVN1RpUEpaTXZWVXpaMnpG?=
- =?utf-8?B?UU0wTFhNem1RSi94SUthK2J1eUpocE8yUTE5U2VWakcwNEJVSitka2psTXRt?=
- =?utf-8?B?c205VnZnWFphVXRrWUZldmhmTlhZRmx6ZVlKVjNFQTNxUjY5MWVVVi9YKzFz?=
- =?utf-8?B?RExqYWpDS1R6REMwWkpBRWNIUXNCZlUweGdyZGdpWDZEQXpOUFhqb3dUQlY3?=
- =?utf-8?B?a0JPUHUyU2x1VVF4dHZ1NG14K0R4L0xZK1pQc1Y0SnlTVUFjeTQ4cTEwZUxI?=
- =?utf-8?B?dDNjbVhyMHFFOEdrL0Y3dFJVOG9ucm1hSURGUVhTTytpWFkrQ2FUTWZKOHRz?=
- =?utf-8?B?YzVXcDBCM0Z2S21PYUs3OVdnUHBxRmJTazR5SHBtWmZOTXdPZGVzeW9EOXlB?=
- =?utf-8?B?a1ExS0IrTW52TDJSd2hmYS9mU3NiU1ZIMVkvM2RIRzN3R2NCVHFqa3IvWHNI?=
- =?utf-8?B?ZHNLT2tVMWlHNzlOZW9CZjhmRy9uVm82U3lhTFhCY256a3VQNHlyR2hxZnhw?=
- =?utf-8?B?ZnVOYjdzb2ZxZ1JXNXpIcFZ2UDdzYysxa1F2SmJUdk9SMThJSnJNN1M3ZElq?=
- =?utf-8?B?djBvd2krY3RHSG9TVkZKZmZIM2d3MzFIWmFjSndlbGZjOEd0OERUajRUNjBM?=
- =?utf-8?B?dEhreTYzcHhWbGJpajFIVjZjN24zYWs1T2NXVURLakp2cjZzMldaV0Z0dEc1?=
- =?utf-8?B?SUF2WUp1cmlFQWpDak4wcnA1dUJkb21BenFpVW1zVklZY2ducjR1UUVhWXNT?=
- =?utf-8?B?dndCaHdYOW10VHk5M0czM21JTGZJcGFlUndnTUdkV1gwVlkyOVJOdjdaNW94?=
- =?utf-8?B?TmwvMEUxYnV2VWlxWlIwb0pRWnFKRzhmNWZITjI5V1ZGSW1MSEVuTldoWTA3?=
- =?utf-8?B?RlRLVlJjZ0J3aHlGUitjdWsycDlYVG5JQVVka2NuV2NKRXNrYkVyV01JdmxE?=
- =?utf-8?B?Qld3ZGJsMEo1Rkd6OWJzL2ZrMTlKSEwxSG9vVWZ6L3hNSmIyNHdRVUU5Tkg0?=
- =?utf-8?B?YnZXR2RSU0JiWEU5VDBXdi91SmliWDJweS92YUg3clpqbVhJOEFkS2FBaDNX?=
- =?utf-8?B?UCtILzdLbFlOTFZvV2w0ZmgvWWNORGVPbkhlSE93TWwrSGo1dGZpUS9tL1RJ?=
- =?utf-8?B?b2lOdTI1ZWFRZnBNVEQrY3RHSDZ6THF4c3F5QTd0amNWQzFSK005eVozcGhV?=
- =?utf-8?B?MUg5MDIvUFo2Q1hUcXMvY3NrN2VXVXFITC8xSWFxWE95K20zUnpMeGFxNjg1?=
- =?utf-8?B?eTFWV3RRSnViMVBFZDdsdEh3UWpVYjhZVURVdkRIT2twKzlnYzlzcDdybGY3?=
- =?utf-8?B?TGFESWZYNkJENDVudWJ3UlM5M3JUd0VZT0Z6T1pLNFRCZGMzclRCbTZOc2VV?=
- =?utf-8?B?K0g1aWEzNWdBeWh5K1FsVmJ2Qk5XOFA1VEJiSWNETkhZOGxGNXZ0WVZGSFhX?=
- =?utf-8?B?cU5BR1lTZDFkZUVrN2FKQzRjdjdhNUEwd3V0dkwwRkFHREd6K1Q5WWRFR0g5?=
- =?utf-8?B?eHk0MEVaMG0zTnV1cE9yRzYxZ3dKREtxd3VMV0NoZHExSTgzU1V5cVZTRk9H?=
- =?utf-8?B?VjlhdFFsSVJLUDFvUENaZGdtOVRtUS9nZ0ZGTnE0N1BSRkhocEdJTEcydmhR?=
- =?utf-8?B?OE0wakZETFZuM2w5UkJ2aEh0QzNobC9icDlOV3A4YjZVUkFkMXZValppL3FM?=
- =?utf-8?B?dzBEd3k5WDB6dzc5c25CNTkzWXc0aERXOXI1WDd1VlRuYU92NTdpWUxjZU9v?=
- =?utf-8?B?dGR5NVFDTC9QSVBjWmZaUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYXPR11MB8729.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OHRpbmY5bGpwUUlyT1YxS0RZeWFGaWwwdnpQWExteUFVN2grbVJTSGUwTXJO?=
+ =?utf-8?B?bmRiZXNjUTdLRFZDU2puSmtTTlAycGJ6Y0lXbkc0S1g3U2N6QytzeWlHYzNP?=
+ =?utf-8?B?dXBsUlhud3NjbUpmWTJ3TTd3a3hTS1dVejB0bzAzSURMWGVyTVhCd0xmV1pQ?=
+ =?utf-8?B?eEhkajhldVoyWTJNY05TZUphenJqNnc1VjVMT1RZWG1kQm5OVDM3U0xNRlY0?=
+ =?utf-8?B?Ui94ZGxNMHYvNzFzT0NKYjdrS2cveWtHa3hMdjFjeTJSNGhXdThkaHpBdk9r?=
+ =?utf-8?B?RDQ3Y25uTG54ZXpSVWRTRW5qYndiRU9VOVNkeDAzWU1YSFhWbUU3b25WN1BY?=
+ =?utf-8?B?c3ZuZXVrZmFiaXIwbUNUeE1SMFRnZmlUUGVyVXFGNTNwZ1FIMURqWU1LSFdP?=
+ =?utf-8?B?M2FUMmZVajM2K0xsQzFwakxwci9wOC9GL2lZWnJwRW9oZEN4RmR0dk9sRGpG?=
+ =?utf-8?B?RUNLdlpGcDFLU0JKQnRFUEVPNjJWd3pYTlNacjJXT25TNis5SGVMK2swOW5Z?=
+ =?utf-8?B?V3dxZEduZWpwVzdLZmswaE9kaldxV3lmZWNzTEpXNUxmV3ZFN1hnSHF0UjFX?=
+ =?utf-8?B?T1RNYmtHUDhKU1ZxY3Qza0FqWHZ4d3FFMTd4V0VqVVkrZ3RCMnFxcmtLbEt4?=
+ =?utf-8?B?b0szRlBKVVM4Z1JZaHVHTXllQlFhc1p1bVZtNHRVeWVaZUZickdoMmxDamVy?=
+ =?utf-8?B?M2hmQWdFTURDWmlaRWtMSWloWEZSUzVtSkxaVEIwdUhmU1Eyck0wS2VoaE0y?=
+ =?utf-8?B?S1dwazdkdHBvTDQ1QkljSllSOHoyaHNUdGJqbk5IZFU4ZjNITjNwOTlQeit4?=
+ =?utf-8?B?SVYzQVBVcXhwYWljK0xGTXl3Q2VtSG9HQWVIeVIwTnRqenVFQlVDMGtpNnVO?=
+ =?utf-8?B?RTJDSFFkOXVUaTVzQ1RrV2NmNjBzMER0SG1HU3BjVDlpVFhSMytsVXFFcW9U?=
+ =?utf-8?B?U1FjQk5KQzhLMlhIN2FSaFp2WmM1cnpodzE0TVh4V1hVTTZyMkNDUjV4aXFT?=
+ =?utf-8?B?VVZtTFRxeHZkakc2cnMvUE85djdVRkhGTXcxbllLUGdtS1lzYnQySlg1NTFk?=
+ =?utf-8?B?R2ZUMU1SOXRvbElUZWNLSldCejkyTHdXWk4zYUdXR0Q1em1jMVdVWkJnbVlt?=
+ =?utf-8?B?WWRCS292TGEwbTV6UGcwcHlBU1J4VGFNaVd5M21GbWxnR2lzRmVYZTlkMGJm?=
+ =?utf-8?B?Ylg0ZDBHL2V2MFlYdkhKTUtoZGF2cFEwR2tkMTg5VHVoYmJEODlhUVlHWFph?=
+ =?utf-8?B?RGwwZkFpWkJjaTg1WWlENmNCUUJrZ2FJQXBtc3ZLUnF1V3dIYjV0dkdnS205?=
+ =?utf-8?B?RVJIOUFOWHR6d0w1cUxWd0VhVTRhUm81aS8zZFFkRG1Pb3BBeGpoL05SQnlm?=
+ =?utf-8?B?dWR3U1Z2d3NtRjRlZ3JDUVJBamVpa2NTUEZUQVMyYytRUlM2a2I2QTBMZGZK?=
+ =?utf-8?B?MDIwdVJQTkcrNm9HMjFhUW5sU2I4SWRCU0pwaHJVR3lDR2ppeFVsQ2JTUC94?=
+ =?utf-8?B?NlVJQUx6cFYyM2tyOFZYWFk0Zy80NlMwYUFSWi9YdkE4NlNwRStDd1Vhenhh?=
+ =?utf-8?B?RjE4cHkrS2wyYi9ZWmhkQ3Q0bWVFTUhlbHNWS2FhUW1WWGpXZzJpdEJwOXpt?=
+ =?utf-8?B?cXBqYW5Hc241MHEzYWlva1dONzVUR29CYW9nOTZOeXVhSFFJakRqWVhDOVM4?=
+ =?utf-8?B?c0lILzRBbUtIdHdCU2hPUkJRRWIvTmp2UDYzQ1hTajJUaGNXVnczV0tPLzZ6?=
+ =?utf-8?B?SnBtSHk5SVF2Rkcva1FQQUxTZnlFeW16YU8vRUEzd3RQL3VyVlY1WFRJMC8r?=
+ =?utf-8?B?Vy9rZWxxV1BjN1lGelc2MjFrMEh2UXpUVkNBUG5tMktYSzVMZWM2angxOVcr?=
+ =?utf-8?Q?cuWpBvee7thNB?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WlFiY3UrQVpLS1h0SFg2TXZVKzQ1b1FpWXpzNjJlN0thbnRrbnQ5b2UwVmI5?=
- =?utf-8?B?NXdndEpzejF1R085RFVTYWk3WlE4bEpFWmt0bkE1aVJkck1Qd290YmV4emlQ?=
- =?utf-8?B?RTZlL1lwalc2L2xqNzZUait1a2RFRURmOUwvcGIwVjRSRlEwYlgxbysva2hO?=
- =?utf-8?B?VnRacFFSTDhVNFdXTUNGYWw4NjZOV3V2cHUvSmFzZi84RHFmYlUwRjJNT0tR?=
- =?utf-8?B?U1dYRzkzRmJ1a0Z0Qml1dGx2MUhVSFJOTmJPZ2FKYW81V3dIVnc0SFRoVEMr?=
- =?utf-8?B?bFJmT09TdS9Na0Q1aUZTOG1hblJXd0JEY1NiN05rbm5sR1d5K3p0MnVVYUx3?=
- =?utf-8?B?ckhYZW9oVkpPOFNqSVZ1VGJvQzluNkVQaDkzRFJsYjArRTdKUGtKMS9Fb1NF?=
- =?utf-8?B?c3czRnV3MVFZSVZkeXNYdWpOTC9OTlBoQjRRWTVEdVRDWFB5cEJzNS85eFg3?=
- =?utf-8?B?L3ZBMmc1UUUyREhvT1F4bXVrRHRiMVF1djBRT0YyT2lqeU16ZlZJQS9UNTRZ?=
- =?utf-8?B?YnQxdnZ1amVXdHJRUjc3RzJPazRWTU9qR0VxRjFVclVrMEhnVE8zMTB4MGJU?=
- =?utf-8?B?Ujhma3huTE5HQSswRkJkZUIxZXBVd1FNU0N5UWdvVEQ3RWQ2NDFVaGp0bEhP?=
- =?utf-8?B?ZjkvQ0ErZHlqNTRYMVorZE5TVGNUWlp2ZlFZMDJnbi8xaVZVMG5aSExsYm8z?=
- =?utf-8?B?bjlJeVZDb0ljTXZzT05rOW85dUlNNzY0Y3BCaFFGVVB3QmNib0tGdWFMV0h0?=
- =?utf-8?B?bldNUW1MOW5Bc3ZlVkFJbksvRUR1cTh6ZHdKVEZ4OG9qVnhGYlNLdE14dUl0?=
- =?utf-8?B?bWFqYlNzU3V1VnlzdGY3eHd3RlNJaTRhcDFZK3pLcXhUcm5ET1NoK3E1ZGdR?=
- =?utf-8?B?ZWdYK2Y5L3NGOFRiMm9NMm1MSUlJZnc3L0dKdGxLYTFvNXZzeURmd1pEcnMw?=
- =?utf-8?B?ZTJZMGRtQndJZG9wQUFaM3VQQkYyZEd2bVIyeVRtRkoveWY1aHhaQ3praWxP?=
- =?utf-8?B?R1ZxbDdOdkRvTFdHQlFwUkFSbENlcXY1NnNKcjViZmxoazI5OGRFdlVRY1pZ?=
- =?utf-8?B?b3lTbmJ3eTNnRmFOOUJRTG5xQjNjdjNKMWwwR2MvVUVQWWsvZldydTdWMDgw?=
- =?utf-8?B?RzA1N3orRmNhK28zZnlnblNnbFg0bzNhT0IwUGlzTlhXV2Z1SzYzL0xJVmRP?=
- =?utf-8?B?NjhBRS9BVjN6OVFrUlVoYXhnVG1wMTR6QTlYZmtZOVhwK2oxd2ZHYzRYcmJ0?=
- =?utf-8?B?VHZHT2swclFpN0JqT3dIK2ZOdDN0TXVTNDBFU3FYTkNlZDJOMjZUWEozZ2dj?=
- =?utf-8?B?eFFHaDB3MjhrTU90R2NSRnJTaVJ6THpvUjFiY2V6ZWVCRVRsVnQ1aDZpK3Zq?=
- =?utf-8?B?NWlrbExXTUlwVlhWcGphNzdQVWxRa1VDY1dTaEdIRTVRWnlUZFFZbitGNXFk?=
- =?utf-8?B?TEtmcTNXTEdUMmdGV0FxQjBLYnpoS2hLazhpbDRISFVpbk9jbVRiWm9rTmFL?=
- =?utf-8?B?alMweFZOa1BwQm52ZmsycnF1RFNFYUJ6S0x6clNDd0pWS29hQmtydm9nSE84?=
- =?utf-8?B?U05wZnd3MldXUnRiK055NjljMmtSakhzZzhPQ01pZFFlcmxRVDVDcWxVTFBw?=
- =?utf-8?B?QzJ1MjZpKzAvcVF2TUk0M2d6b3FnaTJMZjJNT3FlK3Rxb2FKQnpkZ2VPdVg1?=
- =?utf-8?B?L1Z4N21mMDYyVVU0VW5JU3VxWmFsSEovYzdDRXRtQzkwdzNIditUbytmVVVZ?=
- =?utf-8?B?NnJrSVdNYldlazZabkkvR0FBYzlLQ25xWTBROUUrY3BKNWc5eFdYQlNwZU1H?=
- =?utf-8?B?MTdPbDRFS0pGejh5TVVXT2FkaEh2U2ZSSENoalZaTnFua2hNcG9BZmREeStD?=
- =?utf-8?B?enZZTjhyMU0xNC9aWFordXQxV0R1VHhHSHlIMFQ3YWg5UFkyL1NDWE1VYmUz?=
- =?utf-8?B?UzR1Vk5vanZHWGd5cGJTUFAremdjZnJJWDJQQVZyWkRIVmZFRkYrRVpoeTBk?=
- =?utf-8?B?SUFXbEtNOHpPTE8yTythQTh1S0Y2MjduN1JxaXhWMzJwdVYweHg2aXo0R1J4?=
- =?utf-8?B?TEMveGtTMVlKY2xSUVJjS0VEZjI0MjUrcXJKclc3UGlQZ2F3QkdRUWFzU3pz?=
- =?utf-8?B?aVk0dXUzcDRnUDVINWtZb3ZnU1h3cy8wNDRIVTgwRVMrZW1Pd1Bxb1F5Rng0?=
- =?utf-8?B?Z2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9919b682-0854-47dc-9612-08dd30829d6e
-X-MS-Exchange-CrossTenant-AuthSource: CYXPR11MB8729.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d3gwL1pnUDM0R3FGeUg2Z1JyOTkxankrbUdvcGxDR1pwVE1ldUFhMDZSTGdH?=
+ =?utf-8?B?VmxOalVDd2pjbW5CWDVxS3BVZjFWNEhNdHRsdnY0NWxwaDZESTV4SHhhWFNI?=
+ =?utf-8?B?eVErN0VpRW9OZkJpbW9VWk13MDRWM0pwNUFyaUNPdUlDUjcrNHNqdlZuZ04w?=
+ =?utf-8?B?cG9OeDQwcFpNbVVRcS9QSlpYSml5bVlibVFqaE5la0xVcVB0Y01qb01NVTJr?=
+ =?utf-8?B?VWNyU2xsT09tZ1E2VjRaU1VHd21hMFJ1MWVwSDlWazNCZEdZWmJYeHpJbGZa?=
+ =?utf-8?B?cUd6S1hBTWR2VEZvVk0rNnB6VERnbFYrYndsSlB1UmIxS3ovTlc5MVhIaTFG?=
+ =?utf-8?B?eWJKUW9uTk1iKzdMa3RMaGV0ZXNuVXAzcDVtUDM2UW9SMHlqRUU0OTAwNDIx?=
+ =?utf-8?B?bHZUSlk3dno4RXhxeWFwSlJOdlBjYVcrVzl0dVc5MWxTbEJZSkkybkR5Q0hu?=
+ =?utf-8?B?WTc2MkVrVUlOZWI4ejN1T3A0TDZxOWtRNGNQdVdwYWRtQ0cvcVd2emlyZ1dy?=
+ =?utf-8?B?ZWFjeWZsYytVYllPWjRjaDdZSTEwOWpKMnJHSGMvQ3ZNZ3NIQjR6T05ZajZP?=
+ =?utf-8?B?Q3Jxc0xTdmwwN1Z2SDZVNmhOa1U3ZS8yNjFiODYwK3R5eGRtbkxUUDdqZXFt?=
+ =?utf-8?B?TjQ1NWhzSi9RZyt6ZmxaVUZVb01VWjBJV2tLenBEUXdQS3k0NFdVdlRySEdJ?=
+ =?utf-8?B?WXdjR1A4V3M5NXZWenFUMUtjZWtMZkZVYkRPS1MxNS91bEZzak9NaldWZmVu?=
+ =?utf-8?B?S1dScGdhMnJkeGRTSnpIU1R1eGQweUl2aXhEOGxsWEljZElwaklaNllwNVFi?=
+ =?utf-8?B?ZnBDRUlObk56T3E3YkphTExOYXNqSll2aXpHbnVyVTUxaThMdG5IWVBhRlNE?=
+ =?utf-8?B?N05DbE1vdHZUSFZXc2FHV0FPb1JINmtybzdRYUdNS2t5UGlhcVk4MkxSWEpz?=
+ =?utf-8?B?NHRFWFkwTnhtSXBhVnlnczdNSXhIV005dVpFYWNuVWZtS0JWalRkcnYwQml0?=
+ =?utf-8?B?VEtXWlNLS2FKeElYSmF5MmVOdzN4U3B1NHdBRm5uQnhpaFE1SXNnZmRPU3hD?=
+ =?utf-8?B?NjRDamVRNGtialE0L3dFb0NET1BvWmp2N3AvYkd5eXdHWVFHbG5MUTdDSmow?=
+ =?utf-8?B?c0M5anhEUkNOdUdUeHZOUFBWNUR0K2pHTTN1RGtLaTdJcDhvcWZmc1dtNVBs?=
+ =?utf-8?B?QkRPOWZGL1N2QWlLZHE0UC83d0dSdnd4VjhGb0EvV2JwS0YxMlFjVmcxWFJM?=
+ =?utf-8?B?aThGazNJZHRYdVFJS3NKdUhlZjJmRnhtNzRieUpiYVlpaThzUC9VM2EwSGc2?=
+ =?utf-8?B?N3B0eVZaWGF6QUI1eHB3RGUrQ2dONXE4cFR2NC9kcEtnbkdEOW80aHNFNHI2?=
+ =?utf-8?B?Yi93bGNQcld5MWZCZFZ5SFlxNC9PbE1yUnByS3hTbXhYelJ3MkJlRWtyRmJ2?=
+ =?utf-8?B?KzUwcGpsYU4yVGZnd3JBSkZ5eEhDMmZiYXl2Sk55bEVSVlF2SUd2MU9IVG9j?=
+ =?utf-8?B?alRjYjdWdHZHV1YxZWxxWlloK3Z2Y0xUYXowc3FrRVJscGkzVE1qV0pTWm5w?=
+ =?utf-8?B?cEIzL2RsT01KZ012RDNJSUwyTmtIMk5sODlMZXQ2SlpPVm1OMzlaV0pkYWdu?=
+ =?utf-8?B?eGl5MnVWRE1HTFJOaU9UM3ZId3ppcUxKRlBTWFZSQzBUMkp6bUNoemxrSG14?=
+ =?utf-8?B?d0dEVEZiM2NBSDI3YTIyWW1CZkxKeDhveDNFUm9NNGpyTTk2TjRJbmZWQUZX?=
+ =?utf-8?B?MUlRRnNDZk5BZXB3VWk3OGJtMlV6eFpzVzJta251cGVwZzZLUjZ5Qms4L2Ry?=
+ =?utf-8?B?ZzE3YVhpcXR0MkF1OXNad2xSRXZYdll2d3dNUnRlT2pVNm0xbnBhY0R0cjI1?=
+ =?utf-8?B?dzhEN0pqamFEZ1FOSVIwYjZTaU9jbGhBN2VYRUprMTVhTGRrZngwZTVGK1Jv?=
+ =?utf-8?B?ZFZXOFVtUXhkZVBjSFNCWnM1Mm44VUpwZDZXUmxjS0E3dGNMUnFmVWxPV0g0?=
+ =?utf-8?B?LzZER0RYWG1xMk8vV3JOZFJTdHZ5Y1RTK25TU20yNXQxOTEvR0MwZXZXdndH?=
+ =?utf-8?B?bkpyTkNUd1NVd1NHNnY2cTBHcWlBOUpFTml6NXozY3BZUFA5a3VFMFB5aDRs?=
+ =?utf-8?Q?ECUwqV709FlJJpMi7nWQLXqeI?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d81a712-e97f-48e6-c2ad-08dd308500b4
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2025 07:52:50.5621
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2025 08:09:56.0091
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uAlTw3Pdb43VQwWTqbGD82xgi5VJ7r+mh/HxVjgkdMu8ZAA57OZ8MQF6Fhcdovgkkbrob7e9tB68sLgMc8PEiw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7819
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5/maxXa1MuommCAMxKNk0JW3jCwK7lPq0UvAt9+JFmGvVzDJyiZC2lEXtKt/WB2F
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8057
 
+Answering on my reply once more as pure text mail.
 
+I love AMDs mail servers.
 
-On 1/8/2025 7:38 PM, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 8/1/25 17:28, Chenyi Qiang wrote:
->> Thanks Alexey for your review!
->>
->> On 1/8/2025 12:47 PM, Alexey Kardashevskiy wrote:
->>> On 13/12/24 18:08, Chenyi Qiang wrote:
->>>> Commit 852f0048f3 ("RAMBlock: make guest_memfd require uncoordinated
->>>> discard") effectively disables device assignment when using
->>>> guest_memfd.
->>>> This poses a significant challenge as guest_memfd is essential for
->>>> confidential guests, thereby blocking device assignment to these VMs.
->>>> The initial rationale for disabling device assignment was due to stale
->>>> IOMMU mappings (see Problem section) and the assumption that TEE I/O
->>>> (SEV-TIO, TDX Connect, COVE-IO, etc.) would solve the device-assignment
->>>> problem for confidential guests [1]. However, this assumption has
->>>> proven
->>>> to be incorrect. TEE I/O relies on the ability to operate devices
->>>> against
->>>> "shared" or untrusted memory, which is crucial for device
->>>> initialization
->>>> and error recovery scenarios. As a result, the current implementation
->>>> does
->>>> not adequately support device assignment for confidential guests,
->>>> necessitating
->>>> a reevaluation of the approach to ensure compatibility and
->>>> functionality.
+Cheers,
+Christian.
+
+Am 09.01.25 um 09:04 schrieb Christian König:
+> Am 08.01.25 um 20:22 schrieb Xu Yilun:
+>> On Wed, Jan 08, 2025 at 07:44:54PM +0100, Simona Vetter wrote:
+>>> On Wed, Jan 08, 2025 at 12:22:27PM -0400, Jason Gunthorpe wrote:
+>>>> On Wed, Jan 08, 2025 at 04:25:54PM +0100, Christian König wrote:
+>>>>> Am 08.01.25 um 15:58 schrieb Jason Gunthorpe:
+>>>>>> I have imagined a staged approach were DMABUF gets a new API that
+>>>>>> works with the new DMA API to do importer mapping with "P2P source
+>>>>>> information" and a gradual conversion.
+>>>>> To make it clear as maintainer of that subsystem I would reject such a step
+>>>>> with all I have.
+>>>> This is unexpected, so you want to just leave dmabuf broken? Do you
+>>>> have any plan to fix it, to fix the misuse of the DMA API, and all
+>>>> the problems I listed below? This is a big deal, it is causing real
+>>>> problems today.
 >>>>
->>>> This series enables shared device assignment by notifying VFIO of page
->>>> conversions using an existing framework named RamDiscardListener.
->>>> Additionally, there is an ongoing patch set [2] that aims to add 1G
->>>> page
->>>> support for guest_memfd. This patch set introduces in-place page
->>>> conversion,
->>>> where private and shared memory share the same physical pages as the
->>>> backend.
->>>> This development may impact our solution.
+>>>> If it going to be like this I think we will stop trying to use dmabuf
+>>>> and do something simpler for vfio/kvm/iommufd :(
+>>> As the gal who help edit the og dma-buf spec 13 years ago, I think adding
+>>> pfn isn't a terrible idea. By design, dma-buf is the "everything is
+>>> optional" interface. And in the beginning, even consistent locking was
+>>> optional, but we've managed to fix that by now :-/
+>
+> Well you were also the person who mangled the struct page pointers in 
+> the scatterlist because people were abusing this and getting a bloody 
+> nose :)
+>
+>>> Where I do agree with Christian is that stuffing pfn support into the
+>>> dma_buf_attachment interfaces feels a bit much wrong.
+>> So it could a dmabuf interface like mmap/vmap()? I was also wondering
+>> about that. But finally I start to use dma_buf_attachment interface
+>> because of leveraging existing buffer pin and move_notify.
+>
+> Exactly that's the point, sharing pfn doesn't work with the pin and 
+> move_notify interfaces because of the MMU notifier approach Sima 
+> mentioned.
+>
+>>>>> We have already gone down that road and it didn't worked at all and
+>>>>> was a really big pain to pull people back from it.
+>>>> Nobody has really seriously tried to improve the DMA API before, so I
+>>>> don't think this is true at all.
+>>> Aside, I really hope this finally happens!
+>
+> Sorry my fault. I was not talking about the DMA API, but rather that 
+> people tried to look behind the curtain of DMA-buf backing stores.
+>
+> In other words all the fun we had with scatterlists and that people 
+> try to modify the struct pages inside of them.
+>
+> Improving the DMA API is something I really really hope for as well.
+>
+>>>>>> 3) Importing devices need to know if they are working with PCI P2P
+>>>>>> addresses during mapping because they need to do things like turn on
+>>>>>> ATS on their DMA. As for multi-path we have the same hacks inside mlx5
+>>>>>> today that assume DMABUFs are always P2P because we cannot determine
+>>>>>> if things are P2P or not after being DMA mapped.
+>>>>> Why would you need ATS on PCI P2P and not for system memory accesses?
+>>>> ATS has a significant performance cost. It is mandatory for PCI P2P,
+>>>> but ideally should be avoided for CPU memory.
+>>> Huh, I didn't know that. And yeah kinda means we've butchered the pci p2p
+>>> stuff a bit I guess ...
+>
+> Hui? Why should ATS be mandatory for PCI P2P?
+>
+> We have tons of production systems using PCI P2P without ATS. And it's 
+> the first time I hear that.
+>
+>>>>>> 5) iommufd and kvm are both using CPU addresses without DMA. No
+>>>>>> exporter mapping is possible
+>>>>> We have customers using both KVM and XEN with DMA-buf, so I can clearly
+>>>>> confirm that this isn't true.
+>>>> Today they are mmaping the dma-buf into a VMA and then using KVM's
+>>>> follow_pfn() flow to extract the CPU pfn from the PTE. Any mmapable
+>>>> dma-buf must have a CPU PFN.
 >>>>
->>>> We presented our solution in the guest_memfd meeting to discuss its
->>>> compatibility with the new changes and potential future directions
->>>> (see [3]
->>>> for more details). The conclusion was that, although our solution may
->>>> not be
->>>> the most elegant (see the Limitation section), it is sufficient for
->>>> now and
->>>> can be easily adapted to future changes.
->>>>
->>>> We are re-posting the patch series with some cleanup and have removed
->>>> the RFC
->>>> label for the main enabling patches (1-6). The newly-added patch 7 is
->>>> still
->>>> marked as RFC as it tries to resolve some extension concerns related to
->>>> RamDiscardManager for future usage.
->>>>
->>>> The overview of the patches:
->>>> - Patch 1: Export a helper to get intersection of a MemoryRegionSection
->>>>     with a given range.
->>>> - Patch 2-6: Introduce a new object to manage the guest-memfd with
->>>>     RamDiscardManager, and notify the shared/private state change
->>>> during
->>>>     conversion.
->>>> - Patch 7: Try to resolve a semantics concern related to
->>>> RamDiscardManager
->>>>     i.e. RamDiscardManager is used to manage memory plug/unplug state
->>>>     instead of shared/private state. It would affect future users of
->>>>     RamDiscardManger in confidential VMs. Attach it behind as a RFC
->>>> patch[4].
->>>>
->>>> Changes since last version:
->>>> - Add a patch to export some generic helper functions from virtio-mem
->>>> code.
->>>> - Change the bitmap in guest_memfd_manager from default shared to
->>>> default
->>>>     private. This keeps alignment with virtio-mem that 1-setting in
->>>> bitmap
->>>>     represents the populated state and may help to export more generic
->>>> code
->>>>     if necessary.
->>>> - Add the helpers to initialize/uninitialize the guest_memfd_manager
->>>> instance
->>>>     to make it more clear.
->>>> - Add a patch to distinguish between the shared/private state change
->>>> and
->>>>     the memory plug/unplug state change in RamDiscardManager.
->>>> - RFC: https://lore.kernel.org/qemu-devel/20240725072118.358923-1-
->>>> chenyi.qiang@intel.com/
->>>>
->>>> ---
->>>>
->>>> Background
->>>> ==========
->>>> Confidential VMs have two classes of memory: shared and private memory.
->>>> Shared memory is accessible from the host/VMM while private memory is
->>>> not. Confidential VMs can decide which memory is shared/private and
->>>> convert memory between shared/private at runtime.
->>>>
->>>> "guest_memfd" is a new kind of fd whose primary goal is to serve guest
->>>> private memory. The key differences between guest_memfd and normal
->>>> memfd
->>>> are that guest_memfd is spawned by a KVM ioctl, bound to its owner
->>>> VM and
->>>> cannot be mapped, read or written by userspace.
+>>>> Here Xu implements basically the same path, except without the VMA
+>>>> indirection, and it suddenly not OK? Illogical.
+>>> So the big difference is that for follow_pfn() you need mmu_notifier since
+>>> the mmap might move around, whereas with pfn smashed into
+>>> dma_buf_attachment you need dma_resv_lock rules, and the move_notify
+>>> callback if you go dynamic.
 >>>
->>> The "cannot be mapped" seems to be not true soon anymore (if not
->>> already).
+>>> So I guess my first question is, which locking rules do you want here for
+>>> pfn importers?
+>> follow_pfn() is unwanted for private MMIO, so dma_resv_lock.
+>
+> As Sima explained you either have follow_pfn() and mmu_notifier or you 
+> have DMA addresses and dma_resv lock / dma_fence.
+>
+> Just giving out PFNs without some lifetime associated with them is one 
+> of the major problems we faced before and really not something you can do.
+>
+>>> If mmu notifiers is fine, then I think the current approach of follow_pfn
+>>> should be ok. But if you instead dma_resv_lock rules (or the cpu mmap
+>>> somehow is an issue itself), then I think the clean design is create a new
+>> cpu mmap() is an issue, this series is aimed to eliminate userspace
+>> mapping for private MMIO resources.
+>
+> Why?
+>
+>>> separate access mechanism just for that. It would be the 5th or so (kernel
+>>> vmap, userspace mmap, dma_buf_attach and driver private stuff like
+>>> virtio_dma_buf.c where you access your buffer with a uuid), so really not
+>>> a big deal.
+>> OK, will think more about that.
+>
+> Please note that we have follow_pfn() + mmu_notifier working for 
+> KVM/XEN with MMIO mappings and P2P. And that required exactly zero 
+> DMA-buf changes :)
+>
+> I don't fully understand your use case, but I think it's quite likely 
+> that we already have that working.
+>
+> Regards,
+> Christian.
+>
+>> Thanks,
+>> Yilun
+>>
+>>> And for non-contrived exporters we might be able to implement the other
+>>> access methods in terms of the pfn method generically, so this wouldn't
+>>> even be a terrible maintenance burden going forward. And meanwhile all the
+>>> contrived exporters just keep working as-is.
 >>>
->>> https://lore.kernel.org/all/20240801090117.3841080-1-tabba@google.com/T/
->>
->> Exactly, allowing guest_memfd to do mmap is the direction. I mentioned
->> it below with in-place page conversion. Maybe I would move it here to
->> make it more clear.
->>
+>>> The other part is that cpu mmap is optional, and there's plenty of strange
+>>> exporters who don't implement. But you can dma map the attachment into
+>>> plenty devices. This tends to mostly be a thing on SoC devices with some
+>>> very funky memory. But I guess you don't care about these use-case, so
+>>> should be ok.
 >>>
+>>> I couldn't come up with a good name for these pfn users, maybe
+>>> dma_buf_pfn_attachment? This does _not_ have a struct device, but maybe
+>>> some of these new p2p source specifiers (or a list of those which are
+>>> allowed, no idea how this would need to fit into the new dma api).
 >>>
->>>>
->>>> In QEMU's implementation, shared memory is allocated with normal
->>>> methods
->>>> (e.g. mmap or fallocate) while private memory is allocated from
->>>> guest_memfd. When a VM performs memory conversions, QEMU frees pages
->>>> via
->>>> madvise() or via PUNCH_HOLE on memfd or guest_memfd from one side and
->>>> allocates new pages from the other side.
->>>>
->>
->> [...]
->>
->>>>
->>>> One limitation (also discussed in the guest_memfd meeting) is that VFIO
->>>> expects the DMA mapping for a specific IOVA to be mapped and unmapped
->>>> with
->>>> the same granularity. The guest may perform partial conversions,
->>>> such as
->>>> converting a small region within a larger region. To prevent such
->>>> invalid
->>>> cases, all operations are performed with 4K granularity. The possible
->>>> solutions we can think of are either to enable VFIO to support partial
->>>> unmap
-> 
-> btw the old VFIO does not split mappings but iommufd seems to be capable
-> of it - there is iopt_area_split(). What happens if you try unmapping a
-> smaller chunk that does not exactly match any mapped chunk? thanks,
-
-iopt_cut_iova() happens in iommufd vfio_compat.c, which is to make
-iommufd be compatible with old VFIO_TYPE1. IIUC, it happens with
-disable_large_page=true. That means the large IOPTE is also disabled in
-IOMMU. So it can do the split easily. See the comment in
-iommufd_vfio_set_iommu().
-
-iommufd VFIO compatible mode is a transition from legacy VFIO to
-iommufd. For the normal iommufd, it requires the iova/length must be a
-superset of a previously mapped range. If not match, will return error.
-
-> 
-> 
+>>> Cheers, Sima
+>>> -- 
+>>> Simona Vetter
+>>> Software Engineer, Intel Corporation
+>>> http://blog.ffwll.ch
+>
 
 
