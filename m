@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-34855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34856-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274F9A06AE5
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 03:26:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A70A06B9D
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 03:44:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11A31163308
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 02:26:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4CE33A145B
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 02:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D3E65BAF0;
-	Thu,  9 Jan 2025 02:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA1913633F;
+	Thu,  9 Jan 2025 02:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R8eT5Y9s"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kTwMotIY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A717B677;
-	Thu,  9 Jan 2025 02:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 297CFB677;
+	Thu,  9 Jan 2025 02:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736389604; cv=none; b=lugtqp62jypPZ1vlF0SxIwp2o/s0zGYGMvOAba0qpssfpUlvWWHdTQdXftL+xH0//0x9IPSIbANA3KMzmyeB+wLEMuvTbclM8KJ6aYVVeQhj0M99h53etGCFIO5V0Bql5lJOgWjqKiFmr+cfg+VfEigDafaD9RltAV/duZI5axo=
+	t=1736390656; cv=none; b=OUPQZdlQdDD9lODZEA/mDeReH9DApEFIAz4E7qUInFQ4KtB3SCOm+rgPQmv2nEmuP1zpu+oSz0eksPVc0ObIwgzJ3HqO7aPyjVajdMo9ChMM6SEDH2bLluDw4hgsXEPEqnJNQFKhm/qLldv9ZzL6yDG7+n35o8IEKUNoZ48QeZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736389604; c=relaxed/simple;
-	bh=rPdMQYQCaxMPd2nVym3BImTVlg7WvbiOA0q8eKvUvA8=;
+	s=arc-20240116; t=1736390656; c=relaxed/simple;
+	bh=7k+mdF549qSWQusWg4/vdeeGlCUR59Hy/a5tDPYZft4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Og17xnsESZbD8rthwGWzbW9dbjiuzjNMYmJnTOcw9+XWHYBmMyv6bXso6PSSpZsQTSaChgh05lntMEjlYd+9QLUW7MNIj7CRi0y7wu/bRLxreQrsipgbPbbv7K3Oa4nva+fCl3+OEvma4aS5tqwKoQuBRQfkKAzawyLugI1iqzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R8eT5Y9s; arc=none smtp.client-ip=192.198.163.9
+	 In-Reply-To:Content-Type; b=EmCLbukQaX73dKsySbzKbX2nkMWWsQ0gbLZJTtKmFTKpbxhqxRjEAUGXdE36BWxR1yfEbxeLqCLJ0bh8ojsbFs2upswVxEA6FGtQfujdbSMDMAHI6zpswY4iXqmRUfFwBc/2e/G8uWTmN7GCF4dHdb5dIP23KuLNKAlVvqQgIeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kTwMotIY; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736389603; x=1767925603;
+  t=1736390654; x=1767926654;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=rPdMQYQCaxMPd2nVym3BImTVlg7WvbiOA0q8eKvUvA8=;
-  b=R8eT5Y9sGF8vP31ilqPHzI/3Wwgu5QNEoV7rQXPS4Vt2qpg8v6Jb2tR6
-   EPt8DOTDDeIaGVa0aWJIESvzrqVWX0Oupn2VjykQ1gYOVYWr91xhQ62nH
-   MJzXpNkEiPasa+QhkWJBcOEYzDsnQ1NuAWVbudXvk5EGGVL406zQWMp72
-   lfykoZ+AQeBlmb2zAWPOU27z40IibaqR/acqduBIKTKwZJG7a8u+LFJsx
-   X/rZv7IVJ54MbutUbeNz4YvUOvPYfJsgmMjhEfqL9VX7jZQg/Pai8KNVC
-   VV1Ksapdugv08fROtEdY6vJCM0iofXi7alT2PWu9JznrgSmLAf2VrbLz+
-   Q==;
-X-CSE-ConnectionGUID: ArJ1Mij7SNySiJHU4TodKw==
-X-CSE-MsgGUID: 5le9cd7ARkeKdY2wF9ZVzg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="47303752"
+  bh=7k+mdF549qSWQusWg4/vdeeGlCUR59Hy/a5tDPYZft4=;
+  b=kTwMotIYRudj7QCS1JSFYc03lSUwzBc+OnkopvgZ8zQY2jo9c3XwTeMs
+   5tsEGmehsRh3v1N8RMEh74m9y7jvv7vVCuXKwsLwgACa1Z69lb0iNLE7g
+   eqDJlCb1xW2NPy0Ra6D7HRwTJ7fDFscOWtxzbOAqn8qd+2DECCfZNnwsJ
+   /Uxn4g9bLiUjOubmxZgA19VUrQZ2c99+ZCiuwHF734n8L59VzARKkMZr6
+   knoFBg311r9MYfiYgWTNYmBEHwvzQibTHdsRapTRUeb9ALgT4ZdJJnpHF
+   s6dKDTRBdWM3/9gDTWZsyI75Ca6foeKtDfSyXOSqXb6OLRdgiRmZENZbR
+   A==;
+X-CSE-ConnectionGUID: cgOBH7v+TnSPoyfyvVE7xA==
+X-CSE-MsgGUID: PqamjesCS0yFw9oE5QI2wQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="36797247"
 X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
-   d="scan'208";a="47303752"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 18:26:42 -0800
-X-CSE-ConnectionGUID: qXxJ3X+ETa+gFCo3VQEWEg==
-X-CSE-MsgGUID: Cb+WgZsVSoe4nUYzeC13eg==
+   d="scan'208";a="36797247"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 18:44:13 -0800
+X-CSE-ConnectionGUID: YKm54DItS4i7FlJLr+eIXg==
+X-CSE-MsgGUID: eaDi7FDzSeai3KLt70zOBQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
-   d="scan'208";a="134111982"
+   d="scan'208";a="103082452"
 Received: from unknown (HELO [10.238.12.121]) ([10.238.12.121])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 18:26:38 -0800
-Message-ID: <8fccaab6-fda3-489c-866d-f0463ebbad65@linux.intel.com>
-Date: Thu, 9 Jan 2025 10:26:36 +0800
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 18:44:11 -0800
+Message-ID: <38116f37-c720-4285-8aaf-1bd64f86c62d@linux.intel.com>
+Date: Thu, 9 Jan 2025 10:44:08 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,160 +67,45 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/16] KVM: TDX: Always block INIT/SIPI
-To: Sean Christopherson <seanjc@google.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, pbonzini@redhat.com,
- kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com,
- adrian.hunter@intel.com, reinette.chatre@intel.com,
+Subject: Re: [PATCH 00/16] KVM: TDX: TDX interrupts
+To: Sean Christopherson <seanjc@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com,
+ kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com,
  tony.lindgren@linux.intel.com, isaku.yamahata@intel.com,
  yan.y.zhao@intel.com, chao.gao@intel.com, linux-kernel@vger.kernel.org
 References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
- <20241209010734.3543481-12-binbin.wu@linux.intel.com>
- <473c1a20-11c8-4e4e-8ff1-e2e5c5d68332@intel.com>
- <904c0aa7-8aa6-4ac2-b2d3-9bac89355af1@linux.intel.com>
- <Z36OYfRW9oPjW8be@google.com>
+ <af89758d-d029-419e-bcb5-713b2460163d@intel.com>
+ <Z3w4Ku4Jq0CrtXne@google.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <Z36OYfRW9oPjW8be@google.com>
+In-Reply-To: <Z3w4Ku4Jq0CrtXne@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
 
-On 1/8/2025 10:40 PM, Sean Christopherson wrote:
-> On Wed, Jan 08, 2025, Binbin Wu wrote:
->> On 1/8/2025 3:21 PM, Xiaoyao Li wrote:
->>> On 12/9/2024 9:07 AM, Binbin Wu wrote:
-> ...
->
->>>> ---
->>>>    arch/x86/kvm/lapic.c    |  2 +-
->>>>    arch/x86/kvm/vmx/main.c | 19 ++++++++++++++++++-
->>>>    2 files changed, 19 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->>>> index 474e0a7c1069..f93c382344ee 100644
->>>> --- a/arch/x86/kvm/lapic.c
->>>> +++ b/arch/x86/kvm/lapic.c
->>>> @@ -3365,7 +3365,7 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
->>>>          if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events)) {
->>>>            kvm_vcpu_reset(vcpu, true);
->>>> -        if (kvm_vcpu_is_bsp(apic->vcpu))
->>>> +        if (kvm_vcpu_is_bsp(vcpu))
->>>>                vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->>>>            else
->>>>                vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
->>>> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
->>>> index 8ec96646faec..7f933f821188 100644
->>>> --- a/arch/x86/kvm/vmx/main.c
->>>> +++ b/arch/x86/kvm/vmx/main.c
->>>> @@ -115,6 +115,11 @@ static void vt_vcpu_free(struct kvm_vcpu *vcpu)
->>>>      static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->>>>    {
->>>> +    /*
->>>> +     * TDX has its own sequence to do init during TD build time (by
->>>> +     * KVM_TDX_INIT_VCPU) and it doesn't support INIT event during TD
->>>> +     * runtime.
->>>> +     */
->>> The first half is confusing. It seems to mix up init(ialization) with INIT
->>> event.
+On 1/7/2025 4:08 AM, Sean Christopherson wrote:
+> On Mon, Jan 06, 2025, Xiaoyao Li wrote:
+>> On 12/9/2024 9:07 AM, Binbin Wu wrote:
+>>> Hi,
 >>>
->>> And this callback is about *reset*, which can be due to INIT event or not.
->>> That's why it has a second parameter of init_event. The comment needs to
->>> clarify why reset is not needed for both cases.
+>>> This patch series introduces the support of interrupt handling for TDX
+>>> guests, including virtual interrupt injection and VM-Exits caused by
+>>> vectored events.
 >>>
->>> I think we can just say TDX doesn't support vcpu reset no matter due to
->>> INIT event or not.
-> That's not entirely accurate either though.  TDX does support KVM's version of
-> RESET, because KVM's RESET is "power-on", i.e. vCPU creation.  Emulation of
-> runtime RESET is userspace's responsibility.
+>> (I'm not sure if it is the correct place to raise the discussion on
+>> KVM_SET_LAPIC and KVM_SET_LAPIC for TDX. But it seems the most related
+>> series)
+>>
+>> Should KVM reject KVM_GET_LAPIC and KVM_SET_LAPIC for TDX?
+> Yes, IIRC that was what Paolo suggested in one of the many PUCK calls.  Until
+> KVM supports intra-host migration for TDX guests, getting and setting APIC state
+> is nonsensical.
 >
-> The real reason why KVM doesn't do anything during KVM's RESET is that what
-> little setup KVM does/can do needs to be defered until after guest CPUID is
-> configured.
->
-> KVM should also WARN if a TDX vCPU gets INIT, no?
-
-There was a KVM_BUG_ON() if a TDX vCPU gets INIT in v19, and later it was
-removed during the cleanup about removing WARN_ON_ONCE() and KVM_BUG_ON().
-
-Since INIT/SIPI are always blocked for TDX guests, a delivery of INIT
-event is a KVM bug and a WARN_ON_ONCE() is appropriate for this case.
-
->
-> Side topic, the comment about x2APIC in tdx_vcpu_init() is too specific, e.g.
-> calling out that x2APIC support is enumerated in CPUID.0x1.ECX isn't necessary,
-> and stating that userspace must use KVM_SET_CPUID2 is flat out wrong.  Very
-> technically, KVM_SET_CPUID is also a valid option, it's just not used in practice
-> because it doesn't support setting non-zero indices (but in theory it could be
-> used to enable x2APIC).
-Indeed, it is too specific.
-
->
-> E.g. something like this?
-
-LGTM.
-Thanks for the suggestion!
-
->
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index d2e78e6675b9..e36fba94fa14 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -115,13 +115,10 @@ static void vt_vcpu_free(struct kvm_vcpu *vcpu)
->   
->   static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->   {
-> -       /*
-> -        * TDX has its own sequence to do init during TD build time (by
-> -        * KVM_TDX_INIT_VCPU) and it doesn't support INIT event during TD
-> -        * runtime.
-> -        */
-> -       if (is_td_vcpu(vcpu))
-> +       if (is_td_vcpu(vcpu)) {
-> +               tdx_vcpu_reset(vcpu, init_event);
->                  return;
-> +       }
->   
->          vmx_vcpu_reset(vcpu, init_event);
->   }
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 9e490fccf073..a587f59167a7 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -2806,9 +2806,8 @@ static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
->                  return -EINVAL;
->   
->          /*
-> -        * As TDX requires X2APIC, set local apic mode to X2APIC.  User space
-> -        * VMM, e.g. qemu, is required to set CPUID[0x1].ecx.X2APIC=1 by
-> -        * KVM_SET_CPUID2.  Otherwise kvm_apic_set_base() will fail.
-> +        * TDX requires x2APIC, userspace is responsible for configuring guest
-> +        * CPUID accordingly.
->           */
->          apic_base = APIC_DEFAULT_PHYS_BASE | LAPIC_MODE_X2APIC |
->                  (kvm_vcpu_is_reset_bsp(vcpu) ? MSR_IA32_APICBASE_BSP : 0);
-> @@ -2827,6 +2826,19 @@ static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
->          return 0;
->   }
->   
-> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +{
-> +       /*
-> +        * Yell on INIT, as TDX doesn't support INIT, i.e. KVM should drop all
-> +        * INIT events.
-> +        *
-> +        * Defer initializing vCPU for RESET state until KVM_TDX_INIT_VCPU, as
-> +        * userspace needs to define the vCPU model before KVM can initialize
-> +        * vCPU state, e.g. to enable x2APIC.
-> +        */
-> +       WARN_ON_ONCE(init_event);
-> +}
-> +
->   struct tdx_gmem_post_populate_arg {
->          struct kvm_vcpu *vcpu;
->          __u32 flags;
->
-
+By rejecting KVM_GET_LAPIC/KVM_SET_LAPIC for TDX guests (i.e.,
+guest_apic_protected), I think it should return an error code instead of
+returning 0.
+Then it requires modifications in QEMU TDX support code to avoid requesting
+KVM_GET_LAPIC/KVM_SET_LAPIC.
 
