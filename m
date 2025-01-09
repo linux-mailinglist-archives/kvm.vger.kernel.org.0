@@ -1,102 +1,128 @@
-Return-Path: <kvm+bounces-34944-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34945-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A08EA080C9
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:49:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EAEAA080CC
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:49:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61E913A91CF
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:49:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 602BD3A8CBF
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:49:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C891F4293;
-	Thu,  9 Jan 2025 19:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D6E204C38;
+	Thu,  9 Jan 2025 19:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bIxAaGbs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K3q9Uu6d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09D51FC7EE
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C17F1FDE2D
+	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736452104; cv=none; b=gHMu19xcjo05WtuwlUfmp9S4gIh/fFpdCd+GEOXbgST1pWFutzqPd9sDfZIShtBjOLFdFocUQtBuBqaYGXFf1JWCryLOBW4OQvfNZOrDMWPWJl9gKyradGdP+pwCAKAaSF5pUawl6dwCPY+38/zZnE78w/IZg1TuEUmIQmSm+qc=
+	t=1736452115; cv=none; b=MdjLVHmrZP1WZ9hyaqoEaxykSHcuVxnAuCiyRgOd7F3XXIuqGG5bENbihdhqo4oLUY+sP7tojrlXjhITrGSpRA7aBTcVoVXT6tsxW6GXtKIajxw02BJbMEuSJEm2LshFMP2eJY6fgylCfwGnANHoIxmLMZGSI+yVj1weL/19znc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736452104; c=relaxed/simple;
-	bh=i3rDKA0F09JEJTZwLo+zdVEcG4ixuVm35C+F41EWN9U=;
+	s=arc-20240116; t=1736452115; c=relaxed/simple;
+	bh=PrFEaEU7DDCl4he6jOcyQtK457MKdnxMIh7aWoIbbEE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FBUKYiBO2c5hZwbltoI0n89Qz+MABcuLVNnI7x9ySKEQ7IF0q+rrQ71SOfUJL0p6hM1Tvqonatkj8+wztzJOWv0oz5/QwWliSzwFIeF+kxqYXNCMi3KBAhcvKYpaNygr4vQpb0bThODglmOHAA3p4fOMC/E2VPmn2ZbCELMYzMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bIxAaGbs; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=tSBRkO28aK0x1YNbX2wMdu7yMsH+5FqM2OmAdKfw5GwoU1w3PaP+70CuIi3yeu1bUSHZfkiaZwKxfaKb9Pkb15GSY2q9peXwepzfIKklcyyEdX8vidVdXzS4gkB8v7lvxNn/pbwHcaJ/5ZbaW05JT3/1dx7n7AS11PmbhXwhPds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K3q9Uu6d; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21640607349so26823825ad.0
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:48:22 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee6dccd3c9so2186916a91.3
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:48:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736452102; x=1737056902; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736452114; x=1737056914; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tEYk3UMg30Ej09kAh2ThRZhDb6n/cWhL70JOK9UY+H0=;
-        b=bIxAaGbs91iMVDc3ULgyllXc5jGubLz14coJPVlIF3kWpDs3wOfsBCqh1XHi4GTa6p
-         LaWYedZ04fMYYp0SVGzkIEOMXrbd6jM6kpK6zvdmByf6rrNousTo2m/bAPaUrrtxuEQ9
-         5WptqLkIyh9YRckG64U8Xe9oaso7eK0q02Ux4Lgp4A1UTTblEUEH1CUfP1SW5Ax923k3
-         /d+qufQsvSBc3Q8NLq1OO6lqA+goMl3BRARNDhX6OxyXTCQBzKM7faLkHbMrik2vfEYx
-         ABrRB4aKukWZoFIYqLGfDeaslo0vPZBrk8FNL3es6pmvywUDkXl2bq8G7uMnk1aIbksR
-         vZHw==
+        bh=DtNoMkgEfRqjn0GoMRLYiLeDG4/kOjxv1c8ix0/Uo/Q=;
+        b=K3q9Uu6dCXbmcTv6yyOsAGkH2JbMTweuELZANPsBYMl+QhxVsakiAQqKDPzOI6ePtn
+         TCS+2YQ42ITMzpzeqgp+I+LArYxZRB4W65UffOuWQsawnP4EZzsdnt9uDTo4nZXWDBXc
+         oBzlqAS6jLye+AvernsdnTR+yxA+sHNAPerJPUjiag8Ff/gpHcgtCKgKS6VLxCsjf02e
+         qApnadCHcWdbHA8asCmgDEoa2+8r30iRfis88gfVVUbWmIeTB4tD1ASiiqaYBCV3PZOM
+         5JUklrALxsL83wIMykLvBOMIK/u4fCllNquuNAPqyHtd30lMU0cJFScKhtUtSb2ExZUC
+         Txcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736452102; x=1737056902;
+        d=1e100.net; s=20230601; t=1736452114; x=1737056914;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tEYk3UMg30Ej09kAh2ThRZhDb6n/cWhL70JOK9UY+H0=;
-        b=CgwGNqQWSx2+zfZBKiiQevRV1/jKlYP6cSeFHiKwtkVdtJ7qbasdfJd92ZLQqREu70
-         f9UE63u7obbt5CqsxM71CrN4MQ0IS9GHLKQfdAbcWsf1pU2InDTEw/QUMyLH6x3+jQ0D
-         eyPT6fkt7i/p9KcjaS32N5Q0oycXk0Al7WgwbVFhjWnayPvEwEJQuS/fI4U2qqH8a1wK
-         RfVhgdAZjMikoJ7cB5AnNSdeUWwgy3taYHk5WZGoWkwJY5LsjFViEXUhgGM8ndlzFuuM
-         MV3mKcn/nA87JCAGWeH/P/m61TupwmTHePDjkmp1+KZRgzG8XX/FplRpOJBdBw2Ol3Um
-         bgoA==
-X-Forwarded-Encrypted: i=1; AJvYcCXt27kBNZ9+XrlQNyAPjbxWO3AGPSsotIPMvIGC6ajZzlyExUWVtoyW4EC95sPDkdvSOO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNLU0lP5TYwjh+iIXJi5k0Q+B+WA7pLGTvmWvDwsO+1wNVM+1P
-	EgSwOtYeNobVzkzYMT7D/8dt6VXyZVbiFu1LPiZMZ0Om0JaTsA6U7aJD0SrO0BKuO6pRYiQ6cnw
-	3BQ==
-X-Google-Smtp-Source: AGHT+IEZS3ENK2nghLtlyDpbzxyRo1u1A41iwyMmacck2Wt5ESSVJoxAMFXh7M0PfZVSXCbHm38vIILs4Ck=
-X-Received: from plce17.prod.google.com ([2002:a17:902:f1d1:b0:216:1a56:4a31])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db06:b0:216:725c:a12c
- with SMTP id d9443c01a7336-21a83f46a4dmr119296495ad.9.1736452102127; Thu, 09
- Jan 2025 11:48:22 -0800 (PST)
-Date: Thu,  9 Jan 2025 11:47:11 -0800
-In-Reply-To: <898ec01580f6f4af5655805863239d6dce0d3fb3.1734128510.git.reinette.chatre@intel.com>
+        bh=DtNoMkgEfRqjn0GoMRLYiLeDG4/kOjxv1c8ix0/Uo/Q=;
+        b=ajSwmUkaaZ0+VskcniOg8LJh33Mdy60oPHOJOvCpISHRO+lSY3uuSbIY3htXg7KLKy
+         4F+ltVn96XKwXKUoyHS6XSQnHgUnucxp1hIJnd7DxEJPyMIaOJPY7aFutSbB66t5GpRk
+         YNZrpTu15x2cb5vg3I7Q6mVQM0Ugur9Ie8zaCcYDCj0Lcw/9tOr2QW00lViBcH/RFNvR
+         F76aNy6Jd28UHmMloza7f94VLn+Zj180OXbeahh/tKOWPngfz+ku0iO4vrumLE3YkjqC
+         WMyElJUWx029/cHbL3KhGJkUCUPI91lNoeAnntKnxfr2eDbvQA+Q+cxokjy1reUh23pr
+         eTQA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWeh7pxtLNuTuQ4cerm8xVf+BmT7DujoYJ3UG+pIFJREEGnKv4z+AKRs00LcboyQPKNw4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVTbXV4wbf7FEGRyPrqt2gUPttW4ZJykB9az0rnCVLJAyZd3nC
+	g7MKZiMjq8Awf0DPRBvi8xD3RIxN6RV1rms054grVJigorpsqX1mdjULl5dyLaHkjwBGJHFECDa
+	uFA==
+X-Google-Smtp-Source: AGHT+IGQsYeXCTLoQtv4zUeKKUd67KMOBJssqkUIj3hvgSqGZyfbB6lhOhAReCaRc5UAnOKDVlHxinf8YUY=
+X-Received: from pjbsl13.prod.google.com ([2002:a17:90b:2e0d:b0:2ef:85ba:108f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8a:b0:2ee:c9d8:d01a
+ with SMTP id 98e67ed59e1d1-2f548f33b54mr11852213a91.11.1736452113738; Thu, 09
+ Jan 2025 11:48:33 -0800 (PST)
+Date: Thu,  9 Jan 2025 11:47:13 -0800
+In-Reply-To: <20241220013906.3518334-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <898ec01580f6f4af5655805863239d6dce0d3fb3.1734128510.git.reinette.chatre@intel.com>
+References: <20241220013906.3518334-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173645119179.885604.11668508135105687384.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: selftests: Add printf attribute to _no_printf()
+Message-ID: <173645122896.885867.13450184481916964756.b4-ty@google.com>
+Subject: Re: [PATCH 0/8] KVM: selftests: Binary stats fixes and infra updates
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, shuah@kernel.org, 
-	Reinette Chatre <reinette.chatre@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 13 Dec 2024 14:30:00 -0800, Reinette Chatre wrote:
-> Annotate the KVM selftests' _no_printf() with the printf format attribute
-> so that the compiler can help check parameters provided to pr_debug() and
-> pr_info() irrespective of DEBUG and QUIET being defined.
+On Thu, 19 Dec 2024 17:38:58 -0800, Sean Christopherson wrote:
+> Fix a handful of bugs in the binary stats infrastructure, expand support
+> to vCPU-scoped stats, enumerate all KVM stats in selftests, and use the
+> enumerated stats to assert at compile-time that {vm,vcpu}_get_stat() is
+> getting a stat that actually exists.
 > 
-> [reinette: move attribute right after storage class, rework changelog]
-> 
+> Most of the bugs are benign, and AFAICT, none actually cause problems in
+> the current code base.  The worst of the bugs is lack of validation that
+> the requested stat actually exists, which is quite annoying if someone
+> fat fingers a stat name, tries to get a vCPU stat on a VM FD, etc.
 > 
 > [...]
 
-Applied to kvm-x86 selftests, thanks!
+Applied 1-7 to kvm-x86 selftests (x86 wants to build tests on the vCPU-scoped
+stats infrastructure).  
 
-[1/1] KVM: selftests: Add printf attribute to _no_printf()
-      https://github.com/kvm-x86/linux/commit/bd7791078ac2
+I'll hold off on the compile-time assertions stuff until there's consensus that
+we want to go that route for all architectures (not at all urgent).
+
+[1/8] KVM: selftests: Fix mostly theoretical leak of VM's binary stats FD
+      https://github.com/kvm-x86/linux/commit/b68ec5b6869f
+[2/8] KVM: selftests: Close VM's binary stats FD when releasing VM
+      https://github.com/kvm-x86/linux/commit/a59768d6cb64
+[3/8] KVM: selftests: Assert that __vm_get_stat() actually finds a stat
+      https://github.com/kvm-x86/linux/commit/52ef723593fe
+[4/8] KVM: selftests: Macrofy vm_get_stat() to auto-generate stat name string
+      https://github.com/kvm-x86/linux/commit/7884da344973
+[5/8] KVM: selftests: Add struct and helpers to wrap binary stats cache
+      https://github.com/kvm-x86/linux/commit/384544c026f6
+[6/8] KVM: selftests: Get VM's binary stats FD when opening VM
+      https://github.com/kvm-x86/linux/commit/6d22ccb1c309
+[7/8] KVM: selftests: Add infrastructure for getting vCPU binary stats
+      https://github.com/kvm-x86/linux/commit/60d432517838
+[8/8] KVM: selftests: Add compile-time assertions to guard against stats typos
+      not applied
 
 --
 https://github.com/kvm-x86/linux/tree/next
