@@ -1,97 +1,102 @@
-Return-Path: <kvm+bounces-34946-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34947-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58AD7A080D7
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:50:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B860A080DA
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 20:50:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EFEC16555C
-	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:50:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E50CE188BDBB
+	for <lists+kvm@lfdr.de>; Thu,  9 Jan 2025 19:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C16520551F;
-	Thu,  9 Jan 2025 19:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6958205ABA;
+	Thu,  9 Jan 2025 19:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fYMUD417"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kYEZ+2iP"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB0E1FF7B9
-	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:48:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7A21FFC58
+	for <kvm@vger.kernel.org>; Thu,  9 Jan 2025 19:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736452131; cv=none; b=KYmIu7PiahCBHZtmRdZKt0BEuFLFQnnWwMmJXEO4//Z1tiLPBV8kyt/aqnNnNjjAomp7KLwBLkQU/QHDE/wtCdYVGz73aGEN7Ho0qZzq82BaryHzGb4QJeasWHpXt7A+kugUbcCJjCDa/EcOAG3SmKZPJlx/MlrdWrEHQWDqVRc=
+	t=1736452138; cv=none; b=fmS41LC/7X7sye3A18iHfnxmvGmyQtR+3gpep/Q/ZTszsNLOhdU6SNupkWj2dqkirWjXwvDPi0s0lTIOxjWmJ6PS78cGXjqdYPnTeCpDhtg0p+FHfRpD8MHEjQACuTy/81D821FzyjBVfbXJ5S2+S2CqeOUw3d+yQD5Kk0hUVkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736452131; c=relaxed/simple;
-	bh=x+aGqnYGYrAnMNzckS0sHoevLoT3Wj9mM/77mbCGXwg=;
+	s=arc-20240116; t=1736452138; c=relaxed/simple;
+	bh=R3htTwJk+vZ2zNqsXn4VlqB2l7GIqaPrfKbUAVg5VAg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WbZVDFiNUKCahZVeJpJ85qzsjz+OwZJINoskyJ+tUBMH0iIySgq+hBxiGIwOKIQ4/XW6K7NSEdKjvlGOv5Hr3Atpq0FAOlqlg7k9E7xIqibsyB2bhLiV47rffUwkDygiU/hyr3JWC08jXeL5fLqnp6ku+UBMwKwI2VEUG6wpF/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fYMUD417; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=ZDvXgNikTKxxyS1h16TEOJ41BPXY8J0jwpgWFhlY2jX9TeD9giHqdBc2dfX4T39yLxKTTcc4eRve1TkHPJ5YO/8cEpuskZy002nilXkRJ6Up8vMxInoHjkHSuElv0jFnzbxUvUSXsKT08imMH4F9rfnexFrtfbZ7/XyrieRqFrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kYEZ+2iP; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef7fbd99a6so2249599a91.1
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:48:50 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so3243109a91.3
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 11:48:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736452129; x=1737056929; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736452137; x=1737056937; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r5nqibBzTG/NMQ3ms6I9/y5I8xNGqcmfWxi8diJq040=;
-        b=fYMUD417q8DJ5F9Axe64B3YTvNzj1Op05vv5tbl3SCo5hnJ0F+e+tQ0navQRIuCibr
-         SsGaHbYgKajx86JNY+HJ9zTigxbjkHsImkoRV7+gO3hbO1IoxRaSRZddcEWmSO4NxZu8
-         ZWZaDkxvBNTFI6R+ZCsvKInc/4ceMpPLIMzsE+XHi/ILUeMARf9PYADid42jMl1l1rr2
-         sS9CdJ3Ca7veGu5NJPzI5Fl81FQPBGiKMCAQKqGHpAvhRhkSMoxZMJQ1uybMZLeqM7fv
-         I5J1AS8LkKHp+FHWSv+d+eu+pPZiacMQFJ7J9zgrg7AAl3gARvkvYFeGnXZvFh9zSkCZ
-         oeFw==
+        bh=lfhaSmxpTuw/GN3P4+eLipeQYHEKMeL/J6VjlNwuwjU=;
+        b=kYEZ+2iPQ0bTK6pgt4WHPezLL7XsltFwBaXm7VDGfZQkKkKDkbJj77ZPuD1E4xr/AN
+         /QwmbY9z6Tu/QfztDga+zvFSIQzgbFsXikmFhSpP2JG35JArwmotqQ9DAHlbI8YryAFN
+         p/SJvAaL8MacSGNog+UP5MQAnvRFz7oT7mATDO4IsRf1SI+YI5OegCjnryQJp3Pm3Ex4
+         EWBdXKDPP4uujxvvg06ezwh4wNJFtBJ4MJ3kjMtvLCPg3JZoS6/6vD+rtl8d/1X9Q+46
+         rykQCDiecXNcxfVeMSEYw6S80HhFUVG9XmD1cDF0vBA4fxodCgYOvw5sESx+zR+9ANl8
+         cP4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736452129; x=1737056929;
+        d=1e100.net; s=20230601; t=1736452137; x=1737056937;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r5nqibBzTG/NMQ3ms6I9/y5I8xNGqcmfWxi8diJq040=;
-        b=sh1ndzdJx4tAEtPYOK45ZZOMBbMMSAgrq/6Jy6kxPOgoIdOuVlMc6TAqkmb/cBfz2B
-         hh93pdLpdlxElFPH0tfU/fH5Ww9xYigGJV8sP9kvUcFbnKv8Uy2MkCZwnnBXIGUFei1g
-         9fO1t31UUrs18Ph0nBi4IbUSKmw5SIfLTs8IpVliaAJwz1x9nz5LDoe0ib6kWKV+/0Ey
-         6fpQIryytUns+v8s1lxY1T9oVKQtq79B4ymo2/Ff4KvkeXZr4+2XWFI9tO/oOUdwzoEZ
-         IPabvxvEHqP8jmmm6g6h9328nhJR/ZTjxpK3C0x6pV56HFMzXkvmotVrSZ1sOdAlcUst
-         sSPA==
-X-Gm-Message-State: AOJu0YxqQDkCusxXfprjfSuZ0i9bDgfZC1nazdo7LVXlih9uPBKAUki9
-	wX4Y9TD9wx1USoWQ86dHJYxtk0N4hABXJ8zAza+eH8cH9hPu3kmD/DRUwsoTsD6j53p4m/At572
-	Rcw==
-X-Google-Smtp-Source: AGHT+IGMWiTQ/DdybpX80GuXSzrWHWU7Q91+GEMnfAcYDVkHTpDHIIXVp9N4YF7t2LPOvNwwFEKx/WgUP4c=
-X-Received: from pjbse8.prod.google.com ([2002:a17:90b:5188:b0:2e2:8d64:6213])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:520e:b0:2ee:9d65:65a7
- with SMTP id 98e67ed59e1d1-2f548f447b8mr11874232a91.29.1736452129673; Thu, 09
- Jan 2025 11:48:49 -0800 (PST)
-Date: Thu,  9 Jan 2025 11:47:15 -0800
-In-Reply-To: <20241220012617.3513898-1-seanjc@google.com>
+        bh=lfhaSmxpTuw/GN3P4+eLipeQYHEKMeL/J6VjlNwuwjU=;
+        b=Jl+To6hGZq5YnQ96qHtJEfi7JJivOhwzS1gl3sqta1xU0enODUf6huISPNFivQ3mXE
+         pyR8otbrBw/dPFm947oOyyobO5sCohIQB8gPhFxAlm3I1T6+1b9ONtluiczZwnrjUm6G
+         hET/vQmlq09BWivk2dnzTibh9C47hvNVsadPQLz3zWAR+wWMN+Jcd4bOCQqVGnEGyN63
+         xV4z7hCzLOJYCdhkHqKGn1U+3UTKi1oeh7iraLTH9nNdMpeSjL1oo31QPDoX13HjaoOn
+         FFA9Qkvhxxam/DdzU17ENWhqupakBR6326niGcm06RN+8DP5vW+P0hZKYvDaNZPxdCHo
+         Fsxg==
+X-Gm-Message-State: AOJu0Yxnm0sjhdixVOjClh+YX7WUqtL1sYrGjCgOmQVVxqnJtpa4Y5Su
+	ceKA5eewW1HcQAO9hYtzccyxjV3f4TpcqKjRGFDo49I8meJpEHhzDAcBbiSCK4R/T0yZSn3PsyG
+	ygA==
+X-Google-Smtp-Source: AGHT+IFbTlnPjI66cIHitJkLWroDgxiUG5mQj5U4MmwDZ1U5pip9Yd89a2hABhhURKE1bT5VGQeRfLDUeHs=
+X-Received: from pfus6.prod.google.com ([2002:a05:6a00:8c6:b0:728:e1a0:2e73])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b89:b0:726:f7c9:7b28
+ with SMTP id d2e1a72fcca58-72d21f383abmr13826859b3a.8.1736452136968; Thu, 09
+ Jan 2025 11:48:56 -0800 (PST)
+Date: Thu,  9 Jan 2025 11:47:17 -0800
+In-Reply-To: <20241127235627.4049619-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241220012617.3513898-1-seanjc@google.com>
+References: <20241127235627.4049619-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <173645120539.885681.9004596567911167052.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: selftests: Add helpers for locally (un)blocking IRQs
- on x86
+Message-ID: <173645118101.885497.8247079551108053264.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: selftests: Use data load to trigger LLC
+ references/misses in Intel PMU
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Manali Shukla <Manali.Shukla@amd.com>
+	Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 19 Dec 2024 17:26:17 -0800, Sean Christopherson wrote:
-> Copy KVM-Unit-Tests' x86 helpers for emitting STI and CLI, comments and
-> all, and use them throughout x86 selftests.  The safe_halt() and sti_nop()
-> logic in particular benefits from centralized comments, as the behavior
-> isn't obvious unless the reader is already aware of the STI shadow.
+On Wed, 27 Nov 2024 15:56:27 -0800, Sean Christopherson wrote:
+> In the PMU counters test, add a data load in the measured loop and target
+> the data with CLFLUSH{OPT} in order to (try to) guarantee the loop
+> generates LLC misses and fills.  Per the SDM, some hardware prefetchers
+> are allowed to omit relevant PMU events, and Emerald Rapids (and possibly
+> Sapphire Rapids) appears to have gained an instruction prefetcher that
+> bypasses event counts.  E.g. the test will consistently fail on EMR CPUs,
+> but then pass with seemingly benign changes to the code.
+> 
+> [...]
 
 Applied to kvm-x86 selftests, thanks!
 
-[1/1] KVM: selftests: Add helpers for locally (un)blocking IRQs on x86
-      https://github.com/kvm-x86/linux/commit/983820cb53c0
+[1/1] KVM: selftests: Use data load to trigger LLC references/misses in Intel PMU
+      https://github.com/kvm-x86/linux/commit/7803339fa929
 
 --
 https://github.com/kvm-x86/linux/tree/next
