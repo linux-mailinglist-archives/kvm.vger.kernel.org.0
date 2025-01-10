@@ -1,75 +1,79 @@
-Return-Path: <kvm+bounces-35012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35013-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CADEA08AF1
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 10:10:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE077A08C10
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 10:31:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15AED169355
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 09:10:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA5663AB099
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 09:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711B820967C;
-	Fri, 10 Jan 2025 09:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC18F20ADF9;
+	Fri, 10 Jan 2025 09:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="REzazV1e"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="rUY8RT4C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1DD1ADFE4;
-	Fri, 10 Jan 2025 09:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7664720ADC5
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 09:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736500206; cv=none; b=HG0tTLmUAXQ+H5njAGXp7upQvEuwsY6w3O45CNLiT6C3hYnPJgpM5td/qLTWZDrL8JMGkkwrzElEwoCJL/TKSdAjmENpukkDu0f183RFc50EKvVdH5+nMTqai+qPLHKwsOTX79tAwAL1p5q/q3gAHDiLRRikgCzn64BIcKatveE=
+	t=1736501024; cv=none; b=WhJ6ii+tBoHHI8S1SLIuDqgUko7NJ0QJgpvqTgW1ULCSndOJpFMZI15yJC7u8mU2IEDnMMJBYlVKnGPmDKqS0jVU+BADBfdAFAuIX2CU7XwPWx1gF70XQDaMT42o/nAis5CYA5KKjO1BaK2q2Jrr0O2xLvavp7zlWT1kXPNr12I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736500206; c=relaxed/simple;
-	bh=xaHN7GWYpt4R+X2qZ8qNWkZmEPbdjynrDmF3DtjZ0Xk=;
+	s=arc-20240116; t=1736501024; c=relaxed/simple;
+	bh=zDliBtx/z6R35uOENVkS8CgF4klrZVGcOMWwhYIWhA0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oBKTD4F5u4kYaDEOKc9ZioKdE5dr5vKw6egitPFjlaPnJ6FxnTJJfeptIy1LvO2dbHbG9AXxrWoaFZ4ZIR5qP/H5K5/Nq2QaO6dPlSq6Iy4dxm5L/bcy7A4GBKBYkVuMQyBpy9Q/LkuSArdB0SMppk0ja4Jc2aHCkaWnYYWcPLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=de.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=REzazV1e; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=de.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50A0t0Ws010436;
-	Fri, 10 Jan 2025 09:09:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=IEV40G
-	+cJBq5cts/Z6I0eqe+nmDed+StMjFKMxusyKE=; b=REzazV1eLqIq2IAkYiLmJq
-	uUHGHg6BiYDwsZHVd+aRnjMNDk6g2RFzwfLJ/UULatHD9BTQLrQrL4FD6L9BVjVz
-	VEOh4jpUFQuYnsskQI3/GfV2qSM5B/ST4ixrdimLao6qRPi0hTIGmG0M3hczNGsj
-	0UPCdIv8hfk0brhV0KCvbklaomjvrrTKbb8M2e/CYNH4rDvPkx2AfH0R7q8JCmuB
-	MP9Qj6XT7UyZVDO9BI6Etna/oarT+CbRp6yDA1gRlW3hGcnRZYkK1/zCBDrBaK16
-	3lxupdQwuheQ/fLe2H7ZfI3/jdIHF7wzeSrXRBw4qAjzs+TIJBR8g3XnpdsOvAqg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 442fx5c143-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 09:09:57 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50A8g5wl008970;
-	Fri, 10 Jan 2025 09:09:56 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43yfq09kd0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 09:09:56 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50A99ro948103768
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Jan 2025 09:09:53 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E8DEF20043;
-	Fri, 10 Jan 2025 09:09:52 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C1E5520040;
-	Fri, 10 Jan 2025 09:09:52 +0000 (GMT)
-Received: from [9.152.224.86] (unknown [9.152.224.86])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 10 Jan 2025 09:09:52 +0000 (GMT)
-Message-ID: <ffcb7b9b-d1ac-473f-afeb-c31ff6bc3429@de.ibm.com>
-Date: Fri, 10 Jan 2025 10:09:52 +0100
+	 In-Reply-To:Content-Type; b=Mh8zEL+PrbSuSL0XvvBTiueEH3s+u4+bHblcjoCj9naR1xsi8n7Ve/5KLaUMKiLZ2dXfjz4trMNsaW7JgnQODqJC0sSW89ThKz7Stflq2amUR+4RSgGCMX701+AaHB5lJGT+Z98V8UPsFANEYJp472L/FsPlBKlRj6oZt9XATpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=rUY8RT4C; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-436637e8c8dso19666155e9.1
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 01:23:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736501020; x=1737105820; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iblOg47SqMhCepIMm1yTeFpLob2mvaxvFIUpMBZ/N44=;
+        b=rUY8RT4CWtpXX+JBnaer9N6JW8HO4XxTjZDb5FbA97G1RB4T489V1Je6C/Ghd/MF1/
+         JGvOjl4ibEhTlhkKF5Eq0Ct2UQWuKMInFME852QqiQifr36jZSk99Wsf9tESN1J3m8pP
+         pjmw9mz8BOoP0ABXIul2DK2SID9pocBcRBKG2K/bYyZd7kFx6zRsdvO6hSYs7A/m4f50
+         K0MuUTEvnIlUF9RjSKbQeIcRY75H9kLyBdjNl7oDtEHDZMAgNcC4V7gdS/lUpz3X2iyc
+         1qLwmjx1JdacZaz1DD0Z34SlmyBvUEeedI1MSCX8W0Z2VvYqipvcTYHCUYQKKR8qBqZS
+         gFtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736501020; x=1737105820;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iblOg47SqMhCepIMm1yTeFpLob2mvaxvFIUpMBZ/N44=;
+        b=KtBrrp0j0TyZCv/uC8Gro5leTvsiwgMJfz//u6LVi3+0xScZRFPlBAFCRFHEluVQmP
+         KcByWlaS64kiiCOHXBZK4A6PoVSNKfBz1OnOgCB90HXU3WfQTvneem/nky60+wNa12y8
+         oAbioLEw/Yx/pzjiaIEgffa02tvhO3q3KZvPCGWqh5wFtrX0olcCBdWN4xIZHDMgCC6G
+         XqT6/bd5y8RftDUNUdg0vfAwA5zDpSK/BYfH+EIoMlgkg49rkQ0S6RCM7QiYcvJbrW7W
+         Ja1rr7t4odyWHSWEABXajH31/7Qy1EPJwSHricnCRv900dtga0HEKdv0hrZKrRchj2Ey
+         lr4A==
+X-Gm-Message-State: AOJu0YyzaEG3rKUgF+i9uhipvwyECIu0u4YDAyi4vSoKnIRUU8vOHnyO
+	WxXJ2D3fmv6F/Znd1jjsBwMGh10cF5YBLMD3PoILKTLf3QOXVl4BevSBzYZww2v70w/X37J52c8
+	S
+X-Gm-Gg: ASbGncsQglVgI3tqZwks22S6eTXOe5KCWPiTOiI6Xyme3CoQiMPTS8FxwrI9fAXzIaS
+	Bq4qxT2esnbWrpYgkiPl8AzxOaW5+uwFrTfH5bxyAhRiqFyE7A0DK+yHTxKNMY3ZzV2eIvNBeX5
+	drPrKMddXzzSlv40dysKvhneNL2Tz0ZR7dxnT7VCHdr99t8dPodZ16K2/+dYGO+MycavxarMwbK
+	KsCQV3XGD0J6ZjPFTahkQ0CLjkxZzYstWJXEsTDHWDOGDnXWCHmDndAV9DJmdSi3dhWH6DGYnPU
+	8H6YzTD/XaW8Fdgw0df4FGKTeA==
+X-Google-Smtp-Source: AGHT+IHmPDT7lummp4HIP/KoVk1LUf7yhzdRFnEabDGyfdw44hXV+escqPFxOsyhmfs5JxEIBNTe+A==
+X-Received: by 2002:a5d:64aa:0:b0:385:dedb:a12f with SMTP id ffacd0b85a97d-38a872fc200mr8365963f8f.6.1736501020360;
+        Fri, 10 Jan 2025 01:23:40 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e4c3428sm3929818f8f.87.2025.01.10.01.23.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jan 2025 01:23:39 -0800 (PST)
+Message-ID: <6e1e0e1c-b8e2-45f7-b4dd-2b651b994b4b@rivosinc.com>
+Date: Fri, 10 Jan 2025 10:23:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,37 +81,78 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 01/13] KVM: s390: wrapper for KVM_BUG
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
-References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
- <20250108181451.74383-2-imbrenda@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v5 0/5] riscv: add SBI SSE extension tests
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Cc: Andrew Jones <ajones@ventanamicro.com>,
+ Anup Patel <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
+References: <20250110085120.2643853-1-cleger@rivosinc.com>
 Content-Language: en-US
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-In-Reply-To: <20250108181451.74383-2-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: xKTqCVcZgNAvKzALPoRwTii1JwIJ3z6o
-X-Proofpoint-ORIG-GUID: xKTqCVcZgNAvKzALPoRwTii1JwIJ3z6o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1011
- spamscore=0 suspectscore=0 impostorscore=0 phishscore=0 priorityscore=1501
- mlxlogscore=630 bulkscore=0 lowpriorityscore=0 malwarescore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501100074
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20250110085120.2643853-1-cleger@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Am 08.01.25 um 19:14 schrieb Claudio Imbrenda:
-> Wrap the call to KVM_BUG; this reduces code duplication and improves
-> readability.
+After testing with a clean build, it seems like asm-offset.h generation
+is broken.
+
+Sorry for that, I'll fix it and sent another version.
+
+Thanks,
+
+Clément
+
+On 10/01/2025 09:51, Clément Léger wrote:
+> This series adds an individual test for SBI SSE extension as well as
+> needed infrastructure for SSE support. It also adds test specific
+> asm-offsets generation to use custom OFFSET and DEFINE from the test
+> directory.
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> ---
+> 
+> V5:
+>  - Update event ranges based on latest spec
+>  - Rename asm-offset-test.c to sbi-asm-offset.c
+> 
+> V4:
+>  - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
+>  - Add proper asm-offset generation for tests
+>  - Move SSE specific file from lib/riscv to riscv/
+> 
+> V3:
+>  - Add -deps variable for test specific dependencies
+>  - Fix formatting errors/typo in sbi.h
+>  - Add missing double trap event
+>  - Alphabetize sbi-sse.c includes
+>  - Fix a6 content after unmasking event
+>  - Add SSE HART_MASK/UNMASK test
+>  - Use mv instead of move
+>  - move sbi_check_sse() definition in sbi.c
+>  - Remove sbi_sse test from unitests.cfg
+> 
+> V2:
+>  - Rebased on origin/master and integrate it into sbi.c tests
+> 
+> Clément Léger (5):
+>   kbuild: allow multiple asm-offsets file to be generated
+>   riscv: use asm-offsets to generate SBI_EXT_HSM values
+>   riscv: Add "-deps" handling for tests
+>   riscv: lib: Add SBI SSE extension definitions
+>   riscv: sbi: Add SSE extension tests
+> 
+>  scripts/asm-offsets.mak |   22 +-
+>  riscv/Makefile          |   10 +-
+>  lib/riscv/asm/csr.h     |    2 +
+>  lib/riscv/asm/sbi.h     |   89 ++++
+>  riscv/sbi-tests.h       |   12 +
+>  riscv/sbi-asm.S         |   96 +++-
+>  riscv/sbi-asm-offsets.c |   19 +
+>  riscv/sbi-sse.c         | 1060 +++++++++++++++++++++++++++++++++++++++
+>  riscv/sbi.c             |    3 +
+>  riscv/.gitignore        |    1 +
+>  10 files changed, 1301 insertions(+), 13 deletions(-)
+>  create mode 100644 riscv/sbi-asm-offsets.c
+>  create mode 100644 riscv/sbi-sse.c
+>  create mode 100644 riscv/.gitignore
+> 
 
 
