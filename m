@@ -1,65 +1,78 @@
-Return-Path: <kvm+bounces-34978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA5AA08633
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 05:29:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F0CCA0863E
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 05:38:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBA071889609
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 04:29:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D234F7A3EEB
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 04:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7774B2063C3;
-	Fri, 10 Jan 2025 04:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5F94AEE0;
+	Fri, 10 Jan 2025 04:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mjm861TN"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="uH4pIbdU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840AF1A9B45;
-	Fri, 10 Jan 2025 04:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CC28F54
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 04:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736483383; cv=none; b=LjjhaF5nas9gllOpGE7UITWVAjy+fRP2kwa0TgnRrywrMaxebR3qzRPFQR3s9YwwRW7LXR+Bed4SvWzWAfuigOdOT6kqv65zVyESYeHPhchfC3dFgzsx2D0FtR6zeVovXJThDulJISam3o+qdr0FAg+QUtx6Be+06oY2njkEBQ0=
+	t=1736483896; cv=none; b=Q88JGOq6T+ngo6EI/IOqULz15+rHmSXeUZhjwHXMtqMYitX8c99MeihkxRCG3xZG1S7Cn8Ssp27JAeofhbR+dUlAX8SFgM7z242muiyIXn84ZHCkrJD4hvTzruitrP+E0H7XL2av1aE043A5zoldQ6ehKwhQtzX2vcwbFxxTviA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736483383; c=relaxed/simple;
-	bh=SIuYMTW48WTruujhi1P5AUTgszgLUCxLVgalWNwe4b8=;
+	s=arc-20240116; t=1736483896; c=relaxed/simple;
+	bh=NQABrOdJjxGKaiqAIDo3XL0V9WgsqmrsrgDnSsJEpZA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CZgC6HkepDWAKo7JpD35i2GPYcIZ0Iagz+uTC8iiI9CKDtFc7NmTVWhCl+q7eUtIDqq3KOso9XPABhSpAp5VWNVxT6/UYBhvxjBK0h6YrOnS4exNkgAOXagpdkCGfhVcmsY7HtfrG7bZtPq8rCNKK4PsLgaGMZyKmWj2bu6xfCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mjm861TN; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736483381; x=1768019381;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=SIuYMTW48WTruujhi1P5AUTgszgLUCxLVgalWNwe4b8=;
-  b=Mjm861TNiXv5tXYOG5L1GJitrQ2rSPKf1dkCawNHPsORkMU9AuvZvX9c
-   WxvhzigM4uBPj7BzZ8D74yP7R873BsDdjHadf6yV6+rYdZTybZej3uj2n
-   IT2q8AnXz7mXRLntFCqb3fpCgxzN2ELzqJgKB26RoGDI0sQ9JqOgbcsa9
-   n+e7MytC30dkBhoJ8GP04vt3hFMpp1smJV0Cb6rnqyqFvn+lhhPM9Jn7u
-   f6By/JiRh2BJ10bra1Z/1CYSwtqqGvNbrNlw/aw8c0BbsH/sf5l7UTzhq
-   uHQ41bewrqjfKIgwyNrtE3RaP5KyrDLh00Npv1nXHWzf+io7nN1CLGEJ9
-   g==;
-X-CSE-ConnectionGUID: 85m69UdfQNOUsb0A50Gcyg==
-X-CSE-MsgGUID: 6CHsTXLVSmua8d2WqOdEEA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="59244243"
-X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
-   d="scan'208";a="59244243"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 20:29:41 -0800
-X-CSE-ConnectionGUID: iUNCCqQeTfuvyd5CdvbqUw==
-X-CSE-MsgGUID: 45NzMe3xS8CIpUw6IQBg0g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
-   d="scan'208";a="134456536"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 20:29:38 -0800
-Message-ID: <7574968a-f0e2-49d5-b740-2454a0f70bb6@intel.com>
-Date: Fri, 10 Jan 2025 12:29:32 +0800
+	 In-Reply-To:Content-Type; b=S52NulArNl01FD3AHv7bvvBLbrOWjSr32XBoYC1ePWrCbKz4wIF6Ww1tgU5uphAifAox4U0k7N9i4qifez9Q8y/6iqZXdQlGfpmXbHLPkdFFlkZ5/YzT4ayPamoua7XKLc6uriS70DbzEut0EYqXdvzh0qwM7xCA6hM+VPvBgks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=uH4pIbdU; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-216634dd574so18258025ad.2
+        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 20:38:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736483893; x=1737088693; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2VRHR34mrz0IlpIAFdzRMCZZmZsA3d1rUTcqvnksKWQ=;
+        b=uH4pIbdUHeoZaQWiz2CcH8v1Yi2mgcrs14D7QdDm+GLCUrpakmP2nl2ESc4D2IBfEh
+         QFVqvv+bnLZJqj68Cp6A/msW1oI1IOfVJQjUjPmqu/xTtc04qUHVrgCy6NnNgW72jKXC
+         n2b0SJ5hzGAGcDXbF7yJwokmefpqJawAC8h4O/3VBrGe5Wo9pfiTB+45puy5488K32/C
+         2ZJg90bY/pCJ2izf1eeokL4B7MkXv3A/Hi7C+y0gGmb9rcAy+d4w9tUH5jNTYLdfkjZn
+         64cpVr79FP0e1jnclELLHEFPn+vRM2aQXq92XaEQVFr4B5u/EpEILxoBU5262OuZnRpV
+         gxfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736483893; x=1737088693;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2VRHR34mrz0IlpIAFdzRMCZZmZsA3d1rUTcqvnksKWQ=;
+        b=Z2iT1ZrqUr4Ay9l/gcpysd0QqYq43A7L1SY7jrDVjaFOp1CVGCb3HE0PnWBAWyFBlC
+         c33CRaJ3OeX4vp6eHiyoWQLymQtLx+wPfVmOQzo8rCpgzHD2WtUvPOzC73+rzQLUmDLO
+         h42gf4WB2QFd3hJ3p9eeus2KvrlModGP933Ij0HSPaCgRf+Cv/otMXMZO1EzsfLxqK6W
+         +RD1bInEMsTP1N1BbgigHt0iYi4ui9m+Y5IzbvE6fuwd0lAYrVpKphfdhdtSpnTWBadD
+         TN0lwNPX7ymIwEZCKUudBMoUC3NmGfU7N5al3CbcrBFM0I0wX5nHbT3aLrr06xzqOdXf
+         Gr+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW7Amy3zRxtyUM+U6pxIU7vXrBKQ/Bui79BTk3N0L3e8aGXPOA6U74v93MJgfDwfW6XTg0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7372hXq/pE2SJZEp+k/dwH7smxx6TpCUckfDYr/PxLe/ion3+
+	ZFLH3UDCsyNk5jS1ddKnGeC5Z8+CLOG9EFIMbHJo2aBSKB+ZvvaHyNX5FHvp7u4=
+X-Gm-Gg: ASbGnctkl23nFjIb4Hn8LEivqBrDbSXpFcVHDH1FylSGyArz/+o3AlgfJ86fog8nWM5
+	10ASOcjjXX31VJ5jjmvW+7qiL+b/v514RoQrzJza69bZQo3lTHAZ4o5keCs3NA6hmXIgWRU54Pl
+	4Fb8BW8swlfyqVbcA5bywxA7Cuj8Qfjs2CuIkcooq5LryuDyl9XpMRfvvWfHFwE5hHFfOR2G/I9
+	cTxIY9YAvMMZubHHfrC3nJAxeA2esaxRexPKDR59oQYyF0gK8eG3eF6Tegm4PAx6zs=
+X-Google-Smtp-Source: AGHT+IGIzSe99ixGVZWcgiRWGgX+k+OXNMhmSVlKwOwyHf8ERTDIVn5bxtWt8REsRDYstEUOtvnfEg==
+X-Received: by 2002:a17:902:ce8d:b0:216:282d:c697 with SMTP id d9443c01a7336-21a83f62877mr120429985ad.27.1736483893141;
+        Thu, 09 Jan 2025 20:38:13 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f26d996sm5709995ad.257.2025.01.09.20.38.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2025 20:38:12 -0800 (PST)
+Message-ID: <5e193a94-8f5a-4a2a-b4c4-3206c21c0b63@daynix.com>
+Date: Fri, 10 Jan 2025 13:38:06 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,115 +80,78 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 24/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
-To: Francesco Lavra <francescolavra.fl@gmail.com>, rick.p.edgecombe@intel.com
-Cc: isaku.yamahata@gmail.com, kai.huang@intel.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, pbonzini@redhat.com,
- reinette.chatre@intel.com, seanjc@google.com, tony.lindgren@linux.intel.com,
- yan.y.zhao@intel.com
-References: <dcb03fc9d73b09734dee4110363cace369fc4d4c.camel@gmail.com>
+Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
+ <20250109-tun-v2-2-388d7d5a287a@daynix.com>
+ <20250109023056-mutt-send-email-mst@kernel.org>
+ <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
+ <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <dcb03fc9d73b09734dee4110363cace369fc4d4c.camel@gmail.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/9/2025 7:07 PM, Francesco Lavra wrote:
-> On 2024-10-30 at 19:00, Rick Edgecombe wrote:
->> @@ -1055,6 +1144,81 @@ static int tdx_td_vcpu_init(struct kvm_vcpu
->> *vcpu, u64 vcpu_rcx)
->>   	return ret;
->>   }
->>   
->> +/* Sometimes reads multipple subleafs. Return how many enties were
->> written. */
->> +static int tdx_vcpu_get_cpuid_leaf(struct kvm_vcpu *vcpu, u32 leaf,
->> int max_cnt,
->> +				   struct kvm_cpuid_entry2
->> *output_e)
->> +{
->> +	int i;
->> +
->> +	if (!max_cnt)
->> +		return 0;
->> +
->> +	/* First try without a subleaf */
->> +	if (!tdx_read_cpuid(vcpu, leaf, 0, false, output_e))
->> +		return 1;
->> +
->> +	/*
->> +	 * If the try without a subleaf failed, try reading subleafs
->> until
->> +	 * failure. The TDX module only supports 6 bits of subleaf
->> index.
+On 2025/01/09 21:46, Willem de Bruijn wrote:
+> Akihiko Odaki wrote:
+>> On 2025/01/09 16:31, Michael S. Tsirkin wrote:
+>>> On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
+>>>> tun used to simply advance iov_iter when it needs to pad virtio header,
+>>>> which leaves the garbage in the buffer as is. This is especially
+>>>> problematic when tun starts to allow enabling the hash reporting
+>>>> feature; even if the feature is enabled, the packet may lack a hash
+>>>> value and may contain a hole in the virtio header because the packet
+>>>> arrived before the feature gets enabled or does not contain the
+>>>> header fields to be hashed. If the hole is not filled with zero, it is
+>>>> impossible to tell if the packet lacks a hash value.
 > 
-> It actually supports 7 bits, i.e. bits 6:0, so the limit below should
-> be 0b1111111.
+> Zero is a valid hash value, so cannot be used as an indication that
+> hashing is inactive.
 
-Nice catch!
+Zeroing will initialize the hash_report field to 
+VIRTIO_NET_HASH_REPORT_NONE, which tells it does not have a hash value.
 
->> +	 */
->> +	for (i = 0; i < 0b111111; i++) {
->> +		if (i > max_cnt)
->> +			goto out;
 > 
-> This will make this function return (max_cnt + 1) instead of max_cnt.
-> I think the code would be simpler if max_cnt was initialized to
-> min(max_cnt, 0x80) (because 0x7f is a supported subleaf index, as far
-> as I can tell), and the for() condition was changed to `i < max_cnt`.
-
-Looks better.
-
->> +		/* Keep reading subleafs until there is a failure.
->> */
->> +		if (tdx_read_cpuid(vcpu, leaf, i, true, output_e))
->> +			return i;
->> +
->> +		output_e++;
-
-here the output_e++ can overflow the buffer.
-
->> +	}
->> +
->> +out:
->> +	return i;
->> +}
->> +
->> +static int tdx_vcpu_get_cpuid(struct kvm_vcpu *vcpu, struct
->> kvm_tdx_cmd *cmd)
->> +{
->> +	struct kvm_cpuid2 __user *output, *td_cpuid;
->> +	struct kvm_cpuid_entry2 *output_e;
->> +	int r = 0, i = 0, leaf;
->> +
->> +	output = u64_to_user_ptr(cmd->data);
->> +	td_cpuid = kzalloc(sizeof(*td_cpuid) +
->> +			sizeof(output->entries[0]) *
->> KVM_MAX_CPUID_ENTRIES,
->> +			GFP_KERNEL);
->> +	if (!td_cpuid)
->> +		return -ENOMEM;
->> +
->> +	for (leaf = 0; leaf <= 0x1f; leaf++) {
->> +		output_e = &td_cpuid->entries[i];
->> +		i += tdx_vcpu_get_cpuid_leaf(vcpu, leaf,
->> +					     KVM_MAX_CPUID_ENTRIES -
->> i - 1,
+>>>> In theory, a user of tun can fill the buffer with zero before calling
+>>>> read() to avoid such a problem, but leaving the garbage in the buffer is
+>>>> awkward anyway so fill the buffer in tun.
+>>>>
+>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>
+>>> But if the user did it, you have just overwritten his value,
+>>> did you not?
+>>
+>> Yes. but that means the user expects some part of buffer is not filled
+>> after read() or recvmsg(). I'm a bit worried that not filling the buffer
+>> may break assumptions others (especially the filesystem and socket
+>> infrastructures in the kernel) may have.
 > 
-> This should be KVM_MAX_CPUID_ENTRIES - i.
+> If this is user memory that is ignored by the kernel, just reflected
+> back, then there is no need in general to zero it. There are many such
+> instances, also in msg_control.
 
-Nice catch!
+More specifically, is there any instance of recvmsg() implementation 
+which returns N and does not fill the complete N bytes of msg_iter?
 
->> +					     output_e);
->> +	}
->> +
->> +	for (leaf = 0x80000000; leaf <= 0x80000008; leaf++) {
->> +		output_e = &td_cpuid->entries[i];
->> +		i += tdx_vcpu_get_cpuid_leaf(vcpu, leaf,
->> +					     KVM_MAX_CPUID_ENTRIES -
->> i - 1,
 > 
-> Same here.
-> 
+> If not zeroing leads to ambiguity with the new feature, that would be
+> a reason to add it -- it is always safe to do so.
+>   
+>> If we are really confident that it will not cause problems, this
+>> behavior can be opt-in based on a flag or we can just write some
+>> documentation warning userspace programmers to initialize the buffer.
 
 
