@@ -1,220 +1,170 @@
-Return-Path: <kvm+bounces-35061-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35058-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 665A8A09662
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 16:49:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1E90A0964B
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 16:47:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6381516A90E
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 15:49:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 227DC3A672E
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 15:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A76211715;
-	Fri, 10 Jan 2025 15:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE316211A16;
+	Fri, 10 Jan 2025 15:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cm/OBxSN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nXkOUhBM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFDB2116E7;
-	Fri, 10 Jan 2025 15:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1EE42063E3;
+	Fri, 10 Jan 2025 15:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736524164; cv=none; b=NXv03/EkTYUZGV9zpk8Au5esu3wqfSe6rXVBzQGuj1EFs4NwxZvxrsG4fN63LMZOWbQ44NKs6eJ9WhhjpHDcDdFzIYMiujcfjb8pYu29IkdQZGtpq1/EIuecWEwQXrxNnwcKkCHbRuk5ieOaJx/7x1kvAMyWa2yHYcE2sPXq2K8=
+	t=1736524033; cv=none; b=t7xGu0aq2asQAXtL18A91NpE2Ehnvau18INLDPK1q25EgnnTgzmCTS+tQ4ra3uYEKgLx1Te8+kdNY+e0w7ZWHDomceZoA5Eb07LrLPA57GIRc9wJA+Ga6VJWdPdtSIk6NjqiOcPh/gpJnkNCNX1nhJ55eUeo9qInk1byKrUtZqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736524164; c=relaxed/simple;
-	bh=6AesAjsPQe+Q6dZmCB7IAZ/dCQeMTOZDKZNyQY1XkyM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=e0z6xZdmjjQNeq7dxzlpXwoiRpryFLDdCS9n7BlIuNm6KZadutU3J07HqXoaFlYUpGB6iFEdCwtAcCpqeEodFOmxqiFNG+glEIAVq++mOBl3tKWroiG+C/8laendE2ykjB+ANLWvaTXfCnTSsdl2mrVLkH315wtw7za0pyfBun0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cm/OBxSN; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50A3rpiF029127;
-	Fri, 10 Jan 2025 15:49:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=PXGEBz
-	0M8UPoIymcBxudeB1arG/6HDODYwhhEf3NTKc=; b=cm/OBxSNWoDwLZAE5rh7C1
-	Ziu/icum5xE1ADpICtJc5sKoff2q5Oy9IcV7pXpfrFYnRwl/2psgCP0hoyRzL6Nk
-	0q5JhmyLEmqj64GPx6MkJPEFfabz4oydN17e6Nt2ZUgi2oSFxQc15BVQIFlHA92V
-	0FVJd5N0P8ZLJoHk/51cQNBDYC2ph3tqKpdCSfQVDsXdvC99nx7qmK0CH1BDVsQr
-	UVT7hCgL+AgtYSqN+ukfpjRjv17/5NKqeGsnsqq88S6sg9/eEz2XgSYd6ppt4B/H
-	D/bUZjBiPyz4CCzY5gHTHJplhsdOHSZc+JiTvrNDpj5GTidAdYoyQ84x/pyhkDNQ
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 442v1q2t1x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 15:49:13 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50ADv2n6013698;
-	Fri, 10 Jan 2025 15:49:12 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43ygapawa6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 15:49:11 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50AFn86N46334424
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Jan 2025 15:49:08 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EED1B2004B;
-	Fri, 10 Jan 2025 15:49:07 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C889A20040;
-	Fri, 10 Jan 2025 15:49:07 +0000 (GMT)
-Received: from darkmoore (unknown [9.179.31.54])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 10 Jan 2025 15:49:07 +0000 (GMT)
+	s=arc-20240116; t=1736524033; c=relaxed/simple;
+	bh=YWN9WWmaVJy6ANwDwQC3AtUSHAXq+7OebIiASUtISLQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iceWxbGGj+Dm+8KILupQG+zx+vEhhoyTIf8JMzeFrKcOVnHPftwtkNOszJiCYaRRO+YiRu4MqcqqL9ZMtwxv9VOnu5ydmOwSNYfG+xhP09M28GQgqqWyZX5FmzqjGy4cejTTIChHwlBR3nrYjiqnFwmla2n58w+nevagFSLZ7oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nXkOUhBM; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1736524031; x=1768060031;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vieCYRbHQr8ti5sbtbp4BprSH2wVytUDu3n2fMb58+U=;
+  b=nXkOUhBMpp7htraXHBSQZcj0WVMZb4MtfpgQBM28Qyzez94rYBbxcJfG
+   m0FdqvZEEt/0STfO/g4GmTaIRRmxp8m/ZC9rsVcxosGhqTDhGnaymCa8S
+   dWJ7obKutASrlAM62Vx+BeNPDXi6hVWC6ao7aYrZD5ZS8Yl9ISKA5K+2J
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.12,303,1728950400"; 
+   d="scan'208";a="709972795"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 15:47:07 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:8609]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.17:2525] with esmtp (Farcaster)
+ id bb1cc44d-cda3-4cca-9ac4-269129b53c73; Fri, 10 Jan 2025 15:47:06 +0000 (UTC)
+X-Farcaster-Flow-ID: bb1cc44d-cda3-4cca-9ac4-269129b53c73
+Received: from EX19D020UWA004.ant.amazon.com (10.13.138.231) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 10 Jan 2025 15:47:02 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
+ EX19D020UWA004.ant.amazon.com (10.13.138.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 10 Jan 2025 15:47:01 +0000
+Received: from email-imr-corp-prod-iad-all-1b-1323ce6b.us-east-1.amazon.com
+ (10.25.36.210) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.39 via Frontend Transport; Fri, 10 Jan 2025 15:47:01 +0000
+Received: from dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com (dev-dsk-kalyazin-1a-a12e27e2.eu-west-1.amazon.com [172.19.103.116])
+	by email-imr-corp-prod-iad-all-1b-1323ce6b.us-east-1.amazon.com (Postfix) with ESMTPS id CCC1F405B0;
+	Fri, 10 Jan 2025 15:46:59 +0000 (UTC)
+From: Nikita Kalyazin <kalyazin@amazon.com>
+To: <willy@infradead.org>, <pbonzini@redhat.com>,
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC: <michael.day@amd.com>, <david@redhat.com>, <jthoughton@google.com>,
+	<michael.roth@amd.com>, <ackerleytng@google.com>, <graf@amazon.de>,
+	<jgowans@amazon.com>, <roypat@amazon.co.uk>, <derekmn@amazon.com>,
+	<nsaenz@amazon.es>, <xmarcalx@amazon.com>, <kalyazin@amazon.com>
+Subject: [RFC PATCH 0/2] mm: filemap: add filemap_grab_folios
+Date: Fri, 10 Jan 2025 15:46:57 +0000
+Message-ID: <20250110154659.95464-1-kalyazin@amazon.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 10 Jan 2025 16:40:04 +0100
-Message-Id: <D6YI8R3EGSM1.3NVP352YOB8KQ@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-s390@vger.kernel.org>, <frankja@linux.ibm.com>,
-        <borntraeger@de.ibm.com>, <david@redhat.com>, <willy@infradead.org>,
-        <hca@linux.ibm.com>, <svens@linux.ibm.com>, <agordeev@linux.ibm.com>,
-        <gor@linux.ibm.com>, <nrb@linux.ibm.com>, <nsg@linux.ibm.com>
-To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v1 02/13] KVM: s390: fake memslots for ucontrol VMs
-X-Mailer: aerc 0.18.2
-References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
- <20250108181451.74383-3-imbrenda@linux.ibm.com>
-In-Reply-To: <20250108181451.74383-3-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 1sYvkqy9m-nvFKgqEyAHodscTxf5tp-S
-X-Proofpoint-ORIG-GUID: 1sYvkqy9m-nvFKgqEyAHodscTxf5tp-S
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- priorityscore=1501 spamscore=0 impostorscore=0 adultscore=0 suspectscore=0
- lowpriorityscore=0 clxscore=1015 mlxscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501100122
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Wed Jan 8, 2025 at 7:14 PM CET, Claudio Imbrenda wrote:
-> Create fake memslots for ucontrol VMs. The fake memslots identity-map
-> userspace.
->
-> Now memslots will always be present, and ucontrol is not a special case
-> anymore.
->
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  arch/s390/kvm/kvm-s390.c | 42 ++++++++++++++++++++++++++++++++++++----
->  1 file changed, 38 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index ecbdd7d41230..797b8503c162 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -59,6 +59,7 @@
->  #define LOCAL_IRQS 32
->  #define VCPU_IRQS_MAX_BUF (sizeof(struct kvm_s390_irq) * \
->  			   (KVM_MAX_VCPUS + LOCAL_IRQS))
-> +#define UCONTROL_SLOT_SIZE SZ_4T
-> =20
->  const struct _kvm_stats_desc kvm_vm_stats_desc[] =3D {
->  	KVM_GENERIC_VM_STATS(),
-> @@ -3326,6 +3327,23 @@ void kvm_arch_free_vm(struct kvm *kvm)
->  	__kvm_arch_free_vm(kvm);
->  }
-> =20
-> +static void kvm_s390_ucontrol_ensure_memslot(struct kvm *kvm, unsigned l=
-ong addr)
-> +{
-> +	struct kvm_userspace_memory_region2 region =3D {
-> +		.slot =3D addr / UCONTROL_SLOT_SIZE,
-> +		.memory_size =3D UCONTROL_SLOT_SIZE,
-> +		.guest_phys_addr =3D ALIGN_DOWN(addr, UCONTROL_SLOT_SIZE),
-> +		.userspace_addr =3D ALIGN_DOWN(addr, UCONTROL_SLOT_SIZE),
-> +	};
-> +	struct kvm_memory_slot *slot;
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +	slot =3D gfn_to_memslot(kvm, addr);
-> +	if (!slot)
-> +		__kvm_set_memory_region(kvm, &region);
+Based on David's suggestion for speeding up guest_memfd memory
+population [1] made at the guest_memfd upstream call on 5 Dec 2024 [2],
+this adds `filemap_grab_folios` that grabs multiple folios at a time.
 
-This will call into kvm_arch_commit_memory_region() where
-kvm->arch.gmap will still be NULL!
+Motivation
 
-> +	mutex_unlock(&kvm->slots_lock);
-> +}
-> +
->  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  {
->  	gfp_t alloc_flags =3D GFP_KERNEL_ACCOUNT;
-> @@ -3430,6 +3448,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
- type)
->  	if (type & KVM_VM_S390_UCONTROL) {
->  		kvm->arch.gmap =3D NULL;
->  		kvm->arch.mem_limit =3D KVM_S390_NO_MEM_LIMIT;
-> +		/* pre-initialize a bunch of memslots; the amount is arbitrary */
-> +		for (i =3D 0; i < 32; i++)
-> +			kvm_s390_ucontrol_ensure_memslot(kvm, i * UCONTROL_SLOT_SIZE);
->  	} else {
->  		if (sclp.hamax =3D=3D U64_MAX)
->  			kvm->arch.mem_limit =3D TASK_SIZE_MAX;
-> @@ -5704,6 +5725,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  #ifdef CONFIG_KVM_S390_UCONTROL
->  	case KVM_S390_UCAS_MAP: {
->  		struct kvm_s390_ucas_mapping ucasmap;
-> +		unsigned long a;
-> =20
->  		if (copy_from_user(&ucasmap, argp, sizeof(ucasmap))) {
->  			r =3D -EFAULT;
-> @@ -5715,6 +5737,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  			break;
->  		}
-> =20
-> +		a =3D ALIGN_DOWN(ucasmap.user_addr, UCONTROL_SLOT_SIZE);
-> +		while (a < ucasmap.user_addr + ucasmap.length) {
-> +			kvm_s390_ucontrol_ensure_memslot(vcpu->kvm, a);
-> +			a +=3D UCONTROL_SLOT_SIZE;
-> +		}
->  		r =3D gmap_map_segment(vcpu->arch.gmap, ucasmap.user_addr,
->  				     ucasmap.vcpu_addr, ucasmap.length);
->  		break;
-> @@ -5852,10 +5879,18 @@ int kvm_arch_prepare_memory_region(struct kvm *kv=
-m,
->  				   struct kvm_memory_slot *new,
->  				   enum kvm_mr_change change)
->  {
-> -	gpa_t size;
-> +	gpa_t size =3D new->npages * PAGE_SIZE;
-> =20
-> -	if (kvm_is_ucontrol(kvm))
-> -		return -EINVAL;
-> +	if (kvm_is_ucontrol(kvm)) {
-> +		if (change !=3D KVM_MR_CREATE || new->flags)
-> +			return -EINVAL;
-> +		if (new->userspace_addr !=3D new->base_gfn * PAGE_SIZE)
-> +			return -EINVAL;
-> +		if (!IS_ALIGNED(new->userspace_addr | size, UCONTROL_SLOT_SIZE))
-> +			return -EINVAL;
-> +		if (new->id !=3D new->userspace_addr / UCONTROL_SLOT_SIZE)
-> +			return -EINVAL;
-> +	}
-> =20
->  	/* When we are protected, we should not change the memory slots */
->  	if (kvm_s390_pv_get_handle(kvm))
-> @@ -5872,7 +5907,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  		if (new->userspace_addr & 0xffffful)
->  			return -EINVAL;
-> =20
-> -		size =3D new->npages * PAGE_SIZE;
->  		if (size & 0xffffful)
->  			return -EINVAL;
-> =20
+When profiling guest_memfd population and comparing the results with
+population of anonymous memory via UFFDIO_COPY, I observed that the
+former was up to 20% slower, mainly due to adding newly allocated pages
+to the pagecache.  As far as I can see, the two main contributors to it
+are pagecache locking and tree traversals needed for every folio.  The
+RFC attempts to partially mitigate those by adding multiple folios at a
+time to the pagecache.
+
+Testing
+
+With the change applied, I was able to observe a 10.3% (708 to 635 ms)
+speedup in a selftest that populated 3GiB guest_memfd and a 9.5% (990 to
+904 ms) speedup when restoring a 3GiB guest_memfd VM snapshot using a
+custom Firecracker version, both on Intel Ice Lake.
+
+Limitations
+
+While `filemap_grab_folios` handles THP/large folios internally and
+deals with reclaim artifacts in the pagecache (shadows), for simplicity
+reasons, the RFC does not support those as it demonstrates the
+optimisation applied to guest_memfd, which only uses small folios and
+does not support reclaim at the moment.
+
+Implementation
+
+I am aware of existing filemap APIs operating on folio batches, however
+I was not able to find one for the use case in question.  I was also
+thinking about making use of the `folio_batch` struct, but was not able
+to convince myself that it was useful.  Instead, a plain array of folio
+pointers is allocated on stack and passed down the callchain.  A bitmap
+is used to keep track of indexes whose folios were already present in
+the pagecache to prevent allocations.  This does not look very clean to
+me and I am more than open to hearing about better approaches.
+
+Not being an expert in xarray, I do not know an idiomatic way to advance
+the index if `xas_next` is called directly after instantiation of the
+state that was never walked, so I used a call to `xas_set`.
+
+While the series focuses on optimising _adding_ folios to the pagecache,
+I was also experimenting with batching of pagecache _querying_.
+Specifically, I tried to make use of `filemap_get_folios` instead of
+`filemap_get_entry`, but I could not observe any visible speedup.
+
+The series is applied on top of [1] as the 1st patch implements
+`filemap_grab_folios`, while the 2nd patch makes use of it in the
+guest_memfd's write syscall as a first user.
+
+Questions:
+ - Does the approach look reasonable in general?
+ - Can the API be kept specialised to the non-reclaim-supported case or
+   does it need to be generic?
+ - Would it be sensible to add a specialised small-folio-only version of
+   `filemap_grab_folios` at the beginning and extend it to large folios
+later on?
+ - Are there better ways to implement batching or even achieve the
+   optimisaton goal in another way?
+
+[1]: https://lore.kernel.org/kvm/20241129123929.64790-1-kalyazin@amazon.com/T/
+[2]: https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?tab=t.0
+
+Thanks
+Nikita
+
+Nikita Kalyazin (2):
+  mm: filemap: add filemap_grab_folios
+  KVM: guest_memfd: use filemap_grab_folios in write
+
+ include/linux/pagemap.h |  31 +++++
+ mm/filemap.c            | 263 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/guest_memfd.c  | 176 ++++++++++++++++++++++-----
+ 3 files changed, 437 insertions(+), 33 deletions(-)
+
+
+base-commit: 643cff38ebe84c39fbd5a0fc3ab053cd941b9f94
+-- 
+2.40.1
 
 
