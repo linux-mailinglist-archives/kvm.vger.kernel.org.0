@@ -1,1434 +1,167 @@
-Return-Path: <kvm+bounces-35036-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D32AA08EF1
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 12:13:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A26BFA08F2E
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 12:26:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CB0D3A1C01
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 11:13:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 329DF3A576C
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 11:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98B420B7F9;
-	Fri, 10 Jan 2025 11:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E5E20D4EA;
+	Fri, 10 Jan 2025 11:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="CnQtyiB2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NffOMgCO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95C720C00F
-	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 11:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF9820B215
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 11:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736507590; cv=none; b=fccrTGB37kh71HAHTNpKqppMx8SYVPtE/q+gA+zE9vYDsFPVkwyjS/PknJnzIf0rIDw9vCdJI09ikrX3V/RXPCY3kFBgnH7cjk1Yug/HjEkGZKg6WzaK1H0CqO0k3jbhtW7ttil095MvOBQcqq222hgW3ZTTkri+gyKDWMDmQ5o=
+	t=1736508322; cv=none; b=e9aWEA7k9ofGIveZJeBp6wEfc9aOG/4dtXeRTBlVjFo2jquH8abgkwZrxjcpdhjG4YhiAyT19kIoSAnLe6qhbzf8TUSNI2uDskbJg+xv6MLdO3RGFcNB+/iOGQd9s9yRO48NdN1SxwchtGmVxIPL28TSMRRRGYV1Mu59/UVJ2c8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736507590; c=relaxed/simple;
-	bh=0D/gxKcHKscX/hM+JfaP4ulJ9g9mSurvPr/Sp+TxT7Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aRdAGV604vRcExgikQyyxcm8UleV6A5my5F3SppqbzV5+jYV2DnOkpp2WA8XA1Fca2MOPKY9qLwXZvclbmsEXIqYQFGqWd2Vgzt1P2/tqH4Z2TSh9uaqckMEdBDq7tgND0JqD85MpHqWaF89IdXA9kKcmSXYrxwEqqXq7bOaP04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=CnQtyiB2; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-436326dcb1cso14171335e9.0
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 03:13:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736507585; x=1737112385; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ed18/q88vMVVLoSoA/tI8Ps9LOXRrSidxOODkJW4eaE=;
-        b=CnQtyiB23Tb1BUAbdT6tDHIltiZtoVmxV1/6wOJYlRRXXXSk0KOyZAbk8Le21AVmLg
-         wjbM0reYdWQ219DnZ13Z4NNC7Ii+I8mGUo6SvmnTefCl9nOLm4Ha7ookOJB1m1U4jleX
-         cWz5cvS4i8DRyfzwcEilYgwHnbaCkaZZ3cbcE1wXEzzgNFionltDj0jeZcXqqm49QAFD
-         RPHKyMa61ilpozEkfjYdoVNiRdWIsKuBV/HL0D4GPhBPaReZyERfnJt7GQUqm0xsgvTZ
-         1qCbaZe+QMTgPkHK5I7m80Wh7W/FpURweH3Zeb2l5ZYjmUEeHYE4G5NYZpGRm1mDevIe
-         bvhQ==
+	s=arc-20240116; t=1736508322; c=relaxed/simple;
+	bh=h+3V8Dg/wI18YbTuYBPBYgVfFTOtZGjB+ocTQMzeqlo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jcI4UtRbdg4t9Glucbpo0MOCnY0FEq6Eev0qH/QV/BWrNz/oZFjcNXH/tJ4SXIlzD/CS3+7GMz/Ia+SKH0NCDiF29TP1hpsQWxXoBMwncPJOOsN8lSyLiBeK0OG5HlX+G5KGQsl33Sj1dY2PFZrEKhuneSY+hCH2fuhtCDNu4dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NffOMgCO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736508320;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4Ef2wLHVQGV1IsoMPeKXi5uZyvCqMew4uoHW3wntJAQ=;
+	b=NffOMgCOAshceS8GokIk/LdN4Ak1N4IygtCeQDEfNXR8+qKbwrYfvNzrEemycOXSzZtf4J
+	WPYi6KlkBD7E0RkDHPFWPNxqB3F4sB15gN/cNtYqJcJrCRJ9sH3+u1FMEkWapm4byuEMJ2
+	MBkzEPmS1ydFf6nQRMXtldRz+RowVy8=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-207-9F5cgMCTNwKpFQ8s45jV5g-1; Fri, 10 Jan 2025 06:25:18 -0500
+X-MC-Unique: 9F5cgMCTNwKpFQ8s45jV5g-1
+X-Mimecast-MFC-AGG-ID: 9F5cgMCTNwKpFQ8s45jV5g
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-aa66bc3b46dso150360066b.3
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 03:25:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736507585; x=1737112385;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ed18/q88vMVVLoSoA/tI8Ps9LOXRrSidxOODkJW4eaE=;
-        b=uTKOFSjiv0pZQEGQbroJwqjSh0WzMUFzkXe0nM+sCBW5AIKF4N8TeNDsLF1lS3mAzX
-         vgaoubxPF6op6sSE6/+gAmRxBYov13uc/4LGeWD9x2zojDwSPL0UITLXwshL4GtZ1X+m
-         Q1g2C2f9ND7odp4ogLRi9Q7ktmoqp4P3fS8uDErPg86m1euaSmofP7m8/Tek5MqPUwuU
-         zicdmzfavvUSpavFqz9NqUdoqPsc5eXQ3qe1F6KKXW1yCyX2ABZ76VnpgAflQWChSnhK
-         m/b9pqU9CYt8I0d2LDc/phe6zP9ccc8ivMYEPSDZC0s2l1zsrlwTK6xHlF0AUmtv4x55
-         uE3w==
-X-Gm-Message-State: AOJu0Yw5rLD0odzmL0TfCu5fbgwo+bc+iQmEIw3Q5QNmA1fCI02tybYl
-	RfQYIQpYQ4aKsgNBRTjBLSUXsAmjnh2vamam64O/JhKZ2VtojDUYVvwSCLoSNGlkvmgcNi/LCn/
-	w
-X-Gm-Gg: ASbGncsZlLNgWreqO7zyR2AHHtd8HBQNWFYA78vOI9nLQ0+3BIm+Df7om7GWQsKjwRB
-	A044yBkDlKa225bbTm5ggfpDknxW4J7uM1yx9c863HTjk6BAx5kSm2MIvpE3U0AnEG8bII9t6EB
-	HkPX9bAfc1j6klDkTdeNzO53+lK+gu0119/G4rJMRDpSVwMD0Z5/8qZedeHffgdx+eku8iO6c3L
-	eKLd7Mwr20NH20wCFDoJZstZcS+xb5icvcaeOC29UfLVTO2H8/7UxYvag==
-X-Google-Smtp-Source: AGHT+IE8zCsG9AFsP0SDpmpGlBMMRyR7X4id8phUkUYhMV9xBhyQnXiDB0Cj6443RVSQkBcwgDUCKA==
-X-Received: by 2002:a05:600c:4ecd:b0:434:f335:83b with SMTP id 5b1f17b1804b1-436e269723emr101017865e9.5.1736507584539;
-        Fri, 10 Jan 2025 03:13:04 -0800 (PST)
-Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38c1d6sm4344459f8f.50.2025.01.10.03.13.03
+        d=1e100.net; s=20230601; t=1736508318; x=1737113118;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4Ef2wLHVQGV1IsoMPeKXi5uZyvCqMew4uoHW3wntJAQ=;
+        b=caxwpqyRJ2w3bQlu5lAOG+lj5x/655mUuOA820TbwFSEW3zb7evZSEVHVfHXPRMo98
+         Z1cU09cFmCFqdoVTKk0x7RaH383Di3eZOKEXkGTp2ccIc2Vyfu2QW9VRHt1idomLr60d
+         CV9XhZh8HEQ/Ygl941L9gXvxgq4zpd3dhvvisWkfA/QBj1l/SF4KCVcgqkBoVuxY7B28
+         rmJvP8LKN4qhF609o0ul7Q5QNxxt4gZdIzdYAlUU1p2QvoP3pItSYbQm4EX+lXOTx+f8
+         lXaVkhQ2MQr5FyQ1YviFHVD3Mjrv1fXpEth4hS2PSr1ryw7lpwzSr+VQGBweHfyec78f
+         wA5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWRzO3tC+ao+vNuPq31FxGSoZupIaum/CgTRfGCyo1p30r02h/GN4Uo8mdXRQ1Y2iyvNyQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFD9funrFOJpgkDQ3BWcitUczDJU+GO/NM6GtQ4GHa1nDgSZlu
+	3A8jgR86V5s/jPnO8b6nzMkHnBymOUgnfcMa8V9pRyo4hnoNgiZtiAf1NKyCOqe6JNteXJE3fQb
+	WX8UhzdU+f3jCZa9edBhIpBqqYNLVmPxvbCv4FMWuuTRq99xHeg==
+X-Gm-Gg: ASbGncv0qQuADpn7ydXsNIbXtaqc6vjEFbDEhxUQhh8O+uKcrMoPlF6kjAMXE0lAgHT
+	zIV9U3bwkuRxWvJtFh2GmdFGVDdGR9Y3IEmXYI7pXEiduJyt0TqBJ1fs3GrGiftzeAu9pbDRsPX
+	4kkReWxysjq9MQH4Ia7FVMUDQ69zztDTuEBaq+yEgX0EC6mLD9n5DySGZwJxzz9C+D12IFstylU
+	yn53GiQGPZTx2Wq9JKuIoVAbOnjFcbmqyCATwHCqdd2D2m1DO7RxUDgMsz24sg=
+X-Received: by 2002:a05:6402:5194:b0:5d0:fb56:3f with SMTP id 4fb4d7f45d1cf-5d972e0e341mr23290989a12.12.1736508317710;
+        Fri, 10 Jan 2025 03:25:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH3mqsKI2idLOS3bFseUHtOVmXbXG31Er639vFwFDT2akA/HfPxaQl8uNFpTeEdJZcPXxQTRg==
+X-Received: by 2002:a05:6402:5194:b0:5d0:fb56:3f with SMTP id 4fb4d7f45d1cf-5d972e0e341mr23290897a12.12.1736508317029;
+        Fri, 10 Jan 2025 03:25:17 -0800 (PST)
+Received: from sgarzare-redhat ([193.207.202.103])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c95af694sm159293266b.144.2025.01.10.03.25.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 03:13:04 -0800 (PST)
-From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <apatel@ventanamicro.com>,
-	Atish Patra <atishp@rivosinc.com>
-Subject: [kvm-unit-tests PATCH v6 5/5] riscv: sbi: Add SSE extension tests
-Date: Fri, 10 Jan 2025 12:12:44 +0100
-Message-ID: <20250110111247.2963146-6-cleger@rivosinc.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250110111247.2963146-1-cleger@rivosinc.com>
-References: <20250110111247.2963146-1-cleger@rivosinc.com>
+        Fri, 10 Jan 2025 03:25:16 -0800 (PST)
+Date: Fri, 10 Jan 2025 12:25:09 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Luigi Leonardi <leonardi@redhat.com>
+Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>, Jakub Kicinski <kuba@kernel.org>, 
+	Michal Luczaj <mhal@rbox.co>, virtualization@lists.linux.dev, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, stable@vger.kernel.org
+Subject: Re: [PATCH net v2 4/5] vsock: reset socket state when de-assigning
+ the transport
+Message-ID: <fjx4nkajq3cnaxdbvs3dd2sxtc35tkqlqti3h44t3xuefclwar@havkg6jfisxu>
+References: <20250110083511.30419-1-sgarzare@redhat.com>
+ <20250110083511.30419-5-sgarzare@redhat.com>
+ <esoasx64en34ixiylalt2hldqi5duvvzrpt65xq7nioro7gbbb@rhp6lth5grj4>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <esoasx64en34ixiylalt2hldqi5duvvzrpt65xq7nioro7gbbb@rhp6lth5grj4>
 
-Add SBI SSE extension tests for the following features:
-- Test attributes errors (invalid values, RO, etc)
-- Registration errors
-- Simple events (register, enable, inject)
-- Events with different priorities
-- Global events dispatch on different harts
-- Local events on all harts
-- Hart mask/unmask events
+On Fri, Jan 10, 2025 at 11:56:28AM +0100, Luigi Leonardi wrote:
+>On Fri, Jan 10, 2025 at 09:35:10AM +0100, Stefano Garzarella wrote:
+>>Transport's release() and destruct() are called when de-assigning the
+>>vsock transport. These callbacks can touch some socket state like
+>>sock flags, sk_state, and peer_shutdown.
+>>
+>>Since we are reassigning the socket to a new transport during
+>>vsock_connect(), let's reset these fields to have a clean state with
+>>the new transport.
+>>
+>>Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+>>Cc: stable@vger.kernel.org
+>>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>---
+>>net/vmw_vsock/af_vsock.c | 9 +++++++++
+>>1 file changed, 9 insertions(+)
+>>
+>>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>index 5cf8109f672a..74d35a871644 100644
+>>--- a/net/vmw_vsock/af_vsock.c
+>>+++ b/net/vmw_vsock/af_vsock.c
+>>@@ -491,6 +491,15 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+>>		 */
+>>		vsk->transport->release(vsk);
+>>		vsock_deassign_transport(vsk);
+>>+
+>>+		/* transport's release() and destruct() can touch some socket
+>>+		 * state, since we are reassigning the socket to a new transport
+>>+		 * during vsock_connect(), let's reset these fields to have a
+>>+		 * clean state.
+>>+		 */
+>>+		sock_reset_flag(sk, SOCK_DONE);
+>>+		sk->sk_state = TCP_CLOSE;
+>>+		vsk->peer_shutdown = 0;
+>>	}
+>>
+>>	/* We increase the module refcnt to prevent the transport unloading
+>>-- 
+>>2.47.1
+>>
+>
+>Hi Stefano,
+>I spent some time investigating what would happen if the scheduled work
+>ran before `virtio_transport_cancel_close_work`. IIUC that should do 
+>no harm and all the fields are reset correctly.
 
-Signed-off-by: Clément Léger <cleger@rivosinc.com>
----
- riscv/Makefile          |   3 +-
- lib/riscv/asm/csr.h     |   2 +
- riscv/sse.h             |  41 ++
- riscv/sse-asm.S         | 104 +++++
- riscv/sbi-asm-offsets.c |   8 +
- riscv/sbi-sse.c         | 936 ++++++++++++++++++++++++++++++++++++++++
- riscv/sbi.c             |   3 +
- riscv/sse.c             | 132 ++++++
- 8 files changed, 1228 insertions(+), 1 deletion(-)
- create mode 100644 riscv/sse.h
- create mode 100644 riscv/sse-asm.S
- create mode 100644 riscv/sbi-sse.c
- create mode 100644 riscv/sse.c
+Yep, after transport->destruct() call, the delayed work should have 
+already finished or canceled.
 
-diff --git a/riscv/Makefile b/riscv/Makefile
-index 517cb0e5..c6ce094a 100644
---- a/riscv/Makefile
-+++ b/riscv/Makefile
-@@ -17,7 +17,8 @@ tests += $(TEST_DIR)/sieve.$(exe)
- 
- all: $(tests)
- 
--$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o
-+sse-objs = $(TEST_DIR)/sse-asm.o $(TEST_DIR)/sse.o
-+$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o $(TEST_DIR)/sbi-sse.o $(sse-objs)
- 
- # When built for EFI sieve needs extra memory, run with e.g. '-m 256' on QEMU
- $(TEST_DIR)/sieve.$(exe): AUXFLAGS = 0x1
-diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-index 16f5ddd7..06831380 100644
---- a/lib/riscv/asm/csr.h
-+++ b/lib/riscv/asm/csr.h
-@@ -21,6 +21,8 @@
- /* Exception cause high bit - is an interrupt if set */
- #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
- 
-+#define SSTATUS_SPP		_AC(0x00000100, UL) /* Previously Supervisor */
-+
- /* Exception causes */
- #define EXC_INST_MISALIGNED	0
- #define EXC_INST_ACCESS		1
-diff --git a/riscv/sse.h b/riscv/sse.h
-new file mode 100644
-index 00000000..a57866df
---- /dev/null
-+++ b/riscv/sse.h
-@@ -0,0 +1,41 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef _RISCV_SSE_H_
-+#define _RISCV_SSE_H_
-+
-+#include <asm/sbi.h>
-+
-+typedef void (*sse_handler_fn)(void *data, struct pt_regs *regs, unsigned int hartid);
-+
-+struct sse_handler_arg {
-+	unsigned long reg_tmp;
-+	sse_handler_fn handler;
-+	void *handler_data;
-+	void *stack;
-+};
-+
-+extern void sse_entry(void);
-+
-+bool sse_event_is_global(unsigned long event_id);
-+
-+struct sbiret sse_event_get_attr_raw(unsigned long event_id, unsigned long base_attr_id,
-+				     unsigned long attr_count, unsigned long phys_lo,
-+				     unsigned long phys_hi);
-+unsigned long sse_event_get_attrs(unsigned long event_id, unsigned long attr_id,
-+				  unsigned long *values, unsigned int attr_count);
-+unsigned long sse_event_get_attr(unsigned long event_id, unsigned long attr_id,
-+				 unsigned long *value);
-+struct sbiret sse_event_set_attr_raw(unsigned long event_id, unsigned long base_attr_id,
-+				     unsigned long attr_count, unsigned long phys_lo,
-+				     unsigned long phys_hi);
-+unsigned long sse_event_set_attr(unsigned long event_id, unsigned long attr_id,
-+				 unsigned long value);
-+unsigned long sse_event_register_raw(unsigned long event_id, void *entry_pc, void *entry_arg);
-+unsigned long sse_event_register(unsigned long event_id, struct sse_handler_arg *arg);
-+unsigned long sse_event_unregister(unsigned long event_id);
-+unsigned long sse_event_enable(unsigned long event_id);
-+unsigned long sse_hart_mask(void);
-+unsigned long sse_hart_unmask(void);
-+unsigned long sse_event_inject(unsigned long event_id, unsigned long hart_id);
-+unsigned long sse_event_disable(unsigned long event_id);
-+
-+#endif /* !_RISCV_SSE_H_ */
-\ No newline at end of file
-diff --git a/riscv/sse-asm.S b/riscv/sse-asm.S
-new file mode 100644
-index 00000000..1f6a91e0
---- /dev/null
-+++ b/riscv/sse-asm.S
-@@ -0,0 +1,104 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Helper assembly code routines for RISC-V SBI extension tests.
-+ *
-+ * Copyright (C) 2024, James Raphael Tiovalen <jamestiotio@gmail.com>
-+ */
-+#define __ASSEMBLY__
-+#include <asm/asm.h>
-+#include <asm/csr.h>
-+#include <asm/asm-offsets.h>
-+#include <generated/sbi-asm-offsets.h>
-+
-+#include "sbi-tests.h"
-+
-+.section .text
-+.global sse_entry
-+sse_entry:
-+	/* Save stack temporarily */
-+	REG_S sp, SBI_SSE_REG_TMP(a7)
-+	/* Set entry stack */
-+	REG_L sp, SBI_SSE_HANDLER_STACK(a7)
-+
-+	addi sp, sp, -(PT_SIZE)
-+	REG_S ra, PT_RA(sp)
-+	REG_S s0, PT_S0(sp)
-+	REG_S s1, PT_S1(sp)
-+	REG_S s2, PT_S2(sp)
-+	REG_S s3, PT_S3(sp)
-+	REG_S s4, PT_S4(sp)
-+	REG_S s5, PT_S5(sp)
-+	REG_S s6, PT_S6(sp)
-+	REG_S s7, PT_S7(sp)
-+	REG_S s8, PT_S8(sp)
-+	REG_S s9, PT_S9(sp)
-+	REG_S s10, PT_S10(sp)
-+	REG_S s11, PT_S11(sp)
-+	REG_S tp, PT_TP(sp)
-+	REG_S t0, PT_T0(sp)
-+	REG_S t1, PT_T1(sp)
-+	REG_S t2, PT_T2(sp)
-+	REG_S t3, PT_T3(sp)
-+	REG_S t4, PT_T4(sp)
-+	REG_S t5, PT_T5(sp)
-+	REG_S t6, PT_T6(sp)
-+	REG_S gp, PT_GP(sp)
-+	REG_S a0, PT_A0(sp)
-+	REG_S a1, PT_A1(sp)
-+	REG_S a2, PT_A2(sp)
-+	REG_S a3, PT_A3(sp)
-+	REG_S a4, PT_A4(sp)
-+	REG_S a5, PT_A5(sp)
-+	csrr a1, CSR_SEPC
-+	REG_S a1, PT_EPC(sp)
-+	csrr a2, CSR_SSTATUS
-+	REG_S a2, PT_STATUS(sp)
-+
-+	REG_L a0, SBI_SSE_REG_TMP(a7)
-+	REG_S a0, PT_SP(sp)
-+
-+	REG_L t0, SBI_SSE_HANDLER(a7)
-+	REG_L a0, SBI_SSE_HANDLER_DATA(a7)
-+	mv a1, sp
-+	mv a2, a6
-+	jalr t0
-+
-+	REG_L a1, PT_EPC(sp)
-+	REG_L a2, PT_STATUS(sp)
-+	csrw CSR_SEPC, a1
-+	csrw CSR_SSTATUS, a2
-+
-+	REG_L ra, PT_RA(sp)
-+	REG_L s0, PT_S0(sp)
-+	REG_L s1, PT_S1(sp)
-+	REG_L s2, PT_S2(sp)
-+	REG_L s3, PT_S3(sp)
-+	REG_L s4, PT_S4(sp)
-+	REG_L s5, PT_S5(sp)
-+	REG_L s6, PT_S6(sp)
-+	REG_L s7, PT_S7(sp)
-+	REG_L s8, PT_S8(sp)
-+	REG_L s9, PT_S9(sp)
-+	REG_L s10, PT_S10(sp)
-+	REG_L s11, PT_S11(sp)
-+	REG_L tp, PT_TP(sp)
-+	REG_L t0, PT_T0(sp)
-+	REG_L t1, PT_T1(sp)
-+	REG_L t2, PT_T2(sp)
-+	REG_L t3, PT_T3(sp)
-+	REG_L t4, PT_T4(sp)
-+	REG_L t5, PT_T5(sp)
-+	REG_L t6, PT_T6(sp)
-+	REG_L gp, PT_GP(sp)
-+	REG_L a0, PT_A0(sp)
-+	REG_L a1, PT_A1(sp)
-+	REG_L a2, PT_A2(sp)
-+	REG_L a3, PT_A3(sp)
-+	REG_L a4, PT_A4(sp)
-+	REG_L a5, PT_A5(sp)
-+
-+	REG_L sp, PT_SP(sp)
-+
-+	li a7, ASM_SBI_EXT_SSE
-+	li a6, ASM_SBI_EXT_SSE_COMPLETE
-+	ecall
-diff --git a/riscv/sbi-asm-offsets.c b/riscv/sbi-asm-offsets.c
-index 116fe497..10fa6347 100644
---- a/riscv/sbi-asm-offsets.c
-+++ b/riscv/sbi-asm-offsets.c
-@@ -2,11 +2,19 @@
- #include <kbuild.h>
- #include <asm/sbi.h>
- #include "sbi-tests.h"
-+#include "sse.h"
- 
- int main(void)
- {
- 	DEFINE(ASM_SBI_EXT_HSM, SBI_EXT_HSM);
- 	DEFINE(ASM_SBI_EXT_HSM_HART_STOP, SBI_EXT_HSM_HART_STOP);
-+	DEFINE(ASM_SBI_EXT_SSE, SBI_EXT_SSE);
-+	DEFINE(ASM_SBI_EXT_SSE_COMPLETE, SBI_EXT_SSE_COMPLETE);
-+
-+	OFFSET(SBI_SSE_REG_TMP, sse_handler_arg, reg_tmp);
-+	OFFSET(SBI_SSE_HANDLER, sse_handler_arg, handler);
-+	OFFSET(SBI_SSE_HANDLER_DATA, sse_handler_arg, handler_data);
-+	OFFSET(SBI_SSE_HANDLER_STACK, sse_handler_arg, stack);
- 
- 	return 0;
- }
-diff --git a/riscv/sbi-sse.c b/riscv/sbi-sse.c
-new file mode 100644
-index 00000000..eb594e7d
---- /dev/null
-+++ b/riscv/sbi-sse.c
-@@ -0,0 +1,936 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * SBI SSE testsuite
-+ *
-+ * Copyright (C) 2024, Rivos Inc., Clément Léger <cleger@rivosinc.com>
-+ */
-+#include <alloc.h>
-+#include <alloc_page.h>
-+#include <bitops.h>
-+#include <cpumask.h>
-+#include <libcflat.h>
-+#include <on-cpus.h>
-+
-+#include <asm/barrier.h>
-+#include <asm/page.h>
-+#include <asm/processor.h>
-+#include <asm/sbi.h>
-+#include <asm/setup.h>
-+
-+#include "sbi-tests.h"
-+#include "sse.h"
-+
-+#define SSE_STACK_SIZE	PAGE_SIZE
-+
-+void check_sse(void);
-+
-+struct sse_event_info {
-+	unsigned long event_id;
-+	const char *name;
-+	bool can_inject;
-+};
-+
-+static struct sse_event_info sse_event_infos[] = {
-+	{
-+		.event_id = SBI_SSE_EVENT_LOCAL_HIGH_PRIO_RAS,
-+		.name = "local_high_prio_ras",
-+	},
-+	{
-+		.event_id = SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP,
-+		.name = "double_trap",
-+	},
-+	{
-+		.event_id = SBI_SSE_EVENT_GLOBAL_HIGH_PRIO_RAS,
-+		.name = "global_high_prio_ras",
-+	},
-+	{
-+		.event_id = SBI_SSE_EVENT_LOCAL_PMU_OVERFLOW,
-+		.name = "local_pmu_overflow",
-+	},
-+	{
-+		.event_id = SBI_SSE_EVENT_LOCAL_LOW_PRIO_RAS,
-+		.name = "local_low_prio_ras",
-+	},
-+	{
-+		.event_id = SBI_SSE_EVENT_GLOBAL_LOW_PRIO_RAS,
-+		.name = "global_low_prio_ras",
-+	},
-+	{
-+		.event_id = SBI_SSE_EVENT_LOCAL_SOFTWARE,
-+		.name = "local_software",
-+	},
-+	{
-+		.event_id = SBI_SSE_EVENT_GLOBAL_SOFTWARE,
-+		.name = "global_software",
-+	},
-+};
-+
-+static const char *const attr_names[] = {
-+	[SBI_SSE_ATTR_STATUS] = "status",
-+	[SBI_SSE_ATTR_PRIORITY] = "prio",
-+	[SBI_SSE_ATTR_CONFIG] = "config",
-+	[SBI_SSE_ATTR_PREFERRED_HART] = "preferred_hart",
-+	[SBI_SSE_ATTR_ENTRY_PC] = "entry_pc",
-+	[SBI_SSE_ATTR_ENTRY_ARG] = "entry_arg",
-+	[SBI_SSE_ATTR_INTERRUPTED_SEPC] = "interrupted_pc",
-+	[SBI_SSE_ATTR_INTERRUPTED_FLAGS] = "interrupted_flags",
-+	[SBI_SSE_ATTR_INTERRUPTED_A6] = "interrupted_a6",
-+	[SBI_SSE_ATTR_INTERRUPTED_A7] = "interrupted_a7",
-+};
-+
-+static const unsigned long ro_attrs[] = {
-+	SBI_SSE_ATTR_STATUS,
-+	SBI_SSE_ATTR_ENTRY_PC,
-+	SBI_SSE_ATTR_ENTRY_ARG,
-+};
-+
-+static const unsigned long interrupted_attrs[] = {
-+	SBI_SSE_ATTR_INTERRUPTED_FLAGS,
-+	SBI_SSE_ATTR_INTERRUPTED_SEPC,
-+	SBI_SSE_ATTR_INTERRUPTED_A6,
-+	SBI_SSE_ATTR_INTERRUPTED_A7,
-+};
-+
-+static const unsigned long interrupted_flags[] = {
-+	SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP,
-+	SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPIE,
-+	SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV,
-+	SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP,
-+};
-+
-+static struct sse_event_info *sse_evt_get_infos(unsigned long event_id)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(sse_event_infos); i++) {
-+		if (sse_event_infos[i].event_id == event_id)
-+			return &sse_event_infos[i];
-+	}
-+
-+	assert_msg(false, "Invalid event id: %ld", event_id);
-+}
-+
-+static const char *sse_evt_name(unsigned long event_id)
-+{
-+	struct sse_event_info *infos = sse_evt_get_infos(event_id);
-+
-+	return infos->name;
-+}
-+
-+static bool sse_evt_can_inject(unsigned long event_id)
-+{
-+	struct sse_event_info *infos = sse_evt_get_infos(event_id);
-+
-+	return infos->can_inject;
-+}
-+
-+static int sse_get_state(unsigned long event_id, enum sbi_sse_state *state)
-+{
-+	int ret;
-+	unsigned long status;
-+
-+	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_STATUS, &status);
-+	if (ret) {
-+		report_fail("Failed to get SSE event status");
-+		return -1;
-+	}
-+
-+	*state = status & SBI_SSE_ATTR_STATUS_STATE_MASK;
-+
-+	return 0;
-+}
-+
-+static void sse_global_event_set_current_hart(unsigned long event_id)
-+{
-+	int ret;
-+
-+	if (!sse_event_is_global(event_id))
-+		return;
-+
-+	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART,
-+				 current_thread_info()->hartid);
-+	if (ret)
-+		report_abort("set preferred hart failure");
-+}
-+
-+static int sse_check_state(unsigned long event_id, unsigned long expected_state)
-+{
-+	int ret;
-+	enum sbi_sse_state state;
-+
-+	ret = sse_get_state(event_id, &state);
-+	if (ret)
-+		return 1;
-+	report(state == expected_state, "SSE event status == %ld", expected_state);
-+
-+	return state != expected_state;
-+}
-+
-+static bool sse_event_pending(unsigned long event_id)
-+{
-+	int ret;
-+	unsigned long status;
-+
-+	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_STATUS, &status);
-+	if (ret) {
-+		report_fail("Failed to get SSE event status");
-+		return false;
-+	}
-+
-+	return !!(status & BIT(SBI_SSE_ATTR_STATUS_PENDING_OFFSET));
-+}
-+
-+static void *sse_alloc_stack(void)
-+{
-+	return (alloc_page() + SSE_STACK_SIZE);
-+}
-+
-+static void sse_free_stack(void *stack)
-+{
-+	free_page(stack - SSE_STACK_SIZE);
-+}
-+
-+static void sse_test_attr(unsigned long event_id)
-+{
-+	unsigned long ret, value = 0;
-+	unsigned long values[ARRAY_SIZE(ro_attrs)];
-+	struct sbiret sret;
-+	unsigned int i;
-+
-+	report_prefix_push("attrs");
-+
-+	for (i = 0; i < ARRAY_SIZE(ro_attrs); i++) {
-+		ret = sse_event_set_attr(event_id, ro_attrs[i], value);
-+		report(ret == SBI_ERR_BAD_RANGE, "RO attribute %s not writable",
-+		       attr_names[ro_attrs[i]]);
-+	}
-+
-+	for (i = SBI_SSE_ATTR_STATUS; i <= SBI_SSE_ATTR_INTERRUPTED_A7; i++) {
-+		ret = sse_event_get_attr(event_id, i, &value);
-+		report(ret == SBI_SUCCESS, "Read single attribute %s", attr_names[i]);
-+		/* Preferred Hart reset value is defined by SBI vendor and status injectable bit
-+		 * also depends on the SBI implementation
-+		 */
-+		if (i != SBI_SSE_ATTR_STATUS && i != SBI_SSE_ATTR_PREFERRED_HART)
-+			report(value == 0, "Attribute %s reset value is 0", attr_names[i]);
-+	}
-+
-+	ret = sse_event_get_attrs(event_id, SBI_SSE_ATTR_STATUS, values,
-+				  SBI_SSE_ATTR_INTERRUPTED_A7 - SBI_SSE_ATTR_STATUS);
-+	report(ret == SBI_SUCCESS, "Read multiple attributes");
-+
-+#if __riscv_xlen > 32
-+	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PRIORITY, 0xFFFFFFFFUL + 1UL);
-+	report(ret == SBI_ERR_INVALID_PARAM, "Write prio > 0xFFFFFFFF error");
-+#endif
-+
-+	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_CONFIG, ~SBI_SSE_ATTR_CONFIG_ONESHOT);
-+	report(ret == SBI_ERR_INVALID_PARAM, "Write invalid config error");
-+
-+	if (sse_event_is_global(event_id)) {
-+		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART, 0xFFFFFFFFUL);
-+		report(ret == SBI_ERR_INVALID_PARAM, "Set invalid hart id error");
-+	} else {
-+		/* Set Hart on local event -> RO */
-+		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART,
-+					 current_thread_info()->hartid);
-+		report(ret == SBI_ERR_BAD_RANGE, "Set hart id on local event error");
-+	}
-+
-+	/* Set/get flags, sepc, a6, a7 */
-+	for (i = 0; i < ARRAY_SIZE(interrupted_attrs); i++) {
-+		ret = sse_event_get_attr(event_id, interrupted_attrs[i], &value);
-+		report(ret == 0, "Get interrupted %s no error", attr_names[interrupted_attrs[i]]);
-+
-+		/* 0x1 is a valid value for all the interrupted attributes */
-+		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_INTERRUPTED_FLAGS, 0x1);
-+		report(ret == SBI_ERR_INVALID_STATE, "Set interrupted flags invalid state error");
-+	}
-+
-+	/* Attr_count == 0 */
-+	sret = sse_event_get_attr_raw(event_id, SBI_SSE_ATTR_STATUS, 0, (unsigned long) &value, 0);
-+	report(sret.error == SBI_ERR_INVALID_PARAM, "Read attribute attr_count == 0 error");
-+
-+	sret = sse_event_set_attr_raw(event_id, SBI_SSE_ATTR_STATUS, 0, (unsigned long) &value, 0);
-+	report(sret.error == SBI_ERR_INVALID_PARAM, "Write attribute attr_count == 0 error");
-+
-+	/* Invalid attribute id */
-+	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_INTERRUPTED_A7 + 1, &value);
-+	report(ret == SBI_ERR_BAD_RANGE, "Read invalid attribute error");
-+	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_INTERRUPTED_A7 + 1, value);
-+	report(ret == SBI_ERR_BAD_RANGE, "Write invalid attribute error");
-+
-+	/* Misaligned phys address */
-+	sret = sse_event_get_attr_raw(event_id, SBI_SSE_ATTR_STATUS, 1,
-+				      ((unsigned long) &value | 0x1), 0);
-+	report(sret.error == SBI_ERR_INVALID_ADDRESS, "Read attribute with invalid address error");
-+	sret = sse_event_set_attr_raw(event_id, SBI_SSE_ATTR_STATUS, 1,
-+				      ((unsigned long) &value | 0x1), 0);
-+	report(sret.error == SBI_ERR_INVALID_ADDRESS, "Write attribute with invalid address error");
-+
-+	report_prefix_pop();
-+}
-+
-+static void sse_test_register_error(unsigned long event_id)
-+{
-+	unsigned long ret;
-+
-+	report_prefix_push("register");
-+
-+	ret = sse_event_unregister(event_id);
-+	report(ret == SBI_ERR_INVALID_STATE, "SSE unregister non registered event");
-+
-+	ret = sse_event_register_raw(event_id, (void *) 0x1, NULL);
-+	report(ret == SBI_ERR_INVALID_PARAM, "SSE register misaligned entry");
-+
-+	ret = sse_event_register_raw(event_id, (void *) sse_entry, NULL);
-+	report(ret == SBI_SUCCESS, "SSE register ok");
-+	if (ret)
-+		goto done;
-+
-+	ret = sse_event_register_raw(event_id, (void *) sse_entry, NULL);
-+	report(ret == SBI_ERR_INVALID_STATE, "SSE register twice failure");
-+	if (!ret)
-+		goto done;
-+
-+	ret = sse_event_unregister(event_id);
-+	report(ret == SBI_SUCCESS, "SSE unregister ok");
-+
-+done:
-+	report_prefix_pop();
-+}
-+
-+struct sse_simple_test_arg {
-+	bool done;
-+	unsigned long expected_a6;
-+	unsigned long event_id;
-+};
-+
-+static void sse_simple_handler(void *data, struct pt_regs *regs, unsigned int hartid)
-+{
-+	volatile struct sse_simple_test_arg *arg = data;
-+	int ret, i;
-+	const char *attr_name;
-+	unsigned long event_id = arg->event_id, value, prev_value, flags, attr;
-+	const unsigned long regs_len = (SBI_SSE_ATTR_INTERRUPTED_A7 - SBI_SSE_ATTR_INTERRUPTED_A6) +
-+				       1;
-+	unsigned long interrupted_state[regs_len];
-+
-+	if ((regs->status & SSTATUS_SPP) == 0)
-+		report_fail("Interrupted S-mode");
-+
-+	if (hartid != current_thread_info()->hartid)
-+		report_fail("Hartid correctly passed");
-+
-+	sse_check_state(event_id, SBI_SSE_STATE_RUNNING);
-+	if (sse_event_pending(event_id))
-+		report_fail("Event is not pending");
-+
-+	/* Set a6, a7, sepc, flags while running */
-+	for (i = 0; i < ARRAY_SIZE(interrupted_attrs); i++) {
-+		attr = interrupted_attrs[i];
-+		attr_name = attr_names[attr];
-+
-+		ret = sse_event_get_attr(event_id, attr, &prev_value);
-+		report(ret == 0, "Get attr %s no error", attr_name);
-+
-+		/* We test SBI_SSE_ATTR_INTERRUPTED_FLAGS below with specific flag values */
-+		if (attr == SBI_SSE_ATTR_INTERRUPTED_FLAGS)
-+			continue;
-+
-+		ret = sse_event_set_attr(event_id, attr, 0xDEADBEEF + i);
-+		report(ret == 0, "Set attr %s invalid state no error", attr_name);
-+
-+		ret = sse_event_get_attr(event_id, attr, &value);
-+		report(ret == 0, "Get attr %s modified value no error", attr_name);
-+		report(value == 0xDEADBEEF + i, "Get attr %s modified value ok", attr_name);
-+
-+		ret = sse_event_set_attr(event_id, attr, prev_value);
-+		report(ret == 0, "Restore attr %s value no error", attr_name);
-+	}
-+
-+	/* Test all flags allowed for SBI_SSE_ATTR_INTERRUPTED_FLAGS*/
-+	attr = SBI_SSE_ATTR_INTERRUPTED_FLAGS;
-+	attr_name = attr_names[attr];
-+	ret = sse_event_get_attr(event_id, attr, &prev_value);
-+	report(ret == 0, "Get attr %s no error", attr_name);
-+
-+	for (i = 0; i < ARRAY_SIZE(interrupted_flags); i++) {
-+		flags = interrupted_flags[i];
-+		ret = sse_event_set_attr(event_id, attr, flags);
-+		report(ret == 0, "Set interrupted %s value no error", attr_name);
-+		ret = sse_event_get_attr(event_id, attr, &value);
-+		report(value == flags, "Get attr %s modified value ok", attr_name);
-+	}
-+
-+	ret = sse_event_set_attr(event_id, attr, prev_value);
-+		report(ret == 0, "Restore attr %s value no error", attr_name);
-+
-+	/* Try to change HARTID/Priority while running */
-+	if (sse_event_is_global(event_id)) {
-+		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART,
-+					 current_thread_info()->hartid);
-+		report(ret == SBI_ERR_INVALID_STATE, "Set hart id while running error");
-+	}
-+
-+	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PRIORITY, 0);
-+	report(ret == SBI_ERR_INVALID_STATE, "Set priority while running error");
-+
-+	ret = sse_event_get_attrs(event_id, SBI_SSE_ATTR_INTERRUPTED_A6, interrupted_state,
-+				  regs_len);
-+	report(ret == SBI_SUCCESS, "Read interrupted context from SSE handler ok");
-+	if (interrupted_state[0] != arg->expected_a6)
-+		report_fail("Interrupted state a6 check ok");
-+	if (interrupted_state[1] != SBI_EXT_SSE)
-+		report_fail("Interrupted state a7 check ok");
-+
-+	arg->done = true;
-+}
-+
-+static void sse_test_inject_simple(unsigned long event_id)
-+{
-+	unsigned long ret;
-+	struct sse_handler_arg args;
-+	volatile struct sse_simple_test_arg test_arg = {.event_id = event_id, .done = 0};
-+
-+	args.handler = sse_simple_handler;
-+	args.handler_data = (void *) &test_arg;
-+	args.stack = sse_alloc_stack();
-+
-+	report_prefix_push("simple");
-+
-+	ret = sse_check_state(event_id, SBI_SSE_STATE_UNUSED);
-+	if (ret)
-+		goto done;
-+
-+	ret = sse_event_register(event_id, &args);
-+	report(ret == SBI_SUCCESS, "SSE register no error");
-+	if (ret)
-+		goto done;
-+
-+	ret = sse_check_state(event_id, SBI_SSE_STATE_REGISTERED);
-+	if (ret)
-+		goto done;
-+
-+	/* Be sure global events are targeting the current hart */
-+	sse_global_event_set_current_hart(event_id);
-+
-+	ret = sse_event_enable(event_id);
-+	report(ret == SBI_SUCCESS, "SSE enable no error");
-+	if (ret)
-+		goto done;
-+
-+	ret = sse_check_state(event_id, SBI_SSE_STATE_ENABLED);
-+	if (ret)
-+		goto done;
-+
-+	ret = sse_hart_mask();
-+	report(ret == SBI_SUCCESS, "SSE hart mask no error");
-+
-+	ret = sse_event_inject(event_id, current_thread_info()->hartid);
-+	report(ret == SBI_SUCCESS, "SSE injection masked no error");
-+	if (ret)
-+		goto done;
-+
-+	barrier();
-+	report(test_arg.done == 0, "SSE event masked not handled");
-+
-+	/*
-+	 * When unmasking the SSE events, we expect it to be injected
-+	 * immediately so a6 should be SBI_EXT_SSE_HART_UNMASK
-+	 */
-+	test_arg.expected_a6 = SBI_EXT_SSE_HART_UNMASK;
-+	ret = sse_hart_unmask();
-+	report(ret == SBI_SUCCESS, "SSE hart unmask no error");
-+
-+	barrier();
-+	report(test_arg.done == 1, "SSE event unmasked handled");
-+	test_arg.done = 0;
-+	test_arg.expected_a6 = SBI_EXT_SSE_INJECT;
-+
-+	/* Set as oneshot and verify it is disabled */
-+	ret = sse_event_disable(event_id);
-+	report(ret == 0, "Disable event ok");
-+	ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_CONFIG, SBI_SSE_ATTR_CONFIG_ONESHOT);
-+	report(ret == 0, "Set event attribute as ONESHOT");
-+	ret = sse_event_enable(event_id);
-+	report(ret == 0, "Enable event ok");
-+
-+	ret = sse_event_inject(event_id, current_thread_info()->hartid);
-+	report(ret == SBI_SUCCESS, "SSE injection 2 no error");
-+	if (ret)
-+		goto done;
-+
-+	barrier();
-+	report(test_arg.done == 1, "SSE event handled ok");
-+	test_arg.done = 0;
-+
-+	ret = sse_check_state(event_id, SBI_SSE_STATE_REGISTERED);
-+	if (ret)
-+		goto done;
-+
-+	/* Clear ONESHOT FLAG */
-+	sse_event_set_attr(event_id, SBI_SSE_ATTR_CONFIG, 0);
-+
-+	ret = sse_event_unregister(event_id);
-+	report(ret == SBI_SUCCESS, "SSE unregister no error");
-+	if (ret)
-+		goto done;
-+
-+	sse_check_state(event_id, SBI_SSE_STATE_UNUSED);
-+
-+done:
-+	sse_free_stack(args.stack);
-+	report_prefix_pop();
-+}
-+
-+struct sse_foreign_cpu_test_arg {
-+	bool done;
-+	unsigned int expected_cpu;
-+	unsigned long event_id;
-+};
-+
-+static void sse_foreign_cpu_handler(void *data, struct pt_regs *regs, unsigned int hartid)
-+{
-+	volatile struct sse_foreign_cpu_test_arg *arg = data;
-+
-+	/* For arg content to be visible */
-+	smp_rmb();
-+	if (arg->expected_cpu != current_thread_info()->cpu)
-+		report_fail("Received event on CPU (%d), expected CPU (%d)",
-+			    current_thread_info()->cpu, arg->expected_cpu);
-+
-+	arg->done = true;
-+	/* For arg update to be visible for other CPUs */
-+	smp_wmb();
-+}
-+
-+struct sse_local_per_cpu {
-+	struct sse_handler_arg args;
-+	unsigned long ret;
-+};
-+
-+struct sse_local_data {
-+	unsigned long event_id;
-+	struct sse_local_per_cpu *cpu_args[NR_CPUS];
-+};
-+
-+static void sse_register_enable_local(void *data)
-+{
-+	struct sse_local_data *local_data = data;
-+	struct sse_local_per_cpu *cpu_arg = local_data->cpu_args[current_thread_info()->cpu];
-+
-+	cpu_arg->ret = sse_event_register(local_data->event_id, &cpu_arg->args);
-+	if (cpu_arg->ret)
-+		return;
-+
-+	cpu_arg->ret = sse_event_enable(local_data->event_id);
-+}
-+
-+static void sse_disable_unregister_local(void *data)
-+{
-+	struct sse_local_data *local_data = data;
-+	struct sse_local_per_cpu *cpu_arg = local_data->cpu_args[current_thread_info()->cpu];
-+
-+	cpu_arg->ret = sse_event_disable(local_data->event_id);
-+	if (cpu_arg->ret)
-+		return;
-+
-+	cpu_arg->ret = sse_event_unregister(local_data->event_id);
-+}
-+
-+static void sse_test_inject_local(unsigned long event_id)
-+{
-+	int cpu;
-+	unsigned long ret;
-+	struct sse_local_data local_data;
-+	struct sse_local_per_cpu *cpu_arg;
-+	volatile struct sse_foreign_cpu_test_arg test_arg = {.event_id = event_id};
-+
-+	report_prefix_push("local_dispatch");
-+	local_data.event_id = event_id;
-+
-+	for_each_online_cpu(cpu) {
-+		cpu_arg = calloc(1, sizeof(struct sse_handler_arg));
-+
-+		cpu_arg->args.stack = sse_alloc_stack();
-+		cpu_arg->args.handler = sse_foreign_cpu_handler;
-+		cpu_arg->args.handler_data = (void *)&test_arg;
-+		local_data.cpu_args[cpu] = cpu_arg;
-+	}
-+
-+	on_cpus(sse_register_enable_local, &local_data);
-+	for_each_online_cpu(cpu) {
-+		if (local_data.cpu_args[cpu]->ret)
-+			report_abort("CPU failed to register/enable SSE event");
-+
-+		test_arg.expected_cpu = cpu;
-+		/* For test_arg content to be visible for other CPUs */
-+		smp_wmb();
-+		ret = sse_event_inject(event_id, cpus[cpu].hartid);
-+		if (ret)
-+			report_abort("CPU failed to register/enable SSE event");
-+
-+		while (!test_arg.done) {
-+			/* For test_arg update to be visible */
-+			smp_rmb();
-+		}
-+
-+		test_arg.done = false;
-+	}
-+
-+	on_cpus(sse_disable_unregister_local, &local_data);
-+	for_each_online_cpu(cpu) {
-+		if (local_data.cpu_args[cpu]->ret)
-+			report_abort("CPU failed to disable/unregister SSE event");
-+	}
-+
-+	for_each_online_cpu(cpu) {
-+		cpu_arg = local_data.cpu_args[cpu];
-+
-+		sse_free_stack(cpu_arg->args.stack);
-+	}
-+
-+	report_pass("local event dispatch on all CPUs");
-+	report_prefix_pop();
-+
-+}
-+
-+static void sse_test_inject_global(unsigned long event_id)
-+{
-+	unsigned long ret;
-+	unsigned int cpu;
-+	struct sse_handler_arg args;
-+	volatile struct sse_foreign_cpu_test_arg test_arg = {.event_id = event_id};
-+	enum sbi_sse_state state;
-+
-+	args.handler = sse_foreign_cpu_handler;
-+	args.handler_data = (void *)&test_arg;
-+	args.stack = sse_alloc_stack();
-+
-+	report_prefix_push("global_dispatch");
-+
-+	ret = sse_event_register(event_id, &args);
-+	if (ret)
-+		goto done;
-+
-+	for_each_online_cpu(cpu) {
-+		test_arg.expected_cpu = cpu;
-+		/* For test_arg content to be visible for other CPUs */
-+		smp_wmb();
-+		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART, cpu);
-+		if (ret) {
-+			report_fail("Failed to set preferred hart");
-+			goto done;
-+		}
-+
-+		ret = sse_event_enable(event_id);
-+		if (ret) {
-+			report_fail("Failed to enable SSE event");
-+			goto done;
-+		}
-+
-+		ret = sse_event_inject(event_id, cpu);
-+		if (ret) {
-+			report_fail("Failed to inject event");
-+			goto done;
-+		}
-+
-+		while (!test_arg.done) {
-+			/* For shared test_arg structure */
-+			smp_rmb();
-+		}
-+
-+		test_arg.done = false;
-+
-+		/* Wait for event to be in ENABLED state */
-+		do {
-+			ret = sse_get_state(event_id, &state);
-+			if (ret) {
-+				report_fail("Failed to get event state");
-+				goto done;
-+			}
-+		} while (state != SBI_SSE_STATE_ENABLED);
-+
-+		ret = sse_event_disable(event_id);
-+		if (ret) {
-+			report_fail("Failed to disable SSE event");
-+			goto done;
-+		}
-+
-+		report_pass("Global event on CPU %d", cpu);
-+	}
-+
-+done:
-+	ret = sse_event_unregister(event_id);
-+	if (ret)
-+		report_fail("Failed to unregister event");
-+
-+	sse_free_stack(args.stack);
-+	report_prefix_pop();
-+}
-+
-+struct priority_test_arg {
-+	unsigned long evt;
-+	bool called;
-+	u32 prio;
-+	struct priority_test_arg *next_evt_arg;
-+	void (*check_func)(struct priority_test_arg *arg);
-+};
-+
-+static void sse_hi_priority_test_handler(void *arg, struct pt_regs *regs,
-+					 unsigned int hartid)
-+{
-+	struct priority_test_arg *targ = arg;
-+	struct priority_test_arg *next = targ->next_evt_arg;
-+
-+	targ->called = 1;
-+	if (next) {
-+		sse_event_inject(next->evt, current_thread_info()->hartid);
-+		if (sse_event_pending(next->evt))
-+			report_fail("Higher priority event is pending");
-+		if (!next->called)
-+			report_fail("Higher priority event was not handled");
-+	}
-+}
-+
-+static void sse_low_priority_test_handler(void *arg, struct pt_regs *regs,
-+					  unsigned int hartid)
-+{
-+	struct priority_test_arg *targ = arg;
-+	struct priority_test_arg *next = targ->next_evt_arg;
-+
-+	targ->called = 1;
-+
-+	if (next) {
-+		sse_event_inject(next->evt, current_thread_info()->hartid);
-+
-+		if (!sse_event_pending(next->evt))
-+			report_fail("Lower priority event is pending");
-+
-+		if (next->called)
-+			report_fail("Lower priority event %s was handle before %s",
-+			      sse_evt_name(next->evt), sse_evt_name(targ->evt));
-+	}
-+}
-+
-+static void sse_test_injection_priority_arg(struct priority_test_arg *in_args,
-+					    unsigned int in_args_size,
-+					    sse_handler_fn handler,
-+					    const char *test_name)
-+{
-+	unsigned int i;
-+	int ret;
-+	unsigned long event_id;
-+	struct priority_test_arg *arg;
-+	unsigned int args_size = 0;
-+	struct sse_handler_arg event_args[in_args_size];
-+	struct priority_test_arg *args[in_args_size];
-+	void *stack;
-+	struct sse_handler_arg *event_arg;
-+
-+	report_prefix_push(test_name);
-+
-+	for (i = 0; i < in_args_size; i++) {
-+		arg = &in_args[i];
-+		event_id = arg->evt;
-+		if (!sse_evt_can_inject(event_id))
-+			continue;
-+
-+		args[args_size] = arg;
-+		args_size++;
-+	}
-+
-+	if (!args_size) {
-+		report_skip("No event injectable");
-+		report_prefix_pop();
-+		goto skip;
-+	}
-+
-+	for (i = 0; i < args_size; i++) {
-+		arg = args[i];
-+		event_id = arg->evt;
-+		stack = sse_alloc_stack();
-+
-+		event_arg = &event_args[i];
-+		event_arg->handler = handler;
-+		event_arg->handler_data = (void *)arg;
-+		event_arg->stack = stack;
-+
-+		if (i < (args_size - 1))
-+			arg->next_evt_arg = args[i + 1];
-+		else
-+			arg->next_evt_arg = NULL;
-+
-+		/* Be sure global events are targeting the current hart */
-+		sse_global_event_set_current_hart(event_id);
-+
-+		sse_event_register(event_id, event_arg);
-+		sse_event_set_attr(event_id, SBI_SSE_ATTR_PRIORITY, arg->prio);
-+		sse_event_enable(event_id);
-+	}
-+
-+	/* Inject first event */
-+	ret = sse_event_inject(args[0]->evt, current_thread_info()->hartid);
-+	report(ret == SBI_SUCCESS, "SSE injection no error");
-+
-+	for (i = 0; i < args_size; i++) {
-+		arg = args[i];
-+		event_id = arg->evt;
-+
-+		if (!arg->called)
-+			report_fail("Event %s handler called", sse_evt_name(arg->evt));
-+
-+		sse_event_disable(event_id);
-+		sse_event_unregister(event_id);
-+
-+		event_arg = &event_args[i];
-+		sse_free_stack(event_arg->stack);
-+	}
-+
-+skip:
-+	report_prefix_pop();
-+}
-+
-+static struct priority_test_arg hi_prio_args[] = {
-+	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE},
-+	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_LOW_PRIO_RAS},
-+	{.evt = SBI_SSE_EVENT_LOCAL_LOW_PRIO_RAS},
-+	{.evt = SBI_SSE_EVENT_LOCAL_PMU_OVERFLOW},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_HIGH_PRIO_RAS},
-+	{.evt = SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP},
-+	{.evt = SBI_SSE_EVENT_LOCAL_HIGH_PRIO_RAS},
-+};
-+
-+static struct priority_test_arg low_prio_args[] = {
-+	{.evt = SBI_SSE_EVENT_LOCAL_HIGH_PRIO_RAS},
-+	{.evt = SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_HIGH_PRIO_RAS},
-+	{.evt = SBI_SSE_EVENT_LOCAL_PMU_OVERFLOW},
-+	{.evt = SBI_SSE_EVENT_LOCAL_LOW_PRIO_RAS},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_LOW_PRIO_RAS},
-+	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE},
-+};
-+
-+static struct priority_test_arg prio_args[] = {
-+	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE, .prio = 5},
-+	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE, .prio = 10},
-+	{.evt = SBI_SSE_EVENT_LOCAL_LOW_PRIO_RAS, .prio = 12},
-+	{.evt = SBI_SSE_EVENT_LOCAL_PMU_OVERFLOW, .prio = 15},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_HIGH_PRIO_RAS, .prio = 20},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_LOW_PRIO_RAS, .prio = 22},
-+	{.evt = SBI_SSE_EVENT_LOCAL_HIGH_PRIO_RAS, .prio = 25},
-+};
-+
-+static struct priority_test_arg same_prio_args[] = {
-+	{.evt = SBI_SSE_EVENT_LOCAL_PMU_OVERFLOW, .prio = 0},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_LOW_PRIO_RAS, .prio = 0},
-+	{.evt = SBI_SSE_EVENT_LOCAL_HIGH_PRIO_RAS, .prio = 10},
-+	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE, .prio = 10},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE, .prio = 10},
-+	{.evt = SBI_SSE_EVENT_GLOBAL_HIGH_PRIO_RAS, .prio = 20},
-+	{.evt = SBI_SSE_EVENT_LOCAL_LOW_PRIO_RAS, .prio = 20},
-+};
-+
-+static void sse_test_injection_priority(void)
-+{
-+	report_prefix_push("prio");
-+
-+	sse_test_injection_priority_arg(hi_prio_args, ARRAY_SIZE(hi_prio_args),
-+					sse_hi_priority_test_handler, "high");
-+
-+	sse_test_injection_priority_arg(low_prio_args, ARRAY_SIZE(low_prio_args),
-+					sse_low_priority_test_handler, "low");
-+
-+	sse_test_injection_priority_arg(prio_args, ARRAY_SIZE(prio_args),
-+					sse_low_priority_test_handler, "changed");
-+
-+	sse_test_injection_priority_arg(same_prio_args, ARRAY_SIZE(same_prio_args),
-+					sse_low_priority_test_handler, "same_prio_args");
-+
-+	report_prefix_pop();
-+}
-+
-+static bool sse_can_inject(unsigned long event_id)
-+{
-+	int ret;
-+	unsigned long status;
-+
-+	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_STATUS, &status);
-+	if (ret)
-+		return false;
-+
-+	return !!(status & BIT(SBI_SSE_ATTR_STATUS_INJECT_OFFSET));
-+}
-+
-+static void boot_secondary(void *data)
-+{
-+	sse_hart_unmask();
-+}
-+
-+static void sse_check_mask(void)
-+{
-+	int ret;
-+
-+	/* Upon boot, event are masked, check that */
-+	ret = sse_hart_mask();
-+	report(ret == SBI_ERR_ALREADY_STARTED, "SSE hart mask at boot time ok");
-+
-+	ret = sse_hart_unmask();
-+	report(ret == SBI_SUCCESS, "SSE hart no error ok");
-+	ret = sse_hart_unmask();
-+	report(ret == SBI_ERR_ALREADY_STOPPED, "SSE hart unmask twice error ok");
-+
-+	ret = sse_hart_mask();
-+	report(ret == SBI_SUCCESS, "SSE hart mask no error");
-+	ret = sse_hart_mask();
-+	report(ret == SBI_ERR_ALREADY_STARTED, "SSE hart mask twice ok");
-+}
-+
-+void check_sse(void)
-+{
-+	unsigned long i, event;
-+
-+	report_prefix_push("sse");
-+	sse_check_mask();
-+
-+	/*
-+	 * Dummy wakeup of all processors since some of them will be targeted
-+	 * by global events without going through the wakeup call as well as
-+	 * unmasking SSE events on all harts
-+	 */
-+	on_cpus(boot_secondary, NULL);
-+
-+	if (!sbi_probe(SBI_EXT_SSE)) {
-+		report_skip("SSE extension not available");
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(sse_event_infos); i++) {
-+		event = sse_event_infos[i].event_id;
-+		report_prefix_push(sse_event_infos[i].name);
-+		if (!sse_can_inject(event)) {
-+			report_skip("Event does not support injection");
-+			report_prefix_pop();
-+			continue;
-+		} else {
-+			sse_event_infos[i].can_inject = true;
-+		}
-+		sse_test_attr(event);
-+		sse_test_register_error(event);
-+		sse_test_inject_simple(event);
-+		if (sse_event_is_global(event))
-+			sse_test_inject_global(event);
-+		else
-+			sse_test_inject_local(event);
-+
-+		report_prefix_pop();
-+	}
-+
-+	sse_test_injection_priority();
-+
-+	report_prefix_pop();
-+}
-diff --git a/riscv/sbi.c b/riscv/sbi.c
-index 6f4ddaf1..33d5e40d 100644
---- a/riscv/sbi.c
-+++ b/riscv/sbi.c
-@@ -32,6 +32,8 @@
- 
- #define	HIGH_ADDR_BOUNDARY	((phys_addr_t)1 << 32)
- 
-+void check_sse(void);
-+
- static long __labs(long a)
- {
- 	return __builtin_labs(a);
-@@ -1451,6 +1453,7 @@ int main(int argc, char **argv)
- 	check_hsm();
- 	check_dbcn();
- 	check_susp();
-+	check_sse();
- 
- 	return report_summary();
- }
-diff --git a/riscv/sse.c b/riscv/sse.c
-new file mode 100644
-index 00000000..2dd7994a
---- /dev/null
-+++ b/riscv/sse.c
-@@ -0,0 +1,132 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * SBI SSE testsuite
-+ *
-+ * Copyright (C) 2024, Rivos Inc., Clément Léger <cleger@rivosinc.com>
-+ */
-+#include <asm/sbi.h>
-+
-+#include "sse.h"
-+
-+bool sse_event_is_global(unsigned long event_id)
-+{
-+	return !!(event_id & SBI_SSE_EVENT_GLOBAL_BIT);
-+}
-+
-+struct sbiret sse_event_get_attr_raw(unsigned long event_id,
-+					    unsigned long base_attr_id,
-+					    unsigned long attr_count,
-+					    unsigned long phys_lo,
-+					    unsigned long phys_hi)
-+{
-+	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_READ_ATTRS, event_id,
-+			base_attr_id, attr_count, phys_lo, phys_hi, 0);
-+}
-+
-+unsigned long sse_event_get_attrs(unsigned long event_id, unsigned long attr_id,
-+					 unsigned long *values, unsigned int attr_count)
-+{
-+	struct sbiret ret;
-+
-+	ret = sse_event_get_attr_raw(event_id, attr_id, attr_count, (unsigned long)values, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_event_get_attr(unsigned long event_id, unsigned long attr_id,
-+					unsigned long *value)
-+{
-+	return sse_event_get_attrs(event_id, attr_id, value, 1);
-+}
-+
-+struct sbiret sse_event_set_attr_raw(unsigned long event_id, unsigned long base_attr_id,
-+					    unsigned long attr_count, unsigned long phys_lo,
-+					    unsigned long phys_hi)
-+{
-+	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_WRITE_ATTRS, event_id, base_attr_id, attr_count,
-+			 phys_lo, phys_hi, 0);
-+}
-+
-+unsigned long sse_event_set_attr(unsigned long event_id, unsigned long attr_id,
-+					unsigned long value)
-+{
-+	struct sbiret ret;
-+
-+	ret = sse_event_set_attr_raw(event_id, attr_id, 1, (unsigned long)&value, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_event_register_raw(unsigned long event_id, void *entry_pc, void *entry_arg)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_REGISTER, event_id, (unsigned long)entry_pc,
-+			(unsigned long)entry_arg, 0, 0, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_event_register(unsigned long event_id, struct sse_handler_arg *arg)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_REGISTER, event_id, (unsigned long)sse_entry,
-+			(unsigned long)arg, 0, 0, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_event_unregister(unsigned long event_id)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_UNREGISTER, event_id, 0, 0, 0, 0, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_event_enable(unsigned long event_id)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_ENABLE, event_id, 0, 0, 0, 0, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_hart_mask(void)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_MASK, 0, 0, 0, 0, 0, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_hart_unmask(void)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_UNMASK, 0, 0, 0, 0, 0, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_event_inject(unsigned long event_id, unsigned long hart_id)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
-+
-+	return ret.error;
-+}
-+
-+unsigned long sse_event_disable(unsigned long event_id)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_DISABLE, event_id, 0, 0, 0, 0, 0);
-+
-+	return ret.error;
-+}
--- 
-2.47.1
+>
+>Thank you,
+>Luigi
+>
+>Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+>
+
+Thanks for the review,
+Stefano
 
 
