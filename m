@@ -1,176 +1,220 @@
-Return-Path: <kvm+bounces-35054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35061-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4A3A0938B
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 15:33:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 665A8A09662
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 16:49:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D193E188C01F
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 14:33:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6381516A90E
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 15:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E72A21128F;
-	Fri, 10 Jan 2025 14:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A76211715;
+	Fri, 10 Jan 2025 15:49:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mB3X0nmj"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cm/OBxSN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7A5211269
-	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 14:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFDB2116E7;
+	Fri, 10 Jan 2025 15:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736519593; cv=none; b=n0VQwwRcSNR+LIOTEurOoar08sTp4n/67H+WpCZLfmbakquDc8Vjx3BI2i00XbAhOSMwsPJIuxLyGCv9bSS1djUzuj3og47unnOyJrW+1V22dDWx6HhysAsAKhM571Qw8SeJ47JJyFhcvo8sTViaodyC2m6dzMJpdTe7bUvhET0=
+	t=1736524164; cv=none; b=NXv03/EkTYUZGV9zpk8Au5esu3wqfSe6rXVBzQGuj1EFs4NwxZvxrsG4fN63LMZOWbQ44NKs6eJ9WhhjpHDcDdFzIYMiujcfjb8pYu29IkdQZGtpq1/EIuecWEwQXrxNnwcKkCHbRuk5ieOaJx/7x1kvAMyWa2yHYcE2sPXq2K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736519593; c=relaxed/simple;
-	bh=o68AVswZC8MMXvOqV0CQg1sP/nxOf+4m/m/wx22k+98=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iwYRgLJTRecv1JSrl05mTd1UisQEdB3YT2CmcHfNQPOGTJ9bm9/UoFG+kJWLJd4wxDbZ5wrTMy8+7mInXGUKo8uUNeZWXgXfJKdZnU0DG4Uzg4Q2uV3iaRM4AuSHWkuUQhqeapO7RF4SaTlKXbqq8KqrASr1dIftYReHIB8ZslM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mB3X0nmj; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736519591; x=1768055591;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=o68AVswZC8MMXvOqV0CQg1sP/nxOf+4m/m/wx22k+98=;
-  b=mB3X0nmjRpEha0bnl9t3LDLiL0OEudYoKSbXYRgjQUfSlcd97DeoC6/9
-   r4Il2ClE17G1oxtLcpoHAafOxJhTlpDYcU7xD5YkUICSQA6WOVnb1KMqK
-   AWpTMvkHjzuvayocoBUztWdou6tlLtXauuWkOPP9qlBDVybAJ06t6/ccD
-   GS2/GpCNmt9KyHvJv4yRSEeJDGs0hRBGl/DQ2Pczuc/1dzVoftHIbZrv/
-   1ITP/MI+3LtDxlcOMLyB/o99qu5RJSmotfu1LEfAmiRFYzHTTWimttaGh
-   QrMsg6SqpraBlL41DEdlBAfPkHnN2SQR32dIf629vQL/Hrwy6sC23xXq2
-   A==;
-X-CSE-ConnectionGUID: OjyWCAcPRZqMgGirwdzaBg==
-X-CSE-MsgGUID: sIxLCZ+xTIO6reZk3svCiQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="62185543"
-X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
-   d="scan'208";a="62185543"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 06:33:11 -0800
-X-CSE-ConnectionGUID: WH9uslLgRtmIp6NNuu6cKw==
-X-CSE-MsgGUID: YLK1mSrmR5etTRZwxZqQ/A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="108790955"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa003.jf.intel.com with ESMTP; 10 Jan 2025 06:33:07 -0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Alireza Sanaee <alireza.sanaee@huawei.com>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v7 RESEND 5/5] i386/cpu: add has_caches flag to check smp_cache configuration
-Date: Fri, 10 Jan 2025 22:51:15 +0800
-Message-Id: <20250110145115.1574345-6-zhao1.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250110145115.1574345-1-zhao1.liu@intel.com>
-References: <20250110145115.1574345-1-zhao1.liu@intel.com>
+	s=arc-20240116; t=1736524164; c=relaxed/simple;
+	bh=6AesAjsPQe+Q6dZmCB7IAZ/dCQeMTOZDKZNyQY1XkyM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=e0z6xZdmjjQNeq7dxzlpXwoiRpryFLDdCS9n7BlIuNm6KZadutU3J07HqXoaFlYUpGB6iFEdCwtAcCpqeEodFOmxqiFNG+glEIAVq++mOBl3tKWroiG+C/8laendE2ykjB+ANLWvaTXfCnTSsdl2mrVLkH315wtw7za0pyfBun0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cm/OBxSN; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50A3rpiF029127;
+	Fri, 10 Jan 2025 15:49:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=PXGEBz
+	0M8UPoIymcBxudeB1arG/6HDODYwhhEf3NTKc=; b=cm/OBxSNWoDwLZAE5rh7C1
+	Ziu/icum5xE1ADpICtJc5sKoff2q5Oy9IcV7pXpfrFYnRwl/2psgCP0hoyRzL6Nk
+	0q5JhmyLEmqj64GPx6MkJPEFfabz4oydN17e6Nt2ZUgi2oSFxQc15BVQIFlHA92V
+	0FVJd5N0P8ZLJoHk/51cQNBDYC2ph3tqKpdCSfQVDsXdvC99nx7qmK0CH1BDVsQr
+	UVT7hCgL+AgtYSqN+ukfpjRjv17/5NKqeGsnsqq88S6sg9/eEz2XgSYd6ppt4B/H
+	D/bUZjBiPyz4CCzY5gHTHJplhsdOHSZc+JiTvrNDpj5GTidAdYoyQ84x/pyhkDNQ
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 442v1q2t1x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jan 2025 15:49:13 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50ADv2n6013698;
+	Fri, 10 Jan 2025 15:49:12 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43ygapawa6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jan 2025 15:49:11 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50AFn86N46334424
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 Jan 2025 15:49:08 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EED1B2004B;
+	Fri, 10 Jan 2025 15:49:07 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C889A20040;
+	Fri, 10 Jan 2025 15:49:07 +0000 (GMT)
+Received: from darkmoore (unknown [9.179.31.54])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 10 Jan 2025 15:49:07 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 10 Jan 2025 16:40:04 +0100
+Message-Id: <D6YI8R3EGSM1.3NVP352YOB8KQ@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, <frankja@linux.ibm.com>,
+        <borntraeger@de.ibm.com>, <david@redhat.com>, <willy@infradead.org>,
+        <hca@linux.ibm.com>, <svens@linux.ibm.com>, <agordeev@linux.ibm.com>,
+        <gor@linux.ibm.com>, <nrb@linux.ibm.com>, <nsg@linux.ibm.com>
+To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v1 02/13] KVM: s390: fake memslots for ucontrol VMs
+X-Mailer: aerc 0.18.2
+References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
+ <20250108181451.74383-3-imbrenda@linux.ibm.com>
+In-Reply-To: <20250108181451.74383-3-imbrenda@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1sYvkqy9m-nvFKgqEyAHodscTxf5tp-S
+X-Proofpoint-ORIG-GUID: 1sYvkqy9m-nvFKgqEyAHodscTxf5tp-S
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ priorityscore=1501 spamscore=0 impostorscore=0 adultscore=0 suspectscore=0
+ lowpriorityscore=0 clxscore=1015 mlxscore=0 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501100122
 
-From: Alireza Sanaee <alireza.sanaee@huawei.com>
+On Wed Jan 8, 2025 at 7:14 PM CET, Claudio Imbrenda wrote:
+> Create fake memslots for ucontrol VMs. The fake memslots identity-map
+> userspace.
+>
+> Now memslots will always be present, and ucontrol is not a special case
+> anymore.
+>
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 42 ++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 38 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index ecbdd7d41230..797b8503c162 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -59,6 +59,7 @@
+>  #define LOCAL_IRQS 32
+>  #define VCPU_IRQS_MAX_BUF (sizeof(struct kvm_s390_irq) * \
+>  			   (KVM_MAX_VCPUS + LOCAL_IRQS))
+> +#define UCONTROL_SLOT_SIZE SZ_4T
+> =20
+>  const struct _kvm_stats_desc kvm_vm_stats_desc[] =3D {
+>  	KVM_GENERIC_VM_STATS(),
+> @@ -3326,6 +3327,23 @@ void kvm_arch_free_vm(struct kvm *kvm)
+>  	__kvm_arch_free_vm(kvm);
+>  }
+> =20
+> +static void kvm_s390_ucontrol_ensure_memslot(struct kvm *kvm, unsigned l=
+ong addr)
+> +{
+> +	struct kvm_userspace_memory_region2 region =3D {
+> +		.slot =3D addr / UCONTROL_SLOT_SIZE,
+> +		.memory_size =3D UCONTROL_SLOT_SIZE,
+> +		.guest_phys_addr =3D ALIGN_DOWN(addr, UCONTROL_SLOT_SIZE),
+> +		.userspace_addr =3D ALIGN_DOWN(addr, UCONTROL_SLOT_SIZE),
+> +	};
+> +	struct kvm_memory_slot *slot;
+> +
+> +	mutex_lock(&kvm->slots_lock);
+> +	slot =3D gfn_to_memslot(kvm, addr);
+> +	if (!slot)
+> +		__kvm_set_memory_region(kvm, &region);
 
-Add has_caches flag to SMPCompatProps, which helps in avoiding
-extra checks for every single layer of caches in x86 (and ARM in
-future).
+This will call into kvm_arch_commit_memory_region() where
+kvm->arch.gmap will still be NULL!
 
-Signed-off-by: Alireza Sanaee <alireza.sanaee@huawei.com>
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
----
-Note: Picked from Alireza's series with the changes:
- * Moved the flag to SMPCompatProps with a new name "has_caches".
-   This way, it remains consistent with the function and style of
-   "has_clusters" in SMPCompatProps.
- * Dropped my previous TODO with the new flag.
----
-Changes since Patch v2:
- * Picked a new patch frome Alireza's ARM smp-cache series.
----
- hw/core/machine-smp.c |  2 ++
- include/hw/boards.h   |  3 +++
- target/i386/cpu.c     | 11 +++++------
- 3 files changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
-index 4e020c358b66..0be0ac044c22 100644
---- a/hw/core/machine-smp.c
-+++ b/hw/core/machine-smp.c
-@@ -332,6 +332,8 @@ bool machine_parse_smp_cache(MachineState *ms,
-             return false;
-         }
-     }
-+
-+    mc->smp_props.has_caches = true;
-     return true;
- }
- 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 2ad711e56dbe..97125b027070 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -156,6 +156,8 @@ typedef struct {
-  * @modules_supported - whether modules are supported by the machine
-  * @cache_supported - whether cache (l1d, l1i, l2 and l3) configuration are
-  *                    supported by the machine
-+ * @has_caches - whether cache properties are explicitly specified in the
-+ *               user provided smp-cache configuration
-  */
- typedef struct {
-     bool prefer_sockets;
-@@ -166,6 +168,7 @@ typedef struct {
-     bool drawers_supported;
-     bool modules_supported;
-     bool cache_supported[CACHE_LEVEL_AND_TYPE__MAX];
-+    bool has_caches;
- } SMPCompatProps;
- 
- /**
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b6d6c4b96d49..7bc619236680 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -8040,13 +8040,12 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- 
- #ifndef CONFIG_USER_ONLY
-     MachineState *ms = MACHINE(qdev_get_machine());
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
- 
--    /*
--     * TODO: Add a SMPCompatProps.has_caches flag to avoid useless updates
--     * if user didn't set smp_cache.
--     */
--    if (!x86_cpu_update_smp_cache_topo(ms, cpu, errp)) {
--        return;
-+    if (mc->smp_props.has_caches) {
-+        if (!x86_cpu_update_smp_cache_topo(ms, cpu, errp)) {
-+            return;
-+        }
-     }
- 
-     qemu_register_reset(x86_cpu_machine_reset_cb, cpu);
--- 
-2.34.1
+> +	mutex_unlock(&kvm->slots_lock);
+> +}
+> +
+>  int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  {
+>  	gfp_t alloc_flags =3D GFP_KERNEL_ACCOUNT;
+> @@ -3430,6 +3448,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long=
+ type)
+>  	if (type & KVM_VM_S390_UCONTROL) {
+>  		kvm->arch.gmap =3D NULL;
+>  		kvm->arch.mem_limit =3D KVM_S390_NO_MEM_LIMIT;
+> +		/* pre-initialize a bunch of memslots; the amount is arbitrary */
+> +		for (i =3D 0; i < 32; i++)
+> +			kvm_s390_ucontrol_ensure_memslot(kvm, i * UCONTROL_SLOT_SIZE);
+>  	} else {
+>  		if (sclp.hamax =3D=3D U64_MAX)
+>  			kvm->arch.mem_limit =3D TASK_SIZE_MAX;
+> @@ -5704,6 +5725,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  #ifdef CONFIG_KVM_S390_UCONTROL
+>  	case KVM_S390_UCAS_MAP: {
+>  		struct kvm_s390_ucas_mapping ucasmap;
+> +		unsigned long a;
+> =20
+>  		if (copy_from_user(&ucasmap, argp, sizeof(ucasmap))) {
+>  			r =3D -EFAULT;
+> @@ -5715,6 +5737,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  			break;
+>  		}
+> =20
+> +		a =3D ALIGN_DOWN(ucasmap.user_addr, UCONTROL_SLOT_SIZE);
+> +		while (a < ucasmap.user_addr + ucasmap.length) {
+> +			kvm_s390_ucontrol_ensure_memslot(vcpu->kvm, a);
+> +			a +=3D UCONTROL_SLOT_SIZE;
+> +		}
+>  		r =3D gmap_map_segment(vcpu->arch.gmap, ucasmap.user_addr,
+>  				     ucasmap.vcpu_addr, ucasmap.length);
+>  		break;
+> @@ -5852,10 +5879,18 @@ int kvm_arch_prepare_memory_region(struct kvm *kv=
+m,
+>  				   struct kvm_memory_slot *new,
+>  				   enum kvm_mr_change change)
+>  {
+> -	gpa_t size;
+> +	gpa_t size =3D new->npages * PAGE_SIZE;
+> =20
+> -	if (kvm_is_ucontrol(kvm))
+> -		return -EINVAL;
+> +	if (kvm_is_ucontrol(kvm)) {
+> +		if (change !=3D KVM_MR_CREATE || new->flags)
+> +			return -EINVAL;
+> +		if (new->userspace_addr !=3D new->base_gfn * PAGE_SIZE)
+> +			return -EINVAL;
+> +		if (!IS_ALIGNED(new->userspace_addr | size, UCONTROL_SLOT_SIZE))
+> +			return -EINVAL;
+> +		if (new->id !=3D new->userspace_addr / UCONTROL_SLOT_SIZE)
+> +			return -EINVAL;
+> +	}
+> =20
+>  	/* When we are protected, we should not change the memory slots */
+>  	if (kvm_s390_pv_get_handle(kvm))
+> @@ -5872,7 +5907,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>  		if (new->userspace_addr & 0xffffful)
+>  			return -EINVAL;
+> =20
+> -		size =3D new->npages * PAGE_SIZE;
+>  		if (size & 0xffffful)
+>  			return -EINVAL;
+> =20
 
 
