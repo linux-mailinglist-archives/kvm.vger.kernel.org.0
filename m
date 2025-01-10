@@ -1,131 +1,157 @@
-Return-Path: <kvm+bounces-35030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E3EA08EE4
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 12:12:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AE58A08EEC
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 12:13:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B477416634C
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 11:12:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B357188D19B
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 11:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6680B20B21E;
-	Fri, 10 Jan 2025 11:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5EA920ADC9;
+	Fri, 10 Jan 2025 11:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="MwO3UGQ8"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="WwCoc8GU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FAD6205AC3
-	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 11:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3742B1E32C5
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 11:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736507554; cv=none; b=Sf+/aPT5W63KmkcEWsQU4CAma5zXPNOQQmPf3uwbjqsWxiuBjTI+cRrKKZNILxTZ3OfM9tOUa9pOyK3deZPSSb3SMuGVeH5NoWg5VWElJEjZUNh9EC6/y3T9yrQ4Qpw7vVEY5vdaIp749Jiq2+eaOC6Io4zoGXKb2iLd3KKSDAQ=
+	t=1736507584; cv=none; b=WII/hTaFFwxbT4Mjo221kHX09XGFKoNgn4rLoCi/em+BSTbvqGZC+c1upX5D5V+H8pnUE8YBrdtUvkStdQNGQWqh6pfMEozUkyaN3UhUSg0qzGdkKuUMxq9MbdjrPekn+w4/CrVRIZWMOM9x8NdxchJiq9qHJNVgiT9LNwfDCgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736507554; c=relaxed/simple;
-	bh=qXSynCY96TYG7wZ7OASI5Muii12uM+aBd0x+fKz2Q64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fE82IGeDN61HGtSTUi5Nj9IpYJQU/KdKaxt6NAl0Ewh4n36N+UbtF4GXnQa7ywUrNtqOFtGOqQOm2yyhzr6UFlp81VpriavJ/rfd1XlrIKa8Bjiq8UniVTxFd5iGa4hqWQk02S1fzRBJzE/7RBDAM9JuiXCinc5boAxb6RF72K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=MwO3UGQ8; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2164b662090so28959645ad.1
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 03:12:32 -0800 (PST)
+	s=arc-20240116; t=1736507584; c=relaxed/simple;
+	bh=kcHd074yr4RuAP/SgM1YMZNeMlBLf2mbqT1677uVoZo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bww5H084BHbYeQIPIqsMA3vlO++om4S5BYcBHm3Xn7r8NkLMI4ykpTix96ma7vJEZQUyRzbYFCGwyLgVHpPz+i8Y/HWvBqMFcjiYCq77BxiGbxFWe+Op2xjzVaYk4w+6qX29n4hIeyjKBEiBEllco4rwKaj6uMtOtQ0S09SYdt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=WwCoc8GU; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-436ce2ab251so14600295e9.1
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 03:13:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736507552; x=1737112352; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fUI/Gf/iNdZ2kON6E6PSrhEkMNvEUQIh/sL8yMhLamQ=;
-        b=MwO3UGQ8TvdlcnS1Er/wPY9ota4qi9gGOgTNt7g7S6YG1L9H3gqX0ExQeXxKJnXL7X
-         XeAWFpsMp3pjyvWra0SCvqOuqk/80Ss1ztp4HN27fDmWYrpuva407XWMh4/xOAEXA3KJ
-         WuOh5DzuQ4gbLE0fUUS7YS/+tghLtkvK+s5eGulTypBG7qqUOlAMyYF9c7Z+TLIAXXwW
-         UE9+ude3fE3mDWHLqpT9hK6iDDqMJCmdSPQ2vfvJ015wBRsVUBZDs2Tw0Jz3m2fwhswE
-         9BT0HSyyEVIF8eiJ9+cOWEtoHXvBzBFnnCNhJrTMzYH6h9prUzxWAnD2O7WOPlgDTkiH
-         UdzA==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736507580; x=1737112380; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cvtjhmhnFALzHo5ylM2nYcQXcJNhmIYsbqZ49LuOAJM=;
+        b=WwCoc8GUDWFj5eyBILTd4DIgsTWCbGs4HfY0xmOJOh4eaZQ+VvTaWTHduhMNob9fAC
+         pBDWNfkoeNgY1WrZa4w8BDrx0GgBTB8FSanW3WmGIN7/G70W7HFEWl0ihftA7pz2WmSO
+         mKOluC5M208Otq9buw13KAuijHJNyPAsPHpS4qJ31x+sHAhRuBmh/PbbKvqd99tGMeyL
+         crAfDSvE3K7i99Hqar/gLMyWeOyCSqxKskqLMALCn6uKnYS8b3rKtsLDJyCQv59HB8zB
+         iuk5ksK0Ik7H5/ljS1xA1En5FNIvk8ze9Tt5bbh9vjk/n2d3K+6lmORHlX3nMAcAo/LO
+         yHpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736507552; x=1737112352;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fUI/Gf/iNdZ2kON6E6PSrhEkMNvEUQIh/sL8yMhLamQ=;
-        b=JLYR3K0xdXyikGZHkApQGwkwedYypMbeiJ9qe+JyKQPIiXa2IZUAaALyAxWw8t/1bX
-         fBCsFGFV4zdzSE6oJxOxiLMRAPY0ME3iPlNGTPTmO+IkbeCcgvjWD2r/u5VYwRCPuqKZ
-         53ihDrcHo8UwaMJ8un+wmj3p7ULONbKvoikgSHQTlng7WJ2ZtoPikRPvw/8ec8a9wS8d
-         B7C+kto274GuYF8+2vbsQDGNMPmxlRyNkriyK5oMRabOj5oAfs6njIFM1mEGovWFWEzn
-         iZsjjOIea4dr23z3a9ZddfP9LNWqHgAQBK16y39GLu5Y+UTygT0TXu+OVfRsvSkX5Fix
-         vLRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNGGS481PVl+Fy1Cihv06TpBAXo1bO8FC80KACj7HqOCEyczVcVakWpE/BR3CriWygKIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyileU3c8qcSg9OUzWP8vmFeQIJaRvCq5x9C/zAdo06G6/IUb6e
-	cnmgyorv7ycMS/3iwW8pkUKktGK7LIkcANtM/oScD0JHobK7eJTj+hXdqlpwG04=
-X-Gm-Gg: ASbGncuteNyxTLBDHLmwR/mddY+Zngrk1k/v1VwXAsxjEZMj/uGKp5R49IxdG/wuCEG
-	Yxga7cy/07KKXvhl6Am2/JTrtgQQG9hXMfSZFP+GPYJykuctsB1RiVcYelBhZoqN4PuglqxA1jU
-	9tIS6zwbtMyplLuCFAb/E9Qt4c3hipv531i6/pKTX+isALRrKxOmxlxqXLAvGq/Go76lAXDO+5Q
-	1eRJEXPCWNxQA3uS6+0QT147VxZdnHHCo/qtgdoGgWMt/ZbP0vok/0cVkyiTpqsL9o=
-X-Google-Smtp-Source: AGHT+IFsisJKA6JOrR0eUj5WfV8wXSlwG+ErpDxaHPAWov6uHn2OYu5jltHENp4vvgdoL273AAhZWg==
-X-Received: by 2002:a05:6a20:244d:b0:1d9:fbc:457c with SMTP id adf61e73a8af0-1e88d0a4770mr18461822637.36.1736507552500;
-        Fri, 10 Jan 2025 03:12:32 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d4056a2cfsm1373935b3a.51.2025.01.10.03.12.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jan 2025 03:12:32 -0800 (PST)
-Message-ID: <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
-Date: Fri, 10 Jan 2025 20:12:25 +0900
+        d=1e100.net; s=20230601; t=1736507580; x=1737112380;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cvtjhmhnFALzHo5ylM2nYcQXcJNhmIYsbqZ49LuOAJM=;
+        b=TkoXfGIIr0ycLW1fzmJpqX/zAqC+fCBuBRp6R/04aftrYRHCILRjnqcEtPLmeARwfp
+         fblMysQX9kt6+NfLJpyxx8gkVHWS1iBIo6pDlOCQlWQjYZU+2XzfvtzDdUK8ognyhRnq
+         Rnvy/Of+0/GTcfxUlcwmbnqby30F0Bm3fOcB4CDMStpF7VqOvpybtA64JPqxCl/AJMkh
+         iGMJbmwQlk8MwLlFX+evmu47Nq0dm8M47OrciqayvIAxYtsOqXKaWLNwY+6z8GdjtyCn
+         hqHrF6CpTAmMBSbl/FuifsveTtO9TkImcJ3xB9qk6Axc4KLGDW5lOfJPgBymnsBIu5/a
+         jupQ==
+X-Gm-Message-State: AOJu0YzbRrydYFfKyjjVdPYn96y+chFlgoVacJxdtWBNKybdQIiv7SgX
+	Gkc5AH7iTML5FQFq/Zfa/1sQKhsUPFlfB+LLE2190r2iNYjM8Kko296zssmoKneAagWCPcMpO65
+	O
+X-Gm-Gg: ASbGncs2xomhi0ZbopR/eoKu4QjpHc1YZBipbpx5+xzDCUs3glcWfivprEtdWELXdX3
+	+FFWh3aHwWoTYk2nJBmKTCMpY5+tQ8bX75f7zw0YoazTf8e26C4v4z6C0vbEv8K9uvErw5XD0mQ
+	ndGoR6CmEYM3naahDCZkcUAb3dGqwWmObwwsheSnW/XNlogbazGYQxX3V4nleFnHOkRtRU5qXlH
+	pNQQj3Sifd3xOwKo+h/9ccg1RBglb03BeO65Kp8QN3K0KrMcEh1TxT/Ww==
+X-Google-Smtp-Source: AGHT+IFxrA4TF3MNStiKx6CJDnq7rdlWFFux+wCJ2jGt4Y3FYGe8jIz1FVZj/htS+4CyB+m8FRfm2Q==
+X-Received: by 2002:a05:600c:19ce:b0:42c:bb96:340e with SMTP id 5b1f17b1804b1-436e26f857fmr101269725e9.31.1736507580056;
+        Fri, 10 Jan 2025 03:13:00 -0800 (PST)
+Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38c1d6sm4344459f8f.50.2025.01.10.03.12.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2025 03:12:59 -0800 (PST)
+From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <apatel@ventanamicro.com>,
+	Atish Patra <atishp@rivosinc.com>
+Subject: [kvm-unit-tests PATCH v6 0/5] riscv: add SBI SSE extension tests
+Date: Fri, 10 Jan 2025 12:12:39 +0100
+Message-ID: <20250110111247.2963146-1-cleger@rivosinc.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-3-388d7d5a287a@daynix.com>
- <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
- <20250110052246-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20250110052246-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 2025/01/10 19:23, Michael S. Tsirkin wrote:
-> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
->> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>
->>> The specification says the device MUST set num_buffers to 1 if
->>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
->>
->> Have we agreed on how to fix the spec or not?
->>
->> As I replied in the spec patch, if we just remove this "MUST", it
->> looks like we are all fine?
->>
->> Thanks
-> 
-> We should replace MUST with SHOULD but it is not all fine,
-> ignoring SHOULD is a quality of implementation issue.
-> 
+This series adds an individual test for SBI SSE extension as well as
+needed infrastructure for SSE support. It also adds test specific
+asm-offsets generation to use custom OFFSET and DEFINE from the test
+directory.
 
-Should we really replace it? It would mean that a driver conformant with 
-the current specification may not be compatible with a device conformant 
-with the future specification.
+---
 
-We are going to fix all implementations known to buggy (QEMU and Linux) 
-anyway so I think it's just fine to leave that part of specification as is.
+V6:
+ - Add missing $(generated-file) dependencies for "-deps" objects
+ - Split SSE entry from sbi-asm.S to sse-asm.S and all SSE core functions
+   since it will be useful for other tests as well (dbltrp).
+
+V5:
+ - Update event ranges based on latest spec
+ - Rename asm-offset-test.c to sbi-asm-offset.c
+
+V4:
+ - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
+ - Add proper asm-offset generation for tests
+ - Move SSE specific file from lib/riscv to riscv/
+
+V3:
+ - Add -deps variable for test specific dependencies
+ - Fix formatting errors/typo in sbi.h
+ - Add missing double trap event
+ - Alphabetize sbi-sse.c includes
+ - Fix a6 content after unmasking event
+ - Add SSE HART_MASK/UNMASK test
+ - Use mv instead of move
+ - move sbi_check_sse() definition in sbi.c
+ - Remove sbi_sse test from unitests.cfg
+
+V2:
+ - Rebased on origin/master and integrate it into sbi.c tests
+
+Clément Léger (5):
+  kbuild: allow multiple asm-offsets file to be generated
+  riscv: use asm-offsets to generate SBI_EXT_HSM values
+  riscv: Add "-deps" handling for tests
+  riscv: lib: Add SBI SSE extension definitions
+  riscv: sbi: Add SSE extension tests
+
+ scripts/asm-offsets.mak |  22 +-
+ riscv/Makefile          |  12 +-
+ lib/riscv/asm/csr.h     |   2 +
+ lib/riscv/asm/sbi.h     |  89 ++++
+ riscv/sse.h             |  41 ++
+ riscv/sbi-asm.S         |   6 +-
+ riscv/sse-asm.S         | 104 +++++
+ riscv/sbi-asm-offsets.c |  20 +
+ riscv/sbi-sse.c         | 936 ++++++++++++++++++++++++++++++++++++++++
+ riscv/sbi.c             |   3 +
+ riscv/sse.c             | 132 ++++++
+ riscv/.gitignore        |   1 +
+ 12 files changed, 1355 insertions(+), 13 deletions(-)
+ create mode 100644 riscv/sse.h
+ create mode 100644 riscv/sse-asm.S
+ create mode 100644 riscv/sbi-asm-offsets.c
+ create mode 100644 riscv/sbi-sse.c
+ create mode 100644 riscv/sse.c
+ create mode 100644 riscv/.gitignore
+
+-- 
+2.47.1
+
 
