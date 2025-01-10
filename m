@@ -1,111 +1,147 @@
-Return-Path: <kvm+bounces-35002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2EDCA08AAF
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 09:48:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C989A08AB7
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 09:54:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 853F77A11FF
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 08:48:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 803E53A914A
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 08:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6858209F27;
-	Fri, 10 Jan 2025 08:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D26B209691;
+	Fri, 10 Jan 2025 08:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="dvIoj2Ua"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="TTSLh5H6"
 X-Original-To: kvm@vger.kernel.org
-Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.7])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 227082080E8;
-	Fri, 10 Jan 2025 08:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.7
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7411916DEA9
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 08:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736498913; cv=none; b=N9MGVwb7K10oEVc9vJaquUEiLuBFPLWZPl5yIBfnZV0uabIqGyTlwssx+N45bQrhmgKe4ZxujowYt3TVqc6zpypfieDKJbtK2b7g/O5CLwndgCzmpN+ft6ZopB2NRm+KAGz69nctZPynaysoM6eOUQIRiRU8QegyGmW94FwUpcw=
+	t=1736499243; cv=none; b=Ao/KDYDwrqt8m8TZ6dB4x154x4Wq83/Mx50BSWKCkLCBQS45zsvuYlcrIo70pxTPkgnDcHVS08u8cdrkPhprC3VYcB5sGWmYW+tCz6SLcFdZej86udY9MGbBjjQMDacC5XABlXLMJ9O50NFtXY4P5eFYAvcap3GI3hI7+gdR5A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736498913; c=relaxed/simple;
-	bh=ub1sZHXFb/F+AxJ6AHCti3HnWJ7GR+UwU33f6KDJfXY=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=oiKSTRduPrfsQ6Sc9dW5Guu7oK9KQXt2QxCSwdwrKmAvzC14wT2OqsNk1MvUPZ8ZBVoAXsOrRQEr2FN/bLfWxfkoCD+X3qW+eCvFsWjG76Qe0aJYVPRGg0YjrM5zAYktL4UfIcdGenLcsfUOJn9x5s6VnTCm1IhtB61omc4ofUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=dvIoj2Ua; arc=none smtp.client-ip=220.197.31.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=GzjIOLyHp5IdO2BVyK
-	Ai1LLovEreSuoc5dzKWXy2fas=; b=dvIoj2UaqQFk7LP+J1xjhOmMe1vvXf2XCU
-	CuvEQ4YpSBP03luS7A/mLmp4B9/ktRYKrSL2mJ9fMidozquyB3fr76+OgkCx26xh
-	bsaajBlzelgX90fzEZou1ef7kYifYwR9h1WYTjaY81xbxAZsiYpLXKC5P3V1QXr4
-	SA1fxSyro=
-Received: from hg-OptiPlex-7040.hygon.cn (unknown [112.64.138.194])
-	by gzsmtp2 (Coremail) with SMTP id pikvCgDXj6zI3oBnEUEFDg--.13619S2;
-	Fri, 10 Jan 2025 16:48:08 +0800 (CST)
-From: yangge1116@126.com
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	michael.roth@amd.com,
-	21cnbao@gmail.com,
-	david@redhat.com,
-	baolin.wang@linux.alibaba.com,
-	liuzixing@hygon.cn,
-	yangge <yangge1116@126.com>
-Subject: [PATCH] KVM: SEV: Pin SEV guest memory out of CMA area
-Date: Fri, 10 Jan 2025 16:48:07 +0800
-Message-Id: <1736498887-28180-1-git-send-email-yangge1116@126.com>
-X-Mailer: git-send-email 2.7.4
-X-CM-TRANSID:pikvCgDXj6zI3oBnEUEFDg--.13619S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Ar4rZry8JF18GF4DCw13twb_yoW8WFy3pF
-	4xGwsIyFZxX3sFyF92q3ykurnruaykWr45AFn7Z345uwn8KFyxtr4xZw1jq3yDZrW8XFnY
-	yr4rWrn8ZF4DZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRolk3UUUUU=
-X-CM-SenderInfo: 51dqwwjhrrila6rslhhfrp/1tbifhzQG2eA2StPegAAsJ
+	s=arc-20240116; t=1736499243; c=relaxed/simple;
+	bh=Li/GpzvgX0clmsLb8qEAToA9iMtROY9ZL/3aCIe8UqI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Y089cTIOsmCARlqjqaNNpAsjcjVEgdELyfpitjBY4jVtTrajDaasic8jN70wQNHRva5zDtUPr/JK1VX4W1bnB/R9hWXb6cRzrCUp3bm4VR1NKoL4FGAqNcrhliALNBDBoYmgNzBlAUIMHQJSRZk4BMC211ipWzspxc6AAH4Fg+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=TTSLh5H6; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3862b40a6e0so989489f8f.0
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 00:54:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736499239; x=1737104039; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z/vmys0EVuwB0xKk+EZlTCl6zKgMXosmjoUNe63DhnQ=;
+        b=TTSLh5H6mC5HP3gyMdtUCxuMHMxk1cqd17y2PAvqp6MQ0gl8HjXmlHFhGnQ0Q2aYVP
+         1owVcpsC2+xpgLm+9ic/d9WVjRcT5+fIGsNCCiCumZcggOEzmL/aBxJD/zdoiH9mKuzx
+         JoxVSGavpCaGkb2J903PNvpXIwaIIOkRbTVBTHP7neAPA6lHWrjGIKL/Ca5wL0K7+5j7
+         ExxgdEO+YomapXZJ+yJ9jfglqDaXLQrJJfJwaGtG1s4jvXjj1GZbUpYpaTrRK4WTkufE
+         whaNDQ1t18+Frgl59r6i0+ICOZWFD3qEr6lbIvaDqZ/5px7b4cutcOSkraak4TuaMTk6
+         5PrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736499239; x=1737104039;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z/vmys0EVuwB0xKk+EZlTCl6zKgMXosmjoUNe63DhnQ=;
+        b=hIgItVKHraPU4NPGGTqJaz/CntSBmMDNH+/+xdUUMu0TRqMg4oroH5Zs0KXS0EV9wW
+         JRm/pQn0IWWdRTLiEtUbMIhKDY4Ji2qfoQ4mVaNhCWHt9mTc4i+XGBo27MUcrVTpxpXl
+         sMNRYQalQ7XonFhGZv0xMtEV5I2xoW6Irv+UW3nhWJbRnUoJtYeBJV7K0SkzO0MfIGyb
+         qvgnro7xu9FKtjnJmytRmYSitYkAFZWdPBO4m5O0rBFo8e1qaVEVz47N9In/RzlxZE9y
+         pKuaf8rHXFvep/TD2wr5kkBDGnMNEXqRlKeZIoWCcK1gocQzXb7uIXWH1hLJlXu2e2LC
+         ag6A==
+X-Gm-Message-State: AOJu0YxMQpvT1Sdbxuqw1aRKtPH9TY5yQtg9LXUbkySClihyag+KpRm9
+	Ei3s6hCpEefkWniTxZ1PbDT+4GzB3jqkfAabQATixyOFias4Tf6jIegVvSpWrzUR1sBsRb1iqno
+	y
+X-Gm-Gg: ASbGncuMs6AP+V0op94zNjJTxFGeSKxq4raTbfR2hKXUFkNr8kQR+D5CcV+u2Fn46pe
+	U257YuwqOXnIZbECUrXb38LrUiaWDENRIo4vygTubiFuxH4AxtPhzwU+vR1wpmq/Xj0pBGIIthq
+	WiajfAGgJyMJT2YTI2F+Kzsb7FmR4UfIOM5G4vJ4uqvKe68cDgYxtnAVcVkbTy7TzrsNupt4DRO
+	boJV6eZ9Xs1M1/ML3xppOjtPEgHfLVgwhpJ7n1IUWORYHOlH2TMRu908A==
+X-Google-Smtp-Source: AGHT+IHUDt07t5Oqoev2Rxl3n1F1zN41WKhamAhtCNOOIbQ11tERVZqurci5ma4ZojCPiSYV/OEFLg==
+X-Received: by 2002:a5d:47a6:0:b0:385:f195:2a8 with SMTP id ffacd0b85a97d-38a87312734mr9091920f8f.30.1736499239125;
+        Fri, 10 Jan 2025 00:53:59 -0800 (PST)
+Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e4c1ce5sm4009283f8f.94.2025.01.10.00.53.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2025 00:53:58 -0800 (PST)
+From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <apatel@ventanamicro.com>,
+	Atish Patra <atishp@rivosinc.com>
+Subject: [kvm-unit-tests PATCH v5 0/5] riscv: add SBI SSE extension tests
+Date: Fri, 10 Jan 2025 09:51:13 +0100
+Message-ID: <20250110085120.2643853-1-cleger@rivosinc.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: yangge <yangge1116@126.com>
+This series adds an individual test for SBI SSE extension as well as
+needed infrastructure for SSE support. It also adds test specific
+asm-offsets generation to use custom OFFSET and DEFINE from the test
+directory.
 
-When pin_user_pages_fast() pins SEV guest memory without the
-FOLL_LONGTERM flag, the pinned pages may inadvertently end up in the
-CMA (Contiguous Memory Allocator) area. This can subsequently cause
-cma_alloc() to fail in allocating these pages, due to the fact that
-the pinned pages are not migratable.
-
-To address the aforementioned problem, we propose adding the
-FOLL_LONGTERM flag to the pin_user_pages_fast() function. By doing
-so, we ensure that the pages allocated will not occupy space within
-the CMA area, thereby preventing potential allocation failures.
-
-Signed-off-by: yangge <yangge1116@126.com>
 ---
- arch/x86/kvm/svm/sev.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 943bd07..35d0714 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -630,6 +630,7 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
- 	unsigned long locked, lock_limit;
- 	struct page **pages;
- 	unsigned long first, last;
-+	unsigned int flags = 0;
- 	int ret;
- 
- 	lockdep_assert_held(&kvm->lock);
-@@ -662,8 +663,10 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
- 	if (!pages)
- 		return ERR_PTR(-ENOMEM);
- 
-+	flags = write ? FOLL_WRITE : 0;
-+
- 	/* Pin the user virtual address. */
--	npinned = pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0, pages);
-+	npinned = pin_user_pages_fast(uaddr, npages, flags | FOLL_LONGTERM, pages);
- 	if (npinned != npages) {
- 		pr_err("SEV: Failure locking %lu pages.\n", npages);
- 		ret = -ENOMEM;
+V5:
+ - Update event ranges based on latest spec
+ - Rename asm-offset-test.c to sbi-asm-offset.c
+
+V4:
+ - Fix typo sbi_ext_ss_fid -> sbi_ext_sse_fid
+ - Add proper asm-offset generation for tests
+ - Move SSE specific file from lib/riscv to riscv/
+
+V3:
+ - Add -deps variable for test specific dependencies
+ - Fix formatting errors/typo in sbi.h
+ - Add missing double trap event
+ - Alphabetize sbi-sse.c includes
+ - Fix a6 content after unmasking event
+ - Add SSE HART_MASK/UNMASK test
+ - Use mv instead of move
+ - move sbi_check_sse() definition in sbi.c
+ - Remove sbi_sse test from unitests.cfg
+
+V2:
+ - Rebased on origin/master and integrate it into sbi.c tests
+
+Clément Léger (5):
+  kbuild: allow multiple asm-offsets file to be generated
+  riscv: use asm-offsets to generate SBI_EXT_HSM values
+  riscv: Add "-deps" handling for tests
+  riscv: lib: Add SBI SSE extension definitions
+  riscv: sbi: Add SSE extension tests
+
+ scripts/asm-offsets.mak |   22 +-
+ riscv/Makefile          |   10 +-
+ lib/riscv/asm/csr.h     |    2 +
+ lib/riscv/asm/sbi.h     |   89 ++++
+ riscv/sbi-tests.h       |   12 +
+ riscv/sbi-asm.S         |   96 +++-
+ riscv/sbi-asm-offsets.c |   19 +
+ riscv/sbi-sse.c         | 1060 +++++++++++++++++++++++++++++++++++++++
+ riscv/sbi.c             |    3 +
+ riscv/.gitignore        |    1 +
+ 10 files changed, 1301 insertions(+), 13 deletions(-)
+ create mode 100644 riscv/sbi-asm-offsets.c
+ create mode 100644 riscv/sbi-sse.c
+ create mode 100644 riscv/.gitignore
+
 -- 
-2.7.4
+2.47.1
 
 
