@@ -1,208 +1,212 @@
-Return-Path: <kvm+bounces-34984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB298A0868F
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 06:37:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B17EA0870C
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 06:52:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E54F1887314
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 05:37:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C60B3A15CD
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 05:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B19C2066C0;
-	Fri, 10 Jan 2025 05:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976A82066EB;
+	Fri, 10 Jan 2025 05:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nKg+KTIL"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GJSCRSIq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2055.outbound.protection.outlook.com [40.107.92.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3536B290F;
-	Fri, 10 Jan 2025 05:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736487425; cv=none; b=cGzdUYfG8z40O1sysSVa4OsRhrQgx30AiJC7I/3iMsQnaHG4PScHRorA1fvstaz5Cn3yzX9vDUjzwazwGLyvoOBlYGa8iWk1fY7dRB++p6XoFDjHiZOPixbEzQFdk5kYyIrw8eEG+STe4LOM0JIssZVOIlG7NDPZG87NZZxLkEs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736487425; c=relaxed/simple;
-	bh=ThGWkbfOq/aZG7WSy5hQQObGHUK/iWXfu7yiYGXiMIQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SmWw1XfDhVOktG4oYT92CPYYC3LYLDMzeBB0j0owHkS/5qemMHdhux7P300ifXJhGKbxNJmhQ69qGB2ltKLbMKGhQRzgSTKPUTzIXle3TtpTEzEgEXgi4UohWGb4pdpx70CC9v4vGkDk4Z5Bb0VDuRDHpuT7bDZy0doWA/zyZE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nKg+KTIL; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736487423; x=1768023423;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ThGWkbfOq/aZG7WSy5hQQObGHUK/iWXfu7yiYGXiMIQ=;
-  b=nKg+KTILqA4GJzjFry2rI88SJpWePZuqTgNm3lOa5UUCj0hV4xaiQ8uN
-   n5pQ7tObqZkDt8RHXZx1FX4XDSuJr35pP/WPlmeB2yB/ZIXEgcvdJAU6+
-   y5g2vtgoA4X8P/zM0x7rP987aqT8tRKdRWsCTNCS0xtW9jSS4bD1TuQYf
-   REgkpFU0AA8qT2fxH9Ho+0y8YJ/1yqIzlgk/TMRBLzF3yhaxoLr71VZol
-   gOSxWP8TdgJSeRPyVlCPSJZzo4pETemqdOvyrf4Jco4y4P/w5SfwlKB9a
-   7vBGWYGW5Otv8sgQcjYCOthP0vtmeYaF01Wds75N03L1dswNqmciNN155
-   A==;
-X-CSE-ConnectionGUID: bpunXoCNQP+eSU3J7iKY+A==
-X-CSE-MsgGUID: wB68o7rbSESacrJEhkHItQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="24375580"
-X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
-   d="scan'208";a="24375580"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 21:37:02 -0800
-X-CSE-ConnectionGUID: 4d89aNziT6CmL0Sl2AzPYw==
-X-CSE-MsgGUID: 1HXlILGgTCiI4YF7U9vMKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="108254319"
-Received: from unknown (HELO [10.238.1.62]) ([10.238.1.62])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 21:36:59 -0800
-Message-ID: <a708b8b3-9a6d-4ff5-ab0d-864d2f80b341@linux.intel.com>
-Date: Fri, 10 Jan 2025 13:36:57 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDD5347C7;
+	Fri, 10 Jan 2025 05:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736488344; cv=fail; b=jHyAJVpoKfPEvaJAOdrWNmf/UDUgNp7Hp9qH3pSjzbYTpwH2eM3TOVngXQsXPLoXtv+MyNmCxq6gyySRZx/khiqFs9+MzTMX2Nht+DnnkXv2XC3rZIPF5Etu43KJAnIFAHE4yaae07fMMpoNQF7KFe/3dak+usF5OEQ/BgsG0m4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736488344; c=relaxed/simple;
+	bh=OmMW09ueGXnmln5Nc4G7xDWEQ6NdZ2MNSGAMwLMHvKI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=gz78kieEQHKkQc2Ds/eE2i5QB5R1XJDgmdZVQKagUPG6eoFBIxn/UsnUVPgjBT7i2kWP0mhU/mLgF+4GYGnFxXPEfRs2rxAMcfrkRncYFLLlBiZftd9Ui0ddtItveAafbooxqXZoDxkNrqP06SWWvoLhAW8RJEdzNM7560S/dHs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GJSCRSIq; arc=fail smtp.client-ip=40.107.92.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ero4B4bkYt1hGnglfDIryh1HtSwWp7wpz6zpkEJuspprnkmNRBNYvsDqN/oiVHdveG5ElfjVIJDvrkuYVzPFSQIpl85n50ecdm7Z49vCYWg6riK32J4gSeHJoixE68+m0zfxsQOx6DCBlqcu2WcsEJswQyWxQR6Vf72anoE22KoiuUwWxRPM6jX2L97XzDwHEsl+fNS2qfGj6KeAYomNmEMdICMFvB4XFiWrTS/q1uL+WuKjWwWjgx3W4muYlLng8meUMgear593KvRc/ZjmoV+nTrR+63hE3EWQyMRGDpgELjXuUWDoeAcAMym9POvrKMR2OiYJcZTjxzyIKVtNZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dQAQ1UJC2/DptjFrfaweS/Ay25ld7FGsW1i23SBvyG8=;
+ b=hHiYpRrMmYJMzk/IxCjUcoIxxO5wCzF0hKZVLGEMzOpfNNbQetAMG2iTFxJLEziI4tBKd4agcRVwPC1L79Mx/qV1qz1Z0dBoi/Pq3yM7K46tZzQlQiXk17+O1KYw1Takobe/LZyTt8G+ZXi9RO2/JMcrAdx6NEdEBolKmUogCX5iKTxe7qIXEjzuk64+ie3MyjPjPJZee6D1J4wZRhbxTdKdFRF+KCJDYLr11KOMlxBLEpejJwu9nx5Dp9KkIx1riV4Mj+/JPt5ot9lqWmr1ucHXG6ko9G7+uD30cHFFoRX+zzzJWgAfhejwD+1I5zuRX2sPjQXSEsm2im6i/FO8GA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dQAQ1UJC2/DptjFrfaweS/Ay25ld7FGsW1i23SBvyG8=;
+ b=GJSCRSIqV/3845mCcDVRUSgCLfefrZiTTZkPKYmeixyFXt3dYGY6Vzo1TRpfiBVaZIRAs3/UrMmPXrk3kVwLnexkOngRnnrEO/HAZOyDDZcnT+QGp4mbqSJOqAbFgNNFBejMioDMzRswBEwvR99q5luzlayckBMwFrXtNRVlFkI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ SA1PR12MB7104.namprd12.prod.outlook.com (2603:10b6:806:29e::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8293.17; Fri, 10 Jan 2025 05:52:15 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec%6]) with mapi id 15.20.8335.011; Fri, 10 Jan 2025
+ 05:52:15 +0000
+Message-ID: <bc5650c3-e759-42d7-b993-1af838fd6a80@amd.com>
+Date: Fri, 10 Jan 2025 11:22:07 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [sos-linux-ext-patches] [PATCH v4 2/8] KVM: selftests: SEV-SNP
+ test for KVM_SEV_INIT2
+To: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, pgonda@google.com,
+ thomas.lendacky@amd.com, michael.roth@amd.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241114234104.128532-1-pratikrajesh.sampat@amd.com>
+ <20241114234104.128532-3-pratikrajesh.sampat@amd.com>
+Content-Language: en-US
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <20241114234104.128532-3-pratikrajesh.sampat@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0042.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:22::17) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/16] KVM: TDX: Add support for find pending IRQ in a
- protected local APIC
-To: Nikolay Borisov <nik.borisov@suse.com>, pbonzini@redhat.com,
- seanjc@google.com, kvm@vger.kernel.org
-Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
- reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@linux.intel.com, isaku.yamahata@intel.com,
- yan.y.zhao@intel.com, chao.gao@intel.com, linux-kernel@vger.kernel.org
-References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
- <20241209010734.3543481-2-binbin.wu@linux.intel.com>
- <5d1d421c-3123-455e-aba1-1baf7f12e89e@suse.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <5d1d421c-3123-455e-aba1-1baf7f12e89e@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|SA1PR12MB7104:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7393be51-9254-44de-6724-08dd313aef90
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?K2NvNDRQUTE3UHlJRldpdUxDK1ptQ2tmaTlrRzh6OTJydVptd1NUMEI0VGxG?=
+ =?utf-8?B?dmN5RDBNN3o0OUVMYVpUbXUyRzl3c1krcEVnOHM5ZGJuM1N1Q2U1em5TendR?=
+ =?utf-8?B?NHJnMEpqV3hDVzlqbXVUSDlsN0JJcTNLaWY2YlozeVlmWWZSRDVXMFFSNFhr?=
+ =?utf-8?B?K0drYWVUUG90cHFFUmsxcTlydklCclArZFVlQW1hTDljMGpEb2NyNXJITThh?=
+ =?utf-8?B?K1kxbEtWNGl2c05DTHdNMGlRcXhjMGkyMTBvTFhsTndQU2pZY002a3c5ZXFS?=
+ =?utf-8?B?amhJcStjU3pBYmU1OU1VSjlKSDFHN2l5R0RMRkRmalJYV0I1Q0lTQlpFdGxX?=
+ =?utf-8?B?cGp1aWZOQU1VUFZQUWdYRk5qTmhNb1kvVERMWlM4OFcvemdTZk8zYzlXaHp1?=
+ =?utf-8?B?WXZJeXpVZmIrZlhjblZuRFJWeVVRZENyVUFGSkEybDhvRHlCa3JCd1VwQWZM?=
+ =?utf-8?B?eER1bENHa1M5RlcvZmQ1VlZocHhDN21BaEM5ekdNYnJ2MlhpMmNaUjJ4UFpa?=
+ =?utf-8?B?MExzQnJyMThEM2FkUWkySjFTWlo1ODhnV2V0ditYVlV4dFBSWDlmc1RZNHhl?=
+ =?utf-8?B?cStBYnVIY0tqWGFPNkxlcndxY0dRT01xNXcyaWI1ZXhnTlU1VWhxK0MwSVFu?=
+ =?utf-8?B?MFdqQ2l6TFBWZ0h1MXp0VzZ3ZFpvQ21Oa1hwOGhRamk5dDNnVVU0WEJGVWlE?=
+ =?utf-8?B?WDdBT0NSMGkybG5QZHZpZ01sSGhORWxocnNTcnE5b0l3WCtxUUhGZkU5aHdl?=
+ =?utf-8?B?TVM2Nmw4WGVEVzh5YUEyTU5CRFh6amRsQjBGOVEwZld0emZtaWc2TEtqemdu?=
+ =?utf-8?B?dXRoSkRIc1ZXVDFLdDIrRVRmYVBMblpRYzl3SUdua2xqbUlLOTVJd3hDb2d6?=
+ =?utf-8?B?TFpGQmc2djY5dDB4MDVvOFJ2V0J5RjV0TUVTL1diL3h0ckNVVCtBb3pqQ2Z5?=
+ =?utf-8?B?QmxPdXZhRi94eDdBZXlTdmh1aFVvaVJ3YXZGK3c5cHVnMk9vT1dSMGVINkFZ?=
+ =?utf-8?B?Skd2a0w4Mm5oUFZUQmZtUXdUeHNKMm9kWmE3dHFzU1RSTjdrc044RnpBZmsy?=
+ =?utf-8?B?aC9GcW5HM0FYWVJxR1JmbHlxQnEyQTFiRGE3NVlPN1QreHVhZUlXbFVPbytB?=
+ =?utf-8?B?QnlML2V6OUVZTFFOOUpyN1IrM0U0MVpxMEtIOG4wMFVVVHlHVHU4bVcyTGtO?=
+ =?utf-8?B?U2g1WFJsZmY3cGpnclhNRDNseG9VanRXNms3TENqeEhUVDZXbndaOFBvT3pC?=
+ =?utf-8?B?aFdrclJiaitETU0zNlRpNTJISWVnUnA4eEx1QkYrY1kzc3FnSXRKTlhidWxN?=
+ =?utf-8?B?RmJsRXFGS3pYWWQyeEROLzg3RUREZWo2TU1xOGpsTmZVMjlpUDYrRWlBS3dH?=
+ =?utf-8?B?QjhaTUJmWnAvNXJZRWdtTEMxWWh1Q0xWNlZHUGp1ekduSDVLUDNNNWJKcFh2?=
+ =?utf-8?B?YzkwOEl6bzhvVk0xVk1jYlF3dEN2WHpuZy9ZcmROeis0eTBaOGVmV2lPdXgr?=
+ =?utf-8?B?Mkt6RXRnN1RKNFFUOTJYbmZvaXl3QkpWN0FhRmxyZGlVbXYyd09MdjlsMlgr?=
+ =?utf-8?B?ckp5VEpOb280NGN5NnBRdjZReFpRV1JPdEpHQzlzOEduWnpvNSt1QnIzRHFt?=
+ =?utf-8?B?MXdxd1JOeEhydUpGZWlSVnF5WE5SK1IxN2t0ZHlBcUYxUWtBcDljTTdvc3ZF?=
+ =?utf-8?B?N0JMUGxjR21heDZvcDkzYUtxdllkYWFUTXhiYXdrd0VGTXVmaVhZSS9LNElD?=
+ =?utf-8?B?Ny9wa3hBVThnenV1ZGNodll4MlBGeWNPVWNkUTIzTTFrOW1QUEt5Wm5NUzl5?=
+ =?utf-8?B?QlhERjJuL1ZVTmptUXNxWjVYSHhQazdvOTc3ZTRDU3U1NkRScE80dHN1NE1G?=
+ =?utf-8?Q?2NBS4Yhdu6YrH?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bnJjaGE1SXVBSmtiTTdBM3NYOHJCVTVvQWV0SGY1SFlsYWNVLzBRbWFpT0xG?=
+ =?utf-8?B?VWxzZnZKbmlFRWx0dEg0cjIvbUI2MG4zTnlVblQ4RDNZRGhvOFVVb2JCNzFa?=
+ =?utf-8?B?NVk0d244WHlIN1BOTGQ4SGsxT25LS3lmSE5mNzZ0YjlET1krdzlYbFVvWUZl?=
+ =?utf-8?B?emcwZ1N6TDljSGNJNEZwVjlKc1FNTkpPaE5ORW9UM0ZqSmNkMjVQYWpiMHJF?=
+ =?utf-8?B?clEwWm54NDlwYkFLZjM3QXB2L2xCTDh4d1diSmZZb1Q3d291UVR1ZHBUem5B?=
+ =?utf-8?B?d3pjb2t6YjdBQ3crMTBTSjZQS3d5TGlvMG5wVGtDSW1DRXFIR0ZUbEppQzhC?=
+ =?utf-8?B?dVpZanRaYlpEcUJWcjBaT1ZXcUZMOUhka21OTS9RaldYb3VrQm9sWU9JRWlv?=
+ =?utf-8?B?UW5Wa24zdlY0aUpCTDVOWE5HdFRrandSbGNWQUlIWFdqN1NWZUJmZUhKUkdv?=
+ =?utf-8?B?Mks0Y0NXK1htaS9KZ214TDBwRWhVaTZEK1hVSkdRSmlqUGhWdGpUUUZQSWpv?=
+ =?utf-8?B?NWx4YlFsQndGNkQ4dHN0QzU0UDVaMmx4bWNXMVk1ZjlIWGJlTUNPTU53UnZQ?=
+ =?utf-8?B?SytzMSthdzU0OUNDYzJLNXRlRGFVc3Fya3JQS052NzBMdE5wR244OWhPRXdh?=
+ =?utf-8?B?bnM2UFRadmttNVgrbWtBcnRqNklnMlJVdml3QjZVNlFZRVRHSEFIUXdxWVdv?=
+ =?utf-8?B?Tzh0aTJEbkM5MXY0Nno0c3AxRmtaRExzVzFGcW9zbURNOHBuUkpUTWQ3OEY0?=
+ =?utf-8?B?dEtlR0VCLzBtTkhxalJxcjdnQ3ltSEEycEhSL3JyZ2VrMzFsWmFIcnptMGd2?=
+ =?utf-8?B?bUpvZll1WVVDa0FxWjVTRit5U0tXRGN6NXhsYTVsWi8vdEdTTnd3RjlnSVg0?=
+ =?utf-8?B?eVhLY3dCdTQrdlZmdXlXdjd2Q25jTnd2OTdzbGp1Vmhvb1QvS2krYXQybGsr?=
+ =?utf-8?B?QmxHM2ZMREpsOEFPRC9EMFVjc0J4aVQyWFpXWWxjelZLRCs4cmpqcWowVno1?=
+ =?utf-8?B?eHV1RHV5MFVhdWh6eGpiSnlHVlY1YWs4UGtKQTV2UUJyMzFSbG5BYjVoM0Q3?=
+ =?utf-8?B?bEtSUCtqaUh0NW1DNHluYzVqZDJvSmZDci9KZnBWQzFkSldaVDMvaklVOGg5?=
+ =?utf-8?B?TEJNWjFYQ0orU0tDTDdyc3V6WnZkMFcrd2lraE9pb0hzSHU1SWV4YjhpU3dz?=
+ =?utf-8?B?bGlDdThaMDE0MmZuajRvVlFvRFJ0L256WXZhOTNYenVwamUxQWw1eFI1eFZt?=
+ =?utf-8?B?L1JhQjFlZXpTNzhIVEJ3RWI3ajc5Y3lqWkpIVm0xYlQ5SElGMjhPRUZwY3R5?=
+ =?utf-8?B?SGNIRHlOT2V3eEhwajgzSFVTMmxJT0JLa1ZHUlpCS2NuaitrNkdBOVdlWG45?=
+ =?utf-8?B?ejIwRWtmQm43Z3R6RmNhUnU5aDNmKzh1ZFlLcmhvQW9TK2lNQkVXZHhLWFR2?=
+ =?utf-8?B?TnNsUTBXNEpmTlRVM3NDb3hpMVdhakh1MUdyeEtNR0xPb0Vmakh3Q2h3MGpq?=
+ =?utf-8?B?TVVSNEdiUnpQYTJBOUcyRk5FSXo1L0N6MGxMeFErRC9UckZGd0d1TGg0eElH?=
+ =?utf-8?B?MWF1dElocUxZd3MzRlI1c1lPT3JlRHZoTmlzNkFnKzBMaDA5TVpsV1pIejhP?=
+ =?utf-8?B?dTFXV0JVTERVVFJkYWRPd1EyZnZSWTZ0aXJyN1g1NjNKZmh1bTJJdllYeWVZ?=
+ =?utf-8?B?eElkVEd1VFJvd3RHUGdnYU04UTcvVFh4bnFua0l1eTNEbSsrcEQ4UmpKbCtq?=
+ =?utf-8?B?YjdlTm1POGVObTRINDJyN3NxbkZXYXhCTm1ScnhEWHhJdnlnaWJHc1RJU050?=
+ =?utf-8?B?VzhlOXdnRkQxVG56MTJhWnQ3dEtwNkpoTjByenZwa3V1ZVdkRzRCaVA1dERT?=
+ =?utf-8?B?cDhsc2o1cld3bHdaYkJ6cmJiR2dEU1c2VnlVT0M2MHdnc2Q5dGlZeTZYQVJx?=
+ =?utf-8?B?UEUyazVPR2JVQTYvSFZHcERFdXFpRnpwbTV2RW5zazJNNnlYMjFXMldLQ3A3?=
+ =?utf-8?B?TEdNSjhocWVlcXBTQ011NlNXZXJIMnZadEorblI1T0JxMWhaWFBibUtwVHl0?=
+ =?utf-8?B?Q3RVbUMyMGNkdmowQkRLUzd5VDFHM0lMYk1KU3VWUnBFdUFibE9ROXowR296?=
+ =?utf-8?Q?/x6MXLKin1NxydRHbS737DJGX?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7393be51-9254-44de-6724-08dd313aef90
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2025 05:52:15.6922
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: E00w+1KJOtWM09cuVloUOuJb9V3vBq5XS0NW2irB3yFMtxA8kyKxfNhs1MLu9eSsHl3yOZytfmxrn9qnOUQmgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7104
 
 
 
+On 11/15/2024 5:10 AM, Pratik R. Sampat wrote:
+> Add the X86_FEATURE_SNP CPU feature to the architectural definition for
+> the SEV-SNP VM type to exercise the KVM_SEV_INIT2 call. Ensure that the
+> SNP test is skipped in scenarios where CPUID supports it but KVM does
+> not, so that a failure is not reported in such cases.
+> 
+> Signed-off-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
+> ---
+>  .../selftests/kvm/include/x86_64/processor.h        |  1 +
+>  .../testing/selftests/kvm/x86_64/sev_init2_tests.c  | 13 +++++++++++++
+>  2 files changed, 14 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 645200e95f89..c18d2405798f 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -199,6 +199,7 @@ struct kvm_x86_cpu_feature {
+>  #define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
+>  #define X86_FEATURE_SEV			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
 
-On 1/9/2025 11:38 PM, Nikolay Borisov wrote:
->
->
-> On 9.12.24 г. 3:07 ч., Binbin Wu wrote:
->> From: Sean Christopherson <seanjc@google.com>
->>
->> Add flag and hook to KVM's local APIC management to support determining
->> whether or not a TDX guest as a pending IRQ.  For TDX vCPUs, the virtual
->> APIC page is owned by the TDX module and cannot be accessed by KVM.  As a
->> result, registers that are virtualized by the CPU, e.g. PPR, cannot be
->> read or written by KVM.  To deliver interrupts for TDX guests, KVM must
->> send an IRQ to the CPU on the posted interrupt notification vector.  And
->> to determine if TDX vCPU has a pending interrupt, KVM must check if there
->> is an outstanding notification.
->>
->> Return "no interrupt" in kvm_apic_has_interrupt() if the guest APIC is
->> protected to short-circuit the various other flows that try to pull an
->> IRQ out of the vAPIC, the only valid operation is querying _if_ an IRQ is
->> pending, KVM can't do anything based on _which_ IRQ is pending.
->>
->> Intentionally omit sanity checks from other flows, e.g. PPR update, so as
->> not to degrade non-TDX guests with unnecessary checks.  A well-behaved KVM
->> and userspace will never reach those flows for TDX guests, but reaching
->> them is not fatal if something does go awry.
->>
->> Note, this doesn't handle interrupts that have been delivered to the vCPU
->> but not yet recognized by the core, i.e. interrupts that are sitting in
->> vmcs.GUEST_INTR_STATUS.  Querying that state requires a SEAMCALL and will
->> be supported in a future patch.
->>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
->> ---
->> TDX interrupts breakout:
->>   - Dropped vt_protected_apic_has_interrupt() with KVM_BUG_ON(), wire in
->>     tdx_protected_apic_has_interrupt() directly. (Rick)
->>   - Add {} on else in vt_hardware_setup()
->> ---
->>   arch/x86/include/asm/kvm-x86-ops.h | 1 +
->>   arch/x86/include/asm/kvm_host.h    | 1 +
->>   arch/x86/kvm/irq.c                 | 3 +++
->>   arch/x86/kvm/lapic.c               | 3 +++
->>   arch/x86/kvm/lapic.h               | 2 ++
->>   arch/x86/kvm/vmx/main.c            | 3 +++
->>   arch/x86/kvm/vmx/tdx.c             | 6 ++++++
->>   arch/x86/kvm/vmx/x86_ops.h         | 2 ++
->>   8 files changed, 21 insertions(+)
->>
->> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
->> index ec1b1b39c6b3..d5faaaee6ac0 100644
->> --- a/arch/x86/include/asm/kvm-x86-ops.h
->> +++ b/arch/x86/include/asm/kvm-x86-ops.h
->> @@ -114,6 +114,7 @@ KVM_X86_OP_OPTIONAL(pi_start_assignment)
->>   KVM_X86_OP_OPTIONAL(apicv_pre_state_restore)
->>   KVM_X86_OP_OPTIONAL(apicv_post_state_restore)
->>   KVM_X86_OP_OPTIONAL_RET0(dy_apicv_has_pending_interrupt)
->> +KVM_X86_OP_OPTIONAL(protected_apic_has_interrupt)
->>   KVM_X86_OP_OPTIONAL(set_hv_timer)
->>   KVM_X86_OP_OPTIONAL(cancel_hv_timer)
->>   KVM_X86_OP(setup_mce)
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 37dc7edef1ca..32c7d58a5d68 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1811,6 +1811,7 @@ struct kvm_x86_ops {
->>       void (*apicv_pre_state_restore)(struct kvm_vcpu *vcpu);
->>       void (*apicv_post_state_restore)(struct kvm_vcpu *vcpu);
->>       bool (*dy_apicv_has_pending_interrupt)(struct kvm_vcpu *vcpu);
->> +    bool (*protected_apic_has_interrupt)(struct kvm_vcpu *vcpu);
->>         int (*set_hv_timer)(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
->>                   bool *expired);
->> diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
->> index 63f66c51975a..f0644d0bbe11 100644
->> --- a/arch/x86/kvm/irq.c
->> +++ b/arch/x86/kvm/irq.c
->> @@ -100,6 +100,9 @@ int kvm_cpu_has_interrupt(struct kvm_vcpu *v)
->>       if (kvm_cpu_has_extint(v))
->>           return 1;
->>   +    if (lapic_in_kernel(v) && v->arch.apic->guest_apic_protected)
->> +        return static_call(kvm_x86_protected_apic_has_interrupt)(v);
->> +
->>       return kvm_apic_has_interrupt(v) != -1;    /* LAPIC */
->>   }
->>   EXPORT_SYMBOL_GPL(kvm_cpu_has_interrupt);
->> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->> index 65412640cfc7..684777c2f0a4 100644
->> --- a/arch/x86/kvm/lapic.c
->> +++ b/arch/x86/kvm/lapic.c
->> @@ -2920,6 +2920,9 @@ int kvm_apic_has_interrupt(struct kvm_vcpu *vcpu)
->>       if (!kvm_apic_present(vcpu))
->>           return -1;
->>   +    if (apic->guest_apic_protected)
->> +        return -1;
->> +
->>       __apic_update_ppr(apic, &ppr);
->>       return apic_has_interrupt_for_ppr(apic, ppr);
->>   }
->> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
->> index 1b8ef9856422..82355faf8c0d 100644
->> --- a/arch/x86/kvm/lapic.h
->> +++ b/arch/x86/kvm/lapic.h
->> @@ -65,6 +65,8 @@ struct kvm_lapic {
->>       bool sw_enabled;
->>       bool irr_pending;
->>       bool lvt0_in_nmi_mode;
->> +    /* Select registers in the vAPIC cannot be read/written. */
->> +    bool guest_apic_protected;
->
-> Can't this member be eliminated and instead  is_td_vcpu() used as it stands currently that member is simply a proxy value for "is this a tdx vcpu"?
+Unrelated to your patch, X86_FEATURE_SEV does not match the KVM API definitions,
+1 is used for KVM_X86_SW_PROTECTED_VM 
 
-By using this member, the code in the common path can be more generic,
-instead of using is_td_vcpu(). I.e, in the future, if other VM types has
-the same characteristic, no need to modify the common code.
+  #define KVM_X86_DEFAULT_VM    0
+  #define KVM_X86_SW_PROTECTED_VM       1
+  #define KVM_X86_SEV_VM        2
+  #define KVM_X86_SEV_ES_VM     3
 
->
-> <snip>
 
+>  #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
+> +#define X86_FEATURE_SNP			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 4)
+
+Additionally, please add KVM_X86_SNP_VM to the Documentation/virt/kvm/api.rst
+
+Regards
+Nikunj
 
