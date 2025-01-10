@@ -1,88 +1,65 @@
-Return-Path: <kvm+bounces-35056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35057-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 551C8A09466
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 15:55:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2060A0946F
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 15:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 315483AD0B5
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 14:53:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DE0F3A428A
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 14:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B1C211A02;
-	Fri, 10 Jan 2025 14:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92EB21324D;
+	Fri, 10 Jan 2025 14:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cr/aq+A5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bpRRtW2V"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F58211700
-	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 14:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CD5213248;
+	Fri, 10 Jan 2025 14:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736520619; cv=none; b=Ej9RCx82LtEINfg3GbLdi8ZAt369Jdbxo45FqsBkDQled41vlf49tRNmCCQ2oE/69cS3G5rXm3a8vHClARnltVL8R8m5hju4c4gUNFn3Slp7McdDkeVG0J4zCRpdGDFNSO56Z3yZfRpkQ2IUT069cK2JfoA+BrYG5Dla25EeWsI=
+	t=1736520649; cv=none; b=aFD2W3kPs5gl4eFWzx2lu0qHi1f0dZJeUgjYmEQVSidHSEZ+RZYrm5C5uJlww99oOmfgdK1ITnjGgJs9+08cs0ztSLzhjhbnGpDBsHd05F/ARaS5qoReH9B74PiJ+mw/ptyIoRwre3gIe095lfPhb9ISRsGtNUX+zy/wJ3c8OZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736520619; c=relaxed/simple;
-	bh=/hfzYhWnWogzNsWnMoDegksCToyTxUcyRqj76XcxpUs=;
+	s=arc-20240116; t=1736520649; c=relaxed/simple;
+	bh=Nr/8cWy/ytkiwzuzf0dij57Q7S3zOYs/c6vUQnl9qDA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UPZXmhFxrNfIOc85AcYsgol/CUOmGfruMpNATK3pGmzBUDPFoNrOQif3B9u1LaAiHu1IrgPMNyGpzF/4lTYeZqdWUFlUR9jlS1tfP13MmEFcTeZXb47hYnWgHR0rEVXE3UTAkAjpa/Wy1eCuaUsUYE0QRp/Yr+7dSz54BqL4hco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cr/aq+A5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736520615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=T+dn5zx8sybwL655A8cvbrkGYW0aEcEOgReGvTCY5E8=;
-	b=Cr/aq+A5wgymcZul0G1zTJ2qzVFX+mprrRpSOD6QeEoPNVl9sOUStaUjuW11tm+mPdZSv1
-	7/SnsfMwD3SGDyjN13Kze6OAapvDWULyv/qvsbZo0RNf9w3tiTvbIF9NXYW49YnmKTRpxa
-	fGF4KBKGKX0vk/RbkN7rHxj276d4om4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-4cZtQNr5N9ycLLw1X0kw1g-1; Fri, 10 Jan 2025 09:50:14 -0500
-X-MC-Unique: 4cZtQNr5N9ycLLw1X0kw1g-1
-X-Mimecast-MFC-AGG-ID: 4cZtQNr5N9ycLLw1X0kw1g
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385d80576abso1425854f8f.3
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 06:50:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736520613; x=1737125413;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=T+dn5zx8sybwL655A8cvbrkGYW0aEcEOgReGvTCY5E8=;
-        b=FLZEz8nwJN3OSZVrle9rrwv/3yg6wl5/sRWup1519RFjSHPjwkL9x/yUQLePLsvM8d
-         C7Nfxre+haGc7rnGupyYFNPZycH+7S9GbTXkT/b4Mb6wGIYsl86JMfzMFRR2/T1lPsm9
-         N04oOA/7fuj0Ekm+IegE5Mao3n74wFofRED7/98mpT6tkai3WDDNbx4qofIOjCKGf9an
-         0Jyqm325GgKHlPUGJt/gi/ZiLyGDALmexhJcP/QXe74aRuoMipjqitza8iHtbCFZWO/+
-         AImF/1KT2Q5p1/6qvFF02ft0LfYJ2rSqxeSszotBkmXoQHjBeAsWBJStWNM6eS9WQ18o
-         rmYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJm3pNMyseAw5sbG3v5TBbf+GQZX7idw4/dGpKETpJDF1rTomDZEW5QUrHE1HU6lUPvn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJxDl6EfsKXb+MnuyRLI4iOGNzzfPob1clcTi3F6hpM1pGg2/7
-	J4VuZoiGVrQwEm0dbIVDNPzTzy5LMfJgNqjfxonvBXnXttuowjQnuNZagJmu7/ydOtacus6gVMP
-	INRQjrg+ghzZw9Fi2U/JO8GqAAbepnoFHV/sANjz1Um3mNyZzlg==
-X-Gm-Gg: ASbGnctpfZa59EGUQT2e0eKgJkJnAEnm7k1Le4ZVT7ObpkVI5eh7Pc6vpxnK8g9SDfx
-	sSDV9xENxDI1nxAL3eJI9uVyB7aEg66BLkStJ+5O36ofieQF6+KqxAnrEikHcc/wDcJ8kI6S0jG
-	r5RCedSo8Ha5s17SPi5reuytxXu/Drgkr4bNVC9l2u/fblPjnDmMXlHwpF1Oa+Ge0NKRQ+9n57S
-	J5qejZaSBNrQal2ozrV5zW5lXaa2cr4cnR+aSx8FLB1fwjKaNNKb0Ovy2QINMKl+TqPesAqT9vs
-	iRFfgW9VQq344vYp4TatvrHR8U5aFVqR3W3oNytiL+VyQQKEwk6nd4zClMCD3s4BxrXx1809cAl
-	mSNshs5Uu
-X-Received: by 2002:a05:6000:1fa1:b0:385:f062:c2d4 with SMTP id ffacd0b85a97d-38a87338c01mr11081588f8f.37.1736520612782;
-        Fri, 10 Jan 2025 06:50:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHEjPNOvQcqE6YNpKOq6FH9tky/TkiWm4L1aV74ulonKhdQxOSf+kNAwkQEOdXbJcU7YkiIyg==
-X-Received: by 2002:a05:6000:1fa1:b0:385:f062:c2d4 with SMTP id ffacd0b85a97d-38a87338c01mr11081553f8f.37.1736520612415;
-        Fri, 10 Jan 2025 06:50:12 -0800 (PST)
-Received: from ?IPV6:2003:cb:c708:e100:4f41:ff29:a59f:8c7a? (p200300cbc708e1004f41ff29a59f8c7a.dip0.t-ipconnect.de. [2003:cb:c708:e100:4f41:ff29:a59f:8c7a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38bf78sm4665272f8f.48.2025.01.10.06.50.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jan 2025 06:50:11 -0800 (PST)
-Message-ID: <cce0bff5-51ca-42e9-98d7-b72ed23c9a1b@redhat.com>
-Date: Fri, 10 Jan 2025 15:50:09 +0100
+	 In-Reply-To:Content-Type; b=CqTwmbAvsQg4AWf3jrerCTtLsczl3IaRBmplL3pOYnvqY73BNQhER4mgKNoBR9GO1YjUVadUX8Tgn8V5CYGtPKkfmeJ2MgP8WCRwMlL0U0FTibM1AuJKfK3izNJmTcLyZn4fJdobXo/FjBvGSLy0/SMEhpnpaZrftmg1JVFxGpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bpRRtW2V; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736520648; x=1768056648;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Nr/8cWy/ytkiwzuzf0dij57Q7S3zOYs/c6vUQnl9qDA=;
+  b=bpRRtW2Vi6ctJuNqM8azCQU6KqVX/eVBZkY6qs/Xk1ItEEyTQ+Jr43d4
+   Bx63TzuHo0cQzZR9DSBJbXl+BD0Sy8RILtpqQZ+tAiGJY6R6SKzWRezmt
+   ebBdSPA1fl455ttxkx3QjdPJzuNA0yvSj41JJi7qOMI6r7/XtVGy5v8ce
+   mtFOzm7OmJqwMQBqjrsnTCduna9ktLHPMO+OOL2Au709VuX7zgcFiWiIS
+   rC04FWp5lhfLBAP5dL5ptu7oR3zr0odl/gc83PxfPFF4zEE6JfXAq8pE3
+   M0bZxhgoZ444fK/l1YO4bTKiJ9VLp2y/rud5Rvw3FSTScAN5LMzRiKSBO
+   A==;
+X-CSE-ConnectionGUID: vcjPv2FETeuOI4iTitXEEA==
+X-CSE-MsgGUID: tNvOTbRSRdi+YD3dtjKP0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="24421523"
+X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
+   d="scan'208";a="24421523"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 06:50:47 -0800
+X-CSE-ConnectionGUID: 9n43q5iXSCyhI9kmCTNqcg==
+X-CSE-MsgGUID: ozaw/qF7TUOCS8gViZDNEA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="108852253"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.16.163])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 06:50:41 -0800
+Message-ID: <3a7d93aa-781b-445e-a67a-25b0ffea0dff@intel.com>
+Date: Fri, 10 Jan 2025 16:50:33 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,142 +67,285 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/7] Enable shared device assignment
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Chenyi Qiang <chenyi.qiang@intel.com>, Alexey Kardashevskiy
- <aik@amd.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Michael Roth <michael.roth@amd.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>,
- Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
- Xu Yilun <yilun.xu@intel.com>
-References: <8457e035-40b0-4268-866e-baa737b6be27@intel.com>
- <6ac5ddea-42d8-40f2-beec-be490f6f289c@amd.com>
- <8f953ffc-6408-4546-a439-d11354b26665@intel.com>
- <d4b57eb8-03f1-40f3-bc7a-23b24294e3d7@amd.com>
- <57a3869d-f3d1-4125-aaa5-e529fb659421@intel.com>
- <008bfbf2-3ea4-4e6c-ad0d-91655cdfc4e8@amd.com>
- <1361f0b4-ddf8-4a83-ba21-b68321d921da@intel.com>
- <c318c89b-967d-456e-ade1-3a8cacb21bd7@redhat.com>
- <20250110132021.GE5556@nvidia.com>
- <17db435a-8eca-4132-8481-34a6b0e986cb@redhat.com>
- <20250110141401.GG5556@nvidia.com>
-From: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 4/7] KVM: TDX: restore host xsave state when exit from the
+ guest TD
+To: Sean Christopherson <seanjc@google.com>
+Cc: Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org,
+ dave.hansen@linux.intel.com, rick.p.edgecombe@intel.com,
+ kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
+ dmatlack@google.com, isaku.yamahata@intel.com, nik.borisov@suse.com,
+ linux-kernel@vger.kernel.org, x86@kernel.org, yan.y.zhao@intel.com,
+ weijiang.yang@intel.com
+References: <20241121201448.36170-1-adrian.hunter@intel.com>
+ <20241121201448.36170-5-adrian.hunter@intel.com> <Z0AbZWd/avwcMoyX@intel.com>
+ <a42183ab-a25a-423e-9ef3-947abec20561@intel.com>
+ <Z2GiQS_RmYeHU09L@google.com>
+ <487a32e6-54cd-43b7-bfa6-945c725a313d@intel.com>
+ <Z2WZ091z8GmGjSbC@google.com>
+ <96f7204b-6eb4-4fac-b5bb-1cd5c1fc6def@intel.com>
+ <Z4Aff2QTJeOyrEUY@google.com>
 Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250110141401.GG5556@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <Z4Aff2QTJeOyrEUY@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10.01.25 15:14, Jason Gunthorpe wrote:
-> On Fri, Jan 10, 2025 at 02:45:39PM +0100, David Hildenbrand wrote:
->>
->> In your commit I read:
->>
->> "Implement the cut operation to be hitless, changes to the page table
->> during cutting must cause zero disruption to any ongoing DMA. This is the
->> expectation of the VFIO type 1 uAPI. Hitless requires HW support, it is
->> incompatible with HW requiring break-before-make."
->>
->> So I guess that would mean that, depending on HW support, one could avoid
->> disabling large pages to still allow for atomic cuts / partial unmaps that
->> don't affect concurrent DMA.
+On 9/01/25 21:11, Sean Christopherson wrote:
+> On Fri, Jan 03, 2025, Adrian Hunter wrote:
+>> On 20/12/24 18:22, Sean Christopherson wrote:
+>> +/* Set a maximal guest CR0 value */
+>> +static u64 tdx_guest_cr0(struct kvm_vcpu *vcpu, u64 cr4)
+>> +{
+>> +	u64 cr0;
+>> +
+>> +	rdmsrl(MSR_IA32_VMX_CR0_FIXED1, cr0);
+>> +
+>> +	if (cr4 & X86_CR4_CET)
+>> +		cr0 |= X86_CR0_WP;
+>> +
+>> +	cr0 |= X86_CR0_PE | X86_CR0_NE;
+>> +	cr0 &= ~(X86_CR0_NW | X86_CR0_CD);
+>> +
+>> +	return cr0;
+>> +}
+>> +
+>> +/*
+>> + * Set a maximal guest CR4 value. Clear bits forbidden by XFAM or
+>> + * TD Attributes.
+>> + */
+>> +static u64 tdx_guest_cr4(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+>> +	u64 cr4;
+>> +
+>> +	rdmsrl(MSR_IA32_VMX_CR4_FIXED1, cr4);
 > 
-> Yes. Most x86 server HW will do this, though ARM support is a bit newish.
-> 
->> What would be your suggestion here to avoid the "map each 4k page
->> individually so we can unmap it individually" ? I didn't completely grasp
->> that, sorry.
-> 
-> Map in large ranges in the VMM, lets say 1G of shared memory as a
-> single mapping (called an iommufd area)
-> 
-> When the guest makes a 2M chunk of it private you do a ioctl to
-> iommufd to split the area into three, leaving the 2M chunk as a
-> seperate area.
-> 
-> The new iommufd ioctl to split areas will go down into the iommu driver
-> and atomically cut the 1G PTEs into smaller PTEs as necessary so that
-> no PTE spans the edges of the 2M area.
-> 
-> Then userspace can unmap the 2M area and leave the remainder of the 1G
-> area mapped.
-> 
-> All of this would be fully hitless to ongoing DMA.
-> 
-> The iommufs code is there to do this assuming the areas are mapped at
-> 4k, what is missing is the iommu driver side to atomically resize
-> large PTEs.
-> 
->>  From "IIRC you can only trigger split using the VFIO type 1 legacy API. We
->> would need to formalize split as an IOMMUFD native ioctl.
->> Nobody should use this stuf through the legacy type 1 API!!!!"
->>
->> I assume you mean that we can only avoid the 4k map/unmap if we add proper
->> support to IOMMUFD native ioctl, and not try making it fly somehow with the
->> legacy type 1 API?
-> 
-> The thread was talking about the built-in support in iommufd to split
-> mappings. That built-in support is only accessible through legacy APIs
-> and should never be used in new qemu code. To use that built in
-> support in new code we need to build new APIs. The advantage of the
-> built-in support is qemu can map in large regions (which is more
-> efficient) and the kernel will break it down to 4k for the iommu
-> driver.
-> 
-> Mapping 4k at a time through the uAPI would be outrageously
-> inefficient.
+> This won't be accurate long-term.  E.g. run KVM on hardware with CR4 bits that
+> neither KVM nor TDX know about, and vcpu->arch.cr4 will end up with bits set that
+> KVM think are illegal, which will cause it's own problems.
 
-Got it, makes all sense, thanks!
+Currently validation of CR4 is only done when user space changes it,
+which should not be allowed for TDX.  For that it looks like TDX
+would need:
 
--- 
-Cheers,
+	kvm->arch.has_protected_state = true;
 
-David / dhildenb
+Not sure why it doesn't already?
+
+> 
+> For CR0 and CR4, we should be able to start with KVM's set of allowed bits, not
+> the CPU's.  That will mean there will likely be missing bits, in vcpu->arch.cr{0,4},
+> but if KVM doesn't know about a bit, the fact that it's missing should be a complete
+> non-issue.
+
+What about adding:
+
+	cr4 &= ~cr4_reserved_bits;
+
+and
+
+	cr0 &= ~CR0_RESERVED_BITS
+> 
+> That also avoids weirdness for things like user-mode interrupts, LASS, PKS, etc.,
+> where KVM is open coding the bits.  The downside is that we'll need to remember
+> to update TDX when enabling those features to account for kvm_tdx->attributes,
+> but that's not unreasonable.
+> 
+>> +
+>> +	if (!(kvm_tdx->xfam & XFEATURE_PKRU))
+>> +		cr4 &= ~X86_CR4_PKE;
+>> +
+>> +	if (!(kvm_tdx->xfam & XFEATURE_CET_USER) || !(kvm_tdx->xfam & BIT_ULL(12)))
+>> +		cr4 &= ~X86_CR4_CET;
+>> +
+>> +	/* User Interrupts */
+>> +	if (!(kvm_tdx->xfam & BIT_ULL(14)))
+>> +		cr4 &= ~BIT_ULL(25);
+>> +
+>> +	if (!(kvm_tdx->attributes & TDX_TD_ATTR_LASS))
+>> +		cr4 &= ~BIT_ULL(27);
+>> +
+>> +	if (!(kvm_tdx->attributes & TDX_TD_ATTR_PKS))
+>> +		cr4 &= ~BIT_ULL(24);
+>> +
+>> +	if (!(kvm_tdx->attributes & TDX_TD_ATTR_KL))
+>> +		cr4 &= ~BIT_ULL(19);
+>> +
+>> +	cr4 &= ~X86_CR4_SMXE;
+>> +
+>> +	return cr4;
+>> +}
+>> +
+>>  int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+>> @@ -732,8 +783,8 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>>  	vcpu->arch.cr0_guest_owned_bits = -1ul;
+>>  	vcpu->arch.cr4_guest_owned_bits = -1ul;
+>>  
+>> -	vcpu->arch.cr4 = <maximal value>;
+>> -	vcpu->arch.cr0 = <maximal value, give or take>;
+>> +	vcpu->arch.cr4 = tdx_guest_cr4(vcpu);
+>> +	vcpu->arch.cr0 = tdx_guest_cr0(vcpu, vcpu->arch.cr4);
+>>  
+>>  	vcpu->arch.tsc_offset = kvm_tdx->tsc_offset;
+>>  	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
+>> @@ -767,6 +818,12 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>>  	return 0;
+>>  }
+>>  
+>> +void tdx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>> +{
+>> +	if (cpu_feature_enabled(X86_FEATURE_XSAVES))
+> 
+> This should use kvm_cpu_caps_has(), because strictly speaking it's KVM support
+> that matters.  In practice, I don't think it matters for XSAVES, but it can
+> matter for other features (though probably not for TDX guests).
+> 
+>> +		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
+>> +}
+>> +
+>>  void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>>  {
+>>  	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>> @@ -933,6 +990,24 @@ static void tdx_user_return_msr_update_cache(void)
+>>  						 tdx_uret_msrs[i].defval);
+>>  }
+>>  
+>> +static void tdx_reinforce_guest_state(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+>> +
+>> +	if (WARN_ON_ONCE(vcpu->arch.xcr0 != (kvm_tdx->xfam & TDX_XFAM_XCR0_MASK)))
+>> +		vcpu->arch.xcr0 = kvm_tdx->xfam & TDX_XFAM_XCR0_MASK;
+>> +	if (WARN_ON_ONCE(vcpu->arch.ia32_xss != (kvm_tdx->xfam & TDX_XFAM_XSS_MASK)))
+>> +		vcpu->arch.ia32_xss = kvm_tdx->xfam & TDX_XFAM_XSS_MASK;
+>> +	if (WARN_ON_ONCE(vcpu->arch.pkru))
+>> +		vcpu->arch.pkru = 0;
+>> +	if (WARN_ON_ONCE(cpu_feature_enabled(X86_FEATURE_XSAVE) &&
+>> +			 !kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)))
+>> +		vcpu->arch.cr4 |= X86_CR4_OSXSAVE;
+>> +	if (WARN_ON_ONCE(cpu_feature_enabled(X86_FEATURE_XSAVES) &&
+>> +			 !guest_can_use(vcpu, X86_FEATURE_XSAVES)))
+>> +		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
+>> +}
+>> +
+>>  static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu)
+>>  {
+>>  	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>> @@ -1028,9 +1103,11 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+>>  		update_debugctlmsr(tdx->host_debugctlmsr);
+>>  
+>>  	tdx_user_return_msr_update_cache();
+>> +
+>> +	tdx_reinforce_guest_state(vcpu);
+> 
+> Hmm, I don't think fixing up guest state is a good idea.  It probably works?
+> But continuing on when we know there's a KVM bug *and* a chance for host data
+> corruption seems unnecessarily risky.
+> 
+> My vote would to KVM_BUG_ON() before entering the guest.  I think I'd also be ok
+> omitting the checks, it's not like the potential for KVM bugs that clobber KVM's
+> view of state are unique to TDX (though I do agree that the behavior of the TDX
+> module in this case does make them more likely).
+
+If the guest state that is vital to host state restoration, goes wrong
+then the machine can die without much explanation, so KVM_BUG_ON() before
+entering the guest seems prudent.
+
+> 
+>>  	kvm_load_host_xsave_state(vcpu);
+>>  
+>> -	vcpu->arch.regs_avail = TDX_REGS_UNSUPPORTED_SET;
+>> +	vcpu->arch.regs_avail = ~0;
+>>  
+>>  	if (unlikely((tdx->vp_enter_ret & TDX_SW_ERROR) == TDX_SW_ERROR))
+>>  		return EXIT_FASTPATH_NONE;
+>> diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+>> index 861c0f649b69..2e0e300a1f5e 100644
+>> --- a/arch/x86/kvm/vmx/tdx_arch.h
+>> +++ b/arch/x86/kvm/vmx/tdx_arch.h
+>> @@ -110,6 +110,7 @@ struct tdx_cpuid_value {
+>>  } __packed;
+>>  
+>>  #define TDX_TD_ATTR_DEBUG		BIT_ULL(0)
+>> +#define TDX_TD_ATTR_LASS		BIT_ULL(27)
+>>  #define TDX_TD_ATTR_SEPT_VE_DISABLE	BIT_ULL(28)
+>>  #define TDX_TD_ATTR_PKS			BIT_ULL(30)
+>>  #define TDX_TD_ATTR_KL			BIT_ULL(31)
+>> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+>> index 7fb1bbf12b39..7f03a6a24abc 100644
+>> --- a/arch/x86/kvm/vmx/x86_ops.h
+>> +++ b/arch/x86/kvm/vmx/x86_ops.h
+>> @@ -126,6 +126,7 @@ void tdx_vm_free(struct kvm *kvm);
+>>  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+>>  
+>>  int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+>> +void tdx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu);
+>>  void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+>>  void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+>>  int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu);
+>> @@ -170,6 +171,7 @@ static inline void tdx_vm_free(struct kvm *kvm) {}
+>>  static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+>>  
+>>  static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+>> +static inline void tdx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu) {}
+>>  static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+>>  static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
+>>  static inline int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index d2ea7db896ba..f2b1980f830d 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -1240,6 +1240,11 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+>>  	u64 old_xcr0 = vcpu->arch.xcr0;
+>>  	u64 valid_bits;
+>>  
+>> +	if (vcpu->arch.guest_state_protected) {
+> 
+> This should be a WARN_ON_ONCE() + return 1, no?
+
+With kvm->arch.has_protected_state = true, KVM_SET_XCRS
+would fail, which would probably be fine except for KVM selftests:
+
+Currently the KVM selftests expect to be able to set XCR0:
+
+    td_vcpu_add()
+	vm_vcpu_add()
+	    vm_arch_vcpu_add()
+		vcpu_init_xcrs()
+		    vcpu_xcrs_set()
+			vcpu_ioctl(KVM_SET_XCRS)
+			    __TEST_ASSERT_VM_VCPU_IOCTL(!ret)
+
+Seems like vm->arch.has_protected_state is needed for
+KVM selftests?
+
+> 
+>> +		kvm_update_cpuid_runtime(vcpu);
+
+And kvm_update_cpuid_runtime() never gets called otherwise.
+Not sure where would be a good place to call it.
+
+>> +		return 0;
+>> +	}
+>> +
+>>  	/* Only support XCR_XFEATURE_ENABLED_MASK(xcr0) now  */
+>>  	if (index != XCR_XFEATURE_ENABLED_MASK)
+>>  		return 1;
+>> @@ -12388,7 +12393,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>>  	 * into hardware, to be zeroed at vCPU creation.  Use CRs as a sentinel
+>>  	 * to detect improper or missing initialization.
+>>  	 */
+>> -	WARN_ON_ONCE(!init_event &&
+>> +	WARN_ON_ONCE(!init_event && !vcpu->arch.guest_state_protected &&
+>>  		     (old_cr0 || kvm_read_cr3(vcpu) || kvm_read_cr4(vcpu)));
+> 
+> Maybe stuff state in tdx_vcpu_init() to avoid this waiver?  KVM is already
+> deferring APIC base and RCX initialization to that point, waiting to stuff all
+> TDX-specific vCPU state seems natural.
 
 
