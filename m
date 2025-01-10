@@ -1,200 +1,210 @@
-Return-Path: <kvm+bounces-35122-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35123-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4742A09D77
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 22:55:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 427AEA09DA5
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 23:16:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F26233A4B57
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 21:55:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 534BA3A6A62
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 22:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2292153F9;
-	Fri, 10 Jan 2025 21:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88AC1215F40;
+	Fri, 10 Jan 2025 22:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="F0OocaJC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yc2W6Uhl"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2074.outbound.protection.outlook.com [40.107.92.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D6B206F38;
-	Fri, 10 Jan 2025 21:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736546115; cv=fail; b=l9JOw+sI1P5yQcZFq5l2zYHGzORy1wgLv1u78a20tm92xliEnMYvPvSEgdgDwkGWT9EGdEAms1wKpF476AB6CnsuzTsnIavlcCJdWyI/IaXx67RetPu5AhjztL+9m0IITCZv0AxtDAvyw9E3EQ7G3GxVJ8AEgZT2qGD4RJerjyQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736546115; c=relaxed/simple;
-	bh=+TbpgjZxInqaXnDmYuwG5EkRODI1WmSiMqcu7GcT3P8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=axPVPieYV0ldwztVyKGmu6Q4OmZF9JttTEW7o1TT2HCI8ddQyF4CzwEbfN54TSpc5ELcEVA64FC0d7XwQB93XazE5BKZYHQ+FTi/0ZwpKkgBw0uVjJM+TBqCyDYD0iOt1dwIpUf7Ws9w9IVd9JqZRSFzal0Ui37VuFeLFfdymW8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=F0OocaJC; arc=fail smtp.client-ip=40.107.92.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FXjGV5S7No/e2GOc8DCr54wZwsTiyUsS0HBi4khokWIXGyCCSBkSe2kMvXzb7mQrCX2byY/n/FAviKyLksgR/dpS3fMxtwt7wbuIApH5W03g8z8mU7gRDnOMbPh/GCRDVPtMTInmTOqiGkx23jRDhbZNKbd929MaFQUlU/ZT0tZx7FSDdaGmowP3G9QPl92edSg7nC0r3PZKANnicU8mRnqFAgEf/gxBsgScIfFD4Fg698XlA/FMo6ra2aLebe4mnCEnHGokwSHMpWWrZxfoKAQyysQAesVNUJV2ws36b8VEnz2EQyG4UAo9TlF3rfdwRkRTC1FzRGXwLKNUdFNgww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=js6GTtlLRjMaq5OQ8QY5xvvyYaaL4/Fi/YVIsgJf9Os=;
- b=ppWV0G/1EFhO9Afqqr7jL0LRnJR8FfsBrjvDatJk6IjeUzNNAmNMCIiiGKeBZsjqs1K8qswFzUemmxHHvd3YpRFl9RBp2P3Gecw2917q30DKKHHvvWdasZCi1mrk8l/3WgaHkGPoWjU4mlqv2zPq/tg3khw22pabmtVTZw1LHjafHE/SIdagGX2P2Eb04hY+XMHpwN5UiYLZLfC01UTVrQu/pttkbhLXDtsM6QVfWFUQEbN00aGc3XkpGeMZ2nZUr5Z4sUj224DUE6EbK6i36YsA6zpAuYy38BBJZ4YEtptWt4sQrmn1oNVqx1VkLAEhqg3S9kM5vc6V+llgLszBhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=js6GTtlLRjMaq5OQ8QY5xvvyYaaL4/Fi/YVIsgJf9Os=;
- b=F0OocaJCXIyd/MGXUX7TWyEoz3Wx2X4sKn0ZU7FCtleSThYQLwqu0rlP2O2eXpTj8/6BM0a7jpg/Q+xQTCH65JHo40tUP1QpOiXVbzkyTD+e8lRYqodMq9YIuhz00Ufyro/K+xIRdxynkp8FqvNrCexE49AB2rLl6fWadXhzQTs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW6PR12MB7087.namprd12.prod.outlook.com (2603:10b6:303:238::14)
- by CY8PR12MB8361.namprd12.prod.outlook.com (2603:10b6:930:7b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.12; Fri, 10 Jan
- 2025 21:55:11 +0000
-Received: from MW6PR12MB7087.namprd12.prod.outlook.com
- ([fe80::41ae:52ce:aaf4:eda]) by MW6PR12MB7087.namprd12.prod.outlook.com
- ([fe80::41ae:52ce:aaf4:eda%5]) with mapi id 15.20.8335.011; Fri, 10 Jan 2025
- 21:55:11 +0000
-Message-ID: <a420bcb4-4979-4143-83cc-1f8f1f38dcc7@amd.com>
-Date: Fri, 10 Jan 2025 15:55:09 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [sos-linux-ext-patches] [PATCH v4 2/8] KVM: selftests: SEV-SNP
- test for KVM_SEV_INIT2
-To: "Nikunj A. Dadhania" <nikunj@amd.com>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, kvm@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, pgonda@google.com,
- thomas.lendacky@amd.com, michael.roth@amd.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241114234104.128532-1-pratikrajesh.sampat@amd.com>
- <20241114234104.128532-3-pratikrajesh.sampat@amd.com>
- <bc5650c3-e759-42d7-b993-1af838fd6a80@amd.com>
-Content-Language: en-US
-From: Pratik Rajesh Sampat <prsampat@amd.com>
-In-Reply-To: <bc5650c3-e759-42d7-b993-1af838fd6a80@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0501CA0011.namprd05.prod.outlook.com
- (2603:10b6:803:40::24) To MW6PR12MB7087.namprd12.prod.outlook.com
- (2603:10b6:303:238::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6E824B25E
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 22:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736547354; cv=none; b=rGednQ2jRBKH+7sBq1UDzJNSeaVSs2zE/5k0fc1D9bQ/aO4kXo52IGmGEMkCaLmcbbZouIOd6A3eQnmyfe3SWukkYcuLKWCeI0a681PTCcwhrGy4GTb1MnutQsPvJAAj4TqSwrWSfaulX66Z7H1zTzWB3oWNarxGoazqhbPWLuY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736547354; c=relaxed/simple;
+	bh=gnlGkcqoy8HDXZ9a0ZC+/Ln+qP750ey1PbJxmMWBHiA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aCVk2YNqusC3oeCu7mQVqlH6qNXViXY+KQYNtIdNZJWI35vTf2kJwRJln6mLDev5zT5W2xuYjzWz5QtlarAhJTZlWujcw0wETQi5yx7c5NTQzPWYTMau+NZ+brBvRpY/XGCz/TmU6p4WP/EpgJTksmdnCO3JBBCjNFySnmC36fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yc2W6Uhl; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef8c7ef51dso4568859a91.1
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 14:15:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736547352; x=1737152152; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WARCt/vdn+mdVM4SzGkFnsiJbS611IMJoZ0S5oBY9ZA=;
+        b=yc2W6Uhl6pzurS2W/JKQmE/G0LxxQ4TYYSYraCyyv1JtXhbe/y6PzLTTqY4AbbLLR2
+         duo6HLjFOxVsJWsHmKy/ILGh7+x5bmrbPKJ1r3MooRpY6jL1QleAAtwhda3FppEI5eRj
+         FiTcwi0UZv4OrxYQT3au15zJSGDxEsNlezRpNcuFI9SWVnE/qmpmNQDlvPWHbhapwf30
+         6B1sexpGhTYLoEpD/oN4thFJRxkCIorwcegmw74o62B2XT9pAXKOu2bmbiYG4o+pNmQ5
+         pKzwKe06Txtj92zZgLR2GMLvtUhiZN/HLWb8HmSuoPpSmGITjCJ6DzKIFAxm+iRU3iFV
+         3qrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736547352; x=1737152152;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WARCt/vdn+mdVM4SzGkFnsiJbS611IMJoZ0S5oBY9ZA=;
+        b=K7670mC8u06W8z0svjEzDlIT8iMD4vUsdE39CygLuZKf92TVNEGF1jPpatx5dAfxpj
+         lJN0KgEbmsEjh3mmuxU0BEsp+yUaRjKysoJ6fViKSVZrRUizGCt+fEJsehQJSbZFkb5O
+         uSUL0IT0vBumhy7CTpfPpBmqsszcs0o1JF3CHY131AiTNH+TOTSFEBUOZAc2DV1anu0+
+         qUDNCtd436mVrFiv7Wy9MkkO/ZUUPNXgaRKzJUiR5zOskX4qqJv0sy5U5MT/DSY6L/NZ
+         fpVolU1tJy+EaBcFNBipMGQ+By8xYCyX1zz1p5Ff/Z8l6UqVlMRCbQxnMhxsrLbVdvxk
+         Tnng==
+X-Forwarded-Encrypted: i=1; AJvYcCXjN1caeDAHywxRTNLzo4jcSb+6A8VDX9adVauvFY64f266nHttP1li4uErjEsjY2CMKJ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw74yyfz1TdF/mT3Q/PVN8S3KFknGlSBbK9xgFIR3+JuvIYkbtx
+	rd3gOM5OcyPdN2UIjL45oql24mHBD5cI0wcIFNLBho8j5bU01VhFK76ZQhdAMPRbxHDdKMHuR7y
+	XJg==
+X-Google-Smtp-Source: AGHT+IFMgbGPh/f2NFCJsUCfG4G1W6cH/dRD+d3e6//H3dc23WWf2uFuIbgG2SvY04H9rIGvR5K/Qf9mhR0=
+X-Received: from pjboh12.prod.google.com ([2002:a17:90b:3a4c:b0:2da:5868:311c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3b4f:b0:2f2:a974:fc11
+ with SMTP id 98e67ed59e1d1-2f554603e39mr12751309a91.17.1736547352564; Fri, 10
+ Jan 2025 14:15:52 -0800 (PST)
+Date: Fri, 10 Jan 2025 14:15:51 -0800
+In-Reply-To: <20241105184333.2305744-2-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW6PR12MB7087:EE_|CY8PR12MB8361:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7386681-b438-4663-b0d0-08dd31c174d6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ekdsZzB4enY5c0lhaEtUbXk1cHVxaVZobkNmVkM4S0R1OU5NdFBEV1kycmpZ?=
- =?utf-8?B?T1lwWmRBYWNHOFF1a05EcFBKeTJlZzRIUEZYcUhYaFNiWGpHZ0tjbXlTUmU3?=
- =?utf-8?B?WmlkbC9MOFdFQXpOckdqMkVlcmYyWUhSSVBFRENRMzJLdWpXR0RYb005bHJS?=
- =?utf-8?B?RVpjSFV3eFdTY1lsS3lyaVVKZGQrWWNPVVdldFZYTlBsME5PZ2ppcHFLL2Zr?=
- =?utf-8?B?d0NlaDI4ZHFaRHlGMnZQNkxKeHVaMEFPa3M5TGowVmVZWmNvSmlFTXFTdSs0?=
- =?utf-8?B?aXJScE5mWlF0WWFoYUZybnVqako1aWhZVWdaTE55REorb3J5YlFFMjdzQjlq?=
- =?utf-8?B?RE85cFpHeEp4Q1hWMWxKU3BvNVVISkdaUDVsemxNY0dBdWJkS0JzZE13TlNm?=
- =?utf-8?B?M0swOGFaNWVBcFRMYkhDUGtpSzdFWDEzdnRZRmpaTDhQb0N4NCt1SHN2ZTNK?=
- =?utf-8?B?REpxTEtoa1F3a2JBdEFTVmdVOHBxcmlXcnVwY3U3U0dUMm5qdjluMWIvRUgr?=
- =?utf-8?B?TGNXSUp1OTdZYTd5MmpmR0lqMEFWOGRuYUpGTTlDVWM5MUplMVE2QkM0NTc1?=
- =?utf-8?B?S2FmK2VSRUdkWWdDQTBqNUZEblJWY0hUL3RhZitOWXlZM2UybVBZeFZDUHRX?=
- =?utf-8?B?bjZJZS9MdnpNc3N5M0RicUo4OHNadFk5T3d2SmZsVTRaWndpRUNQYlFPM1oy?=
- =?utf-8?B?U21kUUV2NE11Zngzc3VTa2luNnhpeVZydUJOSFpRRU90MkRZeHZqcFdGYVVG?=
- =?utf-8?B?VlYxYlZYVW95bURNOEtJQ3FPdkNvdUdsdXUxRmdPMUptZXpwWkxTSG90cytS?=
- =?utf-8?B?M2RYVzlCTlNXY2s0SHFpYlZLVkFQWnlGcmlLL1FDNFdzdEs5NmVVZ2xoeURI?=
- =?utf-8?B?NWdlVjBPWGdxaHJNUnhzSzRxUiswaTRMbXduR0JUeVI2aTYzWDJxOHZDLzhQ?=
- =?utf-8?B?M0JzalQzckdYcEs3enlpRVQ0bmIxc0U4QkN4NU9vNHdlZmYwaEFiSjFYUm54?=
- =?utf-8?B?eWczZUFYWktoOVBMcEZDT2dXTVhhTWJ6TEdESlRUYWlqbmpKQ2laNTFzMllS?=
- =?utf-8?B?ZDZzK1lVNERhT3dCVHA3ZjdXSnp0RjZ3ZlByZ0V3RUhvSGRTNVpoRHpqeTVB?=
- =?utf-8?B?R2dwUzFxVVNYK2RNNXVuNEZaaERuK2pud0RTNFZjVTNxbG9naTd6ZHZHK3dx?=
- =?utf-8?B?TEJQdVU3Zm0ybmYxQ0k3V1V6cWV0YmJwaUNmNGNFdEpwUHFJREtJcDdQY2R4?=
- =?utf-8?B?NjRlTWZDZEpKc0RMZ0Q4OWh3VWhvMzNUWXlCVVlobmxBSGlCUG9TRldhT0I2?=
- =?utf-8?B?YXdyVmlJWHhWY1JQYWJ3MHR0V002d2pVa3NONDhEQWIxeHR0bm1OUG8rZ1RW?=
- =?utf-8?B?N25BYTRubmVvbFJTdnY5MmVVdmErSEdtOGpXQXkrM2Rla1Zsdkp2OWVGYVVW?=
- =?utf-8?B?RCtZLzEzUWpMVHVDWWNwT1hwVGt1QnlpZDdwTXpYRHpYcmFpOEdvQWpJYTNL?=
- =?utf-8?B?WDNidU1IejVVWjl5WWd0Vkd2VUlrYkt5TEgxTS95Tm1aOEFweFFkZk8zdms2?=
- =?utf-8?B?WExNdnZkODYwMGFrOUoxWklmWEZqYjdES1hPeW1hd1BYaERJdjdEcUViQ25O?=
- =?utf-8?B?eGQyT1dvcVl1SUxRVkl3RXRDMVF1VXRHYjA5QWZZY0tTK3kvZEd1RkFKOFA2?=
- =?utf-8?B?Q0VDOUFtcGhwcjNyMnlOQWp4eE5Gc2lZWlRIWXhJblRqRERqYnlRekJNUUl1?=
- =?utf-8?B?bDhMc3Z0RTJIN0lXTGxpWkdRK2d1NWpTUDR1RytUN0VsZGlTaVM2ZHVlcVVV?=
- =?utf-8?B?NjI5MUV5ZWtlS2tJU3kvbEJ5a0xlOFJ2ZFFCV0F0K3MrV1pseWlWS3p5SnZI?=
- =?utf-8?Q?Eyi3fFKWJxuPE?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR12MB7087.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RU40dW5XUzdvQ0dyNFlOQmxkYjBMUW5YbkNkLzQ0czN4TUI4TjhEQlh2UEds?=
- =?utf-8?B?VUtmVVQzeGVZOHp2Mi9DUGtpZ1hXNll1aUpybjBrUFlsUmtxL1h3QW9CMzFn?=
- =?utf-8?B?cWRqeCsyWnFrZ0NHVEtwRHE3WjQ1ajVCallSY2J5dVdTc3lVWkp0aWNVMUhi?=
- =?utf-8?B?UisrdjBVelhaZHl2KzJIWDhMTGdXR2FodlBVWENMOTlWd0piak1hWi9jT2E4?=
- =?utf-8?B?ZEFXaDgvV2h0bzlYL1diWGhIYVFXTVpvOC9WUXpVZDNjaVZUQk1xUGtHUUhK?=
- =?utf-8?B?bXZtaGRxQXFjY0VSVkhJaXlKQVVQMnZYZUFJN1VoKzdkYWoyRis2NXhQcWJP?=
- =?utf-8?B?cktGSm5TRjA4TXJlcnV2cXZHWXdQWW0rTVdwRWV6dlRrU21yZ1lqcGtzOGov?=
- =?utf-8?B?ZjU2WjZwUWJ3V0xxV3NvQzl5ZG9jL1NFaDl4WGN0bzVRQ0JoRE5NdmNZZ0Jn?=
- =?utf-8?B?K0hFZGd3Q0IydG83QmlyeE9yVlc0VFZiZVNqT21UcUphUnZwMzlEbmRUeHd2?=
- =?utf-8?B?Rm5KZHQ4alhkdzFGRnVRbzVaYzZPTjI0WGhYWCtlYysya1BNM2p2VytkbDgw?=
- =?utf-8?B?N1hjT0svcWlmWE5TOU5zUG84dlBqNDZhV09pazhKL1Fid1crdjBJVlN3VDlD?=
- =?utf-8?B?OCtmTVRkWTdCa0w1VkVuQWpkRDltVjduay9VZk12L3UyL0lEUmtIYSt0UU9y?=
- =?utf-8?B?UFg2OXM1eTA5eXdqcENWZlZzVmJqT1VjUm5sVTJ4T0k3bzBXWm5nVDVPTURw?=
- =?utf-8?B?T3ppUkRwK2gvQ0xYekZHVXRwTUUwN0UvMUp3eFYwaU9zRG5nQ2ZGT0dNL0Ry?=
- =?utf-8?B?aWk4aUplSUhZdnhmR0FSekVRbkJ5ZXFUT3YrSGR4RmlMcXRPSGFmL1ZBeVFs?=
- =?utf-8?B?YVEva0tzb1VnTkdNVjI0bEx4OG1mQjU3REZ6U1hrdGNWM3ZVY0U3ckhwZlZ5?=
- =?utf-8?B?U1R2L1ZFcm5KZm1xdjVOZkphTkZwZlJyTVRsUUZXWDE3VkVTTzlMaWV0MGpm?=
- =?utf-8?B?UGVhV2k0c0RMUWhSVUFBQlg2YzhLK1VwMmFBeDc5Q3dxZEFrL3p5aWpNY0N0?=
- =?utf-8?B?YWVEdEFGckxTK3owU1RJRlhZUjBJbmFnVHhSUE4yS2pCN25KWGgvSlZWRm5l?=
- =?utf-8?B?YmxkL0NmZmRGK2V4cjh4VFFXanRiZFRyVHRjS1A5TWdxMXBVcEpTZjhTaGtQ?=
- =?utf-8?B?cFJrcXdid2V3WURHMEdKSjJkWVVTZVlMNWFQdi9KMlkvWUJLN2N2SXNiT09i?=
- =?utf-8?B?U1h1eGI3TjE4VVB0ZE9jWmVXdEtXRHRaRS9mclliUXpNVXJTanozaVAxR1ZY?=
- =?utf-8?B?M0QweWlqNktPMktWdWhQTmp5VnJsMWsxRDJ6ZWxFeTRZajFWSlZsWm80eXoy?=
- =?utf-8?B?RDBDNlJkSUM2NTJLTHE0dEhTQnplSVhmSkN3ZFE4Nk9GT2VBTkpLMG5NWWJy?=
- =?utf-8?B?WlpnSEFhTGFPaU9Ya2F6WWJBMW9OekhnSWNXRXZXUjRNUmRkdnFJaVl6RU02?=
- =?utf-8?B?TllyOVY2Ni9IWTBiMGVkOWVVZ1dKRm9wRmR1S2JZU2JjTXJxOGJKOEYwdXJQ?=
- =?utf-8?B?MEoxUnJobEI1NkdkU0ZiS3Q3a2doSyt1bXJESzFyK3FUaXF5VU85T3dSQklQ?=
- =?utf-8?B?S016Z3h1Y1F3bVhVc3pxYlNJOWN6Rm96QUsvVVkxTmU5YjNUd0I5d0Q3ZmR4?=
- =?utf-8?B?eFh4ZDd3WG45REh4YmE2YkVlK2NyclUvNG5na0JCWXc4VmI0ZDRaVU8vNEFQ?=
- =?utf-8?B?TnhnMUk2c01LT0k1QWpaaVd4TVY1cGt2TXQvRWtqTmNlNjJjR0IwcVRjd1pV?=
- =?utf-8?B?RU0reXh3R0dPOElKTGtnUk1mdjYrOWVOMkgwQUEwaTI5WjRQQ0xwN1Qyb09p?=
- =?utf-8?B?c0RZZ1AxSzNQTmRFRlBVcEM1K2pTaHZLWm1XQzJ5NGlKVmk2N0Nwb3g2Ym5R?=
- =?utf-8?B?NGgyQU9aTEQ0K1hYSFBzUWJNcDZxNDZpZGpRSzJpT1hmNkJkeGxzeXI4azM5?=
- =?utf-8?B?Um5mZjlkWGJ0d1hxdGFEb2huVXFDbldab04zem5lTjNUcVlBQVdSdEd3K3VS?=
- =?utf-8?B?bjMyRStQNzZ2OWt2R2twVmFsMkxGQzBrZURoZmN2WVM3RnJFVDllKy95ZnFM?=
- =?utf-8?Q?e/0dCWNd6KiLJDgNSWQzwJXgf?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7386681-b438-4663-b0d0-08dd31c174d6
-X-MS-Exchange-CrossTenant-AuthSource: MW6PR12MB7087.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2025 21:55:11.6907
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Sk4fnaBuWQDmrYXkDh6VVpq4rk+IeJzSzI4dwU0kyj/X4ZOYPtdmMNeZygb/N5YQuvYELQ1UFMdW0tYxBQIqNg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8361
+Mime-Version: 1.0
+References: <20241105184333.2305744-1-jthoughton@google.com> <20241105184333.2305744-2-jthoughton@google.com>
+Message-ID: <Z4GcF4sIJHfEAEDg@google.com>
+Subject: Re: [PATCH v8 01/11] KVM: Remove kvm_handle_hva_range helper functions
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao <yuzhao@google.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Tue, Nov 05, 2024, James Houghton wrote:
+> kvm_handle_hva_range is only used by the young notifiers. In a later
+> patch, it will be even further tied to the young notifiers. Instead of
+> renaming kvm_handle_hva_range to something like
 
+When referencing functions, include parantheses so its super obvious that the
+symbol is a function(), e.g. kvm_handle_hva_range(), kvm_handle_hva_range_young(),
+etc.
 
-On 1/9/25 11:52 PM, Nikunj A. Dadhania wrote:
-> 
-> 
-> On 11/15/2024 5:10 AM, Pratik R. Sampat wrote:
->> Add the X86_FEATURE_SNP CPU feature to the architectural definition for
->> the SEV-SNP VM type to exercise the KVM_SEV_INIT2 call. Ensure that the
->> SNP test is skipped in scenarios where CPUID supports it but KVM does
->> not, so that a failure is not reported in such cases.
->>
->> Signed-off-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
->> ---
->>  #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
->> +#define X86_FEATURE_SNP			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 4)
-> 
-> Additionally, please add KVM_X86_SNP_VM to the Documentation/virt/kvm/api.rst
-> 
+> kvm_handle_hva_range_young, simply remove kvm_handle_hva_range. This
+> seems slightly more readable, 
 
-Ack, will add that.
+I disagree, quite strongly in fact.  The amount of duplication makes it harder
+to see the differences between the three aging flow, and the fewer instances of
+this pattern:
 
-Thanks for your review!
-Pratik
+	return kvm_handle_hva_range(kvm, &range).ret;
+
+the better.  I added the tuple return as a way to avoid an out-param (which I
+still think is a good tradeoff), but there's definitely a cost to it.
+
+> though there is slightly more code duplication.
+
+Heh, you have a different definition of "slightly".  The total lines of code may
+be close to a wash, but at the end of the series there's ~10 lines of code that
+is nearly identical in three different places.
+
+My vote is for this:
+
+---
+ virt/kvm/kvm_main.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index de2c11dae231..bf4670e9fcc6 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -551,8 +551,8 @@ static void kvm_null_fn(void)
+ 	     node;							     \
+ 	     node = interval_tree_iter_next(node, start, last))	     \
+ 
+-static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+-							   const struct kvm_mmu_notifier_range *range)
++static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
++							 const struct kvm_mmu_notifier_range *range)
+ {
+ 	struct kvm_mmu_notifier_return r = {
+ 		.ret = false,
+@@ -628,7 +628,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+ 	return r;
+ }
+ 
+-static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
++static __always_inline int kvm_age_hva_range(struct mmu_notifier *mn,
+ 						unsigned long start,
+ 						unsigned long end,
+ 						gfn_handler_t handler,
+@@ -647,10 +647,10 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+ 	return __kvm_handle_hva_range(kvm, &range).ret;
+ }
+ 
+-static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn,
+-							 unsigned long start,
+-							 unsigned long end,
+-							 gfn_handler_t handler)
++static __always_inline int kvm_age_hva_range_no_flush(struct mmu_notifier *mn,
++						      unsigned long start,
++						      unsigned long end,
++						      gfn_handler_t handler)
+ {
+ 	return kvm_handle_hva_range(mn, start, end, handler, false);
+ }
+@@ -747,7 +747,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 	 * that guest memory has been reclaimed.  This needs to be done *after*
+ 	 * dropping mmu_lock, as x86's reclaim path is slooooow.
+ 	 */
+-	if (__kvm_handle_hva_range(kvm, &hva_range).found_memslot)
++	if (kvm_handle_hva_range(kvm, &hva_range).found_memslot)
+ 		kvm_arch_guest_memory_reclaimed(kvm);
+ 
+ 	return 0;
+@@ -793,7 +793,7 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+ 	};
+ 	bool wake;
+ 
+-	__kvm_handle_hva_range(kvm, &hva_range);
++	kvm_handle_hva_range(kvm, &hva_range);
+ 
+ 	/* Pairs with the increment in range_start(). */
+ 	spin_lock(&kvm->mn_invalidate_lock);
+@@ -817,8 +817,8 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
+ {
+ 	trace_kvm_age_hva(start, end);
+ 
+-	return kvm_handle_hva_range(mn, start, end, kvm_age_gfn,
+-				    !IS_ENABLED(CONFIG_KVM_ELIDE_TLB_FLUSH_IF_YOUNG));
++	return kvm_age_hva_range(mn, start, end, kvm_age_gfn,
++				 !IS_ENABLED(CONFIG_KVM_ELIDE_TLB_FLUSH_IF_YOUNG));
+ }
+ 
+ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+@@ -841,7 +841,7 @@ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+ 	 * cadence. If we find this inaccurate, we might come up with a
+ 	 * more sophisticated heuristic later.
+ 	 */
+-	return kvm_handle_hva_range_no_flush(mn, start, end, kvm_age_gfn);
++	return kvm_age_hva_range_no_flush(mn, start, end, kvm_age_gfn);
+ }
+ 
+ static int kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
+@@ -850,8 +850,7 @@ static int kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
+ {
+ 	trace_kvm_test_age_hva(address);
+ 
+-	return kvm_handle_hva_range_no_flush(mn, address, address + 1,
+-					     kvm_test_age_gfn);
++	return kvm_age_hva_range_no_flush(mn, address, address + 1, kvm_test_age_gfn);
+ }
+ 
+ static void kvm_mmu_notifier_release(struct mmu_notifier *mn,
+
+base-commit: 2d5faa6a8402435d6332e8e8f3c3f18cca382d83
+-- 
 
