@@ -1,167 +1,166 @@
-Return-Path: <kvm+bounces-34994-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34995-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75811A08A45
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 09:34:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 403C2A08A5A
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 09:35:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCB531888CF3
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 08:34:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA9C93A906F
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 08:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA8A208978;
-	Fri, 10 Jan 2025 08:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C702D20898D;
+	Fri, 10 Jan 2025 08:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ftEv9mTY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1KLGp/6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5F1204C32
-	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 08:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530CD20767A
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 08:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736498022; cv=none; b=NqAoStRDh/2Ug4NAA8sxgorFEU4MgmJtUxECYUUgufiOBnBb3mqmcdqxnplrFI4P1iUw7UbpBNNHNoG3uSDv2m6EsqbhHtPDoUhHvax1XaO/xogUkrNPpcELSysIhaf7H33NvrKZXD18NftJYnXWeUh1YHXbg05eiNXiWvm2ZvA=
+	t=1736498121; cv=none; b=tfPQ9x27BdHKxdsZexkO97bBChlxy+1JaQRbPMQjLWQHLh1JOOrQBzbPlCHfaTzaBI1I+0Lh1VzdXpAhEPEFP+6qxOO2THz2OvudPevW/ggZs2WMEILW6DS8ZNuU3xKL2mM5erb3TD9b6flFFfYwajLpEiPjfP47CaPhgQtwBJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736498022; c=relaxed/simple;
-	bh=jHWzqnciWVxWixyPQhRuC+28OpV2V/bBQGrWzPx3hbg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P15IfadHh2ob+H6ruQKaJCystXovsHa7cwon4MO0vMfqu4e9ZsIiaE038jlxvYAEopWciKKDjKbrx2zTP3UdmlRnSeXmzAuEwGQ7q9mlY5uZHhWQ3wbo0gXt8kmwXDr4Jir9wpVziC7Up2AGOv+PEHXEwaxOlbDQp9/2s9qWFXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ftEv9mTY; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1736498121; c=relaxed/simple;
+	bh=QijatkL6bTXb4QjXb8f+a6DCbXKfBlg4o0lO26tSjvQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=UV2Uwi3oAcbWUq7gkimOTJMccDgAXI4qBZnku07Mc5NJjUJwKKUTMBf1JCnZkchXIkSDhE8Q0iHs2/W+BqfC4ZKE+3pVD8mRArfnSH6rkBbLdk/B2WRfAStBGh0hCBQj4tk+g8rN/xFZvhoovfoYBzBegOEEE/eHKUqBzGScadI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q1KLGp/6; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736498018;
+	s=mimecast20190719; t=1736498118;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v3AxsQKFkY0E+0MZ060gdGU5E31S3yG/jY+mnuNkfgk=;
-	b=ftEv9mTYws7LJlI9kXr3WgbR/ZoLzAJhKF4SxzUUXANmsfrmAAa6uCPAatbgLgW8N1YZDB
-	xGKpSvFKCvXvwHiophkL8IAyCRe4wtzSzmQ4rWeGUGsEC1uGvAsg6e9ZpZci48vtuhazJT
-	7JnD3i7fTJ1cgmJ9+rx1UH8VXWXUXwI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Yzh6BESNkCmUyBWDujO38MFMNfd269W0kyJHQMOPcgo=;
+	b=Q1KLGp/6jBPTukyqyao4cRj8eZwT7TwMKr+U/54CnE13KfTZ2Y6C28vHJPI7CbB7aCtnEE
+	HChrjDtnX8R7n6DrMaPYb2Ijk9SRjR6c2ViF3eC7JM2Mq1ZB4kYd9P2y46zCbFwzyTfp8k
+	LeBmiVjz68zQ+RnzcRkGdmTBkmkIX1Y=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-qq7gfZXAPmSZtfyxinebFw-1; Fri, 10 Jan 2025 03:33:37 -0500
-X-MC-Unique: qq7gfZXAPmSZtfyxinebFw-1
-X-Mimecast-MFC-AGG-ID: qq7gfZXAPmSZtfyxinebFw
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385e3cbf308so706827f8f.2
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 00:33:37 -0800 (PST)
+ us-mta-655-KPetVSn6Ml6DxiOqk3ftGg-1; Fri, 10 Jan 2025 03:35:17 -0500
+X-MC-Unique: KPetVSn6Ml6DxiOqk3ftGg-1
+X-Mimecast-MFC-AGG-ID: KPetVSn6Ml6DxiOqk3ftGg
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-436379713baso8625795e9.2
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 00:35:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736498016; x=1737102816;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v3AxsQKFkY0E+0MZ060gdGU5E31S3yG/jY+mnuNkfgk=;
-        b=P7kW/bCyj1ikHr9hnBurZo8jzsJPFP7T+Tk/YxWcjenrHwYjzco52lvBYEmftFRgri
-         7USeQvTqP3pqwNn7+AbjYo5WYXeQkaO4dvVCpXkD6VQRWMfRTSgaT3uAE9RpDUBk/BS0
-         1O3re6EAQbyAFMS0HKDUk5e+2pVLXtVh+oBHnkIXvmP4/scYb/Kwqk8/WCJTbTqo5bqX
-         OKTYLacBvc5+egWMyJoiiyGUWh0t/RbE/H1pKaztZREovTK5y8UJsRs4Ng4LoSeRRHOr
-         lxmYYFFXvEDPhqakdVv5keLEoFEF7i/RDmQkw7VShWpFvv6UfaETES8SL7wuzsDKF2as
-         SIzA==
-X-Forwarded-Encrypted: i=1; AJvYcCWOAtC9768M+0uW8qetIDJAq4oWLzOTV6JNdEHeS0BeZ5eYCAgRSoUeT6s8xbDz+Zp6fyI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQihrOpIOA07GfpdQlVtw4SM0qcVZ+iX2/QHgSynG9TDltIbTF
-	BX9QGYJk0RXKIWDLYLMJh/lG/VibyWeL9gx9qLrsumgYxjOv5e7F3QUxbXe+cYO5cHuljzINf0C
-	3RB7ocqyhnCyQ7QpAL7Dw4e1vjGL/jK2zZYrHFy8ajDChW1nk9Q==
-X-Gm-Gg: ASbGncvt97qg7s6TkYlgu561MbdOmJ0WnYUGATxQwH4xVov+X+7coBWPr5EKGoozPfJ
-	hX3DAGthTjoMh2XTyQK7+4c7W8naHEU+y3YKV0YL3L+PZpVlTcgGU0Hd2UoC5xM+XdQm65s1Q+6
-	TH5me35xdUxD35KFYH1jNY2cM9sSsmdBFDrBb+Ma7m/4ReLtkAZT45DrxFb4EyStC+LayDZ8IYd
-	i+bBXOE0m0hVB29zkUgRCVuMIWaFpQvf+a9r3irj53VXXrrTCfz
-X-Received: by 2002:a05:6000:704:b0:386:3272:ee68 with SMTP id ffacd0b85a97d-38a8730af1emr7361847f8f.28.1736498016255;
-        Fri, 10 Jan 2025 00:33:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHDkmvAzVbQy4Z1oN4ubuGOtq8JEjPwlHX/LMcj/lU9WejRkYESinAg0MOkridrYlqI4G3XFw==
-X-Received: by 2002:a05:6000:704:b0:386:3272:ee68 with SMTP id ffacd0b85a97d-38a8730af1emr7361814f8f.28.1736498015919;
-        Fri, 10 Jan 2025 00:33:35 -0800 (PST)
-Received: from redhat.com ([2a06:c701:740d:3500:7f3a:4e66:9c0d:1416])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e4b82ddsm3883422f8f.71.2025.01.10.00.33.32
+        d=1e100.net; s=20230601; t=1736498116; x=1737102916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Yzh6BESNkCmUyBWDujO38MFMNfd269W0kyJHQMOPcgo=;
+        b=WovIesSGMX0JAyhbghfNpXDsfMwKkvMz3VDJxdD/c1vqiFVqJQquQx41YrzvgvOK+I
+         GpTskkwT482INusq3IkOqwUei3cP29i2fCYcgNffMZ8ZyS9ACivD2MyR5K9RdMqG36fL
+         AMwOv4RzSLb3UTFx+AQ16hBOXsXWaBb6OAQtZaRTgwYCxNpGSmfyUCJkT7vO+5DToSEi
+         4cWtjQ0WTHpYfS9xHzVvOBTZoinxCfrDSOuXclgJ1hqu0XyeiIkYHBbNZy///uCAnjeg
+         x3xo1GhQlDxeIRV5uCKjN33OGkr53Fxkh5VzEQKBf9/UY2PoKIBZbboPLORbj9nOVClp
+         ZauQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW00wVZMS0AkzoMGRAxm0IxQh4kERFsyHi5jQuIxFqRDUDElRZUWtL1PschxvgZycKDJcg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytancSsExU5wO2Sm0nnZP7IReG5UCR0NZj0SnBIc7rUjfzdPPF
+	R95SvfwwFyMt0y7ggNM9ok/9UnHmEVzptz1mgaNvETRkO3S8WMYbmefPuatWDxEunTGxEgQ7s8d
+	3atq6hv1X9sYAUVEtAtVLcPy7BTltn9uV6GnhhelEju0X76Q4AQ==
+X-Gm-Gg: ASbGncuYjPw9DZEt8zIkVZe7ovif8mIf0GiKQW7slgKFBmjL3ioVV3llWKk+s26b2Qr
+	QKs33hGDBzjQJB14SI35KZIt0IyJa8vmwLjLjZ36TTxgf2Rm5x6h+OOxpiuTrMR0ZEmPwgTSFT4
+	6vYYFNb7yXLcr6x7xBg1IJsEPMKz59qoFy2HBAs4PFWybGDMlcWs5s9nDF6O5oqMgs/YvvDZ7my
+	emNjyonwA7X95HoLurgpsx7PLEw5QN0PIgffIbIgOIsXjQ=
+X-Received: by 2002:a05:600c:1e0e:b0:434:fd01:2e5f with SMTP id 5b1f17b1804b1-436e26ef441mr85679795e9.29.1736498115842;
+        Fri, 10 Jan 2025 00:35:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFXWC3jUEXmmFtLxV2Q6VbhhNg8qt0/mZE4AbvDPzxpMk49Vg8ocWzwB7SpzfJcC2i53xpVFg==
+X-Received: by 2002:a05:600c:1e0e:b0:434:fd01:2e5f with SMTP id 5b1f17b1804b1-436e26ef441mr85679275e9.29.1736498115183;
+        Fri, 10 Jan 2025 00:35:15 -0800 (PST)
+Received: from step1.. ([5.77.78.183])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2e8a326sm79953575e9.35.2025.01.10.00.35.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 00:33:35 -0800 (PST)
-Date: Fri, 10 Jan 2025 03:33:31 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
+        Fri, 10 Jan 2025 00:35:14 -0800 (PST)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Luigi Leonardi <leonardi@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Wongi Lee <qwerty@theori.io>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	linux-kselftest@vger.kernel.org,
-	Yuri Benditovich <yuri.benditovich@daynix.com>,
-	Andrew Melnychenko <andrew@daynix.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	gur.stavi@huawei.com, devel@daynix.com
-Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
-Message-ID: <20250110033306-mutt-send-email-mst@kernel.org>
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-2-388d7d5a287a@daynix.com>
- <20250109023056-mutt-send-email-mst@kernel.org>
- <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
- <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
- <5e193a94-8f5a-4a2a-b4c4-3206c21c0b63@daynix.com>
+	kvm@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Hyunwoo Kim <v4bel@theori.io>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Michal Luczaj <mhal@rbox.co>,
+	virtualization@lists.linux.dev,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>
+Subject: [PATCH net v2 0/5] vsock: some fixes due to transport de-assignment
+Date: Fri, 10 Jan 2025 09:35:06 +0100
+Message-ID: <20250110083511.30419-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.47.1
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e193a94-8f5a-4a2a-b4c4-3206c21c0b63@daynix.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 10, 2025 at 01:38:06PM +0900, Akihiko Odaki wrote:
-> On 2025/01/09 21:46, Willem de Bruijn wrote:
-> > Akihiko Odaki wrote:
-> > > On 2025/01/09 16:31, Michael S. Tsirkin wrote:
-> > > > On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
-> > > > > tun used to simply advance iov_iter when it needs to pad virtio header,
-> > > > > which leaves the garbage in the buffer as is. This is especially
-> > > > > problematic when tun starts to allow enabling the hash reporting
-> > > > > feature; even if the feature is enabled, the packet may lack a hash
-> > > > > value and may contain a hole in the virtio header because the packet
-> > > > > arrived before the feature gets enabled or does not contain the
-> > > > > header fields to be hashed. If the hole is not filled with zero, it is
-> > > > > impossible to tell if the packet lacks a hash value.
-> > 
-> > Zero is a valid hash value, so cannot be used as an indication that
-> > hashing is inactive.
-> 
-> Zeroing will initialize the hash_report field to
-> VIRTIO_NET_HASH_REPORT_NONE, which tells it does not have a hash value.
-> 
-> > 
-> > > > > In theory, a user of tun can fill the buffer with zero before calling
-> > > > > read() to avoid such a problem, but leaving the garbage in the buffer is
-> > > > > awkward anyway so fill the buffer in tun.
-> > > > > 
-> > > > > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> > > > 
-> > > > But if the user did it, you have just overwritten his value,
-> > > > did you not?
-> > > 
-> > > Yes. but that means the user expects some part of buffer is not filled
-> > > after read() or recvmsg(). I'm a bit worried that not filling the buffer
-> > > may break assumptions others (especially the filesystem and socket
-> > > infrastructures in the kernel) may have.
-> > 
-> > If this is user memory that is ignored by the kernel, just reflected
-> > back, then there is no need in general to zero it. There are many such
-> > instances, also in msg_control.
-> 
-> More specifically, is there any instance of recvmsg() implementation which
-> returns N and does not fill the complete N bytes of msg_iter?
+v1: https://lore.kernel.org/netdev/20250108180617.154053-1-sgarzare@redhat.com/
+v2:
+- Added patch 3 to cancel the virtio close delayed work when de-assigning
+  the transport
+- Added patch 4 to clean the socket state after de-assigning the transport
+- Added patch 5 as suggested by Michael and Hyunwoo Kim. It's based on
+  Hyunwoo Kim and Wongi Lee patch [1] but using WARN_ON and covering more
+  functions
+- Added R-b/T-b tags
 
-The one in tun. It was a silly idea but it has been here for years now.
+This series includes two patches discussed in the thread started by
+Hyunwoo Kim a few weeks ago [1], plus 3 more patches added after some
+discussions on v1 (see changelog). All related to the case where a vsock
+socket is de-assigned from a transport (e.g., because the connect fails
+or is interrupted by a signal) and then assigned to another transport
+or to no-one (NULL).
+
+I tested with usual vsock test suite, plus Michal repro [2]. (Note: the repo
+works only if a G2H transport is not loaded, e.g. virtio-vsock driver).
+
+The first patch is a fix more appropriate to the problem reported in
+that thread, the second patch on the other hand is a related fix but
+of a different problem highlighted by Michal Luczaj. It's present only
+in vsock_bpf and already handled in af_vsock.c
+The third patch is to cancel the virtio close delayed work when de-assigning
+the transport, the fourth patch is to clean the socket state after de-assigning
+the transport, the last patch adds warnings and prevents null-ptr-deref in
+vsock_*[has_data|has_space].
+
+Hyunwoo Kim, Michal, if you can test and report your Tested-by that
+would be great!
+
+[1] https://lore.kernel.org/netdev/Z2K%2FI4nlHdfMRTZC@v4bel-B760M-AORUS-ELITE-AX/
+[2] https://lore.kernel.org/netdev/2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co/
+
+Stefano Garzarella (5):
+  vsock/virtio: discard packets if the transport changes
+  vsock/bpf: return early if transport is not assigned
+  vsock/virtio: cancel close work in the destructor
+  vsock: reset socket state when de-assigning the transport
+  vsock: prevent null-ptr-deref in vsock_*[has_data|has_space]
+
+ net/vmw_vsock/af_vsock.c                | 18 +++++++++++++
+ net/vmw_vsock/virtio_transport_common.c | 36 ++++++++++++++++++-------
+ net/vmw_vsock/vsock_bpf.c               |  9 +++++++
+ 3 files changed, 53 insertions(+), 10 deletions(-)
 
 
-> > 
-> > If not zeroing leads to ambiguity with the new feature, that would be
-> > a reason to add it -- it is always safe to do so.
-> > > If we are really confident that it will not cause problems, this
-> > > behavior can be opt-in based on a flag or we can just write some
-> > > documentation warning userspace programmers to initialize the buffer.
+base-commit: fbfd64d25c7af3b8695201ebc85efe90be28c5a3
+-- 
+2.47.1
 
 
