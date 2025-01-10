@@ -1,351 +1,196 @@
-Return-Path: <kvm+bounces-35057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35049-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2060A0946F
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 15:56:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A7BBA09386
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 15:32:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DE0F3A428A
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 14:53:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 830683A7FCF
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 14:32:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92EB21324D;
-	Fri, 10 Jan 2025 14:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224B7211285;
+	Fri, 10 Jan 2025 14:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bpRRtW2V"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AlnnWZ2K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CD5213248;
-	Fri, 10 Jan 2025 14:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D02211269
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 14:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736520649; cv=none; b=aFD2W3kPs5gl4eFWzx2lu0qHi1f0dZJeUgjYmEQVSidHSEZ+RZYrm5C5uJlww99oOmfgdK1ITnjGgJs9+08cs0ztSLzhjhbnGpDBsHd05F/ARaS5qoReH9B74PiJ+mw/ptyIoRwre3gIe095lfPhb9ISRsGtNUX+zy/wJ3c8OZE=
+	t=1736519572; cv=none; b=Nfzs3UUgypOvfq2ZU/qn2Ih+rn59f87mORQgkP6w824OJG4shbarpghMzM+R9Y+RGFc/zxEfTtQ1tkSK5YzHi5b1ZHVahm1GfZODRJJdDLZh1bivjTG+QGJxYFOoMh5L6sMbFJhZUFpFyfJDI5C/qVoQLSV2MB+5+8nkXTxciAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736520649; c=relaxed/simple;
-	bh=Nr/8cWy/ytkiwzuzf0dij57Q7S3zOYs/c6vUQnl9qDA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CqTwmbAvsQg4AWf3jrerCTtLsczl3IaRBmplL3pOYnvqY73BNQhER4mgKNoBR9GO1YjUVadUX8Tgn8V5CYGtPKkfmeJ2MgP8WCRwMlL0U0FTibM1AuJKfK3izNJmTcLyZn4fJdobXo/FjBvGSLy0/SMEhpnpaZrftmg1JVFxGpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bpRRtW2V; arc=none smtp.client-ip=192.198.163.16
+	s=arc-20240116; t=1736519572; c=relaxed/simple;
+	bh=wQakl14sIa/TQlT+I/DKr4worOCNT8tEroVig3IR2oY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d66GUSiwW76UtADVsYCIt2BnFWdRpFV6tejVwSWfaD02Tbt+sF3PrZvoWvJiexZcvfJ4Ccp79ElIs1wxThyBLkPQDwQdj/puo1+79pX2kCXSoc8r9aPBMGVq9xU0odhVRGBnH6NndiW1LUyRoPGpPrj4HZkpfXojB97j8qlQ2OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AlnnWZ2K; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736520648; x=1768056648;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Nr/8cWy/ytkiwzuzf0dij57Q7S3zOYs/c6vUQnl9qDA=;
-  b=bpRRtW2Vi6ctJuNqM8azCQU6KqVX/eVBZkY6qs/Xk1ItEEyTQ+Jr43d4
-   Bx63TzuHo0cQzZR9DSBJbXl+BD0Sy8RILtpqQZ+tAiGJY6R6SKzWRezmt
-   ebBdSPA1fl455ttxkx3QjdPJzuNA0yvSj41JJi7qOMI6r7/XtVGy5v8ce
-   mtFOzm7OmJqwMQBqjrsnTCduna9ktLHPMO+OOL2Au709VuX7zgcFiWiIS
-   rC04FWp5lhfLBAP5dL5ptu7oR3zr0odl/gc83PxfPFF4zEE6JfXAq8pE3
-   M0bZxhgoZ444fK/l1YO4bTKiJ9VLp2y/rud5Rvw3FSTScAN5LMzRiKSBO
+  t=1736519570; x=1768055570;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wQakl14sIa/TQlT+I/DKr4worOCNT8tEroVig3IR2oY=;
+  b=AlnnWZ2K05VYUSy3/332f1r2sDqpJlHEzZHAFiM+8/sbn6QXWGA4cIrD
+   22rtvqhiMrDUdBaLLb9XFSfuopj/Ni2DqvnXifcK/Df9CtJUKz3Rr/psu
+   1dFnVimldE/VvMAbMxN3XgCRKUyBMgmfV0ehcp6yUyJnoUYuKeXN+YEue
+   Y1FcytikqiViA7FYlTnBHs9wKLaAMUE078kCQAJSiYMJiJ3vjMT+G21X3
+   CDUbI1afjRaYioSaxaZJR7lUqebMd44Uuc/j9+3b/iriC2R8LWLeOY8fa
+   vT7STmls6co4km92scSWKlVCBoQj9ySxF+RLvuqk9ikvByAugFNsLdVDp
    A==;
-X-CSE-ConnectionGUID: vcjPv2FETeuOI4iTitXEEA==
-X-CSE-MsgGUID: tNvOTbRSRdi+YD3dtjKP0Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="24421523"
+X-CSE-ConnectionGUID: dx4NRdqiSkiqqcITWMiwuQ==
+X-CSE-MsgGUID: ptml8DJFQ26u4WKEnFwQrg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="62185483"
 X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
-   d="scan'208";a="24421523"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 06:50:47 -0800
-X-CSE-ConnectionGUID: 9n43q5iXSCyhI9kmCTNqcg==
-X-CSE-MsgGUID: ozaw/qF7TUOCS8gViZDNEA==
+   d="scan'208";a="62185483"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 06:32:49 -0800
+X-CSE-ConnectionGUID: 1NZVCdmoSluNKfvaeEt6Dg==
+X-CSE-MsgGUID: +ATDI3lWQk+/tDoMUiKj2A==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="108852253"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.16.163])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 06:50:41 -0800
-Message-ID: <3a7d93aa-781b-445e-a67a-25b0ffea0dff@intel.com>
-Date: Fri, 10 Jan 2025 16:50:33 +0200
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="108790792"
+Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
+  by orviesa003.jf.intel.com with ESMTP; 10 Jan 2025 06:32:45 -0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Alireza Sanaee <alireza.sanaee@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>
+Cc: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v7 RESEND 0/5] i386: Support SMP Cache Topology
+Date: Fri, 10 Jan 2025 22:51:10 +0800
+Message-Id: <20250110145115.1574345-1-zhao1.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] KVM: TDX: restore host xsave state when exit from the
- guest TD
-To: Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org,
- dave.hansen@linux.intel.com, rick.p.edgecombe@intel.com,
- kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
- dmatlack@google.com, isaku.yamahata@intel.com, nik.borisov@suse.com,
- linux-kernel@vger.kernel.org, x86@kernel.org, yan.y.zhao@intel.com,
- weijiang.yang@intel.com
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-5-adrian.hunter@intel.com> <Z0AbZWd/avwcMoyX@intel.com>
- <a42183ab-a25a-423e-9ef3-947abec20561@intel.com>
- <Z2GiQS_RmYeHU09L@google.com>
- <487a32e6-54cd-43b7-bfa6-945c725a313d@intel.com>
- <Z2WZ091z8GmGjSbC@google.com>
- <96f7204b-6eb4-4fac-b5bb-1cd5c1fc6def@intel.com>
- <Z4Aff2QTJeOyrEUY@google.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <Z4Aff2QTJeOyrEUY@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/01/25 21:11, Sean Christopherson wrote:
-> On Fri, Jan 03, 2025, Adrian Hunter wrote:
->> On 20/12/24 18:22, Sean Christopherson wrote:
->> +/* Set a maximal guest CR0 value */
->> +static u64 tdx_guest_cr0(struct kvm_vcpu *vcpu, u64 cr4)
->> +{
->> +	u64 cr0;
->> +
->> +	rdmsrl(MSR_IA32_VMX_CR0_FIXED1, cr0);
->> +
->> +	if (cr4 & X86_CR4_CET)
->> +		cr0 |= X86_CR0_WP;
->> +
->> +	cr0 |= X86_CR0_PE | X86_CR0_NE;
->> +	cr0 &= ~(X86_CR0_NW | X86_CR0_CD);
->> +
->> +	return cr0;
->> +}
->> +
->> +/*
->> + * Set a maximal guest CR4 value. Clear bits forbidden by XFAM or
->> + * TD Attributes.
->> + */
->> +static u64 tdx_guest_cr4(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
->> +	u64 cr4;
->> +
->> +	rdmsrl(MSR_IA32_VMX_CR4_FIXED1, cr4);
-> 
-> This won't be accurate long-term.  E.g. run KVM on hardware with CR4 bits that
-> neither KVM nor TDX know about, and vcpu->arch.cr4 will end up with bits set that
-> KVM think are illegal, which will cause it's own problems.
+Hi folks,
 
-Currently validation of CR4 is only done when user space changes it,
-which should not be allowed for TDX.  For that it looks like TDX
-would need:
+This is my v7 resend version (updated the commit message of origin
+v7's Patch 1).
 
-	kvm->arch.has_protected_state = true;
+Compared with v6 [1], v7 dropped the "thread" level cache topology
+(cache per thread):
 
-Not sure why it doesn't already?
+ - Patch 1 is the new patch to reject "thread" parameter for smp-cache.
+ - Ptach 2 dropped cache per thread support.
+ (Others remain unchanged.)
 
-> 
-> For CR0 and CR4, we should be able to start with KVM's set of allowed bits, not
-> the CPU's.  That will mean there will likely be missing bits, in vcpu->arch.cr{0,4},
-> but if KVM doesn't know about a bit, the fact that it's missing should be a complete
-> non-issue.
+There're several reasons:
 
-What about adding:
+ * Currently, neither i386 nor ARM have real hardware support for per-
+   thread cache.
+ * ARM can't support thread level cache in device tree. [2].
 
-	cr4 &= ~cr4_reserved_bits;
+So it is unnecessary to support it at this moment, even though per-
+thread cache might have potential scheduling benefits for VMs without
+CPU affinity.
 
-and
+In the future, if there is a clear demand for this feature, the correct
+approach would be to add a new control field in MachineClass.smp_props
+and enable it only for the machines that require it.
 
-	cr0 &= ~CR0_RESERVED_BITS
-> 
-> That also avoids weirdness for things like user-mode interrupts, LASS, PKS, etc.,
-> where KVM is open coding the bits.  The downside is that we'll need to remember
-> to update TDX when enabling those features to account for kvm_tdx->attributes,
-> but that's not unreasonable.
-> 
->> +
->> +	if (!(kvm_tdx->xfam & XFEATURE_PKRU))
->> +		cr4 &= ~X86_CR4_PKE;
->> +
->> +	if (!(kvm_tdx->xfam & XFEATURE_CET_USER) || !(kvm_tdx->xfam & BIT_ULL(12)))
->> +		cr4 &= ~X86_CR4_CET;
->> +
->> +	/* User Interrupts */
->> +	if (!(kvm_tdx->xfam & BIT_ULL(14)))
->> +		cr4 &= ~BIT_ULL(25);
->> +
->> +	if (!(kvm_tdx->attributes & TDX_TD_ATTR_LASS))
->> +		cr4 &= ~BIT_ULL(27);
->> +
->> +	if (!(kvm_tdx->attributes & TDX_TD_ATTR_PKS))
->> +		cr4 &= ~BIT_ULL(24);
->> +
->> +	if (!(kvm_tdx->attributes & TDX_TD_ATTR_KL))
->> +		cr4 &= ~BIT_ULL(19);
->> +
->> +	cr4 &= ~X86_CR4_SMXE;
->> +
->> +	return cr4;
->> +}
->> +
->>  int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->>  {
->>  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
->> @@ -732,8 +783,8 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->>  	vcpu->arch.cr0_guest_owned_bits = -1ul;
->>  	vcpu->arch.cr4_guest_owned_bits = -1ul;
->>  
->> -	vcpu->arch.cr4 = <maximal value>;
->> -	vcpu->arch.cr0 = <maximal value, give or take>;
->> +	vcpu->arch.cr4 = tdx_guest_cr4(vcpu);
->> +	vcpu->arch.cr0 = tdx_guest_cr0(vcpu, vcpu->arch.cr4);
->>  
->>  	vcpu->arch.tsc_offset = kvm_tdx->tsc_offset;
->>  	vcpu->arch.l1_tsc_offset = vcpu->arch.tsc_offset;
->> @@ -767,6 +818,12 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
->>  	return 0;
->>  }
->>  
->> +void tdx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->> +{
->> +	if (cpu_feature_enabled(X86_FEATURE_XSAVES))
-> 
-> This should use kvm_cpu_caps_has(), because strictly speaking it's KVM support
-> that matters.  In practice, I don't think it matters for XSAVES, but it can
-> matter for other features (though probably not for TDX guests).
-> 
->> +		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
->> +}
->> +
->>  void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>  {
->>  	struct vcpu_tdx *tdx = to_tdx(vcpu);
->> @@ -933,6 +990,24 @@ static void tdx_user_return_msr_update_cache(void)
->>  						 tdx_uret_msrs[i].defval);
->>  }
->>  
->> +static void tdx_reinforce_guest_state(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
->> +
->> +	if (WARN_ON_ONCE(vcpu->arch.xcr0 != (kvm_tdx->xfam & TDX_XFAM_XCR0_MASK)))
->> +		vcpu->arch.xcr0 = kvm_tdx->xfam & TDX_XFAM_XCR0_MASK;
->> +	if (WARN_ON_ONCE(vcpu->arch.ia32_xss != (kvm_tdx->xfam & TDX_XFAM_XSS_MASK)))
->> +		vcpu->arch.ia32_xss = kvm_tdx->xfam & TDX_XFAM_XSS_MASK;
->> +	if (WARN_ON_ONCE(vcpu->arch.pkru))
->> +		vcpu->arch.pkru = 0;
->> +	if (WARN_ON_ONCE(cpu_feature_enabled(X86_FEATURE_XSAVE) &&
->> +			 !kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)))
->> +		vcpu->arch.cr4 |= X86_CR4_OSXSAVE;
->> +	if (WARN_ON_ONCE(cpu_feature_enabled(X86_FEATURE_XSAVES) &&
->> +			 !guest_can_use(vcpu, X86_FEATURE_XSAVES)))
->> +		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
->> +}
->> +
->>  static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu)
->>  {
->>  	struct vcpu_tdx *tdx = to_tdx(vcpu);
->> @@ -1028,9 +1103,11 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
->>  		update_debugctlmsr(tdx->host_debugctlmsr);
->>  
->>  	tdx_user_return_msr_update_cache();
->> +
->> +	tdx_reinforce_guest_state(vcpu);
-> 
-> Hmm, I don't think fixing up guest state is a good idea.  It probably works?
-> But continuing on when we know there's a KVM bug *and* a chance for host data
-> corruption seems unnecessarily risky.
-> 
-> My vote would to KVM_BUG_ON() before entering the guest.  I think I'd also be ok
-> omitting the checks, it's not like the potential for KVM bugs that clobber KVM's
-> view of state are unique to TDX (though I do agree that the behavior of the TDX
-> module in this case does make them more likely).
 
-If the guest state that is vital to host state restoration, goes wrong
-then the machine can die without much explanation, so KVM_BUG_ON() before
-entering the guest seems prudent.
+This series is based on the master branch at commit aa3a285b5bc5 ("Merge
+tag 'mem-2024-12-21' of https://github.com/davidhildenbrand/qemu into
+staging").
 
-> 
->>  	kvm_load_host_xsave_state(vcpu);
->>  
->> -	vcpu->arch.regs_avail = TDX_REGS_UNSUPPORTED_SET;
->> +	vcpu->arch.regs_avail = ~0;
->>  
->>  	if (unlikely((tdx->vp_enter_ret & TDX_SW_ERROR) == TDX_SW_ERROR))
->>  		return EXIT_FASTPATH_NONE;
->> diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
->> index 861c0f649b69..2e0e300a1f5e 100644
->> --- a/arch/x86/kvm/vmx/tdx_arch.h
->> +++ b/arch/x86/kvm/vmx/tdx_arch.h
->> @@ -110,6 +110,7 @@ struct tdx_cpuid_value {
->>  } __packed;
->>  
->>  #define TDX_TD_ATTR_DEBUG		BIT_ULL(0)
->> +#define TDX_TD_ATTR_LASS		BIT_ULL(27)
->>  #define TDX_TD_ATTR_SEPT_VE_DISABLE	BIT_ULL(28)
->>  #define TDX_TD_ATTR_PKS			BIT_ULL(30)
->>  #define TDX_TD_ATTR_KL			BIT_ULL(31)
->> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
->> index 7fb1bbf12b39..7f03a6a24abc 100644
->> --- a/arch/x86/kvm/vmx/x86_ops.h
->> +++ b/arch/x86/kvm/vmx/x86_ops.h
->> @@ -126,6 +126,7 @@ void tdx_vm_free(struct kvm *kvm);
->>  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
->>  
->>  int tdx_vcpu_create(struct kvm_vcpu *vcpu);
->> +void tdx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu);
->>  void tdx_vcpu_free(struct kvm_vcpu *vcpu);
->>  void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
->>  int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu);
->> @@ -170,6 +171,7 @@ static inline void tdx_vm_free(struct kvm *kvm) {}
->>  static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
->>  
->>  static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
->> +static inline void tdx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu) {}
->>  static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
->>  static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
->>  static inline int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index d2ea7db896ba..f2b1980f830d 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -1240,6 +1240,11 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
->>  	u64 old_xcr0 = vcpu->arch.xcr0;
->>  	u64 valid_bits;
->>  
->> +	if (vcpu->arch.guest_state_protected) {
-> 
-> This should be a WARN_ON_ONCE() + return 1, no?
+Smp-cache support of ARM side can be found at [3].
 
-With kvm->arch.has_protected_state = true, KVM_SET_XCRS
-would fail, which would probably be fine except for KVM selftests:
 
-Currently the KVM selftests expect to be able to set XCR0:
+Background
+==========
 
-    td_vcpu_add()
-	vm_vcpu_add()
-	    vm_arch_vcpu_add()
-		vcpu_init_xcrs()
-		    vcpu_xcrs_set()
-			vcpu_ioctl(KVM_SET_XCRS)
-			    __TEST_ASSERT_VM_VCPU_IOCTL(!ret)
+The x86 and ARM (RISCV) need to allow user to configure cache properties
+(current only topology):
+ * For x86, the default cache topology model (of max/host CPU) does not
+   always match the Host's real physical cache topology. Performance can
+   increase when the configured virtual topology is closer to the
+   physical topology than a default topology would be.
+ * For ARM, QEMU can't get the cache topology information from the CPU
+   registers, then user configuration is necessary. Additionally, the
+   cache information is also needed for MPAM emulation (for TCG) to
+   build the right PPTT. (Originally from Jonathan)
 
-Seems like vm->arch.has_protected_state is needed for
-KVM selftests?
 
-> 
->> +		kvm_update_cpuid_runtime(vcpu);
+About smp-cache
+===============
 
-And kvm_update_cpuid_runtime() never gets called otherwise.
-Not sure where would be a good place to call it.
+The API design has been discussed heavily in [4].
 
->> +		return 0;
->> +	}
->> +
->>  	/* Only support XCR_XFEATURE_ENABLED_MASK(xcr0) now  */
->>  	if (index != XCR_XFEATURE_ENABLED_MASK)
->>  		return 1;
->> @@ -12388,7 +12393,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->>  	 * into hardware, to be zeroed at vCPU creation.  Use CRs as a sentinel
->>  	 * to detect improper or missing initialization.
->>  	 */
->> -	WARN_ON_ONCE(!init_event &&
->> +	WARN_ON_ONCE(!init_event && !vcpu->arch.guest_state_protected &&
->>  		     (old_cr0 || kvm_read_cr3(vcpu) || kvm_read_cr4(vcpu)));
-> 
-> Maybe stuff state in tdx_vcpu_init() to avoid this waiver?  KVM is already
-> deferring APIC base and RCX initialization to that point, waiting to stuff all
-> TDX-specific vCPU state seems natural.
+Now, smp-cache is implemented as a array integrated in -machine. Though
+-machine currently can't support JSON format, this is the one of the
+directions of future.
+
+An example is as follows:
+
+smp_cache=smp-cache.0.cache=l1i,smp-cache.0.topology=core,smp-cache.1.cache=l1d,smp-cache.1.topology=core,smp-cache.2.cache=l2,smp-cache.2.topology=module,smp-cache.3.cache=l3,smp-cache.3.topology=die
+
+"cache" specifies the cache that the properties will be applied on. This
+field is the combination of cache level and cache type. Now it supports
+"l1d" (L1 data cache), "l1i" (L1 instruction cache), "l2" (L2 unified
+cache) and "l3" (L3 unified cache).
+
+"topology" field accepts CPU topology levels including "core", "module",
+"cluster", "die", "socket", "book", "drawer" and a special value
+"default". (Note, now, in v7, smp-cache doesn't support "thread".)
+
+The "default" is introduced to make it easier for libvirt to set a
+default parameter value without having to care about the specific
+machine (because currently there is no proper way for machine to
+expose supported topology levels and caches).
+
+If "default" is set, then the cache topology will follow the
+architecture's default cache topology model. If other CPU topology level
+is set, the cache will be shared at corresponding CPU topology level.
+
+[1]: Patch v6: https://lore.kernel.org/qemu-devel/20241219083237.265419-1-zhao1.liu@intel.com/
+[2]: Gap of cache per thread for ARM: https://lore.kernel.org/qemu-devel/20250110114100.00002296@huawei.com/T/#m50c37fa5d372feac8e607c279cd446da3e22a12c
+[3]: ARM smp-cache: https://lore.kernel.org/qemu-devel/20250102152012.1049-1-alireza.sanaee@huawei.com/
+[4]: API disscussion: https://lore.kernel.org/qemu-devel/8734ndj33j.fsf@pond.sub.org/
+
+Thanks and Best Regards,
+Zhao
+---
+Alireza Sanaee (1):
+  i386/cpu: add has_caches flag to check smp_cache configuration
+
+Zhao Liu (4):
+  hw/core/machine: Reject thread level cache
+  i386/cpu: Support module level cache topology
+  i386/cpu: Update cache topology with machine's configuration
+  i386/pc: Support cache topology in -machine for PC machine
+
+ hw/core/machine-smp.c |  9 ++++++
+ hw/i386/pc.c          |  4 +++
+ include/hw/boards.h   |  3 ++
+ qemu-options.hx       | 30 +++++++++++++++++-
+ target/i386/cpu.c     | 71 ++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 115 insertions(+), 2 deletions(-)
+
+-- 
+2.34.1
 
 
