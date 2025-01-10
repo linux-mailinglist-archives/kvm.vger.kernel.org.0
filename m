@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-35137-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35138-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48CDFA09ECE
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 00:47:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDB09A09EE1
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 00:55:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A5B37A44BC
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 23:47:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0114188ED0A
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 23:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD4622257C;
-	Fri, 10 Jan 2025 23:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D7422331C;
+	Fri, 10 Jan 2025 23:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Bd+AchDl"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="eb9v4QNQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC20E1ACEB8
-	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 23:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24092139AC
+	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 23:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736552868; cv=none; b=FXmpYpN9AshDAzF61XqmUrCur5abOvDfyzAJZC+SZPwUYMKluRbEQmiYA43rogmSabJTXx+vWg6PVw/tWMCwLQTF1013/k6u20yxYLzNq5pupBtu0p7jwzmaeH3GosCiAsHq+VKz/WXZm+CH+TcLxOxDi55rwWQbTU/pzp4xF7E=
+	t=1736553348; cv=none; b=W76rkDFqWJXrcMo2nkOgrUiIn9L1EkALKbF/EN/xoiYOAaXWWibLN9EjTEU37sVPJriShwPo9Kz2HZEZt4975AE8y3teVhoJP1AkvtktIlLF4rJ/gbCvaTHWqdziFCrD6HMJ6I1q9gAamnkYOjrPupr/7D01+mX+JFg1B7qAgsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736552868; c=relaxed/simple;
-	bh=9Bh4dh+03/jLiIS4sK1fKcIYfTDN2f35KLErB4mqqkQ=;
+	s=arc-20240116; t=1736553348; c=relaxed/simple;
+	bh=6WwWPxjEZKQ1xUf1jWLHrZ93xlpPj2Otfo2my453W+4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=SjXuH79fBG7s/2FJdS9cC+LcYQezvCdEoNIXJ6i+puD2O8IjQOar1HxMDuUZ8p2/kxw0ebRaetOSci4SVDqwqS8L4yqlSuuOfs0tZY4/atqG2BkkAaOhpQHTzw2vfpNMWA9eBS90hHbaCGz/xPt0EBENzy2h+aHhgE+Dn1UxRZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=Bd+AchDl; arc=none smtp.client-ip=209.85.166.44
+	 In-Reply-To:Content-Type; b=VjMMSrNM0Jp/dCgvj2Lc0+HYhOLxzL+V4/JXdfnUGnxqft04CXWX4arS0U0CQ3VSKI4pAf2o/jQ7eVieSxhsyV/uC+6ZQMErx1dp0ZYCIdiDS6cg/4puSeuSsIwmS7Mr3qFCPXBw43niofukwcVO75EBUXcQ/12HhrORSGQ7mb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=eb9v4QNQ; arc=none smtp.client-ip=209.85.166.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-84a1ce51187so76264739f.1
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 15:47:46 -0800 (PST)
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-844ef6275c5so84106839f.0
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 15:55:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1736552866; x=1737157666; darn=vger.kernel.org;
+        d=sifive.com; s=google; t=1736553345; x=1737158145; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:cc:content-language:from
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=E7FhfTgUDsdvAshb7Fbz0DWhP2Rg10//miG1n5hHZBE=;
-        b=Bd+AchDlmQ65qd/dob4CI+d/M0CafkmAnmQFL+R8u5crro1o3kLt2HO8RJp7jeRDP8
-         kz2uE819knn5mwm4/bdbesZdEXBgjfWqIvUotsoFBxfxmXzoWuTvriKiuMiaoEFC9oK0
-         5PQDaFovfx/nuJNc5/ibTujmAmMjCbYtc2Bu0PGpoch7JFErjmjQlUmGX9RwW2HBlwlq
-         zu48wGzu0QJFZ4U6VS6t9xjU/vuyqSsp2HZcMjsHZuB1wfYiU7KihAeRVRgjeC8Jy5vp
-         yZEWw++sQoFT2w+vRlpozlwv560/b+3hRFranw4lbcwPq+jdQJ8s1ri1G3osXldK42Kn
-         WXYw==
+        bh=83wRULGvUmj10rdkn50Twrq4N8VlHWb+qzAtMGfh0G4=;
+        b=eb9v4QNQendavFA7FJQ4geosQtKaR91Ll1gigMBeiWjedGjNuaQ5uaXW+C1xrSmIe4
+         EyNuRvH9W2ojUI7Lzq/7Aq5ccxy+BMW5FcVCfl7LfWtj9dONr/lAv8yoyxNFNDx35j1Q
+         Y45MpxOyITk0eGJqqkPUAGBaEX1rJ+07CoJemSvO7iYwobUBYwdBJiLqr9NoEAM0ZAG6
+         N/Cn3Q0ubidIZ3wM2uBCanEX0r8WST1twIG7l1kPuN2jMgh8APMYYEaFYRZNh+Z1LCva
+         aYtwGQEywlGbP6LeZGvmVeuIrg7d0qz+XzkzvvrzCJ4Nn7r84/TPMoKhZHyfKh3m+qOv
+         UmtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736552866; x=1737157666;
+        d=1e100.net; s=20230601; t=1736553345; x=1737158145;
         h=content-transfer-encoding:in-reply-to:cc:content-language:from
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E7FhfTgUDsdvAshb7Fbz0DWhP2Rg10//miG1n5hHZBE=;
-        b=UMnSbR4LS787J3LWSIXZnqVQv/zoGe4nf4Lif6yrrBqUnzImB+eKuf0mnodQQenfz5
-         bDOHEb3KuDi/1o7jSODUjLX0VnaHHd/8UKOJuL6OZaiMincUqUBMinkVb7yA/QGn3E4y
-         dMl8dDAsZwykPD7rHvMWC3WBceqUmQu082IejRXEfBvMbTzaeP1HNbUWjp4YPdLGA6jZ
-         5NRsmodf/GxHCbP7WC6bapVDDr/yEZVtj7ObOFJKQPvaMZ6Zyed0vJgsV600g6cnFGtf
-         aBqQK7oAr6vYTzNFIDpdJPZ0Bq8SfS8dE1Kx2E+cTesAvwvVj1C8ltnBrKh2gO3R34Ew
-         SCxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCfupisoGYKPc/7WRwFL/n0vcD2Uqk1h9wOZtoqP9f1voPncUhdrTEgdxZY4QubKaWwow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEJ3TTcHtzfTyNOKkvWZ0n5DBscbJ1RYw/2env7130LIy4SKQn
-	Z+vKYUXZlvGGA1oNhsTVrFluoKfOb1cGQV1b90z5iyw60duuwcvRlnipS19Gt58=
-X-Gm-Gg: ASbGncut/bRLVFmDD8vi9A9JKHdUKaO4+a7etLtUomg4VgHcxElggYugvUHpYD/+nbu
-	3NtkVvbz152JaXe+Az8FR9CtzN7fH52vLRwTQ3oFFNN9OJFv5o15zExQYBY4dSCjpTD3Xt2ZvTO
-	vpc2YTaEEl7hiICFpB8sSACil4qlyMi05EfIbRINuk4VXxq6uU3ZtgCTExKmbAQjhXt5yRX6SDc
-	TNPUIayy1fkUyfOt8ouvjDB6oKItAbxZxwH8dwTxarw5iXmMcqTJ7hXw2HypKJFtQ3mbZpCdacA
-	Qg6+
-X-Google-Smtp-Source: AGHT+IHc3hawEH72BOuREBbr9aM6RiuMYEkEBgMor65OdodG3NV8W/0PQoOelCZBrCJNuv+/uKZ03A==
-X-Received: by 2002:a05:6602:751a:b0:83d:ff89:218c with SMTP id ca18e2360f4ac-84ce00b8a80mr1181590939f.7.1736552865857;
-        Fri, 10 Jan 2025 15:47:45 -0800 (PST)
+        bh=83wRULGvUmj10rdkn50Twrq4N8VlHWb+qzAtMGfh0G4=;
+        b=gxWIg2ENlen1//KPEywyLN9TlgjCbrkGr6ECqHtWzoMZHPmBvpmfymB0LnQwUhGAn4
+         1TU0dl7HmWcQ8PWuB3NBIj9zgCDNj8HlObkPE/QwQ64/XYzV6g8aM7KHaO46oKuP2hoy
+         Dxm2E+IkFjlDOPxeDMFlLpe3LLc1Goi7Iri1b6fH24oEqUel7ngN8/AiHxF0/seUstur
+         bgHfvG3act1O5v547trrJlu1lpmblEUyNYVOMABmxFw0iRoTnH0gQpeFnyI5nkZvA6/E
+         05l2vV2zU5pQ7e3+dW4FTA+4Bkv2FF9Ovi3aMieDBB2s5vXXShG+KHpvMbVqf6XQWtLC
+         7IxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUjJPsHhgS2vh1VkuZhQcnSJ6r2zWnwIl9sT6ITBWpBU1X2VqxUu9grnhueY53BUoE8tpU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8aq1tGzyL24ZsxiBTq0Gdwfi4of3OZUXHY/bIs3u3YCrgc2cN
+	JfFbp+99DXPudYjUPg9XsI3WGp4D54IIwzRARhTQ6oBi+gX/6cXDrvNbEBnmczI=
+X-Gm-Gg: ASbGnctqgDtph8YaHhEbxgmFb8BiEtQCOZyMdjJdWL2FTrni2DVe9DuEIyqRQ+rswut
+	Ml+y80HNAK3z1cZ9DSDDZr77wTU33GoHUVw7c9BHVXUBHevf6sFQYGOMSndaOvVLwm8QFAI5nZI
+	04JLrF+Apa92O76Ad9p8zMmqLV3/wU65jEjAaDVfHWQs5jQdSJd7D7DvjBJX1cwJJfFfoe0Ypnp
+	UgySmjF3xMy00YYRj0khSmPCvmSSG5yhzRGWd5lAzn2cIVylALURE8CJVqe/XFo6ib6morgPU7W
+	p1U0
+X-Google-Smtp-Source: AGHT+IH0fgQxMOSKadJfIoy2Nj8jc7fKrOvZJO0N4J4fYEHjn0eRwTiFqc8rtxsnNitjP7FoCOy29w==
+X-Received: by 2002:a05:6e02:1c81:b0:3a7:6636:eb3b with SMTP id e9e14a558f8ab-3ce3aa5ad65mr87898675ab.17.1736553344919;
+        Fri, 10 Jan 2025 15:55:44 -0800 (PST)
 Received: from [100.64.0.1] ([165.188.116.9])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-84d61fc811esm114615839f.42.2025.01.10.15.47.44
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ce4ad94327sm11932995ab.15.2025.01.10.15.55.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jan 2025 15:47:45 -0800 (PST)
-Message-ID: <65f1b520-5d0d-4494-b3f5-1d3e3265a762@sifive.com>
-Date: Fri, 10 Jan 2025 17:47:43 -0600
+        Fri, 10 Jan 2025 15:55:44 -0800 (PST)
+Message-ID: <b3f54d34-bc77-46db-88da-70c0c602081f@sifive.com>
+Date: Fri, 10 Jan 2025 17:55:43 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,10 +81,11 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] RISC-V: KVM: add support for FWFT SBI extension
+Subject: Re: [PATCH 6/6] RISC-V: KVM: add support for
+ SBI_FWFT_MISALIGNED_DELEG
 To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
 References: <20250106154847.1100344-1-cleger@rivosinc.com>
- <20250106154847.1100344-5-cleger@rivosinc.com>
+ <20250106154847.1100344-7-cleger@rivosinc.com>
 From: Samuel Holland <samuel.holland@sifive.com>
 Content-Language: en-US
 Cc: Paul Walmsley <paul.walmsley@sifive.com>,
@@ -92,334 +93,122 @@ Cc: Paul Walmsley <paul.walmsley@sifive.com>,
  Atish Patra <atishp@atishpatra.org>, linux-riscv@lists.infradead.org,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  kvm-riscv@lists.infradead.org
-In-Reply-To: <20250106154847.1100344-5-cleger@rivosinc.com>
+In-Reply-To: <20250106154847.1100344-7-cleger@rivosinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Clément,
-
-This looks good to me, but will need changes for the updated semantics of the
-LOCK flag. One minor comment below.
-
 On 2025-01-06 9:48 AM, Clément Léger wrote:
-> Add basic infrastructure to support the FWFT extension in KVM.
+> SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
+> misaligned load/store exceptions. Save and restore it during CPU
+> load/put.
 > 
 > Signed-off-by: Clément Léger <cleger@rivosinc.com>
 > ---
->  arch/riscv/include/asm/kvm_host.h          |   4 +
->  arch/riscv/include/asm/kvm_vcpu_sbi.h      |   1 +
->  arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  37 +++++
->  arch/riscv/include/uapi/asm/kvm.h          |   1 +
->  arch/riscv/kvm/Makefile                    |   1 +
->  arch/riscv/kvm/vcpu_sbi.c                  |   4 +
->  arch/riscv/kvm/vcpu_sbi_fwft.c             | 176 +++++++++++++++++++++
->  7 files changed, 224 insertions(+)
->  create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
->  create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
+>  arch/riscv/kvm/vcpu.c          |  3 +++
+>  arch/riscv/kvm/vcpu_sbi_fwft.c | 39 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 42 insertions(+)
 > 
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> index 35eab6e0f4ae..9bd046ed7907 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -19,6 +19,7 @@
->  #include <asm/kvm_vcpu_fp.h>
->  #include <asm/kvm_vcpu_insn.h>
->  #include <asm/kvm_vcpu_sbi.h>
-> +#include <asm/kvm_vcpu_sbi_fwft.h>
->  #include <asm/kvm_vcpu_timer.h>
->  #include <asm/kvm_vcpu_pmu.h>
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 3420a4a62c94..bb6f788d46f5 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -641,6 +641,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+>  	void *nsh;
+>  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> +	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
 >  
-> @@ -276,6 +277,9 @@ struct kvm_vcpu_arch {
->  	/* Performance monitoring context */
->  	struct kvm_pmu pmu_context;
+>  	vcpu->cpu = -1;
 >  
-> +	/* Firmware feature SBI extension context */
-> +	struct kvm_sbi_fwft fwft_context;
-> +
->  	/* 'static' configurations which are set only once */
->  	struct kvm_vcpu_config cfg;
+> @@ -666,6 +667,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
+>  		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
+>  		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
+> +		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
+>  	} else {
+>  		csr->vsstatus = csr_read(CSR_VSSTATUS);
+>  		csr->vsie = csr_read(CSR_VSIE);
+> @@ -676,6 +678,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  		csr->vstval = csr_read(CSR_VSTVAL);
+>  		csr->hvip = csr_read(CSR_HVIP);
+>  		csr->vsatp = csr_read(CSR_VSATP);
+> +		cfg->hedeleg = csr_read(CSR_HEDELEG);
+>  	}
+>  }
 >  
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> index 8c465ce90e73..7ff200a1ad3b 100644
-> --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> @@ -95,6 +95,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_sta;
-> +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_fwft;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experimental;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
->  
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
-> new file mode 100644
-> index 000000000000..5782517f6e08
-> --- /dev/null
-> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
-> @@ -0,0 +1,37 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (c) 2025 Rivos Inc.
-> + *
-> + * Authors:
-> + *     Clément Léger <cleger@rivosinc.com>
-> + */
-> +
-> +#ifndef __KVM_VCPU_RISCV_FWFT_H
-> +#define __KVM_VCPU_RISCV_FWFT_H
-> +
-> +#include <asm/sbi.h>
-> +
-> +struct kvm_sbi_fwft_config;
-> +struct kvm_vcpu;
-> +
-> +struct kvm_sbi_fwft_feature {
-> +	enum sbi_fwft_feature_t id;
-> +	bool (*supported)(struct kvm_vcpu *vcpu);
-> +	int (*set)(struct kvm_vcpu *vcpu, struct kvm_sbi_fwft_config *conf, unsigned long value);
-> +	int (*get)(struct kvm_vcpu *vcpu, struct kvm_sbi_fwft_config *conf, unsigned long *value);
-> +};
-> +
-> +struct kvm_sbi_fwft_config {
-> +	const struct kvm_sbi_fwft_feature *feature;
-> +	bool supported;
-> +	unsigned long flags;
-> +};
-> +
-> +/* FWFT data structure per vcpu */
-> +struct kvm_sbi_fwft {
-> +	struct kvm_sbi_fwft_config *configs;
-> +};
-> +
-> +#define vcpu_to_fwft(vcpu) (&(vcpu)->arch.fwft_context)
-> +
-> +#endif /* !__KVM_VCPU_RISCV_FWFT_H */
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-> index 3482c9a73d1b..0813145a6272 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -198,6 +198,7 @@ enum KVM_RISCV_SBI_EXT_ID {
->  	KVM_RISCV_SBI_EXT_VENDOR,
->  	KVM_RISCV_SBI_EXT_DBCN,
->  	KVM_RISCV_SBI_EXT_STA,
-> +	KVM_RISCV_SBI_EXT_FWFT,
->  	KVM_RISCV_SBI_EXT_MAX,
->  };
->  
-> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> index 0fb1840c3e0a..ece6b119913a 100644
-> --- a/arch/riscv/kvm/Makefile
-> +++ b/arch/riscv/kvm/Makefile
-> @@ -32,6 +32,7 @@ kvm-y += vcpu_sbi_replace.o
->  kvm-y += vcpu_sbi_sta.o
->  kvm-$(CONFIG_RISCV_SBI_V01) += vcpu_sbi_v01.o
->  kvm-y += vcpu_switch.o
-> +kvm-y += vcpu_sbi_fwft.o
-
-nit: this should go with the other vcpu_sbi_* files.
-
-Regards,
-Samuel
-
->  kvm-y += vcpu_timer.o
->  kvm-y += vcpu_vector.o
->  kvm-y += vm.o
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index d2dbb0762072..5bf6c92cca5b 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -74,6 +74,10 @@ static const struct kvm_riscv_sbi_extension_entry sbi_ext[] = {
->  		.ext_idx = KVM_RISCV_SBI_EXT_STA,
->  		.ext_ptr = &vcpu_sbi_ext_sta,
->  	},
-> +	{
-> +		.ext_idx = KVM_RISCV_SBI_EXT_FWFT,
-> +		.ext_ptr = &vcpu_sbi_ext_fwft,
-> +	},
->  	{
->  		.ext_idx = KVM_RISCV_SBI_EXT_EXPERIMENTAL,
->  		.ext_ptr = &vcpu_sbi_ext_experimental,
 > diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> new file mode 100644
-> index 000000000000..55433e805baa
-> --- /dev/null
+> index 55433e805baa..1e85ff6666af 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
 > +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-> @@ -0,0 +1,176 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2025 Rivos Inc.
-> + *
-> + * Authors:
-> + *     Clément Léger <cleger@rivosinc.com>
-> + */
+> @@ -14,6 +14,8 @@
+>  #include <asm/kvm_vcpu_sbi.h>
+>  #include <asm/kvm_vcpu_sbi_fwft.h>
+>  
+> +#define MIS_DELEG (1UL << EXC_LOAD_MISALIGNED | 1UL << EXC_STORE_MISALIGNED)
 > +
-> +#include <linux/errno.h>
-> +#include <linux/err.h>
-> +#include <linux/kvm_host.h>
-> +#include <asm/cpufeature.h>
-> +#include <asm/sbi.h>
-> +#include <asm/kvm_vcpu_sbi.h>
-> +#include <asm/kvm_vcpu_sbi_fwft.h>
-> +
-> +static const enum sbi_fwft_feature_t kvm_fwft_defined_features[] = {
-> +	SBI_FWFT_MISALIGNED_EXC_DELEG,
-> +	SBI_FWFT_LANDING_PAD,
-> +	SBI_FWFT_SHADOW_STACK,
-> +	SBI_FWFT_DOUBLE_TRAP,
-> +	SBI_FWFT_PTE_AD_HW_UPDATING,
-> +	SBI_FWFT_POINTER_MASKING_PMLEN,
-> +};
-> +
-> +static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
+>  static const enum sbi_fwft_feature_t kvm_fwft_defined_features[] = {
+>  	SBI_FWFT_MISALIGNED_EXC_DELEG,
+>  	SBI_FWFT_LANDING_PAD,
+> @@ -35,7 +37,44 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
+>  	return false;
+>  }
+>  
+> +static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
 > +{
-> +	int i;
+> +	if (!unaligned_ctl_available())
+
+This seems like the wrong condition. Patch 2 requests delegation regardless of
+what probing detects. For MISALIGNED_SCALAR_FAST, the delegation likely doesn't
+change any actual behavior, because the hardware likely never raises the
+exception. But it does ensure M-mode never emulates anything, so if the
+exception were to occur, the kernel has the choice whether to handle it. And
+this lets us provide the same guarantee to KVM guests. So I think this feature
+should also be supported if we successfully delegated the exception on the host
+side.
+
+> +		return false;
 > +
-> +	for (i = 0; i < ARRAY_SIZE(kvm_fwft_defined_features); i++) {
-> +		if (kvm_fwft_defined_features[i] == feature)
-> +			return true;
-> +	}
-> +
-> +	return false;
+> +	return true;
 > +}
 > +
-> +static const struct kvm_sbi_fwft_feature features[] = {
-> +};
-> +
-> +static struct kvm_sbi_fwft_config *
-> +kvm_sbi_fwft_get_config(struct kvm_vcpu *vcpu, enum sbi_fwft_feature_t feature)
+> +static int kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
+> +					struct kvm_sbi_fwft_config *conf,
+> +					unsigned long value)
 > +{
-> +	int i = 0;
-> +	struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
-> +
-> +	for (i = 0; i < ARRAY_SIZE(features); i++) {
-> +		if (fwft->configs[i].feature->id == feature)
-> +			return &fwft->configs[i];
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static int kvm_fwft_get_feature(struct kvm_vcpu *vcpu,
-> +				enum sbi_fwft_feature_t feature,
-> +				struct kvm_sbi_fwft_config **conf)
-> +{
-> +	struct kvm_sbi_fwft_config *tconf;
-> +
-> +	tconf = kvm_sbi_fwft_get_config(vcpu, feature);
-> +	if (!tconf) {
-> +		if (kvm_fwft_is_defined_feature(feature))
-> +			return SBI_ERR_NOT_SUPPORTED;
-> +
-> +		return SBI_ERR_DENIED;
-> +	}
-> +
-> +	if (!tconf->supported)
-> +		return SBI_ERR_NOT_SUPPORTED;
-> +
-> +	*conf = tconf;
+> +	if (value == 1)
+> +		csr_set(CSR_HEDELEG, MIS_DELEG);
+> +	else if (value == 0)
+> +		csr_clear(CSR_HEDELEG, MIS_DELEG);
+> +	else
+> +		return SBI_ERR_INVALID_PARAM;
 > +
 > +	return SBI_SUCCESS;
 > +}
 > +
-> +static int kvm_sbi_fwft_set(struct kvm_vcpu *vcpu,
-> +			    enum sbi_fwft_feature_t feature,
-> +			    unsigned long value, unsigned long flags)
+> +static int kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
+> +					struct kvm_sbi_fwft_config *conf,
+> +					unsigned long *value)
 > +{
-> +	int ret;
-> +	struct kvm_sbi_fwft_config *conf;
+> +	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) != 0;
 > +
-> +	ret = kvm_fwft_get_feature(vcpu, feature, &conf);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if ((flags & ~SBI_FWFT_SET_FLAG_LOCK) != 0)
-> +		return SBI_ERR_INVALID_PARAM;
-> +
-> +	if (conf->flags & SBI_FWFT_SET_FLAG_LOCK)
-> +		return SBI_ERR_DENIED;
-> +
-> +	conf->flags = flags;
-> +
-> +	return conf->feature->set(vcpu, conf, value);
+> +	return SBI_SUCCESS;
 > +}
 > +
-> +static int kvm_sbi_fwft_get(struct kvm_vcpu *vcpu,
-> +			    enum sbi_fwft_feature_t feature,
-> +			    unsigned long *value)
-> +{
-> +	int ret;
-> +	struct kvm_sbi_fwft_config *conf;
-> +
-> +	ret = kvm_fwft_get_feature(vcpu, feature, &conf);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return conf->feature->get(vcpu, conf, value);
-> +}
-> +
-> +static int kvm_sbi_ext_fwft_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> +				    struct kvm_vcpu_sbi_return *retdata)
-> +{
-> +	int ret = 0;
-> +	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> +	unsigned long funcid = cp->a6;
-> +
-> +	switch (funcid) {
-> +	case SBI_EXT_FWFT_SET:
-> +		ret = kvm_sbi_fwft_set(vcpu, cp->a0, cp->a1, cp->a2);
-> +		break;
-> +	case SBI_EXT_FWFT_GET:
-> +		ret = kvm_sbi_fwft_get(vcpu, cp->a0, &retdata->out_val);
-> +		break;
-> +	default:
-> +		ret = SBI_ERR_NOT_SUPPORTED;
-> +		break;
+>  static const struct kvm_sbi_fwft_feature features[] = {
+> +	{
+> +		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
+> +		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
+> +		.set = kvm_sbi_fwft_set_misaligned_delegation,
+> +		.get = kvm_sbi_fwft_get_misaligned_delegation,
 > +	}
-> +
-> +	retdata->err_val = ret;
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_sbi_ext_fwft_init(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
-> +	const struct kvm_sbi_fwft_feature *feature;
-> +	struct kvm_sbi_fwft_config *conf;
-> +	int i;
-> +
-> +	fwft->configs = kcalloc(ARRAY_SIZE(features), sizeof(struct kvm_sbi_fwft_config),
-> +				GFP_KERNEL);
-> +	if (!fwft->configs)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(features); i++) {
-> +		feature = &features[i];
-> +		conf = &fwft->configs[i];
-> +		if (feature->supported)
-> +			conf->supported = feature->supported(vcpu);
-> +		else
-> +			conf->supported = true;
-> +
-> +		conf->feature = feature;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void kvm_sbi_ext_fwft_deinit(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
-> +
-> +	kfree(fwft->configs);
-> +}
-> +
-> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_fwft = {
-> +	.extid_start = SBI_EXT_FWFT,
-> +	.extid_end = SBI_EXT_FWFT,
-> +	.handler = kvm_sbi_ext_fwft_handler,
-> +	.init = kvm_sbi_ext_fwft_init,
-> +	.deinit = kvm_sbi_ext_fwft_deinit,
-> +};
+
+nit: Please add a trailing comma here as future patches will extend the array.
+
+Regards,
+Samuel
+
+>  };
+>  
+>  static struct kvm_sbi_fwft_config *
 
 
