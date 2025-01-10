@@ -1,78 +1,65 @@
-Return-Path: <kvm+bounces-34979-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-34981-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F0CCA0863E
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 05:38:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89204A08648
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 05:47:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D234F7A3EEB
-	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 04:38:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E05A188CB15
+	for <lists+kvm@lfdr.de>; Fri, 10 Jan 2025 04:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5F94AEE0;
-	Fri, 10 Jan 2025 04:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AED4205E05;
+	Fri, 10 Jan 2025 04:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="uH4pIbdU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hJM+AfBa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CC28F54
-	for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 04:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F47E290F;
+	Fri, 10 Jan 2025 04:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736483896; cv=none; b=Q88JGOq6T+ngo6EI/IOqULz15+rHmSXeUZhjwHXMtqMYitX8c99MeihkxRCG3xZG1S7Cn8Ssp27JAeofhbR+dUlAX8SFgM7z242muiyIXn84ZHCkrJD4hvTzruitrP+E0H7XL2av1aE043A5zoldQ6ehKwhQtzX2vcwbFxxTviA=
+	t=1736484437; cv=none; b=CjyOFtMFRJcV19UnmQMOARlJvbh6EKIgXP5V6bezj4o+ycu34MXrclGzL7PT6j5ejqoEjGEq2C+yD3LMcJ8OibTOMhY64sNyKW11vuH5kNxt/ZVVhrYT3URvQjMMgoPo6W+Ws4u/Nk6lXEfX5LjlxA9mVP7d6MhhSZKo4gW8UAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736483896; c=relaxed/simple;
-	bh=NQABrOdJjxGKaiqAIDo3XL0V9WgsqmrsrgDnSsJEpZA=;
+	s=arc-20240116; t=1736484437; c=relaxed/simple;
+	bh=Pd2/0UPBg8cDbKdRW+tKf4P0ax2K1l7aoxcHx7DSEG0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S52NulArNl01FD3AHv7bvvBLbrOWjSr32XBoYC1ePWrCbKz4wIF6Ww1tgU5uphAifAox4U0k7N9i4qifez9Q8y/6iqZXdQlGfpmXbHLPkdFFlkZ5/YzT4ayPamoua7XKLc6uriS70DbzEut0EYqXdvzh0qwM7xCA6hM+VPvBgks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=uH4pIbdU; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-216634dd574so18258025ad.2
-        for <kvm@vger.kernel.org>; Thu, 09 Jan 2025 20:38:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736483893; x=1737088693; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2VRHR34mrz0IlpIAFdzRMCZZmZsA3d1rUTcqvnksKWQ=;
-        b=uH4pIbdUHeoZaQWiz2CcH8v1Yi2mgcrs14D7QdDm+GLCUrpakmP2nl2ESc4D2IBfEh
-         QFVqvv+bnLZJqj68Cp6A/msW1oI1IOfVJQjUjPmqu/xTtc04qUHVrgCy6NnNgW72jKXC
-         n2b0SJ5hzGAGcDXbF7yJwokmefpqJawAC8h4O/3VBrGe5Wo9pfiTB+45puy5488K32/C
-         2ZJg90bY/pCJ2izf1eeokL4B7MkXv3A/Hi7C+y0gGmb9rcAy+d4w9tUH5jNTYLdfkjZn
-         64cpVr79FP0e1jnclELLHEFPn+vRM2aQXq92XaEQVFr4B5u/EpEILxoBU5262OuZnRpV
-         gxfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736483893; x=1737088693;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2VRHR34mrz0IlpIAFdzRMCZZmZsA3d1rUTcqvnksKWQ=;
-        b=Z2iT1ZrqUr4Ay9l/gcpysd0QqYq43A7L1SY7jrDVjaFOp1CVGCb3HE0PnWBAWyFBlC
-         c33CRaJ3OeX4vp6eHiyoWQLymQtLx+wPfVmOQzo8rCpgzHD2WtUvPOzC73+rzQLUmDLO
-         h42gf4WB2QFd3hJ3p9eeus2KvrlModGP933Ij0HSPaCgRf+Cv/otMXMZO1EzsfLxqK6W
-         +RD1bInEMsTP1N1BbgigHt0iYi4ui9m+Y5IzbvE6fuwd0lAYrVpKphfdhdtSpnTWBadD
-         TN0lwNPX7ymIwEZCKUudBMoUC3NmGfU7N5al3CbcrBFM0I0wX5nHbT3aLrr06xzqOdXf
-         Gr+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW7Amy3zRxtyUM+U6pxIU7vXrBKQ/Bui79BTk3N0L3e8aGXPOA6U74v93MJgfDwfW6XTg0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7372hXq/pE2SJZEp+k/dwH7smxx6TpCUckfDYr/PxLe/ion3+
-	ZFLH3UDCsyNk5jS1ddKnGeC5Z8+CLOG9EFIMbHJo2aBSKB+ZvvaHyNX5FHvp7u4=
-X-Gm-Gg: ASbGnctkl23nFjIb4Hn8LEivqBrDbSXpFcVHDH1FylSGyArz/+o3AlgfJ86fog8nWM5
-	10ASOcjjXX31VJ5jjmvW+7qiL+b/v514RoQrzJza69bZQo3lTHAZ4o5keCs3NA6hmXIgWRU54Pl
-	4Fb8BW8swlfyqVbcA5bywxA7Cuj8Qfjs2CuIkcooq5LryuDyl9XpMRfvvWfHFwE5hHFfOR2G/I9
-	cTxIY9YAvMMZubHHfrC3nJAxeA2esaxRexPKDR59oQYyF0gK8eG3eF6Tegm4PAx6zs=
-X-Google-Smtp-Source: AGHT+IGIzSe99ixGVZWcgiRWGgX+k+OXNMhmSVlKwOwyHf8ERTDIVn5bxtWt8REsRDYstEUOtvnfEg==
-X-Received: by 2002:a17:902:ce8d:b0:216:282d:c697 with SMTP id d9443c01a7336-21a83f62877mr120429985ad.27.1736483893141;
-        Thu, 09 Jan 2025 20:38:13 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f26d996sm5709995ad.257.2025.01.09.20.38.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jan 2025 20:38:12 -0800 (PST)
-Message-ID: <5e193a94-8f5a-4a2a-b4c4-3206c21c0b63@daynix.com>
-Date: Fri, 10 Jan 2025 13:38:06 +0900
+	 In-Reply-To:Content-Type; b=ZLzka47Urxrye2exlsGiMaTOgIY6X4V0829HAHvyRHv5Mr0OL+luVFXxzI9g1mP9/6QaigxDAehN8sZRFfTRD54fvkEqZ/PrwSsfUU/jqQOwDjmItBHbpzdyMzf7xlU/1PkOJbxJTmiY+JWbYtDZRBNPwseYAPUHRh2eRpqcZxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hJM+AfBa; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736484435; x=1768020435;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Pd2/0UPBg8cDbKdRW+tKf4P0ax2K1l7aoxcHx7DSEG0=;
+  b=hJM+AfBaxWEqgf4pS4sbQjZz8XiVMsZ4OwihBuMGSEBU2AX9AvbiNdDh
+   M9LO2cDfnhM2VuWOj4wEO4nAVWji6Dmzzeqh5YiiNqAijjPBV6u0SWzZf
+   tWxvv5+LsdatF0drTjVVJ3N/GTkIu1JjdSHc2mFe/OxS2oiMdrNhcVQ1O
+   fN9URiHeyuoSlrL8NBzCBcii9Sv0fxk3FuOa1z31v3pyZPBP/L3eCCI/I
+   oTxV1Omx+tuNMI8w9xGmY6Am7jP+kddMt0wXMyloW6ORAXCVBI9fRM1ge
+   l0spc5zKxJ3xhqz1nxlTGU71JiJlglQttYVdfO2v50OCb5dHlNqtcCdnT
+   A==;
+X-CSE-ConnectionGUID: t4R7nOL1TUaVXNxEnXjsfw==
+X-CSE-MsgGUID: /ISj5EfDT3SbC0kR3defZQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="36792896"
+X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
+   d="scan'208";a="36792896"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 20:47:15 -0800
+X-CSE-ConnectionGUID: tGFzLeBpQ+ybLQwfUny1Ug==
+X-CSE-MsgGUID: pkIzvumUTUWG/UaYVVik7w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
+   d="scan'208";a="103675577"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 20:47:12 -0800
+Message-ID: <9e7d3f5c-156b-4257-965d-aae03beb5faa@intel.com>
+Date: Fri, 10 Jan 2025 12:47:09 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,78 +67,326 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-2-388d7d5a287a@daynix.com>
- <20250109023056-mutt-send-email-mst@kernel.org>
- <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
- <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH v2 24/25] KVM: x86: Introduce KVM_TDX_GET_CPUID
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>, pbonzini@redhat.com,
+ seanjc@google.com
+Cc: yan.y.zhao@intel.com, isaku.yamahata@gmail.com, kai.huang@intel.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ tony.lindgren@linux.intel.com, reinette.chatre@intel.com
+References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
+ <20241030190039.77971-25-rick.p.edgecombe@intel.com>
 Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20241030190039.77971-25-rick.p.edgecombe@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2025/01/09 21:46, Willem de Bruijn wrote:
-> Akihiko Odaki wrote:
->> On 2025/01/09 16:31, Michael S. Tsirkin wrote:
->>> On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
->>>> tun used to simply advance iov_iter when it needs to pad virtio header,
->>>> which leaves the garbage in the buffer as is. This is especially
->>>> problematic when tun starts to allow enabling the hash reporting
->>>> feature; even if the feature is enabled, the packet may lack a hash
->>>> value and may contain a hole in the virtio header because the packet
->>>> arrived before the feature gets enabled or does not contain the
->>>> header fields to be hashed. If the hole is not filled with zero, it is
->>>> impossible to tell if the packet lacks a hash value.
+On 10/31/2024 3:00 AM, Rick Edgecombe wrote:
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
 > 
-> Zero is a valid hash value, so cannot be used as an indication that
-> hashing is inactive.
-
-Zeroing will initialize the hash_report field to 
-VIRTIO_NET_HASH_REPORT_NONE, which tells it does not have a hash value.
-
+> Implement an IOCTL to allow userspace to read the CPUID bit values for a
+> configured TD.
 > 
->>>> In theory, a user of tun can fill the buffer with zero before calling
->>>> read() to avoid such a problem, but leaving the garbage in the buffer is
->>>> awkward anyway so fill the buffer in tun.
->>>>
->>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>
->>> But if the user did it, you have just overwritten his value,
->>> did you not?
->>
->> Yes. but that means the user expects some part of buffer is not filled
->> after read() or recvmsg(). I'm a bit worried that not filling the buffer
->> may break assumptions others (especially the filesystem and socket
->> infrastructures in the kernel) may have.
+> The TDX module doesn't provide the ability to set all CPUID bits. Instead
+> some are configured indirectly, or have fixed values. But it does allow
+> for the final resulting CPUID bits to be read. This information will be
+> useful for userspace to understand the configuration of the TD, and set
+> KVM's copy via KVM_SET_CPUID2.
 > 
-> If this is user memory that is ignored by the kernel, just reflected
-> back, then there is no need in general to zero it. There are many such
-> instances, also in msg_control.
+> To prevent userspace from starting to use features that might not have KVM
+> support yet, filter the reported values by KVM's support CPUID bits.
 
-More specifically, is there any instance of recvmsg() implementation 
-which returns N and does not fill the complete N bytes of msg_iter?
+This sentence is not implemented, we need drop it.
 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Co-developed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
+> Signed-off-by: Tony Lindgren <tony.lindgren@linux.intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> ---
+> uAPI breakout v2:
+>   - Improve error path for tdx_vcpu_get_cpuid() (Xu)
+>   - Drop unused cpuid in struct kvm_tdx (Xu)
+>   - Rip out cpuid bit filtering
+>   - Fixup SEAMCALL call sites due to function parameter changes to SEAMCALL
+>     wrappers (Kai)
+>   - Add mmu.h for kvm_gfn_direct_bits() (Binbin)
+>   - Drop unused nr_premapped (Tao)
+>   - Fix formatting for tdx_vcpu_get_cpuid_leaf() (Tony)
+>   - Use helpers for phys_addr_bits (Paolo)
 > 
-> If not zeroing leads to ambiguity with the new feature, that would be
-> a reason to add it -- it is always safe to do so.
+> uAPI breakout v1:
+>   - New patch
+> ---
+>   arch/x86/include/uapi/asm/kvm.h |   1 +
+>   arch/x86/kvm/vmx/tdx.c          | 167 ++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/tdx_arch.h     |   5 +
+>   arch/x86/kvm/vmx/tdx_errno.h    |   1 +
+>   4 files changed, 174 insertions(+)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 2cfec4b42b9d..36fa03376581 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -931,6 +931,7 @@ enum kvm_tdx_cmd_id {
+>   	KVM_TDX_CAPABILITIES = 0,
+>   	KVM_TDX_INIT_VM,
+>   	KVM_TDX_INIT_VCPU,
+> +	KVM_TDX_GET_CPUID,
 >   
->> If we are really confident that it will not cause problems, this
->> behavior can be opt-in based on a flag or we can just write some
->> documentation warning userspace programmers to initialize the buffer.
+>   	KVM_TDX_CMD_NR_MAX,
+>   };
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 9008db6cf3b4..1feb3307fd70 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -2,6 +2,7 @@
+>   #include <linux/cpu.h>
+>   #include <asm/tdx.h>
+>   #include "capabilities.h"
+> +#include "mmu.h"
+>   #include "x86_ops.h"
+>   #include "tdx.h"
+>   
+> @@ -857,6 +858,94 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+>   	return ret;
+>   }
+>   
+> +static u64 tdx_td_metadata_field_read(struct kvm_tdx *tdx, u64 field_id,
+> +				      u64 *data)
+> +{
+> +	u64 err;
+> +
+> +	err = tdh_mng_rd(tdx->tdr_pa, field_id, data);
+> +
+> +	return err;
+> +}
+> +
+> +#define TDX_MD_UNREADABLE_LEAF_MASK	GENMASK(30, 7)
+> +#define TDX_MD_UNREADABLE_SUBLEAF_MASK	GENMASK(31, 7)
+> +
+> +static int tdx_read_cpuid(struct kvm_vcpu *vcpu, u32 leaf, u32 sub_leaf,
+> +			  bool sub_leaf_set, struct kvm_cpuid_entry2 *out)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> +	u64 field_id = TD_MD_FIELD_ID_CPUID_VALUES;
+> +	u64 ebx_eax, edx_ecx;
+> +	u64 err = 0;
+> +
+> +	if (sub_leaf & TDX_MD_UNREADABLE_LEAF_MASK ||
+> +	    sub_leaf_set & TDX_MD_UNREADABLE_SUBLEAF_MASK)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * bit 23:17, REVSERVED: reserved, must be 0;
+> +	 * bit 16,    LEAF_31: leaf number bit 31;
+> +	 * bit 15:9,  LEAF_6_0: leaf number bits 6:0, leaf bits 30:7 are
+> +	 *                      implicitly 0;
+> +	 * bit 8,     SUBLEAF_NA: sub-leaf not applicable flag;
+> +	 * bit 7:1,   SUBLEAF_6_0: sub-leaf number bits 6:0. If SUBLEAF_NA is 1,
+> +	 *                         the SUBLEAF_6_0 is all-1.
+> +	 *                         sub-leaf bits 31:7 are implicitly 0;
+> +	 * bit 0,     ELEMENT_I: Element index within field;
+> +	 */
+> +	field_id |= ((leaf & 0x80000000) ? 1 : 0) << 16;
+> +	field_id |= (leaf & 0x7f) << 9;
+> +	if (sub_leaf_set)
+> +		field_id |= (sub_leaf & 0x7f) << 1;
+> +	else
+> +		field_id |= 0x1fe;
+> +
+> +	err = tdx_td_metadata_field_read(kvm_tdx, field_id, &ebx_eax);
+> +	if (err) //TODO check for specific errors
+> +		goto err_out;
+> +
+> +	out->eax = (u32) ebx_eax;
+> +	out->ebx = (u32) (ebx_eax >> 32);
+> +
+> +	field_id++;
+> +	err = tdx_td_metadata_field_read(kvm_tdx, field_id, &edx_ecx);
+> +	/*
+> +	 * It's weird that reading edx_ecx fails while reading ebx_eax
+> +	 * succeeded.
+> +	 */
+> +	if (WARN_ON_ONCE(err))
+> +		goto err_out;
+> +
+> +	out->ecx = (u32) edx_ecx;
+> +	out->edx = (u32) (edx_ecx >> 32);
+> +
+> +	out->function = leaf;
+> +	out->index = sub_leaf;
+> +	out->flags |= sub_leaf_set ? KVM_CPUID_FLAG_SIGNIFCANT_INDEX : 0;
+> +
+> +	/*
+> +	 * Work around missing support on old TDX modules, fetch
+> +	 * guest maxpa from gfn_direct_bits.
+> +	 */
+> +	if (leaf == 0x80000008) {
+> +		gpa_t gpa_bits = gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kvm));
+> +		unsigned int g_maxpa = __ffs(gpa_bits) + 1;
+> +
+> +		out->eax = tdx_set_guest_phys_addr_bits(out->eax, g_maxpa);
+> +	}
+> +
+> +	return 0;
+> +
+> +err_out:
+> +	out->eax = 0;
+> +	out->ebx = 0;
+> +	out->ecx = 0;
+> +	out->edx = 0;
+> +
+> +	return -EIO;
+> +}
+> +
+>   static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+>   {
+>   	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> @@ -1055,6 +1144,81 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+>   	return ret;
+>   }
+>   
+> +/* Sometimes reads multipple subleafs. Return how many enties were written. */
+> +static int tdx_vcpu_get_cpuid_leaf(struct kvm_vcpu *vcpu, u32 leaf, int max_cnt,
+> +				   struct kvm_cpuid_entry2 *output_e)
+> +{
+> +	int i;
+> +
+> +	if (!max_cnt)
+> +		return 0;
+> +
+> +	/* First try without a subleaf */
+> +	if (!tdx_read_cpuid(vcpu, leaf, 0, false, output_e))
+> +		return 1;
+> +
+> +	/*
+> +	 * If the try without a subleaf failed, try reading subleafs until
+> +	 * failure. The TDX module only supports 6 bits of subleaf index.
+> +	 */
+> +	for (i = 0; i < 0b111111; i++) {
+> +		if (i > max_cnt)
+> +			goto out;
+> +
+> +		/* Keep reading subleafs until there is a failure. */
+> +		if (tdx_read_cpuid(vcpu, leaf, i, true, output_e))
+> +			return i;
+> +
+> +		output_e++;
+> +	}
+> +
+> +out:
+> +	return i;
+> +}
+> +
+> +static int tdx_vcpu_get_cpuid(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+> +{
+> +	struct kvm_cpuid2 __user *output, *td_cpuid;
+> +	struct kvm_cpuid_entry2 *output_e;
+> +	int r = 0, i = 0, leaf;
+> +
+> +	output = u64_to_user_ptr(cmd->data);
+> +	td_cpuid = kzalloc(sizeof(*td_cpuid) +
+> +			sizeof(output->entries[0]) * KVM_MAX_CPUID_ENTRIES,
+> +			GFP_KERNEL);
+> +	if (!td_cpuid)
+> +		return -ENOMEM;
+> +
+> +	for (leaf = 0; leaf <= 0x1f; leaf++) {
+
+0x1f needs clarification here.
+
+If it's going to use the maximum leaf KVM can support, it should be 0x24 
+to align with __do_cpuid_func().
+
+alternatively, it can use the EAX value of leaf 0 returned by TDX 
+module. That is the value TDX module presents to the TD guest.
+
+> +		output_e = &td_cpuid->entries[i];
+> +		i += tdx_vcpu_get_cpuid_leaf(vcpu, leaf,
+> +					     KVM_MAX_CPUID_ENTRIES - i - 1,
+> +					     output_e);
+> +	}
+> +
+> +	for (leaf = 0x80000000; leaf <= 0x80000008; leaf++) {
+> +		output_e = &td_cpuid->entries[i];
+> +		i += tdx_vcpu_get_cpuid_leaf(vcpu, leaf,
+> +					     KVM_MAX_CPUID_ENTRIES - i - 1,
+> +					     output_e);
+
+Though what gets passed in for max_cnt is
+
+   KVM_MAX_CPUID_ENTRIES - i - 1
+
+tdx_vcpu_get_cpuid_leaf() can return "max_cnt+1", i.e., 
+KVM_MAX_CPUID_ENTRIES - i.
+
+Then, it makes next round i to be KVM_MAX_CPUID_ENTRIES, and
+
+   output_e = &td_cpuid->entries[i];
+
+will overflow the buffer and access illegal memory.
+
+Similar issue inside tdx_vcpu_get_cpuid_leaf() as I replied in [*]
+
+[*] 
+https://lore.kernel.org/all/7574968a-f0e2-49d5-b740-2454a0f70bb6@intel.com/
+
+> +	}
+> +
+> +	td_cpuid->nent = i;
+> +
+> +	if (copy_to_user(output, td_cpuid, sizeof(*output))) {
+> +		r = -EFAULT;
+> +		goto out;
+> +	}
+> +	if (copy_to_user(output->entries, td_cpuid->entries,
+> +			 td_cpuid->nent * sizeof(struct kvm_cpuid_entry2)))
+> +		r = -EFAULT;
+> +
+> +out:
+> +	kfree(td_cpuid);
+> +
+> +	return r;
+> +}
+> +
+>   static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+>   {
+>   	struct msr_data apic_base_msr;
+> @@ -1108,6 +1272,9 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+>   	case KVM_TDX_INIT_VCPU:
+>   		ret = tdx_vcpu_init(vcpu, &cmd);
+>   		break;
+> +	case KVM_TDX_GET_CPUID:
+> +		ret = tdx_vcpu_get_cpuid(vcpu, &cmd);
+> +		break;
+>   	default:
+>   		ret = -EINVAL;
+>   		break;
+> diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+> index 9d41699e66a2..d80ec118834e 100644
+> --- a/arch/x86/kvm/vmx/tdx_arch.h
+> +++ b/arch/x86/kvm/vmx/tdx_arch.h
+> @@ -157,4 +157,9 @@ struct td_params {
+>   
+>   #define MD_FIELD_ID_FEATURES0_TOPOLOGY_ENUM	BIT_ULL(20)
+>   
+> +/*
+> + * TD scope metadata field ID.
+> + */
+> +#define TD_MD_FIELD_ID_CPUID_VALUES		0x9410000300000000ULL
+> +
+>   #endif /* __KVM_X86_TDX_ARCH_H */
+> diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
+> index dc3fa2a58c2c..f9dbb3a065cc 100644
+> --- a/arch/x86/kvm/vmx/tdx_errno.h
+> +++ b/arch/x86/kvm/vmx/tdx_errno.h
+> @@ -23,6 +23,7 @@
+>   #define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
+>   #define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
+>   #define TDX_EPT_ENTRY_STATE_INCORRECT		0xC0000B0D00000000ULL
+> +#define TDX_METADATA_FIELD_NOT_READABLE		0xC0000C0200000000ULL
+>   
+>   /*
+>    * TDX module operand ID, appears in 31:0 part of error code as
 
 
