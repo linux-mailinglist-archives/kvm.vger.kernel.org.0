@@ -1,229 +1,129 @@
-Return-Path: <kvm+bounces-35172-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35173-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F21A09FAA
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 01:47:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AACD4A09FAE
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 01:49:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 309AC188F25F
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 00:47:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8DC3A7C71
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 00:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F5880BEC;
-	Sat, 11 Jan 2025 00:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365B714F90;
+	Sat, 11 Jan 2025 00:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="NAvT3SRs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nu902t86"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A80A17BA9
-	for <kvm@vger.kernel.org>; Sat, 11 Jan 2025 00:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172FC2FB6
+	for <kvm@vger.kernel.org>; Sat, 11 Jan 2025 00:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736556429; cv=none; b=k6sNSsKih1hjWvjw4edr5TCOaHwgeY6XqowkJL/txUy1JUjs85xwOnlQg/6l9HTHp1zlczqjYxXu/QMeGYx3LEk+RSeNrOCwuqCGUPHB48hLb+krEruSUzF+6SxqdGOJFcqyVt+whCXB8h9qTGG5HDA+yBZAW+pUu1xlK3MmTZI=
+	t=1736556570; cv=none; b=r0N/16mEWNb+P/R5CGS3vL0jRzUdS0CrYZVv1l5uDH1Rtoeh46g7j/iASJcj8frQIA+iW4X/lm4ktKEeyO6ho1saANEoKZoqvkqtvZtpPH6OqD2n8wcTEg+Re8mUoIKTVV6aQngEBbqSEvi05Ia/EUNdOUueMB7zPs2v7+ScOIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736556429; c=relaxed/simple;
-	bh=x73fNqoAS5LRFmLCPzUJa5e+UjVghwTErrVQRXnjl1s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mk+z/O3H3kLCn5jON3W35Nrw1AYa/OB3xhOXDnjdFPRpI8wJvOL1cx1mnSoqGK2JqpmdO9igw9OnEKr+ViKg66cgkqsufJsA+dTXoU0E5E7iK/5iRc/HQJes5YimxQSS+eRBwZX1CASZdj33CxK0YbLuQv4cq3/NT3fs5tDqsnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=NAvT3SRs; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ef8c012913so3432996a91.3
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 16:47:07 -0800 (PST)
+	s=arc-20240116; t=1736556570; c=relaxed/simple;
+	bh=DqbsPM7pbMq3tNO53LpeaJ86ETg2ScGj8LGDaaUTLJM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hRbMhszJA58cwjnaVHOkKo1FcWGq/4Jf9sxWDD2L9UPKhzmCifyggouCC6E4vA+IvIL/N4UZ1pL1302MkZ5oBWrvZXI9nS+yNIv6xffNHTgpntROmzssR7sEsh90Yb1t3hlHRzcaQShNcklyV6NPQcI4TYbEfGCUcGRQUdYtcyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nu902t86; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so6692232a91.3
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 16:49:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1736556427; x=1737161227; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dhKWMGnM57WsMY43qomywj90difyS8W0XzJpu0qHE5Y=;
-        b=NAvT3SRsWOLinGDQiHK44VVSX2/1ajnGSrVtiOSlaVJa/7cyXri77QfzsBNUO6KjSw
-         OQnRJDOOkPAo/UTrpi7dvi8GDZSqK3tb3bOUHyLBtCf898NDC4Kmih1XBPBkKRzONRvp
-         8FDRJKzLPyU+WwjNxW6+hxNi/Il2+Yi5qGgTXjHsrXm2JJPt5bjVS+WefMIbHNxE5wgT
-         RfPafRkJptKbSTC/sXHbbYLZSxvEEYyjv6KjQIvLenrfQs2IPxM2RB7NQtnjfBFZWrxM
-         MKxYBI8zMV6fnfSPRhIFUcXc0uN4JA0/RSSfwCX9XccIbENH2fx6jB05gn2C12wXYbWn
-         VINw==
+        d=google.com; s=20230601; t=1736556567; x=1737161367; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YX28d/CEykAYv4b51S4uD+A1lpSwnJPjWn7kTo7F+wY=;
+        b=Nu902t86+h2+UCpAerjCkL1TxbV1qTw+ub+wiooHKXwFb+VvD7cGumqCUdu4VdJaVC
+         wQRcVfcjLeG+0OD+ph810tBX2DRJnI1sKuYSWyaYS85EkRagqODZsqYf4Nh5Jlf8MWfU
+         OoblEve0Cu5eGvBTfN0E1VBNgLEwTRwRVkuAOTnlFaUSNboPXKpf4nQ2M4WirwklA9I4
+         L5GyIAofAqrnmPwlZBuC4nSx6DrCGjg6kLbTs5u6YVuCOjk35n+cCqh7qib4W2uJ3JNQ
+         S6pEt9JhWGBvZ1aI0GBgJXJxfkCn6yXuS2+b6AQTFzW67CTkKeIGuAK/O1p8hz1VGjth
+         1txg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736556427; x=1737161227;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dhKWMGnM57WsMY43qomywj90difyS8W0XzJpu0qHE5Y=;
-        b=d4ywTfhgd52TfvP1qMFtfcOy8U6f6wkO7qEKSQDzivTHCkMI4KB4ITStMT7dx68UTh
-         TvrRUPYZKGmkjSSdqXDBOK/eAeGTFVk50V3zITxMGx8FWDz/8JTyMcGSIY5axcSA9umy
-         m4KdAT44bdOcRQ2aAcq6R7r4JKxf5XlHEz+dKJg0B6LbRTEV4+U+ei816VTyhaH4py5b
-         6ddGcMk+Dx4a6Mpii+HUsbsRAEqRqtxg4uW7rh6I6LzayWeR088JyjRy+HVSWP5DnxCK
-         yd2De0A8in021JB8ZVZgTh+uPxwLbZM6S9JcdZZ7YG/Gu8m0lTdOWKwJ5JtUQtYAQxIq
-         VoJA==
-X-Forwarded-Encrypted: i=1; AJvYcCXb9+F4e//Fdbi6fFd+G9fgm8H5kN0OmbzgNTsE12VaLiXA6PxVHGvcMFkPZoyc13sJz8E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4TLUa/4dngC4TS4LwV1mIdPmElDFbyuhdMJpqV/9LGIvETvzt
-	tU5bJ8t+q7LJTS5ZZtREsU23Kij8Lj2Rmb4iC8B01CPIYfEZVr9I6UDQpA2kYTg=
-X-Gm-Gg: ASbGncsU0nRI9sCwaTgUiXA5UGoXQ4x/rRYmqiiz4FG/+7tcQhU27mzu3DWA+D4X+MJ
-	3U//aBGWL4cDiK1PQ446vNRrwjvNx90VqukyQP6s7Yrw5fnXGOs0swEdnXwiKCe70V8/vhn/BR9
-	A2/kk6V//flpeTmJdTwObfF8DV9qiV6COWDISV5djEAfbOckW7CL8QOuxLMhvJLQqRgWu0LcZ9m
-	zg7AyLnf7se1d1oKv3qcyYYjTaDMRcz232KLauDO2JVCpP6RTjJe53vwDBgGQz+q3rxyf1BTQ0u
-	SEM=
-X-Google-Smtp-Source: AGHT+IEzAQsFVVUnarlp48IX+/exhmsTTctl6ss+iMEnk5dre6TgWISy267dYaDXt8LAjE4L45Tvqw==
-X-Received: by 2002:a17:90b:3bcf:b0:2ee:b6c5:1de7 with SMTP id 98e67ed59e1d1-2f548e9872emr19653709a91.2.1736556426732;
-        Fri, 10 Jan 2025 16:47:06 -0800 (PST)
-Received: from sw06.internal.sifive.com ([4.53.31.132])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f54a28723esm6064295a91.19.2025.01.10.16.47.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 16:47:06 -0800 (PST)
-From: Samuel Holland <samuel.holland@sifive.com>
-To: Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Cc: Samuel Holland <samuel.holland@sifive.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/2] RISC-V: KVM: Add support for SBI_FWFT_POINTER_MASKING_PMLEN
-Date: Fri, 10 Jan 2025 16:46:59 -0800
-Message-ID: <20250111004702.2813013-3-samuel.holland@sifive.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20250111004702.2813013-1-samuel.holland@sifive.com>
-References: <20250111004702.2813013-1-samuel.holland@sifive.com>
+        d=1e100.net; s=20230601; t=1736556567; x=1737161367;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YX28d/CEykAYv4b51S4uD+A1lpSwnJPjWn7kTo7F+wY=;
+        b=vgqZwfwDVvLX5rPMWjkYmnebPNm/9kOcCeg4bLdZ4L9/UHck+0LnD58v1HNzBTh/h+
+         o6CXeK6IfpOm+0WfSmJHx1DCBGqurqVOC+RDAVWCOtABvpLpsSlGrNRs8exsD013H31K
+         +gkS31szghJ+ZlanVFZnZeu0QDZeS16bi7JeTYT5Jxrp8SHEKDfn3RrCPDJgKgSe3lnk
+         G36Wuy2YNPdIhAJH5hAMR9N6sawsVxZmI1+MrYTxkTXZoVTHDJjHS8b4IZk2uela68D6
+         rqj5jHiCdFZz3/v2/k2ED/uWTXZOQ6YOj/ltismDhAOR9uHm1QkKkR5xC5TVK+JHCswu
+         N/hA==
+X-Forwarded-Encrypted: i=1; AJvYcCVC11RJDBnEfEJcMFvelXVYqI/bMB7GVoY0ZCMDCQieZ1WTKSnow2fZ+UGYXZmrMyRtNSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZl+rTgNy2Ny6736lQ+LC8C/3FeIwH1Kc+C6KD48iyi8MXZ5va
+	Y0t/JODltGHoviIXTTSyBr3wdQPea6K31o2oE2EFUmYvP9LI7wPQ0szokNuUSJjRil+CjoRyfLP
+	e6w==
+X-Google-Smtp-Source: AGHT+IH361hyEP8ZBxDjRVTWmQZDmlNvVhHg1tXUKZ2PrfsrRNnR2/vcWBj5z0ljoK7+gcYBV3qV4n3VGY0=
+X-Received: from pjbhl13.prod.google.com ([2002:a17:90b:134d:b0:2e0:9fee:4b86])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2747:b0:2f2:a664:df1a
+ with SMTP id 98e67ed59e1d1-2f548e9c9bcmr19626538a91.2.1736556567441; Fri, 10
+ Jan 2025 16:49:27 -0800 (PST)
+Date: Fri, 10 Jan 2025 16:49:26 -0800
+In-Reply-To: <CAAH4kHZn_gtspOisv6gxQiD=JeZbZstQoR68mFCxn34Am76Bdg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <cover.1735931639.git.ashish.kalra@amd.com> <14f97f58d6150c6784909261db7f9a05d8d32566.1735931639.git.ashish.kalra@amd.com>
+ <6241f868-98ee-592b-9475-7e6cec09d977@amd.com> <8ae7718c-2321-4f3a-b5b7-7fb029d150cf@amd.com>
+ <8adf7f48-dab0-cbed-d920-e3b74d8411cf@amd.com> <ee9d2956-fa55-4c83-b17d-055df7e1150c@amd.com>
+ <d6d08c6b-9602-4f3d-92c2-8db6d50a1b92@amd.com> <Z4G9--FpoeOlbEDz@google.com> <CAAH4kHZn_gtspOisv6gxQiD=JeZbZstQoR68mFCxn34Am76Bdg@mail.gmail.com>
+Message-ID: <Z4HAFmyhw5DeIRBT@google.com>
+Subject: Re: [PATCH v3 6/7] KVM: SVM: Add support to initialize SEV/SNP
+ functionality in KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Dionna Amalie Glaze <dionnaglaze@google.com>
+Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, pbonzini@redhat.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	michael.roth@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Pointer masking is controlled through a WARL field in henvcfg. Expose
-the feature only if at least one PMLEN value is supported for VS-mode.
-Allow the VMM to block access to the feature by disabling the Smnpm ISA
-extension in the guest.
+On Fri, Jan 10, 2025, Dionna Amalie Glaze wrote:
+> On Fri, Jan 10, 2025 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > > Is there a way to change the load order of built-in modules and/or ch=
+ange
+> > > dependency of built-in modules ?
+> >
+> > The least awful option I know of would be to have the PSP use a higher =
+priority
+> > initcall type so that it runs before the standard initcalls.  When comp=
+iled as
+> > a module, all initcall types are #defined to module_init.
+> >
+> > E.g. this should work, /cross fingers
+> >
+> > diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+> > index 7eb3e4668286..02c49fbf6198 100644
+> > --- a/drivers/crypto/ccp/sp-dev.c
+> > +++ b/drivers/crypto/ccp/sp-dev.c
+> > @@ -295,5 +295,6 @@ static void __exit sp_mod_exit(void)
+> >  #endif
+> >  }
+> >
+> > -module_init(sp_mod_init);
+> > +/* The PSP needs to be initialized before dependent modules, e.g. befo=
+re KVM. */
+> > +subsys_initcall(sp_mod_init);
+>=20
+> I was 2 seconds from clicking send with this exact suggestion. There
+> are examples in 'drivers/' that use subsys_initcall / module_exit
+> pairs.
 
-Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
----
-
- arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  2 +
- arch/riscv/kvm/vcpu_onereg.c               |  1 -
- arch/riscv/kvm/vcpu_sbi_fwft.c             | 70 +++++++++++++++++++++-
- 3 files changed, 71 insertions(+), 2 deletions(-)
-
-diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
-index 5782517f6e08..5176344d9162 100644
---- a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
-@@ -30,6 +30,8 @@ struct kvm_sbi_fwft_config {
- /* FWFT data structure per vcpu */
- struct kvm_sbi_fwft {
- 	struct kvm_sbi_fwft_config *configs;
-+	bool have_vs_pmlen_7;
-+	bool have_vs_pmlen_16;
- };
- 
- #define vcpu_to_fwft(vcpu) (&(vcpu)->arch.fwft_context)
-diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-index 93115abca3b8..1d2033b33e6d 100644
---- a/arch/riscv/kvm/vcpu_onereg.c
-+++ b/arch/riscv/kvm/vcpu_onereg.c
-@@ -168,7 +168,6 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsigned long ext)
- 	case KVM_RISCV_ISA_EXT_C:
- 	case KVM_RISCV_ISA_EXT_I:
- 	case KVM_RISCV_ISA_EXT_M:
--	case KVM_RISCV_ISA_EXT_SMNPM:
- 	/* There is not architectural config bit to disable sscofpmf completely */
- 	case KVM_RISCV_ISA_EXT_SSCOFPMF:
- 	case KVM_RISCV_ISA_EXT_SSNPM:
-diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
-index 1e85ff6666af..6e8f818fd6f5 100644
---- a/arch/riscv/kvm/vcpu_sbi_fwft.c
-+++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
-@@ -68,13 +68,81 @@ static int kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
- 	return SBI_SUCCESS;
- }
- 
-+static bool try_to_set_pmm(unsigned long value)
-+{
-+	csr_set(CSR_HENVCFG, value);
-+	return (csr_read_clear(CSR_HENVCFG, ENVCFG_PMM) & ENVCFG_PMM) == value;
-+}
-+
-+static bool kvm_sbi_fwft_pointer_masking_pmlen_supported(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
-+
-+	if (!riscv_isa_extension_available(vcpu->arch.isa, SMNPM))
-+		return false;
-+
-+	fwft->have_vs_pmlen_7 = try_to_set_pmm(ENVCFG_PMM_PMLEN_7);
-+	fwft->have_vs_pmlen_16 = try_to_set_pmm(ENVCFG_PMM_PMLEN_16);
-+
-+	return fwft->have_vs_pmlen_7 || fwft->have_vs_pmlen_16;
-+}
-+
-+static int kvm_sbi_fwft_set_pointer_masking_pmlen(struct kvm_vcpu *vcpu,
-+						  struct kvm_sbi_fwft_config *conf,
-+						  unsigned long value)
-+{
-+	struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
-+	unsigned long pmm;
-+
-+	if (value == 0)
-+		pmm = ENVCFG_PMM_PMLEN_0;
-+	else if (value <= 7 && fwft->have_vs_pmlen_7)
-+		pmm = ENVCFG_PMM_PMLEN_7;
-+	else if (value <= 16 && fwft->have_vs_pmlen_16)
-+		pmm = ENVCFG_PMM_PMLEN_16;
-+	else
-+		return SBI_ERR_INVALID_PARAM;
-+
-+	vcpu->arch.cfg.henvcfg &= ~ENVCFG_PMM;
-+	vcpu->arch.cfg.henvcfg |= pmm;
-+
-+	return SBI_SUCCESS;
-+}
-+
-+static int kvm_sbi_fwft_get_pointer_masking_pmlen(struct kvm_vcpu *vcpu,
-+						  struct kvm_sbi_fwft_config *conf,
-+						  unsigned long *value)
-+{
-+	switch (vcpu->arch.cfg.henvcfg & ENVCFG_PMM) {
-+	case ENVCFG_PMM_PMLEN_0:
-+		*value = 0;
-+		break;
-+	case ENVCFG_PMM_PMLEN_7:
-+		*value = 7;
-+		break;
-+	case ENVCFG_PMM_PMLEN_16:
-+		*value = 16;
-+		break;
-+	default:
-+		return SBI_ERR_FAILURE;
-+	}
-+
-+	return SBI_SUCCESS;
-+}
-+
- static const struct kvm_sbi_fwft_feature features[] = {
- 	{
- 		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
- 		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
- 		.set = kvm_sbi_fwft_set_misaligned_delegation,
- 		.get = kvm_sbi_fwft_get_misaligned_delegation,
--	}
-+	},
-+	{
-+		.id = SBI_FWFT_POINTER_MASKING_PMLEN,
-+		.supported = kvm_sbi_fwft_pointer_masking_pmlen_supported,
-+		.set = kvm_sbi_fwft_set_pointer_masking_pmlen,
-+		.get = kvm_sbi_fwft_get_pointer_masking_pmlen,
-+	},
- };
- 
- static struct kvm_sbi_fwft_config *
--- 
-2.47.0
-
+Ha!  For once, I wasn't too slow due to writing an overly verbose message :=
+-)
 
