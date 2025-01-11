@@ -1,152 +1,217 @@
-Return-Path: <kvm+bounces-35212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35213-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 561FDA0A10D
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 06:46:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A47D3A0A134
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 07:15:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 280533A0281
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 05:46:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA4F93A977B
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 06:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90B716C687;
-	Sat, 11 Jan 2025 05:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D590B16BE3A;
+	Sat, 11 Jan 2025 06:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jzAGSXfT"
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="Mjqi712+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62336372;
-	Sat, 11 Jan 2025 05:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.9])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C80515383D;
+	Sat, 11 Jan 2025 06:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736574356; cv=none; b=FtfOjtRMTF0ukOnMUM4VNIwiOogTSGFD6L/q1oDCh4QnORh4KbaA8PgOHLYE7ZJH1cnKaAFrm9mX8WaRB2V/iZVfN6Ku1LX/wHXBpZV88K9XqfAb3RGzsWqnu9YIkhlwyNUoRQGiR+KOaM1hBVfXNYPkYMg9LYIcne07WhDI8qI=
+	t=1736576124; cv=none; b=tTnLYuyd/9ig7wIcfJGrQbCc/SRmCJ8j3Pz1Ird2XPDuCvJpeCDH1oMjPX/2JHLPttRhAfU+PTM4cOyvtudJHxMlcIiHq2xiQC67c5acI+PVm4/Tzfn4+UJSfxw+TGSYhomo24e1ufQYi90nQ8TLkwTMNVA/b6KU0vdnhgCLJuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736574356; c=relaxed/simple;
-	bh=w5UDPf02yjMUtRPxrqVltZiw7m+4/f0Z1d01B0JvqJY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PyKhmGJAmA84JSkF+CncNBUqkGTBpjjUvit32a52RU5lj5bvpgC4HbIt2iiJoFJXHYdW96v/mnPlb7a/V8aE7V+5CTONnkyTD4kgTLLDNMWx+lBN/7ygSuMpunJn5z/Ehqbyzr7rnIKBrUZV2bl+Ve4dWO5qYqaTFIy65iI+zI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jzAGSXfT; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ef87d24c2dso3709682a91.1;
-        Fri, 10 Jan 2025 21:45:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736574355; x=1737179155; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k1Z3EPmQB5lAsqR6w+HJRVOlWNoYOrb5PkJHCsiLoH0=;
-        b=jzAGSXfTCjKiF4bioFNHZ46WwAoRpunVlLnGrdRlclTRlF/iN1wtWJ2qBDNUBM4gqD
-         AL49w5k66h8xfUaa/RnfN9FImGW+J/U522YLxxBYmRsD3GtLuXqZNad2qVpjeZG2SAVb
-         56P66/mghnHWNmv7BXR2x0So2Qq0R4gWDYjpqMcIPMEx1w1mHxJaRifZaDvLH6TjwaMk
-         pLgR3ULEyD2dyyDaWLhBiaNphM6QPGtEB2hXq0YZWxo76Ol1ns1C06XZZbWJzWs0ajKE
-         +LQ+BfJb6BC5gMNIv49eS2xNMiWwVEM9kq+XpatwxpsyB91rkQkSIR5aTrhbBUNjX9eC
-         2KpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736574355; x=1737179155;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k1Z3EPmQB5lAsqR6w+HJRVOlWNoYOrb5PkJHCsiLoH0=;
-        b=HxAWfvwWUbvA1EbWqjTe+k70VvHzkanzJ/v1LMnSrZth4RUyKJxsDKNKktM2PjpMVD
-         HmAE3lKrhVHXaoShfGln5J4ENodJwwFxaCUHf67reassjYovEIQclBrveFLcf7qPileZ
-         XcvQbzryv9IyT0YLjL+FvRvBh0WteoneZnQaH92gWoTC79oAXH0VaLSPRpgxlx6iVL/w
-         CSnCOf9m90r/e8AJwqfdZ2oBo+ap7/U6TLmLny7xb/04OKufLrhMEr4TQF27vWZC9PV4
-         1kLWyCooVcznk1qDWQ65rn0jFOm81b/ro6SxrT3CPsANz7gcybz2oLNQrqXdTVxAtKAE
-         tntA==
-X-Forwarded-Encrypted: i=1; AJvYcCULGWhmQZVWjggr9Xis+PUbfglpKb38xiV9oSKo3DNqPyaUL5GMo+rhqbZLuT6UjpcR8xA=@vger.kernel.org, AJvYcCUc7N22TeXMGl/Dr8IbQWuPCNUhGPAxSN9eLzt5Gf2fx0V1jXZPoQ+YqDX5pybgS2puw3+9jEjkgCzVhoAh@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9C0oJF1at8nj9X5SMZ460Rdi4YZNLGd+b3l0WSPre1tqsm8Q2
-	NKlEVmPhUxMsI9pWtIINtS8/7ioLOdpbsqlNsue4mMecLp3ixjhw
-X-Gm-Gg: ASbGnctXjZcCuVkcOvpwtfjKS30MbUX/FNxRlpIcZxUmh6yelvZHymayOzGf+6NfwTF
-	qycCNZXGxggwYCrbCo9T1hSTHmAzuUut64PHjHTlU/drHs0HgNoVcROUO+SpdqKJYAX0DNr4J1S
-	kdbi5mRIVoIX7hG0r3I9ZM7jftYOHq/fbq/Fqmeq5wNig/tL+AXI07p6gpcVF/ndI48Siw0BDLb
-	xkQV8qjIDwyVuPwWIYQZfGNIz1MFe2osdeO0ffeVtBzL8qn9Ctv43MPcsmgt2ft/nld7xp2ehA3
-	S+/TSHJu
-X-Google-Smtp-Source: AGHT+IHoyaim4PFSUoWf+l1fZq8aXgC6U/STMs5zRin/hXJAzkXTfotBKoZoyfn6mdvVHEXHOl6Ogg==
-X-Received: by 2002:a17:90b:4d10:b0:2ee:cd83:8fe7 with SMTP id 98e67ed59e1d1-2f5490edb9emr19348033a91.35.1736574354440;
-        Fri, 10 Jan 2025 21:45:54 -0800 (PST)
-Received: from visitorckw-System-Product-Name ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f21ada1sm21233845ad.138.2025.01.10.21.45.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 21:45:53 -0800 (PST)
-Date: Sat, 11 Jan 2025 13:45:50 +0800
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: Haoran Zhang <wh1sper@zju.edu.cn>
-Cc: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
-	pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/scsi: Fix improper cleanup in
- vhost_scsi_set_endpoint()
-Message-ID: <Z4IFjgpYEn3NuMZM@visitorckw-System-Product-Name>
-References: <20250111033454.26596-1-wh1sper@zju.edu.cn>
+	s=arc-20240116; t=1736576124; c=relaxed/simple;
+	bh=38RaDs87PAaxibWI5mIf84vwxxF7MUkRDRsC5TlwFhI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ps4B/y+SGjKaPN4lPb2Xiz39XQmlN/guj1zhKDcOSMlFLpu9INXolBDpgKCZUTrCc21+8aXZSkyGsnkAEN9dBTgz546gz9Pnp6wG4ebpuKjU5m5geUCd86S5806/IG22KcSE036Iq7ukuslSP0sfl/1yekLT90d7QcfPDpRML6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=Mjqi712+; arc=none smtp.client-ip=220.197.31.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=pFD0qqzOGd0US3edIzgXO+FcPjO8z4JifZsLny7fPyc=;
+	b=Mjqi712+1XP8sqESPgfyLRK3goP2RxD+kAA/vDQ4io5aiOVeUsWTugbNIjLGmw
+	2v+sjn4RZwDZ6ID1ODd0LqVx9CMB3lxJT/fJIpZeFkd25RLV6RcnmFgWeTrnzKxD
+	4INkYa3YVvHjQRAOy0l0baaqCer/EJ7mVDUTXALUbKYHk=
+Received: from [172.19.20.199] (unknown [])
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wD3f+JcDIJncOh3Aw--.43996S2;
+	Sat, 11 Jan 2025 14:14:53 +0800 (CST)
+Message-ID: <928fc38a-687f-4aa1-9a98-103a5e784e8f@126.com>
+Date: Sat, 11 Jan 2025 14:14:52 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250111033454.26596-1-wh1sper@zju.edu.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] KVM: SEV: fix wrong pinning of pages
+To: David Hildenbrand <david@redhat.com>, pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, seanjc@google.com,
+ 21cnbao@gmail.com, baolin.wang@linux.alibaba.com, liuzixing@hygon.cn
+References: <1736509376-30746-1-git-send-email-yangge1116@126.com>
+ <1d020344-37e0-4386-a064-ddd0ca71d110@redhat.com>
+From: Ge Yang <yangge1116@126.com>
+In-Reply-To: <1d020344-37e0-4386-a064-ddd0ca71d110@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3f+JcDIJncOh3Aw--.43996S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZr45Wr43KFy5Zw1UXryUGFg_yoW7Jw47pF
+	4rGws0yFW3Kr9FvFyxtrWkur47Z3y8Kw4jkr1Iy3s5uFnxtFyxtr4Igw1Ut395A348WF93
+	tr4DGan8uw4DZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jYGQhUUUUU=
+X-CM-SenderInfo: 51dqwwjhrrila6rslhhfrp/1tbifh3RG2eCCUAiJgAAsB
 
-Hi Haoran,
 
-On Sat, Jan 11, 2025 at 11:34:18AM +0800, Haoran Zhang wrote:
-> Since commit 3f8ca2e115e55 ("vhost scsi: alloc cmds per vq instead of session"), a bug can be triggered when the host sends a duplicate VHOST_SCSI_SET_ENDPOINT ioctl command.
+
+在 2025/1/10 19:53, David Hildenbrand 写道:
+> On 10.01.25 12:42, yangge1116@126.com wrote:
+>> From: yangge <yangge1116@126.com>
+>>
+>> When pin_user_pages_fast() pins SEV guest memory without the
+>> FOLL_LONGTERM flag, the pages will not get migrated out of MIGRATE_CMA/
+>> ZONE_MOVABLE, violating these mechanisms to avoid fragmentation with
+>> unmovable pages, for example making CMA allocations fail.
+>>
+>> To address the aforementioned problem, we propose adding the
+>> FOLL_LONGTERM flag to the pin_user_pages_fast() function.
+>>
+>> Signed-off-by: yangge <yangge1116@126.com>
+>> ---
+>>
+>> V2:
+>> - update code and commit message suggested by David
+>>
+>>   arch/x86/kvm/svm/sev.c | 5 ++++-
+>>   1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 943bd07..96f3b8e 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -630,6 +630,7 @@ static struct page **sev_pin_memory(struct kvm 
+>> *kvm, unsigned long uaddr,
+>>       unsigned long locked, lock_limit;
+>>       struct page **pages;
+>>       unsigned long first, last;
+>> +    unsigned int flags = FOLL_LONGTERM;
+>>       int ret;
+>>       lockdep_assert_held(&kvm->lock);
+>> @@ -662,8 +663,10 @@ static struct page **sev_pin_memory(struct kvm 
+>> *kvm, unsigned long uaddr,
+>>       if (!pages)
+>>           return ERR_PTR(-ENOMEM);
+>> +    flags |= write ? FOLL_WRITE : 0;
+>> +
+>>       /* Pin the user virtual address. */
+>> -    npinned = pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 
+>> 0, pages);
+>> +    npinned = pin_user_pages_fast(uaddr, npages, flags, pages);
+>>       if (npinned != npages) {
+>>           pr_err("SEV: Failure locking %lu pages.\n", npages);
+>>           ret = -ENOMEM;
 > 
-> In vhost_scsi_set_endpoint(), if the new `vhost_wwpn` matches the old tpg's tport_name but the tpg is still held by current vhost_scsi(i.e. it is busy), the active `tpg` will be unreferenced. Subsequently, if the owner releases vhost_scsi, the assertion `BUG_ON(sd->s_dependent_count < 1)` will be triggerred, terminating the  target_undepend_item() procedure and leaving `configfs_dirent_lock` locked. If user enters configfs afterward, the CPU will become locked up.
-> This issue occurs because vhost_scsi_set_endpoint() allocates a new `vs_tpg` to hold the tpg array and copies all the old tpg entries into it before proceeding. When the new target is busy, the controw flow falls back to the `undepend` label, cause ing all the target `tpg` entries to be unreferenced, including the old one, which is still in use.
+> Sorry, looking into it in more detail, there are some paths that 
+> immediately unpin again,
+> and don't seem to have longterm semantics.
 > 
-> The backtrace is:
 > 
-> [   60.085044] kernel BUG at fs/configfs/dir.c:1179!
-> [   60.087729] RIP: 0010:configfs_undepend_item+0x76/0x80
-> [   60.094735] Call Trace:
-> [   60.094926]  <TASK>
-> [   60.098232]  target_undepend_item+0x1a/0x30
-> [   60.098745]  vhost_scsi_clear_endpoint+0x363/0x3e0
-> [   60.099342]  vhost_scsi_release+0xea/0x1a0
-> [   60.099860]  ? __pfx_vhost_scsi_release+0x10/0x10
-> [   60.100459]  ? __pfx_locks_remove_file+0x10/0x10
-> [   60.101025]  ? __pfx_task_work_add+0x10/0x10
-> [   60.101565]  ? evm_file_release+0xc8/0xe0
-> [   60.102074]  ? __pfx_vhost_scsi_release+0x10/0x10
-> [   60.102661]  __fput+0x222/0x5a0
-> [   60.102925]  ____fput+0x1e/0x30
-> [   60.103187]  task_work_run+0x133/0x1c0
-> [   60.103479]  ? __pfx_task_work_run+0x10/0x10
-> [   60.103813]  ? pick_next_task_fair+0xe1/0x6f0
-> [   60.104179]  syscall_exit_to_user_mode+0x235/0x240
-> [   60.104542]  do_syscall_64+0x8a/0x170
-> [   60.113301]  </TASK>
-> [   60.113931] ---[ end trace 0000000000000000 ]---
-> [   60.121517] note: poc[2363] exited with preempt_count 1
+> Could we do the following, so longterm pinning would be limited to the 
+> memory regions
+> that might stay pinned possible forever?
+
+ok, thanks.
+
 > 
-> To fix this issue, the controw flow should be redirected to the `free_vs_tpg` label to ensure proper cleanup.
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 943bd074a5d37..4b0f03f0ea741 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -622,7 +622,7 @@ static int sev_launch_start(struct kvm *kvm, struct 
+> kvm_sev_cmd *argp)
 > 
-> Fixes: 3f8ca2e115e55 ("vhost scsi: alloc cmds per vq instead of session")
-> Signed-off-by: Haoran Zhang <wh1sper@zju.edu.cn>
+>   static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
+>                                      unsigned long ulen, unsigned long *n,
+> -                                   int write)
+> +                                   int flags)
+>   {
+>          struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>          unsigned long npages, size;
+> @@ -663,7 +663,7 @@ static struct page **sev_pin_memory(struct kvm *kvm, 
+> unsigned long uaddr,
+>                  return ERR_PTR(-ENOMEM);
+> 
+>          /* Pin the user virtual address. */
+> -       npinned = pin_user_pages_fast(uaddr, npages, write ? 
+> FOLL_WRITE : 0, pages);
+> +       npinned = pin_user_pages_fast(uaddr, npages, flags, pages);
+>          if (npinned != npages) {
+>                  pr_err("SEV: Failure locking %lu pages.\n", npages);
+>                  ret = -ENOMEM;
+> @@ -751,7 +751,7 @@ static int sev_launch_update_data(struct kvm *kvm, 
+> struct kvm_sev_cmd *argp)
+>          vaddr_end = vaddr + size;
+> 
+>          /* Lock the user memory. */
+> -       inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
+> +       inpages = sev_pin_memory(kvm, vaddr, size, &npages, FOLL_WRITE);
+>          if (IS_ERR(inpages))
+>                  return PTR_ERR(inpages);
+> 
+> @@ -1250,7 +1250,8 @@ static int sev_dbg_crypt(struct kvm *kvm, struct 
+> kvm_sev_cmd *argp, bool dec)
+>                  if (IS_ERR(src_p))
+>                          return PTR_ERR(src_p);
+> 
+> -               dst_p = sev_pin_memory(kvm, dst_vaddr & PAGE_MASK, 
+> PAGE_SIZE, &n, 1);
+> +               dst_p = sev_pin_memory(kvm, dst_vaddr & PAGE_MASK, 
+> PAGE_SIZE, &n,
+> +                                      FOLL_WRITE);
+>                  if (IS_ERR(dst_p)) {
+>                          sev_unpin_memory(kvm, src_p, n);
+>                          return PTR_ERR(dst_p);
+> @@ -1316,7 +1317,8 @@ static int sev_launch_secret(struct kvm *kvm, 
+> struct kvm_sev_cmd *argp)
+>          if (copy_from_user(&params, u64_to_user_ptr(argp->data), 
+> sizeof(params)))
+>                  return -EFAULT;
+> 
+> -       pages = sev_pin_memory(kvm, params.guest_uaddr, 
+> params.guest_len, &n, 1);
+> +       pages = sev_pin_memory(kvm, params.guest_uaddr, 
+> params.guest_len, &n,
+> +                              FOLL_WRITE);
+>          if (IS_ERR(pages))
+>                  return PTR_ERR(pages);
+> 
+> @@ -1798,7 +1800,7 @@ static int sev_receive_update_data(struct kvm 
+> *kvm, struct kvm_sev_cmd *argp)
+> 
+>          /* Pin guest memory */
+>          guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
+> -                                   PAGE_SIZE, &n, 1);
+> +                                   PAGE_SIZE, &n, FOLL_WRITE);
+>          if (IS_ERR(guest_page)) {
+>                  ret = PTR_ERR(guest_page);
+>                  goto e_free_trans;
+> @@ -2696,7 +2698,8 @@ int sev_mem_enc_register_region(struct kvm *kvm,
+>                  return -ENOMEM;
+> 
+>          mutex_lock(&kvm->lock);
+> -       region->pages = sev_pin_memory(kvm, range->addr, range->size, 
+> &region->npages, 1);
+> +       region->pages = sev_pin_memory(kvm, range->addr, range->size, 
+> &region->npages,
+> +                                      FOLL_WRITE | FOLL_LONGTERM);
+>          if (IS_ERR(region->pages)) {
+>                  ret = PTR_ERR(region->pages);
+>                  mutex_unlock(&kvm->lock);
+> 
+> 
+> Thoughts?
+> 
 
-checkpatch.pl generated the following errors and warnings:
-
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#59:
-Since commit 3f8ca2e115e55 ("vhost scsi: alloc cmds per vq instead of session"), a bug can be triggered when the host sends a duplicate VHOST_SCSI_SET_ENDPOINT ioctl command.
-
-ERROR: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit 3f8ca2e115e5 ("vhost/scsi: Extract common handling code from control queue handler")'
-#59:
-Since commit 3f8ca2e115e55 ("vhost scsi: alloc cmds per vq instead of session"), a bug can be triggered when the host sends a duplicate VHOST_SCSI_SET_ENDPOINT ioctl command.
-
-WARNING: Please use correct Fixes: style 'Fixes: <12 chars of sha1> ("<title line>")' - ie: 'Fixes: 3f8ca2e115e5 ("vhost/scsi: Extract common handling code from control queue handler")'
-#91:
-Fixes: 3f8ca2e115e55 ("vhost scsi: alloc cmds per vq instead of session")
-
-total: 1 errors, 2 warnings, 15 lines checked
-
-
-Regards,
-Kuan-Wei
 
