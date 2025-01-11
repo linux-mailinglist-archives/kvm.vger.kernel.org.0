@@ -1,130 +1,221 @@
-Return-Path: <kvm+bounces-35216-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35217-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B3EBA0A1F7
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 09:15:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 210A3A0A32F
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 12:01:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 405F23ABC4B
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 08:15:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 630043A816E
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 11:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFAE918A931;
-	Sat, 11 Jan 2025 08:15:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CA51922F2;
+	Sat, 11 Jan 2025 11:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5/bVuzb"
 X-Original-To: kvm@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CCF17BB21;
-	Sat, 11 Jan 2025 08:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6729124B249;
+	Sat, 11 Jan 2025 11:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736583315; cv=none; b=Gx/9Fz3qkfHpaRXdUx7MwMEo8oKyVWCp+ivi02swwZOgFADRIDVcamWUyk8kcn1D3pPxQ2XLdbSHsw+kBsTOqHro8Jio05Hb514gBXlKp3GPx6RNhNg81kt73LmW62SpJ6WSHigx9IbjqyodfBLooQm1ypj3Y9kopbFbr3ArUnw=
+	t=1736593296; cv=none; b=nurbDl9BTXekFk1lMN8xbYK/fOt2bC7i7+g2mFvWwTm9ZIyu7qsNsx20aVhTSPrxgYII8F99rM1c9jhL9GOn99eDikQ8N2iuo6ndW0kP9miBJH9EP6q4lzqOEhPgOXrnMvZ7sbpD7UyGOb2ps2kIT0IepfOjTJT23RQJ8Yir8ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736583315; c=relaxed/simple;
-	bh=VwFDX38VsO4QwSFbPOX/2A/9s+WBeV7vs7Kj1Kypteg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=O9g6f03Sui+ZemdmdBJ9etS/DDi+Kp0KzwrIcOSvwv+iWQbPASY6XOzr820Owj13iFfHtXEgo+ahZnhNE+gcd1BCD0m+KHyCvafJvSCTMlmJ4jbQHBIyW6y0e045SQeYwp/JvBrxkZ2dxVNp4irUhXOROxgAiK865gRfZxKt0/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=207.46.229.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from wh1sper$zju.edu.cn ( [10.214.100.10] ) by
- ajax-webmail-mail-app3 (Coremail) ; Sat, 11 Jan 2025 16:14:47 +0800
- (GMT+08:00)
-Date: Sat, 11 Jan 2025 16:14:47 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?5byg5rWp54S2?= <wh1sper@zju.edu.cn>
-To: "Kuan-Wei Chiu" <visitorckw@gmail.com>
-Cc: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
-	pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	s=arc-20240116; t=1736593296; c=relaxed/simple;
+	bh=gy67Eo8C1hKneW/xn+UE+Oh9vmay9ok/H+SGcDXNdi8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k94aVMSKwsD3ZaSxx7c0dHCp2h3ydskOEaev54gY96NX1WzFt99x6BhYOFeVMDf4E3Hgl7Lx6qVwbS66iupz39XwPAUiX/4uV8dbXgc+Ky21ff0HzICGPMzHbIeQGf0ZG6IfOzjb3cj14GCJKE7g9Pz/yO6VLGOAgFO9amqlw6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5/bVuzb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B134C4CED2;
+	Sat, 11 Jan 2025 11:01:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736593296;
+	bh=gy67Eo8C1hKneW/xn+UE+Oh9vmay9ok/H+SGcDXNdi8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=s5/bVuzbBSzTi3/QQcP+Y5MyFvpGcjUyPB4u8ZMRYy0G+Pa+O0yWM7q7/jnwyAI8n
+	 lTwe1nz38A6Bibbxyz/hndpTkb3vjQFTiwJAS5t+XIIhRP3WeI5b84YSIiZaz4VuMZ
+	 YTpIm+6Iid4koRAJwFjMR6C2FC62G7CMhrmd5KTYuD0wkH6lO78w5jNrlfcH+oKZp9
+	 06HYKpx254waJxqGuoxRbXper7rm/FeuXfIR66r/Wv8xArJK/xuWmLtvMc4LGs2gfx
+	 eb7JOt1v/wlvhMvB47kcDPS9oZHCYxmp3PJCpwInb8C/xqs+7FwXVi8cojI57iQkI/
+	 T2Ri6OEh71jxw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tWZFE-00B9ML-Kd;
+	Sat, 11 Jan 2025 11:01:33 +0000
+Date: Sat, 11 Jan 2025 11:01:31 +0000
+Message-ID: <87ikqlr4vo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH] vhost/scsi: Fix improper cleanup in
- vhost_scsi_set_endpoint()
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.1-cmXT5 build
- 20240625(a75f206e) Copyright (c) 2002-2025 www.mailtech.cn zju.edu.cn
-In-Reply-To: <Z4IFjgpYEn3NuMZM@visitorckw-System-Product-Name>
-References: <20250111033454.26596-1-wh1sper@zju.edu.cn>
- <Z4IFjgpYEn3NuMZM@visitorckw-System-Product-Name>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
+In-Reply-To: <20250111012450.1262638-4-seanjc@google.com>
+References: <20250111012450.1262638-1-seanjc@google.com>
+	<20250111012450.1262638-4-seanjc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <3e1e312e.21abc.194546e119c.Coremail.wh1sper@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cC_KCgBHl9h3KIJnI4AKAQ--.31564W
-X-CM-SenderInfo: asssliaqzvq6lmxovvfxof0/1tbiAgQDB2eBVi8v2QABsq
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-SGkgS3Vhbi1XZWksCgpPbiBTYXQsIEphbiAxMSwgMjAyNSBhdCAxMzo0NTo1MCArMDgwMCwgS3Vh
-bi1XZWkgQ2hpdSB3cm90ZToKPiBIaSBIYW9yYW4sCj4gCj4gT24gU2F0LCBKYW4gMTEsIDIwMjUg
-YXQgMTE6MzQ6MThBTSArMDgwMCwgSGFvcmFuIFpoYW5nIHdyb3RlOgo+ID4gU2luY2UgY29tbWl0
-IDNmOGNhMmUxMTVlNTUgKCJ2aG9zdCBzY3NpOiBhbGxvYyBjbWRzIHBlciB2cSBpbnN0ZWFkIG9m
-IHNlc3Npb24iKSwgYSBidWcgY2FuIGJlIHRyaWdnZXJlZCB3aGVuIHRoZSBob3N0IHNlbmRzIGEg
-ZHVwbGljYXRlIFZIT1NUX1NDU0lfU0VUX0VORFBPSU5UIGlvY3RsIGNvbW1hbmQuCj4gPiAKPiA+
-IEluIHZob3N0X3Njc2lfc2V0X2VuZHBvaW50KCksIGlmIHRoZSBuZXcgYHZob3N0X3d3cG5gIG1h
-dGNoZXMgdGhlIG9sZCB0cGcncyB0cG9ydF9uYW1lIGJ1dCB0aGUgdHBnIGlzIHN0aWxsIGhlbGQg
-YnkgY3VycmVudCB2aG9zdF9zY3NpKGkuZS4gaXQgaXMgYnVzeSksIHRoZSBhY3RpdmUgYHRwZ2Ag
-d2lsbCBiZSB1bnJlZmVyZW5jZWQuIFN1YnNlcXVlbnRseSwgaWYgdGhlIG93bmVyIHJlbGVhc2Vz
-IHZob3N0X3Njc2ksIHRoZSBhc3NlcnRpb24gYEJVR19PTihzZC0+c19kZXBlbmRlbnRfY291bnQg
-PCAxKWAgd2lsbCBiZSB0cmlnZ2VycmVkLCB0ZXJtaW5hdGluZyB0aGUgIHRhcmdldF91bmRlcGVu
-ZF9pdGVtKCkgcHJvY2VkdXJlIGFuZCBsZWF2aW5nIGBjb25maWdmc19kaXJlbnRfbG9ja2AgbG9j
-a2VkLiBJZiB1c2VyIGVudGVycyBjb25maWdmcyBhZnRlcndhcmQsIHRoZSBDUFUgd2lsbCBiZWNv
-bWUgbG9ja2VkIHVwLgo+ID4gVGhpcyBpc3N1ZSBvY2N1cnMgYmVjYXVzZSB2aG9zdF9zY3NpX3Nl
-dF9lbmRwb2ludCgpIGFsbG9jYXRlcyBhIG5ldyBgdnNfdHBnYCB0byBob2xkIHRoZSB0cGcgYXJy
-YXkgYW5kIGNvcGllcyBhbGwgdGhlIG9sZCB0cGcgZW50cmllcyBpbnRvIGl0IGJlZm9yZSBwcm9j
-ZWVkaW5nLiBXaGVuIHRoZSBuZXcgdGFyZ2V0IGlzIGJ1c3ksIHRoZSBjb250cm93IGZsb3cgZmFs
-bHMgYmFjayB0byB0aGUgYHVuZGVwZW5kYCBsYWJlbCwgY2F1c2UgaW5nIGFsbCB0aGUgdGFyZ2V0
-IGB0cGdgIGVudHJpZXMgdG8gYmUgdW5yZWZlcmVuY2VkLCBpbmNsdWRpbmcgdGhlIG9sZCBvbmUs
-IHdoaWNoIGlzIHN0aWxsIGluIHVzZS4KPiA+IAo+ID4gVGhlIGJhY2t0cmFjZSBpczoKPiA+IAo+
-ID4gWyAgIDYwLjA4NTA0NF0ga2VybmVsIEJVRyBhdCBmcy9jb25maWdmcy9kaXIuYzoxMTc5IQo+
-ID4gWyAgIDYwLjA4NzcyOV0gUklQOiAwMDEwOmNvbmZpZ2ZzX3VuZGVwZW5kX2l0ZW0rMHg3Ni8w
-eDgwCj4gPiBbICAgNjAuMDk0NzM1XSBDYWxsIFRyYWNlOgo+ID4gWyAgIDYwLjA5NDkyNl0gIDxU
-QVNLPgo+ID4gWyAgIDYwLjA5ODIzMl0gIHRhcmdldF91bmRlcGVuZF9pdGVtKzB4MWEvMHgzMAo+
-ID4gWyAgIDYwLjA5ODc0NV0gIHZob3N0X3Njc2lfY2xlYXJfZW5kcG9pbnQrMHgzNjMvMHgzZTAK
-PiA+IFsgICA2MC4wOTkzNDJdICB2aG9zdF9zY3NpX3JlbGVhc2UrMHhlYS8weDFhMAo+ID4gWyAg
-IDYwLjA5OTg2MF0gID8gX19wZnhfdmhvc3Rfc2NzaV9yZWxlYXNlKzB4MTAvMHgxMAo+ID4gWyAg
-IDYwLjEwMDQ1OV0gID8gX19wZnhfbG9ja3NfcmVtb3ZlX2ZpbGUrMHgxMC8weDEwCj4gPiBbICAg
-NjAuMTAxMDI1XSAgPyBfX3BmeF90YXNrX3dvcmtfYWRkKzB4MTAvMHgxMAo+ID4gWyAgIDYwLjEw
-MTU2NV0gID8gZXZtX2ZpbGVfcmVsZWFzZSsweGM4LzB4ZTAKPiA+IFsgICA2MC4xMDIwNzRdICA/
-IF9fcGZ4X3Zob3N0X3Njc2lfcmVsZWFzZSsweDEwLzB4MTAKPiA+IFsgICA2MC4xMDI2NjFdICBf
-X2ZwdXQrMHgyMjIvMHg1YTAKPiA+IFsgICA2MC4xMDI5MjVdICBfX19fZnB1dCsweDFlLzB4MzAK
-PiA+IFsgICA2MC4xMDMxODddICB0YXNrX3dvcmtfcnVuKzB4MTMzLzB4MWMwCj4gPiBbICAgNjAu
-MTAzNDc5XSAgPyBfX3BmeF90YXNrX3dvcmtfcnVuKzB4MTAvMHgxMAo+ID4gWyAgIDYwLjEwMzgx
-M10gID8gcGlja19uZXh0X3Rhc2tfZmFpcisweGUxLzB4NmYwCj4gPiBbICAgNjAuMTA0MTc5XSAg
-c3lzY2FsbF9leGl0X3RvX3VzZXJfbW9kZSsweDIzNS8weDI0MAo+ID4gWyAgIDYwLjEwNDU0Ml0g
-IGRvX3N5c2NhbGxfNjQrMHg4YS8weDE3MAo+ID4gWyAgIDYwLjExMzMwMV0gIDwvVEFTSz4KPiA+
-IFsgICA2MC4xMTM5MzFdIC0tLVsgZW5kIHRyYWNlIDAwMDAwMDAwMDAwMDAwMDAgXS0tLQo+ID4g
-WyAgIDYwLjEyMTUxN10gbm90ZTogcG9jWzIzNjNdIGV4aXRlZCB3aXRoIHByZWVtcHRfY291bnQg
-MQo+ID4gCj4gPiBUbyBmaXggdGhpcyBpc3N1ZSwgdGhlIGNvbnRyb3cgZmxvdyBzaG91bGQgYmUg
-cmVkaXJlY3RlZCB0byB0aGUgYGZyZWVfdnNfdHBnYCBsYWJlbCB0byBlbnN1cmUgcHJvcGVyIGNs
-ZWFudXAuCj4gPiAKPiA+IEZpeGVzOiAzZjhjYTJlMTE1ZTU1ICgidmhvc3Qgc2NzaTogYWxsb2Mg
-Y21kcyBwZXIgdnEgaW5zdGVhZCBvZiBzZXNzaW9uIikKPiA+IFNpZ25lZC1vZmYtYnk6IEhhb3Jh
-biBaaGFuZyA8d2gxc3BlckB6anUuZWR1LmNuPgo+IAo+IGNoZWNrcGF0Y2gucGwgZ2VuZXJhdGVk
-IHRoZSBmb2xsb3dpbmcgZXJyb3JzIGFuZCB3YXJuaW5nczoKPiAKPiBXQVJOSU5HOiBQcmVmZXIg
-YSBtYXhpbXVtIDc1IGNoYXJzIHBlciBsaW5lIChwb3NzaWJsZSB1bndyYXBwZWQgY29tbWl0IGRl
-c2NyaXB0aW9uPykKPiAjNTk6Cj4gU2luY2UgY29tbWl0IDNmOGNhMmUxMTVlNTUgKCJ2aG9zdCBz
-Y3NpOiBhbGxvYyBjbWRzIHBlciB2cSBpbnN0ZWFkIG9mIHNlc3Npb24iKSwgYSBidWcgY2FuIGJl
-IHRyaWdnZXJlZCB3aGVuIHRoZSBob3N0IHNlbmRzIGEgZHVwbGljYXRlIFZIT1NUX1NDU0lfU0VU
-X0VORFBPSU5UIGlvY3RsIGNvbW1hbmQuCj4gCj4gRVJST1I6IFBsZWFzZSB1c2UgZ2l0IGNvbW1p
-dCBkZXNjcmlwdGlvbiBzdHlsZSAnY29tbWl0IDwxMisgY2hhcnMgb2Ygc2hhMT4gKCI8dGl0bGUg
-bGluZT4iKScgLSBpZTogJ2NvbW1pdCAzZjhjYTJlMTE1ZTUgKCJ2aG9zdC9zY3NpOiBFeHRyYWN0
-IGNvbW1vbiBoYW5kbGluZyBjb2RlIGZyb20gY29udHJvbCBxdWV1ZSBoYW5kbGVyIiknCj4gIzU5
-Ogo+IFNpbmNlIGNvbW1pdCAzZjhjYTJlMTE1ZTU1ICgidmhvc3Qgc2NzaTogYWxsb2MgY21kcyBw
-ZXIgdnEgaW5zdGVhZCBvZiBzZXNzaW9uIiksIGEgYnVnIGNhbiBiZSB0cmlnZ2VyZWQgd2hlbiB0
-aGUgaG9zdCBzZW5kcyBhIGR1cGxpY2F0ZSBWSE9TVF9TQ1NJX1NFVF9FTkRQT0lOVCBpb2N0bCBj
-b21tYW5kLgo+IAo+IFdBUk5JTkc6IFBsZWFzZSB1c2UgY29ycmVjdCBGaXhlczogc3R5bGUgJ0Zp
-eGVzOiA8MTIgY2hhcnMgb2Ygc2hhMT4gKCI8dGl0bGUgbGluZT4iKScgLSBpZTogJ0ZpeGVzOiAz
-ZjhjYTJlMTE1ZTUgKCJ2aG9zdC9zY3NpOiBFeHRyYWN0IGNvbW1vbiBoYW5kbGluZyBjb2RlIGZy
-b20gY29udHJvbCBxdWV1ZSBoYW5kbGVyIiknCj4gIzkxOgo+IEZpeGVzOiAzZjhjYTJlMTE1ZTU1
-ICgidmhvc3Qgc2NzaTogYWxsb2MgY21kcyBwZXIgdnEgaW5zdGVhZCBvZiBzZXNzaW9uIikKPiAK
-PiB0b3RhbDogMSBlcnJvcnMsIDIgd2FybmluZ3MsIDE1IGxpbmVzIGNoZWNrZWQKPiAKPiAKPiBS
-ZWdhcmRzLAo+IEt1YW4tV2VpCgpUaGFua3MgZm9yIHlvdXIgc3VnZ2VzdGlvbiwgSSB3aWxsIHNl
-bmQgYSBjb3JyZWN0ZWQgcGF0Y2ggbGF0ZXIuCkJlc3QgcmVnYXJkcywKSGFvcmFuIFpoYW5n
+On Sat, 11 Jan 2025 01:24:48 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
+> that KVM_RUN needs to be re-executed prior to save/restore in order to
+> complete the instruction/operation that triggered the userspace exit.
+> 
+> KVM's current approach of adding notes in the Documentation is beyond
+> brittle, e.g. there is at least one known case where a KVM developer added
+> a new userspace exit type, and then that same developer forgot to handle
+> completion when adding userspace support.
+
+Is this going to fix anything? If they couldn't be bothered to read
+the documentation, let alone update it, how is that going to be
+improved by extra rules and regulations?
+
+I don't see how someone ignoring the documented behaviour of a given
+exit reason is, all of a sudden, have an epiphany and take a *new*
+flag into account.
+
+> 
+> On x86, there are multiple exits that need completion, but they are all
+> conveniently funneled through a single callback, i.e. in theory, this is a
+> one-time thing for KVM x86 (and other architectures could follow suit with
+> additional refactoring).
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 48 ++++++++++++++++++++++---------
+>  arch/powerpc/kvm/book3s_emulate.c |  1 +
+>  arch/powerpc/kvm/book3s_hv.c      |  1 +
+>  arch/powerpc/kvm/book3s_pr.c      |  2 ++
+>  arch/powerpc/kvm/booke.c          |  1 +
+>  arch/x86/include/uapi/asm/kvm.h   |  7 +++--
+>  arch/x86/kvm/x86.c                |  2 ++
+>  include/uapi/linux/kvm.h          |  3 ++
+>  virt/kvm/kvm_main.c               |  1 +
+>  9 files changed, 49 insertions(+), 17 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index c92c8d4e8779..8e172675d8d6 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6505,7 +6505,7 @@ local APIC is not used.
+>  
+>  	__u16 flags;
+>  
+> -More architecture-specific flags detailing state of the VCPU that may
+> +Common and architecture-specific flags detailing state of the VCPU that may
+>  affect the device's behavior. Current defined flags::
+>  
+>    /* x86, set if the VCPU is in system management mode */
+> @@ -6518,6 +6518,8 @@ affect the device's behavior. Current defined flags::
+>    /* arm64, set for KVM_EXIT_DEBUG */
+>    #define KVM_DEBUG_ARCH_HSR_HIGH_VALID  (1 << 0)
+>  
+> +  /* all architectures, set when the exit needs completion (via KVM_RUN) */
+> +  #define KVM_RUN_NEEDS_COMPLETION  (1 << 15)
+>  ::
+>  
+>  	/* in (pre_kvm_run), out (post_kvm_run) */
+> @@ -6632,19 +6634,10 @@ requires a guest to interact with host userspace.
+>  
+>  .. note::
+>  
+> -      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN,
+> -      KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR, KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL
+> -      the corresponding operations are complete (and guest state is consistent)
+> -      only after userspace has re-entered the kernel with KVM_RUN.  The kernel
+> -      side will first finish incomplete operations and then check for pending
+> -      signals.
+> +      For some exits, userspace must re-enter the kernel with KVM_RUN to
+> +      complete the exit and ensure guest state is consistent.
+>  
+> -      The pending state of the operation is not preserved in state which is
+> -      visible to userspace, thus userspace should ensure that the operation is
+> -      completed before performing a live migration.  Userspace can re-enter the
+> -      guest with an unmasked signal pending or with the immediate_exit field set
+> -      to complete pending operations without allowing any further instructions
+> -      to be executed.
+> +      See KVM_CAP_NEEDS_COMPLETION for details.
+>  
+>  ::
+>  
+> @@ -8239,7 +8232,7 @@ Note: Userspace is responsible for correctly configuring CPUID 0x15, a.k.a. the
+>  core crystal clock frequency, if a non-zero CPUID 0x15 is exposed to the guest.
+>  
+>  7.36 KVM_CAP_X86_GUEST_MODE
+> -------------------------------
+> +---------------------------
+>  
+>  :Architectures: x86
+>  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+> @@ -8252,6 +8245,33 @@ KVM exits with the register state of either the L1 or L2 guest
+>  depending on which executed at the time of an exit. Userspace must
+>  take care to differentiate between these cases.
+>  
+> +7.37 KVM_CAP_NEEDS_COMPLETION
+> +-----------------------------
+> +
+> +:Architectures: all
+> +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+> +
+> +The presence of this capability indicates that KVM_RUN will set
+> +KVM_RUN_NEEDS_COMPLETION in kvm_run.flags if KVM requires userspace to re-enter
+> +the kernel KVM_RUN to complete the exit.
+> +
+> +For select exits, userspace must re-enter the kernel with KVM_RUN to complete
+> +the corresponding operation, only after which is guest state guaranteed to be
+> +consistent.  On such a KVM_RUN, the kernel side will first finish incomplete
+> +operations and then check for pending signals.
+> +
+> +The pending state of the operation for such exits is not preserved in state
+> +which is visible to userspace, thus userspace should ensure that the operation
+> +is completed before performing state save/restore, e.g. for live migration.
+> +Userspace can re-enter the guest with an unmasked signal pending or with the
+> +immediate_exit field set to complete pending operations without allowing any
+> +further instructions to be executed.
+> +
+> +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
+> +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
+> +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
+> +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
+
+So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
+must be present for all of these exits, right? And from what I can
+tell, this capability is unconditionally advertised.
+
+Yet, you don't amend arm64 to publish that flag. Not that I think this
+causes any issue (even if you save the state at that point without
+reentering the guest, it will be still be consistent), but that
+directly contradicts the documentation (isn't that ironic? ;-).
+
+Or is your intent to *relax* the requirements on arm64 (and anything
+else but x86 and POWER)?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
