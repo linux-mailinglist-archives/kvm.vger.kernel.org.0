@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-35142-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35143-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49863A09F31
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 01:21:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39169A09F32
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 01:21:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26A1E188CC84
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 00:21:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2140B188CEB2
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 00:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E239D20322;
-	Sat, 11 Jan 2025 00:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A864E4D5AB;
+	Sat, 11 Jan 2025 00:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GrrCx9Ns"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V5qmcVK9"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917479454
-	for <kvm@vger.kernel.org>; Sat, 11 Jan 2025 00:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470971BC20
+	for <kvm@vger.kernel.org>; Sat, 11 Jan 2025 00:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736554830; cv=none; b=O44GmZ3NjmSgd2cFFnGMjITm3BYOEZ68unBpBdyaSxHhc4XL/UcFPpXKR9edoHmwnvJ/4Nm4UF9wHewVopdKw/wwdpkAs1cAuC7o0HE9SduP9WTaO1boHhPpOj27n3GQNzs4jGt1K3m6b1zhO6OX+ZFeSBtcbB6vS9e/L/jezQI=
+	t=1736554831; cv=none; b=eZH9mIeUjrsSkcMIvPZRpQYu+tnOMlrWMGUvwtf8DTKAs8uyBeu+oCE+0YOSoVKNQ+fs0wUBnKrxgYFq+hjVDYCJNqmYUld1Pfqt8g/ROWqioxJev3Dx1jogMMxhXAu4tMAaWVUHemR/hZjImRiiw5A3Pe20mA7OlCcyEsaN/yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736554830; c=relaxed/simple;
-	bh=TPYIUhk66icLn4klFzPb+dLqocxeMl6d1T8cmhRTu/I=;
+	s=arc-20240116; t=1736554831; c=relaxed/simple;
+	bh=zx4dqWjk0j1kl0acCQQPeLTqubWJGVskp3jgLunn0Fk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BG89Gv9pnOPBKTZsJBuFmlDivAOhURXSo/IGPOO1Ak08Zpa+IRlaQ3CiOuMOdD4CGkLpPc/2U6Tk/0tzjcMNbsr7u8CsPsHf1+nDiY52fgwqJjmdLJVj9Hmb49HEU6+0edb/hp1U67stBJEYZ/iw/9XiojpwnRTcNz7OMR5OYAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GrrCx9Ns; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=WSUkdO6+7VKhyPC1WpPf0er9+EP3jjFEg80HnOh8eF2rRjuCgah5qwWdTs+y99GOIhxKrI7sw+Wt7iqmByHyMFxCz8opDR5eyftKqCaqAQby4qwY0p7eQ7ZSiJeknoFLp0lqJLCT61RjTYiB0XEb/rAW1FGPJpRrtYUV+JpTYrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V5qmcVK9; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21648ddd461so50546405ad.0
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 16:20:28 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2164fad3792so44085425ad.0
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 16:20:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736554828; x=1737159628; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736554829; x=1737159629; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=895F/8HOIoZ/1RnH4XNznGAUJfeM7NK0SPEGQvgpER8=;
-        b=GrrCx9NsvhM8oo8APdth4Pd8sEjnkDyGQ9LaG+tqk2jn9zgnuUNkYeNZ4keEO9HXHG
-         tshnaSH+WxWNDAC1jzlObwhRJhB5P4xf85z0FFeoGehs7bE95/wbaf3jdeqfio4vZHia
-         SA7LinFBIQjf5JyA/uUx3IQcY4C0WF2z9YU/87vy8klX/zlbbSbiP9toeoURbP4EDYF6
-         M5ubTtfu4K00DV2qWcyy4AuEJPwvJtaIYvOkPAif8CSDTL2iyOdzS7a0LJmL77uDKcEd
-         Texddq4QwsHcgDBIf3OcLCRGD05bUGXxaFgAOb/krTeIT0dceD3nVRaJ/E4quxek7Yuc
-         QoqA==
+        bh=eB8gBJuxbpe5X48d9PLQPVBWlx8r3t3ZJrmp2uj4RCY=;
+        b=V5qmcVK91kTOaaFafo+noRd7hFTFGWYgRGNy6TrYaZonLEafH4g5n9sJ3a1sSHz499
+         oHUYvpLiLAU9rA+oXinLWea8SaxhtvR0t+CGvWNj1bxde4rc7Vxn8Wr3c92um6nbf6Id
+         9NztDY5t/5lRrFMHSOEtS+rTLGpbpYLpKI6PLFbVkqG+mL9CmDCsiBe0JSqMpYmgZhII
+         btCR2xRz9EA31tgso4nXr4tU+YYGZOww00d4wDB79ySLi6yxXTzF/13rxT7drAq474/q
+         6LtjAsEy++7z0MtvbkZ/+3C3Cs91oxozAC6ttVv/VvB84zMWC3Of2a8XCKm5oKvTyONe
+         R40g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736554828; x=1737159628;
+        d=1e100.net; s=20230601; t=1736554829; x=1737159629;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=895F/8HOIoZ/1RnH4XNznGAUJfeM7NK0SPEGQvgpER8=;
-        b=rdt+nLga+pw1EkmkmipUaa6kzP4GTMzKJUNYdghV7wl4NxLe48AKXafA6L0Y/nualS
-         Dk+Lz4hwocbdmun8ILPHFzKe8AISNkzD6eA9uT3e6oDKFDpcF3Q0AxE7KxloQYpl9NtS
-         PQKOxqbsJbGodkXGAIjxzmRPqEuzkNBKGKLmGFz324TWtwzZ42sc48pyMW9uh4Ear49n
-         OsyNhXkB0FmT/GwWubzkIbXPlGlCpFCH3hG6M6gbWWDIaMj6T2I7eF5dY4Oj6OR1L6pc
-         TJL/qDRtu7EZbPNQU1jfCEFaiefy2Rg3maXFy9fWrZVQaPcDGNwqVXumN5287vtvyTIh
-         GSJQ==
-X-Gm-Message-State: AOJu0YzTdrxUeBfJTuf4TfJBibExYNts0jv1tnVJAX/HXxAJ7/2qprEe
-	2l0qhT5CmI6b/PHm0k29WxUENBpS/osA5/X/wUwmAfFiEWCAVrx1I3xuwFoBp7FgTuc1v3nab4D
-	4UA==
-X-Google-Smtp-Source: AGHT+IHCA/ETl/3gcC8jDf9XvD+nlajF/u7s1VZSF3c8VsdM1o/ROmNiXPwd+PqoNaqHkoH9I4bjiYtp/o4=
-X-Received: from pfbfa27.prod.google.com ([2002:a05:6a00:2d1b:b0:725:d033:af87])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:918d:b0:1e0:f05b:e727
- with SMTP id adf61e73a8af0-1e88d0e63a6mr20310025637.2.1736554827806; Fri, 10
- Jan 2025 16:20:27 -0800 (PST)
+        bh=eB8gBJuxbpe5X48d9PLQPVBWlx8r3t3ZJrmp2uj4RCY=;
+        b=mpoj9IlHZoH56aexEdcZwwoTSLLQl5+8j/AJ9gR83nqsIS5ggyqMz+h+8GkcznvwFV
+         M/i86+LEwRYvtrpR3tROju5hkNS6jWZqSjrOLx8O8k9wFAjLczohu9vloQvOQWWEWV8F
+         2yOGBR4s2sgLA/7CXXwC/oA+V5vA3JevB2SNVaLN1Ag0BgNek//ufrVbgy6WROyT9Lfl
+         WE02eQyw5Ni08qxfU4GKQ/R5Fbh8mBvZFzc/xzOWCPqYeM+5PN//wbucv9H+RGf293FY
+         vMaIAecBTNWt2MVfIWsKrhHG4o8UQhUMzckmqZig8WkNJN8u7K/vusmAUYTm8/Dr4jQ2
+         HbfQ==
+X-Gm-Message-State: AOJu0YwP0/fVSHn/IfI+V238zcO9GO7VviK1iU6LPCxvnKvdHmqnyMo9
+	9fYIIWGCKG3nMRcA5z6j/d+ZQqjLn5gmjZJ9JNrEA5ifC3b9MCfySUgeT144YtrXOyk+/2yFxLO
+	KIA==
+X-Google-Smtp-Source: AGHT+IGNsgJP7koT39cFwI4Yg+3wXDCAQbpwSVw/Id0arVP5ZQq/8yJYYSBpdXsIn/H3/U0UxdATkYQDmUo=
+X-Received: from pfjf21.prod.google.com ([2002:a05:6a00:22d5:b0:725:f1d9:f706])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:c88b:b0:1e1:a693:d5fd
+ with SMTP id adf61e73a8af0-1e88d128f5dmr21173841637.25.1736554829616; Fri, 10
+ Jan 2025 16:20:29 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 10 Jan 2025 16:20:19 -0800
+Date: Fri, 10 Jan 2025 16:20:20 -0800
 In-Reply-To: <20250111002022.1230573-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250111002022.1230573-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250111002022.1230573-3-seanjc@google.com>
-Subject: [PATCH v2 2/5] KVM: Assert slots_lock is held when setting memory regions
+Message-ID: <20250111002022.1230573-4-seanjc@google.com>
+Subject: [PATCH v2 3/5] KVM: Add a dedicated API for setting KVM-internal memslots
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -84,62 +84,83 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Christian Borntraeger <borntraeger@de.ibm.com>, Xiaoyao Li <xiaoyao.li@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add proper lockdep assertions in __kvm_set_memory_region() and
-__x86_set_memory_region() instead of relying comments.
+Add a dedicated API for setting internal memslots, and have it explicitly
+disallow setting userspace memslots.  Setting a userspace memslots without
+a direct command from userspace would result in all manner of issues.
 
-Opportunistically delete __kvm_set_memory_region()'s entire function
-comment as the API doesn't allocate memory or select a gfn, and the
-"mostly for framebuffers" comment hasn't been true for a very long time.
+No functional change intended.
 
 Cc: Tao Su <tao1.su@linux.intel.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c  |  3 ++-
- virt/kvm/kvm_main.c | 10 ++--------
- 2 files changed, 4 insertions(+), 9 deletions(-)
+ arch/x86/kvm/x86.c       |  2 +-
+ include/linux/kvm_host.h |  4 ++--
+ virt/kvm/kvm_main.c      | 15 ++++++++++++---
+ 3 files changed, 15 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1b04092ec76a..a861287a67bd 100644
+index a861287a67bd..36b5d06e3904 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -12793,7 +12793,8 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
- 	struct kvm_memslots *slots = kvm_memslots(kvm);
- 	struct kvm_memory_slot *slot;
+@@ -12827,7 +12827,7 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+ 		m.guest_phys_addr = gpa;
+ 		m.userspace_addr = hva;
+ 		m.memory_size = size;
+-		r = __kvm_set_memory_region(kvm, &m);
++		r = kvm_set_internal_memslot(kvm, &m);
+ 		if (r < 0)
+ 			return ERR_PTR_USR(r);
+ 	}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7443de24b1d9..8707d25a2e5b 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1192,8 +1192,8 @@ enum kvm_mr_change {
+ 	KVM_MR_FLAGS_ONLY,
+ };
  
--	/* Called with kvm->slots_lock held.  */
-+	lockdep_assert_held(&kvm->slots_lock);
-+
- 	if (WARN_ON(id >= KVM_MEM_SLOTS_NUM))
- 		return ERR_PTR_USR(-EINVAL);
- 
+-int __kvm_set_memory_region(struct kvm *kvm,
+-			    const struct kvm_userspace_memory_region2 *mem);
++int kvm_set_internal_memslot(struct kvm *kvm,
++			     const struct kvm_userspace_memory_region2 *mem);
+ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
+ int kvm_arch_prepare_memory_region(struct kvm *kvm,
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index eb3d0a385077..7d25b50cb298 100644
+index 7d25b50cb298..e1be2e4e6c9f 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1926,14 +1926,6 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
+@@ -1926,8 +1926,8 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
  	return false;
  }
  
--/*
-- * Allocate some memory and give it an address in the guest physical address
-- * space.
-- *
-- * Discontiguous memory is allowed, mostly for framebuffers.
-- *
-- * Must be called holding kvm->slots_lock for write.
-- */
- int __kvm_set_memory_region(struct kvm *kvm,
- 			    const struct kvm_userspace_memory_region2 *mem)
+-int __kvm_set_memory_region(struct kvm *kvm,
+-			    const struct kvm_userspace_memory_region2 *mem)
++static int __kvm_set_memory_region(struct kvm *kvm,
++				   const struct kvm_userspace_memory_region2 *mem)
  {
-@@ -1945,6 +1937,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	int as_id, id;
- 	int r;
- 
-+	lockdep_assert_held(&kvm->slots_lock);
+ 	struct kvm_memory_slot *old, *new;
+ 	struct kvm_memslots *slots;
+@@ -2050,7 +2050,16 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	kfree(new);
+ 	return r;
+ }
+-EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
 +
- 	r = check_memory_region_flags(kvm, mem);
- 	if (r)
- 		return r;
++int kvm_set_internal_memslot(struct kvm *kvm,
++			     const struct kvm_userspace_memory_region2 *mem)
++{
++	if (WARN_ON_ONCE(mem->slot < KVM_USER_MEM_SLOTS))
++		return -EINVAL;
++
++	return __kvm_set_memory_region(kvm, mem);
++}
++EXPORT_SYMBOL_GPL(kvm_set_internal_memslot);
+ 
+ static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
+ 					  struct kvm_userspace_memory_region2 *mem)
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
