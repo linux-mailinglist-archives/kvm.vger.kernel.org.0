@@ -1,221 +1,310 @@
-Return-Path: <kvm+bounces-35217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 210A3A0A32F
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 12:01:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D60D7A0A3AC
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 13:52:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 630043A816E
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 11:01:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4467B7A405E
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 12:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CA51922F2;
-	Sat, 11 Jan 2025 11:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832CD1A01B9;
+	Sat, 11 Jan 2025 12:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5/bVuzb"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Mrqv6fC0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6729124B249;
-	Sat, 11 Jan 2025 11:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B1E19259D;
+	Sat, 11 Jan 2025 12:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736593296; cv=none; b=nurbDl9BTXekFk1lMN8xbYK/fOt2bC7i7+g2mFvWwTm9ZIyu7qsNsx20aVhTSPrxgYII8F99rM1c9jhL9GOn99eDikQ8N2iuo6ndW0kP9miBJH9EP6q4lzqOEhPgOXrnMvZ7sbpD7UyGOb2ps2kIT0IepfOjTJT23RQJ8Yir8ag=
+	t=1736599961; cv=none; b=IPKofDrIhNcrr41sIDeC5re9EIfpG2FTlbv5SeqROyU+OhY3btTLVryCUQVVMYm2eKQ43cf4apTx83quZ+fkDiEnMnEZg8fQ4fyY/fu0pIOlJd0kzuDbAqNjP3n8yIjefDBM5UOea3EcNRAEs1t4KZOD75JcXcOg3FdtOmbGpYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736593296; c=relaxed/simple;
-	bh=gy67Eo8C1hKneW/xn+UE+Oh9vmay9ok/H+SGcDXNdi8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k94aVMSKwsD3ZaSxx7c0dHCp2h3ydskOEaev54gY96NX1WzFt99x6BhYOFeVMDf4E3Hgl7Lx6qVwbS66iupz39XwPAUiX/4uV8dbXgc+Ky21ff0HzICGPMzHbIeQGf0ZG6IfOzjb3cj14GCJKE7g9Pz/yO6VLGOAgFO9amqlw6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5/bVuzb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B134C4CED2;
-	Sat, 11 Jan 2025 11:01:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736593296;
-	bh=gy67Eo8C1hKneW/xn+UE+Oh9vmay9ok/H+SGcDXNdi8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s5/bVuzbBSzTi3/QQcP+Y5MyFvpGcjUyPB4u8ZMRYy0G+Pa+O0yWM7q7/jnwyAI8n
-	 lTwe1nz38A6Bibbxyz/hndpTkb3vjQFTiwJAS5t+XIIhRP3WeI5b84YSIiZaz4VuMZ
-	 YTpIm+6Iid4koRAJwFjMR6C2FC62G7CMhrmd5KTYuD0wkH6lO78w5jNrlfcH+oKZp9
-	 06HYKpx254waJxqGuoxRbXper7rm/FeuXfIR66r/Wv8xArJK/xuWmLtvMc4LGs2gfx
-	 eb7JOt1v/wlvhMvB47kcDPS9oZHCYxmp3PJCpwInb8C/xqs+7FwXVi8cojI57iQkI/
-	 T2Ri6OEh71jxw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tWZFE-00B9ML-Kd;
-	Sat, 11 Jan 2025 11:01:33 +0000
-Date: Sat, 11 Jan 2025 11:01:31 +0000
-Message-ID: <87ikqlr4vo.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	s=arc-20240116; t=1736599961; c=relaxed/simple;
+	bh=l3crMzuURiZFYNNZJqhlmUF6mgG6AleJhoxt/Ef1Oas=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jIvUnmHJiplA9qXLGG+yk58rZfgvKnpgkQgCYBUmeikBVOm26pmsHU+jTttPd671Xdy7mJBp5SgwIe/taN3dctxNFw/xkkBGQ61fAIIsKeNXfq6B75N1RKk9CzL8XS25VTXYflExuOFZVF3pJuN89KcriQr1lNdSuyntybGnL9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Mrqv6fC0; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5C7AF40E02BF;
+	Sat, 11 Jan 2025 12:52:35 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id lrwzxQ2SD4e8; Sat, 11 Jan 2025 12:52:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1736599949; bh=sK93eAe06EajimDvRPRKfH+5sJbFrcP0v7PeaJCsWA8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Mrqv6fC0iHF93NI1OzFJ6RyvxM42S4M+2KHcdzA+NlhDYEPa7f4x8kEERGkyWLeMg
+	 nlLDlR7VaAbI47XRTj5Tjv2YDdAQFTF8tuOwa+QnYvb1MuKUu3FJ86T1NUVzNXN5j+
+	 MdKBA6NxOyHrxiZ/epJDht00A3IojdVhCMAGjBu4iqhIVTstTpyIX6nZ+XkvkQFqrN
+	 HgH66l/OEIX8nmb7aX9Qhke0i3NZ6u5sNqyteEw0V1/t8GD57sLS0Bgfk83zQEG4cC
+	 utvO8I2Vc1QOn8BdxsgV1WigTFz3xhicLOTDjhgp5d2qICwS8M1Q/40TqDV18D7qqG
+	 u+dmu85l6P8tH1S0fyojhfdbuXOnzjxRshkdGzKF5BJAl598WHBeahuJ6FL3eH0nTO
+	 8SaPSMTNxoWS7NMfcLhdSYkkMNhxV3qYTSoAKZyrijkIUPu8H3E8thhCUanJAVzifi
+	 QThaU9mHy6d/vr4qR4m5Ugv8H22F+XYZpEOakc00WukYNDCINQiV/Y9IEIfVtWpbhm
+	 1HOLF2n3kNeu85VHASAJUSSxkdmfAahqq8c72eLQcivAsbcRWvOrm7MEaDb466Kl+V
+	 JLgcKNH6xMJMXfa19mlIdlO7I+2ox3DtqR1EVVinN2or7VKMe2cv29rIU2DiUO9si9
+	 wD4s3y+oW/x/bcvOP9ZLQOkU=
+Received: from zn.tnic (pd953008e.dip0.t-ipconnect.de [217.83.0.142])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3ECDC40E02C1;
+	Sat, 11 Jan 2025 12:52:21 +0000 (UTC)
+Date: Sat, 11 Jan 2025 13:52:15 +0100
+From: Borislav Petkov <bp@alien8.de>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
-In-Reply-To: <20250111012450.1262638-4-seanjc@google.com>
-References: <20250111012450.1262638-1-seanjc@google.com>
-	<20250111012450.1262638-4-seanjc@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250111125215.GAZ4Jpf6tbcoS7jCzz@fat_crate.local>
+References: <20241202120416.6054-1-bp@kernel.org>
+ <20241202120416.6054-4-bp@kernel.org>
+ <Z1oR3qxjr8hHbTpN@google.com>
+ <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
+ <Z2B2oZ0VEtguyeDX@google.com>
+ <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
+ <Z35_34GTLUHJTfVQ@google.com>
+ <20250108154901.GFZ36ebXAZMFZJ7D8t@fat_crate.local>
+ <Z36zWVBOiBF4g-mW@google.com>
+ <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
 
-On Sat, 11 Jan 2025 01:24:48 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
-> that KVM_RUN needs to be re-executed prior to save/restore in order to
-> complete the instruction/operation that triggered the userspace exit.
-> 
-> KVM's current approach of adding notes in the Documentation is beyond
-> brittle, e.g. there is at least one known case where a KVM developer added
-> a new userspace exit type, and then that same developer forgot to handle
-> completion when adding userspace support.
+Ok,
 
-Is this going to fix anything? If they couldn't be bothered to read
-the documentation, let alone update it, how is that going to be
-improved by extra rules and regulations?
+here's a new version, I think I've addressed all outstanding review comments.
 
-I don't see how someone ignoring the documented behaviour of a given
-exit reason is, all of a sudden, have an epiphany and take a *new*
-flag into account.
+Lemme know how we should proceed here, you take it or I? Judging by the
+diffstat probably I should and you ack it or so.
 
-> 
-> On x86, there are multiple exits that need completion, but they are all
-> conveniently funneled through a single callback, i.e. in theory, this is a
-> one-time thing for KVM x86 (and other architectures could follow suit with
-> additional refactoring).
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  Documentation/virt/kvm/api.rst    | 48 ++++++++++++++++++++++---------
->  arch/powerpc/kvm/book3s_emulate.c |  1 +
->  arch/powerpc/kvm/book3s_hv.c      |  1 +
->  arch/powerpc/kvm/book3s_pr.c      |  2 ++
->  arch/powerpc/kvm/booke.c          |  1 +
->  arch/x86/include/uapi/asm/kvm.h   |  7 +++--
->  arch/x86/kvm/x86.c                |  2 ++
->  include/uapi/linux/kvm.h          |  3 ++
->  virt/kvm/kvm_main.c               |  1 +
->  9 files changed, 49 insertions(+), 17 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c92c8d4e8779..8e172675d8d6 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6505,7 +6505,7 @@ local APIC is not used.
->  
->  	__u16 flags;
->  
-> -More architecture-specific flags detailing state of the VCPU that may
-> +Common and architecture-specific flags detailing state of the VCPU that may
->  affect the device's behavior. Current defined flags::
->  
->    /* x86, set if the VCPU is in system management mode */
-> @@ -6518,6 +6518,8 @@ affect the device's behavior. Current defined flags::
->    /* arm64, set for KVM_EXIT_DEBUG */
->    #define KVM_DEBUG_ARCH_HSR_HIGH_VALID  (1 << 0)
->  
-> +  /* all architectures, set when the exit needs completion (via KVM_RUN) */
-> +  #define KVM_RUN_NEEDS_COMPLETION  (1 << 15)
->  ::
->  
->  	/* in (pre_kvm_run), out (post_kvm_run) */
-> @@ -6632,19 +6634,10 @@ requires a guest to interact with host userspace.
->  
->  .. note::
->  
-> -      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN,
-> -      KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR, KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL
-> -      the corresponding operations are complete (and guest state is consistent)
-> -      only after userspace has re-entered the kernel with KVM_RUN.  The kernel
-> -      side will first finish incomplete operations and then check for pending
-> -      signals.
-> +      For some exits, userspace must re-enter the kernel with KVM_RUN to
-> +      complete the exit and ensure guest state is consistent.
->  
-> -      The pending state of the operation is not preserved in state which is
-> -      visible to userspace, thus userspace should ensure that the operation is
-> -      completed before performing a live migration.  Userspace can re-enter the
-> -      guest with an unmasked signal pending or with the immediate_exit field set
-> -      to complete pending operations without allowing any further instructions
-> -      to be executed.
-> +      See KVM_CAP_NEEDS_COMPLETION for details.
->  
->  ::
->  
-> @@ -8239,7 +8232,7 @@ Note: Userspace is responsible for correctly configuring CPUID 0x15, a.k.a. the
->  core crystal clock frequency, if a non-zero CPUID 0x15 is exposed to the guest.
->  
->  7.36 KVM_CAP_X86_GUEST_MODE
-> -------------------------------
-> +---------------------------
->  
->  :Architectures: x86
->  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
-> @@ -8252,6 +8245,33 @@ KVM exits with the register state of either the L1 or L2 guest
->  depending on which executed at the time of an exit. Userspace must
->  take care to differentiate between these cases.
->  
-> +7.37 KVM_CAP_NEEDS_COMPLETION
-> +-----------------------------
-> +
-> +:Architectures: all
-> +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
-> +
-> +The presence of this capability indicates that KVM_RUN will set
-> +KVM_RUN_NEEDS_COMPLETION in kvm_run.flags if KVM requires userspace to re-enter
-> +the kernel KVM_RUN to complete the exit.
-> +
-> +For select exits, userspace must re-enter the kernel with KVM_RUN to complete
-> +the corresponding operation, only after which is guest state guaranteed to be
-> +consistent.  On such a KVM_RUN, the kernel side will first finish incomplete
-> +operations and then check for pending signals.
-> +
-> +The pending state of the operation for such exits is not preserved in state
-> +which is visible to userspace, thus userspace should ensure that the operation
-> +is completed before performing state save/restore, e.g. for live migration.
-> +Userspace can re-enter the guest with an unmasked signal pending or with the
-> +immediate_exit field set to complete pending operations without allowing any
-> +further instructions to be executed.
-> +
-> +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
-> +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
-> +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
-> +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
+Also, lemme know if I should add your Co-developed-by for the user_return
+portion.
 
-So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
-must be present for all of these exits, right? And from what I can
-tell, this capability is unconditionally advertised.
+Thx.
 
-Yet, you don't amend arm64 to publish that flag. Not that I think this
-causes any issue (even if you save the state at that point without
-reentering the guest, it will be still be consistent), but that
-directly contradicts the documentation (isn't that ironic? ;-).
+---
+From: "Borislav Petkov (AMD)" <bp@alien8.de>
 
-Or is your intent to *relax* the requirements on arm64 (and anything
-else but x86 and POWER)?
+Add support for
 
-	M.
+  CPUID Fn8000_0021_EAX[31] (SRSO_MSR_FIX). If this bit is 1, it
+  indicates that software may use MSR BP_CFG[BpSpecReduce] to mitigate
+  SRSO.
+
+enable this BpSpecReduce bit to mitigate SRSO across guest/host
+boundaries.
+
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+---
+ Documentation/admin-guide/hw-vuln/srso.rst | 21 +++++++++++++++++++++
+ arch/x86/include/asm/cpufeatures.h         |  1 +
+ arch/x86/include/asm/msr-index.h           |  1 +
+ arch/x86/include/asm/processor.h           |  1 +
+ arch/x86/kernel/cpu/bugs.c                 | 16 +++++++++++++++-
+ arch/x86/kvm/svm/svm.c                     | 14 ++++++++++++++
+ arch/x86/lib/msr.c                         |  2 ++
+ 7 files changed, 55 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/admin-guide/hw-vuln/srso.rst b/Documentation/admin-guide/hw-vuln/srso.rst
+index 2ad1c05b8c88..b856538083a2 100644
+--- a/Documentation/admin-guide/hw-vuln/srso.rst
++++ b/Documentation/admin-guide/hw-vuln/srso.rst
+@@ -104,6 +104,27 @@ The possible values in this file are:
+ 
+    (spec_rstack_overflow=ibpb-vmexit)
+ 
++ * 'Mitigation: Reduced Speculation':
++
++   This mitigation gets automatically enabled when the above one "IBPB on
++   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
++
++   It gets automatically enabled on machines which have the
++   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the code logic is to switch
++   to the above =ibpb-vmexit mitigation because the user/kernel boundary is
++   not affected anymore and thus "safe RET" is not needed.
++
++   After enabling the IBPB on VMEXIT mitigation option, the BpSpecReduce bit
++   is detected (functionality present on all such machines) and that
++   practically overrides IBPB on VMEXIT as it has a lot less performance
++   impact and takes care of the guest->host attack vector too.
++
++   Currently, the mitigation uses KVM's user_return approach
++   (kvm_set_user_return_msr()) to set the BpSpecReduce bit when a vCPU runs
++   a guest and reset it upon return to host userspace or when the KVM module
++   is unloaded. The intent being, the small perf impact of BpSpecReduce should
++   be incurred only when really necessary.
++
+ 
+ 
+ In order to exploit vulnerability, an attacker needs to:
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 508c0dad116b..471447a31605 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -468,6 +468,7 @@
+ #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
+ #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
+ #define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
++#define X86_FEATURE_SRSO_MSR_FIX	(20*32+31) /* MSR BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs */
+ 
+ /*
+  * Extended auxiliary flags: Linux defined - for features scattered in various
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 3f3e2bc99162..4cbd461081a1 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -719,6 +719,7 @@
+ 
+ /* Zen4 */
+ #define MSR_ZEN4_BP_CFG                 0xc001102e
++#define MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT 4
+ #define MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT 5
+ 
+ /* Fam 19h MSRs */
+diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+index c0cd10182e90..a956cd578df6 100644
+--- a/arch/x86/include/asm/processor.h
++++ b/arch/x86/include/asm/processor.h
+@@ -762,6 +762,7 @@ enum mds_mitigations {
+ };
+ 
+ extern bool gds_ucode_mitigated(void);
++extern bool srso_spec_reduce_enabled(void);
+ 
+ /*
+  * Make previous memory operations globally visible before
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 5a505aa65489..07c04b3844fc 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -2523,6 +2523,7 @@ enum srso_mitigation {
+ 	SRSO_MITIGATION_SAFE_RET,
+ 	SRSO_MITIGATION_IBPB,
+ 	SRSO_MITIGATION_IBPB_ON_VMEXIT,
++	SRSO_MITIGATION_BP_SPEC_REDUCE,
+ };
+ 
+ enum srso_mitigation_cmd {
+@@ -2540,12 +2541,19 @@ static const char * const srso_strings[] = {
+ 	[SRSO_MITIGATION_MICROCODE]		= "Vulnerable: Microcode, no safe RET",
+ 	[SRSO_MITIGATION_SAFE_RET]		= "Mitigation: Safe RET",
+ 	[SRSO_MITIGATION_IBPB]			= "Mitigation: IBPB",
+-	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only"
++	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only",
++	[SRSO_MITIGATION_BP_SPEC_REDUCE]	= "Mitigation: Reduced Speculation"
+ };
+ 
+ static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
+ static enum srso_mitigation_cmd srso_cmd __ro_after_init = SRSO_CMD_SAFE_RET;
+ 
++bool srso_spec_reduce_enabled(void)
++{
++	return srso_mitigation == SRSO_MITIGATION_BP_SPEC_REDUCE;
++}
++EXPORT_SYMBOL_GPL(srso_spec_reduce_enabled);
++
+ static int __init srso_parse_cmdline(char *str)
+ {
+ 	if (!str)
+@@ -2663,6 +2671,12 @@ static void __init srso_select_mitigation(void)
+ 
+ ibpb_on_vmexit:
+ 	case SRSO_CMD_IBPB_ON_VMEXIT:
++		if (boot_cpu_has(X86_FEATURE_SRSO_MSR_FIX)) {
++			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
++			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
++			break;
++		}
++
+ 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
+ 			if (!boot_cpu_has(X86_FEATURE_ENTRY_IBPB) && has_microcode) {
+ 				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 21dacd312779..59656fd51d57 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -256,6 +256,7 @@ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
+  * defer the restoration of TSC_AUX until the CPU returns to userspace.
+  */
+ static int tsc_aux_uret_slot __read_mostly = -1;
++static int zen4_bp_cfg_uret_slot __ro_after_init = -1;
+ 
+ static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
+ 
+@@ -1541,6 +1542,11 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+ 	    (!boot_cpu_has(X86_FEATURE_V_TSC_AUX) || !sev_es_guest(vcpu->kvm)))
+ 		kvm_set_user_return_msr(tsc_aux_uret_slot, svm->tsc_aux, -1ull);
+ 
++	if (srso_spec_reduce_enabled())
++		kvm_set_user_return_msr(zen4_bp_cfg_uret_slot,
++					BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT),
++					BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT));
++
+ 	svm->guest_state_loaded = true;
+ }
+ 
+@@ -5298,6 +5304,14 @@ static __init int svm_hardware_setup(void)
+ 
+ 	tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
+ 
++	if (srso_spec_reduce_enabled()) {
++		zen4_bp_cfg_uret_slot = kvm_add_user_return_msr(MSR_ZEN4_BP_CFG);
++		if (WARN_ON_ONCE(zen4_bp_cfg_uret_slot < 0)) {
++			r = -EIO;
++			goto err;
++		}
++	}
++
+ 	if (boot_cpu_has(X86_FEATURE_AUTOIBRS))
+ 		kvm_enable_efer_bits(EFER_AUTOIBRS);
+ 
+diff --git a/arch/x86/lib/msr.c b/arch/x86/lib/msr.c
+index 4bf4fad5b148..5a18ecc04a6c 100644
+--- a/arch/x86/lib/msr.c
++++ b/arch/x86/lib/msr.c
+@@ -103,6 +103,7 @@ int msr_set_bit(u32 msr, u8 bit)
+ {
+ 	return __flip_bit(msr, bit, true);
+ }
++EXPORT_SYMBOL_GPL(msr_set_bit);
+ 
+ /**
+  * msr_clear_bit - Clear @bit in a MSR @msr.
+@@ -118,6 +119,7 @@ int msr_clear_bit(u32 msr, u8 bit)
+ {
+ 	return __flip_bit(msr, bit, false);
+ }
++EXPORT_SYMBOL_GPL(msr_clear_bit);
+ 
+ #ifdef CONFIG_TRACEPOINTS
+ void do_trace_write_msr(unsigned int msr, u64 val, int failed)
+-- 
+2.43.0
+
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
