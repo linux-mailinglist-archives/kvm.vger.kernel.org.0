@@ -1,129 +1,142 @@
-Return-Path: <kvm+bounces-35173-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35174-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AACD4A09FAE
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 01:49:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53910A09FAF
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 01:51:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8DC3A7C71
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 00:49:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CAAB3A80DF
+	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 00:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365B714F90;
-	Sat, 11 Jan 2025 00:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8700DD299;
+	Sat, 11 Jan 2025 00:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nu902t86"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zOeOfTcf"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172FC2FB6
-	for <kvm@vger.kernel.org>; Sat, 11 Jan 2025 00:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402F8634
+	for <kvm@vger.kernel.org>; Sat, 11 Jan 2025 00:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736556570; cv=none; b=r0N/16mEWNb+P/R5CGS3vL0jRzUdS0CrYZVv1l5uDH1Rtoeh46g7j/iASJcj8frQIA+iW4X/lm4ktKEeyO6ho1saANEoKZoqvkqtvZtpPH6OqD2n8wcTEg+Re8mUoIKTVV6aQngEBbqSEvi05Ia/EUNdOUueMB7zPs2v7+ScOIM=
+	t=1736556653; cv=none; b=ogHg1PPmH9YWvbO/3CvBZFMg/Ub8cUjtdrOLoWZFvxz5MMtTQMO0wPwBTQrf8GAuYyF68h7e2wfAhwhQ3MTny+zfu4cxWUFVIa5b5bV3DnHtlPvz2Sm333pn4Z49WW/exc/Ii+V0ZXFkAxDeaH8ZevHH7KAvAnaIKL8d0tK8ao4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736556570; c=relaxed/simple;
-	bh=DqbsPM7pbMq3tNO53LpeaJ86ETg2ScGj8LGDaaUTLJM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hRbMhszJA58cwjnaVHOkKo1FcWGq/4Jf9sxWDD2L9UPKhzmCifyggouCC6E4vA+IvIL/N4UZ1pL1302MkZ5oBWrvZXI9nS+yNIv6xffNHTgpntROmzssR7sEsh90Yb1t3hlHRzcaQShNcklyV6NPQcI4TYbEfGCUcGRQUdYtcyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nu902t86; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1736556653; c=relaxed/simple;
+	bh=kul+Fw4DW6osdE/Z2GoPabxZf5HTWm/6V8saFNmXeC0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=H3gOaPL4koE8w+gty01TgEMyqeGVqk8sQ1hnIfvDH7gEYPw3IwofBEQ/UUvOsG5UN1EQqdcDK/PH1v44eNfGMOwE0ObZ6pyx61PV+sYbHAXq0Y2M0XQgqse/DyteTjssIh/mbL2pEJ6RrDg4fzV5fgBApkf3XC5rl4YCSInGqMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zOeOfTcf; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so6692232a91.3
-        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 16:49:27 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2efa0eb9dacso4827637a91.1
+        for <kvm@vger.kernel.org>; Fri, 10 Jan 2025 16:50:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736556567; x=1737161367; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YX28d/CEykAYv4b51S4uD+A1lpSwnJPjWn7kTo7F+wY=;
-        b=Nu902t86+h2+UCpAerjCkL1TxbV1qTw+ub+wiooHKXwFb+VvD7cGumqCUdu4VdJaVC
-         wQRcVfcjLeG+0OD+ph810tBX2DRJnI1sKuYSWyaYS85EkRagqODZsqYf4Nh5Jlf8MWfU
-         OoblEve0Cu5eGvBTfN0E1VBNgLEwTRwRVkuAOTnlFaUSNboPXKpf4nQ2M4WirwklA9I4
-         L5GyIAofAqrnmPwlZBuC4nSx6DrCGjg6kLbTs5u6YVuCOjk35n+cCqh7qib4W2uJ3JNQ
-         S6pEt9JhWGBvZ1aI0GBgJXJxfkCn6yXuS2+b6AQTFzW67CTkKeIGuAK/O1p8hz1VGjth
-         1txg==
+        d=google.com; s=20230601; t=1736556652; x=1737161452; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9xron+KThU7T77R5VL2QV4m0fAH5NzD4XXNwhcBHEXQ=;
+        b=zOeOfTcfKH+ZQfrz7ABQmoiuYih5lDbKsFY6HCUkRlmttJF2Phaovqeo7pa+ulHEVo
+         i3A+k7IEno1pKfxygSo4V2sFFZgnCBjCE469E+gFiXTHuJg8qi0jFDqQGgBfqV7EZ+ZY
+         Pu47VyxcqvlnJ9AA6Q/b+4xCAK6N1/oM0lKAdmqvwO+L/aL/eFfwIwaF6JOmf04sU2lu
+         4ypCzMtzkGMeHs3ez0qrEsF7nD7EElApVRp1Q0HM8CafMW6wSPIC/Gy2aoWFQhAReD0x
+         9i50xMmssa/YkKp/20YT8kKCKHfXUy6Xif96j+O5CUzEQSOaFXrHifZzHsQlppI3vABY
+         XWRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736556567; x=1737161367;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YX28d/CEykAYv4b51S4uD+A1lpSwnJPjWn7kTo7F+wY=;
-        b=vgqZwfwDVvLX5rPMWjkYmnebPNm/9kOcCeg4bLdZ4L9/UHck+0LnD58v1HNzBTh/h+
-         o6CXeK6IfpOm+0WfSmJHx1DCBGqurqVOC+RDAVWCOtABvpLpsSlGrNRs8exsD013H31K
-         +gkS31szghJ+ZlanVFZnZeu0QDZeS16bi7JeTYT5Jxrp8SHEKDfn3RrCPDJgKgSe3lnk
-         G36Wuy2YNPdIhAJH5hAMR9N6sawsVxZmI1+MrYTxkTXZoVTHDJjHS8b4IZk2uela68D6
-         rqj5jHiCdFZz3/v2/k2ED/uWTXZOQ6YOj/ltismDhAOR9uHm1QkKkR5xC5TVK+JHCswu
-         N/hA==
-X-Forwarded-Encrypted: i=1; AJvYcCVC11RJDBnEfEJcMFvelXVYqI/bMB7GVoY0ZCMDCQieZ1WTKSnow2fZ+UGYXZmrMyRtNSU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZl+rTgNy2Ny6736lQ+LC8C/3FeIwH1Kc+C6KD48iyi8MXZ5va
-	Y0t/JODltGHoviIXTTSyBr3wdQPea6K31o2oE2EFUmYvP9LI7wPQ0szokNuUSJjRil+CjoRyfLP
-	e6w==
-X-Google-Smtp-Source: AGHT+IH361hyEP8ZBxDjRVTWmQZDmlNvVhHg1tXUKZ2PrfsrRNnR2/vcWBj5z0ljoK7+gcYBV3qV4n3VGY0=
-X-Received: from pjbhl13.prod.google.com ([2002:a17:90b:134d:b0:2e0:9fee:4b86])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2747:b0:2f2:a664:df1a
- with SMTP id 98e67ed59e1d1-2f548e9c9bcmr19626538a91.2.1736556567441; Fri, 10
- Jan 2025 16:49:27 -0800 (PST)
-Date: Fri, 10 Jan 2025 16:49:26 -0800
-In-Reply-To: <CAAH4kHZn_gtspOisv6gxQiD=JeZbZstQoR68mFCxn34Am76Bdg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1736556652; x=1737161452;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9xron+KThU7T77R5VL2QV4m0fAH5NzD4XXNwhcBHEXQ=;
+        b=H2oSkIXoLHpuIQxs6hL3HPT4ACEeU8RAQ2NfmqOf+FCJRch7xraEebqzKD4Zi+c6eV
+         BdWQrKKET7k2lfoZbr2Vq6clG4A10yvhIo/wXVmHNwP3AWp9VIyp01VNwNLqpjXMoV+i
+         spEUxg337lF4242K7WnWTsSWjBcX4wUR+wxisJmIbN6tyqJEpkmxjY0DN/yxkqbTpsPi
+         yv/P68gR6wUNWOtTZwGnujYo/9P3K2vm6ckOcNjLWc3dIL8oE33mxt1wF5KQumebm5yy
+         3exlZDJCb4kbFU5ddWWe/Oo2xRZ7DlxG0emwwHBsr5rroE9DpCJLMn98CDaKqnqDfWlG
+         GETg==
+X-Forwarded-Encrypted: i=1; AJvYcCWls/SSqQQiC0jMJXRSRvbNlTnPDuBQEmXEMVpi0VuvxiKfYZmnHdior5A6p60D25n/c5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMAR6xrCgTISeoMtJgy7CjGcBOLA6PGP2745Ep0HuJ1PuMYkil
+	uYBQ4jtyh/aR9dv3edqbJoU+W6T2jq19LBEefON4ZaExKsewieaHZdFwX28av4tH5+8uJiR7kNS
+	5BQ==
+X-Google-Smtp-Source: AGHT+IFGHtmLK/IYHq0Rf1GMc11fdZBgGQoU3n0wFrQS04Q/FED/wp6nrTmZr2LCO3EYVe3us4g7I58uwQQ=
+X-Received: from pjbqi13.prod.google.com ([2002:a17:90b:274d:b0:2ef:82c0:cb8d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a44:b0:2ea:61de:38f7
+ with SMTP id 98e67ed59e1d1-2f548f1d420mr19019162a91.29.1736556651751; Fri, 10
+ Jan 2025 16:50:51 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 10 Jan 2025 16:50:40 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1735931639.git.ashish.kalra@amd.com> <14f97f58d6150c6784909261db7f9a05d8d32566.1735931639.git.ashish.kalra@amd.com>
- <6241f868-98ee-592b-9475-7e6cec09d977@amd.com> <8ae7718c-2321-4f3a-b5b7-7fb029d150cf@amd.com>
- <8adf7f48-dab0-cbed-d920-e3b74d8411cf@amd.com> <ee9d2956-fa55-4c83-b17d-055df7e1150c@amd.com>
- <d6d08c6b-9602-4f3d-92c2-8db6d50a1b92@amd.com> <Z4G9--FpoeOlbEDz@google.com> <CAAH4kHZn_gtspOisv6gxQiD=JeZbZstQoR68mFCxn34Am76Bdg@mail.gmail.com>
-Message-ID: <Z4HAFmyhw5DeIRBT@google.com>
-Subject: Re: [PATCH v3 6/7] KVM: SVM: Add support to initialize SEV/SNP
- functionality in KVM
+X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
+Message-ID: <20250111005049.1247555-1-seanjc@google.com>
+Subject: [PATCH v2 0/9] KVM: selftests: Binary stats fixes and infra updates
 From: Sean Christopherson <seanjc@google.com>
-To: Dionna Amalie Glaze <dionnaglaze@google.com>
-Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, pbonzini@redhat.com, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	michael.roth@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 10, 2025, Dionna Amalie Glaze wrote:
-> On Fri, Jan 10, 2025 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > > Is there a way to change the load order of built-in modules and/or ch=
-ange
-> > > dependency of built-in modules ?
-> >
-> > The least awful option I know of would be to have the PSP use a higher =
-priority
-> > initcall type so that it runs before the standard initcalls.  When comp=
-iled as
-> > a module, all initcall types are #defined to module_init.
-> >
-> > E.g. this should work, /cross fingers
-> >
-> > diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
-> > index 7eb3e4668286..02c49fbf6198 100644
-> > --- a/drivers/crypto/ccp/sp-dev.c
-> > +++ b/drivers/crypto/ccp/sp-dev.c
-> > @@ -295,5 +295,6 @@ static void __exit sp_mod_exit(void)
-> >  #endif
-> >  }
-> >
-> > -module_init(sp_mod_init);
-> > +/* The PSP needs to be initialized before dependent modules, e.g. befo=
-re KVM. */
-> > +subsys_initcall(sp_mod_init);
->=20
-> I was 2 seconds from clicking send with this exact suggestion. There
-> are examples in 'drivers/' that use subsys_initcall / module_exit
-> pairs.
+Fix a handful of bugs in the binary stats infrastructure, expand support
+to vCPU-scoped stats, enumerate all KVM stats in selftests, and use the
+enumerated stats to assert at compile-time that {vm,vcpu}_get_stat() is
+getting a stat that actually exists.
 
-Ha!  For once, I wasn't too slow due to writing an overly verbose message :=
--)
+Most of the bugs are benign, and AFAICT, none actually cause problems in
+the current code base.  The worst of the bugs is lack of validation that
+the requested stat actually exists, which is quite annoying if someone
+fat fingers a stat name, tries to get a vCPU stat on a VM FD, etc.
+
+As called out multiple times in v1, I'm on the fence regarding the last
+patch (compile-time assertions).  My plan is to apply everything except the
+last patch fairly quickly, so that the vCPU stats stuff in particular can be
+used in x86 tests, and hold off on the compile-time assertion goo until
+someone comes along with a strong opinion one way or the other.
+
+v2:
+ - Update rlimit number of files for all "standard" VMs.
+ - Account for the vCPU stats fd when updating rlimits.
+
+v1: https://lore.kernel.org/all/20241220013906.3518334-1-seanjc@google.com
+
+Sean Christopherson (9):
+  KVM: selftests: Fix mostly theoretical leak of VM's binary stats FD
+  KVM: selftests: Close VM's binary stats FD when releasing VM
+  KVM: selftests: Assert that __vm_get_stat() actually finds a stat
+  KVM: selftests: Macrofy vm_get_stat() to auto-generate stat name
+    string
+  KVM: selftests: Add struct and helpers to wrap binary stats cache
+  KVM: selftests: Get VM's binary stats FD when opening VM
+  KVM: selftests: Adjust number of files rlimit for all "standard" VMs
+  KVM: selftests: Add infrastructure for getting vCPU binary stats
+  KVM: selftests: Add compile-time assertions to guard against stats
+    typos
+
+ .../kvm/include/arm64/kvm_util_arch.h         |  12 ++
+ .../testing/selftests/kvm/include/kvm_util.h  |  51 ++++++--
+ .../selftests/kvm/include/kvm_util_types.h    |   6 +
+ .../kvm/include/riscv/kvm_util_arch.h         |  14 +++
+ .../kvm/include/s390/kvm_util_arch.h          | 113 +++++++++++++++++
+ .../selftests/kvm/include/x86/kvm_util_arch.h |  52 ++++++++
+ .../selftests/kvm/kvm_create_max_vcpus.c      |  28 +----
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 114 ++++++++++++------
+ .../kvm/x86/dirty_log_page_splitting_test.c   |   6 +-
+ .../selftests/kvm/x86/nx_huge_pages_test.c    |   4 +-
+ .../selftests/kvm/x86/xapic_ipi_test.c        |   2 +
+ 11 files changed, 324 insertions(+), 78 deletions(-)
+
+
+base-commit: 10b2c8a67c4b8ec15f9d07d177f63b563418e948
+-- 
+2.47.1.613.gc27f4b7a9f-goog
+
 
