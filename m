@@ -1,145 +1,150 @@
-Return-Path: <kvm+bounces-35221-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35222-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71773A0A47E
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 16:49:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9431DA0A80D
+	for <lists+kvm@lfdr.de>; Sun, 12 Jan 2025 10:55:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 599033AA3AD
-	for <lists+kvm@lfdr.de>; Sat, 11 Jan 2025 15:49:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95A34166F3B
+	for <lists+kvm@lfdr.de>; Sun, 12 Jan 2025 09:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406AD1B0F2D;
-	Sat, 11 Jan 2025 15:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEE81A23A0;
+	Sun, 12 Jan 2025 09:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kP5aa05/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZhGhgTsQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E5482899;
-	Sat, 11 Jan 2025 15:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442962556E
+	for <kvm@vger.kernel.org>; Sun, 12 Jan 2025 09:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736610557; cv=none; b=fS2yPOIalLOKRJKRP5qVuF7vQdzrFIkC2rNrmk6f+r/Q9dl++nloPSxgnRqIntn+xRV8LV3qCY0AGBnxqjvcBuSrFomIx1VbsUWDa/K6znDKF9qP/OkdSkNfGsY7zfaspYtBzXR0h5zdyjLdsGl7ZCrI0Xk6oQKw6bUw+ZSSTjc=
+	t=1736675738; cv=none; b=UsgKXlT8qUECvjG3RXLgnOxE+vdO+XUx1K/k+elRie897Jpp/0BRRv2lG5IUvgTY7ABauaWsWCQbBmlhAfvA5SvDjYaxp6LHc0u4T8efQYf1lvMJuVZ2ZLDhhd6B5FTFyE/nBSPjbU9bWYIRPqKTN3cr975yua+3XLhRgdZrQvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736610557; c=relaxed/simple;
-	bh=I13GjTQ/bEvxNSkVaRmA8TbxVYEsI+KUb/3rMftBa1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pRhs8KC8qNSndiQi7cwAtr2PTbxTgJnfnhUOkaCrKnt8P8mCO4HHogyyCFWjkKO/6D9TZ5nJsysQhR8fWWZl/jv3mCyXIA6LwigHAEGHmJaZhg9zbN/3n93Ez9LkHfwdr7GRCFLn9rvV4TrGwF7foFhZgxhrTxotnPZ301hydqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kP5aa05/; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736610556; x=1768146556;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=I13GjTQ/bEvxNSkVaRmA8TbxVYEsI+KUb/3rMftBa1w=;
-  b=kP5aa05/+oOC70dpBPxjExgVw2Z0WfsXpg4iXw9/THOv4c0fy8Wqttms
-   FpoqNprn8prk0vsQiC7OvDsagBA1583YHvYjMrsuSeN5fZN97i+0HcWJF
-   163FUZP7AQCHxfO6SLbcV+aWIuhcJKAZp1wvlujimZDcxxEeZdkHJUXIg
-   XwKOoaD+wVs/2sP5zVS7Ltm9phOPk0FYfEYIm+nt52yJ6sFq0Uw8LzcBY
-   TnVtBucYkxsgvpSPo8Q3U55X7iYG/dQpl2Bs6gxRSjg9YaDfMUToi8uSz
-   aAowotGrj5eCslD8w3fu2KHNjQ/O+7+ULBwKdEd/jz04nFvOFddQAEzHe
-   w==;
-X-CSE-ConnectionGUID: mgiuiz6WTvOkUuBIbAIqQw==
-X-CSE-MsgGUID: loxvwsSqRi23cjNTI7xrqg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11312"; a="36174424"
-X-IronPort-AV: E=Sophos;i="6.12,307,1728975600"; 
-   d="scan'208";a="36174424"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2025 07:49:15 -0800
-X-CSE-ConnectionGUID: qX0nMsRYREGTB/bib2eOkw==
-X-CSE-MsgGUID: FcNHmfEXSp6HC708tUJ8qQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="134900487"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa001.fm.intel.com with ESMTP; 11 Jan 2025 07:49:10 -0800
-Date: Sat, 11 Jan 2025 11:48:06 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
-	yilun.xu@intel.com, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
-	zhenzhong.duan@intel.com, tao1.su@intel.com
-Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
- private device
-Message-ID: <Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050>
-References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
- <20250107142719.179636-9-yilun.xu@linux.intel.com>
- <20250108133026.GQ5556@nvidia.com>
- <Z36ulpCoJAllp4fP@yilunxu-OptiPlex-7050>
- <20250109144051.GX5556@nvidia.com>
- <Z3/7/PQCLi1GE5Ry@yilunxu-OptiPlex-7050>
- <20250110133116.GF5556@nvidia.com>
+	s=arc-20240116; t=1736675738; c=relaxed/simple;
+	bh=5LgN3kghoTo+6hcMs9ps9ijUlydUFsGCZ5ZnuL33xl4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L+D8oaVQ8vQpHxXLH6gYRfwp11zX4zj6RV+ucgJP4EhDUi/dPpuAnSASwbuWQscHAO2KYTVTCmA3X4uimzl7YVCqyHvIiTZyba8KBbSlYc3SGTb+r5B9QQ7RdiuV++DN4YaDRMrRaqjGcIk7X7ZXaipvL29v1OfrQkzTP/9Skts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZhGhgTsQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736675734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LbPMvXWxkqoPEVecK8C7xcWKRlslEHctKLKomp3MgmA=;
+	b=ZhGhgTsQf/NCg/wWvBkAQgDskH80c/bxe583983KSyCmraaYxVYtZChfM08xpCHeqflg19
+	a+woe/WtLE/Qa2XUlu1RvBajlukbc7T75c2UlcRZzdNVxawj6uneeqQglyWljEHV7WGfod
+	tYsvrERwK/7ffzLGVCA7zjlSaSd0M7k=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-641-3MGBvIL1PWG0O1QG0MgRxw-1; Sun, 12 Jan 2025 04:55:32 -0500
+X-MC-Unique: 3MGBvIL1PWG0O1QG0MgRxw-1
+X-Mimecast-MFC-AGG-ID: 3MGBvIL1PWG0O1QG0MgRxw
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5d3e4e09ae7so4802593a12.3
+        for <kvm@vger.kernel.org>; Sun, 12 Jan 2025 01:55:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736675731; x=1737280531;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LbPMvXWxkqoPEVecK8C7xcWKRlslEHctKLKomp3MgmA=;
+        b=DLGoe/1v9hzccwjckjNEX/Sgd7vUhyeMXcExs+tU7TbLgehyW0aZ2e3UCROTrHGFyN
+         fQzHj1GqXWNtJyclg99pMSYLeOiFd+4OujArCzfL53JWfkzAJZnXKioglUwk4Vv7Ev5H
+         LOR88VHDqzHpN+KPfVp5XOqfXWKIZWW8iBXSkFsM4TXagfGkS+zKFoXepvwWyUhsiFXh
+         haiVYJPKgH0O5OFk8TaBFS+zgj5mMiEwSe3KPmSpWBMbXKGZuQd+hAJJ34eFlx8Ur05W
+         GcYDmmsqNVvVwkTDBMqzhdNY6FVyW2QyPOtogufWfHvwrmpiCBzEslaC+ZE73/G7GpLf
+         ohzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX2Rbf6qL3ENPBB63Prrh8XaDl4nSQUxERxhxbgVrpKg2FLwO2AIHIAdwNC+39le4h0qEQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZpZy7etzZzFceKwh6jLh1KLaVmB9lZEZ03CHM8c/P3rSGg5HV
+	+etBDysxgBsERKYjinTwsUOVWJNcSuLP73yzkvagF4JlkxmwgdHHLIV/mHDYPe/+uZjgGehnQes
+	5khMBPmqV5h/LrVPldqjFLsnnvmAN0bg7giu0KNrV00/NUT5o1Q==
+X-Gm-Gg: ASbGnctv7PMCSXzAVpqmj7jakPh+y4k8e+OtnIH47JHCwNujaVtIH3dtCOVpyCQh1jc
+	drDTB/vfl/MpadJkIDG/y+DORW9j3puGwxTQWSD33lAq503YCatVUXTNGn4On9s4iGFZfNx/Syg
+	IKozJniPvfMbXgqiV+ijjAGIe+yNtJ4bD5qM5zb8jgI/TKg3sqL5D3EwxiaaQWXy4k2ZHbT45Wq
+	x5JZ/8vLKhTxbIADgKPLOxqqOcynu+mXWfymyQB8CwTkVkBHhKGScu1r8w=
+X-Received: by 2002:a05:6402:354c:b0:5d3:ba42:e9d6 with SMTP id 4fb4d7f45d1cf-5d972e14828mr16993857a12.17.1736675731154;
+        Sun, 12 Jan 2025 01:55:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEVLh0vGs9D36Q0IyXZ3HUQ2iOTSRSffuWayJjX6NDL6ISEn6UK/f5SUb1xvo4fnr5VPoS7bQ==
+X-Received: by 2002:a05:6402:354c:b0:5d3:ba42:e9d6 with SMTP id 4fb4d7f45d1cf-5d972e14828mr16993834a12.17.1736675730719;
+        Sun, 12 Jan 2025 01:55:30 -0800 (PST)
+Received: from [192.168.10.3] ([151.62.105.73])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d9903c3206sm3714091a12.46.2025.01.12.01.55.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jan 2025 01:55:29 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	linuxppc-dev@lists.ozlabs.org,
+	regressions@lists.linux.dev,
+	Christian Zigotzky <chzigotzky@xenosoft.de>
+Subject: [PATCH v2 0/5] KVM: e500: map readonly host pages for read, and cleanup
+Date: Sun, 12 Jan 2025 10:55:22 +0100
+Message-ID: <20250112095527.434998-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250110133116.GF5556@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 10, 2025 at 09:31:16AM -0400, Jason Gunthorpe wrote:
-> On Fri, Jan 10, 2025 at 12:40:28AM +0800, Xu Yilun wrote:
-> 
-> > So then we face with the shared <-> private device conversion in CoCo VM,
-> > and in turn shared <-> private MMIO conversion. MMIO region has only one
-> > physical backend so it is a bit like in-place conversion which is
-> > complicated. I wanna simply the MMIO conversion routine based on the fact
-> > that VMM never needs to access assigned MMIO for feature emulation, so
-> > always disallow userspace MMIO mapping during the whole lifecycle. That's
-> > why the flag is introduced.
-> 
-> The VMM can simply not map it if for these cases. As part of the TDI
-> flow the kernel can validate it is not mapped.
+The new __kvm_faultin_pfn() function is upset by the fact that e500
+KVM ignores host page permissions - __kvm_faultin requires a "writable"
+outgoing argument, but e500 KVM is passing NULL.
 
-That's a good point. I can try on that.
+While a simple fix would be possible that simply allows writable to
+be NULL, it is quite ugly to have e500 KVM ignore completely the host
+permissions and map readonly host pages as guest-writable.  A more
+complete fix is present in the second to fourth patches (the first is
+an independent bugfix, Cc'd to stable).
 
->  
-> > > can be sure what is the correct UAPI. In other words, make the
-> > > VFIO device into a CC device should also prevent mmaping it and so on.
-> > 
-> > My idea is prevent mmaping first, then allow VFIO device into CC dev (TDI).
-> 
-> I think you need to start the TDI process much earlier. Some arches
-> are going to need work to prepare the TDI before the VM is started.
+The last one removes the VMA-based attempts at building huge shadow TLB
+entries, in favor of using a PTE lookup similar to what is done for x86.
+This special casing of VM_PFNMAP does not work well with remap_pfn_range()
+as it assumes that VM_PFNMAP areas are contiguous.  Note that the same
+incorrect logic is there in ARM's get_vma_page_shift() and RISC-V's
+kvm_riscv_gstage_ioremap().
 
-Could you elaborate more on that? AFAICS Intel & AMD are all good on
-"late bind", but not sure for other architectures. This relates to the
-definition of TSM verbs and is the right time we collect the needs for
-Dan's series.
+Fortunately, for e500 most of the code is already there; it just has to
+be changed to compute the range from find_linux_pte()'s output rather
+than find_vma().  The new code works for both VM_PFNMAP and hugetlb
+mappings, so the latter is removed.
 
-> 
-> The other issue here is that Intel is somewhat different from others
-> and when we build uapi for TDI it has to accommodate everyone.
+If this does not work out I'll go for something like
+https://lore.kernel.org/kvm/Z3wnsQQ67GBf1Vsb@google.com/, but
+with the helper in arch/powerpc/kvm/e500_mmu_host.c.
 
-Sure, this is the aim for PCI TSM core, and VFIO as a PCI TSM user
-should not be TDX awared.
-
-> 
-> > Yes. It carries out the idea of "KVM maps MMIO resources without firstly
-> > mapping into the host" even for normal VM. That's why I think it could
-> > be an independent patchset.
-> 
-> Yes, just remove this patch and other TDI focused stuff. Just
-> infrastructure to move to FD based mapping instead of VMA.
-
-Yes.
+Patches 2-5 were tested by the reporter, Christian Zigotzky.  Since
+the difference with v1 is minimal, I am going to send it to Linus
+today.
 
 Thanks,
-Yilun
 
-> 
-> Jason
+Paolo
+
+v1->v2: do not bother checking again that a memslot exists, instead
+	add a fix to restore irqs even if !ptep
+
+
+Paolo Bonzini (5):
+  KVM: e500: always restore irqs
+  KVM: e500: use shadow TLB entry as witness for writability
+  KVM: e500: track host-writability of pages
+  KVM: e500: map readonly host pages for read
+  KVM: e500: perform hugepage check after looking up the PFN
+
+ arch/powerpc/kvm/e500.h          |   2 +
+ arch/powerpc/kvm/e500_mmu_host.c | 199 +++++++++++++------------------
+ 2 files changed, 85 insertions(+), 116 deletions(-)
+
+-- 
+2.47.1
+
 
