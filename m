@@ -1,156 +1,174 @@
-Return-Path: <kvm+bounces-35310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6F6A0BEE5
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 18:31:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FFFA0BF6A
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 18:58:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D5567A10E8
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 17:31:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 754C21884B4C
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 17:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 226571BD9C1;
-	Mon, 13 Jan 2025 17:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E681AD3E5;
+	Mon, 13 Jan 2025 17:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BO/QF2TM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="psvnlW4w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39251AAA3D;
-	Mon, 13 Jan 2025 17:30:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DBB1BD9E5;
+	Mon, 13 Jan 2025 17:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736789461; cv=none; b=PqqTzcsk6sMnuztPgB9nlqC+wGGU18/je94T+FperWIlr/caO1s8GtKqZie3aYVmfht3iHtbMB54XR9eG8ak+Y9Ag7aaTd6TUaNHvdxBa+1xkRXYE4dKuXRdR1i2MhFEON2WFL42NOg0MUUYJx0krdI2ltgrqGeRKYTPYswuVGg=
+	t=1736791108; cv=none; b=DTNRB/ttGt34fZadr44WQx5GJ060Sw/K5pr4T1XGcqaGkQ+91QTs3ipG2nQ8LsBLzuGwdGcbyLdoc0obMY1oeXlSg2t9jCGUQ4BdRCj3xpVq8Z0uB4BimxABG3EtrAVY9ELTp9wVk0Eam/KhzT0bpRTWRX9nC5Qb6goFmVnej/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736789461; c=relaxed/simple;
-	bh=CJDTD91NwB58SF9b13WK+duuxiRgu3sEyCBeb2I1DvU=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=WizX2u6eplaEaxoQKvKuN1WGK9YPBwBl2sapQY+bidqSfuKxrfzw66rkGJXZiZGvirGddVPvjMPlM5x+6i/q0bXGfnYXEDDtZOhuZgcnkZNwSwd1OVHkCJstnvDpyK+Sil1xsLgrgLSrEEs37wTeMl1twCMCE1BW43pyzZcGbIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BO/QF2TM; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50DE70oS020899;
-	Mon, 13 Jan 2025 17:30:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=tbllvC
-	fsBS60ycTEFMX3aBw/CjsDHL2pea8FntFTRlQ=; b=BO/QF2TMV5nKKv2CEy5ysY
-	DstV8MhApTEsvnJC87wSf87Ef3bLZ/7aadrXmdVnhfAuejwkCDNqETitC55N8GzJ
-	Ha4vdEbB4mioVOTlkhNjYMTmGD6SoBj0cSaEBIdUpt3T/EwtGOa1+HWsrqbyGVlo
-	2uQk0NwS8ruGUiTcGev/KUvkXVAC6u8jSXdr3Xgu5dhKujVi9dqkNPtJLPpRpF64
-	Bm7M9ODyx57zHv1anRqe4Dztjdj2oVzdBUJ9khHvkARFBq4STfI7hGjjBvzioHaO
-	i4Diluj+7ZZt4nyNsWTWqkwqPAfKzZkZn2hYbqelKCYzqLw1kL2aPCmreEpE/MwA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4454a58ysf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 17:30:53 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50DHTZZS010972;
-	Mon, 13 Jan 2025 17:30:53 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4454a58ysd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 17:30:53 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50DFqnJZ004540;
-	Mon, 13 Jan 2025 17:30:52 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4442ysfgn0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 17:30:52 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50DHUm6T55902584
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 13 Jan 2025 17:30:49 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E394D2004B;
-	Mon, 13 Jan 2025 17:30:48 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B559520040;
-	Mon, 13 Jan 2025 17:30:48 +0000 (GMT)
-Received: from darkmoore (unknown [9.171.41.227])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 13 Jan 2025 17:30:48 +0000 (GMT)
+	s=arc-20240116; t=1736791108; c=relaxed/simple;
+	bh=C4U6jDO5tq6E1mF/aBnMvfQnGQRHeO89RHzRkvIhJs4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YxmbeKxkH75FlP+whCSmTLvDEPxuTmBR7+BFhQl+sH25g4SrxrOUWlgp7Vrj/ovX2ZhhV1HacI0nNiO3t336THqN+GPA7Ruea2Ma8i97LLY0o51+wh6QC9+SP35EILTdxELh7uTM3F7BHzQFsTeR50JmPT12kMuZGIV6XUz/rvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=psvnlW4w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12333C4CED6;
+	Mon, 13 Jan 2025 17:58:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736791108;
+	bh=C4U6jDO5tq6E1mF/aBnMvfQnGQRHeO89RHzRkvIhJs4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=psvnlW4wafKLVUpZBhNf6LkVPQOrFv6SKqJM0kifmMX54rU4xub0H+UAf1xugSgmM
+	 moc6VjZ331Ircoli93W25Z8NosRTi9AbmDVjtUbn8IpTreweH93OkwH4lY3aTOPFMJ
+	 bz/tgzDFfnETQHbGpaYrQTkJRGOzkV8n2TWGPiwWKxXZGWLddZk1KH72egmd275I+7
+	 02c3/sDd0VfdinwVbal7Pbu33AfO2Yp5TcXkNp2RnKCeXQfi5DXuZc0kAoPCf6KO3L
+	 rE4n6tNNW/hFUrUtOlc8j3jebW9cEG+0NLmZRFl97Lj/g4up9g8GXP8V+8B8HwW9jW
+	 sUzQJW0KDIZCQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tXOhl-00Bj4p-S9;
+	Mon, 13 Jan 2025 17:58:25 +0000
+Date: Mon, 13 Jan 2025 17:58:25 +0000
+Message-ID: <86ikqiwq7y.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
+In-Reply-To: <Z4U03KRYy2DVEgJR@google.com>
+References: <20250111012450.1262638-1-seanjc@google.com>
+	<20250111012450.1262638-4-seanjc@google.com>
+	<87ikqlr4vo.wl-maz@kernel.org>
+	<Z4U03KRYy2DVEgJR@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 13 Jan 2025 18:30:43 +0100
-Message-Id: <D714H3L41ZMM.1R3UEQ00HD8XG@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Tao Su"
- <tao1.su@linux.intel.com>,
-        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "Christian Borntraeger" <borntraeger@de.ibm.com>,
-        "Xiaoyao Li"
- <xiaoyao.li@intel.com>
-To: "Sean Christopherson" <seanjc@google.com>,
-        "Paolo Bonzini"
- <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 0/5] KVM: kvm_set_memory_region() cleanups
-X-Mailer: aerc 0.18.2
-References: <20250111002022.1230573-1-seanjc@google.com>
-In-Reply-To: <20250111002022.1230573-1-seanjc@google.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fe0F3bi9aFx8-5ygAGQCLFHmzx0KE_dM
-X-Proofpoint-ORIG-GUID: PbwdJFwfjyjXZ29pYru1nrgEBE4ayf1i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- suspectscore=0 phishscore=0 mlxlogscore=827 spamscore=0 impostorscore=0
- clxscore=1011 lowpriorityscore=0 bulkscore=0 malwarescore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501130141
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat Jan 11, 2025 at 1:20 AM CET, Sean Christopherson wrote:
-> Cleanups related to kvm_set_memory_region(), salvaged from similar patche=
-s
-> that were flying around when we were sorting out KVM_SET_USER_MEMORY_REGI=
-ON2.
->
-> And, hopefully, the KVM-internal memslots hardening will also be useful f=
-or
-> s390's ucontrol stuff (https://lore.kernel.org/all/Z4FJNJ3UND8LSJZz@googl=
-e.com).
+On Mon, 13 Jan 2025 15:44:28 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Sat, Jan 11, 2025, Marc Zyngier wrote:
+> > On Sat, 11 Jan 2025 01:24:48 +0000,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> > > 
+> > > Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
+> > > that KVM_RUN needs to be re-executed prior to save/restore in order to
+> > > complete the instruction/operation that triggered the userspace exit.
+> > > 
+> > > KVM's current approach of adding notes in the Documentation is beyond
+> > > brittle, e.g. there is at least one known case where a KVM developer added
+> > > a new userspace exit type, and then that same developer forgot to handle
+> > > completion when adding userspace support.
+> > 
+> > Is this going to fix anything? If they couldn't be bothered to read
+> > the documentation, let alone update it, how is that going to be
+> > improved by extra rules and regulations?
+> > 
+> > I don't see how someone ignoring the documented behaviour of a given
+> > exit reason is, all of a sudden, have an epiphany and take a *new*
+> > flag into account.
+> 
+> The idea is to reduce the probability of introducing bugs, in KVM or userspace,
+> every time KVM attaches a completion callback.  Yes, userspace would need to be
+> updated to handle KVM_RUN_NEEDS_COMPLETION, but once that flag is merged, neither
+> KVM's documentation nor userspace would never need to be updated again.  And if
+> all architectures took an approach of handling completion via function callback,
+> I'm pretty sure we'd never need to manually update KVM itself either.
 
-Whole series:
-
-Acked-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+You are assuming that we need this completion, and I dispute this
+assertion.
 
 >
-> v2:
->  - Keep check_memory_region_flags() where it is. [Xiaoyao]
->  - Rework the changelog for the last patch to account for the change in
->    motiviation.
->  - Fix double spaces goofs. [Tao]
->  - Add a lockdep assertion in the x86 code, too. [Tao]
->
-> v1: https://lore.kernel.org/all/20240802205003.353672-1-seanjc@google.com
->
-> Sean Christopherson (5):
->   KVM: Open code kvm_set_memory_region() into its sole caller (ioctl()
->     API)
->   KVM: Assert slots_lock is held when setting memory regions
->   KVM: Add a dedicated API for setting KVM-internal memslots
->   KVM: x86: Drop double-underscores from __kvm_set_memory_region()
->   KVM: Disallow all flags for KVM-internal memslots
->
->  arch/x86/kvm/x86.c       |  7 ++++---
->  include/linux/kvm_host.h |  8 +++-----
->  virt/kvm/kvm_main.c      | 33 ++++++++++++++-------------------
->  3 files changed, 21 insertions(+), 27 deletions(-)
->
->
-> base-commit: 10b2c8a67c4b8ec15f9d07d177f63b563418e948
+> > > +7.37 KVM_CAP_NEEDS_COMPLETION
+> > > +-----------------------------
+> > > +
+> > > +:Architectures: all
+> > > +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+> > > +
+> > > +The presence of this capability indicates that KVM_RUN will set
+> > > +KVM_RUN_NEEDS_COMPLETION in kvm_run.flags if KVM requires userspace to re-enter
+> > > +the kernel KVM_RUN to complete the exit.
+> > > +
+> > > +For select exits, userspace must re-enter the kernel with KVM_RUN to complete
+> > > +the corresponding operation, only after which is guest state guaranteed to be
+> > > +consistent.  On such a KVM_RUN, the kernel side will first finish incomplete
+> > > +operations and then check for pending signals.
+> > > +
+> > > +The pending state of the operation for such exits is not preserved in state
+> > > +which is visible to userspace, thus userspace should ensure that the operation
+> > > +is completed before performing state save/restore, e.g. for live migration.
+> > > +Userspace can re-enter the guest with an unmasked signal pending or with the
+> > > +immediate_exit field set to complete pending operations without allowing any
+> > > +further instructions to be executed.
+> > > +
+> > > +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
+> > > +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
+> > > +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
+> > > +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
+> > 
+> > So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
+> > must be present for all of these exits, right? And from what I can
+> > tell, this capability is unconditionally advertised.
+> > 
+> > Yet, you don't amend arm64 to publish that flag. Not that I think this
+> > causes any issue (even if you save the state at that point without
+> > reentering the guest, it will be still be consistent), but that
+> > directly contradicts the documentation (isn't that ironic? ;-).
+> 
+> It does cause issues, I missed this code in kvm_arch_vcpu_ioctl_run():
+> 
+> 	if (run->exit_reason == KVM_EXIT_MMIO) {
+> 		ret = kvm_handle_mmio_return(vcpu);
+> 		if (ret <= 0)
+> 			return ret;
+> 	}
 
+That's satisfying a load from the guest forwarded to userspace. If the
+VMM did a save of the guest at this stage, restored and resumed it,
+*nothing* bad would happen, as PC still points to the instruction that
+got forwarded. You'll see the same load again.
+
+As for all arm64 synchronous exceptions, they are idempotent, and can
+be repeated as often as you want without side effects.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
