@@ -1,174 +1,171 @@
-Return-Path: <kvm+bounces-35311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85FFFA0BF6A
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 18:58:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 338FDA0BFB5
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 19:22:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 754C21884B4C
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 17:58:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45C391688D5
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 18:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E681AD3E5;
-	Mon, 13 Jan 2025 17:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04291C07ED;
+	Mon, 13 Jan 2025 18:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="psvnlW4w"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ad4fAZxT"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98DBB1BD9E5;
-	Mon, 13 Jan 2025 17:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC511953BB
+	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 18:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736791108; cv=none; b=DTNRB/ttGt34fZadr44WQx5GJ060Sw/K5pr4T1XGcqaGkQ+91QTs3ipG2nQ8LsBLzuGwdGcbyLdoc0obMY1oeXlSg2t9jCGUQ4BdRCj3xpVq8Z0uB4BimxABG3EtrAVY9ELTp9wVk0Eam/KhzT0bpRTWRX9nC5Qb6goFmVnej/c=
+	t=1736792547; cv=none; b=Ie9+11O45eI3HQwASEgh5c83W0Ub50MrmtOZ1KgGQ4CURaZLPhgG+6qZsyaqoWec/1Rdv0Jxv5umYkYPKOL2tJ9R10j9zzh2Wz/Cm5DSlOC3BprxzH7AdTP+QIF79KW0Z0rb10EeyeH66U9whE8vEWcnmj20dIGXmNEAD1/TvM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736791108; c=relaxed/simple;
-	bh=C4U6jDO5tq6E1mF/aBnMvfQnGQRHeO89RHzRkvIhJs4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YxmbeKxkH75FlP+whCSmTLvDEPxuTmBR7+BFhQl+sH25g4SrxrOUWlgp7Vrj/ovX2ZhhV1HacI0nNiO3t336THqN+GPA7Ruea2Ma8i97LLY0o51+wh6QC9+SP35EILTdxELh7uTM3F7BHzQFsTeR50JmPT12kMuZGIV6XUz/rvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=psvnlW4w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12333C4CED6;
-	Mon, 13 Jan 2025 17:58:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736791108;
-	bh=C4U6jDO5tq6E1mF/aBnMvfQnGQRHeO89RHzRkvIhJs4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=psvnlW4wafKLVUpZBhNf6LkVPQOrFv6SKqJM0kifmMX54rU4xub0H+UAf1xugSgmM
-	 moc6VjZ331Ircoli93W25Z8NosRTi9AbmDVjtUbn8IpTreweH93OkwH4lY3aTOPFMJ
-	 bz/tgzDFfnETQHbGpaYrQTkJRGOzkV8n2TWGPiwWKxXZGWLddZk1KH72egmd275I+7
-	 02c3/sDd0VfdinwVbal7Pbu33AfO2Yp5TcXkNp2RnKCeXQfi5DXuZc0kAoPCf6KO3L
-	 rE4n6tNNW/hFUrUtOlc8j3jebW9cEG+0NLmZRFl97Lj/g4up9g8GXP8V+8B8HwW9jW
-	 sUzQJW0KDIZCQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tXOhl-00Bj4p-S9;
-	Mon, 13 Jan 2025 17:58:25 +0000
-Date: Mon, 13 Jan 2025 17:58:25 +0000
-Message-ID: <86ikqiwq7y.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
-In-Reply-To: <Z4U03KRYy2DVEgJR@google.com>
-References: <20250111012450.1262638-1-seanjc@google.com>
-	<20250111012450.1262638-4-seanjc@google.com>
-	<87ikqlr4vo.wl-maz@kernel.org>
-	<Z4U03KRYy2DVEgJR@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1736792547; c=relaxed/simple;
+	bh=mlJpaoZU5IHPNxKBSiT3wFA46twmtC/vSL/aXDBzDtw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oTyjyRPEHHIWLTOrznWBLonXY7OVT9wRPvahCpejMmbCm428k3zOTAmX9jw+XGc2GWnc3AMmOX3jnCe9w2QnC15ihRe/jWeIFjowcYYx1a6b9haV9MNlW6pWP74b/pZgb2JetIxDNYHOtPFZNg8oj99Fd6AfwQV4WvnPK81/46c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ad4fAZxT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736792544;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kpQjFN8DHH3vTIh1N54T9tC0U6NEMf1EWuNsFTx1vug=;
+	b=ad4fAZxT4ez9PnhiG//uMMdDgHmTls54dI5RuJXEstgzGCSqlDD93JhbQnixA0XCnJcy11
+	Nbdv+YksLB0451St7IYZg/Y2k/hxvmtrIgSmvVmdwhMV9JGGJeG59/iMPVH6uI4OGYdwpw
+	WI1x58T3PfON4OdzFk1d26sr7ikxB+o=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-182-FadkyuGUMtWPFbDBxgZ7jA-1; Mon, 13 Jan 2025 13:22:22 -0500
+X-MC-Unique: FadkyuGUMtWPFbDBxgZ7jA-1
+X-Mimecast-MFC-AGG-ID: FadkyuGUMtWPFbDBxgZ7jA
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-84990d44b31so23545539f.3
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 10:22:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736792542; x=1737397342;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kpQjFN8DHH3vTIh1N54T9tC0U6NEMf1EWuNsFTx1vug=;
+        b=b4i5klcDZpJlqTvhsThOEu28XCA9UmBAf1xQ/GcFErujxU2mqSWNFUBDfqinqyrbPl
+         /5egniCLj+vKlkp6rT4IIaXiWehowS7uh6yTvBBjKE8EjQVTIVAycfSEtQGW/ZQD/9Nd
+         174qBNUwjG97Xhf0s0BPeTjOfIElJR72xqXGNQX9b+iu7+S/V0zSwzUJcyZ0ocYb5jx0
+         TMEgMNO0yCBmpA1rEbJtCjLoEhxF/VOWAiM8GLISSObX/TQRSORdFmu9ShmzLtp+KiZt
+         yQIrPbAx6MYvHc0GaGjZPViLPbUUoWXt/OiurxVgBvElBBoPxAH06ltsVtsiDHJOilUk
+         I8Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbmpQshIaawgNP0E0BrWNZEHsr/eHF/UNYGLpr3g+bo8h4ifC6SFGkoIj+7gXTMiz+BFk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJo39Faa2ba6+yQQmXwP3Fd67SmB+CnP5sBa4GWkjwFOMK0faO
+	WBNwaWxDt3F0Wi1qtJ53Ae/GAxImh6y+AY1FHtXgUcgNb8hV17jCSSd+6Dtm8hVbs2oUGIkBLLy
+	GvUN3ZJ611NgB5WYLG1dNFwttNxlMIPNCaZPHT1xYqd7xOXhtmQ==
+X-Gm-Gg: ASbGnct8Tenlpb2oRPACdTRtg2TZLL9MVevNT2wwitOyvB3Rk/0Nbd1WUC1U8UoWucu
+	ken3srmMoSFkk9nqaQ0QVny87MHCEcADCT+ZtbHGP+jSZ85D/loDq4E4v7XGq56DsBTn+8UyxP/
+	07OKu2/MkNgY5OnGKaDUlgpojUgIPCbcJWS35JXS2dQwmqU+EzFhfuv2gh1goPvfIVDUP2vZebF
+	aeL7fT81ABej9Px34oTfgExqXW8t2IpS2V+kUtuChuaWAXyTYh0OmzfBk2A
+X-Received: by 2002:a05:6e02:20cf:b0:3a7:bc95:bae5 with SMTP id e9e14a558f8ab-3ce3a8f4251mr43530185ab.5.1736792542236;
+        Mon, 13 Jan 2025 10:22:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGyH9wnFNqQ+n+mjGC8mmSv4B42nvMciCAmuDvhldkJxXrWuz7tfNZyGJ/5zifS7d05UYhzqg==
+X-Received: by 2002:a05:6e02:20cf:b0:3a7:bc95:bae5 with SMTP id e9e14a558f8ab-3ce3a8f4251mr43530095ab.5.1736792541940;
+        Mon, 13 Jan 2025 10:22:21 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea1b6143a6sm2834234173.60.2025.01.13.10.22.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 10:22:21 -0800 (PST)
+Date: Mon, 13 Jan 2025 13:22:08 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Mitchell Augustin <mitchell.augustin@canonical.com>
+Cc: linux-pci@vger.kernel.org, kvm@vger.kernel.org, Bjorn Helgaas
+ <bhelgaas@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: drivers/pci: (and/or KVM): Slow PCI initialization during VM
+ boot with passthrough of large BAR Nvidia GPUs on DGX H100
+Message-ID: <20250113132208.118f6bfc.alex.williamson@redhat.com>
+In-Reply-To: <CAHTA-uZtRzFOuo7vZCjoLF3_n0CCy3+0U0r_deB3jFF0cPivnw@mail.gmail.com>
+References: <CAHTA-uYp07FgM6T1OZQKqAdSA5JrZo0ReNEyZgQZub4mDRrV5w@mail.gmail.com>
+	<CAHTA-ubXiDePmfgTdPbg144tHmRZR8=2cNshcL5tMkoMXdyn_Q@mail.gmail.com>
+	<20241126154145.638dba46.alex.williamson@redhat.com>
+	<CAHTA-uZp-bk5HeE7uhsR1frtj9dU+HrXxFZTAVeAwFhPen87wA@mail.gmail.com>
+	<20241126170214.5717003f.alex.williamson@redhat.com>
+	<CAHTA-uY3pyDLH9-hy1RjOqrRR+OU=Ko6hJ4xWmMTyoLwHhgTOQ@mail.gmail.com>
+	<20241127102243.57cddb78.alex.williamson@redhat.com>
+	<CAHTA-uaGZkQ6rEMcRq6JiZn8v9nZPn80NyucuSTEXuPfy+0ccw@mail.gmail.com>
+	<20241203122023.21171712.alex.williamson@redhat.com>
+	<CAHTA-uZWGmoLr0R4L608xzvBAxnr7zQPMDbX0U4MTfN3BAsfTQ@mail.gmail.com>
+	<20241203150620.15431c5c.alex.williamson@redhat.com>
+	<CAHTA-uZD5_TAZQkxdJRt48T=aPNAKg+x1tgpadv8aDbX5f14vA@mail.gmail.com>
+	<20241203163045.3e068562.alex.williamson@redhat.com>
+	<CAHTA-ua5g2ygX_1T=YV7Nf1pRzO8TuqS==CCEpK51Gez9Q5woA@mail.gmail.com>
+	<CAHTA-uZtRzFOuo7vZCjoLF3_n0CCy3+0U0r_deB3jFF0cPivnw@mail.gmail.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
 
-On Mon, 13 Jan 2025 15:44:28 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+On Wed, 8 Jan 2025 17:06:18 -0600
+Mitchell Augustin <mitchell.augustin@canonical.com> wrote:
+
+> Hi Alex,
 > 
-> On Sat, Jan 11, 2025, Marc Zyngier wrote:
-> > On Sat, 11 Jan 2025 01:24:48 +0000,
-> > Sean Christopherson <seanjc@google.com> wrote:
-> > > 
-> > > Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
-> > > that KVM_RUN needs to be re-executed prior to save/restore in order to
-> > > complete the instruction/operation that triggered the userspace exit.
-> > > 
-> > > KVM's current approach of adding notes in the Documentation is beyond
-> > > brittle, e.g. there is at least one known case where a KVM developer added
-> > > a new userspace exit type, and then that same developer forgot to handle
-> > > completion when adding userspace support.
-> > 
-> > Is this going to fix anything? If they couldn't be bothered to read
-> > the documentation, let alone update it, how is that going to be
-> > improved by extra rules and regulations?
-> > 
-> > I don't see how someone ignoring the documented behaviour of a given
-> > exit reason is, all of a sudden, have an epiphany and take a *new*
-> > flag into account.
+> While waiting for
+> https://lore.kernel.org/all/20241218224258.2225210-1-mitchell.augustin@canonical.com/
+> to be reviewed, I was thinking more about the slowness of
+> pci_write_config_<size>() itself in my use case.
 > 
-> The idea is to reduce the probability of introducing bugs, in KVM or userspace,
-> every time KVM attaches a completion callback.  Yes, userspace would need to be
-> updated to handle KVM_RUN_NEEDS_COMPLETION, but once that flag is merged, neither
-> KVM's documentation nor userspace would never need to be updated again.  And if
-> all architectures took an approach of handling completion via function callback,
-> I'm pretty sure we'd never need to manually update KVM itself either.
-
-You are assuming that we need this completion, and I dispute this
-assertion.
-
->
-> > > +7.37 KVM_CAP_NEEDS_COMPLETION
-> > > +-----------------------------
-> > > +
-> > > +:Architectures: all
-> > > +:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
-> > > +
-> > > +The presence of this capability indicates that KVM_RUN will set
-> > > +KVM_RUN_NEEDS_COMPLETION in kvm_run.flags if KVM requires userspace to re-enter
-> > > +the kernel KVM_RUN to complete the exit.
-> > > +
-> > > +For select exits, userspace must re-enter the kernel with KVM_RUN to complete
-> > > +the corresponding operation, only after which is guest state guaranteed to be
-> > > +consistent.  On such a KVM_RUN, the kernel side will first finish incomplete
-> > > +operations and then check for pending signals.
-> > > +
-> > > +The pending state of the operation for such exits is not preserved in state
-> > > +which is visible to userspace, thus userspace should ensure that the operation
-> > > +is completed before performing state save/restore, e.g. for live migration.
-> > > +Userspace can re-enter the guest with an unmasked signal pending or with the
-> > > +immediate_exit field set to complete pending operations without allowing any
-> > > +further instructions to be executed.
-> > > +
-> > > +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
-> > > +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
-> > > +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
-> > > +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
-> > 
-> > So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
-> > must be present for all of these exits, right? And from what I can
-> > tell, this capability is unconditionally advertised.
-> > 
-> > Yet, you don't amend arm64 to publish that flag. Not that I think this
-> > causes any issue (even if you save the state at that point without
-> > reentering the guest, it will be still be consistent), but that
-> > directly contradicts the documentation (isn't that ironic? ;-).
+> You mentioned this earlier in the thread:
 > 
-> It does cause issues, I missed this code in kvm_arch_vcpu_ioctl_run():
+> > It doesn't take into account that toggling the command register bit is not a trivial operation in a virtualized environment.  
 > 
-> 	if (run->exit_reason == KVM_EXIT_MMIO) {
-> 		ret = kvm_handle_mmio_return(vcpu);
-> 		if (ret <= 0)
-> 			return ret;
-> 	}
+> The thing that I don't understand about this is why the speed for this
+> toggle (an individual pci_write_config_*() call) would be different
+> for one passed-through GPU than for another. On one of my other
+> machines with a different GPU, I didn't see any PCI config register
+> write slowness during boot with passthrough. Notably, that other GPU
+> does have much less VRAM (and is not an Nvidia GPU). While scaling
+> issues due to larger GPU memory space would make sense to me if the
+> slowdown was in some function whose number of operations was bound by
+> device memory, it is unclear to me if that is relevant here, since as
+> far as I can tell, no such relationship exists in pci_write_config_*()
+> itself since it is just writing a single value to a single
+> configuration register regardless of the underlying platform. (It
+> appears entirely atomic, and only bound by how long it takes to
+> acquire the lock around the register.)  All I can hypothesize is that
+> maybe that lock acquisition needs to wait for some
+> hardware-implemented operation whose runtime is bound by memory size,
+> but that is just my best guess.
+> 
+> Is there anything you can think of that is triggered by the
+> pci_write_config_*() alone that you think might cause device-dependent
+> behavior here, or is this likely something that I will just need to
+> raise with Nvidia?
 
-That's satisfying a load from the guest forwarded to userspace. If the
-VMM did a save of the guest at this stage, restored and resumed it,
-*nothing* bad would happen, as PC still points to the instruction that
-got forwarded. You'll see the same load again.
+The slowness is proportional to the size of the device MMIO address
+space.  In QEMU, follow the path of pci_default_write_config().  It's
+not simply the config space write, but the fact that the config space
+write needs to populate the device memory into the guest address space.
+On memory_region_transaction_commit() affected memory listeners are
+called, for vfio this is vfio_listener_region_add().  At this point the
+device MMIO space is being added to the system_memory address space.
+Without a vIOMMU, devices also operate in this same address space,
+therefore the MMIO regions of the device need to be DMA mapped through
+the IOMMU.  This is where I expect we have the bulk of the overhead as
+we iterate the pfnmaps and insert the IOMMU page tables.
 
-As for all arm64 synchronous exceptions, they are idempotent, and can
-be repeated as often as you want without side effects.
+Potentially the huge pfnmap support that we've introduced in v6.12 can
+help us here if we're faulting the mappings on PUD or PMD levels, then
+we should be able to insert the same size mappings into the IOMMU.  I'm
+hoping we can begin to make such optimizations now.  Thanks,
 
-	M.
+Alex
 
--- 
-Without deviation from the norm, progress is not possible.
 
