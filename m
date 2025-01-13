@@ -1,270 +1,199 @@
-Return-Path: <kvm+bounces-35277-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35278-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 399F7A0B38E
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 10:50:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4035AA0B398
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 10:52:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89B063ADDDD
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 09:45:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE6A162FC3
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 09:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51F322AE43;
-	Mon, 13 Jan 2025 09:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764A31FDA6C;
+	Mon, 13 Jan 2025 09:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VPMAMGEQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405F11FDA74;
-	Mon, 13 Jan 2025 09:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736761398; cv=none; b=DQs60LP4a5nu358u6DZVSVJ5zopLbvINV5Q+Vr3zvj/oYKyyOazCai8Tqofukmz+XzEBhf/qQnFLhiQzsgbSr+GNfWBl2hjMrwWrJaIvHnMPIcqm+CUdjGElZ7so+Id9Idtvtc6iKcOAZBOzakmSTHe4TfrOpL2P39rJopbKzH4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736761398; c=relaxed/simple;
-	bh=G96+eajjF5vjIsshb0b/rtXGvJo3YwFDKHT3mNWRyy8=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ofyDqdVNHpJyvxE0EI+LtqK2wTRlVsUdLJyHSccuVHU+DGoInBz/XNEdkcoA9FW4v8ouluADNShGpNe00kFgRoUg8OcB1atN4yQNhzAxMlbyrUbRacMNHXOu1br4F+wveOMnCVw2/PQ/wXm8d8nXIW6rpL9VV3b8kpO7/gvj5fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4YWnNX5KN5z1JHW8;
-	Mon, 13 Jan 2025 17:42:20 +0800 (CST)
-Received: from dggemv704-chm.china.huawei.com (unknown [10.3.19.47])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6AC3B140361;
-	Mon, 13 Jan 2025 17:43:11 +0800 (CST)
-Received: from kwepemn100017.china.huawei.com (7.202.194.122) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CC3235BF6;
+	Mon, 13 Jan 2025 09:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736761940; cv=fail; b=DscW6PvukOQLz2l1ifIE5EGdb7i+HeWOC3XPE82K1vSG4UjsuunVdveidiLM86eilpwktGfUhvPxGKHpUpEkhkMSjfB4VyDV58GBdJcgsPN86OyGckQiKxgk20YfnC9V48jB+CktoEghZccZBR8tZKwbe+p3pMUJB5LDygN8wmM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736761940; c=relaxed/simple;
+	bh=Qp+f3wRCgQSbuILWFkzkrkwvy5aTaGshw5JpMvPzjBI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jktO1bYamWIkwRz6K7Twt0atYzu26yDkuI1tITDodY/vT85qLNXzlt8jo9jY1MGQzQWb9gThHTA1HIgQTPylwUurjBJpI/wwUUfp6McB92HZ5FAgOlJe92qef3SobJAtiT+YbHIS4NmQM3EjekhlbciGXR5XiVS0r9wo44N65Ew=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VPMAMGEQ; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736761939; x=1768297939;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=Qp+f3wRCgQSbuILWFkzkrkwvy5aTaGshw5JpMvPzjBI=;
+  b=VPMAMGEQUr4OSngXNtAoJw+6ItosWMq0Ho1T12LF23ija0jAA9ELQPLP
+   iF3HQ62WZrmtrnYzkOpXJUnNy6BsYVPu+aHPTJ3ONQizNQiPUyKidLzY3
+   2MOdI40ZIiy/0wf6a3IphSVo3YO1XOAhmuz8fcAji9rQNUFyP+yxMP8Rf
+   8noqhm1MykPR1S2frZE2w24NemTUewb9EI0i+2lJcdoPx7DNcB2dX/a3W
+   B6PAjjLN6sjo4rda5mswD7xGw9yee0afu6mpIwIhMjptvnPdI3O9IRpWJ
+   bUjJojXk/mOismW9PurSeeQ1i/9w3K3o5iLLP9QMCvwo4ygkqtNm3WNK7
+   w==;
+X-CSE-ConnectionGUID: CiO6DiV8RvyulQ8B699JmA==
+X-CSE-MsgGUID: ypC9P4tTRvGTSHfandp0OA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11313"; a="24612390"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="24612390"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 01:52:17 -0800
+X-CSE-ConnectionGUID: L1OipkN9TNqOy1kdGhW5wA==
+X-CSE-MsgGUID: kEBR/crPTOiOe/SqRNVmBQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="104379176"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Jan 2025 01:52:17 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 13 Jan 2025 01:52:16 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Mon, 13 Jan 2025 01:52:16 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 13 Jan 2025 17:43:11 +0800
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemn100017.china.huawei.com (7.202.194.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 13 Jan 2025 17:43:10 +0800
-Subject: Re: [PATCH v2 1/5] hisi_acc_vfio_pci: fix XQE dma address error
-To: Alex Williamson <alex.williamson@redhat.com>, Shameerali Kolothum Thodi
-	<shameerali.kolothum.thodi@huawei.com>
-CC: "jgg@nvidia.com" <jgg@nvidia.com>, Jonathan Cameron
-	<jonathan.cameron@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-References: <20241219091800.41462-1-liulongfang@huawei.com>
- <20241219091800.41462-2-liulongfang@huawei.com>
- <099e0e1215f34d64a4ae698b90ee372c@huawei.com>
- <20250102153008.301730f3.alex.williamson@redhat.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <4d48db10-23e1-1bb4-54ea-4c659ab85f19@huawei.com>
-Date: Mon, 13 Jan 2025 17:43:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ 15.1.2507.44; Mon, 13 Jan 2025 01:52:16 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GAD3+ADQ1OUQf+P3sofnohfv4MfSuEhuKM8QPU9oRopZ6m9T/tXT24n7osh6XlkC0TIAweHX7yb49p+N7m/IEjiNnh002I/ctjHSuhUmXx/aiuTAp0crOBRNfecSls+sbuCo4Y+bx5yb8u4Vgg9amyJN4NvZlDFTzzG+77/JyKbbdyBdxjS9fmlc7c+K1CgIvvm6jzMDHRb8px65CwjNMpVBFprBfMk/bJZundw2HE0KYbTgvzbT7TWpyS7btvkH3Nm70Y7SBXrLOwZeRVQk/6Xk/AQ5zsgbNPaXhsFqWRZ3aThYCahPOGO3Wu6aUlHJynIRhiZKGck0iYq4MeaziQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Qp+f3wRCgQSbuILWFkzkrkwvy5aTaGshw5JpMvPzjBI=;
+ b=Uo5IXonvuElc33xpNS29s+9fv4tjgblKfZHc5ZE/Sruwkyqt2eG2MP6BbOY9t6cO0qmnlXskX0NEzzHp20SMO81Jf4PNkO36VGXpZUT9laN9LvEXV7z/cYt04FoaYwvSW//V5cGB60RboRA87fmVsJCFlVkMytLYWnhjDEC1Bu0g+BapD3tdzlpc9z7/N1XMUyWgflGkIRuHNiJCmj+3pSdQLpnk6bzEusEWJY4S2TBQcUaDPHaX7Fy74P9AVNKEnEWWGlPhxYDVxFBhuUT9OZ8ko0g1Uz2syD+VCYW0i4XMqdtpgl+vMQboZnV3CTBmYSjcqMYnNCmuaC7pMp03Vg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ CH0PR11MB8234.namprd11.prod.outlook.com (2603:10b6:610:190::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Mon, 13 Jan
+ 2025 09:52:14 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%4]) with mapi id 15.20.8335.017; Mon, 13 Jan 2025
+ 09:52:14 +0000
+Date: Mon, 13 Jan 2025 17:51:20 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Peter Xu <peterx@redhat.com>, Maxim Levitsky
+	<mlevitsk@redhat.com>
+Subject: Re: [PATCH 0/5] KVM: Dirty ring fixes and cleanups
+Message-ID: <Z4TiGLp/91vJjZh9@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20250111010409.1252942-1-seanjc@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250111010409.1252942-1-seanjc@google.com>
+X-ClientProxiedBy: SI2PR02CA0014.apcprd02.prod.outlook.com
+ (2603:1096:4:194::19) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250102153008.301730f3.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemn100017.china.huawei.com (7.202.194.122)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CH0PR11MB8234:EE_
+X-MS-Office365-Filtering-Correlation-Id: dbbddc94-6273-499f-4773-08dd33b7f4e6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?CgHqyoz2cIXFDH32PkZ0h4cq7lTL3ayuwSfNC5CYavh1hrycTi33s+/Y3dYL?=
+ =?us-ascii?Q?xHcu9bZOCJSNav8Cd2YQc8NbHe9aG+3KF2+mEvFKj7BXLeY23UWDsRqusKek?=
+ =?us-ascii?Q?3bPEQgykBhlxyhf8JSu/sT9USy6aAmbqpfXIegOqXyyjHzTmRGlbLtE7olSi?=
+ =?us-ascii?Q?CFugBVsoDPP9Afk6p+T5cfnOPLZNYyS4CSKQqaOTc9RQL351RqfElWHRkyhy?=
+ =?us-ascii?Q?Z7EQuYsIRX3wbZSBZLsuSu/vgRVVV2COPaykIlwPw4R3ZdumndJ5dWoYbEj8?=
+ =?us-ascii?Q?759my7dqTYC2bIMaaVg7X6xu6t4Vz+NE6yYI5/n2qSbhO+QOVGFmoYqg8p8k?=
+ =?us-ascii?Q?Utpr1AHW8vbGhPMqhSvEwB+sWNAE7P319A5ZNUD16BbXSrPnxhfXN3niWZaJ?=
+ =?us-ascii?Q?VGtNN+sHlcV4moCzwVvXxW8Je9ZKkwiAlxFwhkMYCG0gJ49v+9VV6u9JuRE/?=
+ =?us-ascii?Q?uCdfzEnCGTvH7UdAc/na+LLdWWXBnvx5TqMUb91OXRGkSxvZbndnEXl0Bv5N?=
+ =?us-ascii?Q?ML08u1N6PzItZiyIXNET2h5L8fEaFaXV8M++GhSPU1jnN4EEKauJANhp5kCP?=
+ =?us-ascii?Q?QDpV5PVF3DU8uzvvHcn41lS8ox0eghAtiho409Q5B9iUNYdBoC+zLg9RNn4Z?=
+ =?us-ascii?Q?CFCHMJG8wXy3hBy3I5V3P8rgr1zS18Q2lbB0hJV65VPTJMUGg3Mw4Toq2DE/?=
+ =?us-ascii?Q?U8e9drphfsh6mFIwGiSHFUrpKvmMQuq03cYzk5Jag+ABUEWOYNEzc+7wQYCV?=
+ =?us-ascii?Q?aoGghB4+UAXadKAwx5TT9oQ4AjKS8cW1L1aQQqCxvPX80RehrLKyTs3pkHII?=
+ =?us-ascii?Q?8+LDLkyTSFmfdy1MmEDChowAGnSPzS2uAR1nmBGKUHNGDBhAMMS9lcBV7V1j?=
+ =?us-ascii?Q?3YdFe+xmCEG6CW57v+ErSoq93a6Db5g5nn+jwXuArU8P0oNtQeFs585Kv1U4?=
+ =?us-ascii?Q?zS1vaL9uzT+8KbFp0PIrSF1l2FUovgAU3IN5GB6f3j5ssDobU+HtN1VflNiW?=
+ =?us-ascii?Q?v4rcQNsBKa2P2eINGUagY88dven5LdT6hTZ957zRCfDlGNDJM6eKliO9W9qe?=
+ =?us-ascii?Q?91dJQVAheDeOhPTVlkKKHmX39B6i28BFEakHiErt+v4gIt7V/4ZYMbCn0GOh?=
+ =?us-ascii?Q?Z/CSED8W21Bq81nR3mKVBG7JgqnWQiXgNS/DhbchPBTkf+qtSDy2Wkp8gyK8?=
+ =?us-ascii?Q?Hqf9uebBbaaPQAxR/F4Vz1oCqgm9DcEsf6GtBcqzbtzFWLwyzY/by1NdedrH?=
+ =?us-ascii?Q?qGFQkZh7T6gLxAK1x8LU+hRFkQkIUEgXDnC0R0BlB+pqX6SUkZp4Y5rAKsX6?=
+ =?us-ascii?Q?xQ+o4ShPDhf7k++nXQdYHa4ac9qdLKjzHKMMqpLObfi8silGRnXYn9pFOI6p?=
+ =?us-ascii?Q?XBILB41pqZBOhDGGICczJB2nvdEI91VqNw+pJDQYl4engYIkoQ=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?CQGhMuYrRvvGXKflw2B0rtsTm8FBUdtaqDLjD4Rz541n4JVu6eDVA2+GKoML?=
+ =?us-ascii?Q?uRIhsXAhGK99+qGbyTQ+3UYlZltaqET4JthiIfz0VHpDn56vf9Mt0R4AKr2C?=
+ =?us-ascii?Q?Qp+aJ3srDkVEjjqPb5Jumu0exVLE3LOHF5LgNuKzzuzO4/CtROQLXFNsonP1?=
+ =?us-ascii?Q?AYq4G80XtER6LAMyEOUPr89ieFl45BmzxP790ja4Ka6oQgswMyO2QY4/WGq7?=
+ =?us-ascii?Q?7Q0iC7DFNaGDbM5M8qv2FtVnqfKFzk3NAWZj4ZsSznZK1ZgM2l7e0kNy71uo?=
+ =?us-ascii?Q?IMchx9IqgFHZ3pD1wxNuYntWgDdzri6x4F7R5WP6KqDUFom6GvA/Xp5MZNai?=
+ =?us-ascii?Q?JEQnALb+GHgyvh319dMiz9XQtrjoJzBoJqQZ1Kdw/93CIZ03680p3gUZcwfK?=
+ =?us-ascii?Q?ORUXIuJjmsw7wm0Sr1Emd2VxRaso/1VdKJJ2WJ3hT0wv/uJ/CTV3mQFBUFRe?=
+ =?us-ascii?Q?uuP6DflVkmnr8jrnbCHsEOuFPIEmeMgt3crnDRnrohgSs01i7kiF1hOQPtuY?=
+ =?us-ascii?Q?+pKH4MbOi24tZtK7Pz85H/flONDMPVWXZ1qu9azZOmyHMfi+w25hSKehYFRz?=
+ =?us-ascii?Q?SwB5MRjLHQnX6T7oSAziujLIWllA0NC5hxLYojOwt+ZyaHzVRNLMXFPr4uPg?=
+ =?us-ascii?Q?vE5TpBTHyyHQAJy20GaGskYNnCzSHBn1Ib4C/qPHf7LeoHEF1E9tUwn75HQl?=
+ =?us-ascii?Q?4FaAsJ37BQHWSrzEVNjWhhSZ0vtbhueQaBE78FmIyLkmpimY+5A7PBVa4ldq?=
+ =?us-ascii?Q?+8lD3L9/UOJcjjdl0hrlsyu1gI64l/vVI9riXBoEwXm4kdmDTa6eUbQ5JPMx?=
+ =?us-ascii?Q?B66c6aRMTOEjb8sWNmzb+zGf29SIrqPD6DrsOjjdXwQ6E+LOPFr5gzthy7P7?=
+ =?us-ascii?Q?K+kpobvE3/6vWJMYNPlxSb2vHV4GlPD+1V8h98gTMSkKG/x3aotcbyAyb7Xw?=
+ =?us-ascii?Q?Fj5Ptv1bQNribznkb90kqyMQJ5BIxxNtSBZjiO4tbedJ0lDdXhl4Ntn1Q8rT?=
+ =?us-ascii?Q?RxBl3LYBDJe4Io8hddFhv+CrcZHLm1XopSRA2PRnWxMAAwjef8bfxpkK1Zy8?=
+ =?us-ascii?Q?P1plqJiOcT0se09dH9QE9GsO1D3n1135MrYWpvYUz6DjHEEODGLNsnRBRUqc?=
+ =?us-ascii?Q?OnLP02u3IP/Qfr8kF1AJ/mIAk4CEW0zhnOaO4LQZQgFjpQ/SAwQ0+5xBnd1n?=
+ =?us-ascii?Q?4/M2yaTyXLHOxJSC2wHWK9UPsUXlj+7HYgVbHOOeHgB2GY6nq3weuate3mc+?=
+ =?us-ascii?Q?tPFdUCliuhwp832GKo+LOVk0Nn8St5rOKZFxkNw/WNFOPewWA3YkeXGUBZOJ?=
+ =?us-ascii?Q?FdXccwJBQQcMxnahYgP4PGojGSQ10ToZlvahAdAlVcofq5RxLWCkxnm3qVQO?=
+ =?us-ascii?Q?SKtvaEzEymND+IRnHHhEGeKa5fLAXXfBjJuX7h9bNYDjxZ1oAvnXV3/1LXYy?=
+ =?us-ascii?Q?d5U7AtOEP4TwLpCbS+XHrx9oPufECsDVBx0tHwuu7SKlLaoPwAngu0d1fIa4?=
+ =?us-ascii?Q?A6eXlqHY+NJZo5Q4crLWCitOPQGRL2sSGFp916bKXS0Eu+rVRvIYSiv1XIoa?=
+ =?us-ascii?Q?XTyiAEhm3dUlC2QlbmVZpbtEk+zaTH10N5TIIDKQ?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dbbddc94-6273-499f-4773-08dd33b7f4e6
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2025 09:52:14.1602
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jBGf4inqJJJ4TCM9z+mrvTPEvZEMgE1HBBUdy6Qg/QBPtTI5NomCXCBvcBLZVrw8QJitAUuGYIO+wfWF+332fg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB8234
+X-OriginatorOrg: intel.com
 
-On 2025/1/3 6:30, Alex Williamson wrote:
-> On Thu, 19 Dec 2024 10:01:03 +0000
-> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
-> 
->>> -----Original Message-----
->>> From: liulongfang <liulongfang@huawei.com>
->>> Sent: Thursday, December 19, 2024 9:18 AM
->>> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
->>> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
->>> <jonathan.cameron@huawei.com>
->>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->>> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
->>> Subject: [PATCH v2 1/5] hisi_acc_vfio_pci: fix XQE dma address error
->>>
->>> The dma addresses of EQE and AEQE are wrong after migration and
->>> results in guest kernel-mode encryption services  failure.
->>> Comparing the definition of hardware registers, we found that
->>> there was an error when the data read from the register was
->>> combined into an address. Therefore, the address combination
->>> sequence needs to be corrected.
->>>
->>> Even after fixing the above problem, we still have an issue
->>> where the Guest from an old kernel can get migrated to
->>> new kernel and may result in wrong data.
->>>
->>> In order to ensure that the address is correct after migration,
->>> if an old magic number is detected, the dma address needs to be
->>> updated.
->>>
->>> Fixes:b0eed085903e("hisi_acc_vfio_pci: Add support for VFIO live
->>> migration")
->>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->>> ---
->>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 34 +++++++++++++++----
->>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  9 ++++-
->>>  2 files changed, 36 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->>> index 451c639299eb..8518efea3a52 100644
->>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->>> @@ -350,6 +350,27 @@ static int vf_qm_func_stop(struct hisi_qm *qm)
->>>  	return hisi_qm_mb(qm, QM_MB_CMD_PAUSE_QM, 0, 0, 0);
->>>  }
->>>
->>> +static int vf_qm_magic_check(struct acc_vf_data *vf_data)
->>> +{
->>> +	switch (vf_data->acc_magic) {
->>> +	case ACC_DEV_MAGIC_V2:
->>> +		break;
->>> +	case ACC_DEV_MAGIC_V1:
->>> +		/* Correct dma address */
->>> +		vf_data->eqe_dma = vf_data-  
->>>> qm_eqc_dw[QM_XQC_ADDR_HIGH];  
->>> +		vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
->>> +		vf_data->eqe_dma |= vf_data-  
->>>> qm_eqc_dw[QM_XQC_ADDR_LOW];  
->>> +		vf_data->aeqe_dma = vf_data-  
->>>> qm_aeqc_dw[QM_XQC_ADDR_HIGH];  
->>> +		vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
->>> +		vf_data->aeqe_dma |= vf_data-  
->>>> qm_aeqc_dw[QM_XQC_ADDR_LOW];  
->>> +		break;
->>> +	default:
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	return 0;
->>> +}
->>> +
->>>  static int vf_qm_check_match(struct hisi_acc_vf_core_device
->>> *hisi_acc_vdev,
->>>  			     struct hisi_acc_vf_migration_file *migf)
->>>  {
->>> @@ -363,7 +384,8 @@ static int vf_qm_check_match(struct
->>> hisi_acc_vf_core_device *hisi_acc_vdev,
->>>  	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev-  
->>>> match_done)  
->>>  		return 0;
->>>
->>> -	if (vf_data->acc_magic != ACC_DEV_MAGIC) {
->>> +	ret = vf_qm_magic_check(vf_data);
->>> +	if (ret) {
->>>  		dev_err(dev, "failed to match ACC_DEV_MAGIC\n");
->>>  		return -EINVAL;
->>>  	}
->>> @@ -418,7 +440,7 @@ static int vf_qm_get_match_data(struct
->>> hisi_acc_vf_core_device *hisi_acc_vdev,
->>>  	int vf_id = hisi_acc_vdev->vf_id;
->>>  	int ret;
->>>
->>> -	vf_data->acc_magic = ACC_DEV_MAGIC;
->>> +	vf_data->acc_magic = ACC_DEV_MAGIC_V2;
->>>  	/* Save device id */
->>>  	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
->>>
->>> @@ -496,12 +518,12 @@ static int vf_qm_read_data(struct hisi_qm
->>> *vf_qm, struct acc_vf_data *vf_data)
->>>  		return -EINVAL;
->>>
->>>  	/* Every reg is 32 bit, the dma address is 64 bit. */
->>> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
->>> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
->>>  	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
->>> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
->>> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
->>> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
->>> +	vf_data->aeqe_dma = vf_data-  
->>>> qm_aeqc_dw[QM_XQC_ADDR_HIGH];  
->>>  	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
->>> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
->>> +	vf_data->aeqe_dma |= vf_data-  
->>>> qm_aeqc_dw[QM_XQC_ADDR_LOW];  
->>>
->>>  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
->>>  	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
->>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->>> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->>> index 245d7537b2bc..2afce68f5a34 100644
->>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
->>> @@ -39,6 +39,9 @@
->>>  #define QM_REG_ADDR_OFFSET	0x0004
->>>
->>>  #define QM_XQC_ADDR_OFFSET	32U
->>> +#define QM_XQC_ADDR_LOW	0x1
->>> +#define QM_XQC_ADDR_HIGH	0x2
->>> +
->>>  #define QM_VF_AEQ_INT_MASK	0x0004
->>>  #define QM_VF_EQ_INT_MASK	0x000c
->>>  #define QM_IFC_INT_SOURCE_V	0x0020
->>> @@ -50,10 +53,14 @@
->>>  #define QM_EQC_DW0		0X8000
->>>  #define QM_AEQC_DW0		0X8020
->>>
->>> +enum acc_magic_num {
->>> +	ACC_DEV_MAGIC_V1 = 0XCDCDCDCDFEEDAACC,
->>> +	ACC_DEV_MAGIC_V2 = 0xAACCFEEDDECADEDE,  
->>
->>
->> I think we have discussed this before that having some kind of 
->> version info embed into magic_num will be beneficial going 
->> forward. ie, may be use the last 4 bytes for denoting version.
->>
->> ACC_DEV_MAGIC_V2 = 0xAACCFEEDDECA0002
->>
->> The reason being, otherwise we have to come up with a random
->> magic each time when a fix like this is required in future.
-> 
-> Overloading the magic value like this is a bit strange.  Typically
-> the magic value should be the cookie that identifies the data blob as
-> generated by this driver and a separate version field would identify
-> any content or format changes.  In the mtty driver I included a magic
-> field along with major and minor versions to provide this flexibility.
-> I wonder why we wouldn't do something similar here rather than create
-> this combination magic/version field.  It's easy enough to append a
-> couple fields onto the structure or redefine a v2 structure to use
-> going forward.  There's even a padding field in the structure already
-> that could be repurposed.
->
+On Fri, Jan 10, 2025 at 05:04:04PM -0800, Sean Christopherson wrote:
+> Yan's series to fix a flaw where a buggy/malicious userspace could coerce
+> KVM into corrupting TDX SPTEs
+> [*] https://lore.kernel.org/all/20241220082027.15851-1-yan.y.zhao@intel.com
 
-If we add the major and minor version numbers like mtty driver, the current
-data structure needs to be changed, and this change also needs to be compatible
-with the old and new versions.
-And the old version does not have this information. The new version cannot
-be adapted when it is imported.
+Hi Sean,
+Here's the v2
+https://lore.kernel.org/kvm/20241223070427.29583-1-yan.y.zhao@intel.com.
+FYI, in case you didn't catch it as it was sent close to Christmas :)
 
-Now in this patch to fix this problem, we only need to update a magic number,
-and then the problem is corrected. Migration between old and new versions can
-also be fixed:
-
-Old --> Old, wrong, but we can't stop it;
-Old --> New, corrected migrated incorrect data, recovery successful;
-New --> New, correct, recovery successful;
-New --> Old, correct, recovery successful.
-
-As for the compatibility issues between old and new versions in the future,
-we do not need to reserve version numbers to deal with them now. Because
-before encountering specific problems, our design may be redundant.
-
-Thanks.
-Longfang.
-
-> I see v3 went on to modify the v2 magic as described here, but there's
-> nothing to suggest the use of these latter bytes as anything other than
-> a slightly different random magic value.  Minimally the suggestion
-> should have resulted in 6-bytes of magic and 2-bytes of version (iiuc),
-> but there's no code to support that nor would I recommend that layout
-> versus the alternatives above.  Thanks,
-> 
-> Alex
-> 
-> 
-> .
-> 
+Thanks
+Yan
 
