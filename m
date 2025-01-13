@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-35332-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35333-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9A53A0C4A9
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 23:28:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FBA3A0C4AA
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 23:28:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5E1E7A358D
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 22:28:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEFFE1881711
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 22:28:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662E51FA14E;
-	Mon, 13 Jan 2025 22:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA7A1FA267;
+	Mon, 13 Jan 2025 22:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fq58RQRH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T13yTbse"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263941F9EB3
-	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 22:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2161F9F70
+	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 22:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736807267; cv=none; b=M6PmrZEDIW38yHrylTqiEueqxkk2iaffLAEgwbpDykiwrF+SmDrJC1isSrKuIb//uEWmO1lKeuxANxenn+RdUFWzcEv1TX+oJS5iOc/p3z6kmfF/tyHEMn11F6lvb4Wy4Q6cmRNRFNwIKKOSVPu9NjFDBtUcf+pYAFdWp+Tmo8E=
+	t=1736807269; cv=none; b=iDpXg0QjAcenKphlUikRzdBnfAsX5E2HftVXKKCobmfPw7X2pVVchr28wb462oSuFpYaMvfVtt1UegoqDuIfwGqUASILJiThnUGUIJSPEM/hgxvEnD+LBjfQX/rxDsf2+HRoKmwUQP626rVSbZBLqJzpAe1T6647NWJXujq0IR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736807267; c=relaxed/simple;
-	bh=zqLBBXrug8v32oNQce0fAdA/PWXxsTOVhZ1W2PAUujg=;
+	s=arc-20240116; t=1736807269; c=relaxed/simple;
+	bh=5GjPFjMPTzjbvv9jMn0Vu+JcFADgwPVyHZSXDMV12jA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hyhe16ZVJzsYHAbuQHWr4A9TtvH5VjHAz1aaRURuAr0npx4m5t1fLhVZfib+m2EoKZMwF5/aoUWH53IMhSO+/5RChbHrA8qEgq+1oemiiXdcB+p91s0Ix3qu1Y0/T4sAF5apKu21fT+47UMo8UKom7eZ8IpOTEniqEriYshGfq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fq58RQRH; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=DMJMULwR9D8LueCwj3Zsxv45YhhLQCYaWbgIQAsIkhLYymyCPWJHFSE7MlEhVPs7EPXsjIpI3n5uRN419B6DhPk/DZRkcAD06hE+G5qBC2qqmxQPGplwLlzWahfpzMBDS8kY9oV/CloeNE87tbI2pyKlbm8XbhOvzz4pas6EVY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T13yTbse; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f129f7717fso8690112a91.0
-        for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 14:27:45 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21661949f23so140517735ad.3
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 14:27:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736807265; x=1737412065; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736807267; x=1737412067; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=lOOaItQ8XjWrN4V+XnxPKIJp+wwpgWIYOMyymj/eGI4=;
-        b=fq58RQRHVE7B25bcyzIUnGkKtG6O8D3+vBcC0+PWEwNE1fBg/cmE48lOcTxLVSysD6
-         zS/PeK6zoPkY4WyXcuNqyXva+vlDRHVdHGAw7NzKZrG2o5oAgK5NJESfTJ+rzk2eQcUG
-         fhZ+eLw8PYdhfuSq0A/qn4M3nHVzA19Afwm+bY9StQNKtiTJpNQzheQJBPA0ETsuVCLX
-         6qS82tiHEN4C2hNqsERJWnQpm0v41ga+V+qFo8Ry8HA5vvV4/jETZayLjODvQGitXrhV
-         i1dTTc7pHcYeC00xwL2YevBxtqfdf+IH8dHsqKhHGE37ka7tcDy4aVexMkSmANtHjemQ
-         +VGA==
+        bh=39mnKX1L0qcb+XQar8pyjjef/DCqBo7Lr0CV2YNY9CI=;
+        b=T13yTbseqeQAH5KEPiugc/exWyyjEyGMweAohAw+s5JWB7yfjYpo9vUZIcEqbpKJKl
+         bcbfTbAAzipDmq1blXRBtSeYqAPIh671M7t7WBzQ3ourEkpQlmnHnychm7aXNqOvW4+z
+         fA5f9/nU0GQGhlAhU7j4tnEgqL/CbIIPgkNkEVooR7emBvR9wlY9X22gNaa7Zeg36nF4
+         +zBLLiVemGOQDNo0tWongkdcDVOAyes3OdnkF+yIYHT0cEj+RoQfBSU3lvVCL7oYd77J
+         9MpXjMcN8nsbHzrHY/Jw12mOUVsJ6yUi+Mr2hP70XAZZjOsGnlIztsZwG8zp/Ovz4R7k
+         T9lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736807265; x=1737412065;
+        d=1e100.net; s=20230601; t=1736807267; x=1737412067;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lOOaItQ8XjWrN4V+XnxPKIJp+wwpgWIYOMyymj/eGI4=;
-        b=mgrG95XowKrMVdwEO4vEhY0G4tnkT4rqka4zYsgv+mT5UXVzXbuh+q3HHdTZOMR8yQ
-         n/x3fx0Cz153Efo+VUR/DftSpxtwQpDoGpMId4AB3cwuDJ3hwZVgAnrd4ltKeMXtd0o8
-         fHKunt8LAVcypI/SrcoAPYmyGAzfM6dMXRnMIpEQTruzeXNlZCJ4vVt7Tu5Fg3HtXUQn
-         pSyeYSAaO5GmwzGQ56Ufh0X0OnKOlrNKyCIk7jj20yh7Wce8MR5IPzDQc7Uja6oOOW85
-         Q9v17QqAJcjXaZdSNdAr+USO8gNNYM9cgYyAW8Pp9HTy8rcZQf08vpDbfMOMLQxYpTU+
-         OY2A==
-X-Gm-Message-State: AOJu0YwQKDafsejJf+nYrzpgUz0r0kfB2djHS8pZ2Vru0vyd2ye09vTQ
-	xkQOspvq3PUwR3kc8tDmjVUKSC63DfHLVW7J2+ALQXR8LvRyeFbcEd6397FldckmAp24UUk4oR2
-	jgg==
-X-Google-Smtp-Source: AGHT+IE4SCIj0eT4MwfhXXuqwjQSQynoe//BaCPOdrBHH5GyAIKrqtS2BvL94oyZ9JQHJxJWpwkBjqq4Xkc=
-X-Received: from pfbcz13.prod.google.com ([2002:aa7:930d:0:b0:724:f17d:ebd7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:8cc3:b0:1d9:2b51:3ccd
- with SMTP id adf61e73a8af0-1e88cf7ba29mr37755024637.7.1736807265389; Mon, 13
- Jan 2025 14:27:45 -0800 (PST)
+        bh=39mnKX1L0qcb+XQar8pyjjef/DCqBo7Lr0CV2YNY9CI=;
+        b=GLxW8UUOlbMySX6ytA3e9gOwJxFx9BSc/Ujf4z3K6YF+0/O5vg1e1ziXwyMvTQsPg/
+         IHoxl61hDqIS4EQtPdEA26uZ4cnGDM53qqRbtVUDVD5ZXXhvvZgZlGXW3Jgdas9hdpEX
+         KRCE5TW7hDnGpm0DYxFdFaiwMPSSRM3dgebyY5FfrhhNyCoU7y+L0RhqLvhaitq0mXPC
+         YE2mgLujlKwfNGy93qY+e34EMc+F+GKBHc4qSJUSvB0ere8BySMTzv3FW4apyr/KMJPK
+         LCI8Y04g0Xyqh8XDNS5ib+HqBSKbZ4EzanB6PJxFutJ8sK+LC17FRK7FK2c1BzkfqgQL
+         59bQ==
+X-Gm-Message-State: AOJu0YwtEw9Vb1xkJ+agFUdgknKgkp84cEHGIzIB02jwQb+yA/H7IDu3
+	Z2UHTBoDmvlv/4nRhFIpG+xDCNdxXtOL6/3zye0wPFLrTY40HWb9p7cBr03KDxkkFZ+OblbSRcX
+	Ptg==
+X-Google-Smtp-Source: AGHT+IHpFJQ9BF+w23kswjBN8A1uwfUDYhkyBhOqmPuMktb7ZLvC/8lkvUR8KHuk272+C/dk8xx6cgvyp/g=
+X-Received: from plks12.prod.google.com ([2002:a17:903:2cc:b0:211:fb3b:763b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c941:b0:215:a179:14ca
+ with SMTP id d9443c01a7336-21a83f3eec9mr341082645ad.2.1736807267148; Mon, 13
+ Jan 2025 14:27:47 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 13 Jan 2025 14:27:37 -0800
+Date: Mon, 13 Jan 2025 14:27:38 -0800
 In-Reply-To: <20250113222740.1481934-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250113222740.1481934-1-seanjc@google.com>
 X-Mailer: git-send-email 2.47.1.688.g23fc6f90ad-goog
-Message-ID: <20250113222740.1481934-3-seanjc@google.com>
-Subject: [PATCH 2/5] KVM: selftests: Mark test_hv_cpuid_e2big() static in
+Message-ID: <20250113222740.1481934-4-seanjc@google.com>
+Subject: [PATCH 3/5] KVM: selftests: Explicitly free CPUID array at end of
  Hyper-V CPUID test
 From: Sean Christopherson <seanjc@google.com>
 To: Vitaly Kuznetsov <vkuznets@redhat.com>, Sean Christopherson <seanjc@google.com>, 
@@ -85,28 +85,28 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Dongjie Zou <zoudongjie@huawei.com>, stable@vger.kernel
 Content-Type: text/plain; charset="UTF-8"
 
-Make the Hyper-V CPUID test's local helper test_hv_cpuid_e2big() static,
-it's not used outside of the test (and isn't intended to be).
+Explicitly free the array of CPUID entries at the end of the Hyper-V CPUID
+test, mainly in anticipation of moving management of the array into the
+main test helper.
 
 Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-index 4f5881d4ef66..9a0fcc713350 100644
+index 9a0fcc713350..09f9874d7705 100644
 --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
 +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-@@ -111,7 +111,7 @@ static void test_hv_cpuid(const struct kvm_cpuid2 *hv_cpuid_entries,
- 	}
- }
+@@ -164,6 +164,7 @@ int main(int argc, char *argv[])
  
--void test_hv_cpuid_e2big(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-+static void test_hv_cpuid_e2big(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- {
- 	static struct kvm_cpuid2 cpuid = {.nent = 0};
- 	int ret;
+ 	hv_cpuid_entries = kvm_get_supported_hv_cpuid();
+ 	test_hv_cpuid(hv_cpuid_entries, kvm_cpu_has(X86_FEATURE_VMX));
++	free((void *)hv_cpuid_entries);
+ 
+ out:
+ 	kvm_vm_free(vm);
 -- 
 2.47.1.688.g23fc6f90ad-goog
 
