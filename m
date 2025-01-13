@@ -1,183 +1,189 @@
-Return-Path: <kvm+bounces-35317-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35318-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AE47A0C1AC
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 20:38:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1AEA0C1B6
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 20:44:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D26B1637F4
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 19:38:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1C811884271
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 19:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7B11CBE94;
-	Mon, 13 Jan 2025 19:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13DC1CBEAC;
+	Mon, 13 Jan 2025 19:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mYmJ9Ai9"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="HJeq8+KP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690961C549F;
-	Mon, 13 Jan 2025 19:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEEF1C760A
+	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 19:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736797092; cv=none; b=ep+6Jp/MvI3gSNjKnQZqKCFiwHh30Jw77z9WEHSdDU3Nrm7xhNCEDrW6Gm70mfRRfsgbG4lTK/uN+PNqcbjloIoT+stp9lpgcGHaZaoRziimKR2f6GYqM2JY3EqY91e14EwOyTiwr/ZORL8011QZiXQD4wfu6cnq6WifegkcnRU=
+	t=1736797427; cv=none; b=rbIwqhgaglHFEPrSV1krYnfCD+KjAf2C62IObR9Im/EgRkI5bC5DCl4FzkSXRsBI5EPnF2V1wRG/VHKYElElDVQ0ffnGzsczEhHrh4pt/M0upIDqAxz2KRBSir7pUnycpAk8uLS5aI+Uvh1jjMxn7LP1W0cvWt2s07mThA2mXSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736797092; c=relaxed/simple;
-	bh=yDf65y7+IH8PA/+JZhqUXTr3IxuryhUAx9rLn3yyULs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CJbrHFneCwtTf31XjWTqTyIirpJgeJJuR+quKQkJ0oJnJsoN9XIiK1TAZtULIEcfj7ve/hBbhMlNSBxwnfQIzTnHdPCSL04ln2VlZVVekdc2789/ESxRaBx+btidyELIlYznPnQPMTrsnNpcn8LilvAiNg1sRUCpS+EVTFQewkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYmJ9Ai9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA9AC4CEE1;
-	Mon, 13 Jan 2025 19:38:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736797092;
-	bh=yDf65y7+IH8PA/+JZhqUXTr3IxuryhUAx9rLn3yyULs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mYmJ9Ai9JhKhbnL/24T8j29IHGHpFxP7mY+XRsEHVBJu++4+QAEE05xDeaQ0loZUH
-	 uI9f//3bbpxPTDmCqxr8uK1bsOeR84DIBfnfN314ou1gekXcm4sWwtM8IoL1N9owcO
-	 uYNOxhB4CMZQndJw7LPUNF3sjdk3UrS69dt9otVHmnzFz66RM27r5QwFGcDyVkSFe5
-	 qfh4TD/mPUmFZ3N1TK4/VhH3sEE84uIZjQv4/qGrhfUtTD6xplhEQJi2rG2n4E+wu6
-	 4bmcAAje2IIvRAwPdYo90ZHDMB1+pS1ASzL73O2f2C+D4HdK0TjfHizjClScKO7qfz
-	 257t6nkLTBD/w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tXQGH-00Bltd-Ms;
-	Mon, 13 Jan 2025 19:38:09 +0000
-Date: Mon, 13 Jan 2025 19:38:08 +0000
-Message-ID: <87bjwaqzbz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
-In-Reply-To: <Z4ViZb7rruRiN-Oe@google.com>
-References: <20250111012450.1262638-1-seanjc@google.com>
-	<20250111012450.1262638-4-seanjc@google.com>
-	<87ikqlr4vo.wl-maz@kernel.org>
-	<Z4U03KRYy2DVEgJR@google.com>
-	<86ikqiwq7y.wl-maz@kernel.org>
-	<Z4ViZb7rruRiN-Oe@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1736797427; c=relaxed/simple;
+	bh=4QHDz4LbVcPnlso4eZvPexhd6g11M8rbT2XBHj4Dbzo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZBnPIbj2HYOfJziRNs4mXzLoEKHtTytkeaKmtRAQLJolFbR/Y+7lOPWGF9sRmvZyrbKKyola9CCzrtTzBhPL4EoJwGRbFAiFQ+Wa9lPECE/5KvaZwoY8Vo5A/ADdQLOErNkWiWL+E36SOnm1X2N713sUCOEGPbQSneOjfRKOrNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=HJeq8+KP; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com [209.85.218.69])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6ADA23F290
+	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 19:43:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1736797423;
+	bh=Qnf0uzWqaurO828FH0JnZK208/uAn6s6rmFWWeOsbs4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=HJeq8+KPYNlWmreq2gCHvcoerAXaad3ShE0dqGj92OmTypwcFQdrg3DFtkGTIvoT7
+	 EmjucsFkl+jQVtkbmb94PhvGfpypLrGChy7fbLAEfgZADPx2045FYGNlvJLW3sL8q1
+	 /+h84pQcrKh32t95pnKdjDENs/XyeXI///cmu8mTBbLnpPMAiOSvrwp3YDfWgR6/4q
+	 lqHxQ9aNF+5uDymoz7G74K7r8tjxgKl81UdEF1xlE0Xx8TXcCfqlqf1D3uOVvDNQJY
+	 Kv9WsHmU9h6p6YabUbCWK2Q49EpBnqJEJ6hEx23Oag3Xslb96TyGfDKIWIQtSWPRL6
+	 UwyCTqcg6/15w==
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-aab954d1116so475728066b.3
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 11:43:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736797422; x=1737402222;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qnf0uzWqaurO828FH0JnZK208/uAn6s6rmFWWeOsbs4=;
+        b=LqzfVslwS6XJph0qi2HFLsBMKhS6MqxXTbZ3xRZB8/d99is8Lg4Grr6loWZ9/IF7+n
+         XeQZUD4mh8dkfsa94JxOcMpPpIA5ovEwwg0MNW+nvyeHzg8dKWYXIFqKxYJzrQL/RZaR
+         RRoLB7X+TH67Or2hWFoZhZivD68Qr1yIFnJriSHHIFiMRwrvl/MIi8SFR/K+Fd466kuA
+         KPiEZjSoKstHKgZwvFydkaxWTD/IVDZFREPWXbuFaDDYWQ9obNx0srwuxE3p9LzAgj5D
+         d5CzDBz0ptcXlq+9KFNr1tNNLhoe/KMPiVXYSiK2dleHI00Tc4FutdjraNgJivMmF7ie
+         +GpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUFP56O4z1luBZXSX2RU/0FxUp4ZJAteKNAAI/zqIqbqy88JXtiS2WlMnhTHG2jwjk6cnQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBpiZw2mAKkeTySYSsKHHZqCM+Sa7EXDy/ZxT5iQFNVCGgnBRa
+	2GSS3miRZoH42Uq1nlk4FusPyefSNbP54/dWxUlapFD5DRF4UXjwrzCLuyEhfM06gAi3gZ+dZmA
+	L2QD8qrsyJTttxee+dR2WjpHpHXn/K0zj0zTLvl4ykQdwGCnzrggUnyv90z38dbXOTXuSUFwO4o
+	hRlIpspFAGuP7Sq41Hb9fB8zRWijKR8DgaN0zZHVb3R9Oc7e7MgQM=
+X-Gm-Gg: ASbGnctsuZXUVEufyoIAZ3KO7wENjCVFR+/4lkQiqQKr4vJntKlqs9pVpBmU8AOzyPp
+	vG41csVdnzV0lukFmb5c9hzm6chTKiZiEiMaz
+X-Received: by 2002:a17:907:60cf:b0:aa6:88f5:5fef with SMTP id a640c23a62f3a-ab2ab6fb426mr2108877966b.32.1736797422030;
+        Mon, 13 Jan 2025 11:43:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEzZdqFVuQvvGC9yfqHnNpnNoqq95zsu4wvYDPNf8aL9YmAGjJAZ0Yrz7R4wl+cXR/dfhBldb7sqRyvajlCFfQ=
+X-Received: by 2002:a17:907:60cf:b0:aa6:88f5:5fef with SMTP id
+ a640c23a62f3a-ab2ab6fb426mr2108875566b.32.1736797421688; Mon, 13 Jan 2025
+ 11:43:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <CAHTA-uYp07FgM6T1OZQKqAdSA5JrZo0ReNEyZgQZub4mDRrV5w@mail.gmail.com>
+ <CAHTA-ubXiDePmfgTdPbg144tHmRZR8=2cNshcL5tMkoMXdyn_Q@mail.gmail.com>
+ <20241126154145.638dba46.alex.williamson@redhat.com> <CAHTA-uZp-bk5HeE7uhsR1frtj9dU+HrXxFZTAVeAwFhPen87wA@mail.gmail.com>
+ <20241126170214.5717003f.alex.williamson@redhat.com> <CAHTA-uY3pyDLH9-hy1RjOqrRR+OU=Ko6hJ4xWmMTyoLwHhgTOQ@mail.gmail.com>
+ <20241127102243.57cddb78.alex.williamson@redhat.com> <CAHTA-uaGZkQ6rEMcRq6JiZn8v9nZPn80NyucuSTEXuPfy+0ccw@mail.gmail.com>
+ <20241203122023.21171712.alex.williamson@redhat.com> <CAHTA-uZWGmoLr0R4L608xzvBAxnr7zQPMDbX0U4MTfN3BAsfTQ@mail.gmail.com>
+ <20241203150620.15431c5c.alex.williamson@redhat.com> <CAHTA-uZD5_TAZQkxdJRt48T=aPNAKg+x1tgpadv8aDbX5f14vA@mail.gmail.com>
+ <20241203163045.3e068562.alex.williamson@redhat.com> <CAHTA-ua5g2ygX_1T=YV7Nf1pRzO8TuqS==CCEpK51Gez9Q5woA@mail.gmail.com>
+ <CAHTA-uZtRzFOuo7vZCjoLF3_n0CCy3+0U0r_deB3jFF0cPivnw@mail.gmail.com> <20250113132208.118f6bfc.alex.williamson@redhat.com>
+In-Reply-To: <20250113132208.118f6bfc.alex.williamson@redhat.com>
+From: Mitchell Augustin <mitchell.augustin@canonical.com>
+Date: Mon, 13 Jan 2025 13:43:30 -0600
+X-Gm-Features: AbW1kvYyxz3GCL0ZZfK5RteHXqQJ-aJea3V5LhXpZsOy5LsNGZt3fXCnT3IxAW0
+Message-ID: <CAHTA-uYDffh1GkPsi-UQcMV4qskN2aT+PhqNENWpUUspPB7uaw@mail.gmail.com>
+Subject: Re: drivers/pci: (and/or KVM): Slow PCI initialization during VM boot
+ with passthrough of large BAR Nvidia GPUs on DGX H100
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-pci@vger.kernel.org, kvm@vger.kernel.org, 
+	Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 13 Jan 2025 18:58:45 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Mon, Jan 13, 2025, Marc Zyngier wrote:
-> > On Mon, 13 Jan 2025 15:44:28 +0000,
-> > Sean Christopherson <seanjc@google.com> wrote:
-> > > 
-> > > On Sat, Jan 11, 2025, Marc Zyngier wrote:
-> > > > On Sat, 11 Jan 2025 01:24:48 +0000,
-> > > > Sean Christopherson <seanjc@google.com> wrote:
-> > > > > 
-> > > > > Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
-> > > > > that KVM_RUN needs to be re-executed prior to save/restore in order to
-> > > > > complete the instruction/operation that triggered the userspace exit.
-> > > > > 
-> > > > > KVM's current approach of adding notes in the Documentation is beyond
-> > > > > brittle, e.g. there is at least one known case where a KVM developer added
-> > > > > a new userspace exit type, and then that same developer forgot to handle
-> > > > > completion when adding userspace support.
-> > > > 
-> > > > Is this going to fix anything? If they couldn't be bothered to read
-> > > > the documentation, let alone update it, how is that going to be
-> > > > improved by extra rules and regulations?
-> > > > 
-> > > > I don't see how someone ignoring the documented behaviour of a given
-> > > > exit reason is, all of a sudden, have an epiphany and take a *new*
-> > > > flag into account.
-> > > 
-> > > The idea is to reduce the probability of introducing bugs, in KVM or userspace,
-> > > every time KVM attaches a completion callback.  Yes, userspace would need to be
-> > > updated to handle KVM_RUN_NEEDS_COMPLETION, but once that flag is merged, neither
-> > > KVM's documentation nor userspace would never need to be updated again.  And if
-> > > all architectures took an approach of handling completion via function callback,
-> > > I'm pretty sure we'd never need to manually update KVM itself either.
-> > 
-> > You are assuming that we need this completion, and I dispute this
-> > assertion.
-> 
-> Ah, gotcha.
-> 
-> > > > > +The pending state of the operation for such exits is not preserved in state
-> > > > > +which is visible to userspace, thus userspace should ensure that the operation
-> > > > > +is completed before performing state save/restore, e.g. for live migration.
-> > > > > +Userspace can re-enter the guest with an unmasked signal pending or with the
-> > > > > +immediate_exit field set to complete pending operations without allowing any
-> > > > > +further instructions to be executed.
-> > > > > +
-> > > > > +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
-> > > > > +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
-> > > > > +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
-> > > > > +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
-> > > > 
-> > > > So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
-> > > > must be present for all of these exits, right? And from what I can
-> > > > tell, this capability is unconditionally advertised.
-> > > > 
-> > > > Yet, you don't amend arm64 to publish that flag. Not that I think this
-> > > > causes any issue (even if you save the state at that point without
-> > > > reentering the guest, it will be still be consistent), but that
-> > > > directly contradicts the documentation (isn't that ironic? ;-).
-> > > 
-> > > It does cause issues, I missed this code in kvm_arch_vcpu_ioctl_run():
-> > > 
-> > > 	if (run->exit_reason == KVM_EXIT_MMIO) {
-> > > 		ret = kvm_handle_mmio_return(vcpu);
-> > > 		if (ret <= 0)
-> > > 			return ret;
-> > > 	}
-> > 
-> > That's satisfying a load from the guest forwarded to userspace.
-> 
-> And MMIO stores, no?  I.e. PC needs to be incremented on stores as well.
+Thank you Alex, that makes more sense now.
 
-Yes, *after* the store as completed. If you replay the instruction,
-the same store comes out.
+> Potentially the huge pfnmap support that we've introduced in v6.12 can he=
+lp us here if we're faulting the mappings on PUD or PMD levels, then we sho=
+uld be able to insert the same size mappings into the IOMMU.  I'm hoping we=
+ can begin to make such optimizations now.
 
+On November 26th, I did try my reproducer out with the 6.12 kernel in
+my guest and host with qemu-9.2.0-rc1, and I did not see any
+improvement in the PCI init time when my devices were attached during
+boot. Just to make sure I understand, are you saying that there are
+still some steps yet to be implemented before the huge pfnmap support
+would show gains with respect to this issue, or should I have
+theoretically seen that improvement with my prior test?
+
+-Mitchell
+
+On Mon, Jan 13, 2025 at 12:22=E2=80=AFPM Alex Williamson
+<alex.williamson@redhat.com> wrote:
 >
-> > If the VMM did a save of the guest at this stage, restored and resumed it,
-> > *nothing* bad would happen, as PC still points to the instruction that got
-> > forwarded. You'll see the same load again.
-> 
-> But replaying an MMIO store could cause all kinds of problems, and even MMIO
-> loads could theoretically be problematic, e.g. if there are side effects in the
-> device that trigger on access to a device register.
+> On Wed, 8 Jan 2025 17:06:18 -0600
+> Mitchell Augustin <mitchell.augustin@canonical.com> wrote:
+>
+> > Hi Alex,
+> >
+> > While waiting for
+> > https://lore.kernel.org/all/20241218224258.2225210-1-mitchell.augustin@=
+canonical.com/
+> > to be reviewed, I was thinking more about the slowness of
+> > pci_write_config_<size>() itself in my use case.
+> >
+> > You mentioned this earlier in the thread:
+> >
+> > > It doesn't take into account that toggling the command register bit i=
+s not a trivial operation in a virtualized environment.
+> >
+> > The thing that I don't understand about this is why the speed for this
+> > toggle (an individual pci_write_config_*() call) would be different
+> > for one passed-through GPU than for another. On one of my other
+> > machines with a different GPU, I didn't see any PCI config register
+> > write slowness during boot with passthrough. Notably, that other GPU
+> > does have much less VRAM (and is not an Nvidia GPU). While scaling
+> > issues due to larger GPU memory space would make sense to me if the
+> > slowdown was in some function whose number of operations was bound by
+> > device memory, it is unclear to me if that is relevant here, since as
+> > far as I can tell, no such relationship exists in pci_write_config_*()
+> > itself since it is just writing a single value to a single
+> > configuration register regardless of the underlying platform. (It
+> > appears entirely atomic, and only bound by how long it takes to
+> > acquire the lock around the register.)  All I can hypothesize is that
+> > maybe that lock acquisition needs to wait for some
+> > hardware-implemented operation whose runtime is bound by memory size,
+> > but that is just my best guess.
+> >
+> > Is there anything you can think of that is triggered by the
+> > pci_write_config_*() alone that you think might cause device-dependent
+> > behavior here, or is this likely something that I will just need to
+> > raise with Nvidia?
+>
+> The slowness is proportional to the size of the device MMIO address
+> space.  In QEMU, follow the path of pci_default_write_config().  It's
+> not simply the config space write, but the fact that the config space
+> write needs to populate the device memory into the guest address space.
+> On memory_region_transaction_commit() affected memory listeners are
+> called, for vfio this is vfio_listener_region_add().  At this point the
+> device MMIO space is being added to the system_memory address space.
+> Without a vIOMMU, devices also operate in this same address space,
+> therefore the MMIO regions of the device need to be DMA mapped through
+> the IOMMU.  This is where I expect we have the bulk of the overhead as
+> we iterate the pfnmaps and insert the IOMMU page tables.
+>
+> Potentially the huge pfnmap support that we've introduced in v6.12 can
+> help us here if we're faulting the mappings on PUD or PMD levels, then
+> we should be able to insert the same size mappings into the IOMMU.  I'm
+> hoping we can begin to make such optimizations now.  Thanks,
+>
+> Alex
+>
 
-But that's the VMM's problem. If it has modified its own state and
-doesn't return to the guest to complete the instruction, that's just
-as bad as a load, which *do* have side effects as well.
 
-Overall, the guest state exposed by KVM is always correct, and
-replaying the instruction is not going to change that. It is if the
-VMM is broken that things turn ugly *for the VMM itself*, and I claim
-that no amount of flag being added is going to help that.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--=20
+Mitchell Augustin
+Software Engineer - Ubuntu Partner Engineering
 
