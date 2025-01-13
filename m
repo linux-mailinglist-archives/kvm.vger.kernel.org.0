@@ -1,181 +1,186 @@
-Return-Path: <kvm+bounces-35303-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35304-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9008AA0BDD1
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 17:41:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C30EA0BDF3
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 17:48:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D7021888F86
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 16:41:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B3F3164043
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 16:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC4520F08C;
-	Mon, 13 Jan 2025 16:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C112229804;
+	Mon, 13 Jan 2025 16:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ju1yMqRo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OjiyP7dw"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061.outbound.protection.outlook.com [40.107.244.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6D51FBBEA;
-	Mon, 13 Jan 2025 16:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736786445; cv=fail; b=IUfgZlGMbijveRyvXNoMyTwx8xD07Ca9p5VkLSj0tFS0gW1iNR8nzgVO9/WW/+gao37zfkZVjoRJsKHc+6xWfDeS81kfI2FQ7HckKH5aQtQwAaens0UCeX5OO4A3RF/VkIKkIKbUHIRLx4yY6R3sDc2bK17ERiNmGAJSm3ueKK4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736786445; c=relaxed/simple;
-	bh=QnKlBB4pWTLJhy4Pr3OmmpwTGLhoORaF4yly6b8dUvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=bNh+y/CQBy2Jj6jAa55TiLaODPgp5bP4xSG/jJRCRx8oTM6MAqm1P76G8kb8bbc2yVxAG9Pa3+0jWvknzAGPDVksubLwYWPwVff0I3sNlKE86BACL7IgWA7M8RLKeKqgd23NTzvRdO4sOeAPAFyDEByg2Pf9G9WjTaojMTAFwAM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ju1yMqRo; arc=fail smtp.client-ip=40.107.244.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TNObtvM5/NMvHxiHbtfcNYDVVhNfBLiJBYRc9iICRKPiCB8gSrar8Il+5rMygLwByda/zF0e+ya7U76m/fwALoZILmcmJkP3eBUfPJ9RnU9/tp4S8/pjPwdSg6lRSPu8e0VSILlHE3QYxstiXTYKmok3PipX5YzsyvExKHztjX7uA13GXz1zl05Qe48CCSJ1ZZDI97nOFu2I/6YORDW5WVF7h6vV/mTmphuqgsZvYr0AJiqJSPnMjCVeGKeZ/xPEYf0enacYXosn7QI6axE9XpgGOOjL7UAyFbt4FT5OM4ulRf8vSsfscrVkdLml3PqYWNATpHVA4L4YrgqfqYCHUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QnKlBB4pWTLJhy4Pr3OmmpwTGLhoORaF4yly6b8dUvE=;
- b=JDNAyf7tRT5CEQ1pMjNpsOmEQkOrdJRLyrTq8Ik7gs5EY89TNq7ihnXPZ97F0GwtV6vk7zY1p1uJOFYs8ZCUXiWhDINqEiAq7Fyf1v75cOtXExwGDCcdJCn6tVkda4HlP4AoJYCXua515HqdMaHiVTqWOuoPtOJqcEKIQm8NgHgZsF9Bu+GxOWekledijxas0IuLk+xVXu0K454tPDKybayHDjM8m/tkzsDcHBtpHQlqNNrYKBptAMHi8QsSRo1k+ex1zpgjxFd1+C5qVVa+YatF05kG/NGfNfg4PNDSRa/nYz7Xu7CA9Oeek9MHGn9AtzAipylE8fb2xqIUGEyLdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QnKlBB4pWTLJhy4Pr3OmmpwTGLhoORaF4yly6b8dUvE=;
- b=ju1yMqRoOuDkglKXbBQYO/dq7GWUCSoSuDIeALnIbUOMRLkvpIzkk77XdVjJyeJnQAqCaZFSKSF0FuCKE4zjg5HmRVh7iZK/7ovQmIUWbaqE6TSAOZUBgikCXKgKNmwmm/XsSlclrEYPrMs71wh4OyHmRGYPSty0Tcd9fffKHeBTX7zyDcz6918wut5xlSPAyJvqS8Psp0MTsecGd9SXkFM2fKVlgdz38EyZbQX9LOkCxTDqIo6dueC/V0edyVHfpyJmx96A3E7p+TA5numPe0jD6qZlAbrfuRftT53Lms4W6Dt8Qne7OjYwRLv4COf8/k+fLZYbVY+UNcHsh8aIgg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DM4PR12MB6495.namprd12.prod.outlook.com (2603:10b6:8:bc::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Mon, 13 Jan
- 2025 16:40:39 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8314.022; Mon, 13 Jan 2025
- 16:40:39 +0000
-Date: Mon, 13 Jan 2025 12:40:37 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Nicolin Chen <nicolinc@nvidia.com>
-Cc: will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com,
-	tglx@linutronix.de, maz@kernel.org, alex.williamson@redhat.com,
-	joro@8bytes.org, shuah@kernel.org, reinette.chatre@intel.com,
-	eric.auger@redhat.com, yebin10@huawei.com, apatel@ventanamicro.com,
-	shivamurthy.shastri@linutronix.de, bhelgaas@google.com,
-	anna-maria@linutronix.de, yury.norov@gmail.com, nipun.gupta@amd.com,
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, patches@lists.linux.dev,
-	jean-philippe@linaro.org, mdf@kernel.org, mshavit@google.com,
-	shameerali.kolothum.thodi@huawei.com, smostafa@google.com,
-	ddutile@redhat.com
-Subject: Re: [PATCH RFCv2 08/13] iommu: Turn iova_cookie to dma-iommu private
- pointer
-Message-ID: <20250113164037.GO5556@nvidia.com>
-References: <cover.1736550979.git.nicolinc@nvidia.com>
- <42c6ff3090636146a86501528eb03df99f83381c.1736550979.git.nicolinc@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42c6ff3090636146a86501528eb03df99f83381c.1736550979.git.nicolinc@nvidia.com>
-X-ClientProxiedBy: BL1PR13CA0253.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::18) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0322297E1
+	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 16:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736786912; cv=none; b=geROdQUSpzOG2jLLpBMwCnxQqB24a5RJDNIwjWdxenL5M/aKyed7KdLNxEvIVE63SAJIzanZwqs0qxkez0qL4v4pKAdNwNFN9VeO4u+G1wbftpBZmpKSV/51StUCgkrO0py13oajLcWwrWKhWWVBvhbWTK9c2b1PtRPvOX/+okc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736786912; c=relaxed/simple;
+	bh=AqUEg4jPd3gdc0ZrKxbCPxP508slXmBYza21VJEGWmM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=o3Dz1Wn5/VGwc1qrZ6LWwxcRwV/DmvSvuirGzusGNZyI2TExHlrQUYKQsQePMeUw5dix9FthmBE8vxKmgDtBVv38d4CvJOUFZ3Nj7sQc6lB/eR/yKBysAyL2aVmKVAo+oGOuPX9veOL9jDbGfF10BBPNNx60SoSYx9rQhnG8HVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OjiyP7dw; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-216430a88b0so85620295ad.0
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 08:48:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736786910; x=1737391710; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KdzkJXloILoledAikhtT8z+TQc6Jd5QhrekVDplnaf8=;
+        b=OjiyP7dwderoERZNQGkPM45q6Lh9y93CEXp3hjiXspN7KvbfrmOrlnDnxzdH4/HlMD
+         RZ98Uqtq0+NMrfgY9tD8ZDK3WLI7189Y8AdCEROqhnWNq6ki82npp+juZCXrkI9Q7Y+V
+         CiCKYYIepzugfpiFLuWhypuvgJaZzvF7yYLN6inRX+LLt4FyyQ8AEv3wPIYe6LDFzIYI
+         EJ4h7L8joETO+Nrl4pjbmcH9z+Uy9AV/YeXJ0/WM1SrL3AUowahQORwnOOpO4YGdBYBq
+         1jsc5vE14Zy8w3lSpVWDN/5av2Kkpn3dRl7maw1a/+LADyzNFs42HgHqOnyn+c7bH/Tf
+         Z8OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736786910; x=1737391710;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KdzkJXloILoledAikhtT8z+TQc6Jd5QhrekVDplnaf8=;
+        b=RkHidfeHL7syB8hs9M/Sfh+R2skGi6312aRHX2jMnBSzZbJ8JuEzLDjrkB0g4kkYba
+         x78KJg6XfUt/OA9Z4yAw69UyxsU8iDrNTIG0oq9BPnlTFOGf3sd2JMgGfwUKK0NUR2sB
+         VhiwD2Sz2R81Tu50L6IkT5yjmRPgPH6sLyDQkuTqtGIv9w4sBGICO6WngttMI/ezjoqk
+         zXjomYPk7UjfPs4PyyDMXwVSHCu5d6arKjdK95bRCWrlOQllhA28pWCv3WoYruJXJLTo
+         a/AmS/5XPgs9jBt3b5bvDYsYj19ovNJRMLfc0TPQgzqkd9bexW4l16r29nVXfLS/WTkL
+         NE5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXQnEVr0R7zO3kRzfEalWJHfCNrrBjCYZuWtgfE3QpbEZ7oBgKzb/0a0uk0DnKyRlQ5zwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD4iDwdmlgHWz/EcMidKWE2vmJPIQFNgJ7TTw91UM/gUoRfNhT
+	c8u6rXjTRkrr+8CYAPbYdCOn7k2tyhajyCCsmr/fZTMwh8kwJIjuSxCG+rV/Cxk1PKyhycWeepu
+	I5Q==
+X-Google-Smtp-Source: AGHT+IEhXLguLVVlB2uMkRYKCqWDmWgyqzXZyQWRPUNpNJuNKno1KXMBErxQc0c7qjKIHmxBNNTEv0LCsQ0=
+X-Received: from pfbmc53.prod.google.com ([2002:a05:6a00:76b5:b0:728:e2c6:8741])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:431a:b0:1d2:eb91:c0c1
+ with SMTP id adf61e73a8af0-1e88d0ddde5mr33087152637.42.1736786909791; Mon, 13
+ Jan 2025 08:48:29 -0800 (PST)
+Date: Mon, 13 Jan 2025 08:48:28 -0800
+In-Reply-To: <Z4TrQedpUgNrW2OB@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DM4PR12MB6495:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f35b9a3-5bc1-45b2-77e8-08dd33f10323
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?uWMU17Z/9vkV4ZyqZ0LNEsH0n5X4a7Zfbjc8NJW+Nt1gkgSfoQlNFbFFxr2L?=
- =?us-ascii?Q?kXpndaaOuWqtDnpfrW5O3mWU0jqdGHRCnAvWQGGyMc73B/ER9/KjVkBpGXMv?=
- =?us-ascii?Q?48m65kVF2Rrv2rQxL7gkyAjYKuYSX1aFgfsH1hLYMTfqkkqEvNke0a22yF6f?=
- =?us-ascii?Q?aKhTVu7jWbfs8W/m8aW5pjv9GJdqdmzp5q3dM7Osb94QjAApwPeHF7v25ICW?=
- =?us-ascii?Q?Dv8jgDHuz4QmByUMcLbyAkbhjJNuDjOLEpnsdT+DdRCBwT6Ck09K16TyNPao?=
- =?us-ascii?Q?pBMN2NmRszyCb6pCPd28ub1rc+RkqmbK4U86n/zHcNUutRp/CN057gLJA/hL?=
- =?us-ascii?Q?1lSpUJLjIFgMu9FONH7xW5USG9vR2pXCdbflh8atND3ogrGeAd0w3DT3ZIH7?=
- =?us-ascii?Q?STH7ea9bY5b81cYEKzsBpyUHdLaWZnc6GVaVa4A98m5zNZqNXZmdLci/OTmg?=
- =?us-ascii?Q?t99p8vb37eSc+MhF14DdugnXeC1q+mhq3C0hucMd66fzGqdgWYqvSrYVTjjm?=
- =?us-ascii?Q?pQLa8g+V3HkfJurxP18U1EKQb1aomJweFJN2x+1vOCUVBmBuK9X2lPLqomN9?=
- =?us-ascii?Q?RfdnR2+wkIkChBc5dXQgGHWxEBFXR+REm+8G2S1bIhi+712e7EdO4HaYfXI0?=
- =?us-ascii?Q?caMEZ9yGVzMUcScKNRfwHup0U5yWLwF/2gSTTbSiroOjc9Ub6XM0uXODrdHR?=
- =?us-ascii?Q?BQGIrF0zGS1mA9RVmwgFOCbmOIviDxYY6mFM6g72fkOCBgnaXv2q/jQyRuzO?=
- =?us-ascii?Q?dRTeydFaeg46Zyy/fsbeP0icfYWiIv64fJKtLBhuYozrapUXVa/AkqIpFf3O?=
- =?us-ascii?Q?DREJIr/u8UdXg53jxsEM3YsvgQ9a/OAyVYD5acf9Ghk7kjgqL7SWltkxes0g?=
- =?us-ascii?Q?JosWFB1GzWHXEb26WTFj2if/6YgKZxtsvj3AYJ8ecmdVMKxy77gkHqKfDQWM?=
- =?us-ascii?Q?5QSO48cf5hq9VJkkp5hm4mOTFnH3Sld0cM3xjIriYFATew1LZvNZ6CXGvI1h?=
- =?us-ascii?Q?qfHkLby4yhz09vy8yMXLwZIdem6VkcA/nXM8ArQyHT0LC8t34b9uTaR9F4ew?=
- =?us-ascii?Q?Ne/8wG4HLmuFZDB7KWsjYn5YYJHRF/O0N74Gngh1bnpxxPinRDGwi9cdr/i7?=
- =?us-ascii?Q?/1HWFPvc8Inv84mOvDYPSeYabh6kCvKiCoCGfYwBjDkGPjNuNrS2Sc407kAZ?=
- =?us-ascii?Q?lurvHetwEEW/rgm6R3R9XSUNmKnkurWe3Z8k1X7ifG9msCFIs3empF4O8Qam?=
- =?us-ascii?Q?tk6pEYRONrwsUVT/WfIYKcMT7emLMu2JWa8rMw4zL8sfwazx9shepzn7L6tR?=
- =?us-ascii?Q?YjfSx/oPQYMY1ZBWmv5VB0267KRB21nPsMJg0TfA2l8ajOGwK2jwnaYin81s?=
- =?us-ascii?Q?Cxuq08WadGYes/kmQ2awdennA4JH?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?HLfzxvzDhdacreZHj9GsiSlpyekIhQ2oFT+H9CphBDviYQQC0H3Z9OWCmKSx?=
- =?us-ascii?Q?LTmtdeLGaW/drWBRTPUK2BnTjPAYNI6yQSR/BgHEz4pscGs7JYh4OJ4UyEaq?=
- =?us-ascii?Q?1SnLzUo/QkDgCH9LQETXFnM0/X2gw29KGnprHIXX2t+XSGusgGCLM//2QjVi?=
- =?us-ascii?Q?eY5xxAoRQkkgE4zwQ+dERmjwNCSgcqiYd8UiaR9ghLr0SALovR0Fc0J/au44?=
- =?us-ascii?Q?FBVTTc7X64BApGhI1uBNDZ+iZqOVBNU90O3dgObl/4UBikc3A0c0uGe6EaG3?=
- =?us-ascii?Q?o76m2CqvoHFaPEqVXRPCe+LFwAi6CZJwDypsHtieeU4CRf2gRgzmj+wVaNYP?=
- =?us-ascii?Q?0WVPjfmGYIWTCsmeVjdOuKv4p4LvgxmrDVD63DcGM+z8D50ywSJL6uWC7+Ub?=
- =?us-ascii?Q?ctSegxbIza1vCt6m2fKZOoqPU43W8HU3ix9KiP6udSjfJfRAiK1uTT5aKyD6?=
- =?us-ascii?Q?/d29WKZujJFUCMxB7E63x9uwtfuCt/mJsoUMIBUSOwpNmL/V5NIB3xx4oyCD?=
- =?us-ascii?Q?aJ44CIpNug9AgvjNERHgGIySVUlFWXA3y7wCWtL5yxQeK9UBVEihGiyDnowB?=
- =?us-ascii?Q?HiWwMg+PXy8H7MgQuopbQt4YYpxSdnQGAxAzovLSTAVlt3BKLGz78qAg3DVV?=
- =?us-ascii?Q?gttHPjErJ/Dt04X9KGLeZjUAW+mpLH+oiSjEoQRCkWYWKi/EjHu9NtWjrPBU?=
- =?us-ascii?Q?XnaeFkeRct8Muwfsw4yIKC0icRvdYxB3V5QRI+85626GEnrWYVuM+Vrc+WMC?=
- =?us-ascii?Q?j9iyBovHuLJ0o3JVH+UILYT4uV4pHSel0wGN6+H/IIwSiPlBl+2pfOplyjFh?=
- =?us-ascii?Q?3oMIPeSLN4Ir+HXWDvaeS8YTfJYs7mHpU0skc49fIxWNaaDrR+Mh4YsBv6p7?=
- =?us-ascii?Q?DQiI9kcNiylfzeWE+LfHdFmSDI96QrGO/UH6RzdUz/Rg3aIxzXW/C9g1+8dY?=
- =?us-ascii?Q?wYC6KArRwJNNnAThVY5IyRrifIHE4dXGi5QwA2OO9ErW1hstn4Dfa9qn4+16?=
- =?us-ascii?Q?gB8lRuxSRPSFcZM82Vcl/HxEFCVBZAHCEdLyhKbaDl5yN7FljlsCr6cw9xSw?=
- =?us-ascii?Q?S0a8kNY5CuAQq91ANAyLQsAEOrPTOfJse6+lxwI1M14lDxyUXPFw61ppHlfZ?=
- =?us-ascii?Q?F0fHipFxEJHFLZg18VlT5e5W3qm+HdGBUYjTfCpNdmpXwx9imkbs8DvOjveA?=
- =?us-ascii?Q?uUR06ybngLUJXFWyImUvBtMzLFn1GLqle0Gz44FbIxzz1PE5cTwY+rLbjJ4z?=
- =?us-ascii?Q?c6q/Qsn5zXF+y53qx22QD9pl6Xgm/GvTnlIQeUixHGeTyV2xDtGgdKzC6zdy?=
- =?us-ascii?Q?y8wiazf6qAUjKfNmYqJpzRtznT8TSSGmxAFGokZXmMyrcOiS0wTrrVB9XCVf?=
- =?us-ascii?Q?MNMtb9u/RsV2r3eYXonUsEpcfWO39ZhQLaLJ6tXw0mfV1rKEJ6gcb5xBgfyS?=
- =?us-ascii?Q?+YzfaIvnKlMvGkorGIi3FSpQhzPf7Ld/0TjkdQDh98FcyzfqUCxNmDngFdXK?=
- =?us-ascii?Q?PY6lyYxuvqu568dSZifsdApthGsqIK6ARS9cyVQlZNs2yEkgP6ltKOIU5Eq7?=
- =?us-ascii?Q?i5vEwjF47Pb2J40MX34=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f35b9a3-5bc1-45b2-77e8-08dd33f10323
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2025 16:40:39.1165
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y1rNZs7iLCT7Ev6SZBy+NlJFrSwvh/twMuJqaZrjTFoGn51BN6uGHYMI7RmJ8m+U
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6495
+Mime-Version: 1.0
+References: <20250111010409.1252942-1-seanjc@google.com> <20250111010409.1252942-5-seanjc@google.com>
+ <Z4TrQedpUgNrW2OB@yzhao56-desk.sh.intel.com>
+Message-ID: <Z4VD3AaQskK7IkYU@google.com>
+Subject: Re: [PATCH 4/5] KVM: Check for empty mask of harvested dirty ring
+ entries in caller
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Peter Xu <peterx@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jan 10, 2025 at 07:32:24PM -0800, Nicolin Chen wrote:
-> Now, iommufd has its own iommufd_sw_msi using iommufd_hwpt, the iommufd
-> owned domain's private pointer. Similarly, iova_cookie can be seen as a
-> dma-iommu owned domain's private pointer. So, move iova_cookie into the
-> union.
+On Mon, Jan 13, 2025, Yan Zhao wrote:
+> On Fri, Jan 10, 2025 at 05:04:08PM -0800, Sean Christopherson wrote:
+> > @@ -163,14 +157,31 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring,
+> >  				continue;
+> >  			}
+> >  		}
+> > -		kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> > +
+> > +		/*
+> > +		 * Reset the slot for all the harvested entries that have been
+> > +		 * gathered, but not yet fully processed.
+> > +		 */
+> I really like the logs as it took me quite a while figuring out how this part of
+> the code works :)
+> 
+> Does "processed" mean the entries have been reset, and "gathered" means they've
+> been read from the ring?
 
-This commit message would be clearer as:
+Yeah.
 
-Now that iommufd does not rely on dma-iommu.c for any purpose we can
-combine the dma-iommu.c iova_cookie and the iommufd_hwpt under the
-same union. This union is effectively 'owner data' can be used by the
-entity that allocated the domain. Note that legacy vfio type1 flows
-continue to use dma-iommu.c for sw_msi and still need iova_cookie.
+> I'm not sure, but do you like this version? e.g.
+> "Combined reset of the harvested entries that can be identified by curr_slot
+> plus cur_offset+mask" ?
 
-Jason
+I have no objection to documenting the mechanics *and* the high level intent,
+but I definitely want to document the "what", not just the "how".
+
+> > +		if (mask)
+> > +			kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> > +
+> > +		/*
+> > +		 * The current slot was reset or this is the first harvested
+> > +		 * entry, (re)initialize the metadata.
+> > +		 */
+> What about
+> "Save the current slot and cur_offset (with mask initialized to 1) to check if
+> any future entries can be found for a combined reset." ?
+
+Hmm, what if I add a comment at the top to document the overall behavior and the
+variables,
+
+	/*
+	 * To minimize mmu_lock contention, batch resets for harvested entries
+	 * whose gfns are in the same slot, and are within N frame numbers of
+	 * each other, where N is the number of bits in an unsigned long.  For
+	 * simplicity, process the current set of entries when the next entry
+	 * can't be included in the batch.
+	 *
+	 * Track the current batch slot, the gfn offset into the slot for the
+	 * batch, and the bitmask of gfns that need to be reset (relative to
+	 * offset).  Note, the offset may be adjusted backwards, e.g. so that
+	 * a sequence of gfns X, X-1, ... X-N can be batched.
+	 */
+	u32 cur_slot, next_slot;
+	u64 cur_offset, next_offset;
+	unsigned long mask = 0;
+	struct kvm_dirty_gfn *entry;
+
+and then keep this as:
+
+		/*
+		 * The current slot was reset or this is the first harvested
+		 * entry, (re)initialize the batching metadata.
+		 */
+
+> 
+> >  		cur_slot = next_slot;
+> >  		cur_offset = next_offset;
+> >  		mask = 1;
+> >  		first_round = false;
+> >  	}
+> >  
+> > -	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> > +	/*
+> > +	 * Perform a final reset if there are harvested entries that haven't
+> > +	 * been processed. The loop only performs a reset when an entry can't
+> > +	 * be coalesced, i.e. always leaves at least one entry pending.
+> The loop only performs a reset when an entry can be coalesced?
+
+No, if an entry can be coalesced then the loop doesn't perform a reset.  Does
+this read better?
+
+	/*
+	 * Perform a final reset if there are harvested entries that haven't
+	 * been processed, which is guaranteed if at least one harvested was
+	 * found.  The loop only performs a reset when the "next" entry can't
+	 * be batched with "current" the entry(s), and that reset processes the
+	 * _current_ entry(s), i.e. the last harvested entry, a.k.a. next, will
+	 * will always be left pending.
+	 */
+
+> > +	 */
+> > +	if (mask)
+> > +		kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> >  
+> >  	/*
+> >  	 * The request KVM_REQ_DIRTY_RING_SOFT_FULL will be cleared
+> > -- 
+> > 2.47.1.613.gc27f4b7a9f-goog
+> > 
 
