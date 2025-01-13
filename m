@@ -1,81 +1,82 @@
-Return-Path: <kvm+bounces-35324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35325-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63B58A0C26F
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 21:10:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA43A0C2AE
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 21:42:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704DC169E11
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 20:10:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E3C518879CB
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 20:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50C21D278A;
-	Mon, 13 Jan 2025 20:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A251D318B;
+	Mon, 13 Jan 2025 20:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mCd0GN0F"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Lf2yV81T"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2050.outbound.protection.outlook.com [40.107.220.50])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2088.outbound.protection.outlook.com [40.107.212.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B211CCB4B;
-	Mon, 13 Jan 2025 20:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD111CEAD0;
+	Mon, 13 Jan 2025 20:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.88
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736799027; cv=fail; b=mKvP7rLMMWLnG1/um1snNaBAAD4l/ost769xSfi06stvycdis6Kf1+7QJiIxYAAdDSusMpxVpiQzfRFezmTTIQyRGD7HVKPZ2E4QjW9VWwxYFGJoh+xt+OYh5GTp+ZxDUWNFOVN3lEJwH5unyZh6cD/bpSj6ZDyzeCtJ0NsyzQQ=
+	t=1736800926; cv=fail; b=nKtxFWLmSCC7SAIiRUb5Li/1b5c3Ki1/i+5enqzO7skVidjYeYX2kYzDIp8J4hCkRcv5r22daK6IFdKvDVmV9fez9n/dRo/avp2gH0/eoM8kv/GbkxoP1fThft7HlIezGJ4lDureMt83kOCfd0YqYQ6wmZQjgyuJ6rCX2iqoKbc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736799027; c=relaxed/simple;
-	bh=VVj1Ymhz0zC8VISr7QCFn3PH3wzgKYnM1o1wVWpJVJU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MFWC1UkiB5ijmmGLhPYBOkE/vwQSo47qrh1jEaIZpYnDRSMlPsxLCHdcAQ21wEmGcylncqyCy18BqgYFxPTe6r8TbYxybSTe+HToBOfi8fzayC310VPYYYYGeVdLz3LV74gIPuqczXPBLf5hfmg2XwVNbeM1MBT4cZZiO5kqGSs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mCd0GN0F; arc=fail smtp.client-ip=40.107.220.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1736800926; c=relaxed/simple;
+	bh=9UcpwZXlH6LfENETFQXeRGHJDtbLastWDgnVSkO17Ao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=E7LKs1ZevQzCIe2AqXY7899i+eQBby+vvrYwijEba6DdvujmiHIuL0sE9Ladvf/lfMqVT0lVHPMpybNIygJEUMSXbnAjS4jimHIamjPAVy5S1G+PLZuFi15OXFY31m2hVX1krg2+t7S6IMOhe4dWhRbsTIP4z29SRxWdLAQv6BE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Lf2yV81T; arc=fail smtp.client-ip=40.107.212.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gFqHQh45HrHiVIhthIlYmooPXjSQxSScj5ZcmghUiQecsswe5jJUkd10rhA/o8NMgQO0iLXaEDeaPfx86jLPK37Q77Is/zZPVcoeYoXqqKqUOWG8MxWa24HPMPpQ8n2Mbb5IMIMegoM9qOSEVa+oRwJpTnk21R7MSnNtkD1iuQRURtA168sqHjTwLpMqq8Q696X/odNDN46bXveW+CM9080ZCmLp0OvjH2f0y56YIGomuuGyn0MLMcpHAEDcRSup+EHQJ7GjFOacjkinT9qbg0nJxk+/FjQXdB0xX+Xp8IEcHnSlUy52STx8qpZietQqIVDwh8d8x0MGmEy2lx4ToQ==
+ b=lJp4l8elMBVTvinoSH9Jc3PV1lvK6SxOxhh1EXSPNFd9eHKyDerF7HRYyx2zEXbuE6S1INfpjYnI7r7ViBYyuFmwaLXLMbPDNUF/exorsQNy0K5ExW6KpR8gLJ2vNAjhk2kto+4mzjfWjPrN5MUJhUpi/+NYx5eq4ipYMI/8B0uKLSyEbit3m+rXDIB2ETSkLgp+jbgzzitulVjgbwOzzPIEryRMsbrWrlQqZs5LhacA21LwFqGwQYiRuuQ+98+apF/InDvveTJwqZ3BIpdPC6rz2b79nDuJYXzx5GZ0blRyJOEp5OsMhRd5dmJRYFiHQmGhdvE8gKKQril9hf321Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lgueIHnlssDcCR0SziTBbVKNf57G98YqKByDW6PqfrY=;
- b=u3yFKO1bgD24Nb6vvd7AYhzoRwRuzCT7XSsjZg2e95DU5sf+d4nzxRDc0cluGgAS6g8x97LlTpR7K8CoKOvDhY7grRgcSL5GQaSyiQPYaZPJf3VhZq9vaNoydZat84D8vlMwjK+FgWwqDPZkaHy+A5k+8aD5ahxLlaANDOmXCqWbRrHfJm32k9PTAzO1HuT8ADCzcgOEO2guoKbMRLMrLlnwfI7fA3AxQVWPtE/H3Dzz/aFN2V8AZhBpQRRm4CHSLgmKTJjDuGkG5iU6M6RFf5v6+eluHAWdv0quVQQw+NypMY1qPYd9YUMHMcDGz25Bce3dp6rmhIij7VF1U4Os9Q==
+ bh=9UcpwZXlH6LfENETFQXeRGHJDtbLastWDgnVSkO17Ao=;
+ b=r85xSZELjSyZRPC4pq9Ghvxh5enmamL+E7QZPfhgmP/W/4t5bF66sbAOAw6ZkwUNnctkmIt6yQmTpaUljfihnBHSPe+dpkzeRhBkoct6pjkqhTWEIqre9eBq/fHSfCY+xrxJfcuI1iE0Pz1ISo7jAAhLCP/yL0mNVHsSk/MDzR/3AWDGiR2VGu2Rre2JDs/edwuckZ0RdKhGm6gx0zX1Ea+6ostXIv65JGUq1+4/p26meS7x3J3rqeL6+abIZ7bWp1nq8ecKpFE0wow94I8y8jxZFNX//1tt8MxDM6j3l2I9joPw79EWQ+sjPPCPAvHJtqgtcLs40xUHG2GbhHTngQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lgueIHnlssDcCR0SziTBbVKNf57G98YqKByDW6PqfrY=;
- b=mCd0GN0F5vzyEKeme10vpmuZ2Moz5PJtSAmIFnIJwDaN/tzlQnMKU3NMfG3K6Bi40Ohu9f+rc6XIOThr7soXMCBVw81LVKA+vBP2pCwodZFLi3tqPk3ZMGEy7jB29yOmA2A4j2DeM0IuY0QQjXF8NloeZrt1zQfE0EJYl4DvXH8=
+ bh=9UcpwZXlH6LfENETFQXeRGHJDtbLastWDgnVSkO17Ao=;
+ b=Lf2yV81TyxuaN4YzythBSCbcQPlmeV0Mft0AxcG3tk4hutVkIQnwQZ1twLpEEWw2ymiT+oAtiwZcm1fdEsOxXjHKlxMnmTF0wCGecvSZLKgFlzAo/BgpoUUjr6IRR5O9CS0rrRQ94+RlSa/7toUG14nXjfM0ZNFzboM6MeDK/LL1fxjkZdZOjcTu2HRHN7O/WRuGGlwTMGJ2xcAEQ71KgOs6Eqe8rroiQml9KERJIKS3CH/bUhb40sCrlTiMSd0oyTilUKezGrmajrCompM8lfbTsLoZ/BZDXI/A9WET2/er0XBCbbqcT5v1Wtp+ZmYGQduPh1z87rsuwsFS38+Ozw==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MW6PR12MB7087.namprd12.prod.outlook.com (2603:10b6:303:238::14)
- by SN7PR12MB7300.namprd12.prod.outlook.com (2603:10b6:806:298::7) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by SA3PR12MB7858.namprd12.prod.outlook.com (2603:10b6:806:306::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Mon, 13 Jan
- 2025 20:10:23 +0000
-Received: from MW6PR12MB7087.namprd12.prod.outlook.com
- ([fe80::41ae:52ce:aaf4:eda]) by MW6PR12MB7087.namprd12.prod.outlook.com
- ([fe80::41ae:52ce:aaf4:eda%5]) with mapi id 15.20.8335.017; Mon, 13 Jan 2025
- 20:10:22 +0000
-Message-ID: <ea783d46-0ed5-40b3-b0d4-5b4e741bab9c@amd.com>
-Date: Mon, 13 Jan 2025 14:10:21 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/8] KVM: selftests: Introduce SEV VM type check
-To: "Nikunj A. Dadhania" <nikunj@amd.com>,
- "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>, kvm@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, pgonda@google.com,
- thomas.lendacky@amd.com, michael.roth@amd.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241114234104.128532-1-pratikrajesh.sampat@amd.com>
- <20241114234104.128532-5-pratikrajesh.sampat@amd.com>
- <71ed4121-83dd-4b09-b1a0-1f0654512c2b@amd.com>
-Content-Language: en-US
-From: Pratik Rajesh Sampat <prsampat@amd.com>
-In-Reply-To: <71ed4121-83dd-4b09-b1a0-1f0654512c2b@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR03CA0013.namprd03.prod.outlook.com
- (2603:10b6:806:20::18) To MW6PR12MB7087.namprd12.prod.outlook.com
- (2603:10b6:303:238::14)
+ 2025 20:42:01 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8314.022; Mon, 13 Jan 2025
+ 20:42:01 +0000
+Date: Mon, 13 Jan 2025 16:42:00 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Nishanth Aravamudan <naravamudan@nvidia.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Raphael Norwitz <raphael.norwitz@nutanix.com>,
+	Amey Narkhede <ameynarkhede03@gmail.com>, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] pci: account for sysfs-disabled reset in
+ pci_{slot,bus}_resettable
+Message-ID: <20250113204200.GZ5556@nvidia.com>
+References: <20250106215231.2104123-1-naravamudan@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250106215231.2104123-1-naravamudan@nvidia.com>
+X-ClientProxiedBy: MN2PR14CA0004.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::9) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,185 +84,104 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW6PR12MB7087:EE_|SN7PR12MB7300:EE_
-X-MS-Office365-Filtering-Correlation-Id: 65042446-603c-4fb3-ce3d-08dd340e4f5c
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SA3PR12MB7858:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5fef147b-43cd-41f8-f890-08dd3412bb37
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?S0VjQ3pUZ0h2Z3M3aGEvSG95OCt1SHlQODUzcVV6OXVVa09nR01LSHI3dWlQ?=
- =?utf-8?B?MXROL0R6bTRpZWRCZlJld0dKMTIySVZXVFQ1QXIvWDJCNGFJZXU3TG10bkRU?=
- =?utf-8?B?UTV6eFhTSWNUUFgvWDRVUjRxQld6aDVGT3ZKc05qVHpVTlRwVkQ1MjFCcnlo?=
- =?utf-8?B?TTFiS21yQWIxQkl3UVI1Tll0VUJYRXJUZ21meE0vQWtYbEhUUFpHTEpkZzlT?=
- =?utf-8?B?NUVnUGxZWllqSlBwWlRTaVRQWjU0OHRvRStHYlJNWTJyalhHcDZnVWYrc0pQ?=
- =?utf-8?B?SnV6UmpqaWx3cWthYzg5TDlKWkhEcDBMVGtzelllZU5xUkkyU05kQjRqT1l4?=
- =?utf-8?B?WTBqV29INk1FNGpGQmN3T1Z6UmkrVnpWRkk1Y0RobkVNbEdsL2UvNWRGeUUv?=
- =?utf-8?B?NWE3bUxBbGZZeE5QbTl5YkFCd1RqWVVTRGZWRkp0NC9qVVhpVUxHSE5aL1dD?=
- =?utf-8?B?RVZQWGRwUVFvazgzUG84UGZ2K3FleCtOYlNLVWc1UEEvWWU2RVd5clBsRytk?=
- =?utf-8?B?dW9MNW1TeHR4ZzYwenVCWHVkQ2xrK3JQajA2eWk3V3JNZllSOTIxcDZpUGdh?=
- =?utf-8?B?dTBhTkRlVjByS0NNQTExVXpKTDI4Yk1qVHM1cTlsV0Q1UVRncnF3b1YzeGty?=
- =?utf-8?B?RVp4QnFnZEdZRUtzNmdzSldESmh1VWJ2eGFlOFM4dHJRWGlRYmVnSW94MDZl?=
- =?utf-8?B?YlNBY0p3Z2FlTUZ3U3dXTEQ0RUxBNXlib0JCS1Q1ZWFTZzRWT3JHU0NsRTNP?=
- =?utf-8?B?QURudXRMUkpUTUxqeFRQTHZzQjJxNjN6TDFxRjd5cmhRMm1vWjQvazdCaDVL?=
- =?utf-8?B?TGVHTFE2VjdsU21WajlrRGRtYVRBajVmYnhYWG9zTzl3SnRFQVR6MkhDZ1lx?=
- =?utf-8?B?NEFLNmc2YU11TzN6Znd3cTRBa1hERDJtWjdTbmRzZ1dDdXVac2VGeFQ5aUNt?=
- =?utf-8?B?SGl5bHFrdS9jSzJrZ2NPTUpuaFpEcTBlQmF3WlAxZWE3aVJ2dnNvYVc5cnBl?=
- =?utf-8?B?ZWhDQjZHRUV0aFdzQ0RtdDlWYmtWc0Q5SU1qb29NTU5sUnRLVXRHNmZkVTR4?=
- =?utf-8?B?dmlkM3NmNExFTjV1TnM4R0pHZFZ2QVZwQ2duUjdmY2MweDBuUTBSTThGQkow?=
- =?utf-8?B?aTR5ZzY5ckxqNEczTkZHOTJFeHU1Q3JZUS9PZkJEOTRNT1QxcXp5bEVSN2dt?=
- =?utf-8?B?L3Rhc2R3QWhnMktnM0RQVGNWVEsrRlN2bDF5QTNod1kvOWJRNHlDWUlySkNP?=
- =?utf-8?B?d2lXTWNOQWVrekViK04rbzJ1R3pTOWpLaUZZOGwrUVR6a2xJbDdDTGtjSmxq?=
- =?utf-8?B?UDlPMml3ckx2dFkxTTNrRzNGN3p2SmI0U2Z1ZkwvVzRzZEMwZ2U1b2FiazVE?=
- =?utf-8?B?eFdId0xkUXlkYktXL2tSUzBvWG5yaDVXMUQ2R1ZjdXFzYjdDc1NrWDFWZWJs?=
- =?utf-8?B?eUkydVl2RXpsMlczeDdLVk4wUE9VcTNMbXhUQm5FbXIraGlpUzI2L2oza1J1?=
- =?utf-8?B?eUhmTzc1ejAxSmNENnlKWFY3ampxcDZqQXlVcU1yT0hWUFQwT3dBVGdlVlE3?=
- =?utf-8?B?Nk1wb3Y4aTVrbnpaMWJvQkxrMm42MkwxSVBiazlBRXRVQXBvUnFXNnJ6NE8x?=
- =?utf-8?B?aUk5ZVZCbkxlYm4rWGx1NmR3a1hTdGdrTlVjcUtnZUpzNSt6ZW81NVY5Qm5h?=
- =?utf-8?B?aXRPZmg5RnQ2cjFMMkdHRktzelc4L3JFSGpIdWdNQ0RoQjJxSGhtVG1CRWti?=
- =?utf-8?B?bXN6M1BLMFhFTmFqVUJqYXd6ODF0OHJ1YTZZNDJLOGVMZnJBY01uYkd0Z0dl?=
- =?utf-8?B?S2RZbk9GbG9aZUhWMXlrR0d6OEJmcit1MWtubWZvczRISnU3TmZkSFJCZDU1?=
- =?utf-8?Q?yVR0y6pDPRtAE?=
+	=?us-ascii?Q?yQ4DKX13FV4mJtdPlDLMdDzSj2PptEiri3ujCIxe9h6aaC2V33ZyvVjeMpcJ?=
+ =?us-ascii?Q?V1zc1nMSFKEV8Ue7aTcL6qYzpE1gUHtHQ28SyzO+lDM8UTb0KwAWqp+7a40x?=
+ =?us-ascii?Q?MkTCaOnXHCluV5R5nuKNetN8+4Wg5qNSciSHo/NYoHAf8BuMOCnYcmjh2oAc?=
+ =?us-ascii?Q?9xqm0ORikyXTlC2czZ8Yr8SqNt2VrlsEdln9TVsIlRXQjRhBLVaU1brTvVUA?=
+ =?us-ascii?Q?FX2GWWdabySSz5iOWFeSgJ44gkwui5hNnjY15XRfTltp855ULNTg4yYxtqCz?=
+ =?us-ascii?Q?6bA+DTqRLHnkxZJUMcmj0y2casXE5ap/EFqZeQChQ3DBrPhUyHs7Hw58HNGW?=
+ =?us-ascii?Q?N6tEhKP+/YvfFsqGKiX66q/UeThKMCLUv0mgYB58072GBx3f2h6CDKMMSjSB?=
+ =?us-ascii?Q?+0cldEg2eJP0pqka+mY/8LrMhuaZC34zVxkLvCrNki+DAroRuNBKteHw/OBA?=
+ =?us-ascii?Q?zVMH75MJbMButmfEb+z2qd4PUoJElY68Ud5eBHQ5455IBzWnBWI70/QjjQcv?=
+ =?us-ascii?Q?Vdy3p9M8qBoLlx7TSuG+VvfJvwAG+JHCQhZO+O91EHVSxH6KvmQwdURVxkAq?=
+ =?us-ascii?Q?wX0XXZLXdynytv4XRaELcHXH2JEWFAna3beRkR9803x77BGwaweSC76EkLYX?=
+ =?us-ascii?Q?MCcJU5i7F9rq+ktScxJZZdefTbk1r3KGbZm13ICgpYRCrH3UhR63yMr9T7Ii?=
+ =?us-ascii?Q?sGW7+Cr6zd9NNjs9isul6j3dMJkDz95LBq0CtDFvS7mZO27u5PxrS39YlFWD?=
+ =?us-ascii?Q?fkhALFBmFqob+ZvD0V0RwM5rX2L/fJK25m7g03UMlxLsi1ha1iX4Sx1Yl1tp?=
+ =?us-ascii?Q?OGJcZMouyPP/6IUTOs7+u7AOkomnHpmEkKGDxBxfeRxc6LYRDcoJfP3CuUmg?=
+ =?us-ascii?Q?+BCAYYRJLbL5lP0j4yhqi9Qljh5JMeLY9cEWaEL4k5h9V3ihh8UY53DGgUPW?=
+ =?us-ascii?Q?8MUO9/WOZI9I8EbWcsvexHeLX1avGJaXrVLhFaIqsu1h9ODmBT+/ELOd7rzZ?=
+ =?us-ascii?Q?jWR+U5MI1iBZyxf3BjZHN0aR0XPiMWV8cOF45Ox0eZPS+/OlwyFixVPPHI/k?=
+ =?us-ascii?Q?HlKo5qJV8dKEeyOkhAMUMj+eYj1XvP3CLrL7bvV/NYpNeZNw40WiHXxxQK/h?=
+ =?us-ascii?Q?iHEbYNIDyjN38YnA57VKn9F+4kH80nytg73YNC2wmN2WM/PcqPzAPwL3FuJa?=
+ =?us-ascii?Q?YmWOjCe7ChOsz4Eo+0JEccT8jOUc8vGJn5CdBrm6zOC2N4l7FX6kBboDRZVp?=
+ =?us-ascii?Q?T4Ng+KNOkeRiuB026/cmLhpZvCohjumpOy2DCi1N+2IXI7BALu4eGVvEVj3q?=
+ =?us-ascii?Q?9MBKD3LdeL31WQu9GwbV6go1/AlAsc38j5FRa5yVZ5g0U2noWoubskS5+R+e?=
+ =?us-ascii?Q?T/YO5SMDvlZSRw9xriKeasUTCQ74?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR12MB7087.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?L3hlczZHM3cyUksrek41cTZVUnlkRVhOOXN4M0N1dzVpMjB5Z0dZRW8zZVRE?=
- =?utf-8?B?SzNXRTFKZzMzZVBPdTdrUHRVOUtCa3lmc0ZNd1FaUTAvYmdlZ2NiRmFyMVRr?=
- =?utf-8?B?VHF1TThWN0lKUXB2eXdHRzhyOER2NTlyVGVKeDhicldDV0tCMmZwY2tENjVj?=
- =?utf-8?B?N3UyajIvZ3dnMU5KTVVMUkFjQTVsdTZqazlqQlYvU240RUdmbkRaNXZIUW5H?=
- =?utf-8?B?K2xPTkNEOTVNS2pwNWFsb0VabFJhMXJqNktKbE9kdnJFUjBNdHJHdEtKYkJj?=
- =?utf-8?B?cGhJU213VFVPQUJwbnNGaHo4WFdsayttbEdRYkRTb2NJcWZvYjl4bktHTG5U?=
- =?utf-8?B?T3FCU0NGcmRWSVZ6NVJzbE1UaTlmZWV6VGV2SUI4aFJWbldOWHJxT2JONVRY?=
- =?utf-8?B?WFdHNUFvSzBwOW9Ob3p5WDQ0U2prQXJ0N21OTmt3K3RuZzVjdUZNZEJ4R1V0?=
- =?utf-8?B?MUZuek1ZK1JlSHJNOGgwUWg2S1BJRkw0aDFRN1ZPSThlYThia0NlcE9BMmZ0?=
- =?utf-8?B?enNHYTc4OTB4dEhHdUE4WDlReUlTTHhRUkdyMWN5R1BlWnZRa3h3RTlneGRM?=
- =?utf-8?B?TEg3dzRyUGk0UTlxMlZPaGlVVVJheXdqMzRKRllOOG1CZ201UEo2aW42Vlky?=
- =?utf-8?B?aWNJaGFLWG41UGUzeUtlTmdJNFdUeWtRdlBxK3FBcGlLVkxGcVcwMy9NaHVK?=
- =?utf-8?B?ZXpXUHk1UUtXT2czWnRadnZmU1l0SzRNZTlxeEdOcFNmb3A0SVFMWFVXZS91?=
- =?utf-8?B?MGg4OHcvcXdMNlIzayt3ajczNmw2U0wwWXB1MkJLejZvZ0VHUFBveUs4WFBD?=
- =?utf-8?B?VHJiZ05pZytlUDJSYkZ1U0NvUVgza1hvNm1HQzAvZWMyazJydnlmdnBzSXlJ?=
- =?utf-8?B?Q3h1SE1mOWREZ2JSWE5WcUx2djNqeHBoODJzYnBvMkxMUHBESGN6a2E4Wjlu?=
- =?utf-8?B?c2hnQmJ4Y1Iwa0ZxN3BjaHBJU2lsR0NGcmhmR3JVazJ4Q0pOcmpsTFNFYk9Z?=
- =?utf-8?B?LzIyZk91NXRWUnpCSmtJbTlYQ0cremJZL2MwTVFHckpiRkk5cURyQXBPVGUv?=
- =?utf-8?B?TWpxZzhRNGlXNUFDMmw2eFBaaW94TkVrZVJhWnphcDg3S2NRNHV5V2xOMzlJ?=
- =?utf-8?B?bytHK1RDNTNQMFdqZGN6YkpWZ1lOYTdtbCs3ampFMWtyOVZmdHJTaFpBeVFi?=
- =?utf-8?B?NU13c3IxczRZeVlZRjVMN0pLeHdQNWJGUXJBZjlaRjB6RTZESlNqY1Y4TFNS?=
- =?utf-8?B?bFI4WW44QlpxQ3JsdkJraC9Xcjk2YmtycnExVTVyTFpBVXJ6SlN4NnRDdnkw?=
- =?utf-8?B?d1ZEandObHFXVHQ0UWplNjF2NVN6MzZJMWU3ZGVkdllVODRVY2ZBVFRmejRX?=
- =?utf-8?B?TWNpd25MU0M0VTZMWFdPemx1UFQ5VDNxcGJtdDI3ODUyMlI2OEZxa0FzTnFp?=
- =?utf-8?B?ZW5tdHVVZXllOXBBWUJUMXQ4ckkyOU1SRzR5dDdJOThIcGozYmw2TFdBZlBM?=
- =?utf-8?B?VmdTMTR0VkcrOVFaT1NBRVhWdE1SVnpra1diL2tLek5sMndCK09takx6UjZI?=
- =?utf-8?B?VERHc01XZ2FYbTVQaWNQdWhmMjhaU3NGN01jU0RGMzE5Rms4MmxmbC8rTkVF?=
- =?utf-8?B?S3ZhNUlRNmJVYi9QVEpBc3dZMkxXU0hUcnkya1I4ZXBjck5DbjdqcUI3MENX?=
- =?utf-8?B?cTNGMTgvaU5IaFhwME14OWV3UEVVWURlL0ZUcG5iYjZ6MHhMeXZLVHRIWmRm?=
- =?utf-8?B?T1FEYmEzSTVGU0x5TGJBbmdoeDM2SjFQclBSd2c4cEo5U1JweHhTeE5ZeG5S?=
- =?utf-8?B?UkNnSGdnNUJseWNxMWt0STRHV05yc2lDT3lvdjA4NytERCsrVldxNGkzOGNQ?=
- =?utf-8?B?Ung2RStUdmdWK3lEbmRlUmVpbHF6YzNGL3pCc2FxTllBcE9adkptWGVCTzhy?=
- =?utf-8?B?OFNQbXBxeEN1NFArOW16aTk3ejR6cUU1cytRdUtaZHh6LzBqejF2YzdIc3BS?=
- =?utf-8?B?TmtROE1maFpNS0xNSFNzaXhBNmNnMFFkUE42K3FpdVQ5TG9CYktJeGxuUUxT?=
- =?utf-8?B?Umw0QjZmMm4wTXp2WHRwbkdKRFVITmpkcHZka2RNK0I5N2MweWdDWERQM1dL?=
- =?utf-8?Q?zEzaffwgi4vJgTaBde1Meu2Iv?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65042446-603c-4fb3-ce3d-08dd340e4f5c
-X-MS-Exchange-CrossTenant-AuthSource: MW6PR12MB7087.namprd12.prod.outlook.com
+	=?us-ascii?Q?uVf8vtu3uS13KWszVINTB8oR89uWMW/MAu7DYuvc375WRaly/QRZxMp6Fljp?=
+ =?us-ascii?Q?9vLmMnXdOSSsTQ4eggGhMRNHXfSG1s8JwgWnmKVajxlxoKJhrvzwQvQnQ313?=
+ =?us-ascii?Q?09WMOEvbjaTTvkdXoLfqTpH4nufsycEyMKizjCsy3psE61e4GGSuovVXOS8a?=
+ =?us-ascii?Q?+dI+jmdxJMvGTrL0vYO+OeRZXVnaV/dmqoOWrZ566PZN0cqfeOx9AuPOekiQ?=
+ =?us-ascii?Q?cFWNR9QqUxRBXG0NfiSm6R2JkzvMmFzo1ldBSJ/BLzEP5gmwoYQulcyFm7aX?=
+ =?us-ascii?Q?leUI3J70DxZ0o41q43ULTrBdOII5PNBOs4Z0tOTH4Z72FoOS8un+nJMXMRBO?=
+ =?us-ascii?Q?D58qKSX0RrVpHxNgGJAAOtcyLJ+/lDe4tpTYR1YmnUqxLc5Yqy7gQMGyR9Fq?=
+ =?us-ascii?Q?YADxSzdtnJAbOGIWMkGFUbOyOvMw5iwRH2SujiTlBZ6hOoSn7dMBT/7RjS4K?=
+ =?us-ascii?Q?8UwgeR533MLUWvRi/ZxmGqD6/fXRijPyRpm3Bt1XDKjyomsQhNpyoyFzPnwO?=
+ =?us-ascii?Q?TLVdIN0qHiBOKdMTIBsU1a1UvIgroDZdGT22l6/lw+uPNE/xm37SGHqVD8yb?=
+ =?us-ascii?Q?zofXf9kHC3PwyNykDPzwSP+20orDWUSZEBrz+qwWgYyxgoQnbA79VZk+ArZQ?=
+ =?us-ascii?Q?vqc3o6kbe/utROGfuUgPukSKch+hcH21rZy+QS/5FK20aTr+zGKYHwPZ58yB?=
+ =?us-ascii?Q?Opijc7hv4gQi3OPCVu2Q62gVDOlGYiGHIR5QUvtLgKQyCyFvBeRx7jK3xSeL?=
+ =?us-ascii?Q?QVdoI+ZMCeZoaYsNZHp3dj2ZNODTD29fQYABaFTJgU0ynQWvBOHLSiYO0MeP?=
+ =?us-ascii?Q?hbcrRV0Akog3ITSp86beYaq75wjSxaTV/SI5DmMhJKp/F5eBZS5UxpaGRkYH?=
+ =?us-ascii?Q?ndm7M23ZSkwoKlfvqqzQfzCBvFOAxzP6nI6JFlcMOgpfLPTv4+xGg4L4k3r8?=
+ =?us-ascii?Q?CU9EjxQEMrL78Rt6FXhZJD6ZGAjc/4uxto5BZRzPzIcJduR6l5DlGM2Mzk1J?=
+ =?us-ascii?Q?3o/chmLivRJqJeYNluIFU0uTNNVq8w4rdd4cMtOvIuhtSy39z0vJYaNvD/5E?=
+ =?us-ascii?Q?FFGJ6wYbt/rb9MLQByRlOwZbrAVlX98joemXFOGDgt8r/0s2k9rXyrb1ZtqI?=
+ =?us-ascii?Q?E82g39/0HQTNghnXgZD/aDWJUqccJ4uQ5RKObRNeTFKVqrZUkypeUnp/xB9U?=
+ =?us-ascii?Q?6s2mFnkJgcTOOGt3H/y9wrhgKXgsiaEfoeyzRrV2J0So3TAyewBIcQ3urvnH?=
+ =?us-ascii?Q?Dgv1Ap+EF0G6HOJyyomx0PPb7KgtVzg+5vuQXgDaNi3pq6dmeRBRIOauvXhO?=
+ =?us-ascii?Q?qcjJJMHlyzaABo/4/yLfKhir70EdLh90uRKm09ZI71xkeLBGUNlcUZtaFYo7?=
+ =?us-ascii?Q?yjuGwStYs3vxmM+BN1kY+5TRhW+SIfSR/hUfsirrEYCsLxsyRqPm/jAONk3A?=
+ =?us-ascii?Q?5VUPwjOzP5qyhAb9q9Q0MYGgPb++JczELz5/OG03TGDkXqAbBJ9DmuXqiwVL?=
+ =?us-ascii?Q?eyuHE5HEixVhPvHoNYLXb0rjnMKjLlCTm2afI2UqleQVWIaJQzpey+KWTE/1?=
+ =?us-ascii?Q?DEdhwAgcWsJkKuKYnBii0M62fkEXuUW4WUUU6gGb?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fef147b-43cd-41f8-f890-08dd3412bb37
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2025 20:10:22.3482
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2025 20:42:01.3325
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 95gjp2rC/PemF6+CeqvNMEZIJXzj/jWkId7pZfeCMCRTvoJVwfRVEZYGuObwq42X4mfiCGzYVPKRR1E/kd839A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7300
+X-MS-Exchange-CrossTenant-UserPrincipalName: ov9PI1y71iT5xnRzz5VJN2xefeuQLbaWf+mtEXkQXA8x1FyfKx1quUk4CCQRh+tg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7858
 
+On Mon, Jan 06, 2025 at 03:52:31PM -0600, Nishanth Aravamudan wrote:
+> vfio_pci_ioctl_get_pci_hot_reset_info checks if either the vdev's slot
+> or bus is not resettable by calling pci_probe_reset_{slot,bus}. Those
+> functions in turn call pci_{slot,bus}_resettable() to see if the PCI
+> device supports reset.
 
+This change makes sense to me, but..
 
-On 1/13/25 2:18 AM, Nikunj A. Dadhania wrote:
-> 
-> 
-> On 11/15/2024 5:11 AM, Pratik R. Sampat wrote:
->> In preparation for SNP, declutter the vm type check by introducing a
->> SEV-SNP VM type check as well a transitive set of helper functions.
->>
->> The SNP VM type is the subset of SEV-ES. Similarly, the SEV-ES and SNP
->> types are subset of the SEV VM type check.
->>
->> Signed-off-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
->> ---
->>  .../testing/selftests/kvm/include/x86_64/sev.h  |  4 ++++
->>  .../selftests/kvm/lib/x86_64/processor.c        |  4 ++--
->>  tools/testing/selftests/kvm/lib/x86_64/sev.c    | 17 +++++++++++++++++
->>  .../selftests/kvm/x86_64/sev_smoke_test.c       |  2 +-
->>  4 files changed, 24 insertions(+), 3 deletions(-)
->>
->> diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
->> index e7df5d0987f6..faed91435963 100644
->> --- a/tools/testing/selftests/kvm/include/x86_64/sev.h
->> +++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
->> @@ -29,6 +29,10 @@ enum sev_guest_state {
->>  
->>  #define VMGEXIT()		{ __asm__ __volatile__("rep; vmmcall"); }
->>  
->> +bool is_sev_vm(struct kvm_vm *vm);
->> +bool is_sev_es_vm(struct kvm_vm *vm);
->> +bool is_sev_snp_vm(struct kvm_vm *vm);
->> +
->>  void sev_vm_launch(struct kvm_vm *vm, uint32_t policy);
->>  void sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement);
->>  void sev_vm_launch_finish(struct kvm_vm *vm);
->> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
->> index 636b29ba8985..13f060748fc2 100644
->> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
->> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
->> @@ -641,7 +641,7 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm)
->>  	sync_global_to_guest(vm, host_cpu_is_amd);
->>  	sync_global_to_guest(vm, is_forced_emulation_enabled);
->>  
->> -	if (vm->type == KVM_X86_SEV_VM || vm->type == KVM_X86_SEV_ES_VM) {
->> +	if (is_sev_vm(vm)) {
->>  		struct kvm_sev_init init = { 0 };
->>  
->>  		vm_sev_ioctl(vm, KVM_SEV_INIT2, &init);
->> @@ -1158,7 +1158,7 @@ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
->>  
->>  void kvm_init_vm_address_properties(struct kvm_vm *vm)
->>  {
->> -	if (vm->type == KVM_X86_SEV_VM || vm->type == KVM_X86_SEV_ES_VM) {
->> +	if (is_sev_vm(vm)) {
->>  		vm->arch.sev_fd = open_sev_dev_path_or_exit();
->>  		vm->arch.c_bit = BIT_ULL(this_cpu_property(X86_PROPERTY_SEV_C_BIT));
->>  		vm->gpa_tag_mask = vm->arch.c_bit;
->> diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
->> index e9535ee20b7f..d6e7a422b69d 100644
->> --- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
->> +++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
->> @@ -4,6 +4,23 @@
->>  
->>  #include "sev.h"
->>  
->> +bool is_sev_snp_vm(struct kvm_vm *vm)
->> +{
->> +	return vm->type == KVM_X86_SNP_VM;
->> +}
->> +
->> +/* A SNP VM is also a SEV-ES VM */
->> +bool is_sev_es_vm(struct kvm_vm *vm)
->> +{
->> +	return is_sev_snp_vm(vm) || vm->type == KVM_X86_SEV_ES_VM;
->> +}
->> +
->> +/* A SEV-ES and SNP VM is also a SEV VM */
->> +bool is_sev_vm(struct kvm_vm *vm)
->> +{
->> +	return is_sev_snp_vm(vm) || is_sev_es_vm(vm) || vm->type == KVM_X86_SEV_VM;
-> 
-> As is_sev_es_vm() already checks is_sev_snp_vm(), we can drop SNP VM check here, right ?
-> 
+> However, commit d88f521da3ef ("PCI: Allow userspace to query and set
+> device reset mechanism") added support for userspace to disable reset of
+> specific PCI devices (by echo'ing "" into reset_method) and
+> pci_{slot,bus}_resettable methods do not check pci_reset_supported() to
+> see if userspace has disabled reset. Therefore, if an administrator
+> disables PCI reset of a specific device, but then uses vfio-pci with
+> that device (e.g. with qemu), vfio-pci will happily end up issuing a
+> reset to that device.
 
-That's right, thanks for catching that. I'll get rid of the
-is_sev_es_vm() check here.
+How does vfio-pci endup issuing a reset? It looked like all the paths
+are blocked in the pci core with pci_reset_supported()? Is there also
+a path that vfio is calling that is missing a pci_reset_supported()
+check? If yes that should probably be fixed in another patch.
 
-Pratik
+Or do you mean that VFIO tries to do a reset but it fails and nothing
+happens, the real issue is that hot_reset_info is reporting incorrect
+information to userspace?
 
-
-
+Jason
 
