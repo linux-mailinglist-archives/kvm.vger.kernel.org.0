@@ -1,123 +1,114 @@
-Return-Path: <kvm+bounces-35336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C86CCA0C4BB
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 23:31:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EAD7A0C520
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 00:07:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 315363A8497
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 22:31:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 466E13A7D12
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 23:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6381E1F9F52;
-	Mon, 13 Jan 2025 22:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFCB61F8933;
+	Mon, 13 Jan 2025 23:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cXc96mjN"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fGN55zD+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278931F9A96
-	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 22:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586071D47A6
+	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 23:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736807400; cv=none; b=goDny1+/BjDQAPhM2c0NwUHhFJG7UvroT40clGolKiYA7xYLLV7bX63oiAsB72z30tBo1w0ihqMU5OSLA8y/s7Meb2n3+xvkymhsV12dX4UE1kaTDVZcFs2aD0gZhHxx6xqFGM6HaTV+N+2ip7WWID63own5Xb1Dni84C8vWbiE=
+	t=1736809612; cv=none; b=iBIAJkpozLICnrFDcEKiL7x82T+2ubqhAhvTwNP7yG2h2e2Z6yINaoxzXuz3Y7dedVsD5eIqUMxCxMOC5YyG9AYbvtqyDlg7lIRreZktI43rGHkkv5uNJfaMjN2/qIvhSYjZcBHZuTu7q1q1P1Vz5Nf2TENcKrBqNs8nufJQz50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736807400; c=relaxed/simple;
-	bh=vFXTme0l2EtGLDvMvr7Wb8nxPHKTVbjWj47NnLK7m4o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=DH1Lk7zzg4+h7+bcdCY8v4qFJZOTwoWbVR7/Ia00/X5PehxdorAkcQzsLxcy84xbRooVNslnSLF/xBVDIwemAIv8jUJB/f58x3Hjtq38GnSjdzESInnVazwMo8+xzYD43+l9slMJrHu5VlVG4+perJp6wRT+03FwWVCumEhGE4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cXc96mjN; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee8ced572eso8644352a91.0
-        for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 14:29:59 -0800 (PST)
+	s=arc-20240116; t=1736809612; c=relaxed/simple;
+	bh=FY3CAUHnUAGPlAvnTqBwytKqjfIe0H96ZK2+kvt3Gpo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tkFvY+qh31bxC8nQnbrn9pleK3CDiYr276xlPITrDcEDYI1JI6wKYgGnOubIMOdKIUH3adWjAXX9F/ksu7cnuOh2KBEAzC5wBRQkLreOUQHmKqSperVOYOreoWqW+QIkL0jByBgNOEyqNyuYcPaV2U6l8fh31LzCHAyc7lo/IDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fGN55zD+; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-844e6d1283aso190304139f.1
+        for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 15:06:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736807398; x=1737412198; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+        d=linuxfoundation.org; s=google; t=1736809600; x=1737414400; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=bw9SY9vXLU/AJEykJA1x18c2kg/nuCeiQgdJRPgfpfc=;
-        b=cXc96mjN7a9aBU8nCaRlBmGx3G2p5um/FDOtOYPqHf+gHoYc/U0neCd3pIGqhmfoWZ
-         +I9EJraRZEU0GUoqB7bYq6bthQoiqRj37enOosINsSVfPaUmYrDA7Ohq7yR8JIsYmP5n
-         G7Tl7a2r1dmImdvIsntbnIraI0k1VYYgK5kewRjxyQ4mQFmUBQ6EQAC1LxWWAwq75ywP
-         zCvSxXN/zLjkoKdOAemG2ykIr/GixLxZ0tpf0Zuztbg1gkH7mBsHur/bHcLd8jFCuiN1
-         xamCMbfkrMJDMrA6HEgFJhucvTdyJ/3E+Eup3mC7eW7rLXxpajjt38cLgsuebE8uNv1X
-         bqYg==
+        bh=t98L05cLqoN9QlNAdFWwtAB2uSyAKNpsq0R3tlTJnx4=;
+        b=fGN55zD+QPKLTIC1ERc58hM9umFVkrs3t9SSVj3jKPYQaee3iswV/0spT0NsKCUget
+         JEyaj3elRNTisN9FN7FtU5LE4NLRwVksQ6Iqm7IzCO96TvYeJpyB84YBTzrg3KQtZIFP
+         uHobzoMZG9AS9FwjzAsqrxgm2ABSeadHkVotc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736807398; x=1737412198;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1736809600; x=1737414400;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bw9SY9vXLU/AJEykJA1x18c2kg/nuCeiQgdJRPgfpfc=;
-        b=VsFVKk9U/fDpz1fV5cqTwrERzobe1HFD3ufjfbht3R48S4eGBtPVNduuJl0o3Hd8kq
-         X28N+9okzLt5uJlOXbmOhzlUT/Ap7Xc7DSKr1VGehPYEpgWL7SzwAL//RASwRS3O0zQm
-         uLW/bcD9CFNebZxHx05sRc+2OfJS+g7iwI8bzlIMne5LWqPPHWUBYpoFZGMt6nb7DQ5d
-         Lj2grGNyFieNJl5bkmwTMritWEJy15CAE4pvTxssQ9aVI7h7ZrLu1KUw3HZgMX9pKx9n
-         9lEI7H8NMqWcWtz+P5rkxiW55beb0+p1od/f6eSct0n84TkIXyLHkc0Gp+bpuou5br5l
-         iz4A==
-X-Forwarded-Encrypted: i=1; AJvYcCUkZhmvhqPILrLO66KIY9Rgbkq/yPllGgAfkGaTd7agzZko7T3yIngijEeomHdAqBQGbmE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVoNBH7TUA+zbsmxf+iexCs7QU4wjcGdAuHu1U9YKr0LnHRyzO
-	w1vUCaqjWt4G6YJBCJm621XcfwECxjRTkF7Hx1i3kQNSS5JEdTfYCpjBh8VFF8NnQvpcH/88D5g
-	uQQ==
-X-Google-Smtp-Source: AGHT+IHyeNuhBnW0QqO63/mQpYNWJJkaFMu8OIJPcWZdkHxnOXShSpmfKQvcDgQI94dU6/2l/aAm83E3Rco=
-X-Received: from pjbsz15.prod.google.com ([2002:a17:90b:2d4f:b0:2ef:8a7b:195c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:54cb:b0:2ee:8e75:4aeb
- with SMTP id 98e67ed59e1d1-2f548ec9267mr36225691a91.17.1736807398604; Mon, 13
- Jan 2025 14:29:58 -0800 (PST)
-Date: Mon, 13 Jan 2025 14:29:57 -0800
-In-Reply-To: <20250113222740.1481934-2-seanjc@google.com>
+        bh=t98L05cLqoN9QlNAdFWwtAB2uSyAKNpsq0R3tlTJnx4=;
+        b=cpkEX0SfOBvRoU3m3PHlSby+4Y+gp4QMqPcDiJugGqBIdC4lZLa+Kez+YeMVKVchrZ
+         PWa0mPbeRlLBE6fZ2Ukwy9eGBGxGNwvgky2tX3ab8IXqmZWFnn/nOiA+c6Ln4bKheDNM
+         qJXNbTnpvaYJi6BXFqDoRko/1OsGN/xwyhZhF2nTu4x5RSZk3mcP/vylkBbiRoch+sHd
+         lNrHV1TniV3eLikzEtJj5IjHtiLiDsnfGE+FhmknnzkbL1muZTFSGQLAU5FnKKuQmW1C
+         JAvKapBJjk97Ru4Y08Vu53QiAtSuYGA6rXyITTVqriMC2zXeuivqxe7QuydSsKjwETEM
+         /6Gg==
+X-Forwarded-Encrypted: i=1; AJvYcCVZJmoVNvbrbld08OfvagoWBESEMmZphBl/YjDBVdtwzQpvuTbobh5G45t+uiDOVOQ04yY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/3A6mDLmQYSjdomD+XVaOc2ZBie8CFRnOUEmutoe4nwMqHcnL
+	4V/iD6H2QfTganDqxq65xIonFDshT7JARN0d4OAVbcgz2ImZR2qzOezkbqZYlmScjTwBqxYLxYH
+	6
+X-Gm-Gg: ASbGncvs2l8WigyCVZ2W/JGy7pPiAWTxRxK4PU8E+IrVW+w0iBjAD5D/QU77z3uDWVG
+	qJhZKxF8YCRt5TyIVfTY8CmjShAx9cv1CBbZsKEX6FP96KmzdC8gCl87FdZP/PdtTMm416UKcan
+	dPFfgfOJ2Wt3PovAXlWPq0GlRxEeZG9ePDvnm543++9XTqDpz/GGOZwJMPPOdzniYRCAnISxfWM
+	ih5FogP3+9FiM7evgD7uwBAYYj27sTP8Cqu8thzZpP4d3BDWID5InAwJ41nCCToG8c=
+X-Google-Smtp-Source: AGHT+IH8D8/WA3nsz270K68ibq75FwpYAmp8r79kGSFWGw5muQ30GDD6Uv2Knph7vskIzmqScVtI3A==
+X-Received: by 2002:a05:6e02:1a8f:b0:3cd:c260:9f55 with SMTP id e9e14a558f8ab-3ce47570cd3mr131591595ab.4.1736809600570;
+        Mon, 13 Jan 2025 15:06:40 -0800 (PST)
+Received: from [192.168.1.14] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea1b717838sm3014196173.102.2025.01.13.15.06.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Jan 2025 15:06:40 -0800 (PST)
+Message-ID: <15339541-8912-4a1f-b5ca-26dd825dfb88@linuxfoundation.org>
+Date: Mon, 13 Jan 2025 16:06:39 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250113222740.1481934-1-seanjc@google.com> <20250113222740.1481934-2-seanjc@google.com>
-Message-ID: <Z4WT5VA4N7hLQnAr@google.com>
-Subject: Re: [PATCH 1/5] KVM: x86: Reject Hyper-V's SEND_IPI hypercalls if
- local APIC isn't in-kernel
-From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Dongjie Zou <zoudongjie@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] selftests/rseq: Fix rseq for cases without glibc support
+To: Raghavendra Rao Ananta <rananta@google.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20241210224435.15206-1-rananta@google.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20241210224435.15206-1-rananta@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 13, 2025, Sean Christopherson wrote:
-> Advertise support for Hyper-V's SEND_IPI and SEND_IPI_EX hypercalls if and
-> only if the local API is emulated/virtualized by KVM, and explicitly reject
-> said hypercalls if the local APIC is emulated in userspace, i.e. don't rely
-> on userspace to opt-in to KVM_CAP_HYPERV_ENFORCE_CPUID.
+On 12/10/24 15:44, Raghavendra Rao Ananta wrote:
+> Currently the rseq constructor, rseq_init(), assumes that glibc always
+> has the support for rseq symbols (__rseq_size for instance). However,
+> glibc supports rseq from version 2.35 onwards. As a result, for the
+> systems that run glibc less than 2.35, the global rseq_size remains
+> initialized to -1U. When a thread then tries to register for rseq,
+> get_rseq_min_alloc_size() would end up returning -1U, which is
+> incorrect. Hence, initialize rseq_size for the cases where glibc doesn't
+> have the support for rseq symbols.
 > 
-> Rejecting SEND_IPI and SEND_IPI_EX fixes a NULL-pointer dereference if
-> Hyper-V enlightenments are exposed to the guest without an in-kernel local
-> APIC:
-> 
->   dump_stack+0xbe/0xfd
->   __kasan_report.cold+0x34/0x84
->   kasan_report+0x3a/0x50
->   __apic_accept_irq+0x3a/0x5c0
->   kvm_hv_send_ipi.isra.0+0x34e/0x820
->   kvm_hv_hypercall+0x8d9/0x9d0
->   kvm_emulate_hypercall+0x506/0x7e0
->   __vmx_handle_exit+0x283/0xb60
->   vmx_handle_exit+0x1d/0xd0
->   vcpu_enter_guest+0x16b0/0x24c0
->   vcpu_run+0xc0/0x550
->   kvm_arch_vcpu_ioctl_run+0x170/0x6d0
->   kvm_vcpu_ioctl+0x413/0xb20
->   __se_sys_ioctl+0x111/0x160
->   do_syscal1_64+0x30/0x40
->   entry_SYSCALL_64_after_hwframe+0x67/0xd1
-> 
-> Note, checking the sending vCPU is sufficient, as the per-VM irqchip_mode
-> can't be modified after vCPUs are created, i.e. if one vCPU has an
-> in-kernel local APIC, then all vCPUs have an in-kernel local APIC.
-> 
-> Reported-by: Dongjie Zou <zoudongjie@huawei.com>
-> Fixes: 214ff83d4473 ("KVM: x86: hyperv: implement PV IPI send hypercalls")
-> Fixes: 2bc39970e932 ("x86/kvm/hyper-v: Introduce KVM_GET_SUPPORTED_HV_CPUID")
-> Cc: stable@vger.kernel
+> Cc: stable@vger.kernel.org
+> Fixes: 73a4f5a704a2 ("selftests/rseq: Fix mm_cid test failure")
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
 
-Argh, I missed the ".org".
+Applied to linux_kselftest next for Linux 6.14-rc1 after fixing the
+commit if for Fixes tag
 
-Paolo, if you end up applying this instead of me, can you fixup the email?
+thanks,
+-- Shuah
 
