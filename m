@@ -1,229 +1,460 @@
-Return-Path: <kvm+bounces-35256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E557A0AD45
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 03:10:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B0BA0AD42
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 03:09:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CF663A739A
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 02:09:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C68523A6E2E
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 02:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A2E136E3B;
-	Mon, 13 Jan 2025 02:09:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BDA253368;
+	Mon, 13 Jan 2025 02:09:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ggWPlK5X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SXZaKfnT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516687F7FC;
-	Mon, 13 Jan 2025 02:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736734183; cv=fail; b=Xbx4MGfthODzGc+kIz0QjYZIOUAz/Z9QCWlRg9XLhGlZ43jUtFL6l7on7mzlVhb2A4/7KxrjvfGTCroe6PNI7AL9H/mk9K6uZhy0EAJLpCFC8erpvm6D9xxIMatPIWYoXZ8hJHnyNUPSNor6FMhtH+PNAOtBi533OjlGOCHDap4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736734183; c=relaxed/simple;
-	bh=44qVJ8JQQunPl/5DJY6lMrOqR1rHAF9jJeyesp7f8Ng=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=NND86u+XlX1NFUHMksFukXDxlf5trlqCRhXjHzRcUJ9n3Qs1hCA8Zb75H4VkTiDdIjZbxY99cW2ePnbqqDbe6gQ7FQdlc5FORUZ71MHszHh1yVBUaXVbqA4TuUgJ0SEYSczEjznaLAj+t951MDdUdzdnscVtHLivaTp+Xtu1ffw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ggWPlK5X; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0B4125D5;
+	Mon, 13 Jan 2025 02:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736734178; cv=none; b=B8uVW4QNpZARv4NLbDS5ODxx/bbqka8rUfkNAjkC63wQQojH3t02dW+aLph5vMJvOEC/vPKy1uL7vQblHtnxF7hGHKs2uF/NEfQUcZu751HOQYLqGw9rEBC7FUpqZYTnwV936QXj2K98LXLVYMwp12jpbJAy20NPLzzeZSEmPao=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736734178; c=relaxed/simple;
+	bh=vp1TK9ckxcl2xdsdpCR4Hs+hfYadThZX+6WHkwH8NhI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ukQ8gGPnW1pUqggejf0TmEtSk+AUlOx8gOqxy72wQu8ERHOGE99xwoQBtMLO6CvhFTDBm8L9yv34ctwex3q0JVYFaVrMes6ejsBQBGy5PUzDqqT+/M5o5F/nzDVNMsq8bLzIJIRYiCB96ytOPqZCh9pflqbMm6RcKMfw4opVEFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SXZaKfnT; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736734181; x=1768270181;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=44qVJ8JQQunPl/5DJY6lMrOqR1rHAF9jJeyesp7f8Ng=;
-  b=ggWPlK5XQCGFlbE/1m3X1xO5wT77ScI7OfpFyX5FtA8OKzw5//Ev3ZLm
-   gSZydVE+kbu6ARyBakHZ/bo6kszao5ETSRc9j9N122SRl/4ebwS3drFo8
-   0tDEWwVMb7MtpV+Q9ot8lU9vMEYnraaxEDutyKfy1fLtVRk+BzI4VeNXE
-   nthnZchYIQgopWCqwKAMizMwMG+ymCNLuyJ3t824d+piwY17sYeBMo7b8
-   y74ovIidLDKYBLJHmnonW37WieKsYGXYy0XP1CIIcBgKbcyRAm5XMQAtb
-   wOENVNimZBhm7ceHgnkuIb+FBilGmGgUJWiHxS3LyE2CUpehEhHhLmWHx
-   g==;
-X-CSE-ConnectionGUID: ay+tGRE8TNayKaXZXvYhlw==
-X-CSE-MsgGUID: 073uCklOTxW/+Rx9nlp2ew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11313"; a="54522346"
+  t=1736734176; x=1768270176;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=vp1TK9ckxcl2xdsdpCR4Hs+hfYadThZX+6WHkwH8NhI=;
+  b=SXZaKfnTMToX3ZW0eJP47EVfKWhKcM07Qeohm78LAbwVqTGMakXSBegd
+   4zexoIVfWJjDOndhENfL5le1t+lJ1Kk+TrlAUC7zDRKw71lffTCCZYUPi
+   gTmgXnOQ4CjBR9hBR/FL15m1elRxp2k+8k1+z2+Lvj1zcYmr7acxcxRRl
+   C70BO9yXjzw074q0ERlwvMavgaY+SeXg9nc0Re7D/lIEAgvCh6IvaroTk
+   P941wySdzJIlaVOH/Pk/dQaV3jSI3uruhjsTQ9NNPJG4yQS5H5wRmvQ8C
+   zxOwyw7UGJmBUBr4LK2Ly9hjVQfHUvqdgPU+9xW+9vScOC+qaZ3QzxFrK
+   w==;
+X-CSE-ConnectionGUID: ACRRiwGNSPOcSupQ5uPdvA==
+X-CSE-MsgGUID: qXvPpjKPSUKM4aN1JWOfDw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11313"; a="54522339"
 X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="54522346"
+   d="scan'208";a="54522339"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2025 18:09:41 -0800
-X-CSE-ConnectionGUID: d8MipuyXTcKtRhl1qTs8BQ==
-X-CSE-MsgGUID: Ap2StcoKR7ywckdRsdRHGQ==
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2025 18:09:36 -0800
+X-CSE-ConnectionGUID: nH7d6XE2SWaU5hPjujvllg==
+X-CSE-MsgGUID: GilHLt81QJ2lABuJoPRvHw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="135141764"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Jan 2025 18:09:42 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Sun, 12 Jan 2025 18:09:40 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Sun, 12 Jan 2025 18:09:40 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.47) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Sun, 12 Jan 2025 18:09:40 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MuSYMmfFqXazjTXHv0/hJaXeRvTG4hpGsItDip1xpjwD7NJLN5YKtTwlgf7JWX4oTgzfNh1k7bjzHXKuc1hVa/fQZ9eRuJTHLyH5QowXc46xlSce4ppxv/oZAceLBBxbO2+Qi+6LjsZfa4J7z0JmL18BNprWtmPy8KKmqHRWFIuRUgfK7R5uClqLLZyGRFp11K/9KfTZD/3tYdzyLMgndCoKy+r1zsV0DqsHdbz19I/Rqd/TbHQf9yQycYI7GnunTjGbM8rzUTMpuYSg3B6PXSC7qCv82iMu2rUCADmrDiHK2q3ZneZBJ5syTb+1iVxDmFamMYJdsqI//IH8P5tYcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+fLOt2fIG+loidnVM152IklkXHiBdttWfK8V5+Fvnbc=;
- b=AGw0ZNKH6XElsWPrFiDxW9NtBOf5ih88McokO8LDGsgkfvb1xJrShFtSxZaVn3h8+ARLQFOXRtb+vCJDCOdbxme5SC5bBzGnDsYcB1HdYdgdQ3ZhC08HrVXd2QxF7MpfJQpsOHc8LOLvV7rIhcPAhsJiPxBuMwByrvQqBUakxuzveHqlmXVdfFzVi5BNdv3ScwhtSd5HM1VPtlT38Ive/0snv2LAmfKkNgUj4VVFvKnx6YwKB07a6nl/BB8omCr/sUIHgmKc7b9nUwCpEJyd8jHoYTNM4ZGL3KsbCBapfH9+srpEjc/bCC9C8SgOO69/MxWGrL2YkYxGxe64hicYNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by DS0PR11MB7880.namprd11.prod.outlook.com (2603:10b6:8:f3::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Mon, 13 Jan
- 2025 02:09:38 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%5]) with mapi id 15.20.8335.017; Mon, 13 Jan 2025
- 02:09:38 +0000
-Date: Mon, 13 Jan 2025 10:09:28 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	"Oliver Upton" <oliver.upton@linux.dev>, Michael Ellerman
-	<mpe@ellerman.id.au>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an
- exit needs completion
-Message-ID: <Z4R12HOD1o8ETYzm@intel.com>
-References: <20250111012450.1262638-1-seanjc@google.com>
- <20250111012450.1262638-4-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250111012450.1262638-4-seanjc@google.com>
-X-ClientProxiedBy: SI2PR01CA0017.apcprd01.prod.exchangelabs.com
- (2603:1096:4:191::19) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+   d="scan'208";a="135141731"
+Received: from unknown (HELO [10.238.1.62]) ([10.238.1.62])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2025 18:09:33 -0800
+Message-ID: <e3a2e8fa-b496-4010-9a8c-bfeb131bc43b@linux.intel.com>
+Date: Mon, 13 Jan 2025 10:09:30 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DS0PR11MB7880:EE_
-X-MS-Office365-Filtering-Correlation-Id: 924063fc-7ee4-4ece-bb59-08dd3377554e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?tIwtRKj3YMqEOtTSxd60+tXOslhIYWeoE06xToSy0iJ21XBr4BGu9q9nz2Nl?=
- =?us-ascii?Q?jMuZyd2yAuEgew3rbjOEq3a6PW2ZawPG40JJVJWJT0FgDOCHTaGE5Jz4ONGE?=
- =?us-ascii?Q?RDyGfRHg5F5rSK0QjXjY8r03gDhA2Zph4bPt9ERZMIOH0FbQ/5TcrjklmQdb?=
- =?us-ascii?Q?QnOKNLO50p22Vu5wrvPpwVT8JSLRQe+wrGKb/GYo+GVTuoonlnnxnhG5GB5f?=
- =?us-ascii?Q?ImHXwPRSGlkqrBGxOZwknD7hRw2Ge7hEd7Et/Cr+ywpa4WdPmvgsf2Du9Hdl?=
- =?us-ascii?Q?x1dBd2hUCG6Vb0pmMCI3KyPBIgHGdqANkbFeRze0n+gWidBpByNsZ2hLgHQf?=
- =?us-ascii?Q?1gpokTuLB0YhZXYJ8e73yyD9bjJ+O9Azz87xRoj0DKFsD8FlEBLSpDlMHA5u?=
- =?us-ascii?Q?V+bRNHDvWP37kXlyiairIlH1IsMnSsOEub9SD8X6e73WoVd4ZmPF1YRo5t9t?=
- =?us-ascii?Q?DbFbZMQauVJZ44R9WMoctPdpdzu0mhGXoN20wEKxNc714mV+E6mfNMrrYMAu?=
- =?us-ascii?Q?LZarpwjM5f3MovIqfhdPFmbbUyIgR9yogks1Kl5s3HYR6ktS4P/Zi5E8lUui?=
- =?us-ascii?Q?n1wWgoslStDABMAbNBuw4BlAooFFpRBRN/w6t7dgqL6Wpeb7fn59XXqzLYC/?=
- =?us-ascii?Q?W/u6uZH6CodXtEfABCOgHs0YI0sTbA5xRQGYrnUcGg4bhxKrdJIlxDFcvLH2?=
- =?us-ascii?Q?A0iVgAnMEroLO7eIU3EMcAS/nDXn4HT2ddmspzn/MssSKEnBeKDmRn5NxNC5?=
- =?us-ascii?Q?9VIdyn88iR2+E0LmqIH8kQy2bLKnWwUXIbSRRyIj3xIllxCLVRRnZHgReIzG?=
- =?us-ascii?Q?afhTIhvNxlG57vvgNgtgnWzXWUldiwbCjcPkK1Idnz+Qlxq+HxBtlmGG82bl?=
- =?us-ascii?Q?ehbfuUBq7CJZn4JfTiPkiruIsgEA6O8IFKqsyaR7/lzBzn/VzTnIwcDVHJZF?=
- =?us-ascii?Q?DMz/Dn9lBnzLpp9JoGUP1wuSy760WQIgVgm6EkGFwnEfLgCUoM6bBPYibIPP?=
- =?us-ascii?Q?9EuP2iPSFyiYsyOjnYHl3jzcAPxDEqH3NvFTcC46oKmzzwmhQCY7/YwpVEZ7?=
- =?us-ascii?Q?HqZF7CJuUGpRNVIAT4uOTNQiEY7eS4842MwkxtE/csKNmCt36J5Z5AQF6stU?=
- =?us-ascii?Q?mdOcFERgpvoSUJsi+Edv7HBQ/7Y1SYXVFdkNoSVbANn09ZV9wMsAmS0i8w2S?=
- =?us-ascii?Q?HdH+Vu7ysst5X6dkkvMK4kf3Kuyb2LCEOx/Xpy/SxjSo93XOtVtPnlFP1Ijb?=
- =?us-ascii?Q?uX4eqxBcaDSSzPdG9h1zwNmNpPrpy4HUE7Ay7wG/R8lM77M21BKNyAb6KBTj?=
- =?us-ascii?Q?HF+8XRBOLbzT/N362t/twOAsYVeyOjSbMuzI+BFVIJ2t1zl8DLdp+laPOpku?=
- =?us-ascii?Q?08PI4wl0UOkSExmySTZTwdrKFHy9Bistns0ykxVF4AhI8RP84g=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?97MGEL9BwQHanUn183vEd2mKI8HaG6qTNp/95tOoT+sLcEmoseRlqjZO/LD9?=
- =?us-ascii?Q?8I72gzPtfZKf6vmU80/+YRtdTZyw5YeCaUw0pB8p51iXOq+ZzlUrjUh2QIPN?=
- =?us-ascii?Q?pc732JW3QVTsWmLqrEkYPfbkgP7rYZNoFzcmpj+qYV/76Uv5pzJQ8n2WGocW?=
- =?us-ascii?Q?VA4dpg4Z3sec6Ru1ZqF8teTHYCS5e6WMwCyfK5zBAZJcPxgIZ73L/y9pwvwO?=
- =?us-ascii?Q?ed+J61mfQLxoDr3Cy3kKiyvOZ0JN7oeAVYZvASpOvAjHTKN0QGgX+tp+bn2n?=
- =?us-ascii?Q?2hqhRZYph8LIUOPxky/Z4TskmYaAmKf6p5XS/j3VukXIxjt1GtCasxrWJUIq?=
- =?us-ascii?Q?LReyBO8iaaKlP2OKUMFGrmdizMIt6PqUPuSngl4AFRd71j00SwM+HNVBsBBZ?=
- =?us-ascii?Q?pRoJdQdqIKy/TgvPAMaLD3PM734AdWPRXyWjTSB0JTbnrVPdmPa1Ojcfy3f0?=
- =?us-ascii?Q?PbrBbsF7V5mX6CBjRHF7R30wkZJOyw8rz4IKWmdJjbfpWK7mjbYkIEJM3i3u?=
- =?us-ascii?Q?2kPXJYLQ4NEi6gKh1iC0k91aIgYo+ocl9jwCAlJ3+ju20MYQEiYvIB8sfdI4?=
- =?us-ascii?Q?N8ueHtpdhw0+jrTqUksb1t2tcRMdEAQ8tj2G3ntlC+iI/Kz19IV1DviaQQk0?=
- =?us-ascii?Q?6QQL+G7dbP7JBZjSSkESu/MT3ILEktK1s+Bqe9q18EImgXPELV5NRvRNLNHC?=
- =?us-ascii?Q?7vpHbsDSrsHO7FbTaxHnpGibEF4S9v+J3Cf5CsmpSuuAtEeiYrEJDLBTdMd6?=
- =?us-ascii?Q?0oYB1TsJMI6GB6fqiF4dGx7tr9V+yCqAKPOdEJIKNPzu6SdTPSquhkuWp8EN?=
- =?us-ascii?Q?F6/nS2B4yXxNZMA2jH7oN9u3btW62hRFTWqoCSihZxKI1RgplwzhF+/b7qXF?=
- =?us-ascii?Q?7O/TL0D976o0nr5aktsbrB4rXBEmsdyA575AghKb1USdWz2VkiG7a9e5m+wc?=
- =?us-ascii?Q?JHbjn7plOiHbTu4iy/eXznCAsXV2Ap/p1/Pw/5hPWR0ht8VIt4eSfHF2mQBv?=
- =?us-ascii?Q?AktOEhf7akPeOMBYg1PJ92zECKhfv9JFg9jy5JzLeTjZrpYAfUc4EWgYcoiH?=
- =?us-ascii?Q?J6oiJAzYAQcva5rP+ka/ReyhHrxVilmfAG6jMtDJUPTDLtvr7kuIf+S7IVpF?=
- =?us-ascii?Q?kgbVualTZaordJQK3gIlT1KUxiW9niilPLSDgMlGLSSXQhAymv0cWmdPud/1?=
- =?us-ascii?Q?t44Uys1EV4yj1BovpQN7FpXSBAbmWV1RQd2cC48nRAypSdjlBZFO9qfiK4Zo?=
- =?us-ascii?Q?NiUrqVRUyRxqPcNgyAMD02s2yMFbKM8+RiRgQQujqc+mOuR0eJJuyO089hHb?=
- =?us-ascii?Q?8kpbrxohUWdDMbTyOLaLwTZRDC4UbKslnaZjseiAASXOaW4fqnW8uBjFbwZX?=
- =?us-ascii?Q?u/aw1khiiMaVKwfgpHKNgQZ0Se9YRvMcpdVwLwasJSLLLKS+/eCi9dYb9aka?=
- =?us-ascii?Q?n91UXqPWHoaZo8esXQUMQWELqKkL5kvG+L0V5che51r3gHAkkpRYQd89FDJr?=
- =?us-ascii?Q?xrq8d50bALd/aowvf5qSucoY8bUYskLAp4rasYm4/hJqnYcogNFQcdsTcb6D?=
- =?us-ascii?Q?ZEsIMedK2C/tnHJc0HrPtIiOMZjnuudxO1ltLNF+?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 924063fc-7ee4-4ece-bb59-08dd3377554e
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2025 02:09:38.5529
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XKex/+Tuny4IS5mEjJcMnwWb8ew/lL98JNob89kCjjGxDNuaqPpSExMHCLnMrSyzBZMg9civN4uwFKuE1Egz/Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7880
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/16] KVM: TDX: Inhibit APICv for TDX guest
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org
+Cc: rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@linux.intel.com, isaku.yamahata@intel.com,
+ yan.y.zhao@intel.com, chao.gao@intel.com, linux-kernel@vger.kernel.org
+References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
+ <20241209010734.3543481-13-binbin.wu@linux.intel.com>
+ <8a9b761b-3ffc-4e67-8254-cf4150a997ae@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <8a9b761b-3ffc-4e67-8254-cf4150a997ae@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 10, 2025 at 05:24:48PM -0800, Sean Christopherson wrote:
->Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
->that KVM_RUN needs to be re-executed prior to save/restore in order to
->complete the instruction/operation that triggered the userspace exit.
+
+
+
+On 1/13/2025 10:03 AM, Binbin Wu wrote:
 >
->KVM's current approach of adding notes in the Documentation is beyond
->brittle, e.g. there is at least one known case where a KVM developer added
->a new userspace exit type, and then that same developer forgot to handle
->completion when adding userspace support.
+> On 12/9/2024 9:07 AM, Binbin Wu wrote:
+>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>
+>> Inhibit APICv for TDX guest in KVM since TDX doesn't support APICv accesses
+>> from host VMM.
+>>
+>> Follow how SEV inhibits APICv.  I.e, define a new inhibit reason for TDX, set
+>> it on TD initialization, and add the flag to kvm_x86_ops.required_apicv_inhibits.
+>
+Resend due to the format mess.
 
-This answers one question I had:
-https://lore.kernel.org/kvm/Z1bmUCEdoZ87wIMn@intel.com/
+For TDX guests, APICv is always enabled by TDX module. But in current TDX
+basic support patch series, TDX code inhibits APICv for TDX guests from
+the view of KVM. Synced with Isaku, the reason was to prevent the APICv
+active state from toggling during runtime.
 
-So, it is the VMM's (i.e., QEMU's) responsibility to re-execute KVM_RUN in this
-case.
+Sean raised the concern in a PUCK session that it is not concept right to
+"lie" to KVM that APICv is disabled while it is actually enabled. Instead,
+it's better to make APICv enabled and prevent it from being disabled from
+the view of KVM.
 
-Btw, can this flag be used to address the issue [*] with steal time accounting?
-We can set the new flag for each vCPU in the PM notifier and we need to change
-the re-execution to handle steal time accounting (not just IO completion).
+Following is the analysis about the APICv active state for TDX to kick off
+further discussions.
 
-[*]: https://lore.kernel.org/kvm/Z36XJl1OAahVkxhl@google.com/
+APICv active state
+==================
+ From the view of KVM, whether APICv state is active or not is decided by:
+1. APIC is hw enabled
+2. VM and vCPU have no inhibit reasons set.
 
-one nit below,
+APIC hw enabled
+---------------
 
->--- a/arch/x86/include/uapi/asm/kvm.h
->+++ b/arch/x86/include/uapi/asm/kvm.h
->@@ -104,9 +104,10 @@ struct kvm_ioapic_state {
-> #define KVM_IRQCHIP_IOAPIC       2
-> #define KVM_NR_IRQCHIPS          3
-> 
->-#define KVM_RUN_X86_SMM		 (1 << 0)
->-#define KVM_RUN_X86_BUS_LOCK     (1 << 1)
->-#define KVM_RUN_X86_GUEST_MODE   (1 << 2)
->+#define KVM_RUN_X86_SMM			(1 << 0)
->+#define KVM_RUN_X86_BUS_LOCK		(1 << 1)
->+#define KVM_RUN_X86_GUEST_MODE		(1 << 2)
->+#define KVM_RUN_X86_NEEDS_COMPLETION	(1 << 2)
+After TDX vCPU init, APIC is set to x2APIC mode. However, userspace could
+disable APIC via KVM_SET_LAPIC or KVM_SET_{SREGS, SREGS2}.
 
-This X86_NEEDS_COMPLETION should be dropped. It is never used.
+- KVM_SET_LAPIC
+   Currently, KVM allows userspace to request KVM_SET_LAPIC to set the state
+   of LAPIC for TDX guests.
+   There are two options:
+   - Force x2APIC mode and default base address when userspace request
+     KVM_SET_LAPIC.
+   - Simply reject KVM_SET_LAPIC for TDX guest (apic->guest_apic_protected
+     is true), since migration is not supported yet.
+   Choose option 2 for simplicity for now.
+
+- KVM_SET_{SREGS, SREGS2}
+   KVM rejects userspace to set APIC base when
+   vcpu->kvm->arch.has_protected_state and vcpu->arch.guest_state_protected
+   are both set.
+   Currently for TDX, kvm->arch.has_protected_state is not set, so userspace
+   is allowed to modify APIC base.
+   There are three options:
+   - Reject KVM_SET_{SREGS, SREGS2} when either vcpu->arch.guest_state_protected
+     or vcpu->kvm->arch.has_protected_state is set.
+   - Check vcpu->arch.guest_state_protected before kvm_apic_set_base() in
+     __set_sregs_common().
+   - Set has_protected_state for TDX guests.
+   Choose option 3, i.e. to set has_protected_state for TDX guests, aligning
+   with SEV/SNP.
+
+APICv inhibit reasons
+---------------------
+
+APICv could be disabled due to a few inhibit reasons.
+
+- APICV_INHIBIT_REASON_DISABLED
+   For TDX, this could be triggered when the module parameter enable_apicv is
+   set to false.
+   enable_apicv could be checked in tdx_bringup(). Disable TDX support if
+   !enable_apicv. So that APICV_INHIBIT_REASON_DISABLED will not be set
+   during runtime and apic->apicv_active is initialized to true.
+
+- APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED
+   KVM will reject userspace to modify APIC base, i.e., APIC mode will always
+   be x2APIC mode, the only reason this could be set is it fails to allocate
+   memory for KVM apic map.
+
+- APICV_INHIBIT_REASON_PIT_REINJ
+   Based on current code, this is relevant only to AMD's AVIC, so this reason
+   will not be set for TDX guests. However, KVM is also not be able to
+   intercept EOI for TDX guests. For TDX, if in-kernel PIT is enabled and in
+   re-inject mode, the use of PIT in guest may have problem. Fortunately,
+   modern OSes don't use PIT.
+   Options:
+   - Enforce irqchip split for TDX guests, i.e. in-kernel PIT is not supported.
+   - Leave it as it is and expect PIT will not be used.
+
+- Reasons will not be set for TDX
+   - APICV_INHIBIT_REASON_HYPERV
+     TDX doesn't support HyperV guest yet.
+   - APICV_INHIBIT_REASON_ABSENT
+     In-kernel LAPIC is checked in tdx_vcpu_create().
+   - APICV_INHIBIT_REASON_BLOCKIRQ
+     TDX doesn't support KVM_SET_GUEST_DEBUG.
+   - APICV_INHIBIT_REASON_APIC_ID_MODIFIED
+     KVM will reject userspace to modify APIC base, i.e., APIC mode will always
+     be x2APIC mode.
+   - APICV_INHIBIT_REASON_APIC_BASE_MODIFIED
+     KVM will reject userspace to set APIC base.
+
+- Reasons relevant only to AMD's AVIC
+   - APICV_INHIBIT_REASON_NESTED,
+   - APICV_INHIBIT_REASON_IRQWIN,
+   - APICV_INHIBIT_REASON_SEV,
+   - APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED.
+
+Summary about APICv inhibit reasons:
+APICv could still be disabled runtime in some corner case, e.g,
+APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED due to memory allocation failure.
+After checking enable_apicv in tdx_bringup(), apic->apicv_active is
+initialized as true in kvm_create_lapic().  If APICv is inhibited due to any
+reason runtime, the refresh_apicv_exec_ctrl() callback could be used to check
+if APICv is disabled for TDX, if APICv is disabled, bug the VM.
+
+
+Changes of APICv active from false to true
+==========================================
+
+Lazy check for pending APIC EOI when In-kernel IOAPIC
+-----------------------------------------------------
+In-kernel IOAPIC does not receive EOI with AMD SVM AVIC since the processor
+accelerates write to APIC EOI register and does not trap if the interrupt
+is edge-triggered. So there is a workaround by lazy check for pending APIC
+EOI at the time when setting new IOAPIC irq, and update IOAPIC EOI if no
+pending APIC EOI.
+KVM is also not be able to intercept EOI for TDX guests.
+- When APICv is enabled
+   The code of lazy check for pending APIC EOI doesn't work for TDX because
+   KVM can't get the status of real IRR and ISR, and the values are 0s in
+   vIRR and vISR in apic->regs[], kvm_apic_pending_eoi() will always return
+   false. So the RTC pending EOI will always be cleared when ioapic_set_irq()
+   is called for RTC. Then userspace may miss the coalesced RTC interrupts.
+- When When APICv is disabled
+   ioapic_lazy_update_eoi() will not be called，then pending EOI status for
+   RTC will not be cleared after setting and this will mislead userspace to
+   see coalesced RTC interrupts.
+Options:
+- Force irqchip split for TDX guests to eliminate the use of in-kernel IOAPIC.
+- Leave it as it is, but the use of RTC may not be accurate.
+
+kvm_can_post_timer_interrupt()
+------------------------------
+Whether housekeeping CPU can deliver timer interrupt to target vCPU via
+posted interrupt when nohz_full option set.
+- When APICv active is false, it always return false.
+- When APICv active is true, it also depends on whether mwait or hlt in guest
+   is set.
+   For TDX guests, hlt will trigger #VE unconditionally and TDX guests request
+   HLT via TDVMCALL. Whether mwait is allowed depends on the cpuid configuration
+   in TD_PARAMS.
+   So current implementation of kvm_mwait_in_guest() and kvm_hlt_in_guest()
+   doesn't reflect the real status for TDX guests.
+However, Sean mentioned "consulting kvm_can_post_timer_interrupt() in the
+expiration path is silly". There could be cleanups for this part.
+https://lore.kernel.org/kvm/Z32ZjGH72WPKBMam@google.com/
+So, don't do any TDX-specific logic for it.
+
+apic_timer_expired()
+--------------------
+About kvm_can_post_timer_interrupt() in the expiration path, see the
+description above.
+For the rest part, when the function is not called from timer function
+- If apicv_active, the timer interrupt will be injected via
+   kvm_apic_inject_pending_timer_irqs().
+- If !apicv_active, the timer interrupt will be handled via
+   lapic_timer.pending approach, and finally, the timer interrupt is also be
+   injected via kvm_apic_inject_pending_timer_irqs().
+Basically, they are functionally equivalent with subtle differences.  E.g.,
+if an hrtimer fires while KVM is handling a write to TMICT, KVM will deliver
+the interrupt if configured to post timer, but not if APICv is disabled,
+because the latter will increment "pending", and "pending" will be cleared
+before handling the new TMICT.  Ditto for switch APIC timer modes.
+Sean mentioned the entire lapic_timer.pending approach may need to be ditched,
+and the timer interrupt could be directly delivered no matter apicv is active
+or not. https://lore.kernel.org/kvm/Z32ZjGH72WPKBMam@google.com/
+This is not TDX specific, leave it for now.
+
+Options:
+- Fix kvm_mwait_in_guest()/kvm_hlt_in_guest() for TDX guests.
+- VMX preemption timer can't be used by TDX guests anyway, leave
+   kvm_mwait_in_guest()/kvm_hlt_in_guest() as them are, posted timer interrupt
+   could be used when userspace requested to disable exit for mwait/hlt.
+- VMX preemption timer can't be used by TDX guests anyway, skip checking
+   kvm_mwait_in_guest()/kvm_hlt_in_guest().
+
+kvm_arch_dy_has_pending_interrupt()
+-----------------------------------
+Before enabling off-TD debug, there is no functional change because there
+is no PAUSE Exit for TDX guests.
+After enabling off-TD debug, the kvm_vcpu_apicv_active(vcpu) should be true
+to get the pending interrupt from PID. Set APICv to active for TDX is the
+right thing to do.
+
+update_cr8_intercept()
+----------------------
+Functionally unchanged because the callback update_cr8_intercept() for TDX
+is ignored. Set APICv to active for TDX can return earlier to skip unnecessary
+code.
+
+kvm_lapic_reset()
+kvm_apic_set_state()
+--------------------
+The callbacks apicv_post_state_restore(), hwapic_irr_update(), and
+hwapic_isr_update() will be called for TDX guests when apicv is active,
+these callbacks have been ignored by TDX code already, no functional changes.
+
+
+Issues
+======
+
+PIC interrupts
+--------------
+KVM inject PIC interrupt via event injection path.
+Currently, TDX code doesn't handle this, thus PIC interrupts will be lost.
+Fortunately, modern OSes don't use PIC.
+We could use posted-interrupt in to deliver PIC interrupt if needed.
+Or can we assume PIC will not be used by TDX guests?
+
+In-kernel PIT in re-inject mode
+-------------------------------
+See the description for "APICV_INHIBIT_REASON_PIT_REINJ" above.
+
+Lazy check for pending APIC EOI of In-kernel IOAPIC
+---------------------------------------------------
+See the description for the same item in "Changes of APICv active from false
+to true".
+
+Open:
+For the issues related to in-kernel PIT and in-kernel IOAPIC, should KVM
+force irqchip split for TDX guests to eliminate the use of in-kernel PIT
+and in-kernel IOAPIC?
+
+
+Proposed code change
+====================
+Below is the proposed code change to change APICv active from false to true
+for TDX guests.
+
+Force irqchip split for TEX guests is not included.
+
+Note, by rejecting KVM_GET_LAPIC/KVM_SET_LAPIC for TDX guests (i.e., when
+guest_apic_protected), it returns an error code instead of returning 0.
+It requires modifications in QEMU TDX support code to avoid requesting
+KVM_GET_LAPIC/KVM_SET_LAPIC.
+
+8<----------------------------------------------------------------------------
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 0787855ab006..97025a240d54 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1289,15 +1289,6 @@ enum kvm_apicv_inhibit {
+       */
+      APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED,
+
+-    /*********************************************************/
+-    /* INHIBITs that are relevant only to the Intel's APICv. */
+-    /*********************************************************/
+-
+-    /*
+-     * APICv is disabled because TDX doesn't support it.
+-     */
+-    APICV_INHIBIT_REASON_TDX,
+-
+      NR_APICV_INHIBIT_REASONS,
+  };
+
+@@ -1316,8 +1307,7 @@ enum kvm_apicv_inhibit {
+      __APICV_INHIBIT_REASON(IRQWIN),            \
+      __APICV_INHIBIT_REASON(PIT_REINJ),        \
+      __APICV_INHIBIT_REASON(SEV),            \
+-    __APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED),    \
+-    __APICV_INHIBIT_REASON(TDX)
++    __APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED)
+
+  struct kvm_arch {
+      unsigned long n_used_mmu_pages;
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 9b79b4bb063f..df9cc4a7f2d8 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -782,8 +782,10 @@ static void vt_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
+
+  static void vt_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
+  {
+-    if (WARN_ON_ONCE(is_td_vcpu(vcpu)))
++    if (is_td_vcpu(vcpu)) {
++        KVM_BUG_ON(!kvm_vcpu_apicv_active(vcpu), vcpu->kvm);
+          return;
++    }
+
+      vmx_refresh_apicv_exec_ctrl(vcpu);
+  }
+@@ -908,8 +910,7 @@ static int vt_gmem_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+       BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |            \
+       BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |    \
+       BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |        \
+-     BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED) |        \
+-     BIT(APICV_INHIBIT_REASON_TDX))
++     BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED))
+
+  struct kvm_x86_ops vt_x86_ops __initdata = {
+      .name = KBUILD_MODNAME,
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 67fc391fe798..cc516ab2d990 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -614,6 +614,7 @@ int tdx_vm_init(struct kvm *kvm)
+      struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+
+      kvm->arch.has_private_mem = true;
++    kvm->arch.has_protected_state = true;
+
+      /*
+       * Because guest TD is protected, VMM can't parse the instruction in TD.
+@@ -2354,8 +2355,6 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+          goto teardown;
+      }
+
+-    kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_TDX);
+-
+      return 0;
+
+      /*
+@@ -2741,7 +2740,6 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+          return -EIO;
+      }
+
+-    vcpu->arch.apic->apicv_active = false;
+      vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+
+      return 0;
+@@ -3273,6 +3271,11 @@ int __init tdx_bringup(void)
+          goto success_disable_tdx;
+      }
+
++    if (!enable_apicv) {
++        pr_err("APICv is required for TDX\n");
++        goto success_disable_tdx;
++    }
++
+      if (!tdp_mmu_enabled || !enable_mmio_caching) {
+          pr_err("TDP MMU and MMIO caching is required for TDX\n");
+          goto success_disable_tdx;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index e433c8ee63a5..837a287d8c47 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5108,6 +5108,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+  static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
+                      struct kvm_lapic_state *s)
+  {
++    if (vcpu->arch.apic->guest_apic_protected)
++        return -EINVAL;
++
+      kvm_x86_call(sync_pir_to_irr)(vcpu);
+
+      return kvm_apic_get_state(vcpu, s);
+@@ -5118,6 +5121,9 @@ static int kvm_vcpu_ioctl_set_lapic(struct kvm_vcpu *vcpu,
+  {
+      int r;
+
++    if (vcpu->arch.apic->guest_apic_protected)
++        return -EINVAL;
++
+      r = kvm_apic_set_state(vcpu, s);
+      if (r)
+          return r;
+
+
 
