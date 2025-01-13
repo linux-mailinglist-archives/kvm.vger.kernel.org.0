@@ -1,129 +1,183 @@
-Return-Path: <kvm+bounces-35316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8984DA0C167
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 20:28:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AE47A0C1AC
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 20:38:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC9903A3D7F
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 19:28:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D26B1637F4
+	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 19:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7C51CAA8C;
-	Mon, 13 Jan 2025 19:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7B11CBE94;
+	Mon, 13 Jan 2025 19:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dU8pHlto"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mYmJ9Ai9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEA01B21BC;
-	Mon, 13 Jan 2025 19:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690961C549F;
+	Mon, 13 Jan 2025 19:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736796497; cv=none; b=LVKzQ1zMW9/wm905gOiQhvXoQ92Q8RDM6b7YN1eN/YNpUA9bDQDg74Rdey2Xtvd7E8lAtofnkFqmwl/C1glukn4X6BWjI9Ju9bqn870J2VsIEpmucsoZRbhHQFMjWXhGt6mU1t7j/C1KgHMfFHe9eCX1Q/R4wMyB0v4KDLLrx7E=
+	t=1736797092; cv=none; b=ep+6Jp/MvI3gSNjKnQZqKCFiwHh30Jw77z9WEHSdDU3Nrm7xhNCEDrW6Gm70mfRRfsgbG4lTK/uN+PNqcbjloIoT+stp9lpgcGHaZaoRziimKR2f6GYqM2JY3EqY91e14EwOyTiwr/ZORL8011QZiXQD4wfu6cnq6WifegkcnRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736796497; c=relaxed/simple;
-	bh=qK/UqylcwZbg+H1qXrkKeVQEmW/bacTD3dMGwHWzRaE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=blmSAphbPNh24XttviH1rnsKeBsg9y38pCkDpYBWpqHjzKCrREaAZjZv2XsO+LYsJ6IQQyhGexnSBCKMehN7I5AqzWxUXaipq6y7ps4vqBn1wSxshPD84rJSdAzTW+JeiluOWOxBRT2r1fx7Oq6RRoh7+KQbkELMRdkAnnkVUIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dU8pHlto; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736796495; x=1768332495;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qK/UqylcwZbg+H1qXrkKeVQEmW/bacTD3dMGwHWzRaE=;
-  b=dU8pHltoQI+T2Ai0LcTVgG309RKSmghUQGfE6Xf6YeeG/mb7wzc917gb
-   jAIeLap7oFodRPL3eZOmR/gsMvOaL5dl8I8f5KWvMoP1pOTmjEqL793vi
-   n8hPy3YDN1Abx8nvdIrogZhAgiXXJWonePLY24Whzs75OXK1AbQsuuBkJ
-   7YvuIQ5w+kOBV3AaQMKkyvtELN4nUSI9QyS9jLbKA54WkH1qOX9+ra8bl
-   4NYloYw4yfPYDOpWAwQd76a6hv3szRdv6hGPZ+DOCcKTR8+VijxQ077E3
-   N7eg4k8myGFtYeUfCs+JmtC2Cssmdc2lilh51I9BRXjd/mJ2v14LENrC7
-   Q==;
-X-CSE-ConnectionGUID: FcgNUrXxQT2CXUdvt4Tesg==
-X-CSE-MsgGUID: Q8sjQSGoQIGZ6rImUCMcDg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40752798"
-X-IronPort-AV: E=Sophos;i="6.12,312,1728975600"; 
-   d="scan'208";a="40752798"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 11:28:15 -0800
-X-CSE-ConnectionGUID: nTcjnS0ORv6RayhXdkIjJQ==
-X-CSE-MsgGUID: WYzs63liSOqC4imFQ+ZYVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,312,1728975600"; 
-   d="scan'208";a="104343628"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.16.163])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 11:28:10 -0800
-Message-ID: <c88ae590-4930-4d22-988c-60a5eeaad490@intel.com>
-Date: Mon, 13 Jan 2025 21:28:01 +0200
+	s=arc-20240116; t=1736797092; c=relaxed/simple;
+	bh=yDf65y7+IH8PA/+JZhqUXTr3IxuryhUAx9rLn3yyULs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CJbrHFneCwtTf31XjWTqTyIirpJgeJJuR+quKQkJ0oJnJsoN9XIiK1TAZtULIEcfj7ve/hBbhMlNSBxwnfQIzTnHdPCSL04ln2VlZVVekdc2789/ESxRaBx+btidyELIlYznPnQPMTrsnNpcn8LilvAiNg1sRUCpS+EVTFQewkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYmJ9Ai9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA9AC4CEE1;
+	Mon, 13 Jan 2025 19:38:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736797092;
+	bh=yDf65y7+IH8PA/+JZhqUXTr3IxuryhUAx9rLn3yyULs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mYmJ9Ai9JhKhbnL/24T8j29IHGHpFxP7mY+XRsEHVBJu++4+QAEE05xDeaQ0loZUH
+	 uI9f//3bbpxPTDmCqxr8uK1bsOeR84DIBfnfN314ou1gekXcm4sWwtM8IoL1N9owcO
+	 uYNOxhB4CMZQndJw7LPUNF3sjdk3UrS69dt9otVHmnzFz66RM27r5QwFGcDyVkSFe5
+	 qfh4TD/mPUmFZ3N1TK4/VhH3sEE84uIZjQv4/qGrhfUtTD6xplhEQJi2rG2n4E+wu6
+	 4bmcAAje2IIvRAwPdYo90ZHDMB1+pS1ASzL73O2f2C+D4HdK0TjfHizjClScKO7qfz
+	 257t6nkLTBD/w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tXQGH-00Bltd-Ms;
+	Mon, 13 Jan 2025 19:38:09 +0000
+Date: Mon, 13 Jan 2025 19:38:08 +0000
+Message-ID: <87bjwaqzbz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/5] KVM: Add a common kvm_run flag to communicate an exit needs completion
+In-Reply-To: <Z4ViZb7rruRiN-Oe@google.com>
+References: <20250111012450.1262638-1-seanjc@google.com>
+	<20250111012450.1262638-4-seanjc@google.com>
+	<87ikqlr4vo.wl-maz@kernel.org>
+	<Z4U03KRYy2DVEgJR@google.com>
+	<86ikqiwq7y.wl-maz@kernel.org>
+	<Z4ViZb7rruRiN-Oe@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] KVM: TDX: restore host xsave state when exit from the
- guest TD
-To: Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org,
- dave.hansen@linux.intel.com, rick.p.edgecombe@intel.com,
- kai.huang@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com,
- dmatlack@google.com, isaku.yamahata@intel.com, nik.borisov@suse.com,
- linux-kernel@vger.kernel.org, x86@kernel.org, yan.y.zhao@intel.com,
- weijiang.yang@intel.com
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-5-adrian.hunter@intel.com> <Z0AbZWd/avwcMoyX@intel.com>
- <a42183ab-a25a-423e-9ef3-947abec20561@intel.com>
- <Z2GiQS_RmYeHU09L@google.com>
- <487a32e6-54cd-43b7-bfa6-945c725a313d@intel.com>
- <Z2WZ091z8GmGjSbC@google.com>
- <96f7204b-6eb4-4fac-b5bb-1cd5c1fc6def@intel.com>
- <Z4Aff2QTJeOyrEUY@google.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <Z4Aff2QTJeOyrEUY@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com, oliver.upton@linux.dev, mpe@ellerman.id.au, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 9/01/25 21:11, Sean Christopherson wrote:
-> My vote would to KVM_BUG_ON() before entering the guest.
+On Mon, 13 Jan 2025 18:58:45 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Mon, Jan 13, 2025, Marc Zyngier wrote:
+> > On Mon, 13 Jan 2025 15:44:28 +0000,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> > > 
+> > > On Sat, Jan 11, 2025, Marc Zyngier wrote:
+> > > > On Sat, 11 Jan 2025 01:24:48 +0000,
+> > > > Sean Christopherson <seanjc@google.com> wrote:
+> > > > > 
+> > > > > Add a kvm_run flag, KVM_RUN_NEEDS_COMPLETION, to communicate to userspace
+> > > > > that KVM_RUN needs to be re-executed prior to save/restore in order to
+> > > > > complete the instruction/operation that triggered the userspace exit.
+> > > > > 
+> > > > > KVM's current approach of adding notes in the Documentation is beyond
+> > > > > brittle, e.g. there is at least one known case where a KVM developer added
+> > > > > a new userspace exit type, and then that same developer forgot to handle
+> > > > > completion when adding userspace support.
+> > > > 
+> > > > Is this going to fix anything? If they couldn't be bothered to read
+> > > > the documentation, let alone update it, how is that going to be
+> > > > improved by extra rules and regulations?
+> > > > 
+> > > > I don't see how someone ignoring the documented behaviour of a given
+> > > > exit reason is, all of a sudden, have an epiphany and take a *new*
+> > > > flag into account.
+> > > 
+> > > The idea is to reduce the probability of introducing bugs, in KVM or userspace,
+> > > every time KVM attaches a completion callback.  Yes, userspace would need to be
+> > > updated to handle KVM_RUN_NEEDS_COMPLETION, but once that flag is merged, neither
+> > > KVM's documentation nor userspace would never need to be updated again.  And if
+> > > all architectures took an approach of handling completion via function callback,
+> > > I'm pretty sure we'd never need to manually update KVM itself either.
+> > 
+> > You are assuming that we need this completion, and I dispute this
+> > assertion.
+> 
+> Ah, gotcha.
+> 
+> > > > > +The pending state of the operation for such exits is not preserved in state
+> > > > > +which is visible to userspace, thus userspace should ensure that the operation
+> > > > > +is completed before performing state save/restore, e.g. for live migration.
+> > > > > +Userspace can re-enter the guest with an unmasked signal pending or with the
+> > > > > +immediate_exit field set to complete pending operations without allowing any
+> > > > > +further instructions to be executed.
+> > > > > +
+> > > > > +Without KVM_CAP_NEEDS_COMPLETION, KVM_RUN_NEEDS_COMPLETION will never be set
+> > > > > +and userspace must assume that exits of type KVM_EXIT_IO, KVM_EXIT_MMIO,
+> > > > > +KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN, KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR,
+> > > > > +KVM_EXIT_X86_WRMSR, and KVM_EXIT_HYPERCALL require completion.
+> > > > 
+> > > > So once you advertise KVM_CAP_NEEDS_COMPLETION, the completion flag
+> > > > must be present for all of these exits, right? And from what I can
+> > > > tell, this capability is unconditionally advertised.
+> > > > 
+> > > > Yet, you don't amend arm64 to publish that flag. Not that I think this
+> > > > causes any issue (even if you save the state at that point without
+> > > > reentering the guest, it will be still be consistent), but that
+> > > > directly contradicts the documentation (isn't that ironic? ;-).
+> > > 
+> > > It does cause issues, I missed this code in kvm_arch_vcpu_ioctl_run():
+> > > 
+> > > 	if (run->exit_reason == KVM_EXIT_MMIO) {
+> > > 		ret = kvm_handle_mmio_return(vcpu);
+> > > 		if (ret <= 0)
+> > > 			return ret;
+> > > 	}
+> > 
+> > That's satisfying a load from the guest forwarded to userspace.
+> 
+> And MMIO stores, no?  I.e. PC needs to be incremented on stores as well.
 
-I notice if KVM_BUG_ON() is called with interrupts disabled
-smp_call_function_many_cond() generates a warning:
+Yes, *after* the store as completed. If you replay the instruction,
+the same store comes out.
 
-WARNING: CPU: 223 PID: 4213 at kernel/smp.c:807 smp_call_function_many_cond+0x421/0x560
+>
+> > If the VMM did a save of the guest at this stage, restored and resumed it,
+> > *nothing* bad would happen, as PC still points to the instruction that got
+> > forwarded. You'll see the same load again.
+> 
+> But replaying an MMIO store could cause all kinds of problems, and even MMIO
+> loads could theoretically be problematic, e.g. if there are side effects in the
+> device that trigger on access to a device register.
 
-static void smp_call_function_many_cond(const struct cpumask *mask,
-					smp_call_func_t func, void *info,
-					unsigned int scf_flags,
-					smp_cond_func_t cond_func)
-{
-	int cpu, last_cpu, this_cpu = smp_processor_id();
-	struct call_function_data *cfd;
-	bool wait = scf_flags & SCF_WAIT;
-	int nr_cpus = 0;
-	bool run_remote = false;
-	bool run_local = false;
+But that's the VMM's problem. If it has modified its own state and
+doesn't return to the guest to complete the instruction, that's just
+as bad as a load, which *do* have side effects as well.
 
-	lockdep_assert_preemption_disabled();
+Overall, the guest state exposed by KVM is always correct, and
+replaying the instruction is not going to change that. It is if the
+VMM is broken that things turn ugly *for the VMM itself*, and I claim
+that no amount of flag being added is going to help that.
 
-	/*
-	 * Can deadlock when called with interrupts disabled.
-	 * We allow cpu's that are not yet online though, as no one else can
-	 * send smp call function interrupt to this cpu and as such deadlocks
-	 * can't happen.
-	 */
-	if (cpu_online(this_cpu) && !oops_in_progress &&
-	    !early_boot_irqs_disabled)
-		lockdep_assert_irqs_enabled();			<------------- here
+	M.
 
-Do we need to care about that?
+-- 
+Without deviation from the norm, progress is not possible.
 
