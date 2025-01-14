@@ -1,206 +1,185 @@
-Return-Path: <kvm+bounces-35379-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35380-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E2D6A107FA
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 14:36:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC315A1083A
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 14:55:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D79D3A16D7
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 13:36:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D22791882397
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 13:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617EC2361C7;
-	Tue, 14 Jan 2025 13:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1361C70819;
+	Tue, 14 Jan 2025 13:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HHO8JSa+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ht6yMadm"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02A823244B;
-	Tue, 14 Jan 2025 13:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736861758; cv=fail; b=p07DHR4Ihg8xNxf4t5TRyxsrSXkkON/DWDhodUW1xiiQN6LA1h1v2dYfrX0XWnXsz9Atm6tr0Kz5Gu4lpqx5jivr1g/7IFM5Rne3SgK+isBNgzIK2yYzLO2rf6squXre6Iozk5nSNA7QEMwfm9u9j9K4VwaDgVKwbEgYOWN/k/U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736861758; c=relaxed/simple;
-	bh=qckIQXJnTmlFLeOADEbOe9Vt27OfrrSZwuo865NOatM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=fA78H831fRb6qF2rn1xrGgoI5Jg5/Cvu6zcQ6Eg+lb1KXkAQvmBvSEqZT0unYGH5biylelw4WToBXV9amkZfFaF2hdohxlEfaKzjYeGIJ4xl5yx/o8fJKlPqeRe+8XS7hNT+2UucCxw4cvuPEeD876AjwTYVY3nWgkpzCkFcgmY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HHO8JSa+; arc=fail smtp.client-ip=40.107.243.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uYjD65Ums/z5lq44ly2oAZG7BA/0D0WQKuwF5tdbLqcT/wM9XKtRJXvFlp/a0izU9oVHbHhpgykYg2JEmvGQCfGxh9sJogXY7tS+K4z2vdmUCcYIsb1yVaJ1HfnZsK0rbix42NDXWqEwxf4MNz40jk+ybvepFDGhzFzkfDsql9vKKAdysEVV5r/9vgXHILt4fX9zXDeGPwKJEDMkpGi7xJE3xb56ZvJvSS6jdoWSNSKhgPFJHuPYG02fpmw31m4FprPQTTnNbdeVs2slVCdq27a+CgtIhASRZO6hkirPI54IGl3yEvoyD5N1j7KuJdH0lrPU0vaqVKhag0gBcNQS2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bCU+np2FymwmOa/p/iANc4AkUige0f+/xzS42iKYUNM=;
- b=duz/c0GNeIovZdyp+sWcDnDFhow9ZKc9ciN4WxILB151Ty/C/+JDUbwJooIpaaQ9toVvhq+cH7QC0Mm5DmmpKBHxmFpmi2hB6+TjcIDSs/muwJ44Roq9hr3YvwLBy+sDATGGpndMkChiQTeR1C44wDkkPCfLWked8vPxXHPNF7vfHud0lzDVBDBN6bwHqI/9YiRea3CWYo1L8x4YUXhmM7tDgBBHAuufRHjlkvPsm0n4Hrst84qQnktnOkYsHdV+xUYYaqYE9QzxO0Q0D+qw5Vy0/5Nnxj1hoscVGFP1Z4/r+NNkcBAZtc7L17FHSoRpn6ZSFf8a05eM4LB02QkbaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bCU+np2FymwmOa/p/iANc4AkUige0f+/xzS42iKYUNM=;
- b=HHO8JSa+3GYVq8kR0hAVXF1o4f7yBSLnp45+myO/kqOfgDiQocqQvtrBCidKqcoruzqmpD9JEHPxDrR74ZaHI/NoKyYUzumxWpVzfP9UTG/9MxL7cE9ZEuWjX7aeeOZ5OB1ICkdP/fDaOVcFMn4YwPF5b5+mmFm1sAYjzPIcNUBqDJcmI7p33+cN1om79rcRn2xDvchr4tpTOL09xraEZ0/dLNpTI4U1s17JBwXkTyeO66F9ykIQ+bJiPs2C5ABm8TalD2rgiFVre04O/iyXPMruxbzYo0532GPQHAbEE4fAmokz4HWp2TTOt7ABAa4mkr2O8NkXGZek4g/NJd1XLA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by MW4PR12MB7429.namprd12.prod.outlook.com (2603:10b6:303:21b::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Tue, 14 Jan
- 2025 13:35:54 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8335.017; Tue, 14 Jan 2025
- 13:35:54 +0000
-Date: Tue, 14 Jan 2025 09:35:53 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
-	yilun.xu@intel.com, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, baolu.lu@linux.intel.com,
-	zhenzhong.duan@intel.com, tao1.su@intel.com
-Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
- private device
-Message-ID: <20250114133553.GB5556@nvidia.com>
-References: <20250107142719.179636-1-yilun.xu@linux.intel.com>
- <20250107142719.179636-9-yilun.xu@linux.intel.com>
- <20250108133026.GQ5556@nvidia.com>
- <Z36ulpCoJAllp4fP@yilunxu-OptiPlex-7050>
- <20250109144051.GX5556@nvidia.com>
- <Z3/7/PQCLi1GE5Ry@yilunxu-OptiPlex-7050>
- <20250110133116.GF5556@nvidia.com>
- <Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050>
- <20250113164935.GP5556@nvidia.com>
- <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050>
-X-ClientProxiedBy: MN0P221CA0009.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:52a::27) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5164F17557
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 13:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736862903; cv=none; b=KqBmKPFB87J7vUV2ru6ujbhvCKawv0nnZrn63CnOmdaJ2k+4yBjtwcFnW6Z0cTtnXF6yrBWA9L8g85Jc/j4cKiXk+kHo9xgQcPxOhSMabUURO2Nr26IXkRcLW4cClaqZJKsAdNyw0jmpGL3JjhIGuQHjykpDM77UWAf47gbzEgA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736862903; c=relaxed/simple;
+	bh=KQc76jw2yVO1YzP3I6M3XTVo7DV1uXdFjbmr/DPnRL8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H8wzPj8Sa8g6VJrXQV5g04aFdF6UxJ4MwPfzh7FIcOz1qqrRrdVrsJDH6Y6X+POS5eju7Q7iju3ODtB+FgI2Lp8UFxhDJQwt614kQ1EQmjhcYSOiZ+hCl1p5lC5ARXZxsF7ktMXBaK3L+z/4SnnWfOwvOOdbIDyPldSmnPNJyCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ht6yMadm; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736862900;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sPMtOWaxET36PC3zKH8M3ARBY50nMtMjbmhfciNkjD0=;
+	b=ht6yMadmkSZNeKvT6hyKqx7udOVuPMPTYMlocDLnf4utLE5h9EqfD1WTyIok/Vf7WAs72G
+	Ebm0myGuOI9HoMhhG798x1HYb1EE/C7IwWBptLoDcHfInHdhl/uDfdPX2WOQQ22An9lHtW
+	fg+M4enA8IdnXNnRVNWU8jFbD10vWEY=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-516-_nt8QI_MM4iklPgOIrHlGA-1; Tue, 14 Jan 2025 08:54:59 -0500
+X-MC-Unique: _nt8QI_MM4iklPgOIrHlGA-1
+X-Mimecast-MFC-AGG-ID: _nt8QI_MM4iklPgOIrHlGA
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-84cd123df74so43843839f.3
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 05:54:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736862898; x=1737467698;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sPMtOWaxET36PC3zKH8M3ARBY50nMtMjbmhfciNkjD0=;
+        b=mC16VGMA7EYQ+bBTWrif5UmwXixQwJPuxpsxDLpWs0QmbFUMDkupwjn4M2NJE5l5UD
+         hL+1R7OfVEkDJudxBNDa4eYGLs1zG6LR4j2RHtZOdu/2gFa1RvtbZ9655xkLz7vunl5E
+         wwhcGME3pCfsjfj/pF+v44OS2HGTrnWmBEOgBU4DkuYZAuzoHbHwz/G0V0ggtTtH60XU
+         c+XT840y6krXl/noYz8CD5jUXEBwWKHbzuvmXgarquhoBoiKeRVs0DAMYscwwgJ8yTey
+         aw6NEHeNd9x66Zc9CnGs6t5jZ29xSohPEsirD0a1d0F+OoGW/mj9hqIz4rfghl7N03fy
+         rKJA==
+X-Forwarded-Encrypted: i=1; AJvYcCVBAiS90Br03YYQdwCEFCeUAZtxIUANhI+zMIea8jctu6ecAjN3iDg9hAYVJOaIT9CwyUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDIG4HRHHsZEQX/L5bTridnGdj2jfOJ3/udpTgJrmWiOJwKVVd
+	+888ulO3p/rDrf4ZEpMw4Cf2ZCd1u5wrMOXpx+6tRuNuixQohcWlO8XRWr8UHN1CRrE0EO2Ne9u
+	ubKPL80jaxyZFVsUDGBjvEVj23YyYx6o0rHkBOUjUE2awUeoXiQ==
+X-Gm-Gg: ASbGnctKXJhBxZzVDMvsmFOHA63hwpuvSDteTT4k4OmIksWUxQHu0ZYVCR5+ZE+F07L
+	WrLywJCJIQ7Bp4Cex9GftpNu6WCGG5h8SmPxOgvL/iMawW/opQtnAAIBL8VVNCHlN2HDPaLk+e6
+	9xdjP164z88V0+DKnpkSwhaK8yh1L0ZOGoTOqxndMBxHop9ULe0NRUqSywjjYOYPXR7BwxOOLzf
+	QMbAKTzbZfgF6b7In6Y7yZ2okwzfIo11+RLzLEBn21aPvTXFu/VSbKGBUEM
+X-Received: by 2002:a05:6e02:1f09:b0:3a7:8720:9ded with SMTP id e9e14a558f8ab-3ce3a86b051mr49009015ab.2.1736862898445;
+        Tue, 14 Jan 2025 05:54:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGtgL8iY7ZCRJa4sPauV5DvThBPPh4mlMgFqmqDoh9/JUdKV2f/oArrE7hAcXlNoOXAHJFgCg==
+X-Received: by 2002:a05:6e02:1f09:b0:3a7:8720:9ded with SMTP id e9e14a558f8ab-3ce3a86b051mr49008985ab.2.1736862898111;
+        Tue, 14 Jan 2025 05:54:58 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ce4adb378asm34022015ab.19.2025.01.14.05.54.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2025 05:54:57 -0800 (PST)
+Date: Tue, 14 Jan 2025 08:54:43 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: liulongfang <liulongfang@huawei.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linuxarm@openeuler.org"
+ <linuxarm@openeuler.org>
+Subject: Re: [PATCH v2 1/5] hisi_acc_vfio_pci: fix XQE dma address error
+Message-ID: <20250114085443.17777cb0.alex.williamson@redhat.com>
+In-Reply-To: <8225389dd537497c9753cf0a321964e4@huawei.com>
+References: <20241219091800.41462-1-liulongfang@huawei.com>
+	<20241219091800.41462-2-liulongfang@huawei.com>
+	<099e0e1215f34d64a4ae698b90ee372c@huawei.com>
+	<20250102153008.301730f3.alex.williamson@redhat.com>
+	<4d48db10-23e1-1bb4-54ea-4c659ab85f19@huawei.com>
+	<20250113083441.0fb7afa3.alex.williamson@redhat.com>
+	<20250113144516.22a17af8.alex.williamson@redhat.com>
+	<80a4e398-ad29-cce8-4a52-ce2a5f6a308c@huawei.com>
+	<8225389dd537497c9753cf0a321964e4@huawei.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MW4PR12MB7429:EE_
-X-MS-Office365-Filtering-Correlation-Id: 30ba289e-ccc0-4a70-1139-08dd34a05e4e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0yFuPRrd9VkmSwtFfxP0buZGCgzV7B6x9HMKz9XE5h1KvsM3RrPN93YyIP5/?=
- =?us-ascii?Q?zEPYh48AxWac2IfMadmTwwqPanzXErE0h7uHX0Bm9H6OZrRKiFPLf6yLOE36?=
- =?us-ascii?Q?iJprNXof8uqj2xG9Oa/ztpKYpYAwUJHm4S0UWeY6IZafgPergArPCJxVBMhT?=
- =?us-ascii?Q?aLKm6gVTvWY/0g6vT4i/CgzEG5aOxPR615zKinbw9JejTlH6GpldXvSoBmVt?=
- =?us-ascii?Q?+T674ftnbDPveDvsFCRt/Tjr0PAtG4MSXiUHYs4xJBr7Lj0agOhLzd5a5yFp?=
- =?us-ascii?Q?VgpgBlEtEggrfvxV7i2w5pB9UBtIj5XbzPPg4ZhOZBIMh95vA5ZUZCrxXwOq?=
- =?us-ascii?Q?gfZhs6ct26OjzPdHwzsxU/o4oVHquQyTxO220rsKvaHCJNCg+O/m3hTM1SMF?=
- =?us-ascii?Q?TCUVObnsJVf8ht4bAnI0iSfzAP1Wnxdtg8F6aNNJAc7X7L9qc63QlG/bk98+?=
- =?us-ascii?Q?fdVn/Ca1R1LRVOVoQTIG68KSvud9MsY7GhtnMT6veicc5/ZGNqMlaEVuDzGO?=
- =?us-ascii?Q?NtIuSikp82bMy9az2eXAbMwtnSMkE8xm1f3twyo7Sxy8ouLd/Y4qRJvDkunZ?=
- =?us-ascii?Q?0ujVZLpcMY5AtkE1aQSlri6Nsu8N8QAnAj2izCrVzEa/e5Coe4+B8+fyBXkh?=
- =?us-ascii?Q?TPgjgB58e/LI0QSSUV0uTULQK0zRBHez8LiAESvxbxTArAQIVDAgr5QFjBTJ?=
- =?us-ascii?Q?ONFrRQOTv0Z6WVRCsfhcRfoYvLR9ptwUVfeW1xrSwGSpxTnPwQalxdT/9bQg?=
- =?us-ascii?Q?p4viL9abA8R/T+zh+SxoLvyVG5CGQvmwyOstmxvZyAn7b1DpXE5zVKmIUXC/?=
- =?us-ascii?Q?PhnXC3Bgq/BrL45HsPksxKE7jCPECss17jzs6OFBPweXPZyogeWtlLwX+xqk?=
- =?us-ascii?Q?q2ErhpoCSQagfUN58Bt8QrbONg3JKu6p0ljBeumMcTbw+317Q/Zf1Wa9RSX5?=
- =?us-ascii?Q?yO7NiItkBChi6u4M1Gb6KY2pKE1c90pkTa7x5+J9oDdBQq8RX2awxDB3UQNF?=
- =?us-ascii?Q?YEvdyjri8ByVcGw8N5zDy65CzTK5OqKB/8gdIgWictfISTj5Q7tio9XaBaLa?=
- =?us-ascii?Q?LNzfPSPnZBET4hrRehWg4oMg85GZO92jNhJSldNoQ8bF0j2ErIZ90iobF43V?=
- =?us-ascii?Q?l+eeE/iupftGrG0o5XqXQnvMjb0LCVvZGl2Ddw/XmVbtvSBG/lkmlLrrjUQm?=
- =?us-ascii?Q?TO1W/0qM5/jN+CHhb1pbK7qi/vvhr+Kt1njllRaocfjhHZcJtw4JXx/aaFWC?=
- =?us-ascii?Q?j6/Ae30A7vlAgaxFfLB6k7rNvs485fdfmYkGmJCGKkOyYbG5am/IlQImKvBe?=
- =?us-ascii?Q?AYIr2ou2gPzyuZ6yeq2oRaFMHssTWP/ML3sqSDoX47GIOge7IcLZCeiq463+?=
- =?us-ascii?Q?21vKoGdauCNnj8r6o++Ett5scjn0?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?5UXR6/W3S0tjJrCmeutoNh8JhYu5M8+4SPOkHpWRqEauki9bQT4V37vwUdTS?=
- =?us-ascii?Q?SDMC9zZCoaxdFb6cifJntqtvePmpDFGS4acHfwNwjaBw0TrMqlimoeHJBZsl?=
- =?us-ascii?Q?0mm4aAIBr0uk5V3y5pDtDV/4Vrbckc62j1F5A+J/hTh+YiFMpp3+RWDcj3LI?=
- =?us-ascii?Q?ygjK9fH832DrDgXF6cwZ/YYqp/rX66vD2Dm17CRpUaUscGKHLNjq2Nfn/2Om?=
- =?us-ascii?Q?6Sd2im5TzFQW+HFm0/RZjl43wa1df8VRfWSIPcCgUDX7qDezKG4pPb/YBkob?=
- =?us-ascii?Q?N9fs1qY6N9GaGyWNffKdYRoqBN7k6he54tzviouToZptQVNZLd2yPVwZOg4O?=
- =?us-ascii?Q?CmbhRNpQIn/LwIE3WeamWh1wuXMcpSLHzPauajurqHyc0E7dd7FTxFyWMMt8?=
- =?us-ascii?Q?uBFTwkStk1/nHHSqT6zYV4b88aBKKq/ZAEoWooqxYQCLX9VriGQQnmRXunHG?=
- =?us-ascii?Q?pdZwebZ7egYekyLR32cjY3wt121yrH0xHEeklCSTBdouzMn4HMgTyjDekQ+s?=
- =?us-ascii?Q?vpXJvM+0ozVbmpBKuFe0szgxsvaAK3iR4VUlZDzar2c4b7QbdqvTLgWa2u/s?=
- =?us-ascii?Q?8auJhJIfJPgrIlrin1YOWyQuDHGKG0X4bxYA63k68/Oj/vg9e5lgB+t0qlbO?=
- =?us-ascii?Q?GCo5a/sKjhb/YHFN6QTBwZZvBBFlLsCWDXsr+oHmTQ2y7tyfGCL0SEtt+LfI?=
- =?us-ascii?Q?VDTcBAhfe07ezatyfYE8LK1OZf7OI+/EUZAutF5qUK4XuiXzqxk9O5vY4hGH?=
- =?us-ascii?Q?IBmUvqhodBVfqF16FeuBuaYFwmVNT0Gsu9kvrqlNM3oKUIhhlbHp5LjbaLKO?=
- =?us-ascii?Q?nAlQr23cwrEYWIwUh6VN/V/k9t5RyDMfihWI3jA2emRuZokjotNZkH9qcEX7?=
- =?us-ascii?Q?FsXX4WB3dza0gyFjph61yGe/ZkCbdXtWTO2zfRgtIRNbpZjtS7Hkvryu3334?=
- =?us-ascii?Q?N/hMSPd9YM8UDQZUlsixVRxOyV84qoX+tElgi2MsQ3xq0Reuyf8dy5xGW4rB?=
- =?us-ascii?Q?TQxJ7FguUvXNhud7tIXofrQUSeDHOC5j0nm1V+CPRCRIpeY3y8RNegVTpxDs?=
- =?us-ascii?Q?PDxHssHsL8Kpu3qBb34iP1hDjYvbyGyvfIyyT/vDXq8bN7mTLD7uX95BUWbT?=
- =?us-ascii?Q?kl283gtPcR2ONnbrP7eQjFlEg1cZOvZh08N7op18rOAv2YyOkd+NsTOGkhEz?=
- =?us-ascii?Q?C8Y09NOv2AXtBkz4rrEzNi8TlJa0D7nTlbKXOQ2iy81D++J4E1A78euyz/rH?=
- =?us-ascii?Q?T9RX14yKUnR9BxLlFrUZHw196h1d8OcL5rHNzY+HNx6a5ny0uwXdaejhNcJU?=
- =?us-ascii?Q?kqizxeyT1ayiUeGbZtkLTcbR+CCpmjeco+T5ORWbGOHw7thRYPhKUXmmhgLR?=
- =?us-ascii?Q?DU+g7XwUlKK0ku+aF3HqIIPtlejOwjKF1uTIdpDPAo7qFS3/JvTQIEE3aEys?=
- =?us-ascii?Q?M1hNG2Jt2wuG1Qeq0+kqeglELavgeORS1mqlsXO/mnxc7CPlUVM6933NxB9w?=
- =?us-ascii?Q?p1e714V/x6jIMfp5dB8dwcqDnnHE8CyTKA896oVQmMOPnzicGLAh7VLytN0g?=
- =?us-ascii?Q?PHCH49jkYj6oOz6gjDgzOTwLcTeBvk0YgzbcF1Ek?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 30ba289e-ccc0-4a70-1139-08dd34a05e4e
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2025 13:35:53.9649
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7zzE58AxLoYG8JOAVdk6cXd374T3Zu8pDLga+4TU4RT/EWnHF5Cys8Jt/6EY0Ahu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7429
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 18, 2024 at 07:28:43AM +0800, Xu Yilun wrote:
+On Tue, 14 Jan 2025 08:07:43 +0000
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-> > is needed so the secure world can prepare anything it needs prior to
-> > starting the VM.
+> > -----Original Message-----
+> > From: liulongfang <liulongfang@huawei.com>
+> > Sent: Tuesday, January 14, 2025 3:18 AM
+> > To: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Shameerali Kolothum Thodi
+> > <shameerali.kolothum.thodi@huawei.com>; jgg@nvidia.com; Jonathan
+> > Cameron <jonathan.cameron@huawei.com>; kvm@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; linuxarm@openeuler.org
+> > Subject: Re: [PATCH v2 1/5] hisi_acc_vfio_pci: fix XQE dma address error
+> >   
 > 
-> OK. From Dan's patchset there are some touch point for vendor tsm
-> drivers to do secure world preparation. e.g. pci_tsm_ops::probe().
+> [...]
 > 
-> Maybe we could move to Dan's thread for discussion.
+> > > @@ -418,7 +440,7 @@ static int vf_qm_get_match_data(struct  
+> > hisi_acc_vf_core_device *hisi_acc_vdev,  
+> > >  	int vf_id = hisi_acc_vdev->vf_id;
+> > >  	int ret;
+> > >
+> > > -	vf_data->acc_magic = ACC_DEV_MAGIC;
+> > > +	vf_data->acc_magic = ACC_DEV_MAGIC_V2;
+> > >  	/* Save device id */
+> > >  	vf_data->dev_id = hisi_acc_vdev->vf_dev->device;
+> > >
+> > > Thanks,
+> > > Alex
+> > >  
+> > >>>
+> > >>> As for the compatibility issues between old and new versions in the
+> > >>> future, we do not need to reserve version numbers to deal with them
+> > >>> now. Because before encountering specific problems, our design may  
+> > be redundant.  
+> > >>
+> > >> A magic value + version number would prevent the need to replace the
+> > >> magic value every time an issue is encountered, which I think was
+> > >> also Shameer's commit, which is not addressed by forcing the
+> > >> formatting of a portion of the magic value.  None of what you're
+> > >> trying to do here precludes a new data structure for the new magic
+> > >> value or defining the padding fields for different use cases.
+> > >> Thanks,
+> > >>
+> > >> Alex  
+> > >  
+> > 
+> > If we want to use the original magic number, we also need to add the major
+> > and minor version numbers. It does not cause compatibility issues and can
+> > only reuse the original u64 memory space.
+> > 
+> > This is also Shameerali's previous plan. Do you accept this plan?  
 > 
-> https://lore.kernel.org/linux-coco/173343739517.1074769.13134786548545925484.stgit@dwillia2-xfh.jf.intel.com/
-
-I think Dan's series is different, any uapi from that series should
-not be used in the VMM case. We need proper vfio APIs for the VMM to
-use. I would expect VFIO to be calling some of that infrastructure.
-
-Really, I don't see a clear sense of how this will look yet. AMD
-provided some patches along these lines, I have not seem ARM and Intel
-proposals yet, not do I sense there is alignment.
-
-> > Setting up secure vIOMMU emulation, for instance. I
+> The suggestion here is to improve my previous plan.. ie, instead of overloading
+> the V2 MAGIC with version info, introduce version(major:minor) separately.
 > 
-> I think this could be done at VM late bind time.
-
-The vIOMMU needs to be setup before the VM boots
-
-> > secure. This should all be pre-arranged as possible before starting
+> Something like,
 > 
-> But our current implementation is not to prepare as much as possible,
-> but only necessary, so most of the secure work for vPCI function is done
-> at late bind time.
+> Rename old MAGIC as MAGIC_V1
+> 
+> Introduce new MAGIC as MAGIC_V2
+> 
+> Repurpose any padding or reserved fields in struct vf_data for major:minor
+> version  fields. The idea of introducing these major:minor is for future use
+> where instead of coming up with a  new MAGIC data every time we can
+> increment the version for bug fixes and features if required. 
 
-That's fine too, but both options need to be valid.
+Yes, there's no suggestion to use the original magic value, that magic
+number describes a non-extensible data structure.  As Shameer
+indicates, use a new magic value and define within the data structure
+specified by that magic value major:minor number and a scheme for
+defining compatible (if any) and incompatible updates.  Thanks,
 
-Jason
+Alex
+
 
