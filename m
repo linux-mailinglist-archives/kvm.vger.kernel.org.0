@@ -1,224 +1,244 @@
-Return-Path: <kvm+bounces-35391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B289A1093F
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 15:27:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8C0A109A0
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 15:44:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECC083AA181
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 14:27:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A20F43A79D1
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 14:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C171474C9;
-	Tue, 14 Jan 2025 14:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36465149C57;
+	Tue, 14 Jan 2025 14:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=efficios.com header.i=@efficios.com header.b="qknHJVHa"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="D9TrP13C"
 X-Original-To: kvm@vger.kernel.org
-Received: from YT5PR01CU002.outbound.protection.outlook.com (mail-canadacentralazon11021111.outbound.protection.outlook.com [40.107.192.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3523623244C;
-	Tue, 14 Jan 2025 14:27:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.192.111
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736864836; cv=fail; b=EN6fTQ9qSY4Vvqp0Nbyin4yYfbaHFG+CIe3efxy+weMSXddTeaAYpM/S6SprAD9CjRXh/bCWFjFsmTfbuTpK/htD3LBL4FD8WvgWmggwHYd99reUbBL4rSM+MdfQcUiZLVS7ZtIIyfQstNHF1OY49IkmcsRRNfAjB7vyc6zVAHE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736864836; c=relaxed/simple;
-	bh=CZauzPepOAwA+bsEFyQZktVT7y0BZbYWkCXeqX6u0Qs=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=sF1Xtb6pzLF3qrW8kcIR5iuA5fIT3fdyCBTrWHTkkAUhpAFl7sypozLMWGDnF5KgabftnFRtSRYfAz4WSILSQWMKLgwEa8wo43/BCYjGmcAw8QlT21k5L+/lphJT5XS7OrCn0bHp7IWwH4vx3bbUBFCqqEH2g6wXzZsODzqnGl8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=efficios.com; spf=pass smtp.mailfrom=efficios.com; dkim=pass (2048-bit key) header.d=efficios.com header.i=@efficios.com header.b=qknHJVHa; arc=fail smtp.client-ip=40.107.192.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=efficios.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=efficios.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LaTL3DsZc18QtKitS/XSfJPNkNX5YQ+AE8Q/5iQ+9zFMreqlwLeW9I35ZicGakDr222ZM5wbaRHDak39kVvdaQpqomI1NKyJWG6PMz0G96F/BY3R1v63qzkw7gVhisNob72/TxSgaht0EKSAhx2jWKfvsECAcfP6YOlI7BD5MWtvKKmJM9P+UM1ReehnQnc/3crwP9KKFGPypzADu5MCWniz8eoNKyKiDZNihH8qSmIKngtgl93Z3BKzC2fTWF/qpi3gMVzBmGdmnyVXZE7+r36+UH9m8w0rFKIG8K01sgJg/Fhd4dqHzc50C90jBJSET0h2EcKgAOBztPVf3Svo1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1c2WdGaPGTdIBK7tkwt/E5fvFcnmF0Zw9KijNoYQUsU=;
- b=pBqy17yeTiZ7QHBzXOOMGpjmxelUqZxmBcIxvBFHdXTufNmhoF+dY7AFslRYFNuJI89SpU3A68mqi3T6cO16HPD1Jbl2Kyjxsh+Y0/sjQ2ZCczZA3fA4oTkB4ZHjHic9pzTPkOTjPVNZJkd1O10UMpihlkSV5iIyVL0x91rE/smYj7ms/4/tcvRkzOdrrL7niRuG/IqT2wJKCto2TBIarXmcV1wccxAaZo+W1RZK0RHBeRvDendHgsVB1cI97amG4Ga/ExwyPucwmsO2MbfRu49tiXp+BpOtbf6OVN5XbOuApxSqzIEWwDUYecu2aLXQ90U4Zvm/XY2LnNMvlw0uIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=efficios.com; dmarc=pass action=none header.from=efficios.com;
- dkim=pass header.d=efficios.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1c2WdGaPGTdIBK7tkwt/E5fvFcnmF0Zw9KijNoYQUsU=;
- b=qknHJVHaho/G6SOXkzSUpWOUOBMVVKiOUHqRJCYhzKCfEl6whJzVXOf+VjYxE30M7YPKUxctaFHA2xKFb5rsnck+cxXoRliSMK93olrGat6LxLNC58dZ0Q6der0h/F+D3SOwUEox9cLi05aruJcUQu5gdhowE79+dpzFBJfBHfrqUShXQcZ0K9Uo4X0fQhjriT1++8pS0pL0bsCUkxTNGWe1Tiihh0ckSIW0kiHqHevELiXwgCqgv8h7W5oFbCZOLybtyEkFiadR5RnpnxX/qIYZNMH5/QABxi62evlrYT4Fx293aJiX1ILYhhAB00bO/aXDOsFVyvSdCe0/1dhZjg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=efficios.com;
-Received: from YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:be::5)
- by TO1PPF55F13247B.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b08::646) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Tue, 14 Jan
- 2025 14:27:11 +0000
-Received: from YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM
- ([fe80::50f1:2e3f:a5dd:5b4]) by YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM
- ([fe80::50f1:2e3f:a5dd:5b4%4]) with mapi id 15.20.8356.010; Tue, 14 Jan 2025
- 14:27:11 +0000
-Message-ID: <fbfe56d9-863b-4bf4-868c-bc64e0d3e93a@efficios.com>
-Date: Tue, 14 Jan 2025 09:27:10 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selftests/rseq: Fix rseq for cases without glibc support
-From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To: Shuah Khan <skhan@linuxfoundation.org>,
- Raghavendra Rao Ananta <rananta@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, stable@vger.kernel.org
-References: <20241210224435.15206-1-rananta@google.com>
- <15339541-8912-4a1f-b5ca-26dd825dfb88@linuxfoundation.org>
- <291b5c9a-af51-4b7a-91de-8408a33f8390@efficios.com>
-Content-Language: en-US
-In-Reply-To: <291b5c9a-af51-4b7a-91de-8408a33f8390@efficios.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: YQBP288CA0004.CANP288.PROD.OUTLOOK.COM
- (2603:10b6:c01:6a::17) To YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:be::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74FD166F34
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 14:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736865855; cv=none; b=Q1aAc1m6fTdp5LsB4eVou7F/a+sAljXK2dj/V8APT6MT05EVwbzXFwGVfBCdFZIE26B1+wf5cIIdRPEVhhaI/TMcKZuSnlKL+j3NSWlXXeZcfGGapHZbx7Wvg6P+izGXUY4VPdGo+Iw+UknsEqR/YUXTxcq/jfUCV1hk66iyMuw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736865855; c=relaxed/simple;
+	bh=tJBzY/+esHF2sg7h4j+gHu6DCf5brYAZN8wsp9y4Jvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gznUgfV3rrmyhsxNGpe6qeEux0zCGTtl/VT3xbDsvP6CencdFzOR9h7HQqKje/Y0N1qrtT9VktkYp8r0AKwzoYjoiSjJ0N2D/aooIjNdihn4rRRObwqSQ7tYCNpAOLoAgK4fPnw2UNB84aKs86dwUjeloRjJTrQHyre72ta8ncM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=D9TrP13C; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d3bdccba49so9446055a12.1
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 06:44:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google; t=1736865847; x=1737470647; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ATFNgMzaw3+odlncdmVbwQjWHseefp7b7ULkUB6sipQ=;
+        b=D9TrP13CAPTCLmyH8jV+Q049/Kn//XJgAmMizkx6C8C7z4muw7GZYs1RytdL96Fq/I
+         bpGPnHYv/TLODNoYFoWCgtiXmjl/wXCzSbMnW7f2RWaN1n+4e1bOV/Xn2EBU0300bNxD
+         sNLXKj4pmyZXGZZz5zkm4y51z4xo8pvNIikqQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736865847; x=1737470647;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ATFNgMzaw3+odlncdmVbwQjWHseefp7b7ULkUB6sipQ=;
+        b=wie3s/6B0OlJdohWTNFSdOc8z68EFet6Rvc0PLNEk483QLPHYLmG8IPr/G3/jFl37W
+         +Xj5wXk/En3NzUIQ+2k8JPXuwOROweQLRhkHh5XEiM0Vnu5lIRXj/FK/3sb4jvTfDA+A
+         rDle4jkeyPDkrI7xM3NaLCdC2AlQZLx7+XyE5aWQagJ8sCA24D4Pk9HWlu7rjJVv4WVp
+         QxnZAcMCAwkKaTXrY8HiwSoMKGL+GHraUdJGnRCI3YamsMRQ/P59wq/ake9d1A52nSfM
+         ZG0x/iXpoS6SPBZOMF/Cye50BcCk05gLwqx/xkCO0JSmKoT0jTnqfRXVmT3/ZhBXZvNF
+         M/qQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWFaVVMnL8CTrRkvadpROxZjcMj+UU01U1WPQ4ZheeHN1Q1PXqYvCmamxvMqX2NkIQgaLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4HMjV2eaoRrupeDFwrzlHxNK3tNqbtHn/BLEQbMptYVsb6TaM
+	BSulaWzGCFS8gpx4o7m+UhDIo24oZ3LGJ1n6qsqSAP90sx5nsZ3/fB1IScVJ/kA=
+X-Gm-Gg: ASbGnctcjP71NjMC5dN6tkf8RkAVbZpPCVSymVtn3HWJc11Yfa4iUNUp7+PNaaSElB/
+	KRPk3KEgLqXIf/qN4kIz3/iD5BpbxtaoNf1aav5XBeLb3Cj8FDmiJSojVLtZwHXEQWw5SBUMWQg
+	EnNvmShSkIKxOl6QlCsOYJhXOZ5MqaTxdQr7p95POH3kBhn/fni6PIPPXFW2BbDf3a5YnT3wtPa
+	5G66MT1gdspEP6R9bDzu2Vws3Edcs1T0mYZ7BKNwW2wybkaiAyPQsoxCbHVSs/UpgsW
+X-Google-Smtp-Source: AGHT+IGAg6SbQyvl4hHoMLWiihnCnk4YJMHgw8ibbt0hblBqr0eHOCrKPtQvQh7P/3PbA4F//m55Iw==
+X-Received: by 2002:a17:907:a48:b0:ab2:c1e2:1da9 with SMTP id a640c23a62f3a-ab2c1e22977mr2341583266b.51.1736865847270;
+        Tue, 14 Jan 2025 06:44:07 -0800 (PST)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:5485:d4b2:c087:b497])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c95b2181sm636633966b.162.2025.01.14.06.44.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2025 06:44:06 -0800 (PST)
+Date: Tue, 14 Jan 2025 15:44:04 +0100
+From: Simona Vetter <simona.vetter@ffwll.ch>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
+	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	sumit.semwal@linaro.org, pbonzini@redhat.com, seanjc@google.com,
+	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+	dan.j.williams@intel.com, aik@amd.com, yilun.xu@intel.com,
+	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	lukas@wunner.de, yan.y.zhao@intel.com, leon@kernel.org,
+	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+Message-ID: <Z4Z4NKqVG2Vbv98Q@phenom.ffwll.local>
+Mail-Followup-To: Jason Gunthorpe <jgg@nvidia.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
+	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	sumit.semwal@linaro.org, pbonzini@redhat.com, seanjc@google.com,
+	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+	dan.j.williams@intel.com, aik@amd.com, yilun.xu@intel.com,
+	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	lukas@wunner.de, yan.y.zhao@intel.com, leon@kernel.org,
+	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+References: <f3748173-2bbc-43fa-b62e-72e778999764@amd.com>
+ <20250108145843.GR5556@nvidia.com>
+ <5a858e00-6fea-4a7a-93be-f23b66e00835@amd.com>
+ <20250108162227.GT5556@nvidia.com>
+ <Z37HpvHAfB0g9OQ-@phenom.ffwll.local>
+ <Z37QaIDUgiygLh74@yilunxu-OptiPlex-7050>
+ <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
+ <Z38FCOPE7WPprYhx@yilunxu-OptiPlex-7050>
+ <Z4F2X7Fu-5lprLrk@phenom.ffwll.local>
+ <20250110203838.GL5556@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: YT2PR01MB9175:EE_|TO1PPF55F13247B:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1e356723-7f95-4dd4-d78a-08dd34a78891
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Uk5pUmRLUE9Nd2JKWlh1YjBKVFBrTThOeXprMUhOR1VlVk5ZRWwzMmh5N3d1?=
- =?utf-8?B?RTJOTUc2WndQY1lOUWZUM1M0TG0rNjl4aFNrWHFlck1BYkExY3RLTmN1amtM?=
- =?utf-8?B?MnpvaW9FdTFWYWRPTkxyOEluZDZrZnRNYjlXU240TlZIcGh3U1FiQkJsblBw?=
- =?utf-8?B?QjQrd2VtWkpWQXJMR1ZvMDFDbFN6L0ZNSjQvV3pGTVR5Rm8wNUUvU0pqZDA0?=
- =?utf-8?B?TTN1SDV2R28weDFhL1pabjdET3pXSWhqb3FYa2RGVU1keGJQc0dkeGpPYmVT?=
- =?utf-8?B?eVBwQy9FblVHc2Exd1A4TkhpMmdsdk5MRlRscWtXS2orSU8yc2ZELzdRZFZa?=
- =?utf-8?B?UXQ3NDQybVNTa1FBdjl6Rjc1UktlNU84cjBQaVBmd1cvRkF4WVUvejd3TXNV?=
- =?utf-8?B?eEJLMFJzNGdrMEdaOVhTV2s1bjhkUTBSc2MvS2RYNU5DbU54T0ZPdzFRY01V?=
- =?utf-8?B?Uk5LSnNOWGp6ZkpGTUQwV082eG9TanNZQjYvVytGWUdZSi84RDFhQUxETnNO?=
- =?utf-8?B?SUFqdGpreGVrdTQyRHpJWk9NNHFUMWZTa1B0NXRlS2FvMzJJYzdVbFFaY0xR?=
- =?utf-8?B?cGpqczU0ek1ONEVMaWNCZENxMUZYSXlDcXZXQ08vK3I2OEJHZVhMaWpnb3pi?=
- =?utf-8?B?aVZXVkRZVklzaithZURzMFF4UGJ0U1IwazF0VC9JN0hSc21SdmlZckl6OG5H?=
- =?utf-8?B?S2kyWWhaSFoyblJhRlUvVkd4NmltcExrL1hpYXdMaTZNekM5TDZFTE8vVjc4?=
- =?utf-8?B?dmVkQ09qbU9YUGgyZmNlRzBHaWhVRlhzU1NVZ3ZnVjR6MnpQcDhvckJxYzlr?=
- =?utf-8?B?VGhVK01Fd2Q3cmkvOWtDRHd2YTNxRFBRc08wdnA2MFJ2b0hFYkt6QXVyN2d4?=
- =?utf-8?B?WlhsOHdpSWFwb24zVWdldWxYM2tGcnBLZzRkNktUUzdCYWJpenRzdUc2UFB3?=
- =?utf-8?B?anA1L3NZVjdyaktxQUM1KytJSE1MWTlyRnZBME03MDlOZkUvdTFMTTR4ejkv?=
- =?utf-8?B?NVZTVjByV1VLV2lyeC9HallBOEJhS1MwV0xVNENFVTc4TkRTNWZpY2dZSEdl?=
- =?utf-8?B?bldOOHhxTzNyTUpDY2tOQnJPWXR4cEJ3ZHRtbm1mK0dhTytsejRJRVJIYmd1?=
- =?utf-8?B?ZVhEQUdNU0pHSVhOM1BCVXgvMW13Y1ZBYVF4aDVhalhxdUlaY2p1cU9mQlFG?=
- =?utf-8?B?alU4Wnp4VVpPQTQ2K3QvKzJSdCtaT2MyM3hnNlFQMDI4NEpHM09CcVRseGlB?=
- =?utf-8?B?Z09wUFRadWtRUzFQVGxrNmNhUXJpZGZjU3pzK0R6OUI3VzlYM2Y1SWdyRFB2?=
- =?utf-8?B?SkFUY1RYRElrcmtZMmIzUDd4Q0hRMEZxZHJxb0t3b0FOcDRRVnFZQnNiOEQ2?=
- =?utf-8?B?ZGNnYUFoS3NOdnZIemE4OElJa2FCdkUrUlNvRnV3bmFzU0oxRnlJNmcxeFA1?=
- =?utf-8?B?VmEyRVJnTkJzMVhXN0JDSVdNaEtNb3c4KzFxTWJNU0JYYzNueXJTUytaK3Vy?=
- =?utf-8?B?RUxkTTFDc21xSndDS1hySjYwMlBsMFdDYkVkVEQ2U0JuU0pKMm9VZWQ1Ynhw?=
- =?utf-8?B?c1dqRWhIYWJGWW5uenVYc0dQM2JOTW1mYW5qRzRBNjY3NVo0ZHBGMG5PTWpL?=
- =?utf-8?B?OWdNaGRKYkxTL3p5UlBKb2tmeHk5QzRBU2oydFg2dVdtNWNTTGE4N0dlbmFq?=
- =?utf-8?B?WmJ6YUMvM0hnYnFTMHlYTnN0SDJBdlFsVTM4NC93RjR1bEcvYnpZTEtMaTdx?=
- =?utf-8?Q?QnVoy5EEO0a4leUsA41wuspIC6dN4IC9ZNfLxWi?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TE9VZldzSE1tZjRrOHJRN2NERjRIUE55RkUrK3llS20rNFI1OVh2OXRULzk2?=
- =?utf-8?B?VytZSnBOQVJsU1pJaHlNZDFpQ0xpTnpObzhGbk81NGloNU0rQmtOR0R6WCtw?=
- =?utf-8?B?dENpK1JjVmdIa0pIN21xK3NQZi8wOEtpbzB3ak1RdnliOTdYT25lT3daRUJX?=
- =?utf-8?B?Y1YwTnZ0RS9ZRmVGanV1REFkczQxNU1GTE10WjMwMit4T09laWdHYzR2TVh5?=
- =?utf-8?B?dkJyVzZ1ZDJlK2hKd3BNYTZ4VStnd2xiRDh1MDhmVlRVN2x1Q1EwRzdoTnlu?=
- =?utf-8?B?T0lRbkVVakU0Y29LNHVwb2xQY2JXb0NuaG5qWDJ2U05EMXJldDVJUldWaWc1?=
- =?utf-8?B?OElncXNpZUEwdFZwWEw4SUEwdUNaNHhGR1pjSXo1eDZzVVowdXBMM0JiWTYw?=
- =?utf-8?B?UVk5QjVoMFVlN0k3VFc1TTdtZmtSaHg3YUNWaUU3SkI3QzRMQzZycHUvTEJt?=
- =?utf-8?B?bXJhQ2NSRWRTcmMzTm9xb3R0aVlFdkdIR1lOL3FscDhlNFN3NE1uRlh6YUNY?=
- =?utf-8?B?c3duMytSRit5Ky9vbmJCQXJtVFNmUUh0ei9IYTByRG50a2xVQ3ozS05QaUND?=
- =?utf-8?B?WnNISm1xeS9paitFRWFaNFY2K2o1YmNxWE5zekVPWjkrcjZXYzI0SlBNLzJB?=
- =?utf-8?B?YXpmTkdPMXo1b1RqaEh1cWdZb3Bvc3dGYll3SmxzejhKQ3lBNmN2SEJLTjEv?=
- =?utf-8?B?ZkxCdHBXS3NGTWR2SC9zSFhKbFZkbVFiVGRSRkNmcnZralN6NlUrVC9jamF2?=
- =?utf-8?B?R2hkbzFydWNJcVJER25PK2FHMGlUbmh0S0ZHb0tWUnFHNHM2K3FYejhvd285?=
- =?utf-8?B?bnRQNVBqQVhwNkNOVFRCb0l0N01qRU5VWDRFNS9RVW82MFp4dDNrUTdtcENK?=
- =?utf-8?B?ZGo4a2RrRmRvamtqRWdLYmFKWG1LY05oMTVQQmNENkNicWFWYnN0SHpGOWlw?=
- =?utf-8?B?RDJ6WSsrWHIydjZEK3cxbVBvUmJYLzdYMTBWTHg3R083bm9KUzVzRG9HRjRG?=
- =?utf-8?B?eEtXY01vOS9sR2NlNmF6aDlOaDFnbjZmZHQvc2w0RWc1UThHODNQemdHTFhn?=
- =?utf-8?B?bjdTeUFxdjFUbkZmQjRFbmlMek0yb1hzRUlqQWlVMlRnRkh3TWRYOWhNU3ho?=
- =?utf-8?B?QW9KL0pBZHRJRDhxeXhQMHZsdTJldmxLRlVZTVpUcVNyV2dMeEw5SmpyNFJB?=
- =?utf-8?B?eXc0MmFpazFabnE5bUNOWmFjTGlJMTk4N3ZIK3hHa2RhdEJyNjdsV1pHN3k1?=
- =?utf-8?B?a0dNMUhTUTlhMzRwZFEwU0htY01MUGtQQ0RzT2xxUTMxVHd5dm9JQlJtQnI1?=
- =?utf-8?B?Q3V3SEcvRlFIMGs3bjJiU3pJd1lyazh4UWxGRUNCaXB1NkNzc2tiSW9zWTJm?=
- =?utf-8?B?ci9tcVBkdWdnb1hrUGx1MG9NWHB2UjVUM1pwVTVad1lBcytkM0lvTDV5c253?=
- =?utf-8?B?S3FiT0ljSU9HMUdReFoxRVRMSVZOZkI5S0pvQUdxRGdpcEwxZXJtQURKYmJE?=
- =?utf-8?B?SW1iMXZhN3ZIK1o1dWVvZFBvUWdqVVJNQ2IrLzd2K09kSlNFOXRpOWxCRGVJ?=
- =?utf-8?B?eVZKdXV4Nk8rRlB5OUYzNXN4QmhGVUFoN0xFQlUwNE1ENTBjMFJ3dTl3b1Ru?=
- =?utf-8?B?Y3MzaVl3cXV4NWMrREtsSURsWkVHbStUeUtoYkxGak9WYnNZMXhVdjBSWUdp?=
- =?utf-8?B?dGVZZmZ4a2FTa2dDL0pWZVl0RkExN2h1dmpLd1Jhb1FXYUNnRHA4YUc0QmZ3?=
- =?utf-8?B?Q3IxYnIyM3YwekhsZGd1ZGdJTDAyTVdvSEdpQWNRUEdVMFF5QnRVYlNqVDZ6?=
- =?utf-8?B?OHZ5emVjN0wraUVsK1dDdFBXUXZnZjVvdjRFME96SEVNMDJkaTJLTU1OMzZl?=
- =?utf-8?B?QmtjQkF0VU13Y09EeWtTMUV6aFN4aGgvMlBTL2RYOVhzS3Q5ODFuRGRmNEc5?=
- =?utf-8?B?eEMzWDRtLzY5bjduOWZXc2lTUmdGS0dlVnJqamN3VnJMMS9PTjFSSzFaR2ZV?=
- =?utf-8?B?SVZNNXEwQ3hGc0IvSlh4OGR6Q2xJQUVKdUFxN01vQWlYeEQ4cU8rSDZnbVFw?=
- =?utf-8?B?R3NYUUtLQkVVT0RIS1lVa2c2aXRkV3RMT0xEZXJUbGdDYnN6N3VpVFRmck90?=
- =?utf-8?B?ZkRuOXBsMFpDV0xRbnZFWjduaWJNVFR2R0psTmxuT05YS2ovdGsxZVRhYnFH?=
- =?utf-8?Q?+VzoWsNIf0/uhUXih/oPfoY=3D?=
-X-OriginatorOrg: efficios.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e356723-7f95-4dd4-d78a-08dd34a78891
-X-MS-Exchange-CrossTenant-AuthSource: YT2PR01MB9175.CANPRD01.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2025 14:27:11.3273
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4f278736-4ab6-415c-957e-1f55336bd31e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SHw6Uh7MNqnXvu6LuNRbI2z1jvC9Mjv8nXrsIKSyf98K18DucQSt738BHA9p+o72vNNMQH7OiACU1GSi4JI3pfn6bASTm7PoQpgRrWvKgsw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TO1PPF55F13247B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250110203838.GL5556@nvidia.com>
+X-Operating-System: Linux phenom 6.12.3-amd64 
 
-On 2025-01-14 09:07, Mathieu Desnoyers wrote:
-> On 2025-01-13 18:06, Shuah Khan wrote:
->> On 12/10/24 15:44, Raghavendra Rao Ananta wrote:
->>> Currently the rseq constructor, rseq_init(), assumes that glibc always
->>> has the support for rseq symbols (__rseq_size for instance). However,
->>> glibc supports rseq from version 2.35 onwards. As a result, for the
->>> systems that run glibc less than 2.35, the global rseq_size remains
->>> initialized to -1U. When a thread then tries to register for rseq,
->>> get_rseq_min_alloc_size() would end up returning -1U, which is
->>> incorrect. Hence, initialize rseq_size for the cases where glibc doesn't
->>> have the support for rseq symbols.
->>>
->>> Cc: stable@vger.kernel.org
->>> Fixes: 73a4f5a704a2 ("selftests/rseq: Fix mm_cid test failure")
->>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
->>> ---
->>
->> Applied to linux_kselftest next for Linux 6.14-rc1 after fixing the
->> commit if for Fixes tag
+On Fri, Jan 10, 2025 at 04:38:38PM -0400, Jason Gunthorpe wrote:
+> On Fri, Jan 10, 2025 at 08:34:55PM +0100, Simona Vetter wrote:
 > 
-> Hi Shuah,
+> > So if I'm getting this right, what you need from a functional pov is a
+> > dma_buf_tdx_mmap? Because due to tdx restrictions, the normal dma_buf_mmap
+> > is not going to work I guess?
 > 
-> I did not review nor ack this patch. I need to review it carefully
-> to make sure it does not break anything else moving forward.
+> Don't want something TDX specific!
 > 
-> Please wait before merging.
+> There is a general desire, and CC is one, but there are other
+> motivations like performance, to stop using VMAs and mmaps as a way to
+> exchanage memory between two entities. Instead we want to use FDs.
+> 
+> We now have memfd and guestmemfd that are usable with
+> memfd_pin_folios() - this covers pinnable CPU memory.
+> 
+> And for a long time we had DMABUF which is for all the other wild
+> stuff, and it supports movable memory too.
+> 
+> So, the normal DMABUF semantics with reservation locking and move
+> notifiers seem workable to me here. They are broadly similar enough to
+> the mmu notifier locking that they can serve the same job of updating
+> page tables.
 
-I am preparing an alternative fix which keeps the selftests
-code in sync with librseq.
+Yeah raw pfn is fine with me too. It might come with more "might not work
+on this dma-buf" restrictions, but I can't think of a practical one right
+now.
 
-Thanks,
+> > Also another thing that's a bit tricky is that kvm kinda has a 3rd dma-buf
+> > memory model:
+> > - permanently pinned dma-buf, they never move
+> > - dynamic dma-buf, they move through ->move_notify and importers can remap
+> > - revocable dma-buf, which thus far only exist for pci mmio resources
+> 
+> I would like to see the importers be able to discover which one is
+> going to be used, because we have RDMA cases where we can support 1
+> and 3 but not 2.
+> 
+> revocable doesn't require page faulting as it is a terminal condition.
 
-Mathieu
+Yeah this is why I think we should separate the dynamic from the revocable
+use-cases clearly, because mixing them is going to result in issues.
 
+> > Since we're leaning even more on that 3rd model I'm wondering whether we
+> > should make it something official. Because the existing dynamic importers
+> > do very much assume that re-acquiring the memory after move_notify will
+> > work. But for the revocable use-case the entire point is that it will
+> > never work.
 > 
-> Thanks,
+> > I feel like that's a concept we need to make explicit, so that dynamic
+> > importers can reject such memory if necessary.
 > 
-> Mathieu
-> 
->>
->> thanks,
->> -- Shuah
-> 
+> It strikes me as strange that HW can do page faulting, so it can
+> support #2, but it can't handle a non-present fault?
 
+I guess it's not a kernel issue, but userspace might want to know whether
+this dma-buf could potentially nuke the entire gpu context. Because that's
+what you get when we can't patch up a fault, which is the difference
+between a recovable dma-buf and a dynamic dma-buf.
+
+E.g. if a compositor gets a dma-buf it assumes that by just binding that
+it will not risk gpu context destruction (unless you're out of memory and
+everything is on fire anyway, and it's ok to die). But if a nasty client
+app supplies a revocable dma-buf, then it can shot down the higher
+priviledged compositor gpu workload with precision. Which is not great, so
+maybe existing dynamic gpu importers should reject revocable dma-buf.
+That's at least what I had in mind as a potential issue.
+
+> > So yeah there's a bunch of tricky lifetime questions that need to be
+> > sorted out with proper design I think, and the current "let's just use pfn
+> > directly" proposal hides them all under the rug. 
+> 
+> I don't think these two things are connected. The lifetime model that
+> KVM needs to work with the EPT, and that VFIO needs for it's MMIO,
+> definately should be reviewed and evaluated.
+> 
+> But it is completely orthogonal to allowing iommufd and kvm to access
+> the CPU PFN to use in their mapping flows, instead of the
+> dma_addr_t.
+> 
+> What I want to get to is a replacement for scatter list in DMABUF that
+> is an array of arrays, roughly like:
+> 
+>   struct memory_chunks {
+>       struct memory_p2p_provider *provider;
+>       struct bio_vec addrs[];
+>   };
+>   int (*dmabuf_get_memory)(struct memory_chunks **chunks, size_t *num_chunks);
+> 
+> This can represent all forms of memory: P2P, private, CPU, etc and
+> would be efficient with the new DMA API.
+> 
+> This is similar to the structure BIO has, and it composes nicely with
+> a future pin_user_pages() and memfd_pin_folios().
+
+Since you mention pin here, I think that's another aspect of the revocable
+vs dynamic question. Dynamic buffers are expected to sometimes just move
+around for no reason, and importers must be able to cope.
+
+For recovable exporters/importers I'd expect that movement is not
+happening, meaning it's pinned until the single terminal revocation. And
+maybe I read the kvm stuff wrong, but it reads more like the latter to me
+when crawling through the pfn code.
+
+Once we have the lifetime rules nailed then there's the other issue of how
+to describe the memory, and my take for that is that once the dma-api has
+a clear answer we'll just blindly adopt that one and done.
+
+And currently with either dynamic attachments and dma_addr_t or through
+fishing the pfn from the cpu pagetables there's some very clearly defined
+lifetime and locking rules (which kvm might get wrong, I've seen some
+discussions fly by where it wasn't doing a perfect job with reflecting pte
+changes, but that was about access attributes iirc). If we add something
+new, we need clear rules and not just "here's the kvm code that uses it".
+That's how we've done dma-buf at first, and it was a terrible mess of
+mismatched expecations.
+-Sima
 -- 
-Mathieu Desnoyers
-EfficiOS Inc.
-https://www.efficios.com
-
+Simona Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
