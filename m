@@ -1,141 +1,95 @@
-Return-Path: <kvm+bounces-35358-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35359-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23AD3A10238
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 09:39:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74337A10253
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 09:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AE911647A7
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 08:39:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 913BB164FDE
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 08:42:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C3928EC63;
-	Tue, 14 Jan 2025 08:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ssv9xXhO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD302284A74;
+	Tue, 14 Jan 2025 08:42:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6AC1CDA19;
-	Tue, 14 Jan 2025 08:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECAF91C5F2A;
+	Tue, 14 Jan 2025 08:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.164.42.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736843935; cv=none; b=rGW0xy4ucJRNbPK8F2Q6NLC1o0vXaBjGi+8zLPfInfiphyUSYkohtEoGf5ZEreLPlqH/nSQaYFUyzF76LWwwVxrM7kmilqh1OewoZL17X7vr2Ll7wkzFIoP+EPrQu5+k9h1wnRC5pSVi7JpQstPGOPY/VY04m0XDr69JmnsVm/Q=
+	t=1736844124; cv=none; b=pLqQoH2AfYxTCaBRTWLvbs6dwUfF4syiUNrjnAIBAoLFD7836SntGxzC+2ykwRLVwDBf+RbU4aLspYz5JNJIvjmyU5+bL/FwhSu4drpx3YVGEIICMZBwz4vLaAR1QHdxAUG38r/PgtSAC0oco+9tI3qc8a3jb3lMFztqWDRKh3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736843935; c=relaxed/simple;
-	bh=WCmlIJb/eJ3RtRwBL0vbXX0Y9UrynyAEdph0c+wowPY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fL0Xr8X8zyI0a/u3GvEX/o7PP+kalNtm0XPaSBemICoiVh//aP7oDh2W5WYv0HRABVFLgIsdrZt9cUkeFUdE15u2yBvZZnN19mVpkfITi/+G5LM7yni7nopqQ5zLT9Y4ta4RCDplBBsMtshG982cQ9fk3SVe/7t3FTayZFff5fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ssv9xXhO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3272C4CEDD;
-	Tue, 14 Jan 2025 08:38:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736843934;
-	bh=WCmlIJb/eJ3RtRwBL0vbXX0Y9UrynyAEdph0c+wowPY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ssv9xXhOL7JbMMQrzlaq27YWcIfBrJoOCeudEXG9TZo+CTwB4dvd5GSjmpavw7e45
-	 mnFmWBsl8OxWd53GB8Ai3qRopj9qNOYzrIKnjN918usYV953p8Z71j8T9h8bRRgd80
-	 mbGV/Q9H0WnXVRuMYHxZFQGgigZ6wJf8UrCX5GqCfJBdnZINfpgPJQrTxLzhlJg07Y
-	 BIQWvXINHA2mvOIkrZyZDtdpZqKLm7qpvrTk+kx7XKDDXEu0pCnY7dzHvA1pZbR8yv
-	 o9iPi8YszEl9iejfRQW/qe5KSfvou9DSiPIxxOEteYKg009tI7JHlqlu+nZukZHN0U
-	 oaCRxAZ2exYjA==
-Date: Tue, 14 Jan 2025 10:38:47 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Keith Busch <kbusch@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v5 00/17] Provide a new two step DMA mapping API
-Message-ID: <20250114083847.GE3146852@unreal>
-References: <cover.1734436840.git.leon@kernel.org>
+	s=arc-20240116; t=1736844124; c=relaxed/simple;
+	bh=uYN89YWMDJIkGeTg164qE0BPS4rRTZt8kOzUvyUZomg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=efhQdbS6nV9WPaVwCWiIL7Z4PU8IgDqCL/m4Mfg9CiqropsWdHnG2qoW9DTKCBqUWzs01vX+KqunV83bdvOGOCsReGAx2xnqPPChK83IG8rQH+esmh+iW2P2dZx/rkKBS1VPvV/NI6aIxnWA9hYQSKVrhdp8zNe89jL/rMAMTzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=61.164.42.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from wh1sper$zju.edu.cn ( [10.162.198.27] ) by
+ ajax-webmail-mail-app4 (Coremail) ; Tue, 14 Jan 2025 16:41:46 +0800
+ (GMT+08:00)
+Date: Tue, 14 Jan 2025 16:41:46 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5byg5rWp54S2?= <wh1sper@zju.edu.cn>
+To: "Lei Yang" <leiyang@redhat.com>
+Cc: mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+	stefanha@redhat.com, eperezma@redhat.com,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Mike Christie" <michael.christie@oracle.com>
+Subject: Re: Re: [PATCH] vhost/scsi: Fix improper cleanup in
+ vhost_scsi_set_endpoint()
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.1-cmXT5 build
+ 20240625(a75f206e) Copyright (c) 2002-2025 www.mailtech.cn zju.edu.cn
+In-Reply-To: <CAPpAL=xC7+f_8V4D==JvZxs5X-CePa_VftOH=KDc8H1vPSNp9w@mail.gmail.com>
+References: <20250111033454.26596-1-wh1sper@zju.edu.cn>
+ <bae5ca72-c6ff-4412-a317-4649f2d09cdf@oracle.com>
+ <481cd60a-d633-4251-bb53-d3026e005930@oracle.com>
+ <CAPpAL=xC7+f_8V4D==JvZxs5X-CePa_VftOH=KDc8H1vPSNp9w@mail.gmail.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1734436840.git.leon@kernel.org>
+Message-ID: <2b10f430.24ffd.19463f9dc80.Coremail.wh1sper@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cS_KCgCHmRVKI4ZnTMIlAQ--.44913W
+X-CM-SenderInfo: asssliaqzvq6lmxovvfxof0/1tbiAg0GB2eFSrAYpgAAso
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW7Jw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Tue, Dec 17, 2024 at 03:00:18PM +0200, Leon Romanovsky wrote:
-> Changelog:
-
-<...>
-
-> Christoph Hellwig (6):
->   PCI/P2PDMA: Refactor the p2pdma mapping helpers
->   dma-mapping: move the PCI P2PDMA mapping helpers to pci-p2pdma.h
->   iommu: generalize the batched sync after map interface
->   iommu/dma: Factor out a iommu_dma_map_swiotlb helper
->   dma-mapping: add a dma_need_unmap helper
->   docs: core-api: document the IOVA-based API
-> 
-> Leon Romanovsky (11):
->   iommu: add kernel-doc for iommu_unmap and iommu_unmap_fast
->   dma-mapping: Provide an interface to allow allocate IOVA
->   dma-mapping: Implement link/unlink ranges API
->   mm/hmm: let users to tag specific PFN with DMA mapped bit
->   mm/hmm: provide generic DMA managing logic
->   RDMA/umem: Store ODP access mask information in PFN
->   RDMA/core: Convert UMEM ODP DMA mapping to caching IOVA and page
->     linkage
->   RDMA/umem: Separate implicit ODP initialization from explicit ODP
->   vfio/mlx5: Explicitly use number of pages instead of allocated length
->   vfio/mlx5: Rewrite create mkey flow to allow better code reuse
->   vfio/mlx5: Enable the DMA link API
-> 
->  Documentation/core-api/dma-api.rst   |  70 +++++
->  drivers/infiniband/core/umem_odp.c   | 250 +++++----------
->  drivers/infiniband/hw/mlx5/mlx5_ib.h |  12 +-
->  drivers/infiniband/hw/mlx5/odp.c     |  65 ++--
->  drivers/infiniband/hw/mlx5/umr.c     |  12 +-
->  drivers/iommu/dma-iommu.c            | 454 +++++++++++++++++++++++----
->  drivers/iommu/iommu.c                |  84 ++---
->  drivers/pci/p2pdma.c                 |  38 +--
->  drivers/vfio/pci/mlx5/cmd.c          | 376 +++++++++++-----------
->  drivers/vfio/pci/mlx5/cmd.h          |  35 ++-
->  drivers/vfio/pci/mlx5/main.c         |  87 +++--
->  include/linux/dma-map-ops.h          |  54 ----
->  include/linux/dma-mapping.h          |  86 +++++
->  include/linux/hmm-dma.h              |  33 ++
->  include/linux/hmm.h                  |  21 ++
->  include/linux/iommu.h                |   4 +
->  include/linux/pci-p2pdma.h           |  84 +++++
->  include/rdma/ib_umem_odp.h           |  25 +-
->  kernel/dma/direct.c                  |  44 +--
->  kernel/dma/mapping.c                 |  18 ++
->  mm/hmm.c                             | 264 ++++++++++++++--
->  21 files changed, 1423 insertions(+), 693 deletions(-)
->  create mode 100644 include/linux/hmm-dma.h
-
-Hi Robin,
-
-Can you please Ack the dma-iommu changes?
-
-Thanks
-
-> 
-> -- 
-> 2.47.0
-> 
-> 
+WWVzLCBhbmQgaXQgYWxzbyBwcm90ZWN0cyB0aGUga2VybmVsIGZyb20gdGhlIFBvQywgYXMgSSd2
+ZSB0ZXN0ZWQuCgpPbiAyMDI1LTAxLTE0IDEwOjE3OjUwIExlaSBZYW5nIHdyb3RlOgo+IEkgdGVz
+dGVkIHRoaXMgcGF0Y2ggd2l0aCB2aXJ0aW8tbmV0IHJlZ3Jlc3Npb24gdGVzdHMsIGV2ZXJ5dGhp
+bmcgd29ya3MgZmluZS4KPiAKPiBUZXN0ZWQtYnk6IExlaSBZYW5nIDxsZWl5YW5nQHJlZGhhdC5j
+b20+Cj4gCj4gCj4gT24gTW9uLCBKYW4gMTMsIDIwMjUgYXQgNToyMOKAr0FNIE1pa2UgQ2hyaXN0
+aWUKPiA8bWljaGFlbC5jaHJpc3RpZUBvcmFjbGUuY29tPiB3cm90ZToKPiA+Cj4gPiBPbiAxLzEy
+LzI1IDExOjM1IEFNLCBtaWNoYWVsLmNocmlzdGllQG9yYWNsZS5jb20gd3JvdGU6Cj4gPiA+IFNv
+IEkgdGhpbmsgdG8gZml4IHRoZSBpc3N1ZSwgd2Ugd291bGQgd2FudCB0bzoKPiA+ID4KPiA+ID4g
+MS4gbW92ZSB0aGUKPiA+ID4KPiA+ID4gbWVtY3B5KHZzX3RwZywgdnMtPnZzX3RwZywgbGVuKTsK
+PiA+ID4KPiA+ID4gdG8gdGhlIGVuZCBvZiB0aGUgZnVuY3Rpb24gYWZ0ZXIgd2UgZG8gdGhlIHZo
+b3N0X3Njc2lfZmx1c2guIFRoaXMgd2lsbAo+ID4gPiBiZSBtb3JlIGNvbXBsaWNhdGVkIHRoYW4g
+dGhlIGN1cnJlbnQgbWVtY3B5IHRob3VnaC4gV2Ugd2lsbCB3YW50IHRvCj4gPiA+IG1lcmdlIHRo
+ZSBsb2NhbCB2c190cGcgYW5kIHRoZSB2cy0+dnNfdHBnIGxpa2U6Cj4gPiA+Cj4gPiA+IGZvciAo
+aSA9IDA7IGkgPCBWSE9TVF9TQ1NJX01BWF9UQVJHRVQ7IGkrKykgewo+ID4gPiAgICAgICBpZiAo
+dnNfdHBnW2ldKQo+ID4gPiAgICAgICAgICAgICAgIHZzLT52c190cGdbaV0gPSB2c190cGdbaV0p
+Cj4gPiA+IH0KPiA+Cj4gPiBJIHRoaW5rIEkgd3JvdGUgdGhhdCBpbiByZXZlcnNlLiBXZSB3b3Vs
+ZCB3YW50Ogo+ID4KPiA+IHZob3N0X3Njc2lfZmx1c2godnMpOwo+ID4KPiA+IGlmICh2cy0+dnNf
+dHBnKSB7Cj4gPiAgICAgICAgIGZvciAoaSA9IDA7IGkgPCBWSE9TVF9TQ1NJX01BWF9UQVJHRVQ7
+IGkrKykgewo+ID4gICAgICAgICAgICAgICAgIGlmICh2cy0+dnNfdHBnW2ldKQo+ID4gICAgICAg
+ICAgICAgICAgICAgICAgICAgdnNfdHBnW2ldID0gdnMtPnZzX3RwZ1tpXSkKPiA+ICAgICAgICAg
+fQo+ID4gfQo+ID4KPiA+IGtmcmVlKHZzLT52c190cGcpOwo+ID4gdnMtPnZzX3RwZyA9IHZzX3Rw
+ZzsKPiA+Cj4gPiBvciB3ZSBjb3VsZCBqdXN0IGFsbG9jYXRlIHRoZSB2c190cGcgd2l0aCB0aGUg
+dmhvc3Rfc2NzaSBsaWtlOgo+ID4KPiA+IHN0cnVjdCB2aG9zdF9zY3NpIHsKPiA+ICAgICAgICAg
+Li4uLgo+ID4KPiA+ICAgICAgICAgc3RydWN0IHZob3N0X3Njc2lfdHBnICp2c190cGdbVkhPU1Rf
+U0NTSV9NQVhfVEFSR0VUXTsKPiA+Cj4gPiB0aGVuIHdoZW4gd2UgbG9vcCBpbiB2aG9zdF9zY3Np
+X3NldC9jbGVhcl9lbmRwb2ludCBzZXQvY2xlYXIgdGhlCj4gPiBldmVyeSB2c190cGcgZW50cnku
+Cj4gPgo=
 
