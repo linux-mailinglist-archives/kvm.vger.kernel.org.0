@@ -1,136 +1,177 @@
-Return-Path: <kvm+bounces-35339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D27A0C5DA
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 00:48:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F294A0FD34
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 01:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D93293A2DDC
-	for <lists+kvm@lfdr.de>; Mon, 13 Jan 2025 23:48:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72E401888DA8
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 00:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783941FA16C;
-	Mon, 13 Jan 2025 23:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A1CF9D9;
+	Tue, 14 Jan 2025 00:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sLHU1YuM"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="K6PlnWJ9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CCD160884
-	for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 23:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4C017C91;
+	Tue, 14 Jan 2025 00:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736812076; cv=none; b=DWVPN5rkdHJfESQI24yrrMB7honplyrdSnoa0V+wdv6FUn1MWW3Ls3ayajconyadrhVVnzHQxvkGW07HU2J5tO3HNzqX9VW6KBHkOs3Ib8Nn9XBN0MDn9ZdfY+/gjQruQn89zfoFTaraBXIvxnem5Y3+t8RV5MWPr6uP31zJHng=
+	t=1736813399; cv=none; b=B8LpQu/DvatSZKOngrYxOmdzxBk8MT4607KnLDlGROuGpfLOuSZTaOYtv0tnTyUfP9g6SBlwl2GNvZUqsFk0lBUtC7ZW26gm9UGKNcwUxgG9vL61VR/l+LonrU5xfxpdBI6d8PcSTjaJglYDj0vnS8BtJ2XB/zfUWYJzkDbt/nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736812076; c=relaxed/simple;
-	bh=fTCT5TpXqNmZ9ymdvmc4dfpQWlYy0cDbHGSxcupe9KQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=vGRT/ewaOv8nZO5Zbp90iTP3ygatu9hQ3D+fXfUoVx5W53ZdqLLKVwu1/sP/UiVZAhxCr4/Fe+MhnQa/Pcvqnes3yNJZ3TNTf4jKEx9EGHH3VyC3gxO9VEvLzIhFf0WgcNhQDX0uJD6YdRnqdKPLsw95JjaithcybS1rT17kF/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sLHU1YuM; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef35de8901so8427668a91.3
-        for <kvm@vger.kernel.org>; Mon, 13 Jan 2025 15:47:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736812074; x=1737416874; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hD6m22BigUgoEDVkJoE+6XsquT1/RMxI0C+5BKRGrtI=;
-        b=sLHU1YuMOuingmbENb4szBJfKwXJD6HN/pAPMj7hgfvLoAqVfbKOjZKzKZqSOHABI7
-         2AcVuARyTSCp6X9ELDDOdxU44cGUyQUVploZVktsTNzD6syGK7KNPvpnQtQt8oVM7gyl
-         Zuj7WPif03zNYH3rcBLTVk57e7ueQU1qIO89dD1PYFzg7ROYf3NkIj+vNqqJTARivGto
-         LtNRErwC38GfMhA+kQPPiT4VrQrYRxxx6TrQ/TMtYupCgDMqP7QIiMk8UVXTW/mMnaoK
-         GRooLQgG8zhWRbhxFhLPJKuX8HXeKeLoFZcE91LLasZBxUNfwjsDEgfQ/OH19QEWqfbS
-         /hTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736812074; x=1737416874;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hD6m22BigUgoEDVkJoE+6XsquT1/RMxI0C+5BKRGrtI=;
-        b=GDYAMAXvXyk8So5Qp+uStpawL7vjoHccYDubsGhhncxBtMAJVn39tNPSaDPfo9qEqX
-         wT08Hs2bgAZOLYB2ybS8uF4k1e45WaEst78FIr5suyfsJ2JIBLL1pVGtlr2j5A8P67Jg
-         ee+By5BXhSWmdhPJKpXqOhyuIIT19WajkLA6NEB5XDiLw/6LiGPHjve/zpWWJUH6scqf
-         myj6mFFa/ob9dTEQVzZOs34Xj42eBGEaWOXqMa2pjPJawK6qJK+3HMkOAD2fv1peeIQT
-         +k4RFIbFYyiLyr7FE21KQOcIXEtdEcAysxhJEn1kXAB6+LOHPLQ9164G/7lCjrD33nbW
-         HXWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUdUMyOAOW/ueIj3lnLkt4GXv7ci9Kc+8SB6Iq5PzaT5vdxsLMY4P+KIJoBmeEmnqUQurA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNe3onav4t81/30mIA9s8GzN0gTv8P8VqLDnKhklwOrc8UkRoG
-	pNG7o1yM+AJ2XNXlWV5iSA99nDaZr94YMo6ZzhtzumTIokUIix+B06WFnpioljn+OG8gJ+iz826
-	fJQ==
-X-Google-Smtp-Source: AGHT+IEqBMb9BlWA9vSB1KYYIXdFRR7DtH4FfJdEq+KBIiQlOOl/g8td+7ypW2x1d66hMNENsHVArA/Xkwc=
-X-Received: from pjbsm10.prod.google.com ([2002:a17:90b:2e4a:b0:2e2:44f2:9175])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:da8f:b0:2ee:dcf6:1c77
- with SMTP id 98e67ed59e1d1-2f548ebf531mr36203067a91.16.1736812074665; Mon, 13
- Jan 2025 15:47:54 -0800 (PST)
-Date: Mon, 13 Jan 2025 15:47:53 -0800
-In-Reply-To: <c88ae590-4930-4d22-988c-60a5eeaad490@intel.com>
+	s=arc-20240116; t=1736813399; c=relaxed/simple;
+	bh=OsKFXtMineW8sNVrB+luwXdbjpxNtb5UUqOWpJzquZs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a232ziLqUv/R3a10GhW0bd2wCAYgLcuZmIptR0897UjH9lotOiGalvftsqViles+41qm7emLrBASpP7H8PTbuKTfEROEVKsXvrbkCRb14rktYY4ExccDRFOCiGReKzvMaxJJktJACip0nvxvdz9TAaxlcYI/5mt3B46Eyvl/yiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=K6PlnWJ9; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tXUV0-00FOKw-Tk; Tue, 14 Jan 2025 01:09:38 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=ItYetxWsSzgRvLHc8dKmyCADQfPIZfMQ4g/EMKUfjZA=; b=K6PlnWJ9JeqtlI+A2SE03zEl5v
+	t0nhZB9327vqImvtuPI90q8kXl3d74poC3e/F3u7e+OIz2gZ38jkJlSBDpHQz4K2MvLP51v95AbtX
+	WZqKZrqBjmk/Fe1arTJCLNAoMjcSkIDU0h53HoVNldRtaHcQ+7OaKXmoLyM8jVyYsPOmEPLpvt6Dn
+	aFnPE1jYDUK04SeFQbc+8UK5WMn+jTB2XEUxgHyWSp+zxdCfVsTGB3CZjQDFi+73Dlb1Y4OBEaqZJ
+	kXBunvm2DK1lqTBFIoQGGazJKgzMubUR9lTSP8HLwlV0v2DCUcKd/+/xnSjdMeVaQWabfhJcZM6wn
+	zQJgWm4A==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tXUUx-0005Z5-Fa; Tue, 14 Jan 2025 01:09:37 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tXUUn-00GzIz-OP; Tue, 14 Jan 2025 01:09:25 +0100
+Message-ID: <7de34054-10cf-45d0-a869-adebb77ad913@rbox.co>
+Date: Tue, 14 Jan 2025 01:09:24 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241121201448.36170-1-adrian.hunter@intel.com>
- <20241121201448.36170-5-adrian.hunter@intel.com> <Z0AbZWd/avwcMoyX@intel.com>
- <a42183ab-a25a-423e-9ef3-947abec20561@intel.com> <Z2GiQS_RmYeHU09L@google.com>
- <487a32e6-54cd-43b7-bfa6-945c725a313d@intel.com> <Z2WZ091z8GmGjSbC@google.com>
- <96f7204b-6eb4-4fac-b5bb-1cd5c1fc6def@intel.com> <Z4Aff2QTJeOyrEUY@google.com>
- <c88ae590-4930-4d22-988c-60a5eeaad490@intel.com>
-Message-ID: <Z4WmKTRQ8e-amGus@google.com>
-Subject: Re: [PATCH 4/7] KVM: TDX: restore host xsave state when exit from the
- guest TD
-From: Sean Christopherson <seanjc@google.com>
-To: Adrian Hunter <adrian.hunter@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	dave.hansen@linux.intel.com, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
-	reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@linux.intel.com, binbin.wu@linux.intel.com, dmatlack@google.com, 
-	isaku.yamahata@intel.com, nik.borisov@suse.com, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, yan.y.zhao@intel.com, weijiang.yang@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the transport
+ changes
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Luigi Leonardi <leonardi@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>,
+ Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+ stable@vger.kernel.org
+References: <20250110083511.30419-1-sgarzare@redhat.com>
+ <20250110083511.30419-2-sgarzare@redhat.com>
+ <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
+ <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
+ <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
+ <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
+ <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
+ <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
+ <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
+From: Michal Luczaj <mhal@rbox.co>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 13, 2025, Adrian Hunter wrote:
-> On 9/01/25 21:11, Sean Christopherson wrote:
-> > My vote would to KVM_BUG_ON() before entering the guest.
+On 1/13/25 16:01, Stefano Garzarella wrote:
+> On Mon, Jan 13, 2025 at 02:51:58PM +0100, Michal Luczaj wrote:
+>> On 1/13/25 12:05, Stefano Garzarella wrote:
+>>> ...
+>>> An alternative approach, which would perhaps allow us to avoid all this,
+>>> is to re-insert the socket in the unbound list after calling release()
+>>> when we deassign the transport.
+>>>
+>>> WDYT?
+>>
+>> If we can't keep the old state (sk_state, transport, etc) on failed
+>> re-connect() then reverting back to initial state sounds, uhh, like an
+>> option :) I'm not sure how well this aligns with (user's expectations of)
+>> good ol' socket API, but maybe that train has already left.
 > 
-> I notice if KVM_BUG_ON() is called with interrupts disabled
-> smp_call_function_many_cond() generates a warning:
-> 
-> WARNING: CPU: 223 PID: 4213 at kernel/smp.c:807 smp_call_function_many_cond+0x421/0x560
-> 
-> static void smp_call_function_many_cond(const struct cpumask *mask,
-> 					smp_call_func_t func, void *info,
-> 					unsigned int scf_flags,
-> 					smp_cond_func_t cond_func)
-> {
-> 	int cpu, last_cpu, this_cpu = smp_processor_id();
-> 	struct call_function_data *cfd;
-> 	bool wait = scf_flags & SCF_WAIT;
-> 	int nr_cpus = 0;
-> 	bool run_remote = false;
-> 	bool run_local = false;
-> 
-> 	lockdep_assert_preemption_disabled();
-> 
-> 	/*
-> 	 * Can deadlock when called with interrupts disabled.
-> 	 * We allow cpu's that are not yet online though, as no one else can
-> 	 * send smp call function interrupt to this cpu and as such deadlocks
-> 	 * can't happen.
-> 	 */
-> 	if (cpu_online(this_cpu) && !oops_in_progress &&
-> 	    !early_boot_irqs_disabled)
-> 		lockdep_assert_irqs_enabled();			<------------- here
-> 
-> Do we need to care about that?
+> We really want to behave as similar as possible with the other sockets,
+> like AF_INET, so I would try to continue toward that train.
 
-Ugh, yes.  E.g. the deadlock mentioned in the comment would occur if two vCPUs
-hit the KVM_BUG_ON() at the same time (they'd both wait for the other to respond
-to *their* IPI).
+I was worried that such connect()/transport error handling may have some
+user visible side effects, but I guess I was wrong. I mean you can still
+reach a sk_state=TCP_LISTEN with a transport assigned[1], but perhaps
+that's a different issue.
 
-Since the damage is limited to the current vCPU, i.e. letting userspace run other
-vCPUs is unlikely to put KVM in harm's way, a not-awful alternative would be to
-WARN_ON_ONCE() and return KVM_EXIT_INTERNAL_ERROR.
+I've tried your suggestion on top of this series. Passes the tests.
+
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index fa9d1b49599b..4718fe86689d 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -492,6 +492,10 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+ 		vsk->transport->release(vsk);
+ 		vsock_deassign_transport(vsk);
+ 
++		vsock_addr_unbind(&vsk->local_addr);
++		vsock_addr_unbind(&vsk->remote_addr);
++		vsock_insert_unbound(vsk);
++
+ 		/* transport's release() and destruct() can touch some socket
+ 		 * state, since we are reassigning the socket to a new transport
+ 		 * during vsock_connect(), let's reset these fields to have a
+
+>> Another possibility would be to simply brick the socket on failed (re)connect.
+> 
+> I see, though, this is not the behavior of AF_INET for example, right?
+
+Right.
+
+> Do you have time to investigate/fix this problem?
+> If not, I'll try to look into it in the next few days, maybe next week.
+
+I'm happy to help, but it's not like I have any better ideas.
+
+Michal
+
+[1]: E.g. this way:
+```
+from socket import *
+
+MAX_PORT_RETRIES = 24 # net/vmw_vsock/af_vsock.c
+VMADDR_CID_LOCAL = 1
+VMADDR_PORT_ANY = -1
+hold = []
+
+def take_port(port):
+	s = socket(AF_VSOCK, SOCK_SEQPACKET)
+	s.bind((VMADDR_CID_LOCAL, port))
+	hold.append(s)
+	return s
+
+s = take_port(VMADDR_PORT_ANY)
+_, port = s.getsockname()
+for _ in range(MAX_PORT_RETRIES):
+	port += 1
+	take_port(port);
+
+s = socket(AF_VSOCK, SOCK_SEQPACKET)
+err = s.connect_ex((VMADDR_CID_LOCAL, port))
+assert err != 0
+print("ok, connect failed; transport set")
+
+s.bind((VMADDR_CID_LOCAL, port+1))
+s.listen(16)
+```
+
 
