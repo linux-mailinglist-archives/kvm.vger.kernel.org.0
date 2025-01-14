@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-35432-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35433-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8078EA10F65
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:11:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B1D4A10F6E
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:12:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92F061881E35
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:11:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10D1B1883F64
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C393226555;
-	Tue, 14 Jan 2025 18:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8B6227588;
+	Tue, 14 Jan 2025 18:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A9LyDnfV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dTN5U6o4"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47CC21ADD2
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DAA2144C4
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736877852; cv=none; b=P8HG5CfTZsbyE77zsLUkYJNz9zaFkljGuM8tBhUFLcLGxc6IF8m1QHq6EYEZ+iI5JsgmFW9qLnxwkCAzW7drEFSdiwKBUcrAcqRempzxcEwrILNTVIO0HBByGSZPND+PBf7NLCppB7EdX8jH4paeH/0l4DW/pcBEnETzgB6HtL0=
+	t=1736877876; cv=none; b=W4jfd+LeM+/fPwolfWcUoQe+GPr7jwqtIAzUPGrTpOpnnjgGkooQZanO61PPaC9y647nMzIaJI5lO8yRihrYyl9YU5R3702WimZDL/Q+d/JtbwiPP/7ounIcgFOsrJ7JZ5bsE5oJHTHWgc0MRCI1M3peTOz/9ts1APdKPZaI7b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736877852; c=relaxed/simple;
-	bh=8Qc17PnoYVrDWBie42x0+m5I3f99ilEL8iBQ1J8ka7s=;
+	s=arc-20240116; t=1736877876; c=relaxed/simple;
+	bh=t9LXtFI+r4sNeKLe+Gkbrocxv375lmqj/KlQHlYTLJ8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LheKQXog71mFm2Ye+JvR199soLpfHioq+30/FscqiM9NEGZxJsGwx+3OyIfbWoif6OlIWoyav8qfq45YT5h6pbbwrXgxZa0bJ71XGFjwkEeM5jfH+JjLDf/rqspjiAFVGMMgdkDZIUADyYajr7bHdxD6T2uE3Z9aVrCnHkAbF+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A9LyDnfV; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=fD77aHFWLugFgOdLp9Fr90szUbEEgN8xITe0OELlBYq+3RppbyibEsAMJiuVuzADijgxWnqor+LanpEVh8RrdoBCCB4IQTFPOZgrw5SXycEphvFlOmgF7DFfiZ3RJsUKSNm7lP564QDxL6aGk+yxZg0jHFfgnp7g2f42opVQVXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dTN5U6o4; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736877849;
+	s=mimecast20190719; t=1736877873;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qfGcbREmcisg82Rx6e546I8mjQ8z9ythW/HTCaSXKy0=;
-	b=A9LyDnfVcrEn1PFMbhyH2l+tzlVvhGRjf/VDiCP3wlfqDEdfdopZj5c743ThhcuHghuX+l
-	3tcUYBt4p3/K2CtucxMrqBaksrejhU8nmrXGbtEIYqtnN9qfc93SDqIDnaTo00pN3IUD7z
-	7rtPUPAq8RGSHCUchk5bY20x45K3Erg=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=uZZLtjs3Zw6jRIC16nznFhpiKaBBT8sXvDLj8C27htE=;
+	b=dTN5U6o4wf67sy7YEmxWlenUbOZzHHePLrQ+e0ysRU+tCm/MY4O6sfCqPMuWfPUyhViSuR
+	ixIjrOwyf0QKZEVPhwjff77MzqRMQG8EaQuKvlAQdOC6YqCaqU/WpMOkaDqU74ROICjPD1
+	1h2NdwIC+0PDBpM4wVAcqepBUGfEVK8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-2bGxv9G8MbqEpONYIM0Pig-1; Tue,
- 14 Jan 2025 13:04:06 -0500
-X-MC-Unique: 2bGxv9G8MbqEpONYIM0Pig-1
-X-Mimecast-MFC-AGG-ID: 2bGxv9G8MbqEpONYIM0Pig
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-442-YsncyNivNYmsu48rkVhymA-1; Tue,
+ 14 Jan 2025 13:04:29 -0500
+X-MC-Unique: YsncyNivNYmsu48rkVhymA-1
+X-Mimecast-MFC-AGG-ID: YsncyNivNYmsu48rkVhymA
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBCE81955D4F;
-	Tue, 14 Jan 2025 18:04:02 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A7D431955DCF;
+	Tue, 14 Jan 2025 18:04:25 +0000 (UTC)
 Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.192.55])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B2065195608A;
-	Tue, 14 Jan 2025 18:03:39 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C14D195608A;
+	Tue, 14 Jan 2025 18:04:03 +0000 (UTC)
 From: Valentin Schneider <vschneid@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
@@ -146,9 +146,9 @@ Cc: Juergen Gross <jgross@suse.com>,
 	Luis Chamberlain <mcgrof@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>,
 	Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: [PATCH v4 27/30] x86/tlb: Make __flush_tlb_local() noinstr-compliant
-Date: Tue, 14 Jan 2025 18:51:40 +0100
-Message-ID: <20250114175143.81438-28-vschneid@redhat.com>
+Subject: [PATCH v4 28/30] x86/tlb: Make __flush_tlb_all() noinstr
+Date: Tue, 14 Jan 2025 18:51:41 +0100
+Message-ID: <20250114175143.81438-29-vschneid@redhat.com>
 In-Reply-To: <20250114175143.81438-1-vschneid@redhat.com>
 References: <20250114175143.81438-1-vschneid@redhat.com>
 Precedence: bulk
@@ -161,54 +161,50 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
 Later patches will require issuing a __flush_tlb_all() from noinstr code.
-This requires making both __flush_tlb_local() and __flush_tlb_global()
-noinstr-compliant.
-
-For __flush_tlb_local(), xen_flush_tlb() has already been made noinstr, so
-it's just native_flush_tlb_global(), and simply __always_inline'ing
-invalidate_user_asid() gets us there
+Both __flush_tlb_local() and __flush_tlb_global() are now
+noinstr-compliant, so __flush_tlb_all() can be made noinstr itself.
 
 Signed-off-by: Valentin Schneider <vschneid@redhat.com>
 ---
- arch/x86/include/asm/paravirt.h | 2 +-
+ arch/x86/include/asm/tlbflush.h | 2 +-
  arch/x86/mm/tlb.c               | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
-index b3daee3d46677..0c0dd186c03e6 100644
---- a/arch/x86/include/asm/paravirt.h
-+++ b/arch/x86/include/asm/paravirt.h
-@@ -70,7 +70,7 @@ void native_flush_tlb_one_user(unsigned long addr);
- void native_flush_tlb_multi(const struct cpumask *cpumask,
- 			     const struct flush_tlb_info *info);
+diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+index 69e79fff41b80..4d11396250999 100644
+--- a/arch/x86/include/asm/tlbflush.h
++++ b/arch/x86/include/asm/tlbflush.h
+@@ -17,7 +17,7 @@
  
--static inline void __flush_tlb_local(void)
-+static __always_inline void __flush_tlb_local(void)
- {
- 	PVOP_VCALL0(mmu.flush_tlb_user);
- }
+ DECLARE_PER_CPU(u64, tlbstate_untag_mask);
+ 
+-void __flush_tlb_all(void);
++noinstr void __flush_tlb_all(void);
+ 
+ #define TLB_FLUSH_ALL	-1UL
+ #define TLB_GENERATION_INVALID	0
 diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
-index 2d2ab3e221f0c..18b40bbc2fa15 100644
+index 18b40bbc2fa15..119765772ab11 100644
 --- a/arch/x86/mm/tlb.c
 +++ b/arch/x86/mm/tlb.c
-@@ -257,7 +257,7 @@ static void choose_new_asid(struct mm_struct *next, u64 next_tlb_gen,
-  *
-  * See SWITCH_TO_USER_CR3.
-  */
--static inline void invalidate_user_asid(u16 asid)
-+static __always_inline void invalidate_user_asid(u16 asid)
- {
- 	/* There is no user ASID if address space separation is off */
- 	if (!IS_ENABLED(CONFIG_MITIGATION_PAGE_TABLE_ISOLATION))
-@@ -1206,7 +1206,7 @@ STATIC_NOPV noinstr void native_flush_tlb_global(void)
+@@ -1229,7 +1229,7 @@ void flush_tlb_local(void)
  /*
-  * Flush the entire current user mapping
+  * Flush everything
   */
--STATIC_NOPV void native_flush_tlb_local(void)
-+STATIC_NOPV noinstr void native_flush_tlb_local(void)
+-void __flush_tlb_all(void)
++noinstr void __flush_tlb_all(void)
  {
  	/*
- 	 * Preemption or interrupts must be disabled to protect the access
+ 	 * This is to catch users with enabled preemption and the PGE feature
+@@ -1243,7 +1243,7 @@ void __flush_tlb_all(void)
+ 		/*
+ 		 * !PGE -> !PCID (setup_pcid()), thus every flush is total.
+ 		 */
+-		flush_tlb_local();
++		__flush_tlb_local();
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(__flush_tlb_all);
 -- 
 2.43.0
 
