@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-35448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A1BA112FC
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 22:24:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F58EA11305
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 22:27:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDB82188344F
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 21:24:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A91A6188A4D2
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 21:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AEA212B3C;
-	Tue, 14 Jan 2025 21:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20D3212D6B;
+	Tue, 14 Jan 2025 21:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a8ZD90/R"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O4Spa79Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F4220F98F
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 21:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902B71FECC8
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 21:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736889865; cv=none; b=cn9K8C9TeK7QQDgIa9gmZNmccC9irPMPONNE+GcYmaczamp/RbVEKf9BrtNFkGWX7VS6IpJvLkOtWt6ruJeC7EGvlgVlAORbF7QADrWUtfCrCgfcisqSoWqruY+gIpth1aawe0+7P7ADzzarSJjK5K/Jgi9Sb2Z0sCeaxJ0URmA=
+	t=1736890017; cv=none; b=kCF/idy4asND4xh3HPViIdMJbIm3IXC5Ik3fg/dcSd7z+blFIPTQxExYUDDPVDEIoE8JFpbPJO76w9EWIzhC5e+RqwFuUr6+n9qUjKiAc0V8kC6TlvsOpKswUEOeJ1RTdonHLCCf3qDCP4FZxRuQhEVucs53QK9H03TWMPq28ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736889865; c=relaxed/simple;
-	bh=UhsLziMJuir9EcfHw8J9VL7USXU5IkN4Qt5js8SLo28=;
+	s=arc-20240116; t=1736890017; c=relaxed/simple;
+	bh=oPosukRuS5Ny6CBCBgfqsCfB0dNx94vYjIEcmowMxlo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=r6TORALnfzaiZ6FNx7skNnmtyRn4cUuEkeyvg3rard6RDMbjN8ARCMrSnbPXy8pI4RSsDR55FC6JJMOY9upviEfcaO8muZhdIH3BIjtqkNQDJQXW5jRyqDhz/v91YL/+JT2oQBkIJ+6ACxv/jduEp+W8Arb2ehucXfI6iR1Vmu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a8ZD90/R; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=e1BSUs70goCLqNCsEEnG2Ptn8lxDpb1yXokwjlZgqqSrEwWs48c6DK4ZSjatQs6xJNRSFhHKLUsZ32yjpcmVTCl6R/VYOzho+vzFQrKB+PXGhJTVKJZCS8D/Q9dHbBI3x2ZSQmnRsrtF6bYW11lwqBbUPKhFCtof8WwRj4kr8Fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O4Spa79Z; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f2a9f056a8so10814293a91.2
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 13:24:23 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9da03117so15478462a91.1
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 13:26:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736889862; x=1737494662; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736890015; x=1737494815; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8cSsXdzV+ZwQOEMikMUZ9KmnzJy+D1+up+g+W/Xr/ho=;
-        b=a8ZD90/R1fxBjGKIJ7nNIE7UWpawA2Y5lURTFsAsoI4Pvc+bWV1DkY4skjpES//Uv5
-         uTgLQhJu3plYnPnKulVXi3jTMKXDUisjINvNtFok402/QQ/azqSmJrGc+2coZFO6uG2p
-         pc/DU/wG4qQBOzUD5A2Zw7QiBC4zYlBHcOPNqXRSX8ANgaA/Zy9wnA/r0tSpgASG0Oav
-         mLQZBPujtPWXHO54lYkHrQJaZeQq5YGQQlHQdf/hldXx/lmjsg9TVWus3SGyrG5z3KdF
-         zWebYYAVF/jIfSPDIB6iPpbgOPd48G/RMxDuW6XI/sT7+glnYuf8H7EkScahRdvQvLCb
-         tY8Q==
+        bh=V8zpuNawVjToL3i20ZYrbUddkmOaJHAfbCZJnZQ478w=;
+        b=O4Spa79Ze7aMx+eLKa/MTEJ2OKNEppiXGyLa0JbQI4GPFrrGHhypguuNt1Y89C0J3z
+         SRnsPNOgnPv1MVdq6KsS4wOKls4USIirpkBvZRcrxPh1qD8Rqrc3ZYdbt/YINrCEyAs6
+         wgr2q/lKBl4JejUObB9lWH5BCxeOypDi6QaN6QtJZZOTSYYJmqy5Cpmv5yMFFw0QyyGZ
+         1sGT+N1bWdGiJXsuZacXmLK2BRtUSnu2IV+Qp4Z/DykjpOHDkq5dXpC7uTJoJuoykGcg
+         teE0YPCVD/KGVN8Q9o7W1kOs2IUKfB2QWiCzLgg1P2Fzxq+4r56idZhZVrkt2FbwMFaP
+         ovDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736889862; x=1737494662;
+        d=1e100.net; s=20230601; t=1736890015; x=1737494815;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8cSsXdzV+ZwQOEMikMUZ9KmnzJy+D1+up+g+W/Xr/ho=;
-        b=qlXRHwjnG3ZqW09v3IHjDDBLHZytkQAnFUqdki15uJSXbboFSwdHON1mBsjotMMh1P
-         TOFI5T6OuEjhYGSFy2HsAzodDAYnmBPKR0NQRVZl9jpxu/wNeG3QyVPYF5SrS6CQrCGS
-         2DDGP5GxiqPTzfojoisJh9w4uY3beBXpqjwgmZJ/5/5lt8ANSsvTlsqIJRtaRksDs86E
-         LSHj5U/wQITTSYiMtZLFFiY4FckrsJ/387GEB/483Mq6fj3wlCD48Gjd6rRvwn36Vkrl
-         t7Glnizfsp8Rfb6YIrn8HwZWXAJGB8g/CJJ9SH5g6JSZjYQ4Xz6wKbVq/5X7Rntg9Ywz
-         firQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9dkdz/+zCVUZ//KZMUOkOu5Hb94v1gMYOhvZuOw9p6qNeYiB9VJ1pxHbEewVYTz3i2lQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+OzdEbJDTah6luhSvg4K/c8mx+vAUhsP5pCunE1Lb0oPmPzYJ
-	aDhu6B66jaW5wEte58Wp3z3mcXNp+bI75LFQJFT7NTZ2Tm1xXj7vsXAQHIYKMSdtvyyfPQ4XCsV
-	2rg==
-X-Google-Smtp-Source: AGHT+IGaqEwoic7xvDyznY8cDg+F7K5+qe11MRhfXOt+1PBXtCG3HV5nSK8yv8Q3/q/HTXMyOsqLmKxvwkg=
-X-Received: from pjbtc8.prod.google.com ([2002:a17:90b:5408:b0:2ef:abba:8bfd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b87:b0:2ee:8031:cdbc
- with SMTP id 98e67ed59e1d1-2f548f1ec3fmr32208440a91.23.1736889862547; Tue, 14
- Jan 2025 13:24:22 -0800 (PST)
-Date: Tue, 14 Jan 2025 13:24:21 -0800
-In-Reply-To: <20250114175143.81438-28-vschneid@redhat.com>
+        bh=V8zpuNawVjToL3i20ZYrbUddkmOaJHAfbCZJnZQ478w=;
+        b=jqxyWKREF1Q7WhCEkTiZ+S8yUI10rHcVvCIHfIRdNUNyd91HxTy2xb1tlcwYIvynhn
+         WeWghk+ZzZyBVaOsWMBP6BZss1jNS5sT2+5Bkg15rM9e+Cy525IoCX6HRYMoUCor+Mlt
+         akSWPtVAmYCxcCAWWnCQ9wT06T0Uxuvma+scga/GLmTrVjKMANC+16blikgtpd/68il+
+         XQSGamPt1CGoI/mlGwIaH/K5uLBt+TpquEkA1ePCYMFRMjWittFTpu+WGKN59w9kGS67
+         /c3MOKlUj1JXX7OUe8m6/52JSkDaFPCnu2tbkTRiHuFugBVq5K5sagMniO2vI8lJJ/FW
+         LGdg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/3u50WBrmC0pNh/O7Kvoh46hsOh38+rHiM4704hRIezLzT5xmMZDPNK7mhAknjEMWxLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqPd4lfLWCkytnKTqbJdndFVNcWJg8O/mnFiFMWgzXXmhwxmtF
+	JN2EpWKMPm+cSZ3PnklRnoMBn7ZO/N7pa1MUnDlTszMn/CMgSjimjgeikXOU6q5ifNJMwx9DdmU
+	Ncg==
+X-Google-Smtp-Source: AGHT+IGDv4Ej+tMoSohr/AoTazwT/WbetgA7Nr8qE8BLNxmtc1cUUDk0TRGuDLxFKlrZpHzOjZy+L7iCKdA=
+X-Received: from pjbsx15.prod.google.com ([2002:a17:90b:2ccf:b0:2ef:8ef8:2701])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:544b:b0:2ee:9902:18b4
+ with SMTP id 98e67ed59e1d1-2f548f61fe6mr37131771a91.27.1736890015061; Tue, 14
+ Jan 2025 13:26:55 -0800 (PST)
+Date: Tue, 14 Jan 2025 13:26:53 -0800
+In-Reply-To: <20250114175143.81438-26-vschneid@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250114175143.81438-1-vschneid@redhat.com> <20250114175143.81438-28-vschneid@redhat.com>
-Message-ID: <Z4bWBUGUH34qLUt0@google.com>
-Subject: Re: [PATCH v4 27/30] x86/tlb: Make __flush_tlb_local() noinstr-compliant
+References: <20250114175143.81438-1-vschneid@redhat.com> <20250114175143.81438-26-vschneid@redhat.com>
+Message-ID: <Z4bWnWYqu1LaD-JG@google.com>
+Subject: Re: [PATCH v4 25/30] context_tracking,x86: Defer kernel text patching IPIs
 From: Sean Christopherson <seanjc@google.com>
 To: Valentin Schneider <vschneid@redhat.com>
 Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
@@ -84,7 +84,8 @@ Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
 	kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org, 
 	linux-hardening@vger.kernel.org, linux-mm@kvack.org, 
 	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
-	bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>, 
+	bcm-kernel-feedback-list@broadcom.com, Peter Zijlstra <peterz@infradead.org>, 
+	Nicolas Saenz Julienne <nsaenzju@redhat.com>, Juergen Gross <jgross@suse.com>, 
 	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.amakhalov@broadcom.com>, 
 	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
 	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
@@ -92,8 +93,8 @@ Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
 	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
 	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
 	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
 	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
 	Kan Liang <kan.liang@linux.intel.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
@@ -114,8 +115,7 @@ Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
 	Shuah Khan <shuah@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
 	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
 	"Mike Rapoport (Microsoft)" <rppt@kernel.org>, Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, 
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Yosry Ahmed <yosryahmed@google.com>, 
+	Geert Uytterhoeven <geert@linux-m68k.org>, Yosry Ahmed <yosryahmed@google.com>, 
 	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
 	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, 
 	Luis Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
@@ -123,27 +123,17 @@ Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Tue, Jan 14, 2025, Valentin Schneider wrote:
-> Later patches will require issuing a __flush_tlb_all() from noinstr code.
-> This requires making both __flush_tlb_local() and __flush_tlb_global()
-> noinstr-compliant.
-> 
-> For __flush_tlb_local(), xen_flush_tlb() has already been made noinstr, so
-> it's just native_flush_tlb_global(), and simply __always_inline'ing
-> invalidate_user_asid() gets us there
-> 
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
-> ---
+>  static __always_inline void arch_context_tracking_work(enum ct_work work)
+>  {
+>  	switch (work) {
+> -	case CT_WORK_n:
+> -		// Do work...
+> +	case CT_WORK_SYNC:
+> +		sync_core();
 
-...
+Not your bug, but serialize() needs to be __always_inline.  Not sure what exactly
+caused it to be uninlined, but this is the obvious new usage.
 
-> @@ -1206,7 +1206,7 @@ STATIC_NOPV noinstr void native_flush_tlb_global(void)
->  /*
->   * Flush the entire current user mapping
->   */
-> -STATIC_NOPV void native_flush_tlb_local(void)
-> +STATIC_NOPV noinstr void native_flush_tlb_local(void)
-
-native_write_cr3() and __native_read_cr3() need to be __always_inline.
-
-vmlinux.o: warning: objtool: native_flush_tlb_local+0x8: call to __native_read_cr3() leaves .noinstr.text section
+vmlinux.o: warning: objtool: __static_call_update_early+0x4e: call to serialize() leaves .noinstr.text section
+vmlinux.o: warning: objtool: ct_work_flush+0x69: call to serialize() leaves .noinstr.text section
 
