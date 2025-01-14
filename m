@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-35388-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35389-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADBA7A108B8
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 15:11:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95727A108C7
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 15:12:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26CED16ACE2
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 14:10:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC9D93A1CDD
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 14:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9BB146A79;
-	Tue, 14 Jan 2025 14:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5736113B7BE;
+	Tue, 14 Jan 2025 14:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tp9gPtHS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HY9g9a0T"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A67B1369AE
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 14:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D996113AA2F
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 14:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736863789; cv=none; b=YE8dca6ehZbpsH8MDiA8XYCLwg42oV0rnhXPd/Y5zILR6RxKPzJcbIOtoekHiTEd32F3WyBB4UHyOtBLzkb6NpbsLYNvk4LGwx6/h5pRbUiwOcxi/8CqSHLINsdUUPimlmHeKDkNwsibe8+lOBwiBDG0fCK++5Frko8AKfCQcV0=
+	t=1736863873; cv=none; b=BPyLW3XlLgtzwWeeve2qUCYGcHTXGurXlHPP8a4KxUSx+E5i1fTVs70CB15faBAcUzZlFjfjPm1ZFtoVbhw0b0Ed/5urAOd2zOUpmVmBHqOLvVD29hjTgVZlvNtM+SSK6h640dn9J6I9J2J2PYEWYiwJKMOrpfi0O7vrPDh1qtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736863789; c=relaxed/simple;
-	bh=jN6hTm5L1X77lWhDNTJGjQfwNAStLyPRmW1i3PsxkDQ=;
+	s=arc-20240116; t=1736863873; c=relaxed/simple;
+	bh=M1wKFPqr6t2Zh6Kz9dgh9aVJk57Ools3iKIW/v66aCg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tLItnoYuTH82g3/u0yV2tRATPaFi61T1tPoehfOxgU+V/yYjWdNRl6mTd+XY8TlTQQMdP4R++JC6LFASV6+esX03pQX+yrD8xLYiCpjEv6JbM3SV2Wonh/AJuCye07aE+Xt3A5jaZ3c7UZkJC/3BsFQ+442EBx9Lrsc2Yrb8EmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tp9gPtHS; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=oX3AFU6s2rtdhGeGDEa1AjLJDdKMdeoRRri/ku8atvR9GEH9gfqvxY9qkX3bEO0Pyu9A21dr7X5httdLt9roR5XmO/Nx3QNIVb2K4YSnK9w8m7K0KS0huaboGmpPvWG00K+BYNBwDEm6zyZpkL3AQ4Wc31nBjt4oegD7D9BhBQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HY9g9a0T; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736863786;
+	s=mimecast20190719; t=1736863870;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=YtFP9pQtyoWXgcTFBJgS77jtXl6lTbOzCPS/O8U2TSM=;
-	b=Tp9gPtHS/Yl3qU740kngH4rzwaHk3+dHLeUm+bxQb9EsUoUSX1qXKCIcewlUMzoYRg4QVd
-	ysDuM8pNUnHoBZx5zNtfm8We2Zz5ALAX36j1h3nK0LKvd8K7aJrRNbIZ+Bj5Z64bYAzVlw
-	gilZAYz9i5XmTPbiml4+VIc7WJhS39E=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=4PrAckxjMX0X/2ESjCBt17CaHgHYf56af0Xw3wi3t9c=;
+	b=HY9g9a0T8eYxW5pK8j1BpJ6FSjXaEIFoN3ZcFB5FQFYhnhC1Is535rGFXui3Yf0Jag1vN9
+	J0m5ydCsFed2JAndKQtO5XJ4emVkFSoEsQlfJZ9OOUDDEoWUJigQYIxjV0dX1/YZTKnDsA
+	vc6Hy/W/TY+fnQ2zIiQVM82AZ856BhQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-39-TNkGwPpZMXut9Uy085CiIA-1; Tue, 14 Jan 2025 09:09:45 -0500
-X-MC-Unique: TNkGwPpZMXut9Uy085CiIA-1
-X-Mimecast-MFC-AGG-ID: TNkGwPpZMXut9Uy085CiIA
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4361efc9dc6so30239175e9.3
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 06:09:44 -0800 (PST)
+ us-mta-164-9Uzu8jwaNrCACbQ5beiGEw-1; Tue, 14 Jan 2025 09:11:09 -0500
+X-MC-Unique: 9Uzu8jwaNrCACbQ5beiGEw-1
+X-Mimecast-MFC-AGG-ID: 9Uzu8jwaNrCACbQ5beiGEw
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361fc2b2d6so31042175e9.3
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 06:11:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736863784; x=1737468584;
+        d=1e100.net; s=20230601; t=1736863868; x=1737468668;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=YtFP9pQtyoWXgcTFBJgS77jtXl6lTbOzCPS/O8U2TSM=;
-        b=qhxiXSYeZPt27OfiaHhvdBVub/79n4/24PxwbeG+MYpGSLdBzOFueKHskF5Rem+iEj
-         ItIl6sG/63zqGgrILt5mJrbp9yLZXmL7TbbLdUY69E8tqH1j6a+BG9PVehOYHQVoacSy
-         4lISK7wGndjiHrrMxTJ3kJU3YNvaugeDhwtiYPRfUwZ9TMHiCuaxlRK8xtZLfLWxJ9vS
-         dsRgR7ZiTDN8WUD4XnagCr0zy9dP/a+5SEZcqRdMl/dQ6ZP3dkT4BGuuLsrnu5ZySJjz
-         9Fq1j1Fd827CTysmVafarLke/uZDxB/w4+WUtgDrBzFnLNvkSwqGAydvU1KGg45ehMgp
-         hSkw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXdJeR6TvYgmKTSPwO9/3eWBkDBJGeBZ+Eoc73nXV3XTh8Y068AWWnLTvIi0rtSGtMoaY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywu4md+33wp6PR6lrPBNjIdZXc0YFDzo2YPbiFNsaVtDrirv85I
-	yBiKXEXR3B3rHJcQ1lKU0UtTdZymQh/FN/19ZgTu/Pu9OgyQIqTnYi14ldGZtiRPeJ+ftBuHl0W
-	WowtYlXWR+nezB2acKukCyHv7tDRzeTBQQiq0g1FSUJ1V2jsHKg==
-X-Gm-Gg: ASbGncuZ9c7Q+lGS1cAUJlOsVIqiI8Ff1pI7Odhi5xMYRNpa5JiFoB0tOJMjV2UxcZV
-	VnaLj3S4GwAIplErkWQENcfuHY7dPKeqXNuwKGHdvUVxHyQ1nMgGB1L5u3SHBIODlfw+BFPjFaa
-	5LDnwYdEsPC/rMTJ0KhTfQeuXzhAC6/lT7gmCHjbtkove5qVlb44U1lyAoHoh0/Q2XZTsT8uXoI
-	dZkzngbObr8r805PmMpbRW7rwXQ+qPts/C8jJyVFoutWiPjoJBWBp76N/HyxLAa5taGJmjtVtZH
-	NjigMl+98JUcGvAevN5pyAIhPh0ZVfh4s29GQrQFi1NxEdqlVlbA76Y8k/j3wnTtuPMurfqKxSn
-	f6abMyNOh
-X-Received: by 2002:a05:600c:1d01:b0:434:fec5:4ef5 with SMTP id 5b1f17b1804b1-436e26b6f51mr256244155e9.14.1736863783737;
-        Tue, 14 Jan 2025 06:09:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGWgBcIVdI6gQFT8JyK2JjUepf09D2Q7KNXgK0Ji2rsye7aHM9jrIvCewzQgzJesG/qFABPCw==
-X-Received: by 2002:a05:600c:1d01:b0:434:fec5:4ef5 with SMTP id 5b1f17b1804b1-436e26b6f51mr256243805e9.14.1736863783347;
-        Tue, 14 Jan 2025 06:09:43 -0800 (PST)
+        bh=4PrAckxjMX0X/2ESjCBt17CaHgHYf56af0Xw3wi3t9c=;
+        b=Jw/rgaPXaw9ov7gPgy5V+qdyXE8ckrMDgILPkHaYiIsVY13R4F/FeIL8En+0vq/nv7
+         PzWT+2E6I01MTV0wyV+BTGOpbmnOFxuN9686zOQ6eSuZtOUfB5qUPpi2dofMtNXMDX41
+         HnlxWBfHbNoM1UbXPqzliKgcYEdK4WAkwtcsmUt1oinMFNW2akgvs/sx1cc3tIucTULL
+         klAtvUEZXv0FgHxV4uD37YhN5TymgZA5pgXoB6+UK8pXhxg8PCMaU+RNqhRQnaiYreLG
+         XlND+cAu8+Y2gUDT/d5JjIBgVXqAs1UdAypCXt2KVGFsu4+Mfo7ZKOAlpLtMt4eRp9rj
+         t0ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdGFa+uiPMf/K0p8gBh0GS+Mc/LHWIuHNuW2O7QGzseUzWTDLtsHdAPCoSB0e57J27330=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdAr2LGuHAxQTc42LkK5Dl4NNhc9E5L7nb0+CsUBp3W1qy7noz
+	tXP/zuTsDGh0LYD2P1+DfYQ0EV9InJa8+qqCsOsHN2bs+zDYi1r8kzj8mPMx76z9fWig+2Yf81Y
+	WvESiREpYb4RfAWzYR++eFGT/D/wSa0Kh/U5XyrcFq4xnywSEZsj9xLwpLtYd
+X-Gm-Gg: ASbGncvQYozziw6ngOFDGtXm+zXoBQw+6PkeHj5CEKRqJXygocKezVZv1wprAp4mubw
+	d4948nKSwCQJ5FA3T8po4MnNnPtbQbX+0dhXHKTt34cRNC+Wky+9npRsD0gxY6xYpxgxQGec99r
+	Mps0FYCXoijQEC0m6B9pB+3LV+x//9szQp99iJDMebCzZdf/mtKXpEhZ3hwB4D22A545f18WUNU
+	x2VnQiZJ7UBOH3nbDMc6gbLrzRStX093/dwC6B9eY8IFNbJYOt7gpX2k7uM2It2Gphcr+9x93lL
+	hHE7k93DhX9DpI9h7BQYe7+sWwhaoNAV4ZiOH6shEnRr8QABr6/egCDvvP1Af2gpqgb12/E1+dh
+	UTKwOxxk1
+X-Received: by 2002:a05:600c:3aca:b0:434:f335:855 with SMTP id 5b1f17b1804b1-436e26eb428mr188949855e9.28.1736863868169;
+        Tue, 14 Jan 2025 06:11:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEm4gIS/GqcHDaKSqHL+sf9sek6/M9j9JUiMeKGvQ58scjz3viCwAVZBGRTOUPtuLzfXiQvEQ==
+X-Received: by 2002:a05:600c:3aca:b0:434:f335:855 with SMTP id 5b1f17b1804b1-436e26eb428mr188949595e9.28.1736863867844;
+        Tue, 14 Jan 2025 06:11:07 -0800 (PST)
 Received: from ?IPV6:2003:cb:c738:3100:8133:26cf:7877:94aa? (p200300cbc7383100813326cf787794aa.dip0.t-ipconnect.de. [2003:cb:c738:3100:8133:26cf:7877:94aa])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9dc8802sm175247615e9.10.2025.01.14.06.09.40
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9e6249csm174697565e9.38.2025.01.14.06.11.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Jan 2025 06:09:42 -0800 (PST)
-Message-ID: <39b26b64-deaa-4c52-8656-b334e992c28c@redhat.com>
-Date: Tue, 14 Jan 2025 15:09:40 +0100
+        Tue, 14 Jan 2025 06:11:06 -0800 (PST)
+Message-ID: <295cb360-b618-4a89-86e2-1630b872fa7f@redhat.com>
+Date: Tue, 14 Jan 2025 15:11:04 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,7 +90,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 3/6] accel/kvm: Report the loss of a large memory page
+Subject: Re: [PATCH v5 6/6] hostmem: Handle remapping of RAM
 To: =?UTF-8?Q?=E2=80=9CWilliam_Roche?= <william.roche@oracle.com>,
  kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
@@ -99,7 +99,7 @@ Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
  wangyanan55@huawei.com, zhao1.liu@intel.com, joao.m.martins@oracle.com
 References: <cf587c8b-3894-4589-bfea-be5db70e81f3@redhat.com>
  <20250110211405.2284121-1-william.roche@oracle.com>
- <20250110211405.2284121-4-william.roche@oracle.com>
+ <20250110211405.2284121-7-william.roche@oracle.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -147,107 +147,17 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250110211405.2284121-4-william.roche@oracle.com>
+In-Reply-To: <20250110211405.2284121-7-william.roche@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 10.01.25 22:14, “William Roche wrote:
-> From: William Roche <william.roche@oracle.com>
+> From: David Hildenbrand <david@redhat.com>
 > 
-> In case of a large page impacted by a memory error, enhance
-> the existing Qemu error message which indicates that the error
-> is injected in the VM, adding "on lost large page SIZE@ADDR".
-> 
-> Include also a similar message to the ARM platform.
-> 
-> In the case of a large page impacted, we now report:
-> ...Memory Error at QEMU addr X and GUEST addr Y on lost large page SIZE@ADDR of type...
-> 
-> Signed-off-by: William Roche <william.roche@oracle.com>
-> ---
->   accel/kvm/kvm-all.c   |  4 ----
->   target/arm/kvm.c      | 13 +++++++++++++
->   target/i386/kvm/kvm.c | 18 ++++++++++++++----
->   3 files changed, 27 insertions(+), 8 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 4f2abd5774..f89568bfa3 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1296,10 +1296,6 @@ static void kvm_unpoison_all(void *param)
->   void kvm_hwpoison_page_add(ram_addr_t ram_addr)
->   {
->       HWPoisonPage *page;
-> -    size_t page_size = qemu_ram_pagesize_from_addr(ram_addr);
-> -
-> -    if (page_size > TARGET_PAGE_SIZE)
-> -        ram_addr = QEMU_ALIGN_DOWN(ram_addr, page_size);
->   
->       QLIST_FOREACH(page, &hwpoison_page_list, list) {
->           if (page->ram_addr == ram_addr) {
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index a9444a2c7a..323ce0045d 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -2366,6 +2366,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->   {
->       ram_addr_t ram_addr;
->       hwaddr paddr;
-> +    size_t page_size;
-> +    char lp_msg[54];
->   
->       assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
->   
-> @@ -2373,6 +2375,14 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->           ram_addr = qemu_ram_addr_from_host(addr);
->           if (ram_addr != RAM_ADDR_INVALID &&
->               kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> +            page_size = qemu_ram_pagesize_from_addr(ram_addr);
-> +            if (page_size > TARGET_PAGE_SIZE) {
-> +                ram_addr = ROUND_DOWN(ram_addr, page_size);
-> +                snprintf(lp_msg, sizeof(lp_msg), " on lost large page "
-> +                    RAM_ADDR_FMT "@" RAM_ADDR_FMT "", page_size, ram_addr);
-> +            } else {
-> +                lp_msg[0] = '\0';
-> +            }
->               kvm_hwpoison_page_add(ram_addr);
->               /*
->                * If this is a BUS_MCEERR_AR, we know we have been called
-> @@ -2389,6 +2399,9 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->                   kvm_cpu_synchronize_state(c);
->                   if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
->                       kvm_inject_arm_sea(c);
-> +                    error_report("Guest Memory Error at QEMU addr %p and "
-> +                        "GUEST addr 0x%" HWADDR_PRIx "%s of type %s injected",
-> +                        addr, paddr, lp_msg, "BUS_MCEERR_AR");
->                   } else {
->                       error_report("failed to record the error");
->                       abort();
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 2f66e63b88..7715cab7cf 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -741,6 +741,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->       CPUX86State *env = &cpu->env;
->       ram_addr_t ram_addr;
->       hwaddr paddr;
-> +    size_t page_size;
-> +    char lp_msg[54];
->   
->       /* If we get an action required MCE, it has been injected by KVM
->        * while the VM was running.  An action optional MCE instead should
-> @@ -753,6 +755,14 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->           ram_addr = qemu_ram_addr_from_host(addr);
->           if (ram_addr != RAM_ADDR_INVALID &&
->               kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> +            page_size = qemu_ram_pagesize_from_addr(ram_addr);
-> +            if (page_size > TARGET_PAGE_SIZE) {
-> +                ram_addr = ROUND_DOWN(ram_addr, page_size);
 
-As raised, aligning ram_addr_t addresses to page_size is wrong.
+You can make yourself the author and just make me a Co-developed-by here.
 
-Maybe we really want to print block->idstr, offset, size like I proposed 
-at the other place, here as well?
+LGTM!
 
 -- 
 Cheers,
