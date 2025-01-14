@@ -1,157 +1,178 @@
-Return-Path: <kvm+bounces-35362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35363-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C71B8A102DF
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 10:19:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D7C12A102E5
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 10:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEB55168368
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 09:19:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E56701684F8
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 09:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6601924022C;
-	Tue, 14 Jan 2025 09:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE541C07DC;
+	Tue, 14 Jan 2025 09:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Sk/HbDXq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e2H+XIWW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE0035959;
-	Tue, 14 Jan 2025 09:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8EEF22DC5B
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 09:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736846331; cv=none; b=mFxH19HyZsC+voA1auNk9BRaihFN2ZqDpl4JtzV9vO4cPzUAZpe6JmQ3bA9Xy4KoB+8ind26Ku4eJtZFJLpvcRByWz1RnaxSiXB75Wwn1ivc0QJhpt0JHvqeede85CWOYoSNus6QNYdJT4A96JZmI293MneCVdRVzm2KM5NmBDE=
+	t=1736846471; cv=none; b=c6i8if8gQl+qoxALHTpQ93mkQoiXciH4Ljw1oy7yXErEWgzJWLnt4qYiDKKOH7yqe9yJ6Ao0iFNdL9NIFIDL4Wx2Q8lEz3k+SizkEKtDMhtNjzMMlgFIq8Q3KDIaBT5BLXFDJUXsWkQLeiwI7yrfJMShTthlidcoGpb1OUS4uN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736846331; c=relaxed/simple;
-	bh=B3zWW+T6RurekpP2ufuUi+M0oc7krA0Uxh8fAcOKR0E=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:Cc:
-	 References:In-Reply-To; b=tJSzSjSLAaJlFvIO9T86XJtYFWNpH0gWQ92lfRpcf+FAoiFwo3NUgPtC47GKd1OFOj6Qv4tE7H7t2QIzOPS0se28e+DHUTd5dU2G3X6lSiyNowAWMlYvkNVkYaaEX79EL/Uq/9bi0fFneSdRyF7NFu5LONS75UvEqa/xIYKLiVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Sk/HbDXq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50DNx3uB005522;
-	Tue, 14 Jan 2025 09:18:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=j89X/B
-	np6s6+PRUTNqctNldmfdMouleevwkz58caS+M=; b=Sk/HbDXq6Im7hkdP8MVA5K
-	anqZpCd6Bsb9j0pxDsYgF0M5QzsKHFZ+tBvuy9V5+A7UblW6ERN818t89+KhcEpp
-	BXd/lJLCibuHt6h4JjeIPvoRY62hWGA2qIiDpvF1Q5WBR14qBch2SHlRsANNWil5
-	9RvxYS0r1hGt2KKU6SslKBPiSgv6aWU7n7hzEuKDAoTpvc9rNLuniQAvUIDQvon3
-	IpckG64H+m5Ids7ih5D6Rnz1AYSe98ht92g4lo3+ibOXXg/z/1OUDY2nbGYfROY8
-	AvKyhQpMzzK/Z0BWtRaKbBC50JIBZfzDMvEMXXWsc6H3b00ZqacVhZpPXu0lTYng
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 445cyhsuww-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Jan 2025 09:18:42 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50E4x8qE007519;
-	Tue, 14 Jan 2025 09:18:41 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443yn2gkj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Jan 2025 09:18:41 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50E9IbGE33882712
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 14 Jan 2025 09:18:37 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4ABFA2004B;
-	Tue, 14 Jan 2025 09:18:37 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 205A620040;
-	Tue, 14 Jan 2025 09:18:37 +0000 (GMT)
-Received: from darkmoore (unknown [9.171.73.13])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 14 Jan 2025 09:18:37 +0000 (GMT)
+	s=arc-20240116; t=1736846471; c=relaxed/simple;
+	bh=9oAZXD3/7PWIdfudQHXuu4TBXO7gQxBOlaBt3H1WgPg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ckFv7I2duFnXNBrUDqX/Bj6vnofUvZMeI/DsDkzQ+Y4hv8S1aBgm7lcQgojnfxBAsb5pGz3uq2vom5wtnVO7BVXr8G2qZ8te20WaunoFqM992txxpGFjljeblGnuBDFQF8x7ZPAlC/KUcsLf6fJsWcgXWTYpVRZnQ2XaTeHWfBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e2H+XIWW; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 14 Jan 2025 10:20:52 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736846456;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bC5LAEj9vdeso+b9F/95zLGevwbLF2e12tr8g2iY4Vo=;
+	b=e2H+XIWWtIh0UPwpjTED/no4d+apsSr1Qdwy+7mbM+WPJ0qOLdF36jo0mfn9GFE5wAsVYE
+	ZnT5ulKmLHh7pO8rysCbghfdHdN7P+bmKnJfAX5Eb0e7qaa4W8xnhGw6ZT5auTNP8M2CG9
+	xGivIi3fmZbBdhkOwutGgRBIkvBX4Og=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Jon Kohler <jon@nutanix.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Thomas Huth <thuth@redhat.com>, Nicholas Piggin <npiggin@gmail.com>, 
+	Eric Auger <eric.auger@redhat.com>, Nina Schoetterl-Glausch <nsg@linux.ibm.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH] Makefile: add portable mode
+Message-ID: <20250114-aa3c045d70769ae051f3b144@orel>
+References: <20250105175723.2887586-1-jon@nutanix.com>
+ <Z4UQKTLWpVs5RNbA@arm.com>
+ <806860A3-4538-4BC3-B6B9-FA5118990D78@nutanix.com>
+ <20250113-e645de551c7279ba77e4fb74@orel>
+ <3F7065A3-DB24-48C5-BD5D-05D98AF8E3E4@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 14 Jan 2025 10:18:31 +0100
-Message-Id: <D71OMSL3ICG0.2AXYO3UR6MS50@linux.ibm.com>
-To: "David Hildenbrand" <david@redhat.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1 0/4] KVM: s390: vsie: vsie page handling fixes +
- rework
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        "Christian
- Borntraeger" <borntraeger@linux.ibm.com>,
-        "Janosch Frank"
- <frankja@linux.ibm.com>,
-        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
-        "Heiko Carstens" <hca@linux.ibm.com>,
-        "Vasily Gorbik" <gor@linux.ibm.com>,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        "Sven Schnelle"
- <svens@linux.ibm.com>,
-        "Thomas Huth" <thuth@redhat.com>,
-        "Matthew Wilcox
- (Oracle)" <willy@infradead.org>
-X-Mailer: aerc 0.18.2
-References: <20250107154344.1003072-1-david@redhat.com>
-In-Reply-To: <20250107154344.1003072-1-david@redhat.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: OjTMgTLvVbSPXJMZpHsUgsAXvdCYxk2d
-X-Proofpoint-GUID: OjTMgTLvVbSPXJMZpHsUgsAXvdCYxk2d
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=656
- malwarescore=0 clxscore=1015 impostorscore=0 bulkscore=0 suspectscore=0
- priorityscore=1501 adultscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501140074
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3F7065A3-DB24-48C5-BD5D-05D98AF8E3E4@nutanix.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue Jan 7, 2025 at 4:43 PM CET, David Hildenbrand wrote:
-> We want to get rid of page->index, so let's make vsie code stop using it
-> for the vsie page.
->
-> While at it, also remove the usage of page refcount, so we can stop messi=
-ng
-> with "struct page" completely.
->
-> ... of course, looking at this code after quite some years, I found some
-> corner cases that should be fixed.
->
-> Briefly sanity tested with kvm-unit-tests running inside a KVM VM, and
-> nothing blew up.
+On Mon, Jan 13, 2025 at 08:53:40PM +0000, Jon Kohler wrote:
+> 
+> 
+> > On Jan 13, 2025, at 10:36 AM, Andrew Jones <andrew.jones@linux.dev> wrote:
+> > 
+> > !-------------------------------------------------------------------|
+> >  CAUTION: External Email
+> > 
+> > |-------------------------------------------------------------------!
+> > 
+> > On Mon, Jan 13, 2025 at 02:49:11PM +0000, Jon Kohler wrote:
+> >> 
+> >> 
+> >>> On Jan 13, 2025, at 8:07 AM, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >>> 
+> >>> !-------------------------------------------------------------------|
+> >>> CAUTION: External Email
+> >>> 
+> >>> |-------------------------------------------------------------------!
+> >>> 
+> >>> Hi,
+> >>> 
+> >>> On Sun, Jan 05, 2025 at 10:57:23AM -0700, Jon Kohler wrote:
+> >>>> Add a 'portable' mode that packages all relevant flat files and helper
+> >>>> scripts into a tarball named 'kut-portable.tar.gz'.
+> >>>> 
+> >>>> This mode is useful for compiling tests on one machine and running them
+> >>>> on another without needing to clone the entire repository. It allows
+> >>>> the runner scripts and unit test configurations to remain local to the
+> >>>> machine under test.
+> >>> 
+> >>> Have you tried make standalone? You can then copy the tests directory, or even a
+> >>> particular test.
+> >> 
+> >> Yes, standalone does not work when copying tests from one host to another. The
+> >> use case for portable mode is to be able to compile within one environment and
+> >> test in completely separate environment. I was not able to accomplish that with
+> >> standalone mode by itself.
+> >> 
+> > 
+> > standalone scripts should be portable. If they're missing something, then
+> > we should fix that. Also 'make install' should include everything
+> > necessary, otherwise it should be fixed. Then, we could consider adding
+> > another target like 'make package' which would do 'make install' to a
+> > temporary directory and tar/gzip or whatever the installation into a
+> > package.
+> 
+> Thanks, Drew. The standalone scripts are not portable in my experience, as
+> in I can not just pick them up, copy them as is, and put them on another host
+> with different directory layouts, etc (and importantly, no kvm-unit-tests repo
+> whatsoever). 
 
-Reviewed and tested the whole series.
+They should work without a kvm-unit-tests repo (they used to anyway). If
+they're not working when moved to a host that doesn't have anything except
+bash and qemu, then we should fix them. Which architecture are you mainly
+testing?
 
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-Tested-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> 
+> The make package idea is effectively what I’m doing here, but it happens to
+> use the word portable instead of package (and not using make install to do
+> the data movement).
 
->
-> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Cc: Janosch Frank <frankja@linux.ibm.com>
-> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> Cc: Sven Schnelle <svens@linux.ibm.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
->
-> David Hildenbrand (4):
->   KVM: s390: vsie: fix some corner-cases when grabbing vsie pages
->   KVM: s390: vsie: stop using page->index
->   KVM: s390: vsie: stop messing with page refcount
->   KVM: s390: vsie: stop using "struct page" for vsie page
->
->  arch/s390/include/asm/kvm_host.h |   4 +-
->  arch/s390/kvm/vsie.c             | 104 ++++++++++++++++++++-----------
->  2 files changed, 69 insertions(+), 39 deletions(-)
->
->
-> base-commit: fbfd64d25c7af3b8695201ebc85efe90be28c5a3
+I know, but I'm suggesting that we do use 'make install' rather than
+introduce an independent target which should be 'make install' plus
+packaging. We don't want to maintain multiple independent targets
+which do almost the same thing.
 
+> 
+> That bit is important:
+> The biggest tidbit is that things like the errata path is hard coded, so
+> in my “make portable” it fixes those things to be not hard coded, and all is well
+> after files are tar’d up and then untar'd later.
+
+So let's fix 'make install' to make sure nothing installed has hard coded
+paths (which standalone should do, since it should only depend on /tmp)
+
+> 
+> Also, in standalone mode, you’d be missing the runner scripts, etc, so it
+> makes it harder to tweak and iterate locally on the system under test.
+
+standalone scripts don't need the run_tests.sh since they include
+everything from unittests.cfg already. It probably would make sense
+to provide a script that allows running all or a subset of tests at
+once, which would just be a for-loop, e.g.
+
+  run_subset() { for t in ${tests}/${1} ${tests}/${1}_*; do [ -e $t ] && $t; done; }
+
+Running tests with different parameters than what are specified in the
+unittests.cfg file isn't currently possible, unless they're also
+configurable with environment variables like MACHINE, ACCEL, TIMEOUT,
+and MAX_SMP. If more configuration changes are necessary, then a make
+target for packaging $TEST_DIR/run and the .flat files is probably the
+right way to go, but it still isn't clear to me if that's what you're
+trying to do.
+
+> 
+> Happy to take guidance if I’m missing something painfully obvious with the
+> existing standalone setup (I felt this way when I started looking at this!) as it
+> doesn’t do what I’d think it would do.
+
+There's a good chance that standalone hasn't been maintained along with
+the rest of the scripts, since we don't currently have a CI test for it.
+But, unless you need to modify test parameters, then we should try to
+fix it (and add CI for it).
+
+Thanks,
+drew
 
