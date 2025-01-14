@@ -1,205 +1,164 @@
-Return-Path: <kvm+bounces-35438-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35439-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50E40A10FE4
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:23:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19DDEA1100F
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:29:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDA1B7A3912
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:22:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAF9A7A0561
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A78D1FA15A;
-	Tue, 14 Jan 2025 18:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182231F9EBB;
+	Tue, 14 Jan 2025 18:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ieLERKxQ"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="KFBFTQuv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD93D232458
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5381FBC8A
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736878966; cv=none; b=p6GObqg7NxW7EcO5zm9Dd+szaHknAl1dazoTajpGLCJDzlVjpLSQuVUzlTPDBjqym1trzNaRHx1lpeZ4LA8GDEC72A2D7b0e4LFWrzQ9zmrnAvYG9jvhvuRu2VUdRn5TOfVGZRWaVgj2UHiefmheJNMo2zST8cld53gshcdb9X8=
+	t=1736879366; cv=none; b=UWpxMEQk9id1O/ARCDCQvvtFGa8aw23TzAuY48MAYukipoEhT+eyBzjCSGpB3f3+sq/XTnyevQkIhuLnnXJZYG35u3FqDuy5pzMiu619x8DpRvsZyP6bjvyYf5+UKE9oN5sPA60jpeZbQgpJ4Rwtw+HZ5UN40B0tDGNb+Kw69mQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736878966; c=relaxed/simple;
-	bh=Z0lime3e2R0jhvU6ZibVA8s6c/Jk1bq7YA9glNsBWqg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XWvOiJWcpYe5NInDqySGMO830PQK09mj8E7Vtj8itu5VZBG0I48+5DD//bLljgCNJ+bz/wDAdh27ulXl3JyFgwxbs36wtOnUDPO8ZSLouui6YUrjnlOg/tH4v0MAW+q/YcezyqIX+iAJetMNZ5djNNHnkeQ2nz3u5lQLcWeQglc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ieLERKxQ; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50EI2UjP021448
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 10:22:44 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=tzv7kDexPXjkVr0dQP
-	3l+Fuqia3TwSfGwjQ2QmPRY/w=; b=ieLERKxQneBOJl3guPcXjMREkksodcD5Ed
-	PUHeaTyYJOYcFx80X93qdxo8aS7H89HRblfX1ylxj50VjObQ+Si29cDiwYfAAE5c
-	rltTYUW1jMCt7BLD7Q4AK/q5yInU9mfYiju1JSsLxKTdKMVs7lDZ2sIAFPKMZqAd
-	YI3HZV3TM40sNC+NsdagGcwcUXYwCv7ypOGjoYkdjNzll3sSmWycShj8yxDk1Rq4
-	GMfrI0gukhv7Acw5adlOHjyWiymAEElp/XdWwgct7hwBE7CHz+7m9t2wqSxuzSDZ
-	5zF9jLhvhobgIihedmXNtBS2H+dHyW+i+xfHgG+Hi+Ze0Kj38mAA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 445vuur5un-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 10:22:43 -0800 (PST)
-Received: from twshared3815.08.ash9.facebook.com (2620:10d:c0a8:1c::11) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Tue, 14 Jan 2025 18:22:41 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 8A60016E4BE2B; Tue, 14 Jan 2025 10:22:31 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <kvm@vger.kernel.org>, <pbonzini@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <tj@kernel.org>,
-        Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCH] kvm: defer huge page recovery vhost task to later
-Date: Tue, 14 Jan 2025 10:22:29 -0800
-Message-ID: <20250114182229.1861709-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1736879366; c=relaxed/simple;
+	bh=jsa0CovMO5ZT70pqhIrCF6Xwrs9x8fVebY2Xd/EYn6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pC+CE74wdJ2y+qagm1KqvArcQjzmZjf8DdoQ6ZqqxuEJsW8Dz5A1b6N8fDVn6TDyYEO5CxrML8ejzmouclkvbTEQNvH5I96B+g9ryr//xx8cWJyBG8t8N1LvF/QH3ehQsuSM2qSug2hAHjrryyoy6jjtSU7QwNTa1f3vqcUs+vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=KFBFTQuv; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa6c0d1833eso429556366b.1
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 10:29:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1736879362; x=1737484162; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+L6x2g4BC/d/+jfoDGOj0pMskOpzz9VGXCLG5E4WwRY=;
+        b=KFBFTQuv4suEhQgFHTC00K5qiQ3Jw2kiLcP2Ut9JBRBrS6MG3+DcQWnTJ2OvOmD2ET
+         VmAoHdL2GNwADncv1A6R63Igi6HrsrO4q0Iy0Tf0ktWX9MhkhZAWTt4DFpf39SgVrvcn
+         goB1HrkuDsZ6EUUMHyn+nRAXkfPC0D6r+s8all1P1Tni6YRXh8p/Hn56TaO13lf8p0o+
+         e8waI5tHtQROzxqeDrKmwdFRhQ/JWlNMRBEbvpsdANDX4sa5h9naV2GPaEWOaWIvEYUT
+         GOIozzsliRXxnLRPkM//8kc56luukRtxY3CL4EKdxIA1Jd9xtXGcUDyU6uX7Lky9U82N
+         XglQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736879362; x=1737484162;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+L6x2g4BC/d/+jfoDGOj0pMskOpzz9VGXCLG5E4WwRY=;
+        b=TDMwvaCq/r6EQlTxLpaqtlSYcnJwTv/vZy6MC7tDYSEWe+E83xcKDSH3DjmTySBNaJ
+         oztlaHQCllHsqAln5WMD/PdDApLBcbYEic/ZiQi+2stqX90yMhDFaGdeeUlvMgJmJUw7
+         PSEtq7Z7GGEaYX3zN/dJp5Fj6YjYuNgw3yoEiXzPl/VUABbcDUTghLifR105bbLjgv6v
+         khlLhWADF5/mrdRIy8bIu8ynLDAjvXlI0QQAQ+acpd+uwZ7tycfJqcJOZ1hVmpL3jVIY
+         6RhOlCBYwi1i5qwxsYmKVThhgtYZVjh69M8DtYP8K28cRqZFc0l1Fdl/SA6f4m6Y07NV
+         Q0zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWNE2/w0zmL8feUmshon79v8I4VkFRzTw4MjgR9+erZG1MRVIkoAc6RsnF199H6Zq8G4zk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8JbzPGCI4FtIQmc+Nz8Go0k6atbYIE21ywsrJ2MB7R4nJ4Yv9
+	4/UBthjs0V/gxSKV/DrKtiD0NQrhuASQjZeETJdEAHt4cyjdE2TA73TmGOG4h64=
+X-Gm-Gg: ASbGncu1QtDolWD1elSkz7VavMc5PZ0yu4zCLSHQ45nrzk4ctCYWG9jb2gogPMx3+i1
+	5s22YYRzV4TV/wPuxWYWWEgeo5O0KQw4vbvo/l+3iBafWfeNafvy6IXSxjZTIO+sK6cMZUHWcBi
+	r035PIATY41uhUncia6mqjiQl/q6e9S8q0MPqeNVoLILPH8ZvHCiVbqxzubNQfCN6XpcWTSEiVH
+	AP891VwAJnSKzBQ9BwmdlWeEzf9SP7uyE66tjsUbmkMVsPfM4ukoYb0J/TGXe63jpdezYAWN4ug
+	lSHQH/OJr7eH3FGdMMpP0nzPPOO1gsCUveQKChYArg==
+X-Google-Smtp-Source: AGHT+IElLRyBSSFsvDLttv+1rxbirlHss1/zCBNTWvitDc/Y1ed9oUs4kNSXL7wHp3+sai4oSrFAlg==
+X-Received: by 2002:a17:907:96a7:b0:aa6:2c18:aaa2 with SMTP id a640c23a62f3a-ab2ab73e7dbmr2340049566b.27.1736879362392;
+        Tue, 14 Jan 2025 10:29:22 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c905f04fsm659166066b.27.2025.01.14.10.29.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2025 10:29:21 -0800 (PST)
+Date: Tue, 14 Jan 2025 19:29:21 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
+	virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, linux-mm@kvack.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com, 
+	Juergen Gross <jgross@suse.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
+	Adrian Hunter <adrian.hunter@intel.com>, "Liang, Kan" <kan.liang@linux.intel.com>, 
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Jason Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ard Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
+	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>, 
+	Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, 
+	Tomas Glozar <tglozar@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Kees Cook <kees@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Christoph Hellwig <hch@infradead.org>, Shuah Khan <shuah@kernel.org>, 
+	Sami Tolvanen <samitolvanen@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, "Mike Rapoport (Microsoft)" <rppt@kernel.org>, 
+	Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, 
+	Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Yosry Ahmed <yosryahmed@google.com>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
+	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
+	Tiezhu Yang <yangtiezhu@loongson.cn>
+Subject: Re: [PATCH v4 10/30] riscv/paravirt: Mark pv_steal_clock static call
+ as __ro_after_init
+Message-ID: <20250114-7fc0ed577ee91b6813f92806@orel>
+References: <20250114175143.81438-1-vschneid@redhat.com>
+ <20250114175143.81438-11-vschneid@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: HUqotXtHUD9D3WkIFsxgOGtlFf0kp6uU
-X-Proofpoint-ORIG-GUID: HUqotXtHUD9D3WkIFsxgOGtlFf0kp6uU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250114175143.81438-11-vschneid@redhat.com>
 
-From: Keith Busch <kbusch@kernel.org>
+On Tue, Jan 14, 2025 at 06:51:23PM +0100, Valentin Schneider wrote:
+> The static call is only ever updated in:
+> 
+>   __init pv_time_init()
+>   __init xen_time_setup_guest()
+> 
+> so mark it appropriately as __ro_after_init.
+> 
+> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+> ---
+>  arch/riscv/kernel/paravirt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/riscv/kernel/paravirt.c b/arch/riscv/kernel/paravirt.c
+> index fa6b0339a65de..dfe8808016fd8 100644
+> --- a/arch/riscv/kernel/paravirt.c
+> +++ b/arch/riscv/kernel/paravirt.c
+> @@ -30,7 +30,7 @@ static u64 native_steal_clock(int cpu)
+>  	return 0;
+>  }
+>  
+> -DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
+> +DEFINE_STATIC_CALL_RO(pv_steal_clock, native_steal_clock);
+>  
+>  static bool steal_acc = true;
+>  static int __init parse_no_stealacc(char *arg)
+> -- 
+> 2.43.0
+>
 
-Some libraries ensure they are single threaded before forking. This
-assumption breaks after making kvm hugepage recovery thread a vhost task
-of the user process. The minijail library used by crosvm is one such
-affected application.
-
-Defer the task to after the first VM_RUN call, which occurs after the
-parent process has forked all its jailed child processes and should be
-safe to start the vhost task.
-
-Link: https://lore.kernel.org/kvm/Z2RYyagu3phDFIac@kbusch-mbp.dhcp.thefac=
-ebook.com/
-Fixes: d96c77bd4eeba46 ("KVM: x86: switch hugepage recovery thread to vho=
-st_task")
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- arch/x86/kvm/mmu/mmu.c   |  2 ++
- arch/x86/kvm/x86.c       |  9 ++++-----
- include/linux/kvm_host.h |  1 -
- virt/kvm/kvm_main.c      | 15 ---------------
- 4 files changed, 6 insertions(+), 21 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2401606db2604..422b6b06de4fe 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -7415,6 +7415,8 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
- {
- 	if (nx_hugepage_mitigation_hard_disabled)
- 		return 0;
-+	if (kvm->arch.nx_huge_page_recovery_thread)
-+		return 0;
-=20
- 	kvm->arch.nx_huge_page_last =3D get_jiffies_64();
- 	kvm->arch.nx_huge_page_recovery_thread =3D vhost_task_create(
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c79a8cc57ba42..263363c46626b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11463,6 +11463,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcp=
-u)
- 	struct kvm_run *kvm_run =3D vcpu->run;
- 	int r;
-=20
-+	r =3D kvm_mmu_post_init_vm(vcpu->kvm);
-+	if (r)
-+		return r;
-+
- 	vcpu_load(vcpu);
- 	kvm_sigset_activate(vcpu);
- 	kvm_run->flags =3D 0;
-@@ -12740,11 +12744,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned l=
-ong type)
- 	return ret;
- }
-=20
--int kvm_arch_post_init_vm(struct kvm *kvm)
--{
--	return kvm_mmu_post_init_vm(kvm);
--}
--
- static void kvm_unload_vcpu_mmu(struct kvm_vcpu *vcpu)
- {
- 	vcpu_load(vcpu);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 401439bb21e3e..a219bd2d8aec8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1596,7 +1596,6 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu=
-);
- bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
- bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu);
--int kvm_arch_post_init_vm(struct kvm *kvm);
- void kvm_arch_pre_destroy_vm(struct kvm *kvm);
- void kvm_arch_create_vm_debugfs(struct kvm *kvm);
-=20
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index de2c11dae2316..adacc6eaa7d9d 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1065,15 +1065,6 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, =
-const char *fdname)
- 	return ret;
- }
-=20
--/*
-- * Called after the VM is otherwise initialized, but just before adding =
-it to
-- * the vm_list.
-- */
--int __weak kvm_arch_post_init_vm(struct kvm *kvm)
--{
--	return 0;
--}
--
- /*
-  * Called just after removing the VM from the vm_list, but before doing =
-any
-  * other destruction.
-@@ -1194,10 +1185,6 @@ static struct kvm *kvm_create_vm(unsigned long typ=
-e, const char *fdname)
- 	if (r)
- 		goto out_err_no_debugfs;
-=20
--	r =3D kvm_arch_post_init_vm(kvm);
--	if (r)
--		goto out_err;
--
- 	mutex_lock(&kvm_lock);
- 	list_add(&kvm->vm_list, &vm_list);
- 	mutex_unlock(&kvm_lock);
-@@ -1207,8 +1194,6 @@ static struct kvm *kvm_create_vm(unsigned long type=
-, const char *fdname)
-=20
- 	return kvm;
-=20
--out_err:
--	kvm_destroy_vm_debugfs(kvm);
- out_err_no_debugfs:
- 	kvm_coalesced_mmio_free(kvm);
- out_no_coalesced_mmio:
---=20
-2.43.5
-
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
