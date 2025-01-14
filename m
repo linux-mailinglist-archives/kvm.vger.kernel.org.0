@@ -1,153 +1,205 @@
-Return-Path: <kvm+bounces-35437-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35438-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C7FA10FC3
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:19:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50E40A10FE4
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BB517A05C2
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:19:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDA1B7A3912
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:22:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB0F20F08A;
-	Tue, 14 Jan 2025 18:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A78D1FA15A;
+	Tue, 14 Jan 2025 18:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EXtm8zSi"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ieLERKxQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E3220CCC4
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD93D232458
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736878644; cv=none; b=HC3gMugI4uVMpXeBZGFJ9ZPqAtNCMEkaQGGIPHQPtG798GweMSvLrRzPW4ukRgcekwbQk0OvAr2yYeSMnvu9MsF47ps73wPgR/0i+x/l+8nTfCvSjS1Of9mxJztIcEQ6Q/r7Ty/xyANfNLSwTgroXOeO5ov7F7lKEkhPdDRuqms=
+	t=1736878966; cv=none; b=p6GObqg7NxW7EcO5zm9Dd+szaHknAl1dazoTajpGLCJDzlVjpLSQuVUzlTPDBjqym1trzNaRHx1lpeZ4LA8GDEC72A2D7b0e4LFWrzQ9zmrnAvYG9jvhvuRu2VUdRn5TOfVGZRWaVgj2UHiefmheJNMo2zST8cld53gshcdb9X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736878644; c=relaxed/simple;
-	bh=I0aYHuk99JA9dU0puEhTqa+Ivu5XtOv7dOMzqH0MLLU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lb1EW0Bqe7JGpl5pdIJUDPANhD5RBFDt0+At5syDS3mVempWlDovHPI+zhyVebvUoSNQoS7Uzt+byuYZodg2KzHrpA0J2l1r6+btbIartdld7eBWvgJf2YK+ukfkkeaSTirDrTX0GuplnY36C3bIXzbRixj+a1ZyjuBTxvsRnQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EXtm8zSi; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d9f0ab2313so10869a12.0
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 10:17:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736878641; x=1737483441; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I0aYHuk99JA9dU0puEhTqa+Ivu5XtOv7dOMzqH0MLLU=;
-        b=EXtm8zSii3wekymY6ORkKD1JDrVoQy0ggWwTrHyXX1420b4Av/uuY4+JYYiI/hRnvC
-         RNIP2ukp8w+O4wfnpBXLBqPL+GaCf3BBfI7manRZsEzpCActvfr9vHL6WJHR2DrG1CK+
-         RS9jdbSS/RGqfs0DflA4BC5xAwWToQdtJU7mldacEsYAyVp/NmixwtYO1Pnw6XQEVrzm
-         tGZmCJgHUquF5szQ0uPUbVEbPr/QXgRfUsBStXb/nrfkbDaAXA7x534l4fcegzZxzo7C
-         kVD2oyGevrHY0bALQymcdJsfMNepU3LctjdMoMOxbb+s4stkse+Dzc07ObbgoO/Mtxiq
-         K4UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736878641; x=1737483441;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I0aYHuk99JA9dU0puEhTqa+Ivu5XtOv7dOMzqH0MLLU=;
-        b=Z6GfhcqvFJeEpddH9dxLaI/czgV155BiEI8SsqxLPMjAx/UfErCMFLpeXbG1uG9Fr0
-         ZuhsQTeQLyizgANnwWWxZtnb1QPvoXHGxPEyAImG9RKyZcu/lcPNpDJLZlsUxbXrRZBy
-         lTqcaG3euJzM0opZtLpZEGsY6CpIJSVPS3F5sf0K58N+TzNsnQV1mz/vaeZPzRARsxcJ
-         xZHKR9niQ2FbZN4iipcbdRQeRgg5++ahgPYjqk/86fXKUIXFKu/fxToXLFzSbamKtdG+
-         8kEzMD37I08YLnffkZ7fjXlxEW9etym7JO0n4gnJSNCZfWc5BduMu162hRvISmfcRt6O
-         Cu6w==
-X-Forwarded-Encrypted: i=1; AJvYcCV2Aa1a1lIlUUcxPzyFd5+QGjn/BWOx1HBZADFnOavL+/EYgRuveffKjAL0uIwlst9EE1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqKE4z5xXCH/9HIyZyZ/iluAx7qyqq5DeAu3O12e1kj1bRZsxw
-	z0JjoNN3nzMo2F0u1Dt2kM3bR6s7uIR9Zgkm6hYS8RRLl4k29I9Iwy0rZ/vLkTirxvXQ1N+jwY5
-	elEJh5QN8jwEsmedq7quvKauL+tpRJb5bSnwt
-X-Gm-Gg: ASbGncv+hgOO9wKAEEr9TqkERAoNtgry/Obpc9q3gRG6GsDEbLgAAzlMkAxCSBoGlJE
-	+SwI149/lF2Gry7LEs/nFdBsLJ/dbm5RYtTrzxC3qChHDcg60ljc+yAJwuFpekPogBA==
-X-Google-Smtp-Source: AGHT+IFOWOuSvDhgzEqoKb2CNkVmA/sXHofQ9hZDfWF+l4vbbQk0RN2k51cQSZIijLzKAw1RUyxlH5Nb9O1wedqOjko=
-X-Received: by 2002:a50:d4d2:0:b0:5d1:22e1:7458 with SMTP id
- 4fb4d7f45d1cf-5d9f695dda7mr124694a12.4.1736878640478; Tue, 14 Jan 2025
- 10:17:20 -0800 (PST)
+	s=arc-20240116; t=1736878966; c=relaxed/simple;
+	bh=Z0lime3e2R0jhvU6ZibVA8s6c/Jk1bq7YA9glNsBWqg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XWvOiJWcpYe5NInDqySGMO830PQK09mj8E7Vtj8itu5VZBG0I48+5DD//bLljgCNJ+bz/wDAdh27ulXl3JyFgwxbs36wtOnUDPO8ZSLouui6YUrjnlOg/tH4v0MAW+q/YcezyqIX+iAJetMNZ5djNNHnkeQ2nz3u5lQLcWeQglc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ieLERKxQ; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50EI2UjP021448
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 10:22:44 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=tzv7kDexPXjkVr0dQP
+	3l+Fuqia3TwSfGwjQ2QmPRY/w=; b=ieLERKxQneBOJl3guPcXjMREkksodcD5Ed
+	PUHeaTyYJOYcFx80X93qdxo8aS7H89HRblfX1ylxj50VjObQ+Si29cDiwYfAAE5c
+	rltTYUW1jMCt7BLD7Q4AK/q5yInU9mfYiju1JSsLxKTdKMVs7lDZ2sIAFPKMZqAd
+	YI3HZV3TM40sNC+NsdagGcwcUXYwCv7ypOGjoYkdjNzll3sSmWycShj8yxDk1Rq4
+	GMfrI0gukhv7Acw5adlOHjyWiymAEElp/XdWwgct7hwBE7CHz+7m9t2wqSxuzSDZ
+	5zF9jLhvhobgIihedmXNtBS2H+dHyW+i+xfHgG+Hi+Ze0Kj38mAA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 445vuur5un-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 10:22:43 -0800 (PST)
+Received: from twshared3815.08.ash9.facebook.com (2620:10d:c0a8:1c::11) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Tue, 14 Jan 2025 18:22:41 +0000
+Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
+	id 8A60016E4BE2B; Tue, 14 Jan 2025 10:22:31 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <kvm@vger.kernel.org>, <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <tj@kernel.org>,
+        Keith Busch
+	<kbusch@kernel.org>
+Subject: [PATCH] kvm: defer huge page recovery vhost task to later
+Date: Tue, 14 Jan 2025 10:22:29 -0800
+Message-ID: <20250114182229.1861709-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250114175143.81438-1-vschneid@redhat.com> <20250114175143.81438-30-vschneid@redhat.com>
-In-Reply-To: <20250114175143.81438-30-vschneid@redhat.com>
-From: Jann Horn <jannh@google.com>
-Date: Tue, 14 Jan 2025 19:16:44 +0100
-X-Gm-Features: AbW1kvY7dNxOnvBqE7JSPz560QoJfBjiwfsZgS18MpZMQ07ZRC1TBr6Zwl5A-60
-Message-ID: <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com>
-Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer flush_tlb_kernel_range()
- targeting NOHZ_FULL CPUs
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
-	virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	loongarch@lists.linux.dev, linux-riscv@lists.infradead.org, 
-	linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
-	bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>, 
-	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.amakhalov@broadcom.com>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	"Liang, Kan" <kan.liang@linux.intel.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Jason Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, 
-	Tomas Glozar <tglozar@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, 
-	Mel Gorman <mgorman@suse.de>, Kees Cook <kees@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Christoph Hellwig <hch@infradead.org>, 
-	Shuah Khan <shuah@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>, Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, 
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Yosry Ahmed <yosryahmed@google.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
-	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
-	Tiezhu Yang <yangtiezhu@loongson.cn>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: HUqotXtHUD9D3WkIFsxgOGtlFf0kp6uU
+X-Proofpoint-ORIG-GUID: HUqotXtHUD9D3WkIFsxgOGtlFf0kp6uU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
 
-On Tue, Jan 14, 2025 at 6:51=E2=80=AFPM Valentin Schneider <vschneid@redhat=
-.com> wrote:
-> vunmap()'s issued from housekeeping CPUs are a relatively common source o=
-f
-> interference for isolated NOHZ_FULL CPUs, as they are hit by the
-> flush_tlb_kernel_range() IPIs.
->
-> Given that CPUs executing in userspace do not access data in the vmalloc
-> range, these IPIs could be deferred until their next kernel entry.
->
-> Deferral vs early entry danger zone
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> This requires a guarantee that nothing in the vmalloc range can be vunmap=
-'d
-> and then accessed in early entry code.
+From: Keith Busch <kbusch@kernel.org>
 
-In other words, it needs a guarantee that no vmalloc allocations that
-have been created in the vmalloc region while the CPU was idle can
-then be accessed during early entry, right?
+Some libraries ensure they are single threaded before forking. This
+assumption breaks after making kvm hugepage recovery thread a vhost task
+of the user process. The minijail library used by crosvm is one such
+affected application.
+
+Defer the task to after the first VM_RUN call, which occurs after the
+parent process has forked all its jailed child processes and should be
+safe to start the vhost task.
+
+Link: https://lore.kernel.org/kvm/Z2RYyagu3phDFIac@kbusch-mbp.dhcp.thefac=
+ebook.com/
+Fixes: d96c77bd4eeba46 ("KVM: x86: switch hugepage recovery thread to vho=
+st_task")
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ arch/x86/kvm/mmu/mmu.c   |  2 ++
+ arch/x86/kvm/x86.c       |  9 ++++-----
+ include/linux/kvm_host.h |  1 -
+ virt/kvm/kvm_main.c      | 15 ---------------
+ 4 files changed, 6 insertions(+), 21 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 2401606db2604..422b6b06de4fe 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7415,6 +7415,8 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
+ {
+ 	if (nx_hugepage_mitigation_hard_disabled)
+ 		return 0;
++	if (kvm->arch.nx_huge_page_recovery_thread)
++		return 0;
+=20
+ 	kvm->arch.nx_huge_page_last =3D get_jiffies_64();
+ 	kvm->arch.nx_huge_page_recovery_thread =3D vhost_task_create(
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c79a8cc57ba42..263363c46626b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11463,6 +11463,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcp=
+u)
+ 	struct kvm_run *kvm_run =3D vcpu->run;
+ 	int r;
+=20
++	r =3D kvm_mmu_post_init_vm(vcpu->kvm);
++	if (r)
++		return r;
++
+ 	vcpu_load(vcpu);
+ 	kvm_sigset_activate(vcpu);
+ 	kvm_run->flags =3D 0;
+@@ -12740,11 +12744,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned l=
+ong type)
+ 	return ret;
+ }
+=20
+-int kvm_arch_post_init_vm(struct kvm *kvm)
+-{
+-	return kvm_mmu_post_init_vm(kvm);
+-}
+-
+ static void kvm_unload_vcpu_mmu(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu_load(vcpu);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 401439bb21e3e..a219bd2d8aec8 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1596,7 +1596,6 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu=
+);
+ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu);
+-int kvm_arch_post_init_vm(struct kvm *kvm);
+ void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+ void kvm_arch_create_vm_debugfs(struct kvm *kvm);
+=20
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index de2c11dae2316..adacc6eaa7d9d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1065,15 +1065,6 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, =
+const char *fdname)
+ 	return ret;
+ }
+=20
+-/*
+- * Called after the VM is otherwise initialized, but just before adding =
+it to
+- * the vm_list.
+- */
+-int __weak kvm_arch_post_init_vm(struct kvm *kvm)
+-{
+-	return 0;
+-}
+-
+ /*
+  * Called just after removing the VM from the vm_list, but before doing =
+any
+  * other destruction.
+@@ -1194,10 +1185,6 @@ static struct kvm *kvm_create_vm(unsigned long typ=
+e, const char *fdname)
+ 	if (r)
+ 		goto out_err_no_debugfs;
+=20
+-	r =3D kvm_arch_post_init_vm(kvm);
+-	if (r)
+-		goto out_err;
+-
+ 	mutex_lock(&kvm_lock);
+ 	list_add(&kvm->vm_list, &vm_list);
+ 	mutex_unlock(&kvm_lock);
+@@ -1207,8 +1194,6 @@ static struct kvm *kvm_create_vm(unsigned long type=
+, const char *fdname)
+=20
+ 	return kvm;
+=20
+-out_err:
+-	kvm_destroy_vm_debugfs(kvm);
+ out_err_no_debugfs:
+ 	kvm_coalesced_mmio_free(kvm);
+ out_no_coalesced_mmio:
+--=20
+2.43.5
+
 
