@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-35443-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35444-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 183FEA1127C
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 21:50:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4459CA11283
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 21:51:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 215C9188A803
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 20:50:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 886813A0FD5
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 20:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2D820DD66;
-	Tue, 14 Jan 2025 20:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7492D20F97E;
+	Tue, 14 Jan 2025 20:50:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70960232428;
-	Tue, 14 Jan 2025 20:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03B71F9ABE;
+	Tue, 14 Jan 2025 20:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736887837; cv=none; b=Kgnq1s99tIYG2xXP2LT8jiX1a6353pSCuTyiHG9B9yo0Isylwf0uZC/+sLnOnAU6L0toCNsxhJCiyl7jltISKzwtWw1SaqRU3IFzA/vxi46N/RKloHP//Q+MI/qQwR1Vao3i8aQcNJ1wx6G5qOnjSC9XZYzuye8Adq0NH55HKsQ=
+	t=1736887849; cv=none; b=EXqr4DTCjX+8/s/pJXWeNqCvYEfsq25ZwCw+YAs2IPWyxItoPli7Bvc5TV9UovISki5Mi55hMOhzAK4rk2Xyudcx1pkGTHj4iM28YzFobEUItPQ1bMP1W8WQHG4RJHW82V9Ph39Gp1MWXMgJaysBvZREubX3HqlgKmy0CWR+R/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736887837; c=relaxed/simple;
-	bh=mFJXQKAqTkWya4NEVNucITl9Hq/KaS/sSXaPct3iOcc=;
+	s=arc-20240116; t=1736887849; c=relaxed/simple;
+	bh=9EKAGbEzUwplEuxyWnRSts0mBps2I6MBFwSv3Z+5+bg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IDIgll0I4ebSjQyMTkXqU+7Zph5z4jY66j4Nc10ym0XPH5FD7UQNEJlpx/kZrf5XSd+ZkzxLtKTWIMij5sqmRAOqaYZpHLgP9sUoB3eQA82mUgaPgr1HqzalJtAvi5OpHZ+pzx4cwjh6mJR+h9FWryILjd5CgbsQCLJ8cvIboQs=
+	 In-Reply-To:Content-Type; b=m47xwV/Gc8XDtpr4Qvnd0sbdoBiKJOanPMrRyoU9G9Ovb/mGki8uQtWryN1HaVVK6sTDH0Kn1IP6cd4qKpKVSHoTL6g1jrFaK/AwVgqwNiwl9VRIfjSgddivXUaJrAW6XWkfzKNtn9T/bAcY/9yxBBYGmu+c7SSyWk5UpitYfeA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CEEE512FC;
-	Tue, 14 Jan 2025 12:51:01 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2962D1D13;
+	Tue, 14 Jan 2025 12:51:15 -0800 (PST)
 Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E7B93F673;
-	Tue, 14 Jan 2025 12:50:30 -0800 (PST)
-Message-ID: <ecb59036-b279-4412-9a09-40e05af3b9ea@arm.com>
-Date: Tue, 14 Jan 2025 20:50:28 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 217DE3F673;
+	Tue, 14 Jan 2025 12:50:35 -0800 (PST)
+Message-ID: <ad2312e0-10d5-467a-be5e-75e80805b311@arm.com>
+Date: Tue, 14 Jan 2025 20:50:35 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,8 +42,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 05/17] dma-mapping: Provide an interface to allow
- allocate IOVA
+Subject: Re: [PATCH v5 07/17] dma-mapping: Implement link/unlink ranges API
 To: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
  Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
  Will Deacon <will@kernel.org>, Christoph Hellwig <hch@lst.de>,
@@ -63,228 +62,436 @@ Cc: Leon Romanovsky <leonro@nvidia.com>, Keith Busch <kbusch@kernel.org>,
  linux-pci@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
  Randy Dunlap <rdunlap@infradead.org>
 References: <cover.1734436840.git.leon@kernel.org>
- <fac6bc6fdcf8e13bd5668386d36289ee38a8a95b.1734436840.git.leon@kernel.org>
+ <fa43307222f263e65ae0a84c303150def15e2c77.1734436840.git.leon@kernel.org>
 From: Robin Murphy <robin.murphy@arm.com>
 Content-Language: en-GB
-In-Reply-To: <fac6bc6fdcf8e13bd5668386d36289ee38a8a95b.1734436840.git.leon@kernel.org>
+In-Reply-To: <fa43307222f263e65ae0a84c303150def15e2c77.1734436840.git.leon@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 17/12/2024 1:00 pm, Leon Romanovsky wrote:
 > From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> The existing .map_page() callback provides both allocating of IOVA
-> and linking DMA pages. That combination works great for most of the
-> callers who use it in control paths, but is less effective in fast
-> paths where there may be multiple calls to map_page().
+> Introduce new DMA APIs to perform DMA linkage of buffers
+> in layers higher than DMA.
 > 
-> These advanced callers already manage their data in some sort of
-> database and can perform IOVA allocation in advance, leaving range
-> linkage operation to be in fast path.
+> In proposed API, the callers will perform the following steps.
+> In map path:
+> 	if (dma_can_use_iova(...))
+> 	    dma_iova_alloc()
+> 	    for (page in range)
+> 	       dma_iova_link_next(...)
+> 	    dma_iova_sync(...)
+> 	else
+> 	     /* Fallback to legacy map pages */
+>               for (all pages)
+> 	       dma_map_page(...)
 > 
-> Provide an interface to allocate/deallocate IOVA and next patch
-> link/unlink DMA ranges to that specific IOVA.
-> 
-> In the new API a DMA mapping transaction is identified by a
-> struct dma_iova_state, which holds some recomputed information
-> for the transaction which does not change for each page being
-> mapped, so add a check if IOVA can be used for the specific
-> transaction.
-> 
-> The API is exported from dma-iommu as it is the only implementation
-> supported, the namespace is clearly different from iommu_* functions
-> which are not allowed to be used. This code layout allows us to save
-> function call per API call used in datapath as well as a lot of boilerplate
-> code.
+> In unmap path:
+> 	if (dma_can_use_iova(...))
+> 	     dma_iova_destroy()
+> 	else
+> 	     for (all pages)
+> 		dma_unmap_page(...)
 > 
 > Reviewed-by: Christoph Hellwig <hch@lst.de>
 > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 > ---
->   drivers/iommu/dma-iommu.c   | 74 +++++++++++++++++++++++++++++++++++++
->   include/linux/dma-mapping.h | 49 ++++++++++++++++++++++++
->   2 files changed, 123 insertions(+)
+>   drivers/iommu/dma-iommu.c   | 259 ++++++++++++++++++++++++++++++++++++
+>   include/linux/dma-mapping.h |  32 +++++
+>   2 files changed, 291 insertions(+)
 > 
 > diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index 853247c42f7d..5906b47a300c 100644
+> index d473ea4329ab..7972270e82b4 100644
 > --- a/drivers/iommu/dma-iommu.c
 > +++ b/drivers/iommu/dma-iommu.c
-> @@ -1746,6 +1746,80 @@ size_t iommu_dma_max_mapping_size(struct device *dev)
->   	return SIZE_MAX;
+> @@ -1829,6 +1829,265 @@ void dma_iova_free(struct device *dev, struct dma_iova_state *state)
 >   }
+>   EXPORT_SYMBOL_GPL(dma_iova_free);
 >   
-> +/**
-> + * dma_iova_try_alloc - Try to allocate an IOVA space
-> + * @dev: Device to allocate the IOVA space for
-> + * @state: IOVA state
-> + * @phys: physical address
-> + * @size: IOVA size
-> + *
-> + * Check if @dev supports the IOVA-based DMA API, and if yes allocate IOVA space
-> + * for the given base address and size.
-> + *
-> + * Note: @phys is only used to calculate the IOVA alignment. Callers that always
-> + * do PAGE_SIZE aligned transfers can safely pass 0 here.
-> + *
-> + * Returns %true if the IOVA-based DMA API can be used and IOVA space has been
-> + * allocated, or %false if the regular DMA API should be used.
-> + */
-> +bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
-> +		phys_addr_t phys, size_t size)
+> +static int __dma_iova_link(struct device *dev, dma_addr_t addr,
+> +		phys_addr_t phys, size_t size, enum dma_data_direction dir,
+> +		unsigned long attrs)
+> +{
+> +	bool coherent = dev_is_dma_coherent(dev);
+> +
+> +	if (!coherent && !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
+> +		arch_sync_dma_for_device(phys, size, dir);
+
+Again, if we're going to pretend to support non-coherent devices, where 
+are the dma_sync_for_{device,cpu} calls that work for a dma_iova_state? 
+It can't be the existing dma_sync_single ops since that would require 
+the user to keep track of every mapping to sync them individually, and 
+the whole premise is to avoid doing that (not to mention dma-debug 
+wouldn't like it). Same for anything coherent but SWIOTLB-bounced.
+
+Or if the API is intended to be actively hostile to buffer reuse, and 
+the only way to recycle an active page is to completely unlink it and 
+link it again, then please clearly document that.
+
+> +	return iommu_map_nosync(iommu_get_dma_domain(dev), addr, phys, size,
+> +			dma_info_to_prot(dir, coherent, attrs), GFP_ATOMIC);
+> +}
+> +
+> +static int iommu_dma_iova_bounce_and_link(struct device *dev, dma_addr_t addr,
+> +		phys_addr_t phys, size_t bounce_len,
+> +		enum dma_data_direction dir, unsigned long attrs,
+> +		size_t iova_start_pad)
+> +{
+> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> +	struct iova_domain *iovad = &domain->iova_cookie->iovad;
+> +	phys_addr_t bounce_phys;
+> +	int error;
+> +
+> +	bounce_phys = iommu_dma_map_swiotlb(dev, phys, bounce_len, dir, attrs);
+> +	if (bounce_phys == DMA_MAPPING_ERROR)
+> +		return -ENOMEM;
+> +
+> +	error = __dma_iova_link(dev, addr - iova_start_pad,
+> +			bounce_phys - iova_start_pad,
+> +			iova_align(iovad, bounce_len), dir, attrs);
+> +	if (error)
+> +		swiotlb_tbl_unmap_single(dev, bounce_phys, bounce_len, dir,
+> +				attrs);
+> +	return error;
+> +}
+> +
+> +static int iommu_dma_iova_link_swiotlb(struct device *dev,
+> +		struct dma_iova_state *state, phys_addr_t phys, size_t offset,
+> +		size_t size, enum dma_data_direction dir, unsigned long attrs)
 > +{
 > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
 > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
 > +	struct iova_domain *iovad = &cookie->iovad;
-> +	size_t iova_off = iova_offset(iovad, phys);
-> +	dma_addr_t addr;
+> +	size_t iova_start_pad = iova_offset(iovad, phys);
+> +	size_t iova_end_pad = iova_offset(iovad, phys + size);
+
+"end_pad" implies a length of padding from the unaligned end address to 
+reach the *next* granule boundary, but it seems this is actually the 
+unaligned tail length of the data itself. That's what confused me last 
+time, since in the map path that post-data padding region does matter in 
+its own right.
+
+> +	dma_addr_t addr = state->addr + offset;
+> +	size_t mapped = 0;
+> +	int error;
 > +
-> +	memset(state, 0, sizeof(*state));
-> +	if (!use_dma_iommu(dev))
-> +		return false;
-
-Can you guess why that return won't ever be taken?
-
-> +	if (static_branch_unlikely(&iommu_deferred_attach_enabled) &&
-> +	    iommu_deferred_attach(dev, iommu_get_domain_for_dev(dev)))
-> +		return false;
+> +	if (iova_start_pad) {
+> +		size_t bounce_len = min(size, iovad->granule - iova_start_pad);
 > +
-> +	if (WARN_ON_ONCE(!size))
-> +		return false;
-> +	if (WARN_ON_ONCE(size & DMA_IOVA_USE_SWIOTLB))
-
-This looks weird. Why would a caller ever set an effectively-private 
-flag in the first place? If it's actually supposed to be a maximum size 
-check, please make it look like a maximum size check.
-
-(Which also makes me consider iommu_dma_max_mapping_size() returning 
-SIZE_MAX isn't strictly accurate, ho hum...)
-
-> +		return false;
+> +		error = iommu_dma_iova_bounce_and_link(dev, addr, phys,
+> +				bounce_len, dir, attrs, iova_start_pad);
+> +		if (error)
+> +			return error;
+> +		state->__size |= DMA_IOVA_USE_SWIOTLB;
 > +
-> +	addr = iommu_dma_alloc_iova(domain,
-> +			iova_align(iovad, size + iova_off),
-> +			dma_get_mask(dev), dev);
-> +	if (!addr)
-> +		return false;
+> +		mapped += bounce_len;
+> +		size -= bounce_len;
+> +		if (!size)
+> +			return 0;
+> +	}
 > +
-> +	state->addr = addr + iova_off;
-> +	state->__size = size;
-> +	return true;
+> +	size -= iova_end_pad;
+> +	error = __dma_iova_link(dev, addr + mapped, phys + mapped, size, dir,
+> +			attrs);
+> +	if (error)
+> +		goto out_unmap;
+> +	mapped += size;
+> +
+> +	if (iova_end_pad) {
+> +		error = iommu_dma_iova_bounce_and_link(dev, addr + mapped,
+> +				phys + mapped, iova_end_pad, dir, attrs, 0);
+> +		if (error)
+> +			goto out_unmap;
+> +		state->__size |= DMA_IOVA_USE_SWIOTLB;
+> +	}
+> +
+> +	return 0;
+> +
+> +out_unmap:
+> +	dma_iova_unlink(dev, state, 0, mapped, dir, attrs);
+> +	return error;
 > +}
-> +EXPORT_SYMBOL_GPL(dma_iova_try_alloc);
 > +
 > +/**
-> + * dma_iova_free - Free an IOVA space
-> + * @dev: Device to free the IOVA space for
+> + * dma_iova_link - Link a range of IOVA space
+> + * @dev: DMA device
 > + * @state: IOVA state
+> + * @phys: physical address to link
+> + * @offset: offset into the IOVA state to map into
+> + * @size: size of the buffer
+> + * @dir: DMA direction
+> + * @attrs: attributes of mapping properties
 > + *
-> + * Undoes a successful dma_try_iova_alloc().
+> + * Link a range of IOVA space for the given IOVA state without IOTLB sync.
+> + * This function is used to link multiple physical addresses in contigueous
+> + * IOVA space without performing costly IOTLB sync.
 > + *
-> + * Note that all dma_iova_link() calls need to be undone first.  For callers
-> + * that never call dma_iova_unlink(), dma_iova_destroy() can be used instead
-> + * which unlinks all ranges and frees the IOVA space in a single efficient
-> + * operation.
-
-That's only true if they *also* call dma_iova_link() in just the right 
-way too.
-
+> + * The caller is responsible to call to dma_iova_sync() to sync IOTLB at
+> + * the end of linkage.
 > + */
-> +void dma_iova_free(struct device *dev, struct dma_iova_state *state)
+> +int dma_iova_link(struct device *dev, struct dma_iova_state *state,
+> +		phys_addr_t phys, size_t offset, size_t size,
+> +		enum dma_data_direction dir, unsigned long attrs)
 > +{
 > +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
 > +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
 > +	struct iova_domain *iovad = &cookie->iovad;
-> +	size_t iova_start_pad = iova_offset(iovad, state->addr);
-> +	size_t size = dma_iova_size(state);
+> +	size_t iova_start_pad = iova_offset(iovad, phys);
 > +
-> +	iommu_dma_free_iova(cookie, state->addr - iova_start_pad,
-> +			iova_align(iovad, size + iova_start_pad), NULL);
+> +	if (WARN_ON_ONCE(iova_start_pad && offset > 0))
+
+"iova_start_pad == 0" still doesn't guarantee that "phys" and "offset" 
+are appropriately aligned to each other.
+
+In fact there are so many other basic sanity checks which could easily 
+be here to make the interface robust that I start to wonder whether 
+maybe this token one its own is a misdirect and the in-joke is actually 
+that the whole thing is designed to be as fragile as possible...
+
+> +		return -EIO;
+> +
+> +	if (dev_use_swiotlb(dev, size, dir) && iova_offset(iovad, phys | size))
+
+Again, why are we supporting non-granule-aligned mappings in the middle 
+of a range when the documentation explicitly says not to?
+
+> +		return iommu_dma_iova_link_swiotlb(dev, state, phys, offset,
+> +				size, dir, attrs);
+> +
+> +	return __dma_iova_link(dev, state->addr + offset - iova_start_pad,
+> +			phys - iova_start_pad,
+> +			iova_align(iovad, size + iova_start_pad), dir, attrs);
 > +}
-> +EXPORT_SYMBOL_GPL(dma_iova_free);
+> +EXPORT_SYMBOL_GPL(dma_iova_link);
+> +
+> +/**
+> + * dma_iova_sync - Sync IOTLB
+> + * @dev: DMA device
+> + * @state: IOVA state
+> + * @offset: offset into the IOVA state to sync
+> + * @size: size of the buffer
+> + *
+> + * Sync IOTLB for the given IOVA state. This function should be called on
+> + * the IOVA-contigous range created by one ore more dma_iova_link() calls
+> + * to sync the IOTLB.
+> + */
+> +int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
+> +		size_t offset, size_t size)
+> +{
+> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+> +	struct iova_domain *iovad = &cookie->iovad;
+> +	dma_addr_t addr = state->addr + offset;
+> +	size_t iova_start_pad = iova_offset(iovad, addr);
+> +
+> +	return iommu_sync_map(domain, addr - iova_start_pad,
+> +		      iova_align(iovad, size + iova_start_pad));
+> +}
+> +EXPORT_SYMBOL_GPL(dma_iova_sync);
+> +
+> +static void iommu_dma_iova_unlink_range_slow(struct device *dev,
+> +		dma_addr_t addr, size_t size, enum dma_data_direction dir,
+> +		unsigned long attrs)
+> +{
+> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+> +	struct iova_domain *iovad = &cookie->iovad;
+> +	size_t iova_start_pad = iova_offset(iovad, addr);
+> +	dma_addr_t end = addr + size;
+> +
+> +	do {
+> +		phys_addr_t phys;
+> +		size_t len;
+> +
+> +		phys = iommu_iova_to_phys(domain, addr);
+> +		if (WARN_ON(!phys))
+> +			continue;
+
+Infinite WARN_ON loop, nice.
+
+> +		len = min_t(size_t,
+> +			end - addr, iovad->granule - iova_start_pad);
+> +
+> +		if (!dev_is_dma_coherent(dev) &&
+> +		    !(attrs & DMA_ATTR_SKIP_CPU_SYNC))
+> +			arch_sync_dma_for_cpu(phys, len, dir);
+
+Hmm, how do attrs even work for a bulk unlink/destroy when the 
+individual mappings could have been linked with different values?
+
+(So no, irrespective of how conceptually horrid it is, clearly it's not 
+even functionally viable to open-code abuse of DMA_ATTR_SKIP_CPU_SYNC in 
+callers to attempt to work around P2P mappings...)
+
+> +
+> +		swiotlb_tbl_unmap_single(dev, phys, len, dir, attrs);
+
+This is still dumb. For everything other than the first and last 
+granule, either it's definitely not in SWIOTLB, or it is (per the 
+unaligned size thing above) but then "len" is definitely wrong and 
+SWIOTLB will complain.
+
+> +
+> +		addr += len;
+> +		iova_start_pad = 0;
+> +	} while (addr < end);
+> +}
+> +
+> +static void __iommu_dma_iova_unlink(struct device *dev,
+> +		struct dma_iova_state *state, size_t offset, size_t size,
+> +		enum dma_data_direction dir, unsigned long attrs,
+> +		bool free_iova)
+> +{
+> +	struct iommu_domain *domain = iommu_get_dma_domain(dev);
+> +	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+> +	struct iova_domain *iovad = &cookie->iovad;
+> +	dma_addr_t addr = state->addr + offset;
+> +	size_t iova_start_pad = iova_offset(iovad, addr);
+> +	struct iommu_iotlb_gather iotlb_gather;
+> +	size_t unmapped;
+> +
+> +	if ((state->__size & DMA_IOVA_USE_SWIOTLB) ||
+> +	    (!dev_is_dma_coherent(dev) && !(attrs & DMA_ATTR_SKIP_CPU_SYNC)))
+> +		iommu_dma_iova_unlink_range_slow(dev, addr, size, dir, attrs);
+> +
+> +	iommu_iotlb_gather_init(&iotlb_gather);
+> +	iotlb_gather.queued = free_iova && READ_ONCE(cookie->fq_domain);
+
+This makes things needlessly hard to follow, just keep the IOVA freeing 
+separate. And by that I really mean just have unlink and free, since 
+dma_iova_destroy() really doesn't seem worth the extra complexity to 
+save one line in one caller...
+
+> +	size = iova_align(iovad, size + iova_start_pad);
+> +	addr -= iova_start_pad;
+> +	unmapped = iommu_unmap_fast(domain, addr, size, &iotlb_gather);
+> +	WARN_ON(unmapped != size);
+> +
+> +	if (!iotlb_gather.queued)
+> +		iommu_iotlb_sync(domain, &iotlb_gather);
+> +	if (free_iova)
+> +		iommu_dma_free_iova(cookie, addr, size, &iotlb_gather);
+
+Case in point, can you spot the bug here if dma_iova_destroy() is used 
+as intended? At least it's the relatively benign direction of this bug, 
+not the really fun pagetable corruption one.
+
+Furthermore I'm also still not convinced it's worth worrying about flush 
+queues here - they make a difference when IOVA release/recycling is in 
+the unmap fastpath, but once link/unlink already replaces that, 
+micro-optimising the one-time teardown slowpath doesn't seem like 
+something to worry about. And I do consider that the interesting case 
+for this, because if you put the whole try_alloc/link/destroy cycle in 
+the per-transfer fastpath then it cannot perform *significantly* better 
+than dma_map_sg/dma_unmap_sg could, given that it's then fundamentally 
+the exact same sequence of IOVA/IOMMU operations. Thus for those uses we 
+come back around to it seeming a better use of effort to just tweak the 
+existing stuff for maximum efficiency.
+
+Thanks,
+Robin.
+
+> +}
+> +
+> +/**
+> + * dma_iova_unlink - Unlink a range of IOVA space
+> + * @dev: DMA device
+> + * @state: IOVA state
+> + * @offset: offset into the IOVA state to unlink
+> + * @size: size of the buffer
+> + * @dir: DMA direction
+> + * @attrs: attributes of mapping properties
+> + *
+> + * Unlink a range of IOVA space for the given IOVA state.
+> + */
+> +void dma_iova_unlink(struct device *dev, struct dma_iova_state *state,
+> +		size_t offset, size_t size, enum dma_data_direction dir,
+> +		unsigned long attrs)
+> +{
+> +	 __iommu_dma_iova_unlink(dev, state, offset, size, dir, attrs, false);
+> +}
+> +EXPORT_SYMBOL_GPL(dma_iova_unlink);
+> +
+> +/**
+> + * dma_iova_destroy - Finish a DMA mapping transaction
+> + * @dev: DMA device
+> + * @state: IOVA state
+> + * @mapped_len: number of bytes to unmap
+> + * @dir: DMA direction
+> + * @attrs: attributes of mapping properties
+> + *
+> + * Unlink the IOVA range up to @mapped_len and free the entire IOVA space. The
+> + * range of IOVA from dma_addr to @mapped_len must all be linked, and be the
+> + * only linked IOVA in state.
+> + */
+> +void dma_iova_destroy(struct device *dev, struct dma_iova_state *state,
+> +		size_t mapped_len, enum dma_data_direction dir,
+> +		unsigned long attrs)
+> +{
+> +	if (mapped_len)
+> +		__iommu_dma_iova_unlink(dev, state, 0, mapped_len, dir, attrs,
+> +				true);
+> +	else
+> +		/*
+> +		 * We can be here if first call to dma_iova_link() failed and
+> +		 * there is nothing to unlink, so let's be more clear.
+> +		 */
+> +		dma_iova_free(dev, state);
+> +}
+> +EXPORT_SYMBOL_GPL(dma_iova_destroy);
 > +
 >   void iommu_setup_dma_ops(struct device *dev)
 >   {
 >   	struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
 > diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-> index b79925b1c433..55899d65668b 100644
+> index 55899d65668b..f4d717e17bde 100644
 > --- a/include/linux/dma-mapping.h
 > +++ b/include/linux/dma-mapping.h
-> @@ -7,6 +7,8 @@
->   #include <linux/dma-direction.h>
->   #include <linux/scatterlist.h>
->   #include <linux/bug.h>
-> +#include <linux/mem_encrypt.h>
-> +#include <linux/iommu.h>
-
-Why are these being pulled in here?
-
->   /**
->    * List of possible attributes associated with a DMA mapping. The semantics
-> @@ -72,6 +74,21 @@
->   
->   #define DMA_BIT_MASK(n)	(((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
->   
-> +struct dma_iova_state {
-> +	dma_addr_t addr;
-> +	size_t __size;
-> +};
-> +
-> +/*
-> + * Use the high bit to mark if we used swiotlb for one or more ranges.
-> + */
-> +#define DMA_IOVA_USE_SWIOTLB		(1ULL << 63)
-
-This will give surprising results for 32-bit size_t (in fact I guess it 
-might fire some build warnings already).
-
-Thanks,
-Robin.
-
-> +
-> +static inline size_t dma_iova_size(struct dma_iova_state *state)
-> +{
-> +	return state->__size & ~DMA_IOVA_USE_SWIOTLB;
-> +}
-> +
->   #ifdef CONFIG_DMA_API_DEBUG
->   void debug_dma_mapping_error(struct device *dev, dma_addr_t dma_addr);
->   void debug_dma_map_single(struct device *dev, const void *addr,
-> @@ -277,6 +294,38 @@ static inline int dma_mmap_noncontiguous(struct device *dev,
+> @@ -310,6 +310,17 @@ static inline bool dma_use_iova(struct dma_iova_state *state)
+>   bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
+>   		phys_addr_t phys, size_t size);
+>   void dma_iova_free(struct device *dev, struct dma_iova_state *state);
+> +void dma_iova_destroy(struct device *dev, struct dma_iova_state *state,
+> +		size_t mapped_len, enum dma_data_direction dir,
+> +		unsigned long attrs);
+> +int dma_iova_sync(struct device *dev, struct dma_iova_state *state,
+> +		size_t offset, size_t size);
+> +int dma_iova_link(struct device *dev, struct dma_iova_state *state,
+> +		phys_addr_t phys, size_t offset, size_t size,
+> +		enum dma_data_direction dir, unsigned long attrs);
+> +void dma_iova_unlink(struct device *dev, struct dma_iova_state *state,
+> +		size_t offset, size_t size, enum dma_data_direction dir,
+> +		unsigned long attrs);
+>   #else /* CONFIG_IOMMU_DMA */
+>   static inline bool dma_use_iova(struct dma_iova_state *state)
+>   {
+> @@ -324,6 +335,27 @@ static inline void dma_iova_free(struct device *dev,
+>   		struct dma_iova_state *state)
+>   {
 >   }
->   #endif /* CONFIG_HAS_DMA */
+> +static inline void dma_iova_destroy(struct device *dev,
+> +		struct dma_iova_state *state, size_t mapped_len,
+> +		enum dma_data_direction dir, unsigned long attrs)
+> +{
+> +}
+> +static inline int dma_iova_sync(struct device *dev,
+> +		struct dma_iova_state *state, size_t offset, size_t size)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +static inline int dma_iova_link(struct device *dev,
+> +		struct dma_iova_state *state, phys_addr_t phys, size_t offset,
+> +		size_t size, enum dma_data_direction dir, unsigned long attrs)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +static inline void dma_iova_unlink(struct device *dev,
+> +		struct dma_iova_state *state, size_t offset, size_t size,
+> +		enum dma_data_direction dir, unsigned long attrs)
+> +{
+> +}
+>   #endif /* CONFIG_IOMMU_DMA */
 >   
-> +#ifdef CONFIG_IOMMU_DMA
-> +/**
-> + * dma_use_iova - check if the IOVA API is used for this state
-> + * @state: IOVA state
-> + *
-> + * Return %true if the DMA transfers uses the dma_iova_*() calls or %false if
-> + * they can't be used.
-> + */
-> +static inline bool dma_use_iova(struct dma_iova_state *state)
-> +{
-> +	return state->__size != 0;
-> +}
-> +
-> +bool dma_iova_try_alloc(struct device *dev, struct dma_iova_state *state,
-> +		phys_addr_t phys, size_t size);
-> +void dma_iova_free(struct device *dev, struct dma_iova_state *state);
-> +#else /* CONFIG_IOMMU_DMA */
-> +static inline bool dma_use_iova(struct dma_iova_state *state)
-> +{
-> +	return false;
-> +}
-> +static inline bool dma_iova_try_alloc(struct device *dev,
-> +		struct dma_iova_state *state, phys_addr_t phys, size_t size)
-> +{
-> +	return false;
-> +}
-> +static inline void dma_iova_free(struct device *dev,
-> +		struct dma_iova_state *state)
-> +{
-> +}
-> +#endif /* CONFIG_IOMMU_DMA */
-> +
 >   #if defined(CONFIG_HAS_DMA) && defined(CONFIG_DMA_NEED_SYNC)
->   void __dma_sync_single_for_cpu(struct device *dev, dma_addr_t addr, size_t size,
->   		enum dma_data_direction dir);
 
