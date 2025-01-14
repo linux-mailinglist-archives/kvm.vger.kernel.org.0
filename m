@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-35422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF082A10EF5
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:03:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4E38A10EFE
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0742D164815
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:03:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38C697A159E
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8215204587;
-	Tue, 14 Jan 2025 18:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D315820E6F1;
+	Tue, 14 Jan 2025 18:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V03GHTpu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JjY67r8h"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FF21FA15D
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339721FA267
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736877619; cv=none; b=sW3SIycKc8EMNdndf9nl/tC/m0rOyW0gZ3FjKEvOUwrUADdXVo+nOlYivEkvPylU9+T49HIURFi5ZxFo7VJr97ia5T7QdioOICtCL+ht9Pt80PIl0PITT0MX/ss9F8t+abakb8SjD01jsCmOOcBLcfcQltbWfu3i7L1RxKP84YM=
+	t=1736877640; cv=none; b=eWlCwhrYamM32OQe/5zvGeOO44J8mnd+iLjygP14B6J8TAAO7ieEUBIKsKXm/6aHe4t0NXF8I5qVFcxPcaKBiAgPWGf9qCS///C8IyN07Ix8P8i5ilPWV/Bb2IYh3JXtPb8oLgS00GPZuR3d7DQ28AaQ7GBqBIyN4eALUm8X/sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736877619; c=relaxed/simple;
-	bh=DlNKaMcWkLekUb5b729QKRNcYbX/BVpcNnQiLO9J7o4=;
+	s=arc-20240116; t=1736877640; c=relaxed/simple;
+	bh=Mw3gFYE3d/xGzHWONneZh61asJCFkOwmbMPlIHsHUKo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=etfnEJ/1KYHkjkWMEmz0mB7GNR/JcNCPLqEdk5xGCFWihvMHAqkEaTVrvrAMMp6VXDWMCZpyyzuuTa8e2htyELIzif4iNSx1jr5dfZv0T3pZEwohDtaTfWsJKGsmR4XM1j//MYTdSz6Q2GQDCC4sErzRO0tFTbRScrLVvD02Ep0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V03GHTpu; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=Tb1zZqMFqPnQW7PWUHsKA7zxhfBJ8+6E8Q0Z8IVReccckUWp4ZMx5bsEH3aZOhVbbeNsj0Q/YKdIe5hLwTKGZcalUpGRF5LMnxGet+OplA4yzgItmzF6aa5PORQbkjN0A+pbIztVcvwlD7j08KpyrzIbh4f5I3+oGgMUdl/aIeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JjY67r8h; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736877616;
+	s=mimecast20190719; t=1736877638;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oEa6Jvbfjlidl4MXGQFSAZ9P76MqELccnrf7elTRMWU=;
-	b=V03GHTpucJlVb3clx5/uT4Uxc8ZehqR0ggTkTgUXMo3v0uPbZ0DU5XSAoLqp6aZRgZ0NZO
-	quaKKht3t/DUTCvn96xfW9fk7ziCdhbq/Cr5plMlXOVQyEljFdWdjKyIzEAxJKwEOqD6uJ
-	NDWU/Z9TjxTJgvH4yJ9kJcrPn8XfhRw=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	bh=1xC4OsvuHAy+Ds3sLAPsZ084bYad84WLBsAT/g0G1RM=;
+	b=JjY67r8hAoByTv4OjbD5E0ksSGxkZXsi7XQabmlX4k7VYopOqbfJmwpciAbZ4gs2i1IwkY
+	WqVPRe3PffYseQVbfG7jj1zEdg6s2jhzK7beO2RN+U78k18S5wD1WErzW4Czw91Q3aw/nb
+	bBW1pW8JWmF84CauZuZJ4OcFOR0nM3E=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-113-k3wLyZ7iPkiQIoWyV-6PFw-1; Tue,
- 14 Jan 2025 13:00:14 -0500
-X-MC-Unique: k3wLyZ7iPkiQIoWyV-6PFw-1
-X-Mimecast-MFC-AGG-ID: k3wLyZ7iPkiQIoWyV-6PFw
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-15QLd5xpPJuBfkaI0jxIcg-1; Tue,
+ 14 Jan 2025 13:00:36 -0500
+X-MC-Unique: 15QLd5xpPJuBfkaI0jxIcg-1
+X-Mimecast-MFC-AGG-ID: 15QLd5xpPJuBfkaI0jxIcg
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BD2A51955DE0;
-	Tue, 14 Jan 2025 18:00:10 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7DD041954195;
+	Tue, 14 Jan 2025 18:00:33 +0000 (UTC)
 Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.192.55])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 79BA9195E3E0;
-	Tue, 14 Jan 2025 17:59:46 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F89B195608A;
+	Tue, 14 Jan 2025 18:00:11 +0000 (UTC)
 From: Valentin Schneider <vschneid@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
@@ -74,7 +74,8 @@ To: linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	bpf@vger.kernel.org,
 	bcm-kernel-feedback-list@broadcom.com
-Cc: Juergen Gross <jgross@suse.com>,
+Cc: Josh Poimboeuf <jpoimboe@kernel.org>,
+	Juergen Gross <jgross@suse.com>,
 	Ajay Kaher <ajay.kaher@broadcom.com>,
 	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
 	Russell King <linux@armlinux.org.uk>,
@@ -100,7 +101,6 @@ Cc: Juergen Gross <jgross@suse.com>,
 	Adrian Hunter <adrian.hunter@intel.com>,
 	"Liang, Kan" <kan.liang@linux.intel.com>,
 	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
 	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
 	Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
@@ -146,9 +146,9 @@ Cc: Juergen Gross <jgross@suse.com>,
 	Luis Chamberlain <mcgrof@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>,
 	Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: [PATCH v4 17/30] sched/clock, x86: Mark __sched_clock_stable key as allowed in .noinstr
-Date: Tue, 14 Jan 2025 18:51:30 +0100
-Message-ID: <20250114175143.81438-18-vschneid@redhat.com>
+Subject: [PATCH v4 18/30] x86/kvm/vmx: Mark vmx_l1d_should flush and vmx_l1d_flush_cond keys as allowed in .noinstr
+Date: Tue, 14 Jan 2025 18:51:31 +0100
+Message-ID: <20250114175143.81438-19-vschneid@redhat.com>
 In-Reply-To: <20250114175143.81438-1-vschneid@redhat.com>
 References: <20250114175143.81438-1-vschneid@redhat.com>
 Precedence: bulk
@@ -164,35 +164,41 @@ Later commits will cause objtool to warn about static keys being used in
 .noinstr sections in order to safely defer instruction patching IPIs
 targeted at NOHZ_FULL CPUs.
 
-__sched_clock_stable is used in .noinstr code, and can be modified at
-runtime (e.g. time_cpufreq_notifier()). Suppressing the text_poke_sync()
-IPI has little benefits for this key, as NOHZ_FULL is incompatible with an
-unstable TSC anyway.
+These keys are used in .noinstr code, and can be modified at runtime
+(/proc/kernel/vmx* write). However it is not expected that they will be
+flipped during latency-sensitive operations, and thus shouldn't be a source
+of interference wrt the text patching IPI.
 
 Mark it to let objtool know not to warn about it.
 
+Reported-by: Josh Poimboeuf <jpoimboe@kernel.org>
 Signed-off-by: Valentin Schneider <vschneid@redhat.com>
 ---
- kernel/sched/clock.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/kernel/sched/clock.c b/kernel/sched/clock.c
-index 200e5568b9894..e59986bc14a43 100644
---- a/kernel/sched/clock.c
-+++ b/kernel/sched/clock.c
-@@ -75,8 +75,11 @@ static DEFINE_STATIC_KEY_FALSE_RO(sched_clock_running);
-  *
-  * Similarly we start with __sched_clock_stable_early, thereby assuming we
-  * will become stable, such that there's only a single 1 -> 0 transition.
-+ *
-+ * Allowed in .noinstr as an unstable TLC is incompatible with NOHZ_FULL,
-+ * thus the text patching IPI would be the least of our concerns.
-  */
--static DEFINE_STATIC_KEY_FALSE(__sched_clock_stable);
-+static DEFINE_STATIC_KEY_FALSE_NOINSTR(__sched_clock_stable);
- static int __sched_clock_stable_early = 1;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 893366e537322..a028c38f44e02 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -225,8 +225,15 @@ module_param(pt_mode, int, S_IRUGO);
  
- /*
+ struct x86_pmu_lbr __ro_after_init vmx_lbr_caps;
+ 
+-static DEFINE_STATIC_KEY_FALSE(vmx_l1d_should_flush);
+-static DEFINE_STATIC_KEY_FALSE(vmx_l1d_flush_cond);
++/*
++ * Both of these static keys end up being used in .noinstr sections, however
++ * they are only modified:
++ * - at init
++ * - from a /proc/kernel/vmx* write
++ * thus during latency-sensitive operations they should remain stable.
++ */
++static DEFINE_STATIC_KEY_FALSE_NOINSTR(vmx_l1d_should_flush);
++static DEFINE_STATIC_KEY_FALSE_NOINSTR(vmx_l1d_flush_cond);
+ static DEFINE_MUTEX(vmx_l1d_flush_mutex);
+ 
+ /* Storage for pre module init parameter parsing */
 -- 
 2.43.0
 
