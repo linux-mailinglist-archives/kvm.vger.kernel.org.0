@@ -1,181 +1,135 @@
-Return-Path: <kvm+bounces-35397-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35398-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11ECEA10C50
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 17:31:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB178A10CE0
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 17:59:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25E9F1889A8C
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 16:31:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C4511885F29
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 16:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9129F1D5142;
-	Tue, 14 Jan 2025 16:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7531D516C;
+	Tue, 14 Jan 2025 16:59:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Zj8zAh65"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z7IGExJC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55231160884;
-	Tue, 14 Jan 2025 16:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144E81C4617
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 16:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736872291; cv=none; b=Jw4Y+a4Q2gMIp7rZtBdsPpOyP3oUoaqquY/nIfiw6v6e47QC5hzbgfSxO4FbSMtIs/KlKjodThSkN2zGskrHdj3VL4R5yXzssXuu/qBgiCe7C322OOTYgDeDbdkUvgtrM7RH/LU/UOGPv7aJZQ1VGe6VGGGsjjl5dqu3hkVnuSM=
+	t=1736873944; cv=none; b=CSmEeDulbJeIlsVCJN6DkGwcwE3cJjIDXrwYtpnyrjHPZ6ySVtESvjgBiAkiW8HGBgFAeVSCnKbrsocYJ1tXE95bTAAA8ZMVieeD+GS62TC2nHaRn5NUVwlUq36CdbcxceOKLyrl4gPddPNxe6N9zvoJxoemAgHZZyzMV6T1lyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736872291; c=relaxed/simple;
-	bh=GliCZdjc9UMRvHhc1En8aKi7hYaY/62aGAlKZEHFeoE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fdSLCJlFBuWdhuQLP6MxDdXovujoTHa6eXhf9MOAveC/DRSmR55kXDNd9Tvvm/vy064RY3TJUcG4LR37VdN0erYeVNpGyo9is4APRcJrk4blR6D3YnHe88hRFZ66oULgP6gAgvVqoZPOskf0Ya3er70vTgvzd5JvZ5BemdbU0EM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Zj8zAh65; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tXjp3-00HICC-LA; Tue, 14 Jan 2025 17:31:21 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=uc3P+aW58p1Wgl/FgiobWz7JZg3jTcWFJd6qr34VHyM=; b=Zj8zAh65jD1PreEiamMYVyGj2V
-	gVX5tchbNSM3Wv6Gbf12HUK9JCzyI2AeruIo25+HSbn3Qznzgu2mQ/0iFOtRy5SAV5/TFkMqXAQZ1
-	jWyhuoFcmKk2fyu+x36pLL6N2MWU6QAYB9pipAkxN1F/c0zcLbKV60O1kqVrr42NEwXkCXEdklOY8
-	kktFdnhdJqFuw+GpAIC+BMjvd19B08h220kQ4FdH7kvxA6ZlHMnKXUaToaVFB/srDG25lPBfT7p/c
-	DAxbe9IyFAL4NkWOG3gsimEY0TV5O5uEgj08MQQkPdFs0VQ7LkT29uAhr7DDwa2GZ9mj1HPWGscdG
-	CdAE0uvA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tXjp2-00007d-B3; Tue, 14 Jan 2025 17:31:20 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tXjor-003bqh-Vn; Tue, 14 Jan 2025 17:31:10 +0100
-Message-ID: <fb6f876f-a4eb-4005-bd76-fff0632291b8@rbox.co>
-Date: Tue, 14 Jan 2025 17:31:08 +0100
+	s=arc-20240116; t=1736873944; c=relaxed/simple;
+	bh=cTPCgZybjgGxoWnvCmC6onK0qXp5XJBkCCWCEp82r4o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LNH07eq4leYAWi0Vl4kpaveJ0+fIbUngfscDaJTwhXsgthfeC69YIB/9fs4sp7kRLVGqwOm2blLhkYjCGvoRL3EMRAKIB3pHAvl98Mivvn4s6al2oJ7YUCnaXGHAjZjNmlQBNFl4PA2Mz/4+zBYVXNsB3TU93XLeiHSkTxirHto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z7IGExJC; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee6dccd3c9so9792867a91.3
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 08:59:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736873942; x=1737478742; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FFDxuX2IJcNSQnso3/JpRuLa7ermog8cVuxURDolQyA=;
+        b=Z7IGExJC7FYfF1a/sKNzrMH5q8FYZSs0mJXCSCvNeSCN7BRZNvEdFxjYAZ38NEbBQN
+         ccJSz6MVllV5dN+wsHCphoF+EVWyBuhD0aVTPW000K2PJhBqHDxqMJJSS2Pz7X/6qC0a
+         +G/LOgq7fLNqNpj+fqSWBWzEGTstu5bIn7ttkw9z2OHjkWRfwHZyAThn8hNiqXop7jz2
+         6UnBeNPN6QLEWGthWvRofJQ5Am2M5rtacjohdXsZnF7Qb8KMUIFnDveuP/32l7sf83/n
+         mjg7EIUtCClKUtZP9aRgyN44nMTJGu4VKk2tlmgpzBOT6QcVJRYazJVTPanfACL7zO2K
+         /Nqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736873942; x=1737478742;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FFDxuX2IJcNSQnso3/JpRuLa7ermog8cVuxURDolQyA=;
+        b=OPI3GoaZzSMfGWzp9SPZs2ql5UsQiuAlUW4/VUNGFsD/yhjBqjgCPc0FCUUOBfr7Hx
+         jVpR9bvdR4yvKtt4BPTqJAXQzRqeFN+BCGhcbzUmt5WvU7jpASvx1iXu5lCUjJ/0pN/h
+         1tBI4YPrsnN98s0TiH5HuPmEvjvQ133ev8JaUauM3d/k6aQWxkHh1LUQ/pu3vKJDjeDc
+         e8jGKuqJ1piLKYHcx57k5tuBi5zAjDy0r6Hj2jhVGRwAUh3RBTxaQU9R4cAdEHUJDb7d
+         YNbd2dZOoozyHr+hAkJO1MAmunNrohQQ8RSjB80A9K51vOMiCg7OZu98DMqRjsinj2VM
+         FqSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWT1Ix0HP8fH09HRsdrwLJyVWBApejLa6rNH2xYsDa+FxC0z+/HXs7m0ephZiXss7anh+8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys+NReZdb37ocRPSsab8+wp06V1bKhbIKLMNC9ak4KDoJxisRo
+	t7LW3CjE4i4NqEKtyoc4lDELjkquNF4WCk2Dftyay3d76vMEsTnZ/yCBmOxlWX0EmAWeWSQrDiS
+	jBw==
+X-Google-Smtp-Source: AGHT+IGcbU/ZRTlWmJyulxFLEuAKTsIN2drNXPY0TcjZmGVTtDPbqAnCMgFSXUmKuLZCq+gbfs0BsetyLKY=
+X-Received: from pjbqb12.prod.google.com ([2002:a17:90b:280c:b0:2ea:5be5:da6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d09:b0:2ee:a6f0:f54
+ with SMTP id 98e67ed59e1d1-2f548f33baemr36642177a91.13.1736873942475; Tue, 14
+ Jan 2025 08:59:02 -0800 (PST)
+Date: Tue, 14 Jan 2025 08:59:00 -0800
+In-Reply-To: <4dcc7c65-18d1-432b-8e98-501e0c38fc6b@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the transport
- changes
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Luigi Leonardi <leonardi@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>,
- kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>,
- Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
- stable@vger.kernel.org
-References: <20250110083511.30419-1-sgarzare@redhat.com>
- <20250110083511.30419-2-sgarzare@redhat.com>
- <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
- <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
- <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
- <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
- <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
- <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
- <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
- <7de34054-10cf-45d0-a869-adebb77ad913@rbox.co>
- <n2itoh23kikzszzgmyejfwe3mdf6fmxzwbtyo5ahtxpaco3euq@osupldmckz7p>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <n2itoh23kikzszzgmyejfwe3mdf6fmxzwbtyo5ahtxpaco3euq@osupldmckz7p>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
+ <20241209010734.3543481-13-binbin.wu@linux.intel.com> <8a9b761b-3ffc-4e67-8254-cf4150a997ae@linux.intel.com>
+ <e3a2e8fa-b496-4010-9a8c-bfeb131bc43b@linux.intel.com> <Z4VKdbW1R0AoLvkB@google.com>
+ <4dcc7c65-18d1-432b-8e98-501e0c38fc6b@linux.intel.com>
+Message-ID: <Z4aX1NjuxeCJd1XY@google.com>
+Subject: Re: [PATCH 12/16] KVM: TDX: Inhibit APICv for TDX guest
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
+	kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com, 
+	xiaoyao.li@intel.com, tony.lindgren@linux.intel.com, isaku.yamahata@intel.com, 
+	yan.y.zhao@intel.com, chao.gao@intel.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/14/25 11:16, Stefano Garzarella wrote:
-> On Tue, Jan 14, 2025 at 01:09:24AM +0100, Michal Luczaj wrote:
->> On 1/13/25 16:01, Stefano Garzarella wrote:
->>> On Mon, Jan 13, 2025 at 02:51:58PM +0100, Michal Luczaj wrote:
->>>> On 1/13/25 12:05, Stefano Garzarella wrote:
->>>>> ...
->>>>> An alternative approach, which would perhaps allow us to avoid all this,
->>>>> is to re-insert the socket in the unbound list after calling release()
->>>>> when we deassign the transport.
->>>>>
->>>>> WDYT?
->>>>
->>>> If we can't keep the old state (sk_state, transport, etc) on failed
->>>> re-connect() then reverting back to initial state sounds, uhh, like an
->>>> option :) I'm not sure how well this aligns with (user's expectations of)
->>>> good ol' socket API, but maybe that train has already left.
->>>
->>> We really want to behave as similar as possible with the other sockets,
->>> like AF_INET, so I would try to continue toward that train.
->>
->> I was worried that such connect()/transport error handling may have some
->> user visible side effects, but I guess I was wrong. I mean you can still
->> reach a sk_state=TCP_LISTEN with a transport assigned[1], but perhaps
->> that's a different issue.
->>
->> I've tried your suggestion on top of this series. Passes the tests.
-> 
-> Great, thanks!
-> 
->>
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index fa9d1b49599b..4718fe86689d 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -492,6 +492,10 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
->> 		vsk->transport->release(vsk);
->> 		vsock_deassign_transport(vsk);
->>
->> +		vsock_addr_unbind(&vsk->local_addr);
->> +		vsock_addr_unbind(&vsk->remote_addr);
-> 
-> My only doubt is that if a user did a specific bind() before the
-> connect, this way we're resetting everything, is that right?
+On Tue, Jan 14, 2025, Binbin Wu wrote:
+> On 1/14/2025 1:16 AM, Sean Christopherson wrote:
+> > On Mon, Jan 13, 2025, Binbin Wu wrote:
+> > > Summary about APICv inhibit reasons:
+> > > APICv could still be disabled runtime in some corner case, e.g,
+> > > APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED due to memory allocation fai=
+lure.
+> > > After checking enable_apicv in tdx_bringup(), apic->apicv_active is
+> > > initialized as true in kvm_create_lapic().=C2=A0 If APICv is inhibite=
+d due to any
+> > > reason runtime, the refresh_apicv_exec_ctrl() callback could be used =
+to check
+> > > if APICv is disabled for TDX, if APICv is disabled, bug the VM.
+> > I _think_ this is a non-issue, and that KVM could do KVM_BUG_ON() if AP=
+ICv is
+> > inihibited by kvm_recalculate_apic_map() for a TDX VM.  x2APIC is manda=
+tory
+> > (KVM_APIC_MODE_MAP_DISABLED and "APIC_ID modified" impossible), KVM emu=
+lates
+> > APIC_ID as read-only for x2APIC mode (physical aliasing impossible), an=
+d LDR is
+> > read-only for x2APIC (logical aliasing impossible).
+>=20
+> For logical aliasing, according to the KVM code, it's only relevant to
+> AMD's AVIC. It's not set in VMX_REQUIRED_APICV_INHIBITS.
 
-That is right.
+Ah, right.
 
-But we aren't changing much. Transport release already removes vsk from
-vsock_bound_sockets. So even though vsk->local_addr is untouched (i.e.
-vsock_addr_bound() returns `true`), vsk can't be picked by
-vsock_find_bound_socket(). User can't bind() it again, either.
+> Is the reason AVIC using logical-id-addressing while APICv using
+> physical-id-addressing for IPI virtualization?
 
-And when patched as above: bind() works as "expected", but socket is pretty
-much useless, anyway. If I'm correct, the first failing connect() trips
-virtio_transport_recv_connecting(), which sets `sk->sk_err`. I don't see it
-being reset. Does the vsock suppose to keep sk_err state once set?
+Ya, more or less.  AVIC supports virtualizing both physical and logical IPI=
+s,
+APICv only supports physical.
 
-Currently only AF_VSOCK throws ConnectionResetError:
-```
-from socket import *
+> > To ensure no physical aliasing, KVM would need to require KVM_CAP_X2API=
+C_API be
+> > enabled, but that should probably be required for TDX no matter what.
+> There is no physical aliasing when APIC is in x2apic mode, vcpu_id is use=
+d
+> anyway.
 
-def test(family, addr):
-	s = socket(family, SOCK_STREAM)
-	assert s.connect_ex(addr) != 0
-
-	lis = socket(family, SOCK_STREAM)
-	lis.bind(addr)
-	lis.listen()
-	s.connect(addr)
-
-	p, _ = lis.accept()
-	p.send(b'x')
-	assert s.recv(1) == b'x'
-
-test(AF_INET, ('127.0.0.1', 2000))
-test(AF_UNIX, '\0/tmp/foo')
-test(AF_VSOCK, (1, 2000)) # VMADDR_CID_LOCAL
-```
-
-> Maybe we need to look better at the release, and prevent it from
-> removing the socket from the lists as you suggested, maybe adding a
-> function in af_vsock.c that all transports can call.
-
-I'd be happy to submit a proper patch, but it would be helpful to decide
-how close to AF_INET/AF_UNIX's behaviour is close enough. Or would you
-rather have that UAF plugged first?
-
+Yeah, ignore this, I misremembered the effects of KVM_CAP_X2APIC_API.
 
