@@ -1,267 +1,277 @@
-Return-Path: <kvm+bounces-35401-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35402-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C20A10DCE
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:31:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D557A10DDC
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D8B53A1E79
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 17:31:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E4B71883CD2
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 17:34:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17AD81F9F66;
-	Tue, 14 Jan 2025 17:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5291F942B;
+	Tue, 14 Jan 2025 17:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rdLuGh0Q"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j+wJxt4b"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2085.outbound.protection.outlook.com [40.107.223.85])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623DB3C3C;
-	Tue, 14 Jan 2025 17:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736875870; cv=fail; b=PaVNB4Ai+xlpzDs52MgLr3wpyoPKSVDXaU2fB46q8G0QgnRF6A/sO88RjCj4zIziOC+Du4ILLY1DS8YTwY3OHfAaW7bDj092BpuoLqzS4J/lQN2MwxLZqGtEUKlbwvpJM8SvvmF0kYu1emaBd5NkePF5IfkfdnYJUxX2sfLQhMg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736875870; c=relaxed/simple;
-	bh=NPC8ZLx/mu4RqXa4YmBVMQT4PMeGVhNV8fHvywSdH4s=;
-	h=Date:From:To:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=VhvDfpDeiAmCnVAktiZmXwvlEd7yITtHnMr7b7m/zA/OPZ1mosSM+VsJrtjOuArThXEs58ytv23BGe6lE5fgMbzeHjr8aWXeOhFHYvq21JA8m/maarxyMSIW5G7dH25r6DfDMGxnr0sMc6lNUuvvJPjq8wAgsFcMYY6H8+SagIg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rdLuGh0Q; arc=fail smtp.client-ip=40.107.223.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HQcVfjDiauhuDDCxXCsk2lpGIK4n8/QASQHVKjdfE5VgMC8sjsKAg3EGlmGDjLeBip2Lsc06hkcG2U8iS7sh0BTUcvxYXIJwBhmT9lTnSRNi0c7PA+ZhPad6ieRBYYFt3YHzENqDlWVcv6w03KbZGe8WcY4GBm4P/+UQg6Dfubg+YXYoOQtJ3r3CXt7Gozp3A14rB8IQeErGX/DRGDEUu9jWyt15qFq4eAUkCrUcZynRkGorBGwJ6ihj381XqFb7Nm3BEwhAcgtcugp8sW1bZrTsYm2Y9zSGCTA1tFwDJknzJxGs2KIMzUrwiOjRjW0uoHzExjpyiGO60XVnyCiO6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wwPXVop7yZOoYa/6nTb1Si4es1VE81yC65xUpTFdGqw=;
- b=OzMt36SqMqtZ56mPzWYOIXrKBeBICCl+EE9dkx+780jDlmQ9GyRNivargJUzUXOL71G0bGbCL5pcC8VioCShgg2fp64lIdhD6+IYhDlju6ChBD8TIuaFXBk3DU9BVLUxterPlkx6Y/SuRg2KINDFOursVKWiLMninGFDSay3aK6F+PyIACksx7k333ErtfN8RYWfSUAMYqnLnZJcgdO/Qbl6poUEWh4l0D7oBfcEOb9Vspl5OTrwDViXnO8JvJosq5jBEJtCleGzrEhq1Unsd92TrZgKqEm25wFw+/2fdwMORTn/lb3hYPwhwCZu+o47ZsoaxLU5YQwok1sV+cnZyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wwPXVop7yZOoYa/6nTb1Si4es1VE81yC65xUpTFdGqw=;
- b=rdLuGh0QwUKNs/U391sKewNYTrHAoczH9ns3FKazfXUxze6aY6MteHhYMsPwmEI8NCfqqWhByYvaG3qSqF4H/JxbiQapjDd32w8Pe9tSDveavQQCc9ZRu7HUvM3G0k2BdeB3eNecTsfIoqbS70zpbS4iDVTB23utoWqqQ1WM79NTK0dgqXQUkgAsf6AAhZElLLvlvth5KdDjf2Jwo2edDdiDzrEIuzOtLIotBe3iIUJr6QM0ZkW/nq76XWAHeG4AezLoy9FjzrbM4nqYZai50b9peZRGJOoV+IzBe51V98eOqAoyfSzuUtNAiKuOoPbeu9HzPxalLbeN5zhga2pyrQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by BL3PR12MB6595.namprd12.prod.outlook.com (2603:10b6:208:38e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Tue, 14 Jan
- 2025 17:31:04 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8335.017; Tue, 14 Jan 2025
- 17:31:04 +0000
-Date: Tue, 14 Jan 2025 13:31:03 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, pbonzini@redhat.com, seanjc@google.com,
-	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
-	dan.j.williams@intel.com, aik@amd.com, yilun.xu@intel.com,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, yan.y.zhao@intel.com, leon@kernel.org,
-	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
- kAPI
-Message-ID: <20250114173103.GE5556@nvidia.com>
-References: <20250108145843.GR5556@nvidia.com>
- <5a858e00-6fea-4a7a-93be-f23b66e00835@amd.com>
- <20250108162227.GT5556@nvidia.com>
- <Z37HpvHAfB0g9OQ-@phenom.ffwll.local>
- <Z37QaIDUgiygLh74@yilunxu-OptiPlex-7050>
- <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
- <Z38FCOPE7WPprYhx@yilunxu-OptiPlex-7050>
- <Z4F2X7Fu-5lprLrk@phenom.ffwll.local>
- <20250110203838.GL5556@nvidia.com>
- <Z4Z4NKqVG2Vbv98Q@phenom.ffwll.local>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z4Z4NKqVG2Vbv98Q@phenom.ffwll.local>
-X-ClientProxiedBy: MN0PR02CA0016.namprd02.prod.outlook.com
- (2603:10b6:208:530::14) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6FE232456;
+	Tue, 14 Jan 2025 17:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736876072; cv=none; b=oumIribbcAudV5sn2gzQQNn3eCxFAYVanISB3h7ioj20sqN+5f6tLDCp5fmdOXSl05B3ZgQ+kBN1C+9AGc1ttw7CyG0vyE5GpSXXP69UQRcEmle7ys4Vz0QkYbHpyVxGETpYq910ID3MtirRf8Cu0LjrvQ43xIIzAn1G/LiodR4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736876072; c=relaxed/simple;
+	bh=4tgaV7/QtrKgElOy9K+p5OVZbHsWTACK89D/RKmpThA=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:Cc:
+	 References:In-Reply-To; b=K3tu+St9fgbdw1NikacS+Lv3fB46ilvkcuJgZj1fDsuqNLJmb0dRBs60+ThOsRsPrPROlp9NbKmnF8QHl+XIRaYBujqqa3UGzMcHNz9HnvJkg7LxAH89kTIbb26X3WcwJq1nlN6MJ45Wy4L7FJ9Y6hjcK0hFGcXhPfgRF/MHhjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=j+wJxt4b; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50E85kwm021279;
+	Tue, 14 Jan 2025 17:34:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=PNvI0X
+	lnsWUDByEi1VYVg759l+9FP1k7j5lMBB/ivQE=; b=j+wJxt4be0gPCD8PwJAqsk
+	M4IArifBAlyKBYRuIKgoOAYKidNRsaGjgNAsG5I3W/bAOeZfLV9+Vfqrub+Q6HCD
+	8prJ3j6KEbJxPx4v6qC3V0k5uJqD44G/dXP3o00plJwPAr9+VTkwDpFgfUMDzZ0X
+	BhxTuOiqseuvWK6tTVcZVl0+x4dHqe2xWRhZASMmiKC/CKGs+2m/0L85aqvJStf8
+	CiS2/WwZGyqkaxZyI9DmGD5p/lTkwWkTy8gstWUgTTVmZq4LWDdWPCKJ4hz1PsSz
+	lxGYXdECoH7SINpKSf0SKzICTPnGhau9Dd4x0g+7hf35QeetrZ409JDMQpWkwoPQ
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 445m432b0c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jan 2025 17:34:24 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50EE0eqW007519;
+	Tue, 14 Jan 2025 17:34:23 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443yn48th-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jan 2025 17:34:23 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50EHYJeF50397662
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 14 Jan 2025 17:34:19 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 61C7820043;
+	Tue, 14 Jan 2025 17:34:19 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3433D20040;
+	Tue, 14 Jan 2025 17:34:19 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.93.160])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 14 Jan 2025 17:34:19 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|BL3PR12MB6595:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9c4e0af-fe6a-405b-9044-08dd34c138d8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?XNt4fLehHId82BQXADJXY5MO7x5KJx2kFPGK2TRPewYznR9+z1WdloyFufSw?=
- =?us-ascii?Q?2OwB2+t2ZLeOa5WrEEq++uPG8/ZjZvt0ieHp6gnxmkAa1FA7q1zxPg1QE1d8?=
- =?us-ascii?Q?cBQHVosv1fmmY9U0P6R/vVSl5sRkQOfDFBAOgbRUmBcv/oBfB2Z2SF+b8FQG?=
- =?us-ascii?Q?RqdIhKl+LPfDuU9aefWGYoH8pw+VqwdCynYnCN5dhRn/HluqcpHKbH8+ZVa+?=
- =?us-ascii?Q?M5ITPVe6BcfGqggFTEH4yfDoaAywkH9+0+2rzxgmzNdk18lequwApPxqiOy9?=
- =?us-ascii?Q?J+tCtdaiGggqLiJ+yDhbnMf95yl7XcaWVve8xXq9/mHixcPV6HMB4Tz7dB+p?=
- =?us-ascii?Q?WlRHKdtvLSvTrgVtBmvNaxIL5sKxp2TfaXYGQjWk6gWmNAsE92VAifpO5dwi?=
- =?us-ascii?Q?8sZM5dCsAsNUXqsA8ulEPRw0uzCkiJRg7nPNL2mWB7bw6XHpo754yWcB4JJZ?=
- =?us-ascii?Q?eYPtCmE+MBLJrbNezkUrMYzrZ8MK3kxiGqQ7+dFvhukH7wSwADBVqde2RSbr?=
- =?us-ascii?Q?JgF2lyo3Dbtl/bYz5eHP52thQHszjJ627zRd7dFdPrsauUj8Hbaydz/L/dq3?=
- =?us-ascii?Q?fXBFJgj7LMbpTbCbBj7x+xlz0uuJSXywFpMEes3E02x3H3SrrFJl1q0CKlP5?=
- =?us-ascii?Q?GSId/j1hRdZ30q2sM+GOTuGdlDPV+9SJdeuapDpyqq9Pe/wJ/nruUprayZFI?=
- =?us-ascii?Q?UaV2Gv8fkNA2SM9IPRdjv3pxPSiieRPpgIyPjfYvkjI35xOTgkHDCDgYPLIz?=
- =?us-ascii?Q?Y2DDOlaZNtFylVDzZ+YB15V1AuLOoi4lmzQ7mUHAjZ2l0DF0oake7+GrcmMs?=
- =?us-ascii?Q?pvDhFxdgEMOx/Td66yRNTyxLvgV8q+w2usGciMKaF2YGqzRqN10tldvZBi/K?=
- =?us-ascii?Q?kE7zuD35dbQt5qO/Ol2sQX6KrPT6itcO/ig8CWOFUY0OhAbEknOvMPQoWy2+?=
- =?us-ascii?Q?cZDn+2LB/rC2bgcAddUZ7RLDkWCVeSfe6OUU383THQPuF8KyRZCIlA3IMSEm?=
- =?us-ascii?Q?aJ3v2FHkASnoAOw4reXga5j/9COQSXRlEaKna+KagpqIwdQcDbrkR8/ujlVi?=
- =?us-ascii?Q?zOTclYdA3PK9z+jl30ExFKwLvH3YWrEFZZSmJklibocM18oprwIpx9JsVVq3?=
- =?us-ascii?Q?NfcuCsWhgys/4DHopb77Cn6ARt3z0LklhIYDfO2t+XRSAiPP1k1JXmul9bAF?=
- =?us-ascii?Q?xJC7sPXoAYZP3OQWOrLgIpngW61ru3U70CUe4bc/DKHDA8Bz6rhaPfI0YxEw?=
- =?us-ascii?Q?eaZEpRt19hyJlEehhoayGS1F7iy7UBKiFOi4ZiM92Pks2J+q4om8IbCY5emx?=
- =?us-ascii?Q?+lnP7WOt2sMfv2XOqKllf6v4NmcU63YDrJ8UtPrOAcKm4NTu2YeRL/6O7QL4?=
- =?us-ascii?Q?U6Iq9bH97zukRMfXWQX+go0/2/yc1ILGouxn05TIP7ZN5lOS7t7od/6skbx3?=
- =?us-ascii?Q?1HLTHRD8RjI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?4Gw9k2OyGF3acFkHI3B8Cq6AFJHBd8k9DOVB/9ixUvvzO2pirryZRl7T2dit?=
- =?us-ascii?Q?mroI1bS9IFR8LFuWP11q4UTKchTHBOL/rMc6z1VK7/C/LSyS595lljuG1M0X?=
- =?us-ascii?Q?rcYVusFLqhz68DUltin/u9HJGuzhmsoq3HKTyuDFdgMqc1pRKEIKgbA1zCYl?=
- =?us-ascii?Q?8ydU+ePyjP95J5VxAQyUZCpk8iuvV6WA+CwPaI/L4jZi6/SnQYE1oFKc6+S4?=
- =?us-ascii?Q?dFabyzKXytjgWxsARWPiaZ+x0LAt0TIcWlspIGHnEra+GCrePYV73sLUILFu?=
- =?us-ascii?Q?e2O1zr5FX9V4HL7MwNfBmNdIllySpQGRsPjKMkNlEk/8mEx+7+rxCbHZ5TLb?=
- =?us-ascii?Q?tQiZrdoTQebQ7bVh1wxoKcgThdX+kpsBa5yyJrioXXiCVpd69VqigBsNHkxh?=
- =?us-ascii?Q?s9ZDgUkiTqpHE1w7eeoFtNOPG42Rr5OGFEZWJZGSZaCa44GB8DHCeFVqzunP?=
- =?us-ascii?Q?8DZKrAITduMWt6z1i4xqUg7DBmKeYPPoUqNFs3cS9iZ6JtqtMVQeiFQoN36O?=
- =?us-ascii?Q?u6rm2wI9240vEp8tlzWens5XAGjE7ygqhygcO/CIeZl5ZoZMEgMWu72JLk+/?=
- =?us-ascii?Q?H0eHplHOP8vdPUd9pBmgFe1sATKo+Nt/yc1uMHCbZ5QIfLR9f9DlRjx28AYH?=
- =?us-ascii?Q?kBzTpLbPeG2ySSPJCOFb3d/Rgg5CkHjUCwvEMXjVzeXzx3/gkKFGt7YbSaND?=
- =?us-ascii?Q?LPwsSc2NXQv/KQgGNJOuZDFwXLXZr933EqctveL3ZuYKAqtKMWm3sqSrNQIe?=
- =?us-ascii?Q?mQmb7sHCIqafabcD4lZwWVE1HevDR3jxmrumPE61tq0LLbmFRd8LAEJ2RgpU?=
- =?us-ascii?Q?PgyOGRrruoYRjWOrxIflrUPoPicahjgZ8viDJ0c1cWl5tDuAed/4iiPiQsEq?=
- =?us-ascii?Q?GoTdr/Ln/UD49KWT+H5sX/ioF6OqxqGh2+GrsMfZxs8BPpDzlObolvwv6nyc?=
- =?us-ascii?Q?3VNR/bv3xiPZ1IOOtpOlhOIErgJ0faMx62f4Uf002mrYB5c7V4TRY6johvoV?=
- =?us-ascii?Q?bVwH57/2xRlSeC7U0owXOnEHy47Dpl+Y7p2nbWcWzFlPTa2E9Qv1iacBpJyK?=
- =?us-ascii?Q?xlJYpXV7NjzKaMmbQy/AxW293F9gJCKagU17CV8JfIM7moN9NAc1Q3t9c5oq?=
- =?us-ascii?Q?SrfOaXrOsAYSdp7RCbk2WhGlXsCtoDKRGuydfYxreCiukLDP5GJA9ZwBTOBt?=
- =?us-ascii?Q?TFpTQFwlX9hhc8vmqRkMlQMPoWjtVj5SZVe8FywJqgLc2CLKMByEVDBh+9VU?=
- =?us-ascii?Q?9CizvHyo1aimHOG/WU41iBl6Bnt5wyB4SRPljOVZMns6Hy2K+zHlEcD4/Jn8?=
- =?us-ascii?Q?FOB3UJH8gNunjG5+oq1vWunIGs7MKK2Ni5cPxH3sA1iO4LYjGfPQmr9bxhfn?=
- =?us-ascii?Q?eqiuIHyt//ZumCSGeKQ/GPZsTlPXGhj1ePFgWgyFd0pp/i/IIRKkSzDhvDG1?=
- =?us-ascii?Q?R3oAArLS3ztkl5vx9ieE84lVqWB9NqTnTsBriLrLx4GVO0GIy42/0/qFqhe2?=
- =?us-ascii?Q?TmU0rt2xeK53WBmLCJabBnWNRbqWhz1W2Wvw0EGxnLHZkz8wL/gPXxseLohl?=
- =?us-ascii?Q?JF9odQZjv9/SFekbTlba32Q3oAwEe/7YU1jJxXVk?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9c4e0af-fe6a-405b-9044-08dd34c138d8
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2025 17:31:04.5955
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: j9CFajaXP4oh2gxVEtjK8vdlsZ+CCARgwVUclBHdwKwr2sUJlOQTQOWp1v96qqYP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6595
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 14 Jan 2025 18:34:13 +0100
+Message-Id: <D71Z6BW4A19F.3OQIPSERFIUCH@linux.ibm.com>
+To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v1 03/13] KVM: s390: use __kvm_faultin_pfn()
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, <frankja@linux.ibm.com>,
+        <borntraeger@de.ibm.com>, <david@redhat.com>, <willy@infradead.org>,
+        <hca@linux.ibm.com>, <svens@linux.ibm.com>, <agordeev@linux.ibm.com>,
+        <gor@linux.ibm.com>, <nrb@linux.ibm.com>, <nsg@linux.ibm.com>
+X-Mailer: aerc 0.18.2
+References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
+ <20250108181451.74383-4-imbrenda@linux.ibm.com>
+In-Reply-To: <20250108181451.74383-4-imbrenda@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 0RMxoIUluzqHNTirAazitC6qlxoNK_AS
+X-Proofpoint-GUID: 0RMxoIUluzqHNTirAazitC6qlxoNK_AS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ bulkscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501140134
 
-On Tue, Jan 14, 2025 at 03:44:04PM +0100, Simona Vetter wrote:
+On Wed Jan 8, 2025 at 7:14 PM CET, Claudio Imbrenda wrote:
+> Refactor the existing page fault handling code to use __kvm_faultin_pfn()=
+.
+>
+> This possible now that memslots are always present.
+>
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 92 +++++++++++++++++++++++++++++++---------
+>  arch/s390/mm/gmap.c      |  1 +
+>  2 files changed, 73 insertions(+), 20 deletions(-)
 
-> E.g. if a compositor gets a dma-buf it assumes that by just binding that
-> it will not risk gpu context destruction (unless you're out of memory and
-> everything is on fire anyway, and it's ok to die). But if a nasty client
-> app supplies a revocable dma-buf, then it can shot down the higher
-> priviledged compositor gpu workload with precision. Which is not great, so
-> maybe existing dynamic gpu importers should reject revocable dma-buf.
-> That's at least what I had in mind as a potential issue.
+With nits resolved:
 
-I see, so it is not that they can't handle a non-present fault it is
-just that the non-present effectively turns into a crash of the
-context and you want to avoid the crash. It makes sense to me to
-negotiate this as part of the API.
+Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
-> > This is similar to the structure BIO has, and it composes nicely with
-> > a future pin_user_pages() and memfd_pin_folios().
-> 
-> Since you mention pin here, I think that's another aspect of the revocable
-> vs dynamic question. Dynamic buffers are expected to sometimes just move
-> around for no reason, and importers must be able to cope.
+>
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 797b8503c162..8e4e7e45238b 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4794,11 +4794,66 @@ static void kvm_s390_assert_primary_as(struct kvm=
+_vcpu *vcpu)
+>  		current->thread.gmap_int_code, current->thread.gmap_teid.val);
+>  }
+> =20
+> +static int kvm_s390_handle_dat_fault(struct kvm_vcpu *vcpu, gfn_t gfn, g=
+pa_t gaddr,
+> +				     unsigned int flags)
+> +{
+> +	struct kvm_memory_slot *slot;
+> +	unsigned int fault_flags;
+> +	bool writable, unlocked;
+> +	unsigned long vmaddr;
+> +	struct page *page;
+> +	kvm_pfn_t pfn;
+> +	int rc;
+> +
+> +	slot =3D kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> +	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+> +		return vcpu_post_run_addressing_exception(vcpu);
+> +
+> +	fault_flags =3D flags & FOLL_WRITE ? FAULT_FLAG_WRITE : 0;
+> +	if (vcpu->arch.gmap->pfault_enabled)
+> +		flags |=3D FOLL_NOWAIT;
+> +	vmaddr =3D __gfn_to_hva_memslot(slot, gfn);
+> +
+> +try_again:
+> +	pfn =3D __kvm_faultin_pfn(slot, gfn, flags, &writable, &page);
+> +
+> +	/* Access outside memory, inject addressing exception */
+> +	if (is_noslot_pfn(pfn))
+> +		return vcpu_post_run_addressing_exception(vcpu);
+> +	/* Signal pending: try again */
+> +	if (pfn =3D=3D KVM_PFN_ERR_SIGPENDING)
+> +		return -EAGAIN;
+> +
+> +	/* Needs I/O, try to setup async pfault (only possible with FOLL_NOWAIT=
+) */
+> +	if (pfn =3D=3D KVM_PFN_ERR_NEEDS_IO) {
+> +		trace_kvm_s390_major_guest_pfault(vcpu);
+> +		if (kvm_arch_setup_async_pf(vcpu))
+> +			return 0;
+> +		vcpu->stat.pfault_sync++;
+> +		/* Could not setup async pfault, try again synchronously */
+> +		flags &=3D ~FOLL_NOWAIT;
+> +		goto try_again;
+> +	}
+> +	/* Any other error */
+> +	if (is_error_pfn(pfn))
+> +		return -EFAULT;
+> +
+> +	/* Success */
+> +	mmap_read_lock(vcpu->arch.gmap->mm);
+> +	/* Mark the userspace PTEs as young and/or dirty, to avoid page fault l=
+oops */
+> +	rc =3D fixup_user_fault(vcpu->arch.gmap->mm, vmaddr, fault_flags, &unlo=
+cked);
+> +	if (!rc)
+> +		rc =3D __gmap_link(vcpu->arch.gmap, gaddr, vmaddr);
+> +	kvm_release_faultin_page(vcpu->kvm, page, false, writable);
+> +	mmap_read_unlock(vcpu->arch.gmap->mm);
+> +	return rc;
+> +}
+> +
+>  static int vcpu_post_run_handle_fault(struct kvm_vcpu *vcpu)
+>  {
+> +	unsigned long gaddr, gaddr_tmp;
+>  	unsigned int flags =3D 0;
+> -	unsigned long gaddr;
+> -	int rc =3D 0;
+> +	gfn_t gfn;
+> =20
+>  	gaddr =3D current->thread.gmap_teid.addr * PAGE_SIZE;
+>  	if (kvm_s390_cur_gmap_fault_is_write())
+> @@ -4850,29 +4905,26 @@ static int vcpu_post_run_handle_fault(struct kvm_=
+vcpu *vcpu)
+>  	case PGM_REGION_SECOND_TRANS:
+>  	case PGM_REGION_THIRD_TRANS:
+>  		kvm_s390_assert_primary_as(vcpu);
+> -		if (vcpu->arch.gmap->pfault_enabled) {
+> -			rc =3D gmap_fault(vcpu->arch.gmap, gaddr, flags | FAULT_FLAG_RETRY_NO=
+WAIT);
+> -			if (rc =3D=3D -EFAULT)
+> -				return vcpu_post_run_addressing_exception(vcpu);
+> -			if (rc =3D=3D -EAGAIN) {
+> -				trace_kvm_s390_major_guest_pfault(vcpu);
+> -				if (kvm_arch_setup_async_pf(vcpu))
+> -					return 0;
+> -				vcpu->stat.pfault_sync++;
+> -			} else {
+> -				return rc;
+> -			}
+> -		}
+> -		rc =3D gmap_fault(vcpu->arch.gmap, gaddr, flags);
+> -		if (rc =3D=3D -EFAULT) {
+> -			if (kvm_is_ucontrol(vcpu->kvm)) {
+> +
+> +		gfn =3D gpa_to_gfn(gaddr);
+> +		if (kvm_is_ucontrol(vcpu->kvm)) {
+> +			/*
+> +			 * This translates the per-vCPU guest address into a
+> +			 * fake guest address, which can then be used with the
+> +			 * fake memslots that are identity mapping userspace.
+> +			 * This allows ucontrol VMs to use the normal fault
+> +			 * resolution path, like normal VMs.
+> +			 */
+> +			gaddr_tmp =3D gmap_translate(vcpu->arch.gmap, gaddr);
+> +			if (gaddr_tmp =3D=3D -EFAULT) {
+>  				vcpu->run->exit_reason =3D KVM_EXIT_S390_UCONTROL;
+>  				vcpu->run->s390_ucontrol.trans_exc_code =3D gaddr;
+>  				vcpu->run->s390_ucontrol.pgm_code =3D 0x10;
 
-Yes, and we have importers that can tolerate dynamic and those that
-can't. Though those that can't tolerate it can often implement revoke.
+nit: s/0x10/PGM_SEGMENT_TRANSLATION/
 
-I view your list as a cascade:
- 1) Fully pinned can never be changed so long as the attach is present
- 2) Fully pinned, but can be revoked. Revoked is a fatal condition and
-    the importer is allowed to experience an error
- 3) Fully dynamic and always present. Support for move, and
-    restartable fault, is required
+>  				return -EREMOTE;
+>  			}
+> -			return vcpu_post_run_addressing_exception(vcpu);
+> +			gfn =3D gpa_to_gfn(gaddr_tmp);
+>  		}
+> +		return kvm_s390_handle_dat_fault(vcpu, gfn, gaddr, flags);
+>  		break;
 
-Today in RDMA we ask the exporter if it is 1 or 3 and allow different
-things. I've seen the GPU side start to offer 1 more often as it has
-significant performance wins.
+nit: Remove the break after the return here?
 
-> For recovable exporters/importers I'd expect that movement is not
-> happening, meaning it's pinned until the single terminal revocation. And
-> maybe I read the kvm stuff wrong, but it reads more like the latter to me
-> when crawling through the pfn code.
+>  	default:
+>  		KVM_BUG(1, vcpu->kvm, "Unexpected program interrupt 0x%x, TEID 0x%016l=
+x",
+> @@ -4880,7 +4932,7 @@ static int vcpu_post_run_handle_fault(struct kvm_vc=
+pu *vcpu)
+>  		send_sig(SIGSEGV, current, 0);
+>  		break;
+>  	}
+> -	return rc;
+> +	return 0;
+>  }
+> =20
+>  static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index 16b8a36c56de..3aacef77c174 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -605,6 +605,7 @@ int __gmap_link(struct gmap *gmap, unsigned long gadd=
+r, unsigned long vmaddr)
+>  	radix_tree_preload_end();
+>  	return rc;
+>  }
+> +EXPORT_SYMBOL(__gmap_link);
+> =20
+>  /**
+>   * fixup_user_fault_nowait - manually resolve a user page fault without =
+waiting
 
-kvm should be fully faultable and it should be able handle move. It
-handles move today using the mmu notifiers after all.
-
-kvm would need to interact with the dmabuf reservations on its page
-fault path.
-
-iommufd cannot be faultable and it would only support revoke. For VFIO
-revoke would not be fully terminal as VFIO can unrevoke too
-(sigh).  If we make revoke special I'd like to eventually include
-unrevoke for this reason.
-
-> Once we have the lifetime rules nailed then there's the other issue of how
-> to describe the memory, and my take for that is that once the dma-api has
-> a clear answer we'll just blindly adopt that one and done.
-
-This is what I hope, we are not there yet, first Leon's series needs
-to get merged then we can start on making the DMA API P2P safe without
-any struct page. From there it should be clear what direction things
-go in.
-
-DMABUF would return pfns annotated with whatever matches the DMA API,
-and the importer would be able to inspect the PFNs to learn
-information like their P2Pness, CPU mappability or whatever.
-
-I'm pushing for the extra struct, and Christoph has been thinking
-about searching a maple tree on the PFN. We need to see what works best.
-
-> And currently with either dynamic attachments and dma_addr_t or through
-> fishing the pfn from the cpu pagetables there's some very clearly defined
-> lifetime and locking rules (which kvm might get wrong, I've seen some
-> discussions fly by where it wasn't doing a perfect job with reflecting pte
-> changes, but that was about access attributes iirc). 
-
-Wouldn't surprise me, mmu notifiers are very complex all around. We've
-had bugs already where the mm doesn't signal the notifiers at the
-right points.
-
-> If we add something
-> new, we need clear rules and not just "here's the kvm code that uses it".
-> That's how we've done dma-buf at first, and it was a terrible mess of
-> mismatched expecations.
-
-Yes, that would be wrong. It should be self defined within dmabuf and
-kvm should adopt to it, move semantics and all.
-
-My general desire is to move all of RDMA's MR process away from
-scatterlist and work using only the new DMA API. This will save *huge*
-amounts of memory in common workloads and be the basis for non-struct
-page DMA support, including P2P.
-
-Jason
 
