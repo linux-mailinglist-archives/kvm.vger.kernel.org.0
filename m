@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-35426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35427-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3497DA10F1E
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:06:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C15DA10F27
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:06:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 450B81652DE
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:06:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C236168788
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ADF1208969;
-	Tue, 14 Jan 2025 18:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D1A20C488;
+	Tue, 14 Jan 2025 18:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxSKU6z7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jNjvARNs"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C7220AF6F
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EE3213232
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736877730; cv=none; b=AeUDQlMZTowJ5tQ7Un5wWT6c5J9MXNllyamI6P1THnJoiRw/y0GvoMXvLbUzjeUD4otQ1aJZpASblCyUawjLj8avyp0ZULlMpp78h5LazouXkHSWrLmMR0XWdQ7fyvuKFE2kZHP/ohimN43vrnD/dljjPgXkjZngX1WGjjBlDo4=
+	t=1736877741; cv=none; b=WdwBrikaYkHyC8Co79gIBTZ0zBYEtap6QZ7VbVX5zKrmYkYKJKj1XRgpn1qI/uOjq+9yHKpHYZSTxwCl7JJ+zbEgWribx/aAEFRyO5AqnlCAPnZ4x+vYzamPpJBLu2Bu16A4bnl1c9H11T2DGILsaaeUczKtDihxWRbCbmfE+MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736877730; c=relaxed/simple;
-	bh=02mHBWRuwn/OIVOqAwedkJUDkIsdyWaT9+VtGiHS9EM=;
+	s=arc-20240116; t=1736877741; c=relaxed/simple;
+	bh=V2qSZpRC+ZRT9R3q5LnXVqhI8sIbniJ7vN+Cq1hcgu4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R7MSESn9GqysJVu/ECoSIemtusop/N3GoXCdudsAztCA+1j8E54RIvoynz4biGD/yETxq5xBpzwBYfMr4Cbl015o2igwDtqcXafSrhhCDxEEz5Kc0UfBKNtnCRLBaeYw1YJWfKN9wWKc1L/fJfr+hXsEBsHR6bOabHsfcTOqsg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JxSKU6z7; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=hbDhJ5Egn/67paLLHfG/jNGp5F5eHXIFkbZnmzLXrtOboimyUbIpXlPKx7zQOtzuopsMxFOuLJ4EM6R6QKLQ3vqH0K5YygdLI99JmmYMqiW0LMgJxANfELlqZc+8YpnLbBzHx0Yiy5U7ed8M5BEvWse2Q8J6k8kFnsO1l03zpt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jNjvARNs; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736877727;
+	s=mimecast20190719; t=1736877739;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KdPtt6PQsN+ylVvy58F0NcuUnOqkUWc+oSjD61c8P1k=;
-	b=JxSKU6z7TIUqS5xF4LeFICqGkb1QmGYALJ0WYaKdh6VVKfTpANtqbGiccJx+uXOQi8543F
-	ba6YlmI9mKvGBqvDECDOmo8+X/AK90wr7qj+YrVmBXprmsVQBNxs1rdHeiLk7g8tjQmdsH
-	BqHvU8nVSQ+oCi7uBaKOLzyieZRE3+s=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=cNwCh5fgGoJuTFO9fvGqFny78uJkIQRICFisC3zeCIo=;
+	b=jNjvARNsZuN+n8Ze+p/qKMsEoF5qDScIfU6QXIDtPMB+Vh7R6P+uZ2GC/NaBwiKT1Kly7E
+	fcbJ6mwmu0eVSiiHtRreSOk2zfHf5DBeVj2SmNpI1TlqS/xyTleWW1OhjtqiPT2w4IxoIr
+	J1bOkqHdp1gwgRIBMCZZCIvB5nB/tFs=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-518-cs0jRgydMTW_3xbdYVeS2w-1; Tue,
- 14 Jan 2025 13:02:03 -0500
-X-MC-Unique: cs0jRgydMTW_3xbdYVeS2w-1
-X-Mimecast-MFC-AGG-ID: cs0jRgydMTW_3xbdYVeS2w
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-230-RjarLQpsMFScdKhdOdyibw-1; Tue,
+ 14 Jan 2025 13:02:13 -0500
+X-MC-Unique: RjarLQpsMFScdKhdOdyibw-1
+X-Mimecast-MFC-AGG-ID: RjarLQpsMFScdKhdOdyibw
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E1CD319772CA;
-	Tue, 14 Jan 2025 18:01:45 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E0C941955DBA;
+	Tue, 14 Jan 2025 18:02:08 +0000 (UTC)
 Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.192.55])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F01A195E3EA;
-	Tue, 14 Jan 2025 18:01:23 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 61C7C195608A;
+	Tue, 14 Jan 2025 18:01:46 +0000 (UTC)
 From: Valentin Schneider <vschneid@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
@@ -146,9 +146,9 @@ Cc: Juergen Gross <jgross@suse.com>,
 	Luis Chamberlain <mcgrof@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>,
 	Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: [PATCH v4 21/30] context_tracking: Explicitely use CT_STATE_KERNEL where it is missing
-Date: Tue, 14 Jan 2025 18:51:34 +0100
-Message-ID: <20250114175143.81438-22-vschneid@redhat.com>
+Subject: [PATCH v4 22/30] context_tracking: Exit CT_STATE_IDLE upon irq/nmi entry
+Date: Tue, 14 Jan 2025 18:51:35 +0100
+Message-ID: <20250114175143.81438-23-vschneid@redhat.com>
 In-Reply-To: <20250114175143.81438-1-vschneid@redhat.com>
 References: <20250114175143.81438-1-vschneid@redhat.com>
 Precedence: bulk
@@ -160,69 +160,92 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-CT_STATE_KERNEL being zero means it can be (and is) omitted in a handful of
-places. A later patch will change CT_STATE_KERNEL into a non-zero value,
-prepare that by using it where it should be:
+ct_nmi_{enter, exit}() only touches the RCU watching counter and doesn't
+modify the actual CT state part context_tracking.state. This means that
+upon receiving an IRQ when idle, the CT_STATE_IDLE->CT_STATE_KERNEL
+transition only happens in ct_idle_exit().
 
-o In the initial CT state
-o At kernel entry / exit
+One can note that ct_nmi_enter() can only ever be entered with the CT state
+as either CT_STATE_KERNEL or CT_STATE_IDLE, as an IRQ/NMI happenning in the
+CT_STATE_USER or CT_STATE_GUEST states will be routed down to ct_user_exit().
 
-No change in functionality intended.
+Add/remove CT_STATE_IDLE from the context tracking state as needed in
+ct_nmi_{enter, exit}().
+
+Note that this leaves the following window where the CPU is executing code
+in kernelspace, but the context tracking state is CT_STATE_IDLE:
+
+  ~> IRQ
+  ct_nmi_enter()
+    state = state + CT_STATE_KERNEL - CT_STATE_IDLE
+
+  [...]
+
+  ct_nmi_exit()
+    state = state - CT_STATE_KERNEL + CT_STATE_IDLE
+
+  [...] /!\ CT_STATE_IDLE here while we're really in kernelspace! /!\
+
+  ct_cpuidle_exit()
+    state = state + CT_STATE_KERNEL - CT_STATE_IDLE
 
 Signed-off-by: Valentin Schneider <vschneid@redhat.com>
 ---
- kernel/context_tracking.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ kernel/context_tracking.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
 diff --git a/kernel/context_tracking.c b/kernel/context_tracking.c
-index 938c48952d265..a61498a8425e2 100644
+index a61498a8425e2..15f10ddec8cbe 100644
 --- a/kernel/context_tracking.c
 +++ b/kernel/context_tracking.c
-@@ -31,7 +31,7 @@ DEFINE_PER_CPU(struct context_tracking, context_tracking) = {
- 	.nesting = 1,
- 	.nmi_nesting = CT_NESTING_IRQ_NONIDLE,
- #endif
--	.state = ATOMIC_INIT(CT_RCU_WATCHING),
-+	.state = ATOMIC_INIT(CT_RCU_WATCHING | CT_STATE_KERNEL),
- };
- EXPORT_SYMBOL_GPL(context_tracking);
- 
-@@ -147,7 +147,7 @@ static void noinstr ct_kernel_exit(bool user, int offset)
+@@ -236,7 +236,9 @@ void noinstr ct_nmi_exit(void)
  	instrumentation_end();
- 	WRITE_ONCE(ct->nesting, 0); /* Avoid irq-access tearing. */
- 	// RCU is watching here ...
--	ct_kernel_exit_state(offset);
-+	ct_kernel_exit_state(offset - CT_STATE_KERNEL);
- 	// ... but is no longer watching here.
- 	rcu_task_exit();
- }
-@@ -175,7 +175,7 @@ static void noinstr ct_kernel_enter(bool user, int offset)
- 	}
- 	rcu_task_enter();
- 	// RCU is not watching here ...
--	ct_kernel_enter_state(offset);
-+	ct_kernel_enter_state(offset + CT_STATE_KERNEL);
- 	// ... but is watching here.
- 	instrumentation_begin();
  
-@@ -537,7 +537,7 @@ void noinstr __ct_user_enter(enum ctx_state state)
- 				 * RCU only requires CT_RCU_WATCHING increments to be fully
- 				 * ordered.
- 				 */
--				raw_atomic_add(state, &ct->state);
-+				raw_atomic_add(state - CT_STATE_KERNEL, &ct->state);
- 			}
- 		}
- 	}
-@@ -647,7 +647,7 @@ void noinstr __ct_user_exit(enum ctx_state state)
- 				 * RCU only requires CT_RCU_WATCHING increments to be fully
- 				 * ordered.
- 				 */
--				raw_atomic_sub(state, &ct->state);
-+				raw_atomic_sub(state - CT_STATE_KERNEL, &ct->state);
- 			}
- 		}
- 	}
+ 	// RCU is watching here ...
+-	ct_kernel_exit_state(CT_RCU_WATCHING);
++	ct_kernel_exit_state(CT_RCU_WATCHING -
++			     CT_STATE_KERNEL +
++			     CT_STATE_IDLE);
+ 	// ... but is no longer watching here.
+ 
+ 	if (!in_nmi())
+@@ -259,6 +261,7 @@ void noinstr ct_nmi_enter(void)
+ {
+ 	long incby = 2;
+ 	struct context_tracking *ct = this_cpu_ptr(&context_tracking);
++	int curr_state;
+ 
+ 	/* Complain about underflow. */
+ 	WARN_ON_ONCE(ct_nmi_nesting() < 0);
+@@ -271,13 +274,26 @@ void noinstr ct_nmi_enter(void)
+ 	 * to be in the outermost NMI handler that interrupted an RCU-idle
+ 	 * period (observation due to Andy Lutomirski).
+ 	 */
+-	if (!rcu_is_watching_curr_cpu()) {
++	curr_state = raw_atomic_read(this_cpu_ptr(&context_tracking.state));
++	if (!(curr_state & CT_RCU_WATCHING)) {
+ 
+ 		if (!in_nmi())
+ 			rcu_task_enter();
+ 
++		/*
++		 * RCU isn't watching, so we're one of
++		 * CT_STATE_IDLE
++		 * CT_STATE_USER
++		 * CT_STATE_GUEST
++		 * guest/user entry is handled by ct_user_enter(), so this has
++		 * to be idle entry.
++		 */
++		WARN_ON_ONCE((curr_state & CT_STATE_MASK) != CT_STATE_IDLE);
++
+ 		// RCU is not watching here ...
+-		ct_kernel_enter_state(CT_RCU_WATCHING);
++		ct_kernel_enter_state(CT_RCU_WATCHING +
++				      CT_STATE_KERNEL -
++				      CT_STATE_IDLE);
+ 		// ... but is watching here.
+ 
+ 		instrumentation_begin();
 -- 
 2.43.0
 
