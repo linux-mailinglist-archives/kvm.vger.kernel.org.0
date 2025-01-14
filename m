@@ -1,168 +1,181 @@
-Return-Path: <kvm+bounces-35396-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35397-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DA17A10BF2
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 17:13:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11ECEA10C50
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 17:31:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2990A16330A
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 16:13:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25E9F1889A8C
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 16:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D28D1C3021;
-	Tue, 14 Jan 2025 16:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9129F1D5142;
+	Tue, 14 Jan 2025 16:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2dfsSdcb"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Zj8zAh65"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC831ADC6E
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 16:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55231160884;
+	Tue, 14 Jan 2025 16:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736871186; cv=none; b=DU9EgwjGchwmE/zKc8yvBEaKVnV2V5hGIriDmaIiHkzhjUMAsfw45lKu6ezSOsdM6YKEkvLqN0pjzWE8BWyoWxhZ1qm5YgvWCvwNTFO3ChGSOpe7+z2zh5f0KAm7mWRd/5FW+VVKt3Ej49uW+T3ZY6c0k/cf6khsYxORRzhYN6U=
+	t=1736872291; cv=none; b=Jw4Y+a4Q2gMIp7rZtBdsPpOyP3oUoaqquY/nIfiw6v6e47QC5hzbgfSxO4FbSMtIs/KlKjodThSkN2zGskrHdj3VL4R5yXzssXuu/qBgiCe7C322OOTYgDeDbdkUvgtrM7RH/LU/UOGPv7aJZQ1VGe6VGGGsjjl5dqu3hkVnuSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736871186; c=relaxed/simple;
-	bh=XT4t419OMBDfK006Un5uZ77ROcrKXKzvheGm0OL36rc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IJGmmhMAEVb7o9kLWb3X2TfyGskc5KdOOsNt2j/5kl0Z0w+QTN+D/bK0cPFHdn7NlNIij32b0uYdW3rPJ4Ni830xGumL4UVWmyj7CF5FrP/8XlVcJ/4IRPcRFF6jbvm1YGI5WWcNGZqEOdNR8w3HrIViU7Pe1/OTvvqOrKdT31A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2dfsSdcb; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef80d30df1so9951030a91.1
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 08:13:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736871184; x=1737475984; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IN4BY1vrx5SuH2U8wdanxq79ndn86isZnzQkNUic768=;
-        b=2dfsSdcb2wedaOpqC8Mx/XdQ6YA5dFAZ4cvhekB3tsQmbB5aaogPgOUIFZal0r9OZQ
-         IaW/ZuGscbKHfkfmZ2Yk5YlgsqghA0KOTCQtPGBR1UfqdU6o9wuXqFShw0yYhc1TyVnD
-         ICkk6j/+mLmoLRF/kVxlWfGwYP4Jj/KMgTONHUPetFFzy7QYT3gDngaSXmzeAnmEiMtB
-         1HvMMMYiW4npst7d8fl6GymPJrOfuXdvjWseDZpOArBJ0T5Vo4XuT9wwm58U2zdUuqoh
-         LKHInBNiGVbBpRqZUeJqkC7bIQ+Qzu65Qd1R48ohsBtjrr8b1wXUGcaq/HOAI42ByQab
-         3MBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736871184; x=1737475984;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=IN4BY1vrx5SuH2U8wdanxq79ndn86isZnzQkNUic768=;
-        b=dgN1BkjEaLCVy73gte/vbbTvheQ1emYeU2Yy+d3EB8DfGGJ2u/TdTtk3tDoasrNVUv
-         UgUphD9rW3JFKI7H277uRlQplM/uFOoZtrlmjWRsk0K/4XJBq+8yDFYFdM5AkZTl+N5h
-         lXgB7HY9ECqDLAlbXEvQwgvx4kR96T2ujScgvls32GzYKf/Hl7mlSI8Xd3EQahii+xDe
-         YsVzhb2OZ4hNk5gJVQVX3Y73rNQdTUKxA10CZWBMWamNIeOXPFfDo3ewzGFRP6Uce73I
-         tKGR4xT1UWnPwaDinBbcrG8XH7I6dWK3DkK8GUlMrp7HCAtnUkCYK7iqzEPIiQ4NDX2l
-         8Y6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUeAvGNXsLv6fSSfYfwjOTJtPz0Rsg6hIJml76c1sIv/vhPkaOFqF0YW+BBokDXDVY3j0s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9py0R100lmcXIj43erKlHjeaQB/HGRUozF8z/zcDX18K+F1kq
-	ELsYOjkHpVgo0g3X6SHkbEiQbRvYMJqsrDlxf6I3vPULemSrkD+7RpWdSoIkbstQtBJlNaTEr7x
-	4yA==
-X-Google-Smtp-Source: AGHT+IGAEkyp2QXBFeT9lZ1xbq10mva6dlyIOf7agiuR/sH5d3IJs8PRMPxifhAIZArJ/WeFmIfc7pJPt4Y=
-X-Received: from pjbqi17.prod.google.com ([2002:a17:90b:2751:b0:2ea:5084:5297])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:280e:b0:2ee:b875:6d30
- with SMTP id 98e67ed59e1d1-2f548ebb62cmr38572711a91.9.1736871184506; Tue, 14
- Jan 2025 08:13:04 -0800 (PST)
-Date: Tue, 14 Jan 2025 08:12:57 -0800
-In-Reply-To: <brebuxyjirsfc257fpq4qxlowveolrabzetg2i3cj3ee6yzci3@j7zlc676gf7n>
+	s=arc-20240116; t=1736872291; c=relaxed/simple;
+	bh=GliCZdjc9UMRvHhc1En8aKi7hYaY/62aGAlKZEHFeoE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fdSLCJlFBuWdhuQLP6MxDdXovujoTHa6eXhf9MOAveC/DRSmR55kXDNd9Tvvm/vy064RY3TJUcG4LR37VdN0erYeVNpGyo9is4APRcJrk4blR6D3YnHe88hRFZ66oULgP6gAgvVqoZPOskf0Ya3er70vTgvzd5JvZ5BemdbU0EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Zj8zAh65; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tXjp3-00HICC-LA; Tue, 14 Jan 2025 17:31:21 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=uc3P+aW58p1Wgl/FgiobWz7JZg3jTcWFJd6qr34VHyM=; b=Zj8zAh65jD1PreEiamMYVyGj2V
+	gVX5tchbNSM3Wv6Gbf12HUK9JCzyI2AeruIo25+HSbn3Qznzgu2mQ/0iFOtRy5SAV5/TFkMqXAQZ1
+	jWyhuoFcmKk2fyu+x36pLL6N2MWU6QAYB9pipAkxN1F/c0zcLbKV60O1kqVrr42NEwXkCXEdklOY8
+	kktFdnhdJqFuw+GpAIC+BMjvd19B08h220kQ4FdH7kvxA6ZlHMnKXUaToaVFB/srDG25lPBfT7p/c
+	DAxbe9IyFAL4NkWOG3gsimEY0TV5O5uEgj08MQQkPdFs0VQ7LkT29uAhr7DDwa2GZ9mj1HPWGscdG
+	CdAE0uvA==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tXjp2-00007d-B3; Tue, 14 Jan 2025 17:31:20 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tXjor-003bqh-Vn; Tue, 14 Jan 2025 17:31:10 +0100
+Message-ID: <fb6f876f-a4eb-4005-bd76-fff0632291b8@rbox.co>
+Date: Tue, 14 Jan 2025 17:31:08 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250109225533.1841097-1-kevinloughlin@google.com>
- <20250109225533.1841097-3-kevinloughlin@google.com> <szkkdk35keb6ibdy2d2p2q6qiykeo2aoj2iqpzx3h6k2wzs2ob@iuidkwpeoxua>
- <CAGdbjm+i52GNLRXVduzqe2h-bmNeJ_ES97p7LhJPJw+8FMuc-A@mail.gmail.com> <brebuxyjirsfc257fpq4qxlowveolrabzetg2i3cj3ee6yzci3@j7zlc676gf7n>
-Message-ID: <Z4aNCa3N3yPZBM2e@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: SEV: Prefer WBNOINVD over WBINVD for cache
- maintenance efficiency
-From: Sean Christopherson <seanjc@google.com>
-To: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc: Kevin Loughlin <kevinloughlin@google.com>, linux-kernel@vger.kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	pbonzini@redhat.com, kai.huang@intel.com, ubizjak@gmail.com, 
-	dave.jiang@intel.com, jgross@suse.com, kvm@vger.kernel.org, 
-	thomas.lendacky@amd.com, pgonda@google.com, sidtelang@google.com, 
-	mizhang@google.com, rientjes@google.com, szy0127@sjtu.edu.cn
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the transport
+ changes
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Luigi Leonardi <leonardi@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>,
+ Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+ stable@vger.kernel.org
+References: <20250110083511.30419-1-sgarzare@redhat.com>
+ <20250110083511.30419-2-sgarzare@redhat.com>
+ <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
+ <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
+ <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
+ <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
+ <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
+ <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
+ <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
+ <7de34054-10cf-45d0-a869-adebb77ad913@rbox.co>
+ <n2itoh23kikzszzgmyejfwe3mdf6fmxzwbtyo5ahtxpaco3euq@osupldmckz7p>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <n2itoh23kikzszzgmyejfwe3mdf6fmxzwbtyo5ahtxpaco3euq@osupldmckz7p>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 14, 2025, Kirill A. Shutemov wrote:
-> On Mon, Jan 13, 2025 at 10:47:57AM -0800, Kevin Loughlin wrote:
-> > On Fri, Jan 10, 2025 at 12:23=E2=80=AFAM Kirill A. Shutemov
-> > <kirill.shutemov@linux.intel.com> wrote:
-> > >
-> > > On Thu, Jan 09, 2025 at 10:55:33PM +0000, Kevin Loughlin wrote:
-> > > > @@ -710,6 +711,14 @@ static void sev_clflush_pages(struct page *pag=
-es[], unsigned long npages)
-> > > >       }
-> > > >  }
-> > > >
-> > > > +static void sev_wb_on_all_cpus(void)
+On 1/14/25 11:16, Stefano Garzarella wrote:
+> On Tue, Jan 14, 2025 at 01:09:24AM +0100, Michal Luczaj wrote:
+>> On 1/13/25 16:01, Stefano Garzarella wrote:
+>>> On Mon, Jan 13, 2025 at 02:51:58PM +0100, Michal Luczaj wrote:
+>>>> On 1/13/25 12:05, Stefano Garzarella wrote:
+>>>>> ...
+>>>>> An alternative approach, which would perhaps allow us to avoid all this,
+>>>>> is to re-insert the socket in the unbound list after calling release()
+>>>>> when we deassign the transport.
+>>>>>
+>>>>> WDYT?
+>>>>
+>>>> If we can't keep the old state (sk_state, transport, etc) on failed
+>>>> re-connect() then reverting back to initial state sounds, uhh, like an
+>>>> option :) I'm not sure how well this aligns with (user's expectations of)
+>>>> good ol' socket API, but maybe that train has already left.
+>>>
+>>> We really want to behave as similar as possible with the other sockets,
+>>> like AF_INET, so I would try to continue toward that train.
+>>
+>> I was worried that such connect()/transport error handling may have some
+>> user visible side effects, but I guess I was wrong. I mean you can still
+>> reach a sk_state=TCP_LISTEN with a transport assigned[1], but perhaps
+>> that's a different issue.
+>>
+>> I've tried your suggestion on top of this series. Passes the tests.
+> 
+> Great, thanks!
+> 
+>>
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index fa9d1b49599b..4718fe86689d 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -492,6 +492,10 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+>> 		vsk->transport->release(vsk);
+>> 		vsock_deassign_transport(vsk);
+>>
+>> +		vsock_addr_unbind(&vsk->local_addr);
+>> +		vsock_addr_unbind(&vsk->remote_addr);
+> 
+> My only doubt is that if a user did a specific bind() before the
+> connect, this way we're resetting everything, is that right?
 
-In anticipation of landing the targeted flushing optimizations[*] in the ne=
-ar-ish
-future, I would prefer to avoid the "on_all_cpus" aspect of the name.
+That is right.
 
-Maybe sev_writeback_caches(), to kinda sorta pair with sev_clflush_pages()?
-Definitely open to other names.
+But we aren't changing much. Transport release already removes vsk from
+vsock_bound_sockets. So even though vsk->local_addr is untouched (i.e.
+vsock_addr_bound() returns `true`), vsk can't be picked by
+vsock_find_bound_socket(). User can't bind() it again, either.
 
-[*] https://lore.kernel.org/all/20240411140445.1038319-1-szy0127@sjtu.edu.c=
-n
+And when patched as above: bind() works as "expected", but socket is pretty
+much useless, anyway. If I'm correct, the first failing connect() trips
+virtio_transport_recv_connecting(), which sets `sk->sk_err`. I don't see it
+being reset. Does the vsock suppose to keep sk_err state once set?
 
-> > > > +{
-> > > > +     if (boot_cpu_has(X86_FEATURE_WBNOINVD))
-> > > > +             wbnoinvd_on_all_cpus();
-> > > > +     else
-> > > > +             wbinvd_on_all_cpus();
-> > >
-> > > I think the X86_FEATURE_WBNOINVD check should be inside wbnoinvd().
-> > > wbnoinvd() should fallback to WBINVD if the instruction is not suppor=
-ted
-> > > rather than trigger #UD.
-> >=20
-> > I debated this as well and am open to doing it that way. One argument
-> > against silently falling back to WBINVD within wbnoinvd() (in general,
-> > not referring to this specific case) is that frequent WBINVD can cause
-> > soft lockups, whereas WBNOINVD is much less likely to do so. As such,
-> > there are potentially use cases where falling back to WBINVD would be
-> > undesirable (and would potentially be non-obvious behavior to the
-> > programmer calling wbnoinvd()), hence why I left the decision outside
-> > wbnoinvd().
+Currently only AF_VSOCK throws ConnectionResetError:
+```
+from socket import *
 
-Practically speaking, I highly doubt there will ever be a scenario where no=
-t
-falling back to WBINVD is a viable option.  The alternatives I see are:
+def test(family, addr):
+	s = socket(family, SOCK_STREAM)
+	assert s.connect_ex(addr) != 0
 
-  1. Crash
-  2. Data Corruption
-  3. CLFLUSH{OPT}
+	lis = socket(family, SOCK_STREAM)
+	lis.bind(addr)
+	lis.listen()
+	s.connect(addr)
 
-(1) and (2) are laughably bad, and (3) would add significant complexity in =
-most
-situations (to enumerate all addresses), and would be outright impossible i=
-n some.
+	p, _ = lis.accept()
+	p.send(b'x')
+	assert s.recv(1) == b'x'
 
-And if someone opts for WBNOINVD, they darn well better have done their hom=
-ework,
-because there should be precious few reasons to need to flush all caches, a=
-nd as
-evidenced by lack of usage in the kernel, even fewer reasons to write back =
-dirty
-data while preserving entries.  I don't think it's at all unreasonable to p=
-ut the
-onus on future developers to look at the implementation of wbnoinvd() and
-understand the implications.
+test(AF_INET, ('127.0.0.1', 2000))
+test(AF_UNIX, '\0/tmp/foo')
+test(AF_VSOCK, (1, 2000)) # VMADDR_CID_LOCAL
+```
 
-> > That said, open to either way, especially since that "potential" use
-> > case doesn't apply here; just lemme know if you still have a strong
-> > preference for doing the check within wbnoinvd().
->=20
-> An alternative would be to fail wbnoinvd() with an error code and
-> possibly a WARN(). Crash on #UD is not helpful.
+> Maybe we need to look better at the release, and prevent it from
+> removing the socket from the lists as you suggested, maybe adding a
+> function in af_vsock.c that all transports can call.
+
+I'd be happy to submit a proper patch, but it would be helpful to decide
+how close to AF_INET/AF_UNIX's behaviour is close enough. Or would you
+rather have that UAF plugged first?
+
 
