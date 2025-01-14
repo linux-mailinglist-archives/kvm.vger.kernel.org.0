@@ -1,164 +1,188 @@
-Return-Path: <kvm+bounces-35439-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35440-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DDEA1100F
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:29:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FEBCA11169
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 20:48:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAF9A7A0561
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 18:29:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9054C165C59
+	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 19:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182231F9EBB;
-	Tue, 14 Jan 2025 18:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9DC420B1F3;
+	Tue, 14 Jan 2025 19:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="KFBFTQuv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XZ969Vod"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5381FBC8A
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F89F20AF6F
+	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 19:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736879366; cv=none; b=UWpxMEQk9id1O/ARCDCQvvtFGa8aw23TzAuY48MAYukipoEhT+eyBzjCSGpB3f3+sq/XTnyevQkIhuLnnXJZYG35u3FqDuy5pzMiu619x8DpRvsZyP6bjvyYf5+UKE9oN5sPA60jpeZbQgpJ4Rwtw+HZ5UN40B0tDGNb+Kw69mQ=
+	t=1736884033; cv=none; b=Dj0L73kl3QySRqK9ZXkY6Z/qRi2OK3LEfTBUBWcqIZzoNB0uumG25Z6MponRctYTykGGgG39Fyv9T/xNiMmXUfvDfFLbD0R4KWox6tEKOEuu1lQkrBYB5gnzdFIESJhdorCQi+d998IItc6/2aOgicNdCrfwQKc7DUwy4JcTrug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736879366; c=relaxed/simple;
-	bh=jsa0CovMO5ZT70pqhIrCF6Xwrs9x8fVebY2Xd/EYn6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pC+CE74wdJ2y+qagm1KqvArcQjzmZjf8DdoQ6ZqqxuEJsW8Dz5A1b6N8fDVn6TDyYEO5CxrML8ejzmouclkvbTEQNvH5I96B+g9ryr//xx8cWJyBG8t8N1LvF/QH3ehQsuSM2qSug2hAHjrryyoy6jjtSU7QwNTa1f3vqcUs+vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=KFBFTQuv; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa6c0d1833eso429556366b.1
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 10:29:23 -0800 (PST)
+	s=arc-20240116; t=1736884033; c=relaxed/simple;
+	bh=0r22/yP8EDC+GPu7ApSIg2mBAi+7oVSaXlZefWFc0Gc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=lNKP04Od4vJ2/dhzjcnSuF2hZYLIIxNQ0J8w+q7GPJKXZhD4BhRnCtQ7QFFZcp8VKl2Y6u3lSS2QT844NeOsGFqcRBMZt0ZklIX7oT8KIjpzGzsWgeKvrMJmTrdCNupE1S7dzlDsE6+OmC6n6q6xi63STDKyr4/jLcr7x0bCG4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XZ969Vod; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee86953aeaso10247958a91.2
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 11:47:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1736879362; x=1737484162; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+L6x2g4BC/d/+jfoDGOj0pMskOpzz9VGXCLG5E4WwRY=;
-        b=KFBFTQuv4suEhQgFHTC00K5qiQ3Jw2kiLcP2Ut9JBRBrS6MG3+DcQWnTJ2OvOmD2ET
-         VmAoHdL2GNwADncv1A6R63Igi6HrsrO4q0Iy0Tf0ktWX9MhkhZAWTt4DFpf39SgVrvcn
-         goB1HrkuDsZ6EUUMHyn+nRAXkfPC0D6r+s8all1P1Tni6YRXh8p/Hn56TaO13lf8p0o+
-         e8waI5tHtQROzxqeDrKmwdFRhQ/JWlNMRBEbvpsdANDX4sa5h9naV2GPaEWOaWIvEYUT
-         GOIozzsliRXxnLRPkM//8kc56luukRtxY3CL4EKdxIA1Jd9xtXGcUDyU6uX7Lky9U82N
-         XglQ==
+        d=google.com; s=20230601; t=1736884031; x=1737488831; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7QgeLrF1bLrbc+AIFcXOLXxQpEAwrbVqsM1G8R/4B2E=;
+        b=XZ969Vod8nudVOeCHUxxz1PAF7QnyP/fxw94Ufn8dSccZsfqc20p+sWuZoRBYAzJcx
+         f8z/oO4tPpbvv0493q3FHdr5+qkoAkYb30IPj5PeFtX07MGtNQQo5rbVc6MdXcnF1rz9
+         Km9eZg6bya/T6vMa1W6+72h8Ktz439A6FETckb4HhnXf2MOk8nVTWLveliBSX0LTNHos
+         gAXO2wFENd+JbjZMyB8Oo1qlgCgANQA/8/N2kSWNJt9R0r5aQH8gxCHCdQ/MmNutm432
+         GpKWoulJJj3ewl42oydiZ6opA2ANJl+XlBmndInOzPIBdcEdBpNsdqtlXuYCSa+kjxnA
+         hwmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736879362; x=1737484162;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+L6x2g4BC/d/+jfoDGOj0pMskOpzz9VGXCLG5E4WwRY=;
-        b=TDMwvaCq/r6EQlTxLpaqtlSYcnJwTv/vZy6MC7tDYSEWe+E83xcKDSH3DjmTySBNaJ
-         oztlaHQCllHsqAln5WMD/PdDApLBcbYEic/ZiQi+2stqX90yMhDFaGdeeUlvMgJmJUw7
-         PSEtq7Z7GGEaYX3zN/dJp5Fj6YjYuNgw3yoEiXzPl/VUABbcDUTghLifR105bbLjgv6v
-         khlLhWADF5/mrdRIy8bIu8ynLDAjvXlI0QQAQ+acpd+uwZ7tycfJqcJOZ1hVmpL3jVIY
-         6RhOlCBYwi1i5qwxsYmKVThhgtYZVjh69M8DtYP8K28cRqZFc0l1Fdl/SA6f4m6Y07NV
-         Q0zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWNE2/w0zmL8feUmshon79v8I4VkFRzTw4MjgR9+erZG1MRVIkoAc6RsnF199H6Zq8G4zk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8JbzPGCI4FtIQmc+Nz8Go0k6atbYIE21ywsrJ2MB7R4nJ4Yv9
-	4/UBthjs0V/gxSKV/DrKtiD0NQrhuASQjZeETJdEAHt4cyjdE2TA73TmGOG4h64=
-X-Gm-Gg: ASbGncu1QtDolWD1elSkz7VavMc5PZ0yu4zCLSHQ45nrzk4ctCYWG9jb2gogPMx3+i1
-	5s22YYRzV4TV/wPuxWYWWEgeo5O0KQw4vbvo/l+3iBafWfeNafvy6IXSxjZTIO+sK6cMZUHWcBi
-	r035PIATY41uhUncia6mqjiQl/q6e9S8q0MPqeNVoLILPH8ZvHCiVbqxzubNQfCN6XpcWTSEiVH
-	AP891VwAJnSKzBQ9BwmdlWeEzf9SP7uyE66tjsUbmkMVsPfM4ukoYb0J/TGXe63jpdezYAWN4ug
-	lSHQH/OJr7eH3FGdMMpP0nzPPOO1gsCUveQKChYArg==
-X-Google-Smtp-Source: AGHT+IElLRyBSSFsvDLttv+1rxbirlHss1/zCBNTWvitDc/Y1ed9oUs4kNSXL7wHp3+sai4oSrFAlg==
-X-Received: by 2002:a17:907:96a7:b0:aa6:2c18:aaa2 with SMTP id a640c23a62f3a-ab2ab73e7dbmr2340049566b.27.1736879362392;
-        Tue, 14 Jan 2025 10:29:22 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c905f04fsm659166066b.27.2025.01.14.10.29.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 10:29:21 -0800 (PST)
-Date: Tue, 14 Jan 2025 19:29:21 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
-	virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev, 
-	linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-mm@kvack.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com, 
-	Juergen Gross <jgross@suse.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
-	Alexey Makhalov <alexey.amakhalov@broadcom.com>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, "Liang, Kan" <kan.liang@linux.intel.com>, 
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>, Josh Poimboeuf <jpoimboe@kernel.org>, 
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Jason Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, 
-	Tomas Glozar <tglozar@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Kees Cook <kees@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Christoph Hellwig <hch@infradead.org>, Shuah Khan <shuah@kernel.org>, 
-	Sami Tolvanen <samitolvanen@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, "Mike Rapoport (Microsoft)" <rppt@kernel.org>, 
-	Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, 
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Yosry Ahmed <yosryahmed@google.com>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
-	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
-	Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: Re: [PATCH v4 10/30] riscv/paravirt: Mark pv_steal_clock static call
- as __ro_after_init
-Message-ID: <20250114-7fc0ed577ee91b6813f92806@orel>
-References: <20250114175143.81438-1-vschneid@redhat.com>
- <20250114175143.81438-11-vschneid@redhat.com>
+        d=1e100.net; s=20230601; t=1736884031; x=1737488831;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7QgeLrF1bLrbc+AIFcXOLXxQpEAwrbVqsM1G8R/4B2E=;
+        b=LUfkpHsDlSYY0NVzZOcXVYkrBEdmA1DGuwcNE4Cn742QfUr4JFR0cqEfIONR0qTgrX
+         ouLtzPG4xWAySG5TaGy1rl6kwSfbP9OHaxn2v/yQD8lyw2sbWEFS1v4SKikkJr2MWBkb
+         KTq0CeunIW1AnHTe/aPZQfRgfq+7WcYYpxTm3j9w9lhgnBaNtzk9y3Uj81X7NvS3AtBj
+         OUbr9Cu3phYY7l7smGII1Yy4i1hJFtglX2PGIc80ZgSGf/Sz9uafMEbTwbbDmmig7cSD
+         pJf7XfLSPxfqnEI/gF9JXryivQAyShCz2nDFl86Ct4b2ekmJj1vpAY97ZCAV8YDrTJ8i
+         dxXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUj2BTndoUOVDryzRaTfbU77oPwGXCG8RaQTjaREIzXKwBT2zSlL67nhxG6XQTyITMPYEU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVBBcIvj0s1BnFJiG3hHcraMX8v29IkNXQBgl7jxvFYoQfutbj
+	6KMsMH7Vj0FH4VuSpnGVNJ1+QX/CrJnvJatQfUNv67Rdba2gil+sAzKLYi8KNAM9Ckbe5znYDjU
+	QsA==
+X-Google-Smtp-Source: AGHT+IGWN1EXcp4hxYKitTkSTxEbPE6icBlOkjTlttxwOdA/3n/RHhDzlF8WrMqOV7l6tXusbzN9f2dTBG4=
+X-Received: from pjbqa1.prod.google.com ([2002:a17:90b:4fc1:b0:2ef:8c7e:239b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5208:b0:2ef:33a4:ae6e
+ with SMTP id 98e67ed59e1d1-2f548eba9c4mr44906337a91.12.1736884031592; Tue, 14
+ Jan 2025 11:47:11 -0800 (PST)
+Date: Tue, 14 Jan 2025 11:47:10 -0800
+In-Reply-To: <202501141009.30c629b4-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250114175143.81438-11-vschneid@redhat.com>
+Mime-Version: 1.0
+References: <202501141009.30c629b4-lkp@intel.com>
+Message-ID: <Z4a_PmUVVmUtOd4p@google.com>
+Subject: Re: [linux-next:master] [KVM]  7803339fa9: kernel-selftests.kvm.pmu_counters_test.fail
+From: Sean Christopherson <seanjc@google.com>
+To: kernel test robot <oliver.sang@intel.com>, g@google.com
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, xudong.hao@intel.com, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 14, 2025 at 06:51:23PM +0100, Valentin Schneider wrote:
-> The static call is only ever updated in:
-> 
->   __init pv_time_init()
->   __init xen_time_setup_guest()
-> 
-> so mark it appropriately as __ro_after_init.
-> 
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
-> ---
->  arch/riscv/kernel/paravirt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/riscv/kernel/paravirt.c b/arch/riscv/kernel/paravirt.c
-> index fa6b0339a65de..dfe8808016fd8 100644
-> --- a/arch/riscv/kernel/paravirt.c
-> +++ b/arch/riscv/kernel/paravirt.c
-> @@ -30,7 +30,7 @@ static u64 native_steal_clock(int cpu)
->  	return 0;
->  }
->  
-> -DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
-> +DEFINE_STATIC_CALL_RO(pv_steal_clock, native_steal_clock);
->  
->  static bool steal_acc = true;
->  static int __init parse_no_stealacc(char *arg)
-> -- 
-> 2.43.0
->
++Dapeng
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+On Tue, Jan 14, 2025, kernel test robot wrote:
+> we fould the test failed on a Cooper Lake, not sure if this is expected.
+> below full report FYI.
+> 
+> 
+> kernel test robot noticed "kernel-selftests.kvm.pmu_counters_test.fail" on:
+> 
+> commit: 7803339fa929387bbc66479532afbaf8cbebb41b ("KVM: selftests: Use data load to trigger LLC references/misses in Intel PMU")
+> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
+> 
+> [test failed on linux-next/master 37136bf5c3a6f6b686d74f41837a6406bec6b7bc]
+> 
+> in testcase: kernel-selftests
+> version: kernel-selftests-x86_64-7503345ac5f5-1_20241208
+> with following parameters:
+> 
+> 	group: kvm
+> 
+> config: x86_64-rhel-9.4-kselftests
+> compiler: gcc-12
+> test machine: 224 threads 4 sockets Intel(R) Xeon(R) Platinum 8380H CPU @ 2.90GHz (Cooper Lake) with 192G memory
+
+*sigh*
+
+This fails on our Skylake and Cascade Lake systems, but I only tested an Emerald
+Rapids.
+
+> # Testing fixed counters, PMU version 0, perf_caps = 2000
+> # Testing arch events, PMU version 1, perf_caps = 0
+> # ==== Test Assertion Failure ====
+> #   x86/pmu_counters_test.c:129: count >= (10 * 4 + 5)
+> #   pid=6278 tid=6278 errno=4 - Interrupted system call
+> #      1	0x0000000000411281: assert_on_unhandled_exception at processor.c:625
+> #      2	0x00000000004075d4: _vcpu_run at kvm_util.c:1652
+> #      3	 (inlined by) vcpu_run at kvm_util.c:1663
+> #      4	0x0000000000402c5e: run_vcpu at pmu_counters_test.c:62
+> #      5	0x0000000000402e4d: test_arch_events at pmu_counters_test.c:315
+> #      6	0x0000000000402663: test_arch_events at pmu_counters_test.c:304
+> #      7	 (inlined by) test_intel_counters at pmu_counters_test.c:609
+> #      8	 (inlined by) main at pmu_counters_test.c:642
+> #      9	0x00007f3b134f9249: ?? ??:0
+> #     10	0x00007f3b134f9304: ?? ??:0
+> #     11	0x0000000000402900: _start at ??:?
+> #   count >= NUM_INSNS_RETIRED
+
+The failure is on top-down slots.  I modified the assert to actually print the
+count (I'll make sure to post a patch regardless of where this goes), and based
+on the count for failing vs. passing, I'm pretty sure the issue is not the extra
+instruction, but instead is due to changing the target of the CLFUSH from the
+address of the code to the address of kvm_pmu_version.
+
+However, I think the blame lies with the assertion itself, i.e. with commit
+4a447b135e45 ("KVM: selftests: Test top-down slots event in x86's pmu_counters_test").
+Either that or top-down slots is broken on the Lakes.
+
+By my rudimentary measurements, tying the number of available slots to the number
+of instructions *retired* is fundamentally flawed.  E.g. on the Lakes (SKX is more
+or less identical to CLX), omitting the CLFLUSHOPT entirely results in *more*
+slots being available throughout the lifetime of the measured section.
+
+My best guess is that flushing the cache line use for the data load causes the
+backend to saturate its slots with prefetching data, and as a result the number
+of slots that are available goes down.
+
+        CLFLUSHOPT .    | CLFLUSHOPT [%m]       | NOP
+CLX     350-100         | 20-60[*]              | 135-150  
+SPR     49000-57000     | 32500-41000           | 6760-6830
+
+[*] CLX had a few outliers in the 200-400 range, but the majority of runs were
+    in the 20-60 range.
+
+Reading through more (and more and more) of the TMA documentation, I don't think
+we can assume anything about the number of available slots, beyond a very basic
+assertion that it's practically impossible for there to never be an available
+slot.  IIUC, retiring an instruction does NOT require an available slot, rather
+it requires the opposite: an occupied slot for the uop(s).
+
+I'm mildly curious as to why the counts for SPR are orders of magnitude higher
+that CLX (simple accounting differences?), but I don't think it changes anything
+in the test itself.
+
+Unless someone has a better idea, my plan is to post a patch to assert that the
+top-down slots count is non-zero, not that it's >= instructions retired.  E.g.
+
+diff --git a/tools/testing/selftests/kvm/x86/pmu_counters_test.c b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+index accd7ecd3e5f..21acedcd46cd 100644
+--- a/tools/testing/selftests/kvm/x86/pmu_counters_test.c
++++ b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+@@ -123,10 +123,8 @@ static void guest_assert_event_count(uint8_t idx,
+                fallthrough;
+        case INTEL_ARCH_CPU_CYCLES_INDEX:
+        case INTEL_ARCH_REFERENCE_CYCLES_INDEX:
+-               GUEST_ASSERT_NE(count, 0);
+-               break;
+        case INTEL_ARCH_TOPDOWN_SLOTS_INDEX:
+-               GUEST_ASSERT(count >= NUM_INSNS_RETIRED);
++               GUEST_ASSERT_NE(count, 0);
+                break;
+        default:
+                break;
+
 
