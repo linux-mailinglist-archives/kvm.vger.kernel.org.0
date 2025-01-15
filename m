@@ -1,105 +1,134 @@
-Return-Path: <kvm+bounces-35525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35524-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D97A11F55
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 11:27:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C349EA11F16
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 11:20:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C96416856C
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 10:27:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2FB4167FD4
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 10:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F28241684;
-	Wed, 15 Jan 2025 10:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B2120B1F5;
+	Wed, 15 Jan 2025 10:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b="y42NWyW2"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PB8OzkBf"
 X-Original-To: kvm@vger.kernel.org
-Received: from imap4.hz.codethink.co.uk (imap4.hz.codethink.co.uk [188.40.203.114])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B80523F280
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 10:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.203.114
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395371DB138;
+	Wed, 15 Jan 2025 10:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736936806; cv=none; b=lpB7zZxJojbQaLMpL5wS0Ly+SofI7BWhaU8foVEDF9YDtvVecj1lzitw//sPANYChLRj71PasMIiypA+QpWxVAYGUrStFBTZCD3oagfoXKBQ0+cmMxyxio5pMNQwbIgkuCSVi2s1cGCtUoW+0FbopS0KdQ7+FzZbqXERSNK0rBM=
+	t=1736936428; cv=none; b=s2gpMcqpZegBJfDuLq9Bo2/QyXkXS+Iwjt6IypbvfgkWhPU/5V8spPn54nahXJ2OukN3oRmfe7+iRmO2MSNJ21GsMTJ+pudgK4ShZoLJPmz4pSke2s6KdLfDEM4WeJU287VSzua4Xq3NB0XKnAbIO3GZeKU+qHWoWgmykPYJ97w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736936806; c=relaxed/simple;
-	bh=o/xRBId6vd12ckPbFLIQDQYVFNxDL/A9W5X5L7wQTJw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qsaBbdCCk/bEQzft3xEiqCErRXAkt6ERly3oZhY+6wT6rH5GpLLbUvfRJKFuvhBbMe9eoa5fy6sJNwEQNpc8zx8fL6gncmpNi8d2MicSHl+s4dLZHHX+0ZM4CzBqWAW+ndZmejomYjWAjvQFnhUmWCOqeGmnsOiFxcFPlCx1fSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.com; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=y42NWyW2; arc=none smtp.client-ip=188.40.203.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codethink.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=codethink.co.uk; s=imap4-20230908; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=SboxPYOGaDW0P/C1VXXtvnKtK1CsOM3SpCK2pkDime8=; b=y42NWyW2+5eJmuLmDP+j5554Sw
-	VN5NfBZ2IzmOUpZWRNe6EtgeR96RgxAMmQFZkA/LR3075WBwSpojdgXL0EAw+O9zPDLkLSssv31j8
-	49pklMZ1sHO3D0VESxNaC0fNeW6To/2Mf/rqpDqIwfB1bt66HQLV03kvhp4RB+bzjtEo4Nf7SMQsB
-	VNw3kCxuJeLhds+zxS54N5W7dX5FnXIQX65AsRScKK3OVPgKUTa1eBmQX0KOOHVpj5Gxnd3pmMG/q
-	7I0IQUo/CkA7CP3pV5pJwLTbbJOuJ8f7BgxhQ2y9XtydyACPwhDRElh8vX7UXKlVcI2X352GRK64J
-	IsBhOyag==;
-Received: from [63.135.74.212] (helo=rainbowdash)
-	by imap4.hz.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-	id 1tY0Mx-000X88-Na; Wed, 15 Jan 2025 10:11:27 +0000
-Received: from ben by rainbowdash with local (Exim 4.98)
-	(envelope-from <ben@rainbowdash>)
-	id 1tY0Mx-00000002Cy1-18ZK;
-	Wed, 15 Jan 2025 10:11:27 +0000
-From: Ben Dooks <ben.dooks@codethink.co.uk>
-To: kvm@vger.kernel.org
-Cc: felix.chong@codethink.co.uk,
-	lawrence.hunter@codethink.co.uk,
-	roan.richmond@codethink.co.uk,
-	Ben Dooks <ben.dooks@codethink.co.uk>
-Subject: [PATCH kvmtool] kvmtool: virtio: fix endian for big endian hosts
-Date: Wed, 15 Jan 2025 10:11:25 +0000
-Message-Id: <20250115101125.526492-1-ben.dooks@codethink.co.uk>
-X-Mailer: git-send-email 2.37.2.352.g3c44437643
+	s=arc-20240116; t=1736936428; c=relaxed/simple;
+	bh=34JBOL+zmXvpqgSI8+nty0X501Jw+lBz7cs5HMeIv/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ecwnq2DZ+prf7wCq7hyUyGwuToUcLqYqLGQFJDI+lAt3BDuYGmY9Ven2W5cm/g1fz+GYByGL/6RpMAUS+4gl0i/1Nxnd0H7j69tcJNIGhFQOLAU7jheB/P4XInj2fUnuxGzHd2gjh38I/eeZYxGAWaViuzPOi6f+QITA5mDEicw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PB8OzkBf; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50F85gHI017620;
+	Wed, 15 Jan 2025 10:20:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=JJ6HKq
+	fUSWCMS+eOo8zfcV7T2eVAkhZjQRFPu2Ff1zI=; b=PB8OzkBfArqOv82ewgehZ9
+	rE72inVzN4BP9ZCPGzdTlXJaYalXZOaz9cCPRR+rc2Sqk8ftNQ+xvUzU9bCOu0cn
+	NiOJoY7/nDWbWgc2/q/FwmOqnw8QbsXozABtCDhGPL8/1ldHHT5hgw2q0LPpVh9+
+	7OqUu9x3ztCmb4bslo8A56gK2zKBOxkxIJuzIk0PXTkr9OQdRYQlaHkEvI54V0s9
+	QGz8ZQmrAGF4Hq9vABRQL6q8rLAdCLDwMNTvSIdEwufht+jhaE3P2hiEgPpGZ4am
+	87Eu9cI9/ai9SfOpQb4H1wxhWdJrxub/gTYUv71Cj2CTzHYbFiwoOdaFtEKNI5MA
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4469730hxk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 10:20:21 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50F6gAqd007386;
+	Wed, 15 Jan 2025 10:20:20 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443yn7s1w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 10:20:20 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50FAKGxY56164818
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Jan 2025 10:20:16 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8B47F2004E;
+	Wed, 15 Jan 2025 10:20:16 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 644A92004D;
+	Wed, 15 Jan 2025 10:20:16 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 15 Jan 2025 10:20:16 +0000 (GMT)
+Date: Wed, 15 Jan 2025 11:20:14 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
+Subject: Re: [PATCH v1 07/13] KVM: s390: move some gmap shadowing functions
+ away from mm/gmap.c
+Message-ID: <20250115112014.19ca99f2@p-imbrenda>
+In-Reply-To: <91c13ac1-ad31-46e2-8a07-9b759caaf33d@linux.ibm.com>
+References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
+	<20250108181451.74383-8-imbrenda@linux.ibm.com>
+	<91c13ac1-ad31-46e2-8a07-9b759caaf33d@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: srv_ts003@codethink.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 0ZhncPHzJScdkmu-7GRgnKKpGkoDVVg4
+X-Proofpoint-GUID: 0ZhncPHzJScdkmu-7GRgnKKpGkoDVVg4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-15_04,2025-01-15_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 phishscore=0 clxscore=1015
+ suspectscore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
+ mlxlogscore=773 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501150076
 
-When running on a big endian host, the virtio mmio-modern.c correctly
-sets all reads to return little endian values. However the header uses
-a 4 byte char for the magic value, which is always going to be in the
-correct endian regardless of host endian.
+On Wed, 15 Jan 2025 09:56:11 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-To make the simplest change, simply avoid endian convresion of the
-read of the magic value. This fixes the following bug from the guest:
+> On 1/8/25 7:14 PM, Claudio Imbrenda wrote:
+> > Move some gmap shadowing functions from mm/gmap.c to kvm/vsie.c and
+> > kvm/kvm-s390.c .
+> >   
+> 
+> Why though?
 
-[    0.592838] virtio-mmio 10020000.virtio: Wrong magic value 0x76697274!
+to start removing stuff from mm
 
-Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
----
- virtio/mmio-modern.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> I don't really want to have gmap code in vsie.c
+> If you want to add a new mm/gmap-vsie.c then do so but I don't see a 
 
-diff --git a/virtio/mmio-modern.c b/virtio/mmio-modern.c
-index 6c0bb38..fd9c0cb 100644
---- a/virtio/mmio-modern.c
-+++ b/virtio/mmio-modern.c
-@@ -66,7 +66,10 @@ static void virtio_mmio_config_in(struct kvm_cpu *vcpu,
- 		return;
- 	}
- 
--	*data = cpu_to_le32(val);
-+	if (addr != VIRTIO_MMIO_MAGIC_VALUE)
-+		*data = cpu_to_le32(val);
-+	else
-+		*data = val;
- }
- 
- static void virtio_mmio_config_out(struct kvm_cpu *vcpu,
--- 
-2.37.2.352.g3c44437643
+will do
+
+> need to move gmap code from mm to kvm and you give no explanation 
+> whatsoever.
+
+the goal is to remove gmap from mm, as mentioned in the cover letter
+
+> 
+> Maybe add a vsie-gmap.c in kvm but I'm not so thrilled about that for 
+> the reasons mentioned above.
 
 
