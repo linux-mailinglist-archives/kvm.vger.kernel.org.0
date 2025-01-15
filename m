@@ -1,199 +1,126 @@
-Return-Path: <kvm+bounces-35531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D978A12384
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 13:07:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6992AA12396
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 13:12:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FA16165A94
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 12:07:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BCF8167CBB
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 12:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A560A1EEA56;
-	Wed, 15 Jan 2025 12:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA0A21858C;
+	Wed, 15 Jan 2025 12:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Cm03brpP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZugvwQkt"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AB52475F3
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 12:07:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF68B2475CC
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 12:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736942826; cv=none; b=awa2yphZMIh2YjyeyQXldkwsbH7Y6NpLFHJLBl4dyXFtwzVsSQgIepj6R51QgTidstwUz/WkmjEusydz5+DpQLSWluNDqZiIN7GEclNkQq87qqz+R2WVkhB90G2omWT+o+OKei/l0uG/n1PIZIi93mOnnVdgry2wKOSJqZCJKp0=
+	t=1736943152; cv=none; b=PfefStVMVpOx2/7HxWEBFTAqWgDXdGaLKpnlXyfAryMWdL1l2zOCFiPaR0JgfQ62nmgFJbcdWkntNFdjNMXB7IyTE+ZRM7rH+1KP3AYUyzuJkYfFDrNJCqRHwzZJUjHgt3gNM/X6I0+dREk5rtnqDmAweQIK2bSRXjeJpnW6gDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736942826; c=relaxed/simple;
-	bh=IW6i5s+Syx1xSgSnZwDsNVWWh5m59kYxZjmHJjxMLr0=;
+	s=arc-20240116; t=1736943152; c=relaxed/simple;
+	bh=mC1XC4djPCDE99XU+hCt7StagXy+WLInG1/ESF761V4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Awv0XH2YLePLFWYQZFW40pEPMrauS/8CviJin0krWCBQbMfdcaXPEui+nSSM1VDH3HE2IEExM0DSXI4S44M7KI59xuJ1FwLt4zySYcdV+9BRecQ8fiCbo4dL7GA4pAKrXlyiEv5F7jnthuabK+l9gpBCD3Q9zKCGbIQpNqFskn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cm03brpP; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 15 Jan 2025 13:06:56 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736942819;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YgbdkOgeyzusvyB+fsODM0Lt17XNh/jVvw1SWNs3Ews=;
-	b=Cm03brpPU/LBmoQmOIqyEP6Vq6uSpPAh79322F1zgs82gwppERqu5mp858ZQhwHrsspdwj
-	7FVoX2tYKDh/6ixmcg/6dfesVeumHSIl3TwaduIXNSDBi4dUuTzEWyhEkiuK6dqOL2VghI
-	kWxH6fZ7w1CqhKToOOGjbLlUyLOOr0c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH v6 4/5] riscv: lib: Add SBI SSE extension
- definitions
-Message-ID: <20250115-ce8e8a312ade5e6c362d514d@orel>
-References: <20250110111247.2963146-1-cleger@rivosinc.com>
- <20250110111247.2963146-5-cleger@rivosinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cs2Xf//eXb1c5vwN4MHGZ4TcJmsZB9sogCNRGadXkvdw9OdowfsHhm/EN4kDPq+xDwyeeSraR8bBf8BEXMLNYQxuztUXtKdx720e+AP9jL7D1Z3qR+apdgme3mBrcNhZna3WVIg7xqQB1yO21yPYqLZ5Hg21ZxWpekOSDO6WJRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZugvwQkt; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736943151; x=1768479151;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mC1XC4djPCDE99XU+hCt7StagXy+WLInG1/ESF761V4=;
+  b=ZugvwQktGn26fWipvqQXvLG/26o5z4V1CDTHfE7AGtO8Eia20IWxSviG
+   TgT6W6lkccUE047CSguFc5KPPOOPP4wXyV6S52u77j+aVqMrUUsALL61T
+   7QvgSkQfrv6Xsw/HQA2dttGiLy5ou+AToQhlv+7lGD9xXKcJ0fcGgtBSR
+   AeBukGs09LqVQjvmIAgH9bJ/3cSC328miw937CsMEuZBmWjWrOrU0sztg
+   n5BGMF03QNt5MTLPhezCGasMH2QQz5NpWf6Ragaa66NUVVtZaQ51i7mB2
+   BAdYtuCSxVvq9ku0gUfRkDqaogHZQcSf5XqixI69hNJ4WnSxZIeuzMAu+
+   A==;
+X-CSE-ConnectionGUID: rl5jDpwDTtqdEAh0kFvc1w==
+X-CSE-MsgGUID: rv/s8XYeSBiULTempATLuA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="41037581"
+X-IronPort-AV: E=Sophos;i="6.12,206,1728975600"; 
+   d="scan'208";a="41037581"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 04:12:30 -0800
+X-CSE-ConnectionGUID: s0GYpNuFTU6eWWueralUcQ==
+X-CSE-MsgGUID: 5/95xIS+TsSjrweD/IvTGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,206,1728975600"; 
+   d="scan'208";a="105078639"
+Received: from kniemiec-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.31])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 04:12:23 -0800
+Date: Wed, 15 Jan 2025 14:12:20 +0200
+From: Tony Lindgren <tony.lindgren@linux.intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Ira Weiny <ira.weiny@intel.com>,
+	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+	"riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+	"imammedo@redhat.com" <imammedo@redhat.com>,
+	"Liu, Zhao1" <zhao1.liu@intel.com>,
+	"marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>,
+	"anisinha@redhat.com" <anisinha@redhat.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+	"armbru@redhat.com" <armbru@redhat.com>,
+	"philmd@linaro.org" <philmd@linaro.org>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"mtosatti@redhat.com" <mtosatti@redhat.com>,
+	"eblake@redhat.com" <eblake@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"wangyanan55@huawei.com" <wangyanan55@huawei.com>,
+	"berrange@redhat.com" <berrange@redhat.com>
+Subject: Re: [PATCH v6 09/60] i386/tdx: Initialize TDX before creating TD
+ vcpus
+Message-ID: <Z4emJKi8LBnYKUUw@tlindgre-MOBL1>
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+ <20241105062408.3533704-10-xiaoyao.li@intel.com>
+ <1235bac6ffe7be6662839adb2630c1a97d1cc4c5.camel@intel.com>
+ <c0ef6c19-756e-43f3-8342-66b032238265@intel.com>
+ <Zyr7FA10pmLhZBxL@tlindgre-MOBL1>
+ <Z1scMzIdT2cI4F5T@iweiny-mobl>
+ <Z2F3mBlIqbf9h4QM@tlindgre-MOBL1>
+ <1b03e7a4-c398-4646-9182-e3757f65980e@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250110111247.2963146-5-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <1b03e7a4-c398-4646-9182-e3757f65980e@intel.com>
 
-On Fri, Jan 10, 2025 at 12:12:43PM +0100, Clément Léger wrote:
-> Add SBI SSE extension definitions in sbi.h
+On Tue, Jan 14, 2025 at 08:39:37PM +0800, Xiaoyao Li wrote:
+> On 12/17/2024 9:10 PM, Tony Lindgren wrote:
+> > Hmm I don't think we should loop forever anywhere, the retries needed should
+> > be only a few. Or what do you have in mind?
 > 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> ---
->  lib/riscv/asm/sbi.h | 89 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 89 insertions(+)
+> "A few" seems not accurate. It depends on how heavy the RDRAND/RDSEED
+> traffic from others are. IIRC, it gets > 10 0000 -EAGAIN before success when
+> all the LPs in the system are doing RDRAND/RDSEED.
+
+Oh OK :)
+
+> Maybe a timeout? E.g., QEMU exits when it cannot move forward for a certain
+> period.
 > 
-> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> index 98a9b097..83bdfb82 100644
-> --- a/lib/riscv/asm/sbi.h
-> +++ b/lib/riscv/asm/sbi.h
-> @@ -11,6 +11,11 @@
->  #define SBI_ERR_ALREADY_AVAILABLE	-6
->  #define SBI_ERR_ALREADY_STARTED		-7
->  #define SBI_ERR_ALREADY_STOPPED		-8
-> +#define SBI_ERR_NO_SHMEM		-9
-> +#define SBI_ERR_INVALID_STATE		-10
-> +#define SBI_ERR_BAD_RANGE		-11
-> +#define SBI_ERR_TIMEOUT			-12
-> +#define SBI_ERR_IO			-13
+> However, I'm not sure what value is reasonable for the timeout.
 
-We need SBI_ERR_DENIED_LOCKED too, but I guess that can be added with the
-FWFT extension.
+Maybe some reasonable timeout could be multiplied by the number of CPUs
+or LPs available on the system?
 
->  
->  #ifndef __ASSEMBLY__
->  #include <cpumask.h>
-> @@ -23,6 +28,7 @@ enum sbi_ext_id {
->  	SBI_EXT_SRST = 0x53525354,
->  	SBI_EXT_DBCN = 0x4442434E,
->  	SBI_EXT_SUSP = 0x53555350,
-> +	SBI_EXT_SSE = 0x535345,
->  };
->  
->  enum sbi_ext_base_fid {
-> @@ -71,6 +77,89 @@ enum sbi_ext_dbcn_fid {
->  	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
->  };
->  
-> +enum sbi_ext_sse_fid {
-> +	SBI_EXT_SSE_READ_ATTRS = 0,
-> +	SBI_EXT_SSE_WRITE_ATTRS,
-> +	SBI_EXT_SSE_REGISTER,
-> +	SBI_EXT_SSE_UNREGISTER,
-> +	SBI_EXT_SSE_ENABLE,
-> +	SBI_EXT_SSE_DISABLE,
-> +	SBI_EXT_SSE_COMPLETE,
-> +	SBI_EXT_SSE_INJECT,
-> +	SBI_EXT_SSE_HART_UNMASK,
-> +	SBI_EXT_SSE_HART_MASK,
-> +};
-> +
-> +/* SBI SSE Event Attributes. */
-> +enum sbi_sse_attr_id {
-> +	SBI_SSE_ATTR_STATUS		= 0x00000000,
-> +	SBI_SSE_ATTR_PRIORITY		= 0x00000001,
-> +	SBI_SSE_ATTR_CONFIG		= 0x00000002,
-> +	SBI_SSE_ATTR_PREFERRED_HART	= 0x00000003,
-> +	SBI_SSE_ATTR_ENTRY_PC		= 0x00000004,
-> +	SBI_SSE_ATTR_ENTRY_ARG		= 0x00000005,
-> +	SBI_SSE_ATTR_INTERRUPTED_SEPC	= 0x00000006,
-> +	SBI_SSE_ATTR_INTERRUPTED_FLAGS	= 0x00000007,
-> +	SBI_SSE_ATTR_INTERRUPTED_A6	= 0x00000008,
-> +	SBI_SSE_ATTR_INTERRUPTED_A7	= 0x00000009,
-> +};
-> +
-> +#define SBI_SSE_ATTR_STATUS_STATE_OFFSET	0
-> +#define SBI_SSE_ATTR_STATUS_STATE_MASK		0x3
-> +#define SBI_SSE_ATTR_STATUS_PENDING_OFFSET	2
-> +#define SBI_SSE_ATTR_STATUS_INJECT_OFFSET	3
-> +
-> +#define SBI_SSE_ATTR_CONFIG_ONESHOT		BIT(0)
-> +
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP	BIT(0)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPIE	BIT(1)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV	BIT(2)
-> +#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP	BIT(3)
-> +
-> +enum sbi_sse_state {
-> +	SBI_SSE_STATE_UNUSED		= 0,
-> +	SBI_SSE_STATE_REGISTERED	= 1,
-> +	SBI_SSE_STATE_ENABLED		= 2,
-> +	SBI_SSE_STATE_RUNNING		= 3,
-> +};
-> +
-> +/* SBI SSE Event IDs. */
-> +/* Range 0x00000000 - 0x0000ffff */
-> +#define SBI_SSE_EVENT_LOCAL_HIGH_PRIO_RAS	0x00000000
-> +#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP		0x00000001
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_0_START	0x00004000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_0_END		0x00007fff
-> +
-> +#define SBI_SSE_EVENT_GLOBAL_HIGH_PRIO_RAS	0x00008000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_START	0x0000c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_0_END		0x0000ffff
-> +
-> +/* Range 0x00010000 - 0x0001ffff */
-> +#define SBI_SSE_EVENT_LOCAL_PMU_OVERFLOW	0x00010000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_1_START	0x00014000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_1_END		0x00017fff
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_START	0x0001c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_1_END		0x0001ffff
-> +
-> +/* Range 0x00100000 - 0x0010ffff */
-> +#define SBI_SSE_EVENT_LOCAL_LOW_PRIO_RAS	0x00100000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_2_START	0x00104000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_2_END		0x00107fff
-> +#define SBI_SSE_EVENT_GLOBAL_LOW_PRIO_RAS	0x00108000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_START	0x0010c000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_2_END		0x0010ffff
-> +
-> +/* Range 0xffff0000 - 0xffffffff */
-> +#define SBI_SSE_EVENT_LOCAL_SOFTWARE		0xffff0000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_3_START	0xffff4000
-> +#define SBI_SSE_EVENT_LOCAL_PLAT_3_END		0xffff7fff
-> +#define SBI_SSE_EVENT_GLOBAL_SOFTWARE		0xffff8000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_START	0xffffc000
-> +#define SBI_SSE_EVENT_GLOBAL_PLAT_3_END		0xffffffff
-> +
-> +#define SBI_SSE_EVENT_PLATFORM_BIT		BIT(14)
-> +#define SBI_SSE_EVENT_GLOBAL_BIT		BIT(15)
-> +
->  struct sbiret {
->  	long error;
->  	long value;
-> -- 
-> 2.47.1
->
+Regards,
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Tony
 
