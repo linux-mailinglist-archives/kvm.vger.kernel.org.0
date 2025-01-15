@@ -1,332 +1,231 @@
-Return-Path: <kvm+bounces-35482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325C0A115FE
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 01:17:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7C30A115FF
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 01:18:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A3FB188951F
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 00:17:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60FF53A816B
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 00:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45651FC0A;
-	Wed, 15 Jan 2025 00:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3228AFBF6;
+	Wed, 15 Jan 2025 00:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eRWJ/zJD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FD9cpGRb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AEB10FD
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 00:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736900249; cv=none; b=M7TeITfK0bYaOKCglPDCyzSaHnD8cVyveVyT3l8pim5Y9JQGglUhC7Ydd2ZjVYTx11UHWADxvM6IDUTtWEcMhFHWLeaSa2HQogvHhNaieEzN7zr6DPXmgY67kVn5RGDfYxq9Yp5VP+hj0aokfAvLN7PCAH1BhZj41UClUa9CGEs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736900249; c=relaxed/simple;
-	bh=l++N0rRRnmhxtLecqKAzKpyOqgFEVFWwoimOEH4Hs6w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HsG0JTMQv3KJFMzmkw3VytSkbF+QfifDo7JlVbF5XX/sDIzImXrcXe606q7o+uHUnkoo2mTKkZ7WI79gRzvGRrcUadri3IjcvSJrwWuX4eombn1zjpSb3rBd1WV7vxqIWjRFT2ahz06zt7yvE7MmMhb5QG8lN6cUMThgkJNNFk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eRWJ/zJD; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2167141dfa1so5498805ad.1
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 16:17:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736900247; x=1737505047; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uOpQ4k9N7Yz9sD40MgkYZa7qAKsgRfoLfiT4EIq2i2Q=;
-        b=eRWJ/zJDs8c3OUIypL2jihM/bimRUyz4Vhz65YzydCEYhT/rN5zvZb3FK0RnQNPJq2
-         sb3F2kLF6LjKnLaMeU6BlYnmh8EvAa+F7adGUdydDsu9DzyXvx69lP5/Tf38O5JozkMh
-         LLCfCKhY2TF+NznzvVL8wWjo9OwrxVQM97qPIigmshJ0tCQG6MKXVNC1CyQ3oKHtjXnf
-         SxOIHYmBVRKfLs1yjuhDIJYSlhCb92f4s+MZoj2nt6odydHHUyfIDU9xbu8idb/w0XiS
-         GlTHNW9IJXOp/OHpNAJV7ZFVH4+WK04mDFMkp6kxZx0sNA6Dbx/A6c2bZUR4eeGGbGhc
-         6SiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736900247; x=1737505047;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uOpQ4k9N7Yz9sD40MgkYZa7qAKsgRfoLfiT4EIq2i2Q=;
-        b=qD4OIZmcTGDEqU/2ihFi5y4XL0V+XaBalUYncEusrjuCSXQNjv78xqLA6Hhjp1nSOU
-         uCHkywVj2UVfHq3SGse156XwBPWwiPNTMjpT9sPyiDOsUPW+/lI6t98TRt83QHx36wqP
-         oZbMOedle3xL+hb2ZSk8dxqFB3xphuWxL2OhR+/Go3jvepo2O5xKXbgwUrx544fqyORy
-         sELzxURXiRCe2zJIrow9yYuRUUR9fnHEJzKBAZKy1nwby9vsQrtv5gc+z/82WO9iQ7ej
-         zeYZBLiDOTzXSzA+kQDbyXmBkGUPpnjVQMw49Z9Xg2gXOCRoMJh+rWN9FlkG4p47YQ7O
-         JS3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVlpckCVTO0IbNfq7FVgKLCTuCa8Yfa5ra9U+yCXlG0rWBBwqQhbXTdojggCXRLFWnWh4I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG8omgn6tZtLBQ88iwvg0DL4FkisC+8jKXK2KZjVLS3ghRGwgL
-	FJe89Zqm//5zLnVPmHp1o7BKwmr4r0jTSg18ujy28c0knYfxh3e6rEmjZx8zDQ==
-X-Gm-Gg: ASbGncspdfZgWAjZurMJ6vtfYn/1NJjLU16NsuFlcENYxiqV8+jZGyqlsX5k5Tl3nIF
-	uim4RJ9199nQY2M6xTBFeUkRsYWv1m0ZRhRr0Xy2SzVg78maFDPP+Uh9PFlkuoqjcyPZsZD4acR
-	DbLsd8uOv0NFWpFRjsxAGU2Y90FP93VYh3MquVPe1oUgUaX3U67LC5/ssxMHAQl7YL6MJdUvXH3
-	QS/NTjvgQudXq9I4ALKgtl/TCZxt4ho5PUQLFpY6K8ZWgH+erT7eoXX3z/PPvsiVhB8ay9w6QR8
-	IWv0NwanMRm4fPQ=
-X-Google-Smtp-Source: AGHT+IHlp6t+xXJnV4P8Vu4aZmuAPI3oW4rb8hqktrWG5kw8S4ybvNBeeQDe7sLXbPwA/Tpw8T7PaA==
-X-Received: by 2002:a17:902:ec87:b0:215:a808:61cf with SMTP id d9443c01a7336-21bf0d269e3mr13524095ad.25.1736900246677;
-        Tue, 14 Jan 2025 16:17:26 -0800 (PST)
-Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f25cc1esm71520325ad.213.2025.01.14.16.17.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 16:17:25 -0800 (PST)
-Date: Wed, 15 Jan 2025 00:17:22 +0000
-From: Mingwei Zhang <mizhang@google.com>
-To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Xiong Zhang <xiong.y.zhang@intel.com>,
-	Kan Liang <kan.liang@intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>,
-	Manali Shukla <manali.shukla@amd.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Jim Mattson <jmattson@google.com>,
-	Stephane Eranian <eranian@google.com>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	gce-passthrou-pmu-dev@google.com,
-	Samantha Alt <samantha.alt@intel.com>,
-	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
-	Like Xu <like.xu.linux@gmail.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [RFC PATCH v3 18/58] KVM: x86/pmu: Introduce
- enable_passthrough_pmu module parameter
-Message-ID: <Z4b-kkRNp1V0faTq@google.com>
-References: <20240801045907.4010984-1-mizhang@google.com>
- <20240801045907.4010984-19-mizhang@google.com>
- <Zzyg_0ACKwHGLC7w@google.com>
- <50ba7bd1-6acf-4b50-9eb1-8beb2beee9ec@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BBCAD24
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 00:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736900284; cv=fail; b=j3lxGaS8EgLPzBdJxw3SxP6mx41CpuigKf25k0RBgRecHed91uWHPG8+dA15xlYjAg2yUNAeuz/xqfiZdNONrZZeyLfkePWxRJLFf7bFC3sFRqxoXBJB32M7ZAWdLUwvqAqZe5U1nBjDktAXWfTOoBD759kQrzNQPl/Rvx7NqJk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736900284; c=relaxed/simple;
+	bh=EU+kC7aLfDodgSgDTeyqW3iPFpgLpOHOs7cQ5kzVmes=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=RQqGE328H/MIzqy0dr9LNIYTPe8wwGsBqXRAcarOLv78bZCumOFUvzMPJ8C+WvSboCuD6DZFmI1gWRZtiMZNK+SWXAfen0WMUb430IjlAS8eSH/LekKHqt4g29yuZ5CxnH1KUYiyPWw5jq4tT7Xg7ch1na66UTKvxM4oYUNTTyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FD9cpGRb; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736900282; x=1768436282;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=EU+kC7aLfDodgSgDTeyqW3iPFpgLpOHOs7cQ5kzVmes=;
+  b=FD9cpGRbMjbPPxslFCcOmtLbxTCxq+Q53pr8vby+iORTyazU1uPj9R6T
+   MDeWAfM5jXC+ZqdOUSkIFxi0ShA/BRaBOeJqYn110ttyWpwFDan2I/9FC
+   1uMDLNXGE8oWRKA8xQFqJ8pgc3NwwEPn/GUqM3VC9cAo0j/islsaj4T8h
+   DUoFiZ6IE+YyDh3wFivesOAIJqm/OIAKESQKp9CKE5wSRMpnMemKEe78k
+   V+ZR5pPO0cSVj5/Q2PiThpchiYLZKGJJc2oc3M/2Yb521q906QUfoF2+b
+   5XgHlxVS+jI+SdmxWS1f+v5s9kuH023hvEh/EAFDGwgL2Y5VdCfueJ9UN
+   w==;
+X-CSE-ConnectionGUID: nKpwvzNsSuK87Q641Tr3NQ==
+X-CSE-MsgGUID: V7C+EyyvQOWrPIb8kxcCbA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="37245764"
+X-IronPort-AV: E=Sophos;i="6.12,315,1728975600"; 
+   d="scan'208";a="37245764"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 16:17:48 -0800
+X-CSE-ConnectionGUID: PfZmYASkR46PJGTtB/XlFQ==
+X-CSE-MsgGUID: j8cpLayHS2KqZyRHNNUbuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,315,1728975600"; 
+   d="scan'208";a="135804757"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Jan 2025 16:17:48 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 14 Jan 2025 16:17:48 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Tue, 14 Jan 2025 16:17:48 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 14 Jan 2025 16:17:47 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aGH9HyB83jwiPiQTQBF0Fk9KnyR/p7aq/cVVmaQw9GpVgnVSB8Te4qJrZ4QMlK0rFq2GD9FsXgk969VknRR4Zt3YnPXfi+cgfxGmPtw0466EWTWgPCXDSO9QLqUYvqDGh8aVSIsBKqij+lOoS9hWDYEioFSSgYGx0yK/sBJAmJi8w80AOJ/5OA4/WTR0x/IqEZ1xYPIO+GXbgX859Im3WSYvCyu4+FTy+u4F1rS94KzgceOWwKPhFGUsfCgukEz+Mgnu+V93kAWCZVz5xg3LwpRATitRzAfJDHSsObhsIqGNuTvCK/teEqWX7xvylQ8xdT+hkZ6yrhPJaiz9QokgmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iVAADT438ZxFo4WBvuRYtZArxRBHteRLV6ZpMwkBPAc=;
+ b=Ew0r+ciCy7ORfRG7JryW3wS0KewGyhZ+wTkpjz870jGsdBSj2TAxSM7u9Djc+fbxybHolSfDsuglXsu1fAY5w9bi5BQsSlbI76BC9kPoySlNYG44aDIPi479WDJzjkeNF4VeF47TK0IticCNZkegnKs9j7M7rodRf6XC5nczczKrDCMnx0c/d7EZx2AjecwgwoSWY112oRe+JdkfHyqSgMPQnBXj3zgbSK8i+yu1SuZPAPVdFHzp4vTRerLGTsxgoUzAlIcIV9YGDs3+qMqzG6aLLVrbWEikvY3h/1ojP4435Cx3sheFZ5A2Ch6Fs5+D4MYmEcTDMNgRzN2YMVHpyA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SJ1PR11MB6129.namprd11.prod.outlook.com (2603:10b6:a03:488::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Wed, 15 Jan
+ 2025 00:17:44 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::d244:15cd:1060:941a%4]) with mapi id 15.20.8335.011; Wed, 15 Jan 2025
+ 00:17:43 +0000
+Message-ID: <3428d2b7-8f91-43ed-8c8a-08358850cc66@intel.com>
+Date: Wed, 15 Jan 2025 08:22:59 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 0/5] vfio-pci support pasid attach/detach
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: <alex.williamson@redhat.com>, <kevin.tian@intel.com>,
+	<eric.auger@redhat.com>, <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
+	<chao.p.peng@linux.intel.com>, <zhenzhong.duan@intel.com>,
+	<willy@infradead.org>, <zhangfei.gao@linaro.org>, <vasant.hegde@amd.com>
+References: <20241219133534.16422-1-yi.l.liu@intel.com>
+ <20250114140047.GK26854@ziepe.ca>
+Content-Language: en-US
+From: Yi Liu <yi.l.liu@intel.com>
+In-Reply-To: <20250114140047.GK26854@ziepe.ca>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR02CA0126.apcprd02.prod.outlook.com
+ (2603:1096:4:188::11) To DS0PR11MB7529.namprd11.prod.outlook.com
+ (2603:10b6:8:141::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <50ba7bd1-6acf-4b50-9eb1-8beb2beee9ec@linux.intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|SJ1PR11MB6129:EE_
+X-MS-Office365-Filtering-Correlation-Id: 887c624a-7196-4b1b-30e7-08dd34fa07e3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Mlp1Nk1XWEJHRHFNRy9vTXNRb21kRWQ5K25CbzhxeTVPcVhOcHNiclVjZ0tu?=
+ =?utf-8?B?aG1zUnVJVEFDZXpxdWtnY3FMclpLQVlDQ2Z0aG82bGdLU1BuNzJyT2dTWHBV?=
+ =?utf-8?B?NEd5azdXMUFLbndLRWVEQnJTZTI2cUJoV0NaTUd4ZU9KcFRwNk44QUFwRURU?=
+ =?utf-8?B?d25VN253WEl6ZGFYZTNFMjNYc1lObC95emJ4RTFWTFpSeHlwaVRHdm9Gd0Rm?=
+ =?utf-8?B?V0VLSkdlcEtJN3U3ZHBacitaZC9obVpISGRwbUxKWUtDcjFCRVRPek1pT2o1?=
+ =?utf-8?B?ZGtIT1JrK2tEVThLamw1NnVGbDZJK1h5MXZLZjRPSUlTUisrQzVVbkpTUUZt?=
+ =?utf-8?B?WUJ3RER0R0FIQ25TbUpSZ0phVmRoemUzMklFK3lURTZEQzZXcXozSCtJbGhY?=
+ =?utf-8?B?ZUdJR2twYndNUWdYRjQ4TExQWVhDaEVaR0ZwemJlbnEwUkVtSXdDYm96Y0Fh?=
+ =?utf-8?B?emU2bEIzeGNnMnVNTWl6aHpBM1ozTis0T000dGd5amszSWpmWDdzUXk0VVFl?=
+ =?utf-8?B?QThBUkR6ckFSdTZUZGkzVGZ1R2lUTWs0RytDZjJWemlKM211VGp5M2UwT0p4?=
+ =?utf-8?B?ZHBUVFJXb0diS3cra1dlR21sRGR5UG96dU42WnM2ZkVMS3JoZDQ5OFJyNklV?=
+ =?utf-8?B?VjRZK1F4OXI3T1JWV01HQ0RjWHZVbE9mU1M4dloxSGpJdERXclZ3Q0l6Ri9o?=
+ =?utf-8?B?NkRRZUZCTitNQVh6Vk1QbE5MRGJwQzBRbXVUclFHYXdhcW02a21UMGRqWFMx?=
+ =?utf-8?B?dlhtbVNuTFJuNlNtaVBEUU41SldxQWtuVGlJQ1NaQWp0YTRrSWdYUU9PWEY4?=
+ =?utf-8?B?T21pMEp2Uk9acm5yQmVmYXBUZTkwSWsvSlI1bzRmdjgweHNCMzFaNC9oWlB1?=
+ =?utf-8?B?TVNjdGlUM1IrcWthcXBpQkh0c25pTE5LUk8zL3owM0ZIWmlWN2hxRWE4VEpK?=
+ =?utf-8?B?b1QzZW42a3NtODcwNWJ0Y1FSclVpeTdLbVlLSWxqTkpwUnNVejgvTXNLNjdQ?=
+ =?utf-8?B?c3FPNFdwMWkyTHJkUENJSXJHM2tHWmdBdEZWeHBYZnRLcm5PLzlUeFFYMWpM?=
+ =?utf-8?B?Wkw0cTBEL0h1N3hsQ2JLRmFUZFZxMEwvS0hVTTRtTzN5SWF3N1IwdjhaSWZm?=
+ =?utf-8?B?amtVYlE0c2MrSjhDQlB0MXZ6bkRuVWFtK3lPK21Sc3M3WDd6c09BVHhBalBo?=
+ =?utf-8?B?NUw3dUQzSVBCMkRKMmdMQVpuenhwNENtOXZzYlhBcjdDWkhlMzRXQnhGenVh?=
+ =?utf-8?B?WGFPaGVMeDhHcHlhMFNKM2F3Y1Z3ZXlBSkVYVVZ0blhXWUxsWmdDdkZsZ0Ux?=
+ =?utf-8?B?QzFZSURTVmNCakwvZUtIcTU5RTluMjcvZ2tsSnJZWS9LMHZjcWg3RGlocS9r?=
+ =?utf-8?B?S2lLY3o2MmJRMUdnRmxGZjVrWmhyNWU5L0Q0WU1VNlhrMGpWazlqM3F2SUlW?=
+ =?utf-8?B?TFNGUzdFbjJKMEhqejlsYWh1a0lIZFphZHYzcXVZYWhiUnRQMEhCSGtqMUVj?=
+ =?utf-8?B?WVY1c3FiMFZ4VExsVmRNdXBMYVh6VzZubXZjWW10RDhxZTlIcy92QUZsVFlq?=
+ =?utf-8?B?VFNNdUhKRTdvY2ZZcWRQbnA5OVpENGVpQzNiMVh4aGN1ZW1oc1gzS2J1bVV2?=
+ =?utf-8?B?TllPK0pKdHNVWGpjWVBLQUZCMlVPeVJ0SFlsSWV4dnNFS084Tll3Y29nRnVr?=
+ =?utf-8?B?WndPNUZGRTVZY014N0dheHZNUERYVFpDNGI0aVpsNXZ5MnpwQW5aRjdiODI4?=
+ =?utf-8?B?SVREYTFUeGQzcnpZWUl1ZTh4NlJwODVRVWVYM2Y5czlxSWZFelBUMG9ONS9h?=
+ =?utf-8?B?Wml5TFBFcFN3RlViR0xSaHI1MmI5Zy9qaVpteGhmd05RSDJ6R21qcXZRUW10?=
+ =?utf-8?Q?l4I0RZQqTI0j1?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Vy9FWWVvRlJDKzNsUkdlc0EyYVNPdm02RDV3dzJocjVhTGV1YUo0MXhiSFNt?=
+ =?utf-8?B?aURHaVBDbHprenp5ZnlMdDFpS0twMjMrcUEwNGFoZWYwZkl3QnVmYlVPUkdm?=
+ =?utf-8?B?RkNyL1pLU3BNWm1tamhnWmRLV3lidDdOOXNreWMyTFJCZlFraGFzSUlNZkZM?=
+ =?utf-8?B?U05sS3RCMzBsN2VnRTRHamh3YlYvWnBlb0tBTE9OelE1dVIyMlcra3pyWFlG?=
+ =?utf-8?B?clFvaGJVbmp3ZUY2akgvcFNrQnRsNkhlSDZaVWlPSnJmMnpCc2djSGQwb3pT?=
+ =?utf-8?B?WWtTUXBoTWxETFFPRE1haXF3UWlUV0NGakF3RFdEN04xUFBMYUlOUWt1L1VO?=
+ =?utf-8?B?QjBUT0R6RWorZHUvQzJjcVdGZmE0T1I2VzBXK0NKSWd1UkJ2cHc0MWV1TDVV?=
+ =?utf-8?B?dy8yeW4zVDNEWjQ5OUQ3Qk40eHUxOUZYcUZNYlNCdmRVTmdmVDNyNlk1TkRF?=
+ =?utf-8?B?UGN1b1dPMkc0MjdELzlEZzRaQkRFajVOampGSWM1VE93Q25RZlgwSUFvVGFO?=
+ =?utf-8?B?VG9ISHluYXBpQUJkL1R0OFd5MmRHL0JnRWYwRE5wR0s2SWFFa1dIeW9HUmxw?=
+ =?utf-8?B?QXJlbUdJWWUrUFBnOHROUkZydGc5RGdzSGRGK2JDZkFKK1lLMHRaQnNGU2RR?=
+ =?utf-8?B?dUJPcVk4Y1hLMTlZTGsrYm5wQW5YWmdXOTZyYlU4b1V6aEVnQ1c4YXErdXd4?=
+ =?utf-8?B?amlXbnRZdkJYWEJwY0Y0eDVCSTdKK2tTOGg1bmV0d1FGaGhzcWM2MENOa1ho?=
+ =?utf-8?B?MVNnWmN4UjAzSkpMcmgxTVpJWjFBR2l0ZlhrUkVXaVJJZzhkcDQ5RnVpMjJS?=
+ =?utf-8?B?YVRBUGw3TXVpVjlIZzFRUk5MVjNOV2o1WmRnbUxBeWIyN1VSZ05Ra0l5RnVE?=
+ =?utf-8?B?c0RlVGNxSDhsLzdWNVppMjR6M00wQlhlODBPTjltZkFOdWZPZWNpUU00bjBW?=
+ =?utf-8?B?ZGpGQ2xQK2w2N3p5Z2F3WFJKeXNzWCtRWGd6YlUrNkJQbHVrdEVkMDdPV2Uy?=
+ =?utf-8?B?MXR4ZWxOOEl0MloweWRZclJiMUQweGR4NllnR0llc2Q4eFcyc3BZd1VseHR0?=
+ =?utf-8?B?czRlYm83dUpBelE4MXk2U01jTndUQXNoZ0RpY0R6Mmp6cFhrNUtBZGVBR2Vt?=
+ =?utf-8?B?ZVdKeTlZSUFFdDJEVFJJSW1ueGhhajgyVUltTy8waTV5Q0dhQ1N6MEFxZnR0?=
+ =?utf-8?B?Ti80NWtjeXFFZzgwR3Bvck54RlJqUVhhYksvR2l2emR6OVhranhGY09jbE5w?=
+ =?utf-8?B?bTdzYmdBTWlFNXd4d0RJbVk4WnNzelJGWVdjOWVpWjBOMklZTTBUdWtQQVVD?=
+ =?utf-8?B?RFdtVkdsQkdJNEUrSkFOZmtSTTN3SHJGcmhNRUxhZmRkUEQxYmZJOUhSWDBX?=
+ =?utf-8?B?S0VsOTduUmlJdUd6YmJKeCtYajNVRE1IS3FobkU5alhaK0lFdDMwOUxGZmtp?=
+ =?utf-8?B?WStoemowa3I3dHN0eWRENytaY3R0ZkttTUt3ZUFWMDNvdHloaUF5NlFtNlRQ?=
+ =?utf-8?B?ODFjODJTYlVkV3FyV1RYRitEbUJFVHppMndKVzJaeVFrZE5wa2VBV2hSUElk?=
+ =?utf-8?B?T0xQUmxQOC9rT0pGUDg5NjRHUjBtVUZvZ1NRbmFTdHpaVEdlNlh1SkJXczdF?=
+ =?utf-8?B?NE1COXp4MGlvRVB3ZjNRSXhtc3h3aWJ1ckVwbkZjcW9PNnNXOUdoTDNpdHht?=
+ =?utf-8?B?bHA4L2hTcmpjZldWa2ZTMUtjckNScVB0RlFGazRhMjIwMWhnNEt4bS94SkM3?=
+ =?utf-8?B?bXQ5OHhuYmVYT2c5UFQ3U1VON3JNdlVoV1U1OWNqazhJMFFiVXBuVVdJeUxx?=
+ =?utf-8?B?QlphWkw3L3FueitSMDNwdTBPeEJoaHRzdkVVaVBxNjdTNlU4cnFOK2VKa2Ny?=
+ =?utf-8?B?ZGducDMyNnZHZlBqZi9TSGcrejA5WnlqaWsweitUSllFdFlPS1BhZmhuZlBr?=
+ =?utf-8?B?ZUo2blRueG1yWFFiS0RZb21uTTR4dXVCaUhrVlo2a2xCcGNHU2Irbm5OcFk4?=
+ =?utf-8?B?WXZyM2xVcVZWUWt4aXdjRFhWOWdHWkN2eHZ6MU1Jby9JVjNUUkdieStoTFhn?=
+ =?utf-8?B?Vno3TXNlQm0yQ05JNkhqR2VndkRQQThzYTZTV2N1TVVXVk0rMEdCZzRHR1Jw?=
+ =?utf-8?Q?9ywjihjHGthyI8iITAVvW7a4/?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 887c624a-7196-4b1b-30e7-08dd34fa07e3
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2025 00:17:43.8504
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ELGa+uUA7iDKglwg8kxdYd6pXA5UzEmXO0PMFsESc2LElz9LQjU8LqaJF/fn/CG6Jr/hoCN1Au14jmcY2obL4g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6129
+X-OriginatorOrg: intel.com
 
-On Wed, Nov 20, 2024, Mi, Dapeng wrote:
+On 2025/1/14 22:00, Jason Gunthorpe wrote:
+> On Thu, Dec 19, 2024 at 05:35:29AM -0800, Yi Liu wrote:
+>> This adds the pasid attach/detach uAPIs for userspace to attach/detach
+>> a PASID of a device to/from a given ioas/hwpt. Only vfio-pci driver is
+>> enabled in this series. After this series, PASID-capable devices bound
+>> with vfio-pci can report PASID capability to userspace and VM to enable
+>> PASID usages like Shared Virtual Addressing (SVA).
 > 
-> On 11/19/2024 10:30 PM, Sean Christopherson wrote:
-> > As per my feedback in the initial RFC[*]:
-> >
-> >  2. The module param absolutely must not be exposed to userspace until all patches
-> >     are in place.  The easiest way to do that without creating dependency hell is
-> >     to simply not create the module param.
-> >
-> > [*] https://lore.kernel.org/all/ZhhQBHQ6V7Zcb8Ve@google.com
-> 
-> Sure. It looks we missed this comment. Would address it.
-> 
+> It looks like all the dependencies are merged now, so we should be
+> able to consider merging this and the matching iommufd series for the
+> next cycle. Something like week of Feb 10 if things are OK with the
+> series?
 
-Dapeng, just synced with Sean offline. His point is that we still need
-kernel parameter but introduce that in the last part of the series so
-that any bisect won't trigger the new PMU logic in the middle of the
-series. But I think you are right to create a global config and make it
-false.
+Hi Jason,
 
-> 
-> >
-> > On Thu, Aug 01, 2024, Mingwei Zhang wrote:
-> >> Introduce enable_passthrough_pmu as a RO KVM kernel module parameter. This
-> >> variable is true only when the following conditions satisfies:
-> >>  - set to true when module loaded.
-> >>  - enable_pmu is true.
-> >>  - is running on Intel CPU.
-> >>  - supports PerfMon v4.
-> >>  - host PMU supports passthrough mode.
-> >>
-> >> The value is always read-only because passthrough PMU currently does not
-> >> support features like LBR and PEBS, while emualted PMU does. This will end
-> >> up with two different values for kvm_cap.supported_perf_cap, which is
-> >> initialized at module load time. Maintaining two different perf
-> >> capabilities will add complexity. Further, there is not enough motivation
-> >> to support running two types of PMU implementations at the same time,
-> >> although it is possible/feasible in reality.
-> >>
-> >> Finally, always propagate enable_passthrough_pmu and perf_capabilities into
-> >> kvm->arch for each KVM instance.
-> >>
-> >> Co-developed-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
-> >> Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
-> >> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> >> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> >> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-> >> ---
-> >>  arch/x86/include/asm/kvm_host.h |  1 +
-> >>  arch/x86/kvm/pmu.h              | 14 ++++++++++++++
-> >>  arch/x86/kvm/vmx/vmx.c          |  7 +++++--
-> >>  arch/x86/kvm/x86.c              |  8 ++++++++
-> >>  arch/x86/kvm/x86.h              |  1 +
-> >>  5 files changed, 29 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> >> index f8ca74e7678f..a15c783f20b9 100644
-> >> --- a/arch/x86/include/asm/kvm_host.h
-> >> +++ b/arch/x86/include/asm/kvm_host.h
-> >> @@ -1406,6 +1406,7 @@ struct kvm_arch {
-> >>  
-> >>  	bool bus_lock_detection_enabled;
-> >>  	bool enable_pmu;
-> >> +	bool enable_passthrough_pmu;
-> > Again, as I suggested/requested in the initial RFC[*], drop the per-VM flag as well
-> > as kvm_pmu.passthrough.  There is zero reason to cache the module param.  KVM
-> > should always query kvm->arch.enable_pmu prior to checking if the mediated PMU
-> > is enabled, so I doubt we even need a helper to check both.
-> >
-> > [*] https://lore.kernel.org/all/ZhhOEDAl6k-NzOkM@google.com
-> 
-> Sure.
-> 
-> 
-> >
-> >>  
-> >>  	u32 notify_window;
-> >>  	u32 notify_vmexit_flags;
-> >> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> >> index 4d52b0b539ba..cf93be5e7359 100644
-> >> --- a/arch/x86/kvm/pmu.h
-> >> +++ b/arch/x86/kvm/pmu.h
-> >> @@ -208,6 +208,20 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
-> >>  			enable_pmu = false;
-> >>  	}
-> >>  
-> >> +	/* Pass-through vPMU is only supported in Intel CPUs. */
-> >> +	if (!is_intel)
-> >> +		enable_passthrough_pmu = false;
-> >> +
-> >> +	/*
-> >> +	 * Pass-through vPMU requires at least PerfMon version 4 because the
-> >> +	 * implementation requires the usage of MSR_CORE_PERF_GLOBAL_STATUS_SET
-> >> +	 * for counter emulation as well as PMU context switch.  In addition, it
-> >> +	 * requires host PMU support on passthrough mode. Disable pass-through
-> >> +	 * vPMU if any condition fails.
-> >> +	 */
-> >> +	if (!enable_pmu || kvm_pmu_cap.version < 4 || !kvm_pmu_cap.passthrough)
-> > As is quite obvious by the end of the series, the v4 requirement is specific to
-> > Intel.
-> >
-> > 	if (!enable_pmu || !kvm_pmu_cap.passthrough ||
-> > 	    (is_intel && kvm_pmu_cap.version < 4) ||
-> > 	    (is_amd && kvm_pmu_cap.version < 2))
-> > 		enable_passthrough_pmu = false;
-> >
-> > Furthermore, there is zero reason to explicitly and manually check the vendor,
-> > kvm_init_pmu_capability() takes kvm_pmu_ops.  Adding a callback is somewhat
-> > undesirable as it would lead to duplicate code, but we can still provide separation
-> > of concerns by adding const variables to kvm_pmu_ops, a la MAX_NR_GP_COUNTERS.
-> >
-> > E.g.
-> >
-> > 	if (enable_pmu) {
-> > 		perf_get_x86_pmu_capability(&kvm_pmu_cap);
-> >
-> > 		/*
-> > 		 * WARN if perf did NOT disable hardware PMU if the number of
-> > 		 * architecturally required GP counters aren't present, i.e. if
-> > 		 * there are a non-zero number of counters, but fewer than what
-> > 		 * is architecturally required.
-> > 		 */
-> > 		if (!kvm_pmu_cap.num_counters_gp ||
-> > 		    WARN_ON_ONCE(kvm_pmu_cap.num_counters_gp < min_nr_gp_ctrs))
-> > 			enable_pmu = false;
-> > 		else if (pmu_ops->MIN_PMU_VERSION > kvm_pmu_cap.version)
-> > 			enable_pmu = false;
-> > 	}
-> >
-> > 	if (!enable_pmu || !kvm_pmu_cap.passthrough ||
-> > 	    pmu_ops->MIN_MEDIATED_PMU_VERSION > kvm_pmu_cap.version)
-> > 		enable_mediated_pmu = false;
-> 
-> Sure.  would do.
-> 
-> 
-> >> +		enable_passthrough_pmu = false;
-> >> +
-> >>  	if (!enable_pmu) {
-> >>  		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
-> >>  		return;
-> >> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> >> index ad465881b043..2ad122995f11 100644
-> >> --- a/arch/x86/kvm/vmx/vmx.c
-> >> +++ b/arch/x86/kvm/vmx/vmx.c
-> >> @@ -146,6 +146,8 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
-> >>  extern bool __read_mostly allow_smaller_maxphyaddr;
-> >>  module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
-> >>  
-> >> +module_param(enable_passthrough_pmu, bool, 0444);
-> > Hmm, we either need to put this param in kvm.ko, or move enable_pmu to vendor
-> > modules (or duplicate it there if we need to for backwards compatibility?).
-> >
-> > There are advantages to putting params in vendor modules, when it's safe to do so,
-> > e.g. it allows toggling the param when (re)loading a vendor module, so I think I'm
-> > supportive of having the param live in vendor code.  I just don't want to split
-> > the two PMU knobs.
-> 
-> Since enable_passthrough_pmu has already been in vendor modules,  we'd
-> better duplicate enable_pmu module parameter in vendor modules as the 1st step.
-> 
-> 
-> >
-> >>  #define KVM_VM_CR0_ALWAYS_OFF (X86_CR0_NW | X86_CR0_CD)
-> >>  #define KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST X86_CR0_NE
-> >>  #define KVM_VM_CR0_ALWAYS_ON				\
-> >> @@ -7924,7 +7926,8 @@ static __init u64 vmx_get_perf_capabilities(void)
-> >>  	if (boot_cpu_has(X86_FEATURE_PDCM))
-> >>  		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
-> >>  
-> >> -	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
-> >> +	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR) &&
-> >> +	    !enable_passthrough_pmu) {
-> >>  		x86_perf_get_lbr(&vmx_lbr_caps);
-> >>  
-> >>  		/*
-> >> @@ -7938,7 +7941,7 @@ static __init u64 vmx_get_perf_capabilities(void)
-> >>  			perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-> >>  	}
-> >>  
-> >> -	if (vmx_pebs_supported()) {
-> >> +	if (vmx_pebs_supported() && !enable_passthrough_pmu) {
-> > Checking enable_mediated_pmu belongs in vmx_pebs_supported(), not in here,
-> > otherwise KVM will incorrectly advertise support to userspace:
-> >
-> > 	if (vmx_pebs_supported()) {
-> > 		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
-> > 		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
-> > 	}
-> 
-> Sure. Thanks for pointing this.
-> 
-> 
-> >
-> >>  		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
-> >>  		/*
-> >> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> >> index f1d589c07068..0c40f551130e 100644
-> >> --- a/arch/x86/kvm/x86.c
-> >> +++ b/arch/x86/kvm/x86.c
-> >> @@ -187,6 +187,10 @@ bool __read_mostly enable_pmu = true;
-> >>  EXPORT_SYMBOL_GPL(enable_pmu);
-> >>  module_param(enable_pmu, bool, 0444);
-> >>  
-> >> +/* Enable/disable mediated passthrough PMU virtualization */
-> >> +bool __read_mostly enable_passthrough_pmu;
-> >> +EXPORT_SYMBOL_GPL(enable_passthrough_pmu);
-> >> +
-> >>  bool __read_mostly eager_page_split = true;
-> >>  module_param(eager_page_split, bool, 0644);
-> >>  
-> >> @@ -6682,6 +6686,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >>  		mutex_lock(&kvm->lock);
-> >>  		if (!kvm->created_vcpus) {
-> >>  			kvm->arch.enable_pmu = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
-> >> +			/* Disable passthrough PMU if enable_pmu is false. */
-> >> +			if (!kvm->arch.enable_pmu)
-> >> +				kvm->arch.enable_passthrough_pmu = false;
-> > And this code obviously goes away if the per-VM snapshot is removed.
+I think the major undone dependency is the iommufd pasid series. We might
+need to wait for it before merging this. :)
+
+[1] 
+https://lore.kernel.org/linux-iommu/20241219132746.16193-1-yi.l.liu@intel.com/
+
+-- 
+Regards,
+Yi Liu
 
