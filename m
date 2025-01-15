@@ -1,178 +1,332 @@
-Return-Path: <kvm+bounces-35481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35482-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09942A11571
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 00:32:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 325C0A115FE
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 01:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AF57166722
-	for <lists+kvm@lfdr.de>; Tue, 14 Jan 2025 23:32:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A3FB188951F
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 00:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82ECF21505A;
-	Tue, 14 Jan 2025 23:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45651FC0A;
+	Wed, 15 Jan 2025 00:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VhoLeljJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eRWJ/zJD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD1920F077
-	for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 23:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AEB10FD
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 00:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736897551; cv=none; b=q+u835CJic5zWMvvAdnvlLrpN940xXeTsneHhavZFJFjX90JAs2b9HpDhackqPVO7Y6rqokF9PqD6++QNYoy9kPVadFJG+H4iMigkzRA7KlAaEBS+Swxn1i+ksmZmJw+r3XohHQ7OBqz5B22jnhX7lk0yjBP/B8Ay8WdhVdOEp8=
+	t=1736900249; cv=none; b=M7TeITfK0bYaOKCglPDCyzSaHnD8cVyveVyT3l8pim5Y9JQGglUhC7Ydd2ZjVYTx11UHWADxvM6IDUTtWEcMhFHWLeaSa2HQogvHhNaieEzN7zr6DPXmgY67kVn5RGDfYxq9Yp5VP+hj0aokfAvLN7PCAH1BhZj41UClUa9CGEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736897551; c=relaxed/simple;
-	bh=/T+OY4OmyRWpdVrFXyc5wLrHbxBlM9/azPHzMNW7WEA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VmNCPycCcyZ2rooVAthNjq5bHFY0E3nwH1UpeABKlMBJoQTSEDlCjzGgxUbQ4XzhIzh6EX+7l3+RApT5H+0UY9S5h8ltxDPQdA+x+AbRMQAarbW8D7GdzmIuvfPCCoOZ0vpWBbcljzcQ4OiQHupVPsT5wcM3FC3I7wB9NAhjbXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VhoLeljJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736897549;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=p1PJwXN5LH4521FXw4nXV0gL2WqhixVjm6mJykcWcXg=;
-	b=VhoLeljJ1yIu7CFqC+ozP7dkBX0b3pf/B5RKCwiG+GZUOojOhPlTCDzfLZ4Vl9NNZoASgh
-	bi9l52Q14nJa76xVlSz/+2Pr1ba+h5RT8gELThZjDn4VasDx806oEFWUQQ60nIIS08AaNb
-	MB0eLCIPOCDCSuHo6jja7rQTaPFdBfw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-W4a5VjabPXyIMcAFrifmCQ-1; Tue, 14 Jan 2025 18:32:27 -0500
-X-MC-Unique: W4a5VjabPXyIMcAFrifmCQ-1
-X-Mimecast-MFC-AGG-ID: W4a5VjabPXyIMcAFrifmCQ
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4361b090d23so31796385e9.0
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 15:32:27 -0800 (PST)
+	s=arc-20240116; t=1736900249; c=relaxed/simple;
+	bh=l++N0rRRnmhxtLecqKAzKpyOqgFEVFWwoimOEH4Hs6w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HsG0JTMQv3KJFMzmkw3VytSkbF+QfifDo7JlVbF5XX/sDIzImXrcXe606q7o+uHUnkoo2mTKkZ7WI79gRzvGRrcUadri3IjcvSJrwWuX4eombn1zjpSb3rBd1WV7vxqIWjRFT2ahz06zt7yvE7MmMhb5QG8lN6cUMThgkJNNFk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eRWJ/zJD; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2167141dfa1so5498805ad.1
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 16:17:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736900247; x=1737505047; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uOpQ4k9N7Yz9sD40MgkYZa7qAKsgRfoLfiT4EIq2i2Q=;
+        b=eRWJ/zJDs8c3OUIypL2jihM/bimRUyz4Vhz65YzydCEYhT/rN5zvZb3FK0RnQNPJq2
+         sb3F2kLF6LjKnLaMeU6BlYnmh8EvAa+F7adGUdydDsu9DzyXvx69lP5/Tf38O5JozkMh
+         LLCfCKhY2TF+NznzvVL8wWjo9OwrxVQM97qPIigmshJ0tCQG6MKXVNC1CyQ3oKHtjXnf
+         SxOIHYmBVRKfLs1yjuhDIJYSlhCb92f4s+MZoj2nt6odydHHUyfIDU9xbu8idb/w0XiS
+         GlTHNW9IJXOp/OHpNAJV7ZFVH4+WK04mDFMkp6kxZx0sNA6Dbx/A6c2bZUR4eeGGbGhc
+         6SiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736897546; x=1737502346;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p1PJwXN5LH4521FXw4nXV0gL2WqhixVjm6mJykcWcXg=;
-        b=r8LHYocNyDleSmBCq/r2qX2LQjdBVJ+y79As5Wo7X93xCCHAMhImszrzX9y3d1NsSd
-         EFzkWENqIc+YTooViQ4CoOcymw02L0Z8Z1OLJikAjeWXyQAYN1ZZxC0FG3UbgcXUaB3S
-         qdaoQ5RT6XX6jebs4963ZGwaEzO7TK5MsWNfM4hs/BYG/FHDholSBnltLb9DUfZjgIOB
-         iA3coTx5owiIILeP/CZI/aTHr3UfFt5SPn1uNhbhpwKo+NoODZ/0AEdIfBmXR62YBddM
-         O4Cbf0f3UvXKInTn/lBtIXVqQ8hkbem8CAcEOZ1hrNd7LIzG4z2epIAS44twPlhKzm+P
-         OFng==
-X-Gm-Message-State: AOJu0YzHZqDIkTuhnUHyi3JIShEoDAn9rgZ5YS7z4xP9MQhLnyn0EWaW
-	d9ob3IxTGA51mShLfITC6qToLK+Zz8bLLyMZSgf1jB3nYPzxKRT5uiCc07rVR3+jKPTDOgXYbrg
-	hZalEmThp2OTDGFLgFncmadfbXVsXOceUjbn6f4uQWmsoxrnIMQ==
-X-Gm-Gg: ASbGncvgFDr0Wt1HrFEGOS0GEjLlVdEwqpe70u8MVWYPdXgEOHNQSeuoya01bWi7e28
-	k7RalLqg2dBkq2wKm0i2LIUJhlT0YPJEHndcLGGy+/+kgnsOC6xm6KKDwJLtdp5eq1IR0q8IFVL
-	KAx27GOj8cwnsH38yVa4dUaTKiKktLgQIA7ittA5LIAUroDDiXRpgUITFJhJChbu63t5RKpUU5s
-	qUu1lhsAm3PkTuX3QH/odf9TZLas0Ftk3L1LVe30G6kHmQVFf2hUjvYNbji
-X-Received: by 2002:a05:600c:4e46:b0:436:488f:50a with SMTP id 5b1f17b1804b1-436e26be5aemr259222885e9.17.1736897546566;
-        Tue, 14 Jan 2025 15:32:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IETLTgqo6f5HuhbUcxZ3ter4nMQl7JFM6YF4YP3njvboY5EBVvNE2lT3PWRG2fQ3g8vl7oCnQ==
-X-Received: by 2002:a05:600c:4e46:b0:436:488f:50a with SMTP id 5b1f17b1804b1-436e26be5aemr259222805e9.17.1736897546253;
-        Tue, 14 Jan 2025 15:32:26 -0800 (PST)
-Received: from [192.168.10.3] ([176.206.124.70])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-437c16610a0sm19753555e9.1.2025.01.14.15.32.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Jan 2025 15:32:25 -0800 (PST)
-Message-ID: <be581731-07e0-4d5c-bee6-1eb653b7b72d@redhat.com>
-Date: Wed, 15 Jan 2025 00:32:24 +0100
+        d=1e100.net; s=20230601; t=1736900247; x=1737505047;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uOpQ4k9N7Yz9sD40MgkYZa7qAKsgRfoLfiT4EIq2i2Q=;
+        b=qD4OIZmcTGDEqU/2ihFi5y4XL0V+XaBalUYncEusrjuCSXQNjv78xqLA6Hhjp1nSOU
+         uCHkywVj2UVfHq3SGse156XwBPWwiPNTMjpT9sPyiDOsUPW+/lI6t98TRt83QHx36wqP
+         oZbMOedle3xL+hb2ZSk8dxqFB3xphuWxL2OhR+/Go3jvepo2O5xKXbgwUrx544fqyORy
+         sELzxURXiRCe2zJIrow9yYuRUUR9fnHEJzKBAZKy1nwby9vsQrtv5gc+z/82WO9iQ7ej
+         zeYZBLiDOTzXSzA+kQDbyXmBkGUPpnjVQMw49Z9Xg2gXOCRoMJh+rWN9FlkG4p47YQ7O
+         JS3A==
+X-Forwarded-Encrypted: i=1; AJvYcCVlpckCVTO0IbNfq7FVgKLCTuCa8Yfa5ra9U+yCXlG0rWBBwqQhbXTdojggCXRLFWnWh4I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG8omgn6tZtLBQ88iwvg0DL4FkisC+8jKXK2KZjVLS3ghRGwgL
+	FJe89Zqm//5zLnVPmHp1o7BKwmr4r0jTSg18ujy28c0knYfxh3e6rEmjZx8zDQ==
+X-Gm-Gg: ASbGncspdfZgWAjZurMJ6vtfYn/1NJjLU16NsuFlcENYxiqV8+jZGyqlsX5k5Tl3nIF
+	uim4RJ9199nQY2M6xTBFeUkRsYWv1m0ZRhRr0Xy2SzVg78maFDPP+Uh9PFlkuoqjcyPZsZD4acR
+	DbLsd8uOv0NFWpFRjsxAGU2Y90FP93VYh3MquVPe1oUgUaX3U67LC5/ssxMHAQl7YL6MJdUvXH3
+	QS/NTjvgQudXq9I4ALKgtl/TCZxt4ho5PUQLFpY6K8ZWgH+erT7eoXX3z/PPvsiVhB8ay9w6QR8
+	IWv0NwanMRm4fPQ=
+X-Google-Smtp-Source: AGHT+IHlp6t+xXJnV4P8Vu4aZmuAPI3oW4rb8hqktrWG5kw8S4ybvNBeeQDe7sLXbPwA/Tpw8T7PaA==
+X-Received: by 2002:a17:902:ec87:b0:215:a808:61cf with SMTP id d9443c01a7336-21bf0d269e3mr13524095ad.25.1736900246677;
+        Tue, 14 Jan 2025 16:17:26 -0800 (PST)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f25cc1esm71520325ad.213.2025.01.14.16.17.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2025 16:17:25 -0800 (PST)
+Date: Wed, 15 Jan 2025 00:17:22 +0000
+From: Mingwei Zhang <mizhang@google.com>
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Kan Liang <kan.liang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Jim Mattson <jmattson@google.com>,
+	Stephane Eranian <eranian@google.com>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	gce-passthrou-pmu-dev@google.com,
+	Samantha Alt <samantha.alt@intel.com>,
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+	Like Xu <like.xu.linux@gmail.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [RFC PATCH v3 18/58] KVM: x86/pmu: Introduce
+ enable_passthrough_pmu module parameter
+Message-ID: <Z4b-kkRNp1V0faTq@google.com>
+References: <20240801045907.4010984-1-mizhang@google.com>
+ <20240801045907.4010984-19-mizhang@google.com>
+ <Zzyg_0ACKwHGLC7w@google.com>
+ <50ba7bd1-6acf-4b50-9eb1-8beb2beee9ec@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/13] x86/virt/tdx: Add SEAMCALL wrappers to add TD
- private pages
-To: Yan Zhao <yan.y.zhao@intel.com>,
- "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Huang, Kai" <kai.huang@intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>
-References: <20250101074959.412696-1-pbonzini@redhat.com>
- <20250101074959.412696-9-pbonzini@redhat.com>
- <c11d9dce9eb334e34ba46e2f17ec3993e3935a31.camel@intel.com>
- <Z3tvHKMhLmXGAiPg@yzhao56-desk.sh.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <Z3tvHKMhLmXGAiPg@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <50ba7bd1-6acf-4b50-9eb1-8beb2beee9ec@linux.intel.com>
 
-On 1/6/25 06:50, Yan Zhao wrote:
-> Yeah.
-> So, do you think we need to have tdh_mem_page_aug() to support 4K level page
-> only and ask for Dave's review again for huge page?
+On Wed, Nov 20, 2024, Mi, Dapeng wrote:
+> 
+> On 11/19/2024 10:30 PM, Sean Christopherson wrote:
+> > As per my feedback in the initial RFC[*]:
+> >
+> >  2. The module param absolutely must not be exposed to userspace until all patches
+> >     are in place.  The easiest way to do that without creating dependency hell is
+> >     to simply not create the module param.
+> >
+> > [*] https://lore.kernel.org/all/ZhhQBHQ6V7Zcb8Ve@google.com
+> 
+> Sure. It looks we missed this comment. Would address it.
+> 
 
-You're right that TDH.MEM.PAGE.AUG is basically the only case in which a 
-struct folio is involved; on the other hand that also means that the 
-arch/x86/virt part of large page support will be tiny and I don't think 
-it will be a problem to review it again (for either Dave or myself).
+Dapeng, just synced with Sean offline. His point is that we still need
+kernel parameter but introduce that in the last part of the series so
+that any bisect won't trigger the new PMU logic in the middle of the
+series. But I think you are right to create a global config and make it
+false.
 
-> Do we need to add param "level" ?
-> - if yes, "struct page" looks not fit.
-
-Maybe, but I think adding folio knowledge now would be a bit too 
-hypothetical.
-
-> - if not, hardcode it as 0 in the wrapper and convert "pfn" to "struct page"?
-
-I think it makes sense to add "int level" now everywhere, even if it is 
-just to match the SEPT API and to have the same style for computing the 
-SEAMCALL arguments.  I'd rather keep the arguments simple with just "gpa 
-| level" (i.e. gpa/level instead of gfn/level) as the computation: 
-that's because gpa is more obviously a u64.
-
-I've pushed to kvm-coco-queue; if you have some time to double check 
-what I did that's great, otherwise if I don't hear from you I'll post 
-around noon European time the v3 of this series.
-
-I have also asked Amazon, since they use KVM without struct page, 
-whether it is a problem to have struct page pervasively in the API and 
-they don't care.
-
-Paolo
-
+> 
+> >
+> > On Thu, Aug 01, 2024, Mingwei Zhang wrote:
+> >> Introduce enable_passthrough_pmu as a RO KVM kernel module parameter. This
+> >> variable is true only when the following conditions satisfies:
+> >>  - set to true when module loaded.
+> >>  - enable_pmu is true.
+> >>  - is running on Intel CPU.
+> >>  - supports PerfMon v4.
+> >>  - host PMU supports passthrough mode.
+> >>
+> >> The value is always read-only because passthrough PMU currently does not
+> >> support features like LBR and PEBS, while emualted PMU does. This will end
+> >> up with two different values for kvm_cap.supported_perf_cap, which is
+> >> initialized at module load time. Maintaining two different perf
+> >> capabilities will add complexity. Further, there is not enough motivation
+> >> to support running two types of PMU implementations at the same time,
+> >> although it is possible/feasible in reality.
+> >>
+> >> Finally, always propagate enable_passthrough_pmu and perf_capabilities into
+> >> kvm->arch for each KVM instance.
+> >>
+> >> Co-developed-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+> >> Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+> >> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> >> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> >> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> >> ---
+> >>  arch/x86/include/asm/kvm_host.h |  1 +
+> >>  arch/x86/kvm/pmu.h              | 14 ++++++++++++++
+> >>  arch/x86/kvm/vmx/vmx.c          |  7 +++++--
+> >>  arch/x86/kvm/x86.c              |  8 ++++++++
+> >>  arch/x86/kvm/x86.h              |  1 +
+> >>  5 files changed, 29 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> >> index f8ca74e7678f..a15c783f20b9 100644
+> >> --- a/arch/x86/include/asm/kvm_host.h
+> >> +++ b/arch/x86/include/asm/kvm_host.h
+> >> @@ -1406,6 +1406,7 @@ struct kvm_arch {
+> >>  
+> >>  	bool bus_lock_detection_enabled;
+> >>  	bool enable_pmu;
+> >> +	bool enable_passthrough_pmu;
+> > Again, as I suggested/requested in the initial RFC[*], drop the per-VM flag as well
+> > as kvm_pmu.passthrough.  There is zero reason to cache the module param.  KVM
+> > should always query kvm->arch.enable_pmu prior to checking if the mediated PMU
+> > is enabled, so I doubt we even need a helper to check both.
+> >
+> > [*] https://lore.kernel.org/all/ZhhOEDAl6k-NzOkM@google.com
+> 
+> Sure.
+> 
+> 
+> >
+> >>  
+> >>  	u32 notify_window;
+> >>  	u32 notify_vmexit_flags;
+> >> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> >> index 4d52b0b539ba..cf93be5e7359 100644
+> >> --- a/arch/x86/kvm/pmu.h
+> >> +++ b/arch/x86/kvm/pmu.h
+> >> @@ -208,6 +208,20 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
+> >>  			enable_pmu = false;
+> >>  	}
+> >>  
+> >> +	/* Pass-through vPMU is only supported in Intel CPUs. */
+> >> +	if (!is_intel)
+> >> +		enable_passthrough_pmu = false;
+> >> +
+> >> +	/*
+> >> +	 * Pass-through vPMU requires at least PerfMon version 4 because the
+> >> +	 * implementation requires the usage of MSR_CORE_PERF_GLOBAL_STATUS_SET
+> >> +	 * for counter emulation as well as PMU context switch.  In addition, it
+> >> +	 * requires host PMU support on passthrough mode. Disable pass-through
+> >> +	 * vPMU if any condition fails.
+> >> +	 */
+> >> +	if (!enable_pmu || kvm_pmu_cap.version < 4 || !kvm_pmu_cap.passthrough)
+> > As is quite obvious by the end of the series, the v4 requirement is specific to
+> > Intel.
+> >
+> > 	if (!enable_pmu || !kvm_pmu_cap.passthrough ||
+> > 	    (is_intel && kvm_pmu_cap.version < 4) ||
+> > 	    (is_amd && kvm_pmu_cap.version < 2))
+> > 		enable_passthrough_pmu = false;
+> >
+> > Furthermore, there is zero reason to explicitly and manually check the vendor,
+> > kvm_init_pmu_capability() takes kvm_pmu_ops.  Adding a callback is somewhat
+> > undesirable as it would lead to duplicate code, but we can still provide separation
+> > of concerns by adding const variables to kvm_pmu_ops, a la MAX_NR_GP_COUNTERS.
+> >
+> > E.g.
+> >
+> > 	if (enable_pmu) {
+> > 		perf_get_x86_pmu_capability(&kvm_pmu_cap);
+> >
+> > 		/*
+> > 		 * WARN if perf did NOT disable hardware PMU if the number of
+> > 		 * architecturally required GP counters aren't present, i.e. if
+> > 		 * there are a non-zero number of counters, but fewer than what
+> > 		 * is architecturally required.
+> > 		 */
+> > 		if (!kvm_pmu_cap.num_counters_gp ||
+> > 		    WARN_ON_ONCE(kvm_pmu_cap.num_counters_gp < min_nr_gp_ctrs))
+> > 			enable_pmu = false;
+> > 		else if (pmu_ops->MIN_PMU_VERSION > kvm_pmu_cap.version)
+> > 			enable_pmu = false;
+> > 	}
+> >
+> > 	if (!enable_pmu || !kvm_pmu_cap.passthrough ||
+> > 	    pmu_ops->MIN_MEDIATED_PMU_VERSION > kvm_pmu_cap.version)
+> > 		enable_mediated_pmu = false;
+> 
+> Sure.  would do.
+> 
+> 
+> >> +		enable_passthrough_pmu = false;
+> >> +
+> >>  	if (!enable_pmu) {
+> >>  		memset(&kvm_pmu_cap, 0, sizeof(kvm_pmu_cap));
+> >>  		return;
+> >> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> >> index ad465881b043..2ad122995f11 100644
+> >> --- a/arch/x86/kvm/vmx/vmx.c
+> >> +++ b/arch/x86/kvm/vmx/vmx.c
+> >> @@ -146,6 +146,8 @@ module_param_named(preemption_timer, enable_preemption_timer, bool, S_IRUGO);
+> >>  extern bool __read_mostly allow_smaller_maxphyaddr;
+> >>  module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
+> >>  
+> >> +module_param(enable_passthrough_pmu, bool, 0444);
+> > Hmm, we either need to put this param in kvm.ko, or move enable_pmu to vendor
+> > modules (or duplicate it there if we need to for backwards compatibility?).
+> >
+> > There are advantages to putting params in vendor modules, when it's safe to do so,
+> > e.g. it allows toggling the param when (re)loading a vendor module, so I think I'm
+> > supportive of having the param live in vendor code.  I just don't want to split
+> > the two PMU knobs.
+> 
+> Since enable_passthrough_pmu has already been in vendor modules,  we'd
+> better duplicate enable_pmu module parameter in vendor modules as the 1st step.
+> 
+> 
+> >
+> >>  #define KVM_VM_CR0_ALWAYS_OFF (X86_CR0_NW | X86_CR0_CD)
+> >>  #define KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST X86_CR0_NE
+> >>  #define KVM_VM_CR0_ALWAYS_ON				\
+> >> @@ -7924,7 +7926,8 @@ static __init u64 vmx_get_perf_capabilities(void)
+> >>  	if (boot_cpu_has(X86_FEATURE_PDCM))
+> >>  		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
+> >>  
+> >> -	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
+> >> +	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR) &&
+> >> +	    !enable_passthrough_pmu) {
+> >>  		x86_perf_get_lbr(&vmx_lbr_caps);
+> >>  
+> >>  		/*
+> >> @@ -7938,7 +7941,7 @@ static __init u64 vmx_get_perf_capabilities(void)
+> >>  			perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
+> >>  	}
+> >>  
+> >> -	if (vmx_pebs_supported()) {
+> >> +	if (vmx_pebs_supported() && !enable_passthrough_pmu) {
+> > Checking enable_mediated_pmu belongs in vmx_pebs_supported(), not in here,
+> > otherwise KVM will incorrectly advertise support to userspace:
+> >
+> > 	if (vmx_pebs_supported()) {
+> > 		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
+> > 		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
+> > 	}
+> 
+> Sure. Thanks for pointing this.
+> 
+> 
+> >
+> >>  		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
+> >>  		/*
+> >> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> >> index f1d589c07068..0c40f551130e 100644
+> >> --- a/arch/x86/kvm/x86.c
+> >> +++ b/arch/x86/kvm/x86.c
+> >> @@ -187,6 +187,10 @@ bool __read_mostly enable_pmu = true;
+> >>  EXPORT_SYMBOL_GPL(enable_pmu);
+> >>  module_param(enable_pmu, bool, 0444);
+> >>  
+> >> +/* Enable/disable mediated passthrough PMU virtualization */
+> >> +bool __read_mostly enable_passthrough_pmu;
+> >> +EXPORT_SYMBOL_GPL(enable_passthrough_pmu);
+> >> +
+> >>  bool __read_mostly eager_page_split = true;
+> >>  module_param(eager_page_split, bool, 0644);
+> >>  
+> >> @@ -6682,6 +6686,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> >>  		mutex_lock(&kvm->lock);
+> >>  		if (!kvm->created_vcpus) {
+> >>  			kvm->arch.enable_pmu = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
+> >> +			/* Disable passthrough PMU if enable_pmu is false. */
+> >> +			if (!kvm->arch.enable_pmu)
+> >> +				kvm->arch.enable_passthrough_pmu = false;
+> > And this code obviously goes away if the per-VM snapshot is removed.
 
