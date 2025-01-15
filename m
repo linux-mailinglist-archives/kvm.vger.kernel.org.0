@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-35572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35575-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FF32A12852
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 17:12:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10773A12855
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 17:13:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 893503A9BA1
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 16:11:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DB38161775
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 16:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C82C1D7E2F;
-	Wed, 15 Jan 2025 16:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1BE41D88AD;
+	Wed, 15 Jan 2025 16:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DcUbFAnd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AHn4Z6uR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09191D63DA
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 16:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082941D89E9
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 16:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736957378; cv=none; b=dMEF7ahGK6CvcZvDwEyLq81iR1JmgmMlV4KJZh1CbjtI+5EcOLFwoG7INQwufyklh0dv+lKsalt/efOIAOwJlGqduxhnQpjvsqVv6zQmyamoOS2mOricCVTuBcbX+vqYhuimdxcVKC/QO1SUydRF0xZMA+M5+px7NNuhvjhAnNA=
+	t=1736957383; cv=none; b=kCs9418OZeCxNQHF6AXj4IikI/WA5kYrwXYA3RBrpdIOKOSEYgDDxgEXY4NXIwBmxdBSEZxY7HF9EzMtno+rst/pAynjfdaWgdp2l0GQVg3nwjH5CUlVOmGYR+aFGDbOMGkRo7njkDWmAEJuL3gmNbMDAb7c80nbp4JzG81VIpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736957378; c=relaxed/simple;
-	bh=gjaSMcttQPrSrTRRUT93bvTQroQb0mfsS9JtxxHapHQ=;
+	s=arc-20240116; t=1736957383; c=relaxed/simple;
+	bh=5MXTcQ+7PQsOOGVqPdJMbA71qT+MfGOkCZ8huD7nrcE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A2pj7W48jNy8M+vNPmnJR40odDonAfDRXmmXSWc07ZjhqqygJha4TQHwTgrqKGm59uKporxQYmH+clRFcn7R5WJYEyiQSHYtqpA3aKco7XU3CY/aJwgR+IYtp0QHCl6s1u4+RayCCj5zLAGulmtS7TPAvLFW2C3ELvSSsuDDPUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DcUbFAnd; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=sOcg/BQvWU13YF32DONfAVB+DGv0KYcGolRQ5Skp4WBcCftn6MGT7JE/iNTcDHZkmi2JtI28YsIPKrpGKPMfyTTBvxtlSLco5SlOl2AZ4I6n19N4i98LI2JP+rven28VeBqEnxK8it4xWTDaXpWAYO3qbpuE3edQd4HWIGdxNi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AHn4Z6uR; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736957375;
+	s=mimecast20190719; t=1736957380;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=byDupud4HQY2alTSPY71Hg59POYn9PT9Pf+Vj1xkleE=;
-	b=DcUbFAndElQVAnyJGDLPMIDqeJqK+DgnRfZcxLx3wSYFIlJWJEZfEnXYbx8Lo8gSdhn3sZ
-	A4Bt9RYWsJgPhDDdVC911vw9SnhESKklB0mas6BP7VrLn+0feftF6k8F2KXyfre3fyitqo
-	xzvSLCUfSPtaxlpZUpgtVWSA1D3i3v8=
+	bh=85tEz9BUIMwULFs12i4DbBRzZWw0rq0TiaJBrDLlk2g=;
+	b=AHn4Z6uRIpqvaNJVhBT0ntNovCG9DJtxe0qW7GVwzBCn8WO1+dLJzKSQ5xd7WzbU6o+LHa
+	gK11A5jIFJn4K0Lu4/QtiupI9rAfuBKbEvZ2XA0sbRvGw/IlMC1z36nDggi6MYWSSmkNQi
+	RZ0LJiIhtptr/0W0Shc7iVujXIdrb+U=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-GUfDMWyvMRO_0ah-8DgGQQ-1; Wed,
- 15 Jan 2025 11:09:34 -0500
-X-MC-Unique: GUfDMWyvMRO_0ah-8DgGQQ-1
-X-Mimecast-MFC-AGG-ID: GUfDMWyvMRO_0ah-8DgGQQ
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-146-40RpI6tsMgSpmBQ0fh87ow-1; Wed,
+ 15 Jan 2025 11:09:36 -0500
+X-MC-Unique: 40RpI6tsMgSpmBQ0fh87ow-1
+X-Mimecast-MFC-AGG-ID: 40RpI6tsMgSpmBQ0fh87ow
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 405CA1956053;
-	Wed, 15 Jan 2025 16:09:33 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87EB4195606A;
+	Wed, 15 Jan 2025 16:09:34 +0000 (UTC)
 Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B39C930001BE;
-	Wed, 15 Jan 2025 16:09:31 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 744303003FD1;
+	Wed, 15 Jan 2025 16:09:33 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
@@ -64,11 +64,10 @@ Cc: kai.huang@intel.com,
 	rick.p.edgecombe@intel.com,
 	dave.hansen@linux.intel.com,
 	yan.y.zhao@intel.com,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v3 11/14] x86/virt/tdx: Add SEAMCALL wrappers for TD measurement of initial contents
-Date: Wed, 15 Jan 2025 11:09:09 -0500
-Message-ID: <20250115160912.617654-12-pbonzini@redhat.com>
+	Adrian Hunter <adrian.hunter@intel.com>
+Subject: [PATCH v3 12/14] x86/virt/tdx: Add SEAMCALL wrapper to enter/exit TDX guest
+Date: Wed, 15 Jan 2025 11:09:10 -0500
+Message-ID: <20250115160912.617654-13-pbonzini@redhat.com>
 In-Reply-To: <20250115160912.617654-1-pbonzini@redhat.com>
 References: <20250115160912.617654-1-pbonzini@redhat.com>
 Precedence: bulk
@@ -81,116 +80,106 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Kai Huang <kai.huang@intel.com>
 
-The TDX module measures the TD during the build process and saves the
-measurement in TDCS.MRTD to facilitate TD attestation of the initial
-contents of the TD. Wrap the SEAMCALL TDH.MR.EXTEND with tdh_mr_extend()
-and TDH.MR.FINALIZE with tdh_mr_finalize() to enable the host kernel to
-assist the TDX module in performing the measurement.
+Intel TDX protects guest VM's from malicious host and certain physical
+attacks.  TDX introduces a new operation mode, Secure Arbitration Mode
+(SEAM) to isolate and protect guest VM's.  A TDX guest VM runs in SEAM and,
+unlike VMX, direct control and interaction with the guest by the host VMM
+is not possible.  Instead, Intel TDX Module, which also runs in SEAM,
+provides a SEAMCALL API.
 
-The measurement in TDCS.MRTD is a SHA-384 digest of the build process.
-SEAMCALLs TDH.MNG.INIT and TDH.MEM.PAGE.ADD initialize and contribute to
-the MRTD digest calculation.
+The SEAMCALL that provides the ability to enter a guest is TDH.VP.ENTER.
+The TDX Module processes TDH.VP.ENTER, and enters the guest via VMX
+VMLAUNCH/VMRESUME instructions.  When a guest VM-exit requires host VMM
+interaction, the TDH.VP.ENTER SEAMCALL returns to the host VMM (KVM).
 
-The caller of tdh_mr_extend() should break the TD private page into chunks
-of size TDX_EXTENDMR_CHUNKSIZE and invoke tdh_mr_extend() to add the page
-content into the digest calculation. Failures are possible with
-TDH.MR.EXTEND (e.g., due to SEPT walking). The caller of tdh_mr_extend()
-can check the function return value and retrieve extended error information
-from the function output parameters.
+Add tdh_vp_enter() to wrap the SEAMCALL invocation of TDH.VP.ENTER.
 
-Calling tdh_mr_finalize() completes the measurement. The TDX module then
-turns the TD into the runnable state. Further TDH.MEM.PAGE.ADD and
-TDH.MR.EXTEND calls will fail.
+TDH.VP.ENTER is different from other SEAMCALLS in several ways:
+ - it may take some time to return as the guest executes
+ - it uses more arguments
+ - after it returns some host state may need to be restored
 
-TDH.MR.FINALIZE may fail due to errors such as the TD having no vCPUs or
-contentions. Check function return value when calling tdh_mr_finalize() to
-determine the exact reason for failure. Take proper locks on the caller's
-side to avoid contention failures, or handle the BUSY error in specific
-ways (e.g., retry). Return the SEAMCALL error code directly to the caller.
-Do not attempt to handle it in the core kernel.
+TDH.VP.ENTER arguments are passed through General Purpose Registers (GPRs).
+For the special case of the TD guest invoking TDG.VP.VMCALL, nearly any GPR
+can be used, as well as XMM0 to XMM15. Notably, RBP is not used, and Linux
+mandates the TDX Module feature NO_RBP_MOD, which is enforced elsewhere.
+Additionally, XMM registers are not required for the existing Guest
+Hypervisor Communication Interface and are handled by existing KVM code
+should they be modified by the guest.
 
-[Kai: Switched from generic seamcall export]
-[Yan: Re-wrote the changelog]
-Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+There are 2 input formats and 5 output formats for TDH.VP.ENTER arguments.
+Input #1 : Initial entry or following a previous async. TD Exit
+Input #2 : Following a previous TDCALL(TDG.VP.VMCALL)
+Output #1 : On Error (No TD Entry)
+Output #2 : Async. Exits with a VMX Architectural Exit Reason
+Output #3 : Async. Exits with a non-VMX TD Exit Status
+Output #4 : Async. Exits with Cross-TD Exit Details
+Output #5 : On TDCALL(TDG.VP.VMCALL)
+
+Currently, to keep things simple, the wrapper function does not attempt
+to support different formats, and just passes all the GPRs that could be
+used.  The GPR values are held by KVM in the area set aside for guest
+GPRs.  KVM code uses the guest GPR area (vcpu->arch.regs[]) to set up for
+or process results of tdh_vp_enter().
+
+Therefore changing tdh_vp_enter() to use more complex argument formats
+would also alter the way KVM code interacts with tdh_vp_enter().
+
 Signed-off-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-Message-ID: <20241112073709.22171-1-yan.y.zhao@intel.com>
+Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Message-ID: <20241121201448.36170-2-adrian.hunter@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/tdx.h  |  2 ++
- arch/x86/virt/vmx/tdx/tdx.c | 27 +++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.h |  2 ++
- 3 files changed, 31 insertions(+)
+ arch/x86/include/asm/tdx.h  | 1 +
+ arch/x86/virt/vmx/tdx/tdx.c | 8 ++++++++
+ arch/x86/virt/vmx/tdx/tdx.h | 1 +
+ 3 files changed, 10 insertions(+)
 
 diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 50b06d91073e..0c89afffdac4 100644
+index 0c89afffdac4..6531b69a53ac 100644
 --- a/arch/x86/include/asm/tdx.h
 +++ b/arch/x86/include/asm/tdx.h
-@@ -164,6 +164,8 @@ u64 tdh_mng_key_config(struct tdx_td *td);
- u64 tdh_mng_create(struct tdx_td *td, u16 hkid);
- u64 tdh_vp_create(struct tdx_td *td, struct tdx_vp *vp);
- u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data);
-+u64 tdh_mr_extend(struct tdx_td *td, u64 gpa, u64 *ext_err1, u64 *ext_err2);
-+u64 tdh_mr_finalize(struct tdx_td *td);
- u64 tdh_vp_flush(struct tdx_vp *vp);
- u64 tdh_mng_vpflushdone(struct tdx_td *td);
- u64 tdh_mng_key_freeid(struct tdx_td *td);
+@@ -154,6 +154,7 @@ static inline int pg_level_to_tdx_sept_level(enum pg_level level)
+         return level - 1;
+ }
+ 
++u64 tdh_vp_enter(struct tdx_vp *vp, struct tdx_module_args *args);
+ u64 tdh_mng_addcx(struct tdx_td *td, struct page *tdcs_page);
+ u64 tdh_mem_page_add(struct tdx_td *td, u64 gpa, struct page *page, struct page *source, u64 *ext_err1, u64 *ext_err2);
+ u64 tdh_mem_sept_add(struct tdx_td *td, u64 gpa, int level, struct page *page, u64 *ext_err1, u64 *ext_err2);
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 91f76501592a..55851a0591d2 100644
+index 55851a0591d2..bb6f8ef9661e 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1629,6 +1629,33 @@ u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data)
+@@ -1479,6 +1479,14 @@ static void tdx_clflush_page(struct page *page)
+ 	clflush_cache_range(page_to_virt(page), PAGE_SIZE);
  }
- EXPORT_SYMBOL_GPL(tdh_mng_rd);
  
-+u64 tdh_mr_extend(struct tdx_td *td, u64 gpa, u64 *ext_err1, u64 *ext_err2)
++u64 tdh_vp_enter(struct tdx_vp *td, struct tdx_module_args *args)
 +{
-+	struct tdx_module_args args = {
-+		.rcx = gpa,
-+		.rdx = tdx_tdr_pa(td),
-+	};
-+	u64 ret;
++	args->rcx = tdx_tdvpr_pa(td);
 +
-+	ret = seamcall_ret(TDH_MR_EXTEND, &args);
-+
-+	*ext_err1 = args.rcx;
-+	*ext_err2 = args.rdx;
-+
-+	return ret;
++	return __seamcall_saved_ret(TDH_VP_ENTER, args);
 +}
-+EXPORT_SYMBOL_GPL(tdh_mr_extend);
++EXPORT_SYMBOL_GPL(tdh_vp_enter);
 +
-+u64 tdh_mr_finalize(struct tdx_td *td)
-+{
-+	struct tdx_module_args args = {
-+		.rcx = tdx_tdr_pa(td),
-+	};
-+
-+	return seamcall(TDH_MR_FINALIZE, &args);
-+}
-+EXPORT_SYMBOL_GPL(tdh_mr_finalize);
-+
- u64 tdh_vp_flush(struct tdx_vp *vp)
+ u64 tdh_mng_addcx(struct tdx_td *td, struct page *tdcs_page)
  {
  	struct tdx_module_args args = {
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index ee07527df279..64932450aba3 100644
+index 64932450aba3..b71b375b10c0 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -24,6 +24,8 @@
- #define TDH_MNG_KEY_CONFIG		8
- #define TDH_MNG_CREATE			9
- #define TDH_MNG_RD			11
-+#define TDH_MR_EXTEND			16
-+#define TDH_MR_FINALIZE			17
- #define TDH_VP_FLUSH			18
- #define TDH_MNG_VPFLUSHDONE		19
- #define TDH_VP_CREATE			10
+@@ -15,6 +15,7 @@
+ /*
+  * TDX module SEAMCALL leaf functions
+  */
++#define TDH_VP_ENTER			0
+ #define TDH_MNG_ADDCX			1
+ #define TDH_MEM_PAGE_ADD		2
+ #define TDH_MEM_SEPT_ADD		3
 -- 
 2.43.5
 
