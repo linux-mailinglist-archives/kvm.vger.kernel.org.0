@@ -1,152 +1,224 @@
-Return-Path: <kvm+bounces-35597-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35598-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEE34A12B11
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 19:41:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CCE2A12B68
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 20:03:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 441A17A1A59
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 18:41:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C35457A0FF0
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 19:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DCB21D63DA;
-	Wed, 15 Jan 2025 18:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70101D6DC5;
+	Wed, 15 Jan 2025 19:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TuI1v/SE"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50161D63D4
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 18:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34F51D61BB;
+	Wed, 15 Jan 2025 19:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736966467; cv=none; b=HVO7yD5eXd5QLzDnTbVkDCQGTw8hwyBsVytag3Iom3B1LdkV8m3xq1IQyqhOnTRqBTrTbGgntwz4mp850Dby7jf8abFewENNE06Db1lLjIsJST9J850idiWGXFVWtno3NxKTL56BBpqVXME/wE57UAKSeDJol52dOgk08kYRb2I=
+	t=1736967810; cv=none; b=Mvovzvkx131DhfoHRUSccnhmrL6+WvpIoN3grictQnKK+y530QQRUHomiR3ITg/0X4D/T9n0qwMMgitLPPVBh+nMJmOnPixp6gHX9YTx99tgwHlyMs/H+gSTCukRN+yH1AwRToRF0BrhGy+8nANCHMC16CA3kEYs9rL9Qo0zbEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736966467; c=relaxed/simple;
-	bh=Irz6csypMe4iw0gBYK2n/Ki5RMnlJZMDUM/e5j5K6es=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fqdvB/OT+LXeNQS1rlBvf2mqrfrh/42oMniA36zzjm5bDP7r3GtubddDle/rmfIScCkHcgbc0oJCahF6snKhLjuLFotxselUSqnR+mxDooTv48xCGGt1xuHEQLi0dFjBCK8HjLIrPtqFVQPxPMlkeaqEnKC8/48l3UnL/wP6SkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 890F21F02;
-	Wed, 15 Jan 2025 10:41:32 -0800 (PST)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A95E03F73F;
-	Wed, 15 Jan 2025 10:41:02 -0800 (PST)
-Date: Wed, 15 Jan 2025 18:41:00 +0000
-From: Andre Przywara <andre.przywara@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu
- <yuzenghui@huawei.com>, Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v2 03/17] arm64: sysreg: Add layout for ICH_MISR_EL2
-Message-ID: <20250115184100.3c2450cc@donnerap.manchester.arm.com>
-In-Reply-To: <20250112170845.1181891-4-maz@kernel.org>
-References: <20250112170845.1181891-1-maz@kernel.org>
-	<20250112170845.1181891-4-maz@kernel.org>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1736967810; c=relaxed/simple;
+	bh=VAPXz2lk/aPqnrUp7qNA4j2tfR1dOW+mD7o3FbZjQtI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tol1926J3pNNVKiYcJ9qSUjQJRB8ntjRXwJ4fFpuGj0JauQGtaLvA2uwl9VwXHDBPP9wooecZZhWFh/l3rXliQuhkLqeYxZXsjadcWpAowtFx0EMfj/ry37jB4rwQWeO2G5fIcPxDkOZgPnV74YtnDAAjTjjcrltFni+n+LDfN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TuI1v/SE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D06C4CEE1;
+	Wed, 15 Jan 2025 19:03:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736967810;
+	bh=VAPXz2lk/aPqnrUp7qNA4j2tfR1dOW+mD7o3FbZjQtI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TuI1v/SEQhVchExis5wBanGXJUS+fP2DCaKBzuqFoXz2IlqIkyqZ8lcbzG9ABDyxJ
+	 cGTxwgADj/67SmbAu1pnkiigQaMEVJbRdoeDXFnzCa6MRbg1fLasscMrJOKPRvd7Dh
+	 yoU7Z57ZIbPyEHzzr/hw/QqRmZlb6PsuGF7FIUB/zHsJLB/gzVQuMMy3wsYVj7hlrP
+	 bko2k2jnf3Nc8RVVgqvvLyr7cPsd7RrxF5vlBaU4LAmMOi0Fge+VB3IiR4xV35Zt8I
+	 G+iLQ9KrvDpATFlZ58pBRxP6o+cxfAeSViwl7LK9EEM4/ppgvvC1GwiulYDOlMdvbD
+	 8Icsxpp0C66HQ==
+Date: Wed, 15 Jan 2025 12:03:27 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, michael.christie@oracle.com,
+	Tejun Heo <tj@kernel.org>, Luca Boccassi <bluca@debian.org>
+Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
+Message-ID: <Z4gGf5SAJwnGEFK0@kbusch-mbp>
+References: <20241108130737.126567-1-pbonzini@redhat.com>
+ <Z2RYyagu3phDFIac@kbusch-mbp.dhcp.thefacebook.com>
+ <fdb5aac8-a657-40ec-9e0b-5340bc144b7b@redhat.com>
+ <Z2RhNcJbP67CRqaM@kbusch-mbp.dhcp.thefacebook.com>
+ <CABgObfYUztpGfBep4ewQXUVJ2vqG_BLrn7c19srBoiXbV+O3+w@mail.gmail.com>
+ <Z4Uy1beVh78KoBqN@kbusch-mbp>
+ <0862979d-cb85-44a8-904b-7318a5be0460@redhat.com>
+ <Z4cmLAu4kdb3cCKo@google.com>
+ <Z4fnkL5-clssIKc-@kbusch-mbp>
+ <CABgObfZWdwsmfT-Y5pzcOKwhjkAdy99KB9OUiMCKDe7UPybkUQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABgObfZWdwsmfT-Y5pzcOKwhjkAdy99KB9OUiMCKDe7UPybkUQ@mail.gmail.com>
 
-On Sun, 12 Jan 2025 17:08:31 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+On Wed, Jan 15, 2025 at 06:10:05PM +0100, Paolo Bonzini wrote:
+> You can implement something like pthread_once():
 
-> The ICH_MISR_EL2-related macros are missing a number of status
-> bits that we are about to handle. Take this opportunity to fully
-> describe the layout of that register as part of the automatic
-> generation infrastructure.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+...
 
-Compared against the ARM ARM:
+> Where to put it I don't know.  It doesn't belong in
+> include/linux/once.h.  I'm okay with arch/x86/kvm/call_once.h and just
+> pull it with #include "call_once.h".
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Thanks for the suggestion, I can work with that. As to where to put it,
+I think the new 'struct once' needs to be a member of struct kvm_arch,
+so I've put it in arch/x86/include/asm/.
 
-Thanks,
-Andre
+Here's the result with that folded in. If this is okay, I'll send a v2,
+and can split out the call_once as a prep patch with your attribution if
+you like.
 
-> ---
->  arch/arm64/include/asm/sysreg.h       |  5 -----
->  arch/arm64/tools/sysreg               | 12 ++++++++++++
->  tools/arch/arm64/include/asm/sysreg.h |  5 -----
->  3 files changed, 12 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index cf74ebcd46d95..815e9b0bdff27 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -561,7 +561,6 @@
->  
->  #define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
->  #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
-> -#define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
->  #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
->  #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
->  #define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
-> @@ -991,10 +990,6 @@
->  #define TRFCR_ELx_E0TRE			BIT(0)
->  
->  /* GIC Hypervisor interface registers */
-> -/* ICH_MISR_EL2 bit definitions */
-> -#define ICH_MISR_EOI		(1 << 0)
-> -#define ICH_MISR_U		(1 << 1)
-> -
->  /* ICH_LR*_EL2 bit definitions */
->  #define ICH_LR_VIRTUAL_ID_MASK	((1ULL << 32) - 1)
->  
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index f5927d345eea3..a601231a088d7 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -2974,6 +2974,18 @@ Res0	17:5
->  Field	4:0	ListRegs
->  EndSysreg
->  
-> +Sysreg	ICH_MISR_EL2	3	4	12	11	2
-> +Res0	63:8
-> +Field	7	VGrp1D
-> +Field	6	VGrp1E
-> +Field	5	VGrp0D
-> +Field	4	VGrp0E
-> +Field	3	NP
-> +Field	2	LRENP
-> +Field	1	U
-> +Field	0	EOI
-> +EndSysreg
-> +
->  Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
->  Fields	CONTEXTIDR_ELx
->  EndSysreg
-> diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
-> index f43e303d31d25..0169bd3137caf 100644
-> --- a/tools/arch/arm64/include/asm/sysreg.h
-> +++ b/tools/arch/arm64/include/asm/sysreg.h
-> @@ -420,7 +420,6 @@
->  
->  #define SYS_ICH_VSEIR_EL2		sys_reg(3, 4, 12, 9, 4)
->  #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
-> -#define SYS_ICH_MISR_EL2		sys_reg(3, 4, 12, 11, 2)
->  #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
->  #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
->  #define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
-> @@ -634,10 +633,6 @@
->  #define TRFCR_ELx_E0TRE			BIT(0)
->  
->  /* GIC Hypervisor interface registers */
-> -/* ICH_MISR_EL2 bit definitions */
-> -#define ICH_MISR_EOI		(1 << 0)
-> -#define ICH_MISR_U		(1 << 1)
-> -
->  /* ICH_LR*_EL2 bit definitions */
->  #define ICH_LR_VIRTUAL_ID_MASK	((1ULL << 32) - 1)
->  
-
+---
+diff --git a/arch/x86/include/asm/kvm_call_once.h b/arch/x86/include/asm/kvm_call_once.h
+new file mode 100644
+index 0000000000000..451cc87084aa7
+--- /dev/null
++++ b/arch/x86/include/asm/kvm_call_once.h
+@@ -0,0 +1,44 @@
++#ifndef _LINUX_CALL_ONCE_H
++#define _LINUX_CALL_ONCE_H
++
++#include <linux/types.h>
++
++#define ONCE_NOT_STARTED 0
++#define ONCE_RUNNING     1
++#define ONCE_COMPLETED   2
++
++struct once {
++        atomic_t state;
++        struct mutex lock;
++};
++
++static inline void __once_init(struct once *once, const char *name,
++			       struct lock_class_key *key)
++{
++        atomic_set(&once->state, ONCE_NOT_STARTED);
++        __mutex_init(&once->lock, name, key);
++}
++
++#define once_init(once)							\
++do {									\
++	static struct lock_class_key __key;				\
++	__once_init((once), #once, &__key);				\
++} while (0)
++
++static inline void call_once(struct once *once, void (*cb)(struct once *))
++{
++        /* Pairs with atomic_set_release() below.  */
++        if (atomic_read_acquire(&once->state) == ONCE_COMPLETED)
++                return;
++
++        guard(mutex)(&once->lock);
++        WARN_ON(atomic_read(&once->state) == ONCE_RUNNING);
++        if (atomic_read(&once->state) != ONCE_NOT_STARTED)
++                return;
++
++        atomic_set(&once->state, ONCE_RUNNING);
++        cb(once);
++        atomic_set_release(&once->state, ONCE_COMPLETED);
++}
++
++#endif /* _LINUX_CALL_ONCE_H */
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index e159e44a6a1b6..56c79958dc9cb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -37,6 +37,7 @@
+ #include <asm/kvm_page_track.h>
+ #include <asm/kvm_vcpu_regs.h>
+ #include <asm/hyperv-tlfs.h>
++#include <asm/kvm_call_once.h>
+ #include <asm/reboot.h>
+ 
+ #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+@@ -1445,6 +1446,7 @@ struct kvm_arch {
+ 	struct kvm_x86_pmu_event_filter __rcu *pmu_event_filter;
+ 	struct vhost_task *nx_huge_page_recovery_thread;
+ 	u64 nx_huge_page_last;
++	struct once nx_once;
+ 
+ #ifdef CONFIG_X86_64
+ 	/* The number of TDP MMU pages across all roots. */
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 2401606db2604..3c0c1f3647ceb 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7411,20 +7411,28 @@ static bool kvm_nx_huge_page_recovery_worker(void *data)
+ 	return true;
+ }
+ 
+-int kvm_mmu_post_init_vm(struct kvm *kvm)
++static void kvm_mmu_start_lpage_recovery(struct once *once)
+ {
+-	if (nx_hugepage_mitigation_hard_disabled)
+-		return 0;
++	struct kvm_arch *ka = container_of(once, struct kvm_arch, nx_once);
++	struct kvm *kvm = container_of(ka, struct kvm, arch);
+ 
+ 	kvm->arch.nx_huge_page_last = get_jiffies_64();
+ 	kvm->arch.nx_huge_page_recovery_thread = vhost_task_create(
+ 		kvm_nx_huge_page_recovery_worker, kvm_nx_huge_page_recovery_worker_kill,
+ 		kvm, "kvm-nx-lpage-recovery");
+ 
++	if (kvm->arch.nx_huge_page_recovery_thread)
++		vhost_task_start(kvm->arch.nx_huge_page_recovery_thread);
++}
++
++int kvm_mmu_post_init_vm(struct kvm *kvm)
++{
++	if (nx_hugepage_mitigation_hard_disabled)
++		return 0;
++
++	call_once(&kvm->arch.nx_once, kvm_mmu_start_lpage_recovery);
+ 	if (!kvm->arch.nx_huge_page_recovery_thread)
+ 		return -ENOMEM;
+-
+-	vhost_task_start(kvm->arch.nx_huge_page_recovery_thread);
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c79a8cc57ba42..23bf088fc4ae1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11463,6 +11463,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 	struct kvm_run *kvm_run = vcpu->run;
+ 	int r;
+ 
++	r = kvm_mmu_post_init_vm(vcpu->kvm);
++	if (r)
++		return r;
++
+ 	vcpu_load(vcpu);
+ 	kvm_sigset_activate(vcpu);
+ 	kvm_run->flags = 0;
+@@ -12742,7 +12746,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 
+ int kvm_arch_post_init_vm(struct kvm *kvm)
+ {
+-	return kvm_mmu_post_init_vm(kvm);
++	once_init(&kvm->arch.nx_once);
++	return 0;
+ }
+ 
+ static void kvm_unload_vcpu_mmu(struct kvm_vcpu *vcpu)
+--
 
