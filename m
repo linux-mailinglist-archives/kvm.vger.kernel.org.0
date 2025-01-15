@@ -1,275 +1,189 @@
-Return-Path: <kvm+bounces-35583-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCDDCA1298D
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 18:14:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F40A12A7F
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 19:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D99071889D84
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 17:14:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 885D4163BC9
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 18:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5CB1A8F7D;
-	Wed, 15 Jan 2025 17:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038261D5AC0;
+	Wed, 15 Jan 2025 18:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LfERWS7T"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VxChtGMM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F1C155C96;
-	Wed, 15 Jan 2025 17:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5CE14A630
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 18:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736961256; cv=none; b=hnd+naIlaatz7i3z1eBbgAtxIglEH0Hq+abdcg5vueNhD/7jCRjWO+1Fcuu2wJQlPvFcpx2fioT1seDwrf1HvQsd378pda8BSRqi14Yi2ST8RN55zjb0+1jCOjA/7kAmimTeYLX3W3a4wnhJlIM1n5G6ZC+hLZ/jol7Hv50xTSY=
+	t=1736964631; cv=none; b=V1+FkGA6FUz2V/o0gxm5cG8/MhO0e1/JxX4jHS9ZeNC27Tkft+b39v53suLsbdyDeh+iiR4DgXB8Tkm1xDp59VA9HUDGyQ1itCtBqCjS2lLlcl9ndTCcXPvZ96CxNsHeptzqVCBY5zWE7X6kViifS6Fvl1jetpEtEpJiR/OEehY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736961256; c=relaxed/simple;
-	bh=9V4f+GgSVr8cFm5enDkmcjGmT6WT96bSBqA8ZFkiaLw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WbRUvS1CxW+Kg6MgzpzSt3F63qC0/5n0VM86nlcTYggcjDS+5yq2c2sAI24c+fyKqUWi/HnreMv0cU2OsCejZkizKgLbnqa7PjpSTCbDFUoh/jFwwP7uNODMaokXUbTaEJ/YSTtIqQ8bro5In4VGhAE1NJwz509dry0G9etSPRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LfERWS7T; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736961254; x=1768497254;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=9V4f+GgSVr8cFm5enDkmcjGmT6WT96bSBqA8ZFkiaLw=;
-  b=LfERWS7TUju5NAtjT+33MS7BMl3QKhMsfKUYhh/RMYZr92yBibNcN/3H
-   WykgpI8HGFLWOy775B+QCiGh7HOVC8no3shRpYZvXbFv7G/7sY1jnnnhB
-   mWimdzYtGrqae89V6uu53LP9vdn7m9BEBYq3msvJh/a5jCHhg7LJfbbAE
-   UWQ4RBEDTkxaxVEmpsKy65pFjOaIQoDmw38DFwN6KH5Kd1WeYWSEz7Vs+
-   KQTzcKeJkRLIw8MLeYl8dZsE+E7kcTbkjyzAjP/HrS+XHAcM+X6XE7no5
-   cK6CdkwAQEOaKYGzUZ0PCI1Ye65QFHjcv1P/dEv/XdxspuJgunMPoFEiV
-   g==;
-X-CSE-ConnectionGUID: zdtB19fGSke2d65MtkLz6A==
-X-CSE-MsgGUID: GWTYY/gAR+SuWht7CFzsog==
-X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="41243390"
-X-IronPort-AV: E=Sophos;i="6.13,206,1732608000"; 
-   d="scan'208";a="41243390"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 09:14:13 -0800
-X-CSE-ConnectionGUID: pudNVkbtStWPuEe01Kt3mA==
-X-CSE-MsgGUID: bPn7Nwm9SVGznJredPS3ig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,206,1732608000"; 
-   d="scan'208";a="105729523"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.246.16.163])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 09:14:10 -0800
-Message-ID: <0c367e27-2b90-4b0a-ae1e-2f8a866bdd75@intel.com>
-Date: Wed, 15 Jan 2025 19:14:03 +0200
+	s=arc-20240116; t=1736964631; c=relaxed/simple;
+	bh=yQ/sw9wRMFaarqcRa9DR96lwFaiZR3HU9sR4NGAmQo8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j+pPGwHgYffoI5ofgcZ5tjsQdIG7WxWrhvAQZUZmV4pPaecHGJ0z0cSmJubqEK+MR2pqZZsi76ThJiug7bWPkKiTXD6Q6WBEj4OSKivovt0lb/WP8IFhdeI0HMzZVx0XMOt9uRFcGVszwTIrNCWtoQno9WoAfwE8oXPATz07bTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VxChtGMM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736964628;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W72gn/X43iSEWHwc8vF+OcjzKNW4pEeZuQNi+6C4SJg=;
+	b=VxChtGMMclFrtapoA4l6Jfzf4WJHvfEBBj+KQ39EfB3FDXmsVRMcgYFggZe89G61qtrWqX
+	D7eOxhpYQw6HrmN7etQ6uxD06g6ZRiwjddjQpup5MLVtZVeMqps4Wp+gsPGhqv9MacNfvX
+	JIP92g48XNysP3R/cJ3j/tUPgITNsVw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-302-zRtRW8NIMcOxaO0iVgh3zg-1; Wed, 15 Jan 2025 13:10:26 -0500
+X-MC-Unique: zRtRW8NIMcOxaO0iVgh3zg-1
+X-Mimecast-MFC-AGG-ID: zRtRW8NIMcOxaO0iVgh3zg
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436723bf7ffso32477515e9.3
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 10:10:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736964625; x=1737569425;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W72gn/X43iSEWHwc8vF+OcjzKNW4pEeZuQNi+6C4SJg=;
+        b=YGvv/nT5rCUdx1hszLeb3nZB712xmQDll27xQbMVN5uVIq9qeu2M9hKuSbFalT5Snt
+         ANyXN5G9odlL70oX8oJhADY271h87ZwgZedZURKPzNn4OyZ17A3OLb+HNxCKqM7Kmf0U
+         gnimwrLi7qDS9BDSvXwHBNLUxX8Cf0QQLcOa11YYkUzZAh5yiCQpP5H+cyQHZWkLi3nC
+         6nckfaQNC4gdmMIdODfgQ0RFlKok4z58cKkzbjGmsmNbZEaeeuLHmUgfjv4gyfEKn5/4
+         rW2GYdArQkDieNhen6MfcxJvAgd/no18iEEqOvMJh1H+FcrJF+DcAjLogVGznnSp5czC
+         61AA==
+X-Forwarded-Encrypted: i=1; AJvYcCXZE9F2/hpSosLz5xMa8kZpv56Gg8szlZ8LwEgYhfDufmJKkG7f6vUle9+n+LgbJWfdsI4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUc6P7MThBlOzxmGR4ejpJzh6Ven+k3S9VQFpzj0t+nVsn6Jn0
+	B86duPsILZB3B7PhmvvsxuDKKPwh8iZjSj1lztIYLB9ffj5qNcTWbyitmEqrMLb2tNddBcaIeXi
+	HJ+ujgok8FayUczNGdoY1IkXXktB9gB0zL50tRCdAXyJk3L0dBg==
+X-Gm-Gg: ASbGncu4oksHTmF0AnJsmC8RdnHyKSGow/eGFYcuyoEY5IJCWypdCNVHJmwymebHvYI
+	mhfXvN5OkcVpC4tX223H16D1WByFh7Nz5157q+/Mfo9Zcq8R0xmwq3M0XaoVJ1GhjpfYCtg/Bqc
+	5her0NhY8V1XpQqb+/51zZi8f2SSBUblKo7R3rBaB6Z/KO8nUlsy5hy9a/HDhWCt9A81nWJYv8z
+	cwyG6lTCJLM3pdo2y3ICfbqPTFT2mu754hFjqYU3cyEgVyjEAq9
+X-Received: by 2002:a05:600c:4586:b0:434:f817:4492 with SMTP id 5b1f17b1804b1-436e26f47f9mr300718005e9.31.1736964625036;
+        Wed, 15 Jan 2025 10:10:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGQBbQ/ucVqe/1aRLFuXcnKDdErlW+RXJrbuNeDn0+FcDJpY3P4Ms2jbcdoT38rACpbOJjs1A==
+X-Received: by 2002:a05:600c:4586:b0:434:f817:4492 with SMTP id 5b1f17b1804b1-436e26f47f9mr300717745e9.31.1736964624696;
+        Wed, 15 Jan 2025 10:10:24 -0800 (PST)
+Received: from redhat.com ([2a0d:6fc7:342:db8c:4ec4:322b:a6a8:f411])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38bf78sm18082767f8f.48.2025.01.15.10.10.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 10:10:23 -0800 (PST)
+Date: Wed, 15 Jan 2025 13:10:21 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Dongjiu Geng <gengdongjiu1@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+	kvm@vger.kernel.org
+Subject: [PULL 36/48] acpi/ghes: better name GHES memory error function
+Message-ID: <d32028a54000db671eb2d0b6b28bbf15acc2e5f9.1736964488.git.mst@redhat.com>
+References: <cover.1736964487.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 12/14] x86/virt/tdx: Add SEAMCALL wrapper to enter/exit
- TDX guest
-To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: kai.huang@intel.com, rick.p.edgecombe@intel.com,
- dave.hansen@linux.intel.com, yan.y.zhao@intel.com
-References: <20250115160912.617654-1-pbonzini@redhat.com>
- <20250115160912.617654-13-pbonzini@redhat.com>
-Content-Language: en-US
-From: Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <20250115160912.617654-13-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1736964487.git.mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-On 15/01/25 18:09, Paolo Bonzini wrote:
-> From: Kai Huang <kai.huang@intel.com>
-> 
-> Intel TDX protects guest VM's from malicious host and certain physical
-> attacks.  TDX introduces a new operation mode, Secure Arbitration Mode
-> (SEAM) to isolate and protect guest VM's.  A TDX guest VM runs in SEAM and,
-> unlike VMX, direct control and interaction with the guest by the host VMM
-> is not possible.  Instead, Intel TDX Module, which also runs in SEAM,
-> provides a SEAMCALL API.
-> 
-> The SEAMCALL that provides the ability to enter a guest is TDH.VP.ENTER.
-> The TDX Module processes TDH.VP.ENTER, and enters the guest via VMX
-> VMLAUNCH/VMRESUME instructions.  When a guest VM-exit requires host VMM
-> interaction, the TDH.VP.ENTER SEAMCALL returns to the host VMM (KVM).
-> 
-> Add tdh_vp_enter() to wrap the SEAMCALL invocation of TDH.VP.ENTER.
-> 
-> TDH.VP.ENTER is different from other SEAMCALLS in several ways:
->  - it may take some time to return as the guest executes
->  - it uses more arguments
->  - after it returns some host state may need to be restored
-> 
-> TDH.VP.ENTER arguments are passed through General Purpose Registers (GPRs).
-> For the special case of the TD guest invoking TDG.VP.VMCALL, nearly any GPR
-> can be used, as well as XMM0 to XMM15. Notably, RBP is not used, and Linux
-> mandates the TDX Module feature NO_RBP_MOD, which is enforced elsewhere.
-> Additionally, XMM registers are not required for the existing Guest
-> Hypervisor Communication Interface and are handled by existing KVM code
-> should they be modified by the guest.
-> 
-> There are 2 input formats and 5 output formats for TDH.VP.ENTER arguments.
-> Input #1 : Initial entry or following a previous async. TD Exit
-> Input #2 : Following a previous TDCALL(TDG.VP.VMCALL)
-> Output #1 : On Error (No TD Entry)
-> Output #2 : Async. Exits with a VMX Architectural Exit Reason
-> Output #3 : Async. Exits with a non-VMX TD Exit Status
-> Output #4 : Async. Exits with Cross-TD Exit Details
-> Output #5 : On TDCALL(TDG.VP.VMCALL)
-> 
-> Currently, to keep things simple, the wrapper function does not attempt
-> to support different formats, and just passes all the GPRs that could be
-> used.  The GPR values are held by KVM in the area set aside for guest
-> GPRs.  KVM code uses the guest GPR area (vcpu->arch.regs[]) to set up for
-> or process results of tdh_vp_enter().
-> 
-> Therefore changing tdh_vp_enter() to use more complex argument formats
-> would also alter the way KVM code interacts with tdh_vp_enter().
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
-> Message-ID: <20241121201448.36170-2-adrian.hunter@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/asm/tdx.h  | 1 +
->  arch/x86/virt/vmx/tdx/tdx.c | 8 ++++++++
->  arch/x86/virt/vmx/tdx/tdx.h | 1 +
->  3 files changed, 10 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index 0c89afffdac4..6531b69a53ac 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -154,6 +154,7 @@ static inline int pg_level_to_tdx_sept_level(enum pg_level level)
->          return level - 1;
->  }
->  
-> +u64 tdh_vp_enter(struct tdx_vp *vp, struct tdx_module_args *args);
->  u64 tdh_mng_addcx(struct tdx_td *td, struct page *tdcs_page);
->  u64 tdh_mem_page_add(struct tdx_td *td, u64 gpa, struct page *page, struct page *source, u64 *ext_err1, u64 *ext_err2);
->  u64 tdh_mem_sept_add(struct tdx_td *td, u64 gpa, int level, struct page *page, u64 *ext_err1, u64 *ext_err2);
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 55851a0591d2..bb6f8ef9661e 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -1479,6 +1479,14 @@ static void tdx_clflush_page(struct page *page)
->  	clflush_cache_range(page_to_virt(page), PAGE_SIZE);
->  }
->  
-> +u64 tdh_vp_enter(struct tdx_vp *td, struct tdx_module_args *args)
-> +{
-> +	args->rcx = tdx_tdvpr_pa(td);
-> +
-> +	return __seamcall_saved_ret(TDH_VP_ENTER, args);
-> +}
-> +EXPORT_SYMBOL_GPL(tdh_vp_enter);
-> +
->  u64 tdh_mng_addcx(struct tdx_td *td, struct page *tdcs_page)
->  {
->  	struct tdx_module_args args = {
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-> index 64932450aba3..b71b375b10c0 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.h
-> +++ b/arch/x86/virt/vmx/tdx/tdx.h
-> @@ -15,6 +15,7 @@
->  /*
->   * TDX module SEAMCALL leaf functions
->   */
-> +#define TDH_VP_ENTER			0
->  #define TDH_MNG_ADDCX			1
->  #define TDH_MEM_PAGE_ADD		2
->  #define TDH_MEM_SEPT_ADD		3
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-FWIW I was planning to squash the noinstr change into this
-patch, and amend the commit message accordingly, like so:
+The current function used to generate GHES data is specific for
+memory errors. Give a better name for it, as we now have a generic
+function as well.
 
-From: Adrian Hunter <adrian.hunter@intel.com>
-Date: Wed, 15 Jan 2025 19:04:31 +0200
-Subject: [PATCH] amend! x86/virt/tdx: Add SEAMCALL wrapper to enter/exit TDX
- guest
-
-x86/virt/tdx: Add SEAMCALL wrapper to enter/exit TDX guest
-
-Intel TDX protects guest VMs from malicious host and certain physical
-attacks.  TDX introduces a new operation mode, Secure Arbitration Mode
-(SEAM) to isolate and protect guest VMs.  A TDX guest VM runs in SEAM and,
-unlike VMX, direct control and interaction with the guest by the host VMM
-is not possible.  Instead, Intel TDX Module, which also runs in SEAM,
-provides a SEAMCALL API.
-
-The SEAMCALL that provides the ability to enter a guest is TDH.VP.ENTER.
-The TDX Module processes TDH.VP.ENTER, and enters the guest via VMX
-VMLAUNCH/VMRESUME instructions.  When a guest VM-exit requires host VMM
-interaction, the TDH.VP.ENTER SEAMCALL returns to the host VMM (KVM).
-
-Add tdh_vp_enter() to wrap the SEAMCALL invocation of TDH.VP.ENTER.
-
-Make tdh_vp_enter() noinstr because KVM requires VM entry to be noinstr
-for 2 reasons:
- 1. The use of context tracking via guest_state_enter_irqoff() and
-    guest_state_exit_irqoff()
- 2. The need to avoid IRET between VM-exit and NMI handling in order to
-    avoid prematurely releasing NMI inhibit.
-
-Consequently make __seamcall_saved_ret() noinstr also. Note,
-tdh_vp_enter() is the only caller of __seamcall_saved_ret().
-Essentially, __seamcall_saved_ret() exists to serve the register passing
-requirements of TDH.VP.ENTER SEAMCALL, and is unlikely to be used for
-anything else.
-
-TDH.VP.ENTER is different from other SEAMCALLS in several ways:
- - it may take some time to return as the guest executes
- - it uses more arguments
- - after it returns some host state may need to be restored
-
-TDH.VP.ENTER arguments are passed through General Purpose Registers (GPRs).
-For the special case of the TD guest invoking TDG.VP.VMCALL, nearly any GPR
-can be used, as well as XMM0 to XMM15. Notably, RBP is not used, and Linux
-mandates the TDX Module feature NO_RBP_MOD, which is enforced elsewhere.
-Additionally, XMM registers are not required for the existing Guest
-Hypervisor Communication Interface and are handled by existing KVM code
-should they be modified by the guest.
-
-Signed-off-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Adrian Hunter <adrian.hunter@intel.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Message-Id: <35b59121129d5e99cb5062cc3d775594bbb0905b.1736945236.git.mchehab+huawei@kernel.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- arch/x86/virt/vmx/tdx/seamcall.S | 3 +++
- arch/x86/virt/vmx/tdx/tdx.c      | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ include/hw/acpi/ghes.h | 4 ++--
+ hw/acpi/ghes-stub.c    | 2 +-
+ hw/acpi/ghes.c         | 2 +-
+ target/arm/kvm.c       | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/virt/vmx/tdx/seamcall.S b/arch/x86/virt/vmx/tdx/seamcall.S
-index 5b1f2286aea9..6854c52c374b 100644
---- a/arch/x86/virt/vmx/tdx/seamcall.S
-+++ b/arch/x86/virt/vmx/tdx/seamcall.S
-@@ -41,6 +41,9 @@ SYM_FUNC_START(__seamcall_ret)
- 	TDX_MODULE_CALL host=1 ret=1
- SYM_FUNC_END(__seamcall_ret)
+diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
+index 8859346af5..21666a4bcc 100644
+--- a/include/hw/acpi/ghes.h
++++ b/include/hw/acpi/ghes.h
+@@ -74,15 +74,15 @@ void acpi_build_hest(GArray *table_data, GArray *hardware_errors,
+                      const char *oem_id, const char *oem_table_id);
+ void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
+                           GArray *hardware_errors);
++int acpi_ghes_memory_errors(uint16_t source_id, uint64_t error_physical_addr);
+ void ghes_record_cper_errors(const void *cper, size_t len,
+                              uint16_t source_id, Error **errp);
+-int acpi_ghes_record_errors(uint16_t source_id, uint64_t error_physical_addr);
  
-+/* KVM requires non-instrumentable __seamcall_saved_ret() for TDH.VP.ENTER */
-+.section .noinstr.text, "ax"
-+
- /*
-  * __seamcall_saved_ret() - Host-side interface functions to SEAM software
-  * (the P-SEAMLDR or the TDX module), with saving output registers to the
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index bb6f8ef9661e..c9c198e0b48c 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -1479,7 +1479,7 @@ static void tdx_clflush_page(struct page *page)
- 	clflush_cache_range(page_to_virt(page), PAGE_SIZE);
+ /**
+  * acpi_ghes_present: Report whether ACPI GHES table is present
+  *
+  * Returns: true if the system has an ACPI GHES table and it is
+- * safe to call acpi_ghes_record_errors() to record a memory error.
++ * safe to call acpi_ghes_memory_errors() to record a memory error.
+  */
+ bool acpi_ghes_present(void);
+ #endif
+diff --git a/hw/acpi/ghes-stub.c b/hw/acpi/ghes-stub.c
+index 2b64cbd281..7cec1812da 100644
+--- a/hw/acpi/ghes-stub.c
++++ b/hw/acpi/ghes-stub.c
+@@ -11,7 +11,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/acpi/ghes.h"
+ 
+-int acpi_ghes_record_errors(uint16_t source_id, uint64_t physical_address)
++int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
+ {
+     return -1;
+ }
+diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
+index 6f40cd35a9..66bd98337a 100644
+--- a/hw/acpi/ghes.c
++++ b/hw/acpi/ghes.c
+@@ -415,7 +415,7 @@ void ghes_record_cper_errors(const void *cper, size_t len,
+     return;
  }
  
--u64 tdh_vp_enter(struct tdx_vp *td, struct tdx_module_args *args)
-+noinstr u64 tdh_vp_enter(struct tdx_vp *td, struct tdx_module_args *args)
+-int acpi_ghes_record_errors(uint16_t source_id, uint64_t physical_address)
++int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
  {
- 	args->rcx = tdx_tdvpr_pa(td);
- 
+     /* Memory Error Section Type */
+     const uint8_t guid[] =
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index a9444a2c7a..da30bdbb23 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -2387,7 +2387,7 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+              */
+             if (code == BUS_MCEERR_AR) {
+                 kvm_cpu_synchronize_state(c);
+-                if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
++                if (!acpi_ghes_memory_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
+                     kvm_inject_arm_sea(c);
+                 } else {
+                     error_report("failed to record the error");
 -- 
-2.43.0
+MST
 
 
