@@ -1,239 +1,381 @@
-Return-Path: <kvm+bounces-35602-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35603-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26E4A12C34
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 21:06:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33775A12DD1
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 22:37:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF467166788
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 20:06:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B34323A594A
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 21:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699681D89FD;
-	Wed, 15 Jan 2025 20:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607FC1DB37C;
+	Wed, 15 Jan 2025 21:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g3E63Qgo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JiJltTVI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0141D61BB;
-	Wed, 15 Jan 2025 20:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736971577; cv=fail; b=b8pm2DzK50bqkJvKWQTi6/DAVFcJmq+yY1fYZZVMbwKipRP5XwPiFDJuTbdqAtIcQ6STW/kCoUBMHRjQwausfMwk8Bs3rnjKn5ZUxaqNTn3ymxq4SgpvpRM69jexbX7V3csYJRfyNYGrnhKI2g9pQJTu6KdhE9S3ZSs7Wb3Bzhk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736971577; c=relaxed/simple;
-	bh=gfKoMT//lX4M61qiv3J3VflqR0jAT212J1BC7by0uj4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fK5VOduVD4qt4MiffWWvSOrO1kITRxQRG04hgan8ZiYdpYAdw1uSRTMDnO8DYkaYMdR9PAMe0H3rkF5VjsJmXSl//OMIXaRNF+w5QJUKGfgPeQeo5zrZQb9eQGpbXZ68UiNt332yNNJgxdPsPqgouDOr130svky3T75HXgqIFWk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g3E63Qgo; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736971576; x=1768507576;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=gfKoMT//lX4M61qiv3J3VflqR0jAT212J1BC7by0uj4=;
-  b=g3E63QgoJAngIzLzF6jwLDXbHxCw1AQFfm6MRoS/rwapu2jnS262GoMr
-   eRjvLuTeqNkFzA3auhB+7l1eCV73VS7Yz7mvlXLekwWkoLxSza853tfAA
-   hvIl/ySlQPARifU9jpK8SNuTX5D/+mKy6AdYT+aBHk19DUIlKXE8Cqh6W
-   UIICGbNuZfbvN8X8BOq0cGzU3UghiUTS1IFT+a5KLkVWTnTn4J0Xp6Oww
-   T3KV/axxE2Jn1ixpuZAjDcJLKYAYbr4vc+SSDbasOzfCNP9S5dZcZjcup
-   HJSs7W0S3bMbI1XLwwgZPXl0dYcIC8OCpr/uu8R0fnlAcpenXyCURAvvl
-   g==;
-X-CSE-ConnectionGUID: o/JKrzVARgeqPT3A5wZnpQ==
-X-CSE-MsgGUID: Jt4RCibUS6qJJ081yiyuRA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="37209817"
-X-IronPort-AV: E=Sophos;i="6.13,207,1732608000"; 
-   d="scan'208";a="37209817"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 12:06:15 -0800
-X-CSE-ConnectionGUID: sGaLiMkITsewLmFdNUCllQ==
-X-CSE-MsgGUID: JpewFj1jQCaKZO17UXzSIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,207,1732608000"; 
-   d="scan'208";a="105179766"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Jan 2025 12:06:14 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 15 Jan 2025 12:06:13 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 15 Jan 2025 12:06:13 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 15 Jan 2025 12:06:12 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Wjus97LceiLc//dmEZ78gGemruPgn/BKBCBcPb2QnH4Q/gtjXQHwOc71/efT/Ch0A38WsaLdgp4FVLCt8XMC1TxIrAdLJdiDfw9MEOp0fmP+G/lnWY56Heewk+Z9rmuxKh+W/b7adfoXhlDLGkyowIxX+f9AvsuzTW7Qv603uuvow0Nk4fetahpSFH99JdglfXPmVtK87zYnnMnVmtFs8TZdGQ75mkALtd3M/dZJQoZ8lCq3NztyL+F3od9PvuKKcYASHB0ylRSUm1R1/JqVaKf6g/vrx6MkJguzRYdWAz39sZGJ0lMRCP+C9kgmfotRze7ai42XRLYlpFn8T64qpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gfKoMT//lX4M61qiv3J3VflqR0jAT212J1BC7by0uj4=;
- b=sqsnpr8fH2ywwTABEs/ipOHr5ujI9xi4Isl4ipCLau2144nVTLH26wvJSB/V90utMW0leEGVni4vtUlOLvzYK88hUFgas9VGfpWFJmgUrz2N32HzFgFKhkXXXRyTWfvIaHb9Lwgd83ZV5pKrVzGZ+8X16QW7QP9n9FtbmwKO01qFCEEPy6o8waXIjdWfQGzLB45UEi+QiSzcFRH/u1NqcQteoCGXhcTU/w8pvUt2j/q0CdvVRzR0EJrZG0swDorcZZ/dHaRwTtnF4m9IS5+Uv5PcYSAzw3gqmqNRqH46ozOl6rLll5DRWR29vKabryqJnMJO72SjaqeOQasGsBksWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from LV2PR11MB5976.namprd11.prod.outlook.com (2603:10b6:408:17c::13)
- by PH0PR11MB5191.namprd11.prod.outlook.com (2603:10b6:510:3e::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Wed, 15 Jan
- 2025 20:06:09 +0000
-Received: from LV2PR11MB5976.namprd11.prod.outlook.com
- ([fe80::d099:e70d:142b:c07d]) by LV2PR11MB5976.namprd11.prod.outlook.com
- ([fe80::d099:e70d:142b:c07d%5]) with mapi id 15.20.8356.010; Wed, 15 Jan 2025
- 20:06:09 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "Huang, Kai" <kai.huang@intel.com>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-Subject: Re: [PATCH v3 00/14] x86/virt/tdx: Add SEAMCALL wrappers for KVM
-Thread-Topic: [PATCH v3 00/14] x86/virt/tdx: Add SEAMCALL wrappers for KVM
-Thread-Index: AQHbZ2fdmbRdWBZ26kOkd1tFP4ljTrMYNK6AgAAF+oCAAAhcAA==
-Date: Wed, 15 Jan 2025 20:06:09 +0000
-Message-ID: <b29ae06660e4d6318d69fd4c9f33a148d4a43900.camel@intel.com>
-References: <20250115160912.617654-1-pbonzini@redhat.com>
-	 <00ff9b4e7ff1a67ca43d4ecd7e46aa59d259733f.camel@intel.com>
-	 <e4b2c596-a2a9-496b-8875-4f73ddcfcf26@redhat.com>
-In-Reply-To: <e4b2c596-a2a9-496b-8875-4f73ddcfcf26@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV2PR11MB5976:EE_|PH0PR11MB5191:EE_
-x-ms-office365-filtering-correlation-id: 747742ea-88d2-4678-e7ac-08dd35a00d80
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?QjBjQ0EybU9wWEJqcUJrclF1MXdFRlBpcEJMYmJhcDdFVitoeVRBTmc4clNl?=
- =?utf-8?B?Z3UwckRDWXFOeU9yRTg2NG1iSmxndnRkZ1dOb0ptMXBBTnk3YTRuQ3lvNEhL?=
- =?utf-8?B?ZDRKTEhaeUpLVUJLVisvbFhsKzZYaXFNa1U2MjNWMGN2Uk05cTR1bkdnaGRn?=
- =?utf-8?B?d0s2Ukh0K2dhMkwvR0w3SUVic1ppdXpOcnU5ZFJUcGZycm9pV0RzbTRRUnkv?=
- =?utf-8?B?N2tRZW5hSDRFd0wzaUl3MFlqejVZRzJYd01tSFpuZWZ2N1JpYjhadzdTT1lK?=
- =?utf-8?B?TmZKZitzWDJkcllOUlJWZHQ1WnZiT3JpTFQvTmxld0dIaEhJUFNtNDNlcEJI?=
- =?utf-8?B?a2ZwTlUzbkNDeU1lWmVjbXRTVTNxT0VEMG1rVDAxUFpzampTdEx5TStzNWZS?=
- =?utf-8?B?ckNIREhqNzI3Mm4zdGltOThVUlNIVnBUUi9uWGhyOUk3WDRuZjhvZTdWckNF?=
- =?utf-8?B?MWkvVVRPSVIvZ3RxZENLRnExTGZYQi9keW1qeDgvakdneFVGbEJwZ2pnMGls?=
- =?utf-8?B?alFTS21lVi9KQktiblNaeDl6UFB0OXVDS2NsNk82aXpPZittQWVwUDdHbXVl?=
- =?utf-8?B?ZVkwREJ0aGlpRk1TdWlGYWtKSHN4RDRhZ2lhb2xqZkxQQW0xc1A3ZlRBQWF2?=
- =?utf-8?B?MzBwd0dQL0hQY1ZWR2trS1Fxbml2dTlNSU9UV0dDNFp4dk10R00xK2NsWk5C?=
- =?utf-8?B?NTV3Zkg3WnRYbVVLR3RxNlpvdWJyQXozc24xR1drUUdhbWdIdmVJeituZzJ5?=
- =?utf-8?B?NlA3c1hFM2Rta2hRNVRvNHZsclVPTWNuRDZkWFdvZlYvZUhtdU1NbDFnLzFJ?=
- =?utf-8?B?QWJKQWhVY1U0RjdST1lwUnYzakwzN0tmcjR4eWp3RHh5d1pxU2FuSzRCZnVm?=
- =?utf-8?B?aXVyZzliV2JEK3Jub1NvMHVuTU5UU0dpUkx1QitNZVI1bld2SWpMQks3cEdr?=
- =?utf-8?B?cW1PZE4wUWJaT2lOblNqc0RyNUg3VGRId09QNUVHTUo1aW5pS091RmNxelVz?=
- =?utf-8?B?LzRnMEJzakFmZldUSlh1YXRzK2RSaDBwbmtCZXVGY0lETG5NS3pYWXltUG9h?=
- =?utf-8?B?aXAxcEJzNU5NcUpMd3M3S3NTYkdWNU5FcVlWS09jS0YvWEttbG51MGp0YnNF?=
- =?utf-8?B?VFRacmNCdlAweHRtL21CMUZNVFA5b1pJKzk4Tlp2bFkwQnd5aXZudGMyTm12?=
- =?utf-8?B?eVZ3SFBsQWg4UnlUa1AzM3JnWVp5aENtQzBhY0VXZ1o3WHEwVHh5dlc4dzZR?=
- =?utf-8?B?d3dPQlFxNXYxUjhFRlZ1SENpbytsMWtIMEk4aVVHZERuOE54c1VES3hadmhs?=
- =?utf-8?B?OFl6TzJxeWNMK2M0c29zam1FWVBHNlZEVFdnVFhKbno2Nnh6QjFLUWRIaHh0?=
- =?utf-8?B?RkFkalp0ODBITWlLcUZCWUVwcm5uSWZhNTdMOW9YelU0ZVJScXpkVGlJbnRw?=
- =?utf-8?B?ZVR0MURGNnM0SUJZcWxwNmZOWm4vZDlvK1hYTVNqK1VhYlZ1YjYxeWYybnor?=
- =?utf-8?B?SGlRSVY0L3NBbk5oN29sNHZ1Zm1rUTZscUxJSFZSRXlGUGlFbkhLZTlBcSsz?=
- =?utf-8?B?bGsvY3N6eTVWQmJXQXR5VHliN3FPRk0wMVI3bVM3em9ubjdtYThyL2xUN0Vp?=
- =?utf-8?B?MnRZNkJ0SHBPWUttcGw5NEF1ZmRzbmFVSGJHSTR1eTFsdkIyem1hVEZEcGl1?=
- =?utf-8?B?WUtUeWlZalc4UTNkc1FkQlhjZktJT2dWMldqVHp2YVBNNCtrR3NUNFoxTjJG?=
- =?utf-8?B?WHpkKzA4UmtKbEJKb3oxN2JvdWo5RVFSdytJWFhZN3RzaGRNSVBhZit5cGxi?=
- =?utf-8?B?UTc3Wm4xYzRnQUlKQ09zbERtNmRTVmVHc1JlUzFuSHZLMlB4WVhpT0dYUThi?=
- =?utf-8?B?ZlZ2MG94WmR3UTZRcnYvUjZOb1k5UURjbXF6cmNDYWowUVJMZnp0eWROckti?=
- =?utf-8?Q?7qP2XQMtYdx8A7lmbJqudHNO/9nd0bdJ?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR11MB5976.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?S2NmMERLQXhjaUpKSXN0dEdYd0F3WG11WmNyeks4eGJHZlExbkVzRG1mQlFk?=
- =?utf-8?B?eUNyVWRVRzVuOTRRL0ZKc3g0aEt4N2lDODZ1Tk8rY3gwUGZxdVFCMlJtSGMx?=
- =?utf-8?B?VTBqNnNNZXhWbUNYY3RUQUFQRWwzaDg1dTR1ZElmMjZXaktFNVJwa2UvWE1D?=
- =?utf-8?B?TGpvRlo5U0R0K1NKMm5YNzFwTEFZMzNMVm1TNXpjU1oydnlxT3pBdFFOQ0I4?=
- =?utf-8?B?TDBOZW9HdkRwY28ySzhuOUN1SmVuVWo2ejNrbG0xSXZkZHcyb0t3NkF5T2tu?=
- =?utf-8?B?YnlEeDFuUFJDa1NPK0pSQm52RjNpWDFGaUlSTmpHS2hzb2F4d3d4MVg5bmZN?=
- =?utf-8?B?WU0yVW5aLzlYNjFUNVdjWjBQSjRqU0xBM1FLOVord2ZrSXQ0YlJobzFXY3Yx?=
- =?utf-8?B?VGEwN3JmMGNXVENXNWpuWFgwd0ZWd3U3MkJEZnU4RnZVTkR4NTV5dDRpVUsz?=
- =?utf-8?B?akZxd1A2WDd5Y290Ti9wZGZFUEhrWVR6SjRzejdOU3pDYlBRMkc1b0JmTFQw?=
- =?utf-8?B?Rk1Na0Z3TUJBelRjU0o1N1FNV3IvQ29YQnVoY25RZTFoYUJsZnlLOE4wNVFY?=
- =?utf-8?B?L3dSUzQ2cXdQdDhIakQxQmZTdVlzWUg2SHNUeTJ1UmxQUUkvNXdYQmVZL3h5?=
- =?utf-8?B?MUZoZlRoWmx5bFpGZ3Z1S3JnMXl5T2FyRVBkcFRMTk55SmZmaXlSSUNvc0o1?=
- =?utf-8?B?RkR0TmdlNUNxMllUQlFQRXo4bjJYQVlhYTNuK2VZK29IajJMa2FFZkczYXpx?=
- =?utf-8?B?NkxweDBoNDJKVkRieGFsUk5HSmFRNDc5b2hQWXFDd3g1V0tLNDNZSHlzM2JP?=
- =?utf-8?B?ODVhVFNSS3ltWlpyS0cyNWVrSU44RHh6MU5iTGRhTkpXb0R1SlE2M29WMDFs?=
- =?utf-8?B?N1lmVmJSWkpwMzRWM1hDRENEMWM5STUwTlB6R29WamhwNjJmOFJHYWhDVUNl?=
- =?utf-8?B?Rnk0WEtOZVpLeWVFT3IwcFd3UkVsc1Z3RjN5N0QyU1U3MGtqMlloRG5HSUow?=
- =?utf-8?B?SnhWL041ZVFGbllzcHkzVVhIL1Rta3p5UVRYdFZ5SitYN2FoL0xLSEdZMk5l?=
- =?utf-8?B?eW5WK2NxdTZCZ0NWTmdOaDIwNnRRc015M0VROTBWQklKM2hYS0pNd1pmMVdS?=
- =?utf-8?B?TUVCVVVINEtKS1RvN3B5S1BuNyt3aDA4RTFISGRDWnFYcFhuZFBrcitnZGpH?=
- =?utf-8?B?Qlhyd3JoTW96R0NRQS84ZGlRVjE1ZCs2bW10S3p3Sm1vaTFFYVFDaWNoenJV?=
- =?utf-8?B?WXIyK0xBbW8vYlV1VXdNWFk4VnlOTkoxVHFBbkJPNmZFZm5QVnVReFpXRDVr?=
- =?utf-8?B?cisva2lxdFNrUmRLbWZqZGZhYzM1TWNiMFpuVk5lOVpKMmc4QmY4aTNJM2tN?=
- =?utf-8?B?NlRRb3dNWStNRU91NE9lVE84Y2RuZFNldDBudkhObHlXT0ltdml2bmsydFdr?=
- =?utf-8?B?NEJGTUZuMFZ5bG5IeUtmRTlmTjErVkNmM2Z6bVJINlNaMWN6bzMwWEE5ekQ2?=
- =?utf-8?B?blVsNTRURkFnaE9PU0FTTzVGSXg0V1BjOCtKeERiU3NTbjQ1RjFjRTNCNXdy?=
- =?utf-8?B?eklneGl1Y2kzMkZtMzIzdmpmejkwdWVWZytnbzEwSDZnRGNBVThmMEtVdno2?=
- =?utf-8?B?Q2hUalRIcjdWVm1HVnNXOC9FdzdiZ25iamdHaGJUdmhzdk02ZmFJYlJqRldw?=
- =?utf-8?B?Z1lTdHNQRXBhQjcyMkMyUHFIdlVVdGE4QlVNN0VlY3JMQVIveVdLeDRqaUJt?=
- =?utf-8?B?NXJkcGxhMjdlbSs0ck1NMHNXMWhNV2wvOFVUTkhwVGxWcW9mdXhJZFlzcTNv?=
- =?utf-8?B?QTFJOWo2MkRqcWIzTjVJeUErMUZ5bmVLeXVDNFFHaitON2dWbHY1eEpTQ2s3?=
- =?utf-8?B?WjQ5a1Ird1Z1SGQ4bWl5Qit1V1RSQVhiUVdRdHg5SVdDL0pTRFluMmIxeWpG?=
- =?utf-8?B?N09jTEhaenVtcWVsK015V3RQOVo1S0g3WFI4MjhLRjdaMzdSQTBNdnJKQVh3?=
- =?utf-8?B?U0lUMjM3dGJrbkQyVmUxejF0S3dkODJibmxFd2RyN2xIWWY0djAvckhnbDhM?=
- =?utf-8?B?N0ovYnZKbjVUbTgrVXgydWxmMFFLV1F2YkM1Rjc4VSt1TVFIMlRweHltL3k4?=
- =?utf-8?B?RWo4NWhXby9hMUgvS0JWdGxaZDZHS2NERExpSk0ram44UTc2RVBtbWRlam4w?=
- =?utf-8?B?aHc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B50829BE0B585B42A5CAC635E0154025@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC44156F57
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 21:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736977049; cv=none; b=HdMCNad6wiL9Z0N65LQuMwHO4IGeXaSBWoH4WO7rMLCB5PJmkTJ5RrlGMwLcDk1pVF3Nb06pSXv+s2vFw9Ju55cRyxLheWbRSdAV5HwOCG7WmxXs0VrPhJgdFl9ClSIMtiXkCXwWQrCDMkLebPADFK9Ad6mAxbAbHKY13v5zIwM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736977049; c=relaxed/simple;
+	bh=SO4KDfuX2Azpjvm/vQCO8Mmo4hgwQHwVrIYLO67qnU0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kVRRjTLdoshEFTYKYjda5he3BOLvetAxh4fJ5CFGtXDfyTyie2+1J4Mt/vDc4jASHfoJ0M7IhXipV9RbnF25LuZPv5UpwjklfjgSW16VLSxXBiVkZ2XLSotuy1tsz36yMKXdW+PzLNZeZao9+9cVX+N3R7Bzcwq81a29D3gMT1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JiJltTVI; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2efa74481fdso529373a91.1
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 13:37:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736977047; x=1737581847; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DE03VH0L0OHrfXKwkdUHEFj5nyzfBv/0w1PnGQr0ZNI=;
+        b=JiJltTVIpgTo7VeZqrhizqCZ8bVFDAivEu31NnBhkWqWsOlN2IVPhrZO7yFTry4+tg
+         AsABMCRJj3h9PhJ5q3hGOW5z1WlOpjPtJ6jfAySUtMhaHc7UNjK+kOshx2fOAqAvWIrh
+         8BKYDSoncPfyAYJqJbs+j/3tYOpOXox11UJoAu6oGgld5GspgHGMw4/S4lzVRyaDXojJ
+         aefJajJw/r+wWATJb1ztB1g4/QlYNvdec6mKPr17LCpmR5Xo6A8Pwa+ZqF2NfrIs/nYc
+         BMQH4UgQJdccMQegrPJaF/8Qq1wsNv6CTOLHf4V8ub4HiN/OO1+cX0wCD4k4f6aahv4F
+         gHiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736977047; x=1737581847;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DE03VH0L0OHrfXKwkdUHEFj5nyzfBv/0w1PnGQr0ZNI=;
+        b=ByaSSUeLpZ0AQU5ZV/e2cRfv/fT9zF3fgL4BcuqGepmjNRxleFkiVCLH2slMccs0N6
+         madeOMzX4YdgMFfTzNVMrQw1m9dWgo9fmKYOcLlRhRJe1vPbRCMQUGQNm0nq3mdDeFnS
+         g1HAsvOLG7zZqfyYBNmKol5oP+ZUW4guIYWKSyf7C31jaMnQ6qP1h6yjW/njx/GvQzRu
+         WLkCQ1YPOLaiTe78B7OrXLUsZgcdWDQmlLY5DrzYSr4S75FIMRUfZM3AkCOy12bMeHL4
+         d8zOa/+wxhfvoMOBWA3dnJ8mvTx0ePv3iXll9barklSWdYiPALW9DZa7NIHQR/FfWZQ1
+         AYAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWQ5AN/S1p/Y9qnHYBjR6TN9GbUDwcX2J4nHYdWS3g4lwOPTVy0U/ptUfEp/7qK61nIEg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUxxnIWHFo/Mjf7nkKatUgXFzdRSX1avYOyBtj60SlDA9CGduh
+	s7QxL/YuHfJkitem/lra6HGpwYbWaoI9y+XBYh4GobleCWQVmHkp6/8eT2rIOJAHVc/2VthPBNR
+	kzA==
+X-Google-Smtp-Source: AGHT+IEe15DAZ7eb/4a7+um2+f6w3QllKB0v/qQaTVLKeY1Vwnntxf3xKoWKAGt1rLFo53oGnaFjnWDYtlk=
+X-Received: from pjwx14.prod.google.com ([2002:a17:90a:c2ce:b0:2ef:d283:5089])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2642:b0:2ea:aa56:499
+ with SMTP id 98e67ed59e1d1-2f548e9aed3mr40147444a91.1.1736977047223; Wed, 15
+ Jan 2025 13:37:27 -0800 (PST)
+Date: Wed, 15 Jan 2025 13:37:25 -0800
+In-Reply-To: <4ab9dc76-4556-4a96-be0d-2c8ee942b113@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR11MB5976.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 747742ea-88d2-4678-e7ac-08dd35a00d80
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jan 2025 20:06:09.3853
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: A4Jt2PyynPpuJp2+NyvGbxh0rmCCyakZpjgEqTo/fOOmPln2LD1dI0jJwT4ed1ceSSVtda0POnjfYegxJcDSHHuOc6fnsot2c1BFczRafLA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5191
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <20250106124633.1418972-13-nikunj@amd.com> <20250107193752.GHZ32CkNhBJkx45Ug4@fat_crate.local>
+ <3acfbef7-8786-4033-ab99-a97e971f5bd9@amd.com> <20250108082221.GBZ341vUyxrBPHgTg3@fat_crate.local>
+ <4b68ee6e-a6b2-4d41-b58f-edcceae3c689@amd.com> <cd6c18f3-538a-494e-9e60-2caedb1f53c2@amd.com>
+ <Z36FG1nfiT5kKsBr@google.com> <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
+ <Z36vqqTgrZp5Y3ab@google.com> <4ab9dc76-4556-4a96-be0d-2c8ee942b113@amd.com>
+Message-ID: <Z4gqlbumOFPF_rxd@google.com>
+Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
+From: Sean Christopherson <seanjc@google.com>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, 
+	x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de, 
+	dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com, 
+	francescolavra.fl@gmail.com, Alexey Makhalov <alexey.makhalov@broadcom.com>, 
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
 
-T24gV2VkLCAyMDI1LTAxLTE1IGF0IDIwOjM2ICswMTAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
-PiBXUlQgaGtpZCwgSSBpbnRlcnByZXRlZCAiSSdkIHBlcnNvbmFsbHkgcHJvYmFibHkganVzdCBr
-ZWVwICdoa2lkJyBhcyBhbiANCj4gaW50IGV2ZXJ5d2hlcmUgdW50aWwgdGhlIHBvaW50IHdoZXJl
-IGl0IGdldHMgc2hvdmVkIGludG8gdGhlIFREWCBtb2R1bGUgDQo+IEFCSSIgYXMgIml0IGNhbiBi
-ZSB1MTYgaW4gdGhlIFNFQU1DQUxMcyBhbmQgaW4gbWtfa2V5ZWRfcGFkZHIiIChhcyB0aGUgDQo+
-IGxhdHRlciBidWlsZHMgYW4gYXJndW1lbnQgdG8gdGhlIFNFQU1DQUxMcykuDQo+IA0KPiBJIHVu
-ZGVyc3Rvb2QgaGlzIG9iamVjdGlvbiB0byBiZSBtb3JlIGFib3V0IA0KPiB0ZHhfZ3Vlc3Rfa2V5
-aWRfYWxsb2MvdGR4X2d1ZXN0X2tleWlkX2ZyZWUgYW5kIHN0cnVjdCBrdm1fdGR4Og0KPiANCj4g
-PiBPaCwgYW5kIGNhc3RzIGxpa2UgdGhpczoNCj4gPiANCj4gPiA+IMKgIHN0YXRpYyBpbmxpbmUg
-dm9pZCB0ZHhfZGlzYXNzb2NpYXRlX3ZwKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4gPiA+IEBA
-IC0yMzU0LDcgKzIzNTQsOCBAQCBzdGF0aWMgaW50IF9fdGR4X3RkX2luaXQoc3RydWN0IGt2bSAq
-a3ZtLCBzdHJ1Y3QgdGRfcGFyYW1zICp0ZF9wYXJhbXMsDQo+ID4gPiDCoMKgCXJldCA9IHRkeF9n
-dWVzdF9rZXlpZF9hbGxvYygpOw0KPiA+ID4gwqDCoAlpZiAocmV0IDwgMCkNCj4gPiA+IMKgwqAJ
-CXJldHVybiByZXQ7DQo+ID4gPiAtCWt2bV90ZHgtPmhraWQgPSByZXQ7DQo+ID4gPiArCWt2bV90
-ZHgtPmhraWQgPSAodTE2KXJldDsNCj4gPiA+ICsJa3ZtX3RkeC0+aGtpZF9hc3NpZ25lZCA9IHRy
-dWU7DQo+ID4gDQo+ID4gYXJlIGEgYml0IHNpbGx5LCBkb24ndCB5b3UgdGhpbms/DQo+IA0KPiBz
-byBJIGRpZG4ndCBjaGFuZ2UgdGR4X2d1ZXN0X2tleWlkX2FsbG9jKCkuDQoNClRoZXJlIHdhcyBh
-IHJlbGF0ZWQgY29tbWVudCBvbiB0aGUgR1BBIHVuaW9uIFlhbiB3YXMgc3VnZ2VzdGluZzoNCmh0
-dHBzOi8vbG9yZS5rZXJuZWwub3JnL2t2bS83NTNjZDlmMS01ZWI3LTQ4MGYtYWU0Zi1kMjYzYWFl
-Y2RkNmNAaW50ZWwuY29tLw0KQmFzaWNhbGx5IHRoYXQgdGhlIGJpdCBmaWVsZHMgaGF2ZSBzdWJ0
-bGUgYmVoYXZpb3Igd2hlbiB5b3Ugc2hpZnQgdGhlbQ0KKGlyb25pY2FsbHkgdGhlIGV4YWN0IGJ1
-ZyB0aGF0IGhhcHBlbmVkIHdpdGggdTE2IGtleWlkKS4NCg0KQnV0IEkgdGhpbmsgeW91ciByZWFz
-b25pbmcgc2VlbXMgdmFsaWQsIGVzcGVjaWFsbHkgc2luY2UgRGF2ZSBoYXMgc2luY2UgcXVvdGVk
-DQp0aGF0IGZ1bmN0aW9uIHdpdGhvdXQgY29tbWVudGluZyBvbiB0aGF0IGFzcGVjdC4gU28gbGV0
-J3MgbGVhdmUgaXQuDQo=
+On Thu, Jan 09, 2025, Nikunj A. Dadhania wrote:
+> On 1/8/2025 10:32 PM, Sean Christopherson wrote:
+> > On Wed, Jan 08, 2025, Borislav Petkov wrote:
+> >> On Wed, Jan 08, 2025 at 06:00:59AM -0800, Sean Christopherson wrote:
+> 
+> > For TDX guests, the TSC is _always_ "secure".  So similar to singling out kvmclock,
+> > handling SNP's STSC but not the TDX case again leaves the kernel in an inconsistent
+> > state.  Which is why I originally suggested[*] fixing the sched_clock mess in a
+> > generically; 
+> > doing so would avoid the need to special case SNP or TDX in code> that doesn't/shouldn't care about SNP or TDX.
+> 
+> That is what I have attempted in this patch[1] where irrespective of SNP/TDX, whenever
+> TSC is picked up as a clock source, sched-clock will start using TSC instead of any
+> PV sched clock. This does not have any special case for STSC/SNP/TDX. 
+
+*sigh*
+
+This is a complete and utter trainwreck.
+
+Paolo had an idea to handle this without a deferred callback by having kvmclock
+detect if kvmclock is selected as the clocksource, OR if the TSC is unreliable,
+i.e. if the kernel may switch to kvmclock due to the TSC being marked unreliable.
+
+Unfortunately, that idea doesn't work because the ordering is all wrong.  The
+*early* TSC initialization in setup_arch() happens after kvmclock_init() (via
+init_hypervisor_platform())
+
+	init_hypervisor_platform();
+
+	tsc_early_init();
+
+and even if we mucked with that, __clocksource_select() very deliberately doesn't
+change the clocksource until the kernel is "finished" booting, in order to avoid
+thrashing the clocksource.
+
+  static struct clocksource *clocksource_find_best(bool oneshot, bool skipcur)
+  {
+	struct clocksource *cs;
+
+	if (!finished_booting || list_empty(&clocksource_list)) <===
+		return NULL;
+
+	...
+  }
+
+
+  /*
+   * clocksource_done_booting - Called near the end of core bootup
+   *
+   * Hack to avoid lots of clocksource churn at boot time.
+   * We use fs_initcall because we want this to start before
+   * device_initcall but after subsys_initcall.
+   */
+  static int __init clocksource_done_booting(void)
+  {
+	mutex_lock(&clocksource_mutex);
+	curr_clocksource = clocksource_default_clock();
+	finished_booting = 1;
+	/*
+	 * Run the watchdog first to eliminate unstable clock sources
+	 */
+	__clocksource_watchdog_kthread();
+	clocksource_select();
+	mutex_unlock(&clocksource_mutex);
+	return 0;
+  }
+  fs_initcall(clocksource_done_booting);
+
+I fiddled with a variety of ideas to try and let kvmclock tell sched_clock that
+it prefers the TSC, e.g. if TSC_RELIABLE is set, but after seeing this comment
+in native_sched_clock():
+
+	/*
+	 * Fall back to jiffies if there's no TSC available:
+	 * ( But note that we still use it if the TSC is marked
+	 *   unstable. We do this because unlike Time Of Day,
+	 *   the scheduler clock tolerates small errors and it's
+	 *   very important for it to be as fast as the platform
+	 *   can achieve it. )
+	 */
+
+My strong vote is prefer TSC over kvmclock for sched_clock if the TSC is constant,
+nonstop, and not marked stable via command line.  I.e. use the same criteria as
+tweaking the clocksource rating.  As above, sched_clock is more tolerant of slop
+than clocksource, so it's a bit ridiculous to care whether the TSC or kvmclock
+(or something else entirely) is used for the clocksource.
+
+If we wanted to go with a more conservative approach, e.g. to minimize the risk
+of breaking existing setups, we could also condition the change on the TSC being
+reliable and having a known frequency.  I.e. require SNP's Secure TSC, or require
+the hypervisor to enumerate the TSC frequency via CPUID.  I don't see a ton of
+value in that approach though, and long-term it would lead to some truly weird
+code due to holding sched_clock to a higher standard than clocksource.
+
+But wait, there's more!  Because TDX doesn't override .calibrate_tsc() or
+.calibrate_cpu(), even though TDX provides a trusted TSC *and* enumerates the
+frequency of the TSC, unless I'm missing something, tsc_early_init() will compute
+the TSC frequency using the information provided by KVM, i.e. the untrusted host.
+
+The "obvious" solution is to leave the calibration functions as-is if the TSC has
+a known, reliable frequency, but even _that_ is riddled with problems, because
+as-is, the kernel sets TSC_KNOWN_FREQ and TSC_RELIABLE in tsc_early_init(), which
+runs *after* init_hypervisor_platform().  SNP Secure TSC fudges around this by
+overiding the calibration routines, but that's a bit gross and easy to fix if we
+also fix TDX.  And fixing TDX by running native_calibrate_tsc() would give the
+same love to setups where the hypervisor provides CPUID 0x15 and/or 0x16.
+
+All in all, I'm thinking something like this (across multiple patches):
+
+---
+ arch/x86/include/asm/tsc.h |  1 +
+ arch/x86/kernel/kvmclock.c | 55 ++++++++++++++++++++++++++------------
+ arch/x86/kernel/setup.c    |  7 +++++
+ arch/x86/kernel/tsc.c      | 32 +++++++++++++++++-----
+ 4 files changed, 72 insertions(+), 23 deletions(-)
+
+diff --git a/arch/x86/include/asm/tsc.h b/arch/x86/include/asm/tsc.h
+index 94408a784c8e..e13d6c3f2298 100644
+--- a/arch/x86/include/asm/tsc.h
++++ b/arch/x86/include/asm/tsc.h
+@@ -28,6 +28,7 @@ static inline cycles_t get_cycles(void)
+ }
+ #define get_cycles get_cycles
+ 
++extern void tsc_early_detect(void);
+ extern void tsc_early_init(void);
+ extern void tsc_init(void);
+ extern void mark_tsc_unstable(char *reason);
+diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+index 5b2c15214a6b..fa6bf71cc511 100644
+--- a/arch/x86/kernel/kvmclock.c
++++ b/arch/x86/kernel/kvmclock.c
+@@ -317,33 +317,54 @@ void __init kvmclock_init(void)
+ 	if (kvm_para_has_feature(KVM_FEATURE_CLOCKSOURCE_STABLE_BIT))
+ 		pvclock_set_flags(PVCLOCK_TSC_STABLE_BIT);
+ 
+-	flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
+-	kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
++	/*
++	 * If the TSC counts at a constant frequency across P/T states, counts
++	 * in deep C-states, and the TSC hasn't been marked unstable, prefer
++	 * the TSC over kvmclock for sched_clock and drop kvmclock's rating so
++	 * that TSC is chosen as the clocksource.  Note, the TSC unstable check
++	 * exists purely to honor the TSC being marked unstable via command
++	 * line, any runtime detection of an unstable will happen after this.
++	 */
++	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
++	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
++	    !check_tsc_unstable()) {
++		kvm_clock.rating = 299;
++		pr_warn("kvm-clock: Using native sched_clock\n");
++	} else {
++		flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
++		kvm_sched_clock_init(flags & PVCLOCK_TSC_STABLE_BIT);
++	}
++
++	/*
++	 * If the TSC frequency is already known, e.g. via CPUID, rely on that
++	 * information.  For "normal" VMs, the hypervisor controls kvmclock and
++	 * CPUID, i.e. the frequency is coming from the same place.  For CoCo
++	 * VMs, the TSC frequency may be provided by trusted firmware, in which
++	 * case it's highly desirable to use that information, not kvmclock's.
++	 * Note, TSC_KNOWN_FREQ must be read before presetting loops-per-jiffy,
++	 * (see kvm_get_tsc_khz()).
++	 */
++	if (!boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ) ||
++	    !boot_cpu_has(X86_FEATURE_TSC_RELIABLE)) {
++		pr_warn("kvm-clock: Using native calibration\n");
++		x86_platform.calibrate_tsc = kvm_get_tsc_khz;
++		x86_platform.calibrate_cpu = kvm_get_tsc_khz;
++	}
+ 
+-	x86_platform.calibrate_tsc = kvm_get_tsc_khz;
+-	x86_platform.calibrate_cpu = kvm_get_tsc_khz;
+ 	x86_platform.get_wallclock = kvm_get_wallclock;
+ 	x86_platform.set_wallclock = kvm_set_wallclock;
+ #ifdef CONFIG_X86_LOCAL_APIC
+ 	x86_cpuinit.early_percpu_clock_init = kvm_setup_secondary_clock;
+ #endif
++	/*
++	 * Save/restore "sched" clock state even if kvmclock isn't being used
++	 * for sched_clock, as kvmclock is still used for wallclock and relies
++	 * on these hooks to re-enable kvmclock after suspend+resume.
++	 */
+ 	x86_platform.save_sched_clock_state = kvm_save_sched_clock_state;
+ 	x86_platform.restore_sched_clock_state = kvm_restore_sched_clock_state;
+ 	kvm_get_preset_lpj();
+ 
+-	/*
+-	 * X86_FEATURE_NONSTOP_TSC is TSC runs at constant rate
+-	 * with P/T states and does not stop in deep C-states.
+-	 *
+-	 * Invariant TSC exposed by host means kvmclock is not necessary:
+-	 * can use TSC as clocksource.
+-	 *
+-	 */
+-	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
+-	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
+-	    !check_tsc_unstable())
+-		kvm_clock.rating = 299;
+-
+ 	clocksource_register_hz(&kvm_clock, NSEC_PER_SEC);
+ 	pv_info.name = "KVM";
+ }
+diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
+index f1fea506e20f..2b6800426349 100644
+--- a/arch/x86/kernel/setup.c
++++ b/arch/x86/kernel/setup.c
+@@ -907,6 +907,13 @@ void __init setup_arch(char **cmdline_p)
+ 	reserve_ibft_region();
+ 	x86_init.resources.dmi_setup();
+ 
++	/*
++	 * Detect, but do not fully initialize, TSC info before initializing
++	 * the hypervisor platform, so that hypervisor code can make informed
++	 * decisions about using a paravirt clock vs. TSC.
++	 */
++	tsc_early_detect();
++
+ 	/*
+ 	 * VMware detection requires dmi to be available, so this
+ 	 * needs to be done after dmi_setup(), for the boot CPU.
+diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+index 0864b314c26a..9baffb425386 100644
+--- a/arch/x86/kernel/tsc.c
++++ b/arch/x86/kernel/tsc.c
+@@ -663,7 +663,12 @@ unsigned long native_calibrate_tsc(void)
+ 	unsigned int eax_denominator, ebx_numerator, ecx_hz, edx;
+ 	unsigned int crystal_khz;
+ 
+-	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
++	/*
++	 * Ignore the vendor when running as a VM, if the hypervisor provides
++	 * garbage CPUID information then the vendor is also suspect.
++	 */
++	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL &&
++	    !boot_cpu_has(X86_FEATURE_HYPERVISOR))
+ 		return 0;
+ 
+ 	if (boot_cpu_data.cpuid_level < 0x15)
+@@ -713,10 +718,13 @@ unsigned long native_calibrate_tsc(void)
+ 		return 0;
+ 
+ 	/*
+-	 * For Atom SoCs TSC is the only reliable clocksource.
+-	 * Mark TSC reliable so no watchdog on it.
++	 * For Atom SoCs TSC is the only reliable clocksource.  Similarly, in a
++	 * VM, any watchdog is going to be less reliable than the TSC as the
++	 * watchdog source will be emulated in software.  In both cases, mark
++	 * the TSC reliable so that no watchdog runs on it.
+ 	 */
+-	if (boot_cpu_data.x86_vfm == INTEL_ATOM_GOLDMONT)
++	if (boot_cpu_has(X86_FEATURE_HYPERVISOR) ||
++	    boot_cpu_data.x86_vfm == INTEL_ATOM_GOLDMONT)
+ 		setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
+ 
+ #ifdef CONFIG_X86_LOCAL_APIC
+@@ -1509,6 +1517,20 @@ static void __init tsc_enable_sched_clock(void)
+ 	static_branch_enable(&__use_tsc);
+ }
+ 
++void __init tsc_early_detect(void)
++{
++	if (!boot_cpu_has(X86_FEATURE_TSC))
++		return;
++
++	snp_secure_tsc_init();
++
++	/*
++	 * Run through native TSC calibration to set TSC_KNOWN_FREQ and/or
++	 * TSC_RELIABLE as appropriate.
++	 */
++	native_calibrate_tsc();
++}
++
+ void __init tsc_early_init(void)
+ {
+ 	if (!boot_cpu_has(X86_FEATURE_TSC))
+@@ -1517,8 +1539,6 @@ void __init tsc_early_init(void)
+ 	if (is_early_uv_system())
+ 		return;
+ 
+-	snp_secure_tsc_init();
+-
+ 	if (!determine_cpu_tsc_frequencies(true))
+ 		return;
+ 	tsc_enable_sched_clock();
+
+base-commit: 0563ee35ae2c9cfb0c6a7b2c0ddf7d9372bb8a98
+-- 
 
