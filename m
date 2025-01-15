@@ -1,660 +1,196 @@
-Return-Path: <kvm+bounces-35535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D15AA123FA
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 13:49:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE97A123FE
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 13:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE3633A75DC
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 12:48:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 474BD3A7710
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 12:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8628F22F84A;
-	Wed, 15 Jan 2025 12:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4ECE22F84A;
+	Wed, 15 Jan 2025 12:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sbSZ/Bmq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SQzxf7Pn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2080.outbound.protection.outlook.com [40.107.244.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0BE2475ED;
-	Wed, 15 Jan 2025 12:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736945340; cv=none; b=E7InXVtruQHmGHzPkEmTKcO0jPvec7tAKOaej2R5DY4/pSD+P/+mYCFtB1MHoiap4/ujYGgYkHnPfIIsyl9pJVNcXfSy6X8xXiL+KcgSoshHboI7HGuwVLjQ02Cwbri/+1299sEHCs1yRKL2bOBcava7q1m2xEdbXBCDiLnxKFk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736945340; c=relaxed/simple;
-	bh=JlIWm2MX/4ePeRRusYT3eNKg7MmtzpljUetGvy0mhWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PRcUy/bXJh4/cYzej9o8miWwuSDn6El8p6Ubh3BKLFKy4gH1BY3HdqL/ZQqLzt2yiQ7NY+8Ydk3mHwQb4pi/o2xlo6SxenL6mrb8sLurnUypFUkn2ip2C0WvDAAa6go9+1sy3vHpeoVC0wUpWmyJ/4YvjfceN2IFriolEi0gcE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sbSZ/Bmq; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50F2eqwp013775;
-	Wed, 15 Jan 2025 12:48:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=58Lwge
-	QXvaXe7ZSt4IHq8SXf0lwoHv++ZsqN0jeTQfU=; b=sbSZ/Bmqueaun0sKDysRfW
-	2g2LY61MSoftVFf8E6y9I7zotbWbX5qSXKcqalYKecXfvG80Ttxq8kp4Rzmk/kBT
-	aXsp3bcSz4O0sVKDHKcDnT72Eedoa5RyYz5Ou/H5G0h5vtvf8v5+EWs3daCP3T+f
-	59me6s41oivQGFTE9vMpnRCn9EvBeA8j3/699YooKmQxXdZj5H8KD06MK4dyPUkO
-	1sGNhgoERS6aR2sy39Fo+q+ThpUDVy26jJq+hVZdrMtQdXg3KVgIrtFytHPMxE+3
-	g+1gxvegQNtwTqPuAXdZk2TuXn8zosIMyEbrKmqUlSApiUbCN66MNtpbZGBG0Lnw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 445sd6528h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 12:48:53 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50FAXO84007994;
-	Wed, 15 Jan 2025 12:48:52 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443yn89yf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 12:48:52 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50FCmm6G33292920
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 Jan 2025 12:48:48 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8ECD420049;
-	Wed, 15 Jan 2025 12:48:48 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E1ACD20040;
-	Wed, 15 Jan 2025 12:48:47 +0000 (GMT)
-Received: from [9.171.76.32] (unknown [9.171.76.32])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 15 Jan 2025 12:48:47 +0000 (GMT)
-Message-ID: <03d91fa8-6f3f-4052-9b03-de28e88f0001@linux.ibm.com>
-Date: Wed, 15 Jan 2025 13:48:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290E62475D6
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 12:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736945378; cv=fail; b=LXs8y4EcDC2IqYbQq4XO1UJr1tqvPhLW2q8PCVTBOdImv0a71YpHeUseaQ0p61rozf+l//duGOvFrGtE34qI4Ki1HHR7G6Px7WpjE3VAVolEW3cv69aam41qUzzcAU9nqWDWNJFx3Ohm1cbVTPjGlGRZFDqkJV/bBjZ2WuoKHPY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736945378; c=relaxed/simple;
+	bh=OSqxR7veM2RL4kZf1p8Gm8T//7dcrCQdIfGJ2PHTqJI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TeQX7VWFDRLCcYoZEoMUUOvvO5VMN9uy76fyueh60xs6Ib8HuZTr93CQ7lQcXa+NM38vJUhdu8Qc8ZHeJySydOp9GZEDFzwlYsFr2xhmCYkiVdRwmlm5m1dGADjGf6/hNQx92pe8Mau0z3VvRDEHMB51XrMBhkzm8ojU8NK5QI8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SQzxf7Pn; arc=fail smtp.client-ip=40.107.244.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=x+EN8iggyscGmtZzl2aoZsUl09RWurtOptyq3GTNRUslyLYJjK4/Mwj8MhgExEmxV096QcpiLFjK7N8eRspNhfL8R1Y3yIt2PhQWSbzr8XRdo8RdzRgWjUucvotgJDXOc6GItT7kRB0mKrr850BH+sPP3i9xO70fCP6e4A3du2jyr0LgcoaLhzgE7jvuzm9X5SygrgyqpIzzlNPsq+3vKhLSC+khNF/3TMLGFCT1LK9Nzydng0yXEjOYd54B07XUlMAICRuQVcYUc2VRYttfQBB3lglC8vck9sNny8XArLfW7hLywhrTIuVWfwDPmMpde/gaRmq7vHubHTpAM7LzAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=imMe7bv2UxF/tFH0YWdb5B8IV87k4Nvd/obVoIJQDNk=;
+ b=DabEPq0MISwrjPZ8sovQva89H0Oc33BkVFKhckvHq4tUlgvhPQLgbF0LD41fEyoT65KGkpgbpph6BktuAZDdhkJnNoq+HbHiNjOgXcaqnqW2ut5KQvM4Ob0xlcU4WLlNFw6ZP7mWMxrjWyUQKONvcjmOTbrmdVnclTbBcuR4UdsytzVO8nFoVoGNg7QBQ+5NJ5u/QGfxXfBwAWWvgU01NdbhCtYA1LF4FtVNjmdAsRFCoQUZbJEBhaeEdL4DLlkt+XrswIwu+J0antMyK4U+qPr2+bPGWNynI1iihz4OPG3ieGBcfkgfV856lfNNCKg2ApxUjpYr03vvblB59kbtgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=imMe7bv2UxF/tFH0YWdb5B8IV87k4Nvd/obVoIJQDNk=;
+ b=SQzxf7PnJrnc/gYGuqdvhGvC2v/03ZyajgopDR3KSpHFldlU6hRxdY8wWwIsQege+Rx9DDZkK2fALWKRLt2nvCg4PuXxYpQTfmemRgw1N8PfEp6DE5a8BKgbT0CLHp2A8e35i6E4zkJeDCQh2LPyHwq1+k28NDsE6+TZbssuIOmbQrwSH2S/y/Zr5iU+2WpX88B0mwH+3Ndx7Vbw2mpNY89nOYNKYQqbszvh3wTeTYGa6flGC4OUmOw88eD6RGwkxYJsYrkyS67vwfIcDKQcMa96XJ5eoo4vMrYyH2n07nWHhM7W6Un2YyZg7XGHBW+ivOYmpPmmSk9Xeha6jwPKTw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by PH8PR12MB6867.namprd12.prod.outlook.com (2603:10b6:510:1ca::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Wed, 15 Jan
+ 2025 12:49:34 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8335.017; Wed, 15 Jan 2025
+ 12:49:34 +0000
+Date: Wed, 15 Jan 2025 08:49:33 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: David Hildenbrand <david@redhat.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>
+Subject: Re: [PATCH 0/7] Enable shared device assignment
+Message-ID: <20250115124933.GL5556@nvidia.com>
+References: <8f953ffc-6408-4546-a439-d11354b26665@intel.com>
+ <d4b57eb8-03f1-40f3-bc7a-23b24294e3d7@amd.com>
+ <57a3869d-f3d1-4125-aaa5-e529fb659421@intel.com>
+ <008bfbf2-3ea4-4e6c-ad0d-91655cdfc4e8@amd.com>
+ <1361f0b4-ddf8-4a83-ba21-b68321d921da@intel.com>
+ <c318c89b-967d-456e-ade1-3a8cacb21bd7@redhat.com>
+ <20250110132021.GE5556@nvidia.com>
+ <17db435a-8eca-4132-8481-34a6b0e986cb@redhat.com>
+ <20250110141401.GG5556@nvidia.com>
+ <9d925eaa-ba32-41f4-8845-448d26cef4c7@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d925eaa-ba32-41f4-8845-448d26cef4c7@amd.com>
+X-ClientProxiedBy: MN2PR08CA0004.namprd08.prod.outlook.com
+ (2603:10b6:208:239::9) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 04/13] KVM: s390: move pv gmap functions into kvm
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
-References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
- <20250108181451.74383-5-imbrenda@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250108181451.74383-5-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 1iBVLCapoQ7id5Q2rWkLVj2gQlVtX3tE
-X-Proofpoint-ORIG-GUID: 1iBVLCapoQ7id5Q2rWkLVj2gQlVtX3tE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-15_05,2025-01-15_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- clxscore=1015 phishscore=0 spamscore=0 suspectscore=0 priorityscore=1501
- mlxlogscore=999 bulkscore=0 lowpriorityscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501150095
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|PH8PR12MB6867:EE_
+X-MS-Office365-Filtering-Correlation-Id: 760a6393-32eb-4cb5-5278-08dd35630fb4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?bloE152ZPHNk3xqguWPluKTRCUuhYv7CysCSpVYc1XV4JouejpOkFDcZTtgk?=
+ =?us-ascii?Q?ffwA2YJsp/KohfdfwvncYsj+D81zRfVxxPgoSsYDrSC6DXMB6t/UwoNvsgwb?=
+ =?us-ascii?Q?18+U9R+d3ViaqoXBE8d/OzzFPkRl+G/Mke87XptfLjdKexE1EjFJWjC9adN7?=
+ =?us-ascii?Q?rhjqRbPq1KvkCZWQsyPqVl+/YbsXAMM8/Ov0hJEQnMf3B+zpYOG1nWL+qJ0o?=
+ =?us-ascii?Q?LOk/2fbW9EtaWpGkK4PtHEr9R01wuE4gzHadK+KEVFqvyiFtZXaK73MOtaMo?=
+ =?us-ascii?Q?etrUaeoKpVUPInWbz0EYnb45N5vnywkmX8yz7WIYsv/DfF0J2oOmS8Z9W53y?=
+ =?us-ascii?Q?MFDIL26+HtzScaqLC4sIeLTW0dciRJkhmoIb5zsDmQQDxaJv0lD0NrzprT+M?=
+ =?us-ascii?Q?/WSEsmuqtgkzuaBIwh7JhsE8IdTPOrYbi+7phk+XKduUwIAio+nFPvB0i6hf?=
+ =?us-ascii?Q?QC6RAfJYrdJrvM+YZOy5LhvAnhRQzuwNd+D4OEw8acvZ9ZfpS95sl4G4cKnO?=
+ =?us-ascii?Q?C22aCQ5zEhcY6cwPHPQoBHQRPZEEu+0WLlH6O/6Zj9sgCnyycu/sm9GnAoge?=
+ =?us-ascii?Q?q6JO4GS61MF5jMzEpnGT7P9i0DnmPkbsSiiIvvphnL4KZRMj9o4n1xIfZPqc?=
+ =?us-ascii?Q?ViHJ4O6IBV8BLUlqIOzjekTRDJQbWNFlKDnOcUEkUEQQJiM6j9qcaT19cD3i?=
+ =?us-ascii?Q?+teyBtWcaWaJzSBkHTYJ3knoWpEwg4YBaol9ViWmXiqtT8jz70fvufA+7Cnm?=
+ =?us-ascii?Q?gYdb7KMojX+ebcOKB6j5WN93rjnPDdS6Qp43vSaAG6/fhacxO9TYQRpAWTOe?=
+ =?us-ascii?Q?87pPsVVF4mOSj44IzY95irKpX5j8tgpLiLJRS3Y2UIiNEEKDLbX/5V6mgh2/?=
+ =?us-ascii?Q?irrAp/Z3MYBaHjjIajdBXwZJJS5hfbrrfTqZEHYd7pHIm7tM02M/UzaZs2zx?=
+ =?us-ascii?Q?VJwZMN9tI4hFoaqUUf3PREfbUMdCo4QPwLD0M1RSsDxjBBEWvr8azGusJ1TP?=
+ =?us-ascii?Q?GkIB/GBZgZc+W4B8ubj1XlmrSdku9cwfUudhv9PxnZfCp+90xjnki4CT2iXC?=
+ =?us-ascii?Q?GjTL1pn2w7GnbSmOa5CRBR1AuH9EQs5BoHUbE3uVDLXizF7RJsSuW2STUnyk?=
+ =?us-ascii?Q?UXcvQ14yJ4MTgIOHNyhSbZpfi9XpUEFgyytSoVsBtoPl2e0La/QrZ5idgX95?=
+ =?us-ascii?Q?nyL9C8NK7LtMpEJnxmHi+rDNONduyMjPK0GZZy2/foS+3lGE9/FzfuQBN9GH?=
+ =?us-ascii?Q?uIQCf3Nv8A+jLA+O6nJVGUKgkFZ5CG8DMOdS4wAChxiPL9lP5a9mwmtjMC0S?=
+ =?us-ascii?Q?5tBhYjge2XP24Ek5a19YFQ3ccnIbtoSHHFit3zdPYTCnV45HUNME9ZIfX7+K?=
+ =?us-ascii?Q?sL/Tqw2AUwOoNPY/xjE80u2Qzyzj?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?l0rT0Zo9O1ikDyGLx+iCFOgNlfjG/OcNPZm0copU7pLNgK0IBltsOHEizYi2?=
+ =?us-ascii?Q?JeuZHKENGJ+qNI3+1PO9oiA7uThYKAkeCpMu/Cyu+DeWVTeu6f8ZhYlDpZ7e?=
+ =?us-ascii?Q?3qVPinIBRFwe2ETJwAlaLFgNbYACo/cMEJt/t3duZ+GVPivDz5GLE+b9QaDz?=
+ =?us-ascii?Q?VRMwkRm4lL7cBsAqLESq9dN80QFQGa2XWChcf0BGPxhSyOTMRl+PgR4KNsWx?=
+ =?us-ascii?Q?nMQJ/rlyh39gdkqYiobeYS5rm4jLuh+jtXhE/F1Tte3dgmUsQGtKKzEKSQ/I?=
+ =?us-ascii?Q?IN/1XfW+HdvWLl4q/z04i4ksbX7hnkyhPuMvnIPMFYZNlIkZzYnavKKqZyyI?=
+ =?us-ascii?Q?Gn3WqyNUN73zFW/CKuOabpdvlA4MzzAz142r0sqsMbMP1PZcvoc2rr6Kp04S?=
+ =?us-ascii?Q?xkmKX962r4Iqp+gxzvRWJjAr0ZOmZ940x92XxdnBnYU3KC6L2W2mjr79zUrb?=
+ =?us-ascii?Q?zx0dYKr/KRJ9Xes8r/MjZucNyEwPwSIy/mpvthqorJc26XrwuZ3LslZUfn+i?=
+ =?us-ascii?Q?sKJplcg1TsRZ+AMVGhC6gO5NVaBoDARNeQ8l5Qp1EgzhJYPi+mrNnNwT0Ss3?=
+ =?us-ascii?Q?AXBLTq7ilsuoTtTc6j6kVgJxwdCdDAz/X8k5hBfedhkFvPr7NwvbDOh7dStV?=
+ =?us-ascii?Q?tiIps15F9apWScMSQFB8BoIXq0twNw03xjIKn40Am7JH2AQSiYtXqbU8xN3q?=
+ =?us-ascii?Q?M7f6CJuHO4WV/4U63Pas06pLuvXEdwQtf4YLXr7yISoSqx+guDpFWuiwOrAa?=
+ =?us-ascii?Q?FsBz1aPdN48AQX5hkKt3GsKjMFzqOgvjh/+gK+RY1ot7Z/6xeuiidJsvLBGd?=
+ =?us-ascii?Q?YjSTMLe6fKAn0ei5DHn4+AEgLeb2uuAdAex2tAL4KWUcGKcAQN8cjJvCeFZd?=
+ =?us-ascii?Q?aV4J0KeFif8WRgmwqZSNAoL8z8ESKttNCS5laxOraprfRTMdgR2a8FYz5KqK?=
+ =?us-ascii?Q?w+2uN8Ci8WZ1QaxuRJn+prweMWGXT6DZj7XOv6nKLX5G0JtQdmy3FOvXlW+L?=
+ =?us-ascii?Q?350JzK6xhKGTzvzFTifuE4dhss/yEXaCgPqPBcwPdjBWgxgs+Z16aS6cGhSN?=
+ =?us-ascii?Q?wswjyeTRLjO9NGIOuGX/uXD7sYtj+HS6LFYswsCB/c+kbtkvkoJJw0eyxcpi?=
+ =?us-ascii?Q?z3PB+bpE14tAx8g1hsZfchqIjQf3x1cMt86qAmilk/qd1xVdJ+7Tk/55YppM?=
+ =?us-ascii?Q?fu7Gv8Ox5jrPils5l+HtIFbJ1izekA9dnHEr7saKjmP8xVKDp36u5N2Lbs65?=
+ =?us-ascii?Q?q1faketEzDiPzYw3ATZRdex1i9JVcPfO/JX7dqUh4/JYxQQjETsjE/CUzsMA?=
+ =?us-ascii?Q?bkA5gXnCoPKqeXfZNMleGpaRmjxhhqtIkOT/4+F1bNAUmobIb0cqbupaCgPf?=
+ =?us-ascii?Q?FIMNTxcjw/cPOY8HiBLgX/fUDiOi8CKD9TStWyAaGv4kg+/xvkl0qCjPB0gO?=
+ =?us-ascii?Q?+HcQrhaxmqub/AlKbcVO0iadbCXz4nS2irHe1/wNlIA5Mr7Pw+5OzwcDOLyn?=
+ =?us-ascii?Q?+St4Ra5WA8R1F6/+q9IDBovjgLOi/oYHG3wy3GVmyXfC8RLGVMmkYOX3a3Za?=
+ =?us-ascii?Q?Ak7EXaG5AzyNo9r47bA=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 760a6393-32eb-4cb5-5278-08dd35630fb4
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2025 12:49:33.9725
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KxR6aHrZeGeANIpFGv1OIwOWt/iiOQa91hv7If8Ws7WaM9Uu9DvYfJQmhUBKpuDl
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6867
 
-On 1/8/25 7:14 PM, Claudio Imbrenda wrote:
-> Move gmap related functions from kernel/uv into kvm.
+On Wed, Jan 15, 2025 at 02:39:55PM +1100, Alexey Kardashevskiy wrote:
+> > The thread was talking about the built-in support in iommufd to split
+> > mappings.
 > 
-> Create a new file to collect gmap-related functions.
+> Just to clarify - I am talking about splitting only "iommufd areas", not
+> large pages.
+
+In generality it is the same thing as you cannot generally guarantee
+that an area split doesn't also cross a large page.
+
+> If all IOMMU PTEs are 4k and areas are bigger than 4K => the hw
+> support is not needed to allow splitting. The comments above and below seem
+> to confuse large pages with large areas (well, I am consufed, at least).
+
+Yes, in that special case yes.
+
+> > That built-in support is only accessible through legacy APIs
+> > and should never be used in new qemu code. To use that built in
+> > support in new code we need to build new APIs.
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   arch/s390/include/asm/uv.h |   7 +-
->   arch/s390/kernel/uv.c      | 293 ++++++-------------------------------
->   arch/s390/kvm/Makefile     |   2 +-
->   arch/s390/kvm/gmap.c       | 183 +++++++++++++++++++++++
->   arch/s390/kvm/gmap.h       |  17 +++
->   arch/s390/kvm/intercept.c  |   1 +
->   arch/s390/kvm/kvm-s390.c   |   1 +
->   arch/s390/kvm/pv.c         |   1 +
->   8 files changed, 251 insertions(+), 254 deletions(-)
->   create mode 100644 arch/s390/kvm/gmap.c
->   create mode 100644 arch/s390/kvm/gmap.h
-> 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index dc332609f2c3..22ec1a24c291 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -628,12 +628,13 @@ static inline int is_prot_virt_host(void)
->   }
->   
->   int uv_pin_shared(unsigned long paddr);
-> -int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb);
-> -int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr);
->   int uv_destroy_folio(struct folio *folio);
->   int uv_destroy_pte(pte_t pte);
->   int uv_convert_from_secure_pte(pte_t pte);
-> -int gmap_convert_to_secure(struct gmap *gmap, unsigned long gaddr);
-> +int uv_wiggle_folio(struct folio *folio, bool split);
-> +int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb);
-> +int uv_convert_from_secure(unsigned long paddr);
-> +int uv_convert_from_secure_folio(struct folio *folio);
->   
->   void setup_uv(void);
->   
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index 6f9654a191ad..832c39c9ccfa 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -19,19 +19,6 @@
->   #include <asm/sections.h>
->   #include <asm/uv.h>
->   
-> -#if !IS_ENABLED(CONFIG_KVM)
-> -unsigned long __gmap_translate(struct gmap *gmap, unsigned long gaddr)
-> -{
-> -	return 0;
-> -}
-> -
-> -int gmap_fault(struct gmap *gmap, unsigned long gaddr,
-> -	       unsigned int fault_flags)
-> -{
-> -	return 0;
-> -}
-> -#endif
-> -
->   /* the bootdata_preserved fields come from ones in arch/s390/boot/uv.c */
->   int __bootdata_preserved(prot_virt_guest);
->   EXPORT_SYMBOL(prot_virt_guest);
-> @@ -159,6 +146,7 @@ int uv_destroy_folio(struct folio *folio)
->   	folio_put(folio);
->   	return rc;
->   }
-> +EXPORT_SYMBOL(uv_destroy_folio);
->   
->   /*
->    * The present PTE still indirectly holds a folio reference through the mapping.
-> @@ -175,7 +163,7 @@ int uv_destroy_pte(pte_t pte)
->    *
->    * @paddr: Absolute host address of page to be exported
->    */
-> -static int uv_convert_from_secure(unsigned long paddr)
-> +int uv_convert_from_secure(unsigned long paddr)
->   {
->   	struct uv_cb_cfs uvcb = {
->   		.header.cmd = UVC_CMD_CONV_FROM_SEC_STOR,
-> @@ -187,11 +175,12 @@ static int uv_convert_from_secure(unsigned long paddr)
->   		return -EINVAL;
->   	return 0;
->   }
-> +EXPORT_SYMBOL_GPL(uv_convert_from_secure);
->   
->   /*
->    * The caller must already hold a reference to the folio.
->    */
-> -static int uv_convert_from_secure_folio(struct folio *folio)
-> +int uv_convert_from_secure_folio(struct folio *folio)
->   {
->   	int rc;
->   
-> @@ -206,6 +195,7 @@ static int uv_convert_from_secure_folio(struct folio *folio)
->   	folio_put(folio);
->   	return rc;
->   }
-> +EXPORT_SYMBOL_GPL(uv_convert_from_secure_folio);
->   
->   /*
->    * The present PTE still indirectly holds a folio reference through the mapping.
-> @@ -237,13 +227,32 @@ static int expected_folio_refs(struct folio *folio)
->   	return res;
->   }
->   
-> -static int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
-> +/**
-> + * make_folio_secure() - make a folio secure
-> + * @folio: the folio to make secure
-> + * @uvcb: the uvcb that describes the UVC to be used
-> + *
-> + * The folio @folio will be made secure if possible, @uvcb will be passed
-> + * as-is to the UVC.
-> + *
-> + * Return: 0 on success;
-> + *         -EBUSY if the folio is in writeback, has too many references, or is large;
-> + *         -EAGAIN if the UVC needs to be attempted again;
-> + *         -ENXIO if the address is not mapped;
-> + *         -EINVAL if the UVC failed for other reasons.
-> + *
-> + * Context: The caller must hold exactly one extra reference on the folio
-> + *          (it's the same logic as split_folio())
-> + */
-> +int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
->   {
->   	int expected, cc = 0;
->   
-> +	if (folio_test_large(folio))
-> +		return -EBUSY;
->   	if (folio_test_writeback(folio))
-> -		return -EAGAIN;
-> -	expected = expected_folio_refs(folio);
-> +		return -EBUSY;
-> +	expected = expected_folio_refs(folio) + 1;
->   	if (!folio_ref_freeze(folio, expected))
->   		return -EBUSY;
->   	set_bit(PG_arch_1, &folio->flags);
-> @@ -267,251 +276,35 @@ static int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
->   		return -EAGAIN;
->   	return uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
->   }
-> +EXPORT_SYMBOL_GPL(make_folio_secure);
->   
->   /**
-> - * should_export_before_import - Determine whether an export is needed
-> - * before an import-like operation
-> - * @uvcb: the Ultravisor control block of the UVC to be performed
-> - * @mm: the mm of the process
-> - *
-> - * Returns whether an export is needed before every import-like operation.
-> - * This is needed for shared pages, which don't trigger a secure storage
-> - * exception when accessed from a different guest.
-> - *
-> - * Although considered as one, the Unpin Page UVC is not an actual import,
-> - * so it is not affected.
-> + * uv_wiggle_folio() - try to drain extra references to a folio
-> + * @folio: the folio
-> + * @split: whether to split a large folio
->    *
-> - * No export is needed also when there is only one protected VM, because the
-> - * page cannot belong to the wrong VM in that case (there is no "other VM"
-> - * it can belong to).
-> - *
-> - * Return: true if an export is needed before every import, otherwise false.
-> + * Context: Must be called while holding an extra reference to the folio;
-> + *          the mm lock should not be held.
->    */
-> -static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
-> +int uv_wiggle_folio(struct folio *folio, bool split)
->   {
-> -	/*
-> -	 * The misc feature indicates, among other things, that importing a
-> -	 * shared page from a different protected VM will automatically also
-> -	 * transfer its ownership.
-> -	 */
-> -	if (uv_has_feature(BIT_UV_FEAT_MISC))
-> -		return false;
-> -	if (uvcb->cmd == UVC_CMD_UNPIN_PAGE_SHARED)
-> -		return false;
-> -	return atomic_read(&mm->context.protected_count) > 1;
-> -}
-> -
-> -/*
-> - * Drain LRU caches: the local one on first invocation and the ones of all
-> - * CPUs on successive invocations. Returns "true" on the first invocation.
-> - */
-> -static bool drain_lru(bool *drain_lru_called)
-> -{
-> -	/*
-> -	 * If we have tried a local drain and the folio refcount
-> -	 * still does not match our expected safe value, try with a
-> -	 * system wide drain. This is needed if the pagevecs holding
-> -	 * the page are on a different CPU.
-> -	 */
-> -	if (*drain_lru_called) {
-> -		lru_add_drain_all();
-> -		/* We give up here, don't retry immediately. */
-> -		return false;
-> -	}
-> -	/*
-> -	 * We are here if the folio refcount does not match the
-> -	 * expected safe value. The main culprits are usually
-> -	 * pagevecs. With lru_add_drain() we drain the pagevecs
-> -	 * on the local CPU so that hopefully the refcount will
-> -	 * reach the expected safe value.
-> -	 */
-> -	lru_add_drain();
-> -	*drain_lru_called = true;
-> -	/* The caller should try again immediately */
-> -	return true;
-> -}
-> -
-> -/*
-> - * Requests the Ultravisor to make a page accessible to a guest.
-> - * If it's brought in the first time, it will be cleared. If
-> - * it has been exported before, it will be decrypted and integrity
-> - * checked.
-> - */
-> -int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
-> -{
-> -	struct vm_area_struct *vma;
-> -	bool drain_lru_called = false;
-> -	spinlock_t *ptelock;
-> -	unsigned long uaddr;
-> -	struct folio *folio;
-> -	pte_t *ptep;
->   	int rc;
->   
-> -again:
-> -	rc = -EFAULT;
-> -	mmap_read_lock(gmap->mm);
-> -
-> -	uaddr = __gmap_translate(gmap, gaddr);
-> -	if (IS_ERR_VALUE(uaddr))
-> -		goto out;
-> -	vma = vma_lookup(gmap->mm, uaddr);
-> -	if (!vma)
-> -		goto out;
-> -	/*
-> -	 * Secure pages cannot be huge and userspace should not combine both.
-> -	 * In case userspace does it anyway this will result in an -EFAULT for
-> -	 * the unpack. The guest is thus never reaching secure mode. If
-> -	 * userspace is playing dirty tricky with mapping huge pages later
-> -	 * on this will result in a segmentation fault.
-> -	 */
-> -	if (is_vm_hugetlb_page(vma))
-> -		goto out;
-> -
-> -	rc = -ENXIO;
-> -	ptep = get_locked_pte(gmap->mm, uaddr, &ptelock);
-> -	if (!ptep)
-> -		goto out;
-> -	if (pte_present(*ptep) && !(pte_val(*ptep) & _PAGE_INVALID) && pte_write(*ptep)) {
-> -		folio = page_folio(pte_page(*ptep));
-> -		rc = -EAGAIN;
-> -		if (folio_test_large(folio)) {
-> -			rc = -E2BIG;
-> -		} else if (folio_trylock(folio)) {
-> -			if (should_export_before_import(uvcb, gmap->mm))
-> -				uv_convert_from_secure(PFN_PHYS(folio_pfn(folio)));
-> -			rc = make_folio_secure(folio, uvcb);
-> -			folio_unlock(folio);
-> -		}
-> -
-> -		/*
-> -		 * Once we drop the PTL, the folio may get unmapped and
-> -		 * freed immediately. We need a temporary reference.
-> -		 */
-> -		if (rc == -EAGAIN || rc == -E2BIG)
-> -			folio_get(folio);
-> -	}
-> -	pte_unmap_unlock(ptep, ptelock);
-> -out:
-> -	mmap_read_unlock(gmap->mm);
-> -
-> -	switch (rc) {
-> -	case -E2BIG:
-> +	folio_wait_writeback(folio);
-> +	if (split) {
->   		folio_lock(folio);
->   		rc = split_folio(folio);
->   		folio_unlock(folio);
-> -		folio_put(folio);
-> -
-> -		switch (rc) {
-> -		case 0:
-> -			/* Splitting succeeded, try again immediately. */
-> -			goto again;
-> -		case -EAGAIN:
-> -			/* Additional folio references. */
-> -			if (drain_lru(&drain_lru_called))
-> -				goto again;
-> -			return -EAGAIN;
-> -		case -EBUSY:
-> -			/* Unexpected race. */
-> +
-> +		if (rc == -EBUSY)
->   			return -EAGAIN;
-> -		}
-> -		WARN_ON_ONCE(1);
-> -		return -ENXIO;
-> -	case -EAGAIN:
-> -		/*
-> -		 * If we are here because the UVC returned busy or partial
-> -		 * completion, this is just a useless check, but it is safe.
-> -		 */
-> -		folio_wait_writeback(folio);
-> -		folio_put(folio);
-> -		return -EAGAIN;
-> -	case -EBUSY:
-> -		/* Additional folio references. */
-> -		if (drain_lru(&drain_lru_called))
-> -			goto again;
-> -		return -EAGAIN;
-> -	case -ENXIO:
-> -		if (gmap_fault(gmap, gaddr, FAULT_FLAG_WRITE))
-> -			return -EFAULT;
-> -		return -EAGAIN;
-> +		if (rc != -EAGAIN)
-> +			return rc;
->   	}
-> -	return rc;
-> -}
-> -EXPORT_SYMBOL_GPL(gmap_make_secure);
-> -
-> -int gmap_convert_to_secure(struct gmap *gmap, unsigned long gaddr)
-> -{
-> -	struct uv_cb_cts uvcb = {
-> -		.header.cmd = UVC_CMD_CONV_TO_SEC_STOR,
-> -		.header.len = sizeof(uvcb),
-> -		.guest_handle = gmap->guest_handle,
-> -		.gaddr = gaddr,
-> -	};
-> -
-> -	return gmap_make_secure(gmap, gaddr, &uvcb);
-> -}
-> -EXPORT_SYMBOL_GPL(gmap_convert_to_secure);
-> -
-> -/**
-> - * gmap_destroy_page - Destroy a guest page.
-> - * @gmap: the gmap of the guest
-> - * @gaddr: the guest address to destroy
-> - *
-> - * An attempt will be made to destroy the given guest page. If the attempt
-> - * fails, an attempt is made to export the page. If both attempts fail, an
-> - * appropriate error is returned.
-> - */
-> -int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
-> -{
-> -	struct vm_area_struct *vma;
-> -	struct folio_walk fw;
-> -	unsigned long uaddr;
-> -	struct folio *folio;
-> -	int rc;
-> -
-> -	rc = -EFAULT;
-> -	mmap_read_lock(gmap->mm);
-> -
-> -	uaddr = __gmap_translate(gmap, gaddr);
-> -	if (IS_ERR_VALUE(uaddr))
-> -		goto out;
-> -	vma = vma_lookup(gmap->mm, uaddr);
-> -	if (!vma)
-> -		goto out;
-> -	/*
-> -	 * Huge pages should not be able to become secure
-> -	 */
-> -	if (is_vm_hugetlb_page(vma))
-> -		goto out;
-> -
-> -	rc = 0;
-> -	folio = folio_walk_start(&fw, vma, uaddr, 0);
-> -	if (!folio)
-> -		goto out;
-> -	/*
-> -	 * See gmap_make_secure(): large folios cannot be secure. Small
-> -	 * folio implies FW_LEVEL_PTE.
-> -	 */
-> -	if (folio_test_large(folio) || !pte_write(fw.pte))
-> -		goto out_walk_end;
-> -	rc = uv_destroy_folio(folio);
-> -	/*
-> -	 * Fault handlers can race; it is possible that two CPUs will fault
-> -	 * on the same secure page. One CPU can destroy the page, reboot,
-> -	 * re-enter secure mode and import it, while the second CPU was
-> -	 * stuck at the beginning of the handler. At some point the second
-> -	 * CPU will be able to progress, and it will not be able to destroy
-> -	 * the page. In that case we do not want to terminate the process,
-> -	 * we instead try to export the page.
-> -	 */
-> -	if (rc)
-> -		rc = uv_convert_from_secure_folio(folio);
-> -out_walk_end:
-> -	folio_walk_end(&fw, vma);
-> -out:
-> -	mmap_read_unlock(gmap->mm);
-> -	return rc;
-> +	lru_add_drain_all();
-> +	return -EAGAIN;
->   }
-> -EXPORT_SYMBOL_GPL(gmap_destroy_page);
-> +EXPORT_SYMBOL_GPL(uv_wiggle_folio);
->   
->   /*
->    * To be called with the folio locked or with an extra reference! This will
-> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
-> index 02217fb4ae10..d972dea657fd 100644
-> --- a/arch/s390/kvm/Makefile
-> +++ b/arch/s390/kvm/Makefile
-> @@ -8,7 +8,7 @@ include $(srctree)/virt/kvm/Makefile.kvm
->   ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
->   
->   kvm-y += kvm-s390.o intercept.o interrupt.o priv.o sigp.o
-> -kvm-y += diag.o gaccess.o guestdbg.o vsie.o pv.o
-> +kvm-y += diag.o gaccess.o guestdbg.o vsie.o pv.o gmap.o
->   
->   kvm-$(CONFIG_VFIO_PCI_ZDEV_KVM) += pci.o
->   obj-$(CONFIG_KVM) += kvm.o
-> diff --git a/arch/s390/kvm/gmap.c b/arch/s390/kvm/gmap.c
-> new file mode 100644
-> index 000000000000..a142bbbddc25
-> --- /dev/null
-> +++ b/arch/s390/kvm/gmap.c
-> @@ -0,0 +1,183 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Guest memory management for KVM/s390
-> + *
-> + * Copyright IBM Corp. 2008, 2020, 2024
-> + *
-> + *    Author(s): Claudio Imbrenda <imbrenda@linux.ibm.com>
-> + *               Martin Schwidefsky <schwidefsky@de.ibm.com>
-> + *               David Hildenbrand <david@redhat.com>
-> + *               Janosch Frank <frankja@linux.vnet.ibm.com>
-> + */
-> +
-> +#include <linux/compiler.h>
-> +#include <linux/kvm.h>
-> +#include <linux/kvm_host.h>
-> +#include <linux/pgtable.h>
-> +#include <linux/pagemap.h>
-> +
-> +#include <asm/lowcore.h>
-> +#include <asm/gmap.h>
-> +#include <asm/uv.h>
-> +
-> +#include "gmap.h"
-> +
-> +/**
-> + * should_export_before_import - Determine whether an export is needed
-> + * before an import-like operation
-> + * @uvcb: the Ultravisor control block of the UVC to be performed
-> + * @mm: the mm of the process
-> + *
-> + * Returns whether an export is needed before every import-like operation.
-> + * This is needed for shared pages, which don't trigger a secure storage
-> + * exception when accessed from a different guest.
-> + *
-> + * Although considered as one, the Unpin Page UVC is not an actual import,
-> + * so it is not affected.
-> + *
-> + * No export is needed also when there is only one protected VM, because the
-> + * page cannot belong to the wrong VM in that case (there is no "other VM"
-> + * it can belong to).
-> + *
-> + * Return: true if an export is needed before every import, otherwise false.
-> + */
-> +static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
-> +{
-> +	/*
-> +	 * The misc feature indicates, among other things, that importing a
-> +	 * shared page from a different protected VM will automatically also
-> +	 * transfer its ownership.
-> +	 */
-> +	if (uv_has_feature(BIT_UV_FEAT_MISC))
-> +		return false;
-> +	if (uvcb->cmd == UVC_CMD_UNPIN_PAGE_SHARED)
-> +		return false;
-> +	return atomic_read(&mm->context.protected_count) > 1;
-> +}
-> +
-> +static int __gmap_make_secure(struct gmap *gmap, struct page *page, void *uvcb)
-> +{
-> +	struct folio *folio = page_folio(page);
-> +	int rc;
-> +
-> +	/*
-> +	 * Secure pages cannot be huge and userspace should not combine both.
-> +	 * In case userspace does it anyway this will result in an -EFAULT for
-> +	 * the unpack. The guest is thus never reaching secure mode. If
-> +	 * userspace is playing dirty tricky with mapping huge pages later
+> Why would not IOMMU_IOAS_MAP/UNMAP uAPI work? Thanks,
 
-s/tricky/tricks/
+I don't want to overload those APIs, I prefer to see a new API that is
+just about splitting areas. Splitting is a special operation that can
+fail depending on driver support.
 
-But the whole last sentence is a bit iffy.
-
-> +	 * on this will result in a segmentation fault or in a -EFAULT return
-> +	 * code from the KVM_RUN ioctl.
-> +	 */
-> +	if (folio_test_hugetlb(folio))
-> +		return -EFAULT;
-> +	if (folio_test_large(folio)) {
-> +		mmap_read_unlock(gmap->mm);
-> +		rc = uv_wiggle_folio(folio, true);
-> +		mmap_read_lock(gmap->mm);
-
-You could move the unlock to uv_wiggle_folio() and add a 
-mmap_assert_locked() in front.
-
-At least if you have no other users in upcoming series which don't need 
-the unlock.
+Jason
 
