@@ -1,189 +1,161 @@
-Return-Path: <kvm+bounces-35584-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35585-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F40A12A7F
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 19:10:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04828A12AE0
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 19:31:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 885D4163BC9
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 18:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D38353A68EF
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 18:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038261D5AC0;
-	Wed, 15 Jan 2025 18:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237611D63F9;
+	Wed, 15 Jan 2025 18:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VxChtGMM"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="JZIZ8WpP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5CE14A630
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 18:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455D3161321
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 18:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736964631; cv=none; b=V1+FkGA6FUz2V/o0gxm5cG8/MhO0e1/JxX4jHS9ZeNC27Tkft+b39v53suLsbdyDeh+iiR4DgXB8Tkm1xDp59VA9HUDGyQ1itCtBqCjS2lLlcl9ndTCcXPvZ96CxNsHeptzqVCBY5zWE7X6kViifS6Fvl1jetpEtEpJiR/OEehY=
+	t=1736965858; cv=none; b=fgNVFrzHMX2k7bgOYtj9JgSEdh8EZtc4YuJEMb0nkQMqpJZ+Uf3HJw3VBstwDshDHSkz5BnoZiTXRMHe1Y8ybzDWkBFK/6miK2BevqSBsQ/JIS0Mi5INjbJlVwWGmiD68bgvUY4ofXoOXv7FX4p8yfvGM+wG1k0E2p+onzA0UaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736964631; c=relaxed/simple;
-	bh=yQ/sw9wRMFaarqcRa9DR96lwFaiZR3HU9sR4NGAmQo8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j+pPGwHgYffoI5ofgcZ5tjsQdIG7WxWrhvAQZUZmV4pPaecHGJ0z0cSmJubqEK+MR2pqZZsi76ThJiug7bWPkKiTXD6Q6WBEj4OSKivovt0lb/WP8IFhdeI0HMzZVx0XMOt9uRFcGVszwTIrNCWtoQno9WoAfwE8oXPATz07bTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VxChtGMM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736964628;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W72gn/X43iSEWHwc8vF+OcjzKNW4pEeZuQNi+6C4SJg=;
-	b=VxChtGMMclFrtapoA4l6Jfzf4WJHvfEBBj+KQ39EfB3FDXmsVRMcgYFggZe89G61qtrWqX
-	D7eOxhpYQw6HrmN7etQ6uxD06g6ZRiwjddjQpup5MLVtZVeMqps4Wp+gsPGhqv9MacNfvX
-	JIP92g48XNysP3R/cJ3j/tUPgITNsVw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-302-zRtRW8NIMcOxaO0iVgh3zg-1; Wed, 15 Jan 2025 13:10:26 -0500
-X-MC-Unique: zRtRW8NIMcOxaO0iVgh3zg-1
-X-Mimecast-MFC-AGG-ID: zRtRW8NIMcOxaO0iVgh3zg
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436723bf7ffso32477515e9.3
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 10:10:26 -0800 (PST)
+	s=arc-20240116; t=1736965858; c=relaxed/simple;
+	bh=43OBilrV18+B5fdkEVcCHjSJ8iWjDPj4M//wXsiMjWE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eWoldXb8le615gS396UeA56fZkFEHSMEQAeYLl2xBNpyHzpnEUyQZ8mcAynxCG0qG7ouo8F3CkEN6sj2LdmtZ/dsFQhXmGwE1sgGGH/S3naxp4xpIuotnP+cwdnE19CPexQSYHJGWl3+fgOSiCLqFjVXxjK+HQAbrf6eAeAzK0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=JZIZ8WpP; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21654fdd5daso122338635ad.1
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 10:30:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1736965855; x=1737570655; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ajGRMGn1FxbsN+PpYAIsQKTZUngiruAaZC1M7x3JFs=;
+        b=JZIZ8WpPERLiAapvWO2r5Zb5bd7aKQ5oJa4cR9dfKR3Bd/Xs2igJEUM+BkfudBvfoP
+         ZEX2b251XdQyvErJ2A4ZVpbOLUWo7UoY+ISHtluck8wmNmcDmDLdo4xC4EBdctgM/dVM
+         kcqlV/yO33xxVu3oIUTejidVo+R4ItQJnBNX67c/HCV95RVJzV3KLt+A3jQa8677PgP6
+         JtMAKudZBSd91nJBSYr5ipCiB1iusqMZvRHnFVp3KGKPG2+hGKCHffTM4Nt9WBrXLWWH
+         UPGNznKk/0DODull2p416BSog/YLYt9cpoU4can1tx6v77SQUXWfO+2V5YetLnXpmrzM
+         eG9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736964625; x=1737569425;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W72gn/X43iSEWHwc8vF+OcjzKNW4pEeZuQNi+6C4SJg=;
-        b=YGvv/nT5rCUdx1hszLeb3nZB712xmQDll27xQbMVN5uVIq9qeu2M9hKuSbFalT5Snt
-         ANyXN5G9odlL70oX8oJhADY271h87ZwgZedZURKPzNn4OyZ17A3OLb+HNxCKqM7Kmf0U
-         gnimwrLi7qDS9BDSvXwHBNLUxX8Cf0QQLcOa11YYkUzZAh5yiCQpP5H+cyQHZWkLi3nC
-         6nckfaQNC4gdmMIdODfgQ0RFlKok4z58cKkzbjGmsmNbZEaeeuLHmUgfjv4gyfEKn5/4
-         rW2GYdArQkDieNhen6MfcxJvAgd/no18iEEqOvMJh1H+FcrJF+DcAjLogVGznnSp5czC
-         61AA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZE9F2/hpSosLz5xMa8kZpv56Gg8szlZ8LwEgYhfDufmJKkG7f6vUle9+n+LgbJWfdsI4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUc6P7MThBlOzxmGR4ejpJzh6Ven+k3S9VQFpzj0t+nVsn6Jn0
-	B86duPsILZB3B7PhmvvsxuDKKPwh8iZjSj1lztIYLB9ffj5qNcTWbyitmEqrMLb2tNddBcaIeXi
-	HJ+ujgok8FayUczNGdoY1IkXXktB9gB0zL50tRCdAXyJk3L0dBg==
-X-Gm-Gg: ASbGncu4oksHTmF0AnJsmC8RdnHyKSGow/eGFYcuyoEY5IJCWypdCNVHJmwymebHvYI
-	mhfXvN5OkcVpC4tX223H16D1WByFh7Nz5157q+/Mfo9Zcq8R0xmwq3M0XaoVJ1GhjpfYCtg/Bqc
-	5her0NhY8V1XpQqb+/51zZi8f2SSBUblKo7R3rBaB6Z/KO8nUlsy5hy9a/HDhWCt9A81nWJYv8z
-	cwyG6lTCJLM3pdo2y3ICfbqPTFT2mu754hFjqYU3cyEgVyjEAq9
-X-Received: by 2002:a05:600c:4586:b0:434:f817:4492 with SMTP id 5b1f17b1804b1-436e26f47f9mr300718005e9.31.1736964625036;
-        Wed, 15 Jan 2025 10:10:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGQBbQ/ucVqe/1aRLFuXcnKDdErlW+RXJrbuNeDn0+FcDJpY3P4Ms2jbcdoT38rACpbOJjs1A==
-X-Received: by 2002:a05:600c:4586:b0:434:f817:4492 with SMTP id 5b1f17b1804b1-436e26f47f9mr300717745e9.31.1736964624696;
-        Wed, 15 Jan 2025 10:10:24 -0800 (PST)
-Received: from redhat.com ([2a0d:6fc7:342:db8c:4ec4:322b:a6a8:f411])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38bf78sm18082767f8f.48.2025.01.15.10.10.22
+        d=1e100.net; s=20230601; t=1736965855; x=1737570655;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/ajGRMGn1FxbsN+PpYAIsQKTZUngiruAaZC1M7x3JFs=;
+        b=oJ3qasa8BZZ6UsadBLWSitX8uGS25QyXGQ9TkliwwigAig0oFPjgx8cbCd/U7jD36f
+         m0hIzXtRARgC79Lp+NPrHK9q9FqPO1FscghuSyQc8PxXUqhcqftu//H6X4dKzExxfE+i
+         o4OHH60mnd0orU23zA04AFEIfllBTzS3djRfDs15yY/DHxm1mInpotimzKPcKrstTNdx
+         R5DRzlfZBiRP9IH1YmI0T6KBjF+FLlA1QbYwZDn9Lr9rYqSjt0uNKKwQmYXYiZ1JD46E
+         sheOIqidDTz1fkWJWpPRH+874LjIiqH4BiNxu6A112o/a+/e9ITVhMbqU/VTreAtfvau
+         agqw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ81SHt9OZeSAlSkE2WT5vlnXFz7EBKCL2bgdq56fqt7s9W2ky1YIcBHNvQFMVH3moh/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+5Fafi/C41QoHGOlDYqFYRJSPUiGh1cxDb0r0D5OtpBMSidpk
+	BGmZHOTLaCbdg9aBv2e6OWh6HTFNYheMVNLUk9ygM5w1pSCZlVpQiqiOAniK0Rk=
+X-Gm-Gg: ASbGnctBerbLl3/VO3pdy4f6h1ARdgJwaN1FeYG6zna7XRc+2gYAkt8X27i1MQEUjdo
+	NfwY2EpwmyHxiTXkroy1FdKoo3JuZnBsExo1iKSIvUUhXeGvQW8yy3Yga8gYqhJbpSp5MI4pI6x
+	8/WKU4XP+O59SVyq4LydTxx3r0jXBpiQaWpihv2XjMKKiTdQJUyTDsq7D4Ft8+iBeUFHr/Cn6yc
+	C/mUC3oJi0HHyZ1nqvEe6ahdPCEyV4iTaBIxUoGFJGTDuk5+h0u58jRV2iV3rXeTl154g==
+X-Google-Smtp-Source: AGHT+IEFG9EqfNb6O2FfoTObOooM3/6B60y7w3sfOaKZm6tCWCH+RNJht379tQ8uKw/jXGcfHEEVRQ==
+X-Received: by 2002:a17:902:f644:b0:212:40e0:9562 with SMTP id d9443c01a7336-21a83f69651mr458458845ad.25.1736965855468;
+        Wed, 15 Jan 2025 10:30:55 -0800 (PST)
+Received: from atishp.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f219f0dsm85333195ad.139.2025.01.15.10.30.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 10:10:23 -0800 (PST)
-Date: Wed, 15 Jan 2025 13:10:21 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Dongjiu Geng <gengdongjiu1@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [PULL 36/48] acpi/ghes: better name GHES memory error function
-Message-ID: <d32028a54000db671eb2d0b6b28bbf15acc2e5f9.1736964488.git.mst@redhat.com>
-References: <cover.1736964487.git.mst@redhat.com>
+        Wed, 15 Jan 2025 10:30:55 -0800 (PST)
+From: Atish Patra <atishp@rivosinc.com>
+Subject: [PATCH v2 0/9] Add SBI v3.0 PMU enhancements
+Date: Wed, 15 Jan 2025 10:30:40 -0800
+Message-Id: <20250115-pmu_event_info-v2-0-84815b70383b@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1736964487.git.mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAND+h2cC/12OQWrDMBBFr2K07gTP2BWSKaX3CME4yriZhaVUc
+ kRKyN2ryJu2oM0TzPvvrhJH4aSG5q4iZ0kSfAF6aZQ7T/6TQU6FFbXUY4sGLst15Mx+HcXPAaz
+ RTOhYH0+dKkeXyLPcqnB/KHyWtIb4Xf0Zn7+bCtH+V2WEFqZ+ttpiTzibjyg5JPFu58KiDo9NH
+ /nrWjLXbUMtnNJUM4fmraoJ6Ze61oyZoLwWDHZsysar1fRH//6MP06JocAi69BkvcMOoqOy/Pg
+ BmvULkCgBAAA=
+To: Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>, 
+ Mark Rutland <mark.rutland@arm.com>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, 
+ Mayuresh Chitale <mchitale@ventanamicro.com>
+Cc: linux-riscv@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>, 
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+ Atish Patra <atishp@rivosinc.com>
+X-Mailer: b4 0.15-dev-13183
 
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+SBI v3.0 specification[1] added two new improvements to the PMU chaper.
 
-The current function used to generate GHES data is specific for
-memory errors. Give a better name for it, as we now have a generic
-function as well.
+1. Added an additional get_event_info function to query event availablity
+in bulk instead of individual SBI calls for each event. This helps in
+improving the boot time.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Message-Id: <35b59121129d5e99cb5062cc3d775594bbb0905b.1736945236.git.mchehab+huawei@kernel.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+2. Raw event width allowed by the platform is widened to have 56 bits
+with RAW event v2 as per new clarification in the priv ISA[2].
+
+Apart from implementing these new features, this series improves the gpa
+range check in KVM and updates the kvm SBI implementation to SBI v3.0.
+
+The opensbi patches have been merged. This series can be found at [4].
+This series will conflict with counter delegation patch series[4]. This
+series is gated on SBI v3.0 freeze requirement while counter delegation
+series is very early. I will rebase one of them on the other as we gather
+more reviews and closer to merge.
+
+[1] https://github.com/riscv-non-isa/riscv-sbi-doc/releases/download/vv3.0-rc2/riscv-sbi.pdf
+[2] https://github.com/riscv/riscv-isa-manual/issues/1578
+[3] https://github.com/atishp04/linux/tree/b4/pmu_event_info_v2
+[4] https://lore.kernel.org/kvm/20250114-counter_delegation-v2-0-8ba74cdb851b@rivosinc.com/
+
+Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- include/hw/acpi/ghes.h | 4 ++--
- hw/acpi/ghes-stub.c    | 2 +-
- hw/acpi/ghes.c         | 2 +-
- target/arm/kvm.c       | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+Changes in v2:
+- Dropped PATCH 2 to be taken during rcX.
+- Improved gpa range check validation by introducing a helper function
+  and checking the entire range.
+- Link to v1: https://lore.kernel.org/r/20241119-pmu_event_info-v1-0-a4f9691421f8@rivosinc.com
 
-diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-index 8859346af5..21666a4bcc 100644
---- a/include/hw/acpi/ghes.h
-+++ b/include/hw/acpi/ghes.h
-@@ -74,15 +74,15 @@ void acpi_build_hest(GArray *table_data, GArray *hardware_errors,
-                      const char *oem_id, const char *oem_table_id);
- void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-                           GArray *hardware_errors);
-+int acpi_ghes_memory_errors(uint16_t source_id, uint64_t error_physical_addr);
- void ghes_record_cper_errors(const void *cper, size_t len,
-                              uint16_t source_id, Error **errp);
--int acpi_ghes_record_errors(uint16_t source_id, uint64_t error_physical_addr);
- 
- /**
-  * acpi_ghes_present: Report whether ACPI GHES table is present
-  *
-  * Returns: true if the system has an ACPI GHES table and it is
-- * safe to call acpi_ghes_record_errors() to record a memory error.
-+ * safe to call acpi_ghes_memory_errors() to record a memory error.
-  */
- bool acpi_ghes_present(void);
- #endif
-diff --git a/hw/acpi/ghes-stub.c b/hw/acpi/ghes-stub.c
-index 2b64cbd281..7cec1812da 100644
---- a/hw/acpi/ghes-stub.c
-+++ b/hw/acpi/ghes-stub.c
-@@ -11,7 +11,7 @@
- #include "qemu/osdep.h"
- #include "hw/acpi/ghes.h"
- 
--int acpi_ghes_record_errors(uint16_t source_id, uint64_t physical_address)
-+int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
- {
-     return -1;
- }
-diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-index 6f40cd35a9..66bd98337a 100644
---- a/hw/acpi/ghes.c
-+++ b/hw/acpi/ghes.c
-@@ -415,7 +415,7 @@ void ghes_record_cper_errors(const void *cper, size_t len,
-     return;
- }
- 
--int acpi_ghes_record_errors(uint16_t source_id, uint64_t physical_address)
-+int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
- {
-     /* Memory Error Section Type */
-     const uint8_t guid[] =
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index a9444a2c7a..da30bdbb23 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -2387,7 +2387,7 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-              */
-             if (code == BUS_MCEERR_AR) {
-                 kvm_cpu_synchronize_state(c);
--                if (!acpi_ghes_record_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
-+                if (!acpi_ghes_memory_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
-                     kvm_inject_arm_sea(c);
-                 } else {
-                     error_report("failed to record the error");
--- 
-MST
+---
+Atish Patra (9):
+      drivers/perf: riscv: Add SBI v3.0 flag
+      drivers/perf: riscv: Add raw event v2 support
+      RISC-V: KVM: Add support for Raw event v2
+      drivers/perf: riscv: Implement PMU event info function
+      drivers/perf: riscv: Export PMU event info function
+      KVM: Add a helper function to validate vcpu gpa range
+      RISC-V: KVM: Use the new gpa range validate helper function
+      RISC-V: KVM: Implement get event info function
+      RISC-V: KVM: Upgrade the supported SBI version to 3.0
+
+ arch/riscv/include/asm/kvm_vcpu_pmu.h |   3 +
+ arch/riscv/include/asm/kvm_vcpu_sbi.h |   2 +-
+ arch/riscv/include/asm/sbi.h          |  13 +++
+ arch/riscv/kvm/vcpu_pmu.c             |  75 +++++++++++++-
+ arch/riscv/kvm/vcpu_sbi_pmu.c         |   3 +
+ arch/riscv/kvm/vcpu_sbi_sta.c         |   6 +-
+ drivers/perf/riscv_pmu_sbi.c          | 190 +++++++++++++++++++++++++---------
+ include/linux/kvm_host.h              |   2 +
+ include/linux/perf/riscv_pmu.h        |   2 +
+ virt/kvm/kvm_main.c                   |  21 ++++
+ 10 files changed, 258 insertions(+), 59 deletions(-)
+---
+base-commit: e32a80927434907f973f38a88cd19d7e51991d24
+change-id: 20241018-pmu_event_info-986e21ce6bd3
+--
+Regards,
+Atish patra
 
 
