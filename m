@@ -1,431 +1,155 @@
-Return-Path: <kvm+bounces-35541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4EE8A12443
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 13:58:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B89DA12448
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 13:59:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 038807A2F19
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 12:58:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D1473A7A5E
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 12:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30152459BB;
-	Wed, 15 Jan 2025 12:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516BD2459BD;
+	Wed, 15 Jan 2025 12:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q64+jiE/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lFYge3Y1"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245B82459AE
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 12:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6562459AE;
+	Wed, 15 Jan 2025 12:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736945908; cv=none; b=XJQJv8Xq3W1ypKMzc3Be/PZL/s/87w0qrksHcWQ8QMPayboYFSjpMcYuP5SiB0adhwS4rzkPKx2At05qIn1EsZch2LI6H+2jn6pyKSgoXEThi9YuCiszIVyN8sFPt2sCegavQZO3MyIZ371t7JzZThTBdOrtz6acWgGwmPSE59U=
+	t=1736945971; cv=none; b=OIMxo/uWYBxo21UHGZOIrIWTLrVPabJhRVYIyZPwkfifx8vZ58pweXMfD5gxxhVep6/SUod4Zb2hnuWh85cr0ToINxYgp+FlrpOpY0hdU0mh6d2X/C/oNCSc280Vo2X+SMhZwMfgL5sVQ9h6tlhOsZJ836Saw3leUamkMuMIjIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736945908; c=relaxed/simple;
-	bh=8RvRg0aNB+Z2dien/+w43N87UCbohVfwdVY2TM6H/D8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VjkF7f2gJB6ogjuSu73bQE7jYTrj8c1tWGOT2j/8hqG4Y99+nzGqwecngbhwYKW8NoSyAX0CfxE6UzAFFz5ZqooB5pfV9QV7ZO/spjuSFHwQgGF+GCgSrM3OueWkBaGpobkUjzJGFkPNSQRC+oifzbV3A2AVS6jKPYC10oVW/Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Q64+jiE/; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 15 Jan 2025 13:58:18 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736945902;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=atQs3bvXD4Yx/ZLDU7Ro3lLnEM/kCrq4wB3RJrd0pA4=;
-	b=Q64+jiE/SMyd/igPD4iG/ga0mZss45Xv16YLNEeWAj3thIuAhvRcq0tZiB6aVWvcbGa2ui
-	BNJac29yZwFGn1CaKJHT32Y0Z+GDWfmzPrIhf+ZYM7eX5lt45jou5j5LST1Lmo9OFbiBSj
-	IcTT+mEj3zHw5fazPkukvS5p48ukqxE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH 2/2] riscv: Add tests for SBI FWFT
- extension
-Message-ID: <20250115-0e896f7efb3e6bc2af91afb4@orel>
-References: <20250106155321.1109586-1-cleger@rivosinc.com>
- <20250106155321.1109586-3-cleger@rivosinc.com>
+	s=arc-20240116; t=1736945971; c=relaxed/simple;
+	bh=xkMkVD9xk7g36ZYAaxYHK9tMepE396I8mqT5K8M4Efs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bSyQTcOqfr029vgxbGML9iuXkb38xPCZa6Pt2LAUsKePahtPlQZzy5WUo48lN9OO/V07L+JUog/U5rgK0M5ueVFaDZRoBPpMd0V/VbckNbN0nhhucqHT0d53SErkHOYtEY8lnfZlB+x+X9D9VKCSTj6318ze0EM2dSA2xspNUrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lFYge3Y1; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50FBe01x010168;
+	Wed, 15 Jan 2025 12:59:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=B3UHFL
+	1hJregBd/uvAz04MN0uEg15IhWrzj10MiMk24=; b=lFYge3Y1WVH0H+hGAC5dG6
+	3f+9/CSW6wNbZr3VBTNuzGl8PHOpBhfHXHr+kQhMK8ol1rm1ML6AA2OxHX4yqz/p
+	gkKAgLoHGpomxeqQrKYxDgIyfYxRI9NTms5FP8Azend1Ym375d4D9hxyV1wTzusm
+	8gzxpAl6TC+WqgLUpTw/afHhW+LB16ipjxdWK9xVKd4r7AGqrv3et+e4N0pvXxhO
+	73SEQaBqivSOTMyy6XXpJeyc5Ob0U+s60EtvmQ4rVhJBLSJaEOu5+OnpvkTX0Lj9
+	QoMOAj5Pc2LLy4l58G9z6TEiyvw+NNUr+gAr3ZbGcxqlgiBA+abWwegeccW1+OaA
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4461rbjt2c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 12:59:25 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50FC7KUD016490;
+	Wed, 15 Jan 2025 12:59:24 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4445p1r0b0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 12:59:24 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50FCxLNj39518618
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Jan 2025 12:59:21 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EFB9720043;
+	Wed, 15 Jan 2025 12:59:20 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AE9F120040;
+	Wed, 15 Jan 2025 12:59:20 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 15 Jan 2025 12:59:20 +0000 (GMT)
+Date: Wed, 15 Jan 2025 13:59:19 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
+Subject: Re: [PATCH v1 04/13] KVM: s390: move pv gmap functions into kvm
+Message-ID: <20250115135919.57fac908@p-imbrenda>
+In-Reply-To: <03d91fa8-6f3f-4052-9b03-de28e88f0001@linux.ibm.com>
+References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
+	<20250108181451.74383-5-imbrenda@linux.ibm.com>
+	<03d91fa8-6f3f-4052-9b03-de28e88f0001@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250106155321.1109586-3-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mZO8pYyL7fLbHL1uuLpnITA_Mth8_vWK
+X-Proofpoint-GUID: mZO8pYyL7fLbHL1uuLpnITA_Mth8_vWK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-15_05,2025-01-15_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 impostorscore=0 mlxscore=0 suspectscore=0
+ mlxlogscore=867 adultscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501150099
 
-On Mon, Jan 06, 2025 at 04:53:20PM +0100, Clément Léger wrote:
-> This commit add tests for a the FWFT SBI extension. Currently, only
+On Wed, 15 Jan 2025 13:48:47 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-s/This commit//
+[...]
 
-> the reserved range as well as the misaligned exception delegation.
+> > +static int __gmap_make_secure(struct gmap *gmap, struct page *page, void *uvcb)
+> > +{
+> > +	struct folio *folio = page_folio(page);
+> > +	int rc;
+> > +
+> > +	/*
+> > +	 * Secure pages cannot be huge and userspace should not combine both.
+> > +	 * In case userspace does it anyway this will result in an -EFAULT for
+> > +	 * the unpack. The guest is thus never reaching secure mode. If
+> > +	 * userspace is playing dirty tricky with mapping huge pages later  
 > 
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> ---
->  riscv/Makefile      |   2 +-
->  lib/riscv/asm/sbi.h |  31 +++++++++
->  riscv/sbi-fwft.c    | 153 ++++++++++++++++++++++++++++++++++++++++++++
->  riscv/sbi.c         |   3 +
->  4 files changed, 188 insertions(+), 1 deletion(-)
->  create mode 100644 riscv/sbi-fwft.c
+> s/tricky/tricks/
 > 
-> diff --git a/riscv/Makefile b/riscv/Makefile
-> index 5b5e157c..52718f3f 100644
-> --- a/riscv/Makefile
-> +++ b/riscv/Makefile
-> @@ -17,7 +17,7 @@ tests += $(TEST_DIR)/sieve.$(exe)
->  
->  all: $(tests)
->  
-> -$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o
-> +$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o $(TEST_DIR)/sbi-fwft.o
->  
->  # When built for EFI sieve needs extra memory, run with e.g. '-m 256' on QEMU
->  $(TEST_DIR)/sieve.$(exe): AUXFLAGS = 0x1
-> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> index 98a9b097..27e6fcdb 100644
-> --- a/lib/riscv/asm/sbi.h
-> +++ b/lib/riscv/asm/sbi.h
-> @@ -11,6 +11,9 @@
->  #define SBI_ERR_ALREADY_AVAILABLE	-6
->  #define SBI_ERR_ALREADY_STARTED		-7
->  #define SBI_ERR_ALREADY_STOPPED		-8
-> +#define SBI_ERR_NO_SHMEM		-9
-> +#define SBI_ERR_INVALID_STATE		-10
-> +#define SBI_ERR_BAD_RANGE		-11
+> But the whole last sentence is a bit iffy.
 
-Need SBI_ERR_DENIED_LOCKED (and TIMEOUT and IO) too
+hmm yes I'll reword it
 
->  
->  #ifndef __ASSEMBLY__
->  #include <cpumask.h>
-> @@ -23,6 +26,7 @@ enum sbi_ext_id {
->  	SBI_EXT_SRST = 0x53525354,
->  	SBI_EXT_DBCN = 0x4442434E,
->  	SBI_EXT_SUSP = 0x53555350,
-> +	SBI_EXT_FWFT = 0x46574654,
->  };
->  
->  enum sbi_ext_base_fid {
-> @@ -71,6 +75,33 @@ enum sbi_ext_dbcn_fid {
->  	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
->  };
->  
-> +/* SBI function IDs for FW feature extension */
-> +#define SBI_EXT_FWFT_SET		0x0
-> +#define SBI_EXT_FWFT_GET		0x1
+> 
+> > +	 * on this will result in a segmentation fault or in a -EFAULT return
+> > +	 * code from the KVM_RUN ioctl.
+> > +	 */
+> > +	if (folio_test_hugetlb(folio))
+> > +		return -EFAULT;
+> > +	if (folio_test_large(folio)) {
+> > +		mmap_read_unlock(gmap->mm);
+> > +		rc = uv_wiggle_folio(folio, true);
+> > +		mmap_read_lock(gmap->mm);  
+> 
+> You could move the unlock to uv_wiggle_folio() and add a 
+> mmap_assert_locked() in front.
 
-Use a _fid enum like the other extensions.
+oh no, I don't want a function that drops a lock that has been acquired
+outside of it.
 
-> +
-> +enum sbi_fwft_feature_t {
+by explicitly dropping and acquiring it, it's obvious what's going on,
+and you can easily see that the lock is being dropped and re-acquired.
 
-Use defines for the following, like SSE does for its ranges.
+__gmap_destroy_page() does it, but it's called exactly in one spot,
+namely gmap_destroy_page(), which is literally below it.
 
-> +	SBI_FWFT_MISALIGNED_EXC_DELEG		= 0x0,
-> +	SBI_FWFT_LANDING_PAD			= 0x1,
-> +	SBI_FWFT_SHADOW_STACK			= 0x2,
-> +	SBI_FWFT_DOUBLE_TRAP			= 0x3,
-> +	SBI_FWFT_PTE_AD_HARDWARE_UPDATE		= 0x4,
+> 
+> At least if you have no other users in upcoming series which don't need 
+> the unlock.
 
-SBI_FWFT_PTE_AD_HW_UPDATING
-
-> +	SBI_FWFT_POINTER_MASKING_PMLEN		= 0x5,
-> +	SBI_FWFT_LOCAL_RESERVED_START		= 0x6,
-> +	SBI_FWFT_LOCAL_RESERVED_END		= 0x3fffffff,
-
-Do we need the reserved start/end? SSE doesn't define its reserved
-ranges.
-
-> +	SBI_FWFT_LOCAL_PLATFORM_START		= 0x40000000,
-> +	SBI_FWFT_LOCAL_PLATFORM_END		= 0x7fffffff,
-> +
-> +	SBI_FWFT_GLOBAL_RESERVED_START		= 0x80000000,
-> +	SBI_FWFT_GLOBAL_RESERVED_END		= 0xbfffffff,
-
-Same reserved range question.
-
-> +	SBI_FWFT_GLOBAL_PLATFORM_START		= 0xc0000000,
-> +	SBI_FWFT_GLOBAL_PLATFORM_END		= 0xffffffff,
-> +};
-> +
-> +#define SBI_FWFT_PLATFORM_FEATURE_BIT		(1 << 30)
-> +#define SBI_FWFT_GLOBAL_FEATURE_BIT		(1 << 31)
-> +
-> +#define SBI_FWFT_SET_FLAG_LOCK			(1 << 0)
-
-BIT() for the above defines
-
-> +
->  struct sbiret {
->  	long error;
->  	long value;
-> diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
-> new file mode 100644
-> index 00000000..8a7f2070
-> --- /dev/null
-> +++ b/riscv/sbi-fwft.c
-> @@ -0,0 +1,153 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * SBI verification
-> + *
-> + * Copyright (C) 2024, Rivos Inc., Clément Léger <cleger@rivosinc.com>
-> + */
-> +#include <libcflat.h>
-> +#include <stdlib.h>
-> +
-> +#include <asm/csr.h>
-> +#include <asm/processor.h>
-> +#include <asm/ptrace.h>
-> +#include <asm/sbi.h>
-> +
-> +void check_fwft(void);
-> +
-> +static int fwft_set(unsigned long feature_id, unsigned long value,
-
-returning an int is truncating sbiret.error
-
-s/unsigned long feature_id/uint32_t feature/
-
-> +		       unsigned long flags)
-> +{
-> +	struct sbiret ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_SET,
-> +				      feature_id, value, flags, 0, 0, 0);
-> +
-> +	return ret.error;
-> +}
-
-Probably need a fwft_set_raw() as well which takes an unsigned long for
-feature in order to test feature IDs that set bits >= 32 and returns
-an sbiret allowing sbiret.value to be checked.
-
-> +
-> +static int fwft_get(unsigned long feature_id, unsigned long *value)
-
-returning an int is truncating sbiret.error
-
-s/unsigned long feature_id/uint32_t feature/
-
-> +{
-> +	struct sbiret ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_GET,
-> +				      feature_id, 0, 0, 0, 0, 0);
-> +
-> +	*value = ret.value;
-> +
-> +	return ret.error;
-
-Why not just return sbiret to return both value and error?
-
-As a separate patch we should update struct sbiret to match the latest
-spec which now has a union in it.
-
-Same comment about needing a _raw version too.
-
-> +}
-> +
-> +static void fwft_check_reserved(unsigned long id)
-> +{
-> +	int ret;
-> +	bool pass = true;
-> +	unsigned long value;
-> +
-> +	ret = fwft_get(id, &value);
-> +	if (ret != SBI_ERR_DENIED)
-> +		pass = false;
-> +
-> +	ret = fwft_set(id, 1, 0);
-> +	if (ret != SBI_ERR_DENIED)
-> +		pass = false;
-> +
-> +	report(pass, "get/set reserved feature 0x%lx error == SBI_ERR_DENIED", id);
-
-The get and set should be split into two tests
-
- struct sbiret ret;
- ret = fwft_get(id);
- report(ret.error == SBI_ERR_DENIED, ...);
- ret = fwft_set(id, 1, 0);
- report(ret.error == SBI_ERR_DENIED, ...);
-
-> +}
-> +
-> +static void fwft_check_denied(void)
-> +{
-> +	fwft_check_reserved(SBI_FWFT_LOCAL_RESERVED_START);
-> +	fwft_check_reserved(SBI_FWFT_LOCAL_RESERVED_END);
-> +	fwft_check_reserved(SBI_FWFT_GLOBAL_RESERVED_START);
-> +	fwft_check_reserved(SBI_FWFT_GLOBAL_RESERVED_END);
-
-I see why we have the reserved ranges defined now. Shouldn't we also have
-tests like these for SSE, which means we should define the reserved ranges
-for it too?
-
-> +}
-> +
-> +static bool misaligned_handled;
-> +
-> +static void misaligned_handler(struct pt_regs *regs)
-> +{
-> +	misaligned_handled = true;
-> +	regs->epc += 4;
-> +}
-> +
-> +static void fwft_check_misaligned(void)
-> +{
-> +	int ret;
-> +	unsigned long value;
-> +
-> +	report_prefix_push("misaligned_deleg");
-
-"misaligned_exc_deleg"
-
-> +
-> +	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
-> +	if (ret == SBI_ERR_NOT_SUPPORTED) {
-> +		report_skip("SBI_FWFT_MISALIGNED_EXC_DELEG is not supported");
-> +		return;
-> +	}
-> +	report(!ret, "Get misaligned deleg feature no error");
-
-Should output the error too
-
-> +	if (ret)
-> +		return;
-> +
-> +	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 2, 0);
-> +	report(ret == SBI_ERR_INVALID_PARAM, "Set misaligned deleg feature invalid value error");
-> +	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 0xFFFFFFFF, 0);
-> +	report(ret == SBI_ERR_INVALID_PARAM, "Set misaligned deleg feature invalid value error");
-
-Something like
-
-     if (__riscv_xlen > 32) {
-        ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, (1ul << 32), 0);
-        report(ret == SBI_ERR_INVALID_PARAM
-     }
-
-would be a good test too (and also for the flags parameter)
-
-> +
-> +	/* Set to 0 and check after with get */
-> +	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 0, 0);
-> +	report(!ret, "Set misaligned deleg feature value no error");
-> +	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
-> +	if (ret)
-> +		report_fail("Get misaligned deleg feature after set");
-> +	else
-> +		report(value == 0, "Set misaligned deleg feature value 0");
-> +
-> +	/* Set to 1 and check after with get */
-> +	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 1, 0);
-> +	report(!ret, "Set misaligned deleg feature value no error");
-> +	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
-> +	if (ret)
-> +		report_fail("Get misaligned deleg feature after set");
-> +	else
-> +		report(value == 1, "Set misaligned deleg feature value 1");
-> +
-> +	install_exception_handler(EXC_LOAD_MISALIGNED, misaligned_handler);
-> +
-> +	asm volatile (
-> +		".option norvc\n"
-
-We also need push/pop otherwise from here on out we stop using compression
-instructions.
-
-> +		"lw %[val], 1(%[val_addr])"
-> +		: [val] "+r" (value)
-> +		: [val_addr] "r" (&value)
-> +		: "memory");
-> +
-> +	if (!misaligned_handled)
-> +		report_skip("Verify misaligned load exception trap in supervisor");
-
-Why is this report_skip()? Shouldn't we just do
-
-  report(misaligned_handled, ...)
-
-> +	else
-> +		report_pass("Verify misaligned load exception trap in supervisor");
-> +
-> +	install_exception_handler(EXC_LOAD_MISALIGNED, NULL);
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +void check_fwft(void)
-> +{
-> +	struct sbiret ret;
-> +
-> +	report_prefix_push("fwft");
-> +
-> +	if (!sbi_probe(SBI_EXT_FWFT)) {
-> +		report_skip("FWFT extension not available");
-> +		report_prefix_pop();
-> +		return;
-> +	}
-> +
-> +	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_PROBE_EXT, SBI_EXT_FWFT, 0, 0, 0, 0, 0);
-> +	report(!ret.error, "FWFT extension probing no error");
-> +	if (ret.error)
-> +		goto done;
-> +
-> +	if (ret.value == 0) {
-> +		report_skip("FWFT extension is not present");
-> +		goto done;
-> +	}
-
-The above "raw" probing looks like it should have been removed when
-the sbi_probe() call was added.
-
-> +
-> +	fwft_check_denied();
-> +	fwft_check_misaligned();
-> +done:
-> +	report_prefix_pop();
-> +}
-> diff --git a/riscv/sbi.c b/riscv/sbi.c
-> index 6f4ddaf1..8600e38e 100644
-> --- a/riscv/sbi.c
-> +++ b/riscv/sbi.c
-> @@ -32,6 +32,8 @@
->  
->  #define	HIGH_ADDR_BOUNDARY	((phys_addr_t)1 << 32)
->  
-> +void check_fwft(void);
-> +
->  static long __labs(long a)
->  {
->  	return __builtin_labs(a);
-> @@ -1451,6 +1453,7 @@ int main(int argc, char **argv)
->  	check_hsm();
->  	check_dbcn();
->  	check_susp();
-> +	check_fwft();
->  
->  	return report_summary();
->  }
-> -- 
-> 2.47.1
->
-
-Nice start to the FWFT tests. After this is merged I'll add tests for
-PTE_AD_HW_UPDATING. We also should get LOCK and local/global tests in
-sooner than later.
-
-Thanks,
-drew
 
