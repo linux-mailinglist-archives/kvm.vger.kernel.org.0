@@ -1,172 +1,155 @@
-Return-Path: <kvm+bounces-35576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6614BA12857
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 17:13:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6724DA128E4
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 17:39:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3490188C873
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 16:12:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63A001886796
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 16:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C951D9A5D;
-	Wed, 15 Jan 2025 16:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E174A199EA3;
+	Wed, 15 Jan 2025 16:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SSRoQIyj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NYAAK6uo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807091D8A14
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 16:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2169217625C;
+	Wed, 15 Jan 2025 16:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736957384; cv=none; b=aI3cXypQxPXyy4J52/UmN1LWRzBs6t1RZUekvODeHa3zOeEzyXlJ32VhUVudepAirQHayFRNdTd+Sl2ccxEWUbjCWMX3DGDD9bFZLsz+yg7Lpf5vKTpSJoxbz1FPkDVOp+qakF7me0c9HE9I6pmlwei73sKEpoIjGgOm0AFOmJU=
+	t=1736959133; cv=none; b=NGF7ZDANg3xfPqJsJAVE9NE1bh9p1uGXxOnOCJd4ye+FEz5wdSnSEvRhr9ycW9QViHBQ+70Lk0HZhf7egpkLDfCLZC+Wy6IFg5Qa39DZs4+Fg903qSHl1/7yCrXF4BEsHTzAtFIOa+JyTmCJysvRoXl9dWoVYebNKwADOPuZhI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736957384; c=relaxed/simple;
-	bh=819bogkfW6jkDpFC+XIOxaVPwbzrJ6UMH5WzvkPxza8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZGkwaHH/y/Skgq/W1YsF02djbrj/yP6+pP7uO2jRMYNGMpfXtxbXr7lR2ayTX+2jJPCZS5LeST3TF59ucYo7YPxLZsymoQMd9jPSLEkpBTM2+6X/FSot4vHAY6hEYxhZjLoswMlpdqiHjYdp0buwT7ZVTjz1fK8BiOUWM0dOOK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SSRoQIyj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736957381;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0ugfIHUXyal3QKNOfuFNAzzde+Li5OchQ7ZMrXanvI=;
-	b=SSRoQIyjtVEA4bijuNZD2AbowAb4Q0oIj2tgRBnVlMFZK4E2ejecCZo72ipqebPIe1U4Ef
-	PLK6Qxi3NUoYXFZh2jVaVp7m042+srfpBbqEO6hrh/BYf6+q3nIqnCaxvoGekqM6NLEfVC
-	sUnDRlVi64+ZqymUd9q4OsAVEaBv8WE=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-PnhPpC6-MxOp1sZixTfPdg-1; Wed,
- 15 Jan 2025 11:09:38 -0500
-X-MC-Unique: PnhPpC6-MxOp1sZixTfPdg-1
-X-Mimecast-MFC-AGG-ID: PnhPpC6-MxOp1sZixTfPdg
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0C7701956054;
-	Wed, 15 Jan 2025 16:09:37 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ECD683003FD1;
-	Wed, 15 Jan 2025 16:09:35 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: kai.huang@intel.com,
-	rick.p.edgecombe@intel.com,
-	dave.hansen@linux.intel.com,
-	yan.y.zhao@intel.com,
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Subject: [PATCH v3 14/14] x86/virt/tdx: Add tdx_guest_keyid_alloc/free() to alloc and free TDX guest KeyID
-Date: Wed, 15 Jan 2025 11:09:12 -0500
-Message-ID: <20250115160912.617654-15-pbonzini@redhat.com>
-In-Reply-To: <20250115160912.617654-1-pbonzini@redhat.com>
-References: <20250115160912.617654-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1736959133; c=relaxed/simple;
+	bh=+/A4JchVaUDObuWH5HgnuSRxOzXU6qmh1rAH2l6gIC8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HDwC16Tf/431vUOksHzKgBgrhYfTVV+BSv1kOuyY1FGBZk4RrjiWV5g5s8sg95UxzEzObDE13B6XDiBTQSOnY5PpOssBASeJhcY2gxcPSKnKjvjsBi/YOdNU9CwE1dokYi6qwICl55+qA40/GqxXDXrJk2Kt/fLONoa2C9cIyFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NYAAK6uo; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736959131; x=1768495131;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+/A4JchVaUDObuWH5HgnuSRxOzXU6qmh1rAH2l6gIC8=;
+  b=NYAAK6uo0l+Iewyw5lS8gvEuD4cCkNQm4ValyR2Zn2cwBLeXHB2xBuAz
+   z+cT+6L5sduN5QQ+dlG/YW1yRFVtCChRx8xUL1bz28xolgI2Fe6NCTJZs
+   5st1aP9K9aMWMF9sxQYy9u/x1Wbz3nt5rfPOfCR7DRURMGR2cu1qqoSjq
+   pRa95WieT82Ewxq29kzHswY/hBSD4Al4oTnN61TQHUELStR4DH1RpITLH
+   yxKMnuCEqfbBEKhotu1JjXFvtt0zX0FCe2KmVlYVoZhHyFp2w8j2WwuLM
+   zChpVkcgBRHf59+HIuw0Ewt1rnsSY2qq8ap92lr46+8g2B5B+9X1Jxx13
+   g==;
+X-CSE-ConnectionGUID: ZAuRxkg6TeCaSTWzv+5AXw==
+X-CSE-MsgGUID: oveSEUbtQR68EkAiOr5YEg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="59781125"
+X-IronPort-AV: E=Sophos;i="6.13,206,1732608000"; 
+   d="scan'208";a="59781125"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 08:38:50 -0800
+X-CSE-ConnectionGUID: /ch+alufQbaHLRqjMge3lg==
+X-CSE-MsgGUID: UabcxfX1TZm/To9JT2RP3Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,206,1732608000"; 
+   d="scan'208";a="105248640"
+Received: from daliomra-mobl3.amr.corp.intel.com (HELO [10.124.220.81]) ([10.124.220.81])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 08:38:49 -0800
+Message-ID: <7df33918-4780-472d-96b5-57566b9a07c1@intel.com>
+Date: Wed, 15 Jan 2025 08:38:50 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 04/14] x86/virt/tdx: Add SEAMCALL wrappers for TDX page
+ cache management
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: kai.huang@intel.com, rick.p.edgecombe@intel.com,
+ dave.hansen@linux.intel.com, yan.y.zhao@intel.com,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Yuan Yao <yuan.yao@intel.com>
+References: <20250115160912.617654-1-pbonzini@redhat.com>
+ <20250115160912.617654-5-pbonzini@redhat.com>
+Content-Language: en-US
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20250115160912.617654-5-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 1/15/25 08:09, Paolo Bonzini wrote:
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -137,6 +137,19 @@ struct tdx_vp {
+>  	struct page **tdcx_pages;
+>  };
+>  
+> +
+> +static inline u64 mk_keyed_paddr(u16 hkid, struct page *page)
+> +{
+> +	u64 ret;
+> +
+> +	ret = page_to_phys(page);
+> +	/* KeyID bits are just above the physical address bits: */
+> +	ret |= hkid << boot_cpu_data.x86_phys_bits;
+> +	
+> +	return ret;
+> +
+> +}
+> +
+>  u64 tdh_mng_addcx(struct tdx_td *td, struct page *tdcs_page);
 
-Intel TDX protects guest VMs from malicious host and certain physical
-attacks. Pre-TDX Intel hardware has support for a memory encryption
-architecture called MK-TME, which repurposes several high bits of
-physical address as "KeyID". The BIOS reserves a sub-range of MK-TME
-KeyIDs as "TDX private KeyIDs".
-
-Each TDX guest must be assigned with a unique TDX KeyID when it is
-created. The kernel reserves the first TDX private KeyID for
-crypto-protection of specific TDX module data which has a lifecycle that
-exceeds the KeyID reserved for the TD's use. The rest of the KeyIDs are
-left for TDX guests to use.
-
-Create a small KeyID allocator. Export
-tdx_guest_keyid_alloc()/tdx_guest_keyid_free() to allocate and free TDX
-guest KeyID for KVM to use.
-
-Don't provide the stub functions when CONFIG_INTEL_TDX_HOST=n since they
-are not supposed to be called in this case.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Message-ID: <20241030190039.77971-5-rick.p.edgecombe@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/tdx.h  |  3 +++
- arch/x86/virt/vmx/tdx/tdx.c | 17 +++++++++++++++++
- 2 files changed, 20 insertions(+)
-
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 6531b69a53ac..58182b245e36 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -117,6 +117,9 @@ int tdx_cpu_enable(void);
- int tdx_enable(void);
- const char *tdx_dump_mce_info(struct mce *m);
- 
-+int tdx_guest_keyid_alloc(void);
-+void tdx_guest_keyid_free(unsigned int keyid);
-+
- struct tdx_td {
- 	/* TD root structure: */
- 	struct page *tdr_page;
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index bb6f8ef9661e..bff350626b08 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -28,6 +28,7 @@
- #include <linux/log2.h>
- #include <linux/acpi.h>
- #include <linux/suspend.h>
-+#include <linux/idr.h>
- #include <asm/page.h>
- #include <asm/special_insns.h>
- #include <asm/msr-index.h>
-@@ -43,6 +44,8 @@ static u32 tdx_global_keyid __ro_after_init;
- static u32 tdx_guest_keyid_start __ro_after_init;
- static u32 tdx_nr_guest_keyids __ro_after_init;
- 
-+static DEFINE_IDA(tdx_guest_keyid_pool);
-+
- static DEFINE_PER_CPU(bool, tdx_lp_initialized);
- 
- static struct tdmr_info_list tdx_tdmr_list;
-@@ -1458,6 +1461,20 @@ void __init tdx_init(void)
- 	check_tdx_erratum();
- }
- 
-+int tdx_guest_keyid_alloc(void)
-+{
-+	return ida_alloc_range(&tdx_guest_keyid_pool, tdx_guest_keyid_start,
-+			       tdx_guest_keyid_start + tdx_nr_guest_keyids - 1,
-+			       GFP_KERNEL);
-+}
-+EXPORT_SYMBOL_GPL(tdx_guest_keyid_alloc);
-+
-+void tdx_guest_keyid_free(unsigned int keyid)
-+{
-+	ida_free(&tdx_guest_keyid_pool, keyid);
-+}
-+EXPORT_SYMBOL_GPL(tdx_guest_keyid_free);
-+
- static inline u64 tdx_tdr_pa(struct tdx_td *td)
- {
- 	return page_to_phys(td->tdr_page);
--- 
-2.43.5
-
+Paolo, any chance you could fix up the whitespace goofiness before
+applying? It's a super minor thing and I think later patches fix up at
+least some of it, but it's a bit wonky.
 
