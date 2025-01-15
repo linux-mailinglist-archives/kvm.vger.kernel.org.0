@@ -1,287 +1,162 @@
-Return-Path: <kvm+bounces-35518-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35519-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D81DBA11C99
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 09:59:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF39AA11C9F
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 09:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EC8F3A1FAC
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 08:58:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1004C7A29B3
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 08:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC891FC7C8;
-	Wed, 15 Jan 2025 08:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2251E7C3F;
+	Wed, 15 Jan 2025 08:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="cJYuZTcw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Us5W4Tdj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A5F246A39
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 08:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14A61E7C26;
+	Wed, 15 Jan 2025 08:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736931335; cv=none; b=YsVZO9lXDQ/elO3FPlHC7bxKnNJaIhDsSTlUzzB97b5bGW/jqFmDesewMNgmFXPa+7TG8SztmJtV/zpJXGU3Ci7U9wcLPl+UWFnAk2QlWZCBWaMMg1ggMhQoNng2oKkid/ZCZbuRK7R0hdj5fvTSZGfLAjhOxIxGCwclTOXmgcM=
+	t=1736931384; cv=none; b=oEsOrMRhzQP4Ff9ViMegzQAx96tqusH2hD/gCUF6cKFda2GLIMlKPTgG9d2YZ7fQ1y0n07hEB9HITu9dW0usuM1gr57QP/+2r/YOUTwoMnb7Q9z3nYBh3nTrK+hYkn/o4LkA2DOmAfYCZxow3qbUA8JtHQ+liBjjw+dVBKThbqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736931335; c=relaxed/simple;
-	bh=BXhjUNiK5nZtNWfmxo4QzngJqamzCvQrhXA93RWRduc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ELfYzJwc6utJImtASh0SbddQ562x9TyNqlIP++6NqYqDoq3SxsAU3jiYXLmITfekLi3TbEin1yGQMWJqjVR/rehqza7QqLxa90u4FQ+hpjtDzYBIGZusuZg0JjfX+1I7PWhKjEJ/UIU3Uoq6I0ERuuuO8zMI02B1KofbRhzIWhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=cJYuZTcw; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-38789e5b6a7so3464212f8f.1
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 00:55:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google; t=1736931332; x=1737536132; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Gj9RZudEPBfF7kw5HyEDfCpQN04hIW75RUFgQLeb7IY=;
-        b=cJYuZTcwVQL8oM7NicjGZfqJJnE+UNDjda4OHBc4lwSeOp60jz9JqiOP+pJ/FnqvXa
-         CITYq6sYERvkemt6ocXPfEhxcYOKns4/q1VzIrzFVhAYM702GzT3x4FBksXO4945z0qz
-         Fg8vcpvGbBukF5wiY1mBHmwPxSRcdpPXuxG6c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736931332; x=1737536132;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gj9RZudEPBfF7kw5HyEDfCpQN04hIW75RUFgQLeb7IY=;
-        b=lPPSHeYnaCyBXxEYSFIXdCS9zmWwB60rFNShlfZHJ9qfXmTwgmBYSETot7HP5kvTq7
-         NhgrYxH8ID9EOjLWU8iIlZ6wSBpFtDK0Dq1RuLb75kNwR3D0E1br01U6OKm1swT8vtfJ
-         5xCi6Qfo71uhPnxynN6iqOPaA8lUxy/upXycUl8gD18Lejx5WrskqPCZPSvm+OEY1jUH
-         oaxkqGmo6lfeMI75zNYgXWhjvL95arItIJAK17BI8uR5G5a2bKDj8zZEVMP9SStJWoW9
-         Sv/tGZNzBT2pIN3JoYsgu3NgOEDk0JCoTwAUToAsB5DgUyeTtrNjghsIHm5R/HiLSQvJ
-         +xJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNYdlAVFoGS9oVI8K/fTYXahpHhMmEiHVIdl4RUR1j8eBawRemEdZFbO3tQNqM4XssSuk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywks44yDgrvRIurkUAkvd3zDGDrSLSqm7aef61+lNVKOBGxdOnT
-	JuhjYRbJrfpc2s5nyL8g0mXg2N6rhGVL2IGq0hKFRiPyJGuT7gEJudHWmaYMplw=
-X-Gm-Gg: ASbGncsT2M8DfkWeURV3xjqaTdhxJmhEDeri+Wqc7Lc5nvE5efszIZFLj5I/7zS+g5X
-	qIZUXt4nFqVz3ZQTjm8+IVBDLCGNGzIuMWEXSzIJADF6X1UF7VL2dXjXX2iiIGMtNZb8lUfT5no
-	HsedZlmKxUc8uZpzjIPkAf2PKCiQNNdLvkEiM7Kd/Okm2TWBHndeSqM6FZvmLVUPe0hgpyIas9m
-	6RSyuyRmjMynUfUQ4gZPdO0T6jd6/k4FUo1c5aHLKr8wREIimnPgq55NqZ9C8g7rpWp
-X-Google-Smtp-Source: AGHT+IFOU+JNTbuMjFC41rceTL+ifkq6PY4kVtqWW8pLQ7ONLhbzAQHBNa3COq6SYahEjPbUlsy+jA==
-X-Received: by 2002:adf:ab01:0:b0:38a:5a37:4a46 with SMTP id ffacd0b85a97d-38a87303f80mr15973078f8f.17.1736931332197;
-        Wed, 15 Jan 2025 00:55:32 -0800 (PST)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:5485:d4b2:c087:b497])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c7499884sm15964335e9.5.2025.01.15.00.55.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 00:55:31 -0800 (PST)
-Date: Wed, 15 Jan 2025 09:55:29 +0100
-From: Simona Vetter <simona.vetter@ffwll.ch>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Xu Yilun <yilun.xu@linux.intel.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, pbonzini@redhat.com, seanjc@google.com,
-	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
-	dan.j.williams@intel.com, aik@amd.com, yilun.xu@intel.com,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, yan.y.zhao@intel.com, leon@kernel.org,
-	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
- kAPI
-Message-ID: <Z4d4AaLGrhRa5KLJ@phenom.ffwll.local>
-Mail-Followup-To: Jason Gunthorpe <jgg@nvidia.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, pbonzini@redhat.com, seanjc@google.com,
-	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
-	dan.j.williams@intel.com, aik@amd.com, yilun.xu@intel.com,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, yan.y.zhao@intel.com, leon@kernel.org,
-	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-References: <5a858e00-6fea-4a7a-93be-f23b66e00835@amd.com>
- <20250108162227.GT5556@nvidia.com>
- <Z37HpvHAfB0g9OQ-@phenom.ffwll.local>
- <Z37QaIDUgiygLh74@yilunxu-OptiPlex-7050>
- <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
- <Z38FCOPE7WPprYhx@yilunxu-OptiPlex-7050>
- <Z4F2X7Fu-5lprLrk@phenom.ffwll.local>
- <20250110203838.GL5556@nvidia.com>
- <Z4Z4NKqVG2Vbv98Q@phenom.ffwll.local>
- <20250114173103.GE5556@nvidia.com>
+	s=arc-20240116; t=1736931384; c=relaxed/simple;
+	bh=n9X+ytbJXmd6sh1cyGdd4/DK31mGd0j/JGIY+bP9LAo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kHh87f+jWIo1V4aDad6c5dy1u/v+GUnnMknwupyk6SZeE+gx3S6um5ae8j3qo18h+k4dfyChkphGvGd/Ae9nwMD1rW4aQYmbLqCx57Syt6DvsMgRitBFw0XjLtJL+SvZPM06kBKv4guFFfDK2XjFpJAVQymWUXISYO7k0bYw+Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Us5W4Tdj; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50ENaOUW010013;
+	Wed, 15 Jan 2025 08:56:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=WpHN0/
+	SzsYoELOlvKaAUcshsYZoQyd+AEub8A0w+OB0=; b=Us5W4TdjtYmULp9gbe7vYP
+	GmbkXiK7CYBIO6g641BxmTHQvkwN+fEohDLQv50wRhMMNXJ8cgebpc9im+hk5DSx
+	/yfQoHDOCxPulS6+k8ZDS6Bn+AVQt7i/zkYOzZ1mDAwfOlZHjFpgwnwSdIJ8NUz3
+	3FkXynWk6ugpheH3CA9DPIvoKAgQU0V1GmRnlGoRe5d2pLAdd7PNQsKGkMZmGyNE
+	mjLcDzJAgK8heFTCYQNUuLpAjxqJBQ9enx6K3ROK+QfLevvH8P/H2OblshM2njSn
+	PnWMeYRo07zDMjA6jEILeia3rkSFX0vNlsQFvceb2jn8qipSdAIKkahPfJKSiatg
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4461rbhs7a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 08:56:16 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50F7WPX5000827;
+	Wed, 15 Jan 2025 08:56:15 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44456jy6xn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 08:56:15 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50F8uCKl35455296
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Jan 2025 08:56:12 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0460C2004D;
+	Wed, 15 Jan 2025 08:56:12 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8015620040;
+	Wed, 15 Jan 2025 08:56:11 +0000 (GMT)
+Received: from [9.171.76.32] (unknown [9.171.76.32])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 15 Jan 2025 08:56:11 +0000 (GMT)
+Message-ID: <91c13ac1-ad31-46e2-8a07-9b759caaf33d@linux.ibm.com>
+Date: Wed, 15 Jan 2025 09:56:11 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250114173103.GE5556@nvidia.com>
-X-Operating-System: Linux phenom 6.12.3-amd64 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 07/13] KVM: s390: move some gmap shadowing functions
+ away from mm/gmap.c
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com
+References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
+ <20250108181451.74383-8-imbrenda@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250108181451.74383-8-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: U0sXMliS1m1UkzwYHUVxd1ZrDUvVAG-f
+X-Proofpoint-GUID: U0sXMliS1m1UkzwYHUVxd1ZrDUvVAG-f
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-15_03,2025-01-15_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 impostorscore=0 mlxscore=0 suspectscore=0
+ mlxlogscore=754 adultscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501150063
 
-On Tue, Jan 14, 2025 at 01:31:03PM -0400, Jason Gunthorpe wrote:
-> On Tue, Jan 14, 2025 at 03:44:04PM +0100, Simona Vetter wrote:
+On 1/8/25 7:14 PM, Claudio Imbrenda wrote:
+> Move some gmap shadowing functions from mm/gmap.c to kvm/vsie.c and
+> kvm/kvm-s390.c .
 > 
-> > E.g. if a compositor gets a dma-buf it assumes that by just binding that
-> > it will not risk gpu context destruction (unless you're out of memory and
-> > everything is on fire anyway, and it's ok to die). But if a nasty client
-> > app supplies a revocable dma-buf, then it can shot down the higher
-> > priviledged compositor gpu workload with precision. Which is not great, so
-> > maybe existing dynamic gpu importers should reject revocable dma-buf.
-> > That's at least what I had in mind as a potential issue.
-> 
-> I see, so it is not that they can't handle a non-present fault it is
-> just that the non-present effectively turns into a crash of the
-> context and you want to avoid the crash. It makes sense to me to
-> negotiate this as part of the API.
 
-Yup.
+Why though?
 
-> > > This is similar to the structure BIO has, and it composes nicely with
-> > > a future pin_user_pages() and memfd_pin_folios().
-> > 
-> > Since you mention pin here, I think that's another aspect of the revocable
-> > vs dynamic question. Dynamic buffers are expected to sometimes just move
-> > around for no reason, and importers must be able to cope.
-> 
-> Yes, and we have importers that can tolerate dynamic and those that
-> can't. Though those that can't tolerate it can often implement revoke.
-> 
-> I view your list as a cascade:
->  1) Fully pinned can never be changed so long as the attach is present
->  2) Fully pinned, but can be revoked. Revoked is a fatal condition and
->     the importer is allowed to experience an error
->  3) Fully dynamic and always present. Support for move, and
->     restartable fault, is required
-> 
-> Today in RDMA we ask the exporter if it is 1 or 3 and allow different
-> things. I've seen the GPU side start to offer 1 more often as it has
-> significant performance wins.
+I don't really want to have gmap code in vsie.c
+If you want to add a new mm/gmap-vsie.c then do so but I don't see a 
+need to move gmap code from mm to kvm and you give no explanation 
+whatsoever.
 
-I'm not entirely sure a cascade is the right thing or whether we should
-have importers just specify bitmask of what is acceptable to them. But
-that little detail aside this sounds like what I was thinking of.
-
-> > For recovable exporters/importers I'd expect that movement is not
-> > happening, meaning it's pinned until the single terminal revocation. And
-> > maybe I read the kvm stuff wrong, but it reads more like the latter to me
-> > when crawling through the pfn code.
-> 
-> kvm should be fully faultable and it should be able handle move. It
-> handles move today using the mmu notifiers after all.
-> 
-> kvm would need to interact with the dmabuf reservations on its page
-> fault path.
-> 
-> iommufd cannot be faultable and it would only support revoke. For VFIO
-> revoke would not be fully terminal as VFIO can unrevoke too
-> (sigh).  If we make revoke special I'd like to eventually include
-> unrevoke for this reason.
-> 
-> > Once we have the lifetime rules nailed then there's the other issue of how
-> > to describe the memory, and my take for that is that once the dma-api has
-> > a clear answer we'll just blindly adopt that one and done.
-> 
-> This is what I hope, we are not there yet, first Leon's series needs
-> to get merged then we can start on making the DMA API P2P safe without
-> any struct page. From there it should be clear what direction things
-> go in.
-> 
-> DMABUF would return pfns annotated with whatever matches the DMA API,
-> and the importer would be able to inspect the PFNs to learn
-> information like their P2Pness, CPU mappability or whatever.
-
-I think for 90% of exporters pfn would fit, but there's some really funny
-ones where you cannot get a cpu pfn by design. So we need to keep the
-pfn-less interfaces around. But ideally for the pfn-capable exporters we'd
-have helpers/common code that just implements all the other interfaces.
-
-I'm not worried about the resulting fragmentation, because dma-buf is the
-"everythig is optional" api. We just need to make sure we have really
-clear semantic api contracts, like with the revocable vs dynamic/moveable
-distinction. Otherwise things go boom when an importer gets an unexpected
-dma-buf fd, and we pass this across security boundaries a lot.
-
-> I'm pushing for the extra struct, and Christoph has been thinking
-> about searching a maple tree on the PFN. We need to see what works best.
-> 
-> > And currently with either dynamic attachments and dma_addr_t or through
-> > fishing the pfn from the cpu pagetables there's some very clearly defined
-> > lifetime and locking rules (which kvm might get wrong, I've seen some
-> > discussions fly by where it wasn't doing a perfect job with reflecting pte
-> > changes, but that was about access attributes iirc). 
-> 
-> Wouldn't surprise me, mmu notifiers are very complex all around. We've
-> had bugs already where the mm doesn't signal the notifiers at the
-> right points.
-> 
-> > If we add something
-> > new, we need clear rules and not just "here's the kvm code that uses it".
-> > That's how we've done dma-buf at first, and it was a terrible mess of
-> > mismatched expecations.
-> 
-> Yes, that would be wrong. It should be self defined within dmabuf and
-> kvm should adopt to it, move semantics and all.
-
-Ack.
-
-I feel like we have a plan here. Summary from my side:
-
-- Sort out pin vs revocable vs dynamic/moveable semantics, make sure
-  importers have no surprises.
-
-- Adopt whatever new dma-api datastructures pops out of the dma-api
-  reworks.
-
-- Add pfn based memory access as yet another optional access method, with
-  helpers so that exporters who support this get all the others for free.
-
-I don't see a strict ordering between these, imo should be driven by
-actual users of the dma-buf api.
-
-Already done:
-
-- dmem cgroup so that we can resource control device pinnings just landed
-  in drm-next for next merge window. So that part is imo sorted and we can
-  charge ahead with pinning into device memory without all the concerns
-  we've had years ago when discussing that for p2p dma-buf support.
-
-  But there might be some work so that we can p2p pin without requiring
-  dynamic attachments only, I haven't checked whether that needs
-  adjustment in dma-buf.c code or just in exporters.
-
-Anything missing?
-
-I feel like this is small enough that m-l archives is good enough. For
-some of the bigger projects we do in graphics we sometimes create entries
-in our kerneldoc with wip design consensus and things like that. But
-feels like overkill here.
-
-> My general desire is to move all of RDMA's MR process away from
-> scatterlist and work using only the new DMA API. This will save *huge*
-> amounts of memory in common workloads and be the basis for non-struct
-> page DMA support, including P2P.
-
-Yeah a more memory efficient structure than the scatterlist would be
-really nice. That would even benefit the very special dma-buf exporters
-where you cannot get a pfn and only the dma_addr_t, altough most of those
-(all maybe even?) have contig buffers, so your scatterlist has only one
-entry. But it would definitely be nice from a design pov.
-
-Aside: A way to more efficiently create compressed scatterlists would be
-neat too, because a lot of drivers hand-roll that and it's a bit brittle
-and kinda silly to duplicate. With compressed I mean just a single entry
-for a contig range, in practice thanks to huge pages/folios and allocators
-trying to hand out contig ranges if there's plenty of memory that saves a
-lot of memory too. But currently it's a bit a pain to construct these
-efficiently, mostly it's just a two-pass approach and then trying to free
-surplus memory or krealloc to fit. Also I don't have good ideas here, but
-dma-api folks might have some from looking at too many things that create
-scatterlists.
--Sima
--- 
-Simona Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Maybe add a vsie-gmap.c in kvm but I'm not so thrilled about that for 
+the reasons mentioned above.
 
