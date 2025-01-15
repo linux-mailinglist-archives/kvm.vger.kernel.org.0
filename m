@@ -1,119 +1,98 @@
-Return-Path: <kvm+bounces-35496-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35497-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 681D7A11791
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 03:59:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4E7DA11797
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 03:59:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C26AD7A0FF1
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 02:59:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BE017A2194
+	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 02:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A615722E41E;
-	Wed, 15 Jan 2025 02:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAB722F39B;
+	Wed, 15 Jan 2025 02:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JvuO+vsr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u0ImUbmk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EC122E3F1
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 02:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D3A22F381
+	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 02:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736909959; cv=none; b=ruW5NDv0Gyzf0eopgHdNh7xliR75bm1eW0spEu/xXHZvKfVxuOD9NSEyDpJzoOg6bup4L8M7kF0QQ3lRQSSklUcWrOWrzaW5FpApCvcPniOYjBB4c1eVU44y2sDBVi7EX3RsppRJhhiuJ/1WRbLK7D/NKYIomBUTgwz4UvIirvc=
+	t=1736909965; cv=none; b=q6zc1IQ2WLd+ddm6oA/RgPgUdiBfzNVvGs/K4y6E6rBQavulnCegyInsvtcqYPWHhwUKZ1enLW6g4IfuhQRR/NKkXNNbf+NG8js/FPO5/+2eGwcFXCc4MhnYXPuDRsAYmE8ojxF9HcgU0MMbLK56ibGXq1dHCghqa7ZHEQ6hbeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736909959; c=relaxed/simple;
-	bh=+NTwq5YHWWKj+lNPYsiG2fx/Hdkl75Y1o+UgnaGwAS4=;
+	s=arc-20240116; t=1736909965; c=relaxed/simple;
+	bh=TRRm2mGjcGr8ctbUTqufswZjr1hU7xKu96AA+vP2VW8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pqh2NJePCdnE2iz37kl4QLq+slz2ptEYeMwO8wmBVGkTrg2GcaTcXzIabTBrlBe3Gt9h+U0X7QGQCknVhv1k7ltM1rzgtyrW2sCYvbag9OzgjeNelQNmhb176WLqVngD8la+2tJChglfwVCoTZFsjAE9/gsRQjhx2j3sp0j4VVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JvuO+vsr; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=KfqDgaA5+ZErb+IGYvkz+krp1Fhn5GnAZexpJnJfurCcSdex1Aitcf/Ud5oK66TsG/bnK7nXvxs0PKWAaS9uq49YbEhG4uSt8phc+Mj5lIPSv35c654OKxVit0tu+A1I+5+o3UnokYuWFgISz3h6oRH5+9uGQWUnj9AUPlXCLoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u0ImUbmk; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-216387ddda8so122251955ad.3
-        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:59:16 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee6dccd3c9so10553546a91.3
+        for <kvm@vger.kernel.org>; Tue, 14 Jan 2025 18:59:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736909956; x=1737514756; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736909963; x=1737514763; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t7UnkG2sUZHI5sYNTsE5cdnTS0itq3U5JxBO6rBeOoo=;
-        b=JvuO+vsrZyUSzt7K2Ai1VLfFvkwgF9Mv5Ne2nLebfrc5ola/4zDQ8KwArcmBOKArNB
-         nPZuY7wi9Tw7r3sKM/nOcZR0VXDNP/Ay1sRqymGhVOJm8p1STQZxmtsU8gqolby8v6qT
-         DlO9CEdZaN2HGsSYwDjKzQfurWAzD7Ntv4gi3aOEQLlCubELBEyf38kx2k6aGgJNNCPt
-         ZOX/h9zKpc9Kw1v6VksCdOZl/rkuXfyWfZAqY67kGpTJgyr2JMmX+cTb/Ht+XqR4UfXz
-         mits6urSP/aDQ5g26y7is369EWyzPCboXcBRMXAm2ENWQ+0yjXrIklrClY3pL+sbRg6Z
-         yVjQ==
+        bh=GMQwKGMJGPZLzExDa++0Yv2owz671vYGvqRbRi6DqN0=;
+        b=u0ImUbmkop2QZT7r9f0Jp9zXjBNsMLHSw/oNt0YgvlFZMmEJFG6ou44cMbrsUDXLf9
+         VGNwWO78yb3B+IyP+TmmEG6DjrEs224xcAuHB3JV5CL3piNNtBZ0rHiep+bFLpDXL4w5
+         L97XuL4d5yMEesJkL9y80IJSpg0t343DwlODRudwfUv8jnZNJo5hpUuKPztVyyuPgHCo
+         TWksb675VyB4/dvf6zEJzZ/3SrI/Wzs3mDNqRN5KgVug0fbw7YQxVVKQMS9tqqxGl6Vo
+         3Srn1bh0Jbo3bsRjRC7dwmF2Md9Q4GR0Yc5xdNy3/dUa0/h++YcqcuwqvCjRIYOjK+Ki
+         Fjrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736909956; x=1737514756;
+        d=1e100.net; s=20230601; t=1736909963; x=1737514763;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t7UnkG2sUZHI5sYNTsE5cdnTS0itq3U5JxBO6rBeOoo=;
-        b=Vq4wRxKcS/M6b11pjruNAvfRdoCEQfP2H5W2E1PhpqFihVm0ydeMy6cKbov3XnLxn5
-         LzMN53UevnC3sfh906tYCRv4+ZrGVluUGd7F/Ci9TVtDihdC9qfS5/t8efFHx+6Ul4St
-         bcN38O7p8OC2EVizlBuCg7DzUI7YkEtP6bfGq+zn+56r4CvvOVk95/vu55XzNjhkrx0D
-         ZVCG0tc2CqwNE78nf9B3HZcSvizPOzXgavwuvv/3YLKSJSvm+i2Z2CYlENA06qoOhAJs
-         oJvNNNZm+9YWuilUS3ZXDSmhICdwbE2kw+gRTlUYz4ZX1LtEFI78vXqLhhyB0kCY/1+9
-         20Ew==
-X-Gm-Message-State: AOJu0Yxx1+c54DgMtlctCP+ccN+kyotovLVAqyOPRAEd/5tpKhtX2LGA
-	OKu4imTWjLGjkhsiYP0FCOE9del7I/4LZiM0ouEeMxwIDBjjkvnRlK5mpDUy/ckzBwxQUHFvLle
-	OHQ==
-X-Google-Smtp-Source: AGHT+IHP2Vogek0dpf9znZxDhDq348SkXY0vLKAUveMc2TfPFaRAGg96yS2AtQqvLlarPDTmxEzNmSW6cZc=
-X-Received: from pjbsn7.prod.google.com ([2002:a17:90b:2e87:b0:2e2:9021:cf53])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ccc8:b0:216:4883:fb43
- with SMTP id d9443c01a7336-21a83f5efdcmr469853535ad.32.1736909955954; Tue, 14
- Jan 2025 18:59:15 -0800 (PST)
-Date: Tue, 14 Jan 2025 18:58:57 -0800
-In-Reply-To: <20250111002022.1230573-1-seanjc@google.com>
+        bh=GMQwKGMJGPZLzExDa++0Yv2owz671vYGvqRbRi6DqN0=;
+        b=JiMUQIrCS3apPQkkv3b5gcjWCY6ypDfFZtXj7PMma8rQ2zg/u+bUuNmTLytkesPuvQ
+         YGZv3pwCQ1AklnZ2pdINRRpGZwQladHxUOUTleU/H5sZAKpO+b7ljS+I5O+xvdNW5fC6
+         6JX6pU3dcTuikHWVv0EE0UEk2B8tID3JkCMMpj0sXCrEDypITcCpvkzDd34rtRHPmi65
+         kL0O6RlQ6/2BGOj6VR3eO3AT8WwmH+w5ESLVrRfPWPt9/zsxeJag+31txTDN42mAxN0A
+         +NDzYMQaBx1WazG3iX3ElQsS60ncePx1ZfvGDsY+aDtyPLVzFS2dxMP/BzN+sLnqCHuM
+         r4uQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUw+mJmd7Q0IyPU6zEccqqf7x9/z7A+9G/qQI9JWTpvNtHN8WIp57a+jvmYciqqsWL6R3E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx12TqFDUW1PzUY/zbg0NgpEBCN8mkMH4O+ddJQb5yr6Swa2alh
+	WcpZmt7ErFXOnqDT2Mxr8aleALguCNXmHljsTjJNqcdBOPMLiA5Q19LYMQh71F3gmjWG/DeHDhN
+	x/g==
+X-Google-Smtp-Source: AGHT+IFbK+7UCk4KgoEPCEidmSm0GOdkAaFo+fXZJntovC77rjYz67Fqm6c/Yk0pxTjWVyWvJrQEx8pvjfY=
+X-Received: from pjuj3.prod.google.com ([2002:a17:90a:d003:b0:2f5:63a:4513])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2748:b0:2f1:30c8:6e75
+ with SMTP id 98e67ed59e1d1-2f5490e89e0mr33511833a91.32.1736909963489; Tue, 14
+ Jan 2025 18:59:23 -0800 (PST)
+Date: Tue, 14 Jan 2025 18:58:59 -0800
+In-Reply-To: <20250110101100.272312-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250111002022.1230573-1-seanjc@google.com>
+References: <20250110101100.272312-2-thorsten.blum@linux.dev>
 X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <173690967333.1806474.13374894408719420681.b4-ty@google.com>
-Subject: Re: [PATCH v2 0/5] KVM: kvm_set_memory_region() cleanups
+Message-ID: <173690982369.1807399.8198702888217013474.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: SVM: Use str_enabled_disabled() helper in svm_hardware_setup()
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tao Su <tao1.su@linux.intel.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Christian Borntraeger <borntraeger@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 10 Jan 2025 16:20:17 -0800, Sean Christopherson wrote:
-> Cleanups related to kvm_set_memory_region(), salvaged from similar patches
-> that were flying around when we were sorting out KVM_SET_USER_MEMORY_REGION2.
-> 
-> And, hopefully, the KVM-internal memslots hardening will also be useful for
-> s390's ucontrol stuff (https://lore.kernel.org/all/Z4FJNJ3UND8LSJZz@google.com).
-> 
-> v2:
->  - Keep check_memory_region_flags() where it is. [Xiaoyao]
->  - Rework the changelog for the last patch to account for the change in
->    motiviation.
->  - Fix double spaces goofs. [Tao]
->  - Add a lockdep assertion in the x86 code, too. [Tao]
-> 
-> [...]
+On Fri, 10 Jan 2025 11:11:00 +0100, Thorsten Blum wrote:
+> Remove hard-coded strings by using the str_enabled_disabled() helper
+> function.
 
-Applied to kvm-x86 memslots, and pushed
+Applied to kvm-x86 svm, thanks!
 
-  https://github.com/kvm-x86/linux tags/kvm-memslots-6.14
-
-as well.  Thanks much for the reviews!
-
-[1/5] KVM: Open code kvm_set_memory_region() into its sole caller (ioctl() API)
-      https://github.com/kvm-x86/linux/commit/f81a6d12bf8b
-[2/5] KVM: Assert slots_lock is held when setting memory regions
-      https://github.com/kvm-x86/linux/commit/d131f0042f46
-[3/5] KVM: Add a dedicated API for setting KVM-internal memslots
-      https://github.com/kvm-x86/linux/commit/156bffdb2b49
-[4/5] KVM: x86: Drop double-underscores from __kvm_set_memory_region()
-      https://github.com/kvm-x86/linux/commit/344315e93dbc
-[5/5] KVM: Disallow all flags for KVM-internal memslots
-      https://github.com/kvm-x86/linux/commit/0cc3cb2151f9
+[1/1] KVM: SVM: Use str_enabled_disabled() helper in svm_hardware_setup()
+      https://github.com/kvm-x86/linux/commit/4c334c68804a
 
 --
 https://github.com/kvm-x86/linux/tree/next
