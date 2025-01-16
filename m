@@ -1,84 +1,85 @@
-Return-Path: <kvm+bounces-35669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35670-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6726AA13D29
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 16:03:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75FC9A13D85
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 16:18:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54F593A379A
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 15:03:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E934E7A53C1
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 15:18:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EBBD22B8DF;
-	Thu, 16 Jan 2025 15:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEC822BAA4;
+	Thu, 16 Jan 2025 15:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e35hNg5u"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s8IfgWo+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6356DCE1
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 15:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A817522B8CA
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 15:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737039783; cv=none; b=p8xGJNsr071Fn059App76tlB8UJfN+cB8Tmv12ciC9V054/5aNDxZPOvANYtB9F1yBJqjkHFVo/15bd1EaEmoWBQdezo78pEyB5tRh1K3pDkLF+62Zl2V+oNzdIEyi4b0M3uadyg1tomRqQwN4mejtBlPR07tFl4D50VK79a6dw=
+	t=1737040641; cv=none; b=YOz7yiaklNrsuY8AxQh0d3wvalY0YXF+xfyznjLcsYHKdHrpYme8VqjHqh328uisgQProdciEotHAdJK3sJWpVhxdVZ+LUhYCZlHkKrokGvlfdv3hWEGD/E0eR8V01ZcoG0L2ZXBcsD3NdFdD4uj/K+OBdOks1338cL/nAd/cS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737039783; c=relaxed/simple;
-	bh=A30ZctwoXfsNf3EywXJmMJRQwL/MpikPxxAnMrPE3fk=;
+	s=arc-20240116; t=1737040641; c=relaxed/simple;
+	bh=Hx1X+lrZTvcioCfyydb4h2gHt5QRPj15apOSr5TJtsE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bZVEftrPLYyWU18tQDB1snl3hW2AMku+Y/ggXVbfYIgoXsoK44cF4EOPxLQkE/wjCANYwu2mrYZSMwGNoclsO5my0TBmWWFXCICanBVMEsu2SgVcnWSGFq8ON5SftOCWLUrLjmych2twoNiUoDe8JvTEWqu1k1Yu18C5XP7G3w4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e35hNg5u; arc=none smtp.client-ip=209.85.128.54
+	 To:Cc:Content-Type; b=cYgOSF958Hh0blOFAc5mbqzdWT3iLZFk2cH6rrr3PoHSbuQkpO2BeItQ/gHMTMomSKaTHJwHV131eILBICQTNjT7wqCatVnzb2U5WF87iJm8WpRXxY1MIlnDXPFLRcYZwHbiUp8FdjbD+Sk+ZyyIJQ1SrSnG/q8IrQhAwFE1NwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s8IfgWo+; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4368a290e0dso46385e9.1
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 07:03:01 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43621d2dd4cso59565e9.0
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 07:17:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737039780; x=1737644580; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737040638; x=1737645438; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kqfFof4DiRiEcVNWi8Q8TQdmOIxGyZ0otuRpv/IQwnY=;
-        b=e35hNg5uhBIL9g4rSVSVz1TGyGs9BkamhvpNsJ2kXhh1AeaZYoJS/G347SqgPdzBWy
-         g6ZLDmPluTEvTVDD2tY7dZ+Hv/qyRiC69T4qkLCU9pXfRTt24VmDH6U33UstBvIgV8Xf
-         LFD6SP8O+prBBxabTFUNcXvef8P7tT3LCKl2StwsH5DtVPa0jrrfSksBmhOUd5EmfCmo
-         IAf+rFrz01BjBAjfqk40HyLZcL2mW5wJ85ZZDTRKVm/J3AENyuZi4VrJlHCCwmcT+ObZ
-         yQTw9DOx+b6ZN33b1jnu44Au2W4ihQiz/b2QQwoy1ZX0U5jRN6H8kYekTMKvf6p1hjYh
-         IXOA==
+        bh=pwaNTbOXMKkPxQLJFe431ZnDyCQwmIS9FL0eLIesENM=;
+        b=s8IfgWo+18BBg44roVLX/xYodHGQp+Zn2ZpdnCR2RsdEy5sGi1GCO7Ny14O3o9OHxZ
+         evbGAwmNmnoubHtcOu+JEtLC816eolXXLnQSA/vviQhHN3Pd243jtA9/52rVhyu2dORk
+         Nte3Ma1zIBYMXKgnLPkRYxq8bK9XZA8eMOcgErcU3ky+R9QhH8VG3w5p4HAF16rm8fEt
+         U7Q/zlDaqeXcxh/ZhJZ/KsOyQyrg5i/RhOTJXbc+b+BtyjsnHVV4DCzlIEvrTYB5s62G
+         lVktK96wMq+3RSPEzQEMlZhdezqGFB1gL8gWDmEvRhCRTratxHYsbUrvV/pNdeQl4vFb
+         JS2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737039780; x=1737644580;
+        d=1e100.net; s=20230601; t=1737040638; x=1737645438;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kqfFof4DiRiEcVNWi8Q8TQdmOIxGyZ0otuRpv/IQwnY=;
-        b=BviaNnqh0ssYNmhfJo1Ukw1saG23go2nAqMNiN+6+Ta1M816Y5jrgA4kJf6SA0ni3a
-         /6rhlhBztO7ngs5Qnv15z83Tu4ezKOhGYKGpSbZw+gaKJNJH0SmEzkR3E5RettMFLfNJ
-         Ir9FqURpD5Jhg5Lyunns/JIZQ2RAJdP7lWicW7QMznSuYFhJpffi2tzUlk5mG6pjAzwh
-         wfgu3+Va7oV8+w5Bt7tg1QmQQ99FosMqdgzDlUSb7D+ScZrqfc+oQUsNhiZqGdUAh2FA
-         V77R9ZRtOgL7saXtiHyjwOcIH0D43fULcUhNivyJEWwIPcgYUDvxXENskAUtiigHc1uD
-         6X/Q==
-X-Gm-Message-State: AOJu0Yz6jo5sk6DQdniESitfCIdU957uxvYVqczX3pRQYy5zoRc9HLin
-	S2YSpE5RyGLvyWluCiGdUHzp2h8gWXm/JtJl4trAtt07ZEBAfHUEn+NvVI0PpWV+YcxFUNdHJ/T
-	sG0wkTSfVFe6JtANP9Omf4F0Stje/VNtNSPel
-X-Gm-Gg: ASbGncv8KledJqg1xp4eLMTHWd005fItUyR1SwTCtexi4n1bRZYMycuYD7ePOcVwgOf
-	qY6uspEDGNuRFxR925NTndWB0v/5/cUnT0+rlQTsl5glntIHy9/Dk7VfploVxhIVqoOg=
-X-Google-Smtp-Source: AGHT+IHuSl+wSG7mPzyQ8i1CvkOu3Nq8nbQwjdEsJxg1QVxRkdYoVp//rZUu/ZKT6BmKz7T5dYlDGSX92vZeFHZaEpE=
-X-Received: by 2002:a05:600c:1c84:b0:436:4e4c:7bae with SMTP id
- 5b1f17b1804b1-4388b96edf5mr1026695e9.1.1737039777705; Thu, 16 Jan 2025
- 07:02:57 -0800 (PST)
+        bh=pwaNTbOXMKkPxQLJFe431ZnDyCQwmIS9FL0eLIesENM=;
+        b=IiSdH1h4UC8bX7na57m5WqbVswDFAFWfbipl3tINucD/8pYfxuEyht0ydT5eLS77Un
+         nQ2EJ/DE5F+yoHrN9ybsggoVKJH7T4mayQkaCh2wmuT+/PTLxW6gm3iuOuu+D+p9bjG5
+         Zj+wdHCN8jNs6wK7LMW4HLF8lBIiHNRyA5KBb/Pi22TE8hAW3RfHcwdD4+AgKgWwudmH
+         7EibQHO2MB3RdRjQN3FMPswmlsfkwXnY0iv3jaRv7WiJkYnf6SUFYcmANciRvE5Csh7o
+         eAzD14F0As3tQw+gcDRr+Ej3aHh2U6FpCNgrNS8FygSsPP4Si7Dz0e5+LCvf/8McTwMg
+         6teg==
+X-Gm-Message-State: AOJu0YxZExXdzX9gHYY5lsoQDSFs6SrMfAxAeCfITM6xUuKCXcmM+zZh
+	guBHAyuXsln6KIk/MTvrUnqz6v2uKgrQYQA2ty0+Q+/73mU0/uz+ebcRRkykVGInLdUeObk3aKw
+	/32S0AigHaFfYQKZVIkE+JWyT1L49MDEH+2wp
+X-Gm-Gg: ASbGncuYPtqpRwTrhmYwP1JnJ/Orwvr0PpY6Vzxu8LepXX3Aj0OTQ8+Dq7l/9rZxQ/S
+	0KcndQveSylhqR4Nj5+xxeUtF2jAgEkAEA2AqHX4YNJSw/+YdP6ylbK6kW1GLxUNRB4E=
+X-Google-Smtp-Source: AGHT+IFerOpLUf4+Oc1OZbSE2vohcdX1NoPD5FkxnfkSCxYZgIo5kiW5QdKvBjzYNAgCUFDG5CGEZXRAhynIVt3lt/0=
+X-Received: by 2002:a05:600c:4fc1:b0:428:e6eb:1340 with SMTP id
+ 5b1f17b1804b1-4388b5296bfmr1116245e9.4.1737040637800; Thu, 16 Jan 2025
+ 07:17:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241213164811.2006197-1-tabba@google.com> <31f1229d-40c8-4a75-b0f1-be315150379f@amazon.co.uk>
-In-Reply-To: <31f1229d-40c8-4a75-b0f1-be315150379f@amazon.co.uk>
+References: <20241213164811.2006197-1-tabba@google.com> <20241213164811.2006197-14-tabba@google.com>
+ <9b5a7efa-1a65-4b84-af60-e8658b18bad0@amazon.co.uk>
+In-Reply-To: <9b5a7efa-1a65-4b84-af60-e8658b18bad0@amazon.co.uk>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 16 Jan 2025 15:02:21 +0000
-X-Gm-Features: AbW1kvbTLlkR0MZtthgK7xg1MWWIvrDI_YynsmM_Oky84q5rjpd6sEQHrbgJ4aI
-Message-ID: <CA+EHjTzCmmOnoAkXdE8JoURUwf=8by=+PX9LpB9NrfsWe5xAwg@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 00/14] KVM: Restricted mapping of guest_memfd at
- the host and arm64 support
+Date: Thu, 16 Jan 2025 15:16:41 +0000
+X-Gm-Features: AbW1kvaxfWYfuwd0W-V5L_bwpr8WlTsKSgGhMIK4AMPErUZAQCGO6nQZU3XdW0M
+Message-ID: <CA+EHjTyCnjnoa8ConrUYNaZyrQewvLx2_fiyG90GSktTtA9bNw@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 13/14] KVM: arm64: Handle guest_memfd()-backed
+ guest page faults
 To: Patrick Roy <roypat@amazon.co.uk>
 Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
 	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -107,246 +108,219 @@ Hi Patrick,
 
 On Thu, 16 Jan 2025 at 14:48, Patrick Roy <roypat@amazon.co.uk> wrote:
 >
-> Hi Fuad!
+> On Fri, 2024-12-13 at 16:48 +0000, Fuad Tabba wrote:
+> > Add arm64 support for resolving guest page faults on
+> > guest_memfd() backed memslots. This support is not contingent on
+> > pKVM, or other confidential computing support, and works in both
+> > VHE and nVHE modes.
+> >
+> > Without confidential computing, this support is useful forQ
+> > testing and debugging. In the future, it might also be useful
+> > should a user want to use guest_memfd() for all code, whether
+> > it's for a protected guest or not.
+> >
+> > For now, the fault granule is restricted to PAGE_SIZE.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 111 ++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 109 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 342a9bd3848f..1c4b3871967c 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1434,6 +1434,107 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+> >         return vma->vm_flags & VM_MTE_ALLOWED;
+> >  }
+> >
+> > +static int guest_memfd_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > +                            struct kvm_memory_slot *memslot, bool fault_is_perm)
+> > +{
+> > +       struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+> > +       bool exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+> > +       bool logging_active = memslot_is_logging(memslot);
+> > +       struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
+> > +       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+> > +       bool write_fault = kvm_is_write_fault(vcpu);
+> > +       struct mm_struct *mm = current->mm;
+> > +       gfn_t gfn = gpa_to_gfn(fault_ipa);
+> > +       struct kvm *kvm = vcpu->kvm;
+> > +       struct page *page;
+> > +       kvm_pfn_t pfn;
+> > +       int ret;
+> > +
+> > +       /* For now, guest_memfd() only supports PAGE_SIZE granules. */
+> > +       if (WARN_ON_ONCE(fault_is_perm &&
+> > +                        kvm_vcpu_trap_get_perm_fault_granule(vcpu) != PAGE_SIZE)) {
+> > +               return -EFAULT;
+> > +       }
+> > +
+> > +       VM_BUG_ON(write_fault && exec_fault);
+> > +
+> > +       if (fault_is_perm && !write_fault && !exec_fault) {
+> > +               kvm_err("Unexpected L2 read permission error\n");
+> > +               return -EFAULT;
+> > +       }
+> > +
+> > +       /*
+> > +        * Permission faults just need to update the existing leaf entry,
+> > +        * and so normally don't require allocations from the memcache. The
+> > +        * only exception to this is when dirty logging is enabled at runtime
+> > +        * and a write fault needs to collapse a block entry into a table.
+> > +        */
+> > +       if (!fault_is_perm || (logging_active && write_fault)) {
+> > +               ret = kvm_mmu_topup_memory_cache(memcache,
+> > +                                                kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
+> > +               if (ret)
+> > +                       return ret;
+> > +       }
+> > +
+> > +       /*
+> > +        * Holds the folio lock until mapped in the guest and its refcount is
+> > +        * stable, to avoid races with paths that check if the folio is mapped
+> > +        * by the host.
+> > +        */
+> > +       ret = kvm_gmem_get_pfn_locked(kvm, memslot, gfn, &pfn, &page, NULL);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       if (!kvm_slot_gmem_is_guest_mappable(memslot, gfn)) {
+> > +               ret = -EAGAIN;
+> > +               goto unlock_page;
+> > +       }
+> > +
+> > +       /*
+> > +        * Once it's faulted in, a guest_memfd() page will stay in memory.
+> > +        * Therefore, count it as locked.
+> > +        */
+> > +       if (!fault_is_perm) {
+> > +               ret = account_locked_vm(mm, 1, true);
+> > +               if (ret)
+> > +                       goto unlock_page;
+> > +       }
+> > +
+> > +       read_lock(&kvm->mmu_lock);
+> > +       if (write_fault)
+> > +               prot |= KVM_PGTABLE_PROT_W;
+> > +
+> > +       if (exec_fault)
+> > +               prot |= KVM_PGTABLE_PROT_X;
+> > +
+> > +       if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+> > +               prot |= KVM_PGTABLE_PROT_X;
+> > +
+> > +       /*
+> > +        * Under the premise of getting a FSC_PERM fault, we just need to relax
+> > +        * permissions.
+> > +        */
+> > +       if (fault_is_perm)
+> > +               ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
+> > +       else
+> > +               ret = kvm_pgtable_stage2_map(pgt, fault_ipa, PAGE_SIZE,
+> > +                                       __pfn_to_phys(pfn), prot,
+> > +                                       memcache,
+> > +                                       KVM_PGTABLE_WALK_HANDLE_FAULT |
+> > +                                       KVM_PGTABLE_WALK_SHARED);
+> > +
+> > +       kvm_release_faultin_page(kvm, page, !!ret, write_fault);
+> > +       read_unlock(&kvm->mmu_lock);
+> > +
+> > +       if (ret && !fault_is_perm)
+> > +               account_locked_vm(mm, 1, false);
+> > +unlock_page:
+> > +       unlock_page(page);
+> > +       put_page(page);
 >
-> I finally got around to giving this patch series a spin for my non-CoCo
-> usecase. I used the below diff to expose the functionality outside of pKVM
-> (Based on Steven P.'s ARM CCA patch for custom VM types on ARM [2]).
-> There's two small things that were broken for me (will post as responses
-> to individual patches), but after fixing those, I was able to boot some
-> guests using a modified Firecracker [1].
+> There's a double-free of `page` here, as kvm_release_faultin_page
+> already calls put_page. I fixed it up locally with
+>
+> +       unlock_page(page);
+>         kvm_release_faultin_page(kvm, page, !!ret, write_fault);
+>         read_unlock(&kvm->mmu_lock);
+>
+>         if (ret && !fault_is_perm)
+>                 account_locked_vm(mm, 1, false);
+> +       goto out;
+> +
+>  unlock_page:
+>         unlock_page(page);
+>         put_page(page);
+> -
+> +out:
+>         return ret != -EAGAIN ? ret : 0;
+>  }
+>
+> which I'm admittedly not sure is correct either because now the locks
+> don't get released in reverse order of acquisition, but with this I
+> was able to boot simple VMs.
 
-That's great, thanks for that, and for your comments on the patches.
+Thanks for that. You're right, I broke this code right before sending
+out the series while fixing a merge conflict. have prepared a new
+patch series (rebased on Linux 6.13-rc7), with this redone to be part
+of  user_mem_abort(), as opposed to being in its own function. Makes
+the code cleaner more maintainable.
 
-> Just wondering, are you still looking into posting a separate series
-> with just the MMU changes (e.g. something to have a bare-bones
-> KVM_SW_PROTECTED_VM on ARM, like we do for x86), like you mentioned in
-> the guest_memfd call before Christmas? We're pretty keen to
-> get our hands something like that for our non-CoCo VMs (and ofc, am
-> happy to help with any work required to get there :)
 
-Yes I am. I'm almost done with it now. That said, I need to make it
-work with attributes as well (as you mention in your comments on the
-other patch). I should to send it out next week, before the biweekly
-meeting in case we need to discuss it.
+> > +
+> > +       return ret != -EAGAIN ? ret : 0;
+> > +}
+> > +
+> >  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >                           struct kvm_s2_trans *nested,
+> >                           struct kvm_memory_slot *memslot, unsigned long hva,
+> > @@ -1900,8 +2001,14 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> >                 goto out_unlock;
+> >         }
+> >
+> > -       ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> > -                            esr_fsc_is_permission_fault(esr));
+> > +       if (kvm_slot_can_be_private(memslot)) {
+>
+> For my setup, I needed
+>
+> if (kvm_mem_is_private(vcpu->kvm, gfn))
+>
+> here instead, because I am making use of KVM_GENERIC_MEMORY_ATTRIBUTES,
+> and  had a memslot with the `KVM_MEM_GUEST_MEMFD` flag set, but whose
+> gfn range wasn't actually set to KVM_MEMORY_ATTRIBUTE_PRIVATE.
+>
+> If I'm reading patch 12 correctly, your memslots always set only one of
+> userspace_addr or guest_memfd, and the stage 2 table setup simply checks
+> which one is the case to decide what to fault in, so maybe to support
+> both cases, this check should be
+>
+> if (kvm_mem_is_private(vcpu->kvm, gfn) || (kvm_slot_can_be_private(memslot) && !memslot->userspace_addr)
+>
+> ?
+
+I've actually missed supporting both cases, and I think your
+suggestion is the right way to do it. I'll fix it in the respin.
 
 Cheers,
 /fuad
 
+
+
+
+
+>
+> [1]: https://lore.kernel.org/all/20240801090117.3841080-1-tabba@google.com/
+>
+> > +               ret = guest_memfd_abort(vcpu, fault_ipa, memslot,
+> > +                                       esr_fsc_is_permission_fault(esr));
+> > +       } else {
+> > +               ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> > +                                    esr_fsc_is_permission_fault(esr));
+> > +       }
+> > +
+> >         if (ret == 0)
+> >                 ret = 1;
+> >  out:
+> > --
+> > 2.47.1.613.gc27f4b7a9f-goog
+>
 > Best,
 > Patrick
 >
-> [1]: https://github.com/roypat/firecracker/tree/secret-freedom-mmap
-> [2]: https://lore.kernel.org/kvm/20241004152804.72508-12-steven.price@arm.com/
->
-> ---
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8dfae9183651..0b8dfb855e51 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -380,6 +380,8 @@ struct kvm_arch {
->          * the associated pKVM instance in the hypervisor.
->          */
->         struct kvm_protected_vm pkvm;
-> +
-> +       unsigned long type;
->  };
->
->  struct kvm_vcpu_fault_info {
-> @@ -1529,7 +1531,11 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
->  #define kvm_has_s1poe(k)                               \
->         (kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
->
-> -#define kvm_arch_has_private_mem(kvm)                                  \
-> -       (IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) && is_protected_kvm_enabled())
-> +#ifdef CONFIG_KVM_PRIVATE_MEM
-> +#define kvm_arch_has_private_mem(kvm)  \
-> +       ((kvm)->arch.type == KVM_VM_TYPE_ARM_SW_PROTECTED || is_protected_kvm_enabled())
-> +#else
-> +#define kvm_arch_has_private_mem(kvm) false
-> +#endif
->
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index fe3451f244b5..2da26aa3b0b5 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -38,6 +38,7 @@ menuconfig KVM
->         select HAVE_KVM_VCPU_RUN_PID_CHANGE
->         select SCHED_INFO
->         select GUEST_PERF_EVENTS if PERF_EVENTS
-> +       select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
->         select KVM_GMEM_MAPPABLE
->         help
->           Support hosting virtualized guest machines.
-> @@ -84,4 +85,10 @@ config PTDUMP_STAGE2_DEBUGFS
->
->           If in doubt, say N.
->
-> +config KVM_SW_PROTECTED_VM
-> +    bool "Enable support for KVM software-protected VMs"
-> +    depends on EXPERT
-> +    depends on KVM && ARM64
-> +    select KVM_GENERIC_PRIVATE_MEM
-> +
->  endif # VIRTUALIZATION
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a102c3aebdbc..35683868c0e4 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -181,6 +181,19 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->         mutex_unlock(&kvm->lock);
->  #endif
->
-> +       if (type & ~(KVM_VM_TYPE_ARM_MASK | KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
-> +               return -EINVAL;
-> +
-> +       switch (type & KVM_VM_TYPE_ARM_MASK) {
-> +       case KVM_VM_TYPE_ARM_NORMAL:
-> +       case KVM_VM_TYPE_ARM_SW_PROTECTED:
-> +               break;
-> +       default:
-> +               return -EINVAL;
-> +       }
-> +
-> +       kvm->arch.type = type & KVM_VM_TYPE_ARM_MASK;
-> +
->         kvm_init_nested(kvm);
->
->         ret = kvm_share_hyp(kvm, kvm + 1);
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 1c4b3871967c..9dbb472eb96a 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -869,9 +869,6 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
->         u64 mmfr0, mmfr1;
->         u32 phys_shift;
->
-> -       if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
-> -               return -EINVAL;
-> -
->         phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
->         if (is_protected_kvm_enabled()) {
->                 phys_shift = kvm_ipa_limit;
-> @@ -2373,3 +2370,31 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
->
->         trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
->  }
-> +
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
-> +                                       struct kvm_gfn_range *range)
-> +{
-> +       /*
-> +        * Zap SPTEs even if the slot can't be mapped PRIVATE.  KVM only
-> +        * supports KVM_MEMORY_ATTRIBUTE_PRIVATE, and so it *seems* like KVM
-> +        * can simply ignore such slots.  But if userspace is making memory
-> +        * PRIVATE, then KVM must prevent the guest from accessing the memory
-> +        * as shared.  And if userspace is making memory SHARED and this point
-> +        * is reached, then at least one page within the range was previously
-> +        * PRIVATE, i.e. the slot's possible hugepage ranges are changing.
-> +        * Zapping SPTEs in this case ensures KVM will reassess whether or not
-> +        * a hugepage can be used for affected ranges.
-> +        */
-> +       if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
-> +               return false;
-> +
-> +       return kvm_unmap_gfn_range(kvm, range);
-> +}
-> +
-> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> +                                        struct kvm_gfn_range *range)
-> +{
-> +       return false;
-> +}
-> +#endif
-> \ No newline at end of file
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index b34aed04ffa5..214f6b5da43f 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -653,6 +653,13 @@ struct kvm_enable_cap {
->   * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
->   * value 0 implies the default IPA size, 40bits.
->   */
-> +#define KVM_VM_TYPE_ARM_SHIFT              8
-> +#define KVM_VM_TYPE_ARM_MASK               (0xfULL << KVM_VM_TYPE_ARM_SHIFT)
-> +#define KVM_VM_TYPE_ARM(_type)         \
-> +       (((_type) << KVM_VM_TYPE_ARM_SHIFT) & KVM_VM_TYPE_ARM_MASK)
-> +#define KVM_VM_TYPE_ARM_NORMAL             KVM_VM_TYPE_ARM(0)
-> +#define KVM_VM_TYPE_ARM_SW_PROTECTED    KVM_VM_TYPE_ARM(1)
-> +
->  #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK  0xffULL
->  #define KVM_VM_TYPE_ARM_IPA_SIZE(x)            \
->         ((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
->
->
-> On Fri, 2024-12-13 at 16:47 +0000, Fuad Tabba wrote:
-> > This series adds restricted mmap() support to guest_memfd, as
-> > well as support for guest_memfd on arm64. It is based on Linux
-> > 6.13-rc2.  Please refer to v3 for the context [1].
-> >
-> > Main changes since v3:
-> > - Added a new folio type for guestmem, used to register a
-> >   callback when a folio's reference count reaches 0 (Matthew
-> >   Wilcox, DavidH) [2]
-> > - Introduce new mappability states for folios, where a folio can
-> > be mappable by the host and the guest, only the guest, or by no
-> > one (transient state)
-> > - Rebased on Linux 6.13-rc2
-> > - Refactoring and tidying up
-> >
-> > Cheers,
-> > /fuad
-> >
-> > [1] https://lore.kernel.org/all/20241010085930.1546800-1-tabba@google.com/
-> > [2] https://lore.kernel.org/all/20241108162040.159038-1-tabba@google.com/
-> >
-> > Ackerley Tng (2):
-> >   KVM: guest_memfd: Make guest mem use guest mem inodes instead of
-> >     anonymous inodes
-> >   KVM: guest_memfd: Track mappability within a struct kvm_gmem_private
-> >
-> > Fuad Tabba (12):
-> >   mm: Consolidate freeing of typed folios on final folio_put()
-> >   KVM: guest_memfd: Introduce kvm_gmem_get_pfn_locked(), which retains
-> >     the folio lock
-> >   KVM: guest_memfd: Folio mappability states and functions that manage
-> >     their transition
-> >   KVM: guest_memfd: Handle final folio_put() of guestmem pages
-> >   KVM: guest_memfd: Allow host to mmap guest_memfd() pages when shared
-> >   KVM: guest_memfd: Add guest_memfd support to
-> >     kvm_(read|/write)_guest_page()
-> >   KVM: guest_memfd: Add KVM capability to check if guest_memfd is host
-> >     mappable
-> >   KVM: guest_memfd: Add a guest_memfd() flag to initialize it as
-> >     mappable
-> >   KVM: guest_memfd: selftests: guest_memfd mmap() test when mapping is
-> >     allowed
-> >   KVM: arm64: Skip VMA checks for slots without userspace address
-> >   KVM: arm64: Handle guest_memfd()-backed guest page faults
-> >   KVM: arm64: Enable guest_memfd private memory when pKVM is enabled
-> >
-> >  Documentation/virt/kvm/api.rst                |   4 +
-> >  arch/arm64/include/asm/kvm_host.h             |   3 +
-> >  arch/arm64/kvm/Kconfig                        |   1 +
-> >  arch/arm64/kvm/mmu.c                          | 119 +++-
-> >  include/linux/kvm_host.h                      |  75 +++
-> >  include/linux/page-flags.h                    |  22 +
-> >  include/uapi/linux/kvm.h                      |   2 +
-> >  include/uapi/linux/magic.h                    |   1 +
-> >  mm/debug.c                                    |   1 +
-> >  mm/swap.c                                     |  28 +-
-> >  tools/testing/selftests/kvm/Makefile          |   1 +
-> >  .../testing/selftests/kvm/guest_memfd_test.c  |  64 +-
-> >  virt/kvm/Kconfig                              |   4 +
-> >  virt/kvm/guest_memfd.c                        | 579 +++++++++++++++++-
-> >  virt/kvm/kvm_main.c                           | 229 ++++++-
-> >  15 files changed, 1074 insertions(+), 59 deletions(-)
-> >
-> >
-> > base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
-> > --
-> > 2.47.1.613.gc27f4b7a9f-goog
 
