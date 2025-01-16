@@ -1,184 +1,195 @@
-Return-Path: <kvm+bounces-35606-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35607-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA54AA12F0F
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 00:22:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14246A12F86
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 01:18:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61CCD3A5F34
-	for <lists+kvm@lfdr.de>; Wed, 15 Jan 2025 23:22:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 097693A520B
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 00:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD161DDA09;
-	Wed, 15 Jan 2025 23:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8996617C8B;
+	Thu, 16 Jan 2025 00:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2wrgifJI"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I4IR8tkE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C791DC98D
-	for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 23:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0554B8BEE;
+	Thu, 16 Jan 2025 00:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736983342; cv=none; b=uOQGovGvYIzFlGIKu2bOljNuoxTftgIovu6qSa9sxcTF93JDy5uBEnFl/8bzSm7l3dvWX04XhHT7TXqy+OjW5tMiBMmzBxftSYv8Prn4MmPcEJFGgN209T0j4Y5P0wWuwcY5+mmPRCbrXKMlQJiMTa+7pImW32DI7KeSoPO2AVs=
+	t=1736986678; cv=none; b=rX1wIbL00OyhJB9tRBEth6Sy0DNciR5MWCG1k2g8qtJYS6oqMIWS30/msVoMQaYsYKS9dinAjRFCJHwC0Zzf/zKyOjTN0aKUsvtQe18v+72mVkTprQsCZMqJw2NoIFEkPATkZa/lhdiS2cKBw/U+pb7vMCmjQYw/5nyHX8Y2b6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736983342; c=relaxed/simple;
-	bh=KdlJluTkxOnfAYEFjgsHb4xMd6XZulqvgcRfp7khFXA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=otO+O4VktU83T69GMYFrxYZyRMV8C86MdWcurUn8+YvKIujcfIAStJ9r95CBhbPd5vbFYr0rr9c6ts+QiAF/bLXWZFPIAvSA/nIR3sRxkt8r8xZqaCIgsru3ghujiJQlyH3Mp4xdOIu62AieAPRjcMoQLE5UENEw2o528W/34kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2wrgifJI; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2efa74481fdso679154a91.1
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 15:22:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736983340; x=1737588140; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JHIOCMGw41yGBGLuHWVhzyX82V4iAB9WkKnb5lhxgI=;
-        b=2wrgifJISFw+YC37b16X7klYyf9ng1mpSAAP2kupmAiKkGudFVY5rzMN0e1VkmefPe
-         21LwDvh09kv34tdbNod1v8WGJ+6h5KUtBDMVPAFYBWtz6F/SeaG1yM5nlIUFvclPqGZ5
-         JurxWWQGorhvQ+qSFlBJITE/ezQDHOdM39paiRms5bO/3kCIWO7tb6l0m2xcc7RLD7cr
-         nMBJibehc2QMarb5ycO26rAJTGSKACA8goC7gsuzSy+g2SiLaZgWF6AreWzfQ8rPs78O
-         89PupwCPojaSt13zEpBPAiUqOAaEtpDl9uOCgNIKkCfLYniwWtwZWXdMH+t1e4UJxxW3
-         ZIUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736983340; x=1737588140;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JHIOCMGw41yGBGLuHWVhzyX82V4iAB9WkKnb5lhxgI=;
-        b=aoqYOwf0jGPo2Reo2KAvqQ4KEXns7exwk995YBpk81LAKcMiwBwFFODT2HgLHwQYXp
-         j1ns+WctmEZ28FF5FNc6ffbllzAniz5cIgT+r5N1U34t402NESXO+627XStjonQgNC0L
-         dFEySMr2kW9ny1ZEFrzpPy5JnBmzjylbHbDlutzQmMUTFaiGVWqcdLQL1N7qCyXIi91F
-         aJ7wyKMg/C7Laq4MdbMdBzC1lJvjx0FDAHFcbXFykSkdyQIqnhUVIZE92IdR3TzSBcB9
-         fVok4S2Mc2wadZhkJnQHSl9iA0YbCw3a+crToTCxfxJ+OrMfL4eIUPjQ9jcyX2odH4V8
-         /IFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHOsMbN4T6OplE6/iYkn2pJRu6xOatxsDkqSUKdOb3daYl+EfECwn3tqVgKtGZYXMt7wI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNkNHtQZVAtmQl7AQjcPvLT1kuC4pqd+M9Il8VSKv1XpkBHQhC
-	sHDKluFaXxxHdibGWT9u/D2tvj4Vog4ErML3uW9m2bcFgrUq4KxD66xC+VOutgf7vYRyAOLlrK1
-	6pA==
-X-Google-Smtp-Source: AGHT+IFBqE3qrBf0HSYHhZWrcCHWk/sS7blXXVC78Ra3Mf5IcMOQB/FvY2GQjkfkps9VzEOlqOEVe0u7bYc=
-X-Received: from pjbpx16.prod.google.com ([2002:a17:90b:2710:b0:2ef:786a:1835])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:534b:b0:2ea:7329:43
- with SMTP id 98e67ed59e1d1-2f548e9a5c2mr40238879a91.6.1736983340616; Wed, 15
- Jan 2025 15:22:20 -0800 (PST)
-Date: Wed, 15 Jan 2025 15:22:19 -0800
-In-Reply-To: <167517494734.4906.17956886323824650289.tip-bot2@tip-bot2>
+	s=arc-20240116; t=1736986678; c=relaxed/simple;
+	bh=oJ1nymuniDEDyUQCqmXFnJrd75CCZfAon2o4EH5LX38=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RPchTAyZwGABcNIHUYRcW50J5w276TmcqCnoKhprjmy6q/g5XhZxtZti59vBA9PysbVZ3AU6mDvaYRKOWgA4pYQ+rIlDbSiGqcz1JATwaW+FyHs7CKWoBJnPCFJyZRAmlf/6/h75oBrT7aIl2RCbWdgKhnHtfSza0aaz440q8Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I4IR8tkE; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50FHX4wJ000813;
+	Thu, 16 Jan 2025 00:17:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=CKADGc
+	28v4va8ahfu5ciB5QUCv5CjHjmgbq9cDaXjr4=; b=I4IR8tkEqdo/6JiQgpskoM
+	4U4fPwY7BcI804Ujr1lrTdIn4tqoqalwoBHyIn5a7Ms9BEjbJg/pHyWNY7S/q1Yb
+	tAdfoXtgfn9lqO37D04bjEnu4bIBeFBCtwVVk5uMa0YlGo94csJoL2yQlX2w5rUf
+	mVwUJhCWZOZVeJXQBfZPC6zLUsofG1tJakJbjIgv3t/PADTiDskrMesYo/HzHgMl
+	1e33artrHqVKJUPiRIRtg8MPtbcjajaZRjfeUm+y3xf++sm3FGHiZFS3Z/bE3DeS
+	iolLWsggi7EeXpAsk8e+Yi1UsLjPSvh6pNimVLy729WF/I7nSKkOfeRny7+pj5YQ
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4465gbw7sk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 00:17:54 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50FL6Rgd016976;
+	Thu, 16 Jan 2025 00:17:53 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fkb1am-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 00:17:53 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50G0HnAU49152366
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Jan 2025 00:17:49 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2014420043;
+	Thu, 16 Jan 2025 00:17:49 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7064520040;
+	Thu, 16 Jan 2025 00:17:48 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.34.169])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 16 Jan 2025 00:17:48 +0000 (GMT)
+Date: Thu, 16 Jan 2025 01:17:46 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Anthony Krowiak <akrowiak@linux.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+        Rorie Reyes
+ <rreyes@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, hca@linux.ibm.com,
+        borntraeger@de.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
+        jjherne@linux.ibm.com, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v1] s390/vfio-ap: Signal eventfd when guest AP
+ configuration is changed
+Message-ID: <20250116011746.20cf941c.pasic@linux.ibm.com>
+In-Reply-To: <5d6402ce-38bd-4632-927e-2551fdd01dbe@linux.ibm.com>
+References: <20250107183645.90082-1-rreyes@linux.ibm.com>
+	<20250114150540.64405f27.alex.williamson@redhat.com>
+	<5d6402ce-38bd-4632-927e-2551fdd01dbe@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230126151323.702003578@infradead.org> <167517494734.4906.17956886323824650289.tip-bot2@tip-bot2>
-Message-ID: <Z4hDK27OV7wK572A@google.com>
-Subject: Re: [tip: sched/core] sched/clock/x86: Mark sched_clock() noinstr
-From: Sean Christopherson <seanjc@google.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-tip-commits@vger.kernel.org, 
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>, x86@kernel.org, 
-	kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ZuQzRs-Mot8nfWElmSTa8QoCEYABMkxX
+X-Proofpoint-ORIG-GUID: ZuQzRs-Mot8nfWElmSTa8QoCEYABMkxX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-15_10,2025-01-15_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
+ adultscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
+ suspectscore=0 bulkscore=0 malwarescore=0 impostorscore=0
+ lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501150173
 
-+KVM and Paolo
+On Wed, 15 Jan 2025 14:35:02 -0500
+Anthony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-On Tue, Jan 31, 2023, tip-bot2 for Peter Zijlstra wrote:
-> The following commit has been merged into the sched/core branch of tip:
+> >> +static int vfio_ap_set_cfg_change_irq(struct ap_matrix_mdev *matrix_mdev, unsigned long arg)
+> >> +{
+> >> +	s32 fd;
+> >> +	void __user *data;
+> >> +	unsigned long minsz;
+> >> +	struct eventfd_ctx *cfg_chg_trigger;
+> >> +
+> >> +	minsz = offsetofend(struct vfio_irq_set, count);
+> >> +	data = (void __user *)(arg + minsz);
+> >> +
+> >> +	if (get_user(fd, (s32 __user *)data))
+> >> +		return -EFAULT;
+> >> +
+> >> +	if (fd == -1) {
+> >> +		if (matrix_mdev->cfg_chg_trigger)
+> >> +			eventfd_ctx_put(matrix_mdev->cfg_chg_trigger);
+> >> +		matrix_mdev->cfg_chg_trigger = NULL;
+> >> +	} else if (fd >= 0) {
+> >> +		cfg_chg_trigger = eventfd_ctx_fdget(fd);
+> >> +		if (IS_ERR(cfg_chg_trigger))
+> >> +			return PTR_ERR(cfg_chg_trigger);
+> >> +
+> >> +		if (matrix_mdev->cfg_chg_trigger)
+> >> +			eventfd_ctx_put(matrix_mdev->cfg_chg_trigger);
+> >> +
+> >> +		matrix_mdev->cfg_chg_trigger = cfg_chg_trigger;
+> >> +	} else {
+> >> +		return -EINVAL;
+> >> +	}
+> >> +
+> >> +	return 0;
+> >> +}  
+> > How does this guard against a use after free, such as the eventfd being
+> > disabled or swapped concurrent to a config change?  Thanks,
+> >
+> > Alex  
 > 
-> Commit-ID:     8739c6811572b087decd561f96382087402cc343
-> Gitweb:        https://git.kernel.org/tip/8739c6811572b087decd561f96382087402cc343
-> Author:        Peter Zijlstra <peterz@infradead.org>
-> AuthorDate:    Thu, 26 Jan 2023 16:08:36 +01:00
-> Committer:     Ingo Molnar <mingo@kernel.org>
-> CommitterDate: Tue, 31 Jan 2023 15:01:47 +01:00
+> Hi Alex. I spent a great deal of time today trying to figure out exactly 
+> what
+> you are asking here; reading about eventfd and digging through code.
+> I looked at other places where eventfd is used to set up communication
+> of events targetting a vfio device from KVM to userspace (e.g., 
+> hw/vfio/ccw.c)
+> and do not find anything much different than what is done here. In fact,
+> this code looks identical to the code that sets up an eventfd for the
+> VFIO_AP_REQ_IRQ_INDEX.
 > 
-> sched/clock/x86: Mark sched_clock() noinstr
-> 
-> In order to use sched_clock() from noinstr code, mark it and all it's
-> implenentations noinstr.
-> 
-> The whole pvclock thing (used by KVM/Xen) is a bit of a pain,
-> since it calls out to watchdogs, create a
-> pvclock_clocksource_read_nowd() variant doesn't do that and can be
-> noinstr.
+> Maybe you can explain how an eventfd is disabled or swapped, or maybe
+> explain how we can guard against its use after free. Thanks.
 
-...
+Maybe I will try! The value of matrix_mdev->cfg_chg_trigger is used in:
+* vfio_ap_set_cfg_change_irq() (rw, with matrix_dev->mdevs_lock)
+* signal_guest_ap_cfg_changed()(r, takes no locks itself, )
+  * called by vfio_ap_mdev_update_guest_apcb() 
+    * called at a bunch of places but AFAICT always with
+      matrix_dev->mdevs_lock held
+  * called by vfio_ap_mdev_unset_kvm() (with matrix_dev->mdevs_lock held
+    via get_update_locks_for_kvm())
+* vfio_ap_mdev_probe() (w, assigns NULL to it)
 
-> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-> index 16333ba..0f35d44 100644
-> --- a/arch/x86/kernel/kvmclock.c
-> +++ b/arch/x86/kernel/kvmclock.c
-> @@ -71,12 +71,12 @@ static int kvm_set_wallclock(const struct timespec64 *now)
->  	return -ENODEV;
->  }
->  
-> -static u64 kvm_clock_read(void)
-> +static noinstr u64 kvm_clock_read(void)
->  {
->  	u64 ret;
->  
->  	preempt_disable_notrace();
-> -	ret = pvclock_clocksource_read(this_cpu_pvti());
-> +	ret = pvclock_clocksource_read_nowd(this_cpu_pvti());
->  	preempt_enable_notrace();
->  	return ret;
->  }
-> @@ -86,7 +86,7 @@ static u64 kvm_clock_get_cycles(struct clocksource *cs)
->  	return kvm_clock_read();
->  }
->  
-> -static u64 kvm_sched_clock_read(void)
-> +static noinstr u64 kvm_sched_clock_read(void)
->  {
->  	return kvm_clock_read() - kvm_sched_clock_offset;
->  }
-> diff --git a/arch/x86/kernel/pvclock.c b/arch/x86/kernel/pvclock.c
-> index 5a2a517..56acf53 100644
-> --- a/arch/x86/kernel/pvclock.c
-> +++ b/arch/x86/kernel/pvclock.c
-> @@ -64,7 +64,8 @@ u8 pvclock_read_flags(struct pvclock_vcpu_time_info *src)
->  	return flags & valid_flags;
->  }
->  
-> -u64 pvclock_clocksource_read(struct pvclock_vcpu_time_info *src)
-> +static __always_inline
-> +u64 __pvclock_clocksource_read(struct pvclock_vcpu_time_info *src, bool dowd)
->  {
->  	unsigned version;
->  	u64 ret;
-> @@ -77,7 +78,7 @@ u64 pvclock_clocksource_read(struct pvclock_vcpu_time_info *src)
->  		flags = src->flags;
->  	} while (pvclock_read_retry(src, version));
->  
-> -	if (unlikely((flags & PVCLOCK_GUEST_STOPPED) != 0)) {
-> +	if (dowd && unlikely((flags & PVCLOCK_GUEST_STOPPED) != 0)) {
+If vfio_ap_set_cfg_change_irq() could change/destroy
+matrix_mdev->cfg_chg_trigger while another thread of execution
+is using it e.g. with signal_guest_ap_cfg_changed() that would be a
+possible UAF and thus BAD.
 
-This effectively broke sched_clock handling of PVCLOCK_GUEST_STOPPED, which was
-added by commit d63285e94af3 ("pvclock: detect watchdog reset at pvclock read").
+Now AFAICT matrix_mdev->cfg_chg_trigger is protected by
+matrix_dev->mdevs_lock on each access except for in vfio_ap_mdev_probe()
+which is AFAIK just an initialization in a safe state where we are
+guaranteed to have exclusive access.
 
-By skipping the watchdog goo in the kvm_clock_read() path, the watchdogs will only
-be petted when kvmclock's pvclock_read_wallclock() is invoked, which AFAICT is
-limited to guest boot and suspend+resume (in the guest).  I.e. PVCLOCK_GUEST_STOPPED
-is ignored until the *guest* suspends, which completely defeats the purpose of
-petting the watchdogs when reading the clock.
+The eventfd is swapped and disabled in vfio_ap_set_cfg_change_irq() with
+userspace supplying a new valid fd or -1 respectively.
 
-I'm guessing no one has noticed/complained because watchdog_timer_fn,
-wq_watchdog_timer_fn(), and check_cpu_stall() all manually handling a STOPPED
-vCPU by invoking kvm_check_and_clear_guest_paused().  At a glance, only the
-hung task detector isn't in on the game, but its doggie still gets petted so
-long as one of the other watchdogs runs first.
+Tony does that answer your question to Alex?
 
-One option would be to sprinkle noinstr everywhere, because despite
-pvclock_touch_watchdogs() calling a lot of functions, all of those functions
-are little more than one-liners, i.e. can be noinstr without significant downsides.
+Alex, does the above answer your question on what guards against UAF (the
+short answer is: matrix_dev->mdevs_lock)?
 
-Alternatively, we could explicitly revert commit d63285e94af3, and then bribe
-someone into finding a better/common place to handle PVCLOCK_GUEST_STOPPED.
-I am leaning heavily toward this alternative, because the way things are headed
-with kvmclock is that the kernel will stop using it for sched_clock[*], at which
-point VMs that run on modern setups won't get the sched_clock behavior anyways.
+Regards,
+Halil
 
-[*] https://lore.kernel.org/all/Z4gqlbumOFPF_rxd@google.com
+
+
 
