@@ -1,205 +1,196 @@
-Return-Path: <kvm+bounces-35678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A07BA13FDC
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 17:52:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0995A1400A
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 17:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE3F53A3E65
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 16:52:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 176973A1E58
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 16:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A21822CBEA;
-	Thu, 16 Jan 2025 16:52:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D6C23243D;
+	Thu, 16 Jan 2025 16:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BPzyMsuU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yCZiWQ/P"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1729E137932
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 16:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D183622D4E0
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 16:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737046368; cv=none; b=ctUvk0+AZr9pDC5zOhd7qZTh51HYqAgJ3GRa2/A5MtPe4x48f0MpIVSq86IpbgUfOYWJ86R6VeOl2+T2rul69wg2v6nN/r3z3Z9Sp32MGlohKsvuL90p15cXvjGjJmbkwPVxQcrOYdMUJhQOmaqOge5KqTN5B6cJfq/mtryDHGs=
+	t=1737046589; cv=none; b=EPkWx4goDgPagGcnPtiQkdqn2f2PqCRtkmm/sw9p7v95vvbZ61tW7V1UGZo0JYi34IbG8fHuciSDoeImXrAsR/XN7vzepZmvCVHMWyJVDQLbF92/CTB9NjZE7FRbSiPaIz+jF407jqzM3Pq0dr3o1XnUjERvfNO/IIGcf9E+uiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737046368; c=relaxed/simple;
-	bh=f8hkhT49y5/wWEPL1dn76NoGi1ZCb5GGkMHI0hsOAqA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M9J5PsbWCWQgv5am/d1OWXDJVEjWjuw+iPz7m7mA+SjDeTJEEZ6VNMUgL401VNdspccYxr5MrKPMB15GB1IVHT/afYC3NdGlwaHuDTZDO4H/yepdVpndbjMQXdagCiSfJ03xfRP3uiMPQ/JEFLDc+KL+vSXUb3Fk8t9NHxtmYY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BPzyMsuU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737046366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/lW37XSswNGfSg646NxTRyIT3sFX1n1Ssxcy5pA8P04=;
-	b=BPzyMsuU8d8QRHL6zFP1sA3JpptwODtY+J8Ycv8Ik8GL+2NBCalIPACBY1BKY6t9ZhqCWj
-	yMHZyzAnhutWSV/RtHqYjTumOmRwYQMoQ+ObkcxIgQ4FAUK2x5Vc77GeWRgwuo/G/CGWj8
-	JjBOPDtF3BZ1q5ljx0qFoyiCeyeB1wc=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-510-ukDBOpVWMdGK2EMRX06n_Q-1; Thu, 16 Jan 2025 11:52:45 -0500
-X-MC-Unique: ukDBOpVWMdGK2EMRX06n_Q-1
-X-Mimecast-MFC-AGG-ID: ukDBOpVWMdGK2EMRX06n_Q
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-844df5d5edfso13796639f.1
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 08:52:44 -0800 (PST)
+	s=arc-20240116; t=1737046589; c=relaxed/simple;
+	bh=X/OOqmQvnqEja0m1VWly6lfnUqGtptI/v2n0gLba+gE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bsORgmwTyKZLeTyPYlzkCHZYgGDNgrcVEVPhLMz3rFuu4zYiv/HtZdrSDYH/42swwSrPdiZzYQRhAXvGX7M96WrLZAc7S+SvWK7SxGOF0xUx5jEtPkJZ7j/QOlyGueXHrk6o1i/guoSa6iuhJpB2qGaUyPxjNOxyYAijA4zTxQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yCZiWQ/P; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f2a9743093so2338275a91.3
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 08:56:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737046587; x=1737651387; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H58Ez4Z8nz/I0BfpOMpCpBNBR2Nn1ADeoJi+O2wMRGI=;
+        b=yCZiWQ/PsQG8sedAMCx/mToNtd0xYIyc+ZseLjKrnCTq9HrXK7FSBKt37vKvfiybmG
+         fTgoD8mp98cPkRqhUqUUvN0j5Uh1TUjTFDTByF7SlTCtdc58HV3HMeaeU8MFnxIv/deV
+         ndrUL1NwAto9pPt/ROSOleSwD2MLIVWVz9agyiX8+ZTwQbzqKsUwNAYcyXxeCexqGPuM
+         I8cjIbYT5HSigu1X/h9q7eSfLIow5DvOdi3Rk0SVpAGxjpwsaQeFtFzlM90kmEuVmpdL
+         uM2CdFt7Njlt/zsRb+g3X69VH881KcxBrlOfmV7B/Mfyxy2wg2M3oqYdQogl4xoR/PAD
+         cHiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737046364; x=1737651164;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/lW37XSswNGfSg646NxTRyIT3sFX1n1Ssxcy5pA8P04=;
-        b=MUBSKNINDykvlzZzV27sX2rxc5LZEOrPsv8//7ZSpJuJ9PWX9JqgCB6GrGLno2TXSb
-         jH+QwmLEGXqgTdjyZQsN5Z00eZADvnkhyQpOriRB/Liu+TLMoIjo+kM7GeP3qB8zwOfL
-         xLyx/gSpz0xKp7Wn23qTwEwPdskiOrSkKcnVdDPiMPGUObpzZVoUJorC5V/1PpGBPiB1
-         uF0UpLMtxOhVtnzkQ2NzoEjD/D1j3olrkc7ZZCV6UOKEYGd/UQa18U87kyWKqQTdKTrj
-         58IUblId7KzJDIuy6R1cW8ptfhIeW+7lnOCPs5TxUZ2GxUTRIEdr7LHNH036WVibUHI1
-         Qeog==
-X-Forwarded-Encrypted: i=1; AJvYcCUbJjO0QAzhzXGSbHtxy2NHwvPD1t0GGFJaVyOsqVMPW6cORtwqpM7dySutKcs8LTUhh4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPk25pJY9EaATF20ABXp2lLVrQMbZ9jBvZZiId9hCQkfz4xIHV
-	cpEcWsYeGutRyL44l5YhAHFrARKAZQ4j7n5e0rcAHfWGdCDP8CHyLsnfDPzB32N5ZeIArxj3gZB
-	LL+VRYJKztZKfyjJRUXuQVkDRCjX39KgiOpSxLyvbTLvbeyUTu2QxdEnOkQ==
-X-Gm-Gg: ASbGnct2dKrcv88RjsGz0rr+L5dpkTW1gy8VG79oYQexexFKAOxr9NC9XI+uE95ANJ8
-	04Z7HzLKf6Kjrx1fys/v63iDSJK7wK4QtyNcayOltYB/TtBin6OMMHb+LkNSgykba3g83a5/mmK
-	fMq9btGwgSB7N9dqNgSaKMMbD2pfP2o22sTzZAgpu5AlYaQhpNaYFNqPXhBQISjyovxXVMETT3y
-	D4SdV8kO5A4JW0KHPjM1nqVaCcoNX3eKvnaozk2B5sRulMpNjseymwwOc6W
-X-Received: by 2002:a05:6602:2b01:b0:844:cbd0:65bf with SMTP id ca18e2360f4ac-84ce01add9fmr864783639f.3.1737046364051;
-        Thu, 16 Jan 2025 08:52:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHSHrOsX5bS3VLCbMhYfAjZgtNuxvEYnqsKnwrFQ7KCWpUcqoI7irh3qYNBdXOn2gmp3m9nqQ==
-X-Received: by 2002:a05:6602:2b01:b0:844:cbd0:65bf with SMTP id ca18e2360f4ac-84ce01add9fmr864782539f.3.1737046363652;
-        Thu, 16 Jan 2025 08:52:43 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea75499c59sm112042173.74.2025.01.16.08.52.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 08:52:43 -0800 (PST)
-Date: Thu, 16 Jan 2025 11:52:28 -0500
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Anthony Krowiak <akrowiak@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Rorie Reyes <rreyes@linux.ibm.com>,
- linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, hca@linux.ibm.com, borntraeger@de.ibm.com,
- agordeev@linux.ibm.com, gor@linux.ibm.com, jjherne@linux.ibm.com
-Subject: Re: [PATCH v1] s390/vfio-ap: Signal eventfd when guest AP
- configuration is changed
-Message-ID: <20250116115228.10eeb510.alex.williamson@redhat.com>
-In-Reply-To: <89a1a029-172a-407a-aeb4-0b6228da07e5@linux.ibm.com>
-References: <20250107183645.90082-1-rreyes@linux.ibm.com>
-	<20250114150540.64405f27.alex.williamson@redhat.com>
-	<5d6402ce-38bd-4632-927e-2551fdd01dbe@linux.ibm.com>
-	<20250116011746.20cf941c.pasic@linux.ibm.com>
-	<89a1a029-172a-407a-aeb4-0b6228da07e5@linux.ibm.com>
-Organization: Red Hat
+        d=1e100.net; s=20230601; t=1737046587; x=1737651387;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H58Ez4Z8nz/I0BfpOMpCpBNBR2Nn1ADeoJi+O2wMRGI=;
+        b=WiTZ89PxXrKbVhpG5pXWyTUY1arsYWDOk1UdSn45SFJz3e2iXV3F3VKYIRnOFBYOeR
+         jxKYV+hrwwemGSL36QdyN2n4Kp5SZGagzSAap3QU7DJCzNBkm0LxZhsMA6bIsGNjh6xe
+         sJCCpcu+fuTf/5Bdukxc+n5342l0Dar0WQtxPbFf/PzBxmmXPuj/WcR7c9+H1opql6ob
+         7/nhJi9ptAOneBp+1kK8etW7Uwc76gm+KdWaRKuB/EhBl781Ek2QW1p9eLSIrvXWBHLs
+         VSUmHfQNU8LYmCyPiQz8Bva1PdlTYSdLArCUrLonsPmTZUwa8ziFuPWsGWT2nYynlU25
+         7+0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXcJWeGG5lt+u/4MoSFyxQrgWUqlkK7NOH2galVbO9CYn5tXGFL/0DbpbFsh1dRm3x7qjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzX40DYZB+zEVeqK49wwZbBHTDZ5JDRSMHvqR9xTFSYFJo4FCYe
+	nBz7Ly3rcuHAXv6dlDCXVRMuSI1jcdjQsX04TErIGiwMRuhISXUzryREZXOqLcCuLpLh26g0RZY
+	lCA==
+X-Google-Smtp-Source: AGHT+IEp63QwXk/+kbItMFqQLqyMWFGeMYyxK8RiI/mCB5mVqcmmuPx7zxejaR+r2KGLU+OLJ1XWO2BpZHY=
+X-Received: from pjbqn7.prod.google.com ([2002:a17:90b:3d47:b0:2ea:5c73:542c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:540e:b0:2ee:a76a:830
+ with SMTP id 98e67ed59e1d1-2f548f1b2bfmr52474138a91.24.1737046587129; Thu, 16
+ Jan 2025 08:56:27 -0800 (PST)
+Date: Thu, 16 Jan 2025 08:56:25 -0800
+In-Reply-To: <20250116162525.GFZ4ky9TdSn7jltgw7@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <3acfbef7-8786-4033-ab99-a97e971f5bd9@amd.com> <20250108082221.GBZ341vUyxrBPHgTg3@fat_crate.local>
+ <4b68ee6e-a6b2-4d41-b58f-edcceae3c689@amd.com> <cd6c18f3-538a-494e-9e60-2caedb1f53c2@amd.com>
+ <Z36FG1nfiT5kKsBr@google.com> <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
+ <Z36vqqTgrZp5Y3ab@google.com> <4ab9dc76-4556-4a96-be0d-2c8ee942b113@amd.com>
+ <Z4gqlbumOFPF_rxd@google.com> <20250116162525.GFZ4ky9TdSn7jltgw7@fat_crate.local>
+Message-ID: <Z4k6OcbLqMxvvmb-@google.com>
+Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
+From: Sean Christopherson <seanjc@google.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, 
+	x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de, 
+	dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com, 
+	francescolavra.fl@gmail.com, Alexey Makhalov <alexey.makhalov@broadcom.com>, 
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 16 Jan 2025 10:38:41 -0500
-Anthony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Thu, Jan 16, 2025, Borislav Petkov wrote:
+> On Wed, Jan 15, 2025 at 01:37:25PM -0800, Sean Christopherson wrote:
+> > My strong vote is prefer TSC over kvmclock for sched_clock if the TSC is constant,
+> > nonstop, and not marked stable via command line.
+> 
+> So how do we deal with the case here where a malicious HV could set those bits
+> and still tweak the TSC?
 
-> On 1/15/25 7:17 PM, Halil Pasic wrote:
-> > On Wed, 15 Jan 2025 14:35:02 -0500
-> > Anthony Krowiak <akrowiak@linux.ibm.com> wrote:
+You don't.  If the hypervisor is malicious, it's game over for non-CoCo guests.
+The clocksource being untrusted is completely unintersting because the host has
+full access to VM state.
+
+It's probably game over for SEV and SEV-ES too, e.g. thanks to remapping attacks,
+lack of robust attestation, and a variety of other avenues a truly malicious
+hypervisor can exploit to attack the guest.
+
+It's only with SNP and TDX that the clocksource becomes at all interesting.
+
+> IOW, I think Secure TSC and TDX should be the only ones who trust the TSC when
+> in a guest.
+> 
+> If anything, trusting the TSC in a normal guest should at least issue
+> a warning saying that we do use the TSC but there's no 100% guarantee that it
+> is trustworthy...
+
+Why?  For non-TDX/SecureTSC guests, *all* clocksources are host controlled.
+
+> > But wait, there's more!  Because TDX doesn't override .calibrate_tsc() or
+> > .calibrate_cpu(), even though TDX provides a trusted TSC *and* enumerates the
+> > frequency of the TSC, unless I'm missing something, tsc_early_init() will compute
+> > the TSC frequency using the information provided by KVM, i.e. the untrusted host.
+> 
+> Yeah, I guess we don't want that. Or at least we should warn about it.
+
+CPUID 0x15 (and 0x16?) is guaranteed to be available under TDX, and Secure TSC
+would ideally assert that the kernel doesn't switch to some other calibration
+method too.  Not sure where to hook into that though, without bleeding TDX and
+SNP details everywhere.
+
+> > +	/*
+> > +	 * If the TSC counts at a constant frequency across P/T states, counts
+> > +	 * in deep C-states, and the TSC hasn't been marked unstable, prefer
+> > +	 * the TSC over kvmclock for sched_clock and drop kvmclock's rating so
+> > +	 * that TSC is chosen as the clocksource.  Note, the TSC unstable check
+> > +	 * exists purely to honor the TSC being marked unstable via command
+> > +	 * line, any runtime detection of an unstable will happen after this.
+> > +	 */
+> > +	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
+> > +	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
+> > +	    !check_tsc_unstable()) {
+> > +		kvm_clock.rating = 299;
+> > +		pr_warn("kvm-clock: Using native sched_clock\n");
+> 
+> The warn is in the right direction but probably should say TSC still cannot be
+> trusted 100%.
+
+Heh, I didn't mean to include the printks, they were purely for my own debugging.
+
+> > diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
+> > index 0864b314c26a..9baffb425386 100644
+> > --- a/arch/x86/kernel/tsc.c
+> > +++ b/arch/x86/kernel/tsc.c
+> > @@ -663,7 +663,12 @@ unsigned long native_calibrate_tsc(void)
+> >  	unsigned int eax_denominator, ebx_numerator, ecx_hz, edx;
+> >  	unsigned int crystal_khz;
 > >  
-> >>>> +static int vfio_ap_set_cfg_change_irq(struct ap_matrix_mdev *matrix_mdev, unsigned long arg)
-> >>>> +{
-> >>>> +	s32 fd;
-> >>>> +	void __user *data;
-> >>>> +	unsigned long minsz;
-> >>>> +	struct eventfd_ctx *cfg_chg_trigger;
-> >>>> +
-> >>>> +	minsz = offsetofend(struct vfio_irq_set, count);
-> >>>> +	data = (void __user *)(arg + minsz);
-> >>>> +
-> >>>> +	if (get_user(fd, (s32 __user *)data))
-> >>>> +		return -EFAULT;
-> >>>> +
-> >>>> +	if (fd == -1) {
-> >>>> +		if (matrix_mdev->cfg_chg_trigger)
-> >>>> +			eventfd_ctx_put(matrix_mdev->cfg_chg_trigger);
-> >>>> +		matrix_mdev->cfg_chg_trigger = NULL;
-> >>>> +	} else if (fd >= 0) {
-> >>>> +		cfg_chg_trigger = eventfd_ctx_fdget(fd);
-> >>>> +		if (IS_ERR(cfg_chg_trigger))
-> >>>> +			return PTR_ERR(cfg_chg_trigger);
-> >>>> +
-> >>>> +		if (matrix_mdev->cfg_chg_trigger)
-> >>>> +			eventfd_ctx_put(matrix_mdev->cfg_chg_trigger);
-> >>>> +
-> >>>> +		matrix_mdev->cfg_chg_trigger = cfg_chg_trigger;
-> >>>> +	} else {
-> >>>> +		return -EINVAL;
-> >>>> +	}
-> >>>> +
-> >>>> +	return 0;
-> >>>> +}  
-> >>> How does this guard against a use after free, such as the eventfd being
-> >>> disabled or swapped concurrent to a config change?  Thanks,
-> >>>
-> >>> Alex  
-> >> Hi Alex. I spent a great deal of time today trying to figure out exactly
-> >> what
-> >> you are asking here; reading about eventfd and digging through code.
-> >> I looked at other places where eventfd is used to set up communication
-> >> of events targetting a vfio device from KVM to userspace (e.g.,
-> >> hw/vfio/ccw.c)
-> >> and do not find anything much different than what is done here. In fact,
-> >> this code looks identical to the code that sets up an eventfd for the
-> >> VFIO_AP_REQ_IRQ_INDEX.
-> >>
-> >> Maybe you can explain how an eventfd is disabled or swapped, or maybe
-> >> explain how we can guard against its use after free. Thanks.  
-> > Maybe I will try! The value of matrix_mdev->cfg_chg_trigger is used in:
-> > * vfio_ap_set_cfg_change_irq() (rw, with matrix_dev->mdevs_lock)
-> > * signal_guest_ap_cfg_changed()(r, takes no locks itself, )
-> >    * called by vfio_ap_mdev_update_guest_apcb()
-> >      * called at a bunch of places but AFAICT always with
-> >        matrix_dev->mdevs_lock held
-> >    * called by vfio_ap_mdev_unset_kvm() (with matrix_dev->mdevs_lock held
-> >      via get_update_locks_for_kvm())
-> > * vfio_ap_mdev_probe() (w, assigns NULL to it)
-> >
-> > If vfio_ap_set_cfg_change_irq() could change/destroy
-> > matrix_mdev->cfg_chg_trigger while another thread of execution
-> > is using it e.g. with signal_guest_ap_cfg_changed() that would be a
-> > possible UAF and thus BAD.
-> >
-> > Now AFAICT matrix_mdev->cfg_chg_trigger is protected by
-> > matrix_dev->mdevs_lock on each access except for in vfio_ap_mdev_probe()
-> > which is AFAIK just an initialization in a safe state where we are
-> > guaranteed to have exclusive access.
-> >
-> > The eventfd is swapped and disabled in vfio_ap_set_cfg_change_irq() with
-> > userspace supplying a new valid fd or -1 respectively.
-> >
-> > Tony does that answer your question to Alex?
-> >
-> > Alex, does the above answer your question on what guards against UAF (the
-> > short answer is: matrix_dev->mdevs_lock)?  
+> > -	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
+> > +	/*
+> > +	 * Ignore the vendor when running as a VM, if the hypervisor provides
+> > +	 * garbage CPUID information then the vendor is also suspect.
+> > +	 */
+> > +	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL &&
+> > +	    !boot_cpu_has(X86_FEATURE_HYPERVISOR))
+> >  		return 0;
+> >  
+> >  	if (boot_cpu_data.cpuid_level < 0x15)
+> > @@ -713,10 +718,13 @@ unsigned long native_calibrate_tsc(void)
+> >  		return 0;
+> >  
+> >  	/*
+> > -	 * For Atom SoCs TSC is the only reliable clocksource.
+> > -	 * Mark TSC reliable so no watchdog on it.
+> > +	 * For Atom SoCs TSC is the only reliable clocksource.  Similarly, in a
+> > +	 * VM, any watchdog is going to be less reliable than the TSC as the
+> > +	 * watchdog source will be emulated in software.  In both cases, mark
+> > +	 * the TSC reliable so that no watchdog runs on it.
+> >  	 */
+> > -	if (boot_cpu_data.x86_vfm == INTEL_ATOM_GOLDMONT)
+> > +	if (boot_cpu_has(X86_FEATURE_HYPERVISOR) ||
+> > +	    boot_cpu_data.x86_vfm == INTEL_ATOM_GOLDMONT)
+> >  		setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
+> >  
+> >  #ifdef CONFIG_X86_LOCAL_APIC
+> 
+> It looks all wrong if a function called native_* sprinkles a bunch of "am
+> I a guest" checks. I guess we should split it into VM and native variants.
 
-Yes, that answers my question, thanks for untangling it.  We might
-consider a lockdep_assert_held() in the new
-signal_guest_ap_cfg_changed() since it does get called from a variety
-of paths and we need that lock to prevent the UAF.
+I agree the naming is weird, but outside of the vendor checks, the VM code is
+identical to the "native" code, so I don't know that it's worth splitting into
+multiple functions.
 
-> I agree that the matrix_dev->mdevs_lock does prevent changes to
-> matrix_mdev->cfg_chg_trigger while it is being accessed by the
-> vfio_ap device driver. My confusion arises from my interpretation of
-> Alex's question; it seemed to me that he was talking its use outside
-> of the vfio_ap driver and how to guard against that.
+What if we simply rename it to calibrate_tsc_from_cpuid()?
 
-Nope, Halil zeroed in on the UAF possibility that concerned me.  Thanks,
-
-Alex
-
+> But yeah, the general direction is ok once we agree on what we do when
+> exactly.
 
