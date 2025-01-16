@@ -1,270 +1,134 @@
-Return-Path: <kvm+bounces-35684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38247A141EB
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 20:02:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84E4BA1422A
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 20:19:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 524F516A892
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 19:02:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 080AE3A97B6
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 19:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA0C22D4C3;
-	Thu, 16 Jan 2025 19:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF5A22F384;
+	Thu, 16 Jan 2025 19:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K6QG6fsf"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VHU0hWTv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6C11547E2
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 19:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0BD23F296;
+	Thu, 16 Jan 2025 19:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737054147; cv=none; b=SFJnnaS5aebwZO/mBwwWmokGqc0rf8cjEbMhqgpTE+Rxj56SeDW8PO3MZfFB6zAYbU91gEHMEqqv2EP9SXrSdOT8oIAJix1oJMvGT7hs5EYESvSxwHRngsIGleZJj+0b/C7cUyBRuoGR7dCgEalfakQE8TFer2qBzDBi6FIsxHs=
+	t=1737055153; cv=none; b=GcBPUF28ggmnMMN1kAMgT3B1W5+h7Zk0nRMsgvl/7uG9dw/tCReT2bQWGwhzNCkXg6Roj93Ne3UuJcdasO/OtxdjR/ZTxI1j0Nl381iurYbNZjRYMT4mD49CKImcImiu+1z4QGHwTcOwCk2rhAPjUpN9xFEB+4yWm9WIwLZOrUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737054147; c=relaxed/simple;
-	bh=w7S+OkrPRN7S4G/rcZSDLEZ1iuNJGLBjlSA9rWT39ss=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=MWx6fEvqHu/dZX2+tHvB5D3ts/Z/fBzU2lRxD256w+lA9Rhjn2eizCF1scgYVnfxKbv1IWpgb4QqssAtyueIW50Ti2FUT4k3QAdh45NvmA4mFlCu/SWoPQBtVdcVGFkIDwXVeHA/RFK51qZxjWViUkxD6lLwafhN5yPTToxnM1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=K6QG6fsf; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-385eed29d17so761465f8f.0
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 11:02:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737054143; x=1737658943; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fuRyw5EWWx6Yp+3IBCpdAz3q5PYO8xyuKBCIsOMef9E=;
-        b=K6QG6fsfU+bHivXRHQw1GOWhXPCV2UHXXS4SWgqmoTX+AnCEdiDarWDwXQp1sUTksp
-         xBwgo3D+PFLJXjnr7QA+E/vrPnFE1PzFnqPN/y529rMPm2xz/gLgDUwR304AoZE3GdPd
-         eV+084qPJV9lswjNz1yfTV94FMpjL+fs32v1c1KoKPWvwomftWVTYaGBiohRHMsyV/3c
-         5kdHdoTLDVhnKdu9tV0lm6jP3GzUByrBYIneWQb/o6PkyvXBNVDjPFhAnlq3c/ZI2b4c
-         AFOb4S/8oZ+Sck8D23MNbBZaOyBbOjOrH2x5pBhQes543PFdRL2YXweLYyCjcfeV7dah
-         OTRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737054143; x=1737658943;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fuRyw5EWWx6Yp+3IBCpdAz3q5PYO8xyuKBCIsOMef9E=;
-        b=tKelZ4TABueeuEol58b+w9uAuD9zg+LHlA+aTe0CkyUV7QFa2n954t2WTdN/f39fU/
-         7lPOYD9GgpRgnBWAtpclPFg2ilGrHP+nMXxC3xex94tEZdOYbqsd2htg34hhxgTsuDui
-         sbvbBEJobZh/3BLcGhfr2oAGbxR649x39KJdLoki7hBF1imFnu9Otct0C2bjrkN8ec91
-         GgHrUmPNUf5IeyCqt2HjUKQKvQeMTyDWti3bW1QigcuOoVn8Pr1CCP/EE9VtVBUDLePH
-         I19dd56Vg5/AQH3mL1f460xXeldvZXnGiy6psOxOmtFd5BBFGLBoFu57K5ixh/i/Ou2O
-         JDeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWhaDw8jqgeYlXo2+b1OVyrNlOTlpdHlh451KDNXF8KYqoZAftKXxXeX+XF80iys2a92kw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3oFcu0SbbAI4QGvPcLXm4CP079gUBfm6sMbRSdcwAAGb6n2Yv
-	EXvEIttAWQo/cSTrYSepjQeItAUDg7w4GmFREtMr+6fVwozxxQ9C5WTOfYqKd1U=
-X-Gm-Gg: ASbGncvnO6sZxy648qqeqy0vLffifE1rW73AzdCl2OS3lTcGNgnGjjJS8YpzRKiz7DM
-	jnBNbXm5Li6zdraMm4X9HdA8xZVkbG5d5PJZls6k/X4aluP2Hz4P0pHKyz4HjjFQ0zT2Dlfds+0
-	+QNVFwn6iMmih9GdeXDyeYMUTVR6GgiIOEw4AG2jGADRuNpB9TVUrtypiL/AN17m5zz83vXohdx
-	onfriFB/FvfMGh5FLLIPWOQ9OGJeC9B2pc248j25NnFnGn5oqtawQJQ/Mfyg9pldpdctCnNO5W6
-	QUjtfUghDriSIbqFBPkK2Zvl
-X-Google-Smtp-Source: AGHT+IEcSQubzWb3CBuT1dMQ1/yjGUHi79uHcxM8wbngetpI0P1jFH07ZTZYoEfZXlXddWqceC+h5Q==
-X-Received: by 2002:a5d:64a8:0:b0:385:e429:e591 with SMTP id ffacd0b85a97d-38a8730a6bdmr34444859f8f.23.1737054142828;
-        Thu, 16 Jan 2025 11:02:22 -0800 (PST)
-Received: from [192.168.69.151] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890421fabsm7885525e9.24.2025.01.16.11.02.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Jan 2025 11:02:22 -0800 (PST)
-Message-ID: <b55ea724-cdc7-4e8c-a954-b10a1cde9bdd@linaro.org>
-Date: Thu, 16 Jan 2025 20:02:18 +0100
+	s=arc-20240116; t=1737055153; c=relaxed/simple;
+	bh=ULFtzri1znEUXQlaetgij/v5Itjwzky80Js1UZCGxq4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fj/aeqTTOaBbmUExrvuX79ICeYlZ5El/znXwpDtbiBfg2tT8QYuL5RTdY84UgijVcn7QMNj635EL43IUQDgyb7bb9cVUb8be/033PuHVi4Wq28EE2CGkTawyhTg75idPIx8pm30gPRSYl1trC/UPy/4bQNxWaaa+4edHE3k86lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VHU0hWTv; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50GE5vFE007900;
+	Thu, 16 Jan 2025 19:19:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=DLc9/y
+	VETKXKMGWKbN8jZGmlMJsKm6sSziimpYr1RIo=; b=VHU0hWTvirxjW+D4LaMY2D
+	gjKlCoh2hF4fB2gbBGajuTc7Z5t8C2A3GNg4NMpwUGZaUX7LppVEvMvVirZsUC8j
+	bukgXhkcJAgtc0UqDGMqZFvfUcHcBuYJMtG36I+VVKyTM796NLNABwn5JqZas5yK
+	K3DLS2UqId9Sc7CvK6He2+RcLirpU4Wjoiak7KnWI1cKOdyAVaZKu/BJzs2FidWn
+	F+agMsn1QJBtRYGnURATrRbpWij4xlz9HixomYVz//5gunm9DQiy6whJpTqxRoMI
+	RG4ORPba/ERdAJA4AipU36Iv2LT6OEzU64/HyOV6o9vGcT85lLzADPHfpZgQQEvw
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkcmcdn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 19:19:05 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GIG9O6001108;
+	Thu, 16 Jan 2025 19:19:04 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44456k747e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 19:19:04 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GJJ1BE62194136
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Jan 2025 19:19:01 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 323EA2004F;
+	Thu, 16 Jan 2025 19:19:01 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 75AF22004B;
+	Thu, 16 Jan 2025 19:19:00 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.92.116])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 16 Jan 2025 19:19:00 +0000 (GMT)
+Date: Thu, 16 Jan 2025 20:18:58 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Anthony Krowiak <akrowiak@linux.ibm.com>,
+        Rorie Reyes
+ <rreyes@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, hca@linux.ibm.com,
+        borntraeger@de.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
+        jjherne@linux.ibm.com, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v1] s390/vfio-ap: Signal eventfd when guest AP
+ configuration is changed
+Message-ID: <20250116201858.1a5f7e7f.pasic@linux.ibm.com>
+In-Reply-To: <20250116115228.10eeb510.alex.williamson@redhat.com>
+References: <20250107183645.90082-1-rreyes@linux.ibm.com>
+	<20250114150540.64405f27.alex.williamson@redhat.com>
+	<5d6402ce-38bd-4632-927e-2551fdd01dbe@linux.ibm.com>
+	<20250116011746.20cf941c.pasic@linux.ibm.com>
+	<89a1a029-172a-407a-aeb4-0b6228da07e5@linux.ibm.com>
+	<20250116115228.10eeb510.alex.williamson@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/22] exec/cpu: Call cpu_remove_sync() once in
- cpu_common_unrealize()
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>,
- David Hildenbrand <david@redhat.com>, Peter Xu <peterx@redhat.com>,
- Anton Johansson <anjo@rev.ng>, Peter Maydell <peter.maydell@linaro.org>,
- kvm@vger.kernel.org, Marek Vasut <marex@denx.de>,
- David Gibson <david@gibson.dropbear.id.au>, Brian Cain <bcain@quicinc.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- Claudio Fontana <cfontana@suse.de>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, qemu-ppc@nongnu.org,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Ilya Leoshkevich <iii@linux.ibm.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- Alessandro Di Federico <ale@rev.ng>, Song Gao <gaosong@loongson.cn>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Chris Wulff <crwulff@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, Fabiano Rosas <farosas@suse.de>,
- qemu-s390x@nongnu.org, Yanan Wang <wangyanan55@huawei.com>,
- Luc Michel <luc@lmichel.fr>, Weiwei Li <liweiwei@iscas.ac.cn>,
- Bin Meng <bin.meng@windriver.com>, Stafford Horne <shorne@gmail.com>,
- Xiaojuan Yang <yangxiaojuan@loongson.cn>,
- "Daniel P . Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-arm@nongnu.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Bernhard Beschow <shentey@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-riscv@nongnu.org,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Nicholas Piggin <npiggin@gmail.com>, Greg Kurz <groug@kaod.org>,
- Michael Rolnik <mrolnik@gmail.com>, Eduardo Habkost <eduardo@habkost.net>,
- Markus Armbruster <armbru@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>
-References: <20230918160257.30127-1-philmd@linaro.org>
- <20230918160257.30127-7-philmd@linaro.org>
- <20231128174215.32d2a350@imammedo.users.ipa.redhat.com>
- <5f25576c-598f-4fd7-8238-61edcff2c411@linaro.org>
-Content-Language: en-US
-In-Reply-To: <5f25576c-598f-4fd7-8238-61edcff2c411@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: O5RdBVzvjBFd3LKH6tBumLQzK6GhfpTO
+X-Proofpoint-GUID: O5RdBVzvjBFd3LKH6tBumLQzK6GhfpTO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-16_08,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 suspectscore=0 clxscore=1015
+ mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501160141
 
-On 16/1/25 19:05, Philippe Mathieu-Daudé wrote:
-> On 28/11/23 17:42, Igor Mammedov wrote:
->> On Mon, 18 Sep 2023 18:02:39 +0200
->> Philippe Mathieu-Daudé <philmd@linaro.org> wrote:
->>
->>> While create_vcpu_thread() creates a vCPU thread, its counterpart
->>> is cpu_remove_sync(), which join and destroy the thread.
->>>
->>> create_vcpu_thread() is called in qemu_init_vcpu(), itself called
->>> in cpu_common_realizefn(). Since we don't have qemu_deinit_vcpu()
->>> helper (we probably don't need any), simply destroy the thread in
->>> cpu_common_unrealizefn().
->>>
->>> Note: only the PPC and X86 targets were calling cpu_remove_sync(),
->>> meaning all other targets were leaking the thread when the vCPU
->>> was unrealized (mostly when vCPU are hot-unplugged).
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
->>> ---
->>>   hw/core/cpu-common.c  | 3 +++
->>>   target/i386/cpu.c     | 1 -
->>>   target/ppc/cpu_init.c | 2 --
->>>   3 files changed, 3 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
->>> index a3b8de7054..e5841c59df 100644
->>> --- a/hw/core/cpu-common.c
->>> +++ b/hw/core/cpu-common.c
->>> @@ -221,6 +221,9 @@ static void cpu_common_unrealizefn(DeviceState *dev)
->>>       /* NOTE: latest generic point before the cpu is fully 
->>> unrealized */
->>>       cpu_exec_unrealizefn(cpu);
->>> +
->>> +    /* Destroy vCPU thread */
->>> +    cpu_remove_sync(cpu);
->>>   }
->>>   static void cpu_common_initfn(Object *obj)
->>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->>> index cb41d30aab..d79797d963 100644
->>> --- a/target/i386/cpu.c
->>> +++ b/target/i386/cpu.c
->>> @@ -7470,7 +7470,6 @@ static void x86_cpu_unrealizefn(DeviceState *dev)
->>>       X86CPUClass *xcc = X86_CPU_GET_CLASS(dev);
->>>   #ifndef CONFIG_USER_ONLY
->>> -    cpu_remove_sync(CPU(dev));
->>>       qemu_unregister_reset(x86_cpu_machine_reset_cb, dev);
->>>   #endif
->>
->> missing  followup context:
->>      ...
->>      xcc->parent_unrealize(dev);
->>
->> Before the patch, vcpu thread is stopped and onnly then
->> clean up happens.
->>
->> After the patch we have cleanup while vcpu thread is still running.
->>
->> Even if it doesn't explode, such ordering still seems to be wrong.
-> 
-> OK.
-> 
->>> diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
->>> index e2c06c1f32..24d4e8fa7e 100644
->>> --- a/target/ppc/cpu_init.c
->>> +++ b/target/ppc/cpu_init.c
->>> @@ -6853,8 +6853,6 @@ static void ppc_cpu_unrealize(DeviceState *dev)
->>>       pcc->parent_unrealize(dev);
->>> -    cpu_remove_sync(CPU(cpu));
->>
->> bug in current code?
-> 
-> Plausibly. See:
-> 
-> commit f1023d21e81b7bf523ddf2ac91a48117f20ef9d7
-> Author: Greg Kurz <groug@kaod.org>
-> Date:   Thu Oct 15 23:18:32 2020 +0200
-> 
->      spapr: Unrealize vCPUs with qdev_unrealize()
-> 
->      Since we introduced CPU hot-unplug in sPAPR, we don't unrealize the
->      vCPU objects explicitly. Instead, we let QOM handle that for us
->      under object_property_del_all() when the CPU core object is
->      finalized. The only thing we do is calling cpu_remove_sync() to
->      tear the vCPU thread down.
-> 
->      This happens to work but it is ugly because:
->      - we call qdev_realize() but the corresponding qdev_unrealize() is
->        buried deep in the QOM code
->      - we call cpu_remove_sync() to undo qemu_init_vcpu() called by
->        ppc_cpu_realize() in target/ppc/translate_init.c.inc
->      - the CPU init and teardown paths aren't really symmetrical
-> 
->      The latter didn't bite us so far but a future patch that greatly
->      simplifies the CPU core realize path needs it to avoid a crash
->      in QOM.
-> 
->      For all these reasons, have ppc_cpu_unrealize() to undo the changes
->      of ppc_cpu_realize() by calling cpu_remove_sync() at the right
->      place, and have the sPAPR CPU core code to call qdev_unrealize().
-> 
->      This requires to add a missing stub because translate_init.c.inc is
->      also compiled for user mode.
+On Thu, 16 Jan 2025 11:52:28 -0500
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-See also:
+> > > Alex, does the above answer your question on what guards against UAF (the
+> > > short answer is: matrix_dev->mdevs_lock)?    
+> 
+> Yes, that answers my question, thanks for untangling it.  We might
+> consider a lockdep_assert_held() in the new
+> signal_guest_ap_cfg_changed() since it does get called from a variety
+> of paths and we need that lock to prevent the UAF.
 
-commit 5e22e29201d80124bca0124f2034e72b698cbb6f
-Author: David Gibson <david@gibson.dropbear.id.au>
-Date:   Wed Jun 13 12:08:42 2018 +1000
+Yes I second that! I was thinking about it myself yesterday. And there
+are also a couple of other functions that expect to be called with
+certain locks held. I would love to see lockdep_assert_held() there
+as well.
 
-     pnv: Add cpu unrealize path
+Since I went through that code last night I could spin a patch that
+catches some of these at least. But if I don't within two weeks, I
+won't be grumpy if somebody else picks that up.
 
-     Currently we don't have any unrealize path for pnv cpu cores.
-     We get away with this because we don't yet support cpu hotplug
-     for pnv.
-
-     However, we're going to want it eventually, and in the meantime,
-     it makes it non-obvious why there are a bunch of allocations on
-     the realize() path that don't have matching frees.
-
-     So, implement the missing unrealize path.
-
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index f4c41d89d6d..f7cf33f547a 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -186,6 +186,26 @@ err:
-      error_propagate(errp, local_err);
-  }
-
-+static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
-+{
-+    qemu_unregister_reset(pnv_cpu_reset, cpu);
-+    object_unparent(cpu->intc);
-+    cpu_remove_sync(CPU(cpu));
-+    object_unparent(OBJECT(cpu));
-+}
-
+Regards,
+Halil
 
