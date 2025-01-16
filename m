@@ -1,170 +1,214 @@
-Return-Path: <kvm+bounces-35614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B246A13294
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 06:28:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2193A1329A
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 06:30:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00EFC3A7D2D
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 05:28:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F85C3A6F59
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 05:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5DC157E99;
-	Thu, 16 Jan 2025 05:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6302315B135;
+	Thu, 16 Jan 2025 05:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2sAGMil+"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="Ct3biXum"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C8E7DA7F
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 05:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC7622331
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 05:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737005278; cv=none; b=L42fJqJ7aO6cnXOIFo/74UYgYNHsELFS+Zls1zxCR1WT5T07yoR4pQ7asf++X0LIiA061BP82CwEu08YtsBAZH7dvIkA6rF9XElTfcf1r0BoV7FF2gYHwp70MKlE7Yboth+3bFmMZPPB3J7aWmf3Gmyx5692XqEAchkh8Za+8jI=
+	t=1737005425; cv=none; b=P489cl1A34syY/U+khEBVBWgQMBCRyN97SQ9lv5uz0ZTjw2AoaPgBlVpOBDngoXqbWH5r+/SYrDC/SqL/bRRe2tpZSzn+eFccxkV2oJC8VB4NPQfe2pivK5xa4UXYBEXzCdQ+EVX1CVF/vhTpNx3wQo5Nw04mwqVp+AbdZykfM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737005278; c=relaxed/simple;
-	bh=L60Ehz5m9IlSHWYuC/xkkOu/iLMWCIP63jqc9uA7u9Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=maB2UEPEw7CWxRMzTfbMYksBqam8e6opFv2zx0T0UiaAdXB4eOh1KBwLkM91X27UBoH1aLXNFGjGtpiViCa6rQgop0gnHO5vzzmfQnmtfK/dDVA2TQf2PNk8tm1fnRuE9dUuQ5W4Sj4yFtzFHB0DCO0i9F3SAzWcl7UIoNdrikE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2sAGMil+; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3a7dfcd40fcso65465ab.1
-        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 21:27:56 -0800 (PST)
+	s=arc-20240116; t=1737005425; c=relaxed/simple;
+	bh=5xQA7+rcyNu9tK/Yw0+0NEwKQ5hjxrD+NiJB5k0WJ3A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hIYwwEmtMCUz/y7ZnzEul/hXEBpqsah4KyoqQNadL2Rpwkx3xsLH4Kj5wE8hGxnFpsP6rFiJB0RHUkW0GerD+gfgjgzsPJTG2UCKmJyptROwwmpvi81zBoSTy+zjBaEG+WdJxojG8/OcdkI1Ub0xWkQmkRBcH15q5rkkW0mpn8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=Ct3biXum; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-216728b1836so7556125ad.0
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 21:30:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737005276; x=1737610076; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2v09XF9zQzvlNY8SqkOSgO3dMkdliSd6tfrxxCHfKAg=;
-        b=2sAGMil+7FdujYSPxVePcV9jgFo8Xz787j4hOlLOCNG72ZDNA/LphtFGOUsY//Sh4i
-         xLe3fr9fceOXZsjgfcEhFNKF/Uj+HEm1Y6N3pZjRiLp/aiTRsu+J+bheV/tN9ls4geXu
-         wN/25PoHh+84/5WhtJ+miz/p5Ek/PxCRGh1a3+arM04M9TJiGdhyjIvs0qtwlRZByNAb
-         iNbGQI30OXYhH43hM0jVKrYN8OCiuDkRf3xVizT1QqGlC2I9kNFnhDMJ6LLFyby8vMOK
-         /uThP7TQceOMVz84DtcYHGzoioi1VnetDeiaPmpXutu+DwFqnz0P1ggWGge5x3KefHpx
-         4hOA==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737005423; x=1737610223; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t85mZgz2Rs3YU6wJKJ13zARpOEqd4Q3PLwsjti7bxDQ=;
+        b=Ct3biXumbZ8x4r0PTptGSo33l1ZLQq70j+BXPuYlXDxxLJXQ4YcrYRh6tfR4fqabOO
+         7IeiK5xCteU9Vy+4qe450Pnfr2Euqbt18+XnTorYKyKIYMkFT7SDvS8ncvLI+1eAQ3r5
+         P+YXsb0U7hsQoWS+y+X+e7seAJulj40sCCXhTt1v04y6vy8MFGUGjBinqOnS2ZFZQ8oW
+         6lcENAShZx40W+kYt2UJ/uHkL5krmNWY8/ycNeJJS8gIhXKrOrv95+U7o+hVCwTkMwOI
+         prMxEBejHxG52OIxExbzNjDyU1H3jqMeCvhi4I94A35lsy2evEJ96aXm0KBcp1OfWQe1
+         s6wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737005276; x=1737610076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2v09XF9zQzvlNY8SqkOSgO3dMkdliSd6tfrxxCHfKAg=;
-        b=GifCV7fXdOry7dAPL5A4JV0JzhBPHOUy932ZueSRfmUvS7Zyl36WQ1yoU7UQSEU12g
-         G5Asa8A65Bg4nFwxxPbX/0PsF8GKjVb8sBFcgVwhVbHuXydYGSjBUAGPj6Wim/ezMo6M
-         fqez4xXmjVtQDoBFvCB1Aijxr+J+wo/lsaYcnHrzsfBQywmbwaWBjgVALval06Wzlg8Z
-         TC79c7FuTmqNYm6ZSf/Y0yz/KO99reLMaT6ENAqqTlvpAfuH6nJ+9f5Jq3DXbgXvqWdu
-         EysSw33YRbi2G9AxmvEKUd54Lm4iAGxzBPp+lW4GH9Zsxp10TIN+P1kYiiy3wymJzVZ8
-         ormA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+K+Ei32Y23pkoTkv9/vA13zqClUslnB3hE7sk/DJ4vjP/hC/bg6aflV0D8fQx+J//WV4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjC0NPGuoicNot5xw/oR5YNooslRBjHWo7/ZF+iuftZOCNuKC1
-	VVUAwgZImYRNI3w8vrb385Pb/w4/kXIztFopfNgquQ0qTzYSXdsiUJlOCnr5teFXgvXJGU9uJVE
-	t4L4mnEqAXgQdM6XOLPBwUESR+l9qT6u/qTvd
-X-Gm-Gg: ASbGnctib3cUzxfyVcA243nXhsixkf/Q6rSKe/3J78l+WK6YCrMmvVa7BUNIezLhuth
-	eBSjXZG403e7S27X3XuLax4cdYgFx2xE8Mhyq9g==
-X-Google-Smtp-Source: AGHT+IEX0Kmq1j9tecJbTclxt72vIPZEI7ZYaku7Q5PHfm7vk1vO1fGSpG1blnXeJT3IvzQfoa/mkgZ0d4gBi9kVrr4=
-X-Received: by 2002:a05:6e02:20e4:b0:3ab:502c:b526 with SMTP id
- e9e14a558f8ab-3cee0bf9f62mr2027715ab.28.1737005275711; Wed, 15 Jan 2025
- 21:27:55 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737005423; x=1737610223;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t85mZgz2Rs3YU6wJKJ13zARpOEqd4Q3PLwsjti7bxDQ=;
+        b=LaS1ROEJHpkPmLSobhhgJqOJ7S/JbDGlG7kKdtpsrQcNM06hinrn4IsQVRkW2WfWvG
+         xd7tI8gNMeWL/i+bwnikg+/soS7pHbs/JUPqgTCaovmMysYv15EP4vuW7rp+H15r8FHS
+         ulIDF9rFgcKWDiiPlwgK9IL8EXoSnnOWFda7miDn+tutWBGGBLLiTf4Z4f2t2bc9e/cL
+         2F6gFPZJwLv3fNplOBlWDz1ej9h85muKQ9DxZBX1cevl7JVDxXzOZ8sAIwPYC/ymfUU2
+         YgOnsTorOkRbD8s6YPykvH9IjS0BZk9ED2gpDP9pCj6OhBRp4mKU5WxF79oZkbQ6iHKE
+         e5PA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5ZuFQ4pVeFs0UEh86nEghlhl5NsQgfQ+BUwcB+ks1RlT5mUDl/bxEgzLOvvTD51unQHs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxteOYXbrN/dR8uLamDbhmhZMGpHAvaj6EMHmyCA7jeiPwuIlRz
+	/3oUiAQvbuc/rg/QGe0hHhsQBk5KiPn1UavGo8HeUWP1+hHiCAqXAg7LszzbHwI=
+X-Gm-Gg: ASbGncumNHMSuDpSg8Swk/4R/Zr3sw89oUlMPVz7lJRhduc9XmfOg9MMgNCYIujS+gX
+	T0WoTP6XbE4SKmDWxazhe6Qa5aMv18ryvWroVF0eLT9QfdMrw/5qVkJBI6zzLWpftTY033L3YLa
+	KPvHAlPoi+KkGPLn252hHpdD4Px5k8BJXn8RqaLmR7720/J152ul5h271mAAuUwze40s9dLMfDi
+	WLhcYnD+W5HKsOJKuM8HczcxEFW9+Ej25tBGZH39l9MC6gFpAWEX8JLIn9yKSzuryg=
+X-Google-Smtp-Source: AGHT+IEwP5ZyOaLIZ2+ZynbDYG6rMIezxsEt9Oeopwo0vGbe1vdYSLm0vMdAkgahtQxltszD6eVILA==
+X-Received: by 2002:a17:902:ea0a:b0:216:682f:175 with SMTP id d9443c01a7336-21a840029a0mr517608085ad.49.1737005423363;
+        Wed, 15 Jan 2025 21:30:23 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f217565sm90290735ad.125.2025.01.15.21.30.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jan 2025 21:30:22 -0800 (PST)
+Message-ID: <cc79bef1-c24e-448d-bc20-f8302e341b2c@daynix.com>
+Date: Thu, 16 Jan 2025 14:30:16 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116035008.43404-1-yosryahmed@google.com>
-In-Reply-To: <20250116035008.43404-1-yosryahmed@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Wed, 15 Jan 2025 21:27:44 -0800
-X-Gm-Features: AbW1kvamF9KeS-hJzKHDfuO7gQ1lt4YSKOxRPBVo0iiUMJMiiVQnV-u_XjNOCtc
-Message-ID: <CALMp9eQoGsO8KvugXP631tL0kWbrcwMrPR_ErLa9c9-OCg7GaA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: Always use TLB_FLUSH_GUEST for nested VM-Enter/VM-Exit
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
+ <20250109-tun-v2-3-388d7d5a287a@daynix.com>
+ <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
+ <20250110052246-mutt-send-email-mst@kernel.org>
+ <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
+ <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
+ <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
+ <CACGkMEvBU3mLbW+-nOscriR-SeDvPSm1mtwwgznYFOocuao5MQ@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEvBU3mLbW+-nOscriR-SeDvPSm1mtwwgznYFOocuao5MQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 15, 2025 at 7:50=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com>=
- wrote:
->
-> nested_vmx_transition_tlb_flush() uses KVM_REQ_TLB_FLUSH_CURRENT to
-> flush the TLB if VPID is enabled for both L1 and L2, but they still
-> share the TLB tag. This happens if EPT is disabled and KVM fails to
-> allocate a VPID for L2, so both the EPTP and VPID are shared between L1
-> and L2.
+On 2025/01/16 10:06, Jason Wang wrote:
+> On Wed, Jan 15, 2025 at 1:07 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2025/01/13 12:04, Jason Wang wrote:
+>>> On Fri, Jan 10, 2025 at 7:12 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
+>>>>> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
+>>>>>> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>>
+>>>>>>> The specification says the device MUST set num_buffers to 1 if
+>>>>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+>>>>>>
+>>>>>> Have we agreed on how to fix the spec or not?
+>>>>>>
+>>>>>> As I replied in the spec patch, if we just remove this "MUST", it
+>>>>>> looks like we are all fine?
+>>>>>>
+>>>>>> Thanks
+>>>>>
+>>>>> We should replace MUST with SHOULD but it is not all fine,
+>>>>> ignoring SHOULD is a quality of implementation issue.
+>>>>>
+>>>
+>>> So is this something that the driver should notice?
+>>>
+>>>>
+>>>> Should we really replace it? It would mean that a driver conformant with
+>>>> the current specification may not be compatible with a device conformant
+>>>> with the future specification.
+>>>
+>>> I don't get this. We are talking about devices and we want to relax so
+>>> it should compatibile.
+>>
+>>
+>> The problem is:
+>> 1) On the device side, the num_buffers can be left uninitialized due to bugs
+>> 2) On the driver side, the specification allows assuming the num_buffers
+>> is set to one.
+>>
+>> Relaxing the device requirement will replace "due to bugs" with
+>> "according to the specification" in 1). It still contradicts with 2) so
+>> does not fix compatibility.
+> 
+> Just to clarify I meant we can simply remove the following:
+> 
+> """
+> The device MUST use only a single descriptor if VIRTIO_NET_F_MRG_RXBUF
+> was not negotiated. Note: This means that num_buffers will always be 1
+> if VIRTIO_NET_F_MRG_RXBUF is not negotiated.
+> """
+> 
+> And
+> 
+> """
+> If VIRTIO_NET_F_MRG_RXBUF has not been negotiated, the device MUST set
+> num_buffers to 1.
+> """
+> 
+> This seems easier as it reflects the fact where some devices don't set
+> it. And it eases the transitional device as it doesn't need to have
+> any special care.
 
-Nit: Combined and guest-physical TLB tags are based on EPTRTA (the new
-acronym for EP4TA), not EPTP. But, in any case, with EPT disabled,
-there are no combined or guest-physical mappings. There are only
-linear mappings.
+That can potentially break existing drivers that are compliant with the 
+current and assumes the num_buffers is set to 1.
 
-> Interestingly, nested_vmx_transition_tlb_flush() uses
-> KVM_REQ_TLB_FLUSH_GUEST to flush the TLB for all other cases where a
-> flush is required.
->
-> Taking a close look at vmx_flush_tlb_guest() and
-> vmx_flush_tlb_current(), the main differences are:
-> (a) vmx_flush_tlb_current() is a noop if the KVM MMU is invalid.
-> (b) vmx_flush_tlb_current() uses INVEPT if EPT is enabled (instead of
-> INVVPID) to flush the guest-physical mappings as well as combined
-> mappings.
->
-> The check in (a) is seemingly an optimization, and there should not be
-> any TLB entries for L1 anyway if the KVM MMU is invalid. Not having this
-> check in vmx_flush_tlb_guest() is not a fundamental difference, and it
-> can be added there separately if needed.
->
-> The difference in (b) is irrelevant in this case, because EPT being
-> enabled for L1 means that its TLB tags are tagged with EPTP and cannot
-> be used by L2 (regardless of whether or not EPT is enabled for L2).
+Regards,
+Akihiko Odaki
 
-The difference is also irrelevant because, as you concluded in the
-first paragraph, EPT is disabled in the final block of
-nested_vmx_transition_tlb_flush().
+> 
+> Then we don't need any driver normative so I don't see any conflict.
+> 
+> Michael suggests we use "SHOULD", but if this is something that the
+> driver needs to be aware of I don't know how "SHOULD" can help a lot
+> or not.
+> 
+>>
+>> Instead, we should make the driver requirement stricter to change 2).
+>> That is what "[PATCH v3] virtio-net: Ignore num_buffers when unused" does:
+>> https://lore.kernel.org/r/20250110-reserved-v3-1-2ade0a5d2090@daynix.com
+>>
+>>>
+>>>>
+>>>> We are going to fix all implementations known to buggy (QEMU and Linux)
+>>>> anyway so I think it's just fine to leave that part of specification as is.
+>>>
+>>> I don't think we can fix it all.
+>>
+>> It essentially only requires storing 16 bits. There are details we need
+>> to work out, but it should be possible to fix.
+> 
+> I meant it's not realistic to fix all the hypervisors. Note that
+> modern devices have been implemented for about a decade so we may have
+> too many versions of various hypervisors. (E.g DPDK seems to stick
+> with the same behaviour of the current kernel).
+ > >>
+>> Regards,
+>> Akihiko Odaki
+>>
+> 
+> Thanks
+> 
 
-> Use KVM_REQ_TLB_FLUSH_GUEST in this case in
-> nested_vmx_transition_tlb_flush() for consistency. This arguably makes
-> more sense conceptually too -- L1 and L2 cannot share the TLB tag for
-> guest-physical translations, so only flushing linear and combined
-> translations (i.e. guest-generated translations) is needed.
-
-And, as I mentioned above, with EPT disabled, there are no combined or
-guest-physical mappings.
-
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-
-I think the reasoning in the commit message can be cleared up a bit, but...
-
-Reviewed-by: Jim Mattson <mattson@google.com>
-
-> ---
->
-> I tested this by running all selftests that have "nested" in their name
-> (and not svm). I was tempted to run KVM-unit-tests in an L1 guest but I
-> convinced myself it's prompted by the change :)
->
-> ---
->  arch/x86/kvm/vmx/nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index aa78b6f38dfef..2ed454186e59c 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1241,7 +1241,7 @@ static void nested_vmx_transition_tlb_flush(struct =
-kvm_vcpu *vcpu,
->          * as the effective ASID is common to both L1 and L2.
->          */
->         if (!nested_has_guest_tlb_tag(vcpu))
-> -               kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-> +               kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
->  }
->
->  static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
-> --
-> 2.48.0.rc2.279.g1de40edade-goog
->
->
 
