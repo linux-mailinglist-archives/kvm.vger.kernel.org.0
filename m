@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-35666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35667-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53D0CA13CC5
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 15:51:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA0CA13CBF
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 15:50:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B48323AC652
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 14:50:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E27D188A996
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 14:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1866B22A7E2;
-	Thu, 16 Jan 2025 14:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF46B22B58E;
+	Thu, 16 Jan 2025 14:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="r4NCht0f"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="oKkNayVd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137F422E41B;
-	Thu, 16 Jan 2025 14:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F421E22B8CD;
+	Thu, 16 Jan 2025 14:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737038912; cv=none; b=tUjARbwsEULts3SYN3SR9OIpuXDujx8yR+9HP0q1OwEvgkoPhWrvO9y1UbTLTNOb6a5ngTc5JvFM/uOxEXxvOU/rqwkxXRajEr+IjQrDpZ+ftOddMn8qkJ3aF1rBzeq4WsgdBfQ8QlYcYj37DJGT+60wBlT/DzEbyQ2JfROdWsA=
+	t=1737038924; cv=none; b=lElGyQH2dPq/BTP82/5OrcFWOWkg3BTynlueXvZAIMNPG36BZPpNxpjGk3OLEpL8Yt55DrDOxCt+UfqWiHhmVU1O6o6mqMtb+SJNJPDU80Xr+myXUlLpKIqAfeqyO2WjN7Nl4R4UH8NffEnxEM7iD1mUDsJ8N+xyfjwsSCPQyps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737038912; c=relaxed/simple;
-	bh=5dwVwQPbFrti9t7CAKA+y94hpM9MdXgbzD/qrj0kprA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=N3KCG36s9uZhPV3Qv6nCq9lHXGF8MPTE/XZewO+q4Xa3Xd749mIWDmo6M1klJQ0lODNVlfXqQWL+VL3/FDG3pXR4QpL4i2e4I4ux9adbTMHvhjv6p+d/044GIUzwPpF4hxqKXe8vyKdtyss13VhCgQZOqHjWQlJ2D29qSXpLn/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=r4NCht0f; arc=none smtp.client-ip=72.21.196.25
+	s=arc-20240116; t=1737038924; c=relaxed/simple;
+	bh=4QoNlBLBRChBVSRPM3v23xepC1bjNn8Qo5BFmw1znwI=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=H4Rrsdgs54SYOIaypN8kUuPHXUnuu2W5zIjlwEun5/MfMpDNf5Q7ft2+Wg2b9IoDG7lARXaLt5wbHeqOR7K6IF+9owa3T+1fslwwxJUKgFBvJdg/Jcbf3cPgihRDTtQ0upaWNpLH/8DOPrDpIbgvfGrYMlwH6aU01HV9kDRJO3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=oKkNayVd; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1737038910; x=1768574910;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=fG4taAKUdQ5Hh7V+qy1Jc/FBV9g1o2/PtE50ldwn630=;
-  b=r4NCht0feVTPWHYfCy4bbeqffTsf27OTN9qi2amCRAPHoTcMkWA34ZoV
-   l34o7rvBO9AkBZrELUbQlfaaonMG78gcUkR9W73IM72F2L1267omTCGua
-   eijg3KvtG5exS+QdgtdoPoj3H5qDMpkt2IRNqLmA/Ro+xf/XsqKCxhEc/
-   M=;
+  s=amazon201209; t=1737038922; x=1768574922;
+  h=message-id:date:mime-version:from:subject:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=PJBYQ3uryckyAO6cux7hKD8JE0wu1xm8ATaH9PcGq0M=;
+  b=oKkNayVdyIhbI7Snnj5xkoNC0cMzfxOvb49WdBKVjDB/L+Pavz3io4uT
+   cWYQDAflvbR/3R8l0vvvyNeDJCMKNSzFNxCn/GH19JbuWQj9J9CATyEuZ
+   rghoWjTdooPg4oxRqrfUJBvJrvPTKKRfinBYOFtH1gQI3l6XCIZN0ohsM
+   s=;
 X-IronPort-AV: E=Sophos;i="6.13,209,1732579200"; 
-   d="scan'208";a="459317083"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 14:48:26 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:24824]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.12:2525] with esmtp (Farcaster)
- id d87e80ce-d7ed-4551-924f-bf0789fff6ba; Thu, 16 Jan 2025 14:48:25 +0000 (UTC)
-X-Farcaster-Flow-ID: d87e80ce-d7ed-4551-924f-bf0789fff6ba
-Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+   d="scan'208";a="263572466"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 14:48:38 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:60350]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.33:2525] with esmtp (Farcaster)
+ id 9ac5c0d5-603c-496c-8529-95dcfbf67d23; Thu, 16 Jan 2025 14:48:37 +0000 (UTC)
+X-Farcaster-Flow-ID: 9ac5c0d5-603c-496c-8529-95dcfbf67d23
+Received: from EX19MTAUWB002.ant.amazon.com (10.250.64.231) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 16 Jan 2025 14:48:22 +0000
-Received: from email-imr-corp-prod-iad-all-1a-8c151b82.us-east-1.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
+ Thu, 16 Jan 2025 14:48:36 +0000
+Received: from email-imr-corp-prod-iad-1box-1a-9bbde7a3.us-east-1.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.228) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Thu, 16 Jan 2025 14:48:22 +0000
+ 15.2.1258.39 via Frontend Transport; Thu, 16 Jan 2025 14:48:36 +0000
 Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
-	by email-imr-corp-prod-iad-all-1a-8c151b82.us-east-1.amazon.com (Postfix) with ESMTPS id 2E40D4041A;
-	Thu, 16 Jan 2025 14:48:14 +0000 (UTC)
-Message-ID: <31f1229d-40c8-4a75-b0f1-be315150379f@amazon.co.uk>
-Date: Thu, 16 Jan 2025 14:48:13 +0000
+	by email-imr-corp-prod-iad-1box-1a-9bbde7a3.us-east-1.amazon.com (Postfix) with ESMTPS id D06C142230;
+	Thu, 16 Jan 2025 14:48:28 +0000 (UTC)
+Message-ID: <9b5a7efa-1a65-4b84-af60-e8658b18bad0@amazon.co.uk>
+Date: Thu, 16 Jan 2025 14:48:27 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -69,8 +69,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 00/14] KVM: Restricted mapping of guest_memfd at
- the host and arm64 support
+From: Patrick Roy <roypat@amazon.co.uk>
+Subject: Re: [RFC PATCH v4 13/14] KVM: arm64: Handle guest_memfd()-backed
+ guest page faults
 To: Fuad Tabba <tabba@google.com>, <kvm@vger.kernel.org>,
 	<linux-arm-msm@vger.kernel.org>, <linux-mm@kvack.org>
 CC: <pbonzini@redhat.com>, <chenhuacai@kernel.org>, <mpe@ellerman.id.au>,
@@ -97,7 +98,7 @@ CC: <pbonzini@redhat.com>, <chenhuacai@kernel.org>, <mpe@ellerman.id.au>,
 	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
 	<xmarcalx@amazon.co.uk>, James Gowans <jgowans@amazon.com>
 References: <20241213164811.2006197-1-tabba@google.com>
-From: Patrick Roy <roypat@amazon.co.uk>
+ <20241213164811.2006197-14-tabba@google.com>
 Content-Language: en-US
 Autocrypt: addr=roypat@amazon.co.uk; keydata=
  xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
@@ -109,240 +110,205 @@ Autocrypt: addr=roypat@amazon.co.uk; keydata=
  IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
  7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
  8hlxFQM=
-In-Reply-To: <20241213164811.2006197-1-tabba@google.com>
+In-Reply-To: <20241213164811.2006197-14-tabba@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 
-Hi Fuad!
+On Fri, 2024-12-13 at 16:48 +0000, Fuad Tabba wrote:
+> Add arm64 support for resolving guest page faults on
+> guest_memfd() backed memslots. This support is not contingent on
+> pKVM, or other confidential computing support, and works in both
+> VHE and nVHE modes.
+> 
+> Without confidential computing, this support is useful forQ
+> testing and debugging. In the future, it might also be useful
+> should a user want to use guest_memfd() for all code, whether
+> it's for a protected guest or not.
+> 
+> For now, the fault granule is restricted to PAGE_SIZE.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 111 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 109 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 342a9bd3848f..1c4b3871967c 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1434,6 +1434,107 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+>         return vma->vm_flags & VM_MTE_ALLOWED;
+>  }
+> 
+> +static int guest_memfd_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> +                            struct kvm_memory_slot *memslot, bool fault_is_perm)
+> +{
+> +       struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
+> +       bool exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+> +       bool logging_active = memslot_is_logging(memslot);
+> +       struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
+> +       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+> +       bool write_fault = kvm_is_write_fault(vcpu);
+> +       struct mm_struct *mm = current->mm;
+> +       gfn_t gfn = gpa_to_gfn(fault_ipa);
+> +       struct kvm *kvm = vcpu->kvm;
+> +       struct page *page;
+> +       kvm_pfn_t pfn;
+> +       int ret;
+> +
+> +       /* For now, guest_memfd() only supports PAGE_SIZE granules. */
+> +       if (WARN_ON_ONCE(fault_is_perm &&
+> +                        kvm_vcpu_trap_get_perm_fault_granule(vcpu) != PAGE_SIZE)) {
+> +               return -EFAULT;
+> +       }
+> +
+> +       VM_BUG_ON(write_fault && exec_fault);
+> +
+> +       if (fault_is_perm && !write_fault && !exec_fault) {
+> +               kvm_err("Unexpected L2 read permission error\n");
+> +               return -EFAULT;
+> +       }
+> +
+> +       /*
+> +        * Permission faults just need to update the existing leaf entry,
+> +        * and so normally don't require allocations from the memcache. The
+> +        * only exception to this is when dirty logging is enabled at runtime
+> +        * and a write fault needs to collapse a block entry into a table.
+> +        */
+> +       if (!fault_is_perm || (logging_active && write_fault)) {
+> +               ret = kvm_mmu_topup_memory_cache(memcache,
+> +                                                kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
+> +               if (ret)
+> +                       return ret;
+> +       }
+> +
+> +       /*
+> +        * Holds the folio lock until mapped in the guest and its refcount is
+> +        * stable, to avoid races with paths that check if the folio is mapped
+> +        * by the host.
+> +        */
+> +       ret = kvm_gmem_get_pfn_locked(kvm, memslot, gfn, &pfn, &page, NULL);
+> +       if (ret)
+> +               return ret;
+> +
+> +       if (!kvm_slot_gmem_is_guest_mappable(memslot, gfn)) {
+> +               ret = -EAGAIN;
+> +               goto unlock_page;
+> +       }
+> +
+> +       /*
+> +        * Once it's faulted in, a guest_memfd() page will stay in memory.
+> +        * Therefore, count it as locked.
+> +        */
+> +       if (!fault_is_perm) {
+> +               ret = account_locked_vm(mm, 1, true);
+> +               if (ret)
+> +                       goto unlock_page;
+> +       }
+> +
+> +       read_lock(&kvm->mmu_lock);
+> +       if (write_fault)
+> +               prot |= KVM_PGTABLE_PROT_W;
+> +
+> +       if (exec_fault)
+> +               prot |= KVM_PGTABLE_PROT_X;
+> +
+> +       if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+> +               prot |= KVM_PGTABLE_PROT_X;
+> +
+> +       /*
+> +        * Under the premise of getting a FSC_PERM fault, we just need to relax
+> +        * permissions.
+> +        */
+> +       if (fault_is_perm)
+> +               ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
+> +       else
+> +               ret = kvm_pgtable_stage2_map(pgt, fault_ipa, PAGE_SIZE,
+> +                                       __pfn_to_phys(pfn), prot,
+> +                                       memcache,
+> +                                       KVM_PGTABLE_WALK_HANDLE_FAULT |
+> +                                       KVM_PGTABLE_WALK_SHARED);
+> +
+> +       kvm_release_faultin_page(kvm, page, !!ret, write_fault);
+> +       read_unlock(&kvm->mmu_lock);
+> +
+> +       if (ret && !fault_is_perm)
+> +               account_locked_vm(mm, 1, false);
+> +unlock_page:
+> +       unlock_page(page);
+> +       put_page(page);
 
-I finally got around to giving this patch series a spin for my non-CoCo
-usecase. I used the below diff to expose the functionality outside of pKVM
-(Based on Steven P.'s ARM CCA patch for custom VM types on ARM [2]).
-There's two small things that were broken for me (will post as responses
-to individual patches), but after fixing those, I was able to boot some
-guests using a modified Firecracker [1].
+There's a double-free of `page` here, as kvm_release_faultin_page
+already calls put_page. I fixed it up locally with
 
-Just wondering, are you still looking into posting a separate series
-with just the MMU changes (e.g. something to have a bare-bones
-KVM_SW_PROTECTED_VM on ARM, like we do for x86), like you mentioned in
-the guest_memfd call before Christmas? We're pretty keen to
-get our hands something like that for our non-CoCo VMs (and ofc, am
-happy to help with any work required to get there :)
-
-Best, 
-Patrick
-
-[1]: https://github.com/roypat/firecracker/tree/secret-freedom-mmap
-[2]: https://lore.kernel.org/kvm/20241004152804.72508-12-steven.price@arm.com/
-
----
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8dfae9183651..0b8dfb855e51 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -380,6 +380,8 @@ struct kvm_arch {
- 	 * the associated pKVM instance in the hypervisor.
- 	 */
- 	struct kvm_protected_vm pkvm;
++       unlock_page(page);
+ 	kvm_release_faultin_page(kvm, page, !!ret, write_fault);
+ 	read_unlock(&kvm->mmu_lock);
+ 
+ 	if (ret && !fault_is_perm)
+ 		account_locked_vm(mm, 1, false);
++       goto out;
 +
-+	unsigned long type;
- };
-
- struct kvm_vcpu_fault_info {
-@@ -1529,7 +1531,11 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
- #define kvm_has_s1poe(k)				\
- 	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
-
--#define kvm_arch_has_private_mem(kvm)					\
--	(IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) && is_protected_kvm_enabled())
-+#ifdef CONFIG_KVM_PRIVATE_MEM
-+#define kvm_arch_has_private_mem(kvm)  \
-+	((kvm)->arch.type == KVM_VM_TYPE_ARM_SW_PROTECTED || is_protected_kvm_enabled())
-+#else
-+#define kvm_arch_has_private_mem(kvm) false
-+#endif
-
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index fe3451f244b5..2da26aa3b0b5 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -38,6 +38,7 @@ menuconfig KVM
- 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
- 	select SCHED_INFO
- 	select GUEST_PERF_EVENTS if PERF_EVENTS
-+	select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
- 	select KVM_GMEM_MAPPABLE
- 	help
- 	  Support hosting virtualized guest machines.
-@@ -84,4 +85,10 @@ config PTDUMP_STAGE2_DEBUGFS
-
- 	  If in doubt, say N.
-
-+config KVM_SW_PROTECTED_VM
-+    bool "Enable support for KVM software-protected VMs"
-+    depends on EXPERT
-+    depends on KVM && ARM64
-+    select KVM_GENERIC_PRIVATE_MEM
-+
- endif # VIRTUALIZATION
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a102c3aebdbc..35683868c0e4 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -181,6 +181,19 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	mutex_unlock(&kvm->lock);
- #endif
-
-+	if (type & ~(KVM_VM_TYPE_ARM_MASK | KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
-+		return -EINVAL;
-+
-+	switch (type & KVM_VM_TYPE_ARM_MASK) {
-+	case KVM_VM_TYPE_ARM_NORMAL:
-+	case KVM_VM_TYPE_ARM_SW_PROTECTED:
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	kvm->arch.type = type & KVM_VM_TYPE_ARM_MASK;
-+
- 	kvm_init_nested(kvm);
-
- 	ret = kvm_share_hyp(kvm, kvm + 1);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1c4b3871967c..9dbb472eb96a 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -869,9 +869,6 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
- 	u64 mmfr0, mmfr1;
- 	u32 phys_shift;
-
--	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
--		return -EINVAL;
+ unlock_page:
+ 	unlock_page(page);
+ 	put_page(page);
 -
- 	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
- 	if (is_protected_kvm_enabled()) {
- 		phys_shift = kvm_ipa_limit;
-@@ -2373,3 +2370,31 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
-
- 	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
++out:
+ 	return ret != -EAGAIN ? ret : 0;
  }
-+
-+#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-+bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
-+					struct kvm_gfn_range *range)
-+{
-+	/*
-+	 * Zap SPTEs even if the slot can't be mapped PRIVATE.  KVM only
-+	 * supports KVM_MEMORY_ATTRIBUTE_PRIVATE, and so it *seems* like KVM
-+	 * can simply ignore such slots.  But if userspace is making memory
-+	 * PRIVATE, then KVM must prevent the guest from accessing the memory
-+	 * as shared.  And if userspace is making memory SHARED and this point
-+	 * is reached, then at least one page within the range was previously
-+	 * PRIVATE, i.e. the slot's possible hugepage ranges are changing.
-+	 * Zapping SPTEs in this case ensures KVM will reassess whether or not
-+	 * a hugepage can be used for affected ranges.
-+	 */
-+	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
-+		return false;
-+
-+	return kvm_unmap_gfn_range(kvm, range);
-+}
-+
-+bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-+					 struct kvm_gfn_range *range)
-+{
-+	return false;
-+}
-+#endif
-\ No newline at end of file
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index b34aed04ffa5..214f6b5da43f 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -653,6 +653,13 @@ struct kvm_enable_cap {
-  * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
-  * value 0 implies the default IPA size, 40bits.
-  */
-+#define KVM_VM_TYPE_ARM_SHIFT		    8
-+#define KVM_VM_TYPE_ARM_MASK		    (0xfULL << KVM_VM_TYPE_ARM_SHIFT)
-+#define KVM_VM_TYPE_ARM(_type)		\
-+	(((_type) << KVM_VM_TYPE_ARM_SHIFT) & KVM_VM_TYPE_ARM_MASK)
-+#define KVM_VM_TYPE_ARM_NORMAL		    KVM_VM_TYPE_ARM(0)
-+#define KVM_VM_TYPE_ARM_SW_PROTECTED    KVM_VM_TYPE_ARM(1)
-+
- #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
- #define KVM_VM_TYPE_ARM_IPA_SIZE(x)		\
- 	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
 
+which I'm admittedly not sure is correct either because now the locks
+don't get released in reverse order of acquisition, but with this I
+was able to boot simple VMs.
 
-On Fri, 2024-12-13 at 16:47 +0000, Fuad Tabba wrote:
-> This series adds restricted mmap() support to guest_memfd, as
-> well as support for guest_memfd on arm64. It is based on Linux
-> 6.13-rc2.  Please refer to v3 for the context [1].
+> +
+> +       return ret != -EAGAIN ? ret : 0;
+> +}
+> +
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>                           struct kvm_s2_trans *nested,
+>                           struct kvm_memory_slot *memslot, unsigned long hva,
+> @@ -1900,8 +2001,14 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>                 goto out_unlock;
+>         }
 > 
-> Main changes since v3:
-> - Added a new folio type for guestmem, used to register a
->   callback when a folio's reference count reaches 0 (Matthew
->   Wilcox, DavidH) [2]
-> - Introduce new mappability states for folios, where a folio can
-> be mappable by the host and the guest, only the guest, or by no
-> one (transient state)
-> - Rebased on Linux 6.13-rc2
-> - Refactoring and tidying up
-> 
-> Cheers,
-> /fuad
-> 
-> [1] https://lore.kernel.org/all/20241010085930.1546800-1-tabba@google.com/
-> [2] https://lore.kernel.org/all/20241108162040.159038-1-tabba@google.com/
-> 
-> Ackerley Tng (2):
->   KVM: guest_memfd: Make guest mem use guest mem inodes instead of
->     anonymous inodes
->   KVM: guest_memfd: Track mappability within a struct kvm_gmem_private
-> 
-> Fuad Tabba (12):
->   mm: Consolidate freeing of typed folios on final folio_put()
->   KVM: guest_memfd: Introduce kvm_gmem_get_pfn_locked(), which retains
->     the folio lock
->   KVM: guest_memfd: Folio mappability states and functions that manage
->     their transition
->   KVM: guest_memfd: Handle final folio_put() of guestmem pages
->   KVM: guest_memfd: Allow host to mmap guest_memfd() pages when shared
->   KVM: guest_memfd: Add guest_memfd support to
->     kvm_(read|/write)_guest_page()
->   KVM: guest_memfd: Add KVM capability to check if guest_memfd is host
->     mappable
->   KVM: guest_memfd: Add a guest_memfd() flag to initialize it as
->     mappable
->   KVM: guest_memfd: selftests: guest_memfd mmap() test when mapping is
->     allowed
->   KVM: arm64: Skip VMA checks for slots without userspace address
->   KVM: arm64: Handle guest_memfd()-backed guest page faults
->   KVM: arm64: Enable guest_memfd private memory when pKVM is enabled
-> 
->  Documentation/virt/kvm/api.rst                |   4 +
->  arch/arm64/include/asm/kvm_host.h             |   3 +
->  arch/arm64/kvm/Kconfig                        |   1 +
->  arch/arm64/kvm/mmu.c                          | 119 +++-
->  include/linux/kvm_host.h                      |  75 +++
->  include/linux/page-flags.h                    |  22 +
->  include/uapi/linux/kvm.h                      |   2 +
->  include/uapi/linux/magic.h                    |   1 +
->  mm/debug.c                                    |   1 +
->  mm/swap.c                                     |  28 +-
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../testing/selftests/kvm/guest_memfd_test.c  |  64 +-
->  virt/kvm/Kconfig                              |   4 +
->  virt/kvm/guest_memfd.c                        | 579 +++++++++++++++++-
->  virt/kvm/kvm_main.c                           | 229 ++++++-
->  15 files changed, 1074 insertions(+), 59 deletions(-)
-> 
-> 
-> base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+> -       ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> -                            esr_fsc_is_permission_fault(esr));
+> +       if (kvm_slot_can_be_private(memslot)) {
+
+For my setup, I needed
+
+if (kvm_mem_is_private(vcpu->kvm, gfn))
+
+here instead, because I am making use of KVM_GENERIC_MEMORY_ATTRIBUTES,
+and  had a memslot with the `KVM_MEM_GUEST_MEMFD` flag set, but whose
+gfn range wasn't actually set to KVM_MEMORY_ATTRIBUTE_PRIVATE.
+
+If I'm reading patch 12 correctly, your memslots always set only one of
+userspace_addr or guest_memfd, and the stage 2 table setup simply checks
+which one is the case to decide what to fault in, so maybe to support
+both cases, this check should be
+
+if (kvm_mem_is_private(vcpu->kvm, gfn) || (kvm_slot_can_be_private(memslot) && !memslot->userspace_addr)
+
+?
+
+[1]: https://lore.kernel.org/all/20240801090117.3841080-1-tabba@google.com/
+
+> +               ret = guest_memfd_abort(vcpu, fault_ipa, memslot,
+> +                                       esr_fsc_is_permission_fault(esr));
+> +       } else {
+> +               ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> +                                    esr_fsc_is_permission_fault(esr));
+> +       }
+> +
+>         if (ret == 0)
+>                 ret = 1;
+>  out:
 > --
 > 2.47.1.613.gc27f4b7a9f-goog
+
+Best,
+Patrick
+
 
