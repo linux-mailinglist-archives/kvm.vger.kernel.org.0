@@ -1,135 +1,145 @@
-Return-Path: <kvm+bounces-35661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29CEBA13A2B
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 13:46:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA8E7A13A44
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 13:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CFB31677F0
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 12:46:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E710E188B2E7
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 12:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852441DE89B;
-	Thu, 16 Jan 2025 12:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F319D1DED55;
+	Thu, 16 Jan 2025 12:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qZCIV2cd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkTm3tgt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5230D1862;
-	Thu, 16 Jan 2025 12:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DE31DE3D9;
+	Thu, 16 Jan 2025 12:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737031591; cv=none; b=GrPmvdW7jT0x9N47owjaUjYpURnG9GRjR9zwINXaqbzfxGhisYK+6CXdOLkTpFOIAXuz1vuPoomDqyoENKIf7AjBnAEKEomMz8PJIN0D7hVRw1RKR7dlW9wJ8jiM/eQXYghF+5PJ71P2vbI36yq/daUAucFbtT8E4ezEP7nT7J8=
+	t=1737032044; cv=none; b=WsXcmrFK2Xj5LzYX70ecg7fE24vKPNWfb8pT9UeO67hyaqtC6eLnWs4DsMYOTN76BVXOUO/nXUVE2LiGFjqJs8z5LyHpfHids/UlgMpSWAGvx2E6BN5oCZxBPk5102KkxRHITBlBln+ZzXwXLvYIo7nfxBp0t2Dui/VWAfYhCug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737031591; c=relaxed/simple;
-	bh=CSZi2vuSwVAuEMKgEUD1yq79UGp0rUX0nY6XcGzVHuA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q8tXhxRDc+J8wPmTSEgYOOAM5u5IsFLm565VHcC7UWHAKKJNEOs1s3BP8Or+uFNcEuvaJvwwX+8xmiE1Hjrynib+2SZXkaW1jPBrbcaH1rPhKtkYodVdtL0zs6eeB9u+R8/xJUK/11wW5A4ikG/nYqXn/xR8jDpw7isMgmlYdRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qZCIV2cd; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50GC0DEJ024474;
-	Thu, 16 Jan 2025 12:46:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=r4MsKn
-	w7exanSMf5ImFTCKudH90P9LRAoegjqoMX0zQ=; b=qZCIV2cdrlz25YznaRJdu/
-	w6Wm6woJafe38GtAHiIuRO7FF1RRtao2A+lcCLTA9TpCGIR9CM7ouLGZP7JRh+wI
-	1KH7P3WfN3awZX2wy1Poeh3oqPC+zw8vhS+RFlE79X7BYwaEdP3QIa7jGJb+43PE
-	7PxhAYWzTPpery1HaCoFPHO9Gf4crR0TSYj1RI2CsAZJADEKPeTb+xrMZUFZtl7x
-	5fIzhgzto5GjPizeE6SEQL8nwbwrQSSSmwVkR4JKmOZemAczBQq4pKtJ/3M5njHV
-	tA10jzZgvjP83Oee/PTfKn4Fx4FFMdeK0WB7Vg7psVUIG8PCX2T3gfRDpOwIRyXA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446pub32x5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 12:46:25 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50GChnXd017491;
-	Thu, 16 Jan 2025 12:46:24 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446pub32x3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 12:46:24 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GATfU8017003;
-	Thu, 16 Jan 2025 12:46:24 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fkdsj3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 12:46:23 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GCkKER61407670
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Jan 2025 12:46:20 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 186C920043;
-	Thu, 16 Jan 2025 12:46:20 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D1A1020040;
-	Thu, 16 Jan 2025 12:46:19 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 Jan 2025 12:46:19 +0000 (GMT)
-Date: Thu, 16 Jan 2025 13:46:18 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        seanjc@google.com, seiden@linux.ibm.com
-Subject: Re: [PATCH v2 04/15] KVM: s390: fake memslot for ucontrol VMs
-Message-ID: <20250116134618.1fdbcbef@p-imbrenda>
-In-Reply-To: <044e5980-e297-4b24-b19a-c257a845097a@linux.ibm.com>
-References: <20250116113355.32184-1-imbrenda@linux.ibm.com>
-	<20250116113355.32184-5-imbrenda@linux.ibm.com>
-	<044e5980-e297-4b24-b19a-c257a845097a@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1737032044; c=relaxed/simple;
+	bh=/smTJtfyV4jnOqCiO5F5O17FS608/jSCKpjgFAeV7QM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=N6eD+rwjuD281Y/tq/Izetz2j0VpWAiPkXCG7ZWFM7oQ0XCG1He2w1FIxzqtn/J4STcDpLGPp3JRsDSE4l8v96kAG92Q7Ccz5MlJurdAG5cCYXWJaw1yMmrqNhrlwyDfDkDn46CnlE4TPT2leVo+KRLWE4rZ5c49XU/JDJZRRw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkTm3tgt; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-467a8d2d7f1so7764171cf.1;
+        Thu, 16 Jan 2025 04:54:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737032041; x=1737636841; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KQMffHB5V9jp1w/KCByUeoZ7ulffBvZYTaCL6OedkWM=;
+        b=YkTm3tgt/CqcpAZy8iDtx/pb1BgLvdvWORKFQvJXC+G+HBDmqP1BLWZ8yM55EulMbZ
+         XOIgjHTZLjayyltUDBLwCXWQkakWUkXT4+dWqeWXuyEKYbjXEqeW5rYuezZWfaMlj+O9
+         J/nIX2vW9x0ZdlvbI+qqkumCZtHqq84ObS9henHvGDtW77hrHEz96mC214wVq97FJQQD
+         iEc11AsZmG3sitUMNQoGokwssnhRaabQmMvhLDHJ/vKyZRXDso8j7dpEN4+y68V7BUD6
+         SUnrm8153JslZ5gYwH9sgXE4DhtQIAGjrI3nb22WkVcxizcL57tCyKrLOWKnMcrunRrx
+         H7Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737032041; x=1737636841;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KQMffHB5V9jp1w/KCByUeoZ7ulffBvZYTaCL6OedkWM=;
+        b=cOX9KcIjJELthFhppyo3R6UglxLr0LuYxssDrZIRsxT24AEEfJF0wkWR2cDZ/ef69v
+         gxaGiLdhSku1B2TZ9FG9RBCQspmza85ZnkpKpmkULHocqjRlFiLm0n0MCgigjRrunCnP
+         rUmNJlo7tj16APWb08R2xBKgCi930KdeC1H/5IhhVKYFk91GROKgDIOgbOImzINtfX0L
+         lc91G+JFapKaddFUPvMqZMREAl60BaihreCh8+ddo8XQHpylM8Tm2g+TBetfvL9fL+Zu
+         EJKfArQqyoYiHgoFBFWnVtvTWQuRj2Pg/nZ8RBQ4blvv5HG0AU1VDArekc0k1w/lrraQ
+         us8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUZouIgwORy3VW6fFkyxHrvJvCJcOwj8xda3a68t3MEGJbAa6FdwhkXtRtIqA/RWcbtw3pFMqAj@vger.kernel.org, AJvYcCVXFVHnrqdp8psi8otYsSx89uGkdqOFjte9evNp+sCcXxDkDM3cvTSPfpsGQmL3rY2J7xR16Nw5sRUfiVIoT7ZT@vger.kernel.org, AJvYcCWN5W/WRBHnWJJkYQb/lj64w4jLKs9ZVDVM+YRPA3JhZAPJi/vbfL8aAyYiqT8Y7MMZput6S+Ezb0wAY4yL@vger.kernel.org, AJvYcCWOEHmjxEaTV9lrWvr0QywswI3je3PXjoATyeWmrP1tfaOmlYk8NZwcajzzlwF5ji3jttM/zSxZVQzY@vger.kernel.org, AJvYcCXxPfg1go9vizdvYEIEFZ40N8IG606ug46kSLFm2n9naGIHcy/4qIAudkjLebkh9cvmdWo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxh0WeEmNicoFXrMiQdsVhgErcoFWDpi9WhkTUz8u1hqlLhPwEu
+	vuk76nMMp6QW26ppNifRyIBvmuz111paRmw1zL2slk/3RMu3t8+1
+X-Gm-Gg: ASbGnctJhibUyjptfJp1/y5YyhZ13t9u6PjBdrgcplc0Bq7MZfISrDv2L8poGiMs0fC
+	dqRn576agwbBy07UFROMaURRf+8COa8N+8FN11Tfe8/bsElQlzLa41RHyLhk+QHXNedF86o0jML
+	Oayc6SkPLKXv9lWnZCe1KtWHVKRkR8NcVcuruUpt+Ch/e/Yc9Bqfj8bjlpgUN8lYQPYhAGf/DKd
+	AG1E69fWE2sMTWCtcQnPvxxiVZNqklnV0IjAaLRNWP8v/GGK0PzD4F3z6abXQHM6T7GOG+bW+bN
+	GvR+2QhL8hVfedNAqI0y/7udtFTh
+X-Google-Smtp-Source: AGHT+IGAPwHCulVk3YA3srEPPAkpgIxRZlbJrc49E6sk7X4J2EiUFlVkp6rRmzHsvgqlARBJ+pjj/Q==
+X-Received: by 2002:ac8:5705:0:b0:466:85eb:6123 with SMTP id d75a77b69052e-46c71003317mr520830751cf.22.1737032041353;
+        Thu, 16 Jan 2025 04:54:01 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfade72b59sm75303556d6.87.2025.01.16.04.54.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 04:54:00 -0800 (PST)
+Date: Thu, 16 Jan 2025 07:54:00 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ devel@daynix.com
+Message-ID: <678901682ff09_3710bc2944f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250116031331-mutt-send-email-mst@kernel.org>
+References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
+ <20250116031331-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH net v3 0/9] tun: Unify vnet implementation
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dd4jS2nQqwSCAD1JFtxcSXE_MpjXfdfF
-X-Proofpoint-ORIG-GUID: JiKHqj1zIlxy4mIoicMdyhkSee9TTKcC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-16_05,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- spamscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 mlxlogscore=897 clxscore=1015 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501160094
 
-On Thu, 16 Jan 2025 13:42:50 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> On 1/16/25 12:33 PM, Claudio Imbrenda wrote:
-> > Create a fake memslot for ucontrol VMs. The fake memslot identity-maps
-> > userspace.
+Michael S. Tsirkin wrote:
+> On Thu, Jan 16, 2025 at 05:08:03PM +0900, Akihiko Odaki wrote:
+> > When I implemented virtio's hash-related features to tun/tap [1],
+> > I found tun/tap does not fill the entire region reserved for the virtio
+> > header, leaving some uninitialized hole in the middle of the buffer
+> > after read()/recvmesg().
 > > 
-> > Now memslots will always be present, and ucontrol is not a special case
-> > anymore.
+> > This series fills the uninitialized hole. More concretely, the
+> > num_buffers field will be initialized with 1, and the other fields will
+> > be inialized with 0. Setting the num_buffers field to 1 is mandated by
+> > virtio 1.0 [2].
 > > 
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>  
+> > The change to virtio header is preceded by another change that refactors
+> > tun and tap to unify their virtio-related code.
+> > 
+> > [1]: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
+> > [2]: https://lore.kernel.org/r/20241227084256-mutt-send-email-mst@kernel.org/
+> > 
+> > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 > 
-> You'll need to update the Documentation because of the ucontrol 
-> EINVAL/EEXIST return change.
+> Will review. But this does not look like net material to me.
+> Not really a bugfix. More like net-next.
 
-ufff that fell off my brain cache; I'll fix it
++1. I said basically the same in v2.
 
-> 
-> I don't like having EEXIST as a return value but I also don't see a lot 
-> of gains in changing common code just so we can return the correct rc.
+Perhaps the field initialization is net material, though not
+critical until hashing is merged, so not stable.
+
+The deduplication does not belong in net.
+
+IMHO it should all go to net-next.
 
