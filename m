@@ -1,228 +1,164 @@
-Return-Path: <kvm+bounces-35671-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35672-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1EE3A13D92
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 16:24:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FF3AA13D96
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 16:26:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E9B4166AE6
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 15:24:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95A321675B1
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 15:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D645722B8B9;
-	Thu, 16 Jan 2025 15:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA72422B8CF;
+	Thu, 16 Jan 2025 15:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RqyOwaaN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gTGzNRU+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A7678F2B
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 15:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D8F22ACDC
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 15:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737041085; cv=none; b=qkc5feDu+TPM3kFaCFK7OX1kzdjIYyPCNQKyTOTja0Am4aFAI8MOB7DHi9cJ1POd50K0suknr0VRhBbjhagwK18qirBpMTXApfWvChZd7EwF7z6EyIteSmShEmB6cqxlhtnJ2Oi6cDRjI9+o7rFIAZRWu1HMOElCBPlY3dj+6OI=
+	t=1737041181; cv=none; b=N54//i6lRbsYrSsfa/9manPShhQ1314oAcI5lJA09voWVDvX8nMCUc2XnJpXw5O0EGfiU7LVh+TralACIeAmUrO5osE1t4nX3UohBJJ4MVWZCTOljhgkRrJPbYl1eizZHukeFb9+ouGxjCKFgjDrpw38fhNOteIl6T6+7pvz0Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737041085; c=relaxed/simple;
-	bh=qRU+G/ICvNjSpda689qHwFWzx6ROcuNqtJyvPx2bLpE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hj1qAH2LIFppcJPk+YmjndB52gqoNH0qgdhtQE8+8PByyxGcxWRYcaU4O4KMFHTh8YWrn2OcOlLPiSaM+gSYJoFH7Ap8mGZKgU7K6/U9vL95GaKRucG4PjN/dKktEbHC88X+9/0N9euoY/SpFZqiw5PFnM+HwbWOqpGWzvJl7jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RqyOwaaN; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1737041181; c=relaxed/simple;
+	bh=RhOOy9lmiSjVKobRKsfe0pSF6X4eKg4ca2n+GxqM8cM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J7s65gRs3PhusVUqX2fdxgWuTsp7ukcPHnp7969tnjMXyNPq9O/eJDIIYr5a4exwiQOb3l6VTaxJnZSw8TzalYh4IlbDxvZU/wMwmVa8PhusGwWqFkJprr5XAO1t1QhlUF6YozFLx2UxXIpOzzA/jnu7vxoMXwewefjEkwxGaxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gTGzNRU+; arc=none smtp.client-ip=209.85.219.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef79403c5eso3206895a91.0
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 07:24:43 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6d8f65ef5abso9493756d6.3
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 07:26:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737041082; x=1737645882; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ogc4PdmAGEvRxwmEx7kBGkRo+slthN0a5iOoXNsY9Rc=;
-        b=RqyOwaaNDptbFFTqtjeJiLFzon3bkPObqxleFzwsz5oXXzUtFS8+DPNi/tCaHIajVE
-         XXlOcZkO/az5OOqg1oYiupNvkxdZBGfMP47WYsbDw4LmeVODA7fuITwhvVQY4dSi+DTO
-         rBaLB9R6G+aevv/nG05t9p8MCr8AMpd0uT+4bSc8vN+pB7pCk3aoJQYB5obEvPPl/cR0
-         /5xPkvWdySLcIhGCpH1s4H738SGi30nt9mSnCWisicYJCttGsiatqVYsdDhJ/r1udDhj
-         RQ3+ZBQZS23qHPnrBF4JY4oZYnEL6z4Q/4pn8gVRxe8667KlBTtkxA/Ng9mevGq0ZG8Z
-         YkEw==
+        d=google.com; s=20230601; t=1737041178; x=1737645978; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7u+x3MkE2/d1WgfPW8yBcqQw0ONZ79mqMOQ0fEliI6Q=;
+        b=gTGzNRU+O9mYDF3xvbVJYYH4Lk4LiOX/v8p4uw0yTsgbpJK3LOUegDK3ZwgP8lIQMv
+         pt8X4DOGSYeEvaZ/wbfEpelIDRAWRGGC3ZZR4KOjT6nsJdvRtspArP6OQlPbzmOXHVUT
+         VDxD2yTRyfsDiULcSE0p51psEsvlNLe7ASFiTyxsCLLVXdFOpkt454rp7qwOv6wwNipP
+         lyvw0dtpJbiEDtzPkIh+xIBmTJF/Y2o7nWy7MXgSaMSBxQ2vxbQ94Wn9PXovi5z+Gy8N
+         la78FhvzgGjLO/UDIiKzLY9E2VJEQ4AkjZk3g0Kpfh5C/s05nvRw8LvpnscBPvinWiBh
+         J7JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737041082; x=1737645882;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ogc4PdmAGEvRxwmEx7kBGkRo+slthN0a5iOoXNsY9Rc=;
-        b=FosjoWdJMk8OJx5F1NWvVlAuaTFrGPJO4OFhuUsZ6H227CFKMDP/XDVhMYrJpeKSAK
-         u6ocTmRCuigemS96vPfL4dkBpj98+lvhKLA+BnXPjigyuZiiSMRp9R5lwZble33HTkvG
-         SXunaYXdrK4ss0EXxCozhRbFnPMyD3WEYPK6bsIhhV1W1XUoHZ1fbp4ILCiYkbI4mKTM
-         t75M7wt8z1XEA3+2Bl5vLd2WgYo/oG0DQZwb6dIprQF5OfA4UiEr5fK5tr2b3kBm+cf6
-         C4HlzzvCWI8zJRBlJpDi/VFyXUnlNVgscTCmeSj4vTmYobPVkiPO1Jcj0lGlsjf5mg6A
-         ivwA==
-X-Forwarded-Encrypted: i=1; AJvYcCWW6f+m3GDt0dyX6i5cMKUkpO5Bohv5xFxqIUw12kvnNu0eS0SPW9VUJVAP25u5IZoi8z8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo1Lz6B2DgJfoLVdl8ZVETHXD/h47gGzXa847TFgq684c54Wq8
-	Rt2Z/2LvvRfNl1S0CFw0aHeIBEhjGvzIAQFxnepjWHVFwPn87xAekKae7OZKzuOqNvG+aQl3l6D
-	24Q==
-X-Google-Smtp-Source: AGHT+IEc8ve7rFeYMBGxZNR6kPwRfkW4GzPtmE6qgJP7td0M778NtMjJKXXvNWNZVi/nqCGJMlh53eGvyZM=
-X-Received: from pjbqn5.prod.google.com ([2002:a17:90b:3d45:b0:2ea:61ba:b8f7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:da8e:b0:2ee:b0b0:8e02
- with SMTP id 98e67ed59e1d1-2f5490ac09cmr47207653a91.28.1737041082706; Thu, 16
- Jan 2025 07:24:42 -0800 (PST)
-Date: Thu, 16 Jan 2025 15:24:41 +0000
-In-Reply-To: <E5C85B8E-D8F8-408F-B00B-A3650C9320EA@gmail.com>
+        d=1e100.net; s=20230601; t=1737041178; x=1737645978;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7u+x3MkE2/d1WgfPW8yBcqQw0ONZ79mqMOQ0fEliI6Q=;
+        b=CEBdwcYlC9gp7Xa9NwC25XNx/0xtgEcoeNnghngNjPeKyfb7zaqnjgQH2z2U+2f5yL
+         //inwxDFFYVE+6mZdMoEoZ1zWsE1FhnbFyP5Gh9gnnLSECfuIvKdBhnuuos4oyLkzybv
+         pnhdJbngQXTLswDmct4ECa/fz5HZS3dwm+rPDLcetkB5MaVH4zfjr3Ikf7yupjq1+7vd
+         u8EoYJVwVKk6vY5WsK7UR7TR0RcA2Z9BUBhDSx7eRZFs+DrcxROph+yreWtg3gKHqXSd
+         fNW5Kwrgr2lSLDeQnibG7BHtsECY/JqqvVf/OU5ulZepLraJDQlgYZriFS7EqDznU8VA
+         rxsA==
+X-Forwarded-Encrypted: i=1; AJvYcCVMNt6yTG3N2Xt9IuzgzojQRPVfYZqc5heyX8CJIP3p9Z/rYMl+NtA9QmBjae9TQwDDfUY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxi4CCP1MAaRJxEB3M5NhavQ4BbUZKY0eWjOZbVD8tSeuEpTM62
+	afENd161gAsv3eqHo6KZMkaSQHdWvJ5J5v7wzb5cqKI8SkY1HClL2CRHaHL1/E3Ay4x/oMXRCvr
+	dz+bMk51wboyzxAqDTAQ6ZW4JryF6xRtZr9Ah
+X-Gm-Gg: ASbGncuMqFVBejjTrOfwf3dAI1ETks1OSDZvYqIysKe4rleHqy0ItFWhwBOZBUqNUCX
+	AoUafbzASSWb3ShS36/UsO7Vj3LqGKCKb+zA=
+X-Google-Smtp-Source: AGHT+IFJJdA052hQRUG4VEnN8RK8MfLIp7aE2ruxupjadKLnn6JTXqFeoq5SBp9WYc+8AZm1k9CNurC9UQJR88kaa+o=
+X-Received: by 2002:a05:6214:d4d:b0:6d8:b189:5412 with SMTP id
+ 6a1803df08f44-6df9b2ddd27mr518390216d6.31.1737041178141; Thu, 16 Jan 2025
+ 07:26:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAFtZq1FwJOtxmbf_NPgYP_ZH=PkXJfF0=cXo0xbGkT5TGv66-A@mail.gmail.com>
- <CAHk-=whnVemumt5AJ1f=rsGdLz4Fk95nZfoBchGmMWCGG63foQ@mail.gmail.com>
- <CAFtZq1FpLfbnJzqc_s=j9TBLyGxe9D_ZYZU2qiES5dgsBAWv+g@mail.gmail.com>
- <2025011646-chariot-revision-5753@gregkh> <E5C85B8E-D8F8-408F-B00B-A3650C9320EA@gmail.com>
-Message-ID: <Z4kkuaY_mJ6z0sa2@google.com>
-Subject: Re: Potential Denial-of-Service Vulnerability in KVM When Emulating
- 'hlt' Instruction in L2 Guests
-From: Sean Christopherson <seanjc@google.com>
-To: chichen241 <chichen241@gmail.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, 
-	Linus Torvalds <torvalds@linuxfoundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"security@kernel.org" <security@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250116035008.43404-1-yosryahmed@google.com> <CALMp9eQoGsO8KvugXP631tL0kWbrcwMrPR_ErLa9c9-OCg7GaA@mail.gmail.com>
+In-Reply-To: <CALMp9eQoGsO8KvugXP631tL0kWbrcwMrPR_ErLa9c9-OCg7GaA@mail.gmail.com>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Thu, 16 Jan 2025 07:25:41 -0800
+X-Gm-Features: AbW1kva4NTwKGPHHbyWkB7ae4q_qIfDsKbcxyAiYzHgxkzbelPg-7FAxz2aregc
+Message-ID: <CAJD7tkbHARZSUNmoKjax=DHUioP1XBWhf639=7twYC63Dq0vwg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: nVMX: Always use TLB_FLUSH_GUEST for nested VM-Enter/VM-Exit
+To: Jim Mattson <jmattson@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-+KVM and LKML to for archival, as this is not a DoS
+On Wed, Jan 15, 2025 at 9:27=E2=80=AFPM Jim Mattson <jmattson@google.com> w=
+rote:
+>
+> On Wed, Jan 15, 2025 at 7:50=E2=80=AFPM Yosry Ahmed <yosryahmed@google.co=
+m> wrote:
+> >
+> > nested_vmx_transition_tlb_flush() uses KVM_REQ_TLB_FLUSH_CURRENT to
+> > flush the TLB if VPID is enabled for both L1 and L2, but they still
+> > share the TLB tag. This happens if EPT is disabled and KVM fails to
+> > allocate a VPID for L2, so both the EPTP and VPID are shared between L1
+> > and L2.
+>
+> Nit: Combined and guest-physical TLB tags are based on EPTRTA (the new
+> acronym for EP4TA), not EPTP. But, in any case, with EPT disabled,
+> there are no combined or guest-physical mappings. There are only
+> linear mappings.
 
-On Thu, Jan 16, 2025, chichen241 wrote:
-> It seems that the attachment content is not convenient for you to see, so I
-> will reuse the email content to describe it.
+Interestingly, I did initially write EPTRTA, but I changed it to EPTP
+because that is the terminology used in nested_has_guest_tlb_tag().
+Anyway, I definitely don't mind changing it to EPTRTA.
 
-...
+>
+> > Interestingly, nested_vmx_transition_tlb_flush() uses
+> > KVM_REQ_TLB_FLUSH_GUEST to flush the TLB for all other cases where a
+> > flush is required.
+> >
+> > Taking a close look at vmx_flush_tlb_guest() and
+> > vmx_flush_tlb_current(), the main differences are:
+> > (a) vmx_flush_tlb_current() is a noop if the KVM MMU is invalid.
+> > (b) vmx_flush_tlb_current() uses INVEPT if EPT is enabled (instead of
+> > INVVPID) to flush the guest-physical mappings as well as combined
+> > mappings.
+> >
+> > The check in (a) is seemingly an optimization, and there should not be
+> > any TLB entries for L1 anyway if the KVM MMU is invalid. Not having thi=
+s
+> > check in vmx_flush_tlb_guest() is not a fundamental difference, and it
+> > can be added there separately if needed.
+> >
+> > The difference in (b) is irrelevant in this case, because EPT being
+> > enabled for L1 means that its TLB tags are tagged with EPTP and cannot
+> > be used by L2 (regardless of whether or not EPT is enabled for L2).
+>
+> The difference is also irrelevant because, as you concluded in the
+> first paragraph, EPT is disabled in the final block of
+> nested_vmx_transition_tlb_flush().
 
-> syz_kvm_setup_cpu(/*fd=*/vmfd, /*cpufd=*/vcpufd, /*usermem=*/mem,
-> /*text=*/&nop_text, /*ntext*/ 1,/*flags=*/-1, /*opts=*/opts, /*nopt=*/1); //
-> The nested vm will run '\x90\xf4', the vm will try to emulate the hlt
-> instruction and fail, entry endless loop.  ioctl(vcpufd, KVM_RUN, NULL);
-> printf("The front kvm_run will caught in loop. This code will not be
-> executed") } ```
-> linux kernel version: 6.12-rc7
-> Also I checked my mailbox and didn't see any quesiton from Sean. Maybe there's some mistake?
+I was trying to explain that even if EPT is enabled, sharing
+guest-physical translations between L1 and L2 should never be possible
+(and hence we should never worry about flushing these translations in
+nested_vmx_transition_tlb_flush()).  Now that I read it again it is
+not as clear as I had hoped.
 
-For posterity:
+>
+> > Use KVM_REQ_TLB_FLUSH_GUEST in this case in
+> > nested_vmx_transition_tlb_flush() for consistency. This arguably makes
+> > more sense conceptually too -- L1 and L2 cannot share the TLB tag for
+> > guest-physical translations, so only flushing linear and combined
+> > translations (i.e. guest-generated translations) is needed.
+>
+> And, as I mentioned above, with EPT disabled, there are no combined or
+> guest-physical mappings.
+>
+> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+>
+> I think the reasoning in the commit message can be cleared up a bit, but.=
+..
 
-  > > virtualization. When an L2 guest attempts to emulate an instruction
-  
-  How did you coerce KVM into emulating HLT from L2?
-  
-  > > using the x86_emulate_instruction() function, and the instruction to
-  > > be emulated is hlt, the x86_decode_emulated_instruction() function
-  > > used for instruction decoding does not support parsing the hlt
-  > > instruction.
-  
-  KVM should parse HLT just fine, I suspect the issue is that KVM _intentionally_
-  refuses to emulate HLT from L2, because encountering HLT in the emulator when L2
-  is active either requires the guest to be playing TLB games (e.g. generate an
-  emulated MMIO exit on a MOV, patch the MOV into a HLT), or it requires enabling
-  an off-by-default, "for testing purposes only" KVM module param.
-  
-  > > As a result, x86_decode_emulated_instruction() returns
-  > > ctxt->execute as null, causing the L2 guest to fail to execute the hlt
-  > > instruction properly. Subsequently, KVM enters an infinite loop,
-  
-  Define "infinite loop", i.e. what are the bounds of the loop?  If the "loop" is
-  KVM re-entering the guest on the same instruction over and over, then everything
-  is working as intended.
-  
-  > > repeatedly invoking x86_emulate_instruction() to perform the same
-  > > operation. This issue does not occur when the instruction to be
-  > > emulated by L2 is another standard instruction.
-  > >
-  > > Therefore, I am wondering whether this constitutes a denial-of-service
-  > > (DoS) vulnerability and whether a CVE number can be assigned.
-  
-  Unless your reproducer causes a hard hang in KVM, or prevents L1 from gaining
-  control from L2, e.g. via a (virtual) interrupt, this is not a DoS.  I can imagine
-  scenarios where L2 can put itself into an infinite loop, i.e. DoS itself, but
-  that's not a vulnerability in any reasonable sense of things.
-  
-  > > Generally, for software emulation in L1 guests, KVM's
-  > > x86_emulate_instruction() function will, after parsing the instruction
-  > > with x86_decode_emulated_instruction(), attempt to use
-  > > retry_instruction() to retry instruction execution.
-  
-  No, retry_instruction() is specifically for cases where KVM fails to emulate an
-  instruction _and_ the emulation was triggered by a write to guest PTE that KVM
-  is shadowing, i.e. a guest page that KVM has made read-only.  If certain criteria
-  were met, KVM will unprotect the page, i.e. make it writable again, and resume
-  the guest to let the CPU retry the instruction.
- 
-> ## DESCRIPTION in this file, the most code is from
-> syzkaller(executor/common_kvm_amd64.h), I mainly call the `syz_kvm_setup_cpu`
-> function and run the vm using ioctl `kvm_run`.  First I use
-> `syz_kvm_setup_cpu` to setup the vm to run a nested vm.  The second time the
-> `syz_kvm_setup_cpu` will turn on the TF bit in the eflag register of the
-> nested vm and let the nested vm run `nop;hlt` code.
-> When running kvm_run, the code will begin looping.
-> ## ANALYSE
-> The nested vm try to emulate the `hlt` code but failed, it will always try, caught in an endless loop.
+Agreed :) I am sure Sean will also want changes in the commit message anywa=
+y.
 
-The guest loops because the the guest's IDT is located in emulated MMIO space,
-and as suspected above, KVM refuses to emulates HLT for L2.
+>
+> Reviewed-by: Jim Mattson <mattson@google.com>
 
-The single-step #DB induced by RFLAGS.TF=1 triggers an EPT Violation as a result
-of the CPU trying to vector the #DB with the IDT residing in non-existent memory.
-At this point KVM *should* kick out to host userspace, as userspace is responsible
-for dealing with the emulate MMIO access during exception vectoring.
-
-           repro-1289    [019] d....   140.314684: kvm_exit: vcpu 0 reason EXCEPTION_NMI rip 0x1 info1 0x0000000000004000 info2 0x0000000000000000 intr_info 0x80000301 error_code 0x00000000
-           repro-1289    [019] .....   140.314685: kvm_nested_vmexit: vcpu 0 reason EXCEPTION_NMI rip 0x1 info1 0x0000000000004000 info2 0x0000000000000000 intr_info 0x80000301 error_code 0x00000000
-           repro-1289    [019] .....   140.314688: kvm_inj_exception: #DB
-           repro-1289    [019] d....   140.314688: kvm_entry: vcpu 0, rip 0x1
-           repro-1289    [019] d....   140.314704: kvm_exit: vcpu 0 reason EPT_VIOLATION rip 0x1 info1 0x0000000000000181 info2 0x0000000080000301 intr_info 0x00000000 error_code 0x00000000
-           repro-1289    [019] .....   140.314706: kvm_nested_vmexit: vcpu 0 reason EPT_VIOLATION rip 0x1 info1 0x0000000000000181 info2 0x0000000080000301 intr_info 0x00000000 error_code 0x00000000
-           repro-1289    [019] .....   140.314706: kvm_page_fault: vcpu 0 rip 0x1 address 0x0000000000001050 error_code 0x181
-           repro-1289    [019] .....   140.314708: kvm_inj_exception: #DB [reinjected]
-           repro-1289    [019] d....   140.314709: kvm_entry: vcpu 0, rip 0x1
-
-KVM misses the weird edge case, and instead ends up trying to emulate the
-instruction at the current RIP.  That instruction happens to be HLT, which KVM
-doesn't support for L2 (nested guests), and so KVM injects #UD.
-
-           repro-1289    [019] d....   140.314732: kvm_exit: vcpu 0 reason EPT_VIOLATION rip 0x1 info1 0x00000000000001aa info2 0x0000000080000301 intr_info 0x00000000 error_code 0x00000000
-           repro-1289    [019] .....   140.314749: kvm_emulate_insn: 0:1:f4 (prot32)
-           repro-1289    [019] .....   140.314751: kvm_emulate_insn: 0:1:f4 (prot32) failed
-           repro-1289    [019] .....   140.314752: kvm_inj_exception: #UD
-
-Vectoring the #UD suffers the same fate as the #DB, and so KVM unintentionally
-puts the vCPU into an endless loop.
-
-           repro-1289    [019] d....   140.314767: kvm_exit: vcpu 0 reason EPT_VIOLATION rip 0x1 info1 0x00000000000001aa info2 0x0000000080000306 intr_info 0x00000000 error_code 0x00000000
-           repro-1289    [019] .....   140.314767: kvm_nested_vmexit: vcpu 0 reason EPT_VIOLATION rip 0x1 info1 0x00000000000001aa info2 0x0000000080000306 intr_info 0x00000000 error_code 0x00000000
-           repro-1289    [019] .....   140.314768: kvm_page_fault: vcpu 0 rip 0x1 address 0x0000000000000f78 error_code 0x1aa
-           repro-1289    [019] .....   140.314778: kvm_emulate_insn: 0:1:f4 (prot32)
-           repro-1289    [019] .....   140.314779: kvm_emulate_insn: 0:1:f4 (prot32) failed
-
-> ## QUESTION
-> The phenomenon is due to the kvm's emulate function can't emulate all the
-> instructions.
-
-No, the issue is that KVM doesn't detect a weird edge case where the *guest* has
-messed up, and instead of effectively terminating the VM, KVM puts it into an
-infinite loop of sorts.
-
-Amusingly, this edge case was just "fixed" for both VMX and SVM[*] (expected to
-to land in v6.14).  In quotes because "fixing" the problem really means killing
-the VM instead of letting it loop.
-
-  [1/7] KVM: x86: Add function for vectoring error generation
-        https://github.com/kvm-x86/linux/commit/11c98fa07a79
-  [2/7] KVM: x86: Add emulation status for unhandleable vectoring
-        https://github.com/kvm-x86/linux/commit/5c9cfc486636
-  [3/7] KVM: x86: Unprotect & retry before unhandleable vectoring check
-        https://github.com/kvm-x86/linux/commit/704fc6021b9e
-  [4/7] KVM: VMX: Handle vectoring error in check_emulate_instruction
-        https://github.com/kvm-x86/linux/commit/47ef3ef843c0
-  [5/7] KVM: SVM: Handle vectoring error in check_emulate_instruction
-        https://github.com/kvm-x86/linux/commit/7bd7ff99110a
-  [6/7] selftests: KVM: extract lidt into helper function
-        https://github.com/kvm-x86/linux/commit/4e9427aeb957
-  [7/7] selftests: KVM: Add test case for MMIO during vectoring
-        https://github.com/kvm-x86/linux/commit/62e41f6b4f36
-
-[*] https://lore.kernel.org/all/173457555486.3295983.11848882309599168611.b4-ty@google.com
+Thanks for the quick review!
 
