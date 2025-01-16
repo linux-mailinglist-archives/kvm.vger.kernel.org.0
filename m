@@ -1,157 +1,177 @@
-Return-Path: <kvm+bounces-35697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10F0A1447C
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 23:29:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7680AA14480
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 23:35:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E839167034
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 22:29:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8E5B3A9C89
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 22:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218BF22BACC;
-	Thu, 16 Jan 2025 22:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3E51DDC33;
+	Thu, 16 Jan 2025 22:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SV1EuSvs"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9417413B58C;
-	Thu, 16 Jan 2025 22:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C8A1B0F30
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 22:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737066537; cv=none; b=YB2GgE3TighGNxwttKSMpxghBkn8ZqLiwolnaOxxmv1Jwn+QhkdOwyf+fOwl6m01wPiZMiJwbtp8PTE9PpOwLtjoMEiwgcA6NFeoWapYOugbHpeDsQJy34KWUwo23eeerDtiFluodIzpjeiIHSnKAF36pww+XP5qasKR0m5epDc=
+	t=1737066922; cv=none; b=inTECr+woA2LxnL6qKOmwZlOPBxYthHYMYysZcDESNpvF6uepZc1j/UcofV/tYeWAfUBpJAp7dRJKKdsWckQltbd1I7+TuA5g3VI55VUFkmndc/IdJX4kTVc3ptbtF0B8/g7BG6VzBalt1gkYuSDnuEeSNOe4oajAXsP0Yw/O88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737066537; c=relaxed/simple;
-	bh=z4Z21kOLF9xnwI/o2ML1cm/gAlvjMWxEDrwbA9fs3D4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rNlCc1NufJp2A6p5lQWbktpZKVM1Jmr22pnYpOwMElWnDlyTtH78kzsSxEaA6gYyugQc52+cWfPc/2G6JaC/UlWeVe4jBA/rtd0V7Ef+ieILOOAmkh2WtUuHgxZWXzV6BudTMYzXqeLz+MXlOTKusDJ7Dp7s8maZH9gswfygkLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3862C4CED6;
-	Thu, 16 Jan 2025 22:28:50 +0000 (UTC)
-Date: Thu, 16 Jan 2025 22:28:48 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Ankit Agrawal <ankita@nvidia.com>, David Hildenbrand <david@redhat.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"sebastianene@google.com" <sebastianene@google.com>,
-	"coltonlewis@google.com" <coltonlewis@google.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
- VMA flags
-Message-ID: <Z4mIIA5UuFcHNUwL@arm.com>
-References: <20241118131958.4609-2-ankita@nvidia.com>
- <a2d95399-62ad-46d3-9e48-6fa90fd2c2f3@redhat.com>
- <20250106165159.GJ5556@nvidia.com>
- <f13622a2-6955-48d0-9793-fba6cea97a60@redhat.com>
- <SA1PR12MB7199E3C81FDC017820773DE0B01C2@SA1PR12MB7199.namprd12.prod.outlook.com>
- <20250113162749.GN5556@nvidia.com>
- <0743193c-80a0-4ef8-9cd7-cb732f3761ab@redhat.com>
- <20250114133145.GA5556@nvidia.com>
- <SA1PR12MB71998E1E70F3A03D5E30DE40B0182@SA1PR12MB7199.namprd12.prod.outlook.com>
- <20250115143213.GQ5556@nvidia.com>
+	s=arc-20240116; t=1737066922; c=relaxed/simple;
+	bh=GkxjblgJIwnUrl7yFh0fd+yTdpnAxSdPyEOWBe1ogGw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=A0jXe5F1X0eRthujteZxHIDCVKKL3ujb8Kjvo9RbIXBBNMecO39atR7/pox3pgJWuLXjfXyXEbPngmGi6lm0jKCViYBPmdyjWwT/qyEG79gz3lCbyeppMc+NjsowTVLxpkJ/3ecMLZ7tO8Btb1utIU1mRRZBn9P+aBUPh6sFCSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SV1EuSvs; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21638389f63so20321535ad.1
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 14:35:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737066920; x=1737671720; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v7ZSFYoL0QJz/svIjPrUJ1gwe8KhLK+3Cjm89lweI1M=;
+        b=SV1EuSvswfQy9HHcKREsnyHyj61GabKtgGVmhkhflyUuO3laVEdZWcJX21iT9jE5Y+
+         QMd2CROseWDnJMBQd8uWXy36vybSegttTdDnDOpFxmOjPxeydj+VyWPBBSzSaP66PpS3
+         o1yppPTKojRrBLvA31JrrL4bg3CdJIw7E6CXFKPo8ppUt0U8sAfTIlaVqyQrqEF/Yiud
+         J+KQbeTi3S98gcsctthvmqW/5HrLspHm/kF1xw035ZIBXIw23NQBa4PnWHolMfenHasN
+         gleQv1mahlAx+sjrNdB3e1npTEkiHxgVlM7VgBwLyUKhP9EEd+55xK8dp63DW41KrTPA
+         63Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737066920; x=1737671720;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=v7ZSFYoL0QJz/svIjPrUJ1gwe8KhLK+3Cjm89lweI1M=;
+        b=Uyv/Op/7zO4YXl2MMDIT1PD4dum/nJT8FgvkydHPVB4RoiXkDjackxCSvjSrNwSFGW
+         FrnrrSWaa7pcol/haXCOyPKkdqJfsq8ZS62tkHFvqVX44HF+0dyxqIfSxOQo1fEyuQu9
+         HdBeP443CBafFtKbNeVhrpCKqWfLaTau3bXE2Cl6jgnI8Or+I+Z/G5C+G0DP4gDpM8Hb
+         y87z/hWP1sbU02ouw5rFdRXFh9jRV6WU5XKvbVLG2WarcFAh5KtgJ4q7S3hh7EOKSg0K
+         7Drrs+c2pklWv75XTqfRCMSGBYj6RrOKI/oLsXsIf93vfRHCvRcFnKoyQkEYKDdbzJ/h
+         AZIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJjEm/FzzmPhVP34RgdEpu5GKXo6JEfbepvZLfJfgQzcAU/68PgGFq9WH0XSN8dtq3XTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjZt0qaAcvV4weCAPO7t5ny8j4AQrdvv4EgtRSfJm6+s5S2iuI
+	SF1zIrldYxQaBpjw6LLqPBtM2ykcJ2bdnma8rulbj/eT5y2Za6AIrziXnefab6O+seEsm2l3SVF
+	D5g==
+X-Google-Smtp-Source: AGHT+IFfulyv5+xsasTh0o5vptCFt+1BlyveHLOPxD0zksiSehNzsehsAo+ZcCPpoa6N2tkYbS8sdiPukEE=
+X-Received: from pjbsl4.prod.google.com ([2002:a17:90b:2e04:b0:2f5:4762:e778])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:41c3:b0:216:4883:fb43
+ with SMTP id d9443c01a7336-21c35594385mr6635515ad.32.1737066920414; Thu, 16
+ Jan 2025 14:35:20 -0800 (PST)
+Date: Thu, 16 Jan 2025 14:35:18 -0800
+In-Reply-To: <CAJD7tkZQQUqh1GG5RpfYFT4-jK-CV7H+z9p2rTudLsrBe3WgbA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115143213.GQ5556@nvidia.com>
+Mime-Version: 1.0
+References: <20250116035008.43404-1-yosryahmed@google.com> <CALMp9eQoGsO8KvugXP631tL0kWbrcwMrPR_ErLa9c9-OCg7GaA@mail.gmail.com>
+ <CAJD7tkbHARZSUNmoKjax=DHUioP1XBWhf639=7twYC63Dq0vwg@mail.gmail.com>
+ <Z4k9seeAK09VAKiz@google.com> <CAJD7tkZQQUqh1GG5RpfYFT4-jK-CV7H+z9p2rTudLsrBe3WgbA@mail.gmail.com>
+Message-ID: <Z4mJpu3MvBeL4d1Q@google.com>
+Subject: Re: [PATCH] KVM: nVMX: Always use TLB_FLUSH_GUEST for nested VM-Enter/VM-Exit
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosryahmed@google.com>
+Cc: Jim Mattson <jmattson@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 at 10:32:13AM -0400, Jason Gunthorpe wrote:
-> On Tue, Jan 14, 2025 at 11:13:48PM +0000, Ankit Agrawal wrote:
-> > > Do we really want another weirdly defined VMA flag? I'd really like to
-> > > avoid this.. 
-> > 
-> > I'd let Catalin chime in on this. My take of the reason for his suggestion is
-> > that we want to reduce the affected configs to only the NVIDIA grace based
-> > systems. The nvgrace-gpu module would be setting the flag and the
-> > new codepath will only be applicable there. Or am I missing something here?
-> 
-> We cannot add VMA flags that are not clearly defined. The rules for
-> when the VMA creater should set the flag need to be extermely clear
-> and well defined.
-> 
-> > > Can't we do a "this is a weird VM_PFNMAP thing, let's consult the VMA
-> > > prot + whatever PFN information to find out if it is weird-device and
-> > > how we could safely map it?"
-> > 
-> > My understanding was that the new suggested flag VM_FORCE_CACHED
-> > was essentially to represent "whatever PFN information to find out if it is
-> > weird-device". Is there an alternate reliable check to figure this out?
-> 
-> For instance FORCE_CACHED makes no sense, how will the VMA creator
-> know it should set this flag?
-> 
-> > Currently in the patch we check the following. So Jason, is the suggestion that
-> > we simply return error to forbid such condition if VM_PFNMAP is set?
-> > +	else if (!mte_allowed && kvm_has_mte(kvm))
-> 
-> I really don't know enought about mte, but I would take the position
-> that VM_PFNMAP does not support MTE, and maybe it is even any VMA
-> without VM_MTE/_ALLOWED does not support MTE?
-> 
-> At least it makes alost more sense for the VMA creator to indicate
-> positively that the underlying HW supports MTE.
+On Thu, Jan 16, 2025, Yosry Ahmed wrote:
+> On Thu, Jan 16, 2025 at 9:11=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Thu, Jan 16, 2025, Yosry Ahmed wrote:
+> > > On Wed, Jan 15, 2025 at 9:27=E2=80=AFPM Jim Mattson <jmattson@google.=
+com> wrote:
+> > > > On Wed, Jan 15, 2025 at 7:50=E2=80=AFPM Yosry Ahmed <yosryahmed@goo=
+gle.com> wrote:
+> > > > > Use KVM_REQ_TLB_FLUSH_GUEST in this case in
+> > > > > nested_vmx_transition_tlb_flush() for consistency. This arguably =
+makes
+> > > > > more sense conceptually too -- L1 and L2 cannot share the TLB tag=
+ for
+> > > > > guest-physical translations, so only flushing linear and combined
+> > > > > translations (i.e. guest-generated translations) is needed.
+> >
+> > No, using KVM_REQ_TLB_FLUSH_CURRENT is correct.  From *L1's* perspectiv=
+e, VPID
+> > is enabled, and so VM-Entry/VM-Exit are NOT architecturally guaranteed =
+to flush
+> > TLBs, and thus KVM is not required to FLUSH_GUEST.
+> >
+> > E.g. if KVM is using shadow paging (no EPT whatsoever), and L1 has modi=
+fied the
+> > PTEs used to map L2 but has not yet flushed TLBs for L2's VPID, then KV=
+M is allowed
+> > to retain its old, "stale" SPTEs that map L2 because architecturally th=
+ey aren't
+> > guaranteed to be visible to L2.
+> >
+> > But because L1 and L2 share TLB entries *in hardware*, KVM needs to ens=
+ure the
+> > hardware TLBs are flushed.  Without EPT, KVM will use different CR3s fo=
+r L1 and
+> > L2, but Intel's ASID tag doesn't include the CR3 address, only the PCID=
+, which
+> > KVM always pulls from guest CR3, i.e. could be the same for L1 and L2.
+> >
+> > Specifically, the synchronization of shadow roots in kvm_vcpu_flush_tlb=
+_guest()
+> > is not required in this scenario.
+>=20
+> Aha, I was examining vmx_flush_tlb_guest() not
+> kvm_vcpu_flush_tlb_guest(), so I missed the synchronization. Yeah I
+> think it's possible that we end up unnecessarily synchronizing the
+> shadow page tables (or dropping them) in this case.
+>=20
+> Do you think it's worth expanding the comment in
+> nested_vmx_transition_tlb_flush()?
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 2ed454186e59c..43d34e413d016 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1239,6 +1239,11 @@ static void
+> nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+>          * does not have a unique TLB tag (ASID), i.e. EPT is disabled an=
+d
+>          * KVM was unable to allocate a VPID for L2, flush the current co=
+ntext
+>          * as the effective ASID is common to both L1 and L2.
+> +        *
+> +        * Note that even though TLB_FLUSH_GUEST would be correct because=
+ we
+> +        * only need to flush linear mappings, it would unnecessarily
+> +        * synchronize the MMU even though a TLB flush is not architectur=
+ally
+> +        * required from L1's perspective.
 
-Sorry, I didn't get the chance to properly read this thread. I'll try
-tomorrow and next week.
+I'm open to calling out that there's no flush from L1's perspective, but th=
+is
+is inaccurate.  Using TLB_FLUSH_GUEST is simply not correct.  Will it cause
+functional problems?  No.  But neither would blasting kvm_flush_remote_tlbs=
+(),
+and I think most people would consider flushing all TLBs on all vCPUs to be=
+ a
+bug.
 
-Basically I don't care whether MTE is supported on such vma, I doubt
-you'd want to enable MTE anyway. But the way MTE was designed in the Arm
-architecture, prior to FEAT_MTE_PERM, it allows a guest to enable MTE at
-Stage 1 when Stage 2 is Normal WB Cacheable. We have no idea what enable
-MTE at Stage 1 means if the memory range doesn't support it. It could be
-external aborts, SError or simply accessing data (as tags) at random
-physical addresses that don't belong to the guest. So if a vma does not
-have VM_MTE_ALLOWED, we either disable Stage 2 cacheable or allow it
-with FEAT_MTE_PERM (patches from Aneesh on the list). Or, a bigger
-happen, disable MTE in guests (well, not that big, not many platforms
-supporting MTE, especially in the enterprise space).
+How about:
 
-A second problem, similar to relaxing to Normal NC we merged last year,
-we can't tell what allowing Stage 2 cacheable means (SError etc). That's
-why I thought this knowledge lies with the device, KVM doesn't have the
-information. Checking vm_page_prot instead of a VM_* flag may work if
-it's mapped in user space but this might not always be the case. I don't
-see how VM_PFNMAP alone can tell us anything about the access properties
-supported by a device address range. Either way, it's the driver setting
-vm_page_prot or some VM_* flag. KVM has no clue, it's just a memory
-slot.
+	 * Note, only the hardware TLB entries need to be flushed, as VPID is
+	 * fully enabled from L1's perspective, i.e. there's no architectural
+	 * TLB flush from L1's perspective.
 
-A third aspect, more of a simplification when reasoning about this, was
-to use FWB at Stage 2 to force cacheability and not care about cache
-maintenance, especially when such range might be mapped both in user
-space and in the guest.
-
--- 
-Catalin
+>          */
+>         if (!nested_has_guest_tlb_tag(vcpu))
+>                 kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
 
