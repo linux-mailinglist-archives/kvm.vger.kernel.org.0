@@ -1,101 +1,128 @@
-Return-Path: <kvm+bounces-35637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0283EA13768
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 11:07:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86F35A137D6
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 11:27:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D876C1889594
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 10:07:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C80E47A2090
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 10:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C182E1DDC0B;
-	Thu, 16 Jan 2025 10:07:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9074C1DE2A6;
+	Thu, 16 Jan 2025 10:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W0p1KzHg"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="W8DHUTcS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CAD156C76
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 10:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184091DDC20;
+	Thu, 16 Jan 2025 10:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737022030; cv=none; b=Zcd0L5k13sG70tCOFh8K7UHDMAVvrNAMqq6OCbCbr2exMzbsBDgKpvRVTklwYwww8gHU7+L5qnN5BXsy0L5PL6ijHefEjPfeSuutC7iyEfScPRRHcixDsJBaBAXNv1PECTSLixs7P4H1HlIY6We6w376bqcgQI9GzQtZlsNQmKE=
+	t=1737023265; cv=none; b=URSJbb5DOAGqV5N2zcOXkHGRWGF8nK9qbCOQzcuu2hlczoIO5yR/UHygHfWxrLhC+Wc8LVALMD+jjhQ3Ez5jVPZyTd0E41VSnJn0eY/THQ9QidLer1rVgQtCPLWyR+dK16pI3Uk34yvFr8aUonsFTRttUX41EWQvWGy/u4LZhlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737022030; c=relaxed/simple;
-	bh=WvHkPKfyGXd9AjxOMUhOE94KeSUE1pQLqETm57wxMv4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rvhbMZkWbCWFfoUaKSqfY48V8khHsMUlI2sIrYB1i/qYZgnn4PzXn5pqJoRdmGjD4wDNe8X6eb7xfQRrNW9KeuziVjuXowS66a3hfNqzGGeV6w4Kx2Ow9q+8uVCU3HeyJ82xIUed09yo9EU3RAQ2S9N90qeGpK8g8JTFeOzHcag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W0p1KzHg; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4679b5c66d0so154721cf.1
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 02:07:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737022027; x=1737626827; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WvHkPKfyGXd9AjxOMUhOE94KeSUE1pQLqETm57wxMv4=;
-        b=W0p1KzHgXcmf2U/G7Zm25r2g2ljRQssTM2mRc5YsdEeMYXsRj+yd8dlP1dFrshJpia
-         L4hphCUkP2rj4b0JFiBsR4lis4yxARWoemISTsP0mXh/5J756G0fUirAssAw1Gl6swTV
-         /u3tPeV0FYUWnH1ms0TcOJR/whpMaB+xqrpTDcn10ibAmHAJiZexXt6KrMcx7B8AEY3b
-         34lZtS2BXXYysOJoCZtyV1u0XZw2nX9bCY//Ir5de5PPNJF1qu3/paw4MaoI2YXOE8Pd
-         RgeJTWabAJkvfSewU3WffkM6g2LW1diL9H6zIhcYUM9H4/FMUh146NfaYuvBYXnZKc24
-         fUZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737022027; x=1737626827;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WvHkPKfyGXd9AjxOMUhOE94KeSUE1pQLqETm57wxMv4=;
-        b=o0775E1YfbtTGlF0tmL8CelNLmHBJo4YuMwUAzGGRcIMJXWImQi2U1OdzlyfQUVfxZ
-         fT0ubHABihdSl4pHBjx4Mog4gCrLdfBgfel2hfhJhGgfyJjqU67uT+lS/Hajd4wdsyuG
-         X+ygi4wVJfQIKvPuhrNu3edcGbFFUzs8gFs5kWnF3DsYVc/rqKOrn6JR41BFYkVbxw21
-         xaKRfeppo97DvUSb2Uxmbhj4mbASfiN0q7PYQzXzoSrlOBMMpgjilTRThP8OTxqcX8lZ
-         z4zmuyR6yL0YVK76eE/T92IJktxZqFq/TzSLK7qQSkW5qIJByTG7PUpqXSy9++fuSJIE
-         RZfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVYhhKnR4+WqsmbEU0/eCg12yd7wZSVW6ceqZeiGa+ujS1R8uz+r9znwUft7Ek9PLwyDoA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsreUHiIF3W/VgdGHK25XDxEOOlORoQnUstQL5Oe/UPidU6qUk
-	UpWsGvN0Ao/qz1Aq45b3XEgZ+MmLx1y+CDy5b1RnsFc/hmLQlfVGn9NtlLNPq37zzTG2E6ZlMt4
-	2oFttTWjG9fRFkfka4ZyLiFq8tu3ypkzL1cCB
-X-Gm-Gg: ASbGncu5jPfKbS1Z59hkUbAyNvYRZksoKDETt+Qiqk0NZ8YtzjsQrPEIB4lFQLPNaL0
-	9y1iCFU8nsGKyw4TLWlWHPYNkNJcne4hLYCCuB0F/ddpnUlIAX9lsI8dzf6fVXXZYHb4=
-X-Google-Smtp-Source: AGHT+IFOMkwJSDq64zLXxSa6dw6mO+3SY/5E1TPwtyTlPAbmBc71F1ay07U9Ys+mXp6/C1CNJDS+iWjfJ88KfeUevR4=
-X-Received: by 2002:a05:622a:199e:b0:466:8887:6751 with SMTP id
- d75a77b69052e-46e054eddf4mr2032541cf.23.1737022027218; Thu, 16 Jan 2025
- 02:07:07 -0800 (PST)
+	s=arc-20240116; t=1737023265; c=relaxed/simple;
+	bh=mQ9UBts0hbUxM2dGwYUo8HcEDdN5Pe4O1LspCdVCA+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EmJrpl7/J2iVHRF1gK0i2bSecn8j7Gzb3VD99bKdo1s9VLkdlOu68ykOtAPs6VJ6nwe8ohy/CNKAMeZb9AZl4gnGenMEY9r/WKGzlWpmJgx6vluB48cn0+vGSdiANi1GUHZno2P+8Az2GKEHdz5Aww698hvs7kJu/sJ3aSHvXP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=W8DHUTcS; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50G3rUDI007900;
+	Thu, 16 Jan 2025 10:27:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=Q7PqrhVDsLrM1oPbf2UP51Y4f4+Msh
+	O+8/bYr5ovi6k=; b=W8DHUTcSU4373XFdJy8P1emOoQfypuQR8nHM2SKlaAkKVx
+	7C0mO0p+VmRQGDjDcoEqiZc32kOfr3aV6YJyevkbShMR09nFLS4nxYUZEVDWWeD7
+	un7hVqON5MADYnEfktI9zFy8g2l7ZnENlSuwotcEe3Bj+2tq7dG1FrUxpnjKo1y7
+	A+Fhwj2rt7QV72wWZufvvU7FQQpMJhFmzfIK+Jf3VB7PK0m+WJHy0n340n7+vGA1
+	kpIhzci8loGoUxa1npaWWRtuGCZnz4wf5BEZBABuBV1/z5JuIAFKXokg5kOGSvxB
+	oNrV9niUr1DzRQC1IvvusLfOGkdafhQd1e404BOw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkchn2e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 10:27:41 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50GAJHAZ030866;
+	Thu, 16 Jan 2025 10:27:40 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkchn2c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 10:27:40 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50G7ZN57000881;
+	Thu, 16 Jan 2025 10:27:40 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44456k50cw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 10:27:39 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GARaXR33489432
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Jan 2025 10:27:36 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7CA7B2037D;
+	Thu, 16 Jan 2025 10:27:36 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 520382037B;
+	Thu, 16 Jan 2025 10:27:36 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.60])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 16 Jan 2025 10:27:36 +0000 (GMT)
+Date: Thu, 16 Jan 2025 11:27:33 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Brendan Jackman <jackmanb@google.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH] kvm_config: add CONFIG_VIRTIO_FS
+Message-ID: <20250116102733.7207-B-hca@linux.ibm.com>
+References: <20241220-kvm-config-virtiofs-v1-1-4f85019e38dc@google.com>
+ <9c04640c-9739-4d5f-aba0-1c12c4c38497@linux.ibm.com>
+ <CA+i-1C3ncij1HLKGOdTC2FtpBY2Gajp8_3E3UrvNBYhs9Hu0dQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241220-kvm-config-virtiofs-v1-1-4f85019e38dc@google.com> <9c04640c-9739-4d5f-aba0-1c12c4c38497@linux.ibm.com>
-In-Reply-To: <9c04640c-9739-4d5f-aba0-1c12c4c38497@linux.ibm.com>
-From: Brendan Jackman <jackmanb@google.com>
-Date: Thu, 16 Jan 2025 11:06:56 +0100
-X-Gm-Features: AbW1kvZgJ_xYEHdNMI59zCSV7pIlY_aZBMf_JVoAUx67vx0p-sB2zIfWs7-2Jzw
-Message-ID: <CA+i-1C3ncij1HLKGOdTC2FtpBY2Gajp8_3E3UrvNBYhs9Hu0dQ@mail.gmail.com>
-Subject: Re: [PATCH] kvm_config: add CONFIG_VIRTIO_FS
-To: Christian Borntraeger <borntraeger@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+i-1C3ncij1HLKGOdTC2FtpBY2Gajp8_3E3UrvNBYhs9Hu0dQ@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 8pDSDv_Ak8HRUGnj_O6J7cWwXRZh68Pb
+X-Proofpoint-GUID: UbunPGYF27dYYX1oJttmqkEQvLt6TD6n
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-16_04,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 suspectscore=0 clxscore=1011
+ mlxlogscore=356 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501160073
 
-Hi Heiko/Vasily/Alexander,
+On Thu, Jan 16, 2025 at 11:06:56AM +0100, Brendan Jackman wrote:
+> Hi Heiko/Vasily/Alexander,
+> 
+> I don't see any obvious choice for a maintainer who would merge this.
+> 
+> On Thu, 9 Jan 2025 at 13:46, Christian Borntraeger
+> <borntraeger@linux.ibm.com> wrote:
+> > Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> 
+> Given that Christian acked it, and it's pretty low-stakes and unlikely
+> to conflict, would you perhaps take it through the S390 tree?
 
-I don't see any obvious choice for a maintainer who would merge this.
-
-On Thu, 9 Jan 2025 at 13:46, Christian Borntraeger
-<borntraeger@linux.ibm.com> wrote:
-> Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-
-Given that Christian acked it, and it's pretty low-stakes and unlikely
-to conflict, would you perhaps take it through the S390 tree?
-
-Thanks,
-Brendan
+Given that this is kvm specific I would prefer if this goes via a kvm
+specific tree. E.g. kvm-s390 :) Which means Christian, Janosch, or
+Claudio should pick this up.
 
