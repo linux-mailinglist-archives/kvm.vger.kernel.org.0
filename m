@@ -1,87 +1,150 @@
-Return-Path: <kvm+bounces-35675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E007EA13F4F
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 17:26:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D8D9A13FC6
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 17:45:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA0A4188E480
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 16:26:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC671188D278
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 16:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AE322CBD3;
-	Thu, 16 Jan 2025 16:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F83022D4E5;
+	Thu, 16 Jan 2025 16:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ZhECqcwc"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Ii/k/+mE"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187BD8635B;
-	Thu, 16 Jan 2025 16:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E061DE4F8;
+	Thu, 16 Jan 2025 16:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737044753; cv=none; b=F3c7t0DHkVD6SLgHyvTh37oRgzEQkVRBQQ+h1JkWbSC9Yks1Ha/lZh83kLl2gDYxlOVXg/G54X0FIgvXMpEYHqf5dTd9/3kjQM5FW6Zqp30WU4/0rHWNCjOv4n9yWWmRFPn7CD+03xizALFL1gosTTaWileGbWd1HTOICYKHWLY=
+	t=1737045905; cv=none; b=dkWP4G1bxj/w1Wrys3Mvkw/s/SqC0OFY7Twp1ont1Byy0qqY/0IfauoeDtljB6jIYm93CZ8cX9AFp3bEs/RtcoMXSdwwwiBWstbucS35KBHY/k6Hn2HEXB/exwiFoHEaArURTT1Wgz6wwNTyNDu5mJmSbXAqqBUA4nEejN9xbrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737044753; c=relaxed/simple;
-	bh=D9vs0Pik0obmHjTbTGJXKLbmJdWS45sJfIOBqU4oo2g=;
+	s=arc-20240116; t=1737045905; c=relaxed/simple;
+	bh=gzIeXtvT+o21ai8GfLNJEIL4JMGkaC8ofbxalttfEtY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ldFJsibJC294BgkS0qsFe+hJOwfLeLjyQdWlbKluO+pkXe/T8+3d8UVKImy4ctLEgx4zU9dXjgMQdZaL4dVMan2oXfXwctYlw/DEGTOURJERK7ZdeFPDQVDB0I+HlJCatAM3J3Vcvm2leCL7+EZO9a2eb7oWuAY5rsh7jxyu8Xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ZhECqcwc; arc=none smtp.client-ip=65.109.113.108
+	 Content-Type:Content-Disposition:In-Reply-To; b=dIQTDhq6U+vpRTL5z0aD0cgX5hjE82nuBHEoLulj6kIgMTNRRovdF7uzUaqwyBvd6qHfvZOQKXPd3FuenpFqT1IQyUOq9RTWffAoHLRmLFwqo0qAovZ+9BUfKfyausvBGSysfSnPfGxpu63TSjcTwNGNdnbfoLHQOVEZVu9QoDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Ii/k/+mE; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A1A3740E0289;
-	Thu, 16 Jan 2025 16:25:49 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id CA9C340E015F;
+	Thu, 16 Jan 2025 16:44:59 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id OK6YAIpT06NV; Thu, 16 Jan 2025 16:25:46 +0000 (UTC)
+	with ESMTP id w_qUMcx4OXut; Thu, 16 Jan 2025 16:44:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1737044746; bh=ugjD+bG6MAlY16q2glKYww+iGyZHisaYpi4PdwxftP4=;
+	t=1737045896; bh=WgoKIzz0OYQgA951gA+dXClPJUSxVjM8SRERMxXCGDE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZhECqcwcBU1LbtABt1WLuInauH12PWJ1wtzKkJSmi438RyI0cp8SMTBuG/I/3ZYM5
-	 P/O90EMoQoTDNouSiDBBgZr50dvyQB0XmZ3bkR/fld+6xFo5h1DsGDt1tzfOPNteut
-	 OKNuVuSjuX7zwmMCt0wIPskEyMNSlPpHVs/Mum/NeA2aOP8k5dyv2GQdDRJQ0z1Bg1
-	 fRiTBJljO4So1QnsFJTQT0jnqF0igaqJQrB3gs48R6f4mBpOtlCzF6BItOkJKgy2Px
-	 I1SqEdvD2nn5QDNca4k5as/2c7Aet9/Z9icgJpIVFrDYrAjSJIdaos0RFmqWBQQ28z
-	 xvlKCa2Pge9dRWJPoH+y9qUqx9uuJei7JALf9bozLcbNmVCnqd5sJC3U2rF367Lu/d
-	 pQoLelVNc5pzIVj8z7Quo4j84MXZckYqqBsfIJM17dXF4XbCOlvU42Y/qPKz+OOO5m
-	 MWekJxK4uiMONv8yexsuyoWvc3CUW3FEw4KI1jzcEFGBVac+Ot1ri/tVxLJ2rC93jv
-	 ZibvWC6osvUs3bu4x58JEPTOxj2kJEtmWjwKDSYFkCnRAVRIlo11qR9LW8sv+XliSg
-	 mpggOjKIwYH9RpRjFkJs38Lq7Csdl+dQUoHWpHaor1Qja9KXVzFhIxQybkO5In8kyY
-	 OmybLsTQ6RpJF88mMpoTqXCk=
-Received: from zn.tnic (p200300eA971F934F329C23fffEA6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:934f:329c:23ff:fea6:a903])
+	b=Ii/k/+mEQxhvi2cUq/OXag0RZzqM3+5gAKnmstJm1M3emqPqpm+FuBuTOkVG6z7Xf
+	 jK+idKpC77Q5Bb60bZEBETOeIYeybsV/OSz+HtCJkvQFCOANvCv50k0v7NDa6SMX+M
+	 eW8d/Kr6ZqmS72pz22a2f/+VjuvWRZi/DggF/7WWes5sPk2G2kgdDpbQuINvEg40Bw
+	 N23oo0oWrzyrbeWzAdiyVuD5Yw3mo37WXbbioRprWVaR2YxBJ0EXK+Gl4VR5xC9PZr
+	 OEgpLDhSThdeD7i1O5+lXsNAoSSCiqPlPw+UuhcmOIMMGEIbCewfQxWy1tU8HF3OLo
+	 971HvVXWqqaYqOUXF6C1rkTZJSjg6i1KL8jPchO1X57XYToTkMPLyPzCkyoYJKp2F/
+	 Q31hRdIdEbLaR8cpz5o5mXbI7I5fBMqVNSBbod4oBwfFPYgChEyFgfhZOsoRk9Bs8B
+	 Mq20gwUu5GXJt+hzn0MH9j0zSLA7eW0zjtMDtDIwaj3DW5gUm514gGFeEzI1eUM7E8
+	 OlSpl1gBnv9+jHVUT6Im6NNIQMxUYvTlP22zuE4gO60oYZW58v76F1ovgaGaD+UBVR
+	 WxxI3+3u6J2jlTd3rFkC2SVxOeTNpyK1mHsXzhJ+es/K1LUAYRL+ghsyJTRL2GcbTo
+	 vQ/6kTLCL9KspKSVn+JOGlao=
+Received: from zn.tnic (p200300ea971f934f329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:934f:329c:23ff:fea6:a903])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4720140E0288;
-	Thu, 16 Jan 2025 16:25:31 +0000 (UTC)
-Date: Thu, 16 Jan 2025 17:25:25 +0100
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AF48840E0286;
+	Thu, 16 Jan 2025 16:43:11 +0000 (UTC)
+Date: Thu, 16 Jan 2025 17:43:05 +0100
 From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
-	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
-	pgonda@google.com, pbonzini@redhat.com, francescolavra.fl@gmail.com,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Juergen Gross <jgross@suse.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
-Message-ID: <20250116162525.GFZ4ky9TdSn7jltgw7@fat_crate.local>
-References: <20250107193752.GHZ32CkNhBJkx45Ug4@fat_crate.local>
- <3acfbef7-8786-4033-ab99-a97e971f5bd9@amd.com>
- <20250108082221.GBZ341vUyxrBPHgTg3@fat_crate.local>
- <4b68ee6e-a6b2-4d41-b58f-edcceae3c689@amd.com>
- <cd6c18f3-538a-494e-9e60-2caedb1f53c2@amd.com>
- <Z36FG1nfiT5kKsBr@google.com>
- <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
- <Z36vqqTgrZp5Y3ab@google.com>
- <4ab9dc76-4556-4a96-be0d-2c8ee942b113@amd.com>
- <Z4gqlbumOFPF_rxd@google.com>
+To: Brendan Jackman <jackmanb@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+	Brian Cain <bcain@quicinc.com>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Michal Simek <monstr@monstr.eu>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Dinh Nguyen <dinguyen@kernel.org>, Jonas Bonn <jonas@southpole.se>,
+	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+	Stafford Horne <shorne@gmail.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Yoshinori Sato <ysato@users.sourceforge.jp>,
+	Rich Felker <dalias@libc.org>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Christoph Lameter <cl@linux.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+	linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org,
+	linux-snps-arc@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
+	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org,
+	linux-efi@vger.kernel.org, Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH RFC v2 02/29] x86: Create
+ CONFIG_MITIGATION_ADDRESS_SPACE_ISOLATION
+Message-ID: <20250116164305.GEZ4k3Gd2IoJpJzEIl@fat_crate.local>
+References: <20250110-asi-rfc-v2-v2-0-8419288bc805@google.com>
+ <20250110-asi-rfc-v2-v2-2-8419288bc805@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,87 +153,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z4gqlbumOFPF_rxd@google.com>
+In-Reply-To: <20250110-asi-rfc-v2-v2-2-8419288bc805@google.com>
 
-On Wed, Jan 15, 2025 at 01:37:25PM -0800, Sean Christopherson wrote:
-> My strong vote is prefer TSC over kvmclock for sched_clock if the TSC is constant,
-> nonstop, and not marked stable via command line.
-
-So how do we deal with the case here where a malicious HV could set those bits
-and still tweak the TSC?
-
-IOW, I think Secure TSC and TDX should be the only ones who trust the TSC when
-in a guest.
-
-If anything, trusting the TSC in a normal guest should at least issue
-a warning saying that we do use the TSC but there's no 100% guarantee that it
-is trustworthy...
-
-> But wait, there's more!  Because TDX doesn't override .calibrate_tsc() or
-> .calibrate_cpu(), even though TDX provides a trusted TSC *and* enumerates the
-> frequency of the TSC, unless I'm missing something, tsc_early_init() will compute
-> the TSC frequency using the information provided by KVM, i.e. the untrusted host.
-
-Yeah, I guess we don't want that. Or at least we should warn about it.
- 
-> +	/*
-> +	 * If the TSC counts at a constant frequency across P/T states, counts
-> +	 * in deep C-states, and the TSC hasn't been marked unstable, prefer
-> +	 * the TSC over kvmclock for sched_clock and drop kvmclock's rating so
-> +	 * that TSC is chosen as the clocksource.  Note, the TSC unstable check
-> +	 * exists purely to honor the TSC being marked unstable via command
-> +	 * line, any runtime detection of an unstable will happen after this.
-> +	 */
-> +	if (boot_cpu_has(X86_FEATURE_CONSTANT_TSC) &&
-> +	    boot_cpu_has(X86_FEATURE_NONSTOP_TSC) &&
-> +	    !check_tsc_unstable()) {
-> +		kvm_clock.rating = 299;
-> +		pr_warn("kvm-clock: Using native sched_clock\n");
-
-The warn is in the right direction but probably should say TSC still cannot be
-trusted 100%.
-
-> diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-> index 0864b314c26a..9baffb425386 100644
-> --- a/arch/x86/kernel/tsc.c
-> +++ b/arch/x86/kernel/tsc.c
-> @@ -663,7 +663,12 @@ unsigned long native_calibrate_tsc(void)
->  	unsigned int eax_denominator, ebx_numerator, ecx_hz, edx;
->  	unsigned int crystal_khz;
+On Fri, Jan 10, 2025 at 06:40:28PM +0000, Brendan Jackman wrote:
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 7b9a7e8f39acc8e9aeb7d4213e87d71047865f5c..5a50582eb210e9d1309856a737d32b76fa1bfc85 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -2519,6 +2519,20 @@ config MITIGATION_PAGE_TABLE_ISOLATION
 >  
-> -	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
-> +	/*
-> +	 * Ignore the vendor when running as a VM, if the hypervisor provides
-> +	 * garbage CPUID information then the vendor is also suspect.
-> +	 */
-> +	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL &&
-> +	    !boot_cpu_has(X86_FEATURE_HYPERVISOR))
->  		return 0;
+>  	  See Documentation/arch/x86/pti.rst for more details.
 >  
->  	if (boot_cpu_data.cpuid_level < 0x15)
-> @@ -713,10 +718,13 @@ unsigned long native_calibrate_tsc(void)
->  		return 0;
->  
->  	/*
-> -	 * For Atom SoCs TSC is the only reliable clocksource.
-> -	 * Mark TSC reliable so no watchdog on it.
-> +	 * For Atom SoCs TSC is the only reliable clocksource.  Similarly, in a
-> +	 * VM, any watchdog is going to be less reliable than the TSC as the
-> +	 * watchdog source will be emulated in software.  In both cases, mark
-> +	 * the TSC reliable so that no watchdog runs on it.
->  	 */
-> -	if (boot_cpu_data.x86_vfm == INTEL_ATOM_GOLDMONT)
-> +	if (boot_cpu_has(X86_FEATURE_HYPERVISOR) ||
-> +	    boot_cpu_data.x86_vfm == INTEL_ATOM_GOLDMONT)
->  		setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
->  
->  #ifdef CONFIG_X86_LOCAL_APIC
+> +config MITIGATION_ADDRESS_SPACE_ISOLATION
+> +	bool "Allow code to run with a reduced kernel address space"
+> +	default n
+> +	depends on X86_64 && !PARAVIRT && !UML
+> +	help
+> +	  This feature provides the ability to run some kernel code
 
-It looks all wrong if a function called native_* sprinkles a bunch of "am
-I a guest" checks. I guess we should split it into VM and native variants.
+s/This feature provide/Provide/
 
-But yeah, the general direction is ok once we agree on what we do when
-exactly.
+> +	  with a reduced kernel address space. This can be used to
+> +	  mitigate some speculative execution attacks.
+> +
+> +	  The !PARAVIRT dependency is only because of lack of testing; in theory
+> +	  the code is written to work under paravirtualization. In practice
+> +	  there are likely to be unhandled cases, in particular concerning TLB
+> +	  flushes.
+
+Right, this paragraph should be under the "---" line too until PARAVIRT gets
+tested, ofc.
 
 Thx.
 
