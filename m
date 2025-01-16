@@ -1,145 +1,183 @@
-Return-Path: <kvm+bounces-35662-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35663-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA8E7A13A44
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 13:54:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EC2DA13AD1
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 14:23:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E710E188B2E7
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 12:54:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE12B7A2A24
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 13:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F319D1DED55;
-	Thu, 16 Jan 2025 12:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7702722A7FF;
+	Thu, 16 Jan 2025 13:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkTm3tgt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pNeyTU4W"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DE31DE3D9;
-	Thu, 16 Jan 2025 12:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925FB22A7E8
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 13:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737032044; cv=none; b=WsXcmrFK2Xj5LzYX70ecg7fE24vKPNWfb8pT9UeO67hyaqtC6eLnWs4DsMYOTN76BVXOUO/nXUVE2LiGFjqJs8z5LyHpfHids/UlgMpSWAGvx2E6BN5oCZxBPk5102KkxRHITBlBln+ZzXwXLvYIo7nfxBp0t2Dui/VWAfYhCug=
+	t=1737033778; cv=none; b=tUbE2TRn3vdt1aYAD3f5hyqTNez1s/o0Y0imIF5yiJ5siODVI+ZO1SKLo39F8/c+QrD+LJwB3AVXGmMW94QnB53H2L/Xz/XN0WPMUUmMLlUndkIOOs/yF/YTpRcIZrflxJUsMR0n9ixBErDmuEIDsNOsLxPLa7BEaOz42epV1GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737032044; c=relaxed/simple;
-	bh=/smTJtfyV4jnOqCiO5F5O17FS608/jSCKpjgFAeV7QM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=N6eD+rwjuD281Y/tq/Izetz2j0VpWAiPkXCG7ZWFM7oQ0XCG1He2w1FIxzqtn/J4STcDpLGPp3JRsDSE4l8v96kAG92Q7Ccz5MlJurdAG5cCYXWJaw1yMmrqNhrlwyDfDkDn46CnlE4TPT2leVo+KRLWE4rZ5c49XU/JDJZRRw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkTm3tgt; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-467a8d2d7f1so7764171cf.1;
-        Thu, 16 Jan 2025 04:54:02 -0800 (PST)
+	s=arc-20240116; t=1737033778; c=relaxed/simple;
+	bh=SixtGEHyx0Ll20sNHrYW42AzL6XqkNRKNahYOvra4Ow=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ap4GrN0MRyFvGjBY/kS/shoOvfRmC2YEcyMS3xS7GRk+owQskE/uNpfoatJdq7hbMRkbwBUVfrPMNpnqknu7bmYanRPELDqWrTqwFyiy7QLJkhGvUceGwFwaeP5E1R9tDiYWjIHI5ZexEISQtzt7j+Tqv4pimlJg4RLtuvVo+ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pNeyTU4W; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-467abce2ef9so221521cf.0
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 05:22:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737032041; x=1737636841; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KQMffHB5V9jp1w/KCByUeoZ7ulffBvZYTaCL6OedkWM=;
-        b=YkTm3tgt/CqcpAZy8iDtx/pb1BgLvdvWORKFQvJXC+G+HBDmqP1BLWZ8yM55EulMbZ
-         XOIgjHTZLjayyltUDBLwCXWQkakWUkXT4+dWqeWXuyEKYbjXEqeW5rYuezZWfaMlj+O9
-         J/nIX2vW9x0ZdlvbI+qqkumCZtHqq84ObS9henHvGDtW77hrHEz96mC214wVq97FJQQD
-         iEc11AsZmG3sitUMNQoGokwssnhRaabQmMvhLDHJ/vKyZRXDso8j7dpEN4+y68V7BUD6
-         SUnrm8153JslZ5gYwH9sgXE4DhtQIAGjrI3nb22WkVcxizcL57tCyKrLOWKnMcrunRrx
-         H7Mg==
+        d=google.com; s=20230601; t=1737033774; x=1737638574; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SixtGEHyx0Ll20sNHrYW42AzL6XqkNRKNahYOvra4Ow=;
+        b=pNeyTU4Wee181wY3gln1ZIsC2nfANHQigyORUUwhis5a/svsy2XSo7Xam0g0o1qqxH
+         OV3IvX1Out0hM4WPFsipP6vuKmYyJ0K4x3mCSX4VAm5Xm3S3TDsbIIUx8pK64aicKtiX
+         xLd8HeF9oG/oYmGWVbBqaGW2jBtGfU+H0aSB0gMnTEscXsxaK9xgNowcUys3eHXReWdL
+         Z0oCT9i8ZxEJFZTbhygdURDe70RmsV70bc+VhaYHHSGUf9PzREFnFp57vDH/WiuzlhNO
+         iOepUKMRMDultudOy77sJhRbFXhTN0QNpa+Vw4mRHcSYaNPF0pG8HeqVuzyI87pcHCug
+         VUuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737032041; x=1737636841;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KQMffHB5V9jp1w/KCByUeoZ7ulffBvZYTaCL6OedkWM=;
-        b=cOX9KcIjJELthFhppyo3R6UglxLr0LuYxssDrZIRsxT24AEEfJF0wkWR2cDZ/ef69v
-         gxaGiLdhSku1B2TZ9FG9RBCQspmza85ZnkpKpmkULHocqjRlFiLm0n0MCgigjRrunCnP
-         rUmNJlo7tj16APWb08R2xBKgCi930KdeC1H/5IhhVKYFk91GROKgDIOgbOImzINtfX0L
-         lc91G+JFapKaddFUPvMqZMREAl60BaihreCh8+ddo8XQHpylM8Tm2g+TBetfvL9fL+Zu
-         EJKfArQqyoYiHgoFBFWnVtvTWQuRj2Pg/nZ8RBQ4blvv5HG0AU1VDArekc0k1w/lrraQ
-         us8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUZouIgwORy3VW6fFkyxHrvJvCJcOwj8xda3a68t3MEGJbAa6FdwhkXtRtIqA/RWcbtw3pFMqAj@vger.kernel.org, AJvYcCVXFVHnrqdp8psi8otYsSx89uGkdqOFjte9evNp+sCcXxDkDM3cvTSPfpsGQmL3rY2J7xR16Nw5sRUfiVIoT7ZT@vger.kernel.org, AJvYcCWN5W/WRBHnWJJkYQb/lj64w4jLKs9ZVDVM+YRPA3JhZAPJi/vbfL8aAyYiqT8Y7MMZput6S+Ezb0wAY4yL@vger.kernel.org, AJvYcCWOEHmjxEaTV9lrWvr0QywswI3je3PXjoATyeWmrP1tfaOmlYk8NZwcajzzlwF5ji3jttM/zSxZVQzY@vger.kernel.org, AJvYcCXxPfg1go9vizdvYEIEFZ40N8IG606ug46kSLFm2n9naGIHcy/4qIAudkjLebkh9cvmdWo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxh0WeEmNicoFXrMiQdsVhgErcoFWDpi9WhkTUz8u1hqlLhPwEu
-	vuk76nMMp6QW26ppNifRyIBvmuz111paRmw1zL2slk/3RMu3t8+1
-X-Gm-Gg: ASbGnctJhibUyjptfJp1/y5YyhZ13t9u6PjBdrgcplc0Bq7MZfISrDv2L8poGiMs0fC
-	dqRn576agwbBy07UFROMaURRf+8COa8N+8FN11Tfe8/bsElQlzLa41RHyLhk+QHXNedF86o0jML
-	Oayc6SkPLKXv9lWnZCe1KtWHVKRkR8NcVcuruUpt+Ch/e/Yc9Bqfj8bjlpgUN8lYQPYhAGf/DKd
-	AG1E69fWE2sMTWCtcQnPvxxiVZNqklnV0IjAaLRNWP8v/GGK0PzD4F3z6abXQHM6T7GOG+bW+bN
-	GvR+2QhL8hVfedNAqI0y/7udtFTh
-X-Google-Smtp-Source: AGHT+IGAPwHCulVk3YA3srEPPAkpgIxRZlbJrc49E6sk7X4J2EiUFlVkp6rRmzHsvgqlARBJ+pjj/Q==
-X-Received: by 2002:ac8:5705:0:b0:466:85eb:6123 with SMTP id d75a77b69052e-46c71003317mr520830751cf.22.1737032041353;
-        Thu, 16 Jan 2025 04:54:01 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfade72b59sm75303556d6.87.2025.01.16.04.54.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 04:54:00 -0800 (PST)
-Date: Thu, 16 Jan 2025 07:54:00 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- devel@daynix.com
-Message-ID: <678901682ff09_3710bc2944f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250116031331-mutt-send-email-mst@kernel.org>
-References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
- <20250116031331-mutt-send-email-mst@kernel.org>
-Subject: Re: [PATCH net v3 0/9] tun: Unify vnet implementation
+        d=1e100.net; s=20230601; t=1737033774; x=1737638574;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SixtGEHyx0Ll20sNHrYW42AzL6XqkNRKNahYOvra4Ow=;
+        b=L8+rirE0ZecZC2/mY1tVLrUnVQDVpBo827wOeY2yBprOQZb4kgHgpsA32veDKNg41O
+         c8m2C/E1tok4quFgQDr5WUuiaVvpFczNjsvEyB+nUQSEehql/fxW8/qiMLjwtwrcNhJO
+         HSZxmXJcznWCVjgPkdvt0NfrJ3HK8DTxGfXVvZnuljmoDM5/HlanEYgFD9tuvJbN70R9
+         tPuOZkpVUOXWF9ovOeJET4v7B1S4FTlk5yj0czDxt4ckSwzk7arXwRgyHEyyaf50DqGU
+         Oy/fI9OUyBizavaeg+UzQPG2FMrhaZOGDHLs8LLhEVn69dJZJlWh7nEQBEUt9RXCcO4z
+         XXLg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8roBvIJSontL2KMuiT5Yqad5ND2KV1Bj4Ap60NMjSJjkKN8zWiDI/iENmXTGDUhLkrtA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlVNcet2bK2Nn+BgOUDDb0qv5RLxf/f69ErBZS7ayMS9ytdhxE
+	cn1U+sRlro1zEDnfAE81kcZb4cd+NWzF10Liw5TKqGFRWBD3qQS2OfrbHWnbYl8y/e77AJbOnIc
+	ScYKSUr4pWulTdX9zEFV2OJa6cDX4107TAxXe
+X-Gm-Gg: ASbGncsuMsR61r2NftBYXaN6WU+4K2nwrPu0ZOUwqXSP1XMIuLG7dTL69L2c9Iv4Sn8
+	fl8NHin98rQ2vDJiJFUvjvtjRIuEtWBvG/VSby13CarzALPif5rt6k87hHRsxoCBSaq8=
+X-Google-Smtp-Source: AGHT+IGgdmm3+dKyYphBOJrkDF9RqCEL6Tsx6LZHIZIcfENKNOrXYM9LEzERENIX0F6hf0/LX3P/eN8RFihp6QDk6j4=
+X-Received: by 2002:ac8:5f11:0:b0:466:7a06:2d03 with SMTP id
+ d75a77b69052e-46e0545796amr2768561cf.1.1737033773706; Thu, 16 Jan 2025
+ 05:22:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250110-asi-rfc-v2-v2-0-8419288bc805@google.com>
+ <20250110-asi-rfc-v2-v2-1-8419288bc805@google.com> <20250116001858.GDZ4hQctZe_PFvJ0AJ@fat_crate.local>
+ <20250116102747.GAZ4jfI9HG3K-PW7nf@fat_crate.local>
+In-Reply-To: <20250116102747.GAZ4jfI9HG3K-PW7nf@fat_crate.local>
+From: Brendan Jackman <jackmanb@google.com>
+Date: Thu, 16 Jan 2025 14:22:42 +0100
+X-Gm-Features: AbW1kvbCtSg9vNMeYe9Cs6fkL4An-kckhSPmCiLhYkfVvSqDDbiTwg4NAXTmVUM
+Message-ID: <CA+i-1C1sXC1tbo9ytuex0eBD3gUbQwnNP8rvOhCv=JV+oSHo1g@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 01/29] mm: asi: Make some utility functions noinstr compatible
+To: Borislav Petkov <bp@alien8.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Richard Henderson <richard.henderson@linaro.org>, Matt Turner <mattst88@gmail.com>, 
+	Vineet Gupta <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>, 
+	Brian Cain <bcain@quicinc.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	WANG Xuerui <kernel@xen0n.name>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Michal Simek <monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	Dinh Nguyen <dinguyen@kernel.org>, Jonas Bonn <jonas@southpole.se>, 
+	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>, Stafford Horne <shorne@gmail.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Yoshinori Sato <ysato@users.sourceforge.jp>, 
+	Rich Felker <dalias@libc.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, 
+	"David S. Miller" <davem@davemloft.net>, Andreas Larsson <andreas@gaisler.com>, 
+	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Chris Zankel <chris@zankel.net>, 
+	Max Filippov <jcmvbkbc@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Andrew Morton <akpm@linux-foundation.org>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Valentin Schneider <vschneid@redhat.com>, Uladzislau Rezki <urezki@gmail.com>, 
+	Christoph Hellwig <hch@infradead.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Mike Rapoport <rppt@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org, 
+	linux-mips@vger.kernel.org, linux-openrisc@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-arch@vger.kernel.org, linux-mm@kvack.org, 
+	linux-trace-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-efi@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Michael S. Tsirkin wrote:
-> On Thu, Jan 16, 2025 at 05:08:03PM +0900, Akihiko Odaki wrote:
-> > When I implemented virtio's hash-related features to tun/tap [1],
-> > I found tun/tap does not fill the entire region reserved for the virtio
-> > header, leaving some uninitialized hole in the middle of the buffer
-> > after read()/recvmesg().
-> > 
-> > This series fills the uninitialized hole. More concretely, the
-> > num_buffers field will be initialized with 1, and the other fields will
-> > be inialized with 0. Setting the num_buffers field to 1 is mandated by
-> > virtio 1.0 [2].
-> > 
-> > The change to virtio header is preceded by another change that refactors
-> > tun and tap to unify their virtio-related code.
-> > 
-> > [1]: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
-> > [2]: https://lore.kernel.org/r/20241227084256-mutt-send-email-mst@kernel.org/
-> > 
-> > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> 
-> Will review. But this does not look like net material to me.
-> Not really a bugfix. More like net-next.
+On Thu, 16 Jan 2025 at 01:21, Borislav Petkov <bp@alien8.de> wrote:
+> > Unfortunately Thomas pointed out this will prevent the function from
+> > being inlined at call sites in .text.
+> >
+> > So far I haven't been able[1] to find a formulation that lets us :
+> > 1. avoid calls from .noinstr.text -> .text,
+> > 2. while also letting the compiler freely decide what to inline.
+> >
+> > 1 is a functional requirement so here I'm just giving up on 2. Existing
+> > callsites of this code are just forced inline. For the incoming code
+> > that needs to call it from noinstr, they will be out-of-line calls.
+>
+> I'm not sure some of that belongs in the commit message - if you want to have
+> it in the submission, you should put it under the --- line below, right above
+> the diffstat.
 
-+1. I said basically the same in v2.
+Sure. I'm actually not even sure that for a [PATCH]-quality thing this
+cross-cutting commit even makes sense - once we've decided on the
+general way to solve this problem, perhaps the changes should just be
+part of the commit that needs them?
 
-Perhaps the field initialization is net material, though not
-critical until hashing is merged, so not stable.
+It feels messy to have a patch that "does multiple things", but on the
+other hand it might be annoying to review a patch that says "make a
+load of random changes across the kernel, which are needed at various
+points in various upcoming patches, trust me".
 
-The deduplication does not belong in net.
+Do you have any opinion on that?
 
-IMHO it should all go to net-next.
+(BTW, since a comment you made on another series (can't find it on
+Lore...), I've changed my writing style to avoid stuff like this in
+comments & commit messages in general, but this text all predates
+that. I'll do my best to sort all that stuff out before I send
+anything as a [PATCH].)
+
+On Thu, 16 Jan 2025 at 11:29, Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Thu, Jan 16, 2025 at 01:18:58AM +0100, Borislav Petkov wrote:
+> > Long story short, lemme try to poke around tomorrow to try to figure out what
+> > actually happens. It could be caused by the part of Rik's patches and this one
+> > inlining things. We'll see...
+>
+> Looks transient... The very similar guest boots fine on another machine. Let's
+> watch this...
+
+Oh, I didn't notice your update until now. But yeah I also couldn't
+reproduce it on a Sapphire Rapids machine and on QEMU with this patch
+applied on top of tip/master (37bc915c6ad0f).
 
