@@ -1,206 +1,348 @@
-Return-Path: <kvm+bounces-35665-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35666-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F69A13BA5
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 15:05:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53D0CA13CC5
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 15:51:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E74716711D
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 14:05:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B48323AC652
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 14:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EC522B8A6;
-	Thu, 16 Jan 2025 14:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1866B22A7E2;
+	Thu, 16 Jan 2025 14:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="AoUcPN70"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="r4NCht0f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0752D1DE8AC;
-	Thu, 16 Jan 2025 14:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137F422E41B;
+	Thu, 16 Jan 2025 14:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737036299; cv=none; b=fYfD3JLSuqVO5Yu0wx2Zz1Ib203/xKe/go/NTe5+t2mU1Lm+fIEMfz1vUQxNjrbOOQFNRXDlBEkXwkDoWumYNH9HaUhzLTCxT/E41G8m/KzUaffhUbnrEvnid52F1sX1/vrUruuzIZd02wx6TO1hNmBqw88TQlhcQWyVdLGxXDk=
+	t=1737038912; cv=none; b=tUjARbwsEULts3SYN3SR9OIpuXDujx8yR+9HP0q1OwEvgkoPhWrvO9y1UbTLTNOb6a5ngTc5JvFM/uOxEXxvOU/rqwkxXRajEr+IjQrDpZ+ftOddMn8qkJ3aF1rBzeq4WsgdBfQ8QlYcYj37DJGT+60wBlT/DzEbyQ2JfROdWsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737036299; c=relaxed/simple;
-	bh=hNyknZwTpS4igQ+b6Q471Clo7jLNR8MSLrznRv+goc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RAPMQmtGvZPqnPyfHSSBetv1bu8un6SIimDWFgH1grLafK3aqPL5xT+FZxfWXPEU6v2FPpm8NZdKSTJOq1SqPaIwp5VaYZpLBEu9/3AKLSAyU9o1RkMJe5X3k1aH3t5B6B1V04OSYpN54ASf79I1xdbSUvHemEMCzv2r+K2VXus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=AoUcPN70; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 64DEC40E0288;
-	Thu, 16 Jan 2025 14:04:47 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 2AjLmPaIv3rS; Thu, 16 Jan 2025 14:04:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1737036284; bh=ugKrbojVRwTBmPMKkHUcaS2aDcqRv9OqaSevzpXMYOg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AoUcPN70r71GRskEbBjwKB5t2IpKoOvWroHj7Gj+yh3TXIQq4jAaeXsAtKetsP+we
-	 7U42EJbMPBRZdphzKgKJnl1FaXd4+NOPdDL1SkgOkJuvHbUXMBGkSPz+3v8h7dNhmT
-	 Hnpwxe9r0qX772w6Op3rP2iEyZS27E/nwn39RIAvFhrt8U3AgFlwZ1zghfPHzcZ8zO
-	 c/4ymjaW+0fTU8jpLPb236iMCAWdJa4hZ/QKzL2ReUqqUBynyzdljxfL49TuGZKsUK
-	 HuZUYY0mmrBW4uLQ4YxKMwtuKAzOBBOTZPyqnz4H81TmMZX9A3znFZ3JT09PpbLLCS
-	 Ia6e5nKvzD4mq+MXsOmJ3+GXejTE4cvNoC5h043TIg2mzfveb9shxPPW6gBlFTA53E
-	 7jgElnzIfinsMoQwVSg6i18FLDzY50+kqVz9+zbr5gpiPs5LeCwLYM/Aq1u2fGPpZ0
-	 0Ls41+wYzo1pfh0OpM+GBydt5tkuWtf+9452THH3PFkEdzhwGbhRprrYvj75bnToTh
-	 nRx4uZELom9gJdmd+ZcYZKN5oNcUaiz0Ijo4hBEtkfRieSbS8RUd1mN91KKgO2qVid
-	 d+CXJjbRpPfJbO67fm64t8fRGqM3v/OqRo/Z09m5/2qMM0veqGpRWUhNKQ3qXXaJz4
-	 pfAh9T0l+/f8chSy2nlAbhlU=
-Received: from zn.tnic (p200300ea971f934f329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:934f:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B67F640E0286;
-	Thu, 16 Jan 2025 14:03:01 +0000 (UTC)
-Date: Thu, 16 Jan 2025 15:02:58 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Brendan Jackman <jackmanb@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-	Brian Cain <bcain@quicinc.com>, Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Michal Simek <monstr@monstr.eu>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Dinh Nguyen <dinguyen@kernel.org>, Jonas Bonn <jonas@southpole.se>,
-	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-	Stafford Horne <shorne@gmail.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>,
-	Rich Felker <dalias@libc.org>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@linux.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org,
-	linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org,
-	linux-efi@vger.kernel.org
-Subject: Re: [PATCH RFC v2 01/29] mm: asi: Make some utility functions
- noinstr compatible
-Message-ID: <20250116140258.GDZ4kRkvEGYovA_J5u@fat_crate.local>
-References: <20250110-asi-rfc-v2-v2-0-8419288bc805@google.com>
- <20250110-asi-rfc-v2-v2-1-8419288bc805@google.com>
- <20250116001858.GDZ4hQctZe_PFvJ0AJ@fat_crate.local>
- <20250116102747.GAZ4jfI9HG3K-PW7nf@fat_crate.local>
- <CA+i-1C1sXC1tbo9ytuex0eBD3gUbQwnNP8rvOhCv=JV+oSHo1g@mail.gmail.com>
+	s=arc-20240116; t=1737038912; c=relaxed/simple;
+	bh=5dwVwQPbFrti9t7CAKA+y94hpM9MdXgbzD/qrj0kprA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=N3KCG36s9uZhPV3Qv6nCq9lHXGF8MPTE/XZewO+q4Xa3Xd749mIWDmo6M1klJQ0lODNVlfXqQWL+VL3/FDG3pXR4QpL4i2e4I4ux9adbTMHvhjv6p+d/044GIUzwPpF4hxqKXe8vyKdtyss13VhCgQZOqHjWQlJ2D29qSXpLn/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=r4NCht0f; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1737038910; x=1768574910;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fG4taAKUdQ5Hh7V+qy1Jc/FBV9g1o2/PtE50ldwn630=;
+  b=r4NCht0feVTPWHYfCy4bbeqffTsf27OTN9qi2amCRAPHoTcMkWA34ZoV
+   l34o7rvBO9AkBZrELUbQlfaaonMG78gcUkR9W73IM72F2L1267omTCGua
+   eijg3KvtG5exS+QdgtdoPoj3H5qDMpkt2IRNqLmA/Ro+xf/XsqKCxhEc/
+   M=;
+X-IronPort-AV: E=Sophos;i="6.13,209,1732579200"; 
+   d="scan'208";a="459317083"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 14:48:26 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:24824]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.12:2525] with esmtp (Farcaster)
+ id d87e80ce-d7ed-4551-924f-bf0789fff6ba; Thu, 16 Jan 2025 14:48:25 +0000 (UTC)
+X-Farcaster-Flow-ID: d87e80ce-d7ed-4551-924f-bf0789fff6ba
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 16 Jan 2025 14:48:22 +0000
+Received: from email-imr-corp-prod-iad-all-1a-8c151b82.us-east-1.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.39 via Frontend Transport; Thu, 16 Jan 2025 14:48:22 +0000
+Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
+	by email-imr-corp-prod-iad-all-1a-8c151b82.us-east-1.amazon.com (Postfix) with ESMTPS id 2E40D4041A;
+	Thu, 16 Jan 2025 14:48:14 +0000 (UTC)
+Message-ID: <31f1229d-40c8-4a75-b0f1-be315150379f@amazon.co.uk>
+Date: Thu, 16 Jan 2025 14:48:13 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CA+i-1C1sXC1tbo9ytuex0eBD3gUbQwnNP8rvOhCv=JV+oSHo1g@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v4 00/14] KVM: Restricted mapping of guest_memfd at
+ the host and arm64 support
+To: Fuad Tabba <tabba@google.com>, <kvm@vger.kernel.org>,
+	<linux-arm-msm@vger.kernel.org>, <linux-mm@kvack.org>
+CC: <pbonzini@redhat.com>, <chenhuacai@kernel.org>, <mpe@ellerman.id.au>,
+	<anup@brainfault.org>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+	<aou@eecs.berkeley.edu>, <seanjc@google.com>, <viro@zeniv.linux.org.uk>,
+	<brauner@kernel.org>, <willy@infradead.org>, <akpm@linux-foundation.org>,
+	<xiaoyao.li@intel.com>, <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
+	<jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
+	<yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>, <mic@digikod.net>,
+	<vbabka@suse.cz>, <vannapurve@google.com>, <ackerleytng@google.com>,
+	<mail@maciej.szmigiero.name>, <david@redhat.com>, <michael.roth@amd.com>,
+	<wei.w.wang@intel.com>, <liam.merwick@oracle.com>,
+	<isaku.yamahata@gmail.com>, <kirill.shutemov@linux.intel.com>,
+	<suzuki.poulose@arm.com>, <steven.price@arm.com>, <quic_eberman@quicinc.com>,
+	<quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
+	<quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
+	<quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
+	<catalin.marinas@arm.com>, <james.morse@arm.com>, <yuzenghui@huawei.com>,
+	<oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
+	<qperret@google.com>, <keirf@google.com>, <shuah@kernel.org>,
+	<hch@infradead.org>, <jgg@nvidia.com>, <rientjes@google.com>,
+	<jhubbard@nvidia.com>, <fvdl@google.com>, <hughd@google.com>,
+	<jthoughton@google.com>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
+	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
+	<xmarcalx@amazon.co.uk>, James Gowans <jgowans@amazon.com>
+References: <20241213164811.2006197-1-tabba@google.com>
+From: Patrick Roy <roypat@amazon.co.uk>
+Content-Language: en-US
+Autocrypt: addr=roypat@amazon.co.uk; keydata=
+ xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
+ NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
+ wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
+ CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
+ AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
+ AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
+ IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
+ 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
+ 8hlxFQM=
+In-Reply-To: <20241213164811.2006197-1-tabba@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 16, 2025 at 02:22:42PM +0100, Brendan Jackman wrote:
-> Sure. I'm actually not even sure that for a [PATCH]-quality thing this
-> cross-cutting commit even makes sense - once we've decided on the
-> general way to solve this problem, perhaps the changes should just be
-> part of the commit that needs them?
+Hi Fuad!
 
-Right, that sounds better.
+I finally got around to giving this patch series a spin for my non-CoCo
+usecase. I used the below diff to expose the functionality outside of pKVM
+(Based on Steven P.'s ARM CCA patch for custom VM types on ARM [2]).
+There's two small things that were broken for me (will post as responses
+to individual patches), but after fixing those, I was able to boot some
+guests using a modified Firecracker [1].
 
-> It feels messy to have a patch that "does multiple things", but on the
-> other hand it might be annoying to review a patch that says "make a
-> load of random changes across the kernel, which are needed at various
-> points in various upcoming patches, trust me".
+Just wondering, are you still looking into posting a separate series
+with just the MMU changes (e.g. something to have a bare-bones
+KVM_SW_PROTECTED_VM on ARM, like we do for x86), like you mentioned in
+the guest_memfd call before Christmas? We're pretty keen to
+get our hands something like that for our non-CoCo VMs (and ofc, am
+happy to help with any work required to get there :)
+
+Best, 
+Patrick
+
+[1]: https://github.com/roypat/firecracker/tree/secret-freedom-mmap
+[2]: https://lore.kernel.org/kvm/20241004152804.72508-12-steven.price@arm.com/
+
+---
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 8dfae9183651..0b8dfb855e51 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -380,6 +380,8 @@ struct kvm_arch {
+ 	 * the associated pKVM instance in the hypervisor.
+ 	 */
+ 	struct kvm_protected_vm pkvm;
++
++	unsigned long type;
+ };
+
+ struct kvm_vcpu_fault_info {
+@@ -1529,7 +1531,11 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+ #define kvm_has_s1poe(k)				\
+ 	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
+
+-#define kvm_arch_has_private_mem(kvm)					\
+-	(IS_ENABLED(CONFIG_KVM_PRIVATE_MEM) && is_protected_kvm_enabled())
++#ifdef CONFIG_KVM_PRIVATE_MEM
++#define kvm_arch_has_private_mem(kvm)  \
++	((kvm)->arch.type == KVM_VM_TYPE_ARM_SW_PROTECTED || is_protected_kvm_enabled())
++#else
++#define kvm_arch_has_private_mem(kvm) false
++#endif
+
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index fe3451f244b5..2da26aa3b0b5 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -38,6 +38,7 @@ menuconfig KVM
+ 	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+ 	select SCHED_INFO
+ 	select GUEST_PERF_EVENTS if PERF_EVENTS
++	select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
+ 	select KVM_GMEM_MAPPABLE
+ 	help
+ 	  Support hosting virtualized guest machines.
+@@ -84,4 +85,10 @@ config PTDUMP_STAGE2_DEBUGFS
+
+ 	  If in doubt, say N.
+
++config KVM_SW_PROTECTED_VM
++    bool "Enable support for KVM software-protected VMs"
++    depends on EXPERT
++    depends on KVM && ARM64
++    select KVM_GENERIC_PRIVATE_MEM
++
+ endif # VIRTUALIZATION
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index a102c3aebdbc..35683868c0e4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -181,6 +181,19 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	mutex_unlock(&kvm->lock);
+ #endif
+
++	if (type & ~(KVM_VM_TYPE_ARM_MASK | KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
++		return -EINVAL;
++
++	switch (type & KVM_VM_TYPE_ARM_MASK) {
++	case KVM_VM_TYPE_ARM_NORMAL:
++	case KVM_VM_TYPE_ARM_SW_PROTECTED:
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	kvm->arch.type = type & KVM_VM_TYPE_ARM_MASK;
++
+ 	kvm_init_nested(kvm);
+
+ 	ret = kvm_share_hyp(kvm, kvm + 1);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1c4b3871967c..9dbb472eb96a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -869,9 +869,6 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+ 	u64 mmfr0, mmfr1;
+ 	u32 phys_shift;
+
+-	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+-		return -EINVAL;
+-
+ 	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
+ 	if (is_protected_kvm_enabled()) {
+ 		phys_shift = kvm_ipa_limit;
+@@ -2373,3 +2370,31 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+
+ 	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+ }
++
++#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
++bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
++					struct kvm_gfn_range *range)
++{
++	/*
++	 * Zap SPTEs even if the slot can't be mapped PRIVATE.  KVM only
++	 * supports KVM_MEMORY_ATTRIBUTE_PRIVATE, and so it *seems* like KVM
++	 * can simply ignore such slots.  But if userspace is making memory
++	 * PRIVATE, then KVM must prevent the guest from accessing the memory
++	 * as shared.  And if userspace is making memory SHARED and this point
++	 * is reached, then at least one page within the range was previously
++	 * PRIVATE, i.e. the slot's possible hugepage ranges are changing.
++	 * Zapping SPTEs in this case ensures KVM will reassess whether or not
++	 * a hugepage can be used for affected ranges.
++	 */
++	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
++		return false;
++
++	return kvm_unmap_gfn_range(kvm, range);
++}
++
++bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
++					 struct kvm_gfn_range *range)
++{
++	return false;
++}
++#endif
+\ No newline at end of file
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index b34aed04ffa5..214f6b5da43f 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -653,6 +653,13 @@ struct kvm_enable_cap {
+  * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
+  * value 0 implies the default IPA size, 40bits.
+  */
++#define KVM_VM_TYPE_ARM_SHIFT		    8
++#define KVM_VM_TYPE_ARM_MASK		    (0xfULL << KVM_VM_TYPE_ARM_SHIFT)
++#define KVM_VM_TYPE_ARM(_type)		\
++	(((_type) << KVM_VM_TYPE_ARM_SHIFT) & KVM_VM_TYPE_ARM_MASK)
++#define KVM_VM_TYPE_ARM_NORMAL		    KVM_VM_TYPE_ARM(0)
++#define KVM_VM_TYPE_ARM_SW_PROTECTED    KVM_VM_TYPE_ARM(1)
++
+ #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
+ #define KVM_VM_TYPE_ARM_IPA_SIZE(x)		\
+ 	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+
+
+On Fri, 2024-12-13 at 16:47 +0000, Fuad Tabba wrote:
+> This series adds restricted mmap() support to guest_memfd, as
+> well as support for guest_memfd on arm64. It is based on Linux
+> 6.13-rc2.  Please refer to v3 for the context [1].
 > 
-> Do you have any opinion on that?
-
-You're absolutely right - we do things when we need them and not before.
-Otherwise, often times things get done preemptively and then forgotten only
-for someone to notice way later and undo them again.
-
-> (BTW, since a comment you made on another series (can't find it on
-> Lore...), I've changed my writing style to avoid stuff like this in
-> comments & commit messages in general, but this text all predates
-> that. I'll do my best to sort all that stuff out before I send
-> anything as a [PATCH].)
-
-Thanks!
-
-Btw, good and funny way to use "[PATCH]-quality" to mean non-RFC. :-P
-
-> Oh, I didn't notice your update until now. But yeah I also couldn't
-> reproduce it on a Sapphire Rapids machine and on QEMU with this patch
-> applied on top of tip/master (37bc915c6ad0f).
-
-Yeah, it feels like toolchain-related but I can't put my finger on it yet.
-We'll see if and when this thing will re-surface its ugly head...
-
-:-)
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> Main changes since v3:
+> - Added a new folio type for guestmem, used to register a
+>   callback when a folio's reference count reaches 0 (Matthew
+>   Wilcox, DavidH) [2]
+> - Introduce new mappability states for folios, where a folio can
+> be mappable by the host and the guest, only the guest, or by no
+> one (transient state)
+> - Rebased on Linux 6.13-rc2
+> - Refactoring and tidying up
+> 
+> Cheers,
+> /fuad
+> 
+> [1] https://lore.kernel.org/all/20241010085930.1546800-1-tabba@google.com/
+> [2] https://lore.kernel.org/all/20241108162040.159038-1-tabba@google.com/
+> 
+> Ackerley Tng (2):
+>   KVM: guest_memfd: Make guest mem use guest mem inodes instead of
+>     anonymous inodes
+>   KVM: guest_memfd: Track mappability within a struct kvm_gmem_private
+> 
+> Fuad Tabba (12):
+>   mm: Consolidate freeing of typed folios on final folio_put()
+>   KVM: guest_memfd: Introduce kvm_gmem_get_pfn_locked(), which retains
+>     the folio lock
+>   KVM: guest_memfd: Folio mappability states and functions that manage
+>     their transition
+>   KVM: guest_memfd: Handle final folio_put() of guestmem pages
+>   KVM: guest_memfd: Allow host to mmap guest_memfd() pages when shared
+>   KVM: guest_memfd: Add guest_memfd support to
+>     kvm_(read|/write)_guest_page()
+>   KVM: guest_memfd: Add KVM capability to check if guest_memfd is host
+>     mappable
+>   KVM: guest_memfd: Add a guest_memfd() flag to initialize it as
+>     mappable
+>   KVM: guest_memfd: selftests: guest_memfd mmap() test when mapping is
+>     allowed
+>   KVM: arm64: Skip VMA checks for slots without userspace address
+>   KVM: arm64: Handle guest_memfd()-backed guest page faults
+>   KVM: arm64: Enable guest_memfd private memory when pKVM is enabled
+> 
+>  Documentation/virt/kvm/api.rst                |   4 +
+>  arch/arm64/include/asm/kvm_host.h             |   3 +
+>  arch/arm64/kvm/Kconfig                        |   1 +
+>  arch/arm64/kvm/mmu.c                          | 119 +++-
+>  include/linux/kvm_host.h                      |  75 +++
+>  include/linux/page-flags.h                    |  22 +
+>  include/uapi/linux/kvm.h                      |   2 +
+>  include/uapi/linux/magic.h                    |   1 +
+>  mm/debug.c                                    |   1 +
+>  mm/swap.c                                     |  28 +-
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../testing/selftests/kvm/guest_memfd_test.c  |  64 +-
+>  virt/kvm/Kconfig                              |   4 +
+>  virt/kvm/guest_memfd.c                        | 579 +++++++++++++++++-
+>  virt/kvm/kvm_main.c                           | 229 ++++++-
+>  15 files changed, 1074 insertions(+), 59 deletions(-)
+> 
+> 
+> base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+> --
+> 2.47.1.613.gc27f4b7a9f-goog
 
