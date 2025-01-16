@@ -1,144 +1,157 @@
-Return-Path: <kvm+bounces-35696-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35697-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41CB8A1446E
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 23:16:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F10F0A1447C
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 23:29:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52923162B3E
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 22:16:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E839167034
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 22:29:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4AA22BAC5;
-	Thu, 16 Jan 2025 22:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AFrQ5oaL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218BF22BACC;
+	Thu, 16 Jan 2025 22:28:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5471DA628
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 22:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9417413B58C;
+	Thu, 16 Jan 2025 22:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737065779; cv=none; b=qZnKjApmWIg2pOqNtMc8LoyodvDiWLQn2kOz6mrt+Zlzo1GsvC1rIcKQ/alGLbzxmPQHPanIo867DG7FGnZwZIQZS0xiuQaB5MWbBmvu/5zsauaUCKUsssFyaS42U36uZZWrYr2bvnYfhgYoiqcFf2ncrm2BqAGWrePMovCkEcg=
+	t=1737066537; cv=none; b=YB2GgE3TighGNxwttKSMpxghBkn8ZqLiwolnaOxxmv1Jwn+QhkdOwyf+fOwl6m01wPiZMiJwbtp8PTE9PpOwLtjoMEiwgcA6NFeoWapYOugbHpeDsQJy34KWUwo23eeerDtiFluodIzpjeiIHSnKAF36pww+XP5qasKR0m5epDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737065779; c=relaxed/simple;
-	bh=Z0ddV2nDeH1UNqlW0vz2htYefbtJD3MtZnrUV8fkTRs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZcuzgctNt/XsTOmD3anPQRJKEyDDdHfa6fEqWo+6h8ciPCtfpdcPFvdsnvoz0MNSbJGQf+vis+Tz36XcYHZSIRtX+Tv7BnaUqFJ19XxhIs+wKlUB+el7PdPLSTnDnbB+fmrYAOZNc/9aPDhg/8ClZgNr/moUZB7ytEJy9peSWHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AFrQ5oaL; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f5538a2356so2780975a91.2
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 14:16:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737065777; x=1737670577; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZ+7NcQN2GRHERXJVYagMBxlSawy5BYRQeFxBS4jvGU=;
-        b=AFrQ5oaLtpsoHHRzu8lF/OnWWx2kVmiXE+W4l/0kIdND6aLBRZH13pCw5tEQ4/LBPc
-         1X50fB48weJRmmLu+fwaeVjdxsa4CTgjGF4chaso8nFAv8BU7ST4J2jjHqMNLDrSneFa
-         MiBRGXGpnUwxVM9jUJtBOdDuvOtCPSn8Ek4mAM0zIXKlDAMsKEslY5cWn+tYk8ub9K23
-         fJoF5DM4DG185DmJ4s5dxKrQUz4vtIZlPb+oJId8xwpD/nRU9gJF3J7lS3/7qkN7lbJy
-         OFWnxO3oWWgTJjLpO8Ykd9AwefKVCgPnOPn9DnDfNOqHkIXSUKdHzMLDVUPzF5rAM7iz
-         WDHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737065777; x=1737670577;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZ+7NcQN2GRHERXJVYagMBxlSawy5BYRQeFxBS4jvGU=;
-        b=nBgEWtbRD8p9QczhfpPZRN+86g/2M0Px5lzlxvuqDBVKZsSZx51nKQ0fRfyZcr2sf9
-         uTUtyqno/BY0iLWdlPi+OWlCsHFiogGSd2MgiuV2KUwOVhDrkLVSXe85QJb5KsrFzSuy
-         yAmqHB6UMIw1dDmVORTkFwi5KRIHqqPMJlejIf+Doga9nBSFPFY1PUOjSvxmIlnPix2C
-         huEn3//2wwZLVAFeFsNaNe2fRHrY5Q/yQ8i0DUqtlGvnEGvHKUqKEA043QC74ldt6mvb
-         s6bTtA/2LTAVPM4lTCSZRVMOnY/yO8iy07aRY1XEz6rsBhjfjhGKoUULlCzEidiAWPVu
-         8hfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVfsEbBaBwel07A2kr6HPxqwX/psnEkXGWDvyhWJD6hRKov0t3IqudBLjRWTsINiCffm30=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTaCx+rCkll38nS1HUKIJm1yLZ+l55pVXDuq71pmTzjcTVdW0J
-	YBgOuh/R7jIVgPNwKHueHcFbcsMPv0/F9nx+zEB3I/+N9qjdbe40QkcDiinUiGeDU3GUEDQ3xZm
-	uoA==
-X-Google-Smtp-Source: AGHT+IFQWdmM2razhLJbL5aP2luCP61s/wuhDj08lqTNDx6qC+0wGyJoLk/MjnPxGPcgL9u/wZA2pdBixos=
-X-Received: from pjbsn6.prod.google.com ([2002:a17:90b:2e86:b0:2ea:4139:e72d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c2c7:b0:2ef:2d9f:8e55
- with SMTP id 98e67ed59e1d1-2f782ca1fffmr397272a91.17.1737065777241; Thu, 16
- Jan 2025 14:16:17 -0800 (PST)
-Date: Thu, 16 Jan 2025 14:16:15 -0800
-In-Reply-To: <Z4lsxgFSdiqpNtdG@x1n>
+	s=arc-20240116; t=1737066537; c=relaxed/simple;
+	bh=z4Z21kOLF9xnwI/o2ML1cm/gAlvjMWxEDrwbA9fs3D4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rNlCc1NufJp2A6p5lQWbktpZKVM1Jmr22pnYpOwMElWnDlyTtH78kzsSxEaA6gYyugQc52+cWfPc/2G6JaC/UlWeVe4jBA/rtd0V7Ef+ieILOOAmkh2WtUuHgxZWXzV6BudTMYzXqeLz+MXlOTKusDJ7Dp7s8maZH9gswfygkLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3862C4CED6;
+	Thu, 16 Jan 2025 22:28:50 +0000 (UTC)
+Date: Thu, 16 Jan 2025 22:28:48 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Ankit Agrawal <ankita@nvidia.com>, David Hildenbrand <david@redhat.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"shahuang@redhat.com" <shahuang@redhat.com>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
+	Kirti Wankhede <kwankhede@nvidia.com>,
+	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
+	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
+	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"sebastianene@google.com" <sebastianene@google.com>,
+	"coltonlewis@google.com" <coltonlewis@google.com>,
+	"kevin.tian@intel.com" <kevin.tian@intel.com>,
+	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"gshan@redhat.com" <gshan@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
+ VMA flags
+Message-ID: <Z4mIIA5UuFcHNUwL@arm.com>
+References: <20241118131958.4609-2-ankita@nvidia.com>
+ <a2d95399-62ad-46d3-9e48-6fa90fd2c2f3@redhat.com>
+ <20250106165159.GJ5556@nvidia.com>
+ <f13622a2-6955-48d0-9793-fba6cea97a60@redhat.com>
+ <SA1PR12MB7199E3C81FDC017820773DE0B01C2@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <20250113162749.GN5556@nvidia.com>
+ <0743193c-80a0-4ef8-9cd7-cb732f3761ab@redhat.com>
+ <20250114133145.GA5556@nvidia.com>
+ <SA1PR12MB71998E1E70F3A03D5E30DE40B0182@SA1PR12MB7199.namprd12.prod.outlook.com>
+ <20250115143213.GQ5556@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241204191349.1730936-1-jthoughton@google.com>
- <Z2simHWeYbww90OZ@x1n> <CADrL8HUkP2ti1yWwp=1LwTX2Koit5Pk6LFcOyTpN2b+B3MfKuw@mail.gmail.com>
- <Z4lp5QzdOX0oYGOk@x1n> <Z4lsxgFSdiqpNtdG@x1n>
-Message-ID: <Z4mFL8wfHjvz6F1Y@google.com>
-Subject: Re: [PATCH v1 00/13] KVM: Introduce KVM Userfault
-From: Sean Christopherson <seanjc@google.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: James Houghton <jthoughton@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Yan Zhao <yan.y.zhao@intel.com>, Nikita Kalyazin <kalyazin@amazon.com>, 
-	Anish Moorthy <amoorthy@google.com>, Peter Gonda <pgonda@google.com>, 
-	David Matlack <dmatlack@google.com>, Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250115143213.GQ5556@nvidia.com>
 
-On Thu, Jan 16, 2025, Peter Xu wrote:
-> On Thu, Jan 16, 2025 at 03:19:49PM -0500, Peter Xu wrote:
-> > > For the gmem case, userfaultfd cannot be used, so KVM Userfault isn't
-> > > replacing it. And as of right now anyway, KVM Userfault *does* provide
-> > > a complete post-copy system for gmem.
-> > > 
-> > > When gmem pages can be mapped into userspace, for post-copy to remain
-> > > functional, userspace-mapped gmem will need userfaultfd integration.
-> > > Keep in mind that even after this integration happens, userfaultfd
-> > > alone will *not* be a complete post-copy solution, as vCPU faults
-> > > won't be resolved via the userspace page tables.
+On Wed, Jan 15, 2025 at 10:32:13AM -0400, Jason Gunthorpe wrote:
+> On Tue, Jan 14, 2025 at 11:13:48PM +0000, Ankit Agrawal wrote:
+> > > Do we really want another weirdly defined VMA flag? I'd really like to
+> > > avoid this.. 
 > > 
-> > Do you know in context of CoCo, whether a private page can be accessed at
-> > all outside of KVM?
+> > I'd let Catalin chime in on this. My take of the reason for his suggestion is
+> > that we want to reduce the affected configs to only the NVIDIA grace based
+> > systems. The nvgrace-gpu module would be setting the flag and the
+> > new codepath will only be applicable there. Or am I missing something here?
+> 
+> We cannot add VMA flags that are not clearly defined. The rules for
+> when the VMA creater should set the flag need to be extermely clear
+> and well defined.
+> 
+> > > Can't we do a "this is a weird VM_PFNMAP thing, let's consult the VMA
+> > > prot + whatever PFN information to find out if it is weird-device and
+> > > how we could safely map it?"
 > > 
-> > I think I'm pretty sure now a private page can never be mapped to
-> > userspace.  However, can another module like vhost-kernel access it during
-> > postcopy?  My impression of that is still a yes, but then how about
-> > vhost-user?
-> > 
-> > Here, the "vhost-kernel" part represents a question on whether private
-> > pages can be accessed at all outside KVM.  While "vhost-user" part
-> > represents a question on whether, if the previous vhost-kernel question
-> > answers as "yes it can", such access attempt can happen in another
-> > process/task (hence, not only does it lack KVM context, but also not
-> > sharing the same task context).
+> > My understanding was that the new suggested flag VM_FORCE_CACHED
+> > was essentially to represent "whatever PFN information to find out if it is
+> > weird-device". Is there an alternate reliable check to figure this out?
 > 
-> Right after I sent it, I just recalled whenever a device needs to access
-> the page, it needs to be converted to shared pages first..
+> For instance FORCE_CACHED makes no sense, how will the VMA creator
+> know it should set this flag?
+> 
+> > Currently in the patch we check the following. So Jason, is the suggestion that
+> > we simply return error to forbid such condition if VM_PFNMAP is set?
+> > +	else if (!mte_allowed && kvm_has_mte(kvm))
+> 
+> I really don't know enought about mte, but I would take the position
+> that VM_PFNMAP does not support MTE, and maybe it is even any VMA
+> without VM_MTE/_ALLOWED does not support MTE?
+> 
+> At least it makes alost more sense for the VMA creator to indicate
+> positively that the underlying HW supports MTE.
 
-FWIW, once Trusted I/O comes along, "trusted" devices will be able to access guest
-private memory.  The basic gist is that the IOMMU will enforce access to private
-memory, e.g. on AMD the IOMMU will check the RMP[*], and I believe the plan for
-TDX is to have the IOMMU share the Secure-EPT tables that are used by the CPU.
+Sorry, I didn't get the chance to properly read this thread. I'll try
+tomorrow and next week.
 
-[*] https://www.amd.com/content/dam/amd/en/documents/developer/sev-tio-whitepaper.pdf
+Basically I don't care whether MTE is supported on such vma, I doubt
+you'd want to enable MTE anyway. But the way MTE was designed in the Arm
+architecture, prior to FEAT_MTE_PERM, it allows a guest to enable MTE at
+Stage 1 when Stage 2 is Normal WB Cacheable. We have no idea what enable
+MTE at Stage 1 means if the memory range doesn't support it. It could be
+external aborts, SError or simply accessing data (as tags) at random
+physical addresses that don't belong to the guest. So if a vma does not
+have VM_MTE_ALLOWED, we either disable Stage 2 cacheable or allow it
+with FEAT_MTE_PERM (patches from Aneesh on the list). Or, a bigger
+happen, disable MTE in guests (well, not that big, not many platforms
+supporting MTE, especially in the enterprise space).
 
-> So I suppose the questions were not valid at all!  It is not about the
-> context but that the pages will be shared always whenever a device in
-> whatever form will access it..
-> 
-> Fundamentally I'm thinking about whether userfaultfd must support (fd,
-> offset) tuple.  Now I suppose it's not, because vCPUs accessing
-> private/shared will all exit to userspace, while all non-vCPU / devices can
-> access shared pages only.
-> 
-> In that case, looks like userfaultfd can support CoCo on device emulations
-> by sticking with virtual-address traps like before, at least from that
-> specific POV.
-> 
-> -- 
-> Peter Xu
-> 
+A second problem, similar to relaxing to Normal NC we merged last year,
+we can't tell what allowing Stage 2 cacheable means (SError etc). That's
+why I thought this knowledge lies with the device, KVM doesn't have the
+information. Checking vm_page_prot instead of a VM_* flag may work if
+it's mapped in user space but this might not always be the case. I don't
+see how VM_PFNMAP alone can tell us anything about the access properties
+supported by a device address range. Either way, it's the driver setting
+vm_page_prot or some VM_* flag. KVM has no clue, it's just a memory
+slot.
+
+A third aspect, more of a simplification when reasoning about this, was
+to use FWB at Stage 2 to force cacheability and not care about cache
+maintenance, especially when such range might be mapped both in user
+space and in the guest.
+
+-- 
+Catalin
 
