@@ -1,133 +1,244 @@
-Return-Path: <kvm+bounces-35681-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35682-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E68A14156
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 19:01:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683E7A1416F
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 19:06:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0C693A2F98
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 18:01:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83B53167FDE
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 18:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF6C22D4EC;
-	Thu, 16 Jan 2025 18:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E32222D4E2;
+	Thu, 16 Jan 2025 18:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i5NjK2p8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JMKGJTWV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8B41428E7
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 18:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDE614EC4E
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 18:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737050492; cv=none; b=hXdb03hocm5zzicKxRpD6yj9FHqtGFoIkwnAV/eA4lYPxFy4rTcK61gGP4jT8irMzNZDtRbp5bimWr71uUeZSXh/sQmo5gNCTtRxuu/+YYaj207WZW49a5BYtUt6ABSI6XCKfMb+aHjkK3x32M9kKD8YI5qDKf1OQAd9nWie+eY=
+	t=1737050753; cv=none; b=BDQdf8IJZWIYThRo6Tce44zaM2m9PKjhRpULaR6sN2rZZuPxqC33eFDwA3WMAKxC5BKDJGeYojbyNB3jRG+YcbQJiClFfOwE50TF/U52f2YwViHw9IqCstmBq+CENFeH4mmsjT78NhncE+o6gIaq6Y5ZD7mmYylFFvqWhCDQCB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737050492; c=relaxed/simple;
-	bh=FVCcM1bmP8n7igPwyVgnG98h7VYBXJXDmiuOC6CuOWI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OM3b1ePICDNN7+beIwckNjLGcVrYtihcD/1CPkDF3omiRZpH6zZRAV1QSupbgWXUTIIkopSPtrwYMbHrK2mRtW0zmXwoV87iJpQL2veDKFHC9LDF9OEd5yoJ8wpmtKEItBegrsrMyIFggLckDz0+F5RXIyg6sFmn/bNTMSpBtuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i5NjK2p8; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so3844935a91.3
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 10:01:30 -0800 (PST)
+	s=arc-20240116; t=1737050753; c=relaxed/simple;
+	bh=ijoVL96Gv6iHqICRsMMtm9LOhroNIMwVmR0QHQThSj8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LQviQP6ZF1YZcmL9hHFh8cE2dW8HwHXG6tW/vwIsmmKyMlTAWqHI2YwP9Q+5ptYUitYEcXhh1zSljf/bEBuv+y91yMImjqIliF407+CpvlEe3x/VJ2RbIXEKwWSd5zcH3I11Ir0bNlD9vKnKE9fFzAnvzmF1RrPBtxEz372Vwm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JMKGJTWV; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-436a03197b2so8025875e9.2
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 10:05:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737050490; x=1737655290; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G9SH9U0n4ScQtvRfb8QH6l3/ztf+u3MBKmjQCKoC3O8=;
-        b=i5NjK2p8qbaijujbVQkdCAEIMCBV7mfHf2Ve+OH2bDODyxeT649syAiTRYJwA2fkIt
-         J29Q4qHbNURdnXpF8HwPjimgRtaTHd55MY+GH56BTVIRQ8xW/sdRcfnhsXf7fsuRt01x
-         mY6JZU1oosaY40yLMkTysvshJazMk3jsxMdgGylwiH/5Xw0LvQnnoWl4Iu1Iu4H0/M3R
-         JaS29i5i500Hx3cFUN2OV5u8dDmK9aPT6xOElI9ydpQA5CUvovdcaMtwsQZQ3Wl548FD
-         4Cmq8ROZyAxfOoVJrfGJOmjPNBRK6F3mz0HioGg3pQMRwYhsFLqRPN0XsI9P+PeTZ5C9
-         UwFw==
+        d=linaro.org; s=google; t=1737050750; x=1737655550; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Rhp05gJbQRlTNfvgsZGYVcl1Q/y5Mvv1WzUV/6aq+RQ=;
+        b=JMKGJTWVO9o4WPGZVoM00nU5K5egAqsGQ10NUJNEM7pJup+T2sGIFRUuYbGd8RwbH0
+         6p8Im8XF1ie9fb6VeyDuSQOZg72eC489ZatRNDAGI2z7xGDWNJG4Mf5izm9u7Bn9bW+k
+         SIt2cLyCdf1bKiy2mJiyLGMTQPvhsanEpvqIBC3hbsP7lfcczI4W/aVHWP+NHZnc0Erz
+         oq3KbMLvcS59FWeKo+hphRcO1xwLhx7DEHB8sfU6Ujz8ULtjobIjY28iUeFvY/r5fsAH
+         IHpwW/ZQB12IzHXFDelqqVH+ueBtfiMzKC2XyWIXuvP/PYIVsQz/vzeK1sA/BFN1c5bg
+         TlqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737050490; x=1737655290;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G9SH9U0n4ScQtvRfb8QH6l3/ztf+u3MBKmjQCKoC3O8=;
-        b=lM5L0UZcaLdMPo/EOppH94N1dFgBVM04klULoFmaYaRfB4VzxJAGYM838YezXUaLu9
-         nQvyolCtNco9XLAYoL9t6Q5vOvs8k9u6Wpemie6lys67Y+1RPeZrVSOnHFrCvMQ/9ho2
-         JgQnFWsJh73pdSj372WaWhxU7RvXujzDztOXZ5rrzH9ZTPerXOVVu8PoiM5z1vSItXtw
-         NNUeDnqpUVRmS44/fSHbmcrGpGrOiuOgY7Ql7FyTUhwgb/iMHAtk+wyqRF0HiXvwK0ZI
-         ba/FiqPedh7N5m6KvJJoA53R5fQBiDYAsAtW9BWG5c2mdusJ4pkH/El9J50tnBFKqA4e
-         fUNA==
-X-Gm-Message-State: AOJu0YxBD8TrTJiyS/nPoHnO4LHmjXRoTEeE65MY1YX5KL7+fR2S2HMe
-	KZM5N9BjWrLVPlvLuPechbpN8k3VBKtKOtK3tEogMcHjDKYQxVDpslW9b17Ia9ruxlefT/CkIrC
-	0kw==
-X-Google-Smtp-Source: AGHT+IFnz5qkkpbHKHvIY9X2JNZh7fL9mYPfmEoDm+fvqAKga7ijY8uVwKZwhhO9TzX0EcG4kdHIUKjHDx0=
-X-Received: from pjbqn5.prod.google.com ([2002:a17:90b:3d45:b0:2ea:61ba:b8f7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:37c5:b0:2ea:3f34:f18d
- with SMTP id 98e67ed59e1d1-2f548eae685mr51210908a91.10.1737050490089; Thu, 16
- Jan 2025 10:01:30 -0800 (PST)
-Date: Thu, 16 Jan 2025 10:01:28 -0800
-In-Reply-To: <6719eaeb.050a0220.1e4b4d.00a0.GAE@google.com>
+        d=1e100.net; s=20230601; t=1737050750; x=1737655550;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rhp05gJbQRlTNfvgsZGYVcl1Q/y5Mvv1WzUV/6aq+RQ=;
+        b=pFYMUOt+ZkyBYCo/nrWtp2N9KkSd7xDq2F5XEmp5G8g0Rs5T6GzN0tciEvqklOqnCX
+         B70pk8HdxPNHb3kVetBv12+kWNTslrFSnoyQ7F9qaGeW2nm8dSUIHxCTsrWdUpuTsFXm
+         4nK+9b0YhRUnZ5bE5tzrri+R3ZHWrcMLfS4W1fWRXp8tAitdbzrsCQj7O4ip2q0Qs9o5
+         CW6PjpG+pkLMu0zlXziw421GXotpiL7+ZD6R6m+4SSzY/ctRBauei5W4Vo1JRm+PRb5L
+         Tpcg9+53WcnsBby1q6BB72uD6oE+nj9JPDVqR0DJkQOwROLMwul4T6J8sp13s4NtH2FZ
+         adhA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8pdu6g/xlSIA94h8ohL7j1sAfdSMfXJwIktltzDmsDFZAumx0qnijFC7HuJMUxbt1DAo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/V6pz4MsnQ9q5a/6E4symy0AvRrIxCkG3F6FNeVpnQfWuk75M
+	S60lXcUeS10OYgbN/tjNQWiqzyrTl4VwB2G5S0iaR+bj5DJl7mjxfC1X000sdgE=
+X-Gm-Gg: ASbGncvzWFwVZu73orlaXLrz7Q3Uu3xDP3rnyipGm0aOxTpEZA7AjWRNi9pE2f2h8C5
+	tRo/hu4NIGc9jvSRUkSpmFnOzkK2MgIUmLcbI5gCqPVynfPIdKilmxt8PR0DWBY4fwJ9ef6f1KM
+	pepJmoU4mQaUGT1JxU6k1IdfGki3biuBaBWyy0RXIEe1rRlQSaNKYOmC+oI1rFLU1MY9Ymw6b8x
+	yBMz9fNNcnkjuKxv/u3GbxmX2e9bbpuwNE3SH5g36TE/DCp6jX+55/n/uWoCtcCxA4sL1NSvNM3
+	UBzU0WA39eDjEkjdAILvtFSt
+X-Google-Smtp-Source: AGHT+IE7PicfAMlxA+nlONgB6VhOPYA3/3n8nOIee+iKmvhp7eYMFXXEQKotYDBpJUtL/z/v/0EW/g==
+X-Received: by 2002:a05:600c:314b:b0:434:f270:a513 with SMTP id 5b1f17b1804b1-436e26ff288mr247488285e9.29.1737050749887;
+        Thu, 16 Jan 2025 10:05:49 -0800 (PST)
+Received: from [192.168.69.151] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890367b48sm6925895e9.0.2025.01.16.10.05.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jan 2025 10:05:48 -0800 (PST)
+Message-ID: <5f25576c-598f-4fd7-8238-61edcff2c411@linaro.org>
+Date: Thu, 16 Jan 2025 19:05:46 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <6719eaeb.050a0220.1e4b4d.00a0.GAE@google.com>
-Message-ID: <Z4lJeDIHfFT9_GG6@google.com>
-Subject: Re: [syzbot] [kvm?] WARNING in kvm_put_kvm (2)
-From: Sean Christopherson <seanjc@google.com>
-To: syzbot <syzbot+4f8d3ac3727ffc0ecd8a@syzkaller.appspotmail.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 06/22] exec/cpu: Call cpu_remove_sync() once in
+ cpu_common_unrealize()
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ David Hildenbrand <david@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Anton Johansson <anjo@rev.ng>, Peter Maydell <peter.maydell@linaro.org>,
+ kvm@vger.kernel.org, Marek Vasut <marex@denx.de>,
+ David Gibson <david@gibson.dropbear.id.au>, Brian Cain <bcain@quicinc.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+ Claudio Fontana <cfontana@suse.de>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, qemu-ppc@nongnu.org,
+ Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Ilya Leoshkevich <iii@linux.ibm.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Alessandro Di Federico <ale@rev.ng>, Song Gao <gaosong@loongson.cn>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Chris Wulff <crwulff@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, Fabiano Rosas <farosas@suse.de>,
+ qemu-s390x@nongnu.org, Yanan Wang <wangyanan55@huawei.com>,
+ Luc Michel <luc@lmichel.fr>, Weiwei Li <liweiwei@iscas.ac.cn>,
+ Bin Meng <bin.meng@windriver.com>, Stafford Horne <shorne@gmail.com>,
+ Xiaojuan Yang <yangxiaojuan@loongson.cn>,
+ "Daniel P . Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-arm@nongnu.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Bernhard Beschow <shentey@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-riscv@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Nicholas Piggin <npiggin@gmail.com>, Greg Kurz <groug@kaod.org>,
+ Michael Rolnik <mrolnik@gmail.com>, Eduardo Habkost <eduardo@habkost.net>,
+ Markus Armbruster <armbru@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>
+References: <20230918160257.30127-1-philmd@linaro.org>
+ <20230918160257.30127-7-philmd@linaro.org>
+ <20231128174215.32d2a350@imammedo.users.ipa.redhat.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20231128174215.32d2a350@imammedo.users.ipa.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 23, 2024, syzbot wrote:
-> Hello,
+On 28/11/23 17:42, Igor Mammedov wrote:
+> On Mon, 18 Sep 2023 18:02:39 +0200
+> Philippe Mathieu-Daudé <philmd@linaro.org> wrote:
 > 
-> syzbot found the following issue on:
+>> While create_vcpu_thread() creates a vCPU thread, its counterpart
+>> is cpu_remove_sync(), which join and destroy the thread.
+>>
+>> create_vcpu_thread() is called in qemu_init_vcpu(), itself called
+>> in cpu_common_realizefn(). Since we don't have qemu_deinit_vcpu()
+>> helper (we probably don't need any), simply destroy the thread in
+>> cpu_common_unrealizefn().
+>>
+>> Note: only the PPC and X86 targets were calling cpu_remove_sync(),
+>> meaning all other targets were leaking the thread when the vCPU
+>> was unrealized (mostly when vCPU are hot-unplugged).
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>> ---
+>>   hw/core/cpu-common.c  | 3 +++
+>>   target/i386/cpu.c     | 1 -
+>>   target/ppc/cpu_init.c | 2 --
+>>   3 files changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
+>> index a3b8de7054..e5841c59df 100644
+>> --- a/hw/core/cpu-common.c
+>> +++ b/hw/core/cpu-common.c
+>> @@ -221,6 +221,9 @@ static void cpu_common_unrealizefn(DeviceState *dev)
+>>   
+>>       /* NOTE: latest generic point before the cpu is fully unrealized */
+>>       cpu_exec_unrealizefn(cpu);
+>> +
+>> +    /* Destroy vCPU thread */
+>> +    cpu_remove_sync(cpu);
+>>   }
+>>   
+>>   static void cpu_common_initfn(Object *obj)
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index cb41d30aab..d79797d963 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -7470,7 +7470,6 @@ static void x86_cpu_unrealizefn(DeviceState *dev)
+>>       X86CPUClass *xcc = X86_CPU_GET_CLASS(dev);
+>>   
+>>   #ifndef CONFIG_USER_ONLY
+>> -    cpu_remove_sync(CPU(dev));
+>>       qemu_unregister_reset(x86_cpu_machine_reset_cb, dev);
+>>   #endif
 > 
-> HEAD commit:    15e7d45e786a Add linux-next specific files for 20241016
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1397b240580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=c36416f1c54640c0
-> dashboard link: https://syzkaller.appspot.com/bug?extid=4f8d3ac3727ffc0ecd8a
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> missing  followup context:
+>      ...
+>      xcc->parent_unrealize(dev);
 > 
-> Unfortunately, I don't have any reproducer for this issue yet.
+> Before the patch, vcpu thread is stopped and onnly then
+> clean up happens.
 > 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/cf2ad43c81cc/disk-15e7d45e.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/c85347a66a1c/vmlinux-15e7d45e.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/648cf8e59c13/bzImage-15e7d45e.xz
+> After the patch we have cleanup while vcpu thread is still running.
 > 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+4f8d3ac3727ffc0ecd8a@syzkaller.appspotmail.com
+> Even if it doesn't explode, such ordering still seems to be wrong.
 
-Yet another bcachefs shutdown problem.
+OK.
 
-#syz set subsystems: bcachefs
+>> diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
+>> index e2c06c1f32..24d4e8fa7e 100644
+>> --- a/target/ppc/cpu_init.c
+>> +++ b/target/ppc/cpu_init.c
+>> @@ -6853,8 +6853,6 @@ static void ppc_cpu_unrealize(DeviceState *dev)
+>>   
+>>       pcc->parent_unrealize(dev);
+>>   
+>> -    cpu_remove_sync(CPU(cpu));
+> 
+> bug in current code?
 
-[   88.514126][ T5826] bcachefs (loop1): flushing journal and stopping allocators complete, journal seq 4
-[   88.569826][ T5836] EXT4-fs (loop2): unmounting filesystem 00000000-0000-0000-0000-000000000000.
-[   88.618725][ T5826] bcachefs (loop1): clean shutdown complete, journal seq 5
-[   88.807819][ T5826] bcachefs (loop1): marking filesystem clean
-[   89.094513][ T5826] bcachefs (loop1): shutdown complete
-[   89.339441][ T6085] loop3: detected capacity change from 0 to 32768
-[   89.629580][ T6096] loop4: detected capacity change from 0 to 40427
-[   89.700754][ T6096] F2FS-fs (loop4): build fault injection attr: rate: 771, type: 0x1fffff
-[   90.062540][ T6085] XFS (loop3): Mounting V5 Filesystem c496e05e-540d-4c72-b591-04d79d8b4eeb
-[   90.081642][ T6096] F2FS-fs (loop4): invalid crc value
-[   90.127830][ T6098] tty tty20: ldisc open failed (-12), clearing slot 19
-[   90.438369][ T6096] F2FS-fs (loop4): Found nat_bits in checkpoint
-[   90.558422][ T6085] XFS (loop3): Ending clean mount
-[   90.619095][ T6115] loop0: detected capacity change from 0 to 128
-[   90.643095][ T6085] XFS (loop3): Unmounting Filesystem c496e05e-540d-4c72-b591-04d79d8b4eeb
-[   90.671995][ T6096] F2FS-fs (loop4): Mounted with checkpoint version = 48b305e5
-[   91.300054][ T6117] syz.0.30 (6117): drop_caches: 2
-[   91.503301][ T6118] syz.4.29: attempt to access beyond end of device
-[   91.503301][ T6118] loop4: rw=2049, sector=77824, nr_sectors = 144 limit=40427
-[   91.556455][ T6096] F2FS-fs (loop4): inject lock_op in f2fs_trylock_op of f2fs_write_single_data_page+0xd20/0x1bd0
-[   91.604651][ T6096] syz.4.29: attempt to access beyond end of device
-[   91.604651][ T6096] loop4: rw=2049, sector=77968, nr_sectors = 112 limit=40427
-[   91.632912][ T6091] ------------[ cut here ]------------
-[   91.638499][ T6091] WARNING: CPU: 0 PID: 6091 at kernel/rcu/srcutree.c:681 cleanup_srcu_struct+0x404/0x4d0
+Plausibly. See:
+
+commit f1023d21e81b7bf523ddf2ac91a48117f20ef9d7
+Author: Greg Kurz <groug@kaod.org>
+Date:   Thu Oct 15 23:18:32 2020 +0200
+
+     spapr: Unrealize vCPUs with qdev_unrealize()
+
+     Since we introduced CPU hot-unplug in sPAPR, we don't unrealize the
+     vCPU objects explicitly. Instead, we let QOM handle that for us
+     under object_property_del_all() when the CPU core object is
+     finalized. The only thing we do is calling cpu_remove_sync() to
+     tear the vCPU thread down.
+
+     This happens to work but it is ugly because:
+     - we call qdev_realize() but the corresponding qdev_unrealize() is
+       buried deep in the QOM code
+     - we call cpu_remove_sync() to undo qemu_init_vcpu() called by
+       ppc_cpu_realize() in target/ppc/translate_init.c.inc
+     - the CPU init and teardown paths aren't really symmetrical
+
+     The latter didn't bite us so far but a future patch that greatly
+     simplifies the CPU core realize path needs it to avoid a crash
+     in QOM.
+
+     For all these reasons, have ppc_cpu_unrealize() to undo the changes
+     of ppc_cpu_realize() by calling cpu_remove_sync() at the right
+     place, and have the sPAPR CPU core code to call qdev_unrealize().
+
+     This requires to add a missing stub because translate_init.c.inc is
+     also compiled for user mode.
+
+> 
+>> -
+>>       destroy_ppc_opcodes(cpu);
+>>   }
+>>   
+
 
