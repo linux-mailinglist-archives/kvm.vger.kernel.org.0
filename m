@@ -1,286 +1,241 @@
-Return-Path: <kvm+bounces-35608-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35609-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD30A12F98
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 01:22:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3261BA1300E
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 01:35:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94AB07A309B
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 00:22:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCA653A1268
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 00:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E10A1804A;
-	Thu, 16 Jan 2025 00:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4210517C8B;
+	Thu, 16 Jan 2025 00:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="J4tKA2z9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fDglf5uI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF6117991;
-	Thu, 16 Jan 2025 00:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519D6B67E
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 00:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736986918; cv=none; b=eX94l3yaVeNk6hI+KbxmbJM0TcqHzEQSVZncL7CUTGS7fyF+ir+Mg1Q8KjI97/skJuzWZPEb+lSBrfXmmi+r+ha9oaEskVl3afsSprpK7WhANkSB8SF0U306XZQ/v13O/H+uf+9fM8vRpCoqB2U3jNLVRD9nvb6Awa8r86mYdRc=
+	t=1736987738; cv=none; b=JTM1eP/SyQOv5WRmkloUkOObaDh5jOAVLOoEFb4liPV7WxUZ3hYzJNvL2Tmhlg2rSe/iAwoUHeYXpUaKZDOowfMr13lrFAs+skE+BZhuHMQESaFsuYDmK1bQrH8elsU3TC2/28ReZNVFeLjc0yhzgpJHj0LXbVoQcsh3G+8ytuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736986918; c=relaxed/simple;
-	bh=CnVEtvm6r0FK1c66L6L7ntFsmh6oSuFSfI8+wFyyIis=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=og/iiOTZmfQRvncJEDafE6drCBB9PlLG6Tr5fHi55vwpszlqP3mdXYsVujcDNLc4fv5w73mVWIzg6262dxTm8snjjwzl0z/9SqzEcLH3XNkGAJGdMQHN2g1r0xJRIL1h/3DpgxS0TaOp7UJQcTqH/faiFCtmgdUSlxjPY14dts8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=J4tKA2z9; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 0C56940E016C;
-	Thu, 16 Jan 2025 00:21:52 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id VbKRelzzy0f1; Thu, 16 Jan 2025 00:21:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1736986908; bh=sf+0ox9qps9OCdNOEgrNakgxyzYQCzMyDXp9Teo1SPg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J4tKA2z9c1dX6/H2/3UFIDVILO8xBwPl1TEyUVQC4DlsQu0QI4LpBFQsTv6iHdtZ2
-	 p9YzSu1IhOTiU08BN0L2M0PecKjs22CleittrM2qBO2cPFFy2HJaYp5I0uY6OZRukR
-	 zozlAlfCzmYK6zA6a7rnwMrIQ0b9nW+RolLTUFHyU+pjU2cgIrmrHLhc5fWiU93M7s
-	 2LkZr/YbbEmZFQD4jIKQDyVrDvGkXqUQxr/6r6ASqtjZeCHNBw03OzcKbqcsL4Zf7y
-	 r1sNh+hwC4E+Sr34rsrK2zYDvzgRcnP4r3tkiHo/VN5TYvqIp98CXQqbLfpwJEbhX6
-	 LaT6JfdqWRw5QyxhDfkiFjx/XLr9NsYyJlC7ZF0t4iyxrgh9cNrQSodGzZq46p9SyW
-	 +WsaNZgJgyJuKoQeomDMVOTWzfADMeQN5FYTZwJH0fqluCcbXDu1gyb+MVca8Gq90k
-	 llpN+og3N+QW/Z2lzB9EkrkOeRj43toNWqIzt56gvuiATFuUMDYR70QV3oeogpE80D
-	 afkT8idhQsUhKtFR8pKG/nJdJsboyyBxDAYqoVUea/m1agSvHxOA/qykF1MomKo6Rn
-	 83v/tkyRaK2qlfWRqxNzTUP0WyMRLSCK9+KBi9ZUGMvUEoc5K77pSKK9g5j/jP4qjT
-	 q2Tju1YxL09ppY+Av5Rr7RuI=
-Received: from zn.tnic (p200300eA971f93c3329C23fFFEA6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:93c3:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7299840E0277;
-	Thu, 16 Jan 2025 00:19:07 +0000 (UTC)
-Date: Thu, 16 Jan 2025 01:18:58 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Brendan Jackman <jackmanb@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-	Brian Cain <bcain@quicinc.com>, Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Michal Simek <monstr@monstr.eu>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Dinh Nguyen <dinguyen@kernel.org>, Jonas Bonn <jonas@southpole.se>,
-	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-	Stafford Horne <shorne@gmail.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>,
-	Rich Felker <dalias@libc.org>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Chris Zankel <chris@zankel.net>, Max Filippov <jcmvbkbc@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@linux.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org,
-	linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-csky@vger.kernel.org,
-	linux-hexagon@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-arch@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, kvm@vger.kernel.org,
-	linux-efi@vger.kernel.org
-Subject: Re: [PATCH RFC v2 01/29] mm: asi: Make some utility functions
- noinstr compatible
-Message-ID: <20250116001858.GDZ4hQctZe_PFvJ0AJ@fat_crate.local>
-References: <20250110-asi-rfc-v2-v2-0-8419288bc805@google.com>
- <20250110-asi-rfc-v2-v2-1-8419288bc805@google.com>
+	s=arc-20240116; t=1736987738; c=relaxed/simple;
+	bh=cqk7jKAnFKD3qxSp8rD+kZBaPY54HemalT1voY1isiU=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=gdIz9/ZJpekBtnmkWNj9CO9iem4rqxA/4SzH7U70v9XRynmmsmv97tJlkq7ZKsR9DHTgqvp7EZ2b3Cj1hiiquvGGx/li1HQvXanDsgIrRN4/8vSArNB6DKnCoc+cnECTmPAcRsgy2+lZIexieT2WsYKjI/j3wGfTMUZ9ilOlOU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fDglf5uI; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2166855029eso6240425ad.0
+        for <kvm@vger.kernel.org>; Wed, 15 Jan 2025 16:35:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736987735; x=1737592535; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZI95E/grQOj5lmAqAkKwCbXt2uGVrqNSdSRAEqaCEQw=;
+        b=fDglf5uIfusxnkHEnsq7mgZCSmgjL9KhPIN6EFd3Uv6dTpj6Krb+zzixUoKrh+/4Zb
+         w3iZta5mjerRz7KIOy8bVHS+qapnfp/LCn5xrPcS2iW8A51JjfvvrcP2U1JsDAGDpxh4
+         kliiHLmhNMdWUvJplIht/bgfCPi/L/CEecY/1/MS/955SaXV1NOkpPfOydFstuG07gkG
+         ZFv0ij3VjzSolW2xYlaRVZ45cdqq6FOMxuiCurhpx2LwksOaaJNgM4wyfb0QoUJs2hWY
+         l5pYCxbwRHQ7D570EYx7ksWFuOOTy6XvEjKT8ZSvxpaw+VXS53s/TzfJlTKMnoW5f/Cr
+         16Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736987735; x=1737592535;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZI95E/grQOj5lmAqAkKwCbXt2uGVrqNSdSRAEqaCEQw=;
+        b=XOkgONlDAlMfswmVdx8Lcub6VmUENF5z1oa7crxjzrG0/Ktbm9oX+PnC9RJ8b9M+1v
+         2zfWllOvJAxhw8ZOUO9r1akoo+s5a6iHu7BXaxUilhl5rV5eDwsmZQbjXLmQKnvfRjSw
+         RbnRnx7BOJYtRbm7uTzxi6m1Z5LRPPN76B6RreCaa8HbzjOnsVr7TvSEuvH3nP/XfJKB
+         3Lc6GI+/XbJ1lsxzUDpGxzxyXnUzC0sB3W52FA9hW3ZbdSQJqdZw4h3gXkXihkspPt9P
+         PBFni2u+et+0VxtTG3AXrWvdzdE4TlhPDf61IEctrWqCyHXti3g3Rs2o73y/rzn+wXnx
+         OFqg==
+X-Gm-Message-State: AOJu0YzTo0LuoLer/OPl/7LnWFo3M3g/3apkya0gXVi3r25r58fTGrfG
+	xjT99ti0d4GEPFl9VeTciqUyuN1SirBtZJlv38/RZgtsp35l3m7pFeFC4cHfY0p2CH/0syPn/Lg
+	q+L6N6rOGXBrVsviFlOW2RA==
+X-Google-Smtp-Source: AGHT+IGAsGunK2FzDulfjw3tOwuPn1zWdFCLhFH0XiViYbpTu3Cro/+3F9g9kMYHMexKuSAzVMO8CIJzcPXKR++RZA==
+X-Received: from pgph7.prod.google.com ([2002:a65:4047:0:b0:7fe:ffa9:4e54])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:3943:b0:1e8:bd15:6819 with SMTP id adf61e73a8af0-1e8bd156be3mr30608996637.22.1736987735482;
+ Wed, 15 Jan 2025 16:35:35 -0800 (PST)
+Date: Thu, 16 Jan 2025 00:35:34 +0000
+In-Reply-To: <CA+EHjTzcx=eXSERSANMByhcgRRAbUL3kPAYkeu-uUgd0nPBPPA@mail.gmail.com>
+ (message from Fuad Tabba on Thu, 9 Jan 2025 16:34:42 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250110-asi-rfc-v2-v2-1-8419288bc805@google.com>
+Mime-Version: 1.0
+Message-ID: <diqzh65zzjc9.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v4 00/14] KVM: Restricted mapping of guest_memfd at
+ the host and arm64 support
+From: Ackerley Tng <ackerleytng@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 10, 2025 at 06:40:27PM +0000, Brendan Jackman wrote:
-> Subject: Re: [PATCH RFC v2 01/29] mm: asi: Make some utility functions noinstr compatible
+Fuad Tabba <tabba@google.com> writes:
 
-The tip tree preferred format for patch subject prefixes is
-'subsys/component:', e.g. 'x86/apic:', 'x86/mm/fault:', 'sched/fair:',
-'genirq/core:'. Please do not use file names or complete file paths as
-prefix. 'git log path/to/file' should give you a reasonable hint in most
-cases.
+> Hi,
+>
+> As mentioned in the guest_memfd sync (2025-01-09), below is the state
+> diagram that uses the new states in this patch series, and how they
+> would interact with sharing/unsharing in pKVM:
+>
+> https://lpc.events/event/18/contributions/1758/attachments/1457/3699/Guestmemfd%20folio%20state%20page_type.pdf
 
-So I guess "x86/asm:" or so.
+Thanks Fuad!
 
-> Some existing utility functions would need to be called from a noinstr
-> context in the later patches. So mark these as either noinstr or
-> __always_inline.
-> 
-> An earlier version of this by Junaid had a macro that was intended to
-> tell the compiler "either inline this function, or call it in the
-> noinstr section", which basically boiled down to:
-> 
->  #define inline_or_noinstr noinline __section(".noinstr.text")
-> 
-> Unfortunately Thomas pointed out this will prevent the function from
-> being inlined at call sites in .text.
-> 
-> So far I haven't been able[1] to find a formulation that lets us :
-> 1. avoid calls from .noinstr.text -> .text,
-> 2. while also letting the compiler freely decide what to inline.
-> 
-> 1 is a functional requirement so here I'm just giving up on 2. Existing
-> callsites of this code are just forced inline. For the incoming code
-> that needs to call it from noinstr, they will be out-of-line calls.
+I took a look at the state diagram [1] and the branch that this patch is
+on [2], and here's what I understand about the flow:
 
-I'm not sure some of that belongs in the commit message - if you want to have
-it in the submission, you should put it under the --- line below, right above
-the diffstat.
+1. From state H in the state diagram, the guest can request to unshare a
+   page. When KVM handles this unsharing, KVM marks the folio
+   mappability as NONE (state J).
+2. The transition from state J to state K or I is independent of KVM -
+   userspace has to do this unmapping
+3. On the next vcpu_run() from userspace, continuing from userspace's
+   handling of the unshare request, guest_memfd will check and try to
+   register a callback if the folio's mappability is NONE. If the folio
+   is mapped, or if folio is not mapped but refcount is elevated for
+   whatever reason, vcpu_run() fails and exits to userspace. If folio is
+   not mapped and gmem holds the last refcount, set folio mappability to
+   GUEST.
 
-> [1] https://lore.kernel.org/lkml/CA+i-1C1z35M8wA_4AwMq7--c1OgjNoLGTkn4+Td5gKg7QQAzWw@mail.gmail.com/
-> 
-> Checkpatch-args: --ignore=COMMIT_LOG_LONG_LINE
+Here's one issue I see based on the above understanding:
 
-Yeah, you can drop those. People should not turn off brain, use checkpatch and
-point at all the silly errors it spits anyway.
+Registration of the folio_put() callback only happens if the VMM
+actually tries to do vcpu_run(). For 4K folios I think this is okay
+since the 4K folio can be freed via the transition state K -> state I,
+but for hugetlb folios that have been split for sharing with userspace,
+not getting a folio_put() callback means never putting the hugetlb folio
+together. Hence, relying on vcpu_run() to add the folio_put() callback
+leaves a way that hugetlb pages can be removed from the system.
 
-> Signed-off-by: Brendan Jackman <jackmanb@google.com>
-> ---
->  arch/x86/include/asm/processor.h     |  2 +-
->  arch/x86/include/asm/special_insns.h |  8 ++++----
->  arch/x86/include/asm/tlbflush.h      |  3 +++
->  arch/x86/mm/tlb.c                    | 13 +++++++++----
->  4 files changed, 17 insertions(+), 9 deletions(-)
+I think we should try and find a path forward that works for both 4K and
+hugetlb folios.
 
-So I was just about to look at the below diff but then booting the patch in my
-guest causes it to stop at:
+IIUC page._mapcount and page.page_type works as a union because
+page_type is only set for page types that are never mapped to userspace,
+like PGTY_slab, PGTY_offline, etc.
 
-[    1.110988] sr 2:0:0:0: Attached scsi generic sg1 type 5
-[    1.114210] PM: Image not found (code -22)
-[    1.114903] clk: Disabling unused clocks
-[    1.119397] EXT4-fs (sda2): mounted filesystem 90868bc4-a017-4fa2-ac81-931ba260346f ro with ordered data mode. Quota mode: disabled.
-[    1.121069] VFS: Mounted root (ext4 filesystem) readonly on device 8:2.
-<--- EOF
+Technically PGTY_guest_memfd is only set once the page can never be
+mapped to userspace, but PGTY_guest_memfd can only be set once mapcount
+reaches 0. Since mapcount is added in the faulting process, could gmem
+perhaps use some kind of .unmap/.unfault callback, so that gmem gets
+notified of all unmaps and will know for sure that the mapcount gets to
+0?
 
-with the below call stack.
+Alternatively, I took a look at the folio_is_zone_device()
+implementation, and page.flags is used to identify the page's type. IIUC
+a ZONE_DEVICE page also falls in the intersection of needing a
+folio_put() callback and can be mapped to userspace. Could we use a
+similar approach, using page.flags to identify a page as a guest_memfd
+page? That way we don't need to know when unmapping happens, and will
+always be able to get a folio_put() callback.
 
-Booting it on Linus' master branch is ok but this is tip/master with all that
-we've accumulated for the next merge window along with other stuff I'm poking
-at...
+[1] https://lpc.events/event/18/contributions/1758/attachments/1457/3699/Guestmemfd%20folio%20state%20page_type.pdf
+[2] https://android-kvm.googlesource.com/linux/+/764360863785ba16d974253a572c87abdd9fdf0b%5E%21/#F0
 
-Long story short, lemme try to poke around tomorrow to try to figure out what
-actually happens. It could be caused by the part of Rik's patches and this one
-inlining things. We'll see...
-
-native_flush_tlb_one_user (addr=2507219558400) at arch/x86/mm/tlb.c:1177
-1177            if (!static_cpu_has(X86_FEATURE_PTI))
-(gdb) bt
-#0  native_flush_tlb_one_user (addr=2507219558400) at arch/x86/mm/tlb.c:1177
-#1  0xffffffff8128206e in flush_tlb_one_user (addr=addr@entry=2507219558400) at arch/x86/mm/tlb.c:1196
-#2  flush_tlb_one_kernel (addr=addr@entry=2507219558400) at arch/x86/mm/tlb.c:1151
-#3  0xffffffff812820b7 in do_kernel_range_flush (info=0xffff88807dc311c0) at arch/x86/mm/tlb.c:1092
-#4  0xffffffff8137beb6 in csd_do_func (csd=0x0 <fixed_percpu_data>, info=0xffff88807dc311c0, 
-    func=0xffffffff81282090 <do_kernel_range_flush>) at kernel/smp.c:134
-#5  smp_call_function_many_cond (mask=<optimized out>, func=func@entry=0xffffffff81282090 <do_kernel_range_flush>, 
-    info=0xffff88807dc311c0, scf_flags=scf_flags@entry=3, cond_func=cond_func@entry=0x0 <fixed_percpu_data>)
-    at kernel/smp.c:876
-#6  0xffffffff8137c254 in on_each_cpu_cond_mask (cond_func=cond_func@entry=0x0 <fixed_percpu_data>, 
-    func=func@entry=0xffffffff81282090 <do_kernel_range_flush>, info=<optimized out>, wait=wait@entry=true, 
-    mask=<optimized out>) at kernel/smp.c:1052
-#7  0xffffffff81282020 in on_each_cpu (wait=1, info=<optimized out>, func=0xffffffff81282090 <do_kernel_range_flush>)
-    at ./include/linux/smp.h:71
-#8  flush_tlb_kernel_range (start=start@entry=18446683600570097664, end=<optimized out>, end@entry=18446683600579907584)
-    at arch/x86/mm/tlb.c:1106
-#9  0xffffffff81481c3f in __purge_vmap_area_lazy (start=18446683600570097664, start@entry=18446744073709551615, 
-    end=18446683600579907584, end@entry=0, full_pool_decay=full_pool_decay@entry=false) at mm/vmalloc.c:2284
-#10 0xffffffff81481fde in _vm_unmap_aliases (start=start@entry=18446744073709551615, end=end@entry=0, 
-    flush=<optimized out>, flush@entry=0) at mm/vmalloc.c:2899
-#11 0xffffffff81482049 in vm_unmap_aliases () at mm/vmalloc.c:2922
-#12 0xffffffff81284d9f in change_page_attr_set_clr (addr=0xffffc9000001fef0, numpages=<optimized out>, mask_set=..., 
-    mask_clr=..., force_split=<optimized out>, in_flag=0, pages=0x0 <fixed_percpu_data>)
-    at arch/x86/mm/pat/set_memory.c:1881
-#13 0xffffffff81285c52 in change_page_attr_set (array=0, mask=..., numpages=511, addr=0xffffc9000001fef0)
-    at arch/x86/mm/pat/set_memory.c:1922
-#14 set_memory_nx (addr=<optimized out>, addr@entry=18446744071759204352, numpages=numpages@entry=511)
-    at arch/x86/mm/pat/set_memory.c:2110
-#15 0xffffffff8127b729 in free_init_pages (what=what@entry=0xffffffff8226bac0 "unused decrypted", 
-    begin=18446744071759204352, end=18446744071761297408) at arch/x86/mm/init.c:929
-#16 0xffffffff898f25aa in mem_encrypt_free_decrypted_mem () at arch/x86/mm/mem_encrypt_amd.c:574
-#17 0xffffffff81ca06c3 in free_initmem () at arch/x86/mm/init.c:973
-#18 0xffffffff81c9fa48 in kernel_init (unused=<optimized out>) at init/main.c:1475
-#19 0xffffffff812398a0 in ret_from_fork (prev=<optimized out>, regs=0xffffc9000001ff58, 
-    fn=0xffffffff81c9fa10 <kernel_init>, fn_arg=0x0 <fixed_percpu_data>) at arch/x86/kernel/process.c:148
-#20 0xffffffff81206f7a in ret_from_fork_asm () at arch/x86/entry/entry_64.S:244
-#21 0x1f0f2e6600000000 in ?? ()
-#22 0x2e66000000000084 in ?? ()
-#23 0x0000000000841f0f in ?? ()
-#24 0x000000841f0f2e66 in ?? ()
-#25 0x00841f0f2e660000 in ?? ()
-#26 0x1f0f2e6600000000 in ?? ()
-#27 0x2e66000000000084 in ?? ()
-#28 0x0000000000841f0f in ?? ()
-#29 0x000000841f0f2e66 in ?? ()
-#30 0x00841f0f2e660000 in ?? ()
-#31 0x0000000000000000 in ?? ()
-(gdb)
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> This patch series doesn't necessarily impose all these transitions,
+> many of them would be a matter of policy. This just happens to be the
+> current way I've done it with pKVM/arm64.
+>
+> Cheers,
+> /fuad
+>
+> On Fri, 13 Dec 2024 at 16:48, Fuad Tabba <tabba@google.com> wrote:
+>>
+>> This series adds restricted mmap() support to guest_memfd, as
+>> well as support for guest_memfd on arm64. It is based on Linux
+>> 6.13-rc2.  Please refer to v3 for the context [1].
+>>
+>> Main changes since v3:
+>> - Added a new folio type for guestmem, used to register a
+>>   callback when a folio's reference count reaches 0 (Matthew
+>>   Wilcox, DavidH) [2]
+>> - Introduce new mappability states for folios, where a folio can
+>> be mappable by the host and the guest, only the guest, or by no
+>> one (transient state)
+>> - Rebased on Linux 6.13-rc2
+>> - Refactoring and tidying up
+>>
+>> Cheers,
+>> /fuad
+>>
+>> [1] https://lore.kernel.org/all/20241010085930.1546800-1-tabba@google.com/
+>> [2] https://lore.kernel.org/all/20241108162040.159038-1-tabba@google.com/
+>>
+>> Ackerley Tng (2):
+>>   KVM: guest_memfd: Make guest mem use guest mem inodes instead of
+>>     anonymous inodes
+>>   KVM: guest_memfd: Track mappability within a struct kvm_gmem_private
+>>
+>> Fuad Tabba (12):
+>>   mm: Consolidate freeing of typed folios on final folio_put()
+>>   KVM: guest_memfd: Introduce kvm_gmem_get_pfn_locked(), which retains
+>>     the folio lock
+>>   KVM: guest_memfd: Folio mappability states and functions that manage
+>>     their transition
+>>   KVM: guest_memfd: Handle final folio_put() of guestmem pages
+>>   KVM: guest_memfd: Allow host to mmap guest_memfd() pages when shared
+>>   KVM: guest_memfd: Add guest_memfd support to
+>>     kvm_(read|/write)_guest_page()
+>>   KVM: guest_memfd: Add KVM capability to check if guest_memfd is host
+>>     mappable
+>>   KVM: guest_memfd: Add a guest_memfd() flag to initialize it as
+>>     mappable
+>>   KVM: guest_memfd: selftests: guest_memfd mmap() test when mapping is
+>>     allowed
+>>   KVM: arm64: Skip VMA checks for slots without userspace address
+>>   KVM: arm64: Handle guest_memfd()-backed guest page faults
+>>   KVM: arm64: Enable guest_memfd private memory when pKVM is enabled
+>>
+>>  Documentation/virt/kvm/api.rst                |   4 +
+>>  arch/arm64/include/asm/kvm_host.h             |   3 +
+>>  arch/arm64/kvm/Kconfig                        |   1 +
+>>  arch/arm64/kvm/mmu.c                          | 119 +++-
+>>  include/linux/kvm_host.h                      |  75 +++
+>>  include/linux/page-flags.h                    |  22 +
+>>  include/uapi/linux/kvm.h                      |   2 +
+>>  include/uapi/linux/magic.h                    |   1 +
+>>  mm/debug.c                                    |   1 +
+>>  mm/swap.c                                     |  28 +-
+>>  tools/testing/selftests/kvm/Makefile          |   1 +
+>>  .../testing/selftests/kvm/guest_memfd_test.c  |  64 +-
+>>  virt/kvm/Kconfig                              |   4 +
+>>  virt/kvm/guest_memfd.c                        | 579 +++++++++++++++++-
+>>  virt/kvm/kvm_main.c                           | 229 ++++++-
+>>  15 files changed, 1074 insertions(+), 59 deletions(-)
+>>
+>>
+>> base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+>> --
+>> 2.47.1.613.gc27f4b7a9f-goog
+>>
 
