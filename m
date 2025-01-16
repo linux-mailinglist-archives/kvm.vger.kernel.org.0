@@ -1,220 +1,272 @@
-Return-Path: <kvm+bounces-35634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3002EA135E7
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 09:57:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28011A13675
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 10:19:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 988443A54D8
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 08:57:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 418DE167D1F
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 09:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7CC1D7E4F;
-	Thu, 16 Jan 2025 08:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AF61D95A3;
+	Thu, 16 Jan 2025 09:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+iUGFTV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xnwI3YUy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEC119E7D0
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 08:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20AD4A05
+	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 09:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737017841; cv=none; b=Oo+6SPjTBfnfyrwUPa55dYmugZdQoAOQO5idFoo8ZGJ92j8XkKtQevAJ2IIA+jF1EjcVW52p9BmBQlCHurf+c0jTio/KF7CPAkcJBuW53dgUpDioabKaldT6iNY0y5onfQCWz/kBBCbg+OsrPl2N+iudRLGeL0aAt89D1M5W2H4=
+	t=1737019189; cv=none; b=QDoc6qogZCAZaUxNdhEhr/ogrF8WLmHqxk/pIEz+9VphPHuZ9P24sToLDcHHYLrOa89P8QS5WIwldR/Y2xyrpGTuOnuDM+c3q28D1XGUI7fVgmbGGmooNQteX8UqTc41sCDZzYZRRbxA8gfeqGQn2CLhnSDTCLvBg4QUyVhRX4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737017841; c=relaxed/simple;
-	bh=PtUhQynYgZLYfz9e+zHBnnH2YW9fJ84gqLC9SnFqqqU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KdOzgOHq2na7YwI7kQROPzgXhPN4F9Mn7SyQ3Wd5sTRnQ0ckI719Hx5dkII+n/2WjiUVoYJY/NqfeaKHmLziFXQpeAYB/IMpOQQvV9Ze0pQlYxHH7irr3hlwS40WCoa/BAKPIkQTA1zSWCknYTwb6scHMxpZYLlTEGJMPAVGSc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b+iUGFTV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737017838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pmkLmsyIcPYmFuaESsfI5oPSmcbmJsLv+8kU8eWcxJk=;
-	b=b+iUGFTVAQTEESja0Q2tHSyjXymaEO+gM2Ow+H6WseVs4tQUCnDgSieFrf4N99ZynKKZV/
-	JEGAuo6h4Ezc12u+ghHLDJxbnukg91t+dQec10P4JMiod1j4Nbx3lnRjKtlV+JS2BaYWRj
-	QsgiPERHC2isFLHuBUfd1p/B/WckPKM=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-OJ44sajMPuinocDTAJV-2w-1; Thu, 16 Jan 2025 03:57:16 -0500
-X-MC-Unique: OJ44sajMPuinocDTAJV-2w-1
-X-Mimecast-MFC-AGG-ID: OJ44sajMPuinocDTAJV-2w
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4679db55860so13441791cf.3
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 00:57:16 -0800 (PST)
+	s=arc-20240116; t=1737019189; c=relaxed/simple;
+	bh=o9sTj5DM+zlnNnoDC/0h4jm3J6PO0PJuplVlGaYJvkQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=osTUpWxUPiJaIpcQKcDv9ZiA+Lf/V7F378t6Bjg7Vmmmb6U2+r87dJtuzkz7C21g6pct3Gnfp6ar5i9qsJz/aTID0BcTR0j6hW/sxD9n8KeI8O8pJYuW7gzL+OFiYJADcRcBR0Z3zir5nmW8BQMAjdtw10ofnnaZaIWAk/QjFPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xnwI3YUy; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4368a290e0dso28755e9.1
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 01:19:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737019186; x=1737623986; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QOQTH7tUiMk7fJ9MtVwTdXT5DSu9exzYGVvW00E16nc=;
+        b=xnwI3YUyGrF2YOT4rzuEzYRr6igErgmlP9bK7NMjTRxexdNiptuenWek0RHYQ8lDdS
+         4rSTFzeMlS2PMkfv+vrwCLhCMGqKroW4wWQsNjOiqitfMss9H84dm4ATcfu8NmPpJV4J
+         YLFopInW/z8FxlkqBOSOUZ5GsxTh6TfhNgu5Yay5gSVbsdjY+Yml1yxy96OzjzCquYKp
+         BEBcMKU9Ofm7sdcsoPIebJzb4GDpYEeAmtpyGwItmhu9JX+5Q85lOB+QxEFIcc52eCrU
+         jRMUGjlyV9zKGU6+7iGFz3WOp3xMe0p770wspKPf+pC43JkfBZmkf0nsumNUkPTsuhh6
+         mkjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737017836; x=1737622636;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pmkLmsyIcPYmFuaESsfI5oPSmcbmJsLv+8kU8eWcxJk=;
-        b=SNu7pER1ityC7Ep/6FWLCwlLj/UxCqUTJ2wdri5Dv/elNkUk3N9MKJEMkVDbCbR/iS
-         WSR8NP5L/bQGSwG3Ms7gUOBAOWMPJcBeKI2thsn8kAJtsWG6lcf117zt1Vw4Jew0rdM0
-         M9LZiU4Uyo0wAswgh4pIHOIf7F/sFGxhLBQAI5EqSEX0rjkfbIFMWRxYKggdiYmi3GIM
-         oTu0DqdMwxuPA4BjpLX30NwzibQwb1n9W65+hwiXYmTFOO7Dihyw5VNEoJEtfW8m6hsp
-         vxhrZ5uFSkyC5Z//bGIwAR8ULmE66Uy13ZuRmiJ4ZGrs6kx+Pg8BHPBYIFxVeMhq8u5K
-         6j5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUZwcif9B3aeG/XX1mJaSnUiSa0Te3vWNxeppnoPl6wABI3D6Rv5V2m2rmPoHjpn8IwrDw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzjlFDWDAkZgfvqz/G0DPsMGr/RxBlnpNDoKsq5dBQFj0QTuBc
-	xBndNIC8R9SgC/eHd+O2LlE4iamev5HyitV8bBw0g9DmoOjnxUrZJ9tkVUaSbdee268nUe7k52G
-	DuQh+gchJD9SVbSTndw7kAQ3GinjMJdAq3dwbIagMusbbtb9Nsg==
-X-Gm-Gg: ASbGncvs6Gshposwy7vc7P1mBX5TjXvWSp/hBEVgCvaCmCOfR+verLjiK62FiUkA/e1
-	o6xyXWR+PyjtcXZZ5FHkIVkz+/ll5zsapiXx/jbzPBW1/QtvLh52Jh04wXB3Q7D0tvjhqPUA0o+
-	M5aQSwVrvPI4fYSQY9ngsJ7MvjroVMmyR70m9eNgwZ4dlfJjha55+I543X6YcPGjgu8yRjCIKAm
-	4y2ktHacZjEIpSl7gAINCoPGfJEn1csSrkS9rk6GQi8BSbYJNcCKBoJYebvlISdB6CVkfheLHjH
-	SU4l/ej1sATynZJkrQuwZoec6MuvtVfm
-X-Received: by 2002:ac8:5813:0:b0:466:aee5:a5b with SMTP id d75a77b69052e-46c70fd1faemr467248021cf.10.1737017836157;
-        Thu, 16 Jan 2025 00:57:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEO29yrvkRyeFaWTkkTVXxmLbJIQYKA6Cnx5MRQ30jCm4qRaBjl6Z9IlhJpdMAezqnYQnnKAw==
-X-Received: by 2002:ac8:5813:0:b0:466:aee5:a5b with SMTP id d75a77b69052e-46c70fd1faemr467247821cf.10.1737017835757;
-        Thu, 16 Jan 2025 00:57:15 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-100.retail.telecomitalia.it. [82.53.134.100])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46c873216dbsm73689241cf.7.2025.01.16.00.57.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 00:57:15 -0800 (PST)
-Date: Thu, 16 Jan 2025 09:57:07 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Luigi Leonardi <leonardi@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Wongi Lee <qwerty@theori.io>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>, 
-	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev, stable@vger.kernel.org
-Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the
- transport changes
-Message-ID: <pl4mhcim7v3ukv6eseynh6x2r6nftf7yuayjzd3ftyupwy5r2h@ixmlevubqzb2>
-References: <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
- <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
- <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
- <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
- <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
- <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
- <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
- <7de34054-10cf-45d0-a869-adebb77ad913@rbox.co>
- <n2itoh23kikzszzgmyejfwe3mdf6fmxzwbtyo5ahtxpaco3euq@osupldmckz7p>
- <fb6f876f-a4eb-4005-bd76-fff0632291b8@rbox.co>
+        d=1e100.net; s=20230601; t=1737019186; x=1737623986;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QOQTH7tUiMk7fJ9MtVwTdXT5DSu9exzYGVvW00E16nc=;
+        b=tmUuhvnivj9cm2fR33qR6zkyv26lQE+A55j2Oytyci457iX5WCmDrNey2MQLwGjFR5
+         UAGRmOkra01L91ZVtawJtrLOrdGnH8wNUTYsP2GkfImknET+Bn9eNmNzFp4gS84w7m6F
+         LWM1Nl810baxNLsnDtVxZ5HdLAI0qJf2VAYIH82LsjS1YtHWW8dkwTQJV8Umqp4HLxqR
+         yMI0EMDWhrAXr2zKskKN82xEqcgq4TYsQN2JI7SlQ3WokqFi494EiWJrczU4FRSuZ4ev
+         aPCNDrqtQP1iVvOcqtV+VCPu0cVLJvtaIB8ZYhURnVbkRNopSREh7U5o17qtqQ/VBuIo
+         WT9A==
+X-Gm-Message-State: AOJu0YxTdiF0nXZGwwSInKPS0b/hWxpwl9W5LEAxt/SH/GHp1g5X8nXD
+	632KpplyhWt4YqJU8UGTgB1BcBuyfivrGRYMdfNs+OHnfm+hNSsR9R11Nsmo0Cyg6odX/EOVRzB
+	TeUHpfilGtuFEU0Hv39IGi+Lek7g8Nx/zS5pR
+X-Gm-Gg: ASbGncsgTWEJP9TyPkDWUjhop5RKmEEPctXNoBb7pSbbw79YrKl8cy/rahbZBWSifJ2
+	X1SzEH6d+kZk7p5eGXEdXrR7QphU+1xnDlg+FMTIxPL5M0YGJ1pLZ8NAiM3g+Nw+ei+8=
+X-Google-Smtp-Source: AGHT+IE8aMwLow5sWY5fJzCKY+xspZ5j3Pvj+/nmGPI1JUwww3Pw+7qETN7C17jt8ym+ycXUPeSkWTSDDlDTu48ZCmI=
+X-Received: by 2002:a05:600c:19c9:b0:42c:9e35:cde6 with SMTP id
+ 5b1f17b1804b1-4388b2ec3a2mr860695e9.2.1737019185907; Thu, 16 Jan 2025
+ 01:19:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <fb6f876f-a4eb-4005-bd76-fff0632291b8@rbox.co>
+References: <CA+EHjTzcx=eXSERSANMByhcgRRAbUL3kPAYkeu-uUgd0nPBPPA@mail.gmail.com>
+ <diqzh65zzjc9.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzh65zzjc9.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 16 Jan 2025 09:19:09 +0000
+X-Gm-Features: AbW1kvYfdnAg5jzOGsWKnus5CfXOeCmlxVqueDrpwKXgQxSqa_22kWzst03_IAY
+Message-ID: <CA+EHjTwXqUHoEp8oqiNDcWqXxCBLHU1+jAdEN8J-pHZjxKnM+A@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 00/14] KVM: Restricted mapping of guest_memfd at
+ the host and arm64 support
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 14, 2025 at 05:31:08PM +0100, Michal Luczaj wrote:
->On 1/14/25 11:16, Stefano Garzarella wrote:
->> On Tue, Jan 14, 2025 at 01:09:24AM +0100, Michal Luczaj wrote:
->>> On 1/13/25 16:01, Stefano Garzarella wrote:
->>>> On Mon, Jan 13, 2025 at 02:51:58PM +0100, Michal Luczaj wrote:
->>>>> On 1/13/25 12:05, Stefano Garzarella wrote:
->>>>>> ...
->>>>>> An alternative approach, which would perhaps allow us to avoid all this,
->>>>>> is to re-insert the socket in the unbound list after calling release()
->>>>>> when we deassign the transport.
->>>>>>
->>>>>> WDYT?
->>>>>
->>>>> If we can't keep the old state (sk_state, transport, etc) on failed
->>>>> re-connect() then reverting back to initial state sounds, uhh, like an
->>>>> option :) I'm not sure how well this aligns with (user's expectations of)
->>>>> good ol' socket API, but maybe that train has already left.
->>>>
->>>> We really want to behave as similar as possible with the other sockets,
->>>> like AF_INET, so I would try to continue toward that train.
->>>
->>> I was worried that such connect()/transport error handling may have some
->>> user visible side effects, but I guess I was wrong. I mean you can still
->>> reach a sk_state=TCP_LISTEN with a transport assigned[1], but perhaps
->>> that's a different issue.
->>>
->>> I've tried your suggestion on top of this series. Passes the tests.
->>
->> Great, thanks!
->>
->>>
->>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>> index fa9d1b49599b..4718fe86689d 100644
->>> --- a/net/vmw_vsock/af_vsock.c
->>> +++ b/net/vmw_vsock/af_vsock.c
->>> @@ -492,6 +492,10 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
->>> 		vsk->transport->release(vsk);
->>> 		vsock_deassign_transport(vsk);
->>>
->>> +		vsock_addr_unbind(&vsk->local_addr);
->>> +		vsock_addr_unbind(&vsk->remote_addr);
->>
->> My only doubt is that if a user did a specific bind() before the
->> connect, this way we're resetting everything, is that right?
->
->That is right.
->
->But we aren't changing much. Transport release already removes vsk from
->vsock_bound_sockets. So even though vsk->local_addr is untouched (i.e.
->vsock_addr_bound() returns `true`), vsk can't be picked by
->vsock_find_bound_socket(). User can't bind() it again, either.
+Hi Ackerley,
 
-Okay, I see, so maybe for now makes sense to merge your patch, to fix 
-the UAF fist.
+On Thu, 16 Jan 2025 at 00:35, Ackerley Tng <ackerleytng@google.com> wrote:
+>
+> Fuad Tabba <tabba@google.com> writes:
+>
+> > Hi,
+> >
+> > As mentioned in the guest_memfd sync (2025-01-09), below is the state
+> > diagram that uses the new states in this patch series, and how they
+> > would interact with sharing/unsharing in pKVM:
+> >
+> > https://lpc.events/event/18/contributions/1758/attachments/1457/3699/Guestmemfd%20folio%20state%20page_type.pdf
+>
+> Thanks Fuad!
+>
+> I took a look at the state diagram [1] and the branch that this patch is
+> on [2], and here's what I understand about the flow:
+>
+> 1. From state H in the state diagram, the guest can request to unshare a
+>    page. When KVM handles this unsharing, KVM marks the folio
+>    mappability as NONE (state J).
+> 2. The transition from state J to state K or I is independent of KVM -
+>    userspace has to do this unmapping
+> 3. On the next vcpu_run() from userspace, continuing from userspace's
+>    handling of the unshare request, guest_memfd will check and try to
+>    register a callback if the folio's mappability is NONE. If the folio
+>    is mapped, or if folio is not mapped but refcount is elevated for
+>    whatever reason, vcpu_run() fails and exits to userspace. If folio is
+>    not mapped and gmem holds the last refcount, set folio mappability to
+>    GUEST.
+>
+> Here's one issue I see based on the above understanding:
+>
+> Registration of the folio_put() callback only happens if the VMM
+> actually tries to do vcpu_run(). For 4K folios I think this is okay
+> since the 4K folio can be freed via the transition state K -> state I,
+> but for hugetlb folios that have been split for sharing with userspace,
+> not getting a folio_put() callback means never putting the hugetlb folio
+> together. Hence, relying on vcpu_run() to add the folio_put() callback
+> leaves a way that hugetlb pages can be removed from the system.
+>
+> I think we should try and find a path forward that works for both 4K and
+> hugetlb folios.
 
->
->And when patched as above: bind() works as "expected", but socket is pretty
->much useless, anyway. If I'm correct, the first failing connect() trips
->virtio_transport_recv_connecting(), which sets `sk->sk_err`. I don't see it
->being reset. Does the vsock suppose to keep sk_err state once set?
+I agree, this could be an issue, but we could find other ways to
+trigger the callback for huge folios. The important thing I was trying
+to get to is how to have the callback and be able to register it.
 
-Nope, I think this is another thing to fix.
+> IIUC page._mapcount and page.page_type works as a union because
+> page_type is only set for page types that are never mapped to userspace,
+> like PGTY_slab, PGTY_offline, etc.
 
->
->Currently only AF_VSOCK throws ConnectionResetError:
->```
->from socket import *
->
->def test(family, addr):
->	s = socket(family, SOCK_STREAM)
->	assert s.connect_ex(addr) != 0
->
->	lis = socket(family, SOCK_STREAM)
->	lis.bind(addr)
->	lis.listen()
->	s.connect(addr)
->
->	p, _ = lis.accept()
->	p.send(b'x')
->	assert s.recv(1) == b'x'
->
->test(AF_INET, ('127.0.0.1', 2000))
->test(AF_UNIX, '\0/tmp/foo')
->test(AF_VSOCK, (1, 2000)) # VMADDR_CID_LOCAL
->```
->
->> Maybe we need to look better at the release, and prevent it from
->> removing the socket from the lists as you suggested, maybe adding a
->> function in af_vsock.c that all transports can call.
->
->I'd be happy to submit a proper patch, but it would be helpful to decide
->how close to AF_INET/AF_UNIX's behaviour is close enough. Or would you
->rather have that UAF plugged first?
->
+In the last guest_memfd sync, David Hildenbrand mentioned that that
+would be a temporary restriction since the two structures would
+eventually be decoupled, work being done by Matthew Wilcox I believe.
 
-I'd say, let's fix the UAF first, then fix the behaviour (also in a
-single series, but I prefer 2 separate patches if possible).
-About that, AF_VSOCK was started with the goal of following AF_INET as
-closely as possible, and the test suite should serve that as well, so if
-we can solve this problem and get closer to AF_INET, possibly even
-adding a dedicated test, that would be ideal!
 
-Thank you very much for the help!
-Stefano
+> Technically PGTY_guest_memfd is only set once the page can never be
+> mapped to userspace, but PGTY_guest_memfd can only be set once mapcount
+> reaches 0. Since mapcount is added in the faulting process, could gmem
+> perhaps use some kind of .unmap/.unfault callback, so that gmem gets
+> notified of all unmaps and will know for sure that the mapcount gets to
+> 0?
 
+I'm not sure if there is such a callback. If there were, I'm not sure
+what that would buy us really. The main pain point is the refcount
+going down to zero. The mapcount part is pretty straightforard and
+likely to be only temporary as mentioned, i.e., when it get decoupled,
+we could register the callback earlier and simplify the transition
+altogether.
+
+> Alternatively, I took a look at the folio_is_zone_device()
+> implementation, and page.flags is used to identify the page's type. IIUC
+> a ZONE_DEVICE page also falls in the intersection of needing a
+> folio_put() callback and can be mapped to userspace. Could we use a
+> similar approach, using page.flags to identify a page as a guest_memfd
+> page? That way we don't need to know when unmapping happens, and will
+> always be able to get a folio_put() callback.
+
+Same as above, with this being temporary, adding a new page flag might
+not be something that the rest of the community might be too excited
+about :)
+
+Thanks for your comments!
+/fuad
+
+> [1] https://lpc.events/event/18/contributions/1758/attachments/1457/3699/Guestmemfd%20folio%20state%20page_type.pdf
+> [2] https://android-kvm.googlesource.com/linux/+/764360863785ba16d974253a572c87abdd9fdf0b%5E%21/#F0
+>
+> > This patch series doesn't necessarily impose all these transitions,
+> > many of them would be a matter of policy. This just happens to be the
+> > current way I've done it with pKVM/arm64.
+> >
+> > Cheers,
+> > /fuad
+> >
+> > On Fri, 13 Dec 2024 at 16:48, Fuad Tabba <tabba@google.com> wrote:
+> >>
+> >> This series adds restricted mmap() support to guest_memfd, as
+> >> well as support for guest_memfd on arm64. It is based on Linux
+> >> 6.13-rc2.  Please refer to v3 for the context [1].
+> >>
+> >> Main changes since v3:
+> >> - Added a new folio type for guestmem, used to register a
+> >>   callback when a folio's reference count reaches 0 (Matthew
+> >>   Wilcox, DavidH) [2]
+> >> - Introduce new mappability states for folios, where a folio can
+> >> be mappable by the host and the guest, only the guest, or by no
+> >> one (transient state)
+> >> - Rebased on Linux 6.13-rc2
+> >> - Refactoring and tidying up
+> >>
+> >> Cheers,
+> >> /fuad
+> >>
+> >> [1] https://lore.kernel.org/all/20241010085930.1546800-1-tabba@google.com/
+> >> [2] https://lore.kernel.org/all/20241108162040.159038-1-tabba@google.com/
+> >>
+> >> Ackerley Tng (2):
+> >>   KVM: guest_memfd: Make guest mem use guest mem inodes instead of
+> >>     anonymous inodes
+> >>   KVM: guest_memfd: Track mappability within a struct kvm_gmem_private
+> >>
+> >> Fuad Tabba (12):
+> >>   mm: Consolidate freeing of typed folios on final folio_put()
+> >>   KVM: guest_memfd: Introduce kvm_gmem_get_pfn_locked(), which retains
+> >>     the folio lock
+> >>   KVM: guest_memfd: Folio mappability states and functions that manage
+> >>     their transition
+> >>   KVM: guest_memfd: Handle final folio_put() of guestmem pages
+> >>   KVM: guest_memfd: Allow host to mmap guest_memfd() pages when shared
+> >>   KVM: guest_memfd: Add guest_memfd support to
+> >>     kvm_(read|/write)_guest_page()
+> >>   KVM: guest_memfd: Add KVM capability to check if guest_memfd is host
+> >>     mappable
+> >>   KVM: guest_memfd: Add a guest_memfd() flag to initialize it as
+> >>     mappable
+> >>   KVM: guest_memfd: selftests: guest_memfd mmap() test when mapping is
+> >>     allowed
+> >>   KVM: arm64: Skip VMA checks for slots without userspace address
+> >>   KVM: arm64: Handle guest_memfd()-backed guest page faults
+> >>   KVM: arm64: Enable guest_memfd private memory when pKVM is enabled
+> >>
+> >>  Documentation/virt/kvm/api.rst                |   4 +
+> >>  arch/arm64/include/asm/kvm_host.h             |   3 +
+> >>  arch/arm64/kvm/Kconfig                        |   1 +
+> >>  arch/arm64/kvm/mmu.c                          | 119 +++-
+> >>  include/linux/kvm_host.h                      |  75 +++
+> >>  include/linux/page-flags.h                    |  22 +
+> >>  include/uapi/linux/kvm.h                      |   2 +
+> >>  include/uapi/linux/magic.h                    |   1 +
+> >>  mm/debug.c                                    |   1 +
+> >>  mm/swap.c                                     |  28 +-
+> >>  tools/testing/selftests/kvm/Makefile          |   1 +
+> >>  .../testing/selftests/kvm/guest_memfd_test.c  |  64 +-
+> >>  virt/kvm/Kconfig                              |   4 +
+> >>  virt/kvm/guest_memfd.c                        | 579 +++++++++++++++++-
+> >>  virt/kvm/kvm_main.c                           | 229 ++++++-
+> >>  15 files changed, 1074 insertions(+), 59 deletions(-)
+> >>
+> >>
+> >> base-commit: fac04efc5c793dccbd07e2d59af9f90b7fc0dca4
+> >> --
+> >> 2.47.1.613.gc27f4b7a9f-goog
+> >>
 
