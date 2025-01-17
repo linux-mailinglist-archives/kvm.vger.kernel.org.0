@@ -1,78 +1,79 @@
-Return-Path: <kvm+bounces-35851-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35852-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D231A157D4
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 20:10:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 240AFA157D6
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 20:10:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 882C31881488
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 19:10:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C4816833A
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 19:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AC11A9B5C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05931AAA11;
 	Fri, 17 Jan 2025 19:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Q/dk60A1"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ft1+d/Xi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD95D1A83E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CD01A83EB;
 	Fri, 17 Jan 2025 19:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737140990; cv=none; b=e+vsTNrLZK8o4y4CBkVMtfftiRg3V4dyvqgXom6TXJcOeXkv4pW5kR+tnxdM4Tg5WpHoY/0FK2eoQCZuH10yzC4YdlLQ0+L/0sneR1fUdfpVATZY/rT7Tu/Bv4FwKPE/KpQx0h6RcKqVYkgoGYgAvvXmdN2iBTV9zaM/wNv6+sE=
+	t=1737140990; cv=none; b=mMlqYlx1llQGNuRMR093JbAN+H2HWH+sRhKZDa7I8MWhqQe0MBxAI1gmn2yfuMz/UPmrc1V7ZfyrGsosqMHwwOxiJYxjn1IOGW2osFfHNK7H0n4VAIeR2UpZkioj+F8uqdYMaRRgk8ANMIP4tqSYJrQUCJmPwlCEzcc6imQwhcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1737140990; c=relaxed/simple;
-	bh=1rhkKN6yVUMro8cr5+/x4h7CR9pzZVCmfgXsFG+oDaQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qLuokQwVj6+wWbrcYvHb4Pe+rQPPBHUSptr4An8yLJZLlC/4abWlFT6BAXHPaAdIz6Gun2/tmTN7xB6/IUmMNmSjyT8GSenDdOyDLIAAJ+dYSDG4LRUWFVUTN8BByebZQhdLe7OnQoWLiVZzUyA/Z7JME2MfrX0Ryz9Va/CZMLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Q/dk60A1; arc=none smtp.client-ip=148.163.156.1
+	bh=yi4WO9ESh/EWpTiw3ToYboFPe3xptoVENUs/EKj1qTk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FUMO5Rv3sz07UusYwXJzEvTTtiHiXgI4ArT/w5E3x36PGbFxBQgIuOCiW70rGpqBilQtiHepYjXGxc3Juc6bnUuWLrpDkmnSIcP/2i7Q74AWKUmjw1W57Vxq4Z6rQoUhbATgBABpak1wxFX7qRBeua7XIXOaVXXRFyA7/NQuUOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ft1+d/Xi; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HEkrQL015094;
-	Fri, 17 Jan 2025 19:09:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=o4h9hJqbOdh+6Zjq+Fcwapr/Kn6LQtscO3Sk2enTf
-	e4=; b=Q/dk60A1ZiPAJJx1yoYiasxUWRydqBUGKIKZs0eWx5IckcsOQMI0cHCrY
-	Fng2a2DJPuY/Zz9t/XIwhaska2kugA6ncc6AenkZ/h/g/wpjlm85G8WpU0W0a/6q
-	rKSzHqUrbQtYQKWqbWBjvdGvQTKv9L4vcVedZNEr01zlaitkkMb7oWCMe3ijN9tq
-	lOJfzH3xA3XYaXmpiu9GBdHBL76h4MkGVbiMDAZuWf2kJAyOXc3dYqkdxvdAiFlX
-	ED5l5YBa6/QjFJf17v7/AqW7uIlg20nmmCFj0aYptIn0yehs+45ofhVlp/0QMrkN
-	sRx+RDPEDIDU0GngNewPfNsvIv09Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpuc1yj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 19:09:44 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HJ9isq009160;
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HHckr6002026;
 	Fri, 17 Jan 2025 19:09:44 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpuc1yg-1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=QhgquwsfYJASkAeh/
+	HEvE3Lq171siDCM9PiELW2IPHM=; b=Ft1+d/XijwC+ezyovqStRLut+66ahgMUf
+	pY4buwsLpBj62bkjUMujoI50vQffu3bxu7jGplD/kIk1qzIXMMnwxAy7UER0An97
+	o1hZqcUkfAzTXwZ4uc5V4SV61SXh736Bl7dqKPEE0A1wJJb/C8vwzzag9r/Tb7xZ
+	ZE5OpalL5MkUbL6N74eOjzQ2d+4bZDrqv/2qFEfnPc02ZHiclba179U63E27zGAQ
+	rj1gigyJIov6SH0CjZcwwUKiop9+z20kCZW6vATTE90XNhL/Y0Fx2yjxYEgWeKDp
+	kdFLMRrxG5LnlkjgACiO1YQIwwfc0bXzrid9/KW8x2WeIF3qon/9A==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447kd3k0e1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 17 Jan 2025 19:09:44 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HIXXYA017359;
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HJ3j3W010809;
+	Fri, 17 Jan 2025 19:09:43 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447kd3k0dx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 19:09:43 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HIh11f007519;
 	Fri, 17 Jan 2025 19:09:43 GMT
 Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fkma8b-1
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443ynmbng-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 19:09:42 +0000
+	Fri, 17 Jan 2025 19:09:43 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HJ9daJ55116112
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HJ9dcn55116116
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Fri, 17 Jan 2025 19:09:39 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0CCFD20043;
+	by IMSVA (Postfix) with ESMTP id 48A4220040;
 	Fri, 17 Jan 2025 19:09:39 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CA17220040;
-	Fri, 17 Jan 2025 19:09:38 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 135752004D;
+	Fri, 17 Jan 2025 19:09:39 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 17 Jan 2025 19:09:38 +0000 (GMT)
+	Fri, 17 Jan 2025 19:09:39 +0000 (GMT)
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, frankja@linux.ibm.com, borntraeger@de.ibm.com,
@@ -80,10 +81,12 @@ Cc: linux-s390@vger.kernel.org, frankja@linux.ibm.com, borntraeger@de.ibm.com,
         hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
         gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
         seanjc@google.com, seiden@linux.ibm.com
-Subject: [PATCH v3 00/15] KVM: s390: Stop using page->index and other things
-Date: Fri, 17 Jan 2025 20:09:23 +0100
-Message-ID: <20250117190938.93793-1-imbrenda@linux.ibm.com>
+Subject: [PATCH v3 01/15] KVM: Do not restrict the size of KVM-internal memory regions
+Date: Fri, 17 Jan 2025 20:09:24 +0100
+Message-ID: <20250117190938.93793-2-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250117190938.93793-1-imbrenda@linux.ibm.com>
+References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,104 +95,52 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: r_bwIuLHishf0mOVybAis-CRLkDFtzZ-
-X-Proofpoint-ORIG-GUID: iFJU1rLk-9-JBUz0lPTAX-Tp_BV_m2px
+X-Proofpoint-ORIG-GUID: 4RQYGynxrSKbrim08kf9HwSZcj-_kM4Q
+X-Proofpoint-GUID: 8RsWg-W2Ml2RM_JRIscrIVs5D1HJGbmV
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-17_06,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- clxscore=1015 malwarescore=0 phishscore=0 lowpriorityscore=0 spamscore=0
- impostorscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=692
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=818
+ priorityscore=1501 malwarescore=0 mlxscore=0 suspectscore=0 bulkscore=0
+ spamscore=0 impostorscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
  definitions=main-2501170149
 
-This patchseries starts moving some of the gmap logic into KVM itself,
-going towards the final goal of completely removing gmap from the
-non-kvm memory management code. Aside from just moving some code from
-mm/gmap into kvm, this series also starts using __kvm_faultin_pfn() to
-fault-in pages as needed.
+From: Sean Christopherson <seanjc@google.com>
 
-But more importantly, this series removes almost all uses of
-page->index (and all uses of page->lru) from the s390 KVM code.
-The only remaining use is for the vsie pages, but that has already been
-taken care of by David in another series.
+Exempt KVM-internal memslots from the KVM_MEM_MAX_NR_PAGES restriction, as
+the limit on the number of pages exists purely to play nice with dirty
+bitmap operations, which use 32-bit values to index the bitmaps, and dirty
+logging isn't supported for KVM-internal memslots.
 
-Unfortunately the mix of hastiness and holidays means that this series
-is a little bit all over the place, and not as complete as I would have
-liked to.
+Link: https://lore.kernel.org/all/20240802205003.353672-6-seanjc@google.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+---
+ virt/kvm/kvm_main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-I'm posting it now so to try to speed up the removal of page->index,
-hopefully I will be able to post another short series before the
-upcoming merge window closes.
-
-
-v1->v2:
-* moved some code around between patches to improve readability and shuffle
-  the order of some patches
-* rebase on Sean's patchseries
-* add Sean's patch to remove size limitations for internal memslots
-* use Sean's new API for internal memslots to place one huge internal
-  memslot instead of many 4T ones for UCONTROL guests
-* create new kvm/gmap-vsie.c file for VSIE code, instead of dumping
-  everything in the existing files, which are already too large
-* improve comments and patch descriptions
-* minor style and cosmetic fixes
-
-v2->v3
-* moved patch 5 back to its place
-* moved uv_wiggle_folio() to mm/gmap.c and renamed it to
-  kvm_s390_wiggle_split_folio()
-* fixed some typos
-* added some lockdep asserts
-* minor style fixes
-* added some comments
-* fixed documentation
-
-
-Claudio Imbrenda (14):
-  KVM: s390: wrapper for KVM_BUG
-  KVM: s390: fake memslot for ucontrol VMs
-  KVM: s390: selftests: fix ucontrol memory region test
-  KVM: s390: move pv gmap functions into kvm
-  KVM: s390: use __kvm_faultin_pfn()
-  KVM: s390: get rid of gmap_fault()
-  KVM: s390: get rid of gmap_translate()
-  KVM: s390: move some gmap shadowing functions away from mm/gmap.c
-  KVM: s390: stop using page->index for non-shadow gmaps
-  KVM: s390: stop using lists to keep track of used dat tables
-  KVM: s390: move gmap_shadow_pgt_lookup() into kvm
-  KVM: s390: remove useless page->index usage
-  KVM: s390: move PGSTE softbits
-  KVM: s390: remove the last user of page->index
-
-Sean Christopherson (1):
-  KVM: Do not restrict the size of KVM-internal memory regions
-
- Documentation/virt/kvm/api.rst                |   2 +-
- arch/s390/include/asm/gmap.h                  |  18 +-
- arch/s390/include/asm/kvm_host.h              |   2 +
- arch/s390/include/asm/pgtable.h               |  21 +-
- arch/s390/include/asm/uv.h                    |   6 +-
- arch/s390/kernel/uv.c                         | 292 +-------
- arch/s390/kvm/Makefile                        |   2 +-
- arch/s390/kvm/gaccess.c                       |  42 ++
- arch/s390/kvm/gmap-vsie.c                     | 142 ++++
- arch/s390/kvm/gmap.c                          | 206 ++++++
- arch/s390/kvm/gmap.h                          |  39 +
- arch/s390/kvm/intercept.c                     |   5 +-
- arch/s390/kvm/interrupt.c                     |  19 +-
- arch/s390/kvm/kvm-s390.c                      | 219 +++++-
- arch/s390/kvm/kvm-s390.h                      |  19 +
- arch/s390/kvm/pv.c                            |   1 +
- arch/s390/kvm/vsie.c                          |   2 +
- arch/s390/mm/gmap.c                           | 681 ++++--------------
- .../selftests/kvm/s390x/ucontrol_test.c       |   6 +-
- virt/kvm/kvm_main.c                           |  10 +-
- 20 files changed, 867 insertions(+), 867 deletions(-)
- create mode 100644 arch/s390/kvm/gmap-vsie.c
- create mode 100644 arch/s390/kvm/gmap.c
- create mode 100644 arch/s390/kvm/gmap.h
-
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index a8a84bf450f9..ee3f040a4891 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1966,7 +1966,15 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 		return -EINVAL;
+ 	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+ 		return -EINVAL;
+-	if ((mem->memory_size >> PAGE_SHIFT) > KVM_MEM_MAX_NR_PAGES)
++
++	/*
++	 * The size of userspace-defined memory regions is restricted in order
++	 * to play nice with dirty bitmap operations, which are indexed with an
++	 * "unsigned int".  KVM's internal memory regions don't support dirty
++	 * logging, and so are exempt.
++	 */
++	if (id < KVM_USER_MEM_SLOTS &&
++	    (mem->memory_size >> PAGE_SHIFT) > KVM_MEM_MAX_NR_PAGES)
+ 		return -EINVAL;
+ 
+ 	slots = __kvm_memslots(kvm, as_id);
 -- 
 2.48.1
 
