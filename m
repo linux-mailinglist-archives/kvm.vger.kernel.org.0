@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-35817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A54A15457
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:31:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E5F7A15455
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:31:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF11E3A4B31
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:31:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EBBB188C23A
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9462919E979;
-	Fri, 17 Jan 2025 16:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A43F19EEC2;
+	Fri, 17 Jan 2025 16:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NkJ602gf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x9nYrvP2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD5A19F462
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111641A23AD
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737131428; cv=none; b=aLxqZbYD4YHt9MVRybhkjR3rHyQlY/h4PrUAXH3hZMXx2nUvPwVm41aOOjqmm+lVzRPiQ76JND3drwrOzqEhPdlDzjEm/kOTv0NlmycdJKQrHtdwGT3NXUXtS/E3eBd5bheC2+KacnyLgx7Fl4x0EMrhc1DqJGQUer1Z10KO1LI=
+	t=1737131430; cv=none; b=nXOgRCkZeBJZHv0/NlMQ7gVCunE1Zqxf9w8b/0lofWl8XoY1IxeXrQuntVXGZM36iZ4vhXHqVYCOUuYvEMV6Le5HEjxBgxjrW7LvB5qzj2hPY3sJb5+czYivHmnU4yQP91fFb/NYB0thsTCenX6KFG8Mql5dUDGH2wqOZtXYTFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737131428; c=relaxed/simple;
-	bh=SNCigYc9J0MoXMLnVEGDyK3YVByWEysZdrZNCK1K+H8=;
+	s=arc-20240116; t=1737131430; c=relaxed/simple;
+	bh=6R3v8tgeSWV1Q1+aFvuFNhTEuic+hcTU1l/2e2lBs/0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nk1kC+fgj+qsgDdWw8xVlSAJC2eMuyQCbpJEhw4cXUU4EZdRrK/qkaAAp1Co04P9kef+RsaC3ZJbCusPsd1oVAmqLtHuD2Wztn+/3cqKs///BlIKRYzokb4nv149UHkw96Wvjq24srDj6BNFP2AXJtQUNamXIOscMDOHflqMKPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NkJ602gf; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=PCKAxyWWB7qz7spQ14V0cgGI7LbR6FIeis8HMvYR1lrvz4wSRyinGfFa0c2sSwggGfED0AViLnDkvOKZBYXsi+YKXCenpolWMTEwpFH+JoRTI6+mkZebIFPruSux6wIK7BzwDjkdbXiB3Z687tT1vkLieVwL4pNL7KbCtdU6SDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x9nYrvP2; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43625ceae52so11895685e9.0
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 08:30:26 -0800 (PST)
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-38634103b0dso1453725f8f.2
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 08:30:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737131425; x=1737736225; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737131427; x=1737736227; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xo0QGcWhFZe9U6hSQiSPOH6tARFYvfNnZ2E+qSQ4HQk=;
-        b=NkJ602gfo+4xOLrPLpy4g0KR4kJhZVPEfaS7CD1rUy2DmpRoFYTXoylDuXu4ujj77Q
-         Wo55E7smx5+l1VJ2jD1DSd5J/KO9R8dvwy06aYkrOcwqfuITpVJBdkH0oLxQS5SJ201g
-         DbRbigDhOoo8ZrM6vO+V1AdYsDbjb8uwTSaMfQ46t539k19/cmpOC4fo/DgnqDV5W0ua
-         5EXqsom7HgFg7YIuLWqD5L/VZojlSleNDSUAKgZoAPsgrdyDg6cAhNOqJnVnP5MfpCXy
-         OFj5T2tQ/sz1bWkFiSLPpWJLmlQcLUBLHij9lYQdKHf5GY4MJajDiWe76e35KCDin7oe
-         ySoA==
+        bh=L3JE5H2O+HhGpe+U3oFgZgOkWGJvxazt/6lMsPLsK3g=;
+        b=x9nYrvP2NqoPtd7SzSVkTGl/U/Vz3uPbvkKQC2QMvGzPzYueIuVwpHvJFfeJqXnXcq
+         cBJKbBIazkr3Nk7QpVNHDN4Uh+ilDzyzZzoKq26bej8VhH5euu8GvjICJzc3H7gWp0CL
+         KDAxKNv6nhhfe1QyG8Q+hmyMmYo1KPRGQdAZXGqt/BaVOlsNe9OB2WDZ/KMFi3VVLkqj
+         2EiXViTW8AE20grLlD2x1OxEeg3ds8pz1LSSMu/WE7+AlSocQVpQ8/WPUeUWazvnkHO3
+         ipXBRJS6WfNGQnCtYp+gBgK5pgVl9ICAplVACF5haHfVLTmiz98fsGBYETZ0toMpwnj+
+         /Lxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737131425; x=1737736225;
+        d=1e100.net; s=20230601; t=1737131427; x=1737736227;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xo0QGcWhFZe9U6hSQiSPOH6tARFYvfNnZ2E+qSQ4HQk=;
-        b=bykpEly6VHFluzBLEyMT2eUbr3FazzgP971DS3/MLhP+7YBHfWnK9antUnnmyYU8YR
-         LRXJxtk8lQRffwXR1oJwyLjNFZrFMIlXV0Q7OU7d/6/xXD69cK7fYclVHVKhAoU+BPBA
-         6trA0P6iMU07ORu2HLqpCyW6tgY1OwEd28T3d8V95fmopP7AlgcgiETGRcH/fzGz69CY
-         pItvFa4xbJb48JnvEB53TtyD61L4W6BuAj+SCL28ldneIaA2i8k1ceBHnE6JC4Vw7Rr3
-         JMi+u04bLElA/ExFUbsSE8EXgP4FiWGGbZ+wus8Syf513NAe0fPoDr6HQq9J5zDclZvh
-         62KQ==
-X-Gm-Message-State: AOJu0YyV85hQ5sq25kvfbQL4HIwYvRAaNbLu9coBJOEW/W3dvsf1Zemv
-	9iaxXSEd6dUdDa+whQxqUpDXGQjNBxszVPs27oz7C1XRMjBL9J7cfWNHQBVMwhTsCVyExuyrzIu
-	PHsm5OlAVl6VgH/gi5f1y3v+Z5qukp3jHvzHjDbZ2e/ENlri2OAHOIhbew98uSmZ0xm/you98Yd
-	/DQMLLhz5Ybi6g1KDn5PUq4j8=
-X-Google-Smtp-Source: AGHT+IEr5gHEVjnL0bNACXR5FJY9vyiyHwTa1xX0TfEkZNy7DAbAsx+X4Pqj72+4G5i8n4A/x2j0nCfypw==
+        bh=L3JE5H2O+HhGpe+U3oFgZgOkWGJvxazt/6lMsPLsK3g=;
+        b=SNWXD0wAoYYuOSkjJ1tbeyyrZEJZCZJYfmMqxjF3NQPK2H+t1nzZKBPI/JT7yys4UR
+         1CSDIFofQUZDp5I0VsfU39ReFgNde8Vpn2NM1uQQn517Af/KitkOlNWlGZk4Q3EmtMTn
+         M/rdtAUmM2DkCTFxn7sETnKtMof904PUd+rga36bGFh2RmYyHT5r30lUef8B2dxzmXDb
+         Hm8WTEOFMimokRWC95n0g3UcyXft3PxfaUY3GtK1ucBq7Yj+uE+N38VgQpV+yAC0nvAj
+         KebbCHR3yTHOuiTyhYLGMAuAiJJxUR/CT6r2LJCuU81VnYeVlnESNV04sjftBNsLmK6V
+         EwNw==
+X-Gm-Message-State: AOJu0Yy0H3rI+nhuhlfmWEjqSoKsu1fOQ5TpbTluyXmaYvtlv+I7Bz3f
+	tG921N8nIzwCmJQvBrd2MjaP9JmVo1luPfsMpYB/06wsaV3bSVogps+Y/lM+1Z6TzOD/dvJY6h7
+	XT0Y/CFSBcHOkJ+vIkQzY0WdKqBZIE3N+9byC2bZApSnuH/dO38b3QWQqJhBRqUV6l49PLjH1Xu
+	xaiHvSuhA01rHofqbndcMBCEc=
+X-Google-Smtp-Source: AGHT+IGRpQ4nyI6BTUrkjbZ8ozpuqJEpQ2vY5BcNInNhu8r9xyJzkDeNESuZ6QV5cyzLhvncD1YckbOmdA==
 X-Received: from wmsn40.prod.google.com ([2002:a05:600c:3ba8:b0:434:a1af:5d39])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1f82:b0:436:fbe0:cebe
- with SMTP id 5b1f17b1804b1-43891452f6emr37291625e9.30.1737131425133; Fri, 17
- Jan 2025 08:30:25 -0800 (PST)
-Date: Fri, 17 Jan 2025 16:29:56 +0000
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:402a:b0:38a:a047:6c0b
+ with SMTP id ffacd0b85a97d-38bf57a97e0mr4283682f8f.35.1737131427228; Fri, 17
+ Jan 2025 08:30:27 -0800 (PST)
+Date: Fri, 17 Jan 2025 16:29:57 +0000
 In-Reply-To: <20250117163001.2326672-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250117163001.2326672-1-tabba@google.com>
 X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250117163001.2326672-11-tabba@google.com>
-Subject: [RFC PATCH v5 10/15] KVM: guest_memfd: Add a guest_memfd() flag to
- initialize it as mappable
+Message-ID: <20250117163001.2326672-12-tabba@google.com>
+Subject: [RFC PATCH v5 11/15] KVM: guest_memfd: selftests: guest_memfd mmap()
+ test when mapping is allowed
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -100,97 +100,124 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	jthoughton@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Not all use cases require guest_memfd() to be mappable by the
-host when first created. Add a new flag,
-GUEST_MEMFD_FLAG_INIT_MAPPABLE, which when set on
-KVM_CREATE_GUEST_MEMFD initializes the memory as mappable by the
-host. Otherwise, memory is private until shared by the guest with
-the host.
+Expand the guest_memfd selftests to include testing mapping guest
+memory if the capability is supported, and that still checks that
+memory is not mappable if the capability isn't supported.
+
+Also, build the guest_memfd selftest for aarch64.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- Documentation/virt/kvm/api.rst                 | 4 ++++
- include/uapi/linux/kvm.h                       | 1 +
- tools/testing/selftests/kvm/guest_memfd_test.c | 7 +++++--
- virt/kvm/guest_memfd.c                         | 6 +++++-
- 4 files changed, 15 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../testing/selftests/kvm/guest_memfd_test.c  | 57 +++++++++++++++++--
+ 2 files changed, 53 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index f15b61317aad..2a8571b1629f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6383,6 +6383,10 @@ most one mapping per page, i.e. binding multiple memory regions to a single
- guest_memfd range is not allowed (any number of memory regions can be bound to
- a single guest_memfd file, but the bound ranges must not overlap).
- 
-+If the capability KVM_CAP_GUEST_MEMFD_MAPPABLE is supported, then the flags
-+field supports GUEST_MEMFD_FLAG_INIT_MAPPABLE, which initializes the memory
-+as mappable by the host.
-+
- See KVM_SET_USER_MEMORY_REGION2 for additional details.
- 
- 4.143 KVM_PRE_FAULT_MEMORY
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 021f8ef9979b..b34aed04ffa5 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1566,6 +1566,7 @@ struct kvm_memory_attributes {
- #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
- 
- #define KVM_CREATE_GUEST_MEMFD	_IOWR(KVMIO,  0xd4, struct kvm_create_guest_memfd)
-+#define GUEST_MEMFD_FLAG_INIT_MAPPABLE		(1UL << 0)
- 
- struct kvm_create_guest_memfd {
- 	__u64 size;
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 41593d2e7de9..c998eb3c3b77 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -174,6 +174,7 @@ TEST_GEN_PROGS_aarch64 += coalesced_io_test
+ TEST_GEN_PROGS_aarch64 += demand_paging_test
+ TEST_GEN_PROGS_aarch64 += dirty_log_test
+ TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
++TEST_GEN_PROGS_aarch64 += guest_memfd_test
+ TEST_GEN_PROGS_aarch64 += guest_print_test
+ TEST_GEN_PROGS_aarch64 += get-reg-list
+ TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
 diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index ce687f8d248f..04b4111b7190 100644
+index 04b4111b7190..12b5777c2eb5 100644
 --- a/tools/testing/selftests/kvm/guest_memfd_test.c
 +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -123,7 +123,7 @@ static void test_invalid_punch_hole(int fd, size_t page_size, size_t total_size)
- static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
+@@ -34,12 +34,55 @@ static void test_file_read_write(int fd)
+ 		    "pwrite on a guest_mem fd should fail");
+ }
+ 
+-static void test_mmap(int fd, size_t page_size)
++static void test_mmap_allowed(int fd, size_t total_size)
  {
- 	size_t page_size = getpagesize();
--	uint64_t flag;
-+	uint64_t flag = BIT(0);
- 	size_t size;
- 	int fd;
++	size_t page_size = getpagesize();
++	char *mem;
++	int ret;
++	int i;
++
++	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT(mem != MAP_FAILED, "mmaping() guest memory should pass.");
++
++	memset(mem, 0xaa, total_size);
++	for (i = 0; i < total_size; i++)
++		TEST_ASSERT_EQ(mem[i], 0xaa);
++
++	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE, 0,
++			page_size);
++	TEST_ASSERT(!ret, "fallocate the first page should succeed");
++
++	for (i = 0; i < page_size; i++)
++		TEST_ASSERT_EQ(mem[i], 0x00);
++	for (; i < total_size; i++)
++		TEST_ASSERT_EQ(mem[i], 0xaa);
++
++	memset(mem, 0xaa, total_size);
++	for (i = 0; i < total_size; i++)
++		TEST_ASSERT_EQ(mem[i], 0xaa);
++
++	ret = munmap(mem, total_size);
++	TEST_ASSERT(!ret, "munmap should succeed");
++}
++
++static void test_mmap_denied(int fd, size_t total_size)
++{
++	size_t page_size = getpagesize();
+ 	char *mem;
  
-@@ -134,7 +134,10 @@ static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
- 			    size);
- 	}
- 
--	for (flag = BIT(0); flag; flag <<= 1) {
+ 	mem = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+ 	TEST_ASSERT_EQ(mem, MAP_FAILED);
++
++	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++	TEST_ASSERT_EQ(mem, MAP_FAILED);
++}
++
++static void test_mmap(int fd, size_t total_size)
++{
 +	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MAPPABLE))
-+		flag = GUEST_MEMFD_FLAG_INIT_MAPPABLE << 1;
++		test_mmap_allowed(fd, total_size);
++	else
++		test_mmap_denied(fd, total_size);
+ }
+ 
+ static void test_file_size(int fd, size_t page_size, size_t total_size)
+@@ -175,13 +218,17 @@ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
+ 
+ int main(int argc, char *argv[])
+ {
+-	size_t page_size;
++	uint64_t flags = 0;
++	struct kvm_vm *vm;
+ 	size_t total_size;
++	size_t page_size;
+ 	int fd;
+-	struct kvm_vm *vm;
+ 
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GUEST_MEMFD));
+ 
++	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD_MAPPABLE))
++		flags |= GUEST_MEMFD_FLAG_INIT_MAPPABLE;
 +
-+	for (; flag; flag <<= 1) {
- 		fd = __vm_create_guest_memfd(vm, page_size, flag);
- 		TEST_ASSERT(fd == -1 && errno == EINVAL,
- 			    "guest_memfd() with flag '0x%lx' should fail with EINVAL",
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 159ffa17f562..932c23f6b2e5 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -939,7 +939,8 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 		goto err_gmem;
- 	}
+ 	page_size = getpagesize();
+ 	total_size = page_size * 4;
  
--	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE)) {
-+	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE) &&
-+	    (flags & GUEST_MEMFD_FLAG_INIT_MAPPABLE)) {
- 		err = gmem_set_mappable(file_inode(file), 0, size >> PAGE_SHIFT);
- 		if (err) {
- 			fput(file);
-@@ -968,6 +969,9 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
- 	u64 flags = args->flags;
- 	u64 valid_flags = 0;
+@@ -190,10 +237,10 @@ int main(int argc, char *argv[])
+ 	test_create_guest_memfd_invalid(vm);
+ 	test_create_guest_memfd_multiple(vm);
  
-+	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE))
-+		valid_flags |= GUEST_MEMFD_FLAG_INIT_MAPPABLE;
-+
- 	if (flags & ~valid_flags)
- 		return -EINVAL;
+-	fd = vm_create_guest_memfd(vm, total_size, 0);
++	fd = vm_create_guest_memfd(vm, total_size, flags);
  
+ 	test_file_read_write(fd);
+-	test_mmap(fd, page_size);
++	test_mmap(fd, total_size);
+ 	test_file_size(fd, page_size, total_size);
+ 	test_fallocate(fd, page_size, total_size);
+ 	test_invalid_punch_hole(fd, page_size, total_size);
 -- 
 2.48.0.rc2.279.g1de40edade-goog
 
