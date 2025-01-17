@@ -1,143 +1,175 @@
-Return-Path: <kvm+bounces-35871-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35872-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E704A1589D
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 21:29:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F2B3A158C2
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 21:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC88B3A91A0
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 20:29:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C040A168E7B
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 20:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7314A1ABED9;
-	Fri, 17 Jan 2025 20:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819F71AA792;
+	Fri, 17 Jan 2025 20:59:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="j9GFd6xm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j572DQgE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E60C1A9B2C;
-	Fri, 17 Jan 2025 20:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BA21A9B5A
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 20:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737145766; cv=none; b=XhFlSJA4O52MKemfrzRqWr4c4NzDtYnxU41vZWd9PaXo5qsQCMGZxsdylbChOoNx4wEYgK7egvmnN/5KT8amkDtTuFVBLDRsnLSkFG/zAVFT3RZNDVe57ZbJBx73xUtV1Wcp2Dj/AXd7EruNgesiRfeM+m7qkJTt3q9odbofmNw=
+	t=1737147580; cv=none; b=a0Lac9ZvPAC7KBWlDa2PmHAeBAJCGmUefnWzuvnxS783NG39QO8HRKVQgHBYzfp2QkbQq9lPtM2Gbs4ff5KUgCfME1Oqt7S2qt7BGudKf+vOtgKQZobpOUsndJr9sHYS7RHIl2VAg4inqNaamn40HTC3w0bQbBi0QrRqV1TiD8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737145766; c=relaxed/simple;
-	bh=jDwH0jwClGveK7duljYjk1jmCfhZmrsPZOmyyDX0DKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QqIeHGs3P5VP6YIHN3DRYqOR6f1d3p5VIBxEWBrQXtDgr/b6s4ZwUS9iQCi3S0Ese+r45Jzpi8fA6t4TVnJw6Vy1BF191HYNWM6qKcdJSFseESmtje2GuXdfQ3Qf6+9iRHDUNPuzaTT2cOMdvWDIafac6NQu3rJyxeF/SZftqJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=j9GFd6xm; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3B29F40E0378;
-	Fri, 17 Jan 2025 20:29:14 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id UdVvd6dyOmzf; Fri, 17 Jan 2025 20:29:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1737145750; bh=GPILzkLj/s4MV8NcCkZWrcr6vzeYAhrHniUXkucJLWs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j9GFd6xmmBbx1qiuPe74fYzvdgfbqSPJG2emUD4JOjtUBCmZzjtpdpx+XU3cHhtUD
-	 BdzKY2s3yebf3cB+rgfhW0Msm/dRCAr//aWicu5CFpl1amWPyica5iY6Rlx7DRB4g4
-	 Q/4uwJJvDOauSzjCtyZRdbHTkdlilh7S89qj4LrBmTDZNOZwO7syNR3c3/SCZfdC2V
-	 +/hgDVxp8BdeUJG8xDeAj64AWTfctXETxRIrE+aRb1IGNoBrtZ5Dza/Gi2SMIC1xTM
-	 jrDB8yHwUTHW6vF6npqrobOnWuCFlVPbbhkkYwXw4CLvm8Od0L0HoFJVRQ2B0SDoqX
-	 sCN4yzsdKOnEVlExo1FLjCMFxe3CYVkejTE1ZjcmPnHQdvye97eC/UZhjdNwJmHt3k
-	 oMM+v32Q28b3EVDLgbloiwH0apJKjtdznBBfRc47NaDPGN09q9b8tBQo1osi1CrBU5
-	 KQmcQ2hymuwe7amj452spu7NS9YzftDiwkf3Sc8mmQ8mpkEzoKOFCck4e6HX4WtvMt
-	 Grs4a3Et1Sqx6f2aIhoahwkt4FohEI+vM2F8e38DtJKSM1t/x+M9g/dnDOi9Q26y3A
-	 N7dqfWns6UMStRlZ9HJdvk+G7ZFRUaNJmTZzzcIX/iu3yVMqPeybsdT76kikB8hkuX
-	 HOPzPSgbZ86aDXfPUKTAURWI=
-Received: from zn.tnic (p200300Ea971f93e4329C23fFFeA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:93e4:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 04A8E40E0289;
-	Fri, 17 Jan 2025 20:28:54 +0000 (UTC)
-Date: Fri, 17 Jan 2025 21:28:48 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
-	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
-	pgonda@google.com, pbonzini@redhat.com, francescolavra.fl@gmail.com,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Juergen Gross <jgross@suse.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
-Message-ID: <20250117202848.GAZ4q9gMHorhVMfvM0@fat_crate.local>
-References: <20250108082221.GBZ341vUyxrBPHgTg3@fat_crate.local>
- <4b68ee6e-a6b2-4d41-b58f-edcceae3c689@amd.com>
- <cd6c18f3-538a-494e-9e60-2caedb1f53c2@amd.com>
- <Z36FG1nfiT5kKsBr@google.com>
- <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
- <Z36vqqTgrZp5Y3ab@google.com>
- <4ab9dc76-4556-4a96-be0d-2c8ee942b113@amd.com>
- <Z4gqlbumOFPF_rxd@google.com>
- <20250116162525.GFZ4ky9TdSn7jltgw7@fat_crate.local>
- <Z4k6OcbLqMxvvmb-@google.com>
+	s=arc-20240116; t=1737147580; c=relaxed/simple;
+	bh=LjyodIw75JAK2JBpoeQznteJOteiW6JjjDQgd03B8p4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NQTZkhDV11ImNQFYRu+NmODvuY+SO9r0jHwVAxyH2eoJNQwDFo7LL8UdBHlcjjUj5s2dj6vph1HqQxhSjh9UybGUQgCPxS9XUV5M7KKJBWXKcVH/KQ5SS6c+rWQReN7JWB5N77Y2qtcOwIataOJxG+ukya7AzH1GWqY7yDZu7U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j572DQgE; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef79403c5eso7024271a91.0
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 12:59:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737147578; x=1737752378; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=m55WVL2tiyVlPfiBYrotwMw+LuFS5qgq+xG3s32wtFg=;
+        b=j572DQgE6teJzLcXZko+pubXFaA0aa+ttmWKahJSaJ0+5au4+9xwKj2nEGLPDLdr/1
+         RuZ4+tobJdz7c3bz75KUfYWwUudrFhedwX+9bftmGc7EVwIL7bVVB2hlK+KvlDht01wa
+         bYQIBNoH7KZPYNoIgvrZVq9HYAFTwnPl2vB85m4jcH8OY9RWbrACKrolhLn0kfA+vPD0
+         fwdTVL9J2yv6yaQEHuiBzD4nHlBjRd/QjFeFG1gGmUxgdQEsVt15pTq8G9aD69c0IAPT
+         ci8UUsiPUQye7AAA71Z0G9LAeqB8ZyYjy09zI2NPNvmrY+v3wHx47aF1CsWTdv//N2I2
+         aoEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737147578; x=1737752378;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m55WVL2tiyVlPfiBYrotwMw+LuFS5qgq+xG3s32wtFg=;
+        b=Y4p+N6wuATeGQMh7GYWLdklj48Id1y6/4kwduo2tl+OQ5A8UnGAJgRR3aCPbAZ4uIQ
+         fyfcpYCkNbDKpqokNA4XwtOjcqDTH9c4AdUjCPaEB6d6tmiA3BcWC6/zbZ/Ip8skXwvQ
+         /zOnaqoDypfvifWmYi/x/2ec3HyhQOoP/g9pr182a/L/keidNlneWxlFbICn6I+hqXLO
+         uDuWwvYA3nMMzA8ExABY4vRBLaWbBnOPU9V4loCSqTlOm0CMMW4vQHJyKb8yJgZCCChL
+         O9AodwtBbUUgyb/TwUh70zfrv0gS9GKFeSuDX05l9FOt/4/aP1C2wek0s+QA9U2rb8EA
+         7dlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJFFy5J+uvKYaPVj/B5mJot0NBfbupPn6bdFfiYZmSnfeb4nxgWmjToEBb6uQtWscAO5I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzrm7r87zYkf9/B9WNUgLJ9kz3maZ99I2AaedwYEQb3AWFEvrlb
+	BukaULRt0v+4rTggEsl0BZMHzPHkrFvA2U8LwOpyka4J/pSdOLFUldPEvbjA2kFFl9vQQqBTApb
+	prw==
+X-Google-Smtp-Source: AGHT+IFn6nYqWbXoAEVF+j7d6mZ5Xr32YJpFkRRa96zlpYnwOdQDnr6kr6etqstec0O+JSrjQddMOTJX2Po=
+X-Received: from pjbnw13.prod.google.com ([2002:a17:90b:254d:b0:2ef:a732:f48d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:258c:b0:2ee:c9b6:c266
+ with SMTP id 98e67ed59e1d1-2f782c71d97mr5825944a91.13.1737147578588; Fri, 17
+ Jan 2025 12:59:38 -0800 (PST)
+Date: Fri, 17 Jan 2025 12:59:37 -0800
+In-Reply-To: <20250117202848.GAZ4q9gMHorhVMfvM0@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z4k6OcbLqMxvvmb-@google.com>
+Mime-Version: 1.0
+References: <4b68ee6e-a6b2-4d41-b58f-edcceae3c689@amd.com> <cd6c18f3-538a-494e-9e60-2caedb1f53c2@amd.com>
+ <Z36FG1nfiT5kKsBr@google.com> <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
+ <Z36vqqTgrZp5Y3ab@google.com> <4ab9dc76-4556-4a96-be0d-2c8ee942b113@amd.com>
+ <Z4gqlbumOFPF_rxd@google.com> <20250116162525.GFZ4ky9TdSn7jltgw7@fat_crate.local>
+ <Z4k6OcbLqMxvvmb-@google.com> <20250117202848.GAZ4q9gMHorhVMfvM0@fat_crate.local>
+Message-ID: <Z4rEuTonLal7Li1O@google.com>
+Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
+From: Sean Christopherson <seanjc@google.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, 
+	x86@kernel.org, kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de, 
+	dave.hansen@linux.intel.com, pgonda@google.com, pbonzini@redhat.com, 
+	francescolavra.fl@gmail.com, Alexey Makhalov <alexey.makhalov@broadcom.com>, 
+	Juergen Gross <jgross@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jan 16, 2025 at 08:56:25AM -0800, Sean Christopherson wrote:
-> It's only with SNP and TDX that the clocksource becomes at all interesting.
-
-So basically you're saying, let's just go ahead and trust the TSC when the HV
-sets a bunch of CPUID bits.
-
-But we really really trust it when the guest type is SNP+STSC or TDX since
-there the HV is out of the picture and the only one who can flub it there is
-the OEM.
-
-> CPUID 0x15 (and 0x16?) is guaranteed to be available under TDX, and Secure TSC
-> would ideally assert that the kernel doesn't switch to some other calibration
-> method too.  Not sure where to hook into that though, without bleeding TDX and
-> SNP details everywhere.
-
-We could use the platform calibrate* function pointers and assign TDX- or
-SNP-specific ones and perhaps even define new such function ptrs. That's what
-the platform stuff is for... needs staring, ofc.
-
-> I agree the naming is weird, but outside of the vendor checks, the VM code is
-> identical to the "native" code, so I don't know that it's worth splitting into
-> multiple functions.
+On Fri, Jan 17, 2025, Borislav Petkov wrote:
+> On Thu, Jan 16, 2025 at 08:56:25AM -0800, Sean Christopherson wrote:
+> > It's only with SNP and TDX that the clocksource becomes at all interesting.
 > 
-> What if we simply rename it to calibrate_tsc_from_cpuid()?
+> So basically you're saying, let's just go ahead and trust the TSC when the HV
+> sets a bunch of CPUID bits.
 
-This is all wrong layering with all those different guest types having their
-own ->calibrate_tsc:
+Sort of.  It's not a trust thing though.  The Xen, KVM, and VMware PV clocks are
+all based on TSC, i.e. we already "trust" the hypervisor to not muck with TSC.
 
-arch/x86/kernel/cpu/acrn.c:32:  x86_platform.calibrate_tsc = acrn_get_tsc_khz;
-arch/x86/kernel/cpu/mshyperv.c:424:             x86_platform.calibrate_tsc = hv_get_tsc_khz;
-arch/x86/kernel/cpu/vmware.c:419:               x86_platform.calibrate_tsc = vmware_get_tsc_khz;
-arch/x86/kernel/jailhouse.c:213:        x86_platform.calibrate_tsc              = jailhouse_get_tsc;
-arch/x86/kernel/kvmclock.c:323: x86_platform.calibrate_tsc = kvm_get_tsc_khz;
-arch/x86/kernel/tsc.c:944:      tsc_khz = x86_platform.calibrate_tsc();
-arch/x86/kernel/tsc.c:1458:                     tsc_khz = x86_platform.calibrate_tsc();
-arch/x86/kernel/x86_init.c:148: .calibrate_tsc                  = native_calibrate_tsc,
-arch/x86/xen/time.c:569:        x86_platform.calibrate_tsc = xen_tsc_khz;
+The purpose of such PV clocks is to account for things in software, that aren't
+handled in hardware.  E.g. to provide a constant counter on hardware without a
+constant TSC.
 
-What you want sounds like a redesign to me considering how you want to keep
-the KVM guest code and baremetal pretty close... Hmmm, needs staring...
+The proposal here, and what kvmclock already does for clocksource, is to use the
+raw TSC when the hypervisor sets bits that effectively say that the massaging of
+TSC done by the PV clock isn't needed.
 
-Thx.
+> But we really really trust it when the guest type is SNP+STSC or TDX since
+> there the HV is out of the picture and the only one who can flub it there is
+> the OEM.
 
--- 
-Regards/Gruss,
-    Boris.
+Yep.  This one _is_ about trust.  Specifically, we trust the raw TSC more than
+any clock that is provided by the HV.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> > CPUID 0x15 (and 0x16?) is guaranteed to be available under TDX, and Secure TSC
+> > would ideally assert that the kernel doesn't switch to some other calibration
+> > method too.  Not sure where to hook into that though, without bleeding TDX and
+> > SNP details everywhere.
+> 
+> We could use the platform calibrate* function pointers and assign TDX- or
+> SNP-specific ones and perhaps even define new such function ptrs. That's what
+> the platform stuff is for... needs staring, ofc.
+> 
+> > I agree the naming is weird, but outside of the vendor checks, the VM code is
+> > identical to the "native" code, so I don't know that it's worth splitting into
+> > multiple functions.
+> > 
+> > What if we simply rename it to calibrate_tsc_from_cpuid()?
+> 
+> This is all wrong layering with all those different guest types having their
+> own ->calibrate_tsc:
+> 
+> arch/x86/kernel/cpu/acrn.c:32:  x86_platform.calibrate_tsc = acrn_get_tsc_khz;
+> arch/x86/kernel/cpu/mshyperv.c:424:             x86_platform.calibrate_tsc = hv_get_tsc_khz;
+> arch/x86/kernel/cpu/vmware.c:419:               x86_platform.calibrate_tsc = vmware_get_tsc_khz;
+> arch/x86/kernel/jailhouse.c:213:        x86_platform.calibrate_tsc              = jailhouse_get_tsc;
+> arch/x86/kernel/kvmclock.c:323: x86_platform.calibrate_tsc = kvm_get_tsc_khz;
+> arch/x86/kernel/tsc.c:944:      tsc_khz = x86_platform.calibrate_tsc();
+> arch/x86/kernel/tsc.c:1458:                     tsc_khz = x86_platform.calibrate_tsc();
+> arch/x86/kernel/x86_init.c:148: .calibrate_tsc                  = native_calibrate_tsc,
+> arch/x86/xen/time.c:569:        x86_platform.calibrate_tsc = xen_tsc_khz;
+> 
+> What you want sounds like a redesign to me considering how you want to keep
+> the KVM guest code and baremetal pretty close... Hmmm, needs staring...
+
+It's not KVM guest code though.  The CPUID stuff is Intel's architecturally
+defined behavior.  There are oodles and oodles of features that are transparently
+emulated by the hypervisor according to hardware specifications.  Generally
+speaking, the kernel treats those as "native", e.g. native_wrmsrl(), native_cpuid(),
+etc.
+
+What I am proposing is that, for TDX especially, instead of relying on the hypervisor
+to use a paravirtual channel for communicating the TSC frequency, we rely on the
+hardware-defined way of getting the frequency, because CPUID is emulated by the
+trusted entity, i.e. the OEM.
+
+Hmm, though I suppose I'm arguing against myself in that case.  If the hypervisor
+provides the frequency and there are no trust issues, why would we care if the
+kernel gets the frequency via CPUID or the PV channel.  It's really only TDX that
+matters.  And we could handle TDX by overriding .calibrate_tsc() in tsc_init(),
+same as Secure TSC.
+
+That said, I do think it makes sense to either override the vendor and F/M/S
+checks native_calibrate_tsc().  Or even better drop the initial vendor check
+entirely, because both Intel and AMD have a rich history of implementing each
+other's CPUID leaves.  I.e. I see no reason to ignore CPUID 0x15 just because
+the CPU isn't Intel.
+
+As for the Goldmost F/M/S check, that one is a virtualization specific thing.
+The argument is that when running as a guest, any non-TSC clocksource is going
+to be emulated by the hypervisor, and therefore is going to be less reliable than
+TSC.  I.e. putting a watchdog on TSC does more harm than good, because what ends
+up happening is the TSC gets marked unreliable because the *watchdog* is unreliable.
 
