@@ -1,248 +1,147 @@
-Return-Path: <kvm+bounces-35823-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35824-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07948A15468
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:32:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58BAEA1546B
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:33:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA2EA3AA524
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:32:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6361C3AB6C8
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5CD19F111;
-	Fri, 17 Jan 2025 16:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E381A08A6;
+	Fri, 17 Jan 2025 16:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="WYU9o+Wy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0VL4va3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCA019CC27
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB3619885F
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737131473; cv=none; b=qESsiu1wDKVnEBEvrvTMiH5EoDDTErLCpUnzJVap6OOD/ujXSf1YMZtwEebfY1Sxqixm06X2l7rQjs2kS5K6J32bzF/42V9GyHTBEOoWVnZAp0CAFiktSBvGRWkLqy3bSWoikqwXX0oTKx0w8xYl5ILN2ateIMZSEMteACODzhs=
+	t=1737131492; cv=none; b=uTaxOVC4935SQ03AEeX3MyPZTeu2b3NdrevfyRZ1eJBe+UU+Qncr/aua0v0/6dHUnoslB4IdJckODx1UTa4jtraeT1NVnwVu5MmchMr5phNo99MrvQRDUkKYq7EIHJcJjPuXKJt4q+mkKisHqV0C8D99z+/aoNjI/K7G3QQVxfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737131473; c=relaxed/simple;
-	bh=mxqFj7Cbt7mFEh8WMnbue8M2/6bNKGAQaEo8QmVgDjM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rvfE+VuHzAATlLemCni+Z7WFMqhPOgwfFP/uovpRYqPGl2jp9MAWP+IwKex9cMbVdXMqszdA2D9cetm60vNib6hCrEhZNqYXEaqiMgM3A3JiOsJEnZIKpQmFxGZ9p3STeoiNQVplCGNtcwKdfekZ+FxotFE/O93DJTfjGzA9PWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=WYU9o+Wy; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3ce886a2d5bso18977115ab.1
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 08:31:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1737131469; x=1737736269; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2LgnsHnmS3fh5mDGhqIRf5OGV7HMImqUQ/i0e8Ovvcw=;
-        b=WYU9o+WyKze7Qv+kqWOhSKa1Z6veT/IJgs2nZLMgqPsT4nLn4GKuZrP8Pmf2yWNgVL
-         tviLW83q3ZHgVj2DCC8/0p2/hYDe+fwmQ42qnHeP9EEE0E5xPN0uH5anV4hk9aCknfF0
-         7hutgy41kH4yj4waJLKh7isE+GA/G1ZxVdNsCPBp6wkCRNfnWr0lJm/xNzwz/J/oXyoN
-         aBPIzix/b7I/4QQBrJmD/lgeAr6cK9KiUDUAEpqLR36Gsnt5w4lSnnj4+1YAFLR/gmP/
-         IDv0CF0ggqfq6y8xc2CU9Do102skyRJXtmzA6jq2/7Dsy2ylQGZ8syCY77mWcKt9YTjq
-         UOYQ==
+	s=arc-20240116; t=1737131492; c=relaxed/simple;
+	bh=SUzw+Oq73Ti5mrMSVS2BVl5YvYwhL8yTQv6MVPwzzqM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=OFLCFs+97LdPFH+kCZQO5jLVrdNEVtvCy0rFhBllljNMxdxPxqy7uY0iKa2mrsEmKhc9uLb0JXTnpJ7ZOOvQsaC6lBLThlZecdPA+YDwjmZjrBO9NxIh5oxQUC7ZM/+cUZRwDDL1ma+S6W51rRYN0FS7eDp12dpEZXpsA/Sq8l0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L0VL4va3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737131489;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5kZSArTqPW7y8wazAkzMJhveaDrun60pF6L1VI/G06I=;
+	b=L0VL4va3EYGS1+b3jJXcrWBEz2BnwDVHobZkrPovHFlQYK608MBtXdqQHqN/REFyyqDrig
+	n2KqA114o3HI4fi4f86l4s6ugqt0QwKk3tvxTUbzVGGpzrGkhOxW8yP2S2LGQDrCz0E7Kv
+	SnrgVVX3I7uxjISX9E5lUBS8GwZXhfE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-185-EZ3U80_4O-23Tsghhji4xQ-1; Fri, 17 Jan 2025 11:31:27 -0500
+X-MC-Unique: EZ3U80_4O-23Tsghhji4xQ-1
+X-Mimecast-MFC-AGG-ID: EZ3U80_4O-23Tsghhji4xQ
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43646b453bcso11628115e9.3
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 08:31:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737131469; x=1737736269;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2LgnsHnmS3fh5mDGhqIRf5OGV7HMImqUQ/i0e8Ovvcw=;
-        b=eIo2j8uWpFMLbh7G7rcvuqLWHfQ/5hrRz1WLHD2yC5VGNPAVMKsyG07hrmbzi9SDc5
-         Pts4ERKfRHA5TUX9v3NLe7JVVpTMHPRyQgzvNuqziGgFEDgPC29n7mf/+lTvfI8w5mNd
-         ImQMfNho9G3LVZ53867RgfkbAezgfLhXZ/1jIN/Pj3160cunRKGubKAsGRA34rrJdelV
-         f1JfxxOXQlLkTSVZhq5jUjc+k7C+VoY2zY52eroVL69gczsQMBmWHGhrNrM4E6KstddR
-         VUlpeSW2rEHpWGaiYwmEsOxUytHAxDxc2LqZ/zBlia0wccroh6EkAyN3Rq9NPtaje3aU
-         Knmw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZaYgvJaSgS1/p+6Ao8NlOH8X/jsd7Psb39YchFCcDA/MZ8nw7QxmqmQIS1Cc6E71gjFg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYvIY79AoikpR+jtyD+K0gQ6Rh/KJNyXdwk/e4LAWzxng41KWl
-	TjjYkUuDWy+fEttT5Q9QPDBSVEMgf5SVXVhG/+c9p7I2EL0yd1ypyMrLKY3OlwY=
-X-Gm-Gg: ASbGncsNb+LYsAlZuaJyIPP9KYED6zJ01ggTWoWVYD4f0DRUEc4zqRsBbHRTwu1l7Z7
-	SvmhpZsPvZCmO0PESiYdnzewpvKuXRXJrGkY+Z/PW3o0s8xIkIWGrv3bJ4DcpLIjB2zQd43xiy8
-	0JCN9QpmRh43IHThcMI4DEvZdHfPNFYHBg2mGs40nAHqzKA8SS/icHtxCoEc1FoeSnNSUeUDHem
-	DwnCYDCwbCFvAAgpXHi8xM/NK/5pIbl9fdmQztPIsYf0RQY9TlrE4AyoQTIkO/rK0Ij8QnM8MuZ
-	cTqc
-X-Google-Smtp-Source: AGHT+IFnKYDZSdNxxP6fjbNh6IOeT1lfl9g/Gyt6iEwmsb06hqBZJxurWC5Tjc8A5f2CPYlVAQFeaA==
-X-Received: by 2002:a05:6e02:214d:b0:3a7:e7bd:9f09 with SMTP id e9e14a558f8ab-3cf743b447dmr25305575ab.5.1737131469361;
-        Fri, 17 Jan 2025 08:31:09 -0800 (PST)
-Received: from [100.64.0.1] ([165.188.116.9])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea7566e4a0sm695782173.121.2025.01.17.08.31.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jan 2025 08:31:08 -0800 (PST)
-Message-ID: <dff019ec-79dc-4be6-b1f4-02e48d84ebc2@sifive.com>
-Date: Fri, 17 Jan 2025 10:31:08 -0600
+        d=1e100.net; s=20230601; t=1737131486; x=1737736286;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5kZSArTqPW7y8wazAkzMJhveaDrun60pF6L1VI/G06I=;
+        b=OpNm7OHKvE1NAMpwadKH14jYynltyeD3K187ZU+OctIeTqxey2DGdszHbPLm3CS6ka
+         Z8bvS4gFFrX1ahjq5NpJ3Fwhc4k7UaZS02AVCcn77O4aO1ZwE2iqF8OFlxpLslb01RAy
+         Cl3jj7r6kz2NQgwCwRZuBxHjd31FGXDvA1TzIcIU11xli0cscvfhF/8f44wQZ/AOhonc
+         2GB0yG5R0THIytokizMr/lYlpmzGXaTH2wwmmxjFNdpWg4FKNpFSLQV8W6OvKO5xX96Z
+         TftX3QzWHyk6Zylxk87gMH6vBqfb/jedJus+HMwpS19VVwO/RSqShBXlQgJwTcXgemkd
+         C/SQ==
+X-Gm-Message-State: AOJu0Yyl5im2YYbnkvHvS2ALlWqexmGvDR2R4BT7uK9c951cc3uL1/oO
+	FxZYxkaYtiDsPBArp/NNJEAeRjpu/xt3SvtAOjsb0XdnNciP2XRRSySVSA8kji7nEB92na9CvkW
+	aS4cPyIn3b6X1XEd7pqMSdyjMBzdYJZx8wsAGjqx7vbEQnLQMZg==
+X-Gm-Gg: ASbGncsh1KCOgb+Jn8I80XEJ1AdmMK8evh+cUC/d/58i0sjykBh1NlSXQJANMn38+CW
+	kKjCh+4e3TwyLmQuizCD+8EhKlztpmeWqLxF1SZIDd4ObrnXlFOl7kk1qHS9hc5sBkZ6mfo8fpQ
+	Ne1TzrcnD8URBpA9jeD8/ARQndfW/WmHUjOcb2leynhmq8zyVlKzTwxo6b4/PnSfkX6IE5E3oYx
+	K9WFwV4hSqpnSkSKYUvv8Xy0ywES10SJ/hukVfmV1dQMAkzqfs=
+X-Received: by 2002:a05:600c:5486:b0:436:51bb:7a52 with SMTP id 5b1f17b1804b1-438913c9c93mr33958885e9.7.1737131484803;
+        Fri, 17 Jan 2025 08:31:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGzybavdrtbNIcjbRCoDzaMdvU1XI2nGM8kEOYRxgMRQWuVVlEmre8BK1gVG96AlnqvHu/htA==
+X-Received: by 2002:a05:600c:5486:b0:436:51bb:7a52 with SMTP id 5b1f17b1804b1-438913c9c93mr33958405e9.7.1737131484456;
+        Fri, 17 Jan 2025 08:31:24 -0800 (PST)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c74c4751sm97808145e9.19.2025.01.17.08.31.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 08:31:23 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Sean Christopherson
+ <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Dongjie Zou
+ <zoudongjie@huawei.com>, stable@vger.kernel
+Subject: Re: [PATCH 3/5] KVM: selftests: Explicitly free CPUID array at end
+ of Hyper-V CPUID test
+In-Reply-To: <20250113222740.1481934-4-seanjc@google.com>
+References: <20250113222740.1481934-1-seanjc@google.com>
+ <20250113222740.1481934-4-seanjc@google.com>
+Date: Fri, 17 Jan 2025 17:31:22 +0100
+Message-ID: <87ikqd8krp.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/6] RISC-V: KVM: add support for
- SBI_FWFT_MISALIGNED_DELEG
-To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org
-References: <20250106154847.1100344-1-cleger@rivosinc.com>
- <20250106154847.1100344-7-cleger@rivosinc.com>
- <b3f54d34-bc77-46db-88da-70c0c602081f@sifive.com>
- <dec723d7-fc16-4edb-b684-1844b08391ba@rivosinc.com>
-From: Samuel Holland <samuel.holland@sifive.com>
-Content-Language: en-US
-In-Reply-To: <dec723d7-fc16-4edb-b684-1844b08391ba@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi Clément,
+Sean Christopherson <seanjc@google.com> writes:
 
-On 2025-01-17 10:05 AM, Clément Léger wrote:
-> On 11/01/2025 00:55, Samuel Holland wrote:
->> On 2025-01-06 9:48 AM, Clément Léger wrote:
->>> SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
->>> misaligned load/store exceptions. Save and restore it during CPU
->>> load/put.
->>>
->>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->>> ---
->>>  arch/riscv/kvm/vcpu.c          |  3 +++
->>>  arch/riscv/kvm/vcpu_sbi_fwft.c | 39 ++++++++++++++++++++++++++++++++++
->>>  2 files changed, 42 insertions(+)
->>>
->>> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
->>> index 3420a4a62c94..bb6f788d46f5 100644
->>> --- a/arch/riscv/kvm/vcpu.c
->>> +++ b/arch/riscv/kvm/vcpu.c
->>> @@ -641,6 +641,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>>  {
->>>  	void *nsh;
->>>  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
->>> +	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
->>>  
->>>  	vcpu->cpu = -1;
->>>  
->>> @@ -666,6 +667,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>>  		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
->>>  		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
->>>  		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
->>> +		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
->>>  	} else {
->>>  		csr->vsstatus = csr_read(CSR_VSSTATUS);
->>>  		csr->vsie = csr_read(CSR_VSIE);
->>> @@ -676,6 +678,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>>  		csr->vstval = csr_read(CSR_VSTVAL);
->>>  		csr->hvip = csr_read(CSR_HVIP);
->>>  		csr->vsatp = csr_read(CSR_VSATP);
->>> +		cfg->hedeleg = csr_read(CSR_HEDELEG);
->>>  	}
->>>  }
->>>  
->>> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
->>> index 55433e805baa..1e85ff6666af 100644
->>> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
->>> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
->>> @@ -14,6 +14,8 @@
->>>  #include <asm/kvm_vcpu_sbi.h>
->>>  #include <asm/kvm_vcpu_sbi_fwft.h>
->>>  
->>> +#define MIS_DELEG (1UL << EXC_LOAD_MISALIGNED | 1UL << EXC_STORE_MISALIGNED)
->>> +
->>>  static const enum sbi_fwft_feature_t kvm_fwft_defined_features[] = {
->>>  	SBI_FWFT_MISALIGNED_EXC_DELEG,
->>>  	SBI_FWFT_LANDING_PAD,
->>> @@ -35,7 +37,44 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
->>>  	return false;
->>>  }
->>>  
->>> +static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
->>> +{
->>> +	if (!unaligned_ctl_available())
->>
->> This seems like the wrong condition. Patch 2 requests delegation regardless of
->> what probing detects. For MISALIGNED_SCALAR_FAST, the delegation likely doesn't> change any actual behavior, because the hardware likely never raises the
->> exception. But it does ensure M-mode never emulates anything, so if the
->> exception were to occur, the kernel has the choice whether to handle it. And
->> this lets us provide the same guarantee to KVM guests. So I think this feature
->> should also be supported if we successfully delegated the exception on the host
->> side.
-> 
-> Not sure to completely follow you here but patch 2 actually does the
-> reverse of what you said. We request delegation from SBI *before*
-> probing so that allows probing to see if we (kernel) receives misaligned
-> accesses traps and thus set MISALIGNED_SCALAR_EMULATED.
+> Explicitly free the array of CPUID entries at the end of the Hyper-V CPUID
+> test, mainly in anticipation of moving management of the array into the
+> main test helper.
+>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> index 9a0fcc713350..09f9874d7705 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> @@ -164,6 +164,7 @@ int main(int argc, char *argv[])
+>  
+>  	hv_cpuid_entries = kvm_get_supported_hv_cpuid();
+>  	test_hv_cpuid(hv_cpuid_entries, kvm_cpu_has(X86_FEATURE_VMX));
+> +	free((void *)hv_cpuid_entries);
 
-Ah, right, that makes sense.
+vcpu_get_supported_hv_cpuid() allocates memory for the resulting array
+each time, however, kvm_get_supported_hv_cpuid() was designed after
+what's now kvm_get_supported_cpuid() (afair) so it has an optimization
+to ask KVM just once:
 
-> But if I understood correctly, you mean that guest delegation should
-> also be available to guest in case misaligned access were delegated by
-> the SBI to the host which I agree. I think this condition should be
+        static struct kvm_cpuid2 *cpuid;
+        int kvm_fd;
 
-Yes, your understanding is correct.
+        if (cpuid)
+                return cpuid;
 
-> reworked to report the delegation status itself and not the misaligned
-> access speed that was detected
+        cpuid = allocate_kvm_cpuid2(MAX_NR_CPUID_ENTRIES);
+        kvm_fd = open_kvm_dev_path_or_exit();
+	...
 
-Agreed, with the nuance that delegation may have been enabled by a FWFT call, or
-it may have been pre-existing, as detected by MISALIGNED_SCALAR_EMULATED or
-MISALIGNED_VECTOR_EMULATED. For example, I would consider a platform where the
-hardware supports misaligned scalar accesses (MISALIGNED_SCALAR_FAST) but not
-vector accesses, and M-mode doesn't emulate them (MISALIGNED_VECTOR_EMULATED) to
-be delegated for the purposes of this check, even if M-mode doesn't implement
-the FWFT extension.
+and it seems that if we free hv_cpuid_entries here, next time we call
+kvm_get_supported_hv_cpuid() an already freed memory will be returned.
+This doesn't matter in in this patch as we're about to quit anyway but
+with the next one in the series it becomes problematic.
 
-Regards,
-Samuel
+>  
+>  out:
+>  	kvm_vm_free(vm);
 
->>> +		return false;
->>> +
->>> +	return true;
->>> +}
->>> +
->>> +static int kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
->>> +					struct kvm_sbi_fwft_config *conf,
->>> +					unsigned long value)
->>> +{
->>> +	if (value == 1)
->>> +		csr_set(CSR_HEDELEG, MIS_DELEG);
->>> +	else if (value == 0)
->>> +		csr_clear(CSR_HEDELEG, MIS_DELEG);
->>> +	else
->>> +		return SBI_ERR_INVALID_PARAM;
->>> +
->>> +	return SBI_SUCCESS;
->>> +}
->>> +
->>> +static int kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
->>> +					struct kvm_sbi_fwft_config *conf,
->>> +					unsigned long *value)
->>> +{
->>> +	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) != 0;
->>> +
->>> +	return SBI_SUCCESS;
->>> +}
->>> +
->>>  static const struct kvm_sbi_fwft_feature features[] = {
->>> +	{
->>> +		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
->>> +		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
->>> +		.set = kvm_sbi_fwft_set_misaligned_delegation,
->>> +		.get = kvm_sbi_fwft_get_misaligned_delegation,
->>> +	}
->>
->> nit: Please add a trailing comma here as future patches will extend the array.
->>
->> Regards,
->> Samuel
->>
->>>  };
->>>  
->>>  static struct kvm_sbi_fwft_config *
->>
-> 
+-- 
+Vitaly
 
 
