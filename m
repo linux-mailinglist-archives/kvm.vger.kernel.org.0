@@ -1,122 +1,176 @@
-Return-Path: <kvm+bounces-35741-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58B1FA14CA2
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 10:57:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1100BA14DC9
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 11:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4863188BD9B
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 09:57:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8036518842A1
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 10:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0871F8AFC;
-	Fri, 17 Jan 2025 09:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6481FC0F5;
+	Fri, 17 Jan 2025 10:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWQyCN7E"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b="opAnlRzp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6129D1F9A8B;
-	Fri, 17 Jan 2025 09:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDEE11F91FF
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 10:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.40.148.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737107823; cv=none; b=F0oNEbp4TtyCrPrDCHLRQV1uiBt+vpmI+jwsoC8UH8/cl3FwBl4K5klhUOR7/qiO5ZvVs4rlayb2NBxmV8bou8A2EWb8i0DC4VyjjsFYQG5myDG20X9vxd5HC8VVc4pY+Wea9EoGojXRubGODvwNk5I2zrWiJQAVhrCkU+mjdXA=
+	t=1737110369; cv=none; b=CLaXQkuqJnCoRCALc4omha+XXyUZvFxmH0KKJYymCJCVi8EgUwr7F6t9h+xuTBzKxdARxXOEFmMwNR6D8lAtmYjNFf8xdrXJ0SBx1ExivtNkEDa83Ls+9mG6ijflL82WzLOg+geDiW1f17QitNLVCvznyzEcWBtnhq9VGVzNhPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737107823; c=relaxed/simple;
-	bh=RFR3/cFbGnpLYips6b5vBfbBKmTBrU1/hib1nOzR0KE=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=OKfdI6gvOnVmRtmIDLOjgo8IVOC7EvdW5U9/+hmrPKmMOWFJ+dYn30GouAr8TfkhWoydoGq+alzDAhu9ys8MwutwHisnw+H9ZriBkRNNoF9YE7QTORwrCKYoRIRgZ+BEbmhZNEnONDo4d/9zMmaro0J/xaV+Ebri2KFkjjaKPMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CWQyCN7E; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-46df3fc7176so19488951cf.2;
-        Fri, 17 Jan 2025 01:57:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737107821; x=1737712621; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ovdk4k/vCUwz5uPdq8Dv4BPzFQxBElwSXmwKsXlIYSA=;
-        b=CWQyCN7EQavSZYruklDV/D1bqcBzX4KFdYJrm0PE6wR7C7vPT6aeWdpbQ7/qsym7mm
-         X2j+6hq8O6UDd4wNTg3uBwTu971Hz0g9o79EDI95TSXbEjW1cQLHgub0bHMX4WvxNwcX
-         RPQS99g6zSzNSljK5O6AjhYd4LuWtZ0NlV+0b62iquK4JxI4jHY2UJxj+Sgr25JivNfc
-         MjoLCAPcw7XBDk3B54/UAE4eFNCT5ZAP3X6mBdnwpUjQxQz/Q4IEquqX4NJ64eRMuFU2
-         OzGs2oHrsDIu0NuiGjkS9xfTWsDKZvvO9zDCGVcRVzqcSF3ZUWJg+j9RRuKe3PCazu59
-         8gKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737107821; x=1737712621;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ovdk4k/vCUwz5uPdq8Dv4BPzFQxBElwSXmwKsXlIYSA=;
-        b=NHvRIWoX3mh/3tiUrsAGZ1J2ELZXpB59OJg6DzT5kqgNWzr/LzUVxjDNi4WO752TVf
-         iPpF6ApEdi+mqvFphrxJzpQfpp8H48GOjV5yfX7m99dQhtWPl5hcRU2e4vYCXmn80xex
-         Pb3qIY3rp9snjsrIejWhOunmzAx7eU0GGUPeyDWG39SMdfMvyTznVMW7VnqVmNywaGKP
-         73ivnCk/EzWPJ5J6OYEtyVwvFwe4u26Hh+FQVAM60c6m9jhFozSGtlPtixBOGiPx3tVf
-         ZkeKWHfIQ/A8VQKb2exCKmwCjMix4pj7BALbXvj9KWjxAukctNPRep0g39q/S6FgiEZQ
-         kE9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUR7mFjhhVqcKZj7IOiPYNho4O+zPsbiAq4pq7l0EiTiF11xmXkbE+/L5LFvmMNfb4MkxllAbaWY6zOyP6D+pIV@vger.kernel.org, AJvYcCVK2u+i2ix3+8PHpF6+W5yqFruMpYdOnfyPy1E5H9VjaxacJM7Yc3SgphfQ6jb152lTakY=@vger.kernel.org, AJvYcCVcMnMJCGoPhEGBBOm3hqHXP6nkTLNIYQjFsLLkh++j5w9Yk7ye/CsnuScsgJmD2+1MJsTXDwDGebcN@vger.kernel.org, AJvYcCXDZKnSlqx97m53VIhgwcuF51EYfjoJfkeiTEmhR6O2umuPjU7geSL0yp+/RwBdLJxHCP0UJYT+@vger.kernel.org, AJvYcCXfoqM2tL6MIEBpFIB2RfCnOLUHKMoZh6YFPecSvXKS/8a5JJU19qNnU1kiMFAPp06Ovfz58uZt/+p0mvfj@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPY1hAUJ2X1iZKpzKN2yP4glpWYJv50qVay5SW8UAaGusYDsma
-	nOtft+zIrSBPBA2KIHfGEmY6t5jbhJfI2NFui1ul9wmDp+FajUfLhCE32Ma9Uqg=
-X-Gm-Gg: ASbGncsOIOgHbaHFFYYXWSWl3IHK7ENw8JVN6vsncYkJm8A2+6DBedyMCleqLC+jvSX
-	Ccd/KPY4WLlEDRc1youth5MFR9CzBuiX2A5d/ug+UNJCSMLcULAu0T0Tshk1X1tzRGHPvddYwax
-	Wi6/dwYTX/8+SMw2/A2vCQ9BJvv7ivAoP81ztxSVUXDB4BoQlW9wPTiyfw6s69j4juUxrjUF31v
-	NAEVBRpT+DWbSLkgCq39IuzuiMpKBkBpI4HH+Ei0tZlK9ykrzQmSk9EayN0lb89wtyYr472nP1e
-	8YRFWIc+92a3Sk8lT0Zqm2WUnfhZ
-X-Google-Smtp-Source: AGHT+IFschQx8vBdX+dVeL7yaPsFln2MhoSz+0jIUqp5PMdVWZN9/2ISB/pefM48R8qe/jWfCm8mvg==
-X-Received: by 2002:a05:6214:4988:b0:6dd:5f90:16bd with SMTP id 6a1803df08f44-6e1b22349dbmr38642296d6.41.1737107821259;
-        Fri, 17 Jan 2025 01:57:01 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afc111e3sm9808596d6.43.2025.01.17.01.57.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2025 01:57:00 -0800 (PST)
-Date: Fri, 17 Jan 2025 04:57:00 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- devel@daynix.com, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-Message-ID: <678a296c687ee_3e985b294a1@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250116-tun-v3-1-c6b2871e97f7@daynix.com>
-References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
- <20250116-tun-v3-1-c6b2871e97f7@daynix.com>
-Subject: Re: [PATCH net v3 1/9] tun: Refactor CONFIG_TUN_VNET_CROSS_LE
+	s=arc-20240116; t=1737110369; c=relaxed/simple;
+	bh=mbtjENaIu932I2dZxMZEecTSNyXFXwtP3N06YtRjxuQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hH1rvLIj8HRfIJSp8PxTjj4/4s3A9VlLcnLwY0nfGo/qleD/Wl8TUtPsCx6k9FGO53VsHdkZvttAF6+B8fDffbyrY+a54tgz8wIjwGGAUWy5ETMoowk78uQEe2FL83397RyVTAIzk9dYyoL+/CG8u95nNahqnvm8TPJtpFG25QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.co.uk; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=opAnlRzp; arc=none smtp.client-ip=78.40.148.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codethink.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=codethink.co.uk; s=imap5-20230908; h=Sender:Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eJEZXV6ErJzZgAb2S4mxKqHkE7EJGWkaUmJxlxdIwMo=; b=opAnlRzp9YY03rDguvYkpVKpQ1
+	dimMYiLfMteqmySR0M7LCmMkFEwwFHjbGxoTAaDK4NjWeSvpVvLYFErzQIpsq0o/IiiULK5wmXWlj
+	/DTPlr/hKWZ3DDqxAaNDzfdprMwz/SwLPalzncN5Q9SABfjSGj7MKISt4POTNCtFnI6xEphhiLxgV
+	l2yJFvtW9hec6aYOwMzGj9iqpPGnnCzWm0L3nqa6Df/hOwss5zZXKukq3bFhCoO/VEwKBa/aGUtSp
+	SjAJqUAbAVHBXeEibHU3RqqjqN1n5ANIUa4GO2MDbHm4vsDILSDFVVyZ0rbvw6VwY+KzcFlenk+p1
+	eGLynzOQ==;
+Received: from [167.98.27.226] (helo=[10.35.6.157])
+	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+	id 1tYj6X-007I2a-E9; Fri, 17 Jan 2025 09:57:29 +0000
+Message-ID: <2509980e-028c-4d49-bb98-a864a9176212@codethink.co.uk>
+Date: Fri, 17 Jan 2025 09:57:29 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool] kvmtool: virtio: fix endian for big endian hosts
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: kvm@vger.kernel.org, felix.chong@codethink.co.uk,
+ lawrence.hunter@codethink.co.uk, roan.richmond@codethink.co.uk
+References: <20250115101125.526492-1-ben.dooks@codethink.co.uk>
+ <20250115-73a1112ddbc729143d052afb@orel>
+ <01e504c1-58d3-4652-9366-1f518b7bd86e@codethink.co.uk>
+ <20250116-e80c8bf6f54d88dbd6d5e7a9@orel>
+Content-Language: en-GB
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+Organization: Codethink Limited.
+In-Reply-To: <20250116-e80c8bf6f54d88dbd6d5e7a9@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Sender: ben.dooks@codethink.co.uk
 
-Akihiko Odaki wrote:
-> Check IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) to save some lines and make
-> future changes easier.
+On 16/01/2025 09:28, Andrew Jones wrote:
+> On Wed, Jan 15, 2025 at 03:09:58PM +0000, Ben Dooks wrote:
+>> On 15/01/2025 14:24, Andrew Jones wrote:
+>>> On Wed, Jan 15, 2025 at 10:11:25AM +0000, Ben Dooks wrote:
+>>>> When running on a big endian host, the virtio mmio-modern.c correctly
+>>>> sets all reads to return little endian values. However the header uses
+>>>> a 4 byte char for the magic value, which is always going to be in the
+>>>> correct endian regardless of host endian.
+>>>>
+>>>> To make the simplest change, simply avoid endian convresion of the
+>>>> read of the magic value. This fixes the following bug from the guest:
+>>>>
+>>>> [    0.592838] virtio-mmio 10020000.virtio: Wrong magic value 0x76697274!
+>>>>
+>>>> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+>>>> ---
+>>>>    virtio/mmio-modern.c | 5 ++++-
+>>>>    1 file changed, 4 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/virtio/mmio-modern.c b/virtio/mmio-modern.c
+>>>> index 6c0bb38..fd9c0cb 100644
+>>>> --- a/virtio/mmio-modern.c
+>>>> +++ b/virtio/mmio-modern.c
+>>>> @@ -66,7 +66,10 @@ static void virtio_mmio_config_in(struct kvm_cpu *vcpu,
+>>>>    		return;
+>>>>    	}
+>>>> -	*data = cpu_to_le32(val);
+>>>> +	if (addr != VIRTIO_MMIO_MAGIC_VALUE)
+>>>> +		*data = cpu_to_le32(val);
+>>>> +	else
+>>>> +		*data = val;
+>>>>    }
+>>>>    static void virtio_mmio_config_out(struct kvm_cpu *vcpu,
+>>>> -- 
+>>>> 2.37.2.352.g3c44437643
+>>>>
+>>>
+>>> I think vendor_id should also have the same issue, but drivers don't
+>>> notice because they all use VIRTIO_DEV_ANY_ID. So how about the
+>>> change below instead?
+>>>
+>>> Thanks,
+>>> drew
+>>>
+>>> diff --git a/include/kvm/virtio-mmio.h b/include/kvm/virtio-mmio.h
+>>> index b428b8d32f48..133817c1dc44 100644
+>>> --- a/include/kvm/virtio-mmio.h
+>>> +++ b/include/kvm/virtio-mmio.h
+>>> @@ -18,7 +18,7 @@ struct virtio_mmio_ioevent_param {
+>>>    };
+>>>
+>>>    struct virtio_mmio_hdr {
+>>> -       char    magic[4];
+>>> +       u32     magic;
+>>>           u32     version;
+>>>           u32     device_id;
+>>>           u32     vendor_id;
+>>> diff --git a/virtio/mmio.c b/virtio/mmio.c
+>>> index fae73b52dae0..782268e8f842 100644
+>>> --- a/virtio/mmio.c
+>>> +++ b/virtio/mmio.c
+>>> @@ -6,6 +6,7 @@
+>>>    #include "kvm/irq.h"
+>>>    #include "kvm/fdt.h"
+>>>
+>>> +#include <linux/byteorder.h>
+>>>    #include <linux/virtio_mmio.h>
+>>>    #include <string.h>
+>>>
+>>> @@ -168,10 +169,10 @@ int virtio_mmio_init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>>>                   return r;
+>>>
+>>>           vmmio->hdr = (struct virtio_mmio_hdr) {
+>>> -               .magic          = {'v', 'i', 'r', 't'},
+>>> +               .magic          = le32_to_cpu(0x74726976), /* 'virt' */
+>>
+>>
+>> just doing the change of magic type and then doing
+>> 	.magic = 0x74726976;
+>>
+>> should work, as then magic is in host order amd will get converted
+>> to le32 in the IO code. Don't think vendor_id suffers as it was
+>> converted from string to hex.
 > 
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> Oh, right. I overthought that one. I prefer the magic in hex better than
+> the special casing in virtio_mmio_config_in()
+> 
+> Thanks,
+> drew
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Ok, will wait a few days to see if anyone else has a comment.
+
+I assume you're ok with me re-doing my patch?
+
+Thanks for the review.
+
+
+-- 
+Ben Dooks				http://www.codethink.co.uk/
+Senior Engineer				Codethink - Providing Genius
+
+https://www.codethink.co.uk/privacy.html
 
