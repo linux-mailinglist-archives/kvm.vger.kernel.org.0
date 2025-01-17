@@ -1,207 +1,160 @@
-Return-Path: <kvm+bounces-35706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1355AA146C6
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 00:47:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E2FA1470C
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 01:35:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 516E3188228E
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 23:47:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDF83188C196
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 00:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C69C1F1505;
-	Thu, 16 Jan 2025 23:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F8DBA42;
+	Fri, 17 Jan 2025 00:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="soYs/OPb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dRrQrdMk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C769C25A627
-	for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 23:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44262A1CA
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 00:35:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737071218; cv=none; b=sxJY4x3xa8cVi7SF8xf+lPLZ5JsPNIYUTepVah6xe8RXGNPW0fz461WmTEab1fHaUYZIY9UNXgWc7Atn/Vg4ih1XufnWx2jwHIccW8GyEB4m7bXXlhkXveI+tWTEzkt59CHqrP9Ri6fOCS36ZZcxTrGrGRW7EKN1l1elHpKvAHk=
+	t=1737074102; cv=none; b=BnbQsRn0KGNN0rGka43mlRqogKJpVfKiUiOYxGutsWOD0yTBriNmPwTkl9uUHIU3ALQ6oNxgOX5cr42ibCsj7sHYY3LCQQdei1zNlxMFh7YidvMl6/iYS2L7rvG4V0ddjzw6RnUFHkf/t6Ao7Vm08zcQuUYqEgegrAld6Jw/MVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737071218; c=relaxed/simple;
-	bh=3EwIz7mnMJW3m1YZtHus0i5SxyyBh7S8/iqg+UaggVM=;
+	s=arc-20240116; t=1737074102; c=relaxed/simple;
+	bh=i+fu4SMiKCiOhqIwNOT0ZXodrO03sEGDTT6rZTLdP3M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=vFUnOG85/IKipsu69yLJcOz0O0W9pnfEngw+D/BlMmG2K6EvH+mOWL8fqDZzNh2WiJy7ZjyB66pSZuiNGv/2lrJz0JsA4y0vuhCyptSqtceqSGV2JRKHTtGdEa1+kGLF4NTh12XCDOb2Rd7vLUtnZJJ6GTI2TaeVkDgnnlafoTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=soYs/OPb; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=H3FcsOAnrVrYRNTUlIug2xOoMu/Ch4kaKqC6z7WaaLY9Vqky1uc43C2yF1pR7DUIE3Qb3SYpy7li/k7YT/pxJMciYtGQ8GZkOgx5luUcnEPFkKmJ7RB8vk7UMyquejQ5SBmR48kuILCtf/Ass0ZWGUGd+hyeb00Ruuw1FejZsWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dRrQrdMk; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21681a2c0d5so28202235ad.2
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 15:46:56 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef7fbd99a6so3056944a91.1
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 16:35:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737071216; x=1737676016; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737074100; x=1737678900; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=B+30IFm68jg6NDwHeVAkv6hKYafQ3ykW53j/B6i3wSI=;
-        b=soYs/OPb1GMP4N4VminXwAHLP6eE8K9Nl/o7HMPuCsSsFqEVR5Dr3jwOZRxluNW/H2
-         tDiSooS8PGErc8pLkpyb4oB74Np8DuNL1VrRRTMdK1YSlPkDSYCIMFyLn/Cuih3PJK0u
-         WeTwcrZ0EfP6fOExabFbCOzErH6Xyv5fw3qztrHhfkojPHpO+yOPZkum7q+knufR9eJ0
-         y+5xUx0NCiL8dc8F4/5/wX1wXoLaCGYNSht44J6tYdNn6q5+/XhV3fGxuJQg9glJowuA
-         Znjm1cYgDCGYMc2kZcV+7teRuEjkzw+M4rimkOiC/8sF4qzIz/JKCNddA1RgNE5+V6ra
-         H16w==
+        bh=lgWPk9r1v2SNvtYRPaNPBYejiII89EyX0Cotmneutyo=;
+        b=dRrQrdMkmebMg7sW8rHLNa1Lgm39z9nAI/dou0f/FBttbU70QKYXZlB/hYQbL57Va4
+         UoqRkB2Bje9JUuWhOyhHZ8vRqymKZQO+ttcHfqc64rzonOd48Pif6JtFjglhAlPDb7cY
+         cCrbuYdFcIbohJerPBVHV6L8eWmFqaSKn6EvvaxaopziqCvAJZMx7YOCCWqHKLqyT1lx
+         z098Ea3hxU1nQb2M9i9XCbxc8v2qPxz905OuNsXuq68E8Jzh0hs9/rK5Pn7lgIBKQBCr
+         tW8uP2NsXPIGBGeBDxo2zP/ai3iJjvpiDfwkkFlz9aLSdngoaP/VFE/kra35ewbz+DQN
+         zncg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737071216; x=1737676016;
+        d=1e100.net; s=20230601; t=1737074100; x=1737678900;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=B+30IFm68jg6NDwHeVAkv6hKYafQ3ykW53j/B6i3wSI=;
-        b=FkpYpYwoMM2ObEfFtkAU+zW3sFhVoXDHMh5WDVg3+mlIPZZCnLJEsK2BLDFH3VTbaf
-         TyN5wixmQGejwPpQniuyMc4+uNJm8yal7lnY4ix1h3TyTA1bq4mn9rQIV8jl26jUhTAV
-         80iZD7RZoDH1wKjAy/h0fqBAIuZ7+TR3Vb1XEUxFK7Locz+4ihRemiN3N4NNhUuEM1yt
-         Aj//A/X+VAQtCbqBHGPZ06zmGNJNifsqw53uNwa/rmSI94gWT8lcoeOxsCzG+bHk2pag
-         9Fiyq2i+P+SWBYBXcAcM0TpySm0k/zUFYSaAPj3//VmB83S7mTHQ02gz+MT361A5Hqfy
-         48DA==
-X-Forwarded-Encrypted: i=1; AJvYcCWqnAKC50o3Yj+Q5YXS82iX9cc7s3AdeIsoFZ5iOVWUJjfiujzF9ZOrYq3rAKtHjxk02tk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfVqqkXulUYfxlt6NhCRpbKUXnQTydVSLnaVsz9Zyjvq3tnmgJ
-	gtaUN7kw/pvPQpk79xOsNt0S/tS2uA6RNt6Jl0ChRewr+2wjBbsQUNm4qYsbx+VhIbUZ/zl0rF4
-	bug==
-X-Google-Smtp-Source: AGHT+IHZR21brkH4uVP110TgbprGaxMRRHTjbTHJnd3oJv8cZv6zsGMgvWQaUzQjRW3B/1TQyJ2Gb8Ip7wA=
-X-Received: from pfbhx8.prod.google.com ([2002:a05:6a00:8988:b0:725:eccc:e998])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2da5:b0:725:f1ca:fd8a
- with SMTP id d2e1a72fcca58-72dafb5580cmr1293395b3a.19.1737071216234; Thu, 16
- Jan 2025 15:46:56 -0800 (PST)
-Date: Thu, 16 Jan 2025 15:46:54 -0800
-In-Reply-To: <Z4mTdOc35hF26PeY@x1n>
+        bh=lgWPk9r1v2SNvtYRPaNPBYejiII89EyX0Cotmneutyo=;
+        b=IaLDznzUm58LU93mBFNM9ifyY3pqibXUaq95SgGTdPAO1HwSries5N02TqfIrKUdfC
+         ERzp1LW/Wm57HgM9UDwrnkp1aP/CdhHNl2cydB/Y31mxjZmrhmCCLbVAs2WjO5BxQ4+I
+         H3xSb2wCyZ9DVmauzNcc6PM1SZKKkrpi53KFNehKA+MvjiOR71CrLl1EDr6GKD3da281
+         CbkoMdwXkImsxEjkYZ9JjJe0IrK4A4NLt4oUKQG34MXp16YsMMyRWS2NLZI2PNdEqDkm
+         Oa2b9dNaF6OkzK1JE0x0Kbc0dysLhQqeS7PgGDY3xZbL30n8W72zjLAeS3+1O47o5B9m
+         EbyA==
+X-Forwarded-Encrypted: i=1; AJvYcCW5UOK9kppiO8hFgrRNUgEWvfldZF1miTAoVMVrGwtsMJ5RVb4eXl+wOC8HPen+zP7F+wk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzvkpVWYPi6BOQAAtBDUsrpTyKoDf3N5WPaIXt2ceZSGsaxnTS
+	t29w9mnhlOVFvmGIvitH+xAg1Df6jpevmv7Jpret0vCzpnJWfOKsNo4iY5eCw+jZgwUn4SCvMqy
+	WJQ==
+X-Google-Smtp-Source: AGHT+IEF+vCsdB8XWnCOfXc26I8zlnaA9viptBGh60aDQoi6XWzvvwmTgjaaVDKjMyjL3uFjKiqnMv4ZWGQ=
+X-Received: from pjbsd7.prod.google.com ([2002:a17:90b:5147:b0:2ef:8d43:14d8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:8a16:b0:2ee:ead6:6213
+ with SMTP id 98e67ed59e1d1-2f782ca2bc0mr801570a91.19.1737074100179; Thu, 16
+ Jan 2025 16:35:00 -0800 (PST)
+Date: Thu, 16 Jan 2025 16:34:58 -0800
+In-Reply-To: <CAJD7tkbqxXQVd5s7adVqzdLBP22ef2Gs+R-SxuM7GtmetaWN+Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20241204191349.1730936-1-jthoughton@google.com>
- <Z2simHWeYbww90OZ@x1n> <CADrL8HUkP2ti1yWwp=1LwTX2Koit5Pk6LFcOyTpN2b+B3MfKuw@mail.gmail.com>
- <Z4lp5QzdOX0oYGOk@x1n> <Z4lsxgFSdiqpNtdG@x1n> <Z4mFL8wfHjvz6F1Y@google.com>
- <CADrL8HW_hgKZBX98Z17eNqC3iJruwLJcFv=pswgT8hKayMYbzw@mail.gmail.com> <Z4mTdOc35hF26PeY@x1n>
-Message-ID: <Z4mablD78z45k1u6@google.com>
-Subject: Re: [PATCH v1 00/13] KVM: Introduce KVM Userfault
+References: <20250116035008.43404-1-yosryahmed@google.com> <CALMp9eQoGsO8KvugXP631tL0kWbrcwMrPR_ErLa9c9-OCg7GaA@mail.gmail.com>
+ <CAJD7tkbHARZSUNmoKjax=DHUioP1XBWhf639=7twYC63Dq0vwg@mail.gmail.com>
+ <Z4k9seeAK09VAKiz@google.com> <CAJD7tkZQQUqh1GG5RpfYFT4-jK-CV7H+z9p2rTudLsrBe3WgbA@mail.gmail.com>
+ <Z4mJpu3MvBeL4d1Q@google.com> <CAJD7tkbqxXQVd5s7adVqzdLBP22ef2Gs+R-SxuM7GtmetaWN+Q@mail.gmail.com>
+Message-ID: <Z4mlsr-xJnKxnDKc@google.com>
+Subject: Re: [PATCH] KVM: nVMX: Always use TLB_FLUSH_GUEST for nested VM-Enter/VM-Exit
 From: Sean Christopherson <seanjc@google.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: James Houghton <jthoughton@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Yan Zhao <yan.y.zhao@intel.com>, Nikita Kalyazin <kalyazin@amazon.com>, 
-	Anish Moorthy <amoorthy@google.com>, Peter Gonda <pgonda@google.com>, 
-	David Matlack <dmatlack@google.com>, Wei W <wei.w.wang@intel.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+To: Yosry Ahmed <yosryahmed@google.com>
+Cc: Jim Mattson <jmattson@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 16, 2025, Peter Xu wrote:
-> On Thu, Jan 16, 2025 at 03:04:45PM -0800, James Houghton wrote:
-> > On Thu, Jan 16, 2025 at 2:16=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > >
-> > > On Thu, Jan 16, 2025, Peter Xu wrote:
-> > > > On Thu, Jan 16, 2025 at 03:19:49PM -0500, Peter Xu wrote:
-> > > > > > For the gmem case, userfaultfd cannot be used, so KVM Userfault=
- isn't
-> > > > > > replacing it. And as of right now anyway, KVM Userfault *does* =
-provide
-> > > > > > a complete post-copy system for gmem.
-> > > > > >
-> > > > > > When gmem pages can be mapped into userspace, for post-copy to =
-remain
-> > > > > > functional, userspace-mapped gmem will need userfaultfd integra=
-tion.
-> > > > > > Keep in mind that even after this integration happens, userfaul=
-tfd
-> > > > > > alone will *not* be a complete post-copy solution, as vCPU faul=
-ts
-> > > > > > won't be resolved via the userspace page tables.
-> > > > >
-> > > > > Do you know in context of CoCo, whether a private page can be acc=
-essed at
-> > > > > all outside of KVM?
-> > > > >
-> > > > > I think I'm pretty sure now a private page can never be mapped to
-> > > > > userspace.  However, can another module like vhost-kernel access =
-it during
-> > > > > postcopy?  My impression of that is still a yes, but then how abo=
-ut
-> > > > > vhost-user?
-> > > > >
-> > > > > Here, the "vhost-kernel" part represents a question on whether pr=
-ivate
-> > > > > pages can be accessed at all outside KVM.  While "vhost-user" par=
+On Thu, Jan 16, 2025, Yosry Ahmed wrote:
+> On Thu, Jan 16, 2025 at 2:35=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > How about:
+> >
+> >          * Note, only the hardware TLB entries need to be flushed, as V=
+PID is
+> >          * fully enabled from L1's perspective, i.e. there's no archite=
+ctural
+> >          * TLB flush from L1's perspective.
+>=20
+> I hate to bikeshed, but I want to explicitly call out that we do not
+> need to synchronize the MMU.
+
+Why?  Honest question, I want to understand what's unclear.  My hesitation =
+to
+talk about synchronizing MMUs is that it brings things into play that aren'=
 t
-> > > > > represents a question on whether, if the previous vhost-kernel qu=
-estion
-> > > > > answers as "yes it can", such access attempt can happen in anothe=
-r
-> > > > > process/task (hence, not only does it lack KVM context, but also =
-not
-> > > > > sharing the same task context).
-> > > >
-> > > > Right after I sent it, I just recalled whenever a device needs to a=
-ccess
-> > > > the page, it needs to be converted to shared pages first..
-> > >
-> > > FWIW, once Trusted I/O comes along, "trusted" devices will be able to=
- access guest
-> > > private memory.  The basic gist is that the IOMMU will enforce access=
- to private
-> > > memory, e.g. on AMD the IOMMU will check the RMP[*], and I believe th=
-e plan for
-> > > TDX is to have the IOMMU share the Secure-EPT tables that are used by=
- the CPU.
-> > >
-> > > [*] https://www.amd.com/content/dam/amd/en/documents/developer/sev-ti=
-o-whitepaper.pdf
->=20
-> Thanks, Sean.  This is interesting to know..
->=20
-> >=20
-> > Hi Sean,
-> >=20
-> > Do you know what API the IOMMU driver would use to get the private
-> > pages to map? Normally it'd use GUP, but GUP would/should fail for
-> > guest-private pages, right?
->=20
-> James,
->=20
-> I'm still reading the link Sean shared, looks like there's answer in the
-> white paper on this on assigned devices:
->=20
->         TDIs access memory via either guest virtual address (GVA) space o=
-r
->         guest physical address (GPA) space.  The I/O Memory Management Un=
-it
->         (IOMMU) in the host hardware is responsible for translating the
->         provided GVAs or GPAs into system physical addresses
->         (SPAs). Because SEV-SNP enforces access control at the time of
->         translation, the IOMMU performs RMP entry lookups on translation
->=20
-> So I suppose after the device is attested and trusted, it can directly ma=
-p
-> everything if wanted, and DMA directly to the encrypted pages.
+super relevant to this specific code, and might even add confusion.  Specif=
+ically,
+kvm_vcpu_flush_tlb_guest() does NOT synchronize MMUs when EPT/TDP is enable=
+d, but
+the fact that this path is reachable if and only if EPT is enabled is compl=
+etely
+coincidental.
 
-But as James called out, the kernel still needs to actually map guest_memfd
-memory (all other memory is shared), and guest_memfd does not and will not =
-ever
-support GUP/mmap() of *private* memory.
+E.g. very hypothetically, if KVM used the same EPT root (I already forgot I=
+ntel's
+new acronym) for L1 and L2, then this would no longer be true:
 
-There's an RFC that's under heavy discussion that I assume will handle some=
-/all?
-of this (I have largely ignored the thread).
+ * If L0 uses EPT, L1 and L2 run with different EPTP because
+ * guest_mode is part of kvm_mmu_page_role. Thus, TLB entries
+ * are tagged with different EPTP.
 
-https://lore.kernel.org/all/20250107142719.179636-1-yilun.xu@linux.intel.co=
-m
+L1 vs. L2 EPT usage would no longer use separate ASID tags, and so KVM woul=
+d
+need to FLUSH_CURRENT on transitions in most cases, e.g. to purge APICv map=
+pings.
 
-> OTOH, for my specific question (on vhost-kernel, or vhost-user), I suppos=
-e
-> they cannot be attested but still be part of host software.. so I'm
-> guessing they'll need to still stick with shared pages, and use a bounce
-> buffer to do DMAs..
+The comment above !nested_cpu_has_vpid() talks at length about synchronizin=
+g MMUs
+because the EPT behavior in particular is subtle and rather unintuitive.  I=
+.e.
+the comment is much more about NOT using KVM_REQ_MMU_SYNC than it is about =
+using
+KVM_REQ_TLB_FLUSH_GUEST.
 
-Yep.  There's no sane way to attest software that runs in "regular" mode on=
- the
-CPU, and so things like device emulation and vhost will always be restricte=
-d to
-shared memory.
+> Maybe this?
+>=20
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 2ed454186e59c..a9171909de63d 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1239,6 +1239,11 @@ static void
+> nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+>          * does not have a unique TLB tag (ASID), i.e. EPT is disabled an=
+d
+>          * KVM was unable to allocate a VPID for L2, flush the current co=
+ntext
+>          * as the effective ASID is common to both L1 and L2.
+> +        *
+> +        * Note, only the hardware TLB entries need to be flushed, as VPI=
+D is
+> +        * fully enabled from L1's perspective, i.e. there's no
+> +        * architectural TLB flush from L1's perspective. Hence, synchron=
+izing
+> +        * the MMU is not required as the mappings are still valid.
+>          */
+>         if (!nested_has_guest_tlb_tag(vcpu))
+>                 kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
 
