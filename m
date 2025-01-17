@@ -1,189 +1,232 @@
-Return-Path: <kvm+bounces-35795-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35796-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D55DA15315
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:46:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19467A15328
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC3FA16750A
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:46:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 774CF3A17EA
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA716194A6B;
-	Fri, 17 Jan 2025 15:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758DB19AD8C;
+	Fri, 17 Jan 2025 15:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Lsgx64qm"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="dz0iJhY+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689DD13AA20;
-	Fri, 17 Jan 2025 15:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4A6D530
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 15:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737128777; cv=none; b=Hw74yPUHPqJMUNprvjxmmr7qq8ATruFyUEuf38WMBUyWoOpDMxWz8IoDPra5Z/qyC1UtA7lRMM+0CwMZB9UXD1KM2GjpeO2QNrFb+0gSU4hRhgmVRjUG9T/ds7IeIJihTag6A8w+pQRwfV01HxFytvpTEv3d5cu6iIoPwYN5nJ4=
+	t=1737129022; cv=none; b=NMUHO4vlIuDSiFjGO0sXc6gJK8EcMaw0oleLr8In7YLIbEHfFBX1UDD1bAijzSqPmR7ADHtd6cZwU3OmSQChuSaKqlEbMY3QWTrrK5hbI4dGRaJlJvni01zpONLqQpyIDFrfEkut2ULW7lIpI5D9ssQyXM9n0wP429+dbDJp6rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737128777; c=relaxed/simple;
-	bh=YZkmvvsyrZR/u00rbPGWdwgCLQCF+tb7pj8Rw7J+ZAQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=elJjH3DUtYFo/6sKz1lwKqvqiL5mM960CTJzP9bJS+JKfi6lbKD/Exo2c0acxBvlrV+yX48ZmLcZkxWZNO4VRhIUfAOND0jjXeYmLLLamDsCSh8cKfR1Xrt3x41EIbn6sbVelHJydohZhHZG23mBYj/Wc4Wq8rJ/Czn8WHVbZCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Lsgx64qm; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50H8600r001111;
-	Fri, 17 Jan 2025 15:45:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=A7Ty/9NQyE3CfKlPT2iaAh4gNzSw5K
-	mkJP28VJu35dQ=; b=Lsgx64qmAA+JVg2PGUe4GeXSdj6YT1PZUtmyM5ZQtN81W4
-	3UlY5SLrBiForFkCUS3+zBzzlAxYfWYEzWjZ+0UIz71rAe3A5PLeHg0e2c+DHRFD
-	1B6u3LcxOsSQdoQ1mC+CHboF4DMoJiMCz00j4PXxFLruAdF0KUXKq3hHMi03Vw1D
-	IerBEiILFMuUhjpFvK5O3SN/WuolGFoUAUOlypQhxBQJ4QTwEqGjlTlMQyGQNdGm
-	TKUHnApyEVv7GNOUHLJqXhSnXAHYO0i29/1EFOrVj3MXweRSm+7EMOdAZjjSy4zk
-	e1v7jgj2AI4EaJdOdMhJ6guVWs9hUZ01F9Vw5zVQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447kd3j0xq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:45:59 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HFjwAO031312;
-	Fri, 17 Jan 2025 15:45:58 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447kd3j0xn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:45:58 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HDrCGa004540;
-	Fri, 17 Jan 2025 15:45:57 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4442yt3qbd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:45:57 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HFjsJm56885592
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jan 2025 15:45:54 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4017720040;
-	Fri, 17 Jan 2025 15:45:54 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 93C082004D;
-	Fri, 17 Jan 2025 15:45:50 +0000 (GMT)
-Received: from vaibhav?linux.ibm.com (unknown [9.124.213.54])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri, 17 Jan 2025 15:45:50 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Fri, 17 Jan 2025 21:15:49 +0530
-From: Vaibhav Jain <vaibhav@linux.ibm.com>
-To: kernel test robot <lkp@intel.com>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Madhavan Srinivasan
- <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas
- Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan
- <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
-        amachhiw@linux.ibm.com
-Subject: Re: [PATCH v2 4/6] kvm powerpc/book3s-apiv2: Introduce kvm-hv
- specific PMU
-In-Reply-To: <202501171030.3x0gqW8G-lkp@intel.com>
-References: <20250115143948.369379-5-vaibhav@linux.ibm.com>
- <202501171030.3x0gqW8G-lkp@intel.com>
-Date: Fri, 17 Jan 2025 21:15:49 +0530
-Message-ID: <87zfjpfnpu.fsf@vajain21.in.ibm.com>
+	s=arc-20240116; t=1737129022; c=relaxed/simple;
+	bh=dclbQA2kv91cOorJaTivwzz7mnR/zYBL6itMyl+l6F4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=koLPbptpyWMaplNw9NRrs3eY2AWH9qSWHc3IqN2YAjcGtIxilGrUHW8H7OrxvDRTGvMJnwJmgjb1gEWVJvKytYZRL6MJHIb2JDnnZSmZUX7S0S3SZTrNqNmJWd8EV6c9CpDaA9iEQh0Iavj0Id4/6m2yAgpcCAq3lyZeYcMLm44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=dz0iJhY+; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3862f32a33eso1055910f8f.3
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 07:50:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1737129018; x=1737733818; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cp/GIvJPAqb8LwPhNDqvZSb8wpAapnmNF5gAZrNXtXA=;
+        b=dz0iJhY+SaJlzRgU+0IhBXaj+VQYmRdzLCvXev0LiDG27OwqdidS7M0rD8LStIevj0
+         fsg+sOrWPYN99qdlTivbqFlR0IuliHlLFM50BcssVwR/dgYwzNgr1Vv6KgjmKRYevW4y
+         yAstQ3Z6Ll9ihWrueHOssIVTrh1iQ4lD4IAS3BFIcsXmgtQpTdUsTcCIPFvQr42e3eRB
+         Xy8UmCy7GqhOEL92ZolIQGpk+gjZyHDINdV98J5qpXlzWj3By88cNmKVjt8nOIpGvY26
+         kGaDyD4WGG9SZ/0IKEWImPTW6J8BgGee+frNdcIwfzY6Ws9yv762Jfyt63LjDcuRU3xb
+         7S6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737129018; x=1737733818;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cp/GIvJPAqb8LwPhNDqvZSb8wpAapnmNF5gAZrNXtXA=;
+        b=TdsUpJnAe+Brx8fAWxByMVh1CHySgy8IwOFw5NAgpWvvgtVa8CVlBJ0yj+XJ3IX/VT
+         BxU4nXSd96CTG4Brei9nBIRMMDa1/nyCXsWXOptDa51MnKwvaq21bsz//YgFgk4FJSe/
+         PnJqoc7IYMMgcnp8A7JtkecvILaeYyU1UUaiYMeL/nxOzxMGYzYxq4p6PjDEvn0NCUy9
+         U9ucNUf4oRqucZ0Yz5r24PAQsjnhs2fK0bjYNmr0+Afr9Qyl6HebH7dM9W5u4CokjzT4
+         EqEevSO7A9M7TDwOnOWWgz9715nm36XPVTeev6a1QhT3GtPV1tOyw0x4jyCxrrelx1pB
+         78zg==
+X-Forwarded-Encrypted: i=1; AJvYcCUQL0RjS4KnMuBCyOfjMpkCuk3l/YPj0aAoJpApLAmyYhNA6bKiQwMLUlfyUQzQBesoZlE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx02sv4BPi15d4T8jfZ5seHfKTQRCU66c/q5BJLsTPgJD1CIZOV
+	ZovAMtQP4d1Md8ufp6dzeduk5YGDU3Hm7+G3vUliG+yJPlrAupIOapthaQi5N6DqkD9y4quWN+2
+	a
+X-Gm-Gg: ASbGncvL/Tw1Jlw8qS03LuSbuCSq3PCRgb1qW3nbpnI8QJnofeXSNvpqs9NT0ymy7rZ
+	bzRDE2o74jN3ghV2s+siaD4oPtGAHbHXmoD/9xAQm3/c4qm8ASbEidL30sL2yGw+gy/Wh6X7slY
+	Fw1Pn18+wf/ztIt+FQMJk8l5pbSRajCAK0R/hxY5pKOKJgxAqeL/13bL/GDwH50KbL2M65zKNpU
+	MsmJQlsru9kPZOeYO5GmHw7WZqFA4qSxOn0FtWMKiL8/3il0BE0AXU4vjd2ubNalMLm6HpXsPOt
+	15FkuEzVYwldVz8fq8FQSS8V2Q==
+X-Google-Smtp-Source: AGHT+IG2hMkiEwGdkGXBgxT0aXmQV7q70JaFEOKvaBWwhUvfyCsA51xrLRzqSMURNo7XJP0BjSwJJw==
+X-Received: by 2002:a5d:620f:0:b0:38b:d765:7027 with SMTP id ffacd0b85a97d-38bf57a2675mr2269669f8f.41.1737129017614;
+        Fri, 17 Jan 2025 07:50:17 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf322b51bsm2860493f8f.60.2025.01.17.07.50.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jan 2025 07:50:16 -0800 (PST)
+Message-ID: <9fdcd0cf-334e-46f9-97c1-305f213d1ad3@rivosinc.com>
+Date: Fri, 17 Jan 2025 16:50:16 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: _iqpKkcXATZ7EQwhnF6QjJJQQHuLyUaA
-X-Proofpoint-GUID: ntbkbz3ndUoZhF4YF4PHpDcoQgNI3bXQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-17_06,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- priorityscore=1501 malwarescore=0 mlxscore=0 suspectscore=0 bulkscore=0
- spamscore=0 impostorscore=0 clxscore=1011 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501170122
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/6] RISC-V: KVM: add SBI extension init()/deinit()
+ functions
+To: Samuel Holland <samuel.holland@sifive.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org
+References: <20250106154847.1100344-1-cleger@rivosinc.com>
+ <20250106154847.1100344-4-cleger@rivosinc.com>
+ <a6196a16-808e-4a69-bcec-a83d868b726f@sifive.com>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <a6196a16-808e-4a69-bcec-a83d868b726f@sifive.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
-Thanks for catching this build warning kernel-test-robot. I will
-spin-off a v3 fixing this.
 
-kernel test robot <lkp@intel.com> writes:
+On 11/01/2025 00:42, Samuel Holland wrote:
+> Hi Clément,
+> 
+> On 2025-01-06 9:48 AM, Clément Léger wrote:
+>> The FWFT SBI extension will need to dynamically allocate memory and do
+>> init time specific initialization. Add an init/deinit callbacks that
+>> allows to do so.
+>>
+>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+>> ---
+>>  arch/riscv/include/asm/kvm_vcpu_sbi.h |  9 ++++++++
+>>  arch/riscv/kvm/vcpu.c                 |  2 ++
+>>  arch/riscv/kvm/vcpu_sbi.c             | 31 ++++++++++++++++++++++++++-
+>>  3 files changed, 41 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+>> index b96705258cf9..8c465ce90e73 100644
+>> --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
+>> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+>> @@ -49,6 +49,14 @@ struct kvm_vcpu_sbi_extension {
+>>  
+>>  	/* Extension specific probe function */
+>>  	unsigned long (*probe)(struct kvm_vcpu *vcpu);
+>> +
+>> +	/*
+>> +	 * Init/deinit function called once during VCPU init/destroy. These
+>> +	 * might be use if the SBI extensions need to allocate or do specific
+>> +	 * init time only configuration.
+>> +	 */
+>> +	int (*init)(struct kvm_vcpu *vcpu);
+>> +	void (*deinit)(struct kvm_vcpu *vcpu);
+>>  };
+>>  
+>>  void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>> @@ -69,6 +77,7 @@ const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(
+>>  bool riscv_vcpu_supports_sbi_ext(struct kvm_vcpu *vcpu, int idx);
+>>  int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>>  void kvm_riscv_vcpu_sbi_init(struct kvm_vcpu *vcpu);
+>> +void kvm_riscv_vcpu_sbi_deinit(struct kvm_vcpu *vcpu);
+>>  
+>>  int kvm_riscv_vcpu_get_reg_sbi_sta(struct kvm_vcpu *vcpu, unsigned long reg_num,
+>>  				   unsigned long *reg_val);
+>> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+>> index e048dcc6e65e..3420a4a62c94 100644
+>> --- a/arch/riscv/kvm/vcpu.c
+>> +++ b/arch/riscv/kvm/vcpu.c
+>> @@ -180,6 +180,8 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+>>  
+>>  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>>  {
+>> +	kvm_riscv_vcpu_sbi_deinit(vcpu);
+>> +
+>>  	/* Cleanup VCPU AIA context */
+>>  	kvm_riscv_vcpu_aia_deinit(vcpu);
+>>  
+>> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+>> index 6e704ed86a83..d2dbb0762072 100644
+>> --- a/arch/riscv/kvm/vcpu_sbi.c
+>> +++ b/arch/riscv/kvm/vcpu_sbi.c
+>> @@ -486,7 +486,7 @@ void kvm_riscv_vcpu_sbi_init(struct kvm_vcpu *vcpu)
+>>  	struct kvm_vcpu_sbi_context *scontext = &vcpu->arch.sbi_context;
+>>  	const struct kvm_riscv_sbi_extension_entry *entry;
+>>  	const struct kvm_vcpu_sbi_extension *ext;
+>> -	int idx, i;
+>> +	int idx, i, ret;
+>>  
+>>  	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
+>>  		entry = &sbi_ext[i];
+>> @@ -501,8 +501,37 @@ void kvm_riscv_vcpu_sbi_init(struct kvm_vcpu *vcpu)
+>>  			continue;
+>>  		}
+>>  
+>> +		if (ext->init) {
+>> +			ret = ext->init(vcpu);
+>> +			if (ret)
+>> +				scontext->ext_status[idx] =
+>> +					KVM_RISCV_SBI_EXT_STATUS_UNAVAILABLE;
+>> +		}
+>> +
+>>  		scontext->ext_status[idx] = ext->default_disabled ?
+>>  					KVM_RISCV_SBI_EXT_STATUS_DISABLED :
+>>  					KVM_RISCV_SBI_EXT_STATUS_ENABLED;
+> 
+> This will overwrite the KVM_RISCV_SBI_EXT_STATUS_UNAVAILABLE set above.
 
-> Hi Vaibhav,
->
-> kernel test robot noticed the following build warnings:
->
-> [auto build test WARNING on powerpc/topic/ppc-kvm]
-> [also build test WARNING on powerpc/next powerpc/fixes kvm/queue kvm/next mst-vhost/linux-next linus/master v6.13-rc7 next-20250116]
-> [cannot apply to kvm/linux-next]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Vaibhav-Jain/powerpc-Document-APIv2-KVM-hcall-spec-for-Hostwide-counters/20250116-024240
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
-> patch link:    https://lore.kernel.org/r/20250115143948.369379-5-vaibhav%40linux.ibm.com
-> patch subject: [PATCH v2 4/6] kvm powerpc/book3s-apiv2: Introduce kvm-hv specific PMU
-> config: powerpc-allnoconfig (https://download.01.org/0day-ci/archive/20250117/202501171030.3x0gqW8G-lkp@intel.com/config)
-> compiler: powerpc-linux-gcc (GCC) 14.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250117/202501171030.3x0gqW8G-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202501171030.3x0gqW8G-lkp@intel.com/
->
-> All warnings (new ones prefixed by >>):
->
->    In file included from arch/powerpc/include/asm/kvm_ppc.h:22,
->                     from arch/powerpc/include/asm/dbell.h:17,
->                     from arch/powerpc/kernel/asm-offsets.c:36:
->>> arch/powerpc/include/asm/kvm_book3s.h:357:13: warning: 'kvmppc_unregister_pmu' defined but not used [-Wunused-function]
->      357 | static void kvmppc_unregister_pmu(void)
->          |             ^~~~~~~~~~~~~~~~~~~~~
->>> arch/powerpc/include/asm/kvm_book3s.h:352:12: warning: 'kvmppc_register_pmu' defined but not used [-Wunused-function]
->      352 | static int kvmppc_register_pmu(void)
->          |            ^~~~~~~~~~~~~~~~~~~
-> --
->    In file included from arch/powerpc/include/asm/kvm_ppc.h:22,
->                     from arch/powerpc/include/asm/dbell.h:17,
->                     from arch/powerpc/kernel/asm-offsets.c:36:
->>> arch/powerpc/include/asm/kvm_book3s.h:357:13: warning: 'kvmppc_unregister_pmu' defined but not used [-Wunused-function]
->      357 | static void kvmppc_unregister_pmu(void)
->          |             ^~~~~~~~~~~~~~~~~~~~~
->>> arch/powerpc/include/asm/kvm_book3s.h:352:12: warning: 'kvmppc_register_pmu' defined but not used [-Wunused-function]
->      352 | static int kvmppc_register_pmu(void)
->          |            ^~~~~~~~~~~~~~~~~~~
->
->
-> vim +/kvmppc_unregister_pmu +357 arch/powerpc/include/asm/kvm_book3s.h
->
->    351	
->  > 352	static int kvmppc_register_pmu(void)
->    353	{
->    354		return 0;
->    355	}
->    356	
->  > 357	static void kvmppc_unregister_pmu(void)
->    358	{
->    359	}
->    360	
->
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+Oh yes indeed, I should add a "continue" under the if above.
 
--- 
-Cheers
-~ Vaibhav
+> 
+>>  	}
+>>  }
+>> +
+>> +void kvm_riscv_vcpu_sbi_deinit(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm_vcpu_sbi_context *scontext = &vcpu->arch.sbi_context;
+>> +	const struct kvm_riscv_sbi_extension_entry *entry;
+>> +	const struct kvm_vcpu_sbi_extension *ext;
+>> +	int idx, i;
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
+>> +		entry = &sbi_ext[i];
+>> +		ext = entry->ext_ptr;
+>> +		idx = entry->ext_idx;
+>> +
+>> +		if (idx < 0 || idx >= ARRAY_SIZE(scontext->ext_status))
+>> +			continue;
+>> +
+>> +		if (scontext->ext_status[idx] != KVM_RISCV_SBI_EXT_STATUS_ENABLED || !ext->deinit)
+> 
+> Given that an extension can be enabled/disabled after initialization, this
+> should only skip deinit if the status is UNAVAILABLE.
+
+yeah, make sense as well,
+
+Thanks for the review,
+
+Clément
+
+> 
+> Regards,
+> Samuel
+> 
+>> +			continue;
+>> +
+>> +		ext->deinit(vcpu);
+>> +	}
+>> +}
+> 
+
 
