@@ -1,146 +1,211 @@
-Return-Path: <kvm+bounces-35730-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35731-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71F78A149F1
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 08:06:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A812A14A02
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 08:14:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9C3B3A7BCB
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 07:06:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1CCC3A3893
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 07:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3174C1F76D7;
-	Fri, 17 Jan 2025 07:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AD01F7908;
+	Fri, 17 Jan 2025 07:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="FhPOibNV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sw9ggfxF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3153A1D6DBF
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 07:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24411F78E7;
+	Fri, 17 Jan 2025 07:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737097599; cv=none; b=FQRNoaoJ0I20NH1LfxaRpnMAUH7kR9vEhaUTaXXb1waMy8OwX+HUyaq4pxH7/zEyhqWavvmhWJBD0PDODKCadFVgxdyIt2+OeVh7QkOSt7wgJgqSCcfAp6pGI6Zh7Uwv5EkHoLzbxJtw4SaDtN7glrWB6EG/HXudjszzGt+PCUw=
+	t=1737098083; cv=none; b=YoJf5v1oSWjKp+JWecxUF68pS0bcz0bqhEkVSIcLo6Hqtj/katvK5jeZcH43Cz82DUaZWlIuMdigxglYzU3Z8JbkQTXWLY4PnIZPWEjxSDPa+Zq5MUnHxdr6rt/y13Y9UV2/S7sayz61Ua/IWGrGhiogotqWPR/9iHO+78lfYW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737097599; c=relaxed/simple;
-	bh=mTDjaC6HpLnOsXoFVd0zRCF3zzfZavhEPJ3YTAXHll4=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=i5cFJoJyg7aGMKE8ybPhflpa+NhZnTQ0dRxQe+c9BKQ/JeE58LbA4Sl40RM/k2K/e1MpTMZ8tJlA7vSDWTUQMYSQM5bh/0EPhXmxkndGfg7c4A6MmsgA/3bgMVcu7Qmc37+WnazrbHpignpWJ73YmF0mF2WL6WFlbIA/gIRRvBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=FhPOibNV; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3ce8a4e95f3so16156185ab.2
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 23:06:35 -0800 (PST)
+	s=arc-20240116; t=1737098083; c=relaxed/simple;
+	bh=m6M53Z4cZzeyxFN6wZfVGIoihDPyDArBi6BoKqTGKpo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tm+5LM/WFslyt/LB6XryXmvnL5Hhfc8vo1slqutKESRCL7QALpUIBnYVK/nM4lCsASX8eCDQ/4xzLA/RELydYkVtn9IaVr/+sUEdBFJvoVz0MB3J3TetaYGlu10mQkA3wmHTEskFH4eyb1bSgzF2e80nbClvk7HOI1608rN1VEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sw9ggfxF; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2167141dfa1so32057115ad.1;
+        Thu, 16 Jan 2025 23:14:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1737097595; x=1737702395; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LfYpH+Y1jpQO12PadF3pL3zexhSFdkqlBmV2LuVWqDs=;
-        b=FhPOibNVQKTH3KRto8pB2n+wj9fn5UNrfSqV9W6Xn4Mjl9JrTNHQGdnAHbGng5b9RL
-         Iz3Po8nDsWzqq5/J+0rnNq8q815tuMVFS6LY2C/28MwqsVuW4zm+SeWWvBvOI9W9M3qy
-         56oaOAyKUgHAXB2Z7J0BhkzjSU6VIOqhgOhXvkbcfWhiZwmNKEPAsHWaPnIoQnEj0QsM
-         KXcXHgeqf4fJRGvZs7T+pMCvb2Al3Hmpo4b5m5UPYkxgdh9FheSkta8YBRKQD/nnDNAv
-         iLiDYq0XOAX4wlxIxCzRYneVzt6svrh42Mn5w0X76FD5XxA8f9lvOSvBwEuIVcOx4mSh
-         0oOw==
+        d=gmail.com; s=20230601; t=1737098081; x=1737702881; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z63qPrynRXI6BmIjk6C4ixdo98vNllP+HEKWG9XiGhs=;
+        b=Sw9ggfxFu8IKzBPcH1v9ZWMipcgy9myvUiN54a4KtjgsGhK1qrCvoCFLFmi49EE1uK
+         aU8ppMuzRJSYRsZwD9rRgQv6hBOCvpf1LtXQfKAow6xkxJ+qrXSKJiG9Eve0kEbkWM+I
+         QLq8UOA90W/kdUdxw6v633gFiKl6ZFc8phSw4/2fycKk2pnw1nhrgKM7of/rx6ffUkJF
+         7gT31eAkb0jcCur5/ZSw6VZP/nFaS/fvVsZBAGbA1FZRrf/pZBCEKd/Wy1HXsti7fpXD
+         yGVq8+iv1L8C3bSaV5fzOHd//vcYYBpgRhGwjuh1lYpbiVPAUhf/BBkATQ62Qi1xqRIa
+         xRmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737097595; x=1737702395;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LfYpH+Y1jpQO12PadF3pL3zexhSFdkqlBmV2LuVWqDs=;
-        b=qM36AdHdcJItkztaKNHOmArFXLoplWeYkjEM8n4VRb5GwMAh2vZO4lzaYe4toPf/Xn
-         tB+0E+dgb34Ob8Nrske8oRy5gPR8C2fwdRWLRA5u/DVenfwnQ5jqczwaOkBKqAQ3nINN
-         0qjb/SSavza6MRQaxnSY+w6PGKn0zUNS6hwgBaF6P4Q1zTCXjvSQFxz9NbFPxGoP6ls2
-         4z8QH+cgM5td1I6aFfNNFwq3k5MIKlQIudCowNZrW7J3KexxnIQ6Qqur0cIfGM6mj3G0
-         +VEF8pkX4dk7mcKRc+0EwffUD4xO27GIoWhStEarM3jLPXCKqpTu1GTdlbSlsFfDzjJd
-         soPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXbJ4PQHcGDI1d9xS50qpfdCZb6CfwGGNUJxzEdUNj5oHaLY3QVIWh+KrNTjxmrTbyszAI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDnNIPfyQrN1gS+XXFL4lDMoILt4ZRAU4unEsyb4WnhiL5Nze4
-	yhQIahhCyah7lMxERPKLl6EJkD9mOEMnEm54vdjOwzAzHUyCghXmNh75uV89rX91Clfo8YOeE2P
-	Q3DFbZLycEHvTalKOwOnWSLTvIuQQeVimLIUheZHeu0898gGK7w8=
-X-Gm-Gg: ASbGnctEa8GcZOJ0R+4m8FMopcVwswRIkfqpXeRd+dxyfOhQ6If0JoLE3sEHDRdNBcf
-	rRp/zDiiBK5Ipery+zZbosiV37KKRTaBWNI/jIwo=
-X-Google-Smtp-Source: AGHT+IF+AL3eLH94oddazC6IWMSZ5U/suLVNW1B+QIp0pFHRGvcni4BJzwXCFG3UMDaASPRqHB6/9Ut3S6E7Kq7eQYM=
-X-Received: by 2002:a05:6e02:2402:b0:3a7:e0c0:5f27 with SMTP id
- e9e14a558f8ab-3cf743df906mr16474775ab.2.1737097595136; Thu, 16 Jan 2025
- 23:06:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737098081; x=1737702881;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z63qPrynRXI6BmIjk6C4ixdo98vNllP+HEKWG9XiGhs=;
+        b=gLZ8quPI/Br6cu1aPw+lC9B1qgbRVECGKdusX7pHPSTw5RGCT0O7ObiSipU6Y++hnP
+         NF3J6XF4uweaksIwJq8nN3pA8nF1opQXQlW3CrcBuw6XC8BUJANy7dirFazen32xztwP
+         g9/DzGuS2LCo0S+mfIM95jJGiCHMNdOU3/QMh8Co1lLqHPygym0TlMH5raMU72ItGAMG
+         Betu5O31HRDF8L3X6TiT+JLoXFvjTAKmDWEVJZ2f+hhM//t5S8KhG3tEBHmTK46f+8eC
+         OaKVEwEuAk4JYentom6Ku7Ge5x8sa7UWXTGJNsjBNsoe/fzUV97/4/XPYag62ZkPib74
+         u1Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCWgS8ilOcUBYMWwDPrjJdgQaoubcljzMIaqO4U/XLvqLvFPtzdTHM/T6+P8gT7wRTVdqgk=@vger.kernel.org, AJvYcCXO7LClzpzP+MQTqsLaWCNquK3YaaQukzsTy8vZb6Vfgtogrec5kssPpcJCHVomg3HN9jPLgNVrq3DVEqBq@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVIfvl1fzHw38Mbut6zV+MjT+Rri94CEq0V3YyevSq411fbfGP
+	EmAmamzHX6DKcA3W4zOjyLY7sG2SpGmeU1jf9oWR7D1xW2XgXJYf
+X-Gm-Gg: ASbGncsAaULz+4rPkzkurqhUPeMh8cwo8k+1MmhZFAjVWe7lz8Q7mT8vjILRq53GnjT
+	hkm5VSJ13Y1F3M4YsXOe1TNtxwyo6KsalOvSziGwURmZTWU+WOy2i1JgUpsU6/q4Xu79pWlX5hc
+	WL3AY21O5lDW95Uoxd9YetwiyDGfKtMh14IKekR6JkEwfdGoqO62+JM91lzMP0QK6EuOuTHPGzz
+	gOBBGj7eSiG2Eh8QXdqoEvZd6gpmzcdJtqc4t7+6eqiiy9M4YizcmmvbaDwvd5V97mO1tc=
+X-Google-Smtp-Source: AGHT+IHyrjJfXew3SY4reCmWuwNIUXV3f0/kopUDZmb2ECnvrX7cAcZ8TXQwLeGALuBvyCSj4BwVHw==
+X-Received: by 2002:a17:902:d58b:b0:215:a034:3bae with SMTP id d9443c01a7336-21c3679d7dfmr22699945ad.18.1737098081136;
+        Thu, 16 Jan 2025 23:14:41 -0800 (PST)
+Received: from tiger.hygon.cn ([112.64.138.194])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2ceb9e71sm9835165ad.70.2025.01.16.23.14.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 23:14:40 -0800 (PST)
+From: Wencheng Yang <east.moutain.yang@gmail.com>
+To: 
+Cc: Wencheng Yang <east.moutain.yang@gmail.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [PATCH v2] drviers/iommu/amd: support P2P access through IOMMU when SME is enabled
+Date: Fri, 17 Jan 2025 15:14:18 +0800
+Message-ID: <20250117071423.469880-1-east.moutain.yang@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 17 Jan 2025 12:36:23 +0530
-X-Gm-Features: AbW1kvZIPS-DR3om7fqXj69kIV9exvX1qxrHBy8YHvK5NBpiQJVs4OBbEUSSQSw
-Message-ID: <CAAhSdy1ekLq08nByCh9E-ZZsMcm7rCpkA+FyAPwvQctEgjwFZA@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.14
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>, 
-	Atish Patra <atishp@atishpatra.org>, 
-	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+When SME is enabled, memory encryption bit is set in IOMMU page table
+pte entry, it works fine if the pfn of the pte entry is memory.
+However, if the pfn is MMIO address, for example, map other device's mmio
+space to its io page table, in such situation, setting memory encryption
+bit in pte would cause P2P failure.
 
-We have the following KVM RISC-V changes for 6.14:
-1) Svvptc, Zabha, and Ziccrse extension support
-2) Virtualize SBI system suspend extension
-3) Trap related exit statistics as SBI PMU firmware counters
+Clear memory encryption bit in io page table if the mapping is MMIO
+rather than memory.
 
-Please pull.
+Signed-off-by: Wencheng Yang <east.moutain.yang@gmail.com>
+---
+ drivers/iommu/amd/amd_iommu_types.h | 7 ++++---
+ drivers/iommu/amd/io_pgtable.c      | 2 ++
+ drivers/iommu/amd/io_pgtable_v2.c   | 5 ++++-
+ drivers/iommu/amd/iommu.c           | 2 ++
+ drivers/vfio/vfio_iommu_type1.c     | 4 +++-
+ include/uapi/linux/vfio.h           | 1 +
+ 6 files changed, 16 insertions(+), 5 deletions(-)
 
-Regards,
-Anup
+diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
+index fdb0357e0bb9..b0f055200cf3 100644
+--- a/drivers/iommu/amd/amd_iommu_types.h
++++ b/drivers/iommu/amd/amd_iommu_types.h
+@@ -434,9 +434,10 @@
+ #define IOMMU_PTE_PAGE(pte) (iommu_phys_to_virt((pte) & IOMMU_PAGE_MASK))
+ #define IOMMU_PTE_MODE(pte) (((pte) >> 9) & 0x07)
+ 
+-#define IOMMU_PROT_MASK 0x03
+-#define IOMMU_PROT_IR 0x01
+-#define IOMMU_PROT_IW 0x02
++#define IOMMU_PROT_MASK 0x07
++#define IOMMU_PROT_IR   0x01
++#define IOMMU_PROT_IW   0x02
++#define IOMMU_PROT_MMIO 0x04
+ 
+ #define IOMMU_UNITY_MAP_FLAG_EXCL_RANGE	(1 << 2)
+ 
+diff --git a/drivers/iommu/amd/io_pgtable.c b/drivers/iommu/amd/io_pgtable.c
+index f3399087859f..dff887958a56 100644
+--- a/drivers/iommu/amd/io_pgtable.c
++++ b/drivers/iommu/amd/io_pgtable.c
+@@ -373,6 +373,8 @@ static int iommu_v1_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
+ 			__pte |= IOMMU_PTE_IR;
+ 		if (prot & IOMMU_PROT_IW)
+ 			__pte |= IOMMU_PTE_IW;
++		if (prot & IOMMU_PROT_MMIO)
++			__pte = __sme_clr(__pte);
+ 
+ 		for (i = 0; i < count; ++i)
+ 			pte[i] = __pte;
+diff --git a/drivers/iommu/amd/io_pgtable_v2.c b/drivers/iommu/amd/io_pgtable_v2.c
+index c616de2c5926..55f969727dea 100644
+--- a/drivers/iommu/amd/io_pgtable_v2.c
++++ b/drivers/iommu/amd/io_pgtable_v2.c
+@@ -65,7 +65,10 @@ static u64 set_pte_attr(u64 paddr, u64 pg_size, int prot)
+ {
+ 	u64 pte;
+ 
+-	pte = __sme_set(paddr & PM_ADDR_MASK);
++	pte = paddr & PM_ADDR_MASK;
++	if (!(prot & IOMMU_PROT_MMIO))
++		pte = __sme_set(pte);
++
+ 	pte |= IOMMU_PAGE_PRESENT | IOMMU_PAGE_USER;
+ 	pte |= IOMMU_PAGE_ACCESS | IOMMU_PAGE_DIRTY;
+ 
+diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
+index 16f40b8000d7..9194ad681504 100644
+--- a/drivers/iommu/amd/iommu.c
++++ b/drivers/iommu/amd/iommu.c
+@@ -2578,6 +2578,8 @@ static int amd_iommu_map_pages(struct iommu_domain *dom, unsigned long iova,
+ 		prot |= IOMMU_PROT_IR;
+ 	if (iommu_prot & IOMMU_WRITE)
+ 		prot |= IOMMU_PROT_IW;
++	if (iommu_prot & IOMMU_MMIO)
++		prot |= IOMMU_PROT_MMIO;
+ 
+ 	if (ops->map_pages) {
+ 		ret = ops->map_pages(ops, iova, paddr, pgsize,
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 50ebc9593c9d..08be1ef8514b 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1557,6 +1557,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 		prot |= IOMMU_WRITE;
+ 	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
+ 		prot |= IOMMU_READ;
++    if (map->flags & VFIO_DMA_MAP_FLAG_MMIO)
++        prot |= IOMMU_MMIO;
+ 
+ 	if ((prot && set_vaddr) || (!prot && !set_vaddr))
+ 		return -EINVAL;
+@@ -2801,7 +2803,7 @@ static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
+ 	struct vfio_iommu_type1_dma_map map;
+ 	unsigned long minsz;
+ 	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
+-			VFIO_DMA_MAP_FLAG_VADDR;
++			VFIO_DMA_MAP_FLAG_VADDR | VFIO_DMA_MAP_FLAG_MMIO;
+ 
+ 	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+ 
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index c8dbf8219c4f..68002c8f1157 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -1560,6 +1560,7 @@ struct vfio_iommu_type1_dma_map {
+ #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
+ #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
+ #define VFIO_DMA_MAP_FLAG_VADDR (1 << 2)
++#define VFIO_DMA_MAP_FLAG_MMIO (1 << 3)     /* map of mmio */
+ 	__u64	vaddr;				/* Process virtual address */
+ 	__u64	iova;				/* IO virtual address */
+ 	__u64	size;				/* Size of mapping (bytes) */
+-- 
+2.43.0
 
-The following changes since commit fc033cf25e612e840e545f8d5ad2edd6ba613ed5:
-
-  Linux 6.13-rc5 (2024-12-29 13:15:45 -0800)
-
-are available in the Git repository at:
-
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.14-1
-
-for you to fetch changes up to af79caa83f6aa41e9092292a2ba7f701e57353ec:
-
-  RISC-V: KVM: Add new exit statstics for redirected traps (2024-12-30
-14:01:02 +0530)
-
-----------------------------------------------------------------
-KVM/riscv changes for 6.14
-
-- Svvptc, Zabha, and Ziccrse extension support for Guest/VM
-- Virtualize SBI system suspend extension for Guest/VM
-- Trap related exit statstics as SBI PMU firmware counters for Guest/VM
-
-----------------------------------------------------------------
-Andrew Jones (2):
-      RISC-V: KVM: Add SBI system suspend support
-      KVM: riscv: selftests: Add SBI SUSP to get-reg-list test
-
-Atish Patra (2):
-      RISC-V: KVM: Update firmware counters for various events
-      RISC-V: KVM: Add new exit statstics for redirected traps
-
-Quan Zhou (5):
-      RISC-V: KVM: Allow Svvptc extension for Guest/VM
-      RISC-V: KVM: Allow Zabha extension for Guest/VM
-      RISC-V: KVM: Allow Ziccrse extension for Guest/VM
-      KVM: riscv: selftests: Add Svvptc/Zabha/Ziccrse exts to get-reg-list test
-      RISC-V: KVM: Redirect instruction access fault trap to guest
-
- arch/riscv/include/asm/kvm_host.h                |  5 ++
- arch/riscv/include/asm/kvm_vcpu_sbi.h            |  1 +
- arch/riscv/include/uapi/asm/kvm.h                |  4 ++
- arch/riscv/kvm/Makefile                          |  1 +
- arch/riscv/kvm/vcpu.c                            |  7 ++-
- arch/riscv/kvm/vcpu_exit.c                       | 37 ++++++++++--
- arch/riscv/kvm/vcpu_onereg.c                     |  6 ++
- arch/riscv/kvm/vcpu_sbi.c                        |  4 ++
- arch/riscv/kvm/vcpu_sbi_system.c                 | 73 ++++++++++++++++++++++++
- tools/testing/selftests/kvm/riscv/get-reg-list.c | 18 +++++-
- 10 files changed, 150 insertions(+), 6 deletions(-)
- create mode 100644 arch/riscv/kvm/vcpu_sbi_system.c
 
