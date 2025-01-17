@@ -1,266 +1,315 @@
-Return-Path: <kvm+bounces-35783-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35784-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28CC9A1511A
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:01:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C6FFA151F2
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:37:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1DA73AA10F
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 14:00:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B18187A43E7
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 14:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29FC41FF601;
-	Fri, 17 Jan 2025 14:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B182B15CD74;
+	Fri, 17 Jan 2025 14:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UBsF8TPr"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="ZDIOm7NW"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2067.outbound.protection.outlook.com [40.107.237.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EBCD530;
-	Fri, 17 Jan 2025 14:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737122457; cv=fail; b=QrwtJWvb1khQu3dCOaoU94v74YNK7CYmIMCu70oqgjr/MQiRDkMxsCGXmX9mIB+AILiLyykHL+/MwEB5Y0809dbztmz4pBjEM/fTbJTOzl83aqx6x0MDm6sqkOAMPJdlkJCu15asggXhtdO37iPCiBIhTmXsN92yeLasxo9cCxA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737122457; c=relaxed/simple;
-	bh=T38IK8xSDMQanxMTFzcI3BKO9wY3CMt+0YCVQYBgreM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=tWGByTHEAemJubccWFNolPqnuYG/H2GmLtjuDq3RTLcRkpO+CP2xAPU2Ubi4l9f3uVwadix1CwWDKboSQA4M2sOetrqLRKhrPUC5l8HoYs9uJFzWifSZ5Xh9SZ+VSMVDyYD/lPJInI6EwZqVCgWi0uq2nL+i0gCb0FDS8KlZxM0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UBsF8TPr; arc=fail smtp.client-ip=40.107.237.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B4eRhOvhk0h52buDjCvL0gTcXi6EdAgA5+nub2whZq1/j7qABUTnSGfW0kDchPtPtbiUE545QhCTTgAR+8fEB0sGpGTokI9tXmrKQXDMido/L5lW6Vqz3IXEZPq7qoFJEJaeLDZ1+N/rMuq7yUZKJ6BAyX0STFOU7JjKJEBWrv9xucrYPj4QP40ieARA7JtldkWsUyBqGRKNFqeKD28dpThB8vJ1Zv1ARHL/cZU2yUvJy2BfaM1CUWJ8HEPBvp1H4guDlor0lcXZioSQVlZBX9YiLN9LFege1XxYS3RXhcrGnLpaNGvYu0HYgGVX8V56XxKu5gIFu02fDChPADVr3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IpOSIhRVZ87Q/TNV6Hbw2Br500R0LtxYlQTdNITClds=;
- b=ycNkMpl0PYtsKqfNKxzswtde7UBMxHXnG1Koxi65CIQk2Lx3zKz4W3j6wzEz1120vp7LqnXs0DBE9CuEk6C0eMZJ70T3UWlYfFmKnPVX6VADaDYvGYBTHv+dgSxPJNPthgkG9aefs1RuKbubPixrIecXvNa7znymyKtw5IKB59uIOpQbClLfasvtWYel3t+EFq8e07iYFFQ7Rbh3MCFeLlKwGHKgNoMrwz4AbI8va3YUQ52en4wOs3GbVdoZ1byjmKEm9d7J9IDhP4HRdgKrOZyqpLBkblXpRt/uxO+qs7RB5ypiqM+bOr+K+H37BJx5O/kM6+mnEzOk9sbPH0fKqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IpOSIhRVZ87Q/TNV6Hbw2Br500R0LtxYlQTdNITClds=;
- b=UBsF8TPrZU4RyZQWjIBo9GNi2Gnc6R6EkZKQj4eSSmx3TkS06aUPmT4Sk2qIGwF9g/b1e8P7Is2CmBFhwmepsshuX6SaBCyyGkRnj63hg9rYDGRJdqQSPe/x+ZbN9UT8e6HfMN800INiYiLkg2awqFwacF/+gK5XwVs6oAgms1+ivNE6cLGj9n5QWyviCbvEGjTgYdN1hCl6vpfwFUEwAzYTW92JXZPPJbeSOnj4jyCvlNHZOSigZ13tDrNf/i4rZO/hj8RVi0/S6Ofeyw0kOptNscDgbhVI2qJaNl1ODAYSDmrRAgikUer4G/tygPTpyyhIHFWXZI4k+S2OK98QXQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by LV8PR12MB9110.namprd12.prod.outlook.com (2603:10b6:408:18b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Fri, 17 Jan
- 2025 14:00:52 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8356.010; Fri, 17 Jan 2025
- 14:00:52 +0000
-Date: Fri, 17 Jan 2025 10:00:50 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Ankit Agrawal <ankita@nvidia.com>, David Hildenbrand <david@redhat.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"shahuang@redhat.com" <shahuang@redhat.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-	Kirti Wankhede <kwankhede@nvidia.com>,
-	"Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-	Vikram Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	John Hubbard <jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>,
-	Zhi Wang <zhiw@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	Uday Dhoke <udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"sebastianene@google.com" <sebastianene@google.com>,
-	"coltonlewis@google.com" <coltonlewis@google.com>,
-	"kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"gshan@redhat.com" <gshan@redhat.com>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v2 1/1] KVM: arm64: Allow cacheable stage 2 mapping using
- VMA flags
-Message-ID: <20250117140050.GC5556@nvidia.com>
-References: <a2d95399-62ad-46d3-9e48-6fa90fd2c2f3@redhat.com>
- <20250106165159.GJ5556@nvidia.com>
- <f13622a2-6955-48d0-9793-fba6cea97a60@redhat.com>
- <SA1PR12MB7199E3C81FDC017820773DE0B01C2@SA1PR12MB7199.namprd12.prod.outlook.com>
- <20250113162749.GN5556@nvidia.com>
- <0743193c-80a0-4ef8-9cd7-cb732f3761ab@redhat.com>
- <20250114133145.GA5556@nvidia.com>
- <SA1PR12MB71998E1E70F3A03D5E30DE40B0182@SA1PR12MB7199.namprd12.prod.outlook.com>
- <20250115143213.GQ5556@nvidia.com>
- <Z4mIIA5UuFcHNUwL@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z4mIIA5UuFcHNUwL@arm.com>
-X-ClientProxiedBy: MN2PR15CA0047.namprd15.prod.outlook.com
- (2603:10b6:208:237::16) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0533C70825
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 14:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737124654; cv=none; b=Tvyvq6lhwqJmPyolfRMkHskQ5l/YaYlstmJZGv0+jHDg0eMnPGSb+iVRF6P5v6iroUqvLgG6ZUKusq2zAiCsA1n3VRstRe/JHDpjdSOhH8p9qh7pfYKomkQhbfDHZ2ONodM15CO7gsWnnCrEL3JJBSBfFXyBPiBOKOWj3ulj5NE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737124654; c=relaxed/simple;
+	bh=ESWgX5V62XCad2HR/HJ25M+BlFYnA66ZmcatpUrszL4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LaO9XUvk9vgmYntroacoJn/w6XSZ3Peo9o+GYvu51wHpoMR5GJTzhaYRBKVF2q0URAGbMQgx57CslyUjEfK1ViKLYtsrG328xUVp/ABzDWz5I9OQQKt9ZvUoocDe/sHckgBBkinsAy6gVc2KCr9HFcC19nUG8KOrQLTtleWrJxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=ZDIOm7NW; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38a8b35e168so1515147f8f.1
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 06:37:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google; t=1737124651; x=1737729451; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XotKZ5aC4hzDyG2o0IeDG6hv28Jq5p2Sy4ygAsaPcU8=;
+        b=ZDIOm7NWy0rRxJTOh11g4HzWPnQu5cM/ONRZTFx4LbDnp5ZEcnvvLvjtwUTwCO1reZ
+         w//Cjy2R8gRcEznvPcANS/h1ms0gYaTBgi6c7WkPa1xkZeqeH3cchYFDmLeXowM5TtIA
+         fEm+1M9on+FqMUQYvi32s2y70AVMzmN1UB5HE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737124651; x=1737729451;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XotKZ5aC4hzDyG2o0IeDG6hv28Jq5p2Sy4ygAsaPcU8=;
+        b=J+5Id19E/CH4L2+Pt07mpZUDgLEK1+LYVAqInCUDaSvuSVw69MtTOz+ZxM0+YnMAex
+         n5t+5g4Jxpb3bGn0AT2rVV7wAQqLA4VTqlVs1muH4Sr7aVcwjYNe8Elyr5POGK0dAnfz
+         lM7IjJcAFZSV3hnYPAoNCgc9RvSgOTeZSK8VD7XePxsyoTZI/GzZPvtW2KOX4Y1grgF8
+         UsiR6eJSDelGoHDiTTV+cdB7sh4xqD5GuQM2w7iYJLhCXp8w6FkHPIJDMG613r7RR/6C
+         WHGKt7FXb9yRwJqrVZODX+wYFiwP3W8pkIddux4v6QOaG5vmbZ8iwO8/TFsWHxNQX4nY
+         hfGg==
+X-Forwarded-Encrypted: i=1; AJvYcCWMO7rA/FTgB8ovyLtVqxJwKIzz5Eeu6CU3t/adIq/XA3gb0Oynf2jubCnmHSO3Qf/juio=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ4zMnkikbxQYPpQnVvSmHtQWqtqlrFCybFxzBlBfBEd7COLYG
+	b1j40tMkdWzLG2UHtsCWnfjJR9hB122xD3naRvKcorr+NbFdvF/XI12fGW1KfXc=
+X-Gm-Gg: ASbGncstCFDpAMOp2fSHKouuDaw8aAV9ALRcmK4evv953u8WjtCnxB0WtaxsSmJ5aq5
+	MitejUz8e/X89oaHYn9y2qmdAP5P/7Of+8SOdFm5Jt/KQIYvA7PSMzu9jL6fyloJ5VVYxQiz0oH
+	9FDKRRplH3LUeN8n3FQAr3elNVju6oy4WpZDlyuH9ljpcbC9thZYli+iduSEK7jFwiNCBAwRuhX
+	cGmQSOBliK0NnasVv08NiSP+P35gDxO+4JRnSwHE7/FN7NJWBzqY9xRpYxKYbw6HrK7
+X-Google-Smtp-Source: AGHT+IGRKn0mOd/rGrQjlD6Ss6MEpPjLO2iVNpAQ/jZBO5GUHVoXw6I4KLkLGt5y/u2vf1HmVS66CA==
+X-Received: by 2002:a05:6000:1788:b0:386:3d27:b4f0 with SMTP id ffacd0b85a97d-38bec505c43mr6963889f8f.14.1737124651189;
+        Fri, 17 Jan 2025 06:37:31 -0800 (PST)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:5485:d4b2:c087:b497])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c753cc1fsm97636935e9.39.2025.01.17.06.37.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 06:37:30 -0800 (PST)
+Date: Fri, 17 Jan 2025 15:37:28 +0100
+From: Simona Vetter <simona.vetter@ffwll.ch>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
+	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+Message-ID: <Z4prKEpIg7A5pjHQ@phenom.ffwll.local>
+Mail-Followup-To: Jason Gunthorpe <jgg@nvidia.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
+	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+References: <f6c2524f-5ef5-4c2c-a464-a7b195e0bf6c@amd.com>
+ <1afd5049-d1d4-4fd6-8259-e7a5454e6a1d@amd.com>
+ <20250115141458.GP5556@nvidia.com>
+ <c86cfee1-063a-4972-a343-ea0eff2141c9@amd.com>
+ <86afb69a-79bd-4719-898e-c6c2e62103f7@amd.com>
+ <20250115151056.GS5556@nvidia.com>
+ <6f7a14aa-f607-45f9-9e15-759e26079dec@amd.com>
+ <20250115170942.GT5556@nvidia.com>
+ <5f588dac-d3e2-445d-9389-067b875412dc@amd.com>
+ <20250116160747.GV5556@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|LV8PR12MB9110:EE_
-X-MS-Office365-Filtering-Correlation-Id: 46b68104-35c8-45b9-9c01-08dd36ff5a6b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?pT8lspFztMkx1UyM6r52SQp0+G8mdmIvXvofEeXJ1Tf0RU4qV8Mext1Xghzf?=
- =?us-ascii?Q?lXfUwCRx8w2dzdRzoc7HPrxVv5JnnYFBgvWXnuw3S2gZXs4DcxlVlt2xCnxY?=
- =?us-ascii?Q?dgKPDY2r4z/AOXP3hAKT7X1Y5s4ssui/bfMbEw3sw5jToARa7AHs+gIzaDat?=
- =?us-ascii?Q?vuI4wkOFzaeq1hVFC4W7MK5goUhIKROWYhhbZcbjJK4mnCOV52I54l4NgwfI?=
- =?us-ascii?Q?+xL39P4fm6QVy/T2PCpfa7rXcxtPwoBPjyr4HvQlnIT+qBUe/fOmAHrkJkxL?=
- =?us-ascii?Q?dfmSrd7qm4WmIm+4XRo3gJ5/YWeOdCrHiVHv8SbwSQsIxinke15ru/3pUAuz?=
- =?us-ascii?Q?eo1wJKIPv8RQfNqIelf91tfi9KkFzS5ZrVCIK9KLbN93ZFHaAkkezCZoTM9s?=
- =?us-ascii?Q?8B7zvvHupNlhjB89fzYRC5uutxhkMGUtBQ8BbOPSN8ODOMyOPAc5T3tWw4QF?=
- =?us-ascii?Q?923xec/nMgKBh/1qPAZYZJrsMnrJ3v0xJfJLpDAt7Dy6LJf3EPg6j3v9yRFu?=
- =?us-ascii?Q?YKga9+xsNwfJTT9Y7I2Iy+yOl9Joolr0H9B+aBnrSm3mPruksukpA8VVPic1?=
- =?us-ascii?Q?iUbQhTsxPITDrQqTf5WKIhIjiuDW4UgDQyRTMISI83i1gKmYBJYiI/ZEGtIL?=
- =?us-ascii?Q?CWvA9vaMgxN13q1tsWCGaUdlUOYes2N8NWYaC9p8dZlSahUYrtCp9gMhM8AT?=
- =?us-ascii?Q?giV6QuAfquDyZCtc8JlKGMdHfsL3gVRVP+EBlD3kQo8q9QL7z5H02ln0t64W?=
- =?us-ascii?Q?pSIcG8CJWb6nQKFjHo/TTU4MMSRmrb+SKhF3H5nK6PCxV7EbmKZuusl3SfPQ?=
- =?us-ascii?Q?5gxiCgI7BxQY6+v0zM+Krc2d/xo5Xn/Qnl2n4DhLBgUBS/R21LWK6haw/1zj?=
- =?us-ascii?Q?AgfbjR5IDo5aHmt6TVeWRYrCgifeKmdK9GxRAPQnmxb+g/3NeZ5IA3DtHIxu?=
- =?us-ascii?Q?UtjkHQyeNs/QCxDu6yCrNrpX8lz7WSDpdyeSjWTmEitUkiG3PHlt6Pyg6R/i?=
- =?us-ascii?Q?kiPZhHaJD73aTyise93UUuRW3WwjbA5U211eRfMv0U8JNUsODLr/ygWqRzFW?=
- =?us-ascii?Q?PLrlQ+iVQdx5qGwApAy2q1VBQoX5tmEWryl3onGgycsjb7c+JcOE7AqimZ/w?=
- =?us-ascii?Q?DNPyTEygXAEtP0bi1x9mDlEhnDfBsXj1tluFi+1Pkgr/A7hS3FQGfRZ7AQ2h?=
- =?us-ascii?Q?2aMdMLjSawkQE09MbCRItDoaoTKvyY8dDctfbgvNhLoXmLBgbgrSxA1mexgv?=
- =?us-ascii?Q?iF6/E0BRIHZruesaPDZvsJe1+484nlkewqiJdc4eE0DCbt+lWlUR3dzlp1+y?=
- =?us-ascii?Q?964UD0geClul5xIXOlTmXGGyP8Z5/46RxrtFzD82CZV+KiSWB/o0MXHXALkL?=
- =?us-ascii?Q?NWOvuIvT1mVfzFabyEVULMvY7p36?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?f79iYav8f5oe5kfkCoFpnU6AyWaAjgIGQN64JI02qGwjbH3wvJTM+kh51Mux?=
- =?us-ascii?Q?3CPBesmc3FxhimIVU0LChXdJMTuQKLp5RQewX+qayiFDqT0mu86H2HFnQf4w?=
- =?us-ascii?Q?uKmb47AE4ixiYKHHrt922Rva7s/5EQRm/U2ZemDKiDGgUZhvCieKdV7BGWwU?=
- =?us-ascii?Q?WJHZ4gIiETthtCsF3c8wEyZaqDPXO6Ev1c32yve+44tCBzZQYph1yVdZSJt5?=
- =?us-ascii?Q?t8rMZ7b7HhHVQfdSKVNJ1F8GayHiAKGVQoILXMi0DZ3OolaDpAsBsEiOuuIS?=
- =?us-ascii?Q?ZAIpSO/APtY8xr+LIMGYXz/0yCnZy5hD9KBV5dA9UPzvs7H/V2gzGZaCvipi?=
- =?us-ascii?Q?c448T5N+hYBD2gZJO//YzhjfRNn+46nYUuUSHbi+ll1mrhftUC/bhvvXA0RU?=
- =?us-ascii?Q?S3k8KUqEijtrzntBk5ux4KhnZhmRaOStwpHu8bT79O++gBuANlTWG0vmQ16X?=
- =?us-ascii?Q?witgWd/nLr4/9tj0UXsxS8UlqnHl1BzWCh2MmBg+SrK5IVPu8yU9tq8nuNwL?=
- =?us-ascii?Q?DZN2AhydmEjv9UDjapIOyMAmYzY8UcaAWDXGl6hUHPm1Q5JIVPjdDEm+MiXv?=
- =?us-ascii?Q?o49DP+Dq3gZyJSIomLVTqawnto+CG/y42S0PH++wGBZJJbvdh20BMC2ueSIB?=
- =?us-ascii?Q?6tsHTBkA9FbO/BLT8F9b4APb1xACk/uenYTQS/Ye41ojRRmRBzWTlRl+V4eZ?=
- =?us-ascii?Q?o9neqErrg72eYvCOXAR9d3D3f72Dt7fxb/61vDMx+p+AvwhUTzlcipJqdl7Y?=
- =?us-ascii?Q?OLLcb692Cw/du19cBIbYP5/gOcQxFKXrNaANlUyGByW1DAVuh+zZBVjL6zYv?=
- =?us-ascii?Q?hPxFBrHtj7mjzUdvj+ryVufB3D+PQwnjBXiGAmd7OTaRGN0pTYg0vemOueRg?=
- =?us-ascii?Q?hjNa2ekrkpia71p+eEjG1FrXyVUSezTK4ZAj9n6U/jlGS4I0f8gYkEqBh+oT?=
- =?us-ascii?Q?CImf+YImjx/XwuzIuE17TSTXzs2FbbVPrgYS/SKZcQQ7sW8BOtms2ZO2Wj4X?=
- =?us-ascii?Q?lTS+J2EnzE9DdRRYyiConVqX433carlKLq+T8lXQUR1bnaUMMmxnCTbuSuDm?=
- =?us-ascii?Q?J88EBaa/7WBxRYnleHjaAF40i0jJzQjLrtNZz51eoAdQKXSat08DCdPitdro?=
- =?us-ascii?Q?ARgc52BO/hzAiMoEcQxoTEY7yNMp5zCRQ2R1vnKwoPE9suioX+UUDXb+dszB?=
- =?us-ascii?Q?r2ghdBfsx9A8G9gzAuwgKlKVrx5JgHddE1Mo592L8C5r/kJMugnkR6vcLvUb?=
- =?us-ascii?Q?YCcUhA252Cf7+GgFDnaiDVKkwv7ZDVBdBGXYJP0hgoJ4kujUEgtl69t5c6Nr?=
- =?us-ascii?Q?XPAwSsm+UWbUBK2cHYpO6Cwmw2bgu/vHvKrWLZarjWBfn7N1kPf8MbjxkXsU?=
- =?us-ascii?Q?wcMiSGlLpd9oNy9mzt7GryFksYd9wT4BDAv0M7DKI4uNiBPn706OL/S5aJgG?=
- =?us-ascii?Q?+NUgYiQh1uTMfEUp1tf0Tkm/melZOksP0UVT53Whb7BM77JxnVXoVzXK2UFU?=
- =?us-ascii?Q?gPTFPO7lZrdGUTyB6BUwgNUbyMcO7zupCJgwwXLOAyk57abuAQW/pGPNoXMr?=
- =?us-ascii?Q?CU5VRijGTSN1wCJqJXHmlOOv4bAzNwzYdIfjlDoe?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46b68104-35c8-45b9-9c01-08dd36ff5a6b
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2025 14:00:52.0449
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yRCTAY8r5aE1A+HkofBsduWzJ8yhRSihpWjpb/gM5oLoqcrdksVFOXH1hO/w4RHS
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9110
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250116160747.GV5556@nvidia.com>
+X-Operating-System: Linux phenom 6.12.3-amd64 
 
-On Thu, Jan 16, 2025 at 10:28:48PM +0000, Catalin Marinas wrote:
+On Thu, Jan 16, 2025 at 12:07:47PM -0400, Jason Gunthorpe wrote:
+> On Thu, Jan 16, 2025 at 04:13:13PM +0100, Christian König wrote:
+> >> But this, fundamentally, is importers creating attachments and then
+> >> *ignoring the lifetime rules of DMABUF*. If you created an attachment,
+> >> got a move and *ignored the move* because you put the PFN in your own
+> >> VMA, then you are not following the attachment lifetime rules!
+> > 
+> >    Move notify is solely for informing the importer that they need to
+> >    re-fresh their DMA mappings and eventually block for ongoing DMA to
+> >    end.
+> 
+> I feel that it is a bit pedantic to say DMA and CPU are somehow
+> different. The DMABUF API gives you a scatterlist, it is reasonable to
+> say that move invalidates the entire scatterlist, CPU and DMA equally.
 
-> Basically I don't care whether MTE is supported on such vma, I doubt
-> you'd want to enable MTE anyway. But the way MTE was designed in the Arm
-> architecture, prior to FEAT_MTE_PERM, it allows a guest to enable MTE at
-> Stage 1 when Stage 2 is Normal WB Cacheable. We have no idea what enable
-> MTE at Stage 1 means if the memory range doesn't support it.
+dma-buf doesn't even give you a scatterlist, there's dma-buf which truly
+are just handles that are 100% device specific.
 
-I'm reading Aneesh's cover letter (Add support for NoTagAccess memory
-attribute) and it seems like we already have exactly the behavior we
-want. If MTE is enabled in the KVM then memory types, like from VFIO,
-are not permitted - this looks like it happens during memslot
-creation, not in the fault handler.
+It really is the "everything is optional" interface. And yes we've had
+endless amounts of fun where importers tried to peek behind the curtain,
+largely because scatterlists didn't cleanly separate the dma_addr_t from
+the struct page side of things. So I understand Christian's concerns here.
 
-So I think at this point Ankit's series should rely on that. We never
-have a fault on a PFNMAP VMA in a MTE enabled KVM in the first place
-because you can't even create a memslot.
+But that doesn't mean we cannot add another interface that does allow
+importers to peek behind the curtiain. As long as we don't make a mess and
+confuse importers, and ideally have compat functions so that existing
+importers can deal with pfn exporters too it's all fine with me.
 
-After Aneesh's series it would make the memory NoTagAccess (though I
-don't understand from the cover letter how this works for MMIO) amd
-faults will be fully contained.
+And I also don't see an issue with reasonable pfn semantics that would
+prevent a generic mmap implementation on top of that, so that
+dma_buf_mmap() just works for those. The mmu notifier pain is when you
+consume mmaps/vma in a generic way, but implementing mmap with the current
+dma_resv locking is dead easy. Unless I've missed something nonobvious and
+just made a big fool of myself :-)
 
-> with FEAT_MTE_PERM (patches from Aneesh on the list). Or, a bigger
-> happen, disable MTE in guests (well, not that big, not many platforms
-> supporting MTE, especially in the enterprise space).
+What we cannot demand is that all existing dma-buf exporters switch over
+to the pfn interfaces. But hey it's the everything optional interface, the
+only things is guarantees are
+- fixed length
+- no copying
+- refcounting and yay it only took 10 years: consistent locking rules
 
-As above, it seems we already effectively disable MTE in guests to use
-VFIO.
+So I really don't understand Christian's fundamental opposition here.
 
-> A second problem, similar to relaxing to Normal NC we merged last year,
-> we can't tell what allowing Stage 2 cacheable means (SError etc).
+Cheers, Sima
 
-That was a very different argument. On that series KVM was upgrading a
-VM with pgprot noncached to Normal NC, that upgrade was what triggered
-the discussions about SError.
+> >    This semantics doesn't work well for CPU mappings because you need to
+> >    hold the reservation lock to make sure that the information stay valid
+> >    and you can't hold a lock while returning from a page fault.
+> 
+> Sure, I imagine hooking up a VMA is hard - but that doesn't change my
+> point. The semantics can be reasonable and well defined.
+> 
+> >    Yeah and exactly that is something we don't want to allow because it
+> >    means that every importer need to get things right to prevent exporters
+> >    from running into problems.
+> 
+> You can make the same argument about the DMA address. We should just
+> get rid of DMABUF entirely because people are going to mis-use it and
+> wrongly implement the invalidation callback.
+> 
+> I have no idea why GPU drivers want to implement mmap of dmabuf, that
+> seems to be a uniquely GPU thing. We are not going to be doing stuff
+> like that in KVM and other places. And we can implement the
+> invalidation callback with correct locking. Why should we all be
+> punished because DRM drivers seem to have this weird historical mmap
+> problem?
+> 
+> I don't think that is a reasonable way to approach building a general
+> purpose linux kernel API.
+>  
+> >    Well it's not miss-used, it's just a very bad design decision to let
+> >    every importer implement functionality which actually belong into a
+> >    single point in the exporter.
+> 
+> Well, this is the problem. Sure it may be that importers should not
+> implement mmap - but using the PFN side address is needed for more
+> than just mmap!
+> 
+> DMA mapping belongs in the importer, and the new DMA API makes this
+> even more explicit by allowing the importer alot of options to
+> optimize the process of building the HW datastructures. Scatterlist
+> and the enforeced represetation of the DMA list is very inefficient
+> and we are working to get rid of it. It isn't going to be replaced by
+> any sort of list of DMA addresses though.
+> 
+> If you really disagree you can try to convince the NVMe people to give
+> up their optimizations the new DMA API allows so DRM can prevent this
+> code-review problem.
+> 
+> I also want the same optimizations in RDMA, and I am also not
+> convinced giving them up is a worthwhile tradeoff.
+> 
+> >    Why would you want to do a dmabuf2 here?
+> 
+> Because I need the same kind of common framework. I need to hook VFIO
+> to RDMA as well. I need to fix RDMA to have working P2P in all
+> cases. I need to hook KVM virtual device stuff to iommufd. Someone
+> else need VFIO to hook into DRM.
+> 
+> How many different times do I need to implement a buffer sharing
+> lifetime model? No, we should not make a VFIO specific thing, we need
+> a general tool to do this properly and cover all the different use
+> cases. That's "dmabuf2" or whatever you want to call it. There are
+> more than enough use cases to justify doing this. I think this is a
+> bad idea, we do not need two things, we should have dmabuf to handle
+> all the use cases people have, not just DRMs.
+> 
+> >    I don't mind improving the scatterlist approach in any way possible.
+> >    I'm just rejecting things which we already tried and turned out to be a
+> >    bad idea.
+> >    If you make an interface which gives DMA addresses plus additional
+> >    information like address space, access hints etc.. to importers that
+> >    would be really welcomed.
+> 
+> This is not welcomed, having lists of DMA addresses is inefficient and
+> does not match the direction of the DMA API. We are trying very hard
+> to completely remove the lists of DMA addresses in common fast paths.
+> 
+> >    But exposing PFNs and letting the importers created their DMA mappings
+> >    themselves and making CPU mappings themselves is an absolutely clear
+> >    no-go.
+> 
+> Again, this is what we must have to support the new DMA API, the KVM
+> and IOMMUFD use cases I mentioned.
+> 
+> >> In this case Xu is exporting MMIO from VFIO and importing to KVM and
+> >> iommufd.
+> > 
+> >    So basically a portion of a PCIe BAR is imported into iommufd?
+> 
+> Yeah, and KVM. And RMDA.
+> 
+> >    Then create an interface between VFIO and KVM/iommufd which allows to
+> >    pass data between these two.
+> >    We already do this between DMA-buf exporters/importers all the time.
+> >    Just don't make it general DMA-buf API.
+> 
+> I have no idea what this means. We'd need a new API linked to DMABUF
+> that would be optional and used by this part of the world. As I said
+> above we could protect it with some module namespace so you can keep
+> it out of DRM. If you can agree to that then it seems fine..
+> 
+> > > Someone else had some use case where they wanted to put the VFIO MMIO
+> > > PCIe BAR into a DMABUF and ship it into a GPU driver for
+> > > somethingsomething virtualization but I didn't understand it.
+> > 
+> >    Yeah, that is already perfectly supported.
+> 
+> No, it isn't. Christoph is blocking DMABUF in VFIO because he does not
+> want to scatterlist abuses that dmabuf is doing to proliferate.  We
+> already have some ARM systems where the naive way typical DMABUF
+> implementations are setting up P2P does not work. Those systems have
+> PCI offset.
+> 
+> Getting this to be "perfectly supported" is why we are working on all
+> these aspects to improve the DMA API and remove the scatterlist
+> abuses.
+> 
+> >> In a certain sense CC is a TEE that is built using KVM instead of the
+> >> TEE subsystem. Using KVM and integrating with the MM brings a whole
+> >> set of unique challenges that TEE got to avoid..
+> > 
+> >    Please go over those challenges in more detail. I need to get a better
+> >    understanding of what's going on here.
+> >    E.g. who manages encryption keys, who raises the machine check on
+> >    violations etc...
+> 
+> TEE broadly has Linux launch a secure world that does some private
+> work. The secure worlds tend to be very limited, they are not really
+> VMs and they don't run full Linux inside
+> 
+> CC broadly has the secure world exist at boot and launch Linux and
+> provide services to Linux. The secure world enforces memory isolation
+> on Linux and generates faults on violations. KVM is the gateway to
+> launch new secure worlds and the secure worlds are full VMs with all
+> the device emulation and more.
+> 
+> It CC is much more like xen with it's hypervisor and DOM0 concepts.
+> 
+> From this perspective, the only thing that matters is that CC secure
+> memory is different and special - it is very much like your private
+> memory concept. Only special places that understand it and have the
+> right HW capability can use it. All the consumers need a CPU address
+> to program their HW because of how the secure world security works.
+> 
+> Jason
 
-For this case the VMA is already pgprot cache. KVM is not changing
-anything. The KVM S2 will have the same Normal NC memory type as the
-VMA has in the S1.  Thus KVM has no additional responsibility for
-safety here.
-
-If using Normal Cachable on this memory is unsafe then VFIO must not
-create such a VMA in the first place.
-
-Today the vfio-grace driver is the only place that creates cachable
-VMAs in VFIO and it is doing so with platform specific knowledge that
-this memory is fully cachable safe.
-
-> information. Checking vm_page_prot instead of a VM_* flag may work if
-> it's mapped in user space but this might not always be the case. 
-
-For this series it is only about mapping VMAs. Some future FD based
-mapping for CC is going to also need similar metadata.. I have another
-thread about that :)
-
-> I don't see how VM_PFNMAP alone can tell us anything about the
-> access properties supported by a device address range. Either way,
-> it's the driver setting vm_page_prot or some VM_* flag. KVM has no
-> clue, it's just a memory slot.
-
-I think David's point about VM_PFNMAP was to avoid some of the
-pfn_valid() logic. If we get VM_PFNMAP we just assume it is non-struct
-page and follow the VMA's pgprot.
-
-> A third aspect, more of a simplification when reasoning about this, was
-> to use FWB at Stage 2 to force cacheability and not care about cache
-> maintenance, especially when such range might be mapped both in user
-> space and in the guest.
-
-Yes, I thought we needed this anyhow as KVM can't cache invalidate
-non-struct page memory..
-
-Jason
+-- 
+Simona Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
