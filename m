@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-35716-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35717-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 934C8A1475F
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 02:10:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A557FA14761
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 02:11:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8A3E16CC1E
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 01:08:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CFB8188A840
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 01:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA321632F2;
-	Fri, 17 Jan 2025 01:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38F617555;
+	Fri, 17 Jan 2025 01:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RPc/TKtq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M5CDvF4f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E411215350B
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 01:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B115515FD01
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 01:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737076054; cv=none; b=J/y658OoBktZ8+gIH4VbzmYwpQLjuCjtplEBUCz6vpDgCGaebc4Ca0pZwHuXawPCbleKHQPG0nwt8rM9ot4uf6YYIhaCD3M40NDZldXU7QhlTy0d0RQbxJbTcgxNnzSIb8yD/+5Cv0lZOctzYbJAUPbIXpcdhRmf53ktgmHH1Io=
+	t=1737076056; cv=none; b=gc6udO/nb3WkTigUji1LGsyKfcC6WmiRqvu5xPnFV16uAIssO6dW7+NDdagGWgTVHD+2dhxQglvb9A1K7CC/Gs5NtjYQUbOfs4xcoodiaOkAVeb4GlOZ/vRyiTQ9xGmEdqUkltrCSez3qD2a6N4uY/4WzJBhYLyBvMU+ll/T+hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737076054; c=relaxed/simple;
-	bh=BuldEnEeGmI9Hw0DVTb8LsiZwmC3XXvZPUEZhBILBts=;
+	s=arc-20240116; t=1737076056; c=relaxed/simple;
+	bh=cnUcN3lkFPLfe0UVCiHE/CS9EnzheWp5w1nG8tqzlzA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=I2Fg9Jcs5ABAEcfKx5mUXWcxpHVcLc9Ic3hv+qXUp5xpqQ9YLcc/lXysc6hmSZ3OUDGS1FM5cmOAJtMdZ0Q0OZIJCo4tluLpo8WVKmphKxSXVd2WKCNMr5+sQu0SoTmcIL9PRjppk10OhPflhqw4AzBarxn0XbkbE4knuLZ8tQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RPc/TKtq; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=JmL1gKgl2XkDkMdV0TPo3ganN3ZyvWNb6iSdD/h+ktcOc4Iv7Nsu+DblhBKUhQJlD+hyr49FwXR4N37sN2La2puMz58MLhNDzFugg10Bxn2RvlWQPhqQrrBkD3AKUAOZEp/icxUP2YZvXgKyL6KvQSEDMeXlYG5uFiGMe3YALiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M5CDvF4f; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ee86953aeaso3088388a91.2
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 17:07:32 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f129f7717fso3129324a91.0
+        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 17:07:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737076052; x=1737680852; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737076054; x=1737680854; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=uNacvWVxexFG3YeYZaGodI9DphNDLIiWKnJHtghb0eg=;
-        b=RPc/TKtqRstV4ey/34j7KcZl/Thy/K6bKWMt9HKnoNqNPgR0EH4tRuSb75UKqMGxIu
-         z89FDNB9MBDr5gnNxXhwPBNZFj1oPs6EDLBqE45I+lh332OAY0JUQzUgTW2alEWKpPO3
-         nXeLKWHR0Wf+Xb579RVC47HYWwN3EUg6m6gsxiXrA5vSfVIZD5RT4IgXyNQT7t7wLa3H
-         7LSK7VAk6yvO6pxahAXZKfqoP4iJI/XAlPZFF6rmdjf68tLbKtNs8y03O9Xtu0MF9iLS
-         tomIuDRs43JIZLjPNLfJtUk4+rYGjF7c+kv/L58yqwG2MegYI39aRry/qbKZkwhdoMD+
-         RdSw==
+        bh=QcYxczR0tvkXhhtjh3QEWO3iRdccgPPVshgvC2xXtIM=;
+        b=M5CDvF4f2GnRU8qmO3c/75MKaOHwCqdw4/L1gKupJBZW3KHHrIPxmEYCAXMOW5PE/O
+         Q4w/0y4WNM+9zIdMSzNUCbGSFDZ59uXlNQJfs9o3UZoRDQug32b/DAzP4zYEylEvfvDk
+         t4HAcNpBYukLk7P0+okTdBD8XjvvcXnphWrZHF8JRBcRKF5RHSWeTEJiQsGcgpropC1O
+         8zN/H5FqmbqDOejcDwHkaESHCiYCEAH6mSshq7GbIJGAkvZGU0GTJ7sKs/wzrwNsiERO
+         1qS2y218nYqIGkCwGm7cSkranmOYT1jCUOzA/PreGlDJjuAiN14+aP7rRNDLkvqlUniH
+         65Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737076052; x=1737680852;
+        d=1e100.net; s=20230601; t=1737076054; x=1737680854;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uNacvWVxexFG3YeYZaGodI9DphNDLIiWKnJHtghb0eg=;
-        b=ebjBhU44qqdNMlDIuFcWYY5rxZymynBdS4EE9uey4P97OlsxVOamf68Q9cKCEVT7sp
-         gKbcitHa1LPqpz4fD2rkJqJNXSbipySPWhX45CBDX25OIIDRBvwA1b6LVeCkEhCkZvHk
-         Cf9kYIIF04RxoLkAObKo8uwHfUDSA7amGIz9VMrmAhQvyvGi4bWHEh6PYvUr1bir6n35
-         rq3bOmi4TmqyTaR7fvAE2gpZ9jeR+vX53n+1D1kcE21eN5GG/762pE1KpsT1FykfOOHU
-         kQal/vPIBD7zDHWqg1PooggsavA1n8jyfl4jB8YDzxkCjvemvjRuzdg+fH3e5A1fHbPz
-         S/1w==
-X-Gm-Message-State: AOJu0YwfuCAl88M2EbC4sXMS5lRr1zbcq7eeRion8ziaxYFJnNHQ5fNv
-	Y0+YnX2E0obUVW3WEX0u1W/iM28HXrnusnh5NorrYaWPlp7PVWiQgvhw7G0Tn2tDabSo/fxJppB
-	TSg==
-X-Google-Smtp-Source: AGHT+IEPoyfyZtaaWCrK+yiJe5hZZ9ztN6DYrVpU93GAOQGnvPWsHL1Iwb6I63C0xEYdVtHQaeGD+6C0ERY=
-X-Received: from pjbse4.prod.google.com ([2002:a17:90b:5184:b0:2eb:12d7:fedd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:534c:b0:2f6:dcc9:38e0
- with SMTP id 98e67ed59e1d1-2f782b01f69mr1289968a91.0.1737076052353; Thu, 16
- Jan 2025 17:07:32 -0800 (PST)
+        bh=QcYxczR0tvkXhhtjh3QEWO3iRdccgPPVshgvC2xXtIM=;
+        b=SZKGZFnj8/OK5qGFLmLGjU/e/fapdjSxmnodFWdOiCjQ6cgzl9MBEaiD79lNLG0v9B
+         QiBKLch9vmb+1kyutNjxEc2UsGSnNKGvXzrJhvOJIe8Gpiv1AByqrclE2KC7L4sFM/jA
+         BGTL8CuqdqR10T//ZpCrQpFGcIju+6Yb/vLiabnxUsYcK/yRYoCaz0h06KJLkm8qHJTl
+         Q1BpY8X7LFJ7JUVExuiuXMoCEgGrVtlqMf8BP5d2IhGz6rRD7gp0RkxsPdqYXpVGwNB7
+         F5yrTnwL2oOuDhjXxUUUVZ5/MKKSm9Jp1erLfr+cClJo2C7iiVslYJ5H8VxQvU5GzVCN
+         fhxw==
+X-Gm-Message-State: AOJu0YzN+I9Ftl6i8ms9eb49iqDPE6/FEur2jpxLgoanq2WO+0IvYPOU
+	xxtYzpHwUmODYYvTEkJ7/DnXAKyvP6wX7aKw0fH3EJeQ2UFcfVeWIxJc0xGC8IN2MHSYSPksNV0
+	VxA==
+X-Google-Smtp-Source: AGHT+IGUIHuN/oPKGCYO3+FW7cDtyj68lojRfHJCr7/KhobmdI4O5lzDG6ATPvYnmoEO8716xXSETQsj4Dw=
+X-Received: from pjbsj7.prod.google.com ([2002:a17:90b:2d87:b0:2da:ac73:93e0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:7141:b0:2ee:dd9b:e402
+ with SMTP id 98e67ed59e1d1-2f782c70237mr1210675a91.12.1737076054056; Thu, 16
+ Jan 2025 17:07:34 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Jan 2025 17:07:17 -0800
+Date: Thu, 16 Jan 2025 17:07:18 -0800
 In-Reply-To: <20250117010718.2328467-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,15 +75,18 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250117010718.2328467-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250117010718.2328467-7-seanjc@google.com>
-Subject: [GIT PULL] KVM: vcpu_array fixes and cleanups for 6.14
+Message-ID: <20250117010718.2328467-8-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: VMX change for 6.14
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The wonderful vcpu_array changes that you already know and love :-D
+A few fixes and cleanups.  The most notable change is Chao's fix for a nasty
+bug where L1's SVI didn't get updated and result in the interrupt being left
+in-service forever (though only uncommon use cases are affected, e.g. running
+pKVM x86 in L1).
 
 The following changes since commit 3522c419758ee8dca5a0e8753ee0070a22157bc1:
 
@@ -91,36 +94,66 @@ The following changes since commit 3522c419758ee8dca5a0e8753ee0070a22157bc1:
 
 are available in the Git repository at:
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-vcpu_array-6.14
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-vmx-6.14
 
-for you to fetch changes up to 01528db67f28d5919f7b0a68900dc212165218e2:
+for you to fetch changes up to 37c3ddfe5238d88b6ec091ecdf967848bce067c2:
 
-  KVM: Drop hack that "manually" informs lockdep of kvm->lock vs. vcpu->mutex (2024-12-16 14:37:30 -0800)
-
-----------------------------------------------------------------
-KVM vcpu_array fixes and cleanups for 6.14:
-
- - Explicitly verify the target vCPU is online in kvm_get_vcpu() to fix a bug
-   where KVM would return a pointer to a vCPU prior to it being fully online,
-   and give kvm_for_each_vcpu() similar treatment to fix a similar flaw.
-
- - Wait for a vCPU to come online prior to executing a vCPU ioctl to fix a
-   bug where userspace could coerce KVM into handling the ioctl on a vCPU that
-   isn't yet onlined.
-
- - Gracefully handle xa_insert() failures even though such failuires should be
-   impossible in practice.
+  KVM: VMX: read the PML log in the same order as it was written (2025-01-08 14:31:25 -0800)
 
 ----------------------------------------------------------------
+KVM VMX changes for 6.14:
+
+ - Fix a bug where KVM updates hardware's APICv cache of the highest ISR bit
+   while L2 is active, while ultimately results in a hardware-accelerated L1
+   EOI effectively being lost.
+
+ - Honor event priority when emulating Posted Interrupt delivery during nested
+   VM-Enter by queueing KVM_REQ_EVENT instead of immediately handling the
+   interrupt.
+
+ - Drop kvm_x86_ops.hwapic_irr_update() as KVM updates hardware's APICv cache
+   prior to every VM-Enter.
+
+ - Rework KVM's processing of the Page-Modification Logging buffer to reap
+   entries in the same order they were created, i.e. to mark gfns dirty in the
+   same order that hardware marked the page/PTE dirty.
+
+ - Misc cleanups.
+
+----------------------------------------------------------------
+Adrian Hunter (1):
+      KVM: VMX: Allow toggling bits in MSR_IA32_RTIT_CTL when enable bit is cleared
+
+Chao Gao (2):
+      KVM: nVMX: Defer SVI update to vmcs01 on EOI when L2 is active w/o VID
+      KVM: x86: Remove hwapic_irr_update() from kvm_x86_ops
+
+Costas Argyris (1):
+      KVM: VMX: Reinstate __exit attribute for vmx_exit()
+
+Gao Shiyuan (1):
+      KVM: VMX: Fix comment of handle_vmx_instruction()
+
+Maxim Levitsky (2):
+      KVM: VMX: refactor PML terminology
+      KVM: VMX: read the PML log in the same order as it was written
+
 Sean Christopherson (6):
-      KVM: Explicitly verify target vCPU is online in kvm_get_vcpu()
-      KVM: Verify there's at least one online vCPU when iterating over all vCPUs
-      KVM: Grab vcpu->mutex across installing the vCPU's fd and bumping online_vcpus
-      Revert "KVM: Fix vcpu_array[0] races"
-      KVM: Don't BUG() the kernel if xa_insert() fails with -EBUSY
-      KVM: Drop hack that "manually" informs lockdep of kvm->lock vs. vcpu->mutex
+      KVM: x86: Plumb in the vCPU to kvm_x86_ops.hwapic_isr_update()
+      KVM: nVMX: Explicitly update vPPR on successful nested VM-Enter
+      KVM: nVMX: Check for pending INIT/SIPI after entering non-root mode
+      KVM: nVMX: Drop manual vmcs01.GUEST_INTERRUPT_STATUS.RVI check at VM-Enter
+      KVM: nVMX: Use vmcs01's controls shadow to check for IRQ/NMI windows at VM-Enter
+      KVM: nVMX: Honor event priority when emulating PI delivery during VM-Enter
 
- include/linux/kvm_host.h | 16 +++++++++---
- virt/kvm/kvm_main.c      | 68 ++++++++++++++++++++++++++++++++++++------------
- 2 files changed, 65 insertions(+), 19 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 -
+ arch/x86/include/asm/kvm_host.h    |  3 +-
+ arch/x86/kvm/lapic.c               | 25 +++++++-----
+ arch/x86/kvm/lapic.h               |  1 +
+ arch/x86/kvm/vmx/main.c            |  3 +-
+ arch/x86/kvm/vmx/nested.c          | 84 +++++++++++++++++++++++---------------
+ arch/x86/kvm/vmx/vmx.c             | 76 ++++++++++++++++++++--------------
+ arch/x86/kvm/vmx/vmx.h             |  6 ++-
+ arch/x86/kvm/vmx/x86_ops.h         |  3 +-
+ 9 files changed, 120 insertions(+), 82 deletions(-)
 
