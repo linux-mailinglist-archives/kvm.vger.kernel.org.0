@@ -1,143 +1,154 @@
-Return-Path: <kvm+bounces-35842-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35843-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A470A155D5
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 18:37:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E838A155FE
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 18:51:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C34CD188D930
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:37:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CFE1168766
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:51:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0FD1A2541;
-	Fri, 17 Jan 2025 17:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13EF1A23AA;
+	Fri, 17 Jan 2025 17:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zCUofYgL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z3Y2pmGY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59932A95C
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 17:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EA986324
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 17:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737135408; cv=none; b=Eczf/thBVZOx8w5BZnszpMhhYAAN3PzYKqGNmsuFaFrAoykpQE52G6fli+aoYpMvpfEe0azvTERu2oGJ38j0gYWbZoSJJlek6rWwsq4ekIhRvalx5C4mONHVayj/E1101JbjC6ai5XOpvRZGA2ZfbseYgr8mvk5eigUj8hmNaws=
+	t=1737136306; cv=none; b=LfoZskbvKzpIhXTpL0J2CDJ49zBogc4eImLMIimPIqcSgV42JzL+eCiXpmv04VAM5U8cYlcBI1b64rza8Qlhqvuy5cNYnVzoiJ54SUW65u46nGXYmsw8oz86Q71rgDeRcLqfInb042KIDuLm9IDA1yMkB9yvmpvtlG/pDa0n+EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737135408; c=relaxed/simple;
-	bh=QBwKeN2Bq2CNE0zF7FaHpH3rztx/oNPKspqXSw64uEU=;
+	s=arc-20240116; t=1737136306; c=relaxed/simple;
+	bh=Wct9HCwUPCVIG+BBVfvCW6z2/NZWOtyjf01kvXutEJ0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pd2zGG6XsxCb7/1WIl5p7myBrZeFxIam53phOmYpVUmb6LMrEr1PjQBm58PhDzDCKVWFL7tOPtwZl7pyLcWFzFjg0GtxVUbCu3ucImZ1H5jmxiw/LSoocz+a+yqDZZ0XzTN8B+DxJDFwcHnpALUmYOfpHMqJVlSwFOQYtAltlTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zCUofYgL; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=fykGxNdYbAlS8+r8GK+AS7jSH9rFbmKBxcIhXaPMZWb99s5mUvUyO4w1AKdixAZvSEuerbZCzXK1aIkzTQDhTDFhkayZA0JeQxuFbNQmwzCMGGL9jL4epcnm+V1QPcI9tiVDx08zhMD6NoWNsPp+/4K+aEA2QZYyQdopmrsB7dE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z3Y2pmGY; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f129f7717fso4652427a91.0
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 09:36:47 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef91d5c863so4738502a91.2
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 09:51:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737135406; x=1737740206; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737136303; x=1737741103; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRfr6c2OOb+CwNJOPVVNgs0oQDVr3N04a+EaawYlXZ8=;
-        b=zCUofYgLlWx7twfe/gYeRmUPyilXdL4C6mimgB6YuRWvpYvzF2Rjd+jgI6IRAeol0A
-         4ZoW7bxOZPk904cWY6UktDl4G/nGH64y7X/2MsPtagibKM9JjqyZFHPy6A+bbacK++cC
-         wYPle6rjtITzkHSV2/tyEoQpM3SgVU8gBT/fRWFZYTArgFZt2iVD0cE5KEhVfzDGy76m
-         OMdofUrkzmMWuJQoGT1bXDWLzI513ApzNN5QRnETn6Sft19gaTniEYWhRqHU9BPia+/V
-         /+lKde6huftZIAWdx2aulfmFYmgC1IxyL+TJNtoIks37S2pxmLaHqU3x3wpvHGHPGhrj
-         zyVA==
+        bh=H7k5xoXdCenaUvwTYHoCS9O0hkrxJj/QWVxA1v+hnUQ=;
+        b=Z3Y2pmGYnLIXP2et6Eh8LiyRk1a2cQ4PLHUFgxoooSjzbm5d/pOuy6yrjEiHD+NAyy
+         vEDht9kM5xEuvgnlU97Hb/uCEwiQBtIoNr7V302SDn6ijVxPKr1Oo9NjHVKIheBOu3Pe
+         vfqQf44IShGKAz6IXWNaHgSGRjwbeJ0AuTH45BjazpOl/PH5XjvGU9DrtsWrLEr4zDJY
+         xuNzkcWumQwMWBH2CXUzdI5z0u4VWyrWvP5BqLIdlxCwHqTNAd7M41n8CLaESDlSl/g7
+         S79h4QAb0L3MdGnXc+U57+p2Ba090EC0se2JAy2UgNY+HUCPPq5t3R2HyDUlwSZRoqyP
+         B+FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737135406; x=1737740206;
+        d=1e100.net; s=20230601; t=1737136303; x=1737741103;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YRfr6c2OOb+CwNJOPVVNgs0oQDVr3N04a+EaawYlXZ8=;
-        b=d+2BUVBbl+SiLYFY2n9yqvj/56HXF3BSMMjgXnkW+vzCVK/a80RokYJAx23deHpAne
-         dKbjM5KRJ1pASfhTflNT73EDCGO9AvyEXzWxSKqCJGfMiWrA4ybZ0efg7OUTDtOKWsbS
-         zkZxmYcbGu+TrIo6bQQM/B5cC0zVcJAdX99VFgBr4nEuC2mwCc6uTH3U3JH/nq3lmOL+
-         4TVuEU6pqef18RUJfpB66frxN771xqZdildjE6EL6m8DV5kPxaqAVMOdlon9OcLF1Qqu
-         /d1i7FPmdm9x57e9HUrHucWLNjiWDOG5G0eSJ/fGbxvb41RJdkw+RFYpyAm4HD/s01RZ
-         RFNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWLm83z7k9sctBdyB5L+bKOaxD8Hd/T8WUZtng89wsnrboBPFO88eDq5hs1uiuOWyKhWI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywhi0e/cruMT0AWLCrrIPUs/ZgV43lRuwuHJamB5qMPPeg3PzjV
-	M+R2mGMPai6RfNt/uoITujmXPLWfzFV9KkVb5Qfg3/7vujGy4PBSwnnsZIJ3M5QHU+xsbWUZn8g
-	RmA==
-X-Google-Smtp-Source: AGHT+IGGs8LQpUxnevvozQKUPF97I/qKWdMA+oKhunNgVSModdZKEUVcGoAjf8+j8iPaYyIgj8mqnh9TmN8=
-X-Received: from pjh8.prod.google.com ([2002:a17:90b:3f88:b0:2e5:5ffc:1c36])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ed0:b0:2ee:c1d2:bc67
- with SMTP id 98e67ed59e1d1-2f782c99704mr5531429a91.16.1737135406699; Fri, 17
- Jan 2025 09:36:46 -0800 (PST)
-Date: Fri, 17 Jan 2025 09:36:45 -0800
-In-Reply-To: <87ikqd8krp.fsf@redhat.com>
+        bh=H7k5xoXdCenaUvwTYHoCS9O0hkrxJj/QWVxA1v+hnUQ=;
+        b=ksRGAZmUQrqf9+gd6IOytN3Gl3U8GJTXO6EoSCnVXjMFha+U7PCkDjgApYc7pSv7DF
+         czptO/KFdzTWZpbdKANoD98D7amhuq3NOHwNCowcYS3IGBEZRZbqzBmNQ25n0Tm9WHNc
+         kI//1DzOLDRFuD+4XqSCQo1/7+JbmhLxKNcluGMvjVe0rRa8szhjXmT0B59ieCyj3IKC
+         0OhkIsxfJv46B5jU1WFQtZy58FHUwLHYTWtIiSHgxqiOjhpYIncc4XiYIO0HBiUp1XyF
+         DwXgYu1pB15WhoKsX2072tmah5b2vLi/uG3YmoqXr4/ZQmLNHcNImq2E604JNIPzDyrj
+         kqaA==
+X-Gm-Message-State: AOJu0Yw28Kb708tvhunE+n9FU4XCkXhV/Baye96Wlm72iPwvvvHEK+5U
+	wlj9W9gk87fn6XoggDmRPhL1Z10emI5vnNEoCMc1kNi95vDx3w1BwSmzO753Bodn15kUnMonegv
+	izw==
+X-Google-Smtp-Source: AGHT+IE+6C+HICgHPyQFwpWVGVWdEAQv1R4pIztlLJmzMOMRKD6iUi4cmrlkQ+r7zcps7U+HAUbzXsZcO9I=
+X-Received: from pjbta14.prod.google.com ([2002:a17:90b:4ece:b0:2f5:5240:4f0f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:568e:b0:2ee:e158:125b
+ with SMTP id 98e67ed59e1d1-2f782d3238cmr4211446a91.26.1737136302993; Fri, 17
+ Jan 2025 09:51:42 -0800 (PST)
+Date: Fri, 17 Jan 2025 09:51:41 -0800
+In-Reply-To: <37a79ba3-9ce0-479c-a5b0-2bd75d573ed3@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250113222740.1481934-1-seanjc@google.com> <20250113222740.1481934-4-seanjc@google.com>
- <87ikqd8krp.fsf@redhat.com>
-Message-ID: <Z4qVLU_hhwFHmic9@google.com>
-Subject: Re: [PATCH 3/5] KVM: selftests: Explicitly free CPUID array at end of
- Hyper-V CPUID test
+References: <37a79ba3-9ce0-479c-a5b0-2bd75d573ed3@stanley.mountain>
+Message-ID: <Z4qYrXJ4YtvpNztT@google.com>
+Subject: Re: [bug report] KVM: x86: Unify TSC logic (sleeping in atomic?)
 From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Dongjie Zou <zoudongjie@huawei.com>, stable@vger.kernel
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: kvm@vger.kernel.org, Yafang Shao <laoar.shao@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, "Michal =?utf-8?Q?Koutn=C3=BD?=" <mkoutny@suse.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Jan 17, 2025, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > Explicitly free the array of CPUID entries at the end of the Hyper-V CPUID
-> > test, mainly in anticipation of moving management of the array into the
-> > main test helper.
-> >
-> > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> > index 9a0fcc713350..09f9874d7705 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> > @@ -164,6 +164,7 @@ int main(int argc, char *argv[])
-> >  
-> >  	hv_cpuid_entries = kvm_get_supported_hv_cpuid();
-> >  	test_hv_cpuid(hv_cpuid_entries, kvm_cpu_has(X86_FEATURE_VMX));
-> > +	free((void *)hv_cpuid_entries);
-> 
-> vcpu_get_supported_hv_cpuid() allocates memory for the resulting array
-> each time, however, kvm_get_supported_hv_cpuid() was designed after
-> what's now kvm_get_supported_cpuid() (afair) so it has an optimization
-> to ask KVM just once:
-> 
->         static struct kvm_cpuid2 *cpuid;
->         int kvm_fd;
-> 
->         if (cpuid)
->                 return cpuid;
-> 
->         cpuid = allocate_kvm_cpuid2(MAX_NR_CPUID_ENTRIES);
->         kvm_fd = open_kvm_dev_path_or_exit();
-> 	...
-> 
-> and it seems that if we free hv_cpuid_entries here, next time we call
-> kvm_get_supported_hv_cpuid() an already freed memory will be returned.
-> This doesn't matter in in this patch as we're about to quit anyway but
-> with the next one in the series it becomes problematic.
++sched folks
 
-Ow.  I totally missed that.  I'll drop this patch, and then adjust the next one
-to do:
+On Fri, Jan 17, 2025, Dan Carpenter wrote:
+> I don't know why I'm seeing this static checker warning only now.  All
+> this code looks to be about 15 years old...
+> 
+> Commit e48672fa25e8 ("KVM: x86: Unify TSC logic") from Aug 19, 2010
+> (linux-next), leads to the following Smatch static checker warning:
 
-	/*
-	 * Note, the CPUID array returned by the system-scoped helper is a one-
-	 * time allocation, i.e. must not be freed.
-	 */
-	if (vcpu)
-		free((void *)hv_cpuid_entries);
+That's not the problematic commit.  This popped because commit 8722903cbb8f
+("sched: Define sched_clock_irqtime as static key") in the tip tree turned
+sched_clock_irqtime into a static key (it was a simple "int").
 
+https://lore.kernel.org/all/20250103022409.2544-2-laoar.shao@gmail.com
 
-I'll post a v2 once I've actually tested.
+> 	arch/x86/kernel/tsc.c:1214 mark_tsc_unstable()
+> 	warn: sleeping in atomic context
+> 
+> The code path is:
+> 
+> vcpu_load() <- disables preempt
+> -> kvm_arch_vcpu_load()
+>    -> mark_tsc_unstable() <- sleeps
+> 
+> virt/kvm/kvm_main.c
+>    166  void vcpu_load(struct kvm_vcpu *vcpu)
+>    167  {
+>    168          int cpu = get_cpu();
+>                           ^^^^^^^^^^
+> This get_cpu() disables preemption.
+> 
+>    169  
+>    170          __this_cpu_write(kvm_running_vcpu, vcpu);
+>    171          preempt_notifier_register(&vcpu->preempt_notifier);
+>    172          kvm_arch_vcpu_load(vcpu, cpu);
+>    173          put_cpu();
+>    174  }
+> 
+> arch/x86/kvm/x86.c
+>   4979          if (unlikely(vcpu->cpu != cpu) || kvm_check_tsc_unstable()) {
+>   4980                  s64 tsc_delta = !vcpu->arch.last_host_tsc ? 0 :
+>   4981                                  rdtsc() - vcpu->arch.last_host_tsc;
+>   4982                  if (tsc_delta < 0)
+>   4983                          mark_tsc_unstable("KVM discovered backwards TSC");
+>                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> It seems pretty unlikely that we'll get a backwards tsc.
 
-Thanks!
+TSC will go "backwards" if the host is suspended, in which case host TSC gets
+reset to 0.
+
+>     1215         pr_info("Marking TSC unstable due to %s\n", reason);
+>     1216 
+>     1217         clocksource_mark_unstable(&clocksource_tsc_early);
+>     1218         clocksource_mark_unstable(&clocksource_tsc);
+>     1219 }
+> 
+> kernel/jump_label.c
+>    245  void static_key_disable(struct static_key *key)
+>    246  {
+>    247          cpus_read_lock();
+>                 ^^^^^^^^^^^^^^^^
+> This lock has a might_sleep() in it which triggers the static checker
+> warning.
+> 
+>    248          static_key_disable_cpuslocked(key);
+>    249          cpus_read_unlock();
+>    250  }
+> 
+> regards,
+> dan carpenter
 
