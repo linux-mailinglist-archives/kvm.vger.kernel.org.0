@@ -1,235 +1,215 @@
-Return-Path: <kvm+bounces-35801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35802-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 863D5A153B6
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:06:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D73A153E7
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:13:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EDEC1881D1D
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:05:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 934423AB66D
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0C0199FA4;
-	Fri, 17 Jan 2025 16:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D531A2391;
+	Fri, 17 Jan 2025 16:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="GyzbGLfn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YIyLfqKO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3103615852E
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D4719C56D;
+	Fri, 17 Jan 2025 16:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737129919; cv=none; b=nvaeOUfrL+Dkq89jFW3jr7GqqsCIt6xslVg5k0uVpWsjDIhW1/l7k9RotHJIvjeL0Fzb1jPM3bm0TX6cox/sbKJkq9U3vM7x8k6TDE3vGElHOc7goQ+BfEgq1VfjMQQymRLzOrJ5JaL7+AIwj0MBI9X4UJDT5LtBXdBOX8gd70E=
+	t=1737130301; cv=none; b=uLB1UFSq8AK2heCzhXaTIm1rJGWHKI8Fv/3ZAS/PiYntToZSKe+mrwEfI2Mlwk8I2ChiWAgFVidhLRk2BGD4xyKdupos1LfMBfxempqLlEZB2V58vqxkvemhCPpxhLQcdMFs8Rw4NsjQR4D8goAZLp7+2Ms7rmYZp9ra5WagKnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737129919; c=relaxed/simple;
-	bh=EYLm5v7oOPjdKvcj5PKDtD5IHLL4Ov9Rnk0LuHg8dVo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NA2Qa0WMpYUcCV5xlktSGAk2Ve9l+UGSHgD+3LJ84wWz2AaXhpTPb/8B4yZtpw7l068gmKepvDifJojQdAcx9uSn1i8Xbm1EfQmz/+nnrtYx6oLnMRZbwVlFsAWxM4JAC/KAcnvBKgptVZClPQqd1owMg37MrYuITcTzmlg5Rjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=GyzbGLfn; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-436202dd7f6so24990995e9.0
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 08:05:15 -0800 (PST)
+	s=arc-20240116; t=1737130301; c=relaxed/simple;
+	bh=J+c0tdWpIHr0KlbOLBzEFr0vBExsTwyn4LFfRX4AfIk=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PsYQEGA4lQ/dnz9J78njIpDzX9CUpxPhk9WMkcEdt6XIoJ1Xj4gSmg7DLx9C2x1qpKRQBbuHJSJWVCu3B23IgX4ry5kAFi8JF5JRzA5gjvhpm8T+5//RhAnsgBsSFFZqhC29GIYTkh3B+fn/2kWmvgUPnLRyUfJ/VMqOj7PvPgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YIyLfqKO; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-3022484d4e4so21922211fa.1;
+        Fri, 17 Jan 2025 08:11:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1737129914; x=1737734714; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KIKm+b7x8ZPOGG0s06oIRZ9t7O2YmNWgG+lZbVw+Ia8=;
-        b=GyzbGLfn0bF47I/VrVMygT/5f1a1bTGJMgqXpCB6iGz1jmtCj/KnLm+d5YShNVO71d
-         +3Gy23+KotKmsIcpsdmwHAfgRBPpdAdY6sw/9YDQSDnSkwFUjbj5yJnMy4sn/3quBqWP
-         VAjsmnBQeOovN+k1Samvd7HEKZOtCEXNmuhbM/iQJrbpdK2ZZytXiPAzdX2KAScgihEP
-         4niuG97L0On9/tA56h/pw5LgqMseYo/Pc32CiLu4DzbEThBweAU9EeXxAcdgSt3W6DaH
-         cbnl5g+/TRiZfIA08R/NaWKZz1oncZHex8Q/mhOfjMy89k7fujgDbUlRwSIp7t7zdx/K
-         DhNw==
+        d=gmail.com; s=20230601; t=1737130297; x=1737735097; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Mwf/8xvajfVfuiw0AKepwMJBFKP0lwWuKM/onBPK6d8=;
+        b=YIyLfqKO1w01qo4BK1cb7TU/xUkmTl45xJ0GMxOmqkN2Wen8zQTg+bhv3ZeeHT25U7
+         7O5IjAJMlWs3/YdLj06FIn05Dzk0zu7zgUVx7ua/pkNct9ifmmlgJ+Zl4Td0GubyKlbi
+         pQhKOiOodVIlqDij7mnP/U1hL/b48G8olQkTLCG0cI6Gl+VfwY/pnszQx+jKt0SEyf2C
+         dXGsR7jVuLXY0pun1yEaKRTUEnoUBqELV/+h+lepc65AZf0Tv773eeNcZQHhPX7grd32
+         hdfn4KYMTb386Sa3gQrM3da+MY7bFq+0jVuonfNnMyI24U/w26W0HzN/gON8GR3o0sTY
+         /lRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737129914; x=1737734714;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1737130297; x=1737735097;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KIKm+b7x8ZPOGG0s06oIRZ9t7O2YmNWgG+lZbVw+Ia8=;
-        b=m/eRljEY4x47SFLIqlOpyCudDQov0gURES5gFrOYwC9WUnRul19wxqFw561SkknVdc
-         flwXGOLHJNG+fBq+tK8xelPgpGCNyD1KApVCg4y0dsmlclYAn9cUqM0LkIfoClZ93JS0
-         6FIDN7Hw2tkiMu/9j3zJ5a/tx3a8CfNuIEf2zASWAa++ZQ+aji3iOBZoQx3pvSBtVDfu
-         t7A3BA9tMGtZAtM5pJYhjfpvXfp3T4hy+/N2IbePxVOIVrN6/WBpmr1xOrcfqPipp9WQ
-         2aXGEpXgBdhg2VlxEhYXjY21k+VJZ99LhjvYgANz2zDAz9iePHzqr08Jus76aRSQT0fJ
-         somw==
-X-Forwarded-Encrypted: i=1; AJvYcCVw8euzpMlhltpcUbsZZplDGg+thUI7QraGjysazosF8sx2p1HSTnQxJtaDbSvEFMNRkLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5SeguEjLepuA6bYYMOnyGSvVF1jS74dh6hjRCoJDkf2MxamAG
-	6vUQmuCcZkZ4fLDxiWtSF6Ikf1FHs9UjLxlqWyJqQpee664V/KQQ1gVIseX6Rhg=
-X-Gm-Gg: ASbGncvqftAfFWAgXpTyVOtBoNWIgjkkgtHlNg+cqsFyHEZtXVpr77rZur+usRSUyoG
-	IklcjNom/Fp2w93/+ZQD2VLVOMBH5osCsu+845fh5LvVsCe/xmv9wN2QBXt6og1OIpUA2VoLSEG
-	L+Tne63hRWmJn7wX4Bst5qA8scI4QdSgPaannsj1CaanMP8UMoGOftK1acvssyrhO9VsgnDQoew
-	eor50DSamcM2W5eHubZNXR/XDkN2cYnKVPmz425XgEjLQCzCGj/6ti1ox7BZqrwSOh+hXIj8PK7
-	XIIR8gkvAnxcEuZKXlMRQWHv9g==
-X-Google-Smtp-Source: AGHT+IEo/qRGSopdNCymFI4uatmcJLeEtoysYWzXy3BlYUa/so7QnTZc8ShIOgGoZZx4+/0Qsn2jCA==
-X-Received: by 2002:a5d:648a:0:b0:385:f349:fffb with SMTP id ffacd0b85a97d-38bf57bfba2mr3199279f8f.45.1737129914326;
-        Fri, 17 Jan 2025 08:05:14 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf322ac88sm2916424f8f.54.2025.01.17.08.05.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jan 2025 08:05:13 -0800 (PST)
-Message-ID: <dec723d7-fc16-4edb-b684-1844b08391ba@rivosinc.com>
-Date: Fri, 17 Jan 2025 17:05:13 +0100
+        bh=Mwf/8xvajfVfuiw0AKepwMJBFKP0lwWuKM/onBPK6d8=;
+        b=XrqquKPIkl0V6AWxmuoH4Br0q2h8D7YBWuUZzeGXvafyniy4pgX/AojwrybKV+ELym
+         lEyHsbWAEl01s3ZFmyrF9vkoT9pP1QhC9eoqVfBdBzoviuTFU8W6rR8s4PqLWFZfyXJq
+         batrzUmKrM9oiBYGmy5zG7R2n4/wdhaEJkrcJ1Jo2oIBEm+6afWusQhiTRvUbzvWjx0H
+         RCSJ01mc+QIAfQq87GMelwyV4zfhkRmdNMMmdm3Q/BjRD94v3ZNb5iH6UnNWhbQL1eIH
+         Ub16OtwMZwONS+1kUPBVYjlQnYSEfNxU+N6bh1tU+GgKuKulP10XlswltvZKDG8MoO7G
+         Wbqg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/fLWuoidPz8cVBtwKS6KxXM1v6JLqam4lfJ657h2zvZiNhOD8xHGn42cvcBpWAF+U7DRvP79J/yQDfw==@vger.kernel.org, AJvYcCU8//FFn0GFAVyPXd5Yykj7vDil6Sc9xWAmeBtEHTjFmJeZldHIadyATDGGshmEgiwaUV+y@vger.kernel.org, AJvYcCUkdKOoNinnv+xRTrrRPBUsxnfmgJUrWS5gwxJuynMsYqOI1wcA1hkldij+KbnMKMuMxaR+Ny2+3kwc0YySV1n7@vger.kernel.org, AJvYcCUl0MDFfyKHU8vjqxWqL9BQMQ+r+/b1tPSUffnNDqFJBvbWjZFy+gIGtDhdphjOfE5iyPfF@vger.kernel.org, AJvYcCVRcF7cJYinXm5Leb3yprFu56a0xEtColtOENPXeXq14sGWKj9MvUV5WJG/K3GRNuJ3xK8=@vger.kernel.org, AJvYcCVi25GCqJjYFdI7HjgDZ4mkWukstFgnHFBBwB05LiVXNIsDd4ogTAYNHf8oztdyipWwS5GT+y2LY4ogw9Pk@vger.kernel.org, AJvYcCWbMFyM5uPi8lIkxgGVVXGQ0rHG07cxZFY5XRClWELpbtUDVaOmUrGO4XomdcRBSD59wqvjS9FXgD6t5lm10Mgl@vger.kernel.org, AJvYcCXBDMvkB2RvSfQIQzZ0IoBv89X/1o7/LwlhJ8n4C3MBVna1yEzxM1WCgcFZxyLXnVD9kg3WLeoL4PH5wqUDrwXWyg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBF0KbmlFxBiLO2Tz/iI6MMGlv1lSdMV/71NaXnV5z+qltvAYQ
+	pyj2LXPa/5iy/vFAJXhf3988+7SlVQgwkNV3yEC82E9wVJBDA9Pg
+X-Gm-Gg: ASbGncuWuFkXI0z41O9QJvntg3khxuglYw5Ln4FJuG0VF9ULY5LXswBLFHOjFx0DZS5
+	S5ReJwjLeATLEak++QrHbR3a289Z0HKLd+NVQrqoU74rh7+THtZfsrGZGoObsMSyvc5F/9cLjqQ
+	1ZZZ07yD05Kf414UCjYsN3hU96awDzZVkeCFwz5om9SXLFLpgqr66CgDFjTHcBLMiIx52Gm0vsI
+	DexUf1i6APU42IPei5Osd4ZRCG6FYw9qDKXnlUsfGHn9HUhxA0GpbEdzFgVWHMH9C5gH92KK1bF
+	NIT1uzwunIU=
+X-Google-Smtp-Source: AGHT+IFH9kfhzB42dITXdZg9xXnIuIrCtLCGkWK8kDwmfncKlFAzifmDHoUZVUHtKkW5iC7Zz8oHDA==
+X-Received: by 2002:a2e:bc27:0:b0:302:40ec:a1b3 with SMTP id 38308e7fff4ca-3072caa166amr12690871fa.21.1737130297134;
+        Fri, 17 Jan 2025 08:11:37 -0800 (PST)
+Received: from pc636 (host-217-213-93-172.mobileonline.telia.com. [217.213.93.172])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3072a4ed4bcsm4854351fa.71.2025.01.17.08.11.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 08:11:36 -0800 (PST)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Fri, 17 Jan 2025 17:11:30 +0100
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: Jann Horn <jannh@google.com>, linux-kernel@vger.kernel.org,
+	x86@kernel.org, virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
+	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+	linux-arch@vger.kernel.org, rcu@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	Juergen Gross <jgross@suse.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"Liang, Kan" <kan.liang@linux.intel.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Jason Baron <jbaron@akamai.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Clark Williams <williams@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Tomas Glozar <tglozar@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Kees Cook <kees@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Rong Xu <xur@google.com>,
+	Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Yosry Ahmed <yosryahmed@google.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>,
+	Jinghao Jia <jinghao7@illinois.edu>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>
+Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer
+ flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
+Message-ID: <Z4qBMqcMg16p57av@pc636>
+References: <20250114175143.81438-1-vschneid@redhat.com>
+ <20250114175143.81438-30-vschneid@redhat.com>
+ <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com>
+ <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/6] RISC-V: KVM: add support for
- SBI_FWFT_MISALIGNED_DELEG
-To: Samuel Holland <samuel.holland@sifive.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org
-References: <20250106154847.1100344-1-cleger@rivosinc.com>
- <20250106154847.1100344-7-cleger@rivosinc.com>
- <b3f54d34-bc77-46db-88da-70c0c602081f@sifive.com>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <b3f54d34-bc77-46db-88da-70c0c602081f@sifive.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 
-
-
-On 11/01/2025 00:55, Samuel Holland wrote:
-> On 2025-01-06 9:48 AM, Clément Léger wrote:
->> SBI_FWFT_MISALIGNED_DELEG needs hedeleg to be modified to delegate
->> misaligned load/store exceptions. Save and restore it during CPU
->> load/put.
->>
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> ---
->>  arch/riscv/kvm/vcpu.c          |  3 +++
->>  arch/riscv/kvm/vcpu_sbi_fwft.c | 39 ++++++++++++++++++++++++++++++++++
->>  2 files changed, 42 insertions(+)
->>
->> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
->> index 3420a4a62c94..bb6f788d46f5 100644
->> --- a/arch/riscv/kvm/vcpu.c
->> +++ b/arch/riscv/kvm/vcpu.c
->> @@ -641,6 +641,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>  {
->>  	void *nsh;
->>  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
->> +	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
->>  
->>  	vcpu->cpu = -1;
->>  
->> @@ -666,6 +667,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>  		csr->vstval = nacl_csr_read(nsh, CSR_VSTVAL);
->>  		csr->hvip = nacl_csr_read(nsh, CSR_HVIP);
->>  		csr->vsatp = nacl_csr_read(nsh, CSR_VSATP);
->> +		cfg->hedeleg = nacl_csr_read(nsh, CSR_HEDELEG);
->>  	} else {
->>  		csr->vsstatus = csr_read(CSR_VSSTATUS);
->>  		csr->vsie = csr_read(CSR_VSIE);
->> @@ -676,6 +678,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>  		csr->vstval = csr_read(CSR_VSTVAL);
->>  		csr->hvip = csr_read(CSR_HVIP);
->>  		csr->vsatp = csr_read(CSR_VSATP);
->> +		cfg->hedeleg = csr_read(CSR_HEDELEG);
->>  	}
->>  }
->>  
->> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
->> index 55433e805baa..1e85ff6666af 100644
->> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
->> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
->> @@ -14,6 +14,8 @@
->>  #include <asm/kvm_vcpu_sbi.h>
->>  #include <asm/kvm_vcpu_sbi_fwft.h>
->>  
->> +#define MIS_DELEG (1UL << EXC_LOAD_MISALIGNED | 1UL << EXC_STORE_MISALIGNED)
->> +
->>  static const enum sbi_fwft_feature_t kvm_fwft_defined_features[] = {
->>  	SBI_FWFT_MISALIGNED_EXC_DELEG,
->>  	SBI_FWFT_LANDING_PAD,
->> @@ -35,7 +37,44 @@ static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
->>  	return false;
->>  }
->>  
->> +static bool kvm_sbi_fwft_misaligned_delegation_supported(struct kvm_vcpu *vcpu)
->> +{
->> +	if (!unaligned_ctl_available())
+On Fri, Jan 17, 2025 at 04:25:45PM +0100, Valentin Schneider wrote:
+> On 14/01/25 19:16, Jann Horn wrote:
+> > On Tue, Jan 14, 2025 at 6:51 PM Valentin Schneider <vschneid@redhat.com> wrote:
+> >> vunmap()'s issued from housekeeping CPUs are a relatively common source of
+> >> interference for isolated NOHZ_FULL CPUs, as they are hit by the
+> >> flush_tlb_kernel_range() IPIs.
+> >>
+> >> Given that CPUs executing in userspace do not access data in the vmalloc
+> >> range, these IPIs could be deferred until their next kernel entry.
+> >>
+> >> Deferral vs early entry danger zone
+> >> ===================================
+> >>
+> >> This requires a guarantee that nothing in the vmalloc range can be vunmap'd
+> >> and then accessed in early entry code.
+> >
+> > In other words, it needs a guarantee that no vmalloc allocations that
+> > have been created in the vmalloc region while the CPU was idle can
+> > then be accessed during early entry, right?
 > 
-> This seems like the wrong condition. Patch 2 requests delegation regardless of
-> what probing detects. For MISALIGNED_SCALAR_FAST, the delegation likely doesn't> change any actual behavior, because the hardware likely never raises the
-> exception. But it does ensure M-mode never emulates anything, so if the
-> exception were to occur, the kernel has the choice whether to handle it. And
-> this lets us provide the same guarantee to KVM guests. So I think this feature
-> should also be supported if we successfully delegated the exception on the host
-> side.
-
-Not sure to completely follow you here but patch 2 actually does the
-reverse of what you said. We request delegation from SBI *before*
-probing so that allows probing to see if we (kernel) receives misaligned
-accesses traps and thus set MISALIGNED_SCALAR_EMULATED.
-
-But if I understood correctly, you mean that guest delegation should
-also be available to guest in case misaligned access were delegated by
-the SBI to the host which I agree. I think this condition should be
-reworked to report the delegation status itself and not the misaligned
-access speed that was detected
-
-Thanks,
-
-Clément
-
-
+> I'm not sure if that would be a problem (not an mm expert, please do
+> correct me) - looking at vmap_pages_range(), flush_cache_vmap() isn't
+> deferred anyway.
 > 
->> +		return false;
->> +
->> +	return true;
->> +}
->> +
->> +static int kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
->> +					struct kvm_sbi_fwft_config *conf,
->> +					unsigned long value)
->> +{
->> +	if (value == 1)
->> +		csr_set(CSR_HEDELEG, MIS_DELEG);
->> +	else if (value == 0)
->> +		csr_clear(CSR_HEDELEG, MIS_DELEG);
->> +	else
->> +		return SBI_ERR_INVALID_PARAM;
->> +
->> +	return SBI_SUCCESS;
->> +}
->> +
->> +static int kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
->> +					struct kvm_sbi_fwft_config *conf,
->> +					unsigned long *value)
->> +{
->> +	*value = (csr_read(CSR_HEDELEG) & MIS_DELEG) != 0;
->> +
->> +	return SBI_SUCCESS;
->> +}
->> +
->>  static const struct kvm_sbi_fwft_feature features[] = {
->> +	{
->> +		.id = SBI_FWFT_MISALIGNED_EXC_DELEG,
->> +		.supported = kvm_sbi_fwft_misaligned_delegation_supported,
->> +		.set = kvm_sbi_fwft_set_misaligned_delegation,
->> +		.get = kvm_sbi_fwft_get_misaligned_delegation,
->> +	}
+> So after vmapping something, I wouldn't expect isolated CPUs to have
+> invalid TLB entries for the newly vmapped page.
 > 
-> nit: Please add a trailing comma here as future patches will extend the array.
+> However, upon vunmap'ing something, the TLB flush is deferred, and thus
+> stale TLB entries can and will remain on isolated CPUs, up until they
+> execute the deferred flush themselves (IOW for the entire duration of the
+> "danger zone").
 > 
-> Regards,
-> Samuel
+> Does that make sense?
 > 
->>  };
->>  
->>  static struct kvm_sbi_fwft_config *
-> 
+Probably i am missing something and need to have a look at your patches,
+but how do you guarantee that no-one map same are that you defer for TLB
+flushing?
 
+As noted by Jann, we already defer a TLB flushing by backing freed areas
+until certain threshold and just after we cross it we do a flush.
+
+--
+Uladzislau Rezki
 
