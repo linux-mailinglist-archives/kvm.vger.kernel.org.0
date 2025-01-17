@@ -1,296 +1,169 @@
-Return-Path: <kvm+bounces-35815-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7435A15451
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:31:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 844E6A15441
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:30:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4CDD3A6A8A
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:31:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B986167613
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8721A239F;
-	Fri, 17 Jan 2025 16:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E2219F121;
+	Fri, 17 Jan 2025 16:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nXWlJ6Vk"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kjxTiCZm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDC919F464
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7DC19E97F;
+	Fri, 17 Jan 2025 16:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737131424; cv=none; b=e/l79LZQtdOaaU4xk0TiPDWCNiFBSA5bSeEE4kQcc/Kw7RoeboMYMhFholq1+J8T97fm7evSsbndTAysf9NEjgRtZxm9Ylvyha4X5TR4IxoXi/T1VPejXFGrvoO8hcvgy13pf80KftkLoa+BTwUEBl8vUcjZF1hWmHu5moa50xk=
+	t=1737131408; cv=none; b=c3M1byE7Yi7sISlEDceBpMkuV4Q8+IZVTMtd4fyKvGUn2AcDgrEeJToxoLn4gB+ou0jna5IV/HPhN8uMVFEDfVWMa2mHQ7OsUD8GsXBhcm1B9x3xhYd1VqabWPx98qPHJWYPMS8jScnZX0rVwtyGrEQ9wk68brmTIsy5MKxuK04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737131424; c=relaxed/simple;
-	bh=Tl0nJPPYuN0KRI0CU4MgAmSjC5la+BBbp2bCwXMtbdw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RA+2m+800YSNPtEgmhYrYOUOQd2dAeZNGEPGImj9yb9peEZ+GpHurLt8jgOvLDIeTXAgDgOHKxMe0RVmu00udLZGJN1PkmXc5qV2yt6hXfj2h3y0ziRKSYOz/UUZY+hS06987DrYynjrkTXoZ6Sr7gFhno1B9nkw/CuIrX5gsz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nXWlJ6Vk; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-43624b08181so12023325e9.0
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 08:30:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737131421; x=1737736221; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBxaOc1Oq/7r5hpyeIybyfEKVewLBSFq8w5fQigelgs=;
-        b=nXWlJ6VkSi74SiJXSRLuSdDCo3s7B5hgHOTmI28iJ4R4V9J1VqYQOFiQj0yqQ14jH/
-         Ilehpo7esHjJO5fWx3IoVjBnO44Crt8i7NvCxTAfCw18PSUD3YFndQQK6a4RKawsqzn7
-         FheKA/Y5YgrN1E5/rQjFIEFe1CFQswmjUhhtckB8S1NeUw9oDDU0Si3ct0WFkxiuYjFc
-         ScGo2bbLddJbYOeFiw3tgCNVAu1PKcCHWCZiFzmUY3DI8lrmg2zNREG9nOJwQq8ffOL7
-         KNBToCNy8snCsVrR0k3avk2kZ3TZ6b+cvuBIJFads8qtUoa/oI+IftUMDKRzvtobQx4R
-         B1Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737131421; x=1737736221;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBxaOc1Oq/7r5hpyeIybyfEKVewLBSFq8w5fQigelgs=;
-        b=YO0Tma9lZmKLmvaVxeruycpeJoYmBzZlVfKN2TrrrqgaV0B5sw2ep6v/1Pe0bywP/k
-         hJpI1AOdhPTLFxW69CSKDj+pdbbXhBtCdO7polN/a29e6/xmQVZAZVP9aIre2YGj29BQ
-         ps/uQkcNflFaEilgViqAziLh0nHSqTYD34CV769Fjl5G+d/QkgIKc45w/zJp8ZxfLbK3
-         MfnwwwsYNrBrULoDBPkpj2t6x7s4d6ko32yMCau6LZxoH8bEaU25in1kv/FVFEqzTmpM
-         fKrgJrvgWRGNdapDC9bzr8ys1OaqH2tqUpOCStGSOUbLiRpbntdQK9SUmbvpPmR2GxUL
-         Om2A==
-X-Gm-Message-State: AOJu0Yzds15nZsv+pWr8kr5Xy5DobWkmt8A68ZzVhhH3ickc+rnV0EV2
-	BW3fsW00SV5TP+ok/S5Djbb+aJZ/Uz6QA2U5szBcbzBUmL6Dz3rgZ4J1fXWl5NK1tMxW/XofjXa
-	TP/fzUQ2Geru5OyHChPtIsZXMchFRlNTmT42m4RNBQm3H1xFpEGlhdjA+nJoAWBQzvCa5O7/Hd5
-	tZlMSK2sfQXL9sJXVUhdjKYUw=
-X-Google-Smtp-Source: AGHT+IFkVUsgGxCt8u55ieXPYflUnbcSMN6hxhrnCXAB/29entNP9EJfjs2xWohE/JZhqpVEKXf+xlIxAw==
-X-Received: from wmqe20.prod.google.com ([2002:a05:600c:4e54:b0:434:f350:9fc])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:8712:b0:436:1b0b:2633
- with SMTP id 5b1f17b1804b1-438918d9008mr33597535e9.9.1737131420833; Fri, 17
- Jan 2025 08:30:20 -0800 (PST)
-Date: Fri, 17 Jan 2025 16:29:54 +0000
-In-Reply-To: <20250117163001.2326672-1-tabba@google.com>
+	s=arc-20240116; t=1737131408; c=relaxed/simple;
+	bh=bId4wEBRFLBHUHfZlv5z5tp41OgM+L/tk3pL8D1TE1M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iOL4mCyRkE5eGMGyNLuvLKiYHcgq01lRH1HAXfLtBCS4a91Sq8g6c7FNmvJ13H1KXmkgU3QXTSJzQor2FMZCaBu135ZbTcQlu9fWVtKRo64RZHBEuIM3BEytGcXq77MaV+DFjlcatpB8B/oYHgTTY9U1+48SKiLV0TNISZ18CIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kjxTiCZm; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HE6Px8021268;
+	Fri, 17 Jan 2025 16:30:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=zJy4PY
+	vzNanPP7E6WBYyzxKpdgX9yJ3KTl5KENiBnU8=; b=kjxTiCZm01FarPgMQuVZBx
+	kLFLfROS0zBxhvWBKFhzZzT7Y/q81rCbiNyC+hDQMbbqPsJ/QaCDC4ddhTlTy65+
+	VCPahXbqAIRuMNlsW2IxBRPLClxuQeX7YfSmGjk+K8YiTF6ctt8Z4ldaVRjRjpW9
+	uZst8/QlIN7RzFCBodww0wQ8f5fDGocIVtpYplz7STfWjRlY5XYQZ7x/hkcK5gBw
+	TrAIbtO7XI684kgskEQyZGXaY28iw8BdtXm74OTq4H6RTCSxi34nur1G6olkyXEl
+	Tn51phEFSV7Pqvg5mLEwbp+fBYhZ8R0h13yUm4c/GwBqBlJENqTSajsq9DOu+y1w
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447rp58qhc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 16:30:01 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HGU0n8017451;
+	Fri, 17 Jan 2025 16:30:00 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447rp58qh7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 16:30:00 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HDYPxK004576;
+	Fri, 17 Jan 2025 16:30:00 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4442yt3wbs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 16:30:00 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HGTuJp56557870
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Jan 2025 16:29:56 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9025A20040;
+	Fri, 17 Jan 2025 16:29:56 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D7A0B2004D;
+	Fri, 17 Jan 2025 16:29:55 +0000 (GMT)
+Received: from [9.171.8.211] (unknown [9.171.8.211])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Jan 2025 16:29:55 +0000 (GMT)
+Message-ID: <5ab8dfc2-077f-4151-818c-b120c3671ec3@linux.ibm.com>
+Date: Fri, 17 Jan 2025 17:29:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250117163001.2326672-1-tabba@google.com>
-X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250117163001.2326672-9-tabba@google.com>
-Subject: [RFC PATCH v5 08/15] KVM: guest_memfd: Add guest_memfd support to kvm_(read|/write)_guest_page()
-From: Fuad Tabba <tabba@google.com>
-To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
-Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 08/15] KVM: s390: get rid of gmap_translate()
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        seanjc@google.com, seiden@linux.ibm.com
+References: <20250116113355.32184-1-imbrenda@linux.ibm.com>
+ <20250116113355.32184-9-imbrenda@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250116113355.32184-9-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ho4iPq328Zgj2A77xSn11FXQbiVlSFR-
+X-Proofpoint-ORIG-GUID: ajdlhbMNgUEQZ0n3GhgFE1RuxXuLOsxx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-17_06,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=619
+ impostorscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 malwarescore=0
+ priorityscore=1501 clxscore=1015 spamscore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501170130
 
-Make kvm_(read|/write)_guest_page() capable of accessing guest
-memory for slots that don't have a userspace address, but only if
-the memory is mappable, which also indicates that it is
-accessible by the host.
+On 1/16/25 12:33 PM, Claudio Imbrenda wrote:
+> Add gpa_to_hva(), which uses memslots, and use it to replace all uses
+> of gmap_translate().
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/gmap.h |  1 -
+>   arch/s390/kvm/interrupt.c    | 19 +++++++++++--------
+>   arch/s390/kvm/kvm-s390.h     |  9 +++++++++
+>   arch/s390/mm/gmap.c          | 20 --------------------
+>   4 files changed, 20 insertions(+), 29 deletions(-)
+> 
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- virt/kvm/kvm_main.c | 133 +++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 114 insertions(+), 19 deletions(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index fffff01cebe7..53692feb6213 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3184,23 +3184,110 @@ int kvm_gmem_clear_mappable(struct kvm *kvm, gfn_t start, gfn_t end)
- 	return r;
- }
- 
-+static int __kvm_read_guest_memfd_page(struct kvm *kvm,
-+				       struct kvm_memory_slot *slot,
-+				       gfn_t gfn, void *data, int offset,
-+				       int len)
-+{
-+	struct page *page;
-+	u64 pfn;
-+	int r;
-+
-+	/*
-+	 * Holds the folio lock until after checking whether it can be faulted
-+	 * in, to avoid races with paths that change a folio's mappability.
-+	 */
-+	r = kvm_gmem_get_pfn_locked(kvm, slot, gfn, &pfn, &page, NULL);
-+	if (r)
-+		return r;
-+
-+	if (!kvm_gmem_is_mappable(kvm, gfn, gfn + 1)) {
-+		r = -EPERM;
-+		goto unlock;
-+	}
-+	memcpy(data, page_address(page) + offset, len);
-+unlock:
-+	unlock_page(page);
-+	if (r)
-+		put_page(page);
-+	else
-+		kvm_release_page_clean(page);
-+
-+	return r;
-+}
-+
-+static int __kvm_write_guest_memfd_page(struct kvm *kvm,
-+					struct kvm_memory_slot *slot,
-+					gfn_t gfn, const void *data,
-+					int offset, int len)
-+{
-+	struct page *page;
-+	u64 pfn;
-+	int r;
-+
-+	/*
-+	 * Holds the folio lock until after checking whether it can be faulted
-+	 * in, to avoid races with paths that change a folio's mappability.
-+	 */
-+	r = kvm_gmem_get_pfn_locked(kvm, slot, gfn, &pfn, &page, NULL);
-+	if (r)
-+		return r;
-+
-+	if (!kvm_gmem_is_mappable(kvm, gfn, gfn + 1)) {
-+		r = -EPERM;
-+		goto unlock;
-+	}
-+	memcpy(page_address(page) + offset, data, len);
-+unlock:
-+	unlock_page(page);
-+	if (r)
-+		put_page(page);
-+	else
-+		kvm_release_page_dirty(page);
-+
-+	return r;
-+}
-+#else
-+static int __kvm_read_guest_memfd_page(struct kvm *kvm,
-+				       struct kvm_memory_slot *slot,
-+				       gfn_t gfn, void *data, int offset,
-+				       int len)
-+{
-+	WARN_ON_ONCE(1);
-+	return -EIO;
-+}
-+
-+static int __kvm_write_guest_memfd_page(struct kvm *kvm,
-+					struct kvm_memory_slot *slot,
-+					gfn_t gfn, const void *data,
-+					int offset, int len)
-+{
-+	WARN_ON_ONCE(1);
-+	return -EIO;
-+}
- #endif /* CONFIG_KVM_GMEM_MAPPABLE */
- 
- /* Copy @len bytes from guest memory at '(@gfn * PAGE_SIZE) + @offset' to @data */
--static int __kvm_read_guest_page(struct kvm_memory_slot *slot, gfn_t gfn,
--				 void *data, int offset, int len)
-+
-+static int __kvm_read_guest_page(struct kvm *kvm, struct kvm_memory_slot *slot,
-+				 gfn_t gfn, void *data, int offset, int len)
- {
--	int r;
- 	unsigned long addr;
- 
- 	if (WARN_ON_ONCE(offset + len > PAGE_SIZE))
- 		return -EFAULT;
- 
-+	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE) &&
-+	    kvm_slot_can_be_private(slot) &&
-+	    !slot->userspace_addr) {
-+		return __kvm_read_guest_memfd_page(kvm, slot, gfn, data,
-+						   offset, len);
-+	}
-+
- 	addr = gfn_to_hva_memslot_prot(slot, gfn, NULL);
- 	if (kvm_is_error_hva(addr))
- 		return -EFAULT;
--	r = __copy_from_user(data, (void __user *)addr + offset, len);
--	if (r)
-+	if (__copy_from_user(data, (void __user *)addr + offset, len))
- 		return -EFAULT;
- 	return 0;
- }
-@@ -3210,7 +3297,7 @@ int kvm_read_guest_page(struct kvm *kvm, gfn_t gfn, void *data, int offset,
- {
- 	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
- 
--	return __kvm_read_guest_page(slot, gfn, data, offset, len);
-+	return __kvm_read_guest_page(kvm, slot, gfn, data, offset, len);
- }
- EXPORT_SYMBOL_GPL(kvm_read_guest_page);
- 
-@@ -3219,7 +3306,7 @@ int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, void *data,
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 
--	return __kvm_read_guest_page(slot, gfn, data, offset, len);
-+	return __kvm_read_guest_page(vcpu->kvm, slot, gfn, data, offset, len);
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_page);
- 
-@@ -3296,22 +3383,30 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
- 
- /* Copy @len bytes from @data into guest memory at '(@gfn * PAGE_SIZE) + @offset' */
- static int __kvm_write_guest_page(struct kvm *kvm,
--				  struct kvm_memory_slot *memslot, gfn_t gfn,
--			          const void *data, int offset, int len)
-+				  struct kvm_memory_slot *slot, gfn_t gfn,
-+				  const void *data, int offset, int len)
- {
--	int r;
--	unsigned long addr;
--
- 	if (WARN_ON_ONCE(offset + len > PAGE_SIZE))
- 		return -EFAULT;
- 
--	addr = gfn_to_hva_memslot(memslot, gfn);
--	if (kvm_is_error_hva(addr))
--		return -EFAULT;
--	r = __copy_to_user((void __user *)addr + offset, data, len);
--	if (r)
--		return -EFAULT;
--	mark_page_dirty_in_slot(kvm, memslot, gfn);
-+	if (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE) &&
-+	    kvm_slot_can_be_private(slot) &&
-+	    !slot->userspace_addr) {
-+		int r = __kvm_write_guest_memfd_page(kvm, slot, gfn, data,
-+						     offset, len);
-+
-+		if (r)
-+			return r;
-+	} else {
-+		unsigned long addr = gfn_to_hva_memslot(slot, gfn);
-+
-+		if (kvm_is_error_hva(addr))
-+			return -EFAULT;
-+		if (__copy_to_user((void __user *)addr + offset, data, len))
-+			return -EFAULT;
-+	}
-+
-+	mark_page_dirty_in_slot(kvm, slot, gfn);
- 	return 0;
- }
- 
--- 
-2.48.0.rc2.279.g1de40edade-goog
-
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
