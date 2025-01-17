@@ -1,105 +1,148 @@
-Return-Path: <kvm+bounces-35799-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35800-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C173A1534D
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:55:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42B9EA153B4
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:06:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BCC41682E3
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:55:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E3AD188CD22
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:05:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BB219AD86;
-	Fri, 17 Jan 2025 15:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBE70198822;
+	Fri, 17 Jan 2025 16:04:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UWPTeZyz"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MBfbvVTz"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB2115696E;
-	Fri, 17 Jan 2025 15:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5855D189F3F;
+	Fri, 17 Jan 2025 16:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737129319; cv=none; b=KAlx53uhjXuIgehj9fYBHeFvdVmNH04mYCnfZiqvgQ8nRQAOeKvPA0AzljceiXVanq+S3487p+IHSAQOzQZoXifa+H4JtjKskMPzMdexJUYJ7ZmGXilFrzIjnVuLiWrYE9E6GilJnh7hveNbO746A86PGKyH4FVhEK2My0+2Qs0=
+	t=1737129856; cv=none; b=M+3pLm1qZmURyMiI+ckH4y1jKli8w8TAKg3RmHr9JOLPd2azgy60hgmFCIBF1jBmp5nGQeRrDoRGl8e3qZj9WcAdfzrW6bkw6c10fdrDABGCk9t59Sh5RDIa09IbgjFi8M+D4CQ1i58LXfE/8s8/8bOISgpjKgsv72o0aj7dMqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737129319; c=relaxed/simple;
-	bh=GWwWFz6AfYN1HCwuIXFKoxyOZzPdX4Oqj/Ww9F2nAZg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z0YgNJrfOpBhGcy0vyfz/5xJ+qMry0UJY2tuNHeDPkiqS8YlVlBacsN/tq4asIQRsc/tdbSL4GqOYLeEPET3/lRueASkq1E7GGXtgP6VUn/VBne0d6EPZeGSMV8lpTQix3lPw0j97vAtNGooA8/7Gw8N1wBbRz8Fcx1RRLWDO8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UWPTeZyz; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1737129856; c=relaxed/simple;
+	bh=wiWaE+QH0fmjOoXJA0MDBRg5KlT+Ii7gfPeP/GrQjuo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vDKNWHXVbBCXuWAFWv8QCke6h4Bfw1a16qnEDQOfttDQxjw4BZiIKK9JrNkZlh+vSfLMn74a5U66vxVGd6ktScFjjl1jCnD4uS11/r24VfFTaacM+8L1/uy6B6zhLSkENiswSA9WVZ6Ofnhv4GKUQe5rvkXFiickE23dR5KfNnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MBfbvVTz; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HE6Vv5021746;
-	Fri, 17 Jan 2025 15:55:06 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HE6POM021321;
+	Fri, 17 Jan 2025 16:04:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=9pxzPosG9tCF7D85ZK70xr6tUxFwzJ
-	EX6i2GcoDtKZc=; b=UWPTeZyza5aFXjZJIPPak795yY/Y1CneKjEtXAcD3DCLLE
-	hbp9etJxHVw/nhCCo1bxWXU7IKP0DgL9fMiUHkpxwruF+yc3dPqmhoCAmlh+peFF
-	oCxiIvOWKR/EcSniCpCCDckZ7Q8LvvU1RMK0WEMeVRL35EFof7lB0swKbC/rT/aJ
-	wvKb3ZjmI1x/i54R0OpQo9QkA7ieaVamQCl0PX1p30zQdfnPls70X70KgIZuGOkW
-	ji6meW3+Qt0rt5GN7339Rd6S44uuHphPBZoV+iPgWyo30ZAbzoaEurH55JXb+HHY
-	Wb1NJ3EM2ubYsh7SktcnNLXCRav26YtAzmQaPh0w==
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=9Xm8Jo
+	pcy0bMQCotKnO8sGmsQkoBGaBLD5v3ZkcsGrM=; b=MBfbvVTzmtR4nZksivkQi8
+	PR5HpGiauijggX9bKQRINilpgQTPfshpzSKHQCj4PauRhPutWNQN/8yr8p+WDPHe
+	OtLDTryNBSq8xvTzv2/vxXgd9VV4SbL144su9/5z1gYsACW+o++yIrEyf5Q8VmCw
+	LATB0RmYDh/OOm2IRMJfqAC31wJcxCZDBiPM7IvyBiMl+e6iTGsaQNuq/PJSPGFF
+	rn2gcLkkWTwbQUtfF91XAXNvNI+dfgOu0kOmc2RFvITQc0QIvWcD9QTIYbu7p58h
+	e/X9j+85N8q/UYul+z9tueE4KBMVrSHxOmZCdp2owAwueBWIihsgtHk7QkKNC9eA
+	==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447rp58h1h-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447rp58j9b-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:55:06 +0000 (GMT)
+	Fri, 17 Jan 2025 16:04:09 +0000 (GMT)
 Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HFpAN8024961;
-	Fri, 17 Jan 2025 15:55:05 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447rp58h1f-1
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HG49ii018884;
+	Fri, 17 Jan 2025 16:04:09 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447rp58j99-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:55:05 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HEoe7u007519;
-	Fri, 17 Jan 2025 15:55:05 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443ynkhwg-1
+	Fri, 17 Jan 2025 16:04:09 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HE7MZY004571;
+	Fri, 17 Jan 2025 16:04:08 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4442yt3s5c-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:55:05 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HFt1Ji53281124
+	Fri, 17 Jan 2025 16:04:08 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HG442N62062966
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jan 2025 15:55:01 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4633F20043;
-	Fri, 17 Jan 2025 15:55:01 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A158A20040;
-	Fri, 17 Jan 2025 15:54:58 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.124.211.105])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 17 Jan 2025 15:54:58 +0000 (GMT)
-Date: Fri, 17 Jan 2025 21:24:55 +0530
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: Vaibhav Jain <vaibhav@linux.ibm.com>
-Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, kconsul@linux.ibm.com, amachhiw@linux.ibm.com
-Subject: Re: [PATCH v2 5/6] powerpc/book3s-hv-pmu: Implement GSB message-ops
- for hostwide counters
-Message-ID: <rygo7e6w6kh2ecucawtqkphyko2kbzoi3fcp4nnkcebcdaadkj@smuvnl7jw5ys>
-References: <20250115143948.369379-1-vaibhav@linux.ibm.com>
- <20250115143948.369379-6-vaibhav@linux.ibm.com>
+	Fri, 17 Jan 2025 16:04:04 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C0DEC20043;
+	Fri, 17 Jan 2025 16:04:04 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E937F20040;
+	Fri, 17 Jan 2025 16:04:03 +0000 (GMT)
+Received: from [9.171.8.211] (unknown [9.171.8.211])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Jan 2025 16:04:03 +0000 (GMT)
+Message-ID: <d1d7f80d-aa41-462f-a796-5cc6f37ef361@linux.ibm.com>
+Date: Fri, 17 Jan 2025 17:04:03 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115143948.369379-6-vaibhav@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 03/15] KVM: s390: move pv gmap functions into kvm
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        seanjc@google.com, seiden@linux.ibm.com
+References: <20250116113355.32184-1-imbrenda@linux.ibm.com>
+ <20250116113355.32184-4-imbrenda@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250116113355.32184-4-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: mgr7iI2DmRQo3mnBY1wsdlGWp9szshbI
-X-Proofpoint-ORIG-GUID: Z9U5GMREmWve8I2dUdpkKK7yyHRTm6_s
+X-Proofpoint-GUID: rBE7m_PGGzvjX2WCOf7FgSoVpPebs-fZ
+X-Proofpoint-ORIG-GUID: ezqG8gMWoGy7H-UXKU5MZRCdd8GH-vjv
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-17_06,2025-01-16_01,2024-11-22_01
@@ -107,288 +150,191 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishsc
  impostorscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 malwarescore=0
  priorityscore=1501 clxscore=1015 spamscore=0 bulkscore=0 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501170122
+ definitions=main-2501170126
 
-On Wed, Jan 15, 2025 at 08:09:46PM +0530, Vaibhav Jain wrote:
-> Implement and setup necessary structures to send a prepolulated
-> Guest-State-Buffer(GSB) requesting hostwide counters to L0-PowerVM and have
-> the returned GSB holding the values of these counters parsed. This is done
-> via existing GSB implementation and with the newly added support of
-> Hostwide elements in GSB.
+On 1/16/25 12:33 PM, Claudio Imbrenda wrote:
+> Move gmap related functions from kernel/uv into kvm.
 > 
-> The request to L0-PowerVM to return Hostwide counters is done using a
-> pre-allocated GSB named 'gsb_l0_stats'. To be able to populate this GSB
-> with the needed Guest-State-Elements (GSIDs) a instance of 'struct
-> kvmppc_gs_msg' named 'gsm_l0_stats' is introduced. The 'gsm_l0_stats' is
-> tied to an instance of 'struct kvmppc_gs_msg_ops' named  'gsb_ops_l0_stats'
-> which holds various callbacks to be compute the size ( hostwide_get_size()
-> ), populate the GSB ( hostwide_fill_info() ) and
-> refresh ( hostwide_refresh_info() ) the contents of
-> 'l0_stats' that holds the Hostwide counters returned from L0-PowerVM.
+> Create a new file to collect gmap-related functions.
 > 
-> To protect these structures from simultaneous access a spinlock
-> 'lock_l0_stats' has been introduced. The allocation and initialization of
-> the above structures is done in newly introduced kvmppc_init_hostwide() and
-> similarly the cleanup is performed in newly introduced
-> kvmppc_cleanup_hostwide().
-> 
-> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
-> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > ---
-> Changelog
-> 
-> v1->v2:
-> * Added error handling to hostwide_fill_info() [Gautam]
-> ---
->  arch/powerpc/kvm/book3s_hv_pmu.c | 199 +++++++++++++++++++++++++++++++
->  1 file changed, 199 insertions(+)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_hv_pmu.c b/arch/powerpc/kvm/book3s_hv_pmu.c
-> index 8c6ed30b7654..0107ed3b03e3 100644
-> --- a/arch/powerpc/kvm/book3s_hv_pmu.c
-> +++ b/arch/powerpc/kvm/book3s_hv_pmu.c
-> @@ -27,10 +27,31 @@
->  #include <asm/plpar_wrappers.h>
->  #include <asm/firmware.h>
->  
-> +#include "asm/guest-state-buffer.h"
-> +
->  enum kvmppc_pmu_eventid {
->  	KVMPPC_EVENT_MAX,
->  };
->  
-> +#define KVMPPC_PMU_EVENT_ATTR(_name, _id) \
-> +	PMU_EVENT_ATTR_ID(_name, power_events_sysfs_show, _id)
-> +
-> +/* Holds the hostwide stats */
-> +static struct kvmppc_hostwide_stats {
-> +	u64 guest_heap;
-> +	u64 guest_heap_max;
-> +	u64 guest_pgtable_size;
-> +	u64 guest_pgtable_size_max;
-> +	u64 guest_pgtable_reclaim;
-> +} l0_stats;
-> +
-> +/* Protect access to l0_stats */
-> +static DEFINE_SPINLOCK(lock_l0_stats);
-> +
-> +/* GSB related structs needed to talk to L0 */
-> +static struct kvmppc_gs_msg *gsm_l0_stats;
-> +static struct kvmppc_gs_buff *gsb_l0_stats;
-> +
->  static struct attribute *kvmppc_pmu_events_attr[] = {
->  	NULL,
->  };
-> @@ -90,6 +111,177 @@ static void kvmppc_pmu_read(struct perf_event *event)
->  {
->  }
->  
-> +/* Return the size of the needed guest state buffer */
-> +static size_t hostwide_get_size(struct kvmppc_gs_msg *gsm)
-> +
+>   arch/s390/include/asm/uv.h |   7 +-
+>   arch/s390/kernel/uv.c      | 293 ++++++-------------------------------
+>   arch/s390/kvm/Makefile     |   2 +-
+>   arch/s390/kvm/gmap.c       | 196 +++++++++++++++++++++++++
+>   arch/s390/kvm/gmap.h       |  17 +++
+>   arch/s390/kvm/intercept.c  |   1 +
+>   arch/s390/kvm/kvm-s390.c   |   1 +
+>   arch/s390/kvm/pv.c         |   1 +
+>   8 files changed, 264 insertions(+), 254 deletions(-)
+>   create mode 100644 arch/s390/kvm/gmap.c
+>   create mode 100644 arch/s390/kvm/gmap.h
+
+[...]
+
+>   
+> -static int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
+> +/**
+> + * make_folio_secure() - make a folio secure
+> + * @folio: the folio to make secure
+> + * @uvcb: the uvcb that describes the UVC to be used
+> + *
+> + * The folio @folio will be made secure if possible, @uvcb will be passed
+> + * as-is to the UVC.
+> + *
+> + * Return: 0 on success;
+> + *         -EBUSY if the folio is in writeback, has too many references, or is large;
+
+I'd expect busy for writeback and too many references since someone is 
+referencing or working with the page.
+
+But EBUSY for large mappings?
+Also, the large mapping doesn't just vanish by waiting, does it?
+You're actively splitting the mapping.
+
+> + *         -EAGAIN if the UVC needs to be attempted again;
+> + *         -ENXIO if the address is not mapped;
+> + *         -EINVAL if the UVC failed for other reasons.
+> + *
+> + * Context: The caller must hold exactly one extra reference on the folio
+> + *          (it's the same logic as split_folio())
+> + */
+> +int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
+>   {
+>   	int expected, cc = 0;
+>   
+> +	if (folio_test_large(folio))
+> +		return -EBUSY;
+>   	if (folio_test_writeback(folio))
+> -		return -EAGAIN;
+> -	expected = expected_folio_refs(folio);
+> +		return -EBUSY;
+> +	expected = expected_folio_refs(folio) + 1;
+>   	if (!folio_ref_freeze(folio, expected))
+>   		return -EBUSY;
+>   	set_bit(PG_arch_1, &folio->flags);
+> @@ -267,251 +276,35 @@ static int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
+>   		return -EAGAIN;
+>   	return uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
+>   }
+> +EXPORT_SYMBOL_GPL(make_folio_secure);
+>   
+>   /**
+> - * should_export_before_import - Determine whether an export is needed
+> - * before an import-like operation
+> - * @uvcb: the Ultravisor control block of the UVC to be performed
+> - * @mm: the mm of the process
+> - *
+> - * Returns whether an export is needed before every import-like operation.
+> - * This is needed for shared pages, which don't trigger a secure storage
+> - * exception when accessed from a different guest.
+> - *
+> - * Although considered as one, the Unpin Page UVC is not an actual import,
+> - * so it is not affected.
+> + * uv_wiggle_folio() - try to drain extra references to a folio
+
+How about adding the split into the name?
+uv_wiggle_split
+
+> + * @folio: the folio
+> + * @split: whether to split a large folio
+
+[...]
+
+> +/**
+> + * should_export_before_import - Determine whether an export is needed
+> + * before an import-like operation
+> + * @uvcb: the Ultravisor control block of the UVC to be performed
+> + * @mm: the mm of the process
+> + *
+> + * Returns whether an export is needed before every import-like operation.
+> + * This is needed for shared pages, which don't trigger a secure storage
+> + * exception when accessed from a different guest.
+> + *
+> + * Although considered as one, the Unpin Page UVC is not an actual import,
+> + * so it is not affected.
+> + *
+> + * No export is needed also when there is only one protected VM, because the
+> + * page cannot belong to the wrong VM in that case (there is no "other VM"
+> + * it can belong to).
+> + *
+> + * Return: true if an export is needed before every import, otherwise false.
+> + */
+> +static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
 > +{
-> +	size_t size = 0;
-> +	const u16 ids[] = {
-> +		KVMPPC_GSID_L0_GUEST_HEAP,
-> +		KVMPPC_GSID_L0_GUEST_HEAP_MAX,
-> +		KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE,
-> +		KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX,
-> +		KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM
-> +	};
-> +
-> +	for (int i = 0; i < ARRAY_SIZE(ids); i++)
-> +		size += kvmppc_gse_total_size(kvmppc_gsid_size(ids[i]));
-> +	return size;
-> +}
-> +
-> +/* Populate the request guest state buffer */
-> +static int hostwide_fill_info(struct kvmppc_gs_buff *gsb,
-> +			      struct kvmppc_gs_msg *gsm)
-> +{
-> +	int rc = 0;
-> +	struct kvmppc_hostwide_stats  *stats = gsm->data;
-> +
 > +	/*
-> +	 * It doesn't matter what values are put into request buffer as
-> +	 * they are going to be overwritten anyways. But for the sake of
-> +	 * testcode and symmetry contents of existing stats are put
-> +	 * populated into the request guest state buffer.
+> +	 * The misc feature indicates, among other things, that importing a
+> +	 * shared page from a different protected VM will automatically also
+> +	 * transfer its ownership.
 > +	 */
-> +	if (kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_HEAP))
-> +		rc = kvmppc_gse_put_u64(gsb,
-> +					KVMPPC_GSID_L0_GUEST_HEAP,
-> +					stats->guest_heap);
-> +
-> +	if (!rc && kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_HEAP_MAX))
-> +		rc = kvmppc_gse_put_u64(gsb,
-> +					KVMPPC_GSID_L0_GUEST_HEAP_MAX,
-> +					stats->guest_heap_max);
-> +
-> +	if (!rc && kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE))
-> +		rc = kvmppc_gse_put_u64(gsb,
-> +					KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE,
-> +					stats->guest_pgtable_size);
-> +	if (!rc &&
-> +	    kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX))
-> +		rc = kvmppc_gse_put_u64(gsb,
-> +					KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX,
-> +					stats->guest_pgtable_size_max);
-> +	if (!rc &&
-> +	    kvmppc_gsm_includes(gsm, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM))
-> +		rc = kvmppc_gse_put_u64(gsb,
-> +					KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM,
-> +					stats->guest_pgtable_reclaim);
-> +
-> +	return rc;
+> +	if (uv_has_feature(BIT_UV_FEAT_MISC))
+> +		return false;
+> +	if (uvcb->cmd == UVC_CMD_UNPIN_PAGE_SHARED)
+> +		return false;
+> +	return atomic_read(&mm->context.protected_count) > 1;
 > +}
 > +
-> +/* Parse and update the host wide stats from returned gsb */
-> +static int hostwide_refresh_info(struct kvmppc_gs_msg *gsm,
-> +				 struct kvmppc_gs_buff *gsb)
+> +static int __gmap_make_secure(struct gmap *gmap, struct page *page, void *uvcb)
 > +{
-> +	struct kvmppc_gs_parser gsp = { 0 };
-> +	struct kvmppc_hostwide_stats *stats = gsm->data;
-> +	struct kvmppc_gs_elem *gse;
+> +	struct folio *folio = page_folio(page);
 > +	int rc;
 > +
-> +	rc = kvmppc_gse_parse(&gsp, gsb);
-> +	if (rc < 0)
-> +		return rc;
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_HEAP);
-> +	if (gse)
-> +		stats->guest_heap = kvmppc_gse_get_u64(gse);
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_HEAP_MAX);
-> +	if (gse)
-> +		stats->guest_heap_max = kvmppc_gse_get_u64(gse);
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE);
-> +	if (gse)
-> +		stats->guest_pgtable_size = kvmppc_gse_get_u64(gse);
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX);
-> +	if (gse)
-> +		stats->guest_pgtable_size_max = kvmppc_gse_get_u64(gse);
-> +
-> +	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM);
-> +	if (gse)
-> +		stats->guest_pgtable_reclaim = kvmppc_gse_get_u64(gse);
-> +
-> +	return 0;
-> +}
-> +
-> +/* gsb-message ops for setting up/parsing */
-> +static struct kvmppc_gs_msg_ops gsb_ops_l0_stats = {
-> +	.get_size = hostwide_get_size,
-> +	.fill_info = hostwide_fill_info,
-> +	.refresh_info = hostwide_refresh_info,
-> +};
-> +
-> +static int kvmppc_init_hostwide(void)
-> +{
-> +	int rc = 0;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&lock_l0_stats, flags);
-> +
-> +	/* already registered ? */
-> +	if (gsm_l0_stats) {
-> +		rc = 0;
-> +		goto out;
+> +	/*
+> +	 * Secure pages cannot be huge and userspace should not combine both.
+> +	 * In case userspace does it anyway this will result in an -EFAULT for
+> +	 * the unpack. The guest is thus never reaching secure mode.
+> +	 * If userspace plays dirty tricks and decides to map huge pages at a
+> +	 * later point in time, it will receive a segmentation fault or
+> +	 * KVM_RUN will return -EFAULT.
+> +	 */
+> +	if (folio_test_hugetlb(folio))
+> +		return -EFAULT;
+> +	if (folio_test_large(folio)) {
+> +		mmap_read_unlock(gmap->mm);
+> +		rc = uv_wiggle_folio(folio, true);
+> +		mmap_read_lock(gmap->mm);
+> +		if (rc)
+> +			return rc;
+> +		folio = page_folio(page);
 > +	}
 > +
-> +	/* setup the Guest state message/buffer to talk to L0 */
-> +	gsm_l0_stats = kvmppc_gsm_new(&gsb_ops_l0_stats, &l0_stats,
-> +				      GSM_SEND, GFP_KERNEL);
-> +	if (!gsm_l0_stats) {
-> +		rc = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	/* Populate the Idents */
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_HEAP);
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_HEAP_MAX);
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE);
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_SIZE_MAX);
-> +	kvmppc_gsm_include(gsm_l0_stats, KVMPPC_GSID_L0_GUEST_PGTABLE_RECLAIM);
-> +
-> +	/* allocate GSB. Guest/Vcpu Id is ignored */
-> +	gsb_l0_stats = kvmppc_gsb_new(kvmppc_gsm_size(gsm_l0_stats), 0, 0,
-> +				      GFP_KERNEL);
-> +	if (!gsb_l0_stats) {
-> +		rc = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	/* ask the ops to fill in the info */
-> +	rc = kvmppc_gsm_fill_info(gsm_l0_stats, gsb_l0_stats);
-> +	if (rc)
-> +		goto out;
+Maybe add something like:
 
-This if check is redundant. We can just continue.
+/* 
+  
+  
+  
 
-> +out:
-> +	if (rc) {
-> +		if (gsm_l0_stats)
-> +			kvmppc_gsm_free(gsm_l0_stats);
-> +		if (gsb_l0_stats)
-> +			kvmppc_gsb_free(gsb_l0_stats);
-> +		gsm_l0_stats = NULL;
-> +		gsb_l0_stats = NULL;
+  * We can race with someone making the folio large again until
+  * we have locked the folio below.
+  *
+  * If we did, we will do the SIE entry/exit dance and end up
+  * here again.
+  */
+
+> +	rc = -EAGAIN;
+> +	if (folio_trylock(folio)) {
+> +		if (should_export_before_import(uvcb, gmap->mm))
+> +			uv_convert_from_secure(folio_to_phys(folio));
+> +		rc = make_folio_secure(folio, uvcb);
+> +		folio_unlock(folio);
 > +	}
-> +	spin_unlock_irqrestore(&lock_l0_stats, flags);
+> +
+> +	/*
+> +	 * Unlikely case: the page is not mapped anymore. Return success
+> +	 * and let the proper fault handler fault in the page again.
+> +	 */
+> +	if (rc == -ENXIO)
+> +		return 0;
+> +	/* The folio has too many references, try to shake some off */
+> +	if (rc == -EBUSY) {
+> +		mmap_read_unlock(gmap->mm);
+> +		uv_wiggle_folio(folio, false);
+> +		mmap_read_lock(gmap->mm);
+> +		return -EAGAIN;
+> +	}
+> +
 > +	return rc;
 > +}
-> +
-> +static void kvmppc_cleanup_hostwide(void)
-> +{
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&lock_l0_stats, flags);
-> +
-> +	if (gsm_l0_stats)
-> +		kvmppc_gsm_free(gsm_l0_stats);
-> +	if (gsb_l0_stats)
-> +		kvmppc_gsb_free(gsb_l0_stats);
-> +	gsm_l0_stats = NULL;
-> +	gsb_l0_stats = NULL;
-> +
-> +	spin_unlock_irqrestore(&lock_l0_stats, flags);
-> +}
-> +
->  /* L1 wide counters PMU */
->  static struct pmu kvmppc_pmu = {
->  	.task_ctx_nr = perf_sw_context,
-> @@ -108,6 +300,10 @@ int kvmppc_register_pmu(void)
->  
->  	/* only support events for nestedv2 right now */
->  	if (kvmhv_is_nestedv2()) {
-> +		rc = kvmppc_init_hostwide();
-> +		if (rc)
-> +			goto out;
-> +
->  		/* Setup done now register the PMU */
->  		pr_info("Registering kvm-hv pmu");
->  
-> @@ -117,6 +313,7 @@ int kvmppc_register_pmu(void)
->  					       -1) : 0;
->  	}
->  
-> +out:
->  	return rc;
->  }
->  EXPORT_SYMBOL_GPL(kvmppc_register_pmu);
-> @@ -124,6 +321,8 @@ EXPORT_SYMBOL_GPL(kvmppc_register_pmu);
->  void kvmppc_unregister_pmu(void)
->  {
->  	if (kvmhv_is_nestedv2()) {
-> +		kvmppc_cleanup_hostwide();
-> +
->  		if (kvmppc_pmu.type != -1)
->  			perf_pmu_unregister(&kvmppc_pmu);
->  
-> -- 
-> 2.47.1
-> 
 
