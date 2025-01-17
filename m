@@ -1,159 +1,152 @@
-Return-Path: <kvm+bounces-35717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35718-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A557FA14761
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 02:11:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97A53A147D7
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 03:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CFB8188A840
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 01:09:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9D4A1650E8
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 02:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38F617555;
-	Fri, 17 Jan 2025 01:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A66151E2009;
+	Fri, 17 Jan 2025 02:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M5CDvF4f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BolhGzCO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B115515FD01
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 01:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C4B1E130F;
+	Fri, 17 Jan 2025 02:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737076056; cv=none; b=gc6udO/nb3WkTigUji1LGsyKfcC6WmiRqvu5xPnFV16uAIssO6dW7+NDdagGWgTVHD+2dhxQglvb9A1K7CC/Gs5NtjYQUbOfs4xcoodiaOkAVeb4GlOZ/vRyiTQ9xGmEdqUkltrCSez3qD2a6N4uY/4WzJBhYLyBvMU+ll/T+hA=
+	t=1737079204; cv=none; b=ANoZd/H0tgrvgVad/+klH4r/VnczQFkJKpmAFResGCJaNhATUFHd+h7Xe1KixWZzeyc5O8L4zoz2tNgWt+cCQ9jFsZ1ILzyVA78FZISH9WmTYAz5Zo2rE029PJrij5PB0rL5gij9ucqec3JU5aT5ZWJ/5XE+8ppIQPB/aBsGWqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737076056; c=relaxed/simple;
-	bh=cnUcN3lkFPLfe0UVCiHE/CS9EnzheWp5w1nG8tqzlzA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JmL1gKgl2XkDkMdV0TPo3ganN3ZyvWNb6iSdD/h+ktcOc4Iv7Nsu+DblhBKUhQJlD+hyr49FwXR4N37sN2La2puMz58MLhNDzFugg10Bxn2RvlWQPhqQrrBkD3AKUAOZEp/icxUP2YZvXgKyL6KvQSEDMeXlYG5uFiGMe3YALiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M5CDvF4f; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f129f7717fso3129324a91.0
-        for <kvm@vger.kernel.org>; Thu, 16 Jan 2025 17:07:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737076054; x=1737680854; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=QcYxczR0tvkXhhtjh3QEWO3iRdccgPPVshgvC2xXtIM=;
-        b=M5CDvF4f2GnRU8qmO3c/75MKaOHwCqdw4/L1gKupJBZW3KHHrIPxmEYCAXMOW5PE/O
-         Q4w/0y4WNM+9zIdMSzNUCbGSFDZ59uXlNQJfs9o3UZoRDQug32b/DAzP4zYEylEvfvDk
-         t4HAcNpBYukLk7P0+okTdBD8XjvvcXnphWrZHF8JRBcRKF5RHSWeTEJiQsGcgpropC1O
-         8zN/H5FqmbqDOejcDwHkaESHCiYCEAH6mSshq7GbIJGAkvZGU0GTJ7sKs/wzrwNsiERO
-         1qS2y218nYqIGkCwGm7cSkranmOYT1jCUOzA/PreGlDJjuAiN14+aP7rRNDLkvqlUniH
-         65Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737076054; x=1737680854;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QcYxczR0tvkXhhtjh3QEWO3iRdccgPPVshgvC2xXtIM=;
-        b=SZKGZFnj8/OK5qGFLmLGjU/e/fapdjSxmnodFWdOiCjQ6cgzl9MBEaiD79lNLG0v9B
-         QiBKLch9vmb+1kyutNjxEc2UsGSnNKGvXzrJhvOJIe8Gpiv1AByqrclE2KC7L4sFM/jA
-         BGTL8CuqdqR10T//ZpCrQpFGcIju+6Yb/vLiabnxUsYcK/yRYoCaz0h06KJLkm8qHJTl
-         Q1BpY8X7LFJ7JUVExuiuXMoCEgGrVtlqMf8BP5d2IhGz6rRD7gp0RkxsPdqYXpVGwNB7
-         F5yrTnwL2oOuDhjXxUUUVZ5/MKKSm9Jp1erLfr+cClJo2C7iiVslYJ5H8VxQvU5GzVCN
-         fhxw==
-X-Gm-Message-State: AOJu0YzN+I9Ftl6i8ms9eb49iqDPE6/FEur2jpxLgoanq2WO+0IvYPOU
-	xxtYzpHwUmODYYvTEkJ7/DnXAKyvP6wX7aKw0fH3EJeQ2UFcfVeWIxJc0xGC8IN2MHSYSPksNV0
-	VxA==
-X-Google-Smtp-Source: AGHT+IGUIHuN/oPKGCYO3+FW7cDtyj68lojRfHJCr7/KhobmdI4O5lzDG6ATPvYnmoEO8716xXSETQsj4Dw=
-X-Received: from pjbsj7.prod.google.com ([2002:a17:90b:2d87:b0:2da:ac73:93e0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:7141:b0:2ee:dd9b:e402
- with SMTP id 98e67ed59e1d1-2f782c70237mr1210675a91.12.1737076054056; Thu, 16
- Jan 2025 17:07:34 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Jan 2025 17:07:18 -0800
-In-Reply-To: <20250117010718.2328467-1-seanjc@google.com>
+	s=arc-20240116; t=1737079204; c=relaxed/simple;
+	bh=5ZUz4QZLDlVa1hMJ47XHMGlOnKcryI3Cj9ggu76axOY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C41z7nscuacDQZsDaYCgWcjYOVUdw2zxuCqOHyYZZimXA9vCfIJCnQ6jJgZe0fiDS8zcdDjc6Lpi9nKMer714fQKA7WOr1lwpKRTVU9k4ohDrs9u9uCq/Jo7IgDGB1BnJhvwxPxd4vS7MKPoJdk1hoaRcqH9lk07JjMTU9CSWvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BolhGzCO; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737079203; x=1768615203;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=5ZUz4QZLDlVa1hMJ47XHMGlOnKcryI3Cj9ggu76axOY=;
+  b=BolhGzCO5+emxeEY2bbCDWEFk2cPQFkmtwrS15gWqEtCopozwZ/Ptuc9
+   Sr50lPxg9MwQfbG1EfqKEV1iTokGAPIdl8M/4gm7TbvY2ABeDC1cQGVcU
+   CMYOS8LyYNx5diU/GjH5C3yYSCXBIVrhCZQvIjNdLGqDD6j/l3B0YbfVl
+   qQsaAsGlqIVp5BIGlEV4GTGR+6AN9tMDRTFYCIH00DYLHi22aQgF5/BKy
+   RYkB7njyvBJP1qDZt3aXgmSUUbFfrjTe2Ot4kpsmg4glRalQ3AdjfX+8a
+   Kc96wBG8qF9CcGxhStoQwEJM4nxWnTMgArWabDdakjM41GCJhlXWJ5vcO
+   g==;
+X-CSE-ConnectionGUID: En+ACN3PQeifh9w+oqC97w==
+X-CSE-MsgGUID: lG+WVuNlQLeLCFEk5+ZM5g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="37653490"
+X-IronPort-AV: E=Sophos;i="6.13,210,1732608000"; 
+   d="scan'208";a="37653490"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 18:00:02 -0800
+X-CSE-ConnectionGUID: q+qN46kgS4eRnBfRJ9Qo0w==
+X-CSE-MsgGUID: pIAKJmATQDajlK90Sjd0tg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="106140512"
+Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 17:59:57 -0800
+Message-ID: <f1ac048f-64b1-4343-ab86-ad98c24a44f5@linux.intel.com>
+Date: Fri, 17 Jan 2025 09:57:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250117010718.2328467-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250117010718.2328467-8-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86: VMX change for 6.14
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
+ private device
+To: Jason Gunthorpe <jgg@nvidia.com>, Alexey Kardashevskiy <aik@amd.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+ christian.koenig@amd.com, pbonzini@redhat.com, seanjc@google.com,
+ alex.williamson@redhat.com, vivek.kasireddy@intel.com,
+ dan.j.williams@intel.com, yilun.xu@intel.com, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+ daniel.vetter@ffwll.ch, leon@kernel.org, zhenzhong.duan@intel.com,
+ tao1.su@intel.com
+References: <20250108133026.GQ5556@nvidia.com>
+ <Z36ulpCoJAllp4fP@yilunxu-OptiPlex-7050> <20250109144051.GX5556@nvidia.com>
+ <Z3/7/PQCLi1GE5Ry@yilunxu-OptiPlex-7050> <20250110133116.GF5556@nvidia.com>
+ <Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050> <20250113164935.GP5556@nvidia.com>
+ <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050> <20250114133553.GB5556@nvidia.com>
+ <17cd9b77-4620-4883-9a6a-8d1cab822c88@amd.com>
+ <20250115130102.GM5556@nvidia.com>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20250115130102.GM5556@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-A few fixes and cleanups.  The most notable change is Chao's fix for a nasty
-bug where L1's SVI didn't get updated and result in the interrupt being left
-in-service forever (though only uncommon use cases are affected, e.g. running
-pKVM x86 in L1).
+On 1/15/25 21:01, Jason Gunthorpe wrote:
+> On Wed, Jan 15, 2025 at 11:57:05PM +1100, Alexey Kardashevskiy wrote:
+>> On 15/1/25 00:35, Jason Gunthorpe wrote:
+>>> On Tue, Jun 18, 2024 at 07:28:43AM +0800, Xu Yilun wrote:
+>>>
+>>>>> is needed so the secure world can prepare anything it needs prior to
+>>>>> starting the VM.
+>>>> OK. From Dan's patchset there are some touch point for vendor tsm
+>>>> drivers to do secure world preparation. e.g. pci_tsm_ops::probe().
+>>>>
+>>>> Maybe we could move to Dan's thread for discussion.
+>>>>
+>>>> https://lore.kernel.org/linux- 
+>>>> coco/173343739517.1074769.13134786548545925484.stgit@dwillia2- 
+>>>> xfh.jf.intel.com/
+>>> I think Dan's series is different, any uapi from that series should
+>>> not be used in the VMM case. We need proper vfio APIs for the VMM to
+>>> use. I would expect VFIO to be calling some of that infrastructure.
+>> Something like this experiment?
+>>
+>> https://github.com/aik/linux/commit/ 
+>> ce052512fb8784e19745d4cb222e23cabc57792e
+> Yeah, maybe, though I don't know which of vfio/iommufd/kvm should be
+> hosting those APIs, the above does seem to be a reasonable direction.
+> 
+> When the various fds are closed I would expect the kernel to unbind
+> and restore the device back.
 
-The following changes since commit 3522c419758ee8dca5a0e8753ee0070a22157bc1:
+I am curious about the value of tsm binding against an iomnufd_vdevice
+instead of the physical iommufd_device.
 
-  Merge tag 'kvm-riscv-fixes-6.13-1' of https://github.com/kvm-riscv/linux into HEAD (2024-12-13 13:59:20 -0500)
+It is likely that the kvm pointer should be passed to iommufd during the
+creation of a viommu object. If my recollection is correct, the arm
+smmu-v3 needs it to obtain the vmid to setup the userspace event queue:
 
-are available in the Git repository at:
+struct iommufd_viommu *arm_vsmmu_alloc(struct device *dev,
+                                        struct iommu_domain *parent,
+                                        struct iommufd_ctx *ictx,
+                                        unsigned int viommu_type)
+{
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-vmx-6.14
+[...]
 
-for you to fetch changes up to 37c3ddfe5238d88b6ec091ecdf967848bce067c2:
+         /* FIXME Move VMID allocation from the S2 domain allocation to 
+here */
+         vsmmu->vmid = s2_parent->s2_cfg.vmid;
 
-  KVM: VMX: read the PML log in the same order as it was written (2025-01-08 14:31:25 -0800)
+         return &vsmmu->core;
+}
 
-----------------------------------------------------------------
-KVM VMX changes for 6.14:
+Intel TDX connect implementation also needs a reference to the kvm
+pointer to obtain the secure EPT information. This is crucial because
+the CPU's page table must be shared with the iommu. I am not sure
+whether the amd architecture has a similar requirement.
 
- - Fix a bug where KVM updates hardware's APICv cache of the highest ISR bit
-   while L2 is active, while ultimately results in a hardware-accelerated L1
-   EOI effectively being lost.
-
- - Honor event priority when emulating Posted Interrupt delivery during nested
-   VM-Enter by queueing KVM_REQ_EVENT instead of immediately handling the
-   interrupt.
-
- - Drop kvm_x86_ops.hwapic_irr_update() as KVM updates hardware's APICv cache
-   prior to every VM-Enter.
-
- - Rework KVM's processing of the Page-Modification Logging buffer to reap
-   entries in the same order they were created, i.e. to mark gfns dirty in the
-   same order that hardware marked the page/PTE dirty.
-
- - Misc cleanups.
-
-----------------------------------------------------------------
-Adrian Hunter (1):
-      KVM: VMX: Allow toggling bits in MSR_IA32_RTIT_CTL when enable bit is cleared
-
-Chao Gao (2):
-      KVM: nVMX: Defer SVI update to vmcs01 on EOI when L2 is active w/o VID
-      KVM: x86: Remove hwapic_irr_update() from kvm_x86_ops
-
-Costas Argyris (1):
-      KVM: VMX: Reinstate __exit attribute for vmx_exit()
-
-Gao Shiyuan (1):
-      KVM: VMX: Fix comment of handle_vmx_instruction()
-
-Maxim Levitsky (2):
-      KVM: VMX: refactor PML terminology
-      KVM: VMX: read the PML log in the same order as it was written
-
-Sean Christopherson (6):
-      KVM: x86: Plumb in the vCPU to kvm_x86_ops.hwapic_isr_update()
-      KVM: nVMX: Explicitly update vPPR on successful nested VM-Enter
-      KVM: nVMX: Check for pending INIT/SIPI after entering non-root mode
-      KVM: nVMX: Drop manual vmcs01.GUEST_INTERRUPT_STATUS.RVI check at VM-Enter
-      KVM: nVMX: Use vmcs01's controls shadow to check for IRQ/NMI windows at VM-Enter
-      KVM: nVMX: Honor event priority when emulating PI delivery during VM-Enter
-
- arch/x86/include/asm/kvm-x86-ops.h |  1 -
- arch/x86/include/asm/kvm_host.h    |  3 +-
- arch/x86/kvm/lapic.c               | 25 +++++++-----
- arch/x86/kvm/lapic.h               |  1 +
- arch/x86/kvm/vmx/main.c            |  3 +-
- arch/x86/kvm/vmx/nested.c          | 84 +++++++++++++++++++++++---------------
- arch/x86/kvm/vmx/vmx.c             | 76 ++++++++++++++++++++--------------
- arch/x86/kvm/vmx/vmx.h             |  6 ++-
- arch/x86/kvm/vmx/x86_ops.h         |  3 +-
- 9 files changed, 120 insertions(+), 82 deletions(-)
+---
+baolu
 
