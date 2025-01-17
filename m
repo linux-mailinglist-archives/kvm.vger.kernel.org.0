@@ -1,288 +1,344 @@
-Return-Path: <kvm+bounces-35724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35725-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27487A148BA
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 05:12:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2DD0A148FC
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 05:55:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DF1D3A98A7
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 04:11:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2762188CB6F
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 04:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D151F6673;
-	Fri, 17 Jan 2025 04:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B311B25A638;
+	Fri, 17 Jan 2025 04:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j2d3vCfz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IJ01yhzg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A5625765
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 04:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF5925A63D;
+	Fri, 17 Jan 2025 04:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737087117; cv=none; b=a/rm9pw5Kb84C4SVXVog8HllC6lLgrDEbPaWynykWJQNzBHFpx8ka1XgMI7u/5EUWEo1kMg7pgDLvYOhV1Ic13jdX7oaeK2bEkzYeuZlqmcFo2f+DcYbnrY0T8htVPpvCV27mk+keY1Gog6g6SScXqLxN/8ZrXOI4GsR9tKoPTM=
+	t=1737089692; cv=none; b=ocfWN0+Pht5r9cflJ9pqX+oMMyxIv92xLFVcWRwfGqE+LD3kpCl/47NxtST9ZmOfoetWC19j+H1Fubi8eh3UPyOIiJp6Jw57npplu+w04tnnUZLVf2Ep7w1ozcZshS1fiScsn30JZ7NVu54y/yumkCDbx8FhjewRo+4nNFa8zCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737087117; c=relaxed/simple;
-	bh=vqNV32umy43STBMmOAo8COODkI6bSRTE6nzZpKA3m8Y=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rM/TP3+xMHHzxpyN26ClNfteX27fWkcb3GOveOjW24XeEALnnj050oi+u7pqwlmyF7oK98QusCmauILalUE9Vb6ekdK/d1Yc6z44t9qEhG0+x1W8uiBsNO5TB508O06ZKvopuCHBxWGv8VByRmLe8BnOJ3HCYY6FN3XzYtJ+lkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=j2d3vCfz; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50GNwF8P008981;
-	Fri, 17 Jan 2025 04:11:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ar9Vgz
-	6woiYDq7yaClNFIq5QaUmXn8hWum8FMgg5iIg=; b=j2d3vCfz0iTmfSuCVPZQRF
-	3I1VwKVvhBg9s163QfKxoNHiO807xIb3MjL8M2YhzVNskVRfBw6t35ZWfAfiCX5+
-	JUjHex4RXKONKfJE0/bnODStQ77xn5W+0JoIeQ8EEHkEuKIf/cfpj2yR9rn3n1um
-	LGW5mq2cohxtmv/CXIIdEvErUEQBGtwpuv4Qce98pbcv0gen5TV8viVcLZhDgNAf
-	Lh0T9Sqoc8COGMs0cC64kN0Se8hyGFeEZsDdFVg9qo1aPB4yNecdmjdQ4ofF1bnC
-	uKCL09C4R8bwp/JS9Oj7rookXUKmRvoY6q2wn2J2lfLJAKf1nqCA9dNvlSGK+cjg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447c8j8tb9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 04:11:30 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50H48cEf000409;
-	Fri, 17 Jan 2025 04:11:30 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447c8j8tb6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 04:11:30 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50H2xMWv000827;
-	Fri, 17 Jan 2025 04:11:29 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44456k8x6t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 04:11:29 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50H4BRLk32834060
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jan 2025 04:11:27 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 678E320040;
-	Fri, 17 Jan 2025 04:11:27 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B283320043;
-	Fri, 17 Jan 2025 04:11:24 +0000 (GMT)
-Received: from [9.39.26.84] (unknown [9.39.26.84])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 17 Jan 2025 04:11:24 +0000 (GMT)
-Message-ID: <bdb1a54c-712e-4cb6-98b0-42419d5a5ed4@linux.ibm.com>
-Date: Fri, 17 Jan 2025 09:41:23 +0530
+	s=arc-20240116; t=1737089692; c=relaxed/simple;
+	bh=I63x7I4Ol/kG4EZ6dbHIfZcgn0SPKDl12VyK3mQhQVM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=izdyO8jLPVWL19oTSv8Ebjf1tToGt8hh82QTl2A8ZP7n3FBl+MbG028AxhwlqjUkATuJNVlJtUXlv/Oj+n3fE140yiD0bb2C2JHG1y5bDrq8Jq6JQPAiRoeKn5oYH1A334c2t4X0+gB2iwfq+uofdglMbof8/0A9qUbFPvsL9tY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IJ01yhzg; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d3bdccba49so2916959a12.1;
+        Thu, 16 Jan 2025 20:54:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737089689; x=1737694489; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DUxSH4RG7W4A6HNQ3Oe1GOvRAjl1PmU8ezkbbKLuQVM=;
+        b=IJ01yhzgY8Nyn39XFVooY3R+XIoAuKEYFcY8YgSps3TLQK5xJVSfD0QHND8Xdy26fZ
+         izShfdLnNCn2HzZSTsSSi+vMlNb4FbhHHEw4xggF9LzBkWBjcwfyLcX5mf9JsDZ8r39+
+         qiU+2QZwshomv4aYACyYeR/MdQLQu5ADpLECQSx7tmlpmT1ZwnKEZM5K1lT8+v5QktBr
+         NsgXcj6g/W9L1rH3xfGOTZnXLI0W/eMPn7BKqYBc+u4BeSKZhBekjP2yY88AAfuliE1t
+         jexKl45rtX7ZlBivLcUJunwM8UyKffEptIivSleNvBS0CJNQH+/anE+SkfyLYiRRgAGN
+         gP/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737089689; x=1737694489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DUxSH4RG7W4A6HNQ3Oe1GOvRAjl1PmU8ezkbbKLuQVM=;
+        b=ERmEwzLQbW+ZOqVSK1KQtaCGRfuxipl4F/2VtslV5zZ6xbz6fuvM6FgitnkOw7V2cD
+         9IDgNMhXx7d7EyYZUNPpIb1rVYd98Lw4BZE60ZSbJlc3oaINQkjmRXFmXvaILflbrtPd
+         HHxiJ2jycCtOCg2Gb/L8alo3juloETm7ECU8ZWF5eJQYAPVNpjR+V3BG/KUxSy1h5JMf
+         Y6dqgKe0aVruTUahUXSVI1Jw7kdkD6A4zKXF2frOQY1yxZV8cv/VtHfigP7F+NUGqF4l
+         437yGs3XpnnzU9Ivyn7tOghRi5IEWCzpbASi9phODVvGSUveUD9vsYnQxX4H1qIbUAYv
+         cNSg==
+X-Forwarded-Encrypted: i=1; AJvYcCWm6+IJx0KPo+wQksgoM27dM9pkLz9gWr6707bd2HRk3MW4llcSwM9lGjXmwbVnA/irkxOnapcha7zJqec7@vger.kernel.org, AJvYcCXMyIKycohf+XyI9eabt9nFJuZcCkkCpwWwnABhODN4Al4wvL1VNpxT26KGs8J3N3KeIFM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8g6GIjoNvTUjnDXI3jzr3QmzpukkeafXP8cHwZienbD6YHhAH
+	KieDBmPy2k/f8nf0PgK5KqEhB1rcMTUcJzngD4yDVbuUKBL6Fl/q1kgc97FZq1CWIgoytLkg9GJ
+	JTRt2/JJTu9eAVdvvXlkVJsrwCwM=
+X-Gm-Gg: ASbGncvw/cIrwKGfLVabeLx0wJz5+6v3I0HWKRHD2qevae9SnjAObPUey0dfI6fC2LP
+	Gk31fkjouVfOXxPEckamgAk6evc7lEqEhjs2ohS5k1KFYK0aGPDlMT8fOwRBWizQYG8Ij6pM=
+X-Google-Smtp-Source: AGHT+IFktXP/8WH4I4TUWs/FsMtmzATH2LuQHry9QKXzHMsp6LOhwa3VXaeTTs3BzR6+pwLXpuNnry4phcGJVNi88ok=
+X-Received: by 2002:a17:906:cec6:b0:ab3:85eb:377b with SMTP id
+ a640c23a62f3a-ab38b4c6c1emr117549766b.53.1737089688785; Thu, 16 Jan 2025
+ 20:54:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Subject: Re: [PATCH v8 2/2] ppc: spapr: Enable 2nd DAWR on Power10 pSeries
- machine
-To: David Gibson <david@gibson.dropbear.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>
-Cc: danielhb413@gmail.com, qemu-ppc@nongnu.org, harshpb@linux.ibm.com,
-        clg@kaod.org, groug@kaod.org, pbonzini@redhat.com, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org
-References: <170679876639.188422.11634974895844092362.stgit@ltc-boston1.aus.stglabs.ibm.com>
- <170679878985.188422.6745903342602285494.stgit@ltc-boston1.aus.stglabs.ibm.com>
- <CZFUVDPGK7OU.1CBJ2TIMJ719P@wheely> <Zd5LpH-pPOT-MHiu@zatzit>
-Content-Language: en-US
-In-Reply-To: <Zd5LpH-pPOT-MHiu@zatzit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IJpc4f7ABEFIhemKAC2MdakTJuQn9vrW
-X-Proofpoint-ORIG-GUID: T4ydShuNrgAZ4IPrOF37poCC8YF2zR-k
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-17_01,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- priorityscore=1501 malwarescore=0 lowpriorityscore=0 adultscore=0
- phishscore=0 impostorscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501170028
+References: <CAFtZq1FwJOtxmbf_NPgYP_ZH=PkXJfF0=cXo0xbGkT5TGv66-A@mail.gmail.com>
+ <CAHk-=whnVemumt5AJ1f=rsGdLz4Fk95nZfoBchGmMWCGG63foQ@mail.gmail.com>
+ <CAFtZq1FpLfbnJzqc_s=j9TBLyGxe9D_ZYZU2qiES5dgsBAWv+g@mail.gmail.com>
+ <2025011646-chariot-revision-5753@gregkh> <E5C85B8E-D8F8-408F-B00B-A3650C9320EA@gmail.com>
+ <Z4kkuaY_mJ6z0sa2@google.com>
+In-Reply-To: <Z4kkuaY_mJ6z0sa2@google.com>
+From: C CHI <chichen241@gmail.com>
+Date: Fri, 17 Jan 2025 12:54:38 +0800
+X-Gm-Features: AbW1kvblF5C-RCxc3JELDB4EQegdMuk_-JiQxHEs781okGaU2ofwL-qcCYgPhaI
+Message-ID: <CAFtZq1F1x5+pXjgUvy=iDMZgY2mPyW+Rq6DKtfD+Msw=-nBaZw@mail.gmail.com>
+Subject: Re: Potential Denial-of-Service Vulnerability in KVM When Emulating
+ 'hlt' Instruction in L2 Guests
+To: Sean Christopherson <seanjc@google.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>, 
+	Linus Torvalds <torvalds@linuxfoundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"security@kernel.org" <security@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi David, Nick,
-
-Sorry about not getting back on this for long!
-
-On 2/28/24 2:22 AM, David Gibson wrote:
-> On Tue, Feb 27, 2024 at 10:21:23PM +1000, Nicholas Piggin wrote:
->> On Fri Feb 2, 2024 at 12:46 AM AEST, Shivaprasad G Bhat wrote:
->>> As per the PAPR, bit 0 of byte 64 in pa-features property
->>> indicates availability of 2nd DAWR registers. i.e. If this bit is set, 2nd
->>> DAWR is present, otherwise not. Use KVM_CAP_PPC_DAWR1 capability to find
->>> whether kvm supports 2nd DAWR or not. If it's supported, allow user to set
->>> the pa-feature bit in guest DT using cap-dawr1 machine capability.
->>>
->>> Signed-off-by: Ravi Bangoria<ravi.bangoria@linux.ibm.com>
->>> Signed-off-by: Shivaprasad G Bhat<sbhat@linux.ibm.com>
->>> ---
->>>   hw/ppc/spapr.c         |    7 ++++++-
->>>   hw/ppc/spapr_caps.c    |   36 ++++++++++++++++++++++++++++++++++++
->>>   hw/ppc/spapr_hcall.c   |   25 ++++++++++++++++---------
->>>   include/hw/ppc/spapr.h |    6 +++++-
->>>   target/ppc/kvm.c       |   12 ++++++++++++
->>>   target/ppc/kvm_ppc.h   |   12 ++++++++++++
->>>   6 files changed, 87 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>> index e8dabc8614..91a97d72e7 100644
->>> --- a/hw/ppc/spapr.c
->>> +++ b/hw/ppc/spapr.c
->>> @@ -262,7 +262,7 @@ static void spapr_dt_pa_features(SpaprMachineState *spapr,
->>>           0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 48 - 53 */
->>>           /* 54: DecFP, 56: DecI, 58: SHA */
->>>           0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 54 - 59 */
->>> -        /* 60: NM atomic, 62: RNG */
->>> +        /* 60: NM atomic, 62: RNG, 64: DAWR1 (ISA 3.1) */
->>>           0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 60 - 65 */
->>>       };
->>>       uint8_t *pa_features = NULL;
->>> @@ -303,6 +303,9 @@ static void spapr_dt_pa_features(SpaprMachineState *spapr,
->>>            * in pa-features. So hide it from them. */
->>>           pa_features[40 + 2] &= ~0x80; /* Radix MMU */
->>>       }
->>> +    if (spapr_get_cap(spapr, SPAPR_CAP_DAWR1)) {
->>> +        pa_features[66] |= 0x80;
->>> +    }
->>>   
->>>       _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
->>>   }
->>> @@ -2138,6 +2141,7 @@ static const VMStateDescription vmstate_spapr = {
->>>           &vmstate_spapr_cap_fwnmi,
->>>           &vmstate_spapr_fwnmi,
->>>           &vmstate_spapr_cap_rpt_invalidate,
->>> +        &vmstate_spapr_cap_dawr1,
->>>           NULL
->>>       }
->>>   };
->>> @@ -4717,6 +4721,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->>>       smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_ON;
->>>       smc->default_caps.caps[SPAPR_CAP_FWNMI] = SPAPR_CAP_ON;
->>>       smc->default_caps.caps[SPAPR_CAP_RPT_INVALIDATE] = SPAPR_CAP_OFF;
->>> +    smc->default_caps.caps[SPAPR_CAP_DAWR1] = SPAPR_CAP_OFF;
->>>   
->>>       /*
->>>        * This cap specifies whether the AIL 3 mode for
->>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
->>> index e889244e52..677f17cea6 100644
->>> --- a/hw/ppc/spapr_caps.c
->>> +++ b/hw/ppc/spapr_caps.c
->>> @@ -655,6 +655,32 @@ static void cap_ail_mode_3_apply(SpaprMachineState *spapr,
->>>       }
->>>   }
->>>   
->>> +static void cap_dawr1_apply(SpaprMachineState *spapr, uint8_t val,
->>> +                               Error **errp)
->>> +{
->>> +    ERRP_GUARD();
->>> +
->>> +    if (!val) {
->>> +        return; /* Disable by default */
->>> +    }
->>> +
->>> +    if (!ppc_type_check_compat(MACHINE(spapr)->cpu_type,
->>> +                               CPU_POWERPC_LOGICAL_3_10, 0,
->>> +                               spapr->max_compat_pvr)) {
->>> +        warn_report("DAWR1 supported only on POWER10 and later CPUs");
->>> +    }
->> Should this be an error?
-
-Changing this to error_report().
-
-> Yes, it should.  If you can't supply the cap requested, you *must*
-> fail to start.  Near enough is not good enough when it comes to the
-> guest visible properties of the virtual machine, or you'll end up with
-> no end of migration headaches.
-This was made to warn_report() as suggested[1] by Greg to avoid "make test"
-
-failures once we enable dawr1 caps ON by default with POWER9 being the 
-default
-
-cpu then.
+I roughly understand the above content. The main reason for this
+phenomenon seems to be the chaotic VM memory layout caused by the
+syzkaller template settings. In fact, it=E2=80=99s even observable that the
+IDT region in the code doesn=E2=80=99t actually contain any exception handl=
+ing
+code, very amusing :)
 
 
-However, now that we have moved to P10 as the default CPU, I tested with 
-default
-
-ON on P10, and OFF otherwise, "make test" passes. The problem was only 
-applicable
-
-before as the default cpu was P9 back then.
-
->> Should the dawr1 cap be enabled by default for POWER10 machines?
-
-Yes. Made it default enabled on Power10 cpu, and disable for Power9 and 
-below.
-
->>> +
->>> +    if (kvm_enabled()) {
->>> +        if (!kvmppc_has_cap_dawr1()) {
->>> +            error_setg(errp, "DAWR1 not supported by KVM.");
->>> +            error_append_hint(errp, "Try appending -machine cap-dawr1=off");
->>> +        } else if (kvmppc_set_cap_dawr1(val) < 0) {
->>> +            error_setg(errp, "Error enabling cap-dawr1 with KVM.");
->>> +            error_append_hint(errp, "Try appending -machine cap-dawr1=off");
->>> +        }
->>> +    }
->>> +}
->>> +
-<snip>
->>> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->>> index fcefd1d1c7..34c1c77c95 100644
->>> --- a/hw/ppc/spapr_hcall.c
->>> +++ b/hw/ppc/spapr_hcall.c
->>> @@ -814,11 +814,12 @@ static target_ulong h_set_mode_resource_set_ciabr(PowerPCCPU *cpu,
->>>       return H_SUCCESS;
->>>   }
->>>   
->>> -static target_ulong h_set_mode_resource_set_dawr0(PowerPCCPU *cpu,
->>> -                                                  SpaprMachineState *spapr,
->>> -                                                  target_ulong mflags,
->>> -                                                  target_ulong value1,
->>> -                                                  target_ulong value2)
->>> +static target_ulong h_set_mode_resource_set_dawr(PowerPCCPU *cpu,
->>> +                                                     SpaprMachineState *spapr,
->>> +                                                     target_ulong mflags,
->>> +                                                     target_ulong resource,
->>> +                                                     target_ulong value1,
->>> +                                                     target_ulong value2)
->> Did the text alignment go wrong here?
-Yes. Fixed that.
->> Aside from those things,
->>
->> Reviewed-by: Nicholas Piggin<npiggin@gmail.com>
-
-Since its been a while, I am not sure if the Reviewed-by is valid anymore.
+Additionally, I would like to ask about the previously mentioned point
+where the IDT is set in the emulated MMIO space. How can I verify
+this, and where can I find the relevant code for setting the MMIO
+region?
 
 
-I am keeping it anyway, please let me know if you have any further
-
-comments in the v9 posted here [2]
-
-
-I have addressed the comments from Harsh as well in the v9.
+    The guest loops because the the guest's IDT is located in emulated
+MMIO space,
+    and as suspected above, KVM refuses to emulates HLT for L2.
 
 
-References:
+Also, I'm curious as to what technique is used to get the following
+type of logging information, and I'd like to be able to get each ENTRY
+and EXIT info on the run
 
-[1] - https://lore.kernel.org/qemu-devel/20230708082536.73a2bfd8@bahia/
 
-[2] - 
-https://lore.kernel.org/all/173708679976.1678.10844458987521427074.stgit@linux.ibm.com/
 
-Thanks,
 
-Shiva
+    repro-1289    [019] d....   140.314684: kvm_exit: vcpu 0 reason
+EXCEPTION_NMI rip 0x1 info1 0x0000000000004000 info2
+0x0000000000000000 intr_info 0x80000301 error_code 0x00000000
+    repro-1289    [019] .....   140.314685: kvm_nested_vmexit: vcpu 0
+reason EXCEPTION_NMI rip 0x1 info1 0x0000000000004000 info2
+0x0000000000000000 intr_info 0x80000301 error_code 0x00000000
+    repro-1289    [019] .....   140.314688: kvm_inj_exception: #DB
+    repro-1289    [019] d....   140.314688: kvm_entry: vcpu 0, rip 0x1
+    repro-1289    [019] d....   140.314704: kvm_exit: vcpu 0 reason
+EPT_VIOLATION rip 0x1 info1 0x0000000000000181 info2
+0x0000000080000301 intr_info 0x00000000 error_code 0x00000000
+    repro-1289    [019] .....   140.314706: kvm_nested_vmexit: vcpu 0
+reason EPT_VIOLATION rip 0x1 info1 0x0000000000000181 info2
+0x0000000080000301 intr_info 0x00000000 error_code 0x00000000
+    repro-1289    [019] .....   140.314706: kvm_page_fault: vcpu 0 rip
+0x1 address 0x0000000000001050 error_code 0x181
+    repro-1289    [019] .....   140.314708: kvm_inj_exception: #DB [reinjec=
+ted]
+    repro-1289    [019] d....   140.314709: kvm_entry: vcpu 0, rip 0x1
 
+
+Sean Christopherson <seanjc@google.com> =E4=BA=8E2025=E5=B9=B41=E6=9C=8816=
+=E6=97=A5=E5=91=A8=E5=9B=9B 23:24=E5=86=99=E9=81=93=EF=BC=9A
+>
+> +KVM and LKML to for archival, as this is not a DoS
+>
+> On Thu, Jan 16, 2025, chichen241 wrote:
+> > It seems that the attachment content is not convenient for you to see, =
+so I
+> > will reuse the email content to describe it.
+>
+> ...
+>
+> > syz_kvm_setup_cpu(/*fd=3D*/vmfd, /*cpufd=3D*/vcpufd, /*usermem=3D*/mem,
+> > /*text=3D*/&nop_text, /*ntext*/ 1,/*flags=3D*/-1, /*opts=3D*/opts, /*no=
+pt=3D*/1); //
+> > The nested vm will run '\x90\xf4', the vm will try to emulate the hlt
+> > instruction and fail, entry endless loop.  ioctl(vcpufd, KVM_RUN, NULL)=
+;
+> > printf("The front kvm_run will caught in loop. This code will not be
+> > executed") } ```
+> > linux kernel version: 6.12-rc7
+> > Also I checked my mailbox and didn't see any quesiton from Sean. Maybe =
+there's some mistake?
+>
+> For posterity:
+>
+>   > > virtualization. When an L2 guest attempts to emulate an instruction
+>
+>   How did you coerce KVM into emulating HLT from L2?
+>
+>   > > using the x86_emulate_instruction() function, and the instruction t=
+o
+>   > > be emulated is hlt, the x86_decode_emulated_instruction() function
+>   > > used for instruction decoding does not support parsing the hlt
+>   > > instruction.
+>
+>   KVM should parse HLT just fine, I suspect the issue is that KVM _intent=
+ionally_
+>   refuses to emulate HLT from L2, because encountering HLT in the emulato=
+r when L2
+>   is active either requires the guest to be playing TLB games (e.g. gener=
+ate an
+>   emulated MMIO exit on a MOV, patch the MOV into a HLT), or it requires =
+enabling
+>   an off-by-default, "for testing purposes only" KVM module param.
+>
+>   > > As a result, x86_decode_emulated_instruction() returns
+>   > > ctxt->execute as null, causing the L2 guest to fail to execute the =
+hlt
+>   > > instruction properly. Subsequently, KVM enters an infinite loop,
+>
+>   Define "infinite loop", i.e. what are the bounds of the loop?  If the "=
+loop" is
+>   KVM re-entering the guest on the same instruction over and over, then e=
+verything
+>   is working as intended.
+>
+>   > > repeatedly invoking x86_emulate_instruction() to perform the same
+>   > > operation. This issue does not occur when the instruction to be
+>   > > emulated by L2 is another standard instruction.
+>   > >
+>   > > Therefore, I am wondering whether this constitutes a denial-of-serv=
+ice
+>   > > (DoS) vulnerability and whether a CVE number can be assigned.
+>
+>   Unless your reproducer causes a hard hang in KVM, or prevents L1 from g=
+aining
+>   control from L2, e.g. via a (virtual) interrupt, this is not a DoS.  I =
+can imagine
+>   scenarios where L2 can put itself into an infinite loop, i.e. DoS itsel=
+f, but
+>   that's not a vulnerability in any reasonable sense of things.
+>
+>   > > Generally, for software emulation in L1 guests, KVM's
+>   > > x86_emulate_instruction() function will, after parsing the instruct=
+ion
+>   > > with x86_decode_emulated_instruction(), attempt to use
+>   > > retry_instruction() to retry instruction execution.
+>
+>   No, retry_instruction() is specifically for cases where KVM fails to em=
+ulate an
+>   instruction _and_ the emulation was triggered by a write to guest PTE t=
+hat KVM
+>   is shadowing, i.e. a guest page that KVM has made read-only.  If certai=
+n criteria
+>   were met, KVM will unprotect the page, i.e. make it writable again, and=
+ resume
+>   the guest to let the CPU retry the instruction.
+>
+> > ## DESCRIPTION in this file, the most code is from
+> > syzkaller(executor/common_kvm_amd64.h), I mainly call the `syz_kvm_setu=
+p_cpu`
+> > function and run the vm using ioctl `kvm_run`.  First I use
+> > `syz_kvm_setup_cpu` to setup the vm to run a nested vm.  The second tim=
+e the
+> > `syz_kvm_setup_cpu` will turn on the TF bit in the eflag register of th=
+e
+> > nested vm and let the nested vm run `nop;hlt` code.
+> > When running kvm_run, the code will begin looping.
+> > ## ANALYSE
+> > The nested vm try to emulate the `hlt` code but failed, it will always =
+try, caught in an endless loop.
+>
+> The guest loops because the the guest's IDT is located in emulated MMIO s=
+pace,
+> and as suspected above, KVM refuses to emulates HLT for L2.
+>
+> The single-step #DB induced by RFLAGS.TF=3D1 triggers an EPT Violation as=
+ a result
+> of the CPU trying to vector the #DB with the IDT residing in non-existent=
+ memory.
+> At this point KVM *should* kick out to host userspace, as userspace is re=
+sponsible
+> for dealing with the emulate MMIO access during exception vectoring.
+>
+>            repro-1289    [019] d....   140.314684: kvm_exit: vcpu 0 reaso=
+n EXCEPTION_NMI rip 0x1 info1 0x0000000000004000 info2 0x0000000000000000 i=
+ntr_info 0x80000301 error_code 0x00000000
+>            repro-1289    [019] .....   140.314685: kvm_nested_vmexit: vcp=
+u 0 reason EXCEPTION_NMI rip 0x1 info1 0x0000000000004000 info2 0x000000000=
+0000000 intr_info 0x80000301 error_code 0x00000000
+>            repro-1289    [019] .....   140.314688: kvm_inj_exception: #DB
+>            repro-1289    [019] d....   140.314688: kvm_entry: vcpu 0, rip=
+ 0x1
+>            repro-1289    [019] d....   140.314704: kvm_exit: vcpu 0 reaso=
+n EPT_VIOLATION rip 0x1 info1 0x0000000000000181 info2 0x0000000080000301 i=
+ntr_info 0x00000000 error_code 0x00000000
+>            repro-1289    [019] .....   140.314706: kvm_nested_vmexit: vcp=
+u 0 reason EPT_VIOLATION rip 0x1 info1 0x0000000000000181 info2 0x000000008=
+0000301 intr_info 0x00000000 error_code 0x00000000
+>            repro-1289    [019] .....   140.314706: kvm_page_fault: vcpu 0=
+ rip 0x1 address 0x0000000000001050 error_code 0x181
+>            repro-1289    [019] .....   140.314708: kvm_inj_exception: #DB=
+ [reinjected]
+>            repro-1289    [019] d....   140.314709: kvm_entry: vcpu 0, rip=
+ 0x1
+>
+> KVM misses the weird edge case, and instead ends up trying to emulate the
+> instruction at the current RIP.  That instruction happens to be HLT, whic=
+h KVM
+> doesn't support for L2 (nested guests), and so KVM injects #UD.
+>
+>            repro-1289    [019] d....   140.314732: kvm_exit: vcpu 0 reaso=
+n EPT_VIOLATION rip 0x1 info1 0x00000000000001aa info2 0x0000000080000301 i=
+ntr_info 0x00000000 error_code 0x00000000
+>            repro-1289    [019] .....   140.314749: kvm_emulate_insn: 0:1:=
+f4 (prot32)
+>            repro-1289    [019] .....   140.314751: kvm_emulate_insn: 0:1:=
+f4 (prot32) failed
+>            repro-1289    [019] .....   140.314752: kvm_inj_exception: #UD
+>
+> Vectoring the #UD suffers the same fate as the #DB, and so KVM unintentio=
+nally
+> puts the vCPU into an endless loop.
+>
+>            repro-1289    [019] d....   140.314767: kvm_exit: vcpu 0 reaso=
+n EPT_VIOLATION rip 0x1 info1 0x00000000000001aa info2 0x0000000080000306 i=
+ntr_info 0x00000000 error_code 0x00000000
+>            repro-1289    [019] .....   140.314767: kvm_nested_vmexit: vcp=
+u 0 reason EPT_VIOLATION rip 0x1 info1 0x00000000000001aa info2 0x000000008=
+0000306 intr_info 0x00000000 error_code 0x00000000
+>            repro-1289    [019] .....   140.314768: kvm_page_fault: vcpu 0=
+ rip 0x1 address 0x0000000000000f78 error_code 0x1aa
+>            repro-1289    [019] .....   140.314778: kvm_emulate_insn: 0:1:=
+f4 (prot32)
+>            repro-1289    [019] .....   140.314779: kvm_emulate_insn: 0:1:=
+f4 (prot32) failed
+>
+> > ## QUESTION
+> > The phenomenon is due to the kvm's emulate function can't emulate all t=
+he
+> > instructions.
+>
+> No, the issue is that KVM doesn't detect a weird edge case where the *gue=
+st* has
+> messed up, and instead of effectively terminating the VM, KVM puts it int=
+o an
+> infinite loop of sorts.
+>
+> Amusingly, this edge case was just "fixed" for both VMX and SVM[*] (expec=
+ted to
+> to land in v6.14).  In quotes because "fixing" the problem really means k=
+illing
+> the VM instead of letting it loop.
+>
+>   [1/7] KVM: x86: Add function for vectoring error generation
+>         https://github.com/kvm-x86/linux/commit/11c98fa07a79
+>   [2/7] KVM: x86: Add emulation status for unhandleable vectoring
+>         https://github.com/kvm-x86/linux/commit/5c9cfc486636
+>   [3/7] KVM: x86: Unprotect & retry before unhandleable vectoring check
+>         https://github.com/kvm-x86/linux/commit/704fc6021b9e
+>   [4/7] KVM: VMX: Handle vectoring error in check_emulate_instruction
+>         https://github.com/kvm-x86/linux/commit/47ef3ef843c0
+>   [5/7] KVM: SVM: Handle vectoring error in check_emulate_instruction
+>         https://github.com/kvm-x86/linux/commit/7bd7ff99110a
+>   [6/7] selftests: KVM: extract lidt into helper function
+>         https://github.com/kvm-x86/linux/commit/4e9427aeb957
+>   [7/7] selftests: KVM: Add test case for MMIO during vectoring
+>         https://github.com/kvm-x86/linux/commit/62e41f6b4f36
+>
+> [*] https://lore.kernel.org/all/173457555486.3295983.11848882309599168611=
+.b4-ty@google.com
 
