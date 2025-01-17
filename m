@@ -1,158 +1,135 @@
-Return-Path: <kvm+bounces-35840-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35841-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D743A15591
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 18:15:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7794EA155A0
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 18:22:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3292D1683D8
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:15:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87C41188D43F
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 17:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC0B1A2395;
-	Fri, 17 Jan 2025 17:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AF11A0BCF;
+	Fri, 17 Jan 2025 17:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4ag2GoeL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bV8/BurP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A958C1A23AA
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 17:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EE419E979
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 17:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737134131; cv=none; b=mNZB32g27TzyQDN8xi5ypin8o/Jnns5Aru9OzxTeYZm38HRQwvZXDWmhwtzjATF5PlyL8J4dBFoIqS6YldEfKbKoZEeMdOlLvPXb3QRN9+122jQ9uUUbjY+3/DnnD7EiGfCqx/BE34jAQMov/nN+jwlWPKC2lUHyyammUhB5Vec=
+	t=1737134546; cv=none; b=P652Fp6vKXvrZ2mViEZ06lKG4MAM/dewuQ+RcYD+tijEjZSnWHIYz3ssX7/pIYYEaMOtA/u4/Mk1EEQQMwqLxU+X83FWy5hxnF8avI4yIIyIz/QcbB9O1CbaCxlV29jJUhZ/iQCTEOekt9ZwFGuyoudHiGoPsNsh/W7/BJREMUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737134131; c=relaxed/simple;
-	bh=0MFya64nSwrKA4zsNtkUtWH4IKaadp8mDbPpC2PlrFo=;
+	s=arc-20240116; t=1737134546; c=relaxed/simple;
+	bh=ko9hCfsTSFb2WHMPF+cKB91E3qzU/D2w3rNbjhFfpKM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=A1Ixuwt+py2iDQZZZQX8ZmBdxOZgyVFqJgSdekIhW2y2gb2Rc/X8T4qq47ySVrh2l6RQZ8WhTW4+4TiQjfsE6ArXOgvMWPwO37neTUvcC1ms6ACNnt+A2F016HUJDwxrgz3remgJYDicD4kIOPGT27gUf0uiPXLgJFv/nUMdaOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4ag2GoeL; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=CjKIsm31JHA31/xJAPbL+Cm1yBfnbCY8V1Qg2LhirHOQlzuR6W/NU03wf/5Rjz7+Nm9P7mcHSnHCAXQ82XTgSwJoSaWMPXIDyeUILHvMth2wWxrUQmyUoxMlOvOnZa4WQdp9/6AQBRG4XneUWbA3gtWDXQxXt1veBxmJZdseJNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bV8/BurP; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21a7cbe3b56so33252725ad.0
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 09:15:29 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef909597d9so6490713a91.3
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 09:22:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737134129; x=1737738929; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/pcx17eniD+ASjh3teIfjrJN/d55a+1SMCIjE05N6Y0=;
-        b=4ag2GoeL9Uij5dXXikR/tga2oE333+Z0UZd8JXsw3kqqlw23y0O2WI2cTxZTydYu+y
-         maXvrtsG9f/N2QLF8f0bu94m9UUcknp5XYbNi74iypZwo4tFIhp2HhWkkEyjzhf2/U0H
-         32YrCRpcmMESOO9ydGjpPlrOkkT3DrRZDdYaUG+6HBYzGmgaskztkRyu5gZTkA934dSS
-         O/iA2JJBQinlPO8c5/kzcRCIXdRGBOggWL5m12u/hJpal2N3y59MNhdHTraWJil+EdMo
-         PHfryZI3ALsHyW3L+tvcA2D983kD9zAGO5rqwFI43pqgco9MISMa0ubHWJ6wQQmh/Caf
-         IjQA==
+        d=google.com; s=20230601; t=1737134544; x=1737739344; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y5yk6XYlrmxggOwgGYss86c4m0CiH1dj4p5ycYrzVkE=;
+        b=bV8/BurPZrCL3AWjCubHzQP1njEqjENqILQeP3qlZal4+FZzVzv5zLzeTvOs/RHmN6
+         mJX18+00FCTs/l3P43/JtBjsak6/ngaABFz/pqtWnsjsO/oFF3t/esliUv3XzLY9IHNZ
+         +EGagopIjg7sbqs7/nzF7q4izAabMNc9Ve55tYs0qT3sW21x+tsEMnGPDEEVfKCGGz9h
+         cE04v+wN8xXqBMHi9oZ9fAaXE9p8ThRPR4lJ5tjCTTtFabm3JqSz2PhRGn22UF26ttz+
+         mxg4XN4wCcJ+RU3H5zCKf3a02zo/Ae7T3+15xswzRmQZaFdL2x2vrEkGHfu20xBpv7Wi
+         BxCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737134129; x=1737738929;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/pcx17eniD+ASjh3teIfjrJN/d55a+1SMCIjE05N6Y0=;
-        b=DiYzs8lNGTuv6obti3Ne2reKJubZ8zqXrwOwQJX16EICROrxS8fOGC2lddhXZpa2Pg
-         yXQEzpjj/czLC9fjEj+LGTQ4Fjp42Vk0i+I9n8Bg+OhL4t61nTa54upkqUETG8smikS2
-         IZz5wmTGAP3IEA1eu+tmo3L0LLJDWpZ32Wd5UHB9USrDTWNYnZz6JpMqOPy1xYwJWyoD
-         gfesEcLnnP49QxWR9wJepbnXQSCehEwpORL9CKWncIfypbvt49nuFRcUMsVoowtX6B21
-         vFRE25ugxMQaI+ojPBpieyrJPc13vc1PLbD7FjbBxNBXQ+0EdmqVgpPTfLGyJCGImlNg
-         j2Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCVUA+5qKomHFGb4wa2O1+yGcQ44phM+ncauDgfQQ8vBGBKFdYZbm0GX2B8y8L6JKeOf3TQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaP1dGDetcy0DQEkb7g6pLQK6Kwgk54gTnTiXVL4kgySjwLIIz
-	uXrgeSaqN31euZvUPT/JL+yYCa4/KzkTP/OnI2q+uvTPIf5sIJhCk2D0+r4dd1HU7mk2v/N7BQd
-	s+Q==
-X-Google-Smtp-Source: AGHT+IFBt8EUJmCBrYJSR6SbgIXxnZj6fm10TNGjaAj4XRK+x0dRIzGirCE9VGAaKkDPtl0zEYTqCFRnILs=
-X-Received: from pfbcv2.prod.google.com ([2002:a05:6a00:44c2:b0:725:a760:4c72])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:148d:b0:725:eb85:f802
- with SMTP id d2e1a72fcca58-72daf930e3cmr5815077b3a.2.1737134128872; Fri, 17
- Jan 2025 09:15:28 -0800 (PST)
-Date: Fri, 17 Jan 2025 09:15:27 -0800
-In-Reply-To: <xhsmhed11hiuy.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+        d=1e100.net; s=20230601; t=1737134544; x=1737739344;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=y5yk6XYlrmxggOwgGYss86c4m0CiH1dj4p5ycYrzVkE=;
+        b=eKBaiSbEHe8eI1ev/A6Uvz01pVnTv6zqwgeWtnCLB3GoTl7cBb26T2V1j+wEXwSd4h
+         I5pbczt1yhJIEpOG/vw3uRQMxLsOLyHqdfVwooY8Nh06LRraPpuFnXwBVKf++lXU0g8Y
+         n2oelXt8sIl7QpTIsqqaW2UggAcT/z/tpzgl0kClJLoW/e47RDvJGpKmlDHAhAJHgkVJ
+         JTIFjRz6KYgxjK98873e+XPYMD70lwwStjaAGT/yJYwsnD4AwtRNoZOicqEv5Ge2yaCf
+         pTxsBcHNN2L9CSzk9R4j/TMYWh4q1gQFHMRUasHZ3cmM1H669xF4bs8roweyRtk33ztm
+         UqzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUh8gVHJk6iaUiSuIVbvWKT8Y2/fr7te/hNnVutZ8dLVtQ4ZLHGsU6Pv4BoXpYk1b7vuC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyc8gRXLcNL5USy+ymK9+JmP9ZIyq91BWVIDvCR48UnxkL3rxxm
+	h4OJLqXT8ez0NDrewxRWsIyMQ168mY9pVpOQ4Fu+A6AL0vBoE5IN0HeS98kOaNREZLPZEjQREd4
+	XDA==
+X-Google-Smtp-Source: AGHT+IEj4uiPctq7slvj0cP2L7ciHNWjI6UojppWmGeB2efD/NJZSfjTA0khj4pTOu7zfYI+CZA6d69DOVM=
+X-Received: from pjuw16.prod.google.com ([2002:a17:90a:d610:b0:2ef:eb2f:ebe])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2f50:b0:2ee:fdf3:38ea
+ with SMTP id 98e67ed59e1d1-2f782d32c45mr4116213a91.23.1737134544351; Fri, 17
+ Jan 2025 09:22:24 -0800 (PST)
+Date: Fri, 17 Jan 2025 09:22:22 -0800
+In-Reply-To: <CAFtZq1F1x5+pXjgUvy=iDMZgY2mPyW+Rq6DKtfD+Msw=-nBaZw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250114175143.81438-1-vschneid@redhat.com> <20250114175143.81438-26-vschneid@redhat.com>
- <Z4bTlZkqihaAyGb4@google.com> <xhsmhed11hiuy.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
-Message-ID: <Z4qQL89GZ_gk0vpu@google.com>
-Subject: Re: [PATCH v4 25/30] context_tracking,x86: Defer kernel text patching IPIs
+References: <CAFtZq1FwJOtxmbf_NPgYP_ZH=PkXJfF0=cXo0xbGkT5TGv66-A@mail.gmail.com>
+ <CAHk-=whnVemumt5AJ1f=rsGdLz4Fk95nZfoBchGmMWCGG63foQ@mail.gmail.com>
+ <CAFtZq1FpLfbnJzqc_s=j9TBLyGxe9D_ZYZU2qiES5dgsBAWv+g@mail.gmail.com>
+ <2025011646-chariot-revision-5753@gregkh> <E5C85B8E-D8F8-408F-B00B-A3650C9320EA@gmail.com>
+ <Z4kkuaY_mJ6z0sa2@google.com> <CAFtZq1F1x5+pXjgUvy=iDMZgY2mPyW+Rq6DKtfD+Msw=-nBaZw@mail.gmail.com>
+Message-ID: <Z4qRzuL3cDbzVTUS@google.com>
+Subject: Re: Potential Denial-of-Service Vulnerability in KVM When Emulating
+ 'hlt' Instruction in L2 Guests
 From: Sean Christopherson <seanjc@google.com>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
-	virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	loongarch@lists.linux.dev, linux-riscv@lists.infradead.org, 
-	linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
-	bcm-kernel-feedback-list@broadcom.com, Peter Zijlstra <peterz@infradead.org>, 
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>, Juergen Gross <jgross@suse.com>, 
-	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.amakhalov@broadcom.com>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	Kan Liang <kan.liang@linux.intel.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Jason Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, 
-	Tomas Glozar <tglozar@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, 
-	Mel Gorman <mgorman@suse.de>, Kees Cook <kees@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Christoph Hellwig <hch@infradead.org>, 
-	Shuah Khan <shuah@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>, Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, Yosry Ahmed <yosryahmed@google.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
-	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
-	Tiezhu Yang <yangtiezhu@loongson.cn>
-Content-Type: text/plain; charset="us-ascii"
+To: C CHI <chichen241@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 17, 2025, Valentin Schneider wrote:
-> On 14/01/25 13:13, Sean Christopherson wrote:
-> > On Tue, Jan 14, 2025, Valentin Schneider wrote:
-> >> +/**
-> >> + * is_kernel_noinstr_text - checks if the pointer address is located in the
-> >> + *                    .noinstr section
-> >> + *
-> >> + * @addr: address to check
-> >> + *
-> >> + * Returns: true if the address is located in .noinstr, false otherwise.
-> >> + */
-> >> +static inline bool is_kernel_noinstr_text(unsigned long addr)
-> >> +{
-> >> +	return addr >= (unsigned long)__noinstr_text_start &&
-> >> +	       addr < (unsigned long)__noinstr_text_end;
-> >> +}
-> >
-> > This doesn't do the right thing for modules, which matters because KVM can be
-> > built as a module on x86, and because context tracking understands transitions
-> > to GUEST mode, i.e. CPUs that are running in a KVM guest will be treated as not
-> > being in the kernel, and thus will have IPIs deferred.  If KVM uses a static key
-> > or branch between guest_state_enter_irqoff() and guest_state_exit_irqoff(), the
-> > patching code won't wait for CPUs to exit guest mode, i.e. KVM could theoretically
-> > use the wrong static path.
-> 
-> AFAICT guest_state_{enter,exit}_irqoff() are only used in noinstr functions
-> and thus such a static key usage should at the very least be caught and
-> warned about by objtool - when this isn't built as a module.
+Dropping Non-KVM folks/lists.
 
-That doesn't magically do the right thing though.  If KVM is built as a module,
-is_kernel_noinstr_text() will get false negatives even for static keys/branches
-that are annotaed as NOINSTR.
+On Fri, Jan 17, 2025, C CHI wrote:
+> I roughly understand the above content.
+
+Heh, you top posted, so it's below.
+
+https://people.kernel.org/tglx/notes-about-netiquette
+
+> The main reason for this phenomenon seems to be the chaotic VM memory lay=
+out
+> caused by the syzkaller template settings. In fact, it=E2=80=99s even obs=
+ervable that
+> the IDT region in the code doesn=E2=80=99t actually contain any exception=
+ handling
+> code, very amusing :)
+>=20
+> Additionally, I would like to ask about the previously mentioned point
+> where the IDT is set in the emulated MMIO space. How can I verify
+> this, and where can I find the relevant code for setting the MMIO
+> region?
+
+In KVM, any guest address that isn't covered by a memslot, a.k.a. a user me=
+mory
+region, is treated as emulated MMIO.
+
+>     The guest loops because the the guest's IDT is located in emulated
+> MMIO space,
+>     and as suspected above, KVM refuses to emulates HLT for L2.
+>=20
+>=20
+> Also, I'm curious as to what technique is used to get the following
+> type of logging information, and I'd like to be able to get each ENTRY
+> and EXIT info on the run
+
+The below comes from KVM's tracepoints.  E.g. if tracefs is mounted at
+/sys/kernel/debug/trace, all KVM tracepoints can be enabled via:
+
+  /sys/kernel/debug/tracing/events/kvm/enable
+
+See Documentation/trace/tracepoints.rst for details on using tracepoints (o=
+r the
+same info in the web version https://docs.kernel.org/trace/tracepoints.html=
+).
 
