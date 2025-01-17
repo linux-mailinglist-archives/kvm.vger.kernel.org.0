@@ -1,232 +1,206 @@
-Return-Path: <kvm+bounces-35796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35797-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19467A15328
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:50:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33AEAA1533F
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:53:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 774CF3A17EA
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:50:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53D98167C65
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758DB19AD8C;
-	Fri, 17 Jan 2025 15:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D0F19CC36;
+	Fri, 17 Jan 2025 15:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="dz0iJhY+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mpGqLvBn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4A6D530
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 15:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154BF19AD8C
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 15:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737129022; cv=none; b=NMUHO4vlIuDSiFjGO0sXc6gJK8EcMaw0oleLr8In7YLIbEHfFBX1UDD1bAijzSqPmR7ADHtd6cZwU3OmSQChuSaKqlEbMY3QWTrrK5hbI4dGRaJlJvni01zpONLqQpyIDFrfEkut2ULW7lIpI5D9ssQyXM9n0wP429+dbDJp6rc=
+	t=1737129180; cv=none; b=Fgbzzi+Yqo9ikPjjdBggNWOBR3jVZT57Z9viI0zGn1yQVg0PeadKVPtGNHVB4KbG0NKeSLO0AwiqHUSzTZtFknnRJvncFCjYMf1n8wBlGkOk2UyjdQjJXpLyMoGfRwVuBLagAQbjEqjSy6WEeNOfHmM6lTrteoiucfhmxCVW6/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737129022; c=relaxed/simple;
-	bh=dclbQA2kv91cOorJaTivwzz7mnR/zYBL6itMyl+l6F4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=koLPbptpyWMaplNw9NRrs3eY2AWH9qSWHc3IqN2YAjcGtIxilGrUHW8H7OrxvDRTGvMJnwJmgjb1gEWVJvKytYZRL6MJHIb2JDnnZSmZUX7S0S3SZTrNqNmJWd8EV6c9CpDaA9iEQh0Iavj0Id4/6m2yAgpcCAq3lyZeYcMLm44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=dz0iJhY+; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3862f32a33eso1055910f8f.3
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 07:50:19 -0800 (PST)
+	s=arc-20240116; t=1737129180; c=relaxed/simple;
+	bh=E7d+TpfXp3p6m5vGusLumGYBM9vV8hEetyox2i/2Tk8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rGEKjZ5mZRwAEAk62SIquKeUEJjSHaCrK+vOA1xsFVUdmHfMLOiHv/4R6QDhRXhgJqzqE+kb1yG/eiWdgsIavyQtwqchGfOkO9OT1aKz85ACgKwLuCveIrbGb/boy+pSjO8Q2B3339M4KH/kDLGXrpR2SVPV9xG3NcTrAKsEO44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mpGqLvBn; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5d0c939ab78so9577a12.0
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 07:52:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1737129018; x=1737733818; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cp/GIvJPAqb8LwPhNDqvZSb8wpAapnmNF5gAZrNXtXA=;
-        b=dz0iJhY+SaJlzRgU+0IhBXaj+VQYmRdzLCvXev0LiDG27OwqdidS7M0rD8LStIevj0
-         fsg+sOrWPYN99qdlTivbqFlR0IuliHlLFM50BcssVwR/dgYwzNgr1Vv6KgjmKRYevW4y
-         yAstQ3Z6Ll9ihWrueHOssIVTrh1iQ4lD4IAS3BFIcsXmgtQpTdUsTcCIPFvQr42e3eRB
-         Xy8UmCy7GqhOEL92ZolIQGpk+gjZyHDINdV98J5qpXlzWj3By88cNmKVjt8nOIpGvY26
-         kGaDyD4WGG9SZ/0IKEWImPTW6J8BgGee+frNdcIwfzY6Ws9yv762Jfyt63LjDcuRU3xb
-         7S6g==
+        d=google.com; s=20230601; t=1737129176; x=1737733976; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E7d+TpfXp3p6m5vGusLumGYBM9vV8hEetyox2i/2Tk8=;
+        b=mpGqLvBniVqxo77vfpJUti5+g+eBQMghQtwoA7cF331WeBcYbaNHa/0Apt7RaciHOt
+         /ckZLqTt5IsP4hkw8MdqGv71PrORwCjtz07dDwHT5XtIP1WSXivZFw5I69VeeqOfcQF3
+         ybe6UQGUK1sRDw7mWfl8g5yJZjAV4KfLbPCbsnEvoY2Is2Ir/+knCLlW/+DsbpZp+F67
+         1YFefnkJmOsddMASB3if29JAVOaoojUkTxLWZBjkgUI3ScVoKgbxbMxoYS341oH/wb1u
+         zde5v0gHpoYfKEPKNScMJekd0S1tXfitnEzMT2pHzwhXP/omYZPS3FKjadRdLXhf/Z61
+         8+oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737129018; x=1737733818;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cp/GIvJPAqb8LwPhNDqvZSb8wpAapnmNF5gAZrNXtXA=;
-        b=TdsUpJnAe+Brx8fAWxByMVh1CHySgy8IwOFw5NAgpWvvgtVa8CVlBJ0yj+XJ3IX/VT
-         BxU4nXSd96CTG4Brei9nBIRMMDa1/nyCXsWXOptDa51MnKwvaq21bsz//YgFgk4FJSe/
-         PnJqoc7IYMMgcnp8A7JtkecvILaeYyU1UUaiYMeL/nxOzxMGYzYxq4p6PjDEvn0NCUy9
-         U9ucNUf4oRqucZ0Yz5r24PAQsjnhs2fK0bjYNmr0+Afr9Qyl6HebH7dM9W5u4CokjzT4
-         EqEevSO7A9M7TDwOnOWWgz9715nm36XPVTeev6a1QhT3GtPV1tOyw0x4jyCxrrelx1pB
-         78zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQL0RjS4KnMuBCyOfjMpkCuk3l/YPj0aAoJpApLAmyYhNA6bKiQwMLUlfyUQzQBesoZlE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx02sv4BPi15d4T8jfZ5seHfKTQRCU66c/q5BJLsTPgJD1CIZOV
-	ZovAMtQP4d1Md8ufp6dzeduk5YGDU3Hm7+G3vUliG+yJPlrAupIOapthaQi5N6DqkD9y4quWN+2
-	a
-X-Gm-Gg: ASbGncvL/Tw1Jlw8qS03LuSbuCSq3PCRgb1qW3nbpnI8QJnofeXSNvpqs9NT0ymy7rZ
-	bzRDE2o74jN3ghV2s+siaD4oPtGAHbHXmoD/9xAQm3/c4qm8ASbEidL30sL2yGw+gy/Wh6X7slY
-	Fw1Pn18+wf/ztIt+FQMJk8l5pbSRajCAK0R/hxY5pKOKJgxAqeL/13bL/GDwH50KbL2M65zKNpU
-	MsmJQlsru9kPZOeYO5GmHw7WZqFA4qSxOn0FtWMKiL8/3il0BE0AXU4vjd2ubNalMLm6HpXsPOt
-	15FkuEzVYwldVz8fq8FQSS8V2Q==
-X-Google-Smtp-Source: AGHT+IG2hMkiEwGdkGXBgxT0aXmQV7q70JaFEOKvaBWwhUvfyCsA51xrLRzqSMURNo7XJP0BjSwJJw==
-X-Received: by 2002:a5d:620f:0:b0:38b:d765:7027 with SMTP id ffacd0b85a97d-38bf57a2675mr2269669f8f.41.1737129017614;
-        Fri, 17 Jan 2025 07:50:17 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf322b51bsm2860493f8f.60.2025.01.17.07.50.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jan 2025 07:50:16 -0800 (PST)
-Message-ID: <9fdcd0cf-334e-46f9-97c1-305f213d1ad3@rivosinc.com>
-Date: Fri, 17 Jan 2025 16:50:16 +0100
+        d=1e100.net; s=20230601; t=1737129176; x=1737733976;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E7d+TpfXp3p6m5vGusLumGYBM9vV8hEetyox2i/2Tk8=;
+        b=Mf36/oXDF3anXl7oeb4bfA1t7MboBslgCeOGHBeEQjiSqNxUtV7Cdx/WeYrR8xJUa/
+         c6WdFvsouZ8PHzuqxmbRf7wa/YZDbznzb8dyqDU9blSlkMWQzOp20RoWdz/L3KETOYEi
+         ogNUIaLXbQOEaVXo9QfQrYgIxXLVqlKOkczqh5d8iJAueDv6IJQ+0TTzrZPjMDWlXpcd
+         Cr8JCjH35Xd3HD3uxpGnc3sfxFKlO1Kw7ACzwF2p8mJ5PcQk2c8qzctzoB+ILMGfTyIa
+         0oOAc4dW+h1jW1Ap9HMFjS3zWN9IXqNRN1A7vpUOS7KGrbv3Vz+axKsoJZPzQz99OQE3
+         wiLA==
+X-Forwarded-Encrypted: i=1; AJvYcCVg0zDY0+hHqksPHqOnm5O/pUqt3LlBjMOCyRYSmIHsfq4ENSONAk7ZZlQhPiBKZamH8do=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWVwoo8GEy37Bq82N/XnvMLzIiO6cyZN52wDR83Hj05ywRTdii
+	khpHA/j1x+fbQKmLArD2AjkSZ/XBW03zEkEsFcEsjcXZvSBUqgWyUS6Qx7Tuj3QARr8Ut2mKnT/
+	pwFtZiregZBtquqSK2JnmiMWcWTFh8iCjdZ8m
+X-Gm-Gg: ASbGncumuJaJS1qOs89sOUhHtvi3J7RYMgEuZr6wfh7Ja/qguatEZo7navCBp96PxWW
+	77+gFXr+roGqz0I8WAU1RKorhz7Rhu2kRpZvuXgoAGSOQhZBJgiNhv5ByWW21lg3ZRg==
+X-Google-Smtp-Source: AGHT+IEEkI7Iy2SK9FPAK0t7gLelF/8kGvCq2TFqgDI01h52pfAV4lOJlwJrdbZvw3hEJ10c/9do3FNZA9vfJuC5wNY=
+X-Received: by 2002:a50:8e10:0:b0:5d0:acf3:e3a6 with SMTP id
+ 4fb4d7f45d1cf-5db7e2c3f9dmr75503a12.1.1737129175787; Fri, 17 Jan 2025
+ 07:52:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] RISC-V: KVM: add SBI extension init()/deinit()
- functions
-To: Samuel Holland <samuel.holland@sifive.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org
-References: <20250106154847.1100344-1-cleger@rivosinc.com>
- <20250106154847.1100344-4-cleger@rivosinc.com>
- <a6196a16-808e-4a69-bcec-a83d868b726f@sifive.com>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <a6196a16-808e-4a69-bcec-a83d868b726f@sifive.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250114175143.81438-1-vschneid@redhat.com> <20250114175143.81438-30-vschneid@redhat.com>
+ <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com> <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+In-Reply-To: <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+From: Jann Horn <jannh@google.com>
+Date: Fri, 17 Jan 2025 16:52:19 +0100
+X-Gm-Features: AbW1kvZJ0qyEwdtkrx_UmrEU0O4aMmTblOKPsNQ-aUYqHdGS_cvMGi3arE1PehU
+Message-ID: <CAG48ez3H8OVP1GxBLdmFgusvT1gQhwu2SiXbgi8T9uuCYVK52w@mail.gmail.com>
+Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer flush_tlb_kernel_range()
+ targeting NOHZ_FULL CPUs
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
+	virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	loongarch@lists.linux.dev, linux-riscv@lists.infradead.org, 
+	linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
+	bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>, 
+	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.amakhalov@broadcom.com>, 
+	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	"Liang, Kan" <kan.liang@linux.intel.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Jason Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ard Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
+	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>, 
+	Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, 
+	Tomas Glozar <tglozar@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, 
+	Mel Gorman <mgorman@suse.de>, Kees Cook <kees@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Christoph Hellwig <hch@infradead.org>, 
+	Shuah Khan <shuah@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>, Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, 
+	Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Yosry Ahmed <yosryahmed@google.com>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
+	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
+	Tiezhu Yang <yangtiezhu@loongson.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jan 17, 2025 at 4:25=E2=80=AFPM Valentin Schneider <vschneid@redhat=
+.com> wrote:
+> On 14/01/25 19:16, Jann Horn wrote:
+> > On Tue, Jan 14, 2025 at 6:51=E2=80=AFPM Valentin Schneider <vschneid@re=
+dhat.com> wrote:
+> >> vunmap()'s issued from housekeeping CPUs are a relatively common sourc=
+e of
+> >> interference for isolated NOHZ_FULL CPUs, as they are hit by the
+> >> flush_tlb_kernel_range() IPIs.
+> >>
+> >> Given that CPUs executing in userspace do not access data in the vmall=
+oc
+> >> range, these IPIs could be deferred until their next kernel entry.
+> >>
+> >> Deferral vs early entry danger zone
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> This requires a guarantee that nothing in the vmalloc range can be vun=
+map'd
+> >> and then accessed in early entry code.
+> >
+> > In other words, it needs a guarantee that no vmalloc allocations that
+> > have been created in the vmalloc region while the CPU was idle can
+> > then be accessed during early entry, right?
+>
+> I'm not sure if that would be a problem (not an mm expert, please do
+> correct me) - looking at vmap_pages_range(), flush_cache_vmap() isn't
+> deferred anyway.
 
+flush_cache_vmap() is about stuff like flushing data caches on
+architectures with virtually indexed caches; that doesn't do TLB
+maintenance. When you look for its definition on x86 or arm64, you'll
+see that they use the generic implementation which is simply an empty
+inline function.
 
-On 11/01/2025 00:42, Samuel Holland wrote:
-> Hi Clément,
-> 
-> On 2025-01-06 9:48 AM, Clément Léger wrote:
->> The FWFT SBI extension will need to dynamically allocate memory and do
->> init time specific initialization. Add an init/deinit callbacks that
->> allows to do so.
->>
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> ---
->>  arch/riscv/include/asm/kvm_vcpu_sbi.h |  9 ++++++++
->>  arch/riscv/kvm/vcpu.c                 |  2 ++
->>  arch/riscv/kvm/vcpu_sbi.c             | 31 ++++++++++++++++++++++++++-
->>  3 files changed, 41 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
->> index b96705258cf9..8c465ce90e73 100644
->> --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
->> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
->> @@ -49,6 +49,14 @@ struct kvm_vcpu_sbi_extension {
->>  
->>  	/* Extension specific probe function */
->>  	unsigned long (*probe)(struct kvm_vcpu *vcpu);
->> +
->> +	/*
->> +	 * Init/deinit function called once during VCPU init/destroy. These
->> +	 * might be use if the SBI extensions need to allocate or do specific
->> +	 * init time only configuration.
->> +	 */
->> +	int (*init)(struct kvm_vcpu *vcpu);
->> +	void (*deinit)(struct kvm_vcpu *vcpu);
->>  };
->>  
->>  void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu, struct kvm_run *run);
->> @@ -69,6 +77,7 @@ const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(
->>  bool riscv_vcpu_supports_sbi_ext(struct kvm_vcpu *vcpu, int idx);
->>  int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run);
->>  void kvm_riscv_vcpu_sbi_init(struct kvm_vcpu *vcpu);
->> +void kvm_riscv_vcpu_sbi_deinit(struct kvm_vcpu *vcpu);
->>  
->>  int kvm_riscv_vcpu_get_reg_sbi_sta(struct kvm_vcpu *vcpu, unsigned long reg_num,
->>  				   unsigned long *reg_val);
->> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
->> index e048dcc6e65e..3420a4a62c94 100644
->> --- a/arch/riscv/kvm/vcpu.c
->> +++ b/arch/riscv/kvm/vcpu.c
->> @@ -180,6 +180,8 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->>  
->>  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->>  {
->> +	kvm_riscv_vcpu_sbi_deinit(vcpu);
->> +
->>  	/* Cleanup VCPU AIA context */
->>  	kvm_riscv_vcpu_aia_deinit(vcpu);
->>  
->> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
->> index 6e704ed86a83..d2dbb0762072 100644
->> --- a/arch/riscv/kvm/vcpu_sbi.c
->> +++ b/arch/riscv/kvm/vcpu_sbi.c
->> @@ -486,7 +486,7 @@ void kvm_riscv_vcpu_sbi_init(struct kvm_vcpu *vcpu)
->>  	struct kvm_vcpu_sbi_context *scontext = &vcpu->arch.sbi_context;
->>  	const struct kvm_riscv_sbi_extension_entry *entry;
->>  	const struct kvm_vcpu_sbi_extension *ext;
->> -	int idx, i;
->> +	int idx, i, ret;
->>  
->>  	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
->>  		entry = &sbi_ext[i];
->> @@ -501,8 +501,37 @@ void kvm_riscv_vcpu_sbi_init(struct kvm_vcpu *vcpu)
->>  			continue;
->>  		}
->>  
->> +		if (ext->init) {
->> +			ret = ext->init(vcpu);
->> +			if (ret)
->> +				scontext->ext_status[idx] =
->> +					KVM_RISCV_SBI_EXT_STATUS_UNAVAILABLE;
->> +		}
->> +
->>  		scontext->ext_status[idx] = ext->default_disabled ?
->>  					KVM_RISCV_SBI_EXT_STATUS_DISABLED :
->>  					KVM_RISCV_SBI_EXT_STATUS_ENABLED;
-> 
-> This will overwrite the KVM_RISCV_SBI_EXT_STATUS_UNAVAILABLE set above.
+> So after vmapping something, I wouldn't expect isolated CPUs to have
+> invalid TLB entries for the newly vmapped page.
+>
+> However, upon vunmap'ing something, the TLB flush is deferred, and thus
+> stale TLB entries can and will remain on isolated CPUs, up until they
+> execute the deferred flush themselves (IOW for the entire duration of the
+> "danger zone").
+>
+> Does that make sense?
 
-Oh yes indeed, I should add a "continue" under the if above.
+The design idea wrt TLB flushes in the vmap code is that you don't do
+TLB flushes when you unmap stuff or when you map stuff, because doing
+TLB flushes across the entire system on every vmap/vunmap would be a
+bit costly; instead you just do batched TLB flushes in between, in
+__purge_vmap_area_lazy().
 
-> 
->>  	}
->>  }
->> +
->> +void kvm_riscv_vcpu_sbi_deinit(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_vcpu_sbi_context *scontext = &vcpu->arch.sbi_context;
->> +	const struct kvm_riscv_sbi_extension_entry *entry;
->> +	const struct kvm_vcpu_sbi_extension *ext;
->> +	int idx, i;
->> +
->> +	for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
->> +		entry = &sbi_ext[i];
->> +		ext = entry->ext_ptr;
->> +		idx = entry->ext_idx;
->> +
->> +		if (idx < 0 || idx >= ARRAY_SIZE(scontext->ext_status))
->> +			continue;
->> +
->> +		if (scontext->ext_status[idx] != KVM_RISCV_SBI_EXT_STATUS_ENABLED || !ext->deinit)
-> 
-> Given that an extension can be enabled/disabled after initialization, this
-> should only skip deinit if the status is UNAVAILABLE.
+In other words, the basic idea is that you can keep calling vmap() and
+vunmap() a bunch of times without ever doing TLB flushes until you run
+out of virtual memory in the vmap region; then you do one big TLB
+flush, and afterwards you can reuse the free virtual address space for
+new allocations again.
 
-yeah, make sense as well,
+So if you "defer" that batched TLB flush for CPUs that are not
+currently running in the kernel, I think the consequence is that those
+CPUs may end up with incoherent TLB state after a reallocation of the
+virtual address space.
 
-Thanks for the review,
+Actually, I think this would mean that your optimization is disallowed
+at least on arm64 - I'm not sure about the exact wording, but arm64
+has a "break before make" rule that forbids conflicting writable
+address translations or something like that.
 
-Clément
-
-> 
-> Regards,
-> Samuel
-> 
->> +			continue;
->> +
->> +		ext->deinit(vcpu);
->> +	}
->> +}
-> 
-
+(I said "until you run out of virtual memory in the vmap region", but
+that's not actually true - see the comment above lazy_max_pages() for
+an explanation of the actual heuristic. You might be able to tune that
+a bit if you'd be significantly happier with less frequent
+interruptions, or something along those lines.)
 
