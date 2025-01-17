@@ -1,246 +1,199 @@
-Return-Path: <kvm+bounces-35769-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35770-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47B31A14E87
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 12:34:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3165CA14EA0
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 12:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 835D01886469
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 11:34:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47366169243
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 11:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D261FE46B;
-	Fri, 17 Jan 2025 11:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949DA1FE478;
+	Fri, 17 Jan 2025 11:44:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2941D8E12;
-	Fri, 17 Jan 2025 11:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D2B19992C;
+	Fri, 17 Jan 2025 11:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737113663; cv=none; b=T48bTB/BrpMPJY3BX05QDBcXgGkG9t9JqvV3JV59s9WB/8xysnVZLl7TF87nuU96++5gqRMZXzLmbJNDnwasL1+jXcrsccRVBZU3UG4DJth2Q1shjiqbp265Y7a84CfmT1knn1ycUbwgtysm2gLULW+Qkn0eDxafPNJBfAnV+j8=
+	t=1737114285; cv=none; b=qEyXHoZ9VL7lsZ4tUWaTDjoHXxbZStIeLiB1PkHkEyhU5AmvPx8x/cz/E7uIzC0bE/qjD0xXzX54IZBnvNygzypWznyjXGbqqU4ZBoQfDDNkF/UnJ5nTS7vSCBJzeRRz/R+6Pt7mueuzP6A5tTz4Ouil3gBn4rYFQEXloRAK9EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737113663; c=relaxed/simple;
-	bh=LAUrUrC3uCCxizrAG4Vg1PHnwSUsUPhIm+o7hM2izr4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d2FqMhqWXJALlbOT5X0pGz9AxXhCpGfeMlZetEcLTAfLuvScpnwKvhno1kQQXppRQjdqq6+slIJ6OwSiw7kmmQVgdyweQ2AZeME1WtIOa/kfYgrmm3eHbQAWhayabqcWMDkRaQnXHuixoIlFHl3sXBDnbn2I9b4TKJ0E1DFgbYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4919C1476;
-	Fri, 17 Jan 2025 03:34:48 -0800 (PST)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 82BEA3F73F;
-	Fri, 17 Jan 2025 03:34:16 -0800 (PST)
-Date: Fri, 17 Jan 2025 11:34:09 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC v3 09/27] KVM: arm64: Factor SVE guest exit handling
- out into a function
-Message-ID: <Z4pAMaEYvdLpmbg2@J2N7QTR9R3>
-References: <20241220-kvm-arm64-sme-v3-0-05b018c1ffeb@kernel.org>
- <20241220-kvm-arm64-sme-v3-9-05b018c1ffeb@kernel.org>
+	s=arc-20240116; t=1737114285; c=relaxed/simple;
+	bh=PhK0DeHGXnoZKBKI5r3PGBPr8XqY/40VBWxLuspWuag=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=p7BJFYnAACdhailsIPAqrQZpKDEmmPiz4Ey4qIY1LMwYxkbc3nDUCCvBELnheMo+us0if+vN1ptme2c8BSYFbNuMTM3q2PRvLjmrX+Rv/JklBuFxapEw2klugOdnM0E2EaJZuzhZhKZxDyIyQLZbzFE95WSBAsCJqRoC2n8Ea1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.237.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from zju.edu.cn (unknown [10.214.100.11])
+	by mtasvr (Coremail) with SMTP id _____wBXxX2GQopnEJ0YAA--.20523S3;
+	Fri, 17 Jan 2025 19:44:07 +0800 (CST)
+Received: from NUC10i7FNH.. (unknown [10.214.100.11])
+	by mail-app2 (Coremail) with SMTP id zC_KCgCXdV6CQopnA40LAA--.9592S2;
+	Fri, 17 Jan 2025 19:44:05 +0800 (CST)
+From: Haoran Zhang <wh1sper@zju.edu.cn>
+To: michael.christie@oracle.com
+Cc: mst@redhat.com,
+	jasowang@redhat.com,
+	pbonzini@redhat.com,
+	stefanha@redhat.com,
+	eperezma@redhat.com,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoran Zhang <wh1sper@zju.edu.cn>
+Subject: Re: Re: [PATCH] vhost/scsi: Fix improper cleanup in vhost_scsi_set_endpoint()
+Date: Fri, 17 Jan 2025 19:42:02 +0800
+Message-ID: <20250117114400.79792-1-wh1sper@zju.edu.cn>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <e418a5ee-45ca-4d18-9b5d-6f8b6b1add8e@oracle.com>
+References: <e418a5ee-45ca-4d18-9b5d-6f8b6b1add8e@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241220-kvm-arm64-sme-v3-9-05b018c1ffeb@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zC_KCgCXdV6CQopnA40LAA--.9592S2
+X-CM-SenderInfo: asssliaqzvq6lmxovvfxof0/1tbiAg8JB2eJiygpSQAAsu
+X-CM-DELIVERINFO: =?B?wOZpVwXKKxbFmtjJiESix3B1w3u7BCRQAee6E0rsv8LVXQpn+jaR4luXxag8yWi2LJ
+	86hmNl1N/KjW2+Pzmhc0HcODClqWXbN+DaVcrUonWrmkaBtWb0Y17wNRe4l1CQeTIzSqoV
+	jvhx3BsZ8YrkQ3MQ8C49b7CoVDZy+9r3JI6jQOmiJ3qtq8cranNWbrrSC45yiw==
+X-Coremail-Antispam: 1Uk129KBj93XoWxuw1rKFyrGFWkCr43XFyDCFX_yoW7Gw4DpF
+	Z8G34jyr48G34UZrs7W3W5Xr18Crs3ur9xKFn2kry2vr98Cry8JrZrK3Z09F4DuFWrJF47
+	J3Wqq3W5Wrn8A3XCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJV
+	Cq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84AC
+	jcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4UJVW0ow
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0V
+	AKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1l
+	Ox8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0Y48IcxkI7VAKI48G6xCjnV
+	AKz4kxM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k2
+	0xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI
+	8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41l
+	IxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIx
+	AIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
+	jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUjtfHUUUUUU==
 
-On Fri, Dec 20, 2024 at 04:46:34PM +0000, Mark Brown wrote:
-> The SVE portion of kvm_vcpu_put() is quite large, especially given the
-> comments required.  When we add similar handling for SME the function
-> will get even larger, in order to keep things managable factor the SVE
-> portion out of the main kvm_vcpu_put().
+> I see now and can replicate it. I think there is a 2nd bug in
+> vhost_scsi_set_endpoint related to all this where we need to
+> prevent switching targets like this or else we'll leak some
+> other refcounts. If 500140501e23be28's tpg number was 3 then
+> we would overwrite the existing vs->vs_vhost_wwpn and never
+> be able to release the refounts on the tpgs from 500140562c8936fa.
+>
+> I'll send a patchset to fix everything and cc you.
+>
+> Thanks for all the work you did testing and debugging this
+> issue.
 
-While investigating some problems with SVE I spotted a latent bug in
-this area where I suspect the fix will conflict with / supersede this
-rework. Details below; IIUC the bug was introduced in commit:
+You are welcome. There is another bug I was about to report, but I'm not
+sure whether I should create a new thread. I feel that the original design
+of dynamically allocating new vs_tpgs in vhost_scsi_set_endpoint is not
+intuitive, and copying TPGs before setting the target doesn't seem
+logical. Since you are already refactoring the code, maybe I should post
+it here so we can address these issues in one go.
 
-  8c8010d69c132273 ("KVM: arm64: Save/restore SVE state for nVHE")
+[PATCH] vhost/scsi: Fix dangling pointer in vhost_scsi_set_endpoint()
 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/kvm/fpsimd.c | 67 +++++++++++++++++++++++++++----------------------
->  1 file changed, 37 insertions(+), 30 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> index 09b65abaf9db60cc57dbc554ad2108a80c2dc46b..3c2e0b96877ac5b4f3b9d8dfa38975f11b74b60d 100644
-> --- a/arch/arm64/kvm/fpsimd.c
-> +++ b/arch/arm64/kvm/fpsimd.c
-> @@ -151,6 +151,41 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> +static void kvm_vcpu_put_sve(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 zcr;
-> +
-> +	if (!vcpu_has_sve(vcpu))
-> +		return;
-> +
-> +	zcr = read_sysreg_el1(SYS_ZCR);
-> +
-> +	/*
-> +	 * If the vCPU is in the hyp context then ZCR_EL1 is loaded
-> +	 * with its vEL2 counterpart.
-> +	 */
-> +	__vcpu_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu)) = zcr;
-> +
-> +	/*
-> +	 * Restore the VL that was saved when bound to the CPU, which
-> +	 * is the maximum VL for the guest. Because the layout of the
-> +	 * data when saving the sve state depends on the VL, we need
-> +	 * to use a consistent (i.e., the maximum) VL.  Note that this
-> +	 * means that at guest exit ZCR_EL1 is not necessarily the
-> +	 * same as on guest entry.
-> +	 *
-> +	 * ZCR_EL2 holds the guest hypervisor's VL when running a
-> +	 * nested guest, which could be smaller than the max for the
-> +	 * vCPU. Similar to above, we first need to switch to a VL
-> +	 * consistent with the layout of the vCPU's SVE state. KVM
-> +	 * support for NV implies VHE, so using the ZCR_EL1 alias is
-> +	 * safe.
-> +	 */
-> +	if (!has_vhe() || (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)))
-> +		sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1,
-> +				       SYS_ZCR_EL1);
-> +}
-> +
->  /*
->   * Write back the vcpu FPSIMD regs if they are dirty, and invalidate the
->   * cpu FPSIMD regs so that they can't be spuriously reused if this vcpu
-> @@ -179,38 +214,10 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
->  	}
+Since commit 4f7f46d32c98 ("tcm_vhost: Use vq->private_data to indicate
+if the endpoint is setup"), a dangling pointer issue has been introduced
+in vhost_scsi_set_endpoint() when the host fails to reconfigure the
+vhost-scsi endpoint. Specifically, this causes a UAF fault in
+vhost_scsi_get_req() when the guest attempts to send an SCSI request.
 
-A little before this context, kvm_arch_vcpu_put_fp() calls
-local_irq_save(), which indicates that IRQs can be taken before this
-point, which is deeply suspicious.
+In vhost_scsi_set_endpoint(), vhost_scsi->vs_tpg holds the same pointer
+as vq->private_data. The code allocates a new vs_tpg array to hold the
+TPGs and updates vq->private_data if a match is found between
+vhost_scsi_list's tport_name and the target WWPN. However, the code
+ignored the case where `match == 0` (i.e. the target endpoint does not
+match any TPGs in vhost_scsi_list). In this scenario, it directly frees
+the old vs_tpg and updates vhost_scsi->vs_tpg without modifying
+vq->private_data, leaving all vq's backend pointer dangling. As a result,
+subsequent requests from the guest will trigger a UAF fault on vs_tpg in
+vhost_scsi_get_req(). Below is the KASAN report:
 
-If IRQs are enabled, then it's possible to take an IRQ and potentially
-run a softirq handler which uses kernel-mode NEON. That means
-kernel_neon_begin() will try to save the live FPSIMD/SVE/SME state via
-fpsimd_save_user_state(), using the live value of ZCR_ELx.LEN, which would not
-be correct per the comment.
+[   68.606821] BUG: KASAN: slab-use-after-free in vhost_scsi_get_req+0xef/0x1f0
+[   68.607671] Read of size 8 at addr ffff8880087a1008 by task vhost-1440/1460
+[   68.608570]
+[   68.612070] Call Trace:
+[   68.612429]  <TASK>
+[   68.612739]  dump_stack_lvl+0x9e/0xd0
+[   68.613206]  print_report+0xd1/0x670
+[   68.613711]  ? __virt_addr_valid+0x54/0x250
+[   68.614232]  ? kasan_complete_mode_report_info+0x6a/0x200
+[   68.614879]  kasan_report+0xd6/0x120
+[   68.615329]  ? vhost_scsi_get_req+0xef/0x1f0
+[   68.615869]  ? vhost_scsi_get_req+0xef/0x1f0
+[   68.616406]  __asan_load8+0x8b/0xe0
+[   68.616854]  vhost_scsi_get_req+0xef/0x1f0
+[   68.617362]  vhost_scsi_handle_vq+0x30f/0x15e0
+[   68.622248]  ...
+[   68.622868]  vhost_scsi_handle_kick+0x39/0x50
+[   68.623409]  vhost_run_work_list+0xd9/0x120
+[   68.623939]  ? __pfx_vhost_run_work_list+0x10/0x10
+[   68.624521]  vhost_task_fn+0xf8/0x240
+[   68.629164]  ...
+[   68.629705]  ret_from_fork+0x5d/0x80
+[   68.630155]  ? __pfx_vhost_task_fn+0x10/0x10
+[   68.630693]  ret_from_fork_asm+0x1a/0x30
+[   68.631179] RIP: 0033:0x0
+[   68.631516] Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+[   68.637405]  </TASK>
+[   68.637670]
+[   68.637798] Allocated by task 1440:
+[   68.638124]  kasan_save_stack+0x39/0x70
+[   68.638607]  kasan_save_track+0x14/0x40
+[   68.638919]  kasan_save_alloc_info+0x37/0x60
+[   68.639331]  __kasan_kmalloc+0xc3/0xd0
+[   68.639625]  __kmalloc_cache_noprof+0x186/0x3a0
+[   68.639971]  vhost_scsi_ioctl+0x630/0xec0
+[   68.640392]  __x64_sys_ioctl+0x126/0x160
+[   68.640755]  x64_sys_call+0x11ad/0x25f0
+[   68.641076]  do_syscall_64+0x7e/0x170
+[   68.641437]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[   68.641887]
+[   68.642016] Freed by task 1461:
+[   68.642301]  kasan_save_stack+0x39/0x70
+[   68.642622]  kasan_save_track+0x14/0x40
+[   68.642958]  kasan_save_free_info+0x3b/0x60
+[   68.643352]  __kasan_slab_free+0x52/0x80
+[   68.643675]  kfree+0x129/0x440
+[   68.643973]  vhost_scsi_ioctl+0xd74/0xec0
+[   68.644290]  __x64_sys_ioctl+0x126/0x160
+[   68.644589]  x64_sys_call+0x11ad/0x25f0
+[   68.644939]  do_syscall_64+0x7e/0x170
+[   68.645377]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Looking at kvm_arch_vcpu_ioctl_run(), the relevant logic is:
+To address this issue, we need to prevent the `free(vs_tpg)` operation
+from being triggered by the `match == 0` branch , either by moving the
+free operation inside the if-clause or by adding a goto statement in the
+else-clause. Here is an alternative patch commit.
 
-	vcpu_load(vcpu); // calls kvm_arch_vcpu_load_fp()
+Fixes: 4f7f46d32c98 ("tcm_vhost: Use vq->private_data to indicate if the endpoint is setup")
+Signed-off-by: Haoran Zhang <wh1sper@zju.edu.cn>
+---
+ drivers/vhost/scsi.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-	while (ret > 0) {
-		preempt_disable();
-		local_irq_disable();
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index 718fa4e0b31e..1e15eab530d7 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -1775,6 +1775,7 @@ vhost_scsi_set_endpoint(struct vhost_scsi *vs,
+ 		ret = 0;
+ 	} else {
+ 		ret = -EEXIST;
++		goto undepend;
+ 	}
+ 
+ 	/*
+-- 
+2.43.0
 
-		kvm_arch_vcpu_ctxflush_fp();
-		ret = kvm_arm_vcpu_enter_exit(vcpu);
-		kvm_arch_vcpu_ctxsync_fp(vcpu);
-
-		local_irq_enable();
-		preempt_enable();
-	}
-
-	vcpu_put(vcpu); // calls kvm_arch_vcpu_put_fp()
-
-... and the problem can occur at any point after the vCPU has run where IRQs
-are enabled, i.e, between local_irq_enable() and either local_irq_disable() or
-vcpu_put()'s call to kvm_arch_vcpu_put_fp().
-
-Note that kernel_neon_begin() calls:
-
-	fpsimd_save_user_state();
-	...
-	fpsimd_flush_cpu_state();
-
-... and fpsimd_save_user_state() will see that the SVE VL is wrong:
-
-	if (WARN_ON(sve_get_vl() != vl)) {
-		force_signal_inject(SIGKILL, SI_KERNEL, 0, 0);
-		return;
-	}
-
-... pending a SIGKILL for the VMM thread without saving the vCPU's state
-before unbinding the live state via fpsimd_flush_cpu_state(), which'll
-set TIF_FOREIGN_FPSTATE.
-
-AFAICT it's possible to re-enter the vCPU after that happens, whereupon
-stale vCPU FPSIMD/SVE state will be restored. Upon return to userspace
-the SIGKILL will be delivered, killing the VMM.
-
-As above, it looks like that's been broken since the nVHE SVE
-save/restore was introduced in commit:
-
-  8c8010d69c132273 ("KVM: arm64: Save/restore SVE state for nVHE")
-
-The TL;DR summary is that it's not sufficient for kvm_arch_vcpu_put_fp()
-to fix up ZCR_ELx. Either:
-
-* That needs to be fixed up while IRQs are masked, e.g. by
-  saving/restoring the host and guest ZCR_EL1 and/or ZCR_ELx values in
-  kvm_arch_vcpu_ctxflush_fp() and kvm_arch_vcpu_ctxsync_fp()
-
-* The lazy save logic in fpsimd_save_user_state() needs to handle KVM
-  explicitly, saving the guest's ZCR_EL1 and restoring the host's
-  ZCR_ELx.
-
-I think we need to fix that before we extend this logic for SME.
-
-Mark.
-
->  
->  	if (guest_owns_fp_regs()) {
-> -		if (vcpu_has_sve(vcpu)) {
-> -			u64 zcr = read_sysreg_el1(SYS_ZCR);
-> -
-> -			/*
-> -			 * If the vCPU is in the hyp context then ZCR_EL1 is
-> -			 * loaded with its vEL2 counterpart.
-> -			 */
-> -			__vcpu_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu)) = zcr;
-> -
-> -			/*
-> -			 * Restore the VL that was saved when bound to the CPU,
-> -			 * which is the maximum VL for the guest. Because the
-> -			 * layout of the data when saving the sve state depends
-> -			 * on the VL, we need to use a consistent (i.e., the
-> -			 * maximum) VL.
-> -			 * Note that this means that at guest exit ZCR_EL1 is
-> -			 * not necessarily the same as on guest entry.
-> -			 *
-> -			 * ZCR_EL2 holds the guest hypervisor's VL when running
-> -			 * a nested guest, which could be smaller than the
-> -			 * max for the vCPU. Similar to above, we first need to
-> -			 * switch to a VL consistent with the layout of the
-> -			 * vCPU's SVE state. KVM support for NV implies VHE, so
-> -			 * using the ZCR_EL1 alias is safe.
-> -			 */
-> -			if (!has_vhe() || (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)))
-> -				sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1,
-> -						       SYS_ZCR_EL1);
-> -		}
-> +		kvm_vcpu_put_sve(vcpu);
->  
->  		/*
-> -		 * Flush (save and invalidate) the fpsimd/sve state so that if
-> +		 * Flush (save and invalidate) the FP state so that if
->  		 * the host tries to use fpsimd/sve, it's not using stale data
->  		 * from the guest.
->  		 *
-> 
-> -- 
-> 2.39.5
-> 
-> 
 
