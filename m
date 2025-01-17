@@ -1,232 +1,203 @@
-Return-Path: <kvm+bounces-35720-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35721-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57993A14866
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 04:04:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83043A148AE
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 05:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 370183AA228
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 03:04:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1D2B188D2C7
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 04:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427411F63F6;
-	Fri, 17 Jan 2025 03:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3831F6664;
+	Fri, 17 Jan 2025 04:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YRX35ylJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hUk/e1gh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862BA7FBA2
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 03:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B21725765
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 04:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737083082; cv=none; b=Vgl9z0aup8MvcSmNsAgP78EI2+NnNIgI+0tgbWgmOrbur1sKjCdDxTHvfLgxvtAAZfjo7BZVa+ZTt2k5tRY6IAYQlB97IU5tKcLqHCnPWRO11n+bBP9T3joq0KKLAMr96BnVp0fzeU8LGJGQe39whbRmtwqGkmBELHc2XtpqGls=
+	t=1737086833; cv=none; b=X0aBa5vL4Put4Boafw42gFIma2oyx7MrYpQ36guVx+3T3IFmP5nbOJF27GYmfwHAafWmmu/7eHFfqgHxOyo42b+wVjOoidrL13Pv4IoTKRrIeqlfK4uhK0jleeiXR7WwsqplDLeSuRKVjH+RiuIIeHhV/EvJMxsy7hfU3v5rPVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737083082; c=relaxed/simple;
-	bh=GYjgPU9QqpbTgDJfdh4tnf/pEUrSMlTiFAYvBLY2sKc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=drS+GSnOrtwPqfky9+zGqdlX1QEky+pegLloSoSlbN7Z4JYv5gZ3Ju82Rj5DYqThDmTMJz7XrFQzlGMrb01n/TBqtZ8/YmFMuXgiMjTn3U9Bf1kgbGC5PL37WeZ8SnsDM75lZ1eY9CTThOopoHu/CGBzaRfmb3MpHjBKSI2YkzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YRX35ylJ; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737083081; x=1768619081;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=GYjgPU9QqpbTgDJfdh4tnf/pEUrSMlTiFAYvBLY2sKc=;
-  b=YRX35ylJWdDtmv4T8rBPcXHimi7hBM13hEz52JfavxV57o+9lztaatIH
-   XAefS1XPmBcFhQ/NGP5Yk7xgX6U4poF59Q2YSxKPKfnQe3h4H1JNf8DhL
-   RgwCAVfa1oHRvCI/5umuOQhK1n5zDPhja9FjzdDeige05Hv4hNnzB2Txn
-   Z1dwohmZiNuDGDxFKNe/EjmkR9INRkhxf9v05zYXWeM2F6zVYGKKNWnP/
-   CD3Sgfoh145QcYcyQSJmj03UwrdIR2qQnBSpI06pwYfbbCTBOtypP1sNk
-   xVB3yXDi7imi0eWpXqNDcPQs3qVxn18qH3B2VcUCJP7l2Nd/wWcBAXf9o
-   w==;
-X-CSE-ConnectionGUID: LVl0jMomR7+mgOWujeQazw==
-X-CSE-MsgGUID: aoPV1c7FRJey/YI/GOkV7g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="25099653"
-X-IronPort-AV: E=Sophos;i="6.13,211,1732608000"; 
-   d="scan'208";a="25099653"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 19:04:40 -0800
-X-CSE-ConnectionGUID: JAu2agUQRm6UqGE/tRwyhA==
-X-CSE-MsgGUID: ONH0PAWfS4Sz6SpS+hzbkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,211,1732608000"; 
-   d="scan'208";a="110681866"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 19:04:38 -0800
-Message-ID: <6c23d536-484f-4c4b-aa85-3e0b9544611a@linux.intel.com>
-Date: Fri, 17 Jan 2025 11:04:35 +0800
+	s=arc-20240116; t=1737086833; c=relaxed/simple;
+	bh=uBefj5FVqCCj/JMSYgzCY3fgFsXnrA5rl7+5wbAA4xs=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=UDxrTpfqhn51jy5AEbMSbDzZ1O1xPCm3jCZ6F4JVRt/4QSY8HG+JSkMJMlvr+i+0MX/OoqXJH9qqxcXwmK6cIODp/0HuY241gK+d8r4ZcpzzIXXNTanjsIwYYR7RtwxAOpizdR/sEOWhMLVm9Fevyc6LEGYqaFZi6Er4L1IRxvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hUk/e1gh; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50GNJ2Ym024549;
+	Fri, 17 Jan 2025 04:06:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=j2WtY7PpvfNoJKOSo3g0k1yAnYTv
+	VbZe7NKspCrFzmE=; b=hUk/e1ghCQxVvf3+4TR4EXUBWq23Nxfbwr2ns7kFIRRk
+	8TkYm/1E7eolZwKSUAzdXNcfF14Hh9px1UDIzkeJLOpWXmoQJrhkOZTRZAQ+dtZ4
+	vlDDJtqGNgX04Sdv/pNze+bKEl8lXwrl52NLSNMcefOEKAns14N5CEyXv8ahqhLV
+	Z79Nc7VA1WY1KqOzG3IR47o9Iv1nF3rXKw+ZCiBRZsPPDxGJwIIce6phwmKNUzRY
+	nSZLbAhj2dRAIyAjxtuy/rVYwwAfLRmp/in/dSJLAdDtsbH8tlAVRLybVr4OC3f2
+	q0uYMdxG5dRKVDjj1OrA8YsbB+OjHexkNzzJ5+JOvw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4473k5bbas-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 04:06:46 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50H46kdP008026;
+	Fri, 17 Jan 2025 04:06:46 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4473k5bbap-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 04:06:46 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50H2HCLq001089;
+	Fri, 17 Jan 2025 04:06:45 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44456k8wc3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 04:06:45 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50H46fDu65863942
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Jan 2025 04:06:41 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AA0F22004E;
+	Fri, 17 Jan 2025 04:06:41 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6F3F520043;
+	Fri, 17 Jan 2025 04:06:40 +0000 (GMT)
+Received: from [172.17.0.2] (unknown [9.3.101.175])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Jan 2025 04:06:40 +0000 (GMT)
+Subject: [PATCH v9 0/2] ppc: Enable 2nd DAWR support on Power10
+From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+To: npiggin@gmail.com
+Cc: danielhb413@gmail.com, harshpb@linux.ibm.com, pbonzini@redhat.com,
+        qemu-ppc@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        sbhat@linux.ibm.com
+Date: Fri, 17 Jan 2025 04:06:39 +0000
+Message-ID: <173708679976.1678.10844458987521427074.stgit@linux.ibm.com>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [linux-next:master] [KVM] 7803339fa9:
- kernel-selftests.kvm.pmu_counters_test.fail
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>,
- kernel test robot <oliver.sang@intel.com>, g@google.com
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
- Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
- xudong.hao@intel.com
-References: <202501141009.30c629b4-lkp@intel.com>
- <Z4a_PmUVVmUtOd4p@google.com>
- <a2adf1b8-c394-4741-a42b-32288657b07e@linux.intel.com>
-Content-Language: en-US
-In-Reply-To: <a2adf1b8-c394-4741-a42b-32288657b07e@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: eHSmqQmNA6aQ8Jh0Kf1Enc-0RWS0su1H
+X-Proofpoint-ORIG-GUID: Os9MC1TB4yqtdKEzfYBaxgkAb8FCMPA2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-17_01,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ adultscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
+ clxscore=1011 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501170028
+
+Extends the existing watchpoint facility from TCG DAWR0 emulation to DAWR1 on
+Power10 for powernv in the first patch, and for pseries in the second patch
+with both TCG and KVM.
+
+---
+Changelog:
+v8: https://lore.kernel.org/qemu-devel/170679876639.188422.11634974895844092362.stgit@ltc-boston1.aus.stglabs.ibm.com/
+v8->v9:
+  - Rebased to upstream.
+  - Addressed the changes suggested by David, Nick and Harsh.
+  - Added g_assert_not_reached in h_set_mode_resource_set_dawr0() in Patch 2.
+  - Made SPAPR_CAP_DAWR1 default ON, so also made it off for cpus below P10.
+
+v7: https://lore.kernel.org/qemu-devel/170063834599.621665.9541440879278084501.stgit@ltcd48-lp2.aus.stglab.ibm.com/
+v7->v8:
+  - Fixed the missed out ppc_store_dawr* calls.
+  - Removed the macros and split the patch into 2 one just enabling the
+    facility for powernv and the next one doing the same for pseries guest.
+  - The macro removal barely increased the number of lines by 12 as against
+    the previous version.
+
+v6: https://lore.kernel.org/qemu-devel/168871963321.58984.15628382614621248470.stgit@ltcd89-lp2/
+v6->v7:
+  - Sorry about the delay in sending out this version, I have dropped the
+    Reviewed-bys as suggested and converted the patch to RFC back again.
+  - Added the TCG support. Basically, converted the existing DAWR0 support
+    routines into macros for reuse by the DAWR1. Let me know if the macro
+    conversions should be moved to a separate independent patch.
+  - As the dawr1 works on TCG, the checks in cap_dawr1_apply() report a warning
+    now only for P9 or P9 compat modes for both KVM and TCG use cases.
+  - 'make test' passes for caps checks. Also, as suggested by Greg Kurz, the
+    'make test' after making the DAWR1 default 'on' and updating defaut cpu
+    to Power10, shows no failures.
+
+v5: https://lore.kernel.org/all/20210412114433.129702-1-ravi.bangoria@linux.ibm.com/
+v5->v6:
+  - The other patches in the original series already merged.
+  - Rebased to the top of the tree. So, the gen_spr_book3s_310_dbg() is renamed
+    to register_book3s_310_dbg_sprs() and moved to cpu_init.c accordingly.
+  - No functional changes.
+
+v4: https://lore.kernel.org/r/20210406053833.282907-1-ravi.bangoria@linux.ibm.com
+v3->v4:
+  - Make error message more proper.
+
+v3: https://lore.kernel.org/r/20210330095350.36309-1-ravi.bangoria@linux.ibm.com
+v3->v4:
+  - spapr_dt_pa_features(): POWER10 processor is compatible with 3.0
+    (PCR_COMPAT_3_00). No need to ppc_check_compat(3_10) for now as
+    ppc_check_compati(3_00) will also be true. ppc_check_compat(3_10)
+    can be added while introducing pa_features_310 in future.
+  - Use error_append_hint() for hints. Also add ERRP_GUARD().
+  - Add kvmppc_set_cap_dawr1() stub function for CONFIG_KVM=n.
+
+v2: https://lore.kernel.org/r/20210329041906.213991-1-ravi.bangoria@linux.ibm.com
+v2->v3:
+  - Don't introduce pa_features_310[], instead, reuse pa_features_300[]
+    for 3.1 guests, as there is no difference between initial values of
+    them atm.
+  - Call gen_spr_book3s_310_dbg() from init_proc_POWER10() instead of
+    init_proc_POWER8(). Also, Don't call gen_spr_book3s_207_dbg() from
+    gen_spr_book3s_310_dbg() as init_proc_POWER10() already calls it.
+
+v1: https://lore.kernel.org/r/20200723104220.314671-1-ravi.bangoria@linux.ibm.com
+v1->v2:
+  - Introduce machine capability cap-dawr1 to enable/disable
+    the feature. By default, 2nd DAWR is OFF for guests even
+    when host kvm supports it. User has to manually enable it
+    with -machine cap-dawr1=on if he wishes to use it.
+  - Split the header file changes into separate patch. (Sync
+    headers from v5.12-rc3)
+
+Shivaprasad G Bhat (2):
+      ppc: Enable 2nd DAWR support on Power10 PowerNV machine
+      ppc: spapr: Enable 2nd DAWR on Power10 pSeries machine
 
 
-On 1/15/2025 10:44 AM, Mi, Dapeng wrote:
-> On 1/15/2025 3:47 AM, Sean Christopherson wrote:
->> +Dapeng
->>
->> On Tue, Jan 14, 2025, kernel test robot wrote:
->>> we fould the test failed on a Cooper Lake, not sure if this is expected.
->>> below full report FYI.
->>>
->>>
->>> kernel test robot noticed "kernel-selftests.kvm.pmu_counters_test.fail" on:
->>>
->>> commit: 7803339fa929387bbc66479532afbaf8cbebb41b ("KVM: selftests: Use data load to trigger LLC references/misses in Intel PMU")
->>> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
->>>
->>> [test failed on linux-next/master 37136bf5c3a6f6b686d74f41837a6406bec6b7bc]
->>>
->>> in testcase: kernel-selftests
->>> version: kernel-selftests-x86_64-7503345ac5f5-1_20241208
->>> with following parameters:
->>>
->>> 	group: kvm
->>>
->>> config: x86_64-rhel-9.4-kselftests
->>> compiler: gcc-12
->>> test machine: 224 threads 4 sockets Intel(R) Xeon(R) Platinum 8380H CPU @ 2.90GHz (Cooper Lake) with 192G memory
->> *sigh*
->>
->> This fails on our Skylake and Cascade Lake systems, but I only tested an Emerald
->> Rapids.
->>
->>> # Testing fixed counters, PMU version 0, perf_caps = 2000
->>> # Testing arch events, PMU version 1, perf_caps = 0
->>> # ==== Test Assertion Failure ====
->>> #   x86/pmu_counters_test.c:129: count >= (10 * 4 + 5)
->>> #   pid=6278 tid=6278 errno=4 - Interrupted system call
->>> #      1	0x0000000000411281: assert_on_unhandled_exception at processor.c:625
->>> #      2	0x00000000004075d4: _vcpu_run at kvm_util.c:1652
->>> #      3	 (inlined by) vcpu_run at kvm_util.c:1663
->>> #      4	0x0000000000402c5e: run_vcpu at pmu_counters_test.c:62
->>> #      5	0x0000000000402e4d: test_arch_events at pmu_counters_test.c:315
->>> #      6	0x0000000000402663: test_arch_events at pmu_counters_test.c:304
->>> #      7	 (inlined by) test_intel_counters at pmu_counters_test.c:609
->>> #      8	 (inlined by) main at pmu_counters_test.c:642
->>> #      9	0x00007f3b134f9249: ?? ??:0
->>> #     10	0x00007f3b134f9304: ?? ??:0
->>> #     11	0x0000000000402900: _start at ??:?
->>> #   count >= NUM_INSNS_RETIRED
->> The failure is on top-down slots.  I modified the assert to actually print the
->> count (I'll make sure to post a patch regardless of where this goes), and based
->> on the count for failing vs. passing, I'm pretty sure the issue is not the extra
->> instruction, but instead is due to changing the target of the CLFUSH from the
->> address of the code to the address of kvm_pmu_version.
->>
->> However, I think the blame lies with the assertion itself, i.e. with commit
->> 4a447b135e45 ("KVM: selftests: Test top-down slots event in x86's pmu_counters_test").
->> Either that or top-down slots is broken on the Lakes.
->>
->> By my rudimentary measurements, tying the number of available slots to the number
->> of instructions *retired* is fundamentally flawed.  E.g. on the Lakes (SKX is more
->> or less identical to CLX), omitting the CLFLUSHOPT entirely results in *more*
->> slots being available throughout the lifetime of the measured section.
->>
->> My best guess is that flushing the cache line use for the data load causes the
->> backend to saturate its slots with prefetching data, and as a result the number
->> of slots that are available goes down.
->>
->>         CLFLUSHOPT .    | CLFLUSHOPT [%m]       | NOP
->> CLX     350-100         | 20-60[*]              | 135-150  
->> SPR     49000-57000     | 32500-41000           | 6760-6830
->>
->> [*] CLX had a few outliers in the 200-400 range, but the majority of runs were
->>     in the 20-60 range.
->>
->> Reading through more (and more and more) of the TMA documentation, I don't think
->> we can assume anything about the number of available slots, beyond a very basic
->> assertion that it's practically impossible for there to never be an available
->> slot.  IIUC, retiring an instruction does NOT require an available slot, rather
->> it requires the opposite: an occupied slot for the uop(s).
-> I'm not quite sure about this. IIUC, retiring an instruction may not need a
-> cycle, but it needs a slot at least except the instruction is macro-fused.
-> Anyway, let me double check with our micro-architecture and perf experts.
+ hw/ppc/spapr.c           |  7 ++++-
+ hw/ppc/spapr_caps.c      | 43 +++++++++++++++++++++++++++++
+ hw/ppc/spapr_hcall.c     | 27 ++++++++++++------
+ include/hw/ppc/spapr.h   |  6 +++-
+ target/ppc/cpu.c         | 45 +++++++++++++++++++++---------
+ target/ppc/cpu.h         |  6 ++--
+ target/ppc/cpu_init.c    | 15 ++++++++++
+ target/ppc/excp_helper.c | 59 +++++++++++++++++++++-------------------
+ target/ppc/helper.h      |  2 ++
+ target/ppc/kvm.c         | 12 ++++++++
+ target/ppc/kvm_ppc.h     | 12 ++++++++
+ target/ppc/machine.c     |  3 +-
+ target/ppc/misc_helper.c | 10 +++++++
+ target/ppc/spr_common.h  |  2 ++
+ target/ppc/translate.c   | 12 ++++++++
+ 15 files changed, 206 insertions(+), 55 deletions(-)
 
-Hi Sean,
-
-Just double check with our perf experts, the understanding that "retiring
-an instruction needs a slot at least except the instruction is macro-fused"
-is correct. The reason of this error is that the architectural topdown
-slots event is just introduced from Ice lake platform and it's not
-supported on skylake and cascade lake platforms. On these earlier platforms
-the event 0x01a4 is another event which counts different thing instead of
-topdown slots. On these earlier platforms, the slots event is derived from
-0x3c event.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/events/intel/core.c#n466
+--
+Signature
 
 
-I don't understand why current pmu_counters_test code would validate an
-architectural event which KVM (HW) doesn't support, it's not reasonable and
-could cause misleading.
-
-        /*
-         * Force iterating over known arch events regardless of whether or not
-         * KVM/hardware supports a given event.
-         */
-        nr_arch_events = max_t(typeof(nr_arch_events), nr_arch_events,
-NR_INTEL_ARCH_EVENTS);
-
-I would provide a patch to fix this.
-
-BTW, currently KVM doesn't check if user space sets a valid pmu version in
-kvm_check_cpuid(). The user space could set KVM a PMU version which is
-larger than KVM supported maximum PMU version, just like currently
-pmu_counters_test does. This is not correct. I originally intent to fix
-this with the mediated vPMU patch series, but It looks we can send the
-patches just with this fix together, then the issue can be fixed earlier.
-
-Thanks,
-
-Dapeng Mi
-
->
->
->> I'm mildly curious as to why the counts for SPR are orders of magnitude higher
->> that CLX (simple accounting differences?), but I don't think it changes anything
->> in the test itself.
->>
->> Unless someone has a better idea, my plan is to post a patch to assert that the
->> top-down slots count is non-zero, not that it's >= instructions retired.  E.g.
->>
->> diff --git a/tools/testing/selftests/kvm/x86/pmu_counters_test.c b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
->> index accd7ecd3e5f..21acedcd46cd 100644
->> --- a/tools/testing/selftests/kvm/x86/pmu_counters_test.c
->> +++ b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
->> @@ -123,10 +123,8 @@ static void guest_assert_event_count(uint8_t idx,
->>                 fallthrough;
->>         case INTEL_ARCH_CPU_CYCLES_INDEX:
->>         case INTEL_ARCH_REFERENCE_CYCLES_INDEX:
->> -               GUEST_ASSERT_NE(count, 0);
->> -               break;
->>         case INTEL_ARCH_TOPDOWN_SLOTS_INDEX:
->> -               GUEST_ASSERT(count >= NUM_INSNS_RETIRED);
->> +               GUEST_ASSERT_NE(count, 0);
->>                 break;
->>         default:
->>                 break;
->>
 
