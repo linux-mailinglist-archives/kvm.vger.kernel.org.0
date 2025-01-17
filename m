@@ -1,125 +1,246 @@
-Return-Path: <kvm+bounces-35880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35881-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D16E6A15952
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 23:03:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C32AA15959
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 23:05:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 499CA188CD31
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 22:03:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEFF1188D12E
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 22:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E3B1A840F;
-	Fri, 17 Jan 2025 22:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49271B0411;
+	Fri, 17 Jan 2025 22:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="FLf1eAGi"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="aKPy3Dm5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54ED019AD90;
-	Fri, 17 Jan 2025 22:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C781514EE
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 22:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737151397; cv=none; b=IMbQ0fZ04AraKsj3trinvxCWpfJJwRAPT3WDiQzcdZ9rlsf4sQCLO+29SiNuKQDX3RhX26IfrmR0pr34OElIpwYFs5oM4wDGXoHLkA/K4ZCcN883CgcTZFBGhuTDGyYPxyk2URrmTQka63XmNdffGYcPr0ZfgBglYKX/3PJXJLY=
+	t=1737151524; cv=none; b=mHLg5p/v3bVq/opFi5xxnLWupz2EYM5glReuOkcwk1C9+2zzluv7ufcksM813vo7KUi4L0HUUkxF91paQu70oCS3MWXqWFqU7w0p+92miAR9ZPTWEafwhrxvjkp79flMMOeNs/yryO86gikhPhQI2HRkzfID+8WeQAvlU9FRH9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737151397; c=relaxed/simple;
-	bh=xY6e8RsoEZ6A+tJaci/cDSUApI6DhAPRsuEwbap3tgo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sOgLf99hlI494W5EJT5EA/HSK7s9YxRiiIkfgMPLeNvSYOOsNciqwfp1+KIGUacPM8ygALNtj3Hcs+mfKjErxnem4igQSHjdO1MGbW9FYuVxe64cT2U/eKI4+W1YzflzlN3zyw8LKj4QuR0yGC4Xbi0vioIxSlDzvNTcrbg0nMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=FLf1eAGi; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tYuQl-008Vo7-H0; Fri, 17 Jan 2025 23:03:07 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=M/reCYsLr6s08s3R0WErIkODtGqCjwAs+f2DwNyZQg8=; b=FLf1eAGim4Tnh+661wlmPJ+n1S
-	yCa8uVopDrAmvazxt16YzB4jYlGXfgtAzjl5f4Apwm5xS4XxBWWPLFYHnDZm9Ft1ZQyGt3BW94Hdv
-	K6CPNyCPpuaIibiuFu1gM5bbGOK4WUHVW3maLrgqmnU+Ls8WguohVomVYHnoqsVXOSiq9bNl/lVqd
-	7qrmb3R3GH4Y768hXDBSw1RALrUe3yyD6aZdDN63L4rCFXIR20qFH4TnZDwLE3hkeuYmTljqxGyUB
-	M+c3EVGzOThShKerEI2HtjWisX/xfgVB7dJVJIi7NpUK7M1Fak6/LSo59WuuL5w2mFIQXe9IVc54T
-	ysJIkptg==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tYuQj-00059q-Um; Fri, 17 Jan 2025 23:03:06 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tYuQe-001shf-2d; Fri, 17 Jan 2025 23:03:00 +0100
-Message-ID: <e3085fe8-3dae-40b2-970f-b8cda956a8f5@rbox.co>
-Date: Fri, 17 Jan 2025 23:02:58 +0100
+	s=arc-20240116; t=1737151524; c=relaxed/simple;
+	bh=pWWEkMtvtT/SQDohStnmEBJisNjdNNakk2Pb1ycp/w4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dQHqz3JbOcX2h6Qv8SERlUGDn2xLY2ssRrwSRF0AJz2iZG6Fs7QpjhQXL5BiMIoXlKNArTRPynBYq6Mel0KT86fPVeQPt9sgVfwFUnBXepNgwZz2+wVOmETuaF7qXsjqM4rVsQ/zhmqyrJy4SS/kZkUCsI6eUjAbtf8Zp+lKTxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=aKPy3Dm5; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HFLGm2001545
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 22:05:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=JSLK34Lu3YRBCLGcytvmW0b3
+	5pxC3UtVOnWaZ8x+bow=; b=aKPy3Dm5ouC+0mQnc+a+5z2phKxBp+BpMJ3Qt7Qt
+	jPer4T9AyxYPNpWj9AYRr+he8QZMGUvmRIkhC1MXzXJxkSa+BSRV+VbJIfgLnT0s
+	bddhrwTbqyamWg3GWpZiUCEHf/oy4CWxjWfEfw4q+bJCUhcUZXi3uZuCdKJe1JS8
+	c82B2ENp4eL/6DbBTfy4QzR2H0V0hVgWlRsblRSuje5TK5R43R5K3qxy+MOpkOsE
+	LGYDZiytEgrd9Lrc8T9EvPq/RlSUDlsYsfssj9i7sh5khdxEaXqJJ0vuGZhWcjLu
+	67xJqQGis6JKy91qSaFmh/NZBpKG9mZ8RuMngPcCS0KlbA==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 447ss10tdf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 22:05:18 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2178115051dso48713315ad.1
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 14:05:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737151517; x=1737756317;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JSLK34Lu3YRBCLGcytvmW0b35pxC3UtVOnWaZ8x+bow=;
+        b=DDy2mEsYRIZRBxebCNkuZIlO79ysYKJxrNttSFbFBkopff/DbTOUZMqagx+Tp4fP4T
+         NSv0ii45QPgvbg9fz1ZmHO2dxvh9LyEP60RdPm6vV1GyQcNwPpQqIAuRPxn/C3f4rmOX
+         rqu31Ya/QNWPvOfcZ1Ejf+I3sInoYt14vk2KCrPgLJPxApTjFHvJFp3voXK4PgFi/F+d
+         Hj8ZqsY+BOlgsF2dDZy2L69HM7pmUnhFO/OhUSjOFFuhN/V95aeE7VL/SmAMfSGWzLOl
+         3sluZcNv2TEEJrX1kyFeXv+9s/0sovSn2EnqTGaYBsHyxmNUeKSd2/nN1rRQAth9QkvX
+         ryuw==
+X-Gm-Message-State: AOJu0YzPvJKnoAL+3+ZoLU6yaj294c07SK5liuawNCRIOjc46D+9tqNz
+	nrOIEkUqLsYWNrLmKPHwTyh4cpj99VuOp0hdC8MNrt5vvEwDFUdqsYum+pVFQChIvVZd0DUIKrS
+	E9oT8boD71ELZ7zxtpb1/nPzFsu/J+Td4zNB3qgjDG1smNQmuLqM=
+X-Gm-Gg: ASbGncuS/Jg1x8aVWEfp7odsy8Tg53YPgYhXipsLtvMqLcDA0jxQqL0qRWKLxgCKI+a
+	dJWJmdG4wdEUDIE7AAdkk8uD5LseYEmeui4ZVeOiLxjeLnWDwnn2XSMTApp/B8qbvqwCrjFQUQD
+	oA+wtIg5oRJndtLVxtHg6KX0S0ztnoqgeBHorM/niJaf7ZwJqeOoaUhTHalB7Sj2KyMsyjcnswR
+	9m5MK9GEVaVPogfqDf5x0L6TkwA8BpcDyTwE0FYqnnC/7M+1dXWMiiSYMIPT6YhvLLArd3sviuu
+	xq5QI5yeWYtROResmCdiRl4XqSNmKnCQJYuRKta/Q4XTkUMYQQ==
+X-Received: by 2002:a17:902:ea06:b0:216:45eb:5e4d with SMTP id d9443c01a7336-21c352c7921mr57027635ad.6.1737151517430;
+        Fri, 17 Jan 2025 14:05:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHk7q6iHrRnd1nXp+s+RpidtLrv0uU4L62iDyixRYGuxhfV0N1Xq3R/zhpGVH2sq0L2lUGqQg==
+X-Received: by 2002:a17:902:ea06:b0:216:45eb:5e4d with SMTP id d9443c01a7336-21c352c7921mr57027115ad.6.1737151516934;
+        Fri, 17 Jan 2025 14:05:16 -0800 (PST)
+Received: from hu-eberman-lv.qualcomm.com (Global_NAT1.qualcomm.com. [129.46.96.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2d4042f8sm20582705ad.236.2025.01.17.14.05.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 14:05:16 -0800 (PST)
+Date: Fri, 17 Jan 2025 14:05:13 -0800
+From: Elliot Berman <elliot.berman@oss.qualcomm.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+        pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+        anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+        xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+        jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+        yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+        vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+        mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
+        wei.w.wang@intel.com, liam.merwick@oracle.com,
+        isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+        suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com,
+        quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
+        quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com,
+        quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
+        catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
+        oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
+        qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+        shuah@kernel.org, hch@infradead.org, jgg@nvidia.com,
+        rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com,
+        hughd@google.com, jthoughton@google.com
+Subject: Re: [RFC PATCH v5 01/15] mm: Consolidate freeing of typed folios on
+ final folio_put()
+Message-ID: <20250117135917364-0800.eberman@hu-eberman-lv.qualcomm.com>
+References: <20250117163001.2326672-1-tabba@google.com>
+ <20250117163001.2326672-2-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the transport
- changes
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Luigi Leonardi <leonardi@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>,
- kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>,
- Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
- stable@vger.kernel.org
-References: <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
- <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
- <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
- <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
- <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
- <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
- <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
- <7de34054-10cf-45d0-a869-adebb77ad913@rbox.co>
- <n2itoh23kikzszzgmyejfwe3mdf6fmxzwbtyo5ahtxpaco3euq@osupldmckz7p>
- <fb6f876f-a4eb-4005-bd76-fff0632291b8@rbox.co>
- <pl4mhcim7v3ukv6eseynh6x2r6nftf7yuayjzd3ftyupwy5r2h@ixmlevubqzb2>
-From: Michal Luczaj <mhal@rbox.co>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <pl4mhcim7v3ukv6eseynh6x2r6nftf7yuayjzd3ftyupwy5r2h@ixmlevubqzb2>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250117163001.2326672-2-tabba@google.com>
+X-Proofpoint-ORIG-GUID: RuFfKVkllM3-Jl9nr5nX5JLO0dNuPtBs
+X-Proofpoint-GUID: RuFfKVkllM3-Jl9nr5nX5JLO0dNuPtBs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-17_07,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ clxscore=1011 bulkscore=0 priorityscore=1501 lowpriorityscore=0
+ suspectscore=0 impostorscore=0 adultscore=0 phishscore=0 mlxlogscore=998
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501170169
 
-On 1/16/25 09:57, Stefano Garzarella wrote:
-> On Tue, Jan 14, 2025 at 05:31:08PM +0100, Michal Luczaj wrote:
->>> ...
->>> Maybe we need to look better at the release, and prevent it from
->>> removing the socket from the lists as you suggested, maybe adding a
->>> function in af_vsock.c that all transports can call.
->>
->> I'd be happy to submit a proper patch, but it would be helpful to decide
->> how close to AF_INET/AF_UNIX's behaviour is close enough. Or would you
->> rather have that UAF plugged first?
->>
+On Fri, Jan 17, 2025 at 04:29:47PM +0000, Fuad Tabba wrote:
+> Some folio types, such as hugetlb, handle freeing their own
+> folios. Moreover, guest_memfd will require being notified once a
+> folio's reference count reaches 0 to facilitate shared to private
+> folio conversion, without the folio actually being freed at that
+> point.
 > 
-> I'd say, let's fix the UAF first, then fix the behaviour (also in a
-> single series, but I prefer 2 separate patches if possible).
-> About that, AF_VSOCK was started with the goal of following AF_INET as
-> closely as possible, and the test suite should serve that as well, so if
-> we can solve this problem and get closer to AF_INET, possibly even
-> adding a dedicated test, that would be ideal!
+> As a first step towards that, this patch consolidates freeing
+> folios that have a type. The first user is hugetlb folios. Later
+> in this patch series, guest_memfd will become the second user of
+> this.
+> 
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  include/linux/page-flags.h | 15 +++++++++++++++
+>  mm/swap.c                  | 24 +++++++++++++++++++-----
+>  2 files changed, 34 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> index 691506bdf2c5..6615f2f59144 100644
+> --- a/include/linux/page-flags.h
+> +++ b/include/linux/page-flags.h
+> @@ -962,6 +962,21 @@ static inline bool page_has_type(const struct page *page)
+>  	return page_mapcount_is_type(data_race(page->page_type));
+>  }
+>  
+> +static inline int page_get_type(const struct page *page)
+> +{
+> +	return page->page_type >> 24;
+> +}
+> +
+> +static inline bool folio_has_type(const struct folio *folio)
+> +{
+> +	return page_has_type(&folio->page);
+> +}
+> +
+> +static inline int folio_get_type(const struct folio *folio)
+> +{
+> +	return page_get_type(&folio->page);
+> +}
+> +
+>  #define FOLIO_TYPE_OPS(lname, fname)					\
+>  static __always_inline bool folio_test_##fname(const struct folio *folio) \
+>  {									\
+> diff --git a/mm/swap.c b/mm/swap.c
+> index 10decd9dffa1..6f01b56bce13 100644
+> --- a/mm/swap.c
+> +++ b/mm/swap.c
+> @@ -94,6 +94,20 @@ static void page_cache_release(struct folio *folio)
+>  		unlock_page_lruvec_irqrestore(lruvec, flags);
+>  }
+>  
+> +static void free_typed_folio(struct folio *folio)
+> +{
+> +	switch (folio_get_type(folio)) {
 
-All right, so let's keep the binding and allow removal from (un)bound list
-only on socket destruction. This is transport independent, changes are
-pretty minimal and, well, keeps the binding. Mixes well with the connect()
-behaviour fix.
+I think you need:
 
-Let me know what you think:
-https://lore.kernel.org/netdev/20250117-vsock-transport-vs-autobind-v1-0-c802c803762d@rbox.co/
++#if IS_ENABLED(CONFIG_HUGETLBFS)
+> +	case PGTY_hugetlb:
+> +		free_huge_folio(folio);
+> +		return;
++#endif
 
-Thanks,
-Michal
+I think this worked before because folio_test_hugetlb was defined by:
+FOLIO_TEST_FLAG_FALSE(hugetlb)
+and evidently compiler optimizes out the free_huge_folio(folio) before
+linking.
 
+You'll probably want to do the same for the PGTY_guestmem in the later
+patch!
+
+> +	case PGTY_offline:
+> +		/* Nothing to do, it's offline. */
+> +		return;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +}
+> +
+>  void __folio_put(struct folio *folio)
+>  {
+>  	if (unlikely(folio_is_zone_device(folio))) {
+> @@ -101,8 +115,8 @@ void __folio_put(struct folio *folio)
+>  		return;
+>  	}
+>  
+> -	if (folio_test_hugetlb(folio)) {
+> -		free_huge_folio(folio);
+> +	if (unlikely(folio_has_type(folio))) {
+> +		free_typed_folio(folio);
+>  		return;
+>  	}
+>  
+> @@ -934,13 +948,13 @@ void folios_put_refs(struct folio_batch *folios, unsigned int *refs)
+>  		if (!folio_ref_sub_and_test(folio, nr_refs))
+>  			continue;
+>  
+> -		/* hugetlb has its own memcg */
+> -		if (folio_test_hugetlb(folio)) {
+> +		if (unlikely(folio_has_type(folio))) {
+> +			/* typed folios have their own memcg, if any */
+>  			if (lruvec) {
+>  				unlock_page_lruvec_irqrestore(lruvec, flags);
+>  				lruvec = NULL;
+>  			}
+> -			free_huge_folio(folio);
+> +			free_typed_folio(folio);
+>  			continue;
+>  		}
+>  		folio_unqueue_deferred_split(folio);
+> -- 
+> 2.48.0.rc2.279.g1de40edade-goog
+> 
 
