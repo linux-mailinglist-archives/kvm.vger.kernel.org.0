@@ -1,185 +1,236 @@
-Return-Path: <kvm+bounces-35780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B6E4A150C6
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 14:45:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3425BA150CC
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 14:45:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFBC03A97E4
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 13:45:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F4FD188CD76
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 13:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B632C200B8B;
-	Fri, 17 Jan 2025 13:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84EBA2010E3;
+	Fri, 17 Jan 2025 13:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MZHV+9J1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsFOzckS"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346AC1EB39
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 13:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409F71FFC74
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 13:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737121500; cv=none; b=sdoI1Zpa1wV+2Nux1/T1hBsEFT7tz0gEK5ioQ23T4UV8Ke15teon3QDzEURFhQhhr5VhjYJMMKX8/PrjXOIk4QJPvorle59guB+XDNsUz/WOGo311U7U41gBoyPyUBnViHVW5ZMDqzQ2bcRSSZORTEr93t4ze+GX0cr8rhN1bjs=
+	t=1737121512; cv=none; b=gwuqEp1oqt0XMUtGj/L98L9hvZ2DdFFj6IJawLve6EyzqxKZSm5BxqdXKXuTa0NRB1y0djcmrxoP1E/tG8rmNJl6+HIJV14BFkGkWmPV0mi7inBgN8+rZre0eqhGcoEzV8pfhSln7HfvvntmklhrLeCEq67mcAA0KEUW2ti/BLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737121500; c=relaxed/simple;
-	bh=3uGThAIZZrxCJ1Zag/yc29l3qlAKBV2/uT4Bw7pXLWs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BywZZxaObZ66WeaziSv8WwMW3Bh5l8XzKiJW6Qolp1KG7pqUu/qGLI4VCkMWSG8u7steNJGPyKUXWMnSk+o6iOQ5tYG63XPqAK0WsGyJzCsKzpz7jStPqSMhjEIJjPg5Ps/fMBsc7BbxpTB0VfBjxx3/mqjow9yVIgZhepwagMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MZHV+9J1; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1737121512; c=relaxed/simple;
+	bh=wMJ7URqUbxG/AeNcisJ1sXvFYg/CQF4Gt3MwmZwHjWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sTrMa3TWA0YpZcOdUVbUWR4RxBMy5NelREXy8LpbrUkm3r3svYB4AxJ/x/2tUNtDoVQZcC1ABKHxZ/Vd7p8+Gd2BCgNmARwCLIeRAzD+apwVbvhlI6X5ShYy2API7FVJh/CW3Dw8m9SdrZEijEosWEQ+PW37gg6ZGG1YJ+OYVS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hsFOzckS; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737121498;
+	s=mimecast20190719; t=1737121509;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HEKKhsO2kOL/qF9SHnIE9a8dcD47/tUh4wLid3vzvOo=;
-	b=MZHV+9J1aUgCppsgpkJpQvMYzSoG8bhifFYQCfj/9s39EQl3oZJe672ABRiEOX8cuePG88
-	3H4b1jduRVI2XTe2rKcWYkNV8UBEftukh2MH9GB4kpf3dz+QS0I7nla6c06YGeayOfRZVY
-	03On0hJE0BKuZFwayCxYqjEIo6cGR24=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=EL/Md/xAnVjdSOMC30BT2Sup8TuZ57RNm5+CW4cdr0g=;
+	b=hsFOzckSPnzfdMmYcJsT+bVl3xtJroc0xSsRxvn36YttcmzlO8RkQVEnxAK+hak5505UZ7
+	shlL0wJMMO0M46uhjvYzzbgulg2Vy849Z6k0RQGdcj/z9VSuaOxO3QCX8o8ArK8P6lTHrF
+	2f76uALbgC25FkIZqJb3thgnbBcY62w=
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
+ [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-rsEKLktQM9-FLc8O4S4Pag-1; Fri, 17 Jan 2025 08:44:57 -0500
-X-MC-Unique: rsEKLktQM9-FLc8O4S4Pag-1
-X-Mimecast-MFC-AGG-ID: rsEKLktQM9-FLc8O4S4Pag
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-467944446a0so33583901cf.1
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 05:44:57 -0800 (PST)
+ us-mta-448-8v2Hqf4yP1WI-I4_A9wUEw-1; Fri, 17 Jan 2025 08:45:07 -0500
+X-MC-Unique: 8v2Hqf4yP1WI-I4_A9wUEw-1
+X-Mimecast-MFC-AGG-ID: 8v2Hqf4yP1WI-I4_A9wUEw
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-2a7b77a1ca2so12646fac.1
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 05:45:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737121496; x=1737726296;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HEKKhsO2kOL/qF9SHnIE9a8dcD47/tUh4wLid3vzvOo=;
-        b=lkx3+OjWAqTmWS7E08CWWAfqxUnfXQnK8G1Nq9hJ5Gbwqk/6I+ffT8HlqCWQg/KQaW
-         S+yuf7qUuqQRPD61pQN5zh1SBlM4TRFEuEwtQ+wX69KfQrFZsMl+jvYZaAZd/gVHt2HT
-         AhBhiCTojF0yDIDl/y0ZtiqQLAigIj+kCBa49+8XXpZNsJ5REvJUGh6Go2MspagpVADb
-         W6CLQY/sNNspZMAOzbklQw6SuOLACHngdnxMR0ErWIInKKfjeG79Ms/OvHGaJMwPkMS1
-         69HIhqY/bMp8oRkPoGlhgpDAzh28BrvNkdxexyVRXDCs7dJfKzxP7o6ojmt9zzOOq/E5
-         wDUA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDNmwXY10715JABbp3qiTSCGLcFm/Gytik5LhMio0DkvQLgojqu6YKPdTo8kX7CjfEUv4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyK5ZE7Sl8lL2E622V5wqw0EeJzuTz7O2Ue7sjZw46ecw02Q7bN
-	xsf9yTukwZbYYT0MhRN6oQLY8MqG7ls7Ue0PzUgeVkrvAXsV+tjFHBsgQU1zJAlncTCS2/9o9r4
-	p13+c61ZqmJG+hzfhCJ9SYR8zwvX/h8ZRWULgTwvvnig8rqfp0Q==
-X-Gm-Gg: ASbGncvta8bgMKVH3NuzK4knV1NnRHmPHgqpbP6PqJs+QFfh11oK9m+IZTCr6oUxHJe
-	kpvu4DGQ4MTAq6FVSjZvPzdDSSB3FfsTECE+jP7tqIvJFPv6If3aRnjGGnxvz/wFcDXnFhwtV05
-	UDZriscpEXA9lE2kDhw7UOViAKcXNY3o9QCSM3TI3CAj9uemApKqUPxgwpSKeqnguH33nMoPRBW
-	wEUwMBO4mZg0QgtSytIRaI4v1E4MVE0fzDWruHsTaqpMIbm2WxTtcb1zHyNYz5dHPRu2nIKG+do
-	b/QrLlzZo5RrYSPMmXCfIYmt4Bz/VCu22GPPsanjGg==
-X-Received: by 2002:a05:622a:1387:b0:467:674d:237f with SMTP id d75a77b69052e-46e12ad5f7bmr40519091cf.11.1737121496632;
-        Fri, 17 Jan 2025 05:44:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHmIl4MCDkHkFsxi8fUyXS99BtrKRZsY+6w06Ii3eQgKuqou3xcsKirOxy10aWGIFujuL9O5w==
-X-Received: by 2002:a05:622a:1387:b0:467:674d:237f with SMTP id d75a77b69052e-46e12ad5f7bmr40518371cf.11.1737121496270;
-        Fri, 17 Jan 2025 05:44:56 -0800 (PST)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e1042ef63sm11228641cf.71.2025.01.17.05.44.44
+        d=1e100.net; s=20230601; t=1737121505; x=1737726305;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EL/Md/xAnVjdSOMC30BT2Sup8TuZ57RNm5+CW4cdr0g=;
+        b=cxNAooy+P7f29Xd5793a7pfKq//UbHbgzz3Sp6ukllxOztawwikWYK1ESUSs6x4Sqz
+         pd2r3E9F93wFVqPiEP5KKUzjqdXyjs+o4gTlGtCbFK1K6wkEhACv4A7RAePw2Vl8DnJ/
+         upWD7e78vrWTd8XL5NreZFJI/4XwbV2SFjAn5yVgke+Yd3LJ5BNBk9MxTFETeJLN8e6g
+         O+Op2xbrmXmv3ikfhGfDCMgsCUArioy3ecA1bVJHjPR4PiJS2h82uLAhFuXVBSq9uisE
+         nsLuiUgLzzSkqXQEBDbr2sa+peOi7AOUknwAG2OOmJBPyEnzUjrdf4daTarOAk0emGh0
+         Nilg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8taMwwANq4kEeNf4hveWRK3B/vcBdL/Nl8bt0lPjGUEQRBYfnIa+FsdPF5lEj4iJicRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7Cz/53JjgoKspXKvUupeUzmgFjSYgqZMG4ZM+AAjAyf+D/3CB
+	41fGV9CGzDnKgbWUuYkdo3OHjwl+ys0mZBRz1e2rRA/yaDUaEszMcRK0JYYfd9A68tpALX0gb8a
+	TViE6l17fKxrxDZR0qZLNzYwccWdilU5DtSgG90nsBAENFJ2kaA==
+X-Gm-Gg: ASbGncst2Xy2VPnf0Bj0oPBJJibN0CgX8+rJbAEALYN2PdYwSzWOgFdyf3zmFFYZ2gV
+	CPzfJOZsrquzUHUmCb7lE77M+o9MqApBG29+sMpqwMBXXnW2Z5kZoZhw5Dop+BbCAIwVDI/8Moi
+	N6HmEBktXiY8dkEtNng/hzKKE+SCKsAP0MCKcRYMIhZ8Q+LATIjGSrjOnNcJzhSqU9uToQKEgPL
+	MsGQJ9sGP4nLJzHOVPm6nN8XPAjynWzar9L67zPsj/Q9kFM1IwGXzKl4qHU
+X-Received: by 2002:a4a:ee06:0:b0:5f2:bae9:5fe4 with SMTP id 006d021491bc7-5fa387f1fafmr610132eaf.1.1737121505633;
+        Fri, 17 Jan 2025 05:45:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFtHhEKqg933zNO3YKsajRZW3t1314FdZw7gNR6lp2izRBKfUR7wM84axeBHAi48Y/sRavCRQ==
+X-Received: by 2002:a4a:ee06:0:b0:5f2:bae9:5fe4 with SMTP id 006d021491bc7-5fa387f1fafmr610123eaf.1.1737121505306;
+        Fri, 17 Jan 2025 05:45:05 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7249b4883c0sm882724a34.50.2025.01.17.05.45.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2025 05:44:55 -0800 (PST)
-From: Valentin Schneider <vschneid@redhat.com>
-To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, virtualization@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
- linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
- xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
- linux-arch@vger.kernel.org, rcu@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-mm@kvack.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com
-Cc: Peter Zijlstra <peterz@infradead.org>, Juergen Gross <jgross@suse.com>,
- Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov
- <alexey.amakhalov@broadcom.com>, Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
- Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
- <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Alexander
- Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa
- <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, Adrian Hunter
- <adrian.hunter@intel.com>, "Liang, Kan" <kan.liang@linux.intel.com>, Boris
- Ostrovsky <boris.ostrovsky@oracle.com>, Josh Poimboeuf
- <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, Frederic Weisbecker <frederic@kernel.org>, "Paul E.
- McKenney" <paulmck@kernel.org>, Jason Baron <jbaron@akamai.com>, Steven
- Rostedt <rostedt@goodmis.org>, Ard Biesheuvel <ardb@kernel.org>, Neeraj
- Upadhyay <neeraj.upadhyay@kernel.org>, Joel Fernandes
- <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, Boqun
- Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan
- <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli
- <juri.lelli@redhat.com>, Clark Williams <williams@redhat.com>, Yair
- Podemsky <ypodemsk@redhat.com>, Tomas Glozar <tglozar@redhat.com>, Vincent
- Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann
- <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, Mel Gorman
- <mgorman@suse.de>, Kees Cook <kees@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Christoph Hellwig <hch@infradead.org>, Shuah
- Khan <shuah@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, Miguel
- Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>, "Mike
- Rapoport (Microsoft)" <rppt@kernel.org>, Samuel Holland
- <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, Nicolas Saenz
- Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>,
- Yosry Ahmed <yosryahmed@google.com>, "Kirill A. Shutemov"
- <kirill.shutemov@linux.intel.com>, "Masami Hiramatsu (Google)"
- <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, Luis
- Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
- Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: Re: [PATCH v4 26/30] x86,tlb: Make __flush_tlb_global()
- noinstr-compliant
-In-Reply-To: <52311c3d-83cf-4dc4-bbcb-5fbca8eb249c@intel.com>
-References: <20250114175143.81438-1-vschneid@redhat.com>
- <20250114175143.81438-27-vschneid@redhat.com>
- <52311c3d-83cf-4dc4-bbcb-5fbca8eb249c@intel.com>
-Date: Fri, 17 Jan 2025 14:44:42 +0100
-Message-ID: <xhsmh5xmdh7w5.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+        Fri, 17 Jan 2025 05:45:04 -0800 (PST)
+Date: Fri, 17 Jan 2025 08:44:49 -0500
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Wencheng Yang <east.moutain.yang@gmail.com>
+Cc: Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit
+ <suravee.suthikulpanit@amd.com>, Will Deacon <will@kernel.org>, Robin
+ Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2] drviers/iommu/amd: support P2P access through IOMMU
+ when SME is enabled
+Message-ID: <20250117084449.6cfd68b3.alex.williamson@redhat.com>
+In-Reply-To: <20250117071423.469880-1-east.moutain.yang@gmail.com>
+References: <20250117071423.469880-1-east.moutain.yang@gmail.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 14/01/25 13:45, Dave Hansen wrote:
-> On 1/14/25 09:51, Valentin Schneider wrote:
->> +	cr4 = this_cpu_read(cpu_tlbstate.cr4);
->> +	asm volatile("mov %0,%%cr4": : "r" (cr4 ^ X86_CR4_PGE) : "memory");
->> +	asm volatile("mov %0,%%cr4": : "r" (cr4) : "memory");
->> +	/*
->> +	 * In lieu of not having the pinning crap, hard fail if CR4 doesn't
->> +	 * match the expected value. This ensures that anybody doing dodgy gets
->> +	 * the fallthrough check.
->> +	 */
->> +	BUG_ON(cr4 != this_cpu_read(cpu_tlbstate.cr4));
->
-> Let's say someone managed to write to cpu_tlbstate.cr4 where they
-> cleared one of the pinned bits.
->
-> Before this patch, CR4 pinning would WARN_ONCE() about it pretty quickly
-> and also reset the cleared bits.
->
-> After this patch, the first native_flush_tlb_global() can clear pinned
-> bits, at least until native_write_cr4() gets called the next time. That
-> seems like it'll undermine CR4 pinning at least somewhat.
->
+On Fri, 17 Jan 2025 15:14:18 +0800
+Wencheng Yang <east.moutain.yang@gmail.com> wrote:
 
-The BUG_ON() should still catch any pinned bit mishandling, however...
+> When SME is enabled, memory encryption bit is set in IOMMU page table
+> pte entry, it works fine if the pfn of the pte entry is memory.
+> However, if the pfn is MMIO address, for example, map other device's mmio
+> space to its io page table, in such situation, setting memory encryption
+> bit in pte would cause P2P failure.
+> 
+> Clear memory encryption bit in io page table if the mapping is MMIO
+> rather than memory.
+> 
+> Signed-off-by: Wencheng Yang <east.moutain.yang@gmail.com>
+> ---
+>  drivers/iommu/amd/amd_iommu_types.h | 7 ++++---
+>  drivers/iommu/amd/io_pgtable.c      | 2 ++
+>  drivers/iommu/amd/io_pgtable_v2.c   | 5 ++++-
+>  drivers/iommu/amd/iommu.c           | 2 ++
+>  drivers/vfio/vfio_iommu_type1.c     | 4 +++-
+>  include/uapi/linux/vfio.h           | 1 +
+>  6 files changed, 16 insertions(+), 5 deletions(-)
 
-> What keeps native_write_cr4() from being noinstr-compliant now? Is it
-> just the WARN_ONCE()?
->
+This needs to:
 
-I don't think that's even an issue since __WARN_printf() wraps the print in
-instrumentation_{begin,end}(). In v3 I made native_write_cr4() noinstr and
-added a non-noinstr wrapper to be used in existing callsites.
+ - Be split into separate IOMMU vs VFIO patches
+ - Consider and consolidate with other IOMMU implementations of the same
+ - Provide introspection to userspace relative to the availability of
+   the resulting mapping option
 
-AFAICT if acceptable we could make the whole thing noinstr and stick with
-that; Peter, is there something I missed that made you write the handmade
-noinstr CR4 RMW?
+It's also not clear to me that the user should be responsible for
+setting this flag versus something in the VFIO or IOMMU layer.  For
+example what are the implications of the user setting this flag
+incorrectly (not just failing to set it for MMIO, but using it for RAM)?
+Thanks,
+
+Alex
+
+> 
+> diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
+> index fdb0357e0bb9..b0f055200cf3 100644
+> --- a/drivers/iommu/amd/amd_iommu_types.h
+> +++ b/drivers/iommu/amd/amd_iommu_types.h
+> @@ -434,9 +434,10 @@
+>  #define IOMMU_PTE_PAGE(pte) (iommu_phys_to_virt((pte) & IOMMU_PAGE_MASK))
+>  #define IOMMU_PTE_MODE(pte) (((pte) >> 9) & 0x07)
+>  
+> -#define IOMMU_PROT_MASK 0x03
+> -#define IOMMU_PROT_IR 0x01
+> -#define IOMMU_PROT_IW 0x02
+> +#define IOMMU_PROT_MASK 0x07
+> +#define IOMMU_PROT_IR   0x01
+> +#define IOMMU_PROT_IW   0x02
+> +#define IOMMU_PROT_MMIO 0x04
+>  
+>  #define IOMMU_UNITY_MAP_FLAG_EXCL_RANGE	(1 << 2)
+>  
+> diff --git a/drivers/iommu/amd/io_pgtable.c b/drivers/iommu/amd/io_pgtable.c
+> index f3399087859f..dff887958a56 100644
+> --- a/drivers/iommu/amd/io_pgtable.c
+> +++ b/drivers/iommu/amd/io_pgtable.c
+> @@ -373,6 +373,8 @@ static int iommu_v1_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
+>  			__pte |= IOMMU_PTE_IR;
+>  		if (prot & IOMMU_PROT_IW)
+>  			__pte |= IOMMU_PTE_IW;
+> +		if (prot & IOMMU_PROT_MMIO)
+> +			__pte = __sme_clr(__pte);
+>  
+>  		for (i = 0; i < count; ++i)
+>  			pte[i] = __pte;
+> diff --git a/drivers/iommu/amd/io_pgtable_v2.c b/drivers/iommu/amd/io_pgtable_v2.c
+> index c616de2c5926..55f969727dea 100644
+> --- a/drivers/iommu/amd/io_pgtable_v2.c
+> +++ b/drivers/iommu/amd/io_pgtable_v2.c
+> @@ -65,7 +65,10 @@ static u64 set_pte_attr(u64 paddr, u64 pg_size, int prot)
+>  {
+>  	u64 pte;
+>  
+> -	pte = __sme_set(paddr & PM_ADDR_MASK);
+> +	pte = paddr & PM_ADDR_MASK;
+> +	if (!(prot & IOMMU_PROT_MMIO))
+> +		pte = __sme_set(pte);
+> +
+>  	pte |= IOMMU_PAGE_PRESENT | IOMMU_PAGE_USER;
+>  	pte |= IOMMU_PAGE_ACCESS | IOMMU_PAGE_DIRTY;
+>  
+> diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
+> index 16f40b8000d7..9194ad681504 100644
+> --- a/drivers/iommu/amd/iommu.c
+> +++ b/drivers/iommu/amd/iommu.c
+> @@ -2578,6 +2578,8 @@ static int amd_iommu_map_pages(struct iommu_domain *dom, unsigned long iova,
+>  		prot |= IOMMU_PROT_IR;
+>  	if (iommu_prot & IOMMU_WRITE)
+>  		prot |= IOMMU_PROT_IW;
+> +	if (iommu_prot & IOMMU_MMIO)
+> +		prot |= IOMMU_PROT_MMIO;
+>  
+>  	if (ops->map_pages) {
+>  		ret = ops->map_pages(ops, iova, paddr, pgsize,
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 50ebc9593c9d..08be1ef8514b 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1557,6 +1557,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>  		prot |= IOMMU_WRITE;
+>  	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
+>  		prot |= IOMMU_READ;
+> +    if (map->flags & VFIO_DMA_MAP_FLAG_MMIO)
+> +        prot |= IOMMU_MMIO;
+>  
+>  	if ((prot && set_vaddr) || (!prot && !set_vaddr))
+>  		return -EINVAL;
+> @@ -2801,7 +2803,7 @@ static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
+>  	struct vfio_iommu_type1_dma_map map;
+>  	unsigned long minsz;
+>  	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
+> -			VFIO_DMA_MAP_FLAG_VADDR;
+> +			VFIO_DMA_MAP_FLAG_VADDR | VFIO_DMA_MAP_FLAG_MMIO;
+>  
+>  	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+>  
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index c8dbf8219c4f..68002c8f1157 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1560,6 +1560,7 @@ struct vfio_iommu_type1_dma_map {
+>  #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
+>  #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
+>  #define VFIO_DMA_MAP_FLAG_VADDR (1 << 2)
+> +#define VFIO_DMA_MAP_FLAG_MMIO (1 << 3)     /* map of mmio */
+>  	__u64	vaddr;				/* Process virtual address */
+>  	__u64	iova;				/* IO virtual address */
+>  	__u64	size;				/* Size of mapping (bytes) */
 
 
