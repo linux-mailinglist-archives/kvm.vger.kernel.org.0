@@ -1,261 +1,132 @@
-Return-Path: <kvm+bounces-35785-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35786-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AB9CA15205
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:42:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD126A15269
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:08:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A5041888671
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 14:42:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D19166AD7
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:08:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6F71632DD;
-	Fri, 17 Jan 2025 14:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6058D1917E4;
+	Fri, 17 Jan 2025 15:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="I9nC3yAP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K0ZfD13Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DEB13B58C
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 14:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3491F15CD74
+	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 15:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737124942; cv=none; b=h8Uj/3y2df35LYKxjAGa13xoV23Gb/Dee/07f4v/79ld1LIUomX9g+SGTbCwKL9GWbc1Yw4KfnNt4Y27Lgt7Jos9W+yarLBuvC1Vo6XdS10+s+76RSQWJE7xD56GnW5tyYF0R+gNKp1yszZZ1QawKsb/61f4CuG/gAU9w9bc7HY=
+	t=1737126514; cv=none; b=Bgp8IYmefB9WBT67MDkHZp19RJtAduLS7nqRMFj953fZkFflar8IKZCHyszScIAc1XC/0VlKXUtnqh7Njq88Bfe69nCM9Y26YGyHklJ6zSrjcKDymS/nwHgHKrazJG9m4xGMjITJh+Tu1neQ4d+yDnmXHYXEdtWfgiZbA+JWNZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737124942; c=relaxed/simple;
-	bh=jwi6a8f3gsj2mguyz/YQikPgquL4wOvJ/aPvkXnwZdE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g1LcCAmZcjITZOM9uK5zmWpl7uXdaayzVLfpprbPgRAbw7IXOCjLwkOYWQSms+Pe6WERwAY4ZHRd66pGv77m8QnaesyBPV3Zsxa5qH4aN2CyofGv29ewZi+JSTGCcHTBv+1qdEHBsaVGz2ljbv6MxXyIOOtpRdKo4GDueRsBeXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=I9nC3yAP; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43622267b2eso20973735e9.0
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 06:42:20 -0800 (PST)
+	s=arc-20240116; t=1737126514; c=relaxed/simple;
+	bh=bWErs4QOqHckU3k36YBCWG6QozKjHcGpU4f6KrtLWaw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ePvu7f0eWs5GtjhQcU/HNpykWRMmpIgkTUDCrRXDpk7NHRSVu77I7/jBX2li4cI67mdTNM1mzRGA+sVUmCQ1zW578/OAv8mz97YSks1g/k1e1rUlfT2YAk+aUL45sMClDPI/mkJlZ4MoXy6vVygrb06KBNAxUHO9OBd74j1NGRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K0ZfD13Z; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9204f898so4123044a91.2
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 07:08:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google; t=1737124939; x=1737729739; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vOyiy7rFa+fZCX1B+kcinTvPMKMqiU+uIoOM7Jp3fa0=;
-        b=I9nC3yAP0M5JCPEpqCiQzRUbwt1lIP0ivNjvWgf7gvK/3avzyrdslDLPsg+UlGJgQE
-         M0KWZiiiFhBGedKdGT+eawg+JJYNxR/lPw/BP04CtmckZGYvS/WkkdLjUPl4XuMa5fOy
-         nhaPQye9LMMVi4gZeX1gtObWC20pvTDFUl4Ho=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737124939; x=1737729739;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1737126512; x=1737731312; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vOyiy7rFa+fZCX1B+kcinTvPMKMqiU+uIoOM7Jp3fa0=;
-        b=piFgjJeb+lWlenLvlsn6nbiIs4smfCOk6yjQENMDVao+7nNZj/UzyEYogBVzt/edsj
-         PEOkL6/5kt94iLW0MTt7nMqdTsjkx4YlAzw12dzib53Z+i6PX9gwAITA5l1w4rjRPSFJ
-         oCaMXkBNexBjpO+kGVFKqJIIvgykviRtiGRP4TrspOmcTtWgD/GwZAtVOrp0D1YsO77V
-         jMX2kxtksEA8rsDf/nYR6nPRAhXGy6EvVvQYi8XgK0EzuS/7xsiLmbxmbbfG7UGwe8q7
-         0ru0HPAjMKRiJfAO/u5cFOVD5ylG2W3RwJGXmFxgPVQwX7J6de7DHVsHBkBd/t3+BEyn
-         o4nw==
-X-Forwarded-Encrypted: i=1; AJvYcCUChBCEl2QV66tetTbWPGOQy01RwE/vwyJ5F+gNJR1VZyV5oTN0B8+ulPMVO/i0PpfeEw8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI1VKLggkVDToFe+wK+gThl1bVubI0rD9+aoxc4wZs4UE7roUM
-	UG+kFbpouiJKLTgccN7FFBmARQLw09Fe1CuYS28T+BGDo44qn7ozvX0xpZeg+wH7d1l7emE72cB
-	X
-X-Gm-Gg: ASbGncvby5y3oUWaoseLC8hFunm7ezAEWslNYOhujm9ZLuXUACKCQlMHZGp5rkgmeM/
-	YkbCCVEfpzkNSjyT0cOF0HxeTqRh4QQ+xVftwVJbcEaAtZJPbsZsbue9Li69jT9QnLgsJHYY+85
-	BXEJeyvgJiDvSqCO+erXDUAZYItV4EL4lI360M/br9+8D+52kTMceU+ACRrM7VaJF6LHoPOj2kr
-	yCJN3QLz78Kezbb3KtT/K76PMzQt0z6B+Et2Ls3SbDG/KQAeg5kWbcJEdlc7klE1F64
-X-Google-Smtp-Source: AGHT+IHxPap8BX01LyIGTU1AEqlpVQWXx2beTFQEyS1P7fpRD3tWSHNYAjM0oXYB5BLI/yHWy1ejYw==
-X-Received: by 2002:a05:600c:3b27:b0:434:fd15:3ac9 with SMTP id 5b1f17b1804b1-43891438051mr28828925e9.22.1737124939130;
-        Fri, 17 Jan 2025 06:42:19 -0800 (PST)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:5485:d4b2:c087:b497])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c74ac5f9sm93712865e9.11.2025.01.17.06.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2025 06:42:17 -0800 (PST)
-Date: Fri, 17 Jan 2025 15:42:15 +0100
-From: Simona Vetter <simona.vetter@ffwll.ch>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Xu Yilun <yilun.xu@linux.intel.com>,
-	Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leonro@nvidia.com>,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, pbonzini@redhat.com, seanjc@google.com,
-	alex.williamson@redhat.com, vivek.kasireddy@intel.com,
-	dan.j.williams@intel.com, aik@amd.com, yilun.xu@intel.com,
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	lukas@wunner.de, yan.y.zhao@intel.com, leon@kernel.org,
-	baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
- kAPI
-Message-ID: <Z4psR1qoNQUQf3Q2@phenom.ffwll.local>
-Mail-Followup-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
-	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
-	yilun.xu@intel.com, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-References: <Z37HpvHAfB0g9OQ-@phenom.ffwll.local>
- <Z37QaIDUgiygLh74@yilunxu-OptiPlex-7050>
- <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
- <Z38FCOPE7WPprYhx@yilunxu-OptiPlex-7050>
- <Z4F2X7Fu-5lprLrk@phenom.ffwll.local>
- <20250110203838.GL5556@nvidia.com>
- <Z4Z4NKqVG2Vbv98Q@phenom.ffwll.local>
- <20250114173103.GE5556@nvidia.com>
- <Z4d4AaLGrhRa5KLJ@phenom.ffwll.local>
- <420bd2ea-d87c-4f01-883e-a7a5cf1635fe@amd.com>
+        bh=3YaZGFwmyF9uOBZwFaSh7/G86/LFKPzPcCNcQPwegjc=;
+        b=K0ZfD13ZiknqWAfkvVgWMBr2y//c4mMjYLLFDB0GDa5TUE+qjhFBczfKWyF2gUVShT
+         76m7PrD2xAuoiCXYvKzUqtrj2wCdUQ+1spS9FT8kVHhYtpzdkMfnbIOSpyqrw6hgh5c9
+         aKWArAk70AUaIIEa1KUtGQ7nNVwY5cj6aIHOFpkUzb+H75iCghRsYz5wG+uPguk7bgAe
+         X5i88Z2dNsfXKqL0k3cXlVQYvcaAw5TPVxePjKUSR3lauTLkHh/pP7AGfhebTfHbsfIu
+         Ly3Cioz5ruamGWFiRZggSqGM6k43E77F8QqOop70702pCD5TuhGSvP/ZU4yW/PZhssUk
+         vyeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737126512; x=1737731312;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3YaZGFwmyF9uOBZwFaSh7/G86/LFKPzPcCNcQPwegjc=;
+        b=mfgZZ7hwUDZ6PKNjRm0ObQTxEBhCai70xGTMFwP2OZOQddWRcwwogKQ8dQ4rfDoXUm
+         DZfeW4Ue7/YAIQH5J3jVqEiZd02BhfVFdlj3LVCdi+bfozoTrV/KMB7oLoUgshZuT+9I
+         XJqRwlG0qow0eg7g64mB/mTZMOWn6tULuElSeAWBqLxuo5gK4PK3l68lusgD13OOVvkD
+         KGi5YaHistQiPaFg1V5WMhGxtrgOfDRDevdE5Fdrcq8cmMqynIwUBAyA7Cy8QE8AcR5v
+         tqRglZ8Jij+0UAOG3Wd63hxwlXBjBNkt6WEZH2iOFmFY6Q1SQ6LZSQ5Q2CkaEoUH95ni
+         Dpow==
+X-Forwarded-Encrypted: i=1; AJvYcCWi6SouTuRdOzncu4/0COukZr3etUqzxkzX6jo+Jtnw18SF4yzNFJMggKD3YNsx5clXF6c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDi83C9fMCGQZARuJ25X7RHMa5HkeZKupLMCJjyMtYIRwkNKZ2
+	+zqbnduuG7TKS1pUJGuT3eqAj+2GInxqrpYK11DPc45mI+mqLu8uZfWhKTlDrt7kP6vFXO6uLjt
+	nZA==
+X-Google-Smtp-Source: AGHT+IH4ol7lmKI8KivBFLKJyqPQ8nvh/dW1PSDT4D7jWlQrx8vl201ftRRIOFbIuOhKJqE35WZCQZoLioE=
+X-Received: from pjbse11.prod.google.com ([2002:a17:90b:518b:b0:2e9:ee22:8881])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:e183:b0:2ee:aed2:c15c
+ with SMTP id 98e67ed59e1d1-2f782d4f2cdmr4142592a91.28.1737126512563; Fri, 17
+ Jan 2025 07:08:32 -0800 (PST)
+Date: Fri, 17 Jan 2025 07:08:31 -0800
+In-Reply-To: <85a8bebd3c92292472bd50c6a03d85365c4979b1.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <420bd2ea-d87c-4f01-883e-a7a5cf1635fe@amd.com>
-X-Operating-System: Linux phenom 6.12.3-amd64 
+Mime-Version: 1.0
+References: <20241209010734.3543481-1-binbin.wu@linux.intel.com>
+ <20241209010734.3543481-13-binbin.wu@linux.intel.com> <8a9b761b-3ffc-4e67-8254-cf4150a997ae@linux.intel.com>
+ <e3a2e8fa-b496-4010-9a8c-bfeb131bc43b@linux.intel.com> <61e66ef579a86deb453bb25febd30f5aec7472fc.camel@intel.com>
+ <Z4kcjygm19Qv1dNN@google.com> <19901a08ab931a0200f7c079f36e4b27ed2e1616.camel@intel.com>
+ <Z4mGNUPy53WfVEZU@google.com> <80c971e62dc44932b626fd6d22195ba62ceb6db7.camel@intel.com>
+ <85a8bebd3c92292472bd50c6a03d85365c4979b1.camel@intel.com>
+Message-ID: <Z4pyEis-6gmBrO1k@google.com>
+Subject: Re: [PATCH 12/16] KVM: TDX: Inhibit APICv for TDX guest
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Chao Gao <chao.gao@intel.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Adrian Hunter <adrian.hunter@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	Yan Y Zhao <yan.y.zhao@intel.com>, 
+	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 at 11:06:53AM +0100, Christian König wrote:
-> Am 15.01.25 um 09:55 schrieb Simona Vetter:
-> > > > If we add something
-> > > > new, we need clear rules and not just "here's the kvm code that uses it".
-> > > > That's how we've done dma-buf at first, and it was a terrible mess of
-> > > > mismatched expecations.
-> > > Yes, that would be wrong. It should be self defined within dmabuf and
-> > > kvm should adopt to it, move semantics and all.
-> > Ack.
-> > 
-> > I feel like we have a plan here.
-> 
-> I think I have to object a bit on that.
-> 
-> >   Summary from my side:
-> > 
-> > - Sort out pin vs revocable vs dynamic/moveable semantics, make sure
-> >    importers have no surprises.
-> > 
-> > - Adopt whatever new dma-api datastructures pops out of the dma-api
-> >    reworks.
-> > 
-> > - Add pfn based memory access as yet another optional access method, with
-> >    helpers so that exporters who support this get all the others for free.
-> > 
-> > I don't see a strict ordering between these, imo should be driven by
-> > actual users of the dma-buf api.
-> > 
-> > Already done:
-> > 
-> > - dmem cgroup so that we can resource control device pinnings just landed
-> >    in drm-next for next merge window. So that part is imo sorted and we can
-> >    charge ahead with pinning into device memory without all the concerns
-> >    we've had years ago when discussing that for p2p dma-buf support.
-> > 
-> >    But there might be some work so that we can p2p pin without requiring
-> >    dynamic attachments only, I haven't checked whether that needs
-> >    adjustment in dma-buf.c code or just in exporters.
-> > 
-> > Anything missing?
-> 
-> Well as far as I can see this use case is not a good fit for the DMA-buf
-> interfaces in the first place. DMA-buf deals with devices and buffer
-> exchange.
-> 
-> What's necessary here instead is to give an importing VM full access on some
-> memory for their specific use case.
-> 
-> That full access includes CPU and DMA mappings, modifying caching
-> attributes, potentially setting encryption keys for specific ranges etc....
-> etc...
-> 
-> In other words we have a lot of things the importer here should be able to
-> do which we don't want most of the DMA-buf importers to do.
+On Fri, Jan 17, 2025, Kai Huang wrote:
+> On Fri, 2025-01-17 at 09:53 +0000, Huang, Kai wrote:
+> > Btw, IIUC, in case of IRQCHIP split, KVM uses KVM_IRQ_ROUTING_MSI for r=
+outes of
+> > GSIs.=C2=A0 But it seems KVM only allows level-triggered MSI to be sign=
+aled (which is
+> > a surprising):
+> >=20
+> > int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 struct kvm *kvm, int irq_source_id, int level, bool l=
+ine_status)
+> > {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct kvm_lapic_irq irq;
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (kvm_msi_route_invalid(kv=
+m, e))
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!level)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return -1;
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_set_msi_irq(kvm, e, &irq=
+);
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return kvm_irq_delivery_to_a=
+pic(kvm, NULL, &irq, NULL);
+> > }
+>=20
+> Ah sorry this 'level' is not trig_mode.  Please ignore :-)
 
-This proposal isn't about forcing existing exporters to allow importers to
-do new stuff. That stays as-is, because it would break things.
-
-It's about adding yet another interface to get at the underlying data, and
-we have tons of those already. The only difference is that if we don't
-butcher the design, we'll be able to implement all the existing dma-buf
-interfaces on top of this new pfn interface, for some neat maximal
-compatibility.
-
-But fundamentally there's never been an expectation that you can take any
-arbitrary dma-buf and pass it any arbitrary importer, and that is must
-work. The fundamental promise is that if it _does_ work, then
-- it's zero copy
-- and fast, or as fast as we can make it
-
-I don't see this any different than all the much more specific prposals
-and existing code, where a subset of importers/exporters have special
-rules so that e.g. gpu interconnect or vfio uuid based sharing works.
-pfn-based sharing is just yet another flavor that exists to get the max
-amount of speed out of interconnects.
-
-Cheers, Sima
-
-> 
-> The semantics for things like pin vs revocable vs dynamic/moveable seems
-> similar, but that's basically it.
-> 
-> As far as I know the TEE subsystem also represents their allocations as file
-> descriptors. If I'm not completely mistaken this use case most likely fit's
-> better there.
-> 
-> > I feel like this is small enough that m-l archives is good enough. For
-> > some of the bigger projects we do in graphics we sometimes create entries
-> > in our kerneldoc with wip design consensus and things like that. But
-> > feels like overkill here.
-> > 
-> > > My general desire is to move all of RDMA's MR process away from
-> > > scatterlist and work using only the new DMA API. This will save *huge*
-> > > amounts of memory in common workloads and be the basis for non-struct
-> > > page DMA support, including P2P.
-> > Yeah a more memory efficient structure than the scatterlist would be
-> > really nice. That would even benefit the very special dma-buf exporters
-> > where you cannot get a pfn and only the dma_addr_t, altough most of those
-> > (all maybe even?) have contig buffers, so your scatterlist has only one
-> > entry. But it would definitely be nice from a design pov.
-> 
-> Completely agree on that part.
-> 
-> Scatterlist have a some design flaws, especially mixing the input and out
-> parameters of the DMA API into the same structure.
-> 
-> Additional to that DMA addresses are basically missing which bus they belong
-> to and details how the access should be made (e.g. snoop vs no-snoop
-> etc...).
-> 
-> > Aside: A way to more efficiently create compressed scatterlists would be
-> > neat too, because a lot of drivers hand-roll that and it's a bit brittle
-> > and kinda silly to duplicate. With compressed I mean just a single entry
-> > for a contig range, in practice thanks to huge pages/folios and allocators
-> > trying to hand out contig ranges if there's plenty of memory that saves a
-> > lot of memory too. But currently it's a bit a pain to construct these
-> > efficiently, mostly it's just a two-pass approach and then trying to free
-> > surplus memory or krealloc to fit. Also I don't have good ideas here, but
-> > dma-api folks might have some from looking at too many things that create
-> > scatterlists.
-> 
-> I mailed with Christoph about that a while back as well and we both agreed
-> that it would probably be a good idea to start defining a data structure to
-> better encapsulate DMA addresses.
-> 
-> It's just that nobody had time for that yet and/or I wasn't looped in in the
-> final discussion about it.
-> 
-> Regards,
-> Christian.
-> 
-> > -Sima
-
--- 
-Simona Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Yeah :-(  I have misread the use of "level" so, so many times in KVM's IRQ =
+code.
 
