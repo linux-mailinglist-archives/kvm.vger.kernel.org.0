@@ -1,206 +1,399 @@
-Return-Path: <kvm+bounces-35797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33AEAA1533F
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:53:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2492BA15346
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 16:53:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53D98167C65
-	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:53:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66AEA3AB465
+	for <lists+kvm@lfdr.de>; Fri, 17 Jan 2025 15:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D0F19CC36;
-	Fri, 17 Jan 2025 15:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BC619C56D;
+	Fri, 17 Jan 2025 15:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mpGqLvBn"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hrwZYIKM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154BF19AD8C
-	for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 15:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B6413AA20;
+	Fri, 17 Jan 2025 15:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737129180; cv=none; b=Fgbzzi+Yqo9ikPjjdBggNWOBR3jVZT57Z9viI0zGn1yQVg0PeadKVPtGNHVB4KbG0NKeSLO0AwiqHUSzTZtFknnRJvncFCjYMf1n8wBlGkOk2UyjdQjJXpLyMoGfRwVuBLagAQbjEqjSy6WEeNOfHmM6lTrteoiucfhmxCVW6/E=
+	t=1737129209; cv=none; b=GiABPiPQhIsVqgzlGGpoFjRZAo2RIioXFW6mTflWVzhhaJsPVVSTcvUucuqsILAIsAieYrJbIWKbwlLcbxPC3KaUaDSh2ELL7a8xT1b6FNcidJTtpoluK0TJvXjkY3nrUJ3dXN6Q2nHB/AX6GTCRAeCdXtDpSkv4hzIc3tZYYI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737129180; c=relaxed/simple;
-	bh=E7d+TpfXp3p6m5vGusLumGYBM9vV8hEetyox2i/2Tk8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rGEKjZ5mZRwAEAk62SIquKeUEJjSHaCrK+vOA1xsFVUdmHfMLOiHv/4R6QDhRXhgJqzqE+kb1yG/eiWdgsIavyQtwqchGfOkO9OT1aKz85ACgKwLuCveIrbGb/boy+pSjO8Q2B3339M4KH/kDLGXrpR2SVPV9xG3NcTrAKsEO44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mpGqLvBn; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5d0c939ab78so9577a12.0
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 07:52:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737129176; x=1737733976; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E7d+TpfXp3p6m5vGusLumGYBM9vV8hEetyox2i/2Tk8=;
-        b=mpGqLvBniVqxo77vfpJUti5+g+eBQMghQtwoA7cF331WeBcYbaNHa/0Apt7RaciHOt
-         /ckZLqTt5IsP4hkw8MdqGv71PrORwCjtz07dDwHT5XtIP1WSXivZFw5I69VeeqOfcQF3
-         ybe6UQGUK1sRDw7mWfl8g5yJZjAV4KfLbPCbsnEvoY2Is2Ir/+knCLlW/+DsbpZp+F67
-         1YFefnkJmOsddMASB3if29JAVOaoojUkTxLWZBjkgUI3ScVoKgbxbMxoYS341oH/wb1u
-         zde5v0gHpoYfKEPKNScMJekd0S1tXfitnEzMT2pHzwhXP/omYZPS3FKjadRdLXhf/Z61
-         8+oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737129176; x=1737733976;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E7d+TpfXp3p6m5vGusLumGYBM9vV8hEetyox2i/2Tk8=;
-        b=Mf36/oXDF3anXl7oeb4bfA1t7MboBslgCeOGHBeEQjiSqNxUtV7Cdx/WeYrR8xJUa/
-         c6WdFvsouZ8PHzuqxmbRf7wa/YZDbznzb8dyqDU9blSlkMWQzOp20RoWdz/L3KETOYEi
-         ogNUIaLXbQOEaVXo9QfQrYgIxXLVqlKOkczqh5d8iJAueDv6IJQ+0TTzrZPjMDWlXpcd
-         Cr8JCjH35Xd3HD3uxpGnc3sfxFKlO1Kw7ACzwF2p8mJ5PcQk2c8qzctzoB+ILMGfTyIa
-         0oOAc4dW+h1jW1Ap9HMFjS3zWN9IXqNRN1A7vpUOS7KGrbv3Vz+axKsoJZPzQz99OQE3
-         wiLA==
-X-Forwarded-Encrypted: i=1; AJvYcCVg0zDY0+hHqksPHqOnm5O/pUqt3LlBjMOCyRYSmIHsfq4ENSONAk7ZZlQhPiBKZamH8do=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWVwoo8GEy37Bq82N/XnvMLzIiO6cyZN52wDR83Hj05ywRTdii
-	khpHA/j1x+fbQKmLArD2AjkSZ/XBW03zEkEsFcEsjcXZvSBUqgWyUS6Qx7Tuj3QARr8Ut2mKnT/
-	pwFtZiregZBtquqSK2JnmiMWcWTFh8iCjdZ8m
-X-Gm-Gg: ASbGncumuJaJS1qOs89sOUhHtvi3J7RYMgEuZr6wfh7Ja/qguatEZo7navCBp96PxWW
-	77+gFXr+roGqz0I8WAU1RKorhz7Rhu2kRpZvuXgoAGSOQhZBJgiNhv5ByWW21lg3ZRg==
-X-Google-Smtp-Source: AGHT+IEEkI7Iy2SK9FPAK0t7gLelF/8kGvCq2TFqgDI01h52pfAV4lOJlwJrdbZvw3hEJ10c/9do3FNZA9vfJuC5wNY=
-X-Received: by 2002:a50:8e10:0:b0:5d0:acf3:e3a6 with SMTP id
- 4fb4d7f45d1cf-5db7e2c3f9dmr75503a12.1.1737129175787; Fri, 17 Jan 2025
- 07:52:55 -0800 (PST)
+	s=arc-20240116; t=1737129209; c=relaxed/simple;
+	bh=7qJkl08f0b4zT55h/xQKfZrhm46XGeEvsD+icweFzoI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EgxVg2+LPng13loDAkO3ylCBN10qraE4qqhTbg5OGgLmTfi6fgWKN7hdRvB5a9XBbSa9r5P2qU1k8jf6dBH4Pmw6C4JIkEeZTWO1Gs76xVhzDZeF5ixlDFNmPo/CaWudMtiNmb4Ls89Kwwkh4Oc4LzWXQY/f8K2h8/uA6J6X6Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hrwZYIKM; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HBRSmu019089;
+	Fri, 17 Jan 2025 15:53:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=KJazkJgtxGZ1/sgOx5bOSqsPf5bUpZ
+	myrTW6V5rld18=; b=hrwZYIKM7dX7YBffkJz/yRyJcDHuuXiCg04LUWB7gn9gf0
+	WIABchfypE1uutBSbMcqscUhYEzQl/ljHGeVlhhLrqvSgCgnbo4JO7MtFH8BGwOD
+	Bw/8Zg4AxX0m19gT7xAppCpqQyZ4WVldbxrQjaFSS4uAn0VIpqfgFrE3Fm2ZD9v2
+	C6+avWO0Xz3svxK163EHeHiLJ2L3dwFslyVRUZTctCoeYW3yVMebtDkJVBKtNW18
+	MBrXxsDhxPCM9E83hOIJfkkmffHQ/JmSWsHa7qBYWWlKgslw7HrbelTrTmQjQ5Dk
+	jlIZvNhEwUf2+BgUf25ny2o2D8jb9POLfgWSmFFQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447bxb3s85-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 15:53:16 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HFiLPG005083;
+	Fri, 17 Jan 2025 15:53:16 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447bxb3s82-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 15:53:16 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HEQ2RB002734;
+	Fri, 17 Jan 2025 15:53:15 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443byknuu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 15:53:15 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HFrBIS47776178
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Jan 2025 15:53:11 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AD5EC20043;
+	Fri, 17 Jan 2025 15:53:11 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A93D720040;
+	Fri, 17 Jan 2025 15:53:08 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com (unknown [9.124.211.105])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 17 Jan 2025 15:53:08 +0000 (GMT)
+Date: Fri, 17 Jan 2025 21:23:05 +0530
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        sbhat@linux.ibm.com, kconsul@linux.ibm.com, amachhiw@linux.ibm.com
+Subject: Re: [PATCH v2 4/6] kvm powerpc/book3s-apiv2: Introduce kvm-hv
+ specific PMU
+Message-ID: <zmlauvqrepqbu3i4grwkvhqjwumauhmeojoslnte6ilaevqtgv@alhbbimtyn7t>
+References: <20250115143948.369379-1-vaibhav@linux.ibm.com>
+ <20250115143948.369379-5-vaibhav@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250114175143.81438-1-vschneid@redhat.com> <20250114175143.81438-30-vschneid@redhat.com>
- <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com> <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
-In-Reply-To: <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
-From: Jann Horn <jannh@google.com>
-Date: Fri, 17 Jan 2025 16:52:19 +0100
-X-Gm-Features: AbW1kvZJ0qyEwdtkrx_UmrEU0O4aMmTblOKPsNQ-aUYqHdGS_cvMGi3arE1PehU
-Message-ID: <CAG48ez3H8OVP1GxBLdmFgusvT1gQhwu2SiXbgi8T9uuCYVK52w@mail.gmail.com>
-Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer flush_tlb_kernel_range()
- targeting NOHZ_FULL CPUs
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
-	virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	loongarch@lists.linux.dev, linux-riscv@lists.infradead.org, 
-	linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
-	bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>, 
-	Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov <alexey.amakhalov@broadcom.com>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	"Liang, Kan" <kan.liang@linux.intel.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Jason Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Uladzislau Rezki <urezki@gmail.com>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>, 
-	Tomas Glozar <tglozar@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, 
-	Mel Gorman <mgorman@suse.de>, Kees Cook <kees@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Christoph Hellwig <hch@infradead.org>, 
-	Shuah Khan <shuah@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	"Mike Rapoport (Microsoft)" <rppt@kernel.org>, Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, 
-	Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Yosry Ahmed <yosryahmed@google.com>, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, 
-	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
-	Tiezhu Yang <yangtiezhu@loongson.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250115143948.369379-5-vaibhav@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Y2QgynrNJiXzfKHcZAb-XmYA60vH9uLy
+X-Proofpoint-GUID: z5sLUiR2JNAODfsAjBZ1FuYv2WKMQxFf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-17_06,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 spamscore=0 clxscore=1015 impostorscore=0
+ lowpriorityscore=0 mlxscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501170122
 
-On Fri, Jan 17, 2025 at 4:25=E2=80=AFPM Valentin Schneider <vschneid@redhat=
-.com> wrote:
-> On 14/01/25 19:16, Jann Horn wrote:
-> > On Tue, Jan 14, 2025 at 6:51=E2=80=AFPM Valentin Schneider <vschneid@re=
-dhat.com> wrote:
-> >> vunmap()'s issued from housekeeping CPUs are a relatively common sourc=
-e of
-> >> interference for isolated NOHZ_FULL CPUs, as they are hit by the
-> >> flush_tlb_kernel_range() IPIs.
-> >>
-> >> Given that CPUs executing in userspace do not access data in the vmall=
-oc
-> >> range, these IPIs could be deferred until their next kernel entry.
-> >>
-> >> Deferral vs early entry danger zone
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>
-> >> This requires a guarantee that nothing in the vmalloc range can be vun=
-map'd
-> >> and then accessed in early entry code.
-> >
-> > In other words, it needs a guarantee that no vmalloc allocations that
-> > have been created in the vmalloc region while the CPU was idle can
-> > then be accessed during early entry, right?
->
-> I'm not sure if that would be a problem (not an mm expert, please do
-> correct me) - looking at vmap_pages_range(), flush_cache_vmap() isn't
-> deferred anyway.
+On Wed, Jan 15, 2025 at 08:09:45PM +0530, Vaibhav Jain wrote:
+> Introduce a new PMU named 'kvm-hv' to report Book3s kvm-hv specific
+> performance counters. This will expose KVM-HV specific performance
+> attributes to user-space via kernel's PMU infrastructure and would enable
+> users to monitor active kvm-hv based guests.
+> 
+> The patch creates necessary scaffolding to for the new PMU callbacks and
+> introduces two new exports kvmppc_{,un}register_pmu() that are called from
+> kvm-hv init and exit function to perform initialize and cleanup for the
+> 'kvm-hv' PMU. The patch doesn't introduce any perf-events yet, which will
+> be introduced in later patches
+> 
+> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+> 
+> ---
+> Changelog
+> 
+> v1->v2:
+> * Fixed an issue of kvm-hv not loading on baremetal kvm [Gautam]
+> ---
+>  arch/powerpc/include/asm/kvm_book3s.h |  12 +++
+>  arch/powerpc/kvm/Makefile             |   6 ++
+>  arch/powerpc/kvm/book3s_hv.c          |   9 ++
+>  arch/powerpc/kvm/book3s_hv_pmu.c      | 133 ++++++++++++++++++++++++++
+>  4 files changed, 160 insertions(+)
+>  create mode 100644 arch/powerpc/kvm/book3s_hv_pmu.c
+> 
+> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
+> index e1ff291ba891..cf91a1493159 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s.h
+> @@ -334,6 +334,9 @@ static inline bool kvmhv_is_nestedv1(void)
+>  	return !static_branch_likely(&__kvmhv_is_nestedv2);
+>  }
+>  
+> +int kvmppc_register_pmu(void);
+> +void kvmppc_unregister_pmu(void);
+> +
+>  #else
+>  
+>  static inline bool kvmhv_is_nestedv2(void)
+> @@ -346,6 +349,15 @@ static inline bool kvmhv_is_nestedv1(void)
+>  	return false;
+>  }
+>  
+> +static int kvmppc_register_pmu(void)
+> +{
+> +	return 0;
+> +}
+> +
+> +static void kvmppc_unregister_pmu(void)
+> +{
+> +}
+> +
+>  #endif
+>  
+>  int __kvmhv_nestedv2_reload_ptregs(struct kvm_vcpu *vcpu, struct pt_regs *regs);
+> diff --git a/arch/powerpc/kvm/Makefile b/arch/powerpc/kvm/Makefile
+> index 4bd9d1230869..094c3916d9d0 100644
+> --- a/arch/powerpc/kvm/Makefile
+> +++ b/arch/powerpc/kvm/Makefile
+> @@ -92,6 +92,12 @@ kvm-book3s_64-builtin-objs-$(CONFIG_KVM_BOOK3S_64_HANDLER) += \
+>  	$(kvm-book3s_64-builtin-tm-objs-y) \
+>  	$(kvm-book3s_64-builtin-xics-objs-y)
+>  
+> +# enable kvm_hv perf events
+> +ifdef CONFIG_HAVE_PERF_EVENTS
+> +kvm-book3s_64-builtin-objs-$(CONFIG_KVM_BOOK3S_64_HANDLER) += \
+> +	book3s_hv_pmu.o
+> +endif
+> +
+>  obj-$(CONFIG_GUEST_STATE_BUFFER_TEST) += test-guest-state-buffer.o
+>  endif
+>  
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 25429905ae90..6365b8126574 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -6662,6 +6662,14 @@ static int kvmppc_book3s_init_hv(void)
+>  		return r;
+>  	}
+>  
+> +	r = kvmppc_register_pmu();
+> +	if (r == -EOPNOTSUPP) {
+> +		pr_info("KVM-HV: PMU not supported %d\n", r);
+> +	} else if (r) {
+> +		pr_err("KVM-HV: Unable to register PMUs %d\n", r);
+> +		goto err;
+> +	}
+> +
 
-flush_cache_vmap() is about stuff like flushing data caches on
-architectures with virtually indexed caches; that doesn't do TLB
-maintenance. When you look for its definition on x86 or arm64, you'll
-see that they use the generic implementation which is simply an empty
-inline function.
+I believe we can simplify this part as follows:
 
-> So after vmapping something, I wouldn't expect isolated CPUs to have
-> invalid TLB entries for the newly vmapped page.
->
-> However, upon vunmap'ing something, the TLB flush is deferred, and thus
-> stale TLB entries can and will remain on isolated CPUs, up until they
-> execute the deferred flush themselves (IOW for the entire duration of the
-> "danger zone").
->
-> Does that make sense?
+	r = kvmppc_register_pmu();
+	if (r) {
+		pr_err("KVM-HV: Unable to register PMUs %d\n", r);
+		goto err;
+	}
 
-The design idea wrt TLB flushes in the vmap code is that you don't do
-TLB flushes when you unmap stuff or when you map stuff, because doing
-TLB flushes across the entire system on every vmap/vunmap would be a
-bit costly; instead you just do batched TLB flushes in between, in
-__purge_vmap_area_lazy().
+This would also require a minor change in kvmppc_register_pmu(), see below
 
-In other words, the basic idea is that you can keep calling vmap() and
-vunmap() a bunch of times without ever doing TLB flushes until you run
-out of virtual memory in the vmap region; then you do one big TLB
-flush, and afterwards you can reuse the free virtual address space for
-new allocations again.
 
-So if you "defer" that batched TLB flush for CPUs that are not
-currently running in the kernel, I think the consequence is that those
-CPUs may end up with incoherent TLB state after a reallocation of the
-virtual address space.
+>  	kvm_ops_hv.owner = THIS_MODULE;
+>  	kvmppc_hv_ops = &kvm_ops_hv;
+>  
+> @@ -6676,6 +6684,7 @@ static int kvmppc_book3s_init_hv(void)
+>  
+>  static void kvmppc_book3s_exit_hv(void)
+>  {
+> +	kvmppc_unregister_pmu();
+>  	kvmppc_uvmem_free();
+>  	kvmppc_free_host_rm_ops();
+>  	if (kvmppc_radix_possible())
+> diff --git a/arch/powerpc/kvm/book3s_hv_pmu.c b/arch/powerpc/kvm/book3s_hv_pmu.c
+> new file mode 100644
+> index 000000000000..8c6ed30b7654
+> --- /dev/null
+> +++ b/arch/powerpc/kvm/book3s_hv_pmu.c
+> @@ -0,0 +1,133 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Description: PMUs specific to running nested KVM-HV guests
+> + * on Book3S processors (specifically POWER9 and later).
+> + */
+> +
+> +#define pr_fmt(fmt)  "kvmppc-pmu: " fmt
+> +
+> +#include "asm-generic/local64.h"
+> +#include <linux/kernel.h>
+> +#include <linux/errno.h>
+> +#include <linux/ratelimit.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/gfp_types.h>
+> +#include <linux/pgtable.h>
+> +#include <linux/perf_event.h>
+> +#include <linux/spinlock_types.h>
+> +#include <linux/spinlock.h>
+> +
+> +#include <asm/types.h>
+> +#include <asm/kvm_ppc.h>
+> +#include <asm/kvm_book3s.h>
+> +#include <asm/mmu.h>
+> +#include <asm/pgalloc.h>
+> +#include <asm/pte-walk.h>
+> +#include <asm/reg.h>
+> +#include <asm/plpar_wrappers.h>
+> +#include <asm/firmware.h>
+> +
+> +enum kvmppc_pmu_eventid {
+> +	KVMPPC_EVENT_MAX,
+> +};
+> +
+> +static struct attribute *kvmppc_pmu_events_attr[] = {
+> +	NULL,
+> +};
+> +
+> +static const struct attribute_group kvmppc_pmu_events_group = {
+> +	.name = "events",
+> +	.attrs = kvmppc_pmu_events_attr,
+> +};
+> +
+> +PMU_FORMAT_ATTR(event, "config:0");
+> +static struct attribute *kvmppc_pmu_format_attr[] = {
+> +	&format_attr_event.attr,
+> +	NULL,
+> +};
+> +
+> +static struct attribute_group kvmppc_pmu_format_group = {
+> +	.name = "format",
+> +	.attrs = kvmppc_pmu_format_attr,
+> +};
+> +
+> +static const struct attribute_group *kvmppc_pmu_attr_groups[] = {
+> +	&kvmppc_pmu_events_group,
+> +	&kvmppc_pmu_format_group,
+> +	NULL,
+> +};
+> +
+> +static int kvmppc_pmu_event_init(struct perf_event *event)
+> +{
+> +	unsigned int config = event->attr.config;
+> +
+> +	pr_debug("%s: Event(%p) id=%llu cpu=%x on_cpu=%x config=%u",
+> +		 __func__, event, event->id, event->cpu,
+> +		 event->oncpu, config);
+> +
+> +	if (event->attr.type != event->pmu->type)
+> +		return -ENOENT;
+> +
+> +	if (config >= KVMPPC_EVENT_MAX)
+> +		return -EINVAL;
+> +
+> +	local64_set(&event->hw.prev_count, 0);
+> +	local64_set(&event->count, 0);
+> +
+> +	return 0;
+> +}
+> +
+> +static void kvmppc_pmu_del(struct perf_event *event, int flags)
+> +{
+> +}
+> +
+> +static int kvmppc_pmu_add(struct perf_event *event, int flags)
+> +{
+> +	return 0;
+> +}
+> +
+> +static void kvmppc_pmu_read(struct perf_event *event)
+> +{
+> +}
+> +
+> +/* L1 wide counters PMU */
+> +static struct pmu kvmppc_pmu = {
+> +	.task_ctx_nr = perf_sw_context,
+> +	.name = "kvm-hv",
+> +	.event_init = kvmppc_pmu_event_init,
+> +	.add = kvmppc_pmu_add,
+> +	.del = kvmppc_pmu_del,
+> +	.read = kvmppc_pmu_read,
+> +	.attr_groups = kvmppc_pmu_attr_groups,
+> +	.type = -1,
+> +};
+> +
+> +int kvmppc_register_pmu(void)
+> +{
+> +	int rc = -EOPNOTSUPP;
+> +
+> +	/* only support events for nestedv2 right now */
+> +	if (kvmhv_is_nestedv2()) {
+> +		/* Setup done now register the PMU */
+> +		pr_info("Registering kvm-hv pmu");
+> +
+> +		/* Register only if we arent already registered */
+> +		rc = (kvmppc_pmu.type == -1) ?
+> +			     perf_pmu_register(&kvmppc_pmu, kvmppc_pmu.name,
+> +					       -1) : 0;
+> +	}
+> +
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_GPL(kvmppc_register_pmu);
 
-Actually, I think this would mean that your optimization is disallowed
-at least on arm64 - I'm not sure about the exact wording, but arm64
-has a "break before make" rule that forbids conflicting writable
-address translations or something like that.
+We can change the return code to support change suggested above
 
-(I said "until you run out of virtual memory in the vmap region", but
-that's not actually true - see the comment above lazy_max_pages() for
-an explanation of the actual heuristic. You might be able to tune that
-a bit if you'd be significantly happier with less frequent
-interruptions, or something along those lines.)
+int kvmppc_register_pmu(void)
+{
+	int rc;
+
+	/* only support events for nestedv2 right now */
+	if (kvmhv_is_nestedv2()) {
+		/* Setup done now register the PMU */
+		pr_info("Registering kvm-hv pmu");
+
+		/* Register only if we arent already registered */
+		rc = (kvmppc_pmu.type == -1) ?
+			     perf_pmu_register(&kvmppc_pmu, kvmppc_pmu.name,
+					       -1) : 0;
+	} else {
+		pr_info("KVM-HV: PMU not supported %d\n", r);
+	}
+
+	return rc;
+}
+
+> +
+> +void kvmppc_unregister_pmu(void)
+> +{
+> +	if (kvmhv_is_nestedv2()) {
+> +		if (kvmppc_pmu.type != -1)
+> +			perf_pmu_unregister(&kvmppc_pmu);
+> +
+> +		pr_info("kvmhv_pmu unregistered.\n");
+> +	}
+> +}
+
+We can get rid of nested ifs. That way, the pr_info will also be emitted
+only when we actually call perf_pmu_unregister()
+
+	if (kvmhv_is_nestedv2() && kvmppc_pmu.type != -1) {
+		perf_pmu_unregister(&kvmppc_pmu);
+		pr_info("kvmhv_pmu unregistered.\n");
+	}
+
+> +EXPORT_SYMBOL_GPL(kvmppc_unregister_pmu);
+> -- 
+> 2.47.1
+> 
 
