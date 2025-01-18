@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-35899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35900-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EBDBA15A59
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53403A15A58
 	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 01:36:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5B22168550
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 00:36:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FB393A970F
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 00:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4BC139CF2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2E6137923;
 	Sat, 18 Jan 2025 00:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LHOvN3C4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I9T1dKEG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83A82746C
-	for <kvm@vger.kernel.org>; Sat, 18 Jan 2025 00:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F93B5789D
+	for <kvm@vger.kernel.org>; Sat, 18 Jan 2025 00:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737160504; cv=none; b=Tqwoj8KUoTgdqVnQNPqzf9W7zqqErxg6V4uW0nFjntSILAkwxMWk1IbHhnoChNo9UU1oBSjCJ+y4/ubMVrscEQiQcqLUPnrGCUI03lccfXk75XDTJg6mnwN7+MhGfV4/6QnHTF/vQAzu4UqWt6soOX3IPZuDHHtcLfYY1clm9Oo=
+	t=1737160504; cv=none; b=Eitqk/sftnNyoctTSfsz+uVVCce9mWJbDFue68XyfgoxXCqS/Lu9Qm7bWfMuqjJK1L9tIykNnQco+Zgld8tGDWSNrvE5zWM8WlxZ4DKBCsfz+9nwF4/QhNyTveiOlAar+m3pg9DBZbMASL2eNknSTj/IIv3EhTkLr0BJDC2+lQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1737160504; c=relaxed/simple;
-	bh=SHTq2kDtgw9gkfy++/oIpJp+B4zXh2grXfh3cPHx9b8=;
+	bh=M+FM8JkgaYrZl57UPJEKqk4HTQ5og7YrE3nrBQALWz8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VdT8CqKBsAU9unX0IecPyoe/lE4e7tZYbf1K5kKo3iJ4yAs8LpMWNpLM6uNfnVRXBAFu3ERcfhBiVqRZFKmTqmsJN+AV9W2Kue24jZ/EXmjozLzkL+yFjR7v7Xu2AZo09Dd/yFAjWzizu+y+VqInNi5h45qgCyA3MFE7XEHqffo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LHOvN3C4; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=I8IytaQkrVpRtbQF1kCJKq2K9IbbJbKe6sbBftGSs+iBCpBsWCHVi8PlayWi7uN7OBD1/4OaaylMiqa3DU0pqIaP3/JIQZ1UCGv3Sd2ZW5eplsyTbUB1+bgYsHVj6ot6gklmwR1+zPKc2QuStosnS4BdZwK0lX3bKh2vTZn3ZMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I9T1dKEG; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2164861e1feso48516645ad.1
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:35:01 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so7648661a91.3
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:35:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737160501; x=1737765301; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737160502; x=1737765302; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=HRXEZ2l2lIq+cPb1+bgcVVd/Y4QYpoxYvkHlcCCt+hc=;
-        b=LHOvN3C4PjjZboGOavajjL05VF2RbaiDtiG70r5PJKFfeaSXEXiIFG+Werh0tSBAIC
-         RQ4Ahpc4wMImD1lQaC7WrEHJlALYAVJ5xFh/nuNRrDeIQAH9YGqjQHR95PKKB0HZyBdF
-         Neb64b3jrEtpOcedkmjas9g+ezgXCHaYyhNlOFVn83Jnxqj/obxTN75/xYRkoXZ19JQG
-         p/3/dMhVvFs7d0UhWo/87vgAEV95elmgcWULlbxVq7PPyTwjqWD8BsvvEu2pTUCLcPGQ
-         ScvImRliofxNo5Hc1xwEyikUy/382qQQSXx0LMq9p9+mfW/g1DcxeWbjmhYaS+lOzCHf
-         VZMQ==
+        bh=cl05ZUliPLXN59ib2RJa1JltTQzfK7DQwuddn7WHN1A=;
+        b=I9T1dKEGMa++wPsxcRnwtvsYyBoG/yXsyeVtwKpDs29aNfFixTKXqZrtfGh3uvDD3q
+         +H2/wgDt0NHizMIfL0QSP/hfd040aRpupB04U8GBUthKOqfe7giPWx5IJRlCUTCp8iXB
+         UEswX6vDmgqFYTUE+uNqF5YqSZq0BI206jIUbLaClSAbXo03Yov7Cw9aeRTGr1SgUhkd
+         Ms4x6Yvwbpd232kKykO15iuggFuXqYPv1DT81W5xiq1mDrHUm9bGI6CtZu2yxdmbhNOR
+         oZhp4YtqPAzmRzW6fsky/G33J1XkN0IGXnLDlKLKlsB/Lz7djSUDiOgsHl+2rp8snzU/
+         OyCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737160501; x=1737765301;
+        d=1e100.net; s=20230601; t=1737160502; x=1737765302;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HRXEZ2l2lIq+cPb1+bgcVVd/Y4QYpoxYvkHlcCCt+hc=;
-        b=Z5LHgs8MVcohdefUMhPd3S4ISbB05K8ZA7bXc7sqeYcV6ohe7MbUnZqyS4IMM8r1YT
-         jJ8cRgsEYKUWK9NYdymyo7e5cFn5rHdBD8ho58AjrT8Ed/75DRmSdmlOkeaDl2wsfbhV
-         0gFME3jWXjcHpHgV4KTkYiUtu+mC0rqEgdt7kc+O2tEjkKfv74ffjxTmq8uBQhuHnZxW
-         rx6gUoSJlp9VJnqttYk2pEl8sq0mv878xYMmdT166E+XptUmQcJKeW/5Q3JrzXfkhK91
-         29Bat2ozgXf+COxTfttuCD4dSYranJf7aRJyqJj4tsUJLKYVXy/Cvnh2x3tdq0EQPkWG
-         7jTw==
-X-Gm-Message-State: AOJu0Yxgb+goIiOZOy88MDokshdcYSGOdITpHLbfQTCPT16j5iNXVDct
-	HFq2+hETj13T+QEIR+cD+9S2/Y7cYtF5rVnQwtEIMEY+gdRj278OwRsvDfOwunl+vUuVshJHipc
-	piw==
-X-Google-Smtp-Source: AGHT+IEdL1a3dtHM8hqnKo2mq4PnvT6aTyCFLyiYxbWZnYz41X4lQpTCsFqPdOa0DVupvRidoIK5scNjGvc=
-X-Received: from pgbcl22.prod.google.com ([2002:a05:6a02:996:b0:7fc:fac3:7df6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7fa5:b0:1e1:c8f5:19ee
- with SMTP id adf61e73a8af0-1eb214dfdddmr7213773637.25.1737160501146; Fri, 17
- Jan 2025 16:35:01 -0800 (PST)
+        bh=cl05ZUliPLXN59ib2RJa1JltTQzfK7DQwuddn7WHN1A=;
+        b=kZus3rPhK28JiM6kn4zEzLOfYiupjEeOjUVqETNSJHRScGZgDgMVkVZeZgmrlbm1dN
+         96rjQjsB7NtGiaYViU8zuK7OLtKyOJwCKg05fGOZvhoUDgZvZZnZK5VkqejPFkQ6hB7a
+         sFkWusKRPEYF4Ea/T8+hT86W81IQtxO8mOmOZ+kaqaf0jWnjzJffGsU0TyVE25VM9kob
+         FSKCl/pCGyq30+SxvRWDA4sRpBZ337EBBaV8FWeLEYU0J4lsG5dwBRGuOa2IC5TSPCTs
+         Wp2R6+joscbskWFdiXRltrY7R9XmbSZgCLhCUSj+hYI/XdgVBWqh2M2NEJG/BM8G9ibL
+         EEWw==
+X-Gm-Message-State: AOJu0YziBcMF5J2YXBECuD9vefcK3adknueYkmSuacnj3EHWoFo+L1pP
+	vxYgW247DNh4VZK+1mn1HxfXcTdf8tyEGBqN4SwnhiD6xRGY6JPlbqDYmLBT+j/TSpGv1Ql7MX7
+	10Q==
+X-Google-Smtp-Source: AGHT+IHQoMle06kwl/jYSacrkQ0Aw9hacjyWr7GuGkDpttr40/QHVTT717DSO+tCgrdOhmz1HhwpSzAHs+o=
+X-Received: from pfbkp16.prod.google.com ([2002:a05:6a00:4650:b0:728:ec44:ed90])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:b96:b0:72a:bc6a:3a85
+ with SMTP id d2e1a72fcca58-72dafbb6205mr6756642b3a.22.1737160502655; Fri, 17
+ Jan 2025 16:35:02 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 17 Jan 2025 16:34:53 -0800
+Date: Fri, 17 Jan 2025 16:34:54 -0800
 In-Reply-To: <20250118003454.2619573-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250118003454.2619573-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250118003454.2619573-4-seanjc@google.com>
-Subject: [PATCH v2 3/4] KVM: selftests: Manage CPUID array in Hyper-V CPUID
- test's core helper
+Message-ID: <20250118003454.2619573-5-seanjc@google.com>
+Subject: [PATCH v2 4/4] KVM: selftests: Add CPUID tests for Hyper-V features
+ that need in-kernel APIC
 From: Sean Christopherson <seanjc@google.com>
 To: Vitaly Kuznetsov <vkuznets@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -85,106 +85,65 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Dongjie Zou <zoudongjie@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Allocate, get, and free the CPUID array in the Hyper-V CPUID test in the
-test's core helper, instead of copy+pasting code at each call site.  In
-addition to deduplicating a small amount of code, restricting visibility
-of the array to a single invocation of the core test prevents "leaking" an
-array across test cases.  Passing in @vcpu to the helper will also allow
-pivoting on VM-scoped information without needing to pass more booleans,
-e.g. to conditionally assert on features that require an in-kernel APIC.
-
-To avoid use-after-free bugs due to overzealous and careless developers,
-opportunstically add a comment to explain that the system-scoped helper
-caches the Hyper-V CPUID entries, i.e. that the caller is not responsible
-for freeing the memory.
+Add testcases to x86's Hyper-V CPUID test to verify that KVM advertises
+support for features that require an in-kernel local APIC appropriately,
+i.e. that KVM hides support from the vCPU-scoped ioctl if the VM doesn't
+have an in-kernel local APIC.
 
 Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/x86_64/hyperv_cpuid.c       | 30 +++++++++++--------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-index 9a0fcc713350..3188749ec6e1 100644
+index 3188749ec6e1..8f26130dc30d 100644
 --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
 +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-@@ -41,13 +41,18 @@ static bool smt_possible(void)
- 	return res;
- }
+@@ -43,6 +43,7 @@ static bool smt_possible(void)
  
--static void test_hv_cpuid(const struct kvm_cpuid2 *hv_cpuid_entries,
--			  bool evmcs_expected)
-+static void test_hv_cpuid(struct kvm_vcpu *vcpu, bool evmcs_expected)
+ static void test_hv_cpuid(struct kvm_vcpu *vcpu, bool evmcs_expected)
  {
-+	const struct kvm_cpuid2 *hv_cpuid_entries;
++	const bool has_irqchip = !vcpu || vcpu->vm->has_irqchip;
+ 	const struct kvm_cpuid2 *hv_cpuid_entries;
  	int i;
  	int nent_expected = 10;
- 	u32 test_val;
+@@ -85,12 +86,19 @@ static void test_hv_cpuid(struct kvm_vcpu *vcpu, bool evmcs_expected)
+ 				    entry->eax, evmcs_expected
+ 				);
+ 			break;
++		case 0x40000003:
++			TEST_ASSERT(has_irqchip || !(entry->edx & BIT(19)),
++				    "Synthetic Timers should require in-kernel APIC");
++			break;
+ 		case 0x40000004:
+ 			test_val = entry->eax & (1UL << 18);
  
-+	if (vcpu)
-+		hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
-+	else
-+		hv_cpuid_entries = kvm_get_supported_hv_cpuid();
+ 			TEST_ASSERT(!!test_val == !smt_possible(),
+ 				    "NoNonArchitecturalCoreSharing bit"
+ 				    " doesn't reflect SMT setting");
 +
- 	TEST_ASSERT(hv_cpuid_entries->nent == nent_expected,
- 		    "KVM_GET_SUPPORTED_HV_CPUID should return %d entries"
- 		    " (returned %d)",
-@@ -109,6 +114,13 @@ static void test_hv_cpuid(const struct kvm_cpuid2 *hv_cpuid_entries,
- 		 *	entry->edx);
- 		 */
- 	}
-+
-+	/*
-+	 * Note, the CPUID array returned by the system-scoped helper is a one-
-+	 * time allocation, i.e. must not be freed.
-+	 */
-+	if (vcpu)
-+		free((void *)hv_cpuid_entries);
- }
- 
- static void test_hv_cpuid_e2big(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-@@ -129,7 +141,6 @@ static void test_hv_cpuid_e2big(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- int main(int argc, char *argv[])
- {
- 	struct kvm_vm *vm;
--	const struct kvm_cpuid2 *hv_cpuid_entries;
- 	struct kvm_vcpu *vcpu;
++			TEST_ASSERT(has_irqchip || !(entry->eax & BIT(10)),
++				    "Cluster IPI (i.e. SEND_IPI) should require in-kernel APIC");
+ 			break;
+ 		case 0x4000000A:
+ 			TEST_ASSERT(entry->eax & (1UL << 19),
+@@ -145,9 +153,14 @@ int main(int argc, char *argv[])
  
  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_CPUID));
-@@ -138,10 +149,7 @@ int main(int argc, char *argv[])
+ 
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++	/* Test the vCPU ioctl without an in-kernel local APIC. */
++	vm = vm_create_barebones();
++	vcpu = __vm_vcpu_add(vm, 0);
++	test_hv_cpuid(vcpu, false);
++	kvm_vm_free(vm);
  
  	/* Test vCPU ioctl version */
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
  	test_hv_cpuid_e2big(vm, vcpu);
--
--	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
--	test_hv_cpuid(hv_cpuid_entries, false);
--	free((void *)hv_cpuid_entries);
-+	test_hv_cpuid(vcpu, false);
+ 	test_hv_cpuid(vcpu, false);
  
- 	if (!kvm_cpu_has(X86_FEATURE_VMX) ||
- 	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
-@@ -149,9 +157,7 @@ int main(int argc, char *argv[])
- 		goto do_sys;
- 	}
- 	vcpu_enable_evmcs(vcpu);
--	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
--	test_hv_cpuid(hv_cpuid_entries, true);
--	free((void *)hv_cpuid_entries);
-+	test_hv_cpuid(vcpu, true);
- 
- do_sys:
- 	/* Test system ioctl version */
-@@ -161,9 +167,7 @@ int main(int argc, char *argv[])
- 	}
- 
- 	test_hv_cpuid_e2big(vm, NULL);
--
--	hv_cpuid_entries = kvm_get_supported_hv_cpuid();
--	test_hv_cpuid(hv_cpuid_entries, kvm_cpu_has(X86_FEATURE_VMX));
-+	test_hv_cpuid(NULL, kvm_cpu_has(X86_FEATURE_VMX));
- 
- out:
- 	kvm_vm_free(vm);
 -- 
 2.48.0.rc2.279.g1de40edade-goog
 
