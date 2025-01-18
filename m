@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-35909-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35910-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99995A15AB2
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 01:57:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F25E0A15AB4
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 01:58:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1635A188BD3F
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 00:57:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25BE73A2C24
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 00:57:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2DA186E56;
-	Sat, 18 Jan 2025 00:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD41618A6D2;
+	Sat, 18 Jan 2025 00:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n97VhTZ5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UBVy+9Ps"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB1C1632E4
-	for <kvm@vger.kernel.org>; Sat, 18 Jan 2025 00:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D901850B5
+	for <kvm@vger.kernel.org>; Sat, 18 Jan 2025 00:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737161769; cv=none; b=XNrbcpCZ3DXyUk8Ifj7JCqUN/liFzlFucfgwMzBfgJPvQvZML3nUIBXyYXkOC5eRh32HmXBMezN04WmEw2vGnsONZWFl9lRwsP1CsDxqTfJ8coPSuAohusY+CymvUT+El9F+T9wdG8my0v6doIcnjQu1W+KAWU3D8o6FoZb/g0M=
+	t=1737161772; cv=none; b=i9bRjmSRDXyzlPbl9Gwg9dT9a4iOAWVOnW8gPrHLGtOxY8XGXXLCBeyQX84E/p4T1DNwUB2aTxzbCPc0Myhrmn+085PY9QrZBaNdkEJILRI4rus+cn2rn+KZV3tW5mYe+9qIN1zVj8rxOF0QbHHsRhyyRZNT+vSBjyWLIXitPoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737161769; c=relaxed/simple;
-	bh=d5eTYZ8nA+eny2dlNR6wc75KXRvXh76kClSBvOeXHgs=;
+	s=arc-20240116; t=1737161772; c=relaxed/simple;
+	bh=MlMCaN4C4GVV0w3D6Tva9o5mp4aTS3X/nOMX8xQEZzw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=r1CpXMrZHY4HLu+E+vRx0DgoH3WNV6GKBQvDCX+jFTUd2Ye3vx0Ia3BTrBbvD04UXmsf1OgJe70Ybz2IDMzj/xrY+3Ur57FM7fPySzkT6l1qW/npuEpiD8hB1YNIFEd/XKBlSKIVT5vzCfVqFTN/tbdeObgkag6j3PVWJBKY/lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n97VhTZ5; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=dWo1KuV6qDFeZbWrdRDJGyk76zSkQ7anb2sfN4a0oPZ+ac6NmMunsTH0NGGUzrHgjSpZ2hGQCDqCHfHvSq3lfPqpfnmHmMB8POGdtz/w+wpmKkv4aXlZ8O8+Y/msGeSsR71aEdwa8XGi3Dbz0EdNHpm0C00FkGmgd15NnURmoMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UBVy+9Ps; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so7680890a91.3
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:56:07 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21a7cbe3b56so38013885ad.0
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:56:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737161767; x=1737766567; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737161769; x=1737766569; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ob51wzRnvvlVEAc5sJP3Qw2cprvn1V49Q6RmU7YLzHo=;
-        b=n97VhTZ5AWGyo8Y5vEnH4a1p6lQPgq/pQ68SUvTc36dunzUw++HJJu0OAFgflN3trB
-         g6Li8BFXI7ILcpVT3N9p7wfOPpKza6BIncAEzCpMXZLZiSOTtnW7xl1WkcXip/20h0av
-         KGbdMGSYepIU9RsLv33lufAcfYOd3QeK4ABOTJk2/+fHT3HNC+5sTMc7ygu1GtVM0zzT
-         Lk3GstfdINAQ+Rd5g9ejCeauflsw3qCPkGVd3rLcpzaBrkeMMFpjqHeO5+5HF8G58EmK
-         s/d9q+sp2Rw2x4er/zgcgFUjUJGjPWcECpW4PS9WEGARfLXLycu3R/4CwuX1dQpf9FQZ
-         16Iw==
+        bh=Xe76inQQED+VDi+GOM1bZpRo/JAeJ3yY7og1Pn73/dU=;
+        b=UBVy+9Ps2M5R+xEiXeKdfcOMLAarv0KF69bYAKJxCx36PzgudtsDma+uXfrXtRCDDk
+         YQBvouZcn7mqbTxdznfVmHK/gtGTdfhhlvxhhLiAcEtEsI9e1U9m6H7HHGpLdr1HEyKv
+         pCeCcZqIaJObAchCvxlF5qrePz8M2LnAZULXJFsZPcnU/W7yiU4GIPUMlM0y8yu3Hzfl
+         yXcu4JHwFKruTer4f3lkrHKBH8bmvRiIlqZji6ZtHfw19VLxiIQIX0ePqj9zlsfRqq/P
+         e922EgMI0/7C/lqB4l2aO8ABD4iYu0J381zXcnvIakMpvShM9K951DIZfB6qsO3hvU+v
+         bq0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737161767; x=1737766567;
+        d=1e100.net; s=20230601; t=1737161769; x=1737766569;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ob51wzRnvvlVEAc5sJP3Qw2cprvn1V49Q6RmU7YLzHo=;
-        b=rnrCjjiyM4MiGDr+QM76h9asCRKJ1iqClub1eDl3NodrhHD/zQgHEPzuKOaHNop+LU
-         5rjbKfhFPd/qB+SeVDfplasdOptWB8V2ySXSXrPqPq3isOWQc8LRLm6/IFDeA9mlk+28
-         NyY019Q4ZsXVVzqOpk5+I4XCvUeP8cybzUwZtPawkt7hhVF1PtRkT4jTcB1d7mhn+0FO
-         TSiWwVR4bMokqy6/qKllVIZALDaB7GBTFDWQZVWg32t78QAtQc+eO5nnUtZLDSG3qubt
-         hMYeyz2nq4bMM4SGCfh49+Wf3UL0rSYbd1UH9tSzuZDgB+5VgDjucmZt2zfUvG/T716R
-         LcNw==
-X-Gm-Message-State: AOJu0Yy5h+lvAdxQkqUmx4yX7zU4B2Ea1bNFb5oQ4OlG2z20d6+4S5iR
-	qkbB4uDejEah3FeA9svFgHqjk9S/fvH+RyJLKZPvA5k049C0P3wI/vwCLjox2U9wyvZAdkapUG5
-	IiQ==
-X-Google-Smtp-Source: AGHT+IFJ/KP3omneRh37cgcPi/MY3vB6qbRxqQ5KBdluhT/QtFH6d0BYfKGKr1KEUpIGhlgHK/uF2kMkV1E=
-X-Received: from pfhx22.prod.google.com ([2002:a05:6a00:1896:b0:725:e05b:5150])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:180c:b0:725:e309:7110
- with SMTP id d2e1a72fcca58-72daf9a53acmr6846276b3a.5.1737161767271; Fri, 17
- Jan 2025 16:56:07 -0800 (PST)
+        bh=Xe76inQQED+VDi+GOM1bZpRo/JAeJ3yY7og1Pn73/dU=;
+        b=uvw2wDcFD7Ns/fmv6WXoX+oyMUyUI9r6aGfgCI6iGrs66xM/CGO5vngM4k5MY1X5MS
+         Y57nF1bYQ7c+4vmFqkCEQdFH+oDZ+hI3d+rUriYxBntKhlfuOSe0+xFiCew3GT0YlhOg
+         fpJvC9NRYUyZJ9jhBQRR0t4+9NIph7byfMLfbBlS6mZ5n014piGkwcL3Mrp7+Oyn77ha
+         qreIkA1SerDgaq1hiPKtGPP4NBEDZ/a/xn0P0IpnONktGzb+Azfnfu9iCy3ljMGWk0JJ
+         nGmhmX9ZScC2VozCJNnv+mHnEZct3NkEgpa5JWqQVGnbp3H1ehHAP+x7KK0SgoY2yy0Q
+         MXiw==
+X-Gm-Message-State: AOJu0YyNgPUdFwSjvx+3R9u8dVjHvdaLGulGpaEBpdpHda5ACPVlMCA6
+	nDtY4gI+8sGrP/KzsBuA+nWSt/rHOzgSHNJWYu28C+/12fPJohCHMBjAbf5/KIl0J/5hDFrGx3D
+	Ykg==
+X-Google-Smtp-Source: AGHT+IEwP7oMktyaCLjiLHcanbI8N9janBfFwvH46GF7ZKFwrHrokmvqDB/j3xfVz2pJ9k+Y3S5lFTl0l78=
+X-Received: from pjbsf7.prod.google.com ([2002:a17:90b:51c7:b0:2ef:71b9:f22f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:da88:b0:216:69ca:773b
+ with SMTP id d9443c01a7336-21c352c7b99mr77384315ad.5.1737161768921; Fri, 17
+ Jan 2025 16:56:08 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 17 Jan 2025 16:55:49 -0800
+Date: Fri, 17 Jan 2025 16:55:50 -0800
 In-Reply-To: <20250118005552.2626804-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250118005552.2626804-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250118005552.2626804-8-seanjc@google.com>
-Subject: [PATCH 07/10] KVM: x86: Pass reference pvclock as a param to kvm_setup_guest_pvclock()
+Message-ID: <20250118005552.2626804-9-seanjc@google.com>
+Subject: [PATCH 08/10] KVM: x86: Remove per-vCPU "cache" of its reference pvclock
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>
@@ -86,73 +86,136 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Vitaly Kuznetsov <vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Pass the reference pvclock structure that's used to setup each individual
-pvclock as a parameter to kvm_setup_guest_pvclock() as a preparatory step
-toward removing kvm_vcpu_arch.hv_clock.
+Remove the per-vCPU "cache" of the reference pvclock and instead cache
+only the TSC shift+multiplier.  All other fields in pvclock are fully
+recomputed by kvm_guest_time_update(), i.e. aren't actually persisted.
 
-No functional change intended.
+In addition to shaving a few bytes, explicitly tracking the TSC shift/mul
+fields makes it easier to see that those fields are tied to hw_tsc_khz
+(they exist to avoid having to do expensive math in the common case).
+And conversely, not tracking the other fields makes it easier to see that
+things like the version number are pulled from the guest's copy, not from
+KVM's reference.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  3 ++-
+ arch/x86/kvm/x86.c              | 27 +++++++++++++++------------
+ arch/x86/kvm/xen.c              |  8 ++++----
+ 3 files changed, 21 insertions(+), 17 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 5193c3dfbce1..f26105654ec4 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -900,7 +900,8 @@ struct kvm_vcpu_arch {
+ 	int (*complete_userspace_io)(struct kvm_vcpu *vcpu);
+ 
+ 	gpa_t time;
+-	struct pvclock_vcpu_time_info hv_clock;
++	u8  pvclock_tsc_shift;
++	u32 pvclock_tsc_mul;
+ 	unsigned int hw_tsc_khz;
+ 	struct gfn_to_pfn_cache pv_time;
+ 	/* set guest stopped flag in pvclock flags field */
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5f3ad13a8ac7..06d27b3cc207 100644
+index 06d27b3cc207..9eabd70891dd 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -3116,17 +3116,17 @@ u64 get_kvmclock_ns(struct kvm *kvm)
- 	return data.clock;
- }
- 
--static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
-+static void kvm_setup_guest_pvclock(struct pvclock_vcpu_time_info *ref_hv_clock,
-+				    struct kvm_vcpu *vcpu,
- 				    struct gfn_to_pfn_cache *gpc,
- 				    unsigned int offset,
- 				    bool force_tsc_unstable)
- {
--	struct kvm_vcpu_arch *vcpu = &v->arch;
- 	struct pvclock_vcpu_time_info *guest_hv_clock;
- 	struct pvclock_vcpu_time_info hv_clock;
- 	unsigned long flags;
- 
--	memcpy(&hv_clock, &vcpu->hv_clock, sizeof(hv_clock));
-+	memcpy(&hv_clock, ref_hv_clock, sizeof(hv_clock));
- 
- 	read_lock_irqsave(&gpc->lock, flags);
- 	while (!kvm_gpc_check(gpc, offset + sizeof(*guest_hv_clock))) {
-@@ -3165,7 +3165,7 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
- 	kvm_gpc_mark_dirty_in_slot(gpc);
- 	read_unlock_irqrestore(&gpc->lock, flags);
- 
--	trace_kvm_pvclock_update(v->vcpu_id, &hv_clock);
-+	trace_kvm_pvclock_update(vcpu->vcpu_id, &hv_clock);
- }
+@@ -3170,6 +3170,7 @@ static void kvm_setup_guest_pvclock(struct pvclock_vcpu_time_info *ref_hv_clock,
  
  static int kvm_guest_time_update(struct kvm_vcpu *v)
-@@ -3272,18 +3272,18 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 			vcpu->hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
+ {
++	struct pvclock_vcpu_time_info hv_clock = {};
+ 	unsigned long flags, tgt_tsc_khz;
+ 	unsigned seq;
+ 	struct kvm_vcpu_arch *vcpu = &v->arch;
+@@ -3247,20 +3248,22 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 
+ 	if (unlikely(vcpu->hw_tsc_khz != tgt_tsc_khz)) {
+ 		kvm_get_time_scale(NSEC_PER_SEC, tgt_tsc_khz * 1000LL,
+-				   &vcpu->hv_clock.tsc_shift,
+-				   &vcpu->hv_clock.tsc_to_system_mul);
++				   &vcpu->pvclock_tsc_shift,
++				   &vcpu->pvclock_tsc_mul);
+ 		vcpu->hw_tsc_khz = tgt_tsc_khz;
+ 		kvm_xen_update_tsc_info(v);
+ 	}
+ 
+-	vcpu->hv_clock.tsc_timestamp = tsc_timestamp;
+-	vcpu->hv_clock.system_time = kernel_ns + v->kvm->arch.kvmclock_offset;
++	hv_clock.tsc_shift = vcpu->pvclock_tsc_shift;
++	hv_clock.tsc_to_system_mul = vcpu->pvclock_tsc_mul;
++	hv_clock.tsc_timestamp = tsc_timestamp;
++	hv_clock.system_time = kernel_ns + v->kvm->arch.kvmclock_offset;
+ 	vcpu->last_guest_tsc = tsc_timestamp;
+ 
+ 	/* If the host uses TSC clocksource, then it is stable */
+-	vcpu->hv_clock.flags = 0;
++	hv_clock.flags = 0;
+ 	if (use_master_clock)
+-		vcpu->hv_clock.flags |= PVCLOCK_TSC_STABLE_BIT;
++		hv_clock.flags |= PVCLOCK_TSC_STABLE_BIT;
+ 
+ 	if (vcpu->pv_time.active) {
+ 		/*
+@@ -3269,24 +3272,24 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 		 * is active/enabled.
+ 		 */
+ 		if (vcpu->pvclock_set_guest_stopped_request) {
+-			vcpu->hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
++			hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
  			vcpu->pvclock_set_guest_stopped_request = false;
  		}
--		kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0, false);
-+		kvm_setup_guest_pvclock(&vcpu->hv_clock, v, &vcpu->pv_time, 0, false);
+-		kvm_setup_guest_pvclock(&vcpu->hv_clock, v, &vcpu->pv_time, 0, false);
++		kvm_setup_guest_pvclock(&hv_clock, v, &vcpu->pv_time, 0, false);
  
- 		vcpu->hv_clock.flags &= ~PVCLOCK_GUEST_STOPPED;
+-		vcpu->hv_clock.flags &= ~PVCLOCK_GUEST_STOPPED;
++		hv_clock.flags &= ~PVCLOCK_GUEST_STOPPED;
  	}
  
  #ifdef CONFIG_KVM_XEN
  	if (vcpu->xen.vcpu_info_cache.active)
--		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_info_cache,
-+		kvm_setup_guest_pvclock(&vcpu->hv_clock, v, &vcpu->xen.vcpu_info_cache,
+-		kvm_setup_guest_pvclock(&vcpu->hv_clock, v, &vcpu->xen.vcpu_info_cache,
++		kvm_setup_guest_pvclock(&hv_clock, v, &vcpu->xen.vcpu_info_cache,
  					offsetof(struct compat_vcpu_info, time),
  					xen_pvclock_tsc_unstable);
  	if (vcpu->xen.vcpu_time_info_cache.active)
--		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_time_info_cache, 0,
-+		kvm_setup_guest_pvclock(&vcpu->hv_clock, v, &vcpu->xen.vcpu_time_info_cache, 0,
+-		kvm_setup_guest_pvclock(&vcpu->hv_clock, v, &vcpu->xen.vcpu_time_info_cache, 0,
++		kvm_setup_guest_pvclock(&hv_clock, v, &vcpu->xen.vcpu_time_info_cache, 0,
  					xen_pvclock_tsc_unstable);
  #endif
- 	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
+-	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
++	kvm_hv_setup_tsc_page(v->kvm, &hv_clock);
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index b82c28223585..7c6e4172527a 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -177,8 +177,8 @@ static int xen_get_guest_pvclock(struct kvm_vcpu *vcpu,
+ 	 * Sanity check TSC shift+multiplier to verify the guest's view of time
+ 	 * is more or less consistent.
+ 	 */
+-	if (hv_clock->tsc_shift != vcpu->arch.hv_clock.tsc_shift ||
+-	    hv_clock->tsc_to_system_mul != vcpu->arch.hv_clock.tsc_to_system_mul)
++	if (hv_clock->tsc_shift != vcpu->arch.pvclock_tsc_shift ||
++	    hv_clock->tsc_to_system_mul != vcpu->arch.pvclock_tsc_mul)
+ 		return -EINVAL;
+ 	return 0;
+ }
+@@ -2309,8 +2309,8 @@ void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
+ 
+ 	entry = kvm_find_cpuid_entry_index(vcpu, function, 1);
+ 	if (entry) {
+-		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
+-		entry->edx = vcpu->arch.hv_clock.tsc_shift;
++		entry->ecx = vcpu->arch.pvclock_tsc_mul;
++		entry->edx = vcpu->arch.pvclock_tsc_shift;
+ 	}
+ 
+ 	entry = kvm_find_cpuid_entry_index(vcpu, function, 2);
 -- 
 2.48.0.rc2.279.g1de40edade-goog
 
