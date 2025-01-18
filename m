@@ -1,319 +1,231 @@
-Return-Path: <kvm+bounces-35919-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 962DDA15DA3
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 16:27:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5D3CA15EC9
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 21:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0EEE1886E84
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 15:27:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2086F3A2B62
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 20:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D2EEEA9;
-	Sat, 18 Jan 2025 15:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250041D5AAC;
+	Sat, 18 Jan 2025 20:33:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="EykxuI82"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YRiZDYx6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2043.outbound.protection.outlook.com [40.107.243.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4906190497;
-	Sat, 18 Jan 2025 15:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737214041; cv=none; b=EO4VQkHrmJ3ekAjeTt0c8E+6UBzNHFpWl15bMQnHRJzHWk/R1NRAm7C/jS6uinixLZdhpHadsPA4gMmpQARpk3TLmoWbWMMTqz5U6ZdXa5vNB3GdeyWmaKQJvAJj7ajU5Tv1390+4YrHjRyaoqtt+0xRJ3yzqgtb9NsUhnyfz2s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737214041; c=relaxed/simple;
-	bh=K3P23oaaNDMXZwEiv1s1kN7nXc8IVMIXVnMSdv2uMNs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ebg+HiFFWfCP/9MK1523PFZwiYlQdbNQ702eCyacDD1P0P/gfi/Dum9eQ+0NS22W4VJinQvS1sSbrhVtwdiLr2YHnGsOnhR3U+wxsBws3RtyfWW3kYt35TldLte0YJYl2tsFDsdgK/S2/TowsW838jODNAD6kvmN85bVU18rijg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=EykxuI82; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 95CB640E0379;
-	Sat, 18 Jan 2025 15:27:15 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id cr8wBz0X17PC; Sat, 18 Jan 2025 15:27:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1737214031; bh=LXLlK4RZAar8K//R4fTEtS4sKK1p59a+4ZHr4baKnMY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EykxuI82IPgldWCdxdzuSNnybn2ma13KSDhuN6wOotvRaaWPQOJAVdoVF3qMOh2d5
-	 US8p6TyMCFd3vQizx/3F25Fc2y0TJg8Bi+oLqcxQv/FwUtASYrkXcNtc/1wG4As5/X
-	 ShWfVWLs0VNjV3+qYcn2EXvMbFgJHD9UnkqoFuNs8F0KdirDx3CVJX/MHJbrcpSEXl
-	 n3FYE6g84qeo8PWp/n3H0WpHdpaE2JH7lLCiyWi2jTY+Tkb3+0ojJrAuHLPgMvQ0/f
-	 jdgKBDeDWjJ4pExS/D+izWX3Fd5ZobwPtIwxOUMGlI0euuNBUkEWMv5oJKlwRJ5exX
-	 ZyEPNr6RKLY1C77wLWBd/SHPYOb5ahByPBYhq+PqSUEKN4uGQIJdRV19W2vDw16ceH
-	 4dgoiacVqjVJxcGJKeR30hKH7vV4LxQNqfOF+P14NSjjydcp4x/Qmf8/1AI1HGMPwO
-	 EpMrEHYJsXfz0ERwTcyTJVtTF7Fbc5LhsdIV1ky0ZlhaWzh3UPL8W3zRQsGlwI9tQK
-	 T2VWanI8A2OhYL81BiR6powpIUPxCUvx+bp/grYiXPqRaEErGNP15/zMY8QBXeiOuD
-	 X/NK+yk0NxvwupJwkJW8m+6Hnrx+7gQv0XtPWzLa3bBnK3Qj4txPWo5TmXO7r8xWTN
-	 mS00YpIhxgecmJkLGOJ4cOqk=
-Received: from zn.tnic (p200300ea971F9362329c23fFFEa6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:9362:329c:23ff:fea6:a903])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3225940E0289;
-	Sat, 18 Jan 2025 15:27:03 +0000 (UTC)
-Date: Sat, 18 Jan 2025 16:26:55 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <20250118152655.GBZ4vIP44MivU2Bv0i@fat_crate.local>
-References: <Z1oR3qxjr8hHbTpN@google.com>
- <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
- <Z2B2oZ0VEtguyeDX@google.com>
- <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
- <Z35_34GTLUHJTfVQ@google.com>
- <20250108154901.GFZ36ebXAZMFZJ7D8t@fat_crate.local>
- <Z36zWVBOiBF4g-mW@google.com>
- <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
- <20250111125215.GAZ4Jpf6tbcoS7jCzz@fat_crate.local>
- <Z4qnzwNYGubresFS@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90FD33398B;
+	Sat, 18 Jan 2025 20:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737232388; cv=fail; b=UCVyKAkhtpTNOapnXv8lKsU2qtHqgf51+q89l+jo+vZhvb9sYm2j0C2ARdtBvRBaeQfhd8IX0APEfX/4L5HN2ORYKcb0cZeZZPigmldMc8C5DYoKuvl+vsmAyCixejOPxmJnkMkWoagM5VE03yh1UehDd8wfvvOduQu29lmddhM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737232388; c=relaxed/simple;
+	bh=X3wVN9hRQtJbHVyOzvLxt+/OU4uZvD1RRsSIxls35YI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B+vb6SC+0h6O796JxoGxxYELlCgIJIkc4jiuz3MyJuF7KVFTrhI9GeXG/6dDIgq+TDdP6+s5ugwsbNioxED8Gp8htgbVVDmYkQAaktB2piT3kLCykGFD2Pyb292PSy41vgtL3lkkCd6P/VnpBft6g4E5QzzqdUXl1tPZj0OgeSo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YRiZDYx6; arc=fail smtp.client-ip=40.107.243.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GMntumkQ05fHi9jbSJJjesSX0yZz+ceA7TSzOOTSKAXCUHWf4UJ/NTWpCRcOAnFOK7aRZoY+D1hBUozuL0MijHSrCY8PtI3LKEe9zpXeIm+qPvPiXFzSDv7PqpgaQvS6S2LKtpu+pasOj5VEHJorD2OlwV7RAnNIp/Xbh5kudLk+mdY0zkWtpvTr37WJSrizjIV7A9W0Ep2lR1w/Fxul2Ij2F+N8aqmj3Uu+0WCBlO8OGEvfqYrtb+JQxaLfg3SQs9D5Bs1TwDVMc87dW/faq3vNOg/KSbNCsZoojOMMibpE82iN2lhEvByji+Tjx1yijWkIuDQ8nDSwFtfV0QpZyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b+l3h3Wa5GLWn0bXsSzQ+qRLAF4OgAT2gnX4c1w1ykQ=;
+ b=lUaptFpo2HTDxCTMUIvwCAWyYqiFhdaooRYjod5MFe29ZVVKOwJoc+b3oxE3c3gZWXx8eUTG/RGvBVZA88qEvIWqORT1e3Mogp2oHwupL1JqC6nyJilmV/YT0qSp2SmFRqcS26ynAfJpLFkXkzK3QXWp+yOSWLhpA4JpyEO8kWyaAao2ip/1zhIWKbHxJgNpy0zuQnD3vkwSwd9TbawSMgYbFVb1ePbcdIwFU3jCwFRy0KElV2IBYAWffYO7Mrvqz2aCWirdKQGMHnk7Ft8z6d+slYs1dgtNE3tbyvbBXbqpFtqj+beAL5DNZnmJib0LMOIbesIfeGnDB15sn6T06A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=b+l3h3Wa5GLWn0bXsSzQ+qRLAF4OgAT2gnX4c1w1ykQ=;
+ b=YRiZDYx6LZj4Mr5CCQdnX5DgMmA7W0qQCN/P+r5FtiTHa63m3oo1cel3F1Iwm9DVpgXpIoRnsnM7PYtqs+TXFF1zqjEWprabcTKCGjCXbe2xqqKRTjLXqwohrg9JgWWFYsC2laNgA1PlBJnzMI2WUDZLVHUUtLdKPiM39qcFYq8fm3A4NanKvbjYjrZiKbmLtSu/T37kpwIxoqQnHxXg4MpHhJfoSHJKQnXViP3u1S2IrwtS0VPmrKHL0Fl3yfxZ03zS5f9cUWsfZvRdbABNCM6IH1At6xj65s8gxVGtmTyYy+GO1j/kNNrOkCFTXOc/w3j83zuV1OamuIM4eJWw+w==
+Received: from DM5PR08CA0041.namprd08.prod.outlook.com (2603:10b6:4:60::30) by
+ BY5PR12MB4243.namprd12.prod.outlook.com (2603:10b6:a03:20f::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.16; Sat, 18 Jan
+ 2025 20:33:02 +0000
+Received: from DS3PEPF0000C381.namprd04.prod.outlook.com
+ (2603:10b6:4:60:cafe::6f) by DM5PR08CA0041.outlook.office365.com
+ (2603:10b6:4:60::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8335.18 via Frontend Transport; Sat,
+ 18 Jan 2025 20:33:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DS3PEPF0000C381.mail.protection.outlook.com (10.167.23.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8377.8 via Frontend Transport; Sat, 18 Jan 2025 20:33:02 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sat, 18 Jan
+ 2025 12:32:57 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sat, 18 Jan 2025 12:32:57 -0800
+Received: from nvidia.com (10.127.8.14) by mail.nvidia.com (10.126.190.182)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4 via Frontend
+ Transport; Sat, 18 Jan 2025 12:32:52 -0800
+Date: Sat, 18 Jan 2025 12:32:49 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: Yi Liu <yi.l.liu@intel.com>, <jgg@nvidia.com>
+CC: <will@kernel.org>, <robin.murphy@arm.com>, <kevin.tian@intel.com>,
+	<tglx@linutronix.de>, <maz@kernel.org>, <alex.williamson@redhat.com>,
+	<joro@8bytes.org>, <shuah@kernel.org>, <reinette.chatre@intel.com>,
+	<eric.auger@redhat.com>, <yebin10@huawei.com>, <apatel@ventanamicro.com>,
+	<shivamurthy.shastri@linutronix.de>, <bhelgaas@google.com>,
+	<anna-maria@linutronix.de>, <yury.norov@gmail.com>, <nipun.gupta@amd.com>,
+	<iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <patches@lists.linux.dev>,
+	<jean-philippe@linaro.org>, <mdf@kernel.org>, <mshavit@google.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <smostafa@google.com>,
+	<ddutile@redhat.com>
+Subject: Re: [PATCH RFCv2 06/13] iommufd: Make attach_handle generic
+Message-ID: <Z4wP8ad/4Q5wMryd@nvidia.com>
+References: <cover.1736550979.git.nicolinc@nvidia.com>
+ <c708aedc678c63e2466b43ab9d4f8ac876e49aa1.1736550979.git.nicolinc@nvidia.com>
+ <62ccc75d-3f30-4167-b9e1-21dd95a6631d@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <Z4qnzwNYGubresFS@google.com>
+In-Reply-To: <62ccc75d-3f30-4167-b9e1-21dd95a6631d@intel.com>
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C381:EE_|BY5PR12MB4243:EE_
+X-MS-Office365-Filtering-Correlation-Id: c2f05d0f-1baa-4569-f847-08dd37ff4dfd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?eJxgLvXqweRLe1RlmxzpFKpfZXb0fYtEO+WAgTIKMuaO9YLADNLeo71ANbIW?=
+ =?us-ascii?Q?LyCAb/p5+gQUON/ZdWdZz4JZvCfzpo0R2VW3/jtY4aQiq0Uvxa4wxUw+C9EW?=
+ =?us-ascii?Q?YWoNYeSN55AzP9t5SmGeYGf+q8ioUlx327H/MS28ppM4zgznf7TMPa2KqteP?=
+ =?us-ascii?Q?FKoUEvDCqk8hCsIdxZYzxt1Q9DpRHwuKaPideFanfLwjCawulOE72r5miyMZ?=
+ =?us-ascii?Q?AZvv7vKmqQLm9Bm3zIX1QQTluN2bam+rLBS4vngrNqtFdy6jUaZJ9GPv6lrm?=
+ =?us-ascii?Q?V4pqHgrsJdfgOflEkIoXyH/Hemp+mp5JFxgjN4NIUZK86WIuVqMJ/OBiSAyw?=
+ =?us-ascii?Q?kcnZdN49AB2H+4FF1M/GqgEmthYqIjg3eDh+HleQ3QVmnoMfSs3dMqVQZbjm?=
+ =?us-ascii?Q?VhphXxt1RKXSzlh1XhkS88T/5l51CC9KYa5n2jJnR38npgbzYYlxQ6UYZ48i?=
+ =?us-ascii?Q?zE7P/C0J+F35U8UYGssoJazF3cHPzvi4jYsOSpzl+rGZG16BiNXKx5DXCjjx?=
+ =?us-ascii?Q?1lGemj1HC/nYGE/2wPi/BezUS4XgnQ8oXlyyr/9977UHOA1kfafcPIhX8pst?=
+ =?us-ascii?Q?XLalqjokk67Unm7GMlz7iVwnP3P7r4AVwqw6Z7pW+fIEi8gAIdglbGJD1sfY?=
+ =?us-ascii?Q?I2RUVnfTXRbcLymlYjs/QC5YSFXo9RaDPNWKKz/CvQLTsjELbx/qNm2xjIrx?=
+ =?us-ascii?Q?RmhSPhwql2ZuKj8w+miSR2mU0WeYxAYz8Dl4pBA15pBho824KSbBb8Y5DU4f?=
+ =?us-ascii?Q?+VGhwE9OoC5YoJB4qSSpMO29SKJPbmtHAWUyqMOzk09ps3G3NM4pWWwv8o02?=
+ =?us-ascii?Q?OW0e7aXquG5aHUnYyw7qzs2qqaNPzMBv2i62tou6ksKSfdCiYTRYGuwxQ4L/?=
+ =?us-ascii?Q?Vo0MVPain1H5YKZG/YyuGdTPull4c9ba7t0MYjTv7lexlwsUbiIk9BF/x5N4?=
+ =?us-ascii?Q?odXHVTRHoR690dNNvXo9LDKmvuUPb1PQxnwdxPJ6oHJsNGJCjuGY/lPLhCmA?=
+ =?us-ascii?Q?xvvwSV5FySzRL9b+3lag2k4eKZNtv8nT/M0UZUe67bczF0U7Eq9NQWrIRXSN?=
+ =?us-ascii?Q?KM3j7yKNCC8d65T7egQOPbIZnmP9OVySXlS/HF1NBKqQnrrsQuAaze95sJ/E?=
+ =?us-ascii?Q?XjiT276G+7hp4id70MFG4OzuJUbdPRVY+YSnBp49MvMsat+9DdGKkDKzrJHG?=
+ =?us-ascii?Q?ALi++cZqdIlaAXivzNZGE3wlYHuHXhwnUcAGIudnjchI7jpnFMHf/orPEkhy?=
+ =?us-ascii?Q?E2vRX/BR56IgpTbvYWqxlhZG1Dd7UF8ziGU1ck894AmfYW936zU8gMGsPR/G?=
+ =?us-ascii?Q?aeyKFFxE5Dc6ZMT5e3WAQFzadnj3ow0GZ3qxxjesdl9awN6O+I7MLz5HufBo?=
+ =?us-ascii?Q?bl+HLaegGkNHQdT6e4xE5BYuSIpZgcizrehNe78Tplq+X7H5WALt8PpbiXz2?=
+ =?us-ascii?Q?CHEJnR748GpJyy3u9/W8XcYjXPRqwK39U9JtqpdSIo1oq6laJo8YRw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2025 20:33:02.0062
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2f05d0f-1baa-4569-f847-08dd37ff4dfd
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C381.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4243
 
-On Fri, Jan 17, 2025 at 10:56:15AM -0800, Sean Christopherson wrote:
-> No preference, either way works for me.
-
-Yeah, too late now. Will queue it after -rc1.
-
-> Heh, no preference again.  In case you want to add Co-developed-by, here's my SoB:
+On Sat, Jan 18, 2025 at 04:23:22PM +0800, Yi Liu wrote:
+> On 2025/1/11 11:32, Nicolin Chen wrote:
+> > "attach_handle" was added exclusively for the iommufd_fault_iopf_handler()
+> > used by IOPF/PRI use cases, along with the "fault_data". Now, the iommufd
+> > version of sw_msi function will resue the attach_handle and fault_data for
+> > a non-fault case.
+> > 
+> > Move the attach_handle part out of the fault.c file to make it generic for
+> > all cases. Simplify the remaining fault specific routine to attach/detach.
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> I guess you can send it separately since both of our series need it. :)
 
-Thanks. Added.
+Jason, would you like to take this patch separately? I can send
+it prior to two big series for a quick review after rc1. It'll
+likely impact the vEVENTQ series too.
 
-> Any objection to calling this X86_FEATURE_SRSO_BP_SPEC_REDUCE?  More below.
+> > +static int iommufd_hwpt_attach_device(struct iommufd_hw_pagetable *hwpt,
+> > +				      struct iommufd_device *idev)
+> > +{
+> > +	struct iommufd_attach_handle *handle;
+> > +	int rc;
+> > +
+> > +	if (hwpt->fault) {
+> > +		rc = iommufd_fault_domain_attach_dev(hwpt, idev, true);
+> > +		if (rc)
+> > +			return rc;
+> > +	}
+> > +
+> > +	handle = kzalloc(sizeof(*handle), GFP_KERNEL);
+> > +	if (!handle) {
+> > +		rc = -ENOMEM;
+> > +		goto out_fault_detach;
+> > +	}
+> > +
+> > +	handle->idev = idev;
+> > +	rc = iommu_attach_group_handle(hwpt->domain, idev->igroup->group,
+> > +				       &handle->handle);
+> > +	if (rc)
+> > +		goto out_free_handle;
+> > +
+> > +	return 0;
+> > +
+> > +out_free_handle:
+> > +	kfree(handle);
+> > +	handle = NULL;
+> > +out_fault_detach:
+> > +	if (hwpt->fault)
+> > +		iommufd_fault_domain_detach_dev(hwpt, idev, handle, true);
+> > +	return rc;
+> > +}
 
-It sure is a better name. Lets leave SRSO_MSR_FIX in the comment so that
-grepping can find it as SRSO_MSR_FIX is what is in the official doc. IOW:
+Here the revert path passes in a handle=NULL..
 
-+#define X86_FEATURE_SRSO_BP_SPEC_REDUCE        (20*32+31) /*
-+                                                   * BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs.
-+                                                   * (SRSO_MSR_FIX in the official doc).
-+
-
-> At the risk of getting too clever, what if we use the X86_FEATURE to communicate
-> that KVM should toggle the magic MSR?
-
-Not too clever at all. I myself have used exactly this scheme to communicate
-settings to other code and actually I should've thought about it... :-\
-
-Definitely better than the silly export.
-
-> That'd avoid the helper+export, and up to this point "srso_mitigation" has
-> been used only for documentation purposes.
+> >   void iommufd_fault_domain_detach_dev(struct iommufd_hw_pagetable *hwpt,
+> > -				     struct iommufd_device *idev)
+> > +				     struct iommufd_device *idev,
+> > +				     struct iommufd_attach_handle *handle,
+> > +				     bool disable_iopf)
+> >   {
+> > +	if (handle)
+> > +		iommufd_auto_response_faults(hwpt, handle);
 > 
-> The flag just needs to be cleared in two locations, which doesn't seem too
-> awful.  Though if we go that route, SRSO_MSR_FIX is a pretty crappy name :-)
+> no need to check handle. After this patch, both the non-fault and the fault
+> path will allocate handle. It cannot be used to isolate fault and non-fault
+> path. Also, the callers of iommufd_fault_domain_detach_dev() will check
+> hwpt->fault before calling it. So just call iommufd_auto_response_faults().
 
-Yap, most def.
+..so we still need this !NULL validation? :-/
 
-> These exports are no longer necessary.
-
-Doh.
-
-> Compile tested only...
-
-Tested on hw.
-
-Thanks!
-
----
-From: "Borislav Petkov (AMD)" <bp@alien8.de>
-Date: Wed, 13 Nov 2024 13:41:10 +0100
-Subject: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-
-Add support for
-
-  CPUID Fn8000_0021_EAX[31] (SRSO_MSR_FIX). If this bit is 1, it
-  indicates that software may use MSR BP_CFG[BpSpecReduce] to mitigate
-  SRSO.
-
-enable this BpSpecReduce bit to mitigate SRSO across guest/host
-boundaries.
-
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
----
- Documentation/admin-guide/hw-vuln/srso.rst | 21 +++++++++++++++++++++
- arch/x86/include/asm/cpufeatures.h         |  4 ++++
- arch/x86/include/asm/msr-index.h           |  1 +
- arch/x86/kernel/cpu/bugs.c                 | 14 +++++++++++++-
- arch/x86/kvm/svm/svm.c                     | 14 ++++++++++++++
- 5 files changed, 53 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/admin-guide/hw-vuln/srso.rst b/Documentation/admin-guide/hw-vuln/srso.rst
-index 2ad1c05b8c88..b856538083a2 100644
---- a/Documentation/admin-guide/hw-vuln/srso.rst
-+++ b/Documentation/admin-guide/hw-vuln/srso.rst
-@@ -104,6 +104,27 @@ The possible values in this file are:
- 
-    (spec_rstack_overflow=ibpb-vmexit)
- 
-+ * 'Mitigation: Reduced Speculation':
-+
-+   This mitigation gets automatically enabled when the above one "IBPB on
-+   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
-+
-+   It gets automatically enabled on machines which have the
-+   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the code logic is to switch
-+   to the above =ibpb-vmexit mitigation because the user/kernel boundary is
-+   not affected anymore and thus "safe RET" is not needed.
-+
-+   After enabling the IBPB on VMEXIT mitigation option, the BpSpecReduce bit
-+   is detected (functionality present on all such machines) and that
-+   practically overrides IBPB on VMEXIT as it has a lot less performance
-+   impact and takes care of the guest->host attack vector too.
-+
-+   Currently, the mitigation uses KVM's user_return approach
-+   (kvm_set_user_return_msr()) to set the BpSpecReduce bit when a vCPU runs
-+   a guest and reset it upon return to host userspace or when the KVM module
-+   is unloaded. The intent being, the small perf impact of BpSpecReduce should
-+   be incurred only when really necessary.
-+
- 
- 
- In order to exploit vulnerability, an attacker needs to:
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 508c0dad116b..43653f2704c9 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -468,6 +468,10 @@
- #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
- #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
- #define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
-+#define X86_FEATURE_SRSO_BP_SPEC_REDUCE	(20*32+31) /*
-+						    * BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs.
-+						    * (SRSO_MSR_FIX in the official doc).
-+						    */
- 
- /*
-  * Extended auxiliary flags: Linux defined - for features scattered in various
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 3f3e2bc99162..4cbd461081a1 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -719,6 +719,7 @@
- 
- /* Zen4 */
- #define MSR_ZEN4_BP_CFG                 0xc001102e
-+#define MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT 4
- #define MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT 5
- 
- /* Fam 19h MSRs */
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 5a505aa65489..9e3ea7f1b358 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -2523,6 +2523,7 @@ enum srso_mitigation {
- 	SRSO_MITIGATION_SAFE_RET,
- 	SRSO_MITIGATION_IBPB,
- 	SRSO_MITIGATION_IBPB_ON_VMEXIT,
-+	SRSO_MITIGATION_BP_SPEC_REDUCE,
- };
- 
- enum srso_mitigation_cmd {
-@@ -2540,7 +2541,8 @@ static const char * const srso_strings[] = {
- 	[SRSO_MITIGATION_MICROCODE]		= "Vulnerable: Microcode, no safe RET",
- 	[SRSO_MITIGATION_SAFE_RET]		= "Mitigation: Safe RET",
- 	[SRSO_MITIGATION_IBPB]			= "Mitigation: IBPB",
--	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only"
-+	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only",
-+	[SRSO_MITIGATION_BP_SPEC_REDUCE]	= "Mitigation: Reduced Speculation"
- };
- 
- static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
-@@ -2663,6 +2665,12 @@ static void __init srso_select_mitigation(void)
- 
- ibpb_on_vmexit:
- 	case SRSO_CMD_IBPB_ON_VMEXIT:
-+		if (boot_cpu_has(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
-+			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
-+			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
-+			break;
-+		}
-+
- 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
- 			if (!boot_cpu_has(X86_FEATURE_ENTRY_IBPB) && has_microcode) {
- 				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
-@@ -2684,6 +2692,10 @@ static void __init srso_select_mitigation(void)
- 	}
- 
- out:
-+
-+	if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
-+		setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
-+
- 	pr_info("%s\n", srso_strings[srso_mitigation]);
- }
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 21dacd312779..ee14833f00e5 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -256,6 +256,7 @@ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
-  * defer the restoration of TSC_AUX until the CPU returns to userspace.
-  */
- static int tsc_aux_uret_slot __read_mostly = -1;
-+static int zen4_bp_cfg_uret_slot __ro_after_init = -1;
- 
- static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
- 
-@@ -1541,6 +1542,11 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- 	    (!boot_cpu_has(X86_FEATURE_V_TSC_AUX) || !sev_es_guest(vcpu->kvm)))
- 		kvm_set_user_return_msr(tsc_aux_uret_slot, svm->tsc_aux, -1ull);
- 
-+	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
-+		kvm_set_user_return_msr(zen4_bp_cfg_uret_slot,
-+					BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT),
-+					BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT));
-+
- 	svm->guest_state_loaded = true;
- }
- 
-@@ -5298,6 +5304,14 @@ static __init int svm_hardware_setup(void)
- 
- 	tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
- 
-+	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
-+		zen4_bp_cfg_uret_slot = kvm_add_user_return_msr(MSR_ZEN4_BP_CFG);
-+		if (WARN_ON_ONCE(zen4_bp_cfg_uret_slot < 0)) {
-+			r = -EIO;
-+			goto err;
-+		}
-+	}
-+
- 	if (boot_cpu_has(X86_FEATURE_AUTOIBRS))
- 		kvm_enable_efer_bits(EFER_AUTOIBRS);
- 
--- 
-2.43.0
-
-
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks
+Nicolin
 
