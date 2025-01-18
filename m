@@ -1,184 +1,217 @@
-Return-Path: <kvm+bounces-35894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A291AA15A38
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 01:03:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C38FA15A3A
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 01:07:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6C5F188B7B0
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 00:03:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 778531674E4
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 00:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6D21853;
-	Sat, 18 Jan 2025 00:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13ABD80B;
+	Sat, 18 Jan 2025 00:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RNbErqVw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zUx9ymlq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABE6173
-	for <kvm@vger.kernel.org>; Sat, 18 Jan 2025 00:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1522173
+	for <kvm@vger.kernel.org>; Sat, 18 Jan 2025 00:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737158613; cv=none; b=svjKbyuYcnFJb6VW2F1fF97VIgSqfSd9cHeDKFlSQqNX3o1tMOcvx24YEfIv++0APYA5cOsF/bo0zOncdg/ixgg0j/P+peMdaKUQCdKXAyoy17ezc0OOfPuRSJ/cW25SoBjGDRRak+TlZYLUYRa+Nqd/upcjlss9Q+veZyiDeXA=
+	t=1737158814; cv=none; b=E4tK+pD6UUw0f5ZVEXpBkB6QYvHd4bTurbKjsYGA9r3OkuyptnqK/EJzBxXEbfogEgRl+7hx3r/7vawbiwD82C24GRoawjP0/Ye1isyO9BXqRWvcGeoMPusZcG28IuXqAZ1w4wukNRtPM+Tal9R5jJ8lCZCNyLpSlERl8vrKolE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737158613; c=relaxed/simple;
-	bh=qJdY9x8suc1rcBEi6tXK+0Y9fSUvD+XII4lshzIJFHI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MR0Meql9SWpneX6RJplgkYW8f7s4IU4JF3EYSTgyq0gfe4Zm8znF+JArxcs7vLmfb8vL7c2TXj2F2uQDWZuv/xrqEsXWtBGyBFzIgN33eVHyKoRmtD9lmGpHixCyYEwsbTKVjySEzFkaS8RIlZTgIgosO61R5zSK9s8YkfCdM84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RNbErqVw; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1737158814; c=relaxed/simple;
+	bh=rFiSGAEYI0oUKzAZ9cdsI/nVcPTVNxsl6QsFPSERTYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l6SSKgbPDxOmhSI/SVEyyuWHscaMsylU3jq/sutp4HhatjiZTae241LwLWO27QNS5dsF9Ec43ni2/F4OIihOQJOGqiVpf5rxJz6//nj17LxYz8LS14oMlk0e1sYxnwflnhXtktN4o4zRJ8tMPiJmYIwquYeuWsICBfMYk2a9ABg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zUx9ymlq; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef35de8901so5040374a91.3
-        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:03:31 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-216395e151bso38000745ad.0
+        for <kvm@vger.kernel.org>; Fri, 17 Jan 2025 16:06:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737158611; x=1737763411; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=etfdB542KXwDSKrqFlaD50tTuvndpX1rN0vVPU52dZU=;
-        b=RNbErqVw3YJQnS/7KeiewE6/IgE50XX2Yq5aujxBJv0E5Hokv2UQXGbxSFwI2FMkpf
-         dSEDmb38iZoKElSRfLefRm6hgH3H/ufWYN+8WhC26w17sPEGUq7+tLuerXTVg5aZcmvk
-         rvFCBADSif6Z7a05x7DPh/2sGDYj2pHXYNURiCgqA+3fR6Bu44Rphe5lF5swIFdRfN75
-         c8JwbMwIg+ANoA2XCVZ0ndj3c/DZ9Ej0JsI27ghLwW9W2skiNzbBLvfnaF/h5Anbt/DQ
-         FfXVErS+yk4ogfcLri8LS9Hq3fHhWedcvT2XQJ7Qj+wxdTjrh9s9hSMsFeTRp2HNfOOS
-         nC+w==
+        d=google.com; s=20230601; t=1737158812; x=1737763612; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NKI978WNr/tmVVEFjRafX7xDGZCXJp7rhKxpi24uDDM=;
+        b=zUx9ymlq1y6BclZfMmW5WKXA5tXUQpiqNq3J6t5ixn+2pbkxKHKLGTCdUp76HASgoQ
+         XAYrg/ctdw61mUSslrcOkUsETMG6ImBX4XbeNyN+kjkgASypgenbmhLY7E/J92V06Duw
+         IzTuMWaENQAZUV5xdxOqvHFENtZhxPaSYmxAImZs0kOGKDskwgsIDOc1qnTKglzg6zhk
+         gJJ+ju/SqpzWyWeOc5AkMEp+skCbpjLuKJIeJh36d6p5USgVese0Fh1MWCiHkgsZqc0v
+         gwiUS6dc3l50Dt5rpVJDBb6YF9Q62OUDDiR+JkUTUlFxRc+Y69Jn/CUGrF/eojEjkWqr
+         q5BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737158611; x=1737763411;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=etfdB542KXwDSKrqFlaD50tTuvndpX1rN0vVPU52dZU=;
-        b=T9yQ4KCxSSx+p4IXysL1Nb2SrmBzY6yVGqp8MtpvS8X0MXQ+AlZ25OumjdYF7J0lMn
-         TXApCvoqmdOw2spdarUGa/mXXEHqX8u+YDVrtgyi2J4B1klclQcm62OiRzMt9vdgJs+s
-         8PA02SY1GYoZ2enaZBnWUSJbgSQ+BKFXnRaNFfqe92Fc1kyCoYtZ30e/CdtFu7NhtX6l
-         vUn+a8HRtWZmw+L0cgyV97M+weCNfmdtoTtAREBqvEceVbnHr8hJmeg56M7YOQ3G5Lr9
-         PjMvL6NCpULDkvvXSGblvPntM2CMWtckb4ZyofAJxPuFr7jU2oSy45yBp0yPcldHgwHX
-         awiA==
-X-Forwarded-Encrypted: i=1; AJvYcCUp8g9izQMNk334iA0Vx0g9BPCMRFkcb3LdlpKJWzGiOMsXZwwBp3AMEoYaIwdqPy0o9Bs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywk8JAFTlU/qX6l68zxZ6mEVT0ZzE0LW5mzPn3kP5VpcgSoXega
-	072vOrKnSK4H22vnkCruLBJmdogwenENhMr4YIWJ949gkwq5Z7Uo4EYn7IMaWe2uDgSG7UBCAwb
-	tZg==
-X-Google-Smtp-Source: AGHT+IHfKny2wEdvKVczFtFx/BNFEUOaoX62L1v/XH5SA10ePHOYZXPulOMMzYqGAfpFB2ydGgUrznkTLDg=
-X-Received: from pjbli9.prod.google.com ([2002:a17:90b:48c9:b0:2ee:3cc1:7944])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f8e:b0:2ef:114d:7bf8
- with SMTP id 98e67ed59e1d1-2f782c4ff33mr6042973a91.6.1737158611359; Fri, 17
- Jan 2025 16:03:31 -0800 (PST)
-Date: Fri, 17 Jan 2025 16:03:30 -0800
-In-Reply-To: <CAJD7tkaa1cqUeUUKNdQADBqXH-G9h=5Liv+wj=5gitgbdO9Tsw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1737158812; x=1737763612;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NKI978WNr/tmVVEFjRafX7xDGZCXJp7rhKxpi24uDDM=;
+        b=nekrzPI4GscyLtkeVPENW7kfamMWs7tXErrjan0jeWoNaERt9fP/mz7bSe2UtmJBTS
+         QqLmrOtyEcUtzOTumdYajLa1B+hLtqQ+2JaoiGM9Yya5HFh3UO5Gs4iU1J11Yr2xgAPQ
+         u6sJfquVDttY5zAXxO6NEsbfQzUFsji9Vlt1MOzhzNxKM1eBAgh3o8GM2Yl7RKgVB10r
+         z7d+0jn5UhppS6Vtmk5zJ7eirv7WwwMaC7rKYX4MtWzZ5eSn1OdZAzjb9ts15xseytLq
+         HPP/TFeMjyqpq2FxRD/6cS7YjsuRRP7NwoopJJLr3SclPntPF6zYQO8y/JAQ0nyAm/VU
+         +9Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCVilUwNzPuxJzEnOHzYAYIlLxASuXkuxZ8aUjgb/CB85mI28lca+xy5Dn/XuvVOx4vdKi4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjXuRNf8sREIqbA0Su10BqeckakT4YWgdXkWHBEXFTlkhOFXMV
+	r+mV3UXVGjoQ1rx7RamSgS3nX91WxnrMEajVsw9BdJQXZ7VCnU+y5jw1Nfb7pQ==
+X-Gm-Gg: ASbGncumgw9hY1cPSi7a1RbayfAlI5RTNkKLkcs76l08slSBitpATXpsojV1SGDBW9J
+	vDzjug9dpUcIE1laDpvOdfpUugmGsnzV7II3Aq3Chnik3JX3MoaTZRNMaBJK/OeNsNeTRTLWMAb
+	u6zAtYgyJUy5Jbz93+mYqsSTHp5CU8xwRCxE7eSuCwF15B+eBn1iG2ERul2TLkFuW7gFQTaB+fz
+	lhDNDBuQmwnxMNZZuQJ2gLMAthuxSJ7DuTBVSI5+n8lmn1iClQF5ZcjQCvdU+dPgIPnQeD2CM9I
+	9Ysc7LcZGtM6+ThMyS2BVpBkh62rjAwZ9cgJLqjvQw==
+X-Google-Smtp-Source: AGHT+IF7HxIa1c5v/h6tQHCCefWog3j2YTShYTHyN1VPg/jPa0S8RLmDiqU3vOlWKD5WIDrGR9rvHQ==
+X-Received: by 2002:a17:902:ecc1:b0:21a:874f:1de1 with SMTP id d9443c01a7336-21bf0ce086emr183185645ad.21.1737158811472;
+        Fri, 17 Jan 2025 16:06:51 -0800 (PST)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f77614c15bsm2765061a91.16.2025.01.17.16.06.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 16:06:50 -0800 (PST)
+Date: Sat, 18 Jan 2025 00:06:47 +0000
+From: Mingwei Zhang <mizhang@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel test robot <oliver.sang@intel.com>
+Subject: Re: [PATCH 2/5] KVM: selftests: Only validate counts for
+ hardware-supported arch events
+Message-ID: <Z4rwlyysGukXBBw4@google.com>
+References: <20250117234204.2600624-1-seanjc@google.com>
+ <20250117234204.2600624-3-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CALMp9eQoGsO8KvugXP631tL0kWbrcwMrPR_ErLa9c9-OCg7GaA@mail.gmail.com>
- <CAJD7tkbHARZSUNmoKjax=DHUioP1XBWhf639=7twYC63Dq0vwg@mail.gmail.com>
- <Z4k9seeAK09VAKiz@google.com> <CAJD7tkZQQUqh1GG5RpfYFT4-jK-CV7H+z9p2rTudLsrBe3WgbA@mail.gmail.com>
- <Z4mJpu3MvBeL4d1Q@google.com> <CAJD7tkbqxXQVd5s7adVqzdLBP22ef2Gs+R-SxuM7GtmetaWN+Q@mail.gmail.com>
- <Z4mlsr-xJnKxnDKc@google.com> <CAJD7tkahmyjXvwKO2=EfQRWu_BHPJ-8+eSEteZH5TGG3+jHtWw@mail.gmail.com>
- <Z4qbDBduEYWEwjkS@google.com> <CAJD7tkaa1cqUeUUKNdQADBqXH-G9h=5Liv+wj=5gitgbdO9Tsw@mail.gmail.com>
-Message-ID: <Z4rv0jzFILtUxK4q@google.com>
-Subject: Re: [PATCH] KVM: nVMX: Always use TLB_FLUSH_GUEST for nested VM-Enter/VM-Exit
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: Jim Mattson <jmattson@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250117234204.2600624-3-seanjc@google.com>
 
-On Fri, Jan 17, 2025, Yosry Ahmed wrote:
-> On Fri, Jan 17, 2025 at 10:01=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > Yep.  I suspect the issue is lack of documentation for TLB_FLUSH_GUEST =
-and
-> > TLB_FLUSH_CURRENT.  I'm not entirely sure where it would be best to doc=
-ument
-> > them.  I guess maybe where they are #defined?
->=20
-> I guess at the #define we can just mention that they result in calling
-> kvm_vcpu_flush_tlb_{guest/current}() before entering the guest, if
-> anything.
+On Fri, Jan 17, 2025, Sean Christopherson wrote:
+> In the Intel PMU counters test, only validate the counts for architectural
+> events that are supported in hardware.  If an arch event isn't supported,
+> the event selector may enable a completely different event, and thus the
+> logic for the expected count is bogus.
+> 
+> This fixes test failures on pre-Icelake systems due to the encoding for
+> the architectural Top-Down Slots event corresponding to something else
+> (at least on the Skylake family of CPUs).
+> 
+> Note, validation relies on *hardware* support, not KVM support and not
+> guest support.  Architectural events are all about enumerating the event
+> selector encoding; lack of enumeration for an architectural event doesn't
+> mean the event itself is unsupported, i.e. the event should still count as
+> expected even if KVM and/or guest CPUID doesn't enumerate the event as
+> being "architectural".
+> 
+> Note #2, it's desirable to _program_ the architectural event encoding even
+> if hardware doesn't support the event.  The count can't be validated when
+> the event is fully enabled, but KVM should still let the guest program the
+> event selector, and the PMC shouldn't count if the event is disabled.
+> 
+> Fixes: 4f1bd6b16074 ("KVM: selftests: Test Intel PMU architectural events on gp counters")
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Closes: https://lore.kernel.org/oe-lkp/202501141009.30c629b4-lkp@intel.com
+> Debugged-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  .../selftests/kvm/x86/pmu_counters_test.c     | 25 +++++++++++++------
+>  1 file changed, 18 insertions(+), 7 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86/pmu_counters_test.c b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+> index fe7d72fc8a75..8159615ad492 100644
+> --- a/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+> +++ b/tools/testing/selftests/kvm/x86/pmu_counters_test.c
+> @@ -29,6 +29,8 @@
+>  /* Total number of instructions retired within the measured section. */
+>  #define NUM_INSNS_RETIRED		(NUM_LOOPS * NUM_INSNS_PER_LOOP + NUM_EXTRA_INSNS)
+>  
+> +/* Track which architectural events are supported by hardware. */
+> +static uint32_t hardware_pmu_arch_events;
+>  
+>  static uint8_t kvm_pmu_version;
+>  static bool kvm_has_perf_caps;
+> @@ -89,6 +91,7 @@ static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
+>  
+>  	vm = vm_create_with_one_vcpu(vcpu, guest_code);
+>  	sync_global_to_guest(vm, kvm_pmu_version);
+> +	sync_global_to_guest(vm, hardware_pmu_arch_events);
+>  
+>  	/*
+>  	 * Set PERF_CAPABILITIES before PMU version as KVM disallows enabling
+> @@ -152,7 +155,7 @@ static void guest_assert_event_count(uint8_t idx,
+>  	uint64_t count;
+>  
+>  	count = _rdpmc(pmc);
+> -	if (!this_pmu_has(event))
+> +	if (!(hardware_pmu_arch_events & BIT(idx)))
+>  		goto sanity_checks;
+>  
+>  	switch (idx) {
+> @@ -560,7 +563,7 @@ static void test_fixed_counters(uint8_t pmu_version, uint64_t perf_capabilities,
+>  
+>  static void test_intel_counters(void)
+>  {
+> -	uint8_t nr_arch_events = kvm_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
+> +	uint8_t nr_arch_events = this_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH);
+>  	uint8_t nr_fixed_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
+>  	uint8_t nr_gp_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
+>  	uint8_t pmu_version = kvm_cpu_property(X86_PROPERTY_PMU_VERSION);
+> @@ -582,18 +585,26 @@ static void test_intel_counters(void)
+>  
+>  	/*
+>  	 * Detect the existence of events that aren't supported by selftests.
+> -	 * This will (obviously) fail any time the kernel adds support for a
+> -	 * new event, but it's worth paying that price to keep the test fresh.
+> +	 * This will (obviously) fail any time hardware adds support for a new
+> +	 * event, but it's worth paying that price to keep the test fresh.
+>  	 */
+>  	TEST_ASSERT(nr_arch_events <= NR_INTEL_ARCH_EVENTS,
+>  		    "New architectural event(s) detected; please update this test (length = %u, mask = %x)",
+> -		    nr_arch_events, kvm_cpu_property(X86_PROPERTY_PMU_EVENTS_MASK));
+> +		    nr_arch_events, this_cpu_property(X86_PROPERTY_PMU_EVENTS_MASK));
 
-Yeah, a "See xx for details" redirect is probably the best option.
+This is where it would make troubles for us (all companies that might be
+using the selftest in upstream kernel and having a new hardware). In
+this case when we get new hardware, the test will fail in the downstream
+kernel. We will have to wait until the fix is ready, and backport it
+downstream, re-test it.... It takes lots of extra work.
 
-> The specific documentation about what they do could be above the
-> functions themselves, and describing the potential MMU sync is
-> naturally part of documenting kvm_vcpu_flush_tlb_guest() (kinda
-> already there).
->=20
-> The flush_tlb_guest() callback is documented in kvm_host.h, but not
-> flush_tlb_current(). I was going to suggest just documenting that. But
-> kvm_vcpu_flush_tlb_guest() does not only call flush_tlb_guest(), but
-> it also potentially synchronizes the MMU. So only documenting the
-> callbacks does not paint a full picture.
->=20
-> FTR, I initially confused myself because all kvm_vcpu_flush_tlb_*()
-> functions are more-or-less thin wrappers around the per-vendor
-> callbacks -- except kvm_vcpu_flush_tlb_guest().
->=20
-> >
-> > TLB_FLUSH_GUEST is used when a flush of the guest's TLB, from the guest=
-'s
-> > perspective, is architecturally required.  The one oddity with TLB_FLUS=
-H_GUEST
-> > is that it does NOT include guest-physical mappings, i.e. TLB entries t=
-hat are
-> > associated with an EPT root.
->=20
-> The way I think about this is how it's documented above the per-vendor
-> callback. It flushes translations created by the guest. The guest does
-> not (directly) create guest-physical translations, only linear and
-> combined translations.
+Perhaps we can just putting nr_arch_events = NR_INTEL_ARCH_EVENTS
+if the former is larger than or equal to the latter? So that the "test"
+only test what it knows. It does not test what it does not know, i.e.,
+it does not "assume" it knows everything. We can always a warning or
+info log at the moment. Then expanding the capability of the test should
+be added smoothly later by either maintainers of SWEs from CPU vendors
+without causing failures.
 
-That's not accurate either.  When L1 is using nested TDP, it does create gu=
-est-
-physical translations.  The lack of any form of handling in TLB_FLUSH_GUEST=
- is
-a reflection of two things: EPT is weird, and nested SVM doesn't yet suppor=
-t
-precise flushing on transitions, i.e. nested NPT handling is missing becaus=
-e KVM
-unconditionally flushes and synchronizes.
-
-EPT is "weird" because the _only_ time guest-physical translations are flus=
-hed
-is when the "wrong" KVM MMU is loaded.  The only way to flush guest-physica=
-l
-translations (short of RESET :-D) is via INVEPT, and INVEPT is a root-only =
-(VMX
-terminology) instruction, i.e. can only be executed by L1.  And because L1 =
-can't
-itself be using EPT[*], INVEPT can never target/flush the current context.
-
-Furthermore, INVEPT isn't strictly tied to a VMCS, e.g. deferring the emula=
-ted
-flush until the next time KVM runs a vmcs12 isn't viable.  Rather than add
-dedicated tracking, KVM simply unloads the roots and lets the normal root
-"allocation" handle the flush+sync the next time the vCPU uses the associat=
-ed MMU.
-
-Nested NPT is different, as there is no INVNPT.  Instead, there's the ASID =
-itself
-and a flushing control, both of which are properties of the VMCB.  As a res=
-ult,
-NPT TLB flushes that are initiated by a hypervisor always take effect at VM=
-RUN,
-e.g. by bumping the ASID, or via the dedicated flushing control.
-
-So when proper handling of TLB flushing on nested SVM transition comes alon=
-g, I
-do expect that either kvm_vcpu_flush_tlb_guest() will grow.  Or maybe we'll=
- add
-yet another TLB_FLUSH_XXX flavor :-)
-
-One thing that could be helpful would be to document that KVM doesn't use
-TLB_FLUSH_GUEST to handle INVEPT, and so there's no need to sync nested TDP=
- MMUs.
-
-[*] Even in a deprivileged scenario like pKVM, the guest kernel would becom=
-e L2
-    from KVM's perspective.
+Thanks.
+-Mingwei
+>  
+>  	/*
+> -	 * Force iterating over known arch events regardless of whether or not
+> -	 * KVM/hardware supports a given event.
+> +	 * Iterate over known arch events irrespective of KVM/hardware support
+> +	 * to verify that KVM doesn't reject programming of events just because
+> +	 * the *architectural* encoding is unsupported.  Track which events are
+> +	 * supported in hardware; the guest side will validate supported events
+> +	 * count correctly, even if *enumeration* of the event is unsupported
+> +	 * by KVM and/or isn't exposed to the guest.
+>  	 */
+>  	nr_arch_events = max_t(typeof(nr_arch_events), nr_arch_events, NR_INTEL_ARCH_EVENTS);
+> +	for (i = 0; i < nr_arch_events; i++) {
+> +		if (this_pmu_has(intel_event_to_feature(i).gp_event))
+> +			hardware_pmu_arch_events |= BIT(i);
+> +	}
+>  
+>  	for (v = 0; v <= max_pmu_version; v++) {
+>  		for (i = 0; i < ARRAY_SIZE(perf_caps); i++) {
+> -- 
+> 2.48.0.rc2.279.g1de40edade-goog
+> 
 
