@@ -1,267 +1,319 @@
-Return-Path: <kvm+bounces-35918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67940A15D37
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 14:42:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 962DDA15DA3
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 16:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A17D91609A7
-	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 13:42:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0EEE1886E84
+	for <lists+kvm@lfdr.de>; Sat, 18 Jan 2025 15:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F4A18FDB1;
-	Sat, 18 Jan 2025 13:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D2EEEA9;
+	Sat, 18 Jan 2025 15:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="oFuo8vYk"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="EykxuI82"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2066.outbound.protection.outlook.com [40.107.243.66])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E22A1EA91;
-	Sat, 18 Jan 2025 13:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737207722; cv=fail; b=b9C0PIreOfJOnXMighWlwgUHkMlDETYUnPmVfTjRWd4FwVbJHFFYZDjmJmGbDc8MJ9hXMpgqChnncQgAFuVJcMFuCzTaAtY5AXvBRrYNC8l3tZNcyNfVu90xfOr43Xs7AcDDE75S9Z+YwG+n0+aMRdHafz9XGnfGlpWZcrZ+zNU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737207722; c=relaxed/simple;
-	bh=27/jkIFNXlheWHvveNsUmNbOx7PADf+rNl9tI0w9duo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qjfx2+yTde56nRVyUuzLK3E8RddIDYc9Nfp/RyTwZfbDcSwGl/n51YmYp8txuw2hLAC376ebU5dwfui4IGo69g2VsOsQIFd4ZF/YA8m2fnbPiGoL1g1BxTbaXjg0X2+essldPg/Psl/k7W4EbyKIxUXPwtN3kv8anFi9KiJ0uQk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=oFuo8vYk; arc=fail smtp.client-ip=40.107.243.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MphAlof/4+dQpnV3PtMJr/4mBP3x6zfQI+nMNE4N9mY/e/U1hVRsRiWGrRqbZelAKvOazoXlA+cOhILQv3tndp8dj2/aOygweVAoAxSIgC9sh7gAoesDZcNcKVqJ2w2d+ahjXUYL5AJPViDIH2NdpGRJJzw/UswWvC0Q2amSr5yj4kFE/Rd8/+q6VLz3aqwERjPsXdnXckkVas/EntpC8pno/30iLfoFwqnbbbk4XeoNcyj80h6tiKFG+wJVvpNvvZC26uAwoKnNtLkZxhLUSFJaOuH4E0RK14Z+ZzuYcKyaOAKKyRoBl7OGQFo5j9sDE6EKyXmXVkWdZAVCmlnE9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eWs3J11jbcka4nma94hjgFA9d2qgO9pVGFoL5AKqVyM=;
- b=arRNABNfG/b+R8Fo9SFGtpLJhtIJSn85o7WvAXTm/kde1tK3gl1eUPnhdvhFksnPKLgZ3rHrXXV5Ub1L+Tw0p0wBm4wCHdFkKvNIb5EzPldc051DwICks1aNGKyir/UbA8hkN1vzIgc0Ane/W9DjXuxgI8ZgVnImDHLuMGMS6mfHD01UJ0Z4PAnMqaFR4FvPQkx4FUqN0aEgPPYdw/q6bMG0LjI2ilHbTPLjtwtg8lCiPZ7cQLEnLBoWcNDcocTcHAOZqm8IJDANP+AahbbQBo7Ilf2CriTjpxkhbqdu9WFpvqM010MwaOuDJXKXT9rcc57D+Nmd6RBuzLU2EE/9SQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eWs3J11jbcka4nma94hjgFA9d2qgO9pVGFoL5AKqVyM=;
- b=oFuo8vYkLqQ8EflRy/ncrhqc/I2c82FMSkmIWnlmrT6p/h/b3FukU+TOi/r1AYjUfxegzdWEdOpYQ+zd46dRw9uNRjDjEa1S9KNx6QkuvbbicDvfQW7ECZK+dqcxV4edA1DlxxBA1iPrcAtZq3jBd2d6V8brhXw6iMlkLLRdq/s=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- SJ0PR12MB7008.namprd12.prod.outlook.com (2603:10b6:a03:486::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.16; Sat, 18 Jan
- 2025 13:41:58 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb%4]) with mapi id 15.20.8356.014; Sat, 18 Jan 2025
- 13:41:58 +0000
-Message-ID: <1d988e21-506b-4dd7-8a55-649ed939ef56@amd.com>
-Date: Sat, 18 Jan 2025 19:11:48 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/3] Add support for the Idle HLT intercept feature
-To: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, nikunj@amd.com,
- thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de,
- babu.moger@amd.com
-References: <20250103081828.7060-1-manali.shukla@amd.com>
-Content-Language: en-US
-From: Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <20250103081828.7060-1-manali.shukla@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN3PR01CA0089.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:9a::7) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4906190497;
+	Sat, 18 Jan 2025 15:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737214041; cv=none; b=EO4VQkHrmJ3ekAjeTt0c8E+6UBzNHFpWl15bMQnHRJzHWk/R1NRAm7C/jS6uinixLZdhpHadsPA4gMmpQARpk3TLmoWbWMMTqz5U6ZdXa5vNB3GdeyWmaKQJvAJj7ajU5Tv1390+4YrHjRyaoqtt+0xRJ3yzqgtb9NsUhnyfz2s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737214041; c=relaxed/simple;
+	bh=K3P23oaaNDMXZwEiv1s1kN7nXc8IVMIXVnMSdv2uMNs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ebg+HiFFWfCP/9MK1523PFZwiYlQdbNQ702eCyacDD1P0P/gfi/Dum9eQ+0NS22W4VJinQvS1sSbrhVtwdiLr2YHnGsOnhR3U+wxsBws3RtyfWW3kYt35TldLte0YJYl2tsFDsdgK/S2/TowsW838jODNAD6kvmN85bVU18rijg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=EykxuI82; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 95CB640E0379;
+	Sat, 18 Jan 2025 15:27:15 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id cr8wBz0X17PC; Sat, 18 Jan 2025 15:27:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1737214031; bh=LXLlK4RZAar8K//R4fTEtS4sKK1p59a+4ZHr4baKnMY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EykxuI82IPgldWCdxdzuSNnybn2ma13KSDhuN6wOotvRaaWPQOJAVdoVF3qMOh2d5
+	 US8p6TyMCFd3vQizx/3F25Fc2y0TJg8Bi+oLqcxQv/FwUtASYrkXcNtc/1wG4As5/X
+	 ShWfVWLs0VNjV3+qYcn2EXvMbFgJHD9UnkqoFuNs8F0KdirDx3CVJX/MHJbrcpSEXl
+	 n3FYE6g84qeo8PWp/n3H0WpHdpaE2JH7lLCiyWi2jTY+Tkb3+0ojJrAuHLPgMvQ0/f
+	 jdgKBDeDWjJ4pExS/D+izWX3Fd5ZobwPtIwxOUMGlI0euuNBUkEWMv5oJKlwRJ5exX
+	 ZyEPNr6RKLY1C77wLWBd/SHPYOb5ahByPBYhq+PqSUEKN4uGQIJdRV19W2vDw16ceH
+	 4dgoiacVqjVJxcGJKeR30hKH7vV4LxQNqfOF+P14NSjjydcp4x/Qmf8/1AI1HGMPwO
+	 EpMrEHYJsXfz0ERwTcyTJVtTF7Fbc5LhsdIV1ky0ZlhaWzh3UPL8W3zRQsGlwI9tQK
+	 T2VWanI8A2OhYL81BiR6powpIUPxCUvx+bp/grYiXPqRaEErGNP15/zMY8QBXeiOuD
+	 X/NK+yk0NxvwupJwkJW8m+6Hnrx+7gQv0XtPWzLa3bBnK3Qj4txPWo5TmXO7r8xWTN
+	 mS00YpIhxgecmJkLGOJ4cOqk=
+Received: from zn.tnic (p200300ea971F9362329c23fFFEa6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971f:9362:329c:23ff:fea6:a903])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3225940E0289;
+	Sat, 18 Jan 2025 15:27:03 +0000 (UTC)
+Date: Sat, 18 Jan 2025 16:26:55 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250118152655.GBZ4vIP44MivU2Bv0i@fat_crate.local>
+References: <Z1oR3qxjr8hHbTpN@google.com>
+ <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
+ <Z2B2oZ0VEtguyeDX@google.com>
+ <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
+ <Z35_34GTLUHJTfVQ@google.com>
+ <20250108154901.GFZ36ebXAZMFZJ7D8t@fat_crate.local>
+ <Z36zWVBOiBF4g-mW@google.com>
+ <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
+ <20250111125215.GAZ4Jpf6tbcoS7jCzz@fat_crate.local>
+ <Z4qnzwNYGubresFS@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|SJ0PR12MB7008:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1a30f40-82a7-43d7-f833-08dd37c5e0df
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UzJrRklsWWpaSFZIaUl5TDdON3paa0NHYy83ZCtFQW5IRDFvemVIbUlJNEla?=
- =?utf-8?B?Wi9OUDNWNHQzUFZaeWZWT01HRE4rWXpocEdvRmhtOTdNMWV4c0wydXowVVlu?=
- =?utf-8?B?Y0xxTFhWUVk4SklmY0dBOXQvK3kxNVU0ZHNVRG5WR01MM3RYQmMxZXJiTm9U?=
- =?utf-8?B?empKTkdCc3UxRkp2bU1TUDBIWlQrSTY0VCtkK3h5Nmh1VUg0Tk5MODJYWHIr?=
- =?utf-8?B?blowSDNGME5kVERaMzhYWHVDbVpLRjNDbE9ZRUZJWkJKdW9HeEUySnROc0hv?=
- =?utf-8?B?UGE2WUsydzhNRThoWVR5d0dlN1M2Z0RmbnBNYXJEVjQ2b2R0VlByaUtsc2h4?=
- =?utf-8?B?NlMwd3pLQXhjYUw3Smw5TGFSNkkrUVJUVXFwcjc2RWFudytvQUppVGNmcm9X?=
- =?utf-8?B?RXVMT3JObXcxaDJMTFI2Z2h3b3FaSG1jSzloaWF6RGVMckxzQmZpYkRCN1lt?=
- =?utf-8?B?Wm8yVDE5azdqVzRETE9RLzNMbEwrbExTcWRQTmdSbjB4RlR0Qlcvc1NjbzZN?=
- =?utf-8?B?TzAwSTNISkk4QWdPcHo4VTJzZ0pVeC9wakFxSU8xL2dSYTJxdEZCM0I0UXZZ?=
- =?utf-8?B?VEJySXlBaFFQL3c5a1dFKzdtQU8wSDV6WTJmY2NvelJrZFNQM3c3ZE4xZFVO?=
- =?utf-8?B?T2IvRnRRaCtaaW1SVWN0dFVZRU0xSTNRZFJpSWxKNmJQRE1HUW0yOWJ1Yk16?=
- =?utf-8?B?VDlPMm45VjRDMnF1S0pXTUxBaWVqZ0ZjMldEaHFEbnVabmhXWDUvR2lXRzdJ?=
- =?utf-8?B?TEw5WnBvOXpJN3VyWitYRXB2TDVKMVFqaDVYZ1AxcHZVVVlRc3paSm5BQXZs?=
- =?utf-8?B?ZkhjVVhjTWt2dW5Oc0lFZkNHRzErczhhZkFDV0FnNWZtcldYU0dSRS85WHVU?=
- =?utf-8?B?RjhMYVhZR1Z0M1l0QzB6ZlpMN2l6SmFWVWl4YzBDdEpTN0toQTZDblhSelUr?=
- =?utf-8?B?a0dSeDZzekNWcGFwbW8vSjZ1dnJTL3V2VDBjTmtQRUZ4T05TTlZXYnlubFNl?=
- =?utf-8?B?bnpuODBDV2ladC9xbXJLbm9iOE5wMmkxdldDdXM2QWwvd1J2cTF4ZUVDUlhR?=
- =?utf-8?B?TFlMaFIrWk81UXBXTUdrYWtOQVVsVE5OMUdudlJONzdHWWlsQjFKMXpicjNL?=
- =?utf-8?B?UHJHTVN4SHltTXN6Qk84WjJrK0xIb2I5MjhPbjdXcVRoQW44bmYrdnFkRFFm?=
- =?utf-8?B?TkdDMkk1WTF1eHZoeGM3M0NMN29LdEtHY2s4bHdycWxySzFUcFVISlRJQkxp?=
- =?utf-8?B?QjZFUm1PbzFQbWVZa0ppNjhnU3JUMEl5MW5MajN6Q1hFa1JGbUx4am5rNWwx?=
- =?utf-8?B?VytmbHJOVlhtZHFtNmVVZTdqNko1MTB6dVdERFZCdnVTb0RLbGE3Mk4zWFUv?=
- =?utf-8?B?RkphZzVXLyt6eDBuMzNqTFVnMWltblRDaXVvb1pLaG5RWjMzRTU5SWNUejI1?=
- =?utf-8?B?bVE2YlNvSVF4NlFxMzRvMVorbnV5K29JM3hBdERVcmdNMTN4R0JVdkNUUzcz?=
- =?utf-8?B?L1NmdUFvUHVudGFFeGp4SjFUc2kxOCtJYVFqdzRVanhWV2Uwb2hrZWdMVVFj?=
- =?utf-8?B?NXFmbjdTem52MTBzUFVRTS9sVGtiODBMRnBndXF5bUlFWEU5dG5hbWsrOWNo?=
- =?utf-8?B?L2plaG9sOFlodG1YUVE2N1RnZXJXemhNek9mT1hZMjZpQ0lXL3VWUHZ4cllZ?=
- =?utf-8?B?UVA2dWxGZ0NCLzVhSHhDZVBTWHp6V3JBci9kaDZlQkhaQmtRN29Wci8ycjRh?=
- =?utf-8?B?b3I2RU9NWUNnbnpQWExvZzlmcDFwSXJUY1ZCR21xcHcreHVVdHEwZ0Q1dTZQ?=
- =?utf-8?B?dWhEUFNrWDllbWdIUmVSdz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QUl5SUFQcCtxVlVwRmVFNXo3cFZseHl5bzAvYitlL2YwNVpIaWQyekp5ak5k?=
- =?utf-8?B?bUxZNXJCaDN2Z1pJWkxIdjlGQTF3N3oxSkRsVUExd3JZdU9vTHZGbEJlK3ZF?=
- =?utf-8?B?VGhBTGlXZ2dseTNEdmlvRXBydkVhWUpTQnoxbFd2a1ZER1dvQ3ZlUGdCZmNs?=
- =?utf-8?B?ZDE3S0RmbXFWYmpMWmh0NEhFNXpscVlBdHliRW4wNkVpbW9kdnFFdWRSVXFm?=
- =?utf-8?B?UDJZRDFEMnVPUGk3VmtYbEtDUmlMUEdFaHd5WVpVOHkrNGcrVTA3NXMvcGRh?=
- =?utf-8?B?c3EzMGE4SElyMDBnZ1ZaWkVvQjR4Z21RY1B1RHdNNGFjbEFuUWhFTFp6WCs1?=
- =?utf-8?B?TkFiM3QzRDhhRUc4UlNqbDNjRXNjTFlMM0gwcGdBaFo4eFVoVmpEMkRVSkZi?=
- =?utf-8?B?UmFKanMwbkhDNmpQZ3ExNEhRYXBNUDk3NnBPeFNOSHZvOE00bUFMdiszdFFM?=
- =?utf-8?B?S21TamtSNXUySVVzOG1FOTVTVDY4N3dZMjhTZlBNT2NxS3BoNUxRUDdiMjJ4?=
- =?utf-8?B?cnptVlBGR2k5dDVBRWx2WjdYTU12R1lEN3lPTDBPSnJDcjZkeEthNUgxR2hD?=
- =?utf-8?B?RjJkVlZOYkxzRWZmSURkSGp5NGtydktKVmJGdUpXTEM3VVVFS3ByNEpna0U3?=
- =?utf-8?B?bDJNeTg2dU9xOStwcHkrM3lpMTRZcEptYVNLOFo3d2VmRDFJaUZsVSsrSTlD?=
- =?utf-8?B?S2hVdyt2SzJjQmxTdFNsRFhxMlpIM3VCYkNRSEtpS1N1bU1FKzVaQ1NUTWZQ?=
- =?utf-8?B?UW1YeGFrNCtqVVZHODk4cGE0ZWp5QUgxSEF3eE1WYjJMeC9iRDZVZW5GWHA3?=
- =?utf-8?B?ZkRDZDZvTjUxdnNFRUlLNXJQa0NZdUJSWWY5dDV2Smo4aXhTMkpxZWs3N1ZX?=
- =?utf-8?B?aVVCdnJxcFZ4V0l1MEVVeVdrZ3llY0dPaCt0b2JXU3dwK0RXWjFJMFlVMzV0?=
- =?utf-8?B?TDdKQ0pEVFd5enBOR25qaTJkay9HdndGTi90QUZoSG5WUUNISlo1N1FTbDZy?=
- =?utf-8?B?bjZVQ0srSm5renFKVy9BNkRrZTM3U0xWRmJHOXFDQVZwTDE0UVpGWlBxMGpz?=
- =?utf-8?B?WkxHQ1JVNW5OV3lCalV5UXNnSjk2d25MaEJ3YVd3OTBNZGJCWlFvbWtNS3Yw?=
- =?utf-8?B?MDdyRnp2Y0dXQVFyOWRvdkxPdUxFQjU1eGtOdmxCUmliMEk1WVFxMVc2S09F?=
- =?utf-8?B?ZzNqc3M5eWdoK2ZKM0lvRFFrUDE0cHJyVzd3TGdXRWpOenhiQzdHM1B1QXpL?=
- =?utf-8?B?WmRNUmY2OHhYbjcxcUhncWFQYll4WVVQMExXSUN3dkVqNlAwamVQTWkxTDBD?=
- =?utf-8?B?Z0Z1RmhjYU80ZEVNQnVBZFFsV01Pc0srbWhodzRlZll6UHNaY0JXZW11QUZN?=
- =?utf-8?B?QUF3N1Y5S1FlM0tUMzhxWjJBMlZDN0pXalNQVis4WUJScXI0dGIrUS9Kclg5?=
- =?utf-8?B?bm1penpTMVJDTDNyc2NDNlZrNW01NVNYbjZQSFg5RmFUdGtKL3pMMlFZbFBw?=
- =?utf-8?B?ZUxYNWtjTUFzTE5zeWk4Q0xEYm5ZdUZMRnorNzQxVkd6R0RXY0FVdXJzNjRm?=
- =?utf-8?B?OTJOTC9pdzJqd0ltZjI0dEE1bnAzTEZ5UXVBa2RTdk9BTXhlWWpCYTFneS9O?=
- =?utf-8?B?Nm9RM05PRFJIdk9tMFkwdG8ranpNVUVNZjVNNW4xYllnbnA4eWNSZElHVS9n?=
- =?utf-8?B?a0M5c0xQd202bXdaUUNmLzd6ZVpRMCswMGtnN3BveS9YM250cGc4L2lpWXh6?=
- =?utf-8?B?YlhmRWdjVFFWSFlhcVA1MlJhRitLdVJUWEVFLzBLRkg1U2xnRU9DWEZSUTZk?=
- =?utf-8?B?V096b290bmNUdDlVcTBHaXFoN1dVR3J2OXVMdlY5SFIxOHcxOGI1OWZpeE5r?=
- =?utf-8?B?bVZjWjVrRzBWekdpbk85UCt2aDVNTDdQMzNxK0ZoQjdlYVhtWENIaTFEMlhH?=
- =?utf-8?B?b1RqQWd3NE4yQVNEbHpKZWJ2SjdnejZBbWNxRkJ1RGIzK1pFdEdObGxXUG9t?=
- =?utf-8?B?Ylh5S3ZNTjRGSjUzd3FhRnQvcnpVc1J1OGc1bHo4Qy8yRnJHTTk3ZU1xY2Fu?=
- =?utf-8?B?aW9LVGNtSlVkTENnSkhuMWl6RXphUjd5RmRnQ0dYOG43NUE1b042dXovbVJm?=
- =?utf-8?Q?VIufJ6kjuYpZ+QumH4dNw4qXJ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1a30f40-82a7-43d7-f833-08dd37c5e0df
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2025 13:41:58.1089
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GAlyALZ/JaRdPN08sfuyH8IVpaLKukdIIB0vBgGin2QGTSvkEua4DbuVmU1rKD0Ve5CBnx/VxaItksfiAbxGcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7008
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z4qnzwNYGubresFS@google.com>
 
-On 1/3/2025 1:48 PM, Manali Shukla wrote:
-> The upcoming new Idle HLT Intercept feature allows for the HLT
-> instruction execution by a vCPU to be intercepted by the hypervisor
-> only if there are no pending V_INTR and V_NMI events for the vCPU.
-> When the vCPU is expected to service the pending V_INTR and V_NMI
-> events, the Idle HLT intercept won’t trigger. The feature allows the
-> hypervisor to determine if the vCPU is actually idle and reduces
-> wasteful VMEXITs.
+On Fri, Jan 17, 2025 at 10:56:15AM -0800, Sean Christopherson wrote:
+> No preference, either way works for me.
+
+Yeah, too late now. Will queue it after -rc1.
+
+> Heh, no preference again.  In case you want to add Co-developed-by, here's my SoB:
 > 
-> The Idle HLT intercept feature is used for enlightened guests who wish
-> to securely handle the events. When an enlightened guest does a HLT
-> while an interrupt is pending, hypervisor will not have a way to
-> figure out whether the guest needs to be re-entered or not. The Idle
-> HLT intercept feature allows the HLT execution only if there are no
-> pending V_INTR and V_NMI events.
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Thanks. Added.
+
+> Any objection to calling this X86_FEATURE_SRSO_BP_SPEC_REDUCE?  More below.
+
+It sure is a better name. Lets leave SRSO_MSR_FIX in the comment so that
+grepping can find it as SRSO_MSR_FIX is what is in the official doc. IOW:
+
++#define X86_FEATURE_SRSO_BP_SPEC_REDUCE        (20*32+31) /*
++                                                   * BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs.
++                                                   * (SRSO_MSR_FIX in the official doc).
++
+
+> At the risk of getting too clever, what if we use the X86_FEATURE to communicate
+> that KVM should toggle the magic MSR?
+
+Not too clever at all. I myself have used exactly this scheme to communicate
+settings to other code and actually I should've thought about it... :-\
+
+Definitely better than the silly export.
+
+> That'd avoid the helper+export, and up to this point "srso_mitigation" has
+> been used only for documentation purposes.
 > 
-> Presence of the Idle HLT Intercept feature is indicated via CPUID
-> function Fn8000_000A_EDX[30].
-> 
-> Document for the Idle HLT intercept feature is available at [1].
-> 
-> This series is based on kvm-x86/next (13e98294d7ce) + [2] + [3].
-> 
-> Testing Done:
-> - Tested the functionality for the Idle HLT intercept feature
->   using selftest ipi_hlt_test.
-> - Tested on normal, SEV, SEV-ES, SEV-SNP guest for the Idle HLT intercept
->   functionality.
-> - Tested the Idle HLT intercept functionality on nested guest.
-> 
-> v4 -> v5
-> - Incorporated Sean's review comments on nested Idle HLT intercept support.
-> - Make svm_idle_hlt_test independent of the Idle HLT to run on all hardware.
-> 
-> v3 -> v4
-> - Drop the patches to add vcpu_get_stat() into a new series [2].
-> - Added nested Idle HLT intercept support.
-> 
-> v2 -> v3
-> - Incorporated Andrew's suggestion to structure vcpu_stat_types in
->   a way that each architecture can share the generic types and also
->   provide its own.
-> 
-> v1 -> v2
-> - Done changes in svm_idle_hlt_test based on the review comments from Sean.
-> - Added an enum based approach to get binary stats in vcpu_get_stat() which
->   doesn't use string to get stat data based on the comments from Sean.
-> - Added safe_halt() and cli() helpers based on the comments from Sean.
-> 
-> [1]: AMD64 Architecture Programmer's Manual Pub. 24593, April 2024,
->      Vol 2, 15.9 Instruction Intercepts (Table 15-7: IDLE_HLT).
->      https://bugzilla.kernel.org/attachment.cgi?id=306250
-> 
-> [2]: https://lore.kernel.org/kvm/20241220013906.3518334-1-seanjc@google.com/T/#u
-> 
-> [3]: https://lore.kernel.org/kvm/20241220012617.3513898-1-seanjc@google.com/T/#u
-> 
-> ---
-> 
-> V4: https://lore.kernel.org/kvm/20241022054810.23369-1-manali.shukla@amd.com/
-> V3: https://lore.kernel.org/kvm/20240528041926.3989-4-manali.shukla@amd.com/T/
-> V2: https://lore.kernel.org/kvm/20240501145433.4070-1-manali.shukla@amd.com/
-> V1: https://lore.kernel.org/kvm/20240307054623.13632-1-manali.shukla@amd.com/
-> 
-> Manali Shukla (3):
->   x86/cpufeatures: Add CPUID feature bit for Idle HLT intercept
->   KVM: SVM: Add Idle HLT intercept support
->   KVM: selftests: Add self IPI HLT test
-> 
->  arch/x86/include/asm/cpufeatures.h            |  1 +
->  arch/x86/include/asm/svm.h                    |  1 +
->  arch/x86/include/uapi/asm/svm.h               |  2 +
->  arch/x86/kvm/svm/svm.c                        | 13 ++-
->  tools/testing/selftests/kvm/Makefile.kvm      |  1 +
->  .../selftests/kvm/include/x86/processor.h     |  1 +
->  tools/testing/selftests/kvm/ipi_hlt_test.c    | 85 +++++++++++++++++++
->  7 files changed, 101 insertions(+), 3 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/ipi_hlt_test.c
-> 
-> 
-> base-commit: 13e98294d7cec978e31138d16824f50556a62d17
-> prerequisite-patch-id: cb345fc0d814a351df2b5788b76eee0eef9de549
-> prerequisite-patch-id: 71806f400cffe09f47d6231cb072cbdbd540de1b
-> prerequisite-patch-id: 9ea0412aab7ecd8555fcee3e9609dbfe8456d47b
-> prerequisite-patch-id: 3504df50cdd33958456f2e56139d76867273525c
-> prerequisite-patch-id: 674e56729a56cc487cb85be1a64ef561eb7bac8a
-> prerequisite-patch-id: 48e87354f9d6e6bd121ca32ab73cd0d7f1dce74f
-> prerequisite-patch-id: 74daffd7677992995f37e5a5cb784b8d4357e342
-> prerequisite-patch-id: 509018dc2fc1657debc641544e86f5a92d04bc1a
-> prerequisite-patch-id: 4a50c6a4dc3b3c8c8c640a86072faafb7bae4384
+> The flag just needs to be cleared in two locations, which doesn't seem too
+> awful.  Though if we go that route, SRSO_MSR_FIX is a pretty crappy name :-)
+
+Yap, most def.
+
+> These exports are no longer necessary.
+
+Doh.
+
+> Compile tested only...
+
+Tested on hw.
+
+Thanks!
+
+---
+From: "Borislav Petkov (AMD)" <bp@alien8.de>
+Date: Wed, 13 Nov 2024 13:41:10 +0100
+Subject: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+
+Add support for
+
+  CPUID Fn8000_0021_EAX[31] (SRSO_MSR_FIX). If this bit is 1, it
+  indicates that software may use MSR BP_CFG[BpSpecReduce] to mitigate
+  SRSO.
+
+enable this BpSpecReduce bit to mitigate SRSO across guest/host
+boundaries.
+
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+---
+ Documentation/admin-guide/hw-vuln/srso.rst | 21 +++++++++++++++++++++
+ arch/x86/include/asm/cpufeatures.h         |  4 ++++
+ arch/x86/include/asm/msr-index.h           |  1 +
+ arch/x86/kernel/cpu/bugs.c                 | 14 +++++++++++++-
+ arch/x86/kvm/svm/svm.c                     | 14 ++++++++++++++
+ 5 files changed, 53 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/admin-guide/hw-vuln/srso.rst b/Documentation/admin-guide/hw-vuln/srso.rst
+index 2ad1c05b8c88..b856538083a2 100644
+--- a/Documentation/admin-guide/hw-vuln/srso.rst
++++ b/Documentation/admin-guide/hw-vuln/srso.rst
+@@ -104,6 +104,27 @@ The possible values in this file are:
+ 
+    (spec_rstack_overflow=ibpb-vmexit)
+ 
++ * 'Mitigation: Reduced Speculation':
++
++   This mitigation gets automatically enabled when the above one "IBPB on
++   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
++
++   It gets automatically enabled on machines which have the
++   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the code logic is to switch
++   to the above =ibpb-vmexit mitigation because the user/kernel boundary is
++   not affected anymore and thus "safe RET" is not needed.
++
++   After enabling the IBPB on VMEXIT mitigation option, the BpSpecReduce bit
++   is detected (functionality present on all such machines) and that
++   practically overrides IBPB on VMEXIT as it has a lot less performance
++   impact and takes care of the guest->host attack vector too.
++
++   Currently, the mitigation uses KVM's user_return approach
++   (kvm_set_user_return_msr()) to set the BpSpecReduce bit when a vCPU runs
++   a guest and reset it upon return to host userspace or when the KVM module
++   is unloaded. The intent being, the small perf impact of BpSpecReduce should
++   be incurred only when really necessary.
++
+ 
+ 
+ In order to exploit vulnerability, an attacker needs to:
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 508c0dad116b..43653f2704c9 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -468,6 +468,10 @@
+ #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
+ #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
+ #define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
++#define X86_FEATURE_SRSO_BP_SPEC_REDUCE	(20*32+31) /*
++						    * BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs.
++						    * (SRSO_MSR_FIX in the official doc).
++						    */
+ 
+ /*
+  * Extended auxiliary flags: Linux defined - for features scattered in various
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 3f3e2bc99162..4cbd461081a1 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -719,6 +719,7 @@
+ 
+ /* Zen4 */
+ #define MSR_ZEN4_BP_CFG                 0xc001102e
++#define MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT 4
+ #define MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT 5
+ 
+ /* Fam 19h MSRs */
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 5a505aa65489..9e3ea7f1b358 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -2523,6 +2523,7 @@ enum srso_mitigation {
+ 	SRSO_MITIGATION_SAFE_RET,
+ 	SRSO_MITIGATION_IBPB,
+ 	SRSO_MITIGATION_IBPB_ON_VMEXIT,
++	SRSO_MITIGATION_BP_SPEC_REDUCE,
+ };
+ 
+ enum srso_mitigation_cmd {
+@@ -2540,7 +2541,8 @@ static const char * const srso_strings[] = {
+ 	[SRSO_MITIGATION_MICROCODE]		= "Vulnerable: Microcode, no safe RET",
+ 	[SRSO_MITIGATION_SAFE_RET]		= "Mitigation: Safe RET",
+ 	[SRSO_MITIGATION_IBPB]			= "Mitigation: IBPB",
+-	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only"
++	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only",
++	[SRSO_MITIGATION_BP_SPEC_REDUCE]	= "Mitigation: Reduced Speculation"
+ };
+ 
+ static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
+@@ -2663,6 +2665,12 @@ static void __init srso_select_mitigation(void)
+ 
+ ibpb_on_vmexit:
+ 	case SRSO_CMD_IBPB_ON_VMEXIT:
++		if (boot_cpu_has(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
++			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
++			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
++			break;
++		}
++
+ 		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
+ 			if (!boot_cpu_has(X86_FEATURE_ENTRY_IBPB) && has_microcode) {
+ 				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
+@@ -2684,6 +2692,10 @@ static void __init srso_select_mitigation(void)
+ 	}
+ 
+ out:
++
++	if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
++		setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
++
+ 	pr_info("%s\n", srso_strings[srso_mitigation]);
+ }
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 21dacd312779..ee14833f00e5 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -256,6 +256,7 @@ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
+  * defer the restoration of TSC_AUX until the CPU returns to userspace.
+  */
+ static int tsc_aux_uret_slot __read_mostly = -1;
++static int zen4_bp_cfg_uret_slot __ro_after_init = -1;
+ 
+ static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
+ 
+@@ -1541,6 +1542,11 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+ 	    (!boot_cpu_has(X86_FEATURE_V_TSC_AUX) || !sev_es_guest(vcpu->kvm)))
+ 		kvm_set_user_return_msr(tsc_aux_uret_slot, svm->tsc_aux, -1ull);
+ 
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
++		kvm_set_user_return_msr(zen4_bp_cfg_uret_slot,
++					BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT),
++					BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT));
++
+ 	svm->guest_state_loaded = true;
+ }
+ 
+@@ -5298,6 +5304,14 @@ static __init int svm_hardware_setup(void)
+ 
+ 	tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
+ 
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
++		zen4_bp_cfg_uret_slot = kvm_add_user_return_msr(MSR_ZEN4_BP_CFG);
++		if (WARN_ON_ONCE(zen4_bp_cfg_uret_slot < 0)) {
++			r = -EIO;
++			goto err;
++		}
++	}
++
+ 	if (boot_cpu_has(X86_FEATURE_AUTOIBRS))
+ 		kvm_enable_efer_bits(EFER_AUTOIBRS);
+ 
+-- 
+2.43.0
 
 
-A gentle reminder for the review.
 
--Manali
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
