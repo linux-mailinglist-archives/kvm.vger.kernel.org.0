@@ -1,248 +1,150 @@
-Return-Path: <kvm+bounces-35925-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2CEA162E6
-	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2025 17:28:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA5CA1648E
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 00:55:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD5501649C3
-	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2025 16:28:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EA02188524D
+	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2025 23:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65BDA1DF74E;
-	Sun, 19 Jan 2025 16:28:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC8C1E0B67;
+	Sun, 19 Jan 2025 23:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b="DiXTQZFH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zvn/mWwh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700C01552E3
-	for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 16:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997921DA3D;
+	Sun, 19 Jan 2025 23:55:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737304087; cv=none; b=p0BIo1yvoO+RbPuuIJxKQ+3GiRTgDscRsr5DCC2y6O95MOkNB6BXu8es9xw9YzhMDNQAfLI5//AXZLL6GMpXZI5cCmAOl8sw9Cj0gzYqdxDziV5rH1t1ers+rRw+7AN0oZPtsH+nr4UcCEr1Gz6vBBC/IXdpxQQysQ8KR6sOT6s=
+	t=1737330946; cv=none; b=pF2+XpRSLaBwwaG+6aNIseouvPRQ8scbEIyUSHvqCKPINc9X+2+op4CyyWsC5gn+MCkuMs/zarPlZbuBg/D9i6WYKaV6XzfMsNFq4ll0H8cqrycit7cN7VKIY0SfeOngdwt+tmqsA4gt4eR+p4rVj/1cDWrHbh8NfxC71Emq4jM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737304087; c=relaxed/simple;
-	bh=/4si3pI3PSm7YJqMDJWO6oO0UM+zHDLK1aDous38f4A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f7KVak32V7GDQZBS8eNoBt5N0GJU1TWMiuRR2fxk05n4Uajvanvu0JDl8EkPtNGC9624j6e+2JjRpbwsRvWiGYrGHRHKHqvQJbVcv7zWxYZSNy9vYvdoYQGJggrg3bMpxE55UHrXghDOr19POLt1dkjhEIvoRsistS6Fr8Q26tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sslab.ics.keio.ac.jp; spf=none smtp.mailfrom=sslab.ics.keio.ac.jp; dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b=DiXTQZFH; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sslab.ics.keio.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sslab.ics.keio.ac.jp
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2f43d17b0e3so6729874a91.0
-        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 08:28:05 -0800 (PST)
+	s=arc-20240116; t=1737330946; c=relaxed/simple;
+	bh=bQXpGVepSY9XdcnDxQo3Am6gt1NpTZUKbJRTtrAZfAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KFVl22PXUHDBYZMjrUQE6S/BM6pdeo5Vi7bIkS8kDawtIjoaUgME1NCRm6fJv3FYOoKW3rdy0T/sD1v/koP2WubtuvE0K2vboe5g+w7srS4l0wa0o1VkhfxcZdHfGY5bW0Rl8BFuWv3Nnip3ap9B3Buf16im9pD1c6gTAQ755tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zvn/mWwh; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21c2f1b610dso61925645ad.0;
+        Sun, 19 Jan 2025 15:55:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sslab.ics.keio.ac.jp; s=google; t=1737304084; x=1737908884; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=snZH8XfRlyi2k+V8MAtXkadSoU1vzCD/EgFRaVm518E=;
-        b=DiXTQZFHMTZKyNQbIJTHbkpeqoj93A875vvYHxanS3OX36REbKP5mZE3CGs+jDi8pw
-         38NbzlHDVt7twPpHPKY7jxqbmx5xxZBcfG7Hd5wlFXqwOocY9d4MajcFI2aAxIjLZZmj
-         lMH9rApIS0IbgeM4DnSeHlFnoiZWfd/DnsScQ=
+        d=gmail.com; s=20230601; t=1737330943; x=1737935743; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y2XVN5sGwZEZd9OemkxZCpLaBh1+XBAUoUQLOEGHa48=;
+        b=Zvn/mWwhWQmTlo+1r2f9desO7d92VLC/j6e8698mvTIMb601I4TC/qmrgjESUVDwiN
+         5e/Ib9DhCzr+78R91jcccFqyAX/vLr2RqreiArNLGOIA1Jh+rV4uGgAoJQvMkG8xHpb+
+         5tx0swdHJUUOUAwfJXbCnjsjIrORONo4IkbpJ1JGKoYl7EruXqYqImzoDhxKWvgyL5jO
+         DiwDi2fvCPmgAH/kg7BHO3CMBIHR2GfhEDwCtijBrhFD2FCYeOQjbCEBzgCzs77kO6bd
+         C9P1OHoAsIcGKalvo6+vxBQ3QJJr+Gl/GoKt2UM4YrTn0Oepif4mP/E02s+f6DOnMKML
+         G7KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737304084; x=1737908884;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=snZH8XfRlyi2k+V8MAtXkadSoU1vzCD/EgFRaVm518E=;
-        b=Zw/ZNrATI71s3WD3MqkF08XORlmpSFyDysiYEaanMa8OftbFGCdZxyFnoluw3+O2S/
-         vDQExHitJo7cQWmqDiKyc9j1+pv/COStr1XJt0NbIzfinGdKAtaW1ZylMExA+Hub2k4j
-         OscVnprV5htaI3Q+jEiC28JIxMLMLgFLDStsm9Bs7gF49Oy4KRRhvGCvOJkrLm33pdwg
-         3PyRY/0C2OAewXbk09NNf3lc1uzGYxlWHK0znqXKu7sBBT6aPGQh9z8AmBsKPDLDAAD+
-         4frwi7xRHXZxDA7qcG24GJOXHJxlB8/RITJypgzcRg4RU5nCwZmJaJLEKOlEtEoEkSOM
-         8fJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWQkLS9M8wDklpiGriBp3a+ZUGhjc0LVltn6DsFm8jq1kLdSZjuPP03Ezu9jNy1NlUrRVc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRlySFFcDSqaSdcxTCQ9ksz3uaoFA3TZYY3PEm8yjlOs736DEK
-	zr2WaGslqR36kJSBw9kSg/a1oB8nE56bbE3IqKVnDnsDVdCd/DH/k3WKNkm4Fd8=
-X-Gm-Gg: ASbGncstLadDg/kxGCxIkFRlBwevg3JesvOjf3DbdT5p/TgUkn+3xIozZ9c9ufTOONH
-	Dz1o0cjkWo5CqQWpI8XZyR51F2YnXWHJCwVHu0fsZYo/cA589YnoZeXYLPsAaA+yW3KI2QMRW5H
-	Vq4kmfbqiBqfkmsmF4nM0LeLKq8/LkAZklUBRhR/Z6Y8UIXqDQFLs4GEWxJbz2CSPI36sJeYzzf
-	gtjeI0DsefgIWomfQV3Ees6ZwYfgQ1bRxrXImHpR3pgnu7ielSEJ/rVBsnYJslsJJ4FkXmcX6jp
-	GiLV/RUoX7vGKH2PHBhS2N8H6spXN38=
-X-Google-Smtp-Source: AGHT+IEW4ntUF55sqc+yIS9AXd8mkMN5CUu4fCQ4/TxEXUT1tq/21UzBAuqtCWeYuX8sM8+h7I9DAA==
-X-Received: by 2002:a05:6a21:7886:b0:1e1:ae9a:6311 with SMTP id adf61e73a8af0-1eb21479b92mr12731205637.4.1737304084528;
-        Sun, 19 Jan 2025 08:28:04 -0800 (PST)
-Received: from saraba.tapir-shark.ts.net ([131.113.100.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab7f190fsm5391625b3a.26.2025.01.19.08.28.02
+        d=1e100.net; s=20230601; t=1737330943; x=1737935743;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y2XVN5sGwZEZd9OemkxZCpLaBh1+XBAUoUQLOEGHa48=;
+        b=tFALb2jnD68vDmeyEcW2JOobgRwja9qU6WaEHX4XYn6IsOSpYOaBbkTOowzSdTYGH/
+         I0E06b0UB7TBydfnyq1vldvXKLPpJn3DZL201jiQmaFs6bbpQfVZB6bsxE7pf8MkQHmb
+         vQNm9qc6RkHX3gmFVMA/3qKXWbXX8Pfbfu7BgcHCMWBc/wS6V3ugNpf6cOgJd8ObYr3p
+         EuKttB/f9NZ3oqiGEgwWLZFOYtmhcbDria7xgRlGtdo2dMhxOZHTMoj7zvWGnI3IhI0G
+         ZUhEtOPhFUkz0l1B3B9Ygwfm7eNoof0V9dHcdCwnYpzpCz+g1QvZe+HZ16g3Dj+VSp4i
+         ceUA==
+X-Forwarded-Encrypted: i=1; AJvYcCVXejwjfDCN4V6VR431dZy89QgsslmJDTEJP1nBkL3eya9gIxNNGD7PTTokxcrDVHsQq24=@vger.kernel.org, AJvYcCWOvu4UI5jo0A+3Eiuo+uwKcMLm2k0iXkBjF8UMCM1tcbr662r14IDn4EIiXQReOHh3no9BtRUDJ8vHfzhl@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuGuP/jL1lkQTJemvvaag1KpJbfm74bYqbzkrIzBhPjfIBvf7J
+	24MGYoo0RvyxZMnLVyIqCyfx8WyUHBr2IsC0Sk+Gav/2TuWSkTn4
+X-Gm-Gg: ASbGncvosmrjJ2jks4SxflMi4ul7+iMCcQSxvJTwG7PRFqbRi83vT09keVFQhIKnJ4t
+	nKEAvPAMQtFg4DaFdwJ/QBJz0WHxN5gI/b3i8A1CUrg0G4RvlDSpn4WFwTQ5ywEdwThxv3LtQIn
+	QYy3R/w7kUts7bgSmirIoSRVId/a6+7u5fn3cIuU4qnyafCGslZ4NXFCZp1DzjHO7Q0Lb9+RQtD
+	4ryigBYC1Er6lmwTuiyUyKPNn6vzaTjB2kCVQ4vN0DuIil6zgrFCXHz8I85zN5ECa4NlA==
+X-Google-Smtp-Source: AGHT+IHWy2tn0ROsIC+XdDJbMemUHnV9qx9ROIXRviCRgGQ8MEqTqrc5MXa6OElcpKZqJPMFTXWKiQ==
+X-Received: by 2002:a05:6a20:a10d:b0:1e0:ca95:3cb2 with SMTP id adf61e73a8af0-1eb2147dd74mr16777728637.8.1737330942467;
+        Sun, 19 Jan 2025 15:55:42 -0800 (PST)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-a9bdd309d91sm5611791a12.48.2025.01.19.15.55.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Jan 2025 08:28:04 -0800 (PST)
-From: Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
-To: seanjc@google.com
-Cc: kentaishiguro@sslab.ics.keio.ac.jp,
-	kvm@vger.kernel.org,
-	pbonzini@redhat.com,
-	vkuznets@redhat.com
-Subject: Re: [RFC] Para-virtualized TLB flush for PV-waiting vCPUs
-Date: Mon, 20 Jan 2025 01:27:49 +0900
-Message-Id: <20250119162749.665030-1-kentaishiguro@sslab.ics.keio.ac.jp>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <Z4rM2abMZvurfFDO@google.com>
-References: <Z4rM2abMZvurfFDO@google.com>
+        Sun, 19 Jan 2025 15:55:41 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id E0868418B9B0; Mon, 20 Jan 2025 06:55:38 +0700 (WIB)
+Date: Mon, 20 Jan 2025 06:55:38 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Toralf =?utf-8?Q?F=C3=B6rster?= <toralf.foerster@gmx.de>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux KVM <kvm@vger.kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: kconfig does not accept a lower value for KVM_MAX_NR_VCPUS
+Message-ID: <Z42Q-sbPMA9zZMIC@archie.me>
+References: <03a04e86-c629-44df-9022-05c42b4c736f@gmx.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
-Thank you for your comments.
-I understood the scenario of why my previous change was unsafe.
-
-Also, I like the concept of KVM_VCPU_IN_HOST for tracking whether a vCPU is
-scheduled out because it can be helpful to understand the vCPU's situation
-from guests.
-
-I have tested the attached changes, but I found that the performance
-improvement was somewhat limited. The boundary-checking code prevents
-KVM from setting KVM_VCPU_IN_HOST and KVM_VCPU_PREEMPTED, which may be
-contributing to this limitation.  I think this is a conservative
-approach to avoid using stale TLB entries.
-I referred to this patch:
-https://lore.kernel.org/lkml/20220614021116.1101331-1-sashal@kernel.org/
-Since PV waiting causes the most significant overhead, is it possible to
-allow guests to perform PV flush if vCPUs are PV waiting and scheduled out?
-
-> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> index a1efa7907a0b..e3a6e6ecf70b 100644
-> --- a/arch/x86/include/uapi/asm/kvm_para.h
-> +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> @@ -70,6 +70,7 @@ struct kvm_steal_time {
->  
->  #define KVM_VCPU_PREEMPTED          (1 << 0)
->  #define KVM_VCPU_FLUSH_TLB          (1 << 1)
-> +#define KVM_VCPU_IN_HOST           (1 << 2)
->  
->  #define KVM_CLOCK_PAIRING_WALLCLOCK 0
->  struct kvm_clock_pairing {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index acdd72e89bb0..5e3dc209e86c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5018,8 +5018,11 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
->         struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
->         struct kvm_steal_time __user *st;
->         struct kvm_memslots *slots;
-> -       static const u8 preempted = KVM_VCPU_PREEMPTED;
->         gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
-> +       u8 preempted = KVM_VCPU_IN_HOST;
-> +
-> +       if (vcpu->preempted)
-> +               preempted |= KVM_VCPU_PREEMPTED;
->  
->         /*
->          * The vCPU can be marked preempted if and only if the VM-Exit was on
-> @@ -5037,7 +5040,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
->         if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
->                 return;
->  
-> -       if (vcpu->arch.st.preempted)
-> +       if (vcpu->arch.st.preempted == preempted)
-This code may clear KVM_VCPU_FLUSH_TLB.
-https://lore.kernel.org/lkml/20200803121849.869521189@linuxfoundation.org/
->                 return;
->  
->         /* This happens on process exit */
-> @@ -5055,7 +5058,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
->         BUILD_BUG_ON(sizeof(st->preempted) != sizeof(preempted));
->  
->         if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
-> -               vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
-> +               vcpu->arch.st.preempted = preempted;
->  
->         mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
->  }
-> @@ -5064,7 +5067,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  {
->         int idx;
->  
-> -       if (vcpu->preempted) {
-> +       if (vcpu->preempted || !kvm_xen_msr_enabled(vcpu->kvm)) {
->                 /*
->                  * Assume protected guests are in-kernel.  Inefficient yielding
->                  * due to false positives is preferable to never yielding due
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="8BgJX5zGcP5XDR3U"
+Content-Disposition: inline
+In-Reply-To: <03a04e86-c629-44df-9022-05c42b4c736f@gmx.de>
 
 
+--8BgJX5zGcP5XDR3U
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
- arch/x86/include/uapi/asm/kvm_para.h |  1 +
- arch/x86/kernel/kvm.c                |  2 +-
- arch/x86/kvm/x86.c                   | 11 +++++++----
- 3 files changed, 9 insertions(+), 5 deletions(-)
+On Sun, Jan 19, 2025 at 12:04:04PM +0100, Toralf F=C3=B6rster wrote:
+> I was wondering why I cannot put a lower value here during make oldconfig:
+>=20
+>=20
+>   Maximum number of vCPUs per KVM guest (KVM_MAX_NR_VCPUS) [1024] (NEW) 16
+>   Maximum number of vCPUs per KVM guest (KVM_MAX_NR_VCPUS) [1024] (NEW) 8
+>   Maximum number of vCPUs per KVM guest (KVM_MAX_NR_VCPUS) [1024] (NEW)
+>=20
 
-diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-index a1efa7907a0b..6ef06c3f234b 100644
---- a/arch/x86/include/uapi/asm/kvm_para.h
-+++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -70,6 +70,7 @@ struct kvm_steal_time {
- 
- #define KVM_VCPU_PREEMPTED          (1 << 0)
- #define KVM_VCPU_FLUSH_TLB          (1 << 1)
-+#define KVM_VCPU_IN_HOST           (1 << 2)
- 
- #define KVM_CLOCK_PAIRING_WALLCLOCK 0
- struct kvm_clock_pairing {
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 21e9e4845354..17ea1111a158 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -668,7 +668,7 @@ static void kvm_flush_tlb_multi(const struct cpumask *cpumask,
- 		 */
- 		src = &per_cpu(steal_time, cpu);
- 		state = READ_ONCE(src->preempted);
--		if ((state & KVM_VCPU_PREEMPTED)) {
-+		if ((state & KVM_VCPU_PREEMPTED) || (state & KVM_VCPU_IN_HOST)) {
- 			if (try_cmpxchg(&src->preempted, &state,
- 					state | KVM_VCPU_FLUSH_TLB))
- 				__cpumask_clear_cpu(cpu, flushmask);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c79a8cc57ba4..27b558ae1ad2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5019,8 +5019,11 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 	struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
- 	struct kvm_steal_time __user *st;
- 	struct kvm_memslots *slots;
--	static const u8 preempted = KVM_VCPU_PREEMPTED;
- 	gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
-+	u8 preempted = KVM_VCPU_IN_HOST;
-+
-+	if (vcpu->preempted)
-+		preempted |= KVM_VCPU_PREEMPTED;
- 
- 	/*
- 	 * The vCPU can be marked preempted if and only if the VM-Exit was on
-@@ -5038,7 +5041,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
- 		return;
- 
--	if (vcpu->arch.st.preempted)
-+	if (vcpu->arch.st.preempted == preempted)
- 		return;
- 
- 	/* This happens on process exit */
-@@ -5056,7 +5059,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 	BUILD_BUG_ON(sizeof(st->preempted) != sizeof(preempted));
- 
- 	if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
--		vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
-+		vcpu->arch.st.preempted = preempted;
- 
- 	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
- }
-@@ -5065,7 +5068,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	int idx;
- 
--	if (vcpu->preempted) {
-+	if (vcpu->preempted || !kvm_xen_msr_enabled(vcpu->kvm)) {
- 		/*
- 		 * Assume protected guests are in-kernel.  Inefficient yielding
- 		 * due to false positives is preferable to never yielding due
--- 
-2.25.1
+Hi Toralf,
 
+=46rom arch/x86/kvm/Kconfig:
+
+>config KVM_MAX_NR_VCPUS
+>	int "Maximum number of vCPUs per KVM guest"
+>	depends on KVM
+>	range 1024 4096
+>	default 4096 if MAXSMP
+>	default 1024
+>	help
+>	  Set the maximum number of vCPUs per KVM guest. Larger values will incre=
+ase
+>	  the memory footprint of each KVM guest, regardless of how many vCPUs are
+>	  created for a given VM.
+
+I don't know your use case, but you can safely choose the default (1024).
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--8BgJX5zGcP5XDR3U
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZ42Q+gAKCRD2uYlJVVFO
+o4+YAQCXy4KWvcbnFObWnVXjInsKyXUHAJRPteJnuJ6u1DlL5gEA3X39TPhmwNMq
+BW6VSoiw50OHIg6ZimjFJUpnG9UdmQk=
+=pcnc
+-----END PGP SIGNATURE-----
+
+--8BgJX5zGcP5XDR3U--
 
