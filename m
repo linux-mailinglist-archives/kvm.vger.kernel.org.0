@@ -1,230 +1,248 @@
-Return-Path: <kvm+bounces-35924-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35925-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 708FAA16242
-	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2025 15:40:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC2CEA162E6
+	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2025 17:28:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9070D164F85
-	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2025 14:40:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD5501649C3
+	for <lists+kvm@lfdr.de>; Sun, 19 Jan 2025 16:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2D21DF260;
-	Sun, 19 Jan 2025 14:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65BDA1DF74E;
+	Sun, 19 Jan 2025 16:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pBcAjeCU"
+	dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b="DiXTQZFH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E851DF244
-	for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 14:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700C01552E3
+	for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 16:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737297637; cv=none; b=W646k0oDCbI/fqmtQajUYpguBTCoQrswn9udsP7UfJceCSbauTNxtv6AVqyAlEPns8NP28+VAqVONXDNcG+5GIJd2i0HhVJnufcP3U1PfDJzsZtd6lubRbETB8w6M2BWDghcJvtTaFf+qKWO1sKqEWCsQAYa3i4bgW2nzhebvd4=
+	t=1737304087; cv=none; b=p0BIo1yvoO+RbPuuIJxKQ+3GiRTgDscRsr5DCC2y6O95MOkNB6BXu8es9xw9YzhMDNQAfLI5//AXZLL6GMpXZI5cCmAOl8sw9Cj0gzYqdxDziV5rH1t1ers+rRw+7AN0oZPtsH+nr4UcCEr1Gz6vBBC/IXdpxQQysQ8KR6sOT6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737297637; c=relaxed/simple;
-	bh=iK+QlwMaOkaHjaTHgJGJg0BIN7roOg7rWdqeebnpM5g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rv6Xy5vAovkM1WAGi1vjjRBMeGJj81vGSAD0tMVDTKqiZ1+MppyPIygpFyrna0OjWdwSRcOWjD+SSKjp3qbJuFm3T912RITDXpAuBbeR0AL3+ORB+FCcTWL+HysnWIqnNYt6SCbpUkf45ftaUM0dyhk5nPVEFa/jL5AkgggAOUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pBcAjeCU; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4368a290e0dso39105e9.1
-        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 06:40:34 -0800 (PST)
+	s=arc-20240116; t=1737304087; c=relaxed/simple;
+	bh=/4si3pI3PSm7YJqMDJWO6oO0UM+zHDLK1aDous38f4A=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=f7KVak32V7GDQZBS8eNoBt5N0GJU1TWMiuRR2fxk05n4Uajvanvu0JDl8EkPtNGC9624j6e+2JjRpbwsRvWiGYrGHRHKHqvQJbVcv7zWxYZSNy9vYvdoYQGJggrg3bMpxE55UHrXghDOr19POLt1dkjhEIvoRsistS6Fr8Q26tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sslab.ics.keio.ac.jp; spf=none smtp.mailfrom=sslab.ics.keio.ac.jp; dkim=pass (1024-bit key) header.d=sslab.ics.keio.ac.jp header.i=@sslab.ics.keio.ac.jp header.b=DiXTQZFH; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sslab.ics.keio.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sslab.ics.keio.ac.jp
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2f43d17b0e3so6729874a91.0
+        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 08:28:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737297633; x=1737902433; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yozjyOOVjvWJnBqKBHEFXaWCaRf+nsltbh0VmuJU/AU=;
-        b=pBcAjeCUDtnUjMsD0aTv4hHJBWRea9ag3fMUgJ/ZqrFjNdkUiPMHujfq55jvdxRK61
-         0+UW4NCx8fimu7d4Oa44H6rmVsOjfaVKNdazNqiuSajt/aN2Otg1igcunYBSDQ6WW0UU
-         IKAaiCxOdSh3x891qC1F/rocWdS74MkWDS2zeXDRjfVbeXTrh/nruwIiT5WcJ240qjJS
-         jqU7a6k7vwqSbFbwJiJTpBZ/tjgD6kt0bai+rUOgCjTeXXZK+zZe8VHft+aLQEHqo74B
-         N23BgDqj6vUwEIxexFC2YTdYMjekpOalYKjvradSFrPHSM9egZ4R3ypp+Qc6S12oUc1r
-         9FvA==
+        d=sslab.ics.keio.ac.jp; s=google; t=1737304084; x=1737908884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=snZH8XfRlyi2k+V8MAtXkadSoU1vzCD/EgFRaVm518E=;
+        b=DiXTQZFHMTZKyNQbIJTHbkpeqoj93A875vvYHxanS3OX36REbKP5mZE3CGs+jDi8pw
+         38NbzlHDVt7twPpHPKY7jxqbmx5xxZBcfG7Hd5wlFXqwOocY9d4MajcFI2aAxIjLZZmj
+         lMH9rApIS0IbgeM4DnSeHlFnoiZWfd/DnsScQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737297633; x=1737902433;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yozjyOOVjvWJnBqKBHEFXaWCaRf+nsltbh0VmuJU/AU=;
-        b=dQEIiT1m98PWYSupYoKC7IWJUmJvqS4anYQWCvK4tu9nP6aYfPRWauFH/tAIMjVWTC
-         eqjD44+u4ICMaZ5wGs/2jexkHzXlHprJml5UwpTXzNysHfvKhHm8//yahQEuTpoj+QdT
-         sj7JL7MpG2jtUHtbu+24BPsOUr+R8gvamLF3LXmszBQQlScIailfD1u0FC+XqinDfmud
-         manGHv/etO+xA6uMe5Mq+3SiMcNJUyYUoTAKq2OpsMu6W5ZUV5Efy9PCt5kv4CFhPrRg
-         BjfKlr9HHSTKtUq66qP4KJCNzWmmMEGmgrxUifogfUa4OqZPmcvuozsovPCQ/V2w9Bbt
-         LZJg==
-X-Gm-Message-State: AOJu0YxEdmFLnFAYckcGPtdRU/wPpthP3PFhDDVyc71O+yJE/y8BcC17
-	9xW0LQ6phBkn7LBG5f++BQd6FbDFC4QDxGlSFejxhPd1bRG2WyiGRgHUaLQFkvKh8hFsUw3vTal
-	/+kHqKlKn9B92hyzbmK8F+F86R/ZDBaQ5rAqK
-X-Gm-Gg: ASbGncsJT/bevisMe6NqhbDGRqPnv46wGtm/uuyWKkvXbAXVCIOkMrecM885enVt+y3
-	5bLhzJrdT7DmYM7mApmmEYKSfNiweCzR6s2b8I7Z2H5t51lx0xA==
-X-Google-Smtp-Source: AGHT+IF9OmfsYNYAh14f5gkDAcnJeYGVY4k5QEJJiVg1RDgOf/8pqrGM2vF1v1I2qBCXAIbPAuAEY0CEq6gZ99y9swk=
-X-Received: by 2002:a7b:c8d0:0:b0:436:1811:a79c with SMTP id
- 5b1f17b1804b1-438a0f45bc4mr1415995e9.5.1737297633182; Sun, 19 Jan 2025
- 06:40:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737304084; x=1737908884;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=snZH8XfRlyi2k+V8MAtXkadSoU1vzCD/EgFRaVm518E=;
+        b=Zw/ZNrATI71s3WD3MqkF08XORlmpSFyDysiYEaanMa8OftbFGCdZxyFnoluw3+O2S/
+         vDQExHitJo7cQWmqDiKyc9j1+pv/COStr1XJt0NbIzfinGdKAtaW1ZylMExA+Hub2k4j
+         OscVnprV5htaI3Q+jEiC28JIxMLMLgFLDStsm9Bs7gF49Oy4KRRhvGCvOJkrLm33pdwg
+         3PyRY/0C2OAewXbk09NNf3lc1uzGYxlWHK0znqXKu7sBBT6aPGQh9z8AmBsKPDLDAAD+
+         4frwi7xRHXZxDA7qcG24GJOXHJxlB8/RITJypgzcRg4RU5nCwZmJaJLEKOlEtEoEkSOM
+         8fJA==
+X-Forwarded-Encrypted: i=1; AJvYcCWQkLS9M8wDklpiGriBp3a+ZUGhjc0LVltn6DsFm8jq1kLdSZjuPP03Ezu9jNy1NlUrRVc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRlySFFcDSqaSdcxTCQ9ksz3uaoFA3TZYY3PEm8yjlOs736DEK
+	zr2WaGslqR36kJSBw9kSg/a1oB8nE56bbE3IqKVnDnsDVdCd/DH/k3WKNkm4Fd8=
+X-Gm-Gg: ASbGncstLadDg/kxGCxIkFRlBwevg3JesvOjf3DbdT5p/TgUkn+3xIozZ9c9ufTOONH
+	Dz1o0cjkWo5CqQWpI8XZyR51F2YnXWHJCwVHu0fsZYo/cA589YnoZeXYLPsAaA+yW3KI2QMRW5H
+	Vq4kmfbqiBqfkmsmF4nM0LeLKq8/LkAZklUBRhR/Z6Y8UIXqDQFLs4GEWxJbz2CSPI36sJeYzzf
+	gtjeI0DsefgIWomfQV3Ees6ZwYfgQ1bRxrXImHpR3pgnu7ielSEJ/rVBsnYJslsJJ4FkXmcX6jp
+	GiLV/RUoX7vGKH2PHBhS2N8H6spXN38=
+X-Google-Smtp-Source: AGHT+IEW4ntUF55sqc+yIS9AXd8mkMN5CUu4fCQ4/TxEXUT1tq/21UzBAuqtCWeYuX8sM8+h7I9DAA==
+X-Received: by 2002:a05:6a21:7886:b0:1e1:ae9a:6311 with SMTP id adf61e73a8af0-1eb21479b92mr12731205637.4.1737304084528;
+        Sun, 19 Jan 2025 08:28:04 -0800 (PST)
+Received: from saraba.tapir-shark.ts.net ([131.113.100.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab7f190fsm5391625b3a.26.2025.01.19.08.28.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Jan 2025 08:28:04 -0800 (PST)
+From: Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
+To: seanjc@google.com
+Cc: kentaishiguro@sslab.ics.keio.ac.jp,
+	kvm@vger.kernel.org,
+	pbonzini@redhat.com,
+	vkuznets@redhat.com
+Subject: Re: [RFC] Para-virtualized TLB flush for PV-waiting vCPUs
+Date: Mon, 20 Jan 2025 01:27:49 +0900
+Message-Id: <20250119162749.665030-1-kentaishiguro@sslab.ics.keio.ac.jp>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <Z4rM2abMZvurfFDO@google.com>
+References: <Z4rM2abMZvurfFDO@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250117163001.2326672-1-tabba@google.com> <20250117163001.2326672-2-tabba@google.com>
- <20250117135917364-0800.eberman@hu-eberman-lv.qualcomm.com>
-In-Reply-To: <20250117135917364-0800.eberman@hu-eberman-lv.qualcomm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Sun, 19 Jan 2025 14:39:56 +0000
-X-Gm-Features: AbW1kvYFuoqqzdPWDUOJX5ZIcY6cxxqPuz3h9GeI5OeA0p3MfrZ12_kY3H6B7Hw
-Message-ID: <CA+EHjTxQ5r_ybMhKBQvj9ep4pZnHo2K+aLMT+9uVyfanV_bZxw@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 01/15] mm: Consolidate freeing of typed folios on
- final folio_put()
-To: Elliot Berman <elliot.berman@oss.qualcomm.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, 17 Jan 2025 at 22:05, Elliot Berman
-<elliot.berman@oss.qualcomm.com> wrote:
->
-> On Fri, Jan 17, 2025 at 04:29:47PM +0000, Fuad Tabba wrote:
-> > Some folio types, such as hugetlb, handle freeing their own
-> > folios. Moreover, guest_memfd will require being notified once a
-> > folio's reference count reaches 0 to facilitate shared to private
-> > folio conversion, without the folio actually being freed at that
-> > point.
-> >
-> > As a first step towards that, this patch consolidates freeing
-> > folios that have a type. The first user is hugetlb folios. Later
-> > in this patch series, guest_memfd will become the second user of
-> > this.
-> >
-> > Suggested-by: David Hildenbrand <david@redhat.com>
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  include/linux/page-flags.h | 15 +++++++++++++++
-> >  mm/swap.c                  | 24 +++++++++++++++++++-----
-> >  2 files changed, 34 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-> > index 691506bdf2c5..6615f2f59144 100644
-> > --- a/include/linux/page-flags.h
-> > +++ b/include/linux/page-flags.h
-> > @@ -962,6 +962,21 @@ static inline bool page_has_type(const struct page *page)
-> >       return page_mapcount_is_type(data_race(page->page_type));
-> >  }
-> >
-> > +static inline int page_get_type(const struct page *page)
-> > +{
-> > +     return page->page_type >> 24;
-> > +}
-> > +
-> > +static inline bool folio_has_type(const struct folio *folio)
-> > +{
-> > +     return page_has_type(&folio->page);
-> > +}
-> > +
-> > +static inline int folio_get_type(const struct folio *folio)
-> > +{
-> > +     return page_get_type(&folio->page);
-> > +}
-> > +
-> >  #define FOLIO_TYPE_OPS(lname, fname)                                 \
-> >  static __always_inline bool folio_test_##fname(const struct folio *folio) \
-> >  {                                                                    \
-> > diff --git a/mm/swap.c b/mm/swap.c
-> > index 10decd9dffa1..6f01b56bce13 100644
-> > --- a/mm/swap.c
-> > +++ b/mm/swap.c
-> > @@ -94,6 +94,20 @@ static void page_cache_release(struct folio *folio)
-> >               unlock_page_lruvec_irqrestore(lruvec, flags);
-> >  }
-> >
-> > +static void free_typed_folio(struct folio *folio)
-> > +{
-> > +     switch (folio_get_type(folio)) {
->
-> I think you need:
->
-> +#if IS_ENABLED(CONFIG_HUGETLBFS)
-> > +     case PGTY_hugetlb:
-> > +             free_huge_folio(folio);
-> > +             return;
-> +#endif
->
-> I think this worked before because folio_test_hugetlb was defined by:
-> FOLIO_TEST_FLAG_FALSE(hugetlb)
-> and evidently compiler optimizes out the free_huge_folio(folio) before
-> linking.
->
-> You'll probably want to do the same for the PGTY_guestmem in the later
-> patch!
+Thank you for your comments.
+I understood the scenario of why my previous change was unsafe.
 
-Thanks Elliot. This will keep the kernel test robot happy when I respin.
+Also, I like the concept of KVM_VCPU_IN_HOST for tracking whether a vCPU is
+scheduled out because it can be helpful to understand the vCPU's situation
+from guests.
 
-Cheers,
-/fuad
+I have tested the attached changes, but I found that the performance
+improvement was somewhat limited. The boundary-checking code prevents
+KVM from setting KVM_VCPU_IN_HOST and KVM_VCPU_PREEMPTED, which may be
+contributing to this limitation.  I think this is a conservative
+approach to avoid using stale TLB entries.
+I referred to this patch:
+https://lore.kernel.org/lkml/20220614021116.1101331-1-sashal@kernel.org/
+Since PV waiting causes the most significant overhead, is it possible to
+allow guests to perform PV flush if vCPUs are PV waiting and scheduled out?
 
->
-> > +     case PGTY_offline:
-> > +             /* Nothing to do, it's offline. */
-> > +             return;
-> > +     default:
-> > +             WARN_ON_ONCE(1);
-> > +     }
-> > +}
-> > +
-> >  void __folio_put(struct folio *folio)
-> >  {
-> >       if (unlikely(folio_is_zone_device(folio))) {
-> > @@ -101,8 +115,8 @@ void __folio_put(struct folio *folio)
-> >               return;
-> >       }
-> >
-> > -     if (folio_test_hugetlb(folio)) {
-> > -             free_huge_folio(folio);
-> > +     if (unlikely(folio_has_type(folio))) {
-> > +             free_typed_folio(folio);
-> >               return;
-> >       }
-> >
-> > @@ -934,13 +948,13 @@ void folios_put_refs(struct folio_batch *folios, unsigned int *refs)
-> >               if (!folio_ref_sub_and_test(folio, nr_refs))
-> >                       continue;
-> >
-> > -             /* hugetlb has its own memcg */
-> > -             if (folio_test_hugetlb(folio)) {
-> > +             if (unlikely(folio_has_type(folio))) {
-> > +                     /* typed folios have their own memcg, if any */
-> >                       if (lruvec) {
-> >                               unlock_page_lruvec_irqrestore(lruvec, flags);
-> >                               lruvec = NULL;
-> >                       }
-> > -                     free_huge_folio(folio);
-> > +                     free_typed_folio(folio);
-> >                       continue;
-> >               }
-> >               folio_unqueue_deferred_split(folio);
-> > --
-> > 2.48.0.rc2.279.g1de40edade-goog
-> >
+> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> index a1efa7907a0b..e3a6e6ecf70b 100644
+> --- a/arch/x86/include/uapi/asm/kvm_para.h
+> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> @@ -70,6 +70,7 @@ struct kvm_steal_time {
+>  
+>  #define KVM_VCPU_PREEMPTED          (1 << 0)
+>  #define KVM_VCPU_FLUSH_TLB          (1 << 1)
+> +#define KVM_VCPU_IN_HOST           (1 << 2)
+>  
+>  #define KVM_CLOCK_PAIRING_WALLCLOCK 0
+>  struct kvm_clock_pairing {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index acdd72e89bb0..5e3dc209e86c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5018,8 +5018,11 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+>         struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
+>         struct kvm_steal_time __user *st;
+>         struct kvm_memslots *slots;
+> -       static const u8 preempted = KVM_VCPU_PREEMPTED;
+>         gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
+> +       u8 preempted = KVM_VCPU_IN_HOST;
+> +
+> +       if (vcpu->preempted)
+> +               preempted |= KVM_VCPU_PREEMPTED;
+>  
+>         /*
+>          * The vCPU can be marked preempted if and only if the VM-Exit was on
+> @@ -5037,7 +5040,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+>         if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+>                 return;
+>  
+> -       if (vcpu->arch.st.preempted)
+> +       if (vcpu->arch.st.preempted == preempted)
+This code may clear KVM_VCPU_FLUSH_TLB.
+https://lore.kernel.org/lkml/20200803121849.869521189@linuxfoundation.org/
+>                 return;
+>  
+>         /* This happens on process exit */
+> @@ -5055,7 +5058,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+>         BUILD_BUG_ON(sizeof(st->preempted) != sizeof(preempted));
+>  
+>         if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
+> -               vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
+> +               vcpu->arch.st.preempted = preempted;
+>  
+>         mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
+>  }
+> @@ -5064,7 +5067,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+>         int idx;
+>  
+> -       if (vcpu->preempted) {
+> +       if (vcpu->preempted || !kvm_xen_msr_enabled(vcpu->kvm)) {
+>                 /*
+>                  * Assume protected guests are in-kernel.  Inefficient yielding
+>                  * due to false positives is preferable to never yielding due
+
+
+
+---
+ arch/x86/include/uapi/asm/kvm_para.h |  1 +
+ arch/x86/kernel/kvm.c                |  2 +-
+ arch/x86/kvm/x86.c                   | 11 +++++++----
+ 3 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index a1efa7907a0b..6ef06c3f234b 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -70,6 +70,7 @@ struct kvm_steal_time {
+ 
+ #define KVM_VCPU_PREEMPTED          (1 << 0)
+ #define KVM_VCPU_FLUSH_TLB          (1 << 1)
++#define KVM_VCPU_IN_HOST           (1 << 2)
+ 
+ #define KVM_CLOCK_PAIRING_WALLCLOCK 0
+ struct kvm_clock_pairing {
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 21e9e4845354..17ea1111a158 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -668,7 +668,7 @@ static void kvm_flush_tlb_multi(const struct cpumask *cpumask,
+ 		 */
+ 		src = &per_cpu(steal_time, cpu);
+ 		state = READ_ONCE(src->preempted);
+-		if ((state & KVM_VCPU_PREEMPTED)) {
++		if ((state & KVM_VCPU_PREEMPTED) || (state & KVM_VCPU_IN_HOST)) {
+ 			if (try_cmpxchg(&src->preempted, &state,
+ 					state | KVM_VCPU_FLUSH_TLB))
+ 				__cpumask_clear_cpu(cpu, flushmask);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c79a8cc57ba4..27b558ae1ad2 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5019,8 +5019,11 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ 	struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
+ 	struct kvm_steal_time __user *st;
+ 	struct kvm_memslots *slots;
+-	static const u8 preempted = KVM_VCPU_PREEMPTED;
+ 	gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
++	u8 preempted = KVM_VCPU_IN_HOST;
++
++	if (vcpu->preempted)
++		preempted |= KVM_VCPU_PREEMPTED;
+ 
+ 	/*
+ 	 * The vCPU can be marked preempted if and only if the VM-Exit was on
+@@ -5038,7 +5041,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+ 		return;
+ 
+-	if (vcpu->arch.st.preempted)
++	if (vcpu->arch.st.preempted == preempted)
+ 		return;
+ 
+ 	/* This happens on process exit */
+@@ -5056,7 +5059,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ 	BUILD_BUG_ON(sizeof(st->preempted) != sizeof(preempted));
+ 
+ 	if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
+-		vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
++		vcpu->arch.st.preempted = preempted;
+ 
+ 	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
+ }
+@@ -5065,7 +5068,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ {
+ 	int idx;
+ 
+-	if (vcpu->preempted) {
++	if (vcpu->preempted || !kvm_xen_msr_enabled(vcpu->kvm)) {
+ 		/*
+ 		 * Assume protected guests are in-kernel.  Inefficient yielding
+ 		 * due to false positives is preferable to never yielding due
+-- 
+2.25.1
+
 
