@@ -1,202 +1,233 @@
-Return-Path: <kvm+bounces-36052-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36053-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E14C1A170F1
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 18:01:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D8DA170F8
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 18:06:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6631F188991D
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 17:01:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE867169A93
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 17:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198A21EBFF8;
-	Mon, 20 Jan 2025 17:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152261EBFEB;
+	Mon, 20 Jan 2025 17:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YdaPt8kH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WguWlmN7"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2087.outbound.protection.outlook.com [40.107.244.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9C21494CC;
-	Mon, 20 Jan 2025 17:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737392497; cv=fail; b=iahd/HjJM28tcRPZwmsblgy8Fay61D6Sgir49sBqP1t4BX5g/yQJTlKZQr/RVcqsKxVQ2Q2nsDhrm9Isg34QWGk8kp6KYwmzhLsidinQ97PCdNvde+EBY7XamQiivebpOOG0V3uxNSuTK4n34sZjVSJ2Ly3Q/jU3AtJeuz7OCHU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737392497; c=relaxed/simple;
-	bh=4yet1xNtkQeFb/3tchYZ/KUTXHJLxSntDLglAWoeLL8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VoMtSxrUhMwuWrDv9bwZbUsxJuB+KiPm+EYi3YgmYW2qMyZSPkYuHqJS7NJkLMBBWHAx4z5O4smNTQ4OWNiwx673sca4xKoHXelLABITX2K18IYKGp3O7rYG3mhweu3MOEF8TaiDSF1ONEtal1f3J0DknNn8lMfclUYowwg0efY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YdaPt8kH; arc=fail smtp.client-ip=40.107.244.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sUx3mW0qvDyzVyfR9Jb4qqOt8Cx8VLUZ+AzYpECLl+epsrfzTi467L7BpAd3ek6eGVpl3gJ+odbmukMgEzYutgalKIh4FXsJ14feWmb9+ogsL43R6IDYh1hvTFwy04DDb+O84Jc3DX9RLQdZvG6Km0BhzSfIH91mLWYPnq5TIOKQYGUMG+rQ/9hyL8kdQyLhE1l+XLoQeyfE779uF/1OuqADRUFVU97hMsw0r/TXZ7BDjjKrCv4xsdqT+ABPYPG80LiBje1b3f1ee97gW7Hldnn/ucpcgTEo1FiI5gCzaLAQv/PGak5HjU9ww+I7SwAGTIOmSW2Ok6P9/gb0cYZeNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4yet1xNtkQeFb/3tchYZ/KUTXHJLxSntDLglAWoeLL8=;
- b=Fr3G2RFYqfJQVivWCTEw3djIsoRxnmOZ+f4VcZv/B+J+h8IqQHLtcHjrhmZJ6uCWT4JJoIljWGRZZXgY6GbB75Xpml0DnPAVQTZ4LYZI8K4nPAFrz/1jDkR73rvogYVG1AHheCoB9YuZVb/SfxU4BNgGRax0GUhFUR+XTKM0ThEB6Wqg5+8nTtEWPnuggQ8nFhHcynAOB1rKG+HAa/Arxm5w7cyQKTPXeKvAhNeJysFDSCynNniT6+WeFCr2L/HKRzYBqkEB1U9NhEvZRDzTtitzcRxyxOmNDvni2hIS2EmbMI6lcR13yyM63y8K270bAewSuO29YM/t6gg4h1XWLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4yet1xNtkQeFb/3tchYZ/KUTXHJLxSntDLglAWoeLL8=;
- b=YdaPt8kHPXuO0nc0HSZgPIsvbme5KLsCXcjaXTv3T6G8GozRt+RaGpR3IQg3ZjT5bRShOeczgDBz1D64Sih1PtRo74uAK8bB67J7y/SKhGpng1GApXtOzy69ymBJUKLTUFSaGrRep/Sfh5YFv08ktVJVE0Of6MQiKMla/sYgTBDq7ZhLj1QSy+w0VOxYHpLHQCf/amrDvThPfCN00BmVniaUOR7IwCHakXQ/MbKBmN0dTfb64tqiQHVCN2KUh7CISu1Y4VVOgXS82tzZ1iiSTBJyvI192NvB2zqUK9pTbG3E7W8X3zroeFMiNn2SfIaDQnBDtQwdOQpoWuhudXkr/g==
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
- by PH7PR12MB6786.namprd12.prod.outlook.com (2603:10b6:510:1ac::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.22; Mon, 20 Jan
- 2025 17:01:33 +0000
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::ae1b:d89a:dfb6:37c2]) by SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::ae1b:d89a:dfb6:37c2%5]) with mapi id 15.20.8356.020; Mon, 20 Jan 2025
- 17:01:33 +0000
-From: Ankit Agrawal <ankita@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, Yishai Hadas
-	<yishaih@nvidia.com>, "shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, Zhi Wang <zhiw@nvidia.com>
-CC: Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, Kirti
- Wankhede <kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)"
-	<targupta@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Andy Currid
-	<acurrid@nvidia.com>, Alistair Popple <apopple@nvidia.com>, John Hubbard
-	<jhubbard@nvidia.com>, Dan Williams <danw@nvidia.com>, "Anuj Aggarwal
- (SW-GPU)" <anuaggarwal@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 1/3] vfio/nvgrace-gpu: Read dvsec register to determine
- need for uncached resmem
-Thread-Topic: [PATCH v4 1/3] vfio/nvgrace-gpu: Read dvsec register to
- determine need for uncached resmem
-Thread-Index: AQHbaTjBZtIyf03Z0EKujaCWGd7uu7MfQe2AgACjJnU=
-Date: Mon, 20 Jan 2025 17:01:32 +0000
-Message-ID:
- <SA1PR12MB7199773CE7D83F39479EB2C2B0E72@SA1PR12MB7199.namprd12.prod.outlook.com>
-References: <20250117233704.3374-1-ankita@nvidia.com>
- <20250117233704.3374-2-ankita@nvidia.com>
- <BN9PR11MB5276B46605C1C15EF39808098CE72@BN9PR11MB5276.namprd11.prod.outlook.com>
-In-Reply-To:
- <BN9PR11MB5276B46605C1C15EF39808098CE72@BN9PR11MB5276.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|PH7PR12MB6786:EE_
-x-ms-office365-filtering-correlation-id: ef8c2a24-d2cf-46db-5703-08dd39741777
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?RQtLJtVW8kSrszscLpac7wO5SU/bFUA2hahR57Yc6dJn9uX4sbPwKmp88+?=
- =?iso-8859-1?Q?VrmxYpHHA/vIIDudYsVeQC+pEgaMOcdYCZg5wPiwT8Ew8ztnAJ2q3yCymm?=
- =?iso-8859-1?Q?jylQnP/VcFt44P1PP5p/rmNw2CjbJn3wBeZv9GmV0x2GVzr1WrGRBLsMCh?=
- =?iso-8859-1?Q?pfLfvbCNzES1psLfnHD+6MZLYXR9Yrix6116bemun6X7WPM3QIx8QHGpZw?=
- =?iso-8859-1?Q?fdSswvn+E/TiHrG7W6v8Vb8NLIS9+0ZzvXVUjztIctbz+YGL8bK3JCKLgm?=
- =?iso-8859-1?Q?kKibRFXNs3WDJbX5lerkBF1tUeFfRZqJCXkx+Od0y/sUO37TvG1dQOzDMf?=
- =?iso-8859-1?Q?3b2ARgje5dYKLxcO2R0I22OWL0oHOxMXpEg7w1uzxFHWfCAl7zJjEWDPTU?=
- =?iso-8859-1?Q?zCOnGcBEinlZoHGfiJ4e8TwbBv7YkWeyZBmLZblDhUc8NtIvmQOpEX4EW1?=
- =?iso-8859-1?Q?H3j1/7AyqTqa53LVvQGiPPXlFRncZu1il9kqb7Xt4ymsyqujRR5j9qY7r0?=
- =?iso-8859-1?Q?GN9/oAWRzGSYiZx+Ex/rEwlrM/HXfNrGfe/a5F/piSzibfKs9b4jxIrunD?=
- =?iso-8859-1?Q?731df+FrKjfEG35xW/jKR+a1mhxE8iEx9pEucaOzYPSUKGXt8yONlHGwO7?=
- =?iso-8859-1?Q?UQfRrfk1bCg6JZAzkmsh/wuKdIZzMCdgqHfuKaS6x/8MqwC5DVwpK+C9mn?=
- =?iso-8859-1?Q?fGFQYqztzP8c15geOPCrPDb8IT+I5rwtJfklDy/mkONGjnb4KzgyOH1bpF?=
- =?iso-8859-1?Q?iXW1Fcc+XGlkRwyfV80Kb9cNZoGsQrVts/51XAp4GhkHi+Vn5hmOmI89GW?=
- =?iso-8859-1?Q?8lxxNVDy+LzID8r7bkRJX7w7bYV8gU3TSwDEtx5R+8MT10RDw3mLFpxL6u?=
- =?iso-8859-1?Q?mgZ6tI/VsYtisngatK3zLxcWPIkZMijs9EPhiKMx0Ho2RBLSSoAmki9n4R?=
- =?iso-8859-1?Q?PyQyXtrW4CXOcp+BcD0gRtUJNr3EP2VFSE+nOz57VpauH15RxWcpUkcYib?=
- =?iso-8859-1?Q?khnCWJQcSnuWwLkD04dWgQoxiq8g8LI+WJvsCP0oZM26RwBkJdD9T4xcIH?=
- =?iso-8859-1?Q?GtBf58mQwr8i+dlEw2TiCNcz3L7oDIQsH7KNiT9aWinbeEuVsDdoDEkioZ?=
- =?iso-8859-1?Q?5JI03qQljfKfMUo4sqMOY69pCpxYgFIwMhTnLWxNYFSvrACiJxff8YLFzA?=
- =?iso-8859-1?Q?8fskQ+dwQHmJwynEqtJDJ5+HKjl5D32OaqnXiTrJJ8rn2nZP+AuaMvamyc?=
- =?iso-8859-1?Q?LuXtflMfZOj1qLv1nBIOqHhSB5z9EqUzWi/np/lJHL5anEcfmCF2rB10UQ?=
- =?iso-8859-1?Q?qmXgzqDC8T1q3jCpAV2gz0eMj1LXfHRQQ75N/bu0RJLvZuVE31TtdikKcq?=
- =?iso-8859-1?Q?TMmS2ATH8yXHr7CX0O4IviF4DD6XL9FO6nv9XsFmc8G8Q03KfDHSgXMSPI?=
- =?iso-8859-1?Q?egRGpnPy3IepfFNNaQ05bW4XDJUSkiMFppu7cu//pNi1xMQ9F0YjIhRor/?=
- =?iso-8859-1?Q?pLPpEzYArtrKEOhSLHWZuN?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?aIa8+9CTysf2BHIJeDT4YCFKP6N7B7Jltq0kEpvARFtFQP+mBp4P1nSiVd?=
- =?iso-8859-1?Q?To9/rZP3kJafei2j3VYIRtYsQg8goR8OezFnjB4yATHDdESukGLXHYVW8R?=
- =?iso-8859-1?Q?RU2g2qgdE0azwjz/mSEF6yceclFysPF6yqt+OPwzgh26VhOqmoMlcD7uoQ?=
- =?iso-8859-1?Q?5PWMt7rqBUHKIO4AKly5wSHf2uTtOiMtiFSkWOTbt2jgQZg7l3NHxJq6dK?=
- =?iso-8859-1?Q?6kXsgqh0btyijncwG2ZpJ5IJcLWj+rCFTF0TrIF0CdouO6nqWphtsEY1Pf?=
- =?iso-8859-1?Q?qLrT08yjPcYX46Yi/+EZPNSRM1xqcmnkhuGqLRfpbUz9gRKTHM7Y0nwi1P?=
- =?iso-8859-1?Q?1DTJ3/4tm6oGLlu5lVDt5+nfxNZ+Gfp25yzClfOj1TxqC2WeEy9i89zY2e?=
- =?iso-8859-1?Q?E4NAhCHI1WyKrXatgghPKTWwNzU6IAVwHrg/ESk6iXRQP0ejUL7pKcn2S6?=
- =?iso-8859-1?Q?jyDZBZ1SZBm5kM88bOnIRaYGA3CEZRj58QZ0zxNBnwqa5Z0OVxtAfzPp4Q?=
- =?iso-8859-1?Q?D7ud9Wu94uPFy+2bvW201cbkohxKjUo9C/VeqQ+33D+tCozAzpPQXqr0Yv?=
- =?iso-8859-1?Q?IxSd/AMm//YNHa65B1VSUe/tLdu2QSyfdwbeD/Kfhg9uHxzihvvEtvnqMM?=
- =?iso-8859-1?Q?enhhyPwNFQrZ22vSS4OzuKTqNVq+I6wBZOBwrT+CTNUdfsdGdZAZUVYJ1U?=
- =?iso-8859-1?Q?1gxmfQ/QgQbDIYGsjYi8XgAOXPP8bK6I+Qf2rsyuowVFQbqJfjzlvqbo+q?=
- =?iso-8859-1?Q?A6UPmj3pXZ0ruffGZnmhQ9aC5j2NcJv2o9ACpuTBzwHgxpbJl2Wlxf4KKd?=
- =?iso-8859-1?Q?4sBF/cFUlyKEwE05r8arhhscxxvyWJVeJVju8fjttQiN4AboTEPgtac/Az?=
- =?iso-8859-1?Q?RSYYml1mK1kqK3eVKN4Yv88utD0ile0kZny0K4rkUxHkiOYtiKKKf3WR6r?=
- =?iso-8859-1?Q?U342VS8MbdbrlHN7W7S8Ib2rEwcTMqvHBIzt99Ndhm3ecmiOh+WvmYFlXN?=
- =?iso-8859-1?Q?xQq+OQoMHlCVpAlDqwnCLDCvlLeuCWAtNx8Hrkr27MfIbsGZyCML3YVlQB?=
- =?iso-8859-1?Q?6BwEX3cIrp1/RhPkOU3rtcfF98rgBb/oGETALYIqeSmhI3/lW+zj+ffaNg?=
- =?iso-8859-1?Q?Tf4I4YlwpVlvknEm6Is2Tzgi5ZzfesPoG4q6rQKrmX3GakB3LlvjeedfF9?=
- =?iso-8859-1?Q?bTEA3QxO4nsc0XaNaDW3+sckS7vPxVLC4ybzAg+4TCVXk5khQDtTSXiAco?=
- =?iso-8859-1?Q?5hOg3XMR2eW5arTaDFmEadhb9yVa4ShRX2xX4CxQIB3dGpSpXcdFCt66ex?=
- =?iso-8859-1?Q?u+mRnaUgcAtf9IjR4NUsYIQdwbebffaDSb0oDZMBBVAc/3VftwlLZ1vRmO?=
- =?iso-8859-1?Q?t0EivJSGTBmAnCIvoexrGFktl14k8BX80/VlcsOzF2gYsQXorNp1LFPRDU?=
- =?iso-8859-1?Q?+2UC7z7kEH2r/+iyficYaN1+Cb49LBlNASJ/K8yR7ZcpGnUMU7deD6Wdbm?=
- =?iso-8859-1?Q?4xkH63iR6BP5NnKApEA7ECZ/0dvshPb0C1tC3f4ZdpheXKC/6KSu8KwPQY?=
- =?iso-8859-1?Q?ZXH2MfYnn52HdPL8UCutY84rOumn3/clZIe2hZu9MxY1zSW/v9+Ms2iNCK?=
- =?iso-8859-1?Q?1QiswoLnToY3Y=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984B21E9B39
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 17:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737392810; cv=none; b=rl1dWX7IGBbpiGSweb3Pn8P4O8TQSJ+Ie9LZCkIQYf+AvH2ta4qsGDFSVfnXG2JhAS1NCRkxqaG15bkGUNo4O8R6ogLfnowjRLPMlJLmtLMEUojKhSs9LepEKh9iy1b/knfj6WXKe0oIInxZGvjdklE6SMK4lN/F1mK/SMRMqdc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737392810; c=relaxed/simple;
+	bh=HA30YDDKbpTQSqVYmFXdDpUCa4FAcHFXcwCxnCi8vgA=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=k+QZOmUWVhyXNOOz8bxhDLKSBEo4KgxzkU7gde/7Gq3y2GowATa/+PNT6LN0q7wNfqPi3dXVB9WsCdlE1CXySRMLpt0gpMUefhZIkjx6/QBVLU6w3w2Bz2pdhYoN/5gYV90C4SdfE7A2Y1vbEwU8L5LdjntWWUFY9sACCpVstLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WguWlmN7; arc=none smtp.client-ip=209.85.166.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-84cdae60616so343222639f.3
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 09:06:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737392808; x=1737997608; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dbzRGIpUfEKMr1862KcWn9pE9FBrro2vsmhqYCsgXnw=;
+        b=WguWlmN7yy6+X4qF3pto0eA9ZARVxmN67rmVTzyQIKqZRZP1XZTcPRRo2kyDj8lXIt
+         k/mT4RRUfTDo4fYvkuRZW5gAaRtjBaW5y3YyEnMQy7Mf0JLE0GnPWCoXlMqLDfNF773S
+         7A2I5ORyEwIL7d3WUG2a3maKvGmnDmPFvO5GhFb9lRDMLBmNIaE4KUgzFD1UJTgeytx1
+         aq0U1zXc9dk8brDRQixkEInpVQ6d3K1rrgS3QM76ge5bzIpg56a1FMPcxgESaGYSliIY
+         nYPQuQ2pvNPLel8vhUwfgmUBIYDZGSJHbrBp441PZk9sOlIgri0Ug/10pGa4h+tus6l8
+         ccAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737392808; x=1737997608;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dbzRGIpUfEKMr1862KcWn9pE9FBrro2vsmhqYCsgXnw=;
+        b=U4RYapjrI3QvngDKf5MCc8WmAoctj1nfqY3OuuSGm+B1XYi/ZfOplc1PDMXkbd/em1
+         sbOa1V8q7/w664lQHxxLoD/pmbUQUlEnF1yBloyWaLFYEMaOcbPi8Axo4ioypMpbvg6g
+         H44Bs5rxevC7VBNZ9T8HVk78MC15ptaDvFRNfTVFcsgGl664XWfe+Idx8xFaiZSUQ9d+
+         BsNhden8VeKknqHMeU7/FytdecFCQBAtytT2ovZNoXAH4QOWG9siYYpWwpqGQNiK/ffP
+         /TGn8Qd9QREd5BurO4f/rHQsH6blcKvzl9Zii+gD0Zd1xb2w/m4cKCdEyAgr3/i8ux+N
+         wB4A==
+X-Gm-Message-State: AOJu0Yxtml3FeCqQEZko24/I4ddplfbfHOfxhrPNjhLBQ+o3QGFwkYam
+	mZSuZnpUtTJq9WLW+FGjefMp1wz99Xy/SjuZ1JtfQ96/r54WSH2WvkDChO6TisDCvYLNRDtIeFh
+	u4qSq42OgOmZQl6lHh3zsaw==
+X-Google-Smtp-Source: AGHT+IG4x7GYL02R2P8WMU+wLeob+JkU+UOoOPCapsMLMJ+HN2IC3jxlZ7fkGf710FtXGhOHOjUVNPZMwxVgc3FATg==
+X-Received: from iox13.prod.google.com ([2002:a05:6602:490d:b0:84f:41e2:80e5])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6602:6b12:b0:84a:5133:9cd8 with SMTP id ca18e2360f4ac-851b62835afmr813531839f.10.1737392807759;
+ Mon, 20 Jan 2025 09:06:47 -0800 (PST)
+Date: Mon, 20 Jan 2025 17:06:45 +0000
+In-Reply-To: <Z368wnzQgMKMclFw@google.com> (message from Sean Christopherson
+ on Wed, 8 Jan 2025 09:58:26 -0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef8c2a24-d2cf-46db-5703-08dd39741777
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2025 17:01:32.8592
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: M0lTiDrfm7B59Z2+MncEzb60hErJ91eFwqQWBZ+G0qTIZ1XEMBD1h38DaceI6L3vkadzJk9Z1DuIXq35qSD3EQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6786
+Mime-Version: 1.0
+Message-ID: <gsntsepd2z4q.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 2/6] KVM: x86: selftests: Define AMD PMU CPUID leaves
+From: Colton Lewis <coltonlewis@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, mizhang@google.com, ljr.kernel@gmail.com, 
+	jmattson@google.com, aaronlewis@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Thanks Kevin for the comments.=0A=
-=0A=
->>=0A=
->> @@ -46,6 +51,7 @@ struct nvgrace_gpu_pci_core_device {=0A=
->>=A0=A0=A0=A0=A0=A0 struct mem_region resmem;=0A=
->>=A0=A0=A0=A0=A0=A0 /* Lock to control device memory kernel mapping */=0A=
->>=A0=A0=A0=A0=A0=A0 struct mutex remap_lock;=0A=
->> +=A0=A0=A0=A0 bool has_mig_hw_bug_fix;=0A=
->=0A=
-> Is 'has_mig_hw_bug" clearer given GB+ hardware should all inherit=0A=
-> the fix anyway?=0A=
-=0A=
-IIUC, are you suggesting an inverted implementation? i.e. use=0A=
-has_mig_hw_bug as the struct member with the semantics=0A=
-!has_mig_hw_bug_fix?=0A=
-=0A=
->>=0A=
->>=A0=A0=A0=A0=A0=A0 if (ops =3D=3D &nvgrace_gpu_pci_ops) {=0A=
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 nvdev->has_mig_hw_bug_fix =3D=0A=
->> nvgrace_gpu_has_mig_hw_bug_fix(pdev);=0A=
->> +=0A=
->=0A=
-> Move it into nvgrace_gpu_init_nvdev_struct() which has plenty=0A=
-> of information to help understand that line.=0A=
-=0A=
-Ack, will update in the next version.=
+Noted about the changelog and the ordering. No objections for how you
+want to apply it.
+
+Sean Christopherson <seanjc@google.com> writes:
+
+> The shortlog is misleading.  It's the *leaves* that are being defined,  
+> it's the
+> features and properties.
+
+> On Wed, Sep 18, 2024, Colton Lewis wrote:
+>> This defined the CPUID calls to determine what extensions and
+>> properties are available.
+
+> This is not a coherent changelog.
+
+>> AMD reference manual names listed below.
+
+>> * PerfCtrExtCore (six core counters instead of four)
+>> * PerfCtrExtNB (four counters for northbridge events)
+>> * PerfCtrExtL2I (four counters for L2 cache events)
+>> * PerfMonV2 (support for registers to control multiple
+>>    counters with a single register write)
+>> * LbrAndPmcFreeze (support for freezing last branch recorded stack on
+>>    performance counter overflow)
+>> * NumPerfCtrCore (number of core counters)
+>> * NumPerfCtrNB (number of northbridge counters)
+
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>   tools/testing/selftests/kvm/include/x86_64/processor.h | 7 +++++++
+>>   1 file changed, 7 insertions(+)
+
+>> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h  
+>> b/tools/testing/selftests/kvm/include/x86_64/processor.h
+>> index a0c1440017bb..44ddfc4c1673 100644
+>> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+>> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+>> @@ -183,6 +183,9 @@ struct kvm_x86_cpu_feature {
+>>   #define	X86_FEATURE_GBPAGES		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
+>>   #define	X86_FEATURE_RDTSCP		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
+>>   #define	X86_FEATURE_LM			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 29)
+>> +#define	X86_FEATURE_PERF_CTR_EXT_CORE	KVM_X86_CPU_FEATURE(0x80000001,  
+>> 0, ECX, 23)
+
+> This ordering is "broken", and confused me for quite some time.  These  
+> new features
+> are in ECX, but they're landed after features for EDX.  To make matters  
+> worse,
+> there's an existing feature, SVM, defined for ECX.
+
+> TL;DR: please be more careful about the ordering, don't just drop stuff  
+> at the
+> end.
+
+>> +#define	X86_FEATURE_PERF_CTR_EXT_NB	KVM_X86_CPU_FEATURE(0x80000001, 0,  
+>> ECX, 24)
+>> +#define	X86_FEATURE_PERF_CTR_EXT_L2I	KVM_X86_CPU_FEATURE(0x80000001, 0,  
+>> ECX, 28)
+
+> To make life easier for developers, I think it makes sense to use the  
+> kernel's
+> names (when the kernel also defines a feature), and adjust the property  
+> names to
+> follow suit.
+
+> If there are no objections, I'll apply this as:
+
+> --
+> Author:     Colton Lewis <coltonlewis@google.com>
+> AuthorDate: Wed Sep 18 20:53:15 2024 +0000
+> Commit:     Sean Christopherson <seanjc@google.com>
+> CommitDate: Wed Jan 8 09:55:57 2025 -0800
+
+>      KVM: selftests: Add defines for AMD PMU CPUID features and properties
+
+>      Add macros for AMD's PMU related CPUID features.  To make it easier to
+>      cross reference selftest code with KVM/kernel code, use the same macro
+>      names as the kernel for the features.
+
+>      For reference, the AMD APM defines the features/properties as:
+
+>        * PerfCtrExtCore (six core counters instead of four)
+>        * PerfCtrExtNB (four counters for northbridge events)
+>        * PerfCtrExtL2I (four counters for L2 cache events)
+>        * PerfMonV2 (support for registers to control multiple
+>          counters with a single register write)
+>        * LbrAndPmcFreeze (support for freezing last branch recorded stack  
+> on
+>          performance counter overflow)
+>        * NumPerfCtrCore (number of core counters)
+>        * NumPerfCtrNB (number of northbridge counters)
+
+>      Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>      Link:  
+> https://lore.kernel.org/r/20240918205319.3517569-3-coltonlewis@google.com
+>      [sean: massage changelog, use same names as the kernel]
+>      Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h  
+> b/tools/testing/selftests/kvm/include/x86/processor.h
+> index 9ec984cf8674..8de7cace1fbf 100644
+> --- a/tools/testing/selftests/kvm/include/x86/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
+> @@ -181,6 +181,9 @@ struct kvm_x86_cpu_feature {
+>    * Extended Leafs, a.k.a. AMD defined
+>    */
+>   #define        X86_FEATURE_SVM                  
+> KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 2)
+> +#define        X86_FEATURE_PERFCTR_CORE         
+> KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 23)
+> +#define        X86_FEATURE_PERFCTR_NB           
+> KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 24)
+> +#define        X86_FEATURE_PERFCTR_LLC          
+> KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 28)
+>   #define        X86_FEATURE_NX                   
+> KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 20)
+>   #define        X86_FEATURE_GBPAGES              
+> KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
+>   #define        X86_FEATURE_RDTSCP               
+> KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
+> @@ -197,6 +200,8 @@ struct kvm_x86_cpu_feature {
+>   #define        X86_FEATURE_VGIF                 
+> KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
+>   #define X86_FEATURE_SEV                         
+> KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
+>   #define X86_FEATURE_SEV_ES             KVM_X86_CPU_FEATURE(0x8000001F,  
+> 0, EAX, 3)
+> +#define        X86_FEATURE_PERFMON_V2           
+> KVM_X86_CPU_FEATURE(0x80000022, 0, EAX, 0)
+> +#define        X86_FEATURE_LBR_PMC_FREEZE       
+> KVM_X86_CPU_FEATURE(0x80000022, 0, EAX, 2)
+
+>   /*
+>    * KVM defined paravirt features.
+> @@ -283,6 +288,8 @@ struct kvm_x86_cpu_property {
+>   #define X86_PROPERTY_GUEST_MAX_PHY_ADDR                 
+> KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 16, 23)
+>   #define X86_PROPERTY_SEV_C_BIT                  
+> KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 0, 5)
+>   #define X86_PROPERTY_PHYS_ADDR_REDUCTION        
+> KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 6, 11)
+> +#define X86_PROPERTY_NR_PERFCTR_CORE            
+> KVM_X86_CPU_PROPERTY(0x80000022, 0, EBX, 0, 3)
+> +#define X86_PROPERTY_NR_PERFCTR_NB              
+> KVM_X86_CPU_PROPERTY(0x80000022, 0, EBX, 10, 15)
+
+>   #define X86_PROPERTY_MAX_CENTAUR_LEAF           
+> KVM_X86_CPU_PROPERTY(0xC0000000, 0, EAX, 0, 31)
 
