@@ -1,92 +1,102 @@
-Return-Path: <kvm+bounces-36016-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36017-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4CAA16DF2
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 15:00:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55DEDA16E52
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 15:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8EA27A0641
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 14:00:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69C3C169B30
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 14:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAFB1E32B7;
-	Mon, 20 Jan 2025 13:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB611E3771;
+	Mon, 20 Jan 2025 14:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="U9HvL4uf"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="UVXBebsp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8034E1E32B3
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 13:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4621E0E0A
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 14:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737381577; cv=none; b=Ab09uo2F3fxmIXnmCkmr79jJ1wK96BNRCLca/QF5WA4wfFAt68uVyzzCYRgn6dbNiWeMHFuUjtpR85G8rLghvrPboovjrYHxq0EHfsWnwoLx96EtZPt+ikOrkKCSOAK5z9tBG7JvRR3mEJv1SsUs8EA0CW5i/k5+1jRaw5udDtY=
+	t=1737382804; cv=none; b=vB9qTbMB5v6nsEH7nKMhKPmNv6neWK1/71bxqGWdbr4dHdQv6M1Wj5Vf3+vqg68mlnqxXdpEQ4KWZI0UF9eH0Sxsqdx1zL97huR1TSNGklMkFGTEnHGpdj+s/x92Wo3Mv6dhzDU12lUUcgwvYGUoG6WqB9hxT5oiG+CrkRTrrxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737381577; c=relaxed/simple;
-	bh=R9UuZ10091tIn/30XWCOiokJdfB+dwU6cOauDpgnyh8=;
+	s=arc-20240116; t=1737382804; c=relaxed/simple;
+	bh=ChimlzVgnnRdEx0IbwOEzpVywHcES5IyZTAkGygkZMk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/eon2qgaFXg3uZfMF5Tly9UgmvN7X++aHqk3ZFhva+3/2tpcIfAGUazyf3JyZ57T+4/N92PQXT5RFLIZ5ufkMySPCqRLYvIpMiQgB9MREIuCRftfTtFkKFIqUttVPiZ5jGBBbSlSaPgtzBmbj/lqhDxyCpTPRvcdqx3t/reRzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=U9HvL4uf; arc=none smtp.client-ip=209.85.222.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=JqWC/KNf8ahr5Eplj7eMpDU7ghjKawDPFUJWJ5Rr5qtpdeRVIF0xMqx3bVjmduIS+pnzXLYBEPJk9q3ZrodAxc/m6DQ6r87vAcQygFJvEQG2YQUpQ58zqtzcGMFzUvDLmCx1iNFt6qYJZ4ILmKx8Gsp9tUfwwY5OKZncbT/kmwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=UVXBebsp; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b6e8fe401eso422623785a.2
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 05:59:35 -0800 (PST)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7b8618be68bso370733585a.3
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 06:20:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1737381574; x=1737986374; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1737382802; x=1737987602; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R9UuZ10091tIn/30XWCOiokJdfB+dwU6cOauDpgnyh8=;
-        b=U9HvL4ufaziM4xBx9X6TtqaEa54oXNBS7Ns8+Oi9BBc3Q0MESOn+3/rsSo3lq0ObtI
-         +BKth8MThNEZYPdBzopGZaIbAka8qgFOhLBEXjGg+Kg98F+sCIT10Y1tqGWTXFszWijM
-         95W224szQL6yRN3mcO2yVtcY+vbA0d/SzCjPF1FBh6qRS/FdX8yBnODV19uC9dA1ZOfT
-         ECF4ztg4+pc/fGEJ7oNvVBlZg8hHyRIAFbplGcu8pO/AX1EI7TQt7ynCNUkFV1IgLEqu
-         TmaZg0BDqY07W8IOQ1kYV3wsxGOx/WuIMV9ebS+ZVQ13u+sz3f3MmxLkBK9Q9OIfwpJJ
-         pykQ==
+        bh=nJYVtS2wyp4YmPXThKgYxTKEqaWqBzZ28kCjv5DfTK0=;
+        b=UVXBebspd4Gkrbdv7VJxo0G3Dt6moz2PcgZu99UxmpsGAOTjf9hfrwvRAL8lSrDosi
+         BYhiFtVyX8cVzt9gIeYi2wsaEpgIdxzu3A1Dia/7fyQqKSx6bvg7zPGkLcNZtwv8laeB
+         ds2QBssEGW2ZuuRdiTDukMrGMTSizd82mR5yR7+o4uk8V12ivposSq5ySWuXDQv3sjr6
+         NddstMpXwWgarivrHwJsnAR7WEWIXGnPNf1VxhXOLEikw+vtYZVTV8K2M76xOu5AKwRr
+         kAXaHEdXPYTuHMJAVGNN0lHBKunMdLZj/sDYE86O53HSV/kTCGmXdgfksBJxTyDaYVoI
+         hcVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737381574; x=1737986374;
+        d=1e100.net; s=20230601; t=1737382802; x=1737987602;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R9UuZ10091tIn/30XWCOiokJdfB+dwU6cOauDpgnyh8=;
-        b=HS8rkuTRvK408Kzhe4D0xSkMz2xTsRIoKbYtiPPYmZK7zAW+ptV5kTSB8i7ljW2gHZ
-         W3EreYHipjt8I3aVF+jhJpwkSnrIFMLj8IoCr8X1p1kSiIGQ7+DpWsbUNveddzoeSC/h
-         fpNoT3B5UtrXwqjrs/RRGxG8F43vM6ygcrnKxpzHKXo/duWNhv/Dr2NlpjiL620NigU9
-         yk86dSw73/Gcuw/MG7ToqIiDOFiNbE/3gWtTmnKIEqqaCGRzrJjVsxaKKKA0oKVc9M/u
-         O6zFfBM1BlAZS1Ylb+qlKTP3NFCQoTPSP6fdUqzc95azHpq3aWNwzczvuwJvS7hB74EQ
-         EiYg==
-X-Forwarded-Encrypted: i=1; AJvYcCURm2otkzdz67XJztbpWemuC6mdEHqjvrr9G/I/EvGJNYle+G3mguvPEkmSTK6eMCAil6A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnNPGkyaagnS7lrEk3SrZClcpKu1gtPxJKJm5EDPaMs5sNtLSz
-	0g0T+wWIEb97s3iN59lyT6cRX1l269mL5MYJIXXR7va/awot3+iFJ9+PndzBFA8=
-X-Gm-Gg: ASbGncsh5o6LpyLU6uNBJedLsuAZ2YYYNhPUQsQLOZCEqyPLthUEEo7JaQUeJN6WsJy
-	jitBuJes7XLtp/eNrghPECDHUwo62X/OGCUp6yhOQQjDw2U6W/Uo8hzmYKb0wgkX+hP+ssgWMKb
-	P2MQBCKfvmmd+2TMDJlEaHe7XHDRdA9EQFe3mbtLhsWZSEqc2fZm+HHW//IcN6uH8gtg3U7i4df
-	/EiIlqfQkMLPf6m4S5MKokZYfw7nCfqhSiOimjP0HHHblAQtSyhFxIrfpylFU7ioau/jP3XErOj
-	C0wzuBdm7j6T0ywqczZ9f8yNWOTBJ6iacGkEqwLAeOI=
-X-Google-Smtp-Source: AGHT+IHXw5XwlAOVQM5DmvsT9Jphrpd/TgpL5J7UWvahF7YSM4NY2jfkZTX/ettpphOLDZrPgY8dFw==
-X-Received: by 2002:a05:620a:2849:b0:7b6:c2bf:3eeb with SMTP id af79cd13be357-7be6318021bmr2068444285a.0.1737381574398;
-        Mon, 20 Jan 2025 05:59:34 -0800 (PST)
+        bh=nJYVtS2wyp4YmPXThKgYxTKEqaWqBzZ28kCjv5DfTK0=;
+        b=sbKFOwW2vpPTSNjRcOJFJj32tVhTmuhugTg0U+va0Cqcy1m2RgAWAvmP7L5A9mJyT8
+         j91FZGsRTh6fJm/pAOQCYd42jeKrblz6ad4igTsK2/Q1QA2Je8yERTh+BMMgineviwcz
+         X0HsHzGl/3WwuwfobqS9p+SdHnawZB4pUrKTp0QPFQqDCwYyPdCLCpYVKxt7kP/u++PY
+         ydkl1z726MKDdt3LqlBkuaqhALuG5bmHsRuFUfs8w+cl4kdmuqDtj+L5hlYMY7GWynai
+         A9lTXpjELX2KStWs4SQ31hnsMGuzQrveo+Zy0dGdFwVc17kO/dmBpBms10DVbNwJLJjE
+         L2+w==
+X-Forwarded-Encrypted: i=1; AJvYcCXSRmmVtMS6LRQC1XA5taOX421gOSIT8/sH6ZuJnaXY0e27mnPD9ewbt5KjNw5jaZwnvnA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWTWiQ9zizuZC4b30RHGEJzyvhXOMVFsHMYqvyGy46lkxXNATq
+	RhL/a6UAtmRjomjwlVbkrFAcRMcOZMUgvOhstNzByTtS3/1Pw5a6nDFkJm9Wx/I=
+X-Gm-Gg: ASbGncsZC1d8fFNm15C+rIJDvGwtU0co5KmTfeOS/rzGCsABwZR9TNBP8WYuCEThlb4
+	buOARNZO7ptY2rrRKWxeG80y/HTNOQdSPT+rQcm4I+3u3qd8qsDR0J83sn+y1gv9p1ipFgQEddx
+	G3DkZ0hBrEpHvuKMlD+ZpdsGRxMl1XZ48whsD7bV9CVGm7qEPOBkQUb/NQhdYKWJTMOK+lVx40T
+	cgWrU9RSWdcr9sItoiKnuTtjiI5EiIJqJDS2IUKj8ss9+3EgSE503u0JehvctlqflimbY/P0LmX
+	9rlQqaFtt2PL6flvRpJe2Mf8Na2hElOtc0fIeJ45TXM=
+X-Google-Smtp-Source: AGHT+IEQfbHlAGgpHPfeCc+lyD5fWS//N7IJUpSAPNWDgqwoZI0jSTzrUMiH8syVCBErRhB4O4Vhqg==
+X-Received: by 2002:a05:620a:43a4:b0:7bc:ded5:888d with SMTP id af79cd13be357-7be63210578mr2197984585a.1.1737382802189;
+        Mon, 20 Jan 2025 06:20:02 -0800 (PST)
 Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e102fc99asm43201701cf.29.2025.01.20.05.59.33
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be614758b6sm447691685a.13.2025.01.20.06.20.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 05:59:33 -0800 (PST)
+        Mon, 20 Jan 2025 06:20:01 -0800 (PST)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1tZsJR-00000003PaH-1oaY;
-	Mon, 20 Jan 2025 09:59:33 -0400
-Date: Mon, 20 Jan 2025 09:59:33 -0400
+	id 1tZsdF-00000003Pge-0aIb;
+	Mon, 20 Jan 2025 10:20:01 -0400
+Date: Mon, 20 Jan 2025 10:20:01 -0400
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Wencheng Yang <east.moutain.yang@gmail.com>
-Cc: Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex.williamson@redhat.com>, iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] drviers/iommu/amd: support P2P access through IOMMU
- when SME is enabled
-Message-ID: <20250120135933.GJ674319@ziepe.ca>
-References: <20250117071423.469880-1-east.moutain.yang@gmail.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: Yi Liu <yi.l.liu@intel.com>, will@kernel.org, robin.murphy@arm.com,
+	kevin.tian@intel.com, tglx@linutronix.de, maz@kernel.org,
+	alex.williamson@redhat.com, joro@8bytes.org, shuah@kernel.org,
+	reinette.chatre@intel.com, eric.auger@redhat.com,
+	yebin10@huawei.com, apatel@ventanamicro.com,
+	shivamurthy.shastri@linutronix.de, bhelgaas@google.com,
+	anna-maria@linutronix.de, yury.norov@gmail.com, nipun.gupta@amd.com,
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, patches@lists.linux.dev,
+	jean-philippe@linaro.org, mdf@kernel.org, mshavit@google.com,
+	shameerali.kolothum.thodi@huawei.com, smostafa@google.com,
+	ddutile@redhat.com
+Subject: Re: [PATCH RFCv2 06/13] iommufd: Make attach_handle generic
+Message-ID: <20250120142001.GL674319@ziepe.ca>
+References: <cover.1736550979.git.nicolinc@nvidia.com>
+ <c708aedc678c63e2466b43ab9d4f8ac876e49aa1.1736550979.git.nicolinc@nvidia.com>
+ <62ccc75d-3f30-4167-b9e1-21dd95a6631d@intel.com>
+ <Z4wP8ad/4Q5wMryd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,22 +105,27 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250117071423.469880-1-east.moutain.yang@gmail.com>
+In-Reply-To: <Z4wP8ad/4Q5wMryd@nvidia.com>
 
-On Fri, Jan 17, 2025 at 03:14:18PM +0800, Wencheng Yang wrote:
-> When SME is enabled, memory encryption bit is set in IOMMU page table
-> pte entry, it works fine if the pfn of the pte entry is memory.
-> However, if the pfn is MMIO address, for example, map other device's mmio
-> space to its io page table, in such situation, setting memory encryption
-> bit in pte would cause P2P failure.
+On Sat, Jan 18, 2025 at 12:32:49PM -0800, Nicolin Chen wrote:
+> On Sat, Jan 18, 2025 at 04:23:22PM +0800, Yi Liu wrote:
+> > On 2025/1/11 11:32, Nicolin Chen wrote:
+> > > "attach_handle" was added exclusively for the iommufd_fault_iopf_handler()
+> > > used by IOPF/PRI use cases, along with the "fault_data". Now, the iommufd
+> > > version of sw_msi function will resue the attach_handle and fault_data for
+> > > a non-fault case.
+> > > 
+> > > Move the attach_handle part out of the fault.c file to make it generic for
+> > > all cases. Simplify the remaining fault specific routine to attach/detach.
+> > 
+> > I guess you can send it separately since both of our series need it. :)
+> 
+> Jason, would you like to take this patch separately? I can send
+> it prior to two big series for a quick review after rc1. It'll
+> likely impact the vEVENTQ series too.
 
-This doesn't seem entirely right to me, the encrypted bit should flow
-in from the entity doing the map and be based on more detailed
-knowledge about what is happening.
-
-Not be guessed at inside the iommu.
-
-We have non-encrpyted CPU memory, and (someday) encrypted MMIO.
+If it helps you can put it in its own series and I will take it with
+pasid or vevent, which ever goes first
 
 Jason
 
