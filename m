@@ -1,254 +1,301 @@
-Return-Path: <kvm+bounces-36057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36058-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1355FA17277
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 18:59:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22955A17281
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 19:03:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4751A3A5CE9
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 17:59:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D48318886FB
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 18:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6755D1EE7BB;
-	Mon, 20 Jan 2025 17:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A681EE01B;
+	Mon, 20 Jan 2025 18:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lcw7CJKe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OJVeEfca"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2070.outbound.protection.outlook.com [40.107.223.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7807C2FB;
-	Mon, 20 Jan 2025 17:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737395950; cv=fail; b=leS21AQFoy9ZQsAPbzzDW7AXm2Mcw7Mj9/VJaDojfPCeBMCM7N1iYmnThNPBMbYeIQWvLUm8w7jBf4SsDh1Bgs64vOiN4gdL8ltD+g+8iTahmB5S5KlWpbdWwAqvda5Y03QJmbhnGPmIEEvqf9l0LjV8bkSncBhcHkceRtNQ4lQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737395950; c=relaxed/simple;
-	bh=daTnWwwnh1AYHbULnSTQIP17u8B1eyIjtfbY35RsQe8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=LkoP41PAau/V2SjqVp35TFFvsvRYe8x1ohrcaY+yZypVQ8uCZ9+imVbZG0bf5KZt9K+K1H99UKWcFaJwVJP/PRqE2a8DhLwvPKaEBFeMjIKN4f/Ey89zmU8b7MNxXntjUVD6GFophG7y4V6TZTahF5pN2X9hLsaC3lnufd/Ecmk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lcw7CJKe; arc=fail smtp.client-ip=40.107.223.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RjQ6cAPj8WPvutAQ7Z5TX2tJOyl2stiRSKHtr5l45Nd6kRnJRaTm9fJAGLC+V2O6OCBbfvYxWGJIyHtg1PRcwwgGzdvZ6iW+9YeyUOW59TXtCJmRjTd8fk7cu7cD22DaWTEIY4Gvd1wqXc5v2cKyjC2VnvWtZcay+FvOdI8fHuXQfhqapJqRDsRcqFMCXRma24yKEPAblo8ws9nOG8hxfSXvp5KKigzC7V/38C7PqCXfXzqiWRajw/knDq2TQ/ESV7PnJAfULvzJ29ZiITA89Uz6LPmwd2O2vhBc3290p+9H+J9E6nVfd4ZWZNqbqrzqgSXVYJlxxi2V898arhlxaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/zWZwwJoXFpppVHURARR17tKAMyZmsvX4NnXTOiXUkk=;
- b=o7ETjSL3gsH9bHxlpUo87HqZNCiiJh39McPoeRAMfSL+2zpZzUDcYrgcSTvw9/er9tGuRFCnaiQMNNk+2hWrLrjJWKyQfV6ioWUeieFXETyzRO01gSgTElyevGItY7mQNA1X4YXFnrg98tS0VAvjWHSIQhYJgPFPLtRNX+iksfx727aWGiueSFZWZFw/o0t/B7OVsGHdRzNDslPGePO5KhB3fiCpEXEXgwvs58vyaThKNQwUHWP06X1gKMMgFNGu9TkHm3jP0y9MeS2ZeRko9a4D9214F7ohOB4DKLIbByCnRQ3zJMYgxuVzV1qBaa6wg+slBPO78zgMBJtnwVrPqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/zWZwwJoXFpppVHURARR17tKAMyZmsvX4NnXTOiXUkk=;
- b=lcw7CJKeegahYwl+QgbHZhg0oVPb+2sZofsS23lOSFHaiKnQ1n84M2KvAjtiCRz/2LEOS0SSIjbGTlxuz/8/JofF3vJzBI7Y0N//12crP7fXijUXd/5MH2MG9KRyUtyhL/lgkesEpfrAYLTJdjeTz29uvEKvgjWMFoX8ajRoDhu65PjBffD2pusCPLTcdKBkRxblslNK+UooPBFoQHB9rwwqOgFpbNEQDQMVQkugD2FT4uj2Lcu66SZ8c32nRGNonA+YnO/tdaOC5AD48u4V5gL4Zg0vzYG3g0xbpeH1+2dif6dAQGhK4SRG2127RpyJAMUx5Jz4mKTqpD97gsxxZQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by SJ1PR12MB6052.namprd12.prod.outlook.com (2603:10b6:a03:489::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.19; Mon, 20 Jan
- 2025 17:59:03 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8356.010; Mon, 20 Jan 2025
- 17:59:03 +0000
-Date: Mon, 20 Jan 2025 13:59:01 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>
-Cc: Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
-	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
-	yilun.xu@intel.com, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
- kAPI
-Message-ID: <20250120175901.GP5556@nvidia.com>
-References: <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
- <Z38FCOPE7WPprYhx@yilunxu-OptiPlex-7050>
- <Z4F2X7Fu-5lprLrk@phenom.ffwll.local>
- <20250110203838.GL5556@nvidia.com>
- <Z4Z4NKqVG2Vbv98Q@phenom.ffwll.local>
- <20250114173103.GE5556@nvidia.com>
- <Z4d4AaLGrhRa5KLJ@phenom.ffwll.local>
- <420bd2ea-d87c-4f01-883e-a7a5cf1635fe@amd.com>
- <Z4psR1qoNQUQf3Q2@phenom.ffwll.local>
- <c10ae58f-280c-4131-802f-d7f62595d013@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c10ae58f-280c-4131-802f-d7f62595d013@amd.com>
-X-ClientProxiedBy: BL6PEPF00016412.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:22e:400:0:1004:0:a) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E019EC0
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 18:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737396209; cv=none; b=CZ6G4jwzhOJfumYBjIo4u/d2wfkeTHFeHujIJrpBDb3O9xlO4Jt3gCM/qIg1VIB1AEk9G6EEZ4lmYcChyrmN5T6KKojEow24vkAg4e1xeHaXa0MhGACZoiLdNzB+wwH1Ng81d/pHy5uN2dm3UmjUKPdZxJ60iW4KG7ZBJMa/4KU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737396209; c=relaxed/simple;
+	bh=OnYOBlwRt2h+lGmMJjZPrgCtqhuuDo3+rXHXvQquy5A=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=FsaSsWoVtf0dfJcVuykIqlPf5Xc+Bvn/jzI/vZg77+YIzQyFcEpkmv97dfoT3DdRth7Km9dheQnKGzHJS9zGFOpD2AMquU5OvoqGufu4j+3vTgaoOyXAy0K/cqFDSF0v9Vz1Ha/1+RV5/Gmc335s5kvySDPUrCM3b7Xoj6zJl/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OJVeEfca; arc=none smtp.client-ip=209.85.160.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-29fb55d5357so4272872fac.0
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 10:03:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737396206; x=1738001006; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xAielVBxCJ6WhBq7MgTSaFFDOlTnnMStQX3hT8+4ErI=;
+        b=OJVeEfcaQKTB26E/kRp3YcVZY4rgRzWsxFRP0PawMLi7FGk/hcVvOkLrKdieusgYZ7
+         HjOEnQ1sXD4xSh9T5nf2s1/HpJTZ5PG6t+VeDuEt9M++ZJF6hpJOXgvxMnuuJGAsrA5w
+         8birdADgbeSvYlaIUGp4coWWj2k2d+gmEqOlTga1P9lKmtSrlzVzc8nWaqlp0qYUdkUA
+         W4KBlyp5rzu+Ba7+PfHyYyygjX9+A8T5A2ZQdfJrV8d0k/5Hep0Lfc+P2MD5fuvYWwxM
+         6SOIwlsslQtXPi6D3flRedkLBGVVJyxm0HvuIYLky3c6825CBpZUCX12MkoNzS2sBg8Q
+         KEwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737396206; x=1738001006;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xAielVBxCJ6WhBq7MgTSaFFDOlTnnMStQX3hT8+4ErI=;
+        b=AO30ZNF4wMHtAriLxipjs9sLyul+Nscsz1o9yMXyHBTauUvdfFjLRSAgwpzS+H6mZ6
+         1ggFECfyX695QI6i8k6mO9FjFm4ZlLvvuR9CEBJcRfbwbcENtIut4L+hrMQoggUsInQo
+         xVcPcFOk6b7CSH8NV7IpMxzOGg+Z+3m0zoyqr+mAn7rmoMVYBsGbS4cCH7PWrlMOw4Bo
+         gtjmu0XeRhSwjvVyAs2KN1Fhrd9h+3izr9lt7/rBd9m82RH8X6RFJhRiBltKx8vDKkPl
+         HIjKMKp9Rz2T9SMhI0/FjNQi3bORr/qPj/Q3sX7p6IEc3HqScrA2W7zRY3IekfjZO9rO
+         aafw==
+X-Gm-Message-State: AOJu0Yx+8/fjAdYYMVZShdWR1W33TS/0GSwhNPJqrtMT4noWUPPivLaL
+	YzRgbHy57S/y9rSa0HXOreMrHhOlux7AzOU6RaBa4B71eqCSE0zfhpJ38bevzSOvLCpPFRQN25P
+	9ip4hF0ONg783K2QnbDHjiA==
+X-Google-Smtp-Source: AGHT+IG9ii1JO8QU6byqwcTmDP437YmYaXev3Cr2KOs3EWfVC/KlKymtDWFXgBz6J3IpTWlDXM21MiBsfxPyj6mkxw==
+X-Received: from oabhb18.prod.google.com ([2002:a05:6870:7812:b0:2a8:47f:e4e2])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6870:e07:b0:297:28ec:9b26 with SMTP id 586e51a60fabf-2b1c0e5233cmr8307141fac.33.1737396206701;
+ Mon, 20 Jan 2025 10:03:26 -0800 (PST)
+Date: Mon, 20 Jan 2025 18:03:25 +0000
+In-Reply-To: <Z37FYUU4ppiZsa68@google.com> (message from Sean Christopherson
+ on Wed, 8 Jan 2025 10:35:13 -0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SJ1PR12MB6052:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7814c0dc-eb73-4334-9ca2-08dd397c1fcb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MWRPSFNBUk53QzBvMlZkM0ZjSktDZEVCN2Uzby9oZFkyUFBlZVJDZUhQVmJm?=
- =?utf-8?B?WW94VW1OR2UxNDNWZDBhT0l1dklaUHdlSDVya1hSOUh2dzBBSTFJRFQzd0g2?=
- =?utf-8?B?MjB5UFV4Um5wa2NJYlgrc0pPeTRDU2Z4QmhOdVF0am5jM3hFck1PMWtlL3Nt?=
- =?utf-8?B?Z1B1Z1ozVFdrTnN5NGdNVCsvcDN2aFlMMGxsdVhCWmxZNVdSMzZiYW5tYTJ5?=
- =?utf-8?B?dEI5cDhWUXVwbkh5N2dJMmVCOEdqVzJPMU5ycEJHN0JNQ2ZLSWtXcFllMGNI?=
- =?utf-8?B?UnUvK0Z5S041YzJNZnJ3bFlWYkZuMUludEVEb0hac21sb29wSkdmV1lYVUE3?=
- =?utf-8?B?WExKVTlHRVpjeGNqUnlJL2hTUVVjbGdKcVFZTW9BSHJXYXMzK0hlRGZDMzNZ?=
- =?utf-8?B?LzdpYlRuU3hIL2hVWEtvR05wY2lkczY5eTBsYXZNSGIxNVR4Y0NzN2JwTFFP?=
- =?utf-8?B?NnBoSEJXTUt0U0dPQWZHVU9zUkxaNjZVRUlRRDZZUWo1L2hSQkU0UWNheUJN?=
- =?utf-8?B?cU9jY01SbkRkak9vcDdQa29wTGFXOFhUdXdudnp6ZkdKVHlVTzdKMjBBemlB?=
- =?utf-8?B?WlhCeldnellmKzhFNFFVYmlxeWVPa3NPQWpFbitJeWU2ejR3U3pPQ0RXVjdQ?=
- =?utf-8?B?V2Vnd3pYWnlLaDVselVCdzVjMkFIL0t3VWJKRlJlMVRPeUNyWmltSnB5bUho?=
- =?utf-8?B?aml2QjBLZC96eGp6OERJT2JReUdENmUxaWkzNWJSUTFaTyt4TlFRYXk0VXFp?=
- =?utf-8?B?MUx3L2xiNXE2cjh1MFV0NW13ZGxZUFRTdTU1ckhpeWh0Z3RTOWxvakdkdzlt?=
- =?utf-8?B?bTFURVcxanhNRGdCck03L3lraDdCY0pRSDVlZGFJVSs4RlVyeE9CUkVwZFFx?=
- =?utf-8?B?NTM1blVpVFJCWFFPTitMeCtTNEMxZFF6OXN5S24xdnByKytCejU2WktnTWlX?=
- =?utf-8?B?N1JiS3kxQStiU2F6ZFk0SWhLSksyc2Ezdmd6MzhpZWpON3Uva0pMZGo0TDl4?=
- =?utf-8?B?bFVUcXZhaHVXS0RBMis2YWJSNDB1NXAxdDNreC9lQTdPMUMzQThkR2tlc210?=
- =?utf-8?B?SktCbFVSajlWcHlqSXkyckt5bUpEZE9CYUkrZ2VvSTJDREh6c2xJMm5RTTBh?=
- =?utf-8?B?eEpMME1XT2JqRU9PYUZma3VFTmpQY2RVUE11b2hkaThCQ2ZiQmhqRTFYMDY3?=
- =?utf-8?B?dmJHa052VlFBb3VrSkM0VTc0ZnlBaDhOZ2lqOXFvZEErblZpbEZOR3Z4N1FZ?=
- =?utf-8?B?blBkU3VTbWpGZFY5RTU1QWlYTXZ5dnY3M2V2TkIzdnZWbE1RTE01amJJY0VO?=
- =?utf-8?B?OVV6UEdDUDRVMEtlczFtQXdzMTRzaU1xcTdWN1V5eTNrR3ZqTFhrczM0LzlB?=
- =?utf-8?B?VWdUZGw2d01kMTUwY1ZXdEFCeEh1Qkd4czdzeUlERFp1NDRpVVA2cUdheUhH?=
- =?utf-8?B?WlZmaThRQ1c1OE14VkJHbVFhMzQwMXhUbGljcmE0cnUwa0x6R2JuWnI4cmls?=
- =?utf-8?B?b2FSRFpPT2swMTJmL1pjdVFQTG40Y0NBaG1QNzZjaVl3eHpWZ0NVYzd1S0JU?=
- =?utf-8?B?b09zTkMycGJLQ3RVc1RHc08zcUdZd0tTeDJ4MGMzdVlhOUNkemlscjBlK1c0?=
- =?utf-8?B?UWlBYXpKSkJQYkNsNG1QVTlEN3Z5OGdrZytlQlBDVFNmV1orS0l4YTZieEYr?=
- =?utf-8?B?ZnJWZ3JOL1hlWU5SRWhVZXhsM2RPaWZPbnlSUDNiUk1NM0hlMGlPWFVXc3hZ?=
- =?utf-8?B?QytzOEhnRVpELzlLdzd4QzkwK1ZVODVUQ1hSczFUM3VoVHJ2VWFMOXlSUU5j?=
- =?utf-8?B?N1FxMmdBbUozalJSNW10bjVPZGNIU0I5Q1VaZDhLN3NlK1FURU1UOXk0M0h6?=
- =?utf-8?Q?oV2kd0hW5H9PI?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RGZmYW9NL0hyU0lNZ2JTWTJpZ0xHRWhCUGpmVktzVlF5d25IN3MrRUM2Z3l0?=
- =?utf-8?B?U2JUV05MSis5NmZoWjNCSncrOWZ5TUoxdjhKY2d6OGMzNUl3SGFQSGZMN1dR?=
- =?utf-8?B?NTFNRkVhRFZDdU80QzRKVVNpQndiT3drUnhjbVV5cHVaM0FYYjJnNzB3bjR5?=
- =?utf-8?B?NTBJWmRMWjJVbkROMDkydWFyekUxVDZpbHN4aGZuMDlkUHBwempTWXhtZnNy?=
- =?utf-8?B?UTQwN3VlZG1FS3N2ZklxSXl0RVRKS2R3d1dTUzNmYXJ1cjk5aUJhTUh2S3dZ?=
- =?utf-8?B?MDBHbzdzZUNpU2dBYzIxbVlDakVuWGhoalJGMjJoY3FBekJ1b1V3MVR5QzNM?=
- =?utf-8?B?VGpONGYwUWRwcnhKYUlnbmhrYjBqQU1IM2h0dExMcXVsV25rY2xZZHpwdTNz?=
- =?utf-8?B?YVhuWC9HcndhTHYxeFc3RzRmUElWaC9NWHNnWTljd0RXR25QbktwQ2M4TnNs?=
- =?utf-8?B?NFBUbCtwVnFTY2tUVXBLd21JMDNrT2REUHFwQTZ6cEQ1dUpiMjg0b1N4U2ZY?=
- =?utf-8?B?MXcyQjBWTk5KdHV5c04vb3RoektrSTR2U2ErZDBiY2RlY3dCOG5GU011N21l?=
- =?utf-8?B?WXFmN1pDd2MxeWpPWGZFNm92UmwxR1UrZWhvZ1M5Q01ENVZuU0JkNE5IOWRm?=
- =?utf-8?B?bjRCUVpJUkNzTUdTZDJ5cjY0N3NMMithRy9ZNytwZkF0eXpxei9BRkJ0WEFF?=
- =?utf-8?B?S2ZMTHlQaEZhRzVyOVc5NEYzVzFIYVJhakxkMG00bkVtcmJFU2IrekxaQlJJ?=
- =?utf-8?B?V0JrZmR0ZUo0SVF2OGx0VzU1NEhSRnVLdExCKzhtQm5UZVJmNHB2aUtIR1RI?=
- =?utf-8?B?Zi96NXBsMjNPZGVUVjFUelIxekpOS09sdXVmQ29yZDhBby9WNzd2NjR6Zkt5?=
- =?utf-8?B?bU9sa3lWaG1NclJLcnRIYjRoTERTblBBZ25kUXRYV1RlRWJLcTNxNGE1R09i?=
- =?utf-8?B?WHRsRldKNEUzcEcxZEtQUkhUQ2w0djE3RUtwRVNSRVFlL2VjMGhDQnRqUk1y?=
- =?utf-8?B?cEhMZDRwVmpEVkRrSkN6NE02bHRraW5UNWRCVm5ha0lCazFYamVvYjlnV1Yv?=
- =?utf-8?B?NVQyOGtzQkZCSitaMUNCbmVrZVYyTnVETllVNmhONWpVZTNyVjJHSFlkUFRj?=
- =?utf-8?B?Q2xscHRxam13Z3hiNldYdks3OUF4YTNDTDhNdlR2T0JaVG5kb2RvVDJRaFE2?=
- =?utf-8?B?N2V1ZGhSdGs2V3VnSVJMVVdiVGdGYVpXQlcrRytsalptT3dIQzR5ZWVEQ2lU?=
- =?utf-8?B?TnVFTDVXT2ZOeG8va3Z2TlJsZTZJdEVtM2hxQmFtVDB5RUlZTXErSVd2Mzdz?=
- =?utf-8?B?MkNIdDBGU1FMSGp0RG9UMDRMSHo3aVU3RDdrektONXJxRnFwWVg0Sll4MzBk?=
- =?utf-8?B?bHJwb2RBZlJhaTNTNVZIR2w3WTB3ck8wOWpTcUl2S2Fsb0FLUHZMaStlY0dV?=
- =?utf-8?B?cVZVQmR0dE41VFBKNXY5MHQ4NThBSkNHZ21lSnlPS0g3Z240NCtheFgrdDRs?=
- =?utf-8?B?bmtOamh4czhwdVFraC9OclN3Vi9YVWJTYXBhSHJSZVkxeGNsQlEwdXlaTFE5?=
- =?utf-8?B?dkU5S0VVMmhZSGRGWDYrTUpqb1ltMERib2ZJaWdDa2JuN05jZnVqaERpV0JV?=
- =?utf-8?B?ZDdoR0o5amNWQ3pHK3hVNjBXTzNZanRMNzdPdG1qeWdYaUpzVDNCVGo4SUpQ?=
- =?utf-8?B?YVh2ekxwM2JyV1B2cVo1VTNOTTJBNENqREtyUlJaMkJrNktLZEs4VXFIcnRF?=
- =?utf-8?B?cnRvWUJTekFId21kUXhkdThzSEpUeENXRnF1UEgyUWpTaGhKdldybHV5a0sx?=
- =?utf-8?B?ampjMUJtWlVqVGFvbUN4QU5FN0xzZi9yMm9CbXlrNUk1L0dMREdRSkx4ckt2?=
- =?utf-8?B?eFVKNi9zZFRTZWd1NjBmYm1rcnQ5SUhRSzF0SVFtc2VYRlFXZTRaNmNjVEZJ?=
- =?utf-8?B?OE9QcWhsdlN1eGoxekN1M01xU1I2c09QT0NhRk5TeDhmL2FKemF2WnJtdnhx?=
- =?utf-8?B?dUpoajM4clRRQXROSkQyR2NSK2lCNnd5NW9zYWQ0L0FYVTQwYVJhbE4ybVA4?=
- =?utf-8?B?Y0p1cDYwRE5hcjJLWnpxRmxRV1BsZjR1cnlpbjNoaUlpOW1jcW5YcTZoZlVY?=
- =?utf-8?Q?d4c4OVU4bkVhA8XnznPu9jbJ5?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7814c0dc-eb73-4334-9ca2-08dd397c1fcb
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2025 17:59:03.0532
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iAYIg5FInixg/IRUfEPbXINngwYLvaalhQ+le372qzHQ3cqKKsP8a/ey0DfR0q3d
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6052
+Mime-Version: 1.0
+Message-ID: <gsntplkh2wia.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 3/6] KVM: x86: selftests: Set up AMD VM in pmu_counters_test
+From: Colton Lewis <coltonlewis@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, mizhang@google.com, ljr.kernel@gmail.com, 
+	jmattson@google.com, aaronlewis@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Mon, Jan 20, 2025 at 01:14:12PM +0100, Christian König wrote:
+Hey Sean,
 
-What is going wrong with your email? You replied to Simona, but
-Simona Vetter <simona.vetter@ffwll.ch> is dropped from the To/CC
-list??? I added the address back, but seems like a weird thing to
-happen.
+Thanks for the review.
 
-> Please take another look at what is proposed here. The function is called
-> dma_buf_get_pfn_*unlocked* !
+Sean Christopherson <seanjc@google.com> writes:
 
-I don't think Simona and I are defending the implementation in this
-series. This series needs work.
+> On Wed, Sep 18, 2024, Colton Lewis wrote:
+>> Branch in main() depending on if the CPU is Intel or AMD. They are
+>> subject to vastly different requirements because the AMD PMU lacks
+>> many properties defined by the Intel PMU including the entire CPUID
+>> 0xa function where Intel stores all the PMU properties. AMD lacks this
+>> as well as any consistent notion of PMU versions as Intel does. Every
+>> feature is a separate flag and they aren't the same features as Intel.
 
-We have been talking about what the implementation should be. I think
-we've all been clear on the idea that the DMA buf locking rules should
-apply to any description of the memory, regardless of if the address
-are CPU, DMA, or private.
+>> Set up a VM for testing core AMD counters and ensure proper CPUID
+>> features are set.
 
-I agree that the idea of any "get unlocked" concept seems nonsensical
-and wrong within dmabuf.
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>   .../selftests/kvm/x86_64/pmu_counters_test.c  | 104 ++++++++++++++----
+>>   1 file changed, 83 insertions(+), 21 deletions(-)
 
-> Inserting PFNs into CPU (or probably also IOMMU) page tables have a
-> different semantics than what DMA-buf usually does, because as soon as the
-> address is written into the page table it is made public.
+>> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c  
+>> b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+>> index 0e305e43a93b..5b240585edc5 100644
+>> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+>> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+>> @@ -30,10 +30,21 @@
+>>   #define NUM_INSNS_RETIRED		(NUM_LOOPS * NUM_INSNS_PER_LOOP +  
+>> NUM_EXTRA_INSNS)
 
-Not really.
 
-The KVM/CPU is fully compatible with move semantics, it has
-restartable page faults and can implement dmabuf's move locking
-scheme. It can use the resv lock, the fences, move_notify and so on to
-implement it. It is a bug if this series isn't doing that.
+>> +/*
+>> + * Limit testing to MSRs that are actually defined by Intel (in the  
+>> SDM).  MSRs
+>> + * that aren't defined counter MSRs *probably* don't exist, but there's  
+>> no
+>> + * guarantee that currently undefined MSR indices won't be used for  
+>> something
+>> + * other than PMCs in the future.
+>> + */
+>> +#define MAX_NR_GP_COUNTERS	8
+>> +#define MAX_NR_FIXED_COUNTERS	3
+>> +#define AMD_NR_CORE_COUNTERS	4
+>> +#define AMD_NR_CORE_EXT_COUNTERS	6
+>> +
+>>   static uint8_t kvm_pmu_version;
+>>   static bool kvm_has_perf_caps;
 
-The iommu cannot support move semantics. It would need the existing
-pin semantics (ie we call dma_buf_pin() and don't support
-move_notify). To work with VFIO we would need to formalize the revoke
-semantics that Simona was discussing.
+>> -static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu  
+>> **vcpu,
+>> +static struct kvm_vm *intel_pmu_vm_create(struct kvm_vcpu **vcpu,
+>>   						  void *guest_code,
 
-We already implement both of these modalities in rdma, the locking API
-is fine and workable with CPU pfns just as well.
+> When renaming things, please fixup the alignment as needed.  Yes, it's  
+> more
+> churn, but one-time pain is preferable to living indefinitely with funky  
+> formatting.
 
-I've imagined a staged flow here:
+Understood
 
- 1) The new DMA API lands
- 2) We improve the new DMA API to be fully struct page free, including
-    setting up P2P
- 3) VFIO provides a dmbuf exporter using the new DMA API's P2P
-    support. We'd have to continue with the scatterlist hacks for now.
-    VFIO would be a move_notify exporter. This should work with RDMA
- 4) RDMA works to drop scatterlist from its internal flows and use the
-    new DMA API instead.
- 5) VFIO/RDMA implement a new non-scatterlist DMABUF op to
-    demonstrate the post-scatterlist world and deprecate the scatterlist
-    hacks.
- 6) We add revoke semantics to dmabuf, and VFIO/RDMA implements them
- 7) iommufd can import a pinnable revokable dmabuf using CPU pfns
-    through the non-scatterlist op.
- 8) Relevant GPU drivers implement the non-scatterlist op and RDMA
-    removes support for the deprecated scatterlist hacks.
+> I also don't like renaming just one symbol.  E.g. the above  
+> MAX_NR_GP_COUNTERS
+> and MAX_NR_FIXED_COUNTERS #defines are Intel specific, but that's not at  
+> all
+> clear from the code.  Ditto for guest_rd_wr_counters() vs.
+> guest_test_rdwr_core_counters().
 
-Xu's series has jumped ahead a bit and is missing infrastructure to
-build it properly.
+> Given how little code is actually shared between Intel and AMD, I think  
+> it makes
+> sense to have the bulk of the code live in separate .c files.  Since
+> tools/testing/selftests/kvm/lib/x86/pmu.c is already a thing, the best  
+> option is
+> probably to rename pmu_counters_test.c to intel_pmu_counters_test.c, and  
+> then
+> extract the common bits to lib/x86/pmu.c (or include/x86/pmu.h as  
+> appropriate).
 
-Jason
+Yeah I see what you mean about making processor-specific functions more
+obvious and think separating to different files would help a lot with
+that.
+
+>>   						  uint8_t pmu_version,
+>>   						  uint64_t perf_capabilities)
+>> +static void test_core_counters(void)
+>> +{
+>> +	uint8_t nr_counters = nr_core_counters();
+>> +	bool core_ext = kvm_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+>> +	bool perfmon_v2 = kvm_cpu_has(X86_FEATURE_PERFMON_V2);
+>> +	struct kvm_vcpu *vcpu;
+>> +	struct kvm_vm *vm;
+>> +
+>> +	for (uint8_t ce = 0; ce <= core_ext; ce++) {
+
+> Kernel style is to not declared variables inside for-loops.
+
+I ran it through checkpatch and it didn't complain.
+
+>> +		for (uint8_t pm = 0; pm <= perfmon_v2; pm++) {
+
+> Iterating over booleans is decidedly odd, the indentation levels are  
+> painful and
+> will only get worse as more features are added, and the "ce" and "pm"  
+> variables
+> aren't all that intuitive.  More below.
+>> +			for (uint8_t nc = 0; nc <= nr_counters; nc++) {
+
+> I also find "nc" to be unintuitive.  Either use a fully descriptive name,  
+> or
+> make it obvious that the variables is an iterator.  E.g. either
+
+> 	uint8_t max_nr_counters = nr_core_counters();
+
+> 	...
+
+> 		for (nr_counters = 0; nr_counters < max_nr_counters; nr_counters++) {
+
+
+> or
+
+> 		for (j = 0; j < nr_counters; j++) {
+
+
+> 'j' is obviously not descriptive, but when reading the usage, it's more  
+> obvious
+> that it's a loop iterator (if you choose
+
+Ok I'll go with the generic loop iterator name.
+
+>> +				vm = vm_create_with_one_vcpu(&vcpu, guest_test_core_counters);
+>> +
+>> +				if (nc)
+
+> Is '0' not a legal number of counters?
+
+AMD64 Architecture Programmers Manual Volume 2 Chapter 13.2.2 states
+that only nonzero values for that property are meaningful.
+
+With 0, you are supposed to assume either 4 or 6 counters depending on
+the CoreExt feature.
+
+I could make 0 mean 0 counters inside the guest but that would break
+what hardware does.
+
+>> +					vcpu_set_cpuid_property(
+
+> Google3!  (Never, ever wrap immediately after the opening paranethesis).
+
+Checkpatch didn't complain.
+
+>> +						vcpu, X86_PROPERTY_NUM_PERF_CTR_CORE, nc);
+>> +				if (ce)
+>> +					vcpu_set_cpuid_feature(
+>> +						vcpu, X86_FEATURE_PERF_CTR_EXT_CORE);
+
+> This likely doesn't do what you want.  By default, vm_arch_vcpu_add()  
+> initializes
+> CPUID to KVM's supported CPUID.  So only _setting_ the feature means that  
+> that
+> the test is likely only ever running with the full set of supported  
+> features.
+
+Ok, so I have to explicitly unset the feature if I don't want it.
+
+> Jumping back to my complaints with the for-loops, if the features to  
+> interate on
+> are collected in an array, then the test can generate a mask of all  
+> possible
+> combinations and iterate over that (plus the array itself).  That keeps  
+> the
+> indentation bounded and eliminates the copy+paste needed to add a new  
+> feature.
+> The only downside is that the test is limited to 64 features, but we'll  
+> run into
+> run time issues long before that limit is reached.
+
+> 	const struct kvm_x86_cpu_feature pmu_features[] = {
+> 		X86_FEATURE_PERF_CTR_EXT_CORE,
+> 		X86_FEATURE_PERFMON_V2,
+> 	};
+
+> 	const u64 pmu_features_mask = BIT_ULL(ARRAY_SIZE(pmu_features)) - 1;
+
+> 	for (mask = 0; mask <= pmu_features_mask; mask++) {
+> 		for (nr_counters = 0; nr_counters < max_nr_counters; nr_counters++) {
+> 			vm = vm_create_with_one_vcpu(&vcpu, guest_test_core_counters);
+
+> 			vcpu_set_cpuid_property(vcpu, X86_PROPERTY_NUM_PERF_CTR_CORE,
+> 						nr_counters);
+
+> 			/* Comment goes here */
+> 			for (i = 0; i < ARRAY_SIZE(pmu_features); i++)
+> 				vcpu_set_or_clear_cpuid_feature(vcpu, pmu_features[i],
+> 								mask & BIT_ULL(i));
+
+> 			...
+> 	}
+
+I thought of putting the features in a bitmask but worried it obscured
+the intent too much. Listing features in an array and constructing the
+bitmask seems clear enough to me so I will use that technique now.
+
+>> +				if (pm)
+>> +					vcpu_set_cpuid_feature(
+>> +						vcpu, X86_FEATURE_PERFMON_V2);
+>> +
+>> +				pr_info("Testing core counters: CoreExt = %u, PerfMonV2 = %u,  
+>> NumCounters = %u\n",
+>> +					ce, pm, nc);
+>> +				run_vcpu(vcpu);
+>> +
+>> +				kvm_vm_free(vm);
+>> +			}
+>> +		}
+>> +	}
+>> +}
 
