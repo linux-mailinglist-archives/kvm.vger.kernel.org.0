@@ -1,65 +1,79 @@
-Return-Path: <kvm+bounces-35935-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 976EDA16626
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 05:43:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA793A1663C
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 05:58:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D10D7A3CF4
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 04:43:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53A3C18898AF
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 04:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D1A1547C3;
-	Mon, 20 Jan 2025 04:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A272516F841;
+	Mon, 20 Jan 2025 04:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WRmH1Wzr"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="1whu3BnK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A1F14BFA2;
-	Mon, 20 Jan 2025 04:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574A015534E
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 04:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737348211; cv=none; b=mIvrdnqt+pYPFqUv+4b1OQiN2p/7sWe50NVD8FhdlR+33bcamvwcPXkCIOOD9DKsTP2qcWF8yNKGeoXm7Eb9svi2JaSe4odS9JI+pS5Qdb2pEpnG5HD2P6DY+78Sln3pSeJpYmojxynhrT0AE9yBEfXzUYaleZaiYm9+Bzlbums=
+	t=1737349088; cv=none; b=epFX8bnwpPBl6R3bl3iJeRPkfApStBpGjmeXmV+wu5yJp950pRPEztF4Br2BMhSVXQYbw8ri/3GhB9Yhi85+2hSle+1C/xxwcgax7u/prKwYHlDpW91axioICzSnXxQw58NauMgNNJQJqH2gsfFlg4JuHehzLn5oWhT1F24QyoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737348211; c=relaxed/simple;
-	bh=k9VTW4s3d7qGGrZ5gSy0LHsgcR6UYlQ4IwsEUwEVNfU=;
+	s=arc-20240116; t=1737349088; c=relaxed/simple;
+	bh=JBhx4FBRzKbzrz2Al5pNMHO5F3JgbgRL5B/gVFGVg/0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Om5mJ2V72rEJB06cBo087y2GP61WoS4dACNXhtWBgZnhmoziOv7PDOBD5v4BSuiHaEwg3saOPUaMFmQDrtBx++fHZD0NeX3okBOsIXS18I8nqRH5vfvNr/hhDMpVAPfYr+1PAepDjabUyXNbBrQQi8xEnVU6ECkq4V4WwGUGm/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WRmH1Wzr; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737348211; x=1768884211;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=k9VTW4s3d7qGGrZ5gSy0LHsgcR6UYlQ4IwsEUwEVNfU=;
-  b=WRmH1Wzrdn19umDn5omEFd8JUriQxC9snlTcZ4MgwpwJjxLemY7jJUX8
-   PEJAeAnjDlUdhTj4PVQgJeQIwAPLRUA/c/2cDs48V4CEKVgZfwSvuRjzL
-   OKEmWoDaxOYAfn8+hb+RNYWFJPOCW2M6gsm6yquDFdB1kMUVlqjlWoXKJ
-   cgjdYRAakWnvKWAz+DK+ufQKSJ/OAUq0HqJ7MCsCPdECDCqTlHHI6WzTa
-   gI8ulWqno0RHmPJ40lbiHQDURNOtRg6WQZga2ffRmCmhSzhrzXm1pKfl7
-   J9UlGWmJHjNji4q/WqrC/Rw6l8mylsqiPLPyGwghohN5GY5MrZ/4CuB+o
-   A==;
-X-CSE-ConnectionGUID: Y0XF0rl+Re2eZozbL+NEtA==
-X-CSE-MsgGUID: Lcaa89r+Rd++5KAhyQOJGw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11320"; a="41467920"
-X-IronPort-AV: E=Sophos;i="6.13,218,1732608000"; 
-   d="scan'208";a="41467920"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2025 20:43:30 -0800
-X-CSE-ConnectionGUID: 7xzZrTKBSAigrIZdE0pXfA==
-X-CSE-MsgGUID: Qwq3bW2hQM27SILBbyoG4g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="106818894"
-Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2025 20:43:24 -0800
-Message-ID: <c5aead07-2511-43a1-8f22-1346be34af28@linux.intel.com>
-Date: Mon, 20 Jan 2025 12:41:04 +0800
+	 In-Reply-To:Content-Type; b=Q3oTJlykwVy0GiOJZAlbM8A6YPM5Dv8s5lvp7R3T/YqWAH/LxiXxufpe2dKkS9DficW1VxM7oLxA9rLZqxBUnI0Gkb4PdS/Nb44xdViMzgEu5O6raQhhFseeUmuAQxAnZ+3lJL5zhz09b0Vk7+nsanR9zo0wFdk8xTWWtB6rfHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=1whu3BnK; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2eec9b3a1bbso5487211a91.3
+        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 20:58:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737349085; x=1737953885; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q4oIihNr6GZKGbnqtazZfNL+Wdu+eK7TRKf6H4jFUt4=;
+        b=1whu3BnKNwtvtqezELWKQt0hPy+FN+eYxFnvphEYfi8qsgYC7W5bmfPPeQAFhfje9v
+         CbaxUnTt6ZJUMsN9QS2shX24wJG64A76ZVHipVlxgXyEAgvl2W/LCo8UaIbMIpcWZ0X5
+         Ht6uaEyQYqQOsJy/RhVomU6JHqfZ9tvSSRWxgAfHN7lvUluRmH0VrqL7ULtJ/cg3AKhm
+         jweriYhaI57MWQQL1HLbdLdrvzjT1mJJE3knFLDLbBqku7AWN5eVh22I363rpyLfcFWm
+         yJcgtQoFIZXlMUwvua1s94+1pI0FzQy1IXT0XLOlcY4cXT0mISggZP6IZFZ1k01USb2L
+         TWVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737349085; x=1737953885;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q4oIihNr6GZKGbnqtazZfNL+Wdu+eK7TRKf6H4jFUt4=;
+        b=fjMUonrDf1Z0yDtd6mcxo/9KdbqLnRxVdxdIhuzgmMjtCO4nA+uFNHMnGNfYIXdH+S
+         PQOZHpIHjsTAj5phPGt/BvW3j6xeas3XRvjTpYUVzgsy6RjzYth5rvaTrvQ76QM3dOgK
+         tBQBQOF9VHwzrv6e+j4gYnl6ABHQV6WwCeAAxD+kLmTTO1uWVImkPd4CAHxQIMhPVK1+
+         cNFH4JlsEsctY9XSjVRRKN9O9bvaZbpVrw2NW51Oix4NQyRjMFPTgVJhXfWUxkmYpPRu
+         CKGerLENSLXmsIwgJMhTn+dw/X5h2XUj9q6bw/kGbF+iFdtZhNqwMwxptucOHDW6eeGM
+         AkQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWw3vxfZcfkqauUoYtvk6/KSPUq8mAqG4bEYMl5vVfpjbMOMMpCeT2ivgVBusvja0Q3s2Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeRFDVrPIpUn0LXHzLVfeQmbGESO1hxrev40IqrTsK/ZC8nx4i
+	PIslj7I5Y2siPpABTutybx7J6yStSJk8p5XFXg2767zg9AV1373Sd2rbQjR12qM=
+X-Gm-Gg: ASbGncvHJWmUi6OXbC0pj27gtBLVHR/7vmCZvkT1O9Q66tI+gubVX4gvOBus8lbYExq
+	WFEjinO2uZqx0wDe4ORk/DzhD//YOuKQvvnAno1RP7UA65HDevWle9JpmH7VmTeu3/7dxh5XYnL
+	POkttHIvYlcZIcMxKVMhRsJS+68i7xo2AlRnZCp+DvRDe/ZEInmF5YPxcrMBTgCQQ6zU1/jPT9o
+	nbw5ZtdpwFrqk0n29OUx+2TcFshLp5UmzYT9+50lfeC3X1aSpEaMg83ugGqFYIPiZFgvbMMyGx7
+	Dy9K
+X-Google-Smtp-Source: AGHT+IE8MzXrgaBKBfP61PbTUvr8PgxgGWYeOWK4EEWyIPyWkez8gj6KrIAnQzmUFU9EFnwQTPVCzw==
+X-Received: by 2002:a05:6a20:914e:b0:1e1:70ab:b369 with SMTP id adf61e73a8af0-1eb214983dfmr16605568637.13.1737349085531;
+        Sun, 19 Jan 2025 20:58:05 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab817529sm6251103b3a.67.2025.01.19.20.58.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 19 Jan 2025 20:58:05 -0800 (PST)
+Message-ID: <8052733d-3e79-4fd5-9bea-9d3724820bb8@daynix.com>
+Date: Mon, 20 Jan 2025 13:57:59 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,91 +81,156 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
- private device
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alexey Kardashevskiy <aik@amd.com>, Xu Yilun <yilun.xu@linux.intel.com>,
- kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- sumit.semwal@linaro.org, christian.koenig@amd.com, pbonzini@redhat.com,
- seanjc@google.com, alex.williamson@redhat.com, vivek.kasireddy@intel.com,
- dan.j.williams@intel.com, yilun.xu@intel.com, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
- daniel.vetter@ffwll.ch, leon@kernel.org, zhenzhong.duan@intel.com,
- tao1.su@intel.com
-References: <20250109144051.GX5556@nvidia.com>
- <Z3/7/PQCLi1GE5Ry@yilunxu-OptiPlex-7050> <20250110133116.GF5556@nvidia.com>
- <Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050> <20250113164935.GP5556@nvidia.com>
- <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050> <20250114133553.GB5556@nvidia.com>
- <17cd9b77-4620-4883-9a6a-8d1cab822c88@amd.com>
- <20250115130102.GM5556@nvidia.com>
- <f1ac048f-64b1-4343-ab86-ad98c24a44f5@linux.intel.com>
- <20250117132523.GA5556@nvidia.com>
+Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
+ <20250109-tun-v2-3-388d7d5a287a@daynix.com>
+ <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
+ <20250110052246-mutt-send-email-mst@kernel.org>
+ <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
+ <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
+ <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
+ <CACGkMEvBU3mLbW+-nOscriR-SeDvPSm1mtwwgznYFOocuao5MQ@mail.gmail.com>
+ <cc79bef1-c24e-448d-bc20-f8302e341b2c@daynix.com>
+ <CACGkMEsJUb3ZLm3rLuaayDAS4kf-vbY03wL4M9j1K+Z=a4BDig@mail.gmail.com>
 Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20250117132523.GA5556@nvidia.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEsJUb3ZLm3rLuaayDAS4kf-vbY03wL4M9j1K+Z=a4BDig@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/17/25 21:25, Jason Gunthorpe wrote:
->> If my recollection is correct, the arm
->> smmu-v3 needs it to obtain the vmid to setup the userspace event queue:
-> Right now it will use a VMID unrelated to KVM. BTM support on ARM will
-> require syncing the VMID with KVM.
+On 2025/01/20 9:40, Jason Wang wrote:
+> On Thu, Jan 16, 2025 at 1:30 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2025/01/16 10:06, Jason Wang wrote:
+>>> On Wed, Jan 15, 2025 at 1:07 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> On 2025/01/13 12:04, Jason Wang wrote:
+>>>>> On Fri, Jan 10, 2025 at 7:12 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>
+>>>>>> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
+>>>>>>> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
+>>>>>>>> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>>>>
+>>>>>>>>> The specification says the device MUST set num_buffers to 1 if
+>>>>>>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+>>>>>>>>
+>>>>>>>> Have we agreed on how to fix the spec or not?
+>>>>>>>>
+>>>>>>>> As I replied in the spec patch, if we just remove this "MUST", it
+>>>>>>>> looks like we are all fine?
+>>>>>>>>
+>>>>>>>> Thanks
+>>>>>>>
+>>>>>>> We should replace MUST with SHOULD but it is not all fine,
+>>>>>>> ignoring SHOULD is a quality of implementation issue.
+>>>>>>>
+>>>>>
+>>>>> So is this something that the driver should notice?
+>>>>>
+>>>>>>
+>>>>>> Should we really replace it? It would mean that a driver conformant with
+>>>>>> the current specification may not be compatible with a device conformant
+>>>>>> with the future specification.
+>>>>>
+>>>>> I don't get this. We are talking about devices and we want to relax so
+>>>>> it should compatibile.
+>>>>
+>>>>
+>>>> The problem is:
+>>>> 1) On the device side, the num_buffers can be left uninitialized due to bugs
+>>>> 2) On the driver side, the specification allows assuming the num_buffers
+>>>> is set to one.
+>>>>
+>>>> Relaxing the device requirement will replace "due to bugs" with
+>>>> "according to the specification" in 1). It still contradicts with 2) so
+>>>> does not fix compatibility.
+>>>
+>>> Just to clarify I meant we can simply remove the following:
+>>>
+>>> """
+>>> The device MUST use only a single descriptor if VIRTIO_NET_F_MRG_RXBUF
+>>> was not negotiated. Note: This means that num_buffers will always be 1
+>>> if VIRTIO_NET_F_MRG_RXBUF is not negotiated.
+>>> """
+>>>
+>>> And
+>>>
+>>> """
+>>> If VIRTIO_NET_F_MRG_RXBUF has not been negotiated, the device MUST set
+>>> num_buffers to 1.
+>>> """
+>>>
+>>> This seems easier as it reflects the fact where some devices don't set
+>>> it. And it eases the transitional device as it doesn't need to have
+>>> any special care.
+>>
+>> That can potentially break existing drivers that are compliant with the
+>> current and assumes the num_buffers is set to 1.
 > 
-> AMD and Intel may require the KVM for some reason as well.
-> 
-> For CC I'm expecting the KVM fd to be the handle for the cVM, so any
-> RPCs that want to call into the secure world need the KVM FD to get
-> the cVM's identifier. Ie a "bind to cVM" RPC will need the PCI
-> information and the cVM's handle.
-> 
->  From that perspective it does make sense that any cVM related APIs,
-> like "bind to cVM" would be against the VDEVICE where we have a link
-> to the VIOMMU which has the KVM. On the iommufd side the VIOMMU is
-> part of the object hierarchy, but does not necessarily have to force a
-> vIOMMU to appear in the cVM.
+> Those drivers are already 'broken'. Aren't they?
 
-Yea, from that perspective, treating the vDEVICE object as the primary
-focus for the uAPIs of cVMs is more reasonable. This simplifies the
-iommu drivers by eliminating the need to verify hardware capabilities
-and compatibilities within each callback. Everything could be done in
-one shot when allocating the vDEVICE object.
+The drivers are not broken, but vhost_net is. The driver works fine as 
+long as it's used with a device compliant with the specification. If we 
+relax the device requirement in the future specification, the drivers 
+may not work with devices compliant with the revised specification.
+
+Regards,
+Akihiko Odaki
 
 > 
-> But it also seems to me that VFIO should be able to support putting
-> the device into the RUN state without involving KVM or cVMs.
-
-Then, it appears that BIND ioctl should be part of VFIO uAPI.
-
->> Intel TDX connect implementation also needs a reference to the kvm
->> pointer to obtain the secure EPT information. This is crucial because
->> the CPU's page table must be shared with the iommu.
-> I thought kvm folks were NAKing this sharing entirely? Or is the
-
-Yes, previous idea of *generic* EPT sharing was objected by the kvm
-folks. The primary concern, as I understand it, is that KVM has many
-"page non-present" tricks in EPT, which are not applicable to IOPT.
-Consequently, KVM must now consider IOPT requirements when sharing the
-EPT with the IOMMU, which presents a significant maintenance burden for
-the KVM folks.
-
-> secure EPT in the secure world and not directly managed by Linux?
-But Secure EPT is managed by the TDX module within the secure world.
-Crucially, KVM does not involve any such mechanisms. The firmware
-guarantees that any Secure EPT configuration will be applicable to
-Secure IOPT. This approach may alleviate concerns raised by the KVM
-community.
-
-> AFAIK AMD is going to mirror the iommu page table like today.
+> Thanks
 > 
-> ARM, I suspect, will not have an "EPT" under Linux control, so
-> whatever happens will be hidden in their secure world.
+>>
+>> Regards,
+>> Akihiko Odaki
+>>
+>>>
+>>> Then we don't need any driver normative so I don't see any conflict.
+>>>
+>>> Michael suggests we use "SHOULD", but if this is something that the
+>>> driver needs to be aware of I don't know how "SHOULD" can help a lot
+>>> or not.
+>>>
+>>>>
+>>>> Instead, we should make the driver requirement stricter to change 2).
+>>>> That is what "[PATCH v3] virtio-net: Ignore num_buffers when unused" does:
+>>>> https://lore.kernel.org/r/20250110-reserved-v3-1-2ade0a5d2090@daynix.com
+>>>>
+>>>>>
+>>>>>>
+>>>>>> We are going to fix all implementations known to buggy (QEMU and Linux)
+>>>>>> anyway so I think it's just fine to leave that part of specification as is.
+>>>>>
+>>>>> I don't think we can fix it all.
+>>>>
+>>>> It essentially only requires storing 16 bits. There are details we need
+>>>> to work out, but it should be possible to fix.
+>>>
+>>> I meant it's not realistic to fix all the hypervisors. Note that
+>>> modern devices have been implemented for about a decade so we may have
+>>> too many versions of various hypervisors. (E.g DPDK seems to stick
+>>> with the same behaviour of the current kernel).
+>>   > >>
+>>>> Regards,
+>>>> Akihiko Odaki
+>>>>
+>>>
+>>> Thanks
+>>>
+>>
+> 
 
-Intel also does not have an EPT under Linux control. The KVM has a
-mirrored page table and syncs it with the secure EPT managed by firmware
-every time it is updated through the ABIs defined by the firmware.
-
-Thanks,
-baolu
 
