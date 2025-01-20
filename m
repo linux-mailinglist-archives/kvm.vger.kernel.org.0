@@ -1,113 +1,127 @@
-Return-Path: <kvm+bounces-36069-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36070-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0D61A1737E
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 21:11:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0DB1A1738C
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 21:19:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0ED96169613
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 20:11:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F07C73A355A
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 20:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2248A1F03CC;
-	Mon, 20 Jan 2025 20:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BFA1EE7AB;
+	Mon, 20 Jan 2025 20:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v+CNQYfq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cCjUP9Pf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25171AAA23
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 20:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9164B155A52
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 20:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737403903; cv=none; b=gE7hH30bsI3yvfek9WLpNP1/FcXVfWg2bUog3E7t0liG+ZPm+vW92l09K5GYbSisrP8w2uN9E1iHIyFl2fMDMjojM1KKjYzqAdkm9pn4okiasCRY2y99GPDMIHCTn8Iz/Sm/M7iLEk3rxymL+tA12yF4kc/DJaC6+4f5QAN5BOE=
+	t=1737404366; cv=none; b=byV+FD8nEfww8JNMO79/Xx5eJZ/ACP92hixN0IafCTHB699JPgJ7evlMYHqmRCq4ai6Oq5tZSl7y0Iva13YoJ3L77xAEw0RdqJrV5/pkWr6FTyoEgAHN+NlZR1H4escyQSUhQFE1VAHiTTLfG2Pa+Nz1pblQTfEvU1oKGZ9sLJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737403903; c=relaxed/simple;
-	bh=uijdKY0wDpdzNoyh/SEHCgVUOpZaMnezM7Uau8HiACc=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=S/qyzQciqJvQhgK7BuYyDG3HUTqkF+1YSHCfJJ6GWpHwzqsl6iYRe0C1tsHYOpWHC0dmNr8uHOZfW6LXGHNsDGg+3iv9OVNeLT3Rolg+02lbTf8Pz16RaLioY9ap9lduITfXFULzSPQXwi4Tl+Rhj3GhikwBwoa/J6S6OVP6Ix4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v+CNQYfq; arc=none smtp.client-ip=209.85.166.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-844ee1661c9so788984839f.1
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 12:11:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737403901; x=1738008701; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EpAqr5jIt3uiRXjUnKjrgnDNDsGAHfvj6DptghegyYA=;
-        b=v+CNQYfqfUXQXf9J+m9LXICdcOwDo4Ei8Msp2zvjNj0JWMOxwqHgYqZ8eibocMuotJ
-         DuwqcUuwJx/uImwSPT1SuawjuaN0H064BaN3cXhxUnc7Ng54wzOxIaSJFSbJpK6V82AT
-         nGSZ3BO0ionNG6NoK+9SQHzK/c9UvCJtl5+f1Vtc+wA0a/ZvHcMMATR9xf3V9Xf3PRp3
-         CUKtmgT8cka5ZpHs1sZqSCZceYt7zUEPwDqtwn4rp+Dah/vEgsLxUO6i7NqxbIqJNowZ
-         lFRYr9tdbxSDhY3Y83xFNG0IB99+22cWKSpkQ64h1AewoubHVgwjvsr/a1QbGBchQNrG
-         uPhg==
+	s=arc-20240116; t=1737404366; c=relaxed/simple;
+	bh=dWC1FZVSBtp+YVt1YlOjaCqU/+hTOBjfdOMJu29G2iQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JcJg0MF1BCzq9ePmB1OB0xv4bqBZz9JDMANv9S59rtzOaZB8SU5KK+xQa9K1X371giKyQwoJIPnhx5bf9EYTr3ToB2Wxxgb0DuAYS8d25iCE/k1EVeGL86itxc3xk04jaqG7WQvcC1dEepyQ4CJV5B/+T/VbdDW3Idnf8FRYNLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cCjUP9Pf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737404363;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jUWDGIwO1FbEQxMvPfuVA74bL427fymFcpQS1Zu4RrY=;
+	b=cCjUP9PfdCV6ueD8367+EfTfqntzGCaziBh7Tj9CQlpp5GpM+orqAowgyNTTvkTD+thDVC
+	MJeIy1gts1PF9NIXk4iaQ/8FNuoTjS88tVMf+8x0i1FMHEaw4eG8O+MOJf7n9OVMYw5aP8
+	m9Uhr23k7qHoYav3bkiwoomnV6C+8qE=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-626-kFU-zON9PROoD8EHyt2j_w-1; Mon, 20 Jan 2025 15:19:22 -0500
+X-MC-Unique: kFU-zON9PROoD8EHyt2j_w-1
+X-Mimecast-MFC-AGG-ID: kFU-zON9PROoD8EHyt2j_w
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6d87d6c09baso73929676d6.3
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 12:19:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737403901; x=1738008701;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EpAqr5jIt3uiRXjUnKjrgnDNDsGAHfvj6DptghegyYA=;
-        b=BSyAfwTNZtuqRxAxtM261ErXNv3jCyGIYhj9kyFHAG6ZzKITrKd6y+KjabSRyLE6Cw
-         ycy+a4TiN96INAMgVGofqTh2u7MEEk9EzDPo3I9eo9a07m78e6rCmYkV1g1KQG3c34CO
-         dz/kNT4PvVaP/hiWoPJcg4B3aNMwJaCjiIBlcz7hGsJ8A2IPjAenBgWi6uF2qEpKN8gK
-         hIrfhcd2PqwlXQ2EevL5XOz1hxhTRslAh7lqqScVvEG2/453j7tnxlqjdpKv8lNBa/kZ
-         mMqRdjBKr9LV67/WAQ3csR6oZs5ZArqvbO1ql0Sv5NR5BFuIjnyabu9WrfdEh9YJ0qVt
-         GHxw==
-X-Forwarded-Encrypted: i=1; AJvYcCWN6bIKWAnUqqyOIxq/ZRQ3tbHtPWfp8IMPmqpn6PXgAk9+1S702+MtPzggWCiduQuGwtQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEBx9UXg41dn9THan/hiOaJnF0yFrGVEvPDw4WgYyrISQ0iS+x
-	iAN6CwyeVUenRGC3lFaJboM/BLAE/pEkHcesxYMRp7gbHkcJclgnjxg94SkkK+jZxhOiKlyjMKQ
-	PnSs7VpO24VRJnt73h7Cv8g==
-X-Google-Smtp-Source: AGHT+IG4xjDkjq92PeXe/NqipBdjYi2MmKqrN60LHzWU7Slr3RIeaGGFeCBKl5znBQ0YMbY1xn1jrlL3o456UNML4A==
-X-Received: from iowg17.prod.google.com ([2002:a05:6602:1511:b0:844:e9b9:6f8e])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6602:27cb:b0:847:51e2:eb0 with SMTP id ca18e2360f4ac-851b62afe94mr1169419539f.12.1737403901124;
- Mon, 20 Jan 2025 12:11:41 -0800 (PST)
-Date: Mon, 20 Jan 2025 20:11:40 +0000
-In-Reply-To: <173645110935.884997.7060671564225875763.b4-ty@google.com>
- (message from Sean Christopherson on Thu,  9 Jan 2025 11:47:07 -0800)
+        d=1e100.net; s=20230601; t=1737404362; x=1738009162;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jUWDGIwO1FbEQxMvPfuVA74bL427fymFcpQS1Zu4RrY=;
+        b=bmPKgqM8+lXCF/pcqUDpuvNFOcLgGY8fX1sQOxq3nmP6qBUnDIXMYSGAh3dFchp+R0
+         bti/XTY5VV8CnkTq/UHzQcOYk6grqyTQ0x3rczTJrPppe18VOCpK3+KNMEtiWPjU0CQS
+         eA0eydPoT5mkAB9+s7T7jBE7YEz1lFHxYos6SCBfmig/RiKwM3OBrnFF+FJQLKMY5Rgo
+         w6/lhH8wwVdYZJWR1Nx0cfOI4HxUbz++txTKEEJaSuVMDKSzGjSYkX+vaOLeQfahFsxP
+         g66qW0eMLNlYU0Lmz60WCKYbW8HqqIENp6eSy35Of642cc+2LqZEmbsvQc0JoaRjJuD7
+         h8ug==
+X-Forwarded-Encrypted: i=1; AJvYcCVjJ//nc5TUGTATNal59EklKVBbCcjkgqcyOmJu7vZuDTQfwxasVTiSrRKo98tcOCxQOOA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy84IN16tuxt8Q6zrQBG5AZh7uFgfcxmrzHyn82ihprWdJR6iZG
+	ERJX874HGZrg7DVTZURGQ5eMw+b+RcSc9RfABSJb4Qx8Z3zAHFGnbXoOi/fS2pGU64mg5Z8SctX
+	roVDj481tdDqYzXMI/+hNxTNqPE6vRTLMFSe2J0YsgcH0Zg1oCg==
+X-Gm-Gg: ASbGncvVDtkm5wjkGWX1RPLjSAa2U1omCs0sVO3zP9XyQ/BauFBRSWm5w85YyqK8ICu
+	IQEO+UV998GENZZEpQ0KYHBs0uOcK2ASFxdW/2YAqn6v6Om4lpWJ7idqepZyGXkGgMrsYbWlSXA
+	urEoxYwAp6SE0OMjIZkRgr6AvSBpJjzpb5zWr5DyJyvARf/xpCQbmaZbopmhJZ4b6nREipEY4So
+	3x9spn/q8EjmO/O/u9cg9Liedf0FJj+8ciW+3+7oa84ltH+19KMYDBjKPMgb91CjvgUsTEKbQC0
+	mp2E0lBH0jQx7r1pj901VokDVvwB41U=
+X-Received: by 2002:a05:6214:570b:b0:6d4:25c4:e772 with SMTP id 6a1803df08f44-6e1b2251083mr288914406d6.36.1737404361956;
+        Mon, 20 Jan 2025 12:19:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEdseRQA0lTqL+ahCpBlb/Tkp1YOBsMwNUZ0Zhdb+QMVK55z+vsjtUKotEmMM7kRLN7wC+2zA==
+X-Received: by 2002:a05:6214:570b:b0:6d4:25c4:e772 with SMTP id 6a1803df08f44-6e1b2251083mr288914096d6.36.1737404361716;
+        Mon, 20 Jan 2025 12:19:21 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afcd5a2dsm44510926d6.72.2025.01.20.12.19.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2025 12:19:21 -0800 (PST)
+Date: Mon, 20 Jan 2025 15:19:18 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Alexey Kardashevskiy <aik@amd.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>
+Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
+ guest-memfd with RamDiscardManager
+Message-ID: <Z46vxmZF_aGyjkgp@x1n>
+References: <20241213070852.106092-3-chenyi.qiang@intel.com>
+ <d0b30448-5061-4e35-97ba-2d360d77f150@amd.com>
+ <80ac1338-a116-48f5-9874-72d42b5b65b4@intel.com>
+ <9dfde186-e3af-40e3-b79f-ad4c71a4b911@redhat.com>
+ <c1723a70-68d8-4211-85f1-d4538ef2d7f7@amd.com>
+ <f3aaffe7-7045-4288-8675-349115a867ce@redhat.com>
+ <Z46GIsAcXJTPQ8yN@x1n>
+ <7e60d2d8-9ee9-4e97-8a45-bd35a3b7b2a2@redhat.com>
+ <Z46W7Ltk-CWjmCEj@x1n>
+ <ba6ea305-fd04-4e88-8bdc-1d6c5dee95f8@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsnted0x2qkj.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v2 0/6] Extend pmu_counters_test to AMD CPUs
-From: Colton Lewis <coltonlewis@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: seanjc@google.com, kvm@vger.kernel.org, mizhang@google.com, 
-	ljr.kernel@gmail.com, jmattson@google.com, aaronlewis@google.com, 
-	pbonzini@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ba6ea305-fd04-4e88-8bdc-1d6c5dee95f8@redhat.com>
 
-Sean Christopherson <seanjc@google.com> writes:
+On Mon, Jan 20, 2025 at 07:47:18PM +0100, David Hildenbrand wrote:
+> "memory_attribute_manager" is weird if it is not memory, but memory-mapped
+> I/O ... :)
 
-> On Wed, 18 Sep 2024 20:53:13 +0000, Colton Lewis wrote:
->> Extend pmu_counters_test to AMD CPUs.
+What you said sounds like a better name already than GuestMemfdManager in
+this patch.. :) To me it's ok to call MMIO as part of "memory" too, and
+"attribute" can describe the shareable / private (as an attribute).  I'm
+guessing Yilun and Chenyi will figure that out..
 
->> As the AMD PMU is quite different from Intel with different events and
->> feature sets, this series introduces a new code path to test it,
->> specifically focusing on the core counters including the
->> PerfCtrExtCore and PerfMonV2 features. Northbridge counters and cache
->> counters exist, but are not as important and can be deferred to a
->> later series.
+-- 
+Peter Xu
 
->> [...]
-
-> Applied 1 and a modified version of 2 to kvm-x86 selftests, thanks!
-
-> [1/6] KVM: x86: selftests: Fix typos in macro variable use
->        https://github.com/kvm-x86/linux/commit/97d0d1655ea8
-> [2/6] KVM: x86: selftests: Define AMD PMU CPUID leaves
->        https://github.com/kvm-x86/linux/commit/c76a92382805
-
-> --
-> https://github.com/kvm-x86/linux/tree/next
-
-Thanks Sean! I'll get to the rest. Sorry for the delay in responding to
-your comments. I was head down in something else and didn't have time
-until now to remember what I was doing here.
 
