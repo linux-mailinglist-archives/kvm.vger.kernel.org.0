@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-35943-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35944-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C195A16693
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 07:13:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5361A16692
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 07:13:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 147F67A41E7
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 06:13:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CFA7188774D
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 06:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729EA186615;
-	Mon, 20 Jan 2025 06:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276E0187FFA;
+	Mon, 20 Jan 2025 06:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d4Hrz7NA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FKkMdwRI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E69183CD1
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 06:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91108183CA6
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 06:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737353611; cv=none; b=iITkHTE+qjyKogoTYeKbzAhDQA2WjXS/+I4Rb59zlia/44CE18/kK/qbREojb9AoQlpv4tTQ8EHwT2mMdNFcdRT+aaW418vJ3zICs31WKaBOFyJSJrXdrQZOtKnh2IGaOA4FndqceNQJPXPLOQmmsJx1bu9vmtITF78OevjnCx8=
+	t=1737353616; cv=none; b=F+q20egkQEu/JmuLMOPsg5jSSRI/IhhO9LP25B3f86LqRKjpO8XK+5WYR5klRtDV9+iPlIoJSeeCYTubggkRJuOlODfZ0/TgUmHfFx/BrenCi+gik46lZwmUTvlw3r83nGRXOHHR48efsXo3jro2/JeOVWKz7QIGQzgMJ+LnMwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737353611; c=relaxed/simple;
-	bh=K1Wcn8Ucet0XH8q61Ezq7T9/YZboaMm8yYJX3EBE8kw=;
+	s=arc-20240116; t=1737353616; c=relaxed/simple;
+	bh=CYhXwgGa4X22iwL0OCe5p6nuIsa6FmpfTmFp/kvJIGE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pyUmUIloISfhPpoiFjSi7yo6lKrU3n4jxyss/pc/eUrlAECSV8wncZBRsgZOAFu6RhvrVVxREDiPW0whUSB78u8hkBEEfiI75H+d/v66sAp/RwByh5N2bIO+HdEwyZHCchttiQ4dGq6IR0b3KFjAhKN1gIx+uDpJ4xDSgpRp0Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=d4Hrz7NA; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version:Content-Type; b=sT4Ip5KrFwdzjn/00mKxN6qjoed3WJAKEvhTwhXvR3N3FDbUQIrnVrNbzITnPtLX6AzHRt1V67sSoKwRo3kzznD5Tks38QPy7xn57SxOXznxNmnLqIr6TWEJVetOxo0TYaFhJ6Diyez6zgJ481lq2FcsTyR2wvNrvRxlDR8Nzj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FKkMdwRI; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4362f61757fso41739315e9.2
-        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 22:13:29 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-435f8f29f8aso28153805e9.2
+        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 22:13:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737353608; x=1737958408; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1737353613; x=1737958413; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/LgmFzZPaYXd/oFrcsNkEtO3/uWCAUa12Q0VDnBXMJM=;
-        b=d4Hrz7NANHWsPgWk0+4jCNWG2/t8QLP1rlXdFPf9MwuU3ux6AkVIfHCek4Mnz5xj0P
-         QOr+knsDR4NjyZF23REkE7uyqo1LcLaS0a9L/KHc/8EWUjMbfh7Wrzp14B3XxBTtAgFx
-         sRPhy8+VyoUfioFxn3OdfFGWiBXeR+splMiGEX0h4//woPgTy4g7ZEFq7sOdGn0bnBC9
-         Kuyt41RFl8E+ULYy6y5XAdCyA+kpURQso1kLhw3+Zf6zcTzuWPOJ3a7HLhJXKq9Kx+pX
-         YWo9lUd8awrL8kQYDbl2sAHXrKkH7fEXCzevFp6I3sa4pblK41AAPO+Q3NVMGiZu+NIn
-         1vhA==
+        bh=Xht6F+Bfddgo3PrucGv//ZpFrfS6UZc2/xGuv7FMfr4=;
+        b=FKkMdwRIdOAOpGUtBvzcKiJoW4dVunxyKsLOoWzIfe9ERx9XxBgdcavBEWC4nrQnKk
+         XjZbWjp3VZQFtN8m+NVfeiCQ/lspBjvyLQXRV15yfLuDBP4sRf/WKH93hfOa2NyKb0/F
+         +Wzbo0yfpVmmD6ed1oHMxXolVsu1GsEmi0Es4w3MYGrgYIzmxY2/Q0pHUz6n+eyr1Aug
+         km7zn1H7WrTwc023iLJxMbiFdmqZljlUxYfDVOjAJycUvp60vicVRHURhslomOwRMy1S
+         RTQONX5B0LBdhrDMrFq6RfDRtyhYs/ZWGA0YT9neN6HcbKv76IxMoBoT2gychEzQ4mWs
+         /TPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737353608; x=1737958408;
+        d=1e100.net; s=20230601; t=1737353613; x=1737958413;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/LgmFzZPaYXd/oFrcsNkEtO3/uWCAUa12Q0VDnBXMJM=;
-        b=nfFZj88cVF5Umyo77l8KSf+Gp7UdNX0lSXVyZWs5nfwe3ImqfbftFwig//lPJL3D97
-         puZ2/vV3Vfe9jNaHN+JGr0/vcRlQxklCvAdlSWEdwEhguLzLg2RsSGzQH5DUUiPKQzBx
-         rWBPFO52cq9F133vhD2M69XaxT9l9u5KIV2Y6LjBg8lH+mlZLyWgc6VaAWey8+C7A5id
-         UqaINZ6qv+CAEztGGhGSovo8MHYi+CnufOOavTnQ8QGLA/yF2Sv+ljmYFJRl267v8eGI
-         YZ6pQL4obtmE/ABRapRqVxyUzyJfW6VOJ7R9oqjQ2+mMt77uge0JI65d2dKwgBDtpFf8
-         wByA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdWGdYzs7eFJx0I/7RZ1JpwFiswe9uHXu4HV/biiT7Rjf2Mn0DuT9d0WfNrnALaHmNlK0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGdhV1C3LgdEqNTw1Q99qfUaDkkq+N2hq7kpypxmvldHCaQvF/
-	K++omGcDbRG9lGJiuaL1Mx9dV8vANWweMLlH3zTG9HE3do3ldNm5HlIJonDVKYc=
-X-Gm-Gg: ASbGncuh+KO43GKM8CnASoVMfqdqQrkrP+Tu/CqkochB41sQ2QwxZB2/jMYEVmymdL8
-	bi3gKHGFJ5ILkI4wElgJ5pov6gIvgLv+hKiTUE870lablc8uUmoODOzC2lmvSIF1TP9bMAaXpaq
-	jSReR95WKWBeUXMOec7bZ4VnzxTh2kh0k1g6PDO9DcUgZpzctPWgjZB4isxYqLz1a9y5CTjrVHZ
-	dVB37NBtvA9crFUwScCyoNjLYctacQglJJHNxHuGs6bInE/j5tCxSeX/92d+jlePj4fNXetQl0t
-	ZgyFTlM+Zbv2d2N9ihJfnX/zvz62yD4trtr4UJYxEBQW
-X-Google-Smtp-Source: AGHT+IFQxWOYTXhmRmfNHYvquVRicISruZz1w3PMDmGF59CMccSZ+zar5LZzshebqb/yaVzBLo/diw==
-X-Received: by 2002:a05:600c:19cc:b0:436:fb9e:26c with SMTP id 5b1f17b1804b1-438913de937mr105007685e9.17.1737353608127;
-        Sun, 19 Jan 2025 22:13:28 -0800 (PST)
+        bh=Xht6F+Bfddgo3PrucGv//ZpFrfS6UZc2/xGuv7FMfr4=;
+        b=pblteaaEw0n5GX1IXkFGjSaugHZO/0URCTHYmfVljbGb+elp/0tff4b0sab+HkZC+o
+         r/uUZfnmU+oMYLtCb30iJXRe7skwCXFcYH7BWPG0oZ08fHy4QBhvQTFSIphStqmKfooW
+         iIUArbGSaDLZ8TEgIpyn5RwzCw8q4e+5gwZgEPYejU4OCloit7SpnHTTHr758njMLHFZ
+         qsLI0NCwgMm184gxpoABklBnb3L7Jd+lkTWc67X4d7MTfxojAW18ide5apMcPwX6o2Mx
+         qWGndL/0amsuMYR3owqTrwMC/wkizxvP0o7RVN9RDGAE7VyaXAYLNbKrqTNEPq3aV/nM
+         slxA==
+X-Forwarded-Encrypted: i=1; AJvYcCW9x/w+/qRSzT6mm0AaiqSY4bGVpaauI3UWkHyCVdaUExMcoHmexY2y90filEIL9NqrPxQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPd7nEu/lsUdPPS4LWcv0qlmPpQTQi4el4YNTsMVwbX3tTCpdb
+	N0Abu7n8iQP2Tofr86XJsp8RFPTculxUYgaQDhLUhLrT5TUN7vs4US9dMMIRLEc=
+X-Gm-Gg: ASbGncvO0SqkUJ2AaSArE/Dt5BPgxPCjU1b8Q//g1XoPXvY5N2FGXu4jZGLJJbGWMUk
+	+4m8C96O75UUSxsNK7aCl99/Sudkl2SBDpp06Ye0OneO2AWt9GetiEmbJ0EZWUQEFwZIAD4FPUs
+	xZP0wgQZx46v1XdE7TefSp6SJinSo1J/wXuiNcMj9Sbul7MeH1keYPPXTpw0ZNTRqjAj74h7lCt
+	7KACqWbZUbdZXtpssX+V4L/VIfDquwI9yreeGXAvwc/6IehFNXRrHqunluBKuvrt3FWoFROvv/u
+	XJY7kiBcKsaF13j88lyXv0F1c407f225/HyReSzPGNIC
+X-Google-Smtp-Source: AGHT+IF+TJkrPn7eE3Okqh3EvtF88mvEqTvQGYIM33ZG3vLFVo2jCll9ng09trmhL1noLdq3Lbecvg==
+X-Received: by 2002:a05:600c:138a:b0:435:194:3cdf with SMTP id 5b1f17b1804b1-438914292demr100258335e9.19.1737353612858;
+        Sun, 19 Jan 2025 22:13:32 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438904087cbsm127685485e9.3.2025.01.19.22.13.27
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c7499821sm186147275e9.2.2025.01.19.22.13.31
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 19 Jan 2025 22:13:27 -0800 (PST)
+        Sun, 19 Jan 2025 22:13:32 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>,
@@ -80,9 +80,9 @@ Cc: Richard Henderson <richard.henderson@linaro.org>,
 	Warner Losh <imp@bsdimp.com>,
 	kvm@vger.kernel.org,
 	Laurent Vivier <laurent@vivier.eu>
-Subject: [PATCH 3/7] cpus: Constify qemu_cpu_is_self() argument
-Date: Mon, 20 Jan 2025 07:13:06 +0100
-Message-ID: <20250120061310.81368-4-philmd@linaro.org>
+Subject: [PATCH 4/7] cpus: Constify cpu_get_address_space() 'cpu' argument
+Date: Mon, 20 Jan 2025 07:13:07 +0100
+Message-ID: <20250120061310.81368-5-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250120061310.81368-1-philmd@linaro.org>
 References: <20250120061310.81368-1-philmd@linaro.org>
@@ -100,63 +100,35 @@ CPUState structure is not modified, make it const.
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
  include/hw/core/cpu.h | 2 +-
- bsd-user/main.c       | 2 +-
- linux-user/main.c     | 2 +-
- system/cpus.c         | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ system/physmem.c      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index fb397cdfc53..782c43ac8b3 100644
+index 782c43ac8b3..04fede0e69a 100644
 --- a/include/hw/core/cpu.h
 +++ b/include/hw/core/cpu.h
-@@ -838,7 +838,7 @@ static inline bool cpu_has_work(CPUState *cpu)
-  *
-  * Returns: %true if called from @cpu's thread, %false otherwise.
+@@ -1155,7 +1155,7 @@ void cpu_watchpoint_remove_all(CPUState *cpu, int mask);
+  * Return the requested address space of this CPU. @asidx
+  * specifies which address space to read.
   */
--bool qemu_cpu_is_self(CPUState *cpu);
-+bool qemu_cpu_is_self(const CPUState *cpu);
+-AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx);
++AddressSpace *cpu_get_address_space(const CPUState *cpu, int asidx);
  
- /**
-  * qemu_cpu_kick:
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index b2f6a9be2f2..6dc4512cebf 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -205,7 +205,7 @@ void stop_all_tasks(void)
-     start_exclusive();
+ G_NORETURN void cpu_abort(CPUState *cpu, const char *fmt, ...)
+     G_GNUC_PRINTF(2, 3);
+diff --git a/system/physmem.c b/system/physmem.c
+index c76503aea82..0ac6acb9764 100644
+--- a/system/physmem.c
++++ b/system/physmem.c
+@@ -805,7 +805,7 @@ void cpu_address_space_destroy(CPUState *cpu, int asidx)
+     }
  }
  
--bool qemu_cpu_is_self(CPUState *cpu)
-+bool qemu_cpu_is_self(const CPUState *cpu)
+-AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx)
++AddressSpace *cpu_get_address_space(const CPUState *cpu, int asidx)
  {
-     return thread_cpu == cpu;
- }
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 7198fa0986b..104704ace96 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -181,7 +181,7 @@ void fork_end(pid_t pid)
- 
- __thread CPUState *thread_cpu;
- 
--bool qemu_cpu_is_self(CPUState *cpu)
-+bool qemu_cpu_is_self(const CPUState *cpu)
- {
-     return thread_cpu == cpu;
- }
-diff --git a/system/cpus.c b/system/cpus.c
-index 37e5892c240..e4910d670cf 100644
---- a/system/cpus.c
-+++ b/system/cpus.c
-@@ -502,7 +502,7 @@ void qemu_cpu_kick_self(void)
-     cpus_kick_thread(current_cpu);
- }
- 
--bool qemu_cpu_is_self(CPUState *cpu)
-+bool qemu_cpu_is_self(const CPUState *cpu)
- {
-     return qemu_thread_is_self(cpu->thread);
- }
+     /* Return the AddressSpace corresponding to the specified index */
+     return cpu->cpu_ases[asidx].as;
 -- 
 2.47.1
 
