@@ -1,209 +1,198 @@
-Return-Path: <kvm+bounces-35969-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35970-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E342BA16AC5
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 11:30:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC13DA16AD8
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 11:35:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B96567A199F
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 10:30:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DEC03A5EC1
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 10:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164471B414F;
-	Mon, 20 Jan 2025 10:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF7D1B6D08;
+	Mon, 20 Jan 2025 10:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="dt3nFW16";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vjrCs9sC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIIW/IQZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from flow-a6-smtp.messagingengine.com (flow-a6-smtp.messagingengine.com [103.168.172.141])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA5814387B;
-	Mon, 20 Jan 2025 10:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370AE1BC07B
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 10:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737369030; cv=none; b=cDtQsVXj26QFq5FKSDkwHp22jfGtCbThfZFBHYk3/F9mqjSheulpAuJHxlg280XodI6pnza+M4CKEkEjoCIjeETs+Hv72prXcvSsUwt9j20JmYwida/AGkj3AqvLvpmbxNVboniRHGSSlExtuYMqPK/DGCFnQTCpeUYlKhAoUnA=
+	t=1737369282; cv=none; b=cj2aVzQnwYgdfrWuPYHZa0vCi3s/GMzOwAteRcVMNEe5e1HRMKTf0cb0qdlqt6bdPN6HuLuZT0TPxQSAMtL75Nu4sfFKJ2iVmQq+McksL+5k2/q9BWTzHanjVedT6G4rnD3RhEimrGJx+swF6xcdH7OQd68vnKWzGP8+ye5rzBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737369030; c=relaxed/simple;
-	bh=dPngGxiY4Q3XOjgFQ7vJUGs73DWP237S6SHJS49fkic=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jiGXFa/ZT62uHxtgCNCl4YYJEpXilILxOULjGNz15avtxk/jRZ80pHzRBakPgox1pEyTDsLTmcB3y98QNwgFt4ryJMZJID4eqMjQFZhZL3s3/ULCKeGFkoFOfVvXLEx9yVjzNtdrpaWkSnTLxqOsp44+3IcgnPNAov1KDK41bmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name; spf=pass smtp.mailfrom=shutemov.name; dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b=dt3nFW16; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vjrCs9sC; arc=none smtp.client-ip=103.168.172.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=shutemov.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shutemov.name
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailflow.phl.internal (Postfix) with ESMTP id 11015200EC5;
-	Mon, 20 Jan 2025 05:30:27 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 20 Jan 2025 05:30:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1737369027; x=
-	1737376227; bh=0ojkMCVyarP9L03GWogf+XnkAUBps3DAxMGuBvM8joI=; b=d
-	t3nFW16YKmJEzF626fgPnJO+RgHZhRP27aLr6RJn8jFxx6S8njGTe3MZ9BI/THP1
-	FHOPmNNmEktaWlyHMVMx24GRuE6s/HneKgesiTeeqiSvEHeXCWYKj6QlNPa1eHfF
-	9BeERmUIxddgSUUf8WzYHJ1KWJNdiLnfRmy1At5yDK+8/BsQDI9xoFcvIen+tvTQ
-	cg5NE4mSp04L/yRkVSpKCOlaqfk+w1v6SUdwmhx0zpaeg6ihu3kTiSvilkDprf8d
-	xRcXc9KCGDhmt/7psKI8q/49uXx/J9eoVagnz3L0jsqZKfjp8BaHTkmp/Uvqfx2n
-	vt2kxtsg4KSb1ZYAs+0FA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1737369027; x=1737376227; bh=0ojkMCVyarP9L03GWogf+XnkAUBps3DAxMG
-	uBvM8joI=; b=vjrCs9sCk67Ho93YcphGlBXipIuFEoQFKkzL+pW+SYq0LauV9DR
-	Fez1bGmLWdR/699rL0M/YnDLXXQdPyQ7a4VHBBBRJALKj/EAVJ0iGczA0UW3/GJG
-	y1oKsgjp1VO88PRgoPo7vi2gGSXwgy3bvQGjwHj6JfL0PnBLKASAhfHhGzP1shB1
-	aRLr0l+uAfgutni0+92suOFC3bmh5EAHXN4UpKP60Gw+OFUBt2I6bXW5YIvhbQJi
-	A108QMLG4kGWIqsSHDOr5GR55obqdXCvwIgdT2Fcq3BAFL74kaUA1R1847Agt/Y6
-	kBF8hrdXNhKyG1aOZ9KflvsA3nkJ4+dXhCw==
-X-ME-Sender: <xms:vyWOZ38D49SNhAfK4IIg7f6SA-9STbxNesVJ0FiYArvBoO5y0g3-wA>
-    <xme:vyWOZzuz1jwqodfCUhTqqRpoXIOguk0_7pEvnCh6E_aLDM1zbEW1I4YnK99Cq8Dim
-    4yhZYA7l2auTeEAwt8>
-X-ME-Received: <xmr:vyWOZ1CqNSiMBcLuQnMyNjWrvdO4Xthzd7XrI-rEL6ZIOaAuovtjaoFDhadOL_ZehI4p6A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeiledgudefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvden
-    ucfhrhhomhepfdfmihhrihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlse
-    hshhhuthgvmhhovhdrnhgrmhgvqeenucggtffrrghtthgvrhhnpeffvdevueetudfhhfff
-    veelhfetfeevveekleevjeduudevvdduvdelteduvefhkeenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhv
-    rdhnrghmvgdpnhgspghrtghpthhtohepiedupdhmohguvgepshhmthhpohhuthdprhgtph
-    htthhopehtrggssggrsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkvhhmsehvghgv
-    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhmmheskhhvrggt
-    khdrohhrghdprhgtphhtthhopehpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdhrtg
-    hpthhtoheptghhvghnhhhurggtrghisehkvghrnhgvlhdrohhrghdprhgtphhtthhopehm
-    phgvsegvlhhlvghrmhgrnhdrihgurdgruhdprhgtphhtthhopegrnhhuphessghrrghinh
-    hfrghulhhtrdhorhhgpdhrtghpthhtohepphgruhhlrdifrghlmhhslhgvhiesshhifhhi
-    vhgvrdgtohhm
-X-ME-Proxy: <xmx:wCWOZzfQgPyF6ajSH6NKEvxqc3awd1YhqjmlJV_cl-81IH3NeFuvkg>
-    <xmx:wCWOZ8PV4R5Y0cRUGiDLVlRkfeV5Y0JkYstDijjqkRdzXrmVGKuQFQ>
-    <xmx:wCWOZ1nS37ZS7N0aHMQOw2hyV_4I96abO4Eij1smo9--hcgw9Gz5Zw>
-    <xmx:wCWOZ2sX8n5slNMCa4Hw83M4yIkBilPlKlVnijOrUr90SgHkt65T6w>
-    <xmx:wyWOZzq54AbLbDNd5x-U5Akn19FD-RAKj42hXiREv7RkeRgYIvWfw3a5>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 20 Jan 2025 05:30:06 -0500 (EST)
-Date: Mon, 20 Jan 2025 12:30:03 +0200
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
- 	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, 	paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, 	viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, 	akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, 	chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- 	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
- vbabka@suse.cz, 	vannapurve@google.com, ackerleytng@google.com,
- mail@maciej.szmigiero.name, 	david@redhat.com, michael.roth@amd.com,
- wei.w.wang@intel.com, 	liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, 	suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com,
- 	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com,
- quic_svaddagi@quicinc.com, 	quic_cvanscha@quicinc.com,
- quic_pderrin@quicinc.com, quic_pheragu@quicinc.com,
- 	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com,
- 	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org,
- qperret@google.com, 	keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, 	jgg@nvidia.com,
- rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com,
- 	hughd@google.com, jthoughton@google.com
-Subject: Re: [RFC PATCH v5 05/15] KVM: guest_memfd: Folio mappability states
- and functions that manage their transition
-Message-ID: <r425iid27x5ybtm4awz3gx2sxibuhlsr6me3e6e3kjtl5nuwia@2xgh3frgoovs>
-References: <20250117163001.2326672-1-tabba@google.com>
- <20250117163001.2326672-6-tabba@google.com>
+	s=arc-20240116; t=1737369282; c=relaxed/simple;
+	bh=XN/jDQj7DFcJlVM+sPKONNEdKWohE83giqJVDR6fIcQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C7mP+MlcTrRvRVTs2tiYVwdtXm97H0NdlO8qkPexYK9Jvry5YzVuta1ZLuL5NXosadiG9XqMqGiEL7P39eG4kFcga0iz3ukwmPMEnDPX1MtoWz+LcR+g8No8nt/3KpwIndfqJ2mRZeK637Ej9Zwv8GkVpEuG6LEkhWr3RVXEZ8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dIIW/IQZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737369280;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=VTK3NeuA2/5eg0HceoKYSEnDBkQEomluQ0LED8G6DTc=;
+	b=dIIW/IQZtkkN6NpyTrrV2d8bkjPViXwGHO3pn2h5DfW2D2TkeqVZ5H65MCZhbM25dnkew6
+	zIXJ1jYHimWUskUVVdfMQpT0zJrrI7dOwlc0zrz6ppyx2/3eT7HoXIzrPmLenpyrva8hGB
+	75JMd+OXRJGAQf8tv2KM7ogHcVFd4e0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-iTAtxEYmP8SBjhk9Gkbwow-1; Mon, 20 Jan 2025 05:34:38 -0500
+X-MC-Unique: iTAtxEYmP8SBjhk9Gkbwow-1
+X-Mimecast-MFC-AGG-ID: iTAtxEYmP8SBjhk9Gkbwow
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-436248d1240so20631775e9.0
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 02:34:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737369277; x=1737974077;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VTK3NeuA2/5eg0HceoKYSEnDBkQEomluQ0LED8G6DTc=;
+        b=TSBwdODRcBH/n6mIWYpkncwmk61kR7cW4gTiI3yaighbncTAVG/+AxuhWHQrtDC5ju
+         vapKAP78ECYFq0Kl2M13SM1ZLEv9Ir7C1+t1vv11LclXJ7TqGAdgNsbqriyIGCVgXfiw
+         lSMyoOe0X8ysu4BvBe7igKPCsWUvT53fulprgjiTrdHqc3iyYVPaBVwsxak4WxN1zT3G
+         85OYcT88MWzdEMQKwXeGNlHF0BH8hfjqQu6frb8PuTcht5AQdzIe3W5Y8rvoStiDnnZu
+         uJxMBa2uCknEUxsbADzqeWeKMMLTM6ZAnh6WD1NkzLa/1biZQ+meo0sg+HhSb2UB9R5d
+         o6sw==
+X-Forwarded-Encrypted: i=1; AJvYcCVElA4zeyr3HxeYB9zTyt9Af4rEb5HiNfCQE01fDPl9gdOHHxt3/2/K6ktub++G0GdtU/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWjIa8cNH+xXWKSrLlzlSJ+CnmIuyh13P7JDhepLZBnJEoNT9F
+	twpnIqp2WUiuubznh3zBVxpqHXnZ6EsebwPQikOKZ9umRjUdQExVmBw3NcHa2/gld2TyDCDtdUM
+	nXVV4Hykq+qO4Zdzyyrx5Ld0u69Oz0owlh1HjUq6XrN7cWARojg==
+X-Gm-Gg: ASbGncuOCZ47W4/fGoGRVZmcA6GM+IKwJ1ZK5xISesd3JJoE33UurmpUDmgVKPa9rON
+	BJDbwMgig6j6a8Np4cGwTlYRCxAd8ysLqmjL3CA5TcbxLX34YOueDyk6RarhernL4Z2OAYcrMth
+	W+kMl1sAL45sel4WpcMUqZ4IkOpOCs0MwxWkD6UDgqEB0up5c3MLDv4y4D7eGclTJBQv8VZFaq0
+	j2AsVq2MB5Apj77l5csVTVfwdy+EANv1xsMXVuOl8NzZxnscRq9Jy8ztPv38IbEquhVfdYGxYG5
+	8ikLwrkZYsPyA/00H5gQk1YTA6Z+9qNmUJS/GW1yubB7+KjDH2UkVNx3iELTRUb2LjcuomaZyu6
+	3U3ltkVY+du3gBJ4z3kX/Eg==
+X-Received: by 2002:a05:600c:4693:b0:434:f0df:a14 with SMTP id 5b1f17b1804b1-438913bed10mr114788125e9.2.1737369277315;
+        Mon, 20 Jan 2025 02:34:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEwm5c24BfYiPulRfzMGPF36n9+HhT1fghFu6Rqr00HIW3Loyfck/ZDjB4k+1ta6larzAGKg==
+X-Received: by 2002:a05:600c:4693:b0:434:f0df:a14 with SMTP id 5b1f17b1804b1-438913bed10mr114787795e9.2.1737369276902;
+        Mon, 20 Jan 2025 02:34:36 -0800 (PST)
+Received: from ?IPV6:2003:d8:2f22:1000:d72d:fd5f:4118:c70b? (p200300d82f221000d72dfd5f4118c70b.dip0.t-ipconnect.de. [2003:d8:2f22:1000:d72d:fd5f:4118:c70b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c7527fc4sm193429185e9.27.2025.01.20.02.34.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jan 2025 02:34:35 -0800 (PST)
+Message-ID: <39715c86-cffb-4d11-aeb0-e056b264cc76@redhat.com>
+Date: Mon, 20 Jan 2025 11:34:33 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250117163001.2326672-6-tabba@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 13/13] KVM: s390: remove the last user of page->index
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+ linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+ schlameuss@linux.ibm.com, willy@infradead.org, hca@linux.ibm.com,
+ svens@linux.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
+ nrb@linux.ibm.com, nsg@linux.ibm.com
+References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
+ <20250108181451.74383-14-imbrenda@linux.ibm.com>
+ <4175795f-9323-4a2c-acef-d387c104f8b3@linux.ibm.com>
+ <e548aa1e-d954-4fab-8b74-302c140c04f7@redhat.com>
+ <20250120112848.1547a439@p-imbrenda>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250120112848.1547a439@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 17, 2025 at 04:29:51PM +0000, Fuad Tabba wrote:
-> +/*
-> + * Marks the range [start, end) as not mappable by the host. If the host doesn't
-> + * have any references to a particular folio, then that folio is marked as
-> + * mappable by the guest.
-> + *
-> + * However, if the host still has references to the folio, then the folio is
-> + * marked and not mappable by anyone. Marking it is not mappable allows it to
-> + * drain all references from the host, and to ensure that the hypervisor does
-> + * not transition the folio to private, since the host still might access it.
-> + *
-> + * Usually called when guest unshares memory with the host.
-> + */
-> +static int gmem_clear_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
-> +{
-> +	struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
-> +	void *xval_guest = xa_mk_value(KVM_GMEM_GUEST_MAPPABLE);
-> +	void *xval_none = xa_mk_value(KVM_GMEM_NONE_MAPPABLE);
-> +	pgoff_t i;
-> +	int r = 0;
-> +
-> +	filemap_invalidate_lock(inode->i_mapping);
-> +	for (i = start; i < end; i++) {
-> +		struct folio *folio;
-> +		int refcount = 0;
-> +
-> +		folio = filemap_lock_folio(inode->i_mapping, i);
-> +		if (!IS_ERR(folio)) {
-> +			refcount = folio_ref_count(folio);
-> +		} else {
-> +			r = PTR_ERR(folio);
-> +			if (WARN_ON_ONCE(r != -ENOENT))
-> +				break;
-> +
-> +			folio = NULL;
-> +		}
-> +
-> +		/* +1 references are expected because of filemap_lock_folio(). */
-> +		if (folio && refcount > folio_nr_pages(folio) + 1) {
+On 20.01.25 11:28, Claudio Imbrenda wrote:
+> On Mon, 20 Jan 2025 10:43:15 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>>>> +static inline unsigned long gmap_pgste_get_index(unsigned long *pgt)
+>>>> +{
+>>>> +	unsigned long *pgstes, res;
+>>>> +
+>>>> +	pgstes = pgt + _PAGE_ENTRIES;
+>>>> +
+>>>> +	res = (pgstes[0] & PGSTE_ST2_MASK) << 16;
+>>>> +	res |= pgstes[1] & PGSTE_ST2_MASK;
+>>>> +	res |= (pgstes[2] & PGSTE_ST2_MASK) >> 16;
+>>>> +	res |= (pgstes[3] & PGSTE_ST2_MASK) >> 32;
+>>>> +
+>>>> +	return res;
+>>>> +}
+>>>
+>>> I have to think about that change for a bit before I post an opinion.
+>>
+>> I'm wondering if we should just do what Willy suggested and use ptdesc
+>> -> pt_index instead?
+> 
+> we will need to store more stuff in the future; putting things in the
+> PGSTEs gives us 512 bytes per table (although I admit it looks... weird)
 
-Looks racy.
+With memdesc/ptdesc you'll be able to allocate more without playing many 
+tricks.
 
-What prevent anybody from obtaining a reference just after check?
+Storing more information could be done today by allocating a separate 
+structure for these page tables and linking it via ptindex. Not that I 
+would suggest that just now. :)
 
-Lock on folio doesn't stop random filemap_get_entry() from elevating the
-refcount.
-
-folio_ref_freeze() might be required.
-
-> +			/*
-> +			 * Outstanding references, the folio cannot be faulted
-> +			 * in by anyone until they're dropped.
-> +			 */
-> +			r = xa_err(xa_store(mappable_offsets, i, xval_none, GFP_KERNEL));
-> +		} else {
-> +			/*
-> +			 * No outstanding references. Transition the folio to
-> +			 * guest mappable immediately.
-> +			 */
-> +			r = xa_err(xa_store(mappable_offsets, i, xval_guest, GFP_KERNEL));
-> +		}
-> +
-> +		if (folio) {
-> +			folio_unlock(folio);
-> +			folio_put(folio);
-> +		}
-> +
-> +		if (WARN_ON_ONCE(r))
-> +			break;
-> +	}
-> +	filemap_invalidate_unlock(inode->i_mapping);
-> +
-> +	return r;
-> +}
+But this is not something I am to decide, just pointing it out that it 
+likely can be done in a simpler+cleaner way and there is no way to rush 
+the pt_index removal.
 
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Cheers,
+
+David / dhildenb
+
 
