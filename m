@@ -1,208 +1,443 @@
-Return-Path: <kvm+bounces-36009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71346A16D60
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 14:26:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C6AA16D64
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 14:27:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90F8116316E
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:26:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 979B83A108F
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:27:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FD41E2859;
-	Mon, 20 Jan 2025 13:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9628D1E102E;
+	Mon, 20 Jan 2025 13:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JbDkUroQ"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="PQegUL0p"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2073.outbound.protection.outlook.com [40.107.92.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7B41E25FA;
-	Mon, 20 Jan 2025 13:25:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737379531; cv=fail; b=I6oveUAFXbRH0S+kqJlWqVPmlVBbPxD8VfYpV/CX+3sehVnWVP0x9iNIZFk9AsU875EckFp3WQncgAmb4K9UPnDKQ7BoxzPf/TTXqVEUU84WL+5Whgkmalu+BFAEGTvQINfvXuu+p5odf4ZSPQnz/WEjzZ9ol29Ku7EI1Y+S4SA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737379531; c=relaxed/simple;
-	bh=VBQdSN+Eq3kZIXAsW43y54MKU4yTnr0mAD/SvhFtTu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=dBBOF7vgbchbPsFQpIqiqz2zSgDgUkZpoMkQwGQUSe2Nw640LiAQRwkHkbhRRm32PKWNFJcnvvJd4yRI34i9AU9KldY4i5bXwWLM1H+hua5CIPhmiNwCXqlbOtaGRLPdj8ojENE43IIPodAOw3DQSg9NT5gTTIBo3pTG0dkE7Nc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JbDkUroQ; arc=fail smtp.client-ip=40.107.92.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aH3xft7D+pOpVzYHnx4KmnmL5qLQ9AX3PFUZ76OWKQrV/qW5YNgpBojXr59z1RluyHYFBaAA3+xeSMEmvX88myGlo6j/tqz+kvtm/llPUyxMCZw7GSlHM0ksA+kmopUQH6xFwGpeeg6GG2mY/Gjz9kkrKK0EpulwBTlE1DSiFgxWisT3OEDXnYR49alDgXE7RE0jgjLcvjD9i29rbUganPQSX7Vq7lyESaQ+VW5VnjSq8xrHVX6CWqe3ZYOgy02IoIk1up5Rs2SiOtULOMi2PaJYr0RTrxvXJKJU4d6xUebD7q82stk7YkMRHbiS/xUQ6Gvor5yMRVJ2PbI8H5ljIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=btigIVsG37A/OtgTyVwom70XQSGhQlGJ2wsruc+hARg=;
- b=FfEUEuCeQRKX3NPyzLhyRpNwa0qcagtlgP0bQbL5cdl/6IzBSniLppPAmRtYPtHBNezywyDTKCZr3PZoKOqw5GNAvBlQ9zlI9GFVpjUdj3Mu8lKIPzruZ5AAEa0wVt4+S8QBlPGTENmo6RIGMZSEjRHx4w8GQejlMv2MUUAnqILtF6MVFPziPgdpO8+v9+Tn6LR3uH/ncTIrmhoHr2sRsItACVyzNDnH0OGUtxSxJ86fpr+A8943+JOGZiv4Rxac4pmODIExwwoYsmlVEwhn5+93nPdIO1BHiSPEHqyvEaFBJKPTgum8eOII/B2uyJ66EgIt34caXuN0JQrJWjLBgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=btigIVsG37A/OtgTyVwom70XQSGhQlGJ2wsruc+hARg=;
- b=JbDkUroQIlNPaS2ZPdxQStyaAm+m9Xh/Pgy7zktpv3CI3jUAuodLFvSemNoARBBKRUPA3dN/SZCzXBSuXFQsH9rhIw/xf57Vy3htUZxOsK85xrr5Ft4/G8ic00s3Nk3ldotKL43ES+8vo9PZ2vz+id+5ZpxY3VgLPUx3aRgj6XLir6hDdXPg+Fb0drBhadr+u3UoX7kAyWO8kUnpeWlZBGUDE5ML4zpraEdq77fBpXg/ngeiG3AeeDTMFvJtqsDAeKEoipXU++/HbmWtsW76gOwHaoKoMcnS9i7yQ/psFk7xtq2zSRkmR6ulWLC8xQelgRCU/6DZ5tVCF8I3CVSfHA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by SA3PR12MB7922.namprd12.prod.outlook.com (2603:10b6:806:314::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.17; Mon, 20 Jan
- 2025 13:25:26 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8356.010; Mon, 20 Jan 2025
- 13:25:26 +0000
-Date: Mon, 20 Jan 2025 09:25:25 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Baolu Lu <baolu.lu@linux.intel.com>, Alexey Kardashevskiy <aik@amd.com>,
-	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	sumit.semwal@linaro.org, christian.koenig@amd.com,
-	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
-	vivek.kasireddy@intel.com, dan.j.williams@intel.com,
-	yilun.xu@intel.com, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
-	daniel.vetter@ffwll.ch, leon@kernel.org, zhenzhong.duan@intel.com,
-	tao1.su@intel.com
-Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
- private device
-Message-ID: <20250120132525.GH5556@nvidia.com>
-References: <20250110133116.GF5556@nvidia.com>
- <Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050>
- <20250113164935.GP5556@nvidia.com>
- <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050>
- <20250114133553.GB5556@nvidia.com>
- <17cd9b77-4620-4883-9a6a-8d1cab822c88@amd.com>
- <20250115130102.GM5556@nvidia.com>
- <f1ac048f-64b1-4343-ab86-ad98c24a44f5@linux.intel.com>
- <20250117132523.GA5556@nvidia.com>
- <Znh+uTMe/wX2RIJm@yilunxu-OptiPlex-7050>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Znh+uTMe/wX2RIJm@yilunxu-OptiPlex-7050>
-X-ClientProxiedBy: BN9PR03CA0146.namprd03.prod.outlook.com
- (2603:10b6:408:fe::31) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69A41B5EBC;
+	Mon, 20 Jan 2025 13:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737379638; cv=none; b=TMHoSQnHeHy27OI0ZQzqhesKcY3imwCESFDCWp+uKRYmoQ1tm0t78z9czeDCKu+t6fcxmCthqZcrLc5OcUuRE+7stAZKDQDpmF+7Sxek8cHAc6gejD8Az7IqXXf/0xWQBGVl5ZxGuJRIvvzo7IBXroELZyCdl6xnN12WNjNvefQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737379638; c=relaxed/simple;
+	bh=LlGFl9fLta6DqNgFQzfJrVo/GiZenAF7eZ3EYYcJMTY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HAGgheMncTFLPLw7UmqqZjSpIr4huWsbuIpo6IcWr3wR5y0WDSdT8Y+MF7q6CqM+S3oA/0bm3GdBJ6hxrwbAG23AV4olHGMsFIoGgV2XQJK7r/IV6c6W4j6/WuuXWWWGUI4t7Xs2JjIsz1DKEQTcuMBZFFjIL1RoIi/xORNoM+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=PQegUL0p; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 6B00925BEE;
+	Mon, 20 Jan 2025 14:27:12 +0100 (CET)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id nuqrjkukl3L0; Mon, 20 Jan 2025 14:27:11 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1737379628; bh=LlGFl9fLta6DqNgFQzfJrVo/GiZenAF7eZ3EYYcJMTY=;
+	h=From:To:Cc:Subject:Date;
+	b=PQegUL0pfzak20jk6tGMM5cplFbWbK0W4toCb7b80FlHO+tRvnj6z9vCRN7o9AM8c
+	 YPvX5QIn9bNRDiW0pcAbALJLXovKyiZd3xTM85EmA/XIfddThOx51tQ2H3D2NNbeNk
+	 yzKJ9ErPhoGNPetrKSf0DO+2P7ND7Ex5BUblKHR2TOh95TnCfXXk7D4e5CFAa5r69O
+	 KbXiqQzIuUJvNrEq06vvpFMCBILHnPq5q0TH7sg4D1pRORuYbD1VqBhsLVwK+Mi61R
+	 H0oHNrV/EFOStG1Sn0iBDihrIE/wdpaA7omHlPCanXFEksmTnHWHWf9iAhhqpIkGHE
+	 cMzeA25IMyDsw==
+From: Daniel Hejduk <danielhejduk@disroot.org>
+To: pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Hejduk <danielhejduk@disroot.org>
+Subject: [PATCH] KVM: Fixing coding style warnings and errors
+Date: Mon, 20 Jan 2025 14:26:37 +0100
+Message-ID: <20250120132637.12484-1-danielhejduk@disroot.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SA3PR12MB7922:EE_
-X-MS-Office365-Filtering-Correlation-Id: e3668284-b31e-4b16-7008-08dd3955e6a4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+Je8LDY+32499pz59ot/IIzYePmAGKaC3kh3VSPiJD/bkoW7jou4IAolj76z?=
- =?us-ascii?Q?rEZfIdReaE4sSj4Qbn8p17R1FqEdPEyLtowJsngM/fvWl0tEX5JnAhhj7jhP?=
- =?us-ascii?Q?EEwh2uGIzIzr4EnHZ2t8K3Hw+dTvmtrF4O3cEQUj/9WnUZ548AX76WitfdE8?=
- =?us-ascii?Q?BQ8cDoLV5nhttEEBLFufFtUAJ+wayZQ3pxYvwzfko6TyuaQziyiYlI05/yx+?=
- =?us-ascii?Q?zMNhXuwrWOvm9jgNsPd77dq56B3UgqNdoUaWVudDmQpKF55PDmRuPzMPLyS+?=
- =?us-ascii?Q?HTONjfeTC9asYMq6JYNy7AQ/wK+O8K4OnXko/PrySRP5qm5pUGlQmB7g7ui2?=
- =?us-ascii?Q?idG+TjFIuSa2K84h4zCDoF7+5aLA+4fErz/usiMIZGTMIb2WSgbvmBBv3MMe?=
- =?us-ascii?Q?/0ZWEWOxMFDfN00A9Ymg/MdKbFtMAktYmsvYRErVnF//FEcqHELqO1A7/do1?=
- =?us-ascii?Q?HwSgRO+QWceSkt8WSEI1iZxfSERqIDNJIbN8oOxfc/XP1n5wyjEBUtg8yP9U?=
- =?us-ascii?Q?SrPCLSSdM8QGEF3LS9r9Vk/9bxi2VoVDdlaZ6oOVVVx0VDh/ajAggCvTX8U7?=
- =?us-ascii?Q?+oi7b+j+xAFZR5gjuQI5KmWXwvZAZy0WlcJkwKm14LCVA0jln/spH5uHvmdH?=
- =?us-ascii?Q?wEJvAPEf76YG4Sw515C/jjhTknFdxYI3ChBwr4PsxJrTZEYIU6PR7oolNCNF?=
- =?us-ascii?Q?L8iWH747JcgAfIOiFPMtaFOsCUpSvh5hUrnQi688USE7m9HEyCZOSra2EUOg?=
- =?us-ascii?Q?pbvTZ0ijVvcViwucUKFBiP8n4HxwcG1y/4SJly4Ht2E/a8Gtuqqk6ODmCoU5?=
- =?us-ascii?Q?5rcwb3j5qmWQpKtBOd7wlrWINvZXfyq3BiZuKGIaVWnV9qyFU8SMLA0S/7Tu?=
- =?us-ascii?Q?eG/LE2v/aKNjvvSpEaxKSWlf14ENfQUNJLQpoKmDqmS2rnbEzkV2HMtY3bPv?=
- =?us-ascii?Q?K7TA93/KzxFrHN2mT6gw1FICJ23VppzEUAcWiDBoZno7eRsqaAHTgkk/3JGX?=
- =?us-ascii?Q?aw81fZ6x4QBR+d/npFAVTvcLOI75BtwKnZAGFLWzIZLaxwrFnid67OY0XdG3?=
- =?us-ascii?Q?1a6qvrSkn0h65hEAe//plN48lPT6a8+VJZqFDvIXqdeP6pP8yNJhq+czGNYO?=
- =?us-ascii?Q?806Lo0O3EeJoNZx+Rpfr4iJR6AhdxC2vWZNrQodCT4GsNsfIgWn+nSRcAikH?=
- =?us-ascii?Q?BuXVCyIkZ1mWJs68zXztmghc3k/kMeKkN7Zipfzm2PfBj82I5cT4+W6I/2x1?=
- =?us-ascii?Q?djWJM8FvU+XyhVGow7249iF16Zu8EWa6x+JP3LZgbB/1a2RjebwlJVSiQVqB?=
- =?us-ascii?Q?EQ7VqJmWFWztRfOp8FHnB/bgn35YzkBFnXY4rxEcfiNWlZoTZR5LQpW148em?=
- =?us-ascii?Q?X6nMbWBuHtvXaGRhFHsqZZIj2V1w?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6lcxK9embQSyr7Zn9BPg26pYGS6zegiEsni7Dsq222Jm8x7DUkdI9eXqH50B?=
- =?us-ascii?Q?uv//Rb+4ADPMi0nDkhUm7NMjgPQwIx0L94O85ass+BsZa8KgNLSSrbGILSby?=
- =?us-ascii?Q?UT9cnvNcs1gAjNl2ypyqaF2VE41kuRsmB2AnzCU9Qu8Vsrv8eG1miHOxCiO7?=
- =?us-ascii?Q?l94JIPyQmouzhJ9AfvH/jy+e42Tsn5kgQDd0yjaLkP6wItlFInehWG/zPrlb?=
- =?us-ascii?Q?lH7KqHAEssxZugT5w4ApuI5uauJZKECvkWNofA6tuP/3c7fEkA0AX/0E21k9?=
- =?us-ascii?Q?weKxh2uGSmY+TD5kpo2v9g0CdYgE2yhd3zNU16aXkEu82BYyP/qADP/eQ7HN?=
- =?us-ascii?Q?Wd4u0ZZuYNEC2zJmtUD96RDpULL9uXyp6XlL0H1k+5gOmLWfHid33UDLe2b3?=
- =?us-ascii?Q?ZftCEcCHLpCBWNrHKpjA4vDa74KaEPEq5+yQwXON+Z92CcKNtB4OTiN19KYm?=
- =?us-ascii?Q?RUwITUANYJo6FbToM75Lo8NODkBCdPacaPPkEsk+i00g+obCBrmBRWYvZ6Aj?=
- =?us-ascii?Q?hnzkHotos5WU4/6fps/+4DN3FREwaDpbmVMUjeA9hCaMXrt/Zc6ooIxjvQ2h?=
- =?us-ascii?Q?uGUZhWC8UVIkGej7pItpvMWG+WqHrbasjMrwj7KRhFDENZ3bGC5wLluO+xTa?=
- =?us-ascii?Q?7SdK8srXJ23MMmDXwqYwh2+gYYc7Nbf+VXO8Zz3IfBYFJFHQkrq4g2ruhMhI?=
- =?us-ascii?Q?OQKbvWmNKsIJ7Eya2zmkDnn2SU3XwG9iWrp1IboRHFhV8sqTY/kcmSUikRYz?=
- =?us-ascii?Q?KavVr5Z7Bv6qyJGlZCIW7tGjQMPzz2+nfE2fiiWFvq7ZW2VuaauzWCd01RkB?=
- =?us-ascii?Q?joXkYT5k1XElDrt1tmCAMSALWn6chn2RVxrZvOhJbMn8Xmp1LwK3hAQDsuAb?=
- =?us-ascii?Q?UuJswP5bd28cGpXYHZie8RBT5eGMpZLEWJ9wrDm5Tsvg63OJuZhI3tJppp4m?=
- =?us-ascii?Q?alYz6cBly+W/t8jGc4jUnPaypz66i6nc3tU5is/JsIWXbPesGor1plZ9Nu0e?=
- =?us-ascii?Q?TARqh+icjl8AsUIio8NEvD6HVIIcgTxp13qr8J0oYxxcKbCm1/ZycyAZk/M/?=
- =?us-ascii?Q?PoWLqKJUsMEelhRC1el6R/IuRN7kTgnRxKICKYEwYSJStbkTR8S1nvsIOkTt?=
- =?us-ascii?Q?F+iR9gs19Zt07QEX3o1Q7I3kYYpQggouVaBRZ7MTCZe3iAHv4rBFWMgDlEqg?=
- =?us-ascii?Q?uMv9B0tcDSz6DYpLfd5g3oeL0KJcAgOURyeeC0v4gR+E26amqYfDxNdwsR9E?=
- =?us-ascii?Q?3UdJmk0nwuNYxhEqyIqNhnhKgCQT6TdZSzJgaeSbkSK0SYTtdw2qEf8CWau/?=
- =?us-ascii?Q?1Ly5FiRW8kQcVYTc+7hS/CEPUTzJWHOJqGeAGriP+5DlInBu5XC1iObWkUGn?=
- =?us-ascii?Q?mPuEnQ1UhXeo1vQpzIVOuFmMou9Y8evtJTr3ReJhpDOAhm/LTEqPxU8hU3lZ?=
- =?us-ascii?Q?cEYIzzn31UzCzMb6PJWzVZcCs4nXNzxGh6/jYjQXazlyyBBiznKTe3aX+42A?=
- =?us-ascii?Q?POtwCm6fv2D4ysIFvtpErFEoNmvpZpsbUcOus7AnSbvGzSKEHRdKFdqSAT9d?=
- =?us-ascii?Q?Zatv1jAZW/lbWfPU88I=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3668284-b31e-4b16-7008-08dd3955e6a4
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2025 13:25:26.2649
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H8L6nCYJlfpR+pJ67Tr52nAEIz+yTtOUaatgy5Nku7SSby5c5/MMmZu+o2QexZmM
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7922
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 24, 2024 at 03:59:53AM +0800, Xu Yilun wrote:
-> > But it also seems to me that VFIO should be able to support putting
-> > the device into the RUN state
-> 
-> Firstly I think VFIO should support putting device into *LOCKED* state.
-> From LOCKED to RUN, there are many evidence fetching and attestation
-> things that only guest cares. I don't think VFIO needs to opt-in.
+Fixing checkpatch warnings and errors in KVM.
 
-VFIO is not just about running VMs. If someone wants to run DPDK on
-VFIO they should be able to get the device into a RUN state and work
-with secure memory without requiring a KVM. Yes there are many steps
-to this, but we should imagine how it can work.
+Signed-off-by: Daniel Hejduk <danielhejduk@disroot.org>
+---
+ virt/kvm/eventfd.c     | 21 +++++++++++----------
+ virt/kvm/guest_memfd.c |  1 +
+ virt/kvm/irqchip.c     | 10 ++++++----
+ virt/kvm/kvm_main.c    | 41 +++++++++++++++++++++++------------------
+ virt/kvm/vfio.c        |  1 +
+ 5 files changed, 42 insertions(+), 32 deletions(-)
 
-> > without involving KVM or cVMs.
-> 
-> It may not be feasible for all vendors. 
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 249ba5b72e9b..34dcef246b2a 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -32,7 +32,7 @@
+ 
+ static struct workqueue_struct *irqfd_cleanup_wq;
+ 
+-bool __attribute__((weak))
++bool __weak
+ kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+ {
+ 	return true;
+@@ -179,7 +179,7 @@ irqfd_deactivate(struct kvm_kernel_irqfd *irqfd)
+ 	queue_work(irqfd_cleanup_wq, &irqfd->shutdown);
+ }
+ 
+-int __attribute__((weak)) kvm_arch_set_irq_inatomic(
++int __weak kvm_arch_set_irq_inatomic(
+ 				struct kvm_kernel_irq_routing_entry *irq,
+ 				struct kvm *kvm, int irq_source_id,
+ 				int level,
+@@ -192,19 +192,20 @@ int __attribute__((weak)) kvm_arch_set_irq_inatomic(
+  * Called with wqh->lock held and interrupts disabled
+  */
+ static int
+-irqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
++irqfd_wakeup(wait_queue_entry_t *wait, unsigned int mode, int sync, void *key)
+ {
+ 	struct kvm_kernel_irqfd *irqfd =
+ 		container_of(wait, struct kvm_kernel_irqfd, wait);
+ 	__poll_t flags = key_to_poll(key);
+ 	struct kvm_kernel_irq_routing_entry irq;
+ 	struct kvm *kvm = irqfd->kvm;
+-	unsigned seq;
++	unsigned int seq;
+ 	int idx;
+ 	int ret = 0;
+ 
+ 	if (flags & EPOLLIN) {
+ 		u64 cnt;
++
+ 		eventfd_ctx_do_read(irqfd->eventfd, &cnt);
+ 
+ 		idx = srcu_read_lock(&kvm->irq_srcu);
+@@ -275,24 +276,24 @@ static void irqfd_update(struct kvm *kvm, struct kvm_kernel_irqfd *irqfd)
+ }
+ 
+ #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+-void __attribute__((weak)) kvm_arch_irq_bypass_stop(
++void __weak kvm_arch_irq_bypass_stop(
+ 				struct irq_bypass_consumer *cons)
+ {
+ }
+ 
+-void __attribute__((weak)) kvm_arch_irq_bypass_start(
++void __weak kvm_arch_irq_bypass_start(
+ 				struct irq_bypass_consumer *cons)
+ {
+ }
+ 
+-int  __attribute__((weak)) kvm_arch_update_irqfd_routing(
++int  __weak kvm_arch_update_irqfd_routing(
+ 				struct kvm *kvm, unsigned int host_irq,
+ 				uint32_t guest_irq, bool set)
+ {
+ 	return 0;
+ }
+ 
+-bool __attribute__((weak)) kvm_arch_irqfd_route_changed(
++bool __weak kvm_arch_irqfd_route_changed(
+ 				struct kvm_kernel_irq_routing_entry *old,
+ 				struct kvm_kernel_irq_routing_entry *new)
+ {
+@@ -456,7 +457,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+ 	return ret;
+ }
+ 
+-bool kvm_irq_has_notifier(struct kvm *kvm, unsigned irqchip, unsigned pin)
++bool kvm_irq_has_notifier(struct kvm *kvm, unsigned int irqchip, unsigned int pin)
+ {
+ 	struct kvm_irq_ack_notifier *kian;
+ 	int gsi, idx;
+@@ -487,7 +488,7 @@ void kvm_notify_acked_gsi(struct kvm *kvm, int gsi)
+ 			kian->irq_acked(kian);
+ }
+ 
+-void kvm_notify_acked_irq(struct kvm *kvm, unsigned irqchip, unsigned pin)
++void kvm_notify_acked_irq(struct kvm *kvm, unsigned int irqchip, unsigned int pin)
+ {
+ 	int gsi, idx;
+ 
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 47a9f68f7b24..28722b9511fb 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -32,6 +32,7 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
+ 	kvm_pfn_t pfn = folio_file_pfn(folio, index);
+ 	gfn_t gfn = slot->base_gfn + index - slot->gmem.pgoff;
+ 	int rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, folio_order(folio));
++
+ 	if (rc) {
+ 		pr_warn_ratelimited("gmem: Failed to prepare folio for index %lx GFN %llx PFN %llx error %d.\n",
+ 				    index, gfn, pfn, rc);
+diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+index 162d8ed889f2..70feb4113fc6 100644
+--- a/virt/kvm/irqchip.c
++++ b/virt/kvm/irqchip.c
+@@ -37,7 +37,7 @@ int kvm_irq_map_gsi(struct kvm *kvm,
+ 	return n;
+ }
+ 
+-int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
++int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned int irqchip, unsigned int pin)
+ {
+ 	struct kvm_irq_routing_table *irq_rt;
+ 
+@@ -85,6 +85,7 @@ int kvm_set_irq(struct kvm *kvm, int irq_source_id, u32 irq, int level,
+ 
+ 	while (i--) {
+ 		int r;
++
+ 		r = irq_set[i].set(&irq_set[i], kvm, irq_source_id, level,
+ 				   line_status);
+ 		if (r < 0)
+@@ -121,6 +122,7 @@ void kvm_free_irq_routing(struct kvm *kvm)
+ 	/* Called only during vm destruction. Nobody can use the pointer
+ 	   at this stage */
+ 	struct kvm_irq_routing_table *rt = rcu_access_pointer(kvm->irq_routing);
++
+ 	free_irq_routing_table(rt);
+ }
+ 
+@@ -156,7 +158,7 @@ static int setup_routing_entry(struct kvm *kvm,
+ 	return 0;
+ }
+ 
+-void __attribute__((weak)) kvm_arch_irq_routing_update(struct kvm *kvm)
++void __weak kvm_arch_irq_routing_update(struct kvm *kvm)
+ {
+ }
+ 
+@@ -167,8 +169,8 @@ bool __weak kvm_arch_can_set_irq_routing(struct kvm *kvm)
+ 
+ int kvm_set_irq_routing(struct kvm *kvm,
+ 			const struct kvm_irq_routing_entry *ue,
+-			unsigned nr,
+-			unsigned flags)
++			unsigned int nr,
++			unsigned int flags)
+ {
+ 	struct kvm_irq_routing_table *new, *old;
+ 	struct kvm_kernel_irq_routing_entry *e;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index de2c11dae231..8841c808a836 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -50,7 +50,7 @@
+ #include <linux/kthread.h>
+ #include <linux/suspend.h>
+ 
+-#include <asm/processor.h>
++#include <linux/processor.h>
+ #include <asm/ioctl.h>
+ #include <linux/uaccess.h>
+ 
+@@ -185,7 +185,7 @@ void vcpu_put(struct kvm_vcpu *vcpu)
+ EXPORT_SYMBOL_GPL(vcpu_put);
+ 
+ /* TODO: merge with kvm_arch_vcpu_should_kick */
+-static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned req)
++static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned int req)
+ {
+ 	int mode = kvm_vcpu_exiting_guest_mode(vcpu);
+ 
+@@ -440,7 +440,7 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+ }
+ #endif
+ 
+-static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
++static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned int id)
+ {
+ 	mutex_init(&vcpu->mutex);
+ 	vcpu->cpu = -1;
+@@ -1661,6 +1661,7 @@ static void kvm_commit_memory_region(struct kvm *kvm,
+ 
+ 	if ((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES) {
+ 		int change = (new_flags & KVM_MEM_LOG_DIRTY_PAGES) ? 1 : -1;
++
+ 		atomic_set(&kvm->nr_memslots_dirty_logging,
+ 			   atomic_read(&kvm->nr_memslots_dirty_logging) + change);
+ 	}
+@@ -2296,7 +2297,7 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+    if (log->first_page > memslot->npages ||
+ 	    log->num_pages > memslot->npages - log->first_page ||
+ 	    (log->num_pages < memslot->npages - log->first_page && (log->num_pages & 63)))
+-	    return -EINVAL;
++	return -EINVAL;
+ 
+ 	kvm_arch_sync_dirty_log(kvm, memslot);
+ 
+@@ -2311,6 +2312,7 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+ 	     i++, offset += BITS_PER_LONG) {
+ 		unsigned long mask = *dirty_bitmap_buffer++;
+ 		atomic_long_t *p = (atomic_long_t *) &dirty_bitmap[i];
++
+ 		if (!mask)
+ 			continue;
+ 
+@@ -2875,6 +2877,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+ 		 * not call the fault handler, so do it here.
+ 		 */
+ 		bool unlocked = false;
++
+ 		r = fixup_user_fault(current->mm, kfp->hva,
+ 				     (write_fault ? FAULT_FLAG_WRITE : 0),
+ 				     &unlocked);
+@@ -3172,7 +3175,7 @@ int kvm_vcpu_read_guest(struct kvm_vcpu *vcpu, gpa_t gpa, void *data, unsigned l
+ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest);
+ 
+ static int __kvm_read_guest_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
+-			           void *data, int offset, unsigned long len)
++				   void *data, int offset, unsigned long len)
+ {
+ 	int r;
+ 	unsigned long addr;
+@@ -3205,7 +3208,7 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_read_guest_atomic);
+ /* Copy @len bytes from @data into guest memory at '(@gfn * PAGE_SIZE) + @offset' */
+ static int __kvm_write_guest_page(struct kvm *kvm,
+ 				  struct kvm_memory_slot *memslot, gfn_t gfn,
+-			          const void *data, int offset, int len)
++				  const void *data, int offset, int len)
+ {
+ 	int r;
+ 	unsigned long addr;
+@@ -3263,7 +3266,7 @@ int kvm_write_guest(struct kvm *kvm, gpa_t gpa, const void *data,
+ EXPORT_SYMBOL_GPL(kvm_write_guest);
+ 
+ int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
+-		         unsigned long len)
++			 unsigned long len)
+ {
+ 	gfn_t gfn = gpa >> PAGE_SHIFT;
+ 	int seg;
+@@ -3328,6 +3331,7 @@ int kvm_gfn_to_hva_cache_init(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
+ 			      gpa_t gpa, unsigned long len)
+ {
+ 	struct kvm_memslots *slots = kvm_memslots(kvm);
++
+ 	return __kvm_gfn_to_hva_cache_init(slots, ghc, gpa, len);
+ }
+ EXPORT_SYMBOL_GPL(kvm_gfn_to_hva_cache_init);
+@@ -3429,7 +3433,7 @@ EXPORT_SYMBOL_GPL(kvm_clear_guest);
+ 
+ void mark_page_dirty_in_slot(struct kvm *kvm,
+ 			     const struct kvm_memory_slot *memslot,
+-		 	     gfn_t gfn)
++			     gfn_t gfn)
+ {
+ 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 
+@@ -3752,7 +3756,7 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (kvm_arch_vcpu_should_kick(vcpu)) {
+ 		cpu = READ_ONCE(vcpu->cpu);
+-		if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
++		if (cpu != me && (unsigned int)cpu < nr_cpu_ids && cpu_online(cpu))
+ 			smp_send_reschedule(cpu);
+ 	}
+ out:
+@@ -4310,6 +4314,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 	switch (ioctl) {
+ 	case KVM_RUN: {
+ 		struct pid *oldpid;
++
+ 		r = -EINVAL;
+ 		if (arg)
+ 			goto out;
+@@ -4859,7 +4864,7 @@ static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
+ 	return cleared;
+ }
+ 
+-int __attribute__((weak)) kvm_vm_ioctl_enable_cap(struct kvm *kvm,
++int __weak kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 						  struct kvm_enable_cap *cap)
+ {
+ 	return -EINVAL;
+@@ -5941,8 +5946,8 @@ static int kvm_debugfs_open(struct inode *inode, struct file *file,
+ 
+ 	/*
+ 	 * The debugfs files are a reference to the kvm struct which
+-        * is still valid when kvm_destroy_vm is called.  kvm_get_kvm_safe
+-        * avoids the race between open and the removal of the debugfs directory.
++	* is still valid when kvm_destroy_vm is called.  kvm_get_kvm_safe
++	* avoids the race between open and the removal of the debugfs directory.
+ 	 */
+ 	if (!kvm_get_kvm_safe(stat_data->kvm))
+ 		return -ENOENT;
+@@ -6062,7 +6067,7 @@ static const struct file_operations stat_fops_per_vm = {
+ 
+ static int vm_stat_get(void *_offset, u64 *val)
+ {
+-	unsigned offset = (long)_offset;
++	unsigned int offset = (long)_offset;
+ 	struct kvm *kvm;
+ 	u64 tmp_val;
+ 
+@@ -6078,7 +6083,7 @@ static int vm_stat_get(void *_offset, u64 *val)
+ 
+ static int vm_stat_clear(void *_offset, u64 val)
+ {
+-	unsigned offset = (long)_offset;
++	unsigned int offset = (long)_offset;
+ 	struct kvm *kvm;
+ 
+ 	if (val)
+@@ -6098,7 +6103,7 @@ DEFINE_SIMPLE_ATTRIBUTE(vm_stat_readonly_fops, vm_stat_get, NULL, "%llu\n");
+ 
+ static int vcpu_stat_get(void *_offset, u64 *val)
+ {
+-	unsigned offset = (long)_offset;
++	unsigned int offset = (long)_offset;
+ 	struct kvm *kvm;
+ 	u64 tmp_val;
+ 
+@@ -6114,7 +6119,7 @@ static int vcpu_stat_get(void *_offset, u64 *val)
+ 
+ static int vcpu_stat_clear(void *_offset, u64 val)
+ {
+-	unsigned offset = (long)_offset;
++	unsigned int offset = (long)_offset;
+ 	struct kvm *kvm;
+ 
+ 	if (val)
+@@ -6274,7 +6279,7 @@ EXPORT_SYMBOL_GPL(kvm_get_running_vcpu);
+  */
+ struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void)
+ {
+-        return &kvm_running_vcpu;
++	return &kvm_running_vcpu;
+ }
+ 
+ #ifdef CONFIG_GUEST_PERF_EVENTS
+@@ -6321,7 +6326,7 @@ void kvm_unregister_perf_callbacks(void)
+ }
+ #endif
+ 
+-int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
++int kvm_init(unsigned int vcpu_size, unsigned int vcpu_align, struct module *module)
+ {
+ 	int r;
+ 	int cpu;
+diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+index 196a102e34fb..b36e203ef78b 100644
+--- a/virt/kvm/vfio.c
++++ b/virt/kvm/vfio.c
+@@ -190,6 +190,7 @@ static int kvm_vfio_file_del(struct kvm_device *dev, unsigned int fd)
+ {
+ 	struct kvm_vfio *kv = dev->private;
+ 	struct kvm_vfio_file *kvf;
++
+ 	CLASS(fd, f)(fd);
+ 	int ret;
+ 
+-- 
+2.43.0
 
-It must be. A CC guest with an in kernel driver can definately get the
-PCI device into RUN, so VFIO running in the guest should be able as
-well.
-
-> I believe AMD would have one firmware call that requires cVM handle
-> *AND* move device into LOCKED state. It really depends on firmware
-> implementation.
-
-IMHO, you would not use the secure firmware if you are not using VMs.
-
-> Yes, the secure EPT is in the secure world and managed by TDX firmware.
-> Now a SW Mirror Secure EPT is introduced in KVM and managed by KVM
-> directly, and KVM will finally use firmware calls to propagate Mirror
-> Secure EPT changes to secure EPT.
-
-If the secure world managed it then the secure world can have rules
-that work with the IOMMU as well..
-
-Jason
 
