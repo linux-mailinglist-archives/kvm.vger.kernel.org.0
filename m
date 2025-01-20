@@ -1,175 +1,276 @@
-Return-Path: <kvm+bounces-36065-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36066-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5380A1735E
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 20:55:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C503A17363
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 20:55:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8F177A1AF6
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 19:54:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C15F07A2422
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 19:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2961F03D6;
-	Mon, 20 Jan 2025 19:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AD71B6D15;
+	Mon, 20 Jan 2025 19:54:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IEJZ0aTY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZvDEIPi3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058831B6D15
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 19:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58AF1EF0B1
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 19:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737402886; cv=none; b=dgdvFfT3HU8wU5SqJqSW2mn3drM2WK4HHaD0/HTgoPOnwnGYMheEayzALFo7Nl7mnfToMYbDJeqY9bVEEAPwylnjOiFo9N8J+CerauIiCoFjm7JaPU93SBUQKkBknWdqKzzd4jeF3P3qQNB+edhdCWO3WFIiLAM0mygIBf+CuRY=
+	t=1737402898; cv=none; b=BdH3rtyOEbZv72S9Qwg9uoojBRjMuabye35cHftaJ7H+ofUKJthKpgDjNuDF1hd+WrzCDdD1PYcGk4AaRyyJQjgd3gMbbpFAPdd/90L8IIkkYUJ9gEDlSeB3GJPkVklXGWnLTI2i01PG5rCQ8jJ89bLhwVHM4u0dPbK++Ek8YIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737402886; c=relaxed/simple;
-	bh=WE1eLVSAcMrJ22tKWiER0be66/aXixqsee4/093Raf8=;
-	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=hbJnHWne0Db64DDpJNBTBeTLB8YbOR3MheedKTCu8o7rj2pYwP86YtyvsP1+xMhEk1tLNibHTmz/NlGqiQPbjr50tVmye7qCw9Xlxbkf8LxOuAr9osu+VPlBAx7nq+aCJC+BMCc4NHMEvz/n1jkrLmN2CjS14IjpOGwkPlziMY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IEJZ0aTY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737402882;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
-	bh=HwAph6RW24z4Ck0QprZ1UVZmmWpp/MHyMPMSij638A8=;
-	b=IEJZ0aTY3fpZVWSC6YoW45/FW25jpiN2b2By+w2HMVJBKSdxK8/uj7/k5H4lwwCEq2f+Wf
-	q5SiPH4UOZZoIaYAhmxHOehVrRpYA9g1Jl85UIU9pyw1np7U4JY+1bNUXYOqj6H7XHv7hc
-	GHNnco4QC9P0lMuYDJF9XIsyMcLLt/I=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-T4vz-h_hOBaxx_Tz-kDZFQ-1; Mon, 20 Jan 2025 14:54:41 -0500
-X-MC-Unique: T4vz-h_hOBaxx_Tz-kDZFQ-1
-X-Mimecast-MFC-AGG-ID: T4vz-h_hOBaxx_Tz-kDZFQ
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4361ac8b25fso25984745e9.2
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 11:54:41 -0800 (PST)
+	s=arc-20240116; t=1737402898; c=relaxed/simple;
+	bh=buzX0uIYG2OYi7c4J/JURtXULgKORQkXEsZYmZeZOAg=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=NpHPS14vkCi9unuzN56h33+VfA8c+Jk6qMF+PawfolVgrT70Wtxt2TVMgGgkGe8qQuCo3/q1mV2A4HgCVapSziPAcvCx2QRgG9qqp4yusfUVFxb7QbYOIG9dy47XYnIpFEtmEMvFI2R41W5nNtaT5IkEW9tWEeovMENL9S5NxCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZvDEIPi3; arc=none smtp.client-ip=209.85.166.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-844d54c3eb5so300722539f.0
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 11:54:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737402895; x=1738007695; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WJCTAYCrgGEytrV0OJwIpIhqe3JDy+IiCXHqoWVAPSU=;
+        b=ZvDEIPi3SCPJH70RX80EgceuVZY8xrQZUTTD2n+KscBKZDjZ+BHm5cmMS/eaBoq94c
+         NtP5CNgGSuhPjbswKG3Sj6ACc8GY2DSq/G/GDHZRlSOnJaPHXoDNmQ6SJtXmpFoAaTsJ
+         nCbQMjCLA+8LuAU7echu1kMnQwgjIyIiAFudz0HBFTcvGld3uXxS8HIL35JVhBDRhnql
+         5sf5WFfIAfxHYLJzIjAbe7w/iWnLawq41apwC7cCqvz9VbjqGvsgbzH8Rd9H3U9jSShL
+         etmtka4uRvrPH2lFbzFvHZT8nfjslAzpfzmyjz96AcOZE+RNTQH4fRYZmZUDprnpqnR8
+         kHZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737402880; x=1738007680;
-        h=content-transfer-encoding:organization:autocrypt:subject:to:from
-         :content-language:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1737402895; x=1738007695;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HwAph6RW24z4Ck0QprZ1UVZmmWpp/MHyMPMSij638A8=;
-        b=T01sCGVvrUfyxQo9hb12N5+sZX9PkhG1sqgZVp1x10fD9YhUaRBbKYKE4kfpCuP2I5
-         p2nB8aszpDnHKTkuFrmLjzk6H/F/nCShARblmjmVUt7LKDBuouaRBG4+QA2BLJSE5QN+
-         yujYH4dwJrGsQasH/Oq7QIyiy+FNDGmz/CLaOm79TGUPJ1y0ua6xef4Qz/8RM+2547Dt
-         0bKPrqEycwcfnFKsaVLQTBT+z3evFbG9IvUqBcKQxSH7STBqXkxFWV3LXMmRQv6/ypxD
-         MU7Jh8Zk65geI9pJ9g0b85jrw7Y/r8B0sZ7YrHtvbpbUpYzPd8PSFis6l/dVuofMNzqu
-         +QKA==
-X-Forwarded-Encrypted: i=1; AJvYcCWoLlfS93+oiZDrcyNbEe+GrBNaJQTE1y8RqxADtnT0VhYS6keUcWUObJGLW5hZdhmktQ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJQ7s9kCh5DoKLZEwN1LCaC1u58KaO4rZsyATitZuXdYtSIMJ2
-	Ub86j/7ER92NdEpZBOgypT1rTGYIrAFeBK7hLKSnceUhgju4YNVVHab8E1eyHRORAQePiatnDGM
-	ex7iFgi2HIQpJl2eCoDulaaaXYny2raq5NHu3ez/LVvKRQb+pGQ==
-X-Gm-Gg: ASbGncs7EqTI6Of+MyCFk9aUzQ/8IXw/Oyutn/M4i+cbNrgZZzWlzhgFxJTQp7I04rj
-	TAO5LBxzA3OLMX8A3s6tUAFyDQ09y26Z6/zQGfg52cuOcvaQflC6AQUyjFGRmynt9VCDJv0505x
-	SEzu+rCuacvKjW4N/Xl2EBgj7xrbfjykD0Ne/7QJMq+6dxdopuOYEFiOIGOICoGUCzpoBLQhsVw
-	9782sEguSGSJ1tbA3G5j8nDau5EU/t0Qk/KoSmmfAP2y7yk3J/Zu6b2Y6pXK2NDOD+ocVoJqLxZ
-	583empyjcFoLwibl0qgvJp0EFUlGoo0UolEq2ADhuqXOslk1XwtYwtI+sskVLid2zdjAvMFSrvN
-	9OXJl+50VraZeQDwgJ0qBOg==
-X-Received: by 2002:a05:6000:10cd:b0:385:e429:e591 with SMTP id ffacd0b85a97d-38bf566e433mr10847093f8f.23.1737402879885;
-        Mon, 20 Jan 2025 11:54:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEZJG13mxi8AbIDkwOnTufhR9i+f5NVshcYfRBbLNh6upODgRLo5O4hvSp40QWYCP94tR4NwQ==
-X-Received: by 2002:a05:6000:10cd:b0:385:e429:e591 with SMTP id ffacd0b85a97d-38bf566e433mr10847067f8f.23.1737402879308;
-        Mon, 20 Jan 2025 11:54:39 -0800 (PST)
-Received: from ?IPV6:2003:cb:c72e:e400:431d:9c08:5611:693c? (p200300cbc72ee400431d9c085611693c.dip0.t-ipconnect.de. [2003:cb:c72e:e400:431d:9c08:5611:693c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf327e1fdsm11490020f8f.94.2025.01.20.11.54.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jan 2025 11:54:38 -0800 (PST)
-Message-ID: <019cd0b3-52ea-44b5-95ae-9b8b14477b8e@redhat.com>
-Date: Mon, 20 Jan 2025 20:54:36 +0100
+        bh=WJCTAYCrgGEytrV0OJwIpIhqe3JDy+IiCXHqoWVAPSU=;
+        b=KsA4Eyx/Z6C+fFaFv1BFJO93g8QKHvXvYfIEG011I/3aHZIk2GDkVUGqLsuXtfkIUl
+         7lCb4JVK9nd6l5IdhY6RVCsG5twaqQrdEIzdk+eGtL9PV5UaHpeSbBIVjPne8CoOWNqa
+         +LR7zAFw212jYzBZ65oAQHNXGsYthk4tVhf4f286bsnX2Dj2H5Mkl1bosAavPmS+KgzO
+         +E5hlcv1qXUsq1vxh1qe2sB4uLarbEL2Kx0M514XvT5ix+BaC7oIQIV3r70s7xqAMwvI
+         YgcuWgGw4HdM/jxYwXYTc6NROypZQ34UdV4+omqKg2PPt//aUUl9kIkgRA4lOL6iC+es
+         lBag==
+X-Gm-Message-State: AOJu0YyzAbodC1mT/3weI6qUGKNLU0NmZWekyEbLwui7iPF8X7ew1JG3
+	zdCc39jTnbaUYEmWq1bDajDeXWBc0Qtm4KH9YfP1BlOXKpCp/OUxzok0z883t6Cs+I6V7ovuuI/
+	wa+epExlXmihV3/ytYwDHTg==
+X-Google-Smtp-Source: AGHT+IGdUIcldOfOqdxMvphi8DxIREObcU7xus5HY8t4YpLAf0zybKTtrAqvkVxhHADo3zSyFQ4jHO+hkXijAJe+Xg==
+X-Received: from jaat21.prod.google.com ([2002:a05:6638:c115:b0:4e8:1778:12dc])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6602:6408:b0:84f:2929:5ec0 with SMTP id ca18e2360f4ac-851b618c4b5mr1201581239f.4.1737402894953;
+ Mon, 20 Jan 2025 11:54:54 -0800 (PST)
+Date: Mon, 20 Jan 2025 19:54:54 +0000
+In-Reply-To: <Z37J1jJCTBZk-0cs@google.com> (message from Sean Christopherson
+ on Wed, 8 Jan 2025 10:54:14 -0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-To: linux-coco@lists.linux.dev, "linux-mm@kvack.org" <linux-mm@kvack.org>,
- KVM <kvm@vger.kernel.org>
-Subject: [Invitation] bi-weekly guest_memfd upstream call on 2025-01-23
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Message-ID: <gsntmsfl2rch.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 4/6] KVM: x86: selftests: Test read/write core counters
+From: Colton Lewis <coltonlewis@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, mizhang@google.com, ljr.kernel@gmail.com, 
+	jmattson@google.com, aaronlewis@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Hi everybody,
+Sean Christopherson <seanjc@google.com> writes:
 
-our next guest_memfd upstream call is scheduled for Thursday,
-2025-01-23 at 8:00 - 9:00am (GMT-08:00) Pacific Time - Vancouver.
+> On Wed, Sep 18, 2024, Colton Lewis wrote:
+>> Run a basic test to ensure we can write an arbitrary value to the core
+>> counters and read it back.
 
-We'll be using the following Google meet:
-http://meet.google.com/wxp-wtju-jzw
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>   .../selftests/kvm/x86_64/pmu_counters_test.c  | 54 +++++++++++++++++++
+>>   1 file changed, 54 insertions(+)
 
-The meeting notes can be found at [1], where we also link recordings and
-collect current guest_memfd upstream proposals. If you want an google
-calendar invitation that also covers all future meetings, just write me
-a mail.
+>> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c  
+>> b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+>> index 5b240585edc5..79ca7d608e00 100644
+>> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+>> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+>> @@ -641,11 +641,65 @@ static uint8_t nr_core_counters(void)
+>>   		return AMD_NR_CORE_EXT_COUNTERS;
+
+>>   	return AMD_NR_CORE_COUNTERS;
+>> +}
+>> +
+>> +static uint8_t guest_nr_core_counters(void)
+>> +{
+>> +	uint8_t nr_counters =  
+>> this_cpu_property(X86_PROPERTY_NUM_PERF_CTR_CORE);
+>> +	bool core_ext = this_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+
+> For both this and nr_core_counters(), there's no need to read  
+> PERF_CTR_EXT_CORE
+> if nr_counters is non-zero, and then no need to capture it in a local  
+> variable.
+
+Sure but since I might need it and don't see why the performance cost
+matters for a test that is only calling it a few times, I thought the
+code looked nicer to just read it up front when I declare the variable.
+
+I can change it.
+
+>> +
+>> +	if (nr_counters != 0)
+>> +		return nr_counters;
+>> +
+>> +	if (core_ext)
+>> +		return AMD_NR_CORE_EXT_COUNTERS;
+>> +
+>> +	return AMD_NR_CORE_COUNTERS;
+
+> This is *painfully* similar to nr_core_counters().  It actually took me  
+> almost
+> a minute of staring to see the difference.  One option would be to add a  
+> helper
+> to dedup the if-statements, but while somewhat gross, I actually think a  
+> macro
+> is the way to go.
+
+> #define nr_core_counters(scope)								\
+> ({											\
+> 	uint8_t nr_counters =  
+> scope##_cpu_property(X86_PROPERTY_NR_PERFCTR_CORE);	\
+> 											\
+> 	if (!nr_counters) {								\
+> 		if (scope##_cpu_has(X86_FEATURE_PERFCTR_CORE))				\
+> 			nr_counters = AMD_NR_CORE_EXT_COUNTERS;				\
+> 		else									\
+> 			nr_counters = AMD_NR_CORE_COUNTERS;				\
+> 	}										\
+> 	nr_counters;									\
+> })
+
+> static uint8_t kvm_nr_core_counters(void)
+> {
+> 	return nr_core_counters(kvm);
+> }
+
+> static uint8_t guest_nr_core_counters(void)
+> {
+> 	return nr_core_counters(this);
+
+> }
+
+Point taken. I'll go with the macro.
+
+>> +
+
+> Unnecessary newline.
+
+Will delete
+
+>> +}
+
+>> +static void guest_test_rdwr_core_counters(void)
+>> +{
+>> +	bool core_ext = this_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+>> +	uint8_t nr_counters = guest_nr_core_counters();
+>> +	uint8_t i;
+>> +	uint32_t esel_msr_base = core_ext ? MSR_F15H_PERF_CTL :  
+>> MSR_K7_EVNTSEL0;
+
+> Please don't concoct new abbreviations.  "esel" isn't used anywhere in  
+> KVM, and
+> AFAICT it's not used in perf either.
+
+I'll avoid that in the future
+
+> I would also prefer to have consistent naming between the Intel and AMD  
+> tests
+> (the Intel test uses base_<name>_msr).
+
+Done
+
+> base_eventsel_msr is all of four characters more.
+
+>> +	uint32_t cnt_msr_base = core_ext ? MSR_F15H_PERF_CTR : MSR_K7_PERFCTR0;
+
+> For better or worse, the Intel version uses "base_pmc_msr".  I see no  
+> reason to
+> diverage from that.
 
 
-If nothing else pops up, in this meeting we'll likely continue our 
-discussion on:
-  * State of huge page support
-  * State of shared device assignment support
-  * State of shared vs. private / mmap support
+Done
 
-To put something to discuss onto the agenda, reply to this mail or add
-them to the "Topics/questions for next meeting(s)" section in the
-meeting notes as a comment.
+>> +	uint32_t msr_step = core_ext ? 2 : 1;
+>> +
+>> +	for (i = 0; i < AMD_NR_CORE_EXT_COUNTERS; i++) {
+>> +		uint64_t test_val = 0xffff;
+>> +		uint32_t esel_msr = esel_msr_base + msr_step * i;
+>> +		uint32_t cnt_msr = cnt_msr_base + msr_step * i;
 
-[1]
-https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?usp=sharing
+> And then
+> 		uint32_t eventsel_msr = ...;
+> 		uint32_t pmc_msr = ...;
 
--- 
-Cheers,
+>> +		bool expect_gp = !(i < nr_counters);
 
-David / dhildenb
+> Uh, isn't that just a weird way of writing:
+
+> 		bool expect_gp = i >= nr_counters;
+
+Yes they are logically equivalent. I thought it was clearer by
+emphasizing it was the negation of "i is a valid counter" (i <
+nr_counters)
+
+But I'll change it
+
+>> +		uint8_t vector;
+>> +		uint64_t val;
+>> +
+>> +		/* Test event selection register. */
+
+> This is pretty obvious if the MSR is named eventsel_msr.
+
+Will delete
+
+>> +		vector = wrmsr_safe(esel_msr, test_val);
+>> +		GUEST_ASSERT_PMC_MSR_ACCESS(WRMSR, esel_msr, expect_gp, vector);
+>> +
+>> +		vector = rdmsr_safe(esel_msr, &val);
+>> +		GUEST_ASSERT_PMC_MSR_ACCESS(RDMSR, esel_msr, expect_gp, vector);
+>> +
+>> +		if (!expect_gp)
+>> +			GUEST_ASSERT_PMC_VALUE(RDMSR, esel_msr, val, test_val);
+>> +
+>> +		/* Test counter register. */
+
+> Same thing here.  If there is novel information/behavior, then by all  
+> means add
+> a comment.
+
+Will delete
+
+>> +		vector = wrmsr_safe(cnt_msr, test_val);
+>> +		GUEST_ASSERT_PMC_MSR_ACCESS(WRMSR, cnt_msr, expect_gp, vector);
+>> +
+>> +		vector = rdmsr_safe(cnt_msr, &val);
+>> +		GUEST_ASSERT_PMC_MSR_ACCESS(RDMSR, cnt_msr, expect_gp, vector);
+>> +
+>> +		if (!expect_gp)
+>> +			GUEST_ASSERT_PMC_VALUE(RDMSR, cnt_msr, val, test_val);
+>> +	}
+>>   }
+
+>>   static void guest_test_core_counters(void)
+>>   {
+>> +	guest_test_rdwr_core_counters();
+>>   	GUEST_DONE();
+>>   }
+
+>> --
+>> 2.46.0.662.g92d0881bb0-goog
 
 
