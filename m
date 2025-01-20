@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-35942-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35943-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D961A16691
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 07:13:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C195A16693
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 07:13:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C47AB169D5F
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 06:13:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 147F67A41E7
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 06:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868CC176FB0;
-	Mon, 20 Jan 2025 06:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729EA186615;
+	Mon, 20 Jan 2025 06:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UrDVwYe6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d4Hrz7NA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA832770C
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 06:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E69183CD1
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 06:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737353606; cv=none; b=TdEPltj85cTwBOh0vJOHCo3mBHv27P+ZBkxPmee3eIFTiI0zq7y/j/4WrZvWG1Nv68DQ5c9aQ1BhUfzFVWjExcgTZm0ZVQD3gDaUQGEp/yqH3KCNNVqxw6+ZsGkYJJMNq3OC6qj7t+Hrx23VuKfUfRCBGnXe/CMa6tfysV3/Wjs=
+	t=1737353611; cv=none; b=iITkHTE+qjyKogoTYeKbzAhDQA2WjXS/+I4Rb59zlia/44CE18/kK/qbREojb9AoQlpv4tTQ8EHwT2mMdNFcdRT+aaW418vJ3zICs31WKaBOFyJSJrXdrQZOtKnh2IGaOA4FndqceNQJPXPLOQmmsJx1bu9vmtITF78OevjnCx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737353606; c=relaxed/simple;
-	bh=yTWCY5k3QG3uCP8nBjEF23kcnm2Rje4eSnFKVIQtXLw=;
+	s=arc-20240116; t=1737353611; c=relaxed/simple;
+	bh=K1Wcn8Ucet0XH8q61Ezq7T9/YZboaMm8yYJX3EBE8kw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rVocDbL+qHtKyPWNu9g5Pqcweam3z6ZJPa/ZEpyEarYTFosb9oNXw3GleBTzJ5Ec/mzz0FSWgmWLPu1WnsfLKdIKre/5jzBUvn0sjQOBFOiWfm8glfONtIzG07Ff4giKLaGQDDdcZ+JRx3nyasrYkZNVHLjD5S+OaB+A3j/+ZVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UrDVwYe6; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version:Content-Type; b=pyUmUIloISfhPpoiFjSi7yo6lKrU3n4jxyss/pc/eUrlAECSV8wncZBRsgZOAFu6RhvrVVxREDiPW0whUSB78u8hkBEEfiI75H+d/v66sAp/RwByh5N2bIO+HdEwyZHCchttiQ4dGq6IR0b3KFjAhKN1gIx+uDpJ4xDSgpRp0Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=d4Hrz7NA; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4361815b96cso27296865e9.1
-        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 22:13:24 -0800 (PST)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4362f61757fso41739315e9.2
+        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 22:13:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737353603; x=1737958403; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1737353608; x=1737958408; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xZ4bgqHK4U63ZyF21ovjhIWwkMXyj56njZ/a/NkbEaQ=;
-        b=UrDVwYe6QvRqeXKIFCM86VbctT6IkdfktJ6ru/9F5BRF9QHRcSdWOJ1Nw6nXALK6rI
-         LfTF8XHKgzusBZA1gfDkdhsEU53WoH1PZDO+vZc67bvMaLQo3/c1Q15XmSQMdRuAhAhj
-         QVhysGIKgCuWJgHvT86N+xlERuF4g52nHqJb3Iot+bH18kw9cSUar2oOcDq4UcTZSdMV
-         NnJ8CO6BZWRed2oDjM/ffW3Q4GHfdmyAOt1ALPHC1Y+p3sswwBv1xMl/d5KhYypflfCn
-         4/+i1ShkdZBFsVaDKFL/UFEB1RZCHwSJBEUXBr1cQBed0Eh25fu9sQyOl943mVwDK9Wz
-         tqSA==
+        bh=/LgmFzZPaYXd/oFrcsNkEtO3/uWCAUa12Q0VDnBXMJM=;
+        b=d4Hrz7NANHWsPgWk0+4jCNWG2/t8QLP1rlXdFPf9MwuU3ux6AkVIfHCek4Mnz5xj0P
+         QOr+knsDR4NjyZF23REkE7uyqo1LcLaS0a9L/KHc/8EWUjMbfh7Wrzp14B3XxBTtAgFx
+         sRPhy8+VyoUfioFxn3OdfFGWiBXeR+splMiGEX0h4//woPgTy4g7ZEFq7sOdGn0bnBC9
+         Kuyt41RFl8E+ULYy6y5XAdCyA+kpURQso1kLhw3+Zf6zcTzuWPOJ3a7HLhJXKq9Kx+pX
+         YWo9lUd8awrL8kQYDbl2sAHXrKkH7fEXCzevFp6I3sa4pblK41AAPO+Q3NVMGiZu+NIn
+         1vhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737353603; x=1737958403;
+        d=1e100.net; s=20230601; t=1737353608; x=1737958408;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xZ4bgqHK4U63ZyF21ovjhIWwkMXyj56njZ/a/NkbEaQ=;
-        b=H58+Gwu2WRXcscjzkGHCjoX6XnxT5Lmc+gycTEZ97N6zqz4eGAJVI/7ez0PBreiDmC
-         1GK748iMZwFMXPy7VT9p/GINCEkNfm6NksdUctr0l/qnLDu8A0uLzQgW8tye+z77Db3X
-         mWmSNyVdfqLSbOf5Rjhza19PpRydIL41rOdvH0Fk8I7F+ASKuEyuiONf7cMmdv+eCnLu
-         jswnPj4OnIjnognE4Q589gmciAlkNEnXKDZQIYuOf0YXJ3LCRQXnddboOE9braFut2j0
-         WieZkb85AvuYhW17DWyuEDx9gU9zWADfpqmIsfe692Jo6TIzDZKW8Q9mok9uTie9PQxK
-         lCxg==
-X-Forwarded-Encrypted: i=1; AJvYcCX0x4fdFHrUgfsFnnSLv3YJO8jIWAkRDcv6qhueWUDrHaS9HcMp/xIPrGi3sLml5d4IlwE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR3Ih1qqbx5hnwoOrx5VHEoHD6g/Vngy3BjLMiWCrICWv84IBt
-	rRiEw00h9qvJns4O2+96Jbo8TZWcfs4Ff1KDc28Y5uzMah35D/IpiZhHbc8GM7k=
-X-Gm-Gg: ASbGncsULEuB4CdUkE2xvGbTjjS3+qsgLgkykJX8ypiimZ5cZJaM/vE8dbHVq5yMVY3
-	Bjdr+JjUZIT2MTdOgm4S2ivOneddbVcuPhpy9hjYI11GLv/uiJWYymWyGRi1D0eJSe8ZXjYMxR2
-	Dt74jfpszn6GZnL+jMsuFMaPHTzPAVRCBij9qTsATCYVkyywx3ZwYqdrJGAa0ZW8dlzSGYQ0dUe
-	dK3ZxRYu38YE+U9Y8LnieydL+DBLha0jyFTMqedsMM4EiSRLJXoBB6EnZpkMkD20QzkukfQ9g2b
-	Bt2Du4A6crBJewuxql62ax/WsCLDp6T0x/PEFRc1CFM/
-X-Google-Smtp-Source: AGHT+IHsLn5UQ2lGNTqaVfR9uW+ill/b230kCe9JxeG+TeBCDdW/xZDrF+sTByfZht58mwD8OlFP8Q==
-X-Received: by 2002:a05:600c:1f10:b0:434:ff9d:a370 with SMTP id 5b1f17b1804b1-438912d1d49mr114113545e9.0.1737353603317;
-        Sun, 19 Jan 2025 22:13:23 -0800 (PST)
+        bh=/LgmFzZPaYXd/oFrcsNkEtO3/uWCAUa12Q0VDnBXMJM=;
+        b=nfFZj88cVF5Umyo77l8KSf+Gp7UdNX0lSXVyZWs5nfwe3ImqfbftFwig//lPJL3D97
+         puZ2/vV3Vfe9jNaHN+JGr0/vcRlQxklCvAdlSWEdwEhguLzLg2RsSGzQH5DUUiPKQzBx
+         rWBPFO52cq9F133vhD2M69XaxT9l9u5KIV2Y6LjBg8lH+mlZLyWgc6VaAWey8+C7A5id
+         UqaINZ6qv+CAEztGGhGSovo8MHYi+CnufOOavTnQ8QGLA/yF2Sv+ljmYFJRl267v8eGI
+         YZ6pQL4obtmE/ABRapRqVxyUzyJfW6VOJ7R9oqjQ2+mMt77uge0JI65d2dKwgBDtpFf8
+         wByA==
+X-Forwarded-Encrypted: i=1; AJvYcCVdWGdYzs7eFJx0I/7RZ1JpwFiswe9uHXu4HV/biiT7Rjf2Mn0DuT9d0WfNrnALaHmNlK0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGdhV1C3LgdEqNTw1Q99qfUaDkkq+N2hq7kpypxmvldHCaQvF/
+	K++omGcDbRG9lGJiuaL1Mx9dV8vANWweMLlH3zTG9HE3do3ldNm5HlIJonDVKYc=
+X-Gm-Gg: ASbGncuh+KO43GKM8CnASoVMfqdqQrkrP+Tu/CqkochB41sQ2QwxZB2/jMYEVmymdL8
+	bi3gKHGFJ5ILkI4wElgJ5pov6gIvgLv+hKiTUE870lablc8uUmoODOzC2lmvSIF1TP9bMAaXpaq
+	jSReR95WKWBeUXMOec7bZ4VnzxTh2kh0k1g6PDO9DcUgZpzctPWgjZB4isxYqLz1a9y5CTjrVHZ
+	dVB37NBtvA9crFUwScCyoNjLYctacQglJJHNxHuGs6bInE/j5tCxSeX/92d+jlePj4fNXetQl0t
+	ZgyFTlM+Zbv2d2N9ihJfnX/zvz62yD4trtr4UJYxEBQW
+X-Google-Smtp-Source: AGHT+IFQxWOYTXhmRmfNHYvquVRicISruZz1w3PMDmGF59CMccSZ+zar5LZzshebqb/yaVzBLo/diw==
+X-Received: by 2002:a05:600c:19cc:b0:436:fb9e:26c with SMTP id 5b1f17b1804b1-438913de937mr105007685e9.17.1737353608127;
+        Sun, 19 Jan 2025 22:13:28 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c7499942sm185021665e9.6.2025.01.19.22.13.22
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438904087cbsm127685485e9.3.2025.01.19.22.13.27
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 19 Jan 2025 22:13:22 -0800 (PST)
+        Sun, 19 Jan 2025 22:13:27 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>,
@@ -80,9 +80,9 @@ Cc: Richard Henderson <richard.henderson@linaro.org>,
 	Warner Losh <imp@bsdimp.com>,
 	kvm@vger.kernel.org,
 	Laurent Vivier <laurent@vivier.eu>
-Subject: [PATCH 2/7] qemu/thread: Constify qemu_thread_is_self() argument
-Date: Mon, 20 Jan 2025 07:13:05 +0100
-Message-ID: <20250120061310.81368-3-philmd@linaro.org>
+Subject: [PATCH 3/7] cpus: Constify qemu_cpu_is_self() argument
+Date: Mon, 20 Jan 2025 07:13:06 +0100
+Message-ID: <20250120061310.81368-4-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250120061310.81368-1-philmd@linaro.org>
 References: <20250120061310.81368-1-philmd@linaro.org>
@@ -95,53 +95,67 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-QemuThread structure is not modified, only read.
+CPUState structure is not modified, make it const.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/qemu/thread.h    | 2 +-
- util/qemu-thread-posix.c | 2 +-
- util/qemu-thread-win32.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ include/hw/core/cpu.h | 2 +-
+ bsd-user/main.c       | 2 +-
+ linux-user/main.c     | 2 +-
+ system/cpus.c         | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/qemu/thread.h b/include/qemu/thread.h
-index d4f44241ef0..d3027c843bc 100644
---- a/include/qemu/thread.h
-+++ b/include/qemu/thread.h
-@@ -195,7 +195,7 @@ int qemu_thread_get_affinity(const QemuThread *thread,
-                              unsigned long **host_cpus, unsigned long *nbits);
- void *qemu_thread_join(QemuThread *thread);
- void qemu_thread_get_self(QemuThread *thread);
--bool qemu_thread_is_self(QemuThread *thread);
-+bool qemu_thread_is_self(const QemuThread *thread);
- G_NORETURN void qemu_thread_exit(void *retval);
- void qemu_thread_naming(bool enable);
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index fb397cdfc53..782c43ac8b3 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -838,7 +838,7 @@ static inline bool cpu_has_work(CPUState *cpu)
+  *
+  * Returns: %true if called from @cpu's thread, %false otherwise.
+  */
+-bool qemu_cpu_is_self(CPUState *cpu);
++bool qemu_cpu_is_self(const CPUState *cpu);
  
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index 0fc3003ec46..c85421f1a0f 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -664,7 +664,7 @@ void qemu_thread_get_self(QemuThread *thread)
-     thread->thread = pthread_self();
+ /**
+  * qemu_cpu_kick:
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index b2f6a9be2f2..6dc4512cebf 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -205,7 +205,7 @@ void stop_all_tasks(void)
+     start_exclusive();
  }
  
--bool qemu_thread_is_self(QemuThread *thread)
-+bool qemu_thread_is_self(const QemuThread *thread)
+-bool qemu_cpu_is_self(CPUState *cpu)
++bool qemu_cpu_is_self(const CPUState *cpu)
  {
-    return pthread_equal(pthread_self(), thread->thread);
+     return thread_cpu == cpu;
  }
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index 0d512c0188e..08c6543fe51 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -546,7 +546,7 @@ HANDLE qemu_thread_get_handle(QemuThread *thread)
-     return handle;
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 7198fa0986b..104704ace96 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -181,7 +181,7 @@ void fork_end(pid_t pid)
+ 
+ __thread CPUState *thread_cpu;
+ 
+-bool qemu_cpu_is_self(CPUState *cpu)
++bool qemu_cpu_is_self(const CPUState *cpu)
+ {
+     return thread_cpu == cpu;
+ }
+diff --git a/system/cpus.c b/system/cpus.c
+index 37e5892c240..e4910d670cf 100644
+--- a/system/cpus.c
++++ b/system/cpus.c
+@@ -502,7 +502,7 @@ void qemu_cpu_kick_self(void)
+     cpus_kick_thread(current_cpu);
  }
  
--bool qemu_thread_is_self(QemuThread *thread)
-+bool qemu_thread_is_self(const QemuThread *thread)
+-bool qemu_cpu_is_self(CPUState *cpu)
++bool qemu_cpu_is_self(const CPUState *cpu)
  {
-     return GetCurrentThreadId() == thread->tid;
+     return qemu_thread_is_self(cpu->thread);
  }
 -- 
 2.47.1
