@@ -1,332 +1,170 @@
-Return-Path: <kvm+bounces-36000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36001-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 502AAA16C33
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:15:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 471E0A16C42
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 630A93A529E
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 12:15:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC0E53A18FD
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 12:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FABE1DFDB8;
-	Mon, 20 Jan 2025 12:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EFB1DFD83;
+	Mon, 20 Jan 2025 12:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ngmKHlrf"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="L+BuXLv8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461651B6CEC
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 12:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595FD1DFFC;
+	Mon, 20 Jan 2025 12:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737375332; cv=none; b=KLMSewnOMnHJD4PK6zWtVkUz0psw7gmpTSummu8cYBgKlTcdIRsZ2XHrpo2gQGlcY20iH3+qgeNuD81FYBXpxeQZXUjvXUwhYtI47N8EXF6uknFRwLTwP/s3+rmUX97DmkzIaRN5LkJ4V7ErbK1y/neXO3XFvDukWXsoWfsnlnk=
+	t=1737375679; cv=none; b=jYDQvdbxGaF7fGOuudfKEoZ0EbQa8dxyy/1XfZlcT2zQmOzBI5wSWJXXZ8e/kse4OhNp5RZcKdWiu6MjvWlom1jeTq2xrN5mWgT8vW4pR1XpJmD8U4dsFiGxzIxAExdiiqy+ptqoMkS5AWA57i8FtEQz4zJzB64+164pXXft/5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737375332; c=relaxed/simple;
-	bh=mBBV7HAY2a4i9ZBM+OIAmCeg6ZqzwvWpFP21CwZt+7U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dFO1UKhLzAIAYceeFoq8VaG9bmGfkxhnW89GsSYNHyqOdtfxiK06Ec362QQVfB3jF0jkg+0H439xCetZTRe1cmYqc6I0APx3b90+O6MjdLKUXNMNMNyaUqo2K+2m9vUxSKuUf46Fsgnkc2rbR46a7fOsPenjMS1PAgl2FgqZjzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ngmKHlrf; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43621d2dd4cso79645e9.0
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 04:15:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737375328; x=1737980128; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QWvW/3T8LwxW9ylBIaUuTKzxQTh1JV8NqskFJ9TijpQ=;
-        b=ngmKHlrfnFapSmwDJQ0tCU4G0OO2KR+YfPnOjF3CvG9kSWceHgTCf4qgYWJlBymjzx
-         +WWO0MoL4U074qeRsMl41HFBF2DoLzs8qfGovDwFR3gR898RT71hNPcYCCCJUDySeCoF
-         P0rzo7hBZ9ukqzppwpY1/cJZ67rlV9ERUbLkq7v2pTeZZqbI4IqDcuIL9RT8eEXaBTs/
-         BMcekbtRk0u6GqlQf+lOS69xycHIyAz2LfYG92Z6t9rX07Wa2XJLakoTNrwiiDiiniXU
-         CfwJ4xwDSGIac/q+A5ko5KuKB+RJTLyRyweIsFAsvD2R2DjP1RX9bTARCaTpm1fFi1bz
-         w0Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737375328; x=1737980128;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QWvW/3T8LwxW9ylBIaUuTKzxQTh1JV8NqskFJ9TijpQ=;
-        b=jBVVGJtEwTlyuPhaY9bL8LlzruHYCLm1Im8GpXxTgOKdKZbn6lQMwO1hKcXyGPv1CU
-         4IA9hayhU/WlxZQbgEHJKX1gihXL4XiAOt+MliEwJlXcKmXOPECbkfHaPv/Z+ZNrqDKI
-         PEcBmNRLNtWiTTcYG22s2/3fWOvyfPhN+pLPaKwJaCRuk3Nsd+Z5zoY+8Haadcf85NP6
-         KyJ1anKxJeE1ZU5pZAo2GWfJtSILyzMJoiF1nqTf/R7TynBVeNp+G2pl8YzUnrM5+13d
-         D/AzEnam5k9IoUTFbdpRebRKJU7qh4PloNh4pzd8mQUjm/BznAll2gnpJZAZMYmrTJ6o
-         /m+w==
-X-Gm-Message-State: AOJu0YwuRw0a8DIjcDCYm4xIi+jNJyG4RbfxLfRC78iuozqJRpotZXz7
-	uGpEENhPQmsCx7RqWbji/ODx5vsZUjoQEOlk4SnTgF+OMGYiK6xrRzWnfmqG08IMt2cGk+/0MVl
-	hI7G9rGaW/+xhNwr4JbqwhmEEIjYTADx7OSHh
-X-Gm-Gg: ASbGncvWQMRxz1dQgLB38eGO8d8QvJArFSBGX8AecP/1y3rz1RlHL1atEeLIWn1H5kF
-	la3cTY5L7e0b4ND2q3a/ugP9IOCveXyQfbAX4X8DoyIY6J/w4gw==
-X-Google-Smtp-Source: AGHT+IE3IRwz5JThPXsLvYgrKPbo7zk3RC9OByqB95gXnpdlRbvzoobzkAL3nR8dunv7BdydKSmbfXaelVImxZDQlPc=
-X-Received: by 2002:a05:600c:6d8c:b0:434:9e1d:44ef with SMTP id
- 5b1f17b1804b1-438a0f45d1bmr2345985e9.7.1737375328262; Mon, 20 Jan 2025
- 04:15:28 -0800 (PST)
+	s=arc-20240116; t=1737375679; c=relaxed/simple;
+	bh=Fc7b/lxG3QRpd0MAJjZrLAxGRVDT0z5D8PN5aVp7CRg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OGl/kijvrUhF6LFXy04PBTUm9gr0lZj8tPPQd/bpFxJEs7Si3oTGu+lbRXAs+nNDFT7qrZhFCCOwTs4LV1sUmnSlINTv8xOm3ds6hCcLFDrKahoDN3dFWDOFgx8fL87UppTHAvZqEIpe1utjiROD8k0jXk4NLZpKKBtkyd9+yzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=L+BuXLv8; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50K7WfbC010031;
+	Mon, 20 Jan 2025 12:21:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Pjj/6b
+	s9G9QaX27DEwqJe7u8YKQWfvtowSD6gfcLWE8=; b=L+BuXLv8kNnNf8ZSeHgvnw
+	5sW8ZecC9C+CXmohS1gtJ8xkI9UNGXe+NwRl/bqrrBz9fpvlqG811zr9hTfdgcnq
+	uHZgS2Gd0TLUF6KxnXEG8yeuLX39LlfDopE507rJmOIRKrB8WGtovgpF+u9QGuvd
+	DSc4l1+B6rVmafSvdIBeysrV2nJIXMGSEqoDO/+K06KJfkHTEqIU7l6A0pGWSARa
+	dwVGQPNxmklAXeR1kvYHrkux+SQYbHwWtBkmJrCveQmmfWaX1LBhWD2hrOwM5b5q
+	C5V0Vvx9kCOlLi6x2w9cySkfY9ZjUZVUngv1xUQ0HVgAqkMwmeq9KVxL0XfX0cpg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449j6n992p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 12:21:10 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50KCHnek027103;
+	Mon, 20 Jan 2025 12:21:10 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449j6n992k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 12:21:09 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50K923Ls032290;
+	Mon, 20 Jan 2025 12:21:09 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 448ruje069-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 12:21:09 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50KCL5F734603676
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Jan 2025 12:21:05 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 75F0A20077;
+	Mon, 20 Jan 2025 12:21:05 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B8B49200A3;
+	Mon, 20 Jan 2025 12:21:04 +0000 (GMT)
+Received: from [9.171.10.126] (unknown [9.171.10.126])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 20 Jan 2025 12:21:04 +0000 (GMT)
+Message-ID: <9dd56395-2d90-41de-985b-cb02adac86b6@linux.ibm.com>
+Date: Mon, 20 Jan 2025 13:21:04 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250117163001.2326672-1-tabba@google.com> <20250117163001.2326672-7-tabba@google.com>
- <417ca32d-b7f3-4dc9-8d3f-dc0ba67214ad@suse.cz>
-In-Reply-To: <417ca32d-b7f3-4dc9-8d3f-dc0ba67214ad@suse.cz>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 20 Jan 2025 12:14:50 +0000
-X-Gm-Features: AbW1kvYiLYDkJccSGcIlFv6JvIp9L0_jnhdtUHGnef2nKfmhei23pDM3daO69gw
-Message-ID: <CA+EHjTxrsPnVYSsc5bJ=fL_tWFUsjqiiMpJ3GURw6s4uwn810w@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 06/15] KVM: guest_memfd: Handle final folio_put()
- of guestmem pages
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 11/15] KVM: s390: stop using lists to keep track of
+ used dat tables
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        seanjc@google.com, seiden@linux.ibm.com
+References: <20250116113355.32184-1-imbrenda@linux.ibm.com>
+ <20250116113355.32184-12-imbrenda@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250116113355.32184-12-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: D3YXmEnGaUkHFkoEwFCPS863BW6bgk8e
+X-Proofpoint-ORIG-GUID: wlNz2SROpbH7eQvVCP4BLbdJb-kh_z4f
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-20_02,2025-01-20_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=806 adultscore=0 phishscore=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015 suspectscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501200100
 
-Hi Vlastimil,
+On 1/16/25 12:33 PM, Claudio Imbrenda wrote:
+> Until now, every dat table allocated to map a guest was put in a
+> linked list. The page->lru field of struct page was used to keep track
+> of which pages were being used, and when the gmap is torn down, the
+> list was walked and all pages freed.
+> 
+> This patch gets rid of the usage of page->lru. Page tables are now
+> freed by recursively walking the dat table tree.
+> 
+> Since s390_unlist_old_asce() becomes useless now, remove it.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-On Mon, 20 Jan 2025 at 11:37, Vlastimil Babka <vbabka@suse.cz> wrote:
->
-> On 1/17/25 17:29, Fuad Tabba wrote:
-> > Before transitioning a guest_memfd folio to unshared, thereby
-> > disallowing access by the host and allowing the hypervisor to
-> > transition its view of the guest page as private, we need to be
-> > sure that the host doesn't have any references to the folio.
-> >
-> > This patch introduces a new type for guest_memfd folios, and uses
-> > that to register a callback that informs the guest_memfd
-> > subsystem when the last reference is dropped, therefore knowing
-> > that the host doesn't have any remaining references.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> > The function kvm_slot_gmem_register_callback() isn't used in this
-> > series. It will be used later in code that performs unsharing of
-> > memory. I have tested it with pKVM, based on downstream code [*].
-> > It's included in this RFC since it demonstrates the plan to
-> > handle unsharing of private folios.
-> >
-> > [*] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/guestmem-6.13-v5-pkvm
->
-> <snip>
->
-> > --- a/virt/kvm/guest_memfd.c
-> > +++ b/virt/kvm/guest_memfd.c
-> > @@ -387,6 +387,28 @@ enum folio_mappability {
-> >       KVM_GMEM_NONE_MAPPABLE  = 0b11, /* Not mappable, transient state. */
-> >  };
-> >
-> > +/*
-> > + * Unregisters the __folio_put() callback from the folio.
-> > + *
-> > + * Restores a folio's refcount after all pending references have been released,
-> > + * and removes the folio type, thereby removing the callback. Now the folio can
-> > + * be freed normaly once all actual references have been dropped.
-> > + *
-> > + * Must be called with the filemap (inode->i_mapping) invalidate_lock held.
-> > + * Must also have exclusive access to the folio: folio must be either locked, or
-> > + * gmem holds the only reference.
-> > + */
-> > +static void __kvm_gmem_restore_pending_folio(struct folio *folio)
-> > +{
-> > +     if (WARN_ON_ONCE(folio_mapped(folio) || !folio_test_guestmem(folio)))
-> > +             return;
-> > +
-> > +     WARN_ON_ONCE(!folio_test_locked(folio) && folio_ref_count(folio) > 1);
->
-> Similar to Kirill's objection on the other patch, I think there might be a
-> speculative refcount increase (i.e. from a pfn scanner) as long as we have
-> refcount over 1. Probably not a problem here if we want to restore refcount
-> anyway? But the warning would be spurious.
->
-> > +
-> > +     __folio_clear_guestmem(folio);
-> > +     folio_ref_add(folio, folio_nr_pages(folio));
-> > +}
-> > +
-> >  /*
-> >   * Marks the range [start, end) as mappable by both the host and the guest.
-> >   * Usually called when guest shares memory with the host.
-> > @@ -400,7 +422,31 @@ static int gmem_set_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
-> >
-> >       filemap_invalidate_lock(inode->i_mapping);
-> >       for (i = start; i < end; i++) {
-> > +             struct folio *folio = NULL;
-> > +
-> > +             /*
-> > +              * If the folio is NONE_MAPPABLE, it indicates that it is
-> > +              * transitioning to private (GUEST_MAPPABLE). Transition it to
-> > +              * shared (ALL_MAPPABLE) immediately, and remove the callback.
-> > +              */
-> > +             if (xa_to_value(xa_load(mappable_offsets, i)) == KVM_GMEM_NONE_MAPPABLE) {
-> > +                     folio = filemap_lock_folio(inode->i_mapping, i);
-> > +                     if (WARN_ON_ONCE(IS_ERR(folio))) {
-> > +                             r = PTR_ERR(folio);
-> > +                             break;
-> > +                     }
-> > +
-> > +                     if (folio_test_guestmem(folio))
-> > +                             __kvm_gmem_restore_pending_folio(folio);
-> > +             }
-> > +
-> >               r = xa_err(xa_store(mappable_offsets, i, xval, GFP_KERNEL));
-> > +
-> > +             if (folio) {
-> > +                     folio_unlock(folio);
-> > +                     folio_put(folio);
-> > +             }
-> > +
-> >               if (r)
-> >                       break;
-> >       }
-> > @@ -473,6 +519,105 @@ static int gmem_clear_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
-> >       return r;
-> >  }
-> >
-> > +/*
-> > + * Registers a callback to __folio_put(), so that gmem knows that the host does
-> > + * not have any references to the folio. It does that by setting the folio type
-> > + * to guestmem.
-> > + *
-> > + * Returns 0 if the host doesn't have any references, or -EAGAIN if the host
-> > + * has references, and the callback has been registered.
->
-> Note this comment.
->
-> > + *
-> > + * Must be called with the following locks held:
-> > + * - filemap (inode->i_mapping) invalidate_lock
-> > + * - folio lock
-> > + */
-> > +static int __gmem_register_callback(struct folio *folio, struct inode *inode, pgoff_t idx)
-> > +{
-> > +     struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
-> > +     void *xval_guest = xa_mk_value(KVM_GMEM_GUEST_MAPPABLE);
-> > +     int refcount;
-> > +
-> > +     rwsem_assert_held_write_nolockdep(&inode->i_mapping->invalidate_lock);
-> > +     WARN_ON_ONCE(!folio_test_locked(folio));
-> > +
-> > +     if (folio_mapped(folio) || folio_test_guestmem(folio))
-> > +             return -EAGAIN;
->
-> But here we return -EAGAIN and no callback was registered?
-
-This is intentional. If the folio is still mapped (i.e., its mapcount
-is elevated), then we cannot register the callback yet, so the
-host/vmm needs to unmap first, then try again. That said, I see the
-problem with the comment above, and I will clarify this.
-
-> > +
-> > +     /* Register a callback first. */
-> > +     __folio_set_guestmem(folio);
-> > +
-> > +     /*
-> > +      * Check for references after setting the type to guestmem, to guard
-> > +      * against potential races with the refcount being decremented later.
-> > +      *
-> > +      * At least one reference is expected because the folio is locked.
-> > +      */
-> > +
-> > +     refcount = folio_ref_sub_return(folio, folio_nr_pages(folio));
-> > +     if (refcount == 1) {
-> > +             int r;
-> > +
-> > +             /* refcount isn't elevated, it's now faultable by the guest. */
->
-> Again this seems racy, somebody could have just speculatively increased it.
-> Maybe we need to freeze here as well?
-
-A speculative increase here is ok I think (famous last words). The
-callback was registered before the check, therefore, such an increase
-would trigger the callback.
-
-Thanks,
-/fuad
-
-
-> > +             r = WARN_ON_ONCE(xa_err(xa_store(mappable_offsets, idx, xval_guest, GFP_KERNEL)));
-> > +             if (!r)
-> > +                     __kvm_gmem_restore_pending_folio(folio);
-> > +
-> > +             return r;
-> > +     }
-> > +
-> > +     return -EAGAIN;
-> > +}
-> > +
-> > +int kvm_slot_gmem_register_callback(struct kvm_memory_slot *slot, gfn_t gfn)
-> > +{
-> > +     unsigned long pgoff = slot->gmem.pgoff + gfn - slot->base_gfn;
-> > +     struct inode *inode = file_inode(slot->gmem.file);
-> > +     struct folio *folio;
-> > +     int r;
-> > +
-> > +     filemap_invalidate_lock(inode->i_mapping);
-> > +
-> > +     folio = filemap_lock_folio(inode->i_mapping, pgoff);
-> > +     if (WARN_ON_ONCE(IS_ERR(folio))) {
-> > +             r = PTR_ERR(folio);
-> > +             goto out;
-> > +     }
-> > +
-> > +     r = __gmem_register_callback(folio, inode, pgoff);
-> > +
-> > +     folio_unlock(folio);
-> > +     folio_put(folio);
-> > +out:
-> > +     filemap_invalidate_unlock(inode->i_mapping);
-> > +
-> > +     return r;
-> > +}
-> > +
-> > +/*
-> > + * Callback function for __folio_put(), i.e., called when all references by the
-> > + * host to the folio have been dropped. This allows gmem to transition the state
-> > + * of the folio to mappable by the guest, and allows the hypervisor to continue
-> > + * transitioning its state to private, since the host cannot attempt to access
-> > + * it anymore.
-> > + */
-> > +void kvm_gmem_handle_folio_put(struct folio *folio)
-> > +{
-> > +     struct xarray *mappable_offsets;
-> > +     struct inode *inode;
-> > +     pgoff_t index;
-> > +     void *xval;
-> > +
-> > +     inode = folio->mapping->host;
-> > +     index = folio->index;
-> > +     mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
-> > +     xval = xa_mk_value(KVM_GMEM_GUEST_MAPPABLE);
-> > +
-> > +     filemap_invalidate_lock(inode->i_mapping);
-> > +     __kvm_gmem_restore_pending_folio(folio);
-> > +     WARN_ON_ONCE(xa_err(xa_store(mappable_offsets, index, xval, GFP_KERNEL)));
-> > +     filemap_invalidate_unlock(inode->i_mapping);
-> > +}
-> > +
-> >  static bool gmem_is_mappable(struct inode *inode, pgoff_t pgoff)
-> >  {
-> >       struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
->
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
