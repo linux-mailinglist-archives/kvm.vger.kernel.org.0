@@ -1,175 +1,180 @@
-Return-Path: <kvm+bounces-35927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35928-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA2AA164A6
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 01:36:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C11FAA164B0
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 01:38:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A03B53A54BD
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 00:36:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5072718852BF
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 00:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790598479;
-	Mon, 20 Jan 2025 00:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72198F5B;
+	Mon, 20 Jan 2025 00:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gdwA/F7T"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iuP/au/3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCBA184E
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 00:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB094DDC5;
+	Mon, 20 Jan 2025 00:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737333409; cv=none; b=IddAC1rub2om6GxgppIvuWPtSDb0ep7l+zPHllXsCcWJOMq/oRjvdnNzDvrciuThV29PWIFT1zjjCUIYDd4tzVd12xTaz+DHOEXd6SKk/vRqBGPMJ04SniHgO3U8Fz8xlGML6fbBjBHNe1WQv6wCjAx6SrbTmtg03X/Hz544/+o=
+	t=1737333488; cv=none; b=urIhKEDtnyRiulLzYZDrl/OT8ekYxQIcVVgSdgdbovYFkTulNhTVJuiIy3U/ysJGlM+FHrRBuVVlF+qHlfncDtReh5WbJbnWHjkhm/DXLliCMW4mC8OS/D/zKaNGyTSG6LmUonYxcoLW7LIRtVFU2EULa2Ig++cahNhQBm/LNNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737333409; c=relaxed/simple;
-	bh=sBrzjN252amelDCl8v0nqe8T7UjrAIPyRfaO63v6GNM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gRhfpHOLGP3zNKPd7VhUa0nm8uYS2SEZm0YCPt+LibRYqFl73XbWqo83bHctgWXDjEbuog2/Z2VTP//5ovLvYBTjmI51SQE2pFAGmLXO5fSO82ZaCw41PLoetPnvrfktD8bblFRQb98+yHa1Z40dtLjTpxI7WWchl/LlEU8e+H4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gdwA/F7T; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737333406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3H0nYB61+8LVuoJq+zs1egrUFpcaWndWQWohYstwrpY=;
-	b=gdwA/F7TLHrh7BwJNbCaJq1HoRXUYwobocfbByOsnHspxtBXU4g9YDegAufkQZAeMQ977m
-	iqM8z8poYgZej2w2PXjEL43HxTHr4MM19W8huO0W7Zg1Dq8ba50jraug3/EsTZvH5MmHAo
-	dZxkCsRVWnoVGVPy3mVDFOuR8W0s9WM=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-252-F4X3oY0tPIiSHcWAwu5ByA-1; Sun, 19 Jan 2025 19:36:45 -0500
-X-MC-Unique: F4X3oY0tPIiSHcWAwu5ByA-1
-X-Mimecast-MFC-AGG-ID: F4X3oY0tPIiSHcWAwu5ByA
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2ef909597d9so11112036a91.3
-        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 16:36:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737333404; x=1737938204;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3H0nYB61+8LVuoJq+zs1egrUFpcaWndWQWohYstwrpY=;
-        b=m7bWyTc2d89+As6YSg6mag7ylN0KNSq4vFjQs5GROLex/zqKdY4VsW++szgE1igR+P
-         59njk5+Snwl78nvsvu9yVkIIP7b7LoT3kX98dyjoiiTonJRk978GjTyLGjvOD+3rUYLo
-         x5U1UJTj4m+zlaS+2gVbfgX1tl+em6TTGzYIMJ+1UDGjR/ZbfQmJRMDgT+OolltN5eVQ
-         KZZaDggtIcUs85UVGzTJrQYq4mEZ+7uNSV8kX19q+Jij+E+L8A16Pg0XYPfYiLZLNFBz
-         Az9SP4wMH4lCVJTx3XxvFdoCHmNCoiH7Y6dEJXAIbhegqNpq2HH3QiDcpwyC9TJmpk3l
-         1nNA==
-X-Forwarded-Encrypted: i=1; AJvYcCXun7dF8YMUAQQAuwmBJ/UsV68LG7lRzATtzJK7jk9IRvQ1qzybgTKCQSxzy2u+/iCC2J0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnOWh4Hw+gbGaRg89Hvi8mGFjlMLB3pgFnWM3D/+RDwogXPSon
-	jPFZ7srRSPaQGY2b9lvSOR9tL8pGO8vZvoFDdmLQBBpOMr4v4/6bzoyMr6HqHpqOYVVorLeyYy6
-	k9bMwmQklFSJwAJ4+dOYhREy4sKSRreUTO6WyX6mWnropwyLj1i4OeUDTllGjCUcGOtHWts68eW
-	ZWQjP62+na6zR510z4L4mXj/Ci
-X-Gm-Gg: ASbGncvd/txzOmemejNFDsDsHii5yJW7nZAs/7hHMXKCAiDShYz3MFtSTPiaVYaRk6r
-	zu6abkxTK3RPRZbZouVHbb25Rw7P+1tp44XZLo+ubou4KAxaoqC6/
-X-Received: by 2002:a17:90b:2b83:b0:2ee:fa3f:4740 with SMTP id 98e67ed59e1d1-2f782d86690mr16043493a91.35.1737333404232;
-        Sun, 19 Jan 2025 16:36:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHp1Ois/gQ7usRrA6ey98y4JMzYea7jlE0C3PdWtBxN0mj155LyybzQ3UYqgF2HjpbQV22UEWHRbWe4ES5xwPY=
-X-Received: by 2002:a17:90b:2b83:b0:2ee:fa3f:4740 with SMTP id
- 98e67ed59e1d1-2f782d86690mr16043449a91.35.1737333403779; Sun, 19 Jan 2025
- 16:36:43 -0800 (PST)
+	s=arc-20240116; t=1737333488; c=relaxed/simple;
+	bh=hmlAlXFdf7hWfysyngcfGdHcDLc8ogIhGBpmTNWP3lY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jr/gfq3+gSP1kuTtHqAeRyIdf0ymwsWdtv0KtiWPXS+klp9k45HhRp194LbnkPXgsALsPVGAAUSM47UpbVHUfxCJKQ4Cq4zeOwRgkbYyZy0wkJQKHn27Q4+j/cMcuGgj3K2fdZK235eyDpXLTIpwPiNSERg+a4wtz9anx67FeYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iuP/au/3; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737333487; x=1768869487;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=hmlAlXFdf7hWfysyngcfGdHcDLc8ogIhGBpmTNWP3lY=;
+  b=iuP/au/3WZo9IuzrW4rkYnZNPELysjprQHR9umWaQGEPtgm2B19XOzob
+   QuoFpqj7j6ENxqhfQ1TLc8eBPJCLHoNtOC53AX071ZuNoXcQlsF93p0J1
+   ZFlhOws3gL2/vlUIuNF5lB7pkVJ7vepAUM6PdjErjs4YH2C8rYs2RqKSD
+   oX6H88w3TlttnRZoVIdPTt3QZaAQlXqaS6fJJlkzFeawBzfV0Q1z9D7ag
+   VLx28urq+9RMErFDVgJPE1I/C3RbTeOU3XNko4rT4pVOXJgzkyIhGLKmW
+   bgc5dk/m6Db5zaDl4J8kG70uyNFu49o8MRRWnLfKZexECgYKgSqqpVfDB
+   g==;
+X-CSE-ConnectionGUID: 49XGtLLUSxWGOZS00TpVyA==
+X-CSE-MsgGUID: e7epICIyRd+7bjlPgSGBug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="37797576"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="37797576"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2025 16:38:03 -0800
+X-CSE-ConnectionGUID: 6vmTYk4GTS6kjdOUQMM7Kw==
+X-CSE-MsgGUID: k+pT2GDiTcanWRxQrvfeFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="129588649"
+Received: from junyanfe-mobl.ccr.corp.intel.com (HELO [10.124.241.228]) ([10.124.241.228])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2025 16:38:01 -0800
+Message-ID: <5718f02c-59e7-402b-91ee-b4b7b43f887a@linux.intel.com>
+Date: Mon, 20 Jan 2025 08:37:58 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com> <20250116-tun-v3-9-c6b2871e97f7@daynix.com>
- <678a21a9388ae_3e503c294f4@willemb.c.googlers.com.notmuch> <51f0c6ba-21bc-4fef-a906-5d83ab29b7ff@daynix.com>
-In-Reply-To: <51f0c6ba-21bc-4fef-a906-5d83ab29b7ff@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 20 Jan 2025 08:36:32 +0800
-X-Gm-Features: AbW1kvaoh25v05-5WCQ_wsN2rqQ8xuqgKjHNGkTQtJgSpKoEbixeVohO4Epfz8s
-Message-ID: <CACGkMEuPXDWHErCCdEUB7+Q0NxsAjpSH9uTvOxzuBvNeyw7_Hg@mail.gmail.com>
-Subject: Re: [PATCH net v3 9/9] tap: Use tun's vnet-related code
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, devel@daynix.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/6] KVM: x86: Prep KVM hypercall handling for TDX
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, Kai Huang <kai.huang@intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Adrian Hunter <adrian.hunter@intel.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>
+References: <20241128004344.4072099-1-seanjc@google.com>
+ <173457537849.3292936.8364596188659598507.b4-ty@google.com>
+ <67f0292e-6eea-4788-977c-50af51910945@linux.intel.com>
+ <Z4qv9VTs0CZ0zoxW@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <Z4qv9VTs0CZ0zoxW@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 17, 2025 at 6:35=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
-.com> wrote:
+
+
+
+On 1/18/2025 3:31 AM, Sean Christopherson wrote:
+> On Wed, Jan 15, 2025, Binbin Wu wrote:
+>> On 12/19/2024 10:40 AM, Sean Christopherson wrote:
+>>> On Wed, 27 Nov 2024 16:43:38 -0800, Sean Christopherson wrote:
+>>>> Effectively v4 of Binbin's series to handle hypercall exits to userspace in
+>>>> a generic manner, so that TDX
+>>>>
+>>>> Binbin and Kai, this is fairly different that what we last discussed.  While
+>>>> sorting through Binbin's latest patch, I stumbled on what I think/hope is an
+>>>> approach that will make life easier for TDX.  Rather than have common code
+>>>> set the return value, _and_ have TDX implement a callback to do the same for
+>>>> user return MSRs, just use the callback for all paths.
+>>>>
+>>>> [...]
+>>> Applied patch 1 to kvm-x86 fixes.  I'm going to hold off on the rest until the
+>>> dust settles on the SEAMCALL interfaces, e.g. in case TDX ends up marshalling
+>>> state into the "normal" GPRs.
+>> Hi Sean, Based on your suggestions in the link
+>> https://lore.kernel.org/kvm/Z1suNzg2Or743a7e@google.com, the v2 of "KVM: TDX:
+>> TDX hypercalls may exit to userspace" is planned to morph the TDG.VP.VMCALL
+>> with KVM hypercall to EXIT_REASON_VMCALL and marshall r10~r14 from
+>> vp_enter_args in struct vcpu_tdx to the appropriate x86 registers for KVM
+>> hypercall handling.
+> ...
 >
-> On 2025/01/17 18:23, Willem de Bruijn wrote:
-> > Akihiko Odaki wrote:
-> >> tun and tap implements the same vnet-related features so reuse the cod=
-e.
-> >>
-> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >> ---
-> >>   drivers/net/Kconfig    |   1 +
-> >>   drivers/net/Makefile   |   6 +-
-> >>   drivers/net/tap.c      | 152 +++++----------------------------------=
-----------
-> >>   drivers/net/tun_vnet.c |   5 ++
-> >>   4 files changed, 24 insertions(+), 140 deletions(-)
-> >>
-> >> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> >> index 1fd5acdc73c6..c420418473fc 100644
-> >> --- a/drivers/net/Kconfig
-> >> +++ b/drivers/net/Kconfig
-> >> @@ -395,6 +395,7 @@ config TUN
-> >>      tristate "Universal TUN/TAP device driver support"
-> >>      depends on INET
-> >>      select CRC32
-> >> +    select TAP
-> >>      help
-> >>        TUN/TAP provides packet reception and transmission for user spa=
-ce
-> >>        programs.  It can be viewed as a simple Point-to-Point or Ether=
-net
-> >> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
-> >> index bb8eb3053772..2275309a97ee 100644
-> >> --- a/drivers/net/Makefile
-> >> +++ b/drivers/net/Makefile
-> >> @@ -29,9 +29,9 @@ obj-y +=3D mdio/
-> >>   obj-y +=3D pcs/
-> >>   obj-$(CONFIG_RIONET) +=3D rionet.o
-> >>   obj-$(CONFIG_NET_TEAM) +=3D team/
-> >> -obj-$(CONFIG_TUN) +=3D tun-drv.o
-> >> -tun-drv-y :=3D tun.o tun_vnet.o
-> >> -obj-$(CONFIG_TAP) +=3D tap.o
-> >> +obj-$(CONFIG_TUN) +=3D tun.o
-> >
-> > Is reversing the previous changes to tun.ko intentional?
-> >
-> > Perhaps the previous approach with a new CONFIG_TUN_VNET is preferable
-> > over this. In particular over making TUN select TAP, a new dependency.
->
-> Jason, you also commented about CONFIG_TUN_VNET for the previous
-> version. Do you prefer the old approach, or the new one? (Or if you have
-> another idea, please tell me.)
+>> To test TDX, I made some modifications to your patch
+>> "KVM: x86: Refactor __kvm_emulate_hypercall() into a macro"
+>> Are the following changes make sense to you?
+> Yes, but I think we can go a step further and effectively revert the bulk of commit
+> e913ef159fad ("KVM: x86: Split core of hypercall emulation to helper function"),
+> i.e. have ____kvm_emulate_hypercall() read the GPRs instead of passing them in
+> via the macro.
 
-Ideally, if we can make TUN select TAP that would be better. But there
-are some subtle differences in the multi queue implementation. We will
-end up with some useless code for TUN unless we can unify the multi
-queue logic. It might not be worth it to change the TUN's multi queue
-logic so having a new file seems to be better.
+Sure.
 
-Thanks
-
+Are you OK if I sent the change (as a prep patch) along with v2 of
+"TDX hypercalls may exit to userspace"?
 
 >
-> >
-> >> +obj-$(CONFIG_TAP) +=3D tap-drv.o
-> >> +tap-drv-y :=3D tap.o tun_vnet.o
-> >>   obj-$(CONFIG_VETH) +=3D veth.o
-> >>   obj-$(CONFIG_VIRTIO_NET) +=3D virtio_net.o
-> >>   obj-$(CONFIG_VXLAN) +=3D vxlan/
->
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index a2198807290b..2c5df57ad799 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -10088,9 +10088,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>>          if (kvm_hv_hypercall_enabled(vcpu))
+>>                  return kvm_hv_hypercall(vcpu);
+>> -       return __kvm_emulate_hypercall(vcpu, rax, rbx, rcx, rdx, rsi,
+>> -                                      is_64_bit_hypercall(vcpu),
+>> -                                      kvm_x86_call(get_cpl)(vcpu),
+>> +       return __kvm_emulate_hypercall(vcpu, kvm_x86_call(get_cpl)(vcpu),
+>>                                         complete_hypercall_exit);
+>>   }
+>>   EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
+>> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+>> index b00ecbfef000..989bed5b48b0 100644
+>> --- a/arch/x86/kvm/x86.h
+>> +++ b/arch/x86/kvm/x86.h
+>> @@ -623,19 +623,18 @@ int ____kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>>                                int op_64_bit, int cpl,
+>>                                int (*complete_hypercall)(struct kvm_vcpu *));
+>> -#define __kvm_emulate_hypercall(_vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl, complete_hypercall) \
+>> -({                                                                                             \
+>> -       int __ret;                                                                              \
+>> -                                                                                               \
+>> -       __ret = ____kvm_emulate_hypercall(_vcpu,                                                \
+>> -                                         kvm_##nr##_read(_vcpu), kvm_##a0##_read(_vcpu),       \
+>> -                                         kvm_##a1##_read(_vcpu), kvm_##a2##_read(_vcpu),       \
+>> -                                         kvm_##a3##_read(_vcpu), op_64_bit, cpl,               \
+>> -                                         complete_hypercall);                                  \
+>> -                                                                                               \
+>> -       if (__ret > 0)                                                                          \
+>> -               __ret = complete_hypercall(_vcpu);                                              \
+>> -       __ret;                                                                                  \
+>> +#define __kvm_emulate_hypercall(_vcpu, cpl, complete_hypercall)                                \
+>> +({                                                                                     \
+>> +       int __ret;                                                                      \
+>> +       __ret = ____kvm_emulate_hypercall(_vcpu, kvm_rax_read(_vcpu),                   \
+>> +                                         kvm_rbx_read(_vcpu), kvm_rcx_read(_vcpu),     \
+>> +                                         kvm_rdx_read(_vcpu), kvm_rsi_read(_vcpu),     \
+>> +                                         is_64_bit_hypercall(_vcpu), cpl,              \
+>> +                                         complete_hypercall);                          \
+>> +                                                                                       \
+>> +       if (__ret > 0)                                                                  \
+>> +               __ret = complete_hypercall(_vcpu);                                      \
+>> +       __ret;                                                                          \
+>>   })
+>>   int kvm_emulate_hypercall(struct kvm_vcpu *vcpu);
+>>
+>>
 
 
