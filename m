@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-36004-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44549A16C8B
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:50:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30097A16C9E
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BEE83A10A5
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 12:50:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7ECB18896D0
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 12:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AE11DFD80;
-	Mon, 20 Jan 2025 12:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DAE1E0DB5;
+	Mon, 20 Jan 2025 12:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YAyNUZay"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fSattvrZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401981FC8
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 12:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B290A1FC8
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 12:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737377452; cv=none; b=CC3fufWEbER/DdOZgofKFbdIV/4H1G/Reo4k4/J5kGX5WXjrDVjU7hdNiws1mhJ44U8nVJVYB0cBRms39wnIl6JlE1QP4kTTukYJqanK8w267F48RFwVd3Dj7DwFa1IWvkmef2Cfx2r+3wpMEqbfFMAgdMClDTXNh6wi4N7BO9c=
+	t=1737377864; cv=none; b=Gy/4s9Pp4JYQfIknCQcSxORCqkxups52WqLYeE+dR3COMqlNRLLvmgtGGqXlJd89r+QP342lu3ocEAvoBqHDzOehQwQA+9Y0gejgW7T1GwnHtf0nY3nK5h+XScs3/EhJSMxYRY77CHI814gYSMrg/ElNdgdBaT/1a9yFVzVXt88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737377452; c=relaxed/simple;
-	bh=z95N+ZPpD/876rA5JJZ6KQsTatmMG8RGVYQXRi+VVcE=;
+	s=arc-20240116; t=1737377864; c=relaxed/simple;
+	bh=OW81Y8gr3eBCJQQBdHJrzKhBykql9njNInjLwFSNtE8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BjVgnV/iNc/6ZboMS8jgOMKnlibTNVxC6OGZmpr48tluCQDVd4QYBpyGaJ0RwQ3lNDJ/Q/Q+LdwV6meR8vFXiZY+rHTi5WR+YgsHpo4Va/mlFI3OfQr6cSb1sdeMLD/qgS2WkioVsoRQKk1zhu3bVyDYv9BeIIMuDE9suvB/f84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YAyNUZay; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=CGjZjURTIpQOGW1yv4zYSM54Fgql6S/nMSYHEk/AJf0j/fcDLmBCdxRywUDyyUHSXsiAGwMBD95C6FmRFMzRWrevFhe3nHQJDAIDioO6VtlZk3YctVQbMqY0dsor5NJBFMYkTbmVrIPKcrAXND3k11qVRT67DOaTFUCnCu9ioHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fSattvrZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737377449;
+	s=mimecast20190719; t=1737377861;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=UjeveJr0nKAk4vsUnn+qk5nokU6V0SYpsBAXoq0q6gA=;
-	b=YAyNUZay6b9/sfBlfth6QuItmHSMGr7F8Z0NFj2S9tQ5L5jrBRK3JlU6BXJ37ZsBlE4U2o
-	GNw00hR/Tg1EgYFftnkixWJIREwR3ax1rUvlaG6IlqziFc93xVmupoCDN/1g2hD5w1/wdb
-	4i+3F6Sk4RGKLhFJbT3ua2imJN31eSI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bhtIEjiXM7eM431n4JWfAYhNrIgk6eKvoLYA6yBhI+E=;
+	b=fSattvrZkxchuo00OZOMi+Cs0VNIbS7aJNEqPLqSEznEuYpFGzsV09E+aNdzKs0U6yMCdS
+	lJsto9qF+4XowvTkSFTwbGryfKZcoNNkQaIn+gC1WNMQ//+QdWaB108EiIz9H+UCyTDTvX
+	MVzamufX7JI5gEPe7DDB2IDEjZCDFe0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-231-SSX9fHsLPXWxBbLIzP5Sjg-1; Mon, 20 Jan 2025 07:50:47 -0500
-X-MC-Unique: SSX9fHsLPXWxBbLIzP5Sjg-1
-X-Mimecast-MFC-AGG-ID: SSX9fHsLPXWxBbLIzP5Sjg
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4361fc2b2d6so23967735e9.3
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 04:50:47 -0800 (PST)
+ us-mta-271-m0jYNmUWNA-SSEZtL6La9Q-1; Mon, 20 Jan 2025 07:57:40 -0500
+X-MC-Unique: m0jYNmUWNA-SSEZtL6La9Q-1
+X-Mimecast-MFC-AGG-ID: m0jYNmUWNA-SSEZtL6La9Q
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43626224274so24074565e9.0
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 04:57:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737377446; x=1737982246;
+        d=1e100.net; s=20230601; t=1737377859; x=1737982659;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=UjeveJr0nKAk4vsUnn+qk5nokU6V0SYpsBAXoq0q6gA=;
-        b=t5lXztYlnm9x/Q1fvQggakV5qJw/L6mXdhJN0E1H4oFiVtOWC6TeNmruXfYNoChVSB
-         Uh5hz6n5RO7f7SHp2aBLZkF5g0Pbcn9aSE4g1jUI+dxB7hWsYxch1fA7Q13ay9mwlBDc
-         4BODj2vD1DCLNSz5fx7Vi3hMReij2PtaI5Uub230JBQneTitJ9E5xlUHG3S01QijmIJS
-         nGfQT36PflZPe3u4cGi3DOgT7sic3uoCvO4lsQvO/uxe/5EIC/z3EA0dJzf8KkiXqoZW
-         w2fEttpwHQkHTwNQN3vVT5n6XgEV3fSE/VHzXudAL360rG4DEqFAeQWdMHGUgK89bOgJ
-         p75g==
-X-Forwarded-Encrypted: i=1; AJvYcCXzC+mXoMe2I90yoZicFVOKeCY3/4C2rL41KOzN1RC+PtJ3uz0lAybxxUVLnYvjb//Tqks=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxsdnEMm3RCMkiP+QHJU4/vxTU+nZhwzrSVB6rArLLfg3+Vbpq
-	zPPh73F2tdmVgVVd439uG5E+Pr9/a1Xy+cQXnVJNaHZvi8Dczqo5IRyO+zbjB4VYgMWwx2Gz0Ah
-	BQc9EmdTACP0UmVBnTL992V4zkh/h9tk6syS+92xehcuq0hNlKA==
-X-Gm-Gg: ASbGncsAjckseOqAoNMIdvRYkzk8AId4Q647VEHNurAdFC1FtMGXlNDhut+ZAs2rE7b
-	81xJTeAP7gAmbeblfPlvPzVZj0vAsHSEfr/hh0KYs13LE/FItXxaFkOGWU6ufqH5qvOdvfJ+8W9
-	ZVg5FmGW3AiTlKPNWkqWI2fxo1xYw3QszudAVckMoph8Wexg92AR2a8czUEWa+wA/tEBOc2tWrM
-	ogUucoPx0lWWLt0v0A+tZUInK23lohuxzlxxzYUV/ay0Z37BKd7KxVlT6p1mLMUkRxmSJ9zIk2b
-	dKkdYq7TdBDgIe++adxfdaEpTUoUSkq4RiJMHLK2avt7dysOvYioZz7u5jVUZO4l8TuasaSbx6D
-	Q/rqVq4v56rjO/kW6BquipQ==
-X-Received: by 2002:a05:600c:870a:b0:434:a923:9310 with SMTP id 5b1f17b1804b1-438913ec91dmr125458815e9.15.1737377446468;
-        Mon, 20 Jan 2025 04:50:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFCMdNMN+xjBND7a4BGyFF3kqQ8uibGtg+rYIoHUhzoDM7xwFgviI6NCHx5/zTRP8KWkdXFeQ==
-X-Received: by 2002:a05:600c:870a:b0:434:a923:9310 with SMTP id 5b1f17b1804b1-438913ec91dmr125458535e9.15.1737377446037;
-        Mon, 20 Jan 2025 04:50:46 -0800 (PST)
+        bh=bhtIEjiXM7eM431n4JWfAYhNrIgk6eKvoLYA6yBhI+E=;
+        b=nn90qpXFNEAL8nOhWNZ+zeNf1RmBRgwG+wSMPNDEgrfnkuB954j/1R3LoDqRR48YOd
+         W9YeQ9eJ99doeELh2/qgPpgg8LWHnawuwsbMHlGw3TxQAZYb8L0K5zuBtXSBib5sk0Je
+         ODv0SLkVl2DwtA3Ze3Gabr1VyzhVpNAi0jTHjK6QEbg+RHER7sWintrlMkxqxUmM14wI
+         QGv2f6rgbI0JWixvdkdcKprBPkM5DMM7t2I3brJq2qkCbx/pPegBJ0sk17A6JpMtE6xy
+         cT+4Eq6vlLjuO6gveUfIcfhik+1pk6gE+ct5XxeUx6CCYNLnUUF0mtBdhYoxUKfBPvMm
+         0/DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6YgUbFwVjQBR7PHrvekNkdXDu8r21k/pu8F+7bXXGK7gaM6D+qxZNV9nXz+DePr/OE7M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMKOlxtcGfWPy0PCkVM9dAXMooNRYbHfw709UWihr4PsuCm4/T
+	oaxKyAAnRw56e4gIllAzwaOLz7inZwlWXDNOOsBDB2sAa2M7wIIXh91koD4ID6p9IC8ZvHpKG5Q
+	yZHIn8Rwo87VvOsswuZgZEKAEhuMxPCwOjMGY3PralPoQMfVLIw==
+X-Gm-Gg: ASbGncsrKYFjwkB8JNBdLb0IC9wfdNytlKSzAY/WdO/AwUxXWP4G+xlt745C5Mt0q7w
+	Wqcm2/XXkrCRYDzce6PuGDts8oUmjJwRoiOjgiJE1MXf2ZiXIoFCTERxBZ9Gb3KntUqGpDo3ZJO
+	TcpDY7S/NLRleETPDQDzJBWkq0stZNlfcwVlv2/J60k6WFBzmIZPYUB0U/h+PskwzwaUonwb5Uu
+	/fDGQWtJFFOzaT/R+dbmxR/v8xf/fF4BM0UR9m4Pk+XLw+fnrM51gJs1ODjrumPX7scxYLgN/uQ
+	iwBnrZEga1aZdJQdmF7w0JzChBjCIi99Lkq7GhZ8eQbVP2aHgGCJHTRuSPKIgjUqAgT4Ln4d68m
+	JasYx/KVwnvwfCS26GDZyUQ==
+X-Received: by 2002:a05:600c:1389:b0:431:52f5:f48d with SMTP id 5b1f17b1804b1-43891460bbemr131850135e9.31.1737377859184;
+        Mon, 20 Jan 2025 04:57:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGCTvH7pnGlLhs7qtg/SAdYcdsf/0fmbuxmG7uz7LfAw+7zvgJ51Tk0ktHwaQlJJxj39s/Cwg==
+X-Received: by 2002:a05:600c:1389:b0:431:52f5:f48d with SMTP id 5b1f17b1804b1-43891460bbemr131849865e9.31.1737377858846;
+        Mon, 20 Jan 2025 04:57:38 -0800 (PST)
 Received: from ?IPV6:2003:d8:2f22:1000:d72d:fd5f:4118:c70b? (p200300d82f221000d72dfd5f4118c70b.dip0.t-ipconnect.de. [2003:d8:2f22:1000:d72d:fd5f:4118:c70b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890413795sm136263025e9.14.2025.01.20.04.50.44
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4389041f7e9sm141012385e9.23.2025.01.20.04.57.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jan 2025 04:50:45 -0800 (PST)
-Message-ID: <5aa112ff-5b45-4ef1-a0a9-c80191331f6c@redhat.com>
-Date: Mon, 20 Jan 2025 13:50:43 +0100
+        Mon, 20 Jan 2025 04:57:37 -0800 (PST)
+Message-ID: <cc3428b1-22b7-432a-9c74-12b7e36b6cc6@redhat.com>
+Date: Mon, 20 Jan 2025 13:57:36 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,19 +90,26 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/7] memory: Export a helper to get intersection of a
- MemoryRegionSection with a given range
-To: Alexey Kardashevskiy <aik@amd.com>, Chenyi Qiang
- <chenyi.qiang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>,
+Subject: Re: [PATCH 0/7] Enable shared device assignment
+To: Jason Gunthorpe <jgg@nvidia.com>, Alexey Kardashevskiy <aik@amd.com>
+Cc: Chenyi Qiang <chenyi.qiang@intel.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
  Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
  Xu Yilun <yilun.xu@intel.com>
-References: <20241213070852.106092-1-chenyi.qiang@intel.com>
- <20241213070852.106092-2-chenyi.qiang@intel.com>
- <30624aca-a718-4a7d-b14f-25ab26e6bded@amd.com>
+References: <8f953ffc-6408-4546-a439-d11354b26665@intel.com>
+ <d4b57eb8-03f1-40f3-bc7a-23b24294e3d7@amd.com>
+ <57a3869d-f3d1-4125-aaa5-e529fb659421@intel.com>
+ <008bfbf2-3ea4-4e6c-ad0d-91655cdfc4e8@amd.com>
+ <1361f0b4-ddf8-4a83-ba21-b68321d921da@intel.com>
+ <c318c89b-967d-456e-ade1-3a8cacb21bd7@redhat.com>
+ <20250110132021.GE5556@nvidia.com>
+ <17db435a-8eca-4132-8481-34a6b0e986cb@redhat.com>
+ <20250110141401.GG5556@nvidia.com>
+ <9d925eaa-ba32-41f4-8845-448d26cef4c7@amd.com>
+ <20250115124933.GL5556@nvidia.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -150,153 +157,43 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <30624aca-a718-4a7d-b14f-25ab26e6bded@amd.com>
+In-Reply-To: <20250115124933.GL5556@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 08.01.25 05:47, Alexey Kardashevskiy wrote:
-> On 13/12/24 18:08, Chenyi Qiang wrote:
->> Rename the helper to memory_region_section_intersect_range() to make it
->> more generic.
+On 15.01.25 13:49, Jason Gunthorpe wrote:
+> On Wed, Jan 15, 2025 at 02:39:55PM +1100, Alexey Kardashevskiy wrote:
+>>> The thread was talking about the built-in support in iommufd to split
+>>> mappings.
 >>
->> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->> ---
->>    hw/virtio/virtio-mem.c | 32 +++++---------------------------
->>    include/exec/memory.h  | 13 +++++++++++++
->>    system/memory.c        | 17 +++++++++++++++++
->>    3 files changed, 35 insertions(+), 27 deletions(-)
->>
->> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
->> index 80ada89551..e3d1ccaeeb 100644
->> --- a/hw/virtio/virtio-mem.c
->> +++ b/hw/virtio/virtio-mem.c
->> @@ -242,28 +242,6 @@ static int virtio_mem_for_each_plugged_range(VirtIOMEM *vmem, void *arg,
->>        return ret;
->>    }
->>    
->> -/*
->> - * Adjust the memory section to cover the intersection with the given range.
->> - *
->> - * Returns false if the intersection is empty, otherwise returns true.
->> - */
->> -static bool virtio_mem_intersect_memory_section(MemoryRegionSection *s,
->> -                                                uint64_t offset, uint64_t size)
->> -{
->> -    uint64_t start = MAX(s->offset_within_region, offset);
->> -    uint64_t end = MIN(s->offset_within_region + int128_get64(s->size),
->> -                       offset + size);
->> -
->> -    if (end <= start) {
->> -        return false;
->> -    }
->> -
->> -    s->offset_within_address_space += start - s->offset_within_region;
->> -    s->offset_within_region = start;
->> -    s->size = int128_make64(end - start);
->> -    return true;
->> -}
->> -
->>    typedef int (*virtio_mem_section_cb)(MemoryRegionSection *s, void *arg);
->>    
->>    static int virtio_mem_for_each_plugged_section(const VirtIOMEM *vmem,
->> @@ -285,7 +263,7 @@ static int virtio_mem_for_each_plugged_section(const VirtIOMEM *vmem,
->>                                          first_bit + 1) - 1;
->>            size = (last_bit - first_bit + 1) * vmem->block_size;
->>    
->> -        if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
->> +        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
->>                break;
->>            }
->>            ret = cb(&tmp, arg);
->> @@ -317,7 +295,7 @@ static int virtio_mem_for_each_unplugged_section(const VirtIOMEM *vmem,
->>                                     first_bit + 1) - 1;
->>            size = (last_bit - first_bit + 1) * vmem->block_size;
->>    
->> -        if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
->> +        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
->>                break;
->>            }
->>            ret = cb(&tmp, arg);
->> @@ -353,7 +331,7 @@ static void virtio_mem_notify_unplug(VirtIOMEM *vmem, uint64_t offset,
->>        QLIST_FOREACH(rdl, &vmem->rdl_list, next) {
->>            MemoryRegionSection tmp = *rdl->section;
->>    
->> -        if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
->> +        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
->>                continue;
->>            }
->>            rdl->notify_discard(rdl, &tmp);
->> @@ -369,7 +347,7 @@ static int virtio_mem_notify_plug(VirtIOMEM *vmem, uint64_t offset,
->>        QLIST_FOREACH(rdl, &vmem->rdl_list, next) {
->>            MemoryRegionSection tmp = *rdl->section;
->>    
->> -        if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
->> +        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
->>                continue;
->>            }
->>            ret = rdl->notify_populate(rdl, &tmp);
->> @@ -386,7 +364,7 @@ static int virtio_mem_notify_plug(VirtIOMEM *vmem, uint64_t offset,
->>                if (rdl2 == rdl) {
->>                    break;
->>                }
->> -            if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
->> +            if (!memory_region_section_intersect_range(&tmp, offset, size)) {
->>                    continue;
->>                }
->>                rdl2->notify_discard(rdl2, &tmp);
->> diff --git a/include/exec/memory.h b/include/exec/memory.h
->> index e5e865d1a9..ec7bc641e8 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -1196,6 +1196,19 @@ MemoryRegionSection *memory_region_section_new_copy(MemoryRegionSection *s);
->>     */
->>    void memory_region_section_free_copy(MemoryRegionSection *s);
->>    
->> +/**
->> + * memory_region_section_intersect_range: Adjust the memory section to cover
->> + * the intersection with the given range.
->> + *
->> + * @s: the #MemoryRegionSection to be adjusted
->> + * @offset: the offset of the given range in the memory region
->> + * @size: the size of the given range
->> + *
->> + * Returns false if the intersection is empty, otherwise returns true.
->> + */
->> +bool memory_region_section_intersect_range(MemoryRegionSection *s,
->> +                                           uint64_t offset, uint64_t size);
->> +
->>    /**
->>     * memory_region_init: Initialize a memory region
->>     *
->> diff --git a/system/memory.c b/system/memory.c
->> index 85f6834cb3..ddcec90f5e 100644
->> --- a/system/memory.c
->> +++ b/system/memory.c
->> @@ -2898,6 +2898,23 @@ void memory_region_section_free_copy(MemoryRegionSection *s)
->>        g_free(s);
->>    }
->>    
->> +bool memory_region_section_intersect_range(MemoryRegionSection *s,
->> +                                           uint64_t offset, uint64_t size)
->> +{
->> +    uint64_t start = MAX(s->offset_within_region, offset);
->> +    uint64_t end = MIN(s->offset_within_region + int128_get64(s->size),
->> +                       offset + size);
+>> Just to clarify - I am talking about splitting only "iommufd areas", not
+>> large pages.
 > 
-> imho @end needs to be Int128 and s/MIN/int128_min/, etc to be totally
-> correct (although it is going to look horrendous). May be it was alright
-> when it was just virtio but now it is a wider API.
+> In generality it is the same thing as you cannot generally guarantee
+> that an area split doesn't also cross a large page.
+> 
+>> If all IOMMU PTEs are 4k and areas are bigger than 4K => the hw
+>> support is not needed to allow splitting. The comments above and below seem
+>> to confuse large pages with large areas (well, I am consufed, at least).
+> 
+> Yes, in that special case yes.
+> 
+>>> That built-in support is only accessible through legacy APIs
+>>> and should never be used in new qemu code. To use that built in
+>>> support in new code we need to build new APIs.
+>>
+>> Why would not IOMMU_IOAS_MAP/UNMAP uAPI work? Thanks,
+> 
+> I don't want to overload those APIs, I prefer to see a new API that is
+> just about splitting areas. Splitting is a special operation that can
+> fail depending on driver support.
 
-Yes, virtio-mem operates on RAM regions only, so it does not exceed 64bit.
+So we'd just always perform a split-before-unmap. If split fails, we're 
+in trouble, just like we would be when unmap would fail.
 
-I understand this is
-> cut-n-paste and unlikely scenario of offset+size crossing 1<<64 but
-> still.
+If the split succeeded, the unmap will succeed *and* be atomic.
 
-It's been bugging me for a while that size is 128bit 
-butoffset_within_address_space and friends are 64bit. Likely we'll never 
-get offset+size > 64bit here as of now, but it is indeed cleaner to just 
-handle it using the correct type.
+That sounds reasonable to me and virtio-mem could benefit from that as well.
 
 -- 
 Cheers,
