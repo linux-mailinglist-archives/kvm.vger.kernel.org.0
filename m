@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-35996-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35997-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A604A16C12
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:09:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CB4DA16C1D
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:12:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCE8C7A1361
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 12:09:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8853516244E
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 12:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823651DF99B;
-	Mon, 20 Jan 2025 12:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2931E0B73;
+	Mon, 20 Jan 2025 12:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/Dhtgll"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vlhz/33R"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370AE1DEFFE
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 12:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4A81E0B66
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 12:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737374957; cv=none; b=dzdB6y8nsphGwsrTEQRMHgxpem/SLAjnU/pJriUDiW+hizdrwXAVh3Ylo4iD5v0Kcd1Fvlv8KVsK/0ky7ktNiqtmflvK5qbQ7+ReMz4kzzAnr4zpKAKXvsUqwSKMs85r+2dCX9gUtek2KHXdlOBpQt81skglbp5dp2yRAM0dAxo=
+	t=1737375159; cv=none; b=EwImyj8Hc92ABrkZhsYhQWT+b3j2sD1gc/rpEcexI5SDBj3O9butMoQ7dcztIKj5at/asKnqrBEXH2r+2DlUb4eORpivoD9TqziJ20UmJx/731s7pSXJM47nNslxnCwYs5saonGxoPNyxlKVp2k1TJyioZRs158K3zqjDBRsnC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737374957; c=relaxed/simple;
-	bh=wyYZHXMjCW6fDQgo56Nnb0Lbnh4xIdOtvsRvRVfIyw0=;
+	s=arc-20240116; t=1737375159; c=relaxed/simple;
+	bh=sy5YIFdgxvVuYN4Kim5frO7IlmzLY6Xq07Re7/Ebv1s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RKieg+2jyFOJWkoiSJ8jX2/COn22pSUn+mecUdPBfezPZHeAS7AU7r6m90+E0IX72ci012LKFRm5rzvIp/kcHZUn8hgJhUd+Du6njau0C62SNsDWROTnqtr/0VYM/k4HDb+9GP4BsoDzaD4LEH8kPlQtwRMJNYLDrzXdxU4Agoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W/Dhtgll; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=VcMYnG1S+A6SarxNjlZfmxQwlFNondsWij1PvEMbloNFZOpNLWIfFRJFXnDLg0ikchCyhDaHyVOSv4IGP6efjgma3cTt4c0K1aKo7scJ8abCX6O/xShRJX4kRiyOEp/2hS2JsJvlipGZQG3C5VZXOGnXFty79HgFbhwRwaKGUvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vlhz/33R; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737374955;
+	s=mimecast20190719; t=1737375156;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=PWZtPfFombM1GwcMhSbDl1k/MneBnq4+qv0QUQPibv8=;
-	b=W/DhtgllxMX+qs9lnC0lbORjhppT7W/zL6SkRkzGuRkqwo63ebALz/BG3fRz0Za0x0nTze
-	T4+l5+xBzRtUl9kETSOv9l4++Fzip9t6Xil5JvEyi8Re1fGzK2AIVHqbQWveDLLIR8h8e7
-	PxvufQ1NEpCXOs8262HT41zgO5LmUTo=
+	bh=yvc/rKaknr027b8OD1G2lVqE5SB9wTxU5u6APXZx1no=;
+	b=Vlhz/33RR36WOlTfTmA2O9gU2qUvZuzbZ4rl5mV4Sgtict0CHNzxslGSiQBRn/G/GevAAy
+	9AsjFKgsfzjfwQTHgceqtkhQ2ggUpokCF8m8rZe8jlwbF7O/7mGV176z28ac9TsOPI4dAv
+	jsDdtu2FFDwYAVXwh4h8E6kt2I6JCOM=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-204-otddRVeDO0u-dZxyvVaI0Q-1; Mon, 20 Jan 2025 07:09:13 -0500
-X-MC-Unique: otddRVeDO0u-dZxyvVaI0Q-1
-X-Mimecast-MFC-AGG-ID: otddRVeDO0u-dZxyvVaI0Q
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385e27c5949so2950039f8f.3
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 04:09:13 -0800 (PST)
+ us-mta-44-e-aF3flQNTOgVpYtNUY6yQ-1; Mon, 20 Jan 2025 07:12:35 -0500
+X-MC-Unique: e-aF3flQNTOgVpYtNUY6yQ-1
+X-Mimecast-MFC-AGG-ID: e-aF3flQNTOgVpYtNUY6yQ
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38bf5ef17b2so2469534f8f.0
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 04:12:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737374952; x=1737979752;
+        d=1e100.net; s=20230601; t=1737375154; x=1737979954;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=PWZtPfFombM1GwcMhSbDl1k/MneBnq4+qv0QUQPibv8=;
-        b=vSdU9CCLPrelBSwsj38iQOXqP4KpkcPVI5sUgeyF5PARkL8ISbqlSGe1VErpSVzAL9
-         cQTZr6tJ44iOlJY+OykPOHLY3sOW5PbsSa7gWHeMF1XKfzylSVtYFt+bk+5FSaWEIAsw
-         QX82k3Vku0R63RgOCL1ua5rNp4cc6/J241J+xszhJgVh2GAUJSUN62joA2z25KVi7UBx
-         jZd2Dwy3n0zDLzfb3AG1C0OyIHbunNDD+4d6fqhdoPyrj8YA4u/bOdM8lInNjwofVwU3
-         /xYAgJT6qds5V9PEvk3NclzKfPOyq0SfOU504I9b7J5sPduKg7FZfMXOaAOh+9lQ/YeJ
-         Nr7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXsEoo0T7IJaByB7rTDrbEGV/+6XLM26Y4rJhX4gfsUAzvkZM90aqI5GvPSXHLeMZLIgpw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypVGYs8hUBrcoK8h1i4+lxYIwprQzbr3e7sss5N+/X0bF9J3z4
-	0TwIBxBZxrvvLgz5uA1r4UVqy9/wSn7FSh/tUGbayldL9wgd8qUXg4EEMiy9mTacmIh22wMH8jX
-	m+2PiXdM/YGKL0aH2bQ7aSNZmckYvbrs3iflLzxr4o0t6j4pEUw==
-X-Gm-Gg: ASbGnctcsegeHZP/qfpmzgkNqmgMm2DUVvxAuK8CycFSUAfvJQMbJ9LG35gB6wKFYYA
-	kUrX/3JwmhBYvxj9HbXqWoHCIsKX1DMxZon04ro06xC7rbrJfOTvwB+jRUAh/M31ZpHGzjLyyEy
-	pWKnUxrKzKcpF4SoTNq/fB+6t6MS4M0/5ObQTSACvPiPfk3XDspRsZJmGQ0pQ7Ai3Hat/nf+oit
-	WQFdhkhSK20Pzn5JUIoRGxUv3xbu+HIGe2oNGGaTV/oVLtZvhVC97xI30zSGbmAZ4ObIfEiNZL7
-	umJuUKmMQE/Z7cPeKNOSyexj9d02QFmBXnbJ9ZAKhy2XSHpKvcjdbVZsduawxjWItb9I/7Fo8xp
-	KXu9QXb4zWyPufS34VqJz5A==
-X-Received: by 2002:a5d:64a1:0:b0:385:ddd2:6ab7 with SMTP id ffacd0b85a97d-38bf57d3802mr11435110f8f.52.1737374952598;
-        Mon, 20 Jan 2025 04:09:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFF9ZJSyFUcZ5+rv6O8fJppajvMveGSZDssR9ikLBpfoeYYgOuSmnlQ2tSrqo+FORUxOGEa0A==
-X-Received: by 2002:a5d:64a1:0:b0:385:ddd2:6ab7 with SMTP id ffacd0b85a97d-38bf57d3802mr11435071f8f.52.1737374952244;
-        Mon, 20 Jan 2025 04:09:12 -0800 (PST)
+        bh=yvc/rKaknr027b8OD1G2lVqE5SB9wTxU5u6APXZx1no=;
+        b=ASgjF89Sp1EuuTb2oaV5MX24oYl5ZE2yyVHz3j3e/iqafgNMIqvrAu+9HUkdIMYZQi
+         ZtAXI/P08s0DEttlfwIpMvWlVQCU3+wrsWqIoLw0GnAJTwncAM9VRV4+WNwGzLFqzNWt
+         jJCJGb0XWnVBI13jI1XVs0wUuyoOu+hcMUWBX/nOPU7kQh1Pbvbms7zfiWSxWwR1ihTJ
+         T3tK6+eTblsqm4NX0Qmsa8PGI8oVCWw5oTitVrMymEKF23rdh7sABPDLxo0V6tgm+FBX
+         xCFp2PYpmUxfYqJ+CXrIwMUlnlhTK1l7Qw43KwSlkYAnZA5VbJaXgpEyHSsbvgN1Qc/g
+         gLXg==
+X-Forwarded-Encrypted: i=1; AJvYcCW0M/K5tSCUJIdHV2eBggWL6kT8/slIoweoiMgox3UFYmwWGrS6isfOitkrHiIiXJ2C4x4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOiz19QAZ2AabSgqZBHu+lhtPKovketVrWZkfeColPNWmy+yOC
+	5Se1t/t9TPT381OrDcMS9CX22fNFTmekkyzy4aeLOJpv5gRnN3rQXpkPO8mU5xNzNL1UXc+biHG
+	LlVYxwGupZYcKpslt7W3MMqAvvHxFK0Z9WQa06dWf6ZtUo2UskQ==
+X-Gm-Gg: ASbGncsUyx9OqvxsATCQ903EZAoP4Rg9SkGtQZJ7Zu2w70EHnjuPJoKBTGCnRIzZQTN
+	hNSn+Rr1HOwTa++dNY+dnQvlmZ0fEyrEAsTNRuMICIi10W8sWcTwUmyjUjXQdaqCSZ8K/wHEijT
+	LHznvryLdlcVj1uBLmSiyQvD6ukVwIc4ANwBvdEI7dODCAzUsjtdlbosdYXGJr4VIo3M7BtagwC
+	FRjTe36did490z+Y5xY+eFhE63D4lTXf2f3bX1WEVo9KZRiHxxO56OWSJtXQQayqE1t75/iWAhl
+	mZ8SAVvZU1/LY1X/6QyX4zuV6HHmOdXQK4NxC/oPKIHU35AtJrPy+WkhKOFs0aOCwu90rmays0n
+	DKZtxgOUWTZOBaWhmhhjzAg==
+X-Received: by 2002:a5d:5f56:0:b0:385:e176:4420 with SMTP id ffacd0b85a97d-38bf567800cmr12372156f8f.10.1737375154289;
+        Mon, 20 Jan 2025 04:12:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG1KNkr7rj8dqOTj7FeoFqku6VN4kPdczGEFkNYq9SPK+CkFWF+zzK0CUnl6OSTBuEdcuB/hQ==
+X-Received: by 2002:a5d:5f56:0:b0:385:e176:4420 with SMTP id ffacd0b85a97d-38bf567800cmr12372125f8f.10.1737375153926;
+        Mon, 20 Jan 2025 04:12:33 -0800 (PST)
 Received: from ?IPV6:2003:d8:2f22:1000:d72d:fd5f:4118:c70b? (p200300d82f221000d72dfd5f4118c70b.dip0.t-ipconnect.de. [2003:d8:2f22:1000:d72d:fd5f:4118:c70b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf327574asm10308237f8f.68.2025.01.20.04.09.09
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c74ac5f9sm193321095e9.11.2025.01.20.04.12.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jan 2025 04:09:11 -0800 (PST)
-Message-ID: <ad68a346-6027-4b5b-a68c-85b8898582dd@redhat.com>
-Date: Mon, 20 Jan 2025 13:09:09 +0100
+        Mon, 20 Jan 2025 04:12:32 -0800 (PST)
+Message-ID: <19a46e9e-afbd-4f83-894d-e3331c3ac956@redhat.com>
+Date: Mon, 20 Jan 2025 13:12:31 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,7 +90,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/15] KVM: s390: fake memslot for ucontrol VMs
+Subject: Re: [PATCH v3 04/15] KVM: s390: selftests: fix ucontrol memory region
+ test
 To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, frankja@linux.ibm.com,
  borntraeger@de.ibm.com, schlameuss@linux.ibm.com, willy@infradead.org,
@@ -98,7 +99,7 @@ Cc: linux-s390@vger.kernel.org, frankja@linux.ibm.com,
  gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com, seanjc@google.com,
  seiden@linux.ibm.com
 References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
- <20250117190938.93793-4-imbrenda@linux.ibm.com>
+ <20250117190938.93793-5-imbrenda@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,22 +147,38 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250117190938.93793-4-imbrenda@linux.ibm.com>
+In-Reply-To: <20250117190938.93793-5-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 17.01.25 20:09, Claudio Imbrenda wrote:
-> Create a fake memslot for ucontrol VMs. The fake memslot identity-maps
-> userspace.
+> With the latest patch, attempting to create a memslot from userspace
+> will result in an EEXIST error for UCONTROL VMs, instead of EINVAL,
+> since the new memslot will collide with the internal memslot. There is
+> no simple way to bring back the previous behaviour.
 > 
-> Now memslots will always be present, and ucontrol is not a special case
-> anymore.
+> This is not a problem, but the test needs to be fixed accordingly.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > ---
+>   tools/testing/selftests/kvm/s390x/ucontrol_test.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> index 135ee22856cf..ca18736257f8 100644
+> --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> @@ -459,10 +459,12 @@ TEST_F(uc_kvm, uc_no_user_region)
+>   	};
+>   
+>   	ASSERT_EQ(-1, ioctl(self->vm_fd, KVM_SET_USER_MEMORY_REGION, &region));
+> -	ASSERT_EQ(EINVAL, errno);
+> +	if (errno != EEXIST)
+> +		ASSERT_EQ(EINVAL, errno);
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+ASSERT_TRUE(errno == EEXIST || errno == EINVAL)'
+
+?
 
 -- 
 Cheers,
