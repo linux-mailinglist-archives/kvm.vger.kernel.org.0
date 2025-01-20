@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-35970-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35971-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC13DA16AD8
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 11:35:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC89FA16AED
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 11:39:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DEC03A5EC1
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 10:35:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E0F0188972B
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 10:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF7D1B6D08;
-	Mon, 20 Jan 2025 10:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD03B1B6D1D;
+	Mon, 20 Jan 2025 10:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIIW/IQZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CeUpEfUf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370AE1BC07B
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 10:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179931B413E
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 10:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737369282; cv=none; b=cj2aVzQnwYgdfrWuPYHZa0vCi3s/GMzOwAteRcVMNEe5e1HRMKTf0cb0qdlqt6bdPN6HuLuZT0TPxQSAMtL75Nu4sfFKJ2iVmQq+McksL+5k2/q9BWTzHanjVedT6G4rnD3RhEimrGJx+swF6xcdH7OQd68vnKWzGP8+ye5rzBM=
+	t=1737369591; cv=none; b=VHNV438MexEjjtRbNUt8cKK+viqwljdue23DUr5neALABU8GfjzOjhh26dJP05HnimtiGMRbULJfdRqIMwn6k7uA2/v1CStAY1dCx8rmk/2UKzNkcuaEabN1UScfRtMsTHr4cYnn8Muir6UoTmFVYLqGnAJKznTOq/QULZ3Ef64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737369282; c=relaxed/simple;
-	bh=XN/jDQj7DFcJlVM+sPKONNEdKWohE83giqJVDR6fIcQ=;
+	s=arc-20240116; t=1737369591; c=relaxed/simple;
+	bh=JiyoTunX9sfsDXRUrgtu+T47V/36ENz9ggZBhV/WnHk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C7mP+MlcTrRvRVTs2tiYVwdtXm97H0NdlO8qkPexYK9Jvry5YzVuta1ZLuL5NXosadiG9XqMqGiEL7P39eG4kFcga0iz3ukwmPMEnDPX1MtoWz+LcR+g8No8nt/3KpwIndfqJ2mRZeK637Ej9Zwv8GkVpEuG6LEkhWr3RVXEZ8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dIIW/IQZ; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=ivszSnQ8vySz9Cu7wZuLB60k+ht2Fmu/dBYZEeVmfmlvMBbUPzK51/INmQvGJ8YQKmwDGwW5jTRUgNMtDlJi7hYvcyy8qU9a/HDdLIayMECMgBOf77Z/rees/YhIG5q4ejX9VMG/eZTBqTDNmAnq3QgzqNGSZY+JHp6lOZ2M/+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CeUpEfUf; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737369280;
+	s=mimecast20190719; t=1737369587;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VTK3NeuA2/5eg0HceoKYSEnDBkQEomluQ0LED8G6DTc=;
-	b=dIIW/IQZtkkN6NpyTrrV2d8bkjPViXwGHO3pn2h5DfW2D2TkeqVZ5H65MCZhbM25dnkew6
-	zIXJ1jYHimWUskUVVdfMQpT0zJrrI7dOwlc0zrz6ppyx2/3eT7HoXIzrPmLenpyrva8hGB
-	75JMd+OXRJGAQf8tv2KM7ogHcVFd4e0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=VNrB+MYFE8yz/6JFZUxImb9XI3I+YQGQ6LNKQMQenfk=;
+	b=CeUpEfUfe0tZyd6HyDJNktFhItFsmbOLVRzhNCQorLSfisDG8PZY7K3AP13+5LbbIZJRFc
+	Kqmj0Cb5gX1sOZyj/674G4gj31H7Y2oEHvyAjtencLejcwzJdmKjX0zvC9wRFAcYCjMgpE
+	eRY8u0W4mJN+wTROMru7j3Jzlquq5pc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-695-iTAtxEYmP8SBjhk9Gkbwow-1; Mon, 20 Jan 2025 05:34:38 -0500
-X-MC-Unique: iTAtxEYmP8SBjhk9Gkbwow-1
-X-Mimecast-MFC-AGG-ID: iTAtxEYmP8SBjhk9Gkbwow
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-436248d1240so20631775e9.0
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 02:34:38 -0800 (PST)
+ us-mta-376-au79zhe6M02WPMs3or8ZoA-1; Mon, 20 Jan 2025 05:39:45 -0500
+X-MC-Unique: au79zhe6M02WPMs3or8ZoA-1
+X-Mimecast-MFC-AGG-ID: au79zhe6M02WPMs3or8ZoA
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385e49efd59so1845594f8f.0
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 02:39:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737369277; x=1737974077;
+        d=1e100.net; s=20230601; t=1737369584; x=1737974384;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=VTK3NeuA2/5eg0HceoKYSEnDBkQEomluQ0LED8G6DTc=;
-        b=TSBwdODRcBH/n6mIWYpkncwmk61kR7cW4gTiI3yaighbncTAVG/+AxuhWHQrtDC5ju
-         vapKAP78ECYFq0Kl2M13SM1ZLEv9Ir7C1+t1vv11LclXJ7TqGAdgNsbqriyIGCVgXfiw
-         lSMyoOe0X8ysu4BvBe7igKPCsWUvT53fulprgjiTrdHqc3iyYVPaBVwsxak4WxN1zT3G
-         85OYcT88MWzdEMQKwXeGNlHF0BH8hfjqQu6frb8PuTcht5AQdzIe3W5Y8rvoStiDnnZu
-         uJxMBa2uCknEUxsbADzqeWeKMMLTM6ZAnh6WD1NkzLa/1biZQ+meo0sg+HhSb2UB9R5d
-         o6sw==
-X-Forwarded-Encrypted: i=1; AJvYcCVElA4zeyr3HxeYB9zTyt9Af4rEb5HiNfCQE01fDPl9gdOHHxt3/2/K6ktub++G0GdtU/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWjIa8cNH+xXWKSrLlzlSJ+CnmIuyh13P7JDhepLZBnJEoNT9F
-	twpnIqp2WUiuubznh3zBVxpqHXnZ6EsebwPQikOKZ9umRjUdQExVmBw3NcHa2/gld2TyDCDtdUM
-	nXVV4Hykq+qO4Zdzyyrx5Ld0u69Oz0owlh1HjUq6XrN7cWARojg==
-X-Gm-Gg: ASbGncuOCZ47W4/fGoGRVZmcA6GM+IKwJ1ZK5xISesd3JJoE33UurmpUDmgVKPa9rON
-	BJDbwMgig6j6a8Np4cGwTlYRCxAd8ysLqmjL3CA5TcbxLX34YOueDyk6RarhernL4Z2OAYcrMth
-	W+kMl1sAL45sel4WpcMUqZ4IkOpOCs0MwxWkD6UDgqEB0up5c3MLDv4y4D7eGclTJBQv8VZFaq0
-	j2AsVq2MB5Apj77l5csVTVfwdy+EANv1xsMXVuOl8NzZxnscRq9Jy8ztPv38IbEquhVfdYGxYG5
-	8ikLwrkZYsPyA/00H5gQk1YTA6Z+9qNmUJS/GW1yubB7+KjDH2UkVNx3iELTRUb2LjcuomaZyu6
-	3U3ltkVY+du3gBJ4z3kX/Eg==
-X-Received: by 2002:a05:600c:4693:b0:434:f0df:a14 with SMTP id 5b1f17b1804b1-438913bed10mr114788125e9.2.1737369277315;
-        Mon, 20 Jan 2025 02:34:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEEwm5c24BfYiPulRfzMGPF36n9+HhT1fghFu6Rqr00HIW3Loyfck/ZDjB4k+1ta6larzAGKg==
-X-Received: by 2002:a05:600c:4693:b0:434:f0df:a14 with SMTP id 5b1f17b1804b1-438913bed10mr114787795e9.2.1737369276902;
-        Mon, 20 Jan 2025 02:34:36 -0800 (PST)
+        bh=VNrB+MYFE8yz/6JFZUxImb9XI3I+YQGQ6LNKQMQenfk=;
+        b=WYfSiBslMIVgyK8dt/s5Jy5CWW3VDe9L48ClHQml4T0GEQRtPI85PSx4VeAYe/BuWS
+         2D77CXcIjwOAb9TppNiqmWenKXSSI4kRw4tI0c8Pcp16xObHFsywTUIpLst3g9sn0WVd
+         15xV7CmIAw9MHD7zPHPRfToRiU4u5HvEDoEittTsAZoAYeGaNxoe8lWl8Z886oW73Fh+
+         wS2hmiQYt14r6Z24DscMyqMNX04ADxoE1PkKfSpPsHNc8L4LkAymPHP3xbzzrBvO+uWM
+         QS2AtM7Hm+VW/d3WKZ1olYKVVQVEUog2cO3J+oYzgBIIPb1OHfiYQsBcKJiN14+axx5G
+         H4vg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3/QmvMDst8c72Ys5qMqg8FgrL/3P0zP91DdEUQqSX0fpVXaEfPKOH7LL7Do76DPxX3Tw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0GEHycQ1G9eV3QUVn8b2k8dDAXhxTfgoQnWZPmgZ3Uyyh28zu
+	mWVMnew1pwXF0WZEdPOwjMGZzvwg1rOjz7sE58ZomBSP4b9Uv6jL5q5FiAlgHIft5XGTAwnqx1g
+	f+reyln07MyV5tf43wiJZk0DDNL+eFYT/mEfuZwHQh2MGQGUO/g==
+X-Gm-Gg: ASbGnctd27q5d3oLFNvXYOpkhfoA3Uq0uzSkE/zm9WwzCFyHXrJRFYcRrlkqykEsKUi
+	ptSDSEkszAA7YlvhY053FcjNsl8NEtwo5F+ER4AfGsB1TUODt/zxkDnckgWvU89cfWt8Eqe6dh5
+	1c4JLnx1ghmqey1VSTmnwt3eyqwKJ/icviwZyOACc6Mb1H//v+KYBuVp9JXdTKaSiTIm9+GY85A
+	fi5j3cohEChnMTzYwhgv29U9lNPnaV5CGH0f86INL0Vy+JNTL6DZKu9oWaoFSXMZV/UZVk+hr7O
+	5HeeaC42CTHoRJIvfbE7TNqu2Ge8aq0pMZdKOxXhayc67d4dbpUdKz5tf5P0dBVZ4MElQ/6Zh7x
+	/lGjIbAR2TNcKakeyzJmahQ==
+X-Received: by 2002:a05:6000:2ce:b0:38a:a117:3da1 with SMTP id ffacd0b85a97d-38bf566e683mr9785294f8f.5.1737369583961;
+        Mon, 20 Jan 2025 02:39:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFaUdOENaKv+8RYq4MM/t1CCcwA79j3X6CMyGrqWHIhAkgAc9rpPt82+IkanNndOgoEAKkuhA==
+X-Received: by 2002:a05:6000:2ce:b0:38a:a117:3da1 with SMTP id ffacd0b85a97d-38bf566e683mr9785263f8f.5.1737369583536;
+        Mon, 20 Jan 2025 02:39:43 -0800 (PST)
 Received: from ?IPV6:2003:d8:2f22:1000:d72d:fd5f:4118:c70b? (p200300d82f221000d72dfd5f4118c70b.dip0.t-ipconnect.de. [2003:d8:2f22:1000:d72d:fd5f:4118:c70b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c7527fc4sm193429185e9.27.2025.01.20.02.34.34
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890367b48sm133942685e9.0.2025.01.20.02.39.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jan 2025 02:34:35 -0800 (PST)
-Message-ID: <39715c86-cffb-4d11-aeb0-e056b264cc76@redhat.com>
-Date: Mon, 20 Jan 2025 11:34:33 +0100
+        Mon, 20 Jan 2025 02:39:43 -0800 (PST)
+Message-ID: <0f588655-62c0-46c3-bd15-01016615953f@redhat.com>
+Date: Mon, 20 Jan 2025 11:39:39 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,18 +90,31 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 13/13] KVM: s390: remove the last user of page->index
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
- schlameuss@linux.ibm.com, willy@infradead.org, hca@linux.ibm.com,
- svens@linux.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
- nrb@linux.ibm.com, nsg@linux.ibm.com
-References: <20250108181451.74383-1-imbrenda@linux.ibm.com>
- <20250108181451.74383-14-imbrenda@linux.ibm.com>
- <4175795f-9323-4a2c-acef-d387c104f8b3@linux.ibm.com>
- <e548aa1e-d954-4fab-8b74-302c140c04f7@redhat.com>
- <20250120112848.1547a439@p-imbrenda>
+Subject: Re: [RFC PATCH v5 01/15] mm: Consolidate freeing of typed folios on
+ final folio_put()
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
+References: <20250117163001.2326672-1-tabba@google.com>
+ <20250117163001.2326672-2-tabba@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -149,46 +162,83 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250120112848.1547a439@p-imbrenda>
+In-Reply-To: <20250117163001.2326672-2-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 20.01.25 11:28, Claudio Imbrenda wrote:
-> On Mon, 20 Jan 2025 10:43:15 +0100
-> David Hildenbrand <david@redhat.com> wrote:
+On 17.01.25 17:29, Fuad Tabba wrote:
+> Some folio types, such as hugetlb, handle freeing their own
+> folios. Moreover, guest_memfd will require being notified once a
+> folio's reference count reaches 0 to facilitate shared to private
+> folio conversion, without the folio actually being freed at that
+> point.
 > 
->>>> +static inline unsigned long gmap_pgste_get_index(unsigned long *pgt)
->>>> +{
->>>> +	unsigned long *pgstes, res;
->>>> +
->>>> +	pgstes = pgt + _PAGE_ENTRIES;
->>>> +
->>>> +	res = (pgstes[0] & PGSTE_ST2_MASK) << 16;
->>>> +	res |= pgstes[1] & PGSTE_ST2_MASK;
->>>> +	res |= (pgstes[2] & PGSTE_ST2_MASK) >> 16;
->>>> +	res |= (pgstes[3] & PGSTE_ST2_MASK) >> 32;
->>>> +
->>>> +	return res;
->>>> +}
->>>
->>> I have to think about that change for a bit before I post an opinion.
->>
->> I'm wondering if we should just do what Willy suggested and use ptdesc
->> -> pt_index instead?
+> As a first step towards that, this patch consolidates freeing
+> folios that have a type. The first user is hugetlb folios. Later
+> in this patch series, guest_memfd will become the second user of
+> this.
 > 
-> we will need to store more stuff in the future; putting things in the
-> PGSTEs gives us 512 bytes per table (although I admit it looks... weird)
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>   include/linux/page-flags.h | 15 +++++++++++++++
+>   mm/swap.c                  | 24 +++++++++++++++++++-----
+>   2 files changed, 34 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> index 691506bdf2c5..6615f2f59144 100644
+> --- a/include/linux/page-flags.h
+> +++ b/include/linux/page-flags.h
+> @@ -962,6 +962,21 @@ static inline bool page_has_type(const struct page *page)
+>   	return page_mapcount_is_type(data_race(page->page_type));
+>   }
+>   
+> +static inline int page_get_type(const struct page *page)
+> +{
+> +	return page->page_type >> 24;
+> +}
+> +
+> +static inline bool folio_has_type(const struct folio *folio)
+> +{
+> +	return page_has_type(&folio->page);
+> +}
+> +
+> +static inline int folio_get_type(const struct folio *folio)
+> +{
+> +	return page_get_type(&folio->page);
+> +}
+> +
+>   #define FOLIO_TYPE_OPS(lname, fname)					\
+>   static __always_inline bool folio_test_##fname(const struct folio *folio) \
+>   {									\
+> diff --git a/mm/swap.c b/mm/swap.c
+> index 10decd9dffa1..6f01b56bce13 100644
+> --- a/mm/swap.c
+> +++ b/mm/swap.c
+> @@ -94,6 +94,20 @@ static void page_cache_release(struct folio *folio)
+>   		unlock_page_lruvec_irqrestore(lruvec, flags);
+>   }
+>   
+> +static void free_typed_folio(struct folio *folio)
+> +{
+> +	switch (folio_get_type(folio)) {
+> +	case PGTY_hugetlb:
+> +		free_huge_folio(folio);
+> +		return;
+> +	case PGTY_offline:
+> +		/* Nothing to do, it's offline. */
+> +		return;
 
-With memdesc/ptdesc you'll be able to allocate more without playing many 
-tricks.
+Please drop the PGTY_offline part for now, it was rather to highlight 
+what could be done.
 
-Storing more information could be done today by allocating a separate 
-structure for these page tables and linking it via ptindex. Not that I 
-would suggest that just now. :)
+But the real goal will be to not make offline pages
+use the refcount at all (frozen).
 
-But this is not something I am to decide, just pointing it out that it 
-likely can be done in a simpler+cleaner way and there is no way to rush 
-the pt_index removal.
+If we really want the temporary PGTY_offline change, it should be 
+introduced separately.
+
+Apart from that LGTM!
 
 -- 
 Cheers,
