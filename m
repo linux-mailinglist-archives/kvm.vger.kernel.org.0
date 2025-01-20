@@ -1,206 +1,156 @@
-Return-Path: <kvm+bounces-36019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE8B1A16E59
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 15:21:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1688DA16EB7
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 15:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB3E1881A88
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 14:21:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE9151882236
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 14:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE991E379F;
-	Mon, 20 Jan 2025 14:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27701E3DD3;
+	Mon, 20 Jan 2025 14:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PiNPAPFm"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HY6/Nl3l"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B9B1E3786
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 14:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB5D1E377D;
+	Mon, 20 Jan 2025 14:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737382857; cv=none; b=m2F3wLANp1oG/4QOLXNPUAgKGqv+bdYKjvgpqojyU6L7JzsIJLzjJQDhM0fkDHXXoBY03fYmnJlkcJHC5gqUg/XpBlgyRiz/vVfAQwxWQkU12mAWNoVeZV9py+DkrKgvqNnEY9zI+Nmn+kHB8Y3S1WpB0CpcbZ8OtJnn519KmaI=
+	t=1737384290; cv=none; b=c4wCVQxT8lD1Irdesrb+sk+uIRUZ25Ze9NOcyRgTEMZSKn+1FXtrk9su2OOtWWZ4cPpm95g3ao4QcgWN0au/vxagBZmFy/08R7U9wh6aZu8v2sODgQORFOVbgHbaEnxqgjt6WHTKuJsqXbbwPMctGQDQsSJI3n1PYpjak7Lo14Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737382857; c=relaxed/simple;
-	bh=suKxKDTEjcS+hBYZlJUZIHQsfCWIJB64PESfiLzeAyQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=flpH9TUSN1MqYhinl3NUnH1QStU9mVuzXgbDm6f71R9OmhocAs9c45VshnzSvoHrFdUXMkRb5yqyOg6Gs8ucPgKj+r9ULofH2dEPsHJXIHRfOMJPw7MjFQWTz12ru9Yc5UCgit0mZBGw2LJEhMiSy7tnEARomEkhSAbBlU3GpFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PiNPAPFm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737382854;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SvN2HL1s3vl0r88ePE5HTVvwon5QIhXjCIcs6kwnVUI=;
-	b=PiNPAPFmkV8rrglV8t7IvoxHDLTElB5WuHqSWz44lzYHGKTrzoq3FopVeAlPCrFLIp8OoK
-	nq8GRdjvJD7e8tAsSBe82yjqtY57wi41JPJ1pe/6KNpCmwvylcV4tNYVu5dHFbBX0WavGy
-	XU2Y1WOzW25bslBOfqvvp09FK67mfGY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665-_dvDfQHRMqGqwmlErj5CTg-1; Mon, 20 Jan 2025 09:20:53 -0500
-X-MC-Unique: _dvDfQHRMqGqwmlErj5CTg-1
-X-Mimecast-MFC-AGG-ID: _dvDfQHRMqGqwmlErj5CTg
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3862be3bfc9so2846795f8f.3
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 06:20:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737382852; x=1737987652;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SvN2HL1s3vl0r88ePE5HTVvwon5QIhXjCIcs6kwnVUI=;
-        b=gx/ITwH+y+biHo9sUICcq4en56SmzgLQMujVTyRONC3KzB39zIS2G07OkjSYK4gSRl
-         8ipNEhoTGz26oq1KX2xiRUI74ZmCSdHzUfno+5tJXzC6PWZz3tTKnavfgaG/zwnz3iGh
-         oOF/2HBUjRDw9jM1cDDV7jC+MuRtyoxkNzxD9fOCujyA0FtQqELEfer71YslBHxAvScL
-         b2rLjDlwyS+DWVBgflXX97yN6Z2J32fAQ1RgCVFzIoBenYjRIzvBj1+cBK5zaxRGvzln
-         z/Y4I7zEXuhWO+iqzpRqvFglhR2uSPdhg6BXl/XG/dXd7Ggv9xGqloHA5ipShefGWOls
-         wbKw==
-X-Gm-Message-State: AOJu0YzNxJpt5KEw3lNuezodkY+/ZVRrySrhaPtTNNz7S9pUIJJCy8mH
-	tHbtnOlhen4Hn/XYP5y4yIHIRijxrZJ9Ow7ue1xVsLdecwFC9ujbSDlFqRUxm0oeinz+40ttxk0
-	DkrQLqgHLR7oJ7DGD7c/aUED7ezCKbDtM4pKwRi+kTTZfvXj9VeAQW64lKw==
-X-Gm-Gg: ASbGncsonr8OisZtJtKuY7XDGltsR4z69Lihe3z7K5U2DkHfVs8+aRU+wSZDfBZ1/10
-	kX01LLDNtY1sJ0xKHaHqfFw9UBihRUX/GLh3l6cN++Zq7KK/l77zvxOGMZnCtMrbh7kiVZMV2Ev
-	drp4luzCsoR4A1dPzIoCvmeRjCg6mzOisDlqdDCE01qNLleiWIjETgK1LI+SMq15s3z34qIEVZw
-	51kzRDyVrNt8YI7SFa9S8MQ4o+iBPKzUnYp7qsZAKMg2LWPPrgbp0HP/QDfYRam
-X-Received: by 2002:a5d:47c2:0:b0:385:e8ce:7483 with SMTP id ffacd0b85a97d-38bf56555admr9436276f8f.4.1737382852041;
-        Mon, 20 Jan 2025 06:20:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEQRZWBg3BiN14B3lboMp8g8k3LhBlXdMxIMG0O7SHp8HTkJQ4e3YMeYry8CkbCXZokHWp2Gg==
-X-Received: by 2002:a5d:47c2:0:b0:385:e8ce:7483 with SMTP id ffacd0b85a97d-38bf56555admr9436260f8f.4.1737382851631;
-        Mon, 20 Jan 2025 06:20:51 -0800 (PST)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438904625f5sm144155115e9.28.2025.01.20.06.20.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 06:20:51 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Dongjie Zou
- <zoudongjie@huawei.com>
-Subject: Re: [PATCH v2 3/4] KVM: selftests: Manage CPUID array in Hyper-V
- CPUID test's core helper
-In-Reply-To: <20250118003454.2619573-4-seanjc@google.com>
-References: <20250118003454.2619573-1-seanjc@google.com>
- <20250118003454.2619573-4-seanjc@google.com>
-Date: Mon, 20 Jan 2025 15:20:50 +0100
-Message-ID: <875xm98t31.fsf@redhat.com>
+	s=arc-20240116; t=1737384290; c=relaxed/simple;
+	bh=bOmMoBat1CWb5QLTa8XXZYmdpHtthhXXObwXhg5vBac=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=VQzVbDCFZskBmSowNkbr8Uh/rsTt8+ByT5X8zP948OEBGf4huAurzNgi0aW8jA9Ljvgo9ha8iiAIaG+i4jJYdd63VvVwbihsHAxqMqv8S3l3Y47QBRgG0UvxxxQ8I3lGf7XGnZxdkqFU3swhwJDah5K9BAbvhWYyasWAha8xcVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HY6/Nl3l; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50K9GSdN008671;
+	Mon, 20 Jan 2025 14:44:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=0aS6LO
+	W8zPzOBD6RH+XCagFp3AAo0WRcl0veVy398w4=; b=HY6/Nl3lBzBUiyHccly7p1
+	H5QnW495S7RiI7qjvJkxG/sA1OS4i7oMmilGH5WgH4iQgnN5c3DvZ5ibOTNmDZMT
+	CuOAbSgAgNhnbca6o/WirizZV1GLRt/3ks+YM7dZJ6XSYe25oG7lpFICSRWA/1jv
+	MHnhIukEEnARKday24zdptGQcwsI2IUjqzbJ0WBu9QlkAC+SB+HkvI2gPvlXA1r3
+	uWNoRyR2TrjVOmF0U5JoPjKBhqbEccCVfAhhuSmlRdYW2jKdxozuuCSSm1OQc/Sz
+	mUCPDrk03t2IAS5BLoM8XnqvI6/t9F98PYFNQ2eHf7bk0k1uZqzNLntXEumMoqew
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44947svgqv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 14:44:44 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50KEdTY3017563;
+	Mon, 20 Jan 2025 14:44:44 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44947svgqt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 14:44:44 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50KB4D4D024225;
+	Mon, 20 Jan 2025 14:44:43 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448q0xxx67-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 14:44:43 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50KEidQC54198778
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Jan 2025 14:44:39 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5A68520067;
+	Mon, 20 Jan 2025 14:44:39 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 32F7C2004E;
+	Mon, 20 Jan 2025 14:44:39 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.4.105])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 20 Jan 2025 14:44:39 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 20 Jan 2025 15:44:33 +0100
+Message-Id: <D76ZBOXNTIGF.3D0BBERDWTY2C@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Paolo Bonzini"
+ <pbonzini@redhat.com>,
+        "Tao Su" <tao1.su@linux.intel.com>,
+        "Claudio
+ Imbrenda" <imbrenda@linux.ibm.com>,
+        "Christian Borntraeger"
+ <borntraeger@de.ibm.com>,
+        "Xiaoyao Li" <xiaoyao.li@intel.com>
+To: "Sean Christopherson" <seanjc@google.com>
+Subject: Re: [PATCH v2 3/5] KVM: Add a dedicated API for setting
+ KVM-internal memslots
+X-Mailer: aerc 0.18.2
+References: <20250111002022.1230573-1-seanjc@google.com>
+ <20250111002022.1230573-4-seanjc@google.com>
+In-Reply-To: <20250111002022.1230573-4-seanjc@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: lE2xijtsZ4sWaaOmO4YxWpW9HH5o_MW9
+X-Proofpoint-ORIG-GUID: MGDp5MVbtsXQcwr_arLoX8pu0hZ8wHgM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-20_03,2025-01-20_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=598
+ malwarescore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 phishscore=0 adultscore=0 spamscore=0
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501200120
 
-Sean Christopherson <seanjc@google.com> writes:
-
-> Allocate, get, and free the CPUID array in the Hyper-V CPUID test in the
-> test's core helper, instead of copy+pasting code at each call site.  In
-> addition to deduplicating a small amount of code, restricting visibility
-> of the array to a single invocation of the core test prevents "leaking" an
-> array across test cases.  Passing in @vcpu to the helper will also allow
-> pivoting on VM-scoped information without needing to pass more booleans,
-> e.g. to conditionally assert on features that require an in-kernel APIC.
+On Sat Jan 11, 2025 at 1:20 AM CET, Sean Christopherson wrote:
+> Add a dedicated API for setting internal memslots, and have it explicitly
+> disallow setting userspace memslots.  Setting a userspace memslots withou=
+t
+> a direct command from userspace would result in all manner of issues.
 >
-> To avoid use-after-free bugs due to overzealous and careless developers,
-> opportunstically add a comment to explain that the system-scoped helper
-> caches the Hyper-V CPUID entries, i.e. that the caller is not responsible
-> for freeing the memory.
+> No functional change intended.
 >
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Tao Su <tao1.su@linux.intel.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  .../selftests/kvm/x86_64/hyperv_cpuid.c       | 30 +++++++++++--------
->  1 file changed, 17 insertions(+), 13 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> index 9a0fcc713350..3188749ec6e1 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> @@ -41,13 +41,18 @@ static bool smt_possible(void)
->  	return res;
->  }
->  
-> -static void test_hv_cpuid(const struct kvm_cpuid2 *hv_cpuid_entries,
-> -			  bool evmcs_expected)
-> +static void test_hv_cpuid(struct kvm_vcpu *vcpu, bool evmcs_expected)
->  {
-> +	const struct kvm_cpuid2 *hv_cpuid_entries;
->  	int i;
->  	int nent_expected = 10;
->  	u32 test_val;
->  
-> +	if (vcpu)
-> +		hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
-> +	else
-> +		hv_cpuid_entries = kvm_get_supported_hv_cpuid();
-> +
->  	TEST_ASSERT(hv_cpuid_entries->nent == nent_expected,
->  		    "KVM_GET_SUPPORTED_HV_CPUID should return %d entries"
->  		    " (returned %d)",
-> @@ -109,6 +114,13 @@ static void test_hv_cpuid(const struct kvm_cpuid2 *hv_cpuid_entries,
->  		 *	entry->edx);
->  		 */
->  	}
-> +
-> +	/*
-> +	 * Note, the CPUID array returned by the system-scoped helper is a one-
-> +	 * time allocation, i.e. must not be freed.
-> +	 */
-> +	if (vcpu)
-> +		free((void *)hv_cpuid_entries);
->  }
->  
->  static void test_hv_cpuid_e2big(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-> @@ -129,7 +141,6 @@ static void test_hv_cpuid_e2big(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
->  int main(int argc, char *argv[])
->  {
->  	struct kvm_vm *vm;
-> -	const struct kvm_cpuid2 *hv_cpuid_entries;
->  	struct kvm_vcpu *vcpu;
->  
->  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_CPUID));
-> @@ -138,10 +149,7 @@ int main(int argc, char *argv[])
->  
->  	/* Test vCPU ioctl version */
->  	test_hv_cpuid_e2big(vm, vcpu);
-> -
-> -	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
-> -	test_hv_cpuid(hv_cpuid_entries, false);
-> -	free((void *)hv_cpuid_entries);
-> +	test_hv_cpuid(vcpu, false);
->  
->  	if (!kvm_cpu_has(X86_FEATURE_VMX) ||
->  	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
-> @@ -149,9 +157,7 @@ int main(int argc, char *argv[])
->  		goto do_sys;
->  	}
->  	vcpu_enable_evmcs(vcpu);
-> -	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
-> -	test_hv_cpuid(hv_cpuid_entries, true);
-> -	free((void *)hv_cpuid_entries);
-> +	test_hv_cpuid(vcpu, true);
->  
->  do_sys:
->  	/* Test system ioctl version */
-> @@ -161,9 +167,7 @@ int main(int argc, char *argv[])
->  	}
->  
->  	test_hv_cpuid_e2big(vm, NULL);
-> -
-> -	hv_cpuid_entries = kvm_get_supported_hv_cpuid();
-> -	test_hv_cpuid(hv_cpuid_entries, kvm_cpu_has(X86_FEATURE_VMX));
-> +	test_hv_cpuid(NULL, kvm_cpu_has(X86_FEATURE_VMX));
->  
->  out:
->  	kvm_vm_free(vm);
+>  arch/x86/kvm/x86.c       |  2 +-
+>  include/linux/kvm_host.h |  4 ++--
+>  virt/kvm/kvm_main.c      | 15 ++++++++++++---
+>  3 files changed, 15 insertions(+), 6 deletions(-)
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+[...]
 
--- 
-Vitaly
+> +int kvm_set_internal_memslot(struct kvm *kvm,
+> +			     const struct kvm_userspace_memory_region2 *mem)
+> +{
+> +	if (WARN_ON_ONCE(mem->slot < KVM_USER_MEM_SLOTS))
+> +		return -EINVAL;
+> +
+
+Looking at Claudios changes I found that this is missing to acquire the
+slots_lock here.
+
+guard(mutex)(&kvm->slots_lock);
+
+> +	return __kvm_set_memory_region(kvm, mem);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_set_internal_memslot);
+> =20
+>  static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
+>  					  struct kvm_userspace_memory_region2 *mem)
 
 
