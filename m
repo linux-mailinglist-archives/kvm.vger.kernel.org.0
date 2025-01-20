@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-35944-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35945-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5361A16692
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 07:13:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4560A16694
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 07:13:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CFA7188774D
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 06:13:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 883531887191
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 06:13:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276E0187FFA;
-	Mon, 20 Jan 2025 06:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93F01865E2;
+	Mon, 20 Jan 2025 06:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FKkMdwRI"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GWAPetPo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91108183CA6
-	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 06:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EBD183CA6
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 06:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737353616; cv=none; b=F+q20egkQEu/JmuLMOPsg5jSSRI/IhhO9LP25B3f86LqRKjpO8XK+5WYR5klRtDV9+iPlIoJSeeCYTubggkRJuOlODfZ0/TgUmHfFx/BrenCi+gik46lZwmUTvlw3r83nGRXOHHR48efsXo3jro2/JeOVWKz7QIGQzgMJ+LnMwQ=
+	t=1737353623; cv=none; b=m7uKJkWk+AZ49HHxfAcD7RRkBYNJT3maBdkZO1uykhKf5HLellGOMwGOIXm7Gu0Jb+kMKTFY795ZVVdrOd0sq/x57UbaLdlyjgFuOw2Waz9Cyl8TJRIB2zqnSMvpUbcgkKGBXYjUjbMjPwEaJSKgbaSoqSApUtnJfeXSMW+DMKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737353616; c=relaxed/simple;
-	bh=CYhXwgGa4X22iwL0OCe5p6nuIsa6FmpfTmFp/kvJIGE=;
+	s=arc-20240116; t=1737353623; c=relaxed/simple;
+	bh=QnSpFRyKWMt39XVVx2ELFJMiClQemrEIudYmDiEkT6Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sT4Ip5KrFwdzjn/00mKxN6qjoed3WJAKEvhTwhXvR3N3FDbUQIrnVrNbzITnPtLX6AzHRt1V67sSoKwRo3kzznD5Tks38QPy7xn57SxOXznxNmnLqIr6TWEJVetOxo0TYaFhJ6Diyez6zgJ481lq2FcsTyR2wvNrvRxlDR8Nzj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FKkMdwRI; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version:Content-Type; b=canLkyVambpx4pJt35xq7s75hBMZ7Z3JP1z1FTrmEtJvpikj5VKqKQ8L+rQmEHOUwmJQ7U+jx8TJvx9z+xGK0F42vSqMr8ylEkNcxD34kgF5fHyv6WnrKnijhYiUDfh67fr0VfkwQ3D7MhoaalbOVgk5/caqjlPqgyjJ3VL38Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GWAPetPo; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-435f8f29f8aso28153805e9.2
-        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 22:13:34 -0800 (PST)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-38a25d4b9d4so2169307f8f.0
+        for <kvm@vger.kernel.org>; Sun, 19 Jan 2025 22:13:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737353613; x=1737958413; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1737353618; x=1737958418; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Xht6F+Bfddgo3PrucGv//ZpFrfS6UZc2/xGuv7FMfr4=;
-        b=FKkMdwRIdOAOpGUtBvzcKiJoW4dVunxyKsLOoWzIfe9ERx9XxBgdcavBEWC4nrQnKk
-         XjZbWjp3VZQFtN8m+NVfeiCQ/lspBjvyLQXRV15yfLuDBP4sRf/WKH93hfOa2NyKb0/F
-         +Wzbo0yfpVmmD6ed1oHMxXolVsu1GsEmi0Es4w3MYGrgYIzmxY2/Q0pHUz6n+eyr1Aug
-         km7zn1H7WrTwc023iLJxMbiFdmqZljlUxYfDVOjAJycUvp60vicVRHURhslomOwRMy1S
-         RTQONX5B0LBdhrDMrFq6RfDRtyhYs/ZWGA0YT9neN6HcbKv76IxMoBoT2gychEzQ4mWs
-         /TPg==
+        bh=zrM4ECk8Y4tTKYauXOgMnvdhb7JSom/rYyhvfhnsqZM=;
+        b=GWAPetPoBEM+xV0Zx7KvGqkfpT8GBZXtFfd40dWKu/KjHxCtBYv43gJjcQuFBeOPCX
+         222xhoNC9Q930OKxns1z8JD9SJ+JxD3HqY2tkoQd6RYZUasYM/iFi9UPfJffLvoQ7muJ
+         rlzyIeS/sf0VY5rVfYxiRr8fAc4yakgI3xJ78lDKIpXTl3tnGAhsHJCKgIbBrKFiJgtM
+         7j5GKdOgGX7YARnoXjhqhxUKQuq8lLdCnVtu0ue4HyJXMDsggpWz1g6LzVDVZ+dBPptb
+         jeAB36YPnXo/EzB1TSCIowd1Ksl69CMdc/0M5b/WmfRQmE14aaghjqkCXVNaSGYrLvIs
+         1ymw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737353613; x=1737958413;
+        d=1e100.net; s=20230601; t=1737353618; x=1737958418;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Xht6F+Bfddgo3PrucGv//ZpFrfS6UZc2/xGuv7FMfr4=;
-        b=pblteaaEw0n5GX1IXkFGjSaugHZO/0URCTHYmfVljbGb+elp/0tff4b0sab+HkZC+o
-         r/uUZfnmU+oMYLtCb30iJXRe7skwCXFcYH7BWPG0oZ08fHy4QBhvQTFSIphStqmKfooW
-         iIUArbGSaDLZ8TEgIpyn5RwzCw8q4e+5gwZgEPYejU4OCloit7SpnHTTHr758njMLHFZ
-         qsLI0NCwgMm184gxpoABklBnb3L7Jd+lkTWc67X4d7MTfxojAW18ide5apMcPwX6o2Mx
-         qWGndL/0amsuMYR3owqTrwMC/wkizxvP0o7RVN9RDGAE7VyaXAYLNbKrqTNEPq3aV/nM
-         slxA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9x/w+/qRSzT6mm0AaiqSY4bGVpaauI3UWkHyCVdaUExMcoHmexY2y90filEIL9NqrPxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPd7nEu/lsUdPPS4LWcv0qlmPpQTQi4el4YNTsMVwbX3tTCpdb
-	N0Abu7n8iQP2Tofr86XJsp8RFPTculxUYgaQDhLUhLrT5TUN7vs4US9dMMIRLEc=
-X-Gm-Gg: ASbGncvO0SqkUJ2AaSArE/Dt5BPgxPCjU1b8Q//g1XoPXvY5N2FGXu4jZGLJJbGWMUk
-	+4m8C96O75UUSxsNK7aCl99/Sudkl2SBDpp06Ye0OneO2AWt9GetiEmbJ0EZWUQEFwZIAD4FPUs
-	xZP0wgQZx46v1XdE7TefSp6SJinSo1J/wXuiNcMj9Sbul7MeH1keYPPXTpw0ZNTRqjAj74h7lCt
-	7KACqWbZUbdZXtpssX+V4L/VIfDquwI9yreeGXAvwc/6IehFNXRrHqunluBKuvrt3FWoFROvv/u
-	XJY7kiBcKsaF13j88lyXv0F1c407f225/HyReSzPGNIC
-X-Google-Smtp-Source: AGHT+IF+TJkrPn7eE3Okqh3EvtF88mvEqTvQGYIM33ZG3vLFVo2jCll9ng09trmhL1noLdq3Lbecvg==
-X-Received: by 2002:a05:600c:138a:b0:435:194:3cdf with SMTP id 5b1f17b1804b1-438914292demr100258335e9.19.1737353612858;
-        Sun, 19 Jan 2025 22:13:32 -0800 (PST)
+        bh=zrM4ECk8Y4tTKYauXOgMnvdhb7JSom/rYyhvfhnsqZM=;
+        b=CCE1HATtTItZ6riryo6Gpt0J+OPH4wqe/ViQma52QCBh0B4CE2izjg/wLrqUcUBzgb
+         aLjPM2VFjtm2grTSM/XNm92YPnjmnabzTkxOPG9lGRb5SK5Dvh9F+qPzjENGUIhHKnEw
+         +RAS8wShtlSan0xq7z+LJjaJLXRJx0/Q/Vy4ZUBR1M5hPLAQXe+JR6BrfpktIi1c5Iq5
+         TkfH1orXV17ORVpc33tSlVVk0rd24l+8g6RarCYwnxrIBCac0wuPq8zZiU0BDjIMN2mb
+         1jua4zFlld/Kz8XANea5uhYKZ3ajOvIEJk5ofDsvRxgV1wr7iNWe29R+njOJSbculrVU
+         SoEg==
+X-Forwarded-Encrypted: i=1; AJvYcCXEy3hj8l9JRWhcjUzRkkJWuRS2/eh/aZOYd9Rrc77hnAabrgZQBOeWyeHI+AuSE5Zp15U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQzwJ1xLSG6LIXwBCU9GrxS4EfQq2xgIboa0liB3nPWXJ0Ksf4
+	6Ec16d4M+40656Loj0hCPyPlxlxiE+lpt4CEtU3dX5XtlRLEy1ICindUbF+ADec=
+X-Gm-Gg: ASbGncsfqL+TLYVmfZUD8CA++01oqoRrmqj7eK3t3dwdHLSqcQ/HIzfOorePGPLQjET
+	5DpAzssxw+bTA9L9r74RRajkWvD3KpTAd/ozi5XaQ2tNS3Qg+FGIaxJxyq+stdFv0NQwIJgC+Pn
+	38zJkDO9RGaQe8aX6ultQtXKg2wE09FeMGBnhmo9QQOT4hmG4FUHl3Bc9uPQiZZPIOozDYnFMf6
+	j/Znpt1TNTlt4YQu96YRSgBtq/smYvPQllE3zFd8VxNTPac4UJRcBrNBmaDWGthH8JxB+b6NIry
+	1cvcWQ6R+sY+zVxiCOEzjnJ7e2NjWR6FfSh7pDgq6BS9
+X-Google-Smtp-Source: AGHT+IFpRrXKHsSHrGRf1/tQTx4ulvm5uan5qSrL2gEPeDMmiy4K8PABoDPo6hPEEcNwmESkC+jhcQ==
+X-Received: by 2002:a05:6000:1fa8:b0:386:32ca:9e22 with SMTP id ffacd0b85a97d-38bf57a9b6cmr12043649f8f.41.1737353618483;
+        Sun, 19 Jan 2025 22:13:38 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c7499821sm186147275e9.2.2025.01.19.22.13.31
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf322b51bsm9514651f8f.60.2025.01.19.22.13.36
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 19 Jan 2025 22:13:32 -0800 (PST)
+        Sun, 19 Jan 2025 22:13:38 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>,
@@ -80,9 +80,9 @@ Cc: Richard Henderson <richard.henderson@linaro.org>,
 	Warner Losh <imp@bsdimp.com>,
 	kvm@vger.kernel.org,
 	Laurent Vivier <laurent@vivier.eu>
-Subject: [PATCH 4/7] cpus: Constify cpu_get_address_space() 'cpu' argument
-Date: Mon, 20 Jan 2025 07:13:07 +0100
-Message-ID: <20250120061310.81368-5-philmd@linaro.org>
+Subject: [PATCH 5/7] cpus: Constify cpu_is_stopped() argument
+Date: Mon, 20 Jan 2025 07:13:08 +0100
+Message-ID: <20250120061310.81368-6-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250120061310.81368-1-philmd@linaro.org>
 References: <20250120061310.81368-1-philmd@linaro.org>
@@ -100,35 +100,35 @@ CPUState structure is not modified, make it const.
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
  include/hw/core/cpu.h | 2 +-
- system/physmem.c      | 2 +-
+ system/cpus.c         | 2 +-
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 782c43ac8b3..04fede0e69a 100644
+index 04fede0e69a..00c16081396 100644
 --- a/include/hw/core/cpu.h
 +++ b/include/hw/core/cpu.h
-@@ -1155,7 +1155,7 @@ void cpu_watchpoint_remove_all(CPUState *cpu, int mask);
-  * Return the requested address space of this CPU. @asidx
-  * specifies which address space to read.
+@@ -857,7 +857,7 @@ void qemu_cpu_kick(CPUState *cpu);
+  * Returns: %true if run state is not running or if artificially stopped;
+  * %false otherwise.
   */
--AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx);
-+AddressSpace *cpu_get_address_space(const CPUState *cpu, int asidx);
+-bool cpu_is_stopped(CPUState *cpu);
++bool cpu_is_stopped(const CPUState *cpu);
  
- G_NORETURN void cpu_abort(CPUState *cpu, const char *fmt, ...)
-     G_GNUC_PRINTF(2, 3);
-diff --git a/system/physmem.c b/system/physmem.c
-index c76503aea82..0ac6acb9764 100644
---- a/system/physmem.c
-+++ b/system/physmem.c
-@@ -805,7 +805,7 @@ void cpu_address_space_destroy(CPUState *cpu, int asidx)
-     }
- }
+ /**
+  * do_run_on_cpu:
+diff --git a/system/cpus.c b/system/cpus.c
+index e4910d670cf..5ea124aed0b 100644
+--- a/system/cpus.c
++++ b/system/cpus.c
+@@ -73,7 +73,7 @@ static QemuMutex bql;
+  */
+ static const AccelOpsClass *cpus_accel;
  
--AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx)
-+AddressSpace *cpu_get_address_space(const CPUState *cpu, int asidx)
+-bool cpu_is_stopped(CPUState *cpu)
++bool cpu_is_stopped(const CPUState *cpu)
  {
-     /* Return the AddressSpace corresponding to the specified index */
-     return cpu->cpu_ases[asidx].as;
+     return cpu->stopped || !runstate_is_running();
+ }
 -- 
 2.47.1
 
