@@ -1,186 +1,116 @@
-Return-Path: <kvm+bounces-36015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 403A7A16DDA
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 14:55:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4CAA16DF2
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 15:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52BCE3A1131
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 13:54:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8EA27A0641
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 14:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E701E2849;
-	Mon, 20 Jan 2025 13:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAFB1E32B7;
+	Mon, 20 Jan 2025 13:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YHypPCJG"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="U9HvL4uf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29B41E2310;
-	Mon, 20 Jan 2025 13:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8034E1E32B3
+	for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 13:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737381295; cv=none; b=qyQw3fn41WGaaU3GHcHn1rt88TPb8Y+yOQ3XcUbQabjLyOXmE4QVfQ27LgLxRK0eyjRPKygwq/FmZIHNHZlM/09pKk28o9Y/8RknbRDicYCWpGQ/N0VIUZnmCPPJ00HBZkQi9Lwlbe/NFXQgvjZzmGdoNX0xLdoXC5c4bs+I6Ww=
+	t=1737381577; cv=none; b=Ab09uo2F3fxmIXnmCkmr79jJ1wK96BNRCLca/QF5WA4wfFAt68uVyzzCYRgn6dbNiWeMHFuUjtpR85G8rLghvrPboovjrYHxq0EHfsWnwoLx96EtZPt+ikOrkKCSOAK5z9tBG7JvRR3mEJv1SsUs8EA0CW5i/k5+1jRaw5udDtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737381295; c=relaxed/simple;
-	bh=x5UUAuEv8BXXleIiUq/fahhikzygzVziB6B5aaD8InE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HD1PlHcUn1MYkMLeBuw8cfes6We8wamEmTi2zSyWimu+MmATmmGqfIL70WGDLGHdwWuhOTkb4LZm39H/XBmVPW73FETy6s5yiHrVCVWcWhF4WdO9eOsuSUyzuWl2DdIEN2yaBMrC9briinnOYTXK3XX1mkGz2iQ8veIT4Snv9Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YHypPCJG; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50K8kEIk010061;
-	Mon, 20 Jan 2025 13:54:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=O21QuF
-	auI8QrnsSXdvrtowmfNL67VxiCVEpoew5S4Mk=; b=YHypPCJGDVbkHvjojlVWV+
-	a2+BTIlStG+ZN7x6KWzekpGPcZHkRk1UFtY3E8vc6f/PNQbNthuL602BpJ7X0QYS
-	lYhava7uEbJmSHtA+1aZf+XpSTRYejLf4wheqgimLm2PbF8SCfWj787EzqBa0GV8
-	9KzJNzVk0V1mb0qvC2dLU4g8al3RIwnmAPbQIAG7tjPG974gtuxoWmXguUDz0Al+
-	CQrKDC0krVMrG94hHSS1YkzsUFTfTgY4WTmAk/57noVUHQuSmdz8Z/2+7GREGYKu
-	ZXA7t+N7TE6IHjpmmjvGx3JS/mX30ZV0I6+bcVtlN0gE31L4SfMlLF50b5scI8tw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44947sva57-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Jan 2025 13:54:49 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50KDQu2m020145;
-	Mon, 20 Jan 2025 13:54:49 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44947sva54-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Jan 2025 13:54:49 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50KBQoMc029553;
-	Mon, 20 Jan 2025 13:54:48 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448qmn6k3j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Jan 2025 13:54:48 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50KDsiZA60162504
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 20 Jan 2025 13:54:44 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7350D2004B;
-	Mon, 20 Jan 2025 13:54:44 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3330E20040;
-	Mon, 20 Jan 2025 13:54:44 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 20 Jan 2025 13:54:44 +0000 (GMT)
-Date: Mon, 20 Jan 2025 14:54:42 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        seanjc@google.com, seiden@linux.ibm.com
-Subject: Re: [PATCH v2 12/15] KVM: s390: move gmap_shadow_pgt_lookup() into
- kvm
-Message-ID: <20250120145442.346c829a@p-imbrenda>
-In-Reply-To: <76d8c896-5c28-4e0b-b8a9-a23b63571717@linux.ibm.com>
-References: <20250116113355.32184-1-imbrenda@linux.ibm.com>
-	<20250116113355.32184-13-imbrenda@linux.ibm.com>
-	<76d8c896-5c28-4e0b-b8a9-a23b63571717@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1737381577; c=relaxed/simple;
+	bh=R9UuZ10091tIn/30XWCOiokJdfB+dwU6cOauDpgnyh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u/eon2qgaFXg3uZfMF5Tly9UgmvN7X++aHqk3ZFhva+3/2tpcIfAGUazyf3JyZ57T+4/N92PQXT5RFLIZ5ufkMySPCqRLYvIpMiQgB9MREIuCRftfTtFkKFIqUttVPiZ5jGBBbSlSaPgtzBmbj/lqhDxyCpTPRvcdqx3t/reRzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=U9HvL4uf; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b6e8fe401eso422623785a.2
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 05:59:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1737381574; x=1737986374; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R9UuZ10091tIn/30XWCOiokJdfB+dwU6cOauDpgnyh8=;
+        b=U9HvL4ufaziM4xBx9X6TtqaEa54oXNBS7Ns8+Oi9BBc3Q0MESOn+3/rsSo3lq0ObtI
+         +BKth8MThNEZYPdBzopGZaIbAka8qgFOhLBEXjGg+Kg98F+sCIT10Y1tqGWTXFszWijM
+         95W224szQL6yRN3mcO2yVtcY+vbA0d/SzCjPF1FBh6qRS/FdX8yBnODV19uC9dA1ZOfT
+         ECF4ztg4+pc/fGEJ7oNvVBlZg8hHyRIAFbplGcu8pO/AX1EI7TQt7ynCNUkFV1IgLEqu
+         TmaZg0BDqY07W8IOQ1kYV3wsxGOx/WuIMV9ebS+ZVQ13u+sz3f3MmxLkBK9Q9OIfwpJJ
+         pykQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737381574; x=1737986374;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R9UuZ10091tIn/30XWCOiokJdfB+dwU6cOauDpgnyh8=;
+        b=HS8rkuTRvK408Kzhe4D0xSkMz2xTsRIoKbYtiPPYmZK7zAW+ptV5kTSB8i7ljW2gHZ
+         W3EreYHipjt8I3aVF+jhJpwkSnrIFMLj8IoCr8X1p1kSiIGQ7+DpWsbUNveddzoeSC/h
+         fpNoT3B5UtrXwqjrs/RRGxG8F43vM6ygcrnKxpzHKXo/duWNhv/Dr2NlpjiL620NigU9
+         yk86dSw73/Gcuw/MG7ToqIiDOFiNbE/3gWtTmnKIEqqaCGRzrJjVsxaKKKA0oKVc9M/u
+         O6zFfBM1BlAZS1Ylb+qlKTP3NFCQoTPSP6fdUqzc95azHpq3aWNwzczvuwJvS7hB74EQ
+         EiYg==
+X-Forwarded-Encrypted: i=1; AJvYcCURm2otkzdz67XJztbpWemuC6mdEHqjvrr9G/I/EvGJNYle+G3mguvPEkmSTK6eMCAil6A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnNPGkyaagnS7lrEk3SrZClcpKu1gtPxJKJm5EDPaMs5sNtLSz
+	0g0T+wWIEb97s3iN59lyT6cRX1l269mL5MYJIXXR7va/awot3+iFJ9+PndzBFA8=
+X-Gm-Gg: ASbGncsh5o6LpyLU6uNBJedLsuAZ2YYYNhPUQsQLOZCEqyPLthUEEo7JaQUeJN6WsJy
+	jitBuJes7XLtp/eNrghPECDHUwo62X/OGCUp6yhOQQjDw2U6W/Uo8hzmYKb0wgkX+hP+ssgWMKb
+	P2MQBCKfvmmd+2TMDJlEaHe7XHDRdA9EQFe3mbtLhsWZSEqc2fZm+HHW//IcN6uH8gtg3U7i4df
+	/EiIlqfQkMLPf6m4S5MKokZYfw7nCfqhSiOimjP0HHHblAQtSyhFxIrfpylFU7ioau/jP3XErOj
+	C0wzuBdm7j6T0ywqczZ9f8yNWOTBJ6iacGkEqwLAeOI=
+X-Google-Smtp-Source: AGHT+IHXw5XwlAOVQM5DmvsT9Jphrpd/TgpL5J7UWvahF7YSM4NY2jfkZTX/ettpphOLDZrPgY8dFw==
+X-Received: by 2002:a05:620a:2849:b0:7b6:c2bf:3eeb with SMTP id af79cd13be357-7be6318021bmr2068444285a.0.1737381574398;
+        Mon, 20 Jan 2025 05:59:34 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e102fc99asm43201701cf.29.2025.01.20.05.59.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2025 05:59:33 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tZsJR-00000003PaH-1oaY;
+	Mon, 20 Jan 2025 09:59:33 -0400
+Date: Mon, 20 Jan 2025 09:59:33 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Wencheng Yang <east.moutain.yang@gmail.com>
+Cc: Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex.williamson@redhat.com>, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2] drviers/iommu/amd: support P2P access through IOMMU
+ when SME is enabled
+Message-ID: <20250120135933.GJ674319@ziepe.ca>
+References: <20250117071423.469880-1-east.moutain.yang@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HWZiRsNCxVBrf3a_aFcmwmMId7HJBYou
-X-Proofpoint-ORIG-GUID: fW3PANClCNFwhckIYlzkAC9i-mJ6LO33
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-20_02,2025-01-20_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- malwarescore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
- clxscore=1015 impostorscore=0 phishscore=0 adultscore=0 spamscore=0
- suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501200112
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250117071423.469880-1-east.moutain.yang@gmail.com>
 
-On Mon, 20 Jan 2025 14:47:55 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Fri, Jan 17, 2025 at 03:14:18PM +0800, Wencheng Yang wrote:
+> When SME is enabled, memory encryption bit is set in IOMMU page table
+> pte entry, it works fine if the pfn of the pte entry is memory.
+> However, if the pfn is MMIO address, for example, map other device's mmio
+> space to its io page table, in such situation, setting memory encryption
+> bit in pte would cause P2P failure.
 
-> On 1/16/25 12:33 PM, Claudio Imbrenda wrote:
-> > Move gmap_shadow_pgt_lookup() from mm/gmap.c into kvm/gaccess.c .
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > ---
-> >   arch/s390/include/asm/gmap.h |  3 +--
-> >   arch/s390/kvm/gaccess.c      | 40 +++++++++++++++++++++++++++++++
-> >   arch/s390/kvm/gmap.h         |  2 ++
-> >   arch/s390/mm/gmap.c          | 46 ++----------------------------------
-> >   4 files changed, 45 insertions(+), 46 deletions(-)  
-> 
-> [...]
-> 
-> >   
-> > +/**
-> > + * gmap_shadow_pgt_lookup - find a shadow page table  
-> 
-> The other two VSIE functions in gaccess.c have the kvm_s390_shadow 
-> prefix but this one is only static anyway and hence we could just drop 
-> the gmap_ from the name.
+This doesn't seem entirely right to me, the encrypted bit should flow
+in from the entity doing the map and be based on more detailed
+knowledge about what is happening.
 
-fair enough, will fix
+Not be guessed at inside the iommu.
 
-> 
-> > + * @sg: pointer to the shadow guest address space structure
-> > + * @saddr: the address in the shadow aguest address space
-> > + * @pgt: parent gmap address of the page table to get shadowed
-> > + * @dat_protection: if the pgtable is marked as protected by dat
-> > + * @fake: pgt references contiguous guest memory block, not a pgtable
-> > + *
-> > + * Returns 0 if the shadow page table was found and -EAGAIN if the page
-> > + * table was not found.
-> > + *
-> > + * Called with sg->mm->mmap_lock in read.
-> > + */
-> > +static int gmap_shadow_pgt_lookup(struct gmap *sg, unsigned long saddr, unsigned long *pgt,
-> > +				  int *dat_protection, int *fake)
-> > +{
-> > +	unsigned long *table;
-> > +	struct page *page;
-> > +	int rc;
-> > +
-> > +	spin_lock(&sg->guest_table_lock);
-> > +	table = gmap_table_walk(sg, saddr, 1); /* get segment pointer */  
-> 
-> I'd be happy if you could introduce an enum for the level argument in a 
-> future series.
+We have non-encrpyted CPU memory, and (someday) encrypted MMIO.
 
-in upcoming series, the gmap table walk will be completely
-rewritten, and yes, it will have enums
-
-> 
-> > +	if (table && !(*table & _SEGMENT_ENTRY_INVALID)) {
-> > +		/* Shadow page tables are full pages (pte+pgste) */
-> > +		page = pfn_to_page(*table >> PAGE_SHIFT);
-> > +		*pgt = page->index & ~GMAP_SHADOW_FAKE_TABLE;
-> > +		*dat_protection = !!(*table & _SEGMENT_ENTRY_PROTECT);
-> > +		*fake = !!(page->index & GMAP_SHADOW_FAKE_TABLE);
-> > +		rc = 0;
-> > +	} else  {
-> > +		rc = -EAGAIN;
-> > +	}
-> > +	spin_unlock(&sg->guest_table_lock);
-> > +	return rc;
-> > +}
-> > +
-> >  
-
+Jason
 
