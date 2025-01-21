@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-36105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DF6FA17D06
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:29:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E16A0A17D08
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:29:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D86C161305
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 11:29:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E034160F99
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 11:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8521F1920;
-	Tue, 21 Jan 2025 11:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2911F1520;
+	Tue, 21 Jan 2025 11:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJXg5s98"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SmeCijyD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23591BBBEA;
-	Tue, 21 Jan 2025 11:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E941BBBEA;
+	Tue, 21 Jan 2025 11:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737458947; cv=none; b=MU4Lwja0LDvGhzmUQdrHJldEC1rwToLB4DJ3tILyPeCxGSEb71s1xdfb+pfhetAbZpnQZlFDd6SZZS3Sg03IkT0l842ZAfr7dyynMgP5ZaVOTlIJgnkVkuAgnlr2KOhaGWHc/DAvOYUy5KwbaeFql6o9TVxb4lCRH5Dk2A1G7/Y=
+	t=1737458956; cv=none; b=gRuHx0Zc43ffsOewse/5eowZd7+W/ezeyRv+AcbUPq9o1hxT16eL6grWiWSOEJ5XAqkz9Yycf4J/Oa3dY/akKHjzCwt0iDt0AwmyUoI8VKPZq4RGV3C1suDrSOpoQwWTTkRCu4xQFXW60VxVAxaJa+B4aJDz+b/dhz4/ylCLaC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737458947; c=relaxed/simple;
-	bh=DtILGrM3+rfRXWqQcTGk9nG1XMGIAOFuySX5/0Wg8L0=;
+	s=arc-20240116; t=1737458956; c=relaxed/simple;
+	bh=nh9WsxIxeYysaVr6MxXvDi1AaHkf78v6tjemOkhShrk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZM6C+bC+SgmZ6s/ST1T61HkWNWJfAvT4YlBm2H6kmkeI6EITep9pCxlkNdf8mniWCczkQRLHgxHywip8FSKmwdVAFY2mxQUlKAmTk7NwOa9+gwuMq927iE3xlY7F9rAP5ldPeb/YUvq50fosVu++6MgxcZ9zn8xPO6J0KR/49Dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XJXg5s98; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=fNV1k0/KMut5Dzo7QjlQWj7LqN9cI4pM9MPrrrJaATqUm7I1A/Y7knh1VfObHs6T/+P35dS18ANGolALuYxVSVq2VwTPNndWPNYnwJmyoBpfn6bMNhvH8m0uZuIvobrAU+gfApkbl6y0E+naWDXSWG3BOdWvujhCLQkvy6AkNyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SmeCijyD; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21644aca3a0so121499545ad.3;
-        Tue, 21 Jan 2025 03:29:05 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-216281bc30fso124775405ad.0;
+        Tue, 21 Jan 2025 03:29:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737458945; x=1738063745; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737458954; x=1738063754; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WXagEzywweo8G/6OstGzvbkfhs6k8bp2kHQoB/L2HB8=;
-        b=XJXg5s98lOGoxQDd0O6MGNLUGuQTX9v8N8CsRh8JWUxETwYaNvpPZjx2ErVRS2wPi3
-         1d5wHQV+VT6pNHdepGlOf1g6iEDKXvw4nh10cnPfk3gcK3hZu794vJZ3hKBJ3N87rPj2
-         fFlPBJsPzsTmtqSgJQkfmkRHqKAdXzZhn2d40Oysin4L7SU7IXbAFGSuN4/uLl2999dY
-         ZkpVrKwvzrQhfKLXzboXwkx+G067LCAIuUdhY9SyiHzkZA3hIAAX4ZTnqiFAsfANN7KR
-         sR4d3ImLcTTPYY9PvR1pn7DWi/5yzii6Fufccjd3Ea/Sza1U7blwzGRJIn4wIswmff/P
-         nGvQ==
+        bh=xMeTfRxhl9BwEfA37y5uSqDF2UTPmXajFpszd0Y6s+U=;
+        b=SmeCijyDOkZIiPeRtg39+fgCjFWhIKlVPhNW5gVmNXIbtdjaGTKQxoCkov2lYldDxM
+         7kjYXmif6U/fhadW0WF5jJ7e/qjMJWb8Ycr+LBpD2SB8rlBUenDGj9KfjsNv/w/eonOr
+         d+yKRQPsKk4obH95hG5RYDo3ktY1Du9XPtT+85wK9tct5CN5LKxi1vij4BJ+4PM1smCH
+         6KgUMObcM2ylDSo6rhjZVzm7lp9Eclk+kwTe2hAqTtFqtuV0i17NQFoS8MI3k2ZAAvVg
+         BcewU4i4VM/4fw2YFkOyU0TAtzNU5UEOP95NgUXlUDFGc/draLr1qPFy8AGEXdhagXLG
+         rFiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737458945; x=1738063745;
+        d=1e100.net; s=20230601; t=1737458954; x=1738063754;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WXagEzywweo8G/6OstGzvbkfhs6k8bp2kHQoB/L2HB8=;
-        b=oN8I9k9U17fmpOgQM9PcXT1A2SfebcUvamhMX3dOYGWnPY4UBdng/GSHDXVZiBuQ3J
-         C5cyyMNs9Q1rWZDJELLFPZEAl1ifkFsUidQ8SRqSApqpzJrmC8t2Mgnyl12M1mxBNTLJ
-         nLtlD3c1Gui5LZVGZb8YGPs6DZfwvjjQ9VTmt1aJFwukQbxWeFLGAQGMH+/GYrXF3sXp
-         UXIWvGflShecCLcwgaV79wIPSRksKDKmm0b7RtiLPqgXbD5v8626Qv0nMblDA8UwMu30
-         LEWZtq425hGF/Ahyao9MIMVdBv5g0T7C1GPwuX0mMj8In9rC2bgzkfP7Ka/TZUCwQ1av
-         Q+cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJF+NvEPYVxMQ/fJ2vf1Sx1gevWqsOLaLqYdveO5Ow4xEhhqnqj0mjafeDrjucIdJTehSk5EMlme3ZZlkZ@vger.kernel.org, AJvYcCVRfFXwYAjPk19kintxaOP8NV/yudM8ZzRHK5rxNNUFG41jq9ZvRIJSdE1BrtR6Ckk9C5g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwoWp2ovKzYGYxnmLc/iw1buNo4MVvtamHbCQEX+sQEmeFWH9R
-	cpKvucRYjyh5OAnslzAWO5naooS+6/0i/bsVNqvvybcwVd7AiSbs
-X-Gm-Gg: ASbGncviRxjGpvbBo94koREr8bBloQH0ttIw1dgXsbB7judF61YY5pfLdcpI3k3fBNz
-	zqlVQYtp7IbJ0ag9RlUBaIZzClwixSZTmJuCfHP/vW3Mj+4HDFBTfKo7sMsw9ooU3OWLc5AB//W
-	JIdF2vZ/y7pVCh+SHARFWsUniuFySfH6w8qhulexr9+x0R0APvV5WkeEK/y4r/sGovA3FGk6LxA
-	npzg9/lHyME878cwJWbTwq3GpIhCJZlWsUxp8PPUp04A3m9sbhOa/rStGu2nuegBXoQ5X/O20Mq
-	MX7QgSYD
-X-Google-Smtp-Source: AGHT+IH6fqnSkGAu0RzR1hL/8eMgnirYGIBDu4gvagajjQRKR4xYSTPHDLM/zXZ9hh02Fhhkq69ucQ==
-X-Received: by 2002:a17:902:f7ce:b0:215:773a:c168 with SMTP id d9443c01a7336-21c352de425mr254278285ad.1.1737458945192;
-        Tue, 21 Jan 2025 03:29:05 -0800 (PST)
+        bh=xMeTfRxhl9BwEfA37y5uSqDF2UTPmXajFpszd0Y6s+U=;
+        b=YSuaPORt9aMNsOGtp2iQ2j7iwKet5vA1Qhz13c5lfvuCfNEEXBDRzWS8sKTC7jpfuB
+         UGPFBPUpj9o+vBKVEbQfpr0hj1dE3cup/up9LlDBzQotqpOUzV1eE+TPpKA+6x2qc04U
+         Pg8JRrjfZyjsiVyHpQL9+U5ks82Odv5hqlWOivIdwJj11z61UFnc1fZUs2S+cXTuxRLM
+         uJz4N5dnPZTWp9cIALJwiNrS+cKAhFfWIH6c9iQNBn5fH96tFK4jLZ7u9PNqHFYeeT8A
+         FEvnIPbqszIxZV5Ot1/iw2CHpr9QKvPP3vgCCvwCBznV9+eggdnsg0cd4Mu6IaH/gTkI
+         1FeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUgxWsODTfrbmB2Xmg9dIr5U6KxrAoFOxen24PL31Slhjqp67Fe0VbDv4G2tdh7tIWJmnw=@vger.kernel.org, AJvYcCWNr0106ZKFB1KHp+3IV+tmCgzD6QypUXkkryZ6ECCuJkOTPNm/xpSGryMURABOb3ecGsAI1UXR1QFXvBdD@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQsrl0cHAg4s//cSp7SWz438MP3LeDrXdb8YF4zEx8nSJFInId
+	EqP8drDs2CiWWbpx2ogQSTiMxjMD/XwkbSzdxblpxnlhPZs85+Pp
+X-Gm-Gg: ASbGncuaNZB+RY55kUinOP+Hacw3XKsgMxo34itTxmHeTj4k65EtG3PNWMqoW42Lk8e
+	uuq+Ws7jVjlP18ZXDEG9C8NpZGbw6CbmVwsirR6IMoH7RdRvFdwO1/07HBqho1T27ZXMt8MUiOL
+	9/wDYFR6ICr/pJb0yrUR2zohaCFQXAMUktUZhOHzyg5a08k/hE0NVmbCO1EcWDPuBAmFh4nBwcr
+	irez1l79Pfwl1JQ+pQpilOXh7UZ+vA4lTsdFRCDYU2Xo2McBws7H/qwjToo6ZMXbCiV0UvhDhzM
+	gi/7lDsm
+X-Google-Smtp-Source: AGHT+IHqVYYJ45lIlWyRx33N4odTV9sw1wF9+nrODrrB/LpvgiOepFLlCXIlPAeAhhX+P42rZbOKUw==
+X-Received: by 2002:a17:903:1cc:b0:216:2474:3c9f with SMTP id d9443c01a7336-21c357b6a7bmr218434175ad.52.1737458954143;
+        Tue, 21 Jan 2025 03:29:14 -0800 (PST)
 Received: from tiger.hygon.cn ([112.64.138.194])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2cea1fdesm75385965ad.26.2025.01.21.03.29.00
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2cea1fdesm75385965ad.26.2025.01.21.03.29.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 03:29:04 -0800 (PST)
+        Tue, 21 Jan 2025 03:29:12 -0800 (PST)
 From: Wencheng Yang <east.moutain.yang@gmail.com>
 To: east.moutain.yang@gmail.com,
 	alex.williamson@redhat.com,
@@ -83,9 +83,9 @@ Cc: iommu@lists.linux.dev,
 	robin.murphy@arm.com,
 	suravee.suthikulpanit@amd.com,
 	will@kernel.org
-Subject: [PATCH v3 2/3] vfio/vfio_iommu_type1:convert VFIO_DMA_MAP_FLAG_MMIO to IOMMU_MMIO flag
-Date: Tue, 21 Jan 2025 19:28:35 +0800
-Message-ID: <20250121112836.525046-2-east.moutain.yang@gmail.com>
+Subject: [PATCH v3 3/3] iommu/amd:Clear encryption bit if the mapping is for device MMIO
+Date: Tue, 21 Jan 2025 19:28:36 +0800
+Message-ID: <20250121112836.525046-3-east.moutain.yang@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250121112836.525046-1-east.moutain.yang@gmail.com>
 References: <CALrP2iW11zHNVWCz3JXjPHxyJ=j3FsVdTGetMoxQvmNZo2X_yQ@mail.gmail.com>
@@ -98,38 +98,83 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Refer to commit: 31e6850e0fdb iommu: Add MMIO mapping type (Robin Murphy),
-IOMMU needs to know the type of mapping to setup IOMMU page table,
-if the mapping is for device MMIO region, on some platforms, IOMMU page
-table entry attrs should be different versus regular memory.
+When SME is enabled, memory encryption bit is set in IOMMU page table
+pte entry, it works fine if the pfn of the pte entry is memory.
+However, if the pfn is MMIO address, for example, map other device's mmio
+space to its io page table, in such situation, setting memory encryption
+bit in pte would cause P2P failure.
+
+Clear memory encryption bit in io page table if the mapping is MMIO
+rather than memory.
 
 Signed-off-by: Wencheng Yang <east.moutain.yang@gmail.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/iommu/amd/amd_iommu_types.h | 7 ++++---
+ drivers/iommu/amd/io_pgtable.c      | 2 ++
+ drivers/iommu/amd/io_pgtable_v2.c   | 5 ++++-
+ drivers/iommu/amd/iommu.c           | 2 ++
+ 4 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 50ebc9593c9d..08be1ef8514b 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1557,6 +1557,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 		prot |= IOMMU_WRITE;
- 	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
- 		prot |= IOMMU_READ;
-+    if (map->flags & VFIO_DMA_MAP_FLAG_MMIO)
-+        prot |= IOMMU_MMIO;
+diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/amd_iommu_types.h
+index fdb0357e0bb9..b0f055200cf3 100644
+--- a/drivers/iommu/amd/amd_iommu_types.h
++++ b/drivers/iommu/amd/amd_iommu_types.h
+@@ -434,9 +434,10 @@
+ #define IOMMU_PTE_PAGE(pte) (iommu_phys_to_virt((pte) & IOMMU_PAGE_MASK))
+ #define IOMMU_PTE_MODE(pte) (((pte) >> 9) & 0x07)
  
- 	if ((prot && set_vaddr) || (!prot && !set_vaddr))
- 		return -EINVAL;
-@@ -2801,7 +2803,7 @@ static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
- 	struct vfio_iommu_type1_dma_map map;
- 	unsigned long minsz;
- 	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
--			VFIO_DMA_MAP_FLAG_VADDR;
-+			VFIO_DMA_MAP_FLAG_VADDR | VFIO_DMA_MAP_FLAG_MMIO;
+-#define IOMMU_PROT_MASK 0x03
+-#define IOMMU_PROT_IR 0x01
+-#define IOMMU_PROT_IW 0x02
++#define IOMMU_PROT_MASK 0x07
++#define IOMMU_PROT_IR   0x01
++#define IOMMU_PROT_IW   0x02
++#define IOMMU_PROT_MMIO 0x04
  
- 	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+ #define IOMMU_UNITY_MAP_FLAG_EXCL_RANGE	(1 << 2)
  
+diff --git a/drivers/iommu/amd/io_pgtable.c b/drivers/iommu/amd/io_pgtable.c
+index f3399087859f..dff887958a56 100644
+--- a/drivers/iommu/amd/io_pgtable.c
++++ b/drivers/iommu/amd/io_pgtable.c
+@@ -373,6 +373,8 @@ static int iommu_v1_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
+ 			__pte |= IOMMU_PTE_IR;
+ 		if (prot & IOMMU_PROT_IW)
+ 			__pte |= IOMMU_PTE_IW;
++		if (prot & IOMMU_PROT_MMIO)
++			__pte = __sme_clr(__pte);
+ 
+ 		for (i = 0; i < count; ++i)
+ 			pte[i] = __pte;
+diff --git a/drivers/iommu/amd/io_pgtable_v2.c b/drivers/iommu/amd/io_pgtable_v2.c
+index c616de2c5926..55f969727dea 100644
+--- a/drivers/iommu/amd/io_pgtable_v2.c
++++ b/drivers/iommu/amd/io_pgtable_v2.c
+@@ -65,7 +65,10 @@ static u64 set_pte_attr(u64 paddr, u64 pg_size, int prot)
+ {
+ 	u64 pte;
+ 
+-	pte = __sme_set(paddr & PM_ADDR_MASK);
++	pte = paddr & PM_ADDR_MASK;
++	if (!(prot & IOMMU_PROT_MMIO))
++		pte = __sme_set(pte);
++
+ 	pte |= IOMMU_PAGE_PRESENT | IOMMU_PAGE_USER;
+ 	pte |= IOMMU_PAGE_ACCESS | IOMMU_PAGE_DIRTY;
+ 
+diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
+index 16f40b8000d7..9194ad681504 100644
+--- a/drivers/iommu/amd/iommu.c
++++ b/drivers/iommu/amd/iommu.c
+@@ -2578,6 +2578,8 @@ static int amd_iommu_map_pages(struct iommu_domain *dom, unsigned long iova,
+ 		prot |= IOMMU_PROT_IR;
+ 	if (iommu_prot & IOMMU_WRITE)
+ 		prot |= IOMMU_PROT_IW;
++	if (iommu_prot & IOMMU_MMIO)
++		prot |= IOMMU_PROT_MMIO;
+ 
+ 	if (ops->map_pages) {
+ 		ret = ops->map_pages(ops, iova, paddr, pgsize,
 -- 
 2.43.0
 
