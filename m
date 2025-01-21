@@ -1,222 +1,206 @@
-Return-Path: <kvm+bounces-36158-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36160-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26028A18262
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:58:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1B40A18272
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:01:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C53F3A26EF
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:58:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0F163AB938
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5D11F4E3A;
-	Tue, 21 Jan 2025 16:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01D91F63FD;
+	Tue, 21 Jan 2025 17:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gi+X6+QY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMVW1OpN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A9E1487E1;
-	Tue, 21 Jan 2025 16:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D721F55E4;
+	Tue, 21 Jan 2025 17:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737478711; cv=none; b=PhaOEKxxNeke/C0XOMF5oacZcGhEIYX5e+yj8U2bOH607ri0dVwS3sdlsbxC9cxFbvAq4BL1QCXxfphnQQSH+TPqbzSTcaubPdSrL2pgAtHlPa/5fgfsvsc1JkZr9x1wANYnlbORN1mwpIeItaYshIzeufVOUajbHmvDdn/+bRo=
+	t=1737478819; cv=none; b=kVk0KzAUjxT9JHFl1p7PAgyXFfbvVkaDgktbM62nrbIhUTLv/QB7lVmwT6o+JylJoJNS7IIV5ZR7NYL4WILayQKhaksGea9OytSPu78pCmuVR5JbJ2VqrQJy2+sBMb06pNat9Yo29YqJg24qDdbuJPGwPlA38wUjR3jkVxotA1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737478711; c=relaxed/simple;
-	bh=1qj1Z7qZjLWMICIl/DvpFySD52Czjkyh0RcZ8KYgRho=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UzDOPfZJmgvXfwt9uQklHXYjjJGFMnDUe3vLKrnHNAwIhVrNoKRV6r/Ng3bGgoQW3900EqMgUUnFR2Ai+7K1LUqDwUSt+eu1hoewgUaK20FnZIh3+Q3er1o7wpYyT45Zj7FtW9QnEcTprJom7k+ILmCaUTqYa6EYOnz58lm6sDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gi+X6+QY; arc=none smtp.client-ip=209.85.218.47
+	s=arc-20240116; t=1737478819; c=relaxed/simple;
+	bh=9OS+xRmfz4uuv2J1YGJZ++S2O40MMdmWQmSQIuypaCI=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aU+abS1bGf7dYKs1ummvugRXTGAWYmpb4L8WEkGY2CbbQm3LdPJEq6cdSBvxNBO4ZdxduDBXeKTr4SSpfG2unbKtwUOTx1qb0oFeUi1lbLS9GmO3czfQftoFs8CiMaHLQXsoGhyhwfvFhvQVuwWs1rso6P5B6RnAEy2eC69ptsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gMVW1OpN; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ab39f84cbf1so706526866b.3;
-        Tue, 21 Jan 2025 08:58:29 -0800 (PST)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-54021daa6cbso6474898e87.0;
+        Tue, 21 Jan 2025 09:00:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737478708; x=1738083508; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=doSIOSoCzjXwkVt78c52kzRTsfNi+ZFQxvkXJliSGTU=;
-        b=gi+X6+QYUNfgeiyQfVf10/ox/6ORUm06gbfpkA7rV13PLcZPcWD8OzZJ+A9CRYTsvI
-         aO3Mmn/jkRfmAvNmTEdWgIr8JtXky4ZrazZSlcKtkBwSf5mPttMeTb6xUjmslYiFikWa
-         G+g2HUAColVi8E4oUTs8Z80xHUBasDAJBu5Ripw/54B1FybcZSapVDzz9+gW3fdcFYZv
-         bVqaanwBco/XWPii12mwY94X3sWol42rw294DiRBL1xFDdZgvqLpDnmZN5gFUZ0TLFBY
-         Foku5sDUXXp7EncrPY2CPBeXMbQmOuzg+k8t8qTEalAtsRcMhMERUXVwISUoe0SGzsat
-         fqkw==
+        d=gmail.com; s=20230601; t=1737478814; x=1738083614; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6O7kZyVX02YaNVvlK+AnjIGslDTljYFtI1mm3L3G+es=;
+        b=gMVW1OpNxZGCbfGiZJN7CWogRmhb8O/8NZQJUjl5VvDOFm8axyCM3Qpxe2lI4LTrUd
+         S23mQS6EhykZyiPZAZchKhUFyLauUNI/PTXzvvS6fpIB8YFJd0EwSz/LdLHeMo5qf/Je
+         6VVfbR2V6g55pg4cEajPSY4yrFuGdGoEoz50ZVvO2khmL7gGXhIELMHTqgr9FxkwFCO0
+         tfH2hYNk7YErLOQGsxdnMpYZwupbPa2WqU4r5r8XKk27iFdmNQZs2/Pv20ZzMCFVmkYF
+         /415sca28vufjjPWayU2xZn2j/5RKYAHoFit+W5tRiL+xJN6X2GLoRIwsp/lGkN2QDzM
+         3KMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737478708; x=1738083508;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1737478814; x=1738083614;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=doSIOSoCzjXwkVt78c52kzRTsfNi+ZFQxvkXJliSGTU=;
-        b=Bys5pnQpOeF/qdnRHXsgngsKDLuZvJ68OW5KxCJVIcG9VdtTKNzARkXPemml3ccOpZ
-         rAb6sGNGZHz+zL8kxTq7y9msMSB92lhvtBLXogYaST3DqWc2G/VsFS0curQzcFaVlBTo
-         P/GZ/3w3DhQP04XF9f5cE1vBWxFa/sRKal2HPaoJ+Tflhn5Da4UrHjbMqmcEJUqG0OYf
-         /ZjgujzJVChfwZw0jSONogWtZGK6F3B79XnDqcg7XBxNUb3Ylh74lv185xlSgF471hpM
-         HeM8DyBRnaKYB9JkDNbwAO7EHZiVhanLECahCnG+xnYFQkK9NJ27YZF7PCrhrQm4NH0y
-         et+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX/epVUyqdz0EU0frr1b1tFWPC9FZIyu+aWzXweft/yHzaEDT9qDuIojkgFYiafLNg5NVv0xRVXTTmt/EU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyW3al63FQCZF9pC34g6YOMa5e3fRJifQ9IYXENHCfJE/N0c/sJ
-	oT+QlLe6tYRbyiZYz19rjEjZwGsxic6D6JOeUle0hIA5HwjRjW0U
-X-Gm-Gg: ASbGncsodW8nGxlPAEwo/Py7Dk9mwwYV11jLVMNbsJZGOASgTACOn2aFpR8HQxOqpQd
-	674QbRU7H3qP+46e6OxiTN2Y2LK1mEUm3HnGc8/77/c2pGhKvezhKiv8GlXMRL1Cwru82SrJgIP
-	VDTL4s0aDBhHeCK/pnl5rIzZLkX0c77izX+kNB1/7uyizp52O/4ngBtXagaDFVo4d79t6gkL7RI
-	m2sDfS9XQIQANTDUr+WXmpuItS1glw7K+E8+Wscq1uSHfZGY6TgNrHff7jr98Bds8JAYf4/rPHO
-	AF9k00JqhUObxntWXLNc1ZOY9g==
-X-Google-Smtp-Source: AGHT+IH6E0iXyO6ZX3ruX7+MIvGHpwSsfWHJ0CBFOG5SlgPu+dJK7mvF4gOyTPjmom9p/9NrsyJ9/w==
-X-Received: by 2002:a17:907:3f95:b0:aac:1b56:324a with SMTP id a640c23a62f3a-ab38b161425mr1642509566b.26.1737478707608;
-        Tue, 21 Jan 2025 08:58:27 -0800 (PST)
-Received: from [192.168.19.15] (54-240-197-233.amazon.com. [54.240.197.233])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384f22c75sm765478766b.88.2025.01.21.08.58.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2025 08:58:27 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <06482c0e-e519-47ca-9f70-da3ab12ed2e4@xen.org>
-Date: Tue, 21 Jan 2025 16:58:26 +0000
+        bh=6O7kZyVX02YaNVvlK+AnjIGslDTljYFtI1mm3L3G+es=;
+        b=lGnTbRWrBRlK7G3M+G46ai6f4FOET4eHZIGsvePltJVuy6ulKHFIHM96u1jR16Ahv+
+         MlqF+IelPynlcok9yft6BzyNfcOodv2v0Df8bz4udphrKAb5o33faizDojADtiGmIzc3
+         BLEiPen3rNdczIJA3rTBX99YYldatJy+JQP4YmYiA1nv/Kna5FsEdUcqzz17RQy3EoEZ
+         UvtQT3apocOGImoKdBhtmHCOlaDfM7XgtEbDlhU2rVuAbWCYmfL1I7tyCsMKBCO+s7ML
+         mOOoKBDweKRmaubPYtdYQSXowFBQv+lW6gHtR5QJA8X9M7ICxRHSR9FcUIIMwHBXOU+r
+         7pvw==
+X-Forwarded-Encrypted: i=1; AJvYcCUigKuYSYVlzKBRoOyZiyvCekM9de8/BgmoF01epWwnOBzPGeufLLCysMPTIqb8vCV2WR38hiqjk3gsNb3nhHcy@vger.kernel.org, AJvYcCVNtzF3fjeLtXQZpDdR8q/KVhJGX5khPOSOMCulvucvUlhK2JGnHQ2OU5hbqfNl3AMrS5OQoEI3GeKwa41qLehO@vger.kernel.org, AJvYcCVX9kf658Bb9flmPpGTJY87XSdeeA/XrJLR/TagmZRByVCGL5YTWs/6NFt68iRpGbHiH8s0vEBdnHiVG0DdXZoMtQ==@vger.kernel.org, AJvYcCVxfB0VZE0r4TTLNqtq9Qg/wCiwgdqMY1S08/n7UCSQQZy9cAJX1oO9pYSmBKgUYqHuYE29cMW9+rlXl/ed@vger.kernel.org, AJvYcCWIFd7d3dJIXZOFjEqSqqXGsZAnLqpxHPvrGFclJTIKJMBLf5++N/JS5lZP12BW0uEMyFQ=@vger.kernel.org, AJvYcCWlOJMi9Xi/D1sWTOXFPlgdWmNj80HvNhhD9dCFNH1lLYwrOKLp5uirslT2Pd0TChwB4yleqmRh31Baxw==@vger.kernel.org, AJvYcCWppZQM2mzUCKA6kpil5RUMmVWvUAPYCfe6r4YwJ61NwYKnAr0oAyjXbz5jAl9FgX3r7MBK@vger.kernel.org, AJvYcCXn5XNKxjuU7Yn3tN4Bp54J7ly3jq96QxClg4eMau4u5ragf3oAS+gD+3a8ZY0aCLQDHZZD@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwnMRjNfrhr2ORtkPt2uwTzgrLHLRF2n4bDrukhK72y9A6qGWh
+	M6W4ovuC0MOgm/tWbLdgRs6o5r6HN52B6rXnVXcPAK+PUDRAPLQKwCLoU7w3
+X-Gm-Gg: ASbGncvtj7NdDPURSgbMGbW7o1rNFvmJ/oyRzvKReHpbORks9jSKs9ZjQDH4Exrk0Nt
+	ID/QCnEt8abXtOpldDHMNyRHEvD+89Wkk38DMe0K/EkbDansjdmpYkAAL4DwqDTpZtvrMapT7Bu
+	u4TOzZhp5YmnzYiq0p1f3fYpSOHphihAKouMGnfpXxUFqEZUrS5hATbc9Ry+jx9/M2BNube9dO6
+	9RQW0VVOnVc/fmKKjRHE/dWY/3oWsZEfTQ8UerOU3xOHwY3LiVCPCkfShdcP3wQN2LInp7oEl7U
+	DU8Y9FiOIHbo4bsGSYvCI7h7
+X-Google-Smtp-Source: AGHT+IGYPF71D1RmaKnbW82c+U5IMmpDPZJTk/HJCRRaq5z7S90tH0rTVzhA6Sl8Kwc0O/33Vf8jgg==
+X-Received: by 2002:a05:6512:104b:b0:543:9b0f:7d39 with SMTP id 2adb3069b0e04-5439c282920mr7151519e87.32.1737478813837;
+        Tue, 21 Jan 2025 09:00:13 -0800 (PST)
+Received: from pc636 (host-217-213-93-172.mobileonline.telia.com. [217.213.93.172])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5439af76fe9sm1916768e87.212.2025.01.21.09.00.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2025 09:00:12 -0800 (PST)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Tue, 21 Jan 2025 18:00:07 +0100
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: Uladzislau Rezki <urezki@gmail.com>, Jann Horn <jannh@google.com>,
+	linux-kernel@vger.kernel.org, x86@kernel.org,
+	virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
+	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+	linux-arch@vger.kernel.org, rcu@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	Juergen Gross <jgross@suse.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"Liang, Kan" <kan.liang@linux.intel.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Jason Baron <jbaron@akamai.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Clark Williams <williams@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Tomas Glozar <tglozar@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Kees Cook <kees@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Rong Xu <xur@google.com>,
+	Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Yosry Ahmed <yosryahmed@google.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>,
+	Jinghao Jia <jinghao7@illinois.edu>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>
+Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer
+ flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
+Message-ID: <Z4_Sl-zu7GprkbaL@pc636>
+References: <20250114175143.81438-1-vschneid@redhat.com>
+ <20250114175143.81438-30-vschneid@redhat.com>
+ <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com>
+ <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <Z4qBMqcMg16p57av@pc636>
+ <xhsmhwmetfk9d.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <Z44wSJTXknQVKWb0@pc636>
+ <xhsmhr04xfow1.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH 06/10] KVM: x86/xen: Use guest's copy of pvclock when
- starting timer
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com,
- Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20250118005552.2626804-1-seanjc@google.com>
- <20250118005552.2626804-7-seanjc@google.com>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <20250118005552.2626804-7-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <xhsmhr04xfow1.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 
-On 18/01/2025 00:55, Sean Christopherson wrote:
-> Use the guest's copy of its pvclock when starting a Xen timer, as KVM's
-> reference copy may not be up-to-date, i.e. may yield a false positive of
-> sorts.  In the unlikely scenario that the guest is starting a Xen timer
-> and has used a Xen pvclock in the past, but has since but turned it "off",
-> then vcpu->arch.hv_clock may be stale, as KVM's reference copy is updated
-> if and only if at least pvclock is enabled.
+> >
+> > As noted before, we defer flushing for vmalloc. We have a lazy-threshold
+> > which can be exposed(if you need it) over sysfs for tuning. So, we can add it.
+> >
 > 
-> Furthermore, vcpu->arch.hv_clock is currently used by three different
-> pvclocks: kvmclock, Xen, and Xen compat.  While it's extremely unlikely a
-> guest would ever enable multiple pvclocks, effectively sharing KVM's
-> reference clock could yield very weird behavior.  Using the guest's active
-> Xen pvclock instead of KVM's reference will allow dropping KVM's
-> reference copy.
+> In a CPU isolation / NOHZ_FULL context, isolated CPUs will be running a
+> single userspace application that will never enter the kernel, unless
+> forced to by some interference (e.g. IPI sent from a housekeeping CPU).
 > 
-> Fixes: 451a707813ae ("KVM: x86/xen: improve accuracy of Xen timers")
-> Cc: Paul Durrant <pdurrant@amazon.com>
-> Cc: David Woodhouse <dwmw@amazon.co.uk>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/xen.c | 58 ++++++++++++++++++++++++++++++++++++++++++----
->   1 file changed, 53 insertions(+), 5 deletions(-)
+> Increasing the lazy threshold would unfortunately only delay the
+> interference - housekeeping CPUs are free to run whatever, and so they will
+> eventually cause the lazy threshold to be hit and IPI all the CPUs,
+> including the isolated/NOHZ_FULL ones.
 > 
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index a909b817b9c0..b82c28223585 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -150,11 +150,46 @@ static enum hrtimer_restart xen_timer_callback(struct hrtimer *timer)
->   	return HRTIMER_NORESTART;
->   }
->   
-> +static int xen_get_guest_pvclock(struct kvm_vcpu *vcpu,
-> +				 struct pvclock_vcpu_time_info *hv_clock,
-> +				 struct gfn_to_pfn_cache *gpc,
-> +				 unsigned int offset)
-> +{
-> +	struct pvclock_vcpu_time_info *guest_hv_clock;
-> +	unsigned long flags;
-> +	int r;
-> +
-> +	read_lock_irqsave(&gpc->lock, flags);
-> +	while (!kvm_gpc_check(gpc, offset + sizeof(*guest_hv_clock))) {
-> +		read_unlock_irqrestore(&gpc->lock, flags);
-> +
-> +		r = kvm_gpc_refresh(gpc, offset + sizeof(*guest_hv_clock));
-> +		if (r)
-> +			return r;
-> +
-> +		read_lock_irqsave(&gpc->lock, flags);
-> +	}
-> +
+Do you have any testing results for your workload? I mean how much
+potentially we can allocate. Again, maybe it is just enough to back
+and once per-hour offload it.
 
-I guess I must be missing something subtle... What is setting 
-guest_hv_clock to point at something meaningful before this line?
+Apart of that how critical IPIing CPUs affect your workloads?
 
-> +	memcpy(hv_clock, guest_hv_clock, sizeof(*hv_clock));
-> +	read_unlock_irqrestore(&gpc->lock, flags);
-> +
-> +	/*
-> +	 * Sanity check TSC shift+multiplier to verify the guest's view of time
-> +	 * is more or less consistent.
-> +	 */
-> +	if (hv_clock->tsc_shift != vcpu->arch.hv_clock.tsc_shift ||
-> +	    hv_clock->tsc_to_system_mul != vcpu->arch.hv_clock.tsc_to_system_mul)
-> +		return -EINVAL;
-> +	return 0;
-> +}
-> +
->   static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs,
->   				bool linux_wa)
->   {
-> +	struct kvm_vcpu_xen *xen;
->   	int64_t kernel_now, delta;
->   	uint64_t guest_now;
-> +	int r = -EOPNOTSUPP;
->   
->   	/*
->   	 * The guest provides the requested timeout in absolute nanoseconds
-> @@ -173,10 +208,22 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs,
->   	 * the absolute CLOCK_MONOTONIC time at which the timer should
->   	 * fire.
->   	 */
-> -	if (vcpu->arch.hv_clock.version && vcpu->kvm->arch.use_master_clock &&
-> -	    static_cpu_has(X86_FEATURE_CONSTANT_TSC)) {
-> +	do {
-> +		struct pvclock_vcpu_time_info hv_clock;
->   		uint64_t host_tsc, guest_tsc;
->   
-> +		if (!static_cpu_has(X86_FEATURE_CONSTANT_TSC) ||
-> +		    !vcpu->kvm->arch.use_master_clock)
-> +			break;
-> +
-> +		if (xen->vcpu_info_cache.active)
-> +			r = xen_get_guest_pvclock(vcpu, &hv_clock, &xen->vcpu_info_cache,
-> +						offsetof(struct compat_vcpu_info, time));
-> +		else if (xen->vcpu_time_info_cache.active)
-> +			r = xen_get_guest_pvclock(vcpu, &hv_clock, &xen->vcpu_time_info_cache, 0);
-> +		if (r)
-> +			break;
-> +
->   		if (!IS_ENABLED(CONFIG_64BIT) ||
->   		    !kvm_get_monotonic_and_clockread(&kernel_now, &host_tsc)) {
->   			/*
-> @@ -197,9 +244,10 @@ static void kvm_xen_start_timer(struct kvm_vcpu *vcpu, u64 guest_abs,
->   
->   		/* Calculate the guest kvmclock as the guest would do it. */
->   		guest_tsc = kvm_read_l1_tsc(vcpu, host_tsc);
-> -		guest_now = __pvclock_read_cycles(&vcpu->arch.hv_clock,
-> -						  guest_tsc);
-> -	} else {
-> +		guest_now = __pvclock_read_cycles(&hv_clock, guest_tsc);
-> +	} while (0);
-> +
-> +	if (r) {
->   		/*
->   		 * Without CONSTANT_TSC, get_kvmclock_ns() is the only option.
->   		 *
+> I was thinking maybe we could subdivide the vmap space into two regions
+> with their own thresholds, but a task may allocate/vmap stuff while on a HK
+> CPU and be moved to an isolated CPU afterwards, and also I still don't have
+> any strong guarantee about what accesses an isolated CPU can do in its
+> early entry code :(
+> 
+I agree this is not worth to play with a vmap space in terms of splitting it.
 
+Sorry for later answer and thank you!
+
+--
+Uladzislau Rezki
 
