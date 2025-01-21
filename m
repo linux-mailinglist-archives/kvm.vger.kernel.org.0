@@ -1,148 +1,140 @@
-Return-Path: <kvm+bounces-36127-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36128-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59B3A1813D
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:38:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFEB2A18149
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:44:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BA0F188B588
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:38:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C97533AB20F
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8097F1F471A;
-	Tue, 21 Jan 2025 15:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BE11F4727;
+	Tue, 21 Jan 2025 15:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8yCHvdp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CT8RILUC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07D31F426C
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 15:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751C01F426C
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 15:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737473905; cv=none; b=CJzYOEHt+jKy29/g1lvk4SE26ZZ/WJsbq40fVJcUeTtEQJp+WhOruzL4Z7Rft0xp5OSzPZhz0Ts6RtyU+wzTZA8COKjRjfQjMaZz6RvUbn20fG8ieVkBSh7Iqb9u2NmXJp00gBCHJ1FKzqWMLVYfUC3j8uzU/UEKMrvDQAlFKsk=
+	t=1737474246; cv=none; b=MCxRfmnbyI8jjfkaj0RN3zjn/n3JlpdOsyElHR5TO1HFnGgPFN9uZVlKhFqJuyDE+u5S19yNow/PFWMPZb4G2jsmCiSAa0yQcVR2roJHbPki38/UyfazZnpYOVNAyXO4WncE/oKkxLqsE+iFcoxEGrR06x3ikMsNEyaYxKc/R8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737473905; c=relaxed/simple;
-	bh=tKzVu7K8VQrnqwY1dpCXix1mUXtPfLMWbHDXszQyeGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D3w4yWI8b2z1eo8oW+QTYSSWi6lae8o6Imccwgy6aMThS5aRu3cIr/YMSyGpZ0pc5f64wM55QIqx+ysLSNqlVlcr3gX6sOxEqoyDDorlIwSNs5Ur1tTEM9UcGYNA8+puU0UFUCtocoLr9joTBAmor/Jk8lkIHZxBbkjxaZ93FuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S8yCHvdp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737473902;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7vWlp2CUskTYXbSVehnKEKMyRmaqBpVNMhezv4fMKgM=;
-	b=S8yCHvdpwWTu6fXVdMRGrKktSrjDDJFOtQ+6kIukbsABgV9KFtUV2GyIz76AsZVf84qXX7
-	SGbsVzilXvwNlDPuZOJam6yXIVSGagx1spMb9Pjf1eCh5SDohoviGgTMS8spJKY37akc3Q
-	GqTPMqDjhkqa23TjZSs92sqk1b5g7fA=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-128-gT9PfDZWNrqQ-6aLEPPL7w-1; Tue, 21 Jan 2025 10:38:21 -0500
-X-MC-Unique: gT9PfDZWNrqQ-6aLEPPL7w-1
-X-Mimecast-MFC-AGG-ID: gT9PfDZWNrqQ-6aLEPPL7w
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6dcd1e4a051so107597546d6.2
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 07:38:21 -0800 (PST)
+	s=arc-20240116; t=1737474246; c=relaxed/simple;
+	bh=b+4csRbUueKF3ZX5iYLlhjnU3JM4B8To8fnyX3tA6AI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=l0m6TET8702vw2nRvmg5CvCGaQ4sczRZqqXBvwtQ9x3Gvz1Wgr0EMlx5tS+bHPHNJSo591X5cVe3UOtZrbYbPoBonVxhCwGsU96hf/jHIIqOhIKlIWxKAIS2VAhAUDJM8t2mfeUjO/JuvHiTUIXBR81gVitEC1tbsDQbxALiiqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CT8RILUC; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2163a2a1ec2so177724375ad.1
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 07:44:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737474244; x=1738079044; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8PCljT+D66JwBF6N6v2y7VFSXya1XW/aQ2CIHDg3OVo=;
+        b=CT8RILUCZUb8tEIE+xM33bRi+7Ojn8B6ZDQL0LPFHDGM8kvjbaKVs4hAlv6Fk9GFV4
+         sucoktB19WzZrxpYAUE3nEM/aBuEyCn/QO/RfrS/N7qYyS/Ve8+NYu9QTO1MT/NA4ytC
+         grdjEkrdVPn+xKjO4YlbEaU23iDhPwGNJe0XpCQUBAVs3TXH1ldPD+EBvt/TNnEQx8re
+         eGJ0Ybj2VcOhUaHFPLcrQHl/1pWKCYN4FxYx2nzKXj+yMNoGZTzsiYGjYMvKc5ePTNVK
+         r5snwZJhf/EVWIsPmVPgrtTksqbnIeeJYMaRmVQpNiumo8mekO4XKN3TAETvXvKvg0aJ
+         H6hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737473901; x=1738078701;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7vWlp2CUskTYXbSVehnKEKMyRmaqBpVNMhezv4fMKgM=;
-        b=JLiMTTblFZD5WMze9fR3evC/5DZPZLOygNU1ufu7sxSZ+2+TGaRMAc+vwLCS7a8/zI
-         RMiJ/Tw3BhJq/IVupoDgybhIixZDvU+zddOT+hU8vtlOqpcPik36BdU6L8Wv94dhtXjv
-         xT2QmRAMwnf9cB43shhEbCPUcS8PGY3hEwdgDjMtMAUa660YU0txdUFm+Pj0E569aiUL
-         Jax5WN8iCg3dbi62wuL3hBTzsKft6yLykIRjSDc+IBkimR1HRwBSKzaleCt0S7n+J+iM
-         VIrMKig/GX5Dn7mdJD+bdNxLGqZfnm61tLTqlbEuV6mNVF87D7j8NUIiI5c5b/BpnrX6
-         sY1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVoUC/SblBL9k4kYR7jkY8DsquwfoD9sic/esmEYv/43pnxrj1Im+yNENpqVGduTD95bmk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjQQJfFq0/7KPkloA4DEwiAMCXDBzOc7613RNHb7Zb2Z/P/2lB
-	Ef9h/D1HZB5pLNqzP6PntTt45/yTYnBvjGSfeClJx/+IaNQ8VOmPh2/M8YKuk0hjyMmEmgObtzl
-	Rpc9jcc9EXtntmcfqWVvMHc4wHeC7J1yXBthz18D251hy1Cje2w==
-X-Gm-Gg: ASbGncvIabyKojuSoirJEjuKd6UCxvicwERfv2heppyFVFrZ19JH09sjh6X2nE9jAYY
-	CGS7UustWI/kvJfKnmuVcxrpUXlpleIPp3LuAZrLzIDgQSUio1ywo8dnfc8zpcaI7te8tZoOmy0
-	g77jKN4yiy/6B9VOR6LHr5ymgz+Oy9NeBN29kh5jx7ShpWJIGL/C1zQPkZm0/QorSHpZuLLesXu
-	PtvuY9ln1hKrd28FojSJKz1BkArgXQmEFoKiqdIZnTefXiUhXW7WAYpN4Uo3pBse91vgB2HfhHY
-	Agtzy185aO6Z35k/lB4YWMvIRKnD2yc=
-X-Received: by 2002:a05:6214:1305:b0:6d3:fa03:23f1 with SMTP id 6a1803df08f44-6e1b2186a41mr285474096d6.13.1737473901085;
-        Tue, 21 Jan 2025 07:38:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHgfx1VJkB5kdl2P+V5WFmu/JkUYutt6JPaRTYfjpiG4rWtIeQDLUTt4TZ3FFWubwJB5OXSGA==
-X-Received: by 2002:a05:6214:1305:b0:6d3:fa03:23f1 with SMTP id 6a1803df08f44-6e1b2186a41mr285473756d6.13.1737473900788;
-        Tue, 21 Jan 2025 07:38:20 -0800 (PST)
-Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afbf3783sm51948996d6.7.2025.01.21.07.38.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 07:38:20 -0800 (PST)
-Date: Tue, 21 Jan 2025 10:38:11 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Chenyi Qiang <chenyi.qiang@intel.com>
-Cc: David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
-	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>
-Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
- guest-memfd with RamDiscardManager
-Message-ID: <Z4-_Y-Yqmz_wBWaU@x1n>
-References: <20241213070852.106092-1-chenyi.qiang@intel.com>
- <20241213070852.106092-3-chenyi.qiang@intel.com>
- <Z46RT__q02nhz3dc@x1n>
- <a55048ec-c02d-4845-8595-cc79b7a5e340@intel.com>
+        d=1e100.net; s=20230601; t=1737474244; x=1738079044;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8PCljT+D66JwBF6N6v2y7VFSXya1XW/aQ2CIHDg3OVo=;
+        b=At2paTSMD6+YtTIhdEVM6muSq2kbETZi6a1FdiXDqHDGe9NKppUlc1TmM8vw8kXfKm
+         iGj9qOWpaRC2yBLpG8f0/7qXwpfBCZ0wq2WGNpjz+lUMOVwOnK6boFKQpJJMBzO469uu
+         R77qXXO7e4akSkuWcSSi0KrwVU2gnPfidLNn1qFArw6uYZJpp5wEK7qkam7fTw7ytsa3
+         CcHkz56fH+4+S3xV1kTZd5SAtrP+VdEDfnwQRrjX/U/e0j85WHbHI77nThAnzKtIqaVA
+         Db1MD60Ksw4i9yMHJUK4HlwX2s3auDKpAMwL+Lz3SxmPUA474+vOMGGZdJMUECyEEBJG
+         pBjA==
+X-Forwarded-Encrypted: i=1; AJvYcCV/HuYeed7SfIdCG+tXQ421p574gkPywJILiCK/YUANs1FJM+H67oFH0RU/SGnBLEvdBeU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwGEPXZnDI9PQl1vTYZ+NKoLam/JH/LVOH8g4QW3lK0iowiXGo
+	z3MPEFQ7LTRfFwcBNRWt2ci/PwRq2PDE+OWUumR/notdlMfQas4pnQL42znzbWQd/J9SBPPiBt6
+	U/w==
+X-Google-Smtp-Source: AGHT+IGQtRScZKc0wjEnvD9y0eY8uhqqwlzVAD9VF6BQL99yX3piQEk1sKLlVMHK/Wj6xBuVEenSHPxEJfU=
+X-Received: from pfbmb8.prod.google.com ([2002:a05:6a00:7608:b0:725:ec78:5008])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:788b:b0:1e1:9bea:659e
+ with SMTP id adf61e73a8af0-1eb215d4c46mr28702196637.35.1737474243736; Tue, 21
+ Jan 2025 07:44:03 -0800 (PST)
+Date: Tue, 21 Jan 2025 07:44:02 -0800
+In-Reply-To: <8734hd8rrx.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a55048ec-c02d-4845-8595-cc79b7a5e340@intel.com>
+Mime-Version: 1.0
+References: <20250118005552.2626804-1-seanjc@google.com> <20250118005552.2626804-10-seanjc@google.com>
+ <8734hd8rrx.fsf@redhat.com>
+Message-ID: <Z4_AwrFFsKg2VgYW@google.com>
+Subject: Re: [PATCH 09/10] KVM: x86: Setup Hyper-V TSC page before Xen PV
+ clocks (during clock update)
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>, 
+	Paul Durrant <paul@xen.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com, 
+	Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 21, 2025 at 05:00:45PM +0800, Chenyi Qiang wrote:
-> >> +
-> >> +    /* block size and alignment */
-> >> +    uint64_t block_size;
-> > 
-> > Can we always fetch it from the MR/ramblock? If this is needed, better add
-> > some comment explaining why.
+On Mon, Jan 20, 2025, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> The block_size is the granularity used to track the private/shared
-> attribute in the bitmap. It is currently hardcoded to 4K as guest_memfd
-> may manipulate the page conversion in at least 4K size and alignment.
-> I think It is somewhat a variable to cache the size and can avoid many
-> getpagesize() calls.
+> > When updating paravirtual clocks, setup the Hyper-V TSC page before
+> > Xen PV clocks.  This will allow dropping xen_pvclock_tsc_unstable in favor
+> > of simply clearing PVCLOCK_TSC_STABLE_BIT in the reference flags.
+> >
+> > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 9eabd70891dd..c68e7f7ba69d 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -3280,6 +3280,8 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+> >  		hv_clock.flags &= ~PVCLOCK_GUEST_STOPPED;
+> >  	}
+> >  
+> > +	kvm_hv_setup_tsc_page(v->kvm, &hv_clock);
+> > +
+> >  #ifdef CONFIG_KVM_XEN
+> >  	if (vcpu->xen.vcpu_info_cache.active)
+> >  		kvm_setup_guest_pvclock(&hv_clock, v, &vcpu->xen.vcpu_info_cache,
+> > @@ -3289,7 +3291,6 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+> >  		kvm_setup_guest_pvclock(&hv_clock, v, &vcpu->xen.vcpu_time_info_cache, 0,
+> >  					xen_pvclock_tsc_unstable);
+> >  #endif
+> > -	kvm_hv_setup_tsc_page(v->kvm, &hv_clock);
+> >  	return 0;
+> >  }
+> 
+> "No functional change detected".
+> 
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> 
+> (What I'm wondering is if (from mostly theoretical PoV) it's OK to pass
+> *some* of the PV clocks as stable and some as unstable to the same
+> guest, i.e. if it would make sense to disable Hyper-V TSC page when
+> KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE too.
 
-Though qemu does it frequently.. e.g. qemu_real_host_page_size() wraps
-that.  So IIUC that's not a major concern, and if it's a concern maybe we
-can cache it globally instead.
+I think it's ok to keep the Hyper-V TSC page in this case.  It's not that the Xen
+PV clock is truly unstable, it's that some guests get tripped up by the STABLE
+flag.  A guest that can't handle the STABLE flag has bigger problems than the
+existence of a completely unrelated clock that is implied to be stable.
 
-OTOH, this is not a per-ramblock limitation either, IIUC.  So maybe instead
-of caching it per manager, we could have memory_attr_manager_get_psize()
-helper (or any better name..):
+> I don't know if anyone combines Xen and Hyper-V emulation capabilities for
+> the same guest on KVM though.)
 
-memory_attr_manager_get_psize(MemoryAttrManager *mgr)
-{
-        /* Due to limitation of ... always notify with host psize */
-        return qemu_real_host_page_size();
-}
-
-Then in the future if necessary, switch to:
-
-memory_attr_manager_get_psize(MemoryAttrManager *mgr)
-{
-        return mgr->mr->ramblock->pagesize;
-}
-
-Thanks,
-
--- 
-Peter Xu
-
+That someone would have to be quite "brave" :-D
 
