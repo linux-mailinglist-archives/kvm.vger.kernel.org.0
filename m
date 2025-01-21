@@ -1,173 +1,138 @@
-Return-Path: <kvm+bounces-36100-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36101-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5370BA17C43
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 11:50:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9FAA17C5C
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 11:55:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3F0F18814A7
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 10:51:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 498D41885980
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 10:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C4E1F0E5C;
-	Tue, 21 Jan 2025 10:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85ECF1F12E9;
+	Tue, 21 Jan 2025 10:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vKsWUSoE"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gUDWESFE"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4A61A8409;
-	Tue, 21 Jan 2025 10:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F198C1E9B0D;
+	Tue, 21 Jan 2025 10:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737456649; cv=none; b=Z46UEzPY2nGSQdCzy/R8uVVzwuFZ5r6VD+9Edw8VlLCMsUjL+K8a2HJRM3102coJztyzyGJjyFEmBufmtEbqMcnAAB4K6pj77xBQgfYfd+dXToNEOOuGbgIyMy3bygROrI+K6xWagGOV3KINNd3R7/abWUd3A7xEhFUTe+QIK9s=
+	t=1737456938; cv=none; b=W7vDWthpPcqTcpDW/ZNtStx0oVy96bxMla4mkz+v4x7/gnK0VuZvwz0QnJRMqoUp2BkB1RokFShjW2TcLvI3cdHL4nwIVLvKi5sGIEaiACbJbeqCoMZbzR8FPzsbDcOELetwhhkYztiG41a3odGmiaIm1fAGX7dXFimOzQsW4/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737456649; c=relaxed/simple;
-	bh=78SvGEEpfplm+QtmRrw7sntzEgBlDVIuLcdixRRZlHo=;
-	h=Subject:MIME-Version:Content-Type:Date:Message-ID:CC:From:To:
-	 References:In-Reply-To; b=o4px5fobmQ5XFw7su6OwsrG9iZodbgwiKtamd35L3MJMPDsWm/r0TtIXEBBSfoJJ9JbhYeddokCVF4zMuJZNocS9xWgkMRCja4urMBOJb2xX/1pSotNN76qyFTuxNNn7o+eQnEiP3ed50XNvIMaC4xb9wVm6wKPid5ejbWwkpn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vKsWUSoE; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1737456648; x=1768992648;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   cc:from:to:references:in-reply-to:subject;
-  bh=ZUMl6My3UOEtLoT92yvNaaCHoq5p5jikRjbcB3m2yvg=;
-  b=vKsWUSoE9/vWqkHs4zEsl/xevS/LAu/ADfuODiFzA1nLnT4GAi33bxMX
-   +l+yVrpC1yGqmwEfOtwOnYbyXKme97ClGuMuZ4E06m+1tm01edTI2kvjc
-   ddLrhMQRldifrvtDbWV4Jgf7KcvPoOQXbXwdy6C05UbpDgBizZV42adsj
-   k=;
-X-IronPort-AV: E=Sophos;i="6.13,221,1732579200"; 
-   d="scan'208";a="163002992"
-Subject: Re: [PATCH 5/5] Documentation: kvm: introduce "VM plane" concept
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 10:50:44 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.43.254:28894]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.13.19:2525] with esmtp (Farcaster)
- id 7d5df69f-310e-4fe8-92d5-d134aa75454d; Tue, 21 Jan 2025 10:50:44 +0000 (UTC)
-X-Farcaster-Flow-ID: 7d5df69f-310e-4fe8-92d5-d134aa75454d
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 21 Jan 2025 10:50:37 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39; Tue, 21 Jan 2025
- 10:50:32 +0000
+	s=arc-20240116; t=1737456938; c=relaxed/simple;
+	bh=2j811sYQgN40V9LO//OIKRb1REOWnFO+AmXAbTsUreA=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=tnHJGZcv4k4l/Ksb3LLE0MluhT9eW8q+NCyVPHDxX5rhJZp8TCA1rrQKUMTbLasNi4HIhsG7ylDnry99xmr1uTcrWshCXbKnD1F2HRiyYU9Hyapy6Hz5sQaB+N8BPQEBMDeVjuVXtKpQgW3/Q4ATb9BhTzNmaKIBWZU1toxLFzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gUDWESFE; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50L20ZNI002891;
+	Tue, 21 Jan 2025 10:55:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pDPpVh
+	cYWabcEzJl4bH2xE3+BDMZ4KIDQjdWIyrlxDs=; b=gUDWESFElr8Re6nALQ+W8y
+	t0VA0BFevfhnb2Xo/qVlJGiwXYzJRn0/syTKzNzm9ZznCzbtzf59HuAPxsE/MYWE
+	WjMteawoMnAIeOA86chRCaF9VtLouBLUfYATO1nVTgGQNpAyJcJrx719v0ZQkRRp
+	Q1Vg7qHWARJAaVdWkD2Emv9MXnVoxOVCLVRKu9SMrM4uwmDJIwBmUOGiEZd+3Uyi
+	m+TYZP8jDl2BC9KwEOHx+P0qq/EsVItqX4dSgc+Y74vQ5xm2bkMAJdFiY9DNbdqu
+	lxrAuTMcHSEk9XymmS96HVBL/wf9mqGM8/1FyXs4Hn7RbJkp2d/n56/sMGHSk+OQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a2dya369-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 10:55:32 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LApkDt024775;
+	Tue, 21 Jan 2025 10:55:31 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a2dya362-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 10:55:31 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50L90T5X024252;
+	Tue, 21 Jan 2025 10:55:30 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448q0y2xur-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 10:55:30 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LAtRpN35848674
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Jan 2025 10:55:27 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 00EA320084;
+	Tue, 21 Jan 2025 10:55:27 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D062D20085;
+	Tue, 21 Jan 2025 10:55:26 +0000 (GMT)
+Received: from darkmoore (unknown [9.179.17.46])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 21 Jan 2025 10:55:26 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 21 Jan 2025 10:50:29 +0000
-Message-ID: <D77OZ0KEG5FP.2BZQFEKQUQZ0P@amazon.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<roy.hopkins@suse.com>, <michael.roth@amd.com>, <ashish.kalra@amd.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <anelkz@amazon.de>,
-	<oliver.upton@linux.dev>, <isaku.yamahata@intel.com>, <maz@kernel.org>,
-	<steven.price@arm.com>, <kai.huang@intel.com>, <rick.p.edgecombe@intel.com>,
-	<James.Bottomley@hansenpartnership.com>
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
-	<pbonzini@redhat.com>
-X-Mailer: aerc 0.19.0-9-g5a90e2f3553b
-References: <20241023124507.280382-1-pbonzini@redhat.com>
- <20241023124507.280382-6-pbonzini@redhat.com> <Z4rQIGxwUNr5UQX0@google.com>
-In-Reply-To: <Z4rQIGxwUNr5UQX0@google.com>
-X-ClientProxiedBy: EX19D044UWB003.ant.amazon.com (10.13.139.168) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 21 Jan 2025 11:55:21 +0100
+Message-Id: <D77P2QTIMIMM.1GYJ277JWT4R6@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, <frankja@linux.ibm.com>,
+        <borntraeger@de.ibm.com>, <david@redhat.com>, <willy@infradead.org>,
+        <hca@linux.ibm.com>, <svens@linux.ibm.com>, <agordeev@linux.ibm.com>,
+        <gor@linux.ibm.com>, <nrb@linux.ibm.com>, <nsg@linux.ibm.com>,
+        <seanjc@google.com>, <seiden@linux.ibm.com>
+To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 05/15] KVM: s390: move pv gmap functions into kvm
+X-Mailer: aerc 0.18.2
+References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
+ <20250117190938.93793-6-imbrenda@linux.ibm.com>
+In-Reply-To: <20250117190938.93793-6-imbrenda@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rE4EgWArfkhzETVCh3xo31fC1o7KQIVv
+X-Proofpoint-ORIG-GUID: ISqlmgnpdian93RODzf_MOt_CVaDK783
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-21_05,2025-01-21_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ mlxscore=0 phishscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 mlxlogscore=597 spamscore=0 suspectscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501210086
 
-Hi Sean,
-
-On Fri Jan 17, 2025 at 9:48 PM UTC, Sean Christopherson wrote:
-> On Wed, Oct 23, 2024, Paolo Bonzini wrote:
->> @@ -6398,6 +6415,46 @@ the capability to be present.
->>  `flags` must currently be zero.
->>
->>
->> +.. _KVM_CREATE_PLANE:
->> +
->> +4.144 KVM_CREATE_PLANE
->> +----------------------
->> +
->> +:Capability: KVM_CAP_PLANE
->> +:Architectures: none
->> +:Type: vm ioctl
->> +:Parameters: plane id
->> +:Returns: a VM fd that can be used to control the new plane.
->> +
->> +Creates a new *plane*, i.e. a separate privilege level for the
->> +virtual machine.  Each plane has its own memory attributes,
->> +which can be used to enable more restricted permissions than
->> +what is allowed with ``KVM_SET_USER_MEMORY_REGION``.
->> +
->> +Each plane has a numeric id that is used when communicating
->> +with KVM through the :ref:`kvm_run <kvm_run>` struct.  While
->> +KVM is currently agnostic to whether low ids are more or less
->> +privileged, it is expected that this will not always be the
->> +case in the future.  For example KVM in the future may use
->> +the plane id when planes are supported by hardware (as is the
->> +case for VMPLs in AMD), or if KVM supports accelerated plane
->> +switch operations (as might be the case for Hyper-V VTLs).
->> +
->> +4.145 KVM_CREATE_VCPU_PLANE
->> +---------------------------
->> +
->> +:Capability: KVM_CAP_PLANE
->> +:Architectures: none
->> +:Type: vm ioctl (non default plane)
->> +:Parameters: vcpu file descriptor for the default plane
->> +:Returns: a vCPU fd that can be used to control the new plane
->> +          for the vCPU.
->> +
->> +Adds a vCPU to a plane; the new vCPU's id comes from the vCPU
->> +file descriptor that is passed in the argument.  Note that
->> + because of how the API is defined, planes other than plane 0
->> +can only have a subset of the ids that are available in plane 0.
+On Fri Jan 17, 2025 at 8:09 PM CET, Claudio Imbrenda wrote:
+> Move gmap related functions from kernel/uv into kvm.
 >
-> Hmm, was there a reason why we decided to add KVM_CREATE_VCPU_PLANE, as o=
-pposed
-> to having KVM_CREATE_PLANE create vCPUs?  IIRC, we talked about being abl=
-e to
-> provide the new FD, but that would be easy enough to handle in KVM_CREATE=
-_PLANE,
-> e.g. with an array of fds.
+> Create a new file to collect gmap-related functions.
+>
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/gmap.h |   1 +
+>  arch/s390/include/asm/uv.h   |   6 +-
+>  arch/s390/kernel/uv.c        | 292 ++++-------------------------------
+>  arch/s390/kvm/Makefile       |   2 +-
+>  arch/s390/kvm/gmap.c         | 206 ++++++++++++++++++++++++
+>  arch/s390/kvm/gmap.h         |  17 ++
+>  arch/s390/kvm/intercept.c    |   1 +
+>  arch/s390/kvm/kvm-s390.c     |   1 +
+>  arch/s390/kvm/pv.c           |   1 +
+>  arch/s390/mm/gmap.c          |  28 ++++
+>  10 files changed, 288 insertions(+), 267 deletions(-)
+>  create mode 100644 arch/s390/kvm/gmap.c
+>  create mode 100644 arch/s390/kvm/gmap.h
+>
 
-IIRC we mentioned that there is nothing in the VSM spec preventing
-higher VTLs from enabling a subset of vCPUs. That said, even the TLFS
-mentions that doing so is not such a great idea (15.4 VTL Enablement):
+LGTM
 
-"Enable the target VTL on one or more virtual processors. [...] It is
- recommended that all VPs have the same enabled VTLs. Having a VTL
- enabled on some VPs (but not all) can lead to unexpected behavior."
+Acked-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
-One thing I've been meaning to research is moving device emulation into
-guest execution context by using VTLs. In that context, it might make
-sense to only enable VTLs on specific vCPUs. But I'm only speculating.
-
-Otherwise, I cannot think of real world scenarios where this property is
-needed.
-
-> k.g. is the expectation that userspace will create all planes before crea=
-ting
-> any vCPUs?
-
-The opposite really, VTLs can be initiated anytime during runtime.
-
-> My concern with relying on userspace to create vCPUs is that it will mean=
- KVM
-> will need to support, or at least not blow up on, VMs with multiple plane=
-s, but
-> only a subset of vCPUs at planes > 0.  Given the snafus with vcpus_array,=
- it's
-> not at all hard to imagine scenarios where KVM tries to access a NULL vCP=
-U in
-> a different plane.
 
