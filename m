@@ -1,501 +1,273 @@
-Return-Path: <kvm+bounces-36102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D76A17C8B
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:00:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71566A17C9A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:07:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDD613A1E35
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 10:59:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DC0F3AB1E1
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 11:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0911F0E4B;
-	Tue, 21 Jan 2025 10:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B761F12EF;
+	Tue, 21 Jan 2025 11:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="w4PMR5y0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MTj33Yul"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13FA1EE02F
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 10:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B041B4137;
+	Tue, 21 Jan 2025 11:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737457171; cv=none; b=eYpwaW0rafeLPcQmbLdHjDq4e+TRpFzYIrqSgKPwHXhhhGRjHu9g38EjAtuNePv9ytR4AEhb7KueU3bhQJ9srxZl6DaPrhnj4p474VVpT5BnEt5x2LmqLY+cKWEpQdRRntshNPNhhgblD1L8Mn0q0+jr46XbzzajS+jLsjHH9aI=
+	t=1737457661; cv=none; b=eQNSSa/4+Ftrz+j0j6IdLgbSp3jYkXuDuDpOUjaqTgmiurC2DKZEDr5s/R33uHbwDnHFD1gsBZoaqfQg2WC/9kUQcFeDNyycyT86Rj0Hrn+7J7oOEueutxQcE3+ci3tD/ijzT1xkr/vVF+6AtNlyZTnQgm+pwE+pjySc4bl/u04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737457171; c=relaxed/simple;
-	bh=tb+w5qhSzadpqndQPCimayTbJ2V7Svm26qZtgVRpIEg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CMN7+jfWBnbtxhJfGqXdrEUHd3txiqBWYZW5xgnujEbr9XmdvjDsB1TIicRxYavuPOEwGovxiJRCa6V6WBFgye45KUbP7l8XWFnu1gNa/M5Zaj0Jorfz4POzuDmiSdCsdF6udAkrEC7ubDCAbnSrSNm5rfhimM9w0raz1QWjWHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=w4PMR5y0; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21634338cfdso127023075ad.2
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 02:59:27 -0800 (PST)
+	s=arc-20240116; t=1737457661; c=relaxed/simple;
+	bh=m1tprvfWRRlC07DIQoKClTxgzVmEIjEJGYB7rI/Hsxw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DvdGJEGoeDC/N2XEdwhG0Xk5yyKBxtzKNsydfzvEXdPIijyhF+PmyOLwLbxzBfI00UtDJPShkigcQrM0wGlJGJQBpF7Tv2QCDlcbW6rvPlpUgckEWjA1RkxWKx+hTr30AZwvdLXBy/JDge9reTiSKD2C9K3NI+iH5uu3PnCu0vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MTj33Yul; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-437a92d7b96so54145945e9.2;
+        Tue, 21 Jan 2025 03:07:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1737457167; x=1738061967; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3Ll3niAYQyqhl1Gu/FURdFm4KuXNJN6QySjFaTiM0So=;
-        b=w4PMR5y0CdmH8ib8MNF4Y9QOAlYqmvifOLzI6ngFYsvVrA1PscS7FJu7JA8G78sAB7
-         JxCB6AVYbAumgadcybdTGS7jHD8MTs65Jz/TbVXMu0TVelB5bQYmGRaCpExPmPMEOzw6
-         umTIhKw7c0nhIZbDy+FefPRniosjX3FP4elpoKqXW9a6R+gd5fuwunzTbKpzaQPLD87r
-         cQf8Zm/Jt49PPGsYn+kNjkJI73PHxL0o9jrxDwjXzR+XNy/TeILUBV3x0hPoodIq2CxB
-         DjslE59YlYgZisSYDckE+U8x9TQevrIvlH+r9Ry50f0yc5zTbzGrK3HdvG6OaP0Le4P5
-         GZNQ==
+        d=gmail.com; s=20230601; t=1737457657; x=1738062457; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=60Ashbu4ZtB730+B8toAPEzMOd5yglkvbvpHZzMPLiA=;
+        b=MTj33Yul6Ijc2YkO7lcIFABvcP5vSOoxwsB75QlR9hP9Asi72IcP7Rr2s3bKgVd/sp
+         PH2wOwvuYj9Ljp5/MUghcSvPWHYhv5ap79oBmw+1v8J3xiJ8xEBPB5vk5MjiaQnwGgfd
+         D+3b/mip+ngvER/GUFeQSUmGW4pjIrjFJEGPK3LGs+ibN82at2dK2eV2VIMWoblGgNpc
+         AkaXqCxhRbvtY8SZFJBOPhzuNrOOpOJYQXBp7nwzuysSvoOcloawvuXLzDqIPIPyoCCS
+         4D7vcZpJJNDSTVE1SOqsmuds33MfytvQEuog0pvYgufNX3BVGmdgis+v8sI79awYsPzn
+         ZwCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737457167; x=1738061967;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Ll3niAYQyqhl1Gu/FURdFm4KuXNJN6QySjFaTiM0So=;
-        b=Sg8jMU+cQjNB2+GE+xHDiIMJgZ35jjvZ8G3//39xW6C3g2MHbMIdTiUqTb0SdlX3nm
-         lpvsJE3QoRTcIWgpAfTFA62rshc5Av0x9ZCtiUpC/5tIlutDdgIXX8/pqZg9Kvg1FoFu
-         eJy6USMiWGjE8cOl2dXCUQ+Xgl9GrKd0l74M54HP2fohiUd8+T/W6xpfHl84+oujveWj
-         ZoOvU+kYSeEk1ijDVtEcbKU3d5dT8tG8FtfbZ9RJ3emKRy5awlXEkgYXtxJ3Y/oDvqrQ
-         NBRs3K/IALRgGCjIp4464pZIamNouIAvOsPezABymcvtz/NiPDXK5bawx61CvF5zYbXy
-         ws3w==
-X-Gm-Message-State: AOJu0Yx2Oq0+bWJqiVF7Mki2LQejmecMLbGF9QtIclqCil9TnKlxZeQr
-	/0VbaNl7oz5APy7tiTqFX3XNApDNhnVwJGvT2p1yR9wlcLiLWD/sMoP7vfdorhQ=
-X-Gm-Gg: ASbGncv8knHaPUvdIag7QUDqvgaST4ww+p46L5XW31Ogzgw9fl6mlzQCu6PJHEFz73H
-	8Y2H9nUihljmveTbQfbizOMbOnRP2G97Degmzo1QnSZYbUyvpLdVP2Hh9olnvrlCKGBhado1MQI
-	5bz1c1Ua9ikrOPmLYjtNwGQUhaW1JIjAr/D4s5UYP4rLfZ9HLwwN396w6fXsSCbq6ZvY3CXSR/V
-	Q7PT8VgSIu+NreiLPd+qmM5u9sTY+ilv/GUKFM0ZQSuDMI9oKN5aT9zvWePMt8xYQd6aBR8UYDO
-	4wLJBlYPrtWPENPobkQX1Q+Yg+1L9Z2K1QGTXpE=
-X-Google-Smtp-Source: AGHT+IGaWUNfLQttDPyCJbytal14ydEn804b4fTgQOfi3CA2cpZq7LiiHXK4re9VMDLeJz//iatDWA==
-X-Received: by 2002:a05:6a21:999e:b0:1db:e0d7:675c with SMTP id adf61e73a8af0-1eb2148cc78mr27945908637.13.1737457167087;
-        Tue, 21 Jan 2025 02:59:27 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-a9bcc3234c4sm8445464a12.19.2025.01.21.02.59.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2025 02:59:26 -0800 (PST)
-Message-ID: <788fe888-c07e-4d2f-9e7b-916ec9e509e9@rivosinc.com>
-Date: Tue, 21 Jan 2025 11:59:16 +0100
+        d=1e100.net; s=20230601; t=1737457657; x=1738062457;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=60Ashbu4ZtB730+B8toAPEzMOd5yglkvbvpHZzMPLiA=;
+        b=Cw8UWmN8co8QhT4Mks2q4wCiu0Cabp0FsbzdyryqjXXuBX8A/gUSqC5RGEVOy7kLsa
+         W8RXS20ZlfOwA7JGVE0b20n3j97ZxUYFtVlb758iJ9puzEuj75c6+fZ5DY81qlviN3mw
+         Lm2AaOhAAGUk57t96wWGloFSwdHEhLt68AwqPTn/fLmB/TuCwYQmy1K+nj/Bf/X6kOjd
+         D7gJknw8kwqTii/LS/3wXEVMrabkk5NV937gk5bPTqxcvVjhIYmA3tND3s3Ji15/6M5Z
+         NEDeL+ZnIlzVBjDIpsQEiVexE3Nn6zUydq9p2GQIEbUI5dm0LTfmVe/DYL6auKAKAG00
+         bEOw==
+X-Forwarded-Encrypted: i=1; AJvYcCVN66pHiOmaRIMrBVGioVMwXUIqPI64ZM/D/2GQfr2f9q719nSVe02+dEMNQlEU3TWN/jg=@vger.kernel.org, AJvYcCWgR7jgxHHxVRDck4ZwgluG+C9T/fAAIpExkAa0Pm2qvh2RSlafe5H/RBUAjlb3/4SsYtRdoFykZHc95hbB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzdd29p5PCLhdiapECyxOKKah1Bel5rlG9tf0eSzg27U5emf7zg
+	2QH1b7JoRTektJI1jk2k44Fs+AbUbpNTMCaQ54baPCnNMEq3HY5DvaC7wkvfBeLOpQ2jw5uwn8S
+	NcFSqN9l3m5fKO6QFfFe6Bh53O2A=
+X-Gm-Gg: ASbGncuCpA0F/J9BrMU8HJ8bNd6OnbA719WxI93yI0nKcZlmJqEm3MuYMM9V1IBwKal
+	o7tHJ1QNUG4jqRRG7Cl8LaFkvg/Q++XhvgUfI0r6FOTQFxRX7sMl7
+X-Google-Smtp-Source: AGHT+IGfvSf6M09BR7JIfEFNdgUGqce6RjqixLfgBHLq9bhdbtl+V3VirJ8yDsw9FaoieXex25TM0s/LQYzvcbbzVys=
+X-Received: by 2002:a05:600c:34c1:b0:438:a432:7c44 with SMTP id
+ 5b1f17b1804b1-438a4327dadmr84043775e9.21.1737457657322; Tue, 21 Jan 2025
+ 03:07:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 2/2] riscv: Add tests for SBI FWFT
- extension
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Andrew Jones <ajones@ventanamicro.com>, Anup Patel
- <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
-References: <20250106155321.1109586-1-cleger@rivosinc.com>
- <20250106155321.1109586-3-cleger@rivosinc.com>
- <20250115-0e896f7efb3e6bc2af91afb4@orel>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20250115-0e896f7efb3e6bc2af91afb4@orel>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250117071423.469880-1-east.moutain.yang@gmail.com> <20250117084449.6cfd68b3.alex.williamson@redhat.com>
+In-Reply-To: <20250117084449.6cfd68b3.alex.williamson@redhat.com>
+From: Wencheng Yang <east.moutain.yang@gmail.com>
+Date: Tue, 21 Jan 2025 19:07:26 +0800
+X-Gm-Features: AbW1kvZ01xYCwDauLptJ25vIP6An_8SaX99fPIWpWTtZ1hVEn4fA8sNC_SMZJqM
+Message-ID: <CALrP2iW11zHNVWCz3JXjPHxyJ=j3FsVdTGetMoxQvmNZo2X_yQ@mail.gmail.com>
+Subject: Re: [PATCH v2] drviers/iommu/amd: support P2P access through IOMMU
+ when SME is enabled
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+> This needs to:
+>
+>  - Be split into separate IOMMU vs VFIO patches
+>  - Consider and consolidate with other IOMMU implementations of the same
 
+I will do that in the next patch.
 
-On 15/01/2025 13:58, Andrew Jones wrote:
-> On Mon, Jan 06, 2025 at 04:53:20PM +0100, Clément Léger wrote:
->> This commit add tests for a the FWFT SBI extension. Currently, only
-> 
-> s/This commit//
-> 
->> the reserved range as well as the misaligned exception delegation.
->>
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> ---
->>  riscv/Makefile      |   2 +-
->>  lib/riscv/asm/sbi.h |  31 +++++++++
->>  riscv/sbi-fwft.c    | 153 ++++++++++++++++++++++++++++++++++++++++++++
->>  riscv/sbi.c         |   3 +
->>  4 files changed, 188 insertions(+), 1 deletion(-)
->>  create mode 100644 riscv/sbi-fwft.c
->>
->> diff --git a/riscv/Makefile b/riscv/Makefile
->> index 5b5e157c..52718f3f 100644
->> --- a/riscv/Makefile
->> +++ b/riscv/Makefile
->> @@ -17,7 +17,7 @@ tests += $(TEST_DIR)/sieve.$(exe)
->>  
->>  all: $(tests)
->>  
->> -$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o
->> +$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o $(TEST_DIR)/sbi-fwft.o
->>  
->>  # When built for EFI sieve needs extra memory, run with e.g. '-m 256' on QEMU
->>  $(TEST_DIR)/sieve.$(exe): AUXFLAGS = 0x1
->> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
->> index 98a9b097..27e6fcdb 100644
->> --- a/lib/riscv/asm/sbi.h
->> +++ b/lib/riscv/asm/sbi.h
->> @@ -11,6 +11,9 @@
->>  #define SBI_ERR_ALREADY_AVAILABLE	-6
->>  #define SBI_ERR_ALREADY_STARTED		-7
->>  #define SBI_ERR_ALREADY_STOPPED		-8
->> +#define SBI_ERR_NO_SHMEM		-9
->> +#define SBI_ERR_INVALID_STATE		-10
->> +#define SBI_ERR_BAD_RANGE		-11
-> 
-> Need SBI_ERR_DENIED_LOCKED (and TIMEOUT and IO) too
+>  - Provide introspection to userspace relative to the availability of
+>    the resulting mapping option
+I don't get your meaning, can you expain in detail?
 
-Indeed, i'll add that.
+>
+> It's also not clear to me that the user should be responsible for
+> setting this flag versus something in the VFIO or IOMMU layer.  For
+> example what are the implications of the user setting this flag
+> incorrectly (not just failing to set it for MMIO, but using it for RAM)?
 
-> 
->>  
->>  #ifndef __ASSEMBLY__
->>  #include <cpumask.h>
->> @@ -23,6 +26,7 @@ enum sbi_ext_id {
->>  	SBI_EXT_SRST = 0x53525354,
->>  	SBI_EXT_DBCN = 0x4442434E,
->>  	SBI_EXT_SUSP = 0x53555350,
->> +	SBI_EXT_FWFT = 0x46574654,
->>  };
->>  
->>  enum sbi_ext_base_fid {
->> @@ -71,6 +75,33 @@ enum sbi_ext_dbcn_fid {
->>  	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
->>  };
->>  
->> +/* SBI function IDs for FW feature extension */
->> +#define SBI_EXT_FWFT_SET		0x0
->> +#define SBI_EXT_FWFT_GET		0x1
-> 
-> Use a _fid enum like the other extensions.
-> 
->> +
->> +enum sbi_fwft_feature_t {
-> 
-> Use defines for the following, like SSE does for its ranges.
-> 
->> +	SBI_FWFT_MISALIGNED_EXC_DELEG		= 0x0,
->> +	SBI_FWFT_LANDING_PAD			= 0x1,
->> +	SBI_FWFT_SHADOW_STACK			= 0x2,
->> +	SBI_FWFT_DOUBLE_TRAP			= 0x3,
->> +	SBI_FWFT_PTE_AD_HARDWARE_UPDATE		= 0x4,
-> 
-> SBI_FWFT_PTE_AD_HW_UPDATING
-> 
->> +	SBI_FWFT_POINTER_MASKING_PMLEN		= 0x5,
->> +	SBI_FWFT_LOCAL_RESERVED_START		= 0x6,
->> +	SBI_FWFT_LOCAL_RESERVED_END		= 0x3fffffff,
-> 
-> Do we need the reserved start/end? SSE doesn't define its reserved
-> ranges.
+If user sets this flag to RAM region, it has no effect on the platform
+that memory
+encrytion is disable. If memory encrytion is enabled, then device
+can't get correct
+data from RAM, for example, CPU writes data to RAM that is encrypted by
+memory controller, but device read the data from RAM as plaintext, but will
+never leak confidential data.
 
-As seen below, it is used for reserved range testing. You are right
-about SSE, that would be nice to test that as well.
+Thanks,
+Wencheng
 
-> 
->> +	SBI_FWFT_LOCAL_PLATFORM_START		= 0x40000000,
->> +	SBI_FWFT_LOCAL_PLATFORM_END		= 0x7fffffff,
->> +
->> +	SBI_FWFT_GLOBAL_RESERVED_START		= 0x80000000,
->> +	SBI_FWFT_GLOBAL_RESERVED_END		= 0xbfffffff,
-> 
-> Same reserved range question.
-> 
->> +	SBI_FWFT_GLOBAL_PLATFORM_START		= 0xc0000000,
->> +	SBI_FWFT_GLOBAL_PLATFORM_END		= 0xffffffff,
->> +};
->> +
->> +#define SBI_FWFT_PLATFORM_FEATURE_BIT		(1 << 30)
->> +#define SBI_FWFT_GLOBAL_FEATURE_BIT		(1 << 31)
->> +
->> +#define SBI_FWFT_SET_FLAG_LOCK			(1 << 0)
-> 
-> BIT() for the above defines
-> 
->> +
->>  struct sbiret {
->>  	long error;
->>  	long value;
->> diff --git a/riscv/sbi-fwft.c b/riscv/sbi-fwft.c
->> new file mode 100644
->> index 00000000..8a7f2070
->> --- /dev/null
->> +++ b/riscv/sbi-fwft.c
->> @@ -0,0 +1,153 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * SBI verification
->> + *
->> + * Copyright (C) 2024, Rivos Inc., Clément Léger <cleger@rivosinc.com>
->> + */
->> +#include <libcflat.h>
->> +#include <stdlib.h>
->> +
->> +#include <asm/csr.h>
->> +#include <asm/processor.h>
->> +#include <asm/ptrace.h>
->> +#include <asm/sbi.h>
->> +
->> +void check_fwft(void);
->> +
->> +static int fwft_set(unsigned long feature_id, unsigned long value,
-> 
-> returning an int is truncating sbiret.error
-> 
-> s/unsigned long feature_id/uint32_t feature/
-> 
->> +		       unsigned long flags)
->> +{
->> +	struct sbiret ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_SET,
->> +				      feature_id, value, flags, 0, 0, 0);
->> +
->> +	return ret.error;
->> +}
-> 
-> Probably need a fwft_set_raw() as well which takes an unsigned long for
-> feature in order to test feature IDs that set bits >= 32 and returns
-> an sbiret allowing sbiret.value to be checked.
-> 
->> +
->> +static int fwft_get(unsigned long feature_id, unsigned long *value)
-> 
-> returning an int is truncating sbiret.error
-> 
-> s/unsigned long feature_id/uint32_t feature/
-> 
->> +{
->> +	struct sbiret ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_GET,
->> +				      feature_id, 0, 0, 0, 0, 0);
->> +
->> +	*value = ret.value;
->> +
->> +	return ret.error;
-> 
-> Why not just return sbiret to return both value and error?
-> 
-> As a separate patch we should update struct sbiret to match the latest
-> spec which now has a union in it.
-> 
-> Same comment about needing a _raw version too.
+On Fri, Jan 17, 2025 at 9:45=E2=80=AFPM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> On Fri, 17 Jan 2025 15:14:18 +0800
+> Wencheng Yang <east.moutain.yang@gmail.com> wrote:
+>
+> > When SME is enabled, memory encryption bit is set in IOMMU page table
+> > pte entry, it works fine if the pfn of the pte entry is memory.
+> > However, if the pfn is MMIO address, for example, map other device's mm=
+io
+> > space to its io page table, in such situation, setting memory encryptio=
+n
+> > bit in pte would cause P2P failure.
+> >
+> > Clear memory encryption bit in io page table if the mapping is MMIO
+> > rather than memory.
+> >
+> > Signed-off-by: Wencheng Yang <east.moutain.yang@gmail.com>
+> > ---
+> >  drivers/iommu/amd/amd_iommu_types.h | 7 ++++---
+> >  drivers/iommu/amd/io_pgtable.c      | 2 ++
+> >  drivers/iommu/amd/io_pgtable_v2.c   | 5 ++++-
+> >  drivers/iommu/amd/iommu.c           | 2 ++
+> >  drivers/vfio/vfio_iommu_type1.c     | 4 +++-
+> >  include/uapi/linux/vfio.h           | 1 +
+> >  6 files changed, 16 insertions(+), 5 deletions(-)
+>
+> This needs to:
+>
+>  - Be split into separate IOMMU vs VFIO patches
+>  - Consider and consolidate with other IOMMU implementations of the same
+>  - Provide introspection to userspace relative to the availability of
+>    the resulting mapping option
+>
+> It's also not clear to me that the user should be responsible for
+> setting this flag versus something in the VFIO or IOMMU layer.  For
+> example what are the implications of the user setting this flag
+> incorrectly (not just failing to set it for MMIO, but using it for RAM)?
 
-Acked, I actually modified bith get/set to return an sbiret directly,
-that's easier to handle a unique return type in tests.
-
-> 
->> +}
->> +
->> +static void fwft_check_reserved(unsigned long id)
->> +{
->> +	int ret;
->> +	bool pass = true;
->> +	unsigned long value;
->> +
->> +	ret = fwft_get(id, &value);
->> +	if (ret != SBI_ERR_DENIED)
->> +		pass = false;
->> +
->> +	ret = fwft_set(id, 1, 0);
->> +	if (ret != SBI_ERR_DENIED)
->> +		pass = false;
->> +
->> +	report(pass, "get/set reserved feature 0x%lx error == SBI_ERR_DENIED", id);
-> 
-> The get and set should be split into two tests
-> 
->  struct sbiret ret;
->  ret = fwft_get(id);
->  report(ret.error == SBI_ERR_DENIED, ...);
->  ret = fwft_set(id, 1, 0);
->  report(ret.error == SBI_ERR_DENIED, ...);
-> 
->> +}
->> +
->> +static void fwft_check_denied(void)
->> +{
->> +	fwft_check_reserved(SBI_FWFT_LOCAL_RESERVED_START);
->> +	fwft_check_reserved(SBI_FWFT_LOCAL_RESERVED_END);
->> +	fwft_check_reserved(SBI_FWFT_GLOBAL_RESERVED_START);
->> +	fwft_check_reserved(SBI_FWFT_GLOBAL_RESERVED_END);
-> 
-> I see why we have the reserved ranges defined now. Shouldn't we also have
-> tests like these for SSE, which means we should define the reserved ranges
-> for it too?
-
-Yes, that should be tested in SSE as well.
-
-> 
->> +}
->> +
->> +static bool misaligned_handled;
->> +
->> +static void misaligned_handler(struct pt_regs *regs)
->> +{
->> +	misaligned_handled = true;
->> +	regs->epc += 4;
->> +}
->> +
->> +static void fwft_check_misaligned(void)
->> +{
->> +	int ret;
->> +	unsigned long value;
->> +
->> +	report_prefix_push("misaligned_deleg");
-> 
-> "misaligned_exc_deleg"
-> 
->> +
->> +	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
->> +	if (ret == SBI_ERR_NOT_SUPPORTED) {
->> +		report_skip("SBI_FWFT_MISALIGNED_EXC_DELEG is not supported");
->> +		return;
->> +	}
->> +	report(!ret, "Get misaligned deleg feature no error");
-> 
-> Should output the error too
-> 
->> +	if (ret)
->> +		return;
->> +
->> +	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 2, 0);
->> +	report(ret == SBI_ERR_INVALID_PARAM, "Set misaligned deleg feature invalid value error");
->> +	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 0xFFFFFFFF, 0);
->> +	report(ret == SBI_ERR_INVALID_PARAM, "Set misaligned deleg feature invalid value error");
-> 
-> Something like
-> 
->      if (__riscv_xlen > 32) {
->         ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, (1ul << 32), 0);
->         report(ret == SBI_ERR_INVALID_PARAM
->      }
-> 
-> would be a good test too (and also for the flags parameter)
-> 
-
-Acked I'll add that.
-
->> +
->> +	/* Set to 0 and check after with get */
->> +	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 0, 0);
->> +	report(!ret, "Set misaligned deleg feature value no error");
->> +	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
->> +	if (ret)
->> +		report_fail("Get misaligned deleg feature after set");
->> +	else
->> +		report(value == 0, "Set misaligned deleg feature value 0");
->> +
->> +	/* Set to 1 and check after with get */
->> +	ret = fwft_set(SBI_FWFT_MISALIGNED_EXC_DELEG, 1, 0);
->> +	report(!ret, "Set misaligned deleg feature value no error");
->> +	ret = fwft_get(SBI_FWFT_MISALIGNED_EXC_DELEG, &value);
->> +	if (ret)
->> +		report_fail("Get misaligned deleg feature after set");
->> +	else
->> +		report(value == 1, "Set misaligned deleg feature value 1");
->> +
->> +	install_exception_handler(EXC_LOAD_MISALIGNED, misaligned_handler);
->> +
->> +	asm volatile (
->> +		".option norvc\n"
-> 
-> We also need push/pop otherwise from here on out we stop using compression
-> instructions.
-
-Yeah, nice catch, I'll add push/pop.
-
-> 
->> +		"lw %[val], 1(%[val_addr])"
->> +		: [val] "+r" (value)
->> +		: [val_addr] "r" (&value)
->> +		: "memory");
->> +
->> +	if (!misaligned_handled)
->> +		report_skip("Verify misaligned load exception trap in supervisor");
-> 
-> Why is this report_skip()? Shouldn't we just do
-> 
->   report(misaligned_handled, ...)
-
-Some platforms might actually allow you to delegate the misaligned
-access trap but handle scalar misaligned accesses in hardware but trap
-on vector misaligned. To be "more" complete, I should add vector testing
-but I haven't had time to check vector instructions.
-
-> 
->> +	else
->> +		report_pass("Verify misaligned load exception trap in supervisor");
->> +
->> +	install_exception_handler(EXC_LOAD_MISALIGNED, NULL);
->> +
->> +	report_prefix_pop();
->> +}
->> +
->> +void check_fwft(void)
->> +{
->> +	struct sbiret ret;
->> +
->> +	report_prefix_push("fwft");
->> +
->> +	if (!sbi_probe(SBI_EXT_FWFT)) {
->> +		report_skip("FWFT extension not available");
->> +		report_prefix_pop();
->> +		return;
->> +	}
->> +
->> +	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_PROBE_EXT, SBI_EXT_FWFT, 0, 0, 0, 0, 0);
->> +	report(!ret.error, "FWFT extension probing no error");
->> +	if (ret.error)
->> +		goto done;
->> +
->> +	if (ret.value == 0) {
->> +		report_skip("FWFT extension is not present");
->> +		goto done;
->> +	}
-> 
-> The above "raw" probing looks like it should have been removed when
-> the sbi_probe() call was added.
-
-Oups yes, that should have been removed.
-
-> 
->> +
->> +	fwft_check_denied();
->> +	fwft_check_misaligned();
->> +done:
->> +	report_prefix_pop();
->> +}
->> diff --git a/riscv/sbi.c b/riscv/sbi.c
->> index 6f4ddaf1..8600e38e 100644
->> --- a/riscv/sbi.c
->> +++ b/riscv/sbi.c
->> @@ -32,6 +32,8 @@
->>  
->>  #define	HIGH_ADDR_BOUNDARY	((phys_addr_t)1 << 32)
->>  
->> +void check_fwft(void);
->> +
->>  static long __labs(long a)
->>  {
->>  	return __builtin_labs(a);
->> @@ -1451,6 +1453,7 @@ int main(int argc, char **argv)
->>  	check_hsm();
->>  	check_dbcn();
->>  	check_susp();
->> +	check_fwft();
->>  
->>  	return report_summary();
->>  }
->> -- 
->> 2.47.1
->>
-> 
-> Nice start to the FWFT tests. After this is merged I'll add tests for
-> PTE_AD_HW_UPDATING. We also should get LOCK and local/global tests in
-> sooner than later.
-
-Acked, I'll add LOCK testing for misaligned as well.
-
-Thanks for the review,
-
-Clément
-
-> 
 > Thanks,
-> drew
-
+>
+> Alex
+>
+> >
+> > diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/am=
+d_iommu_types.h
+> > index fdb0357e0bb9..b0f055200cf3 100644
+> > --- a/drivers/iommu/amd/amd_iommu_types.h
+> > +++ b/drivers/iommu/amd/amd_iommu_types.h
+> > @@ -434,9 +434,10 @@
+> >  #define IOMMU_PTE_PAGE(pte) (iommu_phys_to_virt((pte) & IOMMU_PAGE_MAS=
+K))
+> >  #define IOMMU_PTE_MODE(pte) (((pte) >> 9) & 0x07)
+> >
+> > -#define IOMMU_PROT_MASK 0x03
+> > -#define IOMMU_PROT_IR 0x01
+> > -#define IOMMU_PROT_IW 0x02
+> > +#define IOMMU_PROT_MASK 0x07
+> > +#define IOMMU_PROT_IR   0x01
+> > +#define IOMMU_PROT_IW   0x02
+> > +#define IOMMU_PROT_MMIO 0x04
+> >
+> >  #define IOMMU_UNITY_MAP_FLAG_EXCL_RANGE      (1 << 2)
+> >
+> > diff --git a/drivers/iommu/amd/io_pgtable.c b/drivers/iommu/amd/io_pgta=
+ble.c
+> > index f3399087859f..dff887958a56 100644
+> > --- a/drivers/iommu/amd/io_pgtable.c
+> > +++ b/drivers/iommu/amd/io_pgtable.c
+> > @@ -373,6 +373,8 @@ static int iommu_v1_map_pages(struct io_pgtable_ops=
+ *ops, unsigned long iova,
+> >                       __pte |=3D IOMMU_PTE_IR;
+> >               if (prot & IOMMU_PROT_IW)
+> >                       __pte |=3D IOMMU_PTE_IW;
+> > +             if (prot & IOMMU_PROT_MMIO)
+> > +                     __pte =3D __sme_clr(__pte);
+> >
+> >               for (i =3D 0; i < count; ++i)
+> >                       pte[i] =3D __pte;
+> > diff --git a/drivers/iommu/amd/io_pgtable_v2.c b/drivers/iommu/amd/io_p=
+gtable_v2.c
+> > index c616de2c5926..55f969727dea 100644
+> > --- a/drivers/iommu/amd/io_pgtable_v2.c
+> > +++ b/drivers/iommu/amd/io_pgtable_v2.c
+> > @@ -65,7 +65,10 @@ static u64 set_pte_attr(u64 paddr, u64 pg_size, int =
+prot)
+> >  {
+> >       u64 pte;
+> >
+> > -     pte =3D __sme_set(paddr & PM_ADDR_MASK);
+> > +     pte =3D paddr & PM_ADDR_MASK;
+> > +     if (!(prot & IOMMU_PROT_MMIO))
+> > +             pte =3D __sme_set(pte);
+> > +
+> >       pte |=3D IOMMU_PAGE_PRESENT | IOMMU_PAGE_USER;
+> >       pte |=3D IOMMU_PAGE_ACCESS | IOMMU_PAGE_DIRTY;
+> >
+> > diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
+> > index 16f40b8000d7..9194ad681504 100644
+> > --- a/drivers/iommu/amd/iommu.c
+> > +++ b/drivers/iommu/amd/iommu.c
+> > @@ -2578,6 +2578,8 @@ static int amd_iommu_map_pages(struct iommu_domai=
+n *dom, unsigned long iova,
+> >               prot |=3D IOMMU_PROT_IR;
+> >       if (iommu_prot & IOMMU_WRITE)
+> >               prot |=3D IOMMU_PROT_IW;
+> > +     if (iommu_prot & IOMMU_MMIO)
+> > +             prot |=3D IOMMU_PROT_MMIO;
+> >
+> >       if (ops->map_pages) {
+> >               ret =3D ops->map_pages(ops, iova, paddr, pgsize,
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_=
+type1.c
+> > index 50ebc9593c9d..08be1ef8514b 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -1557,6 +1557,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iom=
+mu,
+> >               prot |=3D IOMMU_WRITE;
+> >       if (map->flags & VFIO_DMA_MAP_FLAG_READ)
+> >               prot |=3D IOMMU_READ;
+> > +    if (map->flags & VFIO_DMA_MAP_FLAG_MMIO)
+> > +        prot |=3D IOMMU_MMIO;
+> >
+> >       if ((prot && set_vaddr) || (!prot && !set_vaddr))
+> >               return -EINVAL;
+> > @@ -2801,7 +2803,7 @@ static int vfio_iommu_type1_map_dma(struct vfio_i=
+ommu *iommu,
+> >       struct vfio_iommu_type1_dma_map map;
+> >       unsigned long minsz;
+> >       uint32_t mask =3D VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRIT=
+E |
+> > -                     VFIO_DMA_MAP_FLAG_VADDR;
+> > +                     VFIO_DMA_MAP_FLAG_VADDR | VFIO_DMA_MAP_FLAG_MMIO;
+> >
+> >       minsz =3D offsetofend(struct vfio_iommu_type1_dma_map, size);
+> >
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index c8dbf8219c4f..68002c8f1157 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -1560,6 +1560,7 @@ struct vfio_iommu_type1_dma_map {
+> >  #define VFIO_DMA_MAP_FLAG_READ (1 << 0)              /* readable from =
+device */
+> >  #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)     /* writable from device *=
+/
+> >  #define VFIO_DMA_MAP_FLAG_VADDR (1 << 2)
+> > +#define VFIO_DMA_MAP_FLAG_MMIO (1 << 3)     /* map of mmio */
+> >       __u64   vaddr;                          /* Process virtual addres=
+s */
+> >       __u64   iova;                           /* IO virtual address */
+> >       __u64   size;                           /* Size of mapping (bytes=
+) */
+>
 
