@@ -1,242 +1,194 @@
-Return-Path: <kvm+bounces-36182-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36183-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49998A18610
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 21:22:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 548EBA18612
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 21:22:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EC6D3AC396
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 20:21:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E903C188B2E4
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 20:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5061F7071;
-	Tue, 21 Jan 2025 20:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A9F1F76AF;
+	Tue, 21 Jan 2025 20:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="inKIVjfK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dHZ1QRxk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001D94594A
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 20:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11AA44594A
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 20:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737490919; cv=none; b=tTHDDZ06q0HGBxL+19SPrF6xnkWfPLnSBMbsArKhfLgc3UR60pmtb0NEZtHJkHN++tNOcUCtbajSBVqgYkIrVKgr8JQZPZFYGAFICJDFkI8ValyB4qK+0pE0u9YrP1fYX0Y7YQMzkdhIOc06w50nhOQYADH5OavI6IWmZBv/6aQ=
+	t=1737490943; cv=none; b=EXV2JjEqvfrKi8nQ0pBPW/yGCCEaG/gvyz7GspZjCwTKknh3X+X8GiSI07xbYN9TWYSJCPJJbNBzzwzIWdHs/L+n66oGVfteh5UPikW/JKPLYLlR6x4n3ngi2NDQd+clSDvUMoPcY0DRQgeky66haDOreaBzs5gUWIn0YvgLAlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737490919; c=relaxed/simple;
-	bh=wwhBJrieHVQ9hn8Ti3aCGQKSKhy/3rKh10YhOEOsrEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p5Q24MA5Hh5JyMwibpMY68U9DB/xTdEQEteeFOXpg97HANEy0/OHsD3aHYGWFgFvmHK3lj65sJkx5UiMplRAG+AZM/Mg+7au+YjpNiXxIs4agN0+HCAo+MQ8o4X792IVsa/y1TxcIiMqKPmXP626D2rqOgsnVI6CXcveKIQ+sWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=inKIVjfK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737490915;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mt99Q6PTtiVRyEYeMJowEAmD8Ow8/OY0SKvysNI4H7s=;
-	b=inKIVjfKdymgmZYkd0h48BVw15meCsXAWvgDAZYRNKXs2aVmZ5eHnW461VmNcGhr5ZprhO
-	/GtG6jn9HF2RlD5zp8ns5iHZjo2DJnGklwTdcANnmRPAoPrlPRHBLpX5UBizZVEELV5bon
-	C45pp2C/1+nCkd8dzitLIXszjYg4QdQ=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-5cpbMIZlPwGnXeAsvGuM1g-1; Tue, 21 Jan 2025 15:21:53 -0500
-X-MC-Unique: 5cpbMIZlPwGnXeAsvGuM1g-1
-X-Mimecast-MFC-AGG-ID: 5cpbMIZlPwGnXeAsvGuM1g
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-46796f4d7c8so103629171cf.3
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 12:21:53 -0800 (PST)
+	s=arc-20240116; t=1737490943; c=relaxed/simple;
+	bh=sfsa44dx/GiptBaBDheJxLaUrkCXXBtCxm8xhPPGxgs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UKBtN/s5deKSne31xA+js5+Bam8X9al5u8+iLH2bOWUPmbCqvt/1hw3O4FBqC51fvvMAtmMoDjrGcke7Vgu4XKCAg9+ZYkd6iNGyHCfKxkfOvSVWc7azWkmWb6EcP2hnySqIIiAXyt0Z94sy5FXvUCuA7qBm8hWMDTNKglLAmWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dHZ1QRxk; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9864e006so16731844a91.2
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 12:22:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737490941; x=1738095741; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2osgii321xHdpLF27fV8JrRroiYrHnwk/f4sg35AhRk=;
+        b=dHZ1QRxkzo7aOvqT+5JqEp1EzO3S5rq+BvsEqyzAoBYQ0J7jGnVYprZeEufyD6KFQv
+         71db7toqHeJxF3gSeApPs4yHubfcWFcvPiWTQNUnPXMH6czH+9TFVBADBUqEwVt/R4p5
+         /vprAE6nM1heFt6fEFE6Y6bLhbn4IPkeYQzmRFVHv5jIOlEqr6ap0ffiiMqRws6we9uM
+         N6ZP1zA6ZVvtetjaNw25GG7zkvdljXRgNCvfmGmK5n881NcQiJyv20t5EoAMz0SBajDE
+         dC+yP709ycENfl5goBg4AqkJJz1OIOdhCdLfNqet16KYQPrHEWfXeQ69tYMDJr7ryGOi
+         p/hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737490913; x=1738095713;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mt99Q6PTtiVRyEYeMJowEAmD8Ow8/OY0SKvysNI4H7s=;
-        b=BgG8sNUTHyPHFXDDsnM7Io0tsilz75/8hEx2/zB/JtcCMfgZ28dM+Jv7/gsNH7LywC
-         IZMEy7Oxi8cIFF+yRfA23yTIpuEzAKlhFt1y2U++PT9zBvrO1SMZ4JYRrYFhBQvVWcaH
-         O5LQFIYJ7/9PUCnhpnQYPYtcrVVUBkOsUaaUuqc9lmCdKuLcWuDH1Tmzob+msNQMCXVy
-         insZ3xGvgXNr7ERF6Fz4U2e+aWeFY1VrAhf0uL+A4NGQCnkUFwGredynsv4rEtrZRWRk
-         Vp6vKRLH3v24/n8grCe9hkF7570VUeTRe9ESe8oYIemYopRr/qyje9hN1BldYw6JICx1
-         RIPA==
-X-Forwarded-Encrypted: i=1; AJvYcCUeZc5u5NwftGfFUJm22aK5rR7meLdAMygP2zLyhLpHg0qhb79zqEDlkhruBpE6N+hLVak=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsenUPf2iXm83j87oCajj0XrLol1Aj4IOqsFWpW1hnn8iOiHlR
-	TonXVNJq2yhL4c1rlqJafSNwE8T4Zjkn4s0cDCt1ymqP0f+duKILbKy7X4dmbnzZ/Yrj2HyIJge
-	L0Ymj3TzQ0EIAnzVorKGrjzuBLvuBiWsLdwntr2utga/J+MfO0g==
-X-Gm-Gg: ASbGnct2QYtfabLhzvHFOTuyll/lCwf2bRErFubwvLZlbSSSwNvw2N74B2FIEuHHTi2
-	AEEe06OtFoXwjjHwafUKPrp2J13TWnK9iBl+7eOM2fkR1IubS3ziDOcm+8W3mL88KKibW2/bicD
-	dR+FZ9VrhA4gHVgaPoxBjT8I4zpO6V4221BGgVBg2SUjunyTUPlXqzbJyqHvwpoErBV2CjaQ6Zr
-	3HBn55kDr6a+jRu6iCYCmtuOU1hUFhp2fp70iroeEuPrBxW4Lo197ZBbaSbaDiCvNKpkfaXQhLF
-	80mKBUOUuUDUh3yHwtWoTRTDOBT2S2g=
-X-Received: by 2002:a05:622a:1116:b0:467:59f6:3e56 with SMTP id d75a77b69052e-46e12b56ef7mr286167171cf.36.1737490913036;
-        Tue, 21 Jan 2025 12:21:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHhKqh/niV03ikVCafvYgoRQT21WqQAnCgYjazIyuuJxjrOz+2e+gwnsOhhs8U6ygSh0qOixw==
-X-Received: by 2002:a05:622a:1116:b0:467:59f6:3e56 with SMTP id d75a77b69052e-46e12b56ef7mr286166701cf.36.1737490912642;
-        Tue, 21 Jan 2025 12:21:52 -0800 (PST)
-Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e102eeafcsm56434351cf.16.2025.01.21.12.21.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 12:21:51 -0800 (PST)
-Date: Tue, 21 Jan 2025 15:21:49 -0500
-From: Peter Xu <peterx@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Pankaj Gupta <pankaj.gupta@amd.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>,
-	Isaku Yamahata <isaku.yamahata@linux.intel.com>
-Subject: Re: [PATCH v3 07/49] HostMem: Add mechanism to opt in kvm guest
- memfd via MachineState
-Message-ID: <Z5AB3SlwRYo19dOa@x1n>
-References: <20240320083945.991426-1-michael.roth@amd.com>
- <20240320083945.991426-8-michael.roth@amd.com>
- <Z4_b3Lrpbnyzyros@x1n>
- <fa29f4ef-f67d-44d7-93f0-753437cf12cb@redhat.com>
+        d=1e100.net; s=20230601; t=1737490941; x=1738095741;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2osgii321xHdpLF27fV8JrRroiYrHnwk/f4sg35AhRk=;
+        b=f8pjdCM7+g2SsGh5AHtxY99wcNN4JSEsEFgmOvk7MyawLlV+Fy/KJM8zRQoVoSncep
+         16H/kd7UibAuMi8XIMPIencMhbgCUgMWcQDEKWzqcrRBUdCIK8dR5aVI5c9pCUycxIeV
+         EwCWChefJfZVGR2jPvJkfKSCW5U2HeMqDTrxCcZz/zJUJNhMewNs4kDWLrAHtUZ8L6rn
+         RgxtJKX1mQc+TFqd3skZkr2umbVco3es+3WyL8fNXXdVvYtF/ibYh21cN7tO6cqj9IFU
+         slHj0dEem6bzfup4ZpVXWPOPnbUTHTlPUeHtT5BG/WAoF6eqIQP631LBvxl3gnWMrb/3
+         hj/w==
+X-Forwarded-Encrypted: i=1; AJvYcCU9BgJhRG9wq15ZNWqFQ7kOPQjj8dMKScu/ayc4EG+ePSWOXosTS7QBa4VFDxkdXzr7G34=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHSbAfUNnuyEFz6KZrr4aXRdH2A6k4hoNDQFv6PC80u4IM+CnS
+	jH4PrRoEAiltsuUZYAiJrPftkLPFgzasZQmJwiLVBDT8BSRYt1/khwJjMyQ5SffqykoS68JPsRb
+	9OQ==
+X-Google-Smtp-Source: AGHT+IGOO1hQm82zN2yLyHv2/gNy5MzjEdUJWiR6aEsp7kYlEQk+WqNPkZqP5BDJYL9539mV7ehRamkJ6+E=
+X-Received: from pfxa2.prod.google.com ([2002:a05:6a00:1d02:b0:72d:afb3:3a2b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:8c6:b0:725:4615:a778
+ with SMTP id d2e1a72fcca58-72dafa015e7mr27416427b3a.7.1737490941329; Tue, 21
+ Jan 2025 12:22:21 -0800 (PST)
+Date: Tue, 21 Jan 2025 12:22:19 -0800
+In-Reply-To: <CABCjUKDDDhXx8mSRKHCa34JjSX1nfM5WMG-UrPu9fjei6gkUJA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <fa29f4ef-f67d-44d7-93f0-753437cf12cb@redhat.com>
+Mime-Version: 1.0
+References: <20250107042202.2554063-1-suleiman@google.com> <20250107042202.2554063-2-suleiman@google.com>
+ <Z4gtb-Z2GpbEkAsQ@google.com> <CABCjUKDU4b5QodgT=tSgrV-fb_qnksmSxhMK3gNrUGsT9xeitg@mail.gmail.com>
+ <Z4qK4B6taSoZTJMp@google.com> <CABCjUKDDDhXx8mSRKHCa34JjSX1nfM5WMG-UrPu9fjei6gkUJA@mail.gmail.com>
+Message-ID: <Z5AB-6bLRNLle27G@google.com>
+Subject: Re: [PATCH v3 1/3] kvm: Introduce kvm_total_suspend_ns().
+From: Sean Christopherson <seanjc@google.com>
+To: Suleiman Souhlal <suleiman@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
+	David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ssouhlal@freebsd.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 21, 2025 at 07:24:29PM +0100, David Hildenbrand wrote:
-> On 21.01.25 18:39, Peter Xu wrote:
-> > On Wed, Mar 20, 2024 at 03:39:03AM -0500, Michael Roth wrote:
-> > > From: Xiaoyao Li <xiaoyao.li@intel.com>
-> > > 
-> > > Add a new member "guest_memfd" to memory backends. When it's set
-> > > to true, it enables RAM_GUEST_MEMFD in ram_flags, thus private kvm
-> > > guest_memfd will be allocated during RAMBlock allocation.
-> > > 
-> > > Memory backend's @guest_memfd is wired with @require_guest_memfd
-> > > field of MachineState. It avoid looking up the machine in phymem.c.
-> > > 
-> > > MachineState::require_guest_memfd is supposed to be set by any VMs
-> > > that requires KVM guest memfd as private memory, e.g., TDX VM.
-> > > 
-> > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > > ---
-> > > Changes in v4:
-> > >   - rename "require_guest_memfd" to "guest_memfd" in struct
-> > >     HostMemoryBackend;	(David Hildenbrand)
-> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > > ---
-> > >   backends/hostmem-file.c  | 1 +
-> > >   backends/hostmem-memfd.c | 1 +
-> > >   backends/hostmem-ram.c   | 1 +
-> > >   backends/hostmem.c       | 1 +
-> > >   hw/core/machine.c        | 5 +++++
-> > >   include/hw/boards.h      | 2 ++
-> > >   include/sysemu/hostmem.h | 1 +
-> > >   7 files changed, 12 insertions(+)
-> > > 
-> > > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> > > index ac3e433cbd..3c69db7946 100644
-> > > --- a/backends/hostmem-file.c
-> > > +++ b/backends/hostmem-file.c
-> > > @@ -85,6 +85,7 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-> > >       ram_flags |= fb->readonly ? RAM_READONLY_FD : 0;
-> > >       ram_flags |= fb->rom == ON_OFF_AUTO_ON ? RAM_READONLY : 0;
-> > >       ram_flags |= backend->reserve ? 0 : RAM_NORESERVE;
-> > > +    ram_flags |= backend->guest_memfd ? RAM_GUEST_MEMFD : 0;
-> > >       ram_flags |= fb->is_pmem ? RAM_PMEM : 0;
-> > >       ram_flags |= RAM_NAMED_FILE;
-> > >       return memory_region_init_ram_from_file(&backend->mr, OBJECT(backend), name,
-> > > diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-> > > index 3923ea9364..745ead0034 100644
-> > > --- a/backends/hostmem-memfd.c
-> > > +++ b/backends/hostmem-memfd.c
-> > > @@ -55,6 +55,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-> > >       name = host_memory_backend_get_name(backend);
-> > >       ram_flags = backend->share ? RAM_SHARED : 0;
-> > >       ram_flags |= backend->reserve ? 0 : RAM_NORESERVE;
-> > > +    ram_flags |= backend->guest_memfd ? RAM_GUEST_MEMFD : 0;
-> > >       return memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend), name,
-> > >                                             backend->size, ram_flags, fd, 0, errp);
-> > >   }
-> > > diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
-> > > index d121249f0f..f7d81af783 100644
-> > > --- a/backends/hostmem-ram.c
-> > > +++ b/backends/hostmem-ram.c
-> > > @@ -30,6 +30,7 @@ ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-> > >       name = host_memory_backend_get_name(backend);
-> > >       ram_flags = backend->share ? RAM_SHARED : 0;
-> > >       ram_flags |= backend->reserve ? 0 : RAM_NORESERVE;
-> > > +    ram_flags |= backend->guest_memfd ? RAM_GUEST_MEMFD : 0;
-> > >       return memory_region_init_ram_flags_nomigrate(&backend->mr, OBJECT(backend),
-> > >                                                     name, backend->size,
-> > >                                                     ram_flags, errp);
-> > 
-> > These change look a bit confusing to me, as I don't see how gmemfd can be
-> > used with either file or ram typed memory backends..
-> 
-> I recall that the following should work:
-> 
-> "private" memory will come from guest_memfd, "shared" (as in, accessible by
-> the host) will come from anonymous memory.
-> 
-> This "anon" memory cannot be "shared" with other processes, but
-> virtio-kernel etc. can just use it.
-> 
-> To "share" the memory with other processes, we'd need memfd/file.
+On Tue, Jan 21, 2025, Suleiman Souhlal wrote:
+> On Sat, Jan 18, 2025 at 1:52=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > In short, AFAICT the issues you are observing are mostly a problem with=
+ kvmclock.
+> > Or maybe it's the other way around and effectively freezing guest TSC i=
+s super
+> > problematic and fundamentally flawed.
+> >
+> > Regardless of which one is "broken", unconditionally accounting suspend=
+ time to
+> > steal_time will do the wrong thing when sched_clock=3Dtsc.  To further =
+muddy the
+> > waters, current Linux-as-a-guest on modern hardware will likely use clo=
+cksource=3Dtsc,
+> > but sched_clock=3Dkvmclock.  In that scenario, guest time doesn't advan=
+ced, but
+> > guest scheduler time does.  Ugh.
+> >
+> > That particular wart can be avoided by having the guest use TSC for sch=
+ed_clock[*],
+> > e.g. so that at least the behavior of time is consistent.
+> >
+> > Hmm, if freezing guest time across suspend is indeed problematic, one t=
+hought
+> > would be to put the onus on the VMM/user to not advertise a "nonstop TS=
+C" if the
+> > host may be suspending.  The Linux-as-a-guest would prefer kvmclock ove=
+r TSC for
+> > both clocksource and sched_clock.
+> >
+> > [*] https://lore.kernel.org/all/Z4gqlbumOFPF_rxd@google.com
+>=20
+> I see what you're saying. Thanks for explaining.
+>=20
+> To complicate things further there are also different kinds of
+> suspends. From what I've seen "shallow" (and/or "suspend-to-idle")
+> suspends don't stop the CPU, at least on our machines, so the host TSC
+> keeps ticking. On "deep" suspends, on the other hand, the TSC might go
+> backwards.
 
-Ah OK, thanks David.  Is this the planned long term solution for
-vhost-kernel?
+Yeah, only S3 and lower will power down the CPU.  All bets are off if the C=
+PU
+doesn't have a nonstop TSC, but that's not at all unique to suspend, e.g. i=
+t's a
+problem if the CPU goes idle, and so I think it's safe to only worry about =
+CPUs
+with nonstop TSC.
 
-I wonder what happens if vhost tries to DMA to a region that is private
-with this setup.
+> But I suppose if the guest uses kvmclock the behavior should be the
+> same in either case.
+>=20
+> At least for our use case we would definitely want guest *wall* time
+> to keep advancing, so we would still want to use kvmclock.
+>=20
+> Would accounting the suspend duration in steal time be acceptable if
+> it was conditional on the guest using kvmclock?
+> We would need a way for the host to be notified that the guest is
+> indeed using it,
 
-AFAIU, it'll try to DMA to the fake address of ramblock->host that is
-pointing to by the memory backend (either anon, shmem, file, etc.).  The
-ideal case IIUC is it should crash QEMU because it's trying to access an
-illegal page which is private. But if with this model, it won't crash but
-silently populate some page in the non-gmemfd backend.
+And not just using kvmclock, but specifically using for sched_clock.  E.g. =
+the
+current behavior for most Linux guests on modern hardware is that they'll u=
+se TSC
+for clocksource, but kvmclock for sched_clock and wall clock.
 
-Is that expected?
+> possibly by adding a new MSR to be written to in
+> kvm_cs_enable().
 
-> 
-> > 
-> > When specified gmemfd=on with those, IIUC it'll allocate both the memory
-> > (ramblock->host) and gmemfd, but without using ->host.  Meanwhile AFAIU the
-> > ramblock->host will start to conflict with gmemfd in the future when it
-> > might be able to be mapp-able (having valid ->host).
-> 
-> These will require a new guest_memfd memory backend (I recall that was
-> discussed a couple of times).
+I don't think that's a good way forward.  I expect kvmclock to be largely
+deprecated (guest side) in favor of raw TSC (with hardware-provided scale+o=
+ffset),
+at which point tying this to kvmclock puts us back at square one.
 
-Do you know if anyone is working on this one?
+Given that s2idle and standby don't reset host TSC, I think the right way t=
+o
+handle this conundrum is to address the flaw that's noted in the "backwards=
+ TSC"
+logic, and adjust guest TSC to be fully up-to-date in the S3 (or lower) cas=
+e.
 
-> 
-> > 
-> > I have a local fix for this (and actually more than below.. but starting
-> > from it), I'm not sure whether I overlooked something, but from reading the
-> > cover letter it's only using memfd backend which makes perfect sense to me
-> > so far.
-> 
-> Does the anon+guest_memfd combination not work or are you speculating about
-> the usability (which I hopefully addressed above).
+	 * ......................................  Unfortunately, we can't
+	 * bring the TSCs fully up to date with real time, as we aren't yet far
+	 * enough into CPU bringup that we know how much real time has actually
+	 * elapsed; our helper function, ktime_get_boottime_ns() will be using boo=
+t
+	 * variables that haven't been updated yet.
 
-IIUC, if with above solution and with how QEMU interacts memory convertions
-right now, at least hugetlb pages will suffer from double allocation, as
-kvm_convert_memory() won't free hugetlb pages even if converted to private.
+I have no idea why commit 0dd6a6edb012 ("KVM: Dont mark TSC unstable due to=
+ S4
+suspend") hooked kvm_arch_enable_virtualization_cpu() instead of implementi=
+ng a
+PM notifier, but I don't see anything that suggests it was deliberate, i.e.=
+ that
+KVm *needs* to effectively snapshot guest TSC when onlining CPUs.
 
-It sounds like also doable (and also preferrable..) that for each of the VM
-we always stich with pages in the gmemfd page cache, no matter if it's
-shared or private.  For private, we could zap all pgtables and sigbus any
-faults afterwards.  I thought that was always the plan, but I could lose
-many latest informations..
-
-Thanks,
-
--- 
-Peter Xu
-
+If that wart is fixed, then both kvmclock and TSC will account host suspend=
+ time,
+and KVM can safely account the suspend time into steal time regardless of w=
+hich
+clock(s) the guest is using.
 
