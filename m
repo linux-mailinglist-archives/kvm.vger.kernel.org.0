@@ -1,141 +1,122 @@
-Return-Path: <kvm+bounces-36186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26FE8A1863F
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 21:48:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5E2A1864A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 21:57:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F387A1664AB
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 20:48:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0109D3A7F41
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 20:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5EA1F8671;
-	Tue, 21 Jan 2025 20:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A20F1F7912;
+	Tue, 21 Jan 2025 20:56:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="PK9ALH2C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kHPndlNE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805B71F63CD
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 20:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF2C1F540D
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 20:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737492483; cv=none; b=Ehh/BKqNXD1hN7vx6CZez7cnyw/nvGTBku3UERXkhD7iEw/2lFFbNcKZfDwJw9z4kxORIy1zPnHjyUT7/jnWE/Ebw1KCzj6KHliZ9XYumYY0HfWRYIkBTXV47eOPJRc5tkoG9YpZtcmmY1I7kFYv2sUZsaU/8GTT6voLjT7+5II=
+	t=1737493017; cv=none; b=hlJFP7eY94GaBEkdHjYyJt36G5xn4w97nA4uoQUTC//+/X1TxpYnZP6grqoz1zSJN64Li2h1KYkfJ3edRX2oz0Q9F18JTQQTrjzkm8M+l0VZ6i6uX+JFAzmo3EwUCPpxdBMNSMMtaLTEAlHPBn8q6YGsmqgdWVpnd8AG+JfLC+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737492483; c=relaxed/simple;
-	bh=g6gsRKJh7V7n8xwdh+JPKCk0Lq/C+rb/lPQNDYRoAx0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZmEcN7DZKLOdn9U/TKauhLBzlbAsCbdHuzYajb/wZY/c8A9VFfvAV/uVW2LCZCKsX7D2c+g3aHKxlP+vwpMEETqp0gVUeTIw/3cT9AgLAZM1D5Z+R7bDE0ewh8h/RPzWoBzuq3fXBY8RYBXfW9vuMjbiwdO9ef2bufeYH/5RVR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=PK9ALH2C; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6e1a41935c3so84927406d6.3
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 12:48:01 -0800 (PST)
+	s=arc-20240116; t=1737493017; c=relaxed/simple;
+	bh=oUeI4xqiwKehrm14csxiidLnNyGQ54ADBOT0ioMFNH0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tq7/84+5tRZ0BXLwD4a5xym9CDeYAWrxO5O+2JhNZ9Aowgc7bPGmbdHGan2Qm/eI2YQs7wv+ZgrVNLue1RDSaHmT44q6hhDiKaQCpYnImucfcMEydzAqsukljB2MKm9W5ZflcFVnSTWUB4kRS9SIVaGJAfdIIGauy4y3AtDHAYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kHPndlNE; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21631cbf87dso115660855ad.3
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 12:56:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1737492480; x=1738097280; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ow8OnSOBUAvF1sR6NsRcQ1mD4Budky7KnwU2LvfpPWA=;
-        b=PK9ALH2CTpxIquPHRrKlIFzCv4C0a9qLPFP2xvEL2ML0hneKUJ38EeputpInMz4tT2
-         mAfD5ckrYzU9r4K6c3HyUq8rmBy2JMERXnWR1Jr0ECTS7WQ8/UcRIhDKN3KAbzzn/AvM
-         evj7pa8a2USTESwwXhdKUCcyPoLSMCHrGWveqKHzVPQsKFlcFtGTBStPsiRpqVXelLKH
-         9D4uFdE4/3+HpuKcKTsRg1THPfparzEN8IFD80yNVkvrbsagTs07yY0sGCg7PyanDPxB
-         CCXPJQ8KA2z8EZXOXSFOZqEK3qQCn9a7k11n2PlwwxeebZgZ9BKHNBT2sx8AJpldPXDA
-         Tq7Q==
+        d=google.com; s=20230601; t=1737493015; x=1738097815; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FPmPdXxg4qDDFjuISJwDdAIVLc44OyHMr66SXY5pv74=;
+        b=kHPndlNEfWXUCZ0isYHUdZwFTgmeO2TUXOEgt361wZVAwhd5PNyig8m04rzDj9OJgy
+         3vmk6tLCYoLfAtKC7cbgBWjb/pP3Boecb6NqIvJoREGT1c/eGzeuHh4vXLey0ACWdMoa
+         od2wmbim3Bw+8ziZMH/d1rJlrg4jZljwkz63qBPqyIFodbiIGYho3wkLhP/6BlC1DlQj
+         zuGzdsBYGL8pSyD4BCh1tkkWQqODtsVFt7qie7rOjrUE1npcvtSg+SHBEFQNBUMYnhCl
+         Xg1NwxFJHB4bCKTl4NVgy53pajIIQIJrmslDISKB3XXDCmVrczGfOahIEtS5w+6qyzo+
+         xf5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737492480; x=1738097280;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ow8OnSOBUAvF1sR6NsRcQ1mD4Budky7KnwU2LvfpPWA=;
-        b=emF0rrK9br5f29IhR37Ku//QtOq0ln1iWEhk8E5pKDffBxJELOhbbDWuHomJDXEaWG
-         xa3JThCdwseJxVwVA7ocsG5rDSsWPckpl9t9KC1WD2yj6Vi6iTaayTzgiQd2m7PiItoJ
-         /0pQvUgcxPFhtw80ISij3g3Cn5pc/Z2yEt1nO8MNAVJ5a8vM+CNSENKaO7b8l00H49Vp
-         edP+DCleC37sx5g9EGyQSNr4XI5NrB5xEfvh2B629Z0hnzxtW+KmnMHRn4KO8T7KE/OX
-         G6jBhjr1fDx7Wy17Y0tQ9sE0cqgBFwdlx6eHmYPYB373ADqbrU9y62wSSz5BxVQVgzSp
-         1haw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdiOH3n4P6SwsgVHjgddWzOies/NJv1/WYq0sV0IcWw39oQPOiGn2jJLMJbjvopZNy6b4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys4Frv+9lBkxym0K5RB7uJwT+eJaHzuOVx57ShRzBKVC7T5FM6
-	m/Lnmcj/CQPimgYzLNcBp58sjAPYxV0u5Y/CHFMbPO5AJ27klVgTjq80MspDadk=
-X-Gm-Gg: ASbGncvCD7xPNpSU8Yp5sq6zQeAuVzfV/Cq6cC/mCXQLZZ0og/upjrU7485rgToDHRK
-	1RUz2VmL6NUBCSwdq9znQm+s9nGq1PYe4qQ6qNHgM4S2LtlR+s4e65ULIr8FtwR1lTRAAspvVrq
-	48NIXq6Lw3VLuD8PjHFd95x5S1CJHpdW2zvseB/IMicep4yO2LBTqARyP5G1xi3rYYj4Jruyod8
-	R0K6PpWXZATyMcekYArPf9xq5iRf4wBkVVRUErWC3aI
-X-Google-Smtp-Source: AGHT+IGpzHbNEy913KwGqLDga7j8XCPTIu+0UlJOC0stjfVReFdRGhjNtDFMtiwPVLFCCekg9fkq/A==
-X-Received: by 2002:a05:6214:1cc7:b0:6e1:697c:d9b8 with SMTP id 6a1803df08f44-6e1b216efb9mr307486706d6.9.1737492480304;
-        Tue, 21 Jan 2025 12:48:00 -0800 (PST)
-Received: from ziepe.ca ([130.41.10.206])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afcd388asm54445966d6.92.2025.01.21.12.47.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 12:47:59 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1taLAE-00000003k34-2XRy;
-	Tue, 21 Jan 2025 16:47:58 -0400
-Date: Tue, 21 Jan 2025 16:47:58 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Wencheng Yang <east.moutain.yang@gmail.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2] drviers/iommu/amd: support P2P access through IOMMU
- when SME is enabled
-Message-ID: <20250121204758.GR674319@ziepe.ca>
-References: <20250117071423.469880-1-east.moutain.yang@gmail.com>
- <20250117084449.6cfd68b3.alex.williamson@redhat.com>
- <CALrP2iW11zHNVWCz3JXjPHxyJ=j3FsVdTGetMoxQvmNZo2X_yQ@mail.gmail.com>
- <20250121083443.3984579a.alex.williamson@redhat.com>
+        d=1e100.net; s=20230601; t=1737493015; x=1738097815;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FPmPdXxg4qDDFjuISJwDdAIVLc44OyHMr66SXY5pv74=;
+        b=d1wCH6dWzVZ5fHzz3dFTzeYXRQ5nzo4F9tIiFc+oeUiNPZf8JEWV4OF/MkAnm/Axbz
+         sp/Xn4H/OnhLqpcubft+D3HDLLqmsiL2C7uKz9Vbzv13uNlcs0N37sxZriuG43cwOdE7
+         aJ1/nI2fD27kBWwjyTrp/QCson+pcHOB5AfTQVzgAZwzScmS2MXKJMEXkv49yWF8GroX
+         BQcYbqw0ovkZIrEk01EsSrI8IAPOj7DmSip9T7GXSX54S6dD55t6B+NmljjizsQjxkne
+         QwrLYwr7QUTCXTdvY2AS1RZRSk4YJTV2k8U3Jlpm99Q1MwIgHHIh8yyz2Dao9PflFSLO
+         R6Ig==
+X-Gm-Message-State: AOJu0Yw5NI7MW5Q7bZ+PbXjNxU6Og7Y+oUKn7l0+G9sggAuK7QTaZ6tZ
+	yfL+WlyYieMhieXjqFP6/14JiBPAOjyAELZf2K2PNRPjchqtBpzJzCHBTlY0niWNzbrmr2ACYlK
+	gDw==
+X-Google-Smtp-Source: AGHT+IFdrRQcFubciantcwlkp+b6rBGHmd4snduv+064ENHS/VQS3HzU5edUM2r89L0j7KTtpRdHOth+VXE=
+X-Received: from pfwo10.prod.google.com ([2002:a05:6a00:1bca:b0:72d:b2a2:bed7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:258e:b0:1e0:d632:b9e0
+ with SMTP id adf61e73a8af0-1eb21481d85mr30143462637.13.1737493015514; Tue, 21
+ Jan 2025 12:56:55 -0800 (PST)
+Date: Tue, 21 Jan 2025 12:56:54 -0800
+In-Reply-To: <gsntplkh2wia.fsf@coltonlewis-kvm.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250121083443.3984579a.alex.williamson@redhat.com>
+Mime-Version: 1.0
+References: <Z37FYUU4ppiZsa68@google.com> <gsntplkh2wia.fsf@coltonlewis-kvm.c.googlers.com>
+Message-ID: <Z5AKFlSJ9wgbX_MS@google.com>
+Subject: Re: [PATCH v2 3/6] KVM: x86: selftests: Set up AMD VM in pmu_counters_test
+From: Sean Christopherson <seanjc@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, mizhang@google.com, ljr.kernel@gmail.com, 
+	jmattson@google.com, aaronlewis@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 21, 2025 at 08:34:43AM -0700, Alex Williamson wrote:
+On Mon, Jan 20, 2025, Colton Lewis wrote:
+> > > +static void test_core_counters(void)
+> > > +{
+> > > +	uint8_t nr_counters = nr_core_counters();
+> > > +	bool core_ext = kvm_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
+> > > +	bool perfmon_v2 = kvm_cpu_has(X86_FEATURE_PERFMON_V2);
+> > > +	struct kvm_vcpu *vcpu;
+> > > +	struct kvm_vm *vm;
+> > > +
+> > > +	for (uint8_t ce = 0; ce <= core_ext; ce++) {
+> 
+> > Kernel style is to not declared variables inside for-loops.
+> 
+> I ran it through checkpatch and it didn't complain.
 
-> This description is unclear to me.  As others have noted, we probably
-> need to look at whether the flag should be automatically applied by the
-> kernel.  We certainly know in the vfio IOMMU layer whether we're
-> mapping a page or a pfnmap.  
+...
 
-It is not page or pfnmap.. When vfio is using follow_pte() it should
-extract information from the PTE and then relay it to the IOMMU. The
-iommu page table and the CPU page table should have the same PTE
-flags.
 
-So, a pte that is pgprot_cached() should be IOMMU_CACHE, otherwise
-IOMMU_MMIO.
+> > > +					vcpu_set_cpuid_property(
+> 
+> > Google3!  (Never, ever wrap immediately after the opening paranethesis).
+> 
+> Checkpatch didn't complain.
 
-The encrypted bit in the PTE should be mapped to some new
-IOMMU_ENCRYPTED.
+Checkpatch is a perl script, not sentient AI.  It's nothing more than a tool to
+help detect common goofs, typos, egregious flaws, etc.  The absense of checkpatch
+warnings/errors does not mean a patch has no issues.  Coding style in particular
+is quite subjective and prone to "exceptions to the rule", which makes is especially
+hard to "enforce" via checkpatch.
 
-I suspect AMD has created a troublesome issue that IOMMU_CACHE
-conditionally implies encrypted depending on their platform features
-(meaning cachable decrypted is impossible). Arguably a higher level
-should be deciding this and the iommu page table code should simply
-follow IOMMU_ENCRYPTED always.
+As explained in Documentation/process/4.Coding.rst, what matters most is consistency:
 
-That might be something for later, but I would note it :\
+  A code base as large as the kernel requires some uniformity of code to make it
+  possible for developers to quickly understand any part of it.  So there is no
+  longer room for strangely-formatted code.
 
-> In any case, we're in the process of phasing out the vfio type1
-> IOMMU backend for iommufd, so whatever the implementation, and
-> especially if there's a uapi component, it needs to be implemented
-> in iommufd first. 
-
-Since iommufd won't be using follow_pte() it will have to get this
-meta information from the FD, eg through DMABUf, and there is a huge
-thread on how to go about doing that..
-
-There should be no uapi component.
-
-Jason
+https://www.kernel.org/doc/html/v5.0/process/4.Coding.html#coding-style
 
