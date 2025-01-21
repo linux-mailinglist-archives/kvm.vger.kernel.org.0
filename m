@@ -1,125 +1,120 @@
-Return-Path: <kvm+bounces-36135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349E3A18193
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:59:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4A14A18198
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:00:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16D48164F24
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:59:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23BD516B65E
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F161F472B;
-	Tue, 21 Jan 2025 15:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B021C1F428E;
+	Tue, 21 Jan 2025 16:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKsrIlb3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oUn6XRqF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C391F1505;
-	Tue, 21 Jan 2025 15:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F18224D7
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 16:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737475174; cv=none; b=G21L0m+LHpvP8n5D93vAAqjVYzYHpfqqYH4nkl3Ra+plqIgRsH77jNYB4AzzJGHuw+yuU+OLoNEFmAJAzyhSXL/jWoBc9d1JshZz/pTPlgErXt3EdLJKcQPKWaA4FUHRhRMsRUuSCu+LVC9djdTKN6apqp3AO2h0X0qz+ZRwkVQ=
+	t=1737475230; cv=none; b=riDoPQQdCNufJ6dIZspTYhEVMhj2tgvGufZUCguc3WDqIWRvG9my51qGhYsRBmZYNYEptJM8obdnmQxuzmHiQ8dyDZy/ZGjcwF0CeJbPso+bGOBrFLcO1BoPGMuMPLPfVgzhvOAiyz6ncBm8RrcBCu593H/hwJmIbarydbwsmTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737475174; c=relaxed/simple;
-	bh=/Q0T30jgTYhIi4Y567kml+Oi8mAO/3iJcnxgEtBAPlY=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=tG6xA4ZPH0OKmgQN44SyqYRwy8DoswgkBw//VMER1yzVjA7jcBoWDplR96TPWWZ9puXE8V8teZykFND83NXKvhYBEjU/vqKgyTsLFv5N95bQcS+/tsh2YSIPfI3KL8C/ob8efwTOdJljgjc5ToS5yEW0b1N/+CiI4Rq+Czsduhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kKsrIlb3; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-38a34e8410bso3049912f8f.2;
-        Tue, 21 Jan 2025 07:59:32 -0800 (PST)
+	s=arc-20240116; t=1737475230; c=relaxed/simple;
+	bh=EicM7X3YMAmO/4d6190TcVVMcOWHVZUm/HS8XF4cjUo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=us9Krv7zK8eoJWacaWNNn+S6jvKhdrdUg/eOZTzrs69UhOtmRElaZd7n5rY4iYGrQ3Qgo9idoLhnJrlGVdtVPF4fuQrFsVUnXDVsMhfLAbcCGTxP8cul98ewC8DxDeYrGqqWpQj9ubSFPXe5jtMkrpydyuQzwmzhmLxKDEzuNTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oUn6XRqF; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2efc3292021so16694253a91.1
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 08:00:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737475171; x=1738079971; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5OLsjHzyq/LJBcjwujNKyBJhOLqaam0VKEvf4djvkd8=;
-        b=kKsrIlb3j/Uu4YlwP7zugTLqar0BaWsgNancL0ukfqS219+9CeMUkhn0sZ7W7o8Uws
-         /oMG3IeBnguk+L2AK8hA+irTNfcMXwXzdlrhx6PfMm5IKy6nfwa3okwvIsNuyYRJ3+xM
-         +3t2JC6sGLtgCwWT8BY1MulCGy5+EM8yhbBiQlbJLWLUUx31iel01FVc+dOWenYBcAku
-         e6BVL+hRdh6EoxX3X/5JVPJfrzhSb84WjyWFtfQjBKpcK9yJ8ZU2+wH58S3h5kewdzuR
-         0A06biYb/6HBL3g19AOKiAiU4CwA+TreCEpBEEyhdbgqtvlsJxtx2v0W3SVv1SUKLZEa
-         VlVg==
+        d=google.com; s=20230601; t=1737475229; x=1738080029; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FcvouzLzCbsOet6nyiRu1sxyIbD8hK9cg7WAyq0uGH0=;
+        b=oUn6XRqF31l9L8r0ULhkrLyaUCJFz/js9sYqiWloCfAfcqng0bJW11AxpHgCaByd0n
+         oCYoebR0bzEvfms7BqdNl4GEt6wYsE0p8mAaFyyrgm/ygcX5gPpLaKjJlv8GnV7rljXn
+         8lYLXN/TSkfUhH+utCa/c+XFEul77g7ILiIYbzeLxHq87oKU34+5Evj8Ab/9rk/eI9tx
+         ekeU72dCyjeg5+N4sFE6F7B4qPKJp1qZHpBMrP2Z4DfTSbFVQbbxNN07UZZbd30u5wDw
+         GGi/uXNLsibLpejsKKg6oVkHrK6q923sTAQ89dsZhQll6teKm7egITB9TUq5iu4OH6V0
+         0gsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737475171; x=1738079971;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5OLsjHzyq/LJBcjwujNKyBJhOLqaam0VKEvf4djvkd8=;
-        b=VTCT14Txmi2GcFLMPF2WU5rE1ZQI7rUzx5LN9zzldGooHrxguZVcTTjVo6jf03UaE0
-         Rd6UkI0rHz1k5D7iuTKcARM15HgRg52Uvrs0vWzNgcoOsdRwG0ogwDLrkhhWPnKYDrA+
-         uRKcjTyDZvwtL52h2ZYuGNW6ZGsXkLMh9AqMoB/rXEfBfOevOLq8pzKQMX45jL+X7ehV
-         +BuAe0nf7GV6VcenGiWNJHhZFn6JbfEcPERlxa2+FQrvAU7wbHEsNDKReTBz9Q/AyNdr
-         t5HrAZgQqA+GH+kBSsVGksp4MXCqhPBJOr7ZScWyNBAxrFd/np7P2hjfRuFCNUA9fYhQ
-         xYcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUB117GJNh9ITTkKeut768JuD0yrBC06sNftBR+zld5urN7JM15p+477J+67FIh7qKhRblJ7hfLHOZXLBnv@vger.kernel.org, AJvYcCUsEvSobQl4+Aomhx9wba7QACYQO4L179tWNq9wpMbOtW0+QZjwtshx76hto4ZQp7VoyN4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+HCKdyJPKTMftleLY/j1drMnltLG2L6h7Hg5pe6LiFjrfre1h
-	DF47OdjbwNw4AiljAUBo+NoIZIETEOELoJEL8dGjcwVLXrnJJlFi
-X-Gm-Gg: ASbGncsJCVCtf3ViA0uWzXVH4GDnyz6r273Z2sr0rQPl2Go8Ax5oNMIhKl71W3Y23pa
-	6UmMH05NSlb5zUbiJshrE78Jf7ihknWyb5CjVpmT2KbDv+ek3DoYXx/L5TWH5equlkOXdRk0wET
-	lvQ60gVpHPbWyxyajM24sn17qB7ljfDx4JAuxZTFKDCwxRNMafbOr65M3T0hlFbe5I9rgm5/fXm
-	sBj6z2nfmKj//EoVOsBLXrUmpborOguG1KVsPYTADvZfWM7Z9Gda7X8N49tYRvfEZ6nVLjMRwPU
-	zWIRMz0uwmE3yXwqcYtcXfNZ+A==
-X-Google-Smtp-Source: AGHT+IErnnUvQbaO26YCZVXCqDz5WwE/7Hvf43v2PzwaqnaHytvckfynXJKWzv06cFtb/IP/UUmd3g==
-X-Received: by 2002:adf:a28a:0:b0:385:dc45:ea06 with SMTP id ffacd0b85a97d-38bf5684d6bmr13123990f8f.13.1737475171183;
-        Tue, 21 Jan 2025 07:59:31 -0800 (PST)
-Received: from [192.168.19.15] (54-240-197-233.amazon.com. [54.240.197.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4389046250csm181639875e9.25.2025.01.21.07.59.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2025 07:59:30 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <eb45ff29-f551-483e-9930-1fa545fb83aa@xen.org>
-Date: Tue, 21 Jan 2025 15:59:29 +0000
+        d=1e100.net; s=20230601; t=1737475229; x=1738080029;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FcvouzLzCbsOet6nyiRu1sxyIbD8hK9cg7WAyq0uGH0=;
+        b=YdlsX+/3yHWc8azjiT7JuBRHfyfQMhqHX+1bRfeA2R8+ARIbu9zH8nBqC5YlMlKJiS
+         66AYAK9kKkfWybtO2LF+n/2G3EzxqYnO0HyGlPtYG2iYHSAMPKVlgJg2UzCDWslCt61v
+         ndclXcwQNQrrNOOHjDjzF3qCGxlHy7YUysuCssQTk8c7d7ouSjhAES6PSXbRSn6X9m93
+         HDI4X75B0KMdo4ShqXWqk26D7xErh8LkkfpepCAT2E/Jjzx8Kn2IfHA8MPiQNkmDgJHM
+         ds/bP8Cf07q3QHK8symI52LvmilbscZS17oY/K+JwitqktMkKVkPf2QGEs7FCKTktxSj
+         byJA==
+X-Forwarded-Encrypted: i=1; AJvYcCXvqyPmD8AV2rZJyO7kzZmi1BwTOO5WpEBv/2sRQL2osqOAaXScv7fCr8fCb5sWgT3ClWo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfMaKYT2k3pGWZ4lF4oD8+lwJ31tvFWlm9BrnOVg7GIdt7ckUF
+	CnmXr9KfOjeRc4YThIv+tCxDTx2H+chEO5kYyJgfDqU+aBgmEYnifOUZoMCLa9u65ST7OBK58O8
+	aPg==
+X-Google-Smtp-Source: AGHT+IFvQ29y/16pSDIesJONr3YtfNFhioLCrBobAQRpweKPd0JZ7QQznRTp9GRySClzqwYoEEjbzpPkMO0=
+X-Received: from pfbbe3.prod.google.com ([2002:a05:6a00:1f03:b0:72d:4132:7360])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:811:b0:72a:a7a4:b641
+ with SMTP id d2e1a72fcca58-72dafb71a28mr29231118b3a.18.1737475228851; Tue, 21
+ Jan 2025 08:00:28 -0800 (PST)
+Date: Tue, 21 Jan 2025 08:00:27 -0800
+In-Reply-To: <877c6p8t35.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH 09/10] KVM: x86: Setup Hyper-V TSC page before Xen PV
- clocks (during clock update)
-To: Sean Christopherson <seanjc@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse
- <dwmw2@infradead.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com,
- Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>
-References: <20250118005552.2626804-1-seanjc@google.com>
- <20250118005552.2626804-10-seanjc@google.com> <8734hd8rrx.fsf@redhat.com>
- <Z4_AwrFFsKg2VgYW@google.com>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <Z4_AwrFFsKg2VgYW@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250118003454.2619573-1-seanjc@google.com> <20250118003454.2619573-5-seanjc@google.com>
+ <877c6p8t35.fsf@redhat.com>
+Message-ID: <Z4_Em95xkvagPOHN@google.com>
+Subject: Re: [PATCH v2 4/4] KVM: selftests: Add CPUID tests for Hyper-V
+ features that need in-kernel APIC
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Dongjie Zou <zoudongjie@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 21/01/2025 15:44, Sean Christopherson wrote:
-[snip]
+On Mon, Jan 20, 2025, Vitaly Kuznetsov wrote:
+> > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> > index 3188749ec6e1..8f26130dc30d 100644
+> > --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> > @@ -43,6 +43,7 @@ static bool smt_possible(void)
+> >  
+> >  static void test_hv_cpuid(struct kvm_vcpu *vcpu, bool evmcs_expected)
+> >  {
+> > +	const bool has_irqchip = !vcpu || vcpu->vm->has_irqchip;
+> >  	const struct kvm_cpuid2 *hv_cpuid_entries;
+> >  	int i;
+> >  	int nent_expected = 10;
+> > @@ -85,12 +86,19 @@ static void test_hv_cpuid(struct kvm_vcpu *vcpu, bool evmcs_expected)
+> >  				    entry->eax, evmcs_expected
+> >  				);
+> >  			break;
+> > +		case 0x40000003:
+> > +			TEST_ASSERT(has_irqchip || !(entry->edx & BIT(19)),
+> > +				    "Synthetic Timers should require in-kernel APIC");
 > 
-> I think it's ok to keep the Hyper-V TSC page in this case.  It's not that the Xen
-> PV clock is truly unstable, it's that some guests get tripped up by the STABLE
-> flag.  A guest that can't handle the STABLE flag has bigger problems than the
-> existence of a completely unrelated clock that is implied to be stable.
+> Nitpick: BIT(19) of CPUID.0x40000003(EDX) advertises 'direct' mode
+> for Synthetic timers and that's what we have paired with
+> lapic_in_kernel() check. Thus, we may want to be a bit more specific and
+> say
 > 
+> "Direct Synthetic timers should require in-kernel APIC"
+> (personally, I'd prefer "Synthetic timers in 'direct' mode" name but
+> that's not how TLFS calls them)
 
-Agreed.
+What about adding quotes to try and communicate that it's a property of Syntehtic
+Timers?  E.g.
 
->> I don't know if anyone combines Xen and Hyper-V emulation capabilities for
->> the same guest on KVM though.)
-> 
-> That someone would have to be quite "brave" :-D
-
-Maybe :-)
-
-Reviewed-by: Paul Durrant <paul@xen.org>
-
+ "\"Direct\" Synthetic Timers should require in-kernel APIC");
 
