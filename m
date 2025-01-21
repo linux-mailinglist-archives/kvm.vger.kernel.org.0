@@ -1,313 +1,148 @@
-Return-Path: <kvm+bounces-36126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D8A9A18131
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:35:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C59B3A1813D
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E95816BDE7
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:35:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BA0F188B588
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCCEF1F471D;
-	Tue, 21 Jan 2025 15:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8097F1F471A;
+	Tue, 21 Jan 2025 15:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dtti4lss"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8yCHvdp"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9231F3D36
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 15:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07D31F426C
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 15:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737473693; cv=none; b=WbDLH9QQTXzbxPwsYhgh7+TwOkuGuldCVwynv7ywgPzptGKf9XCFwtAJvYvFpNqbrjVv/1fPBS2o5kNrtS92KKQdpIBhx1uxH8/YG/1JGpRvljcBZYvx9CLZNg5YU0MZgr5bCyFFsTRGr2VFffNIwUQbVrVCXCIbhBAIWm5oouw=
+	t=1737473905; cv=none; b=CJzYOEHt+jKy29/g1lvk4SE26ZZ/WJsbq40fVJcUeTtEQJp+WhOruzL4Z7Rft0xp5OSzPZhz0Ts6RtyU+wzTZA8COKjRjfQjMaZz6RvUbn20fG8ieVkBSh7Iqb9u2NmXJp00gBCHJ1FKzqWMLVYfUC3j8uzU/UEKMrvDQAlFKsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737473693; c=relaxed/simple;
-	bh=afviXNWO37OLbCdPveVgalVfRIUMjV5OEQjfKTrtdr0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mZMpgkNXUSv9SIx+oEYhln3oDRgk12dlimtNusdsIsP4nLNG0X+Y1h9Jse1ymaj5jPqewufJkXDw2VSIv0xB2IeskErsamJDtK2H2dGjdE2tPeooZsMZ4WDvT9a3a/F8GjGMuufJSC4dOU6aW4puEEJDoOWDS8L5c1KpM87FCzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dtti4lss; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1737473905; c=relaxed/simple;
+	bh=tKzVu7K8VQrnqwY1dpCXix1mUXtPfLMWbHDXszQyeGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D3w4yWI8b2z1eo8oW+QTYSSWi6lae8o6Imccwgy6aMThS5aRu3cIr/YMSyGpZ0pc5f64wM55QIqx+ysLSNqlVlcr3gX6sOxEqoyDDorlIwSNs5Ur1tTEM9UcGYNA8+puU0UFUCtocoLr9joTBAmor/Jk8lkIHZxBbkjxaZ93FuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S8yCHvdp; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737473690;
+	s=mimecast20190719; t=1737473902;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uMSAKbRPh6a+5W2yOXg2mdEQMDX85qLb4xAsmG7l1FI=;
-	b=Dtti4lssex7vFWbAc2qBUB7QnX2u3G2zjPtQ6Gk2cKoE9nH/fBnFD3D9A9O00ea9MnMEDJ
-	oXTT6EDGr9hSHnHA7APfYy964jUNRPq5S7hwdS1FIh1rjzzl6H+RjAxgObY0A+V/J73nx0
-	n/9SjMaOWj51MgxVEGyweIssjDFn8gs=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7vWlp2CUskTYXbSVehnKEKMyRmaqBpVNMhezv4fMKgM=;
+	b=S8yCHvdpwWTu6fXVdMRGrKktSrjDDJFOtQ+6kIukbsABgV9KFtUV2GyIz76AsZVf84qXX7
+	SGbsVzilXvwNlDPuZOJam6yXIVSGagx1spMb9Pjf1eCh5SDohoviGgTMS8spJKY37akc3Q
+	GqTPMqDjhkqa23TjZSs92sqk1b5g7fA=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-6-ZsHTPgTfNyKfRTkDyQ-DpQ-1; Tue, 21 Jan 2025 10:34:48 -0500
-X-MC-Unique: ZsHTPgTfNyKfRTkDyQ-DpQ-1
-X-Mimecast-MFC-AGG-ID: ZsHTPgTfNyKfRTkDyQ-DpQ
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ce46f7d554so4222855ab.1
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 07:34:48 -0800 (PST)
+ us-mta-128-gT9PfDZWNrqQ-6aLEPPL7w-1; Tue, 21 Jan 2025 10:38:21 -0500
+X-MC-Unique: gT9PfDZWNrqQ-6aLEPPL7w-1
+X-Mimecast-MFC-AGG-ID: gT9PfDZWNrqQ-6aLEPPL7w
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6dcd1e4a051so107597546d6.2
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 07:38:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737473687; x=1738078487;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uMSAKbRPh6a+5W2yOXg2mdEQMDX85qLb4xAsmG7l1FI=;
-        b=udXwVdW5neS9wPh1lbZ0dPFNfysQovhoc8XU8CI82qijCxG36S2t39KXhFWc23Mi6t
-         El8foemV7PWkopEaqNrRgINYf6lLMZ7H5tsGkY/93lhgy67nChnthhpnazzOXfMGP0qs
-         6q/0pZb0XYb5lmL53DGfkHDj/h+dcIVZm4by2m5V5RhpmQM6K0Slmz3u51FItjJQ1uBU
-         UwagC9txE1NPwn/Qx6ZF9inO/kfbc1exLICJkaZTt+aXUhSWScGxL+3EiBdVkZSETmON
-         Wvz5BJQYuByoUNiroDyvgJDYcUC0D1lFMNEODkIp/E/taPK+zaQr0SM89EqMcNNjvRMX
-         PmUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUqwVZY4g4Nvfbh661urs+95GCuUNLe75S7mnuUwmxpYhkUIT/CwY5B0f44LxcFMIlVu6Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7khOVe4XLsVmyjHm8LHuNCi2M81cGHzsCJ7f483us9oyRyTZZ
-	8OrWw74efEt9QRvLg4r5yLWsiP4w4+eoNB/+NpSfFBUDiHOBttaSU7LARM9emD3L9HBRi2ap18j
-	dAaye4n9Dk/VIcNqDCB9TXVMvYFKWV8+SQs2v10Xm7GUedsktcw==
-X-Gm-Gg: ASbGncttZ2J8Be5+bNakXbNs14RfBQsoWxv4pHOAY23CUe8xCVd2k3xdmwnBVBRAZ1p
-	T8JSsvgCYE3vYsoXlL9QMc+QmSVn//vDyyy4xrg9pZcJV7PbSXWHAGQyRivo6eXYNkotX1stkgK
-	bP9C/T0hJ8JtiAyKJNCrixsU2vy2rGuS25VGQMZ/1jalryO2NZn0nuKJQnZ9RhfNe2T/UKoWflZ
-	nPSbYN9rFEA6DYgZZ5mcUWw65qs2qF+kEhJd1SjBh7VRJPsZ1JaE4U07VM1CyAwqBEiexZLNQ==
-X-Received: by 2002:a05:6602:888:b0:847:5b61:636c with SMTP id ca18e2360f4ac-851b618ea35mr341445439f.2.1737473687365;
-        Tue, 21 Jan 2025 07:34:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGkmTrnhDbMZuVVvF5aGKoAlr5t2ri5MIgtN3x0h66amEtEIzKucp7O3u/rYt/X9g6rlR8mng==
-X-Received: by 2002:a05:6602:888:b0:847:5b61:636c with SMTP id ca18e2360f4ac-851b618ea35mr341443939f.2.1737473686956;
-        Tue, 21 Jan 2025 07:34:46 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ea753f6502sm3381142173.18.2025.01.21.07.34.46
+        d=1e100.net; s=20230601; t=1737473901; x=1738078701;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7vWlp2CUskTYXbSVehnKEKMyRmaqBpVNMhezv4fMKgM=;
+        b=JLiMTTblFZD5WMze9fR3evC/5DZPZLOygNU1ufu7sxSZ+2+TGaRMAc+vwLCS7a8/zI
+         RMiJ/Tw3BhJq/IVupoDgybhIixZDvU+zddOT+hU8vtlOqpcPik36BdU6L8Wv94dhtXjv
+         xT2QmRAMwnf9cB43shhEbCPUcS8PGY3hEwdgDjMtMAUa660YU0txdUFm+Pj0E569aiUL
+         Jax5WN8iCg3dbi62wuL3hBTzsKft6yLykIRjSDc+IBkimR1HRwBSKzaleCt0S7n+J+iM
+         VIrMKig/GX5Dn7mdJD+bdNxLGqZfnm61tLTqlbEuV6mNVF87D7j8NUIiI5c5b/BpnrX6
+         sY1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVoUC/SblBL9k4kYR7jkY8DsquwfoD9sic/esmEYv/43pnxrj1Im+yNENpqVGduTD95bmk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjQQJfFq0/7KPkloA4DEwiAMCXDBzOc7613RNHb7Zb2Z/P/2lB
+	Ef9h/D1HZB5pLNqzP6PntTt45/yTYnBvjGSfeClJx/+IaNQ8VOmPh2/M8YKuk0hjyMmEmgObtzl
+	Rpc9jcc9EXtntmcfqWVvMHc4wHeC7J1yXBthz18D251hy1Cje2w==
+X-Gm-Gg: ASbGncvIabyKojuSoirJEjuKd6UCxvicwERfv2heppyFVFrZ19JH09sjh6X2nE9jAYY
+	CGS7UustWI/kvJfKnmuVcxrpUXlpleIPp3LuAZrLzIDgQSUio1ywo8dnfc8zpcaI7te8tZoOmy0
+	g77jKN4yiy/6B9VOR6LHr5ymgz+Oy9NeBN29kh5jx7ShpWJIGL/C1zQPkZm0/QorSHpZuLLesXu
+	PtvuY9ln1hKrd28FojSJKz1BkArgXQmEFoKiqdIZnTefXiUhXW7WAYpN4Uo3pBse91vgB2HfhHY
+	Agtzy185aO6Z35k/lB4YWMvIRKnD2yc=
+X-Received: by 2002:a05:6214:1305:b0:6d3:fa03:23f1 with SMTP id 6a1803df08f44-6e1b2186a41mr285474096d6.13.1737473901085;
+        Tue, 21 Jan 2025 07:38:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHgfx1VJkB5kdl2P+V5WFmu/JkUYutt6JPaRTYfjpiG4rWtIeQDLUTt4TZ3FFWubwJB5OXSGA==
+X-Received: by 2002:a05:6214:1305:b0:6d3:fa03:23f1 with SMTP id 6a1803df08f44-6e1b2186a41mr285473756d6.13.1737473900788;
+        Tue, 21 Jan 2025 07:38:20 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afbf3783sm51948996d6.7.2025.01.21.07.38.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 07:34:46 -0800 (PST)
-Date: Tue, 21 Jan 2025 08:34:43 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Wencheng Yang <east.moutain.yang@gmail.com>
-Cc: Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit
- <suravee.suthikulpanit@amd.com>, Will Deacon <will@kernel.org>, Robin
- Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] drviers/iommu/amd: support P2P access through IOMMU
- when SME is enabled
-Message-ID: <20250121083443.3984579a.alex.williamson@redhat.com>
-In-Reply-To: <CALrP2iW11zHNVWCz3JXjPHxyJ=j3FsVdTGetMoxQvmNZo2X_yQ@mail.gmail.com>
-References: <20250117071423.469880-1-east.moutain.yang@gmail.com>
-	<20250117084449.6cfd68b3.alex.williamson@redhat.com>
-	<CALrP2iW11zHNVWCz3JXjPHxyJ=j3FsVdTGetMoxQvmNZo2X_yQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        Tue, 21 Jan 2025 07:38:20 -0800 (PST)
+Date: Tue, 21 Jan 2025 10:38:11 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Chenyi Qiang <chenyi.qiang@intel.com>
+Cc: David Hildenbrand <david@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>
+Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
+ guest-memfd with RamDiscardManager
+Message-ID: <Z4-_Y-Yqmz_wBWaU@x1n>
+References: <20241213070852.106092-1-chenyi.qiang@intel.com>
+ <20241213070852.106092-3-chenyi.qiang@intel.com>
+ <Z46RT__q02nhz3dc@x1n>
+ <a55048ec-c02d-4845-8595-cc79b7a5e340@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a55048ec-c02d-4845-8595-cc79b7a5e340@intel.com>
 
-On Tue, 21 Jan 2025 19:07:26 +0800
-Wencheng Yang <east.moutain.yang@gmail.com> wrote:
+On Tue, Jan 21, 2025 at 05:00:45PM +0800, Chenyi Qiang wrote:
+> >> +
+> >> +    /* block size and alignment */
+> >> +    uint64_t block_size;
+> > 
+> > Can we always fetch it from the MR/ramblock? If this is needed, better add
+> > some comment explaining why.
+> 
+> The block_size is the granularity used to track the private/shared
+> attribute in the bitmap. It is currently hardcoded to 4K as guest_memfd
+> may manipulate the page conversion in at least 4K size and alignment.
+> I think It is somewhat a variable to cache the size and can avoid many
+> getpagesize() calls.
 
-> > This needs to:
-> >
-> >  - Be split into separate IOMMU vs VFIO patches
-> >  - Consider and consolidate with other IOMMU implementations of the sam=
-e =20
->=20
-> I will do that in the next patch.
+Though qemu does it frequently.. e.g. qemu_real_host_page_size() wraps
+that.  So IIUC that's not a major concern, and if it's a concern maybe we
+can cache it globally instead.
 
-Clearly the latter bullet is not considered in the most recent posting.
+OTOH, this is not a per-ramblock limitation either, IIUC.  So maybe instead
+of caching it per manager, we could have memory_attr_manager_get_psize()
+helper (or any better name..):
 
-> >  - Provide introspection to userspace relative to the availability of
-> >    the resulting mapping option =20
-> I don't get your meaning, can you expain in detail?
+memory_attr_manager_get_psize(MemoryAttrManager *mgr)
+{
+        /* Due to limitation of ... always notify with host psize */
+        return qemu_real_host_page_size();
+}
 
-Generally it would be polite to get these sorts of clarifications
-before spamming the list with another version of the series.  Userspace
-has no ability to determine whether the kernel supports this flag other
-than trial and error.  The ability to determine the kernel support for
-a new feature is introspection.  For example, if QEMU blindly adds the
-MMIO flag the mapping will fail on older kernels.  How does QEMU know
-whether support for the flag is available on the underlying kernel?
+Then in the future if necessary, switch to:
 
-> > It's also not clear to me that the user should be responsible for
-> > setting this flag versus something in the VFIO or IOMMU layer.  For
-> > example what are the implications of the user setting this flag
-> > incorrectly (not just failing to set it for MMIO, but using it for RAM)=
-? =20
->=20
-> If user sets this flag to RAM region, it has no effect on the platform
-> that memory
-> encrytion is disable. If memory encrytion is enabled, then device
-> can't get correct
-> data from RAM, for example, CPU writes data to RAM that is encrypted by
-> memory controller, but device read the data from RAM as plaintext, but wi=
-ll
-> never leak confidential data.
+memory_attr_manager_get_psize(MemoryAttrManager *mgr)
+{
+        return mgr->mr->ramblock->pagesize;
+}
 
-This description is unclear to me.  As others have noted, we probably
-need to look at whether the flag should be automatically applied by the
-kernel.  We certainly know in the vfio IOMMU layer whether we're
-mapping a page or a pfnmap.  In any case, we're in the process of
-phasing out the vfio type1 IOMMU backend for iommufd, so whatever the
-implementation, and especially if there's a uapi component, it needs to
-be implemented in iommufd first.  Thanks,
+Thanks,
 
-Alex
-
-> On Fri, Jan 17, 2025 at 9:45=E2=80=AFPM Alex Williamson
-> <alex.williamson@redhat.com> wrote:
-> >
-> > On Fri, 17 Jan 2025 15:14:18 +0800
-> > Wencheng Yang <east.moutain.yang@gmail.com> wrote:
-> > =20
-> > > When SME is enabled, memory encryption bit is set in IOMMU page table
-> > > pte entry, it works fine if the pfn of the pte entry is memory.
-> > > However, if the pfn is MMIO address, for example, map other device's =
-mmio
-> > > space to its io page table, in such situation, setting memory encrypt=
-ion
-> > > bit in pte would cause P2P failure.
-> > >
-> > > Clear memory encryption bit in io page table if the mapping is MMIO
-> > > rather than memory.
-> > >
-> > > Signed-off-by: Wencheng Yang <east.moutain.yang@gmail.com>
-> > > ---
-> > >  drivers/iommu/amd/amd_iommu_types.h | 7 ++++---
-> > >  drivers/iommu/amd/io_pgtable.c      | 2 ++
-> > >  drivers/iommu/amd/io_pgtable_v2.c   | 5 ++++-
-> > >  drivers/iommu/amd/iommu.c           | 2 ++
-> > >  drivers/vfio/vfio_iommu_type1.c     | 4 +++-
-> > >  include/uapi/linux/vfio.h           | 1 +
-> > >  6 files changed, 16 insertions(+), 5 deletions(-) =20
-> >
-> > This needs to:
-> >
-> >  - Be split into separate IOMMU vs VFIO patches
-> >  - Consider and consolidate with other IOMMU implementations of the same
-> >  - Provide introspection to userspace relative to the availability of
-> >    the resulting mapping option
-> >
-> > It's also not clear to me that the user should be responsible for
-> > setting this flag versus something in the VFIO or IOMMU layer.  For
-> > example what are the implications of the user setting this flag
-> > incorrectly (not just failing to set it for MMIO, but using it for RAM)=
-? =20
->=20
-> > Thanks,
-> >
-> > Alex
-> > =20
-> > >
-> > > diff --git a/drivers/iommu/amd/amd_iommu_types.h b/drivers/iommu/amd/=
-amd_iommu_types.h
-> > > index fdb0357e0bb9..b0f055200cf3 100644
-> > > --- a/drivers/iommu/amd/amd_iommu_types.h
-> > > +++ b/drivers/iommu/amd/amd_iommu_types.h
-> > > @@ -434,9 +434,10 @@
-> > >  #define IOMMU_PTE_PAGE(pte) (iommu_phys_to_virt((pte) & IOMMU_PAGE_M=
-ASK))
-> > >  #define IOMMU_PTE_MODE(pte) (((pte) >> 9) & 0x07)
-> > >
-> > > -#define IOMMU_PROT_MASK 0x03
-> > > -#define IOMMU_PROT_IR 0x01
-> > > -#define IOMMU_PROT_IW 0x02
-> > > +#define IOMMU_PROT_MASK 0x07
-> > > +#define IOMMU_PROT_IR   0x01
-> > > +#define IOMMU_PROT_IW   0x02
-> > > +#define IOMMU_PROT_MMIO 0x04
-> > >
-> > >  #define IOMMU_UNITY_MAP_FLAG_EXCL_RANGE      (1 << 2)
-> > >
-> > > diff --git a/drivers/iommu/amd/io_pgtable.c b/drivers/iommu/amd/io_pg=
-table.c
-> > > index f3399087859f..dff887958a56 100644
-> > > --- a/drivers/iommu/amd/io_pgtable.c
-> > > +++ b/drivers/iommu/amd/io_pgtable.c
-> > > @@ -373,6 +373,8 @@ static int iommu_v1_map_pages(struct io_pgtable_o=
-ps *ops, unsigned long iova,
-> > >                       __pte |=3D IOMMU_PTE_IR;
-> > >               if (prot & IOMMU_PROT_IW)
-> > >                       __pte |=3D IOMMU_PTE_IW;
-> > > +             if (prot & IOMMU_PROT_MMIO)
-> > > +                     __pte =3D __sme_clr(__pte);
-> > >
-> > >               for (i =3D 0; i < count; ++i)
-> > >                       pte[i] =3D __pte;
-> > > diff --git a/drivers/iommu/amd/io_pgtable_v2.c b/drivers/iommu/amd/io=
-_pgtable_v2.c
-> > > index c616de2c5926..55f969727dea 100644
-> > > --- a/drivers/iommu/amd/io_pgtable_v2.c
-> > > +++ b/drivers/iommu/amd/io_pgtable_v2.c
-> > > @@ -65,7 +65,10 @@ static u64 set_pte_attr(u64 paddr, u64 pg_size, in=
-t prot)
-> > >  {
-> > >       u64 pte;
-> > >
-> > > -     pte =3D __sme_set(paddr & PM_ADDR_MASK);
-> > > +     pte =3D paddr & PM_ADDR_MASK;
-> > > +     if (!(prot & IOMMU_PROT_MMIO))
-> > > +             pte =3D __sme_set(pte);
-> > > +
-> > >       pte |=3D IOMMU_PAGE_PRESENT | IOMMU_PAGE_USER;
-> > >       pte |=3D IOMMU_PAGE_ACCESS | IOMMU_PAGE_DIRTY;
-> > >
-> > > diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-> > > index 16f40b8000d7..9194ad681504 100644
-> > > --- a/drivers/iommu/amd/iommu.c
-> > > +++ b/drivers/iommu/amd/iommu.c
-> > > @@ -2578,6 +2578,8 @@ static int amd_iommu_map_pages(struct iommu_dom=
-ain *dom, unsigned long iova,
-> > >               prot |=3D IOMMU_PROT_IR;
-> > >       if (iommu_prot & IOMMU_WRITE)
-> > >               prot |=3D IOMMU_PROT_IW;
-> > > +     if (iommu_prot & IOMMU_MMIO)
-> > > +             prot |=3D IOMMU_PROT_MMIO;
-> > >
-> > >       if (ops->map_pages) {
-> > >               ret =3D ops->map_pages(ops, iova, paddr, pgsize,
-> > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iomm=
-u_type1.c
-> > > index 50ebc9593c9d..08be1ef8514b 100644
-> > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > @@ -1557,6 +1557,8 @@ static int vfio_dma_do_map(struct vfio_iommu *i=
-ommu,
-> > >               prot |=3D IOMMU_WRITE;
-> > >       if (map->flags & VFIO_DMA_MAP_FLAG_READ)
-> > >               prot |=3D IOMMU_READ;
-> > > +    if (map->flags & VFIO_DMA_MAP_FLAG_MMIO)
-> > > +        prot |=3D IOMMU_MMIO;
-> > >
-> > >       if ((prot && set_vaddr) || (!prot && !set_vaddr))
-> > >               return -EINVAL;
-> > > @@ -2801,7 +2803,7 @@ static int vfio_iommu_type1_map_dma(struct vfio=
-_iommu *iommu,
-> > >       struct vfio_iommu_type1_dma_map map;
-> > >       unsigned long minsz;
-> > >       uint32_t mask =3D VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WR=
-ITE |
-> > > -                     VFIO_DMA_MAP_FLAG_VADDR;
-> > > +                     VFIO_DMA_MAP_FLAG_VADDR | VFIO_DMA_MAP_FLAG_MMI=
-O;
-> > >
-> > >       minsz =3D offsetofend(struct vfio_iommu_type1_dma_map, size);
-> > >
-> > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > > index c8dbf8219c4f..68002c8f1157 100644
-> > > --- a/include/uapi/linux/vfio.h
-> > > +++ b/include/uapi/linux/vfio.h
-> > > @@ -1560,6 +1560,7 @@ struct vfio_iommu_type1_dma_map {
-> > >  #define VFIO_DMA_MAP_FLAG_READ (1 << 0)              /* readable fro=
-m device */
-> > >  #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)     /* writable from device=
- */
-> > >  #define VFIO_DMA_MAP_FLAG_VADDR (1 << 2)
-> > > +#define VFIO_DMA_MAP_FLAG_MMIO (1 << 3)     /* map of mmio */
-> > >       __u64   vaddr;                          /* Process virtual addr=
-ess */
-> > >       __u64   iova;                           /* IO virtual address */
-> > >       __u64   size;                           /* Size of mapping (byt=
-es) */ =20
-> > =20
->=20
+-- 
+Peter Xu
 
 
