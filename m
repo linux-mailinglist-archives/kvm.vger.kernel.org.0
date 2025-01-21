@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-36115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EADD3A17F6F
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:09:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8549A17FA9
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:23:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3FD77A19C0
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:09:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9753A3A324D
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12131F37C0;
-	Tue, 21 Jan 2025 14:09:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE71B1F37D0;
+	Tue, 21 Jan 2025 14:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GSCFixQH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F1iIL3gb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B94363CF;
-	Tue, 21 Jan 2025 14:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6681F03DC;
+	Tue, 21 Jan 2025 14:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737468586; cv=none; b=K8FcMcN32Ig7NKEBnnmkAJKSpHtyu1D/GOm+biFHT/tWee68hp4m/YPyX9/Bd1WDxC6oCJT1Nyk9XveOYfk2UXurJH7KmMTO7IQYN1y5TidfxZE/ZCgL5Dd1+yL17ES+eT84js+luvoDxlUh0D7xWB41l61OMgEM+4FEpRK9Uj8=
+	t=1737469407; cv=none; b=ZqP0Ub0062ufwE+2e6kL7ORiJ7VdtX8DXz2E0WryY7cmSoWpGMkZfdvdZ43jQa5Ek0Tdvhl5nK/lKTbE97k/OCIbo47DcHC/SMjMJE+LIueheLE7U703ue4dtJNiBD8RvqYAbV5HFm51LAv1W+TYkr6Tt00mJ/su5ZEqYI81xxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737468586; c=relaxed/simple;
-	bh=yo8uUAPDHfbR5BfOwtRe9ftZrr2yufIBhkWSlyil5ag=;
+	s=arc-20240116; t=1737469407; c=relaxed/simple;
+	bh=HYdfXiMeLcGXCzwGH792us75BwHwloVR3qB+k2tIm+o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hwG9c3W6mb6BBui4wgTG49lp/Bo6LCabzb0TP3VctDWbzMEhGmIvTged/+KWGn2nktewYy0YrlCxkIH2LwGBs2OAVwrDqXuL/B3dE6DdbFfbwL9rOLadf0i5jzidZNX3ldleVF/mxST5Ma7RWsWS3py4RmV82h8FWoiNAK6HaTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GSCFixQH; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=J4OCKv54BAsVedd+ThPgMJwPtIcGghG8L0cxzybH1EYtwH+yS3SpdFGAk+2y+XIUnXx/mzWiFoyA1pesPjp+YoqaUYXJ0qrzPtNsY7SZdbtidbZ5p+CVLbQJ82I8SqVqsfaolmuM1tX7G+6lnBJxKEQYPsaDWfsriYfr0jvwHQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F1iIL3gb; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50LE81AX002805;
-	Tue, 21 Jan 2025 14:09:40 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50L5XBdk004403;
+	Tue, 21 Jan 2025 14:23:21 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=yveeZC
-	rJrXj3PD8CZKCHdRLUlQ3NLxDOMzMLWlPnr7Y=; b=GSCFixQHpzI61mq/IcGX+L
-	0VYbXMVZs8POuCEsZdb1OGubEofQraHo48dAhzVuZDshO8zDjejmvK2rmpcE3ttc
-	SwT7Mt4IjqUUf68KsJGfX1eS/lW4sTbesiYqIGcG6sIDceoZm2VuhDaenHWv8sRH
-	G+4yY4zW+ivT3PyPpMtYl3MftKIR+Yd+SzSVpzKjKOzlFL4/eN4+HAVJ+p7l/K8A
-	Ukdrl6YHYZKQbhmXJyVlQnXHjQG0acpEIe53cRSFpw8BZgZW5UQRfWOuO7VzUkMM
-	YZF+T1w/utFEHd1H8kcuUPfl3PdlX/sFfjKsaxoV+v5ogRbdvaw6YeDWMnGnNzTA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=u6GiQh
+	P1Bhsb+YXaQ8FRLtKHAdwmNNfy0gU2euYV+f8=; b=F1iIL3gb9Xvkvqa5bxM6YJ
+	0y5rqJKFapY2mKNsPUo8pz/Nq+oAH6XkiCbblvGG3eML5C0gTcEiEomQBsn/qUF8
+	7WToYIRCqstu8gfw0MBBnghcLexVzKM5bLiEG7ZcX8TSLzZVHv1eiJF2caF0Z+A2
+	DLfYgnOio2kU8lNVyPHsWo2vwdYDhBTYaE5k9UKHrEtHilZYF8ZPNuCSFX9F46wj
+	OcBWngU5XURwJ4FCPoumKXZDYvdn6lTYPnMaYQ9eN1buV/fBHC2UYEBUIMB90Jz0
+	qpFqqCvkxYpopj1bqWH9K4ZHil5Y0ccx+VWIm8S/t7Hm2HFT0+pvStqOJkeSroCg
 	==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a2dyay4v-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449rryd79u-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 14:09:39 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LE8R6q032082;
-	Tue, 21 Jan 2025 14:09:39 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a2dyay4s-1
+	Tue, 21 Jan 2025 14:23:21 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LEKhA4026467;
+	Tue, 21 Jan 2025 14:23:20 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449rryd79q-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 14:09:39 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LDIA4Z024307;
-	Tue, 21 Jan 2025 14:09:38 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448q0y3m8u-1
+	Tue, 21 Jan 2025 14:23:20 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LANeSt022449;
+	Tue, 21 Jan 2025 14:23:19 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448r4k3ce7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 14:09:38 +0000
+	Tue, 21 Jan 2025 14:23:19 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LE9Yfj56361446
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LENFJW57540920
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Jan 2025 14:09:35 GMT
+	Tue, 21 Jan 2025 14:23:15 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DA9762005A;
-	Tue, 21 Jan 2025 14:09:34 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id CA7262004E;
+	Tue, 21 Jan 2025 14:23:15 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DF52B20040;
-	Tue, 21 Jan 2025 14:09:33 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id F3DBF20043;
+	Tue, 21 Jan 2025 14:23:14 +0000 (GMT)
 Received: from [9.171.13.4] (unknown [9.171.13.4])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 21 Jan 2025 14:09:33 +0000 (GMT)
-Message-ID: <87a29211-7092-48eb-be98-3f4fb3cf36be@linux.ibm.com>
-Date: Tue, 21 Jan 2025 15:09:33 +0100
+	Tue, 21 Jan 2025 14:23:14 +0000 (GMT)
+Message-ID: <ab7e69d7-141f-44b3-b4cc-4f2832dd6fdd@linux.ibm.com>
+Date: Tue, 21 Jan 2025 15:23:14 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,8 +84,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 11/15] KVM: s390: stop using lists to keep track of
- used dat tables
+Subject: Re: [PATCH v3 12/15] KVM: s390: move gmap_shadow_pgt_lookup() into
+ kvm
 To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
         schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
@@ -93,7 +93,7 @@ Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
         gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
         seanjc@google.com, seiden@linux.ibm.com
 References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
- <20250117190938.93793-12-imbrenda@linux.ibm.com>
+ <20250117190938.93793-13-imbrenda@linux.ibm.com>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -138,33 +138,27 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20250117190938.93793-12-imbrenda@linux.ibm.com>
+In-Reply-To: <20250117190938.93793-13-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: j15h4ps74J1OEQUjEjSpjBKVhTJuKjIk
-X-Proofpoint-ORIG-GUID: LsTT8q1NNl0bZYNYB70jcaTdDD-tuLWA
+X-Proofpoint-GUID: V7v9n2VYheTHPIycGK2-hbzAfi-ro8WT
+X-Proofpoint-ORIG-GUID: Kf_Aey1iLukRAOCTCY4JCjXONInyukgd
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-21_05,2025-01-21_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- mlxscore=0 phishscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 mlxlogscore=797 spamscore=0 suspectscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501210115
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 suspectscore=0 spamscore=0
+ bulkscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ mlxlogscore=739 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501210115
 
 On 1/17/25 8:09 PM, Claudio Imbrenda wrote:
-> Until now, every dat table allocated to map a guest was put in a
-> linked list. The page->lru field of struct page was used to keep track
-> of which pages were being used, and when the gmap is torn down, the
-> list was walked and all pages freed.
-> 
-> This patch gets rid of the usage of page->lru. Page tables are now
-> freed by recursively walking the dat table tree.
-> 
-> Since s390_unlist_old_asce() becomes useless now, remove it.
+> Move gmap_shadow_pgt_lookup() from mm/gmap.c into kvm/gaccess.c .
 > 
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+Once the naming is fixed:
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
