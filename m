@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-36161-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36162-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7745FA1827D
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:03:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E9E7A18280
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:05:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 196143A2C65
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:03:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC8643A28C2
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:05:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C1C1F4E41;
-	Tue, 21 Jan 2025 17:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5ABE1F4E40;
+	Tue, 21 Jan 2025 17:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ct/3TdVn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ekgm5za4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC291922FB;
-	Tue, 21 Jan 2025 17:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD561922FB;
+	Tue, 21 Jan 2025 17:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737479004; cv=none; b=KCbLFKyih0Hkl8XjZn8xxFVdQ87uRyeU1Tc6dfA1HIzP/kLwbc9zVsRw45yaXnfvTxEFJWNsYnE0lcZga4zpWGuk1xibaCxFNTz2OW13MXelwFOzFBeOfmSBy2xsUGUR5mxNBUBKedPPEzd7R8MNWz1pOjf0FasRuWLx6uVPYj4=
+	t=1737479137; cv=none; b=fcdA2ZG1Oce4qBSW9BviqxOMMvXO2YOR1DhgEYHETBrHFJWkmjN8Z6vxIgFGgBp0BrTBnvoPNbReiPedOHjfcHRFzH39to12pIcpT+f7tKBK0y7InFOhOHefWFBVlRZDq4tuipYEWda7aC4h2+Z48jHV4oWKswfuyIGDxDDb168=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737479004; c=relaxed/simple;
-	bh=nTsL6z4n3ipvojdaCs7f0TEXc9N2safqo7KfRTUsEeo=;
+	s=arc-20240116; t=1737479137; c=relaxed/simple;
+	bh=7Wnl9oSRTR0U9afAlbrFumWrAKFW9AV1mVaZgNK4C1Q=;
 	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=GfxCmVY8wR/T3N0mmN+83jQ2Dh7VisjHlbD8m1bNRskfXvK6rMYD6lljDTOfosg+RmSrLqqp1I2VPlNhu+5HnpnuEDGrlHhgJ6UkV6tnjtxsVHesbjsLLKl/SaK++IR8vp0+f7ECQmWR9Gr1pXWW6NCzT3f63KOC2y6797n9m0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ct/3TdVn; arc=none smtp.client-ip=209.85.221.50
+	 In-Reply-To:Content-Type; b=j3Cu7+cYNLWvNEsN93WzDMUt/1RsGckF+z2Sx8VsnxcmZYkTs9zf19tJ1Dme6i7wz76LCGK7aWENdhAJkBT+J9uDw7Fi+xVU6Df5V/SH4ibvhsjMNJX2IuifxXlA9Vh6jEMrluEEngWkud3y86N4V7qYyHN7H/N9JgMyZdsjruU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ekgm5za4; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-385e3621518so2722611f8f.1;
-        Tue, 21 Jan 2025 09:03:22 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43675b1155bso68075135e9.2;
+        Tue, 21 Jan 2025 09:05:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737479001; x=1738083801; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737479134; x=1738083934; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:content-language
          :references:cc:to:subject:reply-to:user-agent:mime-version:date
          :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oPYMhPHyht6dFTKsF2mZrpCtdkwhoXBUojhT9raPQPM=;
-        b=Ct/3TdVn75JgcUegJyAkMngzfRoaOYGmndd7q0RAkUvtkNjikwh/3DJ2NtYfTzSOU1
-         EMLvGkFHnyVD0i0k/3PKkXU115We0Bj1owGc5m+7aP1wLKXiOpt7wVv2neCKOE3e9h5+
-         LP0kuHF6ibb/CHiwDCyTR+4nvFSMY3xyTiqGoDbdNEz6S0+cfftNRNLDkp+19LrU5ICo
-         Mk4V/eSw5BBgjY51X8TH6GSIGPct9hBzl2x4Z774GKQ0pSyRGHsAQl/IYsItf1Z6nJD2
-         tSJIDk/GW7VwnA4HkJGjF6WHVFvaA9Sv5RrLGhe3/GJa+RcneeKt/qhcha25Dy+JGrrI
-         JWpg==
+        bh=LjJHSXbQesT/9Ft4jUdfkWoFqW+2359bV+wDEaGzyKE=;
+        b=Ekgm5za4ix7yj/HJ8r8gp2kC85lULAaNYEm/p2iFLcOBFzMgdMwLRDSwi5xkOYniig
+         p/NcrdhrkVb6XpP5q20UytwzTTPU1yV1Cayccc0DZZeLrYHLHvAOSaR4eWN6WjKhRKjP
+         RbUMs3czRjfqRetj0Kcl7gGZAH3Q0ZynR3lBG56U6quNNQCbdMdUf5omKtJaXr9mVsd2
+         N/Y3V2UHZjA866NgrSYGTwT/VP6yd9WIU0Ak73HP9R6HtTsRj9hSfvRbQthvYvmqIxvU
+         z1nS91Xi44I4xILcktZdG+hEdTrfZ+J2NwSAhiIZd7rvTH5UmBLQivlPqVA5NL2ZLJcP
+         NA6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737479001; x=1738083801;
+        d=1e100.net; s=20230601; t=1737479134; x=1738083934;
         h=content-transfer-encoding:in-reply-to:organization:content-language
          :references:cc:to:subject:reply-to:user-agent:mime-version:date
          :message-id:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oPYMhPHyht6dFTKsF2mZrpCtdkwhoXBUojhT9raPQPM=;
-        b=TSv+V0lSPsTV6NIWwMcIwCByUqAL88mHfdJxacwuQJLGBgY0YRQdWiJ31FgL2APwIL
-         SoD9sW7aZ9C2jR6jhL7lYCqPSA/MkSCXMyydzzR9RLJJcpi4C4ai1rf5Rd5BbOsf6AJs
-         HaGvgA9+PoA7GDTQKbQ0mJmUVCONNlrKHkhAeKzDEx1OpHMm69qwN16UQHvi3PIC+TRq
-         3W7Xf0LwObi9fUKA0HQfFJzBkraOjoWtMQrs1pyN3kwhxXuZDo3+bRJKQQjEwFcSiIm/
-         MR3zQrza5rKgN1d5FN9STuYNWZwKlNx9ibVLv+gmDUTRIMmcmJXWf+NOQPyztBfOf26Q
-         7y2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWCQTo+nf3N891eia9zxH7CnXT/pVNGy7WzT8hl22dks+uDf5jQpP3OQ3rAfa5kbZH/5RjDHt0SgmHrZ/Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxT3WLRwgkY7JfcXt7NSZ9X9YWpgH2zkEfqLBvuVACUZfPlxJZ1
-	4+3YmbIY39v1gNCgHNXS2y+A10yCfWC3bRAOW9zFIut+nR0Cxt6f
-X-Gm-Gg: ASbGncvXEJEfDp4cHR79az0GbJW/8SyVPJWCiXCAUTBAgn7u15MqsHUwdJwuEs2z6qa
-	n8WBsTfslVNWvS9Eoj3YwpTfMnLdS668/aa6Zi0AoUI2Y75RWEpd/8y92flCNOZqlbJVU0o+3cF
-	HyvJ0iW+pV5OJt4f91bdnlBIxJOaT07rAq8ZZU/D21qq1a/9Rby4Y0WpESgr8exAfsqg4o6fi2T
-	oOa3ne7KGFf85eRolBjk8OY+SmKiECIhO+6Wy4m8IwbRnYJKpYZBUOuHpUcGGkcRK1sWB0jHoke
-	X3emXXPolhc0B4B9O6Cs6rXWeQ==
-X-Google-Smtp-Source: AGHT+IG64sN1ZFuK9cz4xUyb7HE0K/OebYaJgvCyrEi+HLqDbSBQkA/qBKX92cLN+R4opN0FAJjVcA==
-X-Received: by 2002:a5d:64a3:0:b0:38a:624b:d55e with SMTP id ffacd0b85a97d-38bf57a684fmr20347202f8f.41.1737479000897;
-        Tue, 21 Jan 2025 09:03:20 -0800 (PST)
+        bh=LjJHSXbQesT/9Ft4jUdfkWoFqW+2359bV+wDEaGzyKE=;
+        b=LZCNcFQuoglIwMeOn9URIZxqit2AC3j62oXWuRoCVHkqwHMpG59aYq4ab8vs+flHri
+         KAN8Jl/S0uCPuRXY50Bzq0mkSreso7RUr5DZ64QdzWXcSzx4dAasSLfxeYmaekwzpoGZ
+         Qe5V6lkkwfPxmcfHkLYE/5/AZ5SwB4DfD/MWKcMLDmjEwA4JofehnT4cggdvGdgzdw0j
+         ovc+6mGakgrphq2SRvGVX5XKbIRFYhJuWImYt3+bGG8cTs2woSCUoHFvmEyZaQQVSWfB
+         NGdjo7GuWa6aJyPp3AVoPRnAsIreVvvgqXFXrxPzIarrX56T0bvX4VSxbAQXn1RY/U2h
+         7LBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdOnf4GearR+FDD1M8P+zpZvInXsqk71Deh1gMGBKviT6Q27NiP3UNmRmSmEc4KaKRAOSw+lO6x2MYCsU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhKU/E7kzDJ/2wVt92dMfVV1N7DEna7nikbSwH50+IkhA2pA7H
+	KPj6lvrGfvX5ZcZ2PyXx9SDH+Ue2we9kxsluJtXcFos7CfgNbbDLvBBWM55ieno=
+X-Gm-Gg: ASbGncvpdNOVBDCDYasYn9VRDlIBH45Q/IkGat+O111/oFoQciQyVJCtNm/4bdWvFU2
+	isK0CeYti8WemyiYLP41lbF7tXJDd9vcSPzd0wdEsozVNetZMckE3JABJFUW911dg7/WDmclNWX
+	ZPxJJsH4WeWiRWEAvxkDgx+KFneuqVo0RMf5UmtiBveJ4JJepmEnWqfdSXHqqrgkbUSRW5nEUL8
+	dnixPj3HW5iOz38LJ5ZdPTdbm0gVBpy4dxWiwiAhAYYwq08nfOc0qNuGZRRT3KrHiauGUP1bUwR
+	hotSYQMMqBk1TxhWKbbCiRXGiQ==
+X-Google-Smtp-Source: AGHT+IEJ4vSshdSFEYbS9I4Tl309UZvuIfRwjAYHTQ0xPfLSEwsXpnBeE7DX2nMEouOupZ40/2yGhg==
+X-Received: by 2002:a05:600c:4e14:b0:436:fa4f:a1cf with SMTP id 5b1f17b1804b1-43891431697mr172803815e9.29.1737479133507;
+        Tue, 21 Jan 2025 09:05:33 -0800 (PST)
 Received: from [192.168.19.15] (54-240-197-233.amazon.com. [54.240.197.233])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf322a838sm13742728f8f.48.2025.01.21.09.03.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890468480sm186826515e9.33.2025.01.21.09.05.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2025 09:03:20 -0800 (PST)
+        Tue, 21 Jan 2025 09:05:33 -0800 (PST)
 From: Paul Durrant <xadimgnik@gmail.com>
 X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <b3c0d243-da02-42db-8885-4290d6859c45@xen.org>
-Date: Tue, 21 Jan 2025 17:03:18 +0000
+Message-ID: <11b2a5ac-0e7a-430b-badc-23dd9907bf03@xen.org>
+Date: Tue, 21 Jan 2025 17:05:32 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,8 +85,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [PATCH 08/10] KVM: x86: Remove per-vCPU "cache" of its reference
- pvclock
+Subject: Re: [PATCH 10/10] KVM: x86: Override TSC_STABLE flag for Xen PV
+ clocks in kvm_guest_time_update()
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -94,31 +94,28 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
  Vitaly Kuznetsov <vkuznets@redhat.com>
 References: <20250118005552.2626804-1-seanjc@google.com>
- <20250118005552.2626804-9-seanjc@google.com>
+ <20250118005552.2626804-11-seanjc@google.com>
 Content-Language: en-US
 Organization: Xen Project
-In-Reply-To: <20250118005552.2626804-9-seanjc@google.com>
+In-Reply-To: <20250118005552.2626804-11-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 18/01/2025 00:55, Sean Christopherson wrote:
-> Remove the per-vCPU "cache" of the reference pvclock and instead cache
-> only the TSC shift+multiplier.  All other fields in pvclock are fully
-> recomputed by kvm_guest_time_update(), i.e. aren't actually persisted.
+> When updating PV clocks, handle the Xen-specific UNSTABLE_TSC override in
+> the main kvm_guest_time_update() by simply clearing PVCLOCK_TSC_STABLE_BIT
+> in the flags of the reference pvclock structure.  Expand the comment to
+> (hopefully) make it obvious that Xen clocks need to be processed after all
+> clocks that care about the TSC_STABLE flag.
 > 
-> In addition to shaving a few bytes, explicitly tracking the TSC shift/mul
-> fields makes it easier to see that those fields are tied to hw_tsc_khz
-> (they exist to avoid having to do expensive math in the common case).
-> And conversely, not tracking the other fields makes it easier to see that
-> things like the version number are pulled from the guest's copy, not from
-> KVM's reference.
+> No functional change intended.
 > 
+> Cc: Paul Durrant <pdurrant@amazon.com>
+> Cc: David Woodhouse <dwmw@amazon.co.uk>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   arch/x86/include/asm/kvm_host.h |  3 ++-
->   arch/x86/kvm/x86.c              | 27 +++++++++++++++------------
->   arch/x86/kvm/xen.c              |  8 ++++----
->   3 files changed, 21 insertions(+), 17 deletions(-)
+>   arch/x86/kvm/x86.c | 35 +++++++++++++++--------------------
+>   1 file changed, 15 insertions(+), 20 deletions(-)
 > 
 
 Reviewed-by: Paul Durrant <paul@xen.org>
