@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-36109-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36110-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 356D0A17E17
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 13:54:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C751A17ED4
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:30:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FD903A3512
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:54:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31B6E3A6DCB
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 13:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C771F237A;
-	Tue, 21 Jan 2025 12:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7CF11F239A;
+	Tue, 21 Jan 2025 13:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pssf+eCy"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TOpUNViC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52FE71F1503;
-	Tue, 21 Jan 2025 12:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1D11B4127;
+	Tue, 21 Jan 2025 13:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737464057; cv=none; b=d/EvVHuaSfvfYTXJklCSNd9wjFR5lqPj98/R79LZQd3+TKeAG/TBPB0rDni3wh4RnVa8239uUS9wJtc3r/WORXxjIpUMuv7SIA0fB4n6RnmxUdpGKNd+Gkh6CIJpmcacVMCvYyIgyH3IVfRftInK0x/tofbT9XWerlBebR4fG7I=
+	t=1737466214; cv=none; b=hngbcJhfYOBkPxAHK9hTTyMSTaqm3T+SgXlhWeZon1XSA92m6idieDpiXaIykXS1QkUGANxQbEr+6gspDFJCz5fM5s3kjeJ4CIXZOge483xnXZYBh1Q2euTtF+FugQ9IP0nZ6OK/LishJZWI3m4Z7GG1NtHwxKL4it30qKGOeBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737464057; c=relaxed/simple;
-	bh=OACKwrInzGmtaJCpMHdJ3jYt68YwIBIcO32LZAYWaBg=;
+	s=arc-20240116; t=1737466214; c=relaxed/simple;
+	bh=4FgJi4QmbAJPi9tcwTEpkiaSei9O1UAhScfF/NRuQ04=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qj2eEqpXOhSsLLQDw/gAqq3iYapkVvC91KH+KPOzhiJ2ukiL6GQajKIFTup+c267uMejxitHVhAHBhdwIURgrjYrLbYYH8OOy6lTzPELqRCd1HWJorJvUMq4lj23s92Mf5pWDySFKqyJMukeZPHURbLg5d+WnKrQAL7Q5coH2rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pssf+eCy; arc=none smtp.client-ip=148.163.156.1
+	 In-Reply-To:Content-Type; b=Boa748TYDgS3CxBT+lQbpgKow6BDMyOUpt19gRZsnx/CvzwtKt5nJ5fO/F5nrDzGveaGqqqpUsghdAS0e8iP6iWcmzjSp0NUXkzh9Uc2c31Z+3zedtcWiSGROTqvOLds9I8/4C2v9rHDeIrtsoulAdBX5q29fbErk0OdPfC2OOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TOpUNViC; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50L5O30x010865;
-	Tue, 21 Jan 2025 12:54:12 GMT
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50LCO4ga003061;
+	Tue, 21 Jan 2025 13:30:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=C+FqAN
-	0dU26wk3b/Oq+NLa42YaOoOYVT2s8mk0j6eEs=; b=Pssf+eCySIfhQfAse536k3
-	uIBzJ/9M/5cEF7b9FYA3KiTSTqj41nKd0qfN9g5m1KvBUMmGy0ctjgSC/hNKL9Kq
-	BzumEAXPkKZtsUTvjNnMf0pxXQSi8j1Rbc2M7+9X8GLlCZw48LcIdh6oDTE4BLsR
-	oZbZDz4yym03RbKUi86/M6rFt6pypoLxVhMYMxZ+5KLr3Td7BOdj56P61x/y4cFN
-	4qa43UNTUCb3LTx+W4e/avE8l+WOeu96hjwehY1s5AEC7w8nq+/3yKEoSkEjkmqD
-	ZTr1swJjizD6bOhV95eT2ctn3T+yiSxzGiomDlJq783e4Rplwx4pHKu2wF1gqVMA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=CYEM15
+	fMuprZhQxCrCDUvGVHKuKb6lKZt/ppbRHawyU=; b=TOpUNViCeV3FYh9m9OSFap
+	GSn1AQ5Bq5H7jxfr+PAdiZQsVTjcNRdpKTkXVwGaDIImVp/eWSrqVKboLX3SKQd0
+	RjDRwKlF0GNZwUKGxrkzye/XwSn5s+de2xlROvkOOJOGDi0An7757itF28OqCMpW
+	OaSuL+WTQ5H1c7U0/pU27aP5xUGkojva991DVBY1K5yLgohBvM5imda01fnjsL74
+	fs0DksB0iX3lPFhZjSEQZ0sZq9tT3xgGld74xarm3TSjeO1FAWQQaNkuBRodRJxs
+	TYxv+/MJKqtq+HlYs0SL4e3ZjCVLvoa7zPaDXw96WMk7Gcz8E13eyO89LgNeMqPQ
 	==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a5d7hy4y-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a2dyas0e-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 12:54:12 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LCoHxj018867;
-	Tue, 21 Jan 2025 12:54:11 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a5d7hy4u-1
+	Tue, 21 Jan 2025 13:30:07 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LDRY4h010347;
+	Tue, 21 Jan 2025 13:30:06 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a2dyas0c-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 12:54:11 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LB67uA032290;
-	Tue, 21 Jan 2025 12:54:10 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 448rujjvqn-1
+	Tue, 21 Jan 2025 13:30:06 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LDF2DG024225;
+	Tue, 21 Jan 2025 13:30:05 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448q0y3fyp-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 12:54:10 +0000
+	Tue, 21 Jan 2025 13:30:05 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LCs7UU56688896
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LDU2kt27394306
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Jan 2025 12:54:07 GMT
+	Tue, 21 Jan 2025 13:30:02 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 51EB92004B;
-	Tue, 21 Jan 2025 12:54:07 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id E7B0820043;
+	Tue, 21 Jan 2025 13:30:01 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B9C1520043;
-	Tue, 21 Jan 2025 12:54:06 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 5929620040;
+	Tue, 21 Jan 2025 13:30:01 +0000 (GMT)
 Received: from [9.171.13.4] (unknown [9.171.13.4])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 21 Jan 2025 12:54:06 +0000 (GMT)
-Message-ID: <8c993f35-bb8e-4285-b8c8-bf3392f45f11@linux.ibm.com>
-Date: Tue, 21 Jan 2025 13:54:06 +0100
+	Tue, 21 Jan 2025 13:30:01 +0000 (GMT)
+Message-ID: <7a9cd6e3-ecd6-47ce-8c19-30c6d18c220c@linux.ibm.com>
+Date: Tue, 21 Jan 2025 14:30:01 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,7 +84,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 05/15] KVM: s390: move pv gmap functions into kvm
+Subject: Re: [PATCH v3 09/15] KVM: s390: move some gmap shadowing functions
+ away from mm/gmap.c
 To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
         schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
@@ -92,7 +93,7 @@ Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
         gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
         seanjc@google.com, seiden@linux.ibm.com
 References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
- <20250117190938.93793-6-imbrenda@linux.ibm.com>
+ <20250117190938.93793-10-imbrenda@linux.ibm.com>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -137,30 +138,64 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20250117190938.93793-6-imbrenda@linux.ibm.com>
+In-Reply-To: <20250117190938.93793-10-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: P2OOOnkeG9dSY00XGQ1-JBd7eXe8PSnS
-X-Proofpoint-ORIG-GUID: 1l_leXUEBy8sByi95QLg5or4Ch9Iv47F
+X-Proofpoint-GUID: pmfEVAyf_q_WSfUw5TN_2w1fVQkCAYm-
+X-Proofpoint-ORIG-GUID: M7cWM_E4u-IDHIQhvkp6xm1hpGBiPsvy
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-21_05,2025-01-21_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 mlxscore=0 spamscore=0 clxscore=1015 mlxlogscore=750
- lowpriorityscore=0 phishscore=0 adultscore=0 malwarescore=0 suspectscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501210104
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ mlxscore=0 phishscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 mlxlogscore=999 spamscore=0 suspectscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501210112
 
 On 1/17/25 8:09 PM, Claudio Imbrenda wrote:
-> Move gmap related functions from kernel/uv into kvm.
+> Move some gmap shadowing functions from mm/gmap.c to kvm/kvm-s390.c and
+> the newly created kvm/gmap-vsie.c
 > 
-> Create a new file to collect gmap-related functions.
+> This is a step toward removing gmap from mm.
 > 
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > ---
->
+>   arch/s390/include/asm/gmap.h |   9 +-
+>   arch/s390/kvm/Makefile       |   2 +-
+>   arch/s390/kvm/gmap-vsie.c    | 142 +++++++++++++++++++++
+>   arch/s390/kvm/gmap.h         |  20 +++
+>   arch/s390/kvm/kvm-s390.c     |  62 ++++++++-
+>   arch/s390/kvm/kvm-s390.h     |   2 +
+>   arch/s390/kvm/vsie.c         |   2 +
+>   arch/s390/mm/gmap.c          | 238 +++++------------------------------
+>   8 files changed, 259 insertions(+), 218 deletions(-)
+>   create mode 100644 arch/s390/kvm/gmap-vsie.c
+[...]
+>   /**
+>    * gmap_get - increase reference counter for guest address space
+> @@ -958,86 +960,40 @@ static int gmap_protect_pte(struct gmap *gmap, unsigned long gaddr,
+>    * @prot: indicates access rights: PROT_NONE, PROT_READ or PROT_WRITE
+>    * @bits: pgste notification bits to set
+>    *
+> - * Returns 0 if successfully protected, -ENOMEM if out of memory and
+> - * -EFAULT if gaddr is invalid (or mapping for shadows is missing).
+> + * Returns:
+> + *   PAGE_SIZE if a small page was successfully protected;
+> + *   HPAGE_SIZE if a large page was successfully protected;
+> + *   -ENOMEM if out of memory;
+> + *   -EFAULT if gaddr is invalid (or mapping for shadows is missing);
+> + *   -EAGAIN if the guest mapping is missing and should be fixed by the caller.
+>    *
+> - * Called with sg->mm->mmap_lock in read.
+> + * Context: Called with sg->mm->mmap_lock in read.
+>    */
+> -static int gmap_protect_range(struct gmap *gmap, unsigned long gaddr,
+> -			      unsigned long len, int prot, unsigned long bits)
+> +int gmap_protect_one(struct gmap *gmap, unsigned long gaddr, int prot, unsigned long bits)
+>   {
 
-Looks good now
+That's a lot nicer than the nested conditionals that we had before.
+
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
