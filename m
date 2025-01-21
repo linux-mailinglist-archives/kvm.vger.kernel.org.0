@@ -1,168 +1,152 @@
-Return-Path: <kvm+bounces-36111-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36112-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 514FCA17F0E
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:42:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06B9EA17F36
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:57:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90DE63AAEAD
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 13:42:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B8393A6367
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 13:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A240B1F2C4E;
-	Tue, 21 Jan 2025 13:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF021F37D6;
+	Tue, 21 Jan 2025 13:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JlnjqfUy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isvlPBsQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2FF1F03EA;
-	Tue, 21 Jan 2025 13:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4481F2380;
+	Tue, 21 Jan 2025 13:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737466928; cv=none; b=s0om9s9EEWrXXv9igR3rWOyyen7s3GF2v8WObOkMLN5gX5p/VtlJakGBnqbCJZivXiPYecifstgQk4PypkSPnL5wB5glxRr5N0c8raD0xdxEWPAZdt/ds0BR57w3Nfa4JFORROezWYexkUGntO0/TCd0crSiwXrOTrISR5E56eg=
+	t=1737467811; cv=none; b=L+0URZx6AWuvPyo8sjRimcXuNIKo6eG1Src4FZa+9Sxn3YmiprshgVACUUjwVi78bcNmSOu5txNN6dlfWk3WRJc2HSY9SmI62BQYDDKjeXD+Ix8bYaC91onrCyoO+Wyt/pscLImPT3c8th61Hgq206K2yVIbRGiIy2AQwri9/jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737466928; c=relaxed/simple;
-	bh=iYS8F+pCxU2I+yHL2bNqv+dQ3loL+ZbsMz65Va4Fj7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N7eF39PbCJ21YijqOVgSlUMYqeZFZJCYtJ3uT14zHRCIX8Y/ekZFi6tyCpUyxX8ly5X2Af3aRpFcdWpg2Ci4zMwvAi/ZVfJFJJZfngVn/opjw/NPoeY4JoLlGLo9HJpI3C1yAWBGuEFJvYIs9DEUKXY6FP2Gvhp9D3DtjvlhRy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JlnjqfUy; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50LCd1K5021747;
-	Tue, 21 Jan 2025 13:42:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=+I2GYY
-	9Eb9cQ7smJY7j9/BCxh1JzSaRPZfIPecyiI5s=; b=JlnjqfUym63t0CW5f65f0h
-	L6BWte5PQj+ZSxHExxz/HMNVNy8PkmPKH1FucLFzfeATb9h3tcxSNTuDHwk77NCi
-	z3oWa92SGJgROXhjT3dfopZf8q8nE5IFZBk7mwsUCyOx+g62czlQeyVKs2/Ue2dm
-	2PPIh+vIgD6fg6VD4Px7wsHN66trtKZF479lqcFVPc/Sfv4zlQ/GcGtTiuagQAj0
-	drlfpnozjcCZ+WVjj1qDIBLNN4DmcklCaWu+pz9XaItQU+rMYr8a59c+LYtfGp/E
-	Q0vmFgK5vquxQB0CKyA1S9+TF2p8MHdnxIfPl+nkcw5uPOp2uljZ2+vLM6LOuVrg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a1n9b13u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 13:42:03 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LDZ8hQ027422;
-	Tue, 21 Jan 2025 13:42:03 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a1n9b13q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 13:42:03 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LD9Zkv019223;
-	Tue, 21 Jan 2025 13:42:02 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 448pmsbhks-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 13:42:02 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LDfwot34079454
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Jan 2025 13:41:58 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C07C20043;
-	Tue, 21 Jan 2025 13:41:58 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 82CF320040;
-	Tue, 21 Jan 2025 13:41:57 +0000 (GMT)
-Received: from [9.171.13.4] (unknown [9.171.13.4])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 21 Jan 2025 13:41:57 +0000 (GMT)
-Message-ID: <aa845e16-55ed-4c52-900e-df40d0a6eb17@linux.ibm.com>
-Date: Tue, 21 Jan 2025 14:41:57 +0100
+	s=arc-20240116; t=1737467811; c=relaxed/simple;
+	bh=MqI6lrWOZQoTFNws7n2UwUgsmLRqEZNZodv6GljplcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s0RNozjaB5DNC6/HxZmZVm8JMA7guwHGdhwoqM3d1yeJXguuzs7EnomVIb/Q8IIvmMTQX1bs4IlQNc1RGky9pfrL9LSZaPmPOTBsP9C92VYHI+SLqN9Ba8wnes77+IZY62K0cNoHcE4qcAnJGDYkle8GP8aePN+r8YaDiPfhWoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isvlPBsQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13D92C4CEDF;
+	Tue, 21 Jan 2025 13:56:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737467810;
+	bh=MqI6lrWOZQoTFNws7n2UwUgsmLRqEZNZodv6GljplcY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=isvlPBsQ7TrI9disQI4ep5AL0JttTMJYCjeOXU0i2Ch/ZJhKtfxYn7noZla1QkDqv
+	 en2cxtzrpb+ySn8gOB8ZoZV2S+K1n5H3W3i1NokW2jFX5MYZAQKEGHyjcd+04RPzL6
+	 fTPenbokZbubnqvnOZIUv59tCiByEKKxVUoJRCVR2ClnBGXpdDVbmRMbF5RR0kls7U
+	 7c4EikX8Q0rBg27nmXW8SWsbwke1FjZREhy6DgcwG1U+Sf6B+2s64Bk1dTdAxFB7Uo
+	 aEgg3mljv5NxhaLk6HLG7ru2QC2RXk1FcHRWMYbZ4w1F80Cti9sUorhTjzrFo4+wEW
+	 S4aA+5YxpaHVg==
+Date: Tue, 21 Jan 2025 14:56:47 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+	virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
+	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+	linux-arch@vger.kernel.org, rcu@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	Juergen Gross <jgross@suse.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"Liang, Kan" <kan.liang@linux.intel.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Jason Baron <jbaron@akamai.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Clark Williams <williams@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Tomas Glozar <tglozar@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Kees Cook <kees@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Rong Xu <xur@google.com>,
+	Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Yosry Ahmed <yosryahmed@google.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>,
+	Jinghao Jia <jinghao7@illinois.edu>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>
+Subject: Re: [PATCH v4 03/30] rcu: Add a small-width RCU watching counter
+ debug option
+Message-ID: <Z4-nn8snXYyzocQW@localhost.localdomain>
+References: <20250114175143.81438-1-vschneid@redhat.com>
+ <20250114175143.81438-4-vschneid@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/15] KVM: s390: stop using page->index for non-shadow
- gmaps
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        seanjc@google.com, seiden@linux.ibm.com
-References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
- <20250117190938.93793-11-imbrenda@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250117190938.93793-11-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: cDbzNLR8RR3AUNFA5jBF3m8MZjSYcDIR
-X-Proofpoint-GUID: nNLy5xPDxvkZKR-zmt3_wzVRao9VqxTg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-21_05,2025-01-21_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- bulkscore=0 suspectscore=0 adultscore=0 clxscore=1015 priorityscore=1501
- spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501210112
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250114175143.81438-4-vschneid@redhat.com>
 
-On 1/17/25 8:09 PM, Claudio Imbrenda wrote:
-> The host_to_guest radix tree will now map userspace addresses to guest
-> addresses, instead of userspace addresses to segment tables.
+Le Tue, Jan 14, 2025 at 06:51:16PM +0100, Valentin Schneider a écrit :
+> A later commit will reduce the size of the RCU watching counter to free up
+> some bits for another purpose. Paul suggested adding a config option to
+> test the extreme case where the counter is reduced to its minimum usable
+> width for rcutorture to poke at, so do that.
 > 
-> When segment tables and page tables are needed, they are found using an
-> additional gmap_table_walk().
+> Make it only configurable under RCU_EXPERT. While at it, add a comment to
+> explain the layout of context_tracking->state.
 > 
-> This gets rid of all usage of page->index for non-shadow gmaps.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Link: http://lore.kernel.org/r/4c2cb573-168f-4806-b1d9-164e8276e66a@paulmck-laptop
+> Suggested-by: Paul E. McKenney <paulmck@kernel.org>
+> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+> Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Frederic Weisbecker <frederic@kernel.org>
 
