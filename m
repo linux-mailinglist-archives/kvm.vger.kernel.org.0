@@ -1,122 +1,161 @@
-Return-Path: <kvm+bounces-36162-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36163-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9E7A18280
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:05:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE98A18293
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:09:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC8643A28C2
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:05:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0849188BC47
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:09:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5ABE1F4E40;
-	Tue, 21 Jan 2025 17:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9770F1F4E48;
+	Tue, 21 Jan 2025 17:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ekgm5za4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hL/ZjOH2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD561922FB;
-	Tue, 21 Jan 2025 17:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5871D1B394B
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 17:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737479137; cv=none; b=fcdA2ZG1Oce4qBSW9BviqxOMMvXO2YOR1DhgEYHETBrHFJWkmjN8Z6vxIgFGgBp0BrTBnvoPNbReiPedOHjfcHRFzH39to12pIcpT+f7tKBK0y7InFOhOHefWFBVlRZDq4tuipYEWda7aC4h2+Z48jHV4oWKswfuyIGDxDDb168=
+	t=1737479386; cv=none; b=PNI4DyFc42LOSZ87HjCwGPW1lc8hnQSU89QV5dt43i4FaKXZ5dhoYmiYb6REPbsEhnlnLeHmWr+7F0pgTN4uy5OEo7z2n2VibBhwEChMYaHt3NTUx2GS2ad/1d5Mj0wfAXaB6R5nj3mRlSgzrDrxzfB7z1pI6CzGgzBSpuBmr6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737479137; c=relaxed/simple;
-	bh=7Wnl9oSRTR0U9afAlbrFumWrAKFW9AV1mVaZgNK4C1Q=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=j3Cu7+cYNLWvNEsN93WzDMUt/1RsGckF+z2Sx8VsnxcmZYkTs9zf19tJ1Dme6i7wz76LCGK7aWENdhAJkBT+J9uDw7Fi+xVU6Df5V/SH4ibvhsjMNJX2IuifxXlA9Vh6jEMrluEEngWkud3y86N4V7qYyHN7H/N9JgMyZdsjruU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ekgm5za4; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43675b1155bso68075135e9.2;
-        Tue, 21 Jan 2025 09:05:35 -0800 (PST)
+	s=arc-20240116; t=1737479386; c=relaxed/simple;
+	bh=joEnkS+Yavjx5oVEMhN2c8f7HsMyLQgz95VavZRtXhA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ajGVuPwG93ZZk0PNyro8d2ibwpxPY7yfCPtW4ZuFZvtP9gzNdj5NVngJ8vWjbD6wOdIZ78vUm/pRCwdhL9pVZDXkksPNg/s2WsfnM26nFLTbKGAZoSC2jwj1YoxOF3d+OpKrcmcMdQscTqOLMf4AwWhEkoitSwC7p1/cE0/GVk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hL/ZjOH2; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9e4c5343so16929521a91.0
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 09:09:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737479134; x=1738083934; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LjJHSXbQesT/9Ft4jUdfkWoFqW+2359bV+wDEaGzyKE=;
-        b=Ekgm5za4ix7yj/HJ8r8gp2kC85lULAaNYEm/p2iFLcOBFzMgdMwLRDSwi5xkOYniig
-         p/NcrdhrkVb6XpP5q20UytwzTTPU1yV1Cayccc0DZZeLrYHLHvAOSaR4eWN6WjKhRKjP
-         RbUMs3czRjfqRetj0Kcl7gGZAH3Q0ZynR3lBG56U6quNNQCbdMdUf5omKtJaXr9mVsd2
-         N/Y3V2UHZjA866NgrSYGTwT/VP6yd9WIU0Ak73HP9R6HtTsRj9hSfvRbQthvYvmqIxvU
-         z1nS91Xi44I4xILcktZdG+hEdTrfZ+J2NwSAhiIZd7rvTH5UmBLQivlPqVA5NL2ZLJcP
-         NA6A==
+        d=google.com; s=20230601; t=1737479384; x=1738084184; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kTIPaVwvdE66u8GfvZeKYzxAZfj8jr5wdUjQPFYH2IU=;
+        b=hL/ZjOH2XcI++UwbELh7aBrNVNxxofkBDYQza7tbd8lLjCsgQ2bQKMy7SNs8z2x4cs
+         Cwj/1tj0cItL7BiiMRAFxUlb8OrcA3/a196Zx1GErCbGbelsxbo5kTOUzFBwVS2+dQUW
+         32MpdiFvY2KpzNJWDKAsAYUZKzZK8kh1PrqkgcdAP1+HhV0TZzyRKOu+jNyY0ms9Q5qk
+         UCPjVPFJpxmlevK8SJCtYK2SN7bAo5CxFFOSjkld+xu6UzBQtTqPKHvssf8wz3Dw01Qj
+         lbBs/tY0WFTErqvHvEaPRrIA1DbfObe30xsu3VJ2cCM2BtFYakjGc+dz780JltTaeBvu
+         K1fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737479134; x=1738083934;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LjJHSXbQesT/9Ft4jUdfkWoFqW+2359bV+wDEaGzyKE=;
-        b=LZCNcFQuoglIwMeOn9URIZxqit2AC3j62oXWuRoCVHkqwHMpG59aYq4ab8vs+flHri
-         KAN8Jl/S0uCPuRXY50Bzq0mkSreso7RUr5DZ64QdzWXcSzx4dAasSLfxeYmaekwzpoGZ
-         Qe5V6lkkwfPxmcfHkLYE/5/AZ5SwB4DfD/MWKcMLDmjEwA4JofehnT4cggdvGdgzdw0j
-         ovc+6mGakgrphq2SRvGVX5XKbIRFYhJuWImYt3+bGG8cTs2woSCUoHFvmEyZaQQVSWfB
-         NGdjo7GuWa6aJyPp3AVoPRnAsIreVvvgqXFXrxPzIarrX56T0bvX4VSxbAQXn1RY/U2h
-         7LBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUdOnf4GearR+FDD1M8P+zpZvInXsqk71Deh1gMGBKviT6Q27NiP3UNmRmSmEc4KaKRAOSw+lO6x2MYCsU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhKU/E7kzDJ/2wVt92dMfVV1N7DEna7nikbSwH50+IkhA2pA7H
-	KPj6lvrGfvX5ZcZ2PyXx9SDH+Ue2we9kxsluJtXcFos7CfgNbbDLvBBWM55ieno=
-X-Gm-Gg: ASbGncvpdNOVBDCDYasYn9VRDlIBH45Q/IkGat+O111/oFoQciQyVJCtNm/4bdWvFU2
-	isK0CeYti8WemyiYLP41lbF7tXJDd9vcSPzd0wdEsozVNetZMckE3JABJFUW911dg7/WDmclNWX
-	ZPxJJsH4WeWiRWEAvxkDgx+KFneuqVo0RMf5UmtiBveJ4JJepmEnWqfdSXHqqrgkbUSRW5nEUL8
-	dnixPj3HW5iOz38LJ5ZdPTdbm0gVBpy4dxWiwiAhAYYwq08nfOc0qNuGZRRT3KrHiauGUP1bUwR
-	hotSYQMMqBk1TxhWKbbCiRXGiQ==
-X-Google-Smtp-Source: AGHT+IEJ4vSshdSFEYbS9I4Tl309UZvuIfRwjAYHTQ0xPfLSEwsXpnBeE7DX2nMEouOupZ40/2yGhg==
-X-Received: by 2002:a05:600c:4e14:b0:436:fa4f:a1cf with SMTP id 5b1f17b1804b1-43891431697mr172803815e9.29.1737479133507;
-        Tue, 21 Jan 2025 09:05:33 -0800 (PST)
-Received: from [192.168.19.15] (54-240-197-233.amazon.com. [54.240.197.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890468480sm186826515e9.33.2025.01.21.09.05.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2025 09:05:33 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <11b2a5ac-0e7a-430b-badc-23dd9907bf03@xen.org>
-Date: Tue, 21 Jan 2025 17:05:32 +0000
+        d=1e100.net; s=20230601; t=1737479384; x=1738084184;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kTIPaVwvdE66u8GfvZeKYzxAZfj8jr5wdUjQPFYH2IU=;
+        b=hpl2L9hLsev4LKMnZjJiFREIB1YNB9NfmW/34HDqth+RQsX/w4JNpNivQ+d+6hq8f9
+         5kjayobXMUDLtn5dbaixVyZdxQRwi6JF3l6V/XC3VJBbRZWZvNtLrZYfIKRRK06FlTPI
+         l+IQqjmMSVvOTsUEK1kpIjx1BlcbFNJBTmtxGX2pwoAD+ToUI+xlo4PF+iywzi/qozrE
+         NqzQWiXUNuIC/cl/ux6rY8TDxmEdRzfS0N2HKmLACBfWfnjkonAATDwND9U8gwSYyERq
+         oPYFLG+HkqPBjycISwchU8RuK9yoeFJwN5tKD4NpB5YLotT0KHDjGUAHN0A4dMdWcRCs
+         CO5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVxIezErGwJuTfjzq6Pz1m7wF8JUX/7HI0rCY7HZHOusJUe/+JlBPH+/pChF+5udAY6Ubk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLUipAAKogHlUQ0SyXRZNZckSGOv4ZH0ka77BuGguD8Oq4ZXL+
+	aNmOs8mXsNTjDqJfUqqtYHCEJYGdVQvYxiKTTmHDaWW09nAMldYgVQe/M16OsH3V5/vH0ozu8dV
+	LgQ==
+X-Google-Smtp-Source: AGHT+IFXhtO/oCrGt8i6oaoAkVXwlRYFse6HqXBKv3/vHJ+bchQ+wvlklzU0zw/eC2aVXwFU/rrZhmvXx58=
+X-Received: from pfar2.prod.google.com ([2002:a05:6a00:a902:b0:728:b8e3:993f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2184:b0:725:ef4b:de33
+ with SMTP id d2e1a72fcca58-72daf88b1b9mr27723623b3a.0.1737479384623; Tue, 21
+ Jan 2025 09:09:44 -0800 (PST)
+Date: Tue, 21 Jan 2025 09:09:43 -0800
+In-Reply-To: <f80fc36f-dd58-4934-9bc0-8e91352a36b2@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH 10/10] KVM: x86: Override TSC_STABLE flag for Xen PV
- clocks in kvm_guest_time_update()
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com,
- Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20250118005552.2626804-1-seanjc@google.com>
- <20250118005552.2626804-11-seanjc@google.com>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <20250118005552.2626804-11-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250118005552.2626804-1-seanjc@google.com> <20250118005552.2626804-5-seanjc@google.com>
+ <f80fc36f-dd58-4934-9bc0-8e91352a36b2@xen.org>
+Message-ID: <Z4_U16jb7IbVdlLi@google.com>
+Subject: Re: [PATCH 04/10] KVM: x86: Set PVCLOCK_GUEST_STOPPED only for
+ kvmclock, not for Xen PV clock
+From: Sean Christopherson <seanjc@google.com>
+To: paul@xen.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com, 
+	Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 18/01/2025 00:55, Sean Christopherson wrote:
-> When updating PV clocks, handle the Xen-specific UNSTABLE_TSC override in
-> the main kvm_guest_time_update() by simply clearing PVCLOCK_TSC_STABLE_BIT
-> in the flags of the reference pvclock structure.  Expand the comment to
-> (hopefully) make it obvious that Xen clocks need to be processed after all
-> clocks that care about the TSC_STABLE flag.
+On Tue, Jan 21, 2025, Paul Durrant wrote:
+> > ---
+> >   arch/x86/kvm/x86.c | 20 ++++++++++++++------
+> >   1 file changed, 14 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index d8ee37dd2b57..3c4d210e8a9e 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -3150,11 +3150,6 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+> >   	/* retain PVCLOCK_GUEST_STOPPED if set in guest copy */
+> >   	vcpu->hv_clock.flags |= (guest_hv_clock->flags & PVCLOCK_GUEST_STOPPED);
+> > -	if (vcpu->pvclock_set_guest_stopped_request) {
+> > -		vcpu->hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
+> > -		vcpu->pvclock_set_guest_stopped_request = false;
+> > -	}
+> > -
+> >   	memcpy(guest_hv_clock, &vcpu->hv_clock, sizeof(*guest_hv_clock));
+> >   	if (force_tsc_unstable)
+> > @@ -3264,8 +3259,21 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+> >   	if (use_master_clock)
+> >   		vcpu->hv_clock.flags |= PVCLOCK_TSC_STABLE_BIT;
+> > -	if (vcpu->pv_time.active)
+> > +	if (vcpu->pv_time.active) {
+> > +		/*
+> > +		 * GUEST_STOPPED is only supported by kvmclock, and KVM's
+> > +		 * historic behavior is to only process the request if kvmclock
+> > +		 * is active/enabled.
+> > +		 */
+> > +		if (vcpu->pvclock_set_guest_stopped_request) {
+> > +			vcpu->hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
+> > +			vcpu->pvclock_set_guest_stopped_request = false;
+> > +		}
+> >   		kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0, false);
+> > +
+> > +		vcpu->hv_clock.flags &= ~PVCLOCK_GUEST_STOPPED;
 > 
-> No functional change intended.
-> 
-> Cc: Paul Durrant <pdurrant@amazon.com>
-> Cc: David Woodhouse <dwmw@amazon.co.uk>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/x86.c | 35 +++++++++++++++--------------------
->   1 file changed, 15 insertions(+), 20 deletions(-)
-> 
+> Is this intentional? The line above your change in kvm_setup_guest_pvclock()
+> clearly keeps the flag enabled if it already set and, without this patch, I
+> don't see anything clearing it.
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+Oh, I see what you're getting at.  Hrm.  Yes, clearing the flag is intentional,
+otherwise the patch wouldn't do what it claims to do (set PVCLOCK_GUEST_STOPPED
+only for kvmclock).
+
+Swapping the order of this patch and the next patch ("don't bleed ...") doesn't
+break the cycle because that would result in PVCLOCK_GUEST_STOPPED only being
+applied to the first active clock (kvmclock).
+
+The only way I can think of to fully isolate the changes would be to split this
+into two patches: (4a) hoist pvclock_set_guest_stopped_request processing into
+kvm_guest_time_update() and (4b) apply it only to kvmclock, and then make the
+ordering 4a, 5, 4b, i.e. "hoist", "don't bleed", "only kvmclock".
+
+4a would be quite ugly, because to avoid introducing a functional change, it
+would need to be:
+
+	if (vcpu->pv_time.active || vcpu->xen.vcpu_info_cache.active ||
+	    vcpu->xen.vcpu_time_info_cache.active) {
+		vcpu->hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
+		vcpu->pvclock_set_guest_stopped_request = false;
+	}
+
+But it's not the worst intermediate code, so I'm not opposed to going that
+route.
+
+> > +	}
+> > +
+> >   #ifdef CONFIG_KVM_XEN
+> >   	if (vcpu->xen.vcpu_info_cache.active)
+> >   		kvm_setup_guest_pvclock(v, &vcpu->xen.vcpu_info_cache,
+> 
 
