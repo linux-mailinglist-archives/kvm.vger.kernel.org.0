@@ -1,251 +1,176 @@
-Return-Path: <kvm+bounces-36120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D773FA1803C
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:45:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 786D0A18040
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:45:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A1A31884691
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:45:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4635D18859F7
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA331F426A;
-	Tue, 21 Jan 2025 14:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC391F3FFC;
+	Tue, 21 Jan 2025 14:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/X7J33z"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ntdyR0v0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B521F192A;
-	Tue, 21 Jan 2025 14:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D521F3FEB;
+	Tue, 21 Jan 2025 14:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737470680; cv=none; b=XTCxZCNFTR2yC+azCrY3iRq3Upuz8mD3S6usuwMSnsigDRqWdN1Xnp/kBxP0Jop2yFzGlXucrkuGHBEIbRKX/dvh9gPhiYg7lJf1gYnUlbsEEPfLnxO2xxU4nbNseYFrOm4xpLoA1RBJQUH+2s8X4BVElBtFs7dq6fhcESQFCi4=
+	t=1737470690; cv=none; b=JxvtK4FHVWjwQc6WSQ8jyRyMsF5KvgXUgB+qyJpz2Ek+fbmPPzhFA4c+62kDlV/Ett3v3tIdvHMs1GtY1BgMzgTkNYwWbaczjQhptXfbvHC+eV5QPyKv9fuu626nquvLZMCc99WKxH0Mx8pMjCRU/xAe4GixdbpBvQ80BpA7XM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737470680; c=relaxed/simple;
-	bh=dzv8d4QgxaaAASlgBbRSTstXZHFvO/eJVQg5Xx7cZgw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=eaufTcutWi/dQhE+nqcmjFZ32Yjs1irrDB4BloGA0qAcwW4p67stHLi2p10QHpa/htQRzh/aq8dJI8eF3Mng260Ancy6MOss9OfkaJmeEgHQThAmEYpcW9a+Dvr5l30yO/d8Q5GH8ZhAWiVo7jV5q5V+5Wn/BqyAptIfvl5q77k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B/X7J33z; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7be6fdeee35so221337485a.1;
-        Tue, 21 Jan 2025 06:44:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737470677; x=1738075477; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jyktx4GLlCScfqAq7gUKHdqOkhKWGMD1Q4f5V2suP8g=;
-        b=B/X7J33zaqIVYG9Gt91PxIxru1XEuQDbEUZli/8EyIfwzFv6OKjAFshQNbLd91SMz7
-         +ccIrY6pJPcDGZtIr4ic9mjJnxTiVwEZFo2pLp4oD7krm5q5WmnitbARy2R+BNaMOTAa
-         /eI13BCvUvo2GQpU4jGj3YK3snwXBUDJ87mavu9+6hop7NuaDKUVh1wM3kAtxaitfsWa
-         UMBT5P0gMQc6h0XrFt9rcyBFzo3wwgqI68Z9/gP75OPcTurSvwYL+WZhSZNJdbDqbfSi
-         yVOm0em1gEK5Ll7kmztzMkcvjBcr3rUwxhZObBUjfcebgAG0dOrqTfVc0PU5W8YRrBTu
-         HkJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737470677; x=1738075477;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jyktx4GLlCScfqAq7gUKHdqOkhKWGMD1Q4f5V2suP8g=;
-        b=t9sf9LxyNkaZe/HR3qC12bitndWVvuu0ZVIArn6GqnX1K1cuQ2cAOvtU1gl0kgptqZ
-         GbYFVmMjRHs3/ppqtU7nRgETAjcmLVYcm5vqcGQJ21eScGXnExhy5V5XqK6GPm7JfiA5
-         aklErK5jmjjycwCqfaOTcXB11boiqAO3L9mF+cnTBZ2T+exmZj7SvEqsTVxIQm+BMk6E
-         no1VBv/piJQ8mwVP2C3Oi+bvjVF1jvhkddvQF6nut8uQPuU2BEln4GHGJ+TSLU2qObsm
-         UW/CSUCymn/hPFyJmPWxxzc0jIoXEPXhDbHkIeP+ZhluLdQURnpko61muhSxrcx7bgcf
-         OgNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjiZ3st9m9UumbUWIz6qBQgtSb0AsqnP6gJbR4CZPzT8SAyUYFtdK15FMx5rsHoTPb/bc=@vger.kernel.org, AJvYcCW7vUIbOQjbmJvY/8bPAaRdMxQLJFHEzxMCqElrNN9oCk6jRqNWpviSJffBLZPGr8/ukjf8TXdtrUcfpARgFEjn@vger.kernel.org, AJvYcCWpYP9b1/lZrrECrAlrbdxGCHpJY+aWLwXZ0f/qmZ+CZKOkaO2koB8OyAGqeCwAeBHmlGl1ZMzM8sH1@vger.kernel.org, AJvYcCXfTR3+zSJBUi9DxiPm1/5xOAOmtFmIVEe6eIUh9Y2NsJrkGwkUCszNbg6IjLY6usPUoNY52gxF@vger.kernel.org, AJvYcCXhHPleVlBTcOBiG8pER/7fV6gDoA6JDmaFCP7Gu5fAR+bVnTmq8f+Sm30wFFrLkgwoyE4/HFRqAm0N7mb3@vger.kernel.org
-X-Gm-Message-State: AOJu0YzicXvuEfTe9RalUBQ5vQfm/3uO8Q8TJ8qE+xjKoUgP393VNhY4
-	35wHgRP3sSNWZ8e2oFqIoecQWVZNEBUjCLmhQliBQpSkjsgGNtMc
-X-Gm-Gg: ASbGncuM7baROEVPWcz0FE/XnrXRNLy9eD+8cAif7reAd3ClzY1WLpcJUhupIRHsFLp
-	aHH5CpLDdWJrtXsysfDL89vwc50gSc+GcQXCtsTWENvGfl7qmW3F0AWfZSLCN78HHUxKE0JFioR
-	TPf1PRhAMbxzqQ4yzNCmAv2cHuZusXBVAMcRjNryTePiLDbhJC67w5jt+vT58DZJlurzNnJmjss
-	0gL3G0AU3e4If1FSbiSgk4geAQkX7cWvXKoPqUOWgtCysIuz2l+8y0Jv/VZTvGyP91cCDc+HVQT
-	Lvo4gD6TpRVSshs/bNlMJ30wzkP8n6EnG4QD3JLbmQ==
-X-Google-Smtp-Source: AGHT+IHtIG5gIIPDS7Z+0e7uts4N1XZIUfZImZcQSkO2xO7BtbJzbDXJHLc7zxNeNompcCwG5inecg==
-X-Received: by 2002:a05:620a:4416:b0:7b6:c4c7:ece6 with SMTP id af79cd13be357-7be6324fc40mr3090213285a.40.1737470677189;
-        Tue, 21 Jan 2025 06:44:37 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e258c82a6sm34065981cf.59.2025.01.21.06.44.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 06:44:36 -0800 (PST)
-Date: Tue, 21 Jan 2025 09:44:36 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Jason Wang <jasowang@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- devel@daynix.com
-Message-ID: <678fb2d43a668_23e15a294c5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <92675e51-cbaf-4905-8cf8-dff741a26db9@daynix.com>
-References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
- <20250116-tun-v3-9-c6b2871e97f7@daynix.com>
- <678a21a9388ae_3e503c294f4@willemb.c.googlers.com.notmuch>
- <51f0c6ba-21bc-4fef-a906-5d83ab29b7ff@daynix.com>
- <CACGkMEuPXDWHErCCdEUB7+Q0NxsAjpSH9uTvOxzuBvNeyw7_Hg@mail.gmail.com>
- <CA+FuTSec1z7-8nNNc1ZXkzekDrFHPnvYKFf8PNZg89VuwhoWSw@mail.gmail.com>
- <92675e51-cbaf-4905-8cf8-dff741a26db9@daynix.com>
-Subject: Re: [PATCH net v3 9/9] tap: Use tun's vnet-related code
+	s=arc-20240116; t=1737470690; c=relaxed/simple;
+	bh=w7rFj57sUCZa6DLo6Im8qSYwzixHy7YrkN2xyDNnfBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bTDG5PtuR8UKdEC0o2EgOQaozVR5tKIo1Du98UnfKDc0a+QQI5AttvwpruIHXymEzOxtw+cTZl0xzVEHP1gdqb61aOWozLc/6WAAIeNvDU3RPIo1ih1Nt/BTXFOfMcSvIZOYHTcpgYhF56bc+MqFgq7qDJeH46MZa+yhpig6KQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ntdyR0v0; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50L5ZbU7004323;
+	Tue, 21 Jan 2025 14:44:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=0qt3Wa
+	BTkfSu7gp994QdzVLdPEcS0YH5Nyeths0ZTNY=; b=ntdyR0v0Z4gg4AnEmseUeu
+	l20pu3qnuCtsCB7uR6ATtgAex7pG+swtZjUo20mSEntC5uJGJpV1iaFBstTku9kW
+	Ex3Kt86dwWSL7FuEuakrW7JmY4J1uyUPK/S9/MtWHjswpCIbibIdl3jT8eleLv/c
+	fzBenGXnlldoKdDpEvfM1Bzxck4V2nNX19e5bvNFQ99Kqx/MxZVLuULwY5K1JUDp
+	CEpwd7pMwjMzWOjXMwUXEuNYmSjsZHN34rk1TeOic4Yyi5qb2B34EG7sd+yXw0K5
+	zwiaGh/EZ6gFzqNqSS1CXqaeV9sNIWYRXAjJU1OVBucOJNki8fa/U//iXVv1Qkqg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449rrydajr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 14:44:43 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LEISYa021597;
+	Tue, 21 Jan 2025 14:44:43 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449rrydajn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 14:44:43 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LDIAD2024307;
+	Tue, 21 Jan 2025 14:44:42 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448q0y3r2c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 14:44:42 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LEiccv65012172
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Jan 2025 14:44:38 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 960AF2004F;
+	Tue, 21 Jan 2025 14:44:38 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D39C52004E;
+	Tue, 21 Jan 2025 14:44:37 +0000 (GMT)
+Received: from [9.171.13.4] (unknown [9.171.13.4])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 21 Jan 2025 14:44:37 +0000 (GMT)
+Message-ID: <9402c203-f4d5-47d1-962d-fd7387daea16@linux.ibm.com>
+Date: Tue, 21 Jan 2025 15:44:37 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 15/15] KVM: s390: remove the last user of page->index
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        seanjc@google.com, seiden@linux.ibm.com
+References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
+ <20250117190938.93793-16-imbrenda@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250117190938.93793-16-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: QIDy2W6ZBTz_kaj61b8oObQ1O82SmT18
+X-Proofpoint-ORIG-GUID: fPSF5idnJE4GdXVNrSF8LIeuf74jxSBg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-21_06,2025-01-21_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 suspectscore=0 spamscore=0
+ bulkscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501210118
 
-Akihiko Odaki wrote:
-> On 2025/01/20 20:19, Willem de Bruijn wrote:
-> > On Mon, Jan 20, 2025 at 1:37=E2=80=AFAM Jason Wang <jasowang@redhat.c=
-om> wrote:
-> >>
-> >> On Fri, Jan 17, 2025 at 6:35=E2=80=AFPM Akihiko Odaki <akihiko.odaki=
-@daynix.com> wrote:
-> >>>
-> >>> On 2025/01/17 18:23, Willem de Bruijn wrote:
-> >>>> Akihiko Odaki wrote:
-> >>>>> tun and tap implements the same vnet-related features so reuse th=
-e code.
-> >>>>>
-> >>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >>>>> ---
-> >>>>>    drivers/net/Kconfig    |   1 +
-> >>>>>    drivers/net/Makefile   |   6 +-
-> >>>>>    drivers/net/tap.c      | 152 +++++----------------------------=
-----------------
-> >>>>>    drivers/net/tun_vnet.c |   5 ++
-> >>>>>    4 files changed, 24 insertions(+), 140 deletions(-)
-> >>>>>
-> >>>>> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> >>>>> index 1fd5acdc73c6..c420418473fc 100644
-> >>>>> --- a/drivers/net/Kconfig
-> >>>>> +++ b/drivers/net/Kconfig
-> >>>>> @@ -395,6 +395,7 @@ config TUN
-> >>>>>       tristate "Universal TUN/TAP device driver support"
-> >>>>>       depends on INET
-> >>>>>       select CRC32
-> >>>>> +    select TAP
-> >>>>>       help
-> >>>>>         TUN/TAP provides packet reception and transmission for us=
-er space
-> >>>>>         programs.  It can be viewed as a simple Point-to-Point or=
- Ethernet
-> >>>>> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
-> >>>>> index bb8eb3053772..2275309a97ee 100644
-> >>>>> --- a/drivers/net/Makefile
-> >>>>> +++ b/drivers/net/Makefile
-> >>>>> @@ -29,9 +29,9 @@ obj-y +=3D mdio/
-> >>>>>    obj-y +=3D pcs/
-> >>>>>    obj-$(CONFIG_RIONET) +=3D rionet.o
-> >>>>>    obj-$(CONFIG_NET_TEAM) +=3D team/
-> >>>>> -obj-$(CONFIG_TUN) +=3D tun-drv.o
-> >>>>> -tun-drv-y :=3D tun.o tun_vnet.o
-> >>>>> -obj-$(CONFIG_TAP) +=3D tap.o
-> >>>>> +obj-$(CONFIG_TUN) +=3D tun.o
-> >>>>
-> >>>> Is reversing the previous changes to tun.ko intentional?
-> >>>>
-> >>>> Perhaps the previous approach with a new CONFIG_TUN_VNET is prefer=
-able
-> >>>> over this. In particular over making TUN select TAP, a new depende=
-ncy.
-> >>>
-> >>> Jason, you also commented about CONFIG_TUN_VNET for the previous
-> >>> version. Do you prefer the old approach, or the new one? (Or if you=
- have
-> >>> another idea, please tell me.)
-> >>
-> >> Ideally, if we can make TUN select TAP that would be better. But the=
-re
-> >> are some subtle differences in the multi queue implementation. We wi=
-ll
-> >> end up with some useless code for TUN unless we can unify the multi
-> >> queue logic. It might not be worth it to change the TUN's multi queu=
-e
-> >> logic so having a new file seems to be better.
-> > =
+On 1/17/25 8:09 PM, Claudio Imbrenda wrote:
+> Shadow page tables use page->index to keep the g2 address of the guest
+> page table being shadowed.
+> 
+> Instead of keeping the information in page->index, split the address
+> and smear it over the 16-bit softbits areas of 4 PGSTEs.
+> 
+> This removes the last s390 user of page->index.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/pgtable.h | 15 +++++++++++++++
+>   arch/s390/kvm/gaccess.c         |  6 ++++--
+>   arch/s390/mm/gmap.c             | 22 ++++++++++++++++++++--
+>   3 files changed, 39 insertions(+), 4 deletions(-)
 
-> > +1 on deduplicating further. But this series is complex enough. Let's=
- not
-> > expand that.
-> > =
+s/index/paddr/ or pgaddr?
 
-> > The latest approach with a separate .o file may have some performance=
-
-> > cost by converting likely inlined code into real function calls.
-> > Another option is to move it all into tun_vnet.h. That also resolves
-> > the Makefile issues.
-> =
-
-> I measured the size difference between the latest inlining approaches. =
-
-> The numbers may vary depending on the system configuration of course, =
-
-> but they should be useful for reference.
-> =
-
-> The below shows sizes when having a separate module: 106496 bytes in to=
-tal
-> =
-
-> # lsmod
-> Module                  Size  Used by
-> tap                    28672  0
-> tun                    61440  0
-> tun_vnet               16384  2 tun,tap
-> =
-
-> The below shows sizes when inlining: 102400 bytes in total
-> =
-
-> # lsmod
-> Module                  Size  Used by
-> tap                    32768  0
-> tun                    69632  0
-> =
-
-> So having a separate module costs 4096 bytes more.
-> =
-
-> These two approaches should have similar tendency for run-time and =
-
-> compile-time performance; the code is so trivial that the overhead of =
-
-> having one additional module is dominant.
-
-The concern raised was not about object size, but about inlined vs
-true calls in the hot path.
- =
-
-> The only downside of having all in tun_vnet.h is that it will expose it=
-s =
-
-> internal macros and functions, which I think tolerable.
-
-As long as only included by tun.c and tap.c, I think that's okay.
-The slow path code (ioctl) could remain in a .c file. But it's
-simpler to just have the header file.
+I get that you're replacing index but you now have the opportunity to 
+choose an expressive name for this field/variable.
 
