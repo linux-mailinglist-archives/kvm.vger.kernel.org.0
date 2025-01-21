@@ -1,235 +1,208 @@
-Return-Path: <kvm+bounces-36151-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36152-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8A9A18206
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:33:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B44F0A1820B
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:35:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CBBF1882B02
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:33:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0040168BED
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC1A1F471A;
-	Tue, 21 Jan 2025 16:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49CDB1F471A;
+	Tue, 21 Jan 2025 16:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Tg5AJE8K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I8nMmVZJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A793BBF2;
-	Tue, 21 Jan 2025 16:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB541741D2
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 16:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737477217; cv=none; b=hqmAPfhjoHRFvbmo35+G/gPzA/ork4nQ2R3qJmWozZnoOpuE0H3zbcrIG4HzgVeb7pP8n4vUKh/SsAB4Ew2029XDfD2IsMUhzIRSVYFVKPM5WiS2Mo1g6K07fRmdp+8lD/eHTbkhydvyqZz9jHMnoMijKZfb72ws5qlSdKF6Dw8=
+	t=1737477316; cv=none; b=PUVFcT6zQlaQdNZbzpaXTIF+2Pevm838LCi2/DnMv2lvSUj2GMVkuaTz8fK7RW3u5qSaR7pSkQq7o10ht+vXvwwGARfMd2ZIBTC+7bdVr9NGKnugtAAiKEY0n55+vc2sNQ1C4x/mKIRKpmbneLrOm8YkQZcwaVRR182IBH4ISck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737477217; c=relaxed/simple;
-	bh=LnqNpn53LWInmijkGHp9IkBD6nuG9rLnV0na/UAZxYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pRUxBPCzlr3NUDrguMhIlQ3TFgHX/uuhtTK2xs9chvTZrI5A4NHhSxMg4MKkhGCDrVIPhd8j4KYvDUG5FYEDGEWu56kdEp9kzLEL9pzuwShixmBoFvJmTDRq6ZhSsD1tMBAz5XqI0R74hYMiTMlMd+GiIvvIc0l5NW46KFZgVIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Tg5AJE8K; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50LF1QW8001329;
-	Tue, 21 Jan 2025 16:33:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=wMbbBI
-	j7SfvWoKhfG2Dxkoa7tanTflOTdbHHQXTTLog=; b=Tg5AJE8KqySYNRNAXR760k
-	I+1isjJxPQcnXZ/dkoODi+VV7qM4cl9akgMF1jcCmM2+7c4RQSsLjB5ifsTbSc8i
-	RRCx77qm2Ym6uKOpTha9y4AQYZUCNy422oHT+TmXgjvDfsoqMMdNraPp+CQ0U5ZC
-	n4mBh4MF7IJE/YikVO5wNvjoFaqTXOSUcqPWYI8RTG6/1W9ILsyOXJiqtiolZv0G
-	HAdGnZoH9Qj1+rnBrJAQ4fWnSkuOG7RdJEvl75w9miMXbIxvZXxKTrrAL2R5wy2k
-	oMDn1Zh3rDhvWCtyaKj2tCMmb8I/OLwecPrgTlGzo58UU1EN0+0JKLVCZuGzRCEg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44aduyrfma-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 16:33:23 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LGTscF013737;
-	Tue, 21 Jan 2025 16:33:22 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44aduyrfm5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 16:33:22 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LEY8Nr022378;
-	Tue, 21 Jan 2025 16:33:21 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448r4k3vhf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 16:33:21 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LGXH5m20906472
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Jan 2025 16:33:17 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F4DB20043;
-	Tue, 21 Jan 2025 16:33:17 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F0B5720040;
-	Tue, 21 Jan 2025 16:33:16 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.11.211])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue, 21 Jan 2025 16:33:16 +0000 (GMT)
-Date: Tue, 21 Jan 2025 17:33:13 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <frankja@linux.ibm.com>, <borntraeger@de.ibm.com>, <david@redhat.com>,
-        <willy@infradead.org>, <hca@linux.ibm.com>, <svens@linux.ibm.com>,
-        <agordeev@linux.ibm.com>, <gor@linux.ibm.com>, <nrb@linux.ibm.com>,
-        <nsg@linux.ibm.com>, <seanjc@google.com>, <seiden@linux.ibm.com>
-Subject: Re: [PATCH v3 03/15] KVM: s390: fake memslot for ucontrol VMs
-Message-ID: <20250121173313.5a11d992@p-imbrenda>
-In-Reply-To: <D7708V1QEO56.SR3N3BFBL4XF@linux.ibm.com>
-References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
-	<20250117190938.93793-4-imbrenda@linux.ibm.com>
-	<D7708V1QEO56.SR3N3BFBL4XF@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1737477316; c=relaxed/simple;
+	bh=O4Pr2rODAgw/vZkbGYv6BlgHcfBvkW9pRTVuaaZ8zeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X05aXNWawBUJyFLOPrqb5Uer7ho+tn3WWQXQMaq9N1lXdQdYpWqZed6CcJ/lnt2ste0w1QKm2Xa1nL9aDoC4RMIL2BZIJtw6E1Uq/I1mHAKNax9wUNXIKO17FfWTeIGGX8GwnLEUi3s3weVlETgn5njcICOyBrAkg4r1A9fR570=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I8nMmVZJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737477313;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5IicrbX29/PlrHURDmORDtKf+izW4RsJs/gkYLbWILo=;
+	b=I8nMmVZJ8HRAnLxmDlgaeCR9bdjEmc2nWUT44R3oyKOHr1HsRBlFkkx0gLq5cJcGNtV0bm
+	x/djbJZyLbdPwQ0G0819Iylm6eJVIVdUKVZixOhbAGeNOIzt55FukETt+vkdXjH+L2f2Iv
+	4JIt5MoR2g6TjOwCUHsh3k+37jibGaM=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-527-Ge8yOqZwMduWOyKGumQ0Cg-1; Tue, 21 Jan 2025 11:35:12 -0500
+X-MC-Unique: Ge8yOqZwMduWOyKGumQ0Cg-1
+X-Mimecast-MFC-AGG-ID: Ge8yOqZwMduWOyKGumQ0Cg
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-46798d74f0cso109091121cf.0
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 08:35:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737477311; x=1738082111;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5IicrbX29/PlrHURDmORDtKf+izW4RsJs/gkYLbWILo=;
+        b=UBbchYjpVYHrZQ9ZZM0HO6u+HfUyn6oyalH9N6FWTO4GPnkgeg0sXr8YEC2hlbZ1uC
+         AOxCJgavjnXxVcdlgi9elXeoMLkg2N26tLzDSKCgsw7kQBKjWIBuget5KvwG29XVCuov
+         MWMlpl07pe1QHF2tYspBgZnrWuFVxr/NUNXet30QnkdVGE+9WlLiIDM722S7pOwwSY1Y
+         W06/emQzS2Xf3iFXOBgnk6ikYYRdmkVfSMg69J5VCy95vBkAZmlJK9AbbrOllFHY3Xl4
+         vdLWzFOmtm/dd9yprze8uH6Z2uhWRaDbJyyVFErF76HSmAmb8Cr5MQrUYvLQR0eYtjBO
+         FMjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTi9RFdhxoDtxf0RAHJ6avi3jEZH49skLHiW0jmqzahLfKRaVaWRvKoafQQVCMxr0zNZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYpkVq0jROhXOJeRfYVujKGYAvCuSuDCWcr9KAeKjjR/M9APs/
+	WGyQU3r19Yg/3Gkx6iaQ/3YKaBTAwfqp4NlcbNXjHPuKXPJDCDKKS6cp9VNSmu0LneGTInCEk4w
+	X05IhW7ZoWjmG3Fi1cqR8O3pjNfW67ZNOWJIy0BYkBiQ0URBcyA==
+X-Gm-Gg: ASbGncvo5WyVh+cyt3F9NDSrSfmUovAPOghIOuw/QQqz95CzcY5hoy+aHyK50Xbm4cO
+	QZ95/jKtRlxyKbiuXHy/aR2ZdOO4+xuZozbIUNvCrx/NuiRaUUO3BfT9u99kJKRIwFjevGnp4GQ
+	t9xn85owJxjf1iwctQiTCoqEF0A0+djyUw11FcikiiYUD64qMSMYYzSf/iUvoDvC51cQHxoLp2M
+	6pIzN1vkFn3JUi1DSZgzpeypwYo6J4Ip6AD6jAAyuuB130A22beb0xmyiaLaiHbsokRDXfe6IZO
+	NMKqiMWY1OQzcV9Dg33En9oTdpiTkgk=
+X-Received: by 2002:ac8:7f89:0:b0:46c:782f:5f6c with SMTP id d75a77b69052e-46e12b20fbamr274079471cf.14.1737477311533;
+        Tue, 21 Jan 2025 08:35:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGEDpP3v3NvNnq0mrgQd+4/LqRJpg4iDbCa/9Y9xWB0RMJdvo/z2nBzTqrMy4G/8FCeBpRGtw==
+X-Received: by 2002:ac8:7f89:0:b0:46c:782f:5f6c with SMTP id d75a77b69052e-46e12b20fbamr274078981cf.14.1737477311163;
+        Tue, 21 Jan 2025 08:35:11 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be614ef236sm569680685a.108.2025.01.21.08.35.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2025 08:35:10 -0800 (PST)
+Date: Tue, 21 Jan 2025 11:35:08 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Chenyi Qiang <chenyi.qiang@intel.com>
+Cc: David Hildenbrand <david@redhat.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>
+Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
+ guest-memfd with RamDiscardManager
+Message-ID: <Z4_MvGSq2B4zptGB@x1n>
+References: <20241213070852.106092-3-chenyi.qiang@intel.com>
+ <d0b30448-5061-4e35-97ba-2d360d77f150@amd.com>
+ <80ac1338-a116-48f5-9874-72d42b5b65b4@intel.com>
+ <9dfde186-e3af-40e3-b79f-ad4c71a4b911@redhat.com>
+ <c1723a70-68d8-4211-85f1-d4538ef2d7f7@amd.com>
+ <f3aaffe7-7045-4288-8675-349115a867ce@redhat.com>
+ <Z46GIsAcXJTPQ8yN@x1n>
+ <7e60d2d8-9ee9-4e97-8a45-bd35a3b7b2a2@redhat.com>
+ <Z46W7Ltk-CWjmCEj@x1n>
+ <8e144c26-b1f4-4156-b959-93dc19ab2984@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 6TeaMGW1Df4Ab-bvtMfISCaP2QxubN0J
-X-Proofpoint-GUID: U6FqVeb9QwjcD58SxT0mudUxn9EnEH-k
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-21_07,2025-01-21_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- adultscore=0 priorityscore=1501 spamscore=0 lowpriorityscore=0
- suspectscore=0 clxscore=1015 bulkscore=0 malwarescore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501210134
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8e144c26-b1f4-4156-b959-93dc19ab2984@intel.com>
 
-On Mon, 20 Jan 2025 16:27:53 +0100
-"Christoph Schlameuss" <schlameuss@linux.ibm.com> wrote:
-
-> On Fri Jan 17, 2025 at 8:09 PM CET, Claudio Imbrenda wrote:
-> > Create a fake memslot for ucontrol VMs. The fake memslot identity-maps
-> > userspace.
-> >
-> > Now memslots will always be present, and ucontrol is not a special case
-> > anymore.
-> >
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>  
+On Tue, Jan 21, 2025 at 09:35:26AM +0800, Chenyi Qiang wrote:
 > 
-> LGTM assuming the triggered warning about the slot_lock can be resolved in
-> another patch.
-> Tested in G1 and G2 using the ucontrol selftests.
 > 
-> Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> Tested-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> On 1/21/2025 2:33 AM, Peter Xu wrote:
+> > On Mon, Jan 20, 2025 at 06:54:14PM +0100, David Hildenbrand wrote:
+> >> On 20.01.25 18:21, Peter Xu wrote:
+> >>> On Mon, Jan 20, 2025 at 11:48:39AM +0100, David Hildenbrand wrote:
+> >>>> Sorry, I was traveling end of last week. I wrote a mail on the train and
+> >>>> apparently it was swallowed somehow ...
+> >>>>
+> >>>>>> Not sure that's the right place. Isn't it the (cc) machine that controls
+> >>>>>> the state?
+> >>>>>
+> >>>>> KVM does, via MemoryRegion->RAMBlock->guest_memfd.
+> >>>>
+> >>>> Right; I consider KVM part of the machine.
+> >>>>
+> >>>>
+> >>>>>
+> >>>>>> It's not really the memory backend, that's just the memory provider.
+> >>>>>
+> >>>>> Sorry but is not "providing memory" the purpose of "memory backend"? :)
+> >>>>
+> >>>> Hehe, what I wanted to say is that a memory backend is just something to
+> >>>> create a RAMBlock. There are different ways to create a RAMBlock, even
+> >>>> guest_memfd ones.
+> >>>>
+> >>>> guest_memfd is stored per RAMBlock. I assume the state should be stored per
+> >>>> RAMBlock as well, maybe as part of a "guest_memfd state" thing.
+> >>>>
+> >>>> Now, the question is, who is the manager?
+> >>>>
+> >>>> 1) The machine. KVM requests the machine to perform the transition, and the
+> >>>> machine takes care of updating the guest_memfd state and notifying any
+> >>>> listeners.
+> >>>>
+> >>>> 2) The RAMBlock. Then we need some other Object to trigger that. Maybe
+> >>>> RAMBlock would have to become an object, or we allocate separate objects.
+> >>>>
+> >>>> I'm leaning towards 1), but I might be missing something.
+> >>>
+> >>> A pure question: how do we process the bios gmemfds?  I assume they're
+> >>> shared when VM starts if QEMU needs to load the bios into it, but are they
+> >>> always shared, or can they be converted to private later?
+> >>
+> >> You're probably looking for memory_region_init_ram_guest_memfd().
+> > 
+> > Yes, but I didn't see whether such gmemfd needs conversions there.  I saw
+> > an answer though from Chenyi in another email:
+> > 
+> > https://lore.kernel.org/all/fc7194ee-ed21-4f6b-bf87-147a47f5f074@intel.com/
+> > 
+> > So I suppose the BIOS region must support private / share conversions too,
+> > just like the rest part.
 > 
-> > ---
-> >  Documentation/virt/kvm/api.rst   |  2 +-
-> >  arch/s390/include/asm/kvm_host.h |  2 ++
-> >  arch/s390/kvm/kvm-s390.c         | 15 ++++++++++++++-
-> >  arch/s390/kvm/kvm-s390.h         |  2 ++
-> >  4 files changed, 19 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index f15b61317aad..cc98115a96d7 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -1419,7 +1419,7 @@ fetch) is injected in the guest.
-> >  S390:
-> >  ^^^^^
-> >  
-> > -Returns -EINVAL if the VM has the KVM_VM_S390_UCONTROL flag set.
-> > +Returns -EINVAL or -EEXIST if the VM has the KVM_VM_S390_UCONTROL flag set.
-> >  Returns -EINVAL if called on a protected VM.
-> >  
-> >  4.36 KVM_SET_TSS_ADDR
-> > diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> > index 97c7c8127543..9df37361bc64 100644
-> > --- a/arch/s390/include/asm/kvm_host.h
-> > +++ b/arch/s390/include/asm/kvm_host.h
-> > @@ -30,6 +30,8 @@
-> >  #define KVM_S390_ESCA_CPU_SLOTS 248
-> >  #define KVM_MAX_VCPUS 255
-> >  
-> > +#define KVM_INTERNAL_MEM_SLOTS 1
-> > +
-> >  /*
-> >   * These seem to be used for allocating ->chip in the routing table, which we
-> >   * don't use. 1 is as small as we can get to reduce the needed memory. If we
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index ecbdd7d41230..58cc7f7444e5 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -3428,8 +3428,18 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >  	VM_EVENT(kvm, 3, "vm created with type %lu", type);
-> >  
-> >  	if (type & KVM_VM_S390_UCONTROL) {
-> > +		struct kvm_userspace_memory_region2 fake_memslot = {
-> > +			.slot = KVM_S390_UCONTROL_MEMSLOT,
-> > +			.guest_phys_addr = 0,
-> > +			.userspace_addr = 0,
-> > +			.memory_size = ALIGN_DOWN(TASK_SIZE, _SEGMENT_SIZE),
-> > +			.flags = 0,
-> > +		};
-> > +
-> >  		kvm->arch.gmap = NULL;
-> >  		kvm->arch.mem_limit = KVM_S390_NO_MEM_LIMIT;
-> > +		/* one flat fake memslot covering the whole address-space */
-> > +		KVM_BUG_ON(kvm_set_internal_memslot(kvm, &fake_memslot), kvm);  
+> Yes, the BIOS region can support conversion as well. I think guest_memfd
+> backed memory regions all follow the same sequence during setup time:
 > 
-> In the current state of kvm_set_internal_memslot this does not acquire the
-> slot_lock and issues a warning. I did bring this up on Seans patch introducing
+> guest_memfd is shared when the guest_memfd fd is created by
+> kvm_create_guest_memfd() in ram_block_add(), But it will sooner be
+> converted to private just after kvm_set_user_memory_region() in
+> kvm_set_phys_mem(). So at the boot time of cc VM, the default attribute
+> is private. During runtime, the vBIOS can also do the conversion if it
+> wants.
 
-Oops, I have missed that
-
-> the method. So I assume at this point this here is fine.
-
-not really; I will add proper locking around the call
+I see.
 
 > 
-> >  	} else {
-> >  		if (sclp.hamax == U64_MAX)
-> >  			kvm->arch.mem_limit = TASK_SIZE_MAX;
-> > @@ -5854,7 +5864,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> >  {
-> >  	gpa_t size;
-> >  
-> > -	if (kvm_is_ucontrol(kvm))
-> > +	if (kvm_is_ucontrol(kvm) && new->id < KVM_USER_MEM_SLOTS)
-> >  		return -EINVAL;
-> >  
-> >  	/* When we are protected, we should not change the memory slots */
-> > @@ -5906,6 +5916,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
-> >  {
-> >  	int rc = 0;
-> >  
-> > +	if (kvm_is_ucontrol(kvm))
-> > +		return;
-> > +
-> >  	switch (change) {
-> >  	case KVM_MR_DELETE:
-> >  		rc = gmap_unmap_segment(kvm->arch.gmap, old->base_gfn * PAGE_SIZE,
-> > diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> > index 597d7a71deeb..30736ac16f84 100644
-> > --- a/arch/s390/kvm/kvm-s390.h
-> > +++ b/arch/s390/kvm/kvm-s390.h
-> > @@ -20,6 +20,8 @@
-> >  #include <asm/processor.h>
-> >  #include <asm/sclp.h>
-> >  
-> > +#define KVM_S390_UCONTROL_MEMSLOT (KVM_USER_MEM_SLOTS + 0)
-> > +
-> >  static inline void kvm_s390_fpu_store(struct kvm_run *run)
-> >  {
-> >  	fpu_stfpc(&run->s.regs.fpc);  
+> > 
+> > Though in that case, I'm not 100% sure whether that could also be done by
+> > reusing the major guest memfd with some specific offset regions.
 > 
+> Not sure if I understand you clearly. guest_memfd is per-Ramblock. It
+> will have its own slot. So the vBIOS can use its own guest_memfd to get
+> the specific offset regions.
+
+Sorry to be confusing, please feel free to ignore my previous comment.
+That came from a very limited mindset that maybe one confidential VM should
+only have one gmemfd..
+
+Now I see it looks like it's by design open to multiple gmemfds for each
+VM, then it's definitely ok that bios has its own.
+
+Do you know why the bios needs to be convertable?  I wonder whether the VM
+can copy it over to a private region and do whatever it wants, e.g.  attest
+the bios being valid.  However this is also more of a pure question.. and
+it can be offtopic to this series, so feel free to ignore.
+
+Thanks,
+
+-- 
+Peter Xu
 
 
