@@ -1,137 +1,161 @@
-Return-Path: <kvm+bounces-36132-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FCAEA1816B
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:55:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE7FA18174
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:56:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D43D61887F1D
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:55:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D91081887204
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6160F1F471D;
-	Tue, 21 Jan 2025 15:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288181F471C;
+	Tue, 21 Jan 2025 15:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MVZ+M1k0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jLVi0j66"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276551F2C57
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 15:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4011F2C57
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 15:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737474916; cv=none; b=ZXvWUxmWuj7pwkZDiy+EVKl6l1w19asebeeOwvMOd3aBN0DJqnQN28IC142Amq3NZ7jLwYCX5XZlGi1ea8b3dRn74HM6IuCQEM+CtBT/D/2H4n1Ny6asz78Qw6iGPRJXe9wIeWJFv+6d40Ivfz0/xSQGs0R+pFZqTaFwTvitm3E=
+	t=1737474960; cv=none; b=rG7suNnv8UMttP+rsGXSM1fC0lFT/bVVEWGxiDE8JvLQptqHm0eLbXIY6ZDuB+tZdC1k4VCzxnj8YmtzZ2/xnoRKUJGNt1PtX4v4y2taWnOXzxXKOH4EgcABD7+vSsOr/pQ2ZSOOGxK8+bwAsezcp6ouDyAmiudrquLzTE2+m8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737474916; c=relaxed/simple;
-	bh=7XZXwF5wdlElwvcZPmyQUeHz6RNJPSi3z8M5J77LL5o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QQZRkX5b4TNgjsGb6H4TerPN8MXTMrpIlioVUbJshYuC74Oe6bIpspPC8W/IclIN+6AAeh3zL9swDrvWQbVvV01Poo5+iW8SeRHWpoOYYh4S9cFiibvHqV24/AXoNd838axQa/EmDdJxar6KmnlGgQDUh5YagcC21+LK4oY3DXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MVZ+M1k0; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9e38b0cfso10742735a91.0
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 07:55:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737474914; x=1738079714; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e6+Apqyoldz7GJ9ISR71ryeAIIRuwHBMgh+a+9AIAM8=;
-        b=MVZ+M1k0/B76YG2eIdls7pkV+v0S8N6D5IGWzPlLpmaP+lIs2hSqj6MyEkB29g1Aqs
-         TONd9Qo8kPCTVamBiJO4tIHmnOGdQmaEF3HBrdqWivcLBVKsh/hkAMofXpDoP0L8tQus
-         DFw10sx/uCMnAL+cYAf6fRwKejzdgkfIayIxgFvHA3S4/CCZRiCWdPLf5ajzVNwsn57O
-         6L9z2t4yRWSGjSvntfZFsdjswzSfiWrd4mecha2zEUKOdezIjiA2dI1wMbmb1Sj5fdFR
-         b2IbBy8IuSCBu9SdM/BptVbdIaKx71492mhWBVTzjdZKehpE+6xa4F18LGRNUpeXPlYx
-         oFrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737474914; x=1738079714;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=e6+Apqyoldz7GJ9ISR71ryeAIIRuwHBMgh+a+9AIAM8=;
-        b=sDEZaxgr1IvHaro0M5UfGuNImb2hOnklio5GuB2GaDtEr4SRrF2rKk2f5ODIhKBR47
-         Io5XsXs9ZLWpH8M7W+ACcmAXOCloWOL3Ijhz6eiaU+XVP512qoWgBEOTadoh8xJ0ClxP
-         Jh5zFFMVnyoEt+TkTJx8FEZP2/jcClR/36ukobHZ/X5WrTdtQI0OdvtDujqGCpelnibK
-         /Z4t1GA7BYh3i5KMpGr9Zp/hJzSMZur8m9PdvTkYcBewoNju7WsSGGnu3xxZHsjsXlGN
-         upgy8lJdqOX2PWYEQ/ZqphciI8l/qnOLXvTYGq6Cyp1lq/xGxsW2Hvr3YoH8DAAWdBg8
-         nwcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVfuB1jBQ3TI1Vjfl9xxqxRnZoZKj59KEio9nn1mTiAHfXkHN2PKw8ejsOU58a2AJcs2k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxpkj/cJ1PJOzmU/PWQdY39aijoCoc6weeBArv0dZhdU5Lwft/s
-	ByqWxAIccVP4vXUo037eS9EvfH+cAzV0x5GVOLMV2YnCPzp0RDDyM1OQRiIGyOlkkBgil/EKEGE
-	KpA==
-X-Google-Smtp-Source: AGHT+IGh29y2t1Ejp1CgkeenXGZZ++olVnu2uIXJAQWnhFxMiW+EJMMlUGjS1gR0STV1P0L/xv7sb9wVQrc=
-X-Received: from pfblu23.prod.google.com ([2002:a05:6a00:7497:b0:725:3321:1f0c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2382:b0:725:ef4b:de28
- with SMTP id d2e1a72fcca58-72dafb365b8mr23518496b3a.17.1737474914409; Tue, 21
- Jan 2025 07:55:14 -0800 (PST)
-Date: Tue, 21 Jan 2025 07:55:13 -0800
-In-Reply-To: <Z42Q-sbPMA9zZMIC@archie.me>
+	s=arc-20240116; t=1737474960; c=relaxed/simple;
+	bh=vV8a59PAiRq7s+DZzmR4ZFPv7EkWYe5x4h3O07wsp58=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Un6BJ+Qsnzk1Gx0XnAJzUa8hJnghz1aU9aL2mLIAnfUdICYOvyFvLCgzlaomrRO8mM0Tjj7Rhn1V4XmzeCF835C/6oITyUwg0tmxqikCSKe4F8MEA9F5Gnavyt+FKEvE/xxXobpsxDkPFJhfVwCBoTeH4u2MHrU1OtA4NYy17zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jLVi0j66; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 21 Jan 2025 16:55:48 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1737474951;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kHTOuyrf6b476FzSvoIER5fEZhvPhJ7qECQ1yaBVPL8=;
+	b=jLVi0j6635xXGMEyTSFWna0XxMzqF2D1nptRyo0YaJbkTHBxTdhT3652Yr2iFc0Y5suHsA
+	4Ei5OyRalZhl/ixQe29WtwJT80HAtPxSaIE95vxNxB08Xo3+igSKAk/Wjly3kv8oY4/7bI
+	ptincaA2GFFdsPAgDVzzEIUHWHkOFaM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
+	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
+	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
+	andre.przywara@arm.com, Alexandru Elisei <alexandru.elisei@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2 05/18] scripts: Rename run_qemu_status
+ -> run_test_status
+Message-ID: <20250121-566d55e720f59e93c88af5e4@orel>
+References: <20250120164316.31473-1-alexandru.elisei@arm.com>
+ <20250120164316.31473-6-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <03a04e86-c629-44df-9022-05c42b4c736f@gmx.de> <Z42Q-sbPMA9zZMIC@archie.me>
-Message-ID: <Z4_DYfJKl3jqzU_Y@google.com>
-Subject: Re: kconfig does not accept a lower value for KVM_MAX_NR_VCPUS
-From: Sean Christopherson <seanjc@google.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: "Toralf =?utf-8?Q?F=C3=B6rster?=" <toralf.foerster@gmx.de>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux KVM <kvm@vger.kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250120164316.31473-6-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jan 20, 2025, Bagas Sanjaya wrote:
-> On Sun, Jan 19, 2025 at 12:04:04PM +0100, Toralf F=C3=B6rster wrote:
-> > I was wondering why I cannot put a lower value here during make oldconf=
-ig:
+On Mon, Jan 20, 2025 at 04:43:03PM +0000, Alexandru Elisei wrote:
+> From: Alexandru Elisei <alexandru.elisei@gmail.com>
+> 
+> For the arm/arm64 architectures, kvm-unit-tests can also be run using the
+> kvmtool virtual machine manager. Rename run_qemu_status to run_test_status
+> to make it more generic, in preparation to add support for kvmtool.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/run               | 4 ++--
+>  powerpc/run           | 2 +-
+>  riscv/run             | 4 ++--
+>  s390x/run             | 2 +-
+>  scripts/arch-run.bash | 2 +-
+>  5 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arm/run b/arm/run
+> index 6db32cf09c88..9b11feafffdd 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -85,9 +85,9 @@ command+=" -display none -serial stdio"
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+>  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> -	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
+> +	ENVIRON_DEFAULT=n run_test_status $command "$@"
+>  elif [ "$EFI_USE_ACPI" = "y" ]; then
+> -	run_qemu_status $command -kernel "$@"
+> +	run_test_status $command -kernel "$@"
+>  else
+>  	run_qemu $command -kernel "$@"
+>  fi
+> diff --git a/powerpc/run b/powerpc/run
+> index 27abf1ef6a4d..9b5fbc1197ed 100755
+> --- a/powerpc/run
+> +++ b/powerpc/run
+> @@ -63,4 +63,4 @@ command="$(migration_cmd) $(timeout_cmd) $command"
+>  # to fixup the fixup below by parsing the true exit code from the output.
+>  # The second fixup is also a FIXME, because once we add chr-testdev
+>  # support for powerpc, we won't need the second fixup.
+> -run_qemu_status $command "$@"
+> +run_test_status $command "$@"
+> diff --git a/riscv/run b/riscv/run
+> index 73f2bf54dc32..2a846d361a4d 100755
+> --- a/riscv/run
+> +++ b/riscv/run
+> @@ -34,8 +34,8 @@ command+=" $mach $acc $firmware -cpu $processor "
+>  command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+>  if [ "$UEFI_SHELL_RUN" = "y" ]; then
+> -	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
+> +	ENVIRON_DEFAULT=n run_test_status $command "$@"
+>  else
+>  	# We return the exit code via stdout, not via the QEMU return code
+> -	run_qemu_status $command -kernel "$@"
+> +	run_test_status $command -kernel "$@"
+>  fi
+> diff --git a/s390x/run b/s390x/run
+> index 34552c2747d4..9ecfaf983a3d 100755
+> --- a/s390x/run
+> +++ b/s390x/run
+> @@ -47,4 +47,4 @@ command+=" -kernel"
+>  command="$(panic_cmd) $(migration_cmd) $(timeout_cmd) $command"
+>  
+>  # We return the exit code via stdout, not via the QEMU return code
+> -run_qemu_status $command "$@"
+> +run_test_status $command "$@"
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 8643bab3b252..d6eaf0ee5f09 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -75,7 +75,7 @@ run_qemu ()
+>  	return $ret
+>  }
+>  
+> -run_qemu_status ()
+> +run_test_status ()
+>  {
+>  	local stdout ret
+>  
+> -- 
+> 2.47.1
 
-The lower limit of 1024 in the Kconfig exists to ensure backwards compatibi=
-lity.
-CONFIG_KVM_MAX_NR_VCPUS is effectively exposed to userspace via KVM_CAP_MAX=
-_VCPUS,
-and prior to the Kconfig KVM hardcoded KVM_CAP_MAX_VCPUS to 1024.
+Hmm, run_qemu_status() wraps run_qemu() so it seems appropriately named,
+especially since the return value of run_qemu() has had QEMU-specific
+return codes considered. It seems we should first decouple
+run_qemu_status() from run_qemu() or to sanitize run_qemu() of anything
+QEMU-specific and rename it to run_test() at the same time.
 
-I did float the idea of setting the range to 1 - 4096, but we opted to go w=
-ith
-the conservative approach because the benefits are relatively minor, and we=
- didn't
-want to risk indirectly breaking userspace.
-
-> >   Maximum number of vCPUs per KVM guest (KVM_MAX_NR_VCPUS) [1024] (NEW)=
- 16
-> >   Maximum number of vCPUs per KVM guest (KVM_MAX_NR_VCPUS) [1024] (NEW)=
- 8
-> >   Maximum number of vCPUs per KVM guest (KVM_MAX_NR_VCPUS) [1024] (NEW)
-> >=20
->=20
-> Hi Toralf,
->=20
-> From arch/x86/kvm/Kconfig:
->=20
-> >config KVM_MAX_NR_VCPUS
-> >	int "Maximum number of vCPUs per KVM guest"
-> >	depends on KVM
-> >	range 1024 4096
-> >	default 4096 if MAXSMP
-> >	default 1024
-> >	help
-> >	  Set the maximum number of vCPUs per KVM guest. Larger values will inc=
-rease
-> >	  the memory footprint of each KVM guest, regardless of how many vCPUs =
-are
-> >	  created for a given VM.
->=20
-> I don't know your use case, but you can safely choose the default (1024).
->=20
-> Thanks.
->=20
-> --=20
-> An old man doll... just what I always wanted! - Clara
+Thanks,
+drew
 
