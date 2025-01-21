@@ -1,199 +1,130 @@
-Return-Path: <kvm+bounces-36123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53BF7A18060
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:49:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96DF0A180D5
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:12:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78AD9188B82C
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:49:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BA5C188497E
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BFFC1F4268;
-	Tue, 21 Jan 2025 14:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA391F4282;
+	Tue, 21 Jan 2025 15:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bizThze3"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BsnM74gO"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F84E1F4260
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 14:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FAA1F37D8;
+	Tue, 21 Jan 2025 15:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737470953; cv=none; b=ca/istKFk68eAkwlQ2Uf8/h6an0lnNtuk+L/SyGIbom8lzjqhJzs2PKYjQkL7Bg7C5dZwmb0a1fytr9XUpwEpZySltkA5RjM4kIE51xzPC/WkacEZBpQ/eLYPo4mKbN/pcOOnhVp1inJlW6aVQ2HyUh4VXNwgfVfRmIobsePxbM=
+	t=1737472332; cv=none; b=kUMnsovSC6EDaa13uqWWpDx+MjAoNL5wZxrWKauSyLYgHI4oR3PfRPVqhdlvMpDRctczKL12wjZH4iSUqjxy1gMmunPU+qeGk90yijJKs/RMpHxZvZ75QJ2xJ0TetOvnmFjU12t0i4pVrw5dNO4AOVvBPTcmTfebmuBALsxagkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737470953; c=relaxed/simple;
-	bh=RmT4EuFeLx2Wfn0yzl3SKco+ybGvdLvm200k8fUIAkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uzT1I8HX9xGTxmhXy/dAKaOrJ1SmePyKwAjgrJLLFuiG66N93DnNVh12s+LRyDS+NqqXkaidbedXlm0Ak+RM8992XJnME4iOeVHjxRRnTVTubmYE7oqVaW3UqBZXlk/X71xS4smQd4NmGMi9JMRaov2A5QQJQoBk5iQXVb2wffA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bizThze3; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 21 Jan 2025 15:48:55 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737470939;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y4U3mhaNeCPZx2S5DokPxis3spPsXAjQG6CQBxTg9Ys=;
-	b=bizThze3yBlYVxibDfKZo6yDUkTwkcWNzU7AThmgiseZtF+i09K+Eu1VGnGFaj5BSju9pB
-	f13cntnWjd1BUtmai6RYLN1Mc6354wufLjcOx1v27+pSUv2Bp7mIXHc6sqOTkKQuKhDmp9
-	Lmw7Xs5KCfvBN3dtKK6dzoVeIXnrnow=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
-	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
-	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
-	andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 03/18] scripts: Refuse to run the tests
- if not configured for qemu
-Message-ID: <20250121-45faf6a9a9681c7c9ece5f44@orel>
-References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-4-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1737472332; c=relaxed/simple;
+	bh=iNHn+qMSUtgr+X956ZogUa4B4ToZNVhgGcSdCr3UJP4=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
+	 References:In-Reply-To; b=PnOiOVIjrcypAl0c2IrFq+MmVhEmeURH0IKTAafmSzf7tOn9zxXu5qacT9d39dFQSY3k7jpls88ELa04aJ6L4AZg8/iOZhxe6U6AMyRHI0T1VKy2kCn9J7AycLAeLNU9/2erbdPaavQER/ncDEBsiOZA501YosSXPTCIk/SfeIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BsnM74gO; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50LCu4KJ022932;
+	Tue, 21 Jan 2025 15:12:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ytqRTP
+	aEnD+aJhUB3ME+8uhTgsQRHhHY85iDOG4pC0Q=; b=BsnM74gOhAD8I1R9np62SJ
+	Rs1qOMkKdQrVxjALyLZQpTsw/ZG0rNtzIHhecBtrmzSo6YBEENq6AyQqwtR3FP1n
+	KaxcWuivm7PgOicx4ucIyblYGTS6eNnCoIu6elSBew+GleGeeTvdzimC6D2N2N9d
+	caOywu26d90rDggsmSo6plFVboUinJSRpHsEUMEWtxTtderBN0oONmT0KoOKbjm9
+	rLfEUFmWABmxhvluJHKUgrUKw1XRZ2enZjgsbUxRK2xsWnLhVdSFmzLw5VNu6cVL
+	adbYvgztYxKjI/RcFb4C3CuDvs8CND7ce+6ncw2Ds31/PW8Jz/MPA067l4oEDQjA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a1n9bf81-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 15:12:05 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LFC4R9023493;
+	Tue, 21 Jan 2025 15:12:04 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a1n9bf7t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 15:12:04 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LDkYxN029587;
+	Tue, 21 Jan 2025 15:12:03 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448qmnbpjd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 15:12:03 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LFBxOd58065244
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Jan 2025 15:11:59 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5E95A20043;
+	Tue, 21 Jan 2025 15:11:59 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3D3FF20040;
+	Tue, 21 Jan 2025 15:11:59 +0000 (GMT)
+Received: from darkmoore (unknown [9.179.17.46])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 21 Jan 2025 15:11:59 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250120164316.31473-4-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 21 Jan 2025 16:11:54 +0100
+Message-Id: <D77UJ5ZYZEFX.6K7XSR64M7KF@linux.ibm.com>
+From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, <frankja@linux.ibm.com>,
+        <borntraeger@de.ibm.com>, <david@redhat.com>, <willy@infradead.org>,
+        <hca@linux.ibm.com>, <svens@linux.ibm.com>, <agordeev@linux.ibm.com>,
+        <gor@linux.ibm.com>, <nrb@linux.ibm.com>, <nsg@linux.ibm.com>,
+        <seanjc@google.com>, <seiden@linux.ibm.com>
+To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 06/15] KVM: s390: use __kvm_faultin_pfn()
+X-Mailer: aerc 0.18.2
+References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
+ <20250117190938.93793-7-imbrenda@linux.ibm.com>
+In-Reply-To: <20250117190938.93793-7-imbrenda@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RHptOCL1GzweJk0t1wrK-4ItByUiRyKe
+X-Proofpoint-GUID: K4qFgGtkXiz276fyaef03nFH0gc8T1x5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-21_06,2025-01-21_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ bulkscore=0 suspectscore=0 adultscore=0 clxscore=1015 priorityscore=1501
+ spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=388
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501210122
 
-On Mon, Jan 20, 2025 at 04:43:01PM +0000, Alexandru Elisei wrote:
-> Arm and arm64 support running the tests under kvmtool. Unsurprisingly,
-> kvmtool and qemu have a different command line syntax for configuring and
-> running a virtual machine.
-> 
-> On top of that, when kvm-unit-tests has been configured to run under
-> kvmtool (via ./configure --target=kvmtool), the early UART address changes,
-> and if then the tests are run with qemu, this warning is displayed:
-> 
-> WARNING: early print support may not work. Found uart at 0x9000000, but early base is 0x1000000.
-> 
-> At the moment, the only way to run a test under kvmtool is manually, as no
-> script has any knowledge of how to invoke kvmtool. Also, unless one looks
-> at the logs, it's not obvious that the test runner is using qemu to run the
-> tests, and not kvmtool.
-> 
-> To avoid any confusion for unsuspecting users, refuse to run a test via the
-> testing scripts when kvm-unit-tests has been configured for kvmtool.
-> 
-> There are four different ways to run a test using the test infrastructure:
-> with run_tests.sh, by invoking arm/run or arm/efi/run with the correct
-> parameters (only the arm directory is mentioned here because the tests can
-> be configured for kvmtool only on arm and arm64), and by creating
-> standalone tests. Add a check in each of these locations for the supported
-> virtual machine manager.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/efi/run             | 8 ++++++++
->  arm/run                 | 9 +++++++++
->  run_tests.sh            | 8 ++++++++
->  scripts/mkstandalone.sh | 8 ++++++++
->  4 files changed, 33 insertions(+)
-> 
-> diff --git a/arm/efi/run b/arm/efi/run
-> index 8f41fc02df31..916f4c4deef6 100755
-> --- a/arm/efi/run
-> +++ b/arm/efi/run
-> @@ -12,6 +12,14 @@ fi
->  source config.mak
->  source scripts/arch-run.bash
->  
-> +case "$TARGET" in
-> +qemu)
-> +    ;;
-> +*)
-> +    echo "$0 does not support '$TARGET'"
-> +    exit 2
-> +esac
-> +
->  if [ -f /usr/share/qemu-efi-aarch64/QEMU_EFI.fd ]; then
->  	DEFAULT_UEFI=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd
->  elif [ -f /usr/share/edk2/aarch64/QEMU_EFI.silent.fd ]; then
-> diff --git a/arm/run b/arm/run
-> index efdd44ce86a7..6db32cf09c88 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -8,6 +8,15 @@ if [ -z "$KUT_STANDALONE" ]; then
->  	source config.mak
->  	source scripts/arch-run.bash
->  fi
-> +
-> +case "$TARGET" in
-> +qemu)
-> +    ;;
-> +*)
-> +   echo "'$TARGET' not supported"
-> +   exit 3
-
-I think we want exit code 2 here.
-
-> +esac
-> +
->  processor="$PROCESSOR"
->  
->  if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 23d81b2caaa1..61480d0c05ed 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -100,6 +100,14 @@ while [ $# -gt 0 ]; do
->      shift
->  done
->  
-> +case "$TARGET" in
-> +qemu)
-> +    ;;
-> +*)
-> +    echo "$0 does not support '$TARGET'"
-> +    exit 2
-> +esac
-> +
->  # RUNTIME_log_file will be configured later
->  if [[ $tap_output == "no" ]]; then
->      process_test_output() { cat >> $RUNTIME_log_file; }
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index 2318a85f0706..4de97056e641 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -7,6 +7,14 @@ fi
->  source config.mak
->  source scripts/common.bash
->  
-> +case "$TARGET" in
-> +qemu)
-> +    ;;
-> +*)
-> +    echo "'$TARGET' not supported for standlone tests"
-> +    exit 2
-> +esac
-> +
->  temp_file ()
->  {
->  	local var="$1"
-> -- 
-> 2.47.1
+On Fri Jan 17, 2025 at 8:09 PM CET, Claudio Imbrenda wrote:
+> Refactor the existing page fault handling code to use __kvm_faultin_pfn()=
+.
 >
+> This possible now that memslots are always present.
+>
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 122 ++++++++++++++++++++++++++++++---------
+>  arch/s390/kvm/kvm-s390.h |   6 ++
+>  arch/s390/mm/gmap.c      |   1 +
+>  3 files changed, 102 insertions(+), 27 deletions(-)
 
-I think we could put the check in a function in scripts/arch-run.bash and
-just use the same error message for all cases.
+LGTM
 
-Thanks,
-drew
+Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
 
