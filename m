@@ -1,254 +1,177 @@
-Return-Path: <kvm+bounces-36086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2C00A1770A
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 06:38:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9162EA17718
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 06:45:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 021AA16A58B
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 05:38:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F65D169520
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 05:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3CD0199FBA;
-	Tue, 21 Jan 2025 05:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25EA1A8F9E;
+	Tue, 21 Jan 2025 05:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gBFGwfnX"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="x0S9cVH+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D4B383
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 05:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D8714EC73
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 05:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737437885; cv=none; b=f6le6N2cI0jTllWqA6wBWjvZ1UsI/PSieFZNCSGxXAQPGVNqAlj/HwCKIU7ktwi0TssZim8HXp59kmXXN+65erl7tXdGjvs6o+I9QuxlDApNZtQ1WXkX+TvdC+FpWcCuMUaVdhUzU0/lOgkk6WRDS3eHrXiz9TWMdogUYE7NwfU=
+	t=1737438288; cv=none; b=ToHpDyMJyJR0ZZ+U4h8QsKoLp21H0cxIUso21cu1wVGWbbON140rw1JvoR0MyaSsIGN/UL+qiAABRUs8BfBRP5DXEu3IoKz0e+HifWP76DYIo1iuMm6W7Yr0AGm4+t/qy8+b7357aQdZlaXU8x7mFKWMltWam9lTVdJZn3TWOIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737437885; c=relaxed/simple;
-	bh=WUonKqdMpCOoJXylWgKKL0HWR6Kqr5oBuq3mD2lpdvg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t82p1Qr4IyYylorgB8QGY4Slw6E2eQkMraHr2c1D7QCJXWVc7lYKauOBOqmx1ArbzgO0MXV/Nk9uFAebt1v46rFYMRiG/7gf1obT/hrvlSl+sEQYeQgW4VBO7cVcSiGMKCW9TKpbyaeM2NIJy9LhAeE9mMBIY/rYlKw5QxS/v1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gBFGwfnX; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-467a17055e6so60227601cf.3
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 21:38:02 -0800 (PST)
+	s=arc-20240116; t=1737438288; c=relaxed/simple;
+	bh=KKjKQrSywZ/HAtYTFy2CTQDgCf1VU2GQ+lX5cc5vXaI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CdVaLS0TPQ/pNWQ6F9aqEjLkh9p0YwQLLbU670LQwyFrtjB+i27PZ9RTl8CWAW7bvKQ0+UR5kKqLZQ/ukixpXIM6nWCwaEveMwXqQ+aQrs7jShQ27E3gPxTGzzxc2SQXNIkSrniLRCQz85ZNHiGUAzZpO239xgefA7+VmogaYM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=x0S9cVH+; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-216728b1836so87556085ad.0
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 21:44:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737437882; x=1738042682; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/hApkXbFMxZLsXTizlCKBKFEmZmeWLn29OK3OXjQI2U=;
-        b=gBFGwfnXrBqzLNwypJFL9zawAFExanjlYbfNfR7VAo1yi3DQ6yF56r+wRnkTjxGyJQ
-         k5M4H3LFG7Or6E8KjXNFdn/xIC7PdfUBW+jfDZPtAW+qCbX333FrnSlg/GUun2E44xhT
-         Ld3s2UsxEqHbZM1UFOPAUDhft4MspPDyuq0AVM6ljXO+fztfX9yhs0YirqVHu15uTyZl
-         29sro4En9ts3JHltUs2Wc9cm+q1ozUzbQF8UkX00v3kLPMp7vO4UCe6yM7wJ8JBD73dS
-         RvTTvMfwMc3df1cN/cKxTTmPOms7+vAZr8o0vUXzN32SK425ByxU5vcfNhddyiyMgfq/
-         PGpA==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737438286; x=1738043086; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=quek95SDTYVXYnePfXxFQzmJR+Lu7obq+8lhE5GmOzk=;
+        b=x0S9cVH+78ZZsjSKnRfDP0qqXDfV4PoPpohm+0pSST8TJ2V/qwePvhtGtyaATADz34
+         cMWnJAVX5i/ptl10y23jtB0aCVN2PKm0SguQmUfFcins2jgSY/jPVpqIAjZSS2OBlpsQ
+         PV7cAkrn+ALhDyHnNpo9vtqbsAdOgdK0yGIZf5sHOylSy811YQJH8230tz16b9Wb5E25
+         ll5/TrZEkikQbRR6+WSkKRHox/ZOZIE3iWVu/M4F/BrJyQyYK4h61ozMmXXehk3msD/H
+         17d8wVOEfLVAycsUnjCn74CHH+SALXwAeaHzJPM1UiptfEUTeqnMs1az81MH1G2hGhVg
+         Es7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737437882; x=1738042682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/hApkXbFMxZLsXTizlCKBKFEmZmeWLn29OK3OXjQI2U=;
-        b=RPZBMs56grq2Wd4AgPPb7AsK+twUx9gThQLK/CvPuYKZ3G4rRM9OANfdMnpkVt4Umq
-         kMUJexeOp7VXAnaRKnpg8EPtQOP4hGSpUihG+MBoxxC0PPKuc3xQBfdW7v9VmtzNrnz+
-         PH3C01MQSuKf4TD8puawzn2vmdjo/q8JPryO9yXhv05m+Bjbb0ewMXziyen2XePFZdeE
-         WvdeJTKTA7EwMp6YmDbbl9+SaIvSFOvaNtzL33sSusvW2uNAKhjlvX9BETOVYG0Lyxtl
-         2Pcmi+usZ0zqo0LYIJ4djcBEIWP6jXG94b5b0if5V6lX6Br1a3oja76bkb9y/LtWeXGo
-         VtIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVMac6/zQLqNlupUiRSzXJ05v0ySoxDhWH8wK23/fjaFmduj1QGo5XgiFd0pQE6JT1P+M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlTXcLN6LHtKTLFU+ICeL1k33cw5MVJxzi2dXDAzfD0FDImH8F
-	UMxrNwOBnnnYTrbuYN6Jy8wgFp4DcE8HecbhEYpcyOQfF/4C6L4r0yDFChp2UHLuNheDJccmUje
-	NDBpG+9CObQvTSSVn9MRoflR0ce2nIQWCZpoc
-X-Gm-Gg: ASbGncteV0jTUqnaHg6SFbVcELqDJnMxl11DhIE0GkfnERFH5Kj26idPLur0i/GTb3E
-	Qaxc+ZatLRIbOuc7YI7p9DuvAl3fmhZZFh/DxN1kW6qBvo0h2sjx7QqSvZmrthReEjD/qUk18Jk
-	oktLi/
-X-Google-Smtp-Source: AGHT+IHbSzp3QiE0lkyqhctqFXrLQBEhMtub+uY8aeVlP9CEqccAymFh9QHqndw+z8IXOdhFUteI1bw1Yl5rhJjmm80=
-X-Received: by 2002:a05:622a:2d5:b0:467:7441:2717 with SMTP id
- d75a77b69052e-46e12a40489mr265877951cf.19.1737437881887; Mon, 20 Jan 2025
- 21:38:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737438286; x=1738043086;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=quek95SDTYVXYnePfXxFQzmJR+Lu7obq+8lhE5GmOzk=;
+        b=Q53Uxhzs4CdpYAko67VNcR2w2kVF5e4oVGMA/4gm2sdZaqP5wRWWIKbvCYgcJb+8ua
+         3tDHmnrYiPHoBq1TWJwUMujHRywolvd56l54sr9nGT1yoGiX5SqHbVskJzxmZiVDG4Xs
+         t95RVpyEgnsk1dSVC3IeaxK+dZXDGVATVJTw8znDtQ74EWa12IEbmx3BJOX9sp3JH21L
+         oHkd1n0QJOWGx2UKs0JSuP+Kw0O6EcBzPKTJ380XXsCw18qdvyIhpDwpbtSmbMQKVrnS
+         iBU8XpqPlyt4ehk8UAX4JLzhNA6uso4XQ/R7JduPFpXH4k1V0SJ50yZKAUnIHVCGVgLH
+         nQiw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9q2ROoQU3tjo0mc9I4wa96xLqD/pol96IAhkc339MkDOJeB88f6siYNfrOM79LuNvoOY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8o3YhkSBYTPt59qSYOPTQfU3YJyQG8c6Bta0ltE+uAyp6pDFZ
+	OOOtf3kNFMOydvgY5q/E49lY7G8Rz2oghb3d+Ix70dwfFipXxSxknjzUc1pAuK4=
+X-Gm-Gg: ASbGncu2O8oyVcMDKGF/XuCOINVtPSlOpk/h/FNS6kJ94USZlODf5jJrzUjqBnmGDnq
+	Ql7LHeHh78/ubERIAGSnubQRfn7o5dpP4sfAbRd+wy22SXpRST4n/4H/4w2teHQI/M0mHkzBhLE
+	JVuVbzzXGviZFEQIQxuAljIUJypmguKJ1BsUfYDpLWQEbXLp2iTZuWVHXmBe073vAgZ3LkwqNG3
+	0AQk8GYyvxPmmlzCa58Yxvyh7Ac5CMvlfI8M+I7Jaw/C/ezkXi/W/owP0zoafLEsfnC0EjH92AO
+	c2P7
+X-Google-Smtp-Source: AGHT+IFTVBGY3mBtHPPZNgGiKdheqCTQ97KHaRubQObIyg1+VGXEf+v/0x6j6pVWQSFPga7FkyMokQ==
+X-Received: by 2002:a05:6a20:2524:b0:1d5:10d6:92b9 with SMTP id adf61e73a8af0-1eb215894f4mr22737961637.30.1737438285826;
+        Mon, 20 Jan 2025 21:44:45 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dababc174sm8360634b3a.178.2025.01.20.21.44.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jan 2025 21:44:45 -0800 (PST)
+Message-ID: <806def7d-16f3-4d53-abc8-7d18e8c22dcb@daynix.com>
+Date: Tue, 21 Jan 2025 14:44:39 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250107042202.2554063-1-suleiman@google.com> <20250107042202.2554063-2-suleiman@google.com>
- <Z4gtb-Z2GpbEkAsQ@google.com> <CABCjUKDU4b5QodgT=tSgrV-fb_qnksmSxhMK3gNrUGsT9xeitg@mail.gmail.com>
- <Z4qK4B6taSoZTJMp@google.com>
-In-Reply-To: <Z4qK4B6taSoZTJMp@google.com>
-From: Suleiman Souhlal <suleiman@google.com>
-Date: Tue, 21 Jan 2025 14:37:50 +0900
-X-Gm-Features: AbW1kvbSm0kCrrqMxpuh1Q0A93h8ZThxoiiJ5P9REEIgeB2rzzGQi9mCvgWri94
-Message-ID: <CABCjUKDDDhXx8mSRKHCa34JjSX1nfM5WMG-UrPu9fjei6gkUJA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] kvm: Introduce kvm_total_suspend_ns().
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
-	David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ssouhlal@freebsd.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 8/9] tap: Keep hdr_len in tap_get_user()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250120-tun-v4-0-ee81dda03d7f@daynix.com>
+ <20250120-tun-v4-8-ee81dda03d7f@daynix.com>
+ <678e327e34602_19c737294b4@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <678e327e34602_19c737294b4@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jan 18, 2025 at 1:52=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Jan 17, 2025, Suleiman Souhlal wrote:
-> > On Thu, Jan 16, 2025 at 6:49=E2=80=AFAM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > >
-> > > On Tue, Jan 07, 2025, Suleiman Souhlal wrote:
-> > > > It returns the cumulative nanoseconds that the host has been suspen=
-ded.
-> > > > It is intended to be used for reporting host suspend time to the gu=
-est.
-> > >
-> > > ...
-> > >
-> > > >  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
-> > > > +static int kvm_pm_notifier(struct kvm *kvm, unsigned long state)
-> > > > +{
-> > > > +     switch (state) {
-> > > > +     case PM_HIBERNATION_PREPARE:
-> > > > +     case PM_SUSPEND_PREPARE:
-> > > > +             last_suspend =3D ktime_get_boottime_ns();
-> > > > +     case PM_POST_HIBERNATION:
-> > > > +     case PM_POST_SUSPEND:
-> > > > +             total_suspend_ns +=3D ktime_get_boottime_ns() - last_=
-suspend;
-> > >
-> > > After spending too much time poking around kvmlock and sched_clock co=
-de, I'm pretty
-> > > sure that accounting *all* suspend time to steal_time is wildly inacc=
-urate for
-> > > most clocksources that will be used by KVM x86 guests.
-> > >
-> > > KVM already adjusts TSC, and by extension kvmclock, to account for th=
-e TSC going
-> > > backwards due to suspend+resume.  I haven't dug super deep, buy I ass=
-ume/hope the
-> > > majority of suspend time is handled by massaging guest TSC.
-> > >
-> > > There's still a notable gap, as KVM's TSC adjustments likely won't ac=
-count for
-> > > the lag between CPUs coming online and vCPU's being restarted, but I =
-don't know
-> > > that having KVM account the suspend duration is the right way to solv=
-e that issue.
-> >
-> > (It is my understanding that steal time has no impact on clock sources.=
-)
-> > On our machines, the problem isn't that the TSC is going backwards. As
-> > you say, kvmclock takes care of that.
-> >
-> > The problem these patches are trying to solve is that the time keeps
-> > advancing for the VM while the host is suspended.
->
-> Right, the issue is that because KVM adjusts guest TSC if the host TSC do=
-es go
-> backwards, then the accounting will be all kinds of messed up.
->
->   1. Initiate suspend at host TSC X, guest TSC X+Y.
->
->   2. Save X into last_host_tsc via kvm_arch_vcpu_put():
->
->         vcpu->arch.last_host_tsc =3D rdtsc();
->
->   3. Resume after N hours, host TSC reset to 0 and starts counting.
->
->   4. kvm_arch_enable_virtualization_cpu() runs at new host time Z.
->
->   5. KVM detects backwards TSC (Z < X) and adjusts guest TSC offset so th=
-at guest
->      TSC stays at/near X+Y, i.e. guest TSC becomes "Z + Y + (X - Z)".
->
->                 u64 delta_cyc =3D max_tsc - local_tsc;
->                 list_for_each_entry(kvm, &vm_list, vm_list) {
->                         kvm->arch.backwards_tsc_observed =3D true;
->                         kvm_for_each_vcpu(i, vcpu, kvm) {
->                                 vcpu->arch.tsc_offset_adjustment +=3D del=
-ta_cyc;
->                                 vcpu->arch.last_host_tsc =3D local_tsc;
->                                 kvm_make_request(KVM_REQ_MASTERCLOCK_UPDA=
-TE, vcpu);
->                         }
->
-> Thus, if the guest is using the TSC for sched_clock, guest time does NOT =
-keep
-> advancing.
->
-> kvmclock on the other hand counts from *host* boot, and so guest time kee=
-ps
-> advancing if the guest is using kvmclock.
->
->   #ifdef CONFIG_X86_64
->   static s64 get_kvmclock_base_ns(void)
->   {
->         /* Count up from boot time, but with the frequency of the raw clo=
-ck.  */
->         return ktime_to_ns(ktime_add(ktime_get_raw(), pvclock_gtod_data.o=
-ffs_boot));
->   }
->   #else
->   static s64 get_kvmclock_base_ns(void)
->   {
->         /* Master clock not used, so we can just use CLOCK_BOOTTIME.  */
->         return ktime_get_boottime_ns();
->   }
->   #endif
->
-> In short, AFAICT the issues you are observing are mostly a problem with k=
-vmclock.
-> Or maybe it's the other way around and effectively freezing guest TSC is =
-super
-> problematic and fundamentally flawed.
->
-> Regardless of which one is "broken", unconditionally accounting suspend t=
-ime to
-> steal_time will do the wrong thing when sched_clock=3Dtsc.  To further mu=
-ddy the
-> waters, current Linux-as-a-guest on modern hardware will likely use clock=
-source=3Dtsc,
-> but sched_clock=3Dkvmclock.  In that scenario, guest time doesn't advance=
-d, but
-> guest scheduler time does.  Ugh.
->
-> That particular wart can be avoided by having the guest use TSC for sched=
-_clock[*],
-> e.g. so that at least the behavior of time is consistent.
->
-> Hmm, if freezing guest time across suspend is indeed problematic, one tho=
-ught
-> would be to put the onus on the VMM/user to not advertise a "nonstop TSC"=
- if the
-> host may be suspending.  The Linux-as-a-guest would prefer kvmclock over =
-TSC for
-> both clocksource and sched_clock.
->
-> [*] https://lore.kernel.org/all/Z4gqlbumOFPF_rxd@google.com
+On 2025/01/20 20:24, Willem de Bruijn wrote:
+> Akihiko Odaki wrote:
+>> hdr_len is repeatedly used so keep it in a local variable.
+>>
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>> ---
+>>   drivers/net/tap.c | 17 +++++++----------
+>>   1 file changed, 7 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>> index 061c2f27dfc83f5e6d0bea4da0e845cc429b1fd8..7ee2e9ee2a89fd539b087496b92d2f6198266f44 100644
+>> --- a/drivers/net/tap.c
+>> +++ b/drivers/net/tap.c
+>> @@ -645,6 +645,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   	int err;
+>>   	struct virtio_net_hdr vnet_hdr = { 0 };
+>>   	int vnet_hdr_len = 0;
+>> +	int hdr_len = 0;
+>>   	int copylen = 0;
+>>   	int depth;
+>>   	bool zerocopy = false;
+>> @@ -672,6 +673,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   		err = -EINVAL;
+>>   		if (tap16_to_cpu(q, vnet_hdr.hdr_len) > iov_iter_count(from))
+>>   			goto err;
+>> +		hdr_len = tap16_to_cpu(q, vnet_hdr.hdr_len);
+>>   	}
+>>   
+>>   	len = iov_iter_count(from);
+>> @@ -683,11 +685,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   	if (msg_control && sock_flag(&q->sk, SOCK_ZEROCOPY)) {
+>>   		struct iov_iter i;
+>>   
+>> -		copylen = vnet_hdr.hdr_len ?
+>> -			tap16_to_cpu(q, vnet_hdr.hdr_len) : GOODCOPY_LEN;
+>> -		if (copylen > good_linear)
+>> -			copylen = good_linear;
+>> -		else if (copylen < ETH_HLEN)
+>> +		copylen = min(hdr_len ? hdr_len : GOODCOPY_LEN, good_linear);
+>> +		if (copylen < ETH_HLEN)
+>>   			copylen = ETH_HLEN;
+>>   		linear = copylen;
+>>   		i = *from;
+>> @@ -698,11 +697,9 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   
+>>   	if (!zerocopy) {
+>>   		copylen = len;
+>> -		linear = tap16_to_cpu(q, vnet_hdr.hdr_len);
+>> -		if (linear > good_linear)
+>> -			linear = good_linear;
+>> -		else if (linear < ETH_HLEN)
+>> -			linear = ETH_HLEN;
+>> +		linear = min(hdr_len, good_linear);
+>> +		if (copylen < ETH_HLEN)
+>> +			copylen = ETH_HLEN;
+> 
+> Similar to previous patch, I don't think this patch is significant
+> enough to warrant the code churn.
 
-I see what you're saying. Thanks for explaining.
+The following patch will require replacing
+tap16_to_cpu(q, vnet_hdr.hdr_len)
+with
+tap16_to_cpu(q->flags, vnet_hdr.hdr_len)
 
-To complicate things further there are also different kinds of
-suspends. From what I've seen "shallow" (and/or "suspend-to-idle")
-suspends don't stop the CPU, at least on our machines, so the host TSC
-keeps ticking. On "deep" suspends, on the other hand, the TSC might go
-backwards.
+It will make some lines a bit too long. Calling tap16_to_cpu() at 
+multiple places is also not good to keep the vnet implementation unified 
+as the function inspects vnet_hdr.
 
-But I suppose if the guest uses kvmclock the behavior should be the
-same in either case.
-
-At least for our use case we would definitely want guest *wall* time
-to keep advancing, so we would still want to use kvmclock.
-
-Would accounting the suspend duration in steal time be acceptable if
-it was conditional on the guest using kvmclock?
-We would need a way for the host to be notified that the guest is
-indeed using it, possibly by adding a new MSR to be written to in
-kvm_cs_enable().
-
--- Suleiman
+This patch is independently too trivial, but I think it is a worthwhile 
+cleanup combined with the following patch.
 
