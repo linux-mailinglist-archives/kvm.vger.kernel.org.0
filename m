@@ -1,153 +1,173 @@
-Return-Path: <kvm+bounces-36156-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36157-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D67A1824F
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:52:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DC67A18253
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:54:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D847F168A20
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:52:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 241613A2772
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23211F4E32;
-	Tue, 21 Jan 2025 16:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F82E1F4E32;
+	Tue, 21 Jan 2025 16:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kn1j32tF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DWTshiM3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7969219DFAB
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 16:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2D7192D70;
+	Tue, 21 Jan 2025 16:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737478327; cv=none; b=m7Duhi2CVQq+xXNdWBRPBK5JM/xea3rWcN7i/n4qvGgG7Z8bJ4GATLqMASagTWK8sEhzw9htGPthUPZCSTgv4G0HAhXqXd1YD3E1Vx6SYHuzOMKHeQFSpp83Wy3xpB/D+O6bAUmDMN6qisUvH1vYaL3s+OSXpSqywrmrOiCmDt0=
+	t=1737478454; cv=none; b=Sh0uwQx8ZiWujcorNG0PMdP0DjM+v5vAHrIQT8Hd/WiHyL/jJ+w75qA2m5v5XiXWCUNxvF7uJWLW/fmgZkcHj8uvr/GtckZbSeSeMQWL4keFiWngRPxujTCZDN8qSzeMXSpSoAoUD6DKfolmMc79NiFtW5NboP9WjJlyphqRlN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737478327; c=relaxed/simple;
-	bh=Cfq7dOuH8IKxACGY1ONgtep+oYU2dAXFSEktjpolXKQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LbBcLhGPyhmH7KbU+SVBRvSLt3Qe1pb7Y2Bb1K+/mfGMk15nRERyyjvh/N8vcVKWO73wilyUt0bLYEM3w61RRQfdDa4YH1UoW7jLJkGB8x6yFy18Ps6iSBuUx/fm7J+infV7bgoKV1EJ4zHePhq3+hZ52vp3ae5B/Ptjb9veLDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kn1j32tF; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef79d9c692so16020604a91.0
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 08:52:05 -0800 (PST)
+	s=arc-20240116; t=1737478454; c=relaxed/simple;
+	bh=kg/kBkGNkFYhiKJ2nHd5EYKfnPTPudIvwmBCWw4IOTk=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=oJjrbg4tHF1SXfw0LyHw33zHnvdwklMQNKVh2FnupwCtmtQr8hFCg6/yoz2xkuOimFQ5Q/kQ4xNdBfo9vC/7bINh23r1et+Bep9XdLpZ/KDlwyM+V84gs0LNqFZXtJ1GEzI/9E5h2u5pvHCzcysPE7JSPSUiykkbHeIbpzdjDhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DWTshiM3; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-436326dcb1cso41608955e9.0;
+        Tue, 21 Jan 2025 08:54:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737478325; x=1738083125; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vanCL9vX2YGo3j10SsliegdRcGeoN0tzUbAnVNu00e4=;
-        b=Kn1j32tF8+mEABWl6spRGTE8gQDykXh+ShpGS3FVlAVUu44tSzUPYKG0NTJBfLPmsD
-         LYDvZKgdP3MFzsepG/9DsZ00tJc9L261cvQTMD3adBabr1tS44rNqeJqooJ+LitUQYgE
-         nnYQmO1ntkcmDiOB4jlztItt5KQERseqqeqbvE6jg3H/nOl8GYiWi3K3WUwGJJuY7aBp
-         aYkbHI+lLdUhJFIDERIsZI4/07O6lFx9WQ2v79rNoGAASZHuBeXUQF28zmiGKdOfIIs6
-         B8oJMz9Le90gp3vlite6UfshE8NxcUoLcs8cdMSK6z2FfHRnqGJZAybg3fMfeNJcWXcZ
-         rxNQ==
+        d=gmail.com; s=20230601; t=1737478451; x=1738083251; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ArjOxIvlgsTQl/WUuSIjkR5VJvFPG+rZLqQWDeFweCc=;
+        b=DWTshiM3OGACDLS1/yyCzHEb/olnVOY+Tcuf6tA/ZNrRQHrkXiKErK2nik2h+5+CGl
+         FFxg0LjdK3wkkxKzaSZInignTuhInlHNs6lu5h3j+g8e79oOLdEQ/UEPKcpGXKDSbgJh
+         LZPyJPvQFFv9i6DQJKUacQjV4ObaWmryvPnHLRErGDspdBoyRIjCpOuEY3/nl94nTNSw
+         ogoGmRFgYEIkh4btduDu0GcC0H2c7hlNMza2eQjrZHRdmZbKWa4SZ45mC5b0NcAWv/Rz
+         jXDeyWfbAhyl/1V64FNgqtCwqZ0vCfzi+fsmEulN87sxBE/LfVnsqD9xlR+XOSoMU2Iw
+         Xd6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737478325; x=1738083125;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vanCL9vX2YGo3j10SsliegdRcGeoN0tzUbAnVNu00e4=;
-        b=R23PT9PE88OGOumf7jujC1x0rLKzNBK43oU9x8wzvRV/Sq91f72ESSF50j6TC+dS2x
-         65ZsuvzZBSmIzyMzzzsE3hrY01w440d+KJxVvY7pPA5r20bMsajfTGAu3UzDBMQ+AbJ8
-         3heUm/g+9FiY7GBnbZWVSdZisiZnU952JwFZTo+R3zXB4bCPYWTcVyil3Rq5wocNXPAR
-         NlgOiebc+0nthR0czKVKR/JF+J7fsX7pu6Z+DqAUQ61hNMCcixSHv2+EsEnSHtaqcmd7
-         TJpmIPsf6VUYfYCiMLDwuvX/inTCR+3A3zAUucZHjY1udNGTvIua++r+sdd0fxnEf8HS
-         rmvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVfI5VI0bIPHkQSH41cg1+yJFlSrWXWK6G1/HrarGBR4PD2wP8eBw5YC0ng2X3Q92vWe8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4fUbqJr4P/huXgZ+kYJSJO9eIb2usGo+wpyRJ6JisdMBM/CfZ
-	TsdDBG8bETNlEsM8Ey7Y+poCmJVIMXUlkgPhyQ0a3OIhwvpnZ9tNwiEBlwPNixeLbIrwK+YxTJg
-	ErQ==
-X-Google-Smtp-Source: AGHT+IHXgQjtXQTO+sAFYluyyMRqgYC+WSGpYCWP3vvuJUdftImnUJ8vLEZRgcWJPE48b1Om4zLopDGykcw=
-X-Received: from pjbcv6.prod.google.com ([2002:a17:90a:fd06:b0:2ea:29de:af10])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a41:b0:2ea:4c8d:c7a2
- with SMTP id 98e67ed59e1d1-2f782d4ed35mr28239094a91.24.1737478324838; Tue, 21
- Jan 2025 08:52:04 -0800 (PST)
-Date: Tue, 21 Jan 2025 08:52:03 -0800
-In-Reply-To: <CAAH4kHZL-9R+MLLvArcwQ2Zpk+gtqYTvVMR01WA1kVJ9goq_sw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1737478451; x=1738083251;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ArjOxIvlgsTQl/WUuSIjkR5VJvFPG+rZLqQWDeFweCc=;
+        b=O7WJ+THjdRem10IAD8L5jVz+mqEBLl1u1gTKnYRWtCOdsptcgwFfWLKN45QobWdTdq
+         A56eyKmYd2uluiZEANnomDD0629UoUwzv2Q4qdaxeA1hkUhvSVmSGSzr1P94VbX2b1Md
+         YpKdnVtS+FczdgZNEGVGnQjkKUlKkpfJ1b/6GMD9f1lRcWABqUtiY4KeVqJ5e0aeEGun
+         PdtxFUUWH0SstWI6JimYe9PaEaAH72v2nKCRvrZ6yy+cBv2NATL2husnjuEKYXK/kCkl
+         WGRD0IcPDJiVTEOGmvSna8J1zlImjaocMnrK8PQDwusi06gWYSJ8v9QVqwvESUDnrChF
+         dOQA==
+X-Forwarded-Encrypted: i=1; AJvYcCX3c3g8Z0EnKF3Nw6SF57bnCeF6tbm3WNNPeE6ipo2feNm57bbie1yC64FWp47j6ckAPCxCc9PPykSfy4s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywd44KWEPz3xVVCqaoyuAWhnZnQqPXCw6EDWynLYR7Z07PKg5Xw
+	ItMNl0tHH3CuUEho/yaekhcxRYbimmvqzV6qEJSA6yob/Iv7Bw+2
+X-Gm-Gg: ASbGncs5JiWT+L0MmBGsJjpbSKerae+SsUIzSxBbYtb+5viKlwPT5AxG3FQ6IIATdvW
+	nTGT0/g8cPQSVgHIul7ub1+B0nvyRq7AQat+p5t1SwgffKQZPcj7Xk9ZmNnLf4Tn0XgBGbR0Z9u
+	9yeMjZFL4/C0lg3ifaOcr9R5qLHwZa4PHdCKj8koRbleZTcU/vxI/vVKQMTfJFeBiKfqvI7/X2Y
+	1IluR/8xQbeaQzH61pFNyTMSP7mwS0VUEe/pAaossFxQcjJmowduzjoSRxSvxhN+6kOjHUsdVeC
+	mZyKK/Ybg+aQuZCQ8AkoFyvemg==
+X-Google-Smtp-Source: AGHT+IECnAhL6lLvWH7fE+GOxM01sNgcJ12kcjcE+1Qpm8wXiLUyFXBKxxWzTOqkT0hH5GDmP9FFIA==
+X-Received: by 2002:a05:600c:1ca7:b0:431:44fe:fd9f with SMTP id 5b1f17b1804b1-4389142776dmr164985895e9.23.1737478451020;
+        Tue, 21 Jan 2025 08:54:11 -0800 (PST)
+Received: from [192.168.19.15] (54-240-197-233.amazon.com. [54.240.197.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c74c4751sm242672905e9.19.2025.01.21.08.54.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jan 2025 08:54:10 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <30fb80cb-7f4b-4abe-8095-c9b029013923@xen.org>
+Date: Tue, 21 Jan 2025 16:54:09 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250120215818.522175-1-huibo.wang@amd.com> <20250120215818.522175-2-huibo.wang@amd.com>
- <CAAH4kHZL-9R+MLLvArcwQ2Zpk+gtqYTvVMR01WA1kVJ9goq_sw@mail.gmail.com>
-Message-ID: <Z4_Qs2mAXK28IwJa@google.com>
-Subject: Re: [PATCH v4 1/1] KVM: Introduce KVM_EXIT_SNP_REQ_CERTS for SNP certificate-fetching
-From: Sean Christopherson <seanjc@google.com>
-To: Dionna Amalie Glaze <dionnaglaze@google.com>
-Cc: Melody Wang <huibo.wang@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, roedel@suse.de, 
-	Tom Lendacky <thomas.lendacky@amd.com>, ashish.kalra@amd.com, liam.merwick@oracle.com, 
-	pankaj.gupta@amd.com, Michael Roth <michael.roth@amd.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH 05/10] KVM: x86: Don't bleed PVCLOCK_GUEST_STOPPED across
+ PV clocks
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com,
+ Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20250118005552.2626804-1-seanjc@google.com>
+ <20250118005552.2626804-6-seanjc@google.com>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <20250118005552.2626804-6-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 21, 2025, Dionna Amalie Glaze wrote:
-> On Mon, Jan 20, 2025 at 1:58=E2=80=AFPM Melody Wang <huibo.wang@amd.com> =
-wrote:
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index 943bd074a5d3..4896c34ed318 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -4064,6 +4064,30 @@ static int snp_handle_guest_req(struct vcpu_svm =
-*svm, gpa_t req_gpa, gpa_t resp_
-> >         return ret;
-> >  }
-> >
-> > +static int snp_complete_req_certs(struct kvm_vcpu *vcpu)
-> > +{
-> > +       struct vcpu_svm *svm =3D to_svm(vcpu);
-> > +       struct vmcb_control_area *control =3D &svm->vmcb->control;
-> > +
-> > +       if (vcpu->run->snp_req_certs.ret) {
-> > +               if (vcpu->run->snp_req_certs.ret =3D=3D ENOSPC) {
-> > +                       vcpu->arch.regs[VCPU_REGS_RBX] =3D vcpu->run->s=
-np_req_certs.npages;
-> > +                       ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
-> > +                                               SNP_GUEST_ERR(SNP_GUEST=
-_VMM_ERR_INVALID_LEN, 0));
-> > +               } else if (vcpu->run->snp_req_certs.ret =3D=3D EAGAIN) =
-{
-> > +                       ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
-> > +                                               SNP_GUEST_ERR(SNP_GUEST=
-_VMM_ERR_BUSY, 0));
->=20
-> Discussion, not a change request: given that my proposed patch [1] to
-> add rate-limiting for guest messages to the PSP generally was
-> rejected,
+On 18/01/2025 00:55, Sean Christopherson wrote:
+> When updating a specific PV clock, make a full copy of KVM's reference
+> copy/cache so that PVCLOCK_GUEST_STOPPED doesn't bleed across clocks.
+> E.g. in the unlikely scenario the guest has enabled both kvmclock and Xen
+> PV clock, a dangling GUEST_STOPPED in kvmclock would bleed into Xen PV
+> clock.
 
-For the record, it wasn't rejected outright.  I pointed out flaws in the pr=
-oposed
-behavior[*], and AFAICT no one ever responded.  If I fully reject something=
-, I
-promise I will make it abundantly clear :-)
+... but the line I queried in the previous patch squashes the flag 
+before the Xen PV clock is set up, so no bleed?
 
-[*] https://lore.kernel.org/all/Y8rEFpbMV58yJIKy@google.com
+> 
+> Using a local copy of the pvclock structure also sets the stage for
+> eliminating the per-vCPU copy/cache (only the TSC frequency information
+> actually "needs" to be cached/persisted).
+> 
+> Fixes: aa096aa0a05f ("KVM: x86/xen: setup pvclock updates")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/x86.c | 13 ++++++++-----
+>   1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3c4d210e8a9e..5f3ad13a8ac7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3123,8 +3123,11 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+>   {
+>   	struct kvm_vcpu_arch *vcpu = &v->arch;
+>   	struct pvclock_vcpu_time_info *guest_hv_clock;
+> +	struct pvclock_vcpu_time_info hv_clock;
+>   	unsigned long flags;
+>   
+> +	memcpy(&hv_clock, &vcpu->hv_clock, sizeof(hv_clock));
+> +
+>   	read_lock_irqsave(&gpc->lock, flags);
+>   	while (!kvm_gpc_check(gpc, offset + sizeof(*guest_hv_clock))) {
+>   		read_unlock_irqrestore(&gpc->lock, flags);
+> @@ -3144,25 +3147,25 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+>   	 * it is consistent.
+>   	 */
+>   
+> -	guest_hv_clock->version = vcpu->hv_clock.version = (guest_hv_clock->version + 1) | 1;
+> +	guest_hv_clock->version = hv_clock.version = (guest_hv_clock->version + 1) | 1;
+>   	smp_wmb();
+>   
+>   	/* retain PVCLOCK_GUEST_STOPPED if set in guest copy */
+> -	vcpu->hv_clock.flags |= (guest_hv_clock->flags & PVCLOCK_GUEST_STOPPED);
+> +	hv_clock.flags |= (guest_hv_clock->flags & PVCLOCK_GUEST_STOPPED);
+>   
+> -	memcpy(guest_hv_clock, &vcpu->hv_clock, sizeof(*guest_hv_clock));
+> +	memcpy(guest_hv_clock, &hv_clock, sizeof(*guest_hv_clock));
+>   
+>   	if (force_tsc_unstable)
+>   		guest_hv_clock->flags &= ~PVCLOCK_TSC_STABLE_BIT;
+>   
+>   	smp_wmb();
+>   
+> -	guest_hv_clock->version = ++vcpu->hv_clock.version;
+> +	guest_hv_clock->version = ++hv_clock.version;
+>   
+>   	kvm_gpc_mark_dirty_in_slot(gpc);
+>   	read_unlock_irqrestore(&gpc->lock, flags);
+>   
+> -	trace_kvm_pvclock_update(v->vcpu_id, &vcpu->hv_clock);
+> +	trace_kvm_pvclock_update(v->vcpu_id, &hv_clock);
+>   }
+>   
+>   static int kvm_guest_time_update(struct kvm_vcpu *v)
 
-> do we think it'd be proper to add a KVM_EXIT_SNP_REQ_MSG or
-> some such for the VMM to decide if the guest should have access to the
-> globally shared resource (PSP) via EAGAIN or 0?
-
-Can you elaborate?  I don't quite understand what you're suggesting.
-
-> [1] https://patchwork.kernel.org/project/kvm/cover/20230119213426.379312-=
-1-dionnaglaze@google.com/
->=20
-> > +               } else {
-> > +                       ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
-> > +                                               SNP_GUEST_ERR(SNP_GUEST=
-_VMM_ERR_GENERIC, 0));
-> > +               }
-> > +
-> > +               return 1; /* resume guest */
-> > +       }
-> > +
-> > +       return snp_handle_guest_req(svm, control->exit_info_1, control-=
->exit_info_2);
-> > +}
 
