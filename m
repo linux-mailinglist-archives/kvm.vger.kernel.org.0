@@ -1,161 +1,125 @@
-Return-Path: <kvm+bounces-36134-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36135-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE7FA18174
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:56:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349E3A18193
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 16:59:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D91081887204
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:56:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16D48164F24
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288181F471C;
-	Tue, 21 Jan 2025 15:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F161F472B;
+	Tue, 21 Jan 2025 15:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jLVi0j66"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKsrIlb3"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4011F2C57
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 15:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C391F1505;
+	Tue, 21 Jan 2025 15:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737474960; cv=none; b=rG7suNnv8UMttP+rsGXSM1fC0lFT/bVVEWGxiDE8JvLQptqHm0eLbXIY6ZDuB+tZdC1k4VCzxnj8YmtzZ2/xnoRKUJGNt1PtX4v4y2taWnOXzxXKOH4EgcABD7+vSsOr/pQ2ZSOOGxK8+bwAsezcp6ouDyAmiudrquLzTE2+m8w=
+	t=1737475174; cv=none; b=G21L0m+LHpvP8n5D93vAAqjVYzYHpfqqYH4nkl3Ra+plqIgRsH77jNYB4AzzJGHuw+yuU+OLoNEFmAJAzyhSXL/jWoBc9d1JshZz/pTPlgErXt3EdLJKcQPKWaA4FUHRhRMsRUuSCu+LVC9djdTKN6apqp3AO2h0X0qz+ZRwkVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737474960; c=relaxed/simple;
-	bh=vV8a59PAiRq7s+DZzmR4ZFPv7EkWYe5x4h3O07wsp58=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Un6BJ+Qsnzk1Gx0XnAJzUa8hJnghz1aU9aL2mLIAnfUdICYOvyFvLCgzlaomrRO8mM0Tjj7Rhn1V4XmzeCF835C/6oITyUwg0tmxqikCSKe4F8MEA9F5Gnavyt+FKEvE/xxXobpsxDkPFJhfVwCBoTeH4u2MHrU1OtA4NYy17zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jLVi0j66; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 21 Jan 2025 16:55:48 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737474951;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kHTOuyrf6b476FzSvoIER5fEZhvPhJ7qECQ1yaBVPL8=;
-	b=jLVi0j6635xXGMEyTSFWna0XxMzqF2D1nptRyo0YaJbkTHBxTdhT3652Yr2iFc0Y5suHsA
-	4Ei5OyRalZhl/ixQe29WtwJT80HAtPxSaIE95vxNxB08Xo3+igSKAk/Wjly3kv8oY4/7bI
-	ptincaA2GFFdsPAgDVzzEIUHWHkOFaM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, david@redhat.com, 
-	pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
-	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org, 
-	oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
-	andre.przywara@arm.com, Alexandru Elisei <alexandru.elisei@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 05/18] scripts: Rename run_qemu_status
- -> run_test_status
-Message-ID: <20250121-566d55e720f59e93c88af5e4@orel>
-References: <20250120164316.31473-1-alexandru.elisei@arm.com>
- <20250120164316.31473-6-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1737475174; c=relaxed/simple;
+	bh=/Q0T30jgTYhIi4Y567kml+Oi8mAO/3iJcnxgEtBAPlY=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=tG6xA4ZPH0OKmgQN44SyqYRwy8DoswgkBw//VMER1yzVjA7jcBoWDplR96TPWWZ9puXE8V8teZykFND83NXKvhYBEjU/vqKgyTsLFv5N95bQcS+/tsh2YSIPfI3KL8C/ob8efwTOdJljgjc5ToS5yEW0b1N/+CiI4Rq+Czsduhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kKsrIlb3; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-38a34e8410bso3049912f8f.2;
+        Tue, 21 Jan 2025 07:59:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737475171; x=1738079971; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5OLsjHzyq/LJBcjwujNKyBJhOLqaam0VKEvf4djvkd8=;
+        b=kKsrIlb3j/Uu4YlwP7zugTLqar0BaWsgNancL0ukfqS219+9CeMUkhn0sZ7W7o8Uws
+         /oMG3IeBnguk+L2AK8hA+irTNfcMXwXzdlrhx6PfMm5IKy6nfwa3okwvIsNuyYRJ3+xM
+         +3t2JC6sGLtgCwWT8BY1MulCGy5+EM8yhbBiQlbJLWLUUx31iel01FVc+dOWenYBcAku
+         e6BVL+hRdh6EoxX3X/5JVPJfrzhSb84WjyWFtfQjBKpcK9yJ8ZU2+wH58S3h5kewdzuR
+         0A06biYb/6HBL3g19AOKiAiU4CwA+TreCEpBEEyhdbgqtvlsJxtx2v0W3SVv1SUKLZEa
+         VlVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737475171; x=1738079971;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5OLsjHzyq/LJBcjwujNKyBJhOLqaam0VKEvf4djvkd8=;
+        b=VTCT14Txmi2GcFLMPF2WU5rE1ZQI7rUzx5LN9zzldGooHrxguZVcTTjVo6jf03UaE0
+         Rd6UkI0rHz1k5D7iuTKcARM15HgRg52Uvrs0vWzNgcoOsdRwG0ogwDLrkhhWPnKYDrA+
+         uRKcjTyDZvwtL52h2ZYuGNW6ZGsXkLMh9AqMoB/rXEfBfOevOLq8pzKQMX45jL+X7ehV
+         +BuAe0nf7GV6VcenGiWNJHhZFn6JbfEcPERlxa2+FQrvAU7wbHEsNDKReTBz9Q/AyNdr
+         t5HrAZgQqA+GH+kBSsVGksp4MXCqhPBJOr7ZScWyNBAxrFd/np7P2hjfRuFCNUA9fYhQ
+         xYcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUB117GJNh9ITTkKeut768JuD0yrBC06sNftBR+zld5urN7JM15p+477J+67FIh7qKhRblJ7hfLHOZXLBnv@vger.kernel.org, AJvYcCUsEvSobQl4+Aomhx9wba7QACYQO4L179tWNq9wpMbOtW0+QZjwtshx76hto4ZQp7VoyN4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+HCKdyJPKTMftleLY/j1drMnltLG2L6h7Hg5pe6LiFjrfre1h
+	DF47OdjbwNw4AiljAUBo+NoIZIETEOELoJEL8dGjcwVLXrnJJlFi
+X-Gm-Gg: ASbGncsJCVCtf3ViA0uWzXVH4GDnyz6r273Z2sr0rQPl2Go8Ax5oNMIhKl71W3Y23pa
+	6UmMH05NSlb5zUbiJshrE78Jf7ihknWyb5CjVpmT2KbDv+ek3DoYXx/L5TWH5equlkOXdRk0wET
+	lvQ60gVpHPbWyxyajM24sn17qB7ljfDx4JAuxZTFKDCwxRNMafbOr65M3T0hlFbe5I9rgm5/fXm
+	sBj6z2nfmKj//EoVOsBLXrUmpborOguG1KVsPYTADvZfWM7Z9Gda7X8N49tYRvfEZ6nVLjMRwPU
+	zWIRMz0uwmE3yXwqcYtcXfNZ+A==
+X-Google-Smtp-Source: AGHT+IErnnUvQbaO26YCZVXCqDz5WwE/7Hvf43v2PzwaqnaHytvckfynXJKWzv06cFtb/IP/UUmd3g==
+X-Received: by 2002:adf:a28a:0:b0:385:dc45:ea06 with SMTP id ffacd0b85a97d-38bf5684d6bmr13123990f8f.13.1737475171183;
+        Tue, 21 Jan 2025 07:59:31 -0800 (PST)
+Received: from [192.168.19.15] (54-240-197-233.amazon.com. [54.240.197.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4389046250csm181639875e9.25.2025.01.21.07.59.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jan 2025 07:59:30 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <eb45ff29-f551-483e-9930-1fa545fb83aa@xen.org>
+Date: Tue, 21 Jan 2025 15:59:29 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250120164316.31473-6-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH 09/10] KVM: x86: Setup Hyper-V TSC page before Xen PV
+ clocks (during clock update)
+To: Sean Christopherson <seanjc@google.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse
+ <dwmw2@infradead.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com,
+ Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>
+References: <20250118005552.2626804-1-seanjc@google.com>
+ <20250118005552.2626804-10-seanjc@google.com> <8734hd8rrx.fsf@redhat.com>
+ <Z4_AwrFFsKg2VgYW@google.com>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <Z4_AwrFFsKg2VgYW@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 20, 2025 at 04:43:03PM +0000, Alexandru Elisei wrote:
-> From: Alexandru Elisei <alexandru.elisei@gmail.com>
+On 21/01/2025 15:44, Sean Christopherson wrote:
+[snip]
 > 
-> For the arm/arm64 architectures, kvm-unit-tests can also be run using the
-> kvmtool virtual machine manager. Rename run_qemu_status to run_test_status
-> to make it more generic, in preparation to add support for kvmtool.
+> I think it's ok to keep the Hyper-V TSC page in this case.  It's not that the Xen
+> PV clock is truly unstable, it's that some guests get tripped up by the STABLE
+> flag.  A guest that can't handle the STABLE flag has bigger problems than the
+> existence of a completely unrelated clock that is implied to be stable.
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/run               | 4 ++--
->  powerpc/run           | 2 +-
->  riscv/run             | 4 ++--
->  s390x/run             | 2 +-
->  scripts/arch-run.bash | 2 +-
->  5 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arm/run b/arm/run
-> index 6db32cf09c88..9b11feafffdd 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -85,9 +85,9 @@ command+=" -display none -serial stdio"
->  command="$(migration_cmd) $(timeout_cmd) $command"
->  
->  if [ "$UEFI_SHELL_RUN" = "y" ]; then
-> -	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
-> +	ENVIRON_DEFAULT=n run_test_status $command "$@"
->  elif [ "$EFI_USE_ACPI" = "y" ]; then
-> -	run_qemu_status $command -kernel "$@"
-> +	run_test_status $command -kernel "$@"
->  else
->  	run_qemu $command -kernel "$@"
->  fi
-> diff --git a/powerpc/run b/powerpc/run
-> index 27abf1ef6a4d..9b5fbc1197ed 100755
-> --- a/powerpc/run
-> +++ b/powerpc/run
-> @@ -63,4 +63,4 @@ command="$(migration_cmd) $(timeout_cmd) $command"
->  # to fixup the fixup below by parsing the true exit code from the output.
->  # The second fixup is also a FIXME, because once we add chr-testdev
->  # support for powerpc, we won't need the second fixup.
-> -run_qemu_status $command "$@"
-> +run_test_status $command "$@"
-> diff --git a/riscv/run b/riscv/run
-> index 73f2bf54dc32..2a846d361a4d 100755
-> --- a/riscv/run
-> +++ b/riscv/run
-> @@ -34,8 +34,8 @@ command+=" $mach $acc $firmware -cpu $processor "
->  command="$(migration_cmd) $(timeout_cmd) $command"
->  
->  if [ "$UEFI_SHELL_RUN" = "y" ]; then
-> -	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
-> +	ENVIRON_DEFAULT=n run_test_status $command "$@"
->  else
->  	# We return the exit code via stdout, not via the QEMU return code
-> -	run_qemu_status $command -kernel "$@"
-> +	run_test_status $command -kernel "$@"
->  fi
-> diff --git a/s390x/run b/s390x/run
-> index 34552c2747d4..9ecfaf983a3d 100755
-> --- a/s390x/run
-> +++ b/s390x/run
-> @@ -47,4 +47,4 @@ command+=" -kernel"
->  command="$(panic_cmd) $(migration_cmd) $(timeout_cmd) $command"
->  
->  # We return the exit code via stdout, not via the QEMU return code
-> -run_qemu_status $command "$@"
-> +run_test_status $command "$@"
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 8643bab3b252..d6eaf0ee5f09 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -75,7 +75,7 @@ run_qemu ()
->  	return $ret
->  }
->  
-> -run_qemu_status ()
-> +run_test_status ()
->  {
->  	local stdout ret
->  
-> -- 
-> 2.47.1
 
-Hmm, run_qemu_status() wraps run_qemu() so it seems appropriately named,
-especially since the return value of run_qemu() has had QEMU-specific
-return codes considered. It seems we should first decouple
-run_qemu_status() from run_qemu() or to sanitize run_qemu() of anything
-QEMU-specific and rename it to run_test() at the same time.
+Agreed.
 
-Thanks,
-drew
+>> I don't know if anyone combines Xen and Hyper-V emulation capabilities for
+>> the same guest on KVM though.)
+> 
+> That someone would have to be quite "brave" :-D
+
+Maybe :-)
+
+Reviewed-by: Paul Durrant <paul@xen.org>
+
 
