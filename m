@@ -1,164 +1,189 @@
-Return-Path: <kvm+bounces-36116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8549A17FA9
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:23:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C5BBA1802A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 15:42:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9753A3A324D
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:23:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54CBA3ABC3B
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 14:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE71B1F37D0;
-	Tue, 21 Jan 2025 14:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894801F4E33;
+	Tue, 21 Jan 2025 14:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F1iIL3gb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ow2/N6rG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6681F03DC;
-	Tue, 21 Jan 2025 14:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE5A1F3FD8;
+	Tue, 21 Jan 2025 14:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737469407; cv=none; b=ZqP0Ub0062ufwE+2e6kL7ORiJ7VdtX8DXz2E0WryY7cmSoWpGMkZfdvdZ43jQa5Ek0Tdvhl5nK/lKTbE97k/OCIbo47DcHC/SMjMJE+LIueheLE7U703ue4dtJNiBD8RvqYAbV5HFm51LAv1W+TYkr6Tt00mJ/su5ZEqYI81xxU=
+	t=1737470407; cv=none; b=ZPZxoL43Nt1oAPLgqYUzv6lxLJvL5RS6DnwTDa9wX49AZ6ymx88lbFMzptq+hamAcHXkvXAKpldDpgr4SEuMevUGM0Wuu2opgo7S6HV3/gWf+SC3u+WXU9DHJsULujeaWbouWMXrYliOdRDn6Lq7UheGhW9pZMBe9ak58JV1Mwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737469407; c=relaxed/simple;
-	bh=HYdfXiMeLcGXCzwGH792us75BwHwloVR3qB+k2tIm+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J4OCKv54BAsVedd+ThPgMJwPtIcGghG8L0cxzybH1EYtwH+yS3SpdFGAk+2y+XIUnXx/mzWiFoyA1pesPjp+YoqaUYXJ0qrzPtNsY7SZdbtidbZ5p+CVLbQJ82I8SqVqsfaolmuM1tX7G+6lnBJxKEQYPsaDWfsriYfr0jvwHQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F1iIL3gb; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50L5XBdk004403;
-	Tue, 21 Jan 2025 14:23:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=u6GiQh
-	P1Bhsb+YXaQ8FRLtKHAdwmNNfy0gU2euYV+f8=; b=F1iIL3gb9Xvkvqa5bxM6YJ
-	0y5rqJKFapY2mKNsPUo8pz/Nq+oAH6XkiCbblvGG3eML5C0gTcEiEomQBsn/qUF8
-	7WToYIRCqstu8gfw0MBBnghcLexVzKM5bLiEG7ZcX8TSLzZVHv1eiJF2caF0Z+A2
-	DLfYgnOio2kU8lNVyPHsWo2vwdYDhBTYaE5k9UKHrEtHilZYF8ZPNuCSFX9F46wj
-	OcBWngU5XURwJ4FCPoumKXZDYvdn6lTYPnMaYQ9eN1buV/fBHC2UYEBUIMB90Jz0
-	qpFqqCvkxYpopj1bqWH9K4ZHil5Y0ccx+VWIm8S/t7Hm2HFT0+pvStqOJkeSroCg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449rryd79u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 14:23:21 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LEKhA4026467;
-	Tue, 21 Jan 2025 14:23:20 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449rryd79q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 14:23:20 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LANeSt022449;
-	Tue, 21 Jan 2025 14:23:19 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448r4k3ce7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 14:23:19 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LENFJW57540920
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Jan 2025 14:23:15 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CA7262004E;
-	Tue, 21 Jan 2025 14:23:15 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F3DBF20043;
-	Tue, 21 Jan 2025 14:23:14 +0000 (GMT)
-Received: from [9.171.13.4] (unknown [9.171.13.4])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 21 Jan 2025 14:23:14 +0000 (GMT)
-Message-ID: <ab7e69d7-141f-44b3-b4cc-4f2832dd6fdd@linux.ibm.com>
-Date: Tue, 21 Jan 2025 15:23:14 +0100
+	s=arc-20240116; t=1737470407; c=relaxed/simple;
+	bh=RoOPEw1pnjf93BWu1H+vv+vMseKv0LAkB8QIKntc2D8=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Cdr0s4rnZrUb2KEHrpoeMDL+uKPPB5PjjjI6THBHpLkRFjQyoU9Eizz8hzMy7KufCYZMRVLU8IDM7DTYuNS1o7dNas+KTF4fyQ8HxVyRZx8buAoynUDXIOhpStyp9Tp9dreWtWxX5ESn+tuchPff6s851b2GaPKbeLTwBp8+37o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ow2/N6rG; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7b700c13edaso303446385a.3;
+        Tue, 21 Jan 2025 06:40:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737470405; x=1738075205; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SGQfSzGMb0K2xpDR8R+dRZzW8GV9BBlFM9+N4B0KulE=;
+        b=Ow2/N6rG03ktTfCSUj4+ZMDgjhPocbxqlwSIFd3xXQzhnFBsGTTWyKf61ZqRqKaGQc
+         29aXBOmc42ocimuf3r44m2y8MUNv2LN5BwFSwtVwZHuuNTf+ZIJ5Ghd5J1YxL+fREngP
+         6pvqz43F7ldltbZXuQsIUSB1IZyi1dQd77tLLdh5aUEdxYJm8UvLrG69N4QGflqoFEez
+         FKWgk6HC3izQBacH07DwmyOJqUJSBzDIhZ2ErABKda+1nVlS/a7Tj33ThD/IBoO2mH3i
+         QbR2agosqWixbD3nZCeVicHy4Zzi1cysMBWd0xSiKlmQiP+YRmRPUZhrlu8hfPMrrt5/
+         Q04w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737470405; x=1738075205;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SGQfSzGMb0K2xpDR8R+dRZzW8GV9BBlFM9+N4B0KulE=;
+        b=CHP2giN/rr25Not5M4aTkZfqCFpebD/v5utLscz3yIc5jN6FumpQin0sbTcHSwS5YP
+         11NWK5ivW2cd22BdP4+8T5gBOUMC5DS55bV3C596LwJoTNy6vn9h2/V+NLxuQ/qq7C2X
+         idxrjRqndLAkuInsRoTUj3rPCouBjkAZTYGYvZ7LVGtNemOdygwkTDdz3wwlaXQrCD5/
+         XNMJbp73JjDwptCuYlbD9VmYzWqSlv0u3r9VFk023Y/AhPCPkfHYcdOMhANnTwB+ZG91
+         eLa+a+vwUhRmFFSxU+oRWrXX3EUoOSF0g1WFPl4cXRHnBXHnKS5RyoLXf3+bXMvnRtzS
+         S68g==
+X-Forwarded-Encrypted: i=1; AJvYcCUymrgrHRhuQWotFPTqplM+B9UzaXLPE1LAAFUjDk+9zgk6iy31/7bspmNspLNo1r4MwU0BhvQt6sDzL3Sy@vger.kernel.org, AJvYcCVe+Hls4EKe27WWZ2vG3vKnBh031Qiqt74vR/AmKA6j6FPRlGjqFKFXc1G9X4kkZxa6Im78MnTt/PsbgnUnYKHP@vger.kernel.org, AJvYcCWIg04mfIBKbJjSatYRPWPY9JBRqy2RVI8tixI52Rn+IUHreq9PAGapjBey5zV/RrKVTTY=@vger.kernel.org, AJvYcCWk4TkcL+GMm+3ninooQUga7TNjTEZdRX1t6D8iecy2NQxcil5FsPZGW/Mc1m2vzwwkQqidGHvgbdTF@vger.kernel.org, AJvYcCXDru/uirb6RE/ex5G4O6RniDTl24WBLGgAJelDHouDPXkBafs+3q2p89KYRvvtwBCME1I78EQM@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHAOIMI6HwHxIoor+lZJ1fjkEARj0SWmMq/7XxjY6kOjjR4j3K
+	qRjMRkMwy/acI29vOxFZ0bDvdMIDLWR4aDozTHDg4YtkW/jP22IE
+X-Gm-Gg: ASbGncss6222td6S81Lc/crawGBidWM/3Bwz6930W2y7N4GmJmrrE0tggYg980/aSQj
+	S8lj8K2MQyZNroaLaPEm+egSjzALJAa5tO/KuyP8udns7IylnDHnnBRdrWIaqHUYZt7aDXH2i0B
+	KN1EopaPZpqyzI0Z3OS/Tosk7cugKew64JppV/Nf+K9nRWtAK73BYSFQzF60e416twi9L30M+50
+	TB0X8GEp0GrA2b4+Bt+F1RikOrVHMjThj/NkgXk8vSO8z2nGy+ArTiz43wr2qYyJau003A0o+TN
+	HAlKvKbWBixhWNOLNmLuBvddpT7G+UcEQ4EUaaQVsA==
+X-Google-Smtp-Source: AGHT+IEm9uh2oi8GwqrdV15LlWS/Rqn7wndmxNzv/1SRiy16/A1ivtq3hKiACLTKq3h6bJm+AeDuYg==
+X-Received: by 2002:a05:6214:c25:b0:6d8:899e:c3bf with SMTP id 6a1803df08f44-6e1b21c47f9mr251116416d6.34.1737470404863;
+        Tue, 21 Jan 2025 06:40:04 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afce3215sm51677466d6.100.2025.01.21.06.40.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2025 06:40:04 -0800 (PST)
+Date: Tue, 21 Jan 2025 09:40:03 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ devel@daynix.com
+Message-ID: <678fb1c3d123b_23e15a2946c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <806def7d-16f3-4d53-abc8-7d18e8c22dcb@daynix.com>
+References: <20250120-tun-v4-0-ee81dda03d7f@daynix.com>
+ <20250120-tun-v4-8-ee81dda03d7f@daynix.com>
+ <678e327e34602_19c737294b4@willemb.c.googlers.com.notmuch>
+ <806def7d-16f3-4d53-abc8-7d18e8c22dcb@daynix.com>
+Subject: Re: [PATCH net-next v4 8/9] tap: Keep hdr_len in tap_get_user()
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 12/15] KVM: s390: move gmap_shadow_pgt_lookup() into
- kvm
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        seanjc@google.com, seiden@linux.ibm.com
-References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
- <20250117190938.93793-13-imbrenda@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250117190938.93793-13-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: V7v9n2VYheTHPIycGK2-hbzAfi-ro8WT
-X-Proofpoint-ORIG-GUID: Kf_Aey1iLukRAOCTCY4JCjXONInyukgd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-21_05,2025-01-21_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 phishscore=0 priorityscore=1501 suspectscore=0 spamscore=0
- bulkscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
- mlxlogscore=739 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501210115
 
-On 1/17/25 8:09 PM, Claudio Imbrenda wrote:
-> Move gmap_shadow_pgt_lookup() from mm/gmap.c into kvm/gaccess.c .
+Akihiko Odaki wrote:
+> On 2025/01/20 20:24, Willem de Bruijn wrote:
+> > Akihiko Odaki wrote:
+> >> hdr_len is repeatedly used so keep it in a local variable.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >> ---
+> >>   drivers/net/tap.c | 17 +++++++----------
+> >>   1 file changed, 7 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> >> index 061c2f27dfc83f5e6d0bea4da0e845cc429b1fd8..7ee2e9ee2a89fd539b087496b92d2f6198266f44 100644
+> >> --- a/drivers/net/tap.c
+> >> +++ b/drivers/net/tap.c
+> >> @@ -645,6 +645,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   	int err;
+> >>   	struct virtio_net_hdr vnet_hdr = { 0 };
+> >>   	int vnet_hdr_len = 0;
+> >> +	int hdr_len = 0;
+> >>   	int copylen = 0;
+> >>   	int depth;
+> >>   	bool zerocopy = false;
+> >> @@ -672,6 +673,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   		err = -EINVAL;
+> >>   		if (tap16_to_cpu(q, vnet_hdr.hdr_len) > iov_iter_count(from))
+> >>   			goto err;
+> >> +		hdr_len = tap16_to_cpu(q, vnet_hdr.hdr_len);
+> >>   	}
+> >>   
+> >>   	len = iov_iter_count(from);
+> >> @@ -683,11 +685,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   	if (msg_control && sock_flag(&q->sk, SOCK_ZEROCOPY)) {
+> >>   		struct iov_iter i;
+> >>   
+> >> -		copylen = vnet_hdr.hdr_len ?
+> >> -			tap16_to_cpu(q, vnet_hdr.hdr_len) : GOODCOPY_LEN;
+> >> -		if (copylen > good_linear)
+> >> -			copylen = good_linear;
+> >> -		else if (copylen < ETH_HLEN)
+> >> +		copylen = min(hdr_len ? hdr_len : GOODCOPY_LEN, good_linear);
+> >> +		if (copylen < ETH_HLEN)
+> >>   			copylen = ETH_HLEN;
+> >>   		linear = copylen;
+> >>   		i = *from;
+> >> @@ -698,11 +697,9 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   
+> >>   	if (!zerocopy) {
+> >>   		copylen = len;
+> >> -		linear = tap16_to_cpu(q, vnet_hdr.hdr_len);
+> >> -		if (linear > good_linear)
+> >> -			linear = good_linear;
+> >> -		else if (linear < ETH_HLEN)
+> >> -			linear = ETH_HLEN;
+> >> +		linear = min(hdr_len, good_linear);
+> >> +		if (copylen < ETH_HLEN)
+> >> +			copylen = ETH_HLEN;
+> > 
+> > Similar to previous patch, I don't think this patch is significant
+> > enough to warrant the code churn.
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+> The following patch will require replacing
+> tap16_to_cpu(q, vnet_hdr.hdr_len)
+> with
+> tap16_to_cpu(q->flags, vnet_hdr.hdr_len)
+>
+> It will make some lines a bit too long. Calling tap16_to_cpu() at 
+> multiple places is also not good to keep the vnet implementation unified 
+> as the function inspects vnet_hdr.
+> 
+> This patch is independently too trivial, but I think it is a worthwhile 
+> cleanup combined with the following patch.
 
-Once the naming is fixed:
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Ok. I see what you mean.
 
