@@ -1,135 +1,148 @@
-Return-Path: <kvm+bounces-36169-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36170-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54D75A182E6
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:30:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA27DA182EC
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 222463A388A
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:30:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A15316A55B
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 17:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908AF1F5423;
-	Tue, 21 Jan 2025 17:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32131F63E2;
+	Tue, 21 Jan 2025 17:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mnhDlCiy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0FcVJz6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B851B4F3E;
-	Tue, 21 Jan 2025 17:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7832D1F543F
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 17:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737480622; cv=none; b=TpIWsXX5JxTWPX7c5A5STRzfICpe+cZqPzQqyIwxIl97/dCtrYm+TdenC+t5tnbGjvB8SM04mS35wmbgpvqQZrU55FswU/NunckDkbWv3/jIVxvefT5LUpaTHGlOXayJW3X+dAqKWkYX0lMpF8XrfoB0hmGdD8DMaNi5CyRJhTc=
+	t=1737480628; cv=none; b=IUVX2fMtEvi6/5JkefSIdEqXL8LtBdC3dXZ/AgWyc8ZTyH9fGmByNWgdVYTD6ko44c30pyxuFTjREYBB5tyhqEuz6BZ4s+zV1k/plS1hOKj9LbjhRkA8Op2THalP0yGMKb88VBfUS2UvZ4KvKc8269y5YZWM9ZIr54zPZ3jVsYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737480622; c=relaxed/simple;
-	bh=u9ahfzQjAWQ9A8s8dAHpSOBLTYEDEdvo67RBllq2i7o=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UHYS0kFpn6vzxHik7cHbiItGGIQEJcjBw6oarSkGvi4GVyWVUxBM6GgrULjzXPo0QUfUUSFvH9bfHfoLcyaztkUc2LwtD7MNfqBknK7c35HSIVXQzynwOvCpAtl/LzJp7iIcPQMkc5CRGER//INGSUN3zpW6ZYErr9So1AA4in4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mnhDlCiy; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-385deda28b3so3756103f8f.0;
-        Tue, 21 Jan 2025 09:30:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737480616; x=1738085416; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ACTeJb+Bue5O35d+xgl3L7SU4BfYA0FRCcm27lTzJ8w=;
-        b=mnhDlCiyBB+wqTvGoNNXxVb/9ZQk00Bz5f6G2mzcGWPXOV1UCpgA4uvq0WXt4wuINH
-         tM6vWyxxctkS2gxOPH6bKuM2POhy7/YdnMZwExiJjRbPz7EG2Zzp1SpkzJ/dtQmf+Xfl
-         1FtHp0MiV5dCpUn1tVfDUN5EWej6EerPI46RxHrDDqAU2vGQuCS22k4fONGrf4XBvvZ9
-         2wdDXlTGgGhzBVq79KPNJ1AlVPoZNn77fn3L6v3PGrbtZ1Z6YE8y72hTRJFeRVlMx1Ft
-         ics7dBxSUztQR+MvykR37HDEzMKBabp06UJgW+NfPq6ts7T2OnNtDMB/mzxbz9ASAbLl
-         8hhA==
+	s=arc-20240116; t=1737480628; c=relaxed/simple;
+	bh=+XqZ2mIVewpWYnLioiQaGxFPazonOEuVdIMJXoMPQ2U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WkSFdYeJQTlgTV8uGOYekJpCj7yOQqNxTdgUk3h7P1uABsd51O8S2EyhkEDbQNgVVfDv/lXF4i2uoBtTgCQbJN1arLsizxLt+Dvclb0S3yg/Gr4UMFJSsAyItpEmv/D5JjWR69/B6JXEpMEmBTEeRhpWlcnCNnKe4GyhVsz/Kfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M0FcVJz6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737480625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1Ohl61oQvrjRs6MMIBMI/1E+/f+GFIL7csbNfKFkQbk=;
+	b=M0FcVJz6XTC0/RXi48r0DJX0aWTxYzAxXp+4iTluzZG1u8ErryjuBkds2ibEL2SPU3mQK+
+	aSzmxJcTnSOJ1MbHrDvKNCrEy/YzLsE1UuROgVZNr7st3jrr0zyWg20W6Sk+G5tGs0JZYO
+	ePX1BJfv+5BI9K1zmlw6YYxMOTvsANk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-546-adXE4IOMMz2E1f62R1hNCA-1; Tue, 21 Jan 2025 12:30:23 -0500
+X-MC-Unique: adXE4IOMMz2E1f62R1hNCA-1
+X-Mimecast-MFC-AGG-ID: adXE4IOMMz2E1f62R1hNCA
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43631d8d9c7so29991895e9.1
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 09:30:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737480616; x=1738085416;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1737480622; x=1738085422;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ACTeJb+Bue5O35d+xgl3L7SU4BfYA0FRCcm27lTzJ8w=;
-        b=H2xwhU3gVo8yWKJ7NENdZhzs6T2ROoDHQCSvknyx1oxZytWIwk9yR0BkT3WJfyS0jk
-         YayHKlbT8Y+roqR5FECtjje6LGh6Xr16pNQN5mHaaIK79G6Qyj3GwSXm8WTJbfpnyHUV
-         I7ATuFaW/LIf4uYEO+7L0ArIy553w6kiK5HylvJVfZjj5G/jD0AoNqPagAi0LV6fQ9P5
-         OyR4oxp4PNBQPrEpj6Sov8PBlfaHzSXN24KWp582hhHI5OtbYyqXOUO+YNXzgw75uLkL
-         VUxyo5UIW6Or/gPCJEsCfeBKT8cA9aDuP4+/NlCMa6FX0YtjnyWIAqzHLNwc2x6Ti6aj
-         Dt2w==
-X-Forwarded-Encrypted: i=1; AJvYcCV5uAYFPl2YLzP6Hmg5f9iB06w3Dr8aOP4RSnUM+Bh3R+co8TOlcZWvYHIzkPpnL5MCTGo=@vger.kernel.org, AJvYcCWh63Iz7nuJ6ccg2L31RqPvdqw57WFonHwQPV+oxicVl0vCS6r/K8HBRTDzHB0AMYkJT+88EItMFJp9MucO@vger.kernel.org
-X-Gm-Message-State: AOJu0YxI0Hrk2F+v6W20fGva7N37grf0iVrwf/1sScFS1zrvDJQJLVbG
-	oQ8o3jYmgJ4cwn4ivRilUzE7QqvxqCP4bnb/7gHXwCQDr1g5O2aO
-X-Gm-Gg: ASbGncsNq9KWOYRf9wRvO9Qy3Tw8plJcXwX8VL8xe8zsMsWrtvw2ILVlM60HHb4MvXq
-	PeCElFsyAAyafAjX0mI8BmaKYVzJ012Xql9dY6GmlGGVxm4/NJm0J1vTfFsGXSRE7kF2vrJXt+l
-	OP3MZajKih9kTJnBFUy3veM1+3vAXWovdeV78cw65SCVCbgmdhQzheYM/H/NEs9muqX22vtmUpc
-	i8+MatKpZqNCelO+8IkRgLBoEbJ2I6T/RjfBrlFFd67MPhgb1DXbAVoXJjPc1N+F2ztMnJRpcTM
-	OOpAU6VP2BxQ2lMpacmX+E7vNg==
-X-Google-Smtp-Source: AGHT+IHzIBJAm2VxZKXjWIIs4Z5rSL8z4B47z7PIwZJJj6Wp3x8fwzH3JpRj/Kp9smK7dxuO2SO6sg==
-X-Received: by 2002:a5d:64ed:0:b0:385:f72a:a3b0 with SMTP id ffacd0b85a97d-38bf57dc942mr16571185f8f.55.1737480616093;
-        Tue, 21 Jan 2025 09:30:16 -0800 (PST)
-Received: from [192.168.19.15] (54-240-197-233.amazon.com. [54.240.197.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438a1f07e1bsm140780635e9.7.2025.01.21.09.30.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2025 09:30:15 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <8a9460aa-7ac7-4e6f-91d5-f1170a1963f3@xen.org>
-Date: Tue, 21 Jan 2025 17:30:14 +0000
+        bh=1Ohl61oQvrjRs6MMIBMI/1E+/f+GFIL7csbNfKFkQbk=;
+        b=r36vOZL/ocUuCZtA0X3m+23Y/VYSoX5eX8kZCUwVWa/T//gUAaB2sk0PlktUhExPYJ
+         0kB0/FVHlsXwBuoyJfo8MdQtmu2MC/uXTkeQ2M0vrL4m/sDftVcyLzEjO43R2gEt7zXZ
+         4x1ZRAq9BSY25wqcLwf2vThwwz4wr1TNL8GHXXhbNRdcEJOXXDk7dQzh6dAz+qHAG2hw
+         Ob63Qjm4WmeGzUopmeUrpydm32SiEe9Wk19ukgbgn2Q1GAlgB0ZAzR8jx2hJSd3Qqarh
+         AgnNXlc7DSmAf8UVY4fxMa7CV49gjPgHH0NxVZ/5xDpamh+7K40CN+1VIh/MVt5/aWJT
+         u15Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUcqvTWionJWKcwHPSQAHzyDNMPXRBNMYnMrGmhoqDBMbpyRh7IhAldZnM9ajRdIixxWnI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHlD7u1GOtq9DlVCtc63D+kKGfqqolloJ07wwfxYgZHx07buyz
+	SOoY1fS7GMXWsIcn7ab1G3WqrjORPO0UfWY5vd7zLEmpeLqS8K5cjUQms3yhTYAgo9QzM1fhzox
+	gNaLMWI3xKQlAeB5alzakHw9XhdhbWYCqITfLfHWm5Q/iC77tyg==
+X-Gm-Gg: ASbGncu1WJrYv3TP4P5c2HtQCZ1Rq4AiIkiP9bMjLvrEmOrDv9m6GepXYpbeeWkFGtI
+	4vPIXT0f0C0IF8FsWeaTToJsGccO0vM2r05857k/sTccu1VulNH0DD0i5hYogZLIYAon8Kc9oEs
+	z0OcfyI6118Q3DlIMCktX2i8iITQWDuKeInR9w01y5TAN7Oxyp9cjaJEq0/8W+3MknCLWgdcFja
+	46vn403GE87WYCK7WPWrCcLGPmGJa3/XD2mvFL5t3kt1MNtVQ19KHvi05pIztEKfmxBBBJe/A==
+X-Received: by 2002:a05:600c:3d89:b0:438:9280:61d5 with SMTP id 5b1f17b1804b1-43892806237mr136001135e9.5.1737480622511;
+        Tue, 21 Jan 2025 09:30:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHOXs9Ya5kOuP/W2rM4xk+vm5PSiTxIW1zce/YaupUUzohswvYEtJM6u59IjkgPls10nttGDQ==
+X-Received: by 2002:a05:600c:3d89:b0:438:9280:61d5 with SMTP id 5b1f17b1804b1-43892806237mr136000975e9.5.1737480622163;
+        Tue, 21 Jan 2025 09:30:22 -0800 (PST)
+Received: from leonardi-redhat ([176.206.32.19])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890408a66sm190273065e9.5.2025.01.21.09.30.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2025 09:30:21 -0800 (PST)
+Date: Tue, 21 Jan 2025 18:30:19 +0100
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org, 
+	Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>, 
+	virtualization@lists.linux.dev, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Hyunwoo Kim <v4bel@theori.io>, kvm@vger.kernel.org
+Subject: Re: [PATCH net 1/2] vsock/virtio: discard packets if the transport
+ changes
+Message-ID: <blvbtr3c7uxtbspbfwrobfk7qdukz6nst2bnomoxbltst2yhkm@47k6evsdceeg>
+References: <20250108180617.154053-1-sgarzare@redhat.com>
+ <20250108180617.154053-2-sgarzare@redhat.com>
+ <2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH 09/10] KVM: x86: Setup Hyper-V TSC page before Xen PV
- clocks (during clock update)
-To: David Woodhouse <dwmw2@infradead.org>,
- Sean Christopherson <seanjc@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com,
- Paul Durrant <pdurrant@amazon.com>
-References: <20250118005552.2626804-1-seanjc@google.com>
- <20250118005552.2626804-10-seanjc@google.com> <8734hd8rrx.fsf@redhat.com>
- <Z4_AwrFFsKg2VgYW@google.com> <eb45ff29-f551-483e-9930-1fa545fb83aa@xen.org>
- <a71d0215ebc34e132081e856f116ca5fcbda41b4.camel@infradead.org>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <a71d0215ebc34e132081e856f116ca5fcbda41b4.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co>
 
-On 21/01/2025 17:16, David Woodhouse wrote:
-> On Tue, 2025-01-21 at 15:59 +0000, Paul Durrant wrote:
->> On 21/01/2025 15:44, Sean Christopherson wrote:
->> [snip]
->>>
->>> I think it's ok to keep the Hyper-V TSC page in this case.  It's not that the Xen
->>> PV clock is truly unstable, it's that some guests get tripped up by the STABLE
->>> flag.  A guest that can't handle the STABLE flag has bigger problems than the
->>> existence of a completely unrelated clock that is implied to be stable.
->>>
->>
->> Agreed.
->>
->>>> I don't know if anyone combines Xen and Hyper-V emulation capabilities for
->>>> the same guest on KVM though.)
->>>
->>> That someone would have to be quite "brave" :-D
->>
->> Maybe :-)
-> 
-> Xen itself does offer some Hyper-V enlightenments, and we might
-> reasonably expect KVM-based hypervisors to offer the same. We
-> explicitly do account for the KVM CPUID leaves moving up to let the
-> Hyper-V ones exist.
-> 
-> I don't recall if Xen's Hyper-V support includes the TSC page though.
+On Thu, Jan 09, 2025 at 02:34:28PM +0100, Michal Luczaj wrote:
+>FWIW, I've tried simplifying Hyunwoo's repro to toy with some tests. 
+>Ended
+>up with
+>
+>```
+>from threading import *
+>from socket import *
+>from signal import *
+>
+>def listener(tid):
+>	while True:
+>		s = socket(AF_VSOCK, SOCK_SEQPACKET)
+>		s.bind((1, 1234))
+>		s.listen()
+>		pthread_kill(tid, SIGUSR1)
+>
+>signal(SIGUSR1, lambda *args: None)
+>Thread(target=listener, args=[get_ident()]).start()
+>
+>while True:
+>	c = socket(AF_VSOCK, SOCK_SEQPACKET)
+>	c.connect_ex((1, 1234))
+>	c.connect_ex((42, 1234))
+>```
+>
+>which gives me splats with or without this patch.
+>
+>That said, when I apply this patch, but drop the `sk->sk_state !=
+>TCP_LISTEN &&`: no more splats.
+>
+Hi Michal,
 
-It does :-)
+I think it would be nice to have this test in the vsock test suite.  
+WDYT? If you don't have any plans to port this to C, I can take care of 
+it :)
+
+Cheers,
+Luigi
+
 
