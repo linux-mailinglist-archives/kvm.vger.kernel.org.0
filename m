@@ -1,202 +1,254 @@
-Return-Path: <kvm+bounces-36085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593CFA17701
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 06:27:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C00A1770A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 06:38:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEFB7188B1C5
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 05:27:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 021AA16A58B
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 05:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E701ABEC7;
-	Tue, 21 Jan 2025 05:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3CD0199FBA;
+	Tue, 21 Jan 2025 05:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="CjFGBInK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gBFGwfnX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CA21A23A0
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 05:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D4B383
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 05:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737437243; cv=none; b=q7uxp+0XvVuFF5/uP94KKItudeKrtKnKUH7+ooWXYPXygXfC4clre++sWmCmFrdXFt+1niNOWA9SrPx8N1bQsxPJ1W57UB15k3F0baOCFafEtjRxEQgZC7z21PMy5xNK1j86K5PlUovEwrvnQKaunK1y0ziYj3PVCyCH15aMMfE=
+	t=1737437885; cv=none; b=f6le6N2cI0jTllWqA6wBWjvZ1UsI/PSieFZNCSGxXAQPGVNqAlj/HwCKIU7ktwi0TssZim8HXp59kmXXN+65erl7tXdGjvs6o+I9QuxlDApNZtQ1WXkX+TvdC+FpWcCuMUaVdhUzU0/lOgkk6WRDS3eHrXiz9TWMdogUYE7NwfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737437243; c=relaxed/simple;
-	bh=17jdquf1O8HrGT7YX1JbIULVdHRHHmmF5bL1fyAoM9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tUkJ0VNzMpBfxKeVwwYxzp+VibAGdWTeTYuy6JtDwly8CWoxOjb1KF/GUgU2plxevjskAXoLHOTVI+EjInJGoqN43bCMExLaGZnkKUziPI0P/+BqYZ/8Z/cZkuVCDSN8dGg9SyhBwbpjCCctgH6PBGu3dusinBAdQ2WYpJVp7kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=CjFGBInK; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21670dce0a7so108254475ad.1
-        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 21:27:19 -0800 (PST)
+	s=arc-20240116; t=1737437885; c=relaxed/simple;
+	bh=WUonKqdMpCOoJXylWgKKL0HWR6Kqr5oBuq3mD2lpdvg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t82p1Qr4IyYylorgB8QGY4Slw6E2eQkMraHr2c1D7QCJXWVc7lYKauOBOqmx1ArbzgO0MXV/Nk9uFAebt1v46rFYMRiG/7gf1obT/hrvlSl+sEQYeQgW4VBO7cVcSiGMKCW9TKpbyaeM2NIJy9LhAeE9mMBIY/rYlKw5QxS/v1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gBFGwfnX; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-467a17055e6so60227601cf.3
+        for <kvm@vger.kernel.org>; Mon, 20 Jan 2025 21:38:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737437239; x=1738042039; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KuNe0V4SlZE9V8OcN/E4qhh/fBRX/xaiMcicz54Ypbc=;
-        b=CjFGBInKFSGtYLOCcEjqY8Bn27ymGEWz+08u6G22zDw2Yn46EzpuW8ioqpYyPZvdeS
-         PL+f0F6rwFmgOXeE9ks7WFaFgX4+4jqLcP+1tXkSMwOk6FpTjJAKFo92DNqefY3itE9+
-         qbnj3cTHBa9mkhch49YxEGenvFajWjpC9wKhOMRN3mg/GEgEzHW1NMt6WQtygK1yl0jT
-         KjHFTzfudxO69pYWMqpeW11YwD/40z4r8JDENBd7cuW9R3f36CPPLMIkEr4ygsBwUqlR
-         phRItPEggnf264dj8xCT/GRiNq1mVtuFb0Mb53x9B/h1AiTanITyn+rEfGqJ8n2DFfkY
-         P4jQ==
+        d=google.com; s=20230601; t=1737437882; x=1738042682; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/hApkXbFMxZLsXTizlCKBKFEmZmeWLn29OK3OXjQI2U=;
+        b=gBFGwfnXrBqzLNwypJFL9zawAFExanjlYbfNfR7VAo1yi3DQ6yF56r+wRnkTjxGyJQ
+         k5M4H3LFG7Or6E8KjXNFdn/xIC7PdfUBW+jfDZPtAW+qCbX333FrnSlg/GUun2E44xhT
+         Ld3s2UsxEqHbZM1UFOPAUDhft4MspPDyuq0AVM6ljXO+fztfX9yhs0YirqVHu15uTyZl
+         29sro4En9ts3JHltUs2Wc9cm+q1ozUzbQF8UkX00v3kLPMp7vO4UCe6yM7wJ8JBD73dS
+         RvTTvMfwMc3df1cN/cKxTTmPOms7+vAZr8o0vUXzN32SK425ByxU5vcfNhddyiyMgfq/
+         PGpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737437239; x=1738042039;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KuNe0V4SlZE9V8OcN/E4qhh/fBRX/xaiMcicz54Ypbc=;
-        b=BkAmvZw2G2stzoS4MnLedV+tieIt/zUcN2Ij5jxKLKQ1efkMZu4tDEgOXmv9VhN4fP
-         IlFhSUMq5tfeMVqTkz4It2yu9zLBDXTutfcCEbnelbTay1FoFcRsrCeabt1gfY6aPwsl
-         j3Ux/IDTdHLEonzlUHXGRfnaNTZiM7Tx85OeeA/oU3R1QWlKS0D4HLCnKwlZVUVICbo7
-         p6vuR+3z0fyJf4vqUjAa6M+RgBBjClhcSMmE7QueBlJ/bYgNiVTq4qqmfnFBpMYwMYG+
-         BEXtuDmdKOWwfDMw6gDcNTZXSYIwZnTwNgWjP9mljwEcGbduVmdQXnF+4hIPzPO/PbQn
-         7NAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXYu54MUua5jzFy77cDQFD7ak6YIYSGgFjo9vPB01mba0gfKMHOiE8BJe0SspflOekVFV4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvz5T8Oa8D+yCltQQWKTyttcmfZCaV83EzQPSv1yaRs79W2Kg+
-	ofZDchob1IwpPx4kR+PBuQ20OBMG2FV7EZsLXd2HqdFsH0EtGCqbAv/yLwZNRmg=
-X-Gm-Gg: ASbGncvOvTeG4SeJwv0HtsbCJbonmV+q0cJVonDyOtbkEGxkK+Zk9vR5ljR+V+MLjYM
-	n/U1sj+PDWnDckqSUHrc/f0znQIWls6w6l3j5gSdXPwD4AyzYvuP8vAml0fpX5dHSsZoInpFBPx
-	wMHOE5OeIiOiCWnB4ntL0kqE33UibLsB/+G8KL7LLSGaujDQmL5sKqNyiCPNUJcgTztezbsNqSO
-	Iq2YTpiU6nVpDGidn6pcftHWnKL49JEtNP0kIlaOlAJGyQJwUSVeQh81vQEG0BWwtNmTyZAOAWp
-	hbP3
-X-Google-Smtp-Source: AGHT+IF8AscE6lKE6K9gAMAkVavPAuy5ImBZTIR2UjEzttP05cs28ECPVkex5+WoyQz221rWXZqSKQ==
-X-Received: by 2002:a17:902:f7ce:b0:215:773a:c168 with SMTP id d9443c01a7336-21c352de425mr241247485ad.1.1737437239066;
-        Mon, 20 Jan 2025 21:27:19 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-a9bdf0b4503sm6710167a12.67.2025.01.20.21.27.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jan 2025 21:27:18 -0800 (PST)
-Message-ID: <92675e51-cbaf-4905-8cf8-dff741a26db9@daynix.com>
-Date: Tue, 21 Jan 2025 14:27:12 +0900
+        d=1e100.net; s=20230601; t=1737437882; x=1738042682;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/hApkXbFMxZLsXTizlCKBKFEmZmeWLn29OK3OXjQI2U=;
+        b=RPZBMs56grq2Wd4AgPPb7AsK+twUx9gThQLK/CvPuYKZ3G4rRM9OANfdMnpkVt4Umq
+         kMUJexeOp7VXAnaRKnpg8EPtQOP4hGSpUihG+MBoxxC0PPKuc3xQBfdW7v9VmtzNrnz+
+         PH3C01MQSuKf4TD8puawzn2vmdjo/q8JPryO9yXhv05m+Bjbb0ewMXziyen2XePFZdeE
+         WvdeJTKTA7EwMp6YmDbbl9+SaIvSFOvaNtzL33sSusvW2uNAKhjlvX9BETOVYG0Lyxtl
+         2Pcmi+usZ0zqo0LYIJ4djcBEIWP6jXG94b5b0if5V6lX6Br1a3oja76bkb9y/LtWeXGo
+         VtIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXVMac6/zQLqNlupUiRSzXJ05v0ySoxDhWH8wK23/fjaFmduj1QGo5XgiFd0pQE6JT1P+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlTXcLN6LHtKTLFU+ICeL1k33cw5MVJxzi2dXDAzfD0FDImH8F
+	UMxrNwOBnnnYTrbuYN6Jy8wgFp4DcE8HecbhEYpcyOQfF/4C6L4r0yDFChp2UHLuNheDJccmUje
+	NDBpG+9CObQvTSSVn9MRoflR0ce2nIQWCZpoc
+X-Gm-Gg: ASbGncteV0jTUqnaHg6SFbVcELqDJnMxl11DhIE0GkfnERFH5Kj26idPLur0i/GTb3E
+	Qaxc+ZatLRIbOuc7YI7p9DuvAl3fmhZZFh/DxN1kW6qBvo0h2sjx7QqSvZmrthReEjD/qUk18Jk
+	oktLi/
+X-Google-Smtp-Source: AGHT+IHbSzp3QiE0lkyqhctqFXrLQBEhMtub+uY8aeVlP9CEqccAymFh9QHqndw+z8IXOdhFUteI1bw1Yl5rhJjmm80=
+X-Received: by 2002:a05:622a:2d5:b0:467:7441:2717 with SMTP id
+ d75a77b69052e-46e12a40489mr265877951cf.19.1737437881887; Mon, 20 Jan 2025
+ 21:38:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 9/9] tap: Use tun's vnet-related code
-To: Willem de Bruijn <willemb@google.com>, Jason Wang <jasowang@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
- <20250116-tun-v3-9-c6b2871e97f7@daynix.com>
- <678a21a9388ae_3e503c294f4@willemb.c.googlers.com.notmuch>
- <51f0c6ba-21bc-4fef-a906-5d83ab29b7ff@daynix.com>
- <CACGkMEuPXDWHErCCdEUB7+Q0NxsAjpSH9uTvOxzuBvNeyw7_Hg@mail.gmail.com>
- <CA+FuTSec1z7-8nNNc1ZXkzekDrFHPnvYKFf8PNZg89VuwhoWSw@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CA+FuTSec1z7-8nNNc1ZXkzekDrFHPnvYKFf8PNZg89VuwhoWSw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250107042202.2554063-1-suleiman@google.com> <20250107042202.2554063-2-suleiman@google.com>
+ <Z4gtb-Z2GpbEkAsQ@google.com> <CABCjUKDU4b5QodgT=tSgrV-fb_qnksmSxhMK3gNrUGsT9xeitg@mail.gmail.com>
+ <Z4qK4B6taSoZTJMp@google.com>
+In-Reply-To: <Z4qK4B6taSoZTJMp@google.com>
+From: Suleiman Souhlal <suleiman@google.com>
+Date: Tue, 21 Jan 2025 14:37:50 +0900
+X-Gm-Features: AbW1kvbSm0kCrrqMxpuh1Q0A93h8ZThxoiiJ5P9REEIgeB2rzzGQi9mCvgWri94
+Message-ID: <CABCjUKDDDhXx8mSRKHCa34JjSX1nfM5WMG-UrPu9fjei6gkUJA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/3] kvm: Introduce kvm_total_suspend_ns().
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
+	David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	ssouhlal@freebsd.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/01/20 20:19, Willem de Bruijn wrote:
-> On Mon, Jan 20, 2025 at 1:37 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> On Fri, Jan 17, 2025 at 6:35 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>
->>> On 2025/01/17 18:23, Willem de Bruijn wrote:
->>>> Akihiko Odaki wrote:
->>>>> tun and tap implements the same vnet-related features so reuse the code.
->>>>>
->>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>>> ---
->>>>>    drivers/net/Kconfig    |   1 +
->>>>>    drivers/net/Makefile   |   6 +-
->>>>>    drivers/net/tap.c      | 152 +++++--------------------------------------------
->>>>>    drivers/net/tun_vnet.c |   5 ++
->>>>>    4 files changed, 24 insertions(+), 140 deletions(-)
->>>>>
->>>>> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
->>>>> index 1fd5acdc73c6..c420418473fc 100644
->>>>> --- a/drivers/net/Kconfig
->>>>> +++ b/drivers/net/Kconfig
->>>>> @@ -395,6 +395,7 @@ config TUN
->>>>>       tristate "Universal TUN/TAP device driver support"
->>>>>       depends on INET
->>>>>       select CRC32
->>>>> +    select TAP
->>>>>       help
->>>>>         TUN/TAP provides packet reception and transmission for user space
->>>>>         programs.  It can be viewed as a simple Point-to-Point or Ethernet
->>>>> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
->>>>> index bb8eb3053772..2275309a97ee 100644
->>>>> --- a/drivers/net/Makefile
->>>>> +++ b/drivers/net/Makefile
->>>>> @@ -29,9 +29,9 @@ obj-y += mdio/
->>>>>    obj-y += pcs/
->>>>>    obj-$(CONFIG_RIONET) += rionet.o
->>>>>    obj-$(CONFIG_NET_TEAM) += team/
->>>>> -obj-$(CONFIG_TUN) += tun-drv.o
->>>>> -tun-drv-y := tun.o tun_vnet.o
->>>>> -obj-$(CONFIG_TAP) += tap.o
->>>>> +obj-$(CONFIG_TUN) += tun.o
->>>>
->>>> Is reversing the previous changes to tun.ko intentional?
->>>>
->>>> Perhaps the previous approach with a new CONFIG_TUN_VNET is preferable
->>>> over this. In particular over making TUN select TAP, a new dependency.
->>>
->>> Jason, you also commented about CONFIG_TUN_VNET for the previous
->>> version. Do you prefer the old approach, or the new one? (Or if you have
->>> another idea, please tell me.)
->>
->> Ideally, if we can make TUN select TAP that would be better. But there
->> are some subtle differences in the multi queue implementation. We will
->> end up with some useless code for TUN unless we can unify the multi
->> queue logic. It might not be worth it to change the TUN's multi queue
->> logic so having a new file seems to be better.
-> 
-> +1 on deduplicating further. But this series is complex enough. Let's not
-> expand that.
-> 
-> The latest approach with a separate .o file may have some performance
-> cost by converting likely inlined code into real function calls.
-> Another option is to move it all into tun_vnet.h. That also resolves
-> the Makefile issues.
+On Sat, Jan 18, 2025 at 1:52=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Fri, Jan 17, 2025, Suleiman Souhlal wrote:
+> > On Thu, Jan 16, 2025 at 6:49=E2=80=AFAM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > >
+> > > On Tue, Jan 07, 2025, Suleiman Souhlal wrote:
+> > > > It returns the cumulative nanoseconds that the host has been suspen=
+ded.
+> > > > It is intended to be used for reporting host suspend time to the gu=
+est.
+> > >
+> > > ...
+> > >
+> > > >  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+> > > > +static int kvm_pm_notifier(struct kvm *kvm, unsigned long state)
+> > > > +{
+> > > > +     switch (state) {
+> > > > +     case PM_HIBERNATION_PREPARE:
+> > > > +     case PM_SUSPEND_PREPARE:
+> > > > +             last_suspend =3D ktime_get_boottime_ns();
+> > > > +     case PM_POST_HIBERNATION:
+> > > > +     case PM_POST_SUSPEND:
+> > > > +             total_suspend_ns +=3D ktime_get_boottime_ns() - last_=
+suspend;
+> > >
+> > > After spending too much time poking around kvmlock and sched_clock co=
+de, I'm pretty
+> > > sure that accounting *all* suspend time to steal_time is wildly inacc=
+urate for
+> > > most clocksources that will be used by KVM x86 guests.
+> > >
+> > > KVM already adjusts TSC, and by extension kvmclock, to account for th=
+e TSC going
+> > > backwards due to suspend+resume.  I haven't dug super deep, buy I ass=
+ume/hope the
+> > > majority of suspend time is handled by massaging guest TSC.
+> > >
+> > > There's still a notable gap, as KVM's TSC adjustments likely won't ac=
+count for
+> > > the lag between CPUs coming online and vCPU's being restarted, but I =
+don't know
+> > > that having KVM account the suspend duration is the right way to solv=
+e that issue.
+> >
+> > (It is my understanding that steal time has no impact on clock sources.=
+)
+> > On our machines, the problem isn't that the TSC is going backwards. As
+> > you say, kvmclock takes care of that.
+> >
+> > The problem these patches are trying to solve is that the time keeps
+> > advancing for the VM while the host is suspended.
+>
+> Right, the issue is that because KVM adjusts guest TSC if the host TSC do=
+es go
+> backwards, then the accounting will be all kinds of messed up.
+>
+>   1. Initiate suspend at host TSC X, guest TSC X+Y.
+>
+>   2. Save X into last_host_tsc via kvm_arch_vcpu_put():
+>
+>         vcpu->arch.last_host_tsc =3D rdtsc();
+>
+>   3. Resume after N hours, host TSC reset to 0 and starts counting.
+>
+>   4. kvm_arch_enable_virtualization_cpu() runs at new host time Z.
+>
+>   5. KVM detects backwards TSC (Z < X) and adjusts guest TSC offset so th=
+at guest
+>      TSC stays at/near X+Y, i.e. guest TSC becomes "Z + Y + (X - Z)".
+>
+>                 u64 delta_cyc =3D max_tsc - local_tsc;
+>                 list_for_each_entry(kvm, &vm_list, vm_list) {
+>                         kvm->arch.backwards_tsc_observed =3D true;
+>                         kvm_for_each_vcpu(i, vcpu, kvm) {
+>                                 vcpu->arch.tsc_offset_adjustment +=3D del=
+ta_cyc;
+>                                 vcpu->arch.last_host_tsc =3D local_tsc;
+>                                 kvm_make_request(KVM_REQ_MASTERCLOCK_UPDA=
+TE, vcpu);
+>                         }
+>
+> Thus, if the guest is using the TSC for sched_clock, guest time does NOT =
+keep
+> advancing.
+>
+> kvmclock on the other hand counts from *host* boot, and so guest time kee=
+ps
+> advancing if the guest is using kvmclock.
+>
+>   #ifdef CONFIG_X86_64
+>   static s64 get_kvmclock_base_ns(void)
+>   {
+>         /* Count up from boot time, but with the frequency of the raw clo=
+ck.  */
+>         return ktime_to_ns(ktime_add(ktime_get_raw(), pvclock_gtod_data.o=
+ffs_boot));
+>   }
+>   #else
+>   static s64 get_kvmclock_base_ns(void)
+>   {
+>         /* Master clock not used, so we can just use CLOCK_BOOTTIME.  */
+>         return ktime_get_boottime_ns();
+>   }
+>   #endif
+>
+> In short, AFAICT the issues you are observing are mostly a problem with k=
+vmclock.
+> Or maybe it's the other way around and effectively freezing guest TSC is =
+super
+> problematic and fundamentally flawed.
+>
+> Regardless of which one is "broken", unconditionally accounting suspend t=
+ime to
+> steal_time will do the wrong thing when sched_clock=3Dtsc.  To further mu=
+ddy the
+> waters, current Linux-as-a-guest on modern hardware will likely use clock=
+source=3Dtsc,
+> but sched_clock=3Dkvmclock.  In that scenario, guest time doesn't advance=
+d, but
+> guest scheduler time does.  Ugh.
+>
+> That particular wart can be avoided by having the guest use TSC for sched=
+_clock[*],
+> e.g. so that at least the behavior of time is consistent.
+>
+> Hmm, if freezing guest time across suspend is indeed problematic, one tho=
+ught
+> would be to put the onus on the VMM/user to not advertise a "nonstop TSC"=
+ if the
+> host may be suspending.  The Linux-as-a-guest would prefer kvmclock over =
+TSC for
+> both clocksource and sched_clock.
+>
+> [*] https://lore.kernel.org/all/Z4gqlbumOFPF_rxd@google.com
 
-I measured the size difference between the latest inlining approaches. 
-The numbers may vary depending on the system configuration of course, 
-but they should be useful for reference.
+I see what you're saying. Thanks for explaining.
 
-The below shows sizes when having a separate module: 106496 bytes in total
+To complicate things further there are also different kinds of
+suspends. From what I've seen "shallow" (and/or "suspend-to-idle")
+suspends don't stop the CPU, at least on our machines, so the host TSC
+keeps ticking. On "deep" suspends, on the other hand, the TSC might go
+backwards.
 
-# lsmod
-Module                  Size  Used by
-tap                    28672  0
-tun                    61440  0
-tun_vnet               16384  2 tun,tap
+But I suppose if the guest uses kvmclock the behavior should be the
+same in either case.
 
-The below shows sizes when inlining: 102400 bytes in total
+At least for our use case we would definitely want guest *wall* time
+to keep advancing, so we would still want to use kvmclock.
 
-# lsmod
-Module                  Size  Used by
-tap                    32768  0
-tun                    69632  0
+Would accounting the suspend duration in steal time be acceptable if
+it was conditional on the guest using kvmclock?
+We would need a way for the host to be notified that the guest is
+indeed using it, possibly by adding a new MSR to be written to in
+kvm_cs_enable().
 
-So having a separate module costs 4096 bytes more.
-
-These two approaches should have similar tendency for run-time and 
-compile-time performance; the code is so trivial that the overhead of 
-having one additional module is dominant.
-
-The only downside of having all in tun_vnet.h is that it will expose its 
-internal macros and functions, which I think tolerable.
+-- Suleiman
 
