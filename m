@@ -1,192 +1,163 @@
-Return-Path: <kvm+bounces-36107-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36108-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 420BEA17D0D
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:32:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54614A17DC4
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 13:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB5BE1884A93
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 11:32:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FA16163DC7
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A808F1F131B;
-	Tue, 21 Jan 2025 11:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502FB1F151C;
+	Tue, 21 Jan 2025 12:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="fsKhi3NQ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="g+oNp/va"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B0526AFA;
-	Tue, 21 Jan 2025 11:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FC81F0E25;
+	Tue, 21 Jan 2025 12:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737459147; cv=none; b=BfeldD3wCkQ2+ZYqii45h9tqAc+Vx72proaQm+i95a6f3KpniTKfdDSfpOGW9XHINWzNKsP5MAshX7kLSPTbB0pznBbn9WA979o4DBteGKwGCrmAtMZV4f91JRcaEz4Jmaq7DKyl4+q0QLlkaGaC2Xj//6syOymGki0VgLF8PEM=
+	t=1737462250; cv=none; b=hRSfOV1KwQwXPpf+UCMfFxZduKpYmSLW7sGeLR4cje0x8MJTACjeRzdYArPIWX1QQJ51ENCtFD27ujkms8BBAlc3N+uHUToWJdU7q4QAFLIYUUVBR6ys3/OK56X25EORJl2Df9i0gvLeMbUzHGx9MlR4Voy4brjppbJNA4boW5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737459147; c=relaxed/simple;
-	bh=af+oSx+K9BpZVMKkleDgbo/9/G4dOsmPyIrvZ1SayG8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ux7f5BnGbu2/gvuBOTZJpBY3KjSWj/wrfHzkG/MrBc4L+gryKE0I0GV+wP9urd782rjXH3jsnkB0f2XBTxSDH46HjNNOTFZuhj2rgDEs8A7tiSJZXXw3mVTM5ILUwC+X4qBlI5l/1xJRSRIEg4v9ZKhP4+vQvXMqRwNPmacjNHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=fsKhi3NQ; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 57D7040E0286;
-	Tue, 21 Jan 2025 11:32:23 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id C9dbRpCkjAkc; Tue, 21 Jan 2025 11:32:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1737459140; bh=pJAtM4599Bc3qsGQx8W8156XT9kNhh7AoEjPS6NUepM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fsKhi3NQF3WiD4rN48HFsAZCOSmOs7DI503aBPgkRuUcvJDG/PgUxh2l7sva2Qll3
-	 V7UQV655yVEXP63F7FghWPyXR5KQ19q5EDkjB6P15xiXWwjVIjxhPMGCdTNuZaHYBs
-	 I8AHExOpsIGnmtIONptReAT1Cs9MSYcCYaI85+Z2RR+qgi6limveKHHOFx0wfyT3wJ
-	 74g+ONC7WlIlCDVuaT7JVbogjyNlip1ldjBLlm9WyDRrqGWmrqAzqI6QjXKY//R7pQ
-	 o88KsDhQkghaVrJ8WrO9gVUKLi/BGqcyFMVCfYSaw+hlOgj5YpiXeaUMBEYx5ezK+8
-	 7uuj/MOVgpRU3dzsy/5R0fQmHFNaUMmdamWp1892OcA8W/CcBuwac4OlONKPxJF8mL
-	 UwRR8/upYoUWsVdK1AcRidlQOhhDIbwIckZNPAfFUvOnAj2yCG2AsSiz8iv82U0mAu
-	 trRV4Ym9bJlITNiBOQCH4mH5eOra+5RWDG2nD/V60wceChHXFYBUjTyoK0Q2gx8AAf
-	 QoDA9+pCY07b1c1FZrKE5eA26E+HdHZUZyuBnllpIrIGOTPB8cIV1BwPb+1zJsZ/pR
-	 KRsmtEJKfe0Tn8hdxBsCb3aI5S+zgrHzgrchVokaWY9hD1b3ieCwvQPxB5w/oVUloD
-	 Q98AENAfbw0ZsYGedHRqYFdc=
-Received: from zn.tnic (pd953008e.dip0.t-ipconnect.de [217.83.0.142])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 173C640E015F;
-	Tue, 21 Jan 2025 11:32:05 +0000 (UTC)
-Date: Tue, 21 Jan 2025 12:32:04 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: "Nikunj A. Dadhania" <nikunj@amd.com>, linux-kernel@vger.kernel.org,
-	thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-	mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
-	pgonda@google.com, pbonzini@redhat.com, francescolavra.fl@gmail.com,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Juergen Gross <jgross@suse.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Subject: Re: [PATCH v16 12/13] x86/tsc: Switch to native sched clock
-Message-ID: <20250121113204.GBZ4-FtP4cjjhKqvCV@fat_crate.local>
-References: <cd6c18f3-538a-494e-9e60-2caedb1f53c2@amd.com>
- <Z36FG1nfiT5kKsBr@google.com>
- <20250108153420.GEZ36a_IqnzlHpmh6K@fat_crate.local>
- <Z36vqqTgrZp5Y3ab@google.com>
- <4ab9dc76-4556-4a96-be0d-2c8ee942b113@amd.com>
- <Z4gqlbumOFPF_rxd@google.com>
- <20250116162525.GFZ4ky9TdSn7jltgw7@fat_crate.local>
- <Z4k6OcbLqMxvvmb-@google.com>
- <20250117202848.GAZ4q9gMHorhVMfvM0@fat_crate.local>
- <Z4rEuTonLal7Li1O@google.com>
+	s=arc-20240116; t=1737462250; c=relaxed/simple;
+	bh=j+/Tblzqde9F1kPNsxOaUOZ3m6W78feNAECOWklcObA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nGAX/nuLRBf1XRebYdLQIjIBSTPY8qG5XVSR5TWlIxBNR7+MUF53ZgopBSrtXGSjISVoghmo0AodIEsWh76UNfpoDmz+j8W+gB9cuYlDYOo3EOZqINjUmfjGCNyT3YkyhXJSz8a6LU/c7CJIDTQ0zhU1JjNtgqro5WzaKxUY72Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=g+oNp/va; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50LC7ksA004381;
+	Tue, 21 Jan 2025 12:24:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=0m8qTk
+	0Ul31sAWKeVTNbBWo/E6KrbuHVKtFW+UFyUH4=; b=g+oNp/vaU742GRSfG+kocz
+	L2AaTYwxzyF47zpFJ1XneMdFWahX7hvqyDsadVHvFNDgJCKXam1iDTqAlZxNScvG
+	KpkRC4GFjfOc98OBtJklsKMutLtK1BdoDeEws9pU89mRYZn8bpnp0zCJcUNSBiTO
+	wFB2M1cL5CoPjS2FUIl62/pJeynrDIUWtPg4giW+FpfCHa62C+I+064/dZkbzFz9
+	jCayXEgbEXS8dbR+y/TSXqb2UA/ckiTqZv/i5AiJuh9vW/SY22ppNowZkqacLEFx
+	EOlzqiZQ4G+k8twtYcOSLearCQ8oQZSLJdgCyEYL5uJKWWczW6vFvFV2NGW7N3cA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449rrycn13-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 12:24:02 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50LCJRIq025497;
+	Tue, 21 Jan 2025 12:24:02 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449rrycn0x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 12:24:02 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50L9T7nO019261;
+	Tue, 21 Jan 2025 12:24:01 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 448pmsb8ut-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 12:24:01 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LCNv2j59638030
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Jan 2025 12:23:57 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6CC0B20087;
+	Tue, 21 Jan 2025 12:23:57 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AD55520082;
+	Tue, 21 Jan 2025 12:23:56 +0000 (GMT)
+Received: from [9.171.13.4] (unknown [9.171.13.4])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 21 Jan 2025 12:23:56 +0000 (GMT)
+Message-ID: <9c74360f-c50d-4dd5-a8b1-e71e5eeb4fa4@linux.ibm.com>
+Date: Tue, 21 Jan 2025 13:23:56 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z4rEuTonLal7Li1O@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 03/15] KVM: s390: fake memslot for ucontrol VMs
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
+        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
+        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        seanjc@google.com, seiden@linux.ibm.com
+References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
+ <20250117190938.93793-4-imbrenda@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20250117190938.93793-4-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rdt9ofwEIquuhhTRv9PYgM9-VX5M8Fj7
+X-Proofpoint-ORIG-GUID: AZreg2LZbj4nOahb6TNPDM_xRPmVeCnU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-21_05,2025-01-21_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 suspectscore=0 spamscore=0
+ bulkscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ mlxlogscore=736 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501210099
 
-On Fri, Jan 17, 2025 at 12:59:37PM -0800, Sean Christopherson wrote:
-> The proposal here, and what kvmclock already does for clocksource, is to use the
-> raw TSC when the hypervisor sets bits that effectively say that the massaging of
-> TSC done by the PV clock isn't needed.
->
-> > But we really really trust it when the guest type is SNP+STSC or TDX since
-> > there the HV is out of the picture and the only one who can flub it there is
-> > the OEM.
+On 1/17/25 8:09 PM, Claudio Imbrenda wrote:
+> Create a fake memslot for ucontrol VMs. The fake memslot identity-maps
+> userspace.
 > 
-> Yep.  This one _is_ about trust.  Specifically, we trust the raw TSC more than
-> any clock that is provided by the HV.
+> Now memslots will always be present, and ucontrol is not a special case
+> anymore.
 
-Ok, makes sense.
-
-> It's not KVM guest code though.  The CPUID stuff is Intel's architecturally
-> defined behavior.  There are oodles and oodles of features that are transparently
-> emulated by the hypervisor according to hardware specifications.  Generally
-> speaking, the kernel treats those as "native", e.g. native_wrmsrl(), native_cpuid(),
-> etc.
-
-Uuuh, this is calling for confusion.
-
-native_* has always been stuff the kernel calls when it runs, well, natively,
-on baremetal. And not some PV or whatever-enlightened ops.
-
-Now, if you want to emulate those transparently that's fine but this is what
-native means in arch/x86/. Unless I've missed some memo but I doubt it. And
-I asked around :)
-
-> What I am proposing is that, for TDX especially, instead of relying on the
-> hypervisor to use a paravirtual channel for communicating the TSC frequency,
-> we rely on the hardware-defined way of getting the frequency, because CPUID
-> is emulated by the trusted entity, i.e. the OEM.
-
-I wouldn't trust the OEM with a single bit but that's a different story. :-P
-
-> Hmm, though I suppose I'm arguing against myself in that case.  If the
-> hypervisor provides the frequency and there are no trust issues, why would
-> we care if the kernel gets the frequency via CPUID or the PV channel.  It's
-> really only TDX that matters.  And we could handle TDX by overriding
-> .calibrate_tsc() in tsc_init(), same as Secure TSC.
-
-I guess it all boils down to the trust level you want to have with the TSC.
-I don't know whether there's even a HV which tries to lie to the guest with
-the TSC and I guess we'll find out eventually but for now we could treat the
-two things similarly. The two things being:
-
-- TDX and STSC SNP guests - full TSC trust
-- HV with the required CPUID bits set - almost full, we assume HV is
-  benevolent. Could change if we notice something.
-
-> That said, I do think it makes sense to either override the vendor and F/M/S
-> checks native_calibrate_tsc().  Or even better drop the initial vendor check
-> entirely,
-
-I have no clue why that thing is even there:
-
-aa297292d708 ("x86/tsc: Enumerate SKL cpu_khz and tsc_khz via CPUID")
-
-I guess back then it meant that only Intel sports those new CPUID leafs but
-those things do change.
-
-> because both Intel and AMD have a rich history of implementing each other's
-> CPUID leaves.  I.e. I see no reason to ignore CPUID 0x15 just because the
-> CPU isn't Intel.
-> 
-> As for the Goldmost F/M/S check, that one is a virtualization specific
-> thing.  The argument is that when running as a guest, any non-TSC
-> clocksource is going to be emulated by the hypervisor, and therefore is
-> going to be less reliable than TSC.  I.e. putting a watchdog on TSC does
-> more harm than good, because what ends up happening is the TSC gets marked
-> unreliable because the *watchdog* is unreliable.
-
-So I think the best thing to do is to carve out the meat of that function
-which is valid for both baremetal and virtualized and then have separate
-helpers which call the common thing. So that you don't have to test
-on *everything* when having to change it in the future for whatever reason and
-so that both camps can be relatively free when implementing their
-idiosyncrasies.
-
-And then it should fit in the current scheme with platform function ptrs.
-
-I know you want to use native_calibrate_tsc() but then you have to sprinkle
-"am I a guest" checks and this reminds me of the "if XEN" fiasco back then.
-Also, a really nasty lying HV won't simply set X86_FEATURE_HYPERVISOR...
-
-So I'd prefer if we fit a guest which runs on a relatively honest HV :) into
-the current scheme as the kernel running simply on yet another platform, even
-at the price of some small code duplication.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
