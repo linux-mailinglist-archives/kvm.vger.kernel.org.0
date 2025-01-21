@@ -1,128 +1,131 @@
-Return-Path: <kvm+bounces-36174-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36175-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67025A1845C
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 19:06:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C50AAA1847D
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 19:08:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 808AF18819D3
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:04:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52D4D7A51DD
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AF01F7064;
-	Tue, 21 Jan 2025 18:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5068F1F7092;
+	Tue, 21 Jan 2025 18:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C6DK+YAr"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="lZhE2ZM5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CA21F63C9
-	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 18:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3D21F0E36;
+	Tue, 21 Jan 2025 18:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737482676; cv=none; b=R+8LeYfKY7ymNBikvGeDJ91QKbvQTodGuIa1LoTfdELkmad4pMYghP5C1eRuxIDoY7F36ewpknThfDw/CE5CKvR3YkwtBROQ9iE/SMaf35Gj4B/kbFyVtfw1EgzHWlNPI1dsNmztNw3gYdI1sMkZLXj7LSJIJEZUywXu8BdYAJM=
+	t=1737482816; cv=none; b=OWgffXbOHUnYi5/8/wV4/VjmQKXb3fBD3eOdctyRV5LZPGLFQPG8TfHJYqbxrqmlA4u/w7+p+bejhgjv99FCPVXnifE10HQfRGYt9MheJUnIsr7/ZXLJ/bP6cIv3C4x6kSkS+KMFKTqbJdEbHbFfDmOo6IPbxd0kk8SqxOyVBnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737482676; c=relaxed/simple;
-	bh=0H6DV1frPEjQ6pyp5LFnKUrOtQChN9SH4bsk1iqonNQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oYswWC29Tndc3Tl+9bOu1BPD8DaHnjCck+vZemxp+bZki05mNXrH/lwN7ZckMEfRlNk/MUJpdJu8Dw27pte6zDPQ3KEWq1vgZvr1By03XZRV/Tvfqdg+cdcdzWo8YtXu0W9JycvnRGYs9PENMFIl/kBQSg9ioNTzInWLzuUK7SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C6DK+YAr; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21650d4612eso40358915ad.2
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 10:04:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737482674; x=1738087474; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UlpJgylYPBhBTOXJmnDjlqjGKEbVzLH3urNLpkBE040=;
-        b=C6DK+YAroXMHhX7+3aRiE05Rq3hj2zy7XXHg+VYW77/2AryU4ubP5epAO9PLnGzXX7
-         KvYBLe22pPWD2sTJYxMSCji7K/RR3zflVJvcZY+TKgyADRX62uOQvbUBWC8P/CUqZgXC
-         yfSip+ERWG8H3iAU9VNJojW8AmenC3QydWOVNSHeP2i0UprpNCijmlfboIvLxnIIxFEO
-         FkyKpWI0eaHP4T1Zn7AMp2/7/WHa+zpP/kusXeJr15rv71pzGjqQmvlKtkqmphdA5vVi
-         +DKW26XI1ZvpuFjTP2O8BGFCfp9BZyfcbU77ZaIE6tBXOPBuYI4kqFkBthIBo//7gd/J
-         on3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737482674; x=1738087474;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UlpJgylYPBhBTOXJmnDjlqjGKEbVzLH3urNLpkBE040=;
-        b=tRxQIx2OCQMxFOX+1yf5xf86l6hCu6mBQW24Hwv4tW+llq/e5f+VWEwJZRBecTpPxm
-         Wfvy/1z01fPzr3h948M86xfE0JA8WOkGNDMRaJ3xkKbMQSTayQh8uRldQDHZ6EQrNsRR
-         Ms7LJyf1GoX9eH5rNJAGN/uMNVFKfx6kZ/Se2WTEZw2TxCakrz6ijCfg/IrbNBbDUhvA
-         kvZ6S4Jkbu2A1TX8m2CtpzKiFQ/dArCLSa2Hua5HZfPfPUqqy9WOtWvj/GbEhWoeWSe+
-         99kaXm9qBtLi6R3692kM4w6FJnNyysq+CueKWm0xPHRkpNFcA1Q/SPRkGWZY1qrFm2+H
-         FG7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXmpRlTuCuSG7UBVoC74+oxbz8lYyZVh1VxeXjEiA+ZRhqnysyKNu5T1lfw99tnoPV8lvc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyB6kqRZA+nsaVO+HDwA57cOw+cXLK4TDF3nvswioeIEVTrV7S+
-	LHnOl4zyOOxkC//7mM3pmp6v09A41eaaO3/l7yPKhd+QaSW4jGw/AerI3S+nAuTW/w4lhwHB4yK
-	HTA==
-X-Google-Smtp-Source: AGHT+IHlUgnOTr4k9tHfDWgSC3sUed0m8QoaMEhUwxYs2XWjlGPAXM0XM+5srTfYVUtWffGBv0HqR/TSvWk=
-X-Received: from pfaq8.prod.google.com ([2002:a05:6a00:a888:b0:725:eb9c:47e4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:728e:b0:1e0:c1d5:f3ac
- with SMTP id adf61e73a8af0-1eb215ec4aemr34539711637.32.1737482673957; Tue, 21
- Jan 2025 10:04:33 -0800 (PST)
-Date: Tue, 21 Jan 2025 10:04:32 -0800
-In-Reply-To: <5718f02c-59e7-402b-91ee-b4b7b43f887a@linux.intel.com>
+	s=arc-20240116; t=1737482816; c=relaxed/simple;
+	bh=yzMp9OHuDafOKBn9rcCV9TmT/23Cxa4L5N2agXVJ7RY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TN7HUBTQDVX0OCWMTE0KHnAYUXauN+ZhDDEd2C2rOssn7qUKmwyNMnU1F6EGjeH8XCa9QS1DOagu7W2Rk1RCwtrlTcTjLch2Jej3oBJyBPtmRmGEGA7jwbjRXFifsrTNGeNvN47ahDBxOECCcDFiiVKvocP4aikQgTcE7g7wneQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=lZhE2ZM5; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1taIeA-001Ctx-TD; Tue, 21 Jan 2025 19:06:42 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=B0NkyGC4wYzCqVt2GL2dQ8Knz8FG3vRNUr8ob8BqF5k=; b=lZhE2ZM5ebUs7A8nmbHRIqXRl8
+	MUCnJTfK17MbN21CUElCkz+PNZr31HSVtBnHd1eMmgeeSikqNLHxtf/3jU0zTXjlGBKVQmfENidkm
+	9PX2cX02Cwhpt+nUurU1kGffhyKp1uR3yOaAHgPLf2hEcMWUlWLGwIhYIC34lrJH1g71frVxPG4ko
+	PwefQEVtEe/Hsg9wcV025DbgJjKWY6KwaHMKzoyDUOMOFKsEcLJrvGeJEcjtCyKWPWslQlw3TprVT
+	WpR6AFtLuPmZhYXl+ifjoto4O8sbMlJxi6mqs1FD5AfKJA6Nl6cfWV9os9vsBqklX4Mazlll4RrjA
+	GQ3R5rpw==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1taIe9-0006xt-CE; Tue, 21 Jan 2025 19:06:41 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1taIe0-006jVZ-TF; Tue, 21 Jan 2025 19:06:32 +0100
+Message-ID: <2bdfe259-e182-4846-b501-a33096cc74f1@rbox.co>
+Date: Tue, 21 Jan 2025 19:06:31 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241128004344.4072099-1-seanjc@google.com> <173457537849.3292936.8364596188659598507.b4-ty@google.com>
- <67f0292e-6eea-4788-977c-50af51910945@linux.intel.com> <Z4qv9VTs0CZ0zoxW@google.com>
- <5718f02c-59e7-402b-91ee-b4b7b43f887a@linux.intel.com>
-Message-ID: <Z4_hsKjBS32_miZP@google.com>
-Subject: Re: [PATCH v4 0/6] KVM: x86: Prep KVM hypercall handling for TDX
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Adrian Hunter <adrian.hunter@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] vsock/virtio: discard packets if the transport
+ changes
+To: Luigi Leonardi <leonardi@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org,
+ Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ virtualization@lists.linux.dev, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, bpf@vger.kernel.org, Jakub Kicinski
+ <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Hyunwoo Kim <v4bel@theori.io>, kvm@vger.kernel.org
+References: <20250108180617.154053-1-sgarzare@redhat.com>
+ <20250108180617.154053-2-sgarzare@redhat.com>
+ <2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co>
+ <blvbtr3c7uxtbspbfwrobfk7qdukz6nst2bnomoxbltst2yhkm@47k6evsdceeg>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <blvbtr3c7uxtbspbfwrobfk7qdukz6nst2bnomoxbltst2yhkm@47k6evsdceeg>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 20, 2025, Binbin Wu wrote:
-> On 1/18/2025 3:31 AM, Sean Christopherson wrote:
-> > On Wed, Jan 15, 2025, Binbin Wu wrote:
-> > > On 12/19/2024 10:40 AM, Sean Christopherson wrote:
-> > > > On Wed, 27 Nov 2024 16:43:38 -0800, Sean Christopherson wrote:
-> > > > > Effectively v4 of Binbin's series to handle hypercall exits to userspace in
-> > > > > a generic manner, so that TDX
-> > > > > 
-> > > > > Binbin and Kai, this is fairly different that what we last discussed.  While
-> > > > > sorting through Binbin's latest patch, I stumbled on what I think/hope is an
-> > > > > approach that will make life easier for TDX.  Rather than have common code
-> > > > > set the return value, _and_ have TDX implement a callback to do the same for
-> > > > > user return MSRs, just use the callback for all paths.
-> > > > > 
-> > > > > [...]
-> > > > Applied patch 1 to kvm-x86 fixes.  I'm going to hold off on the rest until the
-> > > > dust settles on the SEAMCALL interfaces, e.g. in case TDX ends up marshalling
-> > > > state into the "normal" GPRs.
-> > > Hi Sean, Based on your suggestions in the link
-> > > https://lore.kernel.org/kvm/Z1suNzg2Or743a7e@google.com, the v2 of "KVM: TDX:
-> > > TDX hypercalls may exit to userspace" is planned to morph the TDG.VP.VMCALL
-> > > with KVM hypercall to EXIT_REASON_VMCALL and marshall r10~r14 from
-> > > vp_enter_args in struct vcpu_tdx to the appropriate x86 registers for KVM
-> > > hypercall handling.
-> > ...
-> > 
-> > > To test TDX, I made some modifications to your patch
-> > > "KVM: x86: Refactor __kvm_emulate_hypercall() into a macro"
-> > > Are the following changes make sense to you?
-> > Yes, but I think we can go a step further and effectively revert the bulk of commit
-> > e913ef159fad ("KVM: x86: Split core of hypercall emulation to helper function"),
-> > i.e. have ____kvm_emulate_hypercall() read the GPRs instead of passing them in
-> > via the macro.
+On 1/21/25 18:30, Luigi Leonardi wrote:
+> On Thu, Jan 09, 2025 at 02:34:28PM +0100, Michal Luczaj wrote:
+>> FWIW, I've tried simplifying Hyunwoo's repro to toy with some tests. 
+>> Ended
+>> up with
+>>
+>> ```
+>>from threading import *
+>>from socket import *
+>>from signal import *
+>>
+>> def listener(tid):
+>> 	while True:
+>> 		s = socket(AF_VSOCK, SOCK_SEQPACKET)
+>> 		s.bind((1, 1234))
+>> 		s.listen()
+>> 		pthread_kill(tid, SIGUSR1)
+>>
+>> signal(SIGUSR1, lambda *args: None)
+>> Thread(target=listener, args=[get_ident()]).start()
+>>
+>> while True:
+>> 	c = socket(AF_VSOCK, SOCK_SEQPACKET)
+>> 	c.connect_ex((1, 1234))
+>> 	c.connect_ex((42, 1234))
+>> ```
+>>
+>> which gives me splats with or without this patch.
+>>
+>> That said, when I apply this patch, but drop the `sk->sk_state !=
+>> TCP_LISTEN &&`: no more splats.
+>>
+> Hi Michal,
 > 
-> Sure.
-> 
-> Are you OK if I sent the change (as a prep patch) along with v2 of
-> "TDX hypercalls may exit to userspace"?
+> I think it would be nice to have this test in the vsock test suite.  
+> WDYT? If you don't have any plans to port this to C, I can take care of 
+> it :)
 
-Ya, go for it.
+Sure, go ahead, but note that this is just a (probably suboptimal) Python
+version of Hyunwoo's C repro[1].
+
+[1]: https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
+
 
