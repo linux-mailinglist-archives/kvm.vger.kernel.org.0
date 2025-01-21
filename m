@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-36104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36105-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58953A17D04
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:29:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF6FA17D06
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 12:29:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E07A91884BAB
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 11:29:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D86C161305
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 11:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4C31F1505;
-	Tue, 21 Jan 2025 11:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8521F1920;
+	Tue, 21 Jan 2025 11:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDxobOKJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJXg5s98"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33921BBBEA;
-	Tue, 21 Jan 2025 11:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23591BBBEA;
+	Tue, 21 Jan 2025 11:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737458942; cv=none; b=gb4ByQ23NmRUsMqZw4nj9zf2W+n1L1YF62IaEsVYDF+U1Cqad5EGO24KzkHmq6StRhR2dSDfI+HdukA4mK+m745fdTDG8YqQya0OqhDFQlkNRKl6FOgXAdLKe1MhFD0/Evhmh8K7zg+6QGNb/FLJ/0T/poQ9knJmJ4p63aNXFPw=
+	t=1737458947; cv=none; b=MU4Lwja0LDvGhzmUQdrHJldEC1rwToLB4DJ3tILyPeCxGSEb71s1xdfb+pfhetAbZpnQZlFDd6SZZS3Sg03IkT0l842ZAfr7dyynMgP5ZaVOTlIJgnkVkuAgnlr2KOhaGWHc/DAvOYUy5KwbaeFql6o9TVxb4lCRH5Dk2A1G7/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737458942; c=relaxed/simple;
-	bh=Bo0v5aRaDzPqvoydQcrBJPn7q9FSqKp9DJF3+UnQwoY=;
+	s=arc-20240116; t=1737458947; c=relaxed/simple;
+	bh=DtILGrM3+rfRXWqQcTGk9nG1XMGIAOFuySX5/0Wg8L0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QlgI6Bwb4fFJNi/C2iaRHIgw1WyPeI8iokLl8fJ3oSTa7xyoNn/mliW38q9AvEonFVD9AwVYtftoYcAgsRFxIxITbS6+KiuX1T8F5ROpM9cr7bBbH7LtMTW4+6ZEa0DjmQmd+T/h1/nyhOWbQe003qniidpAInqJDF4/HcosRys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDxobOKJ; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=ZM6C+bC+SgmZ6s/ST1T61HkWNWJfAvT4YlBm2H6kmkeI6EITep9pCxlkNdf8mniWCczkQRLHgxHywip8FSKmwdVAFY2mxQUlKAmTk7NwOa9+gwuMq927iE3xlY7F9rAP5ldPeb/YUvq50fosVu++6MgxcZ9zn8xPO6J0KR/49Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XJXg5s98; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-216634dd574so62665395ad.2;
-        Tue, 21 Jan 2025 03:29:00 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21644aca3a0so121499545ad.3;
+        Tue, 21 Jan 2025 03:29:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737458940; x=1738063740; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737458945; x=1738063745; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g5a4wofP0E6vgMXtYk2R7pF6NDbjnXiV9YnBTUjkP3o=;
-        b=CDxobOKJtfv4V+mCIBS3xqltUGeA1oCFT8hjrKCYKfcdwm0+NRJzDgycBdtI02S3a/
-         9ZpWIFlqJwTjkXTfGP0TrKYaiP+TZSq0ihimQw+yiiG4CFM3By7+Jvsm3TpqimayxZPb
-         ylt94KBt77c89PY2yoHyMN0T+3LH7viCbuf2vKU1AR+YRCjSVt+ZqHdCoG1RCr+0/Twe
-         otAX7mtR+AmbMtNt+eG468C7no5yYoAj9p2o581kkNbe/rFkFYUhOUEI2P4qbii+O5ia
-         malcbQkB5wGAeaOsanQnc/eQVesVyaakD5oEh+NbCVCVk5ZT2v8s+z51qmcCL1nccPRx
-         sjTA==
+        bh=WXagEzywweo8G/6OstGzvbkfhs6k8bp2kHQoB/L2HB8=;
+        b=XJXg5s98lOGoxQDd0O6MGNLUGuQTX9v8N8CsRh8JWUxETwYaNvpPZjx2ErVRS2wPi3
+         1d5wHQV+VT6pNHdepGlOf1g6iEDKXvw4nh10cnPfk3gcK3hZu794vJZ3hKBJ3N87rPj2
+         fFlPBJsPzsTmtqSgJQkfmkRHqKAdXzZhn2d40Oysin4L7SU7IXbAFGSuN4/uLl2999dY
+         ZkpVrKwvzrQhfKLXzboXwkx+G067LCAIuUdhY9SyiHzkZA3hIAAX4ZTnqiFAsfANN7KR
+         sR4d3ImLcTTPYY9PvR1pn7DWi/5yzii6Fufccjd3Ea/Sza1U7blwzGRJIn4wIswmff/P
+         nGvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737458940; x=1738063740;
+        d=1e100.net; s=20230601; t=1737458945; x=1738063745;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g5a4wofP0E6vgMXtYk2R7pF6NDbjnXiV9YnBTUjkP3o=;
-        b=jHJgZCmazTVfuSywAkRLJ41LGyQM+p2oGYI3YS8deGZJCeKETO19JXXh/1c/5+lxad
-         oFL/ukCsAIUQjYoigWVbs36qXZQhNrcK8xcs+atfNL9R7zFBOnQ+eeEmwHxsA81ZSCZ5
-         qjoBCeKSiETmNAZD74uKQtzzGzYdI45CV0BS7l7c/z/zrIRZQ1x7lxeAHigM+8tcYPtn
-         nNQJsUS3b28/0e3WPjFo13i8jkj/ZyguHKKjZPbtkxV1q+XoXKEblgOOyAHw1dL1L29Q
-         I1vqICAplCpkO+J28/UxLXyEbKpBQqrFUuFhtQ4wv+tPoYARjmC0Qv0B01ZcneqUOMfP
-         LZnw==
-X-Forwarded-Encrypted: i=1; AJvYcCV+2NdTUneUy+feG6jTWz2gkXDof9jnUvopvi0WFBOUmOOiUkt0T9oieangkh8w5L7XUtg=@vger.kernel.org, AJvYcCXeJT32mDd/dcznku4f9U04ash1R2UdJGqbC8uN5RhsH22zgVGh8Zr9mFkgtyYMFzq8O+OTZcyGoqx2W+Es@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU/RxISh56lEum2fhbeGgXW6QQTfRstaHHoryAzLQDrnhk+QBg
-	kVaSgaZz9L0B5tgMW2vkANwcO9tknwoL3LprL9j/BqAu6Ce6mGVSiV10nQj/ogY=
-X-Gm-Gg: ASbGncvVxb2U+WBLrW4NoTaPL8QzSVniLqh8Uo9kDv+0d1PBo5DLjFaaxYiRtof/jlT
-	iqEY7Tx17U9kxgNdetgEaSKqJz6lZAXsoQG80Cm0pE+IDQ+/bjuOK/A3qZ+g1jpXI92Xm7x6YOK
-	z+k4Zcy2LUKYrXdIz4MAScjfQelPUd3Ww1/uSWFbhz0quirqoImLTstpytzSBrcHcRfCkLkwSoH
-	VIey+eryXWrGBUxzHcLnG4sA7Ta3g879/e7gwmJbwssE8YUU30Hy3LDmNQIJorfio2gumXxf4+p
-	+r+0C7/Q
-X-Google-Smtp-Source: AGHT+IEnO0MUrq69t5u503b7yFJyykRzPXOMC4CCZR6vu5qS1x/UI2lZ7qnZuoxHX4BSZoPVYb0Xpg==
-X-Received: by 2002:a17:903:8cb:b0:21a:874e:8adf with SMTP id d9443c01a7336-21c355dc4eemr248202715ad.45.1737458939824;
-        Tue, 21 Jan 2025 03:28:59 -0800 (PST)
+        bh=WXagEzywweo8G/6OstGzvbkfhs6k8bp2kHQoB/L2HB8=;
+        b=oN8I9k9U17fmpOgQM9PcXT1A2SfebcUvamhMX3dOYGWnPY4UBdng/GSHDXVZiBuQ3J
+         C5cyyMNs9Q1rWZDJELLFPZEAl1ifkFsUidQ8SRqSApqpzJrmC8t2Mgnyl12M1mxBNTLJ
+         nLtlD3c1Gui5LZVGZb8YGPs6DZfwvjjQ9VTmt1aJFwukQbxWeFLGAQGMH+/GYrXF3sXp
+         UXIWvGflShecCLcwgaV79wIPSRksKDKmm0b7RtiLPqgXbD5v8626Qv0nMblDA8UwMu30
+         LEWZtq425hGF/Ahyao9MIMVdBv5g0T7C1GPwuX0mMj8In9rC2bgzkfP7Ka/TZUCwQ1av
+         Q+cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUJF+NvEPYVxMQ/fJ2vf1Sx1gevWqsOLaLqYdveO5Ow4xEhhqnqj0mjafeDrjucIdJTehSk5EMlme3ZZlkZ@vger.kernel.org, AJvYcCVRfFXwYAjPk19kintxaOP8NV/yudM8ZzRHK5rxNNUFG41jq9ZvRIJSdE1BrtR6Ckk9C5g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwoWp2ovKzYGYxnmLc/iw1buNo4MVvtamHbCQEX+sQEmeFWH9R
+	cpKvucRYjyh5OAnslzAWO5naooS+6/0i/bsVNqvvybcwVd7AiSbs
+X-Gm-Gg: ASbGncviRxjGpvbBo94koREr8bBloQH0ttIw1dgXsbB7judF61YY5pfLdcpI3k3fBNz
+	zqlVQYtp7IbJ0ag9RlUBaIZzClwixSZTmJuCfHP/vW3Mj+4HDFBTfKo7sMsw9ooU3OWLc5AB//W
+	JIdF2vZ/y7pVCh+SHARFWsUniuFySfH6w8qhulexr9+x0R0APvV5WkeEK/y4r/sGovA3FGk6LxA
+	npzg9/lHyME878cwJWbTwq3GpIhCJZlWsUxp8PPUp04A3m9sbhOa/rStGu2nuegBXoQ5X/O20Mq
+	MX7QgSYD
+X-Google-Smtp-Source: AGHT+IH6fqnSkGAu0RzR1hL/8eMgnirYGIBDu4gvagajjQRKR4xYSTPHDLM/zXZ9hh02Fhhkq69ucQ==
+X-Received: by 2002:a17:902:f7ce:b0:215:773a:c168 with SMTP id d9443c01a7336-21c352de425mr254278285ad.1.1737458945192;
+        Tue, 21 Jan 2025 03:29:05 -0800 (PST)
 Received: from tiger.hygon.cn ([112.64.138.194])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2cea1fdesm75385965ad.26.2025.01.21.03.28.52
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2cea1fdesm75385965ad.26.2025.01.21.03.29.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 03:28:59 -0800 (PST)
+        Tue, 21 Jan 2025 03:29:04 -0800 (PST)
 From: Wencheng Yang <east.moutain.yang@gmail.com>
 To: east.moutain.yang@gmail.com,
 	alex.williamson@redhat.com,
@@ -83,12 +83,13 @@ Cc: iommu@lists.linux.dev,
 	robin.murphy@arm.com,
 	suravee.suthikulpanit@amd.com,
 	will@kernel.org
-Subject: [PATCH v3 1/3] uapi/linux/vfio:Add VFIO_DMA_MAP_FLAG_MMIO flag
-Date: Tue, 21 Jan 2025 19:28:34 +0800
-Message-ID: <20250121112836.525046-1-east.moutain.yang@gmail.com>
+Subject: [PATCH v3 2/3] vfio/vfio_iommu_type1:convert VFIO_DMA_MAP_FLAG_MMIO to IOMMU_MMIO flag
+Date: Tue, 21 Jan 2025 19:28:35 +0800
+Message-ID: <20250121112836.525046-2-east.moutain.yang@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CALrP2iW11zHNVWCz3JXjPHxyJ=j3FsVdTGetMoxQvmNZo2X_yQ@mail.gmail.com>
+In-Reply-To: <20250121112836.525046-1-east.moutain.yang@gmail.com>
 References: <CALrP2iW11zHNVWCz3JXjPHxyJ=j3FsVdTGetMoxQvmNZo2X_yQ@mail.gmail.com>
+ <20250121112836.525046-1-east.moutain.yang@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -97,25 +98,38 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The flag will be used by VFIO to map DMA for device MMIO on IOMMU page table.
+Refer to commit: 31e6850e0fdb iommu: Add MMIO mapping type (Robin Murphy),
+IOMMU needs to know the type of mapping to setup IOMMU page table,
+if the mapping is for device MMIO region, on some platforms, IOMMU page
+table entry attrs should be different versus regular memory.
 
 Signed-off-by: Wencheng Yang <east.moutain.yang@gmail.com>
 ---
- include/uapi/linux/vfio.h | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/vfio/vfio_iommu_type1.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index c8dbf8219c4f..68002c8f1157 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -1560,6 +1560,7 @@ struct vfio_iommu_type1_dma_map {
- #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
- #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
- #define VFIO_DMA_MAP_FLAG_VADDR (1 << 2)
-+#define VFIO_DMA_MAP_FLAG_MMIO (1 << 3)     /* map of mmio */
- 	__u64	vaddr;				/* Process virtual address */
- 	__u64	iova;				/* IO virtual address */
- 	__u64	size;				/* Size of mapping (bytes) */
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 50ebc9593c9d..08be1ef8514b 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1557,6 +1557,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 		prot |= IOMMU_WRITE;
+ 	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
+ 		prot |= IOMMU_READ;
++    if (map->flags & VFIO_DMA_MAP_FLAG_MMIO)
++        prot |= IOMMU_MMIO;
+ 
+ 	if ((prot && set_vaddr) || (!prot && !set_vaddr))
+ 		return -EINVAL;
+@@ -2801,7 +2803,7 @@ static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
+ 	struct vfio_iommu_type1_dma_map map;
+ 	unsigned long minsz;
+ 	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
+-			VFIO_DMA_MAP_FLAG_VADDR;
++			VFIO_DMA_MAP_FLAG_VADDR | VFIO_DMA_MAP_FLAG_MMIO;
+ 
+ 	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+ 
 -- 
 2.43.0
 
