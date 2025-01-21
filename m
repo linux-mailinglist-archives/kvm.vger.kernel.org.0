@@ -1,179 +1,195 @@
-Return-Path: <kvm+bounces-36178-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56103A18549
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 19:35:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8721A18559
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 19:46:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 408983AB7B2
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:35:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CAB518874CC
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 18:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800ED1F5436;
-	Tue, 21 Jan 2025 18:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253511F63FD;
+	Tue, 21 Jan 2025 18:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NQj/ANmX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n6fvwFmD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13588BEC;
-	Tue, 21 Jan 2025 18:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03001F4285
+	for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 18:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737484510; cv=none; b=fNArmZ34WByLPGVruR23AiiZ7/aXPHjeiOxDXL9tqGHbG4/SEPVjFRLSS4909i9EYE6P1iXTG8tCBO7zcJLmjvkHpgGKRZ5T7FYyIFDQg9FMBGUT5vNKwkvj/yCAMhaBr8xkWo8qPlUg1uWI0OeYs6eWlX00canD63a5VlXWVG4=
+	t=1737485150; cv=none; b=I6NlQspbeBFwaYU+Scpu5eh90Vxd2LBJT3CSEesOS0jhUFm/TQYY9O8yN/9WECia+hYL+CpOP1/udY9QnKVtguliPVzRXolHAgLHBcbYhXdyAYM5mdDqJiPLU0yuM2bXTgjXJyPIq4aREjOvSMGei+sVu+yL7hrJYJCJ6bwxAsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737484510; c=relaxed/simple;
-	bh=zioiELri2bbKUZA5iJKjNU3x7gbn6LaRKQrwZLKDuSo=;
-	h=Subject:MIME-Version:Content-Type:Date:Message-ID:CC:From:To:
-	 References:In-Reply-To; b=IhC4L/eMAjn9poTiH68R8A+1q0UPWtz5Yp5mJcshVJZDraG7sTSFjfBxbNj+EEf7FiMQkI48ODGtg7M2XBVBh1OGdOJQx+YdFEtLw7ixQbgY5rJpAIreWi0vj5N0PXc6Okb5pDr+04njyw+fT1AhE+CutZBDBFNa/NOFdsr+W04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NQj/ANmX; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+	s=arc-20240116; t=1737485150; c=relaxed/simple;
+	bh=PoFV2Jgi8Fv/S9H4xkzEez8rOm0Jx0WTT+lGGYyfGd4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ljhwXaZnJJwkEUmeyTM+FE3kSWXAnbyctK32oRdpmgvjR7QHULvyD/qKmM50ZaehdZSlKWSGa+fsl0CqzHz2b0LGbD9gJ+fa4RBqkErBH3W0H0qA9PKN3NhPAMMfXhlCwE0BPw0Aa/Q31r2xAp0nClAcN7NKN/S96TZi+uxGgfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n6fvwFmD; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee86953aeaso11016781a91.2
+        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 10:45:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1737484509; x=1769020509;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   cc:from:to:references:in-reply-to:subject;
-  bh=C/k7aoKQmXURtKxIX6BzaTRc7fIKc7Gcjulas4yt2Tk=;
-  b=NQj/ANmXTHLyGQTr/j/VXFQqPxzr6kKB3DrxqIAnC9DnnBV/tyInSl+b
-   sNeoPQeEWYzkNQ4C23xa0Qy382faqhmfP62TTCUSAGT05u+DK1RgpkFU6
-   K2NzwP0Mu/tOlvWTQwJpcUKpTjj0x006SfVoV7E7ZqMjJi2hDOr3kxaHG
-   0=;
-X-IronPort-AV: E=Sophos;i="6.13,222,1732579200"; 
-   d="scan'208";a="264740713"
-Subject: Re: [PATCH 5/5] Documentation: kvm: introduce "VM plane" concept
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 18:35:05 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.43.254:6305]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.31.172:2525] with esmtp (Farcaster)
- id ed8904b8-4ec4-494e-89a1-85c70c80ec24; Tue, 21 Jan 2025 18:35:04 +0000 (UTC)
-X-Farcaster-Flow-ID: ed8904b8-4ec4-494e-89a1-85c70c80ec24
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.192) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 21 Jan 2025 18:35:04 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39; Tue, 21 Jan 2025
- 18:34:59 +0000
+        d=google.com; s=20230601; t=1737485148; x=1738089948; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LaKDWUH4IvX2kG7AwZHBx4f4xmaqVOZBhWz5/OH0b4U=;
+        b=n6fvwFmDBNBAOxeGu7QZAsrm9n9bFZ0fVBGATC34Em6dNgt5qfuk5Z2p5IcBtA9MJA
+         Hib4uWcWSbDUeHP3otNbZT3tmIQsNCfmXYCuuE4uZlmd6/MAdgtwjJjTJow80cKVkGU1
+         cpsvIxn9FQUBlTfD5REOeYA82dKOTDVjfGSKMFpN4EwWbdF/uDORe/PghD5or0Zzq1NT
+         pCWVVh2OkCnOLVt71lm1DQEZuEFZPdCtiZNPVKQQkVIKcBb2QWfkdhDFWBFR3IoDOrQ9
+         J8kdWvvaItONZVWhO3TR9zB9JtM2n+cjHhMgarHR++zaxQG58vFbnzghnjNFID6Wv9Q6
+         wN1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737485148; x=1738089948;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LaKDWUH4IvX2kG7AwZHBx4f4xmaqVOZBhWz5/OH0b4U=;
+        b=FqKXnhSu2tyNhNgBsFA1C/Ex1vXPv95joZZ+lCMDui30gVwELNeRVD4DSRTtCjn+bx
+         I2KahOa5SrqWOTF/VUZRZL6QHnfYOdk6u0MlK9l/xy2UhSGt1D7N+xQCR+VrW2B+Uht5
+         BXFf5Ai4W2SPqA8FYLQcDKkzg0ej4ST7eh0fPmRINaTpaP03365gzw2ECIYdqiDYj9MA
+         CrNgNJI0Y0RbvKVNIK1hkNPoUFQ71skRzHKhH7uPSt3L5Ilo7N+UmUz/jgz/jqiBo4yp
+         4AGRDxM7mcBe28rPRLf6WjMlhS4T/KbJ2/nf30C5ALqqErMUj0L9xcCJ442MTUUsSE6X
+         j2cg==
+X-Forwarded-Encrypted: i=1; AJvYcCXlXFc0WyoADDHxsvKNv3v0DwILzpiili54KhExN95BC7qlELbE3wCNSatF6TW2hwLwe5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySNyFJNkJrJv17rJrXGRxE+pjDgk9GJ+H44NC9nbaySnl+C+fR
+	DpRWr1AZkrYdNjTogMBS41bLeGhP5I7WjUfC3cszQId7JUFzH1ik6RevJNZIDzZ+FbOA94I8xqE
+	nQQ==
+X-Google-Smtp-Source: AGHT+IGSvIQ0DSCpnKPgCfk4ldySQtzhEACwGpRoNFncGuH1X7X3fTN5qZxjjPi3+rjBp9+1Qu5qO604uJY=
+X-Received: from pfbbx10.prod.google.com ([2002:a05:6a00:428a:b0:725:eccc:e998])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4510:b0:724:5815:62c1
+ with SMTP id d2e1a72fcca58-72dafb367dfmr24723026b3a.19.1737485148160; Tue, 21
+ Jan 2025 10:45:48 -0800 (PST)
+Date: Tue, 21 Jan 2025 10:45:46 -0800
+In-Reply-To: <06482c0e-e519-47ca-9f70-da3ab12ed2e4@xen.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 21 Jan 2025 18:34:56 +0000
-Message-ID: <D77YUMCRT8A8.1QZOJD3EQG58W@amazon.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <roy.hopkins@suse.com>, <michael.roth@amd.com>,
-	<ashish.kalra@amd.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-	<anelkz@amazon.de>, <oliver.upton@linux.dev>, <isaku.yamahata@intel.com>,
-	<maz@kernel.org>, <steven.price@arm.com>, <kai.huang@intel.com>,
-	<rick.p.edgecombe@intel.com>, <James.Bottomley@hansenpartnership.com>
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: Sean Christopherson <seanjc@google.com>
-X-Mailer: aerc 0.19.0-9-g5a90e2f3553b
-References: <20241023124507.280382-1-pbonzini@redhat.com>
- <20241023124507.280382-6-pbonzini@redhat.com> <Z4rQIGxwUNr5UQX0@google.com>
- <D77OZ0KEG5FP.2BZQFEKQUQZ0P@amazon.com> <Z4_XX--PvhC9PBNB@google.com>
-In-Reply-To: <Z4_XX--PvhC9PBNB@google.com>
-X-ClientProxiedBy: EX19D046UWB001.ant.amazon.com (10.13.139.187) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Mime-Version: 1.0
+References: <20250118005552.2626804-1-seanjc@google.com> <20250118005552.2626804-7-seanjc@google.com>
+ <06482c0e-e519-47ca-9f70-da3ab12ed2e4@xen.org>
+Message-ID: <Z4_rWp97tzzZy0Po@google.com>
+Subject: Re: [PATCH 06/10] KVM: x86/xen: Use guest's copy of pvclock when
+ starting timer
+From: Sean Christopherson <seanjc@google.com>
+To: paul@xen.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com, 
+	Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue Jan 21, 2025 at 5:20 PM UTC, Sean Christopherson wrote:
-> On Tue, Jan 21, 2025, Nicolas Saenz Julienne wrote:
->> On Fri Jan 17, 2025 at 9:48 PM UTC, Sean Christopherson wrote:
->> > On Wed, Oct 23, 2024, Paolo Bonzini wrote:
->> >> @@ -6398,6 +6415,46 @@ the capability to be present.
->> >>  `flags` must currently be zero.
->> >> +.. _KVM_CREATE_PLANE:
->> >> +
->> >> +4.144 KVM_CREATE_PLANE
->> >> +----------------------
->> >> +
->> >> +:Capability: KVM_CAP_PLANE
->> >> +:Architectures: none
->> >> +:Type: vm ioctl
->> >> +:Parameters: plane id
->> >> +:Returns: a VM fd that can be used to control the new plane.
->> >> +
->> >> +Creates a new *plane*, i.e. a separate privilege level for the
->> >> +virtual machine.  Each plane has its own memory attributes,
->> >> +which can be used to enable more restricted permissions than
->> >> +what is allowed with ``KVM_SET_USER_MEMORY_REGION``.
->> >> +
->> >> +Each plane has a numeric id that is used when communicating
->> >> +with KVM through the :ref:`kvm_run <kvm_run>` struct.  While
->> >> +KVM is currently agnostic to whether low ids are more or less
->> >> +privileged, it is expected that this will not always be the
->> >> +case in the future.  For example KVM in the future may use
->> >> +the plane id when planes are supported by hardware (as is the
->> >> +case for VMPLs in AMD), or if KVM supports accelerated plane
->> >> +switch operations (as might be the case for Hyper-V VTLs).
->> >> +
->> >> +4.145 KVM_CREATE_VCPU_PLANE
->> >> +---------------------------
->> >> +
->> >> +:Capability: KVM_CAP_PLANE
->> >> +:Architectures: none
->> >> +:Type: vm ioctl (non default plane)
->> >> +:Parameters: vcpu file descriptor for the default plane
->> >> +:Returns: a vCPU fd that can be used to control the new plane
->> >> +          for the vCPU.
->> >> +
->> >> +Adds a vCPU to a plane; the new vCPU's id comes from the vCPU
->> >> +file descriptor that is passed in the argument.  Note that
->> >> + because of how the API is defined, planes other than plane 0
->> >> +can only have a subset of the ids that are available in plane 0.
->> >
->> > Hmm, was there a reason why we decided to add KVM_CREATE_VCPU_PLANE, a=
-s opposed
->> > to having KVM_CREATE_PLANE create vCPUs?  IIRC, we talked about being =
-able to
->> > provide the new FD, but that would be easy enough to handle in KVM_CRE=
-ATE_PLANE,
->> > e.g. with an array of fds.
->>
->> IIRC we mentioned that there is nothing in the VSM spec preventing
->> higher VTLs from enabling a subset of vCPUs. That said, even the TLFS
->> mentions that doing so is not such a great idea (15.4 VTL Enablement):
->>
->> "Enable the target VTL on one or more virtual processors. [...] It is
->>  recommended that all VPs have the same enabled VTLs. Having a VTL
->>  enabled on some VPs (but not all) can lead to unexpected behavior."
->>
->> One thing I've been meaning to research is moving device emulation into
->> guest execution context by using VTLs. In that context, it might make
->> sense to only enable VTLs on specific vCPUs. But I'm only speculating.
->
-> Creating vCPUs for a VTL in KVM doesn't need to _enable_ that VTL, and AI=
-UI
-> shouldn't enable the VTL, because HvCallEnablePartitionVtl "only" enables=
- the VTL
-> for the VM, HvCallEnableVpVtl is what fully enables the VTL for a given v=
-CPU.
+On Tue, Jan 21, 2025, Paul Durrant wrote:
+> On 18/01/2025 00:55, Sean Christopherson wrote:
+> > Use the guest's copy of its pvclock when starting a Xen timer, as KVM's
+> > reference copy may not be up-to-date, i.e. may yield a false positive of
+> > sorts.  In the unlikely scenario that the guest is starting a Xen timer
+> > and has used a Xen pvclock in the past, but has since but turned it "off",
+> > then vcpu->arch.hv_clock may be stale, as KVM's reference copy is updated
+> > if and only if at least pvclock is enabled.
+> > 
+> > Furthermore, vcpu->arch.hv_clock is currently used by three different
+> > pvclocks: kvmclock, Xen, and Xen compat.  While it's extremely unlikely a
+> > guest would ever enable multiple pvclocks, effectively sharing KVM's
+> > reference clock could yield very weird behavior.  Using the guest's active
+> > Xen pvclock instead of KVM's reference will allow dropping KVM's
+> > reference copy.
+> > 
+> > Fixes: 451a707813ae ("KVM: x86/xen: improve accuracy of Xen timers")
+> > Cc: Paul Durrant <pdurrant@amazon.com>
+> > Cc: David Woodhouse <dwmw@amazon.co.uk>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/xen.c | 58 ++++++++++++++++++++++++++++++++++++++++++----
+> >   1 file changed, 53 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> > index a909b817b9c0..b82c28223585 100644
+> > --- a/arch/x86/kvm/xen.c
+> > +++ b/arch/x86/kvm/xen.c
+> > @@ -150,11 +150,46 @@ static enum hrtimer_restart xen_timer_callback(struct hrtimer *timer)
+> >   	return HRTIMER_NORESTART;
+> >   }
+> > +static int xen_get_guest_pvclock(struct kvm_vcpu *vcpu,
+> > +				 struct pvclock_vcpu_time_info *hv_clock,
+> > +				 struct gfn_to_pfn_cache *gpc,
+> > +				 unsigned int offset)
+> > +{
+> > +	struct pvclock_vcpu_time_info *guest_hv_clock;
+> > +	unsigned long flags;
+> > +	int r;
+> > +
+> > +	read_lock_irqsave(&gpc->lock, flags);
+> > +	while (!kvm_gpc_check(gpc, offset + sizeof(*guest_hv_clock))) {
+> > +		read_unlock_irqrestore(&gpc->lock, flags);
+> > +
+> > +		r = kvm_gpc_refresh(gpc, offset + sizeof(*guest_hv_clock));
+> > +		if (r)
+> > +			return r;
+> > +
+> > +		read_lock_irqsave(&gpc->lock, flags);
+> > +	}
+> > +
+> 
+> I guess I must be missing something subtle... What is setting guest_hv_clock
+> to point at something meaningful before this line?
 
-Yes.
+Nope, you're not missing anything, this code is completely broken.  As pointed
+out by the kernel test bot, the caller is also busted, because the "xen" pointer
+is never initialied.
 
-> What I am proposing is to create the KVM vCPU object(s) at KVM_CREATE_PLA=
-NE,
-> purely to help avoid NULL pointer dereferences.  Actually, since KVM will=
- likely
-> need uAPI to let userspace enable a VTL for a vCPU even if the vCPU objec=
-t is
-> auto-created, we could have KVM auto-create the objects transparently, i.=
-e. still
-> provide KVM_CREATE_VCPU_PLANE, but under the hood it would simply enable =
-a flag
-> and install the vCPU's file descriptor.
+	struct kvm_vcpu_xen *xen;
 
-Sounds good. I like the idea of keeping KVM_CREATE_VCPU_PLANE around. It
-also leaves the door open to creating the objects at that stage if it
-ever necessary.
+	...
 
-Nicolas
+	do {
+		...
+
+		if (xen->vcpu_info_cache.active)
+			r = xen_get_guest_pvclock(vcpu, &hv_clock, &xen->vcpu_info_cache,
+						offsetof(struct compat_vcpu_info, time));
+		else if (xen->vcpu_time_info_cache.active)
+			r = xen_get_guest_pvclock(vcpu, &hv_clock, &xen->vcpu_time_info_cache, 0);
+		if (r)
+			break;
+	}
+
+
+I suspect the selftest passes because the @gpc passed to xen_get_guest_pvclock()
+is garbage, which likely results in kvm_gpc_refresh() failing, and so KVM falls
+backs to the less precise method:
+
+	if (r) {
+		/*
+		 * Without CONSTANT_TSC, get_kvmclock_ns() is the only option.
+		 *
+		 * Also if the guest PV clock hasn't been set up yet, as is
+		 * likely to be the case during migration when the vCPU has
+		 * not been run yet. It would be possible to calculate the
+		 * scaling factors properly in that case but there's not much
+		 * point in doing so. The get_kvmclock_ns() drift accumulates
+		 * over time, so it's OK to use it at startup. Besides, on
+		 * migration there's going to be a little bit of skew in the
+		 * precise moment at which timers fire anyway. Often they'll
+		 * be in the "past" by the time the VM is running again after
+		 * migration.
+		 */
+		guest_now = get_kvmclock_ns(vcpu->kvm);
+		kernel_now = ktime_get();
+	}
+
+Ugh.  And the reason my build tests didn't catch this is because the only config
+I test with KVM_XEN=y also has KASAN=y, which is incompatible with KVM_ERROR=y
+(unless the global WERROR=y is enabled).
+
+Time to punt KASAN=y to it's own Kconfig I guess...
+
+I'll verify the happy path is actually being tested before posting v2.
 
