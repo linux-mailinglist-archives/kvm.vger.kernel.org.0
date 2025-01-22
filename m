@@ -1,177 +1,219 @@
-Return-Path: <kvm+bounces-36285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56675A19800
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 18:50:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0F4A1983E
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 19:14:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C64A87A3082
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 17:49:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACCE37A4C4F
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 18:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3547F2163A1;
-	Wed, 22 Jan 2025 17:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACEDA2153F3;
+	Wed, 22 Jan 2025 18:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oi0eEiL7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TR6Zw25J"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2065.outbound.protection.outlook.com [40.107.92.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1CA2153D5
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 17:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737567888; cv=none; b=Wiqbh/Cbshi2iKvWCu2iq2QiP2XF48e9YWwyHdqKpswq8yygeKjB8qOXoEa5qvajJMFaicca3rKGwEK+ts4aH0ze6gDaBQWqCQtmEpn4q5LmrSj0xrKMM8N0NcgdrGNx5xckg68KlslJgpwBNFo6r+fy1vtL452qcZhztp4sn+U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737567888; c=relaxed/simple;
-	bh=9+dYk6uLPNaSfPahFJwjv2TJWB45nPzIcxXEYA0CRvk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=eANoejnLVo6yHf1I/dNyZMWe4VgeIdy9EZAXwauBEVEEA4PZo7BEBf1vV4z1eB8XU/3PjksAM+JWVfEJ7qWae2iuuARXPoAHcW4F4nROjb903PP9HOtwcRjTfzH7BqvB9ocFy+9szFLHNr/bXH3JwpgtUpZh6it9uk5khSbx+0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oi0eEiL7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737567885;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0mKiKkRzZUgeGTjqlBuywLicTrfkha+hCUcAXkj1MAM=;
-	b=Oi0eEiL7XIMe4gZbO43hOqxFSvC9ASvzVfaEAeN5vlPP32F7z1E4bvTeDQkpKMh/2GWoC+
-	gKWaN32zwQ2HzqDsrMrZ+DJUmmfCSaFr3staXSC7DzdnkjWdHm6GLarBBgI/1JGj9AVxZP
-	DqnhaF/fkBXbuTEn4eMMKM283PW6Qy8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-M1olSR2iPZSC3SxWXWlkNQ-1; Wed, 22 Jan 2025 12:44:43 -0500
-X-MC-Unique: M1olSR2iPZSC3SxWXWlkNQ-1
-X-Mimecast-MFC-AGG-ID: M1olSR2iPZSC3SxWXWlkNQ
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385d7611ad3so4487651f8f.2
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 09:44:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737567882; x=1738172682;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0mKiKkRzZUgeGTjqlBuywLicTrfkha+hCUcAXkj1MAM=;
-        b=MZCPGhj5rE0lJJ5MANzNUYyr9ysV4uTaEW5BwG90BSHXGnO0IWYUoY178ewTGywAkO
-         N51sUfiJ7g0evPkPI6t6LmJaACi9TwIaNB/zfldxPDV4s0+EFchH3sp4q+zfV68ljZtN
-         406vxhs215hB6jAYlPLdsHJ/MBIMJtTaio+8/gpqP9kcjhaVt96pVgjiSzRMBVZBO41u
-         4/3f2ltxxtlC6z1Jvzg66riuFeFPrAa56iXSR6vKB9UNXTORUXiNmXQ7b7EnIrNhbq06
-         XOWX/4KJgfn9/eFj1QEyOvCgQrkXsQoAVN0h9Vvno0jeDYWdXEaJti2S50qC5iZCDdyk
-         OOsg==
-X-Forwarded-Encrypted: i=1; AJvYcCXt675bLIMKyhZgcRKLrS9qiBmL3dVDg2YML5ccjiVdO2Ik2ua/sACFqVzCBpcbYoEP9mU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyzNF9Va+9wIq2O+JfFhEtPte3qwpllkJly3XEJ5LE8d6kfq89
-	JWKrziGMqgRoas8aIRgjR/h4rTk66gATWJ/a7ZtImQC2jCDXRnzupWs4zCkerI/fxfFnfrd4mTh
-	XAxwjNYtk4F8KHY9vFogFX4vOIRBLIE+sD6XiXpm3N4IwtRQNEw==
-X-Gm-Gg: ASbGnctfZnhE/9jpn3tTyw386XejlMmBOecFw+BWygi37q7Y2tWy5OyXUQRVD6Lou21
-	uUK2dkqJ8ErP0LbdEbCVwEkqQ5R9zW0M4lkOc9KOp1M6a9hdUBlZ5zEQX+nNAgqfnos2na3zd5e
-	gGQ9RdywAZw4h6z64ky+SBwz6IuDsK4JPUht4b7YCmlIZ1d+Fq8J9NxDA6cLxcy2ZE1mPxTWMxm
-	nX6IRpL3R7kcC0IiBlPxcjedqYdRjljeNU0gYLDnfuLUdkipqKV6RcJVEQoRZVb
-X-Received: by 2002:a05:6000:1a8c:b0:385:e5d8:2bea with SMTP id ffacd0b85a97d-38bf56639c9mr19598827f8f.20.1737567882531;
-        Wed, 22 Jan 2025 09:44:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEDOBXvsJXq7GbkbLYKEhW7E7CbQYXUCT5onjS2F9ksK1iDunvcE5QpwuEznxi/SuLc8Yw7WA==
-X-Received: by 2002:a05:6000:1a8c:b0:385:e5d8:2bea with SMTP id ffacd0b85a97d-38bf56639c9mr19598813f8f.20.1737567882216;
-        Wed, 22 Jan 2025 09:44:42 -0800 (PST)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3221a5csm17131075f8f.34.2025.01.22.09.44.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 09:44:41 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: paul@xen.org, Fred Griffoul <fgriffo@amazon.co.uk>, kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
- <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
-In-Reply-To: <a5d69c3b-5b9f-4ecf-bae2-2110e52eac64@xen.org>
-References: <20250122161612.20981-1-fgriffo@amazon.co.uk>
- <87tt9q7orq.fsf@redhat.com> <a5d69c3b-5b9f-4ecf-bae2-2110e52eac64@xen.org>
-Date: Wed, 22 Jan 2025 18:44:40 +0100
-Message-ID: <87r04u7ng7.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387D1215079;
+	Wed, 22 Jan 2025 18:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737569656; cv=fail; b=o9SR18HD9jCjlTOGMvh1AyWzJu97fR39PPGsLW3rtfT1YOdHQg7GJ3uG+wwt/J9zSktv7l1+d5XdodFdmUWqDR1kgsXFE7BrdXeMQ9qmsbiHgPfTmKBkcLeETOc9rcXZPoRr3rDNR/9uud9Jx6TFlhTl3yZTVOwjE4B/OdVDqqo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737569656; c=relaxed/simple;
+	bh=vvyiD6pjrhLtXPYrtcWTADYtH/Z0h6ziSLXrex2OZIg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ZKDz3BNsXNVlmh31NmkLtgFUiNufIQUHeLv4W+1B55HRuCPxbGXQ9Ww0yyg0N1/iKxQZM5HcXM1S9FZdeEgwr9DPIKN4CRu8OicbiL9smSxSDsbIVJ2k1vdcGlHa4aCZHU4RQJDp2NsF6Hwjb9fa0FpotkR/hJ46EWiuU10mzTg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TR6Zw25J; arc=fail smtp.client-ip=40.107.92.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KQnWhlqui2ll5dMMG439qPGOKH8HhzpKRREiJC4V1en7a/G9ymxIzCzjM2oBD8QaPGFnjRA2gaf74LvS0qYfjIOOodge3YkmulX3Jf1MyQfRZ9dx3xqUPsK6EbhFAM70+DhYfo6/xagjE08lWn2iDsUDCjSM9RePbj+OZ8Pmm4GVpL9hStDg6nIgg7tcHRHy8YmL3WUfeV5zWfFHn+P0kfWH/aihbie99YM46sAgZXZ8idQCEKnmhMi7jIxilXo161Pj7Bfclj90W7yzJgOaiTPKxf97lH8j3kfzQmhWs8j12C7L4IoznFgBCCPLj7C5pj56iEhV5vYNnAfta99plw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f/7J0MSg/7ggIOOk4oV1fkCjSTbl9LlfAMHm4hzX+38=;
+ b=TNaHjzCHrFSAPTa/uGjhsz23k94vptqQZc639x/T9UHHqFyX7DP5zjPmOuAfI5OusPkDuKCoCpS83S4NdT3iwbj4/n8rjEGrGiXUrIZOfJOkzbHv3UxzsoslEKYPsG+p+UFNP5gV6gYxCggl/zb3Njp121rVoC8+eFmSMke25lMrv/B8BgsOW/biyJwDH91ZzQvEifq0i2BcYvBW8L/gQeWQuKAWxUhhFf3bUcx/y8jv9gHxMZj49+YXxXQSiD6TYKS5kujO3OVoAgJNzBBe4e8BIxYH2A1wNLzlDeZD0EvjKJZ8xJg1fRM9PLgfCvHtL8hyBBKK+vqIxtpPdfiEXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f/7J0MSg/7ggIOOk4oV1fkCjSTbl9LlfAMHm4hzX+38=;
+ b=TR6Zw25JrHb5btMODbNb6mYbeiQdbpTIaHPVmd50kjri1oE+Mu0EruR1GvM6iD7hKIQyAxu0IGMKQ3pDhHMjH5rwQ6A7uJinGZhx+UIU6f7XhDIdnxyDirV6AZJYyKM+fo2BR1ZyUeJ7MFAXxqbqM/D8M8tnUzQvTuc72scxuBMazoNS8IISuwJuHlpaFms0zI5q0nIfRSeM+BorQ5rFlGUerRwjsYwb0iTRanZKjtsrn+0G948mME2K5j+IVYzd+COND0vpYNebzwoW/7oEttPy9TK1PlIlS3eAAFzx2pY3mUwLJmKmbc/vgSFOzPSPvC5FKaJgEBD143RN/nfOeA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW3PR12MB4524.namprd12.prod.outlook.com (2603:10b6:303:2d::12)
+ by SA3PR12MB7860.namprd12.prod.outlook.com (2603:10b6:806:307::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Wed, 22 Jan
+ 2025 18:14:10 +0000
+Received: from MW3PR12MB4524.namprd12.prod.outlook.com
+ ([fe80::b134:a3d5:5871:979e]) by MW3PR12MB4524.namprd12.prod.outlook.com
+ ([fe80::b134:a3d5:5871:979e%4]) with mapi id 15.20.8377.009; Wed, 22 Jan 2025
+ 18:14:10 +0000
+Date: Wed, 22 Jan 2025 12:14:02 -0600
+From: Nishanth Aravamudan <naravamudan@nvidia.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Raphael Norwitz <raphael.norwitz@nutanix.com>,
+	Amey Narkhede <ameynarkhede03@gmail.com>, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] pci: account for sysfs-disabled reset in
+ pci_{slot,bus}_resettable
+Message-ID: <Z5E1alwzi4YnJFLI@6121402-lcelt>
+References: <20250106215231.2104123-1-naravamudan@nvidia.com>
+ <20250113204200.GZ5556@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250113204200.GZ5556@nvidia.com>
+X-ClientProxiedBy: SJ0PR03CA0109.namprd03.prod.outlook.com
+ (2603:10b6:a03:333::24) To MW3PR12MB4524.namprd12.prod.outlook.com
+ (2603:10b6:303:2d::12)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW3PR12MB4524:EE_|SA3PR12MB7860:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9846722f-cc53-4a7c-7cf8-08dd3b109146
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?MpLHDdIDIboJoXTTt7OT/dcRZj2HEDZL17rhFjSmCfdVqEJvIRHkLpHxdUAc?=
+ =?us-ascii?Q?Ixa3AEUWZfDwLQfNBBlAVK9cwgBR4naT3KNt419OqDLdIR1kisK1rx08MPhK?=
+ =?us-ascii?Q?mysvraHXAroLMZVu4iESwJ1XtnY4KTO/YwKCkb/Dk+N3JhPtBktRw/RCuoU1?=
+ =?us-ascii?Q?ujRJRiKFUkNofICUJ8UZRDrZ+sl+BUZJjPUxCj/I9yvsO/4RY7o5OpFSy9xO?=
+ =?us-ascii?Q?wetbbD2TOEW1MILh5leHrUHadbF1NjLZxHPGm98CR/I1m+sjRJzV3FyBPYZ9?=
+ =?us-ascii?Q?aVyTYb4ptQuLHjtI13ECyviYEetqvYIy6JLdl8Sj8jtI+GPHzJIyJA4RXAyJ?=
+ =?us-ascii?Q?nX6Rpd/iUx7Alc5YxEFc/+0pMa9s2ttHXvX2+I4rfJIUGooCaTRXuFfRQ1xS?=
+ =?us-ascii?Q?vQQ2oZlnBA3OPN4Ik36HHuPfZ9iqUFHfP87kHB/NcKxow2tOQdW2Y9OBTgi4?=
+ =?us-ascii?Q?9J8iiWkpEM/FHXKvvfdWOpsLV9bYp2Sf3NKk/s8oKxFdHNHt4eiU3mmBcXL4?=
+ =?us-ascii?Q?cyRivejEq4TCUBztBDS6uQCEnKaHc6A0GnUKp1mIT0225JMzPDI7UGGoFPfm?=
+ =?us-ascii?Q?vqOpDB2A8Elwx7Ewz7BTi1kKaozMP1L9V2mrQyQ2f0lk80JExWtXxARJ2fhH?=
+ =?us-ascii?Q?iIWWs4p+69M3F8Kjk8+P4PMnAiSpL6tXiWBMd37SpL/lg5R3WUSd1FqU5USK?=
+ =?us-ascii?Q?lCsMKWu7om7mnWUoY72bA8P3dpBj/BdcVT0VYcyEkwxYBNU15HEhdefI/mEa?=
+ =?us-ascii?Q?KzJIXKzJ+A/qWgzguzLvqsDFkrOng+JD3Rfhf8+QZWTzlSIFwkHSOpSgbyAO?=
+ =?us-ascii?Q?MmgrGIWtQrzkON7+MBDk5JUS6BCS6qOXDzrQjF4TnYQmz6DOid25DzK4Nt86?=
+ =?us-ascii?Q?0OsMojJZizHAegtypdn7T26bJVNqoTM0Xdpv80bFlyPL1PRI8aadCyA3JhY1?=
+ =?us-ascii?Q?hTslK4Cbn9q+70WGHTMAiQMZtbVvqgk7RFYL993Hef6Jn5TaB/3Zbo5gOdbY?=
+ =?us-ascii?Q?QCUISrhTuUzLzQXULPtDGhUzEVTzs8Lyerz+/+CiF5sAL3rrvshizYf3N385?=
+ =?us-ascii?Q?KEDEZx3wq2ZSioffoM6PQJQolOTJOAZKlNkMVilJDvQTNrtqnf+Zu1FtVgju?=
+ =?us-ascii?Q?S0U/aL1admllsRodL+sTsUoB2XWQazhy6yU8AbUw3CTpwGDadMy7TuVfQE/G?=
+ =?us-ascii?Q?my9zEGQEO5hgA/Aqr+eE9SmG1y5x7mF/fzjNKn951Mglyy+gw/JwmpH4KjD+?=
+ =?us-ascii?Q?O8MeTRdOlElRINfePpeL05w6AGs6oLO2qamSoU15e6I59cJo49Hf2p/XLYCE?=
+ =?us-ascii?Q?vdaMeL539+jbTqef0s9SJeAIRfJcK4lKSMIvg/jP1FHqozgaioL1XTp3VJmp?=
+ =?us-ascii?Q?q2BRtw3M8mE0OHUx2vG5NsVRonB3?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4524.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?1QkwX1w/+92darD9pqTy01zMiGuB1Htopf8uK91D1tOd2gutudGpJcQYYg4T?=
+ =?us-ascii?Q?niR4EMQBmJLxgmCfthAfq05nGRipxOcU1M+IOXKKh+PdmokOx2U75xlUUhuh?=
+ =?us-ascii?Q?lK6rUe8Khecm2e9f+lnr89qrMCv88zCQtwEka0odN999BBTppXuxIy/GzNJr?=
+ =?us-ascii?Q?Cy5C4cltkgNVDdvdF55Fn0wVQUGz7QL652dLOIOiYjVhIzzUHtI8wFqygSfO?=
+ =?us-ascii?Q?wdN/IRljLI/RQfrStFDTxR6zP0w8nAo98L0FrafAYS6osOPeCb75iM9Y6GbF?=
+ =?us-ascii?Q?fGbDbULO+SBIY9HwuTrlT+HQPdHZDXZflDatT0Emtk87K25vaGID4bbn4637?=
+ =?us-ascii?Q?9uuhF4yClXt3Uu6SluxURbJ+u1qsq7ftpHag5rmzRWGX3KFcmrHKGbRr0I6O?=
+ =?us-ascii?Q?1qSWwKUq6KkZBspfza36Uq1G7mXyZ8T9w/qeaDWYucuVGB0Eh06P0exzjhcg?=
+ =?us-ascii?Q?wJURfCl9G+VaUZcRAo48QQy+bNGiyvv/e1vjKLGGyxmGnkr4ogse9cZcvgzw?=
+ =?us-ascii?Q?rUi44LoAL6KGKFcrHZY9PHf3Q9M/4f2WIKXHLIhmnrxWbX2OiPS+jhiqye9i?=
+ =?us-ascii?Q?jxpjGG8KIUvuWl4mIN716OofGqLQK5KlpXZKgad1nZ7aPSzuv3FCcYsacIA1?=
+ =?us-ascii?Q?5N/JZh+L7luZuQkQ9iT4m6+FPg3T0uwU3lvz/yRGtEHHKE4YCTCQAXgKYQ+e?=
+ =?us-ascii?Q?zYdw/kkryeOBnQKGb46b+pzwzEOeSzxnBZ2oKdRelfeAnbBGfcXirhQX1frY?=
+ =?us-ascii?Q?Tg9Cayr2xeW/L7p6F6FFuTv3pN/oiJHehtORv+wvaxJqnzqNZrV9Gk5ysk4p?=
+ =?us-ascii?Q?XScb0bP/Wi64HdNkG5kkPPcbn4RJA/rET9AdxNmPpt8XuS4jUDIWGCl/blWk?=
+ =?us-ascii?Q?JLMOkcQVlquF9xzf9dLTvkRGzFs0gel6q779KvyB5vTjm+1y/Ag+O/pMr428?=
+ =?us-ascii?Q?ycfgg7CGukXlUq+cRdLDwpgAdnVkz9hJeDgjc7ru5oMRsdQ+75fIYDZuOAXT?=
+ =?us-ascii?Q?I9b2BKHvdRl69kj4cx2GADpL9NRvQj1rI1KrqtehsW0aFFHQj0tWtPhbOvET?=
+ =?us-ascii?Q?cvnMSjAyLE+Y48DbPHjGW55QhuSdPAMmh1Vgpcafca3WqJ4/gYs27P18RkgW?=
+ =?us-ascii?Q?966hlUkJHoH2uF0DyOIZy2BKThVDJx+FFZsZ0YWiDi9Y26m3Bm6wmSZV/f7b?=
+ =?us-ascii?Q?HmEtUxPW2RYswdgn78x5SnPD+SFXbrbPCWeD28OfukckII9RfIx3f37aVUe7?=
+ =?us-ascii?Q?p6dIOicbI+CqJBOcSsij1RBiPLXuopHmXmp7T0Bb4BhGz15w3cJflyJfy9bv?=
+ =?us-ascii?Q?c9XNpQVG37esT8mR35x6d3AorEP7MYl4OjO6fBkjedJwhQrCDSHBD3kv56vu?=
+ =?us-ascii?Q?YJK9kJpMvOFUo+Arox9lvsuiziL2gK+n+rZU0YGYovXLFIg9t3cEXKu4AujE?=
+ =?us-ascii?Q?S2QUa6hxWePJa46tdNy9GssGC1gB+N6l7nZNw/2eNTx78l6h+lBj15QqV9Ll?=
+ =?us-ascii?Q?ofxY+OVttf3BEU2/q9zzIN49b4QZREmZzoosyunjfkKGlJHUJ18RxQJLiag8?=
+ =?us-ascii?Q?FeVAMf5luMX+dZmCjK60/vHijEBTrcqyjZc0K+Tk?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9846722f-cc53-4a7c-7cf8-08dd3b109146
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4524.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2025 18:14:10.0967
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UWER3bZYDaGv4VZVyCQGRRssaFBAx5jpg6bYoK9DPSBNjVeb4+7VMeuvAcViC9UaFYwu2fPFWSsVgIpLCdov7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7860
 
-Paul Durrant <xadimgnik@gmail.com> writes:
+On Mon, Jan 13, 2025 at 04:42:00PM -0400, Jason Gunthorpe wrote:
+> On Mon, Jan 06, 2025 at 03:52:31PM -0600, Nishanth Aravamudan wrote:
+> > vfio_pci_ioctl_get_pci_hot_reset_info checks if either the vdev's slot
+> > or bus is not resettable by calling pci_probe_reset_{slot,bus}. Those
+> > functions in turn call pci_{slot,bus}_resettable() to see if the PCI
+> > device supports reset.
+> 
+> This change makes sense to me, but..
+> 
+> > However, commit d88f521da3ef ("PCI: Allow userspace to query and set
+> > device reset mechanism") added support for userspace to disable reset of
+> > specific PCI devices (by echo'ing "" into reset_method) and
+> > pci_{slot,bus}_resettable methods do not check pci_reset_supported() to
+> > see if userspace has disabled reset. Therefore, if an administrator
+> > disables PCI reset of a specific device, but then uses vfio-pci with
+> > that device (e.g. with qemu), vfio-pci will happily end up issuing a
+> > reset to that device.
+> 
+> How does vfio-pci endup issuing a reset? It looked like all the paths
+> are blocked in the pci core with pci_reset_supported()? Is there also
+> a path that vfio is calling that is missing a pci_reset_supported()
+> check? If yes that should probably be fixed in another patch.
 
-> On 22/01/2025 17:16, Vitaly Kuznetsov wrote:
->> Fred Griffoul <fgriffo@amazon.co.uk> writes:
->> 
->>> Previous commit ee3a5f9e3d9b ("KVM: x86: Do runtime CPUID update before
->>> updating vcpu->arch.cpuid_entries") implemented CPUID data mangling in
->>> KVM_SET_CPUID2 support before verifying that no changes occur on running
->>> vCPUs. However, it overlooked the CPUID leaves that are modified by
->>> KVM's Xen emulation.
->>>
->>> Fix this by calling a Xen update function when mangling CPUID data.
->>>
->>> Fixes: ee3a5f9e3d9b ("KVM: x86: Do runtime CPUID update before
->>> updating vcpu->arch.cpuid_entries")
->> 
->> Well, kvm_xen_update_tsc_info() was added with
->> 
->> commit f422f853af0369be27d2a9f1b20079f2bc3d1ca2
->> Author: Paul Durrant <pdurrant@amazon.com>
->> Date:   Fri Jan 6 10:36:00 2023 +0000
->> 
->>      KVM: x86/xen: update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present
->> 
->> and the commit you mention in 'Fixes' is older:
->> 
->> commit ee3a5f9e3d9bf94159f3cc80da542fbe83502dd8
->> Author: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Date:   Mon Jan 17 16:05:39 2022 +0100
->> 
->>      KVM: x86: Do runtime CPUID update before updating vcpu->arch.cpuid_entries
->> 
->> so I guess we should be 'Fixing' f422f853af03 instead :-)
->> 
->>> Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
->>> ---
->>>   arch/x86/kvm/cpuid.c | 1 +
->>>   arch/x86/kvm/xen.c   | 5 +++++
->>>   arch/x86/kvm/xen.h   | 5 +++++
->>>   3 files changed, 11 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>> index edef30359c19..432d8e9e1bab 100644
->>> --- a/arch/x86/kvm/cpuid.c
->>> +++ b/arch/x86/kvm/cpuid.c
->>> @@ -212,6 +212,7 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2
->>>   	 */
->>>   	kvm_update_cpuid_runtime(vcpu);
->>>   	kvm_apply_cpuid_pv_features_quirk(vcpu);
->>> +	kvm_xen_update_cpuid_runtime(vcpu);
->> 
->> This one is weird as we update it in runtime (kvm_guest_time_update())
->> and values may change when we e.g. migrate the guest. First, I do not
->> understand how the guest is supposed to notice the change as CPUID data
->> is normally considered static. Second, I do not see how the VMM is
->> supposed to track it as if it tries to supply some different data for
->> these Xen leaves, kvm_cpuid_check_equal() will still fail.
->> 
->> Would it make more sense to just ignore these Xen CPUID leaves with TSC
->> information when we do the comparison?
->> 
->
-> What is the purpose of the comparison anyway? IIUC we want to ensure 
-> that a VMM does not change its mind after KVM_RUN so should we not be 
-> stashing what was set by the VMM and comparing against that *before* 
-> mangling any values?
->
+This is the path I observed:
 
-I guess it can be done this way but we will need to keep these 'original'
-unmangled values for the lifetime of the vCPU with very little gain (IMO):
-KVM_SET_CPUID{,2} either fails (if the data is different) or does (almost)
-nothing when the data is the same.
+drivers/vfio/vfio_pci_core::vfio_pci_ioctl_get_pci_hot_reset_info()
+	indicates a reset is possible if either
+	-> drivers/pci/pci.c::pci_probe_reset_slot() ||
+	-> drivers/pci/pci.c::pci_probe_reset_bus()
+	returns 0
 
--- 
-Vitaly
+drivers/pci/pci.c::pci_probe_reset_slot()
+	-> pci_slot_reset(..., PCI_RESET_PROBE)
+		-> pci_slot_resettable()
+drivers/pci/pci.c::pci_probe_reset_bus()
+	-> pci_bus_reset(..., PCI_RESET_PROBE)
+		-> pci_bus_resettable()
 
+Both pci_{slot,bus}_resettable() before my change returned true even if the
+sysfs files indicated resets were disabled.
+
+Separate from this path, e.g., a poorly-behaving userspace that ignores
+or does not execute the VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl before
+issuing a VFIO_DEVICE_PCI_HOT_RESET ioctl, actual resets check the same
+return values:
+
+drivers/vfio/vfio_pci_core::vfio_pci_ioctl_pci_hot_reset()
+	indicates a reset is possible if either
+	-> drivers/pci/pci.c::pci_probe_reset_slot() ||
+	-> drivers/pci/pci.c::pci_probe_reset_bus()
+	returns 0
+
+	and will then issue a reset to the device via either
+	-> vfio_pci_ioctl_pci_hot_reset_groups() ||
+	-> vfio_pci_dev_set_hot_reset()
+
+Thanks,
+Nish
 
