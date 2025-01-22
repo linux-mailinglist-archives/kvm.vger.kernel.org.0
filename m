@@ -1,175 +1,239 @@
-Return-Path: <kvm+bounces-36277-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36278-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF26A196C7
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 17:43:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8F91A196C9
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 17:44:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64A41188DCA0
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 16:43:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87DB07A26B3
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 16:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCC4215074;
-	Wed, 22 Jan 2025 16:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAEA21518C;
+	Wed, 22 Jan 2025 16:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LYVa0uMO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W2w2ZQoS"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4702A215048
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 16:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E37215192
+	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 16:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737564188; cv=none; b=Z2P/fbB8rq7YlTi2Q9IkIuy0EXE9soRAVSnkldFe4Bdugncc2AjqW8sRlwbndNYfzg6DruiQjBt6HycAy/kZ8qJ8eGNF88dSrATzdNxbRYvsZd3vzX0vsLpJh2Rv2uNGCTHltqAfjUFaGnlEELYm8gHg3qZyvPE6wGElorhRsWM=
+	t=1737564210; cv=none; b=FYWxaiynmCR1At8Tiy8af4kQudYMWsws+2tK8fejVOwrh6iD5tR28zST/sH83qwkckCejaXuryAYo5QIFOEz25RbtP9GNLxv2L4hLyLOuDIgs+hAlA/eu4TKTQUbRgdUK74tXG4691enmg5KvJurQNnHtK4aNW+lcNug5q9QiRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737564188; c=relaxed/simple;
-	bh=yWi4FXbD11PvYaHHMRAHbvxxV68FSQtTNOXx5gSMVHo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nFssOeur2t2XnOr4FZGR1TUjPS7OHyYnTfQTU7G4gecca6ycopuQJYqxmwxPcGTv0QROmgxL2RKz3xHyubuZo4i20AYgafHx9Bnhoy7xmkc3rVC3+ScR/HnExXvVnC5aLOg75levg1NAdBIFKXBTk+S7DK3Qa/gQFD/xvnjaYdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LYVa0uMO; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1737564210; c=relaxed/simple;
+	bh=nFNvs5W/qHs8NbJzTv+9VtubwYt4otmZ0nMYx6Zu5fU=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Ng6oNpirz/Rrlkdd2vT946O0c2c/RiBIpGe9ClhLpuSeXKId8aSVeqHeoLkTL420/jWMS+5svIGXM8Us1Dwe97RQG7au+HtOXNsIsNJ3dsI18FffzXB/mCBYBgUX+vfMF1DaTYjL10E5kaosUtdWzrU1SVyHUDUPv8AV6+J0ZZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W2w2ZQoS; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737564186;
+	s=mimecast20190719; t=1737564207;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3y0fMZSE7a+ty4qcm/cQWGtpuEjSKpLOhWLAcuXU2f0=;
-	b=LYVa0uMOeruWKGr4VIHW0uEvmLut/1P554HlzZCAHeyAuXN1C7lF+o62ABTf+atih1XTT3
-	CE9VHuou5FXdV6Z74UoaDeVIna55cEWtUw6MXom9KeuBEtgF42fwQTJFAy16xehKWD4Zsq
-	BGrygCuNPkJ4/BA+BkEVqY17HF/yHzc=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=gP0baBFoiq4g8/dSmAedFF4kBdcRSt2fdh27G5QkyRw=;
+	b=W2w2ZQoS+u/iEKKdbTRuSGzhj77u4RkAeSqycvBMs6gkIjGqkslJ0ryPYNA6X9em8yPksK
+	DaxgYAIC+wZVdbwjz1IBZSTk14SIUoEpYqons7/8uDIpOiqsMtk8QdgztIfD4gjLN618hp
+	N9oLtp+eb41TyPE9Wef2tuySpyyec1k=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-494-x6PHo_mnOeCMQS7U0D9KOg-1; Wed, 22 Jan 2025 11:43:04 -0500
-X-MC-Unique: x6PHo_mnOeCMQS7U0D9KOg-1
-X-Mimecast-MFC-AGG-ID: x6PHo_mnOeCMQS7U0D9KOg
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4675749a982so121065811cf.1
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 08:43:04 -0800 (PST)
+ us-mta-658-irgEFAdKNsWKHPTxuEvYyQ-1; Wed, 22 Jan 2025 11:43:26 -0500
+X-MC-Unique: irgEFAdKNsWKHPTxuEvYyQ-1
+X-Mimecast-MFC-AGG-ID: irgEFAdKNsWKHPTxuEvYyQ
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-46792701b64so133234331cf.3
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 08:43:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737564184; x=1738168984;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3y0fMZSE7a+ty4qcm/cQWGtpuEjSKpLOhWLAcuXU2f0=;
-        b=szpktO4Ccyan1AHuPakudwVmrbIeo0MlejZfvFcQVapg6NOLP5ukSjfsQrLI4ryOxU
-         M0uFkHzG0Q2he19m3Oijk+ebpePI5SZsuFc8Z2vPItbiiJZ/YH56uVob5H8vLeWohmt+
-         OWJBsfZkJeZV4K6PIH3DyByus8YnLlFe9kWcEjTScFdLHwQQu+RdBdlvD6VeLIb7rxZi
-         XnRk0gC7jpYt9l4Td2xj1t4luSgXuFFQh7HZXD+21gOB5pe6ejRzhf/jZmmmeph2M0n7
-         FyUDWYTrOxElrYXdHmkRH/H6EbESAN656VB8fkqGZodtpsC+SrCPEVF+Bz3rK+aResql
-         xtqg==
-X-Forwarded-Encrypted: i=1; AJvYcCVWVixh941SGJTdEZk+qswon9XHWNAsTiCx6UG1f6eZT4fm4XFM7mPSupq3l4zZL14BdaA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjOSUPiZU3O69o/l/a1XLGwD0wQCg2KfPtNwirjDo2qWtsiHN3
-	bes2QwXoqn5KaQDv8jMfG3FsNbvBQsFkoB8DURpBFy9sLRX4qNBa5y1wRovnR3tI1z6IhpAZnp7
-	xGfKMuLercKJXhEZtwFnQ3WwLytkz0C7bp3MJulUrwE+lCSZr6w==
-X-Gm-Gg: ASbGncubsKqbFAwuo2/i6MH+62KXrzOO/xypzXc1J6/1MrZmwfhQ+LrsPK3t6QONetw
-	4el6p0ddxuZZYgKVjaCLIv1RuiL6aXNC9pAFj2jxc1266ekwgGhd7lhVGH0EA5B+hge3JsTwoEk
-	yOChY9J5gv7ZjV9hvyVMvHPNT1TCRRT2/Gx/eCzuwnhHCTHTtOfVgLreEu/p0pvx8tmbN6wiG7a
-	QCipp7PJiZkMDFW96vwwmHKjJy0Xzlw0EHLcoDvvKOek8qGfffXBa9CWPOQmUkNcw/nEF8CZ9lp
-	Ao7m0hG2PXgnsQmmjiVw3zhw5BqbxSE=
-X-Received: by 2002:ac8:7f83:0:b0:467:681c:425f with SMTP id d75a77b69052e-46e12a1e89amr335229501cf.4.1737564184264;
-        Wed, 22 Jan 2025 08:43:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IETxltspJm2hV7oT91UaMx+gaN/Hy/EpGHdI43Wk+riEdrbGMvExnVUyAvjtxygRe6Mo7vWDQ==
-X-Received: by 2002:ac8:7f83:0:b0:467:681c:425f with SMTP id d75a77b69052e-46e12a1e89amr335229041cf.4.1737564183924;
-        Wed, 22 Jan 2025 08:43:03 -0800 (PST)
-Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e102ec205sm65385351cf.11.2025.01.22.08.43.02
+        d=1e100.net; s=20230601; t=1737564206; x=1738169006;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=gP0baBFoiq4g8/dSmAedFF4kBdcRSt2fdh27G5QkyRw=;
+        b=iD/eWCjFzYq2bsXTlpAv9mPqmV+saPitw+Cq0TFe0pzGB1MI/wk+4T5NGezdwoewmS
+         1j+/PO6Q6TeJPyg9VsTATbwNsebFIiYEWmJYoBb7Fo3TqWTrZvBnTU6z8mM3LTKK8LCh
+         0AYPUZYuQtpMelZ1u99ZkE7N5U6MHSbWZpafhiFljRZa/LoSyi0tf8YY2Qc0M6YygF5i
+         TMWIaLZsLaKKoOINgA59D+WcSnpOiFN3C2+xUyhREraUcuZ4xbxOVkWQjPQ4CPlH66Kh
+         0cgNliUaf4Ietg0FBpRM0PpQ884rZM8xZjK2snVV6Lv+vU0Knf9W/FD1zYD0D0OyggJm
+         nV+w==
+X-Forwarded-Encrypted: i=1; AJvYcCU6KDU6ImKeHEmqjdBiwSc6NBnZe5F5VQC6TlByQ0E+JCY34WtzYEDByJgWIa0IttYYhrU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6j6fWgRz/97QaHtg5JlsebDyVDEjoniVqc9VOJPmhrT/BUDTP
+	uWtqwe4zFL4p7KjsxRvygoceRtpgzvEAcPBlh32SdwNfDiFmaUy/CA9K8CSUy+AzmLqgt281Nwg
+	ttfku4s0Y6rhl9inks0RHLJnjSTr7WeS7jxId4Z9GYRXEMTRFnkszkNaWsQ==
+X-Gm-Gg: ASbGncsi//Q/lQpvpT9jzLFUqq3vR1NTTKta9LEWW5K/4R3WJC6z0rTZAZRj43w+Hr1
+	3joOsUlujvxhJISh+mcKRN79NjFapI6e7AbP2YoFnKJVa2JodHdD3sRICgr9hcy0K2t5eIU7Z3f
+	gyuxpNUnhw5Mbcpk2T3gKG22veMTmNfnsjMfcy4+twHwZemU9KyyAgrGTi2LqwUhkNWic4xMz1Y
+	SHxF+J+Qeg6vQgPIw95XUFUCMevyTLxc2jJnTWQl+qGTz1sGh0oI8ktmzEvTXivf2tMrA==
+X-Received: by 2002:a05:6214:3006:b0:6d8:68a1:b7aa with SMTP id 6a1803df08f44-6e1b222f202mr369516566d6.28.1737564205671;
+        Wed, 22 Jan 2025 08:43:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHNosXfmrCHlrQvCywOeWXzuKBFz26tKShC77cA7JOkkN1dF+4WcPXS2EUE7FhFI3yfmSsmiw==
+X-Received: by 2002:a05:6214:3006:b0:6d8:68a1:b7aa with SMTP id 6a1803df08f44-6e1b222f202mr369516256d6.28.1737564205368;
+        Wed, 22 Jan 2025 08:43:25 -0800 (PST)
+Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afcd38a0sm62363556d6.89.2025.01.22.08.43.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 08:43:03 -0800 (PST)
-Date: Wed, 22 Jan 2025 11:43:01 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Alexey Kardashevskiy <aik@amd.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
-	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>
-Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
- guest-memfd with RamDiscardManager
-Message-ID: <Z5EgFaWIyjIiOZnv@x1n>
-References: <4d22d3ce-a5a1-49f2-a578-8e0fe7d26893@amd.com>
- <2b799426-deaa-4644-aa17-6ef31899113b@intel.com>
- <2400268e-d26a-4933-80df-cfe44b38ae40@amd.com>
- <590432e1-4a26-4ae8-822f-ccfbac352e6b@intel.com>
- <2b2730f3-6e1a-4def-b126-078cf6249759@amd.com>
- <Z462F1Dwm6cUdCcy@x1n>
- <ZnmfUelBs3Cm0ZHd@yilunxu-OptiPlex-7050>
- <Z4-6u5_9NChu_KZq@x1n>
- <95a14f7d-4782-40b3-a55d-7cf67b911bbe@amd.com>
- <Z5C9SzXxX7M1DBE3@yilunxu-OptiPlex-7050>
+        Wed, 22 Jan 2025 08:43:24 -0800 (PST)
+Message-ID: <93e33d01a81e548aedd78aca672fb89200c562de.camel@redhat.com>
+Subject: Re: [Bug 218267] [Sapphire Rapids][Upstream]Boot up multiple
+ Windows VMs hang
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: bugzilla-daemon@kernel.org, kvm@vger.kernel.org
+Date: Wed, 22 Jan 2025 11:43:24 -0500
+In-Reply-To: <bug-218267-28872-5V2mMZW0sp@https.bugzilla.kernel.org/>
+References: <bug-218267-28872@https.bugzilla.kernel.org/>
+	 <bug-218267-28872-5V2mMZW0sp@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z5C9SzXxX7M1DBE3@yilunxu-OptiPlex-7050>
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 22, 2025 at 05:41:31PM +0800, Xu Yilun wrote:
-> On Wed, Jan 22, 2025 at 03:30:05PM +1100, Alexey Kardashevskiy wrote:
-> > 
-> > 
-> > On 22/1/25 02:18, Peter Xu wrote:
-> > > On Tue, Jun 25, 2024 at 12:31:13AM +0800, Xu Yilun wrote:
-> > > > On Mon, Jan 20, 2025 at 03:46:15PM -0500, Peter Xu wrote:
-> > > > > On Mon, Jan 20, 2025 at 09:22:50PM +1100, Alexey Kardashevskiy wrote:
-> > > > > > > It is still uncertain how to implement the private MMIO. Our assumption
-> > > > > > > is the private MMIO would also create a memory region with
-> > > > > > > guest_memfd-like backend. Its mr->ram is true and should be managed by
-> > > > > > > RamdDiscardManager which can skip doing DMA_MAP in VFIO's region_add
-> > > > > > > listener.
-> > > > > > 
-> > > > > > My current working approach is to leave it as is in QEMU and VFIO.
-> > > > > 
-> > > > > Agreed.  Setting ram=true to even private MMIO sounds hackish, at least
-> > > > 
-> > > > The private MMIO refers to assigned MMIO, not emulated MMIO. IIUC,
-> > > > normal assigned MMIO is always set ram=true,
-> > > > 
-> > > > void memory_region_init_ram_device_ptr(MemoryRegion *mr,
-> > > >                                         Object *owner,
-> > > >                                         const char *name,
-> > > >                                         uint64_t size,
-> > > >                                         void *ptr)
-
-[1]
-
-> > > > {
-> > > >      memory_region_init(mr, owner, name, size);
-> > > >      mr->ram = true;
-> > > > 
-> > > > 
-> > > > So I don't think ram=true is a problem here.
-> > > 
-> > > I see.  If there's always a host pointer then it looks valid.  So it means
-> > > the device private MMIOs are always mappable since the start?
-> > 
-> > Yes. VFIO owns the mapping and does not treat shared/private MMIO any
-> > different at the moment. Thanks,
+On Mon, 2024-12-16 at 19:08 +0000, bugzilla-daemon@kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=218267
 > 
-> mm.. I'm actually expecting private MMIO not have a host pointer, just
-> as private memory do.
+> --- Comment #8 from Sean Christopherson (seanjc@google.com) ---
+> Thanks Chao!
 > 
-> But I'm not sure why having host pointer correlates mr->ram == true.
+> Until the ucode update is available, I think we can workaround the issue in KVM
+> by clearing VECTORING_INFO_VALID_MASK _immediately_ after exit, i.e. before
+> queueing the event for re-injection, if it should be impossible for the exit to
+> have occurred while vectoring.  I'm not sure I want to carry something like
+> this long-term since a ucode fix is imminent, but at the least it can hopefully
+> unblock end users.
+> 
+> The below uses a fairly conservative list of exits (a false positive could be
+> quite painful).  A slightly less conservative approach would be to also
+> include:
+> 
+> case EXIT_REASON_EXTERNAL_INTERRUPT:
+> case EXIT_REASON_TRIPLE_FAULT:
+> case EXIT_REASON_INIT_SIGNAL:
+> case EXIT_REASON_SIPI_SIGNAL:
+> case EXIT_REASON_INTERRUPT_WINDOW:
+> case EXIT_REASON_NMI_WINDOW:
+> 
+> as those exits should all be recognized only at instruction boundaries.
+> 
+> Compile tested only...
+> 
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 66 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 66 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 893366e53732..7240bd72b5f2 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -147,6 +147,9 @@ module_param_named(preemption_timer,
+> enable_preemption_timer, bool, S_IRUGO);
+>  extern bool __read_mostly allow_smaller_maxphyaddr;
+>  module_param(allow_smaller_maxphyaddr, bool, S_IRUGO);
+> 
+> +static bool __ro_after_init enable_spr141_erratum_workaround = true;
+> +module_param(enable_spr141_erratum_workaround, bool, S_IRUGO);
+> +
+>  #define KVM_VM_CR0_ALWAYS_OFF (X86_CR0_NW | X86_CR0_CD)
+>  #define KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST X86_CR0_NE
+>  #define KVM_VM_CR0_ALWAYS_ON                           \
+> @@ -7163,8 +7166,67 @@ static void __vmx_complete_interrupts(struct kvm_vcpu
+> *vcpu,
+>         }
+>  }
+> 
+> +static bool is_vectoring_on_exit_impossible(struct vcpu_vmx *vmx)
+> +{
+> +       switch (vmx->exit_reason.basic) {
+> +       case EXIT_REASON_CPUID:
+> +       case EXIT_REASON_HLT:
+> +       case EXIT_REASON_INVD:
+> +       case EXIT_REASON_INVLPG:
+> +       case EXIT_REASON_RDPMC:
+> +       case EXIT_REASON_RDTSC:
+> +       case EXIT_REASON_VMCALL:
+> +       case EXIT_REASON_VMCLEAR:
+> +       case EXIT_REASON_VMLAUNCH:
+> +       case EXIT_REASON_VMPTRLD:
+> +       case EXIT_REASON_VMPTRST:
+> +       case EXIT_REASON_VMREAD:
+> +       case EXIT_REASON_VMRESUME:
+> +       case EXIT_REASON_VMWRITE:
+> +       case EXIT_REASON_VMOFF:
+> +       case EXIT_REASON_VMON:
+> +       case EXIT_REASON_CR_ACCESS:
+> +       case EXIT_REASON_DR_ACCESS:
+> +       case EXIT_REASON_IO_INSTRUCTION:
+> +       case EXIT_REASON_MSR_READ:
+> +       case EXIT_REASON_MSR_WRITE:
+> +       case EXIT_REASON_MSR_LOAD_FAIL:
+> +       case EXIT_REASON_MWAIT_INSTRUCTION:
+> +       case EXIT_REASON_MONITOR_TRAP_FLAG:
+> +       case EXIT_REASON_MONITOR_INSTRUCTION:
+> +       case EXIT_REASON_PAUSE_INSTRUCTION:
+> +       case EXIT_REASON_TPR_BELOW_THRESHOLD:
+> +       case EXIT_REASON_GDTR_IDTR:
+> +       case EXIT_REASON_LDTR_TR:
+> +       case EXIT_REASON_INVEPT:
+> +       case EXIT_REASON_RDTSCP:
+> +       case EXIT_REASON_PREEMPTION_TIMER:
+> +       case EXIT_REASON_INVVPID:
+> +       case EXIT_REASON_WBINVD:
+> +       case EXIT_REASON_XSETBV:
+> +       case EXIT_REASON_APIC_WRITE:
+> +       case EXIT_REASON_RDRAND:
+> +       case EXIT_REASON_INVPCID:
+> +       case EXIT_REASON_VMFUNC:
+> +       case EXIT_REASON_ENCLS:
+> +       case EXIT_REASON_RDSEED:
+> +       case EXIT_REASON_XSAVES:
+> +       case EXIT_REASON_XRSTORS:
+> +       case EXIT_REASON_UMWAIT:
+> +       case EXIT_REASON_TPAUSE:
+> +               return true;
+> +       }
+> +
+> +       return false;
+> +}
+> +
+>  static void vmx_complete_interrupts(struct vcpu_vmx *vmx)
+>  {
+> +       if ((vmx->idt_vectoring_info & VECTORING_INFO_VALID_MASK) &&
+> +           enable_spr141_erratum_workaround &&
+> +           is_vectoring_on_exit_impossible(vmx))
+> +               vmx->idt_vectoring_info &= ~VECTORING_INFO_VALID_MASK;
+> +
+>         __vmx_complete_interrupts(&vmx->vcpu, vmx->idt_vectoring_info,
+>                                   VM_EXIT_INSTRUCTION_LEN,
+>                                   IDT_VECTORING_ERROR_CODE);
+> @@ -8487,6 +8549,10 @@ __init int vmx_hardware_setup(void)
+>         if (!enable_apicv || !cpu_has_vmx_ipiv())
+>                 enable_ipiv = false;
+> 
+> +       if (boot_cpu_data.x86_vfm != INTEL_SAPPHIRERAPIDS_X &&
+> +           boot_cpu_data.x86_vfm != INTEL_EMERALDRAPIDS_X)
+> +               enable_spr141_erratum_workaround = false;
+> +
+>         if (cpu_has_vmx_tsc_scaling())
+>                 kvm_caps.has_tsc_control = true;
+> 
+> 
+> base-commit: 50e5669285fc2586c9f946c1d2601451d77cb49e
+> --
+> 
 
-If there is no host pointer, what would you pass into "ptr" as referenced
-at [1] above when creating the private MMIO memory region?
+Do we plan to move forward with this workaround or you think this is adds too much complexity to KVM?
 
-OTOH, IIUC guest private memory finally can also have a host pointer (aka,
-mmap()-able), it's just that even if it exists, accessing it may crash QEMU
-if it's private.
+Best regards,
+	Maxim Levitsky
 
-Thanks,
 
--- 
-Peter Xu
 
 
