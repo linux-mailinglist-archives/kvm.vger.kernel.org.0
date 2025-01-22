@@ -1,234 +1,160 @@
-Return-Path: <kvm+bounces-36196-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36197-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BC9DA188C4
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 01:14:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41EFA188E5
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 01:22:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75D803AB3A9
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 00:14:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E48F163C8D
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 00:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32C63D66;
-	Wed, 22 Jan 2025 00:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D7F1BC41;
+	Wed, 22 Jan 2025 00:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mz/txDfB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m6yz2ru+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D9114AA9
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 00:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DC912B71;
+	Wed, 22 Jan 2025 00:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737504856; cv=none; b=QDuLEEwYQWJIbTZpny6AyeK01IuGP90mNndT+6KBELbf7z76ryCmWpPxWGWjf6+w22ezZpZDoqGcDKoCNkjUgMMXlofcUMlHRXrtyCEMQoVZtSfLke7nkuG5UkEduOWwmgR2gF8ZRK1Ocm78+Q11YvAnVAJiNjLTRA6rMdhx5IU=
+	t=1737505336; cv=none; b=mXRnw7MoJrKr0fVFK8Tk+gXkhybANZXgq/W1cRBBJEo4RNmDOBhcDw/eOa0LyCvM7tjGzX7lKpij/Mgzn7DBu+6owiyIVhnJyaIA1FNtIxWJltTTEyxxZSfp4Kak/LaTC5Bt7td98S5TKy9QhX5mAY1h1KZ+aj1EZ3wha6su2zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737504856; c=relaxed/simple;
-	bh=yPf27K03/uVqqrLt0hh23/xHA+vw8UXWLwpu1KmsK20=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ee2uXqypgmG7NQeuEl+kAM4hYyti0+5oh7M/Khy9Hj6qO6iwPyjMk827gSD9/jPFw4MWyWy12DQL67F0kHHhF7trs0u2uOpEEzLUOBqu2xQIPvejj3/kGMZ2bZVjjXGZKdgfvWuHCujIVG7iG3Pmzm4QPfDmxA82lpdKtpCEzTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kevinloughlin.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mz/txDfB; arc=none smtp.client-ip=209.85.166.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kevinloughlin.bounces.google.com
-Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3cfb11f46a5so7347435ab.2
-        for <kvm@vger.kernel.org>; Tue, 21 Jan 2025 16:14:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737504854; x=1738109654; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o1kWLqC/0VVh3Ec7HiMF8h2C2kgo4gHLLUGbm+ZaoH4=;
-        b=Mz/txDfBCfH3IfImCF+OCNlvZD4Oktau31dKrcg6QN1E/MOQiUdkBwL7TOSzntGWe+
-         OO3mJLhxfXvYgwZj+8N3hTNidNNhN3F0qkP9gzuijKBNHydyYsrgE2Prhm0VtpwrferM
-         0Zq9Hy4BGydH61MtDmNAnAYS17rfArYDWe6M2TfXUL9AhT/B4H1DtWs3UNhXqzcfYb8J
-         Q3hsR/X1FFS7X8s4dpJdeibndmdQR+0kl2RotDGiA9kWAYXRMrYJh8r8QCBFy7Q3Uwmw
-         0UZgdHovTOS8pNZigXYLR8aFTEA+wV3+X7zUi6IOzteTQZ0MHfw9da80/lVUctaMA3P5
-         6VmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737504854; x=1738109654;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o1kWLqC/0VVh3Ec7HiMF8h2C2kgo4gHLLUGbm+ZaoH4=;
-        b=mIQm1U4IUbwjWU4pWaPM5P9kcfpJ+XrcCBw9dBidKmZa9U5z4Q1T+lpW4nLdg84Qlq
-         Q90+hG9JcOHXhRSIF2ZRQB3/OSrnHIyDPh1FFJrjwQF5CNVqTO9qZnvC+Gl0xArAKJLU
-         d4qVY6/6S1gPx9hzQTnwP4VRySLgL3yGqhfuPgMm8/yE65qr/ExmVKkgzgJWdyFav68i
-         euB3NdeIDNYNOHhZFMfbhOTCKkPMvqBYpZ7COWehTwdkrgnEtDSUihHHSHZSpZy02g7N
-         L4BzJJHZAbL1jBj9nfLj7HRT9TWhQjDzhzYvrUZ61UyXBnOW3pAwAFhSBD7x9qrZtq42
-         iDSA==
-X-Forwarded-Encrypted: i=1; AJvYcCU3GEHc4Z+gRRx25M9e4Fj5ZuShjqYKupZqJZlrPve6JhgOnw/E71R6QxN+s+njeHqTIBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZvc3J4Jw2TZ4UqUFqzhs+0deuShA7sOrqOjsNWbuRb/5pHPzv
-	CSmtphMPnTOh0QXHE1kCMkRSnklgGZek8vaFjvCgZrqaFg0in9CpK/hwAn4PV98QNHfPjgHc8QS
-	XGYRlJJJfaJCHqjOUI8rhjDgVqPtnDA==
-X-Google-Smtp-Source: AGHT+IG305xU5CD0b2jVDKdRvmBdRl1YZXRs3dTwFnmSMf0/bvpcEMobbX1Bp+YetUiisp6N5NyrhFzXMOPYd/tSNjeP
-X-Received: from ilbcr4.prod.google.com ([2002:a05:6e02:3a84:b0:3ce:8579:c1eb])
- (user=kevinloughlin job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:1789:b0:3ce:8e89:90c2 with SMTP id e9e14a558f8ab-3cf7443c362mr158017415ab.13.1737504854292;
- Tue, 21 Jan 2025 16:14:14 -0800 (PST)
-Date: Wed, 22 Jan 2025 00:13:29 +0000
-In-Reply-To: <20250122001329.647970-1-kevinloughlin@google.com>
+	s=arc-20240116; t=1737505336; c=relaxed/simple;
+	bh=/jGFli4cvz5GuKwl53vdKodQbbfB6lqGAT1IVg71WEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t6xb0AlHxCL5QW3ZfQOtlZgaCvjSx4j93KZhBGBEhAJHETBXKdAIcvJYop+jbHLxobySvAcSG3DCX1u0+lEgTBrNVMRDoWLikVqRaCAA3D4QrK6DoANtVd/dwnXLXFSZPGY122OlRpXy7FI3bdTKrcqSZCi2Ol6UDzGD1Fys1Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m6yz2ru+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A0ECC4CEDF;
+	Wed, 22 Jan 2025 00:22:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737505335;
+	bh=/jGFli4cvz5GuKwl53vdKodQbbfB6lqGAT1IVg71WEg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m6yz2ru+LXXh5xzgW1nRGofBLoFG1mOtZGKi5a///oNnHCh2ZlX7+dcv8uCWMxNTP
+	 NYc7Ip5HhxveoM1UG1zbALPWHqlghrr9FWkgxzL4ynzknjr2qzRJNXR0bvmmp0LFhV
+	 2OSMqyc+t3WixyaNjJpsZ4FqrFQOpqBUkDbXqnD8oIRzHSRo6BI6S0PtYY51ka7mXT
+	 F/aNHCRlDP27nrL0iFxyIILAmTVs3KAxdOxLI4Oy09Y/BLpA3KwnyrjprYZYiv2vA6
+	 /XRCO70HAGc/N4UdSrMWqxSo9SxN0390mZcC3+duriCj1eGd6MeQlfVWwQxOpCa2cX
+	 9AeBV3eiLnmoQ==
+Date: Wed, 22 Jan 2025 01:22:12 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+	virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+	linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
+	xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
+	linux-arch@vger.kernel.org, rcu@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	Juergen Gross <jgross@suse.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	"Liang, Kan" <kan.liang@linux.intel.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Jason Baron <jbaron@akamai.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Clark Williams <williams@redhat.com>,
+	Yair Podemsky <ypodemsk@redhat.com>,
+	Tomas Glozar <tglozar@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Kees Cook <kees@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Rong Xu <xur@google.com>,
+	Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Yosry Ahmed <yosryahmed@google.com>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	"Masami Hiramatsu (Google)" <mhiramat@kernel.org>,
+	Jinghao Jia <jinghao7@illinois.edu>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>
+Subject: Re: [PATCH v4 22/30] context_tracking: Exit CT_STATE_IDLE upon
+ irq/nmi entry
+Message-ID: <Z5A6NPqVGoZ32YsN@pavilion.home>
+References: <20250114175143.81438-1-vschneid@redhat.com>
+ <20250114175143.81438-23-vschneid@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250109225533.1841097-1-kevinloughlin@google.com> <20250122001329.647970-1-kevinloughlin@google.com>
-X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
-Message-ID: <20250122001329.647970-3-kevinloughlin@google.com>
-Subject: [PATCH v3 2/2] KVM: SEV: Prefer WBNOINVD over WBINVD for cache
- maintenance efficiency
-From: Kevin Loughlin <kevinloughlin@google.com>
-To: linux-kernel@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com, 
-	pbonzini@redhat.com, kevinloughlin@google.com, 
-	kirill.shutemov@linux.intel.com, kai.huang@intel.com, ubizjak@gmail.com, 
-	jgross@suse.com, kvm@vger.kernel.org, thomas.lendacky@amd.com, 
-	pgonda@google.com, sidtelang@google.com, mizhang@google.com, 
-	rientjes@google.com, manalinandan@google.com, szy0127@sjtu.edu.cn
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250114175143.81438-23-vschneid@redhat.com>
 
-AMD CPUs currently execute WBINVD in the host when unregistering SEV
-guest memory or when deactivating SEV guests. Such cache maintenance is
-performed to prevent data corruption, wherein the encrypted (C=1)
-version of a dirty cache line might otherwise only be written back
-after the memory is written in a different context (ex: C=0), yielding
-corruption. However, WBINVD is performance-costly, especially because
-it invalidates processor caches.
+Le Tue, Jan 14, 2025 at 06:51:35PM +0100, Valentin Schneider a écrit :
+> ct_nmi_{enter, exit}() only touches the RCU watching counter and doesn't
+> modify the actual CT state part context_tracking.state. This means that
+> upon receiving an IRQ when idle, the CT_STATE_IDLE->CT_STATE_KERNEL
+> transition only happens in ct_idle_exit().
+> 
+> One can note that ct_nmi_enter() can only ever be entered with the CT state
+> as either CT_STATE_KERNEL or CT_STATE_IDLE, as an IRQ/NMI happenning in the
+> CT_STATE_USER or CT_STATE_GUEST states will be routed down to ct_user_exit().
 
-Strictly-speaking, unless the SEV ASID is being recycled (meaning the
-SNP firmware requires the use of WBINVD prior to DF_FLUSH), the cache
-invalidation triggered by WBINVD is unnecessary; only the writeback is
-needed to prevent data corruption in remaining scenarios.
+Are you sure? An NMI can fire between guest_state_enter_irqoff() and
+__svm_vcpu_run(). And NMIs interrupting userspace don't call
+enter_from_user_mode(). In fact they don't call irqentry_enter_from_user_mode()
+like regular IRQs but irqentry_nmi_enter() instead. Well that's for archs
+implementing common entry code, I can't speak for the others.
 
-To improve performance in these scenarios, use WBNOINVD when available
-instead of WBINVD. WBNOINVD still writes back all dirty lines
-(preventing host data corruption by SEV guests) but does *not*
-invalidate processor caches. Note that the implementation of wbnoinvd()
-ensures fall back to WBINVD if WBNOINVD is unavailable.
+Unifying the behaviour between user and idle such that the IRQs/NMIs exit the
+CT_STATE can be interesting but I fear this may not come for free. You would
+need to save the old state on IRQ/NMI entry and restore it on exit.
 
-In anticipation of forthcoming optimizations to limit the WBNOINVD only
-to physical CPUs that have executed SEV guests, place the call to
-wbnoinvd_on_all_cpus() in a wrapper function sev_writeback_caches().
+Do we really need it?
 
-Signed-off-by: Kevin Loughlin <kevinloughlin@google.com>
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/svm/sev.c | 41 +++++++++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 20 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index fe6cc763fd51..f10f1c53345e 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -116,6 +116,7 @@ static int sev_flush_asids(unsigned int min_asid, unsigned int max_asid)
- 	 */
- 	down_write(&sev_deactivate_lock);
- 
-+	/* SNP firmware requires use of WBINVD for ASID recycling. */
- 	wbinvd_on_all_cpus();
- 
- 	if (sev_snp_enabled)
-@@ -710,6 +711,16 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
- 	}
- }
- 
-+static inline void sev_writeback_caches(void)
-+{
-+	/*
-+	 * Ensure that all dirty guest tagged cache entries are written back
-+	 * before releasing the pages back to the system for use. CLFLUSH will
-+	 * not do this without SME_COHERENT, so issue a WBNOINVD.
-+	 */
-+	wbnoinvd_on_all_cpus();
-+}
-+
- static unsigned long get_num_contig_pages(unsigned long idx,
- 				struct page **inpages, unsigned long npages)
- {
-@@ -2773,12 +2784,7 @@ int sev_mem_enc_unregister_region(struct kvm *kvm,
- 		goto failed;
- 	}
- 
--	/*
--	 * Ensure that all guest tagged cache entries are flushed before
--	 * releasing the pages back to the system for use. CLFLUSH will
--	 * not do this, so issue a WBINVD.
--	 */
--	wbinvd_on_all_cpus();
-+	sev_writeback_caches();
- 
- 	__unregister_enc_region_locked(kvm, region);
- 
-@@ -2899,12 +2905,7 @@ void sev_vm_destroy(struct kvm *kvm)
- 		return;
- 	}
- 
--	/*
--	 * Ensure that all guest tagged cache entries are flushed before
--	 * releasing the pages back to the system for use. CLFLUSH will
--	 * not do this, so issue a WBINVD.
--	 */
--	wbinvd_on_all_cpus();
-+	sev_writeback_caches();
- 
- 	/*
- 	 * if userspace was terminated before unregistering the memory regions
-@@ -3126,16 +3127,16 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
- 
- 	/*
- 	 * VM Page Flush takes a host virtual address and a guest ASID.  Fall
--	 * back to WBINVD if this faults so as not to make any problems worse
-+	 * back to WBNOINVD if this faults so as not to make any problems worse
- 	 * by leaving stale encrypted data in the cache.
- 	 */
- 	if (WARN_ON_ONCE(wrmsrl_safe(MSR_AMD64_VM_PAGE_FLUSH, addr | asid)))
--		goto do_wbinvd;
-+		goto do_sev_writeback_caches;
- 
- 	return;
- 
--do_wbinvd:
--	wbinvd_on_all_cpus();
-+do_sev_writeback_caches:
-+	sev_writeback_caches();
- }
- 
- void sev_guest_memory_reclaimed(struct kvm *kvm)
-@@ -3144,12 +3145,12 @@ void sev_guest_memory_reclaimed(struct kvm *kvm)
- 	 * With SNP+gmem, private/encrypted memory is unreachable via the
- 	 * hva-based mmu notifiers, so these events are only actually
- 	 * pertaining to shared pages where there is no need to perform
--	 * the WBINVD to flush associated caches.
-+	 * the WBNOINVD to flush associated caches.
- 	 */
- 	if (!sev_guest(kvm) || sev_snp_guest(kvm))
- 		return;
- 
--	wbinvd_on_all_cpus();
-+	sev_writeback_caches();
- }
- 
- void sev_free_vcpu(struct kvm_vcpu *vcpu)
-@@ -3858,7 +3859,7 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
- 		 * guest-mapped page rather than the initial one allocated
- 		 * by KVM in svm->sev_es.vmsa. In theory, svm->sev_es.vmsa
- 		 * could be free'd and cleaned up here, but that involves
--		 * cleanups like wbinvd_on_all_cpus() which would ideally
-+		 * cleanups like sev_writeback_caches() which would ideally
- 		 * be handled during teardown rather than guest boot.
- 		 * Deferring that also allows the existing logic for SEV-ES
- 		 * VMSAs to be re-used with minimal SNP-specific changes.
-@@ -4910,7 +4911,7 @@ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
- 
- 		/*
- 		 * SEV-ES avoids host/guest cache coherency issues through
--		 * WBINVD hooks issued via MMU notifiers during run-time, and
-+		 * WBNOINVD hooks issued via MMU notifiers during run-time, and
- 		 * KVM's VM destroy path at shutdown. Those MMU notifier events
- 		 * don't cover gmem since there is no requirement to map pages
- 		 * to a HVA in order to use them for a running guest. While the
--- 
-2.48.1.262.g85cc9f2d1e-goog
-
+Thanks.
 
