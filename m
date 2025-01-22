@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-36228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2BAA18DB9
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 09:46:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0121EA18DBB
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 09:46:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A63921620DC
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 08:46:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E415E1639FF
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 08:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C871F75B2;
-	Wed, 22 Jan 2025 08:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3C42045BA;
+	Wed, 22 Jan 2025 08:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hvgppxuy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fRl2YDjM"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FFA1C3C0B
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 08:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFF9188721
+	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 08:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737535574; cv=none; b=ZB66EMl0ZgClms789ukwJTQL8UiM5lBqYP7rvnzJcN5kfaQ7hOT83MNfS9OidSD2fWbuYPaVm6Hyea0wyLB+HOOSWXCOsYolfHIEDpH8LV16GgyaaoT2v/UnPiPUf/zpRSAMmJWoQ/pSz1bywCmcSNZxIkx9HNr9OGki874lr30=
+	t=1737535579; cv=none; b=TQ3EihVpor9uB7krGu5+NwzAG3057oj0UOu6eWl1fOeSrlY5EsGrciemlCaklTI+gYDsCk/5qWM3INNamCIBcuoTPASEKwG5EEHoPIWz+o7p/zCw1TVfH6x7Z32xVKhs4yCV26/mXckfQMnu0Qku87W/ovKeITyaQPfFqU57fqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737535574; c=relaxed/simple;
-	bh=HP1zZWGiw1yE/RZYTSNmKOwsJodBHoq6Uwf30q0PM8c=;
+	s=arc-20240116; t=1737535579; c=relaxed/simple;
+	bh=VMFyzU7rJ0ERY+XN36rgAcSEcfJLdF/jbMtrra/GTKA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ASAYQwsQnwLgAzvk7wDDThzIPsOEc+2aSOeZxPXcHyGksafS6JLzVEw0eSfsd7ONOEQuZCg35FsoF6ZHohbw73MYqtOPn5RZ7juMJHH4fVpkIKhZa4INrHr9k0jwsZJ25gE43iGNWxfxvFhNwpg2MEeh/dUdF1G0ftaaK0RDtjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hvgppxuy; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=fbVgMp1d/DGwEHa5wkXx31RRIsmB5L0ZB4+PiC0WV+1eW5e8aCzU91L31960Rw+/IeymizxwBmY342oHIVFpBHokckN5f47hHvCulgyNmHQDKRZdinMbJuR8e18Bt8sFOimYdfOBXWpq1Ub+Q4kQkOWADCzHu5ZBB0tHCWkcBg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fRl2YDjM; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737535573; x=1769071573;
+  t=1737535578; x=1769071578;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HP1zZWGiw1yE/RZYTSNmKOwsJodBHoq6Uwf30q0PM8c=;
-  b=hvgppxuyElZs9NCeT206eu3t6vrfAcek5pOrgp9jsVak32Mg+5aZSjQb
-   6ZnGCbjl4eCY3cGFrz2MkeaAlxG/fvPD8B908WIOcFPef55Msen09NLLr
-   /EPBj9Ft9HRsgjGfrfHhKI9cp4gpVT/KCPzpoaQQZVprOeHGodTEHwA++
-   v69uOYedty+4oMEPe3CaLjrZEIR+B2ewYClE1O1XvTWRFUwPSQKpPq00x
-   Q+XRKPFeIntg9LWjoGov3YeGKGKJbDZi9A1gRX3Uy/SEzGn78VIr2MKNH
-   eCOcsHF9kYwZ3pgKiUwMnMFxu1HmfyWoQq0YtrzNG0dffHaVHPcjBmj2d
-   Q==;
-X-CSE-ConnectionGUID: RwLto7ygSg6RYIb/0+48DQ==
-X-CSE-MsgGUID: p+kG/WJzQz2xEZyYDFL0kA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="60451546"
+  bh=VMFyzU7rJ0ERY+XN36rgAcSEcfJLdF/jbMtrra/GTKA=;
+  b=fRl2YDjMSKqIeuv1/omSOm2tVi9r9hArsXQ8mWvuL+mOQXjdk3gZIoBU
+   lB+3x0ta14/cFoEwZdXXh5okRIok78DtYFsOKwynKYNtqZ9SJ9/ZjGNOJ
+   /gc5UEh2ZJ+mxTpdpKT8Dx6nTS0KCm4A5D+nOkoyWIF8EmUhxcAQWyc1W
+   N673nZbRiEf4PxvQMVIIkyGZjT4CprzSFqR/PLzKms2CjT1r6+i1jTjmh
+   SdMJys1Q4pGllw9w1CN6Pa18wzm1RBAaHcOhCEn8BVb8FrrDMRCqV0OIC
+   Gk+sU9AqVZRd9ykDm+x6M6Glei6YvsIZxiusmdlFiLpgMR2YqmmPkNtJO
+   g==;
+X-CSE-ConnectionGUID: QyY8lamYQcWKtQKqzdMUzA==
+X-CSE-MsgGUID: RWlOPk9PQsi8aslW6jwnFQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="60451559"
 X-IronPort-AV: E=Sophos;i="6.13,224,1732608000"; 
-   d="scan'208";a="60451546"
+   d="scan'208";a="60451559"
 Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 00:46:13 -0800
-X-CSE-ConnectionGUID: xyizYcnKT1aXiu9Q3we+jw==
-X-CSE-MsgGUID: mMCxGChuQ8KsZox6WG6UNw==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 00:46:17 -0800
+X-CSE-ConnectionGUID: fA1qO0UsTNWEBq4maCd8bQ==
+X-CSE-MsgGUID: bO2kWi3pSM6t8TGjTKIFOw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="112049682"
+   d="scan'208";a="112049753"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa003.jf.intel.com with ESMTP; 22 Jan 2025 00:46:08 -0800
+  by orviesa003.jf.intel.com with ESMTP; 22 Jan 2025 00:46:13 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Eric Blake <eblake@redhat.com>,
@@ -79,9 +79,9 @@ Cc: qemu-devel@nongnu.org,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Yi Lai <yi1.lai@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
-Date: Wed, 22 Jan 2025 17:05:13 +0800
-Message-Id: <20250122090517.294083-2-zhao1.liu@intel.com>
+Subject: [RFC v2 2/5] i386/kvm: Support basic KVM PMU filter
+Date: Wed, 22 Jan 2025 17:05:14 +0800
+Message-Id: <20250122090517.294083-3-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250122090517.294083-1-zhao1.liu@intel.com>
 References: <20250122090517.294083-1-zhao1.liu@intel.com>
@@ -93,446 +93,213 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce the kvm-pmu-filter object and support the PMU event with raw
-format.
+Filter PMU events with raw format in i386 code.
 
-The raw format, as a native PMU event code representation, can be used
-for several architectures.
-
-Considering that PMU event related fields are commonly used in
-hexadecimal, define KVMPMURawEventVariant, KVMPMUFilterEventVariant, and
-KVMPMUFilterPropertyVariant in kvm.json to support hexadecimal number
-strings in JSON.
-
-Additionally, define the corresponding numeric versions of
-KVMPMURawEvent, KVMPMUFilterEvent, and KVMPMUFilterProperty in kvm.json.
-This allows to handle numeric values more effectively and take advantage
-of the qapi helpers.
+For i386, raw format indicates that the PMU event code is already
+encoded according to the KVM ioctl requirements, and can be delivered
+directly to KVM without additional encoding work.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Changes since RFC v1:
- * Make "action" as a global (per filter object) item, not a per-event
-   parameter. (Dapeng)
- * Bump up the supported QAPI version to 10.0.
+Changes since v1:
+ * Stop check whether per-event actions are the same, as "action" has
+   been a global parameter. (Dapeng)
+ * Make pmu filter related functions return int in
+   target/i386/kvm/kvm.c.
 ---
- MAINTAINERS              |   1 +
- accel/kvm/kvm-pmu.c      | 164 +++++++++++++++++++++++++++++++++++++++
- accel/kvm/meson.build    |   1 +
- include/system/kvm-pmu.h |  30 +++++++
- qapi/kvm.json            | 116 +++++++++++++++++++++++++++
- qapi/meson.build         |   1 +
- qapi/qapi-schema.json    |   1 +
- qapi/qom.json            |   3 +
- 8 files changed, 317 insertions(+)
- create mode 100644 accel/kvm/kvm-pmu.c
- create mode 100644 include/system/kvm-pmu.h
- create mode 100644 qapi/kvm.json
+ include/system/kvm_int.h |   2 +
+ target/i386/kvm/kvm.c    | 123 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 125 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 846b81e3ec03..21adc1c10607 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -440,6 +440,7 @@ F: accel/kvm/
- F: accel/stubs/kvm-stub.c
- F: include/hw/kvm/
- F: include/system/kvm*.h
-+F: qapi/kvm.json
- F: scripts/kvm/kvm_flightrecorder
- 
- ARM KVM CPUs
-diff --git a/accel/kvm/kvm-pmu.c b/accel/kvm/kvm-pmu.c
-new file mode 100644
-index 000000000000..4d0d4e7a452b
---- /dev/null
-+++ b/accel/kvm/kvm-pmu.c
-@@ -0,0 +1,164 @@
-+/*
-+ * QEMU KVM PMU Abstractions
-+ *
-+ * Copyright (C) 2024 Intel Corporation.
-+ *
-+ * Author: Zhao Liu <zhao1.liu@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "qapi/error.h"
-+#include "qapi/qapi-visit-kvm.h"
-+#include "qemu/cutils.h"
-+#include "qom/object_interfaces.h"
+diff --git a/include/system/kvm_int.h b/include/system/kvm_int.h
+index 4de6106869b0..743fed29b17b 100644
+--- a/include/system/kvm_int.h
++++ b/include/system/kvm_int.h
+@@ -17,6 +17,7 @@
+ #include "hw/boards.h"
+ #include "hw/i386/topology.h"
+ #include "io/channel-socket.h"
 +#include "system/kvm-pmu.h"
+ 
+ typedef struct KVMSlot
+ {
+@@ -166,6 +167,7 @@ struct KVMState
+     uint16_t xen_gnttab_max_frames;
+     uint16_t xen_evtchn_max_pirq;
+     char *device;
++    KVMPMUFilter *pmu_filter;
+ };
+ 
+ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 6c749d4ee812..b82adbed50f4 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -34,6 +34,7 @@
+ #include "system/system.h"
+ #include "system/hw_accel.h"
+ #include "system/kvm_int.h"
++#include "system/kvm-pmu.h"
+ #include "system/runstate.h"
+ #include "kvm_i386.h"
+ #include "../confidential-guest.h"
+@@ -110,6 +111,7 @@ typedef struct {
+ static void kvm_init_msrs(X86CPU *cpu);
+ static int kvm_filter_msr(KVMState *s, uint32_t msr, QEMURDMSRHandler *rdmsr,
+                           QEMUWRMSRHandler *wrmsr);
++static int kvm_filter_pmu_event(KVMState *s);
+ 
+ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+     KVM_CAP_INFO(SET_TSS_ADDR),
+@@ -3346,6 +3348,14 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         }
+     }
+ 
++    if (s->pmu_filter) {
++        ret = kvm_filter_pmu_event(s);
++        if (ret < 0) {
++            error_report("Could not set KVM PMU filter");
++            return ret;
++        }
++    }
 +
-+static void kvm_pmu_filter_set_action(Object *obj, int value,
-+                                      Error **errp G_GNUC_UNUSED)
+     return 0;
+ }
+ 
+@@ -5942,6 +5952,82 @@ static int kvm_handle_wrmsr(X86CPU *cpu, struct kvm_run *run)
+     g_assert_not_reached();
+ }
+ 
++static bool kvm_config_pmu_event(KVMPMUFilter *filter,
++                                 struct kvm_pmu_event_filter *kvm_filter)
 +{
-+    KVMPMUFilter *filter = KVM_PMU_FILTER(obj);
++    KVMPMUFilterEventList *events;
++    KVMPMUFilterEvent *event;
++    uint64_t code;
++    int idx = 0;
 +
-+    filter->action = value;
-+}
++    kvm_filter->nevents = filter->nevents;
++    events = filter->events;
++    while (events) {
++        assert(idx < kvm_filter->nevents);
 +
-+
-+static int kvm_pmu_filter_get_action(Object *obj,
-+                                     Error **errp G_GNUC_UNUSED)
-+{
-+    KVMPMUFilter *filter = KVM_PMU_FILTER(obj);
-+
-+    return filter->action;
-+}
-+
-+static void kvm_pmu_filter_get_event(Object *obj, Visitor *v, const char *name,
-+                                     void *opaque, Error **errp)
-+{
-+    KVMPMUFilter *filter = KVM_PMU_FILTER(obj);
-+    KVMPMUFilterEventList *node;
-+    KVMPMUFilterEventVariantList *head = NULL;
-+    KVMPMUFilterEventVariantList **tail = &head;
-+
-+    for (node = filter->events; node; node = node->next) {
-+        KVMPMUFilterEventVariant *str_event;
-+        KVMPMUFilterEvent *event = node->value;
-+
-+        str_event = g_new(KVMPMUFilterEventVariant, 1);
-+        str_event->format = event->format;
-+
++        event = events->value;
 +        switch (event->format) {
 +        case KVM_PMU_EVENT_FMT_RAW:
-+            str_event->u.raw.code = g_strdup_printf("0x%lx",
-+                                                    event->u.raw.code);
++            code = event->u.raw.code;
 +            break;
 +        default:
 +            g_assert_not_reached();
 +        }
 +
-+        QAPI_LIST_APPEND(tail, str_event);
++        kvm_filter->events[idx++] = code;
++        events = events->next;
 +    }
 +
-+    visit_type_KVMPMUFilterEventVariantList(v, name, &head, errp);
-+    qapi_free_KVMPMUFilterEventVariantList(head);
++    return true;
 +}
 +
-+static void kvm_pmu_filter_set_event(Object *obj, Visitor *v, const char *name,
-+                                     void *opaque, Error **errp)
++static int kvm_install_pmu_event_filter(KVMState *s)
 +{
-+    KVMPMUFilter *filter = KVM_PMU_FILTER(obj);
-+    KVMPMUFilterEventVariantList *list, *node;
-+    KVMPMUFilterEventList *head = NULL, *old_head;
-+    KVMPMUFilterEventList **tail = &head;
-+    int ret, nevents = 0;
++    struct kvm_pmu_event_filter *kvm_filter;
++    KVMPMUFilter *filter = s->pmu_filter;
++    int ret;
 +
-+    if (!visit_type_KVMPMUFilterEventVariantList(v, name, &list, errp)) {
++    kvm_filter = g_malloc0(sizeof(struct kvm_pmu_event_filter) +
++                           filter->nevents * sizeof(uint64_t));
++
++    switch (filter->action) {
++    case KVM_PMU_FILTER_ACTION_ALLOW:
++        kvm_filter->action = KVM_PMU_EVENT_ALLOW;
++        break;
++    case KVM_PMU_FILTER_ACTION_DENY:
++        kvm_filter->action = KVM_PMU_EVENT_DENY;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    if (!kvm_config_pmu_event(filter, kvm_filter)) {
++        goto fail;
++    }
++
++    ret = kvm_vm_ioctl(s, KVM_SET_PMU_EVENT_FILTER, kvm_filter);
++    if (ret) {
++        error_report("KVM_SET_PMU_EVENT_FILTER fails (%s)", strerror(-ret));
++        goto fail;
++    }
++
++    g_free(kvm_filter);
++    return 0;
++fail:
++    g_free(kvm_filter);
++    return -EINVAL;
++}
++
++static int kvm_filter_pmu_event(KVMState *s)
++{
++    if (!kvm_vm_check_extension(s, KVM_CAP_PMU_EVENT_FILTER)) {
++        error_report("KVM PMU filter is not supported by Host.");
++        return -1;
++    }
++
++    return kvm_install_pmu_event_filter(s);
++}
++
+ static bool has_sgx_provisioning;
+ 
+ static bool __kvm_enable_sgx_provisioning(KVMState *s)
+@@ -6537,6 +6623,35 @@ static void kvm_arch_set_xen_evtchn_max_pirq(Object *obj, Visitor *v,
+     s->xen_evtchn_max_pirq = value;
+ }
+ 
++static void kvm_arch_check_pmu_filter(const Object *obj, const char *name,
++                                      Object *child, Error **errp)
++{
++    KVMPMUFilter *filter = KVM_PMU_FILTER(child);
++    KVMPMUFilterEventList *events = filter->events;
++
++    if (!filter->nevents) {
++        error_setg(errp,
++                   "Empty KVM PMU filter.");
 +        return;
 +    }
 +
-+    for (node = list; node; node = node->next) {
-+        KVMPMUFilterEvent *event = g_new(KVMPMUFilterEvent, 1);
-+        KVMPMUFilterEventVariant *str_event = node->value;
++    while (events) {
++        KVMPMUFilterEvent *event = events->value;
 +
-+        event->format = str_event->format;
-+
-+        switch (str_event->format) {
++        switch (event->format) {
 +        case KVM_PMU_EVENT_FMT_RAW:
-+            ret = qemu_strtou64(str_event->u.raw.code, NULL,
-+                                0, &event->u.raw.code);
-+            if (ret < 0) {
-+                error_setg(errp,
-+                           "Invalid %s PMU event (code: %s): %s. "
-+                           "The code must be a uint64 string.",
-+                           KVMPMUEventEncodeFmt_str(str_event->format),
-+                           str_event->u.raw.code, strerror(-ret));
-+                g_free(event);
-+                goto fail;
-+            }
 +            break;
 +        default:
-+            g_assert_not_reached();
++            error_setg(errp,
++                       "Unsupported PMU event format %s.",
++                       KVMPMUEventEncodeFmt_str(events->value->format));
++            return;
 +        }
 +
-+        nevents++;
-+        QAPI_LIST_APPEND(tail, event);
++        events = events->next;
 +    }
-+
-+    old_head = filter->events;
-+    filter->events = head;
-+    filter->nevents = nevents;
-+
-+    qapi_free_KVMPMUFilterEventVariantList(list);
-+    qapi_free_KVMPMUFilterEventList(old_head);
-+    return;
-+
-+fail:
-+    qapi_free_KVMPMUFilterEventList(head);
 +}
 +
-+static void kvm_pmu_filter_class_init(ObjectClass *oc, void *data)
-+{
-+    object_class_property_add_enum(oc, "action", "KVMPMUFilterAction",
-+                                   &KVMPMUFilterAction_lookup,
-+                                   kvm_pmu_filter_get_action,
-+                                   kvm_pmu_filter_set_action);
-+    object_class_property_set_description(oc, "action",
-+                                          "KVM PMU event action");
+ void kvm_arch_accel_class_init(ObjectClass *oc)
+ {
+     object_class_property_add_enum(oc, "notify-vmexit", "NotifyVMexitOption",
+@@ -6576,6 +6691,14 @@ void kvm_arch_accel_class_init(ObjectClass *oc)
+                               NULL, NULL);
+     object_class_property_set_description(oc, "xen-evtchn-max-pirq",
+                                           "Maximum number of Xen PIRQs");
 +
-+    object_class_property_add(oc, "events", "KVMPMUFilterEvent",
-+                              kvm_pmu_filter_get_event,
-+                              kvm_pmu_filter_set_event,
-+                              NULL, NULL);
-+    object_class_property_set_description(oc, "events",
-+                                          "KVM PMU event list");
-+}
-+
-+static void kvm_pmu_filter_instance_init(Object *obj)
-+{
-+    KVMPMUFilter *filter = KVM_PMU_FILTER(obj);
-+
-+    /* Initial state, 0 events allowed. */
-+    filter->action = KVM_PMU_FILTER_ACTION_ALLOW;
-+    filter->nevents = 0;
-+}
-+
-+static const TypeInfo kvm_pmu_filter_info = {
-+    .parent = TYPE_OBJECT,
-+    .name = TYPE_KVM_PMU_FILTER,
-+    .class_init = kvm_pmu_filter_class_init,
-+    .instance_size = sizeof(KVMPMUFilter),
-+    .instance_init = kvm_pmu_filter_instance_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void kvm_pmu_event_register_type(void)
-+{
-+    type_register_static(&kvm_pmu_filter_info);
-+}
-+
-+type_init(kvm_pmu_event_register_type);
-diff --git a/accel/kvm/meson.build b/accel/kvm/meson.build
-index 397a1fe1fd1e..dfab2854f3a8 100644
---- a/accel/kvm/meson.build
-+++ b/accel/kvm/meson.build
-@@ -2,6 +2,7 @@ kvm_ss = ss.source_set()
- kvm_ss.add(files(
-   'kvm-all.c',
-   'kvm-accel-ops.c',
-+  'kvm-pmu.c',
- ))
++    object_class_property_add_link(oc, "pmu-filter",
++                                   TYPE_KVM_PMU_FILTER,
++                                   offsetof(KVMState, pmu_filter),
++                                   kvm_arch_check_pmu_filter,
++                                   OBJ_PROP_LINK_STRONG);
++    object_class_property_set_description(oc, "pmu-filter",
++                                          "Set the KVM PMU filter");
+ }
  
- specific_ss.add_all(when: 'CONFIG_KVM', if_true: kvm_ss)
-diff --git a/include/system/kvm-pmu.h b/include/system/kvm-pmu.h
-new file mode 100644
-index 000000000000..b09f70d3a370
---- /dev/null
-+++ b/include/system/kvm-pmu.h
-@@ -0,0 +1,30 @@
-+/*
-+ * QEMU KVM PMU Abstraction Header
-+ *
-+ * Copyright (C) 2024 Intel Corporation.
-+ *
-+ * Authors:
-+ *  Zhao Liu <zhao1.liu@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef KVM_PMU_H
-+#define KVM_PMU_H
-+
-+#include "qapi/qapi-types-kvm.h"
-+#include "qom/object.h"
-+
-+#define TYPE_KVM_PMU_FILTER "kvm-pmu-filter"
-+OBJECT_DECLARE_SIMPLE_TYPE(KVMPMUFilter, KVM_PMU_FILTER)
-+
-+struct KVMPMUFilter {
-+    Object parent_obj;
-+
-+    KVMPMUFilterAction action;
-+    uint32_t nevents;
-+    KVMPMUFilterEventList *events;
-+};
-+
-+#endif /* KVM_PMU_H */
-diff --git a/qapi/kvm.json b/qapi/kvm.json
-new file mode 100644
-index 000000000000..d51aeeba7cd8
---- /dev/null
-+++ b/qapi/kvm.json
-@@ -0,0 +1,116 @@
-+# -*- Mode: Python -*-
-+# vim: filetype=python
-+
-+##
-+# = KVM based feature API
-+##
-+
-+##
-+# @KVMPMUFilterAction:
-+#
-+# Actions that KVM PMU filter supports.
-+#
-+# @deny: disable the PMU event/counter in KVM PMU filter.
-+#
-+# @allow: enable the PMU event/counter in KVM PMU filter.
-+#
-+# Since 10.0
-+##
-+{ 'enum': 'KVMPMUFilterAction',
-+  'prefix': 'KVM_PMU_FILTER_ACTION',
-+  'data': ['allow', 'deny'] }
-+
-+##
-+# @KVMPMUEventEncodeFmt:
-+#
-+# Encoding formats of PMU event that QEMU/KVM supports.
-+#
-+# @raw: the encoded event code that KVM can directly consume.
-+#
-+# Since 10.0
-+##
-+{ 'enum': 'KVMPMUEventEncodeFmt',
-+  'prefix': 'KVM_PMU_EVENT_FMT',
-+  'data': ['raw'] }
-+
-+##
-+# @KVMPMURawEvent:
-+#
-+# Raw PMU event code.
-+#
-+# @code: the raw value that has been encoded, and QEMU could deliver
-+#     to KVM directly.
-+#
-+# Since 10.0
-+##
-+{ 'struct': 'KVMPMURawEvent',
-+  'data': { 'code': 'uint64' } }
-+
-+##
-+# @KVMPMUFilterEvent:
-+#
-+# PMU event filtered by KVM.
-+#
-+# @format: PMU event format.
-+#
-+# Since 10.0
-+##
-+{ 'union': 'KVMPMUFilterEvent',
-+  'base': { 'format': 'KVMPMUEventEncodeFmt' },
-+  'discriminator': 'format',
-+  'data': { 'raw': 'KVMPMURawEvent' } }
-+
-+##
-+# @KVMPMUFilterProperty:
-+#
-+# Property of KVM PMU Filter.
-+#
-+# @events: the KVMPMUFilterEvent list.
-+#
-+# Since 10.0
-+##
-+{ 'struct': 'KVMPMUFilterProperty',
-+  'data': { '*events': ['KVMPMUFilterEvent'] } }
-+
-+##
-+# @KVMPMURawEventVariant:
-+#
-+# The variant of KVMPMURawEvent with the string, rather than the
-+# numeric value.
-+#
-+# @code: the raw value that has been encoded, and QEMU could deliver
-+#     to KVM directly.  This field is a uint64 string.
-+#
-+# Since 10.0
-+##
-+{ 'struct': 'KVMPMURawEventVariant',
-+  'data': { 'code': 'str' } }
-+
-+##
-+# @KVMPMUFilterEventVariant:
-+#
-+# The variant of KVMPMUFilterEvent.
-+#
-+# @format: PMU event format.
-+#
-+# Since 10.0
-+##
-+{ 'union': 'KVMPMUFilterEventVariant',
-+  'base': { 'format': 'KVMPMUEventEncodeFmt' },
-+  'discriminator': 'format',
-+  'data': { 'raw': 'KVMPMURawEventVariant' } }
-+
-+##
-+# @KVMPMUFilterPropertyVariant:
-+#
-+# The variant of KVMPMUFilterProperty.
-+#
-+# @action: action that KVM PMU filter will take.
-+#
-+# @events: the KVMPMUFilterEventVariant list.
-+#
-+# Since 10.0
-+##
-+{ 'struct': 'KVMPMUFilterPropertyVariant',
-+  'data': { 'action': 'KVMPMUFilterAction',
-+            '*events': ['KVMPMUFilterEventVariant'] } }
-diff --git a/qapi/meson.build b/qapi/meson.build
-index e7bc54e5d047..856439c76b67 100644
---- a/qapi/meson.build
-+++ b/qapi/meson.build
-@@ -37,6 +37,7 @@ qapi_all_modules = [
-   'error',
-   'introspect',
-   'job',
-+  'kvm',
-   'machine-common',
-   'machine',
-   'machine-target',
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index b1581988e4eb..742818d16e45 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -64,6 +64,7 @@
- { 'include': 'compat.json' }
- { 'include': 'control.json' }
- { 'include': 'introspect.json' }
-+{ 'include': 'kvm.json' }
- { 'include': 'qom.json' }
- { 'include': 'qdev.json' }
- { 'include': 'machine-common.json' }
-diff --git a/qapi/qom.json b/qapi/qom.json
-index 28ce24cd8d08..c75ec4b21e95 100644
---- a/qapi/qom.json
-+++ b/qapi/qom.json
-@@ -8,6 +8,7 @@
- { 'include': 'block-core.json' }
- { 'include': 'common.json' }
- { 'include': 'crypto.json' }
-+{ 'include': 'kvm.json' }
- 
- ##
- # = QEMU Object Model (QOM)
-@@ -1108,6 +1109,7 @@
-       'if': 'CONFIG_LINUX' },
-     'iommufd',
-     'iothread',
-+    'kvm-pmu-filter',
-     'main-loop',
-     { 'name': 'memory-backend-epc',
-       'if': 'CONFIG_LINUX' },
-@@ -1183,6 +1185,7 @@
-                                       'if': 'CONFIG_LINUX' },
-       'iommufd':                    'IOMMUFDProperties',
-       'iothread':                   'IothreadProperties',
-+      'kvm-pmu-filter':             'KVMPMUFilterPropertyVariant',
-       'main-loop':                  'MainLoopProperties',
-       'memory-backend-epc':         { 'type': 'MemoryBackendEpcProperties',
-                                       'if': 'CONFIG_LINUX' },
+ void kvm_set_max_apic_id(uint32_t max_apic_id)
 -- 
 2.34.1
 
