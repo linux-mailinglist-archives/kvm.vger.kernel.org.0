@@ -1,141 +1,235 @@
-Return-Path: <kvm+bounces-36296-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36297-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6217AA19A18
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 22:02:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1847A19A7C
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 22:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F9D616A55A
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 21:02:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06CAF1652FF
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 21:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9641F1C5D53;
-	Wed, 22 Jan 2025 21:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7121C5F2D;
+	Wed, 22 Jan 2025 21:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gtHVe9Yt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XhT+FLHv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4EC1C3BE6
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 21:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499DA8F7D
+	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 21:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737579748; cv=none; b=IOtWdKsyMzPof44EG7kBj+6trLwinP8n7c/sfygG26v7rZ1mYc97nmRUh6izcInjmXs3Gqev/OoFX7oK9b/mdTiC1Kj1pfe5aiOIz+r7p3rw4clB6qbeMCIfKfgdaX9MGfbJ1edrkbE6snW/aRyzLR9CVDOkk5Ss5vPGBwtM4dY=
+	t=1737582171; cv=none; b=dTjGV3syH2JS7oWuSIWG/JnCCCPl0hIKKnkO6NC79MBxGmCVIrZ6+K1duGNNrtvyWQutzzhstH4BSW64xcTmaGEuBDX4XHYCQ7VLuTr4q3fUpr2CQ8n6xt43m5TnY8y1mqatIXmykTCbY99L0UOjvpo98HnNn3HZQEvsc+fErcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737579748; c=relaxed/simple;
-	bh=pLJ/MLuvuagw10c9IniFm4CuSVxD8IIYNjKXFFggoho=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GDdenC01xxbbMV+KYmSNcbwtX3MtXpU9sYhO00z5VVEvDoIaOxrvF3gBVAx69j1Qm7n/tn47HLNB/4VPK0wXrWLthRSJplevwLtpN4hAqrqfLXCMxsIJwJv/Pw7xlE3MNGml/4UeJ9KH1gT9p8SfVj4yOy6h22jueSudYTqIVgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gtHVe9Yt; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2166855029eso2889325ad.0
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 13:02:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737579747; x=1738184547; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DicZYtp/EHieoQvK3C/2OykVBIHxoy6pTrroBeARA8Q=;
-        b=gtHVe9YtN8b7knBUeVk6zy/So2vQc6v0rQUJp6m6Ne+VmmIyB+Q99Ns0BsQUPgOedc
-         +dISGnKuRdC3owI8jRZyN3loRV0hf4/G9ctxaZi77sgv1f7T8b+epKZEp6ZWBtjzhcxt
-         lPATKzS7vwDv/Ep1QDdgnoEyN6wWXChtcyBN8A1VAzn9b0cbrB9cf83xc88FvUqWO78i
-         7QEfR+V39VSrPBAUGWUrNAFYgM6xvCHeQGThYJEYU1+0JpW8qIZN0k3Cex7ZxX+TsuEI
-         Bs9AYJLN9d/3hxukkTOoGra2h2m6ns4o822umqayexFHK41UdlLFfyrIgwRADvN3woFz
-         scFA==
+	s=arc-20240116; t=1737582171; c=relaxed/simple;
+	bh=r4Y+6EbNXIzr4NvRlNgwowwkci7/0JuHo8TYB8MJOMM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BPrKI/ZNH72xZ8PBYTRrlrvBGOeKeZRUxR8BZQcYA7w50N/8MytjL/94GGhgEIISMCLuLY3pom5wo0KFLI8MFsOhrApM0IP/44FNsGBSKbPo/mOZUV3e/40AuKaYqIQkckd3cbggXAOdynAYYTmMpMLWcNy8s40jmIHQrCBeLg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XhT+FLHv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737582168;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=JrXWysB/Rz0f9WqGz6m0p+hsGiw7d2E4zBU2fQwLRZY=;
+	b=XhT+FLHvPzWXrvph/IYCC+NDunyi0jj36MayjFjKx7xeU/BgzSv80rtQ8nbXrLZff8bhjO
+	+Dvgzu1tnJcFvSUG7sZ9F4DmLcrqJt1uA07uVEPbQrk2TgY6ubkrOVIaubznl93WO7RZak
+	UC/grYPwQgo/1JnH0c7sg0vlH3O4q7Y=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-359-AZzaLqA9OimSDB_ActtPzQ-1; Wed, 22 Jan 2025 16:42:46 -0500
+X-MC-Unique: AZzaLqA9OimSDB_ActtPzQ-1
+X-Mimecast-MFC-AGG-ID: AZzaLqA9OimSDB_ActtPzQ
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3862c67763dso74326f8f.3
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 13:42:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737579747; x=1738184547;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DicZYtp/EHieoQvK3C/2OykVBIHxoy6pTrroBeARA8Q=;
-        b=xBjE2gzKtFzJieoFYYJjO7pcpoAL7m0LtlDOb0l2Heu872jeSbhbovBcN0rd3+HDt3
-         kMKpCcQmZFkzC3u5kl2hUQpaF2gwrkwu8JUYtZMfUqt4pw1ruMixSOgDfY/rcwTnsbWR
-         UN60lP55J1KTOCQEBimuI0SSzW1jPHSeG/MqgfPFMqeUsTH87qMnQubbuaeA/8cCi4Ez
-         KoCetL89mylnvZLE961LUbUcz7Tc0kGb/RMavCvYH0apP8G2oXaLTH9jBFUSqIOG/PbI
-         yuhnU2RKPPXYGP9vdNwnlkYZ8aelI3SlCgfljg/a4w60A97Najn7JN1hGqJVeQOshfCG
-         jwvw==
-X-Gm-Message-State: AOJu0Yy4RIRq+lOPx1VAMpkB7Udqw6r3p9B8K+yFfpsRn0ZFzMvLDha1
-	I2hXPL4CQ8i4LXCuwrYAhnIFKrvDFUgQRaD5NdN/GBqOQfgVmnnezudjOHS/3hrMo8T6I4CWXY7
-	xvQ==
-X-Google-Smtp-Source: AGHT+IHM2QebG58cNXyhzFMVNZ1kenC/xYWAhyilKflk6S5aKuHiubU8xjxlTDSIV8gXkbMieHxUCIPeVME=
-X-Received: from pgbck6.prod.google.com ([2002:a05:6a02:906:b0:8ae:4cf4:372])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:789a:b0:1e6:51d2:c8e3
- with SMTP id adf61e73a8af0-1eb215f52a7mr44525602637.35.1737579746710; Wed, 22
- Jan 2025 13:02:26 -0800 (PST)
-Date: Wed, 22 Jan 2025 13:02:25 -0800
-In-Reply-To: <dd128607c0306d21e57994ffb964514728b92f29.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1737582165; x=1738186965;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JrXWysB/Rz0f9WqGz6m0p+hsGiw7d2E4zBU2fQwLRZY=;
+        b=wI618tshf7xz6+7RJ7qjPl4Ce+b2Ar4ze8E7EPejrGNc2+U9mnGJwjf6S23xcHFOV2
+         yIZSBGwXHfWQrcamtBxTIm2d6FiloPbpiNuVwNRt3fEkMLXLiK267PmWF+bd0Y8GOdzm
+         IlDGpyHFX7ym0A580w3Tka7c98TeRoZFFhbhDUmYX6MhOr4LbTmXAvj66fEUqBIJbLJO
+         1gj3Bj8u5AjcHx8MAw1iHaSraH0sDkIqyw3hS27F+Wvn7fPcTObzntx60SRmHwt1STlD
+         On8GHilzPD54eCliS/HHBkDzSA7mECE2qu/mPZAL3HMCit4a83HAoYf0QRMjAE33IrJd
+         2CMA==
+X-Gm-Message-State: AOJu0YzFAJI1GRtHg72ZikR3RQNIfEfnqUNVBvfrEVlg2gP7HjDj0KUF
+	K5HqGNFip34ebTejXVjGa6HwERrbqEheK2w/yTUY91+zJY16p8EYVLXTDi18h8oIHApRhYBfB3s
+	luv3vf7COHU7Mt3R92UG1V7e06UFSD8xT1hzhL2iVnob15vw6Pw==
+X-Gm-Gg: ASbGncvmmD8tmve5jyFIH+Fu+zdY9LQjHoUGQ/PHqHaVHsULfV1oPDi8rccZGKAATmc
+	8pVynKoO+bT4f7Ir8pNdo2/L6gRxRbweos4KkltgIDX+B1wHLZmo3I+XguXpOm7xxDr96yhe5mr
+	Sw8TZE1tUMBd8aQko0b2krzm+gntXyIndRpieyd7zb4fsdSCIhzFwb74WGNSYeYVSg+6XWJEJFB
+	yMOxCvA6CsjmNaocD4Sq/P2gTMC/lkrcts1hm0Wk0t7etAEdoCOo/7JIUBZTwjPHBwRGbiAImDi
+	rZ5748HvLMisaTl7vtSYo8jePSVsErEcO05y2gdpMvLgYlWYc3dSK9wnADpgYpJvlmOXeQxf425
+	vahyLoFg6YnIGv73ghmtjnA==
+X-Received: by 2002:a5d:6c63:0:b0:385:fdc2:1808 with SMTP id ffacd0b85a97d-38bf57a65b6mr24558001f8f.40.1737582165673;
+        Wed, 22 Jan 2025 13:42:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG4bFDJj8ac+KncXIYJmqblo1/34Fs6nG8R1OO1NYezMiJx8E82JmXMxOV+89Jv2kvTozPlWg==
+X-Received: by 2002:a5d:6c63:0:b0:385:fdc2:1808 with SMTP id ffacd0b85a97d-38bf57a65b6mr24557980f8f.40.1737582165289;
+        Wed, 22 Jan 2025 13:42:45 -0800 (PST)
+Received: from ?IPV6:2003:cb:c70b:db00:724d:8b0c:110e:3713? (p200300cbc70bdb00724d8b0c110e3713.dip0.t-ipconnect.de. [2003:cb:c70b:db00:724d:8b0c:110e:3713])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3275755sm17081743f8f.80.2025.01.22.13.42.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 22 Jan 2025 13:42:44 -0800 (PST)
+Message-ID: <f801219f-96e1-4b52-85aa-f5a331e06183@redhat.com>
+Date: Wed, 22 Jan 2025 22:42:40 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <c9d8269bff69f6359731d758e3b1135dedd7cc61.camel@redhat.com>
- <Zx-z5sRKCXAXysqv@google.com> <948408887cbe83cbcf05452a53d33fb5aaf79524.camel@redhat.com>
- <Z5BDr2mm57F0vfax@google.com> <dd128607c0306d21e57994ffb964514728b92f29.camel@redhat.com>
-Message-ID: <Z5Fc4d5bVf5oVlOk@google.com>
-Subject: Re: vmx_pmu_caps_test fails on Skylake based CPUS due to read only LBRs
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 0/9] KVM: Mapping of guest_memfd at the host and a
+ software protected VM type
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
+References: <20250122152738.1173160-1-tabba@google.com>
+ <c15c84f2-bf19-4a62-91b8-03eefd0c1c89@redhat.com>
+ <03bbcd00-bd5e-47de-8b20-31636e361f52@redhat.com>
+ <CA+EHjTyGgs_Sp0b6OqeS7oVskhVG+S1cHhVRb5Z6mPAwGwmqFA@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CA+EHjTyGgs_Sp0b6OqeS7oVskhVG+S1cHhVRb5Z6mPAwGwmqFA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 22, 2025, Maxim Levitsky wrote:
-> On Tue, 2025-01-21 at 17:02 -0800, Sean Christopherson wrote:
-> > On Sun, Nov 03, 2024, Maxim Levitsky wrote:
-> > > On Mon, 2024-10-28 at 08:55 -0700, Sean Christopherson wrote:
-> > > > On Fri, Oct 18, 2024, Maxim Levitsky wrote:
-> > > > > Our CI found another issue, this time with vmx_pmu_caps_test.
-> > > > > 
-> > > > > On 'Intel(R) Xeon(R) Gold 6328HL CPU' I see that all LBR msrs (from/to and
-> > > > > TOS), are always read only - even when LBR is disabled - once I disable the
-> > > > > feature in DEBUG_CTL, all LBR msrs reset to 0, and you can't change their
-> > > > > value manually.  Freeze LBRS on PMI seems not to affect this behavior.
-> > 
-> > ...
-> > 
-> > > When DEBUG_CTL.LBR=1, the LBRs do work, I see all the registers update,
-> > > although TOS does seem to be stuck at one value, but it does change
-> > > sometimes, and it's non zero.
-> > > 
-> > > The FROM/TO do show healthy amount of updates 
-> > > 
-> > > Note that I read all msrs using 'rdmsr' userspace tool.
-> > 
-> > I'm pretty sure debugging via 'rdmsr', i.e. /dev/msr, isn't going to work.  I
-> > assume perf is clobbering LBR MSRs on context switch, but I haven't tracked that
-> > down to confirm (the code I see on inspecition is gated on at least one perf
-> > event using LBRs).  My guess is that there's a software bug somewhere in the
-> > perf/KVM exchange.
-> > 
-> > I confirmed that using 'rdmsr' and 'wrmsr' "loses" values, but that hacking KVM
-> > to read/write all LBRs during initialization works with LBRs disabled.
+On 22.01.25 18:16, Fuad Tabba wrote:
+> Hi David,
 > 
-> Hi,
+> On Wed, 22 Jan 2025 at 15:41, David Hildenbrand <david@redhat.com> wrote:
+>>
+>> On 22.01.25 16:35, David Hildenbrand wrote:
+>>> On 22.01.25 16:27, Fuad Tabba wrote:
+>>>> The purpose of this series is to serve as a potential base for
+>>>> restricted mmap() support for guest_memfd [1]. It would allow
+>>>> experimentation with what that support would be like, in the safe
+>>>> environment of a new VM type used for testing.
+>>>>
+>>>> This series adds a new VM type for arm64,
+>>>> KVM_VM_TYPE_ARM_SW_PROTECTED, analogous to the x86
+>>>> KVM_X86_SW_PROTECTED_VM. This type is to serve as a development
+>>>> and testing vehicle for Confidential (CoCo) VMs.
+>>>>
+>>>> Similar to the x86 type, this is currently only for development
+>>>> and testing. It's not meant to be used for "real" VMs, and
+>>>> especially not in production. The behavior and effective ABI for
+>>>> software-protected VMs is unstable.
+>>>>
+>>>> This series enables mmap() support for guest_memfd specifically
+>>>> for the new software-protected VM type, only when explicitly
+>>>> enabled in the config.
+>>>
+>>> Hi!
+>>>
+>>> IIUC, in this series, there is no "private" vs "shared" distinction,
+>>> right? So all pages are mappable, and "conversion" does not exist?
 > 
-> OK, this is a very good piece of the puzzle.
+> You're right. This is a simplified version of my series that allows
+> mmaping of the new KVM_VM_TYPE_ARM_SW_PROTECTED vms to use for
+> experimentation.
 > 
-> I didn't expect context switch to interfere with this because I thought that
-> perf code won't touch LBRs if they are not in use. 
-> rdmsr/wrmsr programs don't do much except doing the instruction in the kernel space.
+> Cheers,
+> /fuad
 > 
-> Is it then possible that the the fact that LBRs were left enabled by BIOS is the
-> culprit of the problem?
+>>
+>> Ah, I spot:
+>>
+>> +#define kvm_arch_private_mem_inplace(kvm)              \
+>> +       (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE) &&        \
+>> +        ((kvm)->arch.vm_type & KVM_VM_TYPE_ARM_SW_PROTECTED))
+>>
+>> Which makes me wonder, why don't we need the same way of making sure all
+>> references/mappings are gone (+ new page type) when doing the shared ->
+>> private conversion? Or is this somewhere in here where I didn't spot it yet?
 > 
-> This particular test never enables LBRs, not anything in the system does this,
+> This is new to this series. The idea, based on a request from Patrick
+> Roy, was to have a VM in arm64 we could use to experiment with. Since
+> it allows the unconditional mmaping, it's only useful for experiments
+> or for non-confidential VMs that want to use guest_memfd.
+> 
+> This series isn't meant to replace the other one, more to supplement
+> it and facilitate experimentation while that's going.
 
-Ugh, but it does.  On writes to any LBR, including LBR_TOS, KVM creates a "virtual"
-LBR perf event.  KVM then relies on perf to context switch LBR MSRs, i.e. relies
-on perf to load the guest's values into hardware.  At least, I think that's what
-is supposed to happen.  AFAIK, the perf-based LBR support has never been properly
-document[*].
+Heh, so "kvm_arch_private_mem_inplace" in this series means "no 
+conversion at all" ? :)
 
-Anyways, my understanding of intel_pmu_handle_lbr_msrs_access() is that if the
-vCPU's LBR perf event is scheduled out or can't be created, the guest's value is
-effectively lost.  Again, I don't know the "rules" for the LBR perf event, but
-it wouldn't suprise me if your CI fails because something in the host conflicts
-with KVM's LBR perf event.
+-- 
+Cheers,
 
-[*] https://lore.kernel.org/all/Y9RUOvJ5dkCU9J8C@google.com
+David / dhildenb
+
 
