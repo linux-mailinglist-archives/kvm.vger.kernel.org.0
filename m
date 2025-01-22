@@ -1,147 +1,149 @@
-Return-Path: <kvm+bounces-36288-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36289-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B0AA1985A
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 19:21:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1DC7A19865
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 19:25:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F0987A531D
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 18:21:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B53A47A025D
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 18:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601F421578E;
-	Wed, 22 Jan 2025 18:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC5C2153F5;
+	Wed, 22 Jan 2025 18:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Md17kWya"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BLErSSFb"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2230215075
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 18:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6632153D5
+	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 18:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737570072; cv=none; b=rVPuu/C4CIQ3nUwfhiduQ9xxD0f1wxQlqs1YXEELBRZaEjAd9GY+CVci6JdQsg0fAzs09yHYH/HPl+vvpjUFaBg6eTt6tsUIuxh8qmLWkqUecTf+D4hn2n1z1GZy7JNmttnWhi6lA8k5kMjRsC4DSESY7ziOFyk5AcEz6Ux5+p0=
+	t=1737570288; cv=none; b=iy7MBlzEyAQdd1wDNeB4k1K9//g5SlXtfc7jMkvmDcBD7vRG3NnUyndPwI/2utzBq4b2W1PG24hndeBMrOfeHx9rr3Fzgsu2GjkWsyJemqWqSS0XXAAJ9Ha2SMoH7MSXCYL6QZw3Yw61QrAi34qBhY1WvEHoeD8c8pQ2rPFjUXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737570072; c=relaxed/simple;
-	bh=RWJtNyHWSTJrcUHBLparY72kk5ggigwOA+MSE9yxTKo=;
+	s=arc-20240116; t=1737570288; c=relaxed/simple;
+	bh=fDTckeX/CL1zTNJjaNBfkhP3uZYpCCy33GaBAfaxNeQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l3vphwkGM4dKiwtvEOveTEQvQGauJDhbRj9DEpqB5fUhbpZnpZij9OxnCwQj3umVep1lxf9iarMY8OD9seO/2AwJQ3LMFUonXpU+r9eTMu0d5r7PlrSZRNVQzN6yNsIWWYhvi0aDbICLc2hm30TOEA5xZa4qwWwf7dfEszuWTk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Md17kWya; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737570069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H86MfsNLg9m/tr9gIJHegKq7ZCSOC+/uCRNwxLxp3UA=;
-	b=Md17kWyaRj/kze5w02xtEgbChv78Siwg0LdYR3QFOEO5f1UlKJbGDpHxhPfunA3eS81Ox6
-	GiXi6d/lzHKcXx4pReXd08spXqy52ONDsecAwkdMtEUpFQrmxOkZgBOhVEN7suzH6NhoSd
-	Yd19QyU2aTe1AkXd2y900dg3sYmxp88=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-527-BSjOWLlpNMCip7DJarYbRw-1; Wed, 22 Jan 2025 13:21:08 -0500
-X-MC-Unique: BSjOWLlpNMCip7DJarYbRw-1
-X-Mimecast-MFC-AGG-ID: BSjOWLlpNMCip7DJarYbRw
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385e3cbf308so3129610f8f.2
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 10:21:08 -0800 (PST)
+	 To:Cc:Content-Type; b=sCSJEmFuk6S1N1v1LmtxX01DGmNiW0IA1YTxIkHJWkeGIFHXWr5ptitFjTroFfbe766Bz4Sw5JIhAJSF5ZyRi6XmI2aFQvPIeFy+LtHbPNv9geHxrDO0TnH/w4+PBwy0wGogKiv1SIRa1JIt36JjjRfNDCc25CZ/WvoowOns8zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BLErSSFb; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aaecf50578eso18367366b.2
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 10:24:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737570285; x=1738175085; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eBcKF3WDi7cpZRdTQuhnil5npY1ucs6/K2dTpV5cSVE=;
+        b=BLErSSFbPZZ6xCrWp9hndASC+bMF50+ly5JNCoW7tq4TogkuldVqM3QBuzJJJs0fxT
+         JtS8WzmauHHbE3rEPA0pe9cJGpDEsiBOoRE/Jog9/3Er1XN8SDJ3gyVQSklyJtAPjdXL
+         /Hv1cTnXEA95B0H4pW/amvEUj1orC0hb5ll2jNTJkcEtxsufID4MMBrtmM0w5vsJwR/j
+         xEPUb119HtfCOkCb5cgjpRav9HBctZmq50eD7twjmu5mwsb2SJMI5X+riSa9OfqqXANO
+         wCocZD/vHKtZtQoj5la84XRnhI+iiod2tOz00JFRwC5p1VVs5nLiy38cVa9prmNrvgA5
+         /uOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737570067; x=1738174867;
+        d=1e100.net; s=20230601; t=1737570285; x=1738175085;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=H86MfsNLg9m/tr9gIJHegKq7ZCSOC+/uCRNwxLxp3UA=;
-        b=X5hcdC1cRLX1ZuefwTADwGHollqLHY+KH5h0M0hcEsUmhzSF581EjAYrQXC5bjDpIo
-         D1a2b5YAqqDG54/uTth2pI9qQ4YKbLtlv7xbTTTnUrz1XqyQapqgB9ZB5i9Q8IKiGN/1
-         Kr84O/kQmh5nKoKVKSJjwzKi6NvRelsBmTFO7AbLsS0djBURnxPsns7R8xbggDFLam6P
-         vNBvFpoBwKN2y5X2++7BICXblnczNF9JHtg+HOSdCsRF2Vc8ocbZe0c4LzYd2X7dOJMx
-         pw4YjgJatoFB5RJi1vUkmKQS7eeZVYOdk87OSQoenaNAioPHNto/1hQZqdriR+Zmagm+
-         rnWg==
-X-Forwarded-Encrypted: i=1; AJvYcCX8uSB6Ztku6wNurMw3jpG+naR7B1mXliQkNj0tzLwJQK8joM7gZ2fcZKOd67jsNZN+ZeQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkeC5IEW5mzZwXihSO73j6p/Q/0HSXwijesJQJCtqj9eNk2HZj
-	7cIdJ8MzuyrMEGUlie94zz9JXZDxVASVYkXp6JXaqcaWObabjFIiREQUEg65+cX1C1M9kLPhK2e
-	ezUEzKzKEsZ5CK3Afu+Lvg9OAOwzrGZZ1u80vO/38pWJTOtMZPO51iFcBA6NXVca6f/Iw6/+Pm/
-	MADtpLUIkrzQnPFWLmTIEO/D6j
-X-Gm-Gg: ASbGncuzBhJ6EQnLVzBNCoozoHtPrUQ96tfyfo6D6mtaHyALi4lf1xkWBnwUasREFxY
-	2M9CVa1N3Fb2pEvqB5b0m4gTfYtv74xIKw7WmvLFsH8Hyjn03qv0W
-X-Received: by 2002:a05:6000:4012:b0:38a:9f27:838c with SMTP id ffacd0b85a97d-38bf57ce8b8mr20271613f8f.55.1737570067226;
-        Wed, 22 Jan 2025 10:21:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHMB9ElCjkyF+3dY60dIilgdLnzIUur2JDlSFqE/fAqKKrX1IrsejUFGblCwxGYRx37VWXUOveYDSSQZvDVXko=
-X-Received: by 2002:a05:6000:4012:b0:38a:9f27:838c with SMTP id
- ffacd0b85a97d-38bf57ce8b8mr20271593f8f.55.1737570066841; Wed, 22 Jan 2025
- 10:21:06 -0800 (PST)
+        bh=eBcKF3WDi7cpZRdTQuhnil5npY1ucs6/K2dTpV5cSVE=;
+        b=GrwiGYJSF9YNgvvTJvYBMoh23CNjx1inwZdVf8o59gPMPzUctg7vTfPe8+QO/KRCZ7
+         3xGKsmQrjWpw9GhZhhUZdrzI5U6AFRQMaamGrircRgJ/jQZJbu1yDA4QLczvvlNk5QZ0
+         Bn101fpq+tj8gMxSQRl+sdz16l3Vf/vtlhoJZHDldbVHfPqQK7UQO8gspyTnCI7s9zoF
+         QTSQaTZ57c7uhVpUabhoTJJwA+A8dQL6nSp0hU5aFHO2engbgRTMRPpM/77QUuIaXf5D
+         1zZes1rwEYmoonMSAxHhSkRrKTWYOOc4AM6GCaUPP+ZUKPuhlU8WsbzpcQc8fbOMyfrr
+         gwqA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHLPJeftoc5EILlwkzSXnLCrhRTKKCUt40i/6oYP2t6BmNSV5oOoVHJ5v3/NEYZmpiGjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLNTRNToVur4QuE7br1pZ+ptYXSFnm8TFAVxhpuXaXl3iu27Rk
+	i6ePFpJntfIi06QDozkayDMwyJDAgt8dk9vyfYcAbP8fIFeLZViPUkSiKx3nsmmVymsPg1MI+hR
+	nfkGzo5F+vX9h+Y9KSCWicU1C40ebelEaMhw=
+X-Gm-Gg: ASbGncs8hqIPFbrI9e4ecmHl1nvdZBP34+ljYzZvifZgwsNrdvK/MFjOatSct4qsget
+	TxPsxRaSJyfKt9R99b0lSvq71BPpifgc5vGMId60r4AFFy/6hgn2u/WK48QjejIi9bebyFDPrz9
+	ys/2ts
+X-Google-Smtp-Source: AGHT+IEzUkcgan8AwVnGF8RuNwIIoZjQ+k7oV6MdkuH4bMn2lkY/6rWxDiDg2qfigx4q6lH7C/ouueU9mIoooOIfDtk=
+X-Received: by 2002:a17:907:3e8f:b0:aae:85a9:e2d with SMTP id
+ a640c23a62f3a-ab38b381397mr2159854566b.45.1737570285188; Wed, 22 Jan 2025
+ 10:24:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241222193445.349800-1-pbonzini@redhat.com> <20241222193445.349800-10-pbonzini@redhat.com>
- <Z4r-Znz1GQ2E1vMX@google.com>
-In-Reply-To: <Z4r-Znz1GQ2E1vMX@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 22 Jan 2025 19:20:55 +0100
-X-Gm-Features: AWEUYZkWYTVxW12MMlPHt2DY4n0z9m4X3MzBD8NoHOMQfOmHP83_WCJ5x1_X_tA
-Message-ID: <CABgObfZBGGcj5pYsNpzwLShxLg8nxOdaQNnouRicFudxXZudxg@mail.gmail.com>
-Subject: Re: [PATCH v6 09/18] KVM: x86/tdp_mmu: Extract root invalid check
- from tdx_mmu_next_root()
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, yan.y.zhao@intel.com, 
-	isaku.yamahata@intel.com, binbin.wu@linux.intel.com, 
-	rick.p.edgecombe@intel.com
+References: <CANDhNCq5_F3HfFYABqFGCA1bPd_+xgNj-iDQhH4tDk+wi8iZZg@mail.gmail.com>
+ <CABgObfbWqcorZC+1Hjh7SQtn69LE-Wng-wBKOq=tqh00_3R6dw@mail.gmail.com> <CALMp9eTcsDcnm2cqWW-tjLJEXb5PeoLUr-Pk=0oOH=_3oowREg@mail.gmail.com>
+In-Reply-To: <CALMp9eTcsDcnm2cqWW-tjLJEXb5PeoLUr-Pk=0oOH=_3oowREg@mail.gmail.com>
+From: John Stultz <jstultz@google.com>
+Date: Wed, 22 Jan 2025 10:24:33 -0800
+X-Gm-Features: AbW1kvY3nFcAyHPkFYzrkMdO4P5yXrTKK6bHtoX_Slr6GUVI7h-ZNIgi-Lw_rfQ
+Message-ID: <CANDhNCoFQXAGT9D=oRefjmAEU=LFVa4Y8-0+peJwiSMf1DuyeA@mail.gmail.com>
+Subject: Re: BUG: Occasional unexpected DR6 value seen with nested
+ virtualization on x86
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, kvm <kvm@vger.kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Frederic Weisbecker <fweisbec@gmail.com>, 
+	Andy Lutomirski <luto@kernel.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, LKML <linux-kernel@vger.kernel.org>, 
+	"Team, Android" <kernel-team@android.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 18, 2025 at 2:05=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
-> > +static bool tdp_mmu_root_match(struct kvm_mmu_page *root, bool only_va=
-lid)
-> > +{
-> > +     if (only_valid && root->role.invalid)
-> > +             return false;
-> > +
-> > +     return true;
+On Wed, Jan 22, 2025 at 8:56=E2=80=AFAM Jim Mattson <jmattson@google.com> w=
+rote:
 >
-> Ugh, this is almost as bad as
+> On Wed, Jan 22, 2025 at 1:01=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.co=
+m> wrote:
+> >
+> > Il mer 22 gen 2025, 07:07 John Stultz <jstultz@google.com> ha scritto:
+> > >
+> > > I then cut down and ported the bionic test out so it could build unde=
+r
+> > > a standard debian environment:
+> > > https://github.com/johnstultz-work/bionic-ptrace-reproducer
+> > >
+> > > Where I was able to reproduce the same problem in a debian VM (after
+> > > running the test in a loop for a short while).
+> >
+> >
+> > Thanks, that's nice to have.
+> >
+> > > Now, here's where it is odd. I could *not* reproduce the problem on
+> > > bare metal hardware, *nor* could I reproduce the problem in a virtual
+> > > environment.  I can *only* reproduce the problem with nested
+> > > virtualization (running the VM inside a VM).
+> >
+> > Typically in that case the best thing to do is turn it into a
+> > kvm-unit-test or selftest (though that's often an endeavor of its own,
+> > as it requires distilling the Linux kernel and userspace code into a
+> > guest that runs without an OS). But what you've done is already a good
+> > step.
 >
->         if (x)
->                 return true;
->
->         return false;
->
-> Just do
->
->         return !only_valid || root->role.invalid;
->
-> And I vote to drop the helper, "match" makes me think about things like r=
-oles
-> and addresses, not just if a root is valid.
+> Just run the kvm-unit-tests 'x86/debug' test in a loop inside an L1
+> VM. It will eventually fail. Maybe not the same bug, but we can hope.
+> :)
 
-This is not the definitive shape of the function; by the end of the
-series it becomes
+Thanks Jim,
 
-static bool tdp_mmu_root_match(struct kvm_mmu_page *root,
-                               enum kvm_tdp_mmu_root_types types)
-{
-        if (WARN_ON_ONCE(!(types & KVM_VALID_ROOTS)))
-                return false;
+I've just reproduced this as well, after running the debug test in a
+loop.  The one odd bit is that it's not always the same subtest that
+fails.
 
-        if (root->role.invalid && !(types & KVM_INVALID_ROOTS))
-                return false;
+I've seen:
+FAIL: Single-step #DB w/ STI blocking
+FAIL: Usermode Single-step #DB w/ STI blocking
+FAIL: Single-step #DB on emulated instructions
+FAIL: Single-step #DB w/ MOVSS blocking
+FAIL: Usermode Single-step #DB basic test
+FAIL: Single-step #DB w/ MOVSS blocking and DR7.GD=3D1
+FAIL: hw breakpoint (test that dr6.BS is not cleared)
 
-        if (likely(!is_mirror_sp(root)))
-                return types & KVM_DIRECT_ROOTS;
-        return types & KVM_MIRROR_ROOTS;
-}
+So yeah, hopefully all the same bug? :)
 
-(where the first "if" could also be just a WARN_ON_ONCE without the
-anticipated return, since KVM_VALID_ROOTS =3D=3D KVM_DIRECT_ROOTS |
-KVM_MIRROR_ROOTS)
-
-Paolo
-
+thanks
+-john
 
