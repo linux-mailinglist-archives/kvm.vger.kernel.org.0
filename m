@@ -1,204 +1,170 @@
-Return-Path: <kvm+bounces-36282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1413A1974D
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 18:16:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1693A1975B
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 18:17:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AE907A289E
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 17:16:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D0BC188A73F
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 17:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB11215175;
-	Wed, 22 Jan 2025 17:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B6A2153C4;
+	Wed, 22 Jan 2025 17:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tyl3XfqW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="beuzzy0x"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A725C17B402
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 17:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63763215177
+	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 17:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737566178; cv=none; b=L0dwK5x3Odn6lPZ9jGd3uD6piiw5XI32dtRtFuh8yXGGpBOu98r+BRQzYLPTyyUXiBPTt8OM4mZX6FTmj8zdRokplkCBaKS0ENr2aC3veMjFIw4bPcJAqXXJZ8ZuSEZiPGdV7/wzpPuXnzmXYkOanipwr1xM6GtT59fXMfR9y7w=
+	t=1737566234; cv=none; b=cXx27Cm2rIgSZgyal+e2dlgCLhG8XceYPFV8vvKLJ+bLCpDwvi9ef3HeHn5i1g6p3blUl9hzyg2El8Z/3nAEYUdYEqbaE2qbDS5fNi3uwv4XRm6Rh568NV5WGoGXO91AAhOlsBJGpMklpmyZvhBEi2+FdCdf9EEcbf6fiuEFn+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737566178; c=relaxed/simple;
-	bh=5CaSZ86XliYCY/hGkfA5agti5alWmrTCQ9JcxO66VkY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LlSIuYaU6OoEVaouJj+iEErkr2/GtPDcH36o4NsvZzkj0PhHUFfNSJG0GU7foIRrArUubAZVCUqyCt50tKQZj7jBqMCiINcUDdgxY/Q3mBIrRzJkZ0pWMQVcKg5BV/vHLkvHuKbMCeTrOOB/oN1bFmBsTo8KUizbI0hNmKrDePU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tyl3XfqW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737566175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yPo2YX5U30tjOL8/8CRlgmVxLk8wf8Vmgnuycw1vH90=;
-	b=Tyl3XfqW9TyUvVc2qAAdllRNiC0mao4/4oIARaa3adAtWWErMk7TQm6BsJtopoo718EZXo
-	LDS7K408thlRyQNSkNNmSJi/OvCcQ24XijIMMWHoZThIoXWPwsjqxmsaKWeCkrpr/UcDyS
-	W8p/jd2dQbU9dsqFR7/GbzR6zchrWEo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-70-9bOk0z52My-4KcSNZv9t_Q-1; Wed, 22 Jan 2025 12:16:14 -0500
-X-MC-Unique: 9bOk0z52My-4KcSNZv9t_Q-1
-X-Mimecast-MFC-AGG-ID: 9bOk0z52My-4KcSNZv9t_Q
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4361d4e8359so54463015e9.3
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 09:16:12 -0800 (PST)
+	s=arc-20240116; t=1737566234; c=relaxed/simple;
+	bh=rFayQj9wRWaR8CO88HMKY/zcB290HuL2TiHKlw5kpQo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u1W5KlbTC2YpAEXfUFhlvMXRezDQu/iAyzbm25I2Ucmyumn3DxpO5O+biNylp13tSi5wdw1Mu/Dqf+sxMOKLSvSACquhXuBgJGOgocByjjtO1QKFxamkAGY2yUiBn/N5vWCs8d9iQTr6eQozhmlFSgjLu9uvQanpwBv+AAtbirM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=beuzzy0x; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4679b5c66d0so314861cf.1
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 09:17:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737566232; x=1738171032; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QXocUQde967szk4UDZKkGbUbU0LoSzeIYIApGnat/VQ=;
+        b=beuzzy0xYA3AAxpSCzHSvofgjKz29wm/fMv8rWArIFWmVqf7384211Py5iBnRCWLkd
+         9WwIkaHbOoD6ubqsAbZYiWo63SxYnrVJnrxRTZ9s/Wy43NSdsSsAidJXYA6YMRL3lkw/
+         4mSTRn/XGE8L1XroVb/DpOzuSMf+uPG8EtaKbljKZBhUaAfcriaKE6efcaKflbAp8ouc
+         zaL5ODw0fA9cPksc4BQ3V4q963oXrqQam5zR/c/xuduVFt9HZG8jrfgxwd5yadBx+kow
+         6JG7fcJjE3KWfXIIMeCr/1EqW/p1eInGo+0Il2e+aOF/7twhH5zk3FSceBXIHEltXukD
+         YKGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737566172; x=1738170972;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yPo2YX5U30tjOL8/8CRlgmVxLk8wf8Vmgnuycw1vH90=;
-        b=WoBsfxFKWQZLNVek6a3DrNuH8joO3XRR6AuaLpZIkeoG7KdubOBlF0I/dHWRKbJ0HF
-         sXheYxWWa9lDmok1o366vN6TCkAvbRibW3o7HKLljc1qW2yVSi/5C8nflbHV2HCpp31i
-         uJCuvRRmXeykAxdMdwhheJ4A8m14GkJqWzJZoAd4aTRe7jffItTWfccAcQiOoWEI5w2j
-         QgQ6qYFtitsC3wv1UEC3emiUTi4VN93JJiKVoN1vGGHDwSJryKCxxf2oAkLv6yqRcwqF
-         dIxtnbkGBZ9pRwttgEdYWoR7qcbawBI7KDiWUXWH7YhFprR4sdJ/vi2d9m1v7WcHYvaF
-         k+6A==
-X-Forwarded-Encrypted: i=1; AJvYcCU+T4c6KzDcap9wb1ykRwN0hN+pbTIiu3LHjgQHWYjkkI6xYihikhDZQQV+3LIZDY00KP4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjcEpxsqjIZRLsqca+IRIpCPXuOkyqnjZwGomQVN3xI/e4CMri
-	bK/WyFZ4Vijo5EP1NqSvHSEnApiuHYA37NQtX7UeZwg6yiDVa1YdNkPemRtD0TnvbuCjOpMKSKZ
-	+kHg6GOEmiv9c//QmCxa3JyqB7pElaT7XkxX6StCVapUqDWx/Vw==
-X-Gm-Gg: ASbGncv2vSPxfFIdQtVDYjQHxfw4AsVCpt5PCOh8wMjGbenzo09uPcaS8+rDOytwNvc
-	Z2LnjgDg+brUe73q2Hr+Bn5tEisRB/d/akQxDCqZWu02dx6PsODE8j35yr3EouJrh5oeoZc+tdY
-	ekensMiS/FQu7U/pIOE5YOQsrDnCN2SYSfqS+NAc5KzMg8vljshcdiOtdU9nnuCmrbB30L+1str
-	vSMTpmljOFx9VgSh40W9tS0TMddRP6LJgTr23S/agYh5CjMxUtwwzzVBO56huYT
-X-Received: by 2002:a05:6000:186f:b0:385:ec6e:e87a with SMTP id ffacd0b85a97d-38bf57b75efmr22167788f8f.43.1737566171820;
-        Wed, 22 Jan 2025 09:16:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEoLWkRfIfVCl1uZMiwftX37+pLjDux++uYs2j2gAOfhA8OOXt+vrKiOd7G9Fcjm/FM8VZllg==
-X-Received: by 2002:a05:6000:186f:b0:385:ec6e:e87a with SMTP id ffacd0b85a97d-38bf57b75efmr22167756f8f.43.1737566171415;
-        Wed, 22 Jan 2025 09:16:11 -0800 (PST)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf322ad74sm17066506f8f.56.2025.01.22.09.16.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 09:16:10 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Fred Griffoul <fgriffo@amazon.co.uk>, kvm@vger.kernel.org
-Cc: Fred Griffoul <fgriffo@amazon.co.uk>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>,
- Paul Durrant <paul@xen.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
-In-Reply-To: <20250122161612.20981-1-fgriffo@amazon.co.uk>
-References: <20250122161612.20981-1-fgriffo@amazon.co.uk>
-Date: Wed, 22 Jan 2025 18:16:09 +0100
-Message-ID: <87tt9q7orq.fsf@redhat.com>
+        d=1e100.net; s=20230601; t=1737566232; x=1738171032;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QXocUQde967szk4UDZKkGbUbU0LoSzeIYIApGnat/VQ=;
+        b=JClhauTj744V9rhO4hl0n84yCf7s/Fg5JCZx0ZW5sgs7UJwWb6LkRPBK1Zs45ZZE2o
+         imlzt3Yc6I5wUgktL5fsmWbA4TDB2rUnkxs5+QGQkh7CGSyp1FCYa4gj2Jk6sdBXta+f
+         ab9v9eC7g7VTTp6EN60nq3V8DJYR992UbUMbQ7c58+FHIv/kgjouYGuBuR/Zu0vq9RFt
+         CDpbKBI4px4M9dXKKp//yfJz6VOXHv3CeDncLxHGhefQ4EQq+xEeGUwOFzShQzoxSdHa
+         ts8k/YxEw1dNpg8jX1fP+kuZVu/1TLYF5QrlI29lbJVr+lkptcaptILyX/RjXEt9dymF
+         XX5g==
+X-Gm-Message-State: AOJu0YyngzGPcm59vXrkUfWrE39cJZwOQLWyNtkKHCXZQUeT/Mbhc4N+
+	LdGLalYJa96VjzW8SaTybMicS3AwNM/U7PRfDD1tLImfp9qlf6XongTwuojc4jufTxElu9Yewil
+	Rwi8Utacs1WDUMWlwtVrRaQoGhEBZxhlA0/u1
+X-Gm-Gg: ASbGncsglte5nXsoWNTRQrGEPivEtPOf/TUIHTzddKT6Q9h9+7UmA1dj32s8W3IiY+p
+	VjkGcBoTBdu9I7m3hoBsC0NPvLc+KyNo/A6zdVkv1ZzFXCs3UAQ==
+X-Google-Smtp-Source: AGHT+IEQsOWG2CkfKJ5UyjyXVqUUaT5f122S2WjK08hXSlhtFa/31FlP+R15S32f6Ry3deFJL8wt7Zw3P8vlYMOWh9A=
+X-Received: by 2002:ac8:5891:0:b0:467:8416:d99e with SMTP id
+ d75a77b69052e-46e51478e5dmr3961311cf.21.1737566231990; Wed, 22 Jan 2025
+ 09:17:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20250122152738.1173160-1-tabba@google.com> <c15c84f2-bf19-4a62-91b8-03eefd0c1c89@redhat.com>
+ <03bbcd00-bd5e-47de-8b20-31636e361f52@redhat.com>
+In-Reply-To: <03bbcd00-bd5e-47de-8b20-31636e361f52@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 22 Jan 2025 17:16:35 +0000
+X-Gm-Features: AWEUYZkG3SbCfMQ8gaycX4XPR7s2V8NDn4-WP1692u2hJ8637NJ27roODZTv50s
+Message-ID: <CA+EHjTyGgs_Sp0b6OqeS7oVskhVG+S1cHhVRb5Z6mPAwGwmqFA@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 0/9] KVM: Mapping of guest_memfd at the host and a
+ software protected VM type
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Fred Griffoul <fgriffo@amazon.co.uk> writes:
+Hi David,
 
-> Previous commit ee3a5f9e3d9b ("KVM: x86: Do runtime CPUID update before
-> updating vcpu->arch.cpuid_entries") implemented CPUID data mangling in
-> KVM_SET_CPUID2 support before verifying that no changes occur on running
-> vCPUs. However, it overlooked the CPUID leaves that are modified by
-> KVM's Xen emulation.
+On Wed, 22 Jan 2025 at 15:41, David Hildenbrand <david@redhat.com> wrote:
 >
-> Fix this by calling a Xen update function when mangling CPUID data.
+> On 22.01.25 16:35, David Hildenbrand wrote:
+> > On 22.01.25 16:27, Fuad Tabba wrote:
+> >> The purpose of this series is to serve as a potential base for
+> >> restricted mmap() support for guest_memfd [1]. It would allow
+> >> experimentation with what that support would be like, in the safe
+> >> environment of a new VM type used for testing.
+> >>
+> >> This series adds a new VM type for arm64,
+> >> KVM_VM_TYPE_ARM_SW_PROTECTED, analogous to the x86
+> >> KVM_X86_SW_PROTECTED_VM. This type is to serve as a development
+> >> and testing vehicle for Confidential (CoCo) VMs.
+> >>
+> >> Similar to the x86 type, this is currently only for development
+> >> and testing. It's not meant to be used for "real" VMs, and
+> >> especially not in production. The behavior and effective ABI for
+> >> software-protected VMs is unstable.
+> >>
+> >> This series enables mmap() support for guest_memfd specifically
+> >> for the new software-protected VM type, only when explicitly
+> >> enabled in the config.
+> >
+> > Hi!
+> >
+> > IIUC, in this series, there is no "private" vs "shared" distinction,
+> > right? So all pages are mappable, and "conversion" does not exist?
+
+You're right. This is a simplified version of my series that allows
+mmaping of the new KVM_VM_TYPE_ARM_SW_PROTECTED vms to use for
+experimentation.
+
+Cheers,
+/fuad
+
 >
-> Fixes: ee3a5f9e3d9b ("KVM: x86: Do runtime CPUID update before
-> updating vcpu->arch.cpuid_entries")
-
-Well, kvm_xen_update_tsc_info() was added with
-
-commit f422f853af0369be27d2a9f1b20079f2bc3d1ca2
-Author: Paul Durrant <pdurrant@amazon.com>
-Date:   Fri Jan 6 10:36:00 2023 +0000
-
-    KVM: x86/xen: update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present
-
-and the commit you mention in 'Fixes' is older:
-
-commit ee3a5f9e3d9bf94159f3cc80da542fbe83502dd8
-Author: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date:   Mon Jan 17 16:05:39 2022 +0100
-
-    KVM: x86: Do runtime CPUID update before updating vcpu->arch.cpuid_entries
-
-so I guess we should be 'Fixing' f422f853af03 instead :-)
-
-> Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
-> ---
->  arch/x86/kvm/cpuid.c | 1 +
->  arch/x86/kvm/xen.c   | 5 +++++
->  arch/x86/kvm/xen.h   | 5 +++++
->  3 files changed, 11 insertions(+)
+> Ah, I spot:
 >
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index edef30359c19..432d8e9e1bab 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -212,6 +212,7 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2
->  	 */
->  	kvm_update_cpuid_runtime(vcpu);
->  	kvm_apply_cpuid_pv_features_quirk(vcpu);
-> +	kvm_xen_update_cpuid_runtime(vcpu);
+> +#define kvm_arch_private_mem_inplace(kvm)              \
+> +       (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE) &&        \
+> +        ((kvm)->arch.vm_type & KVM_VM_TYPE_ARM_SW_PROTECTED))
+>
+> Which makes me wonder, why don't we need the same way of making sure all
+> references/mappings are gone (+ new page type) when doing the shared ->
+> private conversion? Or is this somewhere in here where I didn't spot it yet?
 
-This one is weird as we update it in runtime (kvm_guest_time_update())
-and values may change when we e.g. migrate the guest. First, I do not
-understand how the guest is supposed to notice the change as CPUID data
-is normally considered static. Second, I do not see how the VMM is
-supposed to track it as if it tries to supply some different data for
-these Xen leaves, kvm_cpuid_check_equal() will still fail.
+This is new to this series. The idea, based on a request from Patrick
+Roy, was to have a VM in arm64 we could use to experiment with. Since
+it allows the unconditional mmaping, it's only useful for experiments
+or for non-confidential VMs that want to use guest_memfd.
 
-Would it make more sense to just ignore these Xen CPUID leaves with TSC
-information when we do the comparison?
+This series isn't meant to replace the other one, more to supplement
+it and facilitate experimentation while that's going.
 
->  
->  	if (nent != vcpu->arch.cpuid_nent)
->  		return -EINVAL;
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index a909b817b9c0..219f9a9a92be 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -2270,6 +2270,11 @@ void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
->  		entry->eax = vcpu->arch.hw_tsc_khz;
->  }
->  
-> +void kvm_xen_update_cpuid_runtime(struct kvm_vcpu *vcpu)
-> +{
-> +	kvm_xen_update_tsc_info(vcpu);
-> +}
-> +
->  void kvm_xen_init_vm(struct kvm *kvm)
->  {
->  	mutex_init(&kvm->arch.xen.xen_lock);
-> diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-> index f5841d9000ae..d3182b0ab7e3 100644
-> --- a/arch/x86/kvm/xen.h
-> +++ b/arch/x86/kvm/xen.h
-> @@ -36,6 +36,7 @@ int kvm_xen_setup_evtchn(struct kvm *kvm,
->  			 struct kvm_kernel_irq_routing_entry *e,
->  			 const struct kvm_irq_routing_entry *ue);
->  void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
-> +void kvm_xen_update_cpuid_runtime(struct kvm_vcpu *vcpu);
->  
->  static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
->  {
-> @@ -160,6 +161,10 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
->  static inline void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
->  {
->  }
-> +
-> +static inline void kvm_xen_update_cpuid_runtime(struct kvm_vcpu *vcpu)
-> +{
-> +}
->  #endif
->  
->  int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+Cheers,
+/fuad
 
--- 
-Vitaly
-
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
