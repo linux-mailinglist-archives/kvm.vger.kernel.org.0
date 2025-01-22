@@ -1,244 +1,175 @@
-Return-Path: <kvm+bounces-36276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86CB3A196A4
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 17:37:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF26A196C7
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 17:43:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF3021643A1
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 16:37:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64A41188DCA0
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 16:43:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57974215166;
-	Wed, 22 Jan 2025 16:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCC4215074;
+	Wed, 22 Jan 2025 16:43:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+RD8U/T"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LYVa0uMO"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A562147F0
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 16:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4702A215048
+	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 16:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737563815; cv=none; b=f9UEi0KFoE/g3ImWdZxDZ2jqr58sbHyJ29hE5k2zdE06oY67z214VwjvXE/auocyUz8KloEbBgm5FWUM6ZwsRjoAnny3eorQGFXb73vOFQgdoNmk9BWxyMRzO6Twyc96SGScaGyjnsx+k/iYwF9zgvJnRWUSt9LqE8WF8wkN9bM=
+	t=1737564188; cv=none; b=Z2P/fbB8rq7YlTi2Q9IkIuy0EXE9soRAVSnkldFe4Bdugncc2AjqW8sRlwbndNYfzg6DruiQjBt6HycAy/kZ8qJ8eGNF88dSrATzdNxbRYvsZd3vzX0vsLpJh2Rv2uNGCTHltqAfjUFaGnlEELYm8gHg3qZyvPE6wGElorhRsWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737563815; c=relaxed/simple;
-	bh=bF1/M7+QtTc4d1f/oQT6ljNfgA3tp39zCQEonkjGnxg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J8AV3oDoIt+JmZtahcAUxQ4YYmgmtHEPP0o2WH3kxs0+51ExTe6/K5R9E5F5J2IjIpeWgLIYENBndfLa87xZfrVeyOPR5g1BjZ312rL5VHHy6tvwOZWQ9ZUsomR84SQUZrVhxj/llyV3I2HP7FsxOrO61dF0JUDfG9D3C5Ui2Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y+RD8U/T; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1737564188; c=relaxed/simple;
+	bh=yWi4FXbD11PvYaHHMRAHbvxxV68FSQtTNOXx5gSMVHo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nFssOeur2t2XnOr4FZGR1TUjPS7OHyYnTfQTU7G4gecca6ycopuQJYqxmwxPcGTv0QROmgxL2RKz3xHyubuZo4i20AYgafHx9Bnhoy7xmkc3rVC3+ScR/HnExXvVnC5aLOg75levg1NAdBIFKXBTk+S7DK3Qa/gQFD/xvnjaYdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LYVa0uMO; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737563812;
+	s=mimecast20190719; t=1737564186;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6uwv6oUI+K7hg2DZpgsM9xyiOHyPUQuUW9kepSMaYec=;
-	b=Y+RD8U/TwqlFceoN/gk2omvqde+1JnBVkGbV+eRuyHkG4tHJsWv5rvUz6M60IVcyYFoABl
-	YJlqaonvUfHBOVWkxZdF/gmvuV/Wrct7OJrNWW7jcYXjD/OwPzYPJftJXAIAxzo1EptCtU
-	B25gCqTFexJe5nRfxEquqhKqcrjH42o=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3y0fMZSE7a+ty4qcm/cQWGtpuEjSKpLOhWLAcuXU2f0=;
+	b=LYVa0uMOeruWKGr4VIHW0uEvmLut/1P554HlzZCAHeyAuXN1C7lF+o62ABTf+atih1XTT3
+	CE9VHuou5FXdV6Z74UoaDeVIna55cEWtUw6MXom9KeuBEtgF42fwQTJFAy16xehKWD4Zsq
+	BGrygCuNPkJ4/BA+BkEVqY17HF/yHzc=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-482-zg0jW0PUPtmBft_8mvFAAw-1; Wed, 22 Jan 2025 11:36:49 -0500
-X-MC-Unique: zg0jW0PUPtmBft_8mvFAAw-1
-X-Mimecast-MFC-AGG-ID: zg0jW0PUPtmBft_8mvFAAw
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6d884999693so233696d6.0
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 08:36:49 -0800 (PST)
+ us-mta-494-x6PHo_mnOeCMQS7U0D9KOg-1; Wed, 22 Jan 2025 11:43:04 -0500
+X-MC-Unique: x6PHo_mnOeCMQS7U0D9KOg-1
+X-Mimecast-MFC-AGG-ID: x6PHo_mnOeCMQS7U0D9KOg
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4675749a982so121065811cf.1
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 08:43:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737563809; x=1738168609;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6uwv6oUI+K7hg2DZpgsM9xyiOHyPUQuUW9kepSMaYec=;
-        b=GCveXi8GzUe057pvK7uNpYMt416vawKvJO2/wjKt35D4XmfUrRgaEYNpfO5z1kATHj
-         cjP3u6sItIkc0UVeSBf5jltXgpEJ83uMcT0prUiOyZpxhReUz99CaRQrYD1SRdiq0/ue
-         1I9bP1uwg4V+ijEU02qe8Q1hnwlbbp2RppNqmhsf5GdKVYydFtXQz1D4iNxpQEGd4yju
-         jarYYlELiXVrw5O4eAgYTeuCsOd4aeF8JJEdsrK9Upgw/FXpapA2gaQQH6iVyUKMNCDy
-         Ec7DdVbJDURedbcSR8s2xhTm34KYo6cvmX5IlrbteLgwaTZhY8Hf7eZthlo8dU3VQRfn
-         6DOA==
-X-Gm-Message-State: AOJu0YyoElC7fN3t3LtLXu2NFdXCyDZHvfhLKFVreXEJixxmQcrBkONT
-	nXOZNiqiAwTvVqAbvwA1bMrRw5atFyp2DL5Nqzk47R131Q11SOwW/0n2vctWHxJbTZ5O9SYIrN8
-	LNl8bbA8sfKy0gbfIqGV5E4c9cjDodk6oZwOua1ZGXOywmZjKBg==
-X-Gm-Gg: ASbGncu4nxMNyyZZAugYmH1z9g7FJkoEtSPp/Sm2ROBDneR2QZxX+ueINj19uz746+r
-	04tOamh5Y6sShESo1zjHQWyk6YLGB8MdfVsOeKZPutVp+Qy2YZEg2bv43lOO2S2kCdCA9Z4ksxa
-	TZSNAjU8ATN0AjXPj90upCMHjRIRMvGDrHgmFDRFnb6laXbz5HbyCWKCtx/kvIODQcroTasQZfR
-	NjSN0YJWTE3t3s76xrBNMwFZflBbn7ivsyqmA/pNcy5f+mwxojnXfuLqwQTsvf3haJAxw==
-X-Received: by 2002:a05:6214:408:b0:6d8:9b20:64e8 with SMTP id 6a1803df08f44-6e1b2172e5amr410864336d6.10.1737563808283;
-        Wed, 22 Jan 2025 08:36:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGKBIv547V44IDQlj8LC6hdSs+dY7ysIRth8GtUW1IbIBSmO1B2euImtO7Cy/s3dnqm6bNg6g==
-X-Received: by 2002:a05:6214:408:b0:6d8:9b20:64e8 with SMTP id 6a1803df08f44-6e1b2172e5amr410864006d6.10.1737563807834;
-        Wed, 22 Jan 2025 08:36:47 -0800 (PST)
-Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afce4695sm62579726d6.104.2025.01.22.08.36.47
+        d=1e100.net; s=20230601; t=1737564184; x=1738168984;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3y0fMZSE7a+ty4qcm/cQWGtpuEjSKpLOhWLAcuXU2f0=;
+        b=szpktO4Ccyan1AHuPakudwVmrbIeo0MlejZfvFcQVapg6NOLP5ukSjfsQrLI4ryOxU
+         M0uFkHzG0Q2he19m3Oijk+ebpePI5SZsuFc8Z2vPItbiiJZ/YH56uVob5H8vLeWohmt+
+         OWJBsfZkJeZV4K6PIH3DyByus8YnLlFe9kWcEjTScFdLHwQQu+RdBdlvD6VeLIb7rxZi
+         XnRk0gC7jpYt9l4Td2xj1t4luSgXuFFQh7HZXD+21gOB5pe6ejRzhf/jZmmmeph2M0n7
+         FyUDWYTrOxElrYXdHmkRH/H6EbESAN656VB8fkqGZodtpsC+SrCPEVF+Bz3rK+aResql
+         xtqg==
+X-Forwarded-Encrypted: i=1; AJvYcCVWVixh941SGJTdEZk+qswon9XHWNAsTiCx6UG1f6eZT4fm4XFM7mPSupq3l4zZL14BdaA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjOSUPiZU3O69o/l/a1XLGwD0wQCg2KfPtNwirjDo2qWtsiHN3
+	bes2QwXoqn5KaQDv8jMfG3FsNbvBQsFkoB8DURpBFy9sLRX4qNBa5y1wRovnR3tI1z6IhpAZnp7
+	xGfKMuLercKJXhEZtwFnQ3WwLytkz0C7bp3MJulUrwE+lCSZr6w==
+X-Gm-Gg: ASbGncubsKqbFAwuo2/i6MH+62KXrzOO/xypzXc1J6/1MrZmwfhQ+LrsPK3t6QONetw
+	4el6p0ddxuZZYgKVjaCLIv1RuiL6aXNC9pAFj2jxc1266ekwgGhd7lhVGH0EA5B+hge3JsTwoEk
+	yOChY9J5gv7ZjV9hvyVMvHPNT1TCRRT2/Gx/eCzuwnhHCTHTtOfVgLreEu/p0pvx8tmbN6wiG7a
+	QCipp7PJiZkMDFW96vwwmHKjJy0Xzlw0EHLcoDvvKOek8qGfffXBa9CWPOQmUkNcw/nEF8CZ9lp
+	Ao7m0hG2PXgnsQmmjiVw3zhw5BqbxSE=
+X-Received: by 2002:ac8:7f83:0:b0:467:681c:425f with SMTP id d75a77b69052e-46e12a1e89amr335229501cf.4.1737564184264;
+        Wed, 22 Jan 2025 08:43:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IETxltspJm2hV7oT91UaMx+gaN/Hy/EpGHdI43Wk+riEdrbGMvExnVUyAvjtxygRe6Mo7vWDQ==
+X-Received: by 2002:ac8:7f83:0:b0:467:681c:425f with SMTP id d75a77b69052e-46e12a1e89amr335229041cf.4.1737564183924;
+        Wed, 22 Jan 2025 08:43:03 -0800 (PST)
+Received: from x1n (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e102ec205sm65385351cf.11.2025.01.22.08.43.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 08:36:47 -0800 (PST)
-Message-ID: <dd128607c0306d21e57994ffb964514728b92f29.camel@redhat.com>
-Subject: Re: vmx_pmu_caps_test fails on Skylake based CPUS due to read only
- LBRs
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Wed, 22 Jan 2025 11:36:46 -0500
-In-Reply-To: <Z5BDr2mm57F0vfax@google.com>
-References: <c9d8269bff69f6359731d758e3b1135dedd7cc61.camel@redhat.com>
-	 <Zx-z5sRKCXAXysqv@google.com>
-	 <948408887cbe83cbcf05452a53d33fb5aaf79524.camel@redhat.com>
-	 <Z5BDr2mm57F0vfax@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Wed, 22 Jan 2025 08:43:03 -0800 (PST)
+Date: Wed, 22 Jan 2025 11:43:01 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Alexey Kardashevskiy <aik@amd.com>,
+	Chenyi Qiang <chenyi.qiang@intel.com>,
+	David Hildenbrand <david@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>
+Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
+ guest-memfd with RamDiscardManager
+Message-ID: <Z5EgFaWIyjIiOZnv@x1n>
+References: <4d22d3ce-a5a1-49f2-a578-8e0fe7d26893@amd.com>
+ <2b799426-deaa-4644-aa17-6ef31899113b@intel.com>
+ <2400268e-d26a-4933-80df-cfe44b38ae40@amd.com>
+ <590432e1-4a26-4ae8-822f-ccfbac352e6b@intel.com>
+ <2b2730f3-6e1a-4def-b126-078cf6249759@amd.com>
+ <Z462F1Dwm6cUdCcy@x1n>
+ <ZnmfUelBs3Cm0ZHd@yilunxu-OptiPlex-7050>
+ <Z4-6u5_9NChu_KZq@x1n>
+ <95a14f7d-4782-40b3-a55d-7cf67b911bbe@amd.com>
+ <Z5C9SzXxX7M1DBE3@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z5C9SzXxX7M1DBE3@yilunxu-OptiPlex-7050>
 
-On Tue, 2025-01-21 at 17:02 -0800, Sean Christopherson wrote:
-> On Sun, Nov 03, 2024, Maxim Levitsky wrote:
-> > On Mon, 2024-10-28 at 08:55 -0700, Sean Christopherson wrote:
-> > > On Fri, Oct 18, 2024, Maxim Levitsky wrote:
-> > > > Our CI found another issue, this time with vmx_pmu_caps_test.
+On Wed, Jan 22, 2025 at 05:41:31PM +0800, Xu Yilun wrote:
+> On Wed, Jan 22, 2025 at 03:30:05PM +1100, Alexey Kardashevskiy wrote:
+> > 
+> > 
+> > On 22/1/25 02:18, Peter Xu wrote:
+> > > On Tue, Jun 25, 2024 at 12:31:13AM +0800, Xu Yilun wrote:
+> > > > On Mon, Jan 20, 2025 at 03:46:15PM -0500, Peter Xu wrote:
+> > > > > On Mon, Jan 20, 2025 at 09:22:50PM +1100, Alexey Kardashevskiy wrote:
+> > > > > > > It is still uncertain how to implement the private MMIO. Our assumption
+> > > > > > > is the private MMIO would also create a memory region with
+> > > > > > > guest_memfd-like backend. Its mr->ram is true and should be managed by
+> > > > > > > RamdDiscardManager which can skip doing DMA_MAP in VFIO's region_add
+> > > > > > > listener.
+> > > > > > 
+> > > > > > My current working approach is to leave it as is in QEMU and VFIO.
+> > > > > 
+> > > > > Agreed.  Setting ram=true to even private MMIO sounds hackish, at least
 > > > > 
-> > > > On 'Intel(R) Xeon(R) Gold 6328HL CPU' I see that all LBR msrs (from/to and
-> > > > TOS), are always read only - even when LBR is disabled - once I disable the
-> > > > feature in DEBUG_CTL, all LBR msrs reset to 0, and you can't change their
-> > > > value manually.  Freeze LBRS on PMI seems not to affect this behavior.
-> 
-> ...
-> 
-> > When DEBUG_CTL.LBR=1, the LBRs do work, I see all the registers update,
-> > although TOS does seem to be stuck at one value, but it does change
-> > sometimes, and it's non zero.
+> > > > The private MMIO refers to assigned MMIO, not emulated MMIO. IIUC,
+> > > > normal assigned MMIO is always set ram=true,
+> > > > 
+> > > > void memory_region_init_ram_device_ptr(MemoryRegion *mr,
+> > > >                                         Object *owner,
+> > > >                                         const char *name,
+> > > >                                         uint64_t size,
+> > > >                                         void *ptr)
+
+[1]
+
+> > > > {
+> > > >      memory_region_init(mr, owner, name, size);
+> > > >      mr->ram = true;
+> > > > 
+> > > > 
+> > > > So I don't think ram=true is a problem here.
+> > > 
+> > > I see.  If there's always a host pointer then it looks valid.  So it means
+> > > the device private MMIOs are always mappable since the start?
 > > 
-> > The FROM/TO do show healthy amount of updates 
-> > 
-> > Note that I read all msrs using 'rdmsr' userspace tool.
+> > Yes. VFIO owns the mapping and does not treat shared/private MMIO any
+> > different at the moment. Thanks,
 > 
-> I'm pretty sure debugging via 'rdmsr', i.e. /dev/msr, isn't going to work.  I
-> assume perf is clobbering LBR MSRs on context switch, but I haven't tracked that
-> down to confirm (the code I see on inspecition is gated on at least one perf
-> event using LBRs).  My guess is that there's a software bug somewhere in the
-> perf/KVM exchange.
+> mm.. I'm actually expecting private MMIO not have a host pointer, just
+> as private memory do.
 > 
-> I confirmed that using 'rdmsr' and 'wrmsr' "loses" values, but that hacking KVM
-> to read/write all LBRs during initialization works with LBRs disabled.
+> But I'm not sure why having host pointer correlates mr->ram == true.
 
-Hi,
+If there is no host pointer, what would you pass into "ptr" as referenced
+at [1] above when creating the private MMIO memory region?
 
-OK, this is a very good piece of the puzzle.
+OTOH, IIUC guest private memory finally can also have a host pointer (aka,
+mmap()-able), it's just that even if it exists, accessing it may crash QEMU
+if it's private.
 
-I didn't expect context switch to interfere with this because I thought that perf code won't touch LBRs if
-they are not in use. 
-rdmsr/wrmsr programs don't do much except doing the instruction in the kernel space.
+Thanks,
 
-Is it then possible that the the fact that LBRs were left enabled by BIOS is the
-culprit of the problem?
-
-This particular test never enables LBRs, not anything in the system does this,
-
-I do some more code digging, lets see if I find anything odd.
-
-Thanks for the info,
-Best regards,
-	Maxim Levitsky
-
-> 
-> ---
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index f72835e85b6d..c68a5a79c668 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7907,6 +7907,8 @@ static __init u64 vmx_get_perf_capabilities(void)
->  {
->         u64 perf_cap = PMU_CAP_FW_WRITES;
->         u64 host_perf_cap = 0;
-> +       u64 debugctl, val;
-> +       int i;
->  
->         if (!enable_pmu)
->                 return 0;
-> @@ -7954,6 +7956,39 @@ static __init u64 vmx_get_perf_capabilities(void)
->                 perf_cap &= ~PERF_CAP_PEBS_BASELINE;
->         }
->  
-> +       if (!vmx_lbr_caps.nr) {
-> +               pr_warn("Uh, what?  No LBRs...\n");
-> +               goto out;
-> +       }
-> +
-> +       rdmsrl(MSR_IA32_DEBUGCTLMSR, debugctl);
-> +       if (debugctl & DEBUGCTLMSR_LBR) {
-> +               pr_warn("Huh, LBRs enabled at KVM load?  debugctl = %llx\n", debugctl);
-> +               wrmsrl(MSR_IA32_DEBUGCTLMSR, debugctl & ~DEBUGCTLMSR_LBR);
-> +       }
-> +
-> +       for (i = 0; i < vmx_lbr_caps.nr; i++) {
-> +               wrmsrl(vmx_lbr_caps.from + i, 0xbeef0000 + i);
-> +               wrmsrl(vmx_lbr_caps.to + i, 0xcafe0000 + i);
-> +       }
-> +
-> +       for (i = 0; i < vmx_lbr_caps.nr; i++) {
-> +               rdmsrl(vmx_lbr_caps.from + i, val);
-> +               if (val != 0xbeef0000 + i)
-> +                       pr_warn("MSR 0x%x Expected %x, got %llx\n",
-> +                               vmx_lbr_caps.from + i, 0xbeef0000 + i, val);
-> +               rdmsrl(vmx_lbr_caps.to + i, val);
-> +               if (val != 0xcafe0000 + i)
-> +                       pr_warn("MSR 0x%x Expected %x, got %llx\n",
-> +                               vmx_lbr_caps.from + i, 0xcafe0000 + i, val);
-> +       }
-> +
-> +       pr_warn("Done validating %u from/to LBRs\n", vmx_lbr_caps.nr);
-> +
-> +       if (debugctl & DEBUGCTLMSR_LBR)
-> +               wrmsrl(MSR_IA32_DEBUGCTLMSR, debugctl);
-> +
-> +out:
->         return perf_cap;
->  }
-> --
-> 
-> And given that perf explicitly disables LBRs (see __intel_pmu_lbr_disable())
-> before reading LBR MSRs (see intel_pmu_lbr_read()) when taking a snaphot, and
-> AFAIK no one has complained, I would be very surprised if this is hardware doing
-> something odd.
-> 
-> ---
-> static noinline int
-> __intel_pmu_snapshot_branch_stack(struct perf_branch_entry *entries,
-> 				  unsigned int cnt, unsigned long flags)
-> {
-> 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
-> 
-> 	intel_pmu_lbr_read();
-> 	cnt = min_t(unsigned int, cnt, x86_pmu.lbr_nr);
-> 
-> 	memcpy(entries, cpuc->lbr_entries, sizeof(struct perf_branch_entry) * cnt);
-> 	intel_pmu_enable_all(0);
-> 	local_irq_restore(flags);
-> 	return cnt;
-> }
-> 
-> static int
-> intel_pmu_snapshot_branch_stack(struct perf_branch_entry *entries, unsigned int cnt)
-> {
-> 	unsigned long flags;
-> 
-> 	/* must not have branches... */
-> 	local_irq_save(flags);
-> 	__intel_pmu_disable_all(false); /* we don't care about BTS */
-> 	__intel_pmu_lbr_disable();
-> 	/*            ... until here */
-> 	return __intel_pmu_snapshot_branch_stack(entries, cnt, flags);
-> }
-> ---
-> 
-
+-- 
+Peter Xu
 
 
