@@ -1,166 +1,240 @@
-Return-Path: <kvm+bounces-36239-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36240-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C68BA190C0
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 12:38:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 263F8A190EE
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 12:51:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA1221887A7A
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 11:38:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D09BA7A1EEA
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 11:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37CF211A3C;
-	Wed, 22 Jan 2025 11:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B35212B1A;
+	Wed, 22 Jan 2025 11:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="ECELAQlC";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kaj9xJl+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bm1/RMxc"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D4920FA9A;
-	Wed, 22 Jan 2025 11:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F3B1BDA99;
+	Wed, 22 Jan 2025 11:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737545911; cv=none; b=VgDx3xMt8pHOHR8ymvqb19+rLXbfiTymyyRyKKLQDc2OQi2Iv+c1mM70i/gq4/f+SsKDysJM+KQxnw2cDvAG4hY77B+gHw+sg8GVcnqocCcgrZO0xfJVCszvvEhccUNf0zfkd3+meY3/58ChfCtXSkVsSwDqnhCtsYBX9ToBY54=
+	t=1737546664; cv=none; b=gAqce4/kQmMF/qXUeWr3GwKuBOU0IPXzUK15fL/HTV9+47f3RhJcGqd18ZlSlyt5AOCPjUnvtR5kixf7Kz/tzQwnpRdTzU01VbqCPGr+XX1SHXIq3hkT55k6MrD8ZLVJPBLmFWp33YHW8LShWMMByTKP8t/NLJPZT950mGtxYxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737545911; c=relaxed/simple;
-	bh=J6psTmPSOU3QKpSJiKJxeAXXel0SZEi6GTHPuAuKZM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=btg6RDhR30ZPXTDUPzVCzsFNl1WGiRJnOZDr8HwOqj/9AMFDV2orqSTRPlvh6ahgr1AW1h5NScQQ6pKvynIGLG6rJ7Yd4SNkYkgioiOBwKRWL8iaWX2lBJIX5cpWj8gHYJox2xrK7OM+Q2kx8X8YppJFV1TRhoJUSVOufXigNiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is; spf=pass smtp.mailfrom=alyssa.is; dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b=ECELAQlC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kaj9xJl+; arc=none smtp.client-ip=202.12.124.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alyssa.is
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id 1BE09114016C;
-	Wed, 22 Jan 2025 06:38:28 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Wed, 22 Jan 2025 06:38:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1737545907; x=1737632307; bh=G8MsUq4Yg2
-	w0NbfNEjbUAvvjkMooYocwMqwISkeqwRs=; b=ECELAQlCZh+3wWqHTR3gkm3IKl
-	gxBsRMiF2EKFJQEatuh7cwdJiGhN5dozRoIhj/9iTNTqD6xaSB9mX55rdlEd42GV
-	UVHHBifG9TtTo8HqNsY+PcXKTkATPd9m02ZSvTvxDnc1mtsuuq/HzWYIJmn+HMby
-	TqBYTGO2BO8EPuB8NIMmCkJ2+j793ADkKSLrcuXoZ5UfHRBDTWeLZadRzReKXq8n
-	C02DiMUB3KE/gl0ZdgSmiNKQR5hMsPdpDHdwPKerlz/Y87unmgGOCLd75A4TSRpS
-	WUnPFKJBRfhV5/m/Ut50PFrzidQaBiv9jwgvgUeRkD7MXthhymoZWgoQbIhg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1737545907; x=1737632307; bh=G8MsUq4Yg2w0NbfNEjbUAvvjkMooYocwMqw
-	ISkeqwRs=; b=kaj9xJl+/kjO73YRAKA75oZUYvBLH+xw6B0HpYpwMzuYIU6idlj
-	B0FH5PZfk8daVL468Q1UTGVGoF9NsbW0kVQ20PYmcMSd9WA5FJdNp4aVIgpV/W4D
-	lrsjcXHQkHCoXfrd/BS2mUdxKFJzuHbbH9TvSD8ZZro8MlMkjPhAXlhGJSLzfFgj
-	SFd2jFpwptJAkGx1sbuENHkU6QglKhV/I7S/e3QAZSR6wbtkkYFP+NjOIdkaPuH4
-	VCXuWbh6KyXNwyhbHsaG98BX/szcuixl66qWZgFn2EmBo0ztxVWmVgRgTtC2LGxi
-	Opx0uSudVPMWr873ehtjMvkJ9v6VRP//XBQ==
-X-ME-Sender: <xms:s9iQZ1cr7X83bJNzUiAMJWGI4E-sedRZdDTOgyzvf-i5fxWnNlmpWA>
-    <xme:s9iQZzO6FTtw5CpEhLEyIzDGX1JTt6mjOC340Q20_s7efpgeJkBHnxvyCIGGZrPXm
-    3zQuVWk2jZHwUODvw>
-X-ME-Received: <xmr:s9iQZ-hx7oU8dvgSyPaIdC8JkTPskVNfkcz2N60rjM2yvgZKPja8Jp6vpxrDvj4sw_B9Wytitn6gOovJZyQB6VIaDCY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejfedgudehiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehgtdfsredttddv
-    necuhfhrohhmpeetlhihshhsrgcutfhoshhsuceohhhisegrlhihshhsrgdrihhsqeenuc
-    ggtffrrghtthgvrhhnpedtjeeuteekheefueeluefgveeiffekhfetfeeivdefheeuhfej
-    gedvieffiefhieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
-    hrohhmpehhihesrghlhihsshgrrdhishdpnhgspghrtghpthhtohepuddtpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopegslhhutggrseguvggsihgrnhdrohhrghdprhgtph
-    htthhopehsvggrnhhjtgesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhgsuhhstghh
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehtjheskhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtoheprhgvghhrvghsshhiohhnsheslhhishhtshdrlhhinhhugidruggvvhdprhgt
-    phhtthhopehmihgthhgrvghlrdgthhhrihhsthhivgesohhrrggtlhgvrdgtohhmpdhrtg
-    hpthhtohepphgsohhniihinhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehkvhhm
-    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvg
-    hlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:s9iQZ-9boLcqCIG8iGSsTn5LWMO3pFQu56TwLW494CMAYE0ix2qZOA>
-    <xmx:s9iQZxujd4BTUKHTrnmBfqhlO2Gu0Ofbn2V7R9x_GKWeYug4LdbAuw>
-    <xmx:s9iQZ9FQRXcYgGSSIwl0Iz1qr8guVbbDhQt9YSKCp3Q6QowKW-tFsQ>
-    <xmx:s9iQZ4PAaEBzihQC8uNL-JA5Il5RhUiwSs7C40SipBSQycr1sur5Xg>
-    <xmx:s9iQZykySSZF3JGjL29Vv404HXDFRyqk6lGXo4Zw3SnJQrv8FiyibfXc>
-Feedback-ID: i12284293:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 22 Jan 2025 06:38:27 -0500 (EST)
-Received: by sf.qyliss.net (Postfix, from userid 1000)
-	id 83C5DC223DF; Wed, 22 Jan 2025 12:38:25 +0100 (CET)
-Date: Wed, 22 Jan 2025 12:38:25 +0100
-From: Alyssa Ross <hi@alyssa.is>
-To: Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, michael.christie@oracle.com, Tejun Heo <tj@kernel.org>, 
-	Luca Boccassi <bluca@debian.org>, stable@vger.kernel.org, regressions@lists.linux.dev
-Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
-Message-ID: <twoqrb4bdyujvnf432lqvm3eqzvhqsbotag3q3snecgqwm7lzw@izuns3gun2a6>
-References: <Z2RYyagu3phDFIac@kbusch-mbp.dhcp.thefacebook.com>
- <fdb5aac8-a657-40ec-9e0b-5340bc144b7b@redhat.com>
- <Z2RhNcJbP67CRqaM@kbusch-mbp.dhcp.thefacebook.com>
- <CABgObfYUztpGfBep4ewQXUVJ2vqG_BLrn7c19srBoiXbV+O3+w@mail.gmail.com>
- <Z4Uy1beVh78KoBqN@kbusch-mbp>
- <0862979d-cb85-44a8-904b-7318a5be0460@redhat.com>
- <Z4cmLAu4kdb3cCKo@google.com>
- <Z4fnkL5-clssIKc-@kbusch-mbp>
- <CABgObfZWdwsmfT-Y5pzcOKwhjkAdy99KB9OUiMCKDe7UPybkUQ@mail.gmail.com>
- <Z4gGf5SAJwnGEFK0@kbusch-mbp>
+	s=arc-20240116; t=1737546664; c=relaxed/simple;
+	bh=63j/7wGwXuaZ+NknazkPZcLSbOn14PDE1Z9XGe727YY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UXezq8AIs5TuhcICzTybXhj73kFXOp5ZAfNYD0utQZZYnSPXEsNeuzVjX/6GJ0gX3klvZCG4EsrCVBWLVANhMF4pWfzBmIg4eXjo5NG6YbdPJpgLopZA/XuchxPPXIB+3Je1anRRiE34nAoV/8ihWH4KpVi6oMteH228yVr0VyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bm1/RMxc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E212C4CED6;
+	Wed, 22 Jan 2025 11:51:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737546663;
+	bh=63j/7wGwXuaZ+NknazkPZcLSbOn14PDE1Z9XGe727YY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bm1/RMxck4trtFrCjtNR5Hr3WVRwSzcTg8mHPDDsGFzqILgDQCTHYZPFCP7yEIW5T
+	 2Ifx9T6vuaoMd9legXGRzIRj7H0qdadj21n1znxFORY07HA1E1c8qt79AKjdjNN/aU
+	 5/gNpls7dNGiDQsBkdCgJwBBj/s6JcIMdilgZ+fobGSlYdAMQEOpFt3Fkg3oOXt7rW
+	 UuDU+Ltd4Bpi61+iEm1Sj7e5R/tPsOnmAyYIJP0udAQSHPbn40tDten9tSmjOVkMuE
+	 Do4Lh4anKNxBzar9MAqXULoRLOlFUkcdJQpusEeTZVsjcT2hPSCJFFBkG01NPHI1bk
+	 /Up+rN3Q+Ei4Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1taZG9-00ENwN-A9;
+	Wed, 22 Jan 2025 11:51:01 +0000
+Date: Wed, 22 Jan 2025 11:51:00 +0000
+Message-ID: <86o6zzukwr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Mark Brown <broonie@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC v3 09/27] KVM: arm64: Factor SVE guest exit handling out into a function
+In-Reply-To: <Z4pAMaEYvdLpmbg2@J2N7QTR9R3>
+References: <20241220-kvm-arm64-sme-v3-0-05b018c1ffeb@kernel.org>
+	<20241220-kvm-arm64-sme-v3-9-05b018c1ffeb@kernel.org>
+	<Z4pAMaEYvdLpmbg2@J2N7QTR9R3>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pbsm6sup57jukwpk"
-Content-Disposition: inline
-In-Reply-To: <Z4gGf5SAJwnGEFK0@kbusch-mbp>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, Dave.Martin@arm.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 17 Jan 2025 11:34:09 +0000,
+Mark Rutland <mark.rutland@arm.com> wrote:
+> 
+> On Fri, Dec 20, 2024 at 04:46:34PM +0000, Mark Brown wrote:
+> > The SVE portion of kvm_vcpu_put() is quite large, especially given the
+> > comments required.  When we add similar handling for SME the function
+> > will get even larger, in order to keep things managable factor the SVE
+> > portion out of the main kvm_vcpu_put().
+> 
+> While investigating some problems with SVE I spotted a latent bug in
+> this area where I suspect the fix will conflict with / supersede this
+> rework. Details below; IIUC the bug was introduced in commit:
+> 
+>   8c8010d69c132273 ("KVM: arm64: Save/restore SVE state for nVHE")
+> 
+> > Signed-off-by: Mark Brown <broonie@kernel.org>
+> > ---
+> >  arch/arm64/kvm/fpsimd.c | 67 +++++++++++++++++++++++++++----------------------
+> >  1 file changed, 37 insertions(+), 30 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> > index 09b65abaf9db60cc57dbc554ad2108a80c2dc46b..3c2e0b96877ac5b4f3b9d8dfa38975f11b74b60d 100644
+> > --- a/arch/arm64/kvm/fpsimd.c
+> > +++ b/arch/arm64/kvm/fpsimd.c
+> > @@ -151,6 +151,41 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+> >  	}
+> >  }
+> >  
+> > +static void kvm_vcpu_put_sve(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u64 zcr;
+> > +
+> > +	if (!vcpu_has_sve(vcpu))
+> > +		return;
+> > +
+> > +	zcr = read_sysreg_el1(SYS_ZCR);
+> > +
+> > +	/*
+> > +	 * If the vCPU is in the hyp context then ZCR_EL1 is loaded
+> > +	 * with its vEL2 counterpart.
+> > +	 */
+> > +	__vcpu_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu)) = zcr;
+> > +
+> > +	/*
+> > +	 * Restore the VL that was saved when bound to the CPU, which
+> > +	 * is the maximum VL for the guest. Because the layout of the
+> > +	 * data when saving the sve state depends on the VL, we need
+> > +	 * to use a consistent (i.e., the maximum) VL.  Note that this
+> > +	 * means that at guest exit ZCR_EL1 is not necessarily the
+> > +	 * same as on guest entry.
+> > +	 *
+> > +	 * ZCR_EL2 holds the guest hypervisor's VL when running a
+> > +	 * nested guest, which could be smaller than the max for the
+> > +	 * vCPU. Similar to above, we first need to switch to a VL
+> > +	 * consistent with the layout of the vCPU's SVE state. KVM
+> > +	 * support for NV implies VHE, so using the ZCR_EL1 alias is
+> > +	 * safe.
+> > +	 */
+> > +	if (!has_vhe() || (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)))
+> > +		sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1,
+> > +				       SYS_ZCR_EL1);
+> > +}
+> > +
+> >  /*
+> >   * Write back the vcpu FPSIMD regs if they are dirty, and invalidate the
+> >   * cpu FPSIMD regs so that they can't be spuriously reused if this vcpu
+> > @@ -179,38 +214,10 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+> >  	}
+> 
+> A little before this context, kvm_arch_vcpu_put_fp() calls
+> local_irq_save(), which indicates that IRQs can be taken before this
+> point, which is deeply suspicious.
+> 
+> If IRQs are enabled, then it's possible to take an IRQ and potentially
+> run a softirq handler which uses kernel-mode NEON. That means
+> kernel_neon_begin() will try to save the live FPSIMD/SVE/SME state via
+> fpsimd_save_user_state(), using the live value of ZCR_ELx.LEN, which would not
+> be correct per the comment.
+> 
+> Looking at kvm_arch_vcpu_ioctl_run(), the relevant logic is:
+> 
+> 	vcpu_load(vcpu); // calls kvm_arch_vcpu_load_fp()
+> 
+> 	while (ret > 0) {
+> 		preempt_disable();
+> 		local_irq_disable();
+> 
+> 		kvm_arch_vcpu_ctxflush_fp();
+> 		ret = kvm_arm_vcpu_enter_exit(vcpu);
+> 		kvm_arch_vcpu_ctxsync_fp(vcpu);
+> 
+> 		local_irq_enable();
+> 		preempt_enable();
+> 	}
+> 
+> 	vcpu_put(vcpu); // calls kvm_arch_vcpu_put_fp()
+> 
+> ... and the problem can occur at any point after the vCPU has run where IRQs
+> are enabled, i.e, between local_irq_enable() and either local_irq_disable() or
+> vcpu_put()'s call to kvm_arch_vcpu_put_fp().
+> 
+> Note that kernel_neon_begin() calls:
+> 
+> 	fpsimd_save_user_state();
+> 	...
+> 	fpsimd_flush_cpu_state();
+> 
+> ... and fpsimd_save_user_state() will see that the SVE VL is wrong:
+> 
+> 	if (WARN_ON(sve_get_vl() != vl)) {
+> 		force_signal_inject(SIGKILL, SI_KERNEL, 0, 0);
+> 		return;
+> 	}
+> 
+> ... pending a SIGKILL for the VMM thread without saving the vCPU's state
+> before unbinding the live state via fpsimd_flush_cpu_state(), which'll
+> set TIF_FOREIGN_FPSTATE.
+> 
+> AFAICT it's possible to re-enter the vCPU after that happens, whereupon
+> stale vCPU FPSIMD/SVE state will be restored. Upon return to userspace
+> the SIGKILL will be delivered, killing the VMM.
+> 
+> As above, it looks like that's been broken since the nVHE SVE
+> save/restore was introduced in commit:
+> 
+>   8c8010d69c132273 ("KVM: arm64: Save/restore SVE state for nVHE")
+> 
+> The TL;DR summary is that it's not sufficient for kvm_arch_vcpu_put_fp()
+> to fix up ZCR_ELx. Either:
+> 
+> * That needs to be fixed up while IRQs are masked, e.g. by
+>   saving/restoring the host and guest ZCR_EL1 and/or ZCR_ELx values in
+>   kvm_arch_vcpu_ctxflush_fp() and kvm_arch_vcpu_ctxsync_fp()
+> 
+> * The lazy save logic in fpsimd_save_user_state() needs to handle KVM
+>   explicitly, saving the guest's ZCR_EL1 and restoring the host's
+>   ZCR_ELx.
+> 
+> I think we need to fix that before we extend this logic for SME.
 
---pbsm6sup57jukwpk
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
-MIME-Version: 1.0
+So save/restore ZCR_ELx eagerly? If that's what it takes, let's do
+that now.
 
-On Wed, Jan 15, 2025 at 12:03:27PM -0700, Keith Busch wrote:
-> On Wed, Jan 15, 2025 at 06:10:05PM +0100, Paolo Bonzini wrote:
-> > You can implement something like pthread_once():
->
-> ...
->
-> > Where to put it I don't know.  It doesn't belong in
-> > include/linux/once.h.  I'm okay with arch/x86/kvm/call_once.h and just
-> > pull it with #include "call_once.h".
->
-> Thanks for the suggestion, I can work with that. As to where to put it,
-> I think the new 'struct once' needs to be a member of struct kvm_arch,
-> so I've put it in arch/x86/include/asm/.
->
-> Here's the result with that folded in. If this is okay, I'll send a v2,
-> and can split out the call_once as a prep patch with your attribution if
-> you like.
+Thanks,
 
-Has there been any progress here?  I'm also affected by the crosvm
-regression, and it's been backported to the LTS stable kernel.
+	M.
 
-(CCing the stable and regressions lists to make sure the regression is
-tracked.)
-
-#regzbot introduced: d96c77bd4eeb
-
---pbsm6sup57jukwpk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRV/neXydHjZma5XLJbRZGEIw/wogUCZ5DYrwAKCRBbRZGEIw/w
-omlXAQDBgeu+m7LZSkjFkp1AZv0g2BuJYTB3+jR3gfIKInXsygEA/RPqyDiFix9/
-FzCbNsxxPIW+EnrJ8Hk/fHMvJDEG6Qo=
-=oPrN
------END PGP SIGNATURE-----
-
---pbsm6sup57jukwpk--
+-- 
+Without deviation from the norm, progress is not possible.
 
