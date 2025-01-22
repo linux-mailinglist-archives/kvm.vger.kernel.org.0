@@ -1,365 +1,283 @@
-Return-Path: <kvm+bounces-36249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36250-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57EBCA193D4
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 15:25:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36854A19418
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 15:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3602A3A4C87
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 14:25:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 838473A29A5
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 14:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED22C213E91;
-	Wed, 22 Jan 2025 14:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AE721422C;
+	Wed, 22 Jan 2025 14:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dAvsISGH"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RCcIuzI1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2066.outbound.protection.outlook.com [40.107.92.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FC81C4604
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 14:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737555938; cv=none; b=lsZ79l7qsMRy/S1k0mch5LjO+r8/QQ9VdGqiHCMfK9XpcbLuagwUl83Sp/8zguOm3rmDjheT5Lpt87ynN7Q3rsJW3dkz81y0Oj5ERGJ/BvkMrwwx1YoeuNal+zL71h4dqSsI0bu1OlTrum2CvBV6NYQyRWsp8HAOEXLeDeF8yIo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737555938; c=relaxed/simple;
-	bh=wyj7joyQXfg7+GOVFFjTB6uG3Fqn1LGGA2Y1RlGW/Jg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JpNUnTvGGvssWwlexuxwqj/L/njeb2zI4TEtmBcZZefrnDgAUW+/qdQ9b9bSvBK7+bDIvYVnboMIffHJPowlTkF02B7vVg6mzd3I2vHtZC39lRdmpuy4AWCEhIzM5vLPXZpRf5GU4Vpk6KZ2pzIATwmk17gg5ncdLyNrqT4utp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dAvsISGH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737555935;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VovBY8C7ZX9LJhRPptigwsin2oTqYRePd/bJwWqtKt4=;
-	b=dAvsISGHlvCPxEF02H5ahGWL7iVIadYuUZKOPuiXNbQAb/12ESESWt43cHifbNNLcjRLB2
-	EbJ567Pni1CxTlcepc4aTjOGgd4JydNjdImRpE5N8+CR3IlVOJF33nSCSt64aBc/CwMu+V
-	uTjZTDPV2ccOnqCdgQceVR1BoEUlWCg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-159-Vfj3EKQNOr-tX9snD3E8FA-1; Wed, 22 Jan 2025 09:25:33 -0500
-X-MC-Unique: Vfj3EKQNOr-tX9snD3E8FA-1
-X-Mimecast-MFC-AGG-ID: Vfj3EKQNOr-tX9snD3E8FA
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361c040ba8so38518175e9.1
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 06:25:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737555933; x=1738160733;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VovBY8C7ZX9LJhRPptigwsin2oTqYRePd/bJwWqtKt4=;
-        b=q0V/0XLjclzh6V+TfVYvEekC6aORVM9xQUVNg34pTd2NtmmeHgzmdyv4FoOe4CFNF/
-         odvXqM8dB8dGQL5nlrQFgFfC6JDpMWrRkEKcjfj+khAh0nRAWSDSRk2Xn8euabFL/6zA
-         KKWf2NuPKFFdubR08IMXgZK0dk24hlV3sveoJmw7IVqW23F7kszyzLD/x60iRSU+mUNR
-         qshubB+oKyRu3II1dgqRitz74IUFqAe5BH/2dv8DlnIsDKidly6LlaDDdKbKLO2R1uUu
-         pxn7kYg5X6YmlzTx6twamVxdzA8Zl3ujaY+OCS4XGhQ/ytMzYjX23PBlU8zlWwquUO71
-         nNdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUj9P+VbkfTjw12w9bNDO/3blYH2wTie6kVkW3Sh0nsLo0YfcOr36Mw9HoRYAYrUdFA1tw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6Wq/PyWHsHew54hYj5Id3COJ60L7SDCuVIR14dyi7l8kCX73a
-	7ZS1MaLaf8KqOsMBahCmbnfFQQr3Rxgrcfi4fuoOwVr84gMA4bF8+zGKGRlLqK55UrxkcggBg+q
-	4y2YMn+yz6vXKfGHA0oH7GW+2JH356l4uPXJh62riRG+PlEO79Q==
-X-Gm-Gg: ASbGncsa/1TTdR+o3jSztIHeo3gvANlwA27a/qnsFwAdZ9GcjbS/o+M1c2pK/zhX2FH
-	CxGlXI+VOsmaEMQGHb4du5Vs40w9gJXSSLwiG65RWh2t9B2MBnAOQwDQ64btuOKG4o8vk4Q7dPj
-	01DYabrRy5qkRQ9db+nWxMv13NU8BGNMh5ZtPVX9kEiGATHIQUXNpIAlLrKAtidlOfg6+Q5jgt3
-	zeqG6/sRwQdXE1H65CtZYgkycgWdA6cvMcbFEKlerPTJdCLpEArT2uMkSTKokOUXi3LOFtFbV1Y
-	IUgtY0Xng4CaFiPBSt/JWKQ=
-X-Received: by 2002:a5d:4568:0:b0:385:decf:52bc with SMTP id ffacd0b85a97d-38bf5671bc4mr14426399f8f.32.1737555932574;
-        Wed, 22 Jan 2025 06:25:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGpy7cMaLRk9dVBA0cgo6W1sQQN68NTp1FDxLTVIYJMJIluWqgnE07uX+vLudYeqOl4NBxvoQ==
-X-Received: by 2002:a5d:4568:0:b0:385:decf:52bc with SMTP id ffacd0b85a97d-38bf5671bc4mr14426373f8f.32.1737555932110;
-        Wed, 22 Jan 2025 06:25:32 -0800 (PST)
-Received: from [192.168.3.141] (p4ff2353b.dip0.t-ipconnect.de. [79.242.53.59])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3221c30sm16704789f8f.32.2025.01.22.06.25.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jan 2025 06:25:30 -0800 (PST)
-Message-ID: <6e55db63-debf-41e6-941e-04690024d591@redhat.com>
-Date: Wed, 22 Jan 2025 15:25:29 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BBE1F94A;
+	Wed, 22 Jan 2025 14:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737556670; cv=fail; b=ZYkTck+O7AD5/neunuEr7sSQtSp68pjOQJSSNBO8A8z9gba+yq2RJm8bUhUWpzgny9+Ya6GG+RUKqgshsOkTb0KwOQd6KSYH0BmCjyZp1rfL8n+wy6ZhtG53hsG8+Qg9IvI2CMBGYt/XMr8xAOoQVRzOav9nKuzY5pJszix6Gts=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737556670; c=relaxed/simple;
+	bh=s7wnQPZMVvPUsFiEsjL9N7sK++T02zeoK5sKmv0ZKc8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=oEbPFOV/aIiN7RtvR9HV1EIuvUawiqf4OEIlpYuRmcn+6YkEvi0wqqOwCs2ZbdNNkD3xilxM0QiaHxj3ATZk+fLBIcN6Inu5Ye3W2oH4Tiw92TXqCtoG/qxiwmZJ9wi+AFKdR2kWrTic9qHhQV1d2OfVoQbLXZjCO0q7guIzvXc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RCcIuzI1; arc=fail smtp.client-ip=40.107.92.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lu1B82B0aeMoqbE7C+Un0z8a4rUoei579XcV3k8H0EV9okTY3pqGERsP9wJJ0CK1CvH1f50rNWBsLwIzlIxaz1nyd7kNIbZ9flSP4y2GWMhejjADYTa4hV0fE3vLLpxheK6dTqSHEDi5/I+Ymx0g1BNfEMpJqLl8C9ewdac6b2IYu9Vrjjf1Y9Gu/NSCe0t/xhyg+iwqcAPCivxWUdt58P3kZBpRtBNRC0PPiNtVW+rY+WeMSkbpGiX5jsb2n0xnqs87rTAlXZ5lQJl+mqziN5udkacjlkbMCnOlGMuaPgr5HZlXjXEP9GlSHU9FlHS+RZbYIGP8I1XXcAoDGykeqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qNcOQiU5hubf2pSx4QqR2AVr0z0Sl78vjJIcFMhEWsY=;
+ b=mgYJz+Hi1isMhPPCO+BM1vBoV/gHVpEVe7fdgeNzSM8VdIO1Lr74mmIPlI/PcuAQzoWsWlWYs+wc9Q2oaE89RayLdOWn/I7PSdU+KA0McclakIKYPwDVM0Dl683+gkI1rUEmTKA7KkbrPIlyuIxWtbZNMUvbHV6q9fPOWSbuiEuslIy5OUSfhZbDq4OlvXC4Xhje2+K4HncP/PNufMDBWduXNpm78QmKMR0Y1nsnhFxXEbXcMbvirx7wyD6y8xSRSLSpQAEzbDCrhqf/PdouQ2XFE3DQxr8fn6sDiPsEcTm14sAPNkZi7kxtl4zMHjCF6eE5IIfc+f9bNcYLAtX6hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qNcOQiU5hubf2pSx4QqR2AVr0z0Sl78vjJIcFMhEWsY=;
+ b=RCcIuzI177Q5wbi+ODPELSp2PCIFtNHSLTcnq17lGGL8DFHBqh+TUomFZBQ2IEYXpcAB5GNoI0JvL7QTl3XnRCCHtnbMFiprJFRhMmJXhrhzK0ANDy/dLOypvKDBOZuiKjFsMhxw+ABAGHXh4OMubdEaBcVP65yvtqWbljaBjeXgTFUNZpTikbp3aapceALwCy/vMCwKFs7rKgEZfZUAw/KBZDlVlRwqjPeyoRg8IHY3rmiepLBsXccqLgcKb3lvisOq8FuAtb8CBxlEeZ2CQyEo+vhzBC+r+heKDj8FgH6cdgzfDmHzgFwAbeUovHFM4AKpFk7mqGXg1gyBpETVIQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by MN2PR12MB4335.namprd12.prod.outlook.com (2603:10b6:208:1d4::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.16; Wed, 22 Jan
+ 2025 14:37:45 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8356.010; Wed, 22 Jan 2025
+ 14:37:45 +0000
+Date: Wed, 22 Jan 2025 10:37:44 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
+	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+Message-ID: <20250122143744.GF5556@nvidia.com>
+References: <420bd2ea-d87c-4f01-883e-a7a5cf1635fe@amd.com>
+ <Z4psR1qoNQUQf3Q2@phenom.ffwll.local>
+ <c10ae58f-280c-4131-802f-d7f62595d013@amd.com>
+ <20250120175901.GP5556@nvidia.com>
+ <Z46a7y02ONFZrS8Y@phenom.ffwll.local>
+ <20250120194804.GT5556@nvidia.com>
+ <Z4_HNA4QQbIsK8D9@phenom.ffwll.local>
+ <20250121173633.GU5556@nvidia.com>
+ <Z5DQsyV0vwX3Iabu@phenom.ffwll.local>
+ <6612c40d-4999-41a1-a4a5-74d3ff5875c3@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6612c40d-4999-41a1-a4a5-74d3ff5875c3@amd.com>
+X-ClientProxiedBy: BN9PR03CA0921.namprd03.prod.outlook.com
+ (2603:10b6:408:107::26) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 0/5] KVM: gmem: 2MB THP support and preparedness
- tracking changes
-To: "Shah, Amit" <Amit.Shah@amd.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "Roth, Michael" <Michael.Roth@amd.com>
-Cc: "liam.merwick@oracle.com" <liam.merwick@oracle.com>,
- "seanjc@google.com" <seanjc@google.com>, "jroedel@suse.de"
- <jroedel@suse.de>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "Sampat, Pratik Rajesh" <PratikRajesh.Sampat@amd.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "vbabka@suse.cz"
- <vbabka@suse.cz>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "quic_eberman@quicinc.com" <quic_eberman@quicinc.com>,
- "Kalra, Ashish" <Ashish.Kalra@amd.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>,
- "vannapurve@google.com" <vannapurve@google.com>
-References: <20241212063635.712877-1-michael.roth@amd.com>
- <11280705-bcb1-4a5e-a689-b8a5f8a0a9a6@redhat.com>
- <3bd7936624b11f755608b1c51cc1376ebf2c3a4f.camel@amd.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <3bd7936624b11f755608b1c51cc1376ebf2c3a4f.camel@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MN2PR12MB4335:EE_
+X-MS-Office365-Filtering-Correlation-Id: a652811b-5c28-4122-f992-08dd3af255cc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VVhUS3lESmk3WnF6bjFyUXdtMkFMcHJUL3Q5N0xDNmpDaXU5WXM4by9DOFBw?=
+ =?utf-8?B?Nnp5N3AvNUJUcEcwekxTcHNObXExN001OGx1Nm9GRnNLMDBFKytZVS91Y1Nz?=
+ =?utf-8?B?cy9jK1U3aFlSTFVORnlxL1A1aUdvelNLZFN2S0MvbVM5THBrTjNQc0Vibmd4?=
+ =?utf-8?B?dUQxZVhuRWt3bnl6Z0pkRXFta1k5WjJ6akIwM2Q4c1FIbkJDUmRSWGlreld3?=
+ =?utf-8?B?VjJJc1FSemZRQUgvZEpueEdDQi9kWkV1RE1uV3NLUzNrbjZ3Z09JYjYrdVNm?=
+ =?utf-8?B?ZXpTUG1JN3pzaWZ6RVNYb1E5WW9yYnJkZGFsWGpoV2pqYng1blJCM3hBMXIx?=
+ =?utf-8?B?U29QWEYyOFcwVk5SUGw5TFdENzF3Y3dqMDJITnQxU1lqWk8xTnpoRjREZUlh?=
+ =?utf-8?B?OEgvWUxycnNscEdjekhkV0xIdVpHNElBY1pYTHN0NEtMRDlWREZTNklnUEx5?=
+ =?utf-8?B?VXprZVlxd2VVc21qck4xRDRxQ1llRXNTTklGcy9SK1hpbGZ6M1haZWxQYVM3?=
+ =?utf-8?B?bDFYeTd6cXFYS0xTa1g1NytWMk9QcFdmWmdvRThubjdyVjRGVS9sZkFTaDlT?=
+ =?utf-8?B?UlU1SGhzRlVrbkZpRzdrWWJ1eDZ6eVBIOHV2ZVhOSzhJZFcxelRwQWNLSE1I?=
+ =?utf-8?B?bjF6dWJ0KzZvcTRPNWJMRUN4VitlcTdtNU8xWDlLMWNJSEYvNmtuK3dTMTNo?=
+ =?utf-8?B?WUl0ZVRhVno2cXpYNVAvbHl4UU4yVllVY29YaWt2WW12SHdCRmlVaFJqRHdx?=
+ =?utf-8?B?dUtkSytkcjVINEN3VUQ2YVlMZzF3eTh5SHBUSHY1RXB1MlVuVGJvcUFVT3FK?=
+ =?utf-8?B?dWxvYVE2S2xETW1vOFN1Mm1US2c4SUVBQlQ0dCtiQ1J5dEZUWDhFR2RZTjFr?=
+ =?utf-8?B?YWlnN1lxVCtkNk9VNVdINVJKVmJSaUxtRThYYUxMYXFiYURiWnIrNFBEazJJ?=
+ =?utf-8?B?RTFPWDRhanBSMGpraE5sVmtaK0pudUE5L1llcldBZHdQdkJxVzVlQkdvYzds?=
+ =?utf-8?B?enFXcW5UNks2Z2R2TExrTzlOSWJUZWZYUHdubUMwcUpNRkVIRm52MEd0TTlE?=
+ =?utf-8?B?QjBGTUpJU2dmQXFPZUFnUzJXOHVtWXZZQndhSWtpbVF3WUZiSmp5WGxIOU5D?=
+ =?utf-8?B?SGJJQzR2RTNldHg1THRFbkQzb1htZ2F0c1Z1MjVwbVNHM0NmUHBwLzFMZGV2?=
+ =?utf-8?B?TE1QTTkwV0U3aC96bHovWmVDbnBYazl1MWc4U0pGWFpHSElrR3V4OWFhbEh4?=
+ =?utf-8?B?Y3lVU2Z2dWpOd3A2TnNGV3Z0MlY0NWxQUHhpT0JscWRjZUNpaDJhdm1UajF1?=
+ =?utf-8?B?UFhvbTJKVnJ1emJmL3d5d1FJSFpGUHp6d2M2Q1pxVjd4Q21OVUc2ZUtiamFy?=
+ =?utf-8?B?K2hraFh1NHVlZjFQcWNlazY3WE5Yd0NmR0krQjRSbjU4ckp5WVZCVWdURE8z?=
+ =?utf-8?B?QU5WcjQwVHRPemlnbkFWTmxNc280dXRtRU1FQ3UySzlZaXUzb3NtZUVJTm8w?=
+ =?utf-8?B?cjhoRG90czhTdzFWSUpwQlpWTXJsOHN3WURHZURLWFZHdUxIMW9MemgvaklL?=
+ =?utf-8?B?T01qempqSmVhY0pqN2JGRnFjdG10Y29oSjM3czB3aksxOEQ0akdoNDdQZE9P?=
+ =?utf-8?B?RmtUREcvUFRVdUIvK0hjR0Vud2Rjclg3dzM3WFZkM2NITXZkTXpBdXA3MWlS?=
+ =?utf-8?B?WEM3bDQ0eGpDUEM1Nk5CQWt3K3pHbysyM1dmelk1bWNkSkRFSnp5elE0OG9s?=
+ =?utf-8?B?RW5pdVNCRExEVlowWDZkR2hWZ3dvREJIYS8zVFFLYVdSemtEWmlaK0FCYVpZ?=
+ =?utf-8?B?Si9ONmV2RjBxMmdSV085Q3lnb0pnYXI4VE4vb1c1QXpLSkhxRDRCTUpwRmtZ?=
+ =?utf-8?Q?OhI7H/a63KI+c?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QUdtWmFIM2VLWUhPWmc0TGJxUHFCd3ZLRGYzc0ZldFRjRXdIQUpXVmJHd3BO?=
+ =?utf-8?B?c3FqdGttL0psSThCcFJmN1EydHFRM0J3b3pMdnlST2NGdjAxYU05eGlnSk40?=
+ =?utf-8?B?MkloTjJMNkpDMEV2Um55dllyYXQxUkI0SkxYdGozNmRhMXNDcjdFR1dxVjdI?=
+ =?utf-8?B?Y3IrYmlnUGhwZEd6dkZzemluN1YzUHg1UWErcGdaRzhvY1JIZTZFMjZBbjhw?=
+ =?utf-8?B?azdrUWNjUlAydWZrZjR4dWxxZjdYenVOVll0bzBZNmQ1VHUycTJuTkNOSmdE?=
+ =?utf-8?B?MXRUbEVlTkZsblhkTXRzUEx3eUpSMEtmdjJzdUJxSTloNGZBSklKTDZvMTd3?=
+ =?utf-8?B?ZW1KOTh5clErUFY0TDFFbGtad1I5WnlwaFB2OGFnTUZFTDV2WWxsSm8yUVpa?=
+ =?utf-8?B?OG13SEFxN05RTHBWU0djWE4zL3pKcEdIMVAyOHBaT0JZcXZZblluajZkbklq?=
+ =?utf-8?B?eElBWHVlV05VR0NFWWh1SCtaT0RsRjFJeklaVzY5enlvV0xWcElaa1F1bEk4?=
+ =?utf-8?B?WmlQYnhNYWVsbENiaDNNajh5WGxuU2tUTTJtZDVMOXh6WW92QzgvZmpCTmFr?=
+ =?utf-8?B?d21QUWduZFFBKzdYelRrMnE3RFZOdUNXdVFnbDJwN1JyTGVDOXRMaUx0WFJy?=
+ =?utf-8?B?SzFvZ09qbzYwaTRsOTBUdmZ6c2xPWVl1UEdsb1FEK0M4MlBtVm5MQW5xMWdq?=
+ =?utf-8?B?ZWRoOUlOUU52eTd3M3BTenhJbTBJQkZYYWFsbVIxZTJsSnlEV0VvK0h3SnMx?=
+ =?utf-8?B?RWRsVkQ4WHJ2VG5zc2hZTUVLcUVGd2Iza05KVGVGZzVlaUxjRnhiS1lxRVpP?=
+ =?utf-8?B?NDlxQkFJMWU3d0RaN0pEaG9KL0FvUzl0Uyt4NURqN2lTL0xkQ29qUWR4U1FM?=
+ =?utf-8?B?KzVuSHYvMzFFK21sR1JPbllkVmc1MUZnd1oxTVhZbFdRRXNmdTd1WUpsUmdV?=
+ =?utf-8?B?akJlVFQwdHU3WFp6U2lZZUJSamZ4OFFwbmlzenpuYlNNdGNzQVRVUEQ3Z1l6?=
+ =?utf-8?B?YnJvWGFodzI4c0FnWUg2OTVmNHY3M0RUNU9kd2k1YTdnejEybmdFSGVGbjlC?=
+ =?utf-8?B?UVhFbzRvbjJWazEzeVBXOFJtMUNrdVRuTDdTZ25XNGpMMUtFVXF0QlpKaWYy?=
+ =?utf-8?B?ZzIxdWl4K0g1dDRYcldxUmFiYzdyWkpzQ0tEWEhHZ2xBaElURVFGQ0t0UVZD?=
+ =?utf-8?B?SDVSUzJlb2MwdmtYWHRENjF2TlAxbGRlVkRIbmU0eC9oeGZpRmVONCtqREF5?=
+ =?utf-8?B?TU5FU00ybDZ4Qk1lRFBqTE9YSHc4UjBnRVY2eFpVREI5VnczajBueGNkUGlH?=
+ =?utf-8?B?blJ1eVlXWFJlQ2hPUnozanlNRS9PTzBkc25OcW15cGtaMmNPM2JwS1lETUtm?=
+ =?utf-8?B?VW5KRVAreEVvV0tucmxwSks1ZFlHa0lTWjI0Sk9lVWdJYXc4RTExUmVsMm5o?=
+ =?utf-8?B?M0xiQ1NvRkFoYjdBVWpQa0gwUCtxL01GTUY3SHBrd2RYa2NVcyt0VUlWN0Z6?=
+ =?utf-8?B?NUhhU2Y4ajNxMDBGOEgvbS85SGptRCtvalhWQThOMklBNXZYKytVaEdOTktq?=
+ =?utf-8?B?cjBtbHVoTnU5Mkk3MkZEellxTXZUK2kyK0JzSjUzM0xTdHdEYkl5RnoydE5x?=
+ =?utf-8?B?cnZleXlVWWpNZVhmamh0Wmlvbzg1dU0xSDBDcXJESk9HTS9xdHd4c2JhSGVH?=
+ =?utf-8?B?V0FFSGluSnlxY3Izc0NDNDVxT0I3K0FCU01kZkljTW5ncTNFV2trc0VUSktO?=
+ =?utf-8?B?aDcyNEpHdHROQnZDbXQrUFQ3dXRMMnBJdTR1WDR0eU01b2JYQlFXc3VYa05m?=
+ =?utf-8?B?dDN0WmVEd1VJKzZsbGZiUzF6UFRDR3hLcHozM3hkVUpLc3pwelozOGtvYWpG?=
+ =?utf-8?B?WnNNY01uaVpsVjdYRThFZFYvbk1kR1RBRUpybCt2c1ZyQXRiZytvZmZsbmgv?=
+ =?utf-8?B?amt6Y25zbW1Ya3NRdzdaNlhzV3hXMENaN1JNd2VqMjFncFIxYlFVR2JGdi9V?=
+ =?utf-8?B?NnNIZTNnQVFiVEtFdEs5S0ZzYUlTdEM3WFY1YkFLUkpNMVNPWHF1bEd4MWwz?=
+ =?utf-8?B?eURRSGEvSHdDQXNIQzZ1VVFhdVMvYjBtYkhGaFNobEF5WWdvQjBleVJBUkc3?=
+ =?utf-8?Q?f861oBX3u3n0UiWajov2zSNl7?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a652811b-5c28-4122-f992-08dd3af255cc
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2025 14:37:45.4412
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JpHm/HqXFq29mLRgibsjUiYc0s4BW3JdUbrD+brGfoyCNQaZc4fj/jjeuHabyKk+
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4335
 
->> Sorry for the late reply, it's been a couple of crazy weeks, and I'm
->> trying to give at least some feedback on stuff in my inbox before
->> even
->> more will pile up over Christmas :) . Let me summarize my thoughts:
+On Wed, Jan 22, 2025 at 02:29:09PM +0100, Christian König wrote:
+
+> I'm having all kind of funny phenomena with AMDs mail servers since coming
+> back from xmas vacation.
+
+:(
+
+A few years back our IT fully migrated our email to into Office 365
+cloud and gave up all the crazy half on-prem stuff they were
+doing. The mail started working fully perfectly after that, as long as
+you use MS's servers directly :\
+
+> But you don't want to handle mmap() on your own, you basically don't want to
+> have a VMA for this stuff at all, correct?
+
+Right, we have no interest in mmap, VMAs or struct page in
+rdma/kvm/iommu.
+ 
+> > > My main interest has been what data structure is produced in the
+> > > attach APIs.
+> > > 
+> > > Eg today we have a struct dma_buf_attachment that returns a sg_table.
+> > > 
+> > > I'm expecting some kind of new data structure, lets call it "physical
+> > > list" that is some efficient coding of meta/addr/len tuples that works
+> > > well with the new DMA API. Matthew has been calling this thing phyr..
 > 
-> My turn for the lateness - back from a break.
+> I would not use a data structure at all. Instead we should have something
+> like an iterator/cursor based approach similar to what the new DMA API is
+> doing.
+
+I'm certainly open to this idea. There may be some technical
+challenges, it is a big change from scatterlist today, and
+function-pointer-per-page sounds like bad performance if there are
+alot of pages..
+
+RDMA would probably have to stuff this immediately into something like
+a phyr anyhow because it needs to fully extent the thing being mapped
+to figure out what the HW page size and geometry should be - that
+would be trivial though, and a RDMA problem.
+
+> > > Now, if you are asking if the current dmabuf mmap callback can be
+> > > improved with the above? Maybe? phyr should have the neccessary
+> > > information inside it to populate a VMA - eventually even fully
+> > > correctly with all the right cachable/encrypted/forbidden/etc flags.
 > 
-> I should also preface that Mike is off for at least a month more, but
-> he will return to continue working on this.  In the meantime, I've had
-> a chat with him about this work to keep the discussion alive on the
-> lists.
+> That won't work like this.
 
-So now it's my turn to being late again ;) As promised during the last 
-call, a few points from my side.
+Note I said "populate a VMA", ie a helper to build the VMA PTEs only.
 
+> See the exporter needs to be informed about page faults on the VMA to
+> eventually wait for operations to end and sync caches.
+
+All of this would still have to be provided outside in the same way as
+today.
+
+> For example we have cases with multiple devices are in the same IOMMU domain
+> and re-using their DMA address mappings.
+
+IMHO this is just another flavour of "private" address flow between
+two cooperating drivers.
+
+It is not a "dma address" in the sense of a dma_addr_t that was output
+from the DMA API. I think that subtle distinction is very
+important. When I say pfn/dma address I'm really only talking about
+standard DMA API flows, used by generic drivers.
+
+IMHO, DMABUF needs a private address "escape hatch", and cooperating
+drivers should do whatever they want when using that flow. The address
+is *fully private*, so the co-operating drivers can do whatever they
+want. iommu_map in exporter and pass an IOVA? Fine! pass a PFN and
+iommu_map in the importer? Also fine! Private is private.
+
+> > But in theory it should be possible to use phyr everywhere eventually, as
+> > long as there's no obviously api-rules-breaking way to go from a phyr back to
+> > a struct page even when that exists.
 > 
->> THPs in Linux rely on the following principle:
->>
->> (1) We try allocating a THP, if that fails we rely on khugepaged to
->> fix
->>       it up later (shmem+anon). So id we cannot grab a free THP, we
->>       deffer it to a later point.
->>
->> (2) We try to be as transparent as possible: punching a hole will
->>       usually destroy the THP (either immediately for shmem/pagecache
->> or
->>       deferred for anon memory) to free up the now-free pages. That's
->>       different to hugetlb, where partial hole-punching will always
->> zero-
->>       out the memory only; the partial memory will not get freed up
->> and
->>       will get reused later.
->>
->>       Destroying a THP for shmem/pagecache only works if there are no
->>       unexpected page references, so there can be cases where we fail
->> to
->>       free up memory. For the pagecache that's not really
->>       an issue, because memory reclaim will fix that up at some point.
->> For
->>       shmem, there  were discussions to do scan for 0ed pages and free
->>       them up during memory reclaim, just like we do now for anon
->> memory
->>        as well.
->>
->> (3) Memory compaction is vital for guaranteeing that we will be able
->> to
->>       create THPs the longer the system was running,
->>
->>
->> With guest_memfd we cannot rely on any daemon to fix it up as in (1)
->> for
->> us later (would require page memory migration support).
-> 
-> True.  And not having a huge page when requested to begin with (as in 1
-> above) beats the purpose entirely -- the point is to speed up SEV-SNP
-> setup and guests by having fewer pages to work with.
+> I would rather say we should stick to DMA addresses as much as possible.
 
-Right.
+I remain skeptical of this.. Aside from all the technical reasons I
+already outlined..
 
-> 
->> We use truncate_inode_pages_range(), which will split a THP into
->> small
->> pages if you partially punch-hole it, so (2) would apply; splitting
->> might fail as well in some cases if there are unexpected references.
->>
->> I wonder what would happen if user space would punch a hole in
->> private
->> memory, making truncate_inode_pages_range() overwrite it with 0s if
->> splitting the THP failed (memory write to private pages under TDX?).
->> Maybe something similar would happen if a private page would get 0-ed
->> out when freeing+reallocating it, not sure how that is handled.
->>
->>
->> guest_memfd currently actively works against (3) as soon as we (A)
->> fallback to allocating small pages or (B) split a THP due to hole
->> punching, as the remaining fragments cannot get reassembled anymore.
->>
->> I assume there is some truth to "hole-punching is a userspace
->> policy",
->> but this mechanism will actively work against itself as soon as you
->> start falling back to small pages in any way.
->>
->>
->>
->> So I'm wondering if a better start would be to (A) always allocate
->> huge
->> pages from the buddy (no fallback) and
-> 
-> that sounds fine..
-> 
->> (B) partial punches are either
->> disallowed or only zero-out the memory. But even a sequence of
->> partial
->> punches that cover the whole huge page will not end up freeing all
->> parts
->> if splitting failed at some point, which I quite dislike ...
-> 
-> ... this  basically just looks like hugetlb support (i.e. without the
-> "transparent" part), isn't it?
+I think it is too much work to have the exporters conditionally build
+all sorts of different representations of the same thing depending on
+the importer. Like having alot of DRM drivers generate both a PFN and
+DMA mapped list in their export code doesn't sound very appealing to
+me at all.
 
-Yes, just using a different allocator until we have a predictable 
-allocator with reserves.
+It makes sense that a driver would be able to conditionally generate
+private and generic based on negotiation, but IMHO, not more than one
+flavour of generic..
 
-Note that I am not sure how much "transparent" here really applies, 
-given the differences to THPs ...
-
-> 
->> But then we'd need memory preallocation, and I suspect to make this
->> really useful -- just like with 2M/1G "hugetlb" support -- in-place
->> shared<->private conversion will be a requirement. ... at which point
->> we'd have reached the state where it's almost the 2M hugetlb support.
-> 
-> Right, exactly.
-> 
->> This is not a very strong push back, more a "this does not quite
->> sound
->> right to me" and I have the feeling that this might get in the way of
->> in-place shared<->private conversion; I might be wrong about the
->> latter
->> though.
-
-As discussed in the last bi-weekly MM meeting (and in contrast to what I 
-assumed), Vishal was right: we should be able to support in-place 
-shared<->private conversion as long as we can split a large folio when 
-any page of it is getting converted to shared.
-
-(split is possible if there are no unexpected folio references; private 
-pages cannot be GUP'ed, so it is feasible)
-
-So similar to the hugetlb work, that split would happen and would be a 
-bit "easier", because ordinary folios (in contrast to hugetlb) are 
-prepared to be split.
-
-So supporting larger folios for private memory might not make in-place 
-conversion significantly harder; the important part is that shared 
-folios may only be small.
-
-The split would just mean that we start exposing individual small folios 
-to the core-mm, not that we would allow page migration for the shared 
-parts etc. So the "whole 2M chunk" will remain allocated to guest_memfd.
-
-> 
-> TBH my 2c are that getting hugepage supported, and disabling THP for
-> SEV-SNP guests will work fine.
-
-Likely it will not be that easy as soon as hugetlb reserves etc. will 
-come into play.
-
-> 
-> But as Mike mentioned above, this series is to add a user on top of
-> Paolo's work - and that seems more straightforward to experiment with
-> and figure out hugepage support in general while getting all the other
-> hugepage details done in parallel.
-
-I would suggest to not call this "THP". Maybe we can call it "2M folio 
-support" for gmem.
-
-Similar to other FSes, we could just not limit ourselves to 2M folios, 
-and simply allocate any large folios. But sticking to 2M might be 
-beneficial in regards to memory fragmentation (below).
-
-> 
->> With memory compaction working for guest_memfd, it would all be
->> easier.
-> 
-> ... btw do you know how well this is coming along?
-
-People have been talking about that, but I suspect this is very 
-long-term material.
-
-> 
->> Note that I'm not quite sure about the "2MB" interface, should it be
->> a
->> "PMD-size" interface?
-> 
-> I think Mike and I touched upon this aspect too - and I may be
-> misremembering - Mike suggested getting 1M, 2M, and bigger page sizes
-> in increments -- and then fitting in PMD sizes when we've had enough of
-> those.  That is to say he didn't want to preclude it, or gate the PMD
-> work on enabling all sizes first.
-
-Starting with 2M is reasonable for now. The real question is how we want 
-to deal with
-
-(a) Not being able to allocate a 2M folio reliably
-(b) Partial discarding
-
-Using only (unmovable) 2M folios would effectively not cause any real 
-memory fragmentation in the system, because memory compaction operates 
-on 2M pageblocks on x86. So that feels quite compelling.
-
-Ideally we'd have a 2M pagepool from which guest_memfd would allocate 
-pages and to which it would putback pages. Yes, this sound similar to 
-hugetlb, but might be much easier to implement, because we are not 
-limited by some of the hugetlb design decisions (HVO, not being able to 
-partially map them, etc.).
-
--- 
-Cheers,
-
-David / dhildenb
-
+Jason
 
