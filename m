@@ -1,117 +1,150 @@
-Return-Path: <kvm+bounces-36226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B086A18D97
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 09:28:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A92A18DFF
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 10:01:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 440323A67E1
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 08:27:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 337431882961
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 09:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E380204681;
-	Wed, 22 Jan 2025 08:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856491C3C0F;
+	Wed, 22 Jan 2025 09:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bLc+5PPU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G2dHyrP9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62CF203705;
-	Wed, 22 Jan 2025 08:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D81A1FAA
+	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 09:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737534470; cv=none; b=nlsxRYfwNK9Nxt+0cLuyTvp2wU4A5lqRPEXWbr4AVapxG6n7huG9c1SPfgi+zsvoWHFR4IMT40iBimWobv7bXg12w5oeD9fMdyBDn79QPXGSRbeMQOinJzVNR1/erJN5ciFor0KTeWHErWh0Tj535imgRUER/Z7Ks3MPNz/FjsU=
+	t=1737536471; cv=none; b=hswjad8uoGsoOJOPFvX/S7insHUk/LdszqTH7acMkgC//MGlRx490PH2F+N8M8jbvaG4j4usEYKl28UPoI3sUBHLtXv0f5jC8r8iKkGA1B7fBtmkxwx408bciwpCyGl8wYffRQWO6LIxxbZh/7Wid4+ffKTkKtU9F3BUVtFmNnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737534470; c=relaxed/simple;
-	bh=FtCqAQv1YlUfdX9xfdQZD810YHl6sym/evT0F7HVC0s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ew6x6IyOc4wOEJ2CbtxJA9vHCaBkU1lYEXkeEvcFUGwR/re0UkVyh9wI2wsVHQbd33in9C5isnDRAm1VUSjfffA7GNnxQxysTXMmP60uDU8yxRbixSgY9p1EL9Nsibgh484FBnupbpknBlj0nGvB1utQ8vc+BWiFTNM/qpS5wrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bLc+5PPU; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737534469; x=1769070469;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=FtCqAQv1YlUfdX9xfdQZD810YHl6sym/evT0F7HVC0s=;
-  b=bLc+5PPU4wOKnfLxoFQv2kpt450PW5VX4sDopbSin6IGsbcI/AZooLPI
-   BSudKt2vIC5z6L1HezAviQfEiOVvJ1+FLeCw+d/Lzckz1S88EF2IiZwWL
-   3mOcNpfD5KObk/XaU4x06vsHAycqW0T7VCg2/GeWikJWCRe9BISDK+wTF
-   eXQpPELPXUyG2TFjMUGVvY1tWf2JWp6zoU6d1+7BlBYfei98b3Zmox8TY
-   RSlcQOCv0Q7r7VK1Yp9XMxBKJTq4sn0jX56gz8YFFaDM51o9Bv0EP7Frj
-   +q/T4xhqn5O8vIOftNd/yLrd7TOmGGz0vAP6yV1Z6MOZKwk9M43Wa1W9v
-   Q==;
-X-CSE-ConnectionGUID: f+a6mIAnQsmjRLyK2XwrnQ==
-X-CSE-MsgGUID: +JA2QYy/QX2YuI0Q35P7ew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="48578185"
-X-IronPort-AV: E=Sophos;i="6.13,224,1732608000"; 
-   d="scan'208";a="48578185"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 00:27:48 -0800
-X-CSE-ConnectionGUID: gkSEjk9NQDOJYznQOI9Z7w==
-X-CSE-MsgGUID: LLxwZOwuQWOQcpF9eKyE3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="112043351"
-Received: from mjarzebo-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.245])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 00:27:44 -0800
-Date: Wed, 22 Jan 2025 10:27:39 +0200
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Huang, Kai" <kai.huang@intel.com>,
-	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>,
-	"Chatre, Reinette" <reinette.chatre@intel.com>
-Subject: Re: [PATCH v2 00/25] TDX vCPU/VM creation
-Message-ID: <Z5Cr-6t469cZRTaA@tlindgre-MOBL1>
-References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
- <CABgObfZsF+1YGTQO_+uF+pBPm-i08BrEGCfTG8_o824776c=6Q@mail.gmail.com>
- <94e37a815632447d4d16df0a85f3ec2e346fca49.camel@intel.com>
+	s=arc-20240116; t=1737536471; c=relaxed/simple;
+	bh=yJoB/l2zgEIpfda+tllzxi0+NYyzT021Y/mneEU8K/Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Lz97XScsy2QFavgPGsfEFD3voTDQ84Sh5yKtEQxKwF+uPSgjxfTD925QTmA60DvyxDeam5gdLYnsWcDt6yglNOuVu2d7yhsFrSHdwaK4W8jogXt22SrRbuzgoBqJ2VkpxRFbl1m6c/40aZ6WnEMiZVLJ6Wql/OkzahcIWgHKpHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G2dHyrP9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737536468;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kOGyU/Qv4F7f+lvHaCoz7+BlEq7z6iiiqFtyrBdQXfg=;
+	b=G2dHyrP9L5aQ6bU4F7ue3UH4s8A8uika6b2lg0m+zCt/PzU6X3vNSHL01+FrLwAz0HF1Ln
+	1l05f7So+6WOFmqWChAeC3DR2gFv3AY3XIZF76apmvnKEqEz8OwPhtACESWtP25zYz6F/g
+	+seuuIiJSflgQ5wBnknb+3WDdKx7xj4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-169-60TglZLcMcuP1o0jklmWHQ-1; Wed, 22 Jan 2025 04:01:06 -0500
+X-MC-Unique: 60TglZLcMcuP1o0jklmWHQ-1
+X-Mimecast-MFC-AGG-ID: 60TglZLcMcuP1o0jklmWHQ
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361fc2b2d6so36372705e9.3
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 01:01:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737536465; x=1738141265;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kOGyU/Qv4F7f+lvHaCoz7+BlEq7z6iiiqFtyrBdQXfg=;
+        b=E5CtI2n4q7YaFHf6mnWigFVGTApjh7opYCqiu9b0FG4Q68qAc0Kl6Wjyzqtm1tChYd
+         pd6vrSOzmCmzj7uRzTOxV1nFlHZY8ThzMD5xOqrrBOIvi/88jzc8bYdGqw1FovmrU2KK
+         TAhy6ZnEYZaIk0aEl6BJ08j8r6XbPkytEmZFHoqezWCFcTvY2yGiRudIrcy9e0BoBZ5F
+         hhnt3NxtB8GWwRmLK+t8sswUoJtiS0TY/xWdNHt8MWhISIoVP2XxGNs0+RU9rUX56eyi
+         PGkIygzyyJ3ENRPvbkDnToQCjVgK6fI2Kamz3lXoiWIlvo42b2SsDz8pQKJyOG/k8T5O
+         h+tw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3clbweCayrm9AF85J03fMx3Jo8eHgAUTiwg8BxGZnh4tSmnyikUEECQZPIKLICavRalE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhC88PvOhiQ9F00UzDuwk8jvoBxxVrL4jvgv1nsG20aw2baDr/
+	6b36tf1ondhwdYO6cER/XMjmctUrNVRvxniNMAHwxTB3VunXpf8xEehnMrXE29cn8qV1GqdSson
+	rMfPO4d8FdrsnIgsRS65f3S2RZ/nZ6tgurN4kgzdxbqu5dAL4SEFiXB3YWhboOEBEZkC9p9Sot1
+	wImu1o5Ec9GzmLrfUFNM6JoNB2
+X-Gm-Gg: ASbGnctonWduQ9YIRUDYiJSA+pV4GslXyL1bGEaFh+8/Q5TSGqiJFtZ7NWvmMauoP0n
+	20WXN8I2iJXS7QLrUTwIhCUppdYnlNvOqHbJUmEnycQtrhiCXN1UQ
+X-Received: by 2002:adf:fb4c:0:b0:38b:f03c:5bb8 with SMTP id ffacd0b85a97d-38bf5662030mr16121347f8f.14.1737536465535;
+        Wed, 22 Jan 2025 01:01:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFWjdwPpVQ3zPjUUiH1aNCGKKGyYEP97TYXiGa5cXMLop9c6nFdf2G8dk6wg3yiP0oRfFEHPGYuO+en6oEBAdw=
+X-Received: by 2002:adf:fb4c:0:b0:38b:f03c:5bb8 with SMTP id
+ ffacd0b85a97d-38bf5662030mr16121313f8f.14.1737536465152; Wed, 22 Jan 2025
+ 01:01:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <94e37a815632447d4d16df0a85f3ec2e346fca49.camel@intel.com>
+References: <CANDhNCq5_F3HfFYABqFGCA1bPd_+xgNj-iDQhH4tDk+wi8iZZg@mail.gmail.com>
+In-Reply-To: <CANDhNCq5_F3HfFYABqFGCA1bPd_+xgNj-iDQhH4tDk+wi8iZZg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 22 Jan 2025 10:00:52 +0100
+X-Gm-Features: AbW1kvbw2R4ISKjYteP0eYoglR2pZPe62sGfrIdFcRReEPnxwI3UtrKTTtD-BjU
+Message-ID: <CABgObfbWqcorZC+1Hjh7SQtn69LE-Wng-wBKOq=tqh00_3R6dw@mail.gmail.com>
+Subject: Re: BUG: Occasional unexpected DR6 value seen with nested
+ virtualization on x86
+To: John Stultz <jstultz@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, kvm <kvm@vger.kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Frederic Weisbecker <fweisbec@gmail.com>, 
+	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>, Jim Mattson <jmattson@google.com>, 
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, LKML <linux-kernel@vger.kernel.org>, 
+	"Team, Android" <kernel-team@android.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Jan 04, 2025 at 01:43:56AM +0000, Edgecombe, Rick P wrote:
-> On Mon, 2024-12-23 at 17:25 +0100, Paolo Bonzini wrote:
-> > 11: see the type safety comment above:
-> > > The ugly part here is the type-unsafety of to_vmx/to_tdx.  We probably
-> > > should add some "#pragma poison" of to_vmx/to_tdx: for example both can
-> > > be poisoned in pmu_intel.c after the definition of
-> > > vcpu_to_lbr_records(), while one of them can be poisoned in
-> > > sgx.c/posted_intr.c/vmx.c/tdx.c.
-> 
-> I left it off because you said "Not a strict requirement though." and gave it a
-> RB tag. Other stuff seemed higher priority. We can look at some options for a
-> follow on patch if it lightens your load.
+Il mer 22 gen 2025, 07:07 John Stultz <jstultz@google.com> ha scritto:
+>
+> I then cut down and ported the bionic test out so it could build under
+> a standard debian environment:
+> https://github.com/johnstultz-work/bionic-ptrace-reproducer
+>
+> Where I was able to reproduce the same problem in a debian VM (after
+> running the test in a loop for a short while).
 
-I suggest we do this:
 
-- Make to_kvm_tdx() and to_tdx() private to tdx.c as they're only used
-  in tdx.c
+Thanks, that's nice to have.
 
-- Add pragma poison to_vmx at the top of tdx.c
+> Now, here's where it is odd. I could *not* reproduce the problem on
+> bare metal hardware, *nor* could I reproduce the problem in a virtual
+> environment.  I can *only* reproduce the problem with nested
+> virtualization (running the VM inside a VM).
 
-- Add pragma poison to_vmx in pmu_intel.c after vcpu_to_lbr_records()
+Typically in that case the best thing to do is turn it into a
+kvm-unit-test or selftest (though that's often an endeavor of its own,
+as it requires distilling the Linux kernel and userspace code into a
+guest that runs without an OS). But what you've done is already a good
+step.
 
-Other pragma poison to_vmx can be added as needed, but AFAIK there's
-not need to add it for to_tdx().
+> I have reproduced this on my intel i12 NUC using the same v6.12 kernel
+> on metal + virt + nested environments.  It also reproduced on the NUC
+> with v5.15 (metal) + v6.1 (virt) + v6.1(nested).
 
-Regards,
+Good that you can use a new kernel. Older kernels are less reliable
+with nested virt (especially since the one that matters the most is
+the metal one).
 
-Tony
+Paolo
+
+> I've tried to do some tracing in the arch/x86/kvm/x86.c logic, but
+> I've not yet directly correlated anything on the hosts to the point
+> where we read the zero DR6 value in the nested guest.
+>
+> But I'm not very savvy around virtualization or ptrace watchpoints or
+> low level details around intel DB6 register, so I wanted to bring this
+> up on the list to see if folks had suggestions or ideas to further
+> narrow this down?  Happy to test things as it's pretty simple to
+> reproduce here.
+>
+> Many thanks to Alex Bennee and Jim Mattson for their testing
+> suggestions to help narrow this down so far.
+>
+> thanks
+> -john
+>
+
 
