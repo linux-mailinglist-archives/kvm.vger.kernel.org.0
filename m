@@ -1,110 +1,166 @@
-Return-Path: <kvm+bounces-36238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36239-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06C66A190B3
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 12:35:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C68BA190C0
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 12:38:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AE5E3A3ECE
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 11:35:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA1221887A7A
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 11:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7755A211A33;
-	Wed, 22 Jan 2025 11:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37CF211A3C;
+	Wed, 22 Jan 2025 11:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lh1TCTUW"
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="ECELAQlC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kaj9xJl+"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05216211A15
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 11:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D4920FA9A;
+	Wed, 22 Jan 2025 11:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737545713; cv=none; b=n23S5MPk4tTDWvaMIOnWDG9YrjksTLMrDvgGMoFnyBKveIU0l3S0Gyyk9Xa3yWobmjHolFsZnQu0SmltQ3yXpc8XJRWIipg12G8ynsUVa4tdp4G7za/IqN3V0tzUzhvkqIp4/IdNFv3CYPicrkRY/fot0nNAGTikRMwovd2M8N4=
+	t=1737545911; cv=none; b=VgDx3xMt8pHOHR8ymvqb19+rLXbfiTymyyRyKKLQDc2OQi2Iv+c1mM70i/gq4/f+SsKDysJM+KQxnw2cDvAG4hY77B+gHw+sg8GVcnqocCcgrZO0xfJVCszvvEhccUNf0zfkd3+meY3/58ChfCtXSkVsSwDqnhCtsYBX9ToBY54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737545713; c=relaxed/simple;
-	bh=kUnZi53CxLhELZQ4CKnK/GrzEfzp798petRIlYLogQA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I5aYU44tqPCbJZviTIiVIbwpSpLmJlnlmn0KGlekRCwzcl+EOK+Uq7UxBgB9goGGEl7vhQcAU5WBYRdJuFDTgIOgXuYfYZiRQ5NY+O7N5kgWzxwY1pc2AyX6UOiW5i626PVBqV14zUK6Ild4LF6vjEI8W4XGIxghpOt7QEygYIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lh1TCTUW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737545710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LIW2RrpZb08kwEsM3N55cp439NM0TAOF6bYvV2mcLz4=;
-	b=Lh1TCTUWbBDafcCio7NEryqjiChRjHJ7yjfqygYu0odg6KV1k/G1eM84R9URvD5TZoLNTo
-	W34UYyqOELoJ4SmHRpqKrcTJHLH+hNsXIWwMWJdTaYPpaSn7zwuMyFrh3A9RfqkZ4YKc8c
-	Pr5krqU0zu7/OK+WXSfXTUky1C+4Dsc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-12-HyTcByckMlWjfYa7SvcHDw-1; Wed, 22 Jan 2025 06:35:09 -0500
-X-MC-Unique: HyTcByckMlWjfYa7SvcHDw-1
-X-Mimecast-MFC-AGG-ID: HyTcByckMlWjfYa7SvcHDw
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361b090d23so35523875e9.0
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 03:35:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737545708; x=1738150508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LIW2RrpZb08kwEsM3N55cp439NM0TAOF6bYvV2mcLz4=;
-        b=Kbu76KGKlYkj6eB8mv6P1s99prP5h54hKO12x1cxPglrdMMRGXZCt+8Tf9qVDIsUAu
-         7IsXIAFybWArGbctPb4dlJeJvQ4Rsgh7U3wk71a/BwBeZxFwQHnbgQQqmfLYcoWKIPLL
-         TPNtxddMNMGC7eN7A5OpsiK1EcOGxGxhJEPu90nNcrtAdgkSKT+54BYnOuS0vwfM6T0h
-         uTSSlygnjy4QKRNGpL8aCExKujXqVNOskKQ3s75PJtQuLUTakqGOJ2OlP5UxR0cF/u2P
-         lWtsa3LU7AsLRhhAC/r156cnaH86grHye/yZqhY2N6v9MveOho27Ag/t2AT3uu9AT5Gy
-         O68w==
-X-Forwarded-Encrypted: i=1; AJvYcCW8a2foWFMzlj3l8EsDVKOBX/vndZJasq9mB5UpqkBCl7BQrEIDO5OZzXFHCakCbVd3eMI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMcWuOqAtNzP1v0iuF3kHbhEwQOvot1zz+Hd3UgkScUKDUtxRK
-	5Q2oXIGy9KHQC8Q4R4sBUseo9G4J12HUgavQoWph6UA7aUk+xMwIuKxKoDGnLyURUL6i4pfkh4Z
-	rG8qoN/O19X+Z+T+ZNnZsDk5eoJ4mwPrRet42HVTt+k0yzxjA2FfINug6nQy8xpP0myA+IZkX+m
-	nv0Qee8VXk6L/+5/nljNq86L+h
-X-Gm-Gg: ASbGncuavsGPBOgo2ukZSvR1wxIE4qVZ3G7Wh7GQAT65rVOflsg2qggRmhGKTkvm13d
-	yFCWnuTuTboARoMv1pCLkMyb6/3N0pU52/0KaVpHaQH1BMAbpd51B
-X-Received: by 2002:a5d:59ad:0:b0:38b:ed7b:f78c with SMTP id ffacd0b85a97d-38bf566f41cmr18078511f8f.6.1737545708294;
-        Wed, 22 Jan 2025 03:35:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGBEDi9vf8dkyhNozAmsi+wbLlIhneovVljfCcbgIwZ4a7c3sWHlocanWluG2OEmdh7ejryg8Td+68lBy3agzk=
-X-Received: by 2002:a5d:59ad:0:b0:38b:ed7b:f78c with SMTP id
- ffacd0b85a97d-38bf566f41cmr18078480f8f.6.1737545707982; Wed, 22 Jan 2025
- 03:35:07 -0800 (PST)
+	s=arc-20240116; t=1737545911; c=relaxed/simple;
+	bh=J6psTmPSOU3QKpSJiKJxeAXXel0SZEi6GTHPuAuKZM8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=btg6RDhR30ZPXTDUPzVCzsFNl1WGiRJnOZDr8HwOqj/9AMFDV2orqSTRPlvh6ahgr1AW1h5NScQQ6pKvynIGLG6rJ7Yd4SNkYkgioiOBwKRWL8iaWX2lBJIX5cpWj8gHYJox2xrK7OM+Q2kx8X8YppJFV1TRhoJUSVOufXigNiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is; spf=pass smtp.mailfrom=alyssa.is; dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b=ECELAQlC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kaj9xJl+; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alyssa.is
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfout.stl.internal (Postfix) with ESMTP id 1BE09114016C;
+	Wed, 22 Jan 2025 06:38:28 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Wed, 22 Jan 2025 06:38:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1737545907; x=1737632307; bh=G8MsUq4Yg2
+	w0NbfNEjbUAvvjkMooYocwMqwISkeqwRs=; b=ECELAQlCZh+3wWqHTR3gkm3IKl
+	gxBsRMiF2EKFJQEatuh7cwdJiGhN5dozRoIhj/9iTNTqD6xaSB9mX55rdlEd42GV
+	UVHHBifG9TtTo8HqNsY+PcXKTkATPd9m02ZSvTvxDnc1mtsuuq/HzWYIJmn+HMby
+	TqBYTGO2BO8EPuB8NIMmCkJ2+j793ADkKSLrcuXoZ5UfHRBDTWeLZadRzReKXq8n
+	C02DiMUB3KE/gl0ZdgSmiNKQR5hMsPdpDHdwPKerlz/Y87unmgGOCLd75A4TSRpS
+	WUnPFKJBRfhV5/m/Ut50PFrzidQaBiv9jwgvgUeRkD7MXthhymoZWgoQbIhg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1737545907; x=1737632307; bh=G8MsUq4Yg2w0NbfNEjbUAvvjkMooYocwMqw
+	ISkeqwRs=; b=kaj9xJl+/kjO73YRAKA75oZUYvBLH+xw6B0HpYpwMzuYIU6idlj
+	B0FH5PZfk8daVL468Q1UTGVGoF9NsbW0kVQ20PYmcMSd9WA5FJdNp4aVIgpV/W4D
+	lrsjcXHQkHCoXfrd/BS2mUdxKFJzuHbbH9TvSD8ZZro8MlMkjPhAXlhGJSLzfFgj
+	SFd2jFpwptJAkGx1sbuENHkU6QglKhV/I7S/e3QAZSR6wbtkkYFP+NjOIdkaPuH4
+	VCXuWbh6KyXNwyhbHsaG98BX/szcuixl66qWZgFn2EmBo0ztxVWmVgRgTtC2LGxi
+	Opx0uSudVPMWr873ehtjMvkJ9v6VRP//XBQ==
+X-ME-Sender: <xms:s9iQZ1cr7X83bJNzUiAMJWGI4E-sedRZdDTOgyzvf-i5fxWnNlmpWA>
+    <xme:s9iQZzO6FTtw5CpEhLEyIzDGX1JTt6mjOC340Q20_s7efpgeJkBHnxvyCIGGZrPXm
+    3zQuVWk2jZHwUODvw>
+X-ME-Received: <xmr:s9iQZ-hx7oU8dvgSyPaIdC8JkTPskVNfkcz2N60rjM2yvgZKPja8Jp6vpxrDvj4sw_B9Wytitn6gOovJZyQB6VIaDCY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejfedgudehiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehgtdfsredttddv
+    necuhfhrohhmpeetlhihshhsrgcutfhoshhsuceohhhisegrlhihshhsrgdrihhsqeenuc
+    ggtffrrghtthgvrhhnpedtjeeuteekheefueeluefgveeiffekhfetfeeivdefheeuhfej
+    gedvieffiefhieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
+    hrohhmpehhihesrghlhihsshgrrdhishdpnhgspghrtghpthhtohepuddtpdhmohguvgep
+    shhmthhpohhuthdprhgtphhtthhopegslhhutggrseguvggsihgrnhdrohhrghdprhgtph
+    htthhopehsvggrnhhjtgesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhgsuhhstghh
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehtjheskhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtoheprhgvghhrvghsshhiohhnsheslhhishhtshdrlhhinhhugidruggvvhdprhgt
+    phhtthhopehmihgthhgrvghlrdgthhhrihhsthhivgesohhrrggtlhgvrdgtohhmpdhrtg
+    hpthhtohepphgsohhniihinhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehkvhhm
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvg
+    hlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:s9iQZ-9boLcqCIG8iGSsTn5LWMO3pFQu56TwLW494CMAYE0ix2qZOA>
+    <xmx:s9iQZxujd4BTUKHTrnmBfqhlO2Gu0Ofbn2V7R9x_GKWeYug4LdbAuw>
+    <xmx:s9iQZ9FQRXcYgGSSIwl0Iz1qr8guVbbDhQt9YSKCp3Q6QowKW-tFsQ>
+    <xmx:s9iQZ4PAaEBzihQC8uNL-JA5Il5RhUiwSs7C40SipBSQycr1sur5Xg>
+    <xmx:s9iQZykySSZF3JGjL29Vv404HXDFRyqk6lGXo4Zw3SnJQrv8FiyibfXc>
+Feedback-ID: i12284293:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 22 Jan 2025 06:38:27 -0500 (EST)
+Received: by sf.qyliss.net (Postfix, from userid 1000)
+	id 83C5DC223DF; Wed, 22 Jan 2025 12:38:25 +0100 (CET)
+Date: Wed, 22 Jan 2025 12:38:25 +0100
+From: Alyssa Ross <hi@alyssa.is>
+To: Keith Busch <kbusch@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, michael.christie@oracle.com, Tejun Heo <tj@kernel.org>, 
+	Luca Boccassi <bluca@debian.org>, stable@vger.kernel.org, regressions@lists.linux.dev
+Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
+Message-ID: <twoqrb4bdyujvnf432lqvm3eqzvhqsbotag3q3snecgqwm7lzw@izuns3gun2a6>
+References: <Z2RYyagu3phDFIac@kbusch-mbp.dhcp.thefacebook.com>
+ <fdb5aac8-a657-40ec-9e0b-5340bc144b7b@redhat.com>
+ <Z2RhNcJbP67CRqaM@kbusch-mbp.dhcp.thefacebook.com>
+ <CABgObfYUztpGfBep4ewQXUVJ2vqG_BLrn7c19srBoiXbV+O3+w@mail.gmail.com>
+ <Z4Uy1beVh78KoBqN@kbusch-mbp>
+ <0862979d-cb85-44a8-904b-7318a5be0460@redhat.com>
+ <Z4cmLAu4kdb3cCKo@google.com>
+ <Z4fnkL5-clssIKc-@kbusch-mbp>
+ <CABgObfZWdwsmfT-Y5pzcOKwhjkAdy99KB9OUiMCKDe7UPybkUQ@mail.gmail.com>
+ <Z4gGf5SAJwnGEFK0@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241209010734.3543481-1-binbin.wu@linux.intel.com> <20241209010734.3543481-14-binbin.wu@linux.intel.com>
-In-Reply-To: <20241209010734.3543481-14-binbin.wu@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 22 Jan 2025 12:34:56 +0100
-X-Gm-Features: AbW1kvbxdoAqejv6wQeII0iNJrMFwYwd6zslL8i6npziPMNoeouDZUvWRi5h00Q
-Message-ID: <CABgObfbFX+3rCcB2teTEMO=EPiuOnaXjMW+tR3UF5t7gWwiNwQ@mail.gmail.com>
-Subject: Re: [PATCH 13/16] KVM: TDX: Add methods to ignore virtual apic
- related operation
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: seanjc@google.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
-	kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com, 
-	xiaoyao.li@intel.com, tony.lindgren@linux.intel.com, isaku.yamahata@intel.com, 
-	yan.y.zhao@intel.com, chao.gao@intel.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pbsm6sup57jukwpk"
+Content-Disposition: inline
+In-Reply-To: <Z4gGf5SAJwnGEFK0@kbusch-mbp>
 
-On Mon, Dec 9, 2024 at 2:06=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.com=
-> wrote:
-> -       .hwapic_irr_update =3D vmx_hwapic_irr_update,
-> -       .hwapic_isr_update =3D vmx_hwapic_isr_update,
-> +       .hwapic_irr_update =3D vt_hwapic_irr_update,
-> +       .hwapic_isr_update =3D vt_hwapic_isr_update,
 
-Just a note, hwapic_irr_update is gone in 6.14 and thus in kvm-coco-queue.
+--pbsm6sup57jukwpk
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Subject: Re: [PATCH] KVM: x86: switch hugepage recovery thread to vhost_task
+MIME-Version: 1.0
 
-Paolo
+On Wed, Jan 15, 2025 at 12:03:27PM -0700, Keith Busch wrote:
+> On Wed, Jan 15, 2025 at 06:10:05PM +0100, Paolo Bonzini wrote:
+> > You can implement something like pthread_once():
+>
+> ...
+>
+> > Where to put it I don't know.  It doesn't belong in
+> > include/linux/once.h.  I'm okay with arch/x86/kvm/call_once.h and just
+> > pull it with #include "call_once.h".
+>
+> Thanks for the suggestion, I can work with that. As to where to put it,
+> I think the new 'struct once' needs to be a member of struct kvm_arch,
+> so I've put it in arch/x86/include/asm/.
+>
+> Here's the result with that folded in. If this is okay, I'll send a v2,
+> and can split out the call_once as a prep patch with your attribution if
+> you like.
 
+Has there been any progress here?  I'm also affected by the crosvm
+regression, and it's been backported to the LTS stable kernel.
+
+(CCing the stable and regressions lists to make sure the regression is
+tracked.)
+
+#regzbot introduced: d96c77bd4eeb
+
+--pbsm6sup57jukwpk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRV/neXydHjZma5XLJbRZGEIw/wogUCZ5DYrwAKCRBbRZGEIw/w
+omlXAQDBgeu+m7LZSkjFkp1AZv0g2BuJYTB3+jR3gfIKInXsygEA/RPqyDiFix9/
+FzCbNsxxPIW+EnrJ8Hk/fHMvJDEG6Qo=
+=oPrN
+-----END PGP SIGNATURE-----
+
+--pbsm6sup57jukwpk--
 
