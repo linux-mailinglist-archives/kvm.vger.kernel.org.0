@@ -1,282 +1,207 @@
-Return-Path: <kvm+bounces-36253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36254-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7053A1947A
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 15:59:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B5CDA194A0
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 16:06:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D959E169C70
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 14:59:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E573B1882E4B
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 15:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7A52144DC;
-	Wed, 22 Jan 2025 14:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177A6214226;
+	Wed, 22 Jan 2025 15:06:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="c2/HbW5g"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cDq19TXe"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2072.outbound.protection.outlook.com [40.107.244.72])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DC0213E9F;
-	Wed, 22 Jan 2025 14:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.72
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737557965; cv=fail; b=qo43lo3xB/b8zcNs/7zgiTZHpfiD+cEOVW1rZMVgfhksenYO1Re1B5R6P+5+O2EgsCgTSqknwQv3RcMkpdw7nSf38yHzrr5wNZAmNWXPzMC/VUpqL+BdQIbV7+zDrJmhDWXCfj7eTj7NNaWTsoR1uxvlc1byEyoxR94HU3NmIdg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737557965; c=relaxed/simple;
-	bh=qlMFaB5aKHs8sBgcVkRMVHVd+byOXTekp/51izzjvvg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kVWPm9DY4YxBJSkZJnJMyq2m1cNxDPqYymhazFdwbEjSRgos8uvoBwN9oVMZv7fKymQTP+n+eFSJWYI9+gn2ds4/DjoONB87ve/zkXWK27Q4goyOAHcQsI4VMFwFz9llBkmn07ScMkUqZGXlUmZlJyvksXxvuAgmHs9IhKHR8jk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=c2/HbW5g; arc=fail smtp.client-ip=40.107.244.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ueq0jxt84xmLv8oxXFiYWBIx5qdXy2xouljCAmMDe6UtVFPgCfOFM2fmb/s/osgngwnHTzPl9fpPTpjGrbt3rTyH2xtsdp9zgj5MamkcBx4Kf5xGFccxQRk0y0738qGy148Rc4ocqS58Mrkq/dCIv4dGatr81WyNLT8gUQMeHlh0ZTMzVB2kWP549KAbNwPrJRAaRm4MZBRhF0nz0ELGRj1hKaEnd9ZOJOOfeJMPr2+cGYzwsqW7ngN5PGoKxml0sK9C5+hOM1ZQJT058Ec2jqkLwbM4HR1DdTjsd8iBtxVFw5sEWT52FuGDoI4AOvyP1MNVGm+Dk8xoz9qr/NHmig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+efFtitZwwu9/7Zn7ZI4QmqVeB4WS/3kdvf65pEQCLw=;
- b=nBBYmqaaSSDLjTY3xL3vkY3Rbp8sURi3IIAuVsTnz2j26oCPXk9pxnDpKnvEx6AZYWRKkrmTBsq8ltSALMQGFs7dy0T3AMYws5Wd+2a7Wm1kn4zc8r/bP4wY5yse/E4l6dp47PckvRfc32hN7aL/LFm+2GSvf0FooLZoY/41fgaJJTar91AMoYoIOKxEPo7nVGBciapyDaMKcrDKTXXkE82xfW/JsbiawHHcEEYi8Zj0irak9mQWISyBNxXlWxRo9kda/ZnnSKcn1vgH2whFpZuPQhXwAD8dw92OnKI86YbyW0Jxox9iXXJGVj+2xe08wgjI5M6eY+Nma6zS/0dd/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+efFtitZwwu9/7Zn7ZI4QmqVeB4WS/3kdvf65pEQCLw=;
- b=c2/HbW5gEGYsFHQs9vMe8AgKy3rmRIsD/4L5Fkc8XYHlhkyrRr0PEiCzwtLWxP+sAjGH9vcozceeCnDYiayF5FCsc+cr7gsHzMqSUQY2SdITbGqWLysA75IsjyWizx47vBIxD9MDY3+JmIPytrWK4VFQarQQsN5fizJXoHOJOHU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by SA1PR12MB9489.namprd12.prod.outlook.com (2603:10b6:806:45c::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Wed, 22 Jan
- 2025 14:59:20 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::46fb:96f2:7667:7ca5%5]) with mapi id 15.20.8356.014; Wed, 22 Jan 2025
- 14:59:20 +0000
-Message-ID: <827315b0-23b6-4a39-88eb-34e756298d67@amd.com>
-Date: Wed, 22 Jan 2025 15:59:11 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
- kAPI
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
- Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
- pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
- vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
- yilun.xu@intel.com, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
- leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
- tao1.su@intel.com
-References: <420bd2ea-d87c-4f01-883e-a7a5cf1635fe@amd.com>
- <Z4psR1qoNQUQf3Q2@phenom.ffwll.local>
- <c10ae58f-280c-4131-802f-d7f62595d013@amd.com>
- <20250120175901.GP5556@nvidia.com> <Z46a7y02ONFZrS8Y@phenom.ffwll.local>
- <20250120194804.GT5556@nvidia.com> <Z4_HNA4QQbIsK8D9@phenom.ffwll.local>
- <20250121173633.GU5556@nvidia.com> <Z5DQsyV0vwX3Iabu@phenom.ffwll.local>
- <6612c40d-4999-41a1-a4a5-74d3ff5875c3@amd.com>
- <20250122143744.GF5556@nvidia.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20250122143744.GF5556@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0133.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9e::17) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD9FECF;
+	Wed, 22 Jan 2025 15:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737558377; cv=none; b=N8enMLVpPdQ0pm+coxq1oMI5Avq+6lwTXBx/2kPp/bM+dZkYKJFFEo0OXX5bYUzMQlxwWqZ6gbQKSe4rZAa291SeM82iwAkXpNJcKZj4jlQL1Ewe+fg7pgTVgDqjXhvp34eBUamOgbOZGSqAbtXnwuLmUoTm0hNlMASli+dZr+M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737558377; c=relaxed/simple;
+	bh=dMl8o0XND35oOQJxQk1TJXjXoYG0oljoyi+EsoBYIs8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WzE4gNT6MovfmOlLTOfYPAzxis9PCGbytVYwRLgo6rTjYbmBr/5B9x53LCT8nBGnkCy2X+0A57XJ+fUGgGANYqklI4QKUQuNoUezHM66KG5ry1Vi40PMTGjOwOsvCAqs+Ju4I9S5VTCd0tHms7WtYQChkqUyTJ1iXmivIzyBmNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cDq19TXe; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50MCRIC5015192;
+	Wed, 22 Jan 2025 15:06:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pFOqVh
+	2RNGstu/3AXWagFiYFpW9dqc3T/e9cFJkWBfI=; b=cDq19TXei8RVyZm5A62uQc
+	PtnCj7HUIJm/Z3VPFvajtqvseEX74QHPsXV6/dmAQcaxMoPJEWdZePQCJ6tAMc3V
+	S2J+bnZ5WkVynr00BC97rRup4dPqPaWK9sR4YCZv4+PXd5Mk5zJRmyw/fDgIxY5c
+	iGXV+4CKKE+oG26uGKT0ewAtqvsrEp1PRqmYYnMTm+9zVgx/uzlUjPERNrQfnAtn
+	MXOyEIObs34YvPbnJfcm5Nf06PrWuEZnqwnWACPhZVYTXMJ+H5DuUYgGuM7d1nj9
+	x0jlaCcOxBRVG58kZ5qNs3zP15MphQ2d/TSkYk5pbNdIEf5BztAKoJCQuz4Kgxmg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44apr9bf16-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Jan 2025 15:06:03 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50MF2CkR024289;
+	Wed, 22 Jan 2025 15:06:02 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44apr9bf13-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Jan 2025 15:06:02 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50MEWxU0029604;
+	Wed, 22 Jan 2025 15:06:01 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448qmngxba-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Jan 2025 15:06:01 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50MF5vDL21496196
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 22 Jan 2025 15:05:57 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5F17E20040;
+	Wed, 22 Jan 2025 15:05:57 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9757A20043;
+	Wed, 22 Jan 2025 15:05:56 +0000 (GMT)
+Received: from [9.179.15.229] (unknown [9.179.15.229])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 22 Jan 2025 15:05:56 +0000 (GMT)
+Message-ID: <15b619e7-cc5e-48a4-ab70-f9dd0f026048@linux.ibm.com>
+Date: Wed, 22 Jan 2025 16:05:56 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SA1PR12MB9489:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0cc47dc2-ca52-4b3f-6307-08dd3af5595c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?am9jM2IwQkZQaFhwWGxmNVdqbStEVWhIb2EvaFlwTDd6UXdPUEpOSlVYNjE3?=
- =?utf-8?B?azdyYTYrb1VQNUI5MHhmbktyUHRVWm9NV2M5ZTBKZmo0eGdPM2kzSDY4VGQ2?=
- =?utf-8?B?bTBDZEdaZHR4aTFZeWJkbmQ5QzNrU0dpZkd6LzRDOFpVMnVET01XUG1DcVFI?=
- =?utf-8?B?dGxuODkyT2hrT1liTFBOWnQxVU9GeUFFK2RzTTNxSS9CVDdmbHJ0c3ZRSkpw?=
- =?utf-8?B?dDNJVmFUSEs4eUN6emRtQytGZDlxZXRaT0xSWHVTTlptMkVTWEwxVnlHcW00?=
- =?utf-8?B?QUhETHdCT1pOS0o0SGRyRy9yQnYzalFkTFk1UE5jUDFCckE4Y0I3ZHNicGNy?=
- =?utf-8?B?dTdNdkRJaGtaZUV2TDUwcU5KNDNiUEtIQmZyVVRPQXpQY1lkMWl4TUk2Sno0?=
- =?utf-8?B?Yy9HMXFFWCtvR3pOdDRlVnBZNnV3ZkQ1SytKWXgrcDNWVWxHU0NOeTdscHV5?=
- =?utf-8?B?YzJYM1Z2MGt3bTgwcUszdUxDMnU0eXBtZVhva2pmdVVEZjN3QlVmLzlZTUEw?=
- =?utf-8?B?eldybzcyVGYxb1VvZFoxOXZ3bDdoVFpkeFdFMjFrdStCeXF5UzZ0SVNwaXEw?=
- =?utf-8?B?UVNLaTRhWkxQTnMxTzRib0hEbTY4aDRGSmsxeUJjTXhjbFFBSUc0YUZuamJX?=
- =?utf-8?B?b3N2QVhkNXNZMlBEVkdXTFhVNlpLaHFia1JWdXkxNlRNSXh0TXNPT0FIeFN5?=
- =?utf-8?B?N3JFbUlIcWIrdzRTaHdGNUJKREtoZnk4ZWlOWXFDZ2ZDWmIrZldBemJZODlM?=
- =?utf-8?B?NWxIWGJERCtLWHhhbjVJMUNTK3BJN2V2akh6QVMrRnp6eURvRmM5amkzZDVW?=
- =?utf-8?B?ckV4UFBKblpMSVZYZG1tTE1zbjlMK3pLbFF1dDBIR2h0UjJVbStjSmRCYlFN?=
- =?utf-8?B?WjFheTVtZXVVaFhmaVhHYmo3cmhpVE9ySlUyeW9GNStvTlh1YlArVHhXU2ZC?=
- =?utf-8?B?RVJRcjROVXJLWFhxOEVUNExUejVjSjZxQk5OYytCd21kL0hiODJwT2o4eWQ0?=
- =?utf-8?B?bDc1NWVWckFCOWNUSW5IZ1BTdklUOUlSb0FBTU80ZDVtVHgweWg5ajlnOXd3?=
- =?utf-8?B?UEJaN0R0dmlmZWJ0SWE4bzI5c3ZYenJBVzFGRzRjUkhGb3d0NDdudmxKdkpE?=
- =?utf-8?B?eDB4NWI0SHZ6WkJjWUNqTHNqU3JMbVF3MzFWbFl4M2FrS05uSG82dTZxdzhQ?=
- =?utf-8?B?UkRIUDVjaXN0bHJHd2tEUWhSWmlmUmJxdGtWTE9xVG1ReWJDdkVkUEFBMk9X?=
- =?utf-8?B?d09aWHpJYkF2RmxIZ1c1RmFmTno3azRCZlo1d0MrR2dJTWp4UzJGZUxMQzVO?=
- =?utf-8?B?d2hXL2dLbVJxcWozeGk4RUhrODJzMGtmazduYnJ2ZkR3OU9xd0dNS3UvUEsy?=
- =?utf-8?B?TnFKejYrVnRSNEJlNlptYjhUSHRtMEdoRW05MVQxNEh6VlJHY2pkVm1UUXRt?=
- =?utf-8?B?QTJ4cExLUnNqQmRMQVI3d3p4M3NxZjMvQ0o2N3hWanp0cVV0SHRHM00ya0NW?=
- =?utf-8?B?U2M1Q09hcEU0bnZRdSt3dnoxaUdCOVNuMjhqTUFyak5hUmJab25IdmZRV0hI?=
- =?utf-8?B?MTlSalI0aGErS1gyWUlpMk14dFV2UDgvUzJrY09MQmxMRzVDRE0zZ3l4bC9O?=
- =?utf-8?B?Mm1Uc1Q5U0t0R1JGTVJjNHZCdXlEUXNCU2ZCSmx4KzN6aGl3TmFkeFhESU95?=
- =?utf-8?B?c05BSVNKVWhBTE9abkVha3lHUXNwT2VEYXY2Z3M2amFCZzFHcUhPMWZPMFYx?=
- =?utf-8?B?eThua3kxMUNFdHRYYWVFMFR1eWFTZXp2QVlLemhna0pPOTVvdkx6Ymk4WW16?=
- =?utf-8?B?RVVQNkNVUFY5dUxsTkVHbHB6ZlhsYTJZUkhWTGVmVnFLSmJsa1hwOUJuVEt6?=
- =?utf-8?Q?ndVuKhhxaBLYs?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TXFaNDRobDQveUtPQTl0Wm5oeHByRGZDZ05ac0xSeFI5bERETnhrUlRUVmtG?=
- =?utf-8?B?YnlTMDZjY294aGtZSlh0c01tRyt2Mk8vcnJOKzArWHhOQUJEd2IxdE5lcVU1?=
- =?utf-8?B?ZktsSVRNdlNpZGo1ckRaS1BES21QTEsyL0NjUEJaSXRUQnF6Ynd3Rkszb1NH?=
- =?utf-8?B?cUhpKzY3aXlJME00WEhGN3hEOWFRaFZ6TGNDNzAyS25VbFBxRUJXT21oeFNN?=
- =?utf-8?B?REx5NXdMNEJwN3NxR3djL3FVc0Frdyt4ZUluRTZGc3BPbURuNVYweWdHc3dm?=
- =?utf-8?B?ZVJ5MnY2K1ZuaWNQRkNUTllqTEh3YXRsa0hXOGpoYmRPaTNLYStEVjdYNVhK?=
- =?utf-8?B?YWNQb0o4eHZvV3o3TUtRWWVxZUVqSENNWXUxQ1YyeTlUczVFdjZoUVd1WUJD?=
- =?utf-8?B?SWdSR3MwN1ZHcXQwZ0VyZEZERExPMjRGaHdFeDRzVTg0MHhzQjdqNlI1VlNO?=
- =?utf-8?B?UUIwYWZSdzJ5cjZsWmhobDN0TUVFQXpqL2Z5NWNWVDdOWTg3TTZjK3hBUDM3?=
- =?utf-8?B?RjlSYTlXWTRRcWQ0UzhCQzc2OGx2bEN1UG9GSXhCQTk1WHVpeElXZFY4eTYr?=
- =?utf-8?B?VkRyWEY4VDB2RWhLZmZ2YlFuc3FLVEpOS3ZvOXg0L2pmOUhwYjZLNVhzMUJY?=
- =?utf-8?B?RE9hVlVYQWM3M3lUbVBpdGRzZkZKdW1hVkE4dEFaVTQwL1dGYlFwSG1yYWow?=
- =?utf-8?B?NHIxa0RiVFc5UmZTbFJPd1NkWkVuR0VXVDlmZHRRbnNLcFNHbVVqeFI0WStE?=
- =?utf-8?B?Nit2U0hxTFNNUGd2YXEyaDhIc0hXMUw4Ni9oWGlyVEE5YmlWQXRPVEx3aGRt?=
- =?utf-8?B?Z1RSMUZmSkV3VFFxOS9vK013ZGlPaWlDYzVkblRKejBkN0k3ZVd5cXozUEda?=
- =?utf-8?B?dkhubWdvWWgzVzhhZDVMYkJIK2o1ajlhT0RpVlRGZThjeWJhdHc0dFJVRVJu?=
- =?utf-8?B?dmYvOTNMNWIvSkd3WFpOVHVwYjFKOWF4Z2J1UExzc3pncWFMazZVdG44MjBC?=
- =?utf-8?B?Y1NrbmdJWWI0NWZlc2cyQVlYTkJucmZBb3Y5Z20vSG1vaWJLa2h2T2VWYXRN?=
- =?utf-8?B?bHJONUw1T3BycTIxL1Y3OEJKb2UxUGMvZy9kdnE0ckRLQ2wzL0h6UnFDc0Ni?=
- =?utf-8?B?L2FCNUJDL0tZZjZRdFdDY0JiQkpUdkdnb2hjNytNZTl6ZFBvTVdOVEhubG83?=
- =?utf-8?B?ZVE1TGt1M1VVZG1YbHpyRmxPU3J3TzFMSURlTExMSzl1S2o4NndyWDNEZWkv?=
- =?utf-8?B?Zit4R0ROKzRCdUxjazJ3S21oNzJzcnY1d0xCUU9zb25KR1ovdVhPZkdBMHMr?=
- =?utf-8?B?U1JsNzVGTFlmTjNGN2N2aG5zMWVjeHR1NVo2SnpTVVZEQmlmZ2JOUEx4ZWRT?=
- =?utf-8?B?ZFZobTY1N1EwZTNsWm4raS8wSy96ZWloL0ZHdkFXNGVMak8vMEN5dUVOcEUx?=
- =?utf-8?B?MThDUnNKZk5TeWsxN3ZFZ3RXSG5mcDUwUHlLM1YyeE8waU4xdDEySFQ5OTZ2?=
- =?utf-8?B?RVVOVHhEdmF2NFpDS3BGNVBDNThVZTlNMGwrLzFaakUza29IUkdPbjNoNTJ4?=
- =?utf-8?B?MW9kOG5PVTNzdHJ0NnJvTm4xQUkyRXNBT0JkZEhtQ1VpY1c3VzM0WlkxL1E4?=
- =?utf-8?B?Z3hkZVROaW9rVk1GTmNQTjljdzUwTUdBWnpxUGptWWEzWGhqR1FkSHgxbFJX?=
- =?utf-8?B?NlBZWU9peHlVRDhOcitVVXkxcHc4alR6UXNJcjJQSkt4UVg2R3VaTHFIS0h0?=
- =?utf-8?B?cDRKUTVIMXRKUFdnWlNhdlN1Q2VGNEZ2WUcyU3U3RlJXSFp0VWtJdDFXU2tJ?=
- =?utf-8?B?VHVFWm9KMTJZc1loSGpBWkc2bjBGWU9Nc3UwUHh4ZzRnV3RieFp0VllvZE9X?=
- =?utf-8?B?UjRYM1pGUzJ5c3BnRW5zTXlGMDNxWEhGaTNLYjFtemY2OWRUYmxyMmxzdEZN?=
- =?utf-8?B?UjcrR3ZNY3FHd2EwNkRtNFVxNnpkRi94akdacmpOSVBiSmg1TmgvUGRRajcx?=
- =?utf-8?B?a0hyQjkrWldUbnR3bnhrYlljdEIyTmNUNXloRlF3c2J0Y0tBdE42TXU4RzZt?=
- =?utf-8?B?N2NadS9sN29mdHJPNzMyYjVXRW05WHhtN1FtWkpHbnY4ajVUb0Z6ZWRFQldG?=
- =?utf-8?Q?qlQ9Tv3OKRFWvCvLwn3vHlqAV?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0cc47dc2-ca52-4b3f-6307-08dd3af5595c
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2025 14:59:19.9621
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: d4wEJXyGFdEclo3THjFctmv+A8zJWcBy2WalUFhRzMO1KWX+ymQpmL984DIYrnjN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9489
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 09/15] KVM: s390: move some gmap shadowing functions
+ away from mm/gmap.c
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com, david@redhat.com,
+        willy@infradead.org, hca@linux.ibm.com, svens@linux.ibm.com,
+        agordeev@linux.ibm.com, gor@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, seanjc@google.com, seiden@linux.ibm.com
+References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
+ <20250117190938.93793-10-imbrenda@linux.ibm.com>
+ <D78M5FNORE1Y.1SJAXHNVZS9GL@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
+ qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
+ 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
+ zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
+ lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
+ Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
+ 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
+ cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
+ Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
+ HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABzSVKYW5vc2NoIEZy
+ YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+wsF3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
+ CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
+ AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
+ bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
+ eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
+ CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
+ EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
+ rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
+ UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
+ RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
+ dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
+ jJbazsFNBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
+ cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
+ JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
+ iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
+ tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
+ 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
+ v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
+ HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
+ 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
+ gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABwsFfBBgBCAAJ
+ BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
+ 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
+ jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
+ IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
+ katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
+ dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
+ FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
+ DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
+ Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
+ phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
+In-Reply-To: <D78M5FNORE1Y.1SJAXHNVZS9GL@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: L6oE3Xg2X3mLMCgpuw73AWS-zgh9UUcH
+X-Proofpoint-ORIG-GUID: aloPTU9s2fnIeKpI368D_3ayOX2nTbjR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-22_06,2025-01-22_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 mlxscore=0
+ spamscore=0 clxscore=1015 bulkscore=0 phishscore=0 malwarescore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501220111
 
-Am 22.01.25 um 15:37 schrieb Jason Gunthorpe:
->>>> My main interest has been what data structure is produced in the
->>>> attach APIs.
->>>>
->>>> Eg today we have a struct dma_buf_attachment that returns a sg_table.
->>>>
->>>> I'm expecting some kind of new data structure, lets call it "physical
->>>> list" that is some efficient coding of meta/addr/len tuples that works
->>>> well with the new DMA API. Matthew has been calling this thing phyr..
->> I would not use a data structure at all. Instead we should have something
->> like an iterator/cursor based approach similar to what the new DMA API is
->> doing.
-> I'm certainly open to this idea. There may be some technical
-> challenges, it is a big change from scatterlist today, and
-> function-pointer-per-page sounds like bad performance if there are
-> alot of pages..
->
-> RDMA would probably have to stuff this immediately into something like
-> a phyr anyhow because it needs to fully extent the thing being mapped
-> to figure out what the HW page size and geometry should be - that
-> would be trivial though, and a RDMA problem.
->
->>>> Now, if you are asking if the current dmabuf mmap callback can be
->>>> improved with the above? Maybe? phyr should have the neccessary
->>>> information inside it to populate a VMA - eventually even fully
->>>> correctly with all the right cachable/encrypted/forbidden/etc flags.
->> That won't work like this.
-> Note I said "populate a VMA", ie a helper to build the VMA PTEs only.
->
->> See the exporter needs to be informed about page faults on the VMA to
->> eventually wait for operations to end and sync caches.
-> All of this would still have to be provided outside in the same way as
-> today.
->
->> For example we have cases with multiple devices are in the same IOMMU domain
->> and re-using their DMA address mappings.
-> IMHO this is just another flavour of "private" address flow between
-> two cooperating drivers.
+On 1/22/25 1:50 PM, Christoph Schlameuss wrote:
+> On Fri Jan 17, 2025 at 8:09 PM CET, Claudio Imbrenda wrote:
+>> Move some gmap shadowing functions from mm/gmap.c to kvm/kvm-s390.c and
+>> the newly created kvm/gmap-vsie.c
+>>
+>> This is a step toward removing gmap from mm.
+>>
 
-Well that's the point. The inporter is not cooperating here.
+[...]
 
-The importer doesn't have the slightest idea that he is sharing it's DMA 
-addresses with the exporter.
+>> +/**
+>> + * gmap_shadow_valid - check if a shadow guest address space matches the
+>> + *                     given properties and is still valid
+>> + * @sg: pointer to the shadow guest address space structure
+>> + * @asce: ASCE for which the shadow table is requested
+>> + * @edat_level: edat level to be used for the shadow translation
+>> + *
+>> + * Returns 1 if the gmap shadow is still valid and matches the given
+>> + * properties, the caller can continue using it. Returns 0 otherwise, the
+>> + * caller has to request a new shadow gmap in this case.
+>> + *
+>> + */
+>> +static inline int gmap_shadow_valid(struct gmap *sg, unsigned long asce, int edat_level)
+>> +{
+>> +	if (sg->removed)
+>> +		return 0;
+>> +	return sg->orig_asce == asce && sg->edat_level == edat_level;
+> 
+> This can simply be a single return:
+> 
+> return !sg->removed && sg->orig_asce == asce && sg->edat_level == edat_level;
 
-All the importer gets is when you want to access this information use 
-this address here.
+NACK, at some point (and that point might be very arbitrary) my eyes 
+start bleeding
 
-> It is not a "dma address" in the sense of a dma_addr_t that was output
-> from the DMA API. I think that subtle distinction is very
-> important. When I say pfn/dma address I'm really only talking about
-> standard DMA API flows, used by generic drivers.
->
-> IMHO, DMABUF needs a private address "escape hatch", and cooperating
-> drivers should do whatever they want when using that flow. The address
-> is *fully private*, so the co-operating drivers can do whatever they
-> want. iommu_map in exporter and pass an IOVA? Fine! pass a PFN and
-> iommu_map in the importer? Also fine! Private is private.
->
->>> But in theory it should be possible to use phyr everywhere eventually, as
->>> long as there's no obviously api-rules-breaking way to go from a phyr back to
->>> a struct page even when that exists.
->> I would rather say we should stick to DMA addresses as much as possible.
-> I remain skeptical of this.. Aside from all the technical reasons I
-> already outlined..
->
-> I think it is too much work to have the exporters conditionally build
-> all sorts of different representations of the same thing depending on
-> the importer. Like having alot of DRM drivers generate both a PFN and
-> DMA mapped list in their export code doesn't sound very appealing to
-> me at all.
-
-Well from experience I can say that it is actually the other way around.
-
-We have a very limited number of exporters and a lot of different 
-importers. So having complexity in the exporter instead of the importer 
-is absolutely beneficial.
-
-PFN is the special case, in other words this is the private address 
-passed around. And I will push hard to not support that in the DRM 
-drivers nor any DMA buf heap.
-
-> It makes sense that a driver would be able to conditionally generate
-> private and generic based on negotiation, but IMHO, not more than one
-> flavour of generic..
-
-I still strongly think that the exporter should talk with the DMA API to 
-setup the access path for the importer and *not* the importer directly.
-
-Regards,
-Christian.
-
->
-> Jason
+> 
+>> +}
+>>   
+>>   #endif
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index b626c87480ed..482f0968abfa 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -4509,6 +4509,63 @@ static bool ibs_enabled(struct kvm_vcpu *vcpu)
+>>   	return kvm_s390_test_cpuflags(vcpu, CPUSTAT_IBS);
+>>   }
+> 
+> [...]
+> 
 
 
