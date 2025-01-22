@@ -1,235 +1,116 @@
-Return-Path: <kvm+bounces-36297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36298-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1847A19A7C
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 22:42:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A1D3A19A9D
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 23:00:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06CAF1652FF
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 21:42:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 353C43AA5A8
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 22:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7121C5F2D;
-	Wed, 22 Jan 2025 21:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF15F1C68B6;
+	Wed, 22 Jan 2025 22:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XhT+FLHv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2sIStrtG"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499DA8F7D
-	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 21:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8959A18A6DB
+	for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 22:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737582171; cv=none; b=dTjGV3syH2JS7oWuSIWG/JnCCCPl0hIKKnkO6NC79MBxGmCVIrZ6+K1duGNNrtvyWQutzzhstH4BSW64xcTmaGEuBDX4XHYCQ7VLuTr4q3fUpr2CQ8n6xt43m5TnY8y1mqatIXmykTCbY99L0UOjvpo98HnNn3HZQEvsc+fErcU=
+	t=1737583225; cv=none; b=e7WUXdP1CQBAbE20DY9vidEvJ8vbapS8i07DbWgkSCFV4ynRCI4CGGJwpstxDLmZzqnRZMZrxTmmCm9gsMfHFOeCn1QF7r6nezz8tYkP5660zOIKNiUmeVSy/dAJRoqx4Quxp31xz/5juCZkSJwWADWLBx37sBXE4qVRBKJjSy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737582171; c=relaxed/simple;
-	bh=r4Y+6EbNXIzr4NvRlNgwowwkci7/0JuHo8TYB8MJOMM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BPrKI/ZNH72xZ8PBYTRrlrvBGOeKeZRUxR8BZQcYA7w50N/8MytjL/94GGhgEIISMCLuLY3pom5wo0KFLI8MFsOhrApM0IP/44FNsGBSKbPo/mOZUV3e/40AuKaYqIQkckd3cbggXAOdynAYYTmMpMLWcNy8s40jmIHQrCBeLg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XhT+FLHv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737582168;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=JrXWysB/Rz0f9WqGz6m0p+hsGiw7d2E4zBU2fQwLRZY=;
-	b=XhT+FLHvPzWXrvph/IYCC+NDunyi0jj36MayjFjKx7xeU/BgzSv80rtQ8nbXrLZff8bhjO
-	+Dvgzu1tnJcFvSUG7sZ9F4DmLcrqJt1uA07uVEPbQrk2TgY6ubkrOVIaubznl93WO7RZak
-	UC/grYPwQgo/1JnH0c7sg0vlH3O4q7Y=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-359-AZzaLqA9OimSDB_ActtPzQ-1; Wed, 22 Jan 2025 16:42:46 -0500
-X-MC-Unique: AZzaLqA9OimSDB_ActtPzQ-1
-X-Mimecast-MFC-AGG-ID: AZzaLqA9OimSDB_ActtPzQ
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3862c67763dso74326f8f.3
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 13:42:46 -0800 (PST)
+	s=arc-20240116; t=1737583225; c=relaxed/simple;
+	bh=l1b6Mjkm9Czkw/S4l9swnJ0dWXkxdCvdoTr1iVj1Luk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FlTfAAwFEAdVAteY+7JK+yUErj1ZXng+OO/OD1vcx85hRhfx4dF4NiNvwkLf/mJEdEiuPn6ZZdKHkH+4WUbF74sKx/NzxlZHsouXfQvJivuHHw9Jl4tfbDyj72ESAcnlR/Zof1wLYlaf1x3z6FQRMXiyvRar+bJLkZaPN62/+d0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2sIStrtG; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2166a1a5cc4so3420745ad.3
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 14:00:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737583224; x=1738188024; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VgNjX+aHj6RonknlNxScnoD3ab9l2nJMXp3ji4z94u4=;
+        b=2sIStrtGLuHvCwZedcL0u3h/m+8U0u0pMcgFUJTM4DqCU6OYH9HZlad8UG6vac7vEq
+         z7q9Pa8lXDk7MJI0/3kCX8BMCgtqWrLRrahAdsbugtnEb8Gc3PMqnbmajQBGGVtX68I2
+         i6Hdz7MiWlAEjdp1Bx02Q1kwnPQFkeFSNz8kPYFHALBhugZdvg46BlGT0PrEX4RX5UH8
+         3p7wqv78tjdNqfTTdqWMUOFDUDXkxuNgm2s3+E5pondEC1ZcsXae+YG1KULpJjzs85r7
+         8a9fvLp04hRv7xiWvip5OEVpZL1W7Z9DjXRqezlNVaquvFfspswl+owUSBvOGH0wNm7v
+         IgRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737582165; x=1738186965;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JrXWysB/Rz0f9WqGz6m0p+hsGiw7d2E4zBU2fQwLRZY=;
-        b=wI618tshf7xz6+7RJ7qjPl4Ce+b2Ar4ze8E7EPejrGNc2+U9mnGJwjf6S23xcHFOV2
-         yIZSBGwXHfWQrcamtBxTIm2d6FiloPbpiNuVwNRt3fEkMLXLiK267PmWF+bd0Y8GOdzm
-         IlDGpyHFX7ym0A580w3Tka7c98TeRoZFFhbhDUmYX6MhOr4LbTmXAvj66fEUqBIJbLJO
-         1gj3Bj8u5AjcHx8MAw1iHaSraH0sDkIqyw3hS27F+Wvn7fPcTObzntx60SRmHwt1STlD
-         On8GHilzPD54eCliS/HHBkDzSA7mECE2qu/mPZAL3HMCit4a83HAoYf0QRMjAE33IrJd
-         2CMA==
-X-Gm-Message-State: AOJu0YzFAJI1GRtHg72ZikR3RQNIfEfnqUNVBvfrEVlg2gP7HjDj0KUF
-	K5HqGNFip34ebTejXVjGa6HwERrbqEheK2w/yTUY91+zJY16p8EYVLXTDi18h8oIHApRhYBfB3s
-	luv3vf7COHU7Mt3R92UG1V7e06UFSD8xT1hzhL2iVnob15vw6Pw==
-X-Gm-Gg: ASbGncvmmD8tmve5jyFIH+Fu+zdY9LQjHoUGQ/PHqHaVHsULfV1oPDi8rccZGKAATmc
-	8pVynKoO+bT4f7Ir8pNdo2/L6gRxRbweos4KkltgIDX+B1wHLZmo3I+XguXpOm7xxDr96yhe5mr
-	Sw8TZE1tUMBd8aQko0b2krzm+gntXyIndRpieyd7zb4fsdSCIhzFwb74WGNSYeYVSg+6XWJEJFB
-	yMOxCvA6CsjmNaocD4Sq/P2gTMC/lkrcts1hm0Wk0t7etAEdoCOo/7JIUBZTwjPHBwRGbiAImDi
-	rZ5748HvLMisaTl7vtSYo8jePSVsErEcO05y2gdpMvLgYlWYc3dSK9wnADpgYpJvlmOXeQxf425
-	vahyLoFg6YnIGv73ghmtjnA==
-X-Received: by 2002:a5d:6c63:0:b0:385:fdc2:1808 with SMTP id ffacd0b85a97d-38bf57a65b6mr24558001f8f.40.1737582165673;
-        Wed, 22 Jan 2025 13:42:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG4bFDJj8ac+KncXIYJmqblo1/34Fs6nG8R1OO1NYezMiJx8E82JmXMxOV+89Jv2kvTozPlWg==
-X-Received: by 2002:a5d:6c63:0:b0:385:fdc2:1808 with SMTP id ffacd0b85a97d-38bf57a65b6mr24557980f8f.40.1737582165289;
-        Wed, 22 Jan 2025 13:42:45 -0800 (PST)
-Received: from ?IPV6:2003:cb:c70b:db00:724d:8b0c:110e:3713? (p200300cbc70bdb00724d8b0c110e3713.dip0.t-ipconnect.de. [2003:cb:c70b:db00:724d:8b0c:110e:3713])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3275755sm17081743f8f.80.2025.01.22.13.42.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jan 2025 13:42:44 -0800 (PST)
-Message-ID: <f801219f-96e1-4b52-85aa-f5a331e06183@redhat.com>
-Date: Wed, 22 Jan 2025 22:42:40 +0100
+        d=1e100.net; s=20230601; t=1737583224; x=1738188024;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VgNjX+aHj6RonknlNxScnoD3ab9l2nJMXp3ji4z94u4=;
+        b=mC04LPrp/cb1sKkBfu9qRrjrSSMjUx9dXAuXzubpg1q49Iedwc6EHYRGxSXXodltC0
+         PD8q20xsah2G7Cm3IQ3fANplGOo2eblTGQUTv8CMCh1cfgRW22shCi9Mwge2jxmewucV
+         L376FhB4uPJekxjwDDNamsG544IQou7eUpuIn7kLTBiOVE3QKCy80o18JTcArEnykoWt
+         6DRIpU0M5iAcDfTWJVMwCWjX5TQVMTgbzYizjlXUiAchOAGWjYtfarmfqrpbh3ehIUXl
+         2/XiCHIx1qyyURjQRx9hJdZKmJa/H8OcIxTTmQqTM8YSoe6hG+qYW8F3OqPwM0p0dWfz
+         fzWg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvBw5ntXOY7DcJSfuoNzRZlVtWl+G4R37lhuG+SiWmaaQ3gHw/kgEXOhwYGAaFquaj6rQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA4i6ocBxgnjAb0nawgvld/AMJVooH3s9ZhtgrosBR/qWAuoHq
+	8I8p/x25mCaGVWm+tI2xdgfWy2Elyzv4TFzYo+5nPErzTmMNEL3YqG1ogP/uN3UJbRPCuykbc8y
+	gPg==
+X-Google-Smtp-Source: AGHT+IHKIfEKJsLPdvtOKj5jPXzf3mSv/EAgdrvewgIqyig1Tk+VI/almLEUEdaCNDfqYarlMhPNUDQEWhk=
+X-Received: from pfbcj14.prod.google.com ([2002:a05:6a00:298e:b0:725:e4b6:901f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:7886:b0:1e1:9de5:4543
+ with SMTP id adf61e73a8af0-1eb2147ea76mr31233458637.14.1737583223715; Wed, 22
+ Jan 2025 14:00:23 -0800 (PST)
+Date: Wed, 22 Jan 2025 14:00:22 -0800
+In-Reply-To: <06e9f951afb46098983dc009c0efbcef3fc1b246.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 0/9] KVM: Mapping of guest_memfd at the host and a
- software protected VM type
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
- pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
- anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
- brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
- xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
- jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
- yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
- vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
- mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
- liam.merwick@oracle.com, isaku.yamahata@gmail.com,
- kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
- steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
- quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
- quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
- quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
- yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
- will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
- shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
- jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
-References: <20250122152738.1173160-1-tabba@google.com>
- <c15c84f2-bf19-4a62-91b8-03eefd0c1c89@redhat.com>
- <03bbcd00-bd5e-47de-8b20-31636e361f52@redhat.com>
- <CA+EHjTyGgs_Sp0b6OqeS7oVskhVG+S1cHhVRb5Z6mPAwGwmqFA@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <CA+EHjTyGgs_Sp0b6OqeS7oVskhVG+S1cHhVRb5Z6mPAwGwmqFA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250122161612.20981-1-fgriffo@amazon.co.uk> <87tt9q7orq.fsf@redhat.com>
+ <a5d69c3b-5b9f-4ecf-bae2-2110e52eac64@xen.org> <87r04u7ng7.fsf@redhat.com> <06e9f951afb46098983dc009c0efbcef3fc1b246.camel@infradead.org>
+Message-ID: <Z5FqdjTwPmnV1t-1@google.com>
+Subject: Re: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, paul@xen.org, Fred Griffoul <fgriffo@amazon.co.uk>, 
+	kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 22.01.25 18:16, Fuad Tabba wrote:
-> Hi David,
-> 
-> On Wed, 22 Jan 2025 at 15:41, David Hildenbrand <david@redhat.com> wrote:
->>
->> On 22.01.25 16:35, David Hildenbrand wrote:
->>> On 22.01.25 16:27, Fuad Tabba wrote:
->>>> The purpose of this series is to serve as a potential base for
->>>> restricted mmap() support for guest_memfd [1]. It would allow
->>>> experimentation with what that support would be like, in the safe
->>>> environment of a new VM type used for testing.
->>>>
->>>> This series adds a new VM type for arm64,
->>>> KVM_VM_TYPE_ARM_SW_PROTECTED, analogous to the x86
->>>> KVM_X86_SW_PROTECTED_VM. This type is to serve as a development
->>>> and testing vehicle for Confidential (CoCo) VMs.
->>>>
->>>> Similar to the x86 type, this is currently only for development
->>>> and testing. It's not meant to be used for "real" VMs, and
->>>> especially not in production. The behavior and effective ABI for
->>>> software-protected VMs is unstable.
->>>>
->>>> This series enables mmap() support for guest_memfd specifically
->>>> for the new software-protected VM type, only when explicitly
->>>> enabled in the config.
->>>
->>> Hi!
->>>
->>> IIUC, in this series, there is no "private" vs "shared" distinction,
->>> right? So all pages are mappable, and "conversion" does not exist?
-> 
-> You're right. This is a simplified version of my series that allows
-> mmaping of the new KVM_VM_TYPE_ARM_SW_PROTECTED vms to use for
-> experimentation.
-> 
-> Cheers,
-> /fuad
-> 
->>
->> Ah, I spot:
->>
->> +#define kvm_arch_private_mem_inplace(kvm)              \
->> +       (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE) &&        \
->> +        ((kvm)->arch.vm_type & KVM_VM_TYPE_ARM_SW_PROTECTED))
->>
->> Which makes me wonder, why don't we need the same way of making sure all
->> references/mappings are gone (+ new page type) when doing the shared ->
->> private conversion? Or is this somewhere in here where I didn't spot it yet?
-> 
-> This is new to this series. The idea, based on a request from Patrick
-> Roy, was to have a VM in arm64 we could use to experiment with. Since
-> it allows the unconditional mmaping, it's only useful for experiments
-> or for non-confidential VMs that want to use guest_memfd.
-> 
-> This series isn't meant to replace the other one, more to supplement
-> it and facilitate experimentation while that's going.
+On Wed, Jan 22, 2025, David Woodhouse wrote:
+> On Wed, 2025-01-22 at 18:44 +0100, Vitaly Kuznetsov wrote:
+> > > What is the purpose of the comparison anyway?
 
-Heh, so "kvm_arch_private_mem_inplace" in this series means "no 
-conversion at all" ? :)
+To avoid scenarios where KVM has configured state for a set of features X, and
+doesn't correctly handle vCPU features suddenly become Y.  Or more commonly,
+where correctly handling such transitions (if there's even a "correct" option)
+is a complete waste of time and complexity because no sane setup will ever add
+and/or remove features from a running VM.
 
--- 
-Cheers,
+> > > IIUC we want to ensure that a VMM does not change its mind after KVM_RUN
+> > > so should we not be stashing what was set by the VMM and comparing
+> > > against that *before* mangling any values?
+> > 
+> > I guess it can be done this way but we will need to keep these 'original'
+> > unmangled values for the lifetime of the vCPU with very little gain (IMO):
+> > KVM_SET_CPUID{,2} either fails (if the data is different) or does (almost)
+> > nothing when the data is the same.
 
-David / dhildenb
+More importantly, userspace is allowed to set the CPUID returned by KVM_GET_CPUID2.
+E.g. selftests do KVM_GET_CPUID2 specifically to read the bits that are managed
+by KVM.
 
+Disallowing that would likely break userspace, and would create a weird ABI where
+the output of KVM_GET_CPUID2 is rejected by KVM_SET_CPUID2.
+
+> If they're supposed to be entirely unchanged, would it suffice just to
+> keep a hash of them?
 
