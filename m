@@ -1,135 +1,117 @@
-Return-Path: <kvm+bounces-36225-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36226-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584E3A18D1D
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 08:52:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B086A18D97
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 09:28:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 356891889FF6
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 07:52:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 440323A67E1
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 08:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C1C1C3BE6;
-	Wed, 22 Jan 2025 07:52:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E380204681;
+	Wed, 22 Jan 2025 08:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JnSIc1Vf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bLc+5PPU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA57917DE36;
-	Wed, 22 Jan 2025 07:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62CF203705;
+	Wed, 22 Jan 2025 08:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737532357; cv=none; b=lp95jdKW7p0IFDgR7zbJ1OOXlo0H3ANldlggqWWyuZrEp4uYGiGAfuedZq2+l4hj1hATsTzSsYFxG4g8coI8vDHycVaBFfEeEkp7i68T9HeEvWZi7fP0acf855gLLatJ58U3NjxoHnioh8lGBd+7ZV9Hg1jq743Zmwy4vrQ5+9Y=
+	t=1737534470; cv=none; b=nlsxRYfwNK9Nxt+0cLuyTvp2wU4A5lqRPEXWbr4AVapxG6n7huG9c1SPfgi+zsvoWHFR4IMT40iBimWobv7bXg12w5oeD9fMdyBDn79QPXGSRbeMQOinJzVNR1/erJN5ciFor0KTeWHErWh0Tj535imgRUER/Z7Ks3MPNz/FjsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737532357; c=relaxed/simple;
-	bh=Q6vLivM4jtrTFDwno2vu0WSq7oz0yBfS4ZY8fxV3sww=;
+	s=arc-20240116; t=1737534470; c=relaxed/simple;
+	bh=FtCqAQv1YlUfdX9xfdQZD810YHl6sym/evT0F7HVC0s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ap1kMZqLTqSU8CZthsWizmUFH5u+q+kBr3KUiIjQc2ydMFHyjeQMztAkASsUaR+wrdxbM8QHaGjQ0KIn1UJNTNgTg416PhMlHr1jcxvlQXSDhgKsD47C3tDPdZc8HN3o1bDxwULmAS3guDgnl9WDbxhGZIg4JURJO/Zmc/dOeYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JnSIc1Vf; arc=none smtp.client-ip=198.175.65.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=ew6x6IyOc4wOEJ2CbtxJA9vHCaBkU1lYEXkeEvcFUGwR/re0UkVyh9wI2wsVHQbd33in9C5isnDRAm1VUSjfffA7GNnxQxysTXMmP60uDU8yxRbixSgY9p1EL9Nsibgh484FBnupbpknBlj0nGvB1utQ8vc+BWiFTNM/qpS5wrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bLc+5PPU; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737532356; x=1769068356;
+  t=1737534469; x=1769070469;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Q6vLivM4jtrTFDwno2vu0WSq7oz0yBfS4ZY8fxV3sww=;
-  b=JnSIc1VfWEIYOKA6fUhnO2WIl5RK06biE++SvMXDXIq4zoM+2rSrVXVc
-   wzEbthPHxdktJljDT8Gg3qtxv3gwJCC25ORgev9Q+u8N0gVZPYP2jOn0t
-   okruKyZ7MY22JuxWsBlWU0TdZXbT9wL7LJtp0SDltYSYV/K3gMMxdkAdc
-   t/CAsOh5zr0wUKXX8wJdwvW6485tu/DVhMP+3IFwp9uU7aLoKBYaO+frL
-   WerQWseLSL2DqwHeNXSZCNlivSy2dysapoW2+G0xilGcjoKqeqjPpMxzo
-   mp7ypCFNokCZXRtyKmtBlMHjktCmx+QAr6wrQU2PttqTDHEw8hXFBcQF4
-   A==;
-X-CSE-ConnectionGUID: swWQn6cWRq+NyxTeb6BR9g==
-X-CSE-MsgGUID: gv0PjfTvRGiTkYeBzMai5A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="38078310"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="38078310"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 23:52:36 -0800
-X-CSE-ConnectionGUID: hO/pC5qwQhqEvwZAT8Sogw==
-X-CSE-MsgGUID: dgmEoyUhSTiZpt0COjusRg==
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=FtCqAQv1YlUfdX9xfdQZD810YHl6sym/evT0F7HVC0s=;
+  b=bLc+5PPU4wOKnfLxoFQv2kpt450PW5VX4sDopbSin6IGsbcI/AZooLPI
+   BSudKt2vIC5z6L1HezAviQfEiOVvJ1+FLeCw+d/Lzckz1S88EF2IiZwWL
+   3mOcNpfD5KObk/XaU4x06vsHAycqW0T7VCg2/GeWikJWCRe9BISDK+wTF
+   eXQpPELPXUyG2TFjMUGVvY1tWf2JWp6zoU6d1+7BlBYfei98b3Zmox8TY
+   RSlcQOCv0Q7r7VK1Yp9XMxBKJTq4sn0jX56gz8YFFaDM51o9Bv0EP7Frj
+   +q/T4xhqn5O8vIOftNd/yLrd7TOmGGz0vAP6yV1Z6MOZKwk9M43Wa1W9v
+   Q==;
+X-CSE-ConnectionGUID: f+a6mIAnQsmjRLyK2XwrnQ==
+X-CSE-MsgGUID: +JA2QYy/QX2YuI0Q35P7ew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="48578185"
+X-IronPort-AV: E=Sophos;i="6.13,224,1732608000"; 
+   d="scan'208";a="48578185"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 00:27:48 -0800
+X-CSE-ConnectionGUID: gkSEjk9NQDOJYznQOI9Z7w==
+X-CSE-MsgGUID: LLxwZOwuQWOQcpF9eKyE3g==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="130353459"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="112043351"
 Received: from mjarzebo-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.245])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 23:52:31 -0800
-Date: Wed, 22 Jan 2025 09:52:26 +0200
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 00:27:44 -0800
+Date: Wed, 22 Jan 2025 10:27:39 +0200
 From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Francesco Lavra <francescolavra.fl@gmail.com>
-Cc: rick.p.edgecombe@intel.com, isaku.yamahata@gmail.com,
-	isaku.yamahata@intel.com, kai.huang@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-	reinette.chatre@intel.com, seanjc@google.com, xiaoyao.li@intel.com,
-	yan.y.zhao@intel.com
-Subject: Re: [PATCH v2 11/25] KVM: TDX: Add placeholders for TDX VM/vCPU
- structures
-Message-ID: <Z5Cjukf9K_1bTxVN@tlindgre-MOBL1>
-References: <20241030190039.77971-12-rick.p.edgecombe@intel.com>
- <23ea8b82982950e171572615cd563da05dfa4f27.camel@gmail.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Huang, Kai" <kai.huang@intel.com>,
+	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>,
+	"Chatre, Reinette" <reinette.chatre@intel.com>
+Subject: Re: [PATCH v2 00/25] TDX vCPU/VM creation
+Message-ID: <Z5Cr-6t469cZRTaA@tlindgre-MOBL1>
+References: <20241030190039.77971-1-rick.p.edgecombe@intel.com>
+ <CABgObfZsF+1YGTQO_+uF+pBPm-i08BrEGCfTG8_o824776c=6Q@mail.gmail.com>
+ <94e37a815632447d4d16df0a85f3ec2e346fca49.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <23ea8b82982950e171572615cd563da05dfa4f27.camel@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <94e37a815632447d4d16df0a85f3ec2e346fca49.camel@intel.com>
 
-On Sun, Jan 05, 2025 at 11:58:12AM +0100, Francesco Lavra wrote:
-> On 2024-10-30 at 19:00, Rick Edgecombe wrote:
-> > --- a/arch/x86/kvm/vmx/tdx.h
-> > +++ b/arch/x86/kvm/vmx/tdx.h
-> > @@ -4,9 +4,58 @@
-> >  #ifdef CONFIG_INTEL_TDX_HOST
-...
-
-> >  #else
-> >  static inline void tdx_bringup(void) {}
-> >  static inline void tdx_cleanup(void) {}
-> > +
-> > +#define enable_tdx	0
-> > +
-> > +struct kvm_tdx {
-> > +	struct kvm kvm;
-> > +};
-> > +
-> > +struct vcpu_tdx {
-> > +	struct kvm_vcpu	vcpu;
-> > +};
-> > +
-> > +static inline bool is_td(struct kvm *kvm) { return false; }
-> > +static inline bool is_td_vcpu(struct kvm_vcpu *vcpu) { return false;
-> > }
-> > +static inline struct kvm_tdx *to_kvm_tdx(struct kvm *kvm) { return
-> > NULL; }
-> > +static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu) {
-> > return NULL; }
+On Sat, Jan 04, 2025 at 01:43:56AM +0000, Edgecombe, Rick P wrote:
+> On Mon, 2024-12-23 at 17:25 +0100, Paolo Bonzini wrote:
+> > 11: see the type safety comment above:
+> > > The ugly part here is the type-unsafety of to_vmx/to_tdx.  We probably
+> > > should add some "#pragma poison" of to_vmx/to_tdx: for example both can
+> > > be poisoned in pmu_intel.c after the definition of
+> > > vcpu_to_lbr_records(), while one of them can be poisoned in
+> > > sgx.c/posted_intr.c/vmx.c/tdx.c.
 > 
-> IMO the definitions of to_kvm_tdx() and to_tdx() shouldn't be there
-> when CONFIG_INTEL_TDX_HOST is not defined: they are (and should be)
-> only used in CONFIG_INTEL_TDX_HOST code.
+> I left it off because you said "Not a strict requirement though." and gave it a
+> RB tag. Other stuff seemed higher priority. We can look at some options for a
+> follow on patch if it lightens your load.
 
-Good idea.
+I suggest we do this:
 
-How about let's just make to_kvm_tdx() and to_tdx() private to tdx.c?
-They are not currently used anywhere else.
+- Make to_kvm_tdx() and to_tdx() private to tdx.c as they're only used
+  in tdx.c
 
-And we can add the #pragma poison GCC to_vmx at the top of tdx.c to avoid
-accidental use of to_vmx() in tdx.c like Paolo suggested earlier at [0]
-below.
+- Add pragma poison to_vmx at the top of tdx.c
 
-The dummy struct kvm_tdx and vcpu_tdx if CONFIG_INTEL_TDX_HOST is
-not defined we could get rid of with a few helpers to get the size.
+- Add pragma poison to_vmx in pmu_intel.c after vcpu_to_lbr_records()
+
+Other pragma poison to_vmx can be added as needed, but AFAIK there's
+not need to add it for to_tdx().
 
 Regards,
 
 Tony
-
-[0] https://lore.kernel.org/kvm/89657f96-0ed1-4543-9074-f13f62cc4694@redhat.com/
 
