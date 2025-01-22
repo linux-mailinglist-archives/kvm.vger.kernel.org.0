@@ -1,207 +1,234 @@
-Return-Path: <kvm+bounces-36254-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B5CDA194A0
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 16:06:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74F8EA1950C
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 16:23:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E573B1882E4B
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 15:06:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EB2D3ACA23
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 15:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177A6214226;
-	Wed, 22 Jan 2025 15:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E0F21420B;
+	Wed, 22 Jan 2025 15:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cDq19TXe"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IYpr/Ddn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2045.outbound.protection.outlook.com [40.107.100.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD9FECF;
-	Wed, 22 Jan 2025 15:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737558377; cv=none; b=N8enMLVpPdQ0pm+coxq1oMI5Avq+6lwTXBx/2kPp/bM+dZkYKJFFEo0OXX5bYUzMQlxwWqZ6gbQKSe4rZAa291SeM82iwAkXpNJcKZj4jlQL1Ewe+fg7pgTVgDqjXhvp34eBUamOgbOZGSqAbtXnwuLmUoTm0hNlMASli+dZr+M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737558377; c=relaxed/simple;
-	bh=dMl8o0XND35oOQJxQk1TJXjXoYG0oljoyi+EsoBYIs8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WzE4gNT6MovfmOlLTOfYPAzxis9PCGbytVYwRLgo6rTjYbmBr/5B9x53LCT8nBGnkCy2X+0A57XJ+fUGgGANYqklI4QKUQuNoUezHM66KG5ry1Vi40PMTGjOwOsvCAqs+Ju4I9S5VTCd0tHms7WtYQChkqUyTJ1iXmivIzyBmNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cDq19TXe; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50MCRIC5015192;
-	Wed, 22 Jan 2025 15:06:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=pFOqVh
-	2RNGstu/3AXWagFiYFpW9dqc3T/e9cFJkWBfI=; b=cDq19TXei8RVyZm5A62uQc
-	PtnCj7HUIJm/Z3VPFvajtqvseEX74QHPsXV6/dmAQcaxMoPJEWdZePQCJ6tAMc3V
-	S2J+bnZ5WkVynr00BC97rRup4dPqPaWK9sR4YCZv4+PXd5Mk5zJRmyw/fDgIxY5c
-	iGXV+4CKKE+oG26uGKT0ewAtqvsrEp1PRqmYYnMTm+9zVgx/uzlUjPERNrQfnAtn
-	MXOyEIObs34YvPbnJfcm5Nf06PrWuEZnqwnWACPhZVYTXMJ+H5DuUYgGuM7d1nj9
-	x0jlaCcOxBRVG58kZ5qNs3zP15MphQ2d/TSkYk5pbNdIEf5BztAKoJCQuz4Kgxmg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44apr9bf16-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 15:06:03 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50MF2CkR024289;
-	Wed, 22 Jan 2025 15:06:02 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44apr9bf13-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 15:06:02 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50MEWxU0029604;
-	Wed, 22 Jan 2025 15:06:01 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448qmngxba-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 15:06:01 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50MF5vDL21496196
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 Jan 2025 15:05:57 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F17E20040;
-	Wed, 22 Jan 2025 15:05:57 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9757A20043;
-	Wed, 22 Jan 2025 15:05:56 +0000 (GMT)
-Received: from [9.179.15.229] (unknown [9.179.15.229])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 22 Jan 2025 15:05:56 +0000 (GMT)
-Message-ID: <15b619e7-cc5e-48a4-ab70-f9dd0f026048@linux.ibm.com>
-Date: Wed, 22 Jan 2025 16:05:56 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957EB2144D9;
+	Wed, 22 Jan 2025 15:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737559383; cv=fail; b=jMlsb3pRECvh5QUHUyNWLw2hBt/4gDZc8pV1Ch8jfVQCNAMpcW/EPhWyGGxMcCi6Q2AfPLyPb3pOwvtLMrfUU32uhvLc73VmtQh6eqlwdbbjQOeINfWYYmIwYz5SHyFevSEk2iQ2eKTmrgrAA5nYWAVMtmar6C3QNxluY9p22/c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737559383; c=relaxed/simple;
+	bh=jKHWO9o+bXStHXxWub8hZ0bVjmz+1nUSwyDB2LFG2Ek=;
+	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=FfFVCUZDwXznDj7xDNjQmVb3gPE7/CoEtynXw05pRbVS4UfihD59yrQr1Kmh0pHbcC6YyD5qvZ2BSUC6L10D4LWgIM2a3V3CS5scr30rXF+6zPCZGCw1MD/0leZTJY2ftsEVzEP2iHtnkNyEHyuXX5rnLVSludhMs6cK2+zIZCI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IYpr/Ddn; arc=fail smtp.client-ip=40.107.100.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FnMs+Rjr/FO+wRtOqMFk2Z27ZnKVjFfPAEdMgXQx33VjWzTaaQZf6NOYPR3hB6G9kzeFaa2aXBebHAySUJqivyvFikX1C06NTn9Ugaga8ABA1LVgmEZ/+eyGaIWgV/ZWIZ70osw6s9yfD/E99oXT6dI0xGWIpdT2kaavXGyqoqs0j7hHj7LdbkZLKIw4QI71lDbRbK8RwlDmymyl8H6Dp+X763FqTHeFORb3rRyiOpCjXbsgWQwHNNgQgg3B7HvNRXo+hA59+CTjvZcBEJlOSa90E+gte8PvX9P5LMwrtVP69tnZRp77HptCGhVyQGXHnPNJCGt5zh7ykVOTRbwjAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X8eJONigEalRExAZ0iOsQsAtQyy+ygJUf9u6WbQc5qs=;
+ b=refnjyBsAFYb1ggRbDsjTm9QAEONOOjNNR30oHpo72qnbCt8Knl1f+BioD/XpxqjmabOl9mF9GEf+fYaTWVt2ZTL4DYyZCguv/jMAHTF/c1eJHvQTcTy95CTgPrAc/KaNWTUqzDEzpXO+CyVa/gSg7UZlkJG9mXitmHl9jvFvIpoRu03ZRH+nzuI2gd2TXKyIfK2w68PorJq8A8XaOPypWLT+aYfOEo77REO5yMG5OukNizEk8EPgq3Bg6GBx8beIHR7zGkHmNCGyC7tT6y9lblpgJwRJakw6rhNJyr3dPmXm+nm0wjuSkLN0bQs0JPVBarPsQBnfkDSxZGNEdGQOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=X8eJONigEalRExAZ0iOsQsAtQyy+ygJUf9u6WbQc5qs=;
+ b=IYpr/DdnN/jqaBZpxgmvWCUJoqQG5PyabPkuqRS7V5TFlp/IBtu9oJ7FCGZUW52aj8o0DHwt9nMsEjomOBTEIiVK35JT/s0Sp+78rK0I+paU6U6uxFteEgjuQE3VQ6gU4eNbFz9hXRlzc8PAkyOm91el2YyEW8AL7F58l++pYHc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by IA1PR12MB6209.namprd12.prod.outlook.com (2603:10b6:208:3e7::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Wed, 22 Jan
+ 2025 15:22:59 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8377.009; Wed, 22 Jan 2025
+ 15:22:58 +0000
+Message-ID: <c310e42d-d8a8-4ca0-f308-e5bb4e978002@amd.com>
+Date: Wed, 22 Jan 2025 09:22:52 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+ joro@8bytes.org, suravee.suthikulpanit@amd.com, will@kernel.org,
+ robin.murphy@arm.com
+Cc: michael.roth@amd.com, dionnaglaze@google.com, vasant.hegde@amd.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev,
+ iommu@lists.linux.dev
+References: <cover.1737505394.git.ashish.kalra@amd.com>
+ <0b74c3fce90ea464621c0be1dbf681bf46f1aadd.1737505394.git.ashish.kalra@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 1/4] iommu/amd: Check SNP support before enabling IOMMU
+In-Reply-To: <0b74c3fce90ea464621c0be1dbf681bf46f1aadd.1737505394.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN7PR04CA0040.namprd04.prod.outlook.com
+ (2603:10b6:806:120::15) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/15] KVM: s390: move some gmap shadowing functions
- away from mm/gmap.c
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, borntraeger@de.ibm.com, david@redhat.com,
-        willy@infradead.org, hca@linux.ibm.com, svens@linux.ibm.com,
-        agordeev@linux.ibm.com, gor@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, seanjc@google.com, seiden@linux.ibm.com
-References: <20250117190938.93793-1-imbrenda@linux.ibm.com>
- <20250117190938.93793-10-imbrenda@linux.ibm.com>
- <D78M5FNORE1Y.1SJAXHNVZS9GL@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <D78M5FNORE1Y.1SJAXHNVZS9GL@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: L6oE3Xg2X3mLMCgpuw73AWS-zgh9UUcH
-X-Proofpoint-ORIG-GUID: aloPTU9s2fnIeKpI368D_3ayOX2nTbjR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-22_06,2025-01-22_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 mlxscore=0
- spamscore=0 clxscore=1015 bulkscore=0 phishscore=0 malwarescore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2501220111
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|IA1PR12MB6209:EE_
+X-MS-Office365-Filtering-Correlation-Id: f58ac867-4188-4b21-e2d6-08dd3af8a6a5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Q0pTWmhoc3BxeVFrb01uRUIrZzJubDRNRm1Nb1lCRjBHV0lyV25yVUxMeC9h?=
+ =?utf-8?B?bHFRcDZyR1J5bUNvenlxN1gwYml3M3RQbklTWUJIUlFxWkZUUkY1T2RFQzM5?=
+ =?utf-8?B?MzE1eUcyblVXb1lESEtVaFdnK01zTFoxY2NIYUVBWDhkUmZsNDNNcHlYY3VL?=
+ =?utf-8?B?WXB6OUtpYzNOUVZSc09qd1pmOHZHQ1hmRklyUGxLbTVqUkx6blRROTUzMWdk?=
+ =?utf-8?B?dFpPbWRybmNoaDRzeThwRFFRcWhDTHJ0WHVOTHgyb2h0TWxZV0pHejJvVDE0?=
+ =?utf-8?B?Nkl3U2pSYTI0ZDVpdTI0OFh2N2NLa3VDU0plWnVqSk85aDdKZUxRL3lsM3Rr?=
+ =?utf-8?B?Z2lSeHZQeURva2pEd1Y0T1R6RE1sVC9YLzBsUU9DcmxBY1c0OHREeFpxMXIz?=
+ =?utf-8?B?bHN6NjgzVXAyTVczQkM2R3FhaytublpRNmN3d1d5SkhJOXk4c000QTRwcjB0?=
+ =?utf-8?B?MURqVU1oR1ZYZUxwS3ppa3FQSUtZT04xMzF0WXNEVFZ2VlNpRzhMd1pUWUg5?=
+ =?utf-8?B?TzNsMWhjcEU5UUlhVU5ERy95elBzOExMZmt0R3ZmVmFaOTJ3cDNoam1HcGVv?=
+ =?utf-8?B?WlNGSXdhYURZcU1Xb3Z2VCswSEdiVXB4cm92SWpvNDAxbUNkRnBBY1BLVVN1?=
+ =?utf-8?B?d2V3alArOFdxb2tRYUtpMFM1dkdDbmF3d0FYQTlXY2pZSWt6UXJINXJrZ1lZ?=
+ =?utf-8?B?Y2h1Ky9OMDQ0clQ3Z0E4OGoxZFdUWjhjV0RnMVNZVG5uRzg3SlJsUHRzSENW?=
+ =?utf-8?B?d20wdlI4WVphSEp0aHl5bzBCYUtXRkxlNE5KK2pWTjVqSmxFbHNCZUVZUll3?=
+ =?utf-8?B?bkR4eklkaDVLUGFQT2Q3dWhGRGxIREQzY1FLUkxsb2VFUktyVmxuZFg5OFdK?=
+ =?utf-8?B?WHZzSUN5b0RmT2ZrL1R2NkF3WkducGV4UUtnYndWUmdIZVRaYmx4T1lYY1cv?=
+ =?utf-8?B?K1BZNlRJaGxIbEtpV0FFaHE0NDcwZVhxY3puQlpNcE4rUG1rck5xZEViRXpt?=
+ =?utf-8?B?bmUvL1NDMWFvUlJSUGUzZXM4bUdkbHVDdXl1YVVrYnpOTDFKaUkvR3RZTVpv?=
+ =?utf-8?B?d3NkbnhxdUkvMktkTmd5azBJOVRncGFxTjFRWUZ4Sk9yU240Y2F2bHdlM2l6?=
+ =?utf-8?B?cU9DcktTMnNkVlQ4a284NlVkNDFsWjd4SmE2TzlhcEI4OWdmUnNsRWhMSm5y?=
+ =?utf-8?B?d3VBY0ZCaXc5bjhwYVk1UllLK1NLVk14OXJ6Kzg2QXU5NGpxN2t4RU1RNG5i?=
+ =?utf-8?B?TXprS1ZqY3hxUGpMeEI2TjBhVTJZamk5dUlLejg2R0xNUzJObGRqV1ZScTli?=
+ =?utf-8?B?YlRBU3ViYnYvY2NDVkdrMDVvZFlWSFhjTEd6TFB4a2ZBaE9ENGozZTJJR3dx?=
+ =?utf-8?B?Zk8vb3cwdWFoZERpbEt2M3JXVWNxVlRRTThOais1ZWtBMXc3bEVQaTFPeWFS?=
+ =?utf-8?B?eGtFUXVFNSs1QVRwQ1YrWkRuc2xNam1qZFBrL2V4WnRUd0tyVHhXbWlyMC9i?=
+ =?utf-8?B?SEIvVVlQK1dJZFFremhDOExKTXAwQmRGbUYwSkZYUkc0eVMxUDhKd0VGdDYy?=
+ =?utf-8?B?Z3ZNWTc2aXYvMnRuU3hXUDVZdHhremVuTUxaMkQ4dmJpeU54MG1tSGEvM1hN?=
+ =?utf-8?B?UW9JeGNlTmxMc0NBR2xoSUJBMGVkSjZSSFJFa1BaSGRsU2NQa3RtQ0IrT00r?=
+ =?utf-8?B?MjJ3cjVldWhZSCtwMk5JcTZ0akZ5cnhsUG1VSjN3RnpGdUJkNUNZYW00RWpS?=
+ =?utf-8?B?NzlNejN0WUM4OTI2S01vc0FsNGYvaHRSVjBaR3h2Q3VRN1VpcVJQUFVHT3JW?=
+ =?utf-8?B?S3lYUjc3ZmlRMFVrV0NxbklOUm9DRStEZ1BuenlVOWgyKzlEMm14SUNXVlJZ?=
+ =?utf-8?B?MWVyRjYxbDhPZUZXVHE1MXFQRWNyR0tvQ1NzWURudE9FL0psSzV1TmRoSk56?=
+ =?utf-8?Q?GMNH16OFm3g=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bEQ1UDdsaUU3T1hGajJQS2tUTkFnZnplOWpib0swZVJ5cWxlcExmSXBhOTZV?=
+ =?utf-8?B?REs4dlRjOXh6MlZPYjM4K0YxUFptQm54TjFESURtQzIzYzJWWGUyV09SRndJ?=
+ =?utf-8?B?R2ZmVFUyOE03czhsY1hBQkxDbUx1QVBxTisxMHhiWDJBdG9WMlZBMlJqZHM3?=
+ =?utf-8?B?M21JOUszbU9adnJHUVgrbGRpNkpKSnhJS2ZFTnpzQituMW5QOG1HdHlUdFhJ?=
+ =?utf-8?B?Z2RZTGpSWjgya1RkOC9sdWl0Z05rcGV4dkRxbWYxR21uVE5JN1BnVE95NHVy?=
+ =?utf-8?B?aFRvSlIrY3dnK1lTWjQzTGVLbUt6TXM2V3VMSEIzZ25pczlJcUZPa0FIZjUy?=
+ =?utf-8?B?YTZDYjB5Z2kxTHV1M05ocm0wQ1dpMDBkSFZucHlNVytCR3crVEZid0Y3OEs0?=
+ =?utf-8?B?cGpsQjNiNTgrUjd2TzIzUmd4OCtscnBzdkZvV0EwMThhbEV1TDhnZVpKdVp2?=
+ =?utf-8?B?aUJYMkYyRngycDNSZ0h3MG5WeHVnOUNZd3cxSjJFNVVObE0yUzhmQ2crd3BX?=
+ =?utf-8?B?c01SazJqeFNDZUZUTlh6Z3I3ZlZ1U2ZwemhvVXVMMEZ2bU9GdXQrYUtHam15?=
+ =?utf-8?B?VDJGUW5NN3R1RFA2a1g2Y3NuZzcxMzc4RDhZK3VEQWVscFVjK3FFMkNBd0R0?=
+ =?utf-8?B?dURPZThEWXdHaFdZSjhSTEdNR3JRM2E1SnNsMGJ1cldkQ2x2RWNYOTRGZlhq?=
+ =?utf-8?B?YVpWazcwSDNuQisxWnBBMDN2UXo4TTBBbENKV2FWSkk0dmpQSnRvOXhZdVVF?=
+ =?utf-8?B?UTRodkFobjd3RDdIQVYvQjdxayt6anFnK2ZiaE1zcTZBOU5VaExpajhXWFdI?=
+ =?utf-8?B?UE5rN0tDaWVpWlBRc0ZGN1NKdDNBM3Q4bUVnckhZYVpEYnZ5alZ3K3pXSUZp?=
+ =?utf-8?B?RTF6aElENm5UODV0dnVtZGhHOXhqZDBCbkk5OUZWcVRjVU44RTBRSXA3eFZm?=
+ =?utf-8?B?d3pyQU5XTmpqdk1oaHFHNkd4Z0c0aXp4dlR5T2phMzJ1UXdYTTBvQldzZVA1?=
+ =?utf-8?B?OENMOVQwT3NzTTlIN2J1RlJTT1BSbW1GcC85SnNOK1BoMzRuaWVLWUtpdHpm?=
+ =?utf-8?B?dmY1RHdRUEJNN2NhN1ExL0RNaTROZ0luUUVJWi9jSXNOM2NHMTE2Vjk3bmJK?=
+ =?utf-8?B?TjJBT1UzTGRxQmtiVWQyUHIzSEJFWHBGa005WDNoVEFGYzZ3OXY0dHNhZGN1?=
+ =?utf-8?B?YVlWSGdIR2F0ZC9OeUcxNmp1Sk1ZQUQ2OTFyVEsrWnRQTVNKUUgvTFhCUEhS?=
+ =?utf-8?B?aTdrU2thc0sraXlxVjhsck1iU1QyTnpVNGFiVXA1WTBPdE5LSVh2Yy9aNzVW?=
+ =?utf-8?B?YTZkYnZlWG9GNmhqcXM3amx2eW1DcnpGU1lMYmhNRmZYSUYyQ2hJVVJQbmRD?=
+ =?utf-8?B?Y0Z0aFp1ZmJ0a3JMbjMrYWFCcmM0dkJlT1VjRGRFam96elpMb1QxbjRDSjZa?=
+ =?utf-8?B?UFB2dEt3Q3cwd1VYVlhLUWxrZHViQ21lc1grMkJsaUxqKzkrZkJZTEhXRmJN?=
+ =?utf-8?B?bUtRNDYxRG9HMFNFVXhLU2JwSXljK1AwUDNWTFk1SG54TEF6R21sOEJKRGVX?=
+ =?utf-8?B?UTBtbFBiNDcyZXlNWGlaM1g3TmYzdmJ0MS9MR1RhTTRDRFc0bTBGa25nMlAz?=
+ =?utf-8?B?QnRYbUN3bUJNUlMyT21WU2JCUmJkTDFqM0tmazc0OFZvS3lXUXZQMVExNTZX?=
+ =?utf-8?B?SnU4MFhkQ1loY1BZSHJOTmtZMnJaM2RwUUsweVZjR3dwSXBEZFRHcGRyVWoz?=
+ =?utf-8?B?SXUwVXY5UjFhaWJ1VzEvWjd3dUFjWmRnaGN3MUJxeGU0czFPYnB0SkdQZExr?=
+ =?utf-8?B?NGY0UDkwcCtNM3p1WGJqN1BBNXFURnZzeHpReVB3VkZheHk2MWhtdnRGa09p?=
+ =?utf-8?B?YU1sQVE5ODljNVJWS3FPelpQbDU2WWpzMEFNbWZMYyszTWQ4cjJ3dUU0c2Nj?=
+ =?utf-8?B?MzIvSU1CVEFoR0dONXIrY0plWGphT0puTXBMNTY3Y0trSFlpak5kOGluczIw?=
+ =?utf-8?B?NWM3bTYrWnNPTlloNHhKdkhHc2hLM1E1alcvbE94TS81UlY1ZS8vWjBTL0FE?=
+ =?utf-8?B?N0dJV2I5Vlp3ellPYi9rVDQ2bWJRdTJOaUN6VkgydFZvODZSR1IxNFFUMmV4?=
+ =?utf-8?Q?o9J8WfQIarZzK8UEFuj8kTe7N?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f58ac867-4188-4b21-e2d6-08dd3af8a6a5
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2025 15:22:58.8698
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aOsjB82WJSZvDwUmKNUbw3GAy1r2K/QxZj4iejaoXw+ghET8Xjit7NZqfQWYDzQCfY6TibJcdChEsPGZliuNmw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6209
 
-On 1/22/25 1:50 PM, Christoph Schlameuss wrote:
-> On Fri Jan 17, 2025 at 8:09 PM CET, Claudio Imbrenda wrote:
->> Move some gmap shadowing functions from mm/gmap.c to kvm/kvm-s390.c and
->> the newly created kvm/gmap-vsie.c
->>
->> This is a step toward removing gmap from mm.
->>
-
-[...]
-
->> +/**
->> + * gmap_shadow_valid - check if a shadow guest address space matches the
->> + *                     given properties and is still valid
->> + * @sg: pointer to the shadow guest address space structure
->> + * @asce: ASCE for which the shadow table is requested
->> + * @edat_level: edat level to be used for the shadow translation
->> + *
->> + * Returns 1 if the gmap shadow is still valid and matches the given
->> + * properties, the caller can continue using it. Returns 0 otherwise, the
->> + * caller has to request a new shadow gmap in this case.
->> + *
->> + */
->> +static inline int gmap_shadow_valid(struct gmap *sg, unsigned long asce, int edat_level)
->> +{
->> +	if (sg->removed)
->> +		return 0;
->> +	return sg->orig_asce == asce && sg->edat_level == edat_level;
+On 1/21/25 19:00, Ashish Kalra wrote:
+> From: Vasant Hegde <vasant.hegde@amd.com>
 > 
-> This can simply be a single return:
-> 
-> return !sg->removed && sg->orig_asce == asce && sg->edat_level == edat_level;
+> iommu_snp_enable() checks for IOMMU feature support and page table
+> compatibility. Ideally this check should be done before enabling
+> IOMMUs. Currently its done after enabling IOMMUs. Also its causes
 
-NACK, at some point (and that point might be very arbitrary) my eyes 
-start bleeding
+Why should it be done before enabling the IOMMUs? In other words, at
+some more detail here.
 
+> issue if kvm_amd is builtin.
 > 
->> +}
->>   
->>   #endif
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index b626c87480ed..482f0968abfa 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -4509,6 +4509,63 @@ static bool ibs_enabled(struct kvm_vcpu *vcpu)
->>   	return kvm_s390_test_cpuflags(vcpu, CPUSTAT_IBS);
->>   }
+> Hence move SNP enable check before enabling IOMMUs.
 > 
-> [...]
-> 
+> Fixes: 04d65a9dbb33 ("iommu/amd: Don't rely on external callers to enable IOMMU SNP support")
+> Cc: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Vasant Hegde <vasant.hegde@amd.com>
 
+Ashish, as the submitter, this requires your Signed-off-by:.
+
+> ---
+>  drivers/iommu/amd/init.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
+> index c5cd92edada0..419a0bc8eeea 100644
+> --- a/drivers/iommu/amd/init.c
+> +++ b/drivers/iommu/amd/init.c
+> @@ -3256,13 +3256,14 @@ static int __init state_next(void)
+>  		}
+>  		break;
+>  	case IOMMU_ACPI_FINISHED:
+> +		/* SNP enable has to be called after early_amd_iommu_init() */
+
+This comment doesn't really explain anything, so I think it should
+either be improved or just remove it.
+
+Thanks,
+Tom
+
+> +		iommu_snp_enable();
+>  		early_enable_iommus();
+>  		x86_platform.iommu_shutdown = disable_iommus;
+>  		init_state = IOMMU_ENABLED;
+>  		break;
+>  	case IOMMU_ENABLED:
+>  		register_syscore_ops(&amd_iommu_syscore_ops);
+> -		iommu_snp_enable();
+>  		ret = amd_iommu_init_pci();
+>  		init_state = ret ? IOMMU_INIT_ERROR : IOMMU_PCI_INIT;
+>  		break;
 
