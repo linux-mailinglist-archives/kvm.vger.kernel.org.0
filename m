@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-36198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36199-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF21DA188F9
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 01:32:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD215A188FB
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 01:33:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F5F2188860B
-	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 00:32:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF56D3AB581
+	for <lists+kvm@lfdr.de>; Wed, 22 Jan 2025 00:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535441BF24;
-	Wed, 22 Jan 2025 00:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D48F1B808;
+	Wed, 22 Jan 2025 00:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S2CldEMA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TibAZEVM"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4640317BA2;
-	Wed, 22 Jan 2025 00:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74546F9FE;
+	Wed, 22 Jan 2025 00:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737505962; cv=none; b=EPoZvPpPsrVWVDo/vRnJtWsNdRcXbZzcgWfYVYew3ffLHH9hRE5ZsmsxhYT3wm0PmI8KxBcNf/1PpAniJHKT3E6mUDQwKirSxzg5JrKubzpo09i6bKMi2QrU+yXPLgltEzwf0h9BJ/X9uIrShTRyFUl33ctAT4pLHT3Gm/7B3LA=
+	t=1737505975; cv=none; b=aqze50B4ZH+Y8rpt6BVFYxmO+qZz+n8r2/8ovPfKjtkky4HtD3n+eUIfvE2jkP3x9wX98V7ayPM9r58lV94ZbX5B/Th1adLCQ2YW461NjwUcCfifO6sJuSCMzwr81pBi7X/uEUA10w9KkDaUFO3/t21uO53fRUaqz2x5fxx3ygY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737505962; c=relaxed/simple;
-	bh=NYXrrJEJt0Xt/NqbEza6sClGmj6wJWbyEGXcFXev+to=;
+	s=arc-20240116; t=1737505975; c=relaxed/simple;
+	bh=6C3hu+ZAUaOKaTdTwdD5K/vrdscscUFLNfWrScH5dcw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dhDywJQBDZz8xTcU9co8PVDzuDBGzq3AVOPlcX2pnkR3mHMtSMqkemG9rtPznPFLxvZ1Y4kaRN9iXvDfDItsjueTJeVMQcAQvlTcWzAskuqd30FQ+owtG9uniSQnLHSq8/FGtpZmm4Eu3Xc2o2CpyWfcLDucjqinorBYEuHED6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S2CldEMA; arc=none smtp.client-ip=198.175.65.17
+	 In-Reply-To:Content-Type; b=upv8EjA8hRTA+w07EUmq0wep7WSSEsE0U9Epf2HkTeuimcZpbWGkMFGscwjHAh9+aIGdGT/lbL9QcJGiWDKlHbabSJB6OXQKR8T7H8Mte/3kIiywcbg/fr2qlFW3uoDoKu0LT+FmXYPuA++5ERW4pUkLWGEFnoc1ozkfjNkCXrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TibAZEVM; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737505960; x=1769041960;
+  t=1737505973; x=1769041973;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=NYXrrJEJt0Xt/NqbEza6sClGmj6wJWbyEGXcFXev+to=;
-  b=S2CldEMAeL68duedxns+/KOQRvb+bCR3SWzlkmAFwLVtGqwec/2K54ZN
-   0on0scj9fjVMYTMdzjbNQzzhAOgqcA8SdxxaemddVzN+sBiZDd+1MKTJm
-   jp/dU4GVMDuOT7djsyi09Oyvir/Zb2X18rnNJYrtd6GuStCWCzTErYy9k
-   xh0GiK0k2FZC/BVwOFoeYNReyG+YKmE1Ycj6i0S0Rv/1y01cWBYGbNpUC
-   OI0ndR2YwgG3uc2uHP9yGvbdbJV9tRm2ybsAmouaoJXMaWl7c63Pbsjpq
-   1QPU2XMn2bc5jqi8m9BcwLVPow1uWm873CqEtM0FQ6VAqcAIDfCW+lkh4
-   A==;
-X-CSE-ConnectionGUID: H3EA+ZiFSNaqgMQ/iIaipA==
-X-CSE-MsgGUID: KgatblaPSDOBgnHhJ/3Rnw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="37976507"
+  bh=6C3hu+ZAUaOKaTdTwdD5K/vrdscscUFLNfWrScH5dcw=;
+  b=TibAZEVMMhGTJVTlJTMDjpCnAjDAG4n0wrW1Xv8oSHknP06iyIuq81ZY
+   /FameAb5rf51HfiY2NXWZoD59q80nagG6ZI6qiD5WLNpRix/aRGqUR6vN
+   Dc3dc4Cs45jfplYg0FawuMNRB09uQiNKS6nmFuyYKqBAUPVlfT4OLY8qK
+   6Bez7PB79WwtGkAubXIbH/hwG4bQwOGl88GSO0G784zSt+yQukziYlXGP
+   OcheVkaRg1YWo2CdqpIuhaSwRKc9ayGFTFvyAbwPFgHoqTVvXryqvz+QV
+   b4Wk6Sb4V3BD4WnkRkIbsNO4A9HfZG2M4JDw4wNT8EBDZ9A7nB0b3xspW
+   g==;
+X-CSE-ConnectionGUID: m7bGdkirTfGcTguiOW1yxg==
+X-CSE-MsgGUID: d0CGhoFBQCCJ+ULXX8cQ9A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="37976628"
 X-IronPort-AV: E=Sophos;i="6.13,223,1732608000"; 
-   d="scan'208";a="37976507"
+   d="scan'208";a="37976628"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 16:32:39 -0800
-X-CSE-ConnectionGUID: YunMcbrAQySSkeNpmje6WQ==
-X-CSE-MsgGUID: YRTwBmRwRauMJ0PVd5g1wA==
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 16:32:53 -0800
+X-CSE-ConnectionGUID: +24YgNvWTw2c/UuYUHowwg==
+X-CSE-MsgGUID: 6yBTptqcQMWtx3dskX7SlQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="144220031"
+   d="scan'208";a="144220068"
 Received: from gargmani-mobl1.amr.corp.intel.com (HELO [10.124.222.89]) ([10.124.222.89])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 16:30:04 -0800
-Message-ID: <3edafd5c-f830-4627-927f-bc9ee6367d17@intel.com>
-Date: Tue, 21 Jan 2025 16:30:05 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 16:30:37 -0800
+Message-ID: <cb7b07eb-e8ff-45eb-93e3-5c9c82f8a898@intel.com>
+Date: Tue, 21 Jan 2025 16:30:38 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,6 +79,7 @@ Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
 References: <20250109225533.1841097-1-kevinloughlin@google.com>
  <20250122001329.647970-1-kevinloughlin@google.com>
  <20250122001329.647970-2-kevinloughlin@google.com>
+ <3edafd5c-f830-4627-927f-bc9ee6367d17@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -124,32 +125,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20250122001329.647970-2-kevinloughlin@google.com>
+In-Reply-To: <3edafd5c-f830-4627-927f-bc9ee6367d17@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/21/25 16:13, Kevin Loughlin wrote:
-> +static __always_inline void wbnoinvd(void)
-> +{
-> +	alternative("wbinvd", "wbnoinvd", X86_FEATURE_WBNOINVD);
->  }
+On 1/21/25 16:30, Dave Hansen wrote:
+> 	 * Use the compatible but more destructuve "invalidate"
 
-Could we please comment this a _bit_?
-
-/*
- * Cheaper version of wbinvd(). Call when caches
- * need to be written back but not invalidated.
- */
-static __always_inline void wbnoinvd(void)
-{
-	/*
-	 * Use the compatible but more destructuve "invalidate"
-	 * variant when no-invalidate is unavailable:
-	 */
-	alternative("wbinvd", "wbnoinvd", X86_FEATURE_WBNOINVD);
-}
-
-Sure, folks can read the instruction reference, but it doesn't give you
-much of the story of why you should use one over the other or why it's
-OK to call one when you ask for the other.
+With my stupid spelling mistakes fixed, if possible. ;)
 
