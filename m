@@ -1,225 +1,162 @@
-Return-Path: <kvm+bounces-36376-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DD4A1A606
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:47:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67225A1A65D
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:57:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17A897A56CD
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:47:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E3FC188931A
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21E7211A23;
-	Thu, 23 Jan 2025 14:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="noc/MsQq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894DA211A1F;
+	Thu, 23 Jan 2025 14:57:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CD9212FBF;
-	Thu, 23 Jan 2025 14:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7D72116F8
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 14:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737643605; cv=none; b=st+6lsnduxWrTFYZX6U/AjNozVQSOZOTY7F59GroM2HMRlKdEq+pJia9aAYymb1atIW/mCuXofRgt0G/QC+jHtWw4BYsFpEpHJo2VGHxY54IoN/tp3142ZuPSTgDhe0hnEAJHOUdLdIzH73KTXEECXf04dwZ5VLtZ4vjmNa4oro=
+	t=1737644248; cv=none; b=t14fJN2F5HUSe6mopY8b6diNgYv16aV5BNHk2rQ4eI0L0ihmPZ8EOtu/TzfKEI3L4/DjAApQjbbc5ntRH7BGb5eIfkE6NEULamY6fohm0HO3kxNz2fd3Lv6Mj0Ub/ejtQ6MrpGLhEPnlhsX+nL4YJTdEH7UkfDKnxy2Six6GMFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737643605; c=relaxed/simple;
-	bh=58hwVVaELyYBdhUWsTnse1kmiGCOYU9Vf9wu/RHauTo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pwSqwjyrwAIRhndF+CY6tL4JtlKa1sx9QtnXnZzdhUg789M+u9SQNbbOPqejkm9AnvcM2+Lo4GBtLxupEXF6avdvs1l5R83i8Ar+YSbnYOQRfKMGeHc3QXG4/6AX/m65jHrTQ1AurtH3lKAXIUNjvs7M6c32Va14hM5QzUlKTOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=noc/MsQq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50NBcq4H027577;
-	Thu, 23 Jan 2025 14:46:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=ExzggXOBv7+v/gDuO
-	wbpZaE1mz1o+4GdLRZmaBcm1qQ=; b=noc/MsQqd+6YycPboOzjYVaOhP/PmeNEg
-	ylvhHf3Y4aOjlfpthN5Nm5Yxk8fVRIZYa0x+Uf8YXt7etnK7dulVLZA/PDRftVF+
-	VVj4g9m6TZ3edhMPpMcEyHllszChrTBYW8hHCknELbmOoTq/xbl9ku+dH/XbizwX
-	qBMUFHVFKEGReeLwQgEwLh9pmufkLpjdTxMnmR8jsbq2QwYVAoQidSw1b8oh/cva
-	CxtW0U2HyOBWLIRlBKhwxcFKa00Yw8FhaKDPtHYEeMDq8hFVpLsa/5RW2aNZNgRz
-	RtXZQhIphmZ/lrEKzt8ptPoZ6RBfoyGf8lUCUoRhv2GXXpt5dY05w==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44b2xyp49w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jan 2025 14:46:38 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50NEgRcl024572;
-	Thu, 23 Jan 2025 14:46:37 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44b2xyp49r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jan 2025 14:46:37 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50NESVEK024225;
-	Thu, 23 Jan 2025 14:46:36 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448q0ye3r4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jan 2025 14:46:36 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50NEkW8750463090
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 Jan 2025 14:46:32 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B447620040;
-	Thu, 23 Jan 2025 14:46:32 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7EE0A20043;
-	Thu, 23 Jan 2025 14:46:32 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 23 Jan 2025 14:46:32 +0000 (GMT)
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, frankja@linux.ibm.com, borntraeger@de.ibm.com,
-        schlameuss@linux.ibm.com, david@redhat.com, willy@infradead.org,
-        hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
-        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
-        seanjc@google.com, seiden@linux.ibm.com, pbonzini@redhat.com
-Subject: [PATCH v4 15/15] KVM: s390: remove the last user of page->index
-Date: Thu, 23 Jan 2025 15:46:27 +0100
-Message-ID: <20250123144627.312456-16-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250123144627.312456-1-imbrenda@linux.ibm.com>
-References: <20250123144627.312456-1-imbrenda@linux.ibm.com>
+	s=arc-20240116; t=1737644248; c=relaxed/simple;
+	bh=fTZJUqNlLAPc9pkjyRGCHYO7ddQj8V2OMB2Uz4GvzRw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=oM9kWwb99JQHe/p+rlFiqxC5bBeWqN4zc4emVY1UdTeYS8eRzLMZCjOrZgi8ZiXmN6WQiFby5k/TubeR9hyffimaitsF6bXS5yGCCwVyb1K/zEDfLCNduvzyNu8ZBzv6k2mb/fvhqx8JmAt0PXWkG4WDZe/UkWeuIC33sbEyBjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ce7a0ec1easo6042665ab.0
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 06:57:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737644245; x=1738249045;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sjuCHk3cPJJKbPfJoSuHlqOyDip86LFpntpwDG2Tqqs=;
+        b=OdyHt/Ulp5TgzoP4v3AxRVoCRIpO+I4apg9Au8Q1anFIjjiMd0j2OA9GGHxZOvJ+Lf
+         hZDh5bZCa0Hz07eDAxSm+P+gHwzWpoegHJL+27RmywzJGd+TgwMJbXTKaq6HeCmQW9fS
+         VkGL3Ded9oTgwSQNe/fAKF/LvIh7RB8He5bIQZ1oEgFZ9k/voA42Shkxz294InIXQnwK
+         gJmKgksxv8Pjq1c59PBVp3oaol+EWzAmT6McY5eignPUWjYFaVTxz5oUfydSpXUXzxEo
+         LO3yB6Y0ipluZhwlg7ulC2oMV8t0Afof+scfFKfXe0vuPwVPvBPwP/B4wS+lxKoOLD98
+         +e7A==
+X-Gm-Message-State: AOJu0YyKjgxsu31eViFJkHw+VxP5IVyrtE8RFb6LyBft0oQxpsv7dEr7
+	Kzu+XqhlXWATJIhX/FPhNpzmGvVT4W0KUYNtuCz/l+9NUDiQCrILlI1yOn5hdqmwx34MvcZgHEp
+	nB76V2lav+5fSJCemLnYNOQa6OHM/c4fpHh/76MJ5ftjxzgK2vYHorh8UpA==
+X-Google-Smtp-Source: AGHT+IHWLkyfFCQWskam3uUwmD2hoz5Qzs9kx9zV6bEZEIwvQxTB/p3y2+5Twyk/F7RLhst1A0/5xTGsslhJBR1XfKKxOPDkT+1v
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jxMqq8jcFNfyPEXDZwd0Zoybb_JV0Rj9
-X-Proofpoint-ORIG-GUID: jMAIiwleg2kF4ntMNm5440QFZZq5FVP0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-23_06,2025-01-23_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- impostorscore=0 adultscore=0 clxscore=1015 bulkscore=0 suspectscore=0
- mlxlogscore=999 phishscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501230108
+X-Received: by 2002:a05:6e02:1fc1:b0:3cf:b7c0:8819 with SMTP id
+ e9e14a558f8ab-3cfb7c08acfmr41500115ab.9.1737644244103; Thu, 23 Jan 2025
+ 06:57:24 -0800 (PST)
+Date: Thu, 23 Jan 2025 06:57:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <679258d4.050a0220.2eae65.000a.GAE@google.com>
+Subject: [syzbot] [kvm?] WARNING: suspicious RCU usage in kvm_vcpu_gfn_to_memslot
+From: syzbot <syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Shadow page tables use page->index to keep the g2 address of the guest
-page table being shadowed.
+Hello,
 
-Instead of keeping the information in page->index, split the address
-and smear it over the 16-bit softbits areas of 4 PGSTEs.
+syzbot found the following issue on:
 
-This removes the last s390 user of page->index.
+HEAD commit:    95ec54a420b8 Merge tag 'powerpc-6.14-1' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15ff45df980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f27a9722e53abeaa
+dashboard link: https://syzkaller.appspot.com/bug?extid=cdeaeec70992eca2d920
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=133ed618580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=110449f8580000
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-95ec54a4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/06bc523d1d96/vmlinux-95ec54a4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c0b342c3e200/bzImage-95ec54a4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com
+
+=============================
+WARNING: suspicious RCU usage
+6.13.0-syzkaller-00918-g95ec54a420b8 #0 Not tainted
+-----------------------------
+./include/linux/kvm_host.h:1038 suspicious rcu_dereference_check() usage!
+
+other info that might help us debug this:
+
+
+rcu_scheduler_active = 2, debug_locks = 1
+no locks held by syz-executor167/5303.
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5303 Comm: syz-executor167 Not tainted 6.13.0-syzkaller-00918-g95ec54a420b8 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x226/0x340 kernel/locking/lockdep.c:6845
+ __kvm_memslots include/linux/kvm_host.h:1036 [inline]
+ kvm_vcpu_memslots include/linux/kvm_host.h:1050 [inline]
+ kvm_vcpu_gfn_to_memslot+0x429/0x4c0 virt/kvm/kvm_main.c:2554
+ kvm_vcpu_write_guest_page virt/kvm/kvm_main.c:3238 [inline]
+ kvm_vcpu_write_guest+0x7c/0x130 virt/kvm/kvm_main.c:3274
+ kvm_xen_write_hypercall_page+0x2ff/0x5f0 arch/x86/kvm/xen.c:1299
+ kvm_set_msr_common+0x150/0x3da0 arch/x86/kvm/x86.c:3751
+ vmx_set_msr+0x15da/0x2790 arch/x86/kvm/vmx/vmx.c:2487
+ __kvm_set_msr arch/x86/kvm/x86.c:1877 [inline]
+ kvm_vcpu_reset+0xbea/0x1740 arch/x86/kvm/x86.c:12456
+ kvm_arch_vcpu_create+0x8dc/0xa80 arch/x86/kvm/x86.c:12305
+ kvm_vm_ioctl_create_vcpu+0x3d6/0xa00 virt/kvm/kvm_main.c:4106
+ kvm_vm_ioctl+0x7e2/0xd30 virt/kvm/kvm_main.c:5019
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9a62a26369
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff83b20f38 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fff83b21108 RCX: 00007f9a62a26369
+RDX: 0000000000000000 RSI: 000000000000ae41 RDI: 0000000000000004
+RBP: 00007f9a62a99610 R08: 00007fff83b21108 R09: 00007fff83b21108
+R10: 00007fff83b21108 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fff83b210f8 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+
+
 ---
- arch/s390/include/asm/pgtable.h | 15 +++++++++++++++
- arch/s390/kvm/gaccess.c         |  6 ++++--
- arch/s390/mm/gmap.c             | 22 ++++++++++++++++++++--
- 3 files changed, 39 insertions(+), 4 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
-index 151488bb9ed7..7d771b0b6bb4 100644
---- a/arch/s390/include/asm/pgtable.h
-+++ b/arch/s390/include/asm/pgtable.h
-@@ -419,6 +419,7 @@ static inline int is_module_addr(void *addr)
- #define PGSTE_HC_BIT	0x0020000000000000UL
- #define PGSTE_GR_BIT	0x0004000000000000UL
- #define PGSTE_GC_BIT	0x0002000000000000UL
-+#define PGSTE_ST2_MASK	0x0000ffff00000000UL
- #define PGSTE_UC_BIT	0x0000000000008000UL	/* user dirty (migration) */
- #define PGSTE_IN_BIT	0x0000000000004000UL	/* IPTE notify bit */
- #define PGSTE_VSIE_BIT	0x0000000000002000UL	/* ref'd in a shadow table */
-@@ -2001,4 +2002,18 @@ extern void s390_reset_cmma(struct mm_struct *mm);
- #define pmd_pgtable(pmd) \
- 	((pgtable_t)__va(pmd_val(pmd) & -sizeof(pte_t)*PTRS_PER_PTE))
- 
-+static inline unsigned long gmap_pgste_get_pgt_addr(unsigned long *pgt)
-+{
-+	unsigned long *pgstes, res;
-+
-+	pgstes = pgt + _PAGE_ENTRIES;
-+
-+	res = (pgstes[0] & PGSTE_ST2_MASK) << 16;
-+	res |= pgstes[1] & PGSTE_ST2_MASK;
-+	res |= (pgstes[2] & PGSTE_ST2_MASK) >> 16;
-+	res |= (pgstes[3] & PGSTE_ST2_MASK) >> 32;
-+
-+	return res;
-+}
-+
- #endif /* _S390_PAGE_H */
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index bb1340389369..f6fded15633a 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -1409,6 +1409,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
- static int shadow_pgt_lookup(struct gmap *sg, unsigned long saddr, unsigned long *pgt,
- 			     int *dat_protection, int *fake)
- {
-+	unsigned long pt_index;
- 	unsigned long *table;
- 	struct page *page;
- 	int rc;
-@@ -1418,9 +1419,10 @@ static int shadow_pgt_lookup(struct gmap *sg, unsigned long saddr, unsigned long
- 	if (table && !(*table & _SEGMENT_ENTRY_INVALID)) {
- 		/* Shadow page tables are full pages (pte+pgste) */
- 		page = pfn_to_page(*table >> PAGE_SHIFT);
--		*pgt = page->index & ~GMAP_SHADOW_FAKE_TABLE;
-+		pt_index = gmap_pgste_get_pgt_addr(page_to_virt(page));
-+		*pgt = pt_index & ~GMAP_SHADOW_FAKE_TABLE;
- 		*dat_protection = !!(*table & _SEGMENT_ENTRY_PROTECT);
--		*fake = !!(page->index & GMAP_SHADOW_FAKE_TABLE);
-+		*fake = !!(pt_index & GMAP_SHADOW_FAKE_TABLE);
- 		rc = 0;
- 	} else  {
- 		rc = -EAGAIN;
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 38f044321704..94d927785800 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -1733,6 +1733,23 @@ int gmap_shadow_sgt(struct gmap *sg, unsigned long saddr, unsigned long sgt,
- }
- EXPORT_SYMBOL_GPL(gmap_shadow_sgt);
- 
-+static void gmap_pgste_set_pgt_addr(struct ptdesc *ptdesc, unsigned long pgt_addr)
-+{
-+	unsigned long *pgstes = page_to_virt(ptdesc_page(ptdesc));
-+
-+	pgstes += _PAGE_ENTRIES;
-+
-+	pgstes[0] &= ~PGSTE_ST2_MASK;
-+	pgstes[1] &= ~PGSTE_ST2_MASK;
-+	pgstes[2] &= ~PGSTE_ST2_MASK;
-+	pgstes[3] &= ~PGSTE_ST2_MASK;
-+
-+	pgstes[0] |= (pgt_addr >> 16) & PGSTE_ST2_MASK;
-+	pgstes[1] |= pgt_addr & PGSTE_ST2_MASK;
-+	pgstes[2] |= (pgt_addr << 16) & PGSTE_ST2_MASK;
-+	pgstes[3] |= (pgt_addr << 32) & PGSTE_ST2_MASK;
-+}
-+
- /**
-  * gmap_shadow_pgt - instantiate a shadow page table
-  * @sg: pointer to the shadow guest address space structure
-@@ -1760,9 +1777,10 @@ int gmap_shadow_pgt(struct gmap *sg, unsigned long saddr, unsigned long pgt,
- 	ptdesc = page_table_alloc_pgste(sg->mm);
- 	if (!ptdesc)
- 		return -ENOMEM;
--	ptdesc->pt_index = pgt & _SEGMENT_ENTRY_ORIGIN;
-+	origin = pgt & _SEGMENT_ENTRY_ORIGIN;
- 	if (fake)
--		ptdesc->pt_index |= GMAP_SHADOW_FAKE_TABLE;
-+		origin |= GMAP_SHADOW_FAKE_TABLE;
-+	gmap_pgste_set_pgt_addr(ptdesc, origin);
- 	s_pgt = page_to_phys(ptdesc_page(ptdesc));
- 	/* Install shadow page table */
- 	spin_lock(&sg->guest_table_lock);
--- 
-2.48.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
