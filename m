@@ -1,161 +1,191 @@
-Return-Path: <kvm+bounces-36363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F080A1A58C
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:14:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE47EA1A58F
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:15:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92E2F3A48F4
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:14:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B42953A45C8
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7AF211489;
-	Thu, 23 Jan 2025 14:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5D321018D;
+	Thu, 23 Jan 2025 14:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1ZIK1Ee7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hE64tbS2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B2520F98A
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 14:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5678713D619
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 14:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737641680; cv=none; b=MJ3fD+hnQC0rZ6ont3wwpr56zsSJV9DBqYDrXHpZWs2Kq8baT2OHeBxblX9cAuBOr1oDDLGzL8C14G/WKspZppw2NGOBfWL6uyKqyjPvVBiY9edcGz/yU76YqlJD+WSaxmzhakbz6erWJtzy/xR7r3JmC58GiXLp2RK4vm/Ch7U=
+	t=1737641744; cv=none; b=HV4Ax1N/0niOtYHNPgMggH47BzS03qbnFP3Asy7u81SxnJANdy7QMDEj4YKP1vumwEgmDsnA4lJ/whFkXWlQs9JE5WTsUn2EfYEMvXTg/nh4gF3HlsRzeMZ2BE3uCpegZTo0z09JZNRlYSuN0C41X8zEzTEPRwAzQcW4ze3Y9iE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737641680; c=relaxed/simple;
-	bh=pyocaIgYW6FpWJ+hgCKaAhp4a9SJ7ESIw0XECJtAsEM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mnZALjKLaglYT/TyIS0K9BeHRLEvx3r98CT5tsNw6SApl+P1IjmYZiCYhOelkluJ0/7HY0KZsxBnQIC/GwD0DZVvPBfHgIQNodENJzHfzml2Y8ylBc5bQeXZ6BnHX1IWjQL6UcRDxBm6PNF9nSRqF3l27gxN/dunUFcNzj3DRic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1ZIK1Ee7; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9e38b0cfso2045888a91.0
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 06:14:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737641678; x=1738246478; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j0LnQnwU5g3fWpCDush3MJhvn8IZIebEPkRKB2Sj6qI=;
-        b=1ZIK1Ee7LX1iIt2CUwpBC5YvT9E7dUAHqFtSxZVL2MFfllq2xxT1PCwXLzwAO8Lv/l
-         BnrBS2+Dc9is9+iT8zWCkYDxM0t8M7WkHKu7KE4ObzQihycsZXOTEVwWpelXaDChtiO8
-         /DAWiN2YlHO8JJXXVs3EvAULS19o28Q2nTsn0KkMCMwFFwBpWdDqe0IYj/HMdkNe+xE7
-         sJMH/0+GuqEMNrVdEj22H2wnauXK6J/WcM/4y1ih1HvSWxAR8a6Cd+O+0G7pBBQ2IZCs
-         3bSQVur0cKlN/PnwyVA0kLquFKDxVbm8JOtTGtxaGeV2AzngUIZ+St7MikMqHPloWbc0
-         iVYw==
+	s=arc-20240116; t=1737641744; c=relaxed/simple;
+	bh=j/jQWP3jevXbvE1wR+V6hZa7c8QKp3Zc7S35t/vecls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XCcAlW4/7BfqBkgRzmU+Cl9GUdl1MzejwerIVQmZ2JG8khLRsur+2wDHLZmS8dcqU+VqAFiHHKFBdKr23nCArPk4IrGTMZ/HyQvsbVzqFIcANqxWGUtphgVRrI2f5AoSNJC/BsBMEf+J+4qxYgoGKxwRtayOEJGawTEwIJHmDKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hE64tbS2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737641742;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Wrx1YQaV4jHrUT1GhyIwTMPOmbXf+GTlJTfZ94QWVzg=;
+	b=hE64tbS2Uy9gKbpKcA/baPUMF7oh4FCAUfmPoeD1Rz3ySc5JsuPg0hwe6oxbkIAXaTvdsw
+	1aIAKiJVg1ntLZZPgnJx1UpxVhl1WVGXj9Ue2GxuSzTrDHPnmEcjVZ4RTySWRoyxbXfG4f
+	Z9mZocfFaS2r0Yi/rtgBG4olQ2osuqA=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-12-UPj_zywXNSyIVxN5hzoPhg-1; Thu, 23 Jan 2025 09:15:40 -0500
+X-MC-Unique: UPj_zywXNSyIVxN5hzoPhg-1
+X-Mimecast-MFC-AGG-ID: UPj_zywXNSyIVxN5hzoPhg
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-aaf5ca740aeso83061566b.2
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 06:15:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737641678; x=1738246478;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=1e100.net; s=20230601; t=1737641739; x=1738246539;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=j0LnQnwU5g3fWpCDush3MJhvn8IZIebEPkRKB2Sj6qI=;
-        b=VF9+heEQk2gfgVRIQYyZ3rn79M6zqkabpWR8IMB1FuBro8/3NmmBR1HrASkU3WJYUR
-         D8VtwCKxGRiKK3rkCW85OCqufUk4GJSN7noyX+WPI0TQkNPKOjDdyfLzexjpVZ76By2u
-         05wZ51Mdbct2jTYdftVpLShDYZmhsUN1IfvMTiIepcX/63BKmm5VGK8dkyu+RCn0sZQ3
-         nCr9XlmuA6jrwPbdywClFszd/wYIbd9zb2D1YKCLv/2AHtH6QbHEV4sZ3FnE8eS+/wg5
-         dAj7lADkIGvnM8BiZP6czjpGB6VqvgodGCv46ExSjGkTflbgXxuelXYEnBB4Mze7ojbY
-         K98w==
-X-Forwarded-Encrypted: i=1; AJvYcCWWOxefl26ZvBMBP2GGFyUOtjqPc3nEmmn7b2UvcJJubYgVPfSPxXBN6D6MH33B2HcJCV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6+AVPfOk7xMOw7tdONv7n6gtbBBF6EFKJCTXB7ZiSdZj+2D8G
-	au2nYwyZuCpHUdQ35veUspM4GhDDgbPHU5PFsBMPq6x8dg43hAddl2Ve/TMvbIhwKkbSm6WGYdp
-	nfA==
-X-Google-Smtp-Source: AGHT+IFpM4hIat+w0vlPn02jx2qvqmsdm14k20gXhYjzbm1EqG62SVufDxICymLNqoCdrH4u2c2rjn12hZY=
-X-Received: from pfwy10.prod.google.com ([2002:a05:6a00:1c8a:b0:72d:7bb4:ffc])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:21ca:b0:727:3fd5:b530
- with SMTP id d2e1a72fcca58-72dafb36d75mr34870853b3a.15.1737641677931; Thu, 23
- Jan 2025 06:14:37 -0800 (PST)
-Date: Thu, 23 Jan 2025 06:14:36 -0800
-In-Reply-To: <b8973c88-ca7d-4f23-bf54-aee0a8bb4c5e@amd.com>
+        bh=Wrx1YQaV4jHrUT1GhyIwTMPOmbXf+GTlJTfZ94QWVzg=;
+        b=gTz/FB/EuP7da0ZYUc+4FFQTYiXiE3ThE2Zr0XaY39Pq7DG+o4+xvnCK8NLwdBjzdk
+         FLulgMuVYshNXLI40gsZOqjeEBmMMNfB64G3pMq+RnvwobVQWHZ1PlC6dunbAvmmkxP+
+         qeQAJutfLCM8mzdAn5numfcrH9dJSEfCOqhBdNZTij8lSnJ65eq9J/pjKiOncr8oCQCD
+         vchAApv2UyXTFl01cFbcDuIAcnABRSWpDaIJSSo7bMtClavcMJj5npJluaVYqD97jTCN
+         1aGGGN7ka7OsElolUFgZIQh7cuqYOuNOMXWI3fwXztUZHnfFhVLa/ET4ZfYIkGawNBcu
+         bNHw==
+X-Gm-Message-State: AOJu0YzvwB3Fhdbb3F/FhlnlysfeC9GTC3Y6LFn9herlhH6N0YndI3RK
+	cht5RvaqJAj1SgfbYhy9QxyblrgA9fxIBzsm87hrtplqR5YycfvtFXnNUEomHSoQ5hh1DUUMDG+
+	o9CRohxURqQ1C+GHJKcWL27ooVpu9SEWj0QY17QPzzi6B/xPh+A==
+X-Gm-Gg: ASbGncuaBnwnmMIuAycC/hdwgwMlnupLg+/cy3s3ho15NOPTOa8j+rg0HHPSvVrlxKM
+	GgqOCguy1GfQznkjxyAHdaXzg9+kJow4kF5eMK+R9ZsNi3bS/VyuQF/GTkgqqUOPsSz0uW278pi
+	MIgOqqReJ5Mz72WC3K4OKaHcFSZZK43T7l3GUsdo2gtzRk7oZmP9f7BCsxeHUOctwD+zpogiED0
+	2CDxHVUw76ImhpUcUX4RikKpiIRQvwVX5ntLqlchjdS7di0/SazQLrkiqEd6HZRf8P6dlvCQCsu
+	M7MQP5YliPpvy0193wGG9NeM4nlxlKgNDyBfHG8Rc7icdRcJeJr4EcRlqguILagurFgIgChw1Ty
+	dhiCEtFsuuKSThrDZPmQdNA==
+X-Received: by 2002:a17:907:1ca8:b0:aaf:ab71:bf79 with SMTP id a640c23a62f3a-ab38b11281cmr2086876466b.19.1737641739518;
+        Thu, 23 Jan 2025 06:15:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFcTUAuhVq/2s4i9/2RbGuCuGUVrgeqSO8BAAm2hdqg4twU0s2Aq/JfxjSXVgW37YmagHr1yw==
+X-Received: by 2002:a17:907:1ca8:b0:aaf:ab71:bf79 with SMTP id a640c23a62f3a-ab38b11281cmr2086872966b.19.1737641739076;
+        Thu, 23 Jan 2025 06:15:39 -0800 (PST)
+Received: from ?IPV6:2003:cb:c70b:b400:e20a:6d03:7ac8:f97d? (p200300cbc70bb400e20a6d037ac8f97d.dip0.t-ipconnect.de. [2003:cb:c70b:b400:e20a:6d03:7ac8:f97d])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384f290a9sm1081240066b.101.2025.01.23.06.15.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jan 2025 06:15:37 -0800 (PST)
+Message-ID: <12286d1d-7671-4c0f-bede-53524ed94f0e@redhat.com>
+Date: Thu, 23 Jan 2025 15:15:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <b8973c88-ca7d-4f23-bf54-aee0a8bb4c5e@amd.com>
-Message-ID: <Z5JOzFv_Us-3jLr4@google.com>
-Subject: Re: next-20250121: kvm selftests: RIP: 0010:__kmalloc_node_noprof+0xff/0x490
-From: Sean Christopherson <seanjc@google.com>
-To: Srikanth Aithal <sraithal@amd.com>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-next@vger.kernel.org, KVM <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 2/9] KVM: guest_memfd: Add guest_memfd support to
+ kvm_(read|/write)_guest_page()
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
+References: <20250122152738.1173160-1-tabba@google.com>
+ <20250122152738.1173160-3-tabba@google.com>
+ <e6ea48d2-959f-4fbb-a170-0beaaf37f867@redhat.com>
+ <CA+EHjTxNEoQ3MtZPi603=366vxt=SmBwetS4mFkvTK2r6u=UHw@mail.gmail.com>
+ <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com>
+ <CA+EHjTzZoGuUcZTNUzx2e3PNOOEtOJT5rUEhSSmYQ-kcoZQiYQ@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CA+EHjTzZoGuUcZTNUzx2e3PNOOEtOJT5rUEhSSmYQ-kcoZQiYQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 22, 2025, Srikanth Aithal wrote:
-> Hello all,
->=20
-> While running kvm selftests on AMD EPYC platform with 6.13.0-next-2025012=
-1
-> below general protection fault is being hit.
->=20
-> /Jan 22 00:45:35 kernel: Oops: general protection fault, probably for
-> non-canonical address 0xe659260b3c31e5e0: 0000 [#1] PREEMPT SMP NOPTI
-> Jan 22 00:45:35 kernel: CPU: 113 UID: 0 PID: 143333 Comm: memslot_perf_te
-> Not tainted 6.13.0-next-20250121-f066b5a6c7-98baed10f3f #1
-> Jan 22 00:45:35 kernel: Hardware name: Dell Inc. PowerEdge R6515/07PXPY,
-> BIOS 2.14.1 12/17/2023
-> Jan 22 00:45:35 kernel: RIP: 0010:__kmalloc_node_noprof+0xff/0x490
-> Jan 22 00:45:35 kernel: Code: 0f 84 0b 01 00 00 84 c9 0f 85 03 01 00 00 4=
-1
-> 83 fb ff 0f 85 e9 00 00 00 41 bb ff ff ff ff 41 8b 44 24 28 49 8b 34 24 4=
-8
-> 01 f8 <48> 8b 18 48 89 c1 49 33 9c 24 b8 00 00 00 48 89 f8 48 0f c9 48 31
-> Jan 22 00:45:35 kernel: RSP: 0018:ffffa77176403ab0 EFLAGS: 00010282
-> Jan 22 00:45:35 kernel: RAX: e659260b3c31e5e0 RBX: ffffed7142251180 RCX:
-> 0000000000000000
-> Jan 22 00:45:35 kernel: RDX: 0000000003106071 RSI: 000000000003b080 RDI:
-> e659260b3c31e5e0
-> Jan 22 00:45:35 kernel: RBP: ffffa77176403b10 R08: 0000000000000000 R09:
-> ffffa771c9605000
-> Jan 22 00:45:35 kernel: R10: ffffa77176403b28 R11: 00000000ffffffff R12:
-> ffff92a240044400
-> Jan 22 00:45:35 kernel: R13: 0000000000000008 R14: 00000000ffffffff R15:
-> 0000000000000dc0
-> Jan 22 00:45:35 kernel: FS:=C2=A0 00007f91abd0d740(0000)
-> GS:ffff92e13e880000(0000) knlGS:0000000000000000
-> Jan 22 00:45:35 kernel: CS:=C2=A0 0010 DS: 0000 ES: 0000 CR0: 00000000800=
-50033
-> Jan 22 00:45:35 kernel: CR2: 000000002346c3c8 CR3: 000000223fbb6004 CR4:
-> 0000000000770ef0
-> Jan 22 00:45:35 kernel: PKRU: 55555554
-> Jan 22 00:45:35 kernel: Call Trace:
-> Jan 22 00:45:35 kernel: <TASK>
-> Jan 22 00:45:35 kernel: ? show_regs+0x6d/0x80
-> Jan 22 00:45:35 kernel: ? die_addr+0x3c/0xa0
-> Jan 22 00:45:35 kernel: ? exc_general_protection+0x248/0x470
-> Jan 22 00:45:35 kernel: ? asm_exc_general_protection+0x2b/0x30
-> Jan 22 00:45:35 kernel: ? __kmalloc_node_noprof+0xff/0x490
-> Jan 22 00:45:35 kernel: ? srso_alias_return_thunk+0x5/0xfbef5
-> Jan 22 00:45:35 kernel: ? __get_vm_area_node+0xd2/0x140
-> Jan 22 00:45:35 kernel: ? __vmalloc_node_range_noprof+0x2ec/0x7f0
-> Jan 22 00:45:35 kernel: __vmalloc_node_range_noprof+0x2ec/0x7f0
-> Jan 22 00:45:35 kernel: ? __vmalloc_node_range_noprof+0x2ec/0x7f0
-> Jan 22 00:45:35 kernel: ? __vcalloc_noprof+0x26/0x40
-> Jan 22 00:45:35 kernel: __vmalloc_noprof+0x4d/0x60
-> Jan 22 00:45:35 kernel: ? __vcalloc_noprof+0x26/0x40
-> Jan 22 00:45:35 kernel: __vcalloc_noprof+0x26/0x40
-> Jan 22 00:45:35 kernel: kvm_arch_prepare_memory_region+0x13f/0x300 [kvm]
+>>
+>> One interesting question is: when would you want shared memory in
+>> guest_memfd and *not* provide it as part of the same memslot.
+>>
+> 
+> My original thinking wasn't that we wouldn't _want_ to, rather that we
+> don't _need_ to. I mistakenly thought that it would simplify things,
+> but, especially after this discussion, I now realize that it makes
+> things more complicated instead.
 
-..
+Right, and it's not off the table: we could always add support for this 
+"no mmaped shared guest_memfd" memory later if there is good reason to 
+have it.
 
-> _Recreate steps:_
->=20
-> 1. Build and Install next-20250121 kernel with attached kernel_config.
->=20
-> 2. Build and run selftests/kvm component from linux next-20250121 tree
->=20
-> Issue currently seem to be hit intermittently, I am trying to find more
-> reliable recreations steps, meantime wanted to post the issue here for
-> awareness/getting any pointers.
+-- 
+Cheers,
 
-I would be surprised if this has anything to do with KVM, KVM is simply doi=
-ng a
-vcalloc(), and it's not even a particularly large allocation for this test.
+David / dhildenb
 
-What code does "__kmalloc_node_noprof+0xff/0x490" correspond to?  Without t=
-hat
-info, you're unlikely to get any help/ideas.
 
