@@ -1,192 +1,204 @@
-Return-Path: <kvm+bounces-36310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F092A19BCD
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 01:32:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE2FA19BD1
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 01:33:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CCE83AD71F
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 00:32:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EC0616995C
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 00:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262EF17557;
-	Thu, 23 Jan 2025 00:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C74717993;
+	Thu, 23 Jan 2025 00:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vYlSbZmg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XFLnhNyN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE81846B5
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 00:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA5EF50F;
+	Thu, 23 Jan 2025 00:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737592345; cv=none; b=RLid8Y5xgC6SBNIKAJr0IpkKxNm+8bqb+VMvZ7fnno3tXirUfWvEjevb6ihMBjYDJAbsUZWn1lHP2SEzK7vmBK0daddEbC5Pw/xMbS76FwpxV8KaIxYuP1xCGHdPz5z+GC472c7GqT42qz4oRkt9F2qe7S0t+CKkpTIeE6ZQL68=
+	t=1737592387; cv=none; b=NiKzP8Pk1VJc+g//m4PnnE0B4nlypyFVKEFt0TWtaq/R/z3uSSrSPhQeMEIKXKAP41GIMsGZM4ImQTVGnf6gIobAUXVG7rSlEXcqr/2UnYoPb18NfIaPyMSIRn2i8G1apSBw6rITjI4lrlvgH5KLXvCJARmPk2wu30waC6TI7yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737592345; c=relaxed/simple;
-	bh=TM33nzDjCjQduT0mnOoGoN1c3R7TrzYewMMEpbOem2w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rIiRcMFgnk94cJS5mgCFlCDFcxRK0jDi4jIKeHRIInVq4aErSacgLYtdvFi6dOqfWST9/nFS7uWHC6YJQnHagy9eGTm4zJU/Xh2rdsiNYJc/+0wgQiGGbWcqMXXtgS3YYJToCbP/jpqBiMTIDF5z4azFtKown4QU169k/YY1+M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vYlSbZmg; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2163dc0f689so8118355ad.1
-        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 16:32:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737592343; x=1738197143; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eti7sVaUcXMEqtoMCKnxd8Ta9ihl6JM2nEYMCy2F8CE=;
-        b=vYlSbZmg8q8YTfy7ssq9pQYmw4S/V1Lx27ft6cF2k6+aTQBW7nL4+zSzieT4TXLX/W
-         OM3YMQHfrfOZyJrIg/zoG/iZmmLmtF7oa+4eDrfEOrIeLnrDBcN8hZmRAgrX7bJWDYWd
-         KWawPeWkv0MJTOpiI8Tu2xNitalLwCPkJYc54XytnjCtcv/llNgzf+Vi98bkaoHsN932
-         uK+slqzGLPbcPPDz1Z9DuIh29iFRfiL+Z9j9kTPTgCLL2L/1vx7KogiWhyX3ZcxjMKTs
-         lImyNf66hFie4WxbvEaTXqM4bTTm7M7AZ7RBF2TBDipQF+OrNYiJ8eu3E0V1PJCHFts8
-         1mtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737592343; x=1738197143;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eti7sVaUcXMEqtoMCKnxd8Ta9ihl6JM2nEYMCy2F8CE=;
-        b=vnq+C9VyTLIKFpHnaBO9J8N9I8EsW62UY4OKb9GrxynGoh5YIn2Bemfs7qf4lTMdpq
-         9skJS8mV9/S6gzuTAaLSlfSW85x1mkuul9Ev9Usy+5h5F4iG2GCTgwP2hWI0LWsRFV4l
-         PhtFcJ5oIFJpNnyH0cMNFa9cCHr7y1+EEtC0P2rtodUqWHHpO70oz9TG0yjmgKqhJDMF
-         5LMHlFK/jViUjL2Iq1HEBDunlb85JVctT5p2YIZ+eWJ0/7NAZgwXza7Q5BxLQ/1CHC83
-         q2xtJcIMoyYDqt7ofKoFwOotuGwl4HPnFHhsMNnGKVdD6/SKjV8KoCi0DPHHMqLbvVlU
-         M12g==
-X-Forwarded-Encrypted: i=1; AJvYcCXPHl8WTMupSu42VSLMiLG60pHvvURrbuk7Ian7RBqhvWejQAgAjVWgktOoGStaLJO+/VM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypLRKcOfaFU0hMNT6NjZk7D1i3C0xwmU+/scFb+h8eKiyXgqb2
-	y/sUq8IF4/dY9Rvub/fJhQJ5jUG4njLOFZCXEhWHY7JjbBI1ILJrWTIGY10FJaRry8RGySbpMvU
-	o+g==
-X-Google-Smtp-Source: AGHT+IG1/AUF68kfEzgxQyITEv9451JMsxy3BXBfoGM3Bwyvux3hREqXbeDNDJg8SSYHHj+rZ8O4MnClQjo=
-X-Received: from pgbck17.prod.google.com ([2002:a05:6a02:911:b0:7fd:460b:daa3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a10c:b0:1e1:9ba5:80d8
- with SMTP id adf61e73a8af0-1eb215ec495mr33615284637.33.1737592343165; Wed, 22
- Jan 2025 16:32:23 -0800 (PST)
-Date: Wed, 22 Jan 2025 16:32:21 -0800
-In-Reply-To: <CANDhNCogn0KogQ6HQJ0+XDwoT4QQFGmqfvTJmtmi65bo=zK=9w@mail.gmail.com>
+	s=arc-20240116; t=1737592387; c=relaxed/simple;
+	bh=h28eMJyE3PwRYXBGQKjxawEU3KLaC2296RpEr+y+gyA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OnL3oFLT9S2v/0qgHZE0lNqY3KCrdiCgOPRk1NqwQiGE4n1TZZgBXQVB+meT3AnBYsIbkyGWkkFkWFcCdW+sf00zO3zKjL3HbeoJn5cX7HwoldCcqNNlsiGJXUAKQFt1Ny6xtcBmYGKTMhe9vg9vjQFJDnPevJpunYE8o2lIoBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XFLnhNyN; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737592386; x=1769128386;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=h28eMJyE3PwRYXBGQKjxawEU3KLaC2296RpEr+y+gyA=;
+  b=XFLnhNyNBON246jOmlFmNAZ6ChKRksIzSaj3OwzGomQ1CGQA3H0yiCPh
+   YFPdvtuP36E9l9SKb5WVURbbOfqA9RffIScmZ5RlURr6hw77ZlNbS7PSN
+   WdBgNf0eShpUA8epavQy7m2FGIF0Q1J33qb+jScIRlzG5+zTAslgIA8AA
+   scKy8Fld7dC/CR551Z6NSt7eYXF1m69I0wqcrHMS9bb0J5RlmupHcUmUF
+   PF2OrcozN0TVSimIGqWUEjft8RPxZeAFD9er0T6AzMZhOSpJL0JMTvLan
+   OkL3v8dHgiQsbF0S1pUr8ECmtYuB8PMxI73Wl4Fh+KlAAf5EAbgMU6u8v
+   w==;
+X-CSE-ConnectionGUID: y8t1rPGxQCm7uc7EH4Q88A==
+X-CSE-MsgGUID: 8yWAnAtpTTKlJApEfAEfJQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="49066111"
+X-IronPort-AV: E=Sophos;i="6.13,226,1732608000"; 
+   d="scan'208";a="49066111"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 16:33:05 -0800
+X-CSE-ConnectionGUID: e4eqRPTXQySwRf1exSNBfg==
+X-CSE-MsgGUID: 7SeFBbE8SquXTsKg8apaKg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,226,1732608000"; 
+   d="scan'208";a="112330363"
+Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.124.222.224]) ([10.124.222.224])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 16:33:02 -0800
+Message-ID: <3dd183fa-df95-487e-a2e9-73579fa160be@intel.com>
+Date: Wed, 22 Jan 2025 16:33:04 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CANDhNCq5_F3HfFYABqFGCA1bPd_+xgNj-iDQhH4tDk+wi8iZZg@mail.gmail.com>
- <Z5FVfe9RwVNr2PGI@google.com> <CANDhNCogn0KogQ6HQJ0+XDwoT4QQFGmqfvTJmtmi65bo=zK=9w@mail.gmail.com>
-Message-ID: <Z5GOFVFO6ocd1sli@google.com>
-Subject: Re: BUG: Occasional unexpected DR6 value seen with nested
- virtualization on x86
-From: Sean Christopherson <seanjc@google.com>
-To: John Stultz <jstultz@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Peter Zijlstra <peterz@infradead.org>, Frederic Weisbecker <fweisbec@gmail.com>, 
-	Andy Lutomirski <luto@kernel.org>, Borislav Petkov <bp@suse.de>, Jim Mattson <jmattson@google.com>, 
-	"Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>, Will Deacon <will@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	LKML <linux-kernel@vger.kernel.org>, kernel-team@android.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] x86, lib: Add WBNOINVD helper functions
+To: Kevin Loughlin <kevinloughlin@google.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+ "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+ linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, pbonzini@redhat.com, kai.huang@intel.com,
+ ubizjak@gmail.com, jgross@suse.com, kvm@vger.kernel.org, pgonda@google.com,
+ sidtelang@google.com, mizhang@google.com, rientjes@google.com,
+ manalinandan@google.com, szy0127@sjtu.edu.cn
+References: <20250122001329.647970-1-kevinloughlin@google.com>
+ <20250122013438.731416-1-kevinloughlin@google.com>
+ <20250122013438.731416-2-kevinloughlin@google.com>
+ <aomvugehkmfj6oi7bwmtiqfbdyet7zyd2llri3c5rgcmgqjkfz@tslxstgihjb5>
+ <d2dce9d8-b79e-7d83-15a5-68889b140229@amd.com>
+ <f98160b0-4f8b-41ab-b555-8e9de83c8552@intel.com>
+ <CAGdbjm+syon_W0W_oEiDJBKu4s5q9JS9cKyPmPoqDAzeyMJf3Q@mail.gmail.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
+ oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
+ 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
+ ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
+ VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
+ iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
+ c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
+ pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
+ ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
+ QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
+ c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
+ LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
+ lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
+ MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
+ IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
+ aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
+ I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
+ E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
+ F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
+ CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
+ P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
+ 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
+ GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
+ MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
+ Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
+ lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
+ 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
+ qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
+ BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
+ 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
+ vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
+ FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
+ l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
+ yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
+ +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
+ asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
+ WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
+ sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
+ KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
+ MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
+ hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
+ vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
+In-Reply-To: <CAGdbjm+syon_W0W_oEiDJBKu4s5q9JS9cKyPmPoqDAzeyMJf3Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 22, 2025, John Stultz wrote:
-> On Wed, Jan 22, 2025 at 12:55=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > On Tue, Jan 21, 2025, John Stultz wrote:
-> > @@ -5043,6 +5041,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata =
-=3D {
-> >         .set_idt =3D svm_set_idt,
-> >         .get_gdt =3D svm_get_gdt,
-> >         .set_gdt =3D svm_set_gdt,
-> > +       .set_dr6 =3D svm_set_dr6,
->=20
->=20
-> Just fyi, to get this to build (svm_set_dr6 takes a *svm not a *vcpu)
-> I needed to create a little wrapper to get the types right:
->=20
-> static void svm_set_dr6_vcpu(struct kvm_vcpu *vcpu, unsigned long value)
-> {
->        struct vcpu_svm *svm =3D to_svm(vcpu);
->        svm_set_dr6(svm, value);
-> }
+On 1/22/25 16:06, Kevin Loughlin wrote:
+>> BTW, I don't think you should be compelled to use alternative() as
+>> opposed to a good old:
+>>
+>>         if (cpu_feature_enabled(X86_FEATURE_WBNOINVD))
+>>                 ...
+> Agreed, though I'm leaving as alternative() for now (both because it
+> results in fewer checks and because that's what is used in the rest of
+> the file); please holler if you prefer otherwise. If so, my slight
+> preference in that case would be to update the whole file
+> stylistically in a separate commit.
 
-Heh, yeah, I discovered as much when I tried to build wht my more generic k=
-config.
+alternative() can make a _lot_ of sense.  It's extremely compact in the
+code it generates. It messes with compiler optimization, of course, just
+like any assembly. But, overall, it's great.
 
-> But otherwise, this looks like it has fixed the issue! I've not been
-> able to trip a failure with the bionic ptrace test, nor with the debug
-> test in kvm-unit-tests, both running in loops for several minutes.
+In this case, though, we don't care one bit about code generation or
+performance. We're running the world's slowest instruction from an IPI.
 
-FWIW, I ran the testcase in L2 for ~45 minutes and saw one failure ~3 minut=
-es in,
-but unfortunately I didn't have any tracing running so I have zero insight =
-into
-what went wrong.  I'm fairly certain the failure was due to running an unpa=
-tched
-kernel in L1, i.e. that I hit the ultra-rare scenario where an L2=3D>L1 fas=
-tpath
-exit between the #DB and read from DR6 clobbered hardware DR6.
+As for consistency, special_insns.h is gloriously inconsistent. But only
+two instructions use alternatives, and they *need* the asm syntax
+because they're passing registers and meaningful constraints in.
 
-For giggle and extra confidence, I hacked KVM to emulate HLT as a nop in th=
-e
-fastpath, and verified failure (and the fix) in a non-nested setup with the=
- below
-selftest, on both AMD and Intel.
+The wbinvds don't get passed registers and their constraints are
+trivial. This conditional:
 
-Sadly, KVM doesn't handle many exits in the fastpath on AMD, so having a re=
-gression
-test that isn't Intel-specific isn't really possible at the momemnt.  I'm m=
-ildly
-tempted to use testing as an excuse to handle some CPUID emulation in the f=
-astpath,
-as Linux userspace does a _lot_ of CPUID, e.g. a kernel build generates ten=
-s of
-thousands of CPUID exits.
+        alternative_io(".byte 0x3e; clflush %0",
+                       ".byte 0x66; clflush %0",
+                       X86_FEATURE_CLFLUSHOPT,
+                       "+m" (*(volatile char __force *)__p));
 
-Anyways, this all makes me confident in the fix.  I'll post it properly tom=
-orrow.
+could be written like this:
 
-diff --git a/tools/testing/selftests/kvm/x86/debug_regs.c b/tools/testing/s=
-elftests/kvm/x86/debug_regs.c
-index 2d814c1d1dc4..a34b65052f4e 100644
---- a/tools/testing/selftests/kvm/x86/debug_regs.c
-+++ b/tools/testing/selftests/kvm/x86/debug_regs.c
-@@ -22,11 +22,25 @@ extern unsigned char sw_bp, hw_bp, write_data, ss_start=
-, bd_start;
-=20
- static void guest_code(void)
- {
-+       unsigned long val =3D 0xffff0ffful;
-+
-        /* Create a pending interrupt on current vCPU */
-        x2apic_enable();
-        x2apic_write_reg(APIC_ICR, APIC_DEST_SELF | APIC_INT_ASSERT |
-                         APIC_DM_FIXED | IRQ_VECTOR);
-=20
-+       /*
-+        * Debug Register Interception tests.
-+        */
-+       asm volatile("mov %%rax, %%dr6\n\t"
-+                    "hlt\n\t"
-+                    "mov %%dr6, %%rax\n\t"
-+                    : "+r" (val));
-+
-+       __GUEST_ASSERT(val =3D=3D 0xffff0ffful,
-+                      "Wanted DR6 =3D 0xffff0ffful, got %lx\n", val);
-+       GUEST_SYNC(0);
-+
-        /*
-         * Software BP tests.
-         *
-@@ -103,6 +117,9 @@ int main(void)
-        vm =3D vm_create_with_one_vcpu(&vcpu, guest_code);
-        run =3D vcpu->run;
-=20
-+       vcpu_run(vcpu);
-+       TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_SYNC);
-+
-        /* Test software BPs - int3 */
-        memset(&debug, 0, sizeof(debug));
-        debug.control =3D KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP;
+	if (cpu_feature_enabled(X86_FEATURE_CLFLUSHOPT))
+	        asm volatile(".byte 0x3e; clflush %0",
+                       "+m" (*(volatile char __force *)__p));
+	else
+		asm volatile(".byte 0x66; clflush %0",
+                       "+m" (*(volatile char __force *)__p));
+
+But that's _actively_ ugly.  alternative() syntax there makes sense.
+Here, it's not ugly at all:
+
+	if (cpu_feature_enabled(X86_FEATURE_WBNOINVD))
+		asm volatile(".byte 0xf3,0x0f,0x09\n\t": : :"memory");
+	else
+		wbinvd();
+
+and it's actually more readable with alternative() syntax.
+
+So, please just do what makes the code look most readable. Performance
+and consistency aren't important. I see absolutely nothing wrong with:
+
+static __always_inline void raw_wbnoinvd(void)
+{
+        asm volatile(".byte 0xf3,0x0f,0x09\n\t": : :"memory");
+}
+
+void wbnoinvd(void)
+{
+	if (cpu_feature_enabled(X86_FEATURE_WBNOINVD))
+		raw_wbnoinvd();
+	else
+		wbinvd();
+}
+
+... except the fact that cpu_feature_enabled() kinda sucks and needs
+some work, but that's a whole other can of worms we can leave closed today.
 
