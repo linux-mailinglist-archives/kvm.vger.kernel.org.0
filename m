@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-36453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 888E5A1AD73
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 00:45:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13913A1AD75
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 00:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6C4516958A
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 23:45:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5007A16708C
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 23:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7038C1D5CDE;
-	Thu, 23 Jan 2025 23:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829371D5144;
+	Thu, 23 Jan 2025 23:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l/TzvQku"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BJiu1REt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E251C1BDAB5
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 23:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD5F1BDAB5
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 23:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737675945; cv=none; b=eBGpKE1gQP1ZJfQ/uY9hPTnEj0JjZGWSN0PYtuD4PKUY+igrhRRe8X8jlkHPlnkvrstF2MME/ovZ/iscKVpL6KkRJ/N6a5cLQOKnrrwHUMFgTnA+KSoZEimI2TCIlEIS0s9wfGJfmDBZUMZQ7Jo9C4R+VizrsgUGcyIbmnH9ktw=
+	t=1737675950; cv=none; b=T4yTpzJ2ULAU68GFAmQ475KfTOH+sGFa/Pe30cH2VZ0ghfWHp2rlpgNlA4iJ7ITZr2gVcBzQysszBuvP6SjBa3TkS57kZG9zQKISiaUXaz1rwLztu3uSNnFIyInFA1UrNUhauvk7GtkdPIVqlEtzqCIZ7b8bYAqQEsmnNw+cFIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737675945; c=relaxed/simple;
-	bh=lFRPiokM9eG16b+LAgFB90BHEa3TmvxS7By0aGgfwio=;
+	s=arc-20240116; t=1737675950; c=relaxed/simple;
+	bh=ub6bjeSmWlmCdXRczEdgqvKy9WwyzTRj55xBtNaNX3c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a6Rh+1r/J4baZzkq+2c1aWcg0neR6rDG2fbojx6LDQhyMeZ8/VQWQ2YvxY9zU+2aOz1tTzEdyFM2Y675FH2tJsf52B/owSrFPlnF2aLxuE0LTsKqfXtKOM1OdhFimCFlHgIsNzyDyXeGq9NU30z2+waJX1CfMZg3k8tXuI1y55k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=l/TzvQku; arc=none smtp.client-ip=209.85.221.46
+	 MIME-Version:Content-Type; b=BscQeRgJ4TowNpPHfZrWf20V2JSjvPOd1CjmmvQCpTkVMf+pJsd6bEkCpTPbQE5khNJcsshR1RQkZlry/s/dY27XzIC5334OfBSoQHs0jQ/HnZu9sR2Ux0TntQ/Inych+LGrp0KGQTdltSmP7guC8iV82BZE1gH1OQYFOsXqoDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BJiu1REt; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-385ddcfc97bso1317272f8f.1
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 15:45:43 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4361f65ca01so15622185e9.1
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 15:45:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737675942; x=1738280742; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1737675947; x=1738280747; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GOf7cXhzVFnELwvvE/9oD0dVEdIwULgdsVx2rdQEX18=;
-        b=l/TzvQkuA2D4s7NbfC7o+A1iGK+cM5S6rxT3yYt/VEo/FYGffhFyXwORUKeVWHrvte
-         0jApKK43nMzy8OIJR0b4q2lBdvwm9ntoqKZeHk/u1wvvznobnPZG2QTqj66eCHiV1prn
-         qQa/6KgT37QKjKLRRmpJ3tW/ww2ZcKPBUyvoVACvpbCtEuPDi4aDm2jQiYpAdivKw+Tl
-         kF1wzCsMk0vNB0Ga0P4U0krN/OFtjo6j/xWerNBUU2fDiDVaOt5BNc1b6aJ+f1HrCxep
-         5gq6MMRrpYW/ZJEQkrDgEOoCLZ1M8v6toIkLU8zLvutnEe8nPJSYzxCOKmQeYU4aACfX
-         qnmQ==
+        bh=OmeiNXwxDOryj9Nk89BSf7ntmaAiV2ODrxL67LjT3oE=;
+        b=BJiu1REtfthomaNMF9UoBdKWKV8RCjZWzw9586QzqntNHbmuyYAEBV34J/fF1iCBiU
+         iW9tJ5odNj7CzroHRLaEv5cll5SfiEuEXzPTcaUhuzeGkSqY/5F7z88To2A0X2FjOmMY
+         zjIQmo1UWOo2NpYC0XVAnvF50wpd06KyxXeHWoOTrIbIswFzHgRr8DElRBC4/VPD+z85
+         IBVUfeGyrc50E4xMKFREqc6xV8Po5IJo6GKrXGXYK113QKKI4VsPt5wEkzqtOzf5ax0N
+         ItPNy0PdBgMqnRPJSPlC8zGvPrfP7ejamXDPLb8eqOeFpvtPFlSLII0MhvzhDMlcBDt2
+         n52w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737675942; x=1738280742;
+        d=1e100.net; s=20230601; t=1737675947; x=1738280747;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GOf7cXhzVFnELwvvE/9oD0dVEdIwULgdsVx2rdQEX18=;
-        b=t01qs/TA7V5QCY0HS/1OcA4WcBJm2pjxgfmkQ9QtliZzolWKSjkv+OLEpeA9LD5FYf
-         cO9fKm3HNgweCkiJAmbRGX82uL5nNTxNPvPM1l1QTog8F0ev5soTP5DoB2SKs3BZ645c
-         SnMhSLDffJJYAjywTLFlZyJaPzUw1TRLnAm1ZTnIzPN4vz3lyfxTq8q8EWG/x4h5Mw04
-         RMK14SreUZRv7fmQ0OoZgBq2woGExqu/wd4ZQCyoS6qnvUr2FN4YiJOzei5fc8P+EmAC
-         nCotLlxbrXwPWPKUqwuBQTVy0LHsFexjqm88a3F7d/NFfLyWpPxz6Js3Tm5X5G1gm66g
-         Gaww==
-X-Forwarded-Encrypted: i=1; AJvYcCVcTmrpEowCNsmgLmko84nwWs1etAzerc5puT5sYJPYAHWoICawX2Ekh4xpFvyRHhb+O6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHHW+PSpRXhd8QqsMpG/SrPhH1yIB3upcu/XHTGbd3gHvirzzX
-	FSCNf9I7+Z52/zi4hTGm/uA8KXdJRHKVQo1cPQQMqUCDpmMwaN5YkcbHbit1e1Y=
-X-Gm-Gg: ASbGncvEAAq27QIgFegVAVhoHGRRyOrlhYK5kz9m+gXu4SGCqLMskaHPoCn/+e6GJ46
-	p57BoZPlQtiOM7kuKum1sWcfJIZGBQimdvXjp7IZMAXvvHEu7himsQm5FoQsac3iRnR/CwlCdDP
-	AMbf81LRE787oibY+boHeAJU1PT9ySZaOhiNyzdL5gAzx1QJhUlwedKzIDNdIcAthJbWpuB1L8o
-	S7ouLlL1bS8SilCveg6YVkXIgltmUxeGlUYph8bMkrbsuoGgW1PopJVH/4EGA3hQKkmW1z9+3Yl
-	K7V9lh+FMjJgNLjvXeuXrbD6cxQV8YQsDX4UET9LGFJTbXhIUE0naac=
-X-Google-Smtp-Source: AGHT+IFFvdlRkBEFpuvRapz+0/bX2s0BjBYZ6M4itb1IiIpdMWapxxpC9ppUNuB95mK5m+Q7pE4GZw==
-X-Received: by 2002:a5d:47c9:0:b0:385:fb56:5596 with SMTP id ffacd0b85a97d-38bf5663956mr20431872f8f.19.1737675942270;
-        Thu, 23 Jan 2025 15:45:42 -0800 (PST)
+        bh=OmeiNXwxDOryj9Nk89BSf7ntmaAiV2ODrxL67LjT3oE=;
+        b=qFF9U3Jw6su9SjRLmoCvpemPZvcVZuCXEwhg27puSbGHfPMbgwRzVUradg+epkS+C3
+         fQ8TI3/oT6lofHU38PGYvgyYI08EKhD4Ea/LiLdhrOygu6TLcyCF4QTkxH8sgcyLTNOP
+         ZyEhfp5WV8jV+c9T9W9pmM9Q6iv2LfeowD/d4Y2RQCLgVRaoYwrxjB1wRETNV6Ixxg1q
+         SwDihfMCAEa4HzPaUNg/gDe2oHZ6wJ1FlzZyJPgTkYMXNb5bMFXcW1F3J6j6lNf4tJh9
+         JQkvUBztnUdfD1A3gtHPiHNc5QOzWaIKMIjy0MumnEf4tpuwaADSnlKCQx7ltJe2mdXo
+         8bjg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+jLA4Bd6VTiob6Han3R7Bpg0ELWd2gIYrI0r9J4MQZvjNRqvoDXxDHVA0k9kHePfIxQo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6Q/tH9bItHlJ90zdtsRLip0ke8+0lR6pB4hgThKoD617B5LYC
+	HbYL5z/yLgBtfAmiCekgBKsOoSqs30gKj2ypbTUuI3couIyidbFVKI/b7SdhPOw=
+X-Gm-Gg: ASbGncvauWmNEevVMSgone7U9bQr5OVkng2vt4b6Eg+skxARZ0Rw55ec8PcuIEO4F+f
+	ohB6zKfJBAeFULXYeYoH26IPWGzspH0WS3iBWY9TBjiScZjEvxw+evuTYvP0EJnJLQljTysLxn4
+	bMa6K5t8j2LhX+6uJagiGKTA3l12L7MrqFYZn+aYo28GzZ3kyvO0xBKDy9pR4L1/UB28Hvk9NtS
+	pHXY8V5vQuKSqeqxNdUNW6X7ziCrIDtlMTGbV9rIqgQ93BcdBYfSDMpawISDaGViml8UIhDPX0p
+	XS1JqA2LsoFcMOv0WaunXobBgTItXrYpLOR3R6gr51lunBiBDE9ZwIw=
+X-Google-Smtp-Source: AGHT+IEFJ1SeJWoUW3YaXnTGBs2yrvL22hVEarb/siWyosLBI70zXEF7xcr/1TRnUm9/lQBURa7m3g==
+X-Received: by 2002:a05:600c:1e18:b0:436:8a6f:b6db with SMTP id 5b1f17b1804b1-4389141c12emr225835175e9.22.1737675947213;
+        Thu, 23 Jan 2025 15:45:47 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1bad87sm971133f8f.74.2025.01.23.15.45.39
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd47f355sm7138595e9.4.2025.01.23.15.45.46
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 23 Jan 2025 15:45:40 -0800 (PST)
+        Thu, 23 Jan 2025 15:45:46 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -87,9 +87,9 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	xen-devel@lists.xenproject.org,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 15/20] cpus: Fix style in cpu-target.c
-Date: Fri, 24 Jan 2025 00:44:09 +0100
-Message-ID: <20250123234415.59850-16-philmd@linaro.org>
+Subject: [PATCH 16/20] cpus: Restrict cpu_common_post_load() code to TCG
+Date: Fri, 24 Jan 2025 00:44:10 +0100
+Message-ID: <20250123234415.59850-17-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250123234415.59850-1-philmd@linaro.org>
 References: <20250123234415.59850-1-philmd@linaro.org>
@@ -102,36 +102,62 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Fix style on code we are going to modify.
+CPU_INTERRUPT_EXIT was removed in commit 3098dba01c7
+("Use a dedicated function to request exit from execution
+loop"), tlb_flush() and tb_flush() are related to TCG
+accelerator.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- cpu-target.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ cpu-target.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
 diff --git a/cpu-target.c b/cpu-target.c
-index 6d8b7825746..a2999e7c3c0 100644
+index a2999e7c3c0..c05ef1ff096 100644
 --- a/cpu-target.c
 +++ b/cpu-target.c
-@@ -47,12 +47,15 @@ static int cpu_common_post_load(void *opaque, int version_id)
+@@ -45,22 +45,27 @@
+ #ifndef CONFIG_USER_ONLY
+ static int cpu_common_post_load(void *opaque, int version_id)
  {
-     CPUState *cpu = opaque;
+-    CPUState *cpu = opaque;
++#ifdef CONFIG_TCG
++    if (tcg_enabled()) {
++        CPUState *cpu = opaque;
  
--    /* 0x01 was CPU_INTERRUPT_EXIT. This line can be removed when the
--       version_id is increased. */
-+    /*
-+     * 0x01 was CPU_INTERRUPT_EXIT. This line can be removed when the
-+     * version_id is increased.
-+     */
-     cpu->interrupt_request &= ~0x01;
-     tlb_flush(cpu);
+-    /*
+-     * 0x01 was CPU_INTERRUPT_EXIT. This line can be removed when the
+-     * version_id is increased.
+-     */
+-    cpu->interrupt_request &= ~0x01;
+-    tlb_flush(cpu);
++        /*
++         * 0x01 was CPU_INTERRUPT_EXIT. This line can be removed when the
++         * version_id is increased.
++         */
++        cpu->interrupt_request &= ~0x01;
  
--    /* loadvm has just updated the content of RAM, bypassing the
-+    /*
-+     * loadvm has just updated the content of RAM, bypassing the
-      * usual mechanisms that ensure we flush TBs for writes to
-      * memory we've translated code from. So we must flush all TBs,
-      * which will now be stale.
+-    /*
+-     * loadvm has just updated the content of RAM, bypassing the
+-     * usual mechanisms that ensure we flush TBs for writes to
+-     * memory we've translated code from. So we must flush all TBs,
+-     * which will now be stale.
+-     */
+-    tb_flush(cpu);
++        tlb_flush(cpu);
++
++        /*
++         * loadvm has just updated the content of RAM, bypassing the
++         * usual mechanisms that ensure we flush TBs for writes to
++         * memory we've translated code from. So we must flush all TBs,
++         * which will now be stale.
++         */
++        tb_flush(cpu);
++    }
++#endif
+ 
+     return 0;
+ }
 -- 
 2.47.1
 
