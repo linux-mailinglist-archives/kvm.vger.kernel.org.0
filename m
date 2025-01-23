@@ -1,296 +1,221 @@
-Return-Path: <kvm+bounces-36349-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36350-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 026B1A1A3E5
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:09:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74D1BA1A40B
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CD0C1884AEC
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:08:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5280118895CC
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690C620F07A;
-	Thu, 23 Jan 2025 12:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CCF120E708;
+	Thu, 23 Jan 2025 12:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MJQ7fJE9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RoyszFv4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED38120E71C;
-	Thu, 23 Jan 2025 12:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F5620E329
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 12:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737634119; cv=none; b=DcrjKSsCBBzSrihSr0/W/iRtegzGeT6aLNGt+nMqnlpao9a9IURKcXaGiFiN6Tv0iRwyBLMG/ew+6xYxndoFTVIchXqx3IrFZsQT2obQ5C+luLsyPdzcxONWmI3blPYcj5gY7hh8bcqbAR91a2OzQwNlvqDVm/hfLdl9N46uPs4=
+	t=1737634628; cv=none; b=RXUVgLtAh0r5JWZT6rMmjsxDqsq7BzuiA0vHQtKHT9ldzFFQn7WXcagKHgSecMI7SRPXDPdZmOLiXQSZ7FL9ge/+vpKhKrU2Fn7FXJdISWR9E8vXhb2YW60Pic6fscMK5zNKf+vz6LeJGA5G/exxVucLcWbRda2MwtzSxr4ck2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737634119; c=relaxed/simple;
-	bh=8DpOYvRS18x/+RXLrSZWrahdxZSwOT0LE4tXASXZNIE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gvuf355OksuNap67K4S9khwoBoYCccOb8FHp1aYNMcpJZasgmEVCfNm67LIJildGZS1/elgNJAxFNBEdB01mYqp7vowXFz+zA1Ahlcdfpwdqx8KaexjDERbDODEYQA5ncRA+1J/o/3OIjzmFN0Lcc5Pd96km89lSX+LcyFiG8PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MJQ7fJE9; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50N7X3US028427;
-	Thu, 23 Jan 2025 12:08:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=B1z0MHxC6gPXv4Qq0
-	GOeux5hNdGD0JVs+IwvXZ3fbMs=; b=MJQ7fJE9OgPoA0Ibo7N3nErXUOg7Ptstt
-	ZStkm514VSAs4Amtu9zY6kZtYqTNqCSsjXFJNCod/RyJ6ZLisuaEO6+pEIXYroHy
-	XMqFcuVve5xooyd5/jr34N7/s3HE3uczJd1dOdF8oK+LhoQq4fm80RDNALen+uHw
-	tdw2uc20N4YI4EUnaFOhB/GxHFLMgZ3kKNr1oo5ktfI5F+iB92cl2TWu0xnfrw+Z
-	jMOKuJJycdVvgzx1eR0eIvM3A9pFlr1XqgkAdyadqlm3p05ayjJyg/stybx6ZbW+
-	xp7EIPpUUJVcJEnt+lyUleRJuTKSBVC95jXYSzwvB493Db9e9naFg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44bhfph82n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jan 2025 12:08:28 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50NC8H5n007904;
-	Thu, 23 Jan 2025 12:08:28 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44bhfph82h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jan 2025 12:08:28 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50NBBTgi022449;
-	Thu, 23 Jan 2025 12:08:27 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448r4kdae9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jan 2025 12:08:27 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50NC8N7U53870896
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 Jan 2025 12:08:23 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 92E2B20043;
-	Thu, 23 Jan 2025 12:08:23 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E7A0B20040;
-	Thu, 23 Jan 2025 12:08:19 +0000 (GMT)
-Received: from vaibhav?linux.ibm.com (unknown [9.124.210.34])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 23 Jan 2025 12:08:19 +0000 (GMT)
-Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Thu, 23 Jan 2025 17:38:19 +0530
-From: Vaibhav Jain <vaibhav@linux.ibm.com>
-To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org
-Cc: Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
-        amachhiw@linux.ibm.com
-Subject: [PATCH v3 6/6] kvm powerpc/book3s-hv-pmu: Add perf-events for Hostwide counters
-Date: Thu, 23 Jan 2025 17:37:48 +0530
-Message-ID: <20250123120749.90505-7-vaibhav@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250123120749.90505-1-vaibhav@linux.ibm.com>
-References: <20250123120749.90505-1-vaibhav@linux.ibm.com>
+	s=arc-20240116; t=1737634628; c=relaxed/simple;
+	bh=PP+gahMXQFB6TzKfhC6Dy2Zg4ehr5p/q5K2aXgevRO0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iRsoRtO7gscCGm7UEdBrQYc+mjC9Uzg+1CIWVFo/G96Y7KRARWAJWVxZjHc04eyiqaaZeDv8eE4Er4epcRkCMKpc2DhJocA9hmm9cYWvj9EbTkYD9kyuTJC4wMCcJEbOYFTLPMooWp1WgAxsP6TuWtj/JcjM2IUftLUnX/yr8Ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RoyszFv4; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-467896541e1so236311cf.0
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 04:17:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737634625; x=1738239425; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=u7c2X9kc5POGVPycCORkuD5RHSMR1gSNujIx7A9z99U=;
+        b=RoyszFv4ihCOhBgc5ec2EA8DKbacfmNQJnU4xSAaa6iphwLYRQy3t27R1T/4aQFvu6
+         lph2R96lBqnud00CArgsWiOSdKREBU5Il5aURzMld4WmBmRoBxF5j8sjZB12dX+y8m2q
+         AIrilBdRmHTLybVnIch1KrarJDwsKdhRAXVz/4AM01iwsrpQJmy31dNZlnmShEvvGGnV
+         aTDyGLgbhKF4p3IBiMyaqLkj7TvEpqZR8L3lqE3NtXKQAcjvGb94CodDncuJyQtHvRhC
+         gVXHpXgvOvOWYHsgwrpcyyXaoGgOdnSlth1Cn1tVcec+E+KEXuZoFnbv+4tGuxgR42gd
+         mQKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737634625; x=1738239425;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u7c2X9kc5POGVPycCORkuD5RHSMR1gSNujIx7A9z99U=;
+        b=oApkXCZGcVtS1URIM3QKyLc30W2XWu6b6DmVZkUqkYDZD9kS/h68Pbs/riTbQhKswD
+         9ZcPe3PYmG0+1fxB0dR/fIDuUQD82yLrkPjXV3N1oTQtewGI7NN/QnRk2mFFQZNbL95g
+         IbnzIg8wybOazpJ8GR7M9Zxr5z27AaqH3XoFAiizyjvI/5wlipdbyaapoqO3I7dAYCCM
+         /Us0emCH8IrA5EMORHqZoktNR4KY4M9k/Lp+nVCwg7czvT1qLBXbwsLahVuiiy7veBSm
+         3LbdgGaXvq4T1dFshjwhjNofgO4f8lyjc6uGj9UBmrkmGVfuxS/x1KF9Qvfdl6kREp+U
+         NUcQ==
+X-Gm-Message-State: AOJu0YwbIEjwOS1SVcJDkVRNSZzXsJBt1S0jqIyx/dRKb+S6lB5IAs75
+	tY5u71Kyi5rePAzII88mJv1itUyJFebc/406WpUKMwLBBaK+XV6YnBTUiB8dESd4WAgzIC417fY
+	gWLarsiBibfuBSzlHNdP+ND9FmW6TmP602nyBh1DFmo7FI+b9K6IY
+X-Gm-Gg: ASbGncsEXJvL9YTxsthqk5Vi/I+SXwPQSrdRJoovBvWzlEvhtDX2TfJ97bM4+VN2+FR
+	HsSe918oOUDkjA6qDW796VTpb26kYaqOq35nvW1dBB8GGh8CX5rxhHWST1odCjkVRjLajQ7KV+0
+	pX594Ymsg5XBSdnA==
+X-Google-Smtp-Source: AGHT+IHg41VKduTv3xsbtO3UMFx2kzshM1QFv1Op/0w7ulZd5Nozoq7Hnn3XMZmqKWZNJuLvb6blkPsJkFfwWIaYc6Q=
+X-Received: by 2002:a05:622a:1183:b0:465:18f3:79cc with SMTP id
+ d75a77b69052e-46e5dacd7b5mr2799021cf.11.1737634625022; Thu, 23 Jan 2025
+ 04:17:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Yhn4NkMHq-4zxrQdXJoLu8WKvmZTykrA
-X-Proofpoint-ORIG-GUID: R6AtYOAa7jNvAoqZY8mi5WQgtDo7FLh_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-23_05,2025-01-22_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 adultscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- clxscore=1015 mlxscore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=999
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501230091
+References: <20250122152738.1173160-1-tabba@google.com> <20250122152738.1173160-3-tabba@google.com>
+ <e6ea48d2-959f-4fbb-a170-0beaaf37f867@redhat.com> <CA+EHjTxNEoQ3MtZPi603=366vxt=SmBwetS4mFkvTK2r6u=UHw@mail.gmail.com>
+ <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com>
+In-Reply-To: <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 23 Jan 2025 12:16:28 +0000
+X-Gm-Features: AWEUYZmQL5kkD90_YRmG3RYm8qDIgmqchmZqRaBczok1nfibbnLskD3572ozPos
+Message-ID: <CA+EHjTzZoGuUcZTNUzx2e3PNOOEtOJT5rUEhSSmYQ-kcoZQiYQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 2/9] KVM: guest_memfd: Add guest_memfd support to kvm_(read|/write)_guest_page()
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Update 'book3s_hv_pmu.c' to add five new perf-events mapped to the five
-Hostwide counters. Since these newly introduced perf events are at system
-wide scope and can be read from any L1-Lpar CPU, 'kvmppv_pmu's scope and
-capabilities are updated appropriately.
+Hi David,
 
-Also introduce two new helpers. First is kvmppc_update_l0_stats() that uses
-the infrastructure introduced in previous patches to issues the
-H_GUEST_GET_STATE hcall L0-PowerVM to fetch guest-state-buffer holding the
-latest values of these counters which is then parsed and 'l0_stats'
-variable updated.
+On Thu, 23 Jan 2025 at 11:39, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 23.01.25 10:48, Fuad Tabba wrote:
+> > On Wed, 22 Jan 2025 at 22:10, David Hildenbrand <david@redhat.com> wrote:
+> >>
+> >> On 22.01.25 16:27, Fuad Tabba wrote:
+> >>> Make kvm_(read|/write)_guest_page() capable of accessing guest
+> >>> memory for slots that don't have a userspace address, but only if
+> >>> the memory is mappable, which also indicates that it is
+> >>> accessible by the host.
+> >>
+> >> Interesting. So far my assumption was that, for shared memory, user
+> >> space would simply mmap() guest_memdd and pass it as userspace address
+> >> to the same memslot that has this guest_memfd for private memory.
+> >>
+> >> Wouldn't that be easier in the first shot? (IOW, not require this patch
+> >> with the cost of faulting the shared page into the page table on access)
+> >
 
-Second helper is kvmppc_pmu_event_update() which is called from
-'kvmppv_pmu' callbacks and uses kvmppc_update_l0_stats() to update
-'l0_stats' and the update the 'struct perf_event's event-counter.
+Before answering your questions in detail, in light of this
+discussion, and in other discussions I've had, I think the more
+reasonable thing to do is to let the memslot for in-place shared
+memory look the same as the other guest_memfd memslots, i.e., have a
+userspace address regardless if it's needed or not. This makes the
+interface the same across all guest_memfd implementations, and avoids
+the need for patches such as this one, at least initially until we
+realize that we need it.
 
-Some minor updates to kvmppc_pmu_{add, del, read}() to remove some debug
-scaffolding code.
+That said...
 
-Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
----
-Changelog
+>
+> In light of:
+>
+> https://lkml.kernel.org/r/20250117190938.93793-4-imbrenda@linux.ibm.com
+>
+> there can, in theory, be memslots that start at address 0 and have a
+> "valid" mapping. This case is done from the kernel (and on special s390x
+> hardware), though, so it does not apply here at all so far.
+>
+> In practice, getting address 0 as a valid address is unlikely, because
+> the default:
+>
+> $ sysctl  vm.mmap_min_addr
+> vm.mmap_min_addr = 65536
+>
+> usually prohibits it for good reason.
 
-v2->v3:
-None
+Ack.
 
-v1->v2:
-None
----
- arch/powerpc/kvm/book3s_hv_pmu.c | 92 +++++++++++++++++++++++++++++++-
- 1 file changed, 91 insertions(+), 1 deletion(-)
+> > This has to do more with the ABI I had for pkvm and shared memory
+> > implementations, in which you don't need to specify the userspace
+> > address for memory in a guestmem memslot. The issue is there is no
+> > obvious address to map it to. This would be the case in kvm:arm64 for
+> > tracking paravirtualized time, which the userspace doesn't necessarily
+> > need to interact with, but kvm does.
+>
+> So I understand correctly: userspace wouldn't have to mmap it because it
+> is not interested in accessing it, but there is nothing speaking against
+> mmaping it, at least in the first shot.
 
-diff --git a/arch/powerpc/kvm/book3s_hv_pmu.c b/arch/powerpc/kvm/book3s_hv_pmu.c
-index a4f8c37d9b39..8121ff3ca7b2 100644
---- a/arch/powerpc/kvm/book3s_hv_pmu.c
-+++ b/arch/powerpc/kvm/book3s_hv_pmu.c
-@@ -30,6 +30,11 @@
- #include "asm/guest-state-buffer.h"
- 
- enum kvmppc_pmu_eventid {
-+	KVMPPC_EVENT_HOST_HEAP,
-+	KVMPPC_EVENT_HOST_HEAP_MAX,
-+	KVMPPC_EVENT_HOST_PGTABLE,
-+	KVMPPC_EVENT_HOST_PGTABLE_MAX,
-+	KVMPPC_EVENT_HOST_PGTABLE_RECLAIM,
- 	KVMPPC_EVENT_MAX,
- };
- 
-@@ -51,8 +56,14 @@ static DEFINE_SPINLOCK(lock_l0_stats);
- /* GSB related structs needed to talk to L0 */
- static struct kvmppc_gs_msg *gsm_l0_stats;
- static struct kvmppc_gs_buff *gsb_l0_stats;
-+static struct kvmppc_gs_parser gsp_l0_stats;
- 
- static struct attribute *kvmppc_pmu_events_attr[] = {
-+	KVMPPC_PMU_EVENT_ATTR(host_heap, KVMPPC_EVENT_HOST_HEAP),
-+	KVMPPC_PMU_EVENT_ATTR(host_heap_max, KVMPPC_EVENT_HOST_HEAP_MAX),
-+	KVMPPC_PMU_EVENT_ATTR(host_pagetable, KVMPPC_EVENT_HOST_PGTABLE),
-+	KVMPPC_PMU_EVENT_ATTR(host_pagetable_max, KVMPPC_EVENT_HOST_PGTABLE_MAX),
-+	KVMPPC_PMU_EVENT_ATTR(host_pagetable_reclaim, KVMPPC_EVENT_HOST_PGTABLE_RECLAIM),
- 	NULL,
- };
- 
-@@ -61,7 +72,7 @@ static const struct attribute_group kvmppc_pmu_events_group = {
- 	.attrs = kvmppc_pmu_events_attr,
- };
- 
--PMU_FORMAT_ATTR(event, "config:0");
-+PMU_FORMAT_ATTR(event, "config:0-5");
- static struct attribute *kvmppc_pmu_format_attr[] = {
- 	&format_attr_event.attr,
- 	NULL,
-@@ -78,6 +89,79 @@ static const struct attribute_group *kvmppc_pmu_attr_groups[] = {
- 	NULL,
- };
- 
-+/*
-+ * Issue the hcall to get the L0-host stats.
-+ * Should be called with l0-stat lock held
-+ */
-+static int kvmppc_update_l0_stats(void)
-+{
-+	int rc;
-+
-+	/* With HOST_WIDE flags guestid and vcpuid will be ignored */
-+	rc = kvmppc_gsb_recv(gsb_l0_stats, KVMPPC_GS_FLAGS_HOST_WIDE);
-+	if (rc)
-+		goto out;
-+
-+	/* Parse the guest state buffer is successful */
-+	rc = kvmppc_gse_parse(&gsp_l0_stats, gsb_l0_stats);
-+	if (rc)
-+		goto out;
-+
-+	/* Update the l0 returned stats*/
-+	memset(&l0_stats, 0, sizeof(l0_stats));
-+	rc = kvmppc_gsm_refresh_info(gsm_l0_stats, gsb_l0_stats);
-+
-+out:
-+	return rc;
-+}
-+
-+/* Update the value of the given perf_event */
-+static int kvmppc_pmu_event_update(struct perf_event *event)
-+{
-+	int rc;
-+	u64 curr_val, prev_val;
-+	unsigned long flags;
-+	unsigned int config = event->attr.config;
-+
-+	/* Ensure no one else is modifying the l0_stats */
-+	spin_lock_irqsave(&lock_l0_stats, flags);
-+
-+	rc = kvmppc_update_l0_stats();
-+	if (!rc) {
-+		switch (config) {
-+		case KVMPPC_EVENT_HOST_HEAP:
-+			curr_val = l0_stats.guest_heap;
-+			break;
-+		case KVMPPC_EVENT_HOST_HEAP_MAX:
-+			curr_val = l0_stats.guest_heap_max;
-+			break;
-+		case KVMPPC_EVENT_HOST_PGTABLE:
-+			curr_val = l0_stats.guest_pgtable_size;
-+			break;
-+		case KVMPPC_EVENT_HOST_PGTABLE_MAX:
-+			curr_val = l0_stats.guest_pgtable_size_max;
-+			break;
-+		case KVMPPC_EVENT_HOST_PGTABLE_RECLAIM:
-+			curr_val = l0_stats.guest_pgtable_reclaim;
-+			break;
-+		default:
-+			rc = -ENOENT;
-+			break;
-+		}
-+	}
-+
-+	spin_unlock_irqrestore(&lock_l0_stats, flags);
-+
-+	/* If no error than update the perf event */
-+	if (!rc) {
-+		prev_val = local64_xchg(&event->hw.prev_count, curr_val);
-+		if (curr_val > prev_val)
-+			local64_add(curr_val - prev_val, &event->count);
-+	}
-+
-+	return rc;
-+}
-+
- static int kvmppc_pmu_event_init(struct perf_event *event)
- {
- 	unsigned int config = event->attr.config;
-@@ -100,15 +184,19 @@ static int kvmppc_pmu_event_init(struct perf_event *event)
- 
- static void kvmppc_pmu_del(struct perf_event *event, int flags)
- {
-+	/* Do nothing */
- }
- 
- static int kvmppc_pmu_add(struct perf_event *event, int flags)
- {
-+	if (flags & PERF_EF_START)
-+		return kvmppc_pmu_event_update(event);
- 	return 0;
- }
- 
- static void kvmppc_pmu_read(struct perf_event *event)
- {
-+	kvmppc_pmu_event_update(event);
- }
- 
- /* Return the size of the needed guest state buffer */
-@@ -291,6 +379,8 @@ static struct pmu kvmppc_pmu = {
- 	.read = kvmppc_pmu_read,
- 	.attr_groups = kvmppc_pmu_attr_groups,
- 	.type = -1,
-+	.scope = PERF_PMU_SCOPE_SYS_WIDE,
-+	.capabilities = PERF_PMU_CAP_NO_EXCLUDE | PERF_PMU_CAP_NO_INTERRUPT,
- };
- 
- int kvmppc_register_pmu(void)
--- 
-2.48.1
+That's right.
 
+> I assume it would not be a private memslot (so far, my understanding is
+> that internal memslots never have a guest_memfd attached).
+> kvm_gmem_create() is only called via KVM_CREATE_GUEST_MEMFD, to be set
+> on user-created memslots.
+
+Right, it wouldn't be a private memslot, but a user created one.
+
+> >
+> > That said, we could always have a userspace address dedicated to
+> > mapping shared locations, and use that address when the necessity
+> > arises. Or we could always require that memslots have a userspace
+> > address, even if not used. I don't really have a strong preference.
+>
+> So, the simpler version where user space would simply mmap guest_memfd
+> to provide the address via userspace_addr would at least work for the
+> use case of paravirtualized time?
+>
+> It would get rid of the immediate need for this patch and patch #4 to
+> get it flying.
+
+I agree now.
+
+>
+> One interesting question is: when would you want shared memory in
+> guest_memfd and *not* provide it as part of the same memslot.
+>
+
+My original thinking wasn't that we wouldn't _want_ to, rather that we
+don't _need_ to. I mistakenly thought that it would simplify things,
+but, especially after this discussion, I now realize that it makes
+things more complicated instead.
+
+> One nice thing about the mmap might be that access go via user-space
+> page tables: E.g., __kvm_read_guest_page can just access the memory
+> without requiring the folio lock and an additional temporary folio
+> reference on every access -- it's handled implicitly via the mapcount.
+>
+> (of course, to map the page we still need that once on the fault path)
+
+Ack.
+
+Thanks,
+/fuad
+
+
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
