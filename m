@@ -1,76 +1,77 @@
-Return-Path: <kvm+bounces-36438-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36439-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC3AFA1AD5B
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 00:44:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E0E5A1AD5C
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 00:44:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77DDD3A27C7
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 23:44:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 529B83A27C4
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 23:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30FD1D5CF2;
-	Thu, 23 Jan 2025 23:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5CB1D61BF;
+	Thu, 23 Jan 2025 23:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d5xa9Qu5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hpubz+pa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051D21D5AB9
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 23:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D0B1D5AB9
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 23:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737675861; cv=none; b=O2BFtZ+fLryFdyPk3G0Tc9DummcguhRpBA5zTAnJ/g+UK/XWH/RcWDFXMloJ2k2I3s15xTJQl70AGNYv8a8puMN+nlSyPZj5cGWKijGeNxy+zEV55xE1vqkbtm1pwQhPYPU5GzY4u0Isfgdqc2rpmMA9Yahzv+QgwWE0vhUYdAM=
+	t=1737675866; cv=none; b=VVwJf4jMShWJE2Ep1gcUCulwTN/8AO3PUcl/93NtnGVh79BMkAIAjoPsGgO+IzA4dGOPtG+kreTgUNYRF5Ht1y4WUNS+6KeX8TyGfPpdJnz4I1Utg/gFhGtWy8fnwDqrwFHfsPMJMYgFX1QJh4K1jROhD1InwucHhSWY4l8Yh8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737675861; c=relaxed/simple;
-	bh=tFNPptsT0HE+ZkqpvwTKnM5+lqvSN1DZbBVMCFQqpzo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qFh8MoeKVVGKWs8NJ7yiw11b8kSlIFSr6MkQSoxg4u7bEU037DbIazACJNRJrF4pwO+jOIWzHSlUp0pFpAIQ/viG1H/u+Y81ps5be3UcG8ej0Q8JsAbrBzFE0dRdPGMbA4VcJVidSzbt0iuk9U5sfPQ02dsUq5HTldf8vC+VTGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=d5xa9Qu5; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1737675866; c=relaxed/simple;
+	bh=MMMuW7B/2orVp6vJiY6H3Sr8YC8XROt2MMvAbMB+csc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JhzqCDGfYBv6EK/Vk6XeWYc07q8+3mwcR+XoclyuXCdmdTrqQ8c02Oi/sFI4I0j14kdNWf3RmolMFEhqVGnFaKputVCYBxyF2KHsX7xCcmIudEJDhMn+9yA1zdG5RQYogH7jcfByBWf59ss/TM7xheKQp328AwQwyQYXM3mNSd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Hpubz+pa; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-436a39e4891so10244685e9.1
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 15:44:18 -0800 (PST)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3863703258fso1722948f8f.1
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 15:44:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737675857; x=1738280657; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SrJqTercMM7Oiv7TI6NgScSjNQ/Q43/m4EWNljCwQJg=;
-        b=d5xa9Qu5eulQEnWK22/SiSfws6JFU5Df8yc+HZDAHAs0ax+kuKwhBwMeLk/SVjZipA
-         G9+u4sC0a9R6cwNFJcoYO8ukeNAOP5nE/Pn3MX3AR0kq17b+5QdVeLqWnjkDnF8lzGGI
-         FHD6Z886iLr7oggyWy1sCoEaP33DobW//A33D2olU9nrjXHWjj9AwTHcnUfNU5rXowuJ
-         PHrBL5YUya/ZutqJPzn1jOzA9yJDFBvbhUX2PaWXr823NXxgPOUXQhDMw+tvgz9lJ91q
-         7gdVB0Cl5TbCl0JIH0rHK35vBU50pal2JhIRRUtHDBOzA8M/AHWyu5SG1MrKK3LqxcP7
-         DcAw==
+        d=linaro.org; s=google; t=1737675862; x=1738280662; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7gr0bDqRAyX8smxLdEX+9XpZH40OE0aprdKko/M9qp4=;
+        b=Hpubz+paVXP/yJ7Vyc8xBHOi9hrrEP6LzqFWSIqT1GizeG2iyQbh4hIK+xpoDoRUYH
+         oOgGBZ4ArHM7uFGtbBH3Wu7YfLRcy+BpfvCOk05KIIrOx4GZ/59E1zul+C+UgR0FUDYt
+         /91q2w9vAUv24j/LTcedBAiS09djFJOgfsBbxYatudyvFGeDFv5tXwBoPzl2Pm6BUZQl
+         1s1754UDokjyjL3bqMpbX5CSkb6CPcsbIhfM9qSrqjrK7lPPSRTQ6O/NQSqp+XS8Z1Ds
+         hHuaSQ6ip/1laYBL/RNcH9RcqyslOgr2w/jScslz0Spmpk8rjPH4fA9HPBw+cA9p1R0R
+         uqYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737675857; x=1738280657;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SrJqTercMM7Oiv7TI6NgScSjNQ/Q43/m4EWNljCwQJg=;
-        b=k7XkzSp76nOC/+Ud/8iiwLxDPIp5OKDB5l8ITwtorMxt+dr1nJ1rZg3nW99+jDMrvR
-         FeBuzXkE55gxOCC1BGW4YX7k+6u5LNQo88J1TNjj1gr6v02fc0SKuA6f9G06f82vCr5j
-         ZVXaSn7e8wLK6hk+xvc9BN3pLDcdjbMQxdcUsncoUISVoc+RGnaBqzNu6j89TW5/msH8
-         5+Adp04SPjzqNRJmAIOXIRuWc9zMJszVjKlqk1zpwJyFs9a53gorI+eiAFu6aU7h6h9+
-         L5W/OtAFUtaqIs6AusCm5TMKTCaeZK+EHDgKfzwgypJdxYG2HMTK/6l5iUYtm4Rsm+t3
-         euGw==
-X-Forwarded-Encrypted: i=1; AJvYcCU322eiaLx3fuz9GWxrbnhUm7Pr/f0fGiw23dF3Ej/pVdZUWKJOPmd3QCphAgx/AzRg/84=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBRVHystPW7L5zVTshOVuJxwPQzgtTeGDi0qUdhtGqvLTw3aMR
-	aAtbqzZkIgmZdvhGpz/CqmLLnLnRBEnQzi3fFgBgUEDlnB97ZX6kngGgqpr2bQujypHhKmWNlhX
-	sBtg=
-X-Gm-Gg: ASbGncuZUUZAYadXYGQDlZrWNKnWHLIZhp/3NaTCsSbBMgRD3Mp3bOYxQhCtq2k59kd
-	ye10M2ilcrJJCsmjXTrJAq/W1g0NvKBOFqv/AQlCuGJWE+GJ9LXBeS+Rkqnh8B64uQDpqWFyQjp
-	GiqWTtTLU20aqtBxvoNkc1HXZOw0uqqVwr0PmDtmzFwCgotf+PWzWm2zv0JDmi9AxHcmCsvGeEm
-	SpqCeiYNia1s9sx0IdjXHyHdFD24IMcbUqXcZ/K1nhbRHXGw95UMz9ikv4KQhukcDuHZbfN7+wR
-	BpsaIVNlgTithmCIZqiCV9csNWTUTB3zJ3jtqcZfkPSVF+OYsfz2ompsCOzm366KSA==
-X-Google-Smtp-Source: AGHT+IGBiB8E0eTSoI28+V9cp1gWnvQIF0NcnM5MrTMqS5rNZ7M1PFDJt5j8Or2lR2bn/A8RFfyqaQ==
-X-Received: by 2002:a05:600c:a09:b0:435:9ed3:5688 with SMTP id 5b1f17b1804b1-438913f86dcmr267594425e9.18.1737675857123;
-        Thu, 23 Jan 2025 15:44:17 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737675862; x=1738280662;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7gr0bDqRAyX8smxLdEX+9XpZH40OE0aprdKko/M9qp4=;
+        b=EsBZODTLzFwmR9O3poAAO78zRiAP0oY+RCqzhHfchvj1x45+nAqkD7jIL99qZ5sTgP
+         nR/UelbT3Q7df2eJfvz4XEo1hlARXNgf0ZjKDGvM9wMb8jBDTWAB9x99Ut7LeUVf9CIO
+         lgDk5BP0gUMJMVy1D0zTAeaCEerSIfu6+PZRw9kuyPLgdQ5L0xIgCuMpy3DirpsdrfHa
+         PFiSZB2jexiTZZmmo7mxlE/R2Km3ln8SIHT51bcwX+JMfyX4nCqrdpHXiUQpbMZQfY8a
+         //hk6wXlqwzGSYekeXqa5HVjd4vDg4kUZUOppPeuN6HobqZgDIzeGyjp5ILgBNtCIcaI
+         8zgA==
+X-Forwarded-Encrypted: i=1; AJvYcCWzuXpgO5Jb1T5YC9Pq0TPnUmdFs6PDTfFNI7Asin9N851h3T9O9TQMozUjFhaVwYT2FwA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuC5PrIzetwo6aXAbqc9CUCX4v+tI8h9KUzqf3rR31y05KAVxN
+	8B3U4Q2nKEe4YPLonlC3KTlJti4/5/H2R1it7D42aVY5SHXmRYfak2llkR7aUug=
+X-Gm-Gg: ASbGncu6GljZ6ZAS7aqo9OwOA9pSQbzluCBhgxeJ89n/WyUZhiHA8c5dYHW9LGl0AmU
+	znzon8+7IUtcd/xwv4TPQRYXlHLo0BwPoW+18enDu/QRRYvT1EcSJbHdmOyFix2XXPOfSe7/HqE
+	CuvHYX39PRYZU70i+FR6PzqXQH2C+Zho274eDMuEXVOKPZxz0g3BEJkbkUrDXWVa3Ji2bM3DYky
+	IFRkTx2liNL4i/5M/uRv8DtlXn5XPagP0FfSW13ubCvWHyxI1KwLJO9zE78N7eYov+GttgwrA+3
+	rlR7B3p7tQ2vI+VBLaWM5xAlA1fJ+ci7hMGOJVIDcuBfE4deK1LM66Q=
+X-Google-Smtp-Source: AGHT+IFO1I6JtHdZSiAttwFg1MlQL9TeL6Qp22FcnpRuMJ6TxX0mL0F5rCxwJt2t6SeC+o26N2z+Yw==
+X-Received: by 2002:a5d:5885:0:b0:386:3213:5b80 with SMTP id ffacd0b85a97d-38c2b7cdc55mr1203868f8f.24.1737675862142;
+        Thu, 23 Jan 2025 15:44:22 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd54c098sm6544235e9.31.2025.01.23.15.44.15
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1764c8sm979124f8f.3.2025.01.23.15.44.20
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 23 Jan 2025 15:44:16 -0800 (PST)
+        Thu, 23 Jan 2025 15:44:21 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -85,148 +86,376 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-s390x@nongnu.org,
 	xen-devel@lists.xenproject.org,
 	Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 00/20] accel: Simplify cpu-target.c (omnibus)
-Date: Fri, 24 Jan 2025 00:43:54 +0100
-Message-ID: <20250123234415.59850-1-philmd@linaro.org>
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	Kevin Wolf <kwolf@redhat.com>
+Subject: [PATCH 01/20] qemu/compiler: Absorb 'clang-tsa.h'
+Date: Fri, 24 Jan 2025 00:43:55 +0100
+Message-ID: <20250123234415.59850-2-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250123234415.59850-1-philmd@linaro.org>
+References: <20250123234415.59850-1-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Yet another cleanup series before respining the "extract TCG
-fields from CPUState" series. Before that, we try to clarify
-a bit the code around CPU creation. Target specific code is
-reduced further. Some intermixed User/System is separated,
-making maintenance simpler IMHO. Since my local branch is
-quite big, I tried to group here all the generic patches.
+We already have "qemu/compiler.h" for compiler-specific arrangements,
+automatically included by "qemu/osdep.h" for each source file. No
+need to explicitly include a header for a Clang particularity.
 
-Regards,
-
-Phil.
-
-Based-on: <20250123215609.30432-1-philmd@linaro.org>
-  "target/ppc: Move TCG code from excp_helper.c to tcg-excp_helper.c"
-
-Philippe Mathieu-Daudé (20):
-  qemu/compiler: Absorb 'clang-tsa.h'
-  user: Extract common MMAP API to 'user/mmap.h'
-  gdbstub: Check for TCG before calling tb_flush()
-  cpus: Cache CPUClass early in instance_init() handler
-  cpus: Keep default fields initialization in cpu_common_initfn()
-  accel/kvm: Remove unused 'system/cpus.h' header in kvm-cpus.h
-  accel/tcg: Build tcg_flags helpers as common code
-  accel/tcg: Restrict tlb_init() / destroy() to TCG
-  accel/tcg: Restrict 'icount_align_option' global to TCG
-  accel/tcg: Rename 'hw/core/tcg-cpu-ops.h' -> 'accel/tcg/cpu-ops.h'
-  accel: Rename 'hw/core/accel-cpu.h' -> 'accel/accel-cpu-target.h'
-  accel/accel-cpu-target.h: Include missing 'cpu.h' header
-  accel: Forward-declare AccelOpsClass in 'qemu/typedefs.h'
-  accel/tcg: Move cpu_memory_rw_debug() user implementation to
-    user-exec.c
-  cpus: Fix style in cpu-target.c
-  cpus: Restrict cpu_common_post_load() code to TCG
-  cpus: Have cpu_class_init_props() per user / system emulation
-  cpus: Have cpu_exec_initfn() per user / system emulation
-  cpus: Register VMState per user / system emulation
-  cpus: Build cpu_exec_[un]realizefn() methods once
-
- MAINTAINERS                                   |   4 +-
- accel/kvm/kvm-cpus.h                          |   2 -
- accel/tcg/internal-common.h                   |  13 +
- bsd-user/qemu.h                               |  13 +-
- .../accel-cpu.h => accel/accel-cpu-target.h}  |   7 +-
- .../tcg-cpu-ops.h => accel/tcg/cpu-ops.h}     |   0
- include/block/block_int-common.h              |   1 -
- include/block/graph-lock.h                    |   2 -
- include/exec/exec-all.h                       |  16 -
- include/exec/page-protection.h                |   2 -
- include/hw/core/cpu.h                         |   2 +
- include/qemu/clang-tsa.h                      | 114 -------
- include/qemu/compiler.h                       |  87 +++++
- include/qemu/thread.h                         |   1 -
- include/qemu/typedefs.h                       |   1 +
- include/system/accel-ops.h                    |   1 -
- include/system/cpus.h                         |   4 -
- include/user/mmap.h                           |  32 ++
- linux-user/user-mmap.h                        |  19 +-
- accel/accel-system.c                          |   1 +
- accel/accel-target.c                          |   2 +-
- accel/hvf/hvf-accel-ops.c                     |   1 +
- accel/kvm/kvm-accel-ops.c                     |   1 +
- accel/qtest/qtest.c                           |   1 +
- accel/stubs/tcg-stub.c                        |   4 -
- accel/tcg/cpu-exec-common.c                   |  34 +-
- accel/tcg/cpu-exec.c                          |  37 +--
- accel/tcg/cputlb.c                            |   2 +-
- accel/tcg/icount-common.c                     |   2 +
- accel/tcg/monitor.c                           |   1 -
- accel/tcg/tcg-accel-ops.c                     |   1 +
- accel/tcg/translate-all.c                     |   3 +-
- accel/tcg/user-exec-stub.c                    |  11 +
- accel/tcg/user-exec.c                         |  94 +++++-
- accel/tcg/watchpoint.c                        |   2 +-
- accel/xen/xen-all.c                           |   1 +
- block/create.c                                |   1 -
- bsd-user/signal.c                             |   2 +-
- cpu-common.c                                  |   1 -
- cpu-target.c                                  | 314 +-----------------
- gdbstub/system.c                              |   6 +-
- hw/core/cpu-common.c                          |  31 ++
- hw/core/cpu-system.c                          | 170 ++++++++++
- hw/core/cpu-user.c                            |  44 +++
- hw/mips/jazz.c                                |   2 +-
- linux-user/signal.c                           |   2 +-
- system/cpus.c                                 |   1 +
- system/globals.c                              |   1 -
- system/physmem.c                              |   2 +-
- target/alpha/cpu.c                            |   2 +-
- target/arm/cpu.c                              |   2 +-
- target/arm/tcg/cpu-v7m.c                      |   2 +-
- target/arm/tcg/cpu32.c                        |   2 +-
- target/arm/tcg/mte_helper.c                   |   2 +-
- target/arm/tcg/sve_helper.c                   |   2 +-
- target/avr/cpu.c                              |   2 +-
- target/avr/helper.c                           |   2 +-
- target/hexagon/cpu.c                          |   2 +-
- target/hppa/cpu.c                             |   2 +-
- target/i386/hvf/hvf-cpu.c                     |   2 +-
- target/i386/kvm/kvm-cpu.c                     |   2 +-
- target/i386/nvmm/nvmm-accel-ops.c             |   1 +
- target/i386/tcg/tcg-cpu.c                     |   4 +-
- target/i386/whpx/whpx-accel-ops.c             |   1 +
- target/loongarch/cpu.c                        |   2 +-
- target/m68k/cpu.c                             |   2 +-
- target/microblaze/cpu.c                       |   2 +-
- target/mips/cpu.c                             |   2 +-
- target/openrisc/cpu.c                         |   2 +-
- target/ppc/cpu_init.c                         |   2 +-
- target/ppc/kvm.c                              |   2 +-
- target/riscv/kvm/kvm-cpu.c                    |   2 +-
- target/riscv/tcg/tcg-cpu.c                    |   4 +-
- target/rx/cpu.c                               |   2 +-
- target/s390x/cpu.c                            |   2 +-
- target/s390x/tcg/mem_helper.c                 |   2 +-
- target/sh4/cpu.c                              |   2 +-
- target/sparc/cpu.c                            |   2 +-
- target/tricore/cpu.c                          |   2 +-
- target/xtensa/cpu.c                           |   2 +-
- tests/unit/test-bdrv-drain.c                  |   1 -
- tests/unit/test-block-iothread.c              |   1 -
- util/qemu-thread-posix.c                      |   1 -
- hw/core/meson.build                           |   5 +-
- 84 files changed, 590 insertions(+), 578 deletions(-)
- rename include/{hw/core/accel-cpu.h => accel/accel-cpu-target.h} (92%)
- rename include/{hw/core/tcg-cpu-ops.h => accel/tcg/cpu-ops.h} (100%)
+Suggested-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+---
+ bsd-user/qemu.h                  |   1 -
+ include/block/block_int-common.h |   1 -
+ include/block/graph-lock.h       |   2 -
+ include/exec/page-protection.h   |   2 -
+ include/qemu/clang-tsa.h         | 114 -------------------------------
+ include/qemu/compiler.h          |  87 +++++++++++++++++++++++
+ include/qemu/thread.h            |   1 -
+ block/create.c                   |   1 -
+ tests/unit/test-bdrv-drain.c     |   1 -
+ tests/unit/test-block-iothread.c |   1 -
+ util/qemu-thread-posix.c         |   1 -
+ 11 files changed, 87 insertions(+), 125 deletions(-)
  delete mode 100644 include/qemu/clang-tsa.h
- create mode 100644 include/user/mmap.h
- create mode 100644 hw/core/cpu-user.c
 
+diff --git a/bsd-user/qemu.h b/bsd-user/qemu.h
+index 3eaa14f3f56..4e97c796318 100644
+--- a/bsd-user/qemu.h
++++ b/bsd-user/qemu.h
+@@ -40,7 +40,6 @@ extern char **environ;
+ #include "target.h"
+ #include "exec/gdbstub.h"
+ #include "exec/page-protection.h"
+-#include "qemu/clang-tsa.h"
+ #include "accel/tcg/vcpu-state.h"
+ 
+ #include "qemu-os.h"
+diff --git a/include/block/block_int-common.h b/include/block/block_int-common.h
+index bb91a0f62fa..ebb4e56a503 100644
+--- a/include/block/block_int-common.h
++++ b/include/block/block_int-common.h
+@@ -28,7 +28,6 @@
+ #include "block/block-common.h"
+ #include "block/block-global-state.h"
+ #include "block/snapshot.h"
+-#include "qemu/clang-tsa.h"
+ #include "qemu/iov.h"
+ #include "qemu/rcu.h"
+ #include "qemu/stats64.h"
+diff --git a/include/block/graph-lock.h b/include/block/graph-lock.h
+index dc8d9491843..2c26c721081 100644
+--- a/include/block/graph-lock.h
++++ b/include/block/graph-lock.h
+@@ -20,8 +20,6 @@
+ #ifndef GRAPH_LOCK_H
+ #define GRAPH_LOCK_H
+ 
+-#include "qemu/clang-tsa.h"
+-
+ /**
+  * Graph Lock API
+  * This API provides a rwlock used to protect block layer
+diff --git a/include/exec/page-protection.h b/include/exec/page-protection.h
+index bae3355f62c..3e0a8a03331 100644
+--- a/include/exec/page-protection.h
++++ b/include/exec/page-protection.h
+@@ -40,8 +40,6 @@
+ 
+ #ifdef CONFIG_USER_ONLY
+ 
+-#include "qemu/clang-tsa.h"
+-
+ void TSA_NO_TSA mmap_lock(void);
+ void TSA_NO_TSA mmap_unlock(void);
+ bool have_mmap_lock(void);
+diff --git a/include/qemu/clang-tsa.h b/include/qemu/clang-tsa.h
+deleted file mode 100644
+index ba06fb8c924..00000000000
+--- a/include/qemu/clang-tsa.h
++++ /dev/null
+@@ -1,114 +0,0 @@
+-#ifndef CLANG_TSA_H
+-#define CLANG_TSA_H
+-
+-/*
+- * Copyright 2018 Jarkko Hietaniemi <jhi@iki.fi>
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining
+- * a copy of this software and associated documentation files (the "Software"),
+- * to deal in the Software without restriction, including without
+- * limitation the rights to use, copy, modify, merge, publish,
+- * distribute, sublicense, and/or sell copies of the Software, and to
+- * permit persons to whom the Software is furnished to do so, subject to
+- * the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be
+- * included in all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+- * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+- */
+-
+-/* http://clang.llvm.org/docs/ThreadSafetyAnalysis.html
+- *
+- * TSA is available since clang 3.6-ish.
+- */
+-#ifdef __clang__
+-#  define TSA(x)   __attribute__((x))
+-#else
+-#  define TSA(x)   /* No TSA, make TSA attributes no-ops. */
+-#endif
+-
+-/* TSA_CAPABILITY() is used to annotate typedefs:
+- *
+- * typedef pthread_mutex_t TSA_CAPABILITY("mutex") tsa_mutex;
+- */
+-#define TSA_CAPABILITY(x) TSA(capability(x))
+-
+-/* TSA_GUARDED_BY() is used to annotate global variables,
+- * the data is guarded:
+- *
+- * Foo foo TSA_GUARDED_BY(mutex);
+- */
+-#define TSA_GUARDED_BY(x) TSA(guarded_by(x))
+-
+-/* TSA_PT_GUARDED_BY() is used to annotate global pointers, the data
+- * behind the pointer is guarded.
+- *
+- * Foo* ptr TSA_PT_GUARDED_BY(mutex);
+- */
+-#define TSA_PT_GUARDED_BY(x) TSA(pt_guarded_by(x))
+-
+-/* The TSA_REQUIRES() is used to annotate functions: the caller of the
+- * function MUST hold the resource, the function will NOT release it.
+- *
+- * More than one mutex may be specified, comma-separated.
+- *
+- * void Foo(void) TSA_REQUIRES(mutex);
+- */
+-#define TSA_REQUIRES(...) TSA(requires_capability(__VA_ARGS__))
+-#define TSA_REQUIRES_SHARED(...) TSA(requires_shared_capability(__VA_ARGS__))
+-
+-/* TSA_EXCLUDES() is used to annotate functions: the caller of the
+- * function MUST NOT hold resource, the function first acquires the
+- * resource, and then releases it.
+- *
+- * More than one mutex may be specified, comma-separated.
+- *
+- * void Foo(void) TSA_EXCLUDES(mutex);
+- */
+-#define TSA_EXCLUDES(...) TSA(locks_excluded(__VA_ARGS__))
+-
+-/* TSA_ACQUIRE() is used to annotate functions: the caller of the
+- * function MUST NOT hold the resource, the function will acquire the
+- * resource, but NOT release it.
+- *
+- * More than one mutex may be specified, comma-separated.
+- *
+- * void Foo(void) TSA_ACQUIRE(mutex);
+- */
+-#define TSA_ACQUIRE(...) TSA(acquire_capability(__VA_ARGS__))
+-#define TSA_ACQUIRE_SHARED(...) TSA(acquire_shared_capability(__VA_ARGS__))
+-
+-/* TSA_RELEASE() is used to annotate functions: the caller of the
+- * function MUST hold the resource, but the function will then release it.
+- *
+- * More than one mutex may be specified, comma-separated.
+- *
+- * void Foo(void) TSA_RELEASE(mutex);
+- */
+-#define TSA_RELEASE(...) TSA(release_capability(__VA_ARGS__))
+-#define TSA_RELEASE_SHARED(...) TSA(release_shared_capability(__VA_ARGS__))
+-
+-/* TSA_NO_TSA is used to annotate functions.  Use only when you need to.
+- *
+- * void Foo(void) TSA_NO_TSA;
+- */
+-#define TSA_NO_TSA TSA(no_thread_safety_analysis)
+-
+-/*
+- * TSA_ASSERT() is used to annotate functions: This function will assert that
+- * the lock is held. When it returns, the caller of the function is assumed to
+- * already hold the resource.
+- *
+- * More than one mutex may be specified, comma-separated.
+- */
+-#define TSA_ASSERT(...) TSA(assert_capability(__VA_ARGS__))
+-#define TSA_ASSERT_SHARED(...) TSA(assert_shared_capability(__VA_ARGS__))
+-
+-#endif /* #ifndef CLANG_TSA_H */
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index d904408e5ed..af0a9b17ff9 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -207,6 +207,93 @@
+ # define QEMU_USED
+ #endif
+ 
++/* http://clang.llvm.org/docs/ThreadSafetyAnalysis.html
++ *
++ * TSA is available since clang 3.6-ish.
++ */
++#ifdef __clang__
++#  define TSA(x)   __attribute__((x))
++#else
++#  define TSA(x)   /* No TSA, make TSA attributes no-ops. */
++#endif
++
++/* TSA_CAPABILITY() is used to annotate typedefs:
++ *
++ * typedef pthread_mutex_t TSA_CAPABILITY("mutex") tsa_mutex;
++ */
++#define TSA_CAPABILITY(x) TSA(capability(x))
++
++/* TSA_GUARDED_BY() is used to annotate global variables,
++ * the data is guarded:
++ *
++ * Foo foo TSA_GUARDED_BY(mutex);
++ */
++#define TSA_GUARDED_BY(x) TSA(guarded_by(x))
++
++/* TSA_PT_GUARDED_BY() is used to annotate global pointers, the data
++ * behind the pointer is guarded.
++ *
++ * Foo* ptr TSA_PT_GUARDED_BY(mutex);
++ */
++#define TSA_PT_GUARDED_BY(x) TSA(pt_guarded_by(x))
++
++/* The TSA_REQUIRES() is used to annotate functions: the caller of the
++ * function MUST hold the resource, the function will NOT release it.
++ *
++ * More than one mutex may be specified, comma-separated.
++ *
++ * void Foo(void) TSA_REQUIRES(mutex);
++ */
++#define TSA_REQUIRES(...) TSA(requires_capability(__VA_ARGS__))
++#define TSA_REQUIRES_SHARED(...) TSA(requires_shared_capability(__VA_ARGS__))
++
++/* TSA_EXCLUDES() is used to annotate functions: the caller of the
++ * function MUST NOT hold resource, the function first acquires the
++ * resource, and then releases it.
++ *
++ * More than one mutex may be specified, comma-separated.
++ *
++ * void Foo(void) TSA_EXCLUDES(mutex);
++ */
++#define TSA_EXCLUDES(...) TSA(locks_excluded(__VA_ARGS__))
++
++/* TSA_ACQUIRE() is used to annotate functions: the caller of the
++ * function MUST NOT hold the resource, the function will acquire the
++ * resource, but NOT release it.
++ *
++ * More than one mutex may be specified, comma-separated.
++ *
++ * void Foo(void) TSA_ACQUIRE(mutex);
++ */
++#define TSA_ACQUIRE(...) TSA(acquire_capability(__VA_ARGS__))
++#define TSA_ACQUIRE_SHARED(...) TSA(acquire_shared_capability(__VA_ARGS__))
++
++/* TSA_RELEASE() is used to annotate functions: the caller of the
++ * function MUST hold the resource, but the function will then release it.
++ *
++ * More than one mutex may be specified, comma-separated.
++ *
++ * void Foo(void) TSA_RELEASE(mutex);
++ */
++#define TSA_RELEASE(...) TSA(release_capability(__VA_ARGS__))
++#define TSA_RELEASE_SHARED(...) TSA(release_shared_capability(__VA_ARGS__))
++
++/* TSA_NO_TSA is used to annotate functions.  Use only when you need to.
++ *
++ * void Foo(void) TSA_NO_TSA;
++ */
++#define TSA_NO_TSA TSA(no_thread_safety_analysis)
++
++/*
++ * TSA_ASSERT() is used to annotate functions: This function will assert that
++ * the lock is held. When it returns, the caller of the function is assumed to
++ * already hold the resource.
++ *
++ * More than one mutex may be specified, comma-separated.
++ */
++#define TSA_ASSERT(...) TSA(assert_capability(__VA_ARGS__))
++#define TSA_ASSERT_SHARED(...) TSA(assert_shared_capability(__VA_ARGS__))
++
+ /*
+  * Ugly CPP trick that is like "defined FOO", but also works in C
+  * code.  Useful to replace #ifdef with "if" statements; assumes
+diff --git a/include/qemu/thread.h b/include/qemu/thread.h
+index 7eba27a7049..6f800aad31a 100644
+--- a/include/qemu/thread.h
++++ b/include/qemu/thread.h
+@@ -3,7 +3,6 @@
+ 
+ #include "qemu/processor.h"
+ #include "qemu/atomic.h"
+-#include "qemu/clang-tsa.h"
+ 
+ typedef struct QemuCond QemuCond;
+ typedef struct QemuSemaphore QemuSemaphore;
+diff --git a/block/create.c b/block/create.c
+index 72abafb4c12..6b23a216753 100644
+--- a/block/create.c
++++ b/block/create.c
+@@ -24,7 +24,6 @@
+ 
+ #include "qemu/osdep.h"
+ #include "block/block_int.h"
+-#include "qemu/clang-tsa.h"
+ #include "qemu/job.h"
+ #include "qemu/main-loop.h"
+ #include "qapi/qapi-commands-block-core.h"
+diff --git a/tests/unit/test-bdrv-drain.c b/tests/unit/test-bdrv-drain.c
+index 98ad89b390c..7410e6f3528 100644
+--- a/tests/unit/test-bdrv-drain.c
++++ b/tests/unit/test-bdrv-drain.c
+@@ -28,7 +28,6 @@
+ #include "system/block-backend.h"
+ #include "qapi/error.h"
+ #include "qemu/main-loop.h"
+-#include "qemu/clang-tsa.h"
+ #include "iothread.h"
+ 
+ static QemuEvent done_event;
+diff --git a/tests/unit/test-block-iothread.c b/tests/unit/test-block-iothread.c
+index 1de04a8a13d..26a6c051758 100644
+--- a/tests/unit/test-block-iothread.c
++++ b/tests/unit/test-block-iothread.c
+@@ -29,7 +29,6 @@
+ #include "system/block-backend.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qdict.h"
+-#include "qemu/clang-tsa.h"
+ #include "qemu/main-loop.h"
+ #include "iothread.h"
+ 
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 6fff4162ac6..b2e26e21205 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -17,7 +17,6 @@
+ #include "qemu-thread-common.h"
+ #include "qemu/tsan.h"
+ #include "qemu/bitmap.h"
+-#include "qemu/clang-tsa.h"
+ 
+ #ifdef CONFIG_PTHREAD_SET_NAME_NP
+ #include <pthread_np.h>
 -- 
 2.47.1
 
