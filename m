@@ -1,176 +1,169 @@
-Return-Path: <kvm+bounces-36401-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36402-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72477A1A7D4
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 17:25:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D8E6A1A7E8
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 17:34:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A436188C380
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 16:25:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ADDC3A3A96
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 16:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F49213236;
-	Thu, 23 Jan 2025 16:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F1B21325C;
+	Thu, 23 Jan 2025 16:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dK62tGqW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bq7mjq5V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188D612FF69
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 16:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD5FF4F1;
+	Thu, 23 Jan 2025 16:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737649521; cv=none; b=ldlgwndDV2HQMc/nKCAFb8sQI1RL9uW1nspqfYMfmPY0yTnEuzb+wxJh0ev2dUcoYXsc7cmok3BFixL7WliKohWu9kShW1ZSdD3w0cvPhdgxfquRp2dDBKF02N7XHf7e3iGHgHcycBJ99YdGp5Nx6gXNwOj3Gf0ObtVm4wP09GA=
+	t=1737650076; cv=none; b=jYW9HozBjqofYaIjGm2d8ZqPBSA8b4bHfzyeYo6JepmbtozxsIpozWZKRSOJav1aUQY5Y8PPTotvs+fw6ctInmleTuEzV80v4pXv8uDeu7fSWSNyTH8c7cAu0Ptm7L0Oo6q70XcGi6ner7SZQazn4aSuHGAWGA3JcgQP3kQBpOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737649521; c=relaxed/simple;
-	bh=aLNarEYJyTL1NCCIDRVBboOMwudeY8FI9Le5DHImmWQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WQBEGNdzVwdYKrbuG8oa4p28whvP5JfwPsD2AAFR7ks4D4Nc07E8WX6Q7W2xpv4fJALT4UH820O0FnRKVfVtgvZLtgAE3drxUgYWKtq5wBGUYAuZDvFDC3RJz3CKkVdgjXjWYUy4cSb497hMFz4zL7c2qZcyemF1cuNAbsWkSfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dK62tGqW; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef114d8346so2336412a91.0
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 08:25:19 -0800 (PST)
+	s=arc-20240116; t=1737650076; c=relaxed/simple;
+	bh=Hg5RB7UpKRce3aj4onmff/gfMBSB9q6DnReFUcl4DFE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hmOYw6Cng4Qrw3k3PG4TQO9irofNS4ZoWgozvkwzwZl4vh+xKlHZaz5nZ66YQSTK8lqnk2x29GT7KnN8LK4gde9+hHjLHMb6etXQ1FNrNgjNLZQfiaOayv2XOPRCKL4hOUSDEtlL8+33FXqMcQfj0WktCXCZ0JIAYPAtRK04toY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bq7mjq5V; arc=none smtp.client-ip=209.85.214.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-21631789fcdso31484775ad.1;
+        Thu, 23 Jan 2025 08:34:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737649519; x=1738254319; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=64SCyRiS1jxS05j2UF5uPNfBJJO/VhtQn/q+gs3Jrf0=;
-        b=dK62tGqW8FkPDDF7M7orsEvxDj8sdiDG3qUXxhzzpl5kATZPjd96LI9D8WM+MezjqT
-         TfSoRoKYEoZdeVfrvQ5CTn1LKr8AzF/MEIu6pcoEXQL22ZoL2p3dECREB5rqXPt2kQZ2
-         P/VWcn0jt7Y2uuSlUSy2iV+xMNL6+Eh05jywhIo8abgRwXrECXgo1DYw7i25EmhAzliP
-         QMOMD6rIAgOSar1FZG2hat4YlO/keRD8/mJANCJkJIMdKzIJZjVR+ulXBC49fcdOdZ9E
-         MzncQP4YpBvoZowkeNlQKZnnUCwMOUZJOur3ZXzkQPIxi3Uxq9IBQLkRAeHiVk/fWCtD
-         C2hg==
+        d=gmail.com; s=20230601; t=1737650074; x=1738254874; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vfAYd0+bLlysrEnQ2PXnYZBaiFGKmawZpmxKg8FYLSI=;
+        b=bq7mjq5VYtcLf4vcd8hiwksxBYyZGlsO/74f/xcy40NVbaaTfGrNn32eubhElBmLg/
+         jTcU5YNHu82YyBuDTQxm1IhYI/mQwv4TrQQrDmg0/BKEBuz4LVpq1f9ehTYHwdAY5Lsx
+         zfSpyh/dnUe4r97uQGxeLM8YggGqexwgl4HVICUxBSNWFuqg5nRrUs1kpLu4d1khI2hb
+         4M87V895P5wyilasNBTh8OJ7Uabs8OrhqDsw7MYkiZrbiuEG09+qVrA6mqfD/XZpLVpl
+         tA6Vo3ZF72vmBPbddWF4OaGIu2pNRrYQbXb5XJfTDPrU85pRKPiH1I/q7pKXRJHdsmYl
+         yBag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737649519; x=1738254319;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=64SCyRiS1jxS05j2UF5uPNfBJJO/VhtQn/q+gs3Jrf0=;
-        b=cmrIi7OCgXQ//yZtoQQMl72wZPj8ilev7whqTzF+Z9h4f59loJIQKazGAxd2z5slKD
-         pe5q5gdvADnCKQ7aZofvw9+bkRKWJLimCAsbWJWbZmwjQt7QIHAv/gzZOfKaoPGxkPJq
-         ngWTggQfhcS1FLivvsIsUVSPC1e5jeboEeT5Qk0VXAja2I2u29hGPDiXthzn3uYP5igr
-         Wo8qaVsrUeQz77yFcViDoOSOv33znrYycymK/3bB9WU/qsANuQRIZ2rhlXK9H393gVK/
-         IE3msO50QCiCnoeHPBiOHqalmK8Zn9eRsNX2tNZ8eBKfKfvNF3uQUj5iYA59yUykbieI
-         3nEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUY0di14awfRfFUW7jmnt4n+hiwmWd9boatLdyse/JJJKzpqaqjf7JTWHWHN3QtpZv02mY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuCdFwakrNA09Vpa8/7mGoe9aowUt8hAotn2uxW2YIEwa2jB/P
-	WBdjGevgQ8X9xpZUJdWvGCdw6AtMNpeaLNumo8eFWODqnLHXenBM9VJex04y6EWEh9yEghymBmC
-	/3g==
-X-Google-Smtp-Source: AGHT+IH0yGN/QwJj2qp5uqOKGauUQieE3T8AzQn7D6+8pBhJNJGOpa+Ovr7omqAZIvsz9KNZ4usYPH1yyCs=
-X-Received: from pfbbv12.prod.google.com ([2002:a05:6a00:414c:b0:724:f17d:ebd7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:448a:b0:725:ebab:bb2e
- with SMTP id d2e1a72fcca58-72daf981283mr35774059b3a.11.1737649519289; Thu, 23
- Jan 2025 08:25:19 -0800 (PST)
-Date: Thu, 23 Jan 2025 08:25:17 -0800
-In-Reply-To: <20250118152655.GBZ4vIP44MivU2Bv0i@fat_crate.local>
+        d=1e100.net; s=20230601; t=1737650074; x=1738254874;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vfAYd0+bLlysrEnQ2PXnYZBaiFGKmawZpmxKg8FYLSI=;
+        b=Df6r6N3BsDDzVc9vgbUB66K6fnTn3zhO8L4NKvQqjiGu+3jFQMwyW4F6hGhYooZv1v
+         O+iS14TIQHUDa/VKcS5TJjM9NsepX/Iy2ihGd4wLH4ykKOMXXYUzKUQKLOcE7RJMATPE
+         39MCPIXMLvLTy7LfjZr75GBW4B9MCRVoh11AaRn+GmdAXgz78G4u+3HnzhWtVjvtioyn
+         q+AzWwd1HNgV9PfFu3IU2EH+wWSR3zCr+82bEjDhfd+H4qPuxvQ2VJSmoZtwSO/u96+E
+         BDnYv4gX5sOPBceYFbX0/c3UmRpU+lCJbI3T9J6ponPYXD1Wfc8ACdE5nxPGBvv+iCzV
+         LYRg==
+X-Forwarded-Encrypted: i=1; AJvYcCUW10/+727SZGJG9lzVwnn9eNBzXiukrkhxt90AOLQv10qizGvudevsttu6qc8x6lNgg9t7o3Chnaw9nVQC@vger.kernel.org, AJvYcCV/sntqWBUnqMeY206pSqyQPbcXYrXWZdHQlZ2V8cDf7RrZ6ElhO7ZVE3pZBbKSvPBjF9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrWFaClqp1yLAOYCxxmswnTF4bKMr11Of7nFfYBZoKcKvPLL2J
+	xGsoC0MGbt7eWaPrTWxeTFISPLI8S0Ati/d1zij8wEizXYS9kUU=
+X-Gm-Gg: ASbGncvYapjj06fBH4NYCcKdgz2NFHA0UyW7zyQrL2ZMiB8J9799L8UJj0ZMCQKtyIz
+	Hp9DeNYBjvq6UPmcAW5XkBB0dR4HFr1VPZEKmP/n2phmVn+ifXdzdEFKNgyTEtO/at4I6l5hbHC
+	Iw+MaPbhZPr5w944UeTyn6fGHayzdWGkssvwmWn5zmhOR3FA3fuzcJX0LAD2MlqHnGgMEKrlVpF
+	GxYD9/vOEcrMkBGGSVkPsteSgrL0FUJ2Dn7y+lEgrrCWbugiX3PV7xRqlboddUNIO2M4Ba3hd6S
+	Pm29KqlatvwaYcIJsw==
+X-Google-Smtp-Source: AGHT+IG0kZzcy1BA/flXibrV7aQWSpL3oHz9BKFUcqiDLBTpMepuh7S6Z0U1RZMVaHudJUlRhRPuwA==
+X-Received: by 2002:a05:6a21:32a6:b0:1e0:d0b9:9a90 with SMTP id adf61e73a8af0-1eb6978f712mr6219586637.13.1737650072924;
+        Thu, 23 Jan 2025 08:34:32 -0800 (PST)
+Received: from localhost.localdomain ([58.37.175.151])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ac495d56669sm59315a12.58.2025.01.23.08.34.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 08:34:32 -0800 (PST)
+From: Tomita Moeko <tomitamoeko@gmail.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Tomita Moeko <tomitamoeko@gmail.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3] vfio/pci: match IGD devices in display controller class
+Date: Fri, 24 Jan 2025 00:34:15 +0800
+Message-ID: <20250123163416.7653-1-tomitamoeko@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241216173142.GDZ2Bj_uPBG3TTPYd_@fat_crate.local>
- <Z2B2oZ0VEtguyeDX@google.com> <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
- <Z35_34GTLUHJTfVQ@google.com> <20250108154901.GFZ36ebXAZMFZJ7D8t@fat_crate.local>
- <Z36zWVBOiBF4g-mW@google.com> <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
- <20250111125215.GAZ4Jpf6tbcoS7jCzz@fat_crate.local> <Z4qnzwNYGubresFS@google.com>
- <20250118152655.GBZ4vIP44MivU2Bv0i@fat_crate.local>
-Message-ID: <Z5JtbZ-UIBJy2aYE@google.com>
-Subject: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Josh Poimboeuf <jpoimboe@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jan 18, 2025, Borislav Petkov wrote:
->  static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
-> @@ -2663,6 +2665,12 @@ static void __init srso_select_mitigation(void)
+IGD device can either expose as a VGA controller or display controller
+depending on whether it is configured as the primary display device in
+BIOS. In both cases, the OpRegion may be present. A new helper function
+vfio_pci_is_intel_display() is introduced to check if the device might
+be an IGD device.
 
-Unless I'm missing something, the cpu_mitigations_off() and "srso_cmd == SRSO_CMD_OFF"
-cases need to clear the feature
+Signed-off-by: Tomita Moeko <tomitamoeko@gmail.com>
+---
+Changelog:
+v3:
+* Removed BDF condition as Intel discrete GPUs does not have OpRegion
+* Added a helper function to match all possible devices with base class
+* Renamed from "vfio/pci: update igd matching conditions"
+Link: https://lore.kernel.org/lkml/20241230161054.3674-2-tomitamoeko@gmail.com/
 
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 9e3ea7f1b3587..3939a8dee27d4 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -2581,6 +2581,7 @@ static void __init srso_select_mitigation(void)
-            srso_cmd == SRSO_CMD_OFF) {
-                if (boot_cpu_has(X86_FEATURE_SBPB))
-                        x86_pred_cmd = PRED_CMD_SBPB;
-+               setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
-                return;
-        }
+v2:
+Fix misuse of pci_get_domain_bus_and_slot(), now only compares bdf
+without touching device reference count.
+Link: https://lore.kernel.org/all/20241229155140.7434-1-tomitamoeko@gmail.com/
 
-There's also the Zen1/Zen2 ucode+!SMT path, which I assume is irreveleant in
-practice:
+ drivers/vfio/pci/vfio_pci.c      | 4 +---
+ drivers/vfio/pci/vfio_pci_igd.c  | 6 ++++++
+ drivers/vfio/pci/vfio_pci_priv.h | 6 ++++++
+ 3 files changed, 13 insertions(+), 3 deletions(-)
 
-		if (boot_cpu_data.x86 < 0x19 && !cpu_smt_possible()) {
-			setup_force_cpu_cap(X86_FEATURE_SRSO_NO);
-			return;
-		}
-
-But if we wanted to catch all paths, wrap the guts and clear the feature in the
-outer layer?
-
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 9e3ea7f1b3587..0501e31971421 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -2572,7 +2572,7 @@ early_param("spec_rstack_overflow", srso_parse_cmdline);
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index e727941f589d..5f169496376a 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -111,9 +111,7 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
+ 	if (ret)
+ 		return ret;
  
- #define SRSO_NOTICE "WARNING: See https://kernel.org/doc/html/latest/admin-guide/hw-vuln/srso.html for mitigation options."
- 
--static void __init srso_select_mitigation(void)
-+static void __init __srso_select_mitigation(void)
- {
-        bool has_microcode = boot_cpu_has(X86_FEATURE_IBPB_BRTYPE);
- 
-@@ -2692,11 +2692,15 @@ static void __init srso_select_mitigation(void)
-        }
- 
- out:
-+       pr_info("%s\n", srso_strings[srso_mitigation]);
-+}
-+
-+static void __init srso_select_mitigation(void)
-+{
-+       __srso_select_mitigation();
- 
-        if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
-                setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
--
--       pr_info("%s\n", srso_strings[srso_mitigation]);
+-	if (vfio_pci_is_vga(pdev) &&
+-	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
+-	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
++	if (vfio_pci_is_intel_display(pdev)) {
+ 		ret = vfio_pci_igd_init(vdev);
+ 		if (ret && ret != -ENODEV) {
+ 			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
+diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+index dd70e2431bd7..ef490a4545f4 100644
+--- a/drivers/vfio/pci/vfio_pci_igd.c
++++ b/drivers/vfio/pci/vfio_pci_igd.c
+@@ -435,6 +435,12 @@ static int vfio_pci_igd_cfg_init(struct vfio_pci_core_device *vdev)
+ 	return 0;
  }
  
- #undef pr_fmt
++bool vfio_pci_is_intel_display(struct pci_dev *pdev)
++{
++	return (pdev->vendor == PCI_VENDOR_ID_INTEL) &&
++	       ((pdev->class >> 16) == PCI_BASE_CLASS_DISPLAY);
++}
++
+ int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
+ {
+ 	int ret;
+diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
+index 5e4fa69aee16..a9972eacb293 100644
+--- a/drivers/vfio/pci/vfio_pci_priv.h
++++ b/drivers/vfio/pci/vfio_pci_priv.h
+@@ -67,8 +67,14 @@ void vfio_pci_memory_unlock_and_restore(struct vfio_pci_core_device *vdev,
+ 					u16 cmd);
+ 
+ #ifdef CONFIG_VFIO_PCI_IGD
++bool vfio_pci_is_intel_display(struct pci_dev *pdev);
+ int vfio_pci_igd_init(struct vfio_pci_core_device *vdev);
+ #else
++static inline bool vfio_pci_is_intel_display(struct pci_dev *pdev)
++{
++	return false;
++}
++
+ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
+ {
+ 	return -ENODEV;
+-- 
+2.45.2
 
->  ibpb_on_vmexit:
->  	case SRSO_CMD_IBPB_ON_VMEXIT:
-> +		if (boot_cpu_has(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
-> +			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
-> +			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
-> +			break;
-> +		}
-> +
->  		if (IS_ENABLED(CONFIG_MITIGATION_SRSO)) {
->  			if (!boot_cpu_has(X86_FEATURE_ENTRY_IBPB) && has_microcode) {
->  				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
-> @@ -2684,6 +2692,10 @@ static void __init srso_select_mitigation(void)
->  	}
->  
->  out:
-> +
-
-Spurious newlines.
-
-> +	if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
-> +		setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
-> +
->  	pr_info("%s\n", srso_strings[srso_mitigation]);
->  }
 
