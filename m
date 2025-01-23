@@ -1,176 +1,173 @@
-Return-Path: <kvm+bounces-36390-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA9F4A1A6F0
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 16:22:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8496A1A722
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 16:33:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D9773ABD3F
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:22:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 473AA188A213
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:33:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2A9212B38;
-	Thu, 23 Jan 2025 15:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94750211470;
+	Thu, 23 Jan 2025 15:33:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="fRcaI3aY"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="ZF2Injrd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15CA20B22;
-	Thu, 23 Jan 2025 15:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028A1F4F1;
+	Thu, 23 Jan 2025 15:33:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737645760; cv=none; b=bkNXjbRcau0SGB5D4Af9w0gBIUcrvGieKnPr9khhqmG5YRQRZmwR86hEjgCizkFbStJhDrQ0GmSDVLTUndUpTZygm58psCpnscGlUH7q3fMma6qmWdx+ITk0PCmIXqTzx0pf16oucDDkAeFNW6wUzF/2EnFIGxuW6bjmwrZ7rbU=
+	t=1737646417; cv=none; b=CuC1g1lWQW3ozXDgCrKnnW0Y0qbeACwCeBUKMe3YHoMBWu24ilBMsit/B99yQiAUMdJ1VQ1b3IlYIbjifWllfKR2XdvEVaV6NKTuVrXh8s17XNAA+kehENxoIV2LHnagz5V/yz6xre6EKT5kaaBAdh8fLdf0gUE6ks4EnqR9IeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737645760; c=relaxed/simple;
-	bh=LdsUt5nuqRKTBo+Zf7y2sEcmeiI/oxeUDf9fxmTv2zg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=IPLyjh74L3Y7kipWY8fRUmu7osvPvJ08jnJI1g4ELTs1+RH9VP1T69E7dR15VDHB7sD45M4HpkdlN1nuanjOfndjI6pfC1Z7Oraqt6IlhnuIQnflzv3cM9l3BFEeBsxfqNZN3JtZRWo7HRqDJKb5s6OFOjxpYypF5TJC1YFVhsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=fRcaI3aY; arc=none smtp.client-ip=99.78.197.219
+	s=arc-20240116; t=1737646417; c=relaxed/simple;
+	bh=5p7xT3po2+F9Cz5BbGOtrlT710KKHhtCw4KbDyKhqUU=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ehdfX/+Ya9wewYZKAtCxL0ATgPDRL41Z4s98WRCO4Hn0NOHIR7nyIXWCiOVv0TyTzzcoDDi9z85MITBzmfakk2Hyn3XxMnjRCsud9UjOtAtgY59WCVaIKFrClLd9fVpSfGmVw5AWzGrcXsIPM6chdHVviQBWnEFkqYuYDpwfE5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=ZF2Injrd; arc=none smtp.client-ip=52.119.213.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1737645758; x=1769181758;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=P5aqkjPNbdb3uSgVXaztNFotezbG1xCHVak/q8V4drs=;
-  b=fRcaI3aYwwAeEb69dgfPtWKJPfTvyB03296jsD5nkpAs+seCaIZqH9Mx
-   XlVbjk2/nLoKigG+nB2ZeLzZBlvdi/nD0U5G0NPLucQkGvUCtbGc/KIwf
-   KcrSuyiKDDrn+M+7CJF35Duntt5vmjsF3toRpu8m3OB17x0XPR6MbVeD3
-   Q=;
+  s=amazon201209; t=1737646416; x=1769182416;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=j7TtwM9zSLgAQwwFMd+Jd7bZJEHYMcgpXdaIjig8Ny8=;
+  b=ZF2Injrdm7oOOMJWX0znR4MQg9kxHlvH41khS4S/b9ktSfV85/rTEcNn
+   SkqHGSLXU9HM5eI9kUiuAD3p1D/1jfgPZLyBuQDqLptV72iLJylRtJGNr
+   Nox/d3rWDwJnmQsestJS9HMEh05AizThQYvmBF9ZgwxKlLHh5ywZz+DTf
+   E=;
 X-IronPort-AV: E=Sophos;i="6.13,228,1732579200"; 
-   d="scan'208";a="163691432"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 15:22:37 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:44330]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.215:2525] with esmtp (Farcaster)
- id c1fbe00d-964c-4662-b952-85a0f885aad2; Thu, 23 Jan 2025 15:22:36 +0000 (UTC)
-X-Farcaster-Flow-ID: c1fbe00d-964c-4662-b952-85a0f885aad2
-Received: from EX19EXOUWC001.ant.amazon.com (10.250.64.135) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+   d="scan'208";a="691397891"
+Subject: Re: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
+Thread-Topic: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 15:33:33 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:20210]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.43.143:2525] with esmtp (Farcaster)
+ id 35af9d30-6e91-4daa-8b8d-812c21f29025; Thu, 23 Jan 2025 15:33:31 +0000 (UTC)
+X-Farcaster-Flow-ID: 35af9d30-6e91-4daa-8b8d-812c21f29025
+Received: from EX19D007EUA003.ant.amazon.com (10.252.50.8) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 23 Jan 2025 15:22:35 +0000
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19EXOUWC001.ant.amazon.com (10.250.64.135) with Microsoft SMTP Server
+ Thu, 23 Jan 2025 15:33:30 +0000
+Received: from EX19D007EUA002.ant.amazon.com (10.252.50.68) by
+ EX19D007EUA003.ant.amazon.com (10.252.50.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 23 Jan 2025 15:22:35 +0000
-Received: from email-imr-corp-prod-pdx-all-2c-475d797d.us-west-2.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Thu, 23 Jan 2025 15:22:35 +0000
-Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
-	by email-imr-corp-prod-pdx-all-2c-475d797d.us-west-2.amazon.com (Postfix) with ESMTPS id 7A4D5A1EFD;
-	Thu, 23 Jan 2025 15:22:22 +0000 (UTC)
-Message-ID: <5b2949bf-ab8b-46d4-9daf-71fe3e20b0c8@amazon.co.uk>
-Date: Thu, 23 Jan 2025 15:22:21 +0000
+ Thu, 23 Jan 2025 15:33:30 +0000
+Received: from EX19D007EUA002.ant.amazon.com ([fe80::1295:20d9:141e:47cc]) by
+ EX19D007EUA002.ant.amazon.com ([fe80::1295:20d9:141e:47cc%3]) with mapi id
+ 15.02.1258.039; Thu, 23 Jan 2025 15:33:30 +0000
+From: "Griffoul, Fred" <fgriffo@amazon.co.uk>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>, Sean Christopherson
+	<seanjc@google.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paolo Bonzini
+	<pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, "H. Peter
+ Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Paul Durrant
+	<paul@xen.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Thread-Index: AQHbbOj/VmoTG6SZV029AmLhfVoQ7bMjCNaAgACFagCAAMwcAIAAIpxX
+Date: Thu, 23 Jan 2025 15:33:30 +0000
+Message-ID: <cd8c29bc349244399b84008ef4c9ce7a@amazon.co.uk>
+References: <20250122161612.20981-1-fgriffo@amazon.co.uk>
+ <87tt9q7orq.fsf@redhat.com>
+ <Z5GXxOr3FHz_53Pj@google.com>,<87frl97jer.fsf@redhat.com>
+In-Reply-To: <87frl97jer.fsf@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 2/9] KVM: guest_memfd: Add guest_memfd support to
- kvm_(read|/write)_guest_page()
-To: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
-CC: <kvm@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-	<linux-mm@kvack.org>, <pbonzini@redhat.com>, <chenhuacai@kernel.org>,
-	<mpe@ellerman.id.au>, <anup@brainfault.org>, <paul.walmsley@sifive.com>,
-	<palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <seanjc@google.com>,
-	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <willy@infradead.org>,
-	<akpm@linux-foundation.org>, <xiaoyao.li@intel.com>, <yilun.xu@intel.com>,
-	<chao.p.peng@linux.intel.com>, <jarkko@kernel.org>, <amoorthy@google.com>,
-	<dmatlack@google.com>, <yu.c.zhang@linux.intel.com>,
-	<isaku.yamahata@intel.com>, <mic@digikod.net>, <vbabka@suse.cz>,
-	<vannapurve@google.com>, <ackerleytng@google.com>,
-	<mail@maciej.szmigiero.name>, <michael.roth@amd.com>, <wei.w.wang@intel.com>,
-	<liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
-	<kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
-	<steven.price@arm.com>, <quic_eberman@quicinc.com>,
-	<quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
-	<quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
-	<quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
-	<catalin.marinas@arm.com>, <james.morse@arm.com>, <yuzenghui@huawei.com>,
-	<oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
-	<qperret@google.com>, <keirf@google.com>, <shuah@kernel.org>,
-	<hch@infradead.org>, <jgg@nvidia.com>, <rientjes@google.com>,
-	<jhubbard@nvidia.com>, <fvdl@google.com>, <hughd@google.com>,
-	<jthoughton@google.com>
-References: <20250122152738.1173160-1-tabba@google.com>
- <20250122152738.1173160-3-tabba@google.com>
- <e6ea48d2-959f-4fbb-a170-0beaaf37f867@redhat.com>
- <CA+EHjTxNEoQ3MtZPi603=366vxt=SmBwetS4mFkvTK2r6u=UHw@mail.gmail.com>
- <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com>
- <ef864674-bbcf-457b-a4e3-fec272fc2d8a@amazon.co.uk>
- <fe154ef9-ac57-40ce-96d8-4e744d83d37e@redhat.com>
-From: Patrick Roy <roypat@amazon.co.uk>
-Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <fe154ef9-ac57-40ce-96d8-4e744d83d37e@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
 
-On Thu, 2025-01-23 at 14:18 +0000, David Hildenbrand wrote:
->>>>
->>>> That said, we could always have a userspace address dedicated to
->>>> mapping shared locations, and use that address when the necessity
->>>> arises. Or we could always require that memslots have a userspace
->>>> address, even if not used. I don't really have a strong preference.
->>>
->>> So, the simpler version where user space would simply mmap guest_memfd
->>> to provide the address via userspace_addr would at least work for the
->>> use case of paravirtualized time?
+Thanks for your comments: I will post a new patch following Sean's idea to =
+fix the CPUID registers directly in kvm_cpuid().
+
+Br,
+
+--
+Fred
+
+________________________________________
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Sent: Thursday, January 23, 2025 1:24:12 PM
+To: Sean Christopherson
+Cc: Griffoul, Fred; kvm@vger.kernel.org; Paolo Bonzini; Thomas Gleixner; In=
+go Molnar; Borislav Petkov; Dave Hansen; x86@kernel.org; H. Peter Anvin; Da=
+vid Woodhouse; Paul Durrant; linux-kernel@vger.kernel.org
+Subject: RE: [EXTERNAL] [PATCH] KVM: x86: Update Xen-specific CPUID leaves =
+during mangling
+
+
+Sean Christopherson <seanjc@google.com> writes:
+
+> On Wed, Jan 22, 2025, Vitaly Kuznetsov wrote:
+>> > Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
+>> > ---
+>> >  arch/x86/kvm/cpuid.c | 1 +
+>> >  arch/x86/kvm/xen.c   | 5 +++++
+>> >  arch/x86/kvm/xen.h   | 5 +++++
+>> >  3 files changed, 11 insertions(+)
+>> >
+>> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> > index edef30359c19..432d8e9e1bab 100644
+>> > --- a/arch/x86/kvm/cpuid.c
+>> > +++ b/arch/x86/kvm/cpuid.c
+>> > @@ -212,6 +212,7 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *=
+vcpu, struct kvm_cpuid_entry2
+>> >     */
+>> >    kvm_update_cpuid_runtime(vcpu);
+>> >    kvm_apply_cpuid_pv_features_quirk(vcpu);
+>> > +  kvm_xen_update_cpuid_runtime(vcpu);
 >>
->> fwiw, I'm currently prototyping something like this for x86 (although
->> not by putting the gmem address into userspace_addr, but by adding a new
->> field to memslots, so that memory attributes continue working), based on
->> what we talked about at the last guest_memfd sync meeting (the whole
->> "how to get MMIO emulation working for non-CoCo VMs in guest_memfd"
->> story).
-> 
-> Yes, I recall that discussion. Can you elaborate why the separate field
-> is required to keep memory attributes working? (could it be sorted out
-> differently, by reusing userspace_addr?).
+>> This one is weird as we update it in runtime (kvm_guest_time_update())
+>> and values may change when we e.g. migrate the guest. First, I do not
+>> understand how the guest is supposed to notice the change as CPUID data
+>> is normally considered static.
+>
+> I don't think it does.  Linux-as-a-guest reads the info once during boot =
+(see
+> xen_tsc_safe_clocksource()), and if and only if the TSC is constant and n=
+on-stop,
+> i.e. iff the values won't change.
 
-The scenario I ran into was that within the same memslots, I wanted some
-gfns to be backed by guest_memfd, and others by traditional memory, so
-that KVM can GUP some parts of guest memory even if guest_memfd itself
-is direct map removed.
+Right, the values shouldn't change on the same host. What I was thinking
+is what happens when we migrate the guest to another
+host. kvm_guest_time_update() is going to be called and we will get
+something different (maybe just slightly different, but still) in Xen
+TSC CPUIDs. The guest, however, is likely not going to notice at all.
 
-It actually also has to do with paravirtual time, but on x86. Here, the
-guest chooses where in guest memory the clock structure is placed via an
-MSR write (so I can't a priori use a traditional memslot, like we can on
-ARM).  KVM internally wants to GUP the hva that corresponds to the gfn
-the guest chooses, but if the hva is in a mapping of direct map removed
-gmem, that won't work. So what I did was just intercept the MSR write in
-userspace, and clear KVM_MEMORY_ATTRIBUTES_PRIVATE for the gfn. But for
-this, I need userspace_addr to not point to the guest_memfd hva.
-Although maybe it'd be possible to instead reconfigure the memslots when
-intercepting the MSR? Not sure where we stand on KVM_MEM_GUEST_MEMFD
-memslots though.
+>
+>>  Second, I do not see how the VMM is
+>> supposed to track it as if it tries to supply some different data for
+>> these Xen leaves, kvm_cpuid_check_equal() will still fail.
+>>
+>> Would it make more sense to just ignore these Xen CPUID leaves with TSC
+>> information when we do the comparison?
+>
+> Another alternative would be to modify the register output in kvm_cpuid()=
+.  Given
+> that Linux reads the info once during boot, and presumably other guests d=
+o the
+> same, runtime "patching" wouldn't incur meaningful overhead.  And there a=
+re no
+> feature bits that KVM cares about, i.e. no reason KVM's view needs to be =
+correct.
 
-But also conceptually, doesn't KVM_MEMORY_ATTRIBUTES_PRIVATE kinda loose
-any meaning if userspace_addr also points towards gmem? E.g. no matter
-what we set, we'd get gmem mapped into the guest.
+True, CPUID reading time should not be performance critical.
 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
+--
+Vitaly
 
-Best, 
-Patrick
 
