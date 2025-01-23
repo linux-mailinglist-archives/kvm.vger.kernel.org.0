@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-36411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36412-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12B1EA1A89F
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 18:14:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE8EA1A8A7
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 18:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F46D16D04A
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 17:11:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB8BC189079E
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 17:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438D6145B39;
-	Thu, 23 Jan 2025 17:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8CF156F2B;
+	Thu, 23 Jan 2025 17:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ifnlsx6Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dA6eSxdc"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE4A13AA41
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 17:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8858F14C59C
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 17:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737652260; cv=none; b=QHN9yTASDUxYU4REmOq7IIQ9xVNIjTZJ+1HeZUHA3ZlSh733n82AXUS+wje9iY36SeuG0zihIJS0e3mH34pp7Wdao8KRkoNu26OtNIb/aR4mPI5FsXL3i9q7kP8dYpJY/1+knJIkqR5GEwrWFxHHn7tRTDAofz6WSzP/HZscirM=
+	t=1737652263; cv=none; b=QNiBhgEsNvBApEWQXJ3qg9KILmIUAsXGJUbn9nj4opQBtU7BvYhRObGKdPTpO24HCP3BNAYIDWLu2tFJg9vOwi55L1rB3ih+V1UPDQ1QY93BJdXLBsSSlokfibF/zLD2me5PhP9N0VmU0h8mrO8jyO90eNSer1EX7cvBQJMDpCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737652260; c=relaxed/simple;
-	bh=T8q34VTWnC53A/omtKXw33TuIrilLgKAMYPU65cm/Qk=;
+	s=arc-20240116; t=1737652263; c=relaxed/simple;
+	bh=So1bT6v/8IBUYr9O0B8Tc8G+IQCBnuKe6Hrn1SqQMRs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tAbTPtOyErV79JfYTFl6dbSwXvrIx75bWfwllAEf4dM2WGklP09b33OpStEWokIuUbYs1ELvfIfubkcvEimA7G4kyza/xakpysNH8NmX1mVHpRw8KKvycQDR7cKUgcCRDmQZD0qE/vfAKN8FLn2W/EDyzGXqMVSRUsnzxiS/nuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ifnlsx6Z; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=aVADvFwDqjxVFSA8LwL8hfNPdHWW4OtPlMBEFs3+Zc34CBsY2Ba34ioZDyjBT82KJ0tD3hW8Hb8ajZH6Es51AYmj8USWnQi2cWnfbIMPX1sihOhmCiPGbErcpk9Y1LcPU4yMn+M5knTonrBijB4yL1eIoC0Z2sDOtypJTETy2gQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dA6eSxdc; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737652257;
+	s=mimecast20190719; t=1737652260;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jAh/e6F0HEaFnHy5OVzmfXhKo/WXlBkiKIGsXte00qk=;
-	b=Ifnlsx6ZZh28hD//z/pqmjmfjIPS49nYG2rmgquVJeRyEpGgZGSaIEbDqKQnpdA32aZPpM
-	FsgnqVAcaYGjJG2i/kJBBiCWueUKkiCWUphf0XSm1GLxzoHrenyEXEY5Dmdk/vrV5L3izy
-	Xt1RJFJRyAQgB5Byehr5vDSBWp7ebkg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=f2lz1JhxCiAQPWfDUtfyCfkikpyW82hyEvi1Or2PPgU=;
+	b=dA6eSxdcTM9zs5iEBA8ytwPYBUY0aMBbkJuoZ6/e1CsDCnBT7oM/Dkr1UfhlXV8A/PvZSv
+	7++adDN/dvfBM1lCmu/CQoGfFt47D6+qij/EbLmCu7wQPzCwpbtD6Vxvw1EJeT81Kj50vh
+	gMvPmq/1ZRwqbH5su4a2IpMtgbekt44=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-576-qxlInJW8OLix15F8kLNG3Q-1; Thu, 23 Jan 2025 12:10:53 -0500
-X-MC-Unique: qxlInJW8OLix15F8kLNG3Q-1
-X-Mimecast-MFC-AGG-ID: qxlInJW8OLix15F8kLNG3Q
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43625ceae52so6864285e9.0
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 09:10:53 -0800 (PST)
+ us-mta-410-wkrIUIKcNty35-H4j2CpkA-1; Thu, 23 Jan 2025 12:10:56 -0500
+X-MC-Unique: wkrIUIKcNty35-H4j2CpkA-1
+X-Mimecast-MFC-AGG-ID: wkrIUIKcNty35-H4j2CpkA
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38634103b0dso663171f8f.2
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 09:10:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737652252; x=1738257052;
+        d=1e100.net; s=20230601; t=1737652255; x=1738257055;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jAh/e6F0HEaFnHy5OVzmfXhKo/WXlBkiKIGsXte00qk=;
-        b=ooLD9/KU0fduNifrcG9dZCS3ZMpmqw28U4GD994ptECiBaG7JYknVv4wUf2cPKPABg
-         BfCwZJvdZLj2cARtyhZFm7f/y0L7/65Mc2YaDSXqvImpw96fVMN1xg4RpHIqmRnMdpRd
-         Bf6uAKAQuJb33OYlQSWVPBfzDT2SClb3B1x2KitK7rKbUUhhHdGxPrAcrHjenQQEzmPG
-         KHukvuxUWVnvNKiqPBP7WYRAO4DM/yl/8aEdZ1tkzFpNJxRBLgLZBM0sy6t5m9aR+dGM
-         OwCwzpYbAOY6wlEvgqw7NtTzk2Ph+7hJLbc2S5XE2ovdXyuhBht5S4mmI/h2ecq4A8yL
-         uIjA==
-X-Forwarded-Encrypted: i=1; AJvYcCWOwqJemKFfRXIo8DKJhjVdN2x4nnR7ZuE8XQ/fBHiR1C00lqTQCMwev+73u17bLkpxegY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs01YKqnHicN9phg8yWFP1vtb9yycl+LL2z8K5wwh47R8LqBNL
-	DfBkvNactWjyUf/RhulyDjXgYmV83/dK6bud/f3FwmNTYK6SmP9erfD6pWEqQRzMqRvC6yveU4s
-	TgaLjRufH96CT/W1bR1v14h76RQ8OpIKkDHmgJ4KFV8BuhlS4OA==
-X-Gm-Gg: ASbGncsa4wdZ+imLZCnFebLCI219s1QLoHv+rlALCFSf6qMhnsS8z7By0iHwtAFpEgP
-	pJ7QmGMJcMSw1KoxRJ2SUESjYKVpjDVBsQkHYDq+5BjZpkfVs/AUDUDNh9AXWOCE+1d4//GBUcL
-	jA7Ss5zet2ft4AzvNI7YuQjcljb6cYVhEQtXrzd+Xp1vsxPrkH8AW66IilhGBgyrS/LhtJm2nkz
-	h5tRRCpaKPBRdln/HYV4NcU1F2l04929gEVQyecaPRuHNob+6Sg0Nu62ckZojp6mtRgCinTaq8F
-	FcrbNALvnL0Euw/1dEmef9SqUkgvDAjtTof1msb/rQ==
-X-Received: by 2002:a05:600c:3d96:b0:434:9dfe:20e6 with SMTP id 5b1f17b1804b1-43891439dfdmr245029625e9.23.1737652251741;
-        Thu, 23 Jan 2025 09:10:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGkHdqQ1Du/TgX49VGOUPaX03Xnk0FckQu07hyXzCGV6GJ69vec6Iv7VJ8KrVMowrhApHUZ3w==
-X-Received: by 2002:a05:600c:3d96:b0:434:9dfe:20e6 with SMTP id 5b1f17b1804b1-43891439dfdmr245029225e9.23.1737652251235;
-        Thu, 23 Jan 2025 09:10:51 -0800 (PST)
+        bh=f2lz1JhxCiAQPWfDUtfyCfkikpyW82hyEvi1Or2PPgU=;
+        b=MKpo0f8CrdjfkesTEZREP0z+1jAQ9BgG+wEoDpwd9+TqdBCR8VsnUW19bSaubeNLL8
+         Fd3VWRv8BdGGSRbPnqPLkODVMrS6qGAakPzQ/L6wYp94velTzGLTq6Ml20Dh9sie6ZSn
+         NUYbmFh4qUUYUuAiWRkXfLDBXL34zc2pvw5utMMMVELsJinT9DVOLzXtExGUIrjhc2JH
+         r+9qS6YTEPBdjunW9v4twxMXIxcoCngfN53H4P+0JXLtoJ9xKPnV3pP/TzE9j/y11IQH
+         Quie7/CGEBkLW6Kvw6c4UIcOqEUmYkNa725jfnYqkH8rhFCCAXevVcyOpQKuvHdOShca
+         yfug==
+X-Forwarded-Encrypted: i=1; AJvYcCWrE9fF7UpPLHZ6qcItY01MsXbpmrUcvijKkOhPNTXi7YGyVE31L3HHCHsQtZ5JjLiaDMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZhB2FW6jqmRIxidfGTRuCwnuPsQinVMeEL2YgaKGQNGkJ6CM+
+	4dbEgpn+kQ5mSVX5aO9B3Tnwc3NpRRiqmDC88TjS73PzAqp1nX/HMob9J6IxH+cJ3Nwn24tr+/Y
+	rfvXB3LQAcC/EXVGqLzsHaesO2Nxds3/f2/o5fTiVZ2DbJ0flkg==
+X-Gm-Gg: ASbGnctv2bWVIcJSVLVMMrRcHcY8LNOyA1EU3ErL44XmY/PDQIAZl8TZ51VZzq7O4wx
+	vFLJPdVYre7Uq97LmDc2mZKVAalrnpeCJRKwH5YnihSWOuaRIvoPMkO3kpoeYfqlYFu/8w1FyMj
+	21WOLG8l7wTAbgI6Airma4gCnsTB3OLSRXGKNsKSSQcFQQIqmVXHMyWRslrClKj0VrHlEO8xBST
+	8eajbKVD4ds7zer+ENvlAWHisu7Svari4NlxqWA7I0Y16wdTkw0DyJdzJrSvnl46jYrW6MoaK1p
+	nwH4XCaHJSuVVcZDjt+T21VJdz2jiO5TFBCtkAU+tA==
+X-Received: by 2002:a5d:6da4:0:b0:38b:e32a:10a6 with SMTP id ffacd0b85a97d-38bf57a9932mr29480871f8f.41.1737652255076;
+        Thu, 23 Jan 2025 09:10:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGK/5MgTOgXIu9+Lg1LjrltVZkaY8JHUprLufh35bjJjxTwBW+dXwhnf8hS5iSt70eBgqDsvw==
+X-Received: by 2002:a5d:6da4:0:b0:38b:e32a:10a6 with SMTP id ffacd0b85a97d-38bf57a9932mr29480826f8f.41.1737652254632;
+        Thu, 23 Jan 2025 09:10:54 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31d9a39sm67975795e9.31.2025.01.23.09.10.47
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31d9a39sm67975795e9.31.2025.01.23.09.10.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2025 09:10:50 -0800 (PST)
-Message-ID: <787fd89b-fbc0-4fd5-a1af-63dfddf13435@redhat.com>
-Date: Thu, 23 Jan 2025 18:10:47 +0100
+        Thu, 23 Jan 2025 09:10:53 -0800 (PST)
+Message-ID: <1b48e138-3134-442a-9796-e3a33b106221@redhat.com>
+Date: Thu, 23 Jan 2025 18:10:48 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,8 +91,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH RFCv2 03/13] iommu: Make iommu_dma_prepare_msi() into a
- generic operation
+Subject: Re: [PATCH RFCv2 01/13] genirq/msi: Store the IOMMU IOVA directly in
+ msi_desc instead of iommu_cookie
 Content-Language: en-US
 To: Nicolin Chen <nicolinc@nvidia.com>, will@kernel.org,
  robin.murphy@arm.com, jgg@nvidia.com, kevin.tian@intel.com,
@@ -107,275 +107,195 @@ Cc: joro@8bytes.org, shuah@kernel.org, reinette.chatre@intel.com,
  jean-philippe@linaro.org, mdf@kernel.org, mshavit@google.com,
  shameerali.kolothum.thodi@huawei.com, smostafa@google.com, ddutile@redhat.com
 References: <cover.1736550979.git.nicolinc@nvidia.com>
- <9914f9e6b32d49f74ace2200fd50583def9f15f6.1736550979.git.nicolinc@nvidia.com>
+ <671b2128c193fc9ac9af0f4add96f85a785f513a.1736550979.git.nicolinc@nvidia.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <9914f9e6b32d49f74ace2200fd50583def9f15f6.1736550979.git.nicolinc@nvidia.com>
+In-Reply-To: <671b2128c193fc9ac9af0f4add96f85a785f513a.1736550979.git.nicolinc@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi,
 
+Hi Nicolin,
 
 On 1/11/25 4:32 AM, Nicolin Chen wrote:
 > From: Jason Gunthorpe <jgg@nvidia.com>
 >
-> SW_MSI supports IOMMU to translate an MSI message before the MSI message
-> is delivered to the interrupt controller. On such systems the iommu_domain
-> must have a translation for the MSI message for interrupts to work.
+> All the iommu cases simply want to override the MSI page's address with
+those which translate MSIs
+> the IOVA that was mapped through the iommu. This doesn't need a cookie
+> pointer, we just need to store the IOVA and its page size in the msi_desc.
 >
-> The IRQ subsystem will call into IOMMU to request that a physical page be
-> setup to receive MSI message, and the IOMMU then sets an IOVA that maps to
-> that physical page. Ultimately the IOVA is programmed into the device via
-> the msi_msg.
+> Instead provide msi_desc_set_iommu_msi_iova() which allows the IOMMU side
+> to specify the IOVA that the MSI page is placed during
+> iommu_dma_prepare(). This is stored in the msi_desc and then
+iommu_dma_prepare_msi()
+> iommu_dma_compose_msi_msg() is a simple inline that sets address_hi/lo.
 >
-> Generalize this to allow the iommu_domain owner to provide its own
-> implementation of this mapping. Add a function pointer to struct
-> iommu_domain to allow the domain owner to provide an implementation.
+> The next patch will correct the naming.
 >
-> Have dma-iommu supply its implementation for IOMMU_DOMAIN_DMA types during
-> the iommu_get_dma_cookie() path. For IOMMU_DOMAIN_UNMANAGED types used by
-> VFIO (and iommufd for now), have the same iommu_dma_sw_msi set as well in
-> the iommu_get_msi_cookie() path.
+> This is done because we cannot correctly lock access to group->domain in
+> the atomic context that iommu_dma_compose_msi_msg() is called under. Today
+> the locking miss is tolerable because dma_iommu.c operates under an
+> assumption that the domain does not change while a driver is probed.
 >
-> Hold the group mutex while in iommu_dma_prepare_msi() to ensure the domain
-> doesn't change or become freed while running. Races with IRQ operations
-> from VFIO and domain changes from iommufd are possible here.
-this was my question in previous comments
+> However iommufd now permits the domain to change while the driver is
+> probed and VFIO userspace can create races with IRQ changes calling
+> iommu_dma_prepare/compose_msi_msg() and changing/freeing the iommu_domain.
+and is it safe in iommu_dma_prepare_msi()?
 >
-> Rreplace the msi_prepare_lock with a lockdep assertion for the group mutex
-Replace
-> as documentation. For the dma_iommu.c each iommu_domain unique to a
-is?
-> group.
+> Removing the pointer, and critically, the call to
+> iommu_get_domain_for_dev() during compose resolves this race.
 >
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> [nicolinc: move iommu_domain_set_sw_msi() from iommu_dma_init_domain() to
->  iommu_dma_init_domain(); add in iommu_put_dma_cookie() an sw_msi test]
 > Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 > ---
->  include/linux/iommu.h     | 44 ++++++++++++++++++++++++++-------------
->  drivers/iommu/dma-iommu.c | 33 +++++++++++++----------------
->  drivers/iommu/iommu.c     | 29 ++++++++++++++++++++++++++
->  3 files changed, 73 insertions(+), 33 deletions(-)
+>  include/linux/iommu.h     |  6 ------
+>  include/linux/msi.h       | 45 +++++++++++++++++++++++----------------
+>  drivers/iommu/dma-iommu.c | 30 +++++---------------------
+>  3 files changed, 32 insertions(+), 49 deletions(-)
 >
 > diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 3a4215966c1b..423fdfa6b3bb 100644
+> index 318d27841130..3a4215966c1b 100644
 > --- a/include/linux/iommu.h
 > +++ b/include/linux/iommu.h
-> @@ -44,6 +44,8 @@ struct iommu_dma_cookie;
->  struct iommu_fault_param;
->  struct iommufd_ctx;
->  struct iommufd_viommu;
-> +struct msi_desc;
-> +struct msi_msg;
->  
->  #define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
->  #define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
-> @@ -216,6 +218,12 @@ struct iommu_domain {
->  	struct iommu_domain_geometry geometry;
->  	struct iommu_dma_cookie *iova_cookie;
->  	int (*iopf_handler)(struct iopf_group *group);
-> +
-> +#if IS_ENABLED(CONFIG_IRQ_MSI_IOMMU)
-> +	int (*sw_msi)(struct iommu_domain *domain, struct msi_desc *desc,
-> +		      phys_addr_t msi_addr);
-> +#endif
-> +
->  	void *fault_data;
->  	union {
->  		struct {
-> @@ -234,6 +242,16 @@ struct iommu_domain {
->  	};
->  };
->  
-> +static inline void iommu_domain_set_sw_msi(
-> +	struct iommu_domain *domain,
-> +	int (*sw_msi)(struct iommu_domain *domain, struct msi_desc *desc,
-> +		      phys_addr_t msi_addr))
-> +{
-> +#if IS_ENABLED(CONFIG_IRQ_MSI_IOMMU)
-> +	domain->sw_msi = sw_msi;
-> +#endif
-> +}
-> +
->  static inline bool iommu_is_dma_domain(struct iommu_domain *domain)
->  {
->  	return domain->type & __IOMMU_DOMAIN_DMA_API;
-> @@ -1475,6 +1493,18 @@ static inline ioasid_t iommu_alloc_global_pasid(struct device *dev)
->  static inline void iommu_free_global_pasid(ioasid_t pasid) {}
->  #endif /* CONFIG_IOMMU_API */
->  
-> +#ifdef CONFIG_IRQ_MSI_IOMMU
-> +#ifdef CONFIG_IOMMU_API
-> +int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr);
-> +#else
-> +static inline int iommu_dma_prepare_msi(struct msi_desc *desc,
-> +					phys_addr_t msi_addr)
-> +{
-> +	return 0;
-> +}
-> +#endif /* CONFIG_IOMMU_API */
-> +#endif /* CONFIG_IRQ_MSI_IOMMU */
-> +
->  #if IS_ENABLED(CONFIG_LOCKDEP) && IS_ENABLED(CONFIG_IOMMU_API)
->  void iommu_group_mutex_assert(struct device *dev);
->  #else
-> @@ -1508,26 +1538,12 @@ static inline void iommu_debugfs_setup(void) {}
->  #endif
->  
->  #ifdef CONFIG_IOMMU_DMA
-> -#include <linux/msi.h>
-> -
+> @@ -1513,7 +1513,6 @@ static inline void iommu_debugfs_setup(void) {}
 >  int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base);
-> -
-> -int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr);
-> -
+>  
+>  int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr);
+> -void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg);
+>  
 >  #else /* CONFIG_IOMMU_DMA */
-> -
-> -struct msi_desc;
-> -struct msi_msg;
-> -
->  static inline int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
+>  
+> @@ -1529,11 +1528,6 @@ static inline int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_a
 >  {
->  	return -ENODEV;
+>  	return 0;
 >  }
 > -
-> -static inline int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
+> -static inline void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg)
 > -{
-> -	return 0;
 > -}
+> -
 >  #endif	/* CONFIG_IOMMU_DMA */
 >  
 >  /*
+> diff --git a/include/linux/msi.h b/include/linux/msi.h
+> index b10093c4d00e..d442b4a69d56 100644
+> --- a/include/linux/msi.h
+> +++ b/include/linux/msi.h
+> @@ -184,7 +184,8 @@ struct msi_desc {
+>  	struct msi_msg			msg;
+>  	struct irq_affinity_desc	*affinity;
+>  #ifdef CONFIG_IRQ_MSI_IOMMU
+> -	const void			*iommu_cookie;
+you may add kernel doc comments above
+> +	u64				iommu_msi_iova : 58;
+> +	u64				iommu_msi_page_shift : 6;
+>  #endif
+>  #ifdef CONFIG_SYSFS
+>  	struct device_attribute		*sysfs_attrs;
+> @@ -285,28 +286,36 @@ struct msi_desc *msi_next_desc(struct device *dev, unsigned int domid,
+>  
+>  #define msi_desc_to_dev(desc)		((desc)->dev)
+>  
+> -#ifdef CONFIG_IRQ_MSI_IOMMU
+> -static inline const void *msi_desc_get_iommu_cookie(struct msi_desc *desc)
+> -{
+> -	return desc->iommu_cookie;
+> -}
+> -
+> -static inline void msi_desc_set_iommu_cookie(struct msi_desc *desc,
+> -					     const void *iommu_cookie)
+> +static inline void msi_desc_set_iommu_msi_iova(struct msi_desc *desc,
+> +					       u64 msi_iova,
+> +					       unsigned int page_shift)
+>  {
+> -	desc->iommu_cookie = iommu_cookie;
+> -}
+> -#else
+> -static inline const void *msi_desc_get_iommu_cookie(struct msi_desc *desc)
+> -{
+> -	return NULL;
+> +#ifdef CONFIG_IRQ_MSI_IOMMU
+> +	desc->iommu_msi_iova = msi_iova >> page_shift;
+> +	desc->iommu_msi_page_shift = page_shift;
+> +#endif
+>  }
+>  
+> -static inline void msi_desc_set_iommu_cookie(struct msi_desc *desc,
+> -					     const void *iommu_cookie)
+> +/**
+> + * iommu_dma_compose_msi_msg() - Apply translation to an MSI message
+> + * @desc: MSI descriptor prepared by iommu_dma_prepare_msi()
+> + * @msg: MSI message containing target physical address
+> + */
+> +static inline void iommu_dma_compose_msi_msg(struct msi_desc *desc,
+> +					     struct msi_msg *msg)
+>  {
+> -}
+> +#ifdef CONFIG_IRQ_MSI_IOMMU
+> +	if (desc->iommu_msi_page_shift) {
+> +		u64 msi_iova = desc->iommu_msi_iova
+> +			       << desc->iommu_msi_page_shift;
+> +
+> +		msg->address_hi = upper_32_bits(msi_iova);
+> +		msg->address_lo = lower_32_bits(msi_iova) |
+> +				  (msg->address_lo &
+> +				   ((1 << desc->iommu_msi_page_shift) - 1));
+> +	}
+>  #endif
+> +}
+>  
+>  int msi_domain_insert_msi_desc(struct device *dev, unsigned int domid,
+>  			       struct msi_desc *init_desc);
 > diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index bf91e014d179..3b58244e6344 100644
+> index 2a9fa0c8cc00..bf91e014d179 100644
 > --- a/drivers/iommu/dma-iommu.c
 > +++ b/drivers/iommu/dma-iommu.c
-> @@ -24,6 +24,7 @@
->  #include <linux/memremap.h>
->  #include <linux/mm.h>
->  #include <linux/mutex.h>
-> +#include <linux/msi.h>
->  #include <linux/of_iommu.h>
->  #include <linux/pci.h>
->  #include <linux/scatterlist.h>
-> @@ -102,6 +103,9 @@ static int __init iommu_dma_forcedac_setup(char *str)
->  }
->  early_param("iommu.forcedac", iommu_dma_forcedac_setup);
+> @@ -1815,7 +1815,7 @@ int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
+>  	static DEFINE_MUTEX(msi_prepare_lock); /* see below */
 >  
-> +static int iommu_dma_sw_msi(struct iommu_domain *domain, struct msi_desc *desc,
-> +			    phys_addr_t msi_addr);
-> +
->  /* Number of entries per flush queue */
->  #define IOVA_DEFAULT_FQ_SIZE	256
->  #define IOVA_SINGLE_FQ_SIZE	32768
-> @@ -398,6 +402,7 @@ int iommu_get_dma_cookie(struct iommu_domain *domain)
->  		return -ENOMEM;
->  
->  	mutex_init(&domain->iova_cookie->mutex);
-> +	iommu_domain_set_sw_msi(domain, iommu_dma_sw_msi);
->  	return 0;
->  }
->  
-> @@ -429,6 +434,7 @@ int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
->  
->  	cookie->msi_iova = base;
->  	domain->iova_cookie = cookie;
-> +	iommu_domain_set_sw_msi(domain, iommu_dma_sw_msi);
->  	return 0;
->  }
->  EXPORT_SYMBOL(iommu_get_msi_cookie);
-> @@ -443,6 +449,9 @@ void iommu_put_dma_cookie(struct iommu_domain *domain)
->  	struct iommu_dma_cookie *cookie = domain->iova_cookie;
->  	struct iommu_dma_msi_page *msi, *tmp;
->  
-> +	if (domain->sw_msi != iommu_dma_sw_msi)
-> +		return;
-> +
-I don't get the above check. The comment says this is also called for a
-cookie prepared with iommu_get_dma_cookie(). Don't you need to do some
-cleanup for this latter?
->  	if (!cookie)
->  		return;
->  
-> @@ -1800,33 +1809,19 @@ static struct iommu_dma_msi_page *iommu_dma_get_msi_page(struct device *dev,
->  	return NULL;
->  }
->  
-> -/**
-> - * iommu_dma_prepare_msi() - Map the MSI page in the IOMMU domain
-> - * @desc: MSI descriptor, will store the MSI page
-> - * @msi_addr: MSI target address to be mapped
-> - *
-> - * Return: 0 on success or negative error code if the mapping failed.
-> - */
-> -int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
-> +static int iommu_dma_sw_msi(struct iommu_domain *domain, struct msi_desc *desc,
-> +			    phys_addr_t msi_addr)
->  {
->  	struct device *dev = msi_desc_to_dev(desc);
-> -	struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
-> -	struct iommu_dma_msi_page *msi_page;
-> -	static DEFINE_MUTEX(msi_prepare_lock); /* see below */
-> +	const struct iommu_dma_msi_page *msi_page;
->  
-> -	if (!domain || !domain->iova_cookie) {
-> +	if (!domain->iova_cookie) {
->  		msi_desc_set_iommu_msi_iova(desc, 0, 0);
+>  	if (!domain || !domain->iova_cookie) {
+> -		desc->iommu_cookie = NULL;
+> +		msi_desc_set_iommu_msi_iova(desc, 0, 0);
 >  		return 0;
 >  	}
 >  
-> -	/*
-> -	 * In fact the whole prepare operation should already be serialised by
-> -	 * irq_domain_mutex further up the callchain, but that's pretty subtle
-> -	 * on its own, so consider this locking as failsafe documentation...
-> -	 */
-> -	mutex_lock(&msi_prepare_lock);
-> +	iommu_group_mutex_assert(dev);
+> @@ -1827,33 +1827,13 @@ int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
+>  	mutex_lock(&msi_prepare_lock);
 >  	msi_page = iommu_dma_get_msi_page(dev, msi_addr, domain);
-> -	mutex_unlock(&msi_prepare_lock);
+>  	mutex_unlock(&msi_prepare_lock);
+> -
+> -	msi_desc_set_iommu_cookie(desc, msi_page);
+> -
 >  	if (!msi_page)
 >  		return -ENOMEM;
+> -	return 0;
+> -}
 >  
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 599030e1e890..fbbbcdba8a4f 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -3587,3 +3587,32 @@ int iommu_replace_group_handle(struct iommu_group *group,
->  	return ret;
+> -/**
+> - * iommu_dma_compose_msi_msg() - Apply translation to an MSI message
+> - * @desc: MSI descriptor prepared by iommu_dma_prepare_msi()
+> - * @msg: MSI message containing target physical address
+> - */
+> -void iommu_dma_compose_msi_msg(struct msi_desc *desc, struct msi_msg *msg)
+> -{
+> -	struct device *dev = msi_desc_to_dev(desc);
+> -	const struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
+> -	const struct iommu_dma_msi_page *msi_page;
+> -
+> -	msi_page = msi_desc_get_iommu_cookie(desc);
+> -
+> -	if (!domain || !domain->iova_cookie || WARN_ON(!msi_page))
+> -		return;
+> -
+> -	msg->address_hi = upper_32_bits(msi_page->iova);
+> -	msg->address_lo &= cookie_msi_granule(domain->iova_cookie) - 1;
+> -	msg->address_lo += lower_32_bits(msi_page->iova);
+> +	msi_desc_set_iommu_msi_iova(
+> +		desc, msi_page->iova,
+> +		ilog2(cookie_msi_granule(domain->iova_cookie)));
+> +	return 0;
 >  }
->  EXPORT_SYMBOL_NS_GPL(iommu_replace_group_handle, "IOMMUFD_INTERNAL");
-> +
-> +#if IS_ENABLED(CONFIG_IRQ_MSI_IOMMU)
-> +/**
-> + * iommu_dma_prepare_msi() - Map the MSI page in the IOMMU domain
-> + * @desc: MSI descriptor, will store the MSI page
-> + * @msi_addr: MSI target address to be mapped
-> + *
-> + * The implementation of sw_msi() should take msi_addr and map it to
-> + * an IOVA in the domain and call msi_desc_set_iommu_msi_iova() with the
-> + * mapping information.
-> + *
-> + * Return: 0 on success or negative error code if the mapping failed.
-> + */
-> +int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
-> +{
-> +	struct device *dev = msi_desc_to_dev(desc);
-> +	struct iommu_group *group = dev->iommu_group;
-> +	int ret = 0;
-> +
-> +	if (!group)
-> +		return 0;
-> +
-> +	mutex_lock(&group->mutex);
-> +	if (group->domain && group->domain->sw_msi)
-> +		ret = group->domain->sw_msi(group->domain, desc, msi_addr);
-> +	mutex_unlock(&group->mutex);
-> +	return ret;
-> +}
-> +#endif /* CONFIG_IRQ_MSI_IOMMU */
-Thanks
-
-Eric
+>  
+>  static int iommu_dma_init(void)
 
 
