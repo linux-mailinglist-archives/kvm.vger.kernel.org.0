@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-36382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36377-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703EEA1A60E
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:48:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBFDCA1A601
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:47:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 562F5169836
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:48:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1599D169839
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33E72144A0;
-	Thu, 23 Jan 2025 14:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780BA2135B3;
+	Thu, 23 Jan 2025 14:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="G3qMa+iO"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="H5vE5tgj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706402135D6;
-	Thu, 23 Jan 2025 14:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C0821322F;
+	Thu, 23 Jan 2025 14:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737643610; cv=none; b=tVQZ0BtYjtCJqvkXODy5u3+SLEmmgkxjSwQdh5b6Kw7ym5ICg99ENpCLVui+YR5cG3G53Ksuw/DvTMIh5THFZ3SGMgsXYCqYx+8/0/eT7137yekvdHu29yV64Crpiex5kR/GS/P6b0AMMOcU5+a1j0Hiwera9zpzqN8o7465ZoA=
+	t=1737643606; cv=none; b=H6iZh/rpBoROMPmV1Ak2II+4W3SKUeaX+/CtzeKQOpVXdn2zFDW3YMrKcg55Yr1+Ww74cBwVNrHqDf3rTq6/xWhQ7l2vEd+krqlYID1nhiGCqBWpMOPhi6lu6e5xl29hOYXyWzq+OTS8jSBhEFIx2iohJv8bl8Jxz/1XhXy5GTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737643610; c=relaxed/simple;
-	bh=XrEnlJR7sSMvolMAzZz63v5Lu2Vi0A+lOO5NnpFOvds=;
+	s=arc-20240116; t=1737643606; c=relaxed/simple;
+	bh=R/qcMzfFLkLUhT66ulB4tjFyvrg8rhE/lOI+1MyUmlY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r6biX6g+B1LpWnSM7wpFdqziBZD0fGTu3XIzCneTFBto194+zh3jxqJP4uQBK6RS9QsBATuNAvnWJ5SMvVpcBtN+3uPJKK1aiA8e051ieRWEA0LTayUJmk4lKJYI2r/GJ3VlSNgCUnMap706BlKCSngGdTmViezCI2sDIxVIxMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=G3qMa+iO; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=SfC49tPvoMXK3RgaubFFmvU/I8dhBOC/kcpU93nod4wLUoXtpVEi/OccnqqnZezybJMw3a43TuyKfhqtgcjtdN7sepbOC6DMBrglbXpcJrr6LxDKthAlcn6T8s8VuH9f/Ln/AGgYIbZDwaH5YkhvRSvJkLDh7ASpiV1nV/ATxbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=H5vE5tgj; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50NCGK66022730;
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50NDClSv016775;
 	Thu, 23 Jan 2025 14:46:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=s/xQIEeO66GP+IOG+
-	v1WqXtimQnowO8P0WhQFC+tcsc=; b=G3qMa+iOyakMyhEfRW2SyA1h5cbmBEFp+
-	ccxonOXYGnqehHrlFzDzWnCm3omr6HdboUc1bUqY/9FdixvflS1xbM1hG0jcKo5Z
-	w7ohHRWxuHuurAHlI6X4TZrU9+P3+krzjpT+0QkGnz/Y8BF8+EFR2M+RxX9cyANT
-	pjXAhCaYxE4Y41JokLhk8FDXth7hmvx0TF+bKSjhUhcPEqV0ooJDSqhJJD0SdwDG
-	Ilxx9HGyFoviy9FfCz3v3BNf/kR/TnwvA1P4DrGvpAl2IMs3GKjuabMchGUJq99u
-	SIQXcb1g8aY6jaO1fL7ykFEnBDRAUxKe5fceRhn06zqhdT4lePf5A==
+	:mime-version:references:subject:to; s=pp1; bh=HzqWAorIM7S7HuUam
+	CjXHJNjqiVP+T7Z4kPPyvjlXT8=; b=H5vE5tgjHB+HkNCx0g/hCOX4tx1eGyndP
+	Y4bYbYDYI43TJV1AxqmoNaJqtODbawiWbZeYcTYlnh753nQ3RqjA7gJbhqcujTf/
+	kl191Og9YlcghRr2bMN6pZA6DTdtMKC5h2upTaxLYW26bKUHFDhZlRMX+BuCoQZw
+	bRKEIwyNpoUnDZI4BHuF+VF9054zhvk3d+/hdBuEvOhyvJZ+kU4JXu9eeRi9NjuT
+	+aBYnn3wQE/31pbMIGL4ZmvvQdDTGme0WBibjPy2YqRXmJgL08RWvLWHYPoFSQTP
+	koXpMrDVoF+LjvnGyGYyaYR5x56EujxqEhxU541gOehvPoWEvKMzw==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44bbu9bh6r-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44b3gtwn3w-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Jan 2025 14:46:36 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50NEau6N001347;
+	Thu, 23 Jan 2025 14:46:37 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50NENHGd001810;
 	Thu, 23 Jan 2025 14:46:36 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44bbu9bh6h-1
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44b3gtwn3u-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 23 Jan 2025 14:46:36 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50NClfTq032248;
-	Thu, 23 Jan 2025 14:46:35 GMT
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50NAnZx9029538;
+	Thu, 23 Jan 2025 14:46:36 GMT
 Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 448rujwmd4-1
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448qmnnysp-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 23 Jan 2025 14:46:35 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50NEkWxN45416898
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50NEkWlQ45416900
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Thu, 23 Jan 2025 14:46:32 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EBDAD20040;
-	Thu, 23 Jan 2025 14:46:31 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3329E20040;
+	Thu, 23 Jan 2025 14:46:32 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ACF342004B;
+	by IMSVA (Postfix) with ESMTP id F1DE62004D;
 	Thu, 23 Jan 2025 14:46:31 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -81,9 +81,9 @@ Cc: linux-s390@vger.kernel.org, frankja@linux.ibm.com, borntraeger@de.ibm.com,
         hca@linux.ibm.com, svens@linux.ibm.com, agordeev@linux.ibm.com,
         gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
         seanjc@google.com, seiden@linux.ibm.com, pbonzini@redhat.com
-Subject: [PATCH v4 12/15] KVM: s390: move gmap_shadow_pgt_lookup() into kvm
-Date: Thu, 23 Jan 2025 15:46:24 +0100
-Message-ID: <20250123144627.312456-13-imbrenda@linux.ibm.com>
+Subject: [PATCH v4 13/15] KVM: s390: remove useless page->index usage
+Date: Thu, 23 Jan 2025 15:46:25 +0100
+Message-ID: <20250123144627.312456-14-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250123144627.312456-1-imbrenda@linux.ibm.com>
 References: <20250123144627.312456-1-imbrenda@linux.ibm.com>
@@ -95,215 +95,62 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 75P2jdsE1xMk4IeWIlPuj-FvzbP-ucko
-X-Proofpoint-ORIG-GUID: pwQkVSuI94pNPDJJYZUsuYR7olDYbidT
+X-Proofpoint-ORIG-GUID: PZaXMawLx1BesV8_bU9XA_T3zqvH6Qzz
+X-Proofpoint-GUID: 5SPQh3lBdUWNaFJVtba7mnuOXryjbHU9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-23_06,2025-01-23_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- priorityscore=1501 clxscore=1015 adultscore=0 bulkscore=0 mlxscore=0
- suspectscore=0 malwarescore=0 impostorscore=0 lowpriorityscore=0
- spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ bulkscore=0 mlxscore=0 malwarescore=0 priorityscore=1501
+ lowpriorityscore=0 impostorscore=0 mlxlogscore=999 phishscore=0
+ spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2411120000 definitions=main-2501230108
 
-Move gmap_shadow_pgt_lookup() from mm/gmap.c into kvm/gaccess.c .
+The page->index field for VSIE dat tables is only used for segment
+tables.
+
+Stop setting the field for all region tables.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- arch/s390/include/asm/gmap.h |  3 +--
- arch/s390/kvm/gaccess.c      | 42 +++++++++++++++++++++++++++++++-
- arch/s390/kvm/gmap.h         |  2 ++
- arch/s390/mm/gmap.c          | 46 ++----------------------------------
- 4 files changed, 46 insertions(+), 47 deletions(-)
+ arch/s390/mm/gmap.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
-index b489c4589618..4e73ef46d4b2 100644
---- a/arch/s390/include/asm/gmap.h
-+++ b/arch/s390/include/asm/gmap.h
-@@ -125,8 +125,6 @@ int gmap_shadow_sgt(struct gmap *sg, unsigned long saddr, unsigned long sgt,
- 		    int fake);
- int gmap_shadow_pgt(struct gmap *sg, unsigned long saddr, unsigned long pgt,
- 		    int fake);
--int gmap_shadow_pgt_lookup(struct gmap *sg, unsigned long saddr,
--			   unsigned long *pgt, int *dat_protection, int *fake);
- int gmap_shadow_page(struct gmap *sg, unsigned long saddr, pte_t pte);
- 
- void gmap_register_pte_notifier(struct gmap_notifier *);
-@@ -142,6 +140,7 @@ void s390_uv_destroy_pfns(unsigned long count, unsigned long *pfns);
- int __s390_uv_destroy_range(struct mm_struct *mm, unsigned long start,
- 			    unsigned long end, bool interruptible);
- int kvm_s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio, bool split);
-+unsigned long *gmap_table_walk(struct gmap *gmap, unsigned long gaddr, int level);
- 
- /**
-  * s390_uv_destroy_range - Destroy a range of pages in the given mm.
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index 9816b0060fbe..bb1340389369 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -16,6 +16,7 @@
- #include <asm/gmap.h>
- #include <asm/dat-bits.h>
- #include "kvm-s390.h"
-+#include "gmap.h"
- #include "gaccess.h"
- 
- /*
-@@ -1392,6 +1393,42 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
- 	return 0;
- }
- 
-+/**
-+ * shadow_pgt_lookup() - find a shadow page table
-+ * @sg: pointer to the shadow guest address space structure
-+ * @saddr: the address in the shadow aguest address space
-+ * @pgt: parent gmap address of the page table to get shadowed
-+ * @dat_protection: if the pgtable is marked as protected by dat
-+ * @fake: pgt references contiguous guest memory block, not a pgtable
-+ *
-+ * Returns 0 if the shadow page table was found and -EAGAIN if the page
-+ * table was not found.
-+ *
-+ * Called with sg->mm->mmap_lock in read.
-+ */
-+static int shadow_pgt_lookup(struct gmap *sg, unsigned long saddr, unsigned long *pgt,
-+			     int *dat_protection, int *fake)
-+{
-+	unsigned long *table;
-+	struct page *page;
-+	int rc;
-+
-+	spin_lock(&sg->guest_table_lock);
-+	table = gmap_table_walk(sg, saddr, 1); /* get segment pointer */
-+	if (table && !(*table & _SEGMENT_ENTRY_INVALID)) {
-+		/* Shadow page tables are full pages (pte+pgste) */
-+		page = pfn_to_page(*table >> PAGE_SHIFT);
-+		*pgt = page->index & ~GMAP_SHADOW_FAKE_TABLE;
-+		*dat_protection = !!(*table & _SEGMENT_ENTRY_PROTECT);
-+		*fake = !!(page->index & GMAP_SHADOW_FAKE_TABLE);
-+		rc = 0;
-+	} else  {
-+		rc = -EAGAIN;
-+	}
-+	spin_unlock(&sg->guest_table_lock);
-+	return rc;
-+}
-+
- /**
-  * kvm_s390_shadow_fault - handle fault on a shadow page table
-  * @vcpu: virtual cpu
-@@ -1415,6 +1452,9 @@ int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
- 	int dat_protection, fake;
- 	int rc;
- 
-+	if (KVM_BUG_ON(!gmap_is_shadow(sg), vcpu->kvm))
-+		return -EFAULT;
-+
- 	mmap_read_lock(sg->mm);
- 	/*
- 	 * We don't want any guest-2 tables to change - so the parent
-@@ -1423,7 +1463,7 @@ int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
- 	 */
- 	ipte_lock(vcpu->kvm);
- 
--	rc = gmap_shadow_pgt_lookup(sg, saddr, &pgt, &dat_protection, &fake);
-+	rc = shadow_pgt_lookup(sg, saddr, &pgt, &dat_protection, &fake);
- 	if (rc)
- 		rc = kvm_s390_shadow_tables(sg, saddr, &pgt, &dat_protection,
- 					    &fake);
-diff --git a/arch/s390/kvm/gmap.h b/arch/s390/kvm/gmap.h
-index 978f541059f0..c8f031c9ea5f 100644
---- a/arch/s390/kvm/gmap.h
-+++ b/arch/s390/kvm/gmap.h
-@@ -10,6 +10,8 @@
- #ifndef ARCH_KVM_S390_GMAP_H
- #define ARCH_KVM_S390_GMAP_H
- 
-+#define GMAP_SHADOW_FAKE_TABLE 1ULL
-+
- int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb);
- int gmap_convert_to_secure(struct gmap *gmap, unsigned long gaddr);
- int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr);
 diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 07df1a7b5ebe..918ea14515a1 100644
+index 918ea14515a1..38f044321704 100644
 --- a/arch/s390/mm/gmap.c
 +++ b/arch/s390/mm/gmap.c
-@@ -36,8 +36,6 @@
- 
- #define GMAP_SHADOW_FAKE_TABLE 1ULL
- 
--static inline unsigned long *gmap_table_walk(struct gmap *gmap, unsigned long gaddr, int level);
--
- static struct page *gmap_alloc_crst(void)
- {
- 	struct page *page;
-@@ -738,8 +736,7 @@ static void gmap_call_notifier(struct gmap *gmap, unsigned long start,
-  *
-  * Note: Can also be called for shadow gmaps.
-  */
--static inline unsigned long *gmap_table_walk(struct gmap *gmap,
--					     unsigned long gaddr, int level)
-+unsigned long *gmap_table_walk(struct gmap *gmap, unsigned long gaddr, int level)
- {
- 	const int asce_type = gmap->asce & _ASCE_TYPE_MASK;
- 	unsigned long *table = gmap->table;
-@@ -790,6 +787,7 @@ static inline unsigned long *gmap_table_walk(struct gmap *gmap,
- 	}
- 	return table;
- }
-+EXPORT_SYMBOL(gmap_table_walk);
- 
- /**
-  * gmap_pte_op_walk - walk the gmap page table, get the page table lock
-@@ -1744,46 +1742,6 @@ int gmap_shadow_sgt(struct gmap *sg, unsigned long saddr, unsigned long sgt,
- }
- EXPORT_SYMBOL_GPL(gmap_shadow_sgt);
- 
--/**
-- * gmap_shadow_pgt_lookup - find a shadow page table
-- * @sg: pointer to the shadow guest address space structure
-- * @saddr: the address in the shadow aguest address space
-- * @pgt: parent gmap address of the page table to get shadowed
-- * @dat_protection: if the pgtable is marked as protected by dat
-- * @fake: pgt references contiguous guest memory block, not a pgtable
-- *
-- * Returns 0 if the shadow page table was found and -EAGAIN if the page
-- * table was not found.
-- *
-- * Called with sg->mm->mmap_lock in read.
-- */
--int gmap_shadow_pgt_lookup(struct gmap *sg, unsigned long saddr,
--			   unsigned long *pgt, int *dat_protection,
--			   int *fake)
--{
--	unsigned long *table;
--	struct page *page;
--	int rc;
--
--	BUG_ON(!gmap_is_shadow(sg));
--	spin_lock(&sg->guest_table_lock);
--	table = gmap_table_walk(sg, saddr, 1); /* get segment pointer */
--	if (table && !(*table & _SEGMENT_ENTRY_INVALID)) {
--		/* Shadow page tables are full pages (pte+pgste) */
--		page = pfn_to_page(*table >> PAGE_SHIFT);
--		*pgt = page->index & ~GMAP_SHADOW_FAKE_TABLE;
--		*dat_protection = !!(*table & _SEGMENT_ENTRY_PROTECT);
--		*fake = !!(page->index & GMAP_SHADOW_FAKE_TABLE);
--		rc = 0;
--	} else  {
--		rc = -EAGAIN;
--	}
--	spin_unlock(&sg->guest_table_lock);
--	return rc;
--
--}
--EXPORT_SYMBOL_GPL(gmap_shadow_pgt_lookup);
--
- /**
-  * gmap_shadow_pgt - instantiate a shadow page table
-  * @sg: pointer to the shadow guest address space structure
+@@ -1520,9 +1520,6 @@ int gmap_shadow_r2t(struct gmap *sg, unsigned long saddr, unsigned long r2t,
+ 	page = gmap_alloc_crst();
+ 	if (!page)
+ 		return -ENOMEM;
+-	page->index = r2t & _REGION_ENTRY_ORIGIN;
+-	if (fake)
+-		page->index |= GMAP_SHADOW_FAKE_TABLE;
+ 	s_r2t = page_to_phys(page);
+ 	/* Install shadow region second table */
+ 	spin_lock(&sg->guest_table_lock);
+@@ -1603,9 +1600,6 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long saddr, unsigned long r3t,
+ 	page = gmap_alloc_crst();
+ 	if (!page)
+ 		return -ENOMEM;
+-	page->index = r3t & _REGION_ENTRY_ORIGIN;
+-	if (fake)
+-		page->index |= GMAP_SHADOW_FAKE_TABLE;
+ 	s_r3t = page_to_phys(page);
+ 	/* Install shadow region second table */
+ 	spin_lock(&sg->guest_table_lock);
+@@ -1686,9 +1680,6 @@ int gmap_shadow_sgt(struct gmap *sg, unsigned long saddr, unsigned long sgt,
+ 	page = gmap_alloc_crst();
+ 	if (!page)
+ 		return -ENOMEM;
+-	page->index = sgt & _REGION_ENTRY_ORIGIN;
+-	if (fake)
+-		page->index |= GMAP_SHADOW_FAKE_TABLE;
+ 	s_sgt = page_to_phys(page);
+ 	/* Install shadow region second table */
+ 	spin_lock(&sg->guest_table_lock);
 -- 
 2.48.1
 
