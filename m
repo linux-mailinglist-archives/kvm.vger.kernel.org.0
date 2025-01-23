@@ -1,228 +1,153 @@
-Return-Path: <kvm+bounces-36351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36352-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D98A1A439
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:29:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1151CA1A463
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38AB0163549
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:29:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C87EC18819F5
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E7C20F083;
-	Thu, 23 Jan 2025 12:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6958B20F087;
+	Thu, 23 Jan 2025 12:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O4JJ9UzA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BXS7gvt3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A708020E32A
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 12:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF1C3596B
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 12:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737635359; cv=none; b=Ly0OpSdDeReou94ZOAq8zJPwTSkHiKwOmzAv0ze9X9lTzD3armZ9Cs3jeaxGUqbg+Nuz+OPYUpySjB9BiTpmBSsjDXM8xv063u7g4214dvt3HLyIDccLczu8UOVqNS6gEYeZT1wQ2FPJjQTWQ7OcMAEPW6vWUaNmyJd2hkslQnY=
+	t=1737635724; cv=none; b=PFBm5RNRn8UAso7y4OYyLhm5qCi2tw3s+V6klaFwMMhRDVXiR2boFy6B6Mcxafw+jb2xAbelU89YW/TPIJoNoHO3CjI8kr+csKSUkmDqGBU6PdbOVREmbTvpFBSomU+hKxKPELZM+06lNI3TgTSWdNxeF+y9+HjIeDiqXcWWT6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737635359; c=relaxed/simple;
-	bh=TKIc+BSqUxTWDRXQBflfAo2GLT0I+z93EFcFnisGVl0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ftuDnHk5DVyIydxWiuEoN12gPtel5ZlgzQmWWCb2dF2e2EC7JmufVPjoaR3PYshGpLBjepw2XdmrUiy0r1IAmQxlPovuM9X+vJ46c3AAzKspm1MoRvxrvW/MgVTlIoXI10w59zKshkFpf3OYRJ5xhZ8MO6glRqYQZw7Q031h6Xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O4JJ9UzA; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4679b5c66d0so180711cf.1
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 04:29:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737635356; x=1738240156; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=j5Uvwp8iLFnxoJglCUJNCQCFMuDYn+JUgCWP0ESBOZs=;
-        b=O4JJ9UzAY1qyj/+zFqeNn8PsNxTBNbs9EGXdDSh9kmzuks5w83jEW7A7GjswifPIT1
-         FodIVNCS1DFX8Ytb0R9eYSEM2x46/BxdUqhJY5E+3jD/F5+qWw+vRJ9fScHwkwT7fljF
-         6uQOm5u3DUa6OZJv3NpDHTOfM3zvn27BePwwfaKxgnuC44xxcsfyOMnjvCgWKhT8PxOC
-         NDaJIXKjXiB5RkYyFjvFEjFgezZ769z7dTMzsH0ptBVoHRgHKdswOa1OEgCtsf/kXRsY
-         xwo8BUEgPjrDASdXc/6X8xT5FIORo/7PGAjoU55TUedcuTEGqsAerGx3gEEJXXGm3NiO
-         xz9w==
+	s=arc-20240116; t=1737635724; c=relaxed/simple;
+	bh=xnFi+wOJypDbDOuWBma0iM8HogcsxEUv2vuCeSTtlvw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tF76Oek0ba6GqnmXnVxWIWLPVB2jsTVg66k0HoUOBTX4bDtB4StomoahthtXqN9VdoTF5CYW8ia91vOpm2DM0uC7iix4CLzDj1GtUIR1GIJKVG250cEdn1pAm2ztLMou7XJy1B6wKLZB1/KZfXmv7pGnptDJG+tUN9OOhnJv9tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BXS7gvt3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737635721;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m8606wbDjuykWUSCHLg5Z4OmTqWmwe2NXbgkVdN2fJg=;
+	b=BXS7gvt3ENO734xEbi65Jb3pZI4p2bc3SGEj8fOpCT3j6c8OwQn8iEI0o0r0aJsBgHnNCi
+	Wpj+lqEmoLqqWIyTlX2vPIUedCxCtjAj3Dg5INjn1146aVjwj6zHHMSJEYBFKpmNO07M6R
+	Ik7ZkZgcicBW31/ldG2Tfqy6S87yqEs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-459-z4AvbsW3OCSXcj_X42Sd9Q-1; Thu, 23 Jan 2025 07:35:20 -0500
+X-MC-Unique: z4AvbsW3OCSXcj_X42Sd9Q-1
+X-Mimecast-MFC-AGG-ID: z4AvbsW3OCSXcj_X42Sd9Q
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4361efc9d1fso7076175e9.2
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 04:35:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737635356; x=1738240156;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j5Uvwp8iLFnxoJglCUJNCQCFMuDYn+JUgCWP0ESBOZs=;
-        b=M4/prn0jX6eoNFIr+4Ke10nr8pElnEK06Nm8CxNe+QZCuizIkdWTFmOMju+JGdbI9V
-         g0oYYgd8F+bmAckTKpx5m+Mizozb2NypE8ZNLJUlq3pjDxZo/Xj6/StOK7V9WPXFQGvh
-         LQSJqx6DL/6kIV9w2qjGog+85+5f7GksVVXPi7ujmo0S/ZIqyY6P3jr4bbI2q0P1mkrD
-         ROgbgtZWD7ahq/odqrsteo5or8M8zjwN/3Mp/5jvoo+fygZzYihBD+LbPYC3tDkmQJry
-         6rgrTKcdCdMfyMV3pcy59OZFfanqQvbq1QZED+MjOH/DLGZmKPESwM0KO31AoadhFbDN
-         3fnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTIVqkx+i3VbpmQaAlaT3nXgtzyxKKt4zGqdM2zd17g18aiL2UtPM7oVpAjMKjSGoe2EY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiYBpUCYbsW4lsgxMnL4tGamSgK9Kq7NXoBAYDOQEVMehJ88j9
-	SdWiP7CVxP0gH5tsFr9yGSuSdAmYX2AjhNlkZ7RH1jFAm4cv3IVn1iAD2rdfy00n/gYNlVjq+RL
-	3Bj2CrLonPZXHkEZr2kNaqSyDaCSoW5jhITvO6BP91DZ5NuLh4wik
-X-Gm-Gg: ASbGnctND5ufHJcEmUEWEgZRK1F5VeXBLo2CuLDeug/v6mx46EGH36rB/kRU75aHwh7
-	6UIOnmFZhexlj6CgfJmGqu6dVqLIqy3RzdUMJTPcbHIew9IxTv4FXvLLJPV3nbsiVA5xNV7xYcG
-	bj2yWt7d+ZntPUlg==
-X-Google-Smtp-Source: AGHT+IFo7gHEqkSt24ROLr+rcgOB4gwt3zbzIxCW0GBek3MCCfZMWVQPp/KG8PZ3z3viNEVgM3hoDHsXK0zFnQOGj2c=
-X-Received: by 2002:a05:622a:1342:b0:466:9af1:5a35 with SMTP id
- d75a77b69052e-46e5c11b2fdmr3773451cf.10.1737635356102; Thu, 23 Jan 2025
- 04:29:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737635719; x=1738240519;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m8606wbDjuykWUSCHLg5Z4OmTqWmwe2NXbgkVdN2fJg=;
+        b=rlhMjm+2xsdbq0IEdww28kpdApnEFWijXfugdL4A1zVo0s1xBOPa0ANwtYaA81j1Xv
+         aJ3tab4gia4aepmikOD3G4lb6EyKY2VBZIxkyZWutTGZhwxI4ztVQqDvCj/RPnQdQ3/T
+         ilIrCsOJmb/F3GD0i8A1Y0/lbwGUvmE4xcPZg86jEbeNUAReStJu/L5vCpAB3OCmlIgZ
+         quPPb/ilFKCbl70UZmZlbKx/HRgJzTk0V0nQh0M0fPyGnH2KQNdjWCLNVs80U5bbbzkD
+         YXOWdzcrFT/ctCG/RCR7efHdvYTjGhvgM/TSy+UG00bvXOL/nV/9ZqSpbvE+nPbLH/ME
+         cIkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvJ/LhfTyaCGHH4cxOUhS6QzC2BGEVS+UDZ27VoEZIIwWNtBb2OgHO2tey3rjZDOMx4FQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGvBotv6mx6N6dYJ29P0wtFQrIXDT1cirvDoo6VtwtPoWREEXq
+	ir+hgT9UFmTEkLYIy3N1uzpRyQZSbFT0zoaO105j6cI5bYKDnQfolSoTN/gUecLm8wEW45ypNl+
+	UYJCgP6UpDR0BClZIUSyuxkZtkAMp8+o/sDvRiJzY2k7fzYQwGO6Huew1JA==
+X-Gm-Gg: ASbGncsEb5TwTfrgNO+WaFlBoiEfBBGN9t6/5UHrCP1CDftfXNGqnKj5NhUHXN/jXwV
+	YU2B4PfH/rZKsjiq6i/p0eq0iul8qYkUCTBMXpXYpKOj2bBxBwlAYF6UqrxtTKBcMSv7LN3iCOV
+	2OvRts3NRH4B/iKcHMDRU2MZOkGbkC5op8X5650NE6xrM6FaqfHKsj/VWnb8mDu2jw6KqoQqskT
+	p3Y+7luvRnLPk3xVLgtqxavdEML2hsN2yBZ28aJo3yIseGosKxIsRIroZBnexvu
+X-Received: by 2002:a05:600c:4e89:b0:436:30e4:459b with SMTP id 5b1f17b1804b1-438913f1649mr250850325e9.18.1737635719164;
+        Thu, 23 Jan 2025 04:35:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEC4nMXDk7Ulk569V8Hjp92gcI6PLi8LlyaLduqUrS8eS5+QtUPpRjnXFGrijzXxgvwLXzPHA==
+X-Received: by 2002:a05:600c:4e89:b0:436:30e4:459b with SMTP id 5b1f17b1804b1-438913f1649mr250850045e9.18.1737635718762;
+        Thu, 23 Jan 2025 04:35:18 -0800 (PST)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31b7655sm59718235e9.30.2025.01.23.04.35.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 04:35:18 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, David Woodhouse
+ <dwmw2@infradead.org>
+Cc: paul@xen.org, Fred Griffoul <fgriffo@amazon.co.uk>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
+ Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
+In-Reply-To: <Z5FqdjTwPmnV1t-1@google.com>
+References: <20250122161612.20981-1-fgriffo@amazon.co.uk>
+ <87tt9q7orq.fsf@redhat.com> <a5d69c3b-5b9f-4ecf-bae2-2110e52eac64@xen.org>
+ <87r04u7ng7.fsf@redhat.com>
+ <06e9f951afb46098983dc009c0efbcef3fc1b246.camel@infradead.org>
+ <Z5FqdjTwPmnV1t-1@google.com>
+Date: Thu, 23 Jan 2025 13:35:17 +0100
+Message-ID: <87ldv17loa.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250122152738.1173160-1-tabba@google.com> <20250122152738.1173160-3-tabba@google.com>
- <e6ea48d2-959f-4fbb-a170-0beaaf37f867@redhat.com> <CA+EHjTxNEoQ3MtZPi603=366vxt=SmBwetS4mFkvTK2r6u=UHw@mail.gmail.com>
- <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com> <ef864674-bbcf-457b-a4e3-fec272fc2d8a@amazon.co.uk>
-In-Reply-To: <ef864674-bbcf-457b-a4e3-fec272fc2d8a@amazon.co.uk>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 23 Jan 2025 12:28:38 +0000
-X-Gm-Features: AWEUYZlk27iu21ce658i7eF8nK3E5OgorA0dDMLJ2rxkwcmmmUKAFqWMqXFFLV8
-Message-ID: <CA+EHjTxc0AwX2=htwC9to7+fYbFJsfVGT5d+BtEYVPncMgq1Mw@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 2/9] KVM: guest_memfd: Add guest_memfd support to kvm_(read|/write)_guest_page()
-To: Patrick Roy <roypat@amazon.co.uk>
-Cc: David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
-	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
-	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hi Patrick,
+Sean Christopherson <seanjc@google.com> writes:
 
-On Thu, 23 Jan 2025 at 11:57, Patrick Roy <roypat@amazon.co.uk> wrote:
+> On Wed, Jan 22, 2025, David Woodhouse wrote:
+>> On Wed, 2025-01-22 at 18:44 +0100, Vitaly Kuznetsov wrote:
+>> > > What is the purpose of the comparison anyway?
 >
+> To avoid scenarios where KVM has configured state for a set of features X, and
+> doesn't correctly handle vCPU features suddenly become Y.  Or more commonly,
+> where correctly handling such transitions (if there's even a "correct" option)
+> is a complete waste of time and complexity because no sane setup will ever add
+> and/or remove features from a running VM.
 >
+>> > > IIUC we want to ensure that a VMM does not change its mind after KVM_RUN
+>> > > so should we not be stashing what was set by the VMM and comparing
+>> > > against that *before* mangling any values?
+>> > 
+>> > I guess it can be done this way but we will need to keep these 'original'
+>> > unmangled values for the lifetime of the vCPU with very little gain (IMO):
+>> > KVM_SET_CPUID{,2} either fails (if the data is different) or does (almost)
+>> > nothing when the data is the same.
 >
-> On Thu, 2025-01-23 at 11:39 +0000, David Hildenbrand wrote:
-> > On 23.01.25 10:48, Fuad Tabba wrote:
-> >> On Wed, 22 Jan 2025 at 22:10, David Hildenbrand <david@redhat.com> wrote:
-> >>>
-> >>> On 22.01.25 16:27, Fuad Tabba wrote:
-> >>>> Make kvm_(read|/write)_guest_page() capable of accessing guest
-> >>>> memory for slots that don't have a userspace address, but only if
-> >>>> the memory is mappable, which also indicates that it is
-> >>>> accessible by the host.
-> >>>
-> >>> Interesting. So far my assumption was that, for shared memory, user
-> >>> space would simply mmap() guest_memdd and pass it as userspace address
-> >>> to the same memslot that has this guest_memfd for private memory.
-> >>>
-> >>> Wouldn't that be easier in the first shot? (IOW, not require this patch
-> >>> with the cost of faulting the shared page into the page table on access)
-> >>
-> >
-> > In light of:
-> >
-> > https://lkml.kernel.org/r/20250117190938.93793-4-imbrenda@linux.ibm.com
-> >
-> > there can, in theory, be memslots that start at address 0 and have a
-> > "valid" mapping. This case is done from the kernel (and on special s390x
-> > hardware), though, so it does not apply here at all so far.
-> >
-> > In practice, getting address 0 as a valid address is unlikely, because
-> > the default:
-> >
-> > $ sysctl  vm.mmap_min_addr
-> > vm.mmap_min_addr = 65536
-> >
-> > usually prohibits it for good reason.
-> >
-> >> This has to do more with the ABI I had for pkvm and shared memory
-> >> implementations, in which you don't need to specify the userspace
-> >> address for memory in a guestmem memslot. The issue is there is no
-> >> obvious address to map it to. This would be the case in kvm:arm64 for
-> >> tracking paravirtualized time, which the userspace doesn't necessarily
-> >> need to interact with, but kvm does.
-> >
-> > So I understand correctly: userspace wouldn't have to mmap it because it
-> > is not interested in accessing it, but there is nothing speaking against
-> > mmaping it, at least in the first shot.
-> >
-> > I assume it would not be a private memslot (so far, my understanding is
-> > that internal memslots never have a guest_memfd attached).
-> > kvm_gmem_create() is only called via KVM_CREATE_GUEST_MEMFD, to be set
-> > on user-created memslots.
-> >
-> >>
-> >> That said, we could always have a userspace address dedicated to
-> >> mapping shared locations, and use that address when the necessity
-> >> arises. Or we could always require that memslots have a userspace
-> >> address, even if not used. I don't really have a strong preference.
-> >
-> > So, the simpler version where user space would simply mmap guest_memfd
-> > to provide the address via userspace_addr would at least work for the
-> > use case of paravirtualized time?
+> More importantly, userspace is allowed to set the CPUID returned by KVM_GET_CPUID2.
+> E.g. selftests do KVM_GET_CPUID2 specifically to read the bits that are managed
+> by KVM.
 >
-> fwiw, I'm currently prototyping something like this for x86 (although
-> not by putting the gmem address into userspace_addr, but by adding a new
-> field to memslots, so that memory attributes continue working), based on
-> what we talked about at the last guest_memfd sync meeting (the whole
-> "how to get MMIO emulation working for non-CoCo VMs in guest_memfd"
-> story). So I guess if we're going down this route for x86, maybe it
-> makes sense to do the same on ARM, for consistency?
+> Disallowing that would likely break userspace, and would create a weird ABI where
+> the output of KVM_GET_CPUID2 is rejected by KVM_SET_CPUID2.
 >
-> > It would get rid of the immediate need for this patch and patch #4 to
-> > get it flying.
-> >
-> >
-> > One interesting question is: when would you want shared memory in
-> > guest_memfd and *not* provide it as part of the same memslot.
->
-> In my testing of non-CoCo gmem VMs on ARM, I've been able to get quite
-> far without giving KVM a way to internally access shared parts of gmem -
-> it's why I was probing Fuad for this simplified series, because
-> KVM_SW_PROTECTED_VM + mmap (for loading guest kernel) is enough to get a
-> working non-CoCo VM on ARM (although I admittedly never looked at clocks
-> inside the guest - maybe that's one thing that breaks if KVM can't
-> access gmem. How to guest and host agree on the guest memory range
-> used to exchange paravirtual timekeeping information? Could that exchange
-> be intercepted in userspace, and set to shared via memory attributes (e.g.
-> placed outside gmem)? That's the route I'm going down the paravirtual
-> time on x86).
+>> If they're supposed to be entirely unchanged, would it suffice just to
+>> keep a hash of them?
 
-For an idea of what it looks like on arm64, here's how kvmtool handles it:
-https://github.com/kvmtool/kvmtool/blob/master/arm/aarch64/pvtime.c
+In case we want to support both cases:
+- VMM calls KVM_SET_CPUID2 at some point in vCPU's lifetime with the
+same data it used initially;
+- VMM does KVM_GET_CPUID2 and feeds this directly into KVM_SET_CPUID2
+we can't use a hash as the later contains entries mangled by
+KVM. Currently, we kind of support both but we expect the result of the
+mangling done by KVM to always be the same.
 
-Cheers,
-/fuad
+I guess we can change the logic the following: when KVM_SET_CPUID2 is
+called on a vCPU again we check that all entries which KVM did not touch
+match. For that, we will need to keep a list of mangled entries so we
+can introduce a kvm_mangle_cpuid_entry() helper to avoid the need to
+keep a static list. Personally, I'm not sure this is not an overkill
+though.
 
+-- 
+Vitaly
 
-
-
-
-> > One nice thing about the mmap might be that access go via user-space
-> > page tables: E.g., __kvm_read_guest_page can just access the memory
-> > without requiring the folio lock and an additional temporary folio
-> > reference on every access -- it's handled implicitly via the mapcount.
-> >
-> > (of course, to map the page we still need that once on the fault path)
->
-> Doing a direct map access in kvm_{read,write}_guest() and friends will
-> also get tricky if guest_memfd folios ever don't have direct map
-> entries. On-demand restoration is painful, both complexity and
-> performance wise [1], while going through a userspace mapping of
-> guest_memfd would "just work".
->
-> > --
-> > Cheers,
-> >
-> > David / dhildenb
-> >
 
