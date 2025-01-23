@@ -1,235 +1,285 @@
-Return-Path: <kvm+bounces-36368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36369-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96012A1A5BD
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:26:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE201A1A5CE
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:35:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 503111885AC1
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:26:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F353316979A
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54EC2116F7;
-	Thu, 23 Jan 2025 14:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3BB211712;
+	Thu, 23 Jan 2025 14:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DcZC7bKa"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WRPY3nKa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2074.outbound.protection.outlook.com [40.107.244.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACF813212A
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 14:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737642355; cv=none; b=fQiXbYnQRWFLpBkPQu1sZ59ZV5IWQQIe59Qu+ZdVwsTkJBq8UdqbMraI4YG9nOVWCkJB7bw5JYpJaHsPr9IOrHHGZ4fSatZ1lAAmhehDl5CkRrlf4p6T3W44HgU8Fmr4C8CQ50lrpQOl0JJaGS0d51PFMaxahwgGRzsgbJFQKkA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737642355; c=relaxed/simple;
-	bh=wV+4Uci9wRBlIsx8M9x1/8PIrnM5ct0TWyz93clW00Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VfqTXdrTH2fd2v3zRLxeHSGLn9yQypiQB3ET7VbRZ/CFVSJvi1xk+D8Pcgx72cMAlooK/8yTn00IY3XqfS06/AqSwwsQp3KFA/NEyYmr4cXTnZHK0ZjST6BXK1jhni5BQCKbTBOJESMEMsRFddLps+8EaqEdq88XjJAQN6t688k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DcZC7bKa; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-467abce2ef9so257381cf.0
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 06:25:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737642352; x=1738247152; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=O0unFcqpZTejthcGsFFqk813fv8vChmX6x5uhJ6+ENs=;
-        b=DcZC7bKa3HhlXJAnMa0/8WBJuj9Sa+iniU73Te8p0HlwnvBRNqXgDVzEJROmsFVH8j
-         frwQJJIkDY9QDuUqi9cY/+nU0D+ipDnRIZ4oRwYp/4jBVQJTDerXAzjR5iK9niH8xKgM
-         H2U087R54Jg+nPh/ddV4cIj0CGlML7yUlwHAFtpm07A4h2BqrPSa3qlA7NX/JbCYqVOB
-         HokpQf2VUfFpJs8ZJitVRSJdNJlJtbBJKRCYJA+1jffqTnwrI+4gf1mo1ca73WfysQmz
-         FOUQryZARRLso+PstB6V17ATV3GOqMw0WsskgBloBRMbpEG9+QX5kJQIuq8VKi2cnrfn
-         5RJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737642352; x=1738247152;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O0unFcqpZTejthcGsFFqk813fv8vChmX6x5uhJ6+ENs=;
-        b=B5VROWNAea/f68Ix/v+Y8Jun1JEIRo8UublbfIUqOuqiRZzvtU6M+p8YlgFbzy9n3i
-         eusdlTyhpkp2iMnsEuxImsF85hppsFAUEgH5MyapC0RxBrlWG2B7iLeOarEBWUdViaye
-         3JFzKZaoy5x3dKhHabErWknzEfxS6tMc0oPyicR2DxrpyW9EG7BYpL333n9ORdBj06u2
-         Ud0++y4A1eX9eD8o9+1B1D2zRTh+0Ggiq0GpcS+zI6jIxzcPEXiWpQL/zc1jzTpF9b88
-         1r2YgFYxCVa1myyOTcjTWJi/4O1pP7Jq8IxTsaFbDnrmxW/r5mQ90TfSLNWFsE+UNQEp
-         N4aw==
-X-Forwarded-Encrypted: i=1; AJvYcCVKnCl1T0N+iN82ErQlM1oqQ8mc3l+UEyZNNsv4CbPiaQ/qCcfgZS8CLwxTnOFHMM3B5v4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu0G9X0AABKruFHdevzRqrMhJfYAYx62vZlDITQ15puKs2M84O
-	XlusEuCrb8RLXamSphh75+uGK4ATBf4vCRQGBnXaVLgfBsyMYwOJ//FqRCC+kyy8m43Ue3Dyeeg
-	GJoTyKZ05WHQE64FECZq8W6XzE+RU+LDAbY6c
-X-Gm-Gg: ASbGncsUmIz2PHGEhlAGFVWu+oZyAU8O0b5Ec87jGXhe7vzjbaU8smZx/Lox2E6LixZ
-	REJfXpNOuoOwIptbXyOsQoFVsOaZDSc0L8coBkanRmrPTawzDXWr+gaWBzPs96iYCmLDR/MT1eG
-	Ea7dxKm761MyAtRvA=
-X-Google-Smtp-Source: AGHT+IHwLdvO8jUAYw+ZBMsSB1pMW7qvcJFpHdLhe5NCuiwdFGJhHa+vxCZyGFrNn+6wnp2cDkISLQGNfay7DpOrLaY=
-X-Received: by 2002:a05:622a:18a3:b0:46e:2769:a4b with SMTP id
- d75a77b69052e-46e5c1225c1mr3484851cf.12.1737642351989; Thu, 23 Jan 2025
- 06:25:51 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1A11CA8D;
+	Thu, 23 Jan 2025 14:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737642933; cv=fail; b=HXu1FiSv3zGD6fB/3l/kfCMZK4hhDspP7+sCcoL/c2MMnyQoxKS+Te+TWJ97cekz5i3aIOuRKHM4GGxMRa7T5uJNNQUiIaVbQ1dzMvdw42wGNV2iiJ8F127xI4P/b98v8/9a856G+TJxFOfEL9Cyjg3L2V7TEeB4Xt/Hxjzelpo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737642933; c=relaxed/simple;
+	bh=Nicj+mrOkMd8wa/FqChGUKkFVy8mwuJfiAE7dHb1quc=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mpkmOaaKEdUOiXiAlTRYsywzoQiVjbMu8FonyaSGKQloeOnuqd68IJiC2FhvPZagBmw7dQzKRMTgx+1lMZgUAnsif4VIr2Jn4u91PN6Rv8+P7seMvcppeGPu469s0MI0nMIJKFVA+JC6mCBjoGcbRGgl1/ZC1bhoRU8gaqG/gs4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WRPY3nKa; arc=fail smtp.client-ip=40.107.244.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YnaR4yns7O2eU5LQcJewPQJdZjEnysyNjalxRO0mTfOifEJaA8Hhmq/58Hj+EfIFY/AX6ii4rM1zf/SZhW/OfjmBIYVcdELmn/jVX4JwLyb9TSXR+KHoWXrCxZPMkYM7lAt4aH4hnU0mdcGBcl73y/BI7ezoyxmUs/6w19pxHZ6vMUndZp/cfYLxn6ZoX0bboNtXtfHtdqG+7KociPhXSwPB2VBB6fdMueCrTH0nHRIpuJEk64K2B4L3CRkpD9a71UKJqOgV3D1Wa6VAlKlwl3u/qsssHg/durJgJGOfUC5p+RwRBeZ3tiFDD8konJdaGJPmrgUXBjMcWDe7SXMqJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PBU2asAspSaoQz2L4KkCEgrslSn8uS/IBFrvCiixtz8=;
+ b=zVI65BbpuJBbgClojf2FSlDJsf5CpCKvrf42eMujbrDicbQp8QKAfH3od15iSY+vfpFCHvc877t+D/5+u2zAs+JLoHk2kUwWNrxJjT3UoAjvZZ9nVJbJ1iz7EWy+oR9yTfv11h3On42eooHIys+MelFxszb1U+eu2Lq+pC+ZkmvDnZC8jKYh/eQM8F4aNf4+VwsuDCA4c5QWiY0iMLGQF/mjrJCpEb5/F4YgvI4Jq/OrOnpK5r1H6m4uLTX6AIsKbLurCvtIRTP9ofYP/SYm3k0vndAKrt1LXNFTAMMBbT5v2IBot0XmP5PUa2TgY2LRUMlB9NVi/pClfm7900FO5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PBU2asAspSaoQz2L4KkCEgrslSn8uS/IBFrvCiixtz8=;
+ b=WRPY3nKagUFoc8qQj6E3jiDtqUIOPG/UpcRDd4ngLtWRbpg6g3EZknxtUOFsCX9LrHrSL28KRQMs+TZhqSv6XsaI79L5u96p1tuNRRuZylNgLmvvcQDboKRO93lnmaSZcIVWJjWHoEm+4+DAWOt6aMYLOBQvEvtIjzpaukF0/gc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by PH0PR12MB8007.namprd12.prod.outlook.com (2603:10b6:510:28e::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Thu, 23 Jan
+ 2025 14:35:29 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5%6]) with mapi id 15.20.8377.009; Thu, 23 Jan 2025
+ 14:35:29 +0000
+Message-ID: <97db03be-df86-440d-be4a-082f94934ddf@amd.com>
+Date: Thu, 23 Jan 2025 15:35:21 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
+ Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+ pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+ vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+ yilun.xu@intel.com, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+ leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+ tao1.su@intel.com
+References: <c10ae58f-280c-4131-802f-d7f62595d013@amd.com>
+ <20250120175901.GP5556@nvidia.com> <Z46a7y02ONFZrS8Y@phenom.ffwll.local>
+ <20250120194804.GT5556@nvidia.com> <Z4_HNA4QQbIsK8D9@phenom.ffwll.local>
+ <20250121173633.GU5556@nvidia.com> <Z5DQsyV0vwX3Iabu@phenom.ffwll.local>
+ <6612c40d-4999-41a1-a4a5-74d3ff5875c3@amd.com>
+ <20250122143744.GF5556@nvidia.com>
+ <827315b0-23b6-4a39-88eb-34e756298d67@amd.com>
+ <20250123135946.GQ5556@nvidia.com>
+ <9a36fba5-2dee-46fd-9f51-47c5f0ffc1d4@amd.com>
+Content-Language: en-US
+In-Reply-To: <9a36fba5-2dee-46fd-9f51-47c5f0ffc1d4@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR3P281CA0029.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1c::22) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250122152738.1173160-1-tabba@google.com> <20250122152738.1173160-3-tabba@google.com>
- <e6ea48d2-959f-4fbb-a170-0beaaf37f867@redhat.com> <CA+EHjTxNEoQ3MtZPi603=366vxt=SmBwetS4mFkvTK2r6u=UHw@mail.gmail.com>
- <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com> <ef864674-bbcf-457b-a4e3-fec272fc2d8a@amazon.co.uk>
- <CA+EHjTxc0AwX2=htwC9to7+fYbFJsfVGT5d+BtEYVPncMgq1Mw@mail.gmail.com>
- <bc59a2ec-7467-4a4e-8d73-9c4126b1c98b@amazon.co.uk> <164e9d74-2f1f-4557-afda-06712e8415b0@redhat.com>
-In-Reply-To: <164e9d74-2f1f-4557-afda-06712e8415b0@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 23 Jan 2025 14:25:14 +0000
-X-Gm-Features: AWEUYZlU5gjG70FmBSxfrrVHIoqMlts0zx6RtYRcoY0_rdwnFzhkEd9xFPpJokE
-Message-ID: <CA+EHjTyKaqDDp=5eZH3Sfoha0KSv616x4NVNr=-h28AaXy1siw@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 2/9] KVM: guest_memfd: Add guest_memfd support to kvm_(read|/write)_guest_page()
-To: David Hildenbrand <david@redhat.com>
-Cc: Patrick Roy <roypat@amazon.co.uk>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
-	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
-	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|PH0PR12MB8007:EE_
+X-MS-Office365-Filtering-Correlation-Id: 75e05991-b5c6-4494-6b46-08dd3bbb2f20
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?eEdIbzFiYmFEbXA5VnV2NHM4emlOeTNjaGtXK1VKZ0hNT3VsODlidThlRUN4?=
+ =?utf-8?B?QXFSRGVmaFRuN3NMRjA2QWdacmdxWlBWVzNRbENEYkNBb0Q0c3g4STRYN0N2?=
+ =?utf-8?B?U3YvQmdmdUpMWnRWamVCUGw3SkZxTEM1LytvNXFOajdZZGRwNHRIbTlPK1Zs?=
+ =?utf-8?B?OGgxckM2U0o3Vm9Gc3N6V1BOTTgzN0dBMk0xKy9HVmd0OThOSVZWenh2cHNE?=
+ =?utf-8?B?ZzRYYmxoUjF6K3cvdHNiWE50WEc2clJDSXptSFRBRTQxeGpHeUoxK3dmcm41?=
+ =?utf-8?B?VWF5MnZzZTV3NWpLUEhlYVUyQ2t0Ukw5WGhwVjljdkt4NlpuQWRveElIdytE?=
+ =?utf-8?B?SUJLQ1UwK0FLczRlWllXVnhmKzJGK2Zzd1ZOMFkzT3o3S2xMaWNjY3pCVTdX?=
+ =?utf-8?B?TnRDeXE1K044TGhUdnZhTTJKOXJJZ0Vpd0M0aWFYUWNDRUdKS0tFVkoxNkZv?=
+ =?utf-8?B?NVlIMFZyekxIZlpSZFNpUDk5R3IvUVVIMG1md3BKKzlFYVlSTTQzRExtSjZh?=
+ =?utf-8?B?UnYrNVljK3VyUDA2L0pwL1FuczBCRDd4ZVZ5N25uaXRMYU9uOHl5N1EvVVZz?=
+ =?utf-8?B?dHJMNWMrQXJLbk5ZSTN5Mlh5WlJVemo5MVRlKzNzSkRyTDV6SC9XS1lQU09t?=
+ =?utf-8?B?M3BuaGRCYXlYZ2hXcGg5TmliTG5mTDVwSUU0WFFPUDFkODdNMk44U0s0ZnNw?=
+ =?utf-8?B?MG5CZk9Vd3hPUERlWmVDaEhaUnRzWU1PaHM3Z2NEVUUxZUkwZnF3NzgyMWFC?=
+ =?utf-8?B?alVoekEzakZncVEwaFV2Nll1VjNnV25yemNmUitvYjM1am5HdXhFaE5lNmhX?=
+ =?utf-8?B?SGR3eHNpYm01RTRHQXpQcUFndTlrNW1mV1dYUjlNaUY1WTlDVjMxTW5yOG5C?=
+ =?utf-8?B?ZHBRNWMvbXJFdlVGa3pmQ2R5OEJxN0l6Z0YrQnNQcENibGMxVWFPZzR2RUZJ?=
+ =?utf-8?B?T0F2V3VoUVFJU0ZQREgxNWNXNWtzcFdVWlVhbmlXWVNIQTI3cGtpeGZ4dW1n?=
+ =?utf-8?B?RWpNZmNMeVpLWDlzL0hobEFlaXM3aDVLc3k1S2NTOVpGMVA3cmZNM0VMOHIy?=
+ =?utf-8?B?alZYaVRtUDczZ2VKbmdGem9UTk1zeUVyNjJ6N0NFbitzN1lpdHBDOGZ3bE9u?=
+ =?utf-8?B?UUlXemJnVWJtY1JxMWdVaEVFZVhUOEkwYjY2ZTBGL2NzZzJ2UXFkaHpoTVcy?=
+ =?utf-8?B?UEdWSVo4UWJxK1dDVEN6NUJrb0VCK3lmVDBET0d4bHQzdDc3YlBYM0taNXln?=
+ =?utf-8?B?d25nM3Z3Z3cwRWh0U1ZRVnhDbHpZSmRwWENLVExVYnYya3RId1d4Mkx3dHd1?=
+ =?utf-8?B?eTQxMzdjdjErTnBGUG9YajdoN3F4NzJveHlnM00vci8rQ0F6SXA4YVZLU2lD?=
+ =?utf-8?B?RnB5RnV4Vks5VGdlUE5kUXlOWFo3a1JtRWZubVJrS3Z4VU9DZTdIL3RkRHdm?=
+ =?utf-8?B?b1h5dHAyeWcwM1podktOU1NXZVJpSnR3Y1JJUkpzNG5MMXlEVVl6SlRBOEpr?=
+ =?utf-8?B?R1VnVW83RFVHRWZRSVgzQ05nbUxjM1ZOOXpGWHZ0am4wQWNWQkpSVTE0MzZ6?=
+ =?utf-8?B?b2wrTUFlMGlJbE11RnpaQ212L1lZbTRmVGc3eUZ2dGR0dHpneEtLblY4dDJT?=
+ =?utf-8?B?RWkrbzkyMGQvS0xSY3dsY1ZZZjd2OXUwOG1uUUZWZVlmK01pczJXQjFSSFNy?=
+ =?utf-8?B?QjFJaEtuYm82VVh2dFlCNFZCWHNpcVhkemlFekV3dnduQjRkdDh0Y01WZFBW?=
+ =?utf-8?B?V0laRENlRVN4SnltTzUyWk1yeVQ1UXdyQWdvSXhydW55cVBTTUc0V2VCakpK?=
+ =?utf-8?B?RlN2VEJSSU9xU0FZamJiTVpwMHBGNi92Y29vWEhMSzFMSzd0Yzh6QzQ0d3Y1?=
+ =?utf-8?Q?oz9zSZ5grnQBz?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VHdickVXKzBvdHhkSHFEbFFydVlvRW9nd2c2dTF3aHdpeHVPcmpPZkNybzVM?=
+ =?utf-8?B?b1psNitxbXZubHIrcFN4QkdnOHcvaWxEZ3I3bEtJNjVLZ2Yxblpjc0dNem1u?=
+ =?utf-8?B?MFNocUlFSXVpQTZieUQ1ajFyeTg1OEVMNE8wajRGc1JGUzdoaUlCNFJCNWlP?=
+ =?utf-8?B?VGdKbk0yT3RNTHAyL1JDOHE1cUk5bmNES3JIeWxpUjQvNG1RUTd3S1YwM0xF?=
+ =?utf-8?B?VHE4NWU5YXNIUUgxZDdiL0FCbUtFaWJvbU51MHVKMDdRR2pUUzN0NnNzMTZ2?=
+ =?utf-8?B?TmRnd0NoaG1ydzRTb2RsN0RQdjFFZnNYVWNwQm51V1VQSGIyZmNDcUdiZDNC?=
+ =?utf-8?B?bmxvUnB0ZnFMUjNxMEcrbkZXUFNadlhHVklxd1ZlUEVObDUvM3EwOEdqSGhW?=
+ =?utf-8?B?QUpRaXRMNjFzdUsvV2hsSUdIbGs1a0drbGRvTjRwcU9zT1l2QjB2MW50SXcr?=
+ =?utf-8?B?ZW1heHJocGtib2lGRmNLaTJhT3BXZ1RKMEp2WXUvdGtvbUsrcmxYV3loUnM2?=
+ =?utf-8?B?WHF2eTlRU1hNams4VXN3bXVRNzZOWHBKZzdkR1JCUHd1a1Nudmlxc3U3dlB2?=
+ =?utf-8?B?aGlGbHBrdThBVEt2QmtMTDdmM0ZrcWR4ZEVyYlU3Q255eU5wZDlvZGRJbjVl?=
+ =?utf-8?B?STdUdlQ1VXR3RWVHZlRmVnNNbVB1ZGpzYldwUzFQT1EyOXpDdG1zMVpRSExY?=
+ =?utf-8?B?aXFHODJJeUhocW1EY0hqR3IyMDhOWGxyaU14T096Tkg0ckhXNlBvekhYbGRn?=
+ =?utf-8?B?OVFrczdVaVlZYkN1QWg5S1dTZGtUWUg5bjR1V1lXeWdlSDR1b2FiL3Zmb3pi?=
+ =?utf-8?B?QU0vL0tHeWozTVp3WVBuWUlOQklBbXhuek5tWGxObVpBZEl3MVkwY2hVTXZL?=
+ =?utf-8?B?RTNoREtQUWtpQkNkcXRlMnorVk96b0Q1cGhXZkErU1c5eUc1SmNwVHBiVWdl?=
+ =?utf-8?B?eUZOMHEyRC8ra0piZ2R6VnVYbDFxT05JYVczRUZYVGM0cGV6N1Q4T2Z6OUZq?=
+ =?utf-8?B?U2Z0ZmJoYTNNc010cHhuYTY5aS9RM1hYSi9CTWVTbVE4OXRMUDJVWlRtN2lR?=
+ =?utf-8?B?QjM2L0xrenRpNmFrTWJra0tEWVBsVm1tWEFsUGtvVFV0ejd2a3RoY25SbEwz?=
+ =?utf-8?B?UFlYa1NaenlUQjJDMHRyUjdQTWFLZXNpYk1CdmVXc3YybTlDQ2Z3czd1V29j?=
+ =?utf-8?B?ZlU2eDBPNlFhR0ZpbUwweUpWRXl5YnpMMHlQZng3T2lhY2hTZ3NoZDNQMzVz?=
+ =?utf-8?B?N1loY3A0QjFFdWljejl4Ly80dnBBcHJDTWdhMm5hZkx4SGY2YXBFTHJMN3dK?=
+ =?utf-8?B?YVJEUTMxT1RKM2M2RTVhWHRSeDJBQ1l2MnFvd2JmaFZGQm1DWTlrSjZPbVRl?=
+ =?utf-8?B?SFIwcVhWMlVHWHpMOHNTM2NyMENnVHJtVFNERzlMUlFtZVU4dmJHbWI1ZUdn?=
+ =?utf-8?B?VFhNT3phVEdTSUEraUVVR0VveGxWSW9VZVNCRW1BVmhZb0h0L2hHemZQcHo2?=
+ =?utf-8?B?Mll6K0YwcVBESFdJblR3eTNPZTcxekZPWWhjOWZOL09Gb3Q2bkYyWTNjcTBQ?=
+ =?utf-8?B?UEhpZ25yY29jcW5VaFBuK0RrSThEM2NHT0dXV0lvSnRBS2IySGRtNE10azg3?=
+ =?utf-8?B?c2pyUzlSczdldlg5alRadi90SVJFcklMNVJpRlFMbzZ2STF5UW4zZk50ajgx?=
+ =?utf-8?B?QjZVZVo0Z3planpMZmhRUDF3N3lKQ3RKL25ud3FkakE5YTFoU0hDQ0NjbjZ0?=
+ =?utf-8?B?VmQ3eGdpWE4yazN5STlXejFGaVAzWndvY1VlVjFGckpNbnVJbGF1emI0Rm84?=
+ =?utf-8?B?cnI4aUt4MXZuTDJPS2t6TDVNV2FyTzNEcmpPeCtsb3RuMlVPYUxJYUprRkls?=
+ =?utf-8?B?MVZMWVNmTFFjay9wS01KNkRiZk1WT0dpZmppSFJCQmlhNUJJVnEwQ28rTjdu?=
+ =?utf-8?B?UEpkWG1lU1JCZXZzMW1UakEyVXFZK0Y4bmdGVTF5L2Z0TlJzVzJIY2NTdTU2?=
+ =?utf-8?B?L2UvV1NhZVA2bkd0dmp3Z3lrblBIeWg3enJJdmpzWUxDUEplNG42Zm8wN3lS?=
+ =?utf-8?B?NkFtTGg3c3ZVR1JTS0pYdmNFY2pjbWJrY3prN3RtV1Z6L3YyaWRLQzV5M21J?=
+ =?utf-8?Q?PrcqUxF8+rVZpFfHGIjb1tv30?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75e05991-b5c6-4494-6b46-08dd3bbb2f20
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2025 14:35:29.4933
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /0K5xjnb49a6qhjzDq+ngxjRsSFMoLxCMqgyfkvIYHha76eFjaTOgI68jOsAY3SO
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8007
 
-On Thu, 23 Jan 2025 at 14:21, David Hildenbrand <david@redhat.com> wrote:
->
-> On 23.01.25 14:57, Patrick Roy wrote:
-> >
-> >
-> > On Thu, 2025-01-23 at 12:28 +0000, Fuad Tabba wrote:
-> >> Hi Patrick,
-> >>
-> >> On Thu, 23 Jan 2025 at 11:57, Patrick Roy <roypat@amazon.co.uk> wrote:
-> >>>
-> >>>
-> >>>
-> >>> On Thu, 2025-01-23 at 11:39 +0000, David Hildenbrand wrote:
-> >>>> On 23.01.25 10:48, Fuad Tabba wrote:
-> >>>>> On Wed, 22 Jan 2025 at 22:10, David Hildenbrand <david@redhat.com> wrote:
-> >>>>>>
-> >>>>>> On 22.01.25 16:27, Fuad Tabba wrote:
-> >>>>>>> Make kvm_(read|/write)_guest_page() capable of accessing guest
-> >>>>>>> memory for slots that don't have a userspace address, but only if
-> >>>>>>> the memory is mappable, which also indicates that it is
-> >>>>>>> accessible by the host.
-> >>>>>>
-> >>>>>> Interesting. So far my assumption was that, for shared memory, user
-> >>>>>> space would simply mmap() guest_memdd and pass it as userspace address
-> >>>>>> to the same memslot that has this guest_memfd for private memory.
-> >>>>>>
-> >>>>>> Wouldn't that be easier in the first shot? (IOW, not require this patch
-> >>>>>> with the cost of faulting the shared page into the page table on access)
-> >>>>>
-> >>>>
-> >>>> In light of:
-> >>>>
-> >>>> https://lkml.kernel.org/r/20250117190938.93793-4-imbrenda@linux.ibm.com
-> >>>>
-> >>>> there can, in theory, be memslots that start at address 0 and have a
-> >>>> "valid" mapping. This case is done from the kernel (and on special s390x
-> >>>> hardware), though, so it does not apply here at all so far.
-> >>>>
-> >>>> In practice, getting address 0 as a valid address is unlikely, because
-> >>>> the default:
-> >>>>
-> >>>> $ sysctl  vm.mmap_min_addr
-> >>>> vm.mmap_min_addr = 65536
-> >>>>
-> >>>> usually prohibits it for good reason.
-> >>>>
-> >>>>> This has to do more with the ABI I had for pkvm and shared memory
-> >>>>> implementations, in which you don't need to specify the userspace
-> >>>>> address for memory in a guestmem memslot. The issue is there is no
-> >>>>> obvious address to map it to. This would be the case in kvm:arm64 for
-> >>>>> tracking paravirtualized time, which the userspace doesn't necessarily
-> >>>>> need to interact with, but kvm does.
-> >>>>
-> >>>> So I understand correctly: userspace wouldn't have to mmap it because it
-> >>>> is not interested in accessing it, but there is nothing speaking against
-> >>>> mmaping it, at least in the first shot.
-> >>>>
-> >>>> I assume it would not be a private memslot (so far, my understanding is
-> >>>> that internal memslots never have a guest_memfd attached).
-> >>>> kvm_gmem_create() is only called via KVM_CREATE_GUEST_MEMFD, to be set
-> >>>> on user-created memslots.
-> >>>>
-> >>>>>
-> >>>>> That said, we could always have a userspace address dedicated to
-> >>>>> mapping shared locations, and use that address when the necessity
-> >>>>> arises. Or we could always require that memslots have a userspace
-> >>>>> address, even if not used. I don't really have a strong preference.
-> >>>>
-> >>>> So, the simpler version where user space would simply mmap guest_memfd
-> >>>> to provide the address via userspace_addr would at least work for the
-> >>>> use case of paravirtualized time?
-> >>>
-> >>> fwiw, I'm currently prototyping something like this for x86 (although
-> >>> not by putting the gmem address into userspace_addr, but by adding a new
-> >>> field to memslots, so that memory attributes continue working), based on
-> >>> what we talked about at the last guest_memfd sync meeting (the whole
-> >>> "how to get MMIO emulation working for non-CoCo VMs in guest_memfd"
-> >>> story). So I guess if we're going down this route for x86, maybe it
-> >>> makes sense to do the same on ARM, for consistency?
-> >>>
-> >>>> It would get rid of the immediate need for this patch and patch #4 to
-> >>>> get it flying.
-> >>>>
-> >>>>
-> >>>> One interesting question is: when would you want shared memory in
-> >>>> guest_memfd and *not* provide it as part of the same memslot.
-> >>>
-> >>> In my testing of non-CoCo gmem VMs on ARM, I've been able to get quite
-> >>> far without giving KVM a way to internally access shared parts of gmem -
-> >>> it's why I was probing Fuad for this simplified series, because
-> >>> KVM_SW_PROTECTED_VM + mmap (for loading guest kernel) is enough to get a
-> >>> working non-CoCo VM on ARM (although I admittedly never looked at clocks
-> >>> inside the guest - maybe that's one thing that breaks if KVM can't
-> >>> access gmem. How to guest and host agree on the guest memory range
-> >>> used to exchange paravirtual timekeeping information? Could that exchange
-> >>> be intercepted in userspace, and set to shared via memory attributes (e.g.
-> >>> placed outside gmem)? That's the route I'm going down the paravirtual
-> >>> time on x86).
-> >>
-> >> For an idea of what it looks like on arm64, here's how kvmtool handles it:
-> >> https://github.com/kvmtool/kvmtool/blob/master/arm/aarch64/pvtime.c
-> >>
-> >> Cheers,
-> >> /fuad
-> >
-> > Thanks! In that example, kvmtool actually allocates a separate memslot for
-> > the pvclock stuff, so I guess it's always possible to simply put it into
-> > a non-gmem memslot, which indeed sidesteps this issue as you mention in
-> > your reply to David :D
->
-> Does that work on CC where all memory defaults to private first, and the
-> VM explicitly has to opt into marking it shared first, or how exactly
-> would the flow of operations be in the cases of the non-gmem ("good
-> old") memslot?
+Sending it as text mail once more.
 
-We use a normal memslot, without the KVM_MEM_GUEST_MEMFD flag, and
-consider that kind of slot to be shared by default.
-
-Cheers,
-/fuad
-
-> --
-> Cheers,
+Am 23.01.25 um 15:32 schrieb Christian König:
+> Am 23.01.25 um 14:59 schrieb Jason Gunthorpe:
+>> On Wed, Jan 22, 2025 at 03:59:11PM +0100, Christian König wrote:
+>>>>> For example we have cases with multiple devices are in the same IOMMU domain
+>>>>> and re-using their DMA address mappings.
+>>>> IMHO this is just another flavour of "private" address flow between
+>>>> two cooperating drivers.
+>>> Well that's the point. The inporter is not cooperating here.
+>> If the private address relies on a shared iommu_domain controlled by
+>> the driver, then yes, the importer MUST be cooperating. For instance,
+>> if you send the same private address into RDMA it will explode because
+>> it doesn't have any notion of shared iommu_domain mappings, and it
+>> certainly doesn't setup any such shared domains.
 >
-> David / dhildenb
+> Hui? Why the heck should a driver own it's iommu domain?
 >
+> The domain is owned and assigned by the PCI subsystem under Linux.
+>
+>>> The importer doesn't have the slightest idea that he is sharing it's DMA
+>>> addresses with the exporter.
+>> Of course it does. The importer driver would have had to explicitly
+>> set this up! The normal kernel behavior is that all drivers get
+>> private iommu_domains controled by the DMA API. If your driver is
+>> doing something else *it did it deliberately*.
+>
+> As far as I know that is simply not correct. Currently IOMMU 
+> domains/groups are usually shared between devices.
+>
+> Especially multi function devices get only a single IOMMU domain.
+>
+>> Some of that mess in tegra host1x around this area is not well
+>> structured, it should not be implicitly setting up domains for
+>> drivers. It is old code that hasn't been updated to use the new iommu
+>> subsystem approach for driver controled non-DMA API domains.
+>>
+>> The new iommu architecture has the probing driver disable the DMA API
+>> and can then manipulate its iommu domain however it likes, safely. Ie
+>> the probing driver is aware and particiapting in disabling the DMA
+>> API.
+>
+> Why the heck should we do this?
+>
+> That drivers manage all of that on their own sounds like a massive 
+> step in the wrong direction.
+>
+>> Again, either you are using the DMA API and you work in generic ways
+>> with generic devices or it is "private" and only co-operating drivers
+>> can interwork with private addresses. A private address must not ever
+>> be sent to a DMA API using driver and vice versa.
+>>
+>> IMHO this is an important architecture point and why Christoph was
+>> frowning on abusing dma_addr_t to represent things that did NOT come
+>> out of the DMA API.
+>>
+>>> We have a very limited number of exporters and a lot of different importers.
+>>> So having complexity in the exporter instead of the importer is absolutely
+>>> beneficial.
+>> Isn't every DRM driver both an importer and exporter? That is what I
+>> was expecting at least..
+>>
+>>> I still strongly think that the exporter should talk with the DMA API to
+>>> setup the access path for the importer and *not* the importer directly.
+>> It is contrary to the design of the new API which wants to co-optimize
+>> mapping and HW setup together as one unit.
+>
+> Yeah and I'm really questioning this design goal. That sounds like 
+> totally going into the wrong direction just because of the RDMA drivers.
+>
+>> For instance in RDMA we want to hint and control the way the IOMMU
+>> mapping works in the DMA API to optimize the RDMA HW side. I can't do
+>> those optimizations if I'm not in control of the mapping.
+>
+> Why? What is the technical background here?
+>
+>> The same is probably true on the GPU side too, you want IOVAs that
+>> have tidy alignment with your PTE structure, but only the importer
+>> understands its own HW to make the correct hints to the DMA API.
+>
+> Yeah but then express those as requirements to the DMA API and not 
+> move all the important decisions into the driver where they are 
+> implemented over and over again and potentially broken halve the time.
+>
+> See drivers are supposed to be simple, small and stupid. They should 
+> be controlled by the core OS and not allowed to do whatever they want.
+>
+> Driver developers are not trust able to always get everything right if 
+> you make it as complicated as this.
+>
+> Regards,
+> Christian.
+>
+>> Jason
+>
+
 
