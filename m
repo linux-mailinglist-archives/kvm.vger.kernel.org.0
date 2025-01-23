@@ -1,231 +1,186 @@
-Return-Path: <kvm+bounces-36423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1DEDA1A9F2
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 20:04:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB96A1AA56
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 20:30:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28CF0188AF24
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 19:04:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2921168975
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 19:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E203B1ADC73;
-	Thu, 23 Jan 2025 19:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD88192B76;
+	Thu, 23 Jan 2025 19:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="uvLv3gxW"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mXrnefq+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2087.outbound.protection.outlook.com [40.107.93.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9DE14A4FB;
-	Thu, 23 Jan 2025 19:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737659033; cv=none; b=tDlOhl1Nao7pkOLza0S4F9wHkedwbP9TZFl8/E+Z80VnMnSO0EVTYjzTcKzB+jLIMa6kLR5/02ZScOJlEsjupmNsx7ZeNT7fdSesmVuGoKgl2qoDK6SMhFz9UlO+nZ7Ze6r/sGExuDFYPA6G9POsx/erXUh1Qyjm1t29AKsLKOI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737659033; c=relaxed/simple;
-	bh=v6WY3ejYSVEbWP8+euITQ1sLLWgQLcrQl1w2qb4OhZE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PYCD1mHd/cSKXafvY84Z0EABpXvnlsH8WlhRMH6fE0O1k2cGmhS0GGigsrJxmAg0HyReGbbGrKxDDVNQ4EUWsg/S8nwAuWS6r9PbOxnNY5seV/FtfxqSzdtveUKGhz8pFDZhvxZs3hV+Fe01P0TQ1JBxYGu4fPOonbMmkikluBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=uvLv3gxW; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1737659031; x=1769195031;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+Weo7nq53cssNLx9atS4Hnhx+PvjEQq16dcM+yILaQM=;
-  b=uvLv3gxWAq7XGlseEpQQH1utM1q5IInaIMLT6AAOLoLcTtmV4G1APr9W
-   u+Dr7zZnCXiOGBhjC3UtPZ2R+UnsMpJGDFd2aG+teKt2q27l2jsbTo0Nj
-   4Z/hZj29FahuKSpYNMOMqpYGC7fMheWGgpxhC/AWDx1n3OyfjtnzHmb+j
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.13,229,1732579200"; 
-   d="scan'208";a="16652907"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 19:03:48 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.43.254:39723]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.45.135:2525] with esmtp (Farcaster)
- id 9206942a-a86a-4a56-bf96-3f7a958e444a; Thu, 23 Jan 2025 19:03:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 9206942a-a86a-4a56-bf96-3f7a958e444a
-Received: from EX19D007EUA003.ant.amazon.com (10.252.50.8) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 23 Jan 2025 19:03:46 +0000
-Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19D007EUA003.ant.amazon.com (10.252.50.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 23 Jan 2025 19:03:46 +0000
-Received: from email-imr-corp-prod-iad-all-1a-059220b4.us-east-1.amazon.com
- (10.43.8.6) by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Thu, 23 Jan 2025 19:03:45 +0000
-Received: from dev-dsk-fgriffo-1c-69b51a13.eu-west-1.amazon.com (dev-dsk-fgriffo-1c-69b51a13.eu-west-1.amazon.com [10.13.244.152])
-	by email-imr-corp-prod-iad-all-1a-059220b4.us-east-1.amazon.com (Postfix) with ESMTPS id 961B2420F6;
-	Thu, 23 Jan 2025 19:03:44 +0000 (UTC)
-From: Fred Griffoul <fgriffo@amazon.co.uk>
-To: <kvm@vger.kernel.org>
-CC: <griffoul@gmail.com>, <vkuznets@redhat.com>, Fred Griffoul
-	<fgriffo@amazon.co.uk>, Sean Christopherson <seanjc@google.com>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
- Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
-	<hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Paul Durrant
-	<paul@xen.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: x86: Update Xen TSC leaves during CPUID emulation
-Date: Thu, 23 Jan 2025 19:02:53 +0000
-Message-ID: <20250123190253.25891-1-fgriffo@amazon.co.uk>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D421ADC88;
+	Thu, 23 Jan 2025 19:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737660614; cv=fail; b=FY6WMQc9tS5LuP2QMeUEnVnkOkEZohtXvU5uNbfPQMe823HUczQi/hNuwiFop/iEFmCOsmV/O+C8EtTm/ypwtEf4CR/eerXKowxk7Uh+AYSEOBGih9dumneITju8M2PCcnRRCkMlpzCUoygHPlQUCFwuLu4xUP/w8Ym0I1wRbcw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737660614; c=relaxed/simple;
+	bh=AIHVOBN5xdaHQHhyDuI5dpDYGssxcKf4kTWeKFuhkjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=E8vl7K4H+/WvyMQRmBnqFs1PUOuWJirJ7Imp3mMV5pfqMl7NEkr6xNz2PF4M9gndQXEyYKyB5upSCjCfGrhPqL4dJ3fAI7LiefP2e1uJruYL142nqa3SXGIvZ7jmOBhMYvB+P9rfkJ3xMtNJGWGFWiaX3Fgknt1/GW0I/p+Lp00=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mXrnefq+; arc=fail smtp.client-ip=40.107.93.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bEzm3kQC11YViktksFK4yCQsElsbiEgbntA9ax2lkC+NX8HuE9pVOM0UF1Bcw8niCXauwbLELIWMMl56zo22C019mvLsVarbFUGNlXQSh0w9ZGA0K6euWAuFi1U9XeS4ICD5hs26PCqKDJi4gL2EIKey9hdlYnmkrGwtVdm5cppOxBLzpAuuxgF7unfO3kSxtjSPuk4NMIb897K8vxAUTGQwFp7HbHI74tjfFZ1Lw1MmvvKfle9HM3LaabnG6ZSfs6QKcKlXK+AJY+sxyQIrj8j6W5TY/2Z9Bw6RmF+ZrjiF57P2tN0EdBzYotg7/n5mzTNklA3+wXga1baPA5X8Uw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AIHVOBN5xdaHQHhyDuI5dpDYGssxcKf4kTWeKFuhkjs=;
+ b=CBRzAFTY5vVE6TNVyi7FdNiIekdxRZaGy2ljeQrEoVJp3+zAQUS7+QM6ENQW0qOwguy15Hng3Jq4pBGuqP3rXHLLeIh8NM8DmYrdCOFsAax3bJhDAWc6iSByXUFrp+UgCOtF3so19ZSD+sP7O6bn+/pZ5aXrCuTKG87ykmX2n0yegqBpls/HkPBfym4HMLtpEWrMpol+Fsm3y70UtYVhNk2D/F3tBAuLmWJxBD2v4Zo9piLdQRlpVqETsnBqVlXNbKOOKAa3nVVQniU343mcCbfPZ56u/Fz0hHzPBGfLjTL4Ueylvl0zGz1G3VrP6XMDIRHq4MNr45cpWbJ7rLZMSQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AIHVOBN5xdaHQHhyDuI5dpDYGssxcKf4kTWeKFuhkjs=;
+ b=mXrnefq+PxV9Ik52Kso7H6e45Y8Mo+AeVRsBlX6WogBi2az6Lt8NxgwD3SttqJVuGG6ZNETuJK9LtbRlWOqMXb3/jfoEHIFdKDfHZEBGGvxMbQkO1ugfTVAzHK8RWJRze6KURnxaQ5syRftKR6ScbXXHmvGxjJDg7O9s/+z3D/ibMZs6jFrBN83cGLrByB96UUYXhRmiGgE4CJGY2oAEME/eUrNH7pozPDDRl67SvUu1dnK3+qk4scS7ZrXbGOqLcjHxq1eA4KjgndSMifJJ/OWk5X0leEbV8PajSOanqURKLHWP3fjvNQF/zlDXEFpRsnszTrkR2luVhR/cdXO+bw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by IA0PR12MB7751.namprd12.prod.outlook.com (2603:10b6:208:430::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.22; Thu, 23 Jan
+ 2025 19:30:07 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8356.010; Thu, 23 Jan 2025
+ 19:30:07 +0000
+Date: Thu, 23 Jan 2025 15:30:06 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: will@kernel.org, robin.murphy@arm.com, kevin.tian@intel.com,
+	tglx@linutronix.de, maz@kernel.org, alex.williamson@redhat.com,
+	joro@8bytes.org, shuah@kernel.org, reinette.chatre@intel.com,
+	eric.auger@redhat.com, yebin10@huawei.com, apatel@ventanamicro.com,
+	shivamurthy.shastri@linutronix.de, bhelgaas@google.com,
+	anna-maria@linutronix.de, yury.norov@gmail.com, nipun.gupta@amd.com,
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, patches@lists.linux.dev,
+	jean-philippe@linaro.org, mdf@kernel.org, mshavit@google.com,
+	shameerali.kolothum.thodi@huawei.com, smostafa@google.com,
+	ddutile@redhat.com
+Subject: Re: [PATCH RFCv2 07/13] iommufd: Implement sw_msi support natively
+Message-ID: <20250123193006.GA1056867@nvidia.com>
+References: <cover.1736550979.git.nicolinc@nvidia.com>
+ <f70451cf4274bc5955824efe9f98ec7dfdd10927.1736550979.git.nicolinc@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f70451cf4274bc5955824efe9f98ec7dfdd10927.1736550979.git.nicolinc@nvidia.com>
+X-ClientProxiedBy: BN8PR12CA0009.namprd12.prod.outlook.com
+ (2603:10b6:408:60::22) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|IA0PR12MB7751:EE_
+X-MS-Office365-Filtering-Correlation-Id: 67bf1bc7-bdab-4632-40fd-08dd3be45819
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?GgNlHvf60S941ZDMSlI0A/WlqzR44+DUyfZ8Ko/KA92fU3ILT1KvBft44Z7u?=
+ =?us-ascii?Q?8fTSVBfB7lNTZACKB6zg9hjPUXKLmR2H4kSv0lK0v2PNaoAxjwQwgRnkJvnJ?=
+ =?us-ascii?Q?Qx/BpMZ9ExlUIuGfUaMroFvsbLwkZIux2X9Mb7mPzYjzfy0pYpbx8lyeer5O?=
+ =?us-ascii?Q?K7+6LIdOhB2uVUWQRE8BkxMZX3BwFRpVGF7/dK8fh+gDzCiQLq+FRqHX0Uoj?=
+ =?us-ascii?Q?d4z3S33mRhqt3BnL5YJZo+XSQAg7ZYAR3tJbCex3mf1jsMG4wdKIXxkB3b3r?=
+ =?us-ascii?Q?a6FpuAma2TmIULiunzcMtad4mXZBkEAfkbjkrTENhu2oZ2O2IOePT6u/gtkx?=
+ =?us-ascii?Q?S1WD9YtJ0NoO6YA5If5VIpEqesfzwaujYkoXAKAJ2/cTAVwE95Vj2Uhx3llE?=
+ =?us-ascii?Q?ss3dO+M26jmh7Ou6wAC5ATZR+iUpFXbsE1Zb5Dtgj7Wx8ddiFBFcRZ6B5dpy?=
+ =?us-ascii?Q?zVBc3PbD/CD9jqx6i2cE9ITkd7u4ZH3kE2rAYyD5AeTrtJunOgEOFopsyi7A?=
+ =?us-ascii?Q?Lv40u55a8SWHgxinK8XYCBAUuMSet8qY+/hrE457UiBLZMjC85P0OPb+eZ0A?=
+ =?us-ascii?Q?2t3D6MXJPKB59UZK5tw3On+8j3hB1OiTl3GbgseVPAy4xO0NWBwXlZqKX6uz?=
+ =?us-ascii?Q?io1qOSPH8MHZJUfxYS14mOSBuyueVjxR0rNHFGsXtv8qGsueHLDX5l8+cftu?=
+ =?us-ascii?Q?noP4OSyE0XzPK2dm/t0Zkw5f8jSSCA7LWTVZtHrBj/u4Oj9L1FGWhJQCh8s6?=
+ =?us-ascii?Q?ajOX9dndAZIg/P742tYV6MaGpEeu4SSLeg2CDAEAaZ6pjuBxEfZdJ3Opkfoy?=
+ =?us-ascii?Q?VHc2bCY79UjSJpyqBWGc5DmCz8gKoHYEMxxI+HVN7JjVWq5UN8cJqzqKN5bj?=
+ =?us-ascii?Q?ecBf7Q+ZOcrs7/zb4qPQZ8+AbnP/27h4zm3acFkHtqAVmHZ5WqqPVKHUKMco?=
+ =?us-ascii?Q?rJeNrHwuro4to9VS+6UoUAVq3xo6d8PAYj38oeNh3PSeEVvxLP+DXMgeH7AQ?=
+ =?us-ascii?Q?zY8GvNpk/qdCLYseRPp64uXcZxeVz5IF4UZGg2wNwnaDl6iQ/x7o5lJzvKBP?=
+ =?us-ascii?Q?ROnAoJBU1xJGAgV4KCkTzRBuOyapxgqLNr7fcIsZMMaaJdNWpLUfYCgIpBeS?=
+ =?us-ascii?Q?ycsyqZYXnX+/P8Ac9aqor6ETp7l8MJqSgVYLFuooU95L/X0k2bf0vUl6dfod?=
+ =?us-ascii?Q?h4VNgl0O4UCaKnHq7xDJrxYzf8TbHnTDBEmteu3IgtLMd9YajbcAkcTath+u?=
+ =?us-ascii?Q?1JCoUaJ33gLEBf/4TT6Zp25689PbVNn2g+HGmLvmn3M6+O++Jm/4DDEUXzs7?=
+ =?us-ascii?Q?rZamOrkWdoNX/YEdAtAYP7p+ng7WOKz/jABjLeyjc3c827oE7IUYNg1aF4q2?=
+ =?us-ascii?Q?2phm1YTsHOLnefSJhgh+1Yv2s3vH?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+F+hvsN+0b6NhFvFP9DZLTIIJqeEjy5lVZzCZcfNqWYVM0FiVbx4Xl2ouN9d?=
+ =?us-ascii?Q?XgXf8/irmVUNBgWq9sF552Sie7vUnMx4/rUOZvNmrjMrxTdbEwQdWswDDarQ?=
+ =?us-ascii?Q?RLXBsMxs9xRGKdcWKBStV2wQvcqNF2CO0BCTNu6xbUlRBHEja3jh0mxzME5Z?=
+ =?us-ascii?Q?cYjrf3GB/3RvKeBEywvImG8FXS2QfnxDK9Tg/402Haj2ilzpN1BX6vD5h9iO?=
+ =?us-ascii?Q?XbjN3rt8B5d6HofUyLSzjEuOZx7ibnzj4G6DbV4CxMKt2Eij6NqBPpnWxBGS?=
+ =?us-ascii?Q?LydoC4exx1FCYdmUYzVg47D08CHw2XfnvUOg5GZb69urQsFYzr3Aijc9oegA?=
+ =?us-ascii?Q?KG+DekE0BJ4aTvn/kFMm4tRLrANpmelWAnYMZZnHGViwawVNhhCVCu2+Btsk?=
+ =?us-ascii?Q?tfKJi9qR+JRpnzSEMRGuqxgHaLX1yqAbXJRH/PXQHCa1bAnYc2hM3dgG4OzQ?=
+ =?us-ascii?Q?znhaI5u8guZ2ly7uuzpr5DtClSU+4TSxLKyhasuJlIvPImNMftotHfid8nVV?=
+ =?us-ascii?Q?y15znyB77IucQ/Ok7XTkuyJOso/Q+79xVfAyP83oqx5Wb0rukNiQ1Tq7UaWR?=
+ =?us-ascii?Q?T2In5FLdCNFG/iszEY0iLOnksVssFahmd9v7eg/nbqepImlKi+hfB/wsP4jq?=
+ =?us-ascii?Q?murvrbJtUrarQE9Dmzcd8c+CtSmbtxapoChl2eNkO0OV47vhFtNy6xVIS1TN?=
+ =?us-ascii?Q?DMB29gpvcDywhTtiLGVy+PBpFGlDSboi6AHiv6AeRFHCX1Dfi1UEdHA670Qz?=
+ =?us-ascii?Q?VwA++4vnilVZAlvmJFE46eT6xbJizO3zCyRQEmu8DJUqmqoCJM0Mb+a5LJTb?=
+ =?us-ascii?Q?jrtBXOYaZzU1i49Uy+koSfA5k2VVbZiaFWj2sZQlvgWRv3rV+nV4oT3zcweX?=
+ =?us-ascii?Q?9NAkAbAZ6C/wk/WImdF55CEQY+DUVSJafUSivZKS7tE5sNrohn94jjxh2uL1?=
+ =?us-ascii?Q?yM868+V+AmsxwHnKc7j0+hSjdDvfQKOBgPKP3QElJAlYJNth22fHRrIHoQEZ?=
+ =?us-ascii?Q?AQil+KpkihW4J67i5NYH1UfqVPjSaZoke9xHTFADashoRrRd3AdaHzEdXPCx?=
+ =?us-ascii?Q?TY6cJnsrNMoOq8RvhBTC2ZQXjn9TAPMsRv2FXyJGivUrj1u5GZMrZbsCQcpH?=
+ =?us-ascii?Q?MZ67Ah0zYAF5fCh/YQuhv9tCfOcBLyv2Ohezy94j5kdQVfpa9UsyWrl8hvUP?=
+ =?us-ascii?Q?X/dpEmLDFSEEF/19sd/AeqrfUdLLmX3sd+MvwfopiHw7RPMZEX8I7un8RglN?=
+ =?us-ascii?Q?j/v+T2olqmKaR5HD/bsbb2rDJuE4/+iY/txVAFdsG44CX6zEeeVPfdvTrzBB?=
+ =?us-ascii?Q?ljUoBs5a6Q4amwXb2W+M0MIDbcLWNSwInRkNaK8PpsePCKdp7EXVgvKeisec?=
+ =?us-ascii?Q?ORqsKv+IzZU0eJMjfGBxZDNFKmT4MAzB93XrR6I/KTdfcmB378Pf5nVVWmET?=
+ =?us-ascii?Q?ofl33Bc0k0IbO5FLlkc24a5zgr0wtMd9AyVNyLzcz0ImXbSrvklbz289rKAd?=
+ =?us-ascii?Q?hKyvaWiqCRAjM8fPY9AFD7bgBDbLSI3JyPioQyJY+5/jON5RROFjeWGuRQlj?=
+ =?us-ascii?Q?7mO0ShfL8BAWq3ufPTbqeH1tAqeBVAiiEgJFBgzT?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 67bf1bc7-bdab-4632-40fd-08dd3be45819
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2025 19:30:07.4969
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rEVQ006ttKebdWLsJqPLee5vqcucRRK82FXiF3Fuc9OdrqiiEx+Ic7E7LV0mMDGL
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7751
 
-The Xen emulation in KVM modifies certain CPUID leaves to expose
-TSC information to the guest.
+On Fri, Jan 10, 2025 at 07:32:23PM -0800, Nicolin Chen wrote:
 
-Previously, these CPUID leaves were updated whenever guest time changed,
-but this conflicts with KVM_SET_CPUID/KVM_SET_CPUID2 ioctls which reject
-changes to CPUID entries on running vCPUs.
+> +/*
+> + * FIXME: when a domain is removed any ids that are not in the union of
+> + * all still attached devices should be removed.
+> + */
 
-Fix this by updating the TSC information directly in the CPUID emulation
-handler instead of modifying the vCPU's CPUID entries.
+I've been thinking about this, maybe we can just delete the comment.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
----
- arch/x86/kvm/cpuid.c |  3 ++-
- arch/x86/kvm/x86.c   |  1 -
- arch/x86/kvm/xen.c   | 24 ------------------------
- arch/x86/kvm/xen.h   | 21 +++++++++++++++++++--
- 4 files changed, 21 insertions(+), 28 deletions(-)
+It is thinking about is the case where you attach a domain to device
+A, then B, then detach B. If there are multiple ITS pages then B's
+page will remain accessible to A.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index edef30359c19..77f50273d902 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -2005,7 +2005,8 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
- 		} else if (function == 0x80000007) {
- 			if (kvm_hv_invtsc_suppressed(vcpu))
- 				*edx &= ~feature_bit(CONSTANT_TSC);
--		}
-+		} else
-+			kvm_xen_may_update_tsc_info(vcpu, function, index, eax, ecx, edx);
- 	} else {
- 		*eax = *ebx = *ecx = *edx = 0;
- 		/*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b2d9a16fd4d3..2e4aaa028238 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3253,7 +3253,6 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 				   &vcpu->hv_clock.tsc_shift,
- 				   &vcpu->hv_clock.tsc_to_system_mul);
- 		vcpu->hw_tsc_khz = tgt_tsc_khz;
--		kvm_xen_update_tsc_info(v);
- 	}
- 
- 	vcpu->hv_clock.tsc_timestamp = tsc_timestamp;
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index a909b817b9c0..f5d1c8132bec 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -23,7 +23,6 @@
- #include <xen/interface/event_channel.h>
- #include <xen/interface/sched.h>
- 
--#include <asm/xen/cpuid.h>
- #include <asm/pvclock.h>
- 
- #include "cpuid.h"
-@@ -2247,29 +2246,6 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
- 	del_timer_sync(&vcpu->arch.xen.poll_timer);
- }
- 
--void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
--{
--	struct kvm_cpuid_entry2 *entry;
--	u32 function;
--
--	if (!vcpu->arch.xen.cpuid.base)
--		return;
--
--	function = vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3);
--	if (function > vcpu->arch.xen.cpuid.limit)
--		return;
--
--	entry = kvm_find_cpuid_entry_index(vcpu, function, 1);
--	if (entry) {
--		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
--		entry->edx = vcpu->arch.hv_clock.tsc_shift;
--	}
--
--	entry = kvm_find_cpuid_entry_index(vcpu, function, 2);
--	if (entry)
--		entry->eax = vcpu->arch.hw_tsc_khz;
--}
--
- void kvm_xen_init_vm(struct kvm *kvm)
- {
- 	mutex_init(&kvm->arch.xen.xen_lock);
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index f5841d9000ae..03ee7d28519a 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -10,6 +10,7 @@
- #define __ARCH_X86_KVM_XEN_H__
- 
- #include <asm/xen/hypervisor.h>
-+#include <asm/xen/cpuid.h>
- 
- #ifdef CONFIG_KVM_XEN
- #include <linux/jump_label_ratelimit.h>
-@@ -35,7 +36,6 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
- int kvm_xen_setup_evtchn(struct kvm *kvm,
- 			 struct kvm_kernel_irq_routing_entry *e,
- 			 const struct kvm_irq_routing_entry *ue);
--void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
- 
- static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
- {
-@@ -92,6 +92,21 @@ static inline int kvm_xen_has_pending_timer(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static inline void kvm_xen_may_update_tsc_info(struct kvm_vcpu *vcpu,
-+					       u32 function, u32 index,
-+					       u32 *eax, u32 *ecx, u32 *edx)
-+{
-+	u32 base = vcpu->arch.xen.cpuid.base;
-+
-+	if (base && (function == (base | XEN_CPUID_LEAF(3)))) {
-+		if (index == 1) {
-+			*ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
-+			*edx = vcpu->arch.hv_clock.tsc_shift;
-+		} else if (index == 2)
-+			*eax = vcpu->arch.hw_tsc_khz;
-+	}
-+}
-+
- void kvm_xen_inject_timer_irqs(struct kvm_vcpu *vcpu);
- #else
- static inline int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
-@@ -157,7 +172,9 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
- 	return false;
- }
- 
--static inline void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
-+static inline void kvm_xen_may_update_tsc_info(struct kvm_vcpu *vcpu,
-+					       u32 function, u32 index,
-+					       u32 *eax, u32 *ecx, u32 *edx)
- {
- }
- #endif
--- 
-2.40.1
+However, A had access to B's page already and it was perfectly fine,
+so why do we need to revoke it?
 
+The logic is fine to keep track of this, so I think we can just let it
+be. ITS pages populate in a lazy way, but are permanent once
+populated.
+
+Jason
 
