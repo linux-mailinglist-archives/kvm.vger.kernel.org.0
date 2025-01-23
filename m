@@ -1,247 +1,253 @@
-Return-Path: <kvm+bounces-36360-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36361-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D981A1A555
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:58:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44367A1A55C
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CE993A4477
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:57:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4F2D169FDC
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A4E211474;
-	Thu, 23 Jan 2025 13:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB99211495;
+	Thu, 23 Jan 2025 13:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="k92sKvSG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MpHsAt+0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2076.outbound.protection.outlook.com [40.107.102.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6E210F7E;
-	Thu, 23 Jan 2025 13:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737640675; cv=none; b=JsV5Idvf/GoOAR7aoL0qsFkSNehf57qLEyL4MdSw8LuNoxECstCZf6cvXZvuH+VQnyjAqFBEuYVw2zJjsqo06vI3Qu3GpxiFsJZZTkKA5cVn3KJ6mRT7X2S3MEfNEJ1lya7vFbxT0nyQYiEmxL+T/V4c0JSiNjRmwpO+y3UumMg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737640675; c=relaxed/simple;
-	bh=NTRJc1vNNrSsKGxWubxtdZH3pNm7h5AtVOvJDIs0kTg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KkRI8PaP2ecS2jAqGihX1ImGypMyYAZA0sRkPeDVlPugaVsK3dmEqiGwvNj/+QuCjD35LunpdNArhLZdcbySWPC3d+Z5gLVGXDyvaCIdzFTFU5z+2Jrb29HZyuydlLxMxdBRemO/7TpnDGjQkX0Bx8KvyXGbm5cOGu68HRHfCbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=k92sKvSG; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1737640675; x=1769176675;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0jTJgN8GxO5zlDk/fEj26ROo4npw/UxB9CSrdOxz2Ic=;
-  b=k92sKvSG/duzyA0TEZJ40k4/ZlmezIX91th0LmlO3ai334tY7PIXhTw5
-   OZjectrqw5WBr2RB/qTB1elbj6pLS54Nm0Z2Pkv3Jaq8Dul7OWzdW/rqf
-   21Ddez51ciSBm2w0r0CZXrrRfVIyG/E+7G8dIZFrN6DlPVcR0Omcy9zmH
-   k=;
-X-IronPort-AV: E=Sophos;i="6.13,228,1732579200"; 
-   d="scan'208";a="59960098"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 13:57:50 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:10688]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.70:2525] with esmtp (Farcaster)
- id ebf92873-7030-453e-8184-9a40e78536fc; Thu, 23 Jan 2025 13:57:48 +0000 (UTC)
-X-Farcaster-Flow-ID: ebf92873-7030-453e-8184-9a40e78536fc
-Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 23 Jan 2025 13:57:48 +0000
-Received: from email-imr-corp-prod-iad-all-1a-6ea42a62.us-east-1.amazon.com
- (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Thu, 23 Jan 2025 13:57:48 +0000
-Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
-	by email-imr-corp-prod-iad-all-1a-6ea42a62.us-east-1.amazon.com (Postfix) with ESMTPS id 7B86D40497;
-	Thu, 23 Jan 2025 13:57:41 +0000 (UTC)
-Message-ID: <bc59a2ec-7467-4a4e-8d73-9c4126b1c98b@amazon.co.uk>
-Date: Thu, 23 Jan 2025 13:57:40 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43386211276;
+	Thu, 23 Jan 2025 13:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737640793; cv=fail; b=MGB/qwn8Iooz/VLh2biC0N26FsFfreo3ATxBiVIoVWApg+hg+Zoqd4GntnYAe64ZOsUV8MYJM0Y3lg2KaoMM9MuJ0dhazBoB2fuFnRzsSIXA1YgelLSq8ox8w3Y36qwhU0Y3D+Bev7dCqqM+Kikwzso+IJ2qgX0/IK7J1nTEJfs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737640793; c=relaxed/simple;
+	bh=x2knVlIKtHPGbjAATsyDm3vGSzoJhdwJ6Y4gCJt5OAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=gaMt33p2ZrSQSZH9AxqmTsFqG1k1GAU7ZiO1T8LeKB/mkHrgL1yOIkrtt4l61OXCPasr95v7qqPZf4G6YAPS5H9pycne2wQbRjEjVd1f6muVYN0lIVoTZOeyDwV0umy37Rqs/vGCX3cDBv43+008Q4dijLWdQfe5pz6iQyWgmzc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MpHsAt+0; arc=fail smtp.client-ip=40.107.102.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pFxorwBgRhVzChBLbmdWHODzUaDDSogEVwaLcJX4XNkvBqy0SZAYdVrGK7UqghgESAMPR9dCAUVOnkQRJCYQbb8ClTG7eryeU+JLYo4KFJCLYv3bA0F+x/1Dqq9CItljsJ+7juHqOg3na154EQQ9Q3V3tqSX4187DScJn6WLB0BpThq0yh9mx9LFO+Og2KEC4AGcrHlyHfQGip6SfOC+n2mklXZAU4FKDwwrZ1t5kZa72EnIlUqLEQ05LyqHHfDKsr8n50Frcaen0AzWj/9bDltIh2gSBfACn3Sqiwa868ZkorXDcu2iqQbl+yeaBxmjE3WYsoqHZb9MmVme1K6MXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZqVhw3daTuRJ2XfVebw0ULNxkFfGJ6G9Xt8ufuSNsZU=;
+ b=uGLLZKgW55OtMSIfRsssYv34Y+0mWDlQmXD61K5e7ecfTdtJ2pII+El6T/sV5OWL+aqo7OpZlLPAzqI+y4MXO+h8D95VOK/ciSnqlAU47MuMWaE7Tmv63IVfXOYkqPRU4NLQ0Bbfr1yzPSLbkMOaiHhKtu/w8p0bHiQCTvZrIvpsRC1tIxbbN4//q00GLGFXsfj02kv1S7aA4TCmvCNHu6V1om94ZE4T7JPQzWpR681nfxYxhnn+rZwnUD+vque4bd2fg4Y6i6lq8ujNK78H550OoDmDugGcQloJq5pg2L/TYjhJz6QO8JjsSHfuMonBSPyaKJiWIum0YdJF846bPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZqVhw3daTuRJ2XfVebw0ULNxkFfGJ6G9Xt8ufuSNsZU=;
+ b=MpHsAt+0zjMMUedRiROU31MJF8fSkDkWeibVzkabmWcXPTz7RcfYgSUXB9okN1wYbFZfpacgp7ypKgCH+ExFDpGXlN5Golic6GpCGVDrnhhR14jqJyucwE0H7HoEcrqmlRqWiQ2sW3Yrx8eciDUhe0kJshO+O8ffB2F6KEultSIItVF4rtqt6RJLO31TdPRizszP90vplaF7MCQkaDXdOuV9CM3bjxYQqygHqqn199VLSoMeEOPeiXaRFpc94jilANHJvq6oScLkr8BdF2ONoGAHGxBtwY0Nr/sVjuVRxWMtmVPx9xDkRtTyXFrWE8VakuOy77qW35IMi7CxEYwpYw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by CH3PR12MB8307.namprd12.prod.outlook.com (2603:10b6:610:12f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.17; Thu, 23 Jan
+ 2025 13:59:47 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8356.010; Thu, 23 Jan 2025
+ 13:59:47 +0000
+Date: Thu, 23 Jan 2025 09:59:46 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
+	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+Message-ID: <20250123135946.GQ5556@nvidia.com>
+References: <c10ae58f-280c-4131-802f-d7f62595d013@amd.com>
+ <20250120175901.GP5556@nvidia.com>
+ <Z46a7y02ONFZrS8Y@phenom.ffwll.local>
+ <20250120194804.GT5556@nvidia.com>
+ <Z4_HNA4QQbIsK8D9@phenom.ffwll.local>
+ <20250121173633.GU5556@nvidia.com>
+ <Z5DQsyV0vwX3Iabu@phenom.ffwll.local>
+ <6612c40d-4999-41a1-a4a5-74d3ff5875c3@amd.com>
+ <20250122143744.GF5556@nvidia.com>
+ <827315b0-23b6-4a39-88eb-34e756298d67@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <827315b0-23b6-4a39-88eb-34e756298d67@amd.com>
+X-ClientProxiedBy: BL0PR0102CA0005.prod.exchangelabs.com
+ (2603:10b6:207:18::18) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 2/9] KVM: guest_memfd: Add guest_memfd support to
- kvm_(read|/write)_guest_page()
-To: Fuad Tabba <tabba@google.com>
-CC: David Hildenbrand <david@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-arm-msm@vger.kernel.org>, <linux-mm@kvack.org>, <pbonzini@redhat.com>,
-	<chenhuacai@kernel.org>, <mpe@ellerman.id.au>, <anup@brainfault.org>,
-	<paul.walmsley@sifive.com>, <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>,
-	<seanjc@google.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-	<willy@infradead.org>, <akpm@linux-foundation.org>, <xiaoyao.li@intel.com>,
-	<yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>, <jarkko@kernel.org>,
-	<amoorthy@google.com>, <dmatlack@google.com>, <yu.c.zhang@linux.intel.com>,
-	<isaku.yamahata@intel.com>, <mic@digikod.net>, <vbabka@suse.cz>,
-	<vannapurve@google.com>, <ackerleytng@google.com>,
-	<mail@maciej.szmigiero.name>, <michael.roth@amd.com>, <wei.w.wang@intel.com>,
-	<liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
-	<kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
-	<steven.price@arm.com>, <quic_eberman@quicinc.com>,
-	<quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
-	<quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
-	<quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
-	<catalin.marinas@arm.com>, <james.morse@arm.com>, <yuzenghui@huawei.com>,
-	<oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
-	<qperret@google.com>, <keirf@google.com>, <shuah@kernel.org>,
-	<hch@infradead.org>, <jgg@nvidia.com>, <rientjes@google.com>,
-	<jhubbard@nvidia.com>, <fvdl@google.com>, <hughd@google.com>,
-	<jthoughton@google.com>
-References: <20250122152738.1173160-1-tabba@google.com>
- <20250122152738.1173160-3-tabba@google.com>
- <e6ea48d2-959f-4fbb-a170-0beaaf37f867@redhat.com>
- <CA+EHjTxNEoQ3MtZPi603=366vxt=SmBwetS4mFkvTK2r6u=UHw@mail.gmail.com>
- <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com>
- <ef864674-bbcf-457b-a4e3-fec272fc2d8a@amazon.co.uk>
- <CA+EHjTxc0AwX2=htwC9to7+fYbFJsfVGT5d+BtEYVPncMgq1Mw@mail.gmail.com>
-From: Patrick Roy <roypat@amazon.co.uk>
-Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <CA+EHjTxc0AwX2=htwC9to7+fYbFJsfVGT5d+BtEYVPncMgq1Mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CH3PR12MB8307:EE_
+X-MS-Office365-Filtering-Correlation-Id: fa50b0a5-7126-44bb-b514-08dd3bb6324b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?U1VPempic2pxaHpWamtNdHVpUWVYWlNDREJYS3FHVFlPNS8yTHp5VVdVV1Ir?=
+ =?utf-8?B?TGNlM2Z5Nzl4RzdaaHJEQjRlbzZPclNYblFnUGI4bE5OeXk3VUxDa1J0R0N5?=
+ =?utf-8?B?bjBOMWRpdm5icVMyeVQ2cnFpK0hRa21oK1piaGpMbGxvdzFkdFBta3ZDcDBO?=
+ =?utf-8?B?RG16eVdVMlMyNGpOeEJqYmV1MXVwOFhKOTZwYmFZcEdjZS9VakM1aDFMbG91?=
+ =?utf-8?B?eWFCSGJ4djNCZWhYSksyK0pWb1Q3NHF4V2RIRnZOSk1mOEhMZ25GMnRiS2xz?=
+ =?utf-8?B?TUQwTy9zcUdSS1RFVjZ4bE1kVFVCSXFsNDVxRU11WUQyNlljWGdsRzJCdDVy?=
+ =?utf-8?B?SGlBakQvUEtuWjM2LzRXMXN6QmlYNzErU3EzaHBDMWIzTDhJLzMxdm1kaWRT?=
+ =?utf-8?B?QkdOTWFYYTJTNjR1Sm5DNzF2em1GTkJoZXlQSnZNbVlUeVFsMkhoTzY4YlRr?=
+ =?utf-8?B?ZldLVFNhZlRDTGYzaEdKb2xZRG5LdXZlb3NrNmRKSUhtRlRub3Z5VlRJZjBL?=
+ =?utf-8?B?NVVzVFVjSjZkeXRGTFJhaFZ0cmtZUUFpT1R1S0tLNFp1bnJHemVXVXpTTEhE?=
+ =?utf-8?B?bkszZUt1UHpncFVieTI1dFNUNHJ6UWhiWE1zZ2Z5d2sxK3pScnQ3M2pPc2V2?=
+ =?utf-8?B?cUhwZlNlazBYT0xvYjVPRmVHTWY5VTg0aCtaNTFMd2lIeVZ5dHVyaU1qSWpS?=
+ =?utf-8?B?bDA1dHlnTUloWVNlNXZYWWV6Skt5NitrRElLZ3MzRzljalEyUjlGWjlOYy8x?=
+ =?utf-8?B?ODdrZGl4NXNVZGR2dEFGaDRWMElBS053SjRDRTcybThDdzkyb2lOaXF3VWpL?=
+ =?utf-8?B?dTMvSnpGaVNMaGp0MmIxN3ZaQ1BOQzZUOHNTNzNWeHF1eEFmTkxWenBFck1z?=
+ =?utf-8?B?OGd6ZG9GbTMyaXpIbzhvR1VKS0NzOVE1UDNwbStTek1xUkJLSmJxbGxyd1ZM?=
+ =?utf-8?B?bUV3NTVVVEtLVlBXUEJpZDRjTEh1dFVKWjdDSTE2bk5LV3RmSGtrU2J2S1RU?=
+ =?utf-8?B?Y0M0NVJtNjRrTnZTZnZuMTByVXNPLzd5RUw5OUlLcDZsNVRzOUlMWEtNNXBs?=
+ =?utf-8?B?cCtoSk9iUWh6eDJrTXVSUnZkbEpDY0NOeUNHZ0M3UUdyNFhoSVBZSjluQmxW?=
+ =?utf-8?B?RTZtc2tvTjBVWEJpK2oyMkM3TXgwVGhadUo3WllibXFHSWdQbzFCY2tpN0xF?=
+ =?utf-8?B?eTJzYmZnM24xbWdSbTh3VHZCSzNpdlJWU21uWCszSXplYk5uakVlRk5IcmE1?=
+ =?utf-8?B?bFQ3b0h5bFd3d3o5c0Zsb1JIWVoxejhka3NaSWs1UVRwNDZXdnpjUDFlU3Jw?=
+ =?utf-8?B?dXo0MWI2a3lRRENia0hRZDg3UktoNWZ0RnZwcGJTZTF0cU9lckh4RnRuTGVa?=
+ =?utf-8?B?QnIrWGVkMjJPV1l5c2szbk5YbXN0YSs3UzV1NjFkbkxyTFlUTnJNSzUyejI0?=
+ =?utf-8?B?amk5NXQ5cndFT0VTSlJ5anR0WDdOMXFFMDd5bnczWE5rb1hyT3FzYTJpU3N5?=
+ =?utf-8?B?czRJeXViZms2NjJBSjlkcVd4ZlN1TW93MWFNa3lNSkVCRlEwVUYvUitRNFVi?=
+ =?utf-8?B?WmMvZTdlMDdoN1VPaEZYYm91aDBScDB5TUtjd1hYMXNjM3hkWlRxZUJhdFJY?=
+ =?utf-8?B?N0ZFZURmQW1yNWJzTHZxTVdxb1U5UUVpNnJwdDdRVEhqTzcxVmtQRWVBNEpX?=
+ =?utf-8?B?WDR5aFlGN3EyTHYwblJ3RVVZNGRZa01Feml0MHc3d3hKOTJIdFJkTURDek12?=
+ =?utf-8?B?cThmNHNWZGlhZmFUYUNvVHh4dUtRMERzVjAxb2d0bm9hQ08rN0UrSkd5T0s1?=
+ =?utf-8?B?VVZ2eHBmdTdyNlVxUlFlZ2hCRmM2OWtyOFZSQ2ZvNVUxZ3NtNHNUSFBVM1dz?=
+ =?utf-8?Q?RYVE2hZwDXY7K?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?KzdtSzRBRXpCc3Y5TTlKL0FWM2dGZXVzWDRRSXZ6dXJHZXczQWlTTk0xR3ZC?=
+ =?utf-8?B?NnRMZmlnRXkxR1J1WXRnVy9FU29rYWlSVU5JSDdSVUc4WFZwcS9kWVcyVTNH?=
+ =?utf-8?B?cEQwUUxhOXVwOGVvU3c0SDlwb09sUWczVlRKcUc5M3lYSGNtK1haQlhnZGQy?=
+ =?utf-8?B?a0hZWndVZnJHQ3puQWc5Ymt0UDhqaHUvZ3VEZ0hMZFl1cmlFSHlQRVM1U0Q0?=
+ =?utf-8?B?dHRPKzdrM0k0WEhLZFpZL2YzYTN3OE10QWdBbFpxQWRmalJ4emtweUh2YXJx?=
+ =?utf-8?B?ajlYZFlBbnU4WkhQaThSWmtsSjdqYU9RV21CL2I5ZW55S2UrSER4aWxYSVFH?=
+ =?utf-8?B?YTJ3OXcvVzJ2STl0Wm1BajBkVE5RVWdINTJzK3JSR3krcVFyM3FKQkJIVEtm?=
+ =?utf-8?B?N1VOQWc1d0ZyUXlGbFZlL2ExaWh1Y2hmZ3hrMVBQemhZVTlOWVJDanU1Qmc5?=
+ =?utf-8?B?MXpiN2M2YnQxaEtLN2VrTHJNdDFob2J6TUpwNW0zbklYTCtUUmh1Z1Z1enNt?=
+ =?utf-8?B?QXZ5NkkvUk5pb1RIclBaK0pYbStZNHBXbmhYMUFsbnE2Q3g3L3JwYzZ4TlJT?=
+ =?utf-8?B?d0hmL2dNczhhblF5eEhPT1owTEZSS1RxWEFHTnhEN1Q4UE00MnZucEFFR0Fk?=
+ =?utf-8?B?UG9CQTNhV2JNUTZNU0NqZWF3RHI2YmFmejJzTjJjcWlnSnZSVU11NHAyaFgv?=
+ =?utf-8?B?QnM1UUh6Z0MwQ1lOTEdsenVZWUF2Qkc1eE9YSUxDUlBlOUFxZWprSzJ5cmY1?=
+ =?utf-8?B?V3V6empIUk8wdlRrNjZPQndVNldjSDhZZCsveGtJWktnKzhwWXNYWHphZ3Vi?=
+ =?utf-8?B?NEFwaEw3bU1Gay9ZWGNodE1hRVRsNVFScytFN2pxSmU1UTFMUXlBRFF6QVlH?=
+ =?utf-8?B?cjVKMFFNZm1nSG5QOU1xRy9nWVl6TmFaelAxdlJEVVhjYmg5MzZPV0V5N2VL?=
+ =?utf-8?B?dy9iQnd1UU1iRUVleXZxV05oRElsZXRpSVZaTy9NOGl4U0pZTDRYQnl4S2I1?=
+ =?utf-8?B?V0FSY0pMTHczSG81ZjFjaXVoZUwwUWRwSWRadkJtNDB2TlI4UFJNdklra3h5?=
+ =?utf-8?B?dXlHdHg1M3JZV1V1L1orVVhxOUJsMTJpY1lkR3Awc2JCSkxLb05CV1MxSndI?=
+ =?utf-8?B?aUJFK3lWbmdiOUs0cXl6bkwwYmNpTkdDWHBxZ0k2eTVEYURlWHJyejNLbEtt?=
+ =?utf-8?B?ZytkM3NwQWRsckxHTUtzb0tYUDZBL1BWWnNLZWc3a0JTK2dOQ0l2ZHBlekhW?=
+ =?utf-8?B?dmVaUHRJMU1FTTlhSENKUGJmRWp2OHVmOEVMRndZblpMbEdaQi9qZ2FabFFE?=
+ =?utf-8?B?SkJHa01PM1A5Wmg1ajNpaERvc29HaEJuZmhNd0xGWVlIMk9LSzJnL3N6NzZL?=
+ =?utf-8?B?dEtsZ3FrVWFhZGMrcjBDdDJvL3E4Q3dEMXBjVGdaL0ZDQTdOOS8yVkcxNVg2?=
+ =?utf-8?B?WDJSMy9GbUg0M1BGTmRXTXZFQXdJdStRMnFDUDYzeTdWUUVtYWhaUEl5Uzk4?=
+ =?utf-8?B?dnJyV0hMblJHS3Zia2JUNmloVDc4aTB3Um1lUnVES0VuTk5Xb2JtcGtlYml1?=
+ =?utf-8?B?NUJ6dCt5bGxoZEc3TkJjSUtKYWpGOUdWTEdGcEVlRndIb2VEMDdSd25VUlU2?=
+ =?utf-8?B?bUJ6Q1NhbXZXS2kyUVVhMVMwYVhqMDlWYnNiL1QxMGhTSGsyVDYxRnFsQmpv?=
+ =?utf-8?B?NnJKTi9WZS9HcGxCM29QdE9oSTJ4eVJ3KzIxZGpTakp1U1lwVEZjMCszWHN5?=
+ =?utf-8?B?bjQzd0EyV28rdHcxbDVRVnYyNFFaN3cweGZDamVTZEJnOTZBZHo0N2pQMVdE?=
+ =?utf-8?B?ZW1lYkZqSnNDWUxKcGVRZmpUZFpORzlHMy9CSzk1dmg3Snl5OWtZMUtnWlBs?=
+ =?utf-8?B?Ylk4RGJFYUlYR3RKakkxNHFwdjdncDVFLzhDcEF5UDVEaWF1ZU1PL3FBSjh0?=
+ =?utf-8?B?QTF4SjBvZkdSTld5dmVYdXBIWTZpYm41ektpV0dLZmxJQ1U4WXhodVU3dTlV?=
+ =?utf-8?B?d05PT3k3dUZhU3dxbHhIS0tBMk1kUnNiTWlSMHdWdE5pK2V4R1g1cFdnV0hG?=
+ =?utf-8?B?YTNLS3pqalY1K3lPdk9WL3IrTWk4L0J0eEovbHdpMGtKa0ZKR1VuSWo3bVll?=
+ =?utf-8?Q?mXaQ=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa50b0a5-7126-44bb-b514-08dd3bb6324b
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2025 13:59:47.2669
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EIqI9zR186QqvO9kj8v6YW0mVVuCFAT3msm6yxCvPydBeiL0zx7syOxk6mmdBAw/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8307
 
-
-
-On Thu, 2025-01-23 at 12:28 +0000, Fuad Tabba wrote:
-> Hi Patrick,
+On Wed, Jan 22, 2025 at 03:59:11PM +0100, Christian König wrote:
+> > > For example we have cases with multiple devices are in the same IOMMU domain
+> > > and re-using their DMA address mappings.
+> > IMHO this is just another flavour of "private" address flow between
+> > two cooperating drivers.
 > 
-> On Thu, 23 Jan 2025 at 11:57, Patrick Roy <roypat@amazon.co.uk> wrote:
->>
->>
->>
->> On Thu, 2025-01-23 at 11:39 +0000, David Hildenbrand wrote:
->>> On 23.01.25 10:48, Fuad Tabba wrote:
->>>> On Wed, 22 Jan 2025 at 22:10, David Hildenbrand <david@redhat.com> wrote:
->>>>>
->>>>> On 22.01.25 16:27, Fuad Tabba wrote:
->>>>>> Make kvm_(read|/write)_guest_page() capable of accessing guest
->>>>>> memory for slots that don't have a userspace address, but only if
->>>>>> the memory is mappable, which also indicates that it is
->>>>>> accessible by the host.
->>>>>
->>>>> Interesting. So far my assumption was that, for shared memory, user
->>>>> space would simply mmap() guest_memdd and pass it as userspace address
->>>>> to the same memslot that has this guest_memfd for private memory.
->>>>>
->>>>> Wouldn't that be easier in the first shot? (IOW, not require this patch
->>>>> with the cost of faulting the shared page into the page table on access)
->>>>
->>>
->>> In light of:
->>>
->>> https://lkml.kernel.org/r/20250117190938.93793-4-imbrenda@linux.ibm.com
->>>
->>> there can, in theory, be memslots that start at address 0 and have a
->>> "valid" mapping. This case is done from the kernel (and on special s390x
->>> hardware), though, so it does not apply here at all so far.
->>>
->>> In practice, getting address 0 as a valid address is unlikely, because
->>> the default:
->>>
->>> $ sysctl  vm.mmap_min_addr
->>> vm.mmap_min_addr = 65536
->>>
->>> usually prohibits it for good reason.
->>>
->>>> This has to do more with the ABI I had for pkvm and shared memory
->>>> implementations, in which you don't need to specify the userspace
->>>> address for memory in a guestmem memslot. The issue is there is no
->>>> obvious address to map it to. This would be the case in kvm:arm64 for
->>>> tracking paravirtualized time, which the userspace doesn't necessarily
->>>> need to interact with, but kvm does.
->>>
->>> So I understand correctly: userspace wouldn't have to mmap it because it
->>> is not interested in accessing it, but there is nothing speaking against
->>> mmaping it, at least in the first shot.
->>>
->>> I assume it would not be a private memslot (so far, my understanding is
->>> that internal memslots never have a guest_memfd attached).
->>> kvm_gmem_create() is only called via KVM_CREATE_GUEST_MEMFD, to be set
->>> on user-created memslots.
->>>
->>>>
->>>> That said, we could always have a userspace address dedicated to
->>>> mapping shared locations, and use that address when the necessity
->>>> arises. Or we could always require that memslots have a userspace
->>>> address, even if not used. I don't really have a strong preference.
->>>
->>> So, the simpler version where user space would simply mmap guest_memfd
->>> to provide the address via userspace_addr would at least work for the
->>> use case of paravirtualized time?
->>
->> fwiw, I'm currently prototyping something like this for x86 (although
->> not by putting the gmem address into userspace_addr, but by adding a new
->> field to memslots, so that memory attributes continue working), based on
->> what we talked about at the last guest_memfd sync meeting (the whole
->> "how to get MMIO emulation working for non-CoCo VMs in guest_memfd"
->> story). So I guess if we're going down this route for x86, maybe it
->> makes sense to do the same on ARM, for consistency?
->>
->>> It would get rid of the immediate need for this patch and patch #4 to
->>> get it flying.
->>>
->>>
->>> One interesting question is: when would you want shared memory in
->>> guest_memfd and *not* provide it as part of the same memslot.
->>
->> In my testing of non-CoCo gmem VMs on ARM, I've been able to get quite
->> far without giving KVM a way to internally access shared parts of gmem -
->> it's why I was probing Fuad for this simplified series, because
->> KVM_SW_PROTECTED_VM + mmap (for loading guest kernel) is enough to get a
->> working non-CoCo VM on ARM (although I admittedly never looked at clocks
->> inside the guest - maybe that's one thing that breaks if KVM can't
->> access gmem. How to guest and host agree on the guest memory range
->> used to exchange paravirtual timekeeping information? Could that exchange
->> be intercepted in userspace, and set to shared via memory attributes (e.g.
->> placed outside gmem)? That's the route I'm going down the paravirtual
->> time on x86).
-> 
-> For an idea of what it looks like on arm64, here's how kvmtool handles it:
-> https://github.com/kvmtool/kvmtool/blob/master/arm/aarch64/pvtime.c
-> 
-> Cheers,
-> /fuad
- 
-Thanks! In that example, kvmtool actually allocates a separate memslot for
-the pvclock stuff, so I guess it's always possible to simply put it into
-a non-gmem memslot, which indeed sidesteps this issue as you mention in
-your reply to David :D
-  
->>> One nice thing about the mmap might be that access go via user-space
->>> page tables: E.g., __kvm_read_guest_page can just access the memory
->>> without requiring the folio lock and an additional temporary folio
->>> reference on every access -- it's handled implicitly via the mapcount.
->>>
->>> (of course, to map the page we still need that once on the fault path)
->>
->> Doing a direct map access in kvm_{read,write}_guest() and friends will
->> also get tricky if guest_memfd folios ever don't have direct map
->> entries. On-demand restoration is painful, both complexity and
->> performance wise [1], while going through a userspace mapping of
->> guest_memfd would "just work".
->>
->>> --
->>> Cheers,
->>>
->>> David / dhildenb
->>>
+> Well that's the point. The inporter is not cooperating here.
 
+If the private address relies on a shared iommu_domain controlled by
+the driver, then yes, the importer MUST be cooperating. For instance,
+if you send the same private address into RDMA it will explode because
+it doesn't have any notion of shared iommu_domain mappings, and it
+certainly doesn't setup any such shared domains.
+
+> The importer doesn't have the slightest idea that he is sharing it's DMA
+> addresses with the exporter.
+
+Of course it does. The importer driver would have had to explicitly
+set this up! The normal kernel behavior is that all drivers get
+private iommu_domains controled by the DMA API. If your driver is
+doing something else *it did it deliberately*.
+
+Some of that mess in tegra host1x around this area is not well
+structured, it should not be implicitly setting up domains for
+drivers. It is old code that hasn't been updated to use the new iommu
+subsystem approach for driver controled non-DMA API domains.
+
+The new iommu architecture has the probing driver disable the DMA API
+and can then manipulate its iommu domain however it likes, safely. Ie
+the probing driver is aware and particiapting in disabling the DMA
+API.
+
+Again, either you are using the DMA API and you work in generic ways
+with generic devices or it is "private" and only co-operating drivers
+can interwork with private addresses. A private address must not ever
+be sent to a DMA API using driver and vice versa.
+
+IMHO this is an important architecture point and why Christoph was
+frowning on abusing dma_addr_t to represent things that did NOT come
+out of the DMA API.
+
+> We have a very limited number of exporters and a lot of different importers.
+> So having complexity in the exporter instead of the importer is absolutely
+> beneficial.
+
+Isn't every DRM driver both an importer and exporter? That is what I
+was expecting at least..
+
+> I still strongly think that the exporter should talk with the DMA API to
+> setup the access path for the importer and *not* the importer directly.
+
+It is contrary to the design of the new API which wants to co-optimize
+mapping and HW setup together as one unit.
+
+For instance in RDMA we want to hint and control the way the IOMMU
+mapping works in the DMA API to optimize the RDMA HW side. I can't do
+those optimizations if I'm not in control of the mapping.
+
+The same is probably true on the GPU side too, you want IOVAs that
+have tidy alignment with your PTE structure, but only the importer
+understands its own HW to make the correct hints to the DMA API.
+
+Jason
 
