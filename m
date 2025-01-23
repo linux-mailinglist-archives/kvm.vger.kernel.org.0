@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-36311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AE2FA19BD1
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 01:33:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB4DEA19BDB
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 01:36:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EC0616995C
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 00:33:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B91B9188B34C
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 00:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C74717993;
-	Thu, 23 Jan 2025 00:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A59717741;
+	Thu, 23 Jan 2025 00:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XFLnhNyN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BKmV1iu4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA5EF50F;
-	Thu, 23 Jan 2025 00:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4F5C2C8;
+	Thu, 23 Jan 2025 00:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737592387; cv=none; b=NiKzP8Pk1VJc+g//m4PnnE0B4nlypyFVKEFt0TWtaq/R/z3uSSrSPhQeMEIKXKAP41GIMsGZM4ImQTVGnf6gIobAUXVG7rSlEXcqr/2UnYoPb18NfIaPyMSIRn2i8G1apSBw6rITjI4lrlvgH5KLXvCJARmPk2wu30waC6TI7yM=
+	t=1737592600; cv=none; b=YxjlhySgOYzVuTpCnuGL4sPlr8XDdjTF+iPokpuko7vQKwL+FnVGXfPo4XU/jA/tnPswuZZhg6f1WmrRmbUBJxfeXDXaXyCqtUaOpZuCOChwIvGWLNbbxU+ee1GoBEoQ+sb1EWKXoHkTvL3zi12dxLYM9xi/9jmdjsvFTcZasls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737592387; c=relaxed/simple;
-	bh=h28eMJyE3PwRYXBGQKjxawEU3KLaC2296RpEr+y+gyA=;
+	s=arc-20240116; t=1737592600; c=relaxed/simple;
+	bh=4M72IyRIuWbPn8kcGStccBne9r2ZE2KTGBycZzkv7bE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OnL3oFLT9S2v/0qgHZE0lNqY3KCrdiCgOPRk1NqwQiGE4n1TZZgBXQVB+meT3AnBYsIbkyGWkkFkWFcCdW+sf00zO3zKjL3HbeoJn5cX7HwoldCcqNNlsiGJXUAKQFt1Ny6xtcBmYGKTMhe9vg9vjQFJDnPevJpunYE8o2lIoBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XFLnhNyN; arc=none smtp.client-ip=198.175.65.13
+	 In-Reply-To:Content-Type; b=LtXde2UaPfIBgdSDtW4V4f5Dh55epBA+3qB/qcTpjo1xZTOd9vgBtAPhZsp5Kl1/SzjI7//g9OX17UVQ1RiB3yIHqwBqFYPom22TGI3J7oDXD7HvP5n9neGL0buDJfk/+wIP1/dM5antk4Uxk1l+FB+HV6pHFXOaA83EVao53Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BKmV1iu4; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737592386; x=1769128386;
+  t=1737592598; x=1769128598;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=h28eMJyE3PwRYXBGQKjxawEU3KLaC2296RpEr+y+gyA=;
-  b=XFLnhNyNBON246jOmlFmNAZ6ChKRksIzSaj3OwzGomQ1CGQA3H0yiCPh
-   YFPdvtuP36E9l9SKb5WVURbbOfqA9RffIScmZ5RlURr6hw77ZlNbS7PSN
-   WdBgNf0eShpUA8epavQy7m2FGIF0Q1J33qb+jScIRlzG5+zTAslgIA8AA
-   scKy8Fld7dC/CR551Z6NSt7eYXF1m69I0wqcrHMS9bb0J5RlmupHcUmUF
-   PF2OrcozN0TVSimIGqWUEjft8RPxZeAFD9er0T6AzMZhOSpJL0JMTvLan
-   OkL3v8dHgiQsbF0S1pUr8ECmtYuB8PMxI73Wl4Fh+KlAAf5EAbgMU6u8v
-   w==;
-X-CSE-ConnectionGUID: y8t1rPGxQCm7uc7EH4Q88A==
-X-CSE-MsgGUID: 8yWAnAtpTTKlJApEfAEfJQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="49066111"
+  bh=4M72IyRIuWbPn8kcGStccBne9r2ZE2KTGBycZzkv7bE=;
+  b=BKmV1iu4myVxuxvPMwLeYetEGae9uMho4Q3fVkkcs9INjWCIM9JU4pkj
+   +4If9hPx7H1xglj/0X4PrUpj2drWPVAYkUMXLbulns1fofaxa00lIE7LO
+   GMtNlfZCziorbGxETV6BCgSNvwT16qnlhKgDRoumpc0Z16+ZznUg41HSC
+   GcqTC+zRL9aH8PUj6KZuo1DH5wVXbNedEGUmh9MxuoaTyV6O70sVJvdYj
+   uDAuImogKUAB8nSRX0lfzO5ytSv7jG1FnZzEjak1Bn+RrEUeWdScUO+C/
+   1/lVCAM80ZTOuq8jU54nzi1wEgSDcDNbkLvbKyuceBGKYCIrt0L7QgqPV
+   A==;
+X-CSE-ConnectionGUID: tTzk+SnnQpKDDWXbiHU55A==
+X-CSE-MsgGUID: dGYxyRtURTmqOxfv8r4ttQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="37993873"
 X-IronPort-AV: E=Sophos;i="6.13,226,1732608000"; 
-   d="scan'208";a="49066111"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 16:33:05 -0800
-X-CSE-ConnectionGUID: e4eqRPTXQySwRf1exSNBfg==
-X-CSE-MsgGUID: 7SeFBbE8SquXTsKg8apaKg==
+   d="scan'208";a="37993873"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 16:36:38 -0800
+X-CSE-ConnectionGUID: Cs17F97wSD+OhDom8NAC6w==
+X-CSE-MsgGUID: eXwomfsXTg+Vmotv7MBSAA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,226,1732608000"; 
-   d="scan'208";a="112330363"
+   d="scan'208";a="107228394"
 Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.124.222.224]) ([10.124.222.224])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 16:33:02 -0800
-Message-ID: <3dd183fa-df95-487e-a2e9-73579fa160be@intel.com>
-Date: Wed, 22 Jan 2025 16:33:04 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 16:36:30 -0800
+Message-ID: <c1c35c9c-e657-4074-b87e-98fb4b332bc5@intel.com>
+Date: Wed, 22 Jan 2025 16:36:31 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,23 +67,18 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] x86, lib: Add WBNOINVD helper functions
-To: Kevin Loughlin <kevinloughlin@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
- "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, kai.huang@intel.com,
- ubizjak@gmail.com, jgross@suse.com, kvm@vger.kernel.org, pgonda@google.com,
+Subject: Re: [PATCH v5 1/2] x86, lib: Add WBNOINVD helper functions
+To: Kevin Loughlin <kevinloughlin@google.com>, linux-kernel@vger.kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, pbonzini@redhat.com, kirill.shutemov@linux.intel.com,
+ kai.huang@intel.com, ubizjak@gmail.com, jgross@suse.com,
+ kvm@vger.kernel.org, thomas.lendacky@amd.com, pgonda@google.com,
  sidtelang@google.com, mizhang@google.com, rientjes@google.com,
  manalinandan@google.com, szy0127@sjtu.edu.cn
-References: <20250122001329.647970-1-kevinloughlin@google.com>
- <20250122013438.731416-1-kevinloughlin@google.com>
- <20250122013438.731416-2-kevinloughlin@google.com>
- <aomvugehkmfj6oi7bwmtiqfbdyet7zyd2llri3c5rgcmgqjkfz@tslxstgihjb5>
- <d2dce9d8-b79e-7d83-15a5-68889b140229@amd.com>
- <f98160b0-4f8b-41ab-b555-8e9de83c8552@intel.com>
- <CAGdbjm+syon_W0W_oEiDJBKu4s5q9JS9cKyPmPoqDAzeyMJf3Q@mail.gmail.com>
+References: <20250122013438.731416-1-kevinloughlin@google.com>
+ <20250123002422.1632517-1-kevinloughlin@google.com>
+ <20250123002422.1632517-2-kevinloughlin@google.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -129,76 +124,28 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <CAGdbjm+syon_W0W_oEiDJBKu4s5q9JS9cKyPmPoqDAzeyMJf3Q@mail.gmail.com>
+In-Reply-To: <20250123002422.1632517-2-kevinloughlin@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/22/25 16:06, Kevin Loughlin wrote:
->> BTW, I don't think you should be compelled to use alternative() as
->> opposed to a good old:
->>
->>         if (cpu_feature_enabled(X86_FEATURE_WBNOINVD))
->>                 ...
-> Agreed, though I'm leaving as alternative() for now (both because it
-> results in fewer checks and because that's what is used in the rest of
-> the file); please holler if you prefer otherwise. If so, my slight
-> preference in that case would be to update the whole file
-> stylistically in a separate commit.
+On 1/22/25 16:24, Kevin Loughlin wrote:
+> +static __always_inline void wbnoinvd(void)
+> +{
+> +	/*
+> +	 * WBNOINVD is encoded as 0xf3 0x0f 0x09. Making this
+> +	 * encoding explicit ensures compatibility with older versions of
+> +	 * binutils, which may not know about WBNOINVD.
 
-alternative() can make a _lot_ of sense.  It's extremely compact in the
-code it generates. It messes with compiler optimization, of course, just
-like any assembly. But, overall, it's great.
+This kinda pokes at one of my pet peeves. It's writing a comment where
+code would do. I'd *much* rather write a function that explains to you
+in code that "WBNOINVD is encoded as 0xf3 0x0f 0x09":
 
-In this case, though, we don't care one bit about code generation or
-performance. We're running the world's slowest instruction from an IPI.
-
-As for consistency, special_insns.h is gloriously inconsistent. But only
-two instructions use alternatives, and they *need* the asm syntax
-because they're passing registers and meaningful constraints in.
-
-The wbinvds don't get passed registers and their constraints are
-trivial. This conditional:
-
-        alternative_io(".byte 0x3e; clflush %0",
-                       ".byte 0x66; clflush %0",
-                       X86_FEATURE_CLFLUSHOPT,
-                       "+m" (*(volatile char __force *)__p));
-
-could be written like this:
-
-	if (cpu_feature_enabled(X86_FEATURE_CLFLUSHOPT))
-	        asm volatile(".byte 0x3e; clflush %0",
-                       "+m" (*(volatile char __force *)__p));
-	else
-		asm volatile(".byte 0x66; clflush %0",
-                       "+m" (*(volatile char __force *)__p));
-
-But that's _actively_ ugly.  alternative() syntax there makes sense.
-Here, it's not ugly at all:
-
-	if (cpu_feature_enabled(X86_FEATURE_WBNOINVD))
-		asm volatile(".byte 0xf3,0x0f,0x09\n\t": : :"memory");
-	else
-		wbinvd();
-
-and it's actually more readable with alternative() syntax.
-
-So, please just do what makes the code look most readable. Performance
-and consistency aren't important. I see absolutely nothing wrong with:
-
-static __always_inline void raw_wbnoinvd(void)
+static __always_inline void native_wbnoinvd(void)
 {
         asm volatile(".byte 0xf3,0x0f,0x09\n\t": : :"memory");
 }
 
-void wbnoinvd(void)
-{
-	if (cpu_feature_enabled(X86_FEATURE_WBNOINVD))
-		raw_wbnoinvd();
-	else
-		wbinvd();
-}
-
-... except the fact that cpu_feature_enabled() kinda sucks and needs
-some work, but that's a whole other can of worms we can leave closed today.
+instead of writing out a comment. It's kinda silly to have to write out
+the encoding explicitly in a comment and then have to rewrite it in the
+code.
 
