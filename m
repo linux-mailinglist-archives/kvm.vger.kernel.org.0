@@ -1,151 +1,123 @@
-Return-Path: <kvm+bounces-36312-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36313-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4DEA19BDB
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 01:36:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80F1DA19BFD
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 01:55:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B91B9188B34C
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 00:36:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 413F816A3BB
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 00:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A59717741;
-	Thu, 23 Jan 2025 00:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9741BC4E;
+	Thu, 23 Jan 2025 00:55:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BKmV1iu4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vdk4MviW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4F5C2C8;
-	Thu, 23 Jan 2025 00:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6142A849C
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 00:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737592600; cv=none; b=YxjlhySgOYzVuTpCnuGL4sPlr8XDdjTF+iPokpuko7vQKwL+FnVGXfPo4XU/jA/tnPswuZZhg6f1WmrRmbUBJxfeXDXaXyCqtUaOpZuCOChwIvGWLNbbxU+ee1GoBEoQ+sb1EWKXoHkTvL3zi12dxLYM9xi/9jmdjsvFTcZasls=
+	t=1737593748; cv=none; b=Fu9Ap/R2QmRuKGNtJyW6X7KoK+Ehjaiujtxgdevs1aWDwb2QiFEifcEkWpx5I9itRmYrE5jR/MlXbMtqgAMvdw0C6dKKNjuhSe8xWrfGNeSaSLETyXP6meKnHIdyY20C+kr+t/tPAGMZUn8htHBSECgSc3r5CfBj+xck+WGA01Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737592600; c=relaxed/simple;
-	bh=4M72IyRIuWbPn8kcGStccBne9r2ZE2KTGBycZzkv7bE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LtXde2UaPfIBgdSDtW4V4f5Dh55epBA+3qB/qcTpjo1xZTOd9vgBtAPhZsp5Kl1/SzjI7//g9OX17UVQ1RiB3yIHqwBqFYPom22TGI3J7oDXD7HvP5n9neGL0buDJfk/+wIP1/dM5antk4Uxk1l+FB+HV6pHFXOaA83EVao53Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BKmV1iu4; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737592598; x=1769128598;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=4M72IyRIuWbPn8kcGStccBne9r2ZE2KTGBycZzkv7bE=;
-  b=BKmV1iu4myVxuxvPMwLeYetEGae9uMho4Q3fVkkcs9INjWCIM9JU4pkj
-   +4If9hPx7H1xglj/0X4PrUpj2drWPVAYkUMXLbulns1fofaxa00lIE7LO
-   GMtNlfZCziorbGxETV6BCgSNvwT16qnlhKgDRoumpc0Z16+ZznUg41HSC
-   GcqTC+zRL9aH8PUj6KZuo1DH5wVXbNedEGUmh9MxuoaTyV6O70sVJvdYj
-   uDAuImogKUAB8nSRX0lfzO5ytSv7jG1FnZzEjak1Bn+RrEUeWdScUO+C/
-   1/lVCAM80ZTOuq8jU54nzi1wEgSDcDNbkLvbKyuceBGKYCIrt0L7QgqPV
-   A==;
-X-CSE-ConnectionGUID: tTzk+SnnQpKDDWXbiHU55A==
-X-CSE-MsgGUID: dGYxyRtURTmqOxfv8r4ttQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="37993873"
-X-IronPort-AV: E=Sophos;i="6.13,226,1732608000"; 
-   d="scan'208";a="37993873"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 16:36:38 -0800
-X-CSE-ConnectionGUID: Cs17F97wSD+OhDom8NAC6w==
-X-CSE-MsgGUID: eXwomfsXTg+Vmotv7MBSAA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,226,1732608000"; 
-   d="scan'208";a="107228394"
-Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.124.222.224]) ([10.124.222.224])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 16:36:30 -0800
-Message-ID: <c1c35c9c-e657-4074-b87e-98fb4b332bc5@intel.com>
-Date: Wed, 22 Jan 2025 16:36:31 -0800
+	s=arc-20240116; t=1737593748; c=relaxed/simple;
+	bh=ek/CJhN1pUQ93gVX1fEMXHFr9Yd6+LRWzXrqM/m5bRQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EP4PVas7ZgyE1iRqdkNk05fnGGWIzL4lAdOaA9Wm5sJlbXxCWnUmnc2YO8hUlegq+HrI54xEV0g6XdjbZ+dzeWrQZYMYEDur8HQO35SW7PTKPwu1DT1cZQRpl7HAztHbZfKo5LSCPpBnsmAMDY2qjVOCSEUx1EXcY0YMByvUjKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vdk4MviW; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-517aea3ee2aso243404e0c.2
+        for <kvm@vger.kernel.org>; Wed, 22 Jan 2025 16:55:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737593746; x=1738198546; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9NotBxDbYozQ1tkzIrYs0D4E9urJx1SRZbVPz4aS/pc=;
+        b=vdk4MviWnJ4tSgerYIrHVMIcxMys6uTRJloqshko8VTFYwa0mc1IIJeDnWaOSI8mTz
+         Ru12RFSMaxVR9QCW/erbzducHy5m1gkWidOwSG5u6Nvmg/d0LbQ+gwjk59WmbinmSoNB
+         0IXTYVoCterfJBNhWLKDDIN/TFYzDfFf4KxZD8QMPgw1bEAABSkea114I7D4HoDrBOuX
+         T7vHvGfydJl+v49894REWNM1oLDYa5kDpbGySfLLrVfKwT2F1UdF9pJHZU3Otj07CviR
+         fy3U3zdoYGLLFZnDkVxxxZoWc5ZcO6gACJss0WTDehaWkiOeAAU1RcXkAWKr24eix0OW
+         5I1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737593746; x=1738198546;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9NotBxDbYozQ1tkzIrYs0D4E9urJx1SRZbVPz4aS/pc=;
+        b=ED2/in9QOpQtrNYFwKHqmrtzBaUlMpGiyo5yK/yyir9niS5PfaCp3XOBt5CC8oNmVC
+         JF7XjkIYyBCdg3kS2qh5Lb3ddakW5M7X1ad5M1Z26D0zCXUAl7KAQMKaqeL/3b9GPhXc
+         ThaleyneWMBA/LBTRE6g9/HF1YRnTwoZVEpig1WOu/JPhI1JXQEQlyF1t9TvpGPwRiJ6
+         5+M8DQgqooh31fMoO71EIeEt65bXJaVsm3QZ2cImKk8KmPHNnI3tGLKiwnQBuHJLvi4s
+         WAVqfR9C75cT73Bu4hQ7KfAbFQtJqGzxYg1tvnV3UPakY0Q6obZtUZt5LdY8MEIh0zWf
+         A8rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXED6QChO3F0KC92FIrhTCRiSv/jNWtWXdjUD5d7MAida9pciXCD1r3ODoYQAzpF+eGQ5o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiYv01oo4qOkpvHTofFbb0sRomCblaYhBYwMDlaTHOeB+C2mG1
+	6gdMcBr/4C+W/G5YYwIf9Gz3KDzmf/1F0+uyjdNKcRd1QorJquZgXTF5zkdDJmv0W8nUfHBxN1U
+	9Ob3Vk/X0LsbtGSZU8zKHD2Xv0NC30SYb/Jisxoxm6RaPib5ftBoseCo=
+X-Gm-Gg: ASbGnctig8NTGQfJrUr9KyQxEoDkW2NuYRm73rCnK54K/ypQiup/fB9Cww9ClGH0ZSX
+	CF0eVapUHkWupWLCQcC1pMEJDtgd/46lJQGHZTAaGKEs9Z5YC1MT2jnL4N88MqINzyQUWDysX07
+	LEyKN9o7FK+VOqwGD+6mE=
+X-Google-Smtp-Source: AGHT+IHrLbKm4Iypkmu6qYwYex4mS8qWd1sDdZWDNi4/BJKK6GIdwJs+B7YEV+2LsAwHrYTfs4G0KQcBgVJRQdUZzVA=
+X-Received: by 2002:a05:6122:169d:b0:50d:35d9:ad60 with SMTP id
+ 71dfb90a1353d-51d5b26e01cmr19855153e0c.5.1737593745897; Wed, 22 Jan 2025
+ 16:55:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/2] x86, lib: Add WBNOINVD helper functions
-To: Kevin Loughlin <kevinloughlin@google.com>, linux-kernel@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, kirill.shutemov@linux.intel.com,
- kai.huang@intel.com, ubizjak@gmail.com, jgross@suse.com,
- kvm@vger.kernel.org, thomas.lendacky@amd.com, pgonda@google.com,
- sidtelang@google.com, mizhang@google.com, rientjes@google.com,
- manalinandan@google.com, szy0127@sjtu.edu.cn
 References: <20250122013438.731416-1-kevinloughlin@google.com>
- <20250123002422.1632517-1-kevinloughlin@google.com>
- <20250123002422.1632517-2-kevinloughlin@google.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20250123002422.1632517-2-kevinloughlin@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20250123002422.1632517-1-kevinloughlin@google.com> <20250123002422.1632517-2-kevinloughlin@google.com>
+ <c1c35c9c-e657-4074-b87e-98fb4b332bc5@intel.com>
+In-Reply-To: <c1c35c9c-e657-4074-b87e-98fb4b332bc5@intel.com>
+From: Kevin Loughlin <kevinloughlin@google.com>
+Date: Wed, 22 Jan 2025 16:55:35 -0800
+X-Gm-Features: AWEUYZn38aO3gbBobICsavjrrG_eWbicKKw6upB7w6XyQYvBTZ14xKIW2s4UHF8
+Message-ID: <CAGdbjmJtBaBt9p3-Kk=XdZZW9LAgz4nuWSDOUdPQ2jY=MpFa2w@mail.gmail.com>
+Subject: Re: [PATCH v5 1/2] x86, lib: Add WBNOINVD helper functions
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	seanjc@google.com, pbonzini@redhat.com, kirill.shutemov@linux.intel.com, 
+	kai.huang@intel.com, ubizjak@gmail.com, jgross@suse.com, kvm@vger.kernel.org, 
+	thomas.lendacky@amd.com, pgonda@google.com, sidtelang@google.com, 
+	mizhang@google.com, rientjes@google.com, manalinandan@google.com, 
+	szy0127@sjtu.edu.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/22/25 16:24, Kevin Loughlin wrote:
-> +static __always_inline void wbnoinvd(void)
-> +{
-> +	/*
-> +	 * WBNOINVD is encoded as 0xf3 0x0f 0x09. Making this
-> +	 * encoding explicit ensures compatibility with older versions of
-> +	 * binutils, which may not know about WBNOINVD.
+On Wed, Jan 22, 2025 at 4:36=E2=80=AFPM Dave Hansen <dave.hansen@intel.com>=
+ wrote:
+>
+> On 1/22/25 16:24, Kevin Loughlin wrote:
+> > +static __always_inline void wbnoinvd(void)
+> > +{
+> > +     /*
+> > +      * WBNOINVD is encoded as 0xf3 0x0f 0x09. Making this
+> > +      * encoding explicit ensures compatibility with older versions of
+> > +      * binutils, which may not know about WBNOINVD.
+>
+> This kinda pokes at one of my pet peeves. It's writing a comment where
+> code would do. I'd *much* rather write a function that explains to you
+> in code that "WBNOINVD is encoded as 0xf3 0x0f 0x09":
+>
+> static __always_inline void native_wbnoinvd(void)
+> {
+>         asm volatile(".byte 0xf3,0x0f,0x09\n\t": : :"memory");
+> }
+>
+> instead of writing out a comment. It's kinda silly to have to write out
+> the encoding explicitly in a comment and then have to rewrite it in the
+> code.
 
-This kinda pokes at one of my pet peeves. It's writing a comment where
-code would do. I'd *much* rather write a function that explains to you
-in code that "WBNOINVD is encoded as 0xf3 0x0f 0x09":
-
-static __always_inline void native_wbnoinvd(void)
-{
-        asm volatile(".byte 0xf3,0x0f,0x09\n\t": : :"memory");
-}
-
-instead of writing out a comment. It's kinda silly to have to write out
-the encoding explicitly in a comment and then have to rewrite it in the
-code.
+Yeah, I see your point. I will add this native_wbnoinvd() wrapper in v6; th=
+anks!
 
