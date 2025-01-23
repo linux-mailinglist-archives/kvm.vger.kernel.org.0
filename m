@@ -1,162 +1,321 @@
-Return-Path: <kvm+bounces-36386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67225A1A65D
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:57:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736AEA1A677
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 16:02:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E3FC188931A
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 14:57:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02FEF3AB84F
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894DA211A1F;
-	Thu, 23 Jan 2025 14:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6706320FAB7;
+	Thu, 23 Jan 2025 15:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CKBnXyMn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2073.outbound.protection.outlook.com [40.107.243.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7D72116F8
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 14:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737644248; cv=none; b=t14fJN2F5HUSe6mopY8b6diNgYv16aV5BNHk2rQ4eI0L0ihmPZ8EOtu/TzfKEI3L4/DjAApQjbbc5ntRH7BGb5eIfkE6NEULamY6fohm0HO3kxNz2fd3Lv6Mj0Ub/ejtQ6MrpGLhEPnlhsX+nL4YJTdEH7UkfDKnxy2Six6GMFg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737644248; c=relaxed/simple;
-	bh=fTZJUqNlLAPc9pkjyRGCHYO7ddQj8V2OMB2Uz4GvzRw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=oM9kWwb99JQHe/p+rlFiqxC5bBeWqN4zc4emVY1UdTeYS8eRzLMZCjOrZgi8ZiXmN6WQiFby5k/TubeR9hyffimaitsF6bXS5yGCCwVyb1K/zEDfLCNduvzyNu8ZBzv6k2mb/fvhqx8JmAt0PXWkG4WDZe/UkWeuIC33sbEyBjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ce7a0ec1easo6042665ab.0
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 06:57:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737644245; x=1738249045;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sjuCHk3cPJJKbPfJoSuHlqOyDip86LFpntpwDG2Tqqs=;
-        b=OdyHt/Ulp5TgzoP4v3AxRVoCRIpO+I4apg9Au8Q1anFIjjiMd0j2OA9GGHxZOvJ+Lf
-         hZDh5bZCa0Hz07eDAxSm+P+gHwzWpoegHJL+27RmywzJGd+TgwMJbXTKaq6HeCmQW9fS
-         VkGL3Ded9oTgwSQNe/fAKF/LvIh7RB8He5bIQZ1oEgFZ9k/voA42Shkxz294InIXQnwK
-         gJmKgksxv8Pjq1c59PBVp3oaol+EWzAmT6McY5eignPUWjYFaVTxz5oUfydSpXUXzxEo
-         LO3yB6Y0ipluZhwlg7ulC2oMV8t0Afof+scfFKfXe0vuPwVPvBPwP/B4wS+lxKoOLD98
-         +e7A==
-X-Gm-Message-State: AOJu0YyKjgxsu31eViFJkHw+VxP5IVyrtE8RFb6LyBft0oQxpsv7dEr7
-	Kzu+XqhlXWATJIhX/FPhNpzmGvVT4W0KUYNtuCz/l+9NUDiQCrILlI1yOn5hdqmwx34MvcZgHEp
-	nB76V2lav+5fSJCemLnYNOQa6OHM/c4fpHh/76MJ5ftjxzgK2vYHorh8UpA==
-X-Google-Smtp-Source: AGHT+IHWLkyfFCQWskam3uUwmD2hoz5Qzs9kx9zV6bEZEIwvQxTB/p3y2+5Twyk/F7RLhst1A0/5xTGsslhJBR1XfKKxOPDkT+1v
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D99820F994;
+	Thu, 23 Jan 2025 15:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737644543; cv=fail; b=aN3KmLUzLGUwoAESTIBDGbOXVP1bSulbs7mZNoIdPCzV4ESPglubGILCjcB9RAJ3ltcHRkAjvWqdmL9SV3Ze64HJl2ZuO+bWVbQvfr5NaMNNO5mAob7r17wpq+SuWxExLoCNK7VmmuFpBISTos7uTTkVcaHPfW7eTSRHdJFgZDI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737644543; c=relaxed/simple;
+	bh=n8n8Lu+v+KgF8cWsfFDPCSAohw0CoeD6qReTpGxa6hA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Tfc3tzs04Y+3a7OX7oe3eGxOTD76x19Hax6mouuvpclNEuy5kPxF0W/UTt8TnGtjeIXF07pb/Nu9IOLHl1D88AzHjBgGzF7ovfjg5z5mOFOmK9hEh7I3IpGxzAW+C+IKveja+wP2BrErP0HmN1TvOPpMFKN7GYAagaoECwPN3QA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CKBnXyMn; arc=fail smtp.client-ip=40.107.243.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=poCj68Nz+7xNPOA/jgTby0l2/lPVwjyuuceTA5XH1SOhcXWoBMwo7SyBrhsI9ISjHQMP2HZXh4x6pry0HbqYSOkIEszFUjLtIE5mNwaxnhJ9JbHCTPzIiDjV+task/7WyDCtnyXZMIowVEMOoi0CMivamyBDLNSeCDZ28ElohREGC9OyZ2GjlHUCDYvcPTJ1HVse5wZA5IJ6lhRckRGlNCudEiU9WNgVUtyzsLsVyL1W6JEdm4Xu2Q8evNv2volUT4C65YuZiKqE+1O+fxBJNL2i0CcvB2A54gJLfdCpYpFBnvU6rnPOp1qZZS9k/7hFkuyF7yg3z4T4lS/3w5x8GQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9X0zY1PirsxozflNWtomch701uE8KASJnn7kUGAlNx8=;
+ b=YME2nf4uLKLT94GLIwgreUNmCW/VXtb+asJQxr+0rx+1q2UAOqnBrqSzj5S7HvQVLvdLgiQWsxJqoZsVnrTGofTt9oq6HfI6qYiys9+f0ocr2uY9l4ZDZU8LmAMhlzyBq+xH8UxhGFbJc5cJim22tzFEPld+DrhkSyaNcxQkj59LzhluMVuJvIxI3+a8eyUb0ARmINpa3M+rsVE4NFzgk55M5sTFLZYNoeSzqeEcp1NluTrWKs5Ju+mCsscWQ2EKJH5gg9UNInrDd5kqDh/bY/qEd5HVudTEw/PTmGhO2CT1j688oZKwvyeLyL6oqrGDGzea2aCI7/aeoEw0xI++fg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9X0zY1PirsxozflNWtomch701uE8KASJnn7kUGAlNx8=;
+ b=CKBnXyMnJqB3xk9x2yuOa2cDd9Lb9WG70n0f/G7zKcYivHq0OjSQRAyDmx4w6Y0sRh9sPqORSXSk7vbYt3nE3LeXY3v8SMKqkOXKVDmI+Ve1xGEPTHnAROmNem8BjGC+Bqk2A2S1vLmJ/4ofLtJnuyvP6oPZrY6V72RzCv0pAvqbsKsghPliuWEnzpSI/cDnw/B1GFhub7Rh4gNZ1Tf0kBMtzpoCMv9vW8xltOGROfgiY3wTGLDxJtkeg2sPtB32QPKxnevCMjx4wdCYpDkvb0W/5v4SNzF+dQBw15fjOetsCPChR9XS2kihcBhLYLnxO1Ux+QWYpb/XN54bESnXtw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by MW4PR12MB7239.namprd12.prod.outlook.com (2603:10b6:303:228::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.17; Thu, 23 Jan
+ 2025 15:02:14 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8356.010; Thu, 23 Jan 2025
+ 15:02:14 +0000
+Date: Thu, 23 Jan 2025 11:02:12 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, Christoph Hellwig <hch@lst.de>,
+	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+Message-ID: <20250123150212.GR5556@nvidia.com>
+References: <20250120194804.GT5556@nvidia.com>
+ <Z4_HNA4QQbIsK8D9@phenom.ffwll.local>
+ <20250121173633.GU5556@nvidia.com>
+ <Z5DQsyV0vwX3Iabu@phenom.ffwll.local>
+ <6612c40d-4999-41a1-a4a5-74d3ff5875c3@amd.com>
+ <20250122143744.GF5556@nvidia.com>
+ <827315b0-23b6-4a39-88eb-34e756298d67@amd.com>
+ <20250123135946.GQ5556@nvidia.com>
+ <9a36fba5-2dee-46fd-9f51-47c5f0ffc1d4@amd.com>
+ <97db03be-df86-440d-be4a-082f94934ddf@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <97db03be-df86-440d-be4a-082f94934ddf@amd.com>
+X-ClientProxiedBy: YQBPR0101CA0210.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:67::21) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fc1:b0:3cf:b7c0:8819 with SMTP id
- e9e14a558f8ab-3cfb7c08acfmr41500115ab.9.1737644244103; Thu, 23 Jan 2025
- 06:57:24 -0800 (PST)
-Date: Thu, 23 Jan 2025 06:57:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <679258d4.050a0220.2eae65.000a.GAE@google.com>
-Subject: [syzbot] [kvm?] WARNING: suspicious RCU usage in kvm_vcpu_gfn_to_memslot
-From: syzbot <syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com>
-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MW4PR12MB7239:EE_
+X-MS-Office365-Filtering-Correlation-Id: 134183e8-d63b-4cb7-cf99-08dd3bbeeb88
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Q0V1Rjh2VXg2YWdZK2ZSSmxLVjZYUFlHY1IxRStYcm84UXdkRmVLN0VTTFVQ?=
+ =?utf-8?B?N1AxUmlZRTVxVERGT0ZINU0wTUFXclNTTlVUM01sWjBmNGIwSlozdGtJSWEz?=
+ =?utf-8?B?WUxEaElyUE1BMkZNVGMrTW9ZbDRxemdMd20rWCt0UDh2QnZYUGFVdGVpL1dk?=
+ =?utf-8?B?QWJud1hDTG9qdmpja1ljU2NkaWdLWEkwQ1E0NDZ3SHFHQm10L1RId1NIbGpG?=
+ =?utf-8?B?VjRaR0RESWpueGpjNFVCdVhVU0ZSb09GK0NoZURGZ0hWZmY0NnhXdVlJUVJq?=
+ =?utf-8?B?TFA2MlNpcFJ5M1JqU2cwVWJ1WEo2NHVqdWNwTzhDdkhPdjM3ZmFRc2x2ekYy?=
+ =?utf-8?B?L0FpV2U1UzQ2ZlFoMUFlTlBKdlRVNUlvb3BHQUJickxjRFFMSUNoclpqWmlD?=
+ =?utf-8?B?QUlGT054a0ZKQk5LVHhXZklzeXJ0cFdiQmJjL2hWM0ZTUFk1Z1U3MVVrZ3ds?=
+ =?utf-8?B?Y3Zrck9MVE1zS1VBUEdCS3hrSjNqM0VLWGRYdktSTDZvbktnL3EwVlZldlNJ?=
+ =?utf-8?B?R0FvblpHcXMzNmNLMkYvZG5tNDBsWUtQOFRnZzdLaHdWYzg0MWRIT0M5Q0Jt?=
+ =?utf-8?B?bUJVT0ZEaGcydlIrU2U2OXMvRDlNa2w2b2kxOU5LNXQzT2VrcmNhOVZrNVhY?=
+ =?utf-8?B?aEpRL0pWdnIvVURGVmRHTnh1NEZ0U2thY0FyUUIybS9hVW1XaU9oMW83RmNk?=
+ =?utf-8?B?T1AxNjR2SERYYzVWQUZZVU9wUTNNRkgwRmJmRy96RjlFb3ZZOXJmbmltMm13?=
+ =?utf-8?B?eUpBUEM5YUNkejZyWG10NW8wUmhwK2hacyswV0pxSE9BTlZ0ZHBBVTBZK0tM?=
+ =?utf-8?B?a3ovcDBIRGlJM0NSZ1ZNY1dDY1JFeEFpcEgrbjZZVzh5NkpqQ2NUM1JIdkpW?=
+ =?utf-8?B?V0k5ZWpTSS9sY0p4UkdLNnloOGd1OEQ2RDhjYlAzREZOeUF4NmtpUHV5amVN?=
+ =?utf-8?B?QzZaVHozZTJwcEVKeTRDMVNDOXBFZWVMME9XbXo0cTV6T09reVltQ0Y1SXoy?=
+ =?utf-8?B?SXl5aVlnNFozRTI0WDZSVG9qc2xKWjRBcVh3dEdBTHB2YU5jZUJ6d2xrTlhn?=
+ =?utf-8?B?TWRmbjNTcEEvSDNlS3hKUjJ2SUw1aEN0M0F1OFlsLy9yR2M1d0dFYkNGSVlO?=
+ =?utf-8?B?ZUx2aXhPb0NrOGU2VW5xV1pacVdrVkNFRjhiMjZqcURocTJ0RXkrZ2hhd1NL?=
+ =?utf-8?B?WWlPcFNleTdRcUFmU3lZaG5LbVoxWE5oZHNHUDhobGIvRXZCNno2Y296SFlx?=
+ =?utf-8?B?OS9iWWpOcVQ4dmIzZG5uN2lIVUVMM3NvUzJOaVNnWkt3VXFEbGtYeVJyTUxY?=
+ =?utf-8?B?Z2tEcGFwQlNlSzNLYTVPYnROeFUvd2YrcUJUV0Nna0pEMk5nTHhyU3gyMGNJ?=
+ =?utf-8?B?ejNVVmZPRHdDSE9HMW0zeHViTnlmSDhyL3dPU3ZGSHNiUzJRdTMrZ3lwRUx3?=
+ =?utf-8?B?VkVjYXpzN25QQUxEM3VCcG1uMnpsbGxrQ1UxcEN4SWlqaTd2WVI3SjVMYm9a?=
+ =?utf-8?B?S1padDZROHhqTzVPb1ZiUEU3QUprODZlanF0QXYwOVZrVkJhbElUMUZpbWJM?=
+ =?utf-8?B?amptNWZwZnhidUxiNUhJYkIvY2hrVnJtYkVJeTFKMitQeG90M2lOM1M0NGUy?=
+ =?utf-8?B?MEpvOXQ3MEQxb3VLdTFmU0tyNzFmcUFkelB2TGp6b2gxazdmdEVaYWVwS1dh?=
+ =?utf-8?B?MWNPVTIzSzBnYzAxRTdIalNzSGsyVGRrSkE1aXdFVlYwZVUrUlo0QVdxSDA1?=
+ =?utf-8?B?SFdTS081eHZNNmU5Qk1jT3ljT29iZVFydTRSSjdxRGdldGY2aTF6Rjhha28y?=
+ =?utf-8?B?OWlqb1RVbk95SmpDTks1c3NDM3ovWSs1cHlZcSs2bFdudTlwT0IvR2syL1kx?=
+ =?utf-8?Q?kmKLHIMWK3251?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OFdSMlpKNTRQWm01TWVhTTU5cFdHWCtlWExSSWlxM2twZ1VXM1dLdlJ4NDdx?=
+ =?utf-8?B?cGFhRnpwbk5lTmJENjE2MHFnOUc0UXlFQStwUmdDZTFzSUZwcVpNY0JzWnhp?=
+ =?utf-8?B?RmZXVkh0NStoZVViS1dxZ1MyanBmTUdtUkdYNUU2bkdQNE1UUVczOHlGRWJC?=
+ =?utf-8?B?eE1TNGxCK0lneHh0WS8zcEQzVjdKQkV1bFRYMjFqWENrSmZjbmlxZ3VhUTJG?=
+ =?utf-8?B?MGpndFNFdG9zelY4ekhkeGJyRFhIR25iRmQrbkttUUlrdFJEdmtHbVpiWjNZ?=
+ =?utf-8?B?d0lQTGJNQzJ5MjlGYUhlSkdXRlBSR3Q0WkhhQk1MYWJzTDZTSWh4S3lNQlA3?=
+ =?utf-8?B?WUFPOG43N0NIZ1g2amZoZ213b3dDTEZWOE5Dc1JiUUR1TGJpcTlPN0tLZm92?=
+ =?utf-8?B?c2hvNVVjZnVKdjBSRjRWdjAzVzM3WGZxNEN2ODBCNWx1QUlWb3crOEpLdGFC?=
+ =?utf-8?B?TXFlck13ZEY2aUdSb2t4QzhRV0JxSjVhakpOSzRJNDd3QWxwT2JvM0toUEZk?=
+ =?utf-8?B?THNCMkNTbTFkd3M0VUpxemtJQnQ4M2NxTXQ5RlVVOXRaRTdXVWN3MVdIejR3?=
+ =?utf-8?B?NTFJc2lRMWY1enJWSFhSNVoxM2FuL2UxNzk5RktWTEt0ZitXempiMDFNaStG?=
+ =?utf-8?B?RmVuL01tSnZMb04rdy81eTNEUDJOcFJKd0diaVBVYkQrazY4V3hiTFFpbHZq?=
+ =?utf-8?B?NnFnYlhTUDltd1JYVnk0UkI1MkR4RWNMMXMzSGZxbDN6OVhHaFE1NXErdEh0?=
+ =?utf-8?B?emZ4cGlPTkh4QmxrYmxiZjVsNTA1L0RGMi9ycjBBeE52YmpySWlLOWZvYXlu?=
+ =?utf-8?B?eUpSOGJmeHFaa3NMS3IycFpaeDdKQmRhRDJydENQQml5RitNZG5PSTZleU1G?=
+ =?utf-8?B?cUxFT3lpNzEwaHM1UzcvblBadjVDcmdtVC9ua3VsdnBXc0g2Uk8xc1ZaenNh?=
+ =?utf-8?B?Z1VQRlVEOUNROUNpVXMyVkZET05sSnVxc2ExN1g2a0ZoV2Q1bXA0SEl0OVNs?=
+ =?utf-8?B?Zk5xamdpc2I1b3VHK3puYzVKVEJWU01IbVp1cHJUc1JOYUdqcktYaUx2U01n?=
+ =?utf-8?B?NVAvSVJXNWVFWXM3M3pkV0Nnck55cSs5dU1yOHFtejhSVVNKWDdmeTlKTmta?=
+ =?utf-8?B?aFJFYWt6SFl4eW15MEpQdnNoU24vcmtYRDFnK1llTlRxUTR0Y0FlVklVUFl1?=
+ =?utf-8?B?YXNZQlNQWURXbUxXbVlqaVdkT2VHMVdtUzBBZWdWaGwzbXEzNDRQSU5TWUVq?=
+ =?utf-8?B?czBZRWl2SmVCejAweGw3UEtGNkd1cWt4dlc3NzhHL0dNOWFSRjE4Qi9PbFVW?=
+ =?utf-8?B?am1HYVdxaTUzNUJ3SmxvaVh6RFoxUnVWYVBzcDFuOGFZSG94d1d2cmV3TTlR?=
+ =?utf-8?B?SU1YRWtlUG9WK0MrRXEyR3c4TVZzRWpHN0xVM3JCWGNsWEJjcXRaOGVrTEpv?=
+ =?utf-8?B?aEtYQmpmKzRNWmU2OVczZTlERmt4ckpiYTVJMSs2YU1UcjM3UmJYMlFxTEtV?=
+ =?utf-8?B?a0UrY0Vwc2c5dG1EZGxLUlVwcCt0enN2Ynd2NDIxRDNzaFRNeWhpNGQyNytS?=
+ =?utf-8?B?Zmh5bWhpMHRDR1RycEplTldnMXFnQ1RLM3JENHNBUkJVZ0pISHVGaC9mUWxE?=
+ =?utf-8?B?dDAxQVJSNVFnd0E2RG1MVS9YNTR4aVQzMG0yc0ZGMzNRbjNGTHIzbFBHSmll?=
+ =?utf-8?B?ZjJ1WUlWbUlCTXhRYkRRb0Z0RFVwb1ZPYmxvYmg4VFBLRkFMYU5WZVpFL2xn?=
+ =?utf-8?B?WTJSL2UrY3ZMbktDOXU5dVdHN0ZkR1o4aGc1aXlNUDd1cGpJOTR0b1Yva0Yx?=
+ =?utf-8?B?NmZNeHpWYVdTK09Zd3FXc1lueGd2VnhjMDNoZTlaMEdEbnNXSXlRSkxyZ3lL?=
+ =?utf-8?B?YzZLS01WWUZLWEh5dHIrYllCa1V0SVZMU0M4dE9BdE9OZS82ZUdjZE1nK0w2?=
+ =?utf-8?B?Y0Z3REFlcUhOdmkvRklGZ2IwelY3V0Q2RWZ0SEU2UTZVTzl6NWdpSlptOWQ3?=
+ =?utf-8?B?d2pZcXN1RW45Yzc5QmU0bnZocVF0Tkh3MGw0eGhBZEVRT2doLzVid3RpT2ov?=
+ =?utf-8?B?VGRLb0syOG16RnF2MGl3ZUIyZy9sVXFVbHJGa21GTzh1cmN2a1hjQWJ3c21N?=
+ =?utf-8?Q?jhZhi/LcyDymuAj0knGdxI048?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 134183e8-d63b-4cb7-cf99-08dd3bbeeb88
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2025 15:02:14.0054
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jYoMGucttTUnGRvoUdgsaJZY8KEv7mtbxt/x6NXWYE8kRZMSKldPwzGKJMwHyt4s
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7239
 
-Hello,
+On Thu, Jan 23, 2025 at 03:35:21PM +0100, Christian König wrote:
+> Sending it as text mail once more.
+> 
+> Am 23.01.25 um 15:32 schrieb Christian König:
+> > Am 23.01.25 um 14:59 schrieb Jason Gunthorpe:
+> > > On Wed, Jan 22, 2025 at 03:59:11PM +0100, Christian König wrote:
+> > > > > > For example we have cases with multiple devices are in the same IOMMU domain
+> > > > > > and re-using their DMA address mappings.
+> > > > > IMHO this is just another flavour of "private" address flow between
+> > > > > two cooperating drivers.
+> > > > Well that's the point. The inporter is not cooperating here.
+> > > If the private address relies on a shared iommu_domain controlled by
+> > > the driver, then yes, the importer MUST be cooperating. For instance,
+> > > if you send the same private address into RDMA it will explode because
+> > > it doesn't have any notion of shared iommu_domain mappings, and it
+> > > certainly doesn't setup any such shared domains.
+> > 
+> > Hui? Why the heck should a driver own it's iommu domain?
 
-syzbot found the following issue on:
+I don't know, you are the one saying the drivers have special shared
+iommu_domains so DMA BUF need some special design to accommodate it.
 
-HEAD commit:    95ec54a420b8 Merge tag 'powerpc-6.14-1' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15ff45df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f27a9722e53abeaa
-dashboard link: https://syzkaller.appspot.com/bug?extid=cdeaeec70992eca2d920
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=133ed618580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=110449f8580000
+I'm aware that DRM drivers do directly call into the iommu subsystem
+and do directly manage their own IOVA. I assumed this is what you were
+talkinga bout. See below.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-95ec54a4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/06bc523d1d96/vmlinux-95ec54a4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c0b342c3e200/bzImage-95ec54a4.xz
+> > The domain is owned and assigned by the PCI subsystem under Linux.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com
+That domain is *exclusively* owned by the DMA API and is only accessed
+via maps created by DMA API calls.
 
-=============================
-WARNING: suspicious RCU usage
-6.13.0-syzkaller-00918-g95ec54a420b8 #0 Not tainted
------------------------------
-./include/linux/kvm_host.h:1038 suspicious rcu_dereference_check() usage!
+If you are using the DMA API correctly then all of this is abstracted
+and none of it matters to you. There is no concept of "shared domains"
+in the DMA API. 
 
-other info that might help us debug this:
+You call the DMA API, you get a dma_addr_t that is valid for a
+*single* device, you program it in HW. That is all. There is no reason
+to dig deeper than this.
+ 
+> > > > The importer doesn't have the slightest idea that he is sharing it's DMA
+> > > > addresses with the exporter.
+> > > Of course it does. The importer driver would have had to explicitly
+> > > set this up! The normal kernel behavior is that all drivers get
+> > > private iommu_domains controled by the DMA API. If your driver is
+> > > doing something else *it did it deliberately*.
+> > 
+> > As far as I know that is simply not correct. Currently IOMMU
+> > domains/groups are usually shared between devices.
 
+No, the opposite. The iommu subsystem tries to maximally isolate
+devices up to the HW limit.
 
-rcu_scheduler_active = 2, debug_locks = 1
-no locks held by syz-executor167/5303.
+On server platforms every device is expected to get its own iommu domain.
 
-stack backtrace:
-CPU: 0 UID: 0 PID: 5303 Comm: syz-executor167 Not tainted 6.13.0-syzkaller-00918-g95ec54a420b8 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x226/0x340 kernel/locking/lockdep.c:6845
- __kvm_memslots include/linux/kvm_host.h:1036 [inline]
- kvm_vcpu_memslots include/linux/kvm_host.h:1050 [inline]
- kvm_vcpu_gfn_to_memslot+0x429/0x4c0 virt/kvm/kvm_main.c:2554
- kvm_vcpu_write_guest_page virt/kvm/kvm_main.c:3238 [inline]
- kvm_vcpu_write_guest+0x7c/0x130 virt/kvm/kvm_main.c:3274
- kvm_xen_write_hypercall_page+0x2ff/0x5f0 arch/x86/kvm/xen.c:1299
- kvm_set_msr_common+0x150/0x3da0 arch/x86/kvm/x86.c:3751
- vmx_set_msr+0x15da/0x2790 arch/x86/kvm/vmx/vmx.c:2487
- __kvm_set_msr arch/x86/kvm/x86.c:1877 [inline]
- kvm_vcpu_reset+0xbea/0x1740 arch/x86/kvm/x86.c:12456
- kvm_arch_vcpu_create+0x8dc/0xa80 arch/x86/kvm/x86.c:12305
- kvm_vm_ioctl_create_vcpu+0x3d6/0xa00 virt/kvm/kvm_main.c:4106
- kvm_vm_ioctl+0x7e2/0xd30 virt/kvm/kvm_main.c:5019
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f9a62a26369
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff83b20f38 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fff83b21108 RCX: 00007f9a62a26369
-RDX: 0000000000000000 RSI: 000000000000ae41 RDI: 0000000000000004
-RBP: 00007f9a62a99610 R08: 00007fff83b21108 R09: 00007fff83b21108
-R10: 00007fff83b21108 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007fff83b210f8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+> > Especially multi function devices get only a single IOMMU domain.
 
+Only if the PCI HW doesn't support ACS.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+This is all DMA API internal details you shouldn't even be talking
+about at the DMA BUF level. It is all hidden and simply does not
+matter to DMA BUF at all.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> > > The new iommu architecture has the probing driver disable the DMA API
+> > > and can then manipulate its iommu domain however it likes, safely. Ie
+> > > the probing driver is aware and particiapting in disabling the DMA
+> > > API.
+> > 
+> > Why the heck should we do this?
+> > 
+> > That drivers manage all of that on their own sounds like a massive step
+> > in the wrong direction.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+I am talking about DRM drivers that HAVE to manage their own for some
+reason I don't know. eg:
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+drivers/gpu/drm/nouveau/nvkm/engine/device/tegra.c:             tdev->iommu.domain = iommu_domain_alloc(&platform_bus_type);
+drivers/gpu/drm/msm/msm_iommu.c:        domain = iommu_paging_domain_alloc(dev);
+drivers/gpu/drm/rockchip/rockchip_drm_drv.c:    private->domain = iommu_paging_domain_alloc(private->iommu_dev);
+drivers/gpu/drm/tegra/drm.c:            tegra->domain = iommu_paging_domain_alloc(dma_dev);
+drivers/gpu/host1x/dev.c:               host->domain = iommu_paging_domain_alloc(host->dev);
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Normal simple drivers should never be calling these functions!
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+If you are calling these functions you are not using the DMA API, and,
+yes, some cases like tegra n1x are actively sharing these special
+domains across multiple devices and drivers.
 
-If you want to undo deduplication, reply with:
-#syz undup
+If you want to pass an IOVA in one of these special driver-created
+domains then it would be some private address in DMABUF that only
+works on drivers that have understood they attached to these manually
+created domains. No DMA API involvement here.
+
+> > > > I still strongly think that the exporter should talk with the DMA API to
+> > > > setup the access path for the importer and *not* the importer directly.
+> > > It is contrary to the design of the new API which wants to co-optimize
+> > > mapping and HW setup together as one unit.
+> > 
+> > Yeah and I'm really questioning this design goal. That sounds like
+> > totally going into the wrong direction just because of the RDMA
+> > drivers.
+
+Actually it is storage that motivates this. It is just pointless to
+allocate a dma_addr_t list in the fast path when you don't need
+it. You can stream the dma_addr_t directly into HW structures that are
+necessary and already allocated.
+
+> > > For instance in RDMA we want to hint and control the way the IOMMU
+> > > mapping works in the DMA API to optimize the RDMA HW side. I can't do
+> > > those optimizations if I'm not in control of the mapping.
+> > 
+> > Why? What is the technical background here?
+
+dma-iommu.c chooses an IOVA alignment based on its own reasoning that
+is not always compatible with the HW. The HW can optimize if the IOVA
+alignment meets certain restrictions. Much like page tables in a GPU.
+
+> > > The same is probably true on the GPU side too, you want IOVAs that
+> > > have tidy alignment with your PTE structure, but only the importer
+> > > understands its own HW to make the correct hints to the DMA API.
+> > 
+> > Yeah but then express those as requirements to the DMA API and not move
+> > all the important decisions into the driver where they are implemented
+> > over and over again and potentially broken halve the time.
+
+It wouild be in the DMA API, just the per-mapping portion of the API.
+
+Same as the multipath, the ATS, and more. It is all per-mapping
+descisions of the executing HW, not global decisions or something
+like.
+
+Jason
 
