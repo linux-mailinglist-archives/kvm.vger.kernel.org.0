@@ -1,153 +1,177 @@
-Return-Path: <kvm+bounces-36352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1151CA1A463
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:35:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B12BA1A46E
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:42:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C87EC18819F5
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:35:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BDDF1644CF
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6958B20F087;
-	Thu, 23 Jan 2025 12:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49DF20F07C;
+	Thu, 23 Jan 2025 12:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BXS7gvt3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9s6dMmn"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF1C3596B
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 12:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7C5136E3B
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 12:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737635724; cv=none; b=PFBm5RNRn8UAso7y4OYyLhm5qCi2tw3s+V6klaFwMMhRDVXiR2boFy6B6Mcxafw+jb2xAbelU89YW/TPIJoNoHO3CjI8kr+csKSUkmDqGBU6PdbOVREmbTvpFBSomU+hKxKPELZM+06lNI3TgTSWdNxeF+y9+HjIeDiqXcWWT6U=
+	t=1737636116; cv=none; b=tCmFFLraGEz/QxzvViZwmigSfm6suGKYATvkim4dILuRRPFxf/Nrx/5zDFNKU2tW26PY/vVAFcngRzfkgyiOL6yvpg7dVA4E1qf9q5xEJqfgr9EXlqmWqfyc7J/IhL3ps0KqEz37bX2heERqRCKFSX0v95Q8EgV+SjvQGlgpXu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737635724; c=relaxed/simple;
-	bh=xnFi+wOJypDbDOuWBma0iM8HogcsxEUv2vuCeSTtlvw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tF76Oek0ba6GqnmXnVxWIWLPVB2jsTVg66k0HoUOBTX4bDtB4StomoahthtXqN9VdoTF5CYW8ia91vOpm2DM0uC7iix4CLzDj1GtUIR1GIJKVG250cEdn1pAm2ztLMou7XJy1B6wKLZB1/KZfXmv7pGnptDJG+tUN9OOhnJv9tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BXS7gvt3; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1737636116; c=relaxed/simple;
+	bh=OlU2/UUlea+lG4tV50En4ktxe/fonxdcvwbkAFIMtfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hsU5Nsnpvn0ZFA0P6j+DibO/68wwYlQ3r83GEt85Ne6I50sl6pt3j56qK1GqgiV9ZC6DYNcUW1ioqwnTfOxBX9/bJzcAZ0Xw8S6NIwXtF629KDkwh0G+yYCy6G5EVK99UxriT7FXuWMZjG8zuxskLMXCKDLe9dUUl5EbOVxbVzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y9s6dMmn; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737635721;
+	s=mimecast20190719; t=1737636113;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=m8606wbDjuykWUSCHLg5Z4OmTqWmwe2NXbgkVdN2fJg=;
-	b=BXS7gvt3ENO734xEbi65Jb3pZI4p2bc3SGEj8fOpCT3j6c8OwQn8iEI0o0r0aJsBgHnNCi
-	Wpj+lqEmoLqqWIyTlX2vPIUedCxCtjAj3Dg5INjn1146aVjwj6zHHMSJEYBFKpmNO07M6R
-	Ik7ZkZgcicBW31/ldG2Tfqy6S87yqEs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=u5FZv+8u+d2GtcDrre/mQ3Ye6vAjYVJKfIBRUFGXtx4=;
+	b=Y9s6dMmnj61YDzY1sLqeXDIBLP4aWJSIui5SL0vsposG3mC7jl1aNHSccQ9IFLxETGWf/s
+	kfkKpUy1vEiDqiHHUJeHSez1/GN4JWH4OLMC/ryiPHqBdI+hJ9F2WUW+Xd0Ebg7wGVj/XC
+	P8t9ysL6E/NgUyuZpNZdhNKQquQS5F4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-459-z4AvbsW3OCSXcj_X42Sd9Q-1; Thu, 23 Jan 2025 07:35:20 -0500
-X-MC-Unique: z4AvbsW3OCSXcj_X42Sd9Q-1
-X-Mimecast-MFC-AGG-ID: z4AvbsW3OCSXcj_X42Sd9Q
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4361efc9d1fso7076175e9.2
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 04:35:20 -0800 (PST)
+ us-mta-655-ddq0XIrlM9qVw9cPV9uGbw-1; Thu, 23 Jan 2025 07:41:52 -0500
+X-MC-Unique: ddq0XIrlM9qVw9cPV9uGbw-1
+X-Mimecast-MFC-AGG-ID: ddq0XIrlM9qVw9cPV9uGbw
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436723bf7ffso6092625e9.3
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 04:41:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737635719; x=1738240519;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m8606wbDjuykWUSCHLg5Z4OmTqWmwe2NXbgkVdN2fJg=;
-        b=rlhMjm+2xsdbq0IEdww28kpdApnEFWijXfugdL4A1zVo0s1xBOPa0ANwtYaA81j1Xv
-         aJ3tab4gia4aepmikOD3G4lb6EyKY2VBZIxkyZWutTGZhwxI4ztVQqDvCj/RPnQdQ3/T
-         ilIrCsOJmb/F3GD0i8A1Y0/lbwGUvmE4xcPZg86jEbeNUAReStJu/L5vCpAB3OCmlIgZ
-         quPPb/ilFKCbl70UZmZlbKx/HRgJzTk0V0nQh0M0fPyGnH2KQNdjWCLNVs80U5bbbzkD
-         YXOWdzcrFT/ctCG/RCR7efHdvYTjGhvgM/TSy+UG00bvXOL/nV/9ZqSpbvE+nPbLH/ME
-         cIkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvJ/LhfTyaCGHH4cxOUhS6QzC2BGEVS+UDZ27VoEZIIwWNtBb2OgHO2tey3rjZDOMx4FQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGvBotv6mx6N6dYJ29P0wtFQrIXDT1cirvDoo6VtwtPoWREEXq
-	ir+hgT9UFmTEkLYIy3N1uzpRyQZSbFT0zoaO105j6cI5bYKDnQfolSoTN/gUecLm8wEW45ypNl+
-	UYJCgP6UpDR0BClZIUSyuxkZtkAMp8+o/sDvRiJzY2k7fzYQwGO6Huew1JA==
-X-Gm-Gg: ASbGncsEb5TwTfrgNO+WaFlBoiEfBBGN9t6/5UHrCP1CDftfXNGqnKj5NhUHXN/jXwV
-	YU2B4PfH/rZKsjiq6i/p0eq0iul8qYkUCTBMXpXYpKOj2bBxBwlAYF6UqrxtTKBcMSv7LN3iCOV
-	2OvRts3NRH4B/iKcHMDRU2MZOkGbkC5op8X5650NE6xrM6FaqfHKsj/VWnb8mDu2jw6KqoQqskT
-	p3Y+7luvRnLPk3xVLgtqxavdEML2hsN2yBZ28aJo3yIseGosKxIsRIroZBnexvu
-X-Received: by 2002:a05:600c:4e89:b0:436:30e4:459b with SMTP id 5b1f17b1804b1-438913f1649mr250850325e9.18.1737635719164;
-        Thu, 23 Jan 2025 04:35:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEC4nMXDk7Ulk569V8Hjp92gcI6PLi8LlyaLduqUrS8eS5+QtUPpRjnXFGrijzXxgvwLXzPHA==
-X-Received: by 2002:a05:600c:4e89:b0:436:30e4:459b with SMTP id 5b1f17b1804b1-438913f1649mr250850045e9.18.1737635718762;
-        Thu, 23 Jan 2025 04:35:18 -0800 (PST)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31b7655sm59718235e9.30.2025.01.23.04.35.17
+        d=1e100.net; s=20230601; t=1737636111; x=1738240911;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u5FZv+8u+d2GtcDrre/mQ3Ye6vAjYVJKfIBRUFGXtx4=;
+        b=Vf+cKkGNHslTdZrYU9PzGigwyy9je0eympg8c2nQNtSjwYumqwiNSum6U8vArfG7DQ
+         GqDw2rAPLgCNt2/UajaxIq6SeKptDbsUYaEfurl8xYGTJSxSLOSUj5LBPByX5eeAFlG8
+         wY91V9X+FDnT9SE2k7a98Z4CI36xe/XbXLyqF9LHE4yBeicMBTDr+glgx0ujN0x6oFQX
+         iKZ55gaDVN/7n9VDcnw+ve1J17mRKXVe+trgJ8kfrAgplyECKvpPn0a5epdqSNOE0FaV
+         rhLOtsZKQBE1apiflDo7pPYaFiLySpoAjIvDn2+uDl5At2GE7P3HGZVrBDLX5E6JeXcn
+         Jkpg==
+X-Forwarded-Encrypted: i=1; AJvYcCW4zRsbdQ9aGKg3NIGXISBaOQqtn5SdV6ATyyGrapuwHPYD82Lj6/gCssWMqo5iR6Z7bd0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBXO+7sqRwwwbPyFEAbhGFv74nd/e4flgPuJthp2WaJnLzWeo/
+	vKqScWLNFTVr7L38Ud3mWO1aW5JaxeWFsPq5bm21GbjSnB9e0r4mROyInJuUB/DVaDTz/ESRr1R
+	pyaa2IZsGinGVpF6fwogw6oQLL8ldc/RAfYPos/BsC4LeA31zLw==
+X-Gm-Gg: ASbGncsRANvZ3LrD8X9NrRD8aQ33qj6I/sAR1OHKjX/9X8zukQmyyAR/MMKozYPQxyT
+	aFTuCOZQTH9bxdpi8Pr2FdVCOqK/jXykDZk7sc04NBAVN2X4grIUbTF3sDUzeP0BscBCn5TneZ7
+	+2n0o/TDt2TmHaAoUu/pP+R0odfQwWFXgzIk0z+8M6PbHKVMvy9D7LzRx+LnTnzpmCyvdqAigWO
+	XM326PM38Y36zURAK4uDSt8umkcPH/FFxeMrOFdSJPUjOiEmENlVEsPT8mVM2CyGElrLJDmtYl5
+	vmuICwmD5YogUmMHc8d0iWe6bsj0fOsKRo56XJ+BMA==
+X-Received: by 2002:a05:600c:1987:b0:434:f753:6012 with SMTP id 5b1f17b1804b1-438913f2f4emr259295215e9.17.1737636110979;
+        Thu, 23 Jan 2025 04:41:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFaf0J1FpGBG9DXD2cCzVrXAaT6T+N0ZijcOGKXj6jeyiABkDxsaVx5NBozYlDdObLnfmJtRw==
+X-Received: by 2002:a05:600c:1987:b0:434:f753:6012 with SMTP id 5b1f17b1804b1-438913f2f4emr259294915e9.17.1737636110549;
+        Thu, 23 Jan 2025 04:41:50 -0800 (PST)
+Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf32151f1sm19447922f8f.14.2025.01.23.04.41.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 04:35:18 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, David Woodhouse
- <dwmw2@infradead.org>
-Cc: paul@xen.org, Fred Griffoul <fgriffo@amazon.co.uk>, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
- Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
-In-Reply-To: <Z5FqdjTwPmnV1t-1@google.com>
-References: <20250122161612.20981-1-fgriffo@amazon.co.uk>
- <87tt9q7orq.fsf@redhat.com> <a5d69c3b-5b9f-4ecf-bae2-2110e52eac64@xen.org>
- <87r04u7ng7.fsf@redhat.com>
- <06e9f951afb46098983dc009c0efbcef3fc1b246.camel@infradead.org>
- <Z5FqdjTwPmnV1t-1@google.com>
-Date: Thu, 23 Jan 2025 13:35:17 +0100
-Message-ID: <87ldv17loa.fsf@redhat.com>
+        Thu, 23 Jan 2025 04:41:49 -0800 (PST)
+Date: Thu, 23 Jan 2025 13:41:48 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>, Zhao Liu
+ <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel
+ Apfelbaum <marcel.apfelbaum@gmail.com>, Ani Sinha <anisinha@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>, Yanan Wang
+ <wangyanan55@huawei.com>, Cornelia Huck <cohuck@redhat.com>, "Daniel P.
+ =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Eric Blake
+ <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, rick.p.edgecombe@intel.com, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org
+Subject: Re: [PATCH v6 40/60] hw/i386: add eoi_intercept_unsupported member
+ to X86MachineState
+Message-ID: <20250123134148.036d52b0@imammedo.users.ipa.redhat.com>
+In-Reply-To: <20241105062408.3533704-41-xiaoyao.li@intel.com>
+References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
+	<20241105062408.3533704-41-xiaoyao.li@intel.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Sean Christopherson <seanjc@google.com> writes:
+On Tue,  5 Nov 2024 01:23:48 -0500
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-> On Wed, Jan 22, 2025, David Woodhouse wrote:
->> On Wed, 2025-01-22 at 18:44 +0100, Vitaly Kuznetsov wrote:
->> > > What is the purpose of the comparison anyway?
->
-> To avoid scenarios where KVM has configured state for a set of features X, and
-> doesn't correctly handle vCPU features suddenly become Y.  Or more commonly,
-> where correctly handling such transitions (if there's even a "correct" option)
-> is a complete waste of time and complexity because no sane setup will ever add
-> and/or remove features from a running VM.
->
->> > > IIUC we want to ensure that a VMM does not change its mind after KVM_RUN
->> > > so should we not be stashing what was set by the VMM and comparing
->> > > against that *before* mangling any values?
->> > 
->> > I guess it can be done this way but we will need to keep these 'original'
->> > unmangled values for the lifetime of the vCPU with very little gain (IMO):
->> > KVM_SET_CPUID{,2} either fails (if the data is different) or does (almost)
->> > nothing when the data is the same.
->
-> More importantly, userspace is allowed to set the CPUID returned by KVM_GET_CPUID2.
-> E.g. selftests do KVM_GET_CPUID2 specifically to read the bits that are managed
-> by KVM.
->
-> Disallowing that would likely break userspace, and would create a weird ABI where
-> the output of KVM_GET_CPUID2 is rejected by KVM_SET_CPUID2.
->
->> If they're supposed to be entirely unchanged, would it suffice just to
->> keep a hash of them?
+> Add a new bool member, eoi_intercept_unsupported, to X86MachineState
+> with default value false. Set true for TDX VM.
 
-In case we want to support both cases:
-- VMM calls KVM_SET_CPUID2 at some point in vCPU's lifetime with the
-same data it used initially;
-- VMM does KVM_GET_CPUID2 and feeds this directly into KVM_SET_CPUID2
-we can't use a hash as the later contains entries mangled by
-KVM. Currently, we kind of support both but we expect the result of the
-mangling done by KVM to always be the same.
+I'd rename it to enable_eoi_intercept, by default set to true for evrything
+and make TDX override this to false.
+> 
+> Inability to intercept eoi causes impossibility to emulate level
+> triggered interrupt to be re-injected when level is still kept active.
+> which affects interrupt controller emulation.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/i386/x86.c         | 1 +
+>  include/hw/i386/x86.h | 1 +
+>  target/i386/kvm/tdx.c | 2 ++
+>  3 files changed, 4 insertions(+)
+> 
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 01fc5e656272..82faeed24ff9 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -370,6 +370,7 @@ static void x86_machine_initfn(Object *obj)
+>      x86ms->oem_table_id = g_strndup(ACPI_BUILD_APPNAME8, 8);
+>      x86ms->bus_lock_ratelimit = 0;
+>      x86ms->above_4g_mem_start = 4 * GiB;
+> +    x86ms->eoi_intercept_unsupported = false;
+>  }
+>  
+>  static void x86_machine_class_init(ObjectClass *oc, void *data)
+> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+> index d43cb3908e65..fd9a30391755 100644
+> --- a/include/hw/i386/x86.h
+> +++ b/include/hw/i386/x86.h
+> @@ -73,6 +73,7 @@ struct X86MachineState {
+>      uint64_t above_4g_mem_start;
+>  
+>      /* CPU and apic information: */
+> +    bool eoi_intercept_unsupported;
+>      unsigned pci_irq_mask;
+>      unsigned apic_id_limit;
+>      uint16_t boot_cpus;
+> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+> index 9ab4e911f78a..9dcb77e011bd 100644
+> --- a/target/i386/kvm/tdx.c
+> +++ b/target/i386/kvm/tdx.c
+> @@ -388,6 +388,8 @@ static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+>          return -EOPNOTSUPP;
+>      }
+>  
+> +    x86ms->eoi_intercept_unsupported = true;
 
-I guess we can change the logic the following: when KVM_SET_CPUID2 is
-called on a vCPU again we check that all entries which KVM did not touch
-match. For that, we will need to keep a list of mangled entries so we
-can introduce a kvm_mangle_cpuid_entry() helper to avoid the need to
-keep a static list. Personally, I'm not sure this is not an overkill
-though.
+I don't particulary like accel go to its parent (machine) object and override things there
+and that being buried deep inside.
 
--- 
-Vitaly
+How do you start TDX guest?
+Is there a machine property or something like it to enable TDX?
+
+> +
+>      /*
+>       * Set kvm_readonly_mem_allowed to false, because TDX only supports readonly
+>       * memory for shared memory but not for private memory. Besides, whether a
 
 
