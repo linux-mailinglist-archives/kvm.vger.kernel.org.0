@@ -1,103 +1,105 @@
-Return-Path: <kvm+bounces-36353-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36354-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B12BA1A46E
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:42:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83ACEA1A492
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:54:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BDDF1644CF
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:42:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41CE73AC6F4
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49DF20F07C;
-	Thu, 23 Jan 2025 12:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE3820F07B;
+	Thu, 23 Jan 2025 12:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9s6dMmn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TsIoqCsg"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7C5136E3B
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 12:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9442720C492
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 12:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737636116; cv=none; b=tCmFFLraGEz/QxzvViZwmigSfm6suGKYATvkim4dILuRRPFxf/Nrx/5zDFNKU2tW26PY/vVAFcngRzfkgyiOL6yvpg7dVA4E1qf9q5xEJqfgr9EXlqmWqfyc7J/IhL3ps0KqEz37bX2heERqRCKFSX0v95Q8EgV+SjvQGlgpXu4=
+	t=1737636837; cv=none; b=VFsMLJDi5bxPv1tgxY3z5Wu1odQAfMBD7MzxkVc0cSlHSA4QcNLIq2O9E0OnI8p0YyZFc/T2s+iaGXIzRKUCyPtUdMGA7dykpb+m9iTm8ShEBzTcjZzJCzeDWUy5Dl6tT1riq/frDD7a3BX6/CtauNrfLMAxVDP/6yMpNAwQjgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737636116; c=relaxed/simple;
-	bh=OlU2/UUlea+lG4tV50En4ktxe/fonxdcvwbkAFIMtfQ=;
+	s=arc-20240116; t=1737636837; c=relaxed/simple;
+	bh=Jiz2B8VoY/wslkPn9A0AoSIAEBMVsGjU4gz0ikl+GCo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hsU5Nsnpvn0ZFA0P6j+DibO/68wwYlQ3r83GEt85Ne6I50sl6pt3j56qK1GqgiV9ZC6DYNcUW1ioqwnTfOxBX9/bJzcAZ0Xw8S6NIwXtF629KDkwh0G+yYCy6G5EVK99UxriT7FXuWMZjG8zuxskLMXCKDLe9dUUl5EbOVxbVzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y9s6dMmn; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=ovhMrH16EbCKGLw4gu0CcLduDtM/g+e1jJyvzPQx8a5f6dCIFRzXrq8zuLE/vP8s8/mFTRKcZV2dizyq8+SM4twQva267FfpkNco+aVxr3Y5cb+ijo3eWWtiYU305W2z5xCj6ODOqcoRMeh+oXM9IaFVfJbQOVtJAiBVVEjxgLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TsIoqCsg; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737636113;
+	s=mimecast20190719; t=1737636834;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=u5FZv+8u+d2GtcDrre/mQ3Ye6vAjYVJKfIBRUFGXtx4=;
-	b=Y9s6dMmnj61YDzY1sLqeXDIBLP4aWJSIui5SL0vsposG3mC7jl1aNHSccQ9IFLxETGWf/s
-	kfkKpUy1vEiDqiHHUJeHSez1/GN4JWH4OLMC/ryiPHqBdI+hJ9F2WUW+Xd0Ebg7wGVj/XC
-	P8t9ysL6E/NgUyuZpNZdhNKQquQS5F4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=i6Lx9XPIMd/NDewlW4eIGmtgOgdyjfOdUOHvx5QPf8I=;
+	b=TsIoqCsgglE7+xInJnNL9atxhzNaghbWaBAYS2SAp08QjajGPfE8LIctJss5RXZDgDYO20
+	/0TpNLVCWppIJL1bPNPD/IdHUhVDyE/XJAf206ZWOTFHhJfNYifRrs3VBzAAc+PFjamsPe
+	XW590iBY/PW2yHzCxhqSCzE/zVNqhI0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-ddq0XIrlM9qVw9cPV9uGbw-1; Thu, 23 Jan 2025 07:41:52 -0500
-X-MC-Unique: ddq0XIrlM9qVw9cPV9uGbw-1
-X-Mimecast-MFC-AGG-ID: ddq0XIrlM9qVw9cPV9uGbw
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436723bf7ffso6092625e9.3
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 04:41:51 -0800 (PST)
+ us-mta-653-0nW2wj4MNSuNUHBEzQdJxg-1; Thu, 23 Jan 2025 07:53:52 -0500
+X-MC-Unique: 0nW2wj4MNSuNUHBEzQdJxg-1
+X-Mimecast-MFC-AGG-ID: 0nW2wj4MNSuNUHBEzQdJxg
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-385e1fd40acso545527f8f.3
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 04:53:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737636111; x=1738240911;
+        d=1e100.net; s=20230601; t=1737636831; x=1738241631;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=u5FZv+8u+d2GtcDrre/mQ3Ye6vAjYVJKfIBRUFGXtx4=;
-        b=Vf+cKkGNHslTdZrYU9PzGigwyy9je0eympg8c2nQNtSjwYumqwiNSum6U8vArfG7DQ
-         GqDw2rAPLgCNt2/UajaxIq6SeKptDbsUYaEfurl8xYGTJSxSLOSUj5LBPByX5eeAFlG8
-         wY91V9X+FDnT9SE2k7a98Z4CI36xe/XbXLyqF9LHE4yBeicMBTDr+glgx0ujN0x6oFQX
-         iKZ55gaDVN/7n9VDcnw+ve1J17mRKXVe+trgJ8kfrAgplyECKvpPn0a5epdqSNOE0FaV
-         rhLOtsZKQBE1apiflDo7pPYaFiLySpoAjIvDn2+uDl5At2GE7P3HGZVrBDLX5E6JeXcn
-         Jkpg==
-X-Forwarded-Encrypted: i=1; AJvYcCW4zRsbdQ9aGKg3NIGXISBaOQqtn5SdV6ATyyGrapuwHPYD82Lj6/gCssWMqo5iR6Z7bd0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBXO+7sqRwwwbPyFEAbhGFv74nd/e4flgPuJthp2WaJnLzWeo/
-	vKqScWLNFTVr7L38Ud3mWO1aW5JaxeWFsPq5bm21GbjSnB9e0r4mROyInJuUB/DVaDTz/ESRr1R
-	pyaa2IZsGinGVpF6fwogw6oQLL8ldc/RAfYPos/BsC4LeA31zLw==
-X-Gm-Gg: ASbGncsRANvZ3LrD8X9NrRD8aQ33qj6I/sAR1OHKjX/9X8zukQmyyAR/MMKozYPQxyT
-	aFTuCOZQTH9bxdpi8Pr2FdVCOqK/jXykDZk7sc04NBAVN2X4grIUbTF3sDUzeP0BscBCn5TneZ7
-	+2n0o/TDt2TmHaAoUu/pP+R0odfQwWFXgzIk0z+8M6PbHKVMvy9D7LzRx+LnTnzpmCyvdqAigWO
-	XM326PM38Y36zURAK4uDSt8umkcPH/FFxeMrOFdSJPUjOiEmENlVEsPT8mVM2CyGElrLJDmtYl5
-	vmuICwmD5YogUmMHc8d0iWe6bsj0fOsKRo56XJ+BMA==
-X-Received: by 2002:a05:600c:1987:b0:434:f753:6012 with SMTP id 5b1f17b1804b1-438913f2f4emr259295215e9.17.1737636110979;
-        Thu, 23 Jan 2025 04:41:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFaf0J1FpGBG9DXD2cCzVrXAaT6T+N0ZijcOGKXj6jeyiABkDxsaVx5NBozYlDdObLnfmJtRw==
-X-Received: by 2002:a05:600c:1987:b0:434:f753:6012 with SMTP id 5b1f17b1804b1-438913f2f4emr259294915e9.17.1737636110549;
-        Thu, 23 Jan 2025 04:41:50 -0800 (PST)
+        bh=i6Lx9XPIMd/NDewlW4eIGmtgOgdyjfOdUOHvx5QPf8I=;
+        b=w3RSYPTSG5V5EjjqBOkg6VALn0TwA8sx2e/er6kpR67bCFW67xfSawXWR30z9gQn4c
+         hYVPdWiIhLOgvTnrd+BcYSp1k4qLtmlCmhh0KzEPbzyv8izXO9tZ7qwAdMbkAT1J0sCl
+         kDqPygCdaAM+y0ifEPL8vWH2yG6MP4GNJDl788VMdruCegaCCdbCIhRE//RQGcreCIZn
+         L9N8OA7X2x3pp0GylvmJGPEInHwkaNJ8Dqh6A2iBzSpnW5sz76+XGv88SwJj0UPWslG7
+         PaNuIVjH39UFSPfbkhV/TNq9ER4UTXIOj9RhzHB+7Ofmw+QrfdLqjoRfHRt72lCar15L
+         YcbA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8Fye4sKlnuDb87VH5uVTjxFT3kVHs3HcyLuwr/f+EudPIepBstnb3GdP3vpi6qJZzWKc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6L1fd2JvRG8NfURDPr+/k0E3wzvT0TwjF9kJ+2y+TgcY6kQlY
+	Bxti3MokCDI1uP6VJyzBhcDbVWDuLpw7CUM0SVs70rGYXwtZkg3k2THVVfrQA9vavznTlbMktBN
+	9wMvVlG+m5lxnjcl0DIvHwsHzMNLx+INfHeWaaz/vjKa8q2cikA==
+X-Gm-Gg: ASbGnctAaAYijKY5NUMFLvzuhlZjGyzlohV/XTGFrxWNMkMJmv0jjVwJIX8/ejOmnge
+	PcDKFohL7VL4Fdry6pW9Qjp2JkTxOnVy0/GNNvX+bUvPl8sBj7YTEVkAuulhmzEhp4xsrXj3Fkf
+	nj8Lq/g6dqz+oJ3rnVhJlJB1U62EBD371PbGjQmazQ3IN28MiPXX4HdDKUnIlJA54DOekc1A6sU
+	1FFgsB1o1/wZSG+lxizUghLnCW2ppQzfHzM0zwinV/DJp2QgrWNzDprruNSOdyWMXadyx+NlgK9
+	6yJPlAUCcrHN0yLMFn8y/hMdIl9KCH8ZP3RibqJE+A==
+X-Received: by 2002:a05:6000:2a7:b0:38a:615c:8225 with SMTP id ffacd0b85a97d-38bf577ff42mr26047599f8f.15.1737636831574;
+        Thu, 23 Jan 2025 04:53:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFMvbIO6o+LlYetLw5pvz3tRShsz4DN1/5eyO2PVnsxorba4zPA/qyLgwjgHMso+ZxhOtCGVw==
+X-Received: by 2002:a05:6000:2a7:b0:38a:615c:8225 with SMTP id ffacd0b85a97d-38bf577ff42mr26047571f8f.15.1737636831081;
+        Thu, 23 Jan 2025 04:53:51 -0800 (PST)
 Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf32151f1sm19447922f8f.14.2025.01.23.04.41.49
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf327e19fsm19632884f8f.93.2025.01.23.04.53.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 04:41:49 -0800 (PST)
-Date: Thu, 23 Jan 2025 13:41:48 +0100
+        Thu, 23 Jan 2025 04:53:50 -0800 (PST)
+Date: Thu, 23 Jan 2025 13:53:49 +0100
 From: Igor Mammedov <imammedo@redhat.com>
 To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>, Zhao Liu
- <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel
- Apfelbaum <marcel.apfelbaum@gmail.com>, Ani Sinha <anisinha@redhat.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>, Yanan Wang
- <wangyanan55@huawei.com>, Cornelia Huck <cohuck@redhat.com>, "Daniel P.
- =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Eric Blake
- <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, rick.p.edgecombe@intel.com, kvm@vger.kernel.org,
- qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 40/60] hw/i386: add eoi_intercept_unsupported member
- to X86MachineState
-Message-ID: <20250123134148.036d52b0@imammedo.users.ipa.redhat.com>
-In-Reply-To: <20241105062408.3533704-41-xiaoyao.li@intel.com>
+Cc: Ira Weiny <ira.weiny@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Richard Henderson
+ <richard.henderson@linaro.org>, Zhao Liu <zhao1.liu@intel.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Ani Sinha <anisinha@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?=
+ <philmd@linaro.org>, Yanan Wang <wangyanan55@huawei.com>, Cornelia Huck
+ <cohuck@redhat.com>, "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?="
+ <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster
+ <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ rick.p.edgecombe@intel.com, kvm@vger.kernel.org, qemu-devel@nongnu.org
+Subject: Re: [PATCH v6 41/60] hw/i386: add option to forcibly report edge
+ trigger in acpi tables
+Message-ID: <20250123135349.3b58f67b@imammedo.users.ipa.redhat.com>
+In-Reply-To: <e97102e9-9c38-46a9-912a-0ccc7753f560@intel.com>
 References: <20241105062408.3533704-1-xiaoyao.li@intel.com>
-	<20241105062408.3533704-41-xiaoyao.li@intel.com>
+	<20241105062408.3533704-42-xiaoyao.li@intel.com>
+	<Z1tmG63P4TR0UYO8@iweiny-mobl>
+	<e97102e9-9c38-46a9-912a-0ccc7753f560@intel.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -108,70 +110,346 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue,  5 Nov 2024 01:23:48 -0500
+On Tue, 14 Jan 2025 21:01:27 +0800
 Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-> Add a new bool member, eoi_intercept_unsupported, to X86MachineState
-> with default value false. Set true for TDX VM.
+> On 12/13/2024 6:39 AM, Ira Weiny wrote:
+> > On Tue, Nov 05, 2024 at 01:23:49AM -0500, Xiaoyao Li wrote:  
+> >> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >>
+> >> When level trigger isn't supported on x86 platform,
 
-I'd rename it to enable_eoi_intercept, by default set to true for evrything
-and make TDX override this to false.
+it used to be level before this patch like for forever, so either
+we have a bug or above statement isn't correct.
+
+> >> forcibly report edge trigger in acpi tables.  
+> > 
+> > This commit message is pretty sparse.  I was thinking of suggesting to squash
+> > this with patch 40 but it occurred to me that perhaps these are split to accept
+> > TDX specifics from general functionality.  Is that the case here?  Is that true
+> > with other patches in the series?  If so what other situations would require
+> > this in the generic code beyond TDX?  
 > 
-> Inability to intercept eoi causes impossibility to emulate level
-> triggered interrupt to be re-injected when level is still kept active.
-> which affects interrupt controller emulation.
+> The goal is trying to avoid adding TDX specific all around QEMU. So we 
+> are trying to add new general interface as a patch and TDX uses the 
+> interface as another patch.
+
+in other words level trigger is not supported when TDX is enable,
+do I get it right?
+
+If yes, then mention it in commit message and also mention
+followup patch which would use this.
+
+see my other comments below.
+ 
 > 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/i386/x86.c         | 1 +
->  include/hw/i386/x86.h | 1 +
->  target/i386/kvm/tdx.c | 2 ++
->  3 files changed, 4 insertions(+)
+> > Ira
+> >   
+> >>
+> >> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> >> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> >> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> >> ---
+> >>   hw/i386/acpi-build.c  | 99 ++++++++++++++++++++++++++++---------------
+> >>   hw/i386/acpi-common.c | 45 +++++++++++++++-----
+> >>   2 files changed, 101 insertions(+), 43 deletions(-)
+> >>
+> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> >> index 4967aa745902..d0a5bfc69e9a 100644
+> >> --- a/hw/i386/acpi-build.c
+> >> +++ b/hw/i386/acpi-build.c
+> >> @@ -888,7 +888,8 @@ static void build_dbg_aml(Aml *table)
+> >>       aml_append(table, scope);
+> >>   }
+> >>   
+> >> -static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
+> >> +static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg,
+> >> +                           bool level_trigger_unsupported)
+
+do not use negative naming, or even better pass AML_EDGE || AML_LEVEL as an argument here.
+the same applies to other places that use level_trigger_unsupported.
+
+> >>   {
+> >>       Aml *dev;
+> >>       Aml *crs;
+> >> @@ -900,7 +901,10 @@ static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
+> >>       aml_append(dev, aml_name_decl("_UID", aml_int(uid)));
+> >>   
+> >>       crs = aml_resource_template();
+> >> -    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
+> >> +    aml_append(crs, aml_interrupt(AML_CONSUMER,
+> >> +                                  level_trigger_unsupported ?
+> >> +                                  AML_EDGE : AML_LEVEL,
+> >> +                                  AML_ACTIVE_HIGH,
+> >>                                     AML_SHARED, irqs, ARRAY_SIZE(irqs)));
+> >>       aml_append(dev, aml_name_decl("_PRS", crs));
+> >>   
+> >> @@ -924,7 +928,8 @@ static Aml *build_link_dev(const char *name, uint8_t uid, Aml *reg)
+> >>       return dev;
+> >>    }
+> >>   
+> >> -static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
+> >> +static Aml *build_gsi_link_dev(const char *name, uint8_t uid,
+> >> +                               uint8_t gsi, bool level_trigger_unsupported)
+> >>   {
+> >>       Aml *dev;
+> >>       Aml *crs;
+> >> @@ -937,7 +942,10 @@ static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
+> >>   
+> >>       crs = aml_resource_template();
+> >>       irqs = gsi;
+> >> -    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
+> >> +    aml_append(crs, aml_interrupt(AML_CONSUMER,
+> >> +                                  level_trigger_unsupported ?
+> >> +                                  AML_EDGE : AML_LEVEL,
+> >> +                                  AML_ACTIVE_HIGH,
+> >>                                     AML_SHARED, &irqs, 1));
+> >>       aml_append(dev, aml_name_decl("_PRS", crs));
+> >>   
+> >> @@ -956,7 +964,7 @@ static Aml *build_gsi_link_dev(const char *name, uint8_t uid, uint8_t gsi)
+> >>   }
+> >>   
+> >>   /* _CRS method - get current settings */
+> >> -static Aml *build_iqcr_method(bool is_piix4)
+> >> +static Aml *build_iqcr_method(bool is_piix4, bool level_trigger_unsupported)
+> >>   {
+> >>       Aml *if_ctx;
+> >>       uint32_t irqs;
+> >> @@ -964,7 +972,9 @@ static Aml *build_iqcr_method(bool is_piix4)
+> >>       Aml *crs = aml_resource_template();
+> >>   
+> >>       irqs = 0;
+> >> -    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL,
+> >> +    aml_append(crs, aml_interrupt(AML_CONSUMER,
+> >> +                                  level_trigger_unsupported ?
+> >> +                                  AML_EDGE : AML_LEVEL,
+> >>                                     AML_ACTIVE_HIGH, AML_SHARED, &irqs, 1));
+> >>       aml_append(method, aml_name_decl("PRR0", crs));
+> >>   
+> >> @@ -998,7 +1008,7 @@ static Aml *build_irq_status_method(void)
+> >>       return method;
+> >>   }
+> >>   
+> >> -static void build_piix4_pci0_int(Aml *table)
+> >> +static void build_piix4_pci0_int(Aml *table, bool level_trigger_unsupported)
+> >>   {
+> >>       Aml *dev;
+> >>       Aml *crs;
+> >> @@ -1011,12 +1021,16 @@ static void build_piix4_pci0_int(Aml *table)
+> >>       aml_append(sb_scope, pci0_scope);
+> >>   
+> >>       aml_append(sb_scope, build_irq_status_method());
+> >> -    aml_append(sb_scope, build_iqcr_method(true));
+> >> +    aml_append(sb_scope, build_iqcr_method(true, level_trigger_unsupported));
+> >>   
+> >> -    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQ0")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQ1")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQ2")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQ3")));
+> >> +    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQ0"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQ1"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQ2"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQ3"),
+> >> +                                        level_trigger_unsupported));
+> >>   
+> >>       dev = aml_device("LNKS");
+> >>       {
+> >> @@ -1025,7 +1039,9 @@ static void build_piix4_pci0_int(Aml *table)
+
+do we really need piix4 machine to work with TDX?
+
+> >>   
+> >>           crs = aml_resource_template();
+> >>           irqs = 9;
+> >> -        aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL,
+> >> +        aml_append(crs, aml_interrupt(AML_CONSUMER,
+> >> +                                      level_trigger_unsupported ?
+> >> +                                      AML_EDGE : AML_LEVEL,
+> >>                                         AML_ACTIVE_HIGH, AML_SHARED,
+> >>                                         &irqs, 1));
+> >>           aml_append(dev, aml_name_decl("_PRS", crs));
+> >> @@ -1111,7 +1127,7 @@ static Aml *build_q35_routing_table(const char *str)
+> >>       return pkg;
+> >>   }
+> >>   
+> >> -static void build_q35_pci0_int(Aml *table)
+> >> +static void build_q35_pci0_int(Aml *table, bool level_trigger_unsupported)
+> >>   {
+> >>       Aml *method;
+> >>       Aml *sb_scope = aml_scope("_SB");
+> >> @@ -1150,25 +1166,41 @@ static void build_q35_pci0_int(Aml *table)
+> >>       aml_append(sb_scope, pci0_scope);
+> >>   
+> >>       aml_append(sb_scope, build_irq_status_method());
+> >> -    aml_append(sb_scope, build_iqcr_method(false));
+> >> +    aml_append(sb_scope, build_iqcr_method(false, level_trigger_unsupported));
+> >>   
+> >> -    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQA")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQB")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQC")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQD")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKE", 4, aml_name("PRQE")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKF", 5, aml_name("PRQF")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKG", 6, aml_name("PRQG")));
+> >> -    aml_append(sb_scope, build_link_dev("LNKH", 7, aml_name("PRQH")));
+> >> +    aml_append(sb_scope, build_link_dev("LNKA", 0, aml_name("PRQA"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKB", 1, aml_name("PRQB"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKC", 2, aml_name("PRQC"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKD", 3, aml_name("PRQD"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKE", 4, aml_name("PRQE"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKF", 5, aml_name("PRQF"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKG", 6, aml_name("PRQG"),
+> >> +                                        level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_link_dev("LNKH", 7, aml_name("PRQH"),
+> >> +                                        level_trigger_unsupported));
+> >>   
+> >> -    aml_append(sb_scope, build_gsi_link_dev("GSIA", 0x10, 0x10));
+> >> -    aml_append(sb_scope, build_gsi_link_dev("GSIB", 0x11, 0x11));
+> >> -    aml_append(sb_scope, build_gsi_link_dev("GSIC", 0x12, 0x12));
+> >> -    aml_append(sb_scope, build_gsi_link_dev("GSID", 0x13, 0x13));
+> >> -    aml_append(sb_scope, build_gsi_link_dev("GSIE", 0x14, 0x14));
+> >> -    aml_append(sb_scope, build_gsi_link_dev("GSIF", 0x15, 0x15));
+> >> -    aml_append(sb_scope, build_gsi_link_dev("GSIG", 0x16, 0x16));
+> >> -    aml_append(sb_scope, build_gsi_link_dev("GSIH", 0x17, 0x17));
+> >> +    aml_append(sb_scope, build_gsi_link_dev("GSIA", 0x10, 0x10,
+> >> +                                            level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_gsi_link_dev("GSIB", 0x11, 0x11,
+> >> +                                            level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_gsi_link_dev("GSIC", 0x12, 0x12,
+> >> +                                            level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_gsi_link_dev("GSID", 0x13, 0x13,
+> >> +                                            level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_gsi_link_dev("GSIE", 0x14, 0x14,
+> >> +                                            level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_gsi_link_dev("GSIF", 0x15, 0x15,
+> >> +                                            level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_gsi_link_dev("GSIG", 0x16, 0x16,
+> >> +                                            level_trigger_unsupported));
+> >> +    aml_append(sb_scope, build_gsi_link_dev("GSIH", 0x17, 0x17,
+> >> +                                            level_trigger_unsupported));
+> >>   
+> >>       aml_append(table, sb_scope);
+> >>   }
+> >> @@ -1350,6 +1382,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >>       PCMachineState *pcms = PC_MACHINE(machine);
+> >>       PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
+> >>       X86MachineState *x86ms = X86_MACHINE(machine);
+> >> +    bool level_trigger_unsupported = x86ms->eoi_intercept_unsupported;
+> >>       AcpiMcfgInfo mcfg;
+> >>       bool mcfg_valid = !!acpi_get_mcfg(&mcfg);
+> >>       uint32_t nr_mem = machine->ram_slots;
+> >> @@ -1382,7 +1415,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >>           if (pm->pcihp_bridge_en || pm->pcihp_root_en) {
+> >>               build_x86_acpi_pci_hotplug(dsdt, pm->pcihp_io_base);
+> >>           }
+> >> -        build_piix4_pci0_int(dsdt);
+> >> +        build_piix4_pci0_int(dsdt, level_trigger_unsupported);
+> >>       } else if (q35) {
+> >>           sb_scope = aml_scope("_SB");
+> >>           dev = aml_device("PCI0");
+> >> @@ -1426,7 +1459,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >>           if (pm->pcihp_bridge_en) {
+> >>               build_x86_acpi_pci_hotplug(dsdt, pm->pcihp_io_base);
+> >>           }
+> >> -        build_q35_pci0_int(dsdt);
+> >> +        build_q35_pci0_int(dsdt, level_trigger_unsupported);
+> >>       }
+> >>   
+> >>       if (misc->has_hpet) {
+> >> diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
+> >> index 0cc2919bb851..ad38a6b31162 100644
+> >> --- a/hw/i386/acpi-common.c
+> >> +++ b/hw/i386/acpi-common.c
+> >> @@ -103,6 +103,7 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
+
+MADT change should be its own patch.
+
+> >>       const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(MACHINE(x86ms));
+> >>       AcpiTable table = { .sig = "APIC", .rev = 3, .oem_id = oem_id,
+> >>                           .oem_table_id = oem_table_id };
+> >> +    bool level_trigger_unsupported = x86ms->eoi_intercept_unsupported;
+> >>   
+> >>       acpi_table_begin(&table, table_data);
+> >>       /* Local APIC Address */
+> >> @@ -124,18 +125,42 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
+> >>                        IO_APIC_SECONDARY_ADDRESS, IO_APIC_SECONDARY_IRQBASE);
+> >>       }
+> >>   
+> >> -    if (x86mc->apic_xrupt_override) {
+> >> -        build_xrupt_override(table_data, 0, 2,
+> >> -            0 /* Flags: Conforms to the specifications of the bus */);
+> >> -    }
+> >> +    if (level_trigger_unsupported) {
+
+maybe, try to set flags as local var first,
+and then use it in build_xrupt_override() instead of rewriting/shifting
+existing blocks
+
+> >> +        /* Force edge trigger */
+> >> +        if (x86mc->apic_xrupt_override) {
+> >> +            build_xrupt_override(table_data, 0, 2,
+> >> +                                 /* Flags: active high, edge triggered */
+> >> +                                 1 | (1 << 2));
+pls point to spec where it comes from
+
+
+> >> +        }
+> >> +
+> >> +        for (i = x86mc->apic_xrupt_override ? 1 : 0; i < 16; i++) {
+                                                  ^^^^^^^
+before patch it was always starting from 1,
+so above does come from?
+
+> >> +            build_xrupt_override(table_data, i, i,
+> >> +                                 /* Flags: active high, edge triggered */
+> >> +                                 1 | (1 << 2));
+> >> +        }
+
+> >> +        if (x86ms->ioapic2) {
+> >> +            for (i = 0; i < 16; i++) {
+> >> +                build_xrupt_override(table_data, IO_APIC_SECONDARY_IRQBASE + i,
+> >> +                                     IO_APIC_SECONDARY_IRQBASE + i,
+> >> +                                     /* Flags: active high, edge triggered */
+> >> +                                     1 | (1 << 2));
+> >> +            }
+> >> +        }
+and this is absolutely new hunk, perhaps its own patch with explanation why it's need
+
+> >> +    } else {
+> >> +        if (x86mc->apic_xrupt_override) {
+> >> +            build_xrupt_override(table_data, 0, 2,
+> >> +                    0 /* Flags: Conforms to the specifications of the bus */);
+> >> +        }
+> >>   
+> >> -    for (i = 1; i < 16; i++) {
+> >> -        if (!(x86ms->pci_irq_mask & (1 << i))) {
+> >> -            /* No need for a INT source override structure. */
+> >> -            continue;
+> >> +        for (i = 1; i < 16; i++) {
+> >> +            if (!(x86ms->pci_irq_mask & (1 << i))) {
+> >> +                /* No need for a INT source override structure. */
+> >> +                continue;
+> >> +            }
+> >> +            build_xrupt_override(table_data, i, i,
+> >> +                0xd /* Flags: Active high, Level Triggered */);
+> >>           }
+> >> -        build_xrupt_override(table_data, i, i,
+> >> -            0xd /* Flags: Active high, Level Triggered */);
+> >>       }
+> >>   
+> >>       if (x2apic_mode) {
+> >> -- 
+> >> 2.34.1
+> >>  
 > 
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 01fc5e656272..82faeed24ff9 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -370,6 +370,7 @@ static void x86_machine_initfn(Object *obj)
->      x86ms->oem_table_id = g_strndup(ACPI_BUILD_APPNAME8, 8);
->      x86ms->bus_lock_ratelimit = 0;
->      x86ms->above_4g_mem_start = 4 * GiB;
-> +    x86ms->eoi_intercept_unsupported = false;
->  }
->  
->  static void x86_machine_class_init(ObjectClass *oc, void *data)
-> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-> index d43cb3908e65..fd9a30391755 100644
-> --- a/include/hw/i386/x86.h
-> +++ b/include/hw/i386/x86.h
-> @@ -73,6 +73,7 @@ struct X86MachineState {
->      uint64_t above_4g_mem_start;
->  
->      /* CPU and apic information: */
-> +    bool eoi_intercept_unsupported;
->      unsigned pci_irq_mask;
->      unsigned apic_id_limit;
->      uint16_t boot_cpus;
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 9ab4e911f78a..9dcb77e011bd 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -388,6 +388,8 @@ static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->          return -EOPNOTSUPP;
->      }
->  
-> +    x86ms->eoi_intercept_unsupported = true;
-
-I don't particulary like accel go to its parent (machine) object and override things there
-and that being buried deep inside.
-
-How do you start TDX guest?
-Is there a machine property or something like it to enable TDX?
-
-> +
->      /*
->       * Set kvm_readonly_mem_allowed to false, because TDX only supports readonly
->       * memory for shared memory but not for private memory. Besides, whether a
 
 
