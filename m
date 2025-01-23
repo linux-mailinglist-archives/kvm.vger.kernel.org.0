@@ -1,204 +1,180 @@
-Return-Path: <kvm+bounces-36326-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36327-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABB94A1A054
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 10:07:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C5AA1A05B
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 10:09:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ABA03A5357
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 09:07:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EDB1188DBDE
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 09:09:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9BF20CCCC;
-	Thu, 23 Jan 2025 09:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FAA20CCC3;
+	Thu, 23 Jan 2025 09:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j946HJd4"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6056A20C004;
-	Thu, 23 Jan 2025 09:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDCB515AF6
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 09:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737623224; cv=none; b=IMwCRc7rmgZ5/PtfVMoPaJwfGvD2CqmMHxxYnze5KtxACAsb8tmM+vjydy5lozi8f2wCvyFNpvzldRmBDexdeaFk5Cm5oc089wyL2wb/LLMpLzt+fBhvEp8Mt0giI1fV06qlzX2tmdFVY71rU8OsIzid1Ok9cU30Vmt8gxjVZNc=
+	t=1737623383; cv=none; b=UhA9vTDIaB+/RIXss2hzn1hDqw8qvdRpAetlpByGGrDm8GcFpWGiX9scq/TbKCDdU5vTNLWqw4GvqdFfw6KerSmrgoXPpE7hGwqXe97HO5RxwHua6UqEAV8QN3hDHaYqHoBsMYTXaaSAi3gQrroDTbyWUs528QXp+iOM7XPvUHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737623224; c=relaxed/simple;
-	bh=jsYgGwDXjoD7lbJi5TWtQno9T386TZfovqcenXGzaD4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZTIQ63M/Mhx5mVbn4gA70x5MchJ5wCCPNTiXz+TphLHo9sQAfOuC8yC9ff1Mecp1j7hqtyq2OsmvBC0nfEx5E9nnyp0sO7nJzGJWegR5FxaybRQgMrMjKrfAUCyB/UxIXtWjH4DAqgjku+voIowgTlpalwXQPwfrJRgJQJwz038=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Ydw5q0xrkz1JFR3;
-	Thu, 23 Jan 2025 17:05:51 +0800 (CST)
-Received: from kwepemd500022.china.huawei.com (unknown [7.221.188.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8BAF714010C;
-	Thu, 23 Jan 2025 17:06:52 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (7.182.85.71) by
- kwepemd500022.china.huawei.com (7.221.188.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 23 Jan 2025 17:06:51 +0800
-Received: from frapeml500008.china.huawei.com ([7.182.85.71]) by
- frapeml500008.china.huawei.com ([7.182.85.71]) with mapi id 15.01.2507.039;
- Thu, 23 Jan 2025 10:06:49 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Nicolin Chen <nicolinc@nvidia.com>, "will@kernel.org" <will@kernel.org>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "maz@kernel.org" <maz@kernel.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC: "joro@8bytes.org" <joro@8bytes.org>, "shuah@kernel.org"
-	<shuah@kernel.org>, "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>, "yebin (H)"
-	<yebin10@huawei.com>, "apatel@ventanamicro.com" <apatel@ventanamicro.com>,
-	"shivamurthy.shastri@linutronix.de" <shivamurthy.shastri@linutronix.de>,
-	"bhelgaas@google.com" <bhelgaas@google.com>, "anna-maria@linutronix.de"
-	<anna-maria@linutronix.de>, "yury.norov@gmail.com" <yury.norov@gmail.com>,
-	"nipun.gupta@amd.com" <nipun.gupta@amd.com>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "patches@lists.linux.dev"
-	<patches@lists.linux.dev>, "jean-philippe@linaro.org"
-	<jean-philippe@linaro.org>, "mdf@kernel.org" <mdf@kernel.org>,
-	"mshavit@google.com" <mshavit@google.com>, "smostafa@google.com"
-	<smostafa@google.com>, "ddutile@redhat.com" <ddutile@redhat.com>
-Subject: RE: [PATCH RFCv2 00/13] iommu: Add MSI mapping support with nested
- SMMU
-Thread-Topic: [PATCH RFCv2 00/13] iommu: Add MSI mapping support with nested
- SMMU
-Thread-Index: AQHbY9mJD8uWl8wEh0eGXlblGWaZErMkIJUA
-Date: Thu, 23 Jan 2025 09:06:49 +0000
-Message-ID: <4946ea266bdc4b1e8796dee1b228bd8f@huawei.com>
-References: <cover.1736550979.git.nicolinc@nvidia.com>
-In-Reply-To: <cover.1736550979.git.nicolinc@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1737623383; c=relaxed/simple;
+	bh=VyjK8LjhHKge7tdxTMJHOwhS4aSCTHVe4TTOSEy0RjU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GZiNTuADaoWEBwWVLBMmLMoJPu2h9QyX2RSomtbjoNWbogEtY/jlkWqrOpv/UtKyQhRdMsW9EYJFiLRdcCZcsXoVY+tXgYgJOBRANdOkfaFXEmvmXMhVcNcwjS1x4/tm/3Zl+xAMa39W/SSXYel/q8tTweNc6fnfCPycj4qe18U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j946HJd4; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4678c9310afso145281cf.1
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 01:09:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737623381; x=1738228181; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=523HWJnbK4uBXJjGY93omTen6Flka4M5EaUf21RzWGA=;
+        b=j946HJd4SzVbsJahDTxRSfZ5tzjfy5ZqLUINAPrLTnnZqY9oMgQJAndmUHrNVCaICD
+         cL0QXyPPQKuawcoAH3IChXgCgAvkrA5/1wovlEP0zAbQodCtjKb39MfZWXcYqCHOPyL4
+         83PkLMlkjRALNzbpbt3Wuh9F4hTCU74PZjEuDKNMe9jSD+RcGNyf0qZQUeczkAjYcFJd
+         YolYEYb7pKRxrs5B1EykLvp0esYniu6mztqE0cW3SZHSB7TJ/6jpxiN4xHV0x6dBOK7f
+         rQ7FeJZkRSYpIYxiCPClkL6OfxQNpL2Lh+adGHL86TmwlbVBWUmXRCFwGOlpuaDUXSz0
+         f5Lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737623381; x=1738228181;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=523HWJnbK4uBXJjGY93omTen6Flka4M5EaUf21RzWGA=;
+        b=ryhmAz0Ikmj9pdQk24qqXBHeK3c/T4yntxGEXj9SyJ22hBcUdGZqGhMEkIp2TE5yse
+         JYlyYhDJ+vq/A6zWbEK2odDMxB25xndfCiaQBZ+ooXerqv8Rlsk1BGqGNR0pc87Csp2u
+         DMR4iy05S67kStNMQBr8WKRLNr/uWMhFAKeYZd/Ugp4+NEOdbZfHRd8DEJ8ARPFPuBwm
+         qB0L1AbwLigS2/QFQKSa7ctJxk2YsaToPHBuUlMVFNcs5zcVdHecEwqOZ3GV4kWJgYun
+         /6eYjcdUYM4H9xMq2soJZBx/obEWBv5ke2BuiwG5FfYMChZX4lRTeu+YgG39AWprWtDW
+         tpaw==
+X-Gm-Message-State: AOJu0YzTJPCZNZb0/NkB0KrpL6SmIHyIBX7pwDpyM/AuJT0Jj0MbyNLM
+	lPC4gAim1fwNh7iTkwCYelmZn4THsfC3JgOBtcFm/9Cdlk3Sd9tLycpoYAWx6xqCjAzICJlFUcU
+	t6TVsllxKCx2kWuFSf6KLUx0C6QEJyhp3L1px
+X-Gm-Gg: ASbGnctMGCL7saHHI0tY4F/15eFa0w+USrK6SIfxvmbMOEbhQQUUpRkNwUCFc9NCOUJ
+	yntDCKnoCmnVzvrWgnmGRBYeTQA26T3/MNkOSozx/kvKnS3DbdMPUk5kqJ3+kY34B5nPPZS6UuN
+	a2VIXb9V3LOPVEUw==
+X-Google-Smtp-Source: AGHT+IEiopQzghyBQuDH+Z++hOyFjaoNNkb3x+F2+vhgN1PyZLbHVj2spWUPREsDCxcgT7MJWxEvinVLGZnXpKHGf2A=
+X-Received: by 2002:a05:622a:182a:b0:466:8c7c:3663 with SMTP id
+ d75a77b69052e-46e5da99a92mr1957191cf.5.1737623380443; Thu, 23 Jan 2025
+ 01:09:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250122152738.1173160-1-tabba@google.com> <c15c84f2-bf19-4a62-91b8-03eefd0c1c89@redhat.com>
+ <03bbcd00-bd5e-47de-8b20-31636e361f52@redhat.com> <CA+EHjTyGgs_Sp0b6OqeS7oVskhVG+S1cHhVRb5Z6mPAwGwmqFA@mail.gmail.com>
+ <f801219f-96e1-4b52-85aa-f5a331e06183@redhat.com>
+In-Reply-To: <f801219f-96e1-4b52-85aa-f5a331e06183@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 23 Jan 2025 09:09:03 +0000
+X-Gm-Features: AWEUYZl_93Hq5l5bhZIehxAbE7u4IasyYqkuXI1uqKIBhVj8G0Cw3XXVO_3GyD4
+Message-ID: <CA+EHjTwhKHcywxtg-ODioOcA79hBjwvx0fHKW2VMxXVpA1LnDw@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 0/9] KVM: Mapping of guest_memfd at the host and a
+ software protected VM type
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Nicolin,
+On Wed, 22 Jan 2025 at 21:42, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 22.01.25 18:16, Fuad Tabba wrote:
+> > Hi David,
+> >
+> > On Wed, 22 Jan 2025 at 15:41, David Hildenbrand <david@redhat.com> wrote:
+> >>
+> >> On 22.01.25 16:35, David Hildenbrand wrote:
+> >>> On 22.01.25 16:27, Fuad Tabba wrote:
+> >>>> The purpose of this series is to serve as a potential base for
+> >>>> restricted mmap() support for guest_memfd [1]. It would allow
+> >>>> experimentation with what that support would be like, in the safe
+> >>>> environment of a new VM type used for testing.
+> >>>>
+> >>>> This series adds a new VM type for arm64,
+> >>>> KVM_VM_TYPE_ARM_SW_PROTECTED, analogous to the x86
+> >>>> KVM_X86_SW_PROTECTED_VM. This type is to serve as a development
+> >>>> and testing vehicle for Confidential (CoCo) VMs.
+> >>>>
+> >>>> Similar to the x86 type, this is currently only for development
+> >>>> and testing. It's not meant to be used for "real" VMs, and
+> >>>> especially not in production. The behavior and effective ABI for
+> >>>> software-protected VMs is unstable.
+> >>>>
+> >>>> This series enables mmap() support for guest_memfd specifically
+> >>>> for the new software-protected VM type, only when explicitly
+> >>>> enabled in the config.
+> >>>
+> >>> Hi!
+> >>>
+> >>> IIUC, in this series, there is no "private" vs "shared" distinction,
+> >>> right? So all pages are mappable, and "conversion" does not exist?
+> >
+> > You're right. This is a simplified version of my series that allows
+> > mmaping of the new KVM_VM_TYPE_ARM_SW_PROTECTED vms to use for
+> > experimentation.
+> >
+> > Cheers,
+> > /fuad
+> >
+> >>
+> >> Ah, I spot:
+> >>
+> >> +#define kvm_arch_private_mem_inplace(kvm)              \
+> >> +       (IS_ENABLED(CONFIG_KVM_GMEM_MAPPABLE) &&        \
+> >> +        ((kvm)->arch.vm_type & KVM_VM_TYPE_ARM_SW_PROTECTED))
+> >>
+> >> Which makes me wonder, why don't we need the same way of making sure all
+> >> references/mappings are gone (+ new page type) when doing the shared ->
+> >> private conversion? Or is this somewhere in here where I didn't spot it yet?
+> >
+> > This is new to this series. The idea, based on a request from Patrick
+> > Roy, was to have a VM in arm64 we could use to experiment with. Since
+> > it allows the unconditional mmaping, it's only useful for experiments
+> > or for non-confidential VMs that want to use guest_memfd.
+> >
+> > This series isn't meant to replace the other one, more to supplement
+> > it and facilitate experimentation while that's going.
+>
+> Heh, so "kvm_arch_private_mem_inplace" in this series means "no
+> conversion at all" ? :)
 
-> -----Original Message-----
-> From: Nicolin Chen <nicolinc@nvidia.com>
-> Sent: Saturday, January 11, 2025 3:32 AM
-> To: will@kernel.org; robin.murphy@arm.com; jgg@nvidia.com;
-> kevin.tian@intel.com; tglx@linutronix.de; maz@kernel.org;
-> alex.williamson@redhat.com
-> Cc: joro@8bytes.org; shuah@kernel.org; reinette.chatre@intel.com;
-> eric.auger@redhat.com; yebin (H) <yebin10@huawei.com>;
-> apatel@ventanamicro.com; shivamurthy.shastri@linutronix.de;
-> bhelgaas@google.com; anna-maria@linutronix.de; yury.norov@gmail.com;
-> nipun.gupta@amd.com; iommu@lists.linux.dev; linux-
-> kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
-> kvm@vger.kernel.org; linux-kselftest@vger.kernel.org;
-> patches@lists.linux.dev; jean-philippe@linaro.org; mdf@kernel.org;
-> mshavit@google.com; Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>; smostafa@google.com;
-> ddutile@redhat.com
-> Subject: [PATCH RFCv2 00/13] iommu: Add MSI mapping support with
-> nested SMMU
->=20
-> [ Background ]
-> On ARM GIC systems and others, the target address of the MSI is translate=
-d
-> by the IOMMU. For GIC, the MSI address page is called "ITS" page. When
-> the
-> IOMMU is disabled, the MSI address is programmed to the physical location
-> of the GIC ITS page (e.g. 0x20200000). When the IOMMU is enabled, the ITS
-> page is behind the IOMMU, so the MSI address is programmed to an
-> allocated
-> IO virtual address (a.k.a IOVA), e.g. 0xFFFF0000, which must be mapped to
-> the physical ITS page: IOVA (0xFFFF0000) =3D=3D=3D> PA (0x20200000).
-> When a 2-stage translation is enabled, IOVA will be still used to program
-> the MSI address, though the mappings will be in two stages:
->   IOVA (0xFFFF0000) =3D=3D=3D> IPA (e.g. 0x80900000) =3D=3D=3D> PA (0x202=
-00000)
-> (IPA stands for Intermediate Physical Address).
->=20
-> If the device that generates MSI is attached to an IOMMU_DOMAIN_DMA,
-> the
-> IOVA is dynamically allocated from the top of the IOVA space. If attached
-> to an IOMMU_DOMAIN_UNMANAGED (e.g. a VFIO passthrough device), the
-> IOVA is
-> fixed to an MSI window reported by the IOMMU driver via
-> IOMMU_RESV_SW_MSI,
-> which is hardwired to MSI_IOVA_BASE (IOVA=3D=3D0x8000000) for ARM
-> IOMMUs.
->=20
-> So far, this IOMMU_RESV_SW_MSI works well as kernel is entirely in charge
-> of the IOMMU translation (1-stage translation), since the IOVA for the IT=
-S
-> page is fixed and known by kernel. However, with virtual machine enabling
-> a nested IOMMU translation (2-stage), a guest kernel directly controls th=
-e
-> stage-1 translation with an IOMMU_DOMAIN_DMA, mapping a vITS page (at
-> an
-> IPA 0x80900000) onto its own IOVA space (e.g. 0xEEEE0000). Then, the host
-> kernel can't know that guest-level IOVA to program the MSI address.
->=20
-> There have been two approaches to solve this problem:
-> 1. Create an identity mapping in the stage-1. VMM could insert a few RMRs
->    (Reserved Memory Regions) in guest's IORT. Then the guest kernel would
->    fetch these RMR entries from the IORT and create an
-> IOMMU_RESV_DIRECT
->    region per iommu group for a direct mapping. Eventually, the mappings
->    would look like: IOVA (0x8000000) =3D=3D=3D IPA (0x8000000) =3D=3D=3D>=
- 0x20200000
->    This requires an IOMMUFD ioctl for kernel and VMM to agree on the IPA.
-> 2. Forward the guest-level MSI IOVA captured by VMM to the host-level GIC
->    driver, to program the correct MSI IOVA. Forward the VMM-defined vITS
->    page location (IPA) to the kernel for the stage-2 mapping. Eventually:
->    IOVA (0xFFFF0000) =3D=3D=3D> IPA (0x80900000) =3D=3D=3D> PA (0x2020000=
-0)
->    This requires a VFIO ioctl (for IOVA) and an IOMMUFD ioctl (for IPA).
->=20
-> Worth mentioning that when Eric Auger was working on the same topic
-> with
-> the VFIO iommu uAPI, he had the approach (2) first, and then switched to
-> the approach (1), suggested by Jean-Philippe for reduction of complexity.
->=20
-> The approach (1) basically feels like the existing VFIO passthrough that
-> has a 1-stage mapping for the unmanaged domain, yet only by shifting the
-> MSI mapping from stage 1 (guest-has-no-iommu case) to stage 2 (guest-has-
-> iommu case). So, it could reuse the existing IOMMU_RESV_SW_MSI piece,
-> by
-> sharing the same idea of "VMM leaving everything to the kernel".
->=20
-> The approach (2) is an ideal solution, yet it requires additional effort
-> for kernel to be aware of the 1-stage gIOVA(s) and 2-stage IPAs for vITS
-> page(s), which demands VMM to closely cooperate.
->  * It also brings some complicated use cases to the table where the host
->    or/and guest system(s) has/have multiple ITS pages.
-
-I had done some basic sanity tests with this series and the Qemu branches y=
-ou
-provided on a HiSilicon hardwrae. The basic dev assignment works fine. I wi=
-ll=20
-rebase my Qemu smuv3-accel branch on top of this and will do some more test=
-s.
-
-One confusion I have about the above text is, do we still plan to support t=
-he
-approach -1( Using RMR in Qemu) or you are just mentioning it here because
-it is still possible to make use of that. I think from previous discussions=
- the=20
-argument was to adopt a more dedicated MSI pass-through model which I
-think is  approach-2 here.  Could you please confirm.
+Yes, just for experimenting with the protected software VM.
 
 Thanks,
-Shameer
+/fuad
 
-
-
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
