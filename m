@@ -1,178 +1,381 @@
-Return-Path: <kvm+bounces-36410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36411-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D3B9A1A84D
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 18:02:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B1EA1A89F
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 18:14:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B363A66A0
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 17:02:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F46D16D04A
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 17:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBD413E03A;
-	Thu, 23 Jan 2025 17:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438D6145B39;
+	Thu, 23 Jan 2025 17:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="g3sJJF8v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ifnlsx6Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC8C126C02;
-	Thu, 23 Jan 2025 17:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE4A13AA41
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 17:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737651734; cv=none; b=EoFabsdP4VD0pKvg/1GD45NbFSr0wyOYnD/oCEyuQUdNaQVsg5kHBhLbdL4iX92TIeSYS/DwbnUUn8ignSQ45BR/sXkr+5QGWgfPrQta7nSMri3WcdP0sRdFoSMnS0K9t9NAQiQFXbHzClgzAL/6sAV7dAFbhZYWio2sTIoPGNU=
+	t=1737652260; cv=none; b=QHN9yTASDUxYU4REmOq7IIQ9xVNIjTZJ+1HeZUHA3ZlSh733n82AXUS+wje9iY36SeuG0zihIJS0e3mH34pp7Wdao8KRkoNu26OtNIb/aR4mPI5FsXL3i9q7kP8dYpJY/1+knJIkqR5GEwrWFxHHn7tRTDAofz6WSzP/HZscirM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737651734; c=relaxed/simple;
-	bh=V6+j3hh4mRPUOw7BK9x3gRaFDIW0sNoj18yEwZLI2BI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vCULRrenvYkU4xc329RI8nrv1RA/LUeNwg0VZX5n/xfoK1HSxUvj//N2aGv8y3pA+pZBd7n/9A3ekRlvW4hMMnGqezIWb/xfsnnlljPJzbqgjVKMPBUs/lHjDXrKajud0mpHrEWvgbXEB3jXraRSSa0X9zsmfE3lqDuR2ehNKTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=g3sJJF8v; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3511540E021A;
-	Thu, 23 Jan 2025 17:02:08 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id EBWQyGcD76_1; Thu, 23 Jan 2025 17:02:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1737651724; bh=pB+ti7PVAOP+Kw7No2ZXR3Kk6PBBTemImGnuMLUn6vA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g3sJJF8v4mlVwhoJFkmCWRFtdL7rg+3VRyI959SyJxUvgyTvt9xDsQygFWviXyEF4
-	 xF6XaChcBDGYshVXp5pEAHOa3Ly/8qDTYnJX2bi+G7B6GknSp/KfUf/ME9uurkpDWJ
-	 ChnaoyR8WtKm/Nn0b0XxRuLNcfCsBN8aeAUhmV3FlOoc9MLZYahc0ZNFHDo3H5v1FO
-	 nlVKb+VCZyUKXPaIK2nlHM0hSqv5ou3ud6uViloLdyKhWJxmWVxCPFO3d041VSoPnZ
-	 DhKCSIvFzTkwWMSH/KNyFJ0QGbpCBassjI9AcblZc4cwG7653ndeG3iwpWy5WSKuwK
-	 pjz/rNY98wAKqA+TY+SBf0SoRgrLLTm+X03Vt407bxkB50O3o/XXEPOMkIj0ylno1N
-	 P5se/MNLwn0DkEUEJWA6HwW9ulgPoNjlrQbygloJRAPTLoPGpba2xug6JrlXGpcESt
-	 KyIqb406V/7TH0wDh6WgYaxrJGguIPVrJAnBK081QVGEawgmYHZtkD/31XZAVE2obE
-	 NV3qeRvC7UM0bVMxrK5Emn+s7BtvdbeTxnSOdmeuKxKRGb+xdmUuFhGtnvU43CibQd
-	 A73Y2j+dduQXFVZTrRNrD+sdq2YuZvk7b+cAjMCG55mLaxvKw9op5dRquR0EFephPc
-	 p0Srhv1kkWNPCs7Z8oAEJCf4=
-Received: from zn.tnic (pd953008e.dip0.t-ipconnect.de [217.83.0.142])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 26B4B40E0163;
-	Thu, 23 Jan 2025 17:01:56 +0000 (UTC)
-Date: Thu, 23 Jan 2025 18:01:49 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Borislav Petkov <bp@kernel.org>, X86 ML <x86@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <20250123170149.GCZ5J1_WovzHQzo0cW@fat_crate.local>
-References: <Z2B2oZ0VEtguyeDX@google.com>
- <20241230111456.GBZ3KAsLTrVs77UmxL@fat_crate.local>
- <Z35_34GTLUHJTfVQ@google.com>
- <20250108154901.GFZ36ebXAZMFZJ7D8t@fat_crate.local>
- <Z36zWVBOiBF4g-mW@google.com>
- <20250108181434.GGZ37AiioQkcYbqugO@fat_crate.local>
- <20250111125215.GAZ4Jpf6tbcoS7jCzz@fat_crate.local>
- <Z4qnzwNYGubresFS@google.com>
- <20250118152655.GBZ4vIP44MivU2Bv0i@fat_crate.local>
- <Z5JtbZ-UIBJy2aYE@google.com>
+	s=arc-20240116; t=1737652260; c=relaxed/simple;
+	bh=T8q34VTWnC53A/omtKXw33TuIrilLgKAMYPU65cm/Qk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tAbTPtOyErV79JfYTFl6dbSwXvrIx75bWfwllAEf4dM2WGklP09b33OpStEWokIuUbYs1ELvfIfubkcvEimA7G4kyza/xakpysNH8NmX1mVHpRw8KKvycQDR7cKUgcCRDmQZD0qE/vfAKN8FLn2W/EDyzGXqMVSRUsnzxiS/nuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ifnlsx6Z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737652257;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jAh/e6F0HEaFnHy5OVzmfXhKo/WXlBkiKIGsXte00qk=;
+	b=Ifnlsx6ZZh28hD//z/pqmjmfjIPS49nYG2rmgquVJeRyEpGgZGSaIEbDqKQnpdA32aZPpM
+	FsgnqVAcaYGjJG2i/kJBBiCWueUKkiCWUphf0XSm1GLxzoHrenyEXEY5Dmdk/vrV5L3izy
+	Xt1RJFJRyAQgB5Byehr5vDSBWp7ebkg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-576-qxlInJW8OLix15F8kLNG3Q-1; Thu, 23 Jan 2025 12:10:53 -0500
+X-MC-Unique: qxlInJW8OLix15F8kLNG3Q-1
+X-Mimecast-MFC-AGG-ID: qxlInJW8OLix15F8kLNG3Q
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43625ceae52so6864285e9.0
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 09:10:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737652252; x=1738257052;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jAh/e6F0HEaFnHy5OVzmfXhKo/WXlBkiKIGsXte00qk=;
+        b=ooLD9/KU0fduNifrcG9dZCS3ZMpmqw28U4GD994ptECiBaG7JYknVv4wUf2cPKPABg
+         BfCwZJvdZLj2cARtyhZFm7f/y0L7/65Mc2YaDSXqvImpw96fVMN1xg4RpHIqmRnMdpRd
+         Bf6uAKAQuJb33OYlQSWVPBfzDT2SClb3B1x2KitK7rKbUUhhHdGxPrAcrHjenQQEzmPG
+         KHukvuxUWVnvNKiqPBP7WYRAO4DM/yl/8aEdZ1tkzFpNJxRBLgLZBM0sy6t5m9aR+dGM
+         OwCwzpYbAOY6wlEvgqw7NtTzk2Ph+7hJLbc2S5XE2ovdXyuhBht5S4mmI/h2ecq4A8yL
+         uIjA==
+X-Forwarded-Encrypted: i=1; AJvYcCWOwqJemKFfRXIo8DKJhjVdN2x4nnR7ZuE8XQ/fBHiR1C00lqTQCMwev+73u17bLkpxegY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs01YKqnHicN9phg8yWFP1vtb9yycl+LL2z8K5wwh47R8LqBNL
+	DfBkvNactWjyUf/RhulyDjXgYmV83/dK6bud/f3FwmNTYK6SmP9erfD6pWEqQRzMqRvC6yveU4s
+	TgaLjRufH96CT/W1bR1v14h76RQ8OpIKkDHmgJ4KFV8BuhlS4OA==
+X-Gm-Gg: ASbGncsa4wdZ+imLZCnFebLCI219s1QLoHv+rlALCFSf6qMhnsS8z7By0iHwtAFpEgP
+	pJ7QmGMJcMSw1KoxRJ2SUESjYKVpjDVBsQkHYDq+5BjZpkfVs/AUDUDNh9AXWOCE+1d4//GBUcL
+	jA7Ss5zet2ft4AzvNI7YuQjcljb6cYVhEQtXrzd+Xp1vsxPrkH8AW66IilhGBgyrS/LhtJm2nkz
+	h5tRRCpaKPBRdln/HYV4NcU1F2l04929gEVQyecaPRuHNob+6Sg0Nu62ckZojp6mtRgCinTaq8F
+	FcrbNALvnL0Euw/1dEmef9SqUkgvDAjtTof1msb/rQ==
+X-Received: by 2002:a05:600c:3d96:b0:434:9dfe:20e6 with SMTP id 5b1f17b1804b1-43891439dfdmr245029625e9.23.1737652251741;
+        Thu, 23 Jan 2025 09:10:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGkHdqQ1Du/TgX49VGOUPaX03Xnk0FckQu07hyXzCGV6GJ69vec6Iv7VJ8KrVMowrhApHUZ3w==
+X-Received: by 2002:a05:600c:3d96:b0:434:9dfe:20e6 with SMTP id 5b1f17b1804b1-43891439dfdmr245029225e9.23.1737652251235;
+        Thu, 23 Jan 2025 09:10:51 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31d9a39sm67975795e9.31.2025.01.23.09.10.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jan 2025 09:10:50 -0800 (PST)
+Message-ID: <787fd89b-fbc0-4fd5-a1af-63dfddf13435@redhat.com>
+Date: Thu, 23 Jan 2025 18:10:47 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z5JtbZ-UIBJy2aYE@google.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH RFCv2 03/13] iommu: Make iommu_dma_prepare_msi() into a
+ generic operation
+Content-Language: en-US
+To: Nicolin Chen <nicolinc@nvidia.com>, will@kernel.org,
+ robin.murphy@arm.com, jgg@nvidia.com, kevin.tian@intel.com,
+ tglx@linutronix.de, maz@kernel.org, alex.williamson@redhat.com
+Cc: joro@8bytes.org, shuah@kernel.org, reinette.chatre@intel.com,
+ yebin10@huawei.com, apatel@ventanamicro.com,
+ shivamurthy.shastri@linutronix.de, bhelgaas@google.com,
+ anna-maria@linutronix.de, yury.norov@gmail.com, nipun.gupta@amd.com,
+ iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, patches@lists.linux.dev,
+ jean-philippe@linaro.org, mdf@kernel.org, mshavit@google.com,
+ shameerali.kolothum.thodi@huawei.com, smostafa@google.com, ddutile@redhat.com
+References: <cover.1736550979.git.nicolinc@nvidia.com>
+ <9914f9e6b32d49f74ace2200fd50583def9f15f6.1736550979.git.nicolinc@nvidia.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <9914f9e6b32d49f74ace2200fd50583def9f15f6.1736550979.git.nicolinc@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 23, 2025 at 08:25:17AM -0800, Sean Christopherson wrote:
-> But if we wanted to catch all paths, wrap the guts and clear the feature in the
-> outer layer?
+Hi,
 
-Yap, all valid points, thanks for catching those.
 
-> +static void __init srso_select_mitigation(void)
-> +{
-> +       __srso_select_mitigation();
+On 1/11/25 4:32 AM, Nicolin Chen wrote:
+> From: Jason Gunthorpe <jgg@nvidia.com>
+>
+> SW_MSI supports IOMMU to translate an MSI message before the MSI message
+> is delivered to the interrupt controller. On such systems the iommu_domain
+> must have a translation for the MSI message for interrupts to work.
+>
+> The IRQ subsystem will call into IOMMU to request that a physical page be
+> setup to receive MSI message, and the IOMMU then sets an IOVA that maps to
+> that physical page. Ultimately the IOVA is programmed into the device via
+> the msi_msg.
+>
+> Generalize this to allow the iommu_domain owner to provide its own
+> implementation of this mapping. Add a function pointer to struct
+> iommu_domain to allow the domain owner to provide an implementation.
+>
+> Have dma-iommu supply its implementation for IOMMU_DOMAIN_DMA types during
+> the iommu_get_dma_cookie() path. For IOMMU_DOMAIN_UNMANAGED types used by
+> VFIO (and iommufd for now), have the same iommu_dma_sw_msi set as well in
+> the iommu_get_msi_cookie() path.
+>
+> Hold the group mutex while in iommu_dma_prepare_msi() to ensure the domain
+> doesn't change or become freed while running. Races with IRQ operations
+> from VFIO and domain changes from iommufd are possible here.
+this was my question in previous comments
+>
+> Rreplace the msi_prepare_lock with a lockdep assertion for the group mutex
+Replace
+> as documentation. For the dma_iommu.c each iommu_domain unique to a
+is?
+> group.
+>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> [nicolinc: move iommu_domain_set_sw_msi() from iommu_dma_init_domain() to
+>  iommu_dma_init_domain(); add in iommu_put_dma_cookie() an sw_msi test]
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
+> ---
+>  include/linux/iommu.h     | 44 ++++++++++++++++++++++++++-------------
+>  drivers/iommu/dma-iommu.c | 33 +++++++++++++----------------
+>  drivers/iommu/iommu.c     | 29 ++++++++++++++++++++++++++
+>  3 files changed, 73 insertions(+), 33 deletions(-)
+>
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 3a4215966c1b..423fdfa6b3bb 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -44,6 +44,8 @@ struct iommu_dma_cookie;
+>  struct iommu_fault_param;
+>  struct iommufd_ctx;
+>  struct iommufd_viommu;
+> +struct msi_desc;
+> +struct msi_msg;
 >  
->         if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
->                 setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
+>  #define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
+>  #define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
+> @@ -216,6 +218,12 @@ struct iommu_domain {
+>  	struct iommu_domain_geometry geometry;
+>  	struct iommu_dma_cookie *iova_cookie;
+>  	int (*iopf_handler)(struct iopf_group *group);
+> +
+> +#if IS_ENABLED(CONFIG_IRQ_MSI_IOMMU)
+> +	int (*sw_msi)(struct iommu_domain *domain, struct msi_desc *desc,
+> +		      phys_addr_t msi_addr);
+> +#endif
+> +
+>  	void *fault_data;
+>  	union {
+>  		struct {
+> @@ -234,6 +242,16 @@ struct iommu_domain {
+>  	};
+>  };
+>  
+> +static inline void iommu_domain_set_sw_msi(
+> +	struct iommu_domain *domain,
+> +	int (*sw_msi)(struct iommu_domain *domain, struct msi_desc *desc,
+> +		      phys_addr_t msi_addr))
+> +{
+> +#if IS_ENABLED(CONFIG_IRQ_MSI_IOMMU)
+> +	domain->sw_msi = sw_msi;
+> +#endif
+> +}
+> +
+>  static inline bool iommu_is_dma_domain(struct iommu_domain *domain)
+>  {
+>  	return domain->type & __IOMMU_DOMAIN_DMA_API;
+> @@ -1475,6 +1493,18 @@ static inline ioasid_t iommu_alloc_global_pasid(struct device *dev)
+>  static inline void iommu_free_global_pasid(ioasid_t pasid) {}
+>  #endif /* CONFIG_IOMMU_API */
+>  
+> +#ifdef CONFIG_IRQ_MSI_IOMMU
+> +#ifdef CONFIG_IOMMU_API
+> +int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr);
+> +#else
+> +static inline int iommu_dma_prepare_msi(struct msi_desc *desc,
+> +					phys_addr_t msi_addr)
+> +{
+> +	return 0;
+> +}
+> +#endif /* CONFIG_IOMMU_API */
+> +#endif /* CONFIG_IRQ_MSI_IOMMU */
+> +
+>  #if IS_ENABLED(CONFIG_LOCKDEP) && IS_ENABLED(CONFIG_IOMMU_API)
+>  void iommu_group_mutex_assert(struct device *dev);
+>  #else
+> @@ -1508,26 +1538,12 @@ static inline void iommu_debugfs_setup(void) {}
+>  #endif
+>  
+>  #ifdef CONFIG_IOMMU_DMA
+> -#include <linux/msi.h>
 > -
-> -       pr_info("%s\n", srso_strings[srso_mitigation]);
+>  int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base);
+> -
+> -int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr);
+> -
+>  #else /* CONFIG_IOMMU_DMA */
+> -
+> -struct msi_desc;
+> -struct msi_msg;
+> -
+>  static inline int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
+>  {
+>  	return -ENODEV;
 >  }
+> -
+> -static inline int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
+> -{
+> -	return 0;
+> -}
+>  #endif	/* CONFIG_IOMMU_DMA */
+>  
+>  /*
+> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+> index bf91e014d179..3b58244e6344 100644
+> --- a/drivers/iommu/dma-iommu.c
+> +++ b/drivers/iommu/dma-iommu.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/memremap.h>
+>  #include <linux/mm.h>
+>  #include <linux/mutex.h>
+> +#include <linux/msi.h>
+>  #include <linux/of_iommu.h>
+>  #include <linux/pci.h>
+>  #include <linux/scatterlist.h>
+> @@ -102,6 +103,9 @@ static int __init iommu_dma_forcedac_setup(char *str)
+>  }
+>  early_param("iommu.forcedac", iommu_dma_forcedac_setup);
+>  
+> +static int iommu_dma_sw_msi(struct iommu_domain *domain, struct msi_desc *desc,
+> +			    phys_addr_t msi_addr);
+> +
+>  /* Number of entries per flush queue */
+>  #define IOVA_DEFAULT_FQ_SIZE	256
+>  #define IOVA_SINGLE_FQ_SIZE	32768
+> @@ -398,6 +402,7 @@ int iommu_get_dma_cookie(struct iommu_domain *domain)
+>  		return -ENOMEM;
+>  
+>  	mutex_init(&domain->iova_cookie->mutex);
+> +	iommu_domain_set_sw_msi(domain, iommu_dma_sw_msi);
+>  	return 0;
+>  }
+>  
+> @@ -429,6 +434,7 @@ int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
+>  
+>  	cookie->msi_iova = base;
+>  	domain->iova_cookie = cookie;
+> +	iommu_domain_set_sw_msi(domain, iommu_dma_sw_msi);
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL(iommu_get_msi_cookie);
+> @@ -443,6 +449,9 @@ void iommu_put_dma_cookie(struct iommu_domain *domain)
+>  	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+>  	struct iommu_dma_msi_page *msi, *tmp;
+>  
+> +	if (domain->sw_msi != iommu_dma_sw_msi)
+> +		return;
+> +
+I don't get the above check. The comment says this is also called for a
+cookie prepared with iommu_get_dma_cookie(). Don't you need to do some
+cleanup for this latter?
+>  	if (!cookie)
+>  		return;
+>  
+> @@ -1800,33 +1809,19 @@ static struct iommu_dma_msi_page *iommu_dma_get_msi_page(struct device *dev,
+>  	return NULL;
+>  }
+>  
+> -/**
+> - * iommu_dma_prepare_msi() - Map the MSI page in the IOMMU domain
+> - * @desc: MSI descriptor, will store the MSI page
+> - * @msi_addr: MSI target address to be mapped
+> - *
+> - * Return: 0 on success or negative error code if the mapping failed.
+> - */
+> -int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
+> +static int iommu_dma_sw_msi(struct iommu_domain *domain, struct msi_desc *desc,
+> +			    phys_addr_t msi_addr)
+>  {
+>  	struct device *dev = msi_desc_to_dev(desc);
+> -	struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
+> -	struct iommu_dma_msi_page *msi_page;
+> -	static DEFINE_MUTEX(msi_prepare_lock); /* see below */
+> +	const struct iommu_dma_msi_page *msi_page;
+>  
+> -	if (!domain || !domain->iova_cookie) {
+> +	if (!domain->iova_cookie) {
+>  		msi_desc_set_iommu_msi_iova(desc, 0, 0);
+>  		return 0;
+>  	}
+>  
+> -	/*
+> -	 * In fact the whole prepare operation should already be serialised by
+> -	 * irq_domain_mutex further up the callchain, but that's pretty subtle
+> -	 * on its own, so consider this locking as failsafe documentation...
+> -	 */
+> -	mutex_lock(&msi_prepare_lock);
+> +	iommu_group_mutex_assert(dev);
+>  	msi_page = iommu_dma_get_msi_page(dev, msi_addr, domain);
+> -	mutex_unlock(&msi_prepare_lock);
+>  	if (!msi_page)
+>  		return -ENOMEM;
+>  
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 599030e1e890..fbbbcdba8a4f 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -3587,3 +3587,32 @@ int iommu_replace_group_handle(struct iommu_group *group,
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL_NS_GPL(iommu_replace_group_handle, "IOMMUFD_INTERNAL");
+> +
+> +#if IS_ENABLED(CONFIG_IRQ_MSI_IOMMU)
+> +/**
+> + * iommu_dma_prepare_msi() - Map the MSI page in the IOMMU domain
+> + * @desc: MSI descriptor, will store the MSI page
+> + * @msi_addr: MSI target address to be mapped
+> + *
+> + * The implementation of sw_msi() should take msi_addr and map it to
+> + * an IOVA in the domain and call msi_desc_set_iommu_msi_iova() with the
+> + * mapping information.
+> + *
+> + * Return: 0 on success or negative error code if the mapping failed.
+> + */
+> +int iommu_dma_prepare_msi(struct msi_desc *desc, phys_addr_t msi_addr)
+> +{
+> +	struct device *dev = msi_desc_to_dev(desc);
+> +	struct iommu_group *group = dev->iommu_group;
+> +	int ret = 0;
+> +
+> +	if (!group)
+> +		return 0;
+> +
+> +	mutex_lock(&group->mutex);
+> +	if (group->domain && group->domain->sw_msi)
+> +		ret = group->domain->sw_msi(group->domain, desc, msi_addr);
+> +	mutex_unlock(&group->mutex);
+> +	return ret;
+> +}
+> +#endif /* CONFIG_IRQ_MSI_IOMMU */
+Thanks
 
-What I'd like, though, here is to not dance around this srso_mitigation
-variable setting in __srso_select_mitigation() and then know that the __
-function did modify it and now we can eval it.
+Eric
 
-I'd like for the __ function to return it like __ssb_select_mitigation() does.
-
-But then if we do that, we'll have to do the same changes and turn the returns
-to "goto out" where all the paths converge. And I'd prefer if those paths
-converged anyway and not have some "early escapes" like those returns which
-I completely overlooked. :-\
-
-And that code is going to change soon anyway after David's attack vectors
-series.
-
-So, long story short, I guess the simplest thing to do would be to simply do
-the below.
-
-I *think*. 
-
-I'll stare at it later, on a clear head again and test all cases to make sure
-nothing's escaping anymore.
-
-Thx!
-
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index 9e3ea7f1b358..11cafe293c29 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -2581,7 +2581,7 @@ static void __init srso_select_mitigation(void)
- 	    srso_cmd == SRSO_CMD_OFF) {
- 		if (boot_cpu_has(X86_FEATURE_SBPB))
- 			x86_pred_cmd = PRED_CMD_SBPB;
--		return;
-+		goto out;
- 	}
- 
- 	if (has_microcode) {
-@@ -2593,7 +2593,7 @@ static void __init srso_select_mitigation(void)
- 		 */
- 		if (boot_cpu_data.x86 < 0x19 && !cpu_smt_possible()) {
- 			setup_force_cpu_cap(X86_FEATURE_SRSO_NO);
--			return;
-+			goto out;
- 		}
- 
- 		if (retbleed_mitigation == RETBLEED_MITIGATION_IBPB) {
-@@ -2692,11 +2692,11 @@ static void __init srso_select_mitigation(void)
- 	}
- 
- out:
--
- 	if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
- 		setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
- 
--	pr_info("%s\n", srso_strings[srso_mitigation]);
-+	if (srso_mitigation != SRSO_MITIGATION_NONE)
-+		pr_info("%s\n", srso_strings[srso_mitigation]);
- }
- 
- #undef pr_fmt
-
-
-
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
