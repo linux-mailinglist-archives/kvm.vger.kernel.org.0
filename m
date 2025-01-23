@@ -1,226 +1,243 @@
-Return-Path: <kvm+bounces-36342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F40AA1A3A9
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:57:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E997BA1A3CE
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 13:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B2C2169E2A
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 11:57:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B61243A286F
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 12:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B7920E33E;
-	Thu, 23 Jan 2025 11:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5442A20E715;
+	Thu, 23 Jan 2025 12:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="MA4Rlu3E"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YvLI/Dxj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4871229B0;
-	Thu, 23 Jan 2025 11:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B454120E307;
+	Thu, 23 Jan 2025 12:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737633455; cv=none; b=JdvG6KkdqQOfNWZTW9XgE3Lvg+Sq+czYQXD8V6+/mZpqtp5eQDjJUXq9WaMHqDxezrCrgquND63b1b6GH/sEQh/CJkP0zebF1tnyT1YlPdDnmKkpTeZFt0Dag2wTwbO35R59Xox6bdKQBkhz9ZKYPhbnrfnts92QW7udFhDV85Y=
+	t=1737634093; cv=none; b=RXYlwIx/DSyKnxW/u8to4Q5ISCeF9VYcgBYv6n/LHT9ONsxkDE2xmB5le6BiuUN/Ht857gLrBPBkEIrMFHsRrXV27CA8pBQKX1pu4MNPt/wX8LlDO9B7CeAI4XL3IaAKKBFgjrCf4QGIrhEVu8aqRUq4KUk59Dhobnjo+N530yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737633455; c=relaxed/simple;
-	bh=+u2UYFgqgOSGz04sLrSBDVoAHxdcRHvP6boh889RNws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=EU3X/CWgM7D7Jn7sRZLDimX537xmXuLLs13ixQ+IyI2ClZGMSqZZQBFf/6pj+5hEzHIOZ6o0eK6kQj2ulXgAqLxu/a1qOqdDDO4vYcZWQxHC9aZ7CoUOsTF1Y+iErK3rH7X9pOb9O7uivpkZYHXZwqkZg1p3e/nU53yLICX1Wjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=MA4Rlu3E; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1737633453; x=1769169453;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=9P/WI2TxBNhrzdT8yDOgB87cpcW0wU2g0ZhcVkOr4h4=;
-  b=MA4Rlu3El5JGADeFzHBxJeeeTs0T220/gft8FT9tXPmhGoGbqcKMzVBW
-   GJJnIhNcX7fPhFAuVFzAsJ4/M/S0hfgMBIBW5ChXpL090q0WkPYKIv4/P
-   3LsaCNqg7fOOhw7FlvqexwavTpql/1HDCbZl3VG0sSXYUzqQu8tVT1NyV
-   M=;
-X-IronPort-AV: E=Sophos;i="6.13,228,1732579200"; 
-   d="scan'208";a="166394565"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 11:57:30 +0000
-Received: from EX19MTAUEC001.ant.amazon.com [10.0.44.209:55325]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.8.105:2525] with esmtp (Farcaster)
- id 85c0e4b1-62e6-4ea9-811e-22b15e9320a9; Thu, 23 Jan 2025 11:57:30 +0000 (UTC)
-X-Farcaster-Flow-ID: 85c0e4b1-62e6-4ea9-811e-22b15e9320a9
-Received: from EX19MTAUEB002.ant.amazon.com (10.252.135.47) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 23 Jan 2025 11:57:30 +0000
-Received: from email-imr-corp-prod-pdx-all-2b-5ec155c2.us-west-2.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.135.97) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Thu, 23 Jan 2025 11:57:30 +0000
-Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
-	by email-imr-corp-prod-pdx-all-2b-5ec155c2.us-west-2.amazon.com (Postfix) with ESMTPS id AB40540C9C;
-	Thu, 23 Jan 2025 11:57:17 +0000 (UTC)
-Message-ID: <ef864674-bbcf-457b-a4e3-fec272fc2d8a@amazon.co.uk>
-Date: Thu, 23 Jan 2025 11:57:16 +0000
+	s=arc-20240116; t=1737634093; c=relaxed/simple;
+	bh=ZYZXC2MNzNzz+MQI6etCpQX9FwAr/03N4zAL+UTsX3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K0/AAOgLCKiLxanp+Qx/iczKXwEbIZsXQSsRBUuMlvJxLL8ObgjTBFhFHWdG4YzKb0Q+q7zv/hobNK5KQ0umH1GkU83bZVhx4fjpz3fcfVwJpzKT4lDkS1ivwp8xwQZoXSaPFc9zstYU9R3VzeEAHOuJCX8jJVWPr4Fx8so2Nmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YvLI/Dxj; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50N20miY014245;
+	Thu, 23 Jan 2025 12:07:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=k9TF4LdNoTfux9z59A4nZezKZsPHoLTSOLGWHHnHd
+	18=; b=YvLI/DxjoMwyvJPtIDiCZWPmHdFAxpsjvBGHe1WSjhjUP4Yqz+zarPkxB
+	MeD5UycDFk0oqYuga9hPrCJ8e1yJg7uAwWBJVOSR4x7mgwk+r+UftyKYEwKlZ65M
+	Dw7F/MQTG5eok/CrZHKjarXnYFvNWWRFYY6Lao2+67dphIK2u5WtFNChB5AGhtq0
+	tCTSxErB7jdvm1fA9y4YBm/SMW0eHFyS526e6HUgxwoZOBOkBd89mQ2+txWrsBbn
+	t3JznydWIF+J22/cmMB0gTioHyCP1pU3T1xQvghzfrRb4urfR9qkFxfPs85Uyy4U
+	ydXD9pFco0iVjOYS3Bcyns0i5Higw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44bckyte8s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Jan 2025 12:07:59 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50NC029N017314;
+	Thu, 23 Jan 2025 12:07:59 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44bckyte8q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Jan 2025 12:07:59 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50NAAAuk024240;
+	Thu, 23 Jan 2025 12:07:58 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448q0ydj6g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 Jan 2025 12:07:58 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50NC7sGP33292682
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 Jan 2025 12:07:54 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7DC442004B;
+	Thu, 23 Jan 2025 12:07:54 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 03C6920043;
+	Thu, 23 Jan 2025 12:07:51 +0000 (GMT)
+Received: from vaibhav?linux.ibm.com (unknown [9.124.210.34])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 23 Jan 2025 12:07:50 +0000 (GMT)
+Received: by vaibhav@linux.ibm.com (sSMTP sendmail emulation); Thu, 23 Jan 2025 17:37:50 +0530
+From: Vaibhav Jain <vaibhav@linux.ibm.com>
+To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, gautam@linux.ibm.com
+Cc: Vaibhav Jain <vaibhav@linux.ibm.com>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
+        sbhat@linux.ibm.com, kconsul@linux.ibm.com, amachhiw@linux.ibm.com
+Subject: [PATCH v3 0/6] kvm powerpc/book3s-hv: Expose Hostwide counters as perf-events
+Date: Thu, 23 Jan 2025 17:37:42 +0530
+Message-ID: <20250123120749.90505-1-vaibhav@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 2/9] KVM: guest_memfd: Add guest_memfd support to
- kvm_(read|/write)_guest_page()
-To: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
-CC: <kvm@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-	<linux-mm@kvack.org>, <pbonzini@redhat.com>, <chenhuacai@kernel.org>,
-	<mpe@ellerman.id.au>, <anup@brainfault.org>, <paul.walmsley@sifive.com>,
-	<palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <seanjc@google.com>,
-	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <willy@infradead.org>,
-	<akpm@linux-foundation.org>, <xiaoyao.li@intel.com>, <yilun.xu@intel.com>,
-	<chao.p.peng@linux.intel.com>, <jarkko@kernel.org>, <amoorthy@google.com>,
-	<dmatlack@google.com>, <yu.c.zhang@linux.intel.com>,
-	<isaku.yamahata@intel.com>, <mic@digikod.net>, <vbabka@suse.cz>,
-	<vannapurve@google.com>, <ackerleytng@google.com>,
-	<mail@maciej.szmigiero.name>, <michael.roth@amd.com>, <wei.w.wang@intel.com>,
-	<liam.merwick@oracle.com>, <isaku.yamahata@gmail.com>,
-	<kirill.shutemov@linux.intel.com>, <suzuki.poulose@arm.com>,
-	<steven.price@arm.com>, <quic_eberman@quicinc.com>,
-	<quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
-	<quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
-	<quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
-	<catalin.marinas@arm.com>, <james.morse@arm.com>, <yuzenghui@huawei.com>,
-	<oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
-	<qperret@google.com>, <keirf@google.com>, <shuah@kernel.org>,
-	<hch@infradead.org>, <jgg@nvidia.com>, <rientjes@google.com>,
-	<jhubbard@nvidia.com>, <fvdl@google.com>, <hughd@google.com>,
-	<jthoughton@google.com>
-References: <20250122152738.1173160-1-tabba@google.com>
- <20250122152738.1173160-3-tabba@google.com>
- <e6ea48d2-959f-4fbb-a170-0beaaf37f867@redhat.com>
- <CA+EHjTxNEoQ3MtZPi603=366vxt=SmBwetS4mFkvTK2r6u=UHw@mail.gmail.com>
- <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com>
-From: Patrick Roy <roypat@amazon.co.uk>
-Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <82d8d3a3-6f06-4904-9d94-6f92bba89dbc@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: RBV3z6SesUUJmfH8PZnqUW3wtcNFwnLK
+X-Proofpoint-ORIG-GUID: G8xwnBqnBpg2Pv2xurdYZiJBs69R3zxP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-23_05,2025-01-22_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ clxscore=1015 mlxscore=0 impostorscore=0 lowpriorityscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501230091
 
+Changes from v2
+Link: https://lore.kernel.org/all/20250115143948.369379-1-vaibhav@linux.ibm.com/
+* Fixed a build warning reported by kernel test robot at [4]
+* Fixed minor nit in documentation patch [Gautam]
+* Fixed a redundant branch in kvmppc_init_hostwide()  [Gautam]
+* Proposed v2 of Qemu-TCG emulation for Hostwide counters [3]
+=======
 
+This patch-series adds support for reporting Hostwide(L1-Lpar) counters via
+perf-events. With the support for running KVM Guest in a PSeries-Lpar using
+nested-APIv2 via [1], the underlying L0-PowerVM hypervisor holds some state
+information pertaining to all running L2-KVM Guests in an L1-Lpar. This
+state information is held in a pre-allocated memory thats owned by
+L0-PowerVM and is termed as Guest-Management-Area(GMA). The GMA is
+allocated per L1-LPAR and is only allocated if the lpar is KVM enabled. The
+size of this area is a fixed percentage of the memory assigned to the KVM
+enabled L1-lpar and is composed of two major components, Guest Management
+Space(Host-Heap) and Guest Page Table Management Space(Host-Pagetable).
 
-On Thu, 2025-01-23 at 11:39 +0000, David Hildenbrand wrote:
-> On 23.01.25 10:48, Fuad Tabba wrote:
->> On Wed, 22 Jan 2025 at 22:10, David Hildenbrand <david@redhat.com> wrote:
->>>
->>> On 22.01.25 16:27, Fuad Tabba wrote:
->>>> Make kvm_(read|/write)_guest_page() capable of accessing guest
->>>> memory for slots that don't have a userspace address, but only if
->>>> the memory is mappable, which also indicates that it is
->>>> accessible by the host.
->>>
->>> Interesting. So far my assumption was that, for shared memory, user
->>> space would simply mmap() guest_memdd and pass it as userspace address
->>> to the same memslot that has this guest_memfd for private memory.
->>>
->>> Wouldn't that be easier in the first shot? (IOW, not require this patch
->>> with the cost of faulting the shared page into the page table on access)
->>
-> 
-> In light of:
-> 
-> https://lkml.kernel.org/r/20250117190938.93793-4-imbrenda@linux.ibm.com
-> 
-> there can, in theory, be memslots that start at address 0 and have a
-> "valid" mapping. This case is done from the kernel (and on special s390x
-> hardware), though, so it does not apply here at all so far.
-> 
-> In practice, getting address 0 as a valid address is unlikely, because
-> the default:
-> 
-> $ sysctl  vm.mmap_min_addr
-> vm.mmap_min_addr = 65536
-> 
-> usually prohibits it for good reason.
-> 
->> This has to do more with the ABI I had for pkvm and shared memory
->> implementations, in which you don't need to specify the userspace
->> address for memory in a guestmem memslot. The issue is there is no
->> obvious address to map it to. This would be the case in kvm:arm64 for
->> tracking paravirtualized time, which the userspace doesn't necessarily
->> need to interact with, but kvm does.
-> 
-> So I understand correctly: userspace wouldn't have to mmap it because it
-> is not interested in accessing it, but there is nothing speaking against
-> mmaping it, at least in the first shot.
-> 
-> I assume it would not be a private memslot (so far, my understanding is
-> that internal memslots never have a guest_memfd attached).
-> kvm_gmem_create() is only called via KVM_CREATE_GUEST_MEMFD, to be set
-> on user-created memslots.
-> 
->>
->> That said, we could always have a userspace address dedicated to
->> mapping shared locations, and use that address when the necessity
->> arises. Or we could always require that memslots have a userspace
->> address, even if not used. I don't really have a strong preference.
-> 
-> So, the simpler version where user space would simply mmap guest_memfd
-> to provide the address via userspace_addr would at least work for the
-> use case of paravirtualized time?
+The Host-Heap holds the various data-structures allocated by L0-PowerVM for
+L2-KVM Guests running in the L1-Lpar. The Host-Pagetable holds the Radix
+pagetable[2] for the L2-KVM Guest which is used by L0-PowerVM to handle
+page faults. Since the size of both of these areas is limited and fixed via
+partition boot profile, it puts an upper bound on the number of L2-KVM
+Guests that can be run in an LPAR. Also due limited size of Host-Pagetable
+area, L0-PowerVM is at times forced to perform reclaim operation on
+it. This reclaim operation is usually performed when running large number
+of L2-KVM Guests which are memory bound and increases Host-Pagetable
+utilization.
 
-fwiw, I'm currently prototyping something like this for x86 (although
-not by putting the gmem address into userspace_addr, but by adding a new
-field to memslots, so that memory attributes continue working), based on
-what we talked about at the last guest_memfd sync meeting (the whole
-"how to get MMIO emulation working for non-CoCo VMs in guest_memfd"
-story). So I guess if we're going down this route for x86, maybe it
-makes sense to do the same on ARM, for consistency?
+In light of the above its recommended to track usage of these areas to
+ensure consistent L2-KVM Guest performance. Hence this patch-series
+attempts to expose the max-size and current-usage of these areas as well as
+cumulative amount of bytes reclaimed from Host-Pagetable as perf-events
+that can be queried via perf-stat.
 
-> It would get rid of the immediate need for this patch and patch #4 to
-> get it flying.
-> 
-> 
-> One interesting question is: when would you want shared memory in
-> guest_memfd and *not* provide it as part of the same memslot. 
+The patch series introduces a new 'kvm-hv' PMU which exports the
+perf-events mentioned below. Since perf-events exported represents the
+state of the whole L1-Lpar and not that of a specific L2-KVM guest hence
+the 'kvm-hv' PMU's scope is set as PERF_PMU_SCOPE_SYS_WIDE(System-Wide).
 
-In my testing of non-CoCo gmem VMs on ARM, I've been able to get quite
-far without giving KVM a way to internally access shared parts of gmem - 
-it's why I was probing Fuad for this simplified series, because
-KVM_SW_PROTECTED_VM + mmap (for loading guest kernel) is enough to get a
-working non-CoCo VM on ARM (although I admittedly never looked at clocks
-inside the guest - maybe that's one thing that breaks if KVM can't
-access gmem. How to guest and host agree on the guest memory range
-used to exchange paravirtual timekeeping information? Could that exchange
-be intercepted in userspace, and set to shared via memory attributes (e.g.
-placed outside gmem)? That's the route I'm going down the paravirtual
-time on x86).
+New perf-events introduced
+==========================
 
-> One nice thing about the mmap might be that access go via user-space
-> page tables: E.g., __kvm_read_guest_page can just access the memory
-> without requiring the folio lock and an additional temporary folio
-> reference on every access -- it's handled implicitly via the mapcount.
-> 
-> (of course, to map the page we still need that once on the fault path)
+* kvm-hv/host_heap/		: The currently used bytes in the
+				  Hypervisor's Guest Management Space
+				  associated with the Host Partition.
+* kvm-hv/host_heap_max/		: The maximum bytes available in the
+				  Hypervisor's Guest Management Space
+				  associated with the Host Partition.
+* kvm-hv/host_pagetable/	: The currently used bytes in the
+				  Hypervisor's Guest Page Table Management
+				  Space associated with the Host Partition.
+* kvm-hv/host_pagetable_max/	: The maximum bytes available in the
+				  Hypervisor's Guest Page Table Management
+				  Space associated with the Host Partition.
+* kvm-hv/host_pagetable_reclaim/: The amount of space in bytes that has
+				  been reclaimed due to overcommit in the
+				  Hypervisor's Guest Page Table Management
+				  Space associated with the Host Partition.
 
-Doing a direct map access in kvm_{read,write}_guest() and friends will
-also get tricky if guest_memfd folios ever don't have direct map
-entries. On-demand restoration is painful, both complexity and
-performance wise [1], while going through a userspace mapping of
-guest_memfd would "just work".
+Structure of this patch series
+==============================
+Start with documenting and updating the KVM nested-APIv2 hcall
+specifications for H_GUEST_GET_STATE hcall and Hostwide guest-state-buffer
+elements.
 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
+Subsequent patches add support for adding and parsing Hostwide
+guest-state-buffer elements in existing kvm-hv apiv2 infrastructure. Also
+add a kunit test case to verify correctness of the changes introduced.
+
+Next set of patches in the patch-set introduces a new PMU for kvm-hv on
+pseries named as 'kvm-hv', implement plumbing between kvm-hv module and
+initialization of this new PMU, necessary setup code in kvm-hv pmu to
+create populate and parse a guest-state-buffer holding the Hostwide
+counters returned from L0-PowerVM.
+
+The final patch in the series creates the five new perf-events which then
+leverage the kernel's perf-event infrastructure to report the Hostwide
+counters returned from L0-PowerVM to perf tool.
+
+Output
+======
+Once the patch-set is integrated, perf-stat should report the Hostwide
+counters for a kvm-enabled pseries lpar as below:
+
+$ sudo perf stat -e 'kvm-hv/host_heap/'  -e 'kvm-hv/host_heap_max/' \
+  -e 'kvm-hv/host_pagetable/' -e 'kvm-hv/host_pagetable_max/' \
+  -e 'kvm-hv/host_pagetable_reclaim/' -- sleep 0
+
+Performance counter stats for 'system wide':
+
+                 0      kvm-hv/host_heap/
+    10,995,367,936      kvm-hv/host_heap_max/
+         2,178,304      kvm-hv/host_pagetable/
+     2,147,483,648      kvm-hv/host_pagetable_max/
+                 0      kvm-hv/host_pagetable_reclaim/
+
+The patch can be tested with Qemu-TCG emulation support for Book3s-HV APIv2
+proposed at [3]. Currently with Qemu-TCG the values for all the Hostwide
+counters is reported as '0'.
+
+References
+==========
+[1] - commit 19d31c5f1157 ("KVM: PPC: Add support for nestedv2 guests")
+[2] - "KVM in a PowerVM LPAR: A Power user guide Part II"
+      https://ibm.biz/BdGHeY
+[3] - https://lore.kernel.org/all/20250123115538.86821-1-vaibhav@linux.ibm.com
+[4] - https://lore.kernel.org/all/202501171030.3x0gqW8G-lkp@intel.com
+
+Vaibhav Jain (6):
+  powerpc: Document APIv2 KVM hcall spec for Hostwide counters
+  kvm powerpc/book3s-apiv2: Add support for Hostwide GSB elements
+  kvm powerpc/book3s-apiv2: Add kunit tests for Hostwide GSB elements
+  kvm powerpc/book3s-apiv2: Introduce kvm-hv specific PMU
+  powerpc/book3s-hv-pmu: Implement GSB message-ops for hostwide counters
+  kvm powerpc/book3s-hv-pmu: Add perf-events for Hostwide counters
+
+ Documentation/arch/powerpc/kvm-nested.rst     |  40 +-
+ arch/powerpc/include/asm/guest-state-buffer.h |  35 +-
+ arch/powerpc/include/asm/hvcall.h             |  13 +-
+ arch/powerpc/include/asm/kvm_book3s.h         |  20 +
+ arch/powerpc/kvm/Makefile                     |   6 +
+ arch/powerpc/kvm/book3s_hv.c                  |   9 +
+ arch/powerpc/kvm/book3s_hv_nestedv2.c         |   6 +
+ arch/powerpc/kvm/book3s_hv_pmu.c              | 421 ++++++++++++++++++
+ arch/powerpc/kvm/guest-state-buffer.c         |  39 ++
+ arch/powerpc/kvm/test-guest-state-buffer.c    | 210 +++++++++
+ 10 files changed, 777 insertions(+), 22 deletions(-)
+ create mode 100644 arch/powerpc/kvm/book3s_hv_pmu.c
+
+-- 
+2.48.1
+
 
