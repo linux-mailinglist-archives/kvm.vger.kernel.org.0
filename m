@@ -1,173 +1,249 @@
-Return-Path: <kvm+bounces-36391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8496A1A722
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 16:33:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEEE8A1A727
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 16:36:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 473AA188A213
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:33:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 189331678E8
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 15:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94750211470;
-	Thu, 23 Jan 2025 15:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04ECD211470;
+	Thu, 23 Jan 2025 15:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="ZF2Injrd"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ZfLS8rsv"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028A1F4F1;
-	Thu, 23 Jan 2025 15:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607ADF4F1
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 15:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737646417; cv=none; b=CuC1g1lWQW3ozXDgCrKnnW0Y0qbeACwCeBUKMe3YHoMBWu24ilBMsit/B99yQiAUMdJ1VQ1b3IlYIbjifWllfKR2XdvEVaV6NKTuVrXh8s17XNAA+kehENxoIV2LHnagz5V/yz6xre6EKT5kaaBAdh8fLdf0gUE6ks4EnqR9IeE=
+	t=1737646571; cv=none; b=WIs01mQsfX2hiQxCTM721pReX0PwUffxRjzG1tY1CmmnyuslyJ0bMfgZ/Go7+Q5SQq1PPihjX2jGFtdDx/9UyMeMOhnL8qmsiUWPzYh9jvoVG70iVw5rqi+14wnYRpm7yGtOTdgHfXHLSYCmrr+lgL6cbXK28zzMfEZ2hwhXLwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737646417; c=relaxed/simple;
-	bh=5p7xT3po2+F9Cz5BbGOtrlT710KKHhtCw4KbDyKhqUU=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ehdfX/+Ya9wewYZKAtCxL0ATgPDRL41Z4s98WRCO4Hn0NOHIR7nyIXWCiOVv0TyTzzcoDDi9z85MITBzmfakk2Hyn3XxMnjRCsud9UjOtAtgY59WCVaIKFrClLd9fVpSfGmVw5AWzGrcXsIPM6chdHVviQBWnEFkqYuYDpwfE5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=ZF2Injrd; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1737646416; x=1769182416;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=j7TtwM9zSLgAQwwFMd+Jd7bZJEHYMcgpXdaIjig8Ny8=;
-  b=ZF2Injrdm7oOOMJWX0znR4MQg9kxHlvH41khS4S/b9ktSfV85/rTEcNn
-   SkqHGSLXU9HM5eI9kUiuAD3p1D/1jfgPZLyBuQDqLptV72iLJylRtJGNr
-   Nox/d3rWDwJnmQsestJS9HMEh05AizThQYvmBF9ZgwxKlLHh5ywZz+DTf
-   E=;
-X-IronPort-AV: E=Sophos;i="6.13,228,1732579200"; 
-   d="scan'208";a="691397891"
-Subject: Re: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
-Thread-Topic: [PATCH] KVM: x86: Update Xen-specific CPUID leaves during mangling
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 15:33:33 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:20210]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.43.143:2525] with esmtp (Farcaster)
- id 35af9d30-6e91-4daa-8b8d-812c21f29025; Thu, 23 Jan 2025 15:33:31 +0000 (UTC)
-X-Farcaster-Flow-ID: 35af9d30-6e91-4daa-8b8d-812c21f29025
-Received: from EX19D007EUA003.ant.amazon.com (10.252.50.8) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 23 Jan 2025 15:33:30 +0000
-Received: from EX19D007EUA002.ant.amazon.com (10.252.50.68) by
- EX19D007EUA003.ant.amazon.com (10.252.50.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 23 Jan 2025 15:33:30 +0000
-Received: from EX19D007EUA002.ant.amazon.com ([fe80::1295:20d9:141e:47cc]) by
- EX19D007EUA002.ant.amazon.com ([fe80::1295:20d9:141e:47cc%3]) with mapi id
- 15.02.1258.039; Thu, 23 Jan 2025 15:33:30 +0000
-From: "Griffoul, Fred" <fgriffo@amazon.co.uk>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Sean Christopherson
-	<seanjc@google.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Paolo Bonzini
-	<pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, "H. Peter
- Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Paul Durrant
-	<paul@xen.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Thread-Index: AQHbbOj/VmoTG6SZV029AmLhfVoQ7bMjCNaAgACFagCAAMwcAIAAIpxX
-Date: Thu, 23 Jan 2025 15:33:30 +0000
-Message-ID: <cd8c29bc349244399b84008ef4c9ce7a@amazon.co.uk>
-References: <20250122161612.20981-1-fgriffo@amazon.co.uk>
- <87tt9q7orq.fsf@redhat.com>
- <Z5GXxOr3FHz_53Pj@google.com>,<87frl97jer.fsf@redhat.com>
-In-Reply-To: <87frl97jer.fsf@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1737646571; c=relaxed/simple;
+	bh=IKRzKxDHgZ6HryTEn90X+Xj30h0PVrX6bIb3+5x0+WA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pD8dkZKP6YntuePO4xz0pi65G0Nt8w32KpYI9b7H37Fbvb62o5POjqLnUSHghhMwD2bd0TpiC1o12R6QEDd6l9duWr+lYDzbYYro/IOEMmnZNThU3hFAgI+ZcF6eeXe31QEjYdqtuX0XyzOhZsSm42Ue5H3LlVbZQxsInpsVvgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ZfLS8rsv; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 50NF7idh019988
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 07:36:08 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2021-q4; bh=lpkECEcCcGYyN5K7oo
+	I8MFikOXuuefuG7+H7ZQWYQqU=; b=ZfLS8rsv+NlJ+U+V0PFDxnubpst9n45L+O
+	OK+R8lpJzI+Vi5Sy/wRae/ZqnvxTxud1Run0eGrkg9I/hrutmb2sy0L0bHrqjPHV
+	Z6hjX6duaWCaygwSCvLZH/AvnGDJkjsbJvTWdH//bCZoQRmiB7l9CO0fypIS4gV3
+	WxHPP5HkAfGA/Dsr/BpOjk+7Eyo0lUij6EvWC+hSre0IQQ33ezGpRQ6ZQWscIsN+
+	nGe+Uiek0t4YHGS/RuqwP98ouXSr1CIVZ6yWpgIYrsORMzY9s+BL5exYaVp7h3u0
+	RK+8ND4hrTifdHB9GcumXq0EROGpnm7TCeL4Zq4DjF/JF08H6sfA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 44br4x86be-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 07:36:07 -0800 (PST)
+Received: from twshared8234.09.ash9.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Thu, 23 Jan 2025 15:35:58 +0000
+Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
+	id 68A4A1735FA2E; Thu, 23 Jan 2025 07:35:44 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <kvm@vger.kernel.org>, <x86@kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Vlad Poenaru <thevlad@meta.com>, <tj@kernel.org>,
+        Keith Busch
+	<kbusch@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini
+	<pbonzini@redhat.com>, Alyssa Ross <hi@alyssa.is>
+Subject: [PATCH] kvm: defer huge page recovery vhost task to later
+Date: Thu, 23 Jan 2025 07:35:43 -0800
+Message-ID: <20250123153543.2769928-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: 5Vx57Q8tKmtMpTGwkH7C-3OAEtMGBqsH
+X-Proofpoint-ORIG-GUID: 5Vx57Q8tKmtMpTGwkH7C-3OAEtMGBqsH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-23_06,2025-01-23_01,2024-11-22_01
 
-Thanks for your comments: I will post a new patch following Sean's idea to =
-fix the CPUID registers directly in kvm_cpuid().
+From: Keith Busch <kbusch@kernel.org>
 
-Br,
+Some libraries want to ensure they are single threaded before forking,
+so making the kernel's kvm huge page recovery process a vhost task of
+the user process breaks those. The minijail library used by crosvm is
+one such affected application.
 
---
-Fred
+Defer the task to after the first VM_RUN call, which occurs after the
+parent process has forked all its jailed processes. This needs to happen
+only once for the kvm instance, so this patch introduces infrastructure
+to do that (Suggested-by Paolo).
 
-________________________________________
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Sent: Thursday, January 23, 2025 1:24:12 PM
-To: Sean Christopherson
-Cc: Griffoul, Fred; kvm@vger.kernel.org; Paolo Bonzini; Thomas Gleixner; In=
-go Molnar; Borislav Petkov; Dave Hansen; x86@kernel.org; H. Peter Anvin; Da=
-vid Woodhouse; Paul Durrant; linux-kernel@vger.kernel.org
-Subject: RE: [EXTERNAL] [PATCH] KVM: x86: Update Xen-specific CPUID leaves =
-during mangling
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Tested-by: Alyssa Ross <hi@alyssa.is>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ arch/x86/include/asm/kvm_call_once.h | 44 ++++++++++++++++++++++++++++
+ arch/x86/include/asm/kvm_host.h      |  2 ++
+ arch/x86/kvm/mmu/mmu.c               | 18 ++++++++----
+ arch/x86/kvm/x86.c                   |  7 ++++-
+ 4 files changed, 65 insertions(+), 6 deletions(-)
+ create mode 100644 arch/x86/include/asm/kvm_call_once.h
 
-
-Sean Christopherson <seanjc@google.com> writes:
-
-> On Wed, Jan 22, 2025, Vitaly Kuznetsov wrote:
->> > Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
->> > ---
->> >  arch/x86/kvm/cpuid.c | 1 +
->> >  arch/x86/kvm/xen.c   | 5 +++++
->> >  arch/x86/kvm/xen.h   | 5 +++++
->> >  3 files changed, 11 insertions(+)
->> >
->> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> > index edef30359c19..432d8e9e1bab 100644
->> > --- a/arch/x86/kvm/cpuid.c
->> > +++ b/arch/x86/kvm/cpuid.c
->> > @@ -212,6 +212,7 @@ static int kvm_cpuid_check_equal(struct kvm_vcpu *=
-vcpu, struct kvm_cpuid_entry2
->> >     */
->> >    kvm_update_cpuid_runtime(vcpu);
->> >    kvm_apply_cpuid_pv_features_quirk(vcpu);
->> > +  kvm_xen_update_cpuid_runtime(vcpu);
->>
->> This one is weird as we update it in runtime (kvm_guest_time_update())
->> and values may change when we e.g. migrate the guest. First, I do not
->> understand how the guest is supposed to notice the change as CPUID data
->> is normally considered static.
->
-> I don't think it does.  Linux-as-a-guest reads the info once during boot =
-(see
-> xen_tsc_safe_clocksource()), and if and only if the TSC is constant and n=
-on-stop,
-> i.e. iff the values won't change.
-
-Right, the values shouldn't change on the same host. What I was thinking
-is what happens when we migrate the guest to another
-host. kvm_guest_time_update() is going to be called and we will get
-something different (maybe just slightly different, but still) in Xen
-TSC CPUIDs. The guest, however, is likely not going to notice at all.
-
->
->>  Second, I do not see how the VMM is
->> supposed to track it as if it tries to supply some different data for
->> these Xen leaves, kvm_cpuid_check_equal() will still fail.
->>
->> Would it make more sense to just ignore these Xen CPUID leaves with TSC
->> information when we do the comparison?
->
-> Another alternative would be to modify the register output in kvm_cpuid()=
-.  Given
-> that Linux reads the info once during boot, and presumably other guests d=
-o the
-> same, runtime "patching" wouldn't incur meaningful overhead.  And there a=
-re no
-> feature bits that KVM cares about, i.e. no reason KVM's view needs to be =
-correct.
-
-True, CPUID reading time should not be performance critical.
-
---
-Vitaly
+diff --git a/arch/x86/include/asm/kvm_call_once.h b/arch/x86/include/asm/=
+kvm_call_once.h
+new file mode 100644
+index 0000000000000..451cc87084aa7
+--- /dev/null
++++ b/arch/x86/include/asm/kvm_call_once.h
+@@ -0,0 +1,44 @@
++#ifndef _LINUX_CALL_ONCE_H
++#define _LINUX_CALL_ONCE_H
++
++#include <linux/types.h>
++
++#define ONCE_NOT_STARTED 0
++#define ONCE_RUNNING     1
++#define ONCE_COMPLETED   2
++
++struct once {
++        atomic_t state;
++        struct mutex lock;
++};
++
++static inline void __once_init(struct once *once, const char *name,
++			       struct lock_class_key *key)
++{
++        atomic_set(&once->state, ONCE_NOT_STARTED);
++        __mutex_init(&once->lock, name, key);
++}
++
++#define once_init(once)							\
++do {									\
++	static struct lock_class_key __key;				\
++	__once_init((once), #once, &__key);				\
++} while (0)
++
++static inline void call_once(struct once *once, void (*cb)(struct once *=
+))
++{
++        /* Pairs with atomic_set_release() below.  */
++        if (atomic_read_acquire(&once->state) =3D=3D ONCE_COMPLETED)
++                return;
++
++        guard(mutex)(&once->lock);
++        WARN_ON(atomic_read(&once->state) =3D=3D ONCE_RUNNING);
++        if (atomic_read(&once->state) !=3D ONCE_NOT_STARTED)
++                return;
++
++        atomic_set(&once->state, ONCE_RUNNING);
++        cb(once);
++        atomic_set_release(&once->state, ONCE_COMPLETED);
++}
++
++#endif /* _LINUX_CALL_ONCE_H */
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+index 2f442701dc755..e1eb8155e6a82 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -37,6 +37,7 @@
+ #include <asm/kvm_page_track.h>
+ #include <asm/kvm_vcpu_regs.h>
+ #include <asm/hyperv-tlfs.h>
++#include <asm/kvm_call_once.h>
+ #include <asm/reboot.h>
+=20
+ #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+@@ -1466,6 +1467,7 @@ struct kvm_arch {
+ 	struct kvm_x86_pmu_event_filter __rcu *pmu_event_filter;
+ 	struct vhost_task *nx_huge_page_recovery_thread;
+ 	u64 nx_huge_page_last;
++	struct once nx_once;
+=20
+ #ifdef CONFIG_X86_64
+ 	/* The number of TDP MMU pages across all roots. */
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 26b4ba7e7cb5e..a45ae60e84ab4 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7447,20 +7447,28 @@ static bool kvm_nx_huge_page_recovery_worker(void=
+ *data)
+ 	return true;
+ }
+=20
+-int kvm_mmu_post_init_vm(struct kvm *kvm)
++static void kvm_mmu_start_lpage_recovery(struct once *once)
+ {
+-	if (nx_hugepage_mitigation_hard_disabled)
+-		return 0;
++	struct kvm_arch *ka =3D container_of(once, struct kvm_arch, nx_once);
++	struct kvm *kvm =3D container_of(ka, struct kvm, arch);
+=20
+ 	kvm->arch.nx_huge_page_last =3D get_jiffies_64();
+ 	kvm->arch.nx_huge_page_recovery_thread =3D vhost_task_create(
+ 		kvm_nx_huge_page_recovery_worker, kvm_nx_huge_page_recovery_worker_kil=
+l,
+ 		kvm, "kvm-nx-lpage-recovery");
+=20
++	if (kvm->arch.nx_huge_page_recovery_thread)
++		vhost_task_start(kvm->arch.nx_huge_page_recovery_thread);
++}
++
++int kvm_mmu_post_init_vm(struct kvm *kvm)
++{
++	if (nx_hugepage_mitigation_hard_disabled)
++		return 0;
++
++	call_once(&kvm->arch.nx_once, kvm_mmu_start_lpage_recovery);
+ 	if (!kvm->arch.nx_huge_page_recovery_thread)
+ 		return -ENOMEM;
+-
+-	vhost_task_start(kvm->arch.nx_huge_page_recovery_thread);
+ 	return 0;
+ }
+=20
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6e248152fa134..6d4a6734b2d69 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11471,6 +11471,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcp=
+u)
+ 	struct kvm_run *kvm_run =3D vcpu->run;
+ 	int r;
+=20
++	r =3D kvm_mmu_post_init_vm(vcpu->kvm);
++	if (r)
++		return r;
++
+ 	vcpu_load(vcpu);
+ 	kvm_sigset_activate(vcpu);
+ 	kvm_run->flags =3D 0;
+@@ -12748,7 +12752,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lo=
+ng type)
+=20
+ int kvm_arch_post_init_vm(struct kvm *kvm)
+ {
+-	return kvm_mmu_post_init_vm(kvm);
++	once_init(&kvm->arch.nx_once);
++	return 0;
+ }
+=20
+ static void kvm_unload_vcpu_mmu(struct kvm_vcpu *vcpu)
+--=20
+2.43.5
 
 
