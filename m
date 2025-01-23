@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-36455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE26A1AD7A
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 00:46:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7271FA1AD7D
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 00:46:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13320188E11D
-	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 23:46:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 096F87A21CF
+	for <lists+kvm@lfdr.de>; Thu, 23 Jan 2025 23:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2105B1D5AB5;
-	Thu, 23 Jan 2025 23:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674981D63F3;
+	Thu, 23 Jan 2025 23:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AM+mBYg6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nHda6UVz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614731D5145
-	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 23:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A551D63DD
+	for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 23:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737675957; cv=none; b=VgHH9TgyyzLcmGWELrX4F58/whUJmU8lTVn6gfcBGSUoQrwQ8to35uX1tyeQQ/dJHACQ4Gd+RB/tGArn/63OH10GlE/1p9SkD/EheXj7l9pWyBosTzKuNv26J86a7OnLwpctcOLSHpRsOF7awbnx5Te3P6VYJv1Ww4CXH44Y4JE=
+	t=1737675962; cv=none; b=c+gKuhQc0e6R4f4NiKIyMfMUGWNmZp42J5Sba8M7IwWzmuqU1J/UHzifylLtPL/4CERzpJ3QzH3wc4CL8K5Q8TspTLyuhZFW9l2z8fuTYH7R3OgZeVQP4p54+o/Wn8XdWndcKt9qkzodVNy6HFqfUZCT1rqQSZyAp+P4yCj+xPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737675957; c=relaxed/simple;
-	bh=+n1etEkqGg0BVPRatlhX1kHquhkRghxAJddT9q32VWo=;
+	s=arc-20240116; t=1737675962; c=relaxed/simple;
+	bh=j9QeyZEDciQrvxU6PmCI1XBKPe2C1gsxmtg5jSikSM0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OEHi6sS+bSMOoYBQ+9A3Ds873OnVfYX7AcZ5N1sM5qakA+lXsnGrlqPTz94PDVyOPMjS1swiCliTEtpD5ATLMoymrlT5yMD/kebmDKb5skCPyiFjm1S6ygx383NiAbutybf5grKCrvPXTVRzpKJg3dujggLicyq7lJf5rHDMe0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AM+mBYg6; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version:Content-Type; b=Hf3skVKlfX6Lc2kFWkb8GsStGRbEaZBpfIykYoclX4MzH5nszvyhyiJ8hvfmalzD3t+rzRdRxVY3LbemL/iEC102hvrxUAEsjgO0MI+DtnSbu2Qf4xppl4CEo92UTCYjKCUg4dW5yBKQGpfgzyC/hL6zBp5f+lrjmbGumY4W4Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nHda6UVz; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-436341f575fso16147025e9.1
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 15:45:55 -0800 (PST)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4361f664af5so17051855e9.1
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 15:46:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737675953; x=1738280753; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1737675959; x=1738280759; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MvtCakZyrGCXwv1NUluQigNUDDDoRJgD07DKcxozaAI=;
-        b=AM+mBYg6hekCtX9q0+NIw/4DXnXxU7izXPM+mKFLP4KLA91n7hwrxKQ4bCP42kucKd
-         0pR8tAv7uIWmQyFIA4jUz/NmyM1/lKOr5Xr2rrblmpYUKMiWZUVVrf/IkYAHjG1PdBdf
-         XpRv1R7QLGxmEUMquYRZNs4xB7I03xkREc3iv4APmleSSyCRYQLiMk+Nw/OFg/oxX1WO
-         U3WdcHjhRSYIgXcrWricDQSdKD+GovGYZcFZOsiRmul+szJrEEdnLpkQ0OUxx5UeGAL9
-         uwSO29bwcsM4RB/8TySSTJBpdcdOyBxoQyhVaMUum3e3tY4my5oxLBlMj6qIeexpndC9
-         yfzg==
+        bh=9gXZ2pCmpp3MBAsW4Hnbi8sV5bqYGRAr8w/4hsc1kvQ=;
+        b=nHda6UVzPd84CB7aEepZKZmlRMzQHln0z1fpFa6mHdLPdRrw5yf2qRVHQzrq6Bq3Sd
+         eG5SDb9cw1XHiJ1tTfQgWrFiq3qny7jiieB1rebZ3UmzbyT5in7A6AAcn6xlsc3NZQ9B
+         mlPiUdAwmvRVOC0ia438OkJnCbmi/ZyPHspXFksNpUFGto5PRFDrVK0uT+uG7afZtgPo
+         rU/hH9ml9ZBd6PnYSVp/Iuo1o6VKYGrvtK+86R+VIqlzsAGYqHBxgSkvLNcfVE2vgNQv
+         iedouJ0W1AX7QW8vDHftnYZ5WCbsMMAtZxBKpetrKYVMcEbsINspGfM/FB9QoaMufoEG
+         f6IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737675953; x=1738280753;
+        d=1e100.net; s=20230601; t=1737675959; x=1738280759;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MvtCakZyrGCXwv1NUluQigNUDDDoRJgD07DKcxozaAI=;
-        b=dwstlcsKPqteNn56XSrGFQrBslmje1IiLq0qM6NLMFKqinDPaq7qdDDwiV8hJwTgfj
-         MEuK1Ivdq+U82io96t9Db9YYkbLDvmzGqm3HDHGJ44n4qVIbBjDmtUe/C3MOuUFZuntV
-         Xx68+LoBCEVC331sHLQbMWSPVkRGlOsMV83o22iplbrKoaYSH2gNX44Pl1AGJEFR4Vz7
-         f7pYyOayh2Fxw8szsy7Jt/7tt9RWIJRm2km4O3mlYZAAYwycNEJ7hx+DDlHpDJ0cARxE
-         RV+yXCeHZ8Iwj4iGuGdqZybvvjsVlRE/6Fl5kki0tOyzww7sI6IEhEQl2A3W7pgV2wHa
-         t+qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVn0SlE/9Xm7JUdrORaQO8DDC1Xuz/tqrmrylY4ZMPSiZoIqER3C1hWORpWtAfnMv4k8Es=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXyBnmMNEcslB6ul2/80r3+zvflDBvABJvS9BLICG3vnKIDomY
-	gQTiD8IPqwKzmuULUh0HHYK1yVebd68RuSsjbJHR5acZXKwaEzhnoPtDbrWlNKw=
-X-Gm-Gg: ASbGncszhECa/K06NBmLRuCWGu/BfWasf3cCNHoJac/xnXH3ROH3ncT5RprqT3kYzbv
-	nL20HliLc4zxPZ18SOwxhZdefJ6b2qIi4dwWHZX4NYmBQFUWR0SHGwbHqYdCxJLs30VtBq7DigM
-	APEIJ0U7dmPnd8L2tNF9+ho9IO1QDmexIpo/xhhk/7Wl35SoFDUZ7bEilAb0t3JTopbIYApP8lQ
-	Q0vQqX5wXfTB7fppye4Gc9lCIl8dXnor/LA2H6Clzaah9RCd8t+Dp76mdMesCQkjqH0bE4AFj/8
-	TtSZI31H6NE8V1mvyiyI7+GOYvKzh3KBx07m9HVl6fmJYSGSFGTj0hA=
-X-Google-Smtp-Source: AGHT+IESHbhLNhi6WI+MIsv7kwcNIGaQJ9dXLlWxoyCR3XibduHPGVHiP0CzOiY9OItw0/7PMnFvyA==
-X-Received: by 2002:a05:600c:1987:b0:434:f753:6012 with SMTP id 5b1f17b1804b1-438913f2f4emr282730315e9.17.1737675953608;
-        Thu, 23 Jan 2025 15:45:53 -0800 (PST)
+        bh=9gXZ2pCmpp3MBAsW4Hnbi8sV5bqYGRAr8w/4hsc1kvQ=;
+        b=IoGYpggV6Or8l4qVgQh9tRToFgytF9mjM5d2WeCxMNGFcdf7RqCCQM85G0GT9eMm+3
+         9gbnag4A/7T5AKDQoB+oQSDXSFZEOU3DGjJ1cm3U1PGfYlU+j3Qk3VOKrei+jlxh6X4a
+         YbhCVU2OU41TrJe28fLMLtk1uBijYD7CwZSzXvmLvqPa1uxbvgWX5/LucqolyEpo3uoP
+         ctqhJX8Py7iROZaOXvefwwmDEvFO2eVmhya2DGGo1xQfDAmuAc6geLVhmYEC63oLYnW1
+         GXwi0Rh/t/0wiQikIrbddj8sKovsNa7AWncIQU+8mjCnwEuk+ILzLMcrZawmVAfXl21q
+         H5Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwWwB7OVgSdJ2pD9VkO91aMLPtz174UpFdHuxD9KlBzQZiOTnJVo8fJdxwqX1Xl1RVBvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSQmKIqB1eeqA72aJxABZ1N2hWBanobjw3BswC1A1EZHyi3Mbk
+	SFLBpCYYZLzQ9A3Vjbh3yrD7IBnq8PGz0aPcVtv5/aYhVDzZo5zdX5b3TXgW3JY=
+X-Gm-Gg: ASbGncsQ2MllFwu+wcksMOWewKUoje/KiymJteVziKauiATt2VMMJQQ6XU0js7QHJKz
+	LG0m/OdKM49CtG/obrvRft/X0sD95O4OkOy3IUVWhXlH3YxvEEZg1I0TgajObvkF2MYHG67UsUO
+	PYQDJf2BlZ+b1xcM//OFxGoYYAOwnOH8EpjGDtkT5Z5WtFiK8DhUffimvbcHQYCraRcJNWowaiv
+	dXXuNluY4QU21M21VIU7JiX3hPmL98XhMSRIrYG+kkQFET4HCL6MtVou78MtvsmODYVV8t1rRGx
+	q+j/97wpq15nXQaSkUIGShUt+f5lwbge/0acsPCOAoyygARkqpAo2sw=
+X-Google-Smtp-Source: AGHT+IFkrF3nSiyRp86eT1OfDhljZaIiOgfPlVgQgIeU90j7M027ZvrIkgirhKCWekxtCJUAZQHWLg==
+X-Received: by 2002:a05:600c:4f48:b0:434:fd15:3adc with SMTP id 5b1f17b1804b1-43891431319mr209632555e9.25.1737675959187;
+        Thu, 23 Jan 2025 15:45:59 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd43cdbbsm7488805e9.0.2025.01.23.15.45.51
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a17d79csm1009152f8f.39.2025.01.23.15.45.57
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 23 Jan 2025 15:45:52 -0800 (PST)
+        Thu, 23 Jan 2025 15:45:58 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -87,9 +87,9 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	xen-devel@lists.xenproject.org,
 	Richard Henderson <richard.henderson@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 17/20] cpus: Have cpu_class_init_props() per user / system emulation
-Date: Fri, 24 Jan 2025 00:44:11 +0100
-Message-ID: <20250123234415.59850-18-philmd@linaro.org>
+Subject: [PATCH 18/20] cpus: Have cpu_exec_initfn() per user / system emulation
+Date: Fri, 24 Jan 2025 00:44:12 +0100
+Message-ID: <20250123234415.59850-19-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250123234415.59850-1-philmd@linaro.org>
 References: <20250123234415.59850-1-philmd@linaro.org>
@@ -102,203 +102,80 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Rather than maintaining a mix of system / user code for CPU
-class properties, move system properties to cpu-system.c
-and user ones to the new cpu-user.c unit.
+Slighly simplify cpu-target.c again by extracting cpu_exec_initfn()
+to cpu-{system,user}.c, adding an empty stub for user emulation.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- cpu-target.c         | 58 --------------------------------------------
- hw/core/cpu-system.c | 40 ++++++++++++++++++++++++++++++
- hw/core/cpu-user.c   | 27 +++++++++++++++++++++
- hw/core/meson.build  |  5 +++-
- 4 files changed, 71 insertions(+), 59 deletions(-)
- create mode 100644 hw/core/cpu-user.c
+Good enough for now...
+---
+ cpu-target.c         | 9 ---------
+ hw/core/cpu-system.c | 7 +++++++
+ hw/core/cpu-user.c   | 5 +++++
+ 3 files changed, 12 insertions(+), 9 deletions(-)
 
 diff --git a/cpu-target.c b/cpu-target.c
-index c05ef1ff096..dff8c0747f9 100644
+index dff8c0747f9..3d33d20b8c8 100644
 --- a/cpu-target.c
 +++ b/cpu-target.c
-@@ -19,15 +19,12 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "hw/qdev-core.h"
--#include "hw/qdev-properties.h"
- #include "qemu/error-report.h"
- #include "qemu/qemu-print.h"
+@@ -24,7 +24,6 @@
  #include "migration/vmstate.h"
  #ifndef CONFIG_USER_ONLY
  #include "hw/core/sysemu-cpu-ops.h"
- #include "exec/address-spaces.h"
--#include "exec/memory.h"
+-#include "exec/address-spaces.h"
  #endif
  #include "system/accel-ops.h"
  #include "system/cpus.h"
-@@ -179,61 +176,6 @@ void cpu_exec_unrealizefn(CPUState *cpu)
+@@ -176,14 +175,6 @@ void cpu_exec_unrealizefn(CPUState *cpu)
      accel_cpu_common_unrealize(cpu);
  }
  
--/*
-- * This can't go in hw/core/cpu.c because that file is compiled only
-- * once for both user-mode and system builds.
-- */
--static const Property cpu_common_props[] = {
--#ifdef CONFIG_USER_ONLY
--    /*
--     * Create a property for the user-only object, so users can
--     * adjust prctl(PR_SET_UNALIGN) from the command-line.
--     * Has no effect if the target does not support the feature.
--     */
--    DEFINE_PROP_BOOL("prctl-unalign-sigbus", CPUState,
--                     prctl_unalign_sigbus, false),
--#else
--    /*
--     * Create a memory property for system CPU object, so users can
--     * wire up its memory.  The default if no link is set up is to use
--     * the system address space.
--     */
--    DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
--                     MemoryRegion *),
--#endif
--};
--
--#ifndef CONFIG_USER_ONLY
--static bool cpu_get_start_powered_off(Object *obj, Error **errp)
--{
--    CPUState *cpu = CPU(obj);
--    return cpu->start_powered_off;
--}
--
--static void cpu_set_start_powered_off(Object *obj, bool value, Error **errp)
--{
--    CPUState *cpu = CPU(obj);
--    cpu->start_powered_off = value;
--}
--#endif
--
--void cpu_class_init_props(DeviceClass *dc)
+-void cpu_exec_initfn(CPUState *cpu)
 -{
 -#ifndef CONFIG_USER_ONLY
--    ObjectClass *oc = OBJECT_CLASS(dc);
--
--    /*
--     * We can't use DEFINE_PROP_BOOL in the Property array for this
--     * property, because we want this to be settable after realize.
--     */
--    object_class_property_add_bool(oc, "start-powered-off",
--                                   cpu_get_start_powered_off,
--                                   cpu_set_start_powered_off);
+-    cpu->memory = get_system_memory();
+-    object_ref(OBJECT(cpu->memory));
 -#endif
--
--    device_class_set_props(dc, cpu_common_props);
 -}
 -
- void cpu_exec_initfn(CPUState *cpu)
+ char *cpu_model_from_type(const char *typename)
  {
- #ifndef CONFIG_USER_ONLY
+     const char *suffix = "-" CPU_RESOLVING_TYPE;
 diff --git a/hw/core/cpu-system.c b/hw/core/cpu-system.c
-index 6aae28a349a..c63c984a803 100644
+index c63c984a803..0520c362db4 100644
 --- a/hw/core/cpu-system.c
 +++ b/hw/core/cpu-system.c
-@@ -20,7 +20,10 @@
+@@ -20,6 +20,7 @@
  
  #include "qemu/osdep.h"
  #include "qapi/error.h"
-+#include "exec/memory.h"
++#include "exec/address-spaces.h"
+ #include "exec/memory.h"
  #include "exec/tswap.h"
-+#include "hw/qdev-core.h"
-+#include "hw/qdev-properties.h"
- #include "hw/core/sysemu-cpu-ops.h"
+ #include "hw/qdev-core.h"
+@@ -182,3 +183,9 @@ void cpu_class_init_props(DeviceClass *dc)
  
- bool cpu_paging_enabled(const CPUState *cpu)
-@@ -142,3 +145,40 @@ GuestPanicInformation *cpu_get_crash_info(CPUState *cpu)
-     }
-     return res;
+     device_class_set_props(dc, cpu_system_props);
  }
 +
-+static const Property cpu_system_props[] = {
-+    /*
-+     * Create a memory property for system CPU object, so users can
-+     * wire up its memory.  The default if no link is set up is to use
-+     * the system address space.
-+     */
-+    DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-+};
-+
-+static bool cpu_get_start_powered_off(Object *obj, Error **errp)
++void cpu_exec_initfn(CPUState *cpu)
 +{
-+    CPUState *cpu = CPU(obj);
-+    return cpu->start_powered_off;
-+}
-+
-+static void cpu_set_start_powered_off(Object *obj, bool value, Error **errp)
-+{
-+    CPUState *cpu = CPU(obj);
-+    cpu->start_powered_off = value;
-+}
-+
-+void cpu_class_init_props(DeviceClass *dc)
-+{
-+    ObjectClass *oc = OBJECT_CLASS(dc);
-+
-+    /*
-+     * We can't use DEFINE_PROP_BOOL in the Property array for this
-+     * property, because we want this to be settable after realize.
-+     */
-+    object_class_property_add_bool(oc, "start-powered-off",
-+                                   cpu_get_start_powered_off,
-+                                   cpu_set_start_powered_off);
-+
-+    device_class_set_props(dc, cpu_system_props);
++    cpu->memory = get_system_memory();
++    object_ref(OBJECT(cpu->memory));
 +}
 diff --git a/hw/core/cpu-user.c b/hw/core/cpu-user.c
-new file mode 100644
-index 00000000000..e5ccf6bf13a
---- /dev/null
+index e5ccf6bf13a..cdd8de2fefa 100644
+--- a/hw/core/cpu-user.c
 +++ b/hw/core/cpu-user.c
-@@ -0,0 +1,27 @@
-+/*
-+ * QEMU CPU model (user specific)
-+ *
-+ * Copyright (c) Linaro, Ltd.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
+@@ -25,3 +25,8 @@ void cpu_class_init_props(DeviceClass *dc)
+ {
+     device_class_set_props(dc, cpu_user_props);
+ }
 +
-+#include "qemu/osdep.h"
-+#include "hw/qdev-core.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/core/cpu.h"
-+
-+static const Property cpu_user_props[] = {
-+    /*
-+     * Create a property for the user-only object, so users can
-+     * adjust prctl(PR_SET_UNALIGN) from the command-line.
-+     * Has no effect if the target does not support the feature.
-+     */
-+    DEFINE_PROP_BOOL("prctl-unalign-sigbus", CPUState,
-+                     prctl_unalign_sigbus, false),
-+};
-+
-+void cpu_class_init_props(DeviceClass *dc)
++void cpu_exec_initfn(CPUState *cpu)
 +{
-+    device_class_set_props(dc, cpu_user_props);
++    /* nothing to do */
 +}
-diff --git a/hw/core/meson.build b/hw/core/meson.build
-index 65a1698ed1f..b5a545a0edd 100644
---- a/hw/core/meson.build
-+++ b/hw/core/meson.build
-@@ -46,4 +46,7 @@ system_ss.add(files(
-   'vm-change-state-handler.c',
-   'clock-vmstate.c',
- ))
--user_ss.add(files('qdev-user.c'))
-+user_ss.add(files(
-+  'cpu-user.c',
-+  'qdev-user.c',
-+))
 -- 
 2.47.1
 
