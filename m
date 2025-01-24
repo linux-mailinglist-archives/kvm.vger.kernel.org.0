@@ -1,251 +1,187 @@
-Return-Path: <kvm+bounces-36544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB481A1B866
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 16:06:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1A1A1B94A
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 16:31:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 501F716903F
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 15:06:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30E3B161319
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 15:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E84156238;
-	Fri, 24 Jan 2025 15:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FEF619A288;
+	Fri, 24 Jan 2025 15:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="C7++pApb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AlYu5wyl"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DF378F57;
-	Fri, 24 Jan 2025 15:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D97D155C9E
+	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 15:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737731158; cv=none; b=hBBWlQ+V9UcKU7dYMP90zL+BLK+u5WufMKF8ei3W/3HPXwEkrT77kM67aI2BrrL1RkVZF6+68AfnZ1nb3swHUyRf+NA4YO9lo3GUkfkzNVwLC1GqIWBhUlMRpaXGX0Q4lpdProewslELDndT3fVZj3bRdExMMkZf1TsdSSor34c=
+	t=1737732168; cv=none; b=VIzN2o5WrOIf0T8KMRdpqDtHwb+7ZDGGf0xYW4Z6REdMAyBnSWJnvwX4YvwtJMv35TsDcDbxYzsu8njjbCIXqqWz630bLAqFBe4Ef1ixIIxsGjPXw+8J8P6qwlmKHM6YjTAmhkGBDgHfCUPYjt85Ot9KztVFJq8A7L+8g3kIls8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737731158; c=relaxed/simple;
-	bh=RXrKOghBdoxlAm1TOxIq4MYTj/FZX2ZSOvZy+kH6Ro0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jFkbFjYd8jU1TVAR2JCA5fdDzc/Bb4qJHosnGtGiVT49vgo6gidB4HZa8FkbQZhVn/V5bCYLOrmt0dPl8YZ+acQT2NJIJ8LUvbtgbSFl6U2DKroUB2GSF4wr2uLhFYDLM9Vpi074G0dTrnaMsCOmM30+yhQR5dnJxgf1ybKOsb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=C7++pApb; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1737731156; x=1769267156;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XlTDsnQoodBIwILVQwR5ogYN5C106rc27ZM2C6oIKEM=;
-  b=C7++pApbIOQsKgdRJKt4lOxnCqx/4vX98G8T1K07v+f/f9HF393husJa
-   76ldzWvLnJ+1KW+So88TOyNWt3uhXSyzJ0VA9a7rMpHjliVH0ZnfMVYvn
-   m1ArvK/2VYDMsXq8sYveEbEaEURS010810YaJRTeGadAT6AyREKy/YAo5
-   c=;
-X-IronPort-AV: E=Sophos;i="6.13,231,1732579200"; 
-   d="scan'208";a="166725375"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 15:05:53 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:3302]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.23.16:2525] with esmtp (Farcaster)
- id 09577ee1-3da1-4993-b3f6-dee7b2de7820; Fri, 24 Jan 2025 15:05:52 +0000 (UTC)
-X-Farcaster-Flow-ID: 09577ee1-3da1-4993-b3f6-dee7b2de7820
-Received: from EX19D007EUA001.ant.amazon.com (10.252.50.133) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 24 Jan 2025 15:05:52 +0000
-Received: from EX19MTAUEA002.ant.amazon.com (10.252.134.9) by
- EX19D007EUA001.ant.amazon.com (10.252.50.133) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 24 Jan 2025 15:05:51 +0000
-Received: from email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.134.34) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Fri, 24 Jan 2025 15:05:51 +0000
-Received: from dev-dsk-fgriffo-1c-69b51a13.eu-west-1.amazon.com (dev-dsk-fgriffo-1c-69b51a13.eu-west-1.amazon.com [10.13.244.152])
-	by email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com (Postfix) with ESMTPS id 1160640A31;
-	Fri, 24 Jan 2025 15:05:48 +0000 (UTC)
-From: Fred Griffoul <fgriffo@amazon.co.uk>
-To: <kvm@vger.kernel.org>
-CC: <griffoul@gmail.com>, <vkuznets@redhat.com>, Fred Griffoul
-	<fgriffo@amazon.co.uk>, Sean Christopherson <seanjc@google.com>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, "Ingo
- Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
-	<hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Paul Durrant
-	<paul@xen.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2] KVM: x86: Update Xen TSC leaves during CPUID emulation
-Date: Fri, 24 Jan 2025 15:05:39 +0000
-Message-ID: <20250124150539.69975-1-fgriffo@amazon.co.uk>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1737732168; c=relaxed/simple;
+	bh=DwitzjRGQEzgyZZn0UD4LNiBUZsqGx1Qrum3CBb5LtE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=I7LnyflJhsqYWzDifCnSsz8v6vAvdq3s1Dkrt2dfx3EF6lyPeq1xFHJeOMc09ZkZ3s8stIPfFpBg1yJtjT6RVYIVsetkjXhYhIa+uZL30SYUhPfFNe/etjJZvz5FMqDbAhtKogMNLNbVR23EkSKKjgR6u4GfTOjsPflXM4jMeFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AlYu5wyl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737732164;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DwitzjRGQEzgyZZn0UD4LNiBUZsqGx1Qrum3CBb5LtE=;
+	b=AlYu5wylCVEvmaGCJoylwxj4kYhsZLifdnCnrsJLfyKiEiNysQ5opPenaJHdzb26ikUmrO
+	RGI8ql0yXUMBoNws2XJhT3XV1/CJeA8T+nzGTj1kml6C2SBwgWqOxmTkiC7vASlWtffFzu
+	nqmrIWuBqUi+auEllwgnpfYDB3rbLz4=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-427-9kVkwWXWNuuyG2-NOcJEpA-1; Fri, 24 Jan 2025 10:22:35 -0500
+X-MC-Unique: 9kVkwWXWNuuyG2-NOcJEpA-1
+X-Mimecast-MFC-AGG-ID: 9kVkwWXWNuuyG2-NOcJEpA
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6d88ccf14aeso35586156d6.1
+        for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 07:22:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737732153; x=1738336953;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DwitzjRGQEzgyZZn0UD4LNiBUZsqGx1Qrum3CBb5LtE=;
+        b=Zg3ZQ1h8gFYjf2LbpWDOF8rzeUjlg7BycqkS7DYwLbfPRuNgWrecaaoU0wzcuSknio
+         7zo3HYgVXGMzlon6jFIn8bh542BqNYGQ79uq3Bn0eDi5sM8XQKlFiJClymFUfWEvHEka
+         +957J7NyNeo1bYex0VEDrFnf7EBAW2dRrroFYGS66IBJynfiiuYqX6j30N48/McrkiA7
+         AK9mvdEp1t9DDmkVJYLhrxQ1YyGcA97AlWUx/6W+wJoC5xue0z2p4rB1PhReSjYd4QpI
+         hH+8I1Re5M46tTJg0dvZLnrNWBggXskpAzATxXGntLFcr2JZWeomZeNtpdjq1AICGhZo
+         VFHg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPHVw/ywjzLcUYLw3ozF/v2W2DtZXpKNaPRBTLCJzCtzpBgN4TmML05TY6QgwRvXYQirQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSdY9SnUP3K8hMBrpC4Fe06HcQUxVmgbS5z8CP+U5OaqzXyqhy
+	/aul9UU5o1LpaM3ydJlGo55hgeHshA9QUmi9vFkkQMSO1SA13A5EG+pdyhmL4jv+KgFrSIJD3ep
+	6991r72I7pf58vs8ogJImXhqRS3fqmITO3giQAMtM4X/xjdhZ9Q==
+X-Gm-Gg: ASbGncs6w41Fab1/6dsECk8qXQnOXJ40S81j4h6TUhvBzuGxDyNE8DZp9mjqZ+EBRVR
+	7xqI41HwGMgh0o7IowsupeaqaIr/B3HrvZ2PR+mDuiYmyisgpMYr80oSegI6qGlx9DMPrxL+FV+
+	VH5HsKD73B/+Nc/ip3FsjJxVQDwKiR/fxXeZRk0u2pFcCQ2SsKgpvqtxk69eH6oJbyhlIPKUHSO
+	juDs+KTfJTZBLJGGvQkiZwMrqf/RYs0axCB3rWKTHI5HsM+Wo7f2q2RG+OZb427JkZNIW2bzhb/
+	ktaE2Q3krq3Ejahzrxgl2hMCBWL6t31mu/eO++1pdLjclAAuv5FZc84=
+X-Received: by 2002:a05:6214:1302:b0:6d8:861f:adca with SMTP id 6a1803df08f44-6e1b2235c9fmr497774356d6.42.1737732153309;
+        Fri, 24 Jan 2025 07:22:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE5TeadQAXYF5iUiWYdZcwN/B3B0GhQEA3OgvrN+YGY06rhpOtkdAXjp93P8gBhIIoKYtqxZQ==
+X-Received: by 2002:a05:6214:1302:b0:6d8:861f:adca with SMTP id 6a1803df08f44-6e1b2235c9fmr497773786d6.42.1737732152904;
+        Fri, 24 Jan 2025 07:22:32 -0800 (PST)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e2058c2a51sm9344776d6.109.2025.01.24.07.22.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jan 2025 07:22:32 -0800 (PST)
+From: Valentin Schneider <vschneid@redhat.com>
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: Uladzislau Rezki <urezki@gmail.com>, Jann Horn <jannh@google.com>,
+ linux-kernel@vger.kernel.org, x86@kernel.org,
+ virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
+ linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org,
+ kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org,
+ linux-hardening@vger.kernel.org, linux-mm@kvack.org,
+ linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+ bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>,
+ Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov
+ <alexey.amakhalov@broadcom.com>, Russell King <linux@armlinux.org.uk>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, Paul
+ Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
+ Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo
+ <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Alexander Shishkin
+ <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, Ian
+ Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
+ "Liang, Kan" <kan.liang@linux.intel.com>, Boris Ostrovsky
+ <boris.ostrovsky@oracle.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Pawan
+ Gupta <pawan.kumar.gupta@linux.intel.com>, Sean Christopherson
+ <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski
+ <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Frederic Weisbecker
+ <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, Jason
+ Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, Ard
+ Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay
+ <neeraj.upadhyay@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
+ Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan
+ <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli
+ <juri.lelli@redhat.com>, Clark Williams <williams@redhat.com>, Yair
+ Podemsky <ypodemsk@redhat.com>, Tomas Glozar <tglozar@redhat.com>, Vincent
+ Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann
+ <dietmar.eggemann@arm.com>, Ben Segall <bsegall@google.com>, Mel Gorman
+ <mgorman@suse.de>, Kees Cook <kees@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Christoph Hellwig <hch@infradead.org>, Shuah
+ Khan <shuah@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, Miguel
+ Ojeda <ojeda@kernel.org>, Alice Ryhl <aliceryhl@google.com>, "Mike
+ Rapoport (Microsoft)" <rppt@kernel.org>, Samuel Holland
+ <samuel.holland@sifive.com>, Rong Xu <xur@google.com>, Nicolas Saenz
+ Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>,
+ Yosry Ahmed <yosryahmed@google.com>, "Kirill A. Shutemov"
+ <kirill.shutemov@linux.intel.com>, "Masami Hiramatsu (Google)"
+ <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, Luis
+ Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
+ Tiezhu Yang <yangtiezhu@loongson.cn>
+Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer
+ flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
+In-Reply-To: <Z4_Sl-zu7GprkbaL@pc636>
+References: <20250114175143.81438-1-vschneid@redhat.com>
+ <20250114175143.81438-30-vschneid@redhat.com>
+ <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com>
+ <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <Z4qBMqcMg16p57av@pc636>
+ <xhsmhwmetfk9d.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <Z44wSJTXknQVKWb0@pc636>
+ <xhsmhr04xfow1.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <Z4_Sl-zu7GprkbaL@pc636>
+Date: Fri, 24 Jan 2025 16:22:19 +0100
+Message-ID: <xhsmh8qr0p784.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-The Xen emulation in KVM modifies certain CPUID leaves to expose
-TSC information to the guest.
+On 21/01/25 18:00, Uladzislau Rezki wrote:
+>> >
+>> > As noted before, we defer flushing for vmalloc. We have a lazy-threshold
+>> > which can be exposed(if you need it) over sysfs for tuning. So, we can add it.
+>> >
+>>
+>> In a CPU isolation / NOHZ_FULL context, isolated CPUs will be running a
+>> single userspace application that will never enter the kernel, unless
+>> forced to by some interference (e.g. IPI sent from a housekeeping CPU).
+>>
+>> Increasing the lazy threshold would unfortunately only delay the
+>> interference - housekeeping CPUs are free to run whatever, and so they will
+>> eventually cause the lazy threshold to be hit and IPI all the CPUs,
+>> including the isolated/NOHZ_FULL ones.
+>>
+> Do you have any testing results for your workload? I mean how much
+> potentially we can allocate. Again, maybe it is just enough to back
+> and once per-hour offload it.
+>
 
-Previously, these CPUID leaves were updated whenever guest time changed,
-but this conflicts with KVM_SET_CPUID/KVM_SET_CPUID2 ioctls which reject
-changes to CPUID entries on running vCPUs.
+Potentially as much as you want... In our Openshift environments, you can
+get any sort of container executing on the housekeeping CPUs and they're
+free to do pretty much whatever they want. Per CPU isolation they're not
+allowed/meant to disturb isolated CPUs, however.
 
-Fix this by updating the TSC information directly in the CPUID emulation
-handler instead of modifying the vCPU's CPUID entries.
+> Apart of that how critical IPIing CPUs affect your workloads?
+>
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
----
- arch/x86/kvm/cpuid.c | 16 ++++++++++++++++
- arch/x86/kvm/x86.c   |  3 +--
- arch/x86/kvm/x86.h   |  1 +
- arch/x86/kvm/xen.c   | 23 -----------------------
- arch/x86/kvm/xen.h   | 13 +++++++++++--
- 5 files changed, 29 insertions(+), 27 deletions(-)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index edef30359c19..689882326618 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -2005,6 +2005,22 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
- 		} else if (function == 0x80000007) {
- 			if (kvm_hv_invtsc_suppressed(vcpu))
- 				*edx &= ~feature_bit(CONSTANT_TSC);
-+		} else if (IS_ENABLED(CONFIG_KVM_XEN) &&
-+			   kvm_xen_is_tsc_leaf(vcpu, function)) {
-+			/*
-+			 * Update guest TSC frequency information is necessary.
-+			 * Ignore failures, there is no sane value that can be
-+			 * provided if KVM can't get the TSC frequency.
-+			 */
-+			if (kvm_check_request(KVM_REQ_CLOCK_UPDATE, vcpu))
-+				kvm_guest_time_update(vcpu);
-+
-+			if (index == 1) {
-+				*ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
-+				*edx = vcpu->arch.hv_clock.tsc_shift;
-+			} else if (index == 2) {
-+				*eax = vcpu->arch.hw_tsc_khz;
-+			}
- 		}
- 	} else {
- 		*eax = *ebx = *ecx = *edx = 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b2d9a16fd4d3..ed33a18e8ac1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3170,7 +3170,7 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
- 	trace_kvm_pvclock_update(v->vcpu_id, &vcpu->hv_clock);
- }
-
--static int kvm_guest_time_update(struct kvm_vcpu *v)
-+int kvm_guest_time_update(struct kvm_vcpu *v)
- {
- 	unsigned long flags, tgt_tsc_khz;
- 	unsigned seq;
-@@ -3253,7 +3253,6 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 				   &vcpu->hv_clock.tsc_shift,
- 				   &vcpu->hv_clock.tsc_to_system_mul);
- 		vcpu->hw_tsc_khz = tgt_tsc_khz;
--		kvm_xen_update_tsc_info(v);
- 	}
-
- 	vcpu->hv_clock.tsc_timestamp = tsc_timestamp;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 7a87c5fc57f1..5fdf32ba9406 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -362,6 +362,7 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
- u64 get_kvmclock_ns(struct kvm *kvm);
- uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm);
- bool kvm_get_monotonic_and_clockread(s64 *kernel_ns, u64 *tsc_timestamp);
-+int kvm_guest_time_update(struct kvm_vcpu *v);
-
- int kvm_read_guest_virt(struct kvm_vcpu *vcpu,
- 	gva_t addr, void *val, unsigned int bytes,
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index a909b817b9c0..ed5c2f088361 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -2247,29 +2247,6 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
- 	del_timer_sync(&vcpu->arch.xen.poll_timer);
- }
-
--void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
--{
--	struct kvm_cpuid_entry2 *entry;
--	u32 function;
--
--	if (!vcpu->arch.xen.cpuid.base)
--		return;
--
--	function = vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3);
--	if (function > vcpu->arch.xen.cpuid.limit)
--		return;
--
--	entry = kvm_find_cpuid_entry_index(vcpu, function, 1);
--	if (entry) {
--		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
--		entry->edx = vcpu->arch.hv_clock.tsc_shift;
--	}
--
--	entry = kvm_find_cpuid_entry_index(vcpu, function, 2);
--	if (entry)
--		entry->eax = vcpu->arch.hw_tsc_khz;
--}
--
- void kvm_xen_init_vm(struct kvm *kvm)
- {
- 	mutex_init(&kvm->arch.xen.xen_lock);
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index f5841d9000ae..8238d64127eb 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -9,6 +9,7 @@
- #ifndef __ARCH_X86_KVM_XEN_H__
- #define __ARCH_X86_KVM_XEN_H__
-
-+#include <asm/xen/cpuid.h>
- #include <asm/xen/hypervisor.h>
-
- #ifdef CONFIG_KVM_XEN
-@@ -35,7 +36,6 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
- int kvm_xen_setup_evtchn(struct kvm *kvm,
- 			 struct kvm_kernel_irq_routing_entry *e,
- 			 const struct kvm_irq_routing_entry *ue);
--void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
-
- static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
- {
-@@ -50,6 +50,14 @@ static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
- 		kvm_xen_inject_vcpu_vector(vcpu);
- }
-
-+static inline bool kvm_xen_is_tsc_leaf(struct kvm_vcpu *vcpu, u32 function)
-+{
-+	return static_branch_unlikely(&kvm_xen_enabled.key) &&
-+		vcpu->arch.xen.cpuid.base &&
-+		function <= vcpu->arch.xen.cpuid.limit &&
-+		function == (vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3));
-+}
-+
- static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
- {
- 	return static_branch_unlikely(&kvm_xen_enabled.key) &&
-@@ -157,8 +165,9 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
- 	return false;
- }
-
--static inline void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
-+static inline bool kvm_xen_is_tsc_leaf(struct kvm_vcpu *vcpu, u32 function)
- {
-+	return false;
- }
- #endif
-
---
-2.40.1
+If I'm being pedantic, a single IPI to an isolated CPU breaks the
+isolation. If we can't quiesce IPIs to isolated CPUs, then we can't
+guarantee that whatever is running on the isolated CPUs is actually
+isolated / shielded from third party interference.
 
 
