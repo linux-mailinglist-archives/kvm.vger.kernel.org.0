@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-36465-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36466-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11624A1AF66
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 05:26:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE76FA1AFE1
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 06:32:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBC8C3A8E2A
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 04:26:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 402C47A3F34
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 05:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148BB1D88AD;
-	Fri, 24 Jan 2025 04:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5145A13A879;
+	Fri, 24 Jan 2025 05:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PBb05AXI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PAsNv9K1"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4EB23B0
-	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 04:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C8F17FE
+	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 05:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737692787; cv=none; b=RG+29hBsOpbgoMC52UmG9jAt22yQTtQYAcQwnIXNqShxc2QToanuNgrxeioIc0cFZvvwHkqI3zTRH6x5hRwiT98uo+Ax7kYtomzKVxboIhVQjdG92JertfYu6doCLWBBWH9dkC/9glrjumPAkTLFvznDw9ZZ/QdS4hNFPtDLzGI=
+	t=1737696746; cv=none; b=pj8JBEQlD8/I2tLmsqoTmQq1tVXTEldNi1GtivnEJ/nvtjuKq5CsY+EyGd2qYH8VBosUZ6DV/cRFIql/u6C2PVXi0mGNqJDfXgiz7ZkjE4AJSa9Vx+f/ghu0k5Ug1WGuaQUvMt9ufCwDelO4SgOACFqxFPL1l2U4aGkZdk2LS+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737692787; c=relaxed/simple;
-	bh=aXa8G+UwR4b+grlTDq708P7uJ8uZWjkDDEo0FNlieAg=;
+	s=arc-20240116; t=1737696746; c=relaxed/simple;
+	bh=/nAMaLIJE3OA+tTLrtrMtWBBmmKw6odEO1dmDd9Kt1Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kEwG/cHBGUudnoYZYTfqNjEHUZsfROATySH6f5Im8To7k0elqMNYvtHG19j5U1izAkhSLOnqdNtJqOdGEhJqfTdN7lO4d/E0iKV49ZJ2NIUMHalAS1qghCsEvILxBw+eEYhg051LcZfQXDKsejj2LpxWQICa54ckdo5fS6jXwnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PBb05AXI; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=ud4VRNrYxMiw/W8X4Ju1a9UTsKxCrlbac4d4EGKtmvx18skksFkmOc3pClQ6JEzySkbjfyb6+ABDmMDCE9ej9vNw4hvTbl2Cc8GCI+0LpIwq+potMlI02Gbw0MGEO6eLWa8aEpAXGy13CHHGwt/IOTQmHx/XDxlTJu/llJ3a5bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PAsNv9K1; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737692782;
+	s=mimecast20190719; t=1737696743;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=W4x8wgZEyKuHwORGDCpsHEEkdJ39AEqwRDp8OAcY8lk=;
-	b=PBb05AXIEPByXUPF7JMfrIcPKzvdSf7N00CsX3U0fok4DnM4VMjPQaZXqJlLtFfxc5w2+B
-	JL+znsGtv76hibMAFP7XjmzTw0BZPRrRwW3Gwh1fQNZWuJJONJrxVSdF482dZvWglgOKNv
-	mlUEe+NLbhNbU3v7HOz4YeNmpgowUIc=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=V43monYRek4i4a9qcZNzucxU9HOMr2YAU2s1SvTctS4=;
+	b=PAsNv9K1uBjWJ7NnHYcCBNd75JS0zmtFhPjrDbLn59Djp8x3KailazMkNW+LLCbjDFj8kC
+	nSxWcKDrxJ7WaCE4mSNITxElzO4T+Nb+H8m6ST5ulsKMiFNbLCuafAXH53s6kjuGbNdXJM
+	k8XbKcT65squvhu7U3f3QNGUKgIjMmU=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-63-mv4PgtBaPaqON5zqur9NAQ-1; Thu, 23 Jan 2025 23:26:20 -0500
-X-MC-Unique: mv4PgtBaPaqON5zqur9NAQ-1
-X-Mimecast-MFC-AGG-ID: mv4PgtBaPaqON5zqur9NAQ
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ef79403c5eso4927475a91.0
-        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 20:26:20 -0800 (PST)
+ us-mta-297-WTYeOK5LPi-BUPIpZmdfhQ-1; Fri, 24 Jan 2025 00:32:19 -0500
+X-MC-Unique: WTYeOK5LPi-BUPIpZmdfhQ-1
+X-Mimecast-MFC-AGG-ID: WTYeOK5LPi-BUPIpZmdfhQ
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2165433e229so34543795ad.1
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 21:32:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737692779; x=1738297579;
+        d=1e100.net; s=20230601; t=1737696738; x=1738301538;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W4x8wgZEyKuHwORGDCpsHEEkdJ39AEqwRDp8OAcY8lk=;
-        b=Xm97DjoDuCd5PnezKhtCQpglDdER03iANSALX3psLswuyS/9roC2FYQRjRiMaFxxKj
-         7EWDYs01JTkqossunuTJxLevltcIVuwN0SQMLmEFmYwbhoyFc7BIswCF/ECQoeErfXeH
-         TWGXrjK4I9Yft77NfYkjCvDmLBJ4cq8O/I+XCbwzJwG9JHmKjmxnzjgecoHDQQkJKexj
-         R5Dau2Ys4hp5wI3lovEpAaLyFES5grzb4ZsmlVrPjW8umo8tns9wu9wmflSf9u4PP92H
-         Ep5XDwdqdPd1dtLMTsCHFeRRPtvEtmcJ2/xZ+nGBHdA2RfaH6Iubf/0NKHzUrbwk2mYl
-         w87w==
-X-Forwarded-Encrypted: i=1; AJvYcCXJbK7oQ8tCr4zZbogFoKVlTquSiNHm8Vt4Fv6a+VVJTdAG+35RmM9OgJ6dbWZl3IzYhjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBf4z7A1korEZNde1XMsbGXaSx8lLD3jLa1XYpE9FOXi22ywmn
-	fUOmMBTZEYetaxmmWQ/tfAHzM0Bp9op8D9qrJmBvmT+QQEO3uO4K8a1Wt0tnSREahYIpsCEqkPl
-	z3njzUH7FsTnAECizU/WaX85NSXYYxgQcv1M+iTu8/JRN6FwPMQ==
-X-Gm-Gg: ASbGncsPo1Q4Y5/mFx4RH01Ufcs6CYyaJmsnY/5dAjZpmqVPlHU/XrOCYKIE15+rwLD
-	/oTqkBX3HIZrglkyXfUCtTVlAZGpns9ULiAKrGralP9hwaXZciGwudt+N3P6TXL2cI9aO2pxBUq
-	fay5kG0gRNWsTVf37d1LCSH1eo7RayoRupuRCIBFT6GSYjfb+blkPcUxA6w/3WT5yRxXaUgHkK0
-	LnodV2buCjaUbBvOdU7apUPOiSMSV+OjzFDX3s4anevhjDLjMvy53XG8MWKhR9wUYM8IPw=
-X-Received: by 2002:a17:90b:4d05:b0:2ee:5958:828 with SMTP id 98e67ed59e1d1-2f782c70176mr42890438a91.9.1737692778660;
-        Thu, 23 Jan 2025 20:26:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHF0DJWclieG8GIGsCzjY2k/MI/u8GaqIVA2CIVqY1sh8z4aaIMUWu09AlsDTA/tx+z6nHtoQ==
-X-Received: by 2002:a17:90b:4d05:b0:2ee:5958:828 with SMTP id 98e67ed59e1d1-2f782c70176mr42890346a91.9.1737692777958;
-        Thu, 23 Jan 2025 20:26:17 -0800 (PST)
+        bh=V43monYRek4i4a9qcZNzucxU9HOMr2YAU2s1SvTctS4=;
+        b=exGl97xIxAFgXfI+1fAf0fHjhZf35qWccFQl37xw6NT6XlwkSb6cryOqJgbO45mub5
+         9Fa7azG1jrEdtAUebY3SaEDuAXzUUMMfaxPj4hy+C00ArKwrbNOHfH5QN5kzbbwx3GZm
+         aDMgKad6JZLgEfiAF+6IACMrRVnC0+N/5ePlV+b6ltp44gKAG/09bE7T226Fj8ExxjQT
+         a4Pgcdp1mbbpuoisPR3fNTdqiMWkoSOqxhPSS2q/r9uUac/YhDBETGgKPSNkRVHE1syk
+         s7sNMMqi0nU494eeLJSAPrkTesRZ/9rCugpLh4hiHqJfhzS+HBXQNLQK3gsp+2O3JmEK
+         c6RQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3mSI4nO2ZxdOuncy5fl9+pfHD7V5nlJJ+ZWR4r5rixG6VoBn8iFdnNsYERQvn7YmtVqE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrTl3VHxUdWEKoLaIgZz1bknWwdJ3VG/v+bFPWkTwLxA/7VDHs
+	i5md9tjs7v9kugocugt0UKe2/G19cIFPJVgcou2mqjXCpyvquO8jcCIDm3as1QYSl1Jty9b6won
+	YXv/qA1FAx9RyjyZCdrNdgh0iolCD2Avvv9r+lgjsJvUZL3qMxQ==
+X-Gm-Gg: ASbGncsDafJnmMfxttg0dgAoVYkdZuhZxXh8PvDUqw9QphT0r/JCYOmSRhqLhnLBVEr
+	mmY6bd03kqSehgPSDsouYC2/nL0dhN4IA0JnL2ZsJ/qlb32DUYG35EJSW1zGcPvl0QPVwfQuNU/
+	jEiX6LNWKEw9f0KJFhlHNmzcujZ9iSdPWFHdw6EiU6iHttgFixVg1oivBwB0q+1l363lzLJ7FF5
+	r+v8wBmxTCSLaPT87lip8y3+NerZ/Vs+HuZdg0CvLk3Jd4hDnH6ISmIyX3CJhUmdZSxKCA=
+X-Received: by 2002:a05:6a20:244d:b0:1db:e464:7b69 with SMTP id adf61e73a8af0-1eb214e82damr43379305637.20.1737696738453;
+        Thu, 23 Jan 2025 21:32:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHqtpZFSrhtF7huOze/hKmkOEqq4y/TfOMaysezICpsnQmSYkT3LOCtGnO0n3WPfw/BdJZyHQ==
+X-Received: by 2002:a05:6a20:244d:b0:1db:e464:7b69 with SMTP id adf61e73a8af0-1eb214e82damr43379243637.20.1737696737997;
+        Thu, 23 Jan 2025 21:32:17 -0800 (PST)
 Received: from [192.168.68.55] ([180.233.125.64])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa5bbfbsm591962a91.19.2025.01.23.20.25.59
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a77c4ecsm909347b3a.121.2025.01.23.21.31.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2025 20:26:16 -0800 (PST)
-Message-ID: <186047ea-a782-494b-bfcf-f5088806bbb4@redhat.com>
-Date: Fri, 24 Jan 2025 14:25:56 +1000
+        Thu, 23 Jan 2025 21:32:17 -0800 (PST)
+Message-ID: <3e1780db-6e39-4508-8ce5-4d28771400e8@redhat.com>
+Date: Fri, 24 Jan 2025 15:31:56 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,8 +87,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v5 02/15] KVM: guest_memfd: Make guest mem use guest
- mem inodes instead of anonymous inodes
+Subject: Re: [RFC PATCH v5 04/15] KVM: guest_memfd: Track mappability within a
+ struct kvm_gmem_private
 To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
@@ -111,10 +111,10 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
  shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
  jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
 References: <20250117163001.2326672-1-tabba@google.com>
- <20250117163001.2326672-3-tabba@google.com>
+ <20250117163001.2326672-5-tabba@google.com>
 Content-Language: en-US
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20250117163001.2326672-3-tabba@google.com>
+In-Reply-To: <20250117163001.2326672-5-tabba@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -123,234 +123,138 @@ Hi Fuad,
 On 1/18/25 2:29 AM, Fuad Tabba wrote:
 > From: Ackerley Tng <ackerleytng@google.com>
 > 
-> Using guest mem inodes allows us to store metadata for the backing
-> memory on the inode. Metadata will be added in a later patch to
-> support HugeTLB pages.
+> Track whether guest_memfd memory can be mapped within the inode,
+> since it is property of the guest_memfd's memory contents.
 > 
-> Metadata about backing memory should not be stored on the file, since
-> the file represents a guest_memfd's binding with a struct kvm, and
-> metadata about backing memory is not unique to a specific binding and
-> struct kvm.
+> The guest_memfd PRIVATE memory attribute is not used for two
+> reasons. First because it reflects the userspace expectation for
+> that memory location, and therefore can be toggled by userspace.
+> The second is, although each guest_memfd file has a 1:1 binding
+> with a KVM instance, the plan is to allow multiple files per
+> inode, e.g. to allow intra-host migration to a new KVM instance,
+> without destroying guest_memfd.
 > 
 > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Co-developed-by: Vishal Annapurve <vannapurve@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> Co-developed-by: Fuad Tabba <tabba@google.com>
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->   include/uapi/linux/magic.h |   1 +
->   virt/kvm/guest_memfd.c     | 119 ++++++++++++++++++++++++++++++-------
->   2 files changed, 100 insertions(+), 20 deletions(-)
+>   virt/kvm/guest_memfd.c | 56 ++++++++++++++++++++++++++++++++++++++----
+>   1 file changed, 51 insertions(+), 5 deletions(-)
 > 
-> diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
-> index bb575f3ab45e..169dba2a6920 100644
-> --- a/include/uapi/linux/magic.h
-> +++ b/include/uapi/linux/magic.h
-> @@ -103,5 +103,6 @@
->   #define DEVMEM_MAGIC		0x454d444d	/* "DMEM" */
->   #define SECRETMEM_MAGIC		0x5345434d	/* "SECM" */
->   #define PID_FS_MAGIC		0x50494446	/* "PIDF" */
-> +#define GUEST_MEMORY_MAGIC	0x474d454d	/* "GMEM" */
->   
->   #endif /* __LINUX_MAGIC_H__ */
 > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 47a9f68f7b24..198554b1f0b5 100644
+> index 6453658d2650..0a7b6cf8bd8f 100644
 > --- a/virt/kvm/guest_memfd.c
 > +++ b/virt/kvm/guest_memfd.c
-> @@ -1,12 +1,17 @@
->   // SPDX-License-Identifier: GPL-2.0
-> +#include <linux/fs.h>
-> +#include <linux/mount.h>
-
-This can be dropped since "linux/mount.h" has been included to "linux/fs.h".
-
->   #include <linux/backing-dev.h>
->   #include <linux/falloc.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/pseudo_fs.h>
->   #include <linux/pagemap.h>
->   #include <linux/anon_inodes.h>
+> @@ -18,6 +18,17 @@ struct kvm_gmem {
+>   	struct list_head entry;
+>   };
 >   
->   #include "kvm_mm.h"
->   
-> +static struct vfsmount *kvm_gmem_mnt;
+> +struct kvm_gmem_inode_private {
+> +#ifdef CONFIG_KVM_GMEM_MAPPABLE
+> +	struct xarray mappable_offsets;
+> +#endif
+> +};
 > +
->   struct kvm_gmem {
->   	struct kvm *kvm;
->   	struct xarray bindings;
-> @@ -307,6 +312,38 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+> +static struct kvm_gmem_inode_private *kvm_gmem_private(struct inode *inode)
+> +{
+> +	return inode->i_mapping->i_private_data;
+> +}
+> +
+>   /**
+>    * folio_file_pfn - like folio_file_page, but return a pfn.
+>    * @folio: The folio which contains this index.
+> @@ -312,8 +323,28 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
 >   	return gfn - slot->base_gfn + slot->gmem.pgoff;
 >   }
 >   
-> +static const struct super_operations kvm_gmem_super_operations = {
-> +	.statfs		= simple_statfs,
-> +};
-> +
-> +static int kvm_gmem_init_fs_context(struct fs_context *fc)
+> +static void kvm_gmem_evict_inode(struct inode *inode)
 > +{
-> +	struct pseudo_fs_context *ctx;
+> +	struct kvm_gmem_inode_private *private = kvm_gmem_private(inode);
 > +
-> +	if (!init_pseudo(fc, GUEST_MEMORY_MAGIC))
-> +		return -ENOMEM;
+> +#ifdef CONFIG_KVM_GMEM_MAPPABLE
+> +	/*
+> +	 * .evict_inode can be called before private data is set up if there are
+> +	 * issues during inode creation.
+> +	 */
+> +	if (private)
+> +		xa_destroy(&private->mappable_offsets);
+> +#endif
 > +
-> +	ctx = fc->fs_private;
-> +	ctx->ops = &kvm_gmem_super_operations;
+> +	truncate_inode_pages_final(inode->i_mapping);
 > +
-> +	return 0;
+> +	kfree(private);
+> +	clear_inode(inode);
 > +}
 > +
-> +static struct file_system_type kvm_gmem_fs = {
-> +	.name		 = "kvm_guest_memory",
-> +	.init_fs_context = kvm_gmem_init_fs_context,
-> +	.kill_sb	 = kill_anon_super,
-> +};
-> +
-> +static void kvm_gmem_init_mount(void)
-> +{
-> +	kvm_gmem_mnt = kern_mount(&kvm_gmem_fs);
-> +	BUG_ON(IS_ERR(kvm_gmem_mnt));
-> +
-> +	/* For giggles. Userspace can never map this anyways. */
-> +	kvm_gmem_mnt->mnt_flags |= MNT_NOEXEC;
-> +}
-> +
->   static struct file_operations kvm_gmem_fops = {
->   	.open		= generic_file_open,
->   	.release	= kvm_gmem_release,
-> @@ -316,6 +353,8 @@ static struct file_operations kvm_gmem_fops = {
->   void kvm_gmem_init(struct module *module)
->   {
->   	kvm_gmem_fops.owner = module;
-> +
-> +	kvm_gmem_init_mount();
->   }
->   
->   static int kvm_gmem_migrate_folio(struct address_space *mapping,
-> @@ -397,11 +436,67 @@ static const struct inode_operations kvm_gmem_iops = {
->   	.setattr	= kvm_gmem_setattr,
+>   static const struct super_operations kvm_gmem_super_operations = {
+> -	.statfs		= simple_statfs,
+> +	.statfs         = simple_statfs,
+> +	.evict_inode	= kvm_gmem_evict_inode,
 >   };
 >   
-> +static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
-> +						      loff_t size, u64 flags)
-> +{
-> +	const struct qstr qname = QSTR_INIT(name, strlen(name));
-> +	struct inode *inode;
-> +	int err;
-> +
-> +	inode = alloc_anon_inode(kvm_gmem_mnt->mnt_sb);
-> +	if (IS_ERR(inode))
-> +		return inode;
-> +
-> +	err = security_inode_init_security_anon(inode, &qname, NULL);
-> +	if (err) {
-> +		iput(inode);
-> +		return ERR_PTR(err);
-> +	}
-> +
-> +	inode->i_private = (void *)(unsigned long)flags;
-> +	inode->i_op = &kvm_gmem_iops;
-> +	inode->i_mapping->a_ops = &kvm_gmem_aops;
-> +	inode->i_mode |= S_IFREG;
-> +	inode->i_size = size;
-> +	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-> +	mapping_set_inaccessible(inode->i_mapping);
-> +	/* Unmovable mappings are supposed to be marked unevictable as well. */
-> +	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
-> +
-> +	return inode;
-> +}
-> +
-> +static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
-> +						  u64 flags)
-> +{
-> +	static const char *name = "[kvm-gmem]";
-> +	struct inode *inode;
-> +	struct file *file;
-> +
-> +	if (kvm_gmem_fops.owner && !try_module_get(kvm_gmem_fops.owner))
-> +		return ERR_PTR(-ENOENT);
-> +
 
-The validation on 'kvm_gmem_fops.owner' can be removed since try_module_get()
-and module_put() are friendly to a NULL parameter, even when CONFIG_MODULE_UNLOAD == N
+As I understood, ->destroy_inode() may be more suitable place where the xarray is
+released. ->evict_inode() usually detach the inode from the existing struct, to make
+it offline. ->destroy_inode() is actually the place where the associated resource
+(memory) is relased.
 
-A module_put(kvm_gmem_fops.owner) is needed in the various erroneous cases in
-this function. Otherwise, the reference count of the owner (module) will become
-imbalanced on any errors.
+Another benefit with ->destroy_inode() is we're not concerned to truncate_inode_pages_final()
+and clear_inode().
 
 
-> +	inode = kvm_gmem_inode_make_secure_inode(name, size, flags);
-> +	if (IS_ERR(inode))
-> +		return ERR_CAST(inode);
-> +
-
-ERR_CAST may be dropped since there is nothing to be casted or converted?
-
-> +	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR,
-> +				 &kvm_gmem_fops);
-> +	if (IS_ERR(file)) {
-> +		iput(inode);
-> +		return file;
-> +	}
-> +
-> +	file->f_mapping = inode->i_mapping;
-> +	file->f_flags |= O_LARGEFILE;
-> +	file->private_data = priv;
-> +
-
-'file->f_mapping = inode->i_mapping' may be dropped since it's already correctly
-set by alloc_file_pseudo().
-
-alloc_file_pseudo
-   alloc_path_pseudo
-   alloc_file
-     alloc_empty_file
-     file_init_path         // Set by this function
-   
-
-> +	return file;
-> +}
-> +
->   static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+>   static int kvm_gmem_init_fs_context(struct fs_context *fc)
+> @@ -440,6 +471,7 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>   						      loff_t size, u64 flags)
 >   {
-> -	const char *anon_name = "[kvm-gmem]";
->   	struct kvm_gmem *gmem;
-> -	struct inode *inode;
->   	struct file *file;
->   	int fd, err;
+>   	const struct qstr qname = QSTR_INIT(name, strlen(name));
+> +	struct kvm_gmem_inode_private *private;
+>   	struct inode *inode;
+>   	int err;
 >   
-> @@ -415,32 +510,16 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
->   		goto err_fd;
->   	}
+> @@ -448,10 +480,19 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>   		return inode;
 >   
-> -	file = anon_inode_create_getfile(anon_name, &kvm_gmem_fops, gmem,
-> -					 O_RDWR, NULL);
-> +	file = kvm_gmem_inode_create_getfile(gmem, size, flags);
->   	if (IS_ERR(file)) {
->   		err = PTR_ERR(file);
->   		goto err_gmem;
->   	}
+>   	err = security_inode_init_security_anon(inode, &qname, NULL);
+> -	if (err) {
+> -		iput(inode);
+> -		return ERR_PTR(err);
+> -	}
+> +	if (err)
+> +		goto out;
+> +
+> +	err = -ENOMEM;
+> +	private = kzalloc(sizeof(*private), GFP_KERNEL);
+> +	if (!private)
+> +		goto out;
+> +
+> +#ifdef CONFIG_KVM_GMEM_MAPPABLE
+> +	xa_init(&private->mappable_offsets);
+> +#endif
+> +
+> +	inode->i_mapping->i_private_data = private;
 >   
-> -	file->f_flags |= O_LARGEFILE;
-> -
-> -	inode = file->f_inode;
-> -	WARN_ON(file->f_mapping != inode->i_mapping);
-> -
-> -	inode->i_private = (void *)(unsigned long)flags;
-> -	inode->i_op = &kvm_gmem_iops;
-> -	inode->i_mapping->a_ops = &kvm_gmem_aops;
-> -	inode->i_mode |= S_IFREG;
-> -	inode->i_size = size;
-> -	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-> -	mapping_set_inaccessible(inode->i_mapping);
-> -	/* Unmovable mappings are supposed to be marked unevictable as well. */
-> -	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
-> -
->   	kvm_get_kvm(kvm);
->   	gmem->kvm = kvm;
->   	xa_init(&gmem->bindings);
-> -	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
-> +	list_add(&gmem->entry, &file_inode(file)->i_mapping->i_private_list);
+
+The whole block of code needs to be guarded by CONFIG_KVM_GMEM_MAPPABLE because
+kzalloc(sizeof(...)) is translated to kzalloc(0) when CONFIG_KVM_GMEM_MAPPABLE
+is disabled, and kzalloc() will always fail. It will lead to unusable guest-memfd
+if CONFIG_KVM_GMEM_MAPPABLE is disabled.
+
+>   	inode->i_private = (void *)(unsigned long)flags;
+>   	inode->i_op = &kvm_gmem_iops;
+> @@ -464,6 +505,11 @@ static struct inode *kvm_gmem_inode_make_secure_inode(const char *name,
+>   	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
 >   
->   	fd_install(fd, file);
->   	return fd;
+>   	return inode;
+> +
+> +out:
+> +	iput(inode);
+> +
+> +	return ERR_PTR(err);
+>   }
+>   
+>   static struct file *kvm_gmem_inode_create_getfile(void *priv, loff_t size,
 
 Thanks,
 Gavin
