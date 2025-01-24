@@ -1,127 +1,79 @@
-Return-Path: <kvm+bounces-36484-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4374A1B6C8
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 14:27:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D4CA1B706
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 14:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32D2716CBD6
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 13:27:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A91E9162970
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 13:39:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48D340BE0;
-	Fri, 24 Jan 2025 13:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2854A12C54B;
+	Fri, 24 Jan 2025 13:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EDzJhJYS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="I1yng0zg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2066.outbound.protection.outlook.com [40.107.223.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292CC35952;
-	Fri, 24 Jan 2025 13:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBEB74436E
+	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 13:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.66
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737725218; cv=fail; b=CIWMMzljWiCbyIuOLjzlMcwDRpDPbi8GP6cVN0hB/97s7YFIXmpH67H0TgslT5hCL2qKIehMMgTkBfjOhhxGHJOW4uF81X0ntuhVuY3yeAbTbI03nQ7Gdm6+Y2gwf1mWg5I2ap9DFnfrdpjY6aEmWuI/aizw/V0GZ27Dnw4TZUM=
+	t=1737725920; cv=fail; b=DAKivP1VNtZTscrsnZQwVOYsN4IxOO3Y6PDcZ+cE2e35Lo18mdk8Q5hEecvizXLTYA+w5B3KqPHBDDWvGifot00ywiBkJt9T4wqxSAP2MK57/wb3ZYqJoGQXrGQ1U1YN3+9jKBZACWdF7DoGVTGElpug6MAABxOykHJb3YBpwR8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737725218; c=relaxed/simple;
-	bh=dLVhE9alcTRDKxrLk9cHnFW3U8OGQrNZd51D3ZxttIs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YRigvDWTDxxF9ivYkRjXRTkobA9eM4Wr8IaD52G4yJEsBAHr3j/YY0EN2qBroZopvYdieM/1dDNEXsHexnVys8YReVCEDCG5PHkbyB+v2KwaSNg6T4XvkI7/soMNWxhZIId8Y5xh8UnPxpXbKQ6goWAzkFaa7L1cnETTHWH80II=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EDzJhJYS; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737725218; x=1769261218;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=dLVhE9alcTRDKxrLk9cHnFW3U8OGQrNZd51D3ZxttIs=;
-  b=EDzJhJYSpFLfvbYssYlV/e4m3nW5yxzeaSckOO7aLF4+Vkqn3S+tJzCs
-   2nl47S+zTgef9XfCnds9znHDvDNs5Uf4EMt5FeZgvi4ZXwtEABxtnJTZf
-   Yr0AC1DxguxmaryATD2hWRlXxZh5MevbDtjgYRWkKWDQ8QmrIo8k4eUG7
-   sO2jdWy15PWHTpp2VAE6Wn4C+Zb/azxgcOce0vNFkFtV8kM5nnDpwn4ss
-   kjv0dkHe7oKI/bNhqxTKn86w0J982VNLYO2Jt+jRQAkoZfihPnRFwrsDv
-   2skfpILyKZpnlvtTuh1lrXcS5lN+Ct7dnctVKS/u7lXQt7nTU/RWzdqzn
-   Q==;
-X-CSE-ConnectionGUID: i73cDnb5TQS+fM/13tTMRQ==
-X-CSE-MsgGUID: OnQ+yG6nS3CN+HsCs1QmdA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11325"; a="55670893"
-X-IronPort-AV: E=Sophos;i="6.13,231,1732608000"; 
-   d="scan'208";a="55670893"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 05:26:57 -0800
-X-CSE-ConnectionGUID: ZmYRnUCvT0SaTDOCu02fLQ==
-X-CSE-MsgGUID: 7n2VO1ZNRf2X4038zk8j8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,231,1732608000"; 
-   d="scan'208";a="138640865"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Jan 2025 05:26:56 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Fri, 24 Jan 2025 05:26:55 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Fri, 24 Jan 2025 05:26:55 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.49) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 24 Jan 2025 05:26:55 -0800
+	s=arc-20240116; t=1737725920; c=relaxed/simple;
+	bh=x8ZUg+4/UhCyuWgHyOxSZRnpDQk7z11TZE9P2Pf6ujc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=jyLmYB6ZjjiIWnABHSclC/acKRIPhoZhvHCavJZ0/8PW3H59NOk73kOUFDVKD5Cfhm7MBDKqrhYvSev3SDjurMl3JkDnVVyVTHbqXBC90cBDlqC0eRXiHD2MmNvR03TLy+3lHzi/JnLYVmGCJ1x6mXGe+ag5iFb9oc/8Mk6oM7w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=I1yng0zg; arc=fail smtp.client-ip=40.107.223.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MLir8fv7l79N85PzEuSDpzJdi2/X/PZyPE4Em66B42VcGUt2qNaiC5+U8zlw04k27xWpt01hDPIoxOHpgNM81Qb4ZjqgeE/D/hC4xbuHu+X42gegaeyyRCg0k/z1QgHy+mjSh1ElisJmfG+aeQHfuxpg/PbbtfmoAxPB5htg5A0egYNcet+/Kom+v15Mg5u6MdSoX+xdYsK7FeDZF9nJgu213e35tujKOZhZ9magKrnzvyQyqUtZW+8H2uGlpN19ERpw3osr0Y9Tg7Eo/wlP7bifAHCPWAQFCpa0GGYDxgX7hZOudlGymUTkS102+oHbuZYkF0CMhHlWM6mBO5Nj2A==
+ b=CZYz7+51M/JYOfwtIlV8AWKlJnprv1Bj6kWkqjUn8YYCdHPWtppNO26xaum9JZaIljSFsf1yLMHRF8onaoOhjVWLLpqiLAg0YrOTz7Qa387bxvRqGqbQfiWiQdOyZ+Y0MYlVdCjQyvlsQuVazlYzqnaXHQWVy/GQFK4wpHQM9TSAabQuH/FgohwULw+tvqMZ3VZAS7kb7TLFKe4Bf4V4erWsehzYwIU+7c+Zfqll9wiMUiQPZaWUCRv2HiisK2JixHQoJaamwTlqronbhtOA1oG8ahONh0ta78KVCZUuRroiUatjnx4C9z8wcr3PyrgHnWyRYJaKoptDP+a+nscfKw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L3gd6DTnQCkipaKyWTEOX5J5zoQBsMquc6yboH8QzeE=;
- b=NuIA9Nw6Vqq24tgm8b/y49LM/3/n5YrMDIgRjIEXXBTwU70wnyJ8Acd53Ju3/5u/w4ZZc8R3nsihMXZw++0ecTYU5B6pQNn4kHx9RZta35Ht5LkgudSMM99wzT/bAVhAK2rowtTHuOzNkrK0KO8pMKyuBfLzYUrg7GYOcomoAUwNA8uwbADWWTdzRBxVZ7lbbKlsZb++RKZswG/aFg/7pT5GA3g92WrZhjdSYX5RZMTdtRkzgxJnaYVkPHtsVb9uN/umlO0kIYxdI4X1+gnV703UwzkSH75FjTgGpZPI4R9gpwyuULhi4vKSEYl0J5jg4NtVapXZTQJVMUELhVQtuw==
+ bh=R8ZebGFq5vQ1m+QpNXaMo6qaXJTY4xNLtFGncDtqty8=;
+ b=gHkfEgctVZLTj/G6Smx/HvtBUxNYnMkFkm1mmbxH02IKDj95/hJnzLyBeNeJsrio7ut6tMEpNiS6B3qq+FmN4VJRe6RZPZL9QOOYOCR1RekLZkq8sZqF5bysIm8rY2QTVFL/PQfajvw73R/6NR6T9EUVx/h12tmb/ywiTij0kX7grfyuu1xZHDrQkPOmhvVcmlJYJ3qsTkfvSfsZCM157uUN575RlXlYaN+E+QQJL8JwVwI+O6vDhargmVfowdGUZO9VV0mGRWgXBmQuH+seBwEF/F8vU69Nhlee3SAYe/KiCj9lRHsQOpH4+fKbflkD/R0DvYDywPKa/IgrFqfhwQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=R8ZebGFq5vQ1m+QpNXaMo6qaXJTY4xNLtFGncDtqty8=;
+ b=I1yng0zglrEcKT0Q9yb8SmeVA9ryZEjihcyKzqpKe3mukBaSc8NgdFXnAzd+m043iSarHG0bhpdv52SQyFMKXYDyuCgwR0GT7vHhddsVWeyB/B4P0sddTWHNz4Qr1ecuWY4t9X6gmsUNiipE/kQC7PQ/Tr4MqBskIijCmz5LPNk=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by PH7PR11MB6331.namprd11.prod.outlook.com (2603:10b6:510:1fd::15) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SA0PR12MB4447.namprd12.prod.outlook.com (2603:10b6:806:9b::23)
+ by DS0PR12MB7770.namprd12.prod.outlook.com (2603:10b6:8:138::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.18; Fri, 24 Jan
- 2025 13:26:54 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a%4]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
- 13:26:53 +0000
-Message-ID: <84f9ab89-483f-4659-8e7c-5b69748d83b8@intel.com>
-Date: Fri, 24 Jan 2025 21:31:59 +0800
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.17; Fri, 24 Jan
+ 2025 13:38:35 +0000
+Received: from SA0PR12MB4447.namprd12.prod.outlook.com
+ ([fe80::b4ba:6991:ab76:86d2]) by SA0PR12MB4447.namprd12.prod.outlook.com
+ ([fe80::b4ba:6991:ab76:86d2%6]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
+ 13:38:34 +0000
+Message-ID: <97712ebe-fd9f-4549-ab95-e638bc9f3741@amd.com>
+Date: Fri, 24 Jan 2025 07:38:32 -0600
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFCv2 06/13] iommufd: Make attach_handle generic
-To: Nicolin Chen <nicolinc@nvidia.com>
-CC: <jgg@nvidia.com>, <will@kernel.org>, <robin.murphy@arm.com>,
-	<kevin.tian@intel.com>, <tglx@linutronix.de>, <maz@kernel.org>,
-	<alex.williamson@redhat.com>, <joro@8bytes.org>, <shuah@kernel.org>,
-	<reinette.chatre@intel.com>, <eric.auger@redhat.com>, <yebin10@huawei.com>,
-	<apatel@ventanamicro.com>, <shivamurthy.shastri@linutronix.de>,
-	<bhelgaas@google.com>, <anna-maria@linutronix.de>, <yury.norov@gmail.com>,
-	<nipun.gupta@amd.com>, <iommu@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<patches@lists.linux.dev>, <jean-philippe@linaro.org>, <mdf@kernel.org>,
-	<mshavit@google.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<smostafa@google.com>, <ddutile@redhat.com>
-References: <cover.1736550979.git.nicolinc@nvidia.com>
- <c708aedc678c63e2466b43ab9d4f8ac876e49aa1.1736550979.git.nicolinc@nvidia.com>
- <62ccc75d-3f30-4167-b9e1-21dd95a6631d@intel.com>
- <Z4wP8ad/4Q5wMryd@nvidia.com>
- <2b6c52f6-037f-43d9-8384-7b48764a3e81@intel.com>
- <Z43lMrJDdFEDaArW@nvidia.com>
+Subject: Re: [PATCH] KVM: SEV: Use to_kvm_sev_info() for fetching kvm_sev_info
+ struct
+To: Nikunj A Dadhania <nikunj@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, kvm@vger.kernel.org
+Cc: thomas.lendacky@amd.com, santosh.shukla@amd.com,
+ Pavan Kumar Paluri <papaluri@amd.com>
+References: <20250123055140.144378-1-nikunj@amd.com>
 Content-Language: en-US
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <Z43lMrJDdFEDaArW@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: "Paluri, PavanKumar" <papaluri@amd.com>
+In-Reply-To: <20250123055140.144378-1-nikunj@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR04CA0007.apcprd04.prod.outlook.com
- (2603:1096:4:197::19) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+X-ClientProxiedBy: SA9PR11CA0024.namprd11.prod.outlook.com
+ (2603:10b6:806:6e::29) To SA0PR12MB4447.namprd12.prod.outlook.com
+ (2603:10b6:806:9b::23)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -129,160 +81,698 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|PH7PR11MB6331:EE_
-X-MS-Office365-Filtering-Correlation-Id: f066dfd5-022e-4a99-681b-08dd3c7ac422
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4447:EE_|DS0PR12MB7770:EE_
+X-MS-Office365-Filtering-Correlation-Id: 223fb180-6c62-44f8-21d9-08dd3c7c662b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?RzRjbTZhNWdyZkNrN0NoZDM1ZjFxUlNiOG0wTlJtTDdYU1R3YzE4NlBoU2U1?=
- =?utf-8?B?UkxCVmVlNWVpR21LdEEvNDNsanpRTWZGeE1DSUZTcEtsYVBqQkJPSFI1OHMr?=
- =?utf-8?B?VGNETWR3djZwQVQxOVNXNW9PS3dkTTRXUDhCNy9xVzBqalRydFF2MjRwMDFL?=
- =?utf-8?B?M1padHZ6czdDb3BWUWZtaHZUQVdveDBUMityQ0pvSkQwTk5wM3A1MzBFMHAr?=
- =?utf-8?B?V0JiNGZiTzNHUVI3bm40cExUQmNFYjk0WjBnY092ZHlHOHZjRlo2Y09YZEwx?=
- =?utf-8?B?anlwUDA3QTQvOUIyaExJMisxcWswekZySkJ4d0pTaFV5NHRpNzlDTWFBTTBB?=
- =?utf-8?B?bXRQa0R2WXluVERjMGlIRVVrNnh5c3BFdVdheUlDRDh1SHExL1Bqa1VteG5B?=
- =?utf-8?B?V1dJYWtGVmttMUR3blduUDRrVEExOEZNakdYTVA1Tlk0aUFIM1hwTm1DOGly?=
- =?utf-8?B?RGhST2I2cTlia2Q2WWdNOTIxMldHVFFVVWdONHc0Ky9UT2ttMGtOSE5hNHcx?=
- =?utf-8?B?ald3WElVanhmN1N2RUFkTFJrc3Z1Tk9yWS9zdm9OcVRJTjAvTjlFWmhtZFZI?=
- =?utf-8?B?TU5wSUwzN1Y3NlE2LzRXWlpOWWdUc2R6bmlud25KNEF1bThuamtXZ3hSdHZt?=
- =?utf-8?B?alkvc0FtRVJianFqZ2dwdnFoaWZtdGZMYVZ2eEtKUG9zV3g3c0xlVGtabEtO?=
- =?utf-8?B?azk3eVZOY3ZHUzIyMnM2bXVieG5jbm4yVVZiQ0lrYm9sVzFHYVlzaWNybmd4?=
- =?utf-8?B?dE9uS05XZ3RjR1lGSEYvMFR2dnplME9MQ2tueitQdDdpWjNJVXY2SUJwSXF4?=
- =?utf-8?B?VjExdjdoZ2RjcmNxKzBGczN3cDJ6SWJXK2dxbGJpZFh2b20yZ0xVNDVpZGlC?=
- =?utf-8?B?UzhENVdCa09CTmpnK2taT2Z0d3FuK3NsN3hIcFR5eXFHbjJuQW9lbEs4bTA4?=
- =?utf-8?B?QnR1WDMwYmw5TUFPTHNiVVpMbjZVajg4QklDVEZTcExXWGQ2dWFLbFJUbitS?=
- =?utf-8?B?TEI0YWMybVd1dFkzeXpEbTB6bk5BN0FlWUNMbXRzekRGYUZLcUdvSjNmUFZw?=
- =?utf-8?B?dUw5eS9DS3UweUJpOThSZ2plVnF1cSs5bGVCSWVUdEhkV3B6VlFXRVZLYXE0?=
- =?utf-8?B?NmYxaGdjTlMzNWNESEhVR2VLWWtHM2l3QWZ6YklkeCtrWTlXTGlyV2t3WlRx?=
- =?utf-8?B?VWlkcXJPSXJhMndLd3BuK0I5L2hUdnpmNEhPZjFxdHJiSXhjZ0dQbmcrR0dR?=
- =?utf-8?B?dytjVnZBTWdiL0ZSelFHODVyQk1EUTBiSGtEWWRqOFozWjRxWkhFb3kzTkVy?=
- =?utf-8?B?VVBBOVh2SDNjL092ZWliTTRiR2JlaVUyQXNPaURCcjd1WmVNemhMTGlFUUs5?=
- =?utf-8?B?VjRENldORkV2a0EzZE1SbU5kMEYxUmFKeXJmb1hJdUsrdHM1SzIxdHZGSlVv?=
- =?utf-8?B?eXJBb2g5WTdOSTBHSDkvbG9BaGtZZXQrbnQ0QVdsN1h1aGdlMkp6a0ZhMDVD?=
- =?utf-8?B?Nm05Ukl2M3NjSTVrcjNoaXYyeWxhMmdCOTFtb3pneDVLMEYxbkVmdis1QmZp?=
- =?utf-8?B?SkxXcnpSYWNTNFBQQlNuV08rNzZRRkYrYlhBV3RzZ3phSGZudW5CWElYNjBx?=
- =?utf-8?B?aXZVeVZPY1dDanFMbW9ZV3NsTmQ2Mng5enJBR1F1L1AxVHIzWEFITmVEek9v?=
- =?utf-8?B?Z2ovdVpVV1FwMUVOWGh1aFAxRE4yREdFUW0xVmh3WXAxekxTeUhWekJSMW5w?=
- =?utf-8?B?cDhCNHNkOG9qcy9KTUNPWi9MU0ZjM0UyZVpxcHo4WCtKNkpuSkQyS1hnRDJK?=
- =?utf-8?B?MmVkVnRzV01vUmJMSG8yb0UvVUFQRkdMNTdacWNlSXBqZzhyNkh5WlY4M2Uv?=
- =?utf-8?Q?eR8Z2nrIL0XYE?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Mk9lbUxjRThjSGp0aW5jVll0eFRJUkZYemxab0VOSGQ5MnEvUU5Za05Qck05?=
+ =?utf-8?B?MnlwZ1NWNlFvelUwMXYwL0ErZ3F0Ky9LaGtBUVMxUkFtOGdFUmYxaU00N0ZU?=
+ =?utf-8?B?cThKbVF5d3NyaEdpUXlOSnAwRlV2UnNQQ3lWUXJHdXJvcHNncUs2dVV6Tkxp?=
+ =?utf-8?B?TjRHYUMyelBmK2pkNUdXMndRNm5BZ3Q1bmNuTGFSay9wYlBUcktNQkFlN09t?=
+ =?utf-8?B?VU1VMEdXUDNUZlpFL3VmT3h1aVh3S1A2a1AxME10d3ZkV3NQbE81MXltZTZh?=
+ =?utf-8?B?OXN5bWUzVSsvd0swcXZyeGlGcXNadzFEcE5mTms0aHVwM1BBdVhreGd2Z08w?=
+ =?utf-8?B?SUFIcWdtTFhtQkFZWWFhbzREMzB4dFBwMEZoUjh0aElwMnpUNmR6aStGWDZy?=
+ =?utf-8?B?WUZWM0hISTRHbGlHTlcwRkd3eUVqNjk4OEQxQTliM1dXVVFUeklrM2d6NXpu?=
+ =?utf-8?B?aTd2eStqRldDMVZtcUh5cld0UnpNTmNlM2pySWtEVHp6TDM4T2tseEtHb1VD?=
+ =?utf-8?B?cm1yUWVSMDIyL3JaQ1B1ajl1YWJ2aUl5ZDVVRzN6aEVjMUhuTFVZMFZVajgw?=
+ =?utf-8?B?S1RmR0tJUmV6TFhsOTdqdC9XckdLSTZkUkJoS3BlTjYrMWlSOHRaRmhlcVNW?=
+ =?utf-8?B?cGE5YXV1ekVCYUFRV2xnVEtrZndybXFUakFaWlZCMjgxUWhaWlN1V0V1MXBJ?=
+ =?utf-8?B?RG5XSkJxQUw5V0lJbHVXeE1LKzZDRlVreHR4UklheVRGTSsxOU8yZW12cHlL?=
+ =?utf-8?B?SWpVR3dMWXJkN2dmNXlEY1BkQ0d0WjJnbU05T1Q2V2VpMk9LQmQzeTN1Q28x?=
+ =?utf-8?B?SFlvN2JwdnY1WVdsYTZqNEllcUt2RHZPZHpMaDR0WFN2UVN4QnJYTVh2QWpH?=
+ =?utf-8?B?ckNhWU1TR3BQT1o5VGZNMS91WVdtdXl3RG1WVkpHdlE1K1ZnME02Yjc4WWoy?=
+ =?utf-8?B?ajdweVVreWRtaFZKWFlFUjdFcXdGdDh4R1pqWkdKZUxaOUd2Zjg0QXZhMXg2?=
+ =?utf-8?B?UStxTTZxREpSQXpSb1dxZS95ZXFTSE1TMk1oRWNiaWxaeTMrMndUV1hjaUxK?=
+ =?utf-8?B?SHEwcGJMWnpwZ0M4K0hVcjFMVm91Y095U3g4SS9sT1JpTFVpcGdINFRRR2Ni?=
+ =?utf-8?B?TFFXV3lja3Z2Uk9Hb1VCTlkrSS81eGNiWm1Lb1lvV3FzRkNOcm9EVmYvaVR6?=
+ =?utf-8?B?QTJhbTVkcUlSeUgxdXZaa2U2K2hVUldpdWRwTStBSG15OGdRYUZXSGsvTTZq?=
+ =?utf-8?B?OGQzeU56YmllOURtMTA5dnExK242MFlrZGd2a1M3d3ovRWJTQ3hQTkhzM1lM?=
+ =?utf-8?B?SnRRZ3hLTHFBaVg0dm1wWnVQdnBhTjdOaFpzTUp1S0JxSGtJQjZxSGRwRVFz?=
+ =?utf-8?B?YVVBWms3K3cxbVdvMkhqblBWb1g4WnJUMkFIZys5VXNQRlVSdGRPTDgwY0Jo?=
+ =?utf-8?B?eDBnNjdtMnJUWDA3NHdQbXlFdTFMNlZ3TnEzMzlPT0RjcS96dERwdVlxbTBW?=
+ =?utf-8?B?MWNhTktDQVdmN1RRVHcyVDNoWXM3ZGxpWGU1UDNWQlp4MVpKVGJGZngwbUNt?=
+ =?utf-8?B?YUUycndMVGJSZ091WFUwRGQwTlBZbDFHUk1YRTRzRCtDbUZzbklackI1VmZv?=
+ =?utf-8?B?dGFoNlRLMmtrb28vL0ZpT0dGYzFQcW1xTVFoSC9hQkVyc0t2NGNaWkdFZHJx?=
+ =?utf-8?B?bFlla0MrRHdSRENUK25SRmdEODZEcitJRzI0NmFXRHFORjEvVzl2Rjd5TGg1?=
+ =?utf-8?B?Z2tkUXN3a3E5RklpdktCeExOM0xNM1RkNEloWWN0OWhhb21kM2ZOc255bFUx?=
+ =?utf-8?B?Z0prcEVrRlN4K05WR0IyTzZwYWtVUTZhVkZNc3o4REhZdDdJeCtXM05tUlhW?=
+ =?utf-8?Q?PutzvN/ESt4nc?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR12MB4447.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q2lET2dpRyt6QXVXSlhwc1lsenkwdFNOQmE0UWhQYmVWRy9iazk1dElqQ0NE?=
- =?utf-8?B?NkV5a3VJMDgwNVpSS3ljZVl0TnJURlhZY3pmdTJNRlpHNENNQndyQUVWOWcv?=
- =?utf-8?B?eHNacU4vNjZidkdCOHVjYU1BcmthUXF6ZzVUY0l4QlBvNHFyT3RqRktpS2tl?=
- =?utf-8?B?Mmp4VGVuZDBWUDE0QkZxWjhLSjFPVURNbjZlSHJteGVNV3Z3TlZ2d0theFE2?=
- =?utf-8?B?NWFrMzhkNHlKMVdyMGptL1I2TUJFSEMwYWl4dXhtRHEvOXo1WjUzQ3J3QzVM?=
- =?utf-8?B?dWxsYkl4RFNXeUJVR0JRYkFnMUNQRkJBa0pKenc4R1ZhM2FjQW9NWjNzL1RV?=
- =?utf-8?B?VFF5UTBJTFJic2dBSmxIaVdoc2w2WnM0NXJBOFV4Q05JWVhuSVRMSFVqTWRt?=
- =?utf-8?B?NmMreDNnQ3pZeWJCOUJ2eXBRdjA5VkQzM0owRTB2RjdiWjFtNFNEcEZsaTBD?=
- =?utf-8?B?dVNaQjN0UElCcS9LUTB5aEVncFNiazBKL3pjRmNPMXJJU1ZubGVnVFZyV2dK?=
- =?utf-8?B?bHhOOVdlNHBZWHhvOXZBSG13T2kxT3hLK04zS05Od1IxdHVpa1o5NUhPTHZ4?=
- =?utf-8?B?Q3dUc0xYM0ZrSXNicXQ1Ly9LNExET1F6VTZhWmowa0tza1M0N2pMZjIwdGsw?=
- =?utf-8?B?U1JyTWVzZFVzVVdoZzgybmpuaVB3eUNJajVmWTdxa1NLZzR6cWREZTVxMnRr?=
- =?utf-8?B?VzkrRXdwTFVXdm9QMnBROEN4bWd6a3E1bW92Ky9ic0dYa1MvUlREemcvZFRJ?=
- =?utf-8?B?SURnaUNoVmt4bFNmQzJwTUxqSWZRTGwrNE1WZ0pIZ1ZBbkc1NmFTZHVRMng0?=
- =?utf-8?B?a04xcTNZaGc4YkZKYXIzUW9XMENqYmNjdE5LSDcyaktIUDJyUFRpUno0Rklw?=
- =?utf-8?B?Mnh6ZWF0cWpjTWdjTGQxenVPVWRhL3Z1Qll4anRrbDRRbVlteXFUdHBINnNV?=
- =?utf-8?B?S0REYjZoRGNwYmRUc2N3L2xPMUpxbHZHTithczJaN0cweU42OTR0cmhPRjVr?=
- =?utf-8?B?T1ZmV0Zwcmhha3orRDdJalpuRzlkYWR3KzM2aWRndlJPRE8xSUdBaENqM3ZI?=
- =?utf-8?B?cVdQc05YZUZlbjNHa3QrWk5PdmVja1NqZ2RDb3ZZOG5TczlvZVJVbTNUQlZk?=
- =?utf-8?B?TzVSbGN4ZFowOTJpSzNOWkZhbjdyR1RUOFZObkI4L3VPaUd3NWJvTlpXYnBt?=
- =?utf-8?B?L2pIQ3p2R1QzSUtJSERKM2dINTBlUkVUeTVnOFJ1bzNpVG5Db3NzS1pkbll6?=
- =?utf-8?B?RG9IbHR2L1o5TmdDb3JxN1NJMUpDcFFpazlMVEovby8vVExMQm5oN2pNcU1M?=
- =?utf-8?B?bkk1K0x0V3FlVm9RUDM0U3k5cUt5UGhOb3dWb0VMc25PZHN1dmVNdDArUDY5?=
- =?utf-8?B?a1J1NFlUKzhDWUN3TkM0SFN2dytqdW9kRFZTeEtEQnNkMnBPazFmbkxKeUlF?=
- =?utf-8?B?SmR6MHpuZEQzUU5jbXBxV3pibXRHY0tTZzZaQ2FzbUJNTkh1d2Q3RTUwaEw0?=
- =?utf-8?B?QmJHK21RRTZWaFVtMG9Mczg4WUxzUkxXdy9GOTFXOFJIQVg1RWFOSThVcXIv?=
- =?utf-8?B?NCtqTHZidCt2V0o4dk5tMTM1dlFBdjl0NnMzeUtXa0c0QVkxam5Fbi9NUUhM?=
- =?utf-8?B?cWVQMlJCVVFNeWlMM0E3TTU4dUtOVHRBbGNUaDN5TGl2RTJoUmk0MjBpVUt4?=
- =?utf-8?B?VnFYN1FPRXFORSsrNW9IeHR1aGFjaWdIYjRwUEd4WHVRNFVVZGJNV296WHNq?=
- =?utf-8?B?Mm55T3FUTFh4NHA2U2VueEp3Z05yVGNvUEM4WnpKTkdaQ3JpeWIweUlXalpk?=
- =?utf-8?B?MVZpT0tVejhZRktEVXpYc0pONHVpRHcxdXRWU1hwTUUwZjA4L3AyOXhuT3Z5?=
- =?utf-8?B?d2loaGFIMHgrMHQzS3U4ajM0NGpMS21pVGk5MFp4V3YrK1ZxaEhwMzJaUWd0?=
- =?utf-8?B?eXB5Y1JHbEJWZndVbnlUY0xNQnllWlRsVG9LbEk3eVN4UkdPWkR4MUhzdHlw?=
- =?utf-8?B?OVRHK2RGYWtiSnlsRzJjdW1UQ2xMOXVGOGtaTXIvWXFmWURsa3J2eW5RZ2h6?=
- =?utf-8?B?ZG5EanoxRFcxZTlRSjYrMFpNS25BVS9WVzYvLzM0ZWx6RmpmWVYyUXdVVjlI?=
- =?utf-8?Q?9/s9IRRwfL09YzLF+gnAE5d+1?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f066dfd5-022e-4a99-681b-08dd3c7ac422
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bTdpM0dYNlNqSzRrQjI2WXJFNWlQS3haMW5zdE01K2l2RmcrazVvZHYzVzVQ?=
+ =?utf-8?B?LzdxNnZZNHNrQ1BXODNjRFIzY2dnUEtaOEZIRGoyYWluNzZYdTNUbWZRdGl4?=
+ =?utf-8?B?Q0RuMlNDVGFlLzllUHR4RjcyNUgwdVdCcFJSZnZPSy9nbnNRc1hrZVUxamcx?=
+ =?utf-8?B?cUZTL2ZIcnVBa2FITWppZDh0QWtVNjY2RzhWT2FzR2Z5WGlza0lvMVhNTVZU?=
+ =?utf-8?B?QlM2RjVpT1RZRHJHdmdLc29aME82a0dyWW53Ri9pZU9LUnd6QU9kQTRHVTll?=
+ =?utf-8?B?U1VQRjlwTkRTUHVrUGFtNzdsQUpvL3VhTHlKV0ZsUTNqc0ZKbVRtRklTVTh3?=
+ =?utf-8?B?cEV0VWRrWGNUY25vL0ZQYzNsWm40Qzk3a0ZGcVN4WkxqRk4wVUhpeW1sNXFa?=
+ =?utf-8?B?ck5pekxxZnFiOS9zVGR2b0lOWmprVDlkY1MxZDZYbUhXK1J2MDdsRU9Jay9Q?=
+ =?utf-8?B?K0JGdHF3ZFpTZUtYdm8vMVdON0NtdXQ1TE5tSzIrdTA2YjBZb1E1MVVpVWNQ?=
+ =?utf-8?B?aVlTQ1hyc3RGZEVBMmMvUU1xL25NSFlLOElra04zaVBXcnphVkIzTXNacFBq?=
+ =?utf-8?B?NSt5L3ovRmNMdFhaaUhpSHhmL3ZIK2gxRG9RQThVcWlpaDRXM1lvV2xSZU1k?=
+ =?utf-8?B?KzA0bUtxNG9LVGxWSEtoRm84Wm9ZZ0s0Z2x6SFBqV1NmWFlnR1NvSnYzUjNw?=
+ =?utf-8?B?SDRsTUpCd3VwNE1oNUhMeHZjWE9Nd082WHIrUU9ONlJ0aGYwSjBKeG1Bb04w?=
+ =?utf-8?B?NHF2dExzMHNBSEdzQk45dTR5Vms5c3EzZWlMRVE0ZEV4N3ZqNklyWXZaMzNW?=
+ =?utf-8?B?VUlUbVJQUjc1Z2Q1UnlKK1J3MVJaK0tzTUlSMVRubXdKeWhpRUl1YWpxQUMz?=
+ =?utf-8?B?aFlxbHF2MTRNYTBhQlFIRm9GRTFtL1lvTWdlYW9TQm9LQXFwYS9qVmg2Y2kx?=
+ =?utf-8?B?WkZGcDF0SWdsdTRCdzFYRmQ4Nm1qbmJiVkZYZk5sMC9Ha05BemZnT2Jpb05M?=
+ =?utf-8?B?OXhxREFHd3JPZGludGQ0cVlBN2djVlREWTdubmp4cnJBZG1NazhhaW9Ba3Ey?=
+ =?utf-8?B?SW9uUjJhQ3pENkg2UXZrSkVQUDVuV0VBWnhNQ3hiUXFucDhWbzBLNE4xaVNZ?=
+ =?utf-8?B?TVBDNkxrUjQ0cHpKdGpuczI4OEZkSVc0a3VPM3ZrVUVmUXdGbS9nRWdNcCty?=
+ =?utf-8?B?MmZlUGt5UTBGMnVEWWttOXN4NWc4UkN2aWtOUWNIbmNDRjhKOE43bUVVS3Rm?=
+ =?utf-8?B?dXQwZlNMSE9VUC9Jbm95TUtrbjR0NGo1Snh2YjJ0cjA2QkFVU216NWs0MGhp?=
+ =?utf-8?B?QUJsUzdyRWxpbERyN09tL0pJeG1sM0cvV2FtN0tONmNKRUdrZDhBajdzNGk2?=
+ =?utf-8?B?NERGYmlPSDRaV1J5K0JxaUowblZVTm9wWmJnK3VJL1pQck43SnNaT0tna0M0?=
+ =?utf-8?B?Tld1UXBDS2NTVWNUcExheEJtcm1SNmpyQVhBdFVyMGRUTndjbGt6V3dkTjlx?=
+ =?utf-8?B?QmZlbzV5RElWNDJ3K1c5ZG53ajcrYThBWEs2aVRSSjlzd1pjQkJBRWdqODZS?=
+ =?utf-8?B?M1FYL0ZxeThveHJUZkhIR0dKUnVjMU1Gc1VIZ2dhcFhzU1NRQ1p1ZUxUK3Iw?=
+ =?utf-8?B?ZlAvZlF2VkNtcXJaWjlhTTdwSHpxUnY4a3hYd2I2V3JMTk1Cb2NTVjB1VnJn?=
+ =?utf-8?B?blU4VC9jbmxudHFxcW5hc01CYjVVMXZlUFk1WFFGaTgzbEsxamJxM25pbHFI?=
+ =?utf-8?B?SUtYOFpkZFhoQTQ1RXo0TjFVbE9MblBpU1l4K2JPQzFITytSZzRJdm9qdmlH?=
+ =?utf-8?B?SVgxUDByWTZXT1IzbkZDK0hwV1YxbjlpdVg0QkQyMFN4d2tuSFh6TjRMZTlo?=
+ =?utf-8?B?YjBodGszQVc5anJRa21iSitOdlFpNysyaGRhZG1pRERWNTFqajJXWkxXaFZP?=
+ =?utf-8?B?SE1VUVliMmJiYzNlOVk5RGNqZFA2QWh4S2VBZ2ltWmlINENJNWpXazQ4a3Ns?=
+ =?utf-8?B?U3VOZ3VUMWh2SUQ0Q1c1c1ZaSDMrOWw2SUZ0QkRSMmZmNllsVnQ2UVhGNXZp?=
+ =?utf-8?B?VVp3bjJXUEZUN1UwMjhKU213L3ZDL3MwcUFlVjFwR0xaTVg5Qi81NFg5cXht?=
+ =?utf-8?Q?u8ry0e2XkBDLXZ/yab0epB6u7?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 223fb180-6c62-44f8-21d9-08dd3c7c662b
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR12MB4447.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 13:26:53.4324
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 13:38:34.6201
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: w/ELXWnrVZsGcFK6OCsoDHWrjRVAYNN6zt7dP5TbiiL8whrTgsssmZw8tkfl1mQGEtk/+Q04ReN5AreE/jXnOQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6331
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: /PnSOpXD2xTBsodwOZ8b9fibE5FkERtCWMmdcq+WF4mg9um1EFQ4eSblFrC6h3ySixUrO2vOi99EoNq9aqpG0g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7770
 
-On 2025/1/20 13:54, Nicolin Chen wrote:
-> On Sun, Jan 19, 2025 at 06:40:57PM +0800, Yi Liu wrote:
->> On 2025/1/19 04:32, Nicolin Chen wrote:
->>> On Sat, Jan 18, 2025 at 04:23:22PM +0800, Yi Liu wrote:
->>>> On 2025/1/11 11:32, Nicolin Chen wrote:
->>>>> +static int iommufd_hwpt_attach_device(struct iommufd_hw_pagetable *hwpt,
->>>>> +				      struct iommufd_device *idev)
->>>>> +{
->>>>> +	struct iommufd_attach_handle *handle;
->>>>> +	int rc;
->>>>> +
->>>>> +	if (hwpt->fault) {
->>>>> +		rc = iommufd_fault_domain_attach_dev(hwpt, idev, true);
->>>>> +		if (rc)
->>>>> +			return rc;
->>>>> +	}
->>>>> +
->>>>> +	handle = kzalloc(sizeof(*handle), GFP_KERNEL);
->>>>> +	if (!handle) {
->>>>> +		rc = -ENOMEM;
->>>>> +		goto out_fault_detach;
->>>>> +	}
->>>>> +
->>>>> +	handle->idev = idev;
->>>>> +	rc = iommu_attach_group_handle(hwpt->domain, idev->igroup->group,
->>>>> +				       &handle->handle);
->>>>> +	if (rc)
->>>>> +		goto out_free_handle;
->>>>> +
->>>>> +	return 0;
->>>>> +
->>>>> +out_free_handle:
->>>>> +	kfree(handle);
->>>>> +	handle = NULL;
->>>>> +out_fault_detach:
->>>>> +	if (hwpt->fault)
->>>>> +		iommufd_fault_domain_detach_dev(hwpt, idev, handle, true);
->>>>> +	return rc;
->>>>> +}
->>>
->>> Here the revert path passes in a handle=NULL..
->>
->> aha. got it. Perhaps we can allocate handle first. In the below thread, it
->> is possible that a failed domain may have pending PRIs, it would require
->> the caller to call the auto response. Although, we are likely to swap the
->> order, but it is nice to have for the caller to do it.
->>
->> https://lore.kernel.org/linux-iommu/f685daca-081a-4ede-b1e1-559009fa9ebc@intel.com/
+
+On 1/22/2025 11:51 PM, Nikunj A Dadhania wrote:
+> Simplify code by replacing &to_kvm_svm(kvm)->sev_info with
+> to_kvm_sev_info() helper function. Wherever possible, drop the local
+> variable declaration and directly use the helper instead.
 > 
-> Hmm, I don't really see a point in letting the detach flow to
-> scan the two lists in hwpt->fault against a zero-ed handle...
-> which feels like a waste of CPU cycles?
+Just thinking out loud...
 
-I meant you may call iommufd_fault_domain_attach_dev() after allocating
-handle. Then in the error path, the handle is not zeroed when calling
-iommufd_fault_domain_detach_dev(). The cpu circle will not be wasted if
-if the two lists are empty. But it would be required if the lists are not
-empty. :)
+I still see local variable retained in couple functions (sev_es_guest(),
+sev_snp_guest(),..). I understand the return would become unnecessarily
+long when replaced with to_kvm_sev_info().. makes sense..
 
-> And I am not sure how that xa_insert part is realted?
+> No functional changes.
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 
-Maybe I failed to make it clear. That thread had discussed a case that the
-PRIs may be forwarded to hwpt before the attach succeeds. But it is needed
-to flush the PRIs in htwp->fault. Although I would swap the order of
-xa_insert() and __iommu_set_group_pasid(), it is still nice if iommufd side
-flushes the two lists in the error handling path.
+Looks good to me
 
-Regards,
-Yi Liu
+Reviewed-by: Pavan Kumar Paluri <papaluri@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 124 +++++++++++++++++------------------------
+>  arch/x86/kvm/svm/svm.h |   8 +--
+>  2 files changed, 54 insertions(+), 78 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 0f04f365885c..e6fd60aac30c 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -140,7 +140,7 @@ static inline bool is_mirroring_enc_context(struct kvm *kvm)
+>  static bool sev_vcpu_has_debug_swap(struct vcpu_svm *svm)
+>  {
+>  	struct kvm_vcpu *vcpu = &svm->vcpu;
+> -	struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(vcpu->kvm);
+>  
+>  	return sev->vmsa_features & SVM_SEV_FEAT_DEBUG_SWAP;
+>  }
+> @@ -226,9 +226,7 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+>  
+>  static unsigned int sev_get_asid(struct kvm *kvm)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -
+> -	return sev->asid;
+> +	return to_kvm_sev_info(kvm)->asid;
+>  }
+>  
+>  static void sev_asid_free(struct kvm_sev_info *sev)
+> @@ -403,7 +401,7 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>  			    struct kvm_sev_init *data,
+>  			    unsigned long vm_type)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct sev_platform_init_args init_args = {0};
+>  	bool es_active = vm_type != KVM_X86_SEV_VM;
+>  	u64 valid_vmsa_features = es_active ? sev_supported_vmsa_features : 0;
+> @@ -500,10 +498,9 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  static int sev_guest_init2(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct kvm_sev_init data;
+>  
+> -	if (!sev->need_init)
+> +	if (!to_kvm_sev_info(kvm)->need_init)
+>  		return -EINVAL;
+>  
+>  	if (kvm->arch.vm_type != KVM_X86_SEV_VM &&
+> @@ -543,14 +540,14 @@ static int __sev_issue_cmd(int fd, int id, void *data, int *error)
+>  
+>  static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  
+>  	return __sev_issue_cmd(sev->fd, id, data, error);
+>  }
+>  
+>  static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct sev_data_launch_start start;
+>  	struct kvm_sev_launch_start params;
+>  	void *dh_blob, *session_blob;
+> @@ -624,7 +621,7 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
+>  				    unsigned long ulen, unsigned long *n,
+>  				    int write)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	unsigned long npages, size;
+>  	int npinned;
+>  	unsigned long locked, lock_limit;
+> @@ -686,11 +683,9 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
+>  static void sev_unpin_memory(struct kvm *kvm, struct page **pages,
+>  			     unsigned long npages)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -
+>  	unpin_user_pages(pages, npages);
+>  	kvfree(pages);
+> -	sev->pages_locked -= npages;
+> +	to_kvm_sev_info(kvm)->pages_locked -= npages;
+>  }
+>  
+>  static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+> @@ -734,7 +729,6 @@ static unsigned long get_num_contig_pages(unsigned long idx,
+>  static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+>  	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct kvm_sev_launch_update_data params;
+>  	struct sev_data_launch_update_data data;
+>  	struct page **inpages;
+> @@ -762,7 +756,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	sev_clflush_pages(inpages, npages);
+>  
+>  	data.reserved = 0;
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  
+>  	for (i = 0; vaddr < vaddr_end; vaddr = next_vaddr, i += pages) {
+>  		int offset, len;
+> @@ -802,7 +796,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>  {
+>  	struct kvm_vcpu *vcpu = &svm->vcpu;
+> -	struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(vcpu->kvm);
+>  	struct sev_es_save_area *save = svm->sev_es.vmsa;
+>  	struct xregs_state *xsave;
+>  	const u8 *s;
+> @@ -972,7 +966,6 @@ static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+>  	void __user *measure = u64_to_user_ptr(argp->data);
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_launch_measure data;
+>  	struct kvm_sev_launch_measure params;
+>  	void __user *p = NULL;
+> @@ -1005,7 +998,7 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	}
+>  
+>  cmd:
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_MEASURE, &data, &argp->error);
+>  
+>  	/*
+> @@ -1033,19 +1026,17 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  static int sev_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_launch_finish data;
+>  
+>  	if (!sev_guest(kvm))
+>  		return -ENOTTY;
+>  
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_FINISH, &data, &argp->error);
+>  }
+>  
+>  static int sev_guest_status(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct kvm_sev_guest_status params;
+>  	struct sev_data_guest_status data;
+>  	int ret;
+> @@ -1055,7 +1046,7 @@ static int sev_guest_status(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  	memset(&data, 0, sizeof(data));
+>  
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_GUEST_STATUS, &data, &argp->error);
+>  	if (ret)
+>  		return ret;
+> @@ -1074,11 +1065,10 @@ static int __sev_issue_dbg_cmd(struct kvm *kvm, unsigned long src,
+>  			       unsigned long dst, int size,
+>  			       int *error, bool enc)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_dbg data;
+>  
+>  	data.reserved = 0;
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	data.dst_addr = dst;
+>  	data.src_addr = src;
+>  	data.len = size;
+> @@ -1302,7 +1292,6 @@ static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
+>  
+>  static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_launch_secret data;
+>  	struct kvm_sev_launch_secret params;
+>  	struct page **pages;
+> @@ -1358,7 +1347,7 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	data.hdr_address = __psp_pa(hdr);
+>  	data.hdr_len = params.hdr_len;
+>  
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_SECRET, &data, &argp->error);
+>  
+>  	kfree(hdr);
+> @@ -1378,7 +1367,6 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+>  	void __user *report = u64_to_user_ptr(argp->data);
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_attestation_report data;
+>  	struct kvm_sev_attestation_report params;
+>  	void __user *p;
+> @@ -1411,7 +1399,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  		memcpy(data.mnonce, params.mnonce, sizeof(params.mnonce));
+>  	}
+>  cmd:
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_ATTESTATION_REPORT, &data, &argp->error);
+>  	/*
+>  	 * If we query the session length, FW responded with expected data.
+> @@ -1441,12 +1429,11 @@ static int
+>  __sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>  				      struct kvm_sev_send_start *params)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_send_start data;
+>  	int ret;
+>  
+>  	memset(&data, 0, sizeof(data));
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, &data, &argp->error);
+>  
+>  	params->session_len = data.session_len;
+> @@ -1459,7 +1446,6 @@ __sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>  
+>  static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_send_start data;
+>  	struct kvm_sev_send_start params;
+>  	void *amd_certs, *session_data;
+> @@ -1520,7 +1506,7 @@ static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	data.amd_certs_len = params.amd_certs_len;
+>  	data.session_address = __psp_pa(session_data);
+>  	data.session_len = params.session_len;
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, &data, &argp->error);
+>  
+> @@ -1552,12 +1538,11 @@ static int
+>  __sev_send_update_data_query_lengths(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>  				     struct kvm_sev_send_update_data *params)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_send_update_data data;
+>  	int ret;
+>  
+>  	memset(&data, 0, sizeof(data));
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_UPDATE_DATA, &data, &argp->error);
+>  
+>  	params->hdr_len = data.hdr_len;
+> @@ -1572,7 +1557,6 @@ __sev_send_update_data_query_lengths(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>  
+>  static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_send_update_data data;
+>  	struct kvm_sev_send_update_data params;
+>  	void *hdr, *trans_data;
+> @@ -1626,7 +1610,7 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	data.guest_address = (page_to_pfn(guest_page[0]) << PAGE_SHIFT) + offset;
+>  	data.guest_address |= sev_me_mask;
+>  	data.guest_len = params.guest_len;
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_UPDATE_DATA, &data, &argp->error);
+>  
+> @@ -1657,31 +1641,29 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  static int sev_send_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_send_finish data;
+>  
+>  	if (!sev_guest(kvm))
+>  		return -ENOTTY;
+>  
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	return sev_issue_cmd(kvm, SEV_CMD_SEND_FINISH, &data, &argp->error);
+>  }
+>  
+>  static int sev_send_cancel(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_send_cancel data;
+>  
+>  	if (!sev_guest(kvm))
+>  		return -ENOTTY;
+>  
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	return sev_issue_cmd(kvm, SEV_CMD_SEND_CANCEL, &data, &argp->error);
+>  }
+>  
+>  static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct sev_data_receive_start start;
+>  	struct kvm_sev_receive_start params;
+>  	int *error = &argp->error;
+> @@ -1755,7 +1737,6 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct kvm_sev_receive_update_data params;
+>  	struct sev_data_receive_update_data data;
+>  	void *hdr = NULL, *trans = NULL;
+> @@ -1815,7 +1796,7 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	data.guest_address = (page_to_pfn(guest_page[0]) << PAGE_SHIFT) + offset;
+>  	data.guest_address |= sev_me_mask;
+>  	data.guest_len = params.guest_len;
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  
+>  	ret = sev_issue_cmd(kvm, SEV_CMD_RECEIVE_UPDATE_DATA, &data,
+>  				&argp->error);
+> @@ -1832,13 +1813,12 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>  	struct sev_data_receive_finish data;
+>  
+>  	if (!sev_guest(kvm))
+>  		return -ENOTTY;
+>  
+> -	data.handle = sev->handle;
+> +	data.handle = to_kvm_sev_info(kvm)->handle;
+>  	return sev_issue_cmd(kvm, SEV_CMD_RECEIVE_FINISH, &data, &argp->error);
+>  }
+>  
+> @@ -1858,8 +1838,8 @@ static bool is_cmd_allowed_from_mirror(u32 cmd_id)
+>  
+>  static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+>  {
+> -	struct kvm_sev_info *dst_sev = &to_kvm_svm(dst_kvm)->sev_info;
+> -	struct kvm_sev_info *src_sev = &to_kvm_svm(src_kvm)->sev_info;
+> +	struct kvm_sev_info *dst_sev = to_kvm_sev_info(dst_kvm);
+> +	struct kvm_sev_info *src_sev = to_kvm_sev_info(src_kvm);
+>  	int r = -EBUSY;
+>  
+>  	if (dst_kvm == src_kvm)
+> @@ -1893,8 +1873,8 @@ static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+>  
+>  static void sev_unlock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+>  {
+> -	struct kvm_sev_info *dst_sev = &to_kvm_svm(dst_kvm)->sev_info;
+> -	struct kvm_sev_info *src_sev = &to_kvm_svm(src_kvm)->sev_info;
+> +	struct kvm_sev_info *dst_sev = to_kvm_sev_info(dst_kvm);
+> +	struct kvm_sev_info *src_sev = to_kvm_sev_info(src_kvm);
+>  
+>  	mutex_unlock(&dst_kvm->lock);
+>  	mutex_unlock(&src_kvm->lock);
+> @@ -1968,8 +1948,8 @@ static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
+>  
+>  static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+>  {
+> -	struct kvm_sev_info *dst = &to_kvm_svm(dst_kvm)->sev_info;
+> -	struct kvm_sev_info *src = &to_kvm_svm(src_kvm)->sev_info;
+> +	struct kvm_sev_info *dst = to_kvm_sev_info(dst_kvm);
+> +	struct kvm_sev_info *src = to_kvm_sev_info(src_kvm);
+>  	struct kvm_vcpu *dst_vcpu, *src_vcpu;
+>  	struct vcpu_svm *dst_svm, *src_svm;
+>  	struct kvm_sev_info *mirror;
+> @@ -2009,8 +1989,7 @@ static void sev_migrate_from(struct kvm *dst_kvm, struct kvm *src_kvm)
+>  	 * and add the new mirror to the list.
+>  	 */
+>  	if (is_mirroring_enc_context(dst_kvm)) {
+> -		struct kvm_sev_info *owner_sev_info =
+> -			&to_kvm_svm(dst->enc_context_owner)->sev_info;
+> +		struct kvm_sev_info *owner_sev_info = to_kvm_sev_info(dst->enc_context_owner);
+>  
+>  		list_del(&src->mirror_entry);
+>  		list_add_tail(&dst->mirror_entry, &owner_sev_info->mirror_vms);
+> @@ -2069,7 +2048,7 @@ static int sev_check_source_vcpus(struct kvm *dst, struct kvm *src)
+>  
+>  int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  {
+> -	struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *dst_sev = to_kvm_sev_info(kvm);
+>  	struct kvm_sev_info *src_sev, *cg_cleanup_sev;
+>  	CLASS(fd, f)(source_fd);
+>  	struct kvm *source_kvm;
+> @@ -2093,7 +2072,7 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  		goto out_unlock;
+>  	}
+>  
+> -	src_sev = &to_kvm_svm(source_kvm)->sev_info;
+> +	src_sev = to_kvm_sev_info(source_kvm);
+>  
+>  	dst_sev->misc_cg = get_current_misc_cg();
+>  	cg_cleanup_sev = dst_sev;
+> @@ -2181,7 +2160,7 @@ static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  static int snp_bind_asid(struct kvm *kvm, int *error)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct sev_data_snp_activate data = {0};
+>  
+>  	data.gctx_paddr = __psp_pa(sev->snp_context);
+> @@ -2191,7 +2170,7 @@ static int snp_bind_asid(struct kvm *kvm, int *error)
+>  
+>  static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct sev_data_snp_launch_start start = {0};
+>  	struct kvm_sev_snp_launch_start params;
+>  	int rc;
+> @@ -2260,7 +2239,7 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn_start, kvm_pfn_t pf
+>  				  void __user *src, int order, void *opaque)
+>  {
+>  	struct sev_gmem_populate_args *sev_populate_args = opaque;
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	int n_private = 0, ret, i;
+>  	int npages = (1 << order);
+>  	gfn_t gfn;
+> @@ -2350,7 +2329,7 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn_start, kvm_pfn_t pf
+>  
+>  static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct sev_gmem_populate_args sev_populate_args = {0};
+>  	struct kvm_sev_snp_launch_update params;
+>  	struct kvm_memory_slot *memslot;
+> @@ -2434,7 +2413,7 @@ static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  static int snp_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct sev_data_snp_launch_update data = {};
+>  	struct kvm_vcpu *vcpu;
+>  	unsigned long i;
+> @@ -2482,7 +2461,7 @@ static int snp_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  
+>  static int snp_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct kvm_sev_snp_launch_finish params;
+>  	struct sev_data_snp_launch_finish *data;
+>  	void *id_block = NULL, *id_auth = NULL;
+> @@ -2677,7 +2656,7 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  int sev_mem_enc_register_region(struct kvm *kvm,
+>  				struct kvm_enc_region *range)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct enc_region *region;
+>  	int ret = 0;
+>  
+> @@ -2729,7 +2708,7 @@ int sev_mem_enc_register_region(struct kvm *kvm,
+>  static struct enc_region *
+>  find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct list_head *head = &sev->regions_list;
+>  	struct enc_region *i;
+>  
+> @@ -2824,9 +2803,9 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  	 * The mirror kvm holds an enc_context_owner ref so its asid can't
+>  	 * disappear until we're done with it
+>  	 */
+> -	source_sev = &to_kvm_svm(source_kvm)->sev_info;
+> +	source_sev = to_kvm_sev_info(source_kvm);
+>  	kvm_get_kvm(source_kvm);
+> -	mirror_sev = &to_kvm_svm(kvm)->sev_info;
+> +	mirror_sev = to_kvm_sev_info(kvm);
+>  	list_add_tail(&mirror_sev->mirror_entry, &source_sev->mirror_vms);
+>  
+>  	/* Set enc_context_owner and copy its encryption context over */
+> @@ -2854,7 +2833,7 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>  
+>  static int snp_decommission_context(struct kvm *kvm)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct sev_data_snp_addr data = {};
+>  	int ret;
+>  
+> @@ -2879,7 +2858,7 @@ static int snp_decommission_context(struct kvm *kvm)
+>  
+>  void sev_vm_destroy(struct kvm *kvm)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	struct list_head *head = &sev->regions_list;
+>  	struct list_head *pos, *q;
+>  
+> @@ -3933,7 +3912,6 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
+>  
+>  static int sev_snp_ap_creation(struct vcpu_svm *svm)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
+>  	struct kvm_vcpu *vcpu = &svm->vcpu;
+>  	struct kvm_vcpu *target_vcpu;
+>  	struct vcpu_svm *target_svm;
+> @@ -3974,7 +3952,7 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
+>  		u64 sev_features;
+>  
+>  		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
+> -		sev_features ^= sev->vmsa_features;
+> +		sev_features ^= to_kvm_sev_info(svm->vcpu.kvm)->vmsa_features;
+>  
+>  		if (sev_features & SVM_SEV_FEAT_INT_INJ_MODES) {
+>  			vcpu_unimpl(vcpu, "vmgexit: invalid AP injection mode [%#lx] from guest\n",
+> @@ -4134,7 +4112,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  {
+>  	struct vmcb_control_area *control = &svm->vmcb->control;
+>  	struct kvm_vcpu *vcpu = &svm->vcpu;
+> -	struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(vcpu->kvm);
+>  	u64 ghcb_info;
+>  	int ret = 1;
+>  
+> @@ -4354,7 +4332,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+>  		ret = kvm_emulate_ap_reset_hold(vcpu);
+>  		break;
+>  	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+> -		struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> +		struct kvm_sev_info *sev = to_kvm_sev_info(vcpu->kvm);
+>  
+>  		switch (control->exit_info_1) {
+>  		case 0:
+> @@ -4565,7 +4543,7 @@ void sev_init_vmcb(struct vcpu_svm *svm)
+>  void sev_es_vcpu_reset(struct vcpu_svm *svm)
+>  {
+>  	struct kvm_vcpu *vcpu = &svm->vcpu;
+> -	struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(vcpu->kvm);
+>  
+>  	/*
+>  	 * Set the GHCB MSR value as per the GHCB specification when emulating
+> @@ -4833,7 +4811,7 @@ static bool is_large_rmp_possible(struct kvm *kvm, kvm_pfn_t pfn, int order)
+>  
+>  int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  	kvm_pfn_t pfn_aligned;
+>  	gfn_t gfn_aligned;
+>  	int level, rc;
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 9d7cdb8fbf87..5b159f017055 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -361,20 +361,18 @@ static __always_inline struct kvm_sev_info *to_kvm_sev_info(struct kvm *kvm)
+>  #ifdef CONFIG_KVM_AMD_SEV
+>  static __always_inline bool sev_guest(struct kvm *kvm)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -
+> -	return sev->active;
+> +	return to_kvm_sev_info(kvm)->active;
+>  }
+>  static __always_inline bool sev_es_guest(struct kvm *kvm)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  
+>  	return sev->es_active && !WARN_ON_ONCE(!sev->active);
+>  }
+>  
+>  static __always_inline bool sev_snp_guest(struct kvm *kvm)
+>  {
+> -	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
+>  
+>  	return (sev->vmsa_features & SVM_SEV_FEAT_SNP_ACTIVE) &&
+>  	       !WARN_ON_ONCE(!sev_es_guest(kvm));
+> 
+> base-commit: 86eb1aef7279ec68fe9b7a44685efc09aa56a8f0
+
 
