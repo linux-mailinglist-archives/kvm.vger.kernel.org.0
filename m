@@ -1,329 +1,366 @@
-Return-Path: <kvm+bounces-36460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9059A1ADDE
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 01:15:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72CA9A1AE24
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 02:19:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92F213A9BA4
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 00:15:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D49607A1DF6
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 01:18:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71336F2F2;
-	Fri, 24 Jan 2025 00:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177C11D517E;
+	Fri, 24 Jan 2025 01:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CqVNso+G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T0P01pB2"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2084.outbound.protection.outlook.com [40.107.236.84])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0320F4EB48
-	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 00:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737677742; cv=fail; b=ljMwzZ1vnWS7QtDq7i0Jnd5lDO4jFjwgaq0eUMdsRmM55obdDthEcvpA6N+fS5xc6C2+XerXtocA/8FEppARDaVkbYB1MUOVPE5Lg2bR6yv/Uro/Wft9WftrC8fIjs5u2SaI3Cz0YFAg6nnH8x9bygu55bM6DvX55RVqbRdRrgU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737677742; c=relaxed/simple;
-	bh=1ySYeE1r3eYNyScHrsbeoPnMzA6i4afqsJ2AHGPfT/k=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=S3CHiNWQ5PvtsGuA2uyqDYf1xVNtFX9/SUDZSBWZyPnyC/Q51gZZqzwKcOH0zau9RNLm/kjLrzsEEeO/rDqnGU0FvvtHq5P5w80DwDrbtzl4mt20d3X3cCERLXOc2fWpJdIrsQFmdZmjvCckDQw+eyb2M7u4vKPkyydKrCPTj3M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=CqVNso+G; arc=fail smtp.client-ip=40.107.236.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=akF5+gARVJgo7WE1muLH8R0yLeH8pMtBT0r2/eSDVxFfK3ZZZDtF4si12C/m5LP2YHbvveCwG7EQJdvWhHGD+eu+fckNcwdb7VpXqkKC+KrMuoi6GR61+tp3xqTysGGpKEWvKEFyFJEfO4sLFhlhZMKOb88CWpkeXgSuN1DvfndG1ZK/IDnFUuCAglneLG9JH1of4msYadohgu2lTX1LTifXuIXAhwGT5tNK/A1DXgioB2xZkTCRRjwoBALJ5bBVFhqTFEv8M7GnUOcxB7NeyGg0FzubZ/OiADBJ4hDU/WSwEeZ4sYm9GGwp0/zRlEEUXK8INjwi8mQ43zEvOWt7nA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yqPoBFbLx4pLSn0+etEQlNEwB0le16gPQDXJzr4ofUk=;
- b=jAugFZNwozHM+uySNS+horjD79g2IP6YSAaJikpL4HXHU7cBwbCUZsBGTq5DhQKouTW2BkGRRRQNybDKov+3SG9a6KvwAonKxwv/UkSXc2+7Nfeg2v+mUWdvl4on5MxHOdomT426vsD9qb2gPstZolkSkcNea4ZKa1sUuQgEHVnmIeQBPd96N0cQm6lBQv/y+lITJ3lsQ6CQlcsX6F5x9VpWkiFY9svOIXAagCXUaHpqeCKndz6ig3DpN4HU2EhpojD7zujk8osGwqn77EjfDce5NrpAvMncGjFt6CQDTIcWPu5lKi+hQv0dNU58cuwgpMyVewuTST/x9zp1EDSwiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yqPoBFbLx4pLSn0+etEQlNEwB0le16gPQDXJzr4ofUk=;
- b=CqVNso+GdaZd7w5FdvBQHSUTKemQhIc+6ND5ZxQ+qW8gE/k8vQ8LhUMxvQGlBUAqKpHxyaNbuYyFF/Oc5+IRvwd8suLz1lf3Li6TSIvzU7M3VgrI0Syem/SNenueL6YZZb+YY53/j2AOLLatum26pAztvchiWgkhy6DuANsIfWU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by PH8PR12MB6889.namprd12.prod.outlook.com (2603:10b6:510:1c9::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.16; Fri, 24 Jan
- 2025 00:15:38 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8356.020; Fri, 24 Jan 2025
- 00:15:38 +0000
-Message-ID: <b11f240d-ff8c-4c83-9b33-5e556cde0bce@amd.com>
-Date: Fri, 24 Jan 2025 11:15:29 +1100
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
- guest-memfd with RamDiscardManager
-Content-Language: en-US
-To: Xiaoyao Li <xiaoyao.li@intel.com>, Chenyi Qiang <chenyi.qiang@intel.com>,
- Peter Xu <peterx@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, Paolo Bonzini
- <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Michael Roth <michael.roth@amd.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>,
- Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
- Xu Yilun <yilun.xu@intel.com>
-References: <20241213070852.106092-3-chenyi.qiang@intel.com>
- <d0b30448-5061-4e35-97ba-2d360d77f150@amd.com>
- <80ac1338-a116-48f5-9874-72d42b5b65b4@intel.com>
- <9dfde186-e3af-40e3-b79f-ad4c71a4b911@redhat.com>
- <c1723a70-68d8-4211-85f1-d4538ef2d7f7@amd.com>
- <f3aaffe7-7045-4288-8675-349115a867ce@redhat.com> <Z46GIsAcXJTPQ8yN@x1n>
- <7e60d2d8-9ee9-4e97-8a45-bd35a3b7b2a2@redhat.com> <Z46W7Ltk-CWjmCEj@x1n>
- <8e144c26-b1f4-4156-b959-93dc19ab2984@intel.com> <Z4_MvGSq2B4zptGB@x1n>
- <c5148428-9ebe-4659-953c-6c9d0eea1051@intel.com>
- <9d4df308-2dfd-4fa0-a19b-ccbbce13a2fc@intel.com>
-From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <9d4df308-2dfd-4fa0-a19b-ccbbce13a2fc@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ME3P282CA0038.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:5::7)
- To CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2953FD1
+	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 01:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737681533; cv=none; b=TCTbOl5As1tJ4mtMaknCbadDholy45phnMTo/CX0TKKUkqseNljePKYVpCQtP6zGqFJYYV5oEwKgUeSMX10sSpAkt4ftvaXmRwNQBWUwyWLRz79j2TsfAYlXGmB+IFZki7FhQddgkcESblfygU0Mumd/xusDJjZhPDXV6Kdc0Nc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737681533; c=relaxed/simple;
+	bh=Kwe8mEuy0tJoIZlJh7U/FTlhIvHqM+4bw/YC7zleOvM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=m56BXPNmR09TCjlPNlUQO3WDU4vgStAdWkQ7HGRcPC/Mz2Hr/Aid03LpkHAM9XoxZfVACWet3TiJVWqrb2XdykrcKssJ2LCJlw7bRfgQQKx65ek3DUywYZiKd784Le6CAOsGYFmNlDi4eY/lIGadAzjE91wwQPx731Ndr4Mwh8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T0P01pB2; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9e4c5343so4559241a91.0
+        for <kvm@vger.kernel.org>; Thu, 23 Jan 2025 17:18:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737681530; x=1738286330; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3ur2PbnNKxFkaTdxwZWyIq/IA0X7RdIwqwKCVenYA4c=;
+        b=T0P01pB2Gkqo7ZPKqwUZb4PudOhXfWm4B6/YmBbh4JXB7Ptw2cwu9N0srl+Jd2F4V0
+         lBoAPGA0wR9HpXnIClDflR4NepkqeG8OvZRoelzWjSEqPu/gDyDDP7sayeO2Wrzm3IOL
+         ZchTJKr12NDvj+PzAE9DUB7DPLd6LKfOLMoTRDi7pg9UZomMZyz23BY+EuREmZVFfhRq
+         /2APGv0fiwfAJ8R2elNxuNymMWrYARPsGrqaT1gvQroReY91ePn9CO8JW0tEP04lDbp5
+         48rIMqG7WfPjTPWprfNTdaZMfoN1akXJaREEHS3UKwYKBNvqdbfS8ezxHneGrefUssRk
+         oDDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737681530; x=1738286330;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3ur2PbnNKxFkaTdxwZWyIq/IA0X7RdIwqwKCVenYA4c=;
+        b=CnOG254xt7PkViR4v1Kag/CSGRDVP+1Q0wyCn3ngm9esCp92NhyYHsba84wlVlzjub
+         MGZGYbA7pMLUZgSaKEDmwwSQbExW3PHSbzA0y/e+EG85PDwfiLxftTRf9y9xtHPoRjOy
+         GiQ2uv/kKA7fZbuiizXn9zm8CmGAAosfPBxeySG43jV79TgJU2YxDBKoSv0OC8xsDlbn
+         SbLNXAFpSAYdrRh9E6/XaIn+lfFiXZoueRnQhqJTd5dOjwcZAMceIwAxofnYvSQ74iYY
+         vg0WxXGZ9+tECHOVYYNuD3nTtbXQhqP/W6qGWUNT4DJCR94Vcfu4yrko227uKQzJU7yH
+         zLPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXHl9lSR+oCLZz63V+B8zgdiUZMHZaplsUa0XzskoXTMkIwOUvZX4S1zUXWNUUDf4AjIPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw32pUJ8iY7C+ny1DJX5+9wZhgtb57LXB6HGmbDWQOBn6+I1Qmx
+	/ACJ8Jk7dzPliqkTpwxuihtg46PFs1hz1qoRBNeLi+KLR6kxOC88/afz7iaKw2FCh6P6Y/UnA3y
+	5rg==
+X-Google-Smtp-Source: AGHT+IF7+RIG2h90IjL10wDrEATogrj6yYNIvhio0s1/V+zrfNZ0ZTIXXYSGMVXge60xKL+iE+0t3TwHcW4=
+X-Received: from pfat15.prod.google.com ([2002:a05:6a00:aa0f:b0:727:3c81:f42a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:330b:b0:724:59e0:5d22
+ with SMTP id d2e1a72fcca58-72dafba2625mr40907641b3a.20.1737681529722; Thu, 23
+ Jan 2025 17:18:49 -0800 (PST)
+Date: Thu, 23 Jan 2025 17:18:48 -0800
+In-Reply-To: <c7b494d34d3e14531337311c286a9c06a99c9295.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|PH8PR12MB6889:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6524cd78-e097-4977-1aa7-08dd3c0c3ab5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RDQwby8rNWtpcDhzUTlWRitaeVZXeUhBemVWd2FWaHNwbUVha21ZVjhoY1c5?=
- =?utf-8?B?ZVN3SmQ4TmRCb1FnQ1AvR3VlSmJiZGhVdlovYTNHMjBPZUp3YTJPVi81aDVa?=
- =?utf-8?B?NlRqcHd1OHR1SlJ5WjAzeHNxUXV6L3NFVzM4QUxyNEhyMnZINUE3a3hWT0FP?=
- =?utf-8?B?UXZIbHVGYjRsMXIzY1ZVa3k0WWRZR2x3SG1RcjB4cXdYVkFlcE5SbUw1aWhH?=
- =?utf-8?B?RzFCTzRud09uWUZFbmZEMmRtV01YU1cxRm5Rb0kxUjFzVjNQWE5IZnFkR2dN?=
- =?utf-8?B?N2hzWXpseWFzMHdDbUsyaXlmYkpaRjdtWnNxNytXdlg3dFZmREYvQ3dkRHlB?=
- =?utf-8?B?MnFIcUtFb3JxWmRFYVgwUGJEQ1ZER0ptTHNTRUQ0M0VVWFdJdU95YUxkNlph?=
- =?utf-8?B?V3NDcmlWUTB1QjVmaVZjY25ISFkydjF5QVMrZ0EyWVJOVjFEYTFtbFBRMDZt?=
- =?utf-8?B?S0UxeXE2NHR0SUF5c3JYZFRtNVdaQ0VVb2lYYW5lR2Nwa25GcEhhUDg4OWJr?=
- =?utf-8?B?YkNtcklja3B0T3ZvaWpyMjdpeU9mb3FzMnBxeWNMM28raUY2VktjcUdzeGdM?=
- =?utf-8?B?Tjk2WTNjZ3ErTG9PdzdKRTJmSDdMTXVBQWdZOUoxZXZmU2ZtdnYyN1ZFdG5y?=
- =?utf-8?B?UzF3a1oxSlNqaXEyY3BacUpGd2taN0Q4ZTNEVFpMYzZDdGpkVmFuUm9CZHg0?=
- =?utf-8?B?YzgvNzBMTlJVQmltdFNuajRVeFZpdEF5aUVTOVlmTkhNV2ZlVUxTVGx3NlhH?=
- =?utf-8?B?WVBCYUUwNi9mOGJRS2lqSDN6Z2h4WmQyM2JYbnlHVGhHLzFkQUVjNzFXbjBy?=
- =?utf-8?B?KzlVdFlLWUdHdlV0Vk9hYVhSME1KenV6WkltUWZodUFkb2I0M3FnUEh4ZHBx?=
- =?utf-8?B?d2xrQ1dzc2s4Ykt6UHdWL1dHVjVnODYxSnVPMm52cDlyUlFId2FmWHl1cmVl?=
- =?utf-8?B?eE84NTFmNmFVQzZZdWloUGZ4ZGxWUU5lbDRTYlk3bXdYQVlsT3lJc3E4eGhM?=
- =?utf-8?B?T2tvYkFDREFUQUZpdDB5MTJUaTNnL3JzNDRKS1g4a1RaYVNPdElZUksyOG9j?=
- =?utf-8?B?MkYrck8zZTNnMUgxOVpMbm5URGRqSE9EVDZBMi9HQ1g3QU1udmxGYTZXeVZX?=
- =?utf-8?B?ZXFpVXFRWWw1b2dqRktJazFsRENzT3hoOWtvY0hSS2NRV25Dc0xXUTdJTzNL?=
- =?utf-8?B?b2pFQmcySnR5cG1IYTBPcEFsbnZhMCthRGlPRDdIcUpNc25mVU9yOGlvQ3B6?=
- =?utf-8?B?OEJad2hPdWo2bVpkZzExQ2E2aHVZTFhwS0pkY1pwK0lUNUsvYzUyeVRvU2Jk?=
- =?utf-8?B?eUp2ZDVnYy92Q1JncVozSkl4S0k0WkIwaGoza3dRb2xJdzRIcVA4Z0cvUmpB?=
- =?utf-8?B?b3RMTzVZOE1rMzYrZ2t3cExoUFUwSkpKM2ZUMFdIRmxHckNEYnpvYnhhN0R5?=
- =?utf-8?B?WnZOUU9MWmtuQUF0Q0JJbTVnRjlFV1BxSjVQSnpYUm54ZEx4bW8yaDhzeE1y?=
- =?utf-8?B?NGJCYWxlT1dadmdsSjVCRkQyOVBmZlpXQTlwQjdkZU9XQzlZK3BRcWMyZzBH?=
- =?utf-8?B?VWxVVUhYMEtQNko0KzVsdGVXS3J3T2NKaUR4QXY3ZWF0OU1vT1AxQzdrNkhI?=
- =?utf-8?B?WXc5Qmw0aDdMTzFyQTJpT1pjQkJ6ZVl3aXUyRlczM2lUcngvQnlUV3pNR0d2?=
- =?utf-8?B?SWtzRWVONkRVVTMxcE5SajlqZi8yU3ZFQU9ib0E5ak1mT293bHByRjc1RHFI?=
- =?utf-8?B?YlVaaXEwQXUvQW5VdExzNWtZTVlKSmd1MFBKRXZ1TE5IOC9SdGVwMUhtVXhx?=
- =?utf-8?B?NjM2emZzcmZxWllZcUZKZUt1RDhzZTlkNzFuSk16MVg5ZjFIVm5BVUI1dVFT?=
- =?utf-8?Q?z7V8E6YZV64pa?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SmhCRlJyNzZFK2Jxbll1R0d1T3VML0QrTG5xZXh6ZzFXZ0VEQnplNnkrQnZ6?=
- =?utf-8?B?cEM5Njh6ZjNaMDRRellFY0xpcVBkeG5YSWZpZTFRUlZXcDVycExNSUZTYmFN?=
- =?utf-8?B?MXd6VUxQanhKVlRkRFAyd2FBOEc1N0NWTmpEUjh3VWZpMEVaUGkrZGtMTlc4?=
- =?utf-8?B?QktjVVFUanY1alNoZndHUDRJT3hWWHFSd0RSMjEvTjByVFhzQ0VQRDNaVlNS?=
- =?utf-8?B?aUJsNmJCY3ZHU3RmZWU1c01TTzRSakFENTRDRUFLSWdrQXkybXg1YnZ3NkNx?=
- =?utf-8?B?YWlLamlIbjgzdklrY2RuejNubVkxcm5nVHlHSER4bDd4S3Vib3duNzYrVUU2?=
- =?utf-8?B?UEVkR3hWaTdINzR1YzIrNjV5THNTR3VxWWVGKzlwQm5FbS9ZMFJaOGpVTEJQ?=
- =?utf-8?B?eHQyd0RlZHV2UWV5MzRwb2gxOU90NXN6c1J6YmZQUlNBcW5EZE1GZHJLNDc2?=
- =?utf-8?B?dDhnNHRZRXNnZDMxdVFsV25uNnVNMEtFajFOOUNPVTVKK3NNYlBNY3F6UlZW?=
- =?utf-8?B?NTV3UklyZ2JtYXM3Mk9sdTVpdmgrQXFTZHZoSzA3aUNiZktubWt4Wk5BbnRQ?=
- =?utf-8?B?QkRhMTdreGR2RTdrc3NzdUowYS84TjQxTzRteThwOSt2dU93aVpUUnBFanZN?=
- =?utf-8?B?MmFuRUNMeUdZTGJvZFdUWDNrV2poVFFQVWhhczVoL3lmNGlEK0lPVG5LTGtS?=
- =?utf-8?B?MEw3ZGpoMGlBZEF2aGVCSFlVRHhxNG1BQnl1L2ZpUWdOam5LZUFPczA0RFor?=
- =?utf-8?B?V2N6WjAyU3dXWGx4N1RwT0I5alN3ZFFkd25nRG5aYUJqTGxsdE9PZVRjZXhs?=
- =?utf-8?B?MlZlSlBxakErVmR3WmJuOStMSlpTRy9OTEtveCtiZUxuQ0JldTMzcjFBajc0?=
- =?utf-8?B?RnIwWUVCdVdwNExJVnhlcHhPc1V4ZHA4dS9oTWx2dDZtaFFTc3RzWFNYMDkv?=
- =?utf-8?B?Z2pjUnpuOEx5dzNiS2Rnb0dtbnYxMEhiRW9XWGxBQ0daRHdnWXB6eGpjUG4r?=
- =?utf-8?B?M3QyalBLU3ZTSzlRQm1XS2tsNWFMM0VCTFNDTE9KcHJzajI2N2FJa3VkemhR?=
- =?utf-8?B?Vm5vK2NJVHNIUC81UENGY1VXL1lBcWlibVQ2U2wxRnpSaUVyWlBRdTlmdTJ1?=
- =?utf-8?B?anZvL0Jsa2lkZ2ttczROSXZydGxwM0pYQUdmK25lblJQdFRLYkJMS1lWenI2?=
- =?utf-8?B?Y2FXY1dGbGl4TjF3UWkwQkJ2MFpUOWZBcjY4TkFDMTFXclFDYUl2MXE1S1J4?=
- =?utf-8?B?SVdQMjRPcitaaXRlck5QV3h0Nzl5bzJFTkQzTUhmc0hIaFprOVBpV2xEMXFq?=
- =?utf-8?B?MjM1YWVUQUVSV0JmU3hMd0FrOGpUS3Y2RG41TzdPeXpTNUsyQ2ZaeE1jN0JF?=
- =?utf-8?B?ektTSWxzQUQzSXRldFdWeHMwMUtURFJsWm45eE1ESjdYT1lmQno4dHd0cElS?=
- =?utf-8?B?cHBGdld3emlHSk05UTNrZXdSVCtvRjZHeldycHFwMUNwV2Q4TmVjRklhQ1R3?=
- =?utf-8?B?aXBRRjJucnh2V2RrSlhBSTRmZm5tL254eXJjT0VGSjdVNWxPdW1odng3SGlw?=
- =?utf-8?B?QU9ZVEN2MnlyU2tRWUp2L1hDWmF5eStpb1BhVmpnbUVOVlBiRVNTdHZsRlFr?=
- =?utf-8?B?QmlmQVJIcTJJb1RDWmdHcVlZZnNlcmJ4Y3o2L0NudUdqQ3ozbWhMM2VkMjVv?=
- =?utf-8?B?WlZ6OXJCcEhsZDZHRFNCL2puTEUrbEUzbmdnV2dGdmsyazFBWlNNb2gwVUZ5?=
- =?utf-8?B?bUlYRmdQMkZSMjI5bDRrR1h4dFYrWWQvSVVEdkJFQ0QzL0VTYVh0endiMEdH?=
- =?utf-8?B?R2EzaStORmVMaERHRmlNTXpLbnVyQ2hudjlZT1MyN1VmNjRTdXA1ZFd4YkhP?=
- =?utf-8?B?Ty9iQzlxd0k0SmVIOHBPNEptUDNReHB5N1RqWnZmMGtveWhGTHRlelN6bzlO?=
- =?utf-8?B?UkI5YXh6Qk5IUDlUYk9zZ3NpTlFSRm05MUpPSldFblNaMmc5cnA5dVh5Qjdi?=
- =?utf-8?B?NEhkTVc0QUJzbkNhZ2owZ0gyd0hHTXZMZTA5dXBpVHBTTnBseWJNeFo5Y3Ni?=
- =?utf-8?B?UkZWYjRmdHdXUlIvbnZCZGN5SXo5a085Q2pITTQ0OEVwWFFhZ3hkVFliQkxa?=
- =?utf-8?Q?E4gt7+cGIUWKWdDMv499p/YGc?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6524cd78-e097-4977-1aa7-08dd3c0c3ab5
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 00:15:38.0224
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rOwuKtdlhlj7Xp4C1T5pR+iLKWOp7ivXcBwYolVCQlkZahqa2pSvcUu+lxgg7iFJ3WT5VgZVSDnRVvG4eCOvWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6889
+Mime-Version: 1.0
+References: <20250123190253.25891-1-fgriffo@amazon.co.uk> <c7b494d34d3e14531337311c286a9c06a99c9295.camel@infradead.org>
+Message-ID: <Z5LqeGa_G_NZ_boC@google.com>
+Subject: Re: [PATCH] KVM: x86: Update Xen TSC leaves during CPUID emulation
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Fred Griffoul <fgriffo@amazon.co.uk>, kvm@vger.kernel.org, griffoul@gmail.com, 
+	vkuznets@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jan 23, 2025, David Woodhouse wrote:
+> On Thu, 2025-01-23 at 19:02 +0000, Fred Griffoul wrote:
+>=20
+> > +static inline void kvm_xen_may_update_tsc_info(struct kvm_vcpu *vcpu,
+> > +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u32 function, u32 index,
+> > +					=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u32 *eax, u32 *ecx, u32 *edx=
+)
+>=20
+> Should this be called kvm_xen_maybe_update_tsc_info() ?=20
+>=20
+> Is it worth adding if (static_branch_unlikely(&kvm_xen_enabled.key))?=20
 
+Or add a helper?  Especially if we end up processing KVM_REQ_CLOCK_UPDATE.
 
-On 22/1/25 16:38, Xiaoyao Li wrote:
-> On 1/22/2025 11:28 AM, Chenyi Qiang wrote:
->>
->>
->> On 1/22/2025 12:35 AM, Peter Xu wrote:
->>> On Tue, Jan 21, 2025 at 09:35:26AM +0800, Chenyi Qiang wrote:
->>>>
->>>>
->>>> On 1/21/2025 2:33 AM, Peter Xu wrote:
->>>>> On Mon, Jan 20, 2025 at 06:54:14PM +0100, David Hildenbrand wrote:
->>>>>> On 20.01.25 18:21, Peter Xu wrote:
->>>>>>> On Mon, Jan 20, 2025 at 11:48:39AM +0100, David Hildenbrand wrote:
->>>>>>>> Sorry, I was traveling end of last week. I wrote a mail on the 
->>>>>>>> train and
->>>>>>>> apparently it was swallowed somehow ...
->>>>>>>>
->>>>>>>>>> Not sure that's the right place. Isn't it the (cc) machine 
->>>>>>>>>> that controls
->>>>>>>>>> the state?
->>>>>>>>>
->>>>>>>>> KVM does, via MemoryRegion->RAMBlock->guest_memfd.
->>>>>>>>
->>>>>>>> Right; I consider KVM part of the machine.
->>>>>>>>
->>>>>>>>
->>>>>>>>>
->>>>>>>>>> It's not really the memory backend, that's just the memory 
->>>>>>>>>> provider.
->>>>>>>>>
->>>>>>>>> Sorry but is not "providing memory" the purpose of "memory 
->>>>>>>>> backend"? :)
->>>>>>>>
->>>>>>>> Hehe, what I wanted to say is that a memory backend is just 
->>>>>>>> something to
->>>>>>>> create a RAMBlock. There are different ways to create a 
->>>>>>>> RAMBlock, even
->>>>>>>> guest_memfd ones.
->>>>>>>>
->>>>>>>> guest_memfd is stored per RAMBlock. I assume the state should be 
->>>>>>>> stored per
->>>>>>>> RAMBlock as well, maybe as part of a "guest_memfd state" thing.
->>>>>>>>
->>>>>>>> Now, the question is, who is the manager?
->>>>>>>>
->>>>>>>> 1) The machine. KVM requests the machine to perform the 
->>>>>>>> transition, and the
->>>>>>>> machine takes care of updating the guest_memfd state and 
->>>>>>>> notifying any
->>>>>>>> listeners.
->>>>>>>>
->>>>>>>> 2) The RAMBlock. Then we need some other Object to trigger that. 
->>>>>>>> Maybe
->>>>>>>> RAMBlock would have to become an object, or we allocate separate 
->>>>>>>> objects.
->>>>>>>>
->>>>>>>> I'm leaning towards 1), but I might be missing something.
->>>>>>>
->>>>>>> A pure question: how do we process the bios gmemfds?  I assume 
->>>>>>> they're
->>>>>>> shared when VM starts if QEMU needs to load the bios into it, but 
->>>>>>> are they
->>>>>>> always shared, or can they be converted to private later?
->>>>>>
->>>>>> You're probably looking for memory_region_init_ram_guest_memfd().
->>>>>
->>>>> Yes, but I didn't see whether such gmemfd needs conversions there.  
->>>>> I saw
->>>>> an answer though from Chenyi in another email:
->>>>>
->>>>> https://lore.kernel.org/all/fc7194ee-ed21-4f6b-bf87-147a47f5f074@intel.com/
->>>>>
->>>>> So I suppose the BIOS region must support private / share 
->>>>> conversions too,
->>>>> just like the rest part.
->>>>
->>>> Yes, the BIOS region can support conversion as well. I think 
->>>> guest_memfd
->>>> backed memory regions all follow the same sequence during setup time:
->>>>
->>>> guest_memfd is shared when the guest_memfd fd is created by
->>>> kvm_create_guest_memfd() in ram_block_add(), But it will sooner be
->>>> converted to private just after kvm_set_user_memory_region() in
->>>> kvm_set_phys_mem(). So at the boot time of cc VM, the default attribute
->>>> is private. During runtime, the vBIOS can also do the conversion if it
->>>> wants.
->>>
->>> I see.
->>>
->>>>
->>>>>
->>>>> Though in that case, I'm not 100% sure whether that could also be 
->>>>> done by
->>>>> reusing the major guest memfd with some specific offset regions.
->>>>
->>>> Not sure if I understand you clearly. guest_memfd is per-Ramblock. It
->>>> will have its own slot. So the vBIOS can use its own guest_memfd to get
->>>> the specific offset regions.
->>>
->>> Sorry to be confusing, please feel free to ignore my previous comment.
->>> That came from a very limited mindset that maybe one confidential VM 
->>> should
->>> only have one gmemfd..
->>>
->>> Now I see it looks like it's by design open to multiple gmemfds for each
->>> VM, then it's definitely ok that bios has its own.
->>>
->>> Do you know why the bios needs to be convertable?  I wonder whether 
->>> the VM
->>> can copy it over to a private region and do whatever it wants, e.g.  
->>> attest
->>> the bios being valid.  However this is also more of a pure question.. 
->>> and
->>> it can be offtopic to this series, so feel free to ignore.
->>
->> AFAIK, the vBIOS won't do conversion after it is set as private at the
->> beginning. But in theory, the VM can do the conversion at runtime with
->> current implementation. As for why make the vBIOS convertable, I'm also
->> uncertain about it. Maybe convenient for managing the private/shared
->> status by guest_memfd as it's also converted once at the beginning.
-> 
-> The reason is just that we are too lazy to implement a variant of guest 
-> memfd for vBIOS that is disallowed to be converted from private to shared.
+static inline bool kvm_xen_is_tsc_leaf(struct kvm_vcpu *vcpu, u32 function)
+{
+	return static_branch_unlikely(&kvm_xen_enabled.key) &&
+	       vcpu->arch.xen.cpuid.base &&
+	       function < vcpu->arch.xen.cpuid.limit;
+	       function =3D=3D (vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3));
+}
 
-What is the point in disallowing such conversion in QEMU? On AMD, a 
-malicious HV can try converting at any time and if the guest did not ask 
-for it, it will continue accessing those pages as private and trigger an 
-RMP fault. But if the guest asked for conversion, then it should be no 
-problem to convert to shared. What do I miss about TDX here? Thanks,
+>=20
+> > +{
+> > +	u32 base =3D vcpu->arch.xen.cpuid.base;
+> > +
+> > +	if (base && (function =3D=3D (base | XEN_CPUID_LEAF(3)))) {
 
+Pretty sure cpuid.limit needs to be checked, e.g. to avoid a false positive=
+ in
+the unlikely scenario that userspace advertised a lower limit but still fil=
+led
+the CPUID entry.
 
-> 
->>>
->>> Thanks,
->>>
->>
-> 
+> > +		if (index =3D=3D 1) {
+> > +			*ecx =3D vcpu->arch.hv_clock.tsc_to_system_mul;
+> > +			*edx =3D vcpu->arch.hv_clock.tsc_shift;
+>=20
+> Are these fields in vcpu->arch.hv_clock definitely going to be set?
 
--- 
-Alexey
+Set, yes.  Up-to-date, no.  If there is a pending KVM_REQ_CLOCK_UPDATE, e.g=
+. due
+to frequency change, KVM could emulate CPUID before processing the request =
+if
+the CPUID VM-Exit occurred before the request was made.
 
+> If so, can we have a comment to that effect? And perhaps a warning to
+> assert the truth of that claim?
+>=20
+> Before this patch, if the hv_clock isn't yet set then the guest would
+> see the original content of the leaves as set by userspace?
+
+In theory, yes, but in practice that can't happen because KVM always pends =
+a
+KVM_REQ_CLOCK_UPDATE before entering the guest (it's stupidly hard to see).
+
+On the first kvm_arch_vcpu_load(), vcpu->cpu will be -1, which results in
+KVM_REQ_GLOBAL_CLOCK_UPDATE being pending.
+
+  	if (unlikely(vcpu->cpu !=3D cpu) || kvm_check_tsc_unstable()) {
+		...
+
+		if (!vcpu->kvm->arch.use_master_clock || vcpu->cpu =3D=3D -1)
+			kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
+
+	}
+
+That in turn triggers a KVM_REQ_CLOCK_UPDATE.
+
+		if (kvm_check_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu))
+			kvm_gen_kvmclock_update(vcpu);
+
+  static void kvm_gen_kvmclock_update(struct kvm_vcpu *v)
+  {
+	struct kvm *kvm =3D v->kvm;
+
+	kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
+	schedule_delayed_work(&kvm->arch.kvmclock_update_work,
+					KVMCLOCK_UPDATE_DELAY);
+  }
+
+And in the extremely unlikely failure path, which I assume handles the case=
+ where
+TSC calibration hasn't completed, KVM requests another KVM_REQ_CLOCK_UPDATE=
+ and
+aborts VM-Enter.  So AFAICT, it's impossible to trigger CPUID emulation wit=
+hout
+first stuffing Xen CPUID.
+
+	/* Keep irq disabled to prevent changes to the clock */
+	local_irq_save(flags);
+	tgt_tsc_khz =3D get_cpu_tsc_khz();
+	if (unlikely(tgt_tsc_khz =3D=3D 0)) {
+		local_irq_restore(flags);
+		kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
+		return 1;
+	}
+
+> Now it gets zeroes if that happens?
+
+Somewhat of a tangent, if userspace is providing non-zero values, commit f4=
+22f853af03
+("KVM: x86/xen: update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present")=
+ would
+have broken userspace.  QEMU doesn't appear to stuff non-zero values and no=
+ one
+has complained, so I think we escaped this time.
+
+Jumping back to the code, if we add kvm_xen_is_tsc_leaf(), I would be a-ok =
+with
+handling the CPUID manipulations in kvm_cpuid().  I'd probably even prefer =
+it,
+because overall I think bleeding a few Xen details into common code is wort=
+h
+making the flow easier to follow.
+
+Putting it all together, something like this?  Compile tested only.
+
+---
+ arch/x86/kvm/cpuid.c | 16 ++++++++++++++++
+ arch/x86/kvm/x86.c   |  3 +--
+ arch/x86/kvm/x86.h   |  1 +
+ arch/x86/kvm/xen.c   | 23 -----------------------
+ arch/x86/kvm/xen.h   | 13 +++++++++++--
+ 5 files changed, 29 insertions(+), 27 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index edef30359c19..689882326618 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -2005,6 +2005,22 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 =
+*ebx,
+ 		} else if (function =3D=3D 0x80000007) {
+ 			if (kvm_hv_invtsc_suppressed(vcpu))
+ 				*edx &=3D ~feature_bit(CONSTANT_TSC);
++		} else if (IS_ENABLED(CONFIG_KVM_XEN) &&
++			   kvm_xen_is_tsc_leaf(vcpu, function)) {
++			/*
++			 * Update guest TSC frequency information is necessary.
++			 * Ignore failures, there is no sane value that can be
++			 * provided if KVM can't get the TSC frequency.
++			 */
++			if (kvm_check_request(KVM_REQ_CLOCK_UPDATE, vcpu))
++				kvm_guest_time_update(vcpu);
++
++			if (index =3D=3D 1) {
++				*ecx =3D vcpu->arch.hv_clock.tsc_to_system_mul;
++				*edx =3D vcpu->arch.hv_clock.tsc_shift;
++			} else if (index =3D=3D 2) {
++				*eax =3D vcpu->arch.hw_tsc_khz;
++			}
+ 		}
+ 	} else {
+ 		*eax =3D *ebx =3D *ecx =3D *edx =3D 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f61d71783d07..817a7e522935 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3173,7 +3173,7 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *=
+v,
+ 	trace_kvm_pvclock_update(v->vcpu_id, &vcpu->hv_clock);
+ }
+=20
+-static int kvm_guest_time_update(struct kvm_vcpu *v)
++int kvm_guest_time_update(struct kvm_vcpu *v)
+ {
+ 	unsigned long flags, tgt_tsc_khz;
+ 	unsigned seq;
+@@ -3256,7 +3256,6 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+ 				   &vcpu->hv_clock.tsc_shift,
+ 				   &vcpu->hv_clock.tsc_to_system_mul);
+ 		vcpu->hw_tsc_khz =3D tgt_tsc_khz;
+-		kvm_xen_update_tsc_info(v);
+ 	}
+=20
+ 	vcpu->hv_clock.tsc_timestamp =3D tsc_timestamp;
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 7a87c5fc57f1..5fdf32ba9406 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -362,6 +362,7 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcp=
+u, int irq, int inc_eip);
+ u64 get_kvmclock_ns(struct kvm *kvm);
+ uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm);
+ bool kvm_get_monotonic_and_clockread(s64 *kernel_ns, u64 *tsc_timestamp);
++int kvm_guest_time_update(struct kvm_vcpu *v);
+=20
+ int kvm_read_guest_virt(struct kvm_vcpu *vcpu,
+ 	gva_t addr, void *val, unsigned int bytes,
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index a909b817b9c0..ed5c2f088361 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -2247,29 +2247,6 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
+ 	del_timer_sync(&vcpu->arch.xen.poll_timer);
+ }
+=20
+-void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
+-{
+-	struct kvm_cpuid_entry2 *entry;
+-	u32 function;
+-
+-	if (!vcpu->arch.xen.cpuid.base)
+-		return;
+-
+-	function =3D vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3);
+-	if (function > vcpu->arch.xen.cpuid.limit)
+-		return;
+-
+-	entry =3D kvm_find_cpuid_entry_index(vcpu, function, 1);
+-	if (entry) {
+-		entry->ecx =3D vcpu->arch.hv_clock.tsc_to_system_mul;
+-		entry->edx =3D vcpu->arch.hv_clock.tsc_shift;
+-	}
+-
+-	entry =3D kvm_find_cpuid_entry_index(vcpu, function, 2);
+-	if (entry)
+-		entry->eax =3D vcpu->arch.hw_tsc_khz;
+-}
+-
+ void kvm_xen_init_vm(struct kvm *kvm)
+ {
+ 	mutex_init(&kvm->arch.xen.xen_lock);
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index f5841d9000ae..5ee7f3f1b45f 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -9,6 +9,7 @@
+ #ifndef __ARCH_X86_KVM_XEN_H__
+ #define __ARCH_X86_KVM_XEN_H__
+=20
++#include <asm/xen/cpuid.h>
+ #include <asm/xen/hypervisor.h>
+=20
+ #ifdef CONFIG_KVM_XEN
+@@ -35,7 +36,6 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
+ int kvm_xen_setup_evtchn(struct kvm *kvm,
+ 			 struct kvm_kernel_irq_routing_entry *e,
+ 			 const struct kvm_irq_routing_entry *ue);
+-void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
+=20
+ static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
+ {
+@@ -50,6 +50,14 @@ static inline void kvm_xen_sw_enable_lapic(struct kvm_vc=
+pu *vcpu)
+ 		kvm_xen_inject_vcpu_vector(vcpu);
+ }
+=20
++static inline bool kvm_xen_is_tsc_leaf(struct kvm_vcpu *vcpu, u32 function=
+)
++{
++	return static_branch_unlikely(&kvm_xen_enabled.key) &&
++	       vcpu->arch.xen.cpuid.base &&
++	       function < vcpu->arch.xen.cpuid.limit &&
++	       function =3D=3D (vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3));
++}
++
+ static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+ {
+ 	return static_branch_unlikely(&kvm_xen_enabled.key) &&
+@@ -157,8 +165,9 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcp=
+u *vcpu)
+ 	return false;
+ }
+=20
+-static inline void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
++static inline bool kvm_xen_is_tsc_leaf(struct kvm_vcpu *vcpu, u32 function=
+)
+ {
++	return false;
+ }
+ #endif
+=20
+
+base-commit: 84be94b5b6490e29a6f386cec90f8d5c6d14f0df
+--=20
 
