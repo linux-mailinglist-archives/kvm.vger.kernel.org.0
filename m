@@ -1,277 +1,457 @@
-Return-Path: <kvm+bounces-36582-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36583-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F18BFA1BF0F
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 00:36:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30322A1BF16
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 00:45:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF6DD188FFEF
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 23:36:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16249188FC85
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 23:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF54A1EEA2E;
-	Fri, 24 Jan 2025 23:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744581EEA2E;
+	Fri, 24 Jan 2025 23:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EySUwm/d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EKCs0rlc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044732B9BC
-	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 23:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF542B9BC
+	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 23:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737761769; cv=none; b=STqa3ym4USOdb8owc/VOaW+09JLIVIy+TvNwwCkOyrzb5cnsW/uTwOpPhMUKtfpJgg2JU41JiyiS6Mo+Ax/5gbGTNB/D0F80oQ4VEHIFfDH4lOP+coldI5f60BdcEkkzyNuap3qh/nvfqLcPRSnJLwYwz8IeIAv2NNZfcLfnX50=
+	t=1737762299; cv=none; b=H1GtbTsI+qlwfVuAUhBvFdbzwZLlSpwsLr5S47YrXHzWs9wI7QD/wYIz+5gnEiyoUPchj5l2oFt0FajJo2yir9t3jdf21NVSyPSW3GQPpGZ6z7ga0MwitoUPfUa7vL7qmtkkUKgTeWSeubcCBmTMAW72nW+v5+PpkMtvU2m7ylU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737761769; c=relaxed/simple;
-	bh=D0GLU8GREmbgQHc8YP//C2Qzi2ex0u88kFzgIC0HnRM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cDxD1L4VQUZwNwN2ABwxMHWDqWbIWz3yjh7xBB47m/G5U4X2rQlnbjNglB3+eqdZ6GKrwtAqFjsD1m753XRGTQemHKA63g9khfB6lbAoV6CMVlPGDXcPUh1KFme+rUDHsDiTfNyMYZV2GHfR4vrKWaAG8vnILBrBt8Boqq4a/xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EySUwm/d; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737761766;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A32pAWHZZ0hQgbLXQptrQMsflGlYd7oIEavcz3xQziw=;
-	b=EySUwm/d7YvC5XYGFxwAzayhPId40li6B3bPGte1hc+wnP366A9ZNNMFCCNOSnsrsScTON
-	IVpWt84W3eYVqzoXijqWST++MlIR9AhJkDENdwdZeSluCtlR0x2j7mHc1wy7NtkZTW4XOC
-	avtGTcowfgssR2Y3bmHIGrBY/xXUMm0=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-54-oIJnewBOOoGf5zMA0jHAjg-1; Fri, 24 Jan 2025 18:36:05 -0500
-X-MC-Unique: oIJnewBOOoGf5zMA0jHAjg-1
-X-Mimecast-MFC-AGG-ID: oIJnewBOOoGf5zMA0jHAjg
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6d884999693so42716446d6.0
-        for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 15:36:05 -0800 (PST)
+	s=arc-20240116; t=1737762299; c=relaxed/simple;
+	bh=rUr16Gh2E03IjABERwE87pz2eo3qnk7+IEb2BAuflY4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ffVwE1FxLDqZtyj9CUYRSJkDWtm9VwlsgKRPWvwUaABln0QZ2YhJfVdSmgn81wzNLlxD/zhGZ6Sg6VUgpXFaAYRXU33rrxMxiS006ezRimO3StTbvrsmTYQ9xFEhhNg4y9dSfk13frS9XIE5ckeIjvxlw4NT4NOHCnTiAFzlLHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EKCs0rlc; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21640607349so62156065ad.0
+        for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 15:44:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737762297; x=1738367097; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=je/I47EYUB+PpcUZ1/0QwgtzzM9PYOHzghBx3MDQBGw=;
+        b=EKCs0rlcIhueSH9QMfuTYE0G3YCHCF2ho/HLVGhi9Q+NGJJwgxd0G7iSKFPk+UovbG
+         V3TyHwvN47Py8HJsG+gjooXDVP7NJrLUXgQ7LXsMuHV3Sd1KMd62c52r5uN0pNgFkh6J
+         JIZ1m/yl5k2JY6bOqBbrs4JH91qKLX1PuXpPV9+WIoiMho/qJ/09j02I+pZT5iPZrzBs
+         YRsUWORxAqNZm2S7l0fAi7aNkr5jFEmfBy2Pp9UypYBxXiq6c9IBdx8+q5/VYTMOVN6/
+         O20/qG+KzFpdZJBPjOWgdzO6nwZ1WkcyN1e9w/4x6kl+HM6a0NHYhODUyMKPIwu7Pm2A
+         IYMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737761765; x=1738366565;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=A32pAWHZZ0hQgbLXQptrQMsflGlYd7oIEavcz3xQziw=;
-        b=FyeewAe6CzfylcndimwolOkrMLYCJx78Arj4wZVE96EVAMYGc9UopcW97A2MFY4QHg
-         dkgtKWsaGZKhumUHyiwKO5X0bbg5z6TCTjh5qU+JtNCvRrbi8WNA9l7Lb5swkfTvng8k
-         foqkgwOi2+zBNHv8pO4I/4LRyeCo05vSNLvY97bP+jSJPGaXhViZN/a7/k7jZ5t15Gp+
-         m4inMtnNreIZD8HNF2DVE8Bmuh8hUIqoE9enztLvfQQQeOs7b7LKwtx4JTgvMkbn/PyD
-         kNCfsHq5avSMvByhSvmT8KVD/xp9DhIo9xGmue/Khg+HzDhsxAFl8nSfnBwKIbzMkbdd
-         mvIw==
-X-Gm-Message-State: AOJu0YxzPRj+gHCuNp3AnULqHntUu3sAqQ5HmjT9AhO+YcYtaiNzavDw
-	cNdwlSmeOm3AOXqwJQNuqDdxgCMwXrOuCstIb9jm2J9UExE2GAw+2N0KV0ajoRU1hIjxoxqKaIq
-	EmX28/esNBCQJ6thR+LabNXz+q0hNqQSKzLpevTHMqyToC+0KDw==
-X-Gm-Gg: ASbGncuWmgfl69FWIqfR29ShrZTlu2eUd6GNJNMyEU8bsJaIWddzailqgIgflat43MK
-	heOyV5Gvo612W+Kx0zZk9DJ36+o7C/PaZL3gXjETVdZIEf2T1kofU08ziTllbdb1Lrd5QvrtI5R
-	k/kRQEggFihPBLNd0FODTb2Zjy++vTHQYQNwjc5vIaN6AYi697j6yykVHYVZjxJAUbBp/N0crM0
-	YrZknvICBG1RQ6cB2ij1hbObq31mjdM3vZeC0noxthDJ8x/rYe1cK0LA4cejgAcDVyQUMKHt7cs
-	XWgZ
-X-Received: by 2002:a05:6214:1306:b0:6cb:e648:863e with SMTP id 6a1803df08f44-6e1b2235398mr467693566d6.43.1737761764797;
-        Fri, 24 Jan 2025 15:36:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGZTCC82u8gha8aTTvVH0C31HiSNCkJc/KsrvWlHVWPziBYrJs6pXOOxSJ6nbFj4xAsNPNUtg==
-X-Received: by 2002:a05:6214:1306:b0:6cb:e648:863e with SMTP id 6a1803df08f44-6e1b2235398mr467693216d6.43.1737761764379;
-        Fri, 24 Jan 2025 15:36:04 -0800 (PST)
-Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e66b67debsm14930451cf.55.2025.01.24.15.36.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jan 2025 15:36:03 -0800 (PST)
-Message-ID: <f7b73f3b65377b7fd28f1f4764ea18f98056c51a.camel@redhat.com>
-Subject: Re: vmx_pmu_caps_test fails on Skylake based CPUS due to read only
- LBRs
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Fri, 24 Jan 2025 18:36:03 -0500
-In-Reply-To: <Z5Fc4d5bVf5oVlOk@google.com>
-References: <c9d8269bff69f6359731d758e3b1135dedd7cc61.camel@redhat.com>
-	 <Zx-z5sRKCXAXysqv@google.com>
-	 <948408887cbe83cbcf05452a53d33fb5aaf79524.camel@redhat.com>
-	 <Z5BDr2mm57F0vfax@google.com>
-	 <dd128607c0306d21e57994ffb964514728b92f29.camel@redhat.com>
-	 <Z5Fc4d5bVf5oVlOk@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1737762297; x=1738367097;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=je/I47EYUB+PpcUZ1/0QwgtzzM9PYOHzghBx3MDQBGw=;
+        b=vbbUKlQUzztQYlytx0cHWMSFQOJ0i5fcpCJ0esuUTWFYmnU1gqyEalr/liI5wpufT3
+         wyWFFYxoSxdm/pmtXcenE+JCWmjw3Uk147GHJ5imO0im6Sy80TmWnA+bIO8UKseD18He
+         3AwmAZ9hwP3ch+vcfe0KjkS6rWxzH3LIZlGh38wvxgc/7Jv0a9Uy20b+5bejr4I4obgA
+         IfOT14tHl82Erqz9/8Iln9muLC3yRFtqC4zDo7IEwdk/O95YXbColB6qBGqRnGtQgrQf
+         KNxAqyW5k2/SaMIy/3hChg31n0I8Ts3STeDKqhJmA7qyeKKIvjLvBPuv3e1Vgsv306fC
+         2uoA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVMIMV+WU5JwkiiNtvm0/dQdEao/Dd1TpJ78k/+g20RFm7wwCc/fqwQTiTqOqGEqF/V3o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxemp77Vxt86PdbGixkp3AlLTyPODVTZnLwy0S8ysfdLi1Ru7c8
+	zohG2HpVdtRFpYaKwLmrLaQu0IP86+MuHtQ7dNNoXJ4GMibodTUs2oSMFk7myT87CnNnsnQDuq+
+	LaA==
+X-Google-Smtp-Source: AGHT+IGB4Wp3yE5PYJMqITriXU/f4vIMrdEJvPGjRSXHmcRLl3Nat0H8fwN+OOEdwW6nejbdK0FAMPGy3hY=
+X-Received: from pfd10.prod.google.com ([2002:a05:6a00:a80a:b0:725:d350:a304])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:918b:b0:1e0:c50c:9842
+ with SMTP id adf61e73a8af0-1eb2157fce9mr59488905637.31.1737762297203; Fri, 24
+ Jan 2025 15:44:57 -0800 (PST)
+Date: Fri, 24 Jan 2025 15:44:55 -0800
+In-Reply-To: <CABgObfa4TKcj-d3Spw+TAE7ZfO8wFGJebkW3jMyFY2TrKxMuSw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250124191109.205955-1-pbonzini@redhat.com> <20250124191109.205955-2-pbonzini@redhat.com>
+ <Z5Pz7Ga5UGt88zDc@google.com> <CABgObfa4TKcj-d3Spw+TAE7ZfO8wFGJebkW3jMyFY2TrKxMuSw@mail.gmail.com>
+Message-ID: <Z5QhGndjNwYdnIZF@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86: fix usage of kvm_lock in set_nx_huge_pages()
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 2025-01-22 at 13:02 -0800, Sean Christopherson wrote:
-> On Wed, Jan 22, 2025, Maxim Levitsky wrote:
-> > On Tue, 2025-01-21 at 17:02 -0800, Sean Christopherson wrote:
-> > > On Sun, Nov 03, 2024, Maxim Levitsky wrote:
-> > > > On Mon, 2024-10-28 at 08:55 -0700, Sean Christopherson wrote:
-> > > > > On Fri, Oct 18, 2024, Maxim Levitsky wrote:
-> > > > > > Our CI found another issue, this time with vmx_pmu_caps_test.
-> > > > > > 
-> > > > > > On 'Intel(R) Xeon(R) Gold 6328HL CPU' I see that all LBR msrs (from/to and
-> > > > > > TOS), are always read only - even when LBR is disabled - once I disable the
-> > > > > > feature in DEBUG_CTL, all LBR msrs reset to 0, and you can't change their
-> > > > > > value manually.  Freeze LBRS on PMI seems not to affect this behavior.
-> > > 
-> > > ...
-> > > 
-> > > > When DEBUG_CTL.LBR=1, the LBRs do work, I see all the registers update,
-> > > > although TOS does seem to be stuck at one value, but it does change
-> > > > sometimes, and it's non zero.
-> > > > 
-> > > > The FROM/TO do show healthy amount of updates 
-> > > > 
-> > > > Note that I read all msrs using 'rdmsr' userspace tool.
-> > > 
-> > > I'm pretty sure debugging via 'rdmsr', i.e. /dev/msr, isn't going to work.  I
-> > > assume perf is clobbering LBR MSRs on context switch, but I haven't tracked that
-> > > down to confirm (the code I see on inspecition is gated on at least one perf
-> > > event using LBRs).  My guess is that there's a software bug somewhere in the
-> > > perf/KVM exchange.
-> > > 
-> > > I confirmed that using 'rdmsr' and 'wrmsr' "loses" values, but that hacking KVM
-> > > to read/write all LBRs during initialization works with LBRs disabled.
-
-Hi!
-
-I finally got to the very bottom of this:
-
-First of all, your assumption that the kernel resets LBR related msrs on context switch after 'wrmsr'
-program finishes execution is wrong, because the kernel will only do this if it *itself*
-enables the LBR feature (that is when something like 'perf', uses a perf counter with a lbr call stack).
-
-Writes that 'wrmsr' tool does are not something that kernel expects so it doesn't
-do anything in this case.
-
-What is happening instead, is something completely different: Turns out that to shave off something like 
-50 nanoseconds, off the deep C-state entry/exit latency, some Intel CPU don't preserve LBR stack
-values over these C-state entries.
-
-Kernel PMU code even has some special code which works this around.
-
-So, right after 'wrmsr' execution the CPU on a otherwise idle host finishes, the CPU will enter a low power state,
-and 'poof', LBR state is gone.
-
-To see this for yourself, just disable C-states
-
-# cpupower idle-set --disable-by-latency 0
-
-And suddenly wrmsr reads/writes the LBR stack start to work normally as expected.
-
-This also in particular explains why I had no problems reading/writing LBR stack msrs on some older CPUs.
-
-> > 
-> > Hi,
-> > 
-> > OK, this is a very good piece of the puzzle.
-> > 
-> > I didn't expect context switch to interfere with this because I thought that
-> > perf code won't touch LBRs if they are not in use. 
-> > rdmsr/wrmsr programs don't do much except doing the instruction in the kernel space.
-> > 
-> > Is it then possible that the the fact that LBRs were left enabled by BIOS is the
-> > culprit of the problem?
-> > 
-> > This particular test never enables LBRs, not anything in the system does this,
+On Fri, Jan 24, 2025, Paolo Bonzini wrote:
+> Il ven 24 gen 2025, 21:11 Sean Christopherson <seanjc@google.com> ha scritto:
+> > Heh, except it's all kinds of broken.
 > 
-> Ugh, but it does.  On writes to any LBR, including LBR_TOS, KVM creates a "virtual"
-> LBR perf event.  KVM then relies on perf to context switch LBR MSRs, i.e. relies
-> on perf to load the guest's values into hardware.  At least, I think that's what
-> is supposed to happen.  AFAIK, the perf-based LBR support has never been properly
-> document[*].
+> Yes, I didn't even try.
 > 
-> Anyways, my understanding of intel_pmu_handle_lbr_msrs_access() is that if the
-> vCPU's LBR perf event is scheduled out or can't be created, the guest's value is
-> effectively lost.  Again, I don't know the "rules" for the LBR perf event, but
-> it wouldn't suprise me if your CI fails because something in the host conflicts
-> with KVM's LBR perf event.
-
-Actually you are partially wrong here too (although BIOS can be considered 'something on the host').
-
-I was able to prove that the reason why the unit test fails *is* because BIOS left LBRs enabled:
-
-First of all, setting LBR bit manually in DEBUG_CTL does trigger this bug 
-(I use a different machine now, which doesn't have the bios bug):
-
-
-# wrmsr -a 0x1d9 0x4001
-# ./x86_64/vmx_pmu_caps_test 
-Random seed: 0x6b8b4567
-TAP version 13
-1..6
-# Starting 6 tests from 1 test cases.
-#  RUN           vmx_pmu_caps.guest_wrmsr_perf_capabilities ...
-#            OK  vmx_pmu_caps.guest_wrmsr_perf_capabilities
-ok 1 vmx_pmu_caps.guest_wrmsr_perf_capabilities
-#  RUN           vmx_pmu_caps.basic_perf_capabilities ...
-#            OK  vmx_pmu_caps.basic_perf_capabilities
-ok 2 vmx_pmu_caps.basic_perf_capabilities
-#  RUN           vmx_pmu_caps.fungible_perf_capabilities ...
-#            OK  vmx_pmu_caps.fungible_perf_capabilities
-ok 3 vmx_pmu_caps.fungible_perf_capabilities
-#  RUN           vmx_pmu_caps.immutable_perf_capabilities ...
-#            OK  vmx_pmu_caps.immutable_perf_capabilities
-ok 4 vmx_pmu_caps.immutable_perf_capabilities
-#  RUN           vmx_pmu_caps.lbr_perf_capabilities ...
-==== Test Assertion Failure ====
-  x86_64/vmx_pmu_caps_test.c:202: r == v
-  pid=8415 tid=8415 errno=0 - Success
-     1	0x0000000000404301: __suite_lbr_perf_capabilities at vmx_pmu_caps_test.c:202
-     2	 (inlined by) vmx_pmu_caps_lbr_perf_capabilities at vmx_pmu_caps_test.c:194
-     3	 (inlined by) wrapper_vmx_pmu_caps_lbr_perf_capabilities at vmx_pmu_caps_test.c:194
-     4	0x000000000040511a: __run_test at kselftest_harness.h:1240
-     5	0x0000000000402b95: test_harness_run at kselftest_harness.h:1310
-     6	 (inlined by) main at vmx_pmu_caps_test.c:246
-     7	0x00007f56ba2295cf: ?? ??:0
-     8	0x00007f56ba22967f: ?? ??:0
-     9	0x0000000000402e44: _start at ??:?
-  Set MSR_LBR_TOS to '0x7', got back '0xc'
-# lbr_perf_capabilities: Test failed
-#          FAIL  vmx_pmu_caps.lbr_perf_capabilities
-not ok 5 vmx_pmu_caps.lbr_perf_capabilities
-#  RUN           vmx_pmu_caps.perf_capabilities_unsupported ...
-#            OK  vmx_pmu_caps.perf_capabilities_unsupported
-ok 6 vmx_pmu_caps.perf_capabilities_unsupported
-# FAILED: 5 / 6 tests passed.
-# Totals: pass:5 fail:1 xfail:0 xpass:0 skip:0 error:0
-
-
-Secondary I went over all places in the kernel and all of them take care to preserve DEBUG_CTL and only set/clear specific bits.
-
-__intel_pmu_lbr_enable() and __intel_pmu_lbr_enable() are practically the only two places where DEBUGCTLMSR_LBR bit is touched,
-and the test doesn't trigger them. Most likely because the test uses special 'INTEL_FIXED_VLBR_EVENT' perf event
-(see intel_pmu_create_guest_lbr_event) which is not enabled while in host mode.
-
-To double check this I traced all writes to DEBUG_CTL msr during this test and the only write is done during 'guest_wrmsr_perf_capabilities'
-subtest, by vmx_vcpu_run() which just restores the value that the msr had prior to VM entry.
-
-So, why the value that BIOS sets survives? Because as I said all code that touches DEBUG_CTL takes care to preserve all bits but
-the bit which is changed, LBRs are never enabled on the host, and even the guest entry preserves host DEBUG_CTL.
-Therefore the value written by BIOS survives.
-
-So we end up with the test writing to LBR_TOS while LBRs are unexpectedly enabled, so it's not a surprise that when the test
-reads back the value written, it will differ, and the test will rightfully fail.
-
-Since we have seen this in CI, and you saw it too in your CI, I think this BIOS bug is not that rare, and so I suggest to stick 
-'wrmsrl(MSR_IA32_DEBUGCTLMSR, 0)' somewhere early in a kernel boot code
-or at least clear the DEBUGCTLMSR_LBR bit.
-
-I haven't found a very good place to put this, in a way that I can be sure that x86 maintainers 
-won't reject it, so I am open to your suggestions.
-
-
-Best regards,
-	Maxim Levitsky
-
-
+> > IMO, biting the bullet and converting to
+> > an SRCU-protected list is going to be far less work in the long run.
 > 
-> [*] https://lore.kernel.org/all/Y9RUOvJ5dkCU9J8C@google.com
+> I did try a long SRCU critical section and it was unreviewable. It
+> ends up a lot less manageable than just making the lock a leaf,
+> especially as the lock hierarchy spans multiple subsystems (static
+> key, KVM, cpufreq---thanks CPU hotplug lock...).
+
+I'm not following.  If __kvmclock_cpufreq_notifier() and set_nx_huge_pages()
+switch to SRCU, then the deadlock goes away (it might even go away if just one
+of those two switches).
+
+SRCU readers would only interact with kvm_destroy_vm() from a locking perspective,
+and if that's problematic then we would already have a plethora of issues.
+
+> I also didn't like adding a synchronization primitive that's... kinda
+> single-use, but that would not be a blocker of course.
+
+It would be single use in the it only protects pure reader of vm_list, but there
+are plenty of those users.
+
+> So the second attempt was regular RCU, which looked a lot like this
+> patch. I started writing all the dances to find a struct kvm that
+> passes kvm_get_kvm_safe() before you do rcu_read_unlock() and drop the
+> previous one (because you cannot do kvm_put_kvm() within the RCU read
+> side) and set aside the idea, incorrectly thinking that they were not
+> needed with kvm_lock. Plus I didn't like having to keep alive a bunch
+> of data for a whole grace period if call_rcu() is used.
 > 
+> So for the third attempt I could have chosen between dropping the SRCU
+> or just using kvm_lock. I didn't even think of SRCU to be honest,
+> because everything so far looked so bad, but it does seem a little
+> better than RCU. At least, if kvm_destroy_vm() uses call_srcu(), you
+> can call kvm_put_kvm() within srcu_read_lock()...srcu_read_unlock().
+> It would look something like
+> 
+>   list_for_each_entry_srcu(kvm, &vm_list, vm_list, 1) {
+>     if (!kvm_get_kvm_safe(kvm))
 
+Unless I'm missing something, we shouldn't need to take a reference so long as
+SRCU is synchronized before destroying any part of the VM.  If we don't take a
+reference, then we don't need to deal with the complexity of kvm_put_kvm()
+creating a recursive lock snafu.
 
+This is what I'm thinking, lightly tested...
 
+---
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 24 Jan 2025 15:15:05 -0800
+Subject: [PATCH] KVM: Use an SRCU lock to protect readers of vm_list
 
+Introduce a global SRCU lock to protect KVM's global list of VMs, and use
+it in all locations that currently take kvm_lock purely to prevent a VM
+from being destroyed.
 
+Keep using kvm_lock for flows that need to prevent VMs from being created,
+as SRCU synchronization only guards against use-after-free, it doesn't
+ensure a stable vm_list for readers.
+
+This fixes a largely theoretical deadlock where:
+
+  - __kvm_set_memory_region() waits for kvm->srcu with kvm->slots_lock taken
+  - set_nx_huge_pages() waits for kvm->slots_lock with kvm_lock taken
+  - __kvmclock_cpufreq_notifier() waits for kvm_lock with cpu_hotplug_lock taken
+  - KVM_RUN waits for cpu_hotplug_lock with kvm->srcu taken
+
+and therefore __kvm_set_memory_region() never completes
+synchronize_srcu(&kvm->srcu).
+
+  __kvm_set_memory_region()
+    lock(&kvm->slots_lock)
+                           set_nx_huge_pages()
+                             lock(kvm_lock)
+                             lock(&kvm->slots_lock)
+                                                     __kvmclock_cpufreq_notifier()
+                                                       lock(cpu_hotplug_lock)
+                                                       lock(kvm_lock)
+                                                                                   lock(&kvm->srcu)
+                                                                                   kvm_lapic_set_base()
+                                                                                     static_branch_inc()
+                                                                                       lock(cpu_hotplug_lock)
+  sync(&kvm->srcu)
+
+Opportunistically add macros to walk the list of VMs, and the array of
+vCPUs in each VMs, to cut down on the amount of boilerplate.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c   | 19 +++++++++++------
+ arch/x86/kvm/x86.c       | 36 +++++++++++++++++--------------
+ include/linux/kvm_host.h |  9 ++++++++
+ virt/kvm/kvm_main.c      | 46 +++++++++++++++++++++++++---------------
+ 4 files changed, 71 insertions(+), 39 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 74fa38ebddbf..f5b7ceb7ca0e 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7127,6 +7127,10 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+ 	} else if (sysfs_streq(val, "never")) {
+ 		new_val = 0;
+ 
++		/*
++		 * Take kvm_lock to ensure no VMs are *created* before the flag
++		 * is set.  vm_list_srcu only protect VMs being deleted.
++		 */
+ 		mutex_lock(&kvm_lock);
+ 		if (!list_empty(&vm_list)) {
+ 			mutex_unlock(&kvm_lock);
+@@ -7142,17 +7146,19 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+ 
+ 	if (new_val != old_val) {
+ 		struct kvm *kvm;
++		int idx;
+ 
+-		mutex_lock(&kvm_lock);
++		idx = srcu_read_lock(&vm_list_srcu);
+ 
+-		list_for_each_entry(kvm, &vm_list, vm_list) {
++		kvm_for_each_vm_srcu(kvm) {
+ 			mutex_lock(&kvm->slots_lock);
+ 			kvm_mmu_zap_all_fast(kvm);
+ 			mutex_unlock(&kvm->slots_lock);
+ 
+ 			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
+ 		}
+-		mutex_unlock(&kvm_lock);
++
++		srcu_read_unlock(&vm_list_srcu, idx);
+ 	}
+ 
+ 	return 0;
+@@ -7275,13 +7281,14 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
+ 	if (is_recovery_enabled &&
+ 	    (!was_recovery_enabled || old_period > new_period)) {
+ 		struct kvm *kvm;
++		int idx;
+ 
+-		mutex_lock(&kvm_lock);
++		idx = srcu_read_lock(&vm_list_srcu);
+ 
+-		list_for_each_entry(kvm, &vm_list, vm_list)
++		kvm_for_each_vm_srcu(kvm)
+ 			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
+ 
+-		mutex_unlock(&kvm_lock);
++		srcu_read_unlock(&vm_list_srcu, idx);
+ 	}
+ 
+ 	return err;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b2d9a16fd4d3..8fb49237d179 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9428,6 +9428,11 @@ static void kvm_hyperv_tsc_notifier(void)
+ 	struct kvm *kvm;
+ 	int cpu;
+ 
++	/*
++	 * Take kvm_lock, not just vm_list_srcu, trevent new VMs from coming
++	 * along in the middle of the update and not getting the in-progress
++	 * request.
++	 */
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list)
+ 		kvm_make_mclock_inprogress_request(kvm);
+@@ -9456,7 +9461,7 @@ static void __kvmclock_cpufreq_notifier(struct cpufreq_freqs *freq, int cpu)
+ {
+ 	struct kvm *kvm;
+ 	struct kvm_vcpu *vcpu;
+-	int send_ipi = 0;
++	int send_ipi = 0, idx;
+ 	unsigned long i;
+ 
+ 	/*
+@@ -9500,17 +9505,16 @@ static void __kvmclock_cpufreq_notifier(struct cpufreq_freqs *freq, int cpu)
+ 
+ 	smp_call_function_single(cpu, tsc_khz_changed, freq, 1);
+ 
+-	mutex_lock(&kvm_lock);
+-	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		kvm_for_each_vcpu(i, vcpu, kvm) {
+-			if (vcpu->cpu != cpu)
+-				continue;
+-			kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
+-			if (vcpu->cpu != raw_smp_processor_id())
+-				send_ipi = 1;
+-		}
++	idx = srcu_read_lock(&vm_list_srcu);
++	kvm_for_each_vcpu_in_each_vm(kvm, vcpu, i) {
++		if (vcpu->cpu != cpu)
++			continue;
++
++		kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
++		if (vcpu->cpu != raw_smp_processor_id())
++			send_ipi = 1;
+ 	}
+-	mutex_unlock(&kvm_lock);
++	srcu_read_unlock(&vm_list_srcu, idx);
+ 
+ 	if (freq->old < freq->new && send_ipi) {
+ 		/*
+@@ -9588,13 +9592,13 @@ static void pvclock_gtod_update_fn(struct work_struct *work)
+ 	struct kvm *kvm;
+ 	struct kvm_vcpu *vcpu;
+ 	unsigned long i;
++	int idx;
+ 
+-	mutex_lock(&kvm_lock);
+-	list_for_each_entry(kvm, &vm_list, vm_list)
+-		kvm_for_each_vcpu(i, vcpu, kvm)
+-			kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
++	idx = srcu_read_lock(&vm_list_srcu);
++	kvm_for_each_vcpu_in_each_vm(kvm, vcpu, i)
++		kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
++	srcu_read_unlock(&vm_list_srcu, idx);
+ 	atomic_set(&kvm_guest_has_master_clock, 0);
+-	mutex_unlock(&kvm_lock);
+ }
+ 
+ static DECLARE_WORK(pvclock_gtod_work, pvclock_gtod_update_fn);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9df590e8f3da..0d0edb697160 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -193,6 +193,11 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
+ 
+ extern struct mutex kvm_lock;
+ extern struct list_head vm_list;
++extern struct srcu_struct vm_list_srcu;
++
++#define kvm_for_each_vm_srcu(__kvm)				\
++	list_for_each_entry_srcu(__kvm, &vm_list, vm_list,	\
++				 srcu_read_lock_held(&vm_list_srcu))
+ 
+ struct kvm_io_range {
+ 	gpa_t addr;
+@@ -1001,6 +1006,10 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
+ 	return NULL;
+ }
+ 
++#define kvm_for_each_vcpu_in_each_vm(__kvm, __vcpu, __i)		\
++	kvm_for_each_vm_srcu(__kvm)					\
++		kvm_for_each_vcpu(__i, __vcpu, __kvm)
++
+ void kvm_destroy_vcpus(struct kvm *kvm);
+ 
+ void vcpu_load(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e0b9d6dd6a85..7fcc4433bf35 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -109,6 +109,7 @@ module_param(allow_unsafe_mappings, bool, 0444);
+ 
+ DEFINE_MUTEX(kvm_lock);
+ LIST_HEAD(vm_list);
++DEFINE_SRCU(vm_list_srcu);
+ 
+ static struct kmem_cache *kvm_vcpu_cache;
+ 
+@@ -1261,13 +1262,21 @@ static void kvm_destroy_vm(struct kvm *kvm)
+ 	int i;
+ 	struct mm_struct *mm = kvm->mm;
+ 
++	mutex_lock(&kvm_lock);
++	list_del(&kvm->vm_list);
++	mutex_unlock(&kvm_lock);
++
++	/*
++	 * Ensure all readers of the global list go away before destroying any
++	 * aspect of the VM.  After this, the VM object is reachable only via
++	 * this task and notifiers that are registered to the VM itself.
++	 */
++	synchronize_srcu(&vm_list_srcu);
++
+ 	kvm_destroy_pm_notifier(kvm);
+ 	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
+ 	kvm_destroy_vm_debugfs(kvm);
+ 	kvm_arch_sync_events(kvm);
+-	mutex_lock(&kvm_lock);
+-	list_del(&kvm->vm_list);
+-	mutex_unlock(&kvm_lock);
+ 	kvm_arch_pre_destroy_vm(kvm);
+ 
+ 	kvm_free_irq_routing(kvm);
+@@ -6096,14 +6105,16 @@ static int vm_stat_get(void *_offset, u64 *val)
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+ 	u64 tmp_val;
++	int idx;
+ 
+ 	*val = 0;
+-	mutex_lock(&kvm_lock);
+-	list_for_each_entry(kvm, &vm_list, vm_list) {
++	idx = srcu_read_lock(&vm_list_srcu);
++	kvm_for_each_vm_srcu(kvm) {
+ 		kvm_get_stat_per_vm(kvm, offset, &tmp_val);
+ 		*val += tmp_val;
+ 	}
+-	mutex_unlock(&kvm_lock);
++	srcu_read_unlock(&vm_list_srcu, idx);
++
+ 	return 0;
+ }
+ 
+@@ -6111,15 +6122,15 @@ static int vm_stat_clear(void *_offset, u64 val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
++	int idx;
+ 
+ 	if (val)
+ 		return -EINVAL;
+ 
+-	mutex_lock(&kvm_lock);
+-	list_for_each_entry(kvm, &vm_list, vm_list) {
++	idx = srcu_read_lock(&vm_list_srcu);
++	kvm_for_each_vm_srcu(kvm)
+ 		kvm_clear_stat_per_vm(kvm, offset);
+-	}
+-	mutex_unlock(&kvm_lock);
++	srcu_read_unlock(&vm_list_srcu, idx);
+ 
+ 	return 0;
+ }
+@@ -6132,14 +6143,15 @@ static int vcpu_stat_get(void *_offset, u64 *val)
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+ 	u64 tmp_val;
++	int idx;
+ 
+ 	*val = 0;
+-	mutex_lock(&kvm_lock);
+-	list_for_each_entry(kvm, &vm_list, vm_list) {
++	idx = srcu_read_lock(&vm_list_srcu);
++	kvm_for_each_vm_srcu(kvm) {
+ 		kvm_get_stat_per_vcpu(kvm, offset, &tmp_val);
+ 		*val += tmp_val;
+ 	}
+-	mutex_unlock(&kvm_lock);
++	srcu_read_unlock(&vm_list_srcu, idx);
+ 	return 0;
+ }
+ 
+@@ -6147,15 +6159,15 @@ static int vcpu_stat_clear(void *_offset, u64 val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
++	int idx;
+ 
+ 	if (val)
+ 		return -EINVAL;
+ 
+-	mutex_lock(&kvm_lock);
+-	list_for_each_entry(kvm, &vm_list, vm_list) {
++	idx = srcu_read_lock(&vm_list_srcu);
++	kvm_for_each_vm_srcu(kvm)
+ 		kvm_clear_stat_per_vcpu(kvm, offset);
+-	}
+-	mutex_unlock(&kvm_lock);
++	srcu_read_unlock(&vm_list_srcu, idx);
+ 
+ 	return 0;
+ }
+
+base-commit: eb723766b1030a23c38adf2348b7c3d1409d11f0
+-- 
 
