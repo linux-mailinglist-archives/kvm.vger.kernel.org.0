@@ -1,122 +1,95 @@
-Return-Path: <kvm+bounces-36467-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36468-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD210A1AFF5
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 06:36:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28FCA1B027
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 06:57:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 801B53AB728
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 05:36:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFFA61676DF
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 05:57:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 791101D7994;
-	Fri, 24 Jan 2025 05:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 041271D88D0;
+	Fri, 24 Jan 2025 05:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Saxq+XR1"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QJx1qRdP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2046.outbound.protection.outlook.com [40.107.223.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF59917FE
-	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 05:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C66258A
+	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 05:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737697009; cv=fail; b=Tiz0u38ZsfpLcW+t2av3X1k8H8x4H1nmjUK2+1Bkz5icjOx/9xKU8vbtYHBdmIKBYcocRwJDfLvYY/KeUazD8euKk8j/HYhlP67AX4vD/kkFY49uvrLYpOOtsoEDS5B04lV4+ma8lYadJy0w1Dq+YSL9A4YAe/6rAZnkmlx9cp0=
+	t=1737698226; cv=fail; b=q+6ZhQIhwub39/C7yqTZV6AJYRAVdQgQrxk+EBIrySZ71/YZUBXwYjxUodjnaCTuGSHWs1zLXtQ9UbByeNFp0IFnsw1wGMA6Y/GYcQDwz9RzBiBcml1M+NAuFfsdiKhP4d+HkK0JlAAXErtJnlZiW1oB6AUmoBHgZ3liNTeSJDE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737697009; c=relaxed/simple;
-	bh=PFID4S/s6yeg+ryipQG6V6YdD+VjYn+1R1AfYZI6qYs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=QMlRQKaC5Ckle/mPJtVXYjxkV2GcJkAbth2XEaAMm1Zx4ARDiprMDpv4Ke5UUHoAdI/O3FDTrxKl83UHdfPTFw6We4HeBgQFOoJTWPyN2YLVXO0lbTpIcaBLhiQEDlosc0AS3WmyeuHMVHTZ1d4vWPec71ih3vFhTNQWkzWf+8k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Saxq+XR1; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737697008; x=1769233008;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=PFID4S/s6yeg+ryipQG6V6YdD+VjYn+1R1AfYZI6qYs=;
-  b=Saxq+XR10IS3/gMzXx6OFS5cX3qM7fpwjWaHheWIj56z2Ju7BUk+p6Iu
-   1bqh/+6dCz44QFngYqfK6Hz8XjAzUr7hRlnL3TKLbemlhGiVovO9DZQzR
-   KGsB12DYvtuK9Zy8V1FzVytE8FyQ5oOk3Y+NC+60G8iPCshLJaukRjgKH
-   qJDggX/mUU8NKbN0pgU02Ero06bKpQD012ReDPBijFcLTHjZ7uDvFfsc2
-   67xyWmUo12wTr2klgZNGr8GN3jtzDpyTph1An24e1sMDeREKq5Lsqiug1
-   IP3fzo/NuZz0rmWPdhYmpDiDQTTw81zhcUo5mjjEpVjRiRuhntbZciGBi
-   w==;
-X-CSE-ConnectionGUID: xMMlvyx5S3uocSzt5Ui5bQ==
-X-CSE-MsgGUID: ahbBW50sQtWPbUcMtVI5jA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="38323695"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="38323695"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 21:36:47 -0800
-X-CSE-ConnectionGUID: mUoLboYBRhau03FPxC7YSA==
-X-CSE-MsgGUID: xc/3eRUiSwGVd9OmRcu2Ng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,230,1732608000"; 
-   d="scan'208";a="107597954"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Jan 2025 21:36:47 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 23 Jan 2025 21:36:46 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Thu, 23 Jan 2025 21:36:46 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 23 Jan 2025 21:36:46 -0800
+	s=arc-20240116; t=1737698226; c=relaxed/simple;
+	bh=B2m+gnrkVVDZFWarCi00ei/2XRJ9M2HE1Vib7xPD8MY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=YDwdbj+hzY2ZyYYs1D/CL4vX5Q9dPI/8FdlKisNbvsk0N5JvAlxAodxIVyZw6Ogjid43lXLewknP+UxdgpQnNp1wy/PMwFSGVQX4VI3EeuKbvEZ5Y3YRDzCeg96vblrBPqp/h5Tr+qnL0+8q7hRyLU9FADWsov7PutQUtrSP5k4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QJx1qRdP; arc=fail smtp.client-ip=40.107.223.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O0xbxB2ma6eNpllisK5qew44iywO9lDXscF4lQbf32a8QKZwzA7M8CcyzY1/uYVgaUikOtQmoyHAU5w3jzk95joCGzzxS0MHP88Ae8qt6tIOV0G1/eKNXzK72FxZnUbgxpC3vb/TJW+C0QnI/ep2L6voefmcl1NTSW8liFJlr7qKekcZSvUj+QmlcUtCXL+7TfecGeXczbhQy0Y/i2jRTrS2qoKAkC/lBCmmGPBRnv3KJ4nr1QXX2SqMomNsC89gO9mPQEGRivhDnptk1otRixNT+lg/HqZHvwn+xOQS0SMoZFDEm4twPT0KvxKUD1F1l0ksObaNMphV0IKfmZPB/Q==
+ b=OFAWh0QTWqXO+YsWG7HC9atQHF3mKMev0M9A+FXsucUI5ElcSK8wBtxmdf0EbJ995Y5X6V9hWXpdML1aM64ljmdnjlLvv9xe7lXOxRA7oht3WHn59W7Do08UtfxvL5WuOeoyE6zXb3++F437PBB7JlhGVFwVTuVwhERB6uV9f59JCX7t/ZdrK/TnjgOpBY/TJEa5jyo1txCzMykEh//1tgHITqlBUbEPmgSXc5ycyqtljsOVFAS29qHwNyJlDpsJPqQuDsMG5bgPs8dRXjrlYOtgTk0t7kg4XCnGgWjw8HQ4E8fQHZw7eLykuEer5wmXTTvCTcvIXcntQHbDsfpemw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f6neuIez3Jn6X8S6sz+7mrL3S+k6Ut60kEFhJkqJfB8=;
- b=drOYxm9yFoREZkijMwJUM8QI4KtbZpgN4NLTnvg3GLAzgOdOyhy+lrKD56v/djpj8CydbXjA8W527yuxk1UYmOqkL6WgTc59m6PEeMMVg7EatoTr3RBbtdMN09B9jRfbF+QNXJYH8n2tBLK6r5orYdEHp9LYStNjFd/phUHLFTCAFiwd+C53kug9AAr2zQ+KRDTz5egTTzxoQAQuJR1yud8ted+U3YYsc4Ku0Oh27/kIU+y+o7o/8ohHiJUZ/ota9f0/7GrxRXParlEtcqViJyG9dX/sGjNXn8IknVSKEm+xXFH7yojk0KJsgD72fGe6OyGTpzbQnSetz/YvHzDyOQ==
+ bh=fVrDHKvihb4QEuw4fbmYt4YQKwl+598z1pCpBsaVUno=;
+ b=YHrKKWtxnw5JCjxV+ITTuSAagA+HGaAhfNqkLLiVGBy9VeO/zoq7DfmUGyv4ucG4L1OKZXLuPFAdEWYEGv0jpVJTAkhq7ZCOx2BJ5gdxzfQ7VgyovD1JTgqBEZCtie6I5S1qrsuZw3B2gJUIhGGxBnRZCoQipuPt8cB4qMhBOfY9JP8QNdEPBGl9RtjMBowVgZTb1N2LxKUI4cfL7e4Lwm9ocoLBYPNZLBZPekhwaBrRLfBb8pFBlrlSe/MAHZ7pwD0ng7wsnBwwTLQfHYRrlGUM3ssfxh8qIe1Ca9F+AZb7AD+GzOT+xLmLfBGs5sJndd5jt8fmkdinXUspSw9pIQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fVrDHKvihb4QEuw4fbmYt4YQKwl+598z1pCpBsaVUno=;
+ b=QJx1qRdPq78AyTMNFUoH+QsYFfwpdJXk7z12GWX2gz479RgQcp81TZGSUV2Xeaff9RxUsvFID7AmPswGZStn0NNaLT0ybKr9DF7TUM8q3OKoCq9fWLcs8yhf/Q4zCkzLUhoyu8xAqTnpzm5A9e8+937+BkAYVrh4QMSxjirSiuc=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
- DS7PR11MB7886.namprd11.prod.outlook.com (2603:10b6:8:d8::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8377.17; Fri, 24 Jan 2025 05:36:44 +0000
-Received: from DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95]) by DM3PR11MB8735.namprd11.prod.outlook.com
- ([fe80::3225:d39b:ca64:ab95%5]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
- 05:36:44 +0000
-Message-ID: <57ce5eba-189a-44aa-b451-1d4dee452dc3@intel.com>
-Date: Fri, 24 Jan 2025 13:36:35 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/7] memory: Register the RamDiscardManager instance upon
- guest_memfd creation
-To: Alexey Kardashevskiy <aik@amd.com>, David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>, Michael Roth
-	<michael.roth@amd.com>
-CC: <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, Williams Dan J
-	<dan.j.williams@intel.com>, Peng Chao P <chao.p.peng@intel.com>, Gao Chao
-	<chao.gao@intel.com>, Xu Yilun <yilun.xu@intel.com>
-References: <20241213070852.106092-1-chenyi.qiang@intel.com>
- <20241213070852.106092-6-chenyi.qiang@intel.com>
- <2582a187-fa16-427b-a925-2ac564848a69@amd.com>
- <5c999e10-772b-4ece-9eed-4d082712b570@intel.com>
- <09b82b7f-7dec-4dd9-bfc0-707f4af23161@amd.com>
- <13b85368-46e8-4b82-b517-01ecc87af00e@intel.com>
- <59bd0e82-f269-4567-8f75-a32c9c997ca9@redhat.com>
- <5746187a-331a-4e8f-a7ab-9273fcc64e9b@amd.com>
-From: Chenyi Qiang <chenyi.qiang@intel.com>
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by CH3PR12MB9393.namprd12.prod.outlook.com (2603:10b6:610:1c5::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Fri, 24 Jan
+ 2025 05:57:01 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8356.020; Fri, 24 Jan 2025
+ 05:57:01 +0000
+Message-ID: <2115c769-144c-4254-94b0-6b38b7afc6fc@amd.com>
+Date: Fri, 24 Jan 2025 16:56:50 +1100
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
+ guest-memfd with RamDiscardManager
 Content-Language: en-US
-In-Reply-To: <5746187a-331a-4e8f-a7ab-9273fcc64e9b@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Chenyi Qiang <chenyi.qiang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Peter Xu <peterx@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Michael Roth <michael.roth@amd.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Williams Dan J <dan.j.williams@intel.com>,
+ Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>
+References: <20241213070852.106092-3-chenyi.qiang@intel.com>
+ <d0b30448-5061-4e35-97ba-2d360d77f150@amd.com>
+ <80ac1338-a116-48f5-9874-72d42b5b65b4@intel.com>
+ <9dfde186-e3af-40e3-b79f-ad4c71a4b911@redhat.com>
+ <c1723a70-68d8-4211-85f1-d4538ef2d7f7@amd.com>
+ <f3aaffe7-7045-4288-8675-349115a867ce@redhat.com> <Z46GIsAcXJTPQ8yN@x1n>
+ <7e60d2d8-9ee9-4e97-8a45-bd35a3b7b2a2@redhat.com> <Z46W7Ltk-CWjmCEj@x1n>
+ <8e144c26-b1f4-4156-b959-93dc19ab2984@intel.com> <Z4_MvGSq2B4zptGB@x1n>
+ <c5148428-9ebe-4659-953c-6c9d0eea1051@intel.com>
+ <9d4df308-2dfd-4fa0-a19b-ccbbce13a2fc@intel.com>
+ <b11f240d-ff8c-4c83-9b33-5e556cde0bce@amd.com>
+ <d54f6f53-3d11-477e-8849-cc3d28a201db@intel.com>
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <d54f6f53-3d11-477e-8849-cc3d28a201db@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SGAP274CA0020.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::32)
- To DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20)
+X-ClientProxiedBy: SY0PR01CA0010.ausprd01.prod.outlook.com
+ (2603:10c6:10:1bb::14) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -124,360 +97,274 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|DS7PR11MB7886:EE_
-X-MS-Office365-Filtering-Correlation-Id: da379d55-5cf6-4d12-7ec0-08dd3c39166d
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|CH3PR12MB9393:EE_
+X-MS-Office365-Filtering-Correlation-Id: f52bda7a-c588-4f86-bab5-08dd3c3beb87
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WktJYTZQbXVaNE5Kc0U4VnJXa2ZOT1BzeVhmZDM3d1ppVHgvV0F3SGZiYTB1?=
- =?utf-8?B?UzFuNnRHY1pYVjQvclMwelNTT2xrbDBKK2FnNW1CcWhXVDlhSlNVWk1QYUZz?=
- =?utf-8?B?YmZZQWRCSWNnQXJlOTFYOWREUUdmMkY1S2dvblBYZEgwMmowK2NpRGRucWVK?=
- =?utf-8?B?REZPSWhnZkYrNzZuNTVCRys2MDgxUGRmUzNPTVZ6OUpIdUFUdlZGSkNjRXR2?=
- =?utf-8?B?OW9UVC94K0cvL29ZYmErMVFBMlljS0d2djcwNzJyOFdjRjg0Y29IUVZmaHJH?=
- =?utf-8?B?YldmR3F3UjQ1RnErRlRvOExGc1dqcWI3MmlzbjV1ajZwb0lvT0owbjBpN1dG?=
- =?utf-8?B?eTNpYWp1SUpncFdqaXo1TkZRRUhDS3pqVHJHZGhKOFQzWmRFSzM0RG00YUdS?=
- =?utf-8?B?ZnBTL0tpZVg1Y3hUM0ZXNER6Z0VaeXY3OUc5M2tmVlZZMU5xbkEzR2M3dDB6?=
- =?utf-8?B?b0tqMGVGOHQzbitMM3AxZDI5ZGI1azU0NFVyMzdINmdIN2xpcnIyV2NDSFhC?=
- =?utf-8?B?YXBjTkxHOXg0b2lCQzl3NzltQ2dqWFBJUXdGeis1M2hWOVVpS0ZBVE9VaGNV?=
- =?utf-8?B?ZlF3SEJQYm1YRUgyb3pFRXdWUC9hc01iY092T3RBNGFxdGF4V0o1dWlNK2Jy?=
- =?utf-8?B?MXZyRGNNdkdsQ2xyTTRSMDJyU244dlptZTY0dXBGQWdpcDRWQTlZZFE2M2ds?=
- =?utf-8?B?YlFYSVpubEZHZXlvdTgvTFhVR1R1L2loZ2NBQXRVWXhJbW8wbWxtbVIxK2pM?=
- =?utf-8?B?Z2FUbC9aZXlNNTdkRk1mdysyaXowUlZ4STNiZEluZUQ0Q1lTdnRYUVBLSVcz?=
- =?utf-8?B?QmFuSG1GL1FGZjZjdkprMUhUaXhnakk1NGRqSHVLTjdRcE1sVk5wSWovTDN4?=
- =?utf-8?B?aWNCTERHVExzV1VYbE9sUjlSZ0d6NTZuaCticHcwZHBmdE0xZDc3VVgvMTZu?=
- =?utf-8?B?VzFJYi8wOVRYVmg5V0o4UnE2QW1FVnUyVU12ZkJJZVJLYmpZZExBQWpBOTJY?=
- =?utf-8?B?KzFGUFAzY1dTM0prUkpKNkhiT01JK1ExRllRVVFqWnI0Y2g2NmdvenVQV1ZD?=
- =?utf-8?B?QzhIeERUYi9BckZsN3VxdUFQV3l3ZFpzSjMwZUJ3YkIyN1J4bGsrM2FpZWFt?=
- =?utf-8?B?TW85UVgwU0Z0TktJRlo5cS9pTXdXZ2QrWkEyUW53SlFGa28zUm9CdFZZOE1T?=
- =?utf-8?B?N2JjTnlPRzZwYjdSV0ZPb1BFRjJod0VLNm9xWkFiaHdRZk5nUVZESTNZOU1B?=
- =?utf-8?B?ZzNkRzZmS21wbkhMK0wvSytMNnd6VjNITlVEaTg4aDRJeXZTU3dTZHVVYnB3?=
- =?utf-8?B?bjB2dmoyUTlWU3JyS0VPQnp2MDRUTnpVQjNSbUlUa3FLYSs0clo1K3RiVFF6?=
- =?utf-8?B?QkN3Y2FnQzNlVGRTNTNrQkljV093Z3RGNTdiSEllOGEzaTNIQ0V0Snl4Z0RT?=
- =?utf-8?B?UFNQM1o3QUlhcGNrWlE3Q252ckwwMTNsZ2wxSzNvcWVqTUFMaUROZmg2MXJs?=
- =?utf-8?B?bnFIaXNnZHhWR21SZ1hHbHBWK1h2b2J3QTJrWGpTTk9iQVE3RTZ4UGxWODMy?=
- =?utf-8?B?VWhVUWpVdEIyVkdTeldBS1cwa3kvb2xtblF5QlZubWdoTTEwUDVqbmFaRTNR?=
- =?utf-8?B?M3RCRHR4SmVHczBjbEZMMDV6VzFkZ3c4eGJmbytGY2RJcFN5Q3B0cFVodlBK?=
- =?utf-8?B?aElGWDdhMndJaG1valBKalJHV3V5L1dLZGN6R0ltWERnMllnd1dGM3lwMHU2?=
- =?utf-8?B?YUJRTVRtM3FFbmJSNWRoWjE0RGJTTDk1anR1RUZtV3FOVkJEV2hWbEFyVU84?=
- =?utf-8?B?SGNndDh0d3k4QnhOS0dMMzNWbERDNEhGQXVRYXMzdHdTS29LQ2ZlNkU2aGJi?=
- =?utf-8?Q?HvY5F1QsNkSTK?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bkJKVWZXb1VVVWhiemZkd1FRQXlUanVNOGhrZ3V3dHdYS0RjeTlFUHBJcnRk?=
+ =?utf-8?B?R0w5ZnpCeklYemlTbmlxd2hmSGc5YXFVWGVWTXdTVGZTR3JQNlRCOXdCRVRm?=
+ =?utf-8?B?NHA2WEJ4cHdEcU04WHBlQ0VqbzJINENWdkJEc0NTcHFEVjdxU2w0cnNqSjgv?=
+ =?utf-8?B?bVkwbkJMK3p2bi9FeUFiRnBRRjk2dlM1djdOWE5TeUNnMGNyQTZqUTRXUGpv?=
+ =?utf-8?B?aGc1OUZlV3hzMzkvZlBGSk1nSUVqbFRxejFVV0hnc1poN2hNOUhsMllhcGhj?=
+ =?utf-8?B?d280SFBOcjlpVzdlVng5UVlFQW03c0k0bCs2enVTcE5uRFRqSzFwTGlxWjdV?=
+ =?utf-8?B?Rks5ejMyRmdIOVRPVlVyS3pUejlBZmdnWUVMTWFpalRhMS91NWIwNkhEbDA1?=
+ =?utf-8?B?UnN0S0ZTM2tJNnREUHIvY2tBNk1NSGdKU3lTcC9pQWhFbFE0V1ROWFNjSS9M?=
+ =?utf-8?B?bVNQT0pwc0tpMFpHRFUzSGRkb2VlNWI2VkU1aFhrZXJPaTFUY2VONURRUDlE?=
+ =?utf-8?B?cjRCNHQ1MDlpSnRLcnFYamUrS29MZDVHcU9jNDkyWkxmWmNwWXhqQXVtRXly?=
+ =?utf-8?B?RU0wSzM3MWF3cmhPYXJXdjZrbHVNZnBFcG1vQ1Y4UVN3b2l6Tm9iU1dJMU8y?=
+ =?utf-8?B?OTNPQ2p4K0NMN2hXK0ErZ0M4WTBKNkJKZEdNclFWdFFOKzdCQ3dmbTFLQVhy?=
+ =?utf-8?B?STBwTXBvekRhczc2WEt0ZVphUER4cUZMSkkyUGl0WkpTbGx5OEJ6VjZQZkpH?=
+ =?utf-8?B?WXVueTZ1ZVhZNy8vOTVTcTJLNGxzbTJ4ZXV5bThpYVRnNEpLQjV4aWhyYkp6?=
+ =?utf-8?B?RjJ2dHdUcmlDcEgreGUwUGdEbDEzcTJaN0xuZFB1Yy8vR2FOMzRRMDU4Rk5z?=
+ =?utf-8?B?cGlOb04rK3hSaVpCUnEyT2Z5YzhUOWVHUHVxUkFLc2JVbDN3amwrOHpCUnEv?=
+ =?utf-8?B?YmFpd2ZyT0ZYekQ2NTdFOU5NZVZQdGN6R3pJQndBcVZ4dlp2WTJNOHVSaTBY?=
+ =?utf-8?B?N1FENU5tTEcrcStOaTZRSVR5NXhFTUlOT3A0dUgxaVVhZm05ZnhmZjB4N3Jq?=
+ =?utf-8?B?aUd2Qlp5dm8yNnNuRkhKS09ncTdzUmpXQ1dOaFVvV1c2VTZ5WjZpMmRxMmJp?=
+ =?utf-8?B?eU5ZYXpCRDhlUmN3ZE5vR3RBWUYrWGc0QlBpNmZmUzA4ajJIWkQ5a1VyalZt?=
+ =?utf-8?B?MTQzejA2VUhXZnYxUmxNcFY4MG5ZWkh0WVdCaVlWeCtEZHkzZm04c0kvc0JF?=
+ =?utf-8?B?QkpwQUw1cEFCTmFNK1BFWmkyS3NXYUxtMWpia3JmbHdKTkptUDlVWndnaCt4?=
+ =?utf-8?B?dlZtemg2YnVJOHhCaG01N1lhemFZekJLL2RjK2ZMRlo0QnVjK2xYbUhBMTVl?=
+ =?utf-8?B?NkhNTi9BR29RWkN0elZHeW9RSjBuSG9OeFJOR05Ob29TWUI2MDAzbEp3UHZF?=
+ =?utf-8?B?VkUyRE9WbGNmT2tLK2hsazA5M1YveUdOTW5nL0ZKOWdGTzQ4ZW1iQ1lYbk9n?=
+ =?utf-8?B?ZTRvb1h5ZE9LWTdvV1BuZVNRK0RXaEpCc2lGLytBUHdDSERMaWp3aCt5R0ZZ?=
+ =?utf-8?B?UnhuU1o4ZVYxMXFUV3VxUUNDbDQyNWhRWk1LZWd6OU1YUEhBSURQS2liai9q?=
+ =?utf-8?B?b2RwTGlBbzV5NDJMTm44bHBNdXppK3BkSGFZMCtaS21yZHdKQzNNNE9VZWxC?=
+ =?utf-8?B?NXJQK08rK25WN3hQY01OYyt4YzZQbGIwWURGVGxuamFBQ1VmejlJS3VzUStS?=
+ =?utf-8?B?K0ZUMXliZXRnSTl6U2pkZThtSmdybjZndzRqM0FrN3NDWlIrRTlJUmRvNHZQ?=
+ =?utf-8?B?NDhJSVNzVXNNRVhsZlJjdz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z2JtRzVpSEpCM2QrbEVSMXBNRW9LNDJsdVZzK2lSU0thUFBaZGROQ3FRSHVQ?=
- =?utf-8?B?Zy93aVEzV1dFUGt6Tm0zYVo4THdHRjBua1JmejgxNndHUWJXdWVFb01jZld3?=
- =?utf-8?B?aFJKblBGdzk4VkFCb0lxWUNMeUovRlh6dnlmTVpsbTVFcnFYd0R5bG1jV0tK?=
- =?utf-8?B?UGc4MWQ1RWUzTWxrdXpWUDFzdGdGTWhPd0tZSmprd3hwdDBrWEs1NkpPLzBV?=
- =?utf-8?B?MW4vWEhDME1MQlE0b0hFMWsvQXU5NFVYUTNBNXRwdkpLWjYxZVNIOURzSXV5?=
- =?utf-8?B?SkVTN0g0ZEpuNFc3SytEYVZuS2hPNGJZRXdKM2JXVGVHNUhuNktpbnVHMjNv?=
- =?utf-8?B?KzlzR0NBTUc1Smx3YXVZb2k2YkIxVzZ3V2x0TlFZaG0xR2p4NlpBMkw2RDh3?=
- =?utf-8?B?NmU2Sm9vQ3RFdk0zS1dNSjZqS0huL3lqSjBYY29LSEV0R2V5TEJtb3o3aDBS?=
- =?utf-8?B?VmFUa242dG5NTE1SWjJLTlpubm12U0pXcHppcmFqQ2dXSU1na2J2dWs2VGQz?=
- =?utf-8?B?dVo4UVQ0MExRNmo4NXExV2tDaVVaandPL2ZUYTJ1TmZJck9hQWtkdEZWSkhp?=
- =?utf-8?B?SmswWCtyZmF4Q2RMajBMcDFKdG92TEYwSGFWMDhjbjd5VEJZT3lEbjJKcWFk?=
- =?utf-8?B?VUI2bWNiQmZJQU5kWnRDdzUwN09EMDJ6SmpPUTN2QkZxT2JGdkgxUGM0eEZx?=
- =?utf-8?B?OEVXR2k2SFM1TzlleE5xR2U3SmRFVjZNMFJUZjhWRXE0SXR4L3NJNEgyS0k4?=
- =?utf-8?B?TkpBM1ExYzJrY1RBM0J3ZkdNTHllMEJyT0NjTHlkZlFpMmpLaUJ5cndQd2d6?=
- =?utf-8?B?VXNtdU1TN0Q5L3lQSkxuQ2pQOGVaQkxjdERtS3pRL29tM1FlN2NibSt0aDNO?=
- =?utf-8?B?dkx1VzlSdklwUXpFREhrZHU3bCt5aHpUeG1USHRJTEdBcTRQVEZ5WlhCUS8w?=
- =?utf-8?B?dFloMG5hZzl5T3luZzhReDVCdld0WHQ0UDV5Z25qK2p4WWFNSVFycmpXTXUv?=
- =?utf-8?B?TWhzRDRaaWtPOUtaQU5wMlVFbXJybERTVWdodG8xWkp1Z3YvMnJhbzQ5d29X?=
- =?utf-8?B?T3ZBcHFvU3o1SmJGMmpMaWlzT1RlR0U3bEtGVDZlYVJvS0JaSzh6TXVaT3dl?=
- =?utf-8?B?VTJkMnJMZTBQc2tpYTN1c1lGcC82WERsR0VLQ200YzVlVndrbHYvUExWV2Ix?=
- =?utf-8?B?YU9laHo3ZjI1R3o2akpUNGtkcTFGdEVtL3BtK1BxaGxxU1ZhVWQweThLSmZJ?=
- =?utf-8?B?aDBPNHVEZm1ZNnJ0VDlkQlFxODNnY3lzYWFtcUFhRTFvSWNVQjN0RG9WSSsy?=
- =?utf-8?B?WStUUXdkdElxN09XYmpvMWNrc1Q4aWE5ZnlzL3R6eFZZY3RoTFJ1dGh1VnhY?=
- =?utf-8?B?OUhWUG9qVXNFYkg2d3lsbzNzUCs1cFZvSlArRkpCS200NFd5Z0UrVHFnektP?=
- =?utf-8?B?cEpHbkVqMzZmUG5EdVZOaWtsS2JiMUZJbFZWU1NON2NoMzJzbVVjRGRHeERR?=
- =?utf-8?B?NnFHSW55RnRyYnBVR21MWmI4TEZZczNGMVArZ3c1RlpHMTNJckpKVXZ2OC9P?=
- =?utf-8?B?WGxkT0hvbklBSHZxbCt1b0MzZnU5Q2pXdkdWWnpLTWdhcFhqdUlNVVp5dFlP?=
- =?utf-8?B?ZWUxNDlJYTR3RXFjdlVsbEdOcVF5MU1CM1N6NXZDL09CcXVDemhvVmthWmRP?=
- =?utf-8?B?QnRaUVVpNXBNTUcxSHVIUXc3UFRWZnFlNW1Sc044M2kyd2R6cW9NTm11Nytn?=
- =?utf-8?B?Tk5xYVVtVXphY0dPVlhBcUxqWW5yUUM5VkFmS2hPSE0wRHRyTjZzckc1dmZI?=
- =?utf-8?B?Nk5nMUJMSCtNTnBOS2F6REhRTDVRbGhBaTlTWFRxVkxCU29aYmNnQ1FOVUtY?=
- =?utf-8?B?eWZZWHAyY1Bqd0lORXEwU1dKZW1XZ3hCaklyQnY0TDY5UFpScS9PeEh6RTRy?=
- =?utf-8?B?cUFWamFaYkRrVkZ3alpQeVlacDc4c2M3VmRveURVR3AyRVA0TVZkZ1lPL1ZI?=
- =?utf-8?B?LzdzUmZla1BlaFl1V2M1SnFkNlRVWjRXaHhJL2VWL05oOHNoeXVaOEtlYWpm?=
- =?utf-8?B?a2FtVFkyQ3Z2U1IrUzhQdUNOeWlVdjNQekJTM3VCU2JYTmtzeVhVNlRhWTA1?=
- =?utf-8?B?NmtEZXczb2hHVlhucmVza3ZKZm1oaEk4Sm50clU4MFhiWmxGOUl0SGpDOW9O?=
- =?utf-8?B?RGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: da379d55-5cf6-4d12-7ec0-08dd3c39166d
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aXFHbmpjKzJvbG1FU3hBdjZHYVVmLzByeTI2eFh0ZndDYlJ1Q1U2M1k4M2V2?=
+ =?utf-8?B?dmpnNTdhY1pOdisrRHdIZHNQcTZic2Z4UjNOR2RQVE9PdVI0V1FUTUU2aHgz?=
+ =?utf-8?B?R1Z4dWpuMisweGplRzJMcWxvY3VmSXNCcnNwN1htK0dYaTdmSHJZMzlEb0hR?=
+ =?utf-8?B?NTh1WXVibDE2NXhDNE9iaDFtY2U1R2NYTzBQTnhZWDFSbTVLeVJ1NUZueGU3?=
+ =?utf-8?B?djk4MXZmTmtFa0dVMUlhNlkzNkwxblAzLzJINHNlM3lsd25oSFFUKytaNlpx?=
+ =?utf-8?B?U0VrZU9McFVqVFQweG9qdnd2U0pIRWtFaDdtaHYxYTdQWkhsSS9rR2w3amY5?=
+ =?utf-8?B?cmJTVHZQa1FmUmNMWmpsMHZnMStETEsydUY1UkZudCtzREx2L0lpVnYxQjBP?=
+ =?utf-8?B?ZGx1Ry93R21kMXZiVG5scS9kdjFBVW5CZHJBOSsza1JKZzVndXhYVWtyaSs4?=
+ =?utf-8?B?UWNkaEtMOE8wK3hHMm1UengzTGJnd1BZbVVZZ0czM0o1N0lLcVVkTkxzU0ha?=
+ =?utf-8?B?bTQ4dU11UnVhR1g4cU1wMkN5VTNDTzhKdkNqTUdYTmgwRERNVlgzVmttckxG?=
+ =?utf-8?B?cThBVDdZdTVMK0JLaDNJTGUzc2xKTVAzK2FhWDV0UC9QZTJQV01ab0ViZDJQ?=
+ =?utf-8?B?Y0RGWCtTdWF6LytFSFI5Mnkza1BFSVVYc2J4eE4zVkk4MWx6YWJlL21HV3dR?=
+ =?utf-8?B?TnVOejZJSTJwbFpCUTZ4ZDJWWExjL2ZRTjVJZ0FCWkpqZG9RcE1rNUVGUTB3?=
+ =?utf-8?B?ZGd0UlIwNUc3VkpsRVVEMTY5S29EeHVRZnc1SHVPU0NvYmE5dXRYbkhYVDNP?=
+ =?utf-8?B?aDRIc3pnaHJOK2lzRmVlbmVaMVZsY3gvaDhIMkNhUEo4RlR2dXJ5YTcvUGdP?=
+ =?utf-8?B?YkR1U0FtY1krblF2aG8vampOSVU5a0ZDRi9ITEZhWGFMMENxUXFoTjNab3Jw?=
+ =?utf-8?B?WW56dU5uNmpGMUtyQ3dSVllWaEtRWExGaEg4OG9sWi9YUzRDSy9rM3k0M0hX?=
+ =?utf-8?B?MU53R3d2R0hKREp2dkovYnFuREN6U0VTVmJwb2E2b2k3VXhQSUNrZnduV3Fx?=
+ =?utf-8?B?aTBmR3gwTzRRSHBIZ0daWEhuaGcwUEZZdTU4RUI4U2xGWnJMOG5RY0hrODVh?=
+ =?utf-8?B?L2d5dHdxSk5GaHlrT0Zzb0JHdDRCT3IrQk41dlRENkYwK2MzWWpQNzMybDdM?=
+ =?utf-8?B?QU5YTXhHbmt4N2VDdmgvbCtOczRpL2c5ZEVRc2c3MG1ISHFwSUlPdnJlbVM0?=
+ =?utf-8?B?RDZkaWFjUnIrQ0R5L1FmVUlhaGNSOUxUSEtVOWVVaWNOK3FteXR3djZsWEV1?=
+ =?utf-8?B?OGpLSEl1R3VSQi9lenJ3bC9KNmtudExoMmxxdURNc3R4bWxvVGNFQzhFSW1W?=
+ =?utf-8?B?L1J5eURMR3BWZ1NFb0VLb1E0MGpveDNXdUpzdmQ1OWpMVEVGdmg2NDJVbzlq?=
+ =?utf-8?B?S0kvYStBYjZwVmNVd2djOWJFNkw5ZzI2bjl3ZjI1S281S0QrMDVGcXQ5VXo0?=
+ =?utf-8?B?eGNYVnF1OFpOSXNkY3hTbXlpMTlydXhaNUI2eFNESkU5WWxlaFZDT3B3MkF5?=
+ =?utf-8?B?VVYrWVI0OVlZWGVwUTU5VW1uOFJqcUFJVkdjM0JPWWNmNHpKVTFnWTNGbWJy?=
+ =?utf-8?B?a3E1R256K3B3UDJSV1lEV2c4bkZXSE1pVzBhTDNHc1VvdUY4ZE5yRFNNdmNU?=
+ =?utf-8?B?N1RmczV4RkpqZUJjTFpQMVFkTTdCL2g0Nnc3aXpjSkZTRUowajRPL3ZwZWFG?=
+ =?utf-8?B?bW04QnpIbnIzTlp6ZmJBTXhSRFZlMEVjc2FaL2UwZTF6UzNyazFoMElmYjJF?=
+ =?utf-8?B?V1lIVTFkSFByWWVwYTQ0NlZkYTRESldENys2SmZjT05vN1NsemhDSzYvRU05?=
+ =?utf-8?B?SkwySEVzKzBGaTNuUnJZUSs0R0trMXhsN3RIRFVKTitNK29kRmlwT0RqYngz?=
+ =?utf-8?B?QVBiTlcrK2ZHeGhleEVNakFMcE5JMnBtQWI1cTZNbGg4SHVWZWpTNmhsc2dN?=
+ =?utf-8?B?aGZkMVE5dTBzZ2lGMG9tVGs1RW9IcmN5WGNZU3FJSWhZR3BBWWdJUnp6OElw?=
+ =?utf-8?B?WjVZNVdUWDlpQWdMTU9rb3pGNmVqL2M2SXc1cVJZTlBJa1RkM3ZnellPZXV1?=
+ =?utf-8?Q?eE9eD/yjfHCsJ8e9t/2G+pPsV?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f52bda7a-c588-4f86-bab5-08dd3c3beb87
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 05:36:44.6845
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 05:57:01.0136
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uRQFs86SsgnZVC2M7idGQFil2I+gfzikK+yteYGKMOwxrFjg1DNJKGk3cCXcxPQiD620lG/2OnbVzjoOfEIujA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7886
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: jNxfu5Gy8VK2oA+Aa1Mkpwg3OWq1AEmbqy5cwYqYLECeEHxP/72FLRYIQyvqXxAPQTfxatRLAksKyG+cuO0IQA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9393
 
 
 
-On 1/24/2025 11:27 AM, Alexey Kardashevskiy wrote:
+On 24/1/25 14:09, Chenyi Qiang wrote:
 > 
 > 
-> On 21/1/25 00:06, David Hildenbrand wrote:
->> On 10.01.25 06:13, Chenyi Qiang wrote:
->>>
->>>
->>> On 1/9/2025 5:32 PM, Alexey Kardashevskiy wrote:
->>>>
->>>>
->>>> On 9/1/25 16:34, Chenyi Qiang wrote:
->>>>>
->>>>>
->>>>> On 1/8/2025 12:47 PM, Alexey Kardashevskiy wrote:
->>>>>> On 13/12/24 18:08, Chenyi Qiang wrote:
->>>>>>> Introduce the realize()/unrealize() callbacks to initialize/
->>>>>>> uninitialize
->>>>>>> the new guest_memfd_manager object and register/unregister it in the
->>>>>>> target MemoryRegion.
->>>>>>>
->>>>>>> Guest_memfd was initially set to shared until the commit bd3bcf6962
->>>>>>> ("kvm/memory: Make memory type private by default if it has guest
->>>>>>> memfd
->>>>>>> backend"). To align with this change, the default state in
->>>>>>> guest_memfd_manager is set to private. (The bitmap is cleared to 0).
->>>>>>> Additionally, setting the default to private can also reduce the
->>>>>>> overhead of mapping shared pages into IOMMU by VFIO during the
->>>>>>> bootup
->>>>>>> stage.
->>>>>>>
->>>>>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
->>>>>>> ---
->>>>>>>     include/sysemu/guest-memfd-manager.h | 27 +++++++++++++++++++
->>>>>>> ++++
->>>>>>> ++++
->>>>>>>     system/guest-memfd-manager.c         | 28 +++++++++++++++++++
->>>>>>> ++++
->>>>>>> ++++-
->>>>>>>     system/physmem.c                     |  7 +++++++
->>>>>>>     3 files changed, 61 insertions(+), 1 deletion(-)
->>>>>>>
->>>>>>> diff --git a/include/sysemu/guest-memfd-manager.h b/include/sysemu/
->>>>>>> guest-memfd-manager.h
->>>>>>> index 9dc4e0346d..d1e7f698e8 100644
->>>>>>> --- a/include/sysemu/guest-memfd-manager.h
->>>>>>> +++ b/include/sysemu/guest-memfd-manager.h
->>>>>>> @@ -42,6 +42,8 @@ struct GuestMemfdManager {
->>>>>>>     struct GuestMemfdManagerClass {
->>>>>>>         ObjectClass parent_class;
->>>>>>>     +    void (*realize)(GuestMemfdManager *gmm, MemoryRegion *mr,
->>>>>>> uint64_t region_size);
->>>>>>> +    void (*unrealize)(GuestMemfdManager *gmm);
->>>>>>>         int (*state_change)(GuestMemfdManager *gmm, uint64_t offset,
->>>>>>> uint64_t size,
->>>>>>>                             bool shared_to_private);
->>>>>>>     };
->>>>>>> @@ -61,4 +63,29 @@ static inline int
->>>>>>> guest_memfd_manager_state_change(GuestMemfdManager *gmm, uint6
->>>>>>>         return 0;
->>>>>>>     }
->>>>>>>     +static inline void
->>>>>>> guest_memfd_manager_realize(GuestMemfdManager
->>>>>>> *gmm,
->>>>>>> +                                              MemoryRegion *mr,
->>>>>>> uint64_t region_size)
->>>>>>> +{
->>>>>>> +    GuestMemfdManagerClass *klass;
->>>>>>> +
->>>>>>> +    g_assert(gmm);
->>>>>>> +    klass = GUEST_MEMFD_MANAGER_GET_CLASS(gmm);
->>>>>>> +
->>>>>>> +    if (klass->realize) {
->>>>>>> +        klass->realize(gmm, mr, region_size);
->>>>>>
->>>>>> Ditch realize() hook and call guest_memfd_manager_realizefn()
->>>>>> directly?
->>>>>> Not clear why these new hooks are needed.
->>>>>
->>>>>>
->>>>>>> +    }
->>>>>>> +}
->>>>>>> +
->>>>>>> +static inline void guest_memfd_manager_unrealize(GuestMemfdManager
->>>>>>> *gmm)
->>>>>>> +{
->>>>>>> +    GuestMemfdManagerClass *klass;
->>>>>>> +
->>>>>>> +    g_assert(gmm);
->>>>>>> +    klass = GUEST_MEMFD_MANAGER_GET_CLASS(gmm);
->>>>>>> +
->>>>>>> +    if (klass->unrealize) {
->>>>>>> +        klass->unrealize(gmm);
->>>>>>> +    }
->>>>>>> +}
->>>>>>
->>>>>> guest_memfd_manager_unrealizefn()?
->>>>>
->>>>> Agree. Adding these wrappers seem unnecessary.
->>>>>
->>>>>>
->>>>>>
->>>>>>> +
->>>>>>>     #endif
->>>>>>> diff --git a/system/guest-memfd-manager.c b/system/guest-memfd-
->>>>>>> manager.c
->>>>>>> index 6601df5f3f..b6a32f0bfb 100644
->>>>>>> --- a/system/guest-memfd-manager.c
->>>>>>> +++ b/system/guest-memfd-manager.c
->>>>>>> @@ -366,6 +366,31 @@ static int
->>>>>>> guest_memfd_state_change(GuestMemfdManager *gmm, uint64_t offset,
->>>>>>>         return ret;
->>>>>>>     }
->>>>>>>     +static void guest_memfd_manager_realizefn(GuestMemfdManager
->>>>>>> *gmm,
->>>>>>> MemoryRegion *mr,
->>>>>>> +                                          uint64_t region_size)
->>>>>>> +{
->>>>>>> +    uint64_t bitmap_size;
->>>>>>> +
->>>>>>> +    gmm->block_size = qemu_real_host_page_size();
->>>>>>> +    bitmap_size = ROUND_UP(region_size, gmm->block_size) / gmm-
->>>>>>>> block_size;
->>>>>>
->>>>>> imho unaligned region_size should be an assert.
->>>>>
->>>>> There's no guarantee the region_size of the MemoryRegion is PAGE_SIZE
->>>>> aligned. So the ROUND_UP() is more appropriate.
->>>>
->>>> It is all about DMA so the smallest you can map is PAGE_SIZE so even if
->>>> you round up here, it is likely going to fail to DMA-map later anyway
->>>> (or not?).
->>>
->>> Checked the handling of VFIO, if the size is less than PAGE_SIZE, it
->>> will just return and won't do DMA-map.
->>>
->>> Here is a different thing. It tries to calculate the bitmap_size. The
->>> bitmap is used to track the private/shared status of the page. So if the
->>> size is less than PAGE_SIZE, we still use the one bit to track this
->>> small-size range.
->>>
->>>>
->>>>
->>>>>>> +
->>>>>>> +    gmm->mr = mr;
->>>>>>> +    gmm->bitmap_size = bitmap_size;
->>>>>>> +    gmm->bitmap = bitmap_new(bitmap_size);
->>>>>>> +
->>>>>>> +    memory_region_set_ram_discard_manager(gmm->mr,
->>>>>>> RAM_DISCARD_MANAGER(gmm));
->>>>>>> +}
->>>>>>
->>>>>> This belongs to 2/7.
->>>>>>
->>>>>>> +
->>>>>>> +static void guest_memfd_manager_unrealizefn(GuestMemfdManager *gmm)
->>>>>>> +{
->>>>>>> +    memory_region_set_ram_discard_manager(gmm->mr, NULL);
->>>>>>> +
->>>>>>> +    g_free(gmm->bitmap);
->>>>>>> +    gmm->bitmap = NULL;
->>>>>>> +    gmm->bitmap_size = 0;
->>>>>>> +    gmm->mr = NULL;
->>>>>>
->>>>>> @gmm is being destroyed here, why bother zeroing?
->>>>>
->>>>> OK, will remove it.
->>>>>
->>>>>>
->>>>>>> +}
->>>>>>> +
->>>>>>
->>>>>> This function belongs to 2/7.
->>>>>
->>>>> Will move both realizefn() and unrealizefn().
->>>>
->>>> Yes.
->>>>
->>>>
->>>>>>
->>>>>>>     static void guest_memfd_manager_init(Object *obj)
->>>>>>>     {
->>>>>>>         GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(obj);
->>>>>>> @@ -375,7 +400,6 @@ static void guest_memfd_manager_init(Object
->>>>>>> *obj)
->>>>>>>       static void guest_memfd_manager_finalize(Object *obj)
->>>>>>>     {
->>>>>>> -    g_free(GUEST_MEMFD_MANAGER(obj)->bitmap);
->>>>>>>     }
->>>>>>>       static void guest_memfd_manager_class_init(ObjectClass *oc,
->>>>>>> void
->>>>>>> *data)
->>>>>>> @@ -384,6 +408,8 @@ static void
->>>>>>> guest_memfd_manager_class_init(ObjectClass *oc, void *data)
->>>>>>>         RamDiscardManagerClass *rdmc =
->>>>>>> RAM_DISCARD_MANAGER_CLASS(oc);
->>>>>>>           gmmc->state_change = guest_memfd_state_change;
->>>>>>> +    gmmc->realize = guest_memfd_manager_realizefn;
->>>>>>> +    gmmc->unrealize = guest_memfd_manager_unrealizefn;
->>>>>>>           rdmc->get_min_granularity =
->>>>>>> guest_memfd_rdm_get_min_granularity;
->>>>>>>         rdmc->register_listener = guest_memfd_rdm_register_listener;
->>>>>>> diff --git a/system/physmem.c b/system/physmem.c
->>>>>>> index dc1db3a384..532182a6dd 100644
->>>>>>> --- a/system/physmem.c
->>>>>>> +++ b/system/physmem.c
->>>>>>> @@ -53,6 +53,7 @@
->>>>>>>     #include "sysemu/hostmem.h"
->>>>>>>     #include "sysemu/hw_accel.h"
->>>>>>>     #include "sysemu/xen-mapcache.h"
->>>>>>> +#include "sysemu/guest-memfd-manager.h"
->>>>>>>     #include "trace.h"
->>>>>>>       #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
->>>>>>> @@ -1885,6 +1886,9 @@ static void ram_block_add(RAMBlock *new_block,
->>>>>>> Error **errp)
->>>>>>>                 qemu_mutex_unlock_ramlist();
->>>>>>>                 goto out_free;
->>>>>>>             }
->>>>>>> +
->>>>>>> +        GuestMemfdManager *gmm =
->>>>>>> GUEST_MEMFD_MANAGER(object_new(TYPE_GUEST_MEMFD_MANAGER));
->>>>>>> +        guest_memfd_manager_realize(gmm, new_block->mr, new_block-
->>>>>>>> mr->size);
->>>>>>
->>>>>> Wow. Quite invasive.
->>>>>
->>>>> Yeah... It creates a manager object no matter whether the user
->>>>> wants to
->>>>> us    e shared passthru or not. We assume some fields like private/
->>>>> shared
->>>>> bitmap may also be helpful in other scenario for future usage, and
->>>>> if no
->>>>> passthru device, the listener would just return, so it is acceptable.
->>>>
->>>> Explain these other scenarios in the commit log please as otherwise
->>>> making this an interface of HostMemoryBackendMemfd looks way cleaner.
->>>> Thanks,
->>>
->>> Thanks for the suggestion. Until now, I think making this an interface
->>> of HostMemoryBackend is cleaner. The potential future usage for
->>> non-HostMemoryBackend guest_memfd-backed memory region I can think of is
->>> the the TEE I/O for iommufd P2P support? when it tries to initialize RAM
->>> device memory region with the attribute of shared/private. But I think
->>> it would be a long term story and we are not sure what it will be like
->>> in future.
+> On 1/24/2025 8:15 AM, Alexey Kardashevskiy wrote:
 >>
->> As raised in #2, I'm don't think this belongs into HostMemoryBackend.
->> It kind-of belongs to the RAMBlock, but we could have another object
->> (similar to virtio-mem currently managing a single HostMemoryBackend-
->> >RAMBlock) that takes care of that for multiple memory backends.
+>>
+>> On 22/1/25 16:38, Xiaoyao Li wrote:
+>>> On 1/22/2025 11:28 AM, Chenyi Qiang wrote:
+>>>>
+>>>>
+>>>> On 1/22/2025 12:35 AM, Peter Xu wrote:
+>>>>> On Tue, Jan 21, 2025 at 09:35:26AM +0800, Chenyi Qiang wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 1/21/2025 2:33 AM, Peter Xu wrote:
+>>>>>>> On Mon, Jan 20, 2025 at 06:54:14PM +0100, David Hildenbrand wrote:
+>>>>>>>> On 20.01.25 18:21, Peter Xu wrote:
+>>>>>>>>> On Mon, Jan 20, 2025 at 11:48:39AM +0100, David Hildenbrand wrote:
+>>>>>>>>>> Sorry, I was traveling end of last week. I wrote a mail on the
+>>>>>>>>>> train and
+>>>>>>>>>> apparently it was swallowed somehow ...
+>>>>>>>>>>
+>>>>>>>>>>>> Not sure that's the right place. Isn't it the (cc) machine
+>>>>>>>>>>>> that controls
+>>>>>>>>>>>> the state?
+>>>>>>>>>>>
+>>>>>>>>>>> KVM does, via MemoryRegion->RAMBlock->guest_memfd.
+>>>>>>>>>>
+>>>>>>>>>> Right; I consider KVM part of the machine.
+>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>>>
+>>>>>>>>>>>> It's not really the memory backend, that's just the memory
+>>>>>>>>>>>> provider.
+>>>>>>>>>>>
+>>>>>>>>>>> Sorry but is not "providing memory" the purpose of "memory
+>>>>>>>>>>> backend"? :)
+>>>>>>>>>>
+>>>>>>>>>> Hehe, what I wanted to say is that a memory backend is just
+>>>>>>>>>> something to
+>>>>>>>>>> create a RAMBlock. There are different ways to create a
+>>>>>>>>>> RAMBlock, even
+>>>>>>>>>> guest_memfd ones.
+>>>>>>>>>>
+>>>>>>>>>> guest_memfd is stored per RAMBlock. I assume the state should
+>>>>>>>>>> be stored per
+>>>>>>>>>> RAMBlock as well, maybe as part of a "guest_memfd state" thing.
+>>>>>>>>>>
+>>>>>>>>>> Now, the question is, who is the manager?
+>>>>>>>>>>
+>>>>>>>>>> 1) The machine. KVM requests the machine to perform the
+>>>>>>>>>> transition, and the
+>>>>>>>>>> machine takes care of updating the guest_memfd state and
+>>>>>>>>>> notifying any
+>>>>>>>>>> listeners.
+>>>>>>>>>>
+>>>>>>>>>> 2) The RAMBlock. Then we need some other Object to trigger
+>>>>>>>>>> that. Maybe
+>>>>>>>>>> RAMBlock would have to become an object, or we allocate
+>>>>>>>>>> separate objects.
+>>>>>>>>>>
+>>>>>>>>>> I'm leaning towards 1), but I might be missing something.
+>>>>>>>>>
+>>>>>>>>> A pure question: how do we process the bios gmemfds?  I assume
+>>>>>>>>> they're
+>>>>>>>>> shared when VM starts if QEMU needs to load the bios into it,
+>>>>>>>>> but are they
+>>>>>>>>> always shared, or can they be converted to private later?
+>>>>>>>>
+>>>>>>>> You're probably looking for memory_region_init_ram_guest_memfd().
+>>>>>>>
+>>>>>>> Yes, but I didn't see whether such gmemfd needs conversions
+>>>>>>> there.  I saw
+>>>>>>> an answer though from Chenyi in another email:
+>>>>>>>
+>>>>>>> https://lore.kernel.org/all/fc7194ee-ed21-4f6b-
+>>>>>>> bf87-147a47f5f074@intel.com/
+>>>>>>>
+>>>>>>> So I suppose the BIOS region must support private / share
+>>>>>>> conversions too,
+>>>>>>> just like the rest part.
+>>>>>>
+>>>>>> Yes, the BIOS region can support conversion as well. I think
+>>>>>> guest_memfd
+>>>>>> backed memory regions all follow the same sequence during setup time:
+>>>>>>
+>>>>>> guest_memfd is shared when the guest_memfd fd is created by
+>>>>>> kvm_create_guest_memfd() in ram_block_add(), But it will sooner be
+>>>>>> converted to private just after kvm_set_user_memory_region() in
+>>>>>> kvm_set_phys_mem(). So at the boot time of cc VM, the default
+>>>>>> attribute
+>>>>>> is private. During runtime, the vBIOS can also do the conversion if it
+>>>>>> wants.
+>>>>>
+>>>>> I see.
+>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>> Though in that case, I'm not 100% sure whether that could also be
+>>>>>>> done by
+>>>>>>> reusing the major guest memfd with some specific offset regions.
+>>>>>>
+>>>>>> Not sure if I understand you clearly. guest_memfd is per-Ramblock. It
+>>>>>> will have its own slot. So the vBIOS can use its own guest_memfd to
+>>>>>> get
+>>>>>> the specific offset regions.
+>>>>>
+>>>>> Sorry to be confusing, please feel free to ignore my previous comment.
+>>>>> That came from a very limited mindset that maybe one confidential VM
+>>>>> should
+>>>>> only have one gmemfd..
+>>>>>
+>>>>> Now I see it looks like it's by design open to multiple gmemfds for
+>>>>> each
+>>>>> VM, then it's definitely ok that bios has its own.
+>>>>>
+>>>>> Do you know why the bios needs to be convertable?  I wonder whether
+>>>>> the VM
+>>>>> can copy it over to a private region and do whatever it wants, e.g.
+>>>>> attest
+>>>>> the bios being valid.  However this is also more of a pure
+>>>>> question.. and
+>>>>> it can be offtopic to this series, so feel free to ignore.
+>>>>
+>>>> AFAIK, the vBIOS won't do conversion after it is set as private at the
+>>>> beginning. But in theory, the VM can do the conversion at runtime with
+>>>> current implementation. As for why make the vBIOS convertable, I'm also
+>>>> uncertain about it. Maybe convenient for managing the private/shared
+>>>> status by guest_memfd as it's also converted once at the beginning.
+>>>
+>>> The reason is just that we are too lazy to implement a variant of
+>>> guest memfd for vBIOS that is disallowed to be converted from private
+>>> to shared.
+>>
+>> What is the point in disallowing such conversion in QEMU? On AMD, a
+>> malicious HV can try converting at any time and if the guest did not ask
+>> for it, it will continue accessing those pages as private and trigger an
+>> RMP fault. But if the guest asked for conversion, then it should be no
+>> problem to convert to shared. What do I miss about TDX here? Thanks,
 > 
-> The vBIOS thingy confused me and then I confused others :) There are 2
-> things:
-> 1) an interface or new subclass of HostMemoryBackendClass which we need
-> to advertise and implement ability to discard pages;
-> 2) RamDiscardManagerClass which is MR/Ramblock and does not really
-> belong to HostMemoryBackend (as it is in what was posted ages ago).
+> Re-read Peter's question, maybe I misunderstood it a little bit.
 > 
-> I suggest Chenyi post a new version using the current approach with the
-> comments and commitlogs fixed. Makes sense? Thanks,
+> I thought Peter asked why the vBIOS need to do page conversion since it
+> would keep private and no need to convert to shared at runtime. So it is
 
-Sure, thanks Alexey! BTW, I'm going to have a vacation. Will continue to
-work on it after I come back :)
+I suspect there is no need to convert vBIOS but also there is no need to 
+assume that some memory is never convertable.
+
+> not necessary to manage the vBIOS with guest_memfd-backed memory region
+> as it only converts to private once during setup stage. Xiaoyao
+> mentioned no need to implement a variant of guest_memfd to convert from
+> private to shared. As you said, allowing such conversion won't bring
+> security issues.
+> 
+> Now, I assume Peter's real question is, if we can copy the vBIOS to a
+> private region and no need to create a specific guest_memfd-backed
+> memory region for it?
+
+I guess we can copy it but we have pc.bios and pc.rom in own memory 
+regions for some reason even for legacy non-secure VMs, for ages, so it 
+has little or nothing to do with whether vBIOS is in private or shared 
+memory. Thanks,
+
 
 > 
+>>
+>>
+>>>
+>>>>>
+>>>>> Thanks,
+>>>>>
+>>>>
+>>>
+>>
 > 
+
+-- 
+Alexey
 
 
