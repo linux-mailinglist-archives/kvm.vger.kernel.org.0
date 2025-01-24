@@ -1,219 +1,366 @@
-Return-Path: <kvm+bounces-36471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36472-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23492A1B277
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 10:18:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37267A1B29A
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 10:29:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C9A53A8232
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 09:18:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F33E51884162
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 09:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABE7219A89;
-	Fri, 24 Jan 2025 09:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5F5219A89;
+	Fri, 24 Jan 2025 09:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LoWrHsSb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UpLfyw7Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2080.outbound.protection.outlook.com [40.107.220.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC9F320B;
-	Fri, 24 Jan 2025 09:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737710317; cv=fail; b=HiMNL4b7oiaL7zsWMkiIex6uwEFy0KywXsDr97eiJfjjdbPsehYKEKzRZ/hEtqwohcoPJ6AGIg0abmPsFL7of1gtMsNZb7sz3AIQY5djTiI6ZJEZcG6ZVPDXbD+skj2FIjBUILaSlMmIDrlE2i1NQFWJf5oO+MkylnkTu7+pb9w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737710317; c=relaxed/simple;
-	bh=U6fcGcoscRPoMWpgrUIUwbhaidCmb7NwPefWYaod9fE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Di3kMX/EP6iPz+sDJo9RyQv6jgZY9RMQkIfC/SZHe/+Qwj7Fv27/5rXbu3jraX9Z1Gsw6bTmHqV3fYOEWmpWbl1Nnq+i24CyqeaKYzoTfAh/ZKTMWYNOleDL+OjFWFCGBQXNNaC1qeRaVeBu5iPZWsl01k7wYK1KZhk7/McNT1Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LoWrHsSb; arc=fail smtp.client-ip=40.107.220.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xS5Q9OCU1AXVtdTeYaUg4wC1HtpeVV+1CQQP21ctB9ZW5rEFpBQAbRjMEtAfxk0WNvpOsJqoh4D0rQbzI8SmeuAXLsGR5kLeDeyeDBRn0oHreZYM4ZkauYFJNs+UWZB3K4FPFWcrkpdfgBV+dljbjGcbcAMpRLsVzheIDvRu7Q/n3a0pmI4V71wg/xf8j+0tTqmW3mrhQgLkVWCXD8z7wz3+7j0DCCOWi+sltlrc4kUwEDmWqdpCAgWFe73C1FauatKWSX0/ZJwGtEB3noZLc+j2A8TMGwbK2jqYhiVf3MlXlGY3DDh5/+nY+amM0q/02z6e2IzKyOleUURoRz985g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HzX1Ivp3TBGZHvIZa68+775bZaT2ZVmrnM+SEPHrPs4=;
- b=Qq5e+sT5d1m+2p6vO0XvEE4cWa0eShd15yTGukeNks18upu9oNh+UD8v3lXda3kagEVDez689l423Qu9Kr33isyd/u03DUT6JSrIlxCbwlDYdLkDGjssisUwF+zOpCwbCh1WhhJhPNMUIUXOjfurxg2yEtAiPnqNPWJ2y4vzgbhFrK23AlIgLflq6Z+cAWQ1WhftOw8vAORlBbHQ6V8tffOd8KaKOYuAGVJtBHEMBIHONsx0cOTYyGXSUA3+N/FvBEEksq/TIfsUDtmIKOBi+vOxsCPLXJ2CfcqnyUCJx656im8IKitJaullnnruBClam6fr2gwLhg9HOQDtBFheqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HzX1Ivp3TBGZHvIZa68+775bZaT2ZVmrnM+SEPHrPs4=;
- b=LoWrHsSbLmGDYCCHYBhKtlI5du/DJ5UkVuRM1kvbdw8vDDen4S2u/iEjVcILdQj4XnsnyJYIedj8G2uWcoDA8vqPACDrTrvC5olAehzO8ZR9A5E82B/uV+Z1MGsg9UVw7/GZ1EFU/LpDRb0UWvPycjSVgKzT+y2srRm2mV8+wLE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
- by MW4PR12MB7311.namprd12.prod.outlook.com (2603:10b6:303:227::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.19; Fri, 24 Jan
- 2025 09:18:34 +0000
-Received: from IA1PR12MB8189.namprd12.prod.outlook.com
- ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
- ([fe80::193b:bbfd:9894:dc48%4]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
- 09:18:33 +0000
-Message-ID: <09f57158-3b79-4c61-834c-950ed40b7605@amd.com>
-Date: Fri, 24 Jan 2025 10:18:25 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/9] KVM: selftests: Add VMGEXIT helper
-To: "Pratik R. Sampat" <prsampat@amd.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, shuah@kernel.org, pgonda@google.com,
- ashish.kalra@amd.com, nikunj@amd.com, michael.roth@amd.com, sraithal@amd.com
-References: <20250123220100.339867-1-prsampat@amd.com>
- <20250123220100.339867-5-prsampat@amd.com>
-Content-Language: en-US
-From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20250123220100.339867-5-prsampat@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0101.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9c::7) To IA1PR12MB8189.namprd12.prod.outlook.com
- (2603:10b6:208:3f0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD09218E91;
+	Fri, 24 Jan 2025 09:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737710966; cv=none; b=sec4N+/rGSjq2G6tMAQF2pf/AE1IZQgW+B/mmRe2DTUQbZZqsNwcGGqBpx+rg90PqrlMgpOXW8paaCt3wgxpL3dPh7nNvaUXBOKavkYaCiU/p0sqoJvZPZNc/nKZDkhLz4v8d6YOZy4Id5QaDU25fUb4gkBaPYSdWb09YOz74Oc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737710966; c=relaxed/simple;
+	bh=0AkQpPJmCBs//CaOlcFfYdOW7wemauTfeM9vMZzpxD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TFagN/YBedkKvADaL1TENca/H5dp+5NOEbPdCMx6IKCJ/OY8GiNnK0Z79LZEtFVGEQ3b40TfVRMfjOYWFhDuLl870Q27aPh6ozYq6G7BPpTUILv23sgQwRbqJAJsq32ejhLK9BNEf2Fes6ean8So/Jm/7T04p60uc4p/Sy0jD80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UpLfyw7Y; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-436249df846so12209685e9.3;
+        Fri, 24 Jan 2025 01:29:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737710963; x=1738315763; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jqyH6bhzvdcnBDUw10mu9jMZ7GZ86MpW0+sReCtDL8g=;
+        b=UpLfyw7YmFtpT8iCaJDUj4ivPbqg9ejsM8CJhM15gEdNxd8cdrRkpupUcYfP84dXeS
+         zXAb8hKKkZq/Ku4xPpeWaB5FmZIMzh4KpV8FNz97+A6uRk1VcoVAzOElBBeylGGRGaeu
+         bG0OyuuAgfnuy/7HEgguQmo/r2je6BOPiaXvl+xh7L+QrggLqqbDU/ahwubfblkwOWCv
+         jUKem+YjtxqmS+cwcPvw9tsscwiO8X8OVPgD2J66fsPNDeUoLFQpQAJ3tKR3I941d/dY
+         P/31cMOmN9mFz4rjhB4k+ACTo+qeU6jSO5V8yQSvz+AJZ2ec2A5yWXbMVIdB+3tWRhrF
+         uH9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737710963; x=1738315763;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jqyH6bhzvdcnBDUw10mu9jMZ7GZ86MpW0+sReCtDL8g=;
+        b=NvJCiHffth3BQr+NSvYs6QTUath6Q169TzmFr/ymnSHRsvUzbtpClm3AKFwIsZS7yw
+         AoLEJDbUAHnliE6RiWr0X43978ygo7teRN/8hB9F4XAaIV+RTPoMhvEftpgBbQz4/3FN
+         gGFOEhLOQkJRDZwzouUEEvAugQH85s8bBwK0Gw54UtNdmBfKxpZEz5Phnt0dhuTYpC8Y
+         ZH4QjFE7/09LISKpNcMHDy73wF0Wn1d54HYUXMu4vTxUqNNCu1eH1IHzOztaxmKCn8bK
+         x7Ag18tPdMBpPGLoEDEdKxzRLJ7xpvd9AsB1vtdvHy4n75Ns2GJGTLPXBpTZg3BfjQ3n
+         3ecw==
+X-Forwarded-Encrypted: i=1; AJvYcCVnBhauTlyLJIq45Ncv8vitVWY3czx2riIzKavcIpGK+s8FHj+7PXlmeusss4w6JNgyKQ9SMGYRyunJet/k@vger.kernel.org, AJvYcCW8U9gWaVbXrCMoBq5EBVlluSynUBqKuKaFt+nn4KJrwps8euTrmG6ZuLhiHYSgrdSMlHA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+uxb41Shncd2dP8ZmwfCPs2fqPgz6o+9u2jlWdQS7aF6pptb0
+	LRDmKVqK3u/sGQkZP1jS95e5aRAuv7zyPiOQw/iULl5b77ijsGSFq7xkQli/eBg=
+X-Gm-Gg: ASbGncuomCFoxFr8qpXd7w7Mb0R87tr7CLNAqLnKXKL+zYjl/Mfrv1328r7I4tHkPcb
+	mWxBhxIKAaNiaZPbGUmaf72wQyMOuNGLwYXgnBHubLL32JJzlfIpzTQSEcJNqzL2PqslsgOfXRY
+	MQ4mQcevmDcgKihhUp9f7iB9LaXOufUD99hhzwC95K6R4FMlbXyvBFk1KHpQVMyBs0MjQfgI/fc
+	7d8aihcb7XPsw5QUdW9LdhPsi1s8nUymQ/1IcqEqqZXPBWpD/a3p3pczRfsI7gwopnRFsxaNy7v
+	6LPyvR3217AdvhYweyHr+5+dBql61tRT7v+/qx0EFUWRb1Q=
+X-Google-Smtp-Source: AGHT+IFziflbIefi1sIJaXB3yllWsc0XeGXMYUj0xGF6k2cK1obeh3fpvU6wVdjbUP+nzYtCVCQalg==
+X-Received: by 2002:a05:600c:310a:b0:434:f335:855 with SMTP id 5b1f17b1804b1-43891440ab1mr245946755e9.28.1737710962385;
+        Fri, 24 Jan 2025 01:29:22 -0800 (PST)
+Received: from [192.168.18.210] (54-240-197-239.amazon.com. [54.240.197.239])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd501721sm19562045e9.9.2025.01.24.01.29.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jan 2025 01:29:22 -0800 (PST)
+Message-ID: <336f5623-b380-49e4-8dbe-ffa98f5aee19@gmail.com>
+Date: Fri, 24 Jan 2025 09:29:20 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|MW4PR12MB7311:EE_
-X-MS-Office365-Filtering-Correlation-Id: 701df5c4-df03-4fbb-fccb-08dd3c58134e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?d0Q1VDhiSjJrT2V3REY5NjFsTE85WURSZWpIWEFISTNFWFBkRlNmcnppeGVL?=
- =?utf-8?B?cnJ5Mng0cHA5NWRxTGJIU1RxbWRQWXhtN2RldEtITWxrbGZONUFoaVFjR1Rl?=
- =?utf-8?B?ZGNWZnUxSVVaaDZpc010TG43bzRkeW1jZ2VzWGhWMG16SFh0NCtKZ09aWDE5?=
- =?utf-8?B?cVpWUlFFVzV1elVFaWFoYmxFcmZrR2dnaDhoRnRiTEIxQ2tsdGlPWEUzZlNw?=
- =?utf-8?B?TFZzTThwSWpndWJlUXY2SWJUQWx6RW4zcDBSSFVYeDdtdUxzU09peEpJM1lH?=
- =?utf-8?B?dkZvUVIyK0VpV25HWFVGTmV3Y2w1VmlpanRIdTVTUkRhOGxUK200NmEzQjFk?=
- =?utf-8?B?ZVZNV2pQUTh6d0cxcGhOZXhXNUpRVTZXL3MyeHRIQndubFlNTDZ0eWhUQ3R5?=
- =?utf-8?B?bk1VRGtzN3V1SW5jRkpOLzNPeFRqSWZHTURHb3E0bGtKMkZMRHdUSDE4NUt0?=
- =?utf-8?B?VFU1TXFWWkVObGFuMHJXVVIyVFFUdEhYK2kxU041VmJDcFVGV09nVnIrSzJM?=
- =?utf-8?B?U1FMK1NoWGpRTGtERlRsM2VPUHBQVkRCcy9qZzV5czY5L2JXNlFTQUI1RkIv?=
- =?utf-8?B?OHNadVZCZVYzRFk5aEZRM3VWL2V0TlN6OWxmcWRSN0VWbmRjemRVWTNnN0Ji?=
- =?utf-8?B?UEhzVU5Cd0kzRHVjWE82MW5JYlllb1hHUzNxU3Q5TFVMa2NkazhodWh4Ym1n?=
- =?utf-8?B?NlhXREt2WVVkcEdScmNEQ29aSml5NThJeHlsaHhwK1dBd1U5SXExSEU0cGR4?=
- =?utf-8?B?R3JVblBCNTVqQnNsNXRuMXdQaThIZUU0ZHdBR2EzbnV0WTFWM25PbW93bm5a?=
- =?utf-8?B?S0lnZFN0YnRwdmN6Nm03UFRxSDdWVTg2cmlIVUZMRnQrSFhDY0J5KzU4NGxY?=
- =?utf-8?B?UGpONWRDQ3pBNHpJaDF1MVRtZnlQbzI4dWVpMGsxb1hjWCtxakJyYVhMSWNn?=
- =?utf-8?B?eHRicnNOL0lVS2Nha0IyQ01FdmJXRm55cXZHMWpIUHhWNUQzK05kWk9EV0xr?=
- =?utf-8?B?VWJBd2EwMjFiOE9tZXFhb0Q3NTQ5YlNxYkJVWGwzWEsxeUY2VGZwUXdkOCtj?=
- =?utf-8?B?N250elUwWXlYWW90RytsQWpuUm1ZSlhqUFJ6dkpHdkdQVWdwTGxWOE84UDF4?=
- =?utf-8?B?YVN5NEtyTmY2c041eGptMGZOaDl2V3FCNVdxRUFRQlkyckJVb1Q1VVVITjYx?=
- =?utf-8?B?blFKbGl5cngzQURSRHdiSE9nYW1STC83N09HQ1lBZkVzUVl6aThqc1VnbGFm?=
- =?utf-8?B?b0pzMWVTQjN4SlBJOWlSdCtHYVRJcFJPWjVIUWdqT1Y4TERuTU9WMjlabSt4?=
- =?utf-8?B?aFVDQ0xkTlpYZCtMbmZsc2E5cFlybVRnMnlSdkdxdGxBWHRiTXNkVWR6VWRi?=
- =?utf-8?B?RDd3SkJmMDROTU9DQmhTOWNNdklmaWpPbmUzU3dLcG1nMHN2NHM4N1FlU21k?=
- =?utf-8?B?RWN2T2FITUNGeXdjRHArYmdKT29NdEQ5UVM2YW9ZL3MwUnF0eTEvMS9LWm4r?=
- =?utf-8?B?TU1tN3VoQWJiaFlpeXQvbWZQV2dxWEZNTmZXUG9IM1IyQjFXcTI5N0c1RlhH?=
- =?utf-8?B?cy9WdVQ2ckNhSldyYW91dm0yWnozNWM5V2VUYUJCSGpsMVlPTG9RSnZXSk5P?=
- =?utf-8?B?eWV1M3Jmd2xlSWM2bE8yK0svUG5JczdSTGpGN3E4Q24weFIzbUNtWTlQQmZI?=
- =?utf-8?B?aFVVNE1lK0NDazBmU2Vtb3Z6ck1kNS9VMlRZaTB4clNRcEhuOGd4TWhSN1FX?=
- =?utf-8?B?Y3d5ZTlhL0Q1Y0syRTlCUS9HMzBId0VtQ21uSVhKQ0RzNmxsUEdRYWdlY3E2?=
- =?utf-8?B?RjBieWYrWkxtRjRZNkJycDNsemZuZjdQdVUxckV6c0RpNkFJdE9Wd0svQStN?=
- =?utf-8?Q?CJIesDFCcJTdT?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?d0JlWG1DS2xjL1ZUdkFmcDd2Q2lkcDlZL21FMWNSWnhsUGYxb1VKMTEwRGR0?=
- =?utf-8?B?S0hoSzBibVZSRStMLzNBYVoreE5iWWFRSlZiUE9US3A4eGZ6R1MwTnhOVlh1?=
- =?utf-8?B?ckc4N0lrUG02b21lNWZwUVdFcEtiWmJwbHBETC9wODNDejQ1amZjb2JKRjhT?=
- =?utf-8?B?c1Q3L3dPS1pURFdzWk10M2x0SGxFY3lpd1BCeC90U0VueUdnRCs0MEViSlJC?=
- =?utf-8?B?T3NycU1CNmlJY092cjNmV1RnaXNNNGpqNHAxK3UrbmtkTlBDSzQ0QWxTVU9v?=
- =?utf-8?B?NDZVQmJvSmhXcXNWYlprVUVia01lUkpVYkpyZGZpS1d0ajRjUEJCR0Jzcmp6?=
- =?utf-8?B?OXQ0eCtTd3h4MERhczNPaHFrTXovVm5yek9OM2gyRXVEMEFBZmdaeEN0eXpV?=
- =?utf-8?B?b093WGMrS1JUdUV1WHJLcUxPSTlrMDZHNnFhaTA4VUxvUzh5ZHFQMkRyNVph?=
- =?utf-8?B?NzdyclVKQVZqNWY2RlA3UVhhcGtsKysxVVVnQXR1cnAzbDM1RU0rWWxMemxa?=
- =?utf-8?B?bnM4Y0JVek9ETWZMWVNCTlRrRTVoWk5iTDZQNE44dGdkVVFydmE4clpSQkRz?=
- =?utf-8?B?d0VsRE93RWlFd0V6UXU0MnppUjF3YWNSeHdHZm5OcVJWb3h2Um9sRzdPd2lG?=
- =?utf-8?B?TXpDNWFBVnVTeVB3dmtpZUpSbmlDNDVwZVlwT1RPNDFpWEwrT3NZa1VuL3hD?=
- =?utf-8?B?ZE4wblBGdjlOek5PaS80RGRXbnN6ZHRXcEdReWJkcmgrenNrclkvQ05iWEhq?=
- =?utf-8?B?dWRrdjNFYmRXSFBwTk13RzQ4TE9Gcy85cFNNcG05U1pjRnRVb1VocUxaRzdS?=
- =?utf-8?B?eExCUi84OTJMNFBYdFgxYVBQWlk2SEpqR0oxSVRNVXhFajhnaEl1aHZWN3hJ?=
- =?utf-8?B?anVHQmdYdjZEVDJCVjFWSlNJTkFFL1JsY2EwR3Z5YjNrTXlRZU5tNDJSaVFP?=
- =?utf-8?B?K0QyRDhaQnNsK2pSbnRWZWhMT3VJREtQTkoxS3lhRXRQbG9iaGdHd3ZLM25n?=
- =?utf-8?B?ZGVhRklCMXZYRE5sSCs2dHlsNm9pUTV6b01xaVpZdXFhN1NjVXd4RFdSTXZi?=
- =?utf-8?B?UzZrN1krZzUvQzRZWnJuTStoQ092Y05MaDNWNWprcUlvMTdWTkFsREFYa2gx?=
- =?utf-8?B?dHAwZEdrR0lRT3hxTlgrdTJGUnppaU5VT0hCMmxJNGVEQjUwL0psQ05xcEVH?=
- =?utf-8?B?cHdOOXYvR1hPbk1MSkZRL3FadEh4dzU4TVQ3SzYvTUJ4bjhCd2UySHVKWDhS?=
- =?utf-8?B?RW1zWjc3V0hUdWZEQ3hQQ05qUHFId0RMOEZnNXVrS0ZhT2I0M2Y2K1pZci92?=
- =?utf-8?B?K3VqanFiNXpDMEIxbEJiVmNNTnZnNDdYaktRa2ZDMmRSY0VHTXhxeGYyd2dn?=
- =?utf-8?B?NXBwaGR3bGE2UEZ0dFRQbFZYYWVLOU4rZHF3MU1vbHhxMjdXd1pGalY2RFFS?=
- =?utf-8?B?S3FObURFKzltSDRqbkRycDRTczNMZVlWb241bWFGaXpUcStmYWFtcExVd2Jn?=
- =?utf-8?B?Z2RwbFY3VXU4MjZDTnhPTktycGZNRExNU0xmekFyMVUzVTJnUmJuMmFHWGRt?=
- =?utf-8?B?KzFWN3lpbXFCK2NHeVNZTTBQRjBFUjQ1aTFsMnpyMUtvYlk5Z1lFRDUzSTdD?=
- =?utf-8?B?MGdPR083Rm43T0V2OGp6V2t3bS9iYzF6RWRKaVg0VlJXRnJJNWUwbDhiTzBT?=
- =?utf-8?B?Si9pbjN1N3UwTmhZci9jVGhvRDllUFM4WnBFRWxKeVh3UXQxUUN2MjNjR3k1?=
- =?utf-8?B?Yk9zTSt5a09qUWV5V1dKN0VmMjB2NGJsVXNlOC90SDA2SlpxZEY5WndKKzMr?=
- =?utf-8?B?U2F3VFN0THhGbTBkejZLMldueXZqTUZXai9Hd3c0cUFMZ0xEM21BOGdBZTVT?=
- =?utf-8?B?cjdlK0tndlhZSFNqa0w3Zk5UVVYxTzdHREJ6YkMrUnl1b3k4alV6NDJmVGsx?=
- =?utf-8?B?SG9DK2FkcDQ3d3hFaTVvZ25HcDg4aEtYSXhTbHRJZ0NNb05aWTllUkRYMlpY?=
- =?utf-8?B?TUlKMkZnaEMyVk5jM2ZSOEtXVmZMOCt2ampMRjhwRDRzN2hzZFdhaWlEbHpM?=
- =?utf-8?B?bDhobXRyNFM2YWp1OFVuaEh1bGM3SEtMVjZtNXFrdlh5K2FMWllZOHZVcFln?=
- =?utf-8?Q?XQP5XH3wk9UT6QBdq1cvXP5Tt?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 701df5c4-df03-4fbb-fccb-08dd3c58134e
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 09:18:33.7835
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FqwgaEfoUzdPzO+F7oOd5wWPczCg2OIPy/eZFwN6bMp4K3kbEa/ZLvEHJcHIa82exlMJIQuPjS/pvnGq5A+G4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7311
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH] KVM: x86: Update Xen TSC leaves during CPUID emulation
+To: Sean Christopherson <seanjc@google.com>,
+ David Woodhouse <dwmw2@infradead.org>
+Cc: Fred Griffoul <fgriffo@amazon.co.uk>, kvm@vger.kernel.org,
+ griffoul@gmail.com, vkuznets@redhat.com, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>,
+ linux-kernel@vger.kernel.org
+References: <20250123190253.25891-1-fgriffo@amazon.co.uk>
+ <c7b494d34d3e14531337311c286a9c06a99c9295.camel@infradead.org>
+ <Z5LqeGa_G_NZ_boC@google.com>
+Content-Language: en-US
+From: "Durrant, Paul" <xadimgnik@gmail.com>
+In-Reply-To: <Z5LqeGa_G_NZ_boC@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 1/23/2025 11:00 PM, Pratik R. Sampat wrote:
-> Abstract rep vmmcall coded into the VMGEXIT helper for the sev
-> library.
+On 24/01/2025 01:18, Sean Christopherson wrote:
+> On Thu, Jan 23, 2025, David Woodhouse wrote:
+>> On Thu, 2025-01-23 at 19:02 +0000, Fred Griffoul wrote:
+>>
+>>> +static inline void kvm_xen_may_update_tsc_info(struct kvm_vcpu *vcpu,
+>>> +					       u32 function, u32 index,
+>>> +					       u32 *eax, u32 *ecx, u32 *edx)
+>>
+>> Should this be called kvm_xen_maybe_update_tsc_info() ?
+>>
+>> Is it worth adding if (static_branch_unlikely(&kvm_xen_enabled.key))?
 > 
-> No functional change intended.
+> Or add a helper?  Especially if we end up processing KVM_REQ_CLOCK_UPDATE.
 > 
-> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
-
-Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
-
+> static inline bool kvm_xen_is_tsc_leaf(struct kvm_vcpu *vcpu, u32 function)
+> {
+> 	return static_branch_unlikely(&kvm_xen_enabled.key) &&
+> 	       vcpu->arch.xen.cpuid.base &&
+> 	       function < vcpu->arch.xen.cpuid.limit;
+> 	       function == (vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3));
+> }
+> 
+>>
+>>> +{
+>>> +	u32 base = vcpu->arch.xen.cpuid.base;
+>>> +
+>>> +	if (base && (function == (base | XEN_CPUID_LEAF(3)))) {
+> 
+> Pretty sure cpuid.limit needs to be checked, e.g. to avoid a false positive in
+> the unlikely scenario that userspace advertised a lower limit but still filled
+> the CPUID entry.
+> 
+>>> +		if (index == 1) {
+>>> +			*ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
+>>> +			*edx = vcpu->arch.hv_clock.tsc_shift;
+>>
+>> Are these fields in vcpu->arch.hv_clock definitely going to be set?
+> 
+> Set, yes.  Up-to-date, no.  If there is a pending KVM_REQ_CLOCK_UPDATE, e.g. due
+> to frequency change, KVM could emulate CPUID before processing the request if
+> the CPUID VM-Exit occurred before the request was made.
+> 
+>> If so, can we have a comment to that effect? And perhaps a warning to
+>> assert the truth of that claim?
+>>
+>> Before this patch, if the hv_clock isn't yet set then the guest would
+>> see the original content of the leaves as set by userspace?
+> 
+> In theory, yes, but in practice that can't happen because KVM always pends a
+> KVM_REQ_CLOCK_UPDATE before entering the guest (it's stupidly hard to see).
+> 
+> On the first kvm_arch_vcpu_load(), vcpu->cpu will be -1, which results in
+> KVM_REQ_GLOBAL_CLOCK_UPDATE being pending.
+> 
+>    	if (unlikely(vcpu->cpu != cpu) || kvm_check_tsc_unstable()) {
+> 		...
+> 
+> 		if (!vcpu->kvm->arch.use_master_clock || vcpu->cpu == -1)
+> 			kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
+> 
+> 	}
+> 
+> That in turn triggers a KVM_REQ_CLOCK_UPDATE.
+> 
+> 		if (kvm_check_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu))
+> 			kvm_gen_kvmclock_update(vcpu);
+> 
+>    static void kvm_gen_kvmclock_update(struct kvm_vcpu *v)
+>    {
+> 	struct kvm *kvm = v->kvm;
+> 
+> 	kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
+> 	schedule_delayed_work(&kvm->arch.kvmclock_update_work,
+> 					KVMCLOCK_UPDATE_DELAY);
+>    }
+> 
+> And in the extremely unlikely failure path, which I assume handles the case where
+> TSC calibration hasn't completed, KVM requests another KVM_REQ_CLOCK_UPDATE and
+> aborts VM-Enter.  So AFAICT, it's impossible to trigger CPUID emulation without
+> first stuffing Xen CPUID.
+> 
+> 	/* Keep irq disabled to prevent changes to the clock */
+> 	local_irq_save(flags);
+> 	tgt_tsc_khz = get_cpu_tsc_khz();
+> 	if (unlikely(tgt_tsc_khz == 0)) {
+> 		local_irq_restore(flags);
+> 		kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
+> 		return 1;
+> 	}
+> 
+>> Now it gets zeroes if that happens?
+> 
+> Somewhat of a tangent, if userspace is providing non-zero values, commit f422f853af03
+> ("KVM: x86/xen: update Xen CPUID Leaf 4 (tsc info) sub-leaves, if present") would
+> have broken userspace.  QEMU doesn't appear to stuff non-zero values and no one
+> has complained, so I think we escaped this time.
+> 
+> Jumping back to the code, if we add kvm_xen_is_tsc_leaf(), I would be a-ok with
+> handling the CPUID manipulations in kvm_cpuid().  I'd probably even prefer it,
+> because overall I think bleeding a few Xen details into common code is worth
+> making the flow easier to follow.
+> 
+> Putting it all together, something like this?  Compile tested only.
+> 
 > ---
->   tools/testing/selftests/kvm/include/x86/sev.h    | 2 ++
->   tools/testing/selftests/kvm/x86/sev_smoke_test.c | 2 +-
->   2 files changed, 3 insertions(+), 1 deletion(-)
+>   arch/x86/kvm/cpuid.c | 16 ++++++++++++++++
+>   arch/x86/kvm/x86.c   |  3 +--
+>   arch/x86/kvm/x86.h   |  1 +
+>   arch/x86/kvm/xen.c   | 23 -----------------------
+>   arch/x86/kvm/xen.h   | 13 +++++++++++--
+>   5 files changed, 29 insertions(+), 27 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86/sev.h b/tools/testing/selftests/kvm/include/x86/sev.h
-> index 82c11c81a956..e7df5d0987f6 100644
-> --- a/tools/testing/selftests/kvm/include/x86/sev.h
-> +++ b/tools/testing/selftests/kvm/include/x86/sev.h
-> @@ -27,6 +27,8 @@ enum sev_guest_state {
->   
->   #define GHCB_MSR_TERM_REQ	0x100
->   
-> +#define VMGEXIT()		{ __asm__ __volatile__("rep; vmmcall"); }
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index edef30359c19..689882326618 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -2005,6 +2005,22 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
+>   		} else if (function == 0x80000007) {
+>   			if (kvm_hv_invtsc_suppressed(vcpu))
+>   				*edx &= ~feature_bit(CONSTANT_TSC);
+> +		} else if (IS_ENABLED(CONFIG_KVM_XEN) &&
+> +			   kvm_xen_is_tsc_leaf(vcpu, function)) {
+> +			/*
+> +			 * Update guest TSC frequency information is necessary.
+> +			 * Ignore failures, there is no sane value that can be
+> +			 * provided if KVM can't get the TSC frequency.
+> +			 */
+> +			if (kvm_check_request(KVM_REQ_CLOCK_UPDATE, vcpu))
+> +				kvm_guest_time_update(vcpu);
 > +
->   void sev_vm_launch(struct kvm_vm *vm, uint32_t policy);
->   void sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement);
->   void sev_vm_launch_finish(struct kvm_vm *vm);
-> diff --git a/tools/testing/selftests/kvm/x86/sev_smoke_test.c b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
-> index a1a688e75266..38f647fe55d2 100644
-> --- a/tools/testing/selftests/kvm/x86/sev_smoke_test.c
-> +++ b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
-> @@ -27,7 +27,7 @@ static void guest_sev_es_code(void)
->   	 * force "termination" to signal "done" via the GHCB MSR protocol.
->   	 */
->   	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
-> -	__asm__ __volatile__("rep; vmmcall");
-> +	VMGEXIT();
+> +			if (index == 1) {
+> +				*ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
+> +				*edx = vcpu->arch.hv_clock.tsc_shift;
+> +			} else if (index == 2) {
+> +				*eax = vcpu->arch.hw_tsc_khz;
+> +			}
+>   		}
+>   	} else {
+>   		*eax = *ebx = *ecx = *edx = 0;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f61d71783d07..817a7e522935 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3173,7 +3173,7 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+>   	trace_kvm_pvclock_update(v->vcpu_id, &vcpu->hv_clock);
 >   }
 >   
->   static void guest_sev_code(void)
+> -static int kvm_guest_time_update(struct kvm_vcpu *v)
+> +int kvm_guest_time_update(struct kvm_vcpu *v)
+>   {
+>   	unsigned long flags, tgt_tsc_khz;
+>   	unsigned seq;
+> @@ -3256,7 +3256,6 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
+>   				   &vcpu->hv_clock.tsc_shift,
+>   				   &vcpu->hv_clock.tsc_to_system_mul);
+>   		vcpu->hw_tsc_khz = tgt_tsc_khz;
+> -		kvm_xen_update_tsc_info(v);
+>   	}
+>   
+>   	vcpu->hv_clock.tsc_timestamp = tsc_timestamp;
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 7a87c5fc57f1..5fdf32ba9406 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -362,6 +362,7 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
+>   u64 get_kvmclock_ns(struct kvm *kvm);
+>   uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm);
+>   bool kvm_get_monotonic_and_clockread(s64 *kernel_ns, u64 *tsc_timestamp);
+> +int kvm_guest_time_update(struct kvm_vcpu *v);
+>   
+>   int kvm_read_guest_virt(struct kvm_vcpu *vcpu,
+>   	gva_t addr, void *val, unsigned int bytes,
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index a909b817b9c0..ed5c2f088361 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -2247,29 +2247,6 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
+>   	del_timer_sync(&vcpu->arch.xen.poll_timer);
+>   }
+>   
+> -void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
+> -{
+> -	struct kvm_cpuid_entry2 *entry;
+> -	u32 function;
+> -
+> -	if (!vcpu->arch.xen.cpuid.base)
+> -		return;
+> -
+> -	function = vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3);
+> -	if (function > vcpu->arch.xen.cpuid.limit)
+> -		return;
+> -
+> -	entry = kvm_find_cpuid_entry_index(vcpu, function, 1);
+> -	if (entry) {
+> -		entry->ecx = vcpu->arch.hv_clock.tsc_to_system_mul;
+> -		entry->edx = vcpu->arch.hv_clock.tsc_shift;
+> -	}
+> -
+> -	entry = kvm_find_cpuid_entry_index(vcpu, function, 2);
+> -	if (entry)
+> -		entry->eax = vcpu->arch.hw_tsc_khz;
+> -}
+
+This LGTM. My only concern is whether vcpu->arch.hv_clock will be 
+updated by anything other than a KVM_REQ_CLOCK_UPDATE? I don't think so 
+but the crucial thing is that the values match what is in the vcpu_info 
+struct... so maybe a safer option is to pull the values directly from that.
+
+> -
+>   void kvm_xen_init_vm(struct kvm *kvm)
+>   {
+>   	mutex_init(&kvm->arch.xen.xen_lock);
+> diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+> index f5841d9000ae..5ee7f3f1b45f 100644
+> --- a/arch/x86/kvm/xen.h
+> +++ b/arch/x86/kvm/xen.h
+> @@ -9,6 +9,7 @@
+>   #ifndef __ARCH_X86_KVM_XEN_H__
+>   #define __ARCH_X86_KVM_XEN_H__
+>   
+> +#include <asm/xen/cpuid.h>
+>   #include <asm/xen/hypervisor.h>
+>   
+>   #ifdef CONFIG_KVM_XEN
+> @@ -35,7 +36,6 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
+>   int kvm_xen_setup_evtchn(struct kvm *kvm,
+>   			 struct kvm_kernel_irq_routing_entry *e,
+>   			 const struct kvm_irq_routing_entry *ue);
+> -void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
+>   
+>   static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
+>   {
+> @@ -50,6 +50,14 @@ static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
+>   		kvm_xen_inject_vcpu_vector(vcpu);
+>   }
+>   
+> +static inline bool kvm_xen_is_tsc_leaf(struct kvm_vcpu *vcpu, u32 function)
+> +{
+> +	return static_branch_unlikely(&kvm_xen_enabled.key) &&
+> +	       vcpu->arch.xen.cpuid.base &&
+> +	       function < vcpu->arch.xen.cpuid.limit &&
+> +	       function == (vcpu->arch.xen.cpuid.base | XEN_CPUID_LEAF(3));
+> +}
+> +
+>   static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+>   {
+>   	return static_branch_unlikely(&kvm_xen_enabled.key) &&
+> @@ -157,8 +165,9 @@ static inline bool kvm_xen_timer_enabled(struct kvm_vcpu *vcpu)
+>   	return false;
+>   }
+>   
+> -static inline void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
+> +static inline bool kvm_xen_is_tsc_leaf(struct kvm_vcpu *vcpu, u32 function)
+>   {
+> +	return false;
+>   }
+>   #endif
+>   
+> 
+> base-commit: 84be94b5b6490e29a6f386cec90f8d5c6d14f0df
 
 
