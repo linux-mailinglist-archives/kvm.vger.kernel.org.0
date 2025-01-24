@@ -1,457 +1,189 @@
-Return-Path: <kvm+bounces-36583-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30322A1BF16
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 00:45:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E228EA1BF1C
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 00:47:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16249188FC85
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 23:45:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC961188C3D6
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 23:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744581EEA2E;
-	Fri, 24 Jan 2025 23:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7AD1EEA29;
+	Fri, 24 Jan 2025 23:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EKCs0rlc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xe2xaP2z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF542B9BC
-	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 23:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C461E7C3D
+	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 23:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737762299; cv=none; b=H1GtbTsI+qlwfVuAUhBvFdbzwZLlSpwsLr5S47YrXHzWs9wI7QD/wYIz+5gnEiyoUPchj5l2oFt0FajJo2yir9t3jdf21NVSyPSW3GQPpGZ6z7ga0MwitoUPfUa7vL7qmtkkUKgTeWSeubcCBmTMAW72nW+v5+PpkMtvU2m7ylU=
+	t=1737762426; cv=none; b=dDQT5p6l8vEThkpYQpumdMwxcIgqEwPsGuSZ9HOMQerKHcq4Pz9fU3jDhYMXKEG4sUW20DMpaaZY1opdyYGGfqJwSLdOqKXXCZtcPe9xEozVFkNtOE9AIB8Lq8YqstKCcRY+GVb+lqgNYbAPPUuy/6gPYuMo3nE0eTOm7I1RwmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737762299; c=relaxed/simple;
-	bh=rUr16Gh2E03IjABERwE87pz2eo3qnk7+IEb2BAuflY4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ffVwE1FxLDqZtyj9CUYRSJkDWtm9VwlsgKRPWvwUaABln0QZ2YhJfVdSmgn81wzNLlxD/zhGZ6Sg6VUgpXFaAYRXU33rrxMxiS006ezRimO3StTbvrsmTYQ9xFEhhNg4y9dSfk13frS9XIE5ckeIjvxlw4NT4NOHCnTiAFzlLHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EKCs0rlc; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1737762426; c=relaxed/simple;
+	bh=fhv6fbic2s0quh3OAunJsF/luT1qeIOYufNBDSqGvto=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ByZq489MJV7qn4TYnmnGx1YGOWB+QTiTVdAKJPJ40lvEedpjZqlXCB9Io+jz0IOPdJGchm8Lwo0vhErAjGkNZTP9elomZelaq7A69wDGhGOrOGTvHVPSI1ptbMisGRjyQPUQ5LPRmqxoObCmHE8zr7WGmaJeLK+WV68TShOejlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xe2xaP2z; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21640607349so62156065ad.0
-        for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 15:44:57 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef909597d9so7486352a91.3
+        for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 15:47:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737762297; x=1738367097; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=je/I47EYUB+PpcUZ1/0QwgtzzM9PYOHzghBx3MDQBGw=;
-        b=EKCs0rlcIhueSH9QMfuTYE0G3YCHCF2ho/HLVGhi9Q+NGJJwgxd0G7iSKFPk+UovbG
-         V3TyHwvN47Py8HJsG+gjooXDVP7NJrLUXgQ7LXsMuHV3Sd1KMd62c52r5uN0pNgFkh6J
-         JIZ1m/yl5k2JY6bOqBbrs4JH91qKLX1PuXpPV9+WIoiMho/qJ/09j02I+pZT5iPZrzBs
-         YRsUWORxAqNZm2S7l0fAi7aNkr5jFEmfBy2Pp9UypYBxXiq6c9IBdx8+q5/VYTMOVN6/
-         O20/qG+KzFpdZJBPjOWgdzO6nwZ1WkcyN1e9w/4x6kl+HM6a0NHYhODUyMKPIwu7Pm2A
-         IYMw==
+        d=google.com; s=20230601; t=1737762424; x=1738367224; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xZqSdmAP4JAfn0GgCRDW/fYFltIoNyRnJ22thKN56cQ=;
+        b=Xe2xaP2z42NGdES5/jI+wFuLbu6PsGLHjyND7yNyq+Gw7UWQDBPUEzRm0+lpRKBZLB
+         TssE1zjN/gYpos+APxLEB3JOT2qcHLZzo0KMeBqYLhmB8gTVReZDIzQtXFZiKf8xlvyA
+         h+g6evoHjhReGrZUcxsgoIM5Zf1HTlSBxJdb837e9Ovv+LxIJ61Z55VGqz2UbOXrTAIV
+         dIbk7UffljScaGU5Y+x7x7LFxmDaiYqaNe384PJ4DyMgeqHML0KpX7vVYnTOWpOKzngP
+         2ccDneq1ns8R3hUICg72C3SA7WoN/7bgfBWJns4oL2YRzqfg9O9on06aD0k44Z3JNkpT
+         8VuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737762297; x=1738367097;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=je/I47EYUB+PpcUZ1/0QwgtzzM9PYOHzghBx3MDQBGw=;
-        b=vbbUKlQUzztQYlytx0cHWMSFQOJ0i5fcpCJ0esuUTWFYmnU1gqyEalr/liI5wpufT3
-         wyWFFYxoSxdm/pmtXcenE+JCWmjw3Uk147GHJ5imO0im6Sy80TmWnA+bIO8UKseD18He
-         3AwmAZ9hwP3ch+vcfe0KjkS6rWxzH3LIZlGh38wvxgc/7Jv0a9Uy20b+5bejr4I4obgA
-         IfOT14tHl82Erqz9/8Iln9muLC3yRFtqC4zDo7IEwdk/O95YXbColB6qBGqRnGtQgrQf
-         KNxAqyW5k2/SaMIy/3hChg31n0I8Ts3STeDKqhJmA7qyeKKIvjLvBPuv3e1Vgsv306fC
-         2uoA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVMIMV+WU5JwkiiNtvm0/dQdEao/Dd1TpJ78k/+g20RFm7wwCc/fqwQTiTqOqGEqF/V3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxemp77Vxt86PdbGixkp3AlLTyPODVTZnLwy0S8ysfdLi1Ru7c8
-	zohG2HpVdtRFpYaKwLmrLaQu0IP86+MuHtQ7dNNoXJ4GMibodTUs2oSMFk7myT87CnNnsnQDuq+
-	LaA==
-X-Google-Smtp-Source: AGHT+IGB4Wp3yE5PYJMqITriXU/f4vIMrdEJvPGjRSXHmcRLl3Nat0H8fwN+OOEdwW6nejbdK0FAMPGy3hY=
-X-Received: from pfd10.prod.google.com ([2002:a05:6a00:a80a:b0:725:d350:a304])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:918b:b0:1e0:c50c:9842
- with SMTP id adf61e73a8af0-1eb2157fce9mr59488905637.31.1737762297203; Fri, 24
- Jan 2025 15:44:57 -0800 (PST)
-Date: Fri, 24 Jan 2025 15:44:55 -0800
-In-Reply-To: <CABgObfa4TKcj-d3Spw+TAE7ZfO8wFGJebkW3jMyFY2TrKxMuSw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1737762424; x=1738367224;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xZqSdmAP4JAfn0GgCRDW/fYFltIoNyRnJ22thKN56cQ=;
+        b=FetMEN2Hv03xEUgoCZT2eNyIklUL2UwLaQG8lbVARzt/OqCKjv0uypFfW9JYZHuVdX
+         DP1Kgdnm4dzibkq72KyWq7pElGSzB92fDH6nbY2Fnf8uCTU1zVVsfZJ/MSNj4D1rI5Yv
+         DPEqfMa4vph9ldo+LiHFhhz3lfltxQy9NUbDOAr3yNKiFtiR1IFWE2Cr3OE8XPvbwPZO
+         0bixfuU9ABNbJDvyTYdtFOQ2i92gSLzj9LUW+USzZIRw5AqNyNfESiMxGDZxzCjga7Eh
+         TO3TZViRjVjbZ/anPMi/7+YR8bg01wKx24WeYD7JXpyc+8o3QCI/g/MQRfw8iubWebMB
+         4suQ==
+X-Gm-Message-State: AOJu0Yyh/RQN/XL80fWpokAPYRHqqvNqses9IAGH43AkxrdKmsp8rdOS
+	Tla8sUuUlZZT1nf8qfJNUfOLMgItf5C38aVZjsvfRCKZsOZGElWiwuFpv1QLCCqRA7MrMu8wozr
+	jAw==
+X-Google-Smtp-Source: AGHT+IFiedBo0HwyMC9WduQOva9J3+TGiP5ylctgfBsgVX+RBYKVPFWUUH/l3n71CNB8yD1/yv+VcEwXHU8=
+X-Received: from pfbcz18.prod.google.com ([2002:aa7:9312:0:b0:72a:f9c7:a2ed])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:288e:b0:72d:2444:da2d
+ with SMTP id d2e1a72fcca58-72dafa03216mr39235754b3a.9.1737762423719; Fri, 24
+ Jan 2025 15:47:03 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 24 Jan 2025 15:46:23 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250124191109.205955-1-pbonzini@redhat.com> <20250124191109.205955-2-pbonzini@redhat.com>
- <Z5Pz7Ga5UGt88zDc@google.com> <CABgObfa4TKcj-d3Spw+TAE7ZfO8wFGJebkW3jMyFY2TrKxMuSw@mail.gmail.com>
-Message-ID: <Z5QhGndjNwYdnIZF@google.com>
-Subject: Re: [PATCH 1/2] KVM: x86: fix usage of kvm_lock in set_nx_huge_pages()
+X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
+Message-ID: <20250124234623.3609069-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Ensure NX huge page recovery thread is alive
+ before waking
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Keith Busch <kbusch@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 24, 2025, Paolo Bonzini wrote:
-> Il ven 24 gen 2025, 21:11 Sean Christopherson <seanjc@google.com> ha scritto:
-> > Heh, except it's all kinds of broken.
-> 
-> Yes, I didn't even try.
-> 
-> > IMO, biting the bullet and converting to
-> > an SRCU-protected list is going to be far less work in the long run.
-> 
-> I did try a long SRCU critical section and it was unreviewable. It
-> ends up a lot less manageable than just making the lock a leaf,
-> especially as the lock hierarchy spans multiple subsystems (static
-> key, KVM, cpufreq---thanks CPU hotplug lock...).
+When waking a VM's NX huge page recovery thread, ensure the thread is
+actually alive before trying to wake it.  Now that the thread is spawned
+on-demand during KVM_RUN, a VM without a recovery thread is reachable via
+the related module params.
 
-I'm not following.  If __kvmclock_cpufreq_notifier() and set_nx_huge_pages()
-switch to SRCU, then the deadlock goes away (it might even go away if just one
-of those two switches).
+  BUG: kernel NULL pointer dereference, address: 0000000000000040
+  #PF: supervisor read access in kernel mode
+  #PF: error_code(0x0000) - not-present page
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:vhost_task_wake+0x5/0x10
+  Call Trace:
+   <TASK>
+   set_nx_huge_pages+0xcc/0x1e0 [kvm]
+   param_attr_store+0x8a/0xd0
+   module_attr_store+0x1a/0x30
+   kernfs_fop_write_iter+0x12f/0x1e0
+   vfs_write+0x233/0x3e0
+   ksys_write+0x60/0xd0
+   do_syscall_64+0x5b/0x160
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+  RIP: 0033:0x7f3b52710104
+   </TASK>
+  Modules linked in: kvm_intel kvm
+  CR2: 0000000000000040
 
-SRCU readers would only interact with kvm_destroy_vm() from a locking perspective,
-and if that's problematic then we would already have a plethora of issues.
-
-> I also didn't like adding a synchronization primitive that's... kinda
-> single-use, but that would not be a blocker of course.
-
-It would be single use in the it only protects pure reader of vm_list, but there
-are plenty of those users.
-
-> So the second attempt was regular RCU, which looked a lot like this
-> patch. I started writing all the dances to find a struct kvm that
-> passes kvm_get_kvm_safe() before you do rcu_read_unlock() and drop the
-> previous one (because you cannot do kvm_put_kvm() within the RCU read
-> side) and set aside the idea, incorrectly thinking that they were not
-> needed with kvm_lock. Plus I didn't like having to keep alive a bunch
-> of data for a whole grace period if call_rcu() is used.
-> 
-> So for the third attempt I could have chosen between dropping the SRCU
-> or just using kvm_lock. I didn't even think of SRCU to be honest,
-> because everything so far looked so bad, but it does seem a little
-> better than RCU. At least, if kvm_destroy_vm() uses call_srcu(), you
-> can call kvm_put_kvm() within srcu_read_lock()...srcu_read_unlock().
-> It would look something like
-> 
->   list_for_each_entry_srcu(kvm, &vm_list, vm_list, 1) {
->     if (!kvm_get_kvm_safe(kvm))
-
-Unless I'm missing something, we shouldn't need to take a reference so long as
-SRCU is synchronized before destroying any part of the VM.  If we don't take a
-reference, then we don't need to deal with the complexity of kvm_put_kvm()
-creating a recursive lock snafu.
-
-This is what I'm thinking, lightly tested...
-
----
-From: Sean Christopherson <seanjc@google.com>
-Date: Fri, 24 Jan 2025 15:15:05 -0800
-Subject: [PATCH] KVM: Use an SRCU lock to protect readers of vm_list
-
-Introduce a global SRCU lock to protect KVM's global list of VMs, and use
-it in all locations that currently take kvm_lock purely to prevent a VM
-from being destroyed.
-
-Keep using kvm_lock for flows that need to prevent VMs from being created,
-as SRCU synchronization only guards against use-after-free, it doesn't
-ensure a stable vm_list for readers.
-
-This fixes a largely theoretical deadlock where:
-
-  - __kvm_set_memory_region() waits for kvm->srcu with kvm->slots_lock taken
-  - set_nx_huge_pages() waits for kvm->slots_lock with kvm_lock taken
-  - __kvmclock_cpufreq_notifier() waits for kvm_lock with cpu_hotplug_lock taken
-  - KVM_RUN waits for cpu_hotplug_lock with kvm->srcu taken
-
-and therefore __kvm_set_memory_region() never completes
-synchronize_srcu(&kvm->srcu).
-
-  __kvm_set_memory_region()
-    lock(&kvm->slots_lock)
-                           set_nx_huge_pages()
-                             lock(kvm_lock)
-                             lock(&kvm->slots_lock)
-                                                     __kvmclock_cpufreq_notifier()
-                                                       lock(cpu_hotplug_lock)
-                                                       lock(kvm_lock)
-                                                                                   lock(&kvm->srcu)
-                                                                                   kvm_lapic_set_base()
-                                                                                     static_branch_inc()
-                                                                                       lock(cpu_hotplug_lock)
-  sync(&kvm->srcu)
-
-Opportunistically add macros to walk the list of VMs, and the array of
-vCPUs in each VMs, to cut down on the amount of boilerplate.
-
+Fixes: 931656b9e2ff ("kvm: defer huge page recovery vhost task to later")
+Cc: stable@vger.kernel.org
+Cc: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c   | 19 +++++++++++------
- arch/x86/kvm/x86.c       | 36 +++++++++++++++++--------------
- include/linux/kvm_host.h |  9 ++++++++
- virt/kvm/kvm_main.c      | 46 +++++++++++++++++++++++++---------------
- 4 files changed, 71 insertions(+), 39 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 33 ++++++++++++++++++++++++++-------
+ 1 file changed, 26 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 74fa38ebddbf..f5b7ceb7ca0e 100644
+index a45ae60e84ab..74c20dbb92da 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -7127,6 +7127,10 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
- 	} else if (sysfs_streq(val, "never")) {
- 		new_val = 0;
+@@ -7120,6 +7120,19 @@ static void mmu_destroy_caches(void)
+ 	kmem_cache_destroy(mmu_page_header_cache);
+ }
  
-+		/*
-+		 * Take kvm_lock to ensure no VMs are *created* before the flag
-+		 * is set.  vm_list_srcu only protect VMs being deleted.
-+		 */
- 		mutex_lock(&kvm_lock);
- 		if (!list_empty(&vm_list)) {
- 			mutex_unlock(&kvm_lock);
-@@ -7142,17 +7146,19 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
- 
- 	if (new_val != old_val) {
- 		struct kvm *kvm;
-+		int idx;
- 
--		mutex_lock(&kvm_lock);
-+		idx = srcu_read_lock(&vm_list_srcu);
- 
--		list_for_each_entry(kvm, &vm_list, vm_list) {
-+		kvm_for_each_vm_srcu(kvm) {
- 			mutex_lock(&kvm->slots_lock);
++static void kvm_wake_nx_recovery_thread(struct kvm *kvm)
++{
++	/*
++	 * The NX recovery thread is spawned on-demand at the first KVM_RUN and
++	 * may not be valid even though the VM is globally visible.  Do nothing,
++	 * as such a VM can't have any possible NX huge pages.
++	 */
++	struct vhost_task *nx_thread = READ_ONCE(kvm->arch.nx_huge_page_recovery_thread);
++
++	if (nx_thread)
++		vhost_task_wake(nx_thread);
++}
++
+ static int get_nx_huge_pages(char *buffer, const struct kernel_param *kp)
+ {
+ 	if (nx_hugepage_mitigation_hard_disabled)
+@@ -7180,7 +7193,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
  			kvm_mmu_zap_all_fast(kvm);
  			mutex_unlock(&kvm->slots_lock);
  
- 			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
+-			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
++			kvm_wake_nx_recovery_thread(kvm);
  		}
--		mutex_unlock(&kvm_lock);
-+
-+		srcu_read_unlock(&vm_list_srcu, idx);
+ 		mutex_unlock(&kvm_lock);
  	}
+@@ -7315,7 +7328,7 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
+ 		mutex_lock(&kvm_lock);
  
- 	return 0;
-@@ -7275,13 +7281,14 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
- 	if (is_recovery_enabled &&
- 	    (!was_recovery_enabled || old_period > new_period)) {
- 		struct kvm *kvm;
-+		int idx;
+ 		list_for_each_entry(kvm, &vm_list, vm_list)
+-			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
++			kvm_wake_nx_recovery_thread(kvm);
  
--		mutex_lock(&kvm_lock);
-+		idx = srcu_read_lock(&vm_list_srcu);
- 
--		list_for_each_entry(kvm, &vm_list, vm_list)
-+		kvm_for_each_vm_srcu(kvm)
- 			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
- 
--		mutex_unlock(&kvm_lock);
-+		srcu_read_unlock(&vm_list_srcu, idx);
+ 		mutex_unlock(&kvm_lock);
  	}
- 
- 	return err;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b2d9a16fd4d3..8fb49237d179 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9428,6 +9428,11 @@ static void kvm_hyperv_tsc_notifier(void)
- 	struct kvm *kvm;
- 	int cpu;
- 
-+	/*
-+	 * Take kvm_lock, not just vm_list_srcu, trevent new VMs from coming
-+	 * along in the middle of the update and not getting the in-progress
-+	 * request.
-+	 */
- 	mutex_lock(&kvm_lock);
- 	list_for_each_entry(kvm, &vm_list, vm_list)
- 		kvm_make_mclock_inprogress_request(kvm);
-@@ -9456,7 +9461,7 @@ static void __kvmclock_cpufreq_notifier(struct cpufreq_freqs *freq, int cpu)
+@@ -7451,14 +7464,20 @@ static void kvm_mmu_start_lpage_recovery(struct once *once)
  {
- 	struct kvm *kvm;
- 	struct kvm_vcpu *vcpu;
--	int send_ipi = 0;
-+	int send_ipi = 0, idx;
- 	unsigned long i;
+ 	struct kvm_arch *ka = container_of(once, struct kvm_arch, nx_once);
+ 	struct kvm *kvm = container_of(ka, struct kvm, arch);
++	struct vhost_task *nx_thread;
  
- 	/*
-@@ -9500,17 +9505,16 @@ static void __kvmclock_cpufreq_notifier(struct cpufreq_freqs *freq, int cpu)
+ 	kvm->arch.nx_huge_page_last = get_jiffies_64();
+-	kvm->arch.nx_huge_page_recovery_thread = vhost_task_create(
+-		kvm_nx_huge_page_recovery_worker, kvm_nx_huge_page_recovery_worker_kill,
+-		kvm, "kvm-nx-lpage-recovery");
++	nx_thread = vhost_task_create(kvm_nx_huge_page_recovery_worker,
++				      kvm_nx_huge_page_recovery_worker_kill,
++				      kvm, "kvm-nx-lpage-recovery");
  
- 	smp_call_function_single(cpu, tsc_khz_changed, freq, 1);
- 
--	mutex_lock(&kvm_lock);
--	list_for_each_entry(kvm, &vm_list, vm_list) {
--		kvm_for_each_vcpu(i, vcpu, kvm) {
--			if (vcpu->cpu != cpu)
--				continue;
--			kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
--			if (vcpu->cpu != raw_smp_processor_id())
--				send_ipi = 1;
--		}
-+	idx = srcu_read_lock(&vm_list_srcu);
-+	kvm_for_each_vcpu_in_each_vm(kvm, vcpu, i) {
-+		if (vcpu->cpu != cpu)
-+			continue;
+-	if (kvm->arch.nx_huge_page_recovery_thread)
+-		vhost_task_start(kvm->arch.nx_huge_page_recovery_thread);
++	if (!nx_thread)
++		return;
 +
-+		kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
-+		if (vcpu->cpu != raw_smp_processor_id())
-+			send_ipi = 1;
- 	}
--	mutex_unlock(&kvm_lock);
-+	srcu_read_unlock(&vm_list_srcu, idx);
- 
- 	if (freq->old < freq->new && send_ipi) {
- 		/*
-@@ -9588,13 +9592,13 @@ static void pvclock_gtod_update_fn(struct work_struct *work)
- 	struct kvm *kvm;
- 	struct kvm_vcpu *vcpu;
- 	unsigned long i;
-+	int idx;
- 
--	mutex_lock(&kvm_lock);
--	list_for_each_entry(kvm, &vm_list, vm_list)
--		kvm_for_each_vcpu(i, vcpu, kvm)
--			kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
-+	idx = srcu_read_lock(&vm_list_srcu);
-+	kvm_for_each_vcpu_in_each_vm(kvm, vcpu, i)
-+		kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
-+	srcu_read_unlock(&vm_list_srcu, idx);
- 	atomic_set(&kvm_guest_has_master_clock, 0);
--	mutex_unlock(&kvm_lock);
++	vhost_task_start(nx_thread);
++
++	/* Make the task visible only once it is fully started. */
++	WRITE_ONCE(kvm->arch.nx_huge_page_recovery_thread, nx_thread);
  }
  
- static DECLARE_WORK(pvclock_gtod_work, pvclock_gtod_update_fn);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9df590e8f3da..0d0edb697160 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -193,6 +193,11 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
- 
- extern struct mutex kvm_lock;
- extern struct list_head vm_list;
-+extern struct srcu_struct vm_list_srcu;
-+
-+#define kvm_for_each_vm_srcu(__kvm)				\
-+	list_for_each_entry_srcu(__kvm, &vm_list, vm_list,	\
-+				 srcu_read_lock_held(&vm_list_srcu))
- 
- struct kvm_io_range {
- 	gpa_t addr;
-@@ -1001,6 +1006,10 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
- 	return NULL;
- }
- 
-+#define kvm_for_each_vcpu_in_each_vm(__kvm, __vcpu, __i)		\
-+	kvm_for_each_vm_srcu(__kvm)					\
-+		kvm_for_each_vcpu(__i, __vcpu, __kvm)
-+
- void kvm_destroy_vcpus(struct kvm *kvm);
- 
- void vcpu_load(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index e0b9d6dd6a85..7fcc4433bf35 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -109,6 +109,7 @@ module_param(allow_unsafe_mappings, bool, 0444);
- 
- DEFINE_MUTEX(kvm_lock);
- LIST_HEAD(vm_list);
-+DEFINE_SRCU(vm_list_srcu);
- 
- static struct kmem_cache *kvm_vcpu_cache;
- 
-@@ -1261,13 +1262,21 @@ static void kvm_destroy_vm(struct kvm *kvm)
- 	int i;
- 	struct mm_struct *mm = kvm->mm;
- 
-+	mutex_lock(&kvm_lock);
-+	list_del(&kvm->vm_list);
-+	mutex_unlock(&kvm_lock);
-+
-+	/*
-+	 * Ensure all readers of the global list go away before destroying any
-+	 * aspect of the VM.  After this, the VM object is reachable only via
-+	 * this task and notifiers that are registered to the VM itself.
-+	 */
-+	synchronize_srcu(&vm_list_srcu);
-+
- 	kvm_destroy_pm_notifier(kvm);
- 	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
- 	kvm_destroy_vm_debugfs(kvm);
- 	kvm_arch_sync_events(kvm);
--	mutex_lock(&kvm_lock);
--	list_del(&kvm->vm_list);
--	mutex_unlock(&kvm_lock);
- 	kvm_arch_pre_destroy_vm(kvm);
- 
- 	kvm_free_irq_routing(kvm);
-@@ -6096,14 +6105,16 @@ static int vm_stat_get(void *_offset, u64 *val)
- 	unsigned offset = (long)_offset;
- 	struct kvm *kvm;
- 	u64 tmp_val;
-+	int idx;
- 
- 	*val = 0;
--	mutex_lock(&kvm_lock);
--	list_for_each_entry(kvm, &vm_list, vm_list) {
-+	idx = srcu_read_lock(&vm_list_srcu);
-+	kvm_for_each_vm_srcu(kvm) {
- 		kvm_get_stat_per_vm(kvm, offset, &tmp_val);
- 		*val += tmp_val;
- 	}
--	mutex_unlock(&kvm_lock);
-+	srcu_read_unlock(&vm_list_srcu, idx);
-+
- 	return 0;
- }
- 
-@@ -6111,15 +6122,15 @@ static int vm_stat_clear(void *_offset, u64 val)
- {
- 	unsigned offset = (long)_offset;
- 	struct kvm *kvm;
-+	int idx;
- 
- 	if (val)
- 		return -EINVAL;
- 
--	mutex_lock(&kvm_lock);
--	list_for_each_entry(kvm, &vm_list, vm_list) {
-+	idx = srcu_read_lock(&vm_list_srcu);
-+	kvm_for_each_vm_srcu(kvm)
- 		kvm_clear_stat_per_vm(kvm, offset);
--	}
--	mutex_unlock(&kvm_lock);
-+	srcu_read_unlock(&vm_list_srcu, idx);
- 
- 	return 0;
- }
-@@ -6132,14 +6143,15 @@ static int vcpu_stat_get(void *_offset, u64 *val)
- 	unsigned offset = (long)_offset;
- 	struct kvm *kvm;
- 	u64 tmp_val;
-+	int idx;
- 
- 	*val = 0;
--	mutex_lock(&kvm_lock);
--	list_for_each_entry(kvm, &vm_list, vm_list) {
-+	idx = srcu_read_lock(&vm_list_srcu);
-+	kvm_for_each_vm_srcu(kvm) {
- 		kvm_get_stat_per_vcpu(kvm, offset, &tmp_val);
- 		*val += tmp_val;
- 	}
--	mutex_unlock(&kvm_lock);
-+	srcu_read_unlock(&vm_list_srcu, idx);
- 	return 0;
- }
- 
-@@ -6147,15 +6159,15 @@ static int vcpu_stat_clear(void *_offset, u64 val)
- {
- 	unsigned offset = (long)_offset;
- 	struct kvm *kvm;
-+	int idx;
- 
- 	if (val)
- 		return -EINVAL;
- 
--	mutex_lock(&kvm_lock);
--	list_for_each_entry(kvm, &vm_list, vm_list) {
-+	idx = srcu_read_lock(&vm_list_srcu);
-+	kvm_for_each_vm_srcu(kvm)
- 		kvm_clear_stat_per_vcpu(kvm, offset);
--	}
--	mutex_unlock(&kvm_lock);
-+	srcu_read_unlock(&vm_list_srcu, idx);
- 
- 	return 0;
- }
+ int kvm_mmu_post_init_vm(struct kvm *kvm)
 
-base-commit: eb723766b1030a23c38adf2348b7c3d1409d11f0
+base-commit: f7bafceba76e9ab475b413578c1757ee18c3e44b
 -- 
+2.48.1.262.g85cc9f2d1e-goog
+
 
