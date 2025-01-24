@@ -1,252 +1,219 @@
-Return-Path: <kvm+bounces-36470-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36471-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2631A1B138
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 09:00:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23492A1B277
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 10:18:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F36116A5F6
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 08:00:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C9A53A8232
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 09:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97A31DB356;
-	Fri, 24 Jan 2025 08:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABE7219A89;
+	Fri, 24 Jan 2025 09:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iPVrV5a8"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LoWrHsSb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2080.outbound.protection.outlook.com [40.107.220.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3961D9A6F
-	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 08:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737705626; cv=none; b=U59DOafGt7X2VovTWmmXxM9BKwyhMhXD/rErFGBWDtYn6dqEczJv5FBYQYAmUSyZRXNpoa8byETmjqPND8R8wGWqazx0QdC1u6P8xSgB7cC1HSHUTYrrmQHdzD2+2gMmqqR9li/vh5vprje//gNZzp52OZP62iaucgtzy2ulGIw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737705626; c=relaxed/simple;
-	bh=vraGi2N1692lrsWeJJ0uu42/dKCVO3ev6i4xeRW/SPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZZxaSvXNQy7YM1x/UG6DhNO3niz2laS2XJK8KhM+fZKV3ban1y87AC7rib2jbfZiSTv3pwf++ddoouibv1O/4xg/2aHuiXzr58VodOdTBT7EvILRTNDuQuCYobIVTPUEAacd4GNatLiacdxnA+TOQJjOVSp0ODzD1/XzmUzkDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iPVrV5a8; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737705624; x=1769241624;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vraGi2N1692lrsWeJJ0uu42/dKCVO3ev6i4xeRW/SPE=;
-  b=iPVrV5a854HuRzt/0skKPckXerUroBqU9xLIkAhoYXg7yQhCkUCNSFjt
-   qrb6xUoHlt/GusO6L2oOlg5q91Xd/UJbLHlQW9fhxFtEJGehIh1kTFoDQ
-   6L2Y5fK5jqfe5xkWGcoPKCTvPoNHvL7mBN1NW8MHUQAOH1dYGHMaBVFA2
-   ZzS60HPsVk1Z2CRdBkzAcV66Ud1xRiVJWr57fwqIxZR8f4uyC85dOSiC7
-   dJNTiFRfEJjFY77cyc8qu9DZcqdaWoKhKXygPJgwURPgJ1RGaUchOjLnq
-   7Zwi9f8qFfUciJd3kPZWsAehGFRPPs/FTTIpUVO96qw4SSwUy3YsMDKby
-   Q==;
-X-CSE-ConnectionGUID: xbWyt1fOROOfyWAYwEXTNg==
-X-CSE-MsgGUID: ZfH5HfeUStSCj1xoldAltQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11324"; a="55777004"
-X-IronPort-AV: E=Sophos;i="6.13,230,1732608000"; 
-   d="scan'208";a="55777004"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 00:00:23 -0800
-X-CSE-ConnectionGUID: bE10kcECQN2Wk7Meqpyilw==
-X-CSE-MsgGUID: 6kwZ9b72RjmqMF9SAtVmrg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="108589618"
-Received: from ly-workstation.sh.intel.com (HELO ly-workstation) ([10.239.161.23])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 00:00:19 -0800
-Date: Fri, 24 Jan 2025 16:00:13 +0800
-From: "Lai, Yi" <yi1.lai@linux.intel.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
-	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>
-Subject: Re: [RFC v2 0/5] accel/kvm: Support KVM PMU filter
-Message-ID: <Z5NIjXYCvNtYohc+@ly-workstation>
-References: <20250122090517.294083-1-zhao1.liu@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC9F320B;
+	Fri, 24 Jan 2025 09:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737710317; cv=fail; b=HiMNL4b7oiaL7zsWMkiIex6uwEFy0KywXsDr97eiJfjjdbPsehYKEKzRZ/hEtqwohcoPJ6AGIg0abmPsFL7of1gtMsNZb7sz3AIQY5djTiI6ZJEZcG6ZVPDXbD+skj2FIjBUILaSlMmIDrlE2i1NQFWJf5oO+MkylnkTu7+pb9w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737710317; c=relaxed/simple;
+	bh=U6fcGcoscRPoMWpgrUIUwbhaidCmb7NwPefWYaod9fE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Di3kMX/EP6iPz+sDJo9RyQv6jgZY9RMQkIfC/SZHe/+Qwj7Fv27/5rXbu3jraX9Z1Gsw6bTmHqV3fYOEWmpWbl1Nnq+i24CyqeaKYzoTfAh/ZKTMWYNOleDL+OjFWFCGBQXNNaC1qeRaVeBu5iPZWsl01k7wYK1KZhk7/McNT1Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LoWrHsSb; arc=fail smtp.client-ip=40.107.220.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xS5Q9OCU1AXVtdTeYaUg4wC1HtpeVV+1CQQP21ctB9ZW5rEFpBQAbRjMEtAfxk0WNvpOsJqoh4D0rQbzI8SmeuAXLsGR5kLeDeyeDBRn0oHreZYM4ZkauYFJNs+UWZB3K4FPFWcrkpdfgBV+dljbjGcbcAMpRLsVzheIDvRu7Q/n3a0pmI4V71wg/xf8j+0tTqmW3mrhQgLkVWCXD8z7wz3+7j0DCCOWi+sltlrc4kUwEDmWqdpCAgWFe73C1FauatKWSX0/ZJwGtEB3noZLc+j2A8TMGwbK2jqYhiVf3MlXlGY3DDh5/+nY+amM0q/02z6e2IzKyOleUURoRz985g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HzX1Ivp3TBGZHvIZa68+775bZaT2ZVmrnM+SEPHrPs4=;
+ b=Qq5e+sT5d1m+2p6vO0XvEE4cWa0eShd15yTGukeNks18upu9oNh+UD8v3lXda3kagEVDez689l423Qu9Kr33isyd/u03DUT6JSrIlxCbwlDYdLkDGjssisUwF+zOpCwbCh1WhhJhPNMUIUXOjfurxg2yEtAiPnqNPWJ2y4vzgbhFrK23AlIgLflq6Z+cAWQ1WhftOw8vAORlBbHQ6V8tffOd8KaKOYuAGVJtBHEMBIHONsx0cOTYyGXSUA3+N/FvBEEksq/TIfsUDtmIKOBi+vOxsCPLXJ2CfcqnyUCJx656im8IKitJaullnnruBClam6fr2gwLhg9HOQDtBFheqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HzX1Ivp3TBGZHvIZa68+775bZaT2ZVmrnM+SEPHrPs4=;
+ b=LoWrHsSbLmGDYCCHYBhKtlI5du/DJ5UkVuRM1kvbdw8vDDen4S2u/iEjVcILdQj4XnsnyJYIedj8G2uWcoDA8vqPACDrTrvC5olAehzO8ZR9A5E82B/uV+Z1MGsg9UVw7/GZ1EFU/LpDRb0UWvPycjSVgKzT+y2srRm2mV8+wLE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
+ by MW4PR12MB7311.namprd12.prod.outlook.com (2603:10b6:303:227::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.19; Fri, 24 Jan
+ 2025 09:18:34 +0000
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48%4]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
+ 09:18:33 +0000
+Message-ID: <09f57158-3b79-4c61-834c-950ed40b7605@amd.com>
+Date: Fri, 24 Jan 2025 10:18:25 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 4/9] KVM: selftests: Add VMGEXIT helper
+To: "Pratik R. Sampat" <prsampat@amd.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, shuah@kernel.org, pgonda@google.com,
+ ashish.kalra@amd.com, nikunj@amd.com, michael.roth@amd.com, sraithal@amd.com
+References: <20250123220100.339867-1-prsampat@amd.com>
+ <20250123220100.339867-5-prsampat@amd.com>
+Content-Language: en-US
+From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <20250123220100.339867-5-prsampat@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0101.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9c::7) To IA1PR12MB8189.namprd12.prod.outlook.com
+ (2603:10b6:208:3f0::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250122090517.294083-1-zhao1.liu@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|MW4PR12MB7311:EE_
+X-MS-Office365-Filtering-Correlation-Id: 701df5c4-df03-4fbb-fccb-08dd3c58134e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?d0Q1VDhiSjJrT2V3REY5NjFsTE85WURSZWpIWEFISTNFWFBkRlNmcnppeGVL?=
+ =?utf-8?B?cnJ5Mng0cHA5NWRxTGJIU1RxbWRQWXhtN2RldEtITWxrbGZONUFoaVFjR1Rl?=
+ =?utf-8?B?ZGNWZnUxSVVaaDZpc010TG43bzRkeW1jZ2VzWGhWMG16SFh0NCtKZ09aWDE5?=
+ =?utf-8?B?cVpWUlFFVzV1elVFaWFoYmxFcmZrR2dnaDhoRnRiTEIxQ2tsdGlPWEUzZlNw?=
+ =?utf-8?B?TFZzTThwSWpndWJlUXY2SWJUQWx6RW4zcDBSSFVYeDdtdUxzU09peEpJM1lH?=
+ =?utf-8?B?dkZvUVIyK0VpV25HWFVGTmV3Y2w1VmlpanRIdTVTUkRhOGxUK200NmEzQjFk?=
+ =?utf-8?B?ZVZNV2pQUTh6d0cxcGhOZXhXNUpRVTZXL3MyeHRIQndubFlNTDZ0eWhUQ3R5?=
+ =?utf-8?B?bk1VRGtzN3V1SW5jRkpOLzNPeFRqSWZHTURHb3E0bGtKMkZMRHdUSDE4NUt0?=
+ =?utf-8?B?VFU1TXFWWkVObGFuMHJXVVIyVFFUdEhYK2kxU041VmJDcFVGV09nVnIrSzJM?=
+ =?utf-8?B?U1FMK1NoWGpRTGtERlRsM2VPUHBQVkRCcy9qZzV5czY5L2JXNlFTQUI1RkIv?=
+ =?utf-8?B?OHNadVZCZVYzRFk5aEZRM3VWL2V0TlN6OWxmcWRSN0VWbmRjemRVWTNnN0Ji?=
+ =?utf-8?B?UEhzVU5Cd0kzRHVjWE82MW5JYlllb1hHUzNxU3Q5TFVMa2NkazhodWh4Ym1n?=
+ =?utf-8?B?NlhXREt2WVVkcEdScmNEQ29aSml5NThJeHlsaHhwK1dBd1U5SXExSEU0cGR4?=
+ =?utf-8?B?R3JVblBCNTVqQnNsNXRuMXdQaThIZUU0ZHdBR2EzbnV0WTFWM25PbW93bm5a?=
+ =?utf-8?B?S0lnZFN0YnRwdmN6Nm03UFRxSDdWVTg2cmlIVUZMRnQrSFhDY0J5KzU4NGxY?=
+ =?utf-8?B?UGpONWRDQ3pBNHpJaDF1MVRtZnlQbzI4dWVpMGsxb1hjWCtxakJyYVhMSWNn?=
+ =?utf-8?B?eHRicnNOL0lVS2Nha0IyQ01FdmJXRm55cXZHMWpIUHhWNUQzK05kWk9EV0xr?=
+ =?utf-8?B?VWJBd2EwMjFiOE9tZXFhb0Q3NTQ5YlNxYkJVWGwzWEsxeUY2VGZwUXdkOCtj?=
+ =?utf-8?B?N250elUwWXlYWW90RytsQWpuUm1ZSlhqUFJ6dkpHdkdQVWdwTGxWOE84UDF4?=
+ =?utf-8?B?YVN5NEtyTmY2c041eGptMGZOaDl2V3FCNVdxRUFRQlkyckJVb1Q1VVVITjYx?=
+ =?utf-8?B?blFKbGl5cngzQURSRHdiSE9nYW1STC83N09HQ1lBZkVzUVl6aThqc1VnbGFm?=
+ =?utf-8?B?b0pzMWVTQjN4SlBJOWlSdCtHYVRJcFJPWjVIUWdqT1Y4TERuTU9WMjlabSt4?=
+ =?utf-8?B?aFVDQ0xkTlpYZCtMbmZsc2E5cFlybVRnMnlSdkdxdGxBWHRiTXNkVWR6VWRi?=
+ =?utf-8?B?RDd3SkJmMDROTU9DQmhTOWNNdklmaWpPbmUzU3dLcG1nMHN2NHM4N1FlU21k?=
+ =?utf-8?B?RWN2T2FITUNGeXdjRHArYmdKT29NdEQ5UVM2YW9ZL3MwUnF0eTEvMS9LWm4r?=
+ =?utf-8?B?TU1tN3VoQWJiaFlpeXQvbWZQV2dxWEZNTmZXUG9IM1IyQjFXcTI5N0c1RlhH?=
+ =?utf-8?B?cy9WdVQ2ckNhSldyYW91dm0yWnozNWM5V2VUYUJCSGpsMVlPTG9RSnZXSk5P?=
+ =?utf-8?B?eWV1M3Jmd2xlSWM2bE8yK0svUG5JczdSTGpGN3E4Q24weFIzbUNtWTlQQmZI?=
+ =?utf-8?B?aFVVNE1lK0NDazBmU2Vtb3Z6ck1kNS9VMlRZaTB4clNRcEhuOGd4TWhSN1FX?=
+ =?utf-8?B?Y3d5ZTlhL0Q1Y0syRTlCUS9HMzBId0VtQ21uSVhKQ0RzNmxsUEdRYWdlY3E2?=
+ =?utf-8?B?RjBieWYrWkxtRjRZNkJycDNsemZuZjdQdVUxckV6c0RpNkFJdE9Wd0svQStN?=
+ =?utf-8?Q?CJIesDFCcJTdT?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d0JlWG1DS2xjL1ZUdkFmcDd2Q2lkcDlZL21FMWNSWnhsUGYxb1VKMTEwRGR0?=
+ =?utf-8?B?S0hoSzBibVZSRStMLzNBYVoreE5iWWFRSlZiUE9US3A4eGZ6R1MwTnhOVlh1?=
+ =?utf-8?B?ckc4N0lrUG02b21lNWZwUVdFcEtiWmJwbHBETC9wODNDejQ1amZjb2JKRjhT?=
+ =?utf-8?B?c1Q3L3dPS1pURFdzWk10M2x0SGxFY3lpd1BCeC90U0VueUdnRCs0MEViSlJC?=
+ =?utf-8?B?T3NycU1CNmlJY092cjNmV1RnaXNNNGpqNHAxK3UrbmtkTlBDSzQ0QWxTVU9v?=
+ =?utf-8?B?NDZVQmJvSmhXcXNWYlprVUVia01lUkpVYkpyZGZpS1d0ajRjUEJCR0Jzcmp6?=
+ =?utf-8?B?OXQ0eCtTd3h4MERhczNPaHFrTXovVm5yek9OM2gyRXVEMEFBZmdaeEN0eXpV?=
+ =?utf-8?B?b093WGMrS1JUdUV1WHJLcUxPSTlrMDZHNnFhaTA4VUxvUzh5ZHFQMkRyNVph?=
+ =?utf-8?B?NzdyclVKQVZqNWY2RlA3UVhhcGtsKysxVVVnQXR1cnAzbDM1RU0rWWxMemxa?=
+ =?utf-8?B?bnM4Y0JVek9ETWZMWVNCTlRrRTVoWk5iTDZQNE44dGdkVVFydmE4clpSQkRz?=
+ =?utf-8?B?d0VsRE93RWlFd0V6UXU0MnppUjF3YWNSeHdHZm5OcVJWb3h2Um9sRzdPd2lG?=
+ =?utf-8?B?TXpDNWFBVnVTeVB3dmtpZUpSbmlDNDVwZVlwT1RPNDFpWEwrT3NZa1VuL3hD?=
+ =?utf-8?B?ZE4wblBGdjlOek5PaS80RGRXbnN6ZHRXcEdReWJkcmgrenNrclkvQ05iWEhq?=
+ =?utf-8?B?dWRrdjNFYmRXSFBwTk13RzQ4TE9Gcy85cFNNcG05U1pjRnRVb1VocUxaRzdS?=
+ =?utf-8?B?eExCUi84OTJMNFBYdFgxYVBQWlk2SEpqR0oxSVRNVXhFajhnaEl1aHZWN3hJ?=
+ =?utf-8?B?anVHQmdYdjZEVDJCVjFWSlNJTkFFL1JsY2EwR3Z5YjNrTXlRZU5tNDJSaVFP?=
+ =?utf-8?B?K0QyRDhaQnNsK2pSbnRWZWhMT3VJREtQTkoxS3lhRXRQbG9iaGdHd3ZLM25n?=
+ =?utf-8?B?ZGVhRklCMXZYRE5sSCs2dHlsNm9pUTV6b01xaVpZdXFhN1NjVXd4RFdSTXZi?=
+ =?utf-8?B?UzZrN1krZzUvQzRZWnJuTStoQ092Y05MaDNWNWprcUlvMTdWTkFsREFYa2gx?=
+ =?utf-8?B?dHAwZEdrR0lRT3hxTlgrdTJGUnppaU5VT0hCMmxJNGVEQjUwL0psQ05xcEVH?=
+ =?utf-8?B?cHdOOXYvR1hPbk1MSkZRL3FadEh4dzU4TVQ3SzYvTUJ4bjhCd2UySHVKWDhS?=
+ =?utf-8?B?RW1zWjc3V0hUdWZEQ3hQQ05qUHFId0RMOEZnNXVrS0ZhT2I0M2Y2K1pZci92?=
+ =?utf-8?B?K3VqanFiNXpDMEIxbEJiVmNNTnZnNDdYaktRa2ZDMmRSY0VHTXhxeGYyd2dn?=
+ =?utf-8?B?NXBwaGR3bGE2UEZ0dFRQbFZYYWVLOU4rZHF3MU1vbHhxMjdXd1pGalY2RFFS?=
+ =?utf-8?B?S3FObURFKzltSDRqbkRycDRTczNMZVlWb241bWFGaXpUcStmYWFtcExVd2Jn?=
+ =?utf-8?B?Z2RwbFY3VXU4MjZDTnhPTktycGZNRExNU0xmekFyMVUzVTJnUmJuMmFHWGRt?=
+ =?utf-8?B?KzFWN3lpbXFCK2NHeVNZTTBQRjBFUjQ1aTFsMnpyMUtvYlk5Z1lFRDUzSTdD?=
+ =?utf-8?B?MGdPR083Rm43T0V2OGp6V2t3bS9iYzF6RWRKaVg0VlJXRnJJNWUwbDhiTzBT?=
+ =?utf-8?B?Si9pbjN1N3UwTmhZci9jVGhvRDllUFM4WnBFRWxKeVh3UXQxUUN2MjNjR3k1?=
+ =?utf-8?B?Yk9zTSt5a09qUWV5V1dKN0VmMjB2NGJsVXNlOC90SDA2SlpxZEY5WndKKzMr?=
+ =?utf-8?B?U2F3VFN0THhGbTBkejZLMldueXZqTUZXai9Hd3c0cUFMZ0xEM21BOGdBZTVT?=
+ =?utf-8?B?cjdlK0tndlhZSFNqa0w3Zk5UVVYxTzdHREJ6YkMrUnl1b3k4alV6NDJmVGsx?=
+ =?utf-8?B?SG9DK2FkcDQ3d3hFaTVvZ25HcDg4aEtYSXhTbHRJZ0NNb05aWTllUkRYMlpY?=
+ =?utf-8?B?TUlKMkZnaEMyVk5jM2ZSOEtXVmZMOCt2ampMRjhwRDRzN2hzZFdhaWlEbHpM?=
+ =?utf-8?B?bDhobXRyNFM2YWp1OFVuaEh1bGM3SEtMVjZtNXFrdlh5K2FMWllZOHZVcFln?=
+ =?utf-8?Q?XQP5XH3wk9UT6QBdq1cvXP5Tt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 701df5c4-df03-4fbb-fccb-08dd3c58134e
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 09:18:33.7835
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FqwgaEfoUzdPzO+F7oOd5wWPczCg2OIPy/eZFwN6bMp4K3kbEa/ZLvEHJcHIa82exlMJIQuPjS/pvnGq5A+G4A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7311
 
-On Wed, Jan 22, 2025 at 05:05:12PM +0800, Zhao Liu wrote:
-> Hi folks,
+On 1/23/2025 11:00 PM, Pratik R. Sampat wrote:
+> Abstract rep vmmcall coded into the VMGEXIT helper for the sev
+> library.
 > 
-> Sorry for the long wait, but RFC v2 is here at last.
+> No functional change intended.
 > 
-> Compared with v1 [1], v2 mianly makes `action` as a global parameter,
-> and all events (and fixed counters) are based on a unified action.
-> 
-> Learned from the discussion with Shaoqin in v1, current pmu-filter QOM
-> design could meet the requirements from the ARM KVM side.
-> 
->
+> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
 
-Tested the v2 patches series with v6.13 kernel.
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
 
-The 3 supported event formats work correctly with both action "allow" and
-"deny". The x86-fixed-counter support also works as expected.
-
-Regards,
-Yi Lai
-
-> Background
-> ==========
-> 
-> I picked up Shaoqing's previous work [2] on the KVM PMU filter for arm,
-> and now is trying to support this feature for x86 with a JSON-compatible
-> API.
-> 
-> While arm and x86 use different KVM ioctls to configure the PMU filter,
-> considering they all have similar inputs (PMU event + action), it is
-> still possible to abstract a generic, cross-architecture kvm-pmu-filter
-> object and provide users with a sufficiently generic or near-consistent
-> QAPI interface.
-> 
-> That's what I did in this series, a new kvm-pmu-filter object, with the
-> API like:
-> 
-> -object '{"qom-type":"kvm-pmu-filter","id":"f0","action":"allow","events":[{"format":"raw","code":"0xc4"}]}'
-> 
-> For i386, this object is inserted into kvm accelerator and is extended
-> to support fixed-counter and more formats ("x86-default" and
-> "x86-masked-entry"):
-> 
-> -accel kvm,pmu-filter=f0 \
-> -object pmu='{"qom-type":"kvm-pmu-filter","id":"f0","action":"allow","x86-fixed-counter":{"bitmap":"0x0"},"events":[{"format":"x86-masked-entry","select":"0xc4","mask":"0xff","match":"0","exclude":true},{"format":"x86-masked-entry","select":"0xc5","mask":"0xff","match":"0","exclude":true}]}'
-> 
-> This object can still be added as the property to the arch CPU if it is
-> desired as a per CPU feature (as Shaoqin did for arm before).
-> 
-> 
-> Introduction
-> ============
-> 
-> 
-> Formats supported in kvm-pmu-filter
-> -----------------------------------
-> 
-> This series supports 3 formats:
-> 
-> * raw format (general format).
-> 
->   This format indicates the code that has been encoded to be able to
->   index the PMU events, and which can be delivered directly to the KVM
->   ioctl. For arm, this means the event code, and for i386, this means
->   the raw event with the layout like:
-> 
->       select high bit | umask | select low bits
-> 
-> * x86-default format (i386 specific)
-> 
->   x86 commonly uses select&umask to identify PMU events, and this format
->   is used to support the select&umask. Then QEMU will encode select and
->   umask into a raw format code.
-> 
-> * x86-masked-entry (i386 specific)
-> 
->   This is a special format that x86's KVM_SET_PMU_EVENT_FILTER supports.
-> 
-> 
-> Hexadecimal value string
-> ------------------------
-> 
-> In practice, the values associated with PMU events (code for arm, select&
-> umask for x86) are often expressed in hexadecimal. Further, from linux
-> perf related information (tools/perf/pmu-events/arch/*/*/*.json), x86/
-> arm64/riscv/nds32/powerpc all prefer the hexadecimal numbers and only
-> s390 uses decimal value.
-> 
-> Therefore, it is necessary to support hexadecimal in order to honor PMU
-> conventions.
-> 
-> However, unfortunately, standard JSON (RFC 8259) does not support
-> hexadecimal numbers. So I can only consider using the numeric string in
-> the QAPI and then parsing it to a number.
-> 
-> To achieve this, I defined two versions of PMU-related structures in
-> kvm.json:
->  * a native version that accepts numeric values, which is used for
->    QEMU's internal code processing,
-> 
->  * and a variant version that accepts numeric string, which is used to
->    receive user input.
-> 
-> kvm-pmu-filter object will take care of converting the string version
-> of the event/counter information into the numeric version.
-> 
-> The related implementation can be found in patch 1.
-> 
-> 
-> CPU property v.s. KVM property
-> ------------------------------
-> 
-> In Shaoqin's previous implementation [2], KVM PMU filter is made as a
-> arm CPU property. This is because arm uses a per CPU ioctl
-> (KVM_SET_DEVICE_ATTR) to configure KVM PMU filter.
-> 
-> However, for x86, the dependent ioctl (KVM_SET_PMU_EVENT_FILTER) is per
-> VM. In the meantime, considering that for hybrid architecture, maybe in
-> the future there will be a new per vCPU ioctl, or there will be
-> practices to support filter fixed counter by configuring CPUIDs.
-> 
-> Based on the above thoughts, for x86, it is not appropriate to make the
-> current per-VM ioctl-based PMU filter a CPU property. Instead, I make it
-> a kvm property and configure it via "-accel kvm,pmu-filter=obj_id".
-> 
-> So in summary, it is feasible to use the KVM PMU filter as either a CPU
-> or a KVM property, depending on whether it is used as a CPU feature or a
-> VM feature.
-> 
-> The kvm-pmu-filter object, as an abstraction, is general enough to
-> support filter configurations for different scopes (per-CPU or per-VM).
-> 
-> [1]: https://lore.kernel.org/qemu-devel/20240710045117.3164577-1-zhao1.liu@intel.com/
-> [2]: https://lore.kernel.org/qemu-devel/20240409024940.180107-1-shahuang@redhat.com/
-> 
-> Thanks and Best Regards,
-> Zhao
 > ---
-> Zhao Liu (5):
->   qapi/qom: Introduce kvm-pmu-filter object
->   i386/kvm: Support basic KVM PMU filter
->   i386/kvm: Support event with select & umask format in KVM PMU filter
->   i386/kvm: Support event with masked entry format in KVM PMU filter
->   i386/kvm: Support fixed counter in KVM PMU filter
+>   tools/testing/selftests/kvm/include/x86/sev.h    | 2 ++
+>   tools/testing/selftests/kvm/x86/sev_smoke_test.c | 2 +-
+>   2 files changed, 3 insertions(+), 1 deletion(-)
 > 
->  MAINTAINERS              |   1 +
->  accel/kvm/kvm-pmu.c      | 386 +++++++++++++++++++++++++++++++++++++++
->  accel/kvm/meson.build    |   1 +
->  include/system/kvm-pmu.h |  44 +++++
->  include/system/kvm_int.h |   2 +
->  qapi/kvm.json            | 246 +++++++++++++++++++++++++
->  qapi/meson.build         |   1 +
->  qapi/qapi-schema.json    |   1 +
->  qapi/qom.json            |   3 +
->  target/i386/kvm/kvm.c    | 176 ++++++++++++++++++
->  10 files changed, 861 insertions(+)
->  create mode 100644 accel/kvm/kvm-pmu.c
->  create mode 100644 include/system/kvm-pmu.h
->  create mode 100644 qapi/kvm.json
-> 
-> -- 
-> 2.34.1
-> 
+> diff --git a/tools/testing/selftests/kvm/include/x86/sev.h b/tools/testing/selftests/kvm/include/x86/sev.h
+> index 82c11c81a956..e7df5d0987f6 100644
+> --- a/tools/testing/selftests/kvm/include/x86/sev.h
+> +++ b/tools/testing/selftests/kvm/include/x86/sev.h
+> @@ -27,6 +27,8 @@ enum sev_guest_state {
+>   
+>   #define GHCB_MSR_TERM_REQ	0x100
+>   
+> +#define VMGEXIT()		{ __asm__ __volatile__("rep; vmmcall"); }
+> +
+>   void sev_vm_launch(struct kvm_vm *vm, uint32_t policy);
+>   void sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement);
+>   void sev_vm_launch_finish(struct kvm_vm *vm);
+> diff --git a/tools/testing/selftests/kvm/x86/sev_smoke_test.c b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
+> index a1a688e75266..38f647fe55d2 100644
+> --- a/tools/testing/selftests/kvm/x86/sev_smoke_test.c
+> +++ b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
+> @@ -27,7 +27,7 @@ static void guest_sev_es_code(void)
+>   	 * force "termination" to signal "done" via the GHCB MSR protocol.
+>   	 */
+>   	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
+> -	__asm__ __volatile__("rep; vmmcall");
+> +	VMGEXIT();
+>   }
+>   
+>   static void guest_sev_code(void)
+
 
