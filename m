@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-36525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9EDAA1B71C
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 14:40:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A66B1A1B71E
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 14:40:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5699A3AEB89
-	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 13:40:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF47B160865
+	for <lists+kvm@lfdr.de>; Fri, 24 Jan 2025 13:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5429814658C;
-	Fri, 24 Jan 2025 13:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A6D14A617;
+	Fri, 24 Jan 2025 13:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GyrlkN45"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FFW7MMch"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1142614658F
-	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 13:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA2214A605
+	for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 13:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737725970; cv=none; b=mcWaQtGIXOZg0ZEJW5SjLZmb2Dm6ASZtykiDgxFyOwAuLB9Gf/Pzk3JiHwo7mo+1GtkJdPJ64He60A+ivrwQ+t4GFaNIjZacEKaqsTZYIILXtD2Tdbwgo4YDfz8qXe6JOn+d7Td84x+kbCRUZD5FaUQB782BubhnPoA1M+fwKac=
+	t=1737725974; cv=none; b=TqwuLar7Hesjw03TiUPKNf5dHqKSCwjX2CI9Or4WGO8+YB6BQpKRTMX3zG5HwRDt9RFzZb/tPNriLjQkdwMHiXoWr7dYFUUragZjA9YoTwVM/HjSDY+qyPP44Oud8QdGWnMjOPY+V6RSq8odhQ21tytVIg4CN6N8Os+/RdS0AME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737725970; c=relaxed/simple;
-	bh=Cg9zFgAAzu9TXNw0/8UbOMWfLRF5mK1sJR1xnM0x7yE=;
+	s=arc-20240116; t=1737725974; c=relaxed/simple;
+	bh=XEwqmQoSvwYMfkPqc6TzR0UgP5NnIAttqomtt/9PTFQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gWx/AxdcD6KaRQFnCnkp4a42rqr5euvhUrNAyVp/9gD+1OxSNxvZnbSqDVEdsIfJyAnmbDnBINdvHj+Yhlq1RMgVNthbPOIHCmVrGJH6HUmAFct6QgDZUnnSun3AjpDdiOWpmzwr+3OE2DrP7F6S0fV+RKiFFGq6ktvoBJT2EYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GyrlkN45; arc=none smtp.client-ip=198.175.65.13
+	 MIME-Version; b=J4CDzmJ2jAM/JtTZZ4Ld9wTbDHt3BC8VGoYxsGOVNfaKxWDzoSN5Pl/gXN55vlO8X18SLlWni0kilOddsgj57f4sLv6JI2pZoyNLHdgtNQTtU/Q6dTd+H96mJfVHjMitTZrefg/D65WhTtCL/JQ/MMejVADw1dskJ/m3IyQxXV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FFW7MMch; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737725969; x=1769261969;
+  t=1737725974; x=1769261974;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Cg9zFgAAzu9TXNw0/8UbOMWfLRF5mK1sJR1xnM0x7yE=;
-  b=GyrlkN45I8ohXUDSnXwX92jTe2Yn7IgH2m5lenjO9suGVOUHo0R2SufQ
-   lPaap18ezVEazp44tp8bfFIcDW/KXna7mozHOZpBW5Bhjg8i9pDjmYeAw
-   fp5lPpZxdaF+WYDhN57l9vlPZ9vY/OZWTPkFy0oaT26ZrH1u5bvjl5l6V
-   eoXADA8WFFrr6cd7cn4crLOSrQdwEouTcGMQi1HpJFVZBGCBdcAh7YWj/
-   WyGybGqS0bOnOdQUOj2OzgQyFb6Ux/ObxK31M4tmmAOuwRalSf/pcMe3W
-   JdPqqreOAacXK+ohd5+5hYGf3U67SAccK92YXYSUSFkySSulD6RKzXmyd
+  bh=XEwqmQoSvwYMfkPqc6TzR0UgP5NnIAttqomtt/9PTFQ=;
+  b=FFW7MMchctz+MDlUNosUDa0Cp80fafzNyZTkLpCrWlIMVUnWLP+R2PXr
+   aqk4gt1WDaV+mIVf2Xv050MXyxS7JG00Z9lgNTTvWkRBrMF43NmOHHjEM
+   c+pcD4ExrbQ0lIKA1s4p0sDko5flFk+3Q75wSXnUgD2ucvLLIRJlXDf2n
+   rzBlRznqJockyRKbMF02FcvnvnnNlNXJEdzAGASWWsZftv+Pu8px740Hi
+   Zrtokwnd+xxQJtkxvnH2zcwChBinxJHvpi3gkI9f1ESYtx/EQ63R3Fc5v
+   oam3Gl1Y4YtiGXUP+czovJlugq8/+s4jtJApGfVnmb//z762KFHRITjou
    A==;
-X-CSE-ConnectionGUID: J1dQQnU+SaK7QmP6+SkbCg==
-X-CSE-MsgGUID: gJWUTbXxQY+23POWxa33BQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11325"; a="49246541"
+X-CSE-ConnectionGUID: uIXUN9AwSPupRG31XiZ5fw==
+X-CSE-MsgGUID: pc5L8uqcSiKrgKcPFN+3GQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11325"; a="49246551"
 X-IronPort-AV: E=Sophos;i="6.13,231,1732608000"; 
-   d="scan'208";a="49246541"
+   d="scan'208";a="49246551"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 05:39:29 -0800
-X-CSE-ConnectionGUID: QgXs53yKRAimdFJ5U90NLA==
-X-CSE-MsgGUID: zZ33BOzxQ56B2EFNvXjAYQ==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 05:39:33 -0800
+X-CSE-ConnectionGUID: e6jGRyZ/TK+fefS8MicOpQ==
+X-CSE-MsgGUID: gNS9RrQUStOtIANF8dwOFg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="111804435"
+   d="scan'208";a="111804442"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2025 05:39:25 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 24 Jan 2025 05:39:29 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
@@ -75,9 +75,9 @@ Cc: Zhao Liu <zhao1.liu@intel.com>,
 	xiaoyao.li@intel.com,
 	qemu-devel@nongnu.org,
 	kvm@vger.kernel.org
-Subject: [PATCH v7 39/52] cpu: Don't set vcpu_dirty when guest_state_protected
-Date: Fri, 24 Jan 2025 08:20:35 -0500
-Message-Id: <20250124132048.3229049-40-xiaoyao.li@intel.com>
+Subject: [PATCH v7 40/52] i386/cgs: Rename *mask_cpuid_features() to *adjust_cpuid_features()
+Date: Fri, 24 Jan 2025 08:20:36 -0500
+Message-Id: <20250124132048.3229049-41-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250124132048.3229049-1-xiaoyao.li@intel.com>
 References: <20250124132048.3229049-1-xiaoyao.li@intel.com>
@@ -89,37 +89,96 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-QEMU calls kvm_arch_put_registers() when vcpu_dirty is true in
-kvm_vcpu_exec(). However, for confidential guest, like TDX, putting
-registers is disallowed due to guest state is protected.
-
-Only set vcpu_dirty to true with guest state is not protected when
-creating the vcpu.
+Because for TDX case, there are also fixed-1 bits that enfored by TDX
+module.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
-Changes in v7:
- - new patch to replace "i386/tdx: Don't get/put guest state for TDX VMs"
-   in v6;
----
- accel/kvm/kvm-all.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ target/i386/confidential-guest.h | 20 ++++++++++----------
+ target/i386/kvm/kvm.c            |  2 +-
+ target/i386/sev.c                |  4 ++--
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index e35a9fbd687e..c1fea69d582e 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -466,7 +466,9 @@ int kvm_create_vcpu(CPUState *cpu)
+diff --git a/target/i386/confidential-guest.h b/target/i386/confidential-guest.h
+index a86c42a47558..777d43cc9688 100644
+--- a/target/i386/confidential-guest.h
++++ b/target/i386/confidential-guest.h
+@@ -40,8 +40,8 @@ struct X86ConfidentialGuestClass {
+     /* <public> */
+     int (*kvm_type)(X86ConfidentialGuest *cg);
+     void (*cpu_instance_init)(X86ConfidentialGuest *cg, CPUState *cpu);
+-    uint32_t (*mask_cpuid_features)(X86ConfidentialGuest *cg, uint32_t feature, uint32_t index,
+-                                    int reg, uint32_t value);
++    uint32_t (*adjust_cpuid_features)(X86ConfidentialGuest *cg, uint32_t feature,
++                                      uint32_t index, int reg, uint32_t value);
+ };
  
-     cpu->kvm_fd = kvm_fd;
-     cpu->kvm_state = s;
--    cpu->vcpu_dirty = true;
-+    if (!s->guest_state_protected) {
-+        cpu->vcpu_dirty = true;
-+    }
-     cpu->dirty_pages = 0;
-     cpu->throttle_us_per_full = 0;
+ /**
+@@ -71,21 +71,21 @@ static inline void x86_confidential_guest_cpu_instance_init(X86ConfidentialGuest
+ }
  
+ /**
+- * x86_confidential_guest_mask_cpuid_features:
++ * x86_confidential_guest_adjust_cpuid_features:
+  *
+- * Removes unsupported features from a confidential guest's CPUID values, returns
+- * the value with the bits removed.  The bits removed should be those that KVM
+- * provides independent of host-supported CPUID features, but are not supported by
+- * the confidential computing firmware.
++ * Adjust the supported features from a confidential guest's CPUID values,
++ * returns the adjusted value.  There are bits being removed that are not
++ * supported by the confidential computing firmware or bits being added that
++ * are forcibly exposed to guest by the confidential computing firmware.
+  */
+-static inline int x86_confidential_guest_mask_cpuid_features(X86ConfidentialGuest *cg,
++static inline int x86_confidential_guest_adjust_cpuid_features(X86ConfidentialGuest *cg,
+                                                              uint32_t feature, uint32_t index,
+                                                              int reg, uint32_t value)
+ {
+     X86ConfidentialGuestClass *klass = X86_CONFIDENTIAL_GUEST_GET_CLASS(cg);
+ 
+-    if (klass->mask_cpuid_features) {
+-        return klass->mask_cpuid_features(cg, feature, index, reg, value);
++    if (klass->adjust_cpuid_features) {
++        return klass->adjust_cpuid_features(cg, feature, index, reg, value);
+     } else {
+         return value;
+     }
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 4078ba40473e..fa46edaeac8d 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -573,7 +573,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+     }
+ 
+     if (current_machine->cgs) {
+-        ret = x86_confidential_guest_mask_cpuid_features(
++        ret = x86_confidential_guest_adjust_cpuid_features(
+             X86_CONFIDENTIAL_GUEST(current_machine->cgs),
+             function, index, reg, ret);
+     }
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 0e1dbb6959ec..a6c0a697250b 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -946,7 +946,7 @@ out:
+ }
+ 
+ static uint32_t
+-sev_snp_mask_cpuid_features(X86ConfidentialGuest *cg, uint32_t feature, uint32_t index,
++sev_snp_adjust_cpuid_features(X86ConfidentialGuest *cg, uint32_t feature, uint32_t index,
+                             int reg, uint32_t value)
+ {
+     switch (feature) {
+@@ -2404,7 +2404,7 @@ sev_snp_guest_class_init(ObjectClass *oc, void *data)
+     klass->launch_finish = sev_snp_launch_finish;
+     klass->launch_update_data = sev_snp_launch_update_data;
+     klass->kvm_init = sev_snp_kvm_init;
+-    x86_klass->mask_cpuid_features = sev_snp_mask_cpuid_features;
++    x86_klass->adjust_cpuid_features = sev_snp_adjust_cpuid_features;
+     x86_klass->kvm_type = sev_snp_kvm_type;
+ 
+     object_class_property_add(oc, "policy", "uint64",
 -- 
 2.34.1
 
