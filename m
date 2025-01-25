@@ -1,171 +1,122 @@
-Return-Path: <kvm+bounces-36585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36586-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4466CA1BF8D
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 01:09:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EEB6A1BF90
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 01:10:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89846168E6A
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 00:09:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 043B83AC72F
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 00:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C271C69D;
-	Sat, 25 Jan 2025 00:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD5D83214;
+	Sat, 25 Jan 2025 00:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gI7nB+Lf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M0WhqAWf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D16179BD
-	for <kvm@vger.kernel.org>; Sat, 25 Jan 2025 00:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF639360
+	for <kvm@vger.kernel.org>; Sat, 25 Jan 2025 00:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737763746; cv=none; b=UBlLaMqYCMcBk/76e9F6DFj/3UWLPtQ4gXG7/S6qDsfkQTxC8EPufLOyG4ID2k5bA9IEDkMu8tUuDzAKBOqTbslGFNo2qZrjir12MuuUJfbd8CKB30bn6eJjbJWGDs5hzLgCi61PMHouoOtdYaI5panRwL6n5Yw9p7TY3LmJsEY=
+	t=1737763849; cv=none; b=pEejgJR6BYmJI4FULZ1LeAGEHqaSIvNapSBod2rvsD0FnGbeOAE1kw3dpa3q82G42NTBCY/tDpy1RxKpQis+MPZnCl1ehhUm99+zu7kAXG9mVRKEKoZuTpiANRhF/eZGNWOhWpf17DHSByJolX5rW3Ut41ezAnjlc09wcG9iE38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737763746; c=relaxed/simple;
-	bh=/Y5Md7Dfd8QuVpnQ6miCnMwO4USPxpBcanRAa/0DuAM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=To5OleOVSgF2MmVXOXHAQ7JJcoWQ4Q9Eum8q+omdlX1OFbUaUqfbQU8ypLfbl3s7ZweyiVMxjX9UPiwkQT2DAnwfn2ro+el2z+lymZhec7uRaRudByFaSQismnfaXG9L2LXQayANtOThaQO5xKOeEYa+1u8aJZaJOUNT9nrwri0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gI7nB+Lf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737763743;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+3uKP8g8eLLTFdF1IwLHx+SHSz3PCMPEzmnoC64xqQk=;
-	b=gI7nB+LfI7KqSUOIwf7VON0+aQ/nLzmRw+B8p3eft4KEkcI8aaJ+BUf8jY5OGcfPrT4zEL
-	GZL+/KqjU7s98gFBHCvj7gRLZcRCy0HEd3Qjty12gS3Xzk+qL/j6YC/1AqTerL9E77zZhb
-	9/rix647SQ4mFadVe5peg7Sv2BqZIHE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-637-RQI3tHtnPiaNWIMdXK6Tng-1; Fri, 24 Jan 2025 19:08:32 -0500
-X-MC-Unique: RQI3tHtnPiaNWIMdXK6Tng-1
-X-Mimecast-MFC-AGG-ID: RQI3tHtnPiaNWIMdXK6Tng
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436379713baso12444445e9.2
-        for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 16:08:31 -0800 (PST)
+	s=arc-20240116; t=1737763849; c=relaxed/simple;
+	bh=vUGqW9hRUo6yTSS0XX3LufamipqZvYQXssBdlkbaMDw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EPf4UZLa0f+9ty99RyMa8mnJzicfuZ1GnwcAXBuwz1LSAAi713CMocdlItwadi0CTQY0M8yhut7KwoX6vVIQapC1QNnH+rQyZ7pGj5eXfEganDUj5y0ppJ7mTWsGrmc1Kq437Mk3rWtuHr6DDMwOHMnMesL61o52Dzh6X2pbEDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M0WhqAWf; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2165433e229so52238905ad.1
+        for <kvm@vger.kernel.org>; Fri, 24 Jan 2025 16:10:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737763847; x=1738368647; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lLBwqek7dAIeuACyAn1wHDWn/eOmVHui0aCFeRl2CPg=;
+        b=M0WhqAWfXlLUBHH4P3DivvEuiySJSOAMnXRZOKmpHmJ5KOyakKVWAwhdCry/tANyyy
+         CGVaBgHoELP9h/Tf02n/+yV/FNlyGSo2C6GsTxphXFYWwnyEhqC5CScdhq1TjavM7ent
+         XdBiB6a116lA1ePpZyiWwcck/zH1y1vWU9Yk/XJazlNMxAnNXD0BUoWpVRyZGQqXo2qU
+         AWg6cv8GjbyqwnlP65jtGjJFFD/e8oNjjUI2p1hPnz4WoAKyeTN463GyseWYF8TAA0Mz
+         ZaD6UR1pJG6AjNrRttTwc/RvC5PH38+gqcRjKjklkDyi6DoXz0DuJy5RI1GAc5cTYtuy
+         N8Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737763711; x=1738368511;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+3uKP8g8eLLTFdF1IwLHx+SHSz3PCMPEzmnoC64xqQk=;
-        b=s+E5PqnnWw+Xi9rM5Agzywh8Xgt+4r75t4AUJmaB09da/lm8hN8L7ePLB8uRkJpI62
-         QGtqdD0psbNNwvgW6XlnTeRyEISxTy+ojyYVXFhCtfWrFwaadRY0tfqcpkCve0EXI/+v
-         RCP64fsjgC354YkZ94+HGrzx2GIlzLwZG6snU0/1ffS4kHd4z/YV6DXrg7cxH8R+gv7f
-         ZEtERrFkZ1FqgErOlfkKY0ApRGbjryvfAL4SSvdvU3olY6ni6YWJTSk+ZPUZmaA6+h9k
-         +UWitLmRN6mukket9uJ1t2th7gHARtGzG2/veS6GNHZNK2MEbwgvVodoi5qy4TUY49x0
-         QWXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXlwwHQYOLrZQkYS/g0u95DQ1T6qPA4SwIlRRBu0I+nE84Dc6iMgiTkX6vmoXcAj6Bj4yI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeiKGfC9wICeSteBUno91YBYTWnHhpqcD7usaGQzAsEmbvb4yC
-	NTpIQbCI6WO5FoJBnjYfkFHlO7dYfhQEaGhSMzJgkqr46jEdaRztIaU2dowacAci3ehONROVOcc
-	taD7YSZia/P8gf0uIiP5Ia7IO99edPOhxkuSr5rHJXeKUZBHNkQ==
-X-Gm-Gg: ASbGncsFQPofvZFsiO69HVzwrKanmvggu4HkPeyj4Z28drDfeFp8fBMRUdFAPPixa0f
-	zI0iEJP5/fx83dmn91oDlaAg80oyWlmn+uyrw8vJUhmQFj16IuK1z7w58l/rxHcP/8Iw2ILHTRo
-	fmdNQU1TB/8fchvEebxruvv9yBsfLEZ/fH/MDbftTklMACzplj7IOH+u6CvEsLiermql7rz7HDK
-	Xxuwi8ZH1RzOfck0i4Gf+jYSbYyMeEosyWNJLhEjX4bhESBDLKUVzqQkwWMq1o1mIvTteOqY1V4
-	zQS1O/Yu
-X-Received: by 2002:a05:600c:4e07:b0:434:a802:e99a with SMTP id 5b1f17b1804b1-438913bec32mr290921085e9.4.1737763710755;
-        Fri, 24 Jan 2025 16:08:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHHwQf+1d6P9WNGtcsm3P4YTP7VDB0bXFJTvbHUWA87Pk09vnWfPT4RuaCxFYTeTol6WEXmPQ==
-X-Received: by 2002:a05:600c:4e07:b0:434:a802:e99a with SMTP id 5b1f17b1804b1-438913bec32mr290920995e9.4.1737763710403;
-        Fri, 24 Jan 2025 16:08:30 -0800 (PST)
-Received: from [192.168.10.82] ([151.95.59.125])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-438bd501c2dsm41680025e9.13.2025.01.24.16.08.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jan 2025 16:08:29 -0800 (PST)
-Message-ID: <0188baf2-0bff-4b08-af1d-21815d4e3b42@redhat.com>
-Date: Sat, 25 Jan 2025 01:08:28 +0100
+        d=1e100.net; s=20230601; t=1737763847; x=1738368647;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lLBwqek7dAIeuACyAn1wHDWn/eOmVHui0aCFeRl2CPg=;
+        b=wmhGI4D8rFbasIZPFuqKNHLszb56mZh0BYuC2IMWsR6BIMlEKaTEL9tacr/Q5ZxhGE
+         8zDY69Jll16xH/t/64Btksy2kQdzDmrhqnhsBi0P/CVRZnPJyjedGLTcbvTvbpwAXYIV
+         M69bK+NnbdgSlEr7zdTqeT2kgUXaPse38wYKJOIzpvvRPZVIPZYD4Y/FEsMPPt52aR0Q
+         zPbofv0ACvkodDYwc11d+THubryh2AhZQIb7TLanZ3u+6xDEHfHaol4uBxfUCfMO2g+z
+         PuD5OwlvyuTpNqVMCJ9tXIKqBw9TiW5vTHG+ncO/atLpmlgNL/zjrOipKaT3L9FacElX
+         IZnw==
+X-Forwarded-Encrypted: i=1; AJvYcCU50TwYPmpYRxdJKdTnXWKifmgPVdF3Nap9JKP7Yaf4czJRhLDKbYphM7D4ep971CjwX84=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6E3zSjhUmA1FEBcGPp/PSV0CncqIuwT9ARQqM8ZyKUCBJzVj0
+	iyE0C+uleaiqDdEutGw1eCRVOo0+i+o2a3PqiOQwSM3stM3jdh8xuvvdbjFmvra7940SmZW1ZQq
+	SgQ==
+X-Google-Smtp-Source: AGHT+IFpy3P4veqv3F3dWouqbdgVpGzdZe9YYIEXXZ4ArJcsgxQiSvHAO44CHe0DkODVGsEgPjRaJAtco+8=
+X-Received: from plbme16.prod.google.com ([2002:a17:902:fc50:b0:216:21cb:2dfe])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f688:b0:215:aee1:7e3e
+ with SMTP id d9443c01a7336-21c352d664fmr461166135ad.5.1737763846919; Fri, 24
+ Jan 2025 16:10:46 -0800 (PST)
+Date: Fri, 24 Jan 2025 16:10:45 -0800
+In-Reply-To: <Z5P97NyK9Rb_cU1z@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] KVM: x86: fix usage of kvm_lock in
- set_nx_huge_pages()
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm <kvm@vger.kernel.org>
-References: <20250124191109.205955-1-pbonzini@redhat.com>
- <20250124191109.205955-2-pbonzini@redhat.com> <Z5Pz7Ga5UGt88zDc@google.com>
- <CABgObfa4TKcj-d3Spw+TAE7ZfO8wFGJebkW3jMyFY2TrKxMuSw@mail.gmail.com>
- <Z5QhGndjNwYdnIZF@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <Z5QhGndjNwYdnIZF@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250123153543.2769928-1-kbusch@meta.com> <Z5Py_JYc8nYHNgZS@google.com>
+ <Z5P97NyK9Rb_cU1z@kbusch-mbp>
+Message-ID: <Z5QsBXJ7rkJFDtmK@google.com>
+Subject: Re: [PATCH] kvm: defer huge page recovery vhost task to later
+From: Sean Christopherson <seanjc@google.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, Vlad Poenaru <thevlad@meta.com>, tj@kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Alyssa Ross <hi@alyssa.is>
+Content-Type: text/plain; charset="us-ascii"
 
-On 1/25/25 00:44, Sean Christopherson wrote:
->> I did try a long SRCU critical section and it was unreviewable. It
->> ends up a lot less manageable than just making the lock a leaf,
->> especially as the lock hierarchy spans multiple subsystems (static
->> key, KVM, cpufreq---thanks CPU hotplug lock...).
+On Fri, Jan 24, 2025, Keith Busch wrote:
+> On Fri, Jan 24, 2025 at 12:07:24PM -0800, Sean Christopherson wrote:
+> > This is broken.  If the module param is toggled before the first KVM_RUN, KVM
+> > will hit a NULL pointer deref due to trying to start a non-existent vhost task:
+> > 
+> >   BUG: kernel NULL pointer dereference, address: 0000000000000040
+> >   #PF: supervisor read access in kernel mode
+> >   #PF: error_code(0x0000) - not-present page
+> >   PGD 0 P4D 0 
+> >   Oops: Oops: 0000 [#1] SMP
+> >   CPU: 16 UID: 0 PID: 1190 Comm: bash Not tainted 6.13.0-rc3-9bb02e874121-x86/xen_msr_fixes-vm #2382
+> >   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+> >   RIP: 0010:vhost_task_wake+0x5/0x10
+> >   Call Trace:
+> >    <TASK>
+> >    set_nx_huge_pages+0xcc/0x1e0 [kvm]
 > 
-> I'm not following.  If __kvmclock_cpufreq_notifier() and set_nx_huge_pages()
-> switch to SRCU, then the deadlock goes away (it might even go away if just one
-> of those two switches). [...] It would be single use in the it only
-> protects pure reader of vm_list, but there are plenty of those users.
+> Thanks for pointing out this gap. It looks like we'd have to hold the
+> kvm_lock in kvm_mmu_post_init_vm(), and add NULL checks in
+> set_nx_huge_pages() and set_nx_huge_pages_recovery_param() to prevent
+> the NULL deref. Is that okay?
 
-Yes, single use in the sense that only set_nx_huge_pages() really needs 
-it.  kvm_lock doesn't produce any noticeable contention and as you noted 
-sometimes you really need it even in pure readers.
+I don't _think_ we need to take kvm_lock.  And I don't want to take kvm_lock,
+because we're also trying to eliminate a (very theoretical) deadlock[1] due to
+taking kvm_lock in the params helpers.
 
-> SRCU readers would only interact with kvm_destroy_vm() from a locking perspective,
-> and if that's problematic then we would already have a plethora of issues.
+There is a race that can happen with my proposed fix[2], but I'm not sure we care
+enough to address it.  If kvm_nx_huge_page_recovery_worker() runs before the params
+are set, and the param setter processes the VM before nx_huge_page_recovery_thread
+is set, then the worker could sleep for too long, relative to what userspace expects.
 
-Ah yeah, I missed that you cannot hold any lock when calling 
-kvm_put_kvm().  So the waiting side is indeed a leaf and cannot block 
-someone else.
+I suppose if we care then we could fix that by taking kvm->arch.nx_once.mutex
+when waking the task?
 
-Still from your patch (thanks!) I don't really like the special cases on 
-taking SRCU vs. kvm_lock... It really seems like a job for a mutex or 
-rwsem.  It keeps the complexity in the one place that is different (i.e. 
-where a lock is taken inside the iteration) and everything else can just 
-iterate normally.
-
-Paolo
-
+[1] https://lore.kernel.org/all/20250124191109.205955-2-pbonzini@redhat.com
+[2] https://lore.kernel.org/all/20250124234623.3609069-1-seanjc@google.com
 
