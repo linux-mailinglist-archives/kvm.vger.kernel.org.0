@@ -1,59 +1,55 @@
-Return-Path: <kvm+bounces-36593-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36594-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA225A1C0E3
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 05:05:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6D22A1C0E5
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 05:11:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1B731886CF2
-	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 04:06:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1628D7A4F30
+	for <lists+kvm@lfdr.de>; Sat, 25 Jan 2025 04:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B29206F02;
-	Sat, 25 Jan 2025 04:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF59206F04;
+	Sat, 25 Jan 2025 04:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3anGjTZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNVuRUaZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04313148316;
-	Sat, 25 Jan 2025 04:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A80148316;
+	Sat, 25 Jan 2025 04:11:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737777948; cv=none; b=s7weCp62/dw0T8J94Slaoo1hlzskxZlY3Lbc99mEZKw34xAnRuNF/Zx4bvgyGb3uYae/5+UJg64l3mnUyolXlu93BQHODUEIxiRUlmyb4mHQnTXtnCZF1nH0z7DUnMDpRFko36gzNb095zdZ3xpg8QgywbLprefXHMmo6t+4I3U=
+	t=1737778291; cv=none; b=XvLP9qSlrF8tuTFSQFQF6B7D9nTKZGNNwwJewpGC2SvpugOcLZkvoPn2Zn8URZI3Gc9nntk3WJfU/zv7OQAkOwSfioYexuXDeN+sMYkYGvUcmPoTMn3EJcR08PwMVwxSmXunrASc6ido2Tg54isQwn9HeOrmA6Epk7TvZ0bUcZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737777948; c=relaxed/simple;
-	bh=ACa61NzkUUavq1Te1B/3kPVDOffuCZpKxogAMHFYAcc=;
+	s=arc-20240116; t=1737778291; c=relaxed/simple;
+	bh=WJB9GpgYf4ZdqLK/uPw+tNP8Ol87+1QFIUtaUo5T6DU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bo5qDrj4TyHMuhTm/uG1fh9lo+TSKh3i2LdLA06TKm1eL3c43OqjNA/BvB+bAtc4Ke8uhIH9eb+RetMn+0Q/y/tz1ZB6J+igjVaI7pYI7/oXwNwqpiHb9ETQHVE8Niqp/8fWxZK3RdsZf3QWzyz/EhejBqt1IHiNA50u+/874q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3anGjTZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0C6CC4CED6;
-	Sat, 25 Jan 2025 04:05:46 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=RhIlMh093XcBHHZgVMQ+qu29nuRq7rAj6yHgoEuhlgN5qNhodYRFDIxjUqPhq0CVL6iBv1+++WMjc8IHGp6Nhzeg5/EYLTLc/JgL3qLjr6Yq7SZ8wjcDriYUhRvoqDLJCINHpEsF01nqW6rgL8WBcWhpvJPtZwXqx8E5EHH+4Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNVuRUaZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DCFFC4CED6;
+	Sat, 25 Jan 2025 04:11:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737777947;
-	bh=ACa61NzkUUavq1Te1B/3kPVDOffuCZpKxogAMHFYAcc=;
+	s=k20201202; t=1737778291;
+	bh=WJB9GpgYf4ZdqLK/uPw+tNP8Ol87+1QFIUtaUo5T6DU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l3anGjTZ4oPxdrT8juwwzrEomg8nrdfLl0zZtRdrsQCIDaT5ywolyJth+xNRsxBZ1
-	 sMYDOrUtLlPxGqimFcf/yymboIGiTmKEiTz6zXMnUj4MzmEj+fQTn2u09Ligd8xdEx
-	 nzQfKqMQhs/VT0so8wYAmZAm2kknsyLHRBhmnU95oFlO0iZi8ymWwCNUJkXu2H6n6l
-	 lRuNzS44BmxSs6jVVYCncLRZ4YTV0BT54L4BET71+cXAgl42qf1dB2gXyyVYyj572Q
-	 w/HlJHdKoM4NNhhvaSM4bhyxJs0ID/0AzfcwxjmXq8Sp3JGnfeq2BHi6KcXpic+8QS
-	 jLtxuClbm0png==
-Date: Fri, 24 Jan 2025 21:05:44 -0700
+	b=pNVuRUaZYcRiDByhYrnMRIIfIbXtn+pek2B1Ef9YCMtRRVy8Gd13J/HnqIe2vzeZs
+	 JPpd+zWVAeMjl+RE6TWYYTCp08I+iOU6G/v4/xZmttu+IbhG5p1PBge3jwvg7XVWhr
+	 6BX1FyJqvcru806Ec/Ux3dVw6MEvlRTC5mRr46aVE0YUuhTv6hYqs83DSuYCwdhhWA
+	 VWa0OAlwQ037+8kqWZ7hRQmZfRxvYpIG1YZZg6sSzkP4pq3RZWc6K3CuDkptI8cqnq
+	 jLBZddqDjbVWI9x+HAdS8RYtLdmHLXVojn88YxHD+z4WboABDPGGJXrn2VHVNMZSgp
+	 3agoyfJ8ZEeJQ==
+Date: Fri, 24 Jan 2025 21:11:28 -0700
 From: Keith Busch <kbusch@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org, x86@kernel.org,
-	linux-kernel@vger.kernel.org, Vlad Poenaru <thevlad@meta.com>,
-	tj@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Alyssa Ross <hi@alyssa.is>
-Subject: Re: [PATCH] kvm: defer huge page recovery vhost task to later
-Message-ID: <Z5RjGOmalDcS-L39@kbusch-mbp>
-References: <20250123153543.2769928-1-kbusch@meta.com>
- <Z5Py_JYc8nYHNgZS@google.com>
- <Z5P97NyK9Rb_cU1z@kbusch-mbp>
- <Z5QsBXJ7rkJFDtmK@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/mmu: Ensure NX huge page recovery thread is
+ alive before waking
+Message-ID: <Z5RkcB_wf5Y74BUM@kbusch-mbp>
+References: <20250124234623.3609069-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -62,45 +58,74 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z5QsBXJ7rkJFDtmK@google.com>
+In-Reply-To: <20250124234623.3609069-1-seanjc@google.com>
 
-On Fri, Jan 24, 2025 at 04:10:45PM -0800, Sean Christopherson wrote:
-> On Fri, Jan 24, 2025, Keith Busch wrote:
-> > On Fri, Jan 24, 2025 at 12:07:24PM -0800, Sean Christopherson wrote:
-> > > This is broken.  If the module param is toggled before the first KVM_RUN, KVM
-> > > will hit a NULL pointer deref due to trying to start a non-existent vhost task:
-> > > 
-> > >   BUG: kernel NULL pointer dereference, address: 0000000000000040
-> > >   #PF: supervisor read access in kernel mode
-> > >   #PF: error_code(0x0000) - not-present page
-> > >   PGD 0 P4D 0 
-> > >   Oops: Oops: 0000 [#1] SMP
-> > >   CPU: 16 UID: 0 PID: 1190 Comm: bash Not tainted 6.13.0-rc3-9bb02e874121-x86/xen_msr_fixes-vm #2382
-> > >   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-> > >   RIP: 0010:vhost_task_wake+0x5/0x10
-> > >   Call Trace:
-> > >    <TASK>
-> > >    set_nx_huge_pages+0xcc/0x1e0 [kvm]
-> > 
-> > Thanks for pointing out this gap. It looks like we'd have to hold the
-> > kvm_lock in kvm_mmu_post_init_vm(), and add NULL checks in
-> > set_nx_huge_pages() and set_nx_huge_pages_recovery_param() to prevent
-> > the NULL deref. Is that okay?
-> 
-> I don't _think_ we need to take kvm_lock.  And I don't want to take kvm_lock,
-> because we're also trying to eliminate a (very theoretical) deadlock[1] due to
-> taking kvm_lock in the params helpers.
-> 
-> There is a race that can happen with my proposed fix[2], but I'm not sure we care
-> enough to address it.  If kvm_nx_huge_page_recovery_worker() runs before the params
-> are set, and the param setter processes the VM before nx_huge_page_recovery_thread
-> is set, then the worker could sleep for too long, relative to what userspace expects.
-> 
-> I suppose if we care then we could fix that by taking kvm->arch.nx_once.mutex
-> when waking the task?
+On Fri, Jan 24, 2025 at 03:46:23PM -0800, Sean Christopherson wrote:
+> When waking a VM's NX huge page recovery thread, ensure the thread is
+> actually alive before trying to wake it.  Now that the thread is spawned
+> on-demand during KVM_RUN, a VM without a recovery thread is reachable via
+> the related module params.
 
-I think we actually can do this without any additional locks. The only
-thing we need to ensure is that the vhost task sees the updated
-variable, and I think we can achieve that with appropriate memory
-barriers on the reads and writes.
+Oh, this is what I thought we could do. I should have read ahead. :)
+
+> +static void kvm_wake_nx_recovery_thread(struct kvm *kvm)
+> +{
+> +	/*
+> +	 * The NX recovery thread is spawned on-demand at the first KVM_RUN and
+> +	 * may not be valid even though the VM is globally visible.  Do nothing,
+> +	 * as such a VM can't have any possible NX huge pages.
+> +	 */
+> +	struct vhost_task *nx_thread = READ_ONCE(kvm->arch.nx_huge_page_recovery_thread);
+> +
+> +	if (nx_thread)
+> +		vhost_task_wake(nx_thread);
+> +}
+> +
+>  static int get_nx_huge_pages(char *buffer, const struct kernel_param *kp)
+>  {
+>  	if (nx_hugepage_mitigation_hard_disabled)
+> @@ -7180,7 +7193,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+>  			kvm_mmu_zap_all_fast(kvm);
+>  			mutex_unlock(&kvm->slots_lock);
+>  
+> -			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
+> +			kvm_wake_nx_recovery_thread(kvm);
+>  		}
+>  		mutex_unlock(&kvm_lock);
+>  	}
+> @@ -7315,7 +7328,7 @@ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel
+>  		mutex_lock(&kvm_lock);
+>  
+>  		list_for_each_entry(kvm, &vm_list, vm_list)
+> -			vhost_task_wake(kvm->arch.nx_huge_page_recovery_thread);
+> +			kvm_wake_nx_recovery_thread(kvm);
+>  
+>  		mutex_unlock(&kvm_lock);
+>  	}
+> @@ -7451,14 +7464,20 @@ static void kvm_mmu_start_lpage_recovery(struct once *once)
+>  {
+>  	struct kvm_arch *ka = container_of(once, struct kvm_arch, nx_once);
+>  	struct kvm *kvm = container_of(ka, struct kvm, arch);
+> +	struct vhost_task *nx_thread;
+>  
+>  	kvm->arch.nx_huge_page_last = get_jiffies_64();
+> -	kvm->arch.nx_huge_page_recovery_thread = vhost_task_create(
+> -		kvm_nx_huge_page_recovery_worker, kvm_nx_huge_page_recovery_worker_kill,
+> -		kvm, "kvm-nx-lpage-recovery");
+> +	nx_thread = vhost_task_create(kvm_nx_huge_page_recovery_worker,
+> +				      kvm_nx_huge_page_recovery_worker_kill,
+> +				      kvm, "kvm-nx-lpage-recovery");
+>  
+> -	if (kvm->arch.nx_huge_page_recovery_thread)
+> -		vhost_task_start(kvm->arch.nx_huge_page_recovery_thread);
+> +	if (!nx_thread)
+> +		return;
+> +
+> +	vhost_task_start(nx_thread);
+> +
+> +	/* Make the task visible only once it is fully started. */
+> +	WRITE_ONCE(kvm->arch.nx_huge_page_recovery_thread, nx_thread);
+
+I believe the WRITE_ONCE needs to happen before the vhost_task_start to
+ensure the parameter update callback can see it before it's started.
 
