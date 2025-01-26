@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-36620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33BF2A1CE40
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 20:56:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C370DA1CE4C
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 21:00:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E2FB165DDD
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 19:56:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A13F166835
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 20:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5831517C21C;
-	Sun, 26 Jan 2025 19:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4C017BEC6;
+	Sun, 26 Jan 2025 20:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KlndNu1f"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Unv/lLmF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11870156C74
-	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 19:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B25C188A15
+	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 20:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737921377; cv=none; b=rarC/upfAvS4qnPMhO1cQN1BFGWyprrxXlXJQ1AAmyeqEn/o4K+2WJlPxWEbkFqxyS9hJpoCwtMsb+tu5fXudPskM6hZTvl4pO2oNgtqn1Cqf5YSWWMF8JsmPzBm4vzOwO64vsYexwkJTtrQ4u0/I0o+MA1dd7/Q2Qm3ECmBkaQ=
+	t=1737921607; cv=none; b=V+T5cTWsvAOZBMEaaYuGFaIkEPVkEjxDiNGnyYdcfDBz5MDTB/vxTSFkBg1z7rd4PRfMJbG8s+zkVvznHgBEM1pV4fbouXgzGOCEAwxeCqJ3mK1lysWNOESm7qoEoaZm8KINg55bEXdIAeus8bR5epjFsLlA/9am5toCR6IpMN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737921377; c=relaxed/simple;
-	bh=R3uxaNQHW3+H7eLa3b0RvKCJyszFgh9qZkagaz+1Tpw=;
+	s=arc-20240116; t=1737921607; c=relaxed/simple;
+	bh=ElopRU/XpBEdsq6Zu40VBpF2PpQl8h8AYs/jZo3L8rs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nrxnb7NRATwvEBVMnVANdA/DVy5D6oGGH/8LpHYI3OI9l6UevAmMFW0xwVZwp6SFozmtl/OUuSBQwp+r1wEtDh0CWq2xDpOF18/oq6fg7VH0A1NceJDLKr0nPBZcdbUCls6vc3urQwA/7Wrgb5Tn5KmnJOGAOqCUIVs57kfMo7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KlndNu1f; arc=none smtp.client-ip=209.85.214.180
+	 In-Reply-To:Content-Type; b=ne64VO1c/pZr0qSHFcj9jT9MOG3thWvVsYTdySp69Puts+G8zOa65Nb2jhP7ZNJ6eTkUmQnzTnhPQmVxAQs0c2JcnC7qCAVQeFTiB7tZmWq+mWWTCKai7cibQS84AiNk7RsTWv+1LXm6mlcA3bmFzoahHKzXSisuIKuVYv4AeK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Unv/lLmF; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21634338cfdso87814005ad.2
-        for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 11:56:15 -0800 (PST)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2f4409fc8fdso5690155a91.1
+        for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 12:00:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737921375; x=1738526175; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1737921605; x=1738526405; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=oZaiNxyRumKDQ6iU0NUlyhjPpWDJhbWYeJfxDmaXxDo=;
-        b=KlndNu1ftdnpNGPoN4HNyLmv/ymDt5EECJD8DQm4/oGErs5vbUq4fm+/Z9OYMk0kvP
-         UeaueEhL4zmEvfUjdAHpcsoUxVDqUBjWfJSwOHtXmGbCzcrLRRm5ePIhv7vLoihlkf3y
-         FPHFmbGg4VpouYZt8PqXJ4GFsvIH2lcnNUzQCSkzmsdfNGDo4rUYS/YeLuKYJoVx24AT
-         73lI4xvEgNguscUK52WyWjtULBo2yI1csqELX9tUa6xnfahsp2A9bW1Gq7pCeE1BAT7x
-         O9/4E3OgQbhqHKfZ4hvBJYWX6K52SpIaL3/CuTZAFqAHZRnyrvFmZ7rys1pO3mxKkGDw
-         ndpw==
+        bh=jvT1nOyyGXJEnkXkKCQj0Xq14BrdlE2RAOYFWR4ybQg=;
+        b=Unv/lLmFcpp7EtNhR9WnXMaurFROuDoZzBhVEGEmmeis1pIMv7Nrbg+Gj82rNrhIyP
+         2U0wpcAee6QgM5ZGfFLMQHCYffPlpswIB0O7p27f0oLXlIxbpT+STxiOzY6LX3Sj4JG0
+         nHhmiB22mosUtn9fCDENfZPYZzWr7U+dk4nm4erHuxD0rQUopLxgVtrVHSbmKGpoWLuk
+         NVVGqxokh2dML1tJBONz2imbnV3ffksDSg1+l7OH4345fS9Kr0jPI/QWf27yCw7/3SEd
+         IBo67BfvU5SYN14nZwCciWZ3SnfNBRmCOo7R6IcBY7iBfKax6G6mkcsz54HmcXYgsdjr
+         13lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737921375; x=1738526175;
+        d=1e100.net; s=20230601; t=1737921605; x=1738526405;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oZaiNxyRumKDQ6iU0NUlyhjPpWDJhbWYeJfxDmaXxDo=;
-        b=NjiAi2lBC4Orcs1P5ox1a23FvaEzNBR+ir1VFmP3NdvWHNLXjO/c/EpVloR6LcBEOq
-         rBwmKuWFnpbRl+ZSu9plB9Qfa7bEAtnpYQJUxjWETdNB029CVF3yBWiD0chNF4QqWnig
-         99yNNVckKsY0Z2RmZiiKf9cyAqLF0hlta77dDXEQTfAEppTJHATmR1M6ASDEbgPVWK4k
-         g8SBlvLOCx+oQOqWozCV5Cx1BboVzKspWLq9BkD9HOQdc+mSBDQbErYwjdRtTPewPHeF
-         ZdHGRi9LSI9znbxm3gs/5C+1GPB26y/B/Hqi28hEOWpQX7vqKjkPi3alLH55iyJXhBHb
-         YwrA==
-X-Forwarded-Encrypted: i=1; AJvYcCWSPUBh/Lj8rOgENLw4x2rBvFhdalPomNy0xX8V4MJgFdSHm0vyhL3vRF0v/nQ9ItF4tCY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFqCIzgVWSZa+wxlhizvUIvyFmzd/1tzPaNUK/dILYQnudDmdQ
-	i35eONqUo97B0gXzuH/odKXRxiMSfLwD2dgnUKkgT3MeXySASmRvTjyEK3Z0XUc=
-X-Gm-Gg: ASbGncuMPH+5nOcC90qVcs4bmXKT3IEueJ/SG9a5oaZ5i+QHT0HjcBhH265gepvhqux
-	NuziBYds1feRciB8nPGlnfn9LnI7188DIya7fMd0769JuDzra/bkkYqTZb/o6h8TUHy6q24uk6X
-	t9P7R3PLuFIB/y/DpDDiOwoB+fljecbQpPEW4pARoju0884+2o96vYqtzCe95cLxVGSpq0dC0KE
-	GCTtzhaanLDvZ552OYaDHHG3uTuiiyvB6PHzZ2+Hkx+y5RKdaCMGTjCllhRPdhpJFyDakLtGVux
-	R5ELFPEJn+oucVhcLGe1cgxUon8KLxiTCIE6hRqi+JgodbU=
-X-Google-Smtp-Source: AGHT+IHO4WMUbjm+0GYB5uvcZM2pATyJHyNJ2uKrCdmerCTV19qq9YWTnaUhr9U9sZ/t561e+9mUEA==
-X-Received: by 2002:a17:902:e746:b0:215:97c5:52b4 with SMTP id d9443c01a7336-21c35631dd4mr526655615ad.39.1737921375406;
-        Sun, 26 Jan 2025 11:56:15 -0800 (PST)
+        bh=jvT1nOyyGXJEnkXkKCQj0Xq14BrdlE2RAOYFWR4ybQg=;
+        b=hvuCaaLHqOFkv1UnSoZFuZ+ADPKlTEFVeDwtg3WlSYjhRU3TEL+d1EytnDst+XGTYc
+         wk8gkzzF+3AvnDL9F1xAhHxH81IsKhfkf21/oJ13UmfhY3aIoA97+bb+TLBV7p6q+W1t
+         pAZB9HLbyB914Orrp6t2zpLsG2SOBNnzvuH9F+vMibY2W1lkp/dnL4Zd2/FC25Cs5/hJ
+         6bFEwy12vGjxVV2uGCVjiXSGOdNHRjugP347l0a2bmKzonz3licupZUFD0dgeweCIrWW
+         pm6vKn8Up2vQsi9a6GmnuI9WLE2tB4NLuMgXj+U4ohFh5jsJoQW3Z75VNeJn5922ilxK
+         wGhA==
+X-Forwarded-Encrypted: i=1; AJvYcCVNbthJ7EwGCdCigaRblZ2zPIjrFopiU4rXw/PkTut7PcwzRZOXHyho7C8zESpYpcqI+NU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzalbqyzCua7exTFQv9EHmMWfcQJoKfTfaXh5DSTtaTFKBGs6bI
+	hxWFog/65vntgrubtDndioRwsNuWDkZ+YZTLGBUlfdwo8MTYTMHAt2xV63YX5sg=
+X-Gm-Gg: ASbGncupJq0Umul9qw2voqwdZ5eQCa7AI7l1p64VlcHhHVt+TZtWuy/8f8nYo579Av5
+	ai+S+1V/O/wxc4mOBQ5gSNF0POzll5kYJSjJRayWZmj/b1wcJgtlBgqg0VC47tkcFSlBO3zz8pg
+	QhI9WpGNDdmtWhOlGp685fWI8d/QscAFOnx7HiRz10ymTbbqYac+YTVUuzzR9UfHLhTmvsaHx04
+	qzFtt7F5+GF+r20OWhAPY/9pqMXPYnkWmvObjVD/Tze8CyDpAcaJhty/tles8hwvRtcLafAHSR1
+	SSu135ViCNxInw3umVEiNcmCtJBdGKig6h1IkJ7ApIPbEPM=
+X-Google-Smtp-Source: AGHT+IEP4DwQ/u514V5B38J2P62wTL0qYp8JNncl4+5UB0i/l/G/YI+4UbX8eVL0ayMsA+c7B1DDZA==
+X-Received: by 2002:a17:90a:f947:b0:2ee:8cbb:de28 with SMTP id 98e67ed59e1d1-2f7f176b184mr25848071a91.8.1737921605198;
+        Sun, 26 Jan 2025 12:00:05 -0800 (PST)
 Received: from [192.168.0.4] (174-21-71-127.tukw.qwest.net. [174.21.71.127])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da424ef28sm48976545ad.258.2025.01.26.11.56.14
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffb1dc56sm6196959a91.49.2025.01.26.12.00.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Jan 2025 11:56:14 -0800 (PST)
-Message-ID: <51770df2-ecbb-47b9-b5c5-a60decf0f751@linaro.org>
-Date: Sun, 26 Jan 2025 11:56:12 -0800
+        Sun, 26 Jan 2025 12:00:04 -0800 (PST)
+Message-ID: <ba781224-7b4a-43f6-af25-acb308f11313@linaro.org>
+Date: Sun, 26 Jan 2025 12:00:02 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,7 +81,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/20] gdbstub: Check for TCG before calling tb_flush()
+Subject: Re: [PATCH 05/20] cpus: Keep default fields initialization in
+ cpu_common_initfn()
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -91,23 +92,25 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  qemu-riscv@nongnu.org, David Hildenbrand <david@redhat.com>,
  qemu-s390x@nongnu.org, xen-devel@lists.xenproject.org
 References: <20250123234415.59850-1-philmd@linaro.org>
- <20250123234415.59850-4-philmd@linaro.org>
+ <20250123234415.59850-6-philmd@linaro.org>
 Content-Language: en-US
 From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250123234415.59850-4-philmd@linaro.org>
+In-Reply-To: <20250123234415.59850-6-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 1/23/25 15:43, Philippe Mathieu-Daudé wrote:
-> Use the tcg_enabled() check so the compiler can elide
-> the call when TCG isn't available, allowing to remove
-> the tb_flush() stub.
+> cpu_common_initfn() is our target agnostic initializer,
+> while cpu_exec_initfn() is the target specific one.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé<philmd@linaro.org>
+> The %as and %num_ases fields are not target specific,
+> so initialize them in the common helper.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   accel/stubs/tcg-stub.c | 4 ----
->   gdbstub/system.c       | 5 ++++-
->   2 files changed, 4 insertions(+), 5 deletions(-)
+>   cpu-target.c         | 3 ---
+>   hw/core/cpu-common.c | 2 ++
+>   2 files changed, 2 insertions(+), 3 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
