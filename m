@@ -1,157 +1,120 @@
-Return-Path: <kvm+bounces-36601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36602-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C85E7A1C63A
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 04:35:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C42A1C64E
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 05:21:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C5A57A3585
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 03:34:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B556D3A79AA
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 04:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC401991B8;
-	Sun, 26 Jan 2025 03:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308DE3C47B;
+	Sun, 26 Jan 2025 04:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e/VhD3H6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BP5xop/L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BFF7494
-	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 03:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5E73232;
+	Sun, 26 Jan 2025 04:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737862495; cv=none; b=PAI7DM46KLfP6WP0ShhnB5HLtdjZOQZVSYjKxClYaV8E4S+hZhvcXXaeTA/NWwbDGfLSq/6cmBjkLhdjoCnPxFTQOckCwFqreBQJHGqFmf4Gxijb+pl2Sc7bgYahjRYkrc+6L1dvJbvMCja+Vir4d3k4YS33ZdNttF2dWHOvviA=
+	t=1737865261; cv=none; b=qNcceynQCqyf+biPmh/+PkCxr/LZlAioTcFYuQfahdXfstKjkj+ZBR2vT+CPg3poV34aBKiGvPB+e5UWFgskL3+M8r4ub+nkVmEDK/kI0jf7zLaFGxQSv8jvgN6u/bPm2tAtQSXjuLKi0zE8QN0nqsPC1hTIRSBAWtwvHKayGkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737862495; c=relaxed/simple;
-	bh=AxH/KOjNZ7bGqZuAZbGbffqbSslE+PDxCx1zDr03ZS4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MiwhzheVnxcp5NMYhWdp8qxwhOyKLMHGE9b00LrLQyD2J7Znn2aPJu9ZlBTJYa2k91LLR1PJKKkqdf2kGjd/kDAzj3devkTST/RDNVPSRR64e91VvEX50oqfBt3BHD+U5X9qHBRNJqs9jB4yzrM7TGAZfhuH8Q5vXw4924YFFmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e/VhD3H6; arc=none smtp.client-ip=192.198.163.18
+	s=arc-20240116; t=1737865261; c=relaxed/simple;
+	bh=EdduNVEXm0ixU7iMv43eZMnNsilUg8zjTaBLlqvx4bc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cTVZFyA341NJ4IOb3oqVLRxhSwB1/hysVb82zmmWMsLMVNaTq7GdClvzkuxeVYC+3USEQTg12GxMgGPxSaAIl5OE7mlOT+05XpZXkFNn1NVgHNfS0mKN/8CRLKT7Myj8WcjNp0jgMMBeR19Hr+1k2EcUAHO3EzOMwm5S5Uv+Q4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BP5xop/L; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737862494; x=1769398494;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=AxH/KOjNZ7bGqZuAZbGbffqbSslE+PDxCx1zDr03ZS4=;
-  b=e/VhD3H6vlfBmQbKdyGTfALt23zEY6HA6UVPqvDK6e0X28IiWTHvyOxv
-   wMJJMuEUNNGGi/FPpKkazj2EcW2km8wKKBgapa6RlKqTwq2AaMtNClfrG
-   ZfhsWNFZIQCqYQrouE/KWPBJS/4bgO/JTnyY/AcQasx/JwLUDYItkHjY/
-   v9TmVq3OIoa+PJccPaF2RZXswdSX4eJ4YpcFkMx3gXmsWISDpMG7myi7W
-   bTemoN7rmIqgt3FUrXk2K3fufqMsosofD1IPc/UUr781x9gCJhS8a+El5
-   XuKOV4YQqpmbOPItmuZEF8N3fr+OJ42qk6AUcljdmNo+Nl7ehSPbXAkOh
-   g==;
-X-CSE-ConnectionGUID: w0bI4/a/Rya7LyM+9dRgQQ==
-X-CSE-MsgGUID: 6sZBx4icT/+mfcmDTtDc7w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11326"; a="37611640"
+  t=1737865260; x=1769401260;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=EdduNVEXm0ixU7iMv43eZMnNsilUg8zjTaBLlqvx4bc=;
+  b=BP5xop/LFK9d8vM4jEHA4z3qD6AQ7RhMRkIAK/jnyPkZrP5z+LMreYoi
+   /38EBeUGHZfdP9rnqtBbIqSx5/jkfLIm0MUf4oiSvYaunPVEvGrSHhye9
+   A0u46tnfzO13qFDBvWF6rVveF8eENv/H8P3yGfTnvv7oLC8elqiEMAYt/
+   TjMUbHyyM7V3ORmHu7w9CQDh3y+fkt9Eas3cqlLTA7QiwzusVGeylTYRw
+   hTch12E8L49NbkejrOriOlJJcHg9Y/QqZ89TH5K70CH/0SontRGr6zz1Y
+   IADuP6We/qWevERYjhpAIR5biK05IXHyVKaP2X4ZkWhhBUgczQbxhrqRr
+   A==;
+X-CSE-ConnectionGUID: ecs9yfIUTwed+ohHFl3jvQ==
+X-CSE-MsgGUID: e7HulCscR4SDmAJDRLwiuw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11326"; a="63712510"
 X-IronPort-AV: E=Sophos;i="6.13,235,1732608000"; 
-   d="scan'208";a="37611640"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2025 19:34:53 -0800
-X-CSE-ConnectionGUID: LP9krpO0Rt6/x9mLgNPCXg==
-X-CSE-MsgGUID: Hmg03IfQRwyvDtewIGau1A==
+   d="scan'208";a="63712510"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2025 20:20:59 -0800
+X-CSE-ConnectionGUID: yEe0SZ8OQqKfSOy3mbkiuA==
+X-CSE-MsgGUID: TUrhaHaoSt683cxUXiyysw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,235,1732608000"; 
-   d="scan'208";a="113126474"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa004.jf.intel.com with ESMTP; 25 Jan 2025 19:34:50 -0800
-Date: Sun, 26 Jan 2025 11:34:29 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: Alexey Kardashevskiy <aik@amd.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
-	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>
-Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
- guest-memfd with RamDiscardManager
-Message-ID: <Z5WtRYSf7cjqITXH@yilunxu-OptiPlex-7050>
-References: <Z462F1Dwm6cUdCcy@x1n>
- <ZnmfUelBs3Cm0ZHd@yilunxu-OptiPlex-7050>
- <Z4-6u5_9NChu_KZq@x1n>
- <95a14f7d-4782-40b3-a55d-7cf67b911bbe@amd.com>
- <Z5C9SzXxX7M1DBE3@yilunxu-OptiPlex-7050>
- <Z5EgFaWIyjIiOZnv@x1n>
- <Z5INAQjxyYhwyc+1@yilunxu-OptiPlex-7050>
- <Z5Jylb73kDJ6HTEZ@x1n>
- <Z5NhwW/IXaLfvjvb@yilunxu-OptiPlex-7050>
- <Z5O4BSCjlhhu4rrw@x1n>
+   d="scan'208";a="108109404"
+Received: from unknown (HELO HaiSPR.bj.intel.com) ([10.240.192.152])
+  by orviesa006.jf.intel.com with ESMTP; 25 Jan 2025 20:20:56 -0800
+From: Ethan Zhao <haifeng.zhao@linux.intel.com>
+To: hpa@zytor.com,
+	bp@alien8.de,
+	tglx@linutronix.de,
+	mingo@redhat.com
+Cc: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	x86@kernel.org,
+	joro@8bytes.org,
+	jmattson@google.com,
+	wanpengli@tencent.com,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	etzhao@outlook.com
+Subject: [PATCH] KVM: x86/cpudid: add type suffix to decimal const 48 fix building warning
+Date: Sun, 26 Jan 2025 12:15:32 +0800
+Message-Id: <20250126041532.3420420-1-haifeng.zhao@linux.intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z5O4BSCjlhhu4rrw@x1n>
+Content-Transfer-Encoding: 8bit
 
-> Definitely not suggesting to install an invalid pointer anywhere.  The
-> mapped pointer will still be valid for gmem for example, but the fault
-> isn't.  We need to differenciate two things (1) virtual address mapping,
-> then (2) permission and accesses on the folios / pages of the mapping.
-> Here I think it's okay if the host pointer is correctly mapped.
-> 
-> For your private MMIO use case, my question is if there's no host pointer
-> to be mapped anyway, then what's the benefit to make the MR to be ram=on?
-> Can we simply make it a normal IO memory region?  The only benefit of a
+The default type of a decimal constant is determined by the magnitude of
+its value. If the value falls within the range of int, its type is int;
+otherwise, if it falls within the range of unsigned int, its type is
+unsigned int. This results in the constant 48 being of type int. In the
+following min call,
 
-The guest access to normal IO memory region would be emulated by QEMU,
-while private assigned MMIO requires guest direct access via Secure EPT.
+g_phys_as = min(g_phys_as, 48);
 
-Seems the existing code doesn't support guest direct access if
-mr->ram == false:
+This leads to a building warning/error (CONFIG_KVM_WERROR=y) caused by
+the mismatch between the types of the two arguments to macro min. By
+adding the suffix U to explicitly declare the type of the constant, this
+issue is fixed.
 
-static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                             MemoryRegionSection *section, bool add)
-{
-    [...]
+Signed-off-by: Ethan Zhao <haifeng.zhao@linux.intel.com>
+---
+ arch/x86/kvm/cpuid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-    if (!memory_region_is_ram(mr)) {
-        if (writable || !kvm_readonly_mem_allowed) {
-            return;
-        } else if (!mr->romd_mode) {
-            /* If the memory device is not in romd_mode, then we actually want
-             * to remove the kvm memory slot so all accesses will trap. */
-            add = false;
-        }
-    }
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 2cbb3874ad39..aa2c319118bc 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -1704,7 +1704,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 			phys_as = entry->eax & 0xff;
+ 			g_phys_as = phys_as;
+ 			if (kvm_mmu_get_max_tdp_level() < 5)
+-				g_phys_as = min(g_phys_as, 48);
++				g_phys_as = min(g_phys_as, 48U);
+ 		}
+ 
+ 		entry->eax = phys_as | (virt_as << 8) | (g_phys_as << 16);
+-- 
+2.31.1
 
-    [...]
-
-    /* register the new slot */
-    do {
-
-        [...]
-
-        err = kvm_set_user_memory_region(kml, mem, true);
-    }
-}
-
-> ram=on MR is, IMHO, being able to be accessed as RAM-like.  If there's no
-> host pointer at all, I don't yet understand how that helps private MMIO
-> from working.
-
-I expect private MMIO not accessible from host, but accessible from
-guest so has kvm_userspace_memory_region2 set. That means the resolving
-of its PFN during EPT fault cannot depends on host pointer.
-
-https://lore.kernel.org/all/20250107142719.179636-1-yilun.xu@linux.intel.com/
-
-Thanks,
-Yilun
-
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
-> 
 
