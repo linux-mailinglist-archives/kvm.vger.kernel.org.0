@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-36635-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36636-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12D5A1CEC8
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 22:21:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F6B5A1CECB
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 22:35:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DD49166D17
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 21:21:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3E463A496E
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 21:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD2817C21B;
-	Sun, 26 Jan 2025 21:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19F016FF37;
+	Sun, 26 Jan 2025 21:35:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LdyN/ubZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LacXhmIh"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34206A33B
-	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 21:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D9B146A6F
+	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 21:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737926494; cv=none; b=jcdJktSiR5hZuEcL9v705h5hup5bRr4YQtkLrDweFvVNO+n6sPFO4lq05F4Hl3k6Y3+zrgzNNqAIkmpYClcl5TObVJX+sYOziOrJaQDdy134A7yGON5QqOBa+A1ZAx6tjOsKMxpwjXh/WhA+EwWjO6VKgPDup4Qnxj9cireDCmQ=
+	t=1737927335; cv=none; b=TjBBORGuKZibD2yxP1RIY/ka2LU8COcIesSO6cfseEcrJJtzVHkEOJ1eX3nzTe/ZplkyNkKkDRIRKCfTMkyhGKyfMXMm0zlHXZcdJjB70GlfvN8zx0JHADKjAnTGJ97JkkAImfJmIjYHJ6IHTw9UwGqIzCkTbz29MSuAPjDErj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737926494; c=relaxed/simple;
-	bh=wAxtQeBDN+yaAUTm+5i7te5ydIKrj4KwmP0g3toDI/0=;
+	s=arc-20240116; t=1737927335; c=relaxed/simple;
+	bh=ek6xIKg/QmiL9JwQU2sJ1FZIzSbfG17yHxhqBOC6tFk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=erQlSSwpa1fdEZXmNWdmB5tFyPIij3VCiBcCPr1aaEKHMtasSXu7X8O9gqiSdvjF3/ssCgYtcWzxKqBITtOiaXCUF/jzrKvA55Z+boV4WHa02m5B7sGdcz47/ckvnPx9veD7a45m5qhjKZ5H3SfaHDU4WPlGzqJXRc6SpGhPPNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LdyN/ubZ; arc=none smtp.client-ip=209.85.214.176
+	 In-Reply-To:Content-Type; b=YqqQR7qA+KiKGMH2Mihcz5fJSUduGlMBWE7GgtGfOl6MsdBaUvvW9YelZOogmR7rNNBCKJ90km2sVFvaC/gaiin3nYshwNdnX93UltSZAR8oKJjw5JPRJQ22LE5Vt4D0uhyr5pJEH7Fbbsvg6SJ9ODrVEITa9k0/NRBnrZMI06s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LacXhmIh; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-216426b0865so60967345ad.0
-        for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 13:21:32 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2161eb94cceso44593925ad.2
+        for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 13:35:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737926492; x=1738531292; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1737927332; x=1738532132; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=QYxKemM/xZvwRVD9aoAgaA6gwfgdoNiv4c107IIPZT4=;
-        b=LdyN/ubZwdaDItHOpJlt7P34p8/0aOrKawCsB3N9LJ9eA37tT6amvGWkpGuYvx5D7z
-         STE+7yUZ4aD4lmKCu7XGWStZWw/nJsnIxvbEd4OPe3LohRFoubteIH0M0L7MRVArR8mD
-         /7pLodGeCMpiCQSEhfbzlx4EDMIU8GVOpnfk6zyJflrWfGWKS1YF8u64IEamnNa+brJ/
-         Rkf1vVKaO51EOK7JooeSk5trbcRIX/e5vskzJUnb2YucWOONweBkrO1t/2trszTCbxnU
-         XeC6YyvMGyYtlIMJrNR3uC4hjDHeAo8vadWK/P2G9zNQn6SerVBURC/tJVpYACqqa+UM
-         uP1w==
+        bh=u0m5yL8s0TWSEEfxviVLYoEbDIw5bajMGnLn0okjgqc=;
+        b=LacXhmIhfSIKrHqItBl2P11E1zEb14IhuI4WwD5hCDJR/jXoFax+G7PldGRiusmeH2
+         a1SueLlvTa2+SW1OtbAHzzlovuRMkjUBhHZJOmSHcZZgVuRIP05meRE7TFmiN2l8QUTk
+         YxrluQrr8DBBSGdfDYNr79LCIF7ZWgD/gAmY/1IVoPA6zkXPYSqN5j8T9oN1vnnwJLpH
+         ZkMg99//NzXfuWvJOquRXiEVFtuLvRT3rWceHDjtb4GG7JqxOH1DEdsSwPgKH6Yl/wHm
+         /0ExlcFWijepfd5PCExfY6E4BBwAmokGKnktCLy2kpMKqUJZ6Q+4U2QxPiufQpZzza9K
+         mKQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737926492; x=1738531292;
+        d=1e100.net; s=20230601; t=1737927332; x=1738532132;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QYxKemM/xZvwRVD9aoAgaA6gwfgdoNiv4c107IIPZT4=;
-        b=R70OrK/wwC48t38CtNudJecUVZhVdtkiErmFiDRHvTs8Ogq2OHVpx/zEZTi+aWqCZb
-         H/Ce7WIb+R+FFCEgNx5npFVYZOnSEkiQd0ufjKFpdZHePn6OHhXlO6uM+hgorCJewmF/
-         GKLEAklytvxNNhg9pdP5vIt/vjn+q/XuP7EU06kg4Vwqu8m5+QziZ+lgQJWoGUuy2DM5
-         w1cIwjIMPNuJ8LZuKksyRAnUHXEUrxh7hXgNJDA96fZv230UricwObUH/NuWZvc9VhFM
-         NfdUWf+P0RQM6IGY1lQgLH8rAXrIybutc2Ji6niO3SyNWIBk06RF4euiEaELDvzREN46
-         IBOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfdxgrV4uzvsPiTBZdATwdCFtZm4subXNPDkAl8PUJ3EofRkAOwZGoMYBk3p75moDbjQA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyxTbVsHX45Y+cJczVwwXmSAxT6xNFXRvw8OGvY3OmyLOvJxwK
-	5hMKeHdOlXFLccl3CMlupBp/4ir/GgjIx3O0pMk3H1Varvo+6YZUQoeM/I+7i8I=
-X-Gm-Gg: ASbGncua7EFz1nBGYDok5ZJ3sweQpFRLahJZjTkucisQL2YgUbxlmm/OUS2ER4Qr+/9
-	zd6n3WXab32lWml7WfP/rF7z/murFGQZJ4KiKNGxFErxguBKsxUKjP4qWUt2OAfAmUhFnZAr8Uf
-	D/RbSk6+9SucG6Jv3bBbD0/L003SE+uXYIHc1DEkGIF/Mx6ROrIwGBNsgd4dsV+K+NAtEWgRKZG
-	lsROEGt0qBnFmt3eoy1wxROiVsZJtYTZnFu1rob9jTKI4+UvJboOd+V0+LEt+EBJgAH9C4C/iMC
-	g4+GmDg8UfKpoWdDmcjFk2GX4eWREaSSKB1wIzUCau8atWk=
-X-Google-Smtp-Source: AGHT+IEK/IDwjYTfcGC9vytnhg57Unum7j14HBhQ+TRt9SQk9fY2DLtXa4M3MfHh3b7yHzuy9lAQFA==
-X-Received: by 2002:a17:902:c951:b0:216:5268:9aab with SMTP id d9443c01a7336-21c355e832amr552530105ad.46.1737926491907;
-        Sun, 26 Jan 2025 13:21:31 -0800 (PST)
+        bh=u0m5yL8s0TWSEEfxviVLYoEbDIw5bajMGnLn0okjgqc=;
+        b=bthVH5VoslbvUB9rbc14fQx04O9ptKx8CThtgziY5cqkr+dvvtIjyTMzxb+fTAVxT0
+         Bcru2apHHia5yMUzxGR1jSlov7hAfyciDs/qHWgpdy4/Gs+8LzxxxZPxrjGUQCTQetF8
+         j/Bn559OpZGrIjsUrp1Bg7kJ7yXOLh9KVYtYBaa9btscxnIuPDHMRbo0IYe9cf4cwBMq
+         oDnfqiHbvIzdf2cBVXGOtgqmUHao7wzBpm/eYAwh++J0QR2wc2wmutAnPhILMkCFXQxZ
+         LDFgd+d7C1WPCyZwtDNe3FYStMqccXr4O9ZlIMRSyrNdkn3O/MGmuQrTe5OZT0YkAlbB
+         2Jlw==
+X-Forwarded-Encrypted: i=1; AJvYcCWgB2VLtjWAQyWWebeVafNss18HtYjoDlNfn496wJcKvE0TJR+f1T5oZdgQ0ISLwXy1HYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwILOT8I7LhI+WSGwWfmg15PDX5fRBLRzHZtvQz+abYCzDAzimw
+	k8h+Om1bBK/4d/q3FhaRAecDVUdTYqw1CoXomqC46w9N6gEWPRsxBbkHrp9eN28=
+X-Gm-Gg: ASbGncv2oXTWfSSG+VourN4P1oajE8J3vwrRUya+9mah6ZB1gLlzLOr3wTyW3/4DVS9
+	hNT5AcsIUlks6rssSbuD/kTCuKyqoQ0VA9a81qEpDqFOjbHvHP7xOGZDmMS/7kvrv2KI/2/vbFY
+	j8QJgY86sKEPDTJKM8I2ndh12Mt9RC2uYq9FGI2vcgluFD3U33UrCb0iY2bqdq6O4rhTCh66Qy0
+	VbEdqiMSxYTb3P8lqRkAmtk5zypcrskPpIGDOGRJA7tb8FCr106yEWneNJI8EHpPX/kIzYcV7kS
+	T5l9QtdBKHoekRz0t4Ml0PH52bcZ3FFabwe8/KPUlxgRk3s=
+X-Google-Smtp-Source: AGHT+IF/uxXXMxK7HfifMI4lK/bjNl3NXv2LfDusZSj5Oq6BRtJb3xCpVAH5ppeGMpTK7NLB5Z4iRQ==
+X-Received: by 2002:a17:903:191:b0:216:3466:7414 with SMTP id d9443c01a7336-21c355f6a9cmr669165345ad.44.1737927327477;
+        Sun, 26 Jan 2025 13:35:27 -0800 (PST)
 Received: from [192.168.0.4] (174-21-71-127.tukw.qwest.net. [174.21.71.127])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da4141e2dsm50143635ad.124.2025.01.26.13.21.31
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da3d9c552sm50455215ad.18.2025.01.26.13.35.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Jan 2025 13:21:31 -0800 (PST)
-Message-ID: <6fcaa7b1-ba43-4a3f-a560-5d05a57cdc7c@linaro.org>
-Date: Sun, 26 Jan 2025 13:21:29 -0800
+        Sun, 26 Jan 2025 13:35:27 -0800 (PST)
+Message-ID: <4de30644-618d-4914-a1c6-008992c7edff@linaro.org>
+Date: Sun, 26 Jan 2025 13:35:25 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,8 +81,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/20] cpus: Have cpu_exec_initfn() per user / system
- emulation
+Subject: Re: [PATCH 19/20] cpus: Register VMState per user / system emulation
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -92,27 +91,50 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  qemu-riscv@nongnu.org, David Hildenbrand <david@redhat.com>,
  qemu-s390x@nongnu.org, xen-devel@lists.xenproject.org
 References: <20250123234415.59850-1-philmd@linaro.org>
- <20250123234415.59850-19-philmd@linaro.org>
+ <20250123234415.59850-20-philmd@linaro.org>
 Content-Language: en-US
 From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250123234415.59850-19-philmd@linaro.org>
+In-Reply-To: <20250123234415.59850-20-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 1/23/25 15:44, Philippe Mathieu-Daudé wrote:
-> Slighly simplify cpu-target.c again by extracting cpu_exec_initfn()
-> to cpu-{system,user}.c, adding an empty stub for user emulation.
+> Simplify cpu-target.c by extracting mixed vmstate code
+> into the cpu_vmstate_register() / cpu_vmstate_unregister()
+> helpers, implemented in cpu-user.c and cpu-system.c.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé<philmd@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
-> Good enough for now...
-> ---
->   cpu-target.c         | 9 ---------
->   hw/core/cpu-system.c | 7 +++++++
->   hw/core/cpu-user.c   | 5 +++++
->   3 files changed, 12 insertions(+), 9 deletions(-)
+> XXX: tlb_flush() temporary declared manually.
+> 
+> Only 2 more CONFIG_USER_ONLY to go.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+> --- a/hw/core/cpu-system.c
+> +++ b/hw/core/cpu-system.c
+> @@ -22,10 +22,21 @@
+>   #include "qapi/error.h"
+>   #include "exec/address-spaces.h"
+>   #include "exec/memory.h"
+> +#include "exec/tb-flush.h"
+>   #include "exec/tswap.h"
+>   #include "hw/qdev-core.h"
+>   #include "hw/qdev-properties.h"
+>   #include "hw/core/sysemu-cpu-ops.h"
+> +#include "migration/vmstate.h"
+> +#include "system/tcg.h"
+> +
+> +/*
+> + * XXX this series plan is to be applied on top on my exec/cputlb rework series,
+> + * then tlb_flush() won't be declared target-specific in exec-all.h.
+> + * Meanwhile, declare locally.
+> + * XXX
+> + */
+> +void tlb_flush(CPUState *cs);
+
+Ack.
+
 
 r~
 
