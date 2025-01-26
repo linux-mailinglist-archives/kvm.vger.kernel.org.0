@@ -1,124 +1,163 @@
-Return-Path: <kvm+bounces-36604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36605-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9919DA1C6AB
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 08:39:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E1AA1C76B
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 11:44:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AD293A7068
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 07:39:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FE2818861E4
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 10:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5036E86348;
-	Sun, 26 Jan 2025 07:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b="IbhnvUTb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559751553BC;
+	Sun, 26 Jan 2025 10:43:59 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp237.sjtu.edu.cn (smtp237.sjtu.edu.cn [202.120.2.237])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D0A73451
-	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 07:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EEF135A63;
+	Sun, 26 Jan 2025 10:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737877145; cv=none; b=UV1jdfuY7d6IOblFfrcSnb8kxsaKXZSr3d1pEQ8XwIRXcZuWML2+hSPBC6ybbrzrhZ3VZyu3XybMX7FHwrg0paN08Fl0dxOyeO6Xe8ukChDO/e8PXr9X0DlUhxl4CdcjC6maoS1Gs+Qglt+pZ5zzunraT83y+gWijeyXTPiMPQI=
+	t=1737888238; cv=none; b=ZIfErzjf+H61pn8ErblKtP7P6qinkXtDN5bpeWmTPRLBNFupqVBGf0JsS366c13egfMqLWSTMVTtL9WUi8h9X8CrixXnLDS76OOhoIYvN7t+CRYd7V4H4NHXEZ1SaRSPCJF09TUlXu45RhvuHuUmrj0PGxpVWY+ONHaKOJ3pUPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737877145; c=relaxed/simple;
-	bh=8YafTq7w40QHvC+gSfIT9UR4k35eayUGfx9hKfudNRo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DuwaWFD7yMnG9reHVOW4NaMl6gPBYExrq83FZf+UvnwztL9cwgj0/d0iRXaTNfoxFi9+LbHah5zVOyK574mM+WZnwxDufryGmOCCxn7PbSdQy+8RBrHhE0mBHrHjrrow6n56yRNJxVRJgB6OP2iBbxxVWHIsdz2u5Y7Or8aFN+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com; spf=pass smtp.mailfrom=tenstorrent.com; dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b=IbhnvUTb; arc=none smtp.client-ip=209.85.160.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tenstorrent.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-2a3bf796cccso1626730fac.1
-        for <kvm@vger.kernel.org>; Sat, 25 Jan 2025 23:39:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tenstorrent.com; s=google; t=1737877142; x=1738481942; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+sVQcTr3DQ3Yj0RB9gfOGE03OWd92mmhsEHZSx5B4rg=;
-        b=IbhnvUTbcEz/6MwEtRoA14ewI/jqYqwq0Zwq+Rbgzd2DDXxBarAL8n6AZDlHXEi8mO
-         u+G9MrhPS2I8KVE3Q5BIdka8KpI7jIpRbqUkYPMbHcdEeaZoHp11u52Kqr8n0kRQ1uxY
-         RFlWQ/VXI013Y0RFNYEHBhEi3Qav6tjPoHLHf6ay7KS6dyb/mAmiVFkCxlc5HENDamCl
-         mtrUBE9WYX+qkjPfPCV6s9Gx57W0uwjePFvB6VBLXLbAYLKWfyRvoOWJuvXo1FPMx5k2
-         wYf/1hAxSn1Dt7lNGeQE7LSh/xQB0TDuqGS7CUQZQBkrg1gi5InfGqTQspsNeL/1L7x4
-         dwVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737877142; x=1738481942;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+sVQcTr3DQ3Yj0RB9gfOGE03OWd92mmhsEHZSx5B4rg=;
-        b=UkWcr5+71dPEiYBLbbs3uynloEpHmzASfChWvDZMK0hqDZXV5aevH6os3SKeT8NdSk
-         55Lc2AcC+ekDHeqphZvuSBAqQ7OCqADmGNeRDdwCZuilNoSGm9Ab0Ap3MH2loZsJeVjB
-         WjFRxhJqeKvDtUGk4Q6yjp7WMS0vh79LVQv01vnvpynppFFproQK85M5ZRWjcyYNn6Cv
-         nhme9GiEvkKuQseRFBCabJXfe4VghGCXfV9/DP/1tPKr+OjTMTPXczUa2jmR6UykpXdV
-         xdsxTPtPwQ/Er1CaTR0zhQlXZuCr4iNbF/9h+98VMkq0KQK+WIVmOw306kA21GVOKE5T
-         Thhw==
-X-Gm-Message-State: AOJu0Yzj79FBtnodXLbSw2UnYCe91NniX2d1SdlkGuinweoxPITHfmso
-	3dxovGePzPQbirBr8DGyKd3Qg8n0d+e19HRTCRpOFE7rDgI3l1sJY6qgvlu8LGxzg6FSRIjz8mW
-	YbuKKJA==
-X-Gm-Gg: ASbGncuEWxCnrsGICfotyokrgD+ewybJVmWKVcIdRq57mXY/aTFNgchdCmtjDEV3iYR
-	mLHElBZArxBvQsqG2I8gTKsPbcnYvst6GQvj285U7TyNFpo0SMzPl7jFxt2ojSRE7m7iDkwYwZr
-	xrr1ke5SkH4iE8E3h3VYdZ/noow45hdlKeGnYr4HIxdOHnYXl7KB/Y4nZsNWOFi0f5M7LVEzaGT
-	jNQNbs4d+ZwIU7jknV0LLXFBvZYgqgsYTAVfs+SItHLM74lax4OBqoXwq121Fgg6R7+WD7iHhx4
-	r4kTAzjOGJp8WZjlq/mbXx+kEMrVJJyH6hED2yY=
-X-Google-Smtp-Source: AGHT+IHD5IFzH7l4AMHQBOEFQuVKf9qPj2IuYiidipjsn6+oWElPCE6JEz5EruB32s2UFQH0TzMUkA==
-X-Received: by 2002:a05:6870:cd87:b0:29e:60c9:9dd8 with SMTP id 586e51a60fabf-2b1c0c5455dmr24455952fac.29.1737877142358;
-        Sat, 25 Jan 2025 23:39:02 -0800 (PST)
-Received: from ausc-rvsw-c-01-anton.tenstorrent.com ([38.104.49.66])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-724ecda4c3bsm1547143a34.1.2025.01.25.23.39.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jan 2025 23:39:02 -0800 (PST)
-From: Anton Blanchard <antonb@tenstorrent.com>
-To: kvm@vger.kernel.org
-Cc: will@kernel.org,
-	julien.thierry.kdev@gmail.com,
-	Anton Blanchard <antonb@tenstorrent.com>
-Subject: [PATCH kvmtool] riscv: Allow initrd to be above 256MB on 64 bit
-Date: Sun, 26 Jan 2025 07:38:43 +0000
-Message-Id: <20250126073843.4005907-1-antonb@tenstorrent.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1737888238; c=relaxed/simple;
+	bh=eMk8Vml2rd+ndaBkn8jpHGFaF+7vVFVRt362o45z07s=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=eZrSKwXjDPxIQl0dsfynaPyzGdCLsMMd8FSChou81G9xJ0uu8MNdSdtrOjgxACu58ciw+lxjpi2M5r2N+aTdg0Efp0iPPN5CWNTt+y3CuQOCymj/WaAmzDsH/gGKEw0dvIaxeGY74ZqFUXPBm79PUnw3e0vaQ8MP4JNfqx+xLRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
+Received: from proxy189.sjtu.edu.cn (smtp189.sjtu.edu.cn [202.120.2.189])
+	by smtp237.sjtu.edu.cn (Postfix) with ESMTPS id 6D7EB7FCDB;
+	Sun, 26 Jan 2025 18:33:40 +0800 (CST)
+Received: from smtpclient.apple (unknown [101.80.151.229])
+	by proxy189.sjtu.edu.cn (Postfix) with ESMTPSA id 4F9B83FC546;
+	Sun, 26 Jan 2025 18:33:30 +0800 (CST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.200.121\))
+Subject: Re: [PATCH v5 3/3] KVM: SVM: Flush cache only on CPUs running SEV
+ guest
+From: Zheyun Shen <szy0127@sjtu.edu.cn>
+In-Reply-To: <85frlcvjyo.fsf@amd.com>
+Date: Sun, 26 Jan 2025 18:33:12 +0800
+Cc: thomas.lendacky@amd.com,
+ seanjc@google.com,
+ pbonzini@redhat.com,
+ tglx@linutronix.de,
+ kevinloughlin@google.com,
+ mingo@redhat.com,
+ bp@alien8.de,
+ kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CB14B1BC-224D-4C10-969C-9C6C7E28F76B@sjtu.edu.cn>
+References: <20250120120503.470533-1-szy0127@sjtu.edu.cn>
+ <20250120120503.470533-4-szy0127@sjtu.edu.cn> <85frlcvjyo.fsf@amd.com>
+To: Nikunj A Dadhania <nikunj@amd.com>
+X-Mailer: Apple Mail (2.3826.200.121)
 
-Signed-off-by: Anton Blanchard <antonb@tenstorrent.com>
----
- riscv/kvm.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/riscv/kvm.c b/riscv/kvm.c
-index 1d49479..191fc31 100644
---- a/riscv/kvm.c
-+++ b/riscv/kvm.c
-@@ -109,16 +109,17 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 	unsigned long guest_addr, kernel_offset;
- 	ssize_t file_size;
- 
-+#if __riscv_xlen == 64
-+	limit = kvm->ram_start + kvm->ram_size - 1;
-+	/* Linux expects to be booted at 2M boundary for RV64 */
-+	kernel_offset = 0x200000;
-+#else
- 	/*
- 	 * Linux requires the initrd and dtb to be mapped inside lowmem,
- 	 * so we can't just place them at the top of memory.
- 	 */
- 	limit = kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M) - 1;
- 
--#if __riscv_xlen == 64
--	/* Linux expects to be booted at 2M boundary for RV64 */
--	kernel_offset = 0x200000;
--#else
- 	/* Linux expects to be booted at 4M boundary for RV32 */
- 	kernel_offset = 0x400000;
- #endif
--- 
-2.34.1
 
+> Nikunj A Dadhania <nikunj@amd.com> writes=EF=BC=9A
+>=20
+> Zheyun Shen <szy0127@sjtu.edu.cn> writes:
+>=20
+>> On AMD CPUs without ensuring cache consistency, each memory page
+>> reclamation in an SEV guest triggers a call to wbinvd_on_all_cpus(),
+>> thereby affecting the performance of other programs on the host.
+>>=20
+>> Typically, an AMD server may have 128 cores or more, while the SEV =
+guest
+>> might only utilize 8 of these cores. Meanwhile, host can use =
+qemu-affinity
+>> to bind these 8 vCPUs to specific physical CPUs.
+>>=20
+>> Therefore, keeping a record of the physical core numbers each time a =
+vCPU
+>> runs can help avoid flushing the cache for all CPUs every time.
+>>=20
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
+>> ---
+>> arch/x86/kvm/svm/sev.c | 39 ++++++++++++++++++++++++++++++++++++---
+>> arch/x86/kvm/svm/svm.c |  2 ++
+>> arch/x86/kvm/svm/svm.h |  5 ++++-
+>> 3 files changed, 42 insertions(+), 4 deletions(-)
+>>=20
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 1ce67de9d..91469edd1 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -252,6 +252,36 @@ static void sev_asid_free(struct kvm_sev_info =
+*sev)
+>> 	sev->misc_cg =3D NULL;
+>> }
+>>=20
+>> +static struct cpumask *sev_get_wbinvd_dirty_mask(struct kvm *kvm)
+>> +{
+>> +	struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_info;
+>=20
+> There is a helper to get sev_info: to_kvm_sev_info(), if you use that,
+> sev_get_wbinvd_dirty_mask() helper will not be needed.
+>=20
+>> +
+>> +	return sev->wbinvd_dirty_mask;
+>> +}
+>> +
+>> +void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>> +{
+>> +	/*
+>> +	 * To optimize cache flushes when memory is reclaimed from an =
+SEV VM,
+>> +	 * track physical CPUs that enter the guest for SEV VMs and thus =
+can
+>> +	 * have encrypted, dirty data in the cache, and flush caches =
+only for
+>> +	 * CPUs that have entered the guest.
+>> +	 */
+>> +	cpumask_set_cpu(cpu, sev_get_wbinvd_dirty_mask(vcpu->kvm));
+>> +}
+>> +
+>> +static void sev_do_wbinvd(struct kvm *kvm)
+>> +{
+>> +	struct cpumask *dirty_mask =3D sev_get_wbinvd_dirty_mask(kvm);
+>> +
+>> +	/*
+>> +	 * TODO: Clear CPUs from the bitmap prior to flushing.  Doing so
+>> +	 * requires serializing multiple calls and having CPUs mark =
+themselves
+>> +	 * "dirty" if they are currently running a vCPU for the VM.
+>> +	 */
+>> +	wbinvd_on_many_cpus(dirty_mask);
+>> +}
+>=20
+> Something like the below
+>=20
+> void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> {
+>        /* ... */
+>        cpumask_set_cpu(cpu, to_kvm_sev_info(kvm)->wbinvd_dirty_mask);
+> }
+>=20
+> static void sev_do_wbinvd(struct kvm *kvm)
+> {
+>        /* ... */
+>        wbinvd_on_many_cpus(to_kvm_sev_info(kvm)->wbinvd_dirty_mask);
+> }
+>=20
+> Regards,
+> Nikunj
+>=20
+Got it, thanks.
+
+Regards,
+Zheyun Shen=
 
