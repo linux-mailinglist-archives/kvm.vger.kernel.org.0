@@ -1,203 +1,197 @@
-Return-Path: <kvm+bounces-36609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0756A1C78A
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 12:38:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F6FCA1C860
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 15:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1FFC166D6B
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 11:38:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDB4E3A6503
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 14:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BCC156F41;
-	Sun, 26 Jan 2025 11:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5B31547E3;
+	Sun, 26 Jan 2025 14:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gkZFk8v/"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp237.sjtu.edu.cn (smtp237.sjtu.edu.cn [202.120.2.237])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3434E1531C4;
-	Sun, 26 Jan 2025 11:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.237
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2724136326
+	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 14:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737891458; cv=none; b=fAfjkcGyJCrrc7cVxhZyxy6G/u/Hiz4FjkUwM3d0LJLAHtFyXQjmbWCDUk7bghop853qX7/NkyIRTv3dq1sa3O7ajJbMLcQtxe0Qx9+ajeZ8AymY1E/pEC4M0Jf03xf2MVCuQDDwIP3upnJxmDiCOfEUsi2Mm7yqUFCQtQNdSyg=
+	t=1737901271; cv=none; b=Bu4Zb2gEl3M3ECI2XjdLJy8R9rKw1coF+3JJLoSP2UHfNDIxJ1Sa/BQxm6umVCbVdGk/vNRzFrXUk5Phg8GFPkQuYDXNF+9hS1RPveQgu6pqeBGS1BT8tyScvVUePgQojyd0KCwXuUhrWsNrFw/KPKVQVYwgQDe/qnoyWybefis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737891458; c=relaxed/simple;
-	bh=dmAcphMopESfxZ04xl0/mZ9P2VsXIR6iEbbjAqJZ9d4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=drkJi7chwsvR37oWkxD9b/Qg91CViqqjg+lY5FrOFeca4G4nA59PXB72cQkwR0GtaFX3oh3gTmel/UCqY1rOyKWqDMdFO/80K2m5bfbgiCo1hRvNuiCgqb9h/Ibu9QgCfIE1FNAwBe7BVMKoXN/xS8WflPFgPTiEV3VL7IoQHJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.237
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
-Received: from proxy189.sjtu.edu.cn (smtp189.sjtu.edu.cn [202.120.2.189])
-	by smtp237.sjtu.edu.cn (Postfix) with ESMTPS id 10D88812AC;
-	Sun, 26 Jan 2025 19:37:19 +0800 (CST)
-Received: from localhost.localdomain (unknown [101.80.151.229])
-	by proxy189.sjtu.edu.cn (Postfix) with ESMTPSA id 6D2623FC595;
-	Sun, 26 Jan 2025 19:37:10 +0800 (CST)
-From: Zheyun Shen <szy0127@sjtu.edu.cn>
-To: thomas.lendacky@amd.com,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	kevinloughlin@google.com,
-	mingo@redhat.com,
-	bp@alien8.de
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Zheyun Shen <szy0127@sjtu.edu.cn>
-Subject: [PATCH v6 3/3] KVM: SVM: Flush cache only on CPUs running SEV guest
-Date: Sun, 26 Jan 2025 19:36:40 +0800
-Message-Id: <20250126113640.3426-4-szy0127@sjtu.edu.cn>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250126113640.3426-1-szy0127@sjtu.edu.cn>
-References: <20250126113640.3426-1-szy0127@sjtu.edu.cn>
+	s=arc-20240116; t=1737901271; c=relaxed/simple;
+	bh=e5uxTfm8Bm7baUh4DjrgZ8lrW7Fjd8cbq7rp2ZazZlU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R0gu73KZMDNfgdqJKIt5t05PxM3HXGAAqbk8Z3+lwmLe2f6P0Kvx8M1z75+/6m3RSh3VW46uQ71d7sbzmwIw1gRuZ8FuBrM02KKgpQHtiyE1NS0ZJGSzTWf28zlhP8MlSD5tctgdpU6n1Bo8ek5KVy+9R80WFP1ouKdykP0RrVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gkZFk8v/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737901268;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7jVhWAcn2+kPT9IwaNA/FK8utBMCkOtUO+6hQLL0u2s=;
+	b=gkZFk8v/xC0TbCgxLTKnJcPS8qwP9bFOkxFo9pIBljNWcvVgM0WOoH0/PIPMrP5VKAumV6
+	HGlWi1lNH8DbSnrkGIFagAh0l5WaIMZyMWKhGNsuL9IJNXaVVjoOVxvf9i6OVp8X9daHzs
+	KQnpUTqJucJkQ/1UR7kVnQpCIU/o+rM=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-BIEChJGVMKWH-5un6fYhrg-1; Sun,
+ 26 Jan 2025 09:21:05 -0500
+X-MC-Unique: BIEChJGVMKWH-5un6fYhrg-1
+X-Mimecast-MFC-AGG-ID: BIEChJGVMKWH-5un6fYhrg
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6CC951800378;
+	Sun, 26 Jan 2025 14:21:04 +0000 (UTC)
+Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.224.72])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 7C07A19560AD;
+	Sun, 26 Jan 2025 14:21:00 +0000 (UTC)
+Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Sun, 26 Jan 2025 15:20:39 +0100 (CET)
+Date: Sun, 26 Jan 2025 15:20:34 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM changes for Linux 6.14
+Message-ID: <20250126142034.GA28135@redhat.com>
+References: <20250124163741.101568-1-pbonzini@redhat.com>
+ <CAHk-=wg4Wm4x9GoUk6M8BhLsrhLj4+n8jA2Kg8XUQF=kxgNL9g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wg4Wm4x9GoUk6M8BhLsrhLj4+n8jA2Kg8XUQF=kxgNL9g@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On AMD CPUs without ensuring cache consistency, each memory page
-reclamation in an SEV guest triggers a call to wbinvd_on_all_cpus(),
-thereby affecting the performance of other programs on the host.
+On 01/25, Linus Torvalds wrote:
+>
+> Keith pinpointed the user space logic to fork_remap():
+>
+>    https://github.com/google/minijail/blob/main/rust/minijail/src/lib.rs#L987
+>
+> and honestly, I do think it makes sense for user space to ask "am I
+> single-threaded" (which is presumably the thing that breaks), and the
+> code for that is pretty simple:
+>
+>   fn is_single_threaded() -> io::Result<bool> {
+>       match count_dir_entries("/proc/self/task") {
+>           Ok(1) => Ok(true),
+>           Ok(_) => Ok(false),
+>           Err(e) => Err(e),
+>       }
+>   }
+>
+> and I really don't think user space is "wrong".
+>
+> So the fact that a kernel helper thread that runs async in the
+> background and does random background infrastructure things that do
+> not really affect user space should probably simply not break this
+> kind of simple (and admittedly simplistic) user space logic.
+>
+> Should we just add some flag to say "don't show this thread in this
+> context"?
 
-Typically, an AMD server may have 128 cores or more, while the SEV guest
-might only utilize 8 of these cores. Meanwhile, host can use qemu-affinity
-to bind these 8 vCPUs to specific physical CPUs.
+Not sure I understand... Looking at is_single_threaded() above I guess
+something like below should work (incomplete, in particular we need to
+chang first_tid() as well).
 
-Therefore, keeping a record of the physical core numbers each time a vCPU
-runs can help avoid flushing the cache for all CPUs every time.
+But a PF_HIDDEN sub-thread will still be visible via /proc/$pid_of_PF_HIDDEN
 
-Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
----
- arch/x86/kvm/svm/sev.c | 30 +++++++++++++++++++++++++++---
- arch/x86/kvm/svm/svm.c |  2 ++
- arch/x86/kvm/svm/svm.h |  5 ++++-
- 3 files changed, 33 insertions(+), 4 deletions(-)
+> We obviously still want to see it for management purposes,
+> so it's not like the thing should be entirely invisible,
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1ce67de9d..4b80ecbe7 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -252,6 +252,27 @@ static void sev_asid_free(struct kvm_sev_info *sev)
- 	sev->misc_cg = NULL;
- }
- 
-+void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-+{
-+	/*
-+	 * To optimize cache flushes when memory is reclaimed from an SEV VM,
-+	 * track physical CPUs that enter the guest for SEV VMs and thus can
-+	 * have encrypted, dirty data in the cache, and flush caches only for
-+	 * CPUs that have entered the guest.
-+	 */
-+	cpumask_set_cpu(cpu, to_kvm_sev_info(kvm)->wbinvd_dirty_mask);
-+}
-+
-+static void sev_do_wbinvd(struct kvm *kvm)
-+{
-+	/*
-+	 * TODO: Clear CPUs from the bitmap prior to flushing.  Doing so
-+	 * requires serializing multiple calls and having CPUs mark themselves
-+	 * "dirty" if they are currently running a vCPU for the VM.
-+	 */
-+	wbinvd_on_many_cpus(to_kvm_sev_info(kvm)->wbinvd_dirty_mask);
-+}
-+
- static void sev_decommission(unsigned int handle)
- {
- 	struct sev_data_decommission decommission;
-@@ -448,6 +469,8 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
- 	ret = sev_platform_init(&init_args);
- 	if (ret)
- 		goto e_free;
-+	if (!zalloc_cpumask_var(&sev->wbinvd_dirty_mask, GFP_KERNEL_ACCOUNT))
-+		goto e_free;
- 
- 	/* This needs to happen after SEV/SNP firmware initialization. */
- 	if (vm_type == KVM_X86_SNP_VM) {
-@@ -2778,7 +2801,7 @@ int sev_mem_enc_unregister_region(struct kvm *kvm,
- 	 * releasing the pages back to the system for use. CLFLUSH will
- 	 * not do this, so issue a WBINVD.
- 	 */
--	wbinvd_on_all_cpus();
-+	sev_do_wbinvd(kvm);
- 
- 	__unregister_enc_region_locked(kvm, region);
- 
-@@ -2926,6 +2949,7 @@ void sev_vm_destroy(struct kvm *kvm)
+Can you explain?
+
+Oleg.
+
+
+--- x/include/linux/sched.h
++++ x/include/linux/sched.h
+@@ -1685,7 +1685,7 @@ extern struct pid *cad_pid;
+ #define PF_USED_MATH		0x00002000	/* If unset the fpu must be initialized before use */
+ #define PF_USER_WORKER		0x00004000	/* Kernel thread cloned from userspace thread */
+ #define PF_NOFREEZE		0x00008000	/* This thread should not be frozen */
+-#define PF__HOLE__00010000	0x00010000
++#define PF_HIDDEN		0x00010000
+ #define PF_KSWAPD		0x00020000	/* I am kswapd */
+ #define PF_MEMALLOC_NOFS	0x00040000	/* All allocations inherit GFP_NOFS. See memalloc_nfs_save() */
+ #define PF_MEMALLOC_NOIO	0x00080000	/* All allocations inherit GFP_NOIO. See memalloc_noio_save() */
+--- x/include/linux/sched/task.h
++++ x/include/linux/sched/task.h
+@@ -31,6 +31,7 @@ struct kernel_clone_args {
+ 	u32 io_thread:1;
+ 	u32 user_worker:1;
+ 	u32 no_files:1;
++	u32 hidden:1;
+ 	unsigned long stack;
+ 	unsigned long stack_size;
+ 	unsigned long tls;
+--- x/kernel/fork.c
++++ x/kernel/fork.c
+@@ -2237,6 +2237,8 @@ __latent_entropy struct task_struct *cop
  	}
+ 	if (args->io_thread)
+ 		p->flags |= PF_IO_WORKER;
++	if (args->hidden)
++		p->flags |= PF_HIDDEN;
  
- 	sev_asid_free(sev);
-+	free_cpumask_var(sev->wbinvd_dirty_mask);
- }
- 
- void __init sev_set_cpu_caps(void)
-@@ -3129,7 +3153,7 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
- 	return;
- 
- do_wbinvd:
--	wbinvd_on_all_cpus();
-+	sev_do_wbinvd(vcpu->kvm);
- }
- 
- void sev_guest_memory_reclaimed(struct kvm *kvm)
-@@ -3143,7 +3167,7 @@ void sev_guest_memory_reclaimed(struct kvm *kvm)
- 	if (!sev_guest(kvm) || sev_snp_guest(kvm))
- 		return;
- 
--	wbinvd_on_all_cpus();
-+	sev_do_wbinvd(kvm);
- }
- 
- void sev_free_vcpu(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index dd15cc635..f3b03b0d8 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1565,6 +1565,8 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (args->name)
+ 		strscpy_pad(p->comm, args->name, sizeof(p->comm));
+--- x/kernel/vhost_task.c
++++ x/kernel/vhost_task.c
+@@ -117,7 +117,7 @@ EXPORT_SYMBOL_GPL(vhost_task_stop);
+  */
+ struct vhost_task *vhost_task_create(bool (*fn)(void *),
+ 				     void (*handle_sigkill)(void *), void *arg,
+-				     const char *name)
++				     bool hidden, const char *name)
+ {
+ 	struct kernel_clone_args args = {
+ 		.flags		= CLONE_FS | CLONE_UNTRACED | CLONE_VM |
+@@ -125,6 +125,7 @@ struct vhost_task *vhost_task_create(boo
+ 		.exit_signal	= 0,
+ 		.fn		= vhost_task_fn,
+ 		.name		= name,
++		.hidden		= hidden,
+ 		.user_worker	= 1,
+ 		.no_files	= 1,
+ 	};
+--- x/fs/proc/base.c
++++ x/fs/proc/base.c
+@@ -3906,9 +3906,12 @@ static struct task_struct *next_tid(stru
+ 	struct task_struct *pos = NULL;
+ 	rcu_read_lock();
+ 	if (pid_alive(start)) {
+-		pos = __next_thread(start);
+-		if (pos)
+-			get_task_struct(pos);
++		for (pos = start; (pos = __next_thread(pos)); ) {
++			if (!(pos->flags & PF_HIDDEN)) {
++				get_task_struct(pos);
++				break;
++			}
++		}
  	}
- 	if (kvm_vcpu_apicv_active(vcpu))
- 		avic_vcpu_load(vcpu, cpu);
-+	if (sev_guest(vcpu->kvm))
-+		sev_vcpu_load(vcpu, cpu);
- }
- 
- static void svm_vcpu_put(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 43fa6a16e..82ec80cf4 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -112,6 +112,8 @@ struct kvm_sev_info {
- 	void *guest_req_buf;    /* Bounce buffer for SNP Guest Request input */
- 	void *guest_resp_buf;   /* Bounce buffer for SNP Guest Request output */
- 	struct mutex guest_req_mutex; /* Must acquire before using bounce buffers */
-+	/* CPUs invoked VMRUN call wbinvd after guest memory is reclaimed */
-+	struct cpumask *wbinvd_dirty_mask;
- };
- 
- struct kvm_svm {
-@@ -763,6 +765,7 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
- int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
- void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
- int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
-+void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
- #else
- static inline struct page *snp_safe_alloc_page_node(int node, gfp_t gfp)
- {
-@@ -793,7 +796,7 @@ static inline int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
- {
- 	return 0;
- }
--
-+static inline void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
- #endif
- 
- /* vmenter.S */
--- 
-2.34.1
+ 	rcu_read_unlock();
+ 	put_task_struct(start);
 
 
