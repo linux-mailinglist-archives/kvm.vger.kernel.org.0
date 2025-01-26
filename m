@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-36630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36631-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0001A1CE80
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 21:42:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02297A1CEBA
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 22:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF1143A70E5
-	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 20:42:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A844E3A4C56
+	for <lists+kvm@lfdr.de>; Sun, 26 Jan 2025 21:13:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450AF1607B4;
-	Sun, 26 Jan 2025 20:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF126175D4F;
+	Sun, 26 Jan 2025 21:13:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UAA6gBlU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H+v4A1an"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E403E25A658
-	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 20:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400F925A62A
+	for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 21:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737924139; cv=none; b=FwDADsWhmw74zRu6BaGx/6hVhlygtktJnggTwEzUZzWThwvn4r15atqXq5oDuXxXp/tNWPtTMCTiCE0pbYqdgYxQ8o17iS6vkOqZtRY7TwUCHJtNLAsz4ihwtJmo6c22sxjhf/oj+/mFkMC9pKfBTEJFInAWg09+HALQaF+hoUo=
+	t=1737926033; cv=none; b=uCpJQ8spwqrfftUWjcH5LskK2eOifcwYy5rdX8+XcpBjaZJKUTZn+rRC8nHjxZJBdvJ5vdZ0cj/PBtNFQ7pBP5GzwqIz2DV2WwWg2YnQdkrBPOmCk1TtRjcfhEpOOfqFFsSEPV0eWIt5k3KmVo2Ra4jDMTsrwwa04+hLBSFIYLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737924139; c=relaxed/simple;
-	bh=WrNZsyTDEp3t+DALVpU4lpxfmzfSwN/ew7PUDLWrq8E=;
+	s=arc-20240116; t=1737926033; c=relaxed/simple;
+	bh=pM8qUUNvaJNHm+L48cHRcyQLruThU4My2WxYWMWa1rM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G3nIJGt8/YZJCgi3xDn4+UOrXn9kfP7F/B/53PzRltHJMcDpGLuXGAsyEKwwX7hR4SB7UMnRt7Nf8nH4mNJA/KsgJbzFlbKZK61mXG7xHMdU2eCCSdBjCog/5+qlbQlxLoN18qH8QAtF+l3MOChyqCTIi8QZ1cdRRb+FRMxwYQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UAA6gBlU; arc=none smtp.client-ip=209.85.214.169
+	 In-Reply-To:Content-Type; b=o2mcI9/K7mVQyEYQfI5hCPeaV9pJisf/6sKkRX2Y2Z22KODr0II9Fth0yJaD2NwzcF6qwZsty86lAtP5qJFPetLnjJLbOlHkUl7AWLPbMtLSEBWOei91g3EDAPoe6uZBOCEe0lsQpZD5DRhT8oBBl0wuFRRJ5mxwVTwBdZSazc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=H+v4A1an; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21631789fcdso62912305ad.1
-        for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 12:42:17 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-216426b0865so60921405ad.0
+        for <kvm@vger.kernel.org>; Sun, 26 Jan 2025 13:13:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737924137; x=1738528937; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1737926031; x=1738530831; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=H48ko7PqBt1MRDsTfWIcWC8+CkMs626ufkIw2bc/5x8=;
-        b=UAA6gBlUvyfXajy3J7HkqSffczEMvjw2PI7tPGepJCl3fzj7I4QKWe8WhgAv8AlGk1
-         LazOrdKAG+mSQCBx5Q/d2QdNGVVnbgYvbW8dbKAm8UjchJVFtBBZ+jPb50E4VcVRRjoh
-         pdyoog04HOlXo5l7RPDY2T5YiBZre/HKKrV2n24TL02usByAsWGSCua94rAPcAWAhp4d
-         N8+Ah0K32IrKcIEcm5/Giwa1tiFmqNIEcUQuNLh+SPeXB3gR8sNP+Njle3ZMYfU2idYG
-         INmdJXX25qttKcmfoVO084x/Hks0JQy0lDZ9IlxeMMjQENM3bO5yJUrAWVExP8zSzf8D
-         lMGQ==
+        bh=M9kpcRwj4XMG8ftG4wmZyZnxF1iU/ErySCW5MvOqlTU=;
+        b=H+v4A1anwbOQwEQav/OVDMXYzeKja/sfH9QJ+zJZGT1ySPNtLZi+DIQnTjf4Bbjh+4
+         +0m3q/5oKJb/UicoB5YgyyGXkbYvrK6QKxiiVJ6OART2OthQfRlgw3F/CFlz/F3Tn+ux
+         ZdFOPwNZloVgSEFqgLyB5DGE97gCgzeBw03A7aQYmS8tM/pEKVnPRZAIbBDAWkNZ/8at
+         FNVJ5BG/i7d1c+9Z0Kh2BIxtFS3ahAvLnHn2V2GfMWvylSf+4TMoW6mbXrSHFgJTDmFL
+         zuRUqAdLusgKAMPaSfvViF5HtPZJoohd96q62b8X42AWxvdX9bQ2Xp306rduIb/idVdN
+         gdwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737924137; x=1738528937;
+        d=1e100.net; s=20230601; t=1737926031; x=1738530831;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H48ko7PqBt1MRDsTfWIcWC8+CkMs626ufkIw2bc/5x8=;
-        b=j2cQXmyI45rAWVSIS7Kt8gIbNsRSFzRs4BlvTRJU6oQdjlQ9UqlbJc+aVq5LY0qQ36
-         nCc5xfF/euyLV8/Ty86ElNT4LfktZH55Y5ldjfz5lYbusjcN+05K8k3dMyyajFGbzmQf
-         1CuNoBMan98L3ujC9dM8fAkRpRwifZwFqWqnzJiIa1SVktHI7QZsQo54WZ98gXzV/dwP
-         y+q/cAmoCXBL0zREp3HnGxLXwFMlhXgzy+lbkZPYZugfyBTHMFNNEaDzML1X2cPRDkwB
-         ixZo0cEAksnJutrU2Qgehbo4l6Osoq4Kg1Bhz+KHP9wTj40VVDTUZ9AE4FjkUcI5CZOz
-         VhKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGjEqa/5Xnj2P+pEB38p3a2Mq+YAlGhiqlJQ3Jn/EXRe8//ChJ/I/LEmW0zyo4ERbbS0g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8aXE9Y/1pr6YsVtQOAOmekLbnWEnWAH9t8R4JitU4IdPwy/mh
-	PUtIVYPgzgcalMzDL7aQyRJsCMSsNNL37dJbj8VjzTRHIyvlOtMuC+CBKlR4ZSA=
-X-Gm-Gg: ASbGncs6pDjfeXQhqctBSUX2Rq4dfQdBg9YaG+vG8A+7mSi/rffRMHlPoCoWC9Uq+Cf
-	5N7QgqF4mHK5MUKyZ4u4FkGgbt5DPoELF2nWnE2H1yskslj8oxRvsLab39j2TLqzZSeXzY7conZ
-	3YLZZlbfbai6hx+xqj2pFMRfipA8Rk+G0h58nPXZeYjwW3KRl3U4vllHMzG4kyzJHubuMP4Zz1F
-	izCnLnmHUHZkwTxmoeqTq2m/KYwMi9VKxPa+TDPY17fYK2CBWnKkalSjiOBfLOQuD7fbeVK61nj
-	03Dz0kd8MubqnoKLqSRyE7cG5qQ6bcW+U9byML8IfbinDt0=
-X-Google-Smtp-Source: AGHT+IET1Hgf5DlFtTnLB6zbw3cCOrZlZ4h4Z0Ht47r+OhnvTjZQY9E5YHFS64waNnu9A7EWzAD+mw==
-X-Received: by 2002:a05:6a00:2719:b0:72a:83ec:b1cb with SMTP id d2e1a72fcca58-72f8adf4091mr15476076b3a.0.1737924137118;
-        Sun, 26 Jan 2025 12:42:17 -0800 (PST)
+        bh=M9kpcRwj4XMG8ftG4wmZyZnxF1iU/ErySCW5MvOqlTU=;
+        b=spBjzZ218dR8AeEMZSRMJY9g0VobIJbhVUdQCd3NrxvF+FmUtwokUZxmXdPnMsQslJ
+         3pqxRuqvw+7LTXEq6H1X8OULlFBekQC4ERc/XkyonjTozIY6iVxabjIipvJQr3eiHSLr
+         8d6Z0RxnKmLw7lM7O/f2fruGGw4LFURe/6D1rrnHYRdFP7OquqbFEbNGxUJb1IdbfMN1
+         DOYQjsS27NbMOA43RYYz/+E4KZtFPPExjaGBK5k5sb1zzqYUX62iFn5TSAz1hInJAPcC
+         h/HXx0zDjZpjXuBGpcIO+bWdsB7ive0pyW7RdJ0jauDUhDSPQWEfF+dQ9rBUCrPXNHNh
+         s93Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUOAYjwQMnd/WkNQEFi4/3rpgVdl99AOGKSNFc93A0AYPlwrU2flu8obK3Smt0W46o3AZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4b8/YKwodl/TwgHwGfBPhBtnEePMapZmMJwo1AuTHhgqh73TB
+	33mIFwCs55CWw+NJsgkAxn7D0pppvszNZOUefX1rfF755tkhhJwAgWP8gPE4lKc=
+X-Gm-Gg: ASbGncs41vEyuKOTD2yq1GKW7ziNfOtK5DC6JQynguimYd/0LcPdricRgmZr1NxaQVn
+	qEtYGcIxi656loLJMmEkjhIkw29+w/cciVDEr2GrUFY9ow5fhknc1pkVsPADrOoHS7UIvkuv4lc
+	02hk9rEHM/ba5VRQ5FcElFKpO/WTj9xroTnYOy/mjkaRqLC4mpajk6U2ejgyiX/2MrpxQVstfs5
+	9enS7MFUXe8NoOSqVwXBNuzUbAinsea+Ul7xjbQgbLGtFEKA+rlKXk+MVBLqBeeAMxncK7cdkgg
+	HTxujiJoabN8gH33pP76aRzgK6WIx5Ngn1WAsZmBtYTGRBk=
+X-Google-Smtp-Source: AGHT+IEZs0zeKB5IzyrVqsgjZQ8Qgr6yuUndfoZR9xIIrSSkISsRSLWzsvON9msLe4CFxT+Ly8wqnw==
+X-Received: by 2002:a17:902:f551:b0:215:431f:268a with SMTP id d9443c01a7336-21c3556016amr565306785ad.31.1737926031507;
+        Sun, 26 Jan 2025 13:13:51 -0800 (PST)
 Received: from [192.168.0.4] (174-21-71-127.tukw.qwest.net. [174.21.71.127])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a6b3233sm5836919b3a.61.2025.01.26.12.42.16
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da3ea3bb9sm50157355ad.92.2025.01.26.13.13.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Jan 2025 12:42:16 -0800 (PST)
-Message-ID: <fc81002d-b169-40f7-80e1-c93e55fadd30@linaro.org>
-Date: Sun, 26 Jan 2025 12:42:15 -0800
+        Sun, 26 Jan 2025 13:13:51 -0800 (PST)
+Message-ID: <c844b086-b3fd-438d-a4ce-6571094e5e14@linaro.org>
+Date: Sun, 26 Jan 2025 13:13:49 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,8 +81,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/20] accel: Forward-declare AccelOpsClass in
- 'qemu/typedefs.h'
+Subject: Re: [PATCH 14/20] accel/tcg: Move cpu_memory_rw_debug() user
+ implementation to user-exec.c
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -92,46 +92,63 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  qemu-riscv@nongnu.org, David Hildenbrand <david@redhat.com>,
  qemu-s390x@nongnu.org, xen-devel@lists.xenproject.org
 References: <20250123234415.59850-1-philmd@linaro.org>
- <20250123234415.59850-14-philmd@linaro.org>
+ <20250123234415.59850-15-philmd@linaro.org>
 Content-Language: en-US
 From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250123234415.59850-14-philmd@linaro.org>
+In-Reply-To: <20250123234415.59850-15-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 1/23/25 15:44, Philippe Mathieu-Daudé wrote:
-> The heavily imported "system/cpus.h" header includes "accel-ops.h"
-> to get AccelOpsClass type declaration. Reduce headers pressure by
-> forward declaring it in "qemu/typedefs.h", where we already
-> declare the AccelCPUState type.
+> cpu_memory_rw_debug() system implementation is defined in
+> system/physmem.c. Move the user one to accel/tcg/user-exec.c
+> to simplify cpu-target.c maintenance.
 > 
-> Reduce "system/cpus.h" inclusions by only including
-> "system/accel-ops.h" when necessary.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé<philmd@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   include/qemu/typedefs.h           | 1 +
->   include/system/accel-ops.h        | 1 -
->   include/system/cpus.h             | 2 --
->   accel/accel-system.c              | 1 +
->   accel/hvf/hvf-accel-ops.c         | 1 +
->   accel/kvm/kvm-accel-ops.c         | 1 +
->   accel/qtest/qtest.c               | 1 +
->   accel/tcg/cpu-exec-common.c       | 1 -
->   accel/tcg/cpu-exec.c              | 1 -
->   accel/tcg/monitor.c               | 1 -
->   accel/tcg/tcg-accel-ops.c         | 1 +
->   accel/tcg/translate-all.c         | 1 -
->   accel/xen/xen-all.c               | 1 +
->   cpu-common.c                      | 1 -
->   cpu-target.c                      | 1 +
->   gdbstub/system.c                  | 1 +
->   system/cpus.c                     | 1 +
->   target/i386/nvmm/nvmm-accel-ops.c | 1 +
->   target/i386/whpx/whpx-accel-ops.c | 1 +
->   19 files changed, 12 insertions(+), 8 deletions(-)
+>   accel/tcg/user-exec.c |  92 +++++++++++++++++++++++++++++++++++++
+>   cpu-target.c          | 102 +-----------------------------------------
+>   2 files changed, 94 insertions(+), 100 deletions(-)
+> 
+> diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+> index c4454100ad7..e7e99a46087 100644
+> --- a/accel/tcg/user-exec.c
+> +++ b/accel/tcg/user-exec.c
+> @@ -19,6 +19,8 @@
+>   #include "qemu/osdep.h"
+>   #include "accel/tcg/cpu-ops.h"
+>   #include "disas/disas.h"
+> +#include "exec/vaddr.h"
+> +#include "exec/tswap.h"
+>   #include "exec/exec-all.h"
+>   #include "tcg/tcg.h"
+>   #include "qemu/bitops.h"
+> @@ -35,6 +37,7 @@
+>   #include "internal-common.h"
+>   #include "internal-target.h"
+>   #include "tb-internal.h"
+> +#include "qemu.h"
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+What is required from *-user/qemu.h?
+We really should not be including that in accel/tcg/.
+
+> +            if (flags & PAGE_WRITE) {
+> +                /* XXX: this code should not depend on lock_user */
+> +                p = lock_user(VERIFY_WRITE, addr, l, 0);
+
+Ah, here it is, complete with comment.
+
+Indeed, I don't think lock_user is required at all.  page_get_flags() and g2h() are 
+sufficient.
+
+> +                mmap_lock();
+> +                tb_invalidate_phys_range(addr, addr + l - 1);
+> +                written = pwrite(fd, buf, l,
+> +                                 (off_t)(uintptr_t)g2h_untagged(addr));
+> +                mmap_unlock();
+
+We probably want to own mmap_lock for the entire function.
+
 
 r~
 
