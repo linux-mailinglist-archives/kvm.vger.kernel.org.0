@@ -1,196 +1,148 @@
-Return-Path: <kvm+bounces-36661-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6700DA1D8BF
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 15:52:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF42A1D951
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 16:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AE321886C78
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 14:52:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AA5F188787D
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 15:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB533D64;
-	Mon, 27 Jan 2025 14:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56AAE152196;
+	Mon, 27 Jan 2025 15:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZZhpZHm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vz42PS6C"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A826F30F
-	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 14:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A621738DD8
+	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 15:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737989507; cv=none; b=i7PJtavUyYmzj2JuvG/D3CsNOgu0elGxOnqdFBwIN93ncuRYy3mDw99mxaxVjVDwHl2aFlAhJXPpmUHIzfVGH6JtfCv3dLOykr0mNhGiKfrQOLG+ABogw8acS941W6Sre08td6Fb/muS1NHzlfOJTpYDjz8+EQpQUD5shetqDBs=
+	t=1737990922; cv=none; b=O8FJJ5vSbENozS1U4pLx7sfnTGldV5G35wC6oFLyI+h1r+VVFhq8d2dUz7tTivLXSs6QgYTUqh66SyIL+3x7bKb3qUMYIjYsyBgY4qyVI4Gc7gMCk1bInXMr9Uty0xsMLZbLBfLiqTwGANsZ9+WzPvP3gobnsQcJC+jg7fqyiNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737989507; c=relaxed/simple;
-	bh=82o5UCZGVSA9UZesK2R8teTwT07ErbjUj7U5zfSimqY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=gLmSROSog5HfIDLzNq2Xq18qZtf9mWG7nuRf1v7gs5VbWzHgiwOG18+zn4ojYn9A53KDJR+TdA1r8CKA0ejhxAatZsSBuutGN7HGvfDnCWDHyWxFq5o+pR/ifShYqSvLgZmUWKy35c7qDciV7Qn0DUPYlDlCfBAo8NqnDBZVms4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aZZhpZHm; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1737990922; c=relaxed/simple;
+	bh=Dv7+mQtwYD42Jjuf9XDSRD1jcbBvvwu8+MprYC7uv3s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jiq7x6BP9OGTgVnbkYrVVK5OGRqlPKJj9yjzoT0vdwdIRXEme+wtrxaXA/M/g26gJfwGt6dsoGpYcuo3ghZokjYLW+BJajYYahA0sPP6Bgl1IFbNbB9qJ63Ict/JuSHq9GuM9c2e2oVVS7qfbFekG4xpef6yRyvrJ2ujbceTBl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vz42PS6C; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737989504;
+	s=mimecast20190719; t=1737990918;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=iau4JPbloeWL667asjULg/fQ3/zjcPRlyMvVrpALuFo=;
-	b=aZZhpZHmoSLOm1bWCLhp02AnyGk70G5DpfAHmZokFRGHmHpi8wyRHFGCP5/4WRm7T1D14+
-	2XJZB+Nv3EcYDCNe1UTyaG8MYM7MsiJa0x2Iv0VECn9Chw3BP6ig1jCbR9cycW8qVPwEFc
-	2IhQi0t9I9dG7+bqiAw3jeaxM5K8+xU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Dv7+mQtwYD42Jjuf9XDSRD1jcbBvvwu8+MprYC7uv3s=;
+	b=Vz42PS6CBQShahMtivGDpNPWK72/frv0ypI6aGdgPRQ9n0zxB5XCTzZ6TARUlbnZyMvGQ2
+	6EGq/KHfOQPBnqXD14SsACaiRKmlhExMVQk+r1zPzQpMFl5ggltXzlilqekR+4gRF4Nivn
+	CZcRlvEHyAUcRkky3KUXkuiY+HkI7DU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-581-x6mJZd11Ov26S6vhB6kK6w-1; Mon, 27 Jan 2025 09:51:42 -0500
-X-MC-Unique: x6mJZd11Ov26S6vhB6kK6w-1
-X-Mimecast-MFC-AGG-ID: x6mJZd11Ov26S6vhB6kK6w
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43619b135bcso22107655e9.1
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 06:51:42 -0800 (PST)
+ us-mta-370-QUb7IQ4kO9u3m2DEx-EVlw-1; Mon, 27 Jan 2025 10:15:14 -0500
+X-MC-Unique: QUb7IQ4kO9u3m2DEx-EVlw-1
+X-Mimecast-MFC-AGG-ID: QUb7IQ4kO9u3m2DEx-EVlw
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38c24ac3706so3773227f8f.0
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 07:15:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737989502; x=1738594302;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iau4JPbloeWL667asjULg/fQ3/zjcPRlyMvVrpALuFo=;
-        b=Kbf27QDQlVYGHzTcXIMvrbDnKVhthwHj7MMtYdmHb76mWInlE4s2yV/A7c+G6lQUGh
-         xBx2Lr6q6oUXochLjAQarWatabDj+7Xm9MJ+U/mn+oBYpobu+VgVtxmEaKDG2P7snN0/
-         V4NOnb542yUFH/a751cdoEzHFgrql96UisJdENY7PmDxXK3W2x+scqkkif6z/lumcexp
-         nQ0HcPhaUMzgVUSzrZqO65k6fzbKORP/ClyIN3wUVLQlt9UrBYQ2hXF9T7DItBgjW4Dp
-         nuFf+4stzu2xmB/lWuZha+ctZc/NJFU2f3R6SyPum8JfQwCwRrJ30+fUY5PJo7RVwZYg
-         Ml2Q==
-X-Gm-Message-State: AOJu0YxK9Lay5LCUtjz1LBu/SIoxtQiXjHhMv4LY5T46uq5fObYOh0W1
-	5JFJvzYXXZEZ0/PqGC6VMAUF4IXrj7npNyZvulS+ZQ2ayYgCKXN+4y+MucHKEaggjVegGLg60sB
-	byOdb7v2TlCGjp9ddveQbz4g0LXTQt6s0YaCJTfn2aa0a9JmX1g==
-X-Gm-Gg: ASbGncsofr1jOKQ1E9Ungs3NrjdSE/uKltsXiNAXQ2ZjxtvFdpsx+TwlAtMELhIoBOQ
-	bO6C/BxxrzRfq0leQ4sceszfDvijqfycPidriSeb7lqgYIs06voJLBJ6K6xI4S9lDaJLzJ4wcyC
-	KPrQDcDHKiNOsnLRB77g6AYUieL4al0TcAhc7GNG9ty3PXXUYBJUFO+XnxckLfrNq7uw4+6VSsS
-	AF9VBsp8VlmKj7BAXoD4szfOqnbo99VHePGfPIpWG5I+CcpQHEaen5ginK1RwtubwaVP9cTJ64n
-	dA==
-X-Received: by 2002:a05:600c:8719:b0:434:9499:9e87 with SMTP id 5b1f17b1804b1-43891437217mr333777625e9.25.1737989501763;
-        Mon, 27 Jan 2025 06:51:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHuV4H4eM+0+8cCmZ4gGN82WCYmpRuJq01+bj07H2U3xuDnsFknD44BEnMwIVHwLR+uIAWc4g==
-X-Received: by 2002:a05:600c:8719:b0:434:9499:9e87 with SMTP id 5b1f17b1804b1-43891437217mr333777455e9.25.1737989501407;
-        Mon, 27 Jan 2025 06:51:41 -0800 (PST)
-Received: from redhat.com ([2a06:c701:740d:3500:7f3a:4e66:9c0d:1416])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b171e68bsm158813595e9.0.2025.01.27.06.51.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 06:51:40 -0800 (PST)
-Date: Mon, 27 Jan 2025 09:51:38 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	akihiko.odaki@daynix.com, akpm@linux-foundation.org, bhe@redhat.com,
-	david@redhat.com, israelr@nvidia.com, jasowang@redhat.com,
-	mst@redhat.com, pstanner@redhat.com, sgarzare@redhat.com,
-	skoteshwar@marvell.com, sthotton@marvell.com,
-	xieyongji@bytedance.com, yuxue.liu@jaguarmicro.com,
-	zhangjiao2@cmss.chinamobile.com
-Subject: [GIT PULL] virtio: features, fixes, cleanups
-Message-ID: <20250127095138-mutt-send-email-mst@kernel.org>
+        d=1e100.net; s=20230601; t=1737990913; x=1738595713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dv7+mQtwYD42Jjuf9XDSRD1jcbBvvwu8+MprYC7uv3s=;
+        b=o684Pik78L0Gyo5Aj9LigRVGnC3t+/EzOVBxVo58KHbAjoosmGOLlsR6ZYJq55QsWH
+         M6OOx+SKdc5Q80KGFFjbnS8ui7pNCTeNNowpx0R9qhVeAVCW+isEOaFp4xh8ghmkOEhc
+         nBjCxXlCZB73YYE8TxzsTc1WE9Lf/QOBzA1MwrKAw7PmpX6YxcwfKMz5wIL1P/E7kYCR
+         2GtTzA0cde+aqr17EOqCYUDVlYuYvLrPhw8v/LFoEi5xu3oh74KEWsdt3JS2J13d0zEQ
+         vPXarnSyXqZIJGx789JtPSpRotJJja2Ruzw9wfeVe3b3ytb/QQnbdTkJj4bWdhEXwxYJ
+         x+Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCUH/h0/dP/Ja0fRLnacgKlU7VDOGFWd8Tyr2esNpF+dbexRUq0i+EF7OxXrOmKP1TT/DTs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoiOMouHb1vcm/akeJK8G/IIIew3SkGruP8WNfLdp0ag3VLvIc
+	teOOvkyh5FSP7x0slFqXxfP+L+lyb32Rrx0o+pwUEvq668TIUVOIrZJr2gARvx0lV3JkqkfkHf5
+	XxFPyOeLKE2EBDeipkPuTz5l+aHWgieYalO06gNzFPVtj4VpmOaYPQPn53ddvjGngFwvJzj4IOQ
+	VAiMRAbTzE7ulMhFf+qW3eAD7x
+X-Gm-Gg: ASbGncsYkz8wDfNSEuqvr3riEyBJMzTdbxY0hRhlSV9fiYWedwJ76Vg2taggyvWtb7W
+	mwdN8IFFDDyaxeLC+BR/plHOKYTKsWGjQ05PK1izUA6mQLoi+lMr5FPrGlRweyA==
+X-Received: by 2002:a5d:64c2:0:b0:385:df73:2f18 with SMTP id ffacd0b85a97d-38bf59ed533mr47518886f8f.51.1737990913145;
+        Mon, 27 Jan 2025 07:15:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE47O9XzRrxKtO4UMj/RH5aYACrMqgZIcqDAz45P6jqa/M8XBT2pQmpaJtgUsVvZJACcUacU3JF1qk0+RWjgWQ=
+X-Received: by 2002:a5d:64c2:0:b0:385:df73:2f18 with SMTP id
+ ffacd0b85a97d-38bf59ed533mr47518860f8f.51.1737990912840; Mon, 27 Jan 2025
+ 07:15:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+References: <20250124163741.101568-1-pbonzini@redhat.com> <CAHk-=wg4Wm4x9GoUk6M8BhLsrhLj4+n8jA2Kg8XUQF=kxgNL9g@mail.gmail.com>
+ <20250126142034.GA28135@redhat.com> <CAHk-=wiOSyfW3sgccrfVtanZGUSnjFidSbaP3tg9wapydb-u6g@mail.gmail.com>
+ <20250126185354.GB28135@redhat.com> <CAHk-=wiA7wzJ9TLMbC6vfer+0F6S91XghxrdKGawO6uMQCfjtQ@mail.gmail.com>
+ <20250127140947.GA22160@redhat.com>
+In-Reply-To: <20250127140947.GA22160@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 27 Jan 2025 16:15:01 +0100
+X-Gm-Features: AWEUYZlYmBQCrohFRr8THABGaTjxEE4J1IYax4X00067peE2DMrzi7feOa-e6PE
+Message-ID: <CABgObfaar9uOx7t6vR0pqk6gU-yNOHX3=R1UHY4mbVwRX_wPkA@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM changes for Linux 6.14
+To: Oleg Nesterov <oleg@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Christian Brauner <brauner@kernel.org>, "Eric W. Biederman" <ebiederm@xmission.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There are still some known issues that I hope to address by rc2.
-Giving them more time to get tested for now - none of them are
-regressions.
+On Mon, Jan 27, 2025 at 3:10=E2=80=AFPM Oleg Nesterov <oleg@redhat.com> wro=
+te:
+> On 01/26, Linus Torvalds wrote:
+> > On Sun, 26 Jan 2025 at 10:54, Oleg Nesterov <oleg@redhat.com> wrote:
+> > >
+> > > I don't think we even need to detect the /proc/self/ or /proc/self-th=
+read/
+> > > case, next_tid() can just check same_thread_group,
+> >
+> > That was my thinking yes.
+> >
+> > If we exclude them from /proc/*/task entirely, I'd worry that it would
+> > hide it from some management tool and be used for nefarious purposes
+>
+> Agreed,
+>
+> > (even if they then show up elsewhere that the tool wouldn't look at).
+>
+> Even if we move them from /proc/*/task to /proc ?
 
-The following changes since commit 9d89551994a430b50c4fffcb1e617a057fa76e20:
+Indeed---as long as they show up somewhere, it's not worse than it
+used to be. The reason why I'd prefer them to stay in /proc/*/task is
+that moving them away at least partly negates the benefits of the
+"workers are children of the starter" model. For example it
+complicates measuring their cost within the process that runs the VM.
+Maybe it's more of a romantic thing than a real practical issue,
+because in the real world resource accounting for VMs is done via
+cgroups. But unlike the lazy creation in KVM, which is overall pretty
+self-contained, I am afraid the ugliness in procfs would be much worse
+compared to the benefit, if there's a benefit at all.
 
-  Linux 6.13-rc6 (2025-01-05 14:13:40 -0800)
+> Perhaps, I honestly do not know what will/can confuse userspace more.
 
-are available in the Git repository at:
+At the very least, marking workers as "Kthread: 1" makes sense and
+should not cause too much confusion. I wouldn't go beyond that unless
+we get more reports of similar issues, and I'm not even sure how
+common it is for userspace libraries to check for single-threadedness.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Paolo
 
-for you to fetch changes up to 5820a3b08987951e3e4a89fca8ab6e1448f672e1:
-
-  virtio_blk: Add support for transport error recovery (2025-01-27 09:39:26 -0500)
-
-----------------------------------------------------------------
-virtio: features, fixes, cleanups
-
-A small number of improvements all over the place:
-
-vdpa/octeon gained support for multiple interrupts
-virtio-pci gained support for error recovery
-vp_vdpa gained support for notification with data
-vhost/net has been fixed to set num_buffers for spec compliance
-virtio-mem now works with kdump on s390
-
-Small cleanups all over the place.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Akihiko Odaki (1):
-      vhost/net: Set num_buffers for virtio 1.0
-
-David Hildenbrand (12):
-      fs/proc/vmcore: convert vmcore_cb_lock into vmcore_mutex
-      fs/proc/vmcore: replace vmcoredd_mutex by vmcore_mutex
-      fs/proc/vmcore: disallow vmcore modifications while the vmcore is open
-      fs/proc/vmcore: prefix all pr_* with "vmcore:"
-      fs/proc/vmcore: move vmcore definitions out of kcore.h
-      fs/proc/vmcore: factor out allocating a vmcore range and adding it to a list
-      fs/proc/vmcore: factor out freeing a list of vmcore ranges
-      fs/proc/vmcore: introduce PROC_VMCORE_DEVICE_RAM to detect device RAM ranges in 2nd kernel
-      virtio-mem: mark device ready before registering callbacks in kdump mode
-      virtio-mem: remember usable region size
-      virtio-mem: support CONFIG_PROC_VMCORE_DEVICE_RAM
-      s390/kdump: virtio-mem kdump support (CONFIG_PROC_VMCORE_DEVICE_RAM)
-
-Israel Rukshin (2):
-      virtio_pci: Add support for PCIe Function Level Reset
-      virtio_blk: Add support for transport error recovery
-
-Philipp Stanner (1):
-      vdpa: solidrun: Replace deprecated PCI functions
-
-Satha Rao (1):
-      vdpa/octeon_ep: handle device config change events
-
-Shijith Thotton (3):
-      vdpa/octeon_ep: enable support for multiple interrupts per device
-      virtio-pci: define type and header for PCI vendor data
-      vdpa/octeon_ep: read vendor-specific PCI capability
-
-Yongji Xie (1):
-      vduse: relicense under GPL-2.0 OR BSD-3-Clause
-
-Yuxue Liu (1):
-      vdpa/vp_vdpa: implement kick_vq_with_data callback
-
-zhang jiao (1):
-      virtio_balloon: Use outer variable 'page'
-
- arch/s390/Kconfig                        |   1 +
- arch/s390/kernel/crash_dump.c            |  39 ++++-
- drivers/block/virtio_blk.c               |  28 ++-
- drivers/vdpa/octeon_ep/octep_vdpa.h      |  32 +++-
- drivers/vdpa/octeon_ep/octep_vdpa_hw.c   |  38 ++++-
- drivers/vdpa/octeon_ep/octep_vdpa_main.c |  99 +++++++----
- drivers/vdpa/solidrun/snet_main.c        |  57 +++----
- drivers/vdpa/virtio_pci/vp_vdpa.c        |   9 +
- drivers/vhost/net.c                      |   5 +-
- drivers/virtio/virtio.c                  |  94 +++++++---
- drivers/virtio/virtio_balloon.c          |   2 +-
- drivers/virtio/virtio_mem.c              | 103 ++++++++++-
- drivers/virtio/virtio_pci_common.c       |  41 +++++
- fs/proc/Kconfig                          |  19 +++
- fs/proc/vmcore.c                         | 283 ++++++++++++++++++++++++-------
- include/linux/crash_dump.h               |  41 +++++
- include/linux/kcore.h                    |  13 --
- include/linux/virtio.h                   |   8 +
- include/uapi/linux/vduse.h               |   2 +-
- include/uapi/linux/virtio_pci.h          |  14 ++
- 20 files changed, 735 insertions(+), 193 deletions(-)
+> > But as mentioned, maybe this is all more of a hack than what kvm now do=
+es.
+>
+> I don't know. But I will be happy to make a patch if we have a consensus.
+>
+> Oleg.
+>
 
 
