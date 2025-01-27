@@ -1,271 +1,112 @@
-Return-Path: <kvm+bounces-36670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06677A1DB16
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 18:16:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1E4A1DB27
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 18:19:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77CA07A04D3
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 17:16:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAE23162317
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 17:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4FD165F01;
-	Mon, 27 Jan 2025 17:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D7FF18A924;
+	Mon, 27 Jan 2025 17:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z512/ExL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L9m3faLe"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com [209.85.167.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7067D1F95A;
-	Mon, 27 Jan 2025 17:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76FD7DA6A
+	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 17:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737998162; cv=none; b=XljAdiXsGe9XwsTTRkkpUIRpQ0SBiac99NjfcC10JoyJTXzVZ7iJHyGLT/OYtz1P9j9mZZoX4fWkUI2ciSgqirsBm4K5V6FuoyyUqZsVfVi+3Qcyhh/o8+MgwbPHONZDgI1WlEjZctKaMpOgJmWQwa1iFCGfwU+GsojvvkZ4Wow=
+	t=1737998355; cv=none; b=kSnRvyryo8sEDb8wL8K5/SLNK8TPiqQqzcx5iGHCc2Dg60D5OnQZVTd9tGrZVZkHxwTdV+NdCMxqJmtWbj9w2TjKxRscbBrTHHaiJ69Yz+TeVFDDtp/ZGmxbCINQFY/6dGeiUXP7tZC659TVXWTY+mn1tC7gDxI7988/QW5Zd6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737998162; c=relaxed/simple;
-	bh=N1fX6+bzR+65LUJel3imzbkdoouWyn23HZhhv1zrwwU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p2F9skEPLi+apluchvPQAXmpuNzJsuzHn+lk6mY1Ea771GXWQ3mIJYgALOgBAXv90pvapz3ze+6eKMlDN3CbJV/80TN4lZGvUVBDHIBpFmrs9SEQGASK/rQDoMj5lpDy1g2VxfKXlvWI261YAjIyAZ8Vg7Px6S26sM9pBxE8l7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z512/ExL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCDB1C4CEE0;
-	Mon, 27 Jan 2025 17:16:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737998162;
-	bh=N1fX6+bzR+65LUJel3imzbkdoouWyn23HZhhv1zrwwU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z512/ExLrazSWVuiElAn6gHXY5zZXk5vswjrVH9Yo9gymQuUwSHqFD9QgiK+MYBdW
-	 WWTVlUHfvuoU1rbMmEUyZ8q3UTqnm/D7eAR8aTRlgr6rlZuxKHj8L//cG8bAw8CdwS
-	 QNgjK4UyrCKkGRZRWRe2aCvMwo4NeRQDHWHJtLn/UOFn3z4+c1Msgol5ugyJ9goWXQ
-	 6Vl9hRQyGF0G6aq65S6mOfzK5m4a+rszK8hE5jDArgLY/TNHmr3+80E8AJWuDBgxIY
-	 Lpsj29eQv45kJY2VPAnisCi2L/ngkL+GEg6m9M4gRO0PfaTWN7yR7YL+6lvENmCaZd
-	 rq6TfrhSBRUKw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tcSiM-00FoSv-V4;
-	Mon, 27 Jan 2025 17:15:59 +0000
-Date: Mon, 27 Jan 2025 17:15:57 +0000
-Message-ID: <86h65kuqia.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
-	<suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Christoffer
- Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni
-	<gankulkarni@os.amperecomputing.com>,
-	Chase Conklin <chase.conklin@arm.com>,
-	Eric Auger <eauger@redhat.com>,
-	Dmytro Terletskyi
-	<Dmytro_Terletskyi@epam.com>, Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Subject: Re: [PATCH v2 02/12] KVM: arm64: nv: Sync nested timer state with FEAT_NV2
-In-Reply-To: <87frl51tse.fsf@epam.com>
-References: <20241217142321.763801-1-maz@kernel.org>
-	<20241217142321.763801-3-maz@kernel.org>
-	<87frl51tse.fsf@epam.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1737998355; c=relaxed/simple;
+	bh=iBnURTqPXW2aHXWRytiUQwc3RleQ1CdQYvgVqtnNdGE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QnIDTaFaLwyilj3CrxaTOgGXu2aps5Mg0oilWiBnatUhlHhQj7olVD0H+P/9q4R+ktoqUZy/2eoU+Fytwhk0YzBgYBhcfvq2zDTwwoWCwGe/c92Zzn3Hv76Xb3byzxWw2mbUvuuADDZX4VGcoAZXSzU0hk7d7poh7OLwngVuFHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L9m3faLe; arc=none smtp.client-ip=209.85.167.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-oi1-f201.google.com with SMTP id 5614622812f47-3eb9757e579so3675319b6e.3
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 09:19:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737998353; x=1738603153; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=k6ZFPH8+E5WrW09Nv346BS0Z+fTVST94HMISpos/8LA=;
+        b=L9m3faLeWOv5z6Mu+hVtTLNJfz7/PcdUvufkKbF6Mt8p2mC70hqBo0aPXO3pPH5eKo
+         e8DAre/szR/bsj4ApYCQrNjkbOhAjwKiGh/fN6G4PYcuzdyxtHfDmcZSdLIQWCknPUKg
+         syjuuHfBfa85BZMtIvz2PqlxalThU3FIoGFrlKsLBHE/45R1JuxV+elP5w5PbuEn5jYS
+         WKKSvp6nXVoyIzHIclSDdopyVLfmK227HzdjZXe5mAF8vroW6BgIM8WgvoEfeQwE+wW/
+         Ffdlf6uvn9SNS3RQKOWJsrzsl6dZeglI3HdJeglbDUXU17GMaCPLDQOlbHZFhliFDdQp
+         5UvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737998353; x=1738603153;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k6ZFPH8+E5WrW09Nv346BS0Z+fTVST94HMISpos/8LA=;
+        b=VAjCr/EL7c4oyZcVxVm3oB/XChvqcWA8TBB9U3x4SKbmDiTHysfg1srVX+5KgPn7Za
+         zThRakbgmweNT1920TDozIorLFVG5+202+TJ2ckscBOMsWXD1i/0WyyJNLqHKlR6FMrp
+         sxQgOJKj6JUHdvQeXDUnPFVbogijh+z/tbt8tAs4RfDeU47NzJ9dKm82Ss6G7/Ii0yY5
+         62GwWbWt0rc8wZdok/Qb8uAeJl/3yD3kbp0/jygdje4gfLkcb7QJ8P4Ce3AoyoVuzt9D
+         7bTXSzv04DbyamOFASzSEDHu9aNH794ubiRBGSa0JRCYkCoQNOlRMtL5pcZNoCLM+dQC
+         D/Uw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3rRE+vVDq+r2Nf/snXcLf6KoHMTakC8vF2YhP/ol8K9v93pou1DW1Oxnp2Q49yN0Dyts=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvltLR6XMzWZpUAycB1CBFpWpnwABiJ+odcMuXif/BdLXBZTDr
+	wtcFqJmOjU3NfMRBKTNlDZcms86Esut2YJ3CUdh5orLozXxlZAYARlcpZZZkZA0y0sEvK03IKIU
+	rHw==
+X-Google-Smtp-Source: AGHT+IGRUszYJFAK7joMtRXqZLbVy1IE+a02qW5WNJPmkf4KHnpufiJpDLdSbCWXxcMpFRmG2nQMUgnxee4=
+X-Received: from pgbcf12.prod.google.com ([2002:a05:6a02:84c:b0:801:d724:5abd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1d1:b0:216:668d:690c
+ with SMTP id d9443c01a7336-21c3558171emr693519375ad.28.1737998342288; Mon, 27
+ Jan 2025 09:19:02 -0800 (PST)
+Date: Mon, 27 Jan 2025 09:19:01 -0800
+In-Reply-To: <Z5e8umkPeRri0Z_p@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Volodymyr_Babchuk@epam.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com, Dmytro_Terletskyi@epam.com, r09922117@csie.ntu.edu.tw
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20250124234623.3609069-1-seanjc@google.com> <Z5RkcB_wf5Y74BUM@kbusch-mbp>
+ <Z5e4w7IlEEk2cpH-@google.com> <Z5e8umkPeRri0Z_p@kbusch-mbp>
+Message-ID: <Z5fABRZuUz6o2cyF@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Ensure NX huge page recovery thread is
+ alive before waking
+From: Sean Christopherson <seanjc@google.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-+ Wei-Lin Chang, who spotted something similar 3 weeks ago, that I
-didn't manage to investigate in time.
+On Mon, Jan 27, 2025, Keith Busch wrote:
+> On Mon, Jan 27, 2025 at 08:48:03AM -0800, Sean Christopherson wrote:
+> > If vhost_task_create() fails, then the call_once() will "succeed" and mark the
+> > structure as ONCE_COMPLETED.  The first KVM_RUN will fail with -ENOMEM, but any
+> > subsequent calls will succeed, including in-flight KVM_RUNs on other threads.
+> 
+> The criteria for returning -ENOMEM for any KVM_RUN is if we have a NULL
+> nx_huge_page_recovery_thread vhost_task. So I think that part, at least,
+> is fine.
+> 
+> The call_once is just needed to ensure that only the very first KVM_RUN
+> even tries to create it. If the vhost_task_create fails, then all the
+> KVM_RUN threads will see the NULL nx_huge_page_recovery_thread and
+> return -ENOMEM.
 
-On Sun, 26 Jan 2025 15:25:39 +0000,
-Volodymyr Babchuk <Volodymyr_Babchuk@epam.com> wrote:
-> 
-> 
-> Hi Marc,
-> 
-> Thank you for these patches. We (myself and Dmytro Terletskyi) are
-> trying to use this series to launch up Xen on Amazon Graviton 4 platform.
-> Graviton 4 is built on Neoverse V2 cores and does **not** support
-> FEAT_ECV. Looks like we have found issue in this particular patch on
-> this particular setup.
-> 
-> Marc Zyngier <maz@kernel.org> writes:
-> 
-> > Emulating the timers with FEAT_NV2 is a bit odd, as the timers
-> > can be reconfigured behind our back without the hypervisor even
-> > noticing. In the VHE case, that's an actual regression in the
-> > architecture...
-> >
-> > Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
-> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/arm.c         |  3 +++
-> >  include/kvm/arm_arch_timer.h |  1 +
-> >  3 files changed, 48 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> > index 1215df5904185..ee5f732fbbece 100644
-> > --- a/arch/arm64/kvm/arch_timer.c
-> > +++ b/arch/arm64/kvm/arch_timer.c
-> > @@ -905,6 +905,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
-> >  		kvm_timer_blocking(vcpu);
-> >  }
-> >  
-> > +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
-> > +{
-> > +	/*
-> > +	 * When NV2 is on, guest hypervisors have their EL1 timer register
-> > +	 * accesses redirected to the VNCR page. Any guest action taken on
-> > +	 * the timer is postponed until the next exit, leading to a very
-> > +	 * poor quality of emulation.
-> > +	 */
-> > +	if (!is_hyp_ctxt(vcpu))
-> > +		return;
-> > +
-> > +	if (!vcpu_el2_e2h_is_set(vcpu)) {
-> > +		/*
-> > +		 * A non-VHE guest hypervisor doesn't have any direct access
-> > +		 * to its timers: the EL2 registers trap (and the HW is
-> > +		 * fully emulated), while the EL0 registers access memory
-> > +		 * despite the access being notionally direct. Boo.
-> > +		 *
-> > +		 * We update the hardware timer registers with the
-> > +		 * latest value written by the guest to the VNCR page
-> > +		 * and let the hardware take care of the rest.
-> > +		 */
-> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
-> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
-> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
-> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
-> 
-> 
-> Here you are overwriting trapped/emulated state of  EL2 vtimer with EL0
-> vtimer, which renders all writes to EL2 timer registers useless.
-> 
-> This is the behavior we observed:
-> 
->  1. Xen writes to CNTHP_CVAL_EL2, which is trapped and handled in
->     kvm_arm_timer_write_sysreg().
-> 
->  2. timer_set_cval() updates __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2)
-> 
->  3. timer_restore_state() updates real CNTP_CVAL_EL0 with value from
->    __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2)
-> 
->  (so far so good)
-> 
->  4. kvm_timer_sync_nested() is called and it updates real CNTP_CVAL_EL0
->  with __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), overwriting value that we got
->  from Xen.
-> 
-> The same stands for other hypervisor timer registers of course.
-> 
-> I am wondering, what is the correct fix for this issue?
-> 
-> Also, we are observing issues with timers in Dom0, which seems related
-> to this, but we didn't pinpoint exact problem yet.
+Ah, duh, because the check is performed by the caller, outside of the "once"
+protection.
 
-Thanks for the great debug above, much appreciated.
+> What you're suggesting here will allow a subsequent thread to attempt
+> creating the vhost task if the first one failed. Maybe you do want to
+> try again, but the current upstream code doesn't retry this, so I
+> thought it best to keep that behavior.
 
-As Wei-Lin pointed out in their email[1], there is a copious amount of
-nonsense here. This is due to leftovers from the mix of NV+NV2 that
-KVM was initially trying to handle before switching to NV2 only.
+No strong opinion.  In practice, it's a moot point because the odds of a VM being
+able to make forward progress if task creation hits an OOM are basically nil.
 
-The whole VHE vs nVHE makes no sense at all, and both should have the
-same behaviour. The only difference is around what gets trapped, and
-what doesn't.
-
-Finally, this crap is masking a subtle bug in timer_emulate(), where
-we return too early on updating the IRQ state, hence failing to
-publish the interrupt state.
-
-Could you please give the hack below a go with your setup and report
-whether it solves this particular issue?
-
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 0e29958e20187..56f4905cdb859 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -471,10 +471,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
- 
- 	trace_kvm_timer_emulate(ctx, should_fire);
- 
--	if (should_fire != ctx->irq.level) {
-+	if (should_fire != ctx->irq.level)
- 		kvm_timer_update_irq(ctx->vcpu, should_fire, ctx);
--		return;
--	}
- 
- 	kvm_timer_update_status(ctx, should_fire);
- 
-@@ -976,31 +974,21 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
- 	 * which allows trapping of the timer registers even with NV2.
- 	 * Still, this is still worse than FEAT_NV on its own. Meh.
- 	 */
--	if (!vcpu_el2_e2h_is_set(vcpu)) {
--		if (cpus_have_final_cap(ARM64_HAS_ECV))
--			return;
--
--		/*
--		 * A non-VHE guest hypervisor doesn't have any direct access
--		 * to its timers: the EL2 registers trap (and the HW is
--		 * fully emulated), while the EL0 registers access memory
--		 * despite the access being notionally direct. Boo.
--		 *
--		 * We update the hardware timer registers with the
--		 * latest value written by the guest to the VNCR page
--		 * and let the hardware take care of the rest.
--		 */
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
--		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
--	} else {
-+	if (!cpus_have_final_cap(ARM64_HAS_ECV)) {
- 		/*
- 		 * For a VHE guest hypervisor, the EL2 state is directly
--		 * stored in the host EL1 timers, while the emulated EL0
-+		 * stored in the host EL1 timers, while the emulated EL1
- 		 * state is stored in the VNCR page. The latter could have
- 		 * been updated behind our back, and we must reset the
- 		 * emulation of the timers.
-+		 *
-+		 * A non-VHE guest hypervisor doesn't have any direct access
-+		 * to its timers: the EL2 registers trap despite being
-+		 * notionally direct (we use the EL1 HW, as for VHE), while
-+		 * the EL1 registers access memory.
-+		 *
-+		 * In both cases, process the emulated timers on each guest
-+		 * exit. Boo.
- 		 */
- 		struct timer_map map;
- 		get_timer_map(vcpu, &map);
-
-Thanks,
-
-	M.
-
-[1] https://lore.kernel.org/r/fqiqfjzwpgbzdtouu2pwqlu7llhnf5lmy4hzv5vo6ph4v3vyls@jdcfy3fjjc5k
-
--- 
-Without deviation from the norm, progress is not possible.
+I'll defer to Paolo on what he thinks is best for the call_once() API.
 
