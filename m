@@ -1,138 +1,115 @@
-Return-Path: <kvm+bounces-36659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE55EA1D695
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 14:25:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11198A1D7D3
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 15:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E68B18875E0
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 13:25:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48D531886CFB
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 14:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CD61FF7D6;
-	Mon, 27 Jan 2025 13:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19F61FE475;
+	Mon, 27 Jan 2025 14:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="hsZXkmQy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JoidnUV/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D29C1FF7B3
-	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 13:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559946FC5
+	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 14:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737984309; cv=none; b=I0JroE3TsK0XUL8ryv3uvtWsa7fifiKGC19SPaw7ifWedWgVQXDQBc445IgOLIYS5XK/AU5dqWbV31vh+Ww+8bRSRdXInuOHC79Cdj6ksdU1+hghxyePMndiHRFyVEhp9/Jh4y0rYpwicFhZZbZTZs+6K7edjGxryF8D19WE7/k=
+	t=1737987024; cv=none; b=GRGXiD8crQvJ98h2hcaIFtAkXrlrtTiz8XZPtGIPHh52d8P2Uqe6IhNJz72hcHVvmyHorQkMW8ckO02PcWH80hbKbX5bs3QnaJYpFIZVzxi95+xdpL8s0GQDLinRGu7woJBXtw/zXz6m6SUwYyTwhMHtv+xdOjHKkk46xVlMDK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737984309; c=relaxed/simple;
-	bh=ohOC8GmOOlj+zRPNrtoqlc+GFSoK5kQme+m2VArIkms=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pG15qqJK4wirfQRo5+5l+ZOP+lo/6OVS9jY1KEQ0EmRL2yW8wJ9+aifyI9EBvbD5tsdXKJFl9QEk6lftubzP5Mihko/Zi5uzE7ySafYcOSg9DWbL6GkJJAZ+OSLYl/SqJlCbt11DYnqEmhVX0WUvs5x3V8H487ZVr8bE4RO2zU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=hsZXkmQy; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2164b662090so84389235ad.1
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 05:25:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1737984307; x=1738589107; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bLm0gl8QnGcQ7zFQ0FaNaPt8MyfRUgwPTIjeTPLiH3w=;
-        b=hsZXkmQyffqxcE4b8vr6IkVzPZxD88bwovZzLFoy9X2YxzexpsHbhtG87jeXZdch1l
-         aZxqu/vua5uUqqjBWG76LhuC4ZR69qtc8wlfg/6lQGaInWH05f3r2e3lMhdzABOHo2Tj
-         jf8XHyUpmTNwl44KBChi19Q5hPapNgr8XBPvME40eYlewLwUzBX0vARNcc8X5AkjuSOR
-         +1m49rwPI/CPxVJshcRAkpvTMFkFnaX4VBPJe3JGnGSvlbSzZdCoB8/UH9C4XgOw7FFC
-         BJZXSj83xdve8pd+sNA4MMHqEWoB9Qn/BuHPhwIbUkYbF//hllontODizN15qY7P1E4G
-         oAag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737984307; x=1738589107;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bLm0gl8QnGcQ7zFQ0FaNaPt8MyfRUgwPTIjeTPLiH3w=;
-        b=LeEoEfywEbiVcyCOX6fL+5ipksdSSWUkBqKtdbYnqcEydWob7jhlLck5Kcumq4aG+M
-         wK2h5SexAPh2bq6R/vcXMbEgv6LUPwIqsbR3vM5FwcoWTycZKeuoinpJwoNwPkA5B5da
-         kzyYbauZC0uQeX+MZstYzRTeN2BU97rBj2lsxj8s0jDJlQlcr1EXrhYPC/Mo4V8+jww5
-         /dbx43SAV/Rh1SYwtOsfIWFBoLnTa9CWIH7LCnNbPkyeA+v3BzZ4zJ+gWNxf5LVCkdYX
-         Apexs39TmZZtePkjyqZSH1RpAKBOhVa90qk8fBbxRZwynchJOridVgZu+hCKxuHd/DVX
-         OZBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXEaH7kF+lobZECKaCwgw1dPR/hJR3uifOkPWslvb7HsWRBztiZfD1isvRjf50Vi4kPSqI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxxb3BwqBQoKqP952XC/WYOr/eUqEzc+xzNj0aKsXA+m8N7pkZV
-	gbuJSppy43Mf/wfc8Qjr1/SFC88Ph/dPjRtYzmT4QDYMhjIOP6T8ToX3bvkmXVg=
-X-Gm-Gg: ASbGncsNlZbEF/Jh6yJiHc1bJUOlhNsCwRvIk0ALXFFF5xhDx1xww3S/JcvK0T4OWkL
-	hBh+x6k0uDEZe17jxwdT/0Y4r2mZBcRQ6DvN6IBVLjKgzo/FFEm4/dwdP7AVkTZWzf6VXXxoAxS
-	M3eVp5HY6+maU+AOoIixTgPfnzsMnTCO0M1pzgrmfWPlBEMxpNQKCp/iJeqKrwrC9vbqmEBGf6Z
-	9AmaQFdF9TQJOO3gkkRp1J7p+AaOE83tTvtVMwIWwwdCXiBk3W6IJVlRIffxCC5g0yEDD05qs6R
-	SIpueeszlMHYzo+0iUc/+JT0vyv6ZfWVmZvlM/L1kXX7
-X-Google-Smtp-Source: AGHT+IFiGzZakhdLd1LspGV1QVZQ5QdzJe3CiSjx3xREUdTHgpSJnCrOlJjbHDpzw3fA6t8lwz8Trg==
-X-Received: by 2002:a05:6a00:4c18:b0:725:c8ea:b320 with SMTP id d2e1a72fcca58-72daf99ec6dmr55413407b3a.14.1737984307586;
-        Mon, 27 Jan 2025 05:25:07 -0800 (PST)
-Received: from anup-ubuntu-vm.localdomain ([103.97.166.196])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a6b324bsm7268930b3a.62.2025.01.27.05.25.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 05:25:07 -0800 (PST)
-From: Anup Patel <apatel@ventanamicro.com>
-To: Will Deacon <will@kernel.org>,
-	julien.thierry.kdev@gmail.com,
-	maz@kernel.org
+	s=arc-20240116; t=1737987024; c=relaxed/simple;
+	bh=apM+5LkQPI28l1tU9B88fTSqOKwe/zXNYApVrJ04oUY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ljxJATwy4QbskY78b32qkaLy9Ukuq7QFYxY6O9BMNb3Pu6MCAUzDJaSpcf6RYAXmpIBv90M7sMdu3mJG99zaVzndVb+xdrfKD8Q+Uk8wXhwC2YxXOzRLRnnGdhv8FNn4NSYHSTSCk6ABG99YbZeQ9ZTuMkEr2MjV1GGnSQy+ngk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JoidnUV/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737987022;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=apM+5LkQPI28l1tU9B88fTSqOKwe/zXNYApVrJ04oUY=;
+	b=JoidnUV/kEUDXcTLmIDL3gxstMu2eyj8/3TYP26oR/u1YNsUQqYYRcN8UXrTHsQOpNp1rh
+	BRlhfBTH9R49s4esocCcR8l1bFgX2MWpb+Iz+dIlUghFRMz0R7igIFc6RggRI8cYfS0Kvd
+	0h0/MxMBa34dGpSU7ZSEibNcB39zxaw=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-601-kkw7-HHfM0W3Q99OiVHISQ-1; Mon,
+ 27 Jan 2025 09:10:20 -0500
+X-MC-Unique: kkw7-HHfM0W3Q99OiVHISQ-1
+X-Mimecast-MFC-AGG-ID: kkw7-HHfM0W3Q99OiVHISQ
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 82DE1195605A;
+	Mon, 27 Jan 2025 14:10:18 +0000 (UTC)
+Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.226.70])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 8B11730001BE;
+	Mon, 27 Jan 2025 14:10:15 +0000 (UTC)
+Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Mon, 27 Jan 2025 15:09:52 +0100 (CET)
+Date: Mon, 27 Jan 2025 15:09:48 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: [kvmtool PATCH 6/6] riscv: Add Ssnpm extension support
-Date: Mon, 27 Jan 2025 18:54:24 +0530
-Message-ID: <20250127132424.339957-7-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250127132424.339957-1-apatel@ventanamicro.com>
-References: <20250127132424.339957-1-apatel@ventanamicro.com>
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Christian Brauner <brauner@kernel.org>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM changes for Linux 6.14
+Message-ID: <20250127140947.GA22160@redhat.com>
+References: <20250124163741.101568-1-pbonzini@redhat.com>
+ <CAHk-=wg4Wm4x9GoUk6M8BhLsrhLj4+n8jA2Kg8XUQF=kxgNL9g@mail.gmail.com>
+ <20250126142034.GA28135@redhat.com>
+ <CAHk-=wiOSyfW3sgccrfVtanZGUSnjFidSbaP3tg9wapydb-u6g@mail.gmail.com>
+ <20250126185354.GB28135@redhat.com>
+ <CAHk-=wiA7wzJ9TLMbC6vfer+0F6S91XghxrdKGawO6uMQCfjtQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wiA7wzJ9TLMbC6vfer+0F6S91XghxrdKGawO6uMQCfjtQ@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-When the Ssnpm extension is available expose it to the guest
-via device tree so that guest can use it.
+On 01/26, Linus Torvalds wrote:
+>
+> On Sun, 26 Jan 2025 at 10:54, Oleg Nesterov <oleg@redhat.com> wrote:
+> >
+> > I don't think we even need to detect the /proc/self/ or /proc/self-thread/
+> > case, next_tid() can just check same_thread_group,
+>
+> That was my thinking yes.
+>
+> If we exclude them from /proc/*/task entirely, I'd worry that it would
+> hide it from some management tool and be used for nefarious purposes
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- riscv/fdt.c                         | 1 +
- riscv/include/kvm/kvm-config-arch.h | 3 +++
- 2 files changed, 4 insertions(+)
+Agreed,
 
-diff --git a/riscv/fdt.c b/riscv/fdt.c
-index 4c9dbc1..03113cc 100644
---- a/riscv/fdt.c
-+++ b/riscv/fdt.c
-@@ -20,6 +20,7 @@ struct isa_ext_info isa_info_arr[] = {
- 	{"smstateen", KVM_RISCV_ISA_EXT_SMSTATEEN},
- 	{"ssaia", KVM_RISCV_ISA_EXT_SSAIA},
- 	{"sscofpmf", KVM_RISCV_ISA_EXT_SSCOFPMF},
-+	{"ssnpm", KVM_RISCV_ISA_EXT_SSNPM},
- 	{"sstc", KVM_RISCV_ISA_EXT_SSTC},
- 	{"svade", KVM_RISCV_ISA_EXT_SVADE},
- 	{"svadu", KVM_RISCV_ISA_EXT_SVADU},
-diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-index 5eccdd0..e56610b 100644
---- a/riscv/include/kvm/kvm-config-arch.h
-+++ b/riscv/include/kvm/kvm-config-arch.h
-@@ -37,6 +37,9 @@ struct kvm_config_arch {
- 	OPT_BOOLEAN('\0', "disable-sscofpmf",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_SSCOFPMF],	\
- 		    "Disable Sscofpmf Extension"),			\
-+	OPT_BOOLEAN('\0', "disable-ssnpm",				\
-+		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_SSNPM],	\
-+		    "Disable Ssnpm Extension"),				\
- 	OPT_BOOLEAN('\0', "disable-sstc",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_SSTC],	\
- 		    "Disable Sstc Extension"),				\
--- 
-2.43.0
+> (even if they then show up elsewhere that the tool wouldn't look at).
+
+Even if we move them from /proc/*/task to /proc ?
+
+Perhaps, I honestly do not know what will/can confuse userspace more.
+
+> But as mentioned, maybe this is all more of a hack than what kvm now does.
+
+I don't know. But I will be happy to make a patch if we have a consensus.
+
+Oleg.
 
 
