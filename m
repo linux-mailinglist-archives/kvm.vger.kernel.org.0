@@ -1,322 +1,238 @@
-Return-Path: <kvm+bounces-36709-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8599EA20075
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 23:21:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48202A200D0
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 23:45:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D133F3A3844
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 22:21:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 945563A2EFC
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 22:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940F81DE2AD;
-	Mon, 27 Jan 2025 22:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443BE1DCB24;
+	Mon, 27 Jan 2025 22:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sg+PLxUJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XHZ3APX3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93DC1DC9BE
-	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 22:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB461DC98C
+	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 22:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738016457; cv=none; b=Sy6CX6au1FziiIxu1noO/NqfV89bzqT9f9p7w8xHCTTbPgcQ4JD1IOQChd4FDGLumhumq2vbFXov11EtYD3qgvDRItHhDoQirVaULpB9Yip3PpIdlKTgdYZWcT4RYlEqMD8naRr6FZLZJyCjx+S3kHS7S4WxFuGTbD0ThUKxuzQ=
+	t=1738017916; cv=none; b=GuokPK9ZnKjnbFKGeRsTD8VxyQn/sS6ePC2t9qLBbi8RP///fj7EVDwfGLY5KZWdTct9wm8IBtFnu62nI/2m/0aAHICLSnGGMMXQfCY2a7QInXEgRAKlFkAaPlO6oWOzAhV7jWhqWXq/8nopCf2bcCY0A/s88frRLjAv6jNj0tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738016457; c=relaxed/simple;
-	bh=GXoHYh1UAH4gJAPtOdGYSiPSHKO96HuekTU4oZlES4I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pMlm3cVcfNtnD01YnkaG0rs5xJcflH1DFq5+A+0jUBSGden1eyFGQMCK/nHLUauQT9W9+IHe+7VrinrnFocsbPN7PH7TNJtEkvCxQaSnST/12cG7yoowbcpRIYgqC4yj3BgTLXBY9AjQmAEFt1zMJ4PdXOrT+fSDyiFH+A6NcMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sg+PLxUJ; arc=none smtp.client-ip=209.85.166.202
+	s=arc-20240116; t=1738017916; c=relaxed/simple;
+	bh=BwWewtzAsBYHFCOY3YZWzHQsU7jCQDKA4zr4sKiwxn4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t7rGO4UUXiKAN5f4n4m70QbRxYOKCyqHuglkt0fG9GXwY39kaXSYsgrZNVsR+9WGh3vFfRGbPSMBsJfq7SzQlG2jVfk/Qfsxk05EELsAMCBWWY2t9QCgyvk9ggPuLDWLABAdS9gknaLtKKwgRnzWoeNItk3OrTChRZBuQfoXLUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XHZ3APX3; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3a9d4ea9e0cso41583645ab.0
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 14:20:55 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-215740b7fb8so50785ad.0
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 14:45:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738016455; x=1738621255; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pVrHE6B2dG3grFDn7LdUZxPwlglEt8pw1xMS4rCkJoc=;
-        b=Sg+PLxUJ1yCRp1H0tGw/h7ZGhDyYhkU8TwIh/ISsTTnreHGHLWfyPM0utj2riYV2ko
-         dRnWXfSPQOkkKoqigTTOCylnYibknxbKn6ZQkTtf6BLtPdT3GKcNbg/lWEGKlxjYRCvh
-         I2raWrpOZaApLKU/HJwupy2frMRt/Pjhy251FpWfzJ1lCuMiN1Tcq6BRdFYWQBOKQxC7
-         68AeBA12C01zL5VVQ+JFZ9UpaY0P3tBRMPRyXhiKaPsLkq8v4HCD0+aEHQ1lK9AtlVSv
-         6x0SDB07WyF2a2e07nL3DPVxg860YRGBCgoa/IyeXjVOUM5rAtShNOMWZ/AZPEItuQMz
-         Ox4g==
+        d=google.com; s=20230601; t=1738017913; x=1738622713; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8t3pPz+1JzaiHbPQBjjwELEPY7O87ftN71YRbgZtoQU=;
+        b=XHZ3APX3jA4TObuDl7MEfB44tWaRQIjFkcSSCXk20txA/6Il8y29FVreLE2KHfWfuX
+         ixLN1PXXOKEel+XWdQMNy5DrRxpkcewPy2HShCTwAY45a0htfyYjoCvg4j1fNs23lfio
+         KWX/Qn06nk610mECoSL9bDUnHkHe7MVk8vMGgfV1gowBWqtK7YBA6EqEqWNjOmEJ3VmD
+         Xfk0hgL+EwXJX8bYixiQA2R3kIV2P6Ssse7naAqvuYLslQrFPLW9Na5nXzOTE53qFcZO
+         C1tNyTPOHm7y0EoWXHdsvaAtnutiQy0kt+AmVj0B4R05LbSP5cjGe6BtqujtsS9/8Cop
+         sPYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738016455; x=1738621255;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pVrHE6B2dG3grFDn7LdUZxPwlglEt8pw1xMS4rCkJoc=;
-        b=xTyPmwbH4EHW5cL3rULgTqGYBW1cqtoFHHd9piaiZzrXhiN2OD4q5/hV+YpVJ57BWr
-         341FQ7fBr/Kuev90hmgFteOkUj+RGTiK5BUOJKbXIeer/poxN7NFwoXg7beIcfBQIhP4
-         pM0NgCUQeQDwlz+276/IZNKKpR9Vy5Xu6fInAYVV2fs5Aacyxs2a7I3krZvlFaLWjhwA
-         vaxxluk8TpuDsgM6ozOO2xXZug0Do0aSRNKF7pjx6pg5aYGu1iSlKMxBjzAaDmqM7J6T
-         k8DBIXXbt10ISvdSbhJTDpRywJYmvQMCU5uqoBjVjMH5aF3la29B8fZa9I8Q9aAYtYtj
-         X4aQ==
-X-Gm-Message-State: AOJu0Yz3u9nFu+T7NpS2v4Sco3Iru8F1mGpBTQmVHwzWvjO53af4m/Kt
-	UAlxgxTB9c/FqduuboAK6xY+9D5NIysQCHSAoyXSDwT8t/0/roEWtcWLrPmtHNI1pUHAsKVJ2gK
-	G9VG7eKmDZ1RQQGeFnf2MuwI6ZdqcOZEQNSve5659AX8qeNL4xTDLQYuqjgW62GUWBGOUpmmjbs
-	HHjVTWjamtjLV5Ay1cn2IKJgk+a0CW/oN3I5HM6V/tJbuOqogbx+gI/wY=
-X-Google-Smtp-Source: AGHT+IFtAnJ1e6Omyb95spUU2CAJPVrJ4SV5b/ores++c+WBrkG6S5co/YmSyuOwcQFNByJ0T9eGNAI5BdjlXyAtsw==
-X-Received: from ilbeb27.prod.google.com ([2002:a05:6e02:461b:b0:3cf:a082:8561])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:4810:b0:3cf:b3ab:584d with SMTP id e9e14a558f8ab-3cfb3ab58famr155469855ab.13.1738016455100;
- Mon, 27 Jan 2025 14:20:55 -0800 (PST)
-Date: Mon, 27 Jan 2025 22:20:30 +0000
-In-Reply-To: <20250127222031.3078945-1-coltonlewis@google.com>
+        d=1e100.net; s=20230601; t=1738017913; x=1738622713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8t3pPz+1JzaiHbPQBjjwELEPY7O87ftN71YRbgZtoQU=;
+        b=MTkGX3NgqgiObOIGbDeDgA8dzytt/EE2nxlMZ/35mGP9EukUFf3lxnzESfLeaP4CXM
+         1JqyiJqcw14MUxlxgl5yXQxkZqeR4VQy1JOujkyj5wc9mlgauvOs99iK1zJNnbMJ7WN4
+         Z7Ddgv23KppFzE7pzRPMq1AmUncHr8jtfYu9Pnq+skso2lfhcjaOHIVYI1nzqTC7dB3r
+         BSOrZ1J7ZtQ9jYGBosKFJyR+qSLSQeQh3xkQLfqJ9RjT3U9UzkWJcCjmFemIA2+WrRFv
+         DlJvhdJj4lc+LKVMvSX5Ui1lAxUmjRWyjNyn+PgMTAQq4bLBPfWO9Y5fLbu2JsTDzqH8
+         +oow==
+X-Forwarded-Encrypted: i=1; AJvYcCW4gNAWHm7ga0kBROq/zUHLzs231jVjShr5FoNDKu/Y+sa8THPvBsiM0wmTqpW413k0F0k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqGx3H3PHuliNsOig6bAr7Ifnd3UIVxmRqDToVOskqsCiJW07P
+	M17jb4LFVOW6vPDswG56uPld0XYsPzdMHhIpztHs6d23AjmweolhHyL/cqAhpVmBvTfdZhQgNJm
+	pwErEFdrpnVEqpVtDBsNXrjqCpAJmqomyxtDQ
+X-Gm-Gg: ASbGncvjfsEGRzWhPEMwsQK7/T/occkG2tJ46I0shkjcq1KB5tei1im6Q+HrnnWVVVY
+	1mFY1wo7s/tjXHrfcEk3d5Ef8VlojPZ3ugRBGSEV/diW123HOyfhAnMjZu6WVgiGJMRttAGoSeU
+	uaCvSq3pOW7q/pzlJw
+X-Google-Smtp-Source: AGHT+IGExTjP7z3sH5xv4dUiC+Zf+Kk1XkUUyDOacm1rZ1hFNJpogpbUpdXTRa7a5h+RLDAp3SXDvxKAvw8QL//ENVE=
+X-Received: by 2002:a17:903:8c6:b0:216:201e:1b4c with SMTP id
+ d9443c01a7336-21dce2c7833mr240915ad.9.1738017913333; Mon, 27 Jan 2025
+ 14:45:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250127222031.3078945-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
-Message-ID: <20250127222031.3078945-5-coltonlewis@google.com>
-Subject: [RFC PATCH 4/4] perf: arm_pmuv3: Keep out of guest counter partition
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Colton Lewis <coltonlewis@google.com>
+MIME-Version: 1.0
+References: <20241221004236.2629280-1-almasrymina@google.com>
+ <20241221004236.2629280-2-almasrymina@google.com> <Z2ZKl_t5e6rutAZ1@mini-arch>
+In-Reply-To: <Z2ZKl_t5e6rutAZ1@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 27 Jan 2025 14:45:00 -0800
+X-Gm-Features: AWEUYZkWf-jlkKJU2y8g8OGRPiPeNCocxqRGzqd-lq7m0uBB6GUIWI0vZLU-iA0
+Message-ID: <CAHS8izOcQRjYYGwA_rx-zvX8dMV=40rzVJvEugY78jzCBHCq=A@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next v1 1/5] net: add devmem TCP TX documentation
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, dw@davidwei.uk
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-If the PMU is partitioned, keep the driver out of the guest counter
-partition and only use the host counter partition. Partitioning is
-defined by the MDCR_EL2.HPMN register field and saved in
-cpu_pmu->hpmn. The range 0..HPMN-1 is accessible by EL1 and EL0 while
-HPMN..PMCR.N is reserved for EL2.
+On Fri, Dec 20, 2024 at 8:56=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 12/21, Mina Almasry wrote:
+> > Add documentation outlining the usage and details of the devmem TCP TX
+> > API.
+> >
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > ---
+> >  Documentation/networking/devmem.rst | 140 +++++++++++++++++++++++++++-
+> >  1 file changed, 136 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/Documentation/networking/devmem.rst b/Documentation/networ=
+king/devmem.rst
+> > index d95363645331..9be01cd96ee2 100644
+> > --- a/Documentation/networking/devmem.rst
+> > +++ b/Documentation/networking/devmem.rst
+> > @@ -62,15 +62,15 @@ More Info
+> >      https://lore.kernel.org/netdev/20240831004313.3713467-1-almasrymin=
+a@google.com/
+> >
+> >
+> > -Interface
+> > -=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +RX Interface
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> >
+> >  Example
+> >  -------
+> >
+> > -tools/testing/selftests/net/ncdevmem.c:do_server shows an example of s=
+etting up
+> > -the RX path of this API.
+> > +./tools/testing/selftests/drivers/net/hw/ncdevmem:do_server shows an e=
+xample of
+> > +setting up the RX path of this API.
+> >
+> >
+> >  NIC Setup
+> > @@ -235,6 +235,138 @@ can be less than the tokens provided by the user =
+in case of:
+> >  (a) an internal kernel leak bug.
+> >  (b) the user passed more than 1024 frags.
+> >
+> > +TX Interface
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +
+> > +Example
+> > +-------
+> > +
+> > +./tools/testing/selftests/drivers/net/hw/ncdevmem:do_client shows an e=
+xample of
+> > +setting up the TX path of this API.
+> > +
+> > +
+> > +NIC Setup
+> > +---------
+> > +
+> > +The user must bind a TX dmabuf to a given NIC using the netlink API::
+> > +
+> > +        struct netdev_bind_tx_req *req =3D NULL;
+> > +        struct netdev_bind_tx_rsp *rsp =3D NULL;
+> > +        struct ynl_error yerr;
+> > +
+> > +        *ys =3D ynl_sock_create(&ynl_netdev_family, &yerr);
+> > +
+> > +        req =3D netdev_bind_tx_req_alloc();
+> > +        netdev_bind_tx_req_set_ifindex(req, ifindex);
+> > +        netdev_bind_tx_req_set_fd(req, dmabuf_fd);
+> > +
+> > +        rsp =3D netdev_bind_tx(*ys, req);
+> > +
+> > +        tx_dmabuf_id =3D rsp->id;
+> > +
+> > +
+> > +The netlink API returns a dmabuf_id: a unique ID that refers to this d=
+mabuf
+> > +that has been bound.
+> > +
+> > +The user can unbind the dmabuf from the netdevice by closing the netli=
+nk socket
+> > +that established the binding. We do this so that the binding is automa=
+tically
+> > +unbound even if the userspace process crashes.
+> > +
+> > +Note that any reasonably well-behaved dmabuf from any exporter should =
+work with
+> > +devmem TCP, even if the dmabuf is not actually backed by devmem. An ex=
+ample of
+> > +this is udmabuf, which wraps user memory (non-devmem) in a dmabuf.
+> > +
+> > +Socket Setup
+> > +------------
+> > +
+> > +The user application must use MSG_ZEROCOPY flag when sending devmem TC=
+P. Devmem
+> > +cannot be copied by the kernel, so the semantics of the devmem TX are =
+similar
+> > +to the semantics of MSG_ZEROCOPY.
+> > +
+> > +     ret =3D setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, size=
+of(opt));
+> > +
+> > +Sending data
+> > +--------------
+> > +
+> > +Devmem data is sent using the SCM_DEVMEM_DMABUF cmsg.
+> > +
+>
+> [...]
+>
+> > +The user should create a msghdr with iov_base set to NULL and iov_len =
+set to the
+> > +number of bytes to be sent from the dmabuf.
+>
+> Should we verify that iov_base is NULL in the kernel?
+>
+> But also, alternatively, why not go with iov_base =3D=3D offset? This way=
+ we
+> can support several offsets in a single message, just like regular
+> sendmsg with host memory. Any reason to not do that?
+>
 
-Define some macros that take HPMN as an argument and construct
-mutually exclusive bitmaps for testing which partition a particular
-counter is in. Note that despite their different position in the
-bitmap, the cycle and instruction counters are always in the guest
-partition.
+Sorry for the late reply. Some of these suggestions took a bit to
+investigate and other priorities pulled me a bit from this.
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- drivers/perf/arm_pmuv3.c       | 72 +++++++++++++++++++++++++++++-----
- include/linux/perf/arm_pmuv3.h |  8 ++++
- 2 files changed, 70 insertions(+), 10 deletions(-)
+I've prototyped using iov_base as offset with some help from your
+published branch, and it works fine. It seems to me a big improvement
+to the UAPI. Will reupload RFC v2 while the tree is closed with this
+change.
 
-diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-index 55f9ae560715..c61845fad9d9 100644
---- a/drivers/perf/arm_pmuv3.c
-+++ b/drivers/perf/arm_pmuv3.c
-@@ -754,15 +754,19 @@ static void armv8pmu_disable_event_irq(struct perf_event *event)
- 	armv8pmu_disable_intens(BIT(event->hw.idx));
- }
- 
--static u64 armv8pmu_getreset_flags(void)
-+static u64 armv8pmu_getreset_flags(struct arm_pmu *cpu_pmu)
- {
- 	u64 value;
- 
- 	/* Read */
- 	value = read_pmovsclr();
- 
-+	if (cpu_pmu->partitioned)
-+		value &= ARMV8_PMU_HOST_CNT_PART(cpu_pmu->hpmn);
-+	else
-+		value &= ARMV8_PMU_OVERFLOWED_MASK;
-+
- 	/* Write to clear flags */
--	value &= ARMV8_PMU_OVERFLOWED_MASK;
- 	write_pmovsclr(value);
- 
- 	return value;
-@@ -789,6 +793,18 @@ static void armv8pmu_disable_user_access(void)
- 	update_pmuserenr(0);
- }
- 
-+static bool armv8pmu_is_guest_part(struct arm_pmu *cpu_pmu, u8 idx)
-+{
-+	return cpu_pmu->partitioned &&
-+		(BIT(idx) & ARMV8_PMU_GUEST_CNT_PART(cpu_pmu->hpmn));
-+}
-+
-+static bool armv8pmu_is_host_part(struct arm_pmu *cpu_pmu, u8 idx)
-+{
-+	return !cpu_pmu->partitioned ||
-+		(BIT(idx) & ARMV8_PMU_HOST_CNT_PART(cpu_pmu->hpmn));
-+}
-+
- static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
- {
- 	int i;
-@@ -797,6 +813,8 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
- 	if (is_pmuv3p9(cpu_pmu->pmuver)) {
- 		u64 mask = 0;
- 		for_each_set_bit(i, cpuc->used_mask, ARMPMU_MAX_HWEVENTS) {
-+			if (armv8pmu_is_guest_part(cpu_pmu, i))
-+				continue;
- 			if (armv8pmu_event_has_user_read(cpuc->events[i]))
- 				mask |= BIT(i);
- 		}
-@@ -805,6 +823,8 @@ static void armv8pmu_enable_user_access(struct arm_pmu *cpu_pmu)
- 		/* Clear any unused counters to avoid leaking their contents */
- 		for_each_andnot_bit(i, cpu_pmu->cntr_mask, cpuc->used_mask,
- 				    ARMPMU_MAX_HWEVENTS) {
-+			if (armv8pmu_is_guest_part(cpu_pmu, i))
-+				continue;
- 			if (i == ARMV8_PMU_CYCLE_IDX)
- 				write_pmccntr(0);
- 			else if (i == ARMV8_PMU_INSTR_IDX)
-@@ -850,7 +870,10 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
- 		armv8pmu_disable_user_access();
- 
- 	/* Enable all counters */
--	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
-+	if (cpu_pmu->partitioned)
-+		armv8pmu_mdcr_write(armv8pmu_mdcr_read() | ARMV8_PMU_MDCR_HPME);
-+	else
-+		armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
- 
- 	kvm_vcpu_pmu_resync_el0();
- }
-@@ -858,7 +881,10 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
- static void armv8pmu_stop(struct arm_pmu *cpu_pmu)
- {
- 	/* Disable all counters */
--	armv8pmu_pmcr_write(armv8pmu_pmcr_read() & ~ARMV8_PMU_PMCR_E);
-+	if (cpu_pmu->partitioned)
-+		armv8pmu_mdcr_write(armv8pmu_pmcr_read() & ~ARMV8_PMU_MDCR_HPME);
-+	else
-+		armv8pmu_pmcr_write(armv8pmu_pmcr_read() & ~ARMV8_PMU_PMCR_E);
- }
- 
- static irqreturn_t armv8pmu_handle_irq(struct arm_pmu *cpu_pmu)
-@@ -872,7 +898,7 @@ static irqreturn_t armv8pmu_handle_irq(struct arm_pmu *cpu_pmu)
- 	/*
- 	 * Get and reset the IRQ flags
- 	 */
--	pmovsr = armv8pmu_getreset_flags();
-+	pmovsr = armv8pmu_getreset_flags(cpu_pmu);
- 
- 	/*
- 	 * Did an overflow occur?
-@@ -930,6 +956,8 @@ static int armv8pmu_get_single_idx(struct pmu_hw_events *cpuc,
- 	int idx;
- 
- 	for_each_set_bit(idx, cpu_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS) {
-+		if (armv8pmu_is_guest_part(cpu_pmu, idx))
-+			continue;
- 		if (!test_and_set_bit(idx, cpuc->used_mask))
- 			return idx;
- 	}
-@@ -946,6 +974,8 @@ static int armv8pmu_get_chain_idx(struct pmu_hw_events *cpuc,
- 	 * the lower idx must be even.
- 	 */
- 	for_each_set_bit(idx, cpu_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS) {
-+		if (armv8pmu_is_guest_part(cpu_pmu, idx))
-+			continue;
- 		if (!(idx & 0x1))
- 			continue;
- 		if (!test_and_set_bit(idx, cpuc->used_mask)) {
-@@ -968,6 +998,7 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
- 
- 	/* Always prefer to place a cycle counter into the cycle counter. */
- 	if ((evtype == ARMV8_PMUV3_PERFCTR_CPU_CYCLES) &&
-+	    !cpu_pmu->partitioned &&
- 	    !armv8pmu_event_get_threshold(&event->attr)) {
- 		if (!test_and_set_bit(ARMV8_PMU_CYCLE_IDX, cpuc->used_mask))
- 			return ARMV8_PMU_CYCLE_IDX;
-@@ -983,6 +1014,7 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
- 	 * may not know how to handle it.
- 	 */
- 	if ((evtype == ARMV8_PMUV3_PERFCTR_INST_RETIRED) &&
-+	    !cpu_pmu->partitioned &&
- 	    !armv8pmu_event_get_threshold(&event->attr) &&
- 	    test_bit(ARMV8_PMU_INSTR_IDX, cpu_pmu->cntr_mask) &&
- 	    !armv8pmu_event_want_user_access(event)) {
-@@ -994,7 +1026,7 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
- 	 * Otherwise use events counters
- 	 */
- 	if (armv8pmu_event_is_chained(event))
--		return	armv8pmu_get_chain_idx(cpuc, cpu_pmu);
-+		return armv8pmu_get_chain_idx(cpuc, cpu_pmu);
- 	else
- 		return armv8pmu_get_single_idx(cpuc, cpu_pmu);
- }
-@@ -1086,6 +1118,15 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
- 	return 0;
- }
- 
-+static void armv8pmu_reset_host_counters(struct arm_pmu *cpu_pmu)
-+{
-+	int idx;
-+
-+	for_each_set_bit(idx, cpu_pmu->cntr_mask, ARMV8_PMU_MAX_GENERAL_COUNTERS)
-+		if (armv8pmu_is_host_part(cpu_pmu, idx))
-+			armv8pmu_write_evcntr(idx, 0);
-+}
-+
- static void armv8pmu_reset(void *info)
- {
- 	struct arm_pmu *cpu_pmu = (struct arm_pmu *)info;
-@@ -1093,8 +1134,10 @@ static void armv8pmu_reset(void *info)
- 
- 	bitmap_to_arr64(&mask, cpu_pmu->cntr_mask, ARMPMU_MAX_HWEVENTS);
- 
--	if (cpu_pmu->partitioned)
-+	if (cpu_pmu->partitioned) {
- 		armv8pmu_partition(cpu_pmu->hpmn);
-+		mask &= ARMV8_PMU_HOST_CNT_PART(cpu_pmu->hpmn);
-+	}
- 
- 	/* The counter and interrupt enable registers are unknown at reset. */
- 	armv8pmu_disable_counter(mask);
-@@ -1103,11 +1146,20 @@ static void armv8pmu_reset(void *info)
- 	/* Clear the counters we flip at guest entry/exit */
- 	kvm_clr_pmu_events(mask);
- 
-+
-+	pmcr = ARMV8_PMU_PMCR_LC;
-+
- 	/*
--	 * Initialize & Reset PMNC. Request overflow interrupt for
--	 * 64 bit cycle counter but cheat in armv8pmu_write_counter().
-+	 * Initialize & Reset PMNC. Request overflow interrupt for 64
-+	 * bit cycle counter but cheat in armv8pmu_write_counter().
-+	 *
-+	 * When partitioned, there is no single bit to reset only the
-+	 * host counters. so reset them individually.
- 	 */
--	pmcr = ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C | ARMV8_PMU_PMCR_LC;
-+	if (cpu_pmu->partitioned)
-+		armv8pmu_reset_host_counters(cpu_pmu);
-+	else
-+		pmcr = ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C;
- 
- 	/* Enable long event counter support where available */
- 	if (armv8pmu_has_long_event(cpu_pmu))
-diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-index 115ee39f693a..5f8b143794ce 100644
---- a/include/linux/perf/arm_pmuv3.h
-+++ b/include/linux/perf/arm_pmuv3.h
-@@ -247,6 +247,14 @@
- #define ARMV8_PMU_OVSR_F		ARMV8_PMU_CNT_MASK_F
- /* Mask for writable bits is both P and C fields */
- #define ARMV8_PMU_OVERFLOWED_MASK	ARMV8_PMU_CNT_MASK_ALL
-+
-+/* Masks for guest and host counter partitions */
-+#define ARMV8_PMU_HPMN_CNT_MASK(N)	GENMASK((N) - 1, 0)
-+#define ARMV8_PMU_GUEST_CNT_PART(N)	(ARMV8_PMU_HPMN_CNT_MASK(N) | \
-+					 ARMV8_PMU_CNT_MASK_C | \
-+					 ARMV8_PMU_CNT_MASK_F)
-+#define ARMV8_PMU_HOST_CNT_PART(N)	(ARMV8_PMU_CNT_MASK_ALL & \
-+					 ~ARMV8_PMU_GUEST_CNT_PART(N))
- /*
-  * PMXEVTYPER: Event selection reg
-  */
--- 
-2.48.1.262.g85cc9f2d1e-goog
-
+--=20
+Thanks,
+Mina
 
