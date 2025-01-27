@@ -1,150 +1,139 @@
-Return-Path: <kvm+bounces-36663-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36664-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37684A1D972
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 16:25:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C409BA1D974
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 16:25:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC2BE7A293C
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 15:24:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D909165ED2
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 15:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C353613B797;
-	Mon, 27 Jan 2025 15:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788A213B797;
+	Mon, 27 Jan 2025 15:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KzQhmbMo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L/smgqVn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ECF13D24D
-	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 15:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1310325A658
+	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 15:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737991490; cv=none; b=TWn/ZDhJVvlt9DxxTxt9jb9qSm4zoLMBV8URoZuQq/7SNLb27oj4XJfqjJD3b4X2pU1eDxn51RIiLKlGjCvU1ozQ0gTxKzWcaRp1RkEA3xJ7prdtRfWA4Njq7JDrsYJRQhbUQnSWhEcs7vgd2bQXTHsdcAXpi5GBrkkv84X2hTQ=
+	t=1737991524; cv=none; b=K+pdZ+q0r1OreYOu8RdWa9tQju7kZIQVVPaLDnP+n1gW9XcAUhLRKsOP3/wETmJdsm3Yv1Oy+o3wRDuwsozrp62sSiEztIWETfr7fh08d/bzUzBCKI6BWpfkbPyPmJErX9EK6vq+xHb11icWHNLXODuYiUQ6bInTySpxf/IqE9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737991490; c=relaxed/simple;
-	bh=MEueiGx/CLwPsfh2pRO44ZyYAyS3IlpdV7imm8VQ6Mo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZKFzLAw0h7HhPeYf+Y0GOkYaOGInh3XSrGCA50JCuNzFZhjnE1l/U3ZW2V1ks0/h5HXEe328sW6k0/x0SGlaTuZPG8SDDwToN4MN4kTMpm3XG9q+J1TswHrHoJOqEqWi/PvnS7ywDaWpZSG+6joDYTFxLU9c9Ero58TwutA65RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KzQhmbMo; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2161d5b3eb5so85973825ad.3
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 07:24:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737991488; x=1738596288; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZoeCnFd5J5xnYNqBdU/ogFWqB8J8v68mjfzwpWs3ZH8=;
-        b=KzQhmbMo/mDMJCETzdx3R4liMfMNBr7z4vR08sWBbM7v2yAPToM/lVfCfkGlnsnGFQ
-         WhI3fU8Bulrf8qiWe8QNgfYps+u1KLhsjDq+FwHwtrYQSnS0SlHHJPoD+/3AW+PJAgYi
-         ++12sjhT38K+z9pc2CrJG6kx2UJgRad82qgKfME3ecXjoFWu4PferYe8FhWP0K0QI6xg
-         mec4htibiXj97HRRPh/AOf1c13a6CL3xfcuRFPUS4KlQn14g/yiVPBzxS6jpqRazFrYK
-         4YSWDfoq/LnwRNQnR4YQgaOoBqAciBaOfLZigfBxTNQjRmFR/aVpjiFxl6tDJR9eG+MS
-         +kIA==
+	s=arc-20240116; t=1737991524; c=relaxed/simple;
+	bh=H19tpCD+6r9uQWFojnxWboQKCbiThOQQh3fjdS37aWA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HgyHLWIHA0ue2Mr1sVIykGkHi4Jpl5Tp9BIC+qQ84l7qWy2K0CRDRa5pmxXYoDbBEsxMT+fIwBMjhQcZYvYyZsr2TRU7M5hUHrkEw0i8orh9wTM6b+D+P/P/voJctcKg1Ecy0gSm1to5JGRi8ymmKyBgNiczp0uM8JJCPnsi5P0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L/smgqVn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737991521;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ni7xoQbBTNC1W1Dz/5tMCYLRc4wPIwk62rJ/YGqS7IQ=;
+	b=L/smgqVns9FzOiIuDp4SroriTXAn3Wtx7rLsD5ixjgnHUftBl34iQRulKqXZYaH9dzxGeu
+	JVQB7nNDtDmPDcq++sRy6MN+rksThTH6e3/Bvhjd1RvxCjrOm7WKjo4r679zVFvjXgnFR2
+	nUqI25bef8fpI/UUOrOwQ8WHirCQ0MY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-26-D1SxUz-CM32Qf42bf1yAkQ-1; Mon, 27 Jan 2025 10:25:20 -0500
+X-MC-Unique: D1SxUz-CM32Qf42bf1yAkQ-1
+X-Mimecast-MFC-AGG-ID: D1SxUz-CM32Qf42bf1yAkQ
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3862f3ccf4fso1679412f8f.0
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 07:25:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737991488; x=1738596288;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZoeCnFd5J5xnYNqBdU/ogFWqB8J8v68mjfzwpWs3ZH8=;
-        b=EGnep5Xcgqdqip+y8sjfvXya0KeeD7Y7+KjLWMkUAmPId3yRMYsl8DERuG47MTe1DI
-         579nF92jWzTYGJMrOsIclpn9eYxRtdUv/STgtJsBV3QnJpoD786WGD2iWYBqdclswg2y
-         WZzk0coqPy8oKBV/+X3oZG+o4PclHw8ifOQko5QF3C/fvTxlEkXQpWmNpNDcyWKyq93h
-         zItXAyTvCMDZTckSt/jjF6bWjflBPwEwXx0VGS3J5IyonlSU2bYVLHkJp2Do0J+/Tnmt
-         4XRdautu1YTFVDL4MBvVEHUYFEkOB04vIPvD9YtigNG6pa5dJ+OISrRb1E+xMJjRNJw+
-         XTiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyiPbiMUxfdUwLBNC2GFXnsSgEgHYxAn0wQw5p2UDMIFDg4dBMVG4BrEveY9hvUo4FtiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFZ10TyVWwC5KPTPw/V7N6l6y4DKk7dnDViucV7FbynlEW98KX
-	mN3g/gl+hxA0nJcHMaYXz62v9yRu5mwe2hfTLQww/ii4R082F0gohP54sCD2SlQrMWmmc/7pH+x
-	FBA==
-X-Google-Smtp-Source: AGHT+IHYoJa0BkqdkhXtUYNXMnIfXT2Kp07cJDVu8LU5YEcGtlhbUTPDhn5/CB6e3hG2xZH+iB3g+iJMLng=
-X-Received: from pgbcl22.prod.google.com ([2002:a05:6a02:996:b0:7fd:5461:1ff6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d86:b0:1e0:9cc2:84b1
- with SMTP id adf61e73a8af0-1eb2158d07amr68681560637.30.1737991488591; Mon, 27
- Jan 2025 07:24:48 -0800 (PST)
-Date: Mon, 27 Jan 2025 07:24:42 -0800
-In-Reply-To: <CAHk-=wghGxSMv3K0BEB8N3N3vwk-3v=T1FhBVJyf2u_xYYJOCA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1737991519; x=1738596319;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ni7xoQbBTNC1W1Dz/5tMCYLRc4wPIwk62rJ/YGqS7IQ=;
+        b=dO/0tAshUmqqfHo8RV1Ds7BBd6cBR0uLt4Qg/zm3B79pCNOBKCdlXx4l4gJdWy9Hdm
+         bdpt9LIFviltO9SGh0bBKqo4NglPIUjtWi4sKenX0dXXPCBwen62KekWHn05R/CB65NG
+         FFVFuE6WQVzvdUP2jYUp22EHRF8RhedKuOByg5libVhWlelAMQWJLNv14SM8Kk9slteA
+         U8UIVC4pD6iMwt55fYfCSGbtR9NyO70RPTAeZaaArKF43MwjgRii+M0/dWeOGJy8+RTq
+         cA62cedkbK9T2OU8aA87YtI2pvOwJU7JYDgXxvwBs4BhmM+80hBSWnP+jvbmeoeC5FyX
+         6uZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWtACTEW7sPyVR5FG8HZiaGhV+GDtfUUCHvzyfGhku64bGhYmggkhM8BYYgpVZegJIejjU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnltJSwZe6y2OwbQUq1GifJbtyQZxVJpe5QAaQtu0DPMCpiuI/
+	xd95yu2pygNyRKXdwfyOdrlGL5gtZhy8HaUu5SPTLhk/2qBVvYyb6tlia+EUse3x9DkxB/DPMPL
+	FSl+4ehdwqvfKBdeOUemTtAVKm+DaNUZAcEQ86bewHJ6zrgr2uxwUnV/PfIANDiOXcab3yHP6s4
+	QeAIQuLg8BHjgkmihz/tXs85uK
+X-Gm-Gg: ASbGncsHyTG+FA5zfEFwXl4HOl4r0LT1FrRcV+49s0OQubFmRPIl4MYxkjQ6zP1wfCF
+	ei3jU/i9906nZZXapxHZnYNY6F8oeSNHgYEWfm/d5s6Tj9mpVtpD2X2OvNSFEdg==
+X-Received: by 2002:adf:e607:0:b0:38b:d765:7046 with SMTP id ffacd0b85a97d-38bf56855dbmr32608394f8f.33.1737991519253;
+        Mon, 27 Jan 2025 07:25:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEDK2nKpEEbuVoTUDJeT8cTSL435WDA3M2uAgnQ4m9e7VF+x8HvYay1WczP3Ph6/swzTVdOFofrnPYmrnoNE04=
+X-Received: by 2002:adf:e607:0:b0:38b:d765:7046 with SMTP id
+ ffacd0b85a97d-38bf56855dbmr32608369f8f.33.1737991518812; Mon, 27 Jan 2025
+ 07:25:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <20250124163741.101568-1-pbonzini@redhat.com> <CAHk-=wghGxSMv3K0BEB8N3N3vwk-3v=T1FhBVJyf2u_xYYJOCA@mail.gmail.com>
-Message-ID: <Z5elOuz1IjFXAtGx@google.com>
+In-Reply-To: <CAHk-=wghGxSMv3K0BEB8N3N3vwk-3v=T1FhBVJyf2u_xYYJOCA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 27 Jan 2025 16:25:07 +0100
+X-Gm-Features: AWEUYZl1IVNK_PFr0bWXpaQk46cR7FhjS9SzgCJZAf3Iy6Jth9zPpPYvremd4GE
+Message-ID: <CABgObfbTB-xuJbFAzH0xV78aZm_mb92oEpNUyZ8LdvN1GdChMw@mail.gmail.com>
 Subject: Re: [GIT PULL] KVM changes for Linux 6.14
-From: Sean Christopherson <seanjc@google.com>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 25, 2025, Linus Torvalds wrote:
-> On Fri, 24 Jan 2025 at 08:38, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > but you can throw away the <<<< ... ==== part completely, and apply the
-> > same change on top of the new implementation:
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index edef30359c19..9f9a29be3beb 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -1177,6 +1177,7 @@ void kvm_set_cpu_caps(void)
-> >                 EMULATED_F(NO_SMM_CTL_MSR),
-> >                 /* PrefetchCtlMsr */
-> >                 F(WRMSR_XX_BASE_NS),
-> > +               F(SRSO_USER_KERNEL_NO),
-> >                 SYNTHESIZED_F(SBPB),
-> >                 SYNTHESIZED_F(IBPB_BRTYPE),
-> >                 SYNTHESIZED_F(SRSO_NO),
-> 
+On Sat, Jan 25, 2025 at 7:16=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 > Ehh. My resolution ended up being different.
-> 
+>
 > I did this instead:
-> 
+>
 >                F(WRMSR_XX_BASE_NS),
 >                SYNTHESIZED_F(SBPB),
 >                SYNTHESIZED_F(IBPB_BRTYPE),
 >                SYNTHESIZED_F(SRSO_NO),
 > +              SYNTHESIZED_F(SRSO_USER_KERNEL_NO),
-> 
+>
 > which (apart from the line ordering) differs from your suggestion in
 > F() vs SYNTHESIZED_F().
-> 
+>
 > That really seemed to be the RightThing(tm) to do from the context of
 > the two conflicting commits, but maybe there was some reason that I
 > didn't catch that you kept it as a plain "F()".
 
-Heh, I waffled on whether SRSO_USER_KERNEL_NO should be F() or SYNTHESIZED_F()
-when the initial commit went in.  I would prefer to keep it F(), though it doesn't
-matter terribly at the moment.
+SYNTHESIZED_F() generally is used together with setup_force_cpu_cap(),
+i.e. when it makes sense to present the feature even if cpuid does not
+have it *and* the VM is not able to see the difference. You use it if
+when mitigations on the host automatically protect the guest as well.
+For example, F vs. SYNTHESIZED_F() makes a difference for
+X86_FEATURE_SRSO_NO because F() hides the feature from the guests and
+SYNTHESIZED_F() lets them use it.
 
-The "synthesized" features are for cases where the kernel stuffs X86_FEATURE_xxx
-via set_cpu_cap() even when the feature isn't present in CPUID, and it's correct
-for KVM to relay the synthesized feature to the guest.
+It doesn't hurt at all in this case, or make a difference for that
+matter, because there's no
+setup_force_cpu_cap(X86_FEATURE_SRSO_USER_KERNEL_NO). But here using
+SYNTHESIZED_F it's just a little less self-documenting and a little
+less future proof, nothing that a quick follow-up PR can't fix, and
+also I managed to pull the KVM/ARM changes from the wrong machine so I
+have to send a second KVM pull request anyway.
 
-E.g. SRSO_NO is synthesized into cpu_caps for Zen1/2, and in that case the
-absense of the SRSO flaw extends to the guest as well.
+> So please take a look, and if I screwed up send me a fix (with a
+> scathing explanation for why I'm maternally related to some
+> less-than-gifted rodentia with syphilis).
 
-		if (boot_cpu_data.x86 < 0x19 && !cpu_smt_possible()) {
-			setup_force_cpu_cap(X86_FEATURE_SRSO_NO);
-			return;
-		}
+I think I don't want to know if it's a Finnish metaphor, or you came
+up with it all on your own...
 
-For SRSO_USER_KERNEL_NO, it's currently not force set, i.e. it's a pure reflection
-of hardware capabilities.  Treating it as synthesized is effectively a nop with
-the current code, but that would change if the kernel were to force set the flag.
+Paolo
 
-If a future commit force set SRSO_USER_KERNEL_NO because of a ucode update that
-didn't also modify CPUID behavior, then treating the flag as synthesized would
-be desirabled, e.g. so that the guest could also avoid the overhead of mitigating
-SRSO.
-
-But if a future commit set the flag for some other reason, e.g. if the kernel
-somehow isn't vulnerable even when running on buggy hardware, then enumerating
-SRSO_USER_KERNEL_NO to the guest could cause the guest kernel to incorrectly
-skips its mitigation.
-
-My vote is to err on the side of caution and go with F().
 
