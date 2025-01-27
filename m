@@ -1,137 +1,214 @@
-Return-Path: <kvm+bounces-36668-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36669-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64621A1DAFC
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 18:05:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78489A1DB05
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 18:09:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FD6E3A2958
-	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 17:05:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D8887A3DDE
+	for <lists+kvm@lfdr.de>; Mon, 27 Jan 2025 17:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A66188926;
-	Mon, 27 Jan 2025 17:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF848189BB1;
+	Mon, 27 Jan 2025 17:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1RXoJyHp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KV/fn+Qw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C051F1581E0
-	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 17:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E28188736
+	for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 17:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737997503; cv=none; b=ZJdatq1ogmtzLZkw+NCT2LG5aqeEwf/uJQ6yrNaC4tSCjIc7ZhMy3Lgaz0bT7cJ0tRqcvfLbIPr9KDbCpzpIb7KTe1r/SqcR+rkg2BpBdbFnEg1BM6Y5kB4CddBfxqfOx/yLz/ymlN0d62/nTXzEY+gv7Q4YTyZYV5URkh4406U=
+	t=1737997747; cv=none; b=SbWlVjUv20LFsz/+bukby9Guy1+1MszaoFqBbGo/yNO6+F4n0bGT5tsvJbb1I1Jd15JUaZC6OSn3HQsglkzjWpDSDBsFxhgu/LwJuBfhNEGLwXnRsR+bt5HvkEQtymwB4CF9AG1QJTJr2CJfUhn+a1z8y6Q8kpkPU36OjJliwKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737997503; c=relaxed/simple;
-	bh=wJmbWVGPNlBY1q9XcbEFIAtJU0FoZRe9yZqry0QkOsk=;
+	s=arc-20240116; t=1737997747; c=relaxed/simple;
+	bh=zQrk1uIf3lMPBaWp52ewOBQRuI5DgfVodYnU/7Wes/g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CWRiNQefMZBFBO9dVebg0tjKVcV9Su5HwdAqnhhKCUj/sbbSBIBU/E0VlGEOwx68XXqvugyTGqMKQubSJOqy5qA4kj+/MSjUb7GJ+3OcN+MweQHqdbkYyLUd6NIinHxb7CsySaI9HvhUN4iBhSsI+NnqI4Yok/h22wBIW4fxyws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1RXoJyHp; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=FPYoF9mBOgpTx2fkQvBli3Rga/XvhDvlIxdqgDp9ZOvHcYDIWNSbcoh+iEl8mkCMaR5kSjxwsJkOP3Roe2OWXPwpakWk+CQdjSfGdgUcT+SjUK9HCOfg+OREw7rUV8f7fpsXmlhb4stl62BbgNjKl8ElTc8V6Dn0qA9BFA4ChxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KV/fn+Qw; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2166e907b5eso82882385ad.3
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 09:05:01 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ee8ced572eso9570487a91.0
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 09:09:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737997501; x=1738602301; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T+ETOTo5IfPgKyFMapOrCWmqlpkzTGZaFAV0TeQlMDE=;
-        b=1RXoJyHpfkMiqH1bgm9VSF2mh9zxPja069TXsbu7lWbeUryTb1BnOyUB1r1/5Q3k9K
-         diKM20jPcJkxROJubTde6IR/qg52IjuVF2PzmSnDN0ccU08zk6C3pcTAGjpvOdj/FPrT
-         +3rS+jV3PiqkPFYurFPf1k79QagbRkgH2o+jXsZI+/V+4a0McS3oYcAQbb9n/KNA/o3V
-         JGMdtSdpFeQl/NVYMuQXLpyPWVm5eH9vQZ9cOJrtmqkE+QW4HCHdMlpvDYJMKE80Yfp3
-         akGSVqPt8Xt0YMxHHe4dOn2BhCtvAwS5uUCnLZUGNK6Qh/yROijso1MeSzabdOiqhAIR
-         DxkQ==
+        d=google.com; s=20230601; t=1737997745; x=1738602545; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LtnrCMjNLY9dxlwp8PuMqWEP2G86XRjQHfhjyZ08Gl4=;
+        b=KV/fn+Qw2kZEe5XxVHuG2ZYLGSCWNkLjUoizq3u5NiISJUhrwJZDqMaCz4TNsSh0eN
+         pDB2y/2RHzM70sP/LNJIE/BtrcDSfDZHjUSHDwzK/cG7u5rGaxyHLQm3IuR1y//i4ma7
+         gh+kbE1jLPPpok9QXGN2P9ag7uEmJWsEzc1sUp4DH4HFDK2S8qgGM9VvKZUV+YDh0kXQ
+         r90Z8+sxAUCSHMNFph4zW3gTYqaif87S2nHqDY/tcV9NLGkKUqQUz1F3eaAMaTl22Ndy
+         2lLAPlTyQTGfWHU83jDxMHjLFY/C+vGEdjf4eQBWzQzkHEpTjO9zjL64BEtDz35dF3iz
+         pA8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737997501; x=1738602301;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T+ETOTo5IfPgKyFMapOrCWmqlpkzTGZaFAV0TeQlMDE=;
-        b=c11Wt54gH9qePUvKQsPpGe32/RgZ2ug+bcdHiz2/VKLsSqAvfzbr1THwMCQNw09Knq
-         aX3S9+/H+9K5SZSxGVfwFUNfirB0b2ffYi8iRwgXkspFQvXA9v9c6s+NRGAUoTGoVYK4
-         B6o3shWXe23D57Ws1BYXfNCOBZ75mGUAZ1fCgPXTfE9Rtdc5XOzZNFaSq1KwFd4PAi5R
-         vSv0fOB5iB+WwNhGjlt7DoiZAFYWSdsaZyIp4Ovn593AS8SN7pJdMTCh73Ri7tDDXVNP
-         GrLPommLswYaNSquy6BqxWfQykuoNayvuts4vEq44mEhuSAnYXcA4xPdFMT4DKHqEXxK
-         Udaw==
-X-Forwarded-Encrypted: i=1; AJvYcCUf8GW4Mc3WrsVMgr90h0CXY/BcQO18FlDKRSkU8aIPrukutx5Ecm8s6VYW4c+PivTFtfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1uy9P+BTpzIobe4unhMFC/i5UBo/5q9nejDdb8gTuRTEcWviN
-	8rMMYFGjzhGIpX+CgI0K3XgBYibRG7lqTUTPI+TW9tClN620kWsNnH1GEp4CblPswzMS41+BQkw
-	xgw==
-X-Google-Smtp-Source: AGHT+IFYQZC+7lIxW9G9BX1IIQ/awHF38+WG0ZYkvV34s8cor4Z8FTRasrIVcMKPRdWl8WX50bSEoI4+OsA=
-X-Received: from plblq13.prod.google.com ([2002:a17:903:144d:b0:216:248e:8fab])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1c6:b0:215:65f3:27f2
- with SMTP id d9443c01a7336-21c352c7915mr502501525ad.8.1737997500962; Mon, 27
- Jan 2025 09:05:00 -0800 (PST)
-Date: Mon, 27 Jan 2025 09:04:59 -0800
-In-Reply-To: <Z5dQtuVO2mQfusOY@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1737997745; x=1738602545;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LtnrCMjNLY9dxlwp8PuMqWEP2G86XRjQHfhjyZ08Gl4=;
+        b=DRa9+5hdO8NcE2FKmAkh7TATimAF66BkIPwoZYVDwYx3RO3yBCiL+bZfQ5bQaoESpr
+         Kj3d83oR/H0XPt1DU0HycsIh+khHsitfBfgpVzZaKn4a0C1K6W/JlZVpDfP7LaP0KB/i
+         D8J26iBW7k3CQSmcf0HZ+xpGftWkydvwqog2y3jbzwOJWKSJ4CqcgC8Pu0/BD7LQiSX3
+         nUe6D0cZX6f7vwUmLqO+i+SyoXY8J+t9EvBxz73cvZML47OxojYxmMcF92A3zU71mp1X
+         iyR6I2F1LVVOTRlfXcNSTswCSVeJKhGVheWp0EdGkzAJFyc5yC6IwJE+QzVA2tj8Vctw
+         peHw==
+X-Gm-Message-State: AOJu0YwnwYajhQ7t6N0xZ3UMxEFRJGN/YcdLpQxh4cGL+wV6uVJJYUuI
+	W9HcNBTjFMKn99JrEtpO8InV+qN3F6cySjFeRyF+P9wivqjCAPlWyylWKnY1ymvjD1UyZjyACaz
+	q+w==
+X-Google-Smtp-Source: AGHT+IEXrxZG+G1Xqw5JASl98ntqnM3sPYFbmM1Uajz1YtmtVorrIvNlzSXcVbijnHi7wc/xQW9amVAMkZo=
+X-Received: from pfblh5.prod.google.com ([2002:a05:6a00:7105:b0:72f:9b55:58a1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:6812:b0:72d:b36a:4497
+ with SMTP id d2e1a72fcca58-72db36a45eemr51052542b3a.3.1737997744779; Mon, 27
+ Jan 2025 09:09:04 -0800 (PST)
+Date: Mon, 27 Jan 2025 09:09:03 -0800
+In-Reply-To: <Z2Xgo3XwE6XrCMOM@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250113020925.18789-1-yan.y.zhao@intel.com> <20250113021218.18922-1-yan.y.zhao@intel.com>
- <Z4rIGv4E7Jdmhl8P@google.com> <Z44DsmpFVZs3kxfE@yzhao56-desk.sh.intel.com>
- <Z5Q9GNdCpSmuWSeZ@google.com> <Z5dQtuVO2mQfusOY@yzhao56-desk.sh.intel.com>
-Message-ID: <Z5e8uycCzOlMwP_t@google.com>
-Subject: Re: [PATCH 3/7] KVM: TDX: Retry locally in TDX EPT violation handler
- on RET_PF_RETRY
+References: <20241121201448.36170-1-adrian.hunter@intel.com>
+ <20241121201448.36170-5-adrian.hunter@intel.com> <Z0AbZWd/avwcMoyX@intel.com>
+ <a42183ab-a25a-423e-9ef3-947abec20561@intel.com> <Z2GiQS_RmYeHU09L@google.com>
+ <487a32e6-54cd-43b7-bfa6-945c725a313d@intel.com> <Z2WZ091z8GmGjSbC@google.com>
+ <Z2Xgo3XwE6XrCMOM@google.com>
+Message-ID: <Z5e9ryXdZxvjzN7-@google.com>
+Subject: Re: PKEY syscall number for selftest? (was: [PATCH 4/7] KVM: TDX:
+ restore host xsave state when exit from the guest TD)
 From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com, 
-	reinette.chatre@intel.com, xiaoyao.li@intel.com, tony.lindgren@intel.com, 
-	binbin.wu@linux.intel.com, dmatlack@google.com, isaku.yamahata@intel.com, 
-	isaku.yamahata@gmail.com
+To: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 27, 2025, Yan Zhao wrote:
-> On Fri, Jan 24, 2025 at 05:23:36PM -0800, Sean Christopherson wrote:
-> My previous consideration is that
-> when there's a pending interrupt that can be recognized, given the current VM
-> Exit reason is EPT violation, the next VM Entry will not deliver the interrupt
-> since the condition to recognize and deliver interrupt is unchanged after the
-> EPT violation VM Exit.
-> So checking pending interrupt brings only false positive, which is unlike
-> checking PID that the vector in the PID could arrive after the EPT violation VM
-> Exit and PID would be cleared after VM Entry even if the interrupts are not
-> deliverable. So checking PID may lead to true positive and less false positive.
-> 
-> But I understand your point now. As checking PID can also be false positive, it
-> would be no harm to introduce another source of false positive.
+Ping, I'm guessing this fell through the holiday cracks.
 
-Yep.  FWIW, I agree that checking VMXIP is theoretically "worse", in the sense
-that it's much more likely to be a false positive.  Off the top of my head, the
-only time VMXIP will be set with RFLAGS.IF=1 on an EPT Violation is if the EPT
-violation happens in an STI or MOV_SS/POP_SS shadow.
-
-> So using kvm_vcpu_has_events() looks like a kind of trade-off?
-> kvm_vcpu_has_events() can make TDX's code less special but might lead to the
-> local vCPU more vulnerable to the 0-step mitigation, especially when interrupts
-> are disabled in the guest.
-
-Ya.  I think it's worth worth using kvm_vcpu_has_events() though.  In practice,
-observing VMXIP=1 with RFLAGS=0 on an EPT Violation means the guest is accessing
-memory for the first time in atomic kernel context.  That alone seems highly
-unlikely.  Add in that triggering retry requires an uncommon race, and the overall
-probability becomes miniscule.
-
-> > That code needs a comment, because depending on the behavior of that field, it
-> > might not even be correct.
-> > 
-> > > (2) kvm_vcpu_has_events() may lead to unnecessary breaks due to exception
-> > >     pending. However, vt_inject_exception() is NULL for TDs.
-> > 
-> > Wouldn't a pending exception be a KVM bug?
-> Hmm, yes, it should be.
-> Although kvm_vcpu_ioctl_x86_set_mce() can invoke kvm_queue_exception() to queue
-> an exception for TDs, 
-
-I thought TDX didn't support synthetic #MCs?
-
-> this should not occur while VCPU_RUN is in progress.
-
-Not "should not", _cannot_, because they're mutually exclusive.
+On Fri, Dec 20, 2024, Sean Christopherson wrote:
+> Switching topics, dropped everyone else except the list.
+>=20
+> On Fri, Dec 20, 2024, Sean Christopherson wrote:
+> >  arch/x86/kvm/x86.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 4320647bd78a..9d5cece9260b 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -1186,7 +1186,7 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *=
+vcpu)
+> >  	    vcpu->arch.pkru !=3D vcpu->arch.host_pkru &&
+> >  	    ((vcpu->arch.xcr0 & XFEATURE_MASK_PKRU) ||
+> >  	     kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE)))
+> > -		write_pkru(vcpu->arch.pkru);
+> > +		wrpkru(vcpu->arch.pkru);
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_load_guest_xsave_state);
+> > =20
+> > @@ -1200,7 +1200,7 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *v=
+cpu)
+> >  	     kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE))) {
+> >  		vcpu->arch.pkru =3D rdpkru();
+> >  		if (vcpu->arch.pkru !=3D vcpu->arch.host_pkru)
+> > -			write_pkru(vcpu->arch.host_pkru);
+> > +			wrpkru(vcpu->arch.host_pkru);
+> >  	}
+> > =20
+> >  	if (kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE)) {
+> >=20
+> > base-commit: 13e98294d7cec978e31138d16824f50556a62d17
+> > --=20
+>=20
+> I tried to test this by running the mm/protection_keys selftest in a VM, =
+but it
+> gives what are effectively false passes on x86-64 due to the selftest pic=
+king up
+> the generic syscall numbers, e.g. 289 for SYS_pkey_alloc, instead of the =
+x86-64
+> numbers.
+>=20
+> I was able to get the test to run by hacking tools/testing/selftests/mm/p=
+key-x86.h
+> to shove in the right numbers, but I can't imagine that's the intended be=
+havior.
+>=20
+> If I omit the #undefs from pkey-x86.h, it shows that the test is grabbing=
+ the
+> definitions from the generic usr/include/asm-generic/unistd.h header.
+>=20
+> Am I doing something stupid?
+>=20
+> Regardless of whether this is PEBKAC or working as intended, on x86, the =
+test
+> should ideally assert that "ospke" support in /proc/cpuinfo is consistent=
+ with
+> the result of sys_pkey_alloc(), e.g. so that an failure to allocate a pke=
+y on a
+> system that work is reported as an error, not a pass.
+>=20
+> --
+> diff --git a/tools/testing/selftests/mm/pkey-x86.h b/tools/testing/selfte=
+sts/mm/pkey-x86.h
+> index ac91777c8917..ccc3552e6b77 100644
+> --- a/tools/testing/selftests/mm/pkey-x86.h
+> +++ b/tools/testing/selftests/mm/pkey-x86.h
+> @@ -3,6 +3,10 @@
+>  #ifndef _PKEYS_X86_H
+>  #define _PKEYS_X86_H
+> =20
+> +#define __NR_pkey_mprotect     329
+> +#define __NR_pkey_alloc                330
+> +#define __NR_pkey_free         331
+> +
+>  #ifdef __i386__
+> =20
+>  #define REG_IP_IDX             REG_EIP
+> --
+>=20
+> Yields:
+>=20
+> $ ARCH=3Dx86_64 make protection_keys_64
+> gcc -Wall -I /home/sean/go/src/kernel.org/linux/tools/testing/selftests/.=
+./../..  -isystem /home/sean/go/src/kernel.org/linux/tools/testing/selftest=
+s/../../../usr/include -isystem /home/sean/go/src/kernel.org/linux/tools/te=
+sting/selftests/../../../tools/include/uapi -no-pie -D_GNU_SOURCE=3D  -m64 =
+-mxsave  protection_keys.c vm_util.c thp_settings.c -lrt -lpthread -lm -lrt=
+ -ldl -o /home/sean/go/src/kernel.org/linux/tools/testing/selftests/mm/prot=
+ection_keys_64
+> In file included from pkey-helpers.h:102:0,
+>                  from protection_keys.c:49:
+> pkey-x86.h:6:0: warning: "__NR_pkey_mprotect" redefined
+>  #define __NR_pkey_mprotect 329
+> =20
+> In file included from protection_keys.c:45:0:
+> /home/sean/go/src/kernel.org/linux/usr/include/asm-generic/unistd.h:693:0=
+: note: this is the location of the previous definition
+>  #define __NR_pkey_mprotect 288
+> =20
+> In file included from pkey-helpers.h:102:0,
+>                  from protection_keys.c:49:
+> pkey-x86.h:7:0: warning: "__NR_pkey_alloc" redefined
+>  #define __NR_pkey_alloc  330
+> =20
+> In file included from protection_keys.c:45:0:
+> /home/sean/go/src/kernel.org/linux/usr/include/asm-generic/unistd.h:695:0=
+: note: this is the location of the previous definition
+>  #define __NR_pkey_alloc 289
+> =20
+> In file included from pkey-helpers.h:102:0,
+>                  from protection_keys.c:49:
+> pkey-x86.h:8:0: warning: "__NR_pkey_free" redefined
+>  #define __NR_pkey_free  331
+> =20
+> In file included from protection_keys.c:45:0:
+> /home/sean/go/src/kernel.org/linux/usr/include/asm-generic/unistd.h:697:0=
+: note: this is the location of the previous definition
+>  #define __NR_pkey_free 290
+> =20
+>=20
 
