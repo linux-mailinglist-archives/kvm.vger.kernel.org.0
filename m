@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-36736-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36737-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE8C6A203C6
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 06:05:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3F1DA203C9
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 06:05:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E2863A299B
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 05:05:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D38F163193
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 05:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3CD1F866D;
-	Tue, 28 Jan 2025 05:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719701F8EF9;
+	Tue, 28 Jan 2025 05:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="uwpmWINs"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="WXFezE8B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865A51F78F1
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 05:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D60B1F8687
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 05:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738040417; cv=none; b=j7JjMWVWHknRkOR8JAxbGXqFdd8wwI2xUoOq6+AEo4Co7bdtN6p7u729f9ek2vnKqmGXzZaUMJZhQ86+1Zl8yUvWzOLHGQ6WC2pE+Nr2MN9hrnyW+pB34yBUipQ4rplXjBEBIJKnLBbOydSqEvvwrxWLBkTLlACd3aEguLLHoiU=
+	t=1738040419; cv=none; b=fOMkuvN2/MKXuhqJfuxqKl2tO9Ru56AxsyecM6F9egOPncv75u0RVsLEnjbSj7qNvSEQmocIxYWc6fWaZhtR2epAhfO1wiXCxEKLm4nGsJhQZWiDdfiqrBDivgtLBa+8ehwV7szZ4T/EMJhVB8sv0Tm7nlLsJ2uPH2FBJkKPewE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738040417; c=relaxed/simple;
-	bh=ZCYEBVqxpbzQ+9XIJos03qUFz14KllynHzMk3UmVHLQ=;
+	s=arc-20240116; t=1738040419; c=relaxed/simple;
+	bh=09lWzd/6dCgnZxyO1zDKn3zFDr4WFTaCMF6mVse96Ps=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JCrJZNUqu03WUf2Y6J5ZHp5LRSNT0Qrs6xDGNsNsBsQZQZCTgLmmHW1A/fYbczJa5xSxY58iKMMZVItyizJSVDsZ5dOeLdayKryS5BB4gjWlktuMbLXrttHyJQfw5Aby5sT/THsfADmgnrPE4cA5w+FQjJS7AXIgNBVwdNIddMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=uwpmWINs; arc=none smtp.client-ip=209.85.216.45
+	 In-Reply-To:To:Cc; b=kiFvrTB5WRsgTeD7trBbY2wqrprBRVd7e4g2Xi4WgL4mrZ2XDinFR+D/paTfXcavQh38mmN7OXI+QCQxEqzHh9YwUun6nu2CYE7zd3CVrmvxXtGhCdmp3geR+5hlYt6s3g1J5AfPv45xA0CH3cYynDZrgJMdMBZzSGnvXFXfK7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=WXFezE8B; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ef760a1001so8867259a91.0
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 21:00:14 -0800 (PST)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2f43da61ba9so6862158a91.2
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 21:00:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738040414; x=1738645214; darn=vger.kernel.org;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738040415; x=1738645215; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=x6U8xZqyjao8QAwlfpahdSahI9u3EBcxYiljZLY35B4=;
-        b=uwpmWINsAqOD8kk/KDZQLBsrZPimng6Z5OhOrrrmARQ+PNlg9nQHmUY4go1YKFwg3I
-         dOghwWOSbR49c1TsV575Lp33M3FjZUyBp6yG8Yw/jvSEDqySfl5oCdU5aXaUxzJScine
-         Endnuj4TQXY1jPUWv1NcxRRZBmYGB0yZ67N+hPZ+eYXmShyT2dADFpe5qeORbr657ACN
-         OwXX1TgWP7n0CZ/8bOR9AWnOCeEIFe/eGH946COF1Uj0uZN9oHBs7dywDQ+3qmQFK3rU
-         uMwinwhlBkFhvoMY6YIHGyB35Az35QTuEiFLwAp8ZZFUvECNgaXfcu1+ziykDIsh7x4z
-         qEaQ==
+        bh=WwSJXYJYJ2QsfeksDYzOVoprLyqehfXihnOY7v/vL40=;
+        b=WXFezE8BDMAqFakkSspMdsynQ9P0lD1Xaq++3GkLoFdYay0kdncsoiDFgPaSpJGsDN
+         9KiV3sIfNmbLBGnoIrTYZ1LY8uWTDMJBTVNE3z+3d4HfeTJ5DJk6Hp6DrMiOTDhO5iv6
+         4yzXYWX62XIdsubjELstgH7j2wR3JAkAv94gl0lUk2H9RtU+GE5UsOwAyYPeXJ/CGXsu
+         45Ijs371f3Tiy9ssP+er9vBJF+KsMwdsAv2JSBfrEXw6ANmiRdqeYIQLlhEqVvLi8Qeq
+         5cZYgJIStI6KHDX538hbRyNqUO1S08/Xk1vtC5Cs7Zx09xCy8jh+MY1v/s044MhoHEZS
+         aoQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738040414; x=1738645214;
+        d=1e100.net; s=20230601; t=1738040415; x=1738645215;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=x6U8xZqyjao8QAwlfpahdSahI9u3EBcxYiljZLY35B4=;
-        b=qR1RZdyOxxDcqP/OFi9GS9F6iHskucjjIz06qublN8xJduqLPlmaH0kkuvIMIE18ax
-         0YLUcFWZz+XeAwXr+tY8CrR1gnFTv22qK30YdYqb4rgsvJ6+a1ymAg9umW/Vz0StlorR
-         s6rUaHdSXM7R2NYsIgHxj+gjbn4/RBRke0GSWYYh2Y6tbr2r+w967FB0TaNhQ3mIgYGO
-         O36OC0EX1A5BOaWkuFIUINUsGDFggsEkue7uiusn51U/lucfjgIL/r4Ux2+ad6etzzH6
-         mC3WEqpRBmg5aYUlqNTOvh+6/Z778sqq0PzcN0JT21Z4AYFDV1HA6TGpThbrijNcgwmP
-         fyOg==
-X-Forwarded-Encrypted: i=1; AJvYcCW4oKdqD3zJjNgxWUgbjDYCxSJbe2vi8ygR/USfNk4nibuO0TBR5ironQrl7Qw+i4r01ro=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcjaPuIKCyt0RWELUNlaPoLJVXu5yLVMCdkG4V9hv8ONaCC4b8
-	355K8W3ry+AQo9/EYiY2L4cSQ2RnccWk5rqDF5B/YqzEAJ67CxOm6AhB33EAseg=
-X-Gm-Gg: ASbGncsmoKPsKW96iqJhMCVTpy+aE2XqdXvHj/BQ12BVtx8XCpuuqMr9ZVt35pIORaL
-	H9CMh9qo2ANsPsYrjsQgW0p0/kPsXQbXaIZyni1UUlieOYZvWSmvfLNu7VSWemC7iVr/SK4EmWg
-	I1agT9XKLPmit4B41OE7nPvXHBMQOcpjUO05v0PKXTRE8SgsNhogjXITOO7vY54F29LjaklkQfP
-	NNAg0Gukio8fuR2OUN/sv+MJv95IK6x5kX/KwIMpuXZc06R0YWI/ydfuLpl8YZcLMvGnJufro8O
-	JsOdo+XWYQt8bq/c0D/tpGTpetCr
-X-Google-Smtp-Source: AGHT+IFgdohYqccPp8BM6+1NKCY6Ks2M+aFjD71kBC5/Uka5+FjgMiLBaROCKnbBuozTYd+KOO+EXw==
-X-Received: by 2002:a17:90b:524b:b0:2ea:3d2e:a0d7 with SMTP id 98e67ed59e1d1-2f782c9846fmr65179131a91.15.1738040413684;
-        Mon, 27 Jan 2025 21:00:13 -0800 (PST)
+        bh=WwSJXYJYJ2QsfeksDYzOVoprLyqehfXihnOY7v/vL40=;
+        b=lZpHBcJZI2uEZCfCalATIzLkwkUJV1QVDE1PRmCrUtrw1E87JP2YmhoRV0O1Aak/yJ
+         cfGM20TjuM1B9I3SgJZFyINLde0hPj8hJESxQQ6YOcbRx+JWwZB1MAsIgA0CcLnp089O
+         y9JTmVSW3zcpI8c17P+lEKjSAGR5iZ11k9AL1j0VSrstSl3msWYcZ0YAxCbCaCSCoOI5
+         aPjCZvZFKtjUVc5tD8Pzcsuw/2pwrRW2m6mkVY5UIdBKJ8u7qPODe19HO+ouseroBIqA
+         MOxAGjWNDK50FEphCKcCCYc6Ubhv/1onSwDrD72PM5M3UpfjN0uoXBnCEvfxMP6aNYZD
+         euBw==
+X-Forwarded-Encrypted: i=1; AJvYcCVLOPo5JXwDZDwXYUltJ2LvR3Kjlf8J7GzvGiWnKYfHVsqq003wiwpfQzglVRCGesQSsLA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/p/w5DZvVqSL4k6Boci01ZmiFf4uvzqkTOqP6FYOJOGr6/Eam
+	4p5MP6685Oc3UsPz5LZFAd9K9rSc9+wRZwCzhFCrhIi4BbjOHShX96K5sfKkqvQ=
+X-Gm-Gg: ASbGncvCcG9lMR5vSYxGzpSo4gGAPrEBX/fbOSZuCFG6X9U0ahi5N6ilvm7LRqPW/mX
+	4RT/OInbph6KF4pBg/0L+YQxRiyY1M05rduI4In1oWyfCSX7nWJuqNxE8ZxpviaBuVOpW8bZNEc
+	ayoPEjhgj+VA9WEE4VfpNyozlLI2d8FLyIDlqF4gzTRrsbsg3OoCowgnu72vpKR6MgMEsOMHN9y
+	KbAJBr/I5L0yBmSznkqJJtmrQsNOLGMBRJSaVZcrwSRDf0ObzLow2BgOSoh8ZEYfxmI/GcnIOOU
+	YogNTV2nFYaGi/O1QWQLEhTbQWTH
+X-Google-Smtp-Source: AGHT+IEKLNFZOaVvDJ2grs7h9hb4mxjnaquPb5u1sc5MAJh5NiIGfsglFThj6u7Oc3KeiatM4ZLmwA==
+X-Received: by 2002:a17:90b:2d48:b0:2ee:3fa7:ef4d with SMTP id 98e67ed59e1d1-2f782d4f152mr64397362a91.24.1738040415260;
+        Mon, 27 Jan 2025 21:00:15 -0800 (PST)
 Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa5a7f7sm8212776a91.11.2025.01.27.21.00.12
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa5a7f7sm8212776a91.11.2025.01.27.21.00.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 21:00:13 -0800 (PST)
+        Mon, 27 Jan 2025 21:00:15 -0800 (PST)
 From: Atish Patra <atishp@rivosinc.com>
-Date: Mon, 27 Jan 2025 20:59:56 -0800
-Subject: [PATCH v3 15/21] RISC-V: perf: Skip PMU SBI extension when not
- implemented
+Date: Mon, 27 Jan 2025 20:59:57 -0800
+Subject: [PATCH v3 16/21] RISC-V: perf: Use config2/vendor table for event
+ to counter mapping
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,7 +84,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250127-counter_delegation-v3-15-64894d7e16d5@rivosinc.com>
+Message-Id: <20250127-counter_delegation-v3-16-64894d7e16d5@rivosinc.com>
 References: <20250127-counter_delegation-v3-0-64894d7e16d5@rivosinc.com>
 In-Reply-To: <20250127-counter_delegation-v3-0-64894d7e16d5@rivosinc.com>
 To: Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -102,124 +102,159 @@ Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
  Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org, 
  kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
  linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
- Atish Patra <atishp@rivosinc.com>, Charlie Jenkins <charlie@rivosinc.com>
+ Atish Patra <atishp@rivosinc.com>
 X-Mailer: b4 0.15-dev-13183
 
-From: Charlie Jenkins <charlie@rivosinc.com>
+The counter restriction specified in the json file is passed to
+the drivers via config2 paarameter in perf attributes. This allows
+any platform vendor to define their custom mapping between event and
+hpmcounters without any rules defined in the ISA.
 
-When the PMU SBI extension is not implemented, sbi_v2_available should
-not be set to true. The SBI implementation for counter config matching
-and firmware counter read  should also be skipped when the SBI extension
-is not implemented.
+For legacy events, the platform vendor may define the mapping in
+the driver in the vendor event table.
+The fixed cycle and instruction counters are fixed (0 and 2
+respectively) by the ISA and maps to the legacy events. The platform
+vendor must specify this in the driver if intended to be used while
+profiling. Otherwise, they can just specify the alternate hpmcounters
+that may monitor and/or sample the cycle/instruction counts.
 
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
-Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
 ---
- drivers/perf/riscv_pmu_dev.c | 49 +++++++++++++++++++++++++-------------------
- 1 file changed, 28 insertions(+), 21 deletions(-)
+ drivers/perf/riscv_pmu_dev.c   | 78 ++++++++++++++++++++++++++++++++++--------
+ include/linux/perf/riscv_pmu.h |  2 ++
+ 2 files changed, 66 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/perf/riscv_pmu_dev.c b/drivers/perf/riscv_pmu_dev.c
-index e075d0d15221..52d927576c9b 100644
+index 52d927576c9b..ab84f83df5e1 100644
 --- a/drivers/perf/riscv_pmu_dev.c
 +++ b/drivers/perf/riscv_pmu_dev.c
-@@ -410,18 +410,22 @@ static void rvpmu_sbi_check_event(struct sbi_pmu_event_data *edata)
- 	}
+@@ -76,6 +76,7 @@ static ssize_t __maybe_unused rvpmu_format_show(struct device *dev, struct devic
+ 	RVPMU_ATTR_ENTRY(_name, rvpmu_format_show, (char *)_config)
+ 
+ PMU_FORMAT_ATTR(firmware, "config:62-63");
++PMU_FORMAT_ATTR(counterid_mask, "config2:0-31");
+ 
+ static bool sbi_v2_available;
+ static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
+@@ -112,6 +113,7 @@ static const struct attribute_group *riscv_sbi_pmu_attr_groups[] = {
+ static struct attribute *riscv_cdeleg_pmu_formats_attr[] = {
+ 	RVPMU_FORMAT_ATTR_ENTRY(event, RVPMU_CDELEG_PMU_FORMAT_ATTR),
+ 	&format_attr_firmware.attr,
++	&format_attr_counterid_mask.attr,
+ 	NULL,
+ };
+ 
+@@ -1383,24 +1385,76 @@ static int rvpmu_deleg_find_ctrs(void)
+ 	return num_hw_ctr;
  }
  
--static void rvpmu_sbi_check_std_events(struct work_struct *work)
-+static void rvpmu_check_std_events(struct work_struct *work)
++/* The json file must correctly specify counter 0 or counter 2 is available
++ * in the counter lists for cycle/instret events. Otherwise, the drivers have
++ * no way to figure out if a fixed counter must be used and pick a programmable
++ * counter if available.
++ */
+ static int get_deleg_fixed_hw_idx(struct cpu_hw_events *cpuc, struct perf_event *event)
  {
--	for (int i = 0; i < ARRAY_SIZE(pmu_hw_event_map); i++)
--		rvpmu_sbi_check_event(&pmu_hw_event_map[i]);
--
--	for (int i = 0; i < ARRAY_SIZE(pmu_cache_event_map); i++)
--		for (int j = 0; j < ARRAY_SIZE(pmu_cache_event_map[i]); j++)
--			for (int k = 0; k < ARRAY_SIZE(pmu_cache_event_map[i][j]); k++)
--				rvpmu_sbi_check_event(&pmu_cache_event_map[i][j][k]);
-+	if (riscv_pmu_sbi_available()) {
-+		for (int i = 0; i < ARRAY_SIZE(pmu_hw_event_sbi_map); i++)
-+			rvpmu_sbi_check_event(&pmu_hw_event_sbi_map[i]);
+-	return -EINVAL;
++	struct hw_perf_event *hwc = &event->hw;
++	bool guest_events = event->attr.config1 & RISCV_PMU_CONFIG1_GUEST_EVENTS;
 +
-+		for (int i = 0; i < ARRAY_SIZE(pmu_cache_event_sbi_map); i++)
-+			for (int j = 0; j < ARRAY_SIZE(pmu_cache_event_sbi_map[i]); j++)
-+				for (int k = 0; k < ARRAY_SIZE(pmu_cache_event_sbi_map[i][j]); k++)
-+					rvpmu_sbi_check_event(&pmu_cache_event_sbi_map[i][j][k]);
-+	} else {
-+		DO_ONCE_LITE_IF(1, pr_err, "Boot time config matching not required for smcdeleg\n");
++	if (guest_events) {
++		if (hwc->event_base == SBI_PMU_HW_CPU_CYCLES)
++			return 0;
++		if (hwc->event_base == SBI_PMU_HW_INSTRUCTIONS)
++			return 2;
++		else
++			return -EINVAL;
 +	}
- }
- 
--static DECLARE_WORK(check_std_events_work, rvpmu_sbi_check_std_events);
-+static DECLARE_WORK(check_std_events_work, rvpmu_check_std_events);
- 
- static ssize_t rvpmu_format_show(struct device *dev,
- 				 struct device_attribute *attr, char *buf)
-@@ -549,6 +553,9 @@ static int rvpmu_sbi_ctr_get_idx(struct perf_event *event)
- 
- 	cflags = rvpmu_sbi_get_filter_flags(event);
- 
-+	if (!riscv_pmu_sbi_available())
-+		return -ENOENT;
 +
- 	/*
- 	 * In legacy mode, we have to force the fixed counters for those events
- 	 * but not in the user access mode as we want to use the other counters
-@@ -562,10 +569,9 @@ static int rvpmu_sbi_ctr_get_idx(struct perf_event *event)
- 			cflags |= SBI_PMU_CFG_FLAG_SKIP_MATCH;
- 			ctr_mask = BIT(CSR_INSTRET - CSR_CYCLE);
- 		}
--	}
--
--	if (pmu_sbi_is_fw_event(event) && cdeleg_available)
-+	} else if (pmu_sbi_is_fw_event(event) && cdeleg_available) {
- 		ctr_mask = firmware_cmask;
-+	}
- 
- 	/* retrieve the available counter index */
- #if defined(CONFIG_32BIT)
-@@ -871,7 +877,7 @@ static u64 rvpmu_ctr_read(struct perf_event *event)
- 		return val;
- 	}
- 
--	if (pmu_sbi_is_fw_event(event)) {
-+	if (pmu_sbi_is_fw_event(event) && riscv_pmu_sbi_available()) {
- 		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ,
- 				hwc->idx, 0, 0, 0, 0, 0);
- 		if (ret.error)
-@@ -1524,9 +1530,8 @@ static int rvpmu_event_map(struct perf_event *event, u64 *econfig)
- 	config1 = event->attr.config1;
- 	if (riscv_pmu_cdeleg_available() && !pmu_sbi_is_fw_event(event))
- 		return rvpmu_cdeleg_event_map(event, econfig);
--	} else {
++	if (!event->attr.config2)
++		return -EINVAL;
++
++	if (event->attr.config2 & RISCV_PMU_CYCLE_FIXED_CTR_MASK)
++		return 0; /* CY counter */
++	else if (event->attr.config2 & RISCV_PMU_INSTRUCTION_FIXED_CTR_MASK)
++		return 2; /* IR counter */
 +	else
- 		return rvpmu_sbi_event_map(event, econfig);
--	}
++		return -EINVAL;
  }
  
- static int rvpmu_ctr_get_idx(struct perf_event *event)
-@@ -1944,14 +1949,16 @@ static int __init rvpmu_devinit(void)
- 	int ret;
- 	struct platform_device *pdev;
+ static int get_deleg_next_hpm_hw_idx(struct cpu_hw_events *cpuc, struct perf_event *event)
+ {
+-	unsigned long hw_ctr_mask = 0;
++	u32 hw_ctr_mask = 0, temp_mask = 0;
++	u32 type = event->attr.type;
++	u64 config = event->attr.config;
++	int ret;
  
--	if (sbi_spec_version >= sbi_mk_version(0, 3) &&
--	    sbi_probe_extension(SBI_EXT_PMU)) {
--		static_branch_enable(&riscv_pmu_sbi_available);
--		sbi_available = true;
-+	if (sbi_probe_extension(SBI_EXT_PMU)) {
-+		if (sbi_spec_version >= sbi_mk_version(0, 3)) {
-+			static_branch_enable(&riscv_pmu_sbi_available);
-+			sbi_available = true;
-+		}
+-	/*
+-	 * TODO: Treat every hpmcounter can monitor every event for now.
+-	 * The event to counter mapping should come from the json file.
+-	 * The mapping should also tell if sampling is supported or not.
+-	 */
++	/* Select only available hpmcounters */
++	hw_ctr_mask = cmask & (~0x7) & ~(cpuc->used_hw_ctrs[0]);
 +
-+		if (sbi_spec_version >= sbi_mk_version(2, 0))
-+			sbi_v2_available = true;
- 	}
++	switch (type) {
++	case PERF_TYPE_HARDWARE:
++		temp_mask = current_pmu_hw_event_map[config].counter_mask;
++		break;
++	case PERF_TYPE_HW_CACHE:
++		ret = cdeleg_pmu_event_find_cache(config, NULL, &temp_mask);
++		if (ret)
++			return ret;
++		break;
++	case PERF_TYPE_RAW:
++		/*
++		 * Mask off the counters that can't monitor this event (specified via json)
++		 * The counter mask for this event is set in config2 via the property 'Counter'
++		 * in the json file or manual configuration of config2. If the config2 is not set,
++		 * it is assumed all the available hpmcounters can monitor this event.
++		 * Note: This assumption may fail for virtualization use case where they hypervisor
++		 * (e.g. KVM) virtualizes the counter. Any event to counter mapping provided by the
++		 * guest is meaningless from a hypervisor perspective. Thus, the hypervisor doesn't
++		 * set config2 when creating kernel counter and relies default host mapping.
++		 */
++		if (event->attr.config2)
++			temp_mask = event->attr.config2;
++		break;
++	default:
++		break;
++	}
++
++	if (temp_mask)
++		hw_ctr_mask &= temp_mask;
  
--	if (sbi_spec_version >= sbi_mk_version(2, 0))
--		sbi_v2_available = true;
- 	/*
- 	 * We need all three extensions to be present to access the counters
- 	 * in S-mode via Supervisor Counter delegation.
+-	/* Select only hpmcounters */
+-	hw_ctr_mask = cmask & (~0x7);
+-	hw_ctr_mask &= ~(cpuc->used_hw_ctrs[0]);
+ 	return __ffs(hw_ctr_mask);
+ }
+ 
+@@ -1429,10 +1483,6 @@ static int rvpmu_deleg_ctr_get_idx(struct perf_event *event)
+ 	u64 priv_filter;
+ 	int idx;
+ 
+-	/*
+-	 * TODO: We should not rely on SBI Perf encoding to check if the event
+-	 * is a fixed one or not.
+-	 */
+ 	if (!is_sampling_event(event)) {
+ 		idx = get_deleg_fixed_hw_idx(cpuc, event);
+ 		if (idx == 0 || idx == 2) {
+diff --git a/include/linux/perf/riscv_pmu.h b/include/linux/perf/riscv_pmu.h
+index 9e2758c32e8b..e58f83811988 100644
+--- a/include/linux/perf/riscv_pmu.h
++++ b/include/linux/perf/riscv_pmu.h
+@@ -30,6 +30,8 @@
+ #define RISCV_PMU_CONFIG1_GUEST_EVENTS 0x1
+ 
+ #define RISCV_PMU_DELEG_RAW_EVENT_MASK GENMASK_ULL(55, 0)
++#define RISCV_PMU_CYCLE_FIXED_CTR_MASK 0x01
++#define RISCV_PMU_INSTRUCTION_FIXED_CTR_MASK 0x04
+ 
+ #define HW_OP_UNSUPPORTED		0xFFFF
+ #define CACHE_OP_UNSUPPORTED		0xFFFF
 
 -- 
 2.34.1
