@@ -1,78 +1,77 @@
-Return-Path: <kvm+bounces-36772-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36773-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6357FA20BEB
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:22:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6416A20BED
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72FCD3A4361
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 14:22:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B81A3A4430
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 14:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C2D1AA1D9;
-	Tue, 28 Jan 2025 14:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDB81A4F1B;
+	Tue, 28 Jan 2025 14:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VH8kakQG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bFQPFoJu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134F5BE40
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 14:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE429BE40
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 14:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738074122; cv=none; b=uDGPhwqf4BM7EufbHQbJUDL4XgadsobfCBOuuWiUz1hDcP0zwp20YuTsCEQrJUjGg7RIejhPv484vMRDE3E9BDR7TUF4q4mbHnjUqfjWNBfCFFS10/K+4gDVqUtn+D/YQpcaSbO+OtSNirTMo84fglQ8WB8vrbg7R7CqxA+TeCQ=
+	t=1738074128; cv=none; b=apgt7CodI4b2flEjWcYx3+QzEcibtHdTVuEVzbeGRRPWFDkpuXd2NnE4GCz0ZcriDMegS2H+VRNV1wL24Cu0iyU+LYa+gqejXD9hMtgucdzpsNII5lJ65VE1leUhueFPlY6IMVOeNuG7XA97LRmydYVQ0y4vJ02AgqVzgwnsWQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738074122; c=relaxed/simple;
-	bh=RFOzBuMsneVwtN783B11tDxukbOuJFk+FGb501bNZqc=;
+	s=arc-20240116; t=1738074128; c=relaxed/simple;
+	bh=38cU2OHlhFZBCnfDkum4Mf8z9x9rVetsPagi6nQhdMw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L9JJCVyUjmL7tkJNnwR9iRrWb16n96uy1d9XShpUVj5FD4tPVQ4qBPr5gIUUPwNJLFoP3sbJ8j02eK8ubnU826IhRZlcOoJmjg/Gk/b3wNajZC+TSXxuZ3bVrvjP8LEijpLs6eIhFS7V8dxuBc/RC1ullTN1yji7ffPCJcHT/vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VH8kakQG; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version:Content-Type; b=bhmC+INVD/hx3GKkgwLxKWTIH/rgF2AGRksc5d6bTyezy+a31sdSCvmKvorSN1KCMVfI1Mu+3w8IlapzsqGTLMRiHsT8gzZ0djzn/VcIpk4zY4tvcOJnd6982yDqB/wMdyCIntqJCnhsF95bo0W6V4hHZlrryySILXej9zJlJek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bFQPFoJu; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-438a39e659cso37681395e9.2
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 06:22:00 -0800 (PST)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-38637614567so2782487f8f.3
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 06:22:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738074119; x=1738678919; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1738074125; x=1738678925; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kO0uRE/b6a4B7/JlExmMlApMO3OGmNzh+eMs/4hpwh4=;
-        b=VH8kakQGA+DmUgAh0KFwxoaSIa3YPYB9ZhYKRGdtmaHj/NruXD3XBAZ7kf7Fp6MCrL
-         WU3Ingh7SBv9J4M2WazMBbsrleWjJtf/LrR9wHZysikc0amo7YALgZwbwlkvmZsvOoGI
-         BkUsk4ppA1NbMBB4intXfbwvQWW64G49gnRfCSosgFg1L/EtV/yJpN7F9hRVCRkZh6Yd
-         4TkQVvLrI82Za+Dpgc71X+Nd1rkanR48ul8yYOfYo5jXo3P7ffbZEWhgLeAVgAqYUWsb
-         FvIDLCYhtLJBOioJR/hSGfSsybdOjZEpGOD+B8f+sDZYaO/HDZFDXkGvGJ4JtEtgp9EC
-         Es+w==
+        bh=seznNsDAaQBVSpbp55D/hE//Nvg+4oVvDGjyXY54BGQ=;
+        b=bFQPFoJuCB9v70JQ+N8iPZ/6Mtr2eYMEm3f7l136cJOeaMiAS4wP+2ReZKG7IGilCP
+         ZiNWjwsW+NBAmtMTRzviUu0yQYP0x4HYUQgyifHDBMEA1Q2L+saw2hTAV8Ncvhbc6fK0
+         2L4f+5mAvP09TBKSkhmadG8V0OPgVj+Rx0+0YIHYNqsuVRnwnhM8niioXZk5qG94Pnkw
+         5yKTzZrNCdhLmG6n4OVMoHATtDb2B8gjDFqNZh19TEl/ilbu6QijCKJWhyNLVAD31o8M
+         uDP7a/T+UenSNJixjtVLHEn36x2XZi+TzHKJJNHtGF3D9Vsgu8iewRoveuNGDxoA1D7z
+         hYVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738074119; x=1738678919;
+        d=1e100.net; s=20230601; t=1738074125; x=1738678925;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kO0uRE/b6a4B7/JlExmMlApMO3OGmNzh+eMs/4hpwh4=;
-        b=fHpFJqNLNqAt3tMkLVS32jf3gDqhzP22fRL4gEzgOOMUjnKGCtf//VmCYTYLkQJMN/
-         I3mnkdZwgYlqRl7Ht27ZGeDzxzGjCRtb1FjR/UowqPnWpinzAbeRjrcyj2db3bF4FY1p
-         JSO0Y3I3/yAC2HOAN1IGt1MJld5XBAeHjekND5ZPiI+A5BmBuyyaPrHFsfrVBBGWIliS
-         Tml+UAX8F8jdSgDDAi4XAKxIuc0+nKwWs7TodjS6rHWaTzg+7XLGhJpyTLSmEn/Yk/V8
-         5u2+GXf6RN3yLM7R30zKrr8mAwtJnYuPSd+0ZQvoQDZL08GJ8y0MfBqxgor4n0fP9qhl
-         kNqA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVVVJzZ7CohGp8Ycw2p4O+rzlp/U0OgUdMbi//ejMlDOsv07QGlFqqTdgoc6COd+n17FU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5BQ768ncwEasrT4AWdxSkwMgNuEnW2bY1a3SAbUid9FG85UO0
-	vNeakVtsuZKkbJouVvlwxh5yUwgk5XWQXt4ShCp4njKhm+vmeCGRHWDEluBSl9o=
-X-Gm-Gg: ASbGncsGgXLhK+epWH5BRRDZui/ihEAXfw/6xkQ3Klk76wD6yznyhKaZ/o5ThJ8gYuV
-	9mIa3NUPnLuIoQ9NBJ7OJFM/gdqaGVZvQxjVgCc1es4ygszkg6AAhnIBaMJ5Ksq6lgI2oqEQ7JI
-	xMqv/Cfyys+B8upfsnU63j78KogUQ6bvV1pVm++M5CnCk1xgwjmpqVzecU+RDIhC39gK6ocd5jR
-	+C4V99J6b83SGllzDzoZXwGNTqVuYw75sWoMdIMd7O/YK+1nfrE1ZWjNnhbH5rKpSOfGjGmKMe6
-	Q9plDQtaISD/7TSKjZxDEoG++hA2DRpPknkfSb61ssuf6l/gK23WD+bKm/Kjem7OJ+zridxyVbC
-	6
-X-Google-Smtp-Source: AGHT+IG02KmwhuUT6IfvBlK1pHwLP8uF0g7mnNTy6Q9yhDmta3+GBFm8pcBIROf6lvdBXsr32dkLzA==
-X-Received: by 2002:a05:600c:4e89:b0:434:f739:7ce3 with SMTP id 5b1f17b1804b1-438913cb518mr403560625e9.8.1738074119339;
-        Tue, 28 Jan 2025 06:21:59 -0800 (PST)
+        bh=seznNsDAaQBVSpbp55D/hE//Nvg+4oVvDGjyXY54BGQ=;
+        b=OJGb+alt2kOM8HfzWRMF65MtQ3Tekpg+A62vM4nxgY+O5p7pMCzvnBgKpWcwdzOEY2
+         03tbVRfnqOlrBN528x/mPAdcWgnYgrcp6q8tHkvBcAphADFwskJUrDHNBed8Vnx9vd7v
+         OCVeHX2mS7rehv3vtFICa34REGw63MUBEXaaQp1HNJLhuT5PJOZFD8VDDn8ZDChk4/Vd
+         xCZ/FGbYn614q6SrrGjnk8RUuBzZj1y125DuIv96Tn+X120MPqTAhlkCapvmrCqTgtct
+         V1kzjwd8sE6+uGo//gTlBzrC9tlpadIotbmoaPC3oxj07/yAgZukrEEB0BPfiGHZJvgM
+         0/Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCWb/NTyiHp9vXYXUXf0frSt/863Yu0E/H+LlIxRMpBYZkB/gnatjAAIGaK6kVe1QO8T5sQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8niXXY5cn3+/rqZI97ULqm8p9Qew2ZFsGgytItVv87rKytnuD
+	2PnQ8bj1WsWHm0fsPXSGft4HBAkXwFn5vTH9jpZdXU0XxyMhNsPvzkrJNRcyIJI=
+X-Gm-Gg: ASbGncvc0WcI8sOKcv6S2my9mVjsqGfLtF3j7VYRObrE6PvsLPkacrsTGw47ZrJLWHG
+	ESiKNVLnMYtJAqib+D3QPZ8c1pT1gITgmi4oK3UvPMBfvw99QH9rVfT1AkvtpbMPc6hpQJQl8G4
+	OB1pqayke7yUYwxtoZLGiEjr0aG/nOB/6ptyEBhrTx9I7pwFlgQNmXHD+tu7mWDDgIuXrrECF8Y
+	ZStJypwJgIpS7Pwjr+8bk5Sa0eIMukJbD2majOJTf4/l+MjOREyeRmjEPU4XWoyXE7kIssOCEkG
+	ZAfHCWJA3x7UaKSCsp4qlPBHllhTffJYCQm8NVo484BFwYtZX3OmYpCA8zCD1hhU8Q==
+X-Google-Smtp-Source: AGHT+IE++a185aCVAwGW9af+PNdrfc3K4O3/zeNI4/CnMV32fBXiZN0yIo7Y1YMI+EEIUBCDGyE+Pg==
+X-Received: by 2002:a5d:6d86:0:b0:385:df6b:7ef6 with SMTP id ffacd0b85a97d-38bf57c94a2mr50508168f8f.51.1738074124946;
+        Tue, 28 Jan 2025 06:22:04 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd47f0fdsm174363075e9.5.2025.01.28.06.21.58
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd5732edsm169125225e9.36.2025.01.28.06.22.03
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 28 Jan 2025 06:21:58 -0800 (PST)
+        Tue, 28 Jan 2025 06:22:03 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -89,9 +88,9 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>
-Subject: [RFC PATCH 1/9] accel/tcg: Simplify use of &first_cpu in rr_cpu_thread_fn()
-Date: Tue, 28 Jan 2025 15:21:44 +0100
-Message-ID: <20250128142152.9889-2-philmd@linaro.org>
+Subject: [RFC PATCH 2/9] accel/tcg: Invalidate TB jump cache with global vCPU queue locked
+Date: Tue, 28 Jan 2025 15:21:45 +0100
+Message-ID: <20250128142152.9889-3-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250128142152.9889-1-philmd@linaro.org>
 References: <20250128142152.9889-1-philmd@linaro.org>
@@ -104,47 +103,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Let vCPUs wait for themselves being ready first, then other ones.
-This allows the first thread to starts without the global vcpu
-queue (thus &first_cpu) being populated.
+Invalidate TB with global vCPU queue locked.
+
+See commit 4731f89b3b9 ("cpu: free cpu->tb_jmp_cache with RCU"):
+
+    Fixes the appended use-after-free. The root cause is that
+    during tb invalidation we use CPU_FOREACH, and therefore
+    to safely free a vCPU we must wait for an RCU grace period
+    to elapse.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- accel/tcg/tcg-accel-ops-rr.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ accel/tcg/tb-maint.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/accel/tcg/tcg-accel-ops-rr.c b/accel/tcg/tcg-accel-ops-rr.c
-index 028b385af9a..5ad3d617bce 100644
---- a/accel/tcg/tcg-accel-ops-rr.c
-+++ b/accel/tcg/tcg-accel-ops-rr.c
-@@ -197,20 +197,21 @@ static void *rr_cpu_thread_fn(void *arg)
-     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+diff --git a/accel/tcg/tb-maint.c b/accel/tcg/tb-maint.c
+index 3f1bebf6ab5..64471af439d 100644
+--- a/accel/tcg/tb-maint.c
++++ b/accel/tcg/tb-maint.c
+@@ -891,6 +891,8 @@ static void tb_jmp_cache_inval_tb(TranslationBlock *tb)
+     } else {
+         uint32_t h = tb_jmp_cache_hash_func(tb->pc);
  
-     /* wait for initial kick-off after machine start */
--    while (first_cpu->stopped) {
--        qemu_cond_wait_bql(first_cpu->halt_cond);
-+    while (cpu->stopped) {
-+        CPUState *iter_cpu;
++        QEMU_LOCK_GUARD(&qemu_cpu_list_lock);
 +
-+        qemu_cond_wait_bql(cpu->halt_cond);
- 
-         /* process any pending work */
--        CPU_FOREACH(cpu) {
--            current_cpu = cpu;
--            qemu_wait_io_event_common(cpu);
-+        CPU_FOREACH(iter_cpu) {
-+            current_cpu = iter_cpu;
-+            qemu_wait_io_event_common(iter_cpu);
-         }
-     }
- 
-+    g_assert(first_cpu);
-     rr_start_kick_timer();
- 
--    cpu = first_cpu;
--
-     /* process any pending work */
-     cpu->exit_request = 1;
+         CPU_FOREACH(cpu) {
+             CPUJumpCache *jc = cpu->tb_jmp_cache;
  
 -- 
 2.47.1
