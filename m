@@ -1,100 +1,110 @@
-Return-Path: <kvm+bounces-36750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2BCBA20796
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 10:43:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63212A2083B
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 11:07:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 356E71888936
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 09:43:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F1063A3919
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 10:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB4B19ABD4;
-	Tue, 28 Jan 2025 09:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283FF19CC37;
+	Tue, 28 Jan 2025 10:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gSmlINAv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fbb+QJaZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136BC199385;
-	Tue, 28 Jan 2025 09:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09CC1991CA;
+	Tue, 28 Jan 2025 10:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738057396; cv=none; b=EvAo5ytMCQiwAKz4CIJeDHqnsl4/RO0pkuTDN1lY4oLCn2QOxtDHNPe6HvvfLBk6NWzyDqxJvzppOjnZD1utbsx67PNVwkogUlB+/dy/k1OdUIizefeINDcxUCA3xzkEWA444eSI8ZN+kfq97SlOQT/PJwsagHZbnnI/fwVZv40=
+	t=1738058813; cv=none; b=Rzy/P1cMP5hgC6i6MYmkbOLH57dtdeyBnmI4u7ME8BlCmXtO/r3Y8pZVptzrKdQJN/MhWfOqndna3tTfwkgqMe4wtH2BC/dDxBf/B+ipJgRT3eEPY+EfZxhfdGKMPQYF2A302bflrpySn0m9vaNpt2iNllrPChPgCH9lnSQ89mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738057396; c=relaxed/simple;
-	bh=nhxX+KKjyAmhuZqSaSiq//fR1W9bmmcoErKE363JeZg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Z/KHclpGReAFcYKBZGCZiHiG0xaaEguTW7LXoHUV0/D34KzSxgT2A/ybXW7SVDRjkXAgwYoFTgLrn+J+IwBdRwbTEbDAUFJr4WHe/5aWoob4m1SRRCZKYixVLvA0yFJT0loZ56jkKVQ/Kecz7P1X5ObihhfAydw+Vtl7BoRhvl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gSmlINAv; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=qiUVswsB3yTR4MT5Ln5A5p1vDg9ssqYWDaSK0rRPwXk=; b=gSmlINAvpXUPukFxeLE2Smgyak
-	cvlBY3CRasQpvgwPWahNX2d8MPFy0mh7kQMPXvjGb8fADnPVzvID69/8xGJwpCx1mmQ+JnwnBT6vX
-	qf5auJplfdAqa/IwrSw7c1o8W2Sm8qRR/XQc1/GLZgKAXa8ULXOXXPeItnv60Sj19Dm2Aa1i7NKGc
-	RDDHQ2qeDWYWZKSGDuSVc88Q5QgQpt6LX9jvuVFioRYO8g86DjyKEjYwode7ri43JCKCV5PW8IkqO
-	X/Arn50qNq+SSfLasPQR650XLG1/+fMeK5IEt10BasynsWapN5MWgfjAaZULelpjTp0YvbhIVCC/B
-	10vqmnLA==;
-Received: from [138.199.18.130] (helo=[172.31.28.190])
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tci7X-0000000ARyH-2y9k;
-	Tue, 28 Jan 2025 09:42:59 +0000
-Message-ID: <83d44307f30ad8ce19de3edcdc00c179750e0e23.camel@infradead.org>
-Subject: Re: [RFC PATCH 00/39] 1G page support for guest_memfd
-From: Amit Shah <amit@infradead.org>
-To: Ackerley Tng <ackerleytng@google.com>, tabba@google.com, 
-	quic_eberman@quicinc.com, roypat@amazon.co.uk, jgg@nvidia.com,
- peterx@redhat.com, 	david@redhat.com, rientjes@google.com, fvdl@google.com,
- jthoughton@google.com, 	seanjc@google.com, pbonzini@redhat.com,
- zhiquan1.li@intel.com, fan.du@intel.com, 	jun.miao@intel.com,
- isaku.yamahata@intel.com, muchun.song@linux.dev, 	mike.kravetz@oracle.com
-Cc: erdemaktas@google.com, vannapurve@google.com, qperret@google.com, 
-	jhubbard@nvidia.com, willy@infradead.org, shuah@kernel.org,
- brauner@kernel.org, 	bfoster@redhat.com, kent.overstreet@linux.dev,
- pvorel@suse.cz, rppt@kernel.org, 	richard.weiyang@gmail.com,
- anup@brainfault.org, haibo1.xu@intel.com, 	ajones@ventanamicro.com,
- vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 	pgonda@google.com,
- oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 	linux-mm@kvack.org,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-fsdevel@kvack.org
-Date: Tue, 28 Jan 2025 10:42:57 +0100
-In-Reply-To: <cover.1726009989.git.ackerleytng@google.com>
-References: <cover.1726009989.git.ackerleytng@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1738058813; c=relaxed/simple;
+	bh=2E8zLUIEzGdm2RSIAvXGBITmAUKAxYTEu7BL5x1hP4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FqlI4MKkCbQVh1FecL3XpsyeGjjdyFDbOX2C8evrWMudE0ixZ9b6s6usGmx13KWWqwhzF+7fvpaSnQwznSXfLQguEDJxTOr9OzMts0W2QTGKqkKOUSIgbbjj1ktK00zr2B0zf1R6XLG3EsfwM9N9TNDLC7RHkGEEiLuEl1wrs8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fbb+QJaZ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50S7X4gN023133;
+	Tue, 28 Jan 2025 10:06:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=XR2rOUG5ikxchzU3fGdSo45XJt5oSJckhqbghmvTb
+	Aw=; b=fbb+QJaZuCiB5xXy6rrQH3maE8PdEPWQEVUxSL0dKM4GqesuXEnS1L7Ax
+	t2YJfuSMlzNCCXhzED42L+0clHrsrXM1DQU7Euqdoz1VL40AoNdzq6z310M4lRK1
+	yrLuB8ffI5GPWOvvbBn986YGeFip+J4kxOTjtdaiEKt+t34EkVQnB7NmdQ6yaUXl
+	EmYA7PbQYxBDwfl4XxtWnF/SgB7usTWTUDM6ICQamFySBjf7vCcLqHnWnOAfFa6v
+	zx9HqqgJZhKSZwXXjHasNUl4Ijjsf0bFVGF6Nmo6JTNwBWnPWmhiW63blbWq+d47
+	9mCzuAuE7oTyXb39VKopLlhSadfWQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44etxrrmmp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 28 Jan 2025 10:06:49 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50S9YKkB028064;
+	Tue, 28 Jan 2025 10:06:48 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44dbskamua-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 28 Jan 2025 10:06:48 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50SA6iVQ55116084
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 28 Jan 2025 10:06:44 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AB76F20238;
+	Tue, 28 Jan 2025 10:06:44 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 57CB020236;
+	Tue, 28 Jan 2025 10:06:44 +0000 (GMT)
+Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com.com (unknown [9.179.13.59])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 28 Jan 2025 10:06:44 +0000 (GMT)
+From: Marc Hartmayer <mhartmay@linux.ibm.com>
+To: <linux-s390@vger.kernel.org>, Thomas Huth <thuth@redhat.com>
+Cc: <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v1 0/2] s390x: Improve out-of-source builds
+Date: Tue, 28 Jan 2025 11:06:37 +0100
+Message-ID: <20250128100639.41779-1-mhartmay@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 9HoaioEuTqFrChHPmTcXzzvRoJfJso7u
+X-Proofpoint-GUID: 9HoaioEuTqFrChHPmTcXzzvRoJfJso7u
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-28_03,2025-01-27_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ impostorscore=0 bulkscore=0 suspectscore=0 mlxlogscore=665
+ priorityscore=1501 phishscore=0 adultscore=0 malwarescore=0
+ lowpriorityscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501280073
 
-Hey Ackerley,
 
-On Tue, 2024-09-10 at 23:43 +0000, Ackerley Tng wrote:
-> Hello,
->=20
-> This patchset is our exploration of how to support 1G pages in
-> guest_memfd, and
-> how the pages will be used in Confidential VMs.
+Marc Hartmayer (2):
+  s390x/Makefile: Make sure the linker script is generated in the build
+    directory
+  s390x/Makefile: Add auxinfo.o to cflatobjs
 
-We've discussed this patchset at LPC and in the guest-memfd calls.  Can
-you please summarise the discussions here as a follow-up, so we can
-also continue discussing on-list, and not repeat things that are
-already discussed?
+ s390x/Makefile | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Also - as mentioned in those meetings, we at AMD are interested in this
-series along with SEV-SNP support - and I'm also interested in figuring
-out how we collaborate on the evolution of this series.
 
-Thanks,
+base-commit: 0ed2cdf3c80ee803b9150898e687e77e4d6f5db2
+-- 
+2.48.1
 
-		Amit
 
