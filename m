@@ -1,231 +1,230 @@
-Return-Path: <kvm+bounces-36759-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F97A20A6C
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 13:15:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57863A20A74
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 13:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C6D51669C3
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 12:15:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CA2C3A564C
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 12:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D611A7046;
-	Tue, 28 Jan 2025 12:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B06198E91;
+	Tue, 28 Jan 2025 12:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="L8/iQUN9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jvNDeJYN"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2052.outbound.protection.outlook.com [40.107.102.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164201A2C06;
-	Tue, 28 Jan 2025 12:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738066437; cv=fail; b=qnWZgx1q/Wa29GQ3awxv/zBA8puOcAFjLAex3x74OND7AFZ+QqTSYVzhEm5uqD2GYTcusfXp+br3b9ztj/heQ3GKxtgNUxWNyyPg94csWNRUSpq10j1UtQ2F5fJ7ThLCrzVxK+jj+QDPc8YVrSeySQZ6KKkkBcH75pGsUCyoZb4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738066437; c=relaxed/simple;
-	bh=CK+VtMOeY46MVI6oYANWDUeay+q6O2cePdZdXT+K5l8=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PrSohtnuxCJT32E3Op7KFNkJs2ypUfcnJ8tgelVYAMx9EtZuTdF0aYw2dv3C5kX2rQy4dyCKpZ2RLzGzcabWanksKnROxg4drN4H48GxRke8tyNda+vhw4MQGY++ObclsF6u3nJKTN/uqhQ8aYsjMopD59g7ZndDRYvLRvX7lKI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=L8/iQUN9; arc=fail smtp.client-ip=40.107.102.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EKDZze1Hu66WXvOl8pVE6H7Q0ONRXQTfhZoMQ08Sjuz7sGZSbQlFn/KR89HWiwxocybCCM7OLupGc4YBeE7LDP5Ib7lifTkOze0Pw9Lb2niNCb8m4nBhVQZ3f9LFmneaD8EVV/6bQexyONpG+ScMJWDfdOcHhVgIDnhH1F3wUdOAshY6QzGo9itDtq332ecIz4eDXuZY0JsF4SYA+i8bP45Hb8IcGNyGgPfgKfWbrjzSqaCnNigAvyBU7R7JSwjfrxcGH2B91VDm5KWTrBzl/H/xHBaMKvT6Ok0kqYphB7YXH2pU2/pkRbvopymej86APkbPl53kv8PALzaUfT5UjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=itc1QvToGoe+J9d2UwWhwo8C6yFjsoavWAQJrBR4Q0w=;
- b=LaaLHMMvo1UXqC21mZPgsmYAsaGForUzvT06eGJ8FdGiS5aB3iIKHPyLqJuJcmXmz/c4q4kINceqQmdrtKFDywGHuj1ETyErhYSVtojvMcyWbTVtCPurVXDF7hnbzCKBQU74xhnCfx3cndINKkbMnblecLzxNxSl0ep39kaFycH7HGkR95hOzG23dUJKW7EtyLMXjRqz6J4UZ4CM6+ZmHlxWQNca+CVJUkYRIPNBWbpTfPysUoKuriw1GV9LCQCP3PJkg13qmJi93fTXaiQMhcbL19aXcXAQuLFaBaXsy4dQzUtswQk8rg3DtwEsIZU/D1baFhI0QaIUtavCsFe7uQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=itc1QvToGoe+J9d2UwWhwo8C6yFjsoavWAQJrBR4Q0w=;
- b=L8/iQUN9XJDJxqy0y0fKm4b/yEDkc2SYynhTTYsYjIStSBxf63Xe3c0PLoWLATV6mWjQcUaDvUoc2P+KPlQAD2tnuaBZMR59OPFFhLyN69oTMHBHzTIfprvrRCi7m6FQhl11JaqUI0HleIqmGNnyOAOnA0EIiPLIdZDt5LluvJs=
-Received: from CH2PR19CA0028.namprd19.prod.outlook.com (2603:10b6:610:4d::38)
- by CYXPR12MB9387.namprd12.prod.outlook.com (2603:10b6:930:e6::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.22; Tue, 28 Jan
- 2025 12:13:50 +0000
-Received: from DS3PEPF000099DB.namprd04.prod.outlook.com
- (2603:10b6:610:4d:cafe::69) by CH2PR19CA0028.outlook.office365.com
- (2603:10b6:610:4d::38) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.23 via Frontend Transport; Tue,
- 28 Jan 2025 12:13:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF000099DB.mail.protection.outlook.com (10.167.17.197) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8398.14 via Frontend Transport; Tue, 28 Jan 2025 12:13:50 +0000
-Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 28 Jan
- 2025 06:13:44 -0600
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: "Pratik R. Sampat" <prsampat@amd.com>, <linux-kernel@vger.kernel.org>,
-	<x86@kernel.org>, <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <thomas.lendacky@amd.com>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <shuah@kernel.org>, <pgonda@google.com>,
-	<ashish.kalra@amd.com>, <michael.roth@amd.com>, <sraithal@amd.com>,
-	<prsampat@amd.com>
-Subject: Re: [PATCH v5 3/9] KVM: selftests: SEV-SNP test for KVM_SEV_INIT2
-In-Reply-To: <20250123220100.339867-4-prsampat@amd.com>
-References: <20250123220100.339867-1-prsampat@amd.com>
- <20250123220100.339867-4-prsampat@amd.com>
-Date: Tue, 28 Jan 2025 12:13:41 +0000
-Message-ID: <85ikpzm8zu.fsf@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD392B9B7;
+	Tue, 28 Jan 2025 12:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738066632; cv=none; b=NQScPcK6qhFFMumhYkoxKWHKNO3d681P83Wy49k/jf7v59tdozW/65PqQRekKuEhU93xTLy8FHrpIWCKselXpa+MRyfq8P01FzUIO8fjpTHn4ML6Cgrtf5Ml58/Y+XyBvqGEedlZA4x9Gauq0CvjWQIo00+89qmSBRJ6PYLsjKo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738066632; c=relaxed/simple;
+	bh=aPed4LKSjoWxpMGVoNy5sasqIn2K/FIq0hJuTdo35Ug=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rXCmFLerGT9XjcSmdKqjEJqrzZwEqqZ0rwaNh0YasuxGlg17AMCvyadGGJEJz5eqZ1LOEqcPDk7UVYlrc+aMjeOY+wwe0LwWY+P1moBhGdzOU5eTTFjMVQcX7jegiNzyrdItBgb0fvlI2AgBoGqNxdh4kOv5KNMZnMPYQOHpEwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jvNDeJYN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3AB8C4CED3;
+	Tue, 28 Jan 2025 12:17:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738066631;
+	bh=aPed4LKSjoWxpMGVoNy5sasqIn2K/FIq0hJuTdo35Ug=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jvNDeJYNrvbjkJk8xHGyWH8h+jOimMJyLhoQ0ZzeU7Bld7VjEPGHN80BIh9KvLvYc
+	 Sz4xJ97iDDPSi7kdzjj7NSj81g5cEf18laHx1CUGmJK1JxcZptf+6f17N5+kFYFPLa
+	 bK3Z4DWtmtwV5UGb1sbF5bp86x11yKzjUvL0DI5fgYF2ujqYTHE/J0j4hLbspGJV8D
+	 c9zWWejaHuT8G0fNGblIuCuuuDnoATZohhJKrptGwGLLo6PDJQsTOyCJbsU/0olLHd
+	 +XQUPYrDnbgKWzfJrrQF9i0g+1UqHqdNaktMUvZJ4ieXmCl5bMu9gJWgiv8Qk/VA+x
+	 RTEN98AyF66MQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tckWj-00G399-G3;
+	Tue, 28 Jan 2025 12:17:09 +0000
+Date: Tue, 28 Jan 2025 12:17:09 +0000
+Message-ID: <86frl3uo8q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Cc: "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose
+	<suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu
+	<yuzenghui@huawei.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Christoffer
+ Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni
+	<gankulkarni@os.amperecomputing.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Eric Auger <eauger@redhat.com>,
+	Dmytro Terletskyi
+	<Dmytro_Terletskyi@epam.com>,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Subject: Re: [PATCH v2 02/12] KVM: arm64: nv: Sync nested timer state with FEAT_NV2
+In-Reply-To: <87a5bb18j7.fsf@epam.com>
+References: <20241217142321.763801-1-maz@kernel.org>
+	<20241217142321.763801-3-maz@kernel.org>
+	<87frl51tse.fsf@epam.com>
+	<86h65kuqia.wl-maz@kernel.org>
+	<87a5bb18j7.fsf@epam.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DB:EE_|CYXPR12MB9387:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d1c99fe-3882-42e7-1ada-08dd3f953977
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Due0T+XMAiE6VvkKmehubJOYtImITBnmz2Dq4nPBsTVPOWshAA2F2tUw6OfG?=
- =?us-ascii?Q?A5dKYQYdo66GjQc/A1nghZQx8gC9xgYwdJDgakWqa2NI5luBtfi0Sry45JtV?=
- =?us-ascii?Q?gUvcfQu/lBnn3HG8P/vs+cJw9t2zcxgeYyHGbC8KWeOZdYTIAA67gJdR1va7?=
- =?us-ascii?Q?6n5rHSby5rtwlsVR1BB+P7BrTjl/09J+jLWdX1iSS2Ldih1tkgb+qGXZJOlB?=
- =?us-ascii?Q?m6th55YFO4LBYlE7ZtwdXe+SAfERnMi1N9lEalYGFXPMroDQqPkem3FAhggL?=
- =?us-ascii?Q?t2Z5GZDzzqKitrVm4nlxd+xWg6qI8NfculI+tuG8BUp5VcLW5X80AtNJb9rY?=
- =?us-ascii?Q?/y5z7txOOyLrJ2ITFEsfIt2beaS+mNiehnrc50AxrU/qnzoZ3jSxZNn+Ezxy?=
- =?us-ascii?Q?+ufAvkIouqMACmYEgpfXQoXPVX54OchUwwO3CDBq0VSS0jdb/6B4V9y3uQ4y?=
- =?us-ascii?Q?uDNedezomU59uD5GpnbVA5FIVwRfXMMYfiwTV9KrTsV1c6ecOnSaBw2R96Lq?=
- =?us-ascii?Q?oXZ1bUFXfmCwlzJMC+YNw+znxmHIh2iY+m3Z1qeSccEFrOtuKcG3MiIDBoCX?=
- =?us-ascii?Q?vCTyGL1LJ+scFFg+KIHgYD/RoLyuOUKFAAC796i9cceAQfk5FfEPF7eSRTVz?=
- =?us-ascii?Q?+PlbE4Ozwpdd7rBio3OSoV5J73xXsIIrTGCysQ5Rqpt99xFIyAycEl7PZjbD?=
- =?us-ascii?Q?mwqhjgwM3P+ZQJRUbKW4tPCWXJO98YQis2vNsI+PklVCS+D1F26FhUME0Af/?=
- =?us-ascii?Q?Z01uLbhe4tlW2eMVIKgQ0kytbYqNLh2Ondlr/1GA4vWjTAFmODsH4mNFn5sS?=
- =?us-ascii?Q?vcRwWJ0FUnRWCesECfX25DKlXXLOC06HJKz+FrloAO1I8tfTZvgeohhPqKf0?=
- =?us-ascii?Q?2Qs/XwYyA2G6BSj3puH04nSdhWA2VOGQbq2rI9bhG/lLe5Z8R87wovoPWe0h?=
- =?us-ascii?Q?BdlXGlS4YgYjZl2U3Hk6FBxPFQidmUX0AFVuYXxYr1Wfglx3rLDEHYytSqGO?=
- =?us-ascii?Q?4lUhOTClo/jh92dyzk1PRUeDICVAaxzuyLFBhC87e7cSIX+1GcZ+gglWdnBj?=
- =?us-ascii?Q?xvLeTgTdy20YjzT+Wwqx+ubYHaDNd8bF2XVWX/tL7JAsE/zXWfyMg0y4HURK?=
- =?us-ascii?Q?4mZqVDf3wKMFBvQ6zJI0nj+yDVtkz0tgLCM3mqVq6tEO21c7xDyfk/nuEWDk?=
- =?us-ascii?Q?6q9bxssKFdstRA0zUzE+0mbLUrRTMIL4lq7J8ULTcXbH2/xMzGT6Z4TABAKK?=
- =?us-ascii?Q?CM2vLcBQEkG7tHxjwMhW59LcV/a3H/CLPRmc4WbB0WQsUEfeHD/s6ak5nBph?=
- =?us-ascii?Q?Aw7+gMboxvQvSEZ2jHkE8CB8n2dPnCZxQ63cazuKCZlNXDGr/iHybmSI+8qH?=
- =?us-ascii?Q?Dpmi5oHS8mR4gDV5DxZdFASYOHzNVgEgsgDOTr6VDOKzNc3polS1WBpwNpo+?=
- =?us-ascii?Q?xM7cn2uc1IpVGz0lJ3hWipmYaJrGhhfH7ybWjWYCaE6ywRbf0LJDvbDMeryl?=
- =?us-ascii?Q?EG123Hvzo4T0BAc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2025 12:13:50.2168
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d1c99fe-3882-42e7-1ada-08dd3f953977
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DB.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9387
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Volodymyr_Babchuk@epam.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andersson@kernel.org, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, chase.conklin@arm.com, eauger@redhat.com, Dmytro_Terletskyi@epam.com, r09922117@csie.ntu.edu.tw
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-"Pratik R. Sampat" <prsampat@amd.com> writes:
+On Tue, 28 Jan 2025 11:29:18 +0000,
+Volodymyr Babchuk <Volodymyr_Babchuk@epam.com> wrote:
+> 
+> 
+> Hi Marc,
+> 
+> 
+> Marc Zyngier <maz@kernel.org> writes:
+> 
+> > + Wei-Lin Chang, who spotted something similar 3 weeks ago, that I
+> > didn't manage to investigate in time.
+> >
+> > On Sun, 26 Jan 2025 15:25:39 +0000,
+> > Volodymyr Babchuk <Volodymyr_Babchuk@epam.com> wrote:
+> >> 
+> >> 
+> >> Hi Marc,
+> >> 
+> >> Thank you for these patches. We (myself and Dmytro Terletskyi) are
+> >> trying to use this series to launch up Xen on Amazon Graviton 4 platform.
+> >> Graviton 4 is built on Neoverse V2 cores and does **not** support
+> >> FEAT_ECV. Looks like we have found issue in this particular patch on
+> >> this particular setup.
+> >> 
+> >> Marc Zyngier <maz@kernel.org> writes:
+> >> 
+> >> > Emulating the timers with FEAT_NV2 is a bit odd, as the timers
+> >> > can be reconfigured behind our back without the hypervisor even
+> >> > noticing. In the VHE case, that's an actual regression in the
+> >> > architecture...
+> >> >
+> >> > Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
+> >> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> >> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >> > ---
+> >> >  arch/arm64/kvm/arch_timer.c  | 44 ++++++++++++++++++++++++++++++++++++
+> >> >  arch/arm64/kvm/arm.c         |  3 +++
+> >> >  include/kvm/arm_arch_timer.h |  1 +
+> >> >  3 files changed, 48 insertions(+)
+> >> >
+> >> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> >> > index 1215df5904185..ee5f732fbbece 100644
+> >> > --- a/arch/arm64/kvm/arch_timer.c
+> >> > +++ b/arch/arm64/kvm/arch_timer.c
+> >> > @@ -905,6 +905,50 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+> >> >  		kvm_timer_blocking(vcpu);
+> >> >  }
+> >> >  
+> >> > +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+> >> > +{
+> >> > +	/*
+> >> > +	 * When NV2 is on, guest hypervisors have their EL1 timer register
+> >> > +	 * accesses redirected to the VNCR page. Any guest action taken on
+> >> > +	 * the timer is postponed until the next exit, leading to a very
+> >> > +	 * poor quality of emulation.
+> >> > +	 */
+> >> > +	if (!is_hyp_ctxt(vcpu))
+> >> > +		return;
+> >> > +
+> >> > +	if (!vcpu_el2_e2h_is_set(vcpu)) {
+> >> > +		/*
+> >> > +		 * A non-VHE guest hypervisor doesn't have any direct access
+> >> > +		 * to its timers: the EL2 registers trap (and the HW is
+> >> > +		 * fully emulated), while the EL0 registers access memory
+> >> > +		 * despite the access being notionally direct. Boo.
+> >> > +		 *
+> >> > +		 * We update the hardware timer registers with the
+> >> > +		 * latest value written by the guest to the VNCR page
+> >> > +		 * and let the hardware take care of the rest.
+> >> > +		 */
+> >> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
+> >> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
+> >> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
+> >> > +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
+> >> 
+> >> 
+> >> Here you are overwriting trapped/emulated state of  EL2 vtimer with EL0
+> >> vtimer, which renders all writes to EL2 timer registers useless.
+> >> 
+> >> This is the behavior we observed:
+> >> 
+> >>  1. Xen writes to CNTHP_CVAL_EL2, which is trapped and handled in
+> >>     kvm_arm_timer_write_sysreg().
+> >> 
+> >>  2. timer_set_cval() updates __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2)
+> >> 
+> >>  3. timer_restore_state() updates real CNTP_CVAL_EL0 with value from
+> >>    __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2)
+> >> 
+> >>  (so far so good)
+> >> 
+> >>  4. kvm_timer_sync_nested() is called and it updates real CNTP_CVAL_EL0
+> >>  with __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), overwriting value that we got
+> >>  from Xen.
+> >> 
+> >> The same stands for other hypervisor timer registers of course.
+> >> 
+> >> I am wondering, what is the correct fix for this issue?
+> >> 
+> >> Also, we are observing issues with timers in Dom0, which seems related
+> >> to this, but we didn't pinpoint exact problem yet.
+> >
+> > Thanks for the great debug above, much appreciated.
+> >
+> > As Wei-Lin pointed out in their email[1], there is a copious amount of
+> > nonsense here. This is due to leftovers from the mix of NV+NV2 that
+> > KVM was initially trying to handle before switching to NV2 only.
+> >
+> > The whole VHE vs nVHE makes no sense at all, and both should have the
+> > same behaviour. The only difference is around what gets trapped, and
+> > what doesn't.
+> >
+> > Finally, this crap is masking a subtle bug in timer_emulate(), where
+> > we return too early on updating the IRQ state, hence failing to
+> > publish the interrupt state.
+> >
+> > Could you please give the hack below a go with your setup and report
+> > whether it solves this particular issue?
+> 
+> Thanks! This is exactly what we needed. Your suggested changes fixed
+> both issues: in Xen and in Dom0.
 
-> Add the X86_FEATURE_SNP CPU feature to the architectural definition for
-> the SEV-SNP VM type to exercise the KVM_SEV_INIT2 call. Ensure that the
-> SNP test is skipped in scenarios where CPUID supports it but KVM does
-> not, preventing reporting of failure in such cases.
->
-> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
+Great, thanks for letting me know.
 
-With a minor nit below:
+I'll shortly post the fixes on the list, and would appreciate it if
+you could reply with a Tested-by: tag.
 
-Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
+Thanks again,
 
-> ---
->  tools/testing/selftests/kvm/include/x86/processor.h |  1 +
->  tools/testing/selftests/kvm/x86/sev_init2_tests.c   | 13 +++++++++++++
->  2 files changed, 14 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-> index d60da8966772..1e05e610bb06 100644
-> --- a/tools/testing/selftests/kvm/include/x86/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
-> @@ -199,6 +199,7 @@ struct kvm_x86_cpu_feature {
->  #define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
->  #define X86_FEATURE_SEV			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
->  #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
-> +#define X86_FEATURE_SNP			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 4)
+	M.
 
-Can we keep the naming same as in cpufeatures.h: X86_FEATURE_SEV_SNP ?
-
-Regards
-Nikunj
-
->
->  /*
->   * KVM defined paravirt features.
-> diff --git a/tools/testing/selftests/kvm/x86/sev_init2_tests.c b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-> index 3fb967f40c6a..3f8fb2cc3431 100644
-> --- a/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-> +++ b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-> @@ -28,6 +28,7 @@
->  int kvm_fd;
->  u64 supported_vmsa_features;
->  bool have_sev_es;
-> +bool have_snp;
->  
->  static int __sev_ioctl(int vm_fd, int cmd_id, void *data)
->  {
-> @@ -83,6 +84,9 @@ void test_vm_types(void)
->  	if (have_sev_es)
->  		test_init2(KVM_X86_SEV_ES_VM, &(struct kvm_sev_init){});
->  
-> +	if (have_snp)
-> +		test_init2(KVM_X86_SNP_VM, &(struct kvm_sev_init){});
-> +
->  	test_init2_invalid(0, &(struct kvm_sev_init){},
->  			   "VM type is KVM_X86_DEFAULT_VM");
->  	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))
-> @@ -138,15 +142,24 @@ int main(int argc, char *argv[])
->  		    "sev-es: KVM_CAP_VM_TYPES (%x) does not match cpuid (checking %x)",
->  		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SEV_ES_VM);
->  
-> +	have_snp = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM);
-> +	TEST_ASSERT(!have_snp || kvm_cpu_has(X86_FEATURE_SNP),
-> +		    "sev-snp: KVM_CAP_VM_TYPES (%x) indicates SNP support (bit %d), but CPUID does not",
-> +		    kvm_check_cap(KVM_CAP_VM_TYPES), KVM_X86_SNP_VM);
-> +
->  	test_vm_types();
->  
->  	test_flags(KVM_X86_SEV_VM);
->  	if (have_sev_es)
->  		test_flags(KVM_X86_SEV_ES_VM);
-> +	if (have_snp)
-> +		test_flags(KVM_X86_SNP_VM);
->  
->  	test_features(KVM_X86_SEV_VM, 0);
->  	if (have_sev_es)
->  		test_features(KVM_X86_SEV_ES_VM, supported_vmsa_features);
-> +	if (have_snp)
-> +		test_features(KVM_X86_SNP_VM, supported_vmsa_features);
->  
->  	return 0;
->  }
-> -- 
-> 2.43.0
+-- 
+Without deviation from the norm, progress is not possible.
 
