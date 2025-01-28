@@ -1,86 +1,91 @@
-Return-Path: <kvm+bounces-36768-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36769-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7218A20BD4
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:16:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB19EA20BD5
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:16:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3A1A3A32CB
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 14:16:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 380D9163F44
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 14:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10331A4F1B;
-	Tue, 28 Jan 2025 14:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902991A9B3E;
+	Tue, 28 Jan 2025 14:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="rVMol1jC"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="J5v2nEo4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223FDBE40
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 14:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A169E8634F
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 14:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738073787; cv=none; b=pw5qAWsGPrnacgL2m0GEkNXTkS7XiW2NVpg1gTFoflTJV2hacwljCzSXxj2wGq5SCK8l0gfu12jzsj+vE9zvmpFqluIq88Iyn1TwJEDmrdm57UNPQPnGhO95DHocxJ4Fhk6Nw1LeV+A8HJnwgqZiIoGG2HEzcWCD5X9ipqnnM8o=
+	t=1738073788; cv=none; b=G0RMzS0n1KBDSw4I/Tc4aQ9NPsYV4Vf9ZLlp7j4Pxb/kB6nppa55UqNCk1TZz79i1tO3vdqvvaPhPsob/TLDomhbhZ34otHW8IfHdw2usOTH8+dlyEZmOZ5Rp8btddPhnQfvqkO/Ydij8KTBMEX5odDSLy9shrBtBFRmD80lkrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738073787; c=relaxed/simple;
-	bh=nV5yvxOXL+Dmgbe6958RbHxwS1sRYWqTC6dMuwDr3GE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nmT1CBy/lCF1SVFiKoyAnNWKbQvmV8vo1FVngD67z5nXvrZLDU/10QRQCWcJD/Hjqy+W2z57al10HXBuO5HEDrpaMIu/bW++7mSV7LT+9DJgUlKgJkGAMoD2RTkErYzP5yK1IO5g90N/sGErDZJqWSHJVqZO8nJCIbc6AkQjtRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=rVMol1jC; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1738073788; c=relaxed/simple;
+	bh=sjFLyabBDgZlsc3lyCvmXRf/d4+M+iAIhC5ZjieuXjg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cg/w+Cxq1/ra+687um0zK2YelOXurteXqmbKr+QhYcc06svV+OlPbbPSe2eyam15TE5UGfhuqEOtq+mGjzsqy7uYnN/HCcNYx+m/gD4GrRLye7WuoquM8QAIwwZIjvzpyyXtSD4Qr8EIbJ2md1LNh01rTjPI0Aq6Zoy2/OD8ZBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=J5v2nEo4; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43690d4605dso38456975e9.0
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 06:16:24 -0800 (PST)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43618283dedso60297855e9.3
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 06:16:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738073783; x=1738678583; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=affeeBrgh4ORX38d2oGXA54lH/oPzlNyTsePW0I63Z4=;
-        b=rVMol1jCFgbbbUBXp4fjJNB45V4vF5YZ1bzwNiGow/tRkggg8FXhdvBasT5ZCwKsmo
-         B3Bsa+WJdA7KMHMh/VIyDrmR72006PLj7NkoHszBJIKZ5CHXwz7dUZPt3qr1IoiTD4AI
-         QWorBWdZaoshpb08i1mxQ0XsxkpcuO1rKch9zPhofYVTbBOKVxPS8EggGQlbzUUp380N
-         yrEgGwhQ6pMDh9Hl3THEZ70/kkL4G1u758zfkeWKzp+Yp43TAsCpQvHrEZi4oyiPd41E
-         w2sJaWpmfPkuPaRZwun76kKh6Re3+swboRmgHYg8o7QYlL6kBwuvvZfeEu+jHlRqTv+g
-         v7lA==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738073784; x=1738678584; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oXZJcyGHTstiDftWq4K40v7tOXTPcWP1rruCYNo4KRY=;
+        b=J5v2nEo47g/HpkRu6vFtWJ4SheW7pJWSxP5ojgeaH39IPATkp2CV30ZwmF14+DhjxL
+         zW/Q/pDP0X+u3BuoTXlbUvdONuXQ2gNDVE0wVk3MuJvMPFhW9MVhI6qNt9tkOZPHtuee
+         l4erim4ZTcUrZ9k/0ZFfDlfGugMww/G5zZVefUbWTXGZX07sTJXpBw4l3ytH6tHplfTv
+         MYcfFW8jDCwxYGkU1p70P0cE7jZRKUozA/ZsRug1eXKD22cfeyi+sifTI9XxY1Ql/est
+         ZCN1Kxp9LENc3wWZ1VGlL14sfLpcYShJrP0JcLNNPM/3IlAUa7lTPQrrogCUsGIo5sfz
+         5Y/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738073783; x=1738678583;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=affeeBrgh4ORX38d2oGXA54lH/oPzlNyTsePW0I63Z4=;
-        b=QG9f4v96cZKcRUBvchxnGthFH7Xk5NAKHtQIhebsog6dlHYdeaiU4W/eDrPH/JLDV9
-         FFrenq02bCzgeiJh9bBAHQqriPpSYwSm2W2+rAoEHBtHnhNEQhWitUMi/QIpsk43KWk1
-         3uE8lt5dLMDCm7PBvkTbIPPdO4r3aJe67jCt7hQtC7vq3pVYYsDzuI2s9Ck6aHFJoUU8
-         4JHc4GsIBGVPbSXE6BRySlD5L3fc3WzcRd7L/5UQeYZDncql8EIo6AILqBrF47c1Y/AD
-         ZckrR+lKx41douo+XnjDUjnsLAq+Hc1pzkjR/4nQN89JcGoQxg41q3J4dvbItCLbpp9+
-         05pg==
-X-Gm-Message-State: AOJu0YwVzMREvSNDWA5wCoDrFAY5jq/+RpRDp/qF5ArGpdNVxnvCudzM
-	qbj1pWcC9kjNH8z6owKZCtLa6AZp+VFhENbputT96/OYEpgbEl97LNLGRuVOhWXDrcI0pS6ylXO
-	F+Io=
-X-Gm-Gg: ASbGncsUPz4o6gW2QzA7aHpQ8NJqR7BAhilW/LF7SRj0lMp2/Gjhmc816EExVc7sOvn
-	8cGOQMSozfeS20tKEJVDTRZy5nvHNiQss8aJe1BAlCrkWcKNCdlsn4cIMBwOHDvYhl2U1Hm2x/a
-	Vs4fAExXVwVuZ76u4Tm1+6ji5K7caXGXKmWudP+oXJnoataMMcc+pL4cPGVtV6dBMG9qtFTwUTH
-	poZ7Y/icyTn0hzwQ5g1GapC1BWv7bROVeWCaN8d8fuUJ96RlJMJwmB9RbPzfCf5g7uNr3TG9X7N
-	j7A+KTA0g3Wxzlnu
-X-Google-Smtp-Source: AGHT+IHtVj6Pq44tPaAWtdP99xnUKZD6nDdtqS+LHs53TT7+RI454gvtIJUV4uw4jyVc1HKtWOIXhA==
-X-Received: by 2002:adf:f402:0:b0:385:f7a3:fea6 with SMTP id ffacd0b85a97d-38bf56628f0mr33487958f8f.13.1738073783085;
-        Tue, 28 Jan 2025 06:16:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738073784; x=1738678584;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oXZJcyGHTstiDftWq4K40v7tOXTPcWP1rruCYNo4KRY=;
+        b=bEPHZ00FUwr5tUQ/kFJmw88zkDM1b7r2yeqHcanO9zkdIY0/H/b4hY05ffRuIckqtJ
+         1q8P4+wMgjk4mmzKG/AkeoIYCXT5P4rcC2Iy0U/UbjPl7OMsBqu55oY0MZwSYrgOOpQu
+         MWiX0qKRs2MpBaKxG2BdXIjUFl7YZ/GsTYRVMez94F5APvUqdt/BKMk5vw9U6JHWDMuX
+         UDTRnWaQ3SqVzXVqc8x2gnfSTPS8rU6uuKui9/tZdDLF3bgcIKUqwoWzaCYVUA/j94XQ
+         UfsHFgcVlcbiL2lOaK3RXrTY7jFCrRrYBbkfOB62zr1oHiJtfg/3uEg2KdfA1ZX1ISDA
+         UGBw==
+X-Gm-Message-State: AOJu0YzfqzcmXVzAYJ0sFFThsIymJpYtGEAyrjRIQQhxi3bhtc43N4ax
+	CsHQmzu19M4aZ8RsVnzGs7bRcpaDmFxp27iTYfy7i4BnpHLb2abunLBaiXlztdK1Ww6Pci4r81w
+	fYS4=
+X-Gm-Gg: ASbGncsSaEPyXGbqJIWJNVYyqFFLPvmm2XifHAjer+vmfYqoBLzUYhOy6X6snIBorzz
+	3fFkiM2+m+/gEU4EE/4l3OhBEmqF3LyBzFzXk1HTaUKZyreMLPukiRTXR12WBXh5jCKf0J4fFQ1
+	HuI3Sut8M4hRVzEncm3m9Hp8MEmnSrqyfGzlzLWAfevlegVwMPf/Rv7OKZ15u6QwirD9BXXwppb
+	wAxR54bkmPOLIiz4+x2IBpc7ClwR06sqKXfKZ7vGMDAupPxy0QUyngkcqIpOvAHYx++30tpoqkn
+	F6Y+RnKkYIMayL3m
+X-Google-Smtp-Source: AGHT+IExkAsT35CibNqnfvFyENC5hhiY7L+ALKdkPXj3RJlFXYg67HOTL5u/M3wiW36Bk+dA5lPp/g==
+X-Received: by 2002:a5d:5989:0:b0:385:f6de:6266 with SMTP id ffacd0b85a97d-38bf566f72cmr41616295f8f.24.1738073784041;
+        Tue, 28 Jan 2025 06:16:24 -0800 (PST)
 Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1c402esm14435772f8f.97.2025.01.28.06.16.22
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1c402esm14435772f8f.97.2025.01.28.06.16.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jan 2025 06:16:22 -0800 (PST)
+        Tue, 28 Jan 2025 06:16:23 -0800 (PST)
 From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
 	Andrew Jones <ajones@ventanamicro.com>,
 	Anup Patel <apatel@ventanamicro.com>,
-	Atish Patra <atishp@rivosinc.com>
-Subject: [kvm-unit-tests PATCH v3 0/2] Add support for SBI FWFT extension testing
-Date: Tue, 28 Jan 2025 15:15:40 +0100
-Message-ID: <20250128141543.1338677-1-cleger@rivosinc.com>
+	Atish Patra <atishp@rivosinc.com>,
+	Andrew Jones <andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v3 1/2] riscv: Add "-deps" handling for tests
+Date: Tue, 28 Jan 2025 15:15:41 +0100
+Message-ID: <20250128141543.1338677-2-cleger@rivosinc.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250128141543.1338677-1-cleger@rivosinc.com>
+References: <20250128141543.1338677-1-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,41 +95,64 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This series adds a minimal set of tests for the FWFT extension. Reserved
-range as well as misaligned exception delegation. A commit coming from
-the SSE tests series is also included in this series to add -deps
-makefile notation.
+Some tests uses additional files that needs to be linked in the final
+binary. This is the case for asm-sbi.S which is only used by the sbi
+test. Add a "-deps" per test variable that allows to designate
+additional .o files.
 
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Clément Léger <cleger@rivosinc.com>
 ---
+ riscv/Makefile | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-V3:
- - Rebase on top of andrew/riscv/sbi
- - Use sbiret_report_error()
- - Add helpers for MISALIGNED_EXC_DELEG fwft set/get
- - Add a comment on misaligned trap handling
-
-V2:
- - Added fwft_{get/set}_raw() to test invalid > 32 bits ids
- - Added test for invalid flags/value > 32 bits
- - Added test for lock feature
- - Use and enum for FWFT functions
- - Replace hardcoded 1 << with BIT()
- - Fix fwft_get/set return value
- - Split set/get tests for reserved ranges
- - Added push/pop to arch -c option
- - Remove leftover of manual probing code
-
-Clément Léger (2):
-  riscv: Add "-deps" handling for tests
-  riscv: Add tests for SBI FWFT extension
-
- riscv/Makefile      |   8 +-
- lib/riscv/asm/sbi.h |  34 ++++++++
- riscv/sbi-fwft.c    | 190 ++++++++++++++++++++++++++++++++++++++++++++
- riscv/sbi.c         |   3 +
- 4 files changed, 232 insertions(+), 3 deletions(-)
- create mode 100644 riscv/sbi-fwft.c
-
+diff --git a/riscv/Makefile b/riscv/Makefile
+index 28b04156..5b5e157c 100644
+--- a/riscv/Makefile
++++ b/riscv/Makefile
+@@ -17,6 +17,8 @@ tests += $(TEST_DIR)/sieve.$(exe)
+ 
+ all: $(tests)
+ 
++$(TEST_DIR)/sbi-deps = $(TEST_DIR)/sbi-asm.o
++
+ # When built for EFI sieve needs extra memory, run with e.g. '-m 256' on QEMU
+ $(TEST_DIR)/sieve.$(exe): AUXFLAGS = 0x1
+ 
+@@ -44,7 +46,6 @@ cflatobjs += lib/riscv/timer.o
+ ifeq ($(ARCH),riscv32)
+ cflatobjs += lib/ldiv32.o
+ endif
+-cflatobjs += riscv/sbi-asm.o
+ 
+ ########################################
+ 
+@@ -93,6 +94,7 @@ include $(SRCDIR)/scripts/asm-offsets.mak
+ 	$(CC) $(CFLAGS) -c -o $@ $< \
+ 		-DPROGNAME=\"$(notdir $(@:.aux.o=.$(exe)))\" -DAUXFLAGS=$(AUXFLAGS)
+ 
++.SECONDEXPANSION:
+ ifeq ($(CONFIG_EFI),y)
+ # avoid jump tables before all relocations have been processed
+ riscv/efi/reloc_riscv64.o: CFLAGS += -fno-jump-tables
+@@ -103,7 +105,7 @@ cflatobjs += lib/efi.o
+ .PRECIOUS: %.so
+ 
+ %.so: EFI_LDFLAGS += -defsym=EFI_SUBSYSTEM=0xa --no-undefined
+-%.so: %.o $(FLATLIBS) $(SRCDIR)/riscv/efi/elf_riscv64_efi.lds $(cstart.o) %.aux.o
++%.so: %.o $(FLATLIBS) $(SRCDIR)/riscv/efi/elf_riscv64_efi.lds $(cstart.o) %.aux.o $$($$*-deps)
+ 	$(LD) $(EFI_LDFLAGS) -o $@ -T $(SRCDIR)/riscv/efi/elf_riscv64_efi.lds \
+ 		$(filter %.o, $^) $(FLATLIBS) $(EFI_LIBS)
+ 
+@@ -119,7 +121,7 @@ cflatobjs += lib/efi.o
+ 		-O binary $^ $@
+ else
+ %.elf: LDFLAGS += -pie -n -z notext
+-%.elf: %.o $(FLATLIBS) $(SRCDIR)/riscv/flat.lds $(cstart.o) %.aux.o
++%.elf: %.o $(FLATLIBS) $(SRCDIR)/riscv/flat.lds $(cstart.o) %.aux.o $$($$*-deps)
+ 	$(LD) $(LDFLAGS) -o $@ -T $(SRCDIR)/riscv/flat.lds \
+ 		$(filter %.o, $^) $(FLATLIBS)
+ 	@chmod a-x $@
 -- 
 2.47.1
 
