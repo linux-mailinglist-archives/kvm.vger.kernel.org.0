@@ -1,342 +1,187 @@
-Return-Path: <kvm+bounces-36742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B88BA203D8
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 06:07:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6D1A203E4
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 06:11:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 968601883101
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 05:07:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F4A23A6CA8
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 05:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4391F9F40;
-	Tue, 28 Jan 2025 05:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A5616D9DF;
+	Tue, 28 Jan 2025 05:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="PJTolUKc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lLC1JgbC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2088.outbound.protection.outlook.com [40.107.92.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97671F78F2
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 05:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738040427; cv=none; b=NDVzFy0squzw0ei7oTj+zwFpOjuD4/fIzuQos68QzYBbdJ2b5SvRkbs+K8NEUEOovSUBto9p4bVtzFCienGg5BS4zitzSer6C7n652JQJvw/hfjpEElNbL5XSmnw0IPsYICzVyaxMsUfKJZZu2yWy55rOUdZjCKe4guC9SMi1MY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738040427; c=relaxed/simple;
-	bh=qQi0qEa37wtz3k1Q8ux7Swe3fgMMiffA1gVEdLrkUVs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gQy0wFbBeTPUf5JxaOyvT2AqL5W+JY6M6Kui/f3xG6PnUtOhVG4nKB3pHQNdaGBS1JPTTpmtvJgGIb8L0StDzJo7KvVPkudcpUP6TI4XV8awQtFDzityg7H8cT2ltl999n+6buj00NeBi7LvF2j/FwEKrfAgYcvp/68p7EUImts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=PJTolUKc; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ef72924e53so8918155a91.3
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 21:00:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738040424; x=1738645224; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LjV/iWQ7Q2hesd2gulek6pUTfHIp6aO/uFRo9yx7LyQ=;
-        b=PJTolUKcUIKIX1nJR0tPD1SPJ5KFTJZ4R+CtU+rQKR4nLpC4LkuakkUTRDtkDH6w6G
-         KCc9u2QyYDaESzQyJ5QGT5njpvaZ1p0hQqJcKzRGJXIdc9ArPbJ+qH3tnYiFmG+pEA1P
-         HYWpCWj7s89WBzBYLfCGwBXwiZBTM6o9o/hKvDpqJbGvmmTMO2JGpI+BYvKm20wsLEnL
-         vN0+NBz8OCaR94MB1Vm/N+dzLc59NIZJK/FJemBTXe0tcdI/5adwhj4USy4O/yzBt73b
-         4+GmZUqEO9N8IAXeoRRMybzh7KDZqvhuEcn4reSJ8YsntORtwfldo/8TmDP+s8rpruCY
-         ojCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738040424; x=1738645224;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LjV/iWQ7Q2hesd2gulek6pUTfHIp6aO/uFRo9yx7LyQ=;
-        b=XCVQ9TnXmFbCZA45HghwCK4V2ot9v2mhrRrS1oQusqeYFbXuAlMVNtl4nB76Shi0Gi
-         cEsAPrajNR+8FmSzsWwdqR/oPildaOEmJfsjRbqmwisr4uj1G7ambVcfdjn9LZ+BRMBw
-         B0YDWguk1EdEcduPWYVY7SwxO/dmOb2M6LW2GSBW39mnwEF6qJ3jHxW1AC7dVZKozTm7
-         Dw2TxcziVkhlfGNxjKsl0R/94EaHAdktJW5JHVnr6dXX7Cm72C9m6Ak6mSrIcCL3fgYW
-         M/SMoruisj/B01C4ErEaYc3VNybZDS1KwU8r9ZVP8R/Yjmc5LCcVfRBV5tZ3qcGQhQr4
-         QjmA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0m4k1usBfLfaC19iIrVdwaukr57kz0c/ioLsTmsIjD02a3lSc9f/kgkgSuxFRT71BHZQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+V4Lul1UYmXMVsUApF6/hqWQISx7qofxb8CgkNZ/PI82bPHvv
-	rFgmiIBY1yj9cVhJLIbO9lHp3IeKrT3gexWaHXJ1S7J+a6vtpAle3/w0Rc9ejsw=
-X-Gm-Gg: ASbGncv4Mc8WIsRdt77weHFvTX8oid9ODStD3YFbam2PQIu3Z03G+guK58PRTB/2K/I
-	G4HKF7sFnysasUET0SoVoeoJbjAtoliNsQ2ZNrzFYeWQmZU9pfxMUVNyt4tzZFFpAnPAm0Bef4I
-	gHcQnCIC6v+i2u++s4JwSpJfxTu5PIHqEEqqBo3fOihrEc8b9Ih5vsCtSnwtTCWOkjxjWhIKL63
-	jxQGDNqoErlfh1Ht8hbwzIs07EQpghlMfxqAHMF2bYkU5+RuCvvXNrSvCdUSDeIN8U1YnUimYwN
-	BvEuCY4/uypa3Zet0Zj9cs9uFruY
-X-Google-Smtp-Source: AGHT+IGOAZgA0dz8eD2csPoThFjQZER6Uln5MypmpaxpoJZWqUdrQc0LE0Me50Jicwc67XjG2ADTZw==
-X-Received: by 2002:a17:90b:2d88:b0:2f2:a664:df1a with SMTP id 98e67ed59e1d1-2f782c628bbmr68345574a91.2.1738040424030;
-        Mon, 27 Jan 2025 21:00:24 -0800 (PST)
-Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa5a7f7sm8212776a91.11.2025.01.27.21.00.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 21:00:23 -0800 (PST)
-From: Atish Patra <atishp@rivosinc.com>
-Date: Mon, 27 Jan 2025 21:00:02 -0800
-Subject: [PATCH v3 21/21] Sync empty-pmu-events.c with autogenerated one
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3080C3D6D;
+	Tue, 28 Jan 2025 05:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738041105; cv=fail; b=eXy8WbIyN54rI6tHJdMmcvRWvsnj16vKCQO1ucIGu0cXS/mZDkDV1aHdon5uA1++YPzVcRn7gLdZ447gcrgNqe56vW13kTS85+oh+tYUYI3mQrO9rQMfE2wkIIP8HA+b7rXm5smNXUHCuDliHbDXv1KUDqusjjFKK+YO7uOddxQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738041105; c=relaxed/simple;
+	bh=v0k80cf6tot479J9cdH+3nzQbbB8lHCfv6hutQw63xk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=q2dHbimNtNwo6/POxacqoqCvtqWVUXaW/W08HJzuOrCHTtOVrWy4/dw8AqpX3JmCTuaefEYTzqfIUe4lgEIe4R+g0b3eQyUCfx2w31mlvXCocBkqrsRvMvb/9ng+hzsVwYlWdQz6GBnths+QSeIQbVEJ9dQK2dGnwmL6gVnZmks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lLC1JgbC; arc=fail smtp.client-ip=40.107.92.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=H+jb0sBO8xPXLxA8PyshJFvSGWkDWIsm97R6LOEQ4rrnZH2VoZ1pi54iufB3KpTVKJ4vq4n4fR0/nwPCgJfJWvJftd09sKysOdjKvqoNIXpTIuqEquKudztuttYCBRjv6gt9K9QSlGMijLQ5atfI5JUm1NM1Gr9Ul7+EB0vJLLQijJrzI35DBcYgCIU8r6xR/J4ecCwV3bw1x2UA+VvVPw1cATLPigUDRaW0UF43wFB7EibezK82LDU2nUHMo6lJl4Kvvjulai1KsSG4w8LpzcnqiAgg8k66VvdRGkFXbyKk/DB2m6YuA6JjS4wq6u6Hk5qBvH5YbiduDXNgjGpdBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v0k80cf6tot479J9cdH+3nzQbbB8lHCfv6hutQw63xk=;
+ b=dyYWUa1+CSHlH6ioRy2i+9e3lL8a5o+oAri22cZADToNybc2K0m9cfEeQ4r4tE08Z4ZH1sHUugH9Q9OZ/wxyHxOmfSscvutd0Q0aQ0XByoe6IJpIzvQfYoleQC7y4NVRC1Ma0kCU7PHxboKfuzlXk/5KEZZm7UL7dPrHS9gQcoR1aSEXhKHBdGhDvkyP9liRrvBOdPaFmaVcgq03HGWijU3h6lKjQKsBWcR9BvEmLgYuQw4IDSv66D3zZhphkGDtAzh4Ry/0s3w/uaf4/KbNQclLY6qF6AxwA4GQAICKURsjVCE0fxbwyZIoHNxBv3pcHhY7LSdwOnFxpsikl0YeJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v0k80cf6tot479J9cdH+3nzQbbB8lHCfv6hutQw63xk=;
+ b=lLC1JgbCNbgAfAZ4ydEI3HYHmIIJ3CljhBYu1TGv2cFM8AAQTY/U9A41ObZwXTnpiEY18XTMTu/I/kqbckldgXGAaLy8ByYOKnkJ0R+h2HJGlJ/QYxjkYkqP0Ns3zWyvM4NX3WHD3Bn5t28v5U54Vr7zC4dVc5RCO+c3RzXsxdj7AD2kEF75JiGXvag1rNnmu78MOpLa/ZZ2zZ/Z7PlvnVmnUKkB1dM7rVBPKlIoT7cXc36nG9DmeY+3xbAwdlGne/J/bTHm/JxWgfindjIXLkND/SaR/6FJ5MIPsT64YSwRLynVnaE4TZOp70pw/f9uROOXMs/xpjrx/mcEL0afhQ==
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
+ by CY8PR12MB7489.namprd12.prod.outlook.com (2603:10b6:930:90::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.22; Tue, 28 Jan
+ 2025 05:11:41 +0000
+Received: from SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::ae1b:d89a:dfb6:37c2]) by SA1PR12MB7199.namprd12.prod.outlook.com
+ ([fe80::ae1b:d89a:dfb6:37c2%5]) with mapi id 15.20.8377.021; Tue, 28 Jan 2025
+ 05:11:41 +0000
+From: Ankit Agrawal <ankita@nvidia.com>
+To: Matt Ochs <mochs@nvidia.com>
+CC: Jason Gunthorpe <jgg@nvidia.com>, Alex Williamson
+	<alex.williamson@redhat.com>, Yishai Hadas <yishaih@nvidia.com>, Shameerali
+ Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
+	<kevin.tian@intel.com>, Zhi Wang <zhiw@nvidia.com>, Aniket Agashe
+	<aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, Kirti Wankhede
+	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Vikram
+ Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>, Alistair Popple
+	<apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>, Dan Williams
+	<danw@nvidia.com>, Krishnakant Jaju <kjaju@nvidia.com>, Uday Dhoke
+	<udhoke@nvidia.com>, Dheeraj Nigam <dnigam@nvidia.com>, Nandini De
+	<nandinid@nvidia.com>, "Anuj Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v6 0/4] vfio/nvgrace-gpu: Enable grace blackwell boards
+Thread-Topic: [PATCH v6 0/4] vfio/nvgrace-gpu: Enable grace blackwell boards
+Thread-Index: AQHbbo41cWLD0OKF3Ee4eDlCHNik2bMrdJEAgAA0Q7M=
+Date: Tue, 28 Jan 2025 05:11:40 +0000
+Message-ID:
+ <SA1PR12MB719929B8ACA6D39B1D2AC8C1B0EF2@SA1PR12MB7199.namprd12.prod.outlook.com>
+References: <20250124183102.3976-1-ankita@nvidia.com>
+ <2AF42909-144F-4864-BC87-64905AA0FA04@nvidia.com>
+In-Reply-To: <2AF42909-144F-4864-BC87-64905AA0FA04@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|CY8PR12MB7489:EE_
+x-ms-office365-filtering-correlation-id: 58ac7e86-8da9-43ef-ee0c-08dd3f5a4000
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?WnDSbizksrridPZUj1WziYLKYGKDv1xFVtIhIZKc9Ujc/cNwRyjEVO/ALk?=
+ =?iso-8859-1?Q?dtqZh5fGnebkbwKVcO+SJ4q2xDNE4Xg05Z0KNCFDeyGjshAM1Rb4vZVqpm?=
+ =?iso-8859-1?Q?LmBEnNFBj1puXIzgdvmOqdZFlKpoGF0NI8q5rU2s+Z6untH61hUQHGTbbM?=
+ =?iso-8859-1?Q?5ca66t4xhqTV4WL5kB0jewefICZPxN1lbf41KEKdOqkgO4SoyxU6zae5fE?=
+ =?iso-8859-1?Q?1mhDU5Sw8ugkglAOWLHrt0yYsaOC5pvxQUQG+bCnp2qjs51zOoVey9MmAG?=
+ =?iso-8859-1?Q?I9BJAO0GsN0qzhazy4euzAZK83a9e01e8u/iuI0Tzc1hAU3wEn0mO35xdP?=
+ =?iso-8859-1?Q?HMYn00nZa5/qaIoOK6rjwqTDPFqtVvCTzpT8SWGvjVVrQ0zRAMA4o+qFuY?=
+ =?iso-8859-1?Q?kdf0ii9vGph63XbWF9KQb0aaDqTubnRTdWhUsOwwaxqZFnrOQVdhjUJRiJ?=
+ =?iso-8859-1?Q?ekWWHHi4ga9jh2NVfQ6+rIuf05xsyd0QjdQBUQsLv3QUpEcWelJ3ceqJvV?=
+ =?iso-8859-1?Q?pl+tEFv1uZSWEyl3hEoLuaErgAJ7A2iUtsttd7/p08xFOZY3/Q9zFpBGB9?=
+ =?iso-8859-1?Q?YGBgCIeawJ5cOwwCvN+erROJMwuh15KQ66vBA/abAkGYnpDWKmmNJg1BU+?=
+ =?iso-8859-1?Q?csF+gGNIJg415909ewCIZwCcP/thFVH+sCQcknZBlJs2DcPaqPzwgxofBb?=
+ =?iso-8859-1?Q?EtkHpZM9jKB/cvzV7qWV9vlLXdRKm9d5owGMi9XWcOdrXzBJfO7RjR8Zej?=
+ =?iso-8859-1?Q?TSzXqV4cVna7xtaP5SvLcCYyqjYdrtRFLjgup8/ZC5iO035mTp6m3Hh4IN?=
+ =?iso-8859-1?Q?hdsAku9fxiDL8uI0KbCJclWvBj5Wax1aRoa3dH78VVEAL761O62x9broME?=
+ =?iso-8859-1?Q?SW9BScwD7uh23w114H6IJRW/5KbToIEIDQGKYT84adzDBr7+62j3DHPuLW?=
+ =?iso-8859-1?Q?b7ixnnaj/KzwtZfW13VLra7Um92hjOkP8HbpsubJVkNx0nbH55pAziOksf?=
+ =?iso-8859-1?Q?2zRUrHv5BmcDTAg6ckj9cx+DQJEaop//3tYxI3yAfvIwKLJl0d4KWObDQi?=
+ =?iso-8859-1?Q?/2RPhjqLb7wZOGq1nrJb66Yi3BPfzwiHdhWIH+Ahb7Wn0Jof7H02hS5cy9?=
+ =?iso-8859-1?Q?NMYrAF8pUJrL1QR2K8VuNjpDpaPcJ88aZrWz3TKRf8APdPDqgO4b9x8zJc?=
+ =?iso-8859-1?Q?T7kD/xr34LereoaPHlKsa7ZcgQTgMce82n12q/HrH2bt7LJJqLqLpB+ilA?=
+ =?iso-8859-1?Q?UxLhVpyUBpF8yGEk9SzD4QUszDp386MhMshALC6T3c6sA5Fwpac5MRqz1s?=
+ =?iso-8859-1?Q?wgPj0v9vntN+JOfNCnD9e/3KxRVHfSzS5w1g+iIOppLKVgbQFCkpt0Rz/C?=
+ =?iso-8859-1?Q?B6c+Q9q6SY74NSwY7aunm9X1/KA43zEQHjkkaXJDMS7vL0dAQyMqC5dBxK?=
+ =?iso-8859-1?Q?njAB83+IWUyNqjIq9oT0YUsyp4Pril3EBx1k1QNAE0j9IS57xfWreF0fqI?=
+ =?iso-8859-1?Q?c299QAp8ou1ZZv7od/Ovdw?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?J3bCK9B0sewF8s8yC9CxKT/sGJwTPjVFZgg14vZTYhJiusQ3w8L1WYAwjQ?=
+ =?iso-8859-1?Q?R0YSStT8GheCEpsihwJA2yClJQ1+NqwA2US/FUVtIbX1nT5/O5jQdFcl3s?=
+ =?iso-8859-1?Q?+PzMe9bVwmdC2wiHTDjTuaKHFVSrSicQAHEwDkXDdCvNF9enYZ/c3Bw15x?=
+ =?iso-8859-1?Q?HwfhM5ct3Hrf8E88ekpxzQFn4Ti/Tid+QStQzSVvO1T1uzQ2Jqej2q2aLS?=
+ =?iso-8859-1?Q?W8iV7aFZjCxMUK5emeuM5zv3SLxMCfQBEB/UbkYPcamK0AsPYa9oGp2F2K?=
+ =?iso-8859-1?Q?TL0U0tAM12LUl2oN8IKP6hwvs3bk3RiIrRaZwhM8Oea6VdzvNhE3Uwtx1P?=
+ =?iso-8859-1?Q?pQ0FjT8bjFBoAi3kKKZKliayB3OexO8zRm5OuT+lLSSckhfBsRf3gdXSQ2?=
+ =?iso-8859-1?Q?D/68GS2J+UEkI/6MXovq8QYGeg0bNdJS1lqMIQfLvU9v+SfJvy3sty7ocl?=
+ =?iso-8859-1?Q?sM4MUzTOF27KMgMT4qNXmQ9L4SzoAx2FkK7NKmU8k0tWXDTh++Jc3dwQRL?=
+ =?iso-8859-1?Q?kB4lQxtSDykejxt7v8jbp585JAF6LLHqTTUnQIaTyZ92FBdWmv+B70mXf9?=
+ =?iso-8859-1?Q?gkwBoPKWV0XZq1Cp+QcCvhmk76m6Wf/c2sfF9ojnqAcUkbvwaODXkCrwKj?=
+ =?iso-8859-1?Q?PY/WU0wroXPWxrOypI1/wLmfvCX5ClZ5bfOav6wBU0VRe1J1Mhnjz5/SU7?=
+ =?iso-8859-1?Q?LR1fqQUx+k/l/9RvMN+3MFMhqcnclS5RtXwqFdtVVcxjEjt/VO9JXlb5Lz?=
+ =?iso-8859-1?Q?nUK4cXt6qYJ139pcPaCDDf9eIlKkNOtNFXOS3GAo7NP9xn1qxzl0Ti6Ut5?=
+ =?iso-8859-1?Q?vCGjxy7f9dS9dAfLR4Tguq1LQb/SsIgXNwyni4mHUpuRQ+CxpmH/XOj+AK?=
+ =?iso-8859-1?Q?INtjwDsVUrlGDz6bsLdgEqyqKYPvVzAUmASz0R6DqdghsCPfm6/N5v7OV8?=
+ =?iso-8859-1?Q?Fy6OHCbqBEJYdpYqSQuS0nxt3okvdNdK/ToD2o/6MAs5nP9pfyRMO0Gq2X?=
+ =?iso-8859-1?Q?YyjghBvCjMBzJh6KXG0rwn9Ir34Xn/yb0j39TsE5dbRa67dTXO3yDOZGm+?=
+ =?iso-8859-1?Q?knSByqOR1uT02w3DXzmDsivPR0copY3QwgO4CeqlU9dKJlWv0BY+Nvciac?=
+ =?iso-8859-1?Q?x6QVY+ux1nDFN8a51Iht1uJwkh9KI/J9nDpN5xyPa7talJRpjeX0GjX6jU?=
+ =?iso-8859-1?Q?xjS+0bbVR41tHrCJKn2+cuqQWI5E7jKLpqA1gV/pk/4NfTIdUZb6JIHeLH?=
+ =?iso-8859-1?Q?dIT52z2rKsXLya92Q5DjizTiYlaAINQFs/LLGedILhk+1pl2qDqYQJkSXH?=
+ =?iso-8859-1?Q?ABlvmC8m+REYYvryv2bsMd3tezi6Qd1p7s4zN6nghUgERvVj614Ej7K2Bm?=
+ =?iso-8859-1?Q?u7kU1Uha14XReFQKvf/OG9c6kBfgOjgwg1xWC2eBB7apv+lyirQIiAUOyN?=
+ =?iso-8859-1?Q?iHMWOt5NViMncgNEeLUy0Tdc+3NfP+LoOi6XLIrYLMTBv3hA157GHMD4Vi?=
+ =?iso-8859-1?Q?funaHTzevZ2cUB6bgnzqF70qUoWkQ3oLqwnkkGdTMF4crNN67LFP/jEc7y?=
+ =?iso-8859-1?Q?grCUDrPtka4HMk4qAo76C6Uiq3sygE6qAlCNB8qCm+KB7kb9BEpcap6l0p?=
+ =?iso-8859-1?Q?p57Eq4bTBjpxY=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250127-counter_delegation-v3-21-64894d7e16d5@rivosinc.com>
-References: <20250127-counter_delegation-v3-0-64894d7e16d5@rivosinc.com>
-In-Reply-To: <20250127-counter_delegation-v3-0-64894d7e16d5@rivosinc.com>
-To: Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Anup Patel <anup@brainfault.org>, 
- Atish Patra <atishp@atishpatra.org>, Will Deacon <will@kernel.org>, 
- Mark Rutland <mark.rutland@arm.com>, Peter Zijlstra <peterz@infradead.org>, 
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
- Namhyung Kim <namhyung@kernel.org>, 
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>, 
- Adrian Hunter <adrian.hunter@intel.com>, weilin.wang@intel.com
-Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org, 
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
- linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
- Atish Patra <atishp@rivosinc.com>
-X-Mailer: b4 0.15-dev-13183
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58ac7e86-8da9-43ef-ee0c-08dd3f5a4000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jan 2025 05:11:40.9825
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6cDSkh5UbeWaTIjbnnLjfcMEU4KC3v0AJe4xJ7x3xp6LTFrNa9Vl7OWcCEHecBMhKo8lXBJ9pYC3ZKz6ANchKw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7489
 
-Signed-off-by: Atish Patra <atishp@rivosinc.com>
----
- tools/perf/pmu-events/empty-pmu-events.c | 144 +++++++++++++++----------------
- 1 file changed, 72 insertions(+), 72 deletions(-)
-
-diff --git a/tools/perf/pmu-events/empty-pmu-events.c b/tools/perf/pmu-events/empty-pmu-events.c
-index 3a7ec31576f5..22f0463dc522 100644
---- a/tools/perf/pmu-events/empty-pmu-events.c
-+++ b/tools/perf/pmu-events/empty-pmu-events.c
-@@ -36,42 +36,42 @@ static const char *const big_c_string =
- /* offset=1127 */ "bp_l1_btb_correct\000branch\000L1 BTB Correction\000event=0x8a\000\00000\000\000\000"
- /* offset=1187 */ "bp_l2_btb_correct\000branch\000L2 BTB Correction\000event=0x8b\000\00000\000\000\000"
- /* offset=1247 */ "l3_cache_rd\000cache\000L3 cache access, read\000event=0x40\000\00000\000Attributable Level 3 cache access, read\000\000"
--/* offset=1343 */ "segment_reg_loads.any\000other\000Number of segment register loads\000event=6,period=200000,umask=0x80\000\00000\000\0000,1\000"
--/* offset=1446 */ "dispatch_blocked.any\000other\000Memory cluster signals to block micro-op dispatch for any reason\000event=9,period=200000,umask=0x20\000\00000\000\0000,1\000"
--/* offset=1580 */ "eist_trans\000other\000Number of Enhanced Intel SpeedStep(R) Technology (EIST) transitions\000event=0x3a,period=200000\000\00000\000\0000,1\000"
--/* offset=1699 */ "hisi_sccl,ddrc\000"
--/* offset=1714 */ "uncore_hisi_ddrc.flux_wcmd\000uncore\000DDRC write commands\000event=2\000\00000\000DDRC write commands\000\000"
--/* offset=1801 */ "uncore_cbox\000"
--/* offset=1813 */ "unc_cbo_xsnp_response.miss_eviction\000uncore\000A cross-core snoop resulted from L3 Eviction which misses in some processor core\000event=0x22,umask=0x81\000\00000\000A cross-core snoop resulted from L3 Eviction which misses in some processor core\0000,1\000"
--/* offset=2048 */ "event-hyphen\000uncore\000UNC_CBO_HYPHEN\000event=0xe0\000\00000\000UNC_CBO_HYPHEN\000\000"
--/* offset=2114 */ "event-two-hyph\000uncore\000UNC_CBO_TWO_HYPH\000event=0xc0\000\00000\000UNC_CBO_TWO_HYPH\000\000"
--/* offset=2186 */ "hisi_sccl,l3c\000"
--/* offset=2200 */ "uncore_hisi_l3c.rd_hit_cpipe\000uncore\000Total read hits\000event=7\000\00000\000Total read hits\000\000"
--/* offset=2281 */ "uncore_imc_free_running\000"
--/* offset=2305 */ "uncore_imc_free_running.cache_miss\000uncore\000Total cache misses\000event=0x12\000\00000\000Total cache misses\000\000"
--/* offset=2401 */ "uncore_imc\000"
--/* offset=2412 */ "uncore_imc.cache_hits\000uncore\000Total cache hits\000event=0x34\000\00000\000Total cache hits\000\000"
--/* offset=2491 */ "uncore_sys_ddr_pmu\000"
--/* offset=2510 */ "sys_ddr_pmu.write_cycles\000uncore\000ddr write-cycles event\000event=0x2b\000v8\00000\000\000\000"
--/* offset=2584 */ "uncore_sys_ccn_pmu\000"
--/* offset=2603 */ "sys_ccn_pmu.read_cycles\000uncore\000ccn read-cycles event\000config=0x2c\0000x01\00000\000\000\000"
--/* offset=2678 */ "uncore_sys_cmn_pmu\000"
--/* offset=2697 */ "sys_cmn_pmu.hnf_cache_miss\000uncore\000Counts total cache misses in first lookup result (high priority)\000eventid=1,type=5\000(434|436|43c|43a).*\00000\000\000\000"
--/* offset=2838 */ "CPI\000\0001 / IPC\000\000\000\000\000\000\000\00000"
--/* offset=2860 */ "IPC\000group1\000inst_retired.any / cpu_clk_unhalted.thread\000\000\000\000\000\000\000\00000"
--/* offset=2923 */ "Frontend_Bound_SMT\000\000idq_uops_not_delivered.core / (4 * (cpu_clk_unhalted.thread / 2 * (1 + cpu_clk_unhalted.one_thread_active / cpu_clk_unhalted.ref_xclk)))\000\000\000\000\000\000\000\00000"
--/* offset=3089 */ "dcache_miss_cpi\000\000l1d\\-loads\\-misses / inst_retired.any\000\000\000\000\000\000\000\00000"
--/* offset=3153 */ "icache_miss_cycles\000\000l1i\\-loads\\-misses / inst_retired.any\000\000\000\000\000\000\000\00000"
--/* offset=3220 */ "cache_miss_cycles\000group1\000dcache_miss_cpi + icache_miss_cycles\000\000\000\000\000\000\000\00000"
--/* offset=3291 */ "DCache_L2_All_Hits\000\000l2_rqsts.demand_data_rd_hit + l2_rqsts.pf_hit + l2_rqsts.rfo_hit\000\000\000\000\000\000\000\00000"
--/* offset=3385 */ "DCache_L2_All_Miss\000\000max(l2_rqsts.all_demand_data_rd - l2_rqsts.demand_data_rd_hit, 0) + l2_rqsts.pf_miss + l2_rqsts.rfo_miss\000\000\000\000\000\000\000\00000"
--/* offset=3519 */ "DCache_L2_All\000\000DCache_L2_All_Hits + DCache_L2_All_Miss\000\000\000\000\000\000\000\00000"
--/* offset=3583 */ "DCache_L2_Hits\000\000d_ratio(DCache_L2_All_Hits, DCache_L2_All)\000\000\000\000\000\000\000\00000"
--/* offset=3651 */ "DCache_L2_Misses\000\000d_ratio(DCache_L2_All_Miss, DCache_L2_All)\000\000\000\000\000\000\000\00000"
--/* offset=3721 */ "M1\000\000ipc + M2\000\000\000\000\000\000\000\00000"
--/* offset=3743 */ "M2\000\000ipc + M1\000\000\000\000\000\000\000\00000"
--/* offset=3765 */ "M3\000\0001 / M3\000\000\000\000\000\000\000\00000"
--/* offset=3785 */ "L1D_Cache_Fill_BW\000\00064 * l1d.replacement / 1e9 / duration_time\000\000\000\000\000\000\000\00000"
-+/* offset=1343 */ "segment_reg_loads.any\000other\000Number of segment register loads\000event=6,period=200000,umask=0x80,counterid_mask=0x3\000\00000\000\0000,1\000"
-+/* offset=1465 */ "dispatch_blocked.any\000other\000Memory cluster signals to block micro-op dispatch for any reason\000event=9,period=200000,umask=0x20,counterid_mask=0x3\000\00000\000\0000,1\000"
-+/* offset=1618 */ "eist_trans\000other\000Number of Enhanced Intel SpeedStep(R) Technology (EIST) transitions\000event=0x3a,period=200000,counterid_mask=0x3\000\00000\000\0000,1\000"
-+/* offset=1756 */ "hisi_sccl,ddrc\000"
-+/* offset=1771 */ "uncore_hisi_ddrc.flux_wcmd\000uncore\000DDRC write commands\000event=2\000\00000\000DDRC write commands\000\000"
-+/* offset=1858 */ "uncore_cbox\000"
-+/* offset=1870 */ "unc_cbo_xsnp_response.miss_eviction\000uncore\000A cross-core snoop resulted from L3 Eviction which misses in some processor core\000event=0x22,umask=0x81,counterid_mask=0x3\000\00000\000A cross-core snoop resulted from L3 Eviction which misses in some processor core\0000,1\000"
-+/* offset=2124 */ "event-hyphen\000uncore\000UNC_CBO_HYPHEN\000event=0xe0\000\00000\000UNC_CBO_HYPHEN\000\000"
-+/* offset=2190 */ "event-two-hyph\000uncore\000UNC_CBO_TWO_HYPH\000event=0xc0\000\00000\000UNC_CBO_TWO_HYPH\000\000"
-+/* offset=2262 */ "hisi_sccl,l3c\000"
-+/* offset=2276 */ "uncore_hisi_l3c.rd_hit_cpipe\000uncore\000Total read hits\000event=7\000\00000\000Total read hits\000\000"
-+/* offset=2357 */ "uncore_imc_free_running\000"
-+/* offset=2381 */ "uncore_imc_free_running.cache_miss\000uncore\000Total cache misses\000event=0x12\000\00000\000Total cache misses\000\000"
-+/* offset=2477 */ "uncore_imc\000"
-+/* offset=2488 */ "uncore_imc.cache_hits\000uncore\000Total cache hits\000event=0x34\000\00000\000Total cache hits\000\000"
-+/* offset=2567 */ "uncore_sys_ddr_pmu\000"
-+/* offset=2586 */ "sys_ddr_pmu.write_cycles\000uncore\000ddr write-cycles event\000event=0x2b\000v8\00000\000\000\000"
-+/* offset=2660 */ "uncore_sys_ccn_pmu\000"
-+/* offset=2679 */ "sys_ccn_pmu.read_cycles\000uncore\000ccn read-cycles event\000config=0x2c\0000x01\00000\000\000\000"
-+/* offset=2754 */ "uncore_sys_cmn_pmu\000"
-+/* offset=2773 */ "sys_cmn_pmu.hnf_cache_miss\000uncore\000Counts total cache misses in first lookup result (high priority)\000eventid=1,type=5\000(434|436|43c|43a).*\00000\000\000\000"
-+/* offset=2914 */ "CPI\000\0001 / IPC\000\000\000\000\000\000\000\00000"
-+/* offset=2936 */ "IPC\000group1\000inst_retired.any / cpu_clk_unhalted.thread\000\000\000\000\000\000\000\00000"
-+/* offset=2999 */ "Frontend_Bound_SMT\000\000idq_uops_not_delivered.core / (4 * (cpu_clk_unhalted.thread / 2 * (1 + cpu_clk_unhalted.one_thread_active / cpu_clk_unhalted.ref_xclk)))\000\000\000\000\000\000\000\00000"
-+/* offset=3165 */ "dcache_miss_cpi\000\000l1d\\-loads\\-misses / inst_retired.any\000\000\000\000\000\000\000\00000"
-+/* offset=3229 */ "icache_miss_cycles\000\000l1i\\-loads\\-misses / inst_retired.any\000\000\000\000\000\000\000\00000"
-+/* offset=3296 */ "cache_miss_cycles\000group1\000dcache_miss_cpi + icache_miss_cycles\000\000\000\000\000\000\000\00000"
-+/* offset=3367 */ "DCache_L2_All_Hits\000\000l2_rqsts.demand_data_rd_hit + l2_rqsts.pf_hit + l2_rqsts.rfo_hit\000\000\000\000\000\000\000\00000"
-+/* offset=3461 */ "DCache_L2_All_Miss\000\000max(l2_rqsts.all_demand_data_rd - l2_rqsts.demand_data_rd_hit, 0) + l2_rqsts.pf_miss + l2_rqsts.rfo_miss\000\000\000\000\000\000\000\00000"
-+/* offset=3595 */ "DCache_L2_All\000\000DCache_L2_All_Hits + DCache_L2_All_Miss\000\000\000\000\000\000\000\00000"
-+/* offset=3659 */ "DCache_L2_Hits\000\000d_ratio(DCache_L2_All_Hits, DCache_L2_All)\000\000\000\000\000\000\000\00000"
-+/* offset=3727 */ "DCache_L2_Misses\000\000d_ratio(DCache_L2_All_Miss, DCache_L2_All)\000\000\000\000\000\000\000\00000"
-+/* offset=3797 */ "M1\000\000ipc + M2\000\000\000\000\000\000\000\00000"
-+/* offset=3819 */ "M2\000\000ipc + M1\000\000\000\000\000\000\000\00000"
-+/* offset=3841 */ "M3\000\0001 / M3\000\000\000\000\000\000\000\00000"
-+/* offset=3861 */ "L1D_Cache_Fill_BW\000\00064 * l1d.replacement / 1e9 / duration_time\000\000\000\000\000\000\000\00000"
- ;
- 
- static const struct compact_pmu_event pmu_events__common_tool[] = {
-@@ -101,27 +101,27 @@ const struct pmu_table_entry pmu_events__common[] = {
- static const struct compact_pmu_event pmu_events__test_soc_cpu_default_core[] = {
- { 1127 }, /* bp_l1_btb_correct\000branch\000L1 BTB Correction\000event=0x8a\000\00000\000\000\000 */
- { 1187 }, /* bp_l2_btb_correct\000branch\000L2 BTB Correction\000event=0x8b\000\00000\000\000\000 */
--{ 1446 }, /* dispatch_blocked.any\000other\000Memory cluster signals to block micro-op dispatch for any reason\000event=9,period=200000,umask=0x20\000\00000\000\0000,1\000 */
--{ 1580 }, /* eist_trans\000other\000Number of Enhanced Intel SpeedStep(R) Technology (EIST) transitions\000event=0x3a,period=200000\000\00000\000\0000,1\000 */
-+{ 1465 }, /* dispatch_blocked.any\000other\000Memory cluster signals to block micro-op dispatch for any reason\000event=9,period=200000,umask=0x20,counterid_mask=0x3\000\00000\000\0000,1\000 */
-+{ 1618 }, /* eist_trans\000other\000Number of Enhanced Intel SpeedStep(R) Technology (EIST) transitions\000event=0x3a,period=200000,counterid_mask=0x3\000\00000\000\0000,1\000 */
- { 1247 }, /* l3_cache_rd\000cache\000L3 cache access, read\000event=0x40\000\00000\000Attributable Level 3 cache access, read\000\000 */
--{ 1343 }, /* segment_reg_loads.any\000other\000Number of segment register loads\000event=6,period=200000,umask=0x80\000\00000\000\0000,1\000 */
-+{ 1343 }, /* segment_reg_loads.any\000other\000Number of segment register loads\000event=6,period=200000,umask=0x80,counterid_mask=0x3\000\00000\000\0000,1\000 */
- };
- static const struct compact_pmu_event pmu_events__test_soc_cpu_hisi_sccl_ddrc[] = {
--{ 1714 }, /* uncore_hisi_ddrc.flux_wcmd\000uncore\000DDRC write commands\000event=2\000\00000\000DDRC write commands\000\000 */
-+{ 1771 }, /* uncore_hisi_ddrc.flux_wcmd\000uncore\000DDRC write commands\000event=2\000\00000\000DDRC write commands\000\000 */
- };
- static const struct compact_pmu_event pmu_events__test_soc_cpu_hisi_sccl_l3c[] = {
--{ 2200 }, /* uncore_hisi_l3c.rd_hit_cpipe\000uncore\000Total read hits\000event=7\000\00000\000Total read hits\000\000 */
-+{ 2276 }, /* uncore_hisi_l3c.rd_hit_cpipe\000uncore\000Total read hits\000event=7\000\00000\000Total read hits\000\000 */
- };
- static const struct compact_pmu_event pmu_events__test_soc_cpu_uncore_cbox[] = {
--{ 2048 }, /* event-hyphen\000uncore\000UNC_CBO_HYPHEN\000event=0xe0\000\00000\000UNC_CBO_HYPHEN\000\000 */
--{ 2114 }, /* event-two-hyph\000uncore\000UNC_CBO_TWO_HYPH\000event=0xc0\000\00000\000UNC_CBO_TWO_HYPH\000\000 */
--{ 1813 }, /* unc_cbo_xsnp_response.miss_eviction\000uncore\000A cross-core snoop resulted from L3 Eviction which misses in some processor core\000event=0x22,umask=0x81\000\00000\000A cross-core snoop resulted from L3 Eviction which misses in some processor core\0000,1\000 */
-+{ 2124 }, /* event-hyphen\000uncore\000UNC_CBO_HYPHEN\000event=0xe0\000\00000\000UNC_CBO_HYPHEN\000\000 */
-+{ 2190 }, /* event-two-hyph\000uncore\000UNC_CBO_TWO_HYPH\000event=0xc0\000\00000\000UNC_CBO_TWO_HYPH\000\000 */
-+{ 1870 }, /* unc_cbo_xsnp_response.miss_eviction\000uncore\000A cross-core snoop resulted from L3 Eviction which misses in some processor core\000event=0x22,umask=0x81,counterid_mask=0x3\000\00000\000A cross-core snoop resulted from L3 Eviction which misses in some processor core\0000,1\000 */
- };
- static const struct compact_pmu_event pmu_events__test_soc_cpu_uncore_imc[] = {
--{ 2412 }, /* uncore_imc.cache_hits\000uncore\000Total cache hits\000event=0x34\000\00000\000Total cache hits\000\000 */
-+{ 2488 }, /* uncore_imc.cache_hits\000uncore\000Total cache hits\000event=0x34\000\00000\000Total cache hits\000\000 */
- };
- static const struct compact_pmu_event pmu_events__test_soc_cpu_uncore_imc_free_running[] = {
--{ 2305 }, /* uncore_imc_free_running.cache_miss\000uncore\000Total cache misses\000event=0x12\000\00000\000Total cache misses\000\000 */
-+{ 2381 }, /* uncore_imc_free_running.cache_miss\000uncore\000Total cache misses\000event=0x12\000\00000\000Total cache misses\000\000 */
- 
- };
- 
-@@ -134,46 +134,46 @@ const struct pmu_table_entry pmu_events__test_soc_cpu[] = {
- {
-      .entries = pmu_events__test_soc_cpu_hisi_sccl_ddrc,
-      .num_entries = ARRAY_SIZE(pmu_events__test_soc_cpu_hisi_sccl_ddrc),
--     .pmu_name = { 1699 /* hisi_sccl,ddrc\000 */ },
-+     .pmu_name = { 1756 /* hisi_sccl,ddrc\000 */ },
- },
- {
-      .entries = pmu_events__test_soc_cpu_hisi_sccl_l3c,
-      .num_entries = ARRAY_SIZE(pmu_events__test_soc_cpu_hisi_sccl_l3c),
--     .pmu_name = { 2186 /* hisi_sccl,l3c\000 */ },
-+     .pmu_name = { 2262 /* hisi_sccl,l3c\000 */ },
- },
- {
-      .entries = pmu_events__test_soc_cpu_uncore_cbox,
-      .num_entries = ARRAY_SIZE(pmu_events__test_soc_cpu_uncore_cbox),
--     .pmu_name = { 1801 /* uncore_cbox\000 */ },
-+     .pmu_name = { 1858 /* uncore_cbox\000 */ },
- },
- {
-      .entries = pmu_events__test_soc_cpu_uncore_imc,
-      .num_entries = ARRAY_SIZE(pmu_events__test_soc_cpu_uncore_imc),
--     .pmu_name = { 2401 /* uncore_imc\000 */ },
-+     .pmu_name = { 2477 /* uncore_imc\000 */ },
- },
- {
-      .entries = pmu_events__test_soc_cpu_uncore_imc_free_running,
-      .num_entries = ARRAY_SIZE(pmu_events__test_soc_cpu_uncore_imc_free_running),
--     .pmu_name = { 2281 /* uncore_imc_free_running\000 */ },
-+     .pmu_name = { 2357 /* uncore_imc_free_running\000 */ },
- },
- };
- 
- static const struct compact_pmu_event pmu_metrics__test_soc_cpu_default_core[] = {
--{ 2838 }, /* CPI\000\0001 / IPC\000\000\000\000\000\000\000\00000 */
--{ 3519 }, /* DCache_L2_All\000\000DCache_L2_All_Hits + DCache_L2_All_Miss\000\000\000\000\000\000\000\00000 */
--{ 3291 }, /* DCache_L2_All_Hits\000\000l2_rqsts.demand_data_rd_hit + l2_rqsts.pf_hit + l2_rqsts.rfo_hit\000\000\000\000\000\000\000\00000 */
--{ 3385 }, /* DCache_L2_All_Miss\000\000max(l2_rqsts.all_demand_data_rd - l2_rqsts.demand_data_rd_hit, 0) + l2_rqsts.pf_miss + l2_rqsts.rfo_miss\000\000\000\000\000\000\000\00000 */
--{ 3583 }, /* DCache_L2_Hits\000\000d_ratio(DCache_L2_All_Hits, DCache_L2_All)\000\000\000\000\000\000\000\00000 */
--{ 3651 }, /* DCache_L2_Misses\000\000d_ratio(DCache_L2_All_Miss, DCache_L2_All)\000\000\000\000\000\000\000\00000 */
--{ 2923 }, /* Frontend_Bound_SMT\000\000idq_uops_not_delivered.core / (4 * (cpu_clk_unhalted.thread / 2 * (1 + cpu_clk_unhalted.one_thread_active / cpu_clk_unhalted.ref_xclk)))\000\000\000\000\000\000\000\00000 */
--{ 2860 }, /* IPC\000group1\000inst_retired.any / cpu_clk_unhalted.thread\000\000\000\000\000\000\000\00000 */
--{ 3785 }, /* L1D_Cache_Fill_BW\000\00064 * l1d.replacement / 1e9 / duration_time\000\000\000\000\000\000\000\00000 */
--{ 3721 }, /* M1\000\000ipc + M2\000\000\000\000\000\000\000\00000 */
--{ 3743 }, /* M2\000\000ipc + M1\000\000\000\000\000\000\000\00000 */
--{ 3765 }, /* M3\000\0001 / M3\000\000\000\000\000\000\000\00000 */
--{ 3220 }, /* cache_miss_cycles\000group1\000dcache_miss_cpi + icache_miss_cycles\000\000\000\000\000\000\000\00000 */
--{ 3089 }, /* dcache_miss_cpi\000\000l1d\\-loads\\-misses / inst_retired.any\000\000\000\000\000\000\000\00000 */
--{ 3153 }, /* icache_miss_cycles\000\000l1i\\-loads\\-misses / inst_retired.any\000\000\000\000\000\000\000\00000 */
-+{ 2914 }, /* CPI\000\0001 / IPC\000\000\000\000\000\000\000\00000 */
-+{ 3595 }, /* DCache_L2_All\000\000DCache_L2_All_Hits + DCache_L2_All_Miss\000\000\000\000\000\000\000\00000 */
-+{ 3367 }, /* DCache_L2_All_Hits\000\000l2_rqsts.demand_data_rd_hit + l2_rqsts.pf_hit + l2_rqsts.rfo_hit\000\000\000\000\000\000\000\00000 */
-+{ 3461 }, /* DCache_L2_All_Miss\000\000max(l2_rqsts.all_demand_data_rd - l2_rqsts.demand_data_rd_hit, 0) + l2_rqsts.pf_miss + l2_rqsts.rfo_miss\000\000\000\000\000\000\000\00000 */
-+{ 3659 }, /* DCache_L2_Hits\000\000d_ratio(DCache_L2_All_Hits, DCache_L2_All)\000\000\000\000\000\000\000\00000 */
-+{ 3727 }, /* DCache_L2_Misses\000\000d_ratio(DCache_L2_All_Miss, DCache_L2_All)\000\000\000\000\000\000\000\00000 */
-+{ 2999 }, /* Frontend_Bound_SMT\000\000idq_uops_not_delivered.core / (4 * (cpu_clk_unhalted.thread / 2 * (1 + cpu_clk_unhalted.one_thread_active / cpu_clk_unhalted.ref_xclk)))\000\000\000\000\000\000\000\00000 */
-+{ 2936 }, /* IPC\000group1\000inst_retired.any / cpu_clk_unhalted.thread\000\000\000\000\000\000\000\00000 */
-+{ 3861 }, /* L1D_Cache_Fill_BW\000\00064 * l1d.replacement / 1e9 / duration_time\000\000\000\000\000\000\000\00000 */
-+{ 3797 }, /* M1\000\000ipc + M2\000\000\000\000\000\000\000\00000 */
-+{ 3819 }, /* M2\000\000ipc + M1\000\000\000\000\000\000\000\00000 */
-+{ 3841 }, /* M3\000\0001 / M3\000\000\000\000\000\000\000\00000 */
-+{ 3296 }, /* cache_miss_cycles\000group1\000dcache_miss_cpi + icache_miss_cycles\000\000\000\000\000\000\000\00000 */
-+{ 3165 }, /* dcache_miss_cpi\000\000l1d\\-loads\\-misses / inst_retired.any\000\000\000\000\000\000\000\00000 */
-+{ 3229 }, /* icache_miss_cycles\000\000l1i\\-loads\\-misses / inst_retired.any\000\000\000\000\000\000\000\00000 */
- 
- };
- 
-@@ -186,13 +186,13 @@ const struct pmu_table_entry pmu_metrics__test_soc_cpu[] = {
- };
- 
- static const struct compact_pmu_event pmu_events__test_soc_sys_uncore_sys_ccn_pmu[] = {
--{ 2603 }, /* sys_ccn_pmu.read_cycles\000uncore\000ccn read-cycles event\000config=0x2c\0000x01\00000\000\000\000 */
-+{ 2679 }, /* sys_ccn_pmu.read_cycles\000uncore\000ccn read-cycles event\000config=0x2c\0000x01\00000\000\000\000 */
- };
- static const struct compact_pmu_event pmu_events__test_soc_sys_uncore_sys_cmn_pmu[] = {
--{ 2697 }, /* sys_cmn_pmu.hnf_cache_miss\000uncore\000Counts total cache misses in first lookup result (high priority)\000eventid=1,type=5\000(434|436|43c|43a).*\00000\000\000\000 */
-+{ 2773 }, /* sys_cmn_pmu.hnf_cache_miss\000uncore\000Counts total cache misses in first lookup result (high priority)\000eventid=1,type=5\000(434|436|43c|43a).*\00000\000\000\000 */
- };
- static const struct compact_pmu_event pmu_events__test_soc_sys_uncore_sys_ddr_pmu[] = {
--{ 2510 }, /* sys_ddr_pmu.write_cycles\000uncore\000ddr write-cycles event\000event=0x2b\000v8\00000\000\000\000 */
-+{ 2586 }, /* sys_ddr_pmu.write_cycles\000uncore\000ddr write-cycles event\000event=0x2b\000v8\00000\000\000\000 */
- 
- };
- 
-@@ -200,17 +200,17 @@ const struct pmu_table_entry pmu_events__test_soc_sys[] = {
- {
-      .entries = pmu_events__test_soc_sys_uncore_sys_ccn_pmu,
-      .num_entries = ARRAY_SIZE(pmu_events__test_soc_sys_uncore_sys_ccn_pmu),
--     .pmu_name = { 2584 /* uncore_sys_ccn_pmu\000 */ },
-+     .pmu_name = { 2660 /* uncore_sys_ccn_pmu\000 */ },
- },
- {
-      .entries = pmu_events__test_soc_sys_uncore_sys_cmn_pmu,
-      .num_entries = ARRAY_SIZE(pmu_events__test_soc_sys_uncore_sys_cmn_pmu),
--     .pmu_name = { 2678 /* uncore_sys_cmn_pmu\000 */ },
-+     .pmu_name = { 2754 /* uncore_sys_cmn_pmu\000 */ },
- },
- {
-      .entries = pmu_events__test_soc_sys_uncore_sys_ddr_pmu,
-      .num_entries = ARRAY_SIZE(pmu_events__test_soc_sys_uncore_sys_ddr_pmu),
--     .pmu_name = { 2491 /* uncore_sys_ddr_pmu\000 */ },
-+     .pmu_name = { 2567 /* uncore_sys_ddr_pmu\000 */ },
- },
- };
- 
-
--- 
-2.34.1
-
+>> v5 -> v6=0A=
+>> * Updated the code based on Alex Williamson's suggestion to move the=0A=
+>>=A0 device id enablement to a new patch and using KBUILD_MODNAME=0A=
+>>=A0 in place of "vfio-pci"=0A=
+>>=0A=
+>> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>=0A=
+>>=0A=
+>=0A=
+> Tested series with Grace-Blackwell and Grace-Hopper.=0A=
+> =0A=
+> Tested-by: Matthew R. Ochs <mochs@nvidia.com>=0A=
+=0A=
+Thank you so much, Matt!=
 
