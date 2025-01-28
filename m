@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-36800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36801-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF9BA2133E
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 21:52:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02EC3A2133F
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 21:53:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D95543A7696
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 20:52:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16BAA7A3E93
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 20:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1721E008E;
-	Tue, 28 Jan 2025 20:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECDC1E008E;
+	Tue, 28 Jan 2025 20:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aJoEShfv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nXQ/kJdn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01C1199EAF
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 20:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCBC199EAF
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 20:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738097564; cv=none; b=lT4kZ2G4+noFdVQs8VOrkpvW9kK7dg+81R+ymlefFBk0gHyNaddI1wEQuR7ss0Pp7BYzLoq0HJUuwPmjUYQ3TIVfU4ex5jmcd4moj5Ik0JoIJHymS8Qx7gmJs9+VbAz/vDOQ/XbbK5bEMDsq4WXVJdf8//5/o12DofpNn4We1Io=
+	t=1738097595; cv=none; b=jWwDg42oujxa6+TnDeHZKl8pcfAjd7vHNcxEkQMhoRNYfZxJnRzTb2j71o5xmLK3FjMKVVL7t3+l1EYEN7hI6lTxHF4DLvrba7VQdHwbIht4N+ltgttzN4/xIjqRttPwVuprl3tSpVv2U736OWuvsMc1r0Pg8F6tp7rVfvBi6Tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738097564; c=relaxed/simple;
-	bh=ru2gAsxMeOMjM0rOu77co7cs9CuXJqKqvt+ygZsdbvQ=;
+	s=arc-20240116; t=1738097595; c=relaxed/simple;
+	bh=PWnUDVBfDfX2sG3oPo/FA5iKmLEbHMLaYzW+DlBiCHM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PSxsL1dmutxISYysX5kgihkjUAv1cSRNSykoiIEEdVmYUEIozPiccTacTFldDVKp4nJ7pN3gCh53E0A0ycZDhgd3l9JcXcgqJTT3YXFbt983yxnEKX979/6bRu47UdlPqjxhiQdPXeUtadM1qTsvCaFfkWOEblVzkAQLZa/Vdfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aJoEShfv; arc=none smtp.client-ip=209.85.214.182
+	 In-Reply-To:Content-Type; b=f+LKI8HGrvL/+MwfIvfxVPm0ZpSNU99bVL77uBd+u0tSxMHUe7IB32avV3rCmblgEhu3c1HUF3IOorXUaXT0YTT8GY8+QBKcw/d169po2Ll0AiE3PQiysvj7o45M6tPIQ+s/zUWQBc06iaqraaIl+8PE3dkF5hWq0xKpdLZggwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nXQ/kJdn; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-216281bc30fso36723545ad.0
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 12:52:42 -0800 (PST)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2eec9b3a1bbso8582973a91.3
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 12:53:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738097562; x=1738702362; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1738097593; x=1738702393; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+AY5k8k+TxGfxhluS8BQjjUBCxahKfmtXeetBu/eOuo=;
-        b=aJoEShfv926FxOvU5BFLbFE4VzNV3jfwDm3tn0R5rAkzquIDkR3Zbg3FHZDYNE0XdM
-         97gHF+lctvA1Di/Q0ZCeX5Vz0kRyyoyJ++Hwws/GqscUgam7BJsBlOnjvQzHNtelx28B
-         KXl25jxjTUQqtxgaEQSGIRBCoDcBNqbXSaSCQdMWrmVusnMDXsGxgbRril0KSg5DFXaG
-         +uFAIhzAhpVLZ0XcXge/OHtnFHfAhYbkNkPR+J3nrni/sgZKY9dVhfYycyH4Ipumj9oD
-         UbJIh6m2rNh2NfE7SrSQbC4zfVQSOYL4o9XOKXfoL3ae18nq0+KF2H8WpgpNXf/Sdi1Y
-         kewQ==
+        bh=URo8FEmDFzB6A///SxC3rjAeGZIUOBN9+BRHaomH+z8=;
+        b=nXQ/kJdnSSK7W/snQ9+wJAWYruAemMI6x3/6VcPbDOPrKqT4hWroVFW5JIKnMNy+Sh
+         Cz2bW7j/mnidodsmIbhGq/bMS7OLoTJrAmNo8PY9YYcUmDh9ws4DSDMVtofEy8d8hQBF
+         xZuYi9LMSVPBSL2Be0HTNjPfoPqD2a4WxVRbXj7/96nB8ZNSUNBlqYHWieiDtKM9T2Mk
+         Lu8cMhMLyer58t4+PZKf7XuOOzFj01adcnojnUtGkMvJZjJlYweFZQ3QF/hbo+X04Tpz
+         nSfSknL1GsSO89LHphnyZkQG0Q+ny57+lWtInLZhtZBVMjZJ5mmugRPVjCLHd+2pjGV8
+         DN0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738097562; x=1738702362;
+        d=1e100.net; s=20230601; t=1738097593; x=1738702393;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+AY5k8k+TxGfxhluS8BQjjUBCxahKfmtXeetBu/eOuo=;
-        b=KNsMqVqv6UJf5BjPVWMPYTSSwxB89+ktXYv0LQuj19l+LhTk11C1biPqWEwy6IpIEk
-         QoFgUD5Ii4DpmaNiI31bflEPMqeOfBZ1lGjLHA78oqmfzvpv9/+6e43R6DpRVRj0DWMI
-         oeYS6T7O7waSj5x99q8xp/88eEz9WBG1WKEGUpAYqrs8gSFrM0yU4mJwpuVXjlMM1jvD
-         rF5s+PWFdcHptgMq7zbammK0G4OOpLI25AHO284S+w3I7W1ufUBfZJlpwBuspww+qUhv
-         VVBY529ULTmpLB7hSOLr0e31NGQk+HtHjqn9iwozSXyidTBwMYEvhLQCYho2eZK9XABQ
-         DsjA==
-X-Forwarded-Encrypted: i=1; AJvYcCWiG4F/x0R2IGgoc8iQ8FukVTmEQdRSOU7siZcK0qNL/n+HWjt9CKIQ6GUAYPQc1PMEwHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsHGatbSCJHCrEtyE9prtODiFwjfSmL1hOmTM7PBaSJVyO5KI9
-	Bkt1goFtP4kqZI6JorFi4GERB+gId3168vltdsXi/QRHV13RjpdiP2iCW6XanJ8=
-X-Gm-Gg: ASbGncuFlH0/gduf30Zhc8PZh3yVpMxFADQCH0b6cjB0MmY0FO/Qk6MVCxlPZ/6oriv
-	JWamOH9lXpYDyIutuPm1QELIdwUdefy4ZwwSvVI90WY0Qo85QCDlVbnWZPnF6uzWTyG2TI1QgKl
-	UvgEvyV5rSSbsNk431qjV1mro1pvJLKnvXlT7Z8XjjqJCSUxKYeX6r9PFrKkYSewHAZIVj6dEB9
-	mpfsDcz9ZMti57U9QCaYQyRvDJsN55HKv+TQCllGQbb/9Z2YyymwxEH6dnLel5ABLJUcGtrysi9
-	QLGL7hvLtNTcJv4leOD/Uhhi6K+C7g7mKTuoQ6V/ObtdXDW9PsZpQOpiCWvNy2qVj2xO
-X-Google-Smtp-Source: AGHT+IHX2b3c+1wIXKNlrq6ihzfzwVqiA1uBVnrtcveXRo1EFuqKfUsw89gpnINxgCOGI5vhU71s/g==
-X-Received: by 2002:a05:6a21:1807:b0:1e1:932e:b348 with SMTP id adf61e73a8af0-1ed7a6236eamr1093398637.41.1738097561894;
-        Tue, 28 Jan 2025 12:52:41 -0800 (PST)
+        bh=URo8FEmDFzB6A///SxC3rjAeGZIUOBN9+BRHaomH+z8=;
+        b=NDOMQQLKyUb7QoZjLvQHmEzQVIJ3qrw7tQuoot0shws1BsKnmvnKqS8Zj8JaPBctzG
+         cDaZLvdZzsz7KkatAX8PVOOsXKrRpcwEFauPZaMuMt9HxXd2W3E5MBoG5fxKR7ra1BMq
+         6g+MInuNEr5Rb4i4SA9A01dJ99m5M5Z0t/2loDYpvWaU61KXgTd2syMoDxL82QpevLFz
+         OKRbdylSPegE9DAIPRWJmDHfJmSm2VvyJheks3y45kIPB6+EseLymXoX5xe/ozBLtMmq
+         tsUnuQpKqchRFR62/lQCIeHnfXJnKPBiSRXCFjAgkoYN5Kxmhv9MbWGeNrr4TSLWtlrY
+         TOAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrAd/2U+25zT0MAEnxpEuTfUxnQFJIaEEtrs4GsyDSNttKoYT7trFV+5iun1JWLx4PPXo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRm0R8Z8GJk7KRB/LXLCYCY9Ai1RNFguCSPsm/kqflSPO6Ijn/
+	azM5qHHRr9ii1dAjZUm1JcSOVupIE7xA9tX6a/iysJOl0JzSyqCQgKvFUSIbM08=
+X-Gm-Gg: ASbGncvK+49I8Fl5HNbKJf4//0IS47NQL5xWhtedtje8Yoc5QYH2DvqduJzP4HlC3lH
+	3Iilz1ZEMsCGu1MAdNz4CnXnjZN9mLdUA5bt4IBJyM7jtaW3TvazvRmoF07sfJjWKKw2yuuOlm+
+	Qm7juzXOzh7EcdeDyauUwMMKVskHTWe7ztc8wcTAVDNVvQPlYjwij4NKr09XyWxIUlXIVuJ7Of0
+	CIUrVEt5UTusErVENcmxrAXqPANhORq7NYKY9V1wr5M5/lJewDr5Z4F/HM87Xod5vY/6TgLlPxW
+	gofMpp4D6+kO0YG4ZS8ahE0c1c9uQKUE8MvRyQ1yw6+g4xNSLdnchYUiFw==
+X-Google-Smtp-Source: AGHT+IGbCkwFcnvbvgjiI0FpzcUxshvLULe2uXuxSWfByzQcwn839F54/2Qol24ldyXXBsV6F8SoBA==
+X-Received: by 2002:a17:90b:4d06:b0:2ee:ab29:1a57 with SMTP id 98e67ed59e1d1-2f83abb3553mr703945a91.2.1738097593044;
+        Tue, 28 Jan 2025 12:53:13 -0800 (PST)
 Received: from [192.168.0.4] (174-21-71-127.tukw.qwest.net. [174.21.71.127])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a78dfa2sm9626014b3a.157.2025.01.28.12.52.41
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f830a3d74esm589772a91.2.2025.01.28.12.53.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Jan 2025 12:52:41 -0800 (PST)
-Message-ID: <b7646baf-a07d-4ded-804c-6809173c1f6b@linaro.org>
-Date: Tue, 28 Jan 2025 12:52:39 -0800
+        Tue, 28 Jan 2025 12:53:12 -0800 (PST)
+Message-ID: <e57a850a-0f1d-426c-ad35-54ea6106f5a0@linaro.org>
+Date: Tue, 28 Jan 2025 12:53:11 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,8 +81,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 4/9] hw/qdev: Introduce DeviceClass::[un]wire()
- handlers
+Subject: Re: [PATCH 5/9] cpus: Add DeviceClass::[un]wire() stubs
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -94,210 +93,51 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Xu <peterx@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>
 References: <20250128142152.9889-1-philmd@linaro.org>
- <20250128142152.9889-5-philmd@linaro.org>
+ <20250128142152.9889-6-philmd@linaro.org>
 Content-Language: en-US
 From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250128142152.9889-5-philmd@linaro.org>
+In-Reply-To: <20250128142152.9889-6-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 1/28/25 06:21, Philippe Mathieu-Daudé wrote:
-> We are trying to understand what means "a qdev is realized".
-> One explanation was "the device is guest visible"; however
-> many devices are realized before being mapped, thus are not
-> "guest visible". Some devices map / wire their IRQs before
-> being realized (such ISA devices). There is a need for devices
-> to be "automatically" mapped/wired (see [2]) such CLI-created
-> devices, but this apply generically to dynamic machines.
-> 
-> Currently the device creation steps are expected to roughly be:
-> 
->    (external use)                (QDev core)                   (Device Impl)
->     ~~~~~~~~~~~~                  ~~~~~~~~~                     ~~~~~~~~~~~
-> 
->                                 INIT enter
->                     ----->
->                           +----------------------+
->                           |    Allocate state    |
->                           +----------------------+
->                                                   ----->
->                                                          +---------------------+
->                                                          | INIT children       |
->                                                          |                     |
->                                                          | Alias children properties
->                                                          |                     |
->                                                          | Expose properties   |
->                                  INIT exit               +---------------------+
->                     <-----------------------------------
->   +----------------+
->   | set properties |
->   |                |
->   | set ClkIn      |
->   +----------------+          REALIZE enter
->                     ---------------------------------->
->                                                         +----------------------+
->                                                         | Use config properties|
->                                                         |                      |
->                                                         | Realize children     |
->                                                         |                      |
->                                                         | Init GPIOs/IRQs      |
->                                                         |                      |
->                                                         | Init MemoryRegions   |
->                                                         +----------------------+
->                                 REALIZE exit
->                     <-----------------------------------                        ----  "realized" / "guest visible"
-> +-----------------+
-> | Explicit wiring:|
-> |   IRQs          |
-> |   I/O / Mem     |
-> |   ClkOut        |
-> +-----------------+             RESET enter
->                      --------------------------------->
->                                                         +----------------------+
->                                                         | Reset default values |
->                                                         +----------------------+
-> 
-> But as mentioned, various devices "wire" parts before they exit
-> the "realize" step.
-> In order to clarify, I'm trying to enforce what can be done
-> *before* and *after* realization.
-> 
-> *after* a device is expected to be stable (no more configurable)
-> and fully usable.
-> 
-> To be able to use internal/auto wiring (such ISA devices) and
-> keep the current external/explicit wiring, I propose to add an
-> extra "internal wiring" step, happening after the REALIZE step
-> as:
-> 
->    (external use)                (QDev core)                   (Device Impl)
->     ~~~~~~~~~~~~                  ~~~~~~~~~                     ~~~~~~~~~~~
-> 
->                                 INIT enter
->                     ----->
->                           +----------------------+
->                           |    Allocate state    |
->                           +----------------------+
->                                                   ----->
->                                                          +---------------------+
->                                                          | INIT children       |
->                                                          |                     |
->                                                          | Alias children properties
->                                                          |                     |
->                                                          | Expose properties   |
->                                  INIT exit               +---------------------+
->                     <-----------------------------------
->   +----------------+
->   | set properties |
->   |                |
->   | set ClkIn      |
->   +----------------+          REALIZE enter
->                     ---------------------------------->
->                                                         +----------------------+
->                                                         | Use config properties|
->                                                         |                      |
->                                                         | Realize children     |
->                                                         |                      |
->                                                         | Init GPIOs/IRQs      |
->                                                         |                      |
->                                                         | Init MemoryRegions   |
->                                                         +----------------------+
->                                 REALIZE exit       <---
->                           +----------------------+
->                           | Internal auto wiring |
->                           |   IRQs               |  (i.e. ISA bus)
->                           |   I/O / Mem          |
->                           |   ClkOut             |
->                           +----------------------+
->                      <---                                                       ----  "realized"
-> +-----------------+
-> | External wiring:|
-> |   IRQs          |
-> |   I/O / Mem     |
-> |   ClkOut        |
-> +-----------------+             RESET enter                                    ----  "guest visible"
->                      --------------------------------->
->                                                         +----------------------+
->                                                         | Reset default values |
->                                                         +----------------------+
-> 
-> The "realized" point is not changed. "guest visible" concept only
-> occurs *after* wiring, just before the reset phase.
-> 
-> This change introduces the DeviceClass::wire handler within qdev
-> core realization code.
-> 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->   include/hw/qdev-core.h |  7 +++++++
->   hw/core/qdev.c         | 20 +++++++++++++++++++-
->   2 files changed, 26 insertions(+), 1 deletion(-)
+>   hw/core/cpu-common.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
 > 
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 530f3da7021..021bb7afdc0 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -102,7 +102,12 @@ typedef int (*DeviceSyncConfig)(DeviceState *dev, Error **errp);
->    * @props: Properties accessing state fields.
->    * @realize: Callback function invoked when the #DeviceState:realized
->    * property is changed to %true.
-> + * @wire: Callback function called after @realize to connect IRQs,
-> + * clocks and map memories. Can not fail.
-> + * @unwire: Callback function to undo @wire. Called before @unrealize.
-> + * Can not fail.
->    * @unrealize: Callback function invoked when the #DeviceState:realized
-> + * property is changed to %false. Can not fail.
->    * property is changed to %false.
->    * @sync_config: Callback function invoked when QMP command device-sync-config
->    * is called. Should synchronize device configuration from host to guest part
-> @@ -171,6 +176,8 @@ struct DeviceClass {
->        */
->       DeviceReset legacy_reset;
->       DeviceRealize realize;
-> +    void (*wire)(DeviceState *dev);
-> +    void (*unwire)(DeviceState *dev);
->       DeviceUnrealize unrealize;
->       DeviceSyncConfig sync_config;
+> diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
+> index cb79566cc51..9ee44a00277 100644
+> --- a/hw/core/cpu-common.c
+> +++ b/hw/core/cpu-common.c
+> @@ -219,6 +219,14 @@ static void cpu_common_realizefn(DeviceState *dev, Error **errp)
+>       /* NOTE: latest generic point where the cpu is fully realized */
+>   }
 >   
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 82bbdcb654e..38449255365 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -554,6 +554,15 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
->               }
->          }
->   
-> +        if (dc->wire) {
-> +            if (!dc->unwire) {
-> +                warn_report_once("wire() without unwire() for type '%s'",
-> +                                 object_get_typename(OBJECT(dev)));
-> +            }
-> +            dc->wire(dev);
-> +        }
+> +static void cpu_common_wire(DeviceState *dev)
+> +{
+> +}
 > +
-> +        /* At this point the device is "guest visible". */
->          qatomic_store_release(&dev->realized, value);
->   
->       } else if (!value && dev->realized) {
-> @@ -573,6 +582,15 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
->            */
->           smp_wmb();
->   
-> +        if (dc->unwire) {
-> +            if (!dc->wire) {
-> +                error_report("disconnect() without connect() for type '%s'",
-> +                             object_get_typename(OBJECT(dev)));
-> +                abort();
-> +            }
-> +            dc->unwire(dev);
-> +        }
+> +static void cpu_common_unwire(DeviceState *dev)
+> +{
+> +}
+> +
+>   static void cpu_common_unrealizefn(DeviceState *dev)
+>   {
+>       CPUState *cpu = CPU(dev);
+> @@ -311,6 +319,8 @@ static void cpu_common_class_init(ObjectClass *klass, void *data)
+>       k->gdb_write_register = cpu_common_gdb_write_register;
+>       set_bit(DEVICE_CATEGORY_CPU, dc->categories);
+>       dc->realize = cpu_common_realizefn;
+> +    dc->wire = cpu_common_wire;
+> +    dc->unwire = cpu_common_unwire;
+>       dc->unrealize = cpu_common_unrealizefn;
+>       rc->phases.hold = cpu_common_reset_hold;
+>       cpu_class_init_props(dc);
 
-Mismatched error messages (wire vs connect).
-But, really, just check both directions properly at startup.
-There's probably lots of places where devices are never unrealized.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Otherwise, this seems sane, having a kind of post_init on the realize path, running after 
-all superclass realization is done.
+But doesn't need to be split from patch 6.
 
 
 r~
