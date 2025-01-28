@@ -1,252 +1,186 @@
-Return-Path: <kvm+bounces-36783-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36784-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2113A20CFD
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 16:25:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6917A20D3F
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 16:41:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D71561881AF8
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:25:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B393A3A3EBA
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A221C831A;
-	Tue, 28 Jan 2025 15:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229501D5AAD;
+	Tue, 28 Jan 2025 15:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CjQUKk8t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIo0CM26"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F271A9B2B;
-	Tue, 28 Jan 2025 15:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCB51A2387
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 15:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738077941; cv=none; b=qvAvnLGnmn/bkLALrC1Ad0X3x4HdnGQOxhVwS9aRwfXsEov3nb6VN2jKYmUihoMlY9l8xOhMzeOCvijNAOWzDlpA8Ik32Kg1gyK8kUKbCWqEReoyl8DApbxAK1NNRsDUhUQ9xUGWuktfs5kaLiozzdWWbWMdQdDMMXhl1iSYb4A=
+	t=1738078912; cv=none; b=BQneFJlk67/Dm9UPMmpzVTRaiuhxKMmzCKeUPlZimKfZ6+B5nr8h/BQObPGS+5k4ULGuM6XUDZjn3iPtt66mpGMlPNFtx+o5M0snkBB1dWbYt6wSWjiYq01HvNp3VORh6IeDMHFdvcnBc5ZLV208vDJQBSCH0Hl3mq/+d9wBaYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738077941; c=relaxed/simple;
-	bh=nV+FzWKbANZx9HgkidFwG5xrewDqm4kJlQ/F9Fw2IS8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iTL1s9XWT/500H9X30rEGWTyUPs5GH6fAJOxhZHBng3kaBrYzwQ5icJ9aCM4vbk1CTEZqXPiGYpRxdi1dMIreMGiGlKNML1XqY5j1Qj55LHFu9qvQZ0cYjNP1DeT+0bHWArbe+NUGH8yyZsgfu6UAzonLy93BS9vfN9O571vTO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CjQUKk8t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D7BCC4CEE4;
-	Tue, 28 Jan 2025 15:25:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738077940;
-	bh=nV+FzWKbANZx9HgkidFwG5xrewDqm4kJlQ/F9Fw2IS8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=CjQUKk8tgxNT5FiUYgBP/EkH7tciprh6KefMogl3Po5J42mA3NXuFZi0diBTojoUc
-	 8dehbYcAIgY1+RCViQd/qQrLPWw6Sr5NiNCPOH2Zt26btzxy5SF2dyEHjCzr/mVi2g
-	 U5YsZURkMYZA5Ajf74Ykhuf5uAc6+UvVXSU1XpiiTLluENpKrp8UJ3zO2Rf1VOAC1B
-	 yf0cVzboM9VEGvZehKjN1UTBQTY6oRiojzAiRao8mFyZSrQqKEw9Ez+EU0+ZquVV8t
-	 /ixlbIXRNpi/g/TyT76quaBuGmBMlqqNg7cVdf/1CEItBggR9PxZdBr7iZ5hanR/QA
-	 q/RK3c0WhfAiQ==
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-540254357c8so5797693e87.1;
-        Tue, 28 Jan 2025 07:25:40 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVST/fm6/34PcapJvo+SMuv/kzpodTM2/etKF0/fGuw8YBHMsHR4Jbizm4K+yrwwibZBYv0AQzJk2yY/qufcP+o@vger.kernel.org, AJvYcCXqaTTjAJyRUbu839w8fzXQSTYK5YX/bIaUwD2aUfBpELcf4vYT44aAbr44ifrPXzQEvES9ulkef5+wQFw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjZTjqsy0PznvCUyBw+R4tnL+W2eqRcvBsUFxZz79hPO5DRncS
-	RXqT6mG3ky0HXIiQ6HGg6WSb5GukC2S3SL1f5SWOb9M1LxkBnlDLEh21cPCXO4HlmIODXMWkWZb
-	vP9nZgtVB6kFXDiJ5Zdw98hQl2g==
-X-Google-Smtp-Source: AGHT+IEFby41Dzk8Di02mNOM5Cxy2EFRJLFUx7f25ID/UUfCbjR1gV58RWSxAT/uUFzd04BUgt4V0MNwsnwXgwYKw80=
-X-Received: by 2002:a05:6512:3c92:b0:53e:39ed:85e6 with SMTP id
- 2adb3069b0e04-5439c27fa73mr18344610e87.32.1738077938743; Tue, 28 Jan 2025
- 07:25:38 -0800 (PST)
+	s=arc-20240116; t=1738078912; c=relaxed/simple;
+	bh=rKnxtCj4PMLlCaWZ99dlMUSfh6A5en5jmHeNNRRfxgI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FRuhoDBmQjKds3XFp4a/QpXHcCHKeJ/8hdiidp1rIM1WIQVbjbLZbDWRDTyKL+8+vv4pzJzpb4UWXv18AMfTXsejrttH3KcMVmXki4FcIQyDQT3y9mvYDRyOqMu2sYJguSv9A7Z+ZAPP7VIqglp3RdDz0dRITAVZefHo24RQ2rY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIo0CM26; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738078909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=k73+ePZvJwg+asv5ryh/70D1PG8qoC0cBjzVRH7Sok8=;
+	b=PIo0CM26CYrinWPFEvbcA6tzYoB8PA9VM7a8sS6UWo+sN9GuF1i7hKwNX7GrOC1Pdhx2EL
+	wUPiDoWJjEwUbb2Ozlf9ssrXXU/rjD8OoyBC7iDePSGWOhH5fAnEsPO8fe2RZLZ7GRu2fh
+	xIh6yoAsBCr40gp88B4mtmj/C+4eF2M=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-272-CoaKGMrSPeauRHJyBw6-jQ-1; Tue, 28 Jan 2025 10:41:46 -0500
+X-MC-Unique: CoaKGMrSPeauRHJyBw6-jQ-1
+X-Mimecast-MFC-AGG-ID: CoaKGMrSPeauRHJyBw6-jQ
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385e49efd59so2224603f8f.0
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 07:41:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738078903; x=1738683703;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k73+ePZvJwg+asv5ryh/70D1PG8qoC0cBjzVRH7Sok8=;
+        b=BzpdQFkFHtKXTTpy0i4BcoqYXN3/+Vid6YiVThJ2JIFOp1zekugkyrfK9qld8s/q3Y
+         iS9Z83lnkMWRBkUU/M4mgVV7A67GQ2osIpy/GvJA15GziXTbvK9xUxlv45hd1Z6YqFM/
+         HVwZ1EC0siomxuF8pl6hKVwecSOav5yxSCPq8ceO/r145ZLPzgrjUPySeAhziCnAZ/5V
+         UiLLopTIMSIeb9R3dN6LTLcP2VwgDVON/7kQX7tcJ8qrhNYaP3ZYt+Ozw+C2s9MisJSQ
+         cjsAH0eZ5YiiySI7TfwoFemWqa3SVLgm2tfrZV3MHZlvuBWUNZVfNPb3JcUzMqOWByoE
+         nrPA==
+X-Gm-Message-State: AOJu0YxqOeZPSE+kdM6kyS7uXeMdKfsuTw7/iTik8MmqCrMan53gs9F+
+	QpSubIuQxD3ZPAP3cF1noAD/Ajd+5ZDx8gHjbNGGFclfd1Ks7ekZKf7XqbiFEfhZtGZz+DsieZF
+	/wnm7YRwsdRJeLbf8UFYKvdtcCL9yqFw4iOQcj+CVPzfX0DzJqA==
+X-Gm-Gg: ASbGncv7hkD3jWv/lqSEs8h6rFHdVYcgBsbqs/qvsKb4tTZvOxYH2tepdLeN5JwlwvI
+	FaF+rbC4yv1+6wvo/RltaoIXWJ95UNuSaWuo8ZnaXefH72QKZWiQmmt5yw5W7fIZ3bBe+vYu5f6
+	1F40ImikJm9d2VAMEv36UGISZzgyco+KEOU0egfY615SdTyW0gfipUjAaBupf01y1D2Ngh+2/lX
+	KIkwx86OYUlisb0xQ/c6En0r6BHZ7+HZuBtmrJBOBa2jfw/7BSzEbindcPw3xUCebjkCNuCPg3+
+	kgG9kkY=
+X-Received: by 2002:a05:6000:2ac:b0:38b:dc3d:e4be with SMTP id ffacd0b85a97d-38bf59f0309mr50514792f8f.51.1738078903486;
+        Tue, 28 Jan 2025 07:41:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGYuQet8DX/TfdKSByKAHxHjKQUGou8aFo7HN2gC1ypQyEsOEM6vmQbJcZ/qnkSOYNTlfE9/w==
+X-Received: by 2002:a05:6000:2ac:b0:38b:dc3d:e4be with SMTP id ffacd0b85a97d-38bf59f0309mr50514769f8f.51.1738078903173;
+        Tue, 28 Jan 2025 07:41:43 -0800 (PST)
+Received: from [192.168.10.3] ([151.95.59.125])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38c2a1761ffsm14197749f8f.7.2025.01.28.07.41.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jan 2025 07:41:42 -0800 (PST)
+Message-ID: <a0d9ad95-ea69-45dc-a07f-b6dc43e9731e@redhat.com>
+Date: Tue, 28 Jan 2025 16:41:41 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250127222031.3078945-1-coltonlewis@google.com> <20250127222031.3078945-2-coltonlewis@google.com>
-In-Reply-To: <20250127222031.3078945-2-coltonlewis@google.com>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 28 Jan 2025 09:25:25 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqLa9KmYjkVBpxwkQXfQyj53=dgj_9rijca5JGem46qZLg@mail.gmail.com>
-X-Gm-Features: AWEUYZkt7YkAXKfFlHInNwyPOLFZ80Bbbmqn6_x8T3vnHAb5bp8zMcQevYuFBUs
-Message-ID: <CAL_JsqLa9KmYjkVBpxwkQXfQyj53=dgj_9rijca5JGem46qZLg@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
- partition the PMU
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86/mmu: Ensure NX huge page recovery thread is
+ alive before waking
+To: Keith Busch <kbusch@kernel.org>, Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250124234623.3609069-1-seanjc@google.com>
+ <Z5RkcB_wf5Y74BUM@kbusch-mbp> <Z5e4w7IlEEk2cpH-@google.com>
+ <Z5fO5bac8ohqUH1D@kbusch-mbp>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <Z5fO5bac8ohqUH1D@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 27, 2025 at 4:26=E2=80=AFPM Colton Lewis <coltonlewis@google.co=
-m> wrote:
+On 1/27/25 19:22, Keith Busch wrote:
+>> It's not clear to me that calling vhost_task_wake() before vhost_task_start() is
+>> allowed, which is why I deliberately waited until the task was started to make it
+>> visible.  Though FWIW, doing "vhost_task_wake(nx_thread)" before vhost_task_start()
+>> doesn't explode.
 >
-> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
-> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
-> allowed, EL0 while counters HPMN..N are only accessible by EL2.
->
-> Introduce a module parameter in the PMUv3 driver to set this
-> register. The name reserved_guest_counters reflects the intent to
-> reserve some counters for the guest so they may eventually be allowed
-> direct access to a subset of PMU functionality for increased
-> performance.
->
-> Track HPMN and whether the pmu is partitioned in struct arm_pmu.
->
-> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
-> specifically disallows that case because it's not useful given the
-> intention to allow guests access to their own counters.
->
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  arch/arm/include/asm/arm_pmuv3.h   | 10 +++++++
->  arch/arm64/include/asm/arm_pmuv3.h | 10 +++++++
->  drivers/perf/arm_pmuv3.c           | 43 ++++++++++++++++++++++++++++--
->  include/linux/perf/arm_pmu.h       |  2 ++
->  include/linux/perf/arm_pmuv3.h     |  7 +++++
->  5 files changed, 70 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_=
-pmuv3.h
-> index 2ec0e5e83fc9..49ad90486aa5 100644
-> --- a/arch/arm/include/asm/arm_pmuv3.h
-> +++ b/arch/arm/include/asm/arm_pmuv3.h
-> @@ -277,4 +277,14 @@ static inline u64 read_pmceid1(void)
->         return val;
->  }
->
-> +static inline u32 read_mdcr(void)
-> +{
-> +       return read_sysreg(mdcr_el2);
-> +}
-> +
-> +static inline void write_mdcr(u32 val)
-> +{
-> +       write_sysreg(val, mdcr_el2);
-> +}
-> +
->  #endif
-> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/=
-arm_pmuv3.h
-> index 8a777dec8d88..fc37e7e81e07 100644
-> --- a/arch/arm64/include/asm/arm_pmuv3.h
-> +++ b/arch/arm64/include/asm/arm_pmuv3.h
-> @@ -188,4 +188,14 @@ static inline bool is_pmuv3p9(int pmuver)
->         return pmuver >=3D ID_AA64DFR0_EL1_PMUVer_V3P9;
->  }
->
-> +static inline u64 read_mdcr(void)
-> +{
-> +       return read_sysreg(mdcr_el2);
-> +}
-> +
-> +static inline void write_mdcr(u64 val)
-> +{
-> +       write_sysreg(val, mdcr_el2);
-> +}
-> +
->  #endif
-> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> index b5cc11abc962..55f9ae560715 100644
-> --- a/drivers/perf/arm_pmuv3.c
-> +++ b/drivers/perf/arm_pmuv3.c
-> @@ -325,6 +325,7 @@ GEN_PMU_FORMAT_ATTR(threshold_compare);
->  GEN_PMU_FORMAT_ATTR(threshold);
->
->  static int sysctl_perf_user_access __read_mostly;
-> +static u8 reserved_guest_counters __read_mostly;
->
->  static bool armv8pmu_event_is_64bit(struct perf_event *event)
->  {
-> @@ -500,6 +501,29 @@ static void armv8pmu_pmcr_write(u64 val)
->         write_pmcr(val);
->  }
->
-> +static u64 armv8pmu_mdcr_read(void)
-> +{
-> +       return read_mdcr();
-> +}
-> +
-> +static void armv8pmu_mdcr_write(u64 val)
-> +{
-> +       write_mdcr(val);
-> +       isb();
-> +}
-> +
-> +static void armv8pmu_partition(u8 hpmn)
-> +{
-> +       u64 mdcr =3D armv8pmu_mdcr_read();
-> +
-> +       mdcr &=3D ~MDCR_EL2_HPMN_MASK;
-> +       mdcr |=3D FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
-> +       /* Prevent guest counters counting at EL2 */
-> +       mdcr |=3D ARMV8_PMU_MDCR_HPMD;
-> +
-> +       armv8pmu_mdcr_write(mdcr);
-> +}
-> +
->  static int armv8pmu_has_overflowed(u64 pmovsr)
->  {
->         return !!(pmovsr & ARMV8_PMU_OVERFLOWED_MASK);
-> @@ -1069,6 +1093,9 @@ static void armv8pmu_reset(void *info)
->
->         bitmap_to_arr64(&mask, cpu_pmu->cntr_mask, ARMPMU_MAX_HWEVENTS);
->
-> +       if (cpu_pmu->partitioned)
-> +               armv8pmu_partition(cpu_pmu->hpmn);
-> +
->         /* The counter and interrupt enable registers are unknown at rese=
-t. */
->         armv8pmu_disable_counter(mask);
->         armv8pmu_disable_intens(mask);
-> @@ -1205,6 +1232,7 @@ static void __armv8pmu_probe_pmu(void *info)
->  {
->         struct armv8pmu_probe_info *probe =3D info;
->         struct arm_pmu *cpu_pmu =3D probe->pmu;
-> +       u8 pmcr_n;
->         u64 pmceid_raw[2];
->         u32 pmceid[2];
->         int pmuver;
-> @@ -1215,10 +1243,19 @@ static void __armv8pmu_probe_pmu(void *info)
->
->         cpu_pmu->pmuver =3D pmuver;
->         probe->present =3D true;
-> +       pmcr_n =3D FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
->
->         /* Read the nb of CNTx counters supported from PMNC */
-> -       bitmap_set(cpu_pmu->cntr_mask,
-> -                  0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
-> +       bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
-> +
-> +       if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr=
-_n) {
-> +               cpu_pmu->hpmn =3D reserved_guest_counters;
-> +               cpu_pmu->partitioned =3D true;
+> Hm, it does look questionable to try to wake a process that hadn't been
+> started yet, but I think it may be okay: task state will be TASK_NEW
+> before vhost_task_start(), which looks like will cause wake_up_process()
+> to do nothing.
 
-You're storing the same information 3 times. 'partitioned' is just
-'reserved_guest_counters !=3D 0' or 'cpu_pmu->hpmn !=3D pmcr_n'.
+Yes, it's okay because both wake_up_new_task() and try_to_wake_up() take
+p->pi_lock.  try_to_wake_up() does not match either bit in TASK_NORMAL
+(which is TASK_INTERRUPTIBLE | TASK_UNINTERRUPTIBLE) and does nothing.
 
-> +       } else {
-> +               reserved_guest_counters =3D 0;
-> +               cpu_pmu->hpmn =3D pmcr_n;
-> +               cpu_pmu->partitioned =3D false;
-> +       }
->
->         /* Add the CPU cycles counter */
->         set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
-> @@ -1516,3 +1553,5 @@ void arch_perf_update_userpage(struct perf_event *e=
-vent,
->         userpg->cap_user_time_zero =3D 1;
->         userpg->cap_user_time_short =3D 1;
->  }
-> +
-> +module_param(reserved_guest_counters, byte, 0);
+I'm queuing the patch with the store before vhost_task_start, and
+acquire/release instead of just READ_ONCE/WRITE_ONCE.
 
-Module params are generally discouraged. Since this driver can't be a
-module, this is a boot time only option. There's little reason this
-can't be a sysfs setting. There's some complexity in changing this
-when counters are in use (just reject the change) and when we have
-asymmetric PMUs. Alternatively, it could be a sysctl like user access.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 74c20dbb92da..6d5708146384 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7127,7 +7127,8 @@ static void kvm_wake_nx_recovery_thread(struct kvm *kvm)
+  	 * may not be valid even though the VM is globally visible.  Do nothing,
+  	 * as such a VM can't have any possible NX huge pages.
+  	 */
+-	struct vhost_task *nx_thread = READ_ONCE(kvm->arch.nx_huge_page_recovery_thread);
++	struct vhost_task *nx_thread =
++		smp_load_acquire(&kvm->arch.nx_huge_page_recovery_thread);
+  
+  	if (nx_thread)
+  		vhost_task_wake(nx_thread);
+@@ -7474,10 +7475,10 @@ static void kvm_mmu_start_lpage_recovery(struct once *once)
+  	if (!nx_thread)
+  		return;
+  
+-	vhost_task_start(nx_thread);
++	/* Make the task visible only once it is fully created. */
++	smp_store_release(&kvm->arch.nx_huge_page_recovery_thread, nx_thread);
+  
+-	/* Make the task visible only once it is fully started. */
+-	WRITE_ONCE(kvm->arch.nx_huge_page_recovery_thread, nx_thread);
++	vhost_task_start(nx_thread);
+  }
+  
+  int kvm_mmu_post_init_vm(struct kvm *kvm)
 
-Rob
 
