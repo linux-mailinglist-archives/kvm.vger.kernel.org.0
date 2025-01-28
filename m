@@ -1,154 +1,252 @@
-Return-Path: <kvm+bounces-36782-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36783-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9E8A20C4E
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:50:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2113A20CFD
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 16:25:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422343A7E44
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 14:50:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D71561881AF8
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FEA1AF0D3;
-	Tue, 28 Jan 2025 14:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A221C831A;
+	Tue, 28 Jan 2025 15:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lv/2KVbG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CjQUKk8t"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975C7F9F8;
-	Tue, 28 Jan 2025 14:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F271A9B2B;
+	Tue, 28 Jan 2025 15:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738075804; cv=none; b=aw9NuPdEeY//r4s0DwUBUcIFUXOHR18kLerRWd2qQPWHMLKcKF3nvT6J0yUbv9XaTGEw77S6E5pSMWUnlqtaKsMPvhqVZF8Rn2kgEjm//m/d4muvK8fY69XKBd9waajQfxgmuarggvCNeUDViVG8Jtdo+ILWpyH7EYT7ZpI7Auk=
+	t=1738077941; cv=none; b=qvAvnLGnmn/bkLALrC1Ad0X3x4HdnGQOxhVwS9aRwfXsEov3nb6VN2jKYmUihoMlY9l8xOhMzeOCvijNAOWzDlpA8Ik32Kg1gyK8kUKbCWqEReoyl8DApbxAK1NNRsDUhUQ9xUGWuktfs5kaLiozzdWWbWMdQdDMMXhl1iSYb4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738075804; c=relaxed/simple;
-	bh=8IpvaS1zfcVdWjXbEe4QmGoiJaTdnB3V6B3WOb2GQHs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=tbEay3yn5nINFhWij7BeSiygJvpSs8wvbss4bL0D2ttfnsZhFroxbUU5X/KWNFVtS94slaRX2CW6rrqTCYQNjc1r36F5q0lJP862ghMtVCWpoIhBQuyLiF2tPyZglsMLbJw4DyqeVTEI/DFEPpGS1+5QPv4Glu1gn89RtbCi0bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lv/2KVbG; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-51619b06a1cso3402336e0c.3;
-        Tue, 28 Jan 2025 06:50:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738075801; x=1738680601; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zb99191K64oonEm8sGz6Xg9hMLlXiUhPwruyb9S25aU=;
-        b=lv/2KVbGrwuZHgAiPcRE8H+1CjngLvPNTTskJwK23Jh2AAWAJOcu54HJe+k7c+DofU
-         CwY1UjDG0PVOr+d6isYLPAZDknLFklvXzOPXbB+WUBbpV801PD3AbyYkl3A1m1el+mik
-         A0jPzdNiscP8UZGafkJUPttF0vR6DxDjyLmO54kuzzQI8/7OUf1DGpQlOZwQabFLNne5
-         CT/4gFj9Dd3vb/eiGgcPUyuXuasXT7gxpoobrEO7+rtiIXEUpC1R5s3c4v+6MHvAM5tw
-         EH8l3WLa6+mK1sm6+nhZtcYYCyDquX/AUQ9J3oyO0WEMmvm6+hFxdaW/Aq3d/xZjnoKF
-         GzeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738075801; x=1738680601;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Zb99191K64oonEm8sGz6Xg9hMLlXiUhPwruyb9S25aU=;
-        b=vay6R+zqy8nfeXPjd1I0yLmegcI9QfqskOWqIPlQGC1CVe3yu7nTuoyN/3+o7NaSUt
-         cixvJgtmMyDjtIAiR0SArpsNJNF30e8EsHiQ0nUNdhfL03Zd8D4HnRG1E8kwNVBiHBba
-         QquZ0hwDjKNbWVOlvogxtu9krlZsbugurNyLOhwbXWDbYKlV8+ksXOt0y8tYLWU2DRuC
-         RI8OKml+E4EP4x+AKhhcyOZJMRvVOPfN65+sAaEQndHoMpUGFgd8CESGX80l2leruThu
-         CnuXZT8H3PJ2iziRTHzES1oSJ6bkuMNRFQBKz/tMMSrLd8uytR7KS7DCWjofXxa0pp80
-         liUg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+4uGqwT1rruM2Shzmyb/uyXLAFrLe+vnVFfPC9DOTR+gwgxcP0azQ1nRYm9CrWiX7qLQRX+sHERBF@vger.kernel.org, AJvYcCXI5jecCS0BIABjbwXK2KmKZc8osH3SKQNZrsiofzt3jo6xbI8sur7L7722hgVbPcRfXA4=@vger.kernel.org, AJvYcCXUTdrddnV8iZZWZVFaUyFEfu6nxJcnoVUj48f/a8dlHJE/R8kg7HjlhOlrCHA/WKTR03PhfLmRW/CKn2KZ@vger.kernel.org, AJvYcCXcaFoRNmupxJARXXkBOFOo+jbyYriQt3loH/2IG3neIq+h9Zdnj/KNKDNNMYD0UrBTds583bLrdtKDr+iR/ZrL@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQhJLxubRbrE9ACE+j45n31jfsi4jruU7/WRYkz7CTP1AE2bzb
-	Ro7oCNXqUbOIp3ftl8ruutc3PimDC3GQLt8344xYGL4V1q/JUf/bXDK/dw==
-X-Gm-Gg: ASbGnct6eI86QQzpFMLFp4MNVcFY9J0unsnH8j4M9sWFos2P+FVVcn/Y9nN3FCZCWrK
-	BadKJK0ykTcjeKny11smcJCz4UlLwEQjhyaM5mIG4xE/QvQFfpecGv6KpE+u35/dE8s/mDXayOA
-	wcB6pG2xMrtTSrBq6X/VDPEs/1AzSCa+LgTJ6DR3XkAMJl+WendzaHw8ESliGYYZiskDBQBLVDE
-	AZYE/ypxRBbX/glthnk7WcRV/snOX1t8UJcJ5T+Aew5c3GNLanM0ZeG7k6mP/zuyWECX7DrzEwP
-	U7DoV1fvE2msffkkNsYvVj652VrSTvra0ibSa8BdvWc51908nkzUq236zmeOKtk=
-X-Google-Smtp-Source: AGHT+IHW31CLAfaZZ/6noX+17+d4mKCF+2r2fMRxUk8GJnrrJeBabGTvUIlBo05ZEujchzkiLC6htg==
-X-Received: by 2002:a05:6122:1698:b0:518:91b3:5e37 with SMTP id 71dfb90a1353d-51d5b26bbafmr36947933e0c.5.1738075801328;
-        Tue, 28 Jan 2025 06:50:01 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-51e4ea71de3sm1791758e0c.12.2025.01.28.06.50.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jan 2025 06:50:00 -0800 (PST)
-Date: Tue, 28 Jan 2025 09:49:59 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Mina Almasry <almasrymina@google.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, 
- virtualization@lists.linux.dev, 
- kvm@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- David Ahern <dsahern@kernel.org>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?UTF-8?B?RXVnZW5pbyBQw6lyZXo=?= <eperezma@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, 
- Stefano Garzarella <sgarzare@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, 
- Kaiyuan Zhang <kaiyuanz@google.com>, 
- Pavel Begunkov <asml.silence@gmail.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Samiullah Khawaja <skhawaja@google.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Joe Damato <jdamato@fastly.com>, 
- dw@davidwei.uk
-Message-ID: <6798ee97c73e1_987d9294d6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAHS8izNzbEi_Dn+hDohF9Go=et7kts-BnmEpq=Znpot7o7B5wA@mail.gmail.com>
-References: <20241221004236.2629280-1-almasrymina@google.com>
- <20241221004236.2629280-6-almasrymina@google.com>
- <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
- <CAHS8izNzbEi_Dn+hDohF9Go=et7kts-BnmEpq=Znpot7o7B5wA@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
+	s=arc-20240116; t=1738077941; c=relaxed/simple;
+	bh=nV+FzWKbANZx9HgkidFwG5xrewDqm4kJlQ/F9Fw2IS8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iTL1s9XWT/500H9X30rEGWTyUPs5GH6fAJOxhZHBng3kaBrYzwQ5icJ9aCM4vbk1CTEZqXPiGYpRxdi1dMIreMGiGlKNML1XqY5j1Qj55LHFu9qvQZ0cYjNP1DeT+0bHWArbe+NUGH8yyZsgfu6UAzonLy93BS9vfN9O571vTO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CjQUKk8t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D7BCC4CEE4;
+	Tue, 28 Jan 2025 15:25:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738077940;
+	bh=nV+FzWKbANZx9HgkidFwG5xrewDqm4kJlQ/F9Fw2IS8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CjQUKk8tgxNT5FiUYgBP/EkH7tciprh6KefMogl3Po5J42mA3NXuFZi0diBTojoUc
+	 8dehbYcAIgY1+RCViQd/qQrLPWw6Sr5NiNCPOH2Zt26btzxy5SF2dyEHjCzr/mVi2g
+	 U5YsZURkMYZA5Ajf74Ykhuf5uAc6+UvVXSU1XpiiTLluENpKrp8UJ3zO2Rf1VOAC1B
+	 yf0cVzboM9VEGvZehKjN1UTBQTY6oRiojzAiRao8mFyZSrQqKEw9Ez+EU0+ZquVV8t
+	 /ixlbIXRNpi/g/TyT76quaBuGmBMlqqNg7cVdf/1CEItBggR9PxZdBr7iZ5hanR/QA
+	 q/RK3c0WhfAiQ==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-540254357c8so5797693e87.1;
+        Tue, 28 Jan 2025 07:25:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVST/fm6/34PcapJvo+SMuv/kzpodTM2/etKF0/fGuw8YBHMsHR4Jbizm4K+yrwwibZBYv0AQzJk2yY/qufcP+o@vger.kernel.org, AJvYcCXqaTTjAJyRUbu839w8fzXQSTYK5YX/bIaUwD2aUfBpELcf4vYT44aAbr44ifrPXzQEvES9ulkef5+wQFw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjZTjqsy0PznvCUyBw+R4tnL+W2eqRcvBsUFxZz79hPO5DRncS
+	RXqT6mG3ky0HXIiQ6HGg6WSb5GukC2S3SL1f5SWOb9M1LxkBnlDLEh21cPCXO4HlmIODXMWkWZb
+	vP9nZgtVB6kFXDiJ5Zdw98hQl2g==
+X-Google-Smtp-Source: AGHT+IEFby41Dzk8Di02mNOM5Cxy2EFRJLFUx7f25ID/UUfCbjR1gV58RWSxAT/uUFzd04BUgt4V0MNwsnwXgwYKw80=
+X-Received: by 2002:a05:6512:3c92:b0:53e:39ed:85e6 with SMTP id
+ 2adb3069b0e04-5439c27fa73mr18344610e87.32.1738077938743; Tue, 28 Jan 2025
+ 07:25:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250127222031.3078945-1-coltonlewis@google.com> <20250127222031.3078945-2-coltonlewis@google.com>
+In-Reply-To: <20250127222031.3078945-2-coltonlewis@google.com>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 28 Jan 2025 09:25:25 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqLa9KmYjkVBpxwkQXfQyj53=dgj_9rijca5JGem46qZLg@mail.gmail.com>
+X-Gm-Features: AWEUYZkt7YkAXKfFlHInNwyPOLFZ80Bbbmqn6_x8T3vnHAb5bp8zMcQevYuFBUs
+Message-ID: <CAL_JsqLa9KmYjkVBpxwkQXfQyj53=dgj_9rijca5JGem46qZLg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
+ partition the PMU
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > > +struct net_devmem_dmabuf_binding *
-> > > +net_devmem_get_sockc_binding(struct sock *sk, struct sockcm_cookie *sockc)
-> > > +{
-> > > +     struct net_devmem_dmabuf_binding *binding;
-> > > +     int err = 0;
-> > > +
-> > > +     binding = net_devmem_lookup_dmabuf(sockc->dmabuf_id);
-> >
-> > This lookup is from global xarray net_devmem_dmabuf_bindings.
-> >
-> > Is there a check that the socket is sending out through the device
-> > to which this dmabuf was bound with netlink? Should there be?
-> > (e.g., SO_BINDTODEVICE).
-> >
-> 
-> Yes, I think it may be an issue if the user triggers a send from a
-> different netdevice, because indeed when we bind a dmabuf we bind it
-> to a specific netdevice.
-> 
-> One option is as you say to require TX sockets to be bound and to
-> check that we're bound to the correct netdev. I also wonder if I can
-> make this work without SO_BINDTODEVICE, by querying the netdev the
-> sock is currently trying to send out on and doing a check in the
-> tcp_sendmsg. I'm not sure if this is possible but I'll give it a look.
+On Mon, Jan 27, 2025 at 4:26=E2=80=AFPM Colton Lewis <coltonlewis@google.co=
+m> wrote:
+>
+> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
+> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
+> allowed, EL0 while counters HPMN..N are only accessible by EL2.
+>
+> Introduce a module parameter in the PMUv3 driver to set this
+> register. The name reserved_guest_counters reflects the intent to
+> reserve some counters for the guest so they may eventually be allowed
+> direct access to a subset of PMU functionality for increased
+> performance.
+>
+> Track HPMN and whether the pmu is partitioned in struct arm_pmu.
+>
+> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
+> specifically disallows that case because it's not useful given the
+> intention to allow guests access to their own counters.
+>
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  arch/arm/include/asm/arm_pmuv3.h   | 10 +++++++
+>  arch/arm64/include/asm/arm_pmuv3.h | 10 +++++++
+>  drivers/perf/arm_pmuv3.c           | 43 ++++++++++++++++++++++++++++--
+>  include/linux/perf/arm_pmu.h       |  2 ++
+>  include/linux/perf/arm_pmuv3.h     |  7 +++++
+>  5 files changed, 70 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_=
+pmuv3.h
+> index 2ec0e5e83fc9..49ad90486aa5 100644
+> --- a/arch/arm/include/asm/arm_pmuv3.h
+> +++ b/arch/arm/include/asm/arm_pmuv3.h
+> @@ -277,4 +277,14 @@ static inline u64 read_pmceid1(void)
+>         return val;
+>  }
+>
+> +static inline u32 read_mdcr(void)
+> +{
+> +       return read_sysreg(mdcr_el2);
+> +}
+> +
+> +static inline void write_mdcr(u32 val)
+> +{
+> +       write_sysreg(val, mdcr_el2);
+> +}
+> +
+>  #endif
+> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/=
+arm_pmuv3.h
+> index 8a777dec8d88..fc37e7e81e07 100644
+> --- a/arch/arm64/include/asm/arm_pmuv3.h
+> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+> @@ -188,4 +188,14 @@ static inline bool is_pmuv3p9(int pmuver)
+>         return pmuver >=3D ID_AA64DFR0_EL1_PMUVer_V3P9;
+>  }
+>
+> +static inline u64 read_mdcr(void)
+> +{
+> +       return read_sysreg(mdcr_el2);
+> +}
+> +
+> +static inline void write_mdcr(u64 val)
+> +{
+> +       write_sysreg(val, mdcr_el2);
+> +}
+> +
+>  #endif
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index b5cc11abc962..55f9ae560715 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -325,6 +325,7 @@ GEN_PMU_FORMAT_ATTR(threshold_compare);
+>  GEN_PMU_FORMAT_ATTR(threshold);
+>
+>  static int sysctl_perf_user_access __read_mostly;
+> +static u8 reserved_guest_counters __read_mostly;
+>
+>  static bool armv8pmu_event_is_64bit(struct perf_event *event)
+>  {
+> @@ -500,6 +501,29 @@ static void armv8pmu_pmcr_write(u64 val)
+>         write_pmcr(val);
+>  }
+>
+> +static u64 armv8pmu_mdcr_read(void)
+> +{
+> +       return read_mdcr();
+> +}
+> +
+> +static void armv8pmu_mdcr_write(u64 val)
+> +{
+> +       write_mdcr(val);
+> +       isb();
+> +}
+> +
+> +static void armv8pmu_partition(u8 hpmn)
+> +{
+> +       u64 mdcr =3D armv8pmu_mdcr_read();
+> +
+> +       mdcr &=3D ~MDCR_EL2_HPMN_MASK;
+> +       mdcr |=3D FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
+> +       /* Prevent guest counters counting at EL2 */
+> +       mdcr |=3D ARMV8_PMU_MDCR_HPMD;
+> +
+> +       armv8pmu_mdcr_write(mdcr);
+> +}
+> +
+>  static int armv8pmu_has_overflowed(u64 pmovsr)
+>  {
+>         return !!(pmovsr & ARMV8_PMU_OVERFLOWED_MASK);
+> @@ -1069,6 +1093,9 @@ static void armv8pmu_reset(void *info)
+>
+>         bitmap_to_arr64(&mask, cpu_pmu->cntr_mask, ARMPMU_MAX_HWEVENTS);
+>
+> +       if (cpu_pmu->partitioned)
+> +               armv8pmu_partition(cpu_pmu->hpmn);
+> +
+>         /* The counter and interrupt enable registers are unknown at rese=
+t. */
+>         armv8pmu_disable_counter(mask);
+>         armv8pmu_disable_intens(mask);
+> @@ -1205,6 +1232,7 @@ static void __armv8pmu_probe_pmu(void *info)
+>  {
+>         struct armv8pmu_probe_info *probe =3D info;
+>         struct arm_pmu *cpu_pmu =3D probe->pmu;
+> +       u8 pmcr_n;
+>         u64 pmceid_raw[2];
+>         u32 pmceid[2];
+>         int pmuver;
+> @@ -1215,10 +1243,19 @@ static void __armv8pmu_probe_pmu(void *info)
+>
+>         cpu_pmu->pmuver =3D pmuver;
+>         probe->present =3D true;
+> +       pmcr_n =3D FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
+>
+>         /* Read the nb of CNTx counters supported from PMNC */
+> -       bitmap_set(cpu_pmu->cntr_mask,
+> -                  0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
+> +       bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
+> +
+> +       if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr=
+_n) {
+> +               cpu_pmu->hpmn =3D reserved_guest_counters;
+> +               cpu_pmu->partitioned =3D true;
 
-I was a bit quick on mentioning SO_BINDTODEVICE. Agreed that it is
-vastly preferable to not require that, but infer the device from
-the connected TCP sock.
+You're storing the same information 3 times. 'partitioned' is just
+'reserved_guest_counters !=3D 0' or 'cpu_pmu->hpmn !=3D pmcr_n'.
 
+> +       } else {
+> +               reserved_guest_counters =3D 0;
+> +               cpu_pmu->hpmn =3D pmcr_n;
+> +               cpu_pmu->partitioned =3D false;
+> +       }
+>
+>         /* Add the CPU cycles counter */
+>         set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
+> @@ -1516,3 +1553,5 @@ void arch_perf_update_userpage(struct perf_event *e=
+vent,
+>         userpg->cap_user_time_zero =3D 1;
+>         userpg->cap_user_time_short =3D 1;
+>  }
+> +
+> +module_param(reserved_guest_counters, byte, 0);
+
+Module params are generally discouraged. Since this driver can't be a
+module, this is a boot time only option. There's little reason this
+can't be a sysfs setting. There's some complexity in changing this
+when counters are in use (just reject the change) and when we have
+asymmetric PMUs. Alternatively, it could be a sysctl like user access.
+
+Rob
 
