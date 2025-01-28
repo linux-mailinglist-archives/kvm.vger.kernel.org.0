@@ -1,193 +1,288 @@
-Return-Path: <kvm+bounces-36794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B4F6A211A8
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 19:34:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708E8A211BE
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 19:42:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 890C01626CF
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 18:34:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87E8A3A3978
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 18:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CBA8145B3E;
-	Tue, 28 Jan 2025 18:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B9E1DE4FA;
+	Tue, 28 Jan 2025 18:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XX8NdJzM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XEYz9usD"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC4D1D7E54;
-	Tue, 28 Jan 2025 18:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9170BE40
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 18:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738089285; cv=none; b=QOtAm+wGMGzi/wXNKHAmR/v0Q/2yQaR2GilC2mWPiP4dVkLHuXZ8uxK+2N7PgL/fYVFyFw6NaPGxZHMSTAbpxQ/0pS4AaNIKhqm9ullwtsvQ8uvM4MQ0ch3PvyVtDPEIFgtYwsSXqeXSbG/Ls9gnKHYOhKUdrAki/a+4huygubU=
+	t=1738089716; cv=none; b=WlQADb2+c2rxzRdTgW3PiZEzoWTMW38c8J2wPTyDMZeq/Z5Jwv7/Mrllivxw+8TltD0yV4TP48Ho04FdY8CsoJixvCbg7CGxsEnvesY/MUfmv/3OBp9iuCdNVamhty9MriMpgkcIGDVBdPwJ8zV+ysgmjER4NPIqb4fCJkabHy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738089285; c=relaxed/simple;
-	bh=mHKBUJdKBC4HZN3rHzTaBLAkUQRvvhlFeGfMJ7nRHis=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Nvoxs7KFd3eGG8peJkOqlCmWr7w2a1X63ABueN1DAWh2kW6ugd9t5lBB6sn2femxBqur+nfiyFhzLl88Cj91O96igLEvRWD5TV9YK+xNoldCsT1s7+qyyyO1up8qyR7U27o1XPDyuNj7v/STBIJe+sp+XQI6zxHxuiul1BlR1RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=XX8NdJzM; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=mHKBUJdKBC4HZN3rHzTaBLAkUQRvvhlFeGfMJ7nRHis=; b=XX8NdJzM0JMilW9OqMyyEJjzON
-	fA2ETCICvh2NWdzQ1m2Kw50L12wMD+qB0spQ76SIgG3cfyOyU/qXA7B6KCBXCChhDu9hVh8OYWJOM
-	iCJXXeT+JoKLPP+AGp3IWsyKLEARdi5uHc7qG7EgvsXQ5BX2YVHhVzJnesxHoSpEA/hMzW1b2a0kA
-	pb60ZIhywuH9kUnJmNqMU5dbSFdk1tIN1EJeuDJjHtJJoA1TpDPk9etrFp0q9naiRNclvH2Y5bqGz
-	UbWYjc6hNIemEaQ9Ummehx/vz+HaY8pQUShFa9Up4fTXoni2cGvQ3QyOT4bxnka/ei+XePLXBPtou
-	Nj0mGEag==;
-Received: from [205.251.233.106] (helo=u09cd745991455d.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tcqQ0-0000000Ay6W-1OMk;
-	Tue, 28 Jan 2025 18:34:36 +0000
-Message-ID: <393b23182f50653b8270d26c41e1f7a010e5d7d6.camel@infradead.org>
-Subject: Re: [PATCH v2] KVM: x86: Update Xen TSC leaves during CPUID
- emulation
-From: David Woodhouse <dwmw2@infradead.org>
-To: Fred Griffoul <fgriffo@amazon.co.uk>, kvm@vger.kernel.org
-Cc: griffoul@gmail.com, vkuznets@redhat.com, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>,
- linux-kernel@vger.kernel.org
-Date: Tue, 28 Jan 2025 10:34:32 -0800
-In-Reply-To: <20250124150539.69975-1-fgriffo@amazon.co.uk>
-References: <20250124150539.69975-1-fgriffo@amazon.co.uk>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-pXUbTm/2kDllcPQHnpge"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1738089716; c=relaxed/simple;
+	bh=TUZSRa+2Jw94fPageQAcvYUfI2IeUsCvG4+byhRGvLA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kUjpZpN3jFo4iqVQKOAQL9tS0RTeen1Z9XVQreh6QHEf9NLsNtmte8jakxfD2BsyA82qlsjXKyWLeRZ6PohlKFhygohbFgSFj+wfrQhwF7bstWLr6nINa5r2onrCmbcDZLb27j19mrZNw7StBTbg3caJs+OTK+I/fK+Ch5/eECA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XEYz9usD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738089713;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hFdkk8WNhqsppe9MpUmgNxGQD4WSUP8nhmUn2jukSYY=;
+	b=XEYz9usD0sHJOtS0ncuDWx4i/75Bz20mdoCo5CLdwXVKdXl5x6YXYCuevuQh+mJ2s96mNA
+	rOwPoFBIO+R8TSzGrRQz2rQudqqiA77rullZGbYEce7eIjQXAlrZ9WjAemqYaDHvov3k1g
+	u0Egs7WBKKmF2QFo4mxTZN0EeR7UOhk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-153-cAwdgNt0OPmXN_5z_uHthg-1; Tue, 28 Jan 2025 13:41:52 -0500
+X-MC-Unique: cAwdgNt0OPmXN_5z_uHthg-1
+X-Mimecast-MFC-AGG-ID: cAwdgNt0OPmXN_5z_uHthg
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43582d49dacso41739475e9.2
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 10:41:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738089711; x=1738694511;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hFdkk8WNhqsppe9MpUmgNxGQD4WSUP8nhmUn2jukSYY=;
+        b=So25SsWuU6phW8NvxcP70Z/gMxnZs0yGWoCpS7KFwYwom733AESEQopxkvVX7cVXRp
+         SmqQvv9fDcl85kyWBCek1K4PkO6VuBYDbIEk89GpINtRWl1hrHooCq6HfaaXcnVYWOy8
+         hjL6Wn20q5nxzcBXOub7Ax8k94yECK2JdZUkziGwA4ZyxC73ftQ9dii1PAB9qdFVZ15w
+         +MspLmPYS9MndbYzUADu4kkE0fpxMZDeQf5aiRwsmGj3rvWAnDiFJcu9QObL2po7ANv+
+         /t+vjOkuegFL7cwJCHv7pcZg+0iPt47C9o7QRg4u5YoydI/QhQHyXNO2IcY6fTnJrOhM
+         8hJg==
+X-Forwarded-Encrypted: i=1; AJvYcCUuAOIFnGWj8fUi3t17VkcOcYgwD2vMW9eOJOpCiOerw2QZpMJMHFXbzjhJG9+AZ8MjzXM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyxo/ynM6IT8SSh+QYEXDQ0J1EAWhNbAjpmtT7Iav6MNnv30XWI
+	/nqtkTrH9D3HforERwuF5uWp7St3X6Xhff6Dv4MlrS9NrfsODFcjFb3lp/UbKtOlNdvMqWoY1U6
+	JkZ+JyX443ONj84pekogfbhg/KqjlVg6NRXQZomfLqfWqA5PG2Q==
+X-Gm-Gg: ASbGncvCnWG1iJIgdQfia5a1+JkuAiTMIvtR9yq+n5MKvRTkJPZpmRsXwsTqIdXUe/O
+	yOJxt112Crsr2nZpx9XA8ExZHM4/s9HiNBBch5EGQP0JXibj3jPlc0hOVIPcLEOT3+HWS85mpP8
+	ZUkyssgiEEyuhU5HKJef8HLqxmnKqvD68H0eMEEPYZhFnFM5FgFgGadEr20ucgs1yYixQ11EsIv
+	lpwVK3mG6X4ia3kkdKGnCAP2uzk+RB6cQ3WvxU3C3b7x2ozmBw82uAw2LxH8IjjUAOa18ZS7KIi
+	Lk4Ji1v6GvsxBjQnja7dZFDHdn9Zd7VGUw==
+X-Received: by 2002:a05:600c:500d:b0:434:e9ee:c3d with SMTP id 5b1f17b1804b1-438dc40e4aamr49045e9.20.1738089710790;
+        Tue, 28 Jan 2025 10:41:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE12RivI6XWkz5cpG4j6QYXp+ni2gDLNCy3t8U2iLzNsy6//bb43tudEHLAF+epO8I/De14sg==
+X-Received: by 2002:a05:600c:500d:b0:434:e9ee:c3d with SMTP id 5b1f17b1804b1-438dc40e4aamr48715e9.20.1738089710358;
+        Tue, 28 Jan 2025 10:41:50 -0800 (PST)
+Received: from [192.168.3.141] (p5b0c6662.dip0.t-ipconnect.de. [91.12.102.98])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd507d60sm178265115e9.18.2025.01.28.10.41.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jan 2025 10:41:49 -0800 (PST)
+Message-ID: <c80016f9-63f3-469f-864b-ca9a2a74735b@redhat.com>
+Date: Tue, 28 Jan 2025 19:41:47 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 1/6] system/physmem: handle hugetlb correctly in
+ qemu_ram_remap()
+To: William Roche <william.roche@oracle.com>, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
+ philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
+ imammedo@redhat.com, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
+ wangyanan55@huawei.com, zhao1.liu@intel.com, joao.m.martins@oracle.com
+References: <cf587c8b-3894-4589-bfea-be5db70e81f3@redhat.com>
+ <20250110211405.2284121-1-william.roche@oracle.com>
+ <20250110211405.2284121-2-william.roche@oracle.com>
+ <2a79643f-1d9e-4122-8932-954743a18c21@redhat.com>
+ <26617c43-1f6c-4870-b99f-50525acd9134@oracle.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <26617c43-1f6c-4870-b99f-50525acd9134@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+On 27.01.25 22:16, William Roche wrote:
+> On 1/14/25 15:02, David Hildenbrand wrote:
+>> On 10.01.25 22:14, “William Roche wrote:
+>>> From: William Roche <william.roche@oracle.com>
+>>>
+>>> The list of hwpoison pages used to remap the memory on reset
+>>> is based on the backend real page size. When dealing with
+>>> hugepages, we create a single entry for the entire page.
+>>>
+>>> To correctly handle hugetlb, we must mmap(MAP_FIXED) a complete
+>>> hugetlb page; hugetlb pages cannot be partially mapped.
+>>>
+>>> Co-developed-by: David Hildenbrand <david@redhat.com>
+>>> Signed-off-by: William Roche <william.roche@oracle.com>
+>>> ---
+>>
+>> See my comments to v4 version and my patch proposal.
+> 
+> I'm copying and answering your comments here:
+> 
+> 
+> On 1/14/25 14:56, David Hildenbrand wrote:
+>> On 10.01.25 21:56, William Roche wrote:
+>>> On 1/8/25 22:34, David Hildenbrand wrote:
+>>>> On 14.12.24 14:45, “William Roche wrote:
+>>>>> From: William Roche <william.roche@oracle.com>
+>>>>> [...]
+>>>>> @@ -1286,6 +1286,10 @@ static void kvm_unpoison_all(void *param)
+>>>>>     void kvm_hwpoison_page_add(ram_addr_t ram_addr)
+>>>>>     {
+>>>>>         HWPoisonPage *page;
+>>>>> +    size_t page_size = qemu_ram_pagesize_from_addr(ram_addr);
+>>>>> +
+>>>>> +    if (page_size > TARGET_PAGE_SIZE)
+>>>>> +        ram_addr = QEMU_ALIGN_DOWN(ram_addr, page_size);
+>>>>
+>>>> Is that part still required? I thought it would be sufficient (at least
+>>>> in the context of this patch) to handle it all in qemu_ram_remap().
+>>>>
+>>>> qemu_ram_remap() will calculate the range to process based on the
+>>>> RAMBlock page size. IOW, the QEMU_ALIGN_DOWN() we do now in
+>>>> qemu_ram_remap().
+>>>>
+>>>> Or am I missing something?
+>>>>
+>>>> (sorry if we discussed that already; if there is a good reason it might
+>>>> make sense to state it in the patch description)
+>>>
+>>> You are right, but at this patch level we still need to round up the
+>>
+>> s/round up/align_down/
+>>
+>>> address and doing it here is small enough.
+>>
+>> Let me explain.
+>>
+>> qemu_ram_remap() in this patch here doesn't need an aligned addr. It
+>> will compute the offset into the block and align that down.
+>>
+>> The only case where we need the addr besides from that is the
+>> error_report(), where I am not 100% sure if that is actually what we
+>> want to print. We want to print something like ram_block_discard_range().
+>>
+>>
+>> Note that ram_addr_t is a weird, separate address space. The alignment
+>> does not have any guarantees / semantics there.
+>>
+>>
+>> See ram_block_add() where we set
+>>       new_block->offset = find_ram_offset(new_block->max_length);
+>>
+>> independent of any other RAMBlock properties.
+>>
+>> The only alignment we do is
+>>       candidate = ROUND_UP(candidate, BITS_PER_LONG << TARGET_PAGE_BITS);
+>>
+>> There is no guarantee that new_block->offset will be aligned to 1 GiB with
+>> a 1 GiB hugetlb mapping.
+>>
+>>
+>> Note that there is another conceptual issue in this function: offset
+>> should be of type uint64_t, it's not really ram_addr_t, but an
+>> offset into the RAMBlock.
+> 
+> Ok.
+> 
+>>
+>>> Of course, the code changes on patch 3/7 where we change both x86 and
+>>> ARM versions of the code to align the memory pointer correctly in both
+>>> cases.
+>>
+>> Thinking about it more, we should never try aligning ram_addr_t, only
+>> the offset into the memory block or the virtual address.
+>>
+>> So please remove this from this ram_addr_t alignment from this patch,
+>> and look into
+>> aligning the virtual address / offset for the other user. Again, aligning
+>> ram_addr_t is not guaranteed to work correctly.
+>>
+> 
+> Thanks for the technical details.
+> 
+> The ram_addr_t value alignment on the beginning of the page was useful
+> to create a single entry in the hwpoison_page_list for a large page, but
+> I understand that this use of ram_addr alignment may not be always accurate.
+> Removing this alignment (without replacing it with something else) will
+> end up creating several page entries in this list for the same hugetlb
+> page. Because when we loose a large page, we can receive several MCEs
+> for the sub-page locations touched on this large page before the VM crashes.
 
---=-pXUbTm/2kDllcPQHnpge
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Right, although the kernel will currently only a single event IIRC. At 
+least for hugetlb.
 
-On Fri, 2025-01-24 at 15:05 +0000, Fred Griffoul wrote:
-> The Xen emulation in KVM modifies certain CPUID leaves to expose
-> TSC information to the guest.
->=20
-> Previously, these CPUID leaves were updated whenever guest time changed,
-> but this conflicts with KVM_SET_CPUID/KVM_SET_CPUID2 ioctls which reject
-> changes to CPUID entries on running vCPUs.
->=20
-> Fix this by updating the TSC information directly in the CPUID emulation
-> handler instead of modifying the vCPU's CPUID entries.
->=20
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
+> So the recovery phase on reset will go through the list to discard/remap
+> all the entries, and the same hugetlb page can be treated several times.
+> But when we had a single entry for a large page, this multiple
+> discard/remap does not occur.
+> 
+> Now, it could be technically acceptable to discard/remap a hugetlb page
+> several times. Other than not being optimal and taking time, the same
+> page being mapped or discarded multiple times doesn't seem to be a problem.
+> So we can leave the code like that  without complicating it with a block
+> and offset attributes to the hwpoison_page_list entries for example.
 
-Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+Right, this is something to optimize when it really becomes a problem I 
+think.
 
-But I would still like to see a selftest covering it.
+-- 
+Cheers,
 
---=-pXUbTm/2kDllcPQHnpge
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+David / dhildenb
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEyODE4MzQz
-MlowLwYJKoZIhvcNAQkEMSIEIKC0sQW/ZZOzfMHgvijCjMCfR8F9CNWi6olbfFDTanPKMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAsxFLJLDhjyAP
-kKB06rb//S6++OLtZZmGE1mQBjPUp9GK5LBWCcDqYOtLrraUm7hUVpxnxQUFfG/AxARmU7SUkrfB
-vZmWeQbXJACSBGcx0bdi9pzcE7QprrXkYFwWCCsocNaG8+vEgNA7EZH6R0wWdb3Sm2WjQRsQ5JDF
-l5epurj0w6rcLqcSytIxPI8NunOQYSYSDfdwgyhnAuXW/PCZQ3L9q79XYHzoPNZR5qPngVJXAwZs
-j2yGhEM5Rbz89zCh+V4SQrrlS4Q0uGCUCQvy08JhzVTHS9sIR7yXut4VDhxN28aiKLsp8dhrbCuF
-r1gf00S4Wzggd+fPOXyZEqSIfLjOwLSN46qjpIUxkdB3Eb1LMq1v4DSopnyi7yIktnZ3NtBveHwl
-ebFHQ7q5JxZBOfI7dI1C7bkp5wcxTT1ePU1fKzBZ1B8gAp+ENt5jJ4o9nSKGHy27jP4MvAthV2HM
-lofQjEfAQoZtgziFy+P0PMHVMMLzfKJTQsmnH6wzcim64u650Zy2qbmw0Xz/QWe43usoy60oL/13
-nlqDPbNTpiAZuBhmdt4NL/gBvU918IJjyXqs23VnJxJFmGSmnXerWx7hhCJNbG9FryHf0U0SLdD+
-82CPa/n5EgNXz9w07mk0zJFcaa7P9O6IGmERwzgLA7WfIv8FgawNxC9ShjgamfAAAAAAAAA=
-
-
---=-pXUbTm/2kDllcPQHnpge--
 
