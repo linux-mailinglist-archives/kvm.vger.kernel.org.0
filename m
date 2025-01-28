@@ -1,79 +1,125 @@
-Return-Path: <kvm+bounces-36811-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36812-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2CAA21482
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 23:39:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95974A214E3
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 00:08:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2F9C3A8033
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 22:39:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B26A7A33DC
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 23:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745451F3FE6;
-	Tue, 28 Jan 2025 22:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4711EEA3E;
+	Tue, 28 Jan 2025 23:08:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRXcZUet"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m67mpdc5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925A21DF260;
-	Tue, 28 Jan 2025 22:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA93C1DDA09
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 23:08:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738103932; cv=none; b=WO58IcyolEpF+Mv/r9z2K6NavA0CTfQIRgMD1ft4KxOpd6MYNQ23LDhNsfLW8Uz2OBRB9kwswwestjENJNZS47hIf9V2ujLznrRLP4YTCyQLJj+tnj7gEqGP5ix/gVZI1pkflRDWolSYzBWZRQgN58wv8wGXKhL2tkJc1ii4kOM=
+	t=1738105698; cv=none; b=OHRLcD1HXRMHK6tad0Dnhkcr6TLysijdtLWMXhHqAXExRXDfXW8qr/op1FI9+0/M2XX/hsXES73VhHcV/hBObzbnxonMrA2ozQKlFiBAAid09/ZTwYim3dcjrKRlrZTQw03KVe/ZiQBrrBbNOmM5Ee03q0CEE9x4K8WA4nsqvqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738103932; c=relaxed/simple;
-	bh=SkWEDtdNb9JMvWR1afcGBxTUbJsjGd8eu9eJtGGY800=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=dfJin5XBF1b+6J3wA8FPum9nFWJP21p78n/mRjBM807uxTIoPcnvvDGxo8CpRgxZf3yiCPPQIaRn7r/RX10YoiwbQxWK06ZEDAP4/FQ2G0U57SNV7tVoFnbVVodxzLscly8a35Rn5MfEvK0cj+yFXY+goI/D1h5TaTC3gF59Cp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRXcZUet; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18D03C4CEE4;
-	Tue, 28 Jan 2025 22:38:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738103932;
-	bh=SkWEDtdNb9JMvWR1afcGBxTUbJsjGd8eu9eJtGGY800=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=XRXcZUetZPiHGj6bIRnUojKdRnfR32wufGdXpPiV4jsuwN0guw0sYE1KKZqu+C6CP
-	 IWPGKn2weDaGoupkjlVDrgtKOrhATXZOaprDVfgSizSct+UKvW5hTxvEzbSRPhAjtU
-	 pSbeH7cblh1NYTAzkJavOuAWLXCGUlVLLTQ+8Xs431TeFHl5jw8Tg86pOxvmgI1j/n
-	 4Aix7Vasv8lL6GH15w6+xs1uzqjH6o7gf0sqng9Ng/YGXcmZIYWXteFWu0FPBUiNU+
-	 N0xEXgxVF0SLIerHkCygbf4DXO1Yc0n7wm4gTo53cJjgROgbjBZguwb+R+Y97S/P4R
-	 kWBH5CGxvstzw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C9B380AA66;
-	Tue, 28 Jan 2025 22:39:19 +0000 (UTC)
-Subject: Re: [GIT PULL] VFIO updates for v6.14-rc1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250128142439.3f6dd5b7.alex.williamson@redhat.com>
-References: <20250128142439.3f6dd5b7.alex.williamson@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250128142439.3f6dd5b7.alex.williamson@redhat.com>
-X-PR-Tracked-Remote: https://github.com/awilliam/linux-vfio.git tags/vfio-v6.14-rc1
-X-PR-Tracked-Commit-Id: 2bb447540e71ee530388750c38e1b2c8ea08b4b7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3673f5be0ec4798089c2c014505e54fc361d3616
-Message-Id: <173810395786.3944426.5181741573210462800.pr-tracker-bot@kernel.org>
-Date: Tue, 28 Jan 2025 22:39:17 +0000
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+	s=arc-20240116; t=1738105698; c=relaxed/simple;
+	bh=c1f9GAm+Tfh1fyQTBlChMqr4dttyOYyLRGgVPWFsuGQ=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=XPV1FROi4c+4lW83O1HIo3xoUPb7ECDb9ZKFHTJRxEYI/lCSwVML1fp0LwAjnP4r/jbv9cfAUpWatfqWhrByGiL7eBt0q7AeThWVV6RvbSCVFozlfiUaENcLoYDPcb0Ps+QFSqPeJp1ItXAzjWnpwvLVY18daWSzX0+IogZvvdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m67mpdc5; arc=none smtp.client-ip=209.85.210.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-71de28807b0so3898720a34.3
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 15:08:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738105696; x=1738710496; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zFo6TxttEqFIalCsIspeo8mg648WKT4oP0eEXrQLVXM=;
+        b=m67mpdc5t5WFFfJatIz8iPL8m/vEM+4NI/pL5Wx9XXoLsKovlY9mLlcpca8tD1ymDc
+         OHl0VF+tt+rIwVACdrvbsBbVFCcVpx4W8DPxkforIwOh0I6VH2P8O7TrHHWCiWrEbpm5
+         MoXL4pxI5wFSYcRPNsuAUgHdQKhDbDT4KujoTTpQbDV+KJoFRnDyh8EtsNkmmQEw7lMg
+         Z2KU8DcVT/U9guv7XYnmeWQsl7VH/UwW92CG16Buh/8TFKnzllkx7uPwwwAxFvI4bEpO
+         boHm6ky0nhdQHfQIGgKjZxjS3lEMLhjXUzNT/fEJUuag4diC61CmqOFfmjVI1bCRWID9
+         SgQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738105696; x=1738710496;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zFo6TxttEqFIalCsIspeo8mg648WKT4oP0eEXrQLVXM=;
+        b=SE8KN+7Uf/PcPyXSIj8ppV8KyP3JVhU38FurV7RuniZ2OKxcTUtCyPQC9+k8Vg8hX2
+         OrmIkhZSZXW49+gNq/6gaUYzeB+c4mzzcdBnC7NPtgFHCtimM6YLRmmbE4qztYwFkDBE
+         6mbRtkURDqV0SRQFaF+A302q2+48MknqK33qLbD7Q1U3ttCSzKrRqD+mPHZXTX1VQFi8
+         PiSRYbLdfiELwOyhJFNB3eQpcwHkeiAabnPDxLo380dBNpAXnrlizQs0Rs0fs1PxnjMB
+         1aaYK5jJwM8lO0gwEpD8rza9h5YxTx0Hx1CR5IQvcRWLIMp5084v37fjqaF+wETY1VNS
+         0bPg==
+X-Forwarded-Encrypted: i=1; AJvYcCUDpNL9q3UcMpneG/NBkhMM3qT1UAvs9G4hGp+DGdfZsjUNQu6SD54GJ/lJcXgOKQev8GM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIKfTxYzpjsQ0VL6Ow2aP0RIm9Jcq/IaiaZkctXQZ/NwIEjAy9
+	lpqNwOyO+6JnzXcN+cuheyMq/Dgi6uCqE6rXJlp78WsMpnZf5B4kKlGb9sMYNAGrgU3Ly/HgvjE
+	IJ1AMxzDxjRHKy9zwhCh/Dg==
+X-Google-Smtp-Source: AGHT+IG5ddnY6/iHSVzZPnfbt3FF1yw2VhaZJBEOVScosdSTNCWOaSf0V1Rutk3fTReV5GNpySjV/C49wUzgPhrdpA==
+X-Received: from oocx8.prod.google.com ([2002:a05:6820:8188:b0:5fa:a33d:6240])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6830:670f:b0:71e:1c5:4f9a with SMTP id 46e09a7af769-726568f8258mr618751a34.25.1738105695853;
+ Tue, 28 Jan 2025 15:08:15 -0800 (PST)
+Date: Tue, 28 Jan 2025 23:08:14 +0000
+In-Reply-To: <gsntbjvq382s.fsf@coltonlewis-kvm.c.googlers.com> (message from
+ Colton Lewis on Tue, 28 Jan 2025 22:08:27 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Message-ID: <gsnt34h235b5.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
+ partition the PMU
+From: Colton Lewis <coltonlewis@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: maz@kernel.org, kvm@vger.kernel.org, linux@armlinux.org.uk, 
+	catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, pbonzini@redhat.com, shuah@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-The pull request you sent on Tue, 28 Jan 2025 14:24:39 -0700:
 
-> https://github.com/awilliam/linux-vfio.git tags/vfio-v6.14-rc1
+Colton Lewis <coltonlewis@google.com> writes:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3673f5be0ec4798089c2c014505e54fc361d3616
+> Hey Marc, thanks for looking.
 
-Thank you!
+*for the review
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> Marc Zyngier <maz@kernel.org> writes:
+
+>> On Mon, 27 Jan 2025 22:20:27 +0000,
+>> Colton Lewis <coltonlewis@google.com> wrote:
+
+>>>    	/* Read the nb of CNTx counters supported from PMNC */
+>>> -	bitmap_set(cpu_pmu->cntr_mask,
+>>> -		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
+>>> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
+>>> +
+>>> +	if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr_n) {
+>>> +		cpu_pmu->hpmn = reserved_guest_counters;
+>>> +		cpu_pmu->partitioned = true;
+
+>> Isn't this going to completely explode on a kernel running at EL1?
+
+> Trying to access an EL2 register at EL1 can do that. I'll add the
+> appropriate hypercalls.
+
+>> Also, how does it work in an asymmetric configuration where some CPUs
+>> can satisfy the reservation, and some can't?
+
+> The CPUs that can't read their own value of PMCR.N below what the
+> attempted reservation is and so do not get partitioned. Nothing changes
+> for that CPU if it can't meet the reservation.
+
+My mistake. That does not happen. I originally did these comparisons in
+armv8pmu_reset which runs for every CPU but __armv8pmu_probe_pmu
+doesn't.
 
