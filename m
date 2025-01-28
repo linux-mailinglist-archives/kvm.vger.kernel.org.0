@@ -1,79 +1,112 @@
-Return-Path: <kvm+bounces-36714-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36715-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EC90A202D5
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 02:07:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D40A20313
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 02:54:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84D537A386D
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 01:06:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 749853A67D9
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 01:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA98A433A6;
-	Tue, 28 Jan 2025 01:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1LISSgy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2581465B8;
+	Tue, 28 Jan 2025 01:54:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp237.sjtu.edu.cn (smtp237.sjtu.edu.cn [202.120.2.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022DF2905;
-	Tue, 28 Jan 2025 01:06:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929BA1B59A;
+	Tue, 28 Jan 2025 01:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738026410; cv=none; b=C2SYdkqKqS0Eod6fScZdeB/3D1uPXwQ1Bmb9eoomtxK+9JuB2BaJvAmKeySkl7IkvbfFGIg32Bs+6SZDXbRD+fbgRv3oI7y1J4oczsEmvzhFnadkq56+zsUHKtKvdaNjYRZ6o9JrVcgQhf1XmmWhAf+XwswC125osdcNuGyPUXo=
+	t=1738029249; cv=none; b=iYdzKtT7Db3Tat9KY43o8qNicaGwDkiLxwtBiH7ko6pvyqAhQtxEjm69O/o0HHrSSosMx7GppvTism0hvWVy/6IMsNPoeAMV2HiU9a7DaNnA/k3r6ix8oBZIBA04vYie6IjRRc2i+18DWu2F5Y1mbgCegGG9UfVFN0xzp2ILwPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738026410; c=relaxed/simple;
-	bh=g2QvMiT5LUVcP9OrA0RXuReUPgCnilj54mqxus/bMCI=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ihsMJASbNF8mgMdTvqVQd02Silw7y+RTfug2UJuSIenK2qvppEuzmAnkIclgv2bkfnMmZnah6JucyqGAAaEmWfU8zglijwlNZXboTllIEu2z6XCUzIQQDJ7i+7kRhYOGqd5k3BnRv60YMBgGPRY4NZlkgdEIqyxzZQmmMPn/cCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1LISSgy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE052C4CED2;
-	Tue, 28 Jan 2025 01:06:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738026409;
-	bh=g2QvMiT5LUVcP9OrA0RXuReUPgCnilj54mqxus/bMCI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=n1LISSgyLEpO/HQUoAZHZSjx3otHAyJjrw0qLjl/TKvV+YHKGmtIrJG9n0FAVTt1N
-	 cMoKIn9/z4bTjFm9puxzImMC7gWXbto2O6PceHR7vQj9Hed/RO4CBlsMffKRwsck73
-	 XyWG5TGoKHiUlgB8VPDKAE4yx8HNSr/zqtebigiZx1xzbnDncZOmacwHMJjL46kdVf
-	 DhatUM+kOLMr+qIGRxgsjmhzlG6zxCPLsalMoi5syfsw2+DQWyUk4H4hi8uC6G35na
-	 UL6O6oZT//TgpVIW10vqvlAA2F6rGulb0JhbKydFSAlQ10ytrZFur661THvdrvFdqc
-	 Dw2mqeanivqbw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE02B380AA63;
-	Tue, 28 Jan 2025 01:07:16 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: features, fixes, cleanups
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250127095138-mutt-send-email-mst@kernel.org>
-References: <20250127095138-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <virtualization.lists.linux.dev>
-X-PR-Tracked-Message-Id: <20250127095138-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 5820a3b08987951e3e4a89fca8ab6e1448f672e1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: deee7487f5d495d0d9e5ab40d866d69ad524c46a
-Message-Id: <173802643525.3281647.14447011836115468769.pr-tracker-bot@kernel.org>
-Date: Tue, 28 Jan 2025 01:07:15 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, akihiko.odaki@daynix.com, akpm@linux-foundation.org, bhe@redhat.com, david@redhat.com, israelr@nvidia.com, jasowang@redhat.com, mst@redhat.com, pstanner@redhat.com, sgarzare@redhat.com, skoteshwar@marvell.com, sthotton@marvell.com, xieyongji@bytedance.com, yuxue.liu@jaguarmicro.com, zhangjiao2@cmss.chinamobile.com
+	s=arc-20240116; t=1738029249; c=relaxed/simple;
+	bh=eCBV3SVc1IwYf3mw3kNVtvVULgUmL7UjKTvK5dSd58A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kdww3GkcOyNI1PV2sox2b8IHf0yZNBitRoWwaCCwPkKJzH/a7+uCW05N0PnI6LgGI1OesqumxoqLufERzvI37/n3jKdBv18JP60mR1tbJXML84euXe+bygXu9qkSG8X4NOlS0lgIE1kviwxlCsRUEgF0djeVoh1jRpxw/ZU6T9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
+Received: from proxy189.sjtu.edu.cn (smtp189.sjtu.edu.cn [202.120.2.189])
+	by smtp237.sjtu.edu.cn (Postfix) with ESMTPS id 8D68A7FD46;
+	Tue, 28 Jan 2025 09:53:56 +0800 (CST)
+Received: from localhost.localdomain (unknown [101.80.151.229])
+	by proxy189.sjtu.edu.cn (Postfix) with ESMTPSA id 69D4C3FC501;
+	Tue, 28 Jan 2025 09:53:47 +0800 (CST)
+From: Zheyun Shen <szy0127@sjtu.edu.cn>
+To: thomas.lendacky@amd.com,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	tglx@linutronix.de,
+	kevinloughlin@google.com,
+	mingo@redhat.com,
+	bp@alien8.de
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Zheyun Shen <szy0127@sjtu.edu.cn>
+Subject: [PATCH v7 0/3] KVM: SVM: Flush cache only on CPUs running SEV guest
+Date: Tue, 28 Jan 2025 09:53:42 +0800
+Message-Id: <20250128015345.7929-1-szy0127@sjtu.edu.cn>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Mon, 27 Jan 2025 09:51:38 -0500:
+Previous versions pointed out the problem of wbinvd_on_all_cpus() in SEV
+and tried to maintain a cpumask to solve it. This version includes
+further code cleanup.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Although dirty_mask is not maintained perfectly and may lead to wbinvd on 
+physical CPUs that are not running a SEV guest, it's still better than 
+wbinvd_on_all_cpus(). And vcpu migration is designed to be solved in 
+future work.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/deee7487f5d495d0d9e5ab40d866d69ad524c46a
+---
+v6 -> v7:
+- Fixed the writing oversight in sev_vcpu_load().
 
-Thank you!
+v5 -> v6:
+- Replaced sev_get_wbinvd_dirty_mask() with the helper function 
+to_kvm_sev_info().
+
+v4 -> v5:
+- rebase to tip @ 15e2f65f2ecf .
+- Added a commit to remove unnecessary calls to wbinvd().
+- Changed some comments.
+
+v3 -> v4:
+- Added a wbinvd helper and export it to SEV.
+- Changed the struct cpumask in kvm_sev_info into cpumask*, which should
+be dynamically allocated and freed.
+- Changed the time of recording the CPUs from pre_sev_run() to vcpu_load().
+- Removed code of clearing the mask.
+
+v2 -> v3:
+- Replaced get_cpu() with parameter cpu in pre_sev_run().
+
+v1 -> v2:
+- Added sev_do_wbinvd() to wrap two operations.
+- Used cpumask_test_and_clear_cpu() to avoid concurrent problems.
+---
+
+Zheyun Shen (3):
+  KVM: x86: Add a wbinvd helper
+  KVM: SVM: Remove wbinvd in sev_vm_destroy()
+  KVM: SVM: Flush cache only on CPUs running SEV guest
+
+ arch/x86/kvm/svm/sev.c | 36 +++++++++++++++++++++++++++---------
+ arch/x86/kvm/svm/svm.c |  2 ++
+ arch/x86/kvm/svm/svm.h |  5 ++++-
+ arch/x86/kvm/x86.c     |  9 +++++++--
+ arch/x86/kvm/x86.h     |  1 +
+ 5 files changed, 41 insertions(+), 12 deletions(-)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.34.1
+
 
