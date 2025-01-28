@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-36804-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36805-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E5E8A21347
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 21:55:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38291A2135B
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 21:57:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3243167301
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 20:55:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 758B9188983F
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 20:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2871E0090;
-	Tue, 28 Jan 2025 20:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49621E7C10;
+	Tue, 28 Jan 2025 20:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MTWM36f+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z1zrNPPt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4202199EAF
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 20:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABFE1B413D
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 20:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738097724; cv=none; b=uxhP8R1AkKD0K8IDqfJNx+7JgL4p/UFvGB0q4EJzMEzlZscf4mrtWCmxkqwWYaRubzIkMs6XocfezzLP1oCx4HdtAjYagUv0I9EK2VgoOWzKWxwxpvIiYrSMZ7ChCXG1CNBHbyhOBWc2DksRzRnbUGUpZXFe7AQA+OpBo659gQ0=
+	t=1738097867; cv=none; b=ZVlKtETu1qpWkpiDXWL092HMWQecM+4YPOEUlxQwi3leDYF3d6DL+5Dgcm7IO7Pm0fd1cYcMfhEaWQInGvsDpREh5W/5fO79jlYkZo6DUVQby0f6DTD1yGV5JMe4JIR5ZWuYMbWysXwvqXt2fmRQAJYQyPvgRf6PsU6ma+/pfkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738097724; c=relaxed/simple;
-	bh=dig+sN+S6+TmdlV8jOQYHU0Sy3zon7wshxRljHxxZnM=;
+	s=arc-20240116; t=1738097867; c=relaxed/simple;
+	bh=u8thISGT2mmeeWQgPouuhF6GQoeDJTzziwaWofUt17s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q/PsgCmHUoRjt1brgqy2Fyq4zvvzZnGGJtN31swa1+w9zHjqu+jUt46uGg8/OSk8m8XCzYycbizNuvVOcowqXc9fVQKvcNi7HNQmJLO1cSMvsY1OYslpZRnEfs0u0WomahwouoMUrdsX03BN7AiNxPp+vnYdbvMCknVzkIyEObc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MTWM36f+; arc=none smtp.client-ip=209.85.216.50
+	 In-Reply-To:Content-Type; b=cQHQQaz4W/OGXFtUtR/ismcBxy37gHAQL+KxiFwrI2+ZQRFMOKdCIEH3psjwFEG3AgwucRIrFk9moItEQ27+km+ppgAeyYou5LuqcsETs9Kysc6FdE1N36fEmeHHvRWErw5eVlG7PhQALjl8S4e4O1ipIbr7w/UG8gUx4o1+hYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=z1zrNPPt; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2f78a4ca5deso8321535a91.0
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 12:55:22 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-216634dd574so74354725ad.2
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 12:57:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738097722; x=1738702522; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1738097865; x=1738702665; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=tk6SC/sXu3nZ38nnpeSVXfPOJnas5Y5jvFOyhMpP5wY=;
-        b=MTWM36f+yu8M/ftcfMt5SnNR3Xbb/J8Xi1f2XBJMRHUlvVoV8HsN6LyLP6dgQwuN0+
-         BuR6Irb6oELPs5IS+Rt2DEFJRl8VQ33/0xJYU6KrcmfQ2vcebHG5QB1x0GVgeKapOXY8
-         Y6ErTr+4IcoG+HBYHPVvA3REvaK2cVRLLiaPaq8SqB2ceamtfl4T/AmqTeermJv26Ze2
-         0Ojv7XiuxhoQ4GKy63ygUKZ9M9OfHgooNimgk9EeQHL+tsv/44tLrYzwrvWktFMIRq/x
-         IlkqUhiKQYr3NObPOlGoKldk/oFX3gm4AFypjhEPjzbVBcFC++sNcwBOMESK9TuPT7k3
-         Mrww==
+        bh=e/j3djX5P7cTMr4TvLlyKKfeb806Lm/X7E899vHrlsk=;
+        b=z1zrNPPtrwBuxC0XK9k05G9DzIoWOrgkAo7nkAojMBLyLh55bNUat0/ZXVJb/EYL+G
+         7sl2qzq4jc/jOSFqKvq0C1Gj/EogrIJEBaTjOdHkxbesx6ON9qXCD54Ld91DjtXM/Bsv
+         WOmY+GAzxNhRn82yy+1gNvKrdYwmbDLZvHW5w16+T2VwGD3OiUQignHPt5klGxTLyT9d
+         S79sGi00RgsPEzjz7eqz63+6RZI0YqCXeaF4q/JlHYarCScPjegPtNohyL+J44ugvHZV
+         Jteolc+6cuexKtL9TSTOVi9nYAIytKGHQ30gBGdzAePWD59E9Z8feRuwuBpeB+g2Ts8D
+         necQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738097722; x=1738702522;
+        d=1e100.net; s=20230601; t=1738097865; x=1738702665;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tk6SC/sXu3nZ38nnpeSVXfPOJnas5Y5jvFOyhMpP5wY=;
-        b=sCSndKsJ93r1nSCp9oxZN4R5jXS0PGIR+sZkYrnfXVg/pgfXPDbcktL1O9z/aDjPIz
-         rAcQDkf8YXW6eRyCSMCtU+i1tjjwzIj8lKw9o7BZLOMpfj10b7SIWPhDjTyW8fSauyHQ
-         uZwdbr1o+sQOvntK+c1Y692gFUq5vVez+CWsACZpdC5Fx2EGUGYKBsUZbJSEeARDa854
-         jkdfwQVHuWpu5gowWVYwu/fOtX+XTQIrYCqYRoBUOHc7f2h3xsSvAj1B1BhRExAymZQm
-         rS3sdNPCCVWIUtE/fWvfqJKWMEEBV29Xu1s8udZ/P/ZfhqiwtvKLnZ1IrV7JSKW25CG1
-         dNIA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+1g/nGmaWApfjyW9omorXL9FVauKtkEQHRLu4HvcOUMIw4QrRFlxB3oTyx03FEYfenmI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7QhZ61ScaP0q3oWXQivFY2AjFhdKzZU/sHIcpmQO/yB8XCHIj
-	RUZOGAa3T2AFVe08yf3thqU+apsLF9OrsIfgE3SZXFlga1EXOUBB9tr4/Icpmbc=
-X-Gm-Gg: ASbGncuhYLyrqfr224cwV3ECWq2YFGVawuYwplcdrPJ5MeY9QfXmW7Fahbuqd7pbC2j
-	o//djPoU+9mi6oe171Cg3AkNntqUwypsmcDkN1xxCOyDDsu7PGbxrLY1IQM1KMKzRvGkC1Q3SiB
-	jCMGR8ECDfOakbLwb1f/N3fobWmEIJrdsutO/12S47uRFyhg7Kv0fhwTx8qR5H3w+JfHfOMz+Y/
-	7E7Tfj5K+H43PIDTbGSAVHpszH7b2a4t79UMBiUC9E19SbghzasyAFEf9PYZ3yoCgPAGBYbdMLM
-	B8iZwRmomVM2/9E6i0wOeYaUH0peZiCFGlV3sCR6BSJCvdGqnaDNb67ayOaH3OJD24e+
-X-Google-Smtp-Source: AGHT+IHXaHwiGgvoGyH4RXVKJr3J+3gnWSR7ML+JiAfdyojCEMUSMyRf8bjV2DFg5vmDLaJiVOu41w==
-X-Received: by 2002:a17:90b:2c84:b0:2ee:cb5c:6c with SMTP id 98e67ed59e1d1-2f83ac70de7mr508691a91.22.1738097721886;
-        Tue, 28 Jan 2025 12:55:21 -0800 (PST)
+        bh=e/j3djX5P7cTMr4TvLlyKKfeb806Lm/X7E899vHrlsk=;
+        b=iQx9aye8M/3kBmrv5lT6zxqcwln44RLG0Q95wMJHHUL3Yv+7yD2oeCWKL0xUhkyg56
+         xYZ0AByTvyjafShbT+/YQQelEEA1UM2ozqCFm46Ay45TCXxDeQj2Lv7CPN46EiAsFelS
+         DuO8keAa80iysxVEIFWGzBzPVgD8fqBDk/HQYOnd775ZmsRU0l/w1sRjmNFRn/Hh/DB0
+         EmMFnO1fXI98mcaZWlrWX3Y3GNLplzajPCEQVJn8JwqI+vk0J2+5TJQTiti+SRubPdlc
+         bVZ8s9IP12lEj9pNkqlkt0IotnZbaSOMt2fHqiLDa3qkV8wD/HZWkS5XjlV6UyGM0SNu
+         nZIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUmG4/cEEUTAeVbgkqlI7xc74dii7UxUIjiO96mH0qQ0nJJmcRKuc7RlE3/VMHFHaUOgxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKx7UMzd1zBqYXhpYZc7t/Da2BM1oWp9OCuDDtMSthKUMVF3Ec
+	QdltNffhD2QJ2XviSCfoLXPv76O0u7NnQRonMEBbmDmkK4fvXg17kKuX1S4bvCw=
+X-Gm-Gg: ASbGnctQ815W5DTSFQ+ZlWQG0fANDWIW5WPie39QObZ58uiEqD2mRB3m0ckzZhxfpBz
+	Lwt4XhxHkYD7qvDAgF9AyAFGuVCxQettWXlCjoGxR91QSIRZAdRu/LP1W6pHpEWDptRqydq7DSy
+	MhWdNmvq+0JZevk4dvGV0oEP/RXJRx/iIJqm2YusAw6RjV45P0UXo/3nRk1VxI+oMPjufv3R+pL
+	4gZPp7TLahAvtyioMvedFURDBCWSgrTKgf2w0GViTeK6UieKbO2yrp260UVIQj1drajknrTkPmY
+	Z3RbbJfWG/m1uDJDddrXxwfFLFkvqLw36ouoXLbm3+KuAbc0nKckiwD6jA==
+X-Google-Smtp-Source: AGHT+IGQmS1U5TkD55lT94xgjJt77H1Ps9AbI7rFVFqB9Sq1Vn3WnMDmHybZ62mb6aXiObb2eeAIHg==
+X-Received: by 2002:a05:6a00:10d4:b0:72d:8fa2:99ac with SMTP id d2e1a72fcca58-72fd0c14853mr796959b3a.13.1738097864710;
+        Tue, 28 Jan 2025 12:57:44 -0800 (PST)
 Received: from [192.168.0.4] (174-21-71-127.tukw.qwest.net. [174.21.71.127])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa456absm10898525a91.2.2025.01.28.12.55.21
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a6b52f9sm9647208b3a.72.2025.01.28.12.57.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Jan 2025 12:55:21 -0800 (PST)
-Message-ID: <55627824-fcbe-442a-ad95-24d5ac6e2ace@linaro.org>
-Date: Tue, 28 Jan 2025 12:55:20 -0800
+        Tue, 28 Jan 2025 12:57:44 -0800 (PST)
+Message-ID: <964bc905-40e2-4394-9470-4950d1a3b887@linaro.org>
+Date: Tue, 28 Jan 2025 12:57:42 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,8 +81,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 7/9] cpus: Only expose REALIZED vCPUs to global
- &cpus_queue
+Subject: Re: [PATCH 8/9] accel/kvm: Assert vCPU is created when calling
+ kvm_dirty_ring_reap*()
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -94,33 +94,27 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Xu <peterx@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>
 References: <20250128142152.9889-1-philmd@linaro.org>
- <20250128142152.9889-8-philmd@linaro.org>
+ <20250128142152.9889-9-philmd@linaro.org>
 Content-Language: en-US
 From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20250128142152.9889-8-philmd@linaro.org>
+In-Reply-To: <20250128142152.9889-9-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 1/28/25 06:21, Philippe Mathieu-Daudé wrote:
-> @@ -91,7 +91,6 @@ void cpu_list_add(CPUState *cpu)
->       } else {
->           assert(!cpu_index_auto_assigned);
->       }
-> -    QTAILQ_INSERT_TAIL_RCU(&cpus_queue, cpu, node);
->       cpu_list_generation_id++;
->   }
->   
-> @@ -103,7 +102,6 @@ void cpu_list_remove(CPUState *cpu)
->           return;
->       }
->   
-> -    QTAILQ_REMOVE_RCU(&cpus_queue, cpu, node);
->       cpu->cpu_index = UNASSIGNED_CPU_INDEX;
->       cpu_list_generation_id++;
->   }
+> Previous commits made sure vCPUs are realized before accelerators
+> (such KVM) use them. Ensure that by asserting the vCPU is created,
+> no need to return.
+> 
+> For more context, see commit 56adee407fc ("kvm: dirty-ring: Fix race
+> with vcpu creation").
+> 
+> Signed-off-by: Philippe Mathieu-Daudé<philmd@linaro.org>
+> ---
+>   accel/kvm/kvm-all.c | 8 +++-----
+>   1 file changed, 3 insertions(+), 5 deletions(-)
 
-We might rename cpu_list_add/remove, since they no longer do what's said on the tin.
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 r~
 
