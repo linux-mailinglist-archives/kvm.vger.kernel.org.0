@@ -1,78 +1,77 @@
-Return-Path: <kvm+bounces-36777-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36778-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7DB5A20BF1
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:22:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 454A6A20BF0
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 15:22:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2B4C3A4FC2
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 14:22:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 993A0162C7C
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 14:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24DA11A83E8;
-	Tue, 28 Jan 2025 14:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B151A8F79;
+	Tue, 28 Jan 2025 14:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GnJijNKS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KMNUKHYX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01201A8407
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 14:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845CD1A9B3B
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 14:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738074148; cv=none; b=HPz5iWybirgdFTsBaMMl3kOrjxNaExB3cTr12wKV+nA4IExrcTSPTUU18blQMv/HMMgqJ2P1sooKUZkNkNa9siI5aBEqd8BBoseZS3WmaNA9dOlVgOy693g5PAoHm02uQ0iKXIhKrdvf1jGty2P19a3zPcQXIF5hkSwSMgDwuPs=
+	t=1738074153; cv=none; b=B05N1kW41OTHXK3FTNtoeWXrQ/5EPNhmKQcwNkLpOshigtzuvAEGpBnO56r1TmbPe+k7mU8qXOfUIm0TR29wpMQiq9WDz1S8lddFVALh/3Btzm1Kep1h5FDGvTrL6pqNHlan8Y2cPsHcInY1BwibP2sHN23Tf8u4AE3HirpFefU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738074148; c=relaxed/simple;
-	bh=b5pmYrFAmwtCJg8B2cUet21qlaBWJzq176CYmqC1/Es=;
+	s=arc-20240116; t=1738074153; c=relaxed/simple;
+	bh=9qP2M/5pQU70znx9jB98YFuJ8vLrfb0v8LfsmSWQm3o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sOaV39rooMv0TR+AUHe1434LcwTj3ZuJ+pGai0vXEqebcBB+z38L6CR7xCP3tsOYh55FFIpJ4JJtp3IASEokVgm6OEEJwmzMLy14KRzmQHbBuAJC1CB2p5bREpX9JIClZbS6kArC9QBrnC0s2d0cIzrFLPHX3pVKJGDsCM1zEhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GnJijNKS; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version:Content-Type; b=Wk1LyMePpJEmboyN9KdUVLrPWLH5mmI9gjwH97i4zQRPhvCPxWiLOTc6NGSFRnh4hb8WjUuIL4AZzr+Vs3LQ8Vy+ay7jP/8fARFNLU8YmZtf9CfLG+MHzUD4otUjaeuSGhOPdpNhIAPRgRU+Kr63f4FMCyNjQAlJB1NDy3zflTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KMNUKHYX; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-436249df846so38370535e9.3
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 06:22:26 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4361b6f9faeso36461495e9.1
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 06:22:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738074145; x=1738678945; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1738074150; x=1738678950; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Tw046dW5+uhhYJLaed8H1nN+PEtNbdWPjJLIYS364MM=;
-        b=GnJijNKSe828VJJaNQXenZs1ajoM+/738CP0f0+4PZEQOLRNxBGeKDhgxNjbNx1yrr
-         QHQ2+RcYor+oiMvdlmTdDfhvc6SsFvT3xrUcb3Z20lG2vYSW+bBq7/wA8kv/+DShe15a
-         q8+TP4+yYNQecqFAUY260/7n2EAz9wunzuJ3Rw3WjaYPqK4puB/GeauI+98pYH3wwefC
-         NesPe/stnRKHI4HFo0ljlBH1iZTwEXre/9BuYoZwPnOKFrF5RnedvW87sxrl2uXnE028
-         cANoOV8lgbC7DNemum+FZDAQwIKe+aJJI+3HwNWgG9AthBhbnn754UdUMEl01S+pM5HM
-         IuRg==
+        bh=fwXtzSsp3Wrsq7TzutaYeT0jWiU8kps8I7b8yY/9nhU=;
+        b=KMNUKHYXkhrlj47HVz39v4tGii7rq6/Ags6fDa+K3WrUnV3lbUyKHNAnDgAT+rk0xD
+         8r4qP2ZaudcS6LhTd6rhxUKmZ3ERcRq9juZzGDcq4u4/1O54d7YKq//susknX44U4WE2
+         03RsNcgkoCDF/+kJ22sHAqBAhmBPm4eZ3dtMGLf3sY12AuolSUoztMHjNlUP/sKq7EP3
+         dIy4n1QuupitBosQ4tHbfIBSSsRerfyCMh6d3JB3KKIsqpm+YDtXhnNAG8xnqCa1Jgoa
+         O5OgOIYoQVaRrjbysapIgdZzJpBPBEYeE7hBhYfliAe1w5wN0rS4AdNE2qkFd0F9yoQ1
+         JSdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738074145; x=1738678945;
+        d=1e100.net; s=20230601; t=1738074150; x=1738678950;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Tw046dW5+uhhYJLaed8H1nN+PEtNbdWPjJLIYS364MM=;
-        b=xLL9WarKfbxUyCj/hXATwvlpHD9lWLWvpFl4ZfmB/4lj8eyd/Yxi0zlj8AXDdoRnsm
-         dom/5V61OHntSTBP6OvfAilYchrhqpz3mjsrBQeu55kkgZYulok8TCxsm1gMqCR6eyU4
-         nuqxnhvpz0frX3bUg1DeuW0yl5ktkBQ1JG3i5iO3Y/O8M4bBspR2Rqxy2Rkldii1vhzN
-         BnPZxAxzaAmTZe5IR28Tb7zaOLc7grHKSOD0dpoSNegzeucYmLSGfPnoJBYTu416cC2B
-         hd34qAAqgV/joDyfQtPa24QGYMV3ovClf/G/Dm9XEFYSCpbQsMQznUxj2KTDemp+GA2r
-         dMTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyw5bTCCsdHjlm0ZXTgmdmiaD+hRBce4so745gy/igZgoYWPPWiCkewI45JaT5Dj0MzV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwftUuNVpUapoF2+6KEZIHcJY/ge/j/qyUMVeAkuR0AwfelIHvU
-	fuagu5luPhuNNlgxU6Q73NOW18zqq4Cs+a2xEbt94GrbS5Mr74omHbJbn1zr+fJx2Kn/6FpqMwf
-	+k4Y=
-X-Gm-Gg: ASbGncvL2DwJOF1R1Qki+/FJtGs+BfKlL4nschjR4G2Y2p92ILvE7G51HnKXMuch6g9
-	gVIc+L6+71cURm5n6V4Al8bcdCTPinHvk8QXwzJ7qspSPRcaPG/7vrMjLcaK0X+Wp1MrSpUvezd
-	dyPwaLEsLabNRz2d5BzclcLi1iKZyTBswjFUT/lcKx17UXAnSzFbziI66qc1urnkTB+Bd+SWhQf
-	S6eq014+7DumWnQvlXr5QWYce8LmBKyffmt1TphwD2+JXJpaCJfcC5Qwmfgwplwi8SzN01qM7vc
-	IkjMWG/TiTGXnRa5Pm3M5sS0bOn8Nv4SFzGV4tiNbNE9IBee39bT3y4AORz59ro8cw==
-X-Google-Smtp-Source: AGHT+IEyyaAAlYQ5I3ppwUr7kelaVWlDzVIFlhZYrwH74VA7sdBpE5YrUhEnY7P3LEg7nQWsma+f4A==
-X-Received: by 2002:a5d:47ac:0:b0:38b:e919:4053 with SMTP id ffacd0b85a97d-38bf57a993dmr44371093f8f.44.1738074144814;
-        Tue, 28 Jan 2025 06:22:24 -0800 (PST)
+        bh=fwXtzSsp3Wrsq7TzutaYeT0jWiU8kps8I7b8yY/9nhU=;
+        b=fco4C6KaMBXSiloGcjvUgFplRmrENqvp6m9duZQQ9zvPbxx+VzasuPk/wT+3Ou+r8x
+         bdi/WAf9zlQiuHOQ+INC1uHR2/Gt8KPjq34sipacGykWk8+ErNAjJ94nX52NwN7pMo1q
+         KdDF1WaY9oSKHqKHqvT5Tob9Vbkrw/Gvjc6luHpGLuhpSCqxIGbU037KPAztMkr8Ai9u
+         lDxkVdiwKCGm9KpmvR0519w1+CUW0YsqosDzbD4PZz43zr+BfD8LBmWJ+9v1+swR+ysm
+         +zMDAX/6Dp2XNq/CBpaSsnsAUtle9ykpLhp4rprX21iMnkPsldvAVzAYLEhofi4c8+8x
+         IloQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUsjfkM9lVP+v9rIJF3S0PfYV5sgRbh50JC1qH5DtAJKGRMNIT2q5qaDekDR2DA45/UynI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy92opnlRfyNyX/dDgAMrgGxbT+RBB3XDviaOXbKuv/8O6Nlz0H
+	6RrQuTObIycXhBUD3kbzs7RfRoqcCn0shL2gI3ADfTHn5kxrwWMOUt5iSRHV8g0=
+X-Gm-Gg: ASbGncvsWW9foEx0YJm6lvrVQ4pdrFW/iYlEmc5+XTa8j8ilSTUKeGOc82HI8ndrA1y
+	66xWcgHX0Uu/av6yRioqw7lO62dP4tkD4BcQAqRY6m6yg75vM0yDM2S36ZSSlMRFTy34tvacUU8
+	d5JfpishA/XWXE+cCMf1d34ReeDGCHI5t5BlL49mlbgKKQcvBIVJhBqQIAahsR0q9KH+qPouAmQ
+	H+lrNrLzZRAPiptrozNk23Uj+UmNT97Q85Ynp9ZWx1gX9Vf6ZiypK64kwkPP0XYMaCxTPCwKCXD
+	Sic/3bG30CLNLIHEfGXoWPdxZKpb5yeZALbL1ld303Bi6O+qsTqO6t+R1tFVIW2EpA==
+X-Google-Smtp-Source: AGHT+IGJgZU4Cp2hilxwmoMaixsHyforairgw/17QEoYqTReWbKeDv+qCHMAqmyxnXcqNHDKAhm1lA==
+X-Received: by 2002:a05:600c:46d2:b0:434:f1bd:1e40 with SMTP id 5b1f17b1804b1-438d596d1bamr27108845e9.6.1738074149822;
+        Tue, 28 Jan 2025 06:22:29 -0800 (PST)
 Received: from localhost.localdomain (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1bad92sm14282474f8f.61.2025.01.28.06.22.23
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a17d7bfsm14358242f8f.35.2025.01.28.06.22.28
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 28 Jan 2025 06:22:24 -0800 (PST)
+        Tue, 28 Jan 2025 06:22:29 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -89,9 +88,9 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH 6/9] cpus: Call hotplug handlers in DeviceWire()
-Date: Tue, 28 Jan 2025 15:21:49 +0100
-Message-ID: <20250128142152.9889-7-philmd@linaro.org>
+Subject: [RFC PATCH 7/9] cpus: Only expose REALIZED vCPUs to global &cpus_queue
+Date: Tue, 28 Jan 2025 15:21:50 +0100
+Message-ID: <20250128142152.9889-8-philmd@linaro.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250128142152.9889-1-philmd@linaro.org>
 References: <20250128142152.9889-1-philmd@linaro.org>
@@ -104,41 +103,70 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-To call the hotplug handlers with REALIZED vCPU, we can
-use the DeviceWire handler.
+cpu_list_add() was doing 2 distinct things:
+- assign some index to vCPU
+- add unrealized (thus in inconsistent state) vcpu to &cpus_queue
+
+Code using CPU_FOREACH() macro would iterate over possibly
+unrealized vCPUs, often dealt with special casing.
+
+In order to avoid that, we move the addition of vCPU to global queue
+to the DeviceWire handler, which is called just before switching the
+vCPU to REALIZED state. This ensure all &cpus_queue users (like via
+&first_cpu or CPU_FOREACH) get a realized vCPU in consistent state.
+
+Similarly we remove it from the global queue at DeviceUnwire phase,
+just after marking the vCPU UNREALIZED.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- hw/core/cpu-common.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ cpu-common.c         | 2 --
+ hw/core/cpu-common.c | 5 +++++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
-index 9ee44a00277..8a02ac146f6 100644
---- a/hw/core/cpu-common.c
-+++ b/hw/core/cpu-common.c
-@@ -211,16 +211,17 @@ static void cpu_common_realizefn(DeviceState *dev, Error **errp)
-         }
+diff --git a/cpu-common.c b/cpu-common.c
+index 4248b2d727e..72ee8dc414e 100644
+--- a/cpu-common.c
++++ b/cpu-common.c
+@@ -91,7 +91,6 @@ void cpu_list_add(CPUState *cpu)
+     } else {
+         assert(!cpu_index_auto_assigned);
      }
- 
--    if (dev->hotplugged) {
--        cpu_synchronize_post_init(cpu);
--        cpu_resume(cpu);
--    }
--
-     /* NOTE: latest generic point where the cpu is fully realized */
+-    QTAILQ_INSERT_TAIL_RCU(&cpus_queue, cpu, node);
+     cpu_list_generation_id++;
  }
  
- static void cpu_common_wire(DeviceState *dev)
+@@ -103,7 +102,6 @@ void cpu_list_remove(CPUState *cpu)
+         return;
+     }
+ 
+-    QTAILQ_REMOVE_RCU(&cpus_queue, cpu, node);
+     cpu->cpu_index = UNASSIGNED_CPU_INDEX;
+     cpu_list_generation_id++;
+ }
+diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
+index 8a02ac146f6..df7a6913603 100644
+--- a/hw/core/cpu-common.c
++++ b/hw/core/cpu-common.c
+@@ -218,6 +218,8 @@ static void cpu_common_wire(DeviceState *dev)
+ {
+     CPUState *cpu = CPU(dev);
+ 
++    QTAILQ_INSERT_TAIL_RCU(&cpus_queue, cpu, node);
++
+     if (dev->hotplugged) {
+         cpu_synchronize_post_init(cpu);
+         cpu_resume(cpu);
+@@ -226,6 +228,9 @@ static void cpu_common_wire(DeviceState *dev)
+ 
+ static void cpu_common_unwire(DeviceState *dev)
  {
 +    CPUState *cpu = CPU(dev);
 +
-+    if (dev->hotplugged) {
-+        cpu_synchronize_post_init(cpu);
-+        cpu_resume(cpu);
-+    }
++    QTAILQ_REMOVE_RCU(&cpus_queue, cpu, node);
  }
  
- static void cpu_common_unwire(DeviceState *dev)
+ static void cpu_common_unrealizefn(DeviceState *dev)
 -- 
 2.47.1
 
