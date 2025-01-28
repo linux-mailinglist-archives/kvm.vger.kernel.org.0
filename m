@@ -1,81 +1,80 @@
-Return-Path: <kvm+bounces-36725-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36726-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99AABA203A3
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 06:01:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BBB7A203A5
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 06:01:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D987E3A6B24
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 05:01:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66D041887636
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 05:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3486A1DF274;
-	Tue, 28 Jan 2025 04:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8211DF986;
+	Tue, 28 Jan 2025 05:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="LGwsla0I"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="rWvoqtiH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817DE1DE8B7
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 04:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1B21DEFE3
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 04:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738040398; cv=none; b=nBMYQSWznYRNwtbt+E8liI5YOnfaZZX4hgd947P7OlLFy5aclSqsc7BYQWqdc0u2//1UqBSOGzJqotRl5wazxkPWdK/C01s3ZHxjkuQaXaKyO+EgHCcBqeLLMIvTpyzYEVI5x4LcL2kga0oH/+LP9L+5gw3DRD2edrnU9csEWo8=
+	t=1738040399; cv=none; b=i69aybdoluCoSDRTE1AXK7jdHvR9sx9LerNBX/r2lUmdwsG8MPQLjelOCEAw2/AyzMcl6TRXVH7++krdf0gdxNIeF73g0Vpq4IVkljHlwBuke8v8AtQdeYUdTOc58fJpcKAsKtbZ+eIRn6JWr3DK2OW2521bNQSjrOITC5EWDiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738040398; c=relaxed/simple;
-	bh=CURFmMM1bMVbBVWFzKB1HrZAF7GWZ+iB6MOdVBx/6BM=;
+	s=arc-20240116; t=1738040399; c=relaxed/simple;
+	bh=D68shKs21+kEnfY1w7KDWjYLipkuW9L+m2trlxew00o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Uv3ZBqmYG2vN2cqrOgrqE4Xcg2SHsdeYTcKRngrtUeSZ+TQNbicTCApZu2gPLiC/CJCF4jyQIWYhAjP0p1ZAyFUYbeZLWiZ23kjo4CkGs0udOBqHIEml7slthaNZh69bf9c6IaAv23zlGyTFYuWdshiiAjDlN/KL6KFHd4Z6mIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=LGwsla0I; arc=none smtp.client-ip=209.85.216.41
+	 In-Reply-To:To:Cc; b=Tt+1wH8IBgaIDMDPJ6k+8cT0KZDLOs8pWnLlt2JTT4HNj9TSr4AWo5aLfQarOFgBkOM4v/nNv+RXQjCrGCS1hN3u8cDLUfUpwxMg4LSnI2hUGKEmxYETWbRIie5HZJFWIxyo+KHBcpOpbo3FX/CCFIfo0CZFAz/Tx/aJ5BEj1fQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=rWvoqtiH; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ef748105deso6911387a91.1
-        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 20:59:56 -0800 (PST)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2f44353649aso6915578a91.0
+        for <kvm@vger.kernel.org>; Mon, 27 Jan 2025 20:59:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738040396; x=1738645196; darn=vger.kernel.org;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738040397; x=1738645197; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/3d11Vb185MzE7T3v4uIyT+JXKKpmn0Bb8O6L8LI7W0=;
-        b=LGwsla0IrPevAlmJuwmHwMnax/7aeAn9OYkbRoP69kT0j8cbMm2aRjEmwPGMNIN1La
-         aevQYwuoqEy1OKvgtptBxSfQ8TFbSYEdDMdJZWOQznznUgCaD+cKBDcPQVa/zFD1JPX1
-         IjrVhLq4GBezq0xfqLqJ9b7xiWZ8OBWMqX3D4vb1UmdrCnyC2mtqIrzgivQEAK8qdrT/
-         aq14SErZp/aRujbE3tg6SRvXdN7ZTDVhrMEVRL2N7m985RHk39Y5BJuTAWzT5SZPayk5
-         Oq5GKy4CnzqR7Sac/zsDJtlBYz2bq1xWpe6fq0c0il+GOTEl2qOqsggVfsfaGBYZs5yo
-         wRww==
+        bh=vL7HY0dEKrWKEMn+BoWLtPifTt6hhf+Eo5KcPrG96mI=;
+        b=rWvoqtiHJF6Uqbzrl058lK83Ee1lMOUOQFr5xBtygdG1eRwif6aPE65cqI/1Q4eQp9
+         prf9EHktOtYByKoETlf3ZaFPYF/S/FRz5BXELCzBerF4tdFzoR7h2OjbOTLiqxNRDWKv
+         N/edfHX4dn9iDXfmc+67FIOMwQp9pAkuM3WUeHcdagQ3VwO9dv/NmgaRofyh8JoP2BVn
+         WGEmGC7gwouSxzOKpvZ3hFrdZu6eHBfjjEcoxJyeTr+ibQOFR5i88sU+vH45xjvFGNGc
+         xRmdAd5ucg1vplboFBEkWPGWPFeYZRX6M0+cfk9rxRHl6KTaVRrbDKZFcHsnMTJfUSi4
+         7xiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738040396; x=1738645196;
+        d=1e100.net; s=20230601; t=1738040397; x=1738645197;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/3d11Vb185MzE7T3v4uIyT+JXKKpmn0Bb8O6L8LI7W0=;
-        b=w9j8kkkQBUtHflCd5N7i1cJSQtfTZNg6rMsriBY/rK96YAD+UCDRHxa9Xa6Rxw9f6U
-         yZrWLAmR50A5MH7A0oKLXhoHviW88fFRQqNK9g8Mf4Xi+2Tf/kn4oWG+8ipFEAmxXrgM
-         LoE0U5tgiIAA46GSdamI8vk+MMyjRwsKbPiqw3CdhZI/4tzUibYSpXZkkRDr1Xoj/AW9
-         Azk/KrjiNKMEMqqv7E9PDyT6Nx2InX6ct061zsmu0jfVOtWdqeOnHzDvuciQfq3ZfhmE
-         4s6/zIwV9Zgkxa6O4wHxs9JUx0bKTQDRucmIdNsGDBzSF/CGS+ldx5WNvrSvEg50GeY5
-         xYRw==
-X-Forwarded-Encrypted: i=1; AJvYcCU0IyNY8tZHl3JIgPjYX27uewKt9kvFyinbvxpi60kif3mQV20AjMDu0IsouciGm5iE4/I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+okcOkNtc875t+oWuFMcQGqDa0v/B8ujyh05tTbBEV18by5Ue
-	rVUUV9v1FXcJOCyhx9/ZzaTxFkuLxv9GwLAbzAaqJZyIT2d9ljImNoJIlBpUTwg=
-X-Gm-Gg: ASbGncti+7Xb/5XGg3vqMPFJK4kNH3KgJUiRrbCof+4dLKMBe1plcjIUnbr26vZBbLj
-	l7WOx5RZ8ncuypr5GAeglZwLCpeVn8uG96oS3GYuqlwve07fUbAy+aAKjYG13++S0pEQAc0VzVK
-	WQ3mGIIeuZ8khynhxg8o6rCJASnX3bz0NAHlMqSf30R11TCYF+Emr3Yb3MesOP9RTzSAlv3tcq5
-	mnTBGKA113oKig3Ox31WNNCtRqTo9NNrkmQdS2Cz5DtgP8fIRWzk03cAVGLlT+zji04s2VXNo69
-	WlfWQXQ3GMd/YlbOBqkXWMVrZUwZ
-X-Google-Smtp-Source: AGHT+IGKJLoG1w7HBodanThehp9jcOrQlRY8JCeFJh3f5TphJqozkTpJC2i92zo0GQX5LVcI8mvvTg==
-X-Received: by 2002:a17:90b:5448:b0:2ea:5dea:eb0a with SMTP id 98e67ed59e1d1-2f782c4d75cmr60425683a91.4.1738040395871;
-        Mon, 27 Jan 2025 20:59:55 -0800 (PST)
+        bh=vL7HY0dEKrWKEMn+BoWLtPifTt6hhf+Eo5KcPrG96mI=;
+        b=RqXmOYvRhV9haVnUtAk4hx6W44YheGB+vymbH8QfXwA6X66GONsHFa/zcDLkAZdphB
+         cSRCFdBK44mu4brRIvgYrYw9iiDyamyJM45B8oPM04fxfhTuJCDyQdeR8bIG4P3owpl4
+         btWQzrzzziewTESGkZkDnZPxSATGKWSouAUxWGAYkEfvrn+OkS7es8aQu+Sl/MtmcvS+
+         6UPl4D4wutaopainIX04SPevlahC77FcQYkMzQCv6IIEcVo6G3C6bWRSFLD89Hpi8cAY
+         47t2H/RxCfJwTx0y+iU3IQUWbRqaUxaawbrodNEYp+mVQ/999/4sqbsE/JNMJvU2yAy5
+         IXOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTBMY/jJv4sqjGIz1tqmyHkzd0PqJGuQHnRwvP1clm4ENaK7/nnf1ww04ogD42tSQkJ1Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxELUND81PSfj5IGjWOT8S7Y0ge53Z1tYdt9LEvJIq/5xh9Zh6o
+	nBMJ8JZo4MVbM9LFlrm4BmaE8v6sffJ4COYMIlE0CFJ9/Bgw+uCuf5dwoRunyQY=
+X-Gm-Gg: ASbGncvBC4PVpe9eDDzWox1uNKrLxm4sZZhTGgt8tSUkkWDG8fKYp5vNRxe3C00aM+2
+	dPxzPfTksQgQZA8/lcRkSn0LhS3GId2ELfhBZe23BwHTUTuoktSGHHj3GuuwurjfveJn5CI3FpM
+	FZarZYv4NlYwcTAA8fa09e/B0jvaxWu/PFWyiIyRdtNvidhbr40G+lSPoxQDpj6L5FO1WVDgpLf
+	uOpMKgHHE8XHFqi0j54a8FTUm9SUwHw1VfMzo96ZxTQoi5x0Igsw3G9ZQti3li9kBmuj9WIrdUD
+	aS6ZRyB3gNMzMtD6p3GXAtmGJ7ik
+X-Google-Smtp-Source: AGHT+IEydkqGnMas9EixfltXBAZwEmzDNcAGB6aZaVaiRCrDSr5UAXUAKLQCmfBM6LnRIdbwcEstgw==
+X-Received: by 2002:a17:90a:da8e:b0:2ea:5e0c:2847 with SMTP id 98e67ed59e1d1-2f782d37703mr53064728a91.22.1738040397475;
+        Mon, 27 Jan 2025 20:59:57 -0800 (PST)
 Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa5a7f7sm8212776a91.11.2025.01.27.20.59.54
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa5a7f7sm8212776a91.11.2025.01.27.20.59.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 20:59:55 -0800 (PST)
+        Mon, 27 Jan 2025 20:59:57 -0800 (PST)
 From: Atish Patra <atishp@rivosinc.com>
-Date: Mon, 27 Jan 2025 20:59:45 -0800
-Subject: [PATCH v3 04/21] dt-bindings: riscv: add Sxcsrind ISA extension
- description
+Date: Mon, 27 Jan 2025 20:59:46 -0800
+Subject: [PATCH v3 05/21] RISC-V: Define indirect CSR access helpers
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,7 +83,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250127-counter_delegation-v3-4-64894d7e16d5@rivosinc.com>
+Message-Id: <20250127-counter_delegation-v3-5-64894d7e16d5@rivosinc.com>
 References: <20250127-counter_delegation-v3-0-64894d7e16d5@rivosinc.com>
 In-Reply-To: <20250127-counter_delegation-v3-0-64894d7e16d5@rivosinc.com>
 To: Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -105,40 +104,62 @@ Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
  Atish Patra <atishp@rivosinc.com>
 X-Mailer: b4 0.15-dev-13183
 
-Add the S[m|s]csrind ISA extension description.
+The indriect CSR requires multiple instructions to read/write CSR.
+Add a few helper functions for ease of usage.
 
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- Documentation/devicetree/bindings/riscv/extensions.yaml | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ arch/riscv/include/asm/csr_ind.h | 42 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
-index 9c7dd7e75e0c..f47d829545db 100644
---- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-+++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-@@ -146,6 +146,22 @@ properties:
-             added by other RISC-V extensions in H/S/VS/U/VU modes and as
-             ratified at commit a28bfae (Ratified (#7)) of riscv-state-enable.
- 
-+        - const: smcsrind
-+          description: |
-+            The standard Smcsrind supervisor-level extension extends the
-+            indirect CSR access mechanism defined by the Smaia extension. This
-+            extension allows other ISA extension to use indirect CSR access
-+            mechanism in M-mode as ratified in the 20240326 version of the
-+            privileged ISA specification.
+diff --git a/arch/riscv/include/asm/csr_ind.h b/arch/riscv/include/asm/csr_ind.h
+new file mode 100644
+index 000000000000..d36e1e06ed2b
+--- /dev/null
++++ b/arch/riscv/include/asm/csr_ind.h
+@@ -0,0 +1,42 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2024 Rivos Inc.
++ */
 +
-+        - const: sscsrind
-+          description: |
-+            The standard Sscsrind supervisor-level extension extends the
-+            indirect CSR access mechanism defined by the Ssaia extension. This
-+            extension allows other ISA extension to use indirect CSR access
-+            mechanism in S-mode as ratified in the 20240326 version of the
-+            privileged ISA specification.
++#ifndef _ASM_RISCV_CSR_IND_H
++#define _ASM_RISCV_CSR_IND_H
 +
-         - const: ssaia
-           description: |
-             The standard Ssaia supervisor-level extension for the advanced
++#include <asm/csr.h>
++
++#define csr_ind_read(iregcsr, iselbase, iseloff) ({	\
++	unsigned long value = 0;			\
++	unsigned long flags;				\
++	local_irq_save(flags);				\
++	csr_write(CSR_ISELECT, iselbase + iseloff);	\
++	value = csr_read(iregcsr);			\
++	local_irq_restore(flags);			\
++	value;						\
++})
++
++#define csr_ind_write(iregcsr, iselbase, iseloff, value) ({	\
++	unsigned long flags;					\
++	local_irq_save(flags);					\
++	csr_write(CSR_ISELECT, iselbase + iseloff);		\
++	csr_write(iregcsr, value);				\
++	local_irq_restore(flags);				\
++})
++
++#define csr_ind_warl(iregcsr, iselbase, iseloff, warl_val) ({	\
++	unsigned long old_val = 0, value = 0;			\
++	unsigned long flags;					\
++	local_irq_save(flags);					\
++	csr_write(CSR_ISELECT, iselbase + iseloff);		\
++	old_val = csr_read(iregcsr);				\
++	csr_write(iregcsr, warl_val);				\
++	value = csr_read(iregcsr);				\
++	csr_write(iregcsr, old_val);				\
++	local_irq_restore(flags);				\
++	value;							\
++})
++
++#endif
 
 -- 
 2.34.1
