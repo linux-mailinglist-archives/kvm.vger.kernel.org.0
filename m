@@ -1,159 +1,231 @@
-Return-Path: <kvm+bounces-36758-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36759-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F235AA20A06
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 12:58:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04F97A20A6C
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 13:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 328EA3A550F
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 11:57:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C6D51669C3
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 12:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC1D1A2396;
-	Tue, 28 Jan 2025 11:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D611A7046;
+	Tue, 28 Jan 2025 12:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ayYcsvup"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="L8/iQUN9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2052.outbound.protection.outlook.com [40.107.102.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6150A199E94;
-	Tue, 28 Jan 2025 11:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738065478; cv=none; b=BPIlVpE5eLiC2ULPXjfpG2Fz2k9x/Jq1+NLkNRPz4Aqdt9Aq0BE82pprAMSSuGyu6pSFr6/UqDH73jjbWFr4psLNciLND8MqnkwMQ0bhqK1OP40p/wiZlYQkvLc+VmvGETsxfSw8ztg9OosyxBq4a6DqOn7eYicLfPOxgKujfb4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738065478; c=relaxed/simple;
-	bh=F0/9IQ0AYzRMcpDNLidcpn2pdwdSs/7SE5pzI5AlAq0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZZ6bM1aObm6on88OfKMYRrP4XzeDepSW/gP98vIylgb691gQm+Ng5UghzSB2eyd+73nCm3xYhkBWb3ksOEyTk2G4VorovUqoIG2UkdXHuFr7xH1MSBjqhaKNT+shQj7t0Q8+535gcTyaYArcINeVDMrT7ZZzHS0UMmFAm16q2uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ayYcsvup; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50S7X5hL023185;
-	Tue, 28 Jan 2025 11:57:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=r7X8KG
-	ofGjzXyiXmNpCqfsbsuZB60462r6ZQo2dzXl8=; b=ayYcsvupPRKoRP/G+OPys1
-	QycJqFRxlExFL71+Y+8MCKAm6S1eALhR9up6ADp3MbVEqBKOshE/ZYtSHJiMqyL5
-	tmr2CCEkfCgeCMaAnWbOYrn43csIYdq6hgajcdaDtRWbQQifCae0mL/R2u++ata5
-	ogooXpH9EldEpu4pukHkOVBLdOeKtWYstJ6YFhIpqIGCaRfJJaLQ0AOkyLMTdp+e
-	ulQ+nD402A07THf8Qw6jVJEamD4nKzuZvkoBm3w/O5OksjGmS1ci+dQFIEFte1+D
-	GPJqES0cmvlqnKilTldeOzX14lQd5/w2D0I5G9KrgTIM9LVcpCFyQIPrqekhN+gw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44etxrs2p0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Jan 2025 11:57:45 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50SBs3oD013874;
-	Tue, 28 Jan 2025 11:57:44 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44etxrs2nw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Jan 2025 11:57:44 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50S88cr2012444;
-	Tue, 28 Jan 2025 11:57:43 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44dany38gc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Jan 2025 11:57:43 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50SBvg2M22282896
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 28 Jan 2025 11:57:42 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64A8D58055;
-	Tue, 28 Jan 2025 11:57:42 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B5505803F;
-	Tue, 28 Jan 2025 11:57:38 +0000 (GMT)
-Received: from [9.204.206.207] (unknown [9.204.206.207])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 28 Jan 2025 11:57:38 +0000 (GMT)
-Message-ID: <27978f31-6b66-4d4c-886b-e2bfb41d5261@linux.ibm.com>
-Date: Tue, 28 Jan 2025 17:27:36 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164201A2C06;
+	Tue, 28 Jan 2025 12:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738066437; cv=fail; b=qnWZgx1q/Wa29GQ3awxv/zBA8puOcAFjLAex3x74OND7AFZ+QqTSYVzhEm5uqD2GYTcusfXp+br3b9ztj/heQ3GKxtgNUxWNyyPg94csWNRUSpq10j1UtQ2F5fJ7ThLCrzVxK+jj+QDPc8YVrSeySQZ6KKkkBcH75pGsUCyoZb4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738066437; c=relaxed/simple;
+	bh=CK+VtMOeY46MVI6oYANWDUeay+q6O2cePdZdXT+K5l8=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=PrSohtnuxCJT32E3Op7KFNkJs2ypUfcnJ8tgelVYAMx9EtZuTdF0aYw2dv3C5kX2rQy4dyCKpZ2RLzGzcabWanksKnROxg4drN4H48GxRke8tyNda+vhw4MQGY++ObclsF6u3nJKTN/uqhQ8aYsjMopD59g7ZndDRYvLRvX7lKI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=L8/iQUN9; arc=fail smtp.client-ip=40.107.102.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EKDZze1Hu66WXvOl8pVE6H7Q0ONRXQTfhZoMQ08Sjuz7sGZSbQlFn/KR89HWiwxocybCCM7OLupGc4YBeE7LDP5Ib7lifTkOze0Pw9Lb2niNCb8m4nBhVQZ3f9LFmneaD8EVV/6bQexyONpG+ScMJWDfdOcHhVgIDnhH1F3wUdOAshY6QzGo9itDtq332ecIz4eDXuZY0JsF4SYA+i8bP45Hb8IcGNyGgPfgKfWbrjzSqaCnNigAvyBU7R7JSwjfrxcGH2B91VDm5KWTrBzl/H/xHBaMKvT6Ok0kqYphB7YXH2pU2/pkRbvopymej86APkbPl53kv8PALzaUfT5UjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=itc1QvToGoe+J9d2UwWhwo8C6yFjsoavWAQJrBR4Q0w=;
+ b=LaaLHMMvo1UXqC21mZPgsmYAsaGForUzvT06eGJ8FdGiS5aB3iIKHPyLqJuJcmXmz/c4q4kINceqQmdrtKFDywGHuj1ETyErhYSVtojvMcyWbTVtCPurVXDF7hnbzCKBQU74xhnCfx3cndINKkbMnblecLzxNxSl0ep39kaFycH7HGkR95hOzG23dUJKW7EtyLMXjRqz6J4UZ4CM6+ZmHlxWQNca+CVJUkYRIPNBWbpTfPysUoKuriw1GV9LCQCP3PJkg13qmJi93fTXaiQMhcbL19aXcXAQuLFaBaXsy4dQzUtswQk8rg3DtwEsIZU/D1baFhI0QaIUtavCsFe7uQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=itc1QvToGoe+J9d2UwWhwo8C6yFjsoavWAQJrBR4Q0w=;
+ b=L8/iQUN9XJDJxqy0y0fKm4b/yEDkc2SYynhTTYsYjIStSBxf63Xe3c0PLoWLATV6mWjQcUaDvUoc2P+KPlQAD2tnuaBZMR59OPFFhLyN69oTMHBHzTIfprvrRCi7m6FQhl11JaqUI0HleIqmGNnyOAOnA0EIiPLIdZDt5LluvJs=
+Received: from CH2PR19CA0028.namprd19.prod.outlook.com (2603:10b6:610:4d::38)
+ by CYXPR12MB9387.namprd12.prod.outlook.com (2603:10b6:930:e6::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.22; Tue, 28 Jan
+ 2025 12:13:50 +0000
+Received: from DS3PEPF000099DB.namprd04.prod.outlook.com
+ (2603:10b6:610:4d:cafe::69) by CH2PR19CA0028.outlook.office365.com
+ (2603:10b6:610:4d::38) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.23 via Frontend Transport; Tue,
+ 28 Jan 2025 12:13:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF000099DB.mail.protection.outlook.com (10.167.17.197) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8398.14 via Frontend Transport; Tue, 28 Jan 2025 12:13:50 +0000
+Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 28 Jan
+ 2025 06:13:44 -0600
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: "Pratik R. Sampat" <prsampat@amd.com>, <linux-kernel@vger.kernel.org>,
+	<x86@kernel.org>, <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <thomas.lendacky@amd.com>,
+	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <shuah@kernel.org>, <pgonda@google.com>,
+	<ashish.kalra@amd.com>, <michael.roth@amd.com>, <sraithal@amd.com>,
+	<prsampat@amd.com>
+Subject: Re: [PATCH v5 3/9] KVM: selftests: SEV-SNP test for KVM_SEV_INIT2
+In-Reply-To: <20250123220100.339867-4-prsampat@amd.com>
+References: <20250123220100.339867-1-prsampat@amd.com>
+ <20250123220100.339867-4-prsampat@amd.com>
+Date: Tue, 28 Jan 2025 12:13:41 +0000
+Message-ID: <85ikpzm8zu.fsf@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] kvm powerpc/book3s-apiv2: Introduce kvm-hv
- specific PMU
-To: Vaibhav Jain <vaibhav@linux.ibm.com>,
-        Athira Rajeev <atrajeev@linux.vnet.ibm.com>
-Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.ibm.com,
-        amachhiw@linux.ibm.com
-References: <20250123120749.90505-1-vaibhav@linux.ibm.com>
- <20250123120749.90505-5-vaibhav@linux.ibm.com>
- <40C19755-ABE4-4E23-A75A-1F6F6DDC505A@linux.vnet.ibm.com>
- <87y0ywu2ri.fsf@vajain21.in.ibm.com>
-Content-Language: en-US
-From: Madhavan Srinivasan <maddy@linux.ibm.com>
-In-Reply-To: <87y0ywu2ri.fsf@vajain21.in.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MNESt_Kp7udNeKkgSEzO62Q2Ay1u4sAz
-X-Proofpoint-GUID: ENHdIdwhxCCLeW6MK-1CsGIb68TQgiQs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-28_04,2025-01-27_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- impostorscore=0 bulkscore=0 suspectscore=0 mlxlogscore=710
- priorityscore=1501 phishscore=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2501280089
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DB:EE_|CYXPR12MB9387:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d1c99fe-3882-42e7-1ada-08dd3f953977
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Due0T+XMAiE6VvkKmehubJOYtImITBnmz2Dq4nPBsTVPOWshAA2F2tUw6OfG?=
+ =?us-ascii?Q?A5dKYQYdo66GjQc/A1nghZQx8gC9xgYwdJDgakWqa2NI5luBtfi0Sry45JtV?=
+ =?us-ascii?Q?gUvcfQu/lBnn3HG8P/vs+cJw9t2zcxgeYyHGbC8KWeOZdYTIAA67gJdR1va7?=
+ =?us-ascii?Q?6n5rHSby5rtwlsVR1BB+P7BrTjl/09J+jLWdX1iSS2Ldih1tkgb+qGXZJOlB?=
+ =?us-ascii?Q?m6th55YFO4LBYlE7ZtwdXe+SAfERnMi1N9lEalYGFXPMroDQqPkem3FAhggL?=
+ =?us-ascii?Q?t2Z5GZDzzqKitrVm4nlxd+xWg6qI8NfculI+tuG8BUp5VcLW5X80AtNJb9rY?=
+ =?us-ascii?Q?/y5z7txOOyLrJ2ITFEsfIt2beaS+mNiehnrc50AxrU/qnzoZ3jSxZNn+Ezxy?=
+ =?us-ascii?Q?+ufAvkIouqMACmYEgpfXQoXPVX54OchUwwO3CDBq0VSS0jdb/6B4V9y3uQ4y?=
+ =?us-ascii?Q?uDNedezomU59uD5GpnbVA5FIVwRfXMMYfiwTV9KrTsV1c6ecOnSaBw2R96Lq?=
+ =?us-ascii?Q?oXZ1bUFXfmCwlzJMC+YNw+znxmHIh2iY+m3Z1qeSccEFrOtuKcG3MiIDBoCX?=
+ =?us-ascii?Q?vCTyGL1LJ+scFFg+KIHgYD/RoLyuOUKFAAC796i9cceAQfk5FfEPF7eSRTVz?=
+ =?us-ascii?Q?+PlbE4Ozwpdd7rBio3OSoV5J73xXsIIrTGCysQ5Rqpt99xFIyAycEl7PZjbD?=
+ =?us-ascii?Q?mwqhjgwM3P+ZQJRUbKW4tPCWXJO98YQis2vNsI+PklVCS+D1F26FhUME0Af/?=
+ =?us-ascii?Q?Z01uLbhe4tlW2eMVIKgQ0kytbYqNLh2Ondlr/1GA4vWjTAFmODsH4mNFn5sS?=
+ =?us-ascii?Q?vcRwWJ0FUnRWCesECfX25DKlXXLOC06HJKz+FrloAO1I8tfTZvgeohhPqKf0?=
+ =?us-ascii?Q?2Qs/XwYyA2G6BSj3puH04nSdhWA2VOGQbq2rI9bhG/lLe5Z8R87wovoPWe0h?=
+ =?us-ascii?Q?BdlXGlS4YgYjZl2U3Hk6FBxPFQidmUX0AFVuYXxYr1Wfglx3rLDEHYytSqGO?=
+ =?us-ascii?Q?4lUhOTClo/jh92dyzk1PRUeDICVAaxzuyLFBhC87e7cSIX+1GcZ+gglWdnBj?=
+ =?us-ascii?Q?xvLeTgTdy20YjzT+Wwqx+ubYHaDNd8bF2XVWX/tL7JAsE/zXWfyMg0y4HURK?=
+ =?us-ascii?Q?4mZqVDf3wKMFBvQ6zJI0nj+yDVtkz0tgLCM3mqVq6tEO21c7xDyfk/nuEWDk?=
+ =?us-ascii?Q?6q9bxssKFdstRA0zUzE+0mbLUrRTMIL4lq7J8ULTcXbH2/xMzGT6Z4TABAKK?=
+ =?us-ascii?Q?CM2vLcBQEkG7tHxjwMhW59LcV/a3H/CLPRmc4WbB0WQsUEfeHD/s6ak5nBph?=
+ =?us-ascii?Q?Aw7+gMboxvQvSEZ2jHkE8CB8n2dPnCZxQ63cazuKCZlNXDGr/iHybmSI+8qH?=
+ =?us-ascii?Q?Dpmi5oHS8mR4gDV5DxZdFASYOHzNVgEgsgDOTr6VDOKzNc3polS1WBpwNpo+?=
+ =?us-ascii?Q?xM7cn2uc1IpVGz0lJ3hWipmYaJrGhhfH7ybWjWYCaE6ywRbf0LJDvbDMeryl?=
+ =?us-ascii?Q?EG123Hvzo4T0BAc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2025 12:13:50.2168
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d1c99fe-3882-42e7-1ada-08dd3f953977
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099DB.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9387
 
+"Pratik R. Sampat" <prsampat@amd.com> writes:
 
+> Add the X86_FEATURE_SNP CPU feature to the architectural definition for
+> the SEV-SNP VM type to exercise the KVM_SEV_INIT2 call. Ensure that the
+> SNP test is skipped in scenarios where CPUID supports it but KVM does
+> not, preventing reporting of failure in such cases.
+>
+> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
 
-On 1/27/25 1:06 PM, Vaibhav Jain wrote:
-> Hi Athira,
-> 
-> Thanks for reviewing this patch series. My responses to your review
-> comment inline below:
-> 
-> 
-> Athira Rajeev <atrajeev@linux.vnet.ibm.com> writes:
-> 
->>> On 23 Jan 2025, at 5:37 PM, Vaibhav Jain <vaibhav@linux.ibm.com> wrote:
->>>
->>> Introduce a new PMU named 'kvm-hv' to report Book3s kvm-hv specific
-> <snip>
->>
->> Hi Vaibhav
->>
->> All PMU specific code is under “arch/powerpc/perf in the kernel source. Here since we are introducing a kvm-hv specific PMU, can we please have it in arch/powerpc/perf ?
-> 
-> Is it common convention to put PMU specific code in
-> arch/powerpc/perf across ppc achitecture variants ? If its there can you
-> please mention the reasons behind it.
-> 
+With a minor nit below:
 
-My concern is about fragmentation. Would prefer to have
-the pmu code under perf folder. Secondly, we did handle
-module case for vpa-pmu.
+Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
 
-Maddy
+> ---
+>  tools/testing/selftests/kvm/include/x86/processor.h |  1 +
+>  tools/testing/selftests/kvm/x86/sev_init2_tests.c   | 13 +++++++++++++
+>  2 files changed, 14 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+> index d60da8966772..1e05e610bb06 100644
+> --- a/tools/testing/selftests/kvm/include/x86/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
+> @@ -199,6 +199,7 @@ struct kvm_x86_cpu_feature {
+>  #define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
+>  #define X86_FEATURE_SEV			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
+>  #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
+> +#define X86_FEATURE_SNP			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 4)
 
+Can we keep the naming same as in cpufeatures.h: X86_FEATURE_SEV_SNP ?
 
-> Also the code for this PMU, will be part of kvm-hv kernel module as it
-> utilizes the functionality implemented there. Moving this PMU code to
-> arch/powerpc/perf will need this to be converted in yet another new
-> kernel module, adding a dependency to kvm-hv module and exporting a
-> bunch of functionality from kvm-hv. Which looks bit messy to me
-> 
-> <snip>
-> 
+Regards
+Nikunj
 
+>
+>  /*
+>   * KVM defined paravirt features.
+> diff --git a/tools/testing/selftests/kvm/x86/sev_init2_tests.c b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
+> index 3fb967f40c6a..3f8fb2cc3431 100644
+> --- a/tools/testing/selftests/kvm/x86/sev_init2_tests.c
+> +++ b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
+> @@ -28,6 +28,7 @@
+>  int kvm_fd;
+>  u64 supported_vmsa_features;
+>  bool have_sev_es;
+> +bool have_snp;
+>  
+>  static int __sev_ioctl(int vm_fd, int cmd_id, void *data)
+>  {
+> @@ -83,6 +84,9 @@ void test_vm_types(void)
+>  	if (have_sev_es)
+>  		test_init2(KVM_X86_SEV_ES_VM, &(struct kvm_sev_init){});
+>  
+> +	if (have_snp)
+> +		test_init2(KVM_X86_SNP_VM, &(struct kvm_sev_init){});
+> +
+>  	test_init2_invalid(0, &(struct kvm_sev_init){},
+>  			   "VM type is KVM_X86_DEFAULT_VM");
+>  	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))
+> @@ -138,15 +142,24 @@ int main(int argc, char *argv[])
+>  		    "sev-es: KVM_CAP_VM_TYPES (%x) does not match cpuid (checking %x)",
+>  		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SEV_ES_VM);
+>  
+> +	have_snp = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM);
+> +	TEST_ASSERT(!have_snp || kvm_cpu_has(X86_FEATURE_SNP),
+> +		    "sev-snp: KVM_CAP_VM_TYPES (%x) indicates SNP support (bit %d), but CPUID does not",
+> +		    kvm_check_cap(KVM_CAP_VM_TYPES), KVM_X86_SNP_VM);
+> +
+>  	test_vm_types();
+>  
+>  	test_flags(KVM_X86_SEV_VM);
+>  	if (have_sev_es)
+>  		test_flags(KVM_X86_SEV_ES_VM);
+> +	if (have_snp)
+> +		test_flags(KVM_X86_SNP_VM);
+>  
+>  	test_features(KVM_X86_SEV_VM, 0);
+>  	if (have_sev_es)
+>  		test_features(KVM_X86_SEV_ES_VM, supported_vmsa_features);
+> +	if (have_snp)
+> +		test_features(KVM_X86_SNP_VM, supported_vmsa_features);
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.43.0
 
