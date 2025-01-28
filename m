@@ -1,125 +1,301 @@
-Return-Path: <kvm+bounces-36812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95974A214E3
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 00:08:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E87CA21550
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 00:52:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B26A7A33DC
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 23:07:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14BC63A4A61
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 23:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4711EEA3E;
-	Tue, 28 Jan 2025 23:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9901F03D9;
+	Tue, 28 Jan 2025 23:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m67mpdc5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sdn+xDVM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA93C1DDA09
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 23:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A029719E97B
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 23:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738105698; cv=none; b=OHRLcD1HXRMHK6tad0Dnhkcr6TLysijdtLWMXhHqAXExRXDfXW8qr/op1FI9+0/M2XX/hsXES73VhHcV/hBObzbnxonMrA2ozQKlFiBAAid09/ZTwYim3dcjrKRlrZTQw03KVe/ZiQBrrBbNOmM5Ee03q0CEE9x4K8WA4nsqvqk=
+	t=1738108310; cv=none; b=IFLW1nYhzRJayICICkw7n7cAO0iuTjjOl+klKkFlZQFopVL+MBtKXxU+YIM0SgLGgLsg71XIuhNNS8bEU524qX2l5rPXPj0klxq/bJM+m4iArdG7PeXBIn7QsL1++4xi7sspYeGMZjyH1PUlLw+7Me2PaKjJMiunjTjvNAj14fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738105698; c=relaxed/simple;
-	bh=c1f9GAm+Tfh1fyQTBlChMqr4dttyOYyLRGgVPWFsuGQ=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=XPV1FROi4c+4lW83O1HIo3xoUPb7ECDb9ZKFHTJRxEYI/lCSwVML1fp0LwAjnP4r/jbv9cfAUpWatfqWhrByGiL7eBt0q7AeThWVV6RvbSCVFozlfiUaENcLoYDPcb0Ps+QFSqPeJp1ItXAzjWnpwvLVY18daWSzX0+IogZvvdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m67mpdc5; arc=none smtp.client-ip=209.85.210.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-71de28807b0so3898720a34.3
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 15:08:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738105696; x=1738710496; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zFo6TxttEqFIalCsIspeo8mg648WKT4oP0eEXrQLVXM=;
-        b=m67mpdc5t5WFFfJatIz8iPL8m/vEM+4NI/pL5Wx9XXoLsKovlY9mLlcpca8tD1ymDc
-         OHl0VF+tt+rIwVACdrvbsBbVFCcVpx4W8DPxkforIwOh0I6VH2P8O7TrHHWCiWrEbpm5
-         MoXL4pxI5wFSYcRPNsuAUgHdQKhDbDT4KujoTTpQbDV+KJoFRnDyh8EtsNkmmQEw7lMg
-         Z2KU8DcVT/U9guv7XYnmeWQsl7VH/UwW92CG16Buh/8TFKnzllkx7uPwwwAxFvI4bEpO
-         boHm6ky0nhdQHfQIGgKjZxjS3lEMLhjXUzNT/fEJUuag4diC61CmqOFfmjVI1bCRWID9
-         SgQA==
+	s=arc-20240116; t=1738108310; c=relaxed/simple;
+	bh=A4jbdWMbW7MvVT/KBEfNr5R+mAmwla0vGhc+P+AhzF4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Dk6NVZWYHZAGCZJrO/glP/WOmnKurGDoJkb7jGELdcLSrL3VOqAFb7Jb3FpHVdd782gtSwj9ulasd1fW/sxe63XmuZfOa51ptaQUDLw/lsO2ryZjuPhx2aFKI1VyOljh7LK42+sC8Ts3Qq7rVim1Dsty3UMsues4SLECJ/cKwUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sdn+xDVM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738108307;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+plZfZMBTkpPOut6ehHxsbo4XAtVzSns554KZTqadOQ=;
+	b=Sdn+xDVM06tdkEgLeIoPlea5mwCD5eFIaxWQkBD4HFy+ZB5N1U8jviH1bOTZLuBuXMm/eR
+	l7f/hjO45afK+9IHeMx+n8dtMNqE+yYwk0u/Q5WweZa5p/64oH10+F60XB6pQuMAN1E9AA
+	H7ISjWLMpQTRv1jGKIFZETn+FvWECKw=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-199-2lcbuxoWNGSZJPXqtetAVw-1; Tue, 28 Jan 2025 18:51:45 -0500
+X-MC-Unique: 2lcbuxoWNGSZJPXqtetAVw-1
+X-Mimecast-MFC-AGG-ID: 2lcbuxoWNGSZJPXqtetAVw
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-218cf85639eso185590665ad.3
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 15:51:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738105696; x=1738710496;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1738108305; x=1738713105;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zFo6TxttEqFIalCsIspeo8mg648WKT4oP0eEXrQLVXM=;
-        b=SE8KN+7Uf/PcPyXSIj8ppV8KyP3JVhU38FurV7RuniZ2OKxcTUtCyPQC9+k8Vg8hX2
-         OrmIkhZSZXW49+gNq/6gaUYzeB+c4mzzcdBnC7NPtgFHCtimM6YLRmmbE4qztYwFkDBE
-         6mbRtkURDqV0SRQFaF+A302q2+48MknqK33qLbD7Q1U3ttCSzKrRqD+mPHZXTX1VQFi8
-         PiSRYbLdfiELwOyhJFNB3eQpcwHkeiAabnPDxLo380dBNpAXnrlizQs0Rs0fs1PxnjMB
-         1aaYK5jJwM8lO0gwEpD8rza9h5YxTx0Hx1CR5IQvcRWLIMp5084v37fjqaF+wETY1VNS
-         0bPg==
-X-Forwarded-Encrypted: i=1; AJvYcCUDpNL9q3UcMpneG/NBkhMM3qT1UAvs9G4hGp+DGdfZsjUNQu6SD54GJ/lJcXgOKQev8GM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIKfTxYzpjsQ0VL6Ow2aP0RIm9Jcq/IaiaZkctXQZ/NwIEjAy9
-	lpqNwOyO+6JnzXcN+cuheyMq/Dgi6uCqE6rXJlp78WsMpnZf5B4kKlGb9sMYNAGrgU3Ly/HgvjE
-	IJ1AMxzDxjRHKy9zwhCh/Dg==
-X-Google-Smtp-Source: AGHT+IG5ddnY6/iHSVzZPnfbt3FF1yw2VhaZJBEOVScosdSTNCWOaSf0V1Rutk3fTReV5GNpySjV/C49wUzgPhrdpA==
-X-Received: from oocx8.prod.google.com ([2002:a05:6820:8188:b0:5fa:a33d:6240])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6830:670f:b0:71e:1c5:4f9a with SMTP id 46e09a7af769-726568f8258mr618751a34.25.1738105695853;
- Tue, 28 Jan 2025 15:08:15 -0800 (PST)
-Date: Tue, 28 Jan 2025 23:08:14 +0000
-In-Reply-To: <gsntbjvq382s.fsf@coltonlewis-kvm.c.googlers.com> (message from
- Colton Lewis on Tue, 28 Jan 2025 22:08:27 +0000)
+        bh=+plZfZMBTkpPOut6ehHxsbo4XAtVzSns554KZTqadOQ=;
+        b=NSTuBmtSHp8+Mx3FGmJoiUBmEiy9lmznSpmXYROZc9uolZt1VxjFdxW+NfwvnogP1Y
+         gZwbg5qIZfWSpG3fmQy9Jtc9aONDWGAdRzVu6pWj9PklnINUhzy5KoDDSk69VWqyXP0N
+         zAXcBRtISwXJYIGTkhuQT1rU8sxP3KxSuRwYNE4HNTdoUrDRKMeZtBqt66W0Oju5HrwE
+         4CmShD3VuY1Kd4Bk86t60nKXtc2BCQqEI8R/AaWSna7upEvdVUBb8WpRuk05Q6RLynGP
+         tiozut6EH1/cyF/11doI3CXGluXwhUbyC2CrmWSLEK9G7iEm8Lx8nobadDg/Bxajnj09
+         gZww==
+X-Forwarded-Encrypted: i=1; AJvYcCUSg6Xl/01WUTeOLCEN1gdP3mVf0YY/pR6K+uadJYL+wSbIJdf3IrRI1zwxQHAoCMq0Hvc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5JGhX5J/5WrMCL5CcXOufEE6dee0KQQKpz2kl9iKSpS14p0rz
+	T59Zre62vKKHvYR5bta/yM+bhFp4DX+xh/OvbmwWNIz+OMz/YhT+0tiZuNnn8mUTowZtahPuqYt
+	C+AhggKSOFDKhMevrxFiVr8MpOVsC0yvzE6XQVuO9qdYDBdGP1w==
+X-Gm-Gg: ASbGncvg0a/ttfbTR8PewhAy0jr+8LD/OmqeFMhsDArrUHhLYWrxdZE1lBamQX0/OQ6
+	zKjW3QDSKFwa8eg5fWVC0Ca7fyZOMrSijBvh46Sqc6oxrlBbWxlxdt8J/s4G7w4Rra1wcHUpfNZ
+	QYsG4EA4hAuIRM4cFFVXOkOg8QAFPa/LotJGXQ6prrL6K5So4oB4KqWdJ9oyaz2y82Ag5yUVSZy
+	/zyVql5K8ppf0J3c7X7ZgwNshaaV0JIw/M7eajEb8Fvdp/wZdFlt3eahhsNavdly07OPFWJhmO1
+	0R8OKQ==
+X-Received: by 2002:a17:902:cec2:b0:215:a57e:88e7 with SMTP id d9443c01a7336-21dd7c44fbemr14311085ad.3.1738108304624;
+        Tue, 28 Jan 2025 15:51:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEisDusPXc7ABGNzSjvOH0bfbYE9rGUJagDAg44yLrrrIJdYRrgsxD0BPQEinR+S01/v+a6Rw==
+X-Received: by 2002:a17:902:cec2:b0:215:a57e:88e7 with SMTP id d9443c01a7336-21dd7c44fbemr14310905ad.3.1738108304240;
+        Tue, 28 Jan 2025 15:51:44 -0800 (PST)
+Received: from [192.168.68.55] ([180.233.125.64])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da414132asm86536785ad.138.2025.01.28.15.51.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jan 2025 15:51:43 -0800 (PST)
+Message-ID: <f6668e66-313a-4c56-92ba-08855878ebf9@redhat.com>
+Date: Wed, 29 Jan 2025 09:51:34 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsnt34h235b5.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
- partition the PMU
-From: Colton Lewis <coltonlewis@google.com>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: maz@kernel.org, kvm@vger.kernel.org, linux@armlinux.org.uk, 
-	catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, pbonzini@redhat.com, shuah@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 07/43] arm64: RME: Define the user ABI
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20241212155610.76522-1-steven.price@arm.com>
+ <20241212155610.76522-8-steven.price@arm.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20241212155610.76522-8-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 12/13/24 1:55 AM, Steven Price wrote:
+> There is one (multiplexed) CAP which can be used to create, populate and
+> then activate the realm.
+> 
+> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes from v5:
+>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+> ---
+>   Documentation/virt/kvm/api.rst    |  1 +
+>   arch/arm64/include/uapi/asm/kvm.h | 49 +++++++++++++++++++++++++++++++
+>   include/uapi/linux/kvm.h          | 12 ++++++++
+>   3 files changed, 62 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 454c2aaa155e..df4679415a4c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5088,6 +5088,7 @@ Recognised values for feature:
+>   
+>     =====      ===========================================
+>     arm64      KVM_ARM_VCPU_SVE (requires KVM_CAP_ARM_SVE)
+> +  arm64      KVM_ARM_VCPU_REC (requires KVM_CAP_ARM_RME)
+>     =====      ===========================================
+>   
+>   Finalizes the configuration of the specified vcpu feature.
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 66736ff04011..8810719523ec 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -108,6 +108,7 @@ struct kvm_regs {
+>   #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
+>   #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
+>   #define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
+> +#define KVM_ARM_VCPU_REC		8 /* VCPU REC state as part of Realm */
+>   
+>   struct kvm_vcpu_init {
+>   	__u32 target;
+> @@ -418,6 +419,54 @@ enum {
+>   #define   KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES	3
+>   #define   KVM_DEV_ARM_ITS_CTRL_RESET		4
+>   
+> +/* KVM_CAP_ARM_RME on VM fd */
+> +#define KVM_CAP_ARM_RME_CONFIG_REALM		0
+> +#define KVM_CAP_ARM_RME_CREATE_RD		1
+> +#define KVM_CAP_ARM_RME_INIT_IPA_REALM		2
+> +#define KVM_CAP_ARM_RME_POPULATE_REALM		3
+> +#define KVM_CAP_ARM_RME_ACTIVATE_REALM		4
+> +
+
+I guess it would be nice to rename KVM_CAP_ARM_RME_CREATE_RD to KVM_CAP_ARM_RME_CREATE_REALM
+since it's to create a realm. All other macros have suffix "_REALM". Besides, KVM_CAP_ARM_RME_INIT_IPA_REALM
+would be KVM_CAP_ARM_RME_INIT_REALM_IPA, and KVM_CAP_ARM_RME_POPULATE_REALM would be
+KVM_CAP_ARM_RME_POPULATE_REALM_IPA. Something like below.
+
+/* KVM_CAP_ARM_RME on VM fd */
+#define KVM_CAP_ARM_RME_CONFIG_REALM		0
+#define KVM_CAP_ARM_RME_CREATE_RD		1
+#define KVM_CAP_ARM_RME_INIT_REALM_IPA		2
+#define KVM_CAP_ARM_RME_POPULATE_REALM_IPA	3
+#define KVM_CAP_ARM_RME_ACTIVATE_REALM		4
+
+> +#define KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA256		0
+> +#define KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA512		1
+> +
+> +#define KVM_CAP_ARM_RME_RPV_SIZE 64
+> +
+> +/* List of configuration items accepted for KVM_CAP_ARM_RME_CONFIG_REALM */
+> +#define KVM_CAP_ARM_RME_CFG_RPV			0
+> +#define KVM_CAP_ARM_RME_CFG_HASH_ALGO		1
+> +
+
+The comments for the list of configuration items accepted for KVM_CAP_ARM_RME_CONFIG_REALM,
+it shall be moved before KVM_CAP_ARM_RME_MEASUREMENT_ALGO_SHA256 to cover all the definitions
+applied to KVM_CAP_ARM_RME_CONFIG_REALM.
+
+Besides, the prefix "KVM_CAP_" in those definitions, except the first 5 definitions like
+KVM_CAP_ARM_RME_CONFIG_REALM, are confusing. The macros with "KVM_CAP_" prefix are usually
+indicating capabilities. In this specific case, they're applied to the argument (struct),
+carried by the corresponding sub-command. So I would suggest to eleminate the prefix,
+something like below:
+
+/* List of configurations accepted for KVM_CAP_ARM_RME_CONFIG_REALM */
+#define ARM_RME_CONFIG_RPV		0
+#define ARM_RME_CONFIG_HASH_ALGO	1
+
+#define ARM_RME_CONFIG_MEASUREMENT_ALGO_SHA256	0
+#define ARM_RME_CONFIG_MEASUREMENT_ALGO_SHA512	1
+
+#define ARM_RME_CONFIG_RPV_SIZE	64
+
+struct arm_rme_config {
+         :
+};
 
 
-Colton Lewis <coltonlewis@google.com> writes:
+> +struct kvm_cap_arm_rme_config_item {
+> +	__u32 cfg;
+> +	union {
+> +		/* cfg == KVM_CAP_ARM_RME_CFG_RPV */
+> +		struct {
+> +			__u8	rpv[KVM_CAP_ARM_RME_RPV_SIZE];
+> +		};
+> +
+> +		/* cfg == KVM_CAP_ARM_RME_CFG_HASH_ALGO */
+> +		struct {
+> +			__u32	hash_algo;
+> +		};
+> +
+> +		/* Fix the size of the union */
+> +		__u8	reserved[256];
+> +	};
+> +};
+> +
+> +#define KVM_ARM_RME_POPULATE_FLAGS_MEASURE	BIT(0)
+> +struct kvm_cap_arm_rme_populate_realm_args {
+> +	__u64 populate_ipa_base;
+> +	__u64 populate_ipa_size;
+> +	__u32 flags;
+> +	__u32 reserved[3];
+> +};
+> +
 
-> Hey Marc, thanks for looking.
+BIT(0) has type of 'unsigned long', inconsistent to '__u32 flags'. So it would
+be something like below.
 
-*for the review
+#define ARM_RME_POPULATE_REALM_IPA_FLAG_MEASURE		(1 << 0)
+struct arm_rme_populate_realm_ipa {
+	__u64 base;
+	__u64 size;
+	__u32 flags;
+	__u32 reserved[3];
+};
 
-> Marc Zyngier <maz@kernel.org> writes:
+> +struct kvm_cap_arm_rme_init_ipa_args {
+> +	__u64 init_ipa_base;
+> +	__u64 init_ipa_size;
+> +	__u32 reserved[4];
+> +};
+> +
 
->> On Mon, 27 Jan 2025 22:20:27 +0000,
->> Colton Lewis <coltonlewis@google.com> wrote:
+Similiarly, it would be something like below:
 
->>>    	/* Read the nb of CNTx counters supported from PMNC */
->>> -	bitmap_set(cpu_pmu->cntr_mask,
->>> -		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
->>> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
->>> +
->>> +	if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr_n) {
->>> +		cpu_pmu->hpmn = reserved_guest_counters;
->>> +		cpu_pmu->partitioned = true;
+struct arm_rme_init_realm_ipa {
+	__u64 base;
+	__u64 size;
+	__u64 reserved[2];
+};
 
->> Isn't this going to completely explode on a kernel running at EL1?
+>   /* Device Control API on vcpu fd */
+>   #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+>   #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 502ea63b5d2e..f448198838cf 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -934,6 +934,8 @@ struct kvm_enable_cap {
+>   #define KVM_CAP_X86_APIC_BUS_CYCLES_NS 237
+>   #define KVM_CAP_X86_GUEST_MODE 238
+>   
+> +#define KVM_CAP_ARM_RME 300 /* FIXME: Large number to prevent conflicts */
+> +
+>   struct kvm_irq_routing_irqchip {
+>   	__u32 irqchip;
+>   	__u32 pin;
+> @@ -1581,4 +1583,14 @@ struct kvm_pre_fault_memory {
+>   	__u64 padding[5];
+>   };
+>   
+> +/* Available with KVM_CAP_ARM_RME, only for VMs with KVM_VM_TYPE_ARM_REALM  */
+> +struct kvm_arm_rmm_psci_complete {
+> +	__u64 target_mpidr;
+> +	__u32 psci_status;
+> +	__u32 padding[3];
+> +};
+> +
+> +/* FIXME: Update nr (0xd2) when merging */
+> +#define KVM_ARM_VCPU_RMM_PSCI_COMPLETE	_IOW(KVMIO, 0xd2, struct kvm_arm_rmm_psci_complete)
+> +
+>   #endif /* __LINUX_KVM_H */
 
-> Trying to access an EL2 register at EL1 can do that. I'll add the
-> appropriate hypercalls.
+Thanks,
+Gavin
 
->> Also, how does it work in an asymmetric configuration where some CPUs
->> can satisfy the reservation, and some can't?
-
-> The CPUs that can't read their own value of PMCR.N below what the
-> attempted reservation is and so do not get partitioned. Nothing changes
-> for that CPU if it can't meet the reservation.
-
-My mistake. That does not happen. I originally did these comparisons in
-armv8pmu_reset which runs for every CPU but __armv8pmu_probe_pmu
-doesn't.
 
