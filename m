@@ -1,153 +1,313 @@
-Return-Path: <kvm+bounces-36807-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36808-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA9BA2139D
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 22:24:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED4AA213E1
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 23:08:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAE283A41E0
-	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 21:24:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0A283A617D
+	for <lists+kvm@lfdr.de>; Tue, 28 Jan 2025 22:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C34F1EEA3D;
-	Tue, 28 Jan 2025 21:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6543F1DFE12;
+	Tue, 28 Jan 2025 22:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MLP8StOP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XDs4VoKY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38FA1DF963
-	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 21:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4C119C574
+	for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 22:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738099487; cv=none; b=rktK6wvAkjJukJeJ2nx+yQ/L5oBkS+0RNA+SlOFAoaY3VVY0xYQivpyncDtpVO6BorSy0YFwtiXw1vtFcTFpQEUE+yy3h6NhqsVXB4h3jyaRnqSSjZX+zhIRlu4zkS5QbYn6fKoyxQHGPV1e/LJ6z2AM8VrTUPGMpOlU4YuhT3U=
+	t=1738102111; cv=none; b=aXMnsMVPjovFCuR72xv8JKcvMP1qjuS8NjuFZ4H7zv2k/CygGz/ixKsaLfeOqKT8LBJbVzqfVVio80jygmnBsw8GjpvFc2BVq5eGzTrGZj5JQYkJ/qljCv1Qus8hm+binpGN3G6G7ozYMetnk/AfFvYYmVs2cdFTTuzSLPcNUZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738099487; c=relaxed/simple;
-	bh=tycid4LRX36eXoKF4zOSilV20YomgXt1nsASiUTH2N8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=iT4eAKve7OzMumca0c7+/oegR/UXHvO16MNTfDIJKVycXE6J25o+V0No3ONczOCRUwv1VzZWMOEkaALP8i1aceHMn6RMlVBdMjdIUSpdbCZOmX2Ex0MuwFDBo+RZJULFt1Xm0nsRbNE66Nm8T35luObmorUKpjny6TCx+hYUNWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MLP8StOP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738099484;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7CZrgIyryoc0JCOxJ5NgFaaoJhN/c/5O9d7nj1y3SgU=;
-	b=MLP8StOPK3jvdcnDQL0kZTXuQPTMb1EMzSgnCIeP9/XalASRTLACtZGZ0m/e3CyFO6znvH
-	RfZS6pXJt3RQGnRlWQgND6sLj6i5F/N2JlZ9og7eASwzyH78iiXhrcb4RUuMx3WtynIoFF
-	DMMLU7z4On5o8PlZvUKBSNl7QYoCW3s=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-275-vYtCjSEKMsy18kcMoOEflA-1; Tue, 28 Jan 2025 16:24:42 -0500
-X-MC-Unique: vYtCjSEKMsy18kcMoOEflA-1
-X-Mimecast-MFC-AGG-ID: vYtCjSEKMsy18kcMoOEflA
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ce815cd25bso5011265ab.3
-        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 13:24:42 -0800 (PST)
+	s=arc-20240116; t=1738102111; c=relaxed/simple;
+	bh=1pSDae9H0Z9Wy7nbC30Dx1r3vFM/TWo0P+jj11OmfgE=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=oUqa9FZKNMpJ9pek14tgTkvP2tpqg4jkf5LDqrICMutrfPKnO7F4tiijEcQJxJJRiGLJ+meC+ESqaeWtpM+6JTWh9Wr09HvqI2Iq6NSSiotKefIoIRKxoSwrL88rJTaboaw5ehn85f+Btv8GdQUI7jYhxW0VvCyQ5kcoPF9R/ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XDs4VoKY; arc=none smtp.client-ip=209.85.166.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-3ce7c75cae9so836295ab.1
+        for <kvm@vger.kernel.org>; Tue, 28 Jan 2025 14:08:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738102108; x=1738706908; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=89hZLr5aXjLsq7ose3Afpbjn+HbyOiqrZ9vNJOq3AHM=;
+        b=XDs4VoKYa/Gx/iNzNWbdwnRPQg+uyXEvvN7YNCKIY/zuh1yTyTxEcjANVm1HL4TNjz
+         iTFaeOUt/0oW7ZTrh0ONvWMZlib8d4GKax1fO/MGI996WguQtEGHKFm9U84qYf7YA174
+         qnV3MRKioREscpsbP4VGYOtTx2i3uCd2HAUZUqkngIg0dOMwn4W3hwr2rtqYxAEz3Y3z
+         98u58x1u9Rp/f+t03XsbyQqGDTfgZx5gvWNFyO9BpWznmCxvocdKPlLlb7i381pZU3Sa
+         aOTbHABxhKTLWoH5wNyJThrE7JShtSsKjTE7u1gxbjb27EmRNwf3/sW6VcsQPHAManmc
+         pB2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738099482; x=1738704282;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7CZrgIyryoc0JCOxJ5NgFaaoJhN/c/5O9d7nj1y3SgU=;
-        b=rC66VV7D4abo+2UHa108yRfAkVrHjXLQDb+cBxBOvmblFNU3HjANSN+d1B+cXu3LAU
-         JgeetHz48xx/BRpcDggoOwBpX2bk+O39dVAHJDBy+yI1MvaIY53c2mhs/DJcxDmxzGfO
-         Hwhq8w0tASTW8Y/pb+PpC19ZQzcTEVKWtO1O5yWYuIqZRwGJSZjIxV4cHxVwevR8oviL
-         J6iEUw2c9CYVtw+kl/Eum5DAzGuHjZ6W4LE8WAE1b9rZ6UQVsYpxyBjG2kl4htR2ixff
-         BJv4BHB81DJPANH3Sx3U3XGt7knVe4W7p071eJtN/cd5k3zt33VQxNEjZ7DSzRsMcWda
-         Qyww==
-X-Forwarded-Encrypted: i=1; AJvYcCVCf1qCos9PxWzfZAbHLicM7ozrma2leU6W9yuBZ5e2cBymvuQ2G3IPvtDzhVPCY5P+3uk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2j9L9fvDCXayBT24r/hSbi7InxjF3niRjKHInIBKPod1j12uR
-	bD6sv1qCIm/8tV5AUkM2n1jArkR+FxtnAd2Ah193DUBtsr+QfZs02070mT5G1vhUdn40o4g9Gig
-	7XvNap7mVyL/S8CYYVgE8SAfWvF3XvtoJ8TNQjQ8SIgjOxaPPeV91b+wWnA==
-X-Gm-Gg: ASbGnctJgIjYfr3xWV+0DYNEfYFz+vNF80lH9cuki9A3SiHVoOyz5NJTqzN30tTY/Gv
-	n7FSM1oWg8GmkbgY45Zt4ZkUjS6259i6vwRZuo/M1WqaODV0A/divCMTbDrSkrzgbV7SKzVBSCV
-	4WrW43rFqgP7mmqZ05kgPQrka68EZF0bZtlfmUYgIwxXAqdwZ7hRJgvna0/XIrOxMMsmE82CqRa
-	PKsa7Y5/tMaTYbKdlU1iOSK3odPSqgBNgajjs8GogF36c6iU9lztHgpKRfiNA8RuAEagjWc/7Bf
-	YwuKJAEN
-X-Received: by 2002:a05:6602:447:b0:83a:a068:75b7 with SMTP id ca18e2360f4ac-85427da8878mr24097139f.1.1738099482094;
-        Tue, 28 Jan 2025 13:24:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMGOPp1q1m6P4yCWdt3otIExGkw/i35PpV5qiC9gP5JESUooqfZcoD3QEgB0DgzFLDUXof1w==
-X-Received: by 2002:a05:6602:447:b0:83a:a068:75b7 with SMTP id ca18e2360f4ac-85427da8878mr24096539f.1.1738099481759;
-        Tue, 28 Jan 2025 13:24:41 -0800 (PST)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ec1dbb1650sm3288522173.144.2025.01.28.13.24.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jan 2025 13:24:41 -0800 (PST)
-Date: Tue, 28 Jan 2025 14:24:39 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>
-Subject: [GIT PULL] VFIO updates for v6.14-rc1
-Message-ID: <20250128142439.3f6dd5b7.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1738102108; x=1738706908;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=89hZLr5aXjLsq7ose3Afpbjn+HbyOiqrZ9vNJOq3AHM=;
+        b=wFfcJ75B6ywRB8qc87T22AM2Jdf9F2RSBYBwccLubw2DEFRBMa8rXiNX7VJ+0yHvMg
+         Pvb6/AEB92WJ2KGn0/ltA9WiQR2BvXr5o46GpwSuQX+8Cwl6oD4LYFk/xPY7BJLSdnfU
+         SCl9yDNHbPadl4KGoyU1W2KhnoG97Szy6i/MfaqRtwdH3mlaJMpXIBnDrxR3DSGeUJqV
+         tpbO4PyqifxS9nllWrbdCwqpBA2P9NKoVUvzcRjcNGNpq/JkIi5X48U7LnLNm5+0EoJw
+         Zq8Vx9OIh9AuPBkVpu0viaj+sXI7HICZAh3BT8qeR3xDESo9dzd2Lre6YAjZo6g+o5O5
+         9DGQ==
+X-Gm-Message-State: AOJu0YyOcEpQiO1RJAoLQMbirHgXZfEiBmgQNox0j1NwLpssHBi2op09
+	aWbsfhzr46cLi0oridtneJaVdw0aQLvrNhGWaD6O6AOCcfmiXIxCxn2keHvpeW7cQLQmREP36q0
+	E3JPD2XOlTX9oDID0qcrySA==
+X-Google-Smtp-Source: AGHT+IH262EdRMOUfzaaFC5efE8ynNaUUswWXOS0wN+Xzq+rqcX3FXHUmWZPPPAck4fFF452iQ0uNkTrY1IgQzsCXA==
+X-Received: from ilbbn5.prod.google.com ([2002:a05:6e02:3385:b0:3cf:fc72:43e3])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6e02:b43:b0:3ce:7da0:6fe2 with SMTP id e9e14a558f8ab-3cffdc2c9c7mr9678045ab.0.1738102108397;
+ Tue, 28 Jan 2025 14:08:28 -0800 (PST)
+Date: Tue, 28 Jan 2025 22:08:27 +0000
+In-Reply-To: <87ikpzthjk.wl-maz@kernel.org> (message from Marc Zyngier on Tue,
+ 28 Jan 2025 09:27:11 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Message-ID: <gsntbjvq382s.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
+ partition the PMU
+From: Colton Lewis <coltonlewis@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, 
+	will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
+	pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Hi Linus,
+Hey Marc, thanks for looking.
 
-The following changes since commit 13563da6ffcf49b8b45772e40b35f96926a7ee1e:
+Marc Zyngier <maz@kernel.org> writes:
 
-  Merge tag 'vfio-v6.13-rc7' of https://github.com/awilliam/linux-vfio (2025-01-06 06:56:23 -0800)
+> On Mon, 27 Jan 2025 22:20:27 +0000,
+> Colton Lewis <coltonlewis@google.com> wrote:
 
-are available in the Git repository at:
+>> For PMUv3, the register MDCR_EL2.HPMN partitiones the PMU counters
+>> into two ranges where counters 0..HPMN-1 are accessible by EL1 and, if
+>> allowed, EL0 while counters HPMN..N are only accessible by EL2.
 
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.14-rc1
+>> Introduce a module parameter in the PMUv3 driver to set this
+>> register. The name reserved_guest_counters reflects the intent to
+>> reserve some counters for the guest so they may eventually be allowed
+>> direct access to a subset of PMU functionality for increased
+>> performance.
 
-for you to fetch changes up to 2bb447540e71ee530388750c38e1b2c8ea08b4b7:
+>> Track HPMN and whether the pmu is partitioned in struct arm_pmu.
 
-  vfio/nvgrace-gpu: Add GB200 SKU to the devid table (2025-01-27 09:43:33 -0700)
+>> While FEAT_HPMN0 does allow HPMN to be set to 0, this patch
+>> specifically disallows that case because it's not useful given the
+>> intention to allow guests access to their own counters.
 
-----------------------------------------------------------------
-VFIO updates for v6.14-rc1
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>   arch/arm/include/asm/arm_pmuv3.h   | 10 +++++++
+>>   arch/arm64/include/asm/arm_pmuv3.h | 10 +++++++
+>>   drivers/perf/arm_pmuv3.c           | 43 ++++++++++++++++++++++++++++--
+>>   include/linux/perf/arm_pmu.h       |  2 ++
+>>   include/linux/perf/arm_pmuv3.h     |  7 +++++
+>>   5 files changed, 70 insertions(+), 2 deletions(-)
 
- - Extend vfio-pci 8-byte read/write support to include archs defining
-   CONFIG_GENERIC_IOMAP, such as x86, and remove now extraneous #ifdefs
-   around 64-bit accessors. (Ramesh Thomas)
+>> diff --git a/arch/arm/include/asm/arm_pmuv3.h  
+>> b/arch/arm/include/asm/arm_pmuv3.h
+>> index 2ec0e5e83fc9..49ad90486aa5 100644
+>> --- a/arch/arm/include/asm/arm_pmuv3.h
+>> +++ b/arch/arm/include/asm/arm_pmuv3.h
+>> @@ -277,4 +277,14 @@ static inline u64 read_pmceid1(void)
+>>   	return val;
+>>   }
 
- - Update vfio-pci shadow ROM handling and allow cached ROM from setup
-   data to be exposed as a functional ROM BAR region when available.
-   (Yunxiang Li)
+>> +static inline u32 read_mdcr(void)
+>> +{
+>> +	return read_sysreg(mdcr_el2);
+>> +}
+>> +
+>> +static inline void write_mdcr(u32 val)
+>> +{
+>> +	write_sysreg(val, mdcr_el2);
+>> +}
+>> +
 
- - Update nvgrace-gpu vfio-pci variant driver for new Grace Blackwell
-   hardware, conditionalizing the uncached BAR workaround for previous
-   generation hardware based on the presence of a flag in a new DVSEC
-   capability, and include a delay during probe for link training to
-   complete, a new requirement for GB devices. (Ankit Agrawal)
+> This will obviously break the 32bit build.
 
-----------------------------------------------------------------
-Alex Williamson (1):
-      vfio/platform: check the bounds of read/write syscalls
+Dang! I did compile with 32 bit arm but I used defconfig which I now
+realize doesn't define CONFIG_ARM_PMUV3 even though 64 bit arm does.
 
-Ankit Agrawal (4):
-      vfio/nvgrace-gpu: Read dvsec register to determine need for uncached resmem
-      vfio/nvgrace-gpu: Expose the blackwell device PF BAR1 to the VM
-      vfio/nvgrace-gpu: Check the HBM training and C2C link status
-      vfio/nvgrace-gpu: Add GB200 SKU to the devid table
+>>   #endif
+>> diff --git a/arch/arm64/include/asm/arm_pmuv3.h  
+>> b/arch/arm64/include/asm/arm_pmuv3.h
+>> index 8a777dec8d88..fc37e7e81e07 100644
+>> --- a/arch/arm64/include/asm/arm_pmuv3.h
+>> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+>> @@ -188,4 +188,14 @@ static inline bool is_pmuv3p9(int pmuver)
+>>   	return pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P9;
+>>   }
 
-Ramesh Thomas (2):
-      vfio/pci: Enable iowrite64 and ioread64 for vfio pci
-      vfio/pci: Remove #ifdef iowrite64 and #ifdef ioread64
+>> +static inline u64 read_mdcr(void)
+>> +{
+>> +	return read_sysreg(mdcr_el2);
+>> +}
+>> +
+>> +static inline void write_mdcr(u64 val)
+>> +{
+>> +	write_sysreg(val, mdcr_el2);
+>> +}
+>> +
+>>   #endif
+>> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+>> index b5cc11abc962..55f9ae560715 100644
+>> --- a/drivers/perf/arm_pmuv3.c
+>> +++ b/drivers/perf/arm_pmuv3.c
+>> @@ -325,6 +325,7 @@ GEN_PMU_FORMAT_ATTR(threshold_compare);
+>>   GEN_PMU_FORMAT_ATTR(threshold);
 
-Yunxiang Li (2):
-      vfio/pci: Remove shadow ROM specific code paths
-      vfio/pci: Expose setup ROM at ROM bar when needed
+>>   static int sysctl_perf_user_access __read_mostly;
+>> +static u8 reserved_guest_counters __read_mostly;
 
- drivers/vfio/pci/nvgrace-gpu/main.c          | 169 +++++++++++++++++++++++----
- drivers/vfio/pci/vfio_pci_config.c           |   8 +-
- drivers/vfio/pci/vfio_pci_core.c             |  40 +++----
- drivers/vfio/pci/vfio_pci_rdwr.c             |  38 +++---
- drivers/vfio/platform/vfio_platform_common.c |  10 ++
- 5 files changed, 196 insertions(+), 69 deletions(-)
+>>   static bool armv8pmu_event_is_64bit(struct perf_event *event)
+>>   {
+>> @@ -500,6 +501,29 @@ static void armv8pmu_pmcr_write(u64 val)
+>>   	write_pmcr(val);
+>>   }
 
+>> +static u64 armv8pmu_mdcr_read(void)
+>> +{
+>> +	return read_mdcr();
+>> +}
+>> +
+>> +static void armv8pmu_mdcr_write(u64 val)
+>> +{
+>> +	write_mdcr(val);
+>> +	isb();
+>> +}
+>> +
+>> +static void armv8pmu_partition(u8 hpmn)
+>> +{
+>> +	u64 mdcr = armv8pmu_mdcr_read();
+>> +
+>> +	mdcr &= ~MDCR_EL2_HPMN_MASK;
+>> +	mdcr |= FIELD_PREP(ARMV8_PMU_MDCR_HPMN, hpmn);
+>> +	/* Prevent guest counters counting at EL2 */
+>> +	mdcr |= ARMV8_PMU_MDCR_HPMD;
+>> +
+>> +	armv8pmu_mdcr_write(mdcr);
+>> +}
+>> +
+>>   static int armv8pmu_has_overflowed(u64 pmovsr)
+>>   {
+>>   	return !!(pmovsr & ARMV8_PMU_OVERFLOWED_MASK);
+>> @@ -1069,6 +1093,9 @@ static void armv8pmu_reset(void *info)
+
+>>   	bitmap_to_arr64(&mask, cpu_pmu->cntr_mask, ARMPMU_MAX_HWEVENTS);
+
+>> +	if (cpu_pmu->partitioned)
+>> +		armv8pmu_partition(cpu_pmu->hpmn);
+>> +
+
+> Kaboom, see below.
+
+>>   	/* The counter and interrupt enable registers are unknown at reset. */
+>>   	armv8pmu_disable_counter(mask);
+>>   	armv8pmu_disable_intens(mask);
+>> @@ -1205,6 +1232,7 @@ static void __armv8pmu_probe_pmu(void *info)
+>>   {
+>>   	struct armv8pmu_probe_info *probe = info;
+>>   	struct arm_pmu *cpu_pmu = probe->pmu;
+>> +	u8 pmcr_n;
+>>   	u64 pmceid_raw[2];
+>>   	u32 pmceid[2];
+>>   	int pmuver;
+>> @@ -1215,10 +1243,19 @@ static void __armv8pmu_probe_pmu(void *info)
+
+>>   	cpu_pmu->pmuver = pmuver;
+>>   	probe->present = true;
+>> +	pmcr_n = FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
+
+>>   	/* Read the nb of CNTx counters supported from PMNC */
+>> -	bitmap_set(cpu_pmu->cntr_mask,
+>> -		   0, FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read()));
+>> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
+>> +
+>> +	if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr_n) {
+>> +		cpu_pmu->hpmn = reserved_guest_counters;
+>> +		cpu_pmu->partitioned = true;
+
+> Isn't this going to completely explode on a kernel running at EL1?
+
+Trying to access an EL2 register at EL1 can do that. I'll add the
+appropriate hypercalls.
+
+> Also, how does it work in an asymmetric configuration where some CPUs
+> can satisfy the reservation, and some can't?
+
+The CPUs that can't read their own value of PMCR.N below what the
+attempted reservation is and so do not get partitioned. Nothing changes
+for that CPU if it can't meet the reservation.
+
+>> +	} else {
+>> +		reserved_guest_counters = 0;
+>> +		cpu_pmu->hpmn = pmcr_n;
+>> +		cpu_pmu->partitioned = false;
+>> +	}
+
+>>   	/* Add the CPU cycles counter */
+>>   	set_bit(ARMV8_PMU_CYCLE_IDX, cpu_pmu->cntr_mask);
+>> @@ -1516,3 +1553,5 @@ void arch_perf_update_userpage(struct perf_event  
+>> *event,
+>>   	userpg->cap_user_time_zero = 1;
+>>   	userpg->cap_user_time_short = 1;
+>>   }
+>> +
+>> +module_param(reserved_guest_counters, byte, 0);
+>> diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+>> index 4b5b83677e3f..ad97aabed25a 100644
+>> --- a/include/linux/perf/arm_pmu.h
+>> +++ b/include/linux/perf/arm_pmu.h
+>> @@ -101,6 +101,8 @@ struct arm_pmu {
+>>   	void		(*reset)(void *);
+>>   	int		(*map_event)(struct perf_event *event);
+>>   	DECLARE_BITMAP(cntr_mask, ARMPMU_MAX_HWEVENTS);
+>> +	u8		hpmn; /* MDCR_EL2.HPMN: counter partition pivot */
+>> +	bool	        partitioned;
+>>   	bool		secure_access; /* 32-bit ARM only */
+>>   #define ARMV8_PMUV3_MAX_COMMON_EVENTS		0x40
+>>   	DECLARE_BITMAP(pmceid_bitmap, ARMV8_PMUV3_MAX_COMMON_EVENTS);
+>> diff --git a/include/linux/perf/arm_pmuv3.h  
+>> b/include/linux/perf/arm_pmuv3.h
+>> index d698efba28a2..d399e8c6f98e 100644
+>> --- a/include/linux/perf/arm_pmuv3.h
+>> +++ b/include/linux/perf/arm_pmuv3.h
+>> @@ -223,6 +223,13 @@
+>>   				 ARMV8_PMU_PMCR_X | ARMV8_PMU_PMCR_DP | \
+>>   				 ARMV8_PMU_PMCR_LC | ARMV8_PMU_PMCR_LP)
+
+>> +/*
+>> + * Per-CPU MDCR: config reg
+>> + */
+>> +#define ARMV8_PMU_MDCR_HPMN		GENMASK(4, 0)
+>> +#define ARMV8_PMU_MDCR_HPME		BIT(7)
+>> +#define ARMV8_PMU_MDCR_HPMD		BIT(17)
+>> +
+
+> I'd rather we find a way to use the existing definitions form the
+> sysreg file rather than add more duplication.
+
+Easy enough
+
+> I also don't see how the kernel knows not to access the low-numbered
+> counters at this point. Maybe in a later patch, I'll keep reading.
+
+> 	M.
+
+> --
+> Without deviation from the norm, progress is not possible.
 
