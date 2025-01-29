@@ -1,113 +1,186 @@
-Return-Path: <kvm+bounces-36860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59E13A21EE7
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:18:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54CB5A21FC9
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:55:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF6ED161F26
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:18:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A59A53A53F5
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4F014AD0D;
-	Wed, 29 Jan 2025 14:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFC91D63CE;
+	Wed, 29 Jan 2025 14:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rFqNfleo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhSQsRfX"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CD31531E9
-	for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 14:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7405191F95
+	for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 14:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738160313; cv=none; b=qwxM1S5A7qi6915HSGaVskwMmUHvSmHI3zJCh36Ly3qnDRFeBLppCdN9biIDfjfqs2aIk7GoA/NllnOAqVYtZ2scUPhB3Sgl06GGQysurhOhQ0uPcmdKIN5CEtrks93lbrvIYt7oUyJrm1eyRSf6Y0Q0uI4kvxC2KGsMYfjE8n8=
+	t=1738162502; cv=none; b=epMn/SGTFdB9du5+fhhOcmRB1t7RL83/+0Dee5m27KvcPzBaPneqMyRk86D/XFlS5dlaUZKnyJNO4NAHiIvg7iT3I33Y/CN7IEEm8PJP/4fbIuNQypQo5LtGh6blDmMjHL6VDxjYEqb3isBrA2BmqjpGxTsGGVsbYzagmn0TPUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738160313; c=relaxed/simple;
-	bh=icTeBGDx73Xb/rrmYSbeWzBVtesvVRErrPmw0pZsNfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WkCHlL7DB+Jd4iR4q/LcvkzgV7r/Tlb/wJoGDIgbBQ+Ymidt60s1b+ivhXt94mv6rTWv6KJotiFEGap8rnubd8AGcG/mzTqdHG9B/CShWlnPWk7yI4rJWjrvCzUqmk4x2C0NDaRPiaGoY3kTer8WxT0A7ocDYykzefBJOFUuXX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rFqNfleo; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 29 Jan 2025 15:18:24 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738160307;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1738162502; c=relaxed/simple;
+	bh=6+OO8Q3b3zt1nWaEORWp4Hfs0gfS/N+UGYsLrltBN2k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kLDXhi29BJpMKpOsieUqxQbpB31T9KRPQ7etMPLYstYOytQFQZ+tezoGCoVm1bUvyYwEVZxgca/CTQPH5sxHuUnqRdFgx9axlEWxgH6zAUBKS0MTMeGt5wv9cWKqyt7+U43o+kZb5W4qXhXRgIlDexSROONDV6WiwEUizo8ZK3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fhSQsRfX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738162499;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=++BNsZx6jximv5tpFJZo63qAT9e5Cd/B0w65SFE0nYw=;
-	b=rFqNfleoEUxa3QZR/Og0RHExNr5sKMOiaZYiC6LNrIs7uI3q0SxlcrFl0iKTV6pW+mENVJ
-	iQTk+uJWy+E4khujZ+F3vXbNojBJPqaAonpueyo6NaCvU8sLfkz1vFC9WErLVDulrBtYoW
-	TAcDEQR2Yx7Wb1Po0Cl4h5hmDPDZTjA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Atish Patra <atishp@rivosinc.com>
-Subject: Re: [kvm-unit-tests PATCH v3 0/2] Add support for SBI FWFT extension
- testing
-Message-ID: <20250129-4e54cccfa2abab6dba9a608b@orel>
-References: <20250128141543.1338677-1-cleger@rivosinc.com>
+	bh=41DS6NhU0zxHo0sjvBCG7EzuBprQ0MM39VMITq82vi0=;
+	b=fhSQsRfXzTx3tcRba6MG5SylUtN2vWjf07LfQ7VO4iJfePH0NSSniEhe0gY5bQ1aQ/zdFm
+	wzjCioeUosKnXi5GF1GorNf1xbmvDychdPuUESSlc95MeGUXKhM22e7Zp8ySEhv77Mm5Sl
+	wxuz59K7nso6HcEBf+pNDEGs2UcyRB0=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-ThoxjpC_N66B0zE4ex9rwg-1; Wed, 29 Jan 2025 09:54:58 -0500
+X-MC-Unique: ThoxjpC_N66B0zE4ex9rwg-1
+X-Mimecast-MFC-AGG-ID: ThoxjpC_N66B0zE4ex9rwg
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b6f3b93f5cso171736385a.0
+        for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 06:54:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738162498; x=1738767298;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=41DS6NhU0zxHo0sjvBCG7EzuBprQ0MM39VMITq82vi0=;
+        b=v5DjRx/JaGe0SnfTMlZVr/WqBtKybH4dJoJqqQrNQwXLjhffD/Zz5Bj0QXZPRrf25v
+         +52Ux2pYbsgZPY8WUyuGPfqZnR+GLXUlQ7xC29HSo1Waw8Ma8DB8BdwS10X+Vgzq+8Sf
+         PbXipqiRKS6ymENvlsX6MjAENzcPwPFfOSHVfSOUKd3ZieKR6kHCSM/ylqvd1HmlMmnk
+         vZ6r6DsdBqaw+/3PDnDxHAbx8rvmC5JDReNwO+ZEWgbu0cQp6p2kC3TmYQR7L2cqudEr
+         6xj+39DOSY4OLOI1t9nJsqapg59gA0pE0rSNjkFSdjBm9VUtazyufHLB7HHzm1H5Glg2
+         oFPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSbGsDNugyF0xiYPoC90eRreUG4bVIOvIBE38vRjc0KgZRp8iEWTgTtA2qXe3zvCBWkbQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLlB2cExGyvKjAHO2ZOXND8wMD+3pUVqWJymlyN/iommkew1BH
+	HYINM6k/wL3+LjVe87Fboc7jqbw3FIRomXt2o4MLCFsA+GB56BQ1LD2V2OAhZa+CFoLp4M5x2Pi
+	1iF7/IuK9PUOVNELIhChP367XDeF5fWnFnXwM/Zngnt8YA56JYw==
+X-Gm-Gg: ASbGnctGJrk9rEJfQ3e0Vurws02tCReojx5rjFHm5irxfJoIARtZgQeqRlG8aSiaDX+
+	yM5lg2RuBpld80PYCt5Q4cbeXfxQ0RcFv69jWuh/xk/PEPTXW9Z95sCPrKy1Ts4/o/QPQkhYDFl
+	0WJKOpUZ2C4QH0ldhbWQlOLZrVufWMloc7QZaBqf2x2EDbAI/E3cqWi15CVdDVF9eEVs3n3av/0
+	0vEMYnnztLA5rRa5bwopFm2S7hVK9M8UMQdtz+8NYlh3SOFCYf6OtAs+bUXc4JdEsB5KsYFDSJ2
+	9lEg3mrKb9uXZzcwj/2Qm33kc5X7wjwk3ICBJxXdqrwiLhtouE8r
+X-Received: by 2002:a05:620a:3951:b0:7b6:d710:22ad with SMTP id af79cd13be357-7bffc653717mr574627585a.27.1738162497758;
+        Wed, 29 Jan 2025 06:54:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHPWgJozhXbMPe2UuS+N7int1mBv1T30ENqy//KBekCyuXuA7cZhOllIHHQgTzUZoQnKd9qwQ==
+X-Received: by 2002:a05:620a:3951:b0:7b6:d710:22ad with SMTP id af79cd13be357-7bffc653717mr574623385a.27.1738162497407;
+        Wed, 29 Jan 2025 06:54:57 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be9af0d281sm629855985a.99.2025.01.29.06.54.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jan 2025 06:54:56 -0800 (PST)
+Message-ID: <de6b9dc1-dedd-4a3d-9db7-cb4b8e281697@redhat.com>
+Date: Wed, 29 Jan 2025 15:54:48 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250128141543.1338677-1-cleger@rivosinc.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH RFCv2 00/13] iommu: Add MSI mapping support with nested
+ SMMU
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: Nicolin Chen <nicolinc@nvidia.com>, "will@kernel.org" <will@kernel.org>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>, "maz@kernel.org"
+ <maz@kernel.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "joro@8bytes.org" <joro@8bytes.org>, "shuah@kernel.org" <shuah@kernel.org>,
+ "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
+ "yebin (H)" <yebin10@huawei.com>,
+ "apatel@ventanamicro.com" <apatel@ventanamicro.com>,
+ "shivamurthy.shastri@linutronix.de" <shivamurthy.shastri@linutronix.de>,
+ "bhelgaas@google.com" <bhelgaas@google.com>,
+ "anna-maria@linutronix.de" <anna-maria@linutronix.de>,
+ "yury.norov@gmail.com" <yury.norov@gmail.com>,
+ "nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+ "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "patches@lists.linux.dev" <patches@lists.linux.dev>,
+ "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "mdf@kernel.org" <mdf@kernel.org>, "mshavit@google.com"
+ <mshavit@google.com>, "smostafa@google.com" <smostafa@google.com>,
+ "ddutile@redhat.com" <ddutile@redhat.com>
+References: <cover.1736550979.git.nicolinc@nvidia.com>
+ <4946ea266bdc4b1e8796dee1b228bd8f@huawei.com>
+ <20250123132432.GJ5556@nvidia.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20250123132432.GJ5556@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 28, 2025 at 03:15:40PM +0100, Clément Léger wrote:
-> This series adds a minimal set of tests for the FWFT extension. Reserved
-> range as well as misaligned exception delegation. A commit coming from
-> the SSE tests series is also included in this series to add -deps
-> makefile notation.
-> 
-> ---
-> 
-> V3:
->  - Rebase on top of andrew/riscv/sbi
->  - Use sbiret_report_error()
->  - Add helpers for MISALIGNED_EXC_DELEG fwft set/get
->  - Add a comment on misaligned trap handling
-> 
-> V2:
->  - Added fwft_{get/set}_raw() to test invalid > 32 bits ids
->  - Added test for invalid flags/value > 32 bits
->  - Added test for lock feature
->  - Use and enum for FWFT functions
->  - Replace hardcoded 1 << with BIT()
->  - Fix fwft_get/set return value
->  - Split set/get tests for reserved ranges
->  - Added push/pop to arch -c option
->  - Remove leftover of manual probing code
-> 
-> Clément Léger (2):
->   riscv: Add "-deps" handling for tests
->   riscv: Add tests for SBI FWFT extension
-> 
->  riscv/Makefile      |   8 +-
->  lib/riscv/asm/sbi.h |  34 ++++++++
->  riscv/sbi-fwft.c    | 190 ++++++++++++++++++++++++++++++++++++++++++++
->  riscv/sbi.c         |   3 +
->  4 files changed, 232 insertions(+), 3 deletions(-)
->  create mode 100644 riscv/sbi-fwft.c
-> 
-> -- 
-> 2.47.1
+
+Hi Jason,
+
+On 1/23/25 2:24 PM, Jason Gunthorpe wrote:
+> On Thu, Jan 23, 2025 at 09:06:49AM +0000, Shameerali Kolothum Thodi wrote:
+>
+>> One confusion I have about the above text is, do we still plan to support the
+>> approach -1( Using RMR in Qemu)
+> Yes, it remains an option. The VMM would use the
+> IOMMU_OPTION_SW_MSI_START/SIZE ioctls to tell the kernel where it
+> wants to put the RMR region then it would send the RMR into the VM
+> through ACPI.
+>
+> The kernel side promises that the RMR region will have a consistent
+> (but unpredictable!) layout of ITS pages (however many are required)
+> within that RMR space, regardless of what devices/domain are attached.
+>
+> I would like to start with patches up to #10 for this part as it
+> solves two of the three problems here.
+>
+>> or you are just mentioning it here because
+>> it is still possible to make use of that. I think from previous discussions the
+>> argument was to adopt a more dedicated MSI pass-through model which I
+>> think is  approach-2 here.  
+> The basic flow of the pass through model is shown in the last two
+> patches, it is not fully complete but is testable. It assumes a single
+> ITS page. The VM would use IOMMU_OPTION_SW_MSI_START/SIZE to put the
+> ITS page at the correct S2 location and then describe it in the ACPI
+> as an ITS page not a RMR.
+This is a nice to have feature but not mandated in the first place, is it?
+>
+> The VMM will capture the MSI writes and use
+> VFIO_IRQ_SET_ACTION_PREPARE to convey the guests's S1 translation to
+> the IRQ subsystem.
+>
+> This missing peice is cleaning up the ITS mapping to allow for
+> multiple ITS pages. I've imagined that kvm would someone give iommufd
+> a FD that holds the specific ITS pages instead of the
+> IOMMU_OPTION_SW_MSI_START/SIZE flow.
+That's what I don't get: at the moment you only pass the gIOVA. With
+technique 2, how can you build the nested mapping, ie.
+
+         S1           S2
+gIOVA    ->    gDB    ->    hDB
+
+without passing the full gIOVA/gDB S1 mapping to the host?
+
+Eric
+
+
+>
+> Jason
 >
 
-Applied to riscv/sbi
-
-https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv/sbi
-
-Thanks,
-drew
 
