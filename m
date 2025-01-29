@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-36847-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 071BAA21E20
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:47:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 360C8A21EE2
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:17:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2506E3A5EE5
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 13:47:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3D818816EA
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF9941C71;
-	Wed, 29 Jan 2025 13:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F62E1494CC;
+	Wed, 29 Jan 2025 14:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MaQsoh8U"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OBPU4IEj"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38D8149C50
-	for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 13:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA0ADF49
+	for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 14:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738158469; cv=none; b=iKF6xjyTcvAmHz19Jx9UTOuVf+2puat5WFOUmMmZ6PL6lrvMGMC1JW3ezMlM9QK1UJ0C+Rc7L7zncDpGLxn8nRnrIN6JqFTMl6h1lhPdit4KxfBTGQFCZACsf+q334hqiy5H24esgv4fLTO3qI4cHvZ1OKipvwXNNmjkmfog2/g=
+	t=1738160242; cv=none; b=axz8ECsQfu3q5SkfAMwRXt3rTON0BBV6+08LGAsHoZkTzFrLsqDxl3qzOZvy9J4sFBtdc/QSaaM/cGPmPjyClWlxvd38H1e6gsbjGoaORPdFlRy9jvMcza/ooumBuJpY+AkOJSAWmoQeuHQnAa1nYNQU95J187bIDNpIsZw8A6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738158469; c=relaxed/simple;
-	bh=BcKXpE72yFoRMhY9eGA7c4yqmV3n2ELaUUzOaf0Fh2g=;
+	s=arc-20240116; t=1738160242; c=relaxed/simple;
+	bh=6Nl4yJJGsKMoKMQS7OlSI6B7Qhs+lNPje1Rdrjw+r+A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nTIadXv4zOB+04947PMwtiEuf6JFLEZ7/QanKnHGZctfg98QSc/m66gLZYER6l2wtvjUG8BUWOrkZParBVCOQTYj87mQ4brjcmHtbKg2LWk8E4B39Y2X8hM6Q/icc+eXSX78K+y/6ecGZjEqFhbN17ooPXFC1Yi6MvzueT1uAkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MaQsoh8U; arc=none smtp.client-ip=91.218.175.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=LJvjD3RGvetnSf+1uyp4Z5Nyr4Nl1TwVv0I0dQq682iwUuEal5r3JVCoai9yTEuMwsUnwgGuIOPXcZdBFNDluWOpuSwPTNty2+qTu0l3ieT+ObHKdD+7dMiom9YntOXFFm+tLqcQ/LzlNJ5yTvbm5RU2j/jO0ZzrOEVhb3x+Rdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OBPU4IEj; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 29 Jan 2025 14:47:40 +0100
+Date: Wed, 29 Jan 2025 15:17:13 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738158462;
+	t=1738160236;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xjhAFNlfSdxxlXBrsa57d35+2hiHQN0ajkkjsYo+Rhs=;
-	b=MaQsoh8UvjI2JJgSnf7PQwgsiaNtY9AIet31ggSKhJWEux5nlvrydURGXDCe4KXykMbL6z
-	0+0rujxbrn5YQ+brTLOt43PUs6+yBEApYFnsyCl1urZQxVbQb1Ksnlfwcd453gDBWjjSHe
-	PS6EKuVlT6saVN7EAkbL9mNqJt5oLq4=
+	bh=3FYe50gT7/INRrDrvYureIAbDleSAcXQFfoib6AD7R4=;
+	b=OBPU4IEjGreOYYBuocl/PISwDOmNRejZFaLZ6Rph/amMKVcV9gjMxadWYzh2qQZr69rgzN
+	XYCHXy1M/Yt4Tu1h9GkiYouVTOcqw4gkt8WtrItZxhkQLhUQI4pilHAS4eelFDaxMhiYIE
+	SNL69s+Fw2Wpn5fSIybK+BzcDxuDu7A=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
@@ -50,7 +50,7 @@ Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
 	Atish Patra <atishp@rivosinc.com>
 Subject: Re: [kvm-unit-tests PATCH v3 2/2] riscv: Add tests for SBI FWFT
  extension
-Message-ID: <20250129-a3f1f5e241901cbd54a82f3a@orel>
+Message-ID: <20250129-ab75148a5b1ce97ae8529532@orel>
 References: <20250128141543.1338677-1-cleger@rivosinc.com>
  <20250128141543.1338677-3-cleger@rivosinc.com>
 Precedence: bulk
@@ -226,6 +226,14 @@ On Tue, Jan 28, 2025 at 03:15:42PM +0100, Clément Léger wrote:
 > +		ret = fwft_set_raw(BIT(32), 0, 0);
 > +		sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM,
 > +				    "set feature 0x%lx error", BIT(32));
+
+At least with the compiler I'm using, the code inside this
+"if (__riscv_xlen > 32)" block is still getting compiled for
+rv32 and breaking on the BIT(). It doesn't help to use BIT_ULL() here
+since fwft_get/set_raw() take longs. I guess we'll have to use #if.
+
+Fixed on merge.
+
 > +	}
 > +
 > +	report_prefix_pop();
@@ -279,104 +287,8 @@ On Tue, Jan 28, 2025 at 03:15:42PM +0100, Clément Léger wrote:
 > +		ret = fwft_misaligned_exc_set(0, BIT(32));
 > +		sbiret_report_error(&ret, SBI_ERR_INVALID_PARAM,
 > +				    "Set misaligned deleg with invalid flag > 32bits");
-> +	}
-> +
-> +	/* Set to 0 and check after with get */
-> +	ret = fwft_misaligned_exc_set(0, 0);
-> +	sbiret_report_error(&ret, 0, "Set misaligned deleg feature value 0 no error");
-> +	ret = fwft_misaligned_exc_get();
-> +	sbiret_report(&ret, 0, 0, "Get misaligned deleg feature expected value 0");
-> +
-> +	/* Set to 1 and check after with get */
-> +	ret = fwft_misaligned_exc_set(1, 0);
-> +	sbiret_report_error(&ret, 0, "Set misaligned deleg feature value 1 no error");
-> +	ret = fwft_misaligned_exc_get();
-> +	sbiret_report(&ret, 0, 1, "Get misaligned deleg feature expected value 1");
-> +
-> +	install_exception_handler(EXC_LOAD_MISALIGNED, misaligned_handler);
-> +
-> +	asm volatile (
-> +		".option push\n"
-> +		/*
-> +		 * Disable compression so the lw takes exactly 4 bytes and thus
-> +		 * can be skipped reliably from the exception handler.
-> +		 */
-> +		".option arch,-c\n"
-> +		"lw %[val], 1(%[val_addr])\n"
-> +		".option pop\n"
-> +		: [val] "+r" (ret.value)
-> +		: [val_addr] "r" (&ret.value)
-> +		: "memory");
-> +
-> +	/*
-> +	 * Even though the SBI delegated the misaligned exception to S-mode, it might not trap on
-> +	 * misaligned load/store access, report that during tests.
-> +	 */
-> +	if (!misaligned_handled)
-> +		report_skip("Misaligned load exception does not trap in S-mode");
-> +	else
-> +		report_pass("Misaligned load exception trap in S-mode");
-> +
-> +	install_exception_handler(EXC_LOAD_MISALIGNED, NULL);
-> +
-> +	/* Lock the feature */
-> +	ret = fwft_misaligned_exc_set(0, SBI_FWFT_SET_FLAG_LOCK);
-> +	sbiret_report_error(&ret, 0, "Set misaligned deleg feature value 0 and lock no error");
-> +	ret = fwft_misaligned_exc_set(1, 0);
-> +	sbiret_report_error(&ret, SBI_ERR_LOCKED,
-> +			    "Set misaligned deleg feature value 0 and lock no error");
 
-The error message is copy+pasted from the last one. I've changed it to
-
-"Set locked misaligned deleg feature to new value returns error"
-
-while merging.
-
-> +	ret = fwft_misaligned_exc_get();
-> +	sbiret_report(&ret, 0, 0, "Get misaligned deleg locked value 0 no error");
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +void check_fwft(void)
-> +{
-> +	report_prefix_push("fwft");
-> +
-> +	if (!sbi_probe(SBI_EXT_FWFT)) {
-> +		report_skip("FWFT extension not available");
-> +		report_prefix_pop();
-> +		return;
-> +	}
-> +
-> +	fwft_check_base();
-> +	fwft_check_misaligned_exc_deleg();
-> +
-> +	report_prefix_pop();
-> +}
-> diff --git a/riscv/sbi.c b/riscv/sbi.c
-> index 3eca8c7e..7c7a2d2d 100644
-> --- a/riscv/sbi.c
-> +++ b/riscv/sbi.c
-> @@ -32,6 +32,8 @@
->  
->  #define	HIGH_ADDR_BOUNDARY	((phys_addr_t)1 << 32)
->  
-> +void check_fwft(void);
-> +
->  static long __labs(long a)
->  {
->  	return __builtin_labs(a);
-> @@ -1437,6 +1439,7 @@ int main(int argc, char **argv)
->  	check_hsm();
->  	check_dbcn();
->  	check_susp();
-> +	check_fwft();
->  
->  	return report_summary();
->  }
-> -- 
-> 2.47.1
->
+Same comment as above and also fixed on merge.
 
 Thanks,
 drew
