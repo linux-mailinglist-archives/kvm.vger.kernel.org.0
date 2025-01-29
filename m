@@ -1,61 +1,65 @@
-Return-Path: <kvm+bounces-36850-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36851-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E1A4A21E8F
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:08:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BAE64A21E9F
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA54718895C6
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:06:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A15FD18892EC
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332FE1E32BD;
-	Wed, 29 Jan 2025 14:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4DD1E7C08;
+	Wed, 29 Jan 2025 14:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iE1qcHUb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ckZEglV4"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F89A1E282D;
-	Wed, 29 Jan 2025 14:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2112F1DF251;
+	Wed, 29 Jan 2025 14:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738159385; cv=none; b=ujLDdfGsHmJ3GDdUGkoMs0Vb4rG+Dhx5h7N0izZyNbDJvdAHB0JJoQ29ZksCCZ2S6ZsOgEElF+fTzBW8VZx1Jji7BDnXn62CffpKIyiAk5HPiRTg3KK4kNFh0LMr6nUldW5ICh7UW4701LzMV1XUDgdykA5I8nbhs2oOzFiHkxY=
+	t=1738159408; cv=none; b=uzAKm8Y0vJ2ugTDy1vbEkoTIvcIYLJDfuZcz0qGDaI3NT10NkyuVaFfzTzfSs/7msST/vM0s8OeA5McS9iqrh5DadU5CgZJHx/fGtes38bC54tprtm2uRCtK3voV14Uejcj9iM/3mn4pbSjh5eiFgytZlAR+Efh7AaEfdflLrK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738159385; c=relaxed/simple;
-	bh=6c7CLUmt9qrkf4kTfJB6uPu250fKtrikfr8L5iglP+Y=;
+	s=arc-20240116; t=1738159408; c=relaxed/simple;
+	bh=29j8ZbfZZys3Tq+aYvAEHgAt0+YHfEqx21MhQu6YHcM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=g+8Pf+MjwcmKkclD9//PQNS6CRWQm4p9EzQ+rm1CCAj54TedPZI7XGdte4aObc2KIyed/Ub7fZcq4Cbv/794LDbk4E5lY01KDhz8gZ+f1p3A2vTLzt2cQ/mgF3RD/xsH+bZ3BYtKTwL0zgHVokYZtqWAkhr1wlsticeMKaPTLf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iE1qcHUb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F06C4CED3;
-	Wed, 29 Jan 2025 14:03:04 +0000 (UTC)
+	 MIME-Version; b=URumpokmtX0Ga0q4Dw4KI+Wjxqy8l2RaC6fSl8NNGdbiWMGaNfOSXpiJOWlbmVE/yzt2yl/pbo8xQUPtFlsqGH9QWCZUdDpZSfEYdKnWt8u/0874nxEBNMxR9s6sewEySnLzqUxqkc3OcvWYjvDVP6F/IsBUbMsdQMhFjauFqIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ckZEglV4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 881B9C4CED1;
+	Wed, 29 Jan 2025 14:03:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738159385;
-	bh=6c7CLUmt9qrkf4kTfJB6uPu250fKtrikfr8L5iglP+Y=;
+	s=k20201202; t=1738159407;
+	bh=29j8ZbfZZys3Tq+aYvAEHgAt0+YHfEqx21MhQu6YHcM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iE1qcHUbfGkqCwSYFdV/Dzwhks4d4Ngo+XYcEHFyTqbvp7AeJt2+DgIUc5ihP3RiT
-	 0Q5SeR6XgnygygyaxfoMc/VDWBk3aO+xWPGN0LMb/GExy0OOip+UbWchecJYcgx+x+
-	 kjMSQJsGnqlqXoTTvA08X1iMs/7p9gi9P/+nw88aE7SGP+0odj8hrDM6qtyt6NoWox
-	 Ew2FohpHkxuEODiP8d5k7LlgbMym3e/7xI3lf5r4HiiRUgHtR1n3BDPOPlY8vLfcxJ
-	 98pp9MAVSDcb3y0x5QW2LNBfJtcxEeQ7gy3Q+2pq4lqhr/Kul1rn59/hV9IhdhfmlA
-	 r4lD1uwn8VBLA==
+	b=ckZEglV4MhARyUMzWQv2+QedwUsT5uM5A4Y7LEqHp17erMI+p6m5Ep7E+iS7pM328
+	 NDbvMx1KO/xdkYg5W/kIJz8lRzFY6heg37mBkzAxLolik4f61lsmIuS5lcPwnGj5wK
+	 9C58MJAJXNTM4PwR0YV4FwhZyX393LvN28bLP7plhpQwoAvfQrMIXBDiFpwrRiE5Rl
+	 8rQD0gmb2uS7YZOCFOzpbzJq/JWCdPhSlOQps3xJthxqbXmYhn/Vet8VAwSDv+6N74
+	 u0PWwVti8QoG8QR3w+JL3+PJrjiz0tjDtzNUv+cNwMCU3Vs2ZYbE6p9QFk0q5AajN0
+	 AxNbqmCwspleA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ankit Agrawal <ankita@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
+Cc: Ramesh Thomas <ramesh.thomas@intel.com>,
 	Jason Gunthorpe <jgg@nvidia.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
+	jgg@ziepe.ca,
+	Yunxiang.Li@amd.com,
+	gbayer@linux.ibm.com,
+	ankita@nvidia.com,
+	bpsegal@us.ibm.com,
 	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.13 8/8] vfio/nvgrace-gpu: Expose the blackwell device PF BAR1 to the VM
-Date: Wed, 29 Jan 2025 07:59:01 -0500
-Message-Id: <20250129125904.1272926-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 5/8] vfio/pci: Enable iowrite64 and ioread64 for vfio pci
+Date: Wed, 29 Jan 2025 07:59:25 -0500
+Message-Id: <20250129125930.1273051-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250129125904.1272926-1-sashal@kernel.org>
-References: <20250129125904.1272926-1-sashal@kernel.org>
+In-Reply-To: <20250129125930.1273051-1-sashal@kernel.org>
+References: <20250129125930.1273051-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,165 +68,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.13
+X-stable-base: Linux 6.12.11
 Content-Transfer-Encoding: 8bit
 
-From: Ankit Agrawal <ankita@nvidia.com>
+From: Ramesh Thomas <ramesh.thomas@intel.com>
 
-[ Upstream commit 6a9eb2d125ba90d13b45bcfabcddf9f61268f6a8 ]
+[ Upstream commit 2b938e3db335e3670475e31a722c2bee34748c5a ]
 
-There is a HW defect on Grace Hopper (GH) to support the
-Multi-Instance GPU (MIG) feature [1] that necessiated the presence
-of a 1G region carved out from the device memory and mapped as
-uncached. The 1G region is shown as a fake BAR (comprising region 2 and 3)
-to workaround the issue.
+Definitions of ioread64 and iowrite64 macros in asm/io.h called by vfio
+pci implementations are enclosed inside check for CONFIG_GENERIC_IOMAP.
+They don't get defined if CONFIG_GENERIC_IOMAP is defined. Include
+linux/io-64-nonatomic-lo-hi.h to define iowrite64 and ioread64 macros
+when they are not defined. io-64-nonatomic-lo-hi.h maps the macros to
+generic implementation in lib/iomap.c. The generic implementation does
+64 bit rw if readq/writeq is defined for the architecture, otherwise it
+would do 32 bit back to back rw.
 
-The Grace Blackwell systems (GB) differ from GH systems in the following
-aspects:
-1. The aforementioned HW defect is fixed on GB systems.
-2. There is a usable BAR1 (region 2 and 3) on GB systems for the
-GPUdirect RDMA feature [2].
+Note that there are two versions of the generic implementation that
+differs in the order the 32 bit words are written if 64 bit support is
+not present. This is not the little/big endian ordering, which is
+handled separately. This patch uses the lo followed by hi word ordering
+which is consistent with current back to back implementation in the
+vfio/pci code.
 
-This patch accommodate those GB changes by showing the 64b physical
-device BAR1 (region2 and 3) to the VM instead of the fake one. This
-takes care of both the differences.
-
-Moreover, the entire device memory is exposed on GB as cacheable to
-the VM as there is no carveout required.
-
-Link: https://www.nvidia.com/en-in/technologies/multi-instance-gpu/ [1]
-Link: https://docs.nvidia.com/cuda/gpudirect-rdma/ [2]
-
-Cc: Kevin Tian <kevin.tian@intel.com>
-CC: Jason Gunthorpe <jgg@nvidia.com>
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-Link: https://lore.kernel.org/r/20250124183102.3976-3-ankita@nvidia.com
+Signed-off-by: Ramesh Thomas <ramesh.thomas@intel.com>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Link: https://lore.kernel.org/r/20241210131938.303500-2-ramesh.thomas@intel.com
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/nvgrace-gpu/main.c | 67 +++++++++++++++++++----------
- 1 file changed, 45 insertions(+), 22 deletions(-)
+ drivers/vfio/pci/vfio_pci_rdwr.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-index b76368958d1c5..778bfd0655de0 100644
---- a/drivers/vfio/pci/nvgrace-gpu/main.c
-+++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-@@ -17,9 +17,6 @@
- #define RESMEM_REGION_INDEX VFIO_PCI_BAR2_REGION_INDEX
- #define USEMEM_REGION_INDEX VFIO_PCI_BAR4_REGION_INDEX
+diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+index 66b72c2892841..a0595c745732a 100644
+--- a/drivers/vfio/pci/vfio_pci_rdwr.c
++++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+@@ -16,6 +16,7 @@
+ #include <linux/io.h>
+ #include <linux/vfio.h>
+ #include <linux/vgaarb.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
  
--/* Memory size expected as non cached and reserved by the VM driver */
--#define RESMEM_SIZE SZ_1G
--
- /* A hardwired and constant ABI value between the GPU FW and VFIO driver. */
- #define MEMBLK_SIZE SZ_512M
+ #include "vfio_pci_priv.h"
  
-@@ -72,7 +69,7 @@ nvgrace_gpu_memregion(int index,
- 	if (index == USEMEM_REGION_INDEX)
- 		return &nvdev->usemem;
- 
--	if (index == RESMEM_REGION_INDEX)
-+	if (nvdev->resmem.memlength && index == RESMEM_REGION_INDEX)
- 		return &nvdev->resmem;
- 
- 	return NULL;
-@@ -757,40 +754,67 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
- 			      u64 memphys, u64 memlength)
- {
- 	int ret = 0;
-+	u64 resmem_size = 0;
- 
- 	/*
--	 * The VM GPU device driver needs a non-cacheable region to support
--	 * the MIG feature. Since the device memory is mapped as NORMAL cached,
--	 * carve out a region from the end with a different NORMAL_NC
--	 * property (called as reserved memory and represented as resmem). This
--	 * region then is exposed as a 64b BAR (region 2 and 3) to the VM, while
--	 * exposing the rest (termed as usable memory and represented using usemem)
--	 * as cacheable 64b BAR (region 4 and 5).
-+	 * On Grace Hopper systems, the VM GPU device driver needs a non-cacheable
-+	 * region to support the MIG feature owing to a hardware bug. Since the
-+	 * device memory is mapped as NORMAL cached, carve out a region from the end
-+	 * with a different NORMAL_NC property (called as reserved memory and
-+	 * represented as resmem). This region then is exposed as a 64b BAR
-+	 * (region 2 and 3) to the VM, while exposing the rest (termed as usable
-+	 * memory and represented using usemem) as cacheable 64b BAR (region 4 and 5).
- 	 *
- 	 *               devmem (memlength)
- 	 * |-------------------------------------------------|
- 	 * |                                           |
- 	 * usemem.memphys                              resmem.memphys
-+	 *
-+	 * This hardware bug is fixed on the Grace Blackwell platforms and the
-+	 * presence of the bug can be determined through nvdev->has_mig_hw_bug.
-+	 * Thus on systems with the hardware fix, there is no need to partition
-+	 * the GPU device memory and the entire memory is usable and mapped as
-+	 * NORMAL cached (i.e. resmem size is 0).
- 	 */
-+	if (nvdev->has_mig_hw_bug)
-+		resmem_size = SZ_1G;
-+
- 	nvdev->usemem.memphys = memphys;
- 
- 	/*
- 	 * The device memory exposed to the VM is added to the kernel by the
--	 * VM driver module in chunks of memory block size. Only the usable
--	 * memory (usemem) is added to the kernel for usage by the VM
--	 * workloads. Make the usable memory size memblock aligned.
-+	 * VM driver module in chunks of memory block size. Note that only the
-+	 * usable memory (usemem) is added to the kernel for usage by the VM
-+	 * workloads.
- 	 */
--	if (check_sub_overflow(memlength, RESMEM_SIZE,
-+	if (check_sub_overflow(memlength, resmem_size,
- 			       &nvdev->usemem.memlength)) {
- 		ret = -EOVERFLOW;
- 		goto done;
- 	}
- 
- 	/*
--	 * The USEMEM part of the device memory has to be MEMBLK_SIZE
--	 * aligned. This is a hardwired ABI value between the GPU FW and
--	 * VFIO driver. The VM device driver is also aware of it and make
--	 * use of the value for its calculation to determine USEMEM size.
-+	 * The usemem region is exposed as a 64B Bar composed of region 4 and 5.
-+	 * Calculate and save the BAR size for the region.
-+	 */
-+	nvdev->usemem.bar_size = roundup_pow_of_two(nvdev->usemem.memlength);
-+
-+	/*
-+	 * If the hardware has the fix for MIG, there is no requirement
-+	 * for splitting the device memory to create RESMEM. The entire
-+	 * device memory is usable and will be USEMEM. Return here for
-+	 * such case.
-+	 */
-+	if (!nvdev->has_mig_hw_bug)
-+		goto done;
-+
-+	/*
-+	 * When the device memory is split to workaround the MIG bug on
-+	 * Grace Hopper, the USEMEM part of the device memory has to be
-+	 * MEMBLK_SIZE aligned. This is a hardwired ABI value between the
-+	 * GPU FW and VFIO driver. The VM device driver is also aware of it
-+	 * and make use of the value for its calculation to determine USEMEM
-+	 * size. Note that the device memory may not be 512M aligned.
- 	 */
- 	nvdev->usemem.memlength = round_down(nvdev->usemem.memlength,
- 					     MEMBLK_SIZE);
-@@ -809,10 +833,9 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
- 	}
- 
- 	/*
--	 * The memory regions are exposed as BARs. Calculate and save
--	 * the BAR size for them.
-+	 * The resmem region is exposed as a 64b BAR composed of region 2 and 3
-+	 * for Grace Hopper. Calculate and save the BAR size for the region.
- 	 */
--	nvdev->usemem.bar_size = roundup_pow_of_two(nvdev->usemem.memlength);
- 	nvdev->resmem.bar_size = roundup_pow_of_two(nvdev->resmem.memlength);
- done:
- 	return ret;
 -- 
 2.39.5
 
