@@ -1,58 +1,58 @@
-Return-Path: <kvm+bounces-36852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C4BA21EA8
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:10:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DAFA21EAB
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E06BE165BE0
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:08:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36D0B1889FDD
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2C71E9B25;
-	Wed, 29 Jan 2025 14:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5D41EBFE6;
+	Wed, 29 Jan 2025 14:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B7XB23jb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfD+AdSU"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A181E991B;
-	Wed, 29 Jan 2025 14:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E13C1E9B05;
+	Wed, 29 Jan 2025 14:03:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738159411; cv=none; b=IKSd6Y5v7siBxSTgD8oNs7VDJ1DzmR6rd40p7Fw99b4TLhX0GZH56J4jXayFxNQ9jadNGYq1bTsfpQZSCD8sqpG0uwv5SqFoHNeoejlivJ7WC8OGPCrpXGtSoKAyLxFZW3Ud4YbZBXdxGzQz9QTpApgPDh7+pzo5FipVIZb9c+w=
+	t=1738159413; cv=none; b=KUhjsaeEzav52jACkilSlUwWzY4iYT7Gug5YCO0DiY5DfshLfc4CY5PkR+jPsdScxnn4CQ3HGrNoAsND1iw8z14lWJlFQUfIEOCE8y42asN8zNRbB9jQUxqtEc6AfqoQC2y8LVdG7jq0+xwLW4p9JTY54gOYLw57YLSXFxGZrEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738159411; c=relaxed/simple;
-	bh=3qnb2y7OEMwqibPFxzj2aNuoKrOGbeCc9z1iL1/UVww=;
+	s=arc-20240116; t=1738159413; c=relaxed/simple;
+	bh=wAvJffez0M1Y+wcDhtFNDtfr4v1OZiR/5/dExj2XCjg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=I4CTpmNcdQ9IHu4HN2QDtwST9he8KfO+dCOrCeUCxwZD7kxMNNAxFV6wBj52qUf1NX5v+BmvCnq+rMZXVU5GpFrrHDJVQM5ktc1yyE4smCuKqhVUUZBEl0EJIKKfkwfQmWAlLGhbL8ZPCL6XOHBg+s955RXlykTI9yan9G3ALBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B7XB23jb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C15EC4CED1;
-	Wed, 29 Jan 2025 14:03:30 +0000 (UTC)
+	 MIME-Version; b=eTJCdj+qc9jAODUTOfsTFZEGZ5lFAvmtinjrr2vx1nWRVl5q1leHT6Kr6fzDk3PR1T12VEEeeAPT9M1HuGIXzIsXIXWC/FTsYAsOKxGaSxlygyPLq+hc4DiwYsIcv14jt4yjQXbPJ2R9Yaevwmv5dFR9jyTZJUhm2ek220qmwOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfD+AdSU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F705C4CED1;
+	Wed, 29 Jan 2025 14:03:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738159411;
-	bh=3qnb2y7OEMwqibPFxzj2aNuoKrOGbeCc9z1iL1/UVww=;
+	s=k20201202; t=1738159413;
+	bh=wAvJffez0M1Y+wcDhtFNDtfr4v1OZiR/5/dExj2XCjg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=B7XB23jbWBTs0Evg3JgZ104gK9pbmTKzKZtIYbuo9n5kOqLRLKnhDfDTdexKzswvL
-	 jWsf6mY9e/LGf2Swb2PaYIfqdYvzrli/u4UcuMw6vr+J0c6oy5yQPiVr71dSRC76Y2
-	 RBYibQ7x9jnorlos+UOz0e13FU/jfI3HQ7VdJ4pNtBfy8/3GZWwb8PZE96x6Pr/LRg
-	 nzebF3oMigq3sM+M3d1UArnWNzJ5fosRPRQOLH024K+0QMHnQEGDhTisaCInnzgrYz
-	 NCgnDJyfyHAirM+TmzX3CpWGVrBFM6UR+ENDTD9TTTbsvqfsb+eF8XX00q+KgRROiH
-	 vzJPKaAPlp4mw==
+	b=OfD+AdSUP4RGkoOCNmZZ2+d3UVuMityctF7pkTJH8V5r0z0SPRVcc8JWZ2z22pM24
+	 n8vA/whWQRH45HXSQJLU9w9df7I+IvbfkN0KNaUY/kpS8/PKMcK2rmnnThnvstLp0K
+	 6igJ/cV37lONppXUR7sskWhPLTBciRWt5gKt772RrkOGYxuCu9e6d+Sb/p3s1KQ7mI
+	 Ywhj/34kse0RBNNxP1cmPpYBc1nd5T31ppJA20UIx5m0ztvqeAQwBf8CEjiguc49/z
+	 AenMTZUrV4W9xGOf3Eb3qUyqKEhtioKAMDxsMvHUJ9GWdNSkLDj44JIvFChxHYE6Bh
+	 G7ED0p7wxNFHg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Ankit Agrawal <ankita@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
 	Kevin Tian <kevin.tian@intel.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
 	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 7/8] vfio/nvgrace-gpu: Read dvsec register to determine need for uncached resmem
-Date: Wed, 29 Jan 2025 07:59:27 -0500
-Message-Id: <20250129125930.1273051-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 8/8] vfio/nvgrace-gpu: Expose the blackwell device PF BAR1 to the VM
+Date: Wed, 29 Jan 2025 07:59:28 -0500
+Message-Id: <20250129125930.1273051-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250129125930.1273051-1-sashal@kernel.org>
 References: <20250129125930.1273051-1-sashal@kernel.org>
@@ -69,99 +69,160 @@ Content-Transfer-Encoding: 8bit
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-[ Upstream commit bd53764a60ad586ad5b6ed339423ad5e67824464 ]
+[ Upstream commit 6a9eb2d125ba90d13b45bcfabcddf9f61268f6a8 ]
 
-NVIDIA's recently introduced Grace Blackwell (GB) Superchip is a
-continuation with the Grace Hopper (GH) superchip that provides a
-cache coherent access to CPU and GPU to each other's memory with
-an internal proprietary chip-to-chip cache coherent interconnect.
+There is a HW defect on Grace Hopper (GH) to support the
+Multi-Instance GPU (MIG) feature [1] that necessiated the presence
+of a 1G region carved out from the device memory and mapped as
+uncached. The 1G region is shown as a fake BAR (comprising region 2 and 3)
+to workaround the issue.
 
-There is a HW defect on GH systems to support the Multi-Instance
-GPU (MIG) feature [1] that necessiated the presence of a 1G region
-with uncached mapping carved out from the device memory. The 1G
-region is shown as a fake BAR (comprising region 2 and 3) to
-workaround the issue. This is fixed on the GB systems.
+The Grace Blackwell systems (GB) differ from GH systems in the following
+aspects:
+1. The aforementioned HW defect is fixed on GB systems.
+2. There is a usable BAR1 (region 2 and 3) on GB systems for the
+GPUdirect RDMA feature [2].
 
-The presence of the fix for the HW defect is communicated by the
-device firmware through the DVSEC PCI config register with ID 3.
-The module reads this to take a different codepath on GB vs GH.
+This patch accommodate those GB changes by showing the 64b physical
+device BAR1 (region2 and 3) to the VM instead of the fake one. This
+takes care of both the differences.
 
-Scan through the DVSEC registers to identify the correct one and use
-it to determine the presence of the fix. Save the value in the device's
-nvgrace_gpu_pci_core_device structure.
+Moreover, the entire device memory is exposed on GB as cacheable to
+the VM as there is no carveout required.
 
 Link: https://www.nvidia.com/en-in/technologies/multi-instance-gpu/ [1]
+Link: https://docs.nvidia.com/cuda/gpudirect-rdma/ [2]
 
+Cc: Kevin Tian <kevin.tian@intel.com>
 CC: Jason Gunthorpe <jgg@nvidia.com>
-CC: Kevin Tian <kevin.tian@intel.com>
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
-Link: https://lore.kernel.org/r/20250124183102.3976-2-ankita@nvidia.com
+Link: https://lore.kernel.org/r/20250124183102.3976-3-ankita@nvidia.com
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/nvgrace-gpu/main.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ drivers/vfio/pci/nvgrace-gpu/main.c | 67 +++++++++++++++++++----------
+ 1 file changed, 45 insertions(+), 22 deletions(-)
 
 diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-index a7fd018aa5483..178ee4180d5c4 100644
+index 178ee4180d5c4..9e1c57baab64a 100644
 --- a/drivers/vfio/pci/nvgrace-gpu/main.c
 +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-@@ -23,6 +23,11 @@
+@@ -17,9 +17,6 @@
+ #define RESMEM_REGION_INDEX VFIO_PCI_BAR2_REGION_INDEX
+ #define USEMEM_REGION_INDEX VFIO_PCI_BAR4_REGION_INDEX
+ 
+-/* Memory size expected as non cached and reserved by the VM driver */
+-#define RESMEM_SIZE SZ_1G
+-
  /* A hardwired and constant ABI value between the GPU FW and VFIO driver. */
  #define MEMBLK_SIZE SZ_512M
  
-+#define DVSEC_BITMAP_OFFSET 0xA
-+#define MIG_SUPPORTED_WITH_CACHED_RESMEM BIT(0)
-+
-+#define GPU_CAP_DVSEC_REGISTER 3
-+
- /*
-  * The state of the two device memory region - resmem and usemem - is
-  * saved as struct mem_region.
-@@ -46,6 +51,7 @@ struct nvgrace_gpu_pci_core_device {
- 	struct mem_region resmem;
- 	/* Lock to control device memory kernel mapping */
- 	struct mutex remap_lock;
-+	bool has_mig_hw_bug;
- };
+@@ -72,7 +69,7 @@ nvgrace_gpu_memregion(int index,
+ 	if (index == USEMEM_REGION_INDEX)
+ 		return &nvdev->usemem;
  
- static void nvgrace_gpu_init_fake_bar_emu_regs(struct vfio_device *core_vdev)
-@@ -812,6 +818,26 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
- 	return ret;
- }
+-	if (index == RESMEM_REGION_INDEX)
++	if (nvdev->resmem.memlength && index == RESMEM_REGION_INDEX)
+ 		return &nvdev->resmem;
  
-+static bool nvgrace_gpu_has_mig_hw_bug(struct pci_dev *pdev)
-+{
-+	int pcie_dvsec;
-+	u16 dvsec_ctrl16;
-+
-+	pcie_dvsec = pci_find_dvsec_capability(pdev, PCI_VENDOR_ID_NVIDIA,
-+					       GPU_CAP_DVSEC_REGISTER);
-+
-+	if (pcie_dvsec) {
-+		pci_read_config_word(pdev,
-+				     pcie_dvsec + DVSEC_BITMAP_OFFSET,
-+				     &dvsec_ctrl16);
-+
-+		if (dvsec_ctrl16 & MIG_SUPPORTED_WITH_CACHED_RESMEM)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- static int nvgrace_gpu_probe(struct pci_dev *pdev,
- 			     const struct pci_device_id *id)
+ 	return NULL;
+@@ -757,40 +754,67 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
+ 			      u64 memphys, u64 memlength)
  {
-@@ -832,6 +858,8 @@ static int nvgrace_gpu_probe(struct pci_dev *pdev,
- 	dev_set_drvdata(&pdev->dev, &nvdev->core_device);
+ 	int ret = 0;
++	u64 resmem_size = 0;
  
- 	if (ops == &nvgrace_gpu_pci_ops) {
-+		nvdev->has_mig_hw_bug = nvgrace_gpu_has_mig_hw_bug(pdev);
+ 	/*
+-	 * The VM GPU device driver needs a non-cacheable region to support
+-	 * the MIG feature. Since the device memory is mapped as NORMAL cached,
+-	 * carve out a region from the end with a different NORMAL_NC
+-	 * property (called as reserved memory and represented as resmem). This
+-	 * region then is exposed as a 64b BAR (region 2 and 3) to the VM, while
+-	 * exposing the rest (termed as usable memory and represented using usemem)
+-	 * as cacheable 64b BAR (region 4 and 5).
++	 * On Grace Hopper systems, the VM GPU device driver needs a non-cacheable
++	 * region to support the MIG feature owing to a hardware bug. Since the
++	 * device memory is mapped as NORMAL cached, carve out a region from the end
++	 * with a different NORMAL_NC property (called as reserved memory and
++	 * represented as resmem). This region then is exposed as a 64b BAR
++	 * (region 2 and 3) to the VM, while exposing the rest (termed as usable
++	 * memory and represented using usemem) as cacheable 64b BAR (region 4 and 5).
+ 	 *
+ 	 *               devmem (memlength)
+ 	 * |-------------------------------------------------|
+ 	 * |                                           |
+ 	 * usemem.memphys                              resmem.memphys
++	 *
++	 * This hardware bug is fixed on the Grace Blackwell platforms and the
++	 * presence of the bug can be determined through nvdev->has_mig_hw_bug.
++	 * Thus on systems with the hardware fix, there is no need to partition
++	 * the GPU device memory and the entire memory is usable and mapped as
++	 * NORMAL cached (i.e. resmem size is 0).
+ 	 */
++	if (nvdev->has_mig_hw_bug)
++		resmem_size = SZ_1G;
 +
- 		/*
- 		 * Device memory properties are identified in the host ACPI
- 		 * table. Set the nvgrace_gpu_pci_core_device structure.
+ 	nvdev->usemem.memphys = memphys;
+ 
+ 	/*
+ 	 * The device memory exposed to the VM is added to the kernel by the
+-	 * VM driver module in chunks of memory block size. Only the usable
+-	 * memory (usemem) is added to the kernel for usage by the VM
+-	 * workloads. Make the usable memory size memblock aligned.
++	 * VM driver module in chunks of memory block size. Note that only the
++	 * usable memory (usemem) is added to the kernel for usage by the VM
++	 * workloads.
+ 	 */
+-	if (check_sub_overflow(memlength, RESMEM_SIZE,
++	if (check_sub_overflow(memlength, resmem_size,
+ 			       &nvdev->usemem.memlength)) {
+ 		ret = -EOVERFLOW;
+ 		goto done;
+ 	}
+ 
+ 	/*
+-	 * The USEMEM part of the device memory has to be MEMBLK_SIZE
+-	 * aligned. This is a hardwired ABI value between the GPU FW and
+-	 * VFIO driver. The VM device driver is also aware of it and make
+-	 * use of the value for its calculation to determine USEMEM size.
++	 * The usemem region is exposed as a 64B Bar composed of region 4 and 5.
++	 * Calculate and save the BAR size for the region.
++	 */
++	nvdev->usemem.bar_size = roundup_pow_of_two(nvdev->usemem.memlength);
++
++	/*
++	 * If the hardware has the fix for MIG, there is no requirement
++	 * for splitting the device memory to create RESMEM. The entire
++	 * device memory is usable and will be USEMEM. Return here for
++	 * such case.
++	 */
++	if (!nvdev->has_mig_hw_bug)
++		goto done;
++
++	/*
++	 * When the device memory is split to workaround the MIG bug on
++	 * Grace Hopper, the USEMEM part of the device memory has to be
++	 * MEMBLK_SIZE aligned. This is a hardwired ABI value between the
++	 * GPU FW and VFIO driver. The VM device driver is also aware of it
++	 * and make use of the value for its calculation to determine USEMEM
++	 * size. Note that the device memory may not be 512M aligned.
+ 	 */
+ 	nvdev->usemem.memlength = round_down(nvdev->usemem.memlength,
+ 					     MEMBLK_SIZE);
+@@ -809,10 +833,9 @@ nvgrace_gpu_init_nvdev_struct(struct pci_dev *pdev,
+ 	}
+ 
+ 	/*
+-	 * The memory regions are exposed as BARs. Calculate and save
+-	 * the BAR size for them.
++	 * The resmem region is exposed as a 64b BAR composed of region 2 and 3
++	 * for Grace Hopper. Calculate and save the BAR size for the region.
+ 	 */
+-	nvdev->usemem.bar_size = roundup_pow_of_two(nvdev->usemem.memlength);
+ 	nvdev->resmem.bar_size = roundup_pow_of_two(nvdev->resmem.memlength);
+ done:
+ 	return ret;
 -- 
 2.39.5
 
