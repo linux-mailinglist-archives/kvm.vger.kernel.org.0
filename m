@@ -1,189 +1,289 @@
-Return-Path: <kvm+bounces-36888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7471A22508
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 21:16:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2126CA2253F
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 21:55:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CEA9167E6A
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 20:16:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E8C97A2BD0
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 20:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1B61DF754;
-	Wed, 29 Jan 2025 20:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099161E260D;
+	Wed, 29 Jan 2025 20:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B6pf27Gc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8wRAniu"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2046.outbound.protection.outlook.com [40.107.236.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B416FB641;
-	Wed, 29 Jan 2025 20:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738181763; cv=fail; b=eeD5BElGbM766/Rkj8Y8uQipijCmtcbF524fwq9fYc0a1NupENVPP3ozC5s7/J+1hvcD82Sb365KsDf0pamPV0crXEbpk+Davd50l3wwDfXWU4RADpXUT/Kf3pP3FhWmnlQsBaBa1wvFnzPOxKBEYAx9H8Dqt+RmAnExqir17G0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738181763; c=relaxed/simple;
-	bh=IrAGjEmC+j/EufbrqE6lsZ0ncyjFlwRhEBDouiN9kW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=HuCpbvIIufLXdV4NjrSf/vyOCKJcd+PAHq8ocamEJyStX7m87IgmQ4CblnP2/3hOPuhTOmyJy49H3G0BdBvS6UJRPof5VcPEeucUf8dtsAPqYTVc1uDIRlJJ8gM0A29rMBQTYARpUhyIwj84zul2Kg2PLwPc+AuxHYOooc6mMCA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=B6pf27Gc; arc=fail smtp.client-ip=40.107.236.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cstfM74OVCZlpSovVQt2wQ+1DfroS9s8y8xOKEoouaHOn4HnQKvR/4IX1lumR4QQdfZI8lQ0EV8JhIFN2axTA++fBgz/T9P5EQLnxLk5fhrKamEFsmndCQAxtiFRQPa+gziUh82096y53ZmnoWeQE5quUnQh8jmOmC/94+dLMJxCWvZx0jk4D8X0acPY8KZaTQMt+LGdJWTl/onifKJt2hAhSlctjSueZYncrkAdiUFXzf0u4dVWGmMop+U4h5Z3TKMKVK5GHGquG0Pq377LcWvBdxWKFXr7DZZ+vMcmBu+8tmjcVlumt2+cMeuQ5+OrOH7KVoyHlL0X3i2cCPga4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V2R8leLWx8ZHkLIBCyMsCcXhS2wKaRukmEZagptH4wE=;
- b=NunMYU7/nrvtbNtv4VOYINfLVN1wA1hUv0uDQeqMt7QCCSOjPn9/9DO8C20l9IHsBmzj0RTXLpFwgNTsawzMSh6LXkaW268WFKFbYIMCKCgbNSoAOJCwbL5w5jjrvc5TXPMXgg7Yrs2HOuYIzmIhVgAWmA0xyiIIjWSaezozpxnqBXQ0E8PJW/XVgpdhF5I6dOBubl7ALSihZPF5rxdnjwzJKgZfZlaylw/6GcRjeIAWbtVKRvIRfXM+BylVA6WCmuxOv66xPjyBsNQ84Z16dcVz/BMK2yzwBfXrG+KituSYSs8FXgvJS15itr1lv1rhNmCAv8pk0p2IGWLY824ifA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V2R8leLWx8ZHkLIBCyMsCcXhS2wKaRukmEZagptH4wE=;
- b=B6pf27GcZTry+7LtKPhEItrg6LyhOBquHKwJ9uHK7+D6ERym1su5r2YzZmpBhLYBIFa2u+LaKRVNLG+JMr+7UogIiX5FqXLrR71g6IK+kpaam6Ahz87QRjwgcVCK6hferlpe9uXkmUNHo9+zLf1lD3MOlx9UGeQO8gRYxex5U6nCXFZlS33MvumWO5D71BddXOu1Bvtaoa+tVVZkOP00g1UAA/YZgW+fMq5pm5EjpGBxVhrwXH74PU++TXXl30fx1H8yDHJ4yVPYTXEyT5++TnGF75vQ0E+RanniJebf3OES4CjHJzRVDUWww89PJLJNnnA2EwUKgJaLOWwQSJTB4Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by CH2PR12MB4184.namprd12.prod.outlook.com (2603:10b6:610:a7::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.23; Wed, 29 Jan
- 2025 20:15:57 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8377.021; Wed, 29 Jan 2025
- 20:15:57 +0000
-Date: Wed, 29 Jan 2025 16:15:56 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Nicolin Chen <nicolinc@nvidia.com>, will@kernel.org,
-	robin.murphy@arm.com, kevin.tian@intel.com, tglx@linutronix.de,
-	maz@kernel.org, alex.williamson@redhat.com, joro@8bytes.org,
-	shuah@kernel.org, reinette.chatre@intel.com, yebin10@huawei.com,
-	apatel@ventanamicro.com, shivamurthy.shastri@linutronix.de,
-	bhelgaas@google.com, anna-maria@linutronix.de, yury.norov@gmail.com,
-	nipun.gupta@amd.com, iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	patches@lists.linux.dev, jean-philippe@linaro.org, mdf@kernel.org,
-	mshavit@google.com, shameerali.kolothum.thodi@huawei.com,
-	smostafa@google.com, ddutile@redhat.com
-Subject: Re: [PATCH RFCv2 09/13] iommufd: Add IOMMU_OPTION_SW_MSI_START/SIZE
- ioctls
-Message-ID: <20250129201556.GK5556@nvidia.com>
-References: <cover.1736550979.git.nicolinc@nvidia.com>
- <d3cb1694e07be0e214dc44dcb2cb74f014606560.1736550979.git.nicolinc@nvidia.com>
- <0521187e-c511-4ab1-9ffa-be2be8eacd04@redhat.com>
- <20250129145800.GG5556@nvidia.com>
- <21ac88b0-fe93-4933-893c-7ffb09267e7b@redhat.com>
- <20250129173909.GI5556@nvidia.com>
- <6f630a23-e1b5-48de-81a6-43cbb1e6cabd@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6f630a23-e1b5-48de-81a6-43cbb1e6cabd@redhat.com>
-X-ClientProxiedBy: BN1PR13CA0014.namprd13.prod.outlook.com
- (2603:10b6:408:e2::19) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4CA187325;
+	Wed, 29 Jan 2025 20:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738184103; cv=none; b=fwLWIPQ3ejIsjiwWbYNv1HahQOZaQbyYZU/mW5SwGAsTuIyGVYZF1v6nIR5wkP/MhhRSqPz2W2CbFiEAqEJVFWQjeMynevMveYvFUFACQ9WaN5UEg5eFwMV0h2NYr8C9lgwSjqgH5Ie6iqSNTXKS6fPZ2PwTEth5VH2BvoOw0Zc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738184103; c=relaxed/simple;
+	bh=oAUBgof2aIujkwQRJYbG9mhga1e78/p7HKpHVeQdrgg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=vCg4vScFeoONmMtLMkzUjHE1f3U6oPjnE5VwoHfsFpt7ndqEyUW+JT8J8jSFIZhl3BN5LXgOw6DA81T/O2KmSjqWTQbq5+xMXEtlgbnK98/RYfW798bKEeo6cLkIVv4SONjFcd29BqtAUF7N3dt68uZ/Wcs503YHtQfsn9exrqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8wRAniu; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e549be93d5eso283739276.1;
+        Wed, 29 Jan 2025 12:55:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738184100; x=1738788900; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ueZk4UbNoQ80hfj8dpqw2VgMTf7ByqVqHJz79+NLnU0=;
+        b=h8wRAniup+DehEQjrPmQOOnoMi/V8QZDyKmPZzP9AahJ3eT0I/Dy+4RcwvBzd0KcbO
+         jIQKlE4NHbItt24M1eyxGqxsv5o3EMWcV7J5WWWvycZjyhdgfI+8cKArQnmkTkw3FJLt
+         eQkNIDp2pkAs5LYSWp0GjvTx3kspBRL1DMYOQTMElp/CQhIfKs0UUBKU+SKDBN8zUYb8
+         g7aY00r8XwjVCDwYJVDVClbrzxLVWAUBBGeijq0Z7BBR8lnmehdcLREVz67k0znglbN8
+         OrfRRPGj6pM+Ofa6MMqwd4YsQZfRQB09NgwR8k671YGXUrGshgiPoeRRMy5rKva71PGY
+         hZ4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738184100; x=1738788900;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ueZk4UbNoQ80hfj8dpqw2VgMTf7ByqVqHJz79+NLnU0=;
+        b=Zu/S7nuiCQ7TKBHCmamFsEaWzjfp0tUYXrIz1tyRHUxHhJVZhH8bDOtkvqBRBAA/g3
+         1rtftC77bZK7L4UF5u4meH5lX0XzjYoBHdAmv6FADPJnnHKQISbDWgGnCnrWG4oy0ZT/
+         DmHmocoiQkDkox7eWlMMynGLa5NGfjVj4WtJDcnvLS1yGrePpJIwSlzqV5587tZB5jz0
+         UIExGsFjYEaYmJrqPhXzDvO9td7ofoK1z2PaWXWssTj+Du6kCnLKGdYFz1gogZhIyQMZ
+         Lkp0QyCFbVcDirOAsjdND8gOASlyWdRsTa3tZ5GNz36l8jUvqgNf5rxifzebseQv1cyR
+         08MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU65YhYJnd4yrIgpgV7RayRx4HD8Kit166g5jfico4uAkRlualGJ2DPfEsO/RL+hVzebS9KDTsxQikeZ++F@vger.kernel.org, AJvYcCUhSLnASyS1dZDpj3Ning74wPQwlXRXQUkdJh+ezIzuU16zN7OXI3mLv4TapW/47gQeGmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywl3IGXz1LjMmR9DR5IHLgUhExRYwoz+oiSCkAfr4n0V8+QXFWr
+	FyKBlDZt21u6j/HtoaW3K9w8wwEl22xMKh8xnNa21bLKWA+QBVxt
+X-Gm-Gg: ASbGncu+8pwydGhMrIjs+DR8ThTfBxerwLtc1zuzSPr1U0rI9QHfHSl0YLy3hJrSd8+
+	nUUpQ0iWLazTYFuGRNUxKW8WmPF3O+S7HEkvV4aAIgLaftVFJKzRkMhUGvzoEAED801TQJILpXO
+	s3x+sk+brNaxq5WQfg/csS/zfXZ1BU4jNk4hHln5cJhjp2U6bBGjbbt1m9WrM7O1/R0bzF5dV79
+	hO3k6EngQxzFiEyfhNDjbztwHgF7QyKnSDFFRDqzpiZj1NU8/zkcTmb+262pVr++3e+scHsO0+I
+	AJhlX0kGGI+IFrrB5I4=
+X-Google-Smtp-Source: AGHT+IEWmX2x1u7n/vc0UVcEoX4V7EHvc3YO4LXHl+8qKvZBYQDsROpwgWkMjeON3KdFCpXBNEgtTQ==
+X-Received: by 2002:a05:690c:4808:b0:6ef:4fba:8143 with SMTP id 00721157ae682-6f7a836fbafmr43773547b3.18.1738184100325;
+        Wed, 29 Jan 2025 12:55:00 -0800 (PST)
+Received: from [10.138.7.94] ([45.134.140.51])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f757876fe8sm24376507b3.5.2025.01.29.12.54.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jan 2025 12:54:59 -0800 (PST)
+Message-ID: <c42ae4f7-f5f4-4906-85aa-b049ed44d7e9@gmail.com>
+Date: Wed, 29 Jan 2025 15:54:59 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CH2PR12MB4184:EE_
-X-MS-Office365-Filtering-Correlation-Id: f6d8ab8a-5291-4177-78bf-08dd40a1bdca
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?E7VXlKODMRJHvK+hpS+cFYEbk++9gXySN3SquoyZKlDg4d7q1W/D3PwsbwGC?=
- =?us-ascii?Q?3ap+10rubMBhNAM62gvlaiJ6Tsr/l3eD7B6sN4qK1BDKM3yd0KZdrfJARbKi?=
- =?us-ascii?Q?CoENpMi+JV1drC4+MIqMPScXUIkypDr5/d5+a5vMS0NY6AhL7pAkuoVY+pk7?=
- =?us-ascii?Q?y9NR5B8A5whid4uyHVmWrw94M1gyy8hrez/Cj5YSNkAGAa1DIP+/zzYRhbHu?=
- =?us-ascii?Q?MKKdxFp40KOcfvraQAnEcgFiOjq9iYzhYWx/CGPozsm+RBwDyXUL6kvpbT46?=
- =?us-ascii?Q?PHez8M+PnwxLwg27puMrxKdZ7VFGkX1p45mgOYcfvYmBIc1XZmlT6/I6J918?=
- =?us-ascii?Q?8n/4FHdEUMr9iwmzKhrGjw1v7SO1T4gvWHXXBaXdnrlsr5WUq3JvE5FsXLro?=
- =?us-ascii?Q?Crst2dH8W4Bj/P6K/EQbUnhN+S4F1JkJH8At+JWd+RWEdTkPiLWofCu0ir0i?=
- =?us-ascii?Q?1eD4VN2SG0M2cLwQGtoTT38MW5VwqDFwhJZ7oTtgmvQq32eEDX7eFALN1kW8?=
- =?us-ascii?Q?c2Utx2n/Qb/1bNoZehST7+aoxrYCVcMfJIiVNpd7KkIogWDyX1ahXLabTd3c?=
- =?us-ascii?Q?cbzrxMWfHx83XrP2VIqAvYMB09s1cG7VngPmTy2lA8REXqtM8Kc9MnnojgLP?=
- =?us-ascii?Q?nzY3+wi5vHRVtlCDphQgV8qlbaKQFtszkNESgBNLdQ+6GNoJFAK1dmD73P5O?=
- =?us-ascii?Q?2Iq6titO0JuGKEhgF4wuTUfOX5wPbK0w8D/qrJnzCdlUd4QhugbssAFLcIZA?=
- =?us-ascii?Q?y5oZDV5+FBQLmlggqibTHIH8qGtJPFaD3La55YgC2/qn8I5ayY8kyOgsYuW6?=
- =?us-ascii?Q?uUuDFIjHbJWRVTtP9n25DvHL3VtyD4M9Vd5oWhGC3C+ideWmtjrxB6uaLQds?=
- =?us-ascii?Q?U8QhHrwToP8guUZPEbI2DPT7TF2ics9UYvd8wSdZj1WlDfIJkv9q4sMbD9B2?=
- =?us-ascii?Q?WZYfIC791yL9sWYSOgumxeGrCYDEuivMk7F5P5AFy4onRF8BzuxwwkR0vGAi?=
- =?us-ascii?Q?WilvwW3Z6Xtz5rN4HXH8zgyQ3YpP/MHnW1XnRo1G4qfJ6QOhfAk2tWk0KjY4?=
- =?us-ascii?Q?/XzpzQLkV5qWYWTPl1w+5ct4371ekn1z81fDw+bQWdf/dKghTJC62mRF2ibI?=
- =?us-ascii?Q?pSAs+4HiSMpwHprAJ3MRDP0TKRAZ098wE/TDZAPrJqZ7+OOC48+KfrByCPfS?=
- =?us-ascii?Q?2rbJghvjppN4Ey1mbA5j86v5nNMIdixIL3TiqqlGduRdkgqRqpLacA0eLM8a?=
- =?us-ascii?Q?mqSzHqmi9moHTSYZL/BkbliJgvLLmDXS5xnR4DTTrPApml8FsRauKGq1CCb3?=
- =?us-ascii?Q?Zi5fRRVbcuqnkBpAc6rU40IeQEmxkbJ2KPLKO/d0lW9cFbrkxsrYh2kgujzL?=
- =?us-ascii?Q?pTYY7x7MQXAHtjCXUeDnDqxf9tj3?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?63mRtmSWUJnNsXAGNmbUNMQkiPKvEQn8VQZk6YCx2N1VqSRJIPUoGdigZfe1?=
- =?us-ascii?Q?MJu2XYyvqMXS9jBrm7hmbmOVfDd4hxiCpHnEch4OS4768Illy1lL/rcfrOTF?=
- =?us-ascii?Q?S6JV5imldCB9wFoRpdq+V3jOg33DhwnUYlbesIE9t/wMS5tOFmrCaQBF+XmN?=
- =?us-ascii?Q?B9IiqZJleWSRCloMEzPGBTB+nrRhIc7Fugokv+mfJ1nfMOKDfR3MDdMalCn4?=
- =?us-ascii?Q?PIXuISG2b9DvbuvFjWbTOhjudHwzqEHSUy2EOx3h+R6/AMvlQJbgJ4syMhQV?=
- =?us-ascii?Q?71dxCYcckrYN78kwk3zsQS69HXtBlCBxkZ8JHgVwee+m6b+BkMZoVhxAQFbk?=
- =?us-ascii?Q?pzfK8jzpp8N+Ix4rlS26eqzftkQ/u+6ihmtQfeTnuY0r63039DbNPj6nmk6X?=
- =?us-ascii?Q?DCF9JJH5ZJ19nOnu7ixxQQ7NJHwSvt3ReZHYTGem0DhpEyBP0clMsLdqW10a?=
- =?us-ascii?Q?g6RDSawX5wmMRWJ2b22ZoRWpCcN+EWBIlG8/GGumEbhxEStkuvQDtvrV0BTF?=
- =?us-ascii?Q?wpPiUTe3v7q3t+BHXtRUpBMcZ6qGV6/OBRqUbY7yO5xZuvPUxoBHZrAaGH0v?=
- =?us-ascii?Q?RzuZrQjMpCAMQushE4uaXeFDcKS5iGdCBDtmDBvstcHePAQET8mbb5MNYjp+?=
- =?us-ascii?Q?Swe8cN2mU+Hb9ZGZrSBGyYNGnosE8X0gzOJQKFTvrJwpALVo0ydv4RHV1GtB?=
- =?us-ascii?Q?oJtzJ+ifM58kJbpcjCzMf9CZCU4Qd5APFCoi9gh01woXvWOulJpuQMWvGkja?=
- =?us-ascii?Q?zTUdKx+zzGak0AbicGIWHSKxsOcd+8kIVdLM3whQ6E82XMD5CpRS+nJAm2ss?=
- =?us-ascii?Q?FV2aaLHDZFdwKxc+4OUIJFQkp2heuaN9i5T2JjormRED9K74jetAaxZzXI+s?=
- =?us-ascii?Q?J+oFn+oKWlS79QD+XGdTukTro/81GbNz8gmaveoyHhsPd3d629+6R9BnaE+C?=
- =?us-ascii?Q?yOQCurh0baI6PWj6xOvpQGhwNk9Zp2Z8b+7Ov4V66LIJEvp+bcp6dOhhPdxO?=
- =?us-ascii?Q?GBkt6YtMMNX5t6Y34mgoSxMQPWE6IQF9/KP3VMylxLDapHPLcCnQtSivixQZ?=
- =?us-ascii?Q?qQU6u/Xasmd7Vj3ptF6wcQgrgJzfJ+EULxn6DbaH9tEceQNocGjfl9NRb62H?=
- =?us-ascii?Q?+fLsoxPeD2zce2wnvRZ6188H/IV2qy0n692kGylZDhquvMl0EE/zfiAM1/a0?=
- =?us-ascii?Q?tAi8/OODNI6Hle7NXVbcxat2aqZovsZNG2sDnMh0S0tmLtHwN7Rl8VCMLL2z?=
- =?us-ascii?Q?V3CpIDb1/8McC3G3mI8OcbbTfLDgTe0Z6beVkboOsE5rtWVdU+pTugZs/zQs?=
- =?us-ascii?Q?Fp0piPi1zw+qxAWpCePIg+4k0ehyvM0C3mDJuns49/H6byroW8dInXbZqIiA?=
- =?us-ascii?Q?ndNqCr9yWtvkA/Htn4aqb+B5rVqeoTblvlgJDBvt1Q5QSNnqXnxyVG3YpYXc?=
- =?us-ascii?Q?uV/U/Z77h9OX6mpn7fcj0XI+0TPIry81bWCqbxymE0XEIxjSDB629e5EvQyQ?=
- =?us-ascii?Q?Gosa6ukyEFfUn/Wbr0WFMqaZfGvANjVOVphTq6aJhWfso6nxl8N8PIZZ8KGv?=
- =?us-ascii?Q?cthHPQ+6VUA7UtsXAlXy7B71Nvfqx7ba1sgKDQgr?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f6d8ab8a-5291-4177-78bf-08dd40a1bdca
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2025 20:15:57.6674
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: j6SZYgv7HzHEn2NKEegL8PkdjwK0tvS2WMPalYTscPVc9U6UahVuMmmz2QvM/pzI
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4184
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 3/3] drm/virtio: implement blob userptr resource
+ object
+Content-Language: en-US
+To: "Huang, Honglei1" <Honglei1.Huang@amd.com>, Huang Rui
+ <ray.huang@amd.com>, virtualization@lists.linux-foundation.org,
+ linux-kernel@vger.kernel.org, Dmitry Osipenko
+ <dmitry.osipenko@collabora.com>, dri-devel@lists.freedesktop.org,
+ David Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
+ <olvaffe@gmail.com>, Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Lingshan Zhu <Lingshan.Zhu@amd.com>,
+ Xen developer discussion <xen-devel@lists.xenproject.org>,
+ =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>,
+ Kernel KVM virtualization development <kvm@vger.kernel.org>
+References: <20241220100409.4007346-1-honglei1.huang@amd.com>
+ <20241220100409.4007346-3-honglei1.huang@amd.com>
+ <Z2WO2udH2zAEr6ln@phenom.ffwll.local>
+ <2fb36b50-4de2-4060-a4b7-54d221db8647@gmail.com>
+ <de8ade34-eb67-4bff-a1c9-27cb51798843@amd.com>
+ <Z36wV07M8B_wgWPl@phenom.ffwll.local>
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <Z36wV07M8B_wgWPl@phenom.ffwll.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 29, 2025 at 06:49:22PM +0100, Eric Auger wrote:
-> > If it was overriden inside iommufd then the user told the kernel what
-> > range to use to override it. I don't need to go back and report back
-> > to userspace information that it already gave to the kernel..
+On 1/8/25 12:05 PM, Simona Vetter wrote:
+> On Fri, Dec 27, 2024 at 10:24:29AM +0800, Huang, Honglei1 wrote:
+>>
+>> On 2024/12/22 9:59, Demi Marie Obenour wrote:
+>>> On 12/20/24 10:35 AM, Simona Vetter wrote:
+>>>> On Fri, Dec 20, 2024 at 06:04:09PM +0800, Honglei Huang wrote:
+>>>>> From: Honglei Huang <Honglei1.Huang@amd.com>
+>>>>>
+>>>>> A virtio-gpu userptr is based on HMM notifier.
+>>>>> Used for let host access guest userspace memory and
+>>>>> notice the change of userspace memory.
+>>>>> This series patches are in very beginning state,
+>>>>> User space are pinned currently to ensure the host
+>>>>> device memory operations are correct.
+>>>>> The free and unmap operations for userspace can be
+>>>>> handled by MMU notifier this is a simple and basice
+>>>>> SVM feature for this series patches.
+>>>>> The physical PFNS update operations is splited into
+>>>>> two OPs in here. The evicted memories won't be used
+>>>>> anymore but remap into host again to achieve same
+>>>>> effect with hmm_rang_fault.
+>>>>
+>>>> So in my opinion there are two ways to implement userptr that make sense:
+>>>>
+>>>> - pinned userptr with pin_user_pages(FOLL_LONGTERM). there is not mmu
+>>>>    notifier
+>>>>
+>>>> - unpinnned userptr where you entirely rely on userptr and do not hold any
+>>>>    page references or page pins at all, for full SVM integration. This
+>>>>    should use hmm_range_fault ideally, since that's the version that
+>>>>    doesn't ever grab any page reference pins.
+>>>>
+>>>> All the in-between variants are imo really bad hacks, whether they hold a
+>>>> page reference or a temporary page pin (which seems to be what you're
+>>>> doing here). In much older kernels there was some justification for them,
+>>>> because strange stuff happened over fork(), but with FOLL_LONGTERM this is
+>>>> now all sorted out. So there's really only fully pinned, or true svm left
+>>>> as clean design choices imo.
+>>>>
+>>>> With that background, why does pin_user_pages(FOLL_LONGTERM) not work for
+>>>> you?
+>>>
+>>> +1 on using FOLL_LONGTERM.  Fully dynamic memory management has a huge cost
+>>> in complexity that pinning everything avoids.  Furthermore, this avoids the
+>>> host having to take action in response to guest memory reclaim requests.
+>>> This avoids additional complexity (and thus attack surface) on the host side.
+>>> Furthermore, since this is for ROCm and not for graphics, I am less concerned
+>>> about supporting systems that require swappable GPU VRAM.
+>>
+>> Hi Sima and Demi,
+>>
+>> I totally agree the flag FOLL_LONGTERM is needed, I will add it in next
+>> version.
+>>
+>> And for the first pin variants implementation, the MMU notifier is also
+>> needed I think.Cause the userptr feature in UMD generally used like this:
+>> the registering of userptr always is explicitly invoked by user code like
+>> "registerMemoryToGPU(userptrAddr, ...)", but for the userptr release/free,
+>> there is no explicit API for it, at least in hsakmt/KFD stack. User just
+>> need call system call "free(userptrAddr)", then kernel driver will release
+>> the userptr by MMU notifier callback.Virtio-GPU has no other way to know if
+>> user has been free the userptr except for MMU notifior.And in UMD theres is
+>> no way to get the free() operation is invoked by user.The only way is use
+>> MMU notifier in virtio-GPU driver and free the corresponding data in host by
+>> some virtio CMDs as far as I can see.
+>>
+>> And for the second way that is use hmm_range_fault, there is a predictable
+>> issues as far as I can see, at least in hsakmt/KFD stack. That is the memory
+>> may migrate when GPU/device is working. In bare metal, when memory is
+>> migrating KFD driver will pause the compute work of the device in
+>> mmap_wirte_lock then use hmm_range_fault to remap the migrated/evicted
+>> memories to GPU then restore the compute work of device to ensure the
+>> correction of the data. But in virtio-GPU driver the migration happen in
+>> guest kernel, the evict mmu notifier callback happens in guest, a virtio CMD
+>> can be used for notify host but as lack of mmap_write_lock protection in
+>> host kernel, host will hold invalid data for a short period of time, this
+>> may lead to some issues. And it is hard to fix as far as I can see.
+>>
+>> I will extract some APIs into helper according to your request, and I will
+>> refactor the whole userptr implementation, use some callbacks in page
+>> getting path, let the pin method and hmm_range_fault can be choiced
+>> in this series patches.
 > 
-> Looks strange to me because info exposed in sysfs is wrong then. What if
-> someone else relies on this info, either at kernel level through the
-> get_resv_regions callback or from user space.
+> Ok, so if this is for svm, then you need full blast hmm, or the semantics
+> are buggy. You cannot fake svm with pin(FOLL_LONGTERM) userptr, this does
+> not work.
+> 
+> The other option is that hsakmt/kfd api is completely busted, and that's
+> kinda not a kernel problem.
+> -Sima
 
-Nothing else should call get_resv_regions() because VFIO is bound to
-the device and iommufd owns the domain. We expect some exclusivity
-here :)
+On further thought, I believe the driver needs to migrate the pages to
+device memory (really a virtio-GPU blob object) *and* take a FOLL_LONGTERM
+pin on them.  The reason is that it isn’t possible to migrate these pages
+back to "host" memory without unmapping them from the GPU.  For the reasons
+I mention in [1], I believe that temporarily revoking access to virtio-GPU
+blob objects is not feasible.  Instead, the pages must be treated as if
+they are permanently in device memory until guest userspace unmaps them
+from the GPU, after which they must be migrated back to host memory.
 
-sysfs for sw_msi should be understood as reporting the driver
-recommendation, not anything to do with the current MSI operation of
-the device.
+The problems with other approaches are most obvious if one considers a Xen
+guest using a virtio-GPU backend that is not all-powerful.  Normal guest
+memory is not accessible to the GPU, and Xen uses the IOMMU to enforce this
+restriction.  Therefore, the guest must migrate pages to virtio-GPU blob
+objects before the GPU can access them.  From Xen’s perspective, virtio-GPU
+blob objects belong to the backend domain, so Xen allows the GPU to access
+them.  However, the pages in blob objects _cannot_ be used in Xen grant table
+operations, because Xen doesn’t consider them to belong to the guest!
+Similarly, if the guest has an assigned PCI device, that device will not
+be able to access the blob object’s pages.
 
-Jason
+I’m no expert on Linux memory management, so I’m not sure how to implement
+this behavior.  What I _can_ say is that a blob object is I/O memory, and
+behaves somewhat similar to a PCI BAR in a system with no P2PDMA support:
+CPU access works, but DMA from other devices does not.  Furthermore, the
+memory can’t be used for page tables or granted to other Xen guests, and it
+will go away if the device is hot-unplugged.  In fact, if the PCI transport
+is used, the blob object is located in the BAR of an (emulated) device.
+There are non-PCI transports, though, so assuming that blob objects are
+located in a PCI BAR is not a good idea.
+
+The reason that pinning the objects in "device" memory is a reasonable
+approach is that the host (or backend, in the Xen case) can still migrate
+pages between device and host memory and not allocate backing store for
+pages that are never accessed.  Therefore, it is not necessary for every
+CPU access to go across the PCIe bus even for dGPUs.  Instead, if guest
+CPU accesses are much more frequent than device accesses, the memory will
+be migrated to the host side.  It’s up to the virtio-GPU backend
+implementation to make sure that this happens.  For KVM, this should be
+automatic, but for Xen, this might need additional Xen patches so that
+the backend domain is notified when pages are accessed or dirtied.
+
+[1]: https://lore.kernel.org/dri-devel/9572ba57-5552-4543-a3b0-6097520a12a3@gmail.com
+-- 
+Sincerely,
+Demi Marie Obenour (she/her/hers)
 
