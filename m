@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-36854-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07B44A21EA5
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:10:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E72DA21EB6
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:11:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E5F73A3446
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:08:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93B16169EB7
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1631EE006;
-	Wed, 29 Jan 2025 14:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1C41EEA3D;
+	Wed, 29 Jan 2025 14:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uD5toAwj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dCg1Ybt8"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31B51BCA0A;
-	Wed, 29 Jan 2025 14:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FA71C5F25;
+	Wed, 29 Jan 2025 14:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738159420; cv=none; b=fQg/eiO/N7NAy1/8UyMO8XiEVOF8WgzbF7bN7eMTtzGdp723xZ1Xj33lS5cvVUijiELIRUhKD14KmkK5djJsDjMxf0TvS8vPoMivSTGX1cP8MgXqs/sSEeXH9AZQmkfvy4qF21aIM21Wl1rZ+GvFISN4J95IwBy+u7+Xmq36Hz0=
+	t=1738159431; cv=none; b=AwliW+4Yt/WFyJLVW70c3TwkaBz1fPEESRf86GWINY8HqCcTuSPGfdawX5++hgkXauteDARKJifjZ4o7mUdi/0Goh2D5Okhgn6hRxFX5Sjsz9ySs9+DIV7zM0bpr9PK/IdDFLMzY4JW9tCOfUGrhwmaxTzEadD7qT4s8yScRHMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738159420; c=relaxed/simple;
+	s=arc-20240116; t=1738159431; c=relaxed/simple;
 	bh=h4vxqUB4hOERtsdwP43pEGBi99XkQnC4xaaefbGsTHI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a5hV09KVRxdqS+K8WoRWHBzW7mmamYAUvkpeZ3vCTIX+vaMfuapJamSYFECWoiScYt3MP/Y//PQhTGbqlFovT78S/QFUamjW/j5Dc5mDgIiZVZTUSwj/wh45zgOl/rpbHJXeDcaV97pB90a3MR7/kDZEoJck/DLIOvW/l9a9Ii4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uD5toAwj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6931C4CED1;
-	Wed, 29 Jan 2025 14:03:38 +0000 (UTC)
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W6wrkbsDgeMjSI7dr10HRJ9ZiC0PwFk7VC+fUDFCfeV/e2A2ZJ7DGe7xPYDJxte+s0gl88IPBiWxY2H1vsvjLAjjdC2S8F3QJxwvCK6cq9nykezfSjOIeuwBrNwlS9ZfvGgxKmBzzkqUwYjkyGbCE44+/2alwRwW0laEeeicGZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dCg1Ybt8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55E41C4CED1;
+	Wed, 29 Jan 2025 14:03:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738159420;
+	s=k20201202; t=1738159430;
 	bh=h4vxqUB4hOERtsdwP43pEGBi99XkQnC4xaaefbGsTHI=;
 	h=From:To:Cc:Subject:Date:From;
-	b=uD5toAwjtn7Sfcco9tcwsUb63eDHAEjBgejPC9adYvRUc2grzBsOB+WCOtHKA0b4S
-	 Q7XwnGhUFoUpARG+I7XqPkSz+Vmh5YLdhbuqBuxNOAdQK8oLvaqes3rvzEIHUucjQn
-	 BekpN9uJd5Y9Di8qDPuNSuQvXyn7ELAbsjYtdM7WjdFykhdVY4nNwxY5bPlhg6weKf
-	 GQShfYfU9Iu+04YhGUMeTbpOOcuPePcFEts+/Yj3ZREJzoDwlVDltUmxYD6dTOsywC
-	 dLGcn8Z1WbpqHcopYtavIa43o5cA3UiF3/QHUeaxBQ3D76oY/vp+RmWd63kSsWBCg9
-	 qdRGwmZHLQSlQ==
+	b=dCg1Ybt8jiaTm13HGSLvgVO21x6z7pQypJ8H+VZetCtRu0p4HlFId4RKiGBHsWdTB
+	 Gxt8PYtMBdWSlM1H9C1qftqD8DH+I43G9HfJUVFnLPwZxmf/D0V0rynFSmQM9mQ4Bj
+	 1p4aLlNsnDE5T5XsyxAVHw7NHNahKgr7I9JDXXr37B5gg1yYh1rCQ68WgardRCaM6R
+	 DqpKo7uA3Bs84i02kuw8ffc2o3U1KEjVuXXG6ZKxUqZokMsKReQ6bA8AqjbmYNpBvD
+	 bAJYiShkcezeMuL+RGxxYSCjVOZVizzV9JaAch/cNMKwR6jLrPCdgmiHrLnon8trP0
+	 lbGNMv9Jn39zg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -48,14 +48,14 @@ Cc: Ramesh Thomas <ramesh.thomas@intel.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
 	Yunxiang.Li@amd.com,
-	jgg@ziepe.ca,
 	gbayer@linux.ibm.com,
+	jgg@ziepe.ca,
 	ankita@nvidia.com,
 	bpsegal@us.ibm.com,
 	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 1/2] vfio/pci: Enable iowrite64 and ioread64 for vfio pci
-Date: Wed, 29 Jan 2025 07:59:54 -0500
-Message-Id: <20250129125958.1273172-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1] vfio/pci: Enable iowrite64 and ioread64 for vfio pci
+Date: Wed, 29 Jan 2025 08:00:05 -0500
+Message-Id: <20250129130008.1273212-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.74
+X-stable-base: Linux 6.1.127
 Content-Transfer-Encoding: 8bit
 
 From: Ramesh Thomas <ramesh.thomas@intel.com>
