@@ -1,138 +1,130 @@
-Return-Path: <kvm+bounces-36865-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36866-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90109A2202C
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 16:24:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC8B9A22072
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 16:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA4D63A71EE
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:24:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E13A7A1F85
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A008E1DDC29;
-	Wed, 29 Jan 2025 15:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DBC1DE2B6;
+	Wed, 29 Jan 2025 15:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GHsKqjCH"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E244418C31;
-	Wed, 29 Jan 2025 15:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E291487D5;
+	Wed, 29 Jan 2025 15:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738164269; cv=none; b=m6Bj6JrF1K0GIGSR/n32953HpT6Ppp3DnuomrGI4wdGXZsAbPjrnS2wR+YikoKADus3PZOSkZ+boVkS2qiryH7Z1TUg9dtiaP9judeEG/UqI06ajjmH6TxjOK5GpwdUOg9WWNznzxYU9zE6C6TlTcU4WxDHqEn02Z9nJ7xaPR70=
+	t=1738164786; cv=none; b=jN60YTITXLujqYQM/1UZ556Per2MctBUAHQIBDgKVYfhMPq5MHKiITp6gTlYTHCvmdn/R4sRChJZh3U+JmCrKfNIay68TLtnxO3tmWm/yizhDWqTz6+vFDuRdbVAz1JoIZPiKX25tt9KrLgjWKvBGfMTMq5BEwnsTn7khRqtX0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738164269; c=relaxed/simple;
-	bh=64wDy/SvJI+sTp+F1GvCexrXLQBTM82iJOEpBiCnsZM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H6pg1aw2T6oCHrg1bMI1exqzMOPCvAuT3FOGR7lE+qz2AFYaD308kRzlRrH9dnZfAzWzlQPAMeYuUFNwB2EJUS5TJt9/g751SGgh678R8I82EYMUlsHLIGapdkV5hwd4h8gjCeWvRlRRF97/0w71xVvVYJySEp+gz6D/quvg61s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E18C497;
-	Wed, 29 Jan 2025 07:24:52 -0800 (PST)
-Received: from [10.57.77.31] (unknown [10.57.77.31])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 336153F63F;
-	Wed, 29 Jan 2025 07:24:22 -0800 (PST)
-Message-ID: <c4c5bb64-bbbc-48d4-9569-c6a55e6edfb4@arm.com>
-Date: Wed, 29 Jan 2025 15:24:20 +0000
+	s=arc-20240116; t=1738164786; c=relaxed/simple;
+	bh=3uM7U4qAvpldPCOBxKRU1v43qglokdN9MY8icFjja2I=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DCCUP5AJxoWleTXnNgTmbN/tCWA4luFpLBWvbz/cLdTeu23lSmZO39TdCjZQe4uPASp8XvaUlE+I8I7U6smM1LQVODSiAGeIirEjoNh70mUZUBo5xbo9LixyCoC1fPrs1BMhEXH+U+OYiUE9XRSY6F9BLtUvU8zMGqOVXoZwsEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GHsKqjCH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26953C4CED1;
+	Wed, 29 Jan 2025 15:33:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738164786;
+	bh=3uM7U4qAvpldPCOBxKRU1v43qglokdN9MY8icFjja2I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GHsKqjCH8IcLZNdtcACkT40J7XtaHcBb4y+e64Mowj5qq+gGepeJ01FRVDMXKRH2W
+	 WWoYMNliWJSpEXwx08t5Ah4MQJ1tHzRBlNMHOv2Kw8BuNuQg0XjePbAcoOGfhvjJ3T
+	 T8GVvCGXRJKLXjxaavwQlFGIV5XN7xihtxyM44GvEmRocTHU6xAE/YLKxUUGSX42rc
+	 YFXI5FVxvzxapuJpg8pc0FlFmLWNzMnmdH+TMqgUAdUBIugFOMKr1pfJY3PsXs7m5x
+	 NtbtUkVG+WYQ91FW0upw6+eMEWD6TUR8xQtAHczdZA48cBGGExGuhuE5T+T8DoFDWm
+	 4uhZMJmGCQ63A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tdA3r-00GNF6-Kq;
+	Wed, 29 Jan 2025 15:33:03 +0000
+Date: Wed, 29 Jan 2025 15:33:02 +0000
+Message-ID: <86bjvpvdn5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org,
+	linux@armlinux.org.uk,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	mark.rutland@arm.com,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to partition the PMU
+In-Reply-To: <gsntbjvq382s.fsf@coltonlewis-kvm.c.googlers.com>
+References: <87ikpzthjk.wl-maz@kernel.org>
+	<gsntbjvq382s.fsf@coltonlewis-kvm.c.googlers.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 06/43] arm64: RME: Check for RME support at KVM init
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-7-steven.price@arm.com>
- <7271b3ff-8665-4a98-b3dd-77417f85d5e3@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <7271b3ff-8665-4a98-b3dd-77417f85d5e3@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 29/01/2025 03:57, Gavin Shan wrote:
-> On 12/13/24 1:55 AM, Steven Price wrote:
->> Query the RMI version number and check if it is a compatible version. A
->> static key is also provided to signal that a supported RMM is available.
->>
->> Functions are provided to query if a VM or VCPU is a realm (or rec)
->> which currently will always return false.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v5:
->>   * Reword "unsupported" message from "host supports" to "we want" to
->>     clarify that 'we' are the 'host'.
->> Changes since v2:
->>   * Drop return value from kvm_init_rme(), it was always 0.
->>   * Rely on the RMM return value to identify whether the RSI ABI is
->>     compatible.
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->>   arch/arm64/include/asm/kvm_host.h    |  4 ++
->>   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->>   arch/arm64/include/asm/virt.h        |  1 +
->>   arch/arm64/kvm/Makefile              |  3 +-
->>   arch/arm64/kvm/arm.c                 |  6 +++
->>   arch/arm64/kvm/rme.c                 | 50 +++++++++++++++++++++++++
->>   7 files changed, 137 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/include/asm/kvm_rme.h
->>   create mode 100644 arch/arm64/kvm/rme.c
->>
+On Tue, 28 Jan 2025 22:08:27 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> [...]
+> >> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
+> >> +
+> >> +	if (reserved_guest_counters > 0 && reserved_guest_counters < pmcr_n) {
+> >> +		cpu_pmu->hpmn = reserved_guest_counters;
+> >> +		cpu_pmu->partitioned = true;
 > 
->> +
->> +static inline bool kvm_is_realm(struct kvm *kvm)
->> +{
->> +    if (static_branch_unlikely(&kvm_rme_is_available) && kvm)
->> +        return kvm->arch.is_realm;
->> +    return false;
->> +}
->> +
+> > Isn't this going to completely explode on a kernel running at EL1?
 > 
-> kvm->arch.is_realm won't be true when kvm_rme_is_available is false.
-> It's set
-> in kvm_arch_init_vm() of PATCH[10]. So it's safe to be simplified as
-> below if
-> the changes to kvm_arch_init_vm() is slightly modified, more details can be
-> found from the comments to PATCH[10]
-> 
-> With the changes, we don't have to check kvm_rme_is_available every time.
+> Trying to access an EL2 register at EL1 can do that. I'll add the
+> appropriate hypercalls.
 
-This is true, however, kvm_rme_is_available is a static key, which means
-that the kernel uses runtime patching to change the value. So by
-checking kvm_rme_is_available this check is short-circuited and there's
-no (data) memory access.
+But what about a guest that would get passed the magic parameter? I
+think you want to prevent that too.
 
-I have to admit I've no idea whether this actually makes any practical
-difference to any benchmark but the intention was to have the minimum
-possible overhead on systems which don't have the RME hardware.
-
-Steve
-
-> static inline bool kvm_is_realm(struct kvm *kvm)
-> {
->     return (kvm && kvm->arch.is_realm);
-> }
 > 
-> Thanks,
-> Gavin
+> > Also, how does it work in an asymmetric configuration where some CPUs
+> > can satisfy the reservation, and some can't?
 > 
+> The CPUs that can't read their own value of PMCR.N below what the
+> attempted reservation is and so do not get partitioned. Nothing changes
+> for that CPU if it can't meet the reservation.
 
+That's not what I meant. The question really is:
+
+- do we want the reservation to be the number of counters reserved for
+  the host
+
+- or do we want it to be for the guest?
+
+On symmetric systems, it doesn't matter. On broken big-little systems,
+this changes everything (it has a direct impact on userspace's ability
+to use the counters).
+
+I think the design should reflect a decision on the above.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
