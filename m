@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-36857-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36858-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35C66A21EBB
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:12:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C09A21EC0
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:12:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D735416AF20
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:10:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0906E162EEE
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBB81F03CB;
-	Wed, 29 Jan 2025 14:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DA712E1CD;
+	Wed, 29 Jan 2025 14:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InlmoVu2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NBo8ZZeM"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE4212E1CD;
-	Wed, 29 Jan 2025 14:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A03314AD0D;
+	Wed, 29 Jan 2025 14:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738159446; cv=none; b=ia9GEKaVcWNGqi11LWm5JqgdUis8ZR3qxkXsNZjDosPfUZaInuNHLhvK/wXmKqEDM2NsVRwSkZPXBjvl8WqANkAdaJxtznqCrD6DO0sJLPOoY9g0mRSOACJp/ST1ljc3hIiYZq+FomNr6nH71CB9n9KYaTAqLfAsy8cV/qLp7rE=
+	t=1738159454; cv=none; b=IXmfNoVEAGHSmc3v9b72SONXm7CJH2hxNjL7WLEBIuVcYlbiY0vKncQKxXT45oDqXdHze3+6K9E5k/9JWEzMyrTKGUOPQSPcjmxq0524aF6fYFxKyK8eSol9g7EIPRSX0kArosLOFFGrB/8VYUQ0oVz0vGqSeeKMDqvLde5GqiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738159446; c=relaxed/simple;
-	bh=lSYTTN3hLoJkIAgPTbOeIJipjaPZmjsbDaNomJGGk6Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oqTY24tlF4LvAU9vO3Lkr+ritSj/LDzTFPcTtbDGa35529C9db+jbaOkf6sDnJiyN+eHwu8pFvbZ9kH1OQDseMjICKYNbmwDk5hdCCnxz3Y4X27ZETQQGHsXriUEugIkbAWHkEdBYX6lgj7YhP59+pRVfnoQC+AOtIt9aUarWpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InlmoVu2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0801CC4CED1;
-	Wed, 29 Jan 2025 14:04:03 +0000 (UTC)
+	s=arc-20240116; t=1738159454; c=relaxed/simple;
+	bh=6uHuE31SFgCh8Tk5sWIhV+CwlgPPY3qcX2ZkNicPk1M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lQfnXB/U2I6yJR7DwpVCD3yeI4sli5Sl8DZKhbvLZLalJ4KRomNytn5i4UDY0Bak44OWsdfiE1uhDUurc3dIYy5ULcFGaddm2mBlchRMo25oP2FibROlbRrkIxTqFmzI61COIs+hlsW8VfxqgVB8GnekMlpr6XRU4YwaQsmwyKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NBo8ZZeM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A81EAC4CED1;
+	Wed, 29 Jan 2025 14:04:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738159446;
-	bh=lSYTTN3hLoJkIAgPTbOeIJipjaPZmjsbDaNomJGGk6Y=;
+	s=k20201202; t=1738159454;
+	bh=6uHuE31SFgCh8Tk5sWIhV+CwlgPPY3qcX2ZkNicPk1M=;
 	h=From:To:Cc:Subject:Date:From;
-	b=InlmoVu2EcKULhE5ak463nq8CikMhKuT65xu5FFk/TFDGh1zFfRZWWiH8bYwsjr5s
-	 k7sNWmu9w38/NclCROrwCJCZKCWI/dwb02o4kSfU3vzYsLrSb/mdt5Cy3kC+vXkTzo
-	 OtEiKBgD31Ed8FBCcr2L6r734DbTJk5Dj/AtKgivueJyW4UAY1b9NcA47mxWqjJI9K
-	 5fUVx/clmrLG/rDn0T78YyFuVMPY1Euo2OR+0uCKxPLdtIE3ThA7CvSmyDnHnEDQ73
-	 wJin4cKGE+LpDo76QJxLlXlPKtrb5ygJdN4/vTV7WQgVaTX7B8Ppj89rgsCWD6Vruw
-	 scw7tR6FRrQpw==
+	b=NBo8ZZeMfKwapvBpHo2tLE1gbJv0qH4qVRcDb40Wyd8PbkNwiHSuoGt0T3rLX1v2c
+	 cWANpPkFLKiZivazf9g6wvOJbY00ON0LOr9YBYVANVjkIuKBpNk5E7qWlSrk6FpjK+
+	 HgKoJFHDtUeFrWjXtkYsytRBk09Qxz/+bYSV2dtl08rvnIT9oV9Vi7eBGuR4kAUF70
+	 DeixB1QFgbM7AUF03Ew9dnPA/vH8sGy15VCutLPA2WSSD25/PPsDFlkkjc/qsINC+C
+	 upBWYT+qCHqeSPOPduLUb3X3+PgjnmE3cr+FQAbtW3vKfe96YPUVBu7iRxlDxrsESY
+	 vHZ8LD6uE2gnw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -47,15 +47,15 @@ Cc: Ramesh Thomas <ramesh.thomas@intel.com>,
 	Jason Gunthorpe <jgg@nvidia.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	Yunxiang.Li@amd.com,
 	jgg@ziepe.ca,
+	Yunxiang.Li@amd.com,
 	gbayer@linux.ibm.com,
 	bpsegal@us.ibm.com,
 	ankita@nvidia.com,
 	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10] vfio/pci: Enable iowrite64 and ioread64 for vfio pci
-Date: Wed, 29 Jan 2025 08:00:20 -0500
-Message-Id: <20250129130024.1273272-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4] vfio/pci: Enable iowrite64 and ioread64 for vfio pci
+Date: Wed, 29 Jan 2025 08:00:29 -0500
+Message-Id: <20250129130031.1273301-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.233
+X-stable-base: Linux 5.4.289
 Content-Transfer-Encoding: 8bit
 
 From: Ramesh Thomas <ramesh.thomas@intel.com>
@@ -98,7 +98,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index a0b5fc8e46f4d..fdcc9dca14ca9 100644
+index 83f81d24df78e..94e3fb9f42243 100644
 --- a/drivers/vfio/pci/vfio_pci_rdwr.c
 +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
 @@ -16,6 +16,7 @@
