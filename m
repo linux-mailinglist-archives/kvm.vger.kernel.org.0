@@ -1,144 +1,178 @@
-Return-Path: <kvm+bounces-36890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD1A9A225A4
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 22:27:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E62F4A226BC
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 00:07:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 417B51671F1
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 21:27:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55306163FCA
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 23:07:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C43F21E3DC9;
-	Wed, 29 Jan 2025 21:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD611B415F;
+	Wed, 29 Jan 2025 23:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j2TLc2M6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W67kCPEP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE181E25EC
-	for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 21:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB85A19F487
+	for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 23:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738186026; cv=none; b=mkzdAvMBFEI/J+WNrxvBvR/zqYgUAZ7EX6PD7WUWepmG7pgFPz7IzPe8jfqz7XWcYlJ6Otb9mzb08B811HlsS0InHQ1WJLt6wgTv3osB5UKeEdrYsMVMNqo1YOpdPxPpzY8wOAAYjdztwC0sf37/PYG6YnpPxkRBo+qXop4niGg=
+	t=1738192022; cv=none; b=r8E85FXX+lXSUXO4BK/tgLniDdhaOVptxxBRYxI3Frimy756UZZfttN/ggnkFPI+f5b5e0QCUouilsjNn5p8qCOAMUuhctMJbf0seFJy4o1+EVM3Fqo/Ap/tsEmEN/cemT7LV2TJbPZ3X8aoVdY4BMqte/QEJ0dTAD1ZAs82O7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738186026; c=relaxed/simple;
-	bh=nN9FJWNplkIKmzFXRfsaSEmbobI8sxtet+92PBTyajw=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=KXM1N+9aQ9v5r7YsTX/euOJXHCI2A0x+drub7+0NytI8AfysoFl9xLjH4jFwbpuAZjhqOIoPgWORwCd8QuPxYZRvt2t3lw+t3E4HBaCKRSZKpE4ZdKzh0RY1TK6Ul1fNl7WwM1ogJwHq/X459iRgc6Z9XbzsZoDZ+PGjZyOM+4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j2TLc2M6; arc=none smtp.client-ip=209.85.166.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3cfba354f79so3364015ab.1
-        for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 13:27:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738186023; x=1738790823; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=f5TFKrdlu748ABqlHsuP9NDv0QkMzFjiUtwaLrqTFf0=;
-        b=j2TLc2M6wiZkJPGU8C8uY4tI4Z9NJS3opsqH5b73tdH9/aaID2ov46WOKFTWGnSDS9
-         7pW82iJdU2kGqOBmvitgQ2H1h4w51wmEEL7xzk9D05lxaXP84sgqzUGXku0rlfHy5v69
-         q0Np7iakn8a9BM+eH4m7w47B3mhc5vcTDblsfBGcEhi7Dmh/lSjTEEuwDXK6PegJThUQ
-         VvWkZZsIPLM2QuRnZG8JNq1WMZLa4poU4NU8ANNwLs/YK6LK4P5CUwjzUJ337VvOUxsA
-         X0GK1TdhYP/8B2BmiAY1Im5f/NDG75K0UTdNCQI+kRdce27XooYIixa48SZzLIzkV+Cm
-         cT+A==
+	s=arc-20240116; t=1738192022; c=relaxed/simple;
+	bh=zUh44u3xHyFvSH3tS0Wr7/FzaJHez2vFFdMcDL88fsI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PvWtd4r5gAOSj0sjYlZE4zjWQGMb6pHtwElNatJfvO9dVhPbt4sgOJ6PV0vbGcRA794UPdL0o6e/WigubwoX7iFRR3gLHD3Lb/KE1Oibi3MkYtvFLznn2E4YXwuswqsY3UcHdA7wd0u1urWQJVQy1OVGc3SV49bq4MuZrYJnKjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W67kCPEP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738192018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KyHbZ+Pwxh06r8uU1Lo24oDU5q1mx0zS6wBE1H4R6WI=;
+	b=W67kCPEP/yZdGQkg2Gmrl9fEB9XzKOwBLbXJIhk9Os0f8qMBtek1zkD+XA3iOhMuAILlXy
+	h5sFNKx82O7x8WknJ+ZIrHqIybOeMf/bWPFVfaUdNZITyiXPkFAhrnVPlzBVWZev9OrVq7
+	wApN7rU+ttxP4aRYg4qNTUcvfbOqfEk=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-146-kSkj4AOTPfq4uDKZoOG68Q-1; Wed, 29 Jan 2025 18:06:57 -0500
+X-MC-Unique: kSkj4AOTPfq4uDKZoOG68Q-1
+X-Mimecast-MFC-AGG-ID: kSkj4AOTPfq4uDKZoOG68Q
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2efa0eb9dacso268352a91.1
+        for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 15:06:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738186023; x=1738790823;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1738192016; x=1738796816;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f5TFKrdlu748ABqlHsuP9NDv0QkMzFjiUtwaLrqTFf0=;
-        b=Qf+frLyjausGczQ7pzD2lFtDAlvIUONiTsvKNB/cSlpWYHkhSjGHICYKbuJ7XaNXif
-         fxdSj8KHz8NIRPMuQOYGBpcueqgevPJ8lISAyeX3qUKmB6LWB1BlmzPHfT/KTr6/j1sP
-         m1ZtbvFWOs4BnqoRIvCG3hLdG+5GCtFwfPoCtYDFiXIEUwsEGQ1DOCkzlf9yPiOe8G3D
-         CLycgPf7bSgOTxDuX65ZihY9oOEoM62yQIkr8WQNVD9UA+959NhN2kJaswesOx5+0kly
-         lyWm3FU4jjLIIj7omT133rT/S2EO3By+6EUNPmRVp/HqAsHXmnDP/iRP08BZA7uKN92o
-         87sg==
-X-Gm-Message-State: AOJu0YyYOP5Gb1FLH8bVRQLCSiImYX0CqJfsrTLb28tlaj2864KReoVd
-	NbFNRAwBtuU84W/IDv7x+XeWDlcHJ9XX09GY+lnmOyhzPTAoX13StJQbA/a64o/87a45EMkH/Cm
-	XgCwN0oHiQG3WdovXu5RgYA==
-X-Google-Smtp-Source: AGHT+IEe9UoVLvNSaHlSkXBd6Ho5IN4ChMz7y7gjFQYGYFiTLbvYP7nErowhtJVcYSVDfJu2qMuLzToHlUCNsQ59Ig==
-X-Received: from ilbbb15.prod.google.com ([2002:a05:6e02:f:b0:3ce:69d1:ce53])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6e02:20cd:b0:3a7:66e0:a98a with SMTP id e9e14a558f8ab-3cffe3d1e48mr43753655ab.9.1738186023704;
- Wed, 29 Jan 2025 13:27:03 -0800 (PST)
-Date: Wed, 29 Jan 2025 21:27:03 +0000
-In-Reply-To: <86bjvpvdn5.wl-maz@kernel.org> (message from Marc Zyngier on Wed,
- 29 Jan 2025 15:33:02 +0000)
+        bh=KyHbZ+Pwxh06r8uU1Lo24oDU5q1mx0zS6wBE1H4R6WI=;
+        b=JzAjoH+D6Rb3U3BXhQcdCWS7vmRHPajNk6c1CRZdU9XfMqyjRHviVtYW3ysDMTMzmA
+         4gvECp80gb4iHgWvQjcBCq+K1Fk4QVyOb/0OzZ82m1poa0ssLwa7lbOqN0YOhuWuvOMA
+         WxMOY28URmuInBPBfgMcn1Dspp18X+3NXUtZC7sHthQtMoOrYoWKHqBlFlPbH5IcD5bb
+         Bzi3TViSziWL91yH5G8Ic6UIIj1qeZmh87NT8rS06LnNcYEjMGh1L0m5K0+sxr2K2Nfv
+         JhEGhyC79697LtTnx41EmL9Fbb8yV/l62D8uSQojwZYwlOLOL1YBzMF+dE7ln1wihjoF
+         7eJA==
+X-Forwarded-Encrypted: i=1; AJvYcCXFc6kUX2C+LQ0mzym5TbyJMvvoiHlTypilboPFZlN3VXBRsXd7DriXuxeWnnwlpQWxOsw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdPAxrFtH6RaPY4q5MdXVAN2dZQloMeLCXWKK3IYtkee19ysCD
+	Wg2Ta0Sm9JJnYoW+FQQrEWpNvm17Y5pr9w+hHYDlpqeXTZeh0x3Sb2OpLhhf9e5zze1flLgkA1z
+	ixAz+l/E7AxwxRRpTy5tO04QZEr/WlYNLrndRx1onHjJs6hlIOg==
+X-Gm-Gg: ASbGnctANAKp8Ul+9jLgVB4deX7PbVEDQu7TbJo1wdtsGO1GZAllVXz/vQ0iqHVN+KK
+	qMiXN6W4OPXdl2IORK55SfBOUlRwJ0s60LcSnZK+/xYvV5K6VPGOiPQowjA6v76Bcom9xUdD9o1
+	Cl12c98dgVAcQYgKybTJQfeTQyfwB05iDRSvG6HpoDqPuzMFFtVdiY/aXwMttC92XA4qAqiLjBN
+	r0v99ALxI+1xseED1Jwv+aUxoWR5egfkwvWxpJP90KXvMlNXmgGPJtM1CI2GdHgaxf7TyOarcKR
+	AjR3fw==
+X-Received: by 2002:a05:6a00:1396:b0:725:db34:6a7d with SMTP id d2e1a72fcca58-72fd0c7c6c5mr7442931b3a.23.1738192016162;
+        Wed, 29 Jan 2025 15:06:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHK+GFtKGuVAzhj66wtlYDvlWWvG3WVubkOllbBq8t3Ltf+GMVUhA51a8pFaMKDNQBYDvAy4Q==
+X-Received: by 2002:a05:6a00:1396:b0:725:db34:6a7d with SMTP id d2e1a72fcca58-72fd0c7c6c5mr7442904b3a.23.1738192015836;
+        Wed, 29 Jan 2025 15:06:55 -0800 (PST)
+Received: from [192.168.68.55] ([180.233.125.64])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe631bfb0sm30521b3a.23.2025.01.29.15.06.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jan 2025 15:06:55 -0800 (PST)
+Message-ID: <dcb08082-4048-4573-9dd4-bf3b81a06bb9@redhat.com>
+Date: Thu, 30 Jan 2025 09:06:47 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsntzfj91fbs.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [RFC PATCH 1/4] perf: arm_pmuv3: Introduce module param to
- partition the PMU
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, linux@armlinux.org.uk, catalin.marinas@arm.com, 
-	will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
-	pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 11/43] arm64: RME: RTT tear down
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20241212155610.76522-1-steven.price@arm.com>
+ <20241212155610.76522-12-steven.price@arm.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20241212155610.76522-12-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Marc Zyngier <maz@kernel.org> writes:
+On 12/13/24 1:55 AM, Steven Price wrote:
+> The RMM owns the stage 2 page tables for a realm, and KVM must request
+> that the RMM creates/destroys entries as necessary. The physical pages
+> to store the page tables are delegated to the realm as required, and can
+> be undelegated when no longer used.
+> 
+> Creating new RTTs is the easy part, tearing down is a little more
+> tricky. The result of realm_rtt_destroy() can be used to effectively
+> walk the tree and destroy the entries (undelegating pages that were
+> given to the realm).
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+> Changes since v5:
+>   * Rename some RME_xxx defines to do with page sizes as RMM_xxx - they are
+>     a property of the RMM specification not the RME architecture.
+> Changes since v2:
+>   * Moved {alloc,free}_delegated_page() and ensure_spare_page() to a
+>     later patch when they are actually used.
+>   * Some simplifications now rmi_xxx() functions allow NULL as an output
+>     parameter.
+>   * Improved comments and code layout.
+> ---
+>   arch/arm64/include/asm/kvm_rme.h |  19 ++++++
+>   arch/arm64/kvm/mmu.c             |   6 +-
+>   arch/arm64/kvm/rme.c             | 112 +++++++++++++++++++++++++++++++
+>   3 files changed, 134 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index 209cd99f03dd..32bdedf1d866 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -71,5 +71,24 @@ u32 kvm_realm_ipa_limit(void);
+>   int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>   int kvm_init_realm_vm(struct kvm *kvm);
+>   void kvm_destroy_realm(struct kvm *kvm);
+> +void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
+> +
+> +#define RMM_RTT_BLOCK_LEVEL	2
+> +#define RMM_RTT_MAX_LEVEL	3
+> +
+> +#define RMM_PAGE_SHIFT		12
+> +#define RMM_PAGE_SIZE		BIT(RMM_PAGE_SHIFT)
+> +/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
+> +#define RMM_RTT_LEVEL_SHIFT(l)	\
+> +	((RMM_PAGE_SHIFT - 3) * (4 - (l)) + 3)
+> +#define RMM_L2_BLOCK_SIZE	BIT(RMM_RTT_LEVEL_SHIFT(2))
+> +
+> +static inline unsigned long rme_rtt_level_mapsize(int level)
+> +{
+> +	if (WARN_ON(level > RMM_RTT_MAX_LEVEL))
+> +		return RMM_PAGE_SIZE;
+> +
+> +	return (1UL << RMM_RTT_LEVEL_SHIFT(level));
+> +}
+>   
+>   #endif
 
-> On Tue, 28 Jan 2025 22:08:27 +0000,
-> Colton Lewis <coltonlewis@google.com> wrote:
+All those definitions can be moved to rme.c since they're only used in rme.c
 
->> >> +	bitmap_set(cpu_pmu->cntr_mask, 0, pmcr_n);
->> >> +
->> >> +	if (reserved_guest_counters > 0 && reserved_guest_counters <  
->> pmcr_n) {
->> >> +		cpu_pmu->hpmn = reserved_guest_counters;
->> >> +		cpu_pmu->partitioned = true;
+Thanks,
+Gavin
 
->> > Isn't this going to completely explode on a kernel running at EL1?
-
->> Trying to access an EL2 register at EL1 can do that. I'll add the
->> appropriate hypercalls.
-
-> But what about a guest that would get passed the magic parameter? I
-> think you want to prevent that too.
-
-That doesn't matter because the ARM manual states that when HPMN is set,
-reads of PMCR.N from EL1 have that value and I've made sure in the
-second patch KVM does that, so a guest believes it has a system where
-reserved_guest_counters/HPMN == PMCR.N so there is no partition.
-
-
->> > Also, how does it work in an asymmetric configuration where some CPUs
->> > can satisfy the reservation, and some can't?
-
->> The CPUs that can't read their own value of PMCR.N below what the
->> attempted reservation is and so do not get partitioned. Nothing changes
->> for that CPU if it can't meet the reservation.
-
-> That's not what I meant. The question really is:
-
-> - do we want the reservation to be the number of counters reserved for
->    the host
-
-> - or do we want it to be for the guest?
-
-> On symmetric systems, it doesn't matter. On broken big-little systems,
-> this changes everything (it has a direct impact on userspace's ability
-> to use the counters).
-
-> I think the design should reflect a decision on the above.
-
-As currently written and reflected in the name reserved_guest_counters
-this series is making a reservation for the guest.
-
-After talking with Oliver it probably makes more sense to make a
-reservation for the host. This is closer to the semantics of the
-underlying CPU feature.
-
-In the limit case it's impossible to leave the host without
-counters. All valid values for HPMN leave the host at least 1, but
-should we make any guarantees beyond that?
 
