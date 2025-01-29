@@ -1,338 +1,222 @@
-Return-Path: <kvm+bounces-36862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36863-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1268A21FCB
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:55:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D62DA21FD2
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 15:58:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE6EA3A54F3
-	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:55:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB34A3A59DD
+	for <lists+kvm@lfdr.de>; Wed, 29 Jan 2025 14:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528BC1C5F2E;
-	Wed, 29 Jan 2025 14:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B4A1D90B1;
+	Wed, 29 Jan 2025 14:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O0xsJd4l"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dHyutCl7"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2045.outbound.protection.outlook.com [40.107.243.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4331B422F
-	for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 14:55:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738162537; cv=none; b=TXcs8cbmfbsxCrEi7zNlbvQVoDgzJVe/ynaHcym0Gpqd94/ySZMINoEONivQYyWqjdrYOrrIU6/PuGjkG0HZ07+Ah3yf1qYbhDCEq9pTcSIZP3Tb1AXleVwfI4XMbseekd9w1moFZzOB8my41Dln23lpCG8ojp+Iqy2j44srsYA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738162537; c=relaxed/simple;
-	bh=OpvV2FRBoOXqoYVkx9trWaePyZ9bhhy3z7ClzhbzshA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rTdeVTOvUOuz2XxhTG61r9nxJz/dYZOusgdAOeygb8UF7dSJrvcfujhQ7OXEPWrPkEGaxzO2/nxZ0CnLmoWTdWa4vLGEKV00DUNaQlQate9nf7W4Hf5HMTLffasIJHxBmWlmc2Hy58XjjF6+u3q07BQH7Xl8orDwkJCJo9LwXmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O0xsJd4l; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738162534;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gmrRKA0ChyO0vLu9JTiC5ZPpN5pGEUANDOxIesc4B2Q=;
-	b=O0xsJd4lt5H2Gy23b53vPImfXomm/B4tyBd+XMVnOIUP1FW+mTfG7hvr6mx3YOXmic2oSU
-	EuZ5TJGEHw6OSZAgRCZOsWQe/58Bpk1Xy9IlZQNmwOxp5NV1AqwXJ+Ud16ynuB0v77RY4H
-	6yRz/wD7RTjCv2da3xzfbAdvtA3De7A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-462-LKn2lv1dNeWyXJhRoiEbzA-1; Wed, 29 Jan 2025 09:55:33 -0500
-X-MC-Unique: LKn2lv1dNeWyXJhRoiEbzA-1
-X-Mimecast-MFC-AGG-ID: LKn2lv1dNeWyXJhRoiEbzA
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38a684a0971so3162765f8f.2
-        for <kvm@vger.kernel.org>; Wed, 29 Jan 2025 06:55:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738162532; x=1738767332;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gmrRKA0ChyO0vLu9JTiC5ZPpN5pGEUANDOxIesc4B2Q=;
-        b=PG30Wc/tiUFpsZ0sn6YwnAIV1NXqaV2cndoNmGgERjTtETN0o0xYBzVJbc1Bf5VryF
-         mRoBanRaisenczLFLf9xVyT8LwQmj65ThNBigZ927BVSKqeePXP7Ul1BPbnN0js6HIqx
-         mIX1hU1OuSS06NXv+3J3KMXjRhoa0gSmaiWcKc8UL6E9eKcQt7Y5EYJnDiBersy/0Uwp
-         1qLmW0h0QhaxFtukCeZS4X7ZCfWJHvdPCwrFTS8/AmwWGMNtry4HvpBZnUP0z3ltooZi
-         S44aLA/T8Uc7H6bC3LtpdMY8ybqORow6fIgJWT7nALGEJU7igGMGpih3n8V3h9oz0K0q
-         Avsw==
-X-Forwarded-Encrypted: i=1; AJvYcCWIbW3rBZQIpq3BPZgFgzFjjG1v/0knPfSnR19IR7BjrHpNhDuMveFqS3jgbyQAOigT1uM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxzUkqGv8xNkDAxXL7vbZUMkRfWZBWO+Zk+aXWUQOWFeW5j9tw
-	hfV9e3LAqw2HGoqsvZvtujih8E/ltR3coHLRDIYS0ZU/obzDAQWRgAq0ZKhQin5WyEa0gygwbBO
-	5lQwZn1wf4rF0h/rZlwltm/MbuScZXIlE16/Ewa8DZ0zTY2XDmw==
-X-Gm-Gg: ASbGncsxKhUMsxZ5HlDqAEh/Y8y3ePiUzrW0lj/Cr0i64+rJxBoztkid3MgNT+b6PLu
-	PyPCLT2at8bHxMSOqTKgnlk2Hehq2ICWLMmX8mhxk1seg+1Svh8Iu0A+n7Yq5zbUWwUugqg6vYK
-	E53ytBe0fhTC38W2JPMiBYDFMmEsdJJm68FhhvzoiM7EtNY4Nww81IX3XRw5lfx5NQHNP3p6SGv
-	1xGnrwUI0hclhFchVfyE8r+IpUciC/2MfBad5c/07cy5bfdB+q1kE4GIpWkd1gLuoc9i63T4j8c
-	KQPOp8j9ZdH+VJkPc7Cm09BeQEUqs04dbHFmOScM220rBVcfV/c3
-X-Received: by 2002:a05:6000:1788:b0:38b:e32a:10aa with SMTP id ffacd0b85a97d-38c51949fbamr3141506f8f.5.1738162532009;
-        Wed, 29 Jan 2025 06:55:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHYY802k1TNGiUZEBvWD3euMsSo6t1SQYXX3//x/iaE/8GbMeWVCUlbIuRNN6C4/ug0ihsZow==
-X-Received: by 2002:a05:6000:1788:b0:38b:e32a:10aa with SMTP id ffacd0b85a97d-38c51949fbamr3141484f8f.5.1738162531533;
-        Wed, 29 Jan 2025 06:55:31 -0800 (PST)
-Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1bad16sm17727837f8f.68.2025.01.29.06.55.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 06:55:31 -0800 (PST)
-Date: Wed, 29 Jan 2025 15:55:30 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Shiju Jose <shiju.jose@huawei.com>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org, Ani Sinha
- <anisinha@redhat.com>, Dongjiu Geng <gengdongjiu1@gmail.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 08/13] acpi/ghes: Cleanup the code which gets ghes
- ged state
-Message-ID: <20250129155530.29455d45@imammedo.users.ipa.redhat.com>
-In-Reply-To: <f40cacd977b9eae69a5b0091d3e7a2746b2892be.1738137123.git.mchehab+huawei@kernel.org>
-References: <cover.1738137123.git.mchehab+huawei@kernel.org>
-	<f40cacd977b9eae69a5b0091d3e7a2746b2892be.1738137123.git.mchehab+huawei@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2099E7E9;
+	Wed, 29 Jan 2025 14:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738162690; cv=fail; b=lA6K07W1T0/hhTajF1lAnpJCMtYLStiy5MP1/TzpUBiXvCSqL4pTqXxxI3lmQNDzSd5UvOemq+P0uejFwtqzNfJlRycZWxxOl7ZQa+c6teDSJnKHoZg5dIP8ryxoO0TwtRzP5xsr8D6PFk12LUvJlIqPKYJR30y0S5CjOROyj50=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738162690; c=relaxed/simple;
+	bh=cXDK4OpvtytR0NSKUbv7VbXxMkdl8ZIpAhRyKDoHvJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=MaLMlwz9QGg7/U+9vGYpob9QMfAwi5Rj2VSHWR0VGuoxJhysgEqkx/0DLcGy1ktsP4A/o9sZ+bVK0Z/jeWUfeLr58MUMQZCXGUE4nUadtVyA8ikeC0bvFWqP4hq2r9WIZnkrL7MASErdGpDV1nEhzuELTrzxzqIa1KcI/qCCGmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dHyutCl7; arc=fail smtp.client-ip=40.107.243.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lJVGJg02uB+iA45SHbNTJhfSmdK3gOpv79GrWNT65M5Lb5N1zqtlapGXoXx6V8BAKc7TpsRAw509XMu8MOYBXx5H6Y3Vfa/5S0BwfQaeuD45SoYcOhSJxnBpbdenZO5f/TMNnN4vbkBwUgS1n0JHbNMeR1jT94VMl799bb5ProFdz+/YAbk7wl1kgbNL929pD+iATWL72XjppLZ4Pj2qxeeXjSwC6ZLl1hDZe2w+YlXQwzg3llULJWf6CVj3ZA15UlnV5Z0yA9jB4sekVqSJ3TDNdJpQ5Zqy1I3Jfb8qslV42/LL7JCR4PYPusS+uRz/89b2EGU8wfoQXo4wSyHI9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jFQ89FOWChVF28LHSvaVAzztV0S8z2Xh7koKtCjF0Ug=;
+ b=hrTCAraD7n+qn82AWy3gqo+tyULGYKk6/VggqlhjlEecW9a2vTmobAFvOKkFt/npXGsUoPhrZOevCZ5jLsboCnqZVp5EivWQoeTogzsjUe20G/YZmnt3Q5N7b7bZp4itmZkZcYIMwvGzpZPdbQbRdR0zSJdRq93T2Ovijlw0+WcG4TxkSM9wfHDxD+8gZ5nbN8/o7rKxRCVQbPteGErtmiBsQaBlKSTegrjpDY+cO484DfoZUYY0YxeimnfjRJIy4Bj7slMC+d++51glMUOtAw0qewIKY0SvZ2Q91qgr3q65FBB1Pf3DeGvH2fzABUyQeYFsGKohjlE0wqkOxyrwGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jFQ89FOWChVF28LHSvaVAzztV0S8z2Xh7koKtCjF0Ug=;
+ b=dHyutCl7Qt40P2hliL+Wn6ShiHj/MEhODcsKjsy59NNwVB4lpKa6lB86O3+A32touacIv0a3++sL5/JUEjYrPWQUdH/1gTmYPRWRPQ6yG+HMI9AaEnS3Auh3WfvBjMeKOY/8TlxbV1Xc4I/uK2bmZjVFi45DsBznM2yPQPyUGet8H2VRjZBDaoLrkx/N8gPVlJgPp5cOODN1kQ54uLs0D0S/iY83ZxS/lgutBYgNgN8iFtgr7yAOUALb8pytf5L05XrICpgxhMt3CCevImFEDOdvay6IW3kEFg5sqrxzY/af8bGyCs1GH8m4gs/6WbxFwi+eJZ9OTn558Z7EeVZzBw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by MW4PR12MB5601.namprd12.prod.outlook.com (2603:10b6:303:168::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.18; Wed, 29 Jan
+ 2025 14:58:01 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%5]) with mapi id 15.20.8377.021; Wed, 29 Jan 2025
+ 14:58:01 +0000
+Date: Wed, 29 Jan 2025 10:58:00 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Nicolin Chen <nicolinc@nvidia.com>, will@kernel.org,
+	robin.murphy@arm.com, kevin.tian@intel.com, tglx@linutronix.de,
+	maz@kernel.org, alex.williamson@redhat.com, joro@8bytes.org,
+	shuah@kernel.org, reinette.chatre@intel.com, yebin10@huawei.com,
+	apatel@ventanamicro.com, shivamurthy.shastri@linutronix.de,
+	bhelgaas@google.com, anna-maria@linutronix.de, yury.norov@gmail.com,
+	nipun.gupta@amd.com, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	patches@lists.linux.dev, jean-philippe@linaro.org, mdf@kernel.org,
+	mshavit@google.com, shameerali.kolothum.thodi@huawei.com,
+	smostafa@google.com, ddutile@redhat.com
+Subject: Re: [PATCH RFCv2 09/13] iommufd: Add IOMMU_OPTION_SW_MSI_START/SIZE
+ ioctls
+Message-ID: <20250129145800.GG5556@nvidia.com>
+References: <cover.1736550979.git.nicolinc@nvidia.com>
+ <d3cb1694e07be0e214dc44dcb2cb74f014606560.1736550979.git.nicolinc@nvidia.com>
+ <0521187e-c511-4ab1-9ffa-be2be8eacd04@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0521187e-c511-4ab1-9ffa-be2be8eacd04@redhat.com>
+X-ClientProxiedBy: BN9PR03CA0806.namprd03.prod.outlook.com
+ (2603:10b6:408:13f::31) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MW4PR12MB5601:EE_
+X-MS-Office365-Filtering-Correlation-Id: fcf25d85-daa1-4a0d-c845-08dd40755373
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?jWOzK87M1b8cwsfukvz8O1tG1WcANaKIXhn+tACyQMeBL3PdHGDm5nP9kUWJ?=
+ =?us-ascii?Q?ajpMCNe4mxSHuJKeSkn8LCTDKQ4hS3ADDvYQxOUOwFzVxoBqkwyGU5KHTR9I?=
+ =?us-ascii?Q?3b5VwdGaok5YQXhLxLzOd64Dj3CiEz6/sdFBbTbjOXN7yDYz2N5AjdgfBqvG?=
+ =?us-ascii?Q?fTjpuZZYpSyWFTh1Zg6qzzrv8evpAbyLHrOkUrMGbjUUu3cO+zQcxddbNSjL?=
+ =?us-ascii?Q?YTZ6RhJ13b2EOdL5dpaY9xhwOiKUQJDxo7k1WdyigHPK409aXrY6AXI0L2wx?=
+ =?us-ascii?Q?jzCxh2jgRu/E3Bn2JCZqWWh+xD5gcQGcFyf6yyzMiE29Fn/6urW+yLgjE8mu?=
+ =?us-ascii?Q?z5TipyLS97EOmRo82cX0/HvW0ugNaqU4tjD83u+rTDJN8C966evZbsoDJRBF?=
+ =?us-ascii?Q?WX4+a3E5G6dpJN8xdT6KkuA2apRhVxlN7uGyr1UpfmHAEO2QXApnpsmWmAAq?=
+ =?us-ascii?Q?K8OM1Ku0Ac5kekMSrNP7f/M1vSVB6/INU0ADRBLo87Uh2i0D6uZ5pH4mFH3Y?=
+ =?us-ascii?Q?vU4cJse5wU1oQ/dDlltfwXOK5lRnUIYkI8wDgXlPiwDT1kSK/TPT/HZxZdv9?=
+ =?us-ascii?Q?pfK7IjmunC7kzWiIvEgAuTjKis6kmtn9TCZvsP4b28A+s75TLoOOTvPbqZoq?=
+ =?us-ascii?Q?Q93vC/RHDpYoDTbounlt0Ghm2zTtaL6OtF0q/XCO5dti2SiILB9fPwvdaiO7?=
+ =?us-ascii?Q?cuE+XBjHN4MTIsQcc48tjBwXqPgfQdUg9HDh/3/er0aVPtZqSegw4txM8uNv?=
+ =?us-ascii?Q?eRnz/pWRhCX/LolKkcGaU2KkPiYwvmqsTwZmHAeKaTSpQzTH+bkD8/L+ma0Q?=
+ =?us-ascii?Q?0sdJf3eER3+PF/DZt0QrRk9UFMpHrptAJRYnFfya42b3yfOFCV+3Csg1YzgE?=
+ =?us-ascii?Q?WKPb9boNbt8L6e7bspcU36XbWnAEJH/SkgHTJdh3FH3daYWo+ko7K0erMWe6?=
+ =?us-ascii?Q?kLQvMeY28VpwO9XUR/XXREZ7aoC8xqf8VjF6AYf3G1ijtfp0JmdsNMpnEo3v?=
+ =?us-ascii?Q?8zaC5mjqFUwpDedgFo0tIHopdcG/m8onLfYWo83LU8Nd+0fzrlRBsqdl4os4?=
+ =?us-ascii?Q?8UIUFWrxaEe6j50q3uggDE3+DfUVFPPApB6/ICTxleU6bk3SEjEUt+1v9I2Y?=
+ =?us-ascii?Q?QbsXPZnGMCchagwqk16iaLjKWaf1jFC9aIeOZAkqPx/hnU9XO9YN9tZD+iIj?=
+ =?us-ascii?Q?DA58fLO5Iva0kizYPB/dGLDQRxbZjrv5qw5gJ7rgOBbkBz+i5PCBfYrAlk3q?=
+ =?us-ascii?Q?sszK7AvsswWGA9HKsIjaP0+pM3kXeCA6Fbyv8Ixp6ch06S+0YugPewrldquH?=
+ =?us-ascii?Q?bEtI5+LnSLWwVQzJ0Lm/DESUwn9xQZ6fVnGKh3NpZM05atFjaOFtEFum81vX?=
+ =?us-ascii?Q?T+lzJwlutOFtCAq0Sz2BE9+RoPfQ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?CCra0dnOUWz8CQxc81GkR2kfQ1Q2PZTUd1O6+0p4+IZRtXBbvUxz8Oy0RObf?=
+ =?us-ascii?Q?Gr8i8RXOBuOw7dzEV5RIy+4RIn480EaFceU41r9p453/hhnNLdlHn4nuXnY1?=
+ =?us-ascii?Q?uy5q/Mny/nc8vWRqJf1VAXmZ3/6zAD+GdF86KuLOVdKQ1TKmKKmq2E6Pi9vD?=
+ =?us-ascii?Q?qOeWWEob3BxrOJ3oM7m0z4ox4oDAVS8BibjIBPL9/RAYUvBP466II7N57ajO?=
+ =?us-ascii?Q?T4/5tdwgwVGk0ueGQd9gv1JfGnzOF4BjelWELCRjqIREsGER8l5zTPZPEaON?=
+ =?us-ascii?Q?G5SC6O0urnfT3o3oTD2pR7Ac+IIOTCOE9wQMguKBVtuJ5cZ0SXr3nv95RuuI?=
+ =?us-ascii?Q?uRc/sQRcHozJxrDsKt2mnHm7jFcsUDXoDIUn+406GOo7NKH8ZDeIhzSQS/fe?=
+ =?us-ascii?Q?zr69t16CpD2IkT+5UL3nCYigvVE1sgYiHOX1ZarQqAVW72MxeZ1lRR3m90H2?=
+ =?us-ascii?Q?wHKheeO38ymRxbsbUMHUQEP1lYYikZFV1QknKZhHSlWVe6ci5yo4Hh16gTm8?=
+ =?us-ascii?Q?8df5xFD4JtMwjUPldtiNbvngRPr/MwvHQxg5BU+zDt351CTBBq3Ym76mIukK?=
+ =?us-ascii?Q?SbnZODE68oGbeMC31hvKq9g2yId6VcBpm5tTVmNiw64O9RmP6csx4Mx1dr7z?=
+ =?us-ascii?Q?84WMJ7fOM2oytD1YFhZ5jcAA3v4O17d4UMCfOzJ7jz/AANjD9F3jUBhJ71bq?=
+ =?us-ascii?Q?UaCnF8/x4BrdsJsWYdXd2yrptytv0KI89+CF4qx3KnyIPkI2gB9l8B3W/8jB?=
+ =?us-ascii?Q?c11dN12whaNOaQsdOjZZ35irJsSaNWqYFEujXna950JmxVxVJu5l55D0SpA3?=
+ =?us-ascii?Q?Zfz4QbCfIWCzkL7d2dtuF9h+tj+8TeIB5ZwNvWiHlHzGLA3Hk8DjvxgbxdCB?=
+ =?us-ascii?Q?SIfqLJ+KjkxlfQ5wC2gXvkkJxMrNtdsEfO/6AYIjhPb18ya5lKzrV2D84GV3?=
+ =?us-ascii?Q?2/kugnGPr9I5FB+jHX8GwOBmy2yeloXej+L9GSVRz1WPszGs7atPEvzOR6Ek?=
+ =?us-ascii?Q?VorGPy5lze3KI0jBqAkWddmENIIEa4UtHdbnyKF8j2UIqJf4vRoqkH5WX1kH?=
+ =?us-ascii?Q?T2846m934TKDJe+/z8G+qpwKsTo4GFyC7JQdPkAA6v+eQeNEd7jNRiTRsed7?=
+ =?us-ascii?Q?cATvH/8kZqLYOArK2bCKkLjD7kZQ3WkJkJMEK7kijZJVbPc7PfCqAY/O+F4f?=
+ =?us-ascii?Q?B2QebJOdLI+6BX6kPixnLm8m3iYvcy5bdFmIuexvXMXMiQRNqIz3t/i3ceW/?=
+ =?us-ascii?Q?CYBsjR6L97NrMfLd0keSHI6tkVz29Xx6wLBa+Lo9W72ceMcqj9IPg4weWqHw?=
+ =?us-ascii?Q?ZawN9A/ynNpND3XHNCVyGctXIN3nqJWMWL/aZaKkg9WmLXV8R/tbVIK1W56j?=
+ =?us-ascii?Q?ZxkbQDlLVyAyGPY8Wqpy1uQY4CutoBoVyXuue8hMJUgFJPuGIo3uvZY0hK+S?=
+ =?us-ascii?Q?dqpLbXaZR3Jn8mpsXmLcbfYwWw2Kn8bkN1/c4bA/HTwyq6k/xtxDKdadMloV?=
+ =?us-ascii?Q?1aF9R3FkhGBU6qRujkFr+CvTsQ62e77IWggTRtWEiDBbsj0xngoDoExWgdwo?=
+ =?us-ascii?Q?wHyKtpMDjFHazjSxXtrpfi/hZktyXLIKGANfmgYD?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fcf25d85-daa1-4a0d-c845-08dd40755373
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2025 14:58:01.3546
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5CrPs+kQttUJM2LUcjZlchk/u1rVuHCATR6lJQEWUqpIvPAsrt8uWIaV7mi7DHV8
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5601
 
-On Wed, 29 Jan 2025 09:04:14 +0100
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
-
-> Move the check logic into a common function and simplify the
-> code which checks if GHES is enabled and was properly setup.
+On Wed, Jan 29, 2025 at 02:44:12PM +0100, Eric Auger wrote:
+> Hi,
 > 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-
-with nits fixed:
-Reviewed-by:  Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/acpi/ghes-stub.c    |  7 ++++---
->  hw/acpi/ghes.c         | 43 ++++++++++++------------------------------
->  include/hw/acpi/ghes.h | 15 ++++++++-------
->  target/arm/kvm.c       |  8 ++++++--
->  4 files changed, 30 insertions(+), 43 deletions(-)
 > 
-> diff --git a/hw/acpi/ghes-stub.c b/hw/acpi/ghes-stub.c
-> index 7cec1812dad9..40f660c246fe 100644
-> --- a/hw/acpi/ghes-stub.c
-> +++ b/hw/acpi/ghes-stub.c
-> @@ -11,12 +11,13 @@
->  #include "qemu/osdep.h"
->  #include "hw/acpi/ghes.h"
->  
-> -int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
-> +int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-> +                            uint64_t physical_address)
->  {
->      return -1;
->  }
->  
-> -bool acpi_ghes_present(void)
-> +AcpiGhesState *acpi_ghes_get_state(void)
->  {
-> -    return false;
-> +    return NULL;
->  }
-> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-> index 38ff95273706..849abfa12187 100644
-> --- a/hw/acpi/ghes.c
-> +++ b/hw/acpi/ghes.c
-> @@ -407,18 +407,12 @@ void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
->          fw_cfg_add_file_callback(s, ACPI_HEST_ADDR_FW_CFG_FILE, NULL, NULL,
->              NULL, &(ags->hest_addr_le), sizeof(ags->hest_addr_le), false);
->      }
-> -
-> -    ags->present = true;
->  }
->  
->  static void get_hw_error_offsets(uint64_t ghes_addr,
->                                   uint64_t *cper_addr,
->                                   uint64_t *read_ack_register_addr)
->  {
-> -    if (!ghes_addr) {
-> -        return;
-> -    }
-> -
->      /*
->       * non-HEST version supports only one source, so no need to change
->       * the start offset based on the source ID. Also, we can't validate
-> @@ -447,9 +441,6 @@ static void get_ghes_source_offsets(uint16_t source_id,
->      uint64_t err_source_entry, error_block_addr;
->      uint32_t num_sources, i;
->  
-> -    if (!hest_entry_addr) {
-> -        return;
-> -    }
->  
->      cpu_physical_memory_read(hest_entry_addr, &num_sources,
->                               sizeof(num_sources));
-> @@ -515,27 +506,17 @@ static void get_ghes_source_offsets(uint16_t source_id,
->  NotifierList acpi_generic_error_notifiers =
->      NOTIFIER_LIST_INITIALIZER(error_device_notifiers);
->  
-> -void ghes_record_cper_errors(const void *cper, size_t len,
-> +void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
->                               uint16_t source_id, Error **errp)
->  {
->      uint64_t cper_addr = 0, read_ack_register_addr = 0, read_ack_register;
-> -    AcpiGedState *acpi_ged_state;
-> -    AcpiGhesState *ags;
->  
->      if (len > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
->          error_setg(errp, "GHES CPER record is too big: %zd", len);
->          return;
->      }
->  
-> -    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
-> -                                                       NULL));
-> -    if (!acpi_ged_state) {
-> -        error_setg(errp, "Can't find ACPI_GED object");
-> -        return;
-> -    }
-> -    ags = &acpi_ged_state->ghes_state;
-> -
-> -    if (!ags->hest_addr_le) {
-> +    if (!ags->use_hest_addr) {
->          get_hw_error_offsets(le64_to_cpu(ags->hw_error_le),
->                               &cper_addr, &read_ack_register_addr);
->      } else {
-> @@ -543,11 +524,6 @@ void ghes_record_cper_errors(const void *cper, size_t len,
->                                  &cper_addr, &read_ack_register_addr, errp);
->      }
->  
-> -    if (!cper_addr) {
-> -        error_setg(errp, "can not find Generic Error Status Block");
-> -        return;
-> -    }
-> -
->      cpu_physical_memory_read(read_ack_register_addr,
->                               &read_ack_register, sizeof(read_ack_register));
->  
-> @@ -573,7 +549,8 @@ void ghes_record_cper_errors(const void *cper, size_t len,
->      notifier_list_notify(&acpi_generic_error_notifiers, NULL);
->  }
->  
-> -int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
-> +int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-> +                            uint64_t physical_address)
->  {
->      /* Memory Error Section Type */
->      const uint8_t guid[] =
-> @@ -599,7 +576,7 @@ int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
->      acpi_ghes_build_append_mem_cper(block, physical_address);
->  
->      /* Report the error */
-> -    ghes_record_cper_errors(block->data, block->len, source_id, &errp);
-> +    ghes_record_cper_errors(ags, block->data, block->len, source_id, &errp);
->  
->      g_array_free(block, true);
->  
-> @@ -611,7 +588,7 @@ int acpi_ghes_memory_errors(uint16_t source_id, uint64_t physical_address)
->      return 0;
->  }
->  
-> -bool acpi_ghes_present(void)
-> +AcpiGhesState *acpi_ghes_get_state(void)
->  {
->      AcpiGedState *acpi_ged_state;
->      AcpiGhesState *ags;
-> @@ -620,8 +597,12 @@ bool acpi_ghes_present(void)
->                                                         NULL));
->  
->      if (!acpi_ged_state) {
-> -        return false;
-> +        return NULL;
->      }
->      ags = &acpi_ged_state->ghes_state;
-> -    return ags->present;
-> +
-> +    if (!ags->hw_error_le && !ags->hest_addr_le) {
+> On 1/11/25 4:32 AM, Nicolin Chen wrote:
+> > For systems that require MSI pages to be mapped into the IOMMU translation
+> > the IOMMU driver provides an IOMMU_RESV_SW_MSI range, which is the default
+> > recommended IOVA window to place these mappings. However, there is nothing
+> > special about this address. And to support the RMR trick in VMM for nested
+> well at least it shall not overlap VMM's RAM. So it was not random either.
+> > translation, the VMM needs to know what sw_msi window the kernel is using.
+> > As there is no particular reason to force VMM to adopt the kernel default,
+> > provide a simple IOMMU_OPTION_SW_MSI_START/SIZE ioctl that the VMM can use
+> > to directly specify the sw_msi window that it wants to use, which replaces
+> > and disables the default IOMMU_RESV_SW_MSI from the driver to avoid having
+> > to build an API to discover the default IOMMU_RESV_SW_MSI.
+> IIUC the MSI window will then be different when using legacy VFIO
+> assignment and iommufd backend.
 
-should we add a warning here?
-(consider case where firmware hasn't managed to update pointers for some reason)
+? They use the same, iommufd can have userspace override it. Then it
+will ignore the reserved region.
 
-> +        return NULL;
-> +    }
-> +    return ags;
->  }
-> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-> index 80a0c3fcfaca..e1b66141d01c 100644
-> --- a/include/hw/acpi/ghes.h
-> +++ b/include/hw/acpi/ghes.h
-> @@ -63,7 +63,6 @@ enum AcpiGhesNotifyType {
->  typedef struct AcpiGhesState {
->      uint64_t hest_addr_le;
->      uint64_t hw_error_le;
-> -    bool present; /* True if GHES is present at all on this board */
->      bool use_hest_addr; /* True if HEST address is present */
->  } AcpiGhesState;
->  
-> @@ -87,15 +86,17 @@ void acpi_build_hest(AcpiGhesState *ags, GArray *table_data,
->                       const char *oem_id, const char *oem_table_id);
->  void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
->                            GArray *hardware_errors);
-> -int acpi_ghes_memory_errors(uint16_t source_id, uint64_t error_physical_addr);
-> -void ghes_record_cper_errors(const void *cper, size_t len,
-> +int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-> +                            uint64_t error_physical_addr);
-> +void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
->                               uint16_t source_id, Error **errp);
->  
->  /**
-> - * acpi_ghes_present: Report whether ACPI GHES table is present
-> + * acpi_ghes_get_state: Get a pointer for ACPI ghes state
->   *
-> - * Returns: true if the system has an ACPI GHES table and it is
-> - * safe to call acpi_ghes_memory_errors() to record a memory error.
-> + * Returns: a pointer to ghes state if the system has an ACPI GHES table,
-> + * it is enabled and it is safe to call acpi_ghes_memory_errors() to record
-> + * a memory error. Returns false, otherwise.
->   */
-> -bool acpi_ghes_present(void);
-> +AcpiGhesState *acpi_ghes_get_state(void);
->  #endif
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index da30bdbb2349..544ff174784d 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -2366,10 +2366,13 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->  {
->      ram_addr_t ram_addr;
->      hwaddr paddr;
-> +    AcpiGhesState *ags;
->  
->      assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
->  
-> -    if (acpi_ghes_present() && addr) {
-> +    ags = acpi_ghes_get_state();
+> MSI reserved regions are exposed in
+> /sys/kernel/iommu_groups/<n>/reserved_regions
+> 0x0000000008000000 0x00000000080fffff msi
+ 
+> Is that configurability reflected accordingly?
 
-> +
-I'd drop this newline
+?
 
-> +    if (ags && addr) {
->          ram_addr = qemu_ram_addr_from_host(addr);
->          if (ram_addr != RAM_ADDR_INVALID &&
->              kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> @@ -2387,7 +2390,8 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->               */
->              if (code == BUS_MCEERR_AR) {
->                  kvm_cpu_synchronize_state(c);
-> -                if (!acpi_ghes_memory_errors(ACPI_HEST_SRC_ID_SEA, paddr)) {
-> +                if (!acpi_ghes_memory_errors(ags, ACPI_HEST_SRC_ID_SEA,
-> +                                             paddr)) {
->                      kvm_inject_arm_sea(c);
->                  } else {
->                      error_report("failed to record the error");
+Nothing using iommufd should parse that sysfs file.
+ 
+> How do you make sure it does not collide with other resv regions? I
+> don't see any check here.
 
+Yes this does need to be checked, it does look missing. It still needs
+to create a reserved region in the ioas when attaching to keep the
+areas safe and it has to intersect with the incoming reserved
+regions from the driver.
+
+> > + * @IOMMU_OPTION_SW_MSI_START:
+> > + *    Change the base address of the IOMMU mapping region for MSI doorbell(s).
+> > + *    It must be set this before attaching a device to an IOAS/HWPT, otherwise
+> > + *    this option will be not effective on that IOAS/HWPT. User can choose to
+> > + *    let kernel pick a base address, by simply ignoring this option or setting
+> > + *    a value 0 to IOMMU_OPTION_SW_MSI_SIZE. Global option, object_id must be 0
+
+> I think we should document it cannot be put at a random place either.
+
+It can be put at any place a map can be placed.
+
+That also needs to be checked when creating a domain, it can't be
+outside the geometry.
+
+Jason
 
