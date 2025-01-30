@@ -1,139 +1,262 @@
-Return-Path: <kvm+bounces-36924-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36925-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4169A22EC8
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 15:15:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FBC6A22FCB
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 15:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44A9B163BB9
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 14:15:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 684C47A45AB
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 14:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DED1E98E7;
-	Thu, 30 Jan 2025 14:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608B21E8835;
+	Thu, 30 Jan 2025 14:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qw5w364u"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9F1199939;
-	Thu, 30 Jan 2025 14:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0D11DDC22
+	for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 14:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738246498; cv=none; b=flUJTgut6FtJvajk30KycvihBuR6UVE2LwZ10rdapkHOn6ijAaZJnf4wu7N/44FyVJZlzFbHUPX7Ng3CUYmiCfmgeI7EhAYGO4zxNGC+MUblP2HtxcWWUuUnMqdAYyU/FeYq79zkTF8c2MgUVsYHVhqMwsy+x4vTDVKlheg/PBI=
+	t=1738247070; cv=none; b=eQRiQCxgGo3mSGmgFjKelL4H+F8ncJStjEJ76cI4ZjrJHjjx1t3b7idei2gt2HIQ3HnqH3/qJFoJ340bdeYiLi7+Eumfl7Flp6fSOoZy3GgN6SXRvg3sH5aEUpuCP6B77rPOt9gRjTVRKdPzrYe5DqSEGaDXrW62xCBAkMWQ1H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738246498; c=relaxed/simple;
-	bh=62uvUPVokekdadvzzYgMQHmplXUKl1Kb/D+EIGlWRtw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lSAUF96v200Lw7UFaybEi2AKzvUkV1nJTXr81gOtDRnXSPfg7f4YrJtVIVcoZWQQia4myj7kIUFt3Itnd8Y4ijCh+JGTEh/PTOzx2YjoZyoYik7J++YW92d6Sa98PX5IFTOuLZVjJg/+Pa1+wc6JkLYC1i8+ldcgp5LHobRAoR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 940B1497;
-	Thu, 30 Jan 2025 06:15:14 -0800 (PST)
-Received: from [10.1.32.52] (e122027.cambridge.arm.com [10.1.32.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BF713F694;
-	Thu, 30 Jan 2025 06:14:45 -0800 (PST)
-Message-ID: <1356de81-2fa1-4ad5-80bd-d02440603288@arm.com>
-Date: Thu, 30 Jan 2025 14:14:43 +0000
+	s=arc-20240116; t=1738247070; c=relaxed/simple;
+	bh=WUswRbBOEewCpy5n2d0Rk0KhGjaWHZygn+/Y3XA878o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eiLH0sHGADnMQx8V5pyS/8hWLJtTuTIIuMWPi/gtQjjkhZpFSaOLONuN3J+U/7feEHZHNpNq3FHHL1YlGmhmwp18KNI0W3Qa70U70W/cWF0GxVtoxJp+XLsr8F3fpWTmKHrL6km7DRFEi+jYjUqOjurAP5xeIPYRuS8r/ACrDfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qw5w364u; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4679b5c66d0so199611cf.1
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 06:24:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738247068; x=1738851868; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lFuJbZiTQXk3Z1XPQsFgKQ9iLshj9zg6jIIn1xLK2qc=;
+        b=qw5w364uRvebUrQU56Y81gMVMqqIEDASpEfffhrdJXV/kPUb5ovpflJ0yWu3ipbL9Y
+         U8ijSa/kM0keSAMK+CarpAU6jrTH8lyunetKegc6+1/NxVEYspU6u9cVUmvkheoucst3
+         AsPw6P8vGICFU1oO5oCGa5ocrFwfp9gvBcYMSKGaX7i9+WcBgCiQHnnzxW0b/Lx0v8Fw
+         VKrlYkKfh2SdglQPUWG7BArI9/ykwkkLQVR/CqTfBwHSNPu74S7mCh4lb2gulK328JjA
+         iSSbwoeVfnpkBpjvA9tirihinb9WR/xv7Z/wlOYqIfgyCzOrs+g9ny65005VToZwJDwe
+         Dcbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738247068; x=1738851868;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lFuJbZiTQXk3Z1XPQsFgKQ9iLshj9zg6jIIn1xLK2qc=;
+        b=ce1V/igqUOFhvqEJkccn+JKCyVn5VBtnJbZRrtIpd+6rK/SXGIHbe3TDnkzmtboalC
+         aNNlKhns6OU+rDG4mm4HmGZ7GSAGxVynf/eknDy2xVUhBxjdrWIgw6maybnnoGD5gm1x
+         NSR/1wEkihkd/ZIejCWFPnbb9RtL7xflxsXhGgzWP1Zp7jZMc+cHTFJOOJ3iUHH1ofsC
+         RbTiRIzaAgi5x1VJlqc7v2ttt9hxcid/xv72QxA9e8/Wq9xvTwkBtiuM2L6uA2xPoUDw
+         wLS4mKMTK/Ryfd6WSV8T0LVJkRev04BrjVOLTg+X3yZQ5s26I5x7L9PNv/1xNvml14Sj
+         KSRA==
+X-Forwarded-Encrypted: i=1; AJvYcCXvc4MApNPI9sTebTt3rkLGRgddmOeYZElZ91MUpuBP67+e1qxjCVyvYaThdu/kOA+1+24=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsMP7JS8elG7bLhn/5bFF0AA63oxGmcZ1zoD1qiuMUewsvHyoC
+	2hmmviwBdhuRDoOtMM928neQ8AYgXdhU0xmKZITfc1mG91ohGTL4nkGCbEr4Y3IdXs0iqfBcfha
+	n9xcq1LTYQa9ASHzUJhZvukG+Ruc9AwwoMg197CkydKUrYfELiw==
+X-Gm-Gg: ASbGnctDAixkF4up9VWzqU9dS/w5bei7MoypaLGNdIlgJG0iT4SYZydp427G/gXMvpZ
+	ikjhlnhTh0GZBAAv7bXw4p4GjSVzFae+OyUJvWu4c3nwzbOS66T9pR+NeEQ1Q8iANaRLxlgb8K+
+	ABB4sn3feM+/UZPCwIZQ7mEr+o
+X-Google-Smtp-Source: AGHT+IE/Ql3C7G878f8upYkFw0LvJ/RXPD8cDOYa1Sn4OttpavWcQAXouw8LV0l9x4PGB3UAEK73GOm53+8mg9ag3aQ=
+X-Received: by 2002:a05:622a:420c:b0:447:e59b:54eb with SMTP id
+ d75a77b69052e-46fde4b14efmr3494451cf.26.1738247067542; Thu, 30 Jan 2025
+ 06:24:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 10/43] arm64: kvm: Allow passing machine type in KVM
- creation
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-11-steven.price@arm.com>
- <a580d287-2fb0-4e9d-adbb-57e4dbf25765@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <a580d287-2fb0-4e9d-adbb-57e4dbf25765@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <CA+EHjTxrsPnVYSsc5bJ=fL_tWFUsjqiiMpJ3GURw6s4uwn810w@mail.gmail.com>
+ <diqzfrlasczw.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzfrlasczw.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 30 Jan 2025 14:23:50 +0000
+X-Gm-Features: AWEUYZknmNOaLyQ73iST8WH591zVF9JPiXujRejW7T2jbpOjiO3gHEXquwThsNI
+Message-ID: <CA+EHjTzO+po41r1QR-160X6u2m=ko9iKh+qVoNqPkBHpCZhocA@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 06/15] KVM: guest_memfd: Handle final folio_put()
+ of guestmem pages
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: vbabka@suse.cz, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 29/01/2025 04:07, Gavin Shan wrote:
-> On 12/13/24 1:55 AM, Steven Price wrote:
->> Previously machine type was used purely for specifying the physical
->> address size of the guest. Reserve the higher bits to specify an ARM
->> specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
->> used to create a realm guest.
->>
->> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/kvm/arm.c     | 17 +++++++++++++++++
->>   arch/arm64/kvm/mmu.c     |  3 ---
->>   include/uapi/linux/kvm.h | 19 +++++++++++++++----
->>   3 files changed, 32 insertions(+), 7 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index c505ec61180a..73016e1e0067 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -207,6 +207,23 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned
->> long type)
->>       mutex_unlock(&kvm->lock);
->>   #endif
->>   +    if (type & ~(KVM_VM_TYPE_ARM_MASK |
->> KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
->> +        return -EINVAL;
->> +
->> +    switch (type & KVM_VM_TYPE_ARM_MASK) {
->> +    case KVM_VM_TYPE_ARM_NORMAL:
->> +        break;
->> +    case KVM_VM_TYPE_ARM_REALM:
->> +        kvm->arch.is_realm = true;
->> +        if (!kvm_is_realm(kvm)) {
->> +            /* Realm support unavailable */
->> +            return -EINVAL;
->> +        }
->> +        break;
->> +    default:
->> +        return -EINVAL;
->> +    }
->> +
->>       kvm_init_nested(kvm);
->>         ret = kvm_share_hyp(kvm, kvm + 1);
-> 
-> Corresponding to comments for PATCH[6], the block of the code can be
-> modified
-> to avoid using kvm_is_realm() here. In this way, kvm_is_realm() can be
-> simplifed
-> as I commented for PATCH[6].
-> 
->     case KVM_VM_TYPE_ARM_REALM:
->         if (static_branch_unlikely(&kvm_rme_is_available))
->             return -EPERM;    /* -EPERM may be more suitable than -
-> EINVAL */
-> 
->         kvm->arch.is_realm = true;
->         break;
+Hi Ackerley,
 
-Yes that's more readable. I'd used kvm_is_realm() because I wanted to
-keep the check on kvm_rme_is_available to one place, but coming back to
-the code there's definitely a "Huh?" moment from setting 'is_realm' and
-then testing if it's a realm!
+On Wed, 22 Jan 2025 at 22:24, Ackerley Tng <ackerleytng@google.com> wrote:
+>
+> Fuad Tabba <tabba@google.com> writes:
+>
+> >> > <snip>
+> >> >
+> >> > +/*
+> >> > + * Registers a callback to __folio_put(), so that gmem knows that the host does
+> >> > + * not have any references to the folio. It does that by setting the folio type
+> >> > + * to guestmem.
+> >> > + *
+> >> > + * Returns 0 if the host doesn't have any references, or -EAGAIN if the host
+> >> > + * has references, and the callback has been registered.
+> >>
+> >> Note this comment.
+> >>
+> >> > + *
+> >> > + * Must be called with the following locks held:
+> >> > + * - filemap (inode->i_mapping) invalidate_lock
+> >> > + * - folio lock
+> >> > + */
+> >> > +static int __gmem_register_callback(struct folio *folio, struct inode *inode, pgoff_t idx)
+> >> > +{
+> >> > +     struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> >> > +     void *xval_guest = xa_mk_value(KVM_GMEM_GUEST_MAPPABLE);
+> >> > +     int refcount;
+> >> > +
+> >> > +     rwsem_assert_held_write_nolockdep(&inode->i_mapping->invalidate_lock);
+> >> > +     WARN_ON_ONCE(!folio_test_locked(folio));
+> >> > +
+> >> > +     if (folio_mapped(folio) || folio_test_guestmem(folio))
+> >> > +             return -EAGAIN;
+> >>
+> >> But here we return -EAGAIN and no callback was registered?
+> >
+> > This is intentional. If the folio is still mapped (i.e., its mapcount
+> > is elevated), then we cannot register the callback yet, so the
+> > host/vmm needs to unmap first, then try again. That said, I see the
+> > problem with the comment above, and I will clarify this.
+> >
+> >> > +
+> >> > +     /* Register a callback first. */
+> >> > +     __folio_set_guestmem(folio);
+> >> > +
+> >> > +     /*
+> >> > +      * Check for references after setting the type to guestmem, to guard
+> >> > +      * against potential races with the refcount being decremented later.
+> >> > +      *
+> >> > +      * At least one reference is expected because the folio is locked.
+> >> > +      */
+> >> > +
+> >> > +     refcount = folio_ref_sub_return(folio, folio_nr_pages(folio));
+> >> > +     if (refcount == 1) {
+> >> > +             int r;
+> >> > +
+> >> > +             /* refcount isn't elevated, it's now faultable by the guest. */
+> >>
+> >> Again this seems racy, somebody could have just speculatively increased it.
+> >> Maybe we need to freeze here as well?
+> >
+> > A speculative increase here is ok I think (famous last words). The
+> > callback was registered before the check, therefore, such an increase
+> > would trigger the callback.
+> >
+> > Thanks,
+> > /fuad
+> >
+> >
+>
+> I checked the callback (kvm_gmem_handle_folio_put()) and agree with you
+> that the mappability reset to KVM_GMEM_GUEST_MAPPABLE is handled
+> correctly (since kvm_gmem_handle_folio_put() doesn't assume anything
+> about the mappability state at callback-time).
+>
+> However, what if the new speculative reference writes to the page and
+> guest goes on to fault/use the page?
 
-I also agree -EPERM is probably better to signify that the kernel
-supports realms but the hardware doesn't.
+In my last email I explained why I thought the code was fine as it is.
+Now that I'm updating the patch series with all the comments, I
+realized that even if I were right (which I am starting to doubt),
+freezing the refcount makes the code easier to reason about. So I'm
+going with ref_freeze here as well when I respin.
 
-Thanks,
+Thanks again,
+/fuad
 
-Steve
 
+
+> >> > +             r = WARN_ON_ONCE(xa_err(xa_store(mappable_offsets, idx, xval_guest, GFP_KERNEL)));
+> >> > +             if (!r)
+> >> > +                     __kvm_gmem_restore_pending_folio(folio);
+> >> > +
+> >> > +             return r;
+> >> > +     }
+> >> > +
+> >> > +     return -EAGAIN;
+> >> > +}
+> >> > +
+> >> > +int kvm_slot_gmem_register_callback(struct kvm_memory_slot *slot, gfn_t gfn)
+> >> > +{
+> >> > +     unsigned long pgoff = slot->gmem.pgoff + gfn - slot->base_gfn;
+> >> > +     struct inode *inode = file_inode(slot->gmem.file);
+> >> > +     struct folio *folio;
+> >> > +     int r;
+> >> > +
+> >> > +     filemap_invalidate_lock(inode->i_mapping);
+> >> > +
+> >> > +     folio = filemap_lock_folio(inode->i_mapping, pgoff);
+> >> > +     if (WARN_ON_ONCE(IS_ERR(folio))) {
+> >> > +             r = PTR_ERR(folio);
+> >> > +             goto out;
+> >> > +     }
+> >> > +
+> >> > +     r = __gmem_register_callback(folio, inode, pgoff);
+> >> > +
+> >> > +     folio_unlock(folio);
+> >> > +     folio_put(folio);
+> >> > +out:
+> >> > +     filemap_invalidate_unlock(inode->i_mapping);
+> >> > +
+> >> > +     return r;
+> >> > +}
+> >> > +
+> >> > +/*
+> >> > + * Callback function for __folio_put(), i.e., called when all references by the
+> >> > + * host to the folio have been dropped. This allows gmem to transition the state
+> >> > + * of the folio to mappable by the guest, and allows the hypervisor to continue
+> >> > + * transitioning its state to private, since the host cannot attempt to access
+> >> > + * it anymore.
+> >> > + */
+> >> > +void kvm_gmem_handle_folio_put(struct folio *folio)
+> >> > +{
+> >> > +     struct xarray *mappable_offsets;
+> >> > +     struct inode *inode;
+> >> > +     pgoff_t index;
+> >> > +     void *xval;
+> >> > +
+> >> > +     inode = folio->mapping->host;
+> >> > +     index = folio->index;
+> >> > +     mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> >> > +     xval = xa_mk_value(KVM_GMEM_GUEST_MAPPABLE);
+> >> > +
+> >> > +     filemap_invalidate_lock(inode->i_mapping);
+> >> > +     __kvm_gmem_restore_pending_folio(folio);
+> >> > +     WARN_ON_ONCE(xa_err(xa_store(mappable_offsets, index, xval, GFP_KERNEL)));
+> >> > +     filemap_invalidate_unlock(inode->i_mapping);
+> >> > +}
+> >> > +
+> >> >  static bool gmem_is_mappable(struct inode *inode, pgoff_t pgoff)
+> >> >  {
+> >> >       struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> >>
 
