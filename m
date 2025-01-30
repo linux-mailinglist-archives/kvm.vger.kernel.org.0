@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-36919-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36920-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CA3A22B4A
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 11:07:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B0A2A22B4C
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 11:08:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A7003ABA50
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 10:05:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 509573A86FD
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 10:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357AE1B87ED;
-	Thu, 30 Jan 2025 10:05:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91FA31B85D3;
+	Thu, 30 Jan 2025 10:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3hyByea"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VxGGWKE1"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7718619C561
-	for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 10:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08AE415382E
+	for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 10:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738231541; cv=none; b=C68U3h7K/1ZbSLC19gPtnqyrk15BFIzHiUsjNeNvLYqN4vxtCXlOB6MxWV8tyCNVgH2pnCGBR5ggtXDvenSi+Hpjw1DUvSiWOcPtucyP5ChYlQs097Ah8k0562zGxP4bBjvB4UmIwm0wEAV4S4zBCT4xuiOGLiMlrA8dz0fjKMI=
+	t=1738231716; cv=none; b=aNCLGMQ/raOSoLBKMonphQnVaUbGWaSQjRHTqpFdpbLIZ5d8S5R69lKnZB+aNJXROekLkC4hTYmyNTRpcUQ9tMQyvvxN9Kci3OSaTFROHCCI2YznTqwfraWu6+ncSucEog/F9ZYcWGZ0i8Thz4a4b8gq81/umNobiiMstsLbIys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738231541; c=relaxed/simple;
-	bh=f09orQzbzT6R/IN9wLvbBl2KUDn4pYD8bZ6lxNzTYLE=;
+	s=arc-20240116; t=1738231716; c=relaxed/simple;
+	bh=KKk7k+HJ6w80lPjeTb2TdUg4YNUzhG9xolmvryWdUmg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nifig6qcOL675r+SIx/UE61RuNQQjgpr++jKEMf+mJxvbj9+qUTMPwOCLHnt0kun87E7Wnw6QmqyeqasAAIwru53AnQWZfkVBejYWTfIgq1aCY2ert7ygHoo51cnLgzsWAYihvVrmlrLLohUAXT3YbQ7bwNx9raZs6TApdAjfJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V3hyByea; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=hb1MbaNjoNnzFx5TsMfJCXq0okBSEFsamoTRQdmQas7PxIBV/53lOKSMRCLeQFvD+pZsh9RHW2MaggAGV94HiMUp7w7doxq6cv+p4UnPPdL+Cw4WRZagA2hjogx+AUU20m+0vCk1tp8uN26KzHfaQ439n0ha8IBvspGAGsfbFG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VxGGWKE1; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738231538;
+	s=mimecast20190719; t=1738231714;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ej34TRKzCk3u66g7ZUBbMIDJC/Cfgozb+JXmH9zPuFY=;
-	b=V3hyByeaUEcUYQtbTepP+/KVmDjpm0gpbfb2yuRzabLXhpVn5aM7g8go4XZrBxtJJCOOho
-	1emTjldytYJDXQBO54ze/JCNMo2fcT0kyHqACd6eDp//G/fy5cCgVlW34R0oIuIJqAwJpK
-	yasshRuV3/MLraisJFAayFodo2byN2M=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=GxtuEqLCldMCiqHlL9qdk33s4rX5+fECbKiC+L8VbpM=;
+	b=VxGGWKE1vzx2Zg9Y63GwV7mXywsxzvgDfI2Zh8Cya1zcHxqPXFMyQx9NUsC9/VfSPLRcnf
+	CL6UMnwW2zcGWHs4qmLPAIoesvbTwxFJZxCplcnALJ+rhKJVV1LiwK5FJln3xve76XkloZ
+	3I3UgjHMedij5SJOvn/nByCkM1eN8yU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-SL0YsquoPD6gBGiUraxWXg-1; Thu, 30 Jan 2025 05:05:36 -0500
-X-MC-Unique: SL0YsquoPD6gBGiUraxWXg-1
-X-Mimecast-MFC-AGG-ID: SL0YsquoPD6gBGiUraxWXg
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-436723db6c4so3802595e9.3
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 02:05:36 -0800 (PST)
+ us-mta-669-QIIxQDTiM62q-TqayuchcA-1; Thu, 30 Jan 2025 05:08:32 -0500
+X-MC-Unique: QIIxQDTiM62q-TqayuchcA-1
+X-Mimecast-MFC-AGG-ID: QIIxQDTiM62q-TqayuchcA
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38634103b0dso363383f8f.2
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 02:08:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738231535; x=1738836335;
+        d=1e100.net; s=20230601; t=1738231711; x=1738836511;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=ej34TRKzCk3u66g7ZUBbMIDJC/Cfgozb+JXmH9zPuFY=;
-        b=qsAZ43ZUzxrZDbTik+n8K2ykVcOyoXKpaZt2RbKBJlzNhnzau1wHbtDyZFzHYb8UBZ
-         9FBNpqRjbVKA1Rlx+Q5VbEuliC47H0TwDP+NkdbwZ1mj2MRsmUrWYJhHdJZIKAB3cXRn
-         SrPZ6uhsZFA7OYhno3TajDKXsN7isOFnzd2ibbf5Jsa+/YpP01nBzWZUqlxYQTvawXDA
-         sja5ZwxJmKbLs/XSHqRKA81IgM0gcfuUzxnSgYWBDKSIPgbT4I2dsXGcxSG34vL6LIVS
-         DCiIlwaCYaXde0FVPcwHtkAGdeOdBOoxPMmERRHWES6XAXRWEruPxq4OWdjG4tWH8Vjy
-         4QKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUl32PNhQ9DF3xs8YdkChcJ9hMwl8uqG/G1B/uxgeWBLcU5BspsdSy3GIzoxj8Ygnc2l00=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqNIGX0N8squXSncKJ/rFeaYpHRLaZuHlq9MWDQe84L4iP1eRC
-	z3KUqFNSAdqaBZh5Ewf7SF7Pp72ssKh8G/cimIFYo3+/5D3V5ZgIikaJ5sPLp2cFYLOnaNmbOxz
-	hO6fzwJIczH2zlfW61zEifLoUy5Gzph5BTCzOMPvTGAxRomiQfQ==
-X-Gm-Gg: ASbGncthU9Iyn7GZ9cFyfFUr+UCkvY23T7aucoVQ83CCLfCe5gG+7963inrB86RLzVL
-	UVjO99EIhL2qItnWItFoUPuT6qTGfAhFdNohtIb4V2PWGaBw2VNRMTSX3PFLnpogbiJdN1WtB08
-	XlPqvDQSfae0YIx2aGxqBrz5R+c7o8m7/tWcOIHtuSz7mSHFDRVudvPjo1Zt6+kgBXmvCH+L9rU
-	opdTfPcMd9yaiRx0722tD4DBuq+N4QoJo05Q3Aqc/q5LkdKG/dzlxA1b7Krw/WdLoReK+84X44q
-	ApQwVzC/zHsPnIzLB69OWN337/My7G8WWVeF2WTj+KdI
-X-Received: by 2002:a05:600c:3306:b0:435:294:f1c8 with SMTP id 5b1f17b1804b1-438e018288dmr30450575e9.28.1738231535594;
-        Thu, 30 Jan 2025 02:05:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFgp2XICVOdE2kJIWFsVmaEZlHa9/HKHWxrRKY9p1icaAeHtZ46p62yKdSY9hlFA7LqmysKkQ==
-X-Received: by 2002:a05:600c:3306:b0:435:294:f1c8 with SMTP id 5b1f17b1804b1-438e018288dmr30450285e9.28.1738231535217;
-        Thu, 30 Jan 2025 02:05:35 -0800 (PST)
+        bh=GxtuEqLCldMCiqHlL9qdk33s4rX5+fECbKiC+L8VbpM=;
+        b=ePJ8uiMyEieM4KvT1d+jZY/wnWaU7uLczm8ylCz5cyMUJHUv5gVGbKFoUfKb6LYIxR
+         +9dnay6/I65hVO3RjJrsIBFW6mmuljvJGoNzqx1Gnu40MB46+Qzj+5RqnsnKsfUQ0r14
+         FG7rz32GAjBGPrL6ZNqMHviI8HE72BVCHZlq52h2U5SASKP50XicCO5RN556CEU6/NAx
+         Cv2snHt2n0rvmwD3IkORyhr+75vomFG03RA7g+Y1xSoJElBSKG1B4lpljKQxn/DxIbPc
+         GiBfSSWO/3mmRuVNXzYAh6Dt2rF/88Vse8UdjJttFOcCB3uFe1zTPbgv6sPF69uLansZ
+         /uOA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwAvkh+evo/Oe6MEYlugR2JYG8Q3L/LbqFzviwrNINycNnKlFq1KB9rlXX6BNz73tWD1o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz1wmWuogiEXqlcP3nS70ptvnHn7BvtpsTmoLHV2lSTIYmHr2u
+	xSy5wkAi7CJ/liFbzk9wS9G+OezzKnFi//+vVtcIgSQbqsJhl54j98omgji6s2WTiWrj7xU6ctg
+	XOiNvKBODXICMqLnq6yL70v2ZKP4LkfJU9CQCRhP+7uMv++4bAg==
+X-Gm-Gg: ASbGncs8iUA4xfc24MR1poMuGwIJ1CMZXvTRa1oe6+3m8oOrBCcaDoAlXOCUZw2etyL
+	QMCT+F3dzmwPmdyMZXeB5mmmA7zFwKq5hG/qufTIUeo4kymBF5gI7dSRlbxgy/fnbKOGq7N0eX3
+	kEEnICf0ZuvXP7TvBztaGZvG2R9eWx8pvU+VeJPYmQqzR1aKLXq/6LRSdlEDeimwyV1VilCA6e5
+	5+zfqsyCUoLk+B6GB5gcRBvEQUG3gzjTq6ingjSR+WQqk+i/ComvdMk2NMfJoQTpnzMMsduYoZh
+	YytJw6KVLTc8Wmjj7CSEwxrKBYW3b+uCH8TlEmvKdEir
+X-Received: by 2002:a05:6000:1fac:b0:386:3329:6a04 with SMTP id ffacd0b85a97d-38c51e8de63mr6292567f8f.39.1738231711171;
+        Thu, 30 Jan 2025 02:08:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGvS3Uy7Eodh52ChzmXqGnzBkmmZ7MfTvQSBcAfuge2S8sB/SSD++pYiQdwzpMFbW+y3P8ccA==
+X-Received: by 2002:a05:6000:1fac:b0:386:3329:6a04 with SMTP id ffacd0b85a97d-38c51e8de63mr6292513f8f.39.1738231710443;
+        Thu, 30 Jan 2025 02:08:30 -0800 (PST)
 Received: from ?IPV6:2a01:599:904:96e0:a245:aa9f:6c57:eb41? ([2a01:599:904:96e0:a245:aa9f:6c57:eb41])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438e245f49dsm17378355e9.35.2025.01.30.02.05.33
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1cf555sm1508408f8f.97.2025.01.30.02.08.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jan 2025 02:05:34 -0800 (PST)
-Message-ID: <05295422-6baf-4f7e-9f02-d2bd9344b7e7@redhat.com>
-Date: Thu, 30 Jan 2025 11:05:33 +0100
+        Thu, 30 Jan 2025 02:08:29 -0800 (PST)
+Message-ID: <6943198a-4d3b-4e3c-a206-d031e8f943b9@redhat.com>
+Date: Thu, 30 Jan 2025 11:08:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,8 +89,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/6] system/physmem: handle hugetlb correctly in
- qemu_ram_remap()
+Subject: Re: [PATCH v6 2/6] system/physmem: poisoned memory discard on reboot
 To: =?UTF-8?Q?=E2=80=9CWilliam_Roche?= <william.roche@oracle.com>,
  kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
@@ -98,7 +97,7 @@ Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
  imammedo@redhat.com, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
  wangyanan55@huawei.com, zhao1.liu@intel.com, joao.m.martins@oracle.com
 References: <20250127213107.3454680-1-william.roche@oracle.com>
- <20250127213107.3454680-2-william.roche@oracle.com>
+ <20250127213107.3454680-3-william.roche@oracle.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,21 +145,105 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20250127213107.3454680-2-william.roche@oracle.com>
+In-Reply-To: <20250127213107.3454680-3-william.roche@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 27.01.25 22:31, “William Roche wrote:
 > From: William Roche <william.roche@oracle.com>
 > 
-> The list of hwpoison pages used to remap the memory on reset
-> is based on the backend real page size.
-> To correctly handle hugetlb, we must mmap(MAP_FIXED) a complete
-> hugetlb page; hugetlb pages cannot be partially mapped.
+> Repair poisoned memory location(s), calling ram_block_discard_range():
+> punching a hole in the backend file when necessary and regenerating
+> a usable memory.
+> If the kernel doesn't support the madvise calls used by this function
+> and we are dealing with anonymous memory, fall back to remapping the
+> location(s).
 > 
-> Co-developed-by: David Hildenbrand <david@redhat.com>
 > Signed-off-by: William Roche <william.roche@oracle.com>
 > ---
+>   system/physmem.c | 54 ++++++++++++++++++++++++++++--------------------
+>   1 file changed, 32 insertions(+), 22 deletions(-)
+> 
+> diff --git a/system/physmem.c b/system/physmem.c
+> index 3dd2adde73..3dc10ae27b 100644
+> --- a/system/physmem.c
+> +++ b/system/physmem.c
+> @@ -2167,6 +2167,23 @@ void qemu_ram_free(RAMBlock *block)
+>   }
+>   
+>   #ifndef _WIN32
+> +/* Simply remap the given VM memory location from start to start+length */
+> +static int qemu_ram_remap_mmap(RAMBlock *block, uint64_t start, size_t length)
+> +{
+> +    int flags, prot;
+> +    void *area;
+> +    void *host_startaddr = block->host + start;
+> +
+> +    assert(block->fd < 0);
+> +    flags = MAP_FIXED | MAP_ANONYMOUS;
+> +    flags |= block->flags & RAM_SHARED ? MAP_SHARED : MAP_PRIVATE;
+> +    flags |= block->flags & RAM_NORESERVE ? MAP_NORESERVE : 0;
+> +    prot = PROT_READ;
+> +    prot |= block->flags & RAM_READONLY ? 0 : PROT_WRITE;
+> +    area = mmap(host_startaddr, length, prot, flags, -1, 0);
+> +    return area != host_startaddr ? -errno : 0;
+> +}
+> +
+>   /*
+>    * qemu_ram_remap - remap a single RAM page
+>    *
+> @@ -2184,9 +2201,7 @@ void qemu_ram_remap(ram_addr_t addr)
+>   {
+>       RAMBlock *block;
+>       uint64_t offset;
+> -    int flags;
+> -    void *area, *vaddr;
+> -    int prot;
+> +    void *vaddr;
+>       size_t page_size;
+>   
+>       RAMBLOCK_FOREACH(block) {
+> @@ -2201,25 +2216,20 @@ void qemu_ram_remap(ram_addr_t addr)
+>                   ;
+>               } else if (xen_enabled()) {
+>                   abort();
+> -            } else {
+> -                flags = MAP_FIXED;
+> -                flags |= block->flags & RAM_SHARED ?
+> -                         MAP_SHARED : MAP_PRIVATE;
+> -                flags |= block->flags & RAM_NORESERVE ? MAP_NORESERVE : 0;
+> -                prot = PROT_READ;
+> -                prot |= block->flags & RAM_READONLY ? 0 : PROT_WRITE;
+> -                if (block->fd >= 0) {
+> -                    area = mmap(vaddr, page_size, prot, flags, block->fd,
+> -                                offset + block->fd_offset);
+> -                } else {
+> -                    flags |= MAP_ANONYMOUS;
+> -                    area = mmap(vaddr, page_size, prot, flags, -1, 0);
+> -                }
+> -                if (area != vaddr) {
+> -                    error_report("Could not remap RAM %s:%" PRIx64 "+%" PRIx64
+> -                                 " +%zx", block->idstr, offset,
+> -                                 block->fd_offset, page_size);
+> -                    exit(1);
+> +                if (ram_block_discard_range(block, offset, page_size) != 0) {
+> +                    /*
+> +                     * Fall back to using mmap() only for anonymous mapping,
+> +                     * as if a backing file is associated we may not be able
+> +                     * to recover the memory in all cases.
+> +                     * So don't take the risk of using only mmap and fail now.
+> +                     */
+> +                    if (block->fd >= 0 ||
+> +                        qemu_ram_remap_mmap(block, offset, page_size) != 0) {
+> +                        error_report("Could not remap RAM %s:%" PRIx64 "+%"
+> +                                     PRIx64 " +%zx", block->idstr, offset,
+> +                                     block->fd_offset, page_size);
+> +                        exit(1);
+> +                    }
+>                   }
+>                   memory_try_enable_merging(vaddr, page_size);
+>                   qemu_ram_setup_dump(vaddr, page_size);
+
 
 Acked-by: David Hildenbrand <david@redhat.com>
 
