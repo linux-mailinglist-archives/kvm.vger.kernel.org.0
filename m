@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-36917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A12A22ADF
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 10:53:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4254CA22AD1
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 10:53:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F3021888421
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 09:53:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8B5F1638B5
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 09:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1041B87DD;
-	Thu, 30 Jan 2025 09:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0381DE4EB;
+	Thu, 30 Jan 2025 09:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VXZ2gkyL"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PwFr02c7"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9201B87ED;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6991B87EA;
 	Thu, 30 Jan 2025 09:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738230694; cv=none; b=g/IX9LqOC7YkTl367c6C4m6JhzG/Rei65bptOp4K0SWdIv3iNypLW29FCAt94MHyOooIdp4x6tx4MjzEsx3ioNrTiJxg3GbFD+R6yU8pBz4In5wyAmgJuKUhDeZ5IDeQBtafNQhQreivVbzUn8thuCx+pTnEZmYbRhwxdg7C0ok=
+	t=1738230693; cv=none; b=i3n16YMKESdmGjJMxSEjiFvOAI3H3EKplNhpJPyKxpf3f3nPFJjcSEKEcbDVQHoWAAjA5MZN76uGfHlQ1+O4oxzzq7RhEXcwkOgPbvBv8XnD/zTTD0yUt3Byf8Leje43FgqfSmbOy+Yqud+cRnmnPierpNBsmxogkC8eZBosH8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738230694; c=relaxed/simple;
-	bh=VxIN4FeIyslKtTPAUdWuL/CWBidHazVQsIdRsgDTEmE=;
+	s=arc-20240116; t=1738230693; c=relaxed/simple;
+	bh=YS5r1/0twAAERL8ngIAxSqp6YM8y5Wy8/pbxtA9g+1k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sT13i1y3Pa9LzgSo11kKNM3uF9v9HKxgH1jvz3nvbsp6UXfNhmIEi0tLoJTKpGgaAQ5Lr8NR1W27r7mI4KKNL8W745Iu4BawzAImtCl4GArqTQF5y/Bkz3fGjNRH0dif+tri1SFgz0Sje2PjwB02gM7klW195HHlOocPz3nnl/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VXZ2gkyL; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=eFmydeUeHeHQGq9jiBhEd1BT0Naj2pJUy+5HHCkb5psNHWlT2wMdQjCiNJig4gXyPr+MaA1HNJz+8oDosKkKLqBU1IeRR5d0y/HuKxITX4fswtg3aJgy4S9yhW4vYvCmXtyDiOe+Mv7h57cWxunnnemg/0AcOGfBLzeVcrCdUd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PwFr02c7; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50U18u3r031484;
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50U5NquP012419;
 	Thu, 30 Jan 2025 09:51:27 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=4APgAzwDh1BMLkCrA
-	XvZ76mNkyeCMn/AytX0MI4bmnk=; b=VXZ2gkyL2knTcvcAVxtz6wEYBpG6veths
-	kBMVTDh/zIfLlowW46zv0ojHOG7iqssjhA3psifL4hqI/cFtr/lUrK2Nm1W4dmRk
-	G1ek7E+Ujo3V+YKFpKbo/TQwqCmaE3/6TF+jK3fHTMteLdEBCrRloAv52is1OoJd
-	B7xTZwAMGgAssHRrQl5CGa4z2whvAtKGiwOUMj4J9ElVF4LnxkBKPHLcv+mKnZ5n
-	2QHcYsxl15z+dqnbiLPtGBXrQdovI44pNnFyd/PQLQplYeU/+khsz3Ph5ytZgt/Q
-	oi/+xQoD9RI3aYJ+5U9uCNoEfTiE8PS0yZ29NUHAYkCPXhdMX68cg==
+	:mime-version:references:subject:to; s=pp1; bh=nXyahyElqM3iBNlWc
+	TVjg8Z6CHgT6G5t1NBhq1glBpU=; b=PwFr02c7lfDPKLRQ30NDe4W0y3PAj4qCx
+	tasaBPLoBvY++gentaOgTgE9I/78xnJk+wZDHRnCR8qM6tnLhRdJHKzbdsglvYH3
+	vPVO3LA7EL0UddwNf7c6bV43cSKEP55gT9YfoHIWOenXohG0+1++EDusuW4eKwG1
+	ePlgCfHmq5cNlXZzfsLEJcLslqhcYXknH4pGcshCI5pYY0MOjKFOhTbxBxrM+nOY
+	+F0dUqreTJBcydEIRUe785JHzsIgtt+SM3wTaSWrKAvaN0vKVnztsgA7BxFh/RTd
+	+jtS+QIo08bfaaz1wAfT0wUD1L6REfTFXFNGDx1rNoSmtpBNXIuAA==
 Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44fyg99xw6-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44g38814e5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 30 Jan 2025 09:51:26 +0000 (GMT)
 Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50U7mBpB028072;
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50U8DVuj028051;
 	Thu, 30 Jan 2025 09:51:25 GMT
 Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44dbsknfmr-1
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44dbsknfms-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 30 Jan 2025 09:51:25 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50U9pLHD56033674
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50U9pLsb56033676
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Thu, 30 Jan 2025 09:51:21 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3EAF520147;
+	by IMSVA (Postfix) with ESMTP id 677B12013E;
 	Thu, 30 Jan 2025 09:51:21 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1B5BA20141;
+	by IMSVA (Postfix) with ESMTP id 44B8F2014B;
 	Thu, 30 Jan 2025 09:51:21 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.155.209.42])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -71,9 +71,9 @@ From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: pbonzini@redhat.com
 Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         borntraeger@de.ibm.com, david@redhat.com
-Subject: [GIT PULL v1 10/20] KVM: s390: use __kvm_faultin_pfn()
-Date: Thu, 30 Jan 2025 10:51:03 +0100
-Message-ID: <20250130095113.166876-11-imbrenda@linux.ibm.com>
+Subject: [GIT PULL v1 11/20] KVM: s390: get rid of gmap_fault()
+Date: Thu, 30 Jan 2025 10:51:04 +0100
+Message-ID: <20250130095113.166876-12-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250130095113.166876-1-imbrenda@linux.ibm.com>
 References: <20250130095113.166876-1-imbrenda@linux.ibm.com>
@@ -85,222 +85,205 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LFr5KFiPms9AJ5B_zVLcNY7CySvq024j
-X-Proofpoint-GUID: LFr5KFiPms9AJ5B_zVLcNY7CySvq024j
+X-Proofpoint-ORIG-GUID: tMML-uQkhE7r85LT8sbx5C8zabvFM0mV
+X-Proofpoint-GUID: tMML-uQkhE7r85LT8sbx5C8zabvFM0mV
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-30_05,2025-01-29_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=989
- priorityscore=1501 suspectscore=0 spamscore=0 mlxscore=0 malwarescore=0
- clxscore=1015 phishscore=0 impostorscore=0 lowpriorityscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501300073
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=732 phishscore=0 clxscore=1015 adultscore=0 priorityscore=1501
+ spamscore=0 impostorscore=0 malwarescore=0 suspectscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501300073
 
-Refactor the existing page fault handling code to use __kvm_faultin_pfn().
+All gmap page faults are already handled in kvm by the function
+kvm_s390_handle_dat_fault(); only few users of gmap_fault remained, all
+within kvm.
 
-This possible now that memslots are always present.
+Convert those calls to use kvm_s390_handle_dat_fault() instead.
+
+Remove gmap_fault() entirely since it has no more users.
 
 Acked-by: Janosch Frank <frankja@linux.ibm.com>
 Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-Link: https://lore.kernel.org/r/20250123144627.312456-7-imbrenda@linux.ibm.com
+Link: https://lore.kernel.org/r/20250123144627.312456-8-imbrenda@linux.ibm.com
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Message-ID: <20250123144627.312456-7-imbrenda@linux.ibm.com>
+Message-ID: <20250123144627.312456-8-imbrenda@linux.ibm.com>
 ---
- arch/s390/kvm/kvm-s390.c | 126 ++++++++++++++++++++++++++++++---------
- arch/s390/kvm/kvm-s390.h |   6 ++
- arch/s390/mm/gmap.c      |   1 +
- 3 files changed, 106 insertions(+), 27 deletions(-)
+ arch/s390/include/asm/gmap.h |   1 -
+ arch/s390/kvm/intercept.c    |   4 +-
+ arch/s390/mm/gmap.c          | 124 -----------------------------------
+ 3 files changed, 2 insertions(+), 127 deletions(-)
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index a25ca440760f..70c98bf12754 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4786,11 +4786,104 @@ static void kvm_s390_assert_primary_as(struct kvm_vcpu *vcpu)
- 		current->thread.gmap_int_code, current->thread.gmap_teid.val);
- }
+diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
+index 3e66f53fe3cc..d4572729269f 100644
+--- a/arch/s390/include/asm/gmap.h
++++ b/arch/s390/include/asm/gmap.h
+@@ -113,7 +113,6 @@ int gmap_unmap_segment(struct gmap *gmap, unsigned long to, unsigned long len);
+ unsigned long __gmap_translate(struct gmap *, unsigned long gaddr);
+ unsigned long gmap_translate(struct gmap *, unsigned long gaddr);
+ int __gmap_link(struct gmap *gmap, unsigned long gaddr, unsigned long vmaddr);
+-int gmap_fault(struct gmap *, unsigned long gaddr, unsigned int fault_flags);
+ void gmap_discard(struct gmap *, unsigned long from, unsigned long to);
+ void __gmap_zap(struct gmap *, unsigned long gaddr);
+ void gmap_unlink(struct mm_struct *, unsigned long *table, unsigned long vmaddr);
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index acf10aefd08f..610dd44a948b 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -368,7 +368,7 @@ static int handle_mvpg_pei(struct kvm_vcpu *vcpu)
+ 					      reg2, &srcaddr, GACC_FETCH, 0);
+ 	if (rc)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
+-	rc = gmap_fault(vcpu->arch.gmap, srcaddr, 0);
++	rc = kvm_s390_handle_dat_fault(vcpu, srcaddr, 0);
+ 	if (rc != 0)
+ 		return rc;
  
-+/*
-+ * __kvm_s390_handle_dat_fault() - handle a dat fault for the gmap of a vcpu
-+ * @vcpu: the vCPU whose gmap is to be fixed up
-+ * @gfn: the guest frame number used for memslots (including fake memslots)
-+ * @gaddr: the gmap address, does not have to match @gfn for ucontrol gmaps
-+ * @flags: FOLL_* flags
-+ *
-+ * Return: 0 on success, < 0 in case of error.
-+ * Context: The mm lock must not be held before calling. May sleep.
-+ */
-+int __kvm_s390_handle_dat_fault(struct kvm_vcpu *vcpu, gfn_t gfn, gpa_t gaddr, unsigned int flags)
-+{
-+	struct kvm_memory_slot *slot;
-+	unsigned int fault_flags;
-+	bool writable, unlocked;
-+	unsigned long vmaddr;
-+	struct page *page;
-+	kvm_pfn_t pfn;
-+	int rc;
-+
-+	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-+	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
-+		return vcpu_post_run_addressing_exception(vcpu);
-+
-+	fault_flags = flags & FOLL_WRITE ? FAULT_FLAG_WRITE : 0;
-+	if (vcpu->arch.gmap->pfault_enabled)
-+		flags |= FOLL_NOWAIT;
-+	vmaddr = __gfn_to_hva_memslot(slot, gfn);
-+
-+try_again:
-+	pfn = __kvm_faultin_pfn(slot, gfn, flags, &writable, &page);
-+
-+	/* Access outside memory, inject addressing exception */
-+	if (is_noslot_pfn(pfn))
-+		return vcpu_post_run_addressing_exception(vcpu);
-+	/* Signal pending: try again */
-+	if (pfn == KVM_PFN_ERR_SIGPENDING)
-+		return -EAGAIN;
-+
-+	/* Needs I/O, try to setup async pfault (only possible with FOLL_NOWAIT) */
-+	if (pfn == KVM_PFN_ERR_NEEDS_IO) {
-+		trace_kvm_s390_major_guest_pfault(vcpu);
-+		if (kvm_arch_setup_async_pf(vcpu))
-+			return 0;
-+		vcpu->stat.pfault_sync++;
-+		/* Could not setup async pfault, try again synchronously */
-+		flags &= ~FOLL_NOWAIT;
-+		goto try_again;
-+	}
-+	/* Any other error */
-+	if (is_error_pfn(pfn))
-+		return -EFAULT;
-+
-+	/* Success */
-+	mmap_read_lock(vcpu->arch.gmap->mm);
-+	/* Mark the userspace PTEs as young and/or dirty, to avoid page fault loops */
-+	rc = fixup_user_fault(vcpu->arch.gmap->mm, vmaddr, fault_flags, &unlocked);
-+	if (!rc)
-+		rc = __gmap_link(vcpu->arch.gmap, gaddr, vmaddr);
-+	scoped_guard(spinlock, &vcpu->kvm->mmu_lock) {
-+		kvm_release_faultin_page(vcpu->kvm, page, false, writable);
-+	}
-+	mmap_read_unlock(vcpu->arch.gmap->mm);
-+	return rc;
-+}
-+
-+static int vcpu_dat_fault_handler(struct kvm_vcpu *vcpu, unsigned long gaddr, unsigned int flags)
-+{
-+	unsigned long gaddr_tmp;
-+	gfn_t gfn;
-+
-+	gfn = gpa_to_gfn(gaddr);
-+	if (kvm_is_ucontrol(vcpu->kvm)) {
-+		/*
-+		 * This translates the per-vCPU guest address into a
-+		 * fake guest address, which can then be used with the
-+		 * fake memslots that are identity mapping userspace.
-+		 * This allows ucontrol VMs to use the normal fault
-+		 * resolution path, like normal VMs.
-+		 */
-+		mmap_read_lock(vcpu->arch.gmap->mm);
-+		gaddr_tmp = __gmap_translate(vcpu->arch.gmap, gaddr);
-+		mmap_read_unlock(vcpu->arch.gmap->mm);
-+		if (gaddr_tmp == -EFAULT) {
-+			vcpu->run->exit_reason = KVM_EXIT_S390_UCONTROL;
-+			vcpu->run->s390_ucontrol.trans_exc_code = gaddr;
-+			vcpu->run->s390_ucontrol.pgm_code = PGM_SEGMENT_TRANSLATION;
-+			return -EREMOTE;
-+		}
-+		gfn = gpa_to_gfn(gaddr_tmp);
-+	}
-+	return __kvm_s390_handle_dat_fault(vcpu, gfn, gaddr, flags);
-+}
-+
- static int vcpu_post_run_handle_fault(struct kvm_vcpu *vcpu)
- {
- 	unsigned int flags = 0;
- 	unsigned long gaddr;
--	int rc = 0;
+@@ -377,7 +377,7 @@ static int handle_mvpg_pei(struct kvm_vcpu *vcpu)
+ 					      reg1, &dstaddr, GACC_STORE, 0);
+ 	if (rc)
+ 		return kvm_s390_inject_prog_cond(vcpu, rc);
+-	rc = gmap_fault(vcpu->arch.gmap, dstaddr, FAULT_FLAG_WRITE);
++	rc = kvm_s390_handle_dat_fault(vcpu, dstaddr, FOLL_WRITE);
+ 	if (rc != 0)
+ 		return rc;
  
- 	gaddr = current->thread.gmap_teid.addr * PAGE_SIZE;
- 	if (kvm_s390_cur_gmap_fault_is_write())
-@@ -4842,37 +4935,14 @@ static int vcpu_post_run_handle_fault(struct kvm_vcpu *vcpu)
- 	case PGM_REGION_SECOND_TRANS:
- 	case PGM_REGION_THIRD_TRANS:
- 		kvm_s390_assert_primary_as(vcpu);
--		if (vcpu->arch.gmap->pfault_enabled) {
--			rc = gmap_fault(vcpu->arch.gmap, gaddr, flags | FAULT_FLAG_RETRY_NOWAIT);
--			if (rc == -EFAULT)
--				return vcpu_post_run_addressing_exception(vcpu);
--			if (rc == -EAGAIN) {
--				trace_kvm_s390_major_guest_pfault(vcpu);
--				if (kvm_arch_setup_async_pf(vcpu))
--					return 0;
--				vcpu->stat.pfault_sync++;
--			} else {
--				return rc;
--			}
--		}
--		rc = gmap_fault(vcpu->arch.gmap, gaddr, flags);
--		if (rc == -EFAULT) {
--			if (kvm_is_ucontrol(vcpu->kvm)) {
--				vcpu->run->exit_reason = KVM_EXIT_S390_UCONTROL;
--				vcpu->run->s390_ucontrol.trans_exc_code = gaddr;
--				vcpu->run->s390_ucontrol.pgm_code = 0x10;
--				return -EREMOTE;
--			}
--			return vcpu_post_run_addressing_exception(vcpu);
--		}
--		break;
-+		return vcpu_dat_fault_handler(vcpu, gaddr, flags);
- 	default:
- 		KVM_BUG(1, vcpu->kvm, "Unexpected program interrupt 0x%x, TEID 0x%016lx",
- 			current->thread.gmap_int_code, current->thread.gmap_teid.val);
- 		send_sig(SIGSEGV, current, 0);
- 		break;
- 	}
--	return rc;
-+	return 0;
- }
- 
- static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
-@@ -5751,7 +5821,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	}
- #endif
- 	case KVM_S390_VCPU_FAULT: {
--		r = gmap_fault(vcpu->arch.gmap, arg, 0);
-+		idx = srcu_read_lock(&vcpu->kvm->srcu);
-+		r = vcpu_dat_fault_handler(vcpu, arg, 0);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 		break;
- 	}
- 	case KVM_ENABLE_CAP:
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index 30736ac16f84..3be5291723c8 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -410,6 +410,12 @@ void kvm_s390_vcpu_unsetup_cmma(struct kvm_vcpu *vcpu);
- void kvm_s390_set_cpu_timer(struct kvm_vcpu *vcpu, __u64 cputm);
- __u64 kvm_s390_get_cpu_timer(struct kvm_vcpu *vcpu);
- int kvm_s390_cpus_from_pv(struct kvm *kvm, u16 *rc, u16 *rrc);
-+int __kvm_s390_handle_dat_fault(struct kvm_vcpu *vcpu, gfn_t gfn, gpa_t gaddr, unsigned int flags);
-+
-+static inline int kvm_s390_handle_dat_fault(struct kvm_vcpu *vcpu, gpa_t gaddr, unsigned int flags)
-+{
-+	return __kvm_s390_handle_dat_fault(vcpu, gpa_to_gfn(gaddr), gaddr, flags);
-+}
- 
- /* implemented in diag.c */
- int kvm_s390_handle_diag(struct kvm_vcpu *vcpu);
 diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 3e6e25119a96..bfaba7733306 100644
+index bfaba7733306..e124fca14737 100644
 --- a/arch/s390/mm/gmap.c
 +++ b/arch/s390/mm/gmap.c
-@@ -605,6 +605,7 @@ int __gmap_link(struct gmap *gmap, unsigned long gaddr, unsigned long vmaddr)
- 	radix_tree_preload_end();
- 	return rc;
+@@ -607,130 +607,6 @@ int __gmap_link(struct gmap *gmap, unsigned long gaddr, unsigned long vmaddr)
  }
-+EXPORT_SYMBOL(__gmap_link);
+ EXPORT_SYMBOL(__gmap_link);
  
- /**
-  * fixup_user_fault_nowait - manually resolve a user page fault without waiting
+-/**
+- * fixup_user_fault_nowait - manually resolve a user page fault without waiting
+- * @mm:		mm_struct of target mm
+- * @address:	user address
+- * @fault_flags:flags to pass down to handle_mm_fault()
+- * @unlocked:	did we unlock the mmap_lock while retrying
+- *
+- * This function behaves similarly to fixup_user_fault(), but it guarantees
+- * that the fault will be resolved without waiting. The function might drop
+- * and re-acquire the mm lock, in which case @unlocked will be set to true.
+- *
+- * The guarantee is that the fault is handled without waiting, but the
+- * function itself might sleep, due to the lock.
+- *
+- * Context: Needs to be called with mm->mmap_lock held in read mode, and will
+- * return with the lock held in read mode; @unlocked will indicate whether
+- * the lock has been dropped and re-acquired. This is the same behaviour as
+- * fixup_user_fault().
+- *
+- * Return: 0 on success, -EAGAIN if the fault cannot be resolved without
+- * waiting, -EFAULT if the fault cannot be resolved, -ENOMEM if out of
+- * memory.
+- */
+-static int fixup_user_fault_nowait(struct mm_struct *mm, unsigned long address,
+-				   unsigned int fault_flags, bool *unlocked)
+-{
+-	struct vm_area_struct *vma;
+-	unsigned int test_flags;
+-	vm_fault_t fault;
+-	int rc;
+-
+-	fault_flags |= FAULT_FLAG_ALLOW_RETRY | FAULT_FLAG_RETRY_NOWAIT;
+-	test_flags = fault_flags & FAULT_FLAG_WRITE ? VM_WRITE : VM_READ;
+-
+-	vma = find_vma(mm, address);
+-	if (unlikely(!vma || address < vma->vm_start))
+-		return -EFAULT;
+-	if (unlikely(!(vma->vm_flags & test_flags)))
+-		return -EFAULT;
+-
+-	fault = handle_mm_fault(vma, address, fault_flags, NULL);
+-	/* the mm lock has been dropped, take it again */
+-	if (fault & VM_FAULT_COMPLETED) {
+-		*unlocked = true;
+-		mmap_read_lock(mm);
+-		return 0;
+-	}
+-	/* the mm lock has not been dropped */
+-	if (fault & VM_FAULT_ERROR) {
+-		rc = vm_fault_to_errno(fault, 0);
+-		BUG_ON(!rc);
+-		return rc;
+-	}
+-	/* the mm lock has not been dropped because of FAULT_FLAG_RETRY_NOWAIT */
+-	if (fault & VM_FAULT_RETRY)
+-		return -EAGAIN;
+-	/* nothing needed to be done and the mm lock has not been dropped */
+-	return 0;
+-}
+-
+-/**
+- * __gmap_fault - resolve a fault on a guest address
+- * @gmap: pointer to guest mapping meta data structure
+- * @gaddr: guest address
+- * @fault_flags: flags to pass down to handle_mm_fault()
+- *
+- * Context: Needs to be called with mm->mmap_lock held in read mode. Might
+- * drop and re-acquire the lock. Will always return with the lock held.
+- */
+-static int __gmap_fault(struct gmap *gmap, unsigned long gaddr, unsigned int fault_flags)
+-{
+-	unsigned long vmaddr;
+-	bool unlocked;
+-	int rc = 0;
+-
+-retry:
+-	unlocked = false;
+-
+-	vmaddr = __gmap_translate(gmap, gaddr);
+-	if (IS_ERR_VALUE(vmaddr))
+-		return vmaddr;
+-
+-	if (fault_flags & FAULT_FLAG_RETRY_NOWAIT)
+-		rc = fixup_user_fault_nowait(gmap->mm, vmaddr, fault_flags, &unlocked);
+-	else
+-		rc = fixup_user_fault(gmap->mm, vmaddr, fault_flags, &unlocked);
+-	if (rc)
+-		return rc;
+-	/*
+-	 * In the case that fixup_user_fault unlocked the mmap_lock during
+-	 * fault-in, redo __gmap_translate() to avoid racing with a
+-	 * map/unmap_segment.
+-	 * In particular, __gmap_translate(), fixup_user_fault{,_nowait}(),
+-	 * and __gmap_link() must all be called atomically in one go; if the
+-	 * lock had been dropped in between, a retry is needed.
+-	 */
+-	if (unlocked)
+-		goto retry;
+-
+-	return __gmap_link(gmap, gaddr, vmaddr);
+-}
+-
+-/**
+- * gmap_fault - resolve a fault on a guest address
+- * @gmap: pointer to guest mapping meta data structure
+- * @gaddr: guest address
+- * @fault_flags: flags to pass down to handle_mm_fault()
+- *
+- * Returns 0 on success, -ENOMEM for out of memory conditions, -EFAULT if the
+- * vm address is already mapped to a different guest segment, and -EAGAIN if
+- * FAULT_FLAG_RETRY_NOWAIT was specified and the fault could not be processed
+- * immediately.
+- */
+-int gmap_fault(struct gmap *gmap, unsigned long gaddr, unsigned int fault_flags)
+-{
+-	int rc;
+-
+-	mmap_read_lock(gmap->mm);
+-	rc = __gmap_fault(gmap, gaddr, fault_flags);
+-	mmap_read_unlock(gmap->mm);
+-	return rc;
+-}
+-EXPORT_SYMBOL_GPL(gmap_fault);
+-
+ /*
+  * this function is assumed to be called with mmap_lock held
+  */
 -- 
 2.48.1
 
