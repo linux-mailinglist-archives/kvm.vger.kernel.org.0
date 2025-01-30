@@ -1,40 +1,88 @@
-Return-Path: <kvm+bounces-36933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36934-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B9ABA23218
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 17:41:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C2AA23242
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 17:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 544D7188342A
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 16:40:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2327E3A3385
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 16:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE3E1EE7A5;
-	Thu, 30 Jan 2025 16:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BDA01EE7A9;
+	Thu, 30 Jan 2025 16:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FOmSf9VV"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6EED1EBFF9;
-	Thu, 30 Jan 2025 16:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94FB154BF0
+	for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 16:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738255229; cv=none; b=dvJW69YOjz77/ONYpdLw2bkKSZUUeleYbIjSccPuZjqhyGTebi/8w8gBMCVyd+nMkV2WPCuzvYOw6QD5EqCbaTOajiVyKfqwVQNCtq93uteeAx1INkEswvkgwycQuH2WzJUBFm6bsdLJooib6iSTgmzap7EIEjG5yMk4Wds4Gvg=
+	t=1738255822; cv=none; b=hyyRv7FiaNvaKSICNFA5V5lYbvaKtGUkf1hD0Wz7QyQSwazI3tTMrthlvnQvxXIk1DlDfyHRcXV/G4jrZdDkaCqJEnA3Sdc+TNqBUMELMf4jiG2sZU1hOc9vi5AIGudozaB0DpKkF7mdA2ojbLh/qVgdEp8gBQTMv66Bv9dAUBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738255229; c=relaxed/simple;
-	bh=CBLwdVRlb+iZaCTkBqzKN0bBsz22zqWBado1sqMK/Jo=;
+	s=arc-20240116; t=1738255822; c=relaxed/simple;
+	bh=sd6/Kr/W0fj4Tt/V73mGqrB78Z99cuIzf7NoMNqTaA8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e2yY6c4zBLo/YTuc0YbRc+9FpzvUiWyaBdNfh8/Wvp+bYc3SukqbrLHy6z6TNjTJD8qw/mMm8qY1XDAk2ieqpphq4DHm4agTzSGxgMlfXbra8072UUQLvL3023XoJ91Bj2MYrudQ2BLQZWjOKsIdjQsOxGZhcsLHbQx9tsg0Ipw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2439497;
-	Thu, 30 Jan 2025 08:40:51 -0800 (PST)
-Received: from [10.1.32.52] (e122027.cambridge.arm.com [10.1.32.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0B083F63F;
-	Thu, 30 Jan 2025 08:40:21 -0800 (PST)
-Message-ID: <9174bc24-6217-4663-a370-291d4790a212@arm.com>
-Date: Thu, 30 Jan 2025 16:40:20 +0000
+	 In-Reply-To:Content-Type; b=oSJQMjISXnCdExdIlMKC06iihsS5TbOXZ6N/0DUAp+cQkuvBS0LfvEooCdkCArQYJJuOBW50S6XpOMe+KQwFRRaZoW00HqRnV8v3Dw/0U02J0wfPsYGI75yWu2GXx8iLZZAlQSOd/QPf4+bS6B+zDLtQYLw0FnMAznhIzw1F2x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FOmSf9VV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738255819;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aDuLjl2GAZ7/D8fcAP2LpDCVaOfyiXeWSKBzLYMRsrM=;
+	b=FOmSf9VV8FlGvUfVpSlNrnDJ0cx+pYw5sapAiobmw9bEGRhUIiUFO7WFW45sLzV5zVOEK0
+	ueYLc6I0UohJ+OH01F9RcNcmIrUUHCDPnh5B9R8fMdBLFlGIwepkvJxO3kvQZ8qYt7wr4s
+	LJFoT2pWPg4+oKY2EvWhb7zgsVZOZXA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-175-h39iLurrOGiE8WIvTB_x5g-1; Thu, 30 Jan 2025 11:50:18 -0500
+X-MC-Unique: h39iLurrOGiE8WIvTB_x5g-1
+X-Mimecast-MFC-AGG-ID: h39iLurrOGiE8WIvTB_x5g
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4362b9c15d8so4929295e9.3
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 08:50:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738255817; x=1738860617;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aDuLjl2GAZ7/D8fcAP2LpDCVaOfyiXeWSKBzLYMRsrM=;
+        b=gA9sQPV41RIWQZAZsZ+++ajusY1tpqEN1deKotsph3CNRiWFBcVr33Tyw+IfECY6qC
+         7ReXxmtSvZgc56+aavxDJa+hxKX51p3D5kDgKAiCWhiGkINptHIzFrocrxBcJPjgXom6
+         wlGtXNEzVQDWQzsNgbDqbRLgrtge0KeZPV3qRhJN1EBisNdXbqE4G71IGVcV8InwDGJe
+         BqL/vRhnq3S6cp3PkKJu8+kOAA6S1V0hhug5Sjnu/C+n9wac6Ld0JdFIoLkzlYpnqMsS
+         nOwnkM8oL+ZMf1pF7uTwJZqnwdoAhYakFhaMQzFrKhG9q/UANckBuef+dP2zP+LH55+u
+         NK+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUmzP0SOBTBn5n2YPsiz7p0EaiQg6axvoEHF/WpGxA+sQ7lQV25oLJ29Em6KkI99hQkPN8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6yZswYerhLHkQ/ruy+spvy4mhF64XiNGOHNT5CX3mW7HVH0RJ
+	QP5k9hC3wD+IkLAkxTprv7ge6CS5YxV+KB+F7xg7VWxVSCj/VVYM06qbA+0jAcVgespxVYLNkNQ
+	JRFchB8q3JddGqxihGi1KWitp/D87vlKtzODZIn50eD5/NAjVeQ==
+X-Gm-Gg: ASbGnctbWvFcfQKSfozB3345+1txncF8NZk0WmGcnkj1l1sOFnNXr749bXWjsDTLoji
+	PbJbMA7yyeIY0tC5Gnwbhsk4OwlLg6bxQqGdRNQOcroOHiqEcKXrDkZ+8kOaffBPIZ6Ty/VjA3E
+	6+PKmLskGQqJ/qb4StrKNAILGQSk97VD4PVt7LjvC+o325ZHZLRsJLPyTgnpUdwVGgcuS6+WYgZ
+	ef0d9kndaVJc5DpK4of2SHLt4HB+zF7gz7JYmIUrjJ4YgJYxtEsZrslCppIGmygWy9wpWGwXeet
+	sSSw0PusUfQwCfk5FQsMSX0m8dkX5O29/wwukXa1Eqz1jzmDUX8owxiU2K6CzjSAmMNdTVvQdcy
+	8AdoUo9rxkiKhHfmiwzRGAsrYlTYSFKu7
+X-Received: by 2002:a05:600c:5252:b0:431:6153:a258 with SMTP id 5b1f17b1804b1-438dc3ca802mr73784395e9.13.1738255816953;
+        Thu, 30 Jan 2025 08:50:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFKH2fW4NSbkO08R90rYpb1d1lZDXWlBjtaOO68yuI6mRQsZM3l8jfnNpqX2ThheKVnCBKblg==
+X-Received: by 2002:a05:600c:5252:b0:431:6153:a258 with SMTP id 5b1f17b1804b1-438dc3ca802mr73784235e9.13.1738255816572;
+        Thu, 30 Jan 2025 08:50:16 -0800 (PST)
+Received: from ?IPV6:2003:cb:c713:3b00:16ce:8f1c:dd50:90fb? (p200300cbc7133b0016ce8f1cdd5090fb.dip0.t-ipconnect.de. [2003:cb:c713:3b00:16ce:8f1c:dd50:90fb])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc6df1esm64941645e9.27.2025.01.30.08.50.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jan 2025 08:50:16 -0800 (PST)
+Message-ID: <6810dbdb-1b44-4656-9f65-abca471523f9@redhat.com>
+Date: Thu, 30 Jan 2025 17:50:13 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,209 +90,114 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 12/43] arm64: RME: Allocate/free RECs to match vCPUs
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-13-steven.price@arm.com>
- <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [RFC PATCH v2 00/11] KVM: Mapping guest_memfd backed memory at
+ the host for software protected VMs
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com,
+ mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
+References: <20250129172320.950523-1-tabba@google.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20250129172320.950523-1-tabba@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 29/01/2025 04:50, Gavin Shan wrote:
-> On 12/13/24 1:55 AM, Steven Price wrote:
->> The RMM maintains a data structure known as the Realm Execution Context
->> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
->> virtual CPUs. KVM must delegate memory and request the structures are
->> created when vCPUs are created, and suitably tear down on destruction.
->>
->> RECs must also be supplied with addition pages - auxiliary (or AUX)
->> granules - for storing the larger registers state (e.g. for SVE). The
->> number of AUX granules for a REC depends on the parameters with which
->> the Realm was created - the RMM makes this information available via the
->> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor
->> (RD).
->>
->> Note that only some of register state for the REC can be set by KVM, the
->> rest is defined by the RMM (zeroed). The register state then cannot be
->> changed by KVM after the REC is created (except when the guest
->> explicitly requests this e.g. by performing a PSCI call). The RMM also
->> requires that the VMM creates RECs in ascending order of the MPIDR.
->>
->> See Realm Management Monitor specification (DEN0137) for more
->> information:
->> https://developer.arm.com/documentation/den0137/
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v5:
->>   * Separate the concept of vcpu_is_rec() and
->>     kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
->>     the indication that the VCPU is a REC.
->> Changes since v2:
->>   * Free rec->run earlier in kvm_destroy_realm() and adapt to previous
->> patches.
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h |   7 ++
->>   arch/arm64/include/asm/kvm_host.h    |   3 +
->>   arch/arm64/include/asm/kvm_rme.h     |  18 ++++
->>   arch/arm64/kvm/arm.c                 |   9 ++
->>   arch/arm64/kvm/reset.c               |  11 ++
->>   arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
->>   6 files changed, 192 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/
->> include/asm/kvm_emulate.h
->> index 27f54a7778aa..ec2b6d9c9c07 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -722,7 +722,14 @@ static inline bool kvm_realm_is_created(struct
->> kvm *kvm)
->>     static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->>   {
->> +    if (static_branch_unlikely(&kvm_rme_is_available))
->> +        return vcpu_has_feature(vcpu, KVM_ARM_VCPU_REC);
->>       return false;
->>   }
->>   
-> 
-> It seems the check on kvm_rme_is_available is unnecessary because
-> KVM_ARM_VCPU_REC
-> is possible to be true only when kvm_rme_is_available is true.
+On 29.01.25 18:23, Fuad Tabba wrote:
 
-Similar to a previous patch - the check of the static key is to avoid
-overhead on systems without RME.
+Thanks for the new version
 
->> +static inline bool kvm_arm_vcpu_rec_finalized(struct kvm_vcpu *vcpu)
->> +{
->> +    return vcpu->arch.rec.mpidr != INVALID_HWID;
->> +}
->> +
->>   #endif /* __ARM64_KVM_EMULATE_H__ */
-> 
-> I would suggest to rename to kvm_arm_rec_finalized() since vCPU and REC are
-> similar objects at the same level. It'd better to avoid duplicate object
-> name reference in the function name.
+> Main changes since v1 [1]:
+> - Added x86 support for mapping guest_memfd at the host, enabled
+>   only for the KVM_X86_SW_PROTECTED_VM type.
 
-Ack
+Nice!
 
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/
->> asm/kvm_host.h
->> index 8482638dce3b..220195c727ef 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -789,6 +789,9 @@ struct kvm_vcpu_arch {
->>         /* Per-vcpu CCSIDR override or NULL */
->>       u32 *ccsidr;
->> +
->> +    /* Realm meta data */
->> +    struct realm_rec rec;
->>   };
->>     /*
->> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
->> asm/kvm_rme.h
->> index 32bdedf1d866..62d4a63d3035 100644
->> --- a/arch/arm64/include/asm/kvm_rme.h
->> +++ b/arch/arm64/include/asm/kvm_rme.h
->> @@ -6,6 +6,7 @@
->>   #ifndef __ASM_KVM_RME_H
->>   #define __ASM_KVM_RME_H
->>   +#include <asm/rmi_smc.h>
->>   #include <uapi/linux/kvm.h>
->>     /**
->> @@ -65,6 +66,21 @@ struct realm {
->>       unsigned int ia_bits;
->>   };
->>   +/**
->> + * struct realm_rec - Additional per VCPU data for a Realm
->> + *
->> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify
->> this VCPU
->> + * @rec_page: Kernel VA of the RMM's private page for this REC
->> + * @aux_pages: Additional pages private to the RMM for this REC
->> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
->> + */
->> +struct realm_rec {
->> +    unsigned long mpidr;
->> +    void *rec_page;
->> +    struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
->> +    struct rec_run *run;
->> +};
->> +
->>   void kvm_init_rme(void);
->>   u32 kvm_realm_ipa_limit(void);
->>   @@ -72,6 +88,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct
->> kvm_enable_cap *cap);
->>   int kvm_init_realm_vm(struct kvm *kvm);
->>   void kvm_destroy_realm(struct kvm *kvm);
->>   void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
->> +int kvm_create_rec(struct kvm_vcpu *vcpu);
->> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->>     #define RMM_RTT_BLOCK_LEVEL    2
->>   #define RMM_RTT_MAX_LEVEL    3
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 73016e1e0067..2d97147651be 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -525,6 +525,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->>       /* Force users to call KVM_ARM_VCPU_INIT */
->>       vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
->>   +    vcpu->arch.rec.mpidr = INVALID_HWID;
->> +
->>       vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->>         /* Set up the timer */
->> @@ -1467,6 +1469,9 @@ static unsigned long
->> system_supported_vcpu_features(void)
->>       if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
->>           clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
->>   +    if (!static_branch_unlikely(&kvm_rme_is_available))
->> +        clear_bit(KVM_ARM_VCPU_REC, &features);
->> +
->>       return features;
->>   }
->>   @@ -1506,6 +1511,10 @@ static int
->> kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
->>       if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
->>           return -EINVAL;
->>   +    /* RME is incompatible with AArch32 */
->> +    if (test_bit(KVM_ARM_VCPU_REC, &features))
->> +        return -EINVAL;
->> +
->>       return 0;
->>   }
->>   
-> 
-> One corner case seems missed in kvm_vcpu_init_check_features(). It's
-> allowed to
-> initialize a vCPU with REC feature even kvm_is_realm(kvm) is false.
-> Hopefully,
-> I didn't miss something.
+> - Require setting memslot userspace_addr for guest_memfd slots
+>   even if shared, and remove patches that worked around that.
+> - Brought in more of the infrastructure from the patch series
+>   that allows restricted mapping of guest_memfd backed memory.
 
-Ah, yes good point. I'll pass a kvm pointer to
-kvm_vcpu_init_check_features() and use kvm_is_realm() in there.
+Ah, that explains why we see the page_type stuff in here now :)
 
-Thanks,
+> - Renamed references to "mappable" -> "shared".
+> - Expanded the selftests.
+> - Added instructions to test on x86 and arm64 (below).
 
-Steve
+Very nice!
 
-> [...]
-> 
-> Thanks,
-> Gavin
-> 
+
+I assume there is still no page conversion happening -- or is there now 
+that the page_stuff thing is in here?
+
+Would be good to spell out what's supported and what's still TBD 
+regarding mmap support.
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
