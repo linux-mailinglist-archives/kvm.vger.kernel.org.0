@@ -1,99 +1,250 @@
-Return-Path: <kvm+bounces-36932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C77C5A2320A
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 17:38:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B9ABA23218
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 17:41:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9319188A2BC
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 16:36:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 544D7188342A
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 16:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77BC51EE003;
-	Thu, 30 Jan 2025 16:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rwkX0tDW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE3E1EE7A5;
+	Thu, 30 Jan 2025 16:40:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566141EBA19
-	for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 16:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6EED1EBFF9;
+	Thu, 30 Jan 2025 16:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738254975; cv=none; b=smlP59GqIBxocud8PFr0B2B7NuWspA4U9amvt46efYVneMYlp+BwJqfFfaDSTsA76o5MAggPVybxVieyy8ERiD/bFLHt+smDnmyZVppevdqM0aXly6UtTm/sb/4gl0hnQGUZ4m1O5vAn0dC9dY6Xc9FE3oGUS8pNz5oEJd1zCJU=
+	t=1738255229; cv=none; b=dvJW69YOjz77/ONYpdLw2bkKSZUUeleYbIjSccPuZjqhyGTebi/8w8gBMCVyd+nMkV2WPCuzvYOw6QD5EqCbaTOajiVyKfqwVQNCtq93uteeAx1INkEswvkgwycQuH2WzJUBFm6bsdLJooib6iSTgmzap7EIEjG5yMk4Wds4Gvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738254975; c=relaxed/simple;
-	bh=599WB4f+HeaYDvUCkjFRfoW7ycd8AtJnybDcm55BZfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jDhAUyHkEfhy5LsyAEWlF7xEjuu1wbEqfL/K+2iiuNSqssX0lHWlVA8/D8i76O5MuGpBTkYR0Z9wBUAw/B+di5fslPspqbdaILW8TE8OYGKXC74Dk39upA1B2ImEEtW4mk9dGpnVV+dFLrtUTyehd59FRzkGaS/ZV+bV4VrnAp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rwkX0tDW; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 30 Jan 2025 16:36:02 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738254966;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bqHX7O8d5cgYeb7FuzF979jxPcJGlS3Q3RcQkc3h9G8=;
-	b=rwkX0tDWzIdr9puvKyNlPXgsuXOv9sjVnukVx/Q4J34iL1Y/Eh9z4fPqfN+1dlG2+6TRh9
-	68t3CgGyyZ1pLuyGJbPV2IrV1cqy6q00uxYDbhyBgaEDbWyUFxX0irH6PXOZg5gOgXQckD
-	YSJy/7aT9LI9LizjUKY+JysUxznc9oE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nSVM: Enter guest mode before initializing nested
- NPT MMU
-Message-ID: <Z5uqct4AJSasUIWq@google.com>
-References: <20250130010825.220346-1-seanjc@google.com>
- <Z5rhH342Jghl2tgL@google.com>
- <Z5ulFoNRWGg3LOzA@google.com>
+	s=arc-20240116; t=1738255229; c=relaxed/simple;
+	bh=CBLwdVRlb+iZaCTkBqzKN0bBsz22zqWBado1sqMK/Jo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e2yY6c4zBLo/YTuc0YbRc+9FpzvUiWyaBdNfh8/Wvp+bYc3SukqbrLHy6z6TNjTJD8qw/mMm8qY1XDAk2ieqpphq4DHm4agTzSGxgMlfXbra8072UUQLvL3023XoJ91Bj2MYrudQ2BLQZWjOKsIdjQsOxGZhcsLHbQx9tsg0Ipw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2439497;
+	Thu, 30 Jan 2025 08:40:51 -0800 (PST)
+Received: from [10.1.32.52] (e122027.cambridge.arm.com [10.1.32.52])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0B083F63F;
+	Thu, 30 Jan 2025 08:40:21 -0800 (PST)
+Message-ID: <9174bc24-6217-4663-a370-291d4790a212@arm.com>
+Date: Thu, 30 Jan 2025 16:40:20 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z5ulFoNRWGg3LOzA@google.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 12/43] arm64: RME: Allocate/free RECs to match vCPUs
+To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20241212155610.76522-1-steven.price@arm.com>
+ <20241212155610.76522-13-steven.price@arm.com>
+ <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 30, 2025 at 08:13:10AM -0800, Sean Christopherson wrote:
-> On Thu, Jan 30, 2025, Yosry Ahmed wrote:
-> > On Wed, Jan 29, 2025 at 05:08:25PM -0800, Sean Christopherson wrote:
-> > > When preparing vmcb02 for nested VMRUN (or state restore), "enter" guest
-> > > mode prior to initializing the MMU for nested NPT so that guest_mode is
-> > > set in the MMU's role.  KVM's model is that all L2 MMUs are tagged with
-> > > guest_mode, as the behavior of hypervisor MMUs tends to be significantly
-> > > different than kernel MMUs.
-> > > 
-> > > Practically speaking, the bug is relatively benign, as KVM only directly
-> > > queries role.guest_mode in kvm_mmu_free_guest_mode_roots(), which SVM
-> > > doesn't use, and in paths that are optimizations (mmu_page_zap_pte() and
-> > > shadow_mmu_try_split_huge_pages()).
-> > 
-> > Just curious, what about kvm_mmu_page_ad_need_write_protect()?
+On 29/01/2025 04:50, Gavin Shan wrote:
+> On 12/13/24 1:55 AM, Steven Price wrote:
+>> The RMM maintains a data structure known as the Realm Execution Context
+>> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+>> virtual CPUs. KVM must delegate memory and request the structures are
+>> created when vCPUs are created, and suitably tear down on destruction.
+>>
+>> RECs must also be supplied with addition pages - auxiliary (or AUX)
+>> granules - for storing the larger registers state (e.g. for SVE). The
+>> number of AUX granules for a REC depends on the parameters with which
+>> the Realm was created - the RMM makes this information available via the
+>> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor
+>> (RD).
+>>
+>> Note that only some of register state for the REC can be set by KVM, the
+>> rest is defined by the RMM (zeroed). The register state then cannot be
+>> changed by KVM after the REC is created (except when the guest
+>> explicitly requests this e.g. by performing a PSCI call). The RMM also
+>> requires that the VMM creates RECs in ascending order of the MPIDR.
+>>
+>> See Realm Management Monitor specification (DEN0137) for more
+>> information:
+>> https://developer.arm.com/documentation/den0137/
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v5:
+>>   * Separate the concept of vcpu_is_rec() and
+>>     kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>>     the indication that the VCPU is a REC.
+>> Changes since v2:
+>>   * Free rec->run earlier in kvm_destroy_realm() and adapt to previous
+>> patches.
+>> ---
+>>   arch/arm64/include/asm/kvm_emulate.h |   7 ++
+>>   arch/arm64/include/asm/kvm_host.h    |   3 +
+>>   arch/arm64/include/asm/kvm_rme.h     |  18 ++++
+>>   arch/arm64/kvm/arm.c                 |   9 ++
+>>   arch/arm64/kvm/reset.c               |  11 ++
+>>   arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
+>>   6 files changed, 192 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/
+>> include/asm/kvm_emulate.h
+>> index 27f54a7778aa..ec2b6d9c9c07 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -722,7 +722,14 @@ static inline bool kvm_realm_is_created(struct
+>> kvm *kvm)
+>>     static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>>   {
+>> +    if (static_branch_unlikely(&kvm_rme_is_available))
+>> +        return vcpu_has_feature(vcpu, KVM_ARM_VCPU_REC);
+>>       return false;
+>>   }
+>>   
 > 
-> Doh, I missed that usage.
-> 
-> > Is it also bengin?
-> 
-> Yes.  Better to be lucky than good :-)
-> 
-> That path forces KVM to use write-protection instead of dirty-bit based Page
-> Modification Logging (PML) when L2 is active, because the GPAs captured by the
-> CPU would be L2 GPAs, not L1 GPAs, and there's no guarantee that the L2=>L1
-> translation would be valid when KVM processes the PML buffer.  To ensure the
-> correct page gets marked dirty, KVM uses it's standard write-protect scheme when
-> running L2, even if KVM is using PML to dirty log L1 accesses.
-> 
-> Lucky for me, PML isn't supported on any AMD CPUs.
+> It seems the check on kvm_rme_is_available is unnecessary because
+> KVM_ARM_VCPU_REC
+> is possible to be true only when kvm_rme_is_available is true.
 
-Well, that worked out nicely, and probably explains why the bug was not
-noticed. Thanks for explaining it!
+Similar to a previous patch - the check of the static key is to avoid
+overhead on systems without RME.
+
+>> +static inline bool kvm_arm_vcpu_rec_finalized(struct kvm_vcpu *vcpu)
+>> +{
+>> +    return vcpu->arch.rec.mpidr != INVALID_HWID;
+>> +}
+>> +
+>>   #endif /* __ARM64_KVM_EMULATE_H__ */
+> 
+> I would suggest to rename to kvm_arm_rec_finalized() since vCPU and REC are
+> similar objects at the same level. It'd better to avoid duplicate object
+> name reference in the function name.
+
+Ack
+
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/
+>> asm/kvm_host.h
+>> index 8482638dce3b..220195c727ef 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -789,6 +789,9 @@ struct kvm_vcpu_arch {
+>>         /* Per-vcpu CCSIDR override or NULL */
+>>       u32 *ccsidr;
+>> +
+>> +    /* Realm meta data */
+>> +    struct realm_rec rec;
+>>   };
+>>     /*
+>> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
+>> asm/kvm_rme.h
+>> index 32bdedf1d866..62d4a63d3035 100644
+>> --- a/arch/arm64/include/asm/kvm_rme.h
+>> +++ b/arch/arm64/include/asm/kvm_rme.h
+>> @@ -6,6 +6,7 @@
+>>   #ifndef __ASM_KVM_RME_H
+>>   #define __ASM_KVM_RME_H
+>>   +#include <asm/rmi_smc.h>
+>>   #include <uapi/linux/kvm.h>
+>>     /**
+>> @@ -65,6 +66,21 @@ struct realm {
+>>       unsigned int ia_bits;
+>>   };
+>>   +/**
+>> + * struct realm_rec - Additional per VCPU data for a Realm
+>> + *
+>> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify
+>> this VCPU
+>> + * @rec_page: Kernel VA of the RMM's private page for this REC
+>> + * @aux_pages: Additional pages private to the RMM for this REC
+>> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+>> + */
+>> +struct realm_rec {
+>> +    unsigned long mpidr;
+>> +    void *rec_page;
+>> +    struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
+>> +    struct rec_run *run;
+>> +};
+>> +
+>>   void kvm_init_rme(void);
+>>   u32 kvm_realm_ipa_limit(void);
+>>   @@ -72,6 +88,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct
+>> kvm_enable_cap *cap);
+>>   int kvm_init_realm_vm(struct kvm *kvm);
+>>   void kvm_destroy_realm(struct kvm *kvm);
+>>   void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bits);
+>> +int kvm_create_rec(struct kvm_vcpu *vcpu);
+>> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>>     #define RMM_RTT_BLOCK_LEVEL    2
+>>   #define RMM_RTT_MAX_LEVEL    3
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 73016e1e0067..2d97147651be 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -525,6 +525,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>>       /* Force users to call KVM_ARM_VCPU_INIT */
+>>       vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
+>>   +    vcpu->arch.rec.mpidr = INVALID_HWID;
+>> +
+>>       vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>>         /* Set up the timer */
+>> @@ -1467,6 +1469,9 @@ static unsigned long
+>> system_supported_vcpu_features(void)
+>>       if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+>>           clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
+>>   +    if (!static_branch_unlikely(&kvm_rme_is_available))
+>> +        clear_bit(KVM_ARM_VCPU_REC, &features);
+>> +
+>>       return features;
+>>   }
+>>   @@ -1506,6 +1511,10 @@ static int
+>> kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+>>       if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
+>>           return -EINVAL;
+>>   +    /* RME is incompatible with AArch32 */
+>> +    if (test_bit(KVM_ARM_VCPU_REC, &features))
+>> +        return -EINVAL;
+>> +
+>>       return 0;
+>>   }
+>>   
+> 
+> One corner case seems missed in kvm_vcpu_init_check_features(). It's
+> allowed to
+> initialize a vCPU with REC feature even kvm_is_realm(kvm) is false.
+> Hopefully,
+> I didn't miss something.
+
+Ah, yes good point. I'll pass a kvm pointer to
+kvm_vcpu_init_check_features() and use kvm_is_realm() in there.
+
+Thanks,
+
+Steve
+
+> [...]
+> 
+> Thanks,
+> Gavin
+> 
+
 
