@@ -1,180 +1,157 @@
-Return-Path: <kvm+bounces-36936-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24317A23256
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 17:56:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2324A2325D
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 17:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57A1C3A5045
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 16:56:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47B941651D0
+	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 16:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C201EEA3C;
-	Thu, 30 Jan 2025 16:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4E21EE7C6;
+	Thu, 30 Jan 2025 16:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3ER7h2Rg"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC841EE035;
-	Thu, 30 Jan 2025 16:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49C21EE01A
+	for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 16:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738256191; cv=none; b=BUMoCWunthEIr1dodOMdoJAZyeVEimDspvIoIbt9CbWVKuFTCdlQI9Mqe/hoS1Z68XIKhzl99z7KKlQdWHXeumvw97G1xsTzwvX6KrX97DU40b2dC+rYkmmCRj0i1ObH4JrgwW1mGWqVzM0Dszigvno7Ceb6DX8N/K0b2/2vjmM=
+	t=1738256318; cv=none; b=r0yZ55KnVAYnglc3L9aD7//9G/1OwECEXmJWU0v0jP7deLsRa8AK2O3fwqxyYv8Nx3WFTIYFFbkHKz6KmK/1Crwc1PjiSI9vbsuWuwsxkl2X2uYi4sKbuJekJrKsAPxSvegcvyj2WuM50HIZDligPw1sSLR3UsRgZdE2aTeBzCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738256191; c=relaxed/simple;
-	bh=eLyjG0G1KbV38YOTYlWw6vyTB9t+tEh09C2FyplIcgs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AQfK+yHJaR5gXHUsAzRyXwAxAZgQ0DTdJbpGt9WIbuARDeHBETRlu1qQEdgY27PJF7tYrGAoNpsLAgj8atxUmStnrDRNfYwsn248IfpmNjZfZBaI2m4bCjmdhcNUya4P1gAkJXlZ7dRfVkw77Ws6LW0GyxVs+SoHhVNs1iFMFiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E7DB497;
-	Thu, 30 Jan 2025 08:56:55 -0800 (PST)
-Received: from [10.1.32.52] (e122027.cambridge.arm.com [10.1.32.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20D4F3F63F;
-	Thu, 30 Jan 2025 08:56:24 -0800 (PST)
-Message-ID: <699f918e-5db4-467c-9dcf-c1474aaef265@arm.com>
-Date: Thu, 30 Jan 2025 16:56:22 +0000
+	s=arc-20240116; t=1738256318; c=relaxed/simple;
+	bh=d+XERwEorFMtt/canygb3yzxG8nO4ybue2mgukhF8iA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B5CuqDLW80GFgxFLIwqU0mNpxD1iybly/4C0fF7hsxPf2smibcFTMBjzbolJh2X2feXDXCDzppMCwBQZ+SNgV9fykiUtggQDLq+GAr6R9sAMK+yUgScy6fxNVYpKzlb0zdPGf6WZHXO5F8j5gwZQXtpD8NFCMjDs5RTiVB6ddVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3ER7h2Rg; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4679b5c66d0so252301cf.1
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 08:58:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738256316; x=1738861116; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OjVSJeaXnqEO6kzNOY1Q8YRm02MOKH0yqrkAcstxsgU=;
+        b=3ER7h2RgmEGDgX70pYFVBWSFTW8aJ/segOd49o/TrhK/Isx8hFne3nwqAaT5RpBp5i
+         esTPw38VjZbWHu0W2Q424ASsr2ImHAtf96pmPHZz5O903fD7tFebcIAGYzglTaLLMc8F
+         gZyDNDbAK5YD0QZxnhToeg8erNJ7hJzQt/Onv9AJEeEdUTdAeMgBQ+cOmrmnT4/b4QUx
+         BIR6OGPq1kU/FG8YHkegL/Z953mi1ouOOKSicSxAC1u+CZEtEmLd3HxOosKNWPUutxUd
+         vGeA0AjnmDQylPJu5T4F3y0ZHOJgRfMtBT94hUPmTNMaJ3QrwOvgYxMh5LkRUcY+VUhN
+         Oe+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738256316; x=1738861116;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OjVSJeaXnqEO6kzNOY1Q8YRm02MOKH0yqrkAcstxsgU=;
+        b=miQ+HR4A3oQWDWz3IVcPw944mPHDrPFTVmdZBicNC4mhNW3ViZze0xIksLEtMoM/lK
+         lv8+Ck7+4VuuogPo/bopbGTrXL9gRK4Esc8wjGq9b8dXFfgZ7hiUIeYiD1oApLArlfTn
+         2nSJLRuiXQNpC+tEreXNkvGqCf92ieEfkpWBpFL2PfeD2gnXfj62vVWPWnrp8r6Qu4o5
+         yLfz9JmZTD46V/G0XNUSKx+UCfdWRxdsLx8xUyGgVC2LDbVzcdjKdsyC05OVrTiKZG2y
+         iQg42kW8gfHIPKaxiiwMuCxv8JAK0jaXE2Lmlvp/RdoaeJmAXzToWpZTWVKNhZH6HG4g
+         ijtw==
+X-Gm-Message-State: AOJu0YxIIVx6KLtHbfXV6SUcjG1h8Y5+QRXKSTbzMlBR4G8v9JoSdFvC
+	EsHTiusjOGcJpWi2aiBqN/oiw/izL6CR+YemEEjUrbHZtRAiZ4yBONd1wo0EiSfTI8pJYCmiKYT
+	aqknZq0ZEylGIHgXttjXjlmEFTpM/cZoUWB/E
+X-Gm-Gg: ASbGncsPmrBecDxeVmj31bmL5kQSwvcxXH9XJxEwtb+NQN7so5hMwzCf6QIiE9aIPoJ
+	7FsdKmRv3TYeX+CcAW7+74TiAGNm5iXuKS2NjdhW3W9RKzt7BXaMGCnHJuY5Vc2gLLHBKR6M=
+X-Google-Smtp-Source: AGHT+IHCwX9tBUNJ4vUL+HRtX/pNUZGqGIBRJgFIeh7dwGLzBMH2QbmaQNU6B5i4kDVwxKn3b3C2BGkQe7GPOVyR6ew=
+X-Received: by 2002:a05:622a:1a9a:b0:466:97d6:b245 with SMTP id
+ d75a77b69052e-46fde4b14e3mr4241201cf.22.1738256315469; Thu, 30 Jan 2025
+ 08:58:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 16/43] arm64: RME: Allow VMM to set RIPAS
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-17-steven.price@arm.com>
- <4c1c507d-25ae-488f-88d3-fd6ffe337d0d@redhat.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <4c1c507d-25ae-488f-88d3-fd6ffe337d0d@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250129172320.950523-1-tabba@google.com> <6810dbdb-1b44-4656-9f65-abca471523f9@redhat.com>
+In-Reply-To: <6810dbdb-1b44-4656-9f65-abca471523f9@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 30 Jan 2025 16:57:58 +0000
+X-Gm-Features: AWEUYZkqjd_c8s8_NqAiNB2ua1_PSsCvwT_KNHeeEKbL3m2RKXKoGVCEenSF2OE
+Message-ID: <CA+EHjTwE3mn+eJgmcFk1GqFdtyBHgM4SpgHNJ-0omNKLSzP8pA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/11] KVM: Mapping guest_memfd backed memory at
+ the host for software protected VMs
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 29/01/2025 23:25, Gavin Shan wrote:
-> On 12/13/24 1:55 AM, Steven Price wrote:
->> Each page within the protected region of the realm guest can be marked
->> as either RAM or EMPTY. Allow the VMM to control this before the guest
->> has started and provide the equivalent functions to change this (with
->> the guest's approval) at runtime.
->>
->> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
->> unmapped from the guest and undelegated allowing the memory to be reused
->> by the host. When transitioning to RIPAS RAM the actual population of
->> the leaf RTTs is done later on stage 2 fault, however it may be
->> necessary to allocate additional RTTs to allow the RMM track the RIPAS
->> for the requested range.
->>
->> When freeing a block mapping it is necessary to temporarily unfold the
->> RTT which requires delegating an extra page to the RMM, this page can
->> then be recovered once the contents of the block mapping have been
->> freed.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes from v5:
->>   * Adapt to rebasing.
->>   * Introduce find_map_level()
->>   * Rename some functions to be clearer.
->>   * Drop the "spare page" functionality.
->> Changes from v2:
->>   * {alloc,free}_delegated_page() moved from previous patch to this one.
->>   * alloc_delegated_page() now takes a gfp_t flags parameter.
->>   * Fix the reference counting of guestmem pages to avoid leaking memory.
->>   * Several misc code improvements and extra comments.
->> ---
->>   arch/arm64/include/asm/kvm_rme.h |  17 ++
->>   arch/arm64/kvm/mmu.c             |   8 +-
->>   arch/arm64/kvm/rme.c             | 411 +++++++++++++++++++++++++++++++
->>   3 files changed, 433 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/
->> asm/kvm_rme.h
->> index be64b749fcac..4e7758f0e4b5 100644
->> --- a/arch/arm64/include/asm/kvm_rme.h
->> +++ b/arch/arm64/include/asm/kvm_rme.h
->> @@ -92,6 +92,15 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32
->> ia_bits);
->>   int kvm_create_rec(struct kvm_vcpu *vcpu);
->>   void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->>   +void kvm_realm_unmap_range(struct kvm *kvm,
->> +               unsigned long ipa,
->> +               u64 size,
->> +               bool unmap_private);
->> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
->> +            unsigned long addr, unsigned long end,
->> +            unsigned long ripas,
->> +            unsigned long *top_ipa);
->> +
-> 
-> The declaration of realm_set_ipa_state() is unnecessary since its scope has
-> been limited to rme.c
+Hi David,
 
-Ack, the function can be static too.
+On Thu, 30 Jan 2025 at 16:50, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 29.01.25 18:23, Fuad Tabba wrote:
+>
+> Thanks for the new version
+>
+> > Main changes since v1 [1]:
+> > - Added x86 support for mapping guest_memfd at the host, enabled
+> >   only for the KVM_X86_SW_PROTECTED_VM type.
+>
+> Nice!
+>
+> > - Require setting memslot userspace_addr for guest_memfd slots
+> >   even if shared, and remove patches that worked around that.
+> > - Brought in more of the infrastructure from the patch series
+> >   that allows restricted mapping of guest_memfd backed memory.
+>
+> Ah, that explains why we see the page_type stuff in here now :)
+>
+> > - Renamed references to "mappable" -> "shared".
+> > - Expanded the selftests.
+> > - Added instructions to test on x86 and arm64 (below).
+>
+> Very nice!
+>
+>
+> I assume there is still no page conversion happening -- or is there now
+> that the page_stuff thing is in here?
+>
+> Would be good to spell out what's supported and what's still TBD
+> regarding mmap support.
 
->>   #define RMM_RTT_BLOCK_LEVEL    2
->>   #define RMM_RTT_MAX_LEVEL    3
->>   @@ -110,4 +119,12 @@ static inline unsigned long
->> rme_rtt_level_mapsize(int level)
->>       return (1UL << RMM_RTT_LEVEL_SHIFT(level));
->>   }
->>   +static inline bool realm_is_addr_protected(struct realm *realm,
->> +                       unsigned long addr)
->> +{
->> +    unsigned int ia_bits = realm->ia_bits;
->> +
->> +    return !(addr & ~(BIT(ia_bits - 1) - 1));
->> +}
->> +
->>   #endif
-> 
-> The check on the specified address to determine its range seems a bit
-> complicated
-> to me, it can be simplified like below. Besides, it may be a good idea
-> to rename
-> it to have the prefix "kvm_realm_".
-> 
-> static inline bool kvm_realm_is_{private | protected}_address(struct
-> realm *realm,
->                           unsigned long addr)
-> {
->     return !(addr & BIT(realm->ia_bits - 1));
-> }
+Thanks! No page conversion happening yet. I'm rebasing the other
+series, the one with the conversions, on top of this one, as well as
+fixing it based on the feedback that I got.
 
-Ack
+What this is missing is the infrastructure that tracks the
+mappability/shareability at the host and the guest, as well as the
+implementation of the callbacks themselves. I thought I'd send this
+one out now, while I work on the larger one, since this one is easier
+to test, and serves as a base for the coming part.
 
-> A question related to the terms used in this series to describe a
-> granule's state:
-> "protected" or "private", "unprotected" or "shared". Those terms are all
-> used in
-> the function names of this series. I guess it would be nice to unify so
-> that
-> "private" and "shared" to be used, which is consistent to the terms used by
-> guest-memfd. For example, kvm_realm_is_protected_address() can be
-> renamed to
-> kvm_realm_is_private_address().
+Cheers,
+/fuad
 
-Happy with the rename here. More generally it's a little awkward because
-the RMM spec does refer to protected/unprotected (e.g.
-RMI_RTT_MAP_UNPROTECTED). So there's always a choice between aligning
-with the RMM spec or aligning with guest-memfd.
-
-Thanks,
-
-Steve
-
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
