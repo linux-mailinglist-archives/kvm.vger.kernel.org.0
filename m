@@ -1,507 +1,354 @@
-Return-Path: <kvm+bounces-36952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B563A237D7
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 00:30:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46ACCA23847
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 01:34:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93FD118870C6
-	for <lists+kvm@lfdr.de>; Thu, 30 Jan 2025 23:30:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AD1E7A2DDF
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 00:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6FE1F1311;
-	Thu, 30 Jan 2025 23:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58B8E571;
+	Fri, 31 Jan 2025 00:33:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ebtU0B/u"
+	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="fBvWEqNn";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ukhYcM46"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2DF1F190C
-	for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 23:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F88ECF;
+	Fri, 31 Jan 2025 00:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738279816; cv=none; b=MJnkeOkW3d/4skdv3RPZrIbfX1SxwVUEgmmdlYhgRfRmyKiFBGCdZ8FBGU4sHVVLbDzzgSi620K7VAvssyrOxHpsolFUJ15jS6ttvvtOi+OJ4PccRXNdFCgRnrUGrY7qmpwBjA43bLM12FuND7BL6IzbyI0D9IOE/BY6YgcwrUk=
+	t=1738283630; cv=none; b=jYxVcsiKuFtQnakImmUNccGvFshLNUNECshRMwF57lPMbAV1/8vOcipfOozCASTUOB8Fkwt2h1bt1b71RR64TQBZhjkwZS6nzAqsIVZUw/nrTlH32WX2Qa2Wh0kJ+kiAoVmdWonqJiTBDUoPFPGQ19TVyqYUpxHlF1VDGwM0w0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738279816; c=relaxed/simple;
-	bh=j1zJsxZDjmgRXarrUjCuotIAKoRYOS5g0bOFikrRh64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d/CDyQQNZDHbe2hiYGGqMoLLYsD+DsGQMfeF4s7RHiR0vQaLYTRP2z7ZfZibAqNmqi9C7JcqxMXI66sIRlRW+APGrUx03HXCO6yi6mT2rxWWajhLtTP28Ver8eoIYzcLdZVHTNkdg6huSlqSbPafh36C+WdIcZY1OSQ9qF2JA1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ebtU0B/u; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2163affd184so21335ad.1
-        for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 15:30:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738279812; x=1738884612; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1rmIesab6i2p3RCJXlVDBZqIYZ/awInCMyNBMuFmviI=;
-        b=ebtU0B/uGfDkO8tUxFKtKkduhi1YuBR1gS5w8Ic4YpTySruqa7JWFzve29C1STke9h
-         2Is4GPtWaWLXnQx0UV7OTacnj4R6uVs+TarHdYBH0rwLcZ52gAIS3tQGdOW1Wr07JM43
-         nr9igxJXaGbLmLkCU2o1wciBGyHrMLXbHVnOJeE3yZWJCm4o7UMGBmr3j66U6nRPhpNv
-         q9CDWrlZdkQ6fbS+DfqSVaGqhtFlQw32Ot6PGuv/oAEGQVASfg538T6PAiPID6go5a/i
-         CdpYc7YLyzfGPWZhIUqim9VtCOmvFA3+SWHYEgGIwykWefq5zEGSfxfKeTlzYCGXUOf9
-         4Cig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738279812; x=1738884612;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1rmIesab6i2p3RCJXlVDBZqIYZ/awInCMyNBMuFmviI=;
-        b=K3rUpHTr2GtUYAK4WfZnA+kU/z0FsswrPglQUpUTjJmlSrqF3y3ZcaOUS2Ba38gKPU
-         6dOUYYWOuh+77lQqLqqTYi3KK8TrdjoFTd7BH4bs8qH0+ITtPT89sbO9+Ia28Un/VJ8i
-         C25CopU2AoEavWxi/UiAkG/xULHRxzXFwRmCheEs0PBapN5io4kmQqQiqVeE20n5rECo
-         egA/kyz4TIDinf3iZV5dMJCIataC0p+0jsnqivXyEuLuI99IJVXmCchbAOXFfzr4bzp+
-         BW2CTB5zd7w4nAsNPtehU5d37UbKIqhV9VVsiR+L4N9k/6s07fDnukRf2Xp5Mb6F+I0h
-         u+Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCU4MOqoKNJbCnHVSkU/RhzkLpnq2sRdiQc0T1nT46EPp//Bzj8rOlvh811uFnDfoVq14l8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYa5uuEWdm83t4Cg3274ZQSHN1ZCA+moye+BPnp6adoouBMcZy
-	k5O96/QiCs38usBORk2SGt1UHHQgwxbSlVx9utAw5OTTCu6fPGFtlbgQksP9GGGTE1IXdU0iNQi
-	uvmpE2gC8S8firGSIhiDch81fHzPbMm55Uerf
-X-Gm-Gg: ASbGncvotk4ysv7r4Cul5cPRIRKgEc79pwXkd9wboB5dop+ciacMn46ab8P+0u1DiCO
-	9Ogl2Howsc4cuxBdHKMfHaJ8BLcppwBRjySYxzJDOc4Gkmza9KWD6CmaPE5PcGWdEI6HF/SHvS/
-	I6vVadR/3oIqbYAkM29s+BT71mqNw=
-X-Google-Smtp-Source: AGHT+IF4fex0zEZPDdhq4r0hwOdVVLdnLANJBfKGdI2Hv9YV8rfN/WnxP54e/v6+9MLpQlX+TdRkKqMftmE/vS75cus=
-X-Received: by 2002:a17:902:778f:b0:216:25a2:2ee3 with SMTP id
- d9443c01a7336-21edf067fc8mr351855ad.25.1738279811617; Thu, 30 Jan 2025
- 15:30:11 -0800 (PST)
+	s=arc-20240116; t=1738283630; c=relaxed/simple;
+	bh=TV47MtjmPBHhuYLr/wq6M9RAfqLB2IJkbs8azlx/L0U=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jUc4KjFEFU+zvhYn6EsKk8UjzHn5n3QhFWQpMKh1s/cXo1UImFABi/ftDM2rpFJMHsZ+q/fglV+MJ4wA5elb3corqXsMq6ZV1Nw3dq75+BEq8/SWzXESouS8KL787DMVvyuO3Z1BoBhrJGVJcvNTfTXk4Of9WqtGPUAnzxCz1KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com; spf=pass smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=fBvWEqNn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ukhYcM46; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=invisiblethingslab.com
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.stl.internal (Postfix) with ESMTP id 63355114015D;
+	Thu, 30 Jan 2025 19:33:46 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Thu, 30 Jan 2025 19:33:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	invisiblethingslab.com; h=cc:content-type:content-type:date:date
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1738283626;
+	 x=1738370026; bh=j99SJx9+IyZ7/r4OezmfhlavbnB02Ja7JSF+YJce3E0=; b=
+	fBvWEqNn3MrBQ97NnULtQxdiecq+Gb+3/PQbbJgjGP9Oj/2spdqMC6rYQ9hsgMRv
+	0Iwxxd/VZqqzzuaIadQ49dTCeyGCYAqNhUqBoDPiyelqNqQJYQx0s3bwD8GyNqVb
+	PjVUn+QUcBuBA54Lr6lwo1h63+6m2nCb2KvoqG2JUnD72Q+wkAVXRfIcOUn53sIZ
+	LAAIRYVZewWomimIxPCBviSXVSIHNwurPGnov/9NvX9bgj4jcIMyeN3BZ7+gUJDl
+	/fHS397ubeg0cjOj07jeuw9HFX0zG9ZhuLn6H4QtPLttdFmtWIbRN7Vr+knDXejq
+	uClXpbh7hcxYeP/liBmpBg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738283626; x=1738370026; bh=j99SJx9+IyZ7/r4OezmfhlavbnB02Ja7JSF
+	+YJce3E0=; b=ukhYcM462h0Yyo5L/vjDR4BlFkf23xJOmGi6reGlSAdN6WQdCFm
+	ve6k9AiPziSvn7UwjoaP4ZuTjc4ZsQc7jvH3uTCVX+Jz5+l7cVloKyzG1HGiP52f
+	GhF0hjQhpRWV/WzIx8IXmVBagnRpxoc2GP7XgTIm3ZEe9Zboewn7QOgJo0AIPWms
+	tVPHBqn+dKkiHMCHuf0oUkF08OS/pAe4lcvekPB6MJ3IFN1Dl+/yhDA7gAYD7MqD
+	jHm4Rds3hp7uCESVeAElD8GAlwjlsH9oUWI1jETAGuuzEEei9MAPqjfehyR4w+e0
+	0ham+c9HxyMKMM/TloJLuhjLgHdDWSRcCUQ==
+X-ME-Sender: <xms:aRqcZ0MVWJjDOhA6w8yXek5zvl-ORa3WWrUa4XsxZc36yXrKNfAkUg>
+    <xme:aRqcZ69bVfwEKpRuUMAqCEBWm0bs4c3rlNc_n2xvzHH4sgD8j-YPsxUxjeEzsn-08
+    dEHQzlG1vkCwvg>
+X-ME-Received: <xmr:aRqcZ7Sba18NnKiQVem16eIihmKJrMzbK_cGsO374AImA2UpJ3sl5hLcr_Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejfedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecu
+    hfhrohhmpeffvghmihcuofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvhhish
+    hisghlvghthhhinhhgshhlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpedttedtueei
+    vdefiedugfejtdeutdelfedvueekledtudegjedviedukeefhfeuteenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhishhi
+    sghlvghthhhinhhgshhlrggsrdgtohhmpdhnsggprhgtphhtthhopedukedpmhhouggvpe
+    hsmhhtphhouhhtpdhrtghpthhtohepuggvmhhiohgsvghnohhurhesghhmrghilhdrtgho
+    mhdprhgtphhtthhopehhohhnghhlvghiuddrhhhurghnghesrghmugdrtghomhdprhgtph
+    htthhopehrrgihrdhhuhgrnhhgsegrmhgurdgtohhmpdhrtghpthhtohepvhhirhhtuhgr
+    lhhiiigrthhiohhnsehlihhsthhsrdhlihhnuhigqdhfohhunhgurghtihhonhdrohhrgh
+    dprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopegumhhithhrhidrohhsihhpvghnkhhosegtohhllhgrsghorhgrrd
+    gtohhmpdhrtghpthhtohepughrihdquggvvhgvlheslhhishhtshdrfhhrvggvuggvshhk
+    thhophdrohhrghdprhgtphhtthhopegrihhrlhhivggusehrvgguhhgrthdrtghomhdprh
+    gtphhtthhopehkrhgrgigvlhesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:aRqcZ8tviDV2fH_Fig7gZuvUTO-Q2ol4AzOWoGY6D7TyyDHDWINsPQ>
+    <xmx:aRqcZ8e_77SMnr4hQcFkljV16wDIKgv2sZp6rruj-cfLrMVFShP_6w>
+    <xmx:aRqcZw0OvE4Bz0ERm413AjBj7Mxs2Yjx4z57hqQB8DctU261M1TGrg>
+    <xmx:aRqcZw87SycT_jcUZzUq_ZJ3fHdctwdGyN8z3rV_RtJajO_jZOXOYw>
+    <xmx:ahqcZ_VIDfYVUxJV9L-zEswUlE7cRIvQCdphyjywN14hUKE26-B8UQea>
+Feedback-ID: iac594737:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 30 Jan 2025 19:33:44 -0500 (EST)
+Date: Thu, 30 Jan 2025 19:33:37 -0500
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+To: Demi Marie Obenour <demiobenour@gmail.com>,
+	"Huang, Honglei1" <Honglei1.Huang@amd.com>,
+	Huang Rui <ray.huang@amd.com>,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	dri-devel@lists.freedesktop.org, David Airlie <airlied@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Lingshan Zhu <Lingshan.Zhu@amd.com>,
+	Xen developer discussion <xen-devel@lists.xenproject.org>,
+	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+	Kernel KVM virtualization development <kvm@vger.kernel.org>,
+	Xenia Ragiadakou <burzalodowa@gmail.com>,
+	Stefano Stabellini <stefano.stabellini@amd.com>
+Subject: Re: [RFC PATCH 3/3] drm/virtio: implement blob userptr resource
+ object
+Message-ID: <Z5waZsddenagCYtl@itl-email>
+References: <20241220100409.4007346-1-honglei1.huang@amd.com>
+ <20241220100409.4007346-3-honglei1.huang@amd.com>
+ <Z2WO2udH2zAEr6ln@phenom.ffwll.local>
+ <2fb36b50-4de2-4060-a4b7-54d221db8647@gmail.com>
+ <de8ade34-eb67-4bff-a1c9-27cb51798843@amd.com>
+ <Z36wV07M8B_wgWPl@phenom.ffwll.local>
+ <c42ae4f7-f5f4-4906-85aa-b049ed44d7e9@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250130211539.428952-1-almasrymina@google.com>
- <20250130211539.428952-3-almasrymina@google.com> <Z5wFs3-6pNWARhRL@mini-arch>
-In-Reply-To: <Z5wFs3-6pNWARhRL@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 30 Jan 2025 15:29:57 -0800
-X-Gm-Features: AWEUYZkPTESrno2iYzeo1K78PcJfaZsMxGDDzhBy002v1BDbsQGxVfN2xbBIxT0
-Message-ID: <CAHS8izMMm--CSCm1c9Ud1WdjxLeCXdNiqLzjeM_ACgKUP35O0w@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v2 2/6] selftests: ncdevmem: Implement devmem
- TCP TX
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="9QyKV9EEhg0eMfJA"
+Content-Disposition: inline
+In-Reply-To: <c42ae4f7-f5f4-4906-85aa-b049ed44d7e9@gmail.com>
+
+
+--9QyKV9EEhg0eMfJA
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 30 Jan 2025 19:33:37 -0500
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+To: Demi Marie Obenour <demiobenour@gmail.com>,
+	"Huang, Honglei1" <Honglei1.Huang@amd.com>,
+	Huang Rui <ray.huang@amd.com>,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	dri-devel@lists.freedesktop.org, David Airlie <airlied@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Lingshan Zhu <Lingshan.Zhu@amd.com>,
+	Xen developer discussion <xen-devel@lists.xenproject.org>,
+	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+	Kernel KVM virtualization development <kvm@vger.kernel.org>,
+	Xenia Ragiadakou <burzalodowa@gmail.com>,
+	Stefano Stabellini <stefano.stabellini@amd.com>
+Subject: Re: [RFC PATCH 3/3] drm/virtio: implement blob userptr resource
+ object
 
-On Thu, Jan 30, 2025 at 3:05=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 01/30, Mina Almasry wrote:
-> > Add support for devmem TX in ncdevmem.
-> >
-> > This is a combination of the ncdevmem from the devmem TCP series RFCv1
-> > which included the TX path, and work by Stan to include the netlink API
-> > and refactored on top of his generic memory_provider support.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> >
-> > ---
-> >
-> > v2:
-> > - make errors a static variable so that we catch instances where there
-> >   are less than 20 errors across different buffers.
-> > - Fix the issue where the seed is reset to 0 instead of its starting
-> >   value 1.
-> > - Use 1000ULL instead of 1000 to guard against overflow (Willem).
-> > - Do not set POLLERR (Willem).
-> > - Update the test to use the new interface where iov_base is the
-> >   dmabuf_offset.
-> > - Update the test to send 2 iov instead of 1, so we get some test
-> >   coverage over sending multiple iovs at once.
-> > - Print the ifindex the test is using, useful for debugging issues wher=
-e
-> >   maybe the test may fail because the ifindex of the socket is differen=
-t
-> >   from the dmabuf binding.
-> > ---
-> >  .../selftests/drivers/net/hw/ncdevmem.c       | 276 +++++++++++++++++-
-> >  1 file changed, 272 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/=
-testing/selftests/drivers/net/hw/ncdevmem.c
-> > index 19a6969643f4..8455f19ecd1a 100644
-> > --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > @@ -40,15 +40,18 @@
-> >  #include <fcntl.h>
-> >  #include <malloc.h>
-> >  #include <error.h>
-> > +#include <poll.h>
-> >
-> >  #include <arpa/inet.h>
-> >  #include <sys/socket.h>
-> >  #include <sys/mman.h>
-> >  #include <sys/ioctl.h>
-> >  #include <sys/syscall.h>
-> > +#include <sys/time.h>
-> >
-> >  #include <linux/memfd.h>
-> >  #include <linux/dma-buf.h>
-> > +#include <linux/errqueue.h>
-> >  #include <linux/udmabuf.h>
-> >  #include <libmnl/libmnl.h>
-> >  #include <linux/types.h>
-> > @@ -80,6 +83,8 @@ static int num_queues =3D -1;
-> >  static char *ifname;
-> >  static unsigned int ifindex;
-> >  static unsigned int dmabuf_id;
-> > +static uint32_t tx_dmabuf_id;
-> > +static int waittime_ms =3D 500;
-> >
-> >  struct memory_buffer {
-> >       int fd;
-> > @@ -93,6 +98,8 @@ struct memory_buffer {
-> >  struct memory_provider {
-> >       struct memory_buffer *(*alloc)(size_t size);
-> >       void (*free)(struct memory_buffer *ctx);
-> > +     void (*memcpy_to_device)(struct memory_buffer *dst, size_t off,
-> > +                              void *src, int n);
-> >       void (*memcpy_from_device)(void *dst, struct memory_buffer *src,
-> >                                  size_t off, int n);
-> >  };
-> > @@ -153,6 +160,20 @@ static void udmabuf_free(struct memory_buffer *ctx=
-)
-> >       free(ctx);
-> >  }
-> >
-> > +static void udmabuf_memcpy_to_device(struct memory_buffer *dst, size_t=
- off,
-> > +                                  void *src, int n)
-> > +{
-> > +     struct dma_buf_sync sync =3D {};
-> > +
-> > +     sync.flags =3D DMA_BUF_SYNC_START | DMA_BUF_SYNC_WRITE;
-> > +     ioctl(dst->fd, DMA_BUF_IOCTL_SYNC, &sync);
-> > +
-> > +     memcpy(dst->buf_mem + off, src, n);
-> > +
-> > +     sync.flags =3D DMA_BUF_SYNC_END | DMA_BUF_SYNC_WRITE;
-> > +     ioctl(dst->fd, DMA_BUF_IOCTL_SYNC, &sync);
-> > +}
-> > +
-> >  static void udmabuf_memcpy_from_device(void *dst, struct memory_buffer=
- *src,
-> >                                      size_t off, int n)
-> >  {
-> > @@ -170,6 +191,7 @@ static void udmabuf_memcpy_from_device(void *dst, s=
-truct memory_buffer *src,
-> >  static struct memory_provider udmabuf_memory_provider =3D {
-> >       .alloc =3D udmabuf_alloc,
-> >       .free =3D udmabuf_free,
-> > +     .memcpy_to_device =3D udmabuf_memcpy_to_device,
-> >       .memcpy_from_device =3D udmabuf_memcpy_from_device,
-> >  };
-> >
-> > @@ -188,7 +210,7 @@ void validate_buffer(void *line, size_t size)
-> >  {
-> >       static unsigned char seed =3D 1;
-> >       unsigned char *ptr =3D line;
-> > -     int errors =3D 0;
-> > +     static int errors;
-> >       size_t i;
-> >
-> >       for (i =3D 0; i < size; i++) {
-> > @@ -202,7 +224,7 @@ void validate_buffer(void *line, size_t size)
-> >               }
-> >               seed++;
-> >               if (seed =3D=3D do_validation)
-> > -                     seed =3D 0;
-> > +                     seed =3D 1;
-> >       }
-> >
-> >       fprintf(stdout, "Validated buffer\n");
-> > @@ -394,6 +416,49 @@ static int bind_rx_queue(unsigned int ifindex, uns=
-igned int dmabuf_fd,
-> >       return -1;
-> >  }
-> >
-> > +static int bind_tx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
-> > +                      struct ynl_sock **ys)
-> > +{
-> > +     struct netdev_bind_tx_req *req =3D NULL;
-> > +     struct netdev_bind_tx_rsp *rsp =3D NULL;
-> > +     struct ynl_error yerr;
-> > +
-> > +     *ys =3D ynl_sock_create(&ynl_netdev_family, &yerr);
-> > +     if (!*ys) {
-> > +             fprintf(stderr, "YNL: %s\n", yerr.msg);
-> > +             return -1;
-> > +     }
-> > +
-> > +     req =3D netdev_bind_tx_req_alloc();
-> > +     netdev_bind_tx_req_set_ifindex(req, ifindex);
-> > +     netdev_bind_tx_req_set_fd(req, dmabuf_fd);
-> > +
-> > +     rsp =3D netdev_bind_tx(*ys, req);
-> > +     if (!rsp) {
-> > +             perror("netdev_bind_tx");
-> > +             goto err_close;
-> > +     }
-> > +
-> > +     if (!rsp->_present.id) {
-> > +             perror("id not present");
-> > +             goto err_close;
-> > +     }
-> > +
-> > +     fprintf(stderr, "got tx dmabuf id=3D%d\n", rsp->id);
-> > +     tx_dmabuf_id =3D rsp->id;
-> > +
-> > +     netdev_bind_tx_req_free(req);
-> > +     netdev_bind_tx_rsp_free(rsp);
-> > +
-> > +     return 0;
-> > +
-> > +err_close:
-> > +     fprintf(stderr, "YNL failed: %s\n", (*ys)->err.msg);
-> > +     netdev_bind_tx_req_free(req);
-> > +     ynl_sock_destroy(*ys);
-> > +     return -1;
-> > +}
-> > +
-> >  static void enable_reuseaddr(int fd)
-> >  {
-> >       int opt =3D 1;
-> > @@ -432,7 +497,7 @@ static int parse_address(const char *str, int port,=
- struct sockaddr_in6 *sin6)
-> >       return 0;
-> >  }
-> >
-> > -int do_server(struct memory_buffer *mem)
-> > +static int do_server(struct memory_buffer *mem)
-> >  {
-> >       char ctrl_data[sizeof(int) * 20000];
-> >       struct netdev_queue_id *queues;
-> > @@ -686,6 +751,207 @@ void run_devmem_tests(void)
-> >       provider->free(mem);
-> >  }
-> >
-> > +static uint64_t gettimeofday_ms(void)
-> > +{
-> > +     struct timeval tv;
-> > +
-> > +     gettimeofday(&tv, NULL);
-> > +     return (tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
-> > +}
-> > +
-> > +static int do_poll(int fd)
-> > +{
-> > +     struct pollfd pfd;
-> > +     int ret;
-> > +
-> > +     pfd.revents =3D 0;
-> > +     pfd.fd =3D fd;
-> > +
-> > +     ret =3D poll(&pfd, 1, waittime_ms);
-> > +     if (ret =3D=3D -1)
-> > +             error(1, errno, "poll");
-> > +
-> > +     return ret && (pfd.revents & POLLERR);
-> > +}
-> > +
-> > +static void wait_compl(int fd)
-> > +{
-> > +     int64_t tstop =3D gettimeofday_ms() + waittime_ms;
-> > +     char control[CMSG_SPACE(100)] =3D {};
-> > +     struct sock_extended_err *serr;
-> > +     struct msghdr msg =3D {};
-> > +     struct cmsghdr *cm;
-> > +     int retries =3D 10;
-> > +     __u32 hi, lo;
-> > +     int ret;
-> > +
-> > +     msg.msg_control =3D control;
-> > +     msg.msg_controllen =3D sizeof(control);
-> > +
-> > +     while (gettimeofday_ms() < tstop) {
-> > +             if (!do_poll(fd))
-> > +                     continue;
-> > +
-> > +             ret =3D recvmsg(fd, &msg, MSG_ERRQUEUE);
-> > +             if (ret < 0) {
-> > +                     if (errno =3D=3D EAGAIN)
-> > +                             continue;
-> > +                     error(1, ret, "recvmsg(MSG_ERRQUEUE)");
-> > +                     return;
-> > +             }
-> > +             if (msg.msg_flags & MSG_CTRUNC)
-> > +                     error(1, 0, "MSG_CTRUNC\n");
-> > +
-> > +             for (cm =3D CMSG_FIRSTHDR(&msg); cm; cm =3D CMSG_NXTHDR(&=
-msg, cm)) {
-> > +                     if (cm->cmsg_level !=3D SOL_IP &&
-> > +                         cm->cmsg_level !=3D SOL_IPV6)
-> > +                             continue;
-> > +                     if (cm->cmsg_level =3D=3D SOL_IP &&
-> > +                         cm->cmsg_type !=3D IP_RECVERR)
-> > +                             continue;
-> > +                     if (cm->cmsg_level =3D=3D SOL_IPV6 &&
-> > +                         cm->cmsg_type !=3D IPV6_RECVERR)
-> > +                             continue;
-> > +
-> > +                     serr =3D (void *)CMSG_DATA(cm);
-> > +                     if (serr->ee_origin !=3D SO_EE_ORIGIN_ZEROCOPY)
-> > +                             error(1, 0, "wrong origin %u", serr->ee_o=
-rigin);
-> > +                     if (serr->ee_errno !=3D 0)
-> > +                             error(1, 0, "wrong errno %d", serr->ee_er=
-rno);
-> > +
-> > +                     hi =3D serr->ee_data;
-> > +                     lo =3D serr->ee_info;
-> > +
-> > +                     fprintf(stderr, "tx complete [%d,%d]\n", lo, hi);
-> > +                     return;
-> > +             }
-> > +     }
-> > +
-> > +     error(1, 0, "did not receive tx completion");
-> > +}
-> > +
-> > +static int do_client(struct memory_buffer *mem)
-> > +{
-> > +     char ctrl_data[CMSG_SPACE(sizeof(struct dmabuf_tx_cmsg))];
-> > +     struct sockaddr_in6 server_sin;
-> > +     struct sockaddr_in6 client_sin;
-> > +     struct dmabuf_tx_cmsg ddmabuf;
-> > +     struct ynl_sock *ys =3D NULL;
-> > +     struct msghdr msg =3D {};
-> > +     ssize_t line_size =3D 0;
-> > +     struct cmsghdr *cmsg;
-> > +     struct iovec iov[2];
-> > +     uint64_t off =3D 100;
-> > +     char *line =3D NULL;
-> > +     size_t len =3D 0;
-> > +     int socket_fd;
-> > +     int ret, mid;
-> > +     int opt =3D 1;
-> > +
-> > +     ret =3D parse_address(server_ip, atoi(port), &server_sin);
-> > +     if (ret < 0)
-> > +             error(1, 0, "parse server address");
-> > +
-> > +     socket_fd =3D socket(AF_INET6, SOCK_STREAM, 0);
-> > +     if (socket_fd < 0)
-> > +             error(1, socket_fd, "create socket");
-> > +
-> > +     enable_reuseaddr(socket_fd);
-> > +
-> > +     ret =3D setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, ifname=
-,
-> > +                      strlen(ifname) + 1);
-> > +     if (ret)
-> > +             error(1, ret, "bindtodevice");
-> > +
-> > +     if (bind_tx_queue(ifindex, mem->fd, &ys))
-> > +             error(1, 0, "Failed to bind\n");
-> > +
-> > +     ret =3D parse_address(client_ip, atoi(port), &client_sin);
-> > +     if (ret < 0)
-> > +             error(1, 0, "parse client address");
-> > +
-> > +     ret =3D bind(socket_fd, &client_sin, sizeof(client_sin));
-> > +     if (ret)
-> > +             error(1, ret, "bind");
-> > +
-> > +     ret =3D setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, size=
-of(opt));
-> > +     if (ret)
-> > +             error(1, ret, "set sock opt");
-> > +
-> > +     fprintf(stderr, "Connect to %s %d (via %s)\n", server_ip,
-> > +             ntohs(server_sin.sin6_port), ifname);
-> > +
-> > +     ret =3D connect(socket_fd, &server_sin, sizeof(server_sin));
-> > +     if (ret)
-> > +             error(1, ret, "connect");
-> > +
-> > +     while (1) {
-> > +             free(line);
-> > +             line =3D NULL;
-> > +             /* Subtract 1 from line_size to remove trailing newlines =
-that
-> > +              * get_line are surely to parse...
-> > +              */
-> > +             line_size =3D getline(&line, &len, stdin) - 1;
->
-> Why not send the '\n' as well? If we skip the '\n', it's not keeping
-> netcat-like behavior :-(
->
+On Wed, Jan 29, 2025 at 03:54:59PM -0500, Demi Marie Obenour wrote:
+> On 1/8/25 12:05 PM, Simona Vetter wrote:
+> > On Fri, Dec 27, 2024 at 10:24:29AM +0800, Huang, Honglei1 wrote:
+> >>
+> >> On 2024/12/22 9:59, Demi Marie Obenour wrote:
+> >>> On 12/20/24 10:35 AM, Simona Vetter wrote:
+> >>>> On Fri, Dec 20, 2024 at 06:04:09PM +0800, Honglei Huang wrote:
+> >>>>> From: Honglei Huang <Honglei1.Huang@amd.com>
+> >>>>>
+> >>>>> A virtio-gpu userptr is based on HMM notifier.
+> >>>>> Used for let host access guest userspace memory and
+> >>>>> notice the change of userspace memory.
+> >>>>> This series patches are in very beginning state,
+> >>>>> User space are pinned currently to ensure the host
+> >>>>> device memory operations are correct.
+> >>>>> The free and unmap operations for userspace can be
+> >>>>> handled by MMU notifier this is a simple and basice
+> >>>>> SVM feature for this series patches.
+> >>>>> The physical PFNS update operations is splited into
+> >>>>> two OPs in here. The evicted memories won't be used
+> >>>>> anymore but remap into host again to achieve same
+> >>>>> effect with hmm_rang_fault.
+> >>>>
+> >>>> So in my opinion there are two ways to implement userptr that make s=
+ense:
+> >>>>
+> >>>> - pinned userptr with pin_user_pages(FOLL_LONGTERM). there is not mmu
+> >>>>    notifier
+> >>>>
+> >>>> - unpinnned userptr where you entirely rely on userptr and do not ho=
+ld any
+> >>>>    page references or page pins at all, for full SVM integration. Th=
+is
+> >>>>    should use hmm_range_fault ideally, since that's the version that
+> >>>>    doesn't ever grab any page reference pins.
+> >>>>
+> >>>> All the in-between variants are imo really bad hacks, whether they h=
+old a
+> >>>> page reference or a temporary page pin (which seems to be what you're
+> >>>> doing here). In much older kernels there was some justification for =
+them,
+> >>>> because strange stuff happened over fork(), but with FOLL_LONGTERM t=
+his is
+> >>>> now all sorted out. So there's really only fully pinned, or true svm=
+ left
+> >>>> as clean design choices imo.
+> >>>>
+> >>>> With that background, why does pin_user_pages(FOLL_LONGTERM) not wor=
+k for
+> >>>> you?
+> >>>
+> >>> +1 on using FOLL_LONGTERM.  Fully dynamic memory management has a hug=
+e cost
+> >>> in complexity that pinning everything avoids.  Furthermore, this avoi=
+ds the
+> >>> host having to take action in response to guest memory reclaim reques=
+ts.
+> >>> This avoids additional complexity (and thus attack surface) on the ho=
+st side.
+> >>> Furthermore, since this is for ROCm and not for graphics, I am less c=
+oncerned
+> >>> about supporting systems that require swappable GPU VRAM.
+> >>
+> >> Hi Sima and Demi,
+> >>
+> >> I totally agree the flag FOLL_LONGTERM is needed, I will add it in next
+> >> version.
+> >>
+> >> And for the first pin variants implementation, the MMU notifier is also
+> >> needed I think.Cause the userptr feature in UMD generally used like th=
+is:
+> >> the registering of userptr always is explicitly invoked by user code l=
+ike
+> >> "registerMemoryToGPU(userptrAddr, ...)", but for the userptr release/f=
+ree,
+> >> there is no explicit API for it, at least in hsakmt/KFD stack. User ju=
+st
+> >> need call system call "free(userptrAddr)", then kernel driver will rel=
+ease
+> >> the userptr by MMU notifier callback.Virtio-GPU has no other way to kn=
+ow if
+> >> user has been free the userptr except for MMU notifior.And in UMD ther=
+es is
+> >> no way to get the free() operation is invoked by user.The only way is =
+use
+> >> MMU notifier in virtio-GPU driver and free the corresponding data in h=
+ost by
+> >> some virtio CMDs as far as I can see.
+> >>
+> >> And for the second way that is use hmm_range_fault, there is a predict=
+able
+> >> issues as far as I can see, at least in hsakmt/KFD stack. That is the =
+memory
+> >> may migrate when GPU/device is working. In bare metal, when memory is
+> >> migrating KFD driver will pause the compute work of the device in
+> >> mmap_wirte_lock then use hmm_range_fault to remap the migrated/evicted
+> >> memories to GPU then restore the compute work of device to ensure the
+> >> correction of the data. But in virtio-GPU driver the migration happen =
+in
+> >> guest kernel, the evict mmu notifier callback happens in guest, a virt=
+io CMD
+> >> can be used for notify host but as lack of mmap_write_lock protection =
+in
+> >> host kernel, host will hold invalid data for a short period of time, t=
+his
+> >> may lead to some issues. And it is hard to fix as far as I can see.
+> >>
+> >> I will extract some APIs into helper according to your request, and I =
+will
+> >> refactor the whole userptr implementation, use some callbacks in page
+> >> getting path, let the pin method and hmm_range_fault can be choiced
+> >> in this series patches.
+> >=20
+> > Ok, so if this is for svm, then you need full blast hmm, or the semanti=
+cs
+> > are buggy. You cannot fake svm with pin(FOLL_LONGTERM) userptr, this do=
+es
+> > not work.
+> >=20
+> > The other option is that hsakmt/kfd api is completely busted, and that's
+> > kinda not a kernel problem.
+> > -Sima
+>=20
+> On further thought, I believe the driver needs to migrate the pages to
+> device memory (really a virtio-GPU blob object) *and* take a FOLL_LONGTERM
+> pin on them.  The reason is that it isn=E2=80=99t possible to migrate the=
+se pages
+> back to "host" memory without unmapping them from the GPU.  For the reaso=
+ns
+> I mention in [1], I believe that temporarily revoking access to virtio-GPU
+> blob objects is not feasible.  Instead, the pages must be treated as if
+> they are permanently in device memory until guest userspace unmaps them
+> from the GPU, after which they must be migrated back to host memory.
 
-Ah, this is to make the validation on the RX side work. The validation
-expects a repeating pattern:
+Discussion on IRC indicates that migration isn't reliable.  This is
+because Linux core memory management is largely lock-free for
+performance reasons, so there is no way to prevent temporary elevation
+of a page's reference count.  A page with an elevated reference count
+cannot be migrated.
 
-1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, ....
+The only alternative I can think of is for the hypervisor to perform the
+migration.  The hypervisor can revoke the guest's access to the page
+without the guest's consent or involvement.  The host can then replace
+the page with one of its own pages, which might be on the CPU or GPU.
+Further migration between the CPU and GPU is controlled by the host
+kernel-mode driver (KMD) and host kernel memory management.  The guest
+kernel driver must take a FOLL_LONGTERM pin before telling the host to
+use the pages, but that is all.
 
-With no newlines.
+On KVM, this should be essentially automatic, as guest memory really is
+just host userspace memory.  On Xen, this requires that the backend
+domain can revoke fronted access to _any_ frontend page, or at least
+frontend pages that have been granted to the backend.  The backend will
+then need to be able to handle page faults for the frontend pages, and
+replace the frontend pages with its own pages at will.  Furthermore,
+revoking pages that the backend has installed into the frontend must
+never fail, because the backend will panic if it does fail.
 
-But it does become weird that TX doesn't match netcat. Let me think on
-this a bit. Maybe I can resolve this in a way where the validation
-works but also the tx side behaves like netcat. Maybe the RX
-validation can skip newlines or something. Maybe I can massage how I
-invoke the test.
-
-This can become a rabbit hole because I do want to invoke multiple
-sendmsg() in one iteration of the test as well, and not overcomplicate
-the series.
-
-> > +
-> > +             if (line_size < 0)
-> > +                     break;
->
-> [..]
->
-> > +             mid =3D (line_size / 2) + 1;
-> > +
-> > +             iov[0].iov_base =3D (void *)100;
-> > +             iov[0].iov_len =3D mid;
-> > +             iov[1].iov_base =3D (void *)2000;
-> > +             iov[1].iov_len =3D line_size - mid;
->
-> This seems a bit hard-coded. We should at least test that mid is < 2000?
->
-
-Yep, I should do at least do that. FWIW (although missed it in this
-iteration), at the top of the file I put docs that list exactly what I
-run for others to repro the results (and nipa should eventually run
-similar, I have that on my todo list), but the test should be more
-flexible to at least catch instances where mid is too large.
-
-> But ideally we should have two modes for tx with a flag (and run them
-> both from the selftest):
-> - pass one big iov, this will test the sendmsg path which creates
->   multiple skbs internally
-> - break 'line' into N sections (as you do here), but maybe have more
->   control over the number of sections?
->
-> Maybe let's have a new --max-iov-size flag? Then we can call ncdevmem
-> with --max-iov-size <some prime number close to 4k> to exercise all
-> sorts of weird offsets?
->
-> (seems ok to also follow up on that separately)
-
-Yeah, improvements to tests are always possible, lets have some
-reasonable tests in the first iteration and expand.
-
-
+Sima, is putting guest pages under host kernel control the only option?
+I thought that this could be avoided by leaving the pages on the CPU if
+migration fails, but that won't work because there will be no way to
+migrate them to the GPU later, causing performance problems that would
+be impossible to debug.  Is waiting (possibly forever) on migration to
+finish an option?  Otherwise, this might mean extra complexity in the
+Xen hypervisor, as I do not believe the primitives needed are currently
+available.  Specifically, in addition to the primitives discussed at Xen
+Project Summit 2024, the backend also needs to intercept access to, and
+replace the contents of, arbitrary frontend-controlled pages.
 --=20
-Thanks,
-Mina
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+Invisible Things Lab
+
+--9QyKV9EEhg0eMfJA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmecGmEACgkQszaHOrMp
+8lMt/w/9EultembzZOpL8oYFzpDKH4QFhJkkcONDqVqYYE5kH122Mqj5GsprGGW0
+FqvHAgK5Qk/W+zz9LQrk+P6WEwJhP0XIo/TKJfSCOXqK6pEqwyZ8OPk1nHAiPli/
+D7bm3ocsg69tYGoLsCylZehwUe87ATZZ43KVsh+bf1h+lRHONd8yOs46nSzJuxzl
+zEOI373RpZVKzpRx3HQfyzS9oALVzvdyGzeX+1n3AmQyDbZtjs4ZInyyng4ruArL
+viZtevqVe6boeeemKkZaGtGOzaiVZAmwX3PjTNXbIygsogzscCrMUfL3ZOYbg9D/
+P18aWdQEu5f7+Vt5PL4sOfY6AsmArvlwAKWVQdmpk8eTTuW6fDk0651ogKcNFiV9
+cgCJhv5SBa/hoas8i4nj2pl58AdfjaZFGtdXsEuKzQ2D7N6LivWZGOsbwfK+NVdT
+AdzfuyH0M41tQw0Oy57NmnnbnC7clqk1wn8UTTSfxmtFWCVhBoMx25WgIK/fGUvp
+JOHj+9q/MfD0A+dY0jng45Y8Kf7saNMMWmpmT0NNoAAnNWZzSJgO7+2IHjjd6DTn
+K07huXex3wpOxtBnd42TWMb5fxiwtU48XhGRz7ZNyhPlakaK/ZKjJX8bE2WrLOrA
+bAwm93etZnI91f08VSApkuYCYUCAh8nk/k6GDDdAkvWTWfsJ09w=
+=U2FS
+-----END PGP SIGNATURE-----
+
+--9QyKV9EEhg0eMfJA--
 
