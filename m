@@ -1,201 +1,238 @@
-Return-Path: <kvm+bounces-36967-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36969-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50C6BA23B0D
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 10:10:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F1ABA23B1B
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 10:12:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEFFC3A6D33
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 09:10:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AB3C18848E4
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 09:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A46016E863;
-	Fri, 31 Jan 2025 09:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C39187FE4;
+	Fri, 31 Jan 2025 09:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKHaGFiH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hO5BNGiu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B4A2BB15;
-	Fri, 31 Jan 2025 09:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC44156F53
+	for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 09:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738314575; cv=none; b=st7NQTqIAJrVvPlqnuik0T4dJlAccK/lYxbjjYI2SIKdHfhVYDZ2QUxg3WO/sHNZgFrzIziSCIS1OD4thKJQD4yhh5FlkAEzQQVforFt4IAgh7l/y0tSXyzHYB0rUD2q8ZBrIGP4/FeyZuwO3BmEH5obR5wPd1mXTFb2X2bbja4=
+	t=1738314716; cv=none; b=t2YbdH/XlSxfl7tm/Y6Ci57CyJ4KKd1Ts15E2MKOstKI84HghIsnl3M+oQqPgACd9I9WXER0Oh4gsoODV0P0yItgNqS2nQnz+OF67uD4Tf8dTNn7CjyEEiDPGk819n3+yNjWzSMhZB7jP1TNmiRKlR5Q/cQYa8wQucEf3xMyEWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738314575; c=relaxed/simple;
-	bh=OFkh54zJD2NZ80nIDeuODN8ZbPLuQVqC5NfP5c5+kts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TmKIL3qsqSGAvY/7TyP/4qVVz4/lV5O1ZWX2U3X2nucHjh1uOob8zXKQwnnJj0F+xvgtUb19mkq6ACX/6OoWjwi+PcaZapBK0DMhd/B/xu3JfZS/qRxxovBaPdftGdlMambBGjjoZdoYMP4V0K7HiQQf+YOj0icrM2vz5QNoP4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKHaGFiH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3C1CC4CED1;
-	Fri, 31 Jan 2025 09:09:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738314575;
-	bh=OFkh54zJD2NZ80nIDeuODN8ZbPLuQVqC5NfP5c5+kts=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vKHaGFiH98f0ILT14IAQOj9WeQK3fwh8ZqZrFPqkhT7d7V3gg5a9AtVD7ggDEWU7O
-	 55GQdD1QJgbgrnJBkMCqgFajkud1Vdv5mLw0+nQlQl16WslYxZp4PiMcGH4+8pwrHJ
-	 mbZdG1nfcR/9pdWTsZmraM6P22/3Cxp4bdtb+t8CJQGgHiwyB1zO8BjcCq+1WQDJqz
-	 dkZh4/XawzORyNqsAd62JiwC1OjSQf544cd6yw6utMepLJ5vEMLz60g6B7Fmqa3yjr
-	 EFFbf1WP7PZgeudjucPZhdKiPOsjBYd3LUgnkg1jhhg1hCWDTM13Mfj6S+jmYsiUeg
-	 f7MZUYN2tPlvg==
-Date: Fri, 31 Jan 2025 09:09:27 +0000
-From: Simon Horman <horms@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	David Ahern <dsahern@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
-	asml.silence@gmail.com, dw@davidwei.uk,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH RFC net-next v2 5/6] net: devmem: Implement TX path
-Message-ID: <20250131090927.GB24105@kernel.org>
-References: <20250130211539.428952-1-almasrymina@google.com>
- <20250130211539.428952-6-almasrymina@google.com>
+	s=arc-20240116; t=1738314716; c=relaxed/simple;
+	bh=3MiUaoIE09covFxVETM/Hw9GvfwjeLJJFJrC7ctUETU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IcEaMtVeU9WXFxxfb/byvjMZUO3kHMvRmlq1wQO859DOrCKN9nK3oerm99XbQWtZxSNPkkNeLIzrWxftFJ9hnw+Yt+yALwGnwSe8ySiwS7/v6/4A6APW8G1DcamcobmRNmlHEZbVGG2oWm5Uzfc9ZsU96wV14QKetGc732rHbUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hO5BNGiu; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-467abce2ef9so174501cf.0
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 01:11:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738314713; x=1738919513; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=V8viV2JIhS0YcyIbIBjf/TReqK6Sasfiya5dHNECPVQ=;
+        b=hO5BNGiuqYs6bSyV5WT63PBC0iEa5jg8RmPDaO7AuV8HG0yhOMLV+cUxJQcsUcCFXi
+         +LAUYJ7Yx8C/NCZznWKwqWaaOMfnececgp+W0WVMpw7FffKCeoD0F0XCkUUCtkS8yRU9
+         qZQUCc0uv+cX92ZWAzymTUHaK2IeBK8VJuWgkAlAclNvk/N8ueMDNDI9SUYX+5CRJb2c
+         RC5bqAn/kobZO9aKIkkc+M3mOBYtCO2yaw3SVzmbCZTaA37S9lzmJzXGNdDfkf3vfRcZ
+         wskTXhzbliK70iT68CVAlPj6UG1Qw7apYIzV6yKq9P1C02AOjx3/oDB8kWSqZBln1AXO
+         Olbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738314713; x=1738919513;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V8viV2JIhS0YcyIbIBjf/TReqK6Sasfiya5dHNECPVQ=;
+        b=TTMyuSGI8CKdA0VpJ3gtE72Eg4TWFgO/f4UZAZ+Io+SkYQ9Qo5Z67WAfLTcniGfisb
+         89JnDX33/xcv6jKWsV7A/wpcEP9d5ueh5BPqSFGovs2XRzpV6eP9IKijI9VY9nVGxOo0
+         4/qwyFwR2ejwAaDMbezNFoKNg94OxauUPUF4wMj3iv7N0zqwIGpmIrjXmp33Yr/H5rPV
+         2n1msfcf9x4rGLUSHzhtENwiO6oQcLeySi2UbO4dDQ4RDmV7R40IF0XVVuFgoJQpnmNN
+         L2BY2OvEs/98UQOD1SRRlf/XlP+qifFUGgpHU4fkotayJGWSR+crPkNbWRwTemfNQkE5
+         wCIg==
+X-Gm-Message-State: AOJu0Yxp8vS1s1+uaV6BfeZ7QNIaeQn/O43iXPrF0cOFniE2yuL2H81h
+	YEBBLg50FmmocMrN7ZpLf4hzoOFlyqPpCMnAcwvZe4JZVS7kmQSfmEPNGMmn4Hg/xvgp7x+D9TX
+	aAtFVyuclHrQDlIz3Xpd10EfjxYIDYUFG2WHh
+X-Gm-Gg: ASbGncui7UIyOKKS3KVrc893MsHfICet12JRYDJXZROt51xs4/ROtVjz7RAJuZHbeex
+	xlxbaaCFQsNEul5GWj9ON7BTXebe6AmeryzTW1VSudPiLuzG9KUKmI2TynosHJtfCepX6c2s=
+X-Google-Smtp-Source: AGHT+IHVEC2s9ki9SQQ/W6ZhPJlLd8vEs50C7zvNlKQG5KfH9Ht7+OxW856Y8WrT5oyxgdpTdK0yVT/Q5aY+XBzx+TU=
+X-Received: by 2002:a05:622a:5d1:b0:46c:791f:bf46 with SMTP id
+ d75a77b69052e-46febfb595cmr1645811cf.19.1738314713185; Fri, 31 Jan 2025
+ 01:11:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250130211539.428952-6-almasrymina@google.com>
+References: <20250129172320.950523-1-tabba@google.com> <20250129172320.950523-4-tabba@google.com>
+ <07e7e09a-997e-444e-92bf-8f2359a36cbd@redhat.com>
+In-Reply-To: <07e7e09a-997e-444e-92bf-8f2359a36cbd@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 31 Jan 2025 09:11:16 +0000
+X-Gm-Features: AWEUYZnOe3bQNC7A_KGszwSxryeZBFYHbPkhnVOeAKu5tArSj7xEMUozbMTEOn8
+Message-ID: <CA+EHjTxXgz9KMNG7MfUVchpThMF=q7A9Yqr3Tqs5N3y4b95F_g@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 03/11] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+To: David Hildenbrand <david@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jan 30, 2025 at 09:15:38PM +0000, Mina Almasry wrote:
-> Augment dmabuf binding to be able to handle TX. Additional to all the RX
-> binding, we also create tx_vec needed for the TX path.
-> 
-> Provide API for sendmsg to be able to send dmabufs bound to this device:
-> 
-> - Provide a new dmabuf_tx_cmsg which includes the dmabuf to send from.
-> - MSG_ZEROCOPY with SCM_DEVMEM_DMABUF cmsg indicates send from dma-buf.
-> 
-> Devmem is uncopyable, so piggyback off the existing MSG_ZEROCOPY
-> implementation, while disabling instances where MSG_ZEROCOPY falls back
-> to copying.
-> 
-> We additionally pipe the binding down to the new
-> zerocopy_fill_skb_from_devmem which fills a TX skb with net_iov netmems
-> instead of the traditional page netmems.
-> 
-> We also special case skb_frag_dma_map to return the dma-address of these
-> dmabuf net_iovs instead of attempting to map pages.
-> 
-> Based on work by Stanislav Fomichev <sdf@fomichev.me>. A lot of the meat
-> of the implementation came from devmem TCP RFC v1[1], which included the
-> TX path, but Stan did all the rebasing on top of netmem/net_iov.
-> 
-> Cc: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
+Hi David,
 
-...
+On Thu, 30 Jan 2025 at 17:20, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 29.01.25 18:23, Fuad Tabba wrote:
+> > Add support for mmap() and fault() for guest_memfd backed memory
+> > in the host for VMs that support in-place conversion between
+> > shared and private (shared memory). To that end, this patch adds
+> > the ability to check whether the VM type has that support, and
+> > only allows mapping its memory if that's the case.
+> >
+> > Additionally, this behavior is gated with a new configuration
+> > option, CONFIG_KVM_GMEM_SHARED_MEM.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> >
+> > ---
+> >
+> > This patch series will allow shared memory support for software
+> > VMs in x86. It will also introduce a similar VM type for arm64
+> > and allow shared memory support for that. In the future, pKVM
+> > will also support shared memory.
+> > ---
+> >   include/linux/kvm_host.h | 11 ++++++
+> >   virt/kvm/Kconfig         |  4 +++
+> >   virt/kvm/guest_memfd.c   | 77 ++++++++++++++++++++++++++++++++++++++++
+> >   3 files changed, 92 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 401439bb21e3..408429f13bf4 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -717,6 +717,17 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+> >   }
+> >   #endif
+> >
+> > +/*
+> > + * Arch code must define kvm_arch_gmem_supports_shared_mem if support for
+> > + * private memory is enabled and it supports in-place shared/private conversion.
+> > + */
+> > +#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KVM_PRIVATE_MEM)
+> > +static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
+> > +{
+> > +     return false;
+> > +}
+> > +#endif
+> > +
+> >   #ifndef kvm_arch_has_readonly_mem
+> >   static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
+> >   {
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 54e959e7d68f..4e759e8020c5 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -124,3 +124,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+> >   config HAVE_KVM_ARCH_GMEM_INVALIDATE
+> >          bool
+> >          depends on KVM_PRIVATE_MEM
+> > +
+> > +config KVM_GMEM_SHARED_MEM
+> > +       select KVM_PRIVATE_MEM
+> > +       bool
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index 47a9f68f7b24..86441581c9ae 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -307,7 +307,84 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+> >       return gfn - slot->base_gfn + slot->gmem.pgoff;
+> >   }
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
+> > +{
+> > +     struct inode *inode = file_inode(vmf->vma->vm_file);
+> > +     struct folio *folio;
+> > +     vm_fault_t ret = VM_FAULT_LOCKED;
+> > +
+> > +     filemap_invalidate_lock_shared(inode->i_mapping);
+> > +
+> > +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> > +     if (IS_ERR(folio)) {
+> > +             ret = VM_FAULT_SIGBUS;
+> > +             goto out_filemap;
+> > +     }
+> > +
+> > +     if (folio_test_hwpoison(folio)) {
+> > +             ret = VM_FAULT_HWPOISON;
+> > +             goto out_folio;
+> > +     }
+> > +
+>
+> Worth adding a comment, something like
+>
+> /*
+>   * Only private folios are marked as "guestmem" so far, and we never
+>   * expect private folios at this point.
+>   */
+> > +     if (WARN_ON_ONCE(folio_test_guestmem(folio)))  {
+> > +             ret = VM_FAULT_SIGBUS;
+> > +             goto out_folio;
+> > +     }
+> > +
+> > +     /* No support for huge pages. */
+> > +     if (WARN_ON_ONCE(folio_nr_pages(folio) > 1)) {
+> > +             ret = VM_FAULT_SIGBUS;
+> > +             goto out_folio;
+> > +     }
+> > +
+>
+> /* We only support mmap of small folios. */
+> VM_WARN_ON_ONCE(folio_test_large(folio));
 
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+Will do. Thanks.
 
-> index 0e41699df419..9ba6994e2a05 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
+/fuad
 
-...
-
-> @@ -911,10 +912,68 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
->  	return err;
->  }
->  
-> -/* stub */
->  int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
->  {
-> -	return 0;
-> +	struct net_devmem_dmabuf_binding *binding;
-> +	struct list_head *sock_binding_list;
-> +	struct net_device *netdev;
-> +	u32 ifindex, dmabuf_fd;
-> +	struct sk_buff *rsp;
-> +	int err = 0;
-> +	void *hdr;
-> +
-> +	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_DEV_IFINDEX) ||
-> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_DMABUF_FD))
-> +		return -EINVAL;
-> +
-> +	ifindex = nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
-> +	dmabuf_fd = nla_get_u32(info->attrs[NETDEV_A_DMABUF_FD]);
-> +
-> +	sock_binding_list =
-> +		genl_sk_priv_get(&netdev_nl_family, NETLINK_CB(skb).sk);
-> +	if (IS_ERR(sock_binding_list))
-> +		return PTR_ERR(sock_binding_list);
-> +
-> +	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-> +	if (!rsp)
-> +		return -ENOMEM;
-> +
-> +	hdr = genlmsg_iput(rsp, info);
-> +	if (!hdr) {
-> +		err = -EMSGSIZE;
-> +		goto err_genlmsg_free;
-> +	}
-> +
-> +	rtnl_lock();
-> +
-> +	netdev = __dev_get_by_index(genl_info_net(info), ifindex);
-> +	if (!netdev || !netif_device_present(netdev)) {
-> +		err = -ENODEV;
-> +		goto err_unlock;
-> +	}
-> +
-> +	binding = net_devmem_bind_dmabuf(netdev, DMA_TO_DEVICE, dmabuf_fd,
-> +					 info->extack);
-> +	if (IS_ERR(binding)) {
-> +		err = PTR_ERR(binding);
-> +		goto err_unlock;
-> +	}
-> +
-> +	list_add(&binding->list, sock_binding_list);
-> +
-> +	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
-> +	genlmsg_end(rsp, hdr);
-> +
-> +	rtnl_unlock();
-> +
-> +	return genlmsg_reply(rsp, info);
-> +
-> +	net_devmem_unbind_dmabuf(binding);
-
-Hi Mina,
-
-It appears that the line above is unreachable.
-I guess it was part of an unwind that is no-longer needed
-and thus can now be removed.
-
-Flagged by Smatch.
-
-> +err_unlock:
-> +	rtnl_unlock();
-> +err_genlmsg_free:
-> +	nlmsg_free(rsp);
-> +	return err;
->  }
-
-...
+>
+> > +     if (!folio_test_uptodate(folio)) {
+> > +             clear_highpage(folio_page(folio, 0));
+> > +             folio_mark_uptodate(folio);
+> > +     }
+> > +
+> > +     vmf->page = folio_file_page(folio, vmf->pgoff);
+> > +
+>
+> Apart from that LGTM.
+>
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
