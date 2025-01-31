@@ -1,354 +1,243 @@
-Return-Path: <kvm+bounces-36953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46ACCA23847
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 01:34:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22F24A23877
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 02:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AD1E7A2DDF
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 00:33:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 977A07A3584
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 01:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58B8E571;
-	Fri, 31 Jan 2025 00:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CD018E20;
+	Fri, 31 Jan 2025 01:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="fBvWEqNn";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ukhYcM46"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TLbjc7d8"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F88ECF;
-	Fri, 31 Jan 2025 00:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320184409
+	for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 01:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738283630; cv=none; b=jYxVcsiKuFtQnakImmUNccGvFshLNUNECshRMwF57lPMbAV1/8vOcipfOozCASTUOB8Fkwt2h1bt1b71RR64TQBZhjkwZS6nzAqsIVZUw/nrTlH32WX2Qa2Wh0kJ+kiAoVmdWonqJiTBDUoPFPGQ19TVyqYUpxHlF1VDGwM0w0U=
+	t=1738285566; cv=none; b=gxM/hoBTXsMW6ZE2KnkLZkAPMLPidCCDN/WPJ0UsLlx0F8a5R5Nz7mvCogn4DQ4OLuf0YrAik41t0zB4Zox/OSXJDCgkB0GtE9wRJD85T1ARr50abejTmOtNxRGzKHX181mk+VR4qD2/V1Duldm7+n33yBYD+8Cj9F2oh/PsHL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738283630; c=relaxed/simple;
-	bh=TV47MtjmPBHhuYLr/wq6M9RAfqLB2IJkbs8azlx/L0U=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jUc4KjFEFU+zvhYn6EsKk8UjzHn5n3QhFWQpMKh1s/cXo1UImFABi/ftDM2rpFJMHsZ+q/fglV+MJ4wA5elb3corqXsMq6ZV1Nw3dq75+BEq8/SWzXESouS8KL787DMVvyuO3Z1BoBhrJGVJcvNTfTXk4Of9WqtGPUAnzxCz1KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com; spf=pass smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=fBvWEqNn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ukhYcM46; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=invisiblethingslab.com
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfout.stl.internal (Postfix) with ESMTP id 63355114015D;
-	Thu, 30 Jan 2025 19:33:46 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Thu, 30 Jan 2025 19:33:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	invisiblethingslab.com; h=cc:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1738283626;
-	 x=1738370026; bh=j99SJx9+IyZ7/r4OezmfhlavbnB02Ja7JSF+YJce3E0=; b=
-	fBvWEqNn3MrBQ97NnULtQxdiecq+Gb+3/PQbbJgjGP9Oj/2spdqMC6rYQ9hsgMRv
-	0Iwxxd/VZqqzzuaIadQ49dTCeyGCYAqNhUqBoDPiyelqNqQJYQx0s3bwD8GyNqVb
-	PjVUn+QUcBuBA54Lr6lwo1h63+6m2nCb2KvoqG2JUnD72Q+wkAVXRfIcOUn53sIZ
-	LAAIRYVZewWomimIxPCBviSXVSIHNwurPGnov/9NvX9bgj4jcIMyeN3BZ7+gUJDl
-	/fHS397ubeg0cjOj07jeuw9HFX0zG9ZhuLn6H4QtPLttdFmtWIbRN7Vr+knDXejq
-	uClXpbh7hcxYeP/liBmpBg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1738283626; x=1738370026; bh=j99SJx9+IyZ7/r4OezmfhlavbnB02Ja7JSF
-	+YJce3E0=; b=ukhYcM462h0Yyo5L/vjDR4BlFkf23xJOmGi6reGlSAdN6WQdCFm
-	ve6k9AiPziSvn7UwjoaP4ZuTjc4ZsQc7jvH3uTCVX+Jz5+l7cVloKyzG1HGiP52f
-	GhF0hjQhpRWV/WzIx8IXmVBagnRpxoc2GP7XgTIm3ZEe9Zboewn7QOgJo0AIPWms
-	tVPHBqn+dKkiHMCHuf0oUkF08OS/pAe4lcvekPB6MJ3IFN1Dl+/yhDA7gAYD7MqD
-	jHm4Rds3hp7uCESVeAElD8GAlwjlsH9oUWI1jETAGuuzEEei9MAPqjfehyR4w+e0
-	0ham+c9HxyMKMM/TloJLuhjLgHdDWSRcCUQ==
-X-ME-Sender: <xms:aRqcZ0MVWJjDOhA6w8yXek5zvl-ORa3WWrUa4XsxZc36yXrKNfAkUg>
-    <xme:aRqcZ69bVfwEKpRuUMAqCEBWm0bs4c3rlNc_n2xvzHH4sgD8j-YPsxUxjeEzsn-08
-    dEHQzlG1vkCwvg>
-X-ME-Received: <xmr:aRqcZ7Sba18NnKiQVem16eIihmKJrMzbK_cGsO374AImA2UpJ3sl5hLcr_Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejfedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecu
-    hfhrohhmpeffvghmihcuofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvhhish
-    hisghlvghthhhinhhgshhlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpedttedtueei
-    vdefiedugfejtdeutdelfedvueekledtudegjedviedukeefhfeuteenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhishhi
-    sghlvghthhhinhhgshhlrggsrdgtohhmpdhnsggprhgtphhtthhopedukedpmhhouggvpe
-    hsmhhtphhouhhtpdhrtghpthhtohepuggvmhhiohgsvghnohhurhesghhmrghilhdrtgho
-    mhdprhgtphhtthhopehhohhnghhlvghiuddrhhhurghnghesrghmugdrtghomhdprhgtph
-    htthhopehrrgihrdhhuhgrnhhgsegrmhgurdgtohhmpdhrtghpthhtohepvhhirhhtuhgr
-    lhhiiigrthhiohhnsehlihhsthhsrdhlihhnuhigqdhfohhunhgurghtihhonhdrohhrgh
-    dprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopegumhhithhrhidrohhsihhpvghnkhhosegtohhllhgrsghorhgrrd
-    gtohhmpdhrtghpthhtohepughrihdquggvvhgvlheslhhishhtshdrfhhrvggvuggvshhk
-    thhophdrohhrghdprhgtphhtthhopegrihhrlhhivggusehrvgguhhgrthdrtghomhdprh
-    gtphhtthhopehkrhgrgigvlhesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:aRqcZ8tviDV2fH_Fig7gZuvUTO-Q2ol4AzOWoGY6D7TyyDHDWINsPQ>
-    <xmx:aRqcZ8e_77SMnr4hQcFkljV16wDIKgv2sZp6rruj-cfLrMVFShP_6w>
-    <xmx:aRqcZw0OvE4Bz0ERm413AjBj7Mxs2Yjx4z57hqQB8DctU261M1TGrg>
-    <xmx:aRqcZw87SycT_jcUZzUq_ZJ3fHdctwdGyN8z3rV_RtJajO_jZOXOYw>
-    <xmx:ahqcZ_VIDfYVUxJV9L-zEswUlE7cRIvQCdphyjywN14hUKE26-B8UQea>
-Feedback-ID: iac594737:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 30 Jan 2025 19:33:44 -0500 (EST)
-Date: Thu, 30 Jan 2025 19:33:37 -0500
-From: Demi Marie Obenour <demi@invisiblethingslab.com>
-To: Demi Marie Obenour <demiobenour@gmail.com>,
-	"Huang, Honglei1" <Honglei1.Huang@amd.com>,
-	Huang Rui <ray.huang@amd.com>,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	dri-devel@lists.freedesktop.org, David Airlie <airlied@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Lingshan Zhu <Lingshan.Zhu@amd.com>,
-	Xen developer discussion <xen-devel@lists.xenproject.org>,
-	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
-	Kernel KVM virtualization development <kvm@vger.kernel.org>,
-	Xenia Ragiadakou <burzalodowa@gmail.com>,
-	Stefano Stabellini <stefano.stabellini@amd.com>
-Subject: Re: [RFC PATCH 3/3] drm/virtio: implement blob userptr resource
- object
-Message-ID: <Z5waZsddenagCYtl@itl-email>
-References: <20241220100409.4007346-1-honglei1.huang@amd.com>
- <20241220100409.4007346-3-honglei1.huang@amd.com>
- <Z2WO2udH2zAEr6ln@phenom.ffwll.local>
- <2fb36b50-4de2-4060-a4b7-54d221db8647@gmail.com>
- <de8ade34-eb67-4bff-a1c9-27cb51798843@amd.com>
- <Z36wV07M8B_wgWPl@phenom.ffwll.local>
- <c42ae4f7-f5f4-4906-85aa-b049ed44d7e9@gmail.com>
+	s=arc-20240116; t=1738285566; c=relaxed/simple;
+	bh=9jf/1nf6tAlLaTCV6LJ7jR9g3FGayPJbCfATcf783SU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rpEpZfXvDrBNlPXAP2jfaVKitalMCe8/+Cnr+paYsn3lraQDYLPnyo4B2kdUnyEzCa+3LyaAImvmCuYKiySSqZnI1hsin99hT7TAS7DC5nNGMJ6BKdHgtUe7Jy6hMCEP5P5XEP/wfRDSITKtg6E+Qxl9okCPLp6Yxv+8PWWGOd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TLbjc7d8; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-218cf85639eso42767715ad.3
+        for <kvm@vger.kernel.org>; Thu, 30 Jan 2025 17:06:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738285564; x=1738890364; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bTNYs099yFFyqnxNpuPISqHSrCDzZ6WUqK+9MhF5wbs=;
+        b=TLbjc7d87TeLS6RlN3HkAbeLlWBHyd0sIYW+HXVWqZDMeUxmHMbKiAkDT2OWtCZyXz
+         YFV/me68MZM5JkmpaedwWVDhDtASP+o6U1kTQEJn/1exclJmC5G0y7AigX5h7qchv1kp
+         RSFiy7fSldiH18zbkRxXdHQWWYiJkFriTuySUcFrHP1bd87PvVKD4QYMn0BR0U2Ykse6
+         pPO/mtEOK+yaGdzUbsy4igm8GtakIRaGXX8ivc0w1sJTW6R+PPN0HKQKJ+KIfFgf6JKu
+         na2C9ahYfV4rEcPBb3sFeacy5KnKKJ45BVUL7Q9b8E+B2pdku6PzvNY1Ks1e5WQ9jOdY
+         +WWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738285564; x=1738890364;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bTNYs099yFFyqnxNpuPISqHSrCDzZ6WUqK+9MhF5wbs=;
+        b=nMYRp8J1/Dxzvd1cORTm/et/HoLBr7PQdt0tRFZ82Ov4F52wXNjUho04CZfYh3zJnE
+         mWWVQnDSXAxq1jin39Gsf8ebbBb3zBNoQQZ7m9PNKl7lCnjIsttfXa2QfRYLa3zuDyTM
+         Ft53rg8aegGYZp+ymIEjBD50+O95yZRbyXMzLl1vYtqXFsndGMStG3R+qMzIX93CODdT
+         GGUh2/Vifc7IZxDTNaRIceYZNKjPbYhC7QeGWivpemjt5orbUEH9kF5YZUFowZ4bm7xL
+         iOc1TzOgLsYfVXKH/45FhX/dD52vSZ0sbsuj+l7cO5JJwGD73B+4HJpZbIzFHZ2VFzwW
+         UCqw==
+X-Gm-Message-State: AOJu0Yz3rBc3R8VTVqEC6CM0iZm73DpYj7y3jsStADch5lsFEeSJLJzz
+	1JWOeeFkHViMbR3ZkGdxp6D+w6mPrUBWt8h78d/IBFp3LzVufCa91lK63dslwTlBgFy/YagiFD9
+	bQQ==
+X-Google-Smtp-Source: AGHT+IGxiC3tKYAQHqYSiS3fnl5uGLVJ5CIUzG+4EgbzBj0T2X1p5kopc3CLdqk/XuszZgPILyjkbC2F5Vo=
+X-Received: from pgbcr6.prod.google.com ([2002:a05:6a02:4106:b0:7fd:5164:d918])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6f8f:b0:1eb:34a6:593e
+ with SMTP id adf61e73a8af0-1ed7a5c4575mr14718423637.1.1738285564440; Thu, 30
+ Jan 2025 17:06:04 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 30 Jan 2025 17:06:01 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9QyKV9EEhg0eMfJA"
-Content-Disposition: inline
-In-Reply-To: <c42ae4f7-f5f4-4906-85aa-b049ed44d7e9@gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
+Message-ID: <20250131010601.469904-1-seanjc@google.com>
+Subject: [PATCH] KVM: nSVM: Never use L0's PAUSE loop exiting while L2 is running
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
+Never use L0's (KVM's) PAUSE loop exiting controls while L2 is running,
+and instead always configure vmcb02 according to L1's exact capabilities
+and desires.
 
---9QyKV9EEhg0eMfJA
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jan 2025 19:33:37 -0500
-From: Demi Marie Obenour <demi@invisiblethingslab.com>
-To: Demi Marie Obenour <demiobenour@gmail.com>,
-	"Huang, Honglei1" <Honglei1.Huang@amd.com>,
-	Huang Rui <ray.huang@amd.com>,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	dri-devel@lists.freedesktop.org, David Airlie <airlied@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Lingshan Zhu <Lingshan.Zhu@amd.com>,
-	Xen developer discussion <xen-devel@lists.xenproject.org>,
-	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
-	Kernel KVM virtualization development <kvm@vger.kernel.org>,
-	Xenia Ragiadakou <burzalodowa@gmail.com>,
-	Stefano Stabellini <stefano.stabellini@amd.com>
-Subject: Re: [RFC PATCH 3/3] drm/virtio: implement blob userptr resource
- object
+The purpose of intercepting PAUSE after N attempts is to detect when the
+vCPU may be stuck waiting on a lock, so that KVM can schedule in a
+different vCPU that may be holding said lock.  Barring a very interesting
+setup, L1 and L2 do not share locks, and it's extremely unlikely that an
+L1 vCPU would hold a spinlock while running L2.  I.e. having a vCPU
+executing in L1 yield to a vCPU running in L2 will not allow the L1 vCPU
+to make forward progress, and vice versa.
 
-On Wed, Jan 29, 2025 at 03:54:59PM -0500, Demi Marie Obenour wrote:
-> On 1/8/25 12:05 PM, Simona Vetter wrote:
-> > On Fri, Dec 27, 2024 at 10:24:29AM +0800, Huang, Honglei1 wrote:
-> >>
-> >> On 2024/12/22 9:59, Demi Marie Obenour wrote:
-> >>> On 12/20/24 10:35 AM, Simona Vetter wrote:
-> >>>> On Fri, Dec 20, 2024 at 06:04:09PM +0800, Honglei Huang wrote:
-> >>>>> From: Honglei Huang <Honglei1.Huang@amd.com>
-> >>>>>
-> >>>>> A virtio-gpu userptr is based on HMM notifier.
-> >>>>> Used for let host access guest userspace memory and
-> >>>>> notice the change of userspace memory.
-> >>>>> This series patches are in very beginning state,
-> >>>>> User space are pinned currently to ensure the host
-> >>>>> device memory operations are correct.
-> >>>>> The free and unmap operations for userspace can be
-> >>>>> handled by MMU notifier this is a simple and basice
-> >>>>> SVM feature for this series patches.
-> >>>>> The physical PFNS update operations is splited into
-> >>>>> two OPs in here. The evicted memories won't be used
-> >>>>> anymore but remap into host again to achieve same
-> >>>>> effect with hmm_rang_fault.
-> >>>>
-> >>>> So in my opinion there are two ways to implement userptr that make s=
-ense:
-> >>>>
-> >>>> - pinned userptr with pin_user_pages(FOLL_LONGTERM). there is not mmu
-> >>>>    notifier
-> >>>>
-> >>>> - unpinnned userptr where you entirely rely on userptr and do not ho=
-ld any
-> >>>>    page references or page pins at all, for full SVM integration. Th=
-is
-> >>>>    should use hmm_range_fault ideally, since that's the version that
-> >>>>    doesn't ever grab any page reference pins.
-> >>>>
-> >>>> All the in-between variants are imo really bad hacks, whether they h=
-old a
-> >>>> page reference or a temporary page pin (which seems to be what you're
-> >>>> doing here). In much older kernels there was some justification for =
-them,
-> >>>> because strange stuff happened over fork(), but with FOLL_LONGTERM t=
-his is
-> >>>> now all sorted out. So there's really only fully pinned, or true svm=
- left
-> >>>> as clean design choices imo.
-> >>>>
-> >>>> With that background, why does pin_user_pages(FOLL_LONGTERM) not wor=
-k for
-> >>>> you?
-> >>>
-> >>> +1 on using FOLL_LONGTERM.  Fully dynamic memory management has a hug=
-e cost
-> >>> in complexity that pinning everything avoids.  Furthermore, this avoi=
-ds the
-> >>> host having to take action in response to guest memory reclaim reques=
-ts.
-> >>> This avoids additional complexity (and thus attack surface) on the ho=
-st side.
-> >>> Furthermore, since this is for ROCm and not for graphics, I am less c=
-oncerned
-> >>> about supporting systems that require swappable GPU VRAM.
-> >>
-> >> Hi Sima and Demi,
-> >>
-> >> I totally agree the flag FOLL_LONGTERM is needed, I will add it in next
-> >> version.
-> >>
-> >> And for the first pin variants implementation, the MMU notifier is also
-> >> needed I think.Cause the userptr feature in UMD generally used like th=
-is:
-> >> the registering of userptr always is explicitly invoked by user code l=
-ike
-> >> "registerMemoryToGPU(userptrAddr, ...)", but for the userptr release/f=
-ree,
-> >> there is no explicit API for it, at least in hsakmt/KFD stack. User ju=
-st
-> >> need call system call "free(userptrAddr)", then kernel driver will rel=
-ease
-> >> the userptr by MMU notifier callback.Virtio-GPU has no other way to kn=
-ow if
-> >> user has been free the userptr except for MMU notifior.And in UMD ther=
-es is
-> >> no way to get the free() operation is invoked by user.The only way is =
-use
-> >> MMU notifier in virtio-GPU driver and free the corresponding data in h=
-ost by
-> >> some virtio CMDs as far as I can see.
-> >>
-> >> And for the second way that is use hmm_range_fault, there is a predict=
-able
-> >> issues as far as I can see, at least in hsakmt/KFD stack. That is the =
-memory
-> >> may migrate when GPU/device is working. In bare metal, when memory is
-> >> migrating KFD driver will pause the compute work of the device in
-> >> mmap_wirte_lock then use hmm_range_fault to remap the migrated/evicted
-> >> memories to GPU then restore the compute work of device to ensure the
-> >> correction of the data. But in virtio-GPU driver the migration happen =
-in
-> >> guest kernel, the evict mmu notifier callback happens in guest, a virt=
-io CMD
-> >> can be used for notify host but as lack of mmap_write_lock protection =
-in
-> >> host kernel, host will hold invalid data for a short period of time, t=
-his
-> >> may lead to some issues. And it is hard to fix as far as I can see.
-> >>
-> >> I will extract some APIs into helper according to your request, and I =
-will
-> >> refactor the whole userptr implementation, use some callbacks in page
-> >> getting path, let the pin method and hmm_range_fault can be choiced
-> >> in this series patches.
-> >=20
-> > Ok, so if this is for svm, then you need full blast hmm, or the semanti=
-cs
-> > are buggy. You cannot fake svm with pin(FOLL_LONGTERM) userptr, this do=
-es
-> > not work.
-> >=20
-> > The other option is that hsakmt/kfd api is completely busted, and that's
-> > kinda not a kernel problem.
-> > -Sima
->=20
-> On further thought, I believe the driver needs to migrate the pages to
-> device memory (really a virtio-GPU blob object) *and* take a FOLL_LONGTERM
-> pin on them.  The reason is that it isn=E2=80=99t possible to migrate the=
-se pages
-> back to "host" memory without unmapping them from the GPU.  For the reaso=
-ns
-> I mention in [1], I believe that temporarily revoking access to virtio-GPU
-> blob objects is not feasible.  Instead, the pages must be treated as if
-> they are permanently in device memory until guest userspace unmaps them
-> from the GPU, after which they must be migrated back to host memory.
+While teaching KVM's "on spin" logic to only yield to other vCPUs in L2 is
+doable, in all likelihood it would do more harm than good for most setups.
+KVM has limited visibility into which L2 "vCPUs" belong to the same VM,
+and thus share a locking domain.  And even if L2 vCPUs are in the same
+VM, KVM has no visilibity into L2 vCPU's that are scheduled out by the
+L1 hypervisor.
 
-Discussion on IRC indicates that migration isn't reliable.  This is
-because Linux core memory management is largely lock-free for
-performance reasons, so there is no way to prevent temporary elevation
-of a page's reference count.  A page with an elevated reference count
-cannot be migrated.
+Furthermore, KVM doesn't actually steal PAUSE exits from L1. If L1 is
+intercepting PAUSE, KVM will route PAUSE exits to L1, not L0, as
+nested_svm_intercept() gives priority to the vmcb12 intercept.  As such,
+overriding the count/threshold fields in vmcb02 with vmcb01's values is
+nonsensical, as doing so clobbers all the training/learning that has been
+done in L1.
 
-The only alternative I can think of is for the hypervisor to perform the
-migration.  The hypervisor can revoke the guest's access to the page
-without the guest's consent or involvement.  The host can then replace
-the page with one of its own pages, which might be on the CPU or GPU.
-Further migration between the CPU and GPU is controlled by the host
-kernel-mode driver (KMD) and host kernel memory management.  The guest
-kernel driver must take a FOLL_LONGTERM pin before telling the host to
-use the pages, but that is all.
+Even worse, if L1 is not intercepting PAUSE, i.e. KVM is handling PAUSE
+exits, then KVM will adjust the PLE knobs based on L2 behavior, which could
+very well be detrimental to L1, e.g. due to essentially poisoning L1 PLE
+training with bad data.
 
-On KVM, this should be essentially automatic, as guest memory really is
-just host userspace memory.  On Xen, this requires that the backend
-domain can revoke fronted access to _any_ frontend page, or at least
-frontend pages that have been granted to the backend.  The backend will
-then need to be able to handle page faults for the frontend pages, and
-replace the frontend pages with its own pages at will.  Furthermore,
-revoking pages that the backend has installed into the frontend must
-never fail, because the backend will panic if it does fail.
+And copying the count from vmcb02 to vmcb01 on a nested VM-Exit makes even
+less sense, because again, the purpose of PLE is to detect spinning vCPUs.
+Whether or not a vCPU is spinning in L2 at the time of a nested VM-Exit
+has no relevance as to the behavior of the vCPU when it executes in L1.
 
-Sima, is putting guest pages under host kernel control the only option?
-I thought that this could be avoided by leaving the pages on the CPU if
-migration fails, but that won't work because there will be no way to
-migrate them to the GPU later, causing performance problems that would
-be impossible to debug.  Is waiting (possibly forever) on migration to
-finish an option?  Otherwise, this might mean extra complexity in the
-Xen hypervisor, as I do not believe the primitives needed are currently
-available.  Specifically, in addition to the primitives discussed at Xen
-Project Summit 2024, the backend also needs to intercept access to, and
-replace the contents of, arbitrary frontend-controlled pages.
---=20
-Sincerely,
-Demi Marie Obenour (she/her/hers)
-Invisible Things Lab
+The only scenarios where any of this actually works is if at least one
+of KVM or L1 is NOT intercepting PAUSE for the guest.  Per the original
+changelog, those were the only scenarios considered to be supported.
+Disabling KVM's use of PLE makes it so the VM is always in a "supported"
+mode.
 
---9QyKV9EEhg0eMfJA
-Content-Type: application/pgp-signature; name="signature.asc"
+Last, but certainly not least, using KVM's count/threshold instead of the
+values provided by L1 is a blatant violation of the SVM architecture.
 
------BEGIN PGP SIGNATURE-----
+Fixes: 74fd41ed16fd ("KVM: x86: nSVM: support PAUSE filtering when L0 doesn't intercept PAUSE")
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/nested.c | 44 +++++++++++++--------------------------
+ arch/x86/kvm/svm/svm.c    |  6 ------
+ 2 files changed, 14 insertions(+), 36 deletions(-)
 
-iQIzBAEBCAAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmecGmEACgkQszaHOrMp
-8lMt/w/9EultembzZOpL8oYFzpDKH4QFhJkkcONDqVqYYE5kH122Mqj5GsprGGW0
-FqvHAgK5Qk/W+zz9LQrk+P6WEwJhP0XIo/TKJfSCOXqK6pEqwyZ8OPk1nHAiPli/
-D7bm3ocsg69tYGoLsCylZehwUe87ATZZ43KVsh+bf1h+lRHONd8yOs46nSzJuxzl
-zEOI373RpZVKzpRx3HQfyzS9oALVzvdyGzeX+1n3AmQyDbZtjs4ZInyyng4ruArL
-viZtevqVe6boeeemKkZaGtGOzaiVZAmwX3PjTNXbIygsogzscCrMUfL3ZOYbg9D/
-P18aWdQEu5f7+Vt5PL4sOfY6AsmArvlwAKWVQdmpk8eTTuW6fDk0651ogKcNFiV9
-cgCJhv5SBa/hoas8i4nj2pl58AdfjaZFGtdXsEuKzQ2D7N6LivWZGOsbwfK+NVdT
-AdzfuyH0M41tQw0Oy57NmnnbnC7clqk1wn8UTTSfxmtFWCVhBoMx25WgIK/fGUvp
-JOHj+9q/MfD0A+dY0jng45Y8Kf7saNMMWmpmT0NNoAAnNWZzSJgO7+2IHjjd6DTn
-K07huXex3wpOxtBnd42TWMb5fxiwtU48XhGRz7ZNyhPlakaK/ZKjJX8bE2WrLOrA
-bAwm93etZnI91f08VSApkuYCYUCAh8nk/k6GDDdAkvWTWfsJ09w=
-=U2FS
------END PGP SIGNATURE-----
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index d77b094d9a4d..9330c15de6b7 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -171,6 +171,16 @@ void recalc_intercepts(struct vcpu_svm *svm)
+ 	if (!intercept_smi)
+ 		vmcb_clr_intercept(c, INTERCEPT_SMI);
+ 
++	/*
++	 * Intercept PAUSE if and only if L1 wants to.  KVM intercepts PAUSE so
++	 * that a vCPU that may be spinning waiting for a lock can be scheduled
++	 * out in favor of the vCPU that holds said lock.  KVM doesn't support
++	 * yielding across L2 vCPUs, as KVM has limited visilibity into which
++	 * L2 vCPUs are in the same L2 VM, i.e. may be contending for locks.
++	 */
++	if (!vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_PAUSE))
++		vmcb_clr_intercept(c, INTERCEPT_PAUSE);
++
+ 	if (nested_vmcb_needs_vls_intercept(svm)) {
+ 		/*
+ 		 * If the virtual VMLOAD/VMSAVE is not enabled for the L2,
+@@ -643,8 +653,6 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 	struct vmcb *vmcb01 = svm->vmcb01.ptr;
+ 	struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
+-	u32 pause_count12;
+-	u32 pause_thresh12;
+ 
+ 	/*
+ 	 * Filled at exit: exit_code, exit_code_hi, exit_info_1, exit_info_2,
+@@ -736,31 +744,13 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+ 		vmcb02->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
+ 
+ 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_PAUSEFILTER))
+-		pause_count12 = svm->nested.ctl.pause_filter_count;
++		vmcb02->control.pause_filter_count = svm->nested.ctl.pause_filter_count;
+ 	else
+-		pause_count12 = 0;
++		vmcb02->control.pause_filter_count = 0;
+ 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_PFTHRESHOLD))
+-		pause_thresh12 = svm->nested.ctl.pause_filter_thresh;
++		vmcb02->control.pause_filter_thresh = svm->nested.ctl.pause_filter_thresh;
+ 	else
+-		pause_thresh12 = 0;
+-	if (kvm_pause_in_guest(svm->vcpu.kvm)) {
+-		/* use guest values since host doesn't intercept PAUSE */
+-		vmcb02->control.pause_filter_count = pause_count12;
+-		vmcb02->control.pause_filter_thresh = pause_thresh12;
+-
+-	} else {
+-		/* start from host values otherwise */
+-		vmcb02->control.pause_filter_count = vmcb01->control.pause_filter_count;
+-		vmcb02->control.pause_filter_thresh = vmcb01->control.pause_filter_thresh;
+-
+-		/* ... but ensure filtering is disabled if so requested.  */
+-		if (vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_PAUSE)) {
+-			if (!pause_count12)
+-				vmcb02->control.pause_filter_count = 0;
+-			if (!pause_thresh12)
+-				vmcb02->control.pause_filter_thresh = 0;
+-		}
+-	}
++		vmcb02->control.pause_filter_thresh = 0;
+ 
+ 	nested_svm_transition_tlb_flush(vcpu);
+ 
+@@ -1033,12 +1023,6 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+ 	vmcb12->control.event_inj         = svm->nested.ctl.event_inj;
+ 	vmcb12->control.event_inj_err     = svm->nested.ctl.event_inj_err;
+ 
+-	if (!kvm_pause_in_guest(vcpu->kvm)) {
+-		vmcb01->control.pause_filter_count = vmcb02->control.pause_filter_count;
+-		vmcb_mark_dirty(vmcb01, VMCB_INTERCEPTS);
+-
+-	}
+-
+ 	nested_svm_copy_common_state(svm->nested.vmcb02.ptr, svm->vmcb01.ptr);
+ 
+ 	svm_switch_vmcb(svm, &svm->vmcb01);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 7640a84e554a..ad5accc29db8 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1079,9 +1079,6 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+ 	int old = control->pause_filter_count;
+ 
+-	if (kvm_pause_in_guest(vcpu->kvm))
+-		return;
+-
+ 	control->pause_filter_count = __grow_ple_window(old,
+ 							pause_filter_count,
+ 							pause_filter_count_grow,
+@@ -1100,9 +1097,6 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+ 	int old = control->pause_filter_count;
+ 
+-	if (kvm_pause_in_guest(vcpu->kvm))
+-		return;
+-
+ 	control->pause_filter_count =
+ 				__shrink_ple_window(old,
+ 						    pause_filter_count,
 
---9QyKV9EEhg0eMfJA--
+base-commit: eb723766b1030a23c38adf2348b7c3d1409d11f0
+-- 
+2.48.1.362.g079036d154-goog
+
 
