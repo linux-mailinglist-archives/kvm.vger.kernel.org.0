@@ -1,388 +1,182 @@
-Return-Path: <kvm+bounces-36975-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36977-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED9B6A23C8F
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 11:58:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCB8A23CF9
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 12:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 573551883506
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 10:58:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E6ED3AA96D
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 11:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5BC1B85EC;
-	Fri, 31 Jan 2025 10:58:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3EC1E98FD;
+	Fri, 31 Jan 2025 11:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MSXhyynl"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sOf/ii5K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4731B6D14
-	for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 10:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF221EC016;
+	Fri, 31 Jan 2025 11:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738321079; cv=none; b=NaFR9IoyBTJYeWRd1ovUs9okF8k/s5TcQcBdppNJ/hC+zshgS8hJS9090GTMk8mYiy1XKTvPO5lLQKFJUcnUnBumSCkwivClrz4O/C+NsfE7oxzaX9wBPgao5LPoaFU4ijinBNyI+dbx0dTtj8ivnh+8dTV7DLe8kCaypL+P87Q=
+	t=1738322724; cv=none; b=T5w3vPQrDJJY07Qvj2+gW4IMbsjkPFfWa81icTJMCTZOlx5K4DgrqkESfiwmGC8u3NoNt2itvTCctzewkywBTTAtF3Jx1aLCGHtn+MIAP57XM/WZ3fEjh3+J+fLFWFrC2uayIaEQAJgmN7b27ADymX1tyDtTYw+mEH0Cte+dD8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738321079; c=relaxed/simple;
-	bh=HmcFTHtCSkE4p5Vx86iDRx2lQmsuGDOrl0D76rU1PtE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=oaUKqamBfjTPMJBVk65WXp4DHKWBJhWikC9bWAtJ3m9hUyZWS6OHvGwwXds++u5+2Wg8ibyFfZvkpSmzaDe4ysbHWjnAnnpODUQ/eJNbY0OVJER0HxamslXkcEqiYuYp0kaIwrvG/DSQTohixqKz78JGKGfWVAEoMJiLRP0SZdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MSXhyynl; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738321077; x=1769857077;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=HmcFTHtCSkE4p5Vx86iDRx2lQmsuGDOrl0D76rU1PtE=;
-  b=MSXhyynlO3cBPAq5CR2/tV7aRvrJ3PfU1+kqZ5tpn+7UpkzT8czO8BO3
-   az82wXGCTQvTlYGKiWfdIelhp06L68uLEic5z/z214Lbr/MyGYbRVlnQh
-   5Usi8Sh1inUaS3mz9aaqCjC2g4L9OTDO4Ire7zL24UQEhxOKiUXNLipol
-   PzV26Zvy/8/skQ6uGWf1m9QTVY+bGkQ74odxuzn2x1PV1neDZW94ZuHaJ
-   lw84wMsIAd2EL3HxFUPmZvELH16Cfk5nNT4dBu/dD293btxvlvigtZDUK
-   jgtscE7mp2ruG7Nm/cjwGmO7OX5xCwvXxT56NzQI9+9FXREFxCK3FJhb8
-   A==;
-X-CSE-ConnectionGUID: w1iCSdupRziwx6fS6OH8mA==
-X-CSE-MsgGUID: GA1gulZATj2iTpdiXCW/Rw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11331"; a="38791511"
-X-IronPort-AV: E=Sophos;i="6.13,248,1732608000"; 
-   d="scan'208";a="38791511"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2025 02:57:56 -0800
-X-CSE-ConnectionGUID: CU2o7CGHTiq3+ruC5mnwMg==
-X-CSE-MsgGUID: KzH4pnsiRAeRpkEPf8kLrA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="146779572"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 31 Jan 2025 02:57:54 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tdoid-000mHt-2a;
-	Fri, 31 Jan 2025 10:57:51 +0000
-Date: Fri, 31 Jan 2025 18:57:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Farrah Chen <farrah.chen@intel.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm:kvm-coco-queue-20250129 43/129] arch/x86/kvm/vmx/main.c:176:13:
- error: 'vt_exit' undeclared; did you mean 'vmx_exit'?
-Message-ID: <202501311811.fRf67aOn-lkp@intel.com>
+	s=arc-20240116; t=1738322724; c=relaxed/simple;
+	bh=FWTDP1rk8DhN4KiP/c62NuMgHbTEIYOMQ9gSclJYTf4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PhdmtH5UbRgSxa0l6gbHTY9emqKaledTvhN1ko7qJh1MiEYPC3Pi/g/qIO06RfRoDU0DBfkrVCgSVcgEK9bVL4/HUBJUB8FWN87haT0iPLlooBvykUiL/ZS/6bwOnR03YGppfgHpeWnv1HM5bJr6qrcTXw6NOy9MRcGgMrt7EfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sOf/ii5K; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50V7Wqbd009647;
+	Fri, 31 Jan 2025 11:25:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=QdZ7+INnoGa6djL8g+i1n3RTdyMfjnw8D3kNVHAT8
+	rg=; b=sOf/ii5KCmAn36pB2udvrplnJobrkbpToAfmwck4yv1qx/eO/bACr0pw4
+	/WfIho/JKanma6Y6xVnXQmZSpeWPH9ErOhsXr3eFS1GO4d9J3I6lIhTkgKphOY94
+	pELpbhJIdu+gVcOJ6dqv1cguOPsHaKV+bjDGuzh2gOMT44L84b/lc9RrOgfRX/RV
+	Jf8nA0X5j9UsLJ3Fev7D55AdeAsvH4Q3lGN1gZOJxvc1gSlA0DpSnPZP51gHQXeL
+	7BIgymAZM1dHa0/1VFfqAoNMjHMmu61hylE1+01oUMQP6SYOrSsR3K6T1ePWBtJS
+	95gihteeRiCAGm8E4AdOFCst85M2g==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44gt7n8v2w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jan 2025 11:25:19 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50V8MOpt017346;
+	Fri, 31 Jan 2025 11:25:19 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44gfaxb8jp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jan 2025 11:25:19 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50VBPFBh56820006
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 31 Jan 2025 11:25:15 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 18B952013A;
+	Fri, 31 Jan 2025 11:25:15 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6585220132;
+	Fri, 31 Jan 2025 11:25:10 +0000 (GMT)
+Received: from p-imbrenda.ibmuc.com (unknown [9.171.25.38])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 31 Jan 2025 11:25:10 +0000 (GMT)
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, david@redhat.com
+Subject: [GIT PULL v2 00/20] KVM: s390: some non-trivial fixes and cleanups for 6.14
+Date: Fri, 31 Jan 2025 12:24:50 +0100
+Message-ID: <20250131112510.48531-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OIDRb8r_C0OQ5VB7rQVG2Iruzpg2B439
+X-Proofpoint-ORIG-GUID: OIDRb8r_C0OQ5VB7rQVG2Iruzpg2B439
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-31_04,2025-01-31_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
+ clxscore=1015 mlxscore=0 spamscore=0 bulkscore=0 mlxlogscore=635
+ phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2501310083
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue-20250129
-head:   0bc4f452607db4e7eee4d3056cd6ec98636260bc
-commit: 4b55a8f7c5f508fe1dd0005aecc81bbb5676aaec [43/129] KVM: VMX: Refactor VMX module init/exit functions
-config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20250131/202501311811.fRf67aOn-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250131/202501311811.fRf67aOn-lkp@intel.com/reproduce)
+Ciao Paolo,
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501311811.fRf67aOn-lkp@intel.com/
+please pull the following changes:
 
-All errors (new ones prefixed by >>):
-
-   In file included from include/linux/kallsyms.h:14,
-                    from include/linux/ftrace.h:13,
-                    from include/linux/kvm_host.h:32,
-                    from arch/x86/kvm/vmx/x86_ops.h:5,
-                    from arch/x86/kvm/vmx/main.c:4:
-   arch/x86/kvm/vmx/main.c: In function '__exittest':
->> arch/x86/kvm/vmx/main.c:176:13: error: 'vt_exit' undeclared (first use in this function); did you mean 'vmx_exit'?
-     176 | module_exit(vt_exit);
-         |             ^~~~~~~
-   include/linux/module.h:140:18: note: in definition of macro 'module_exit'
-     140 |         { return exitfn; }                                      \
-         |                  ^~~~~~
-   arch/x86/kvm/vmx/main.c:176:13: note: each undeclared identifier is reported only once for each function it appears in
-     176 | module_exit(vt_exit);
-         |             ^~~~~~~
-   include/linux/module.h:140:18: note: in definition of macro 'module_exit'
-     140 |         { return exitfn; }                                      \
-         |                  ^~~~~~
-   In file included from include/linux/compiler_types.h:89,
-                    from <command-line>:
-   arch/x86/kvm/vmx/main.c: At top level:
->> arch/x86/kvm/vmx/main.c:176:13: error: 'vt_exit' undeclared here (not in a function); did you mean 'vmx_exit'?
-     176 | module_exit(vt_exit);
-         |             ^~~~~~~
-   include/linux/compiler_attributes.h:92:65: note: in definition of macro '__copy'
-      92 | # define __copy(symbol)                 __attribute__((__copy__(symbol)))
-         |                                                                 ^~~~~~
-   arch/x86/kvm/vmx/main.c:176:1: note: in expansion of macro 'module_exit'
-     176 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
->> include/linux/module.h:139:49: error: redefinition of '__exittest'
-     139 |         static inline exitcall_t __maybe_unused __exittest(void)                \
-         |                                                 ^~~~~~~~~~
-   arch/x86/kvm/vmx/main.c:183:1: note: in expansion of macro 'module_exit'
-     183 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
-   include/linux/module.h:139:49: note: previous definition of '__exittest' with type 'void (*(void))(void)'
-     139 |         static inline exitcall_t __maybe_unused __exittest(void)                \
-         |                                                 ^~~~~~~~~~
-   arch/x86/kvm/vmx/main.c:176:1: note: in expansion of macro 'module_exit'
-     176 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
->> include/linux/module.h:141:14: error: redefinition of 'cleanup_module'
-     141 |         void cleanup_module(void) __copy(exitfn)                \
-         |              ^~~~~~~~~~~~~~
-   arch/x86/kvm/vmx/main.c:183:1: note: in expansion of macro 'module_exit'
-     183 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
-   include/linux/module.h:141:14: note: previous definition of 'cleanup_module' with type 'void(void)'
-     141 |         void cleanup_module(void) __copy(exitfn)                \
-         |              ^~~~~~~~~~~~~~
-   arch/x86/kvm/vmx/main.c:176:1: note: in expansion of macro 'module_exit'
-     176 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
---
-   In file included from include/linux/kallsyms.h:14,
-                    from include/linux/ftrace.h:13,
-                    from include/linux/kvm_host.h:32,
-                    from vmx/x86_ops.h:5,
-                    from vmx/main.c:4:
-   vmx/main.c: In function '__exittest':
-   vmx/main.c:176:13: error: 'vt_exit' undeclared (first use in this function); did you mean 'vmx_exit'?
-     176 | module_exit(vt_exit);
-         |             ^~~~~~~
-   include/linux/module.h:140:18: note: in definition of macro 'module_exit'
-     140 |         { return exitfn; }                                      \
-         |                  ^~~~~~
-   vmx/main.c:176:13: note: each undeclared identifier is reported only once for each function it appears in
-     176 | module_exit(vt_exit);
-         |             ^~~~~~~
-   include/linux/module.h:140:18: note: in definition of macro 'module_exit'
-     140 |         { return exitfn; }                                      \
-         |                  ^~~~~~
-   In file included from include/linux/compiler_types.h:89,
-                    from <command-line>:
-   vmx/main.c: At top level:
-   vmx/main.c:176:13: error: 'vt_exit' undeclared here (not in a function); did you mean 'vmx_exit'?
-     176 | module_exit(vt_exit);
-         |             ^~~~~~~
-   include/linux/compiler_attributes.h:92:65: note: in definition of macro '__copy'
-      92 | # define __copy(symbol)                 __attribute__((__copy__(symbol)))
-         |                                                                 ^~~~~~
-   vmx/main.c:176:1: note: in expansion of macro 'module_exit'
-     176 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
->> include/linux/module.h:139:49: error: redefinition of '__exittest'
-     139 |         static inline exitcall_t __maybe_unused __exittest(void)                \
-         |                                                 ^~~~~~~~~~
-   vmx/main.c:183:1: note: in expansion of macro 'module_exit'
-     183 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
-   include/linux/module.h:139:49: note: previous definition of '__exittest' with type 'void (*(void))(void)'
-     139 |         static inline exitcall_t __maybe_unused __exittest(void)                \
-         |                                                 ^~~~~~~~~~
-   vmx/main.c:176:1: note: in expansion of macro 'module_exit'
-     176 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
->> include/linux/module.h:141:14: error: redefinition of 'cleanup_module'
-     141 |         void cleanup_module(void) __copy(exitfn)                \
-         |              ^~~~~~~~~~~~~~
-   vmx/main.c:183:1: note: in expansion of macro 'module_exit'
-     183 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
-   include/linux/module.h:141:14: note: previous definition of 'cleanup_module' with type 'void(void)'
-     141 |         void cleanup_module(void) __copy(exitfn)                \
-         |              ^~~~~~~~~~~~~~
-   vmx/main.c:176:1: note: in expansion of macro 'module_exit'
-     176 | module_exit(vt_exit);
-         | ^~~~~~~~~~~
+- some selftest fixes
+- move some kvm-related functions from mm into kvm
+- remove all usage of page->index and page->lru from kvm
+- fixes and cleanups for vsie
 
 
-vim +176 arch/x86/kvm/vmx/main.c
+and this time I did not forget any Signed-off-by: tags! *facepalm*
+sorry for the noise
 
-     3	
-   > 4	#include "x86_ops.h"
-     5	#include "vmx.h"
-     6	#include "nested.h"
-     7	#include "pmu.h"
-     8	#include "posted_intr.h"
-     9	
-    10	#define VMX_REQUIRED_APICV_INHIBITS				\
-    11		(BIT(APICV_INHIBIT_REASON_DISABLED) |			\
-    12		 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
-    13		 BIT(APICV_INHIBIT_REASON_HYPERV) |			\
-    14		 BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |			\
-    15		 BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |	\
-    16		 BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |		\
-    17		 BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED))
-    18	
-    19	struct kvm_x86_ops vt_x86_ops __initdata = {
-    20		.name = KBUILD_MODNAME,
-    21	
-    22		.check_processor_compatibility = vmx_check_processor_compat,
-    23	
-    24		.hardware_unsetup = vmx_hardware_unsetup,
-    25	
-    26		.enable_virtualization_cpu = vmx_enable_virtualization_cpu,
-    27		.disable_virtualization_cpu = vmx_disable_virtualization_cpu,
-    28		.emergency_disable_virtualization_cpu = vmx_emergency_disable_virtualization_cpu,
-    29	
-    30		.has_emulated_msr = vmx_has_emulated_msr,
-    31	
-    32		.vm_size = sizeof(struct kvm_vmx),
-    33		.vm_init = vmx_vm_init,
-    34		.vm_destroy = vmx_vm_destroy,
-    35	
-    36		.vcpu_precreate = vmx_vcpu_precreate,
-    37		.vcpu_create = vmx_vcpu_create,
-    38		.vcpu_free = vmx_vcpu_free,
-    39		.vcpu_reset = vmx_vcpu_reset,
-    40	
-    41		.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
-    42		.vcpu_load = vmx_vcpu_load,
-    43		.vcpu_put = vmx_vcpu_put,
-    44	
-    45		.update_exception_bitmap = vmx_update_exception_bitmap,
-    46		.get_feature_msr = vmx_get_feature_msr,
-    47		.get_msr = vmx_get_msr,
-    48		.set_msr = vmx_set_msr,
-    49		.get_segment_base = vmx_get_segment_base,
-    50		.get_segment = vmx_get_segment,
-    51		.set_segment = vmx_set_segment,
-    52		.get_cpl = vmx_get_cpl,
-    53		.get_cpl_no_cache = vmx_get_cpl_no_cache,
-    54		.get_cs_db_l_bits = vmx_get_cs_db_l_bits,
-    55		.is_valid_cr0 = vmx_is_valid_cr0,
-    56		.set_cr0 = vmx_set_cr0,
-    57		.is_valid_cr4 = vmx_is_valid_cr4,
-    58		.set_cr4 = vmx_set_cr4,
-    59		.set_efer = vmx_set_efer,
-    60		.get_idt = vmx_get_idt,
-    61		.set_idt = vmx_set_idt,
-    62		.get_gdt = vmx_get_gdt,
-    63		.set_gdt = vmx_set_gdt,
-    64		.set_dr7 = vmx_set_dr7,
-    65		.sync_dirty_debug_regs = vmx_sync_dirty_debug_regs,
-    66		.cache_reg = vmx_cache_reg,
-    67		.get_rflags = vmx_get_rflags,
-    68		.set_rflags = vmx_set_rflags,
-    69		.get_if_flag = vmx_get_if_flag,
-    70	
-    71		.flush_tlb_all = vmx_flush_tlb_all,
-    72		.flush_tlb_current = vmx_flush_tlb_current,
-    73		.flush_tlb_gva = vmx_flush_tlb_gva,
-    74		.flush_tlb_guest = vmx_flush_tlb_guest,
-    75	
-    76		.vcpu_pre_run = vmx_vcpu_pre_run,
-    77		.vcpu_run = vmx_vcpu_run,
-    78		.handle_exit = vmx_handle_exit,
-    79		.skip_emulated_instruction = vmx_skip_emulated_instruction,
-    80		.update_emulated_instruction = vmx_update_emulated_instruction,
-    81		.set_interrupt_shadow = vmx_set_interrupt_shadow,
-    82		.get_interrupt_shadow = vmx_get_interrupt_shadow,
-    83		.patch_hypercall = vmx_patch_hypercall,
-    84		.inject_irq = vmx_inject_irq,
-    85		.inject_nmi = vmx_inject_nmi,
-    86		.inject_exception = vmx_inject_exception,
-    87		.cancel_injection = vmx_cancel_injection,
-    88		.interrupt_allowed = vmx_interrupt_allowed,
-    89		.nmi_allowed = vmx_nmi_allowed,
-    90		.get_nmi_mask = vmx_get_nmi_mask,
-    91		.set_nmi_mask = vmx_set_nmi_mask,
-    92		.enable_nmi_window = vmx_enable_nmi_window,
-    93		.enable_irq_window = vmx_enable_irq_window,
-    94		.update_cr8_intercept = vmx_update_cr8_intercept,
-    95	
-    96		.x2apic_icr_is_split = false,
-    97		.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
-    98		.set_apic_access_page_addr = vmx_set_apic_access_page_addr,
-    99		.refresh_apicv_exec_ctrl = vmx_refresh_apicv_exec_ctrl,
-   100		.load_eoi_exitmap = vmx_load_eoi_exitmap,
-   101		.apicv_pre_state_restore = vmx_apicv_pre_state_restore,
-   102		.required_apicv_inhibits = VMX_REQUIRED_APICV_INHIBITS,
-   103		.hwapic_isr_update = vmx_hwapic_isr_update,
-   104		.sync_pir_to_irr = vmx_sync_pir_to_irr,
-   105		.deliver_interrupt = vmx_deliver_interrupt,
-   106		.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
-   107	
-   108		.set_tss_addr = vmx_set_tss_addr,
-   109		.set_identity_map_addr = vmx_set_identity_map_addr,
-   110		.get_mt_mask = vmx_get_mt_mask,
-   111	
-   112		.get_exit_info = vmx_get_exit_info,
-   113		.get_entry_info = vmx_get_entry_info,
-   114	
-   115		.vcpu_after_set_cpuid = vmx_vcpu_after_set_cpuid,
-   116	
-   117		.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
-   118	
-   119		.get_l2_tsc_offset = vmx_get_l2_tsc_offset,
-   120		.get_l2_tsc_multiplier = vmx_get_l2_tsc_multiplier,
-   121		.write_tsc_offset = vmx_write_tsc_offset,
-   122		.write_tsc_multiplier = vmx_write_tsc_multiplier,
-   123	
-   124		.load_mmu_pgd = vmx_load_mmu_pgd,
-   125	
-   126		.check_intercept = vmx_check_intercept,
-   127		.handle_exit_irqoff = vmx_handle_exit_irqoff,
-   128	
-   129		.cpu_dirty_log_size = PML_LOG_NR_ENTRIES,
-   130		.update_cpu_dirty_logging = vmx_update_cpu_dirty_logging,
-   131	
-   132		.nested_ops = &vmx_nested_ops,
-   133	
-   134		.pi_update_irte = vmx_pi_update_irte,
-   135		.pi_start_assignment = vmx_pi_start_assignment,
-   136	
-   137	#ifdef CONFIG_X86_64
-   138		.set_hv_timer = vmx_set_hv_timer,
-   139		.cancel_hv_timer = vmx_cancel_hv_timer,
-   140	#endif
-   141	
-   142		.setup_mce = vmx_setup_mce,
-   143	
-   144	#ifdef CONFIG_KVM_SMM
-   145		.smi_allowed = vmx_smi_allowed,
-   146		.enter_smm = vmx_enter_smm,
-   147		.leave_smm = vmx_leave_smm,
-   148		.enable_smi_window = vmx_enable_smi_window,
-   149	#endif
-   150	
-   151		.check_emulate_instruction = vmx_check_emulate_instruction,
-   152		.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-   153		.migrate_timers = vmx_migrate_timers,
-   154	
-   155		.msr_filter_changed = vmx_msr_filter_changed,
-   156		.complete_emulated_msr = kvm_complete_insn_gp,
-   157	
-   158		.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
-   159	
-   160		.get_untagged_addr = vmx_get_untagged_addr,
-   161	};
-   162	
-   163	struct kvm_x86_init_ops vt_init_ops __initdata = {
-   164		.hardware_setup = vmx_hardware_setup,
-   165		.handle_intel_pt_intr = NULL,
-   166	
-   167		.runtime_ops = &vt_x86_ops,
-   168		.pmu_ops = &intel_pmu_ops,
-   169	};
-   170	
-   171	static void __vt_exit(void)
-   172	{
-   173		vmx_exit();
-   174		kvm_x86_vendor_exit();
-   175	}
- > 176	module_exit(vt_exit);
-   177	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The following changes since commit 72deda0abee6e705ae71a93f69f55e33be5bca5c:
+
+  Merge tag 'soundwire-6.14-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/vkoul/soundwire (2025-01-29 14:38:19 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-next-6.14-2
+
+for you to fetch changes up to 32239066776a27287837a193b37c6e55259e5c10:
+
+  KVM: s390: selftests: Streamline uc_skey test to issue iske after sske (2025-01-31 12:03:53 +0100)
+
+----------------------------------------------------------------
+- some selftest fixes
+- move some kvm-related functions from mm into kvm
+- remove all usage of page->index and page->lru from kvm
+- fixes and cleanups for vsie
+
+----------------------------------------------------------------
+Christoph Schlameuss (1):
+      KVM: s390: selftests: Streamline uc_skey test to issue iske after sske
+
+Claudio Imbrenda (14):
+      KVM: s390: wrapper for KVM_BUG
+      KVM: s390: fake memslot for ucontrol VMs
+      KVM: s390: selftests: fix ucontrol memory region test
+      KVM: s390: move pv gmap functions into kvm
+      KVM: s390: use __kvm_faultin_pfn()
+      KVM: s390: get rid of gmap_fault()
+      KVM: s390: get rid of gmap_translate()
+      KVM: s390: move some gmap shadowing functions away from mm/gmap.c
+      KVM: s390: stop using page->index for non-shadow gmaps
+      KVM: s390: stop using lists to keep track of used dat tables
+      KVM: s390: move gmap_shadow_pgt_lookup() into kvm
+      KVM: s390: remove useless page->index usage
+      KVM: s390: move PGSTE softbits
+      KVM: s390: remove the last user of page->index
+
+David Hildenbrand (4):
+      KVM: s390: vsie: fix some corner-cases when grabbing vsie pages
+      KVM: s390: vsie: stop using page->index
+      KVM: s390: vsie: stop messing with page refcount
+      KVM: s390: vsie: stop using "struct page" for vsie page
+
+Sean Christopherson (1):
+      KVM: Do not restrict the size of KVM-internal memory regions
+
+ Documentation/virt/kvm/api.rst                   |   2 +-
+ arch/s390/include/asm/gmap.h                     |  20 +-
+ arch/s390/include/asm/kvm_host.h                 |   6 +-
+ arch/s390/include/asm/pgtable.h                  |  21 +-
+ arch/s390/include/asm/uv.h                       |   6 +-
+ arch/s390/kernel/uv.c                            | 292 +---------
+ arch/s390/kvm/Makefile                           |   2 +-
+ arch/s390/kvm/gaccess.c                          |  44 +-
+ arch/s390/kvm/gmap-vsie.c                        | 142 +++++
+ arch/s390/kvm/gmap.c                             | 212 +++++++
+ arch/s390/kvm/gmap.h                             |  39 ++
+ arch/s390/kvm/intercept.c                        |   7 +-
+ arch/s390/kvm/interrupt.c                        |  19 +-
+ arch/s390/kvm/kvm-s390.c                         | 237 ++++++--
+ arch/s390/kvm/kvm-s390.h                         |  19 +
+ arch/s390/kvm/pv.c                               |  21 +
+ arch/s390/kvm/vsie.c                             | 106 ++--
+ arch/s390/mm/gmap.c                              | 681 +++++------------------
+ arch/s390/mm/pgalloc.c                           |   2 -
+ tools/testing/selftests/kvm/s390/ucontrol_test.c |  32 +-
+ virt/kvm/kvm_main.c                              |  10 +-
+ 21 files changed, 990 insertions(+), 930 deletions(-)
+ create mode 100644 arch/s390/kvm/gmap-vsie.c
+ create mode 100644 arch/s390/kvm/gmap.c
+ create mode 100644 arch/s390/kvm/gmap.h
 
