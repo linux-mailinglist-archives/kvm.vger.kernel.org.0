@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-36964-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36965-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F55A23AE7
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 09:54:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 740BBA23AE9
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 09:56:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03C3F188632F
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 08:54:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4758163938
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 08:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E364F16A959;
-	Fri, 31 Jan 2025 08:54:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBA016ABC6;
+	Fri, 31 Jan 2025 08:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Jm1bOVnW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XUoFmKLZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA77158A19;
-	Fri, 31 Jan 2025 08:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7153485260;
+	Fri, 31 Jan 2025 08:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738313679; cv=none; b=P5vF6ozUVMtTzH1ZF9TegWJiGo/Y1K/zq9UqlSrKrFJYkDhru/pgfIrh1GN5WyXX5H1q6O47GrQAaGxuYvkoiB2MhN1p+d+GffI8vV4G57mvs4I1K6F3/6cigLXmGUTmXAbJKIsV3RIK/QHFZTiLF10dm00H84S9/KICnrA/s2g=
+	t=1738313802; cv=none; b=uk76BWpOLegrGb3drJxPfouAUrTOxieAqdIUkn6y0QyaV6gCLXky5Ug/mQcSlZZiUvBhr49iRGIpNP9YQ+5zRtEOMiHpNFYt+xDpvpwmF/zEjlJ6jyduR94GRz0LLV6NH6GUI0sESDvgB9eK0GLAznDa4uQ1CKLCL5Nm5kB7TDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738313679; c=relaxed/simple;
-	bh=0yeoWHsptm0KXQm6mUBpcl/+kDScxLraHXzPrT7SMYU=;
+	s=arc-20240116; t=1738313802; c=relaxed/simple;
+	bh=p4IR+mEn8NGcfomUhFfWmtewWrRS2R+frm6WviSIM3Y=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=ldoKe4fQL8KkGNUbBnYIkTUE3/hvL/tSRO14GR4hZgxBeHcW/GjjKUCJVY0dQ8AAqUVy7DAEw0qovp0T6EKPXG0LX8YUb/nAmP5bkigFfNPX4GKz0/JhG3ilepOL4LQcSAoykG4vtW04cLdNc0Br3MNRtH/Kjedd6GZS0nnwpQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Jm1bOVnW; arc=none smtp.client-ip=148.163.158.5
+	 References:In-Reply-To; b=gx4nMtcYb3oDTKAPD36I5OQlnfH80uy6rSBl8sP/q8s7M/Cm67YAbeSFUG6qAVgZbGPsDKOhyYcRFHUMFum2FHCiR2OYkt6Wwf3uSGtg11WRjEAYitkFnQTKbXDjaofo/xLM7RBQKvaFgpKQ+Ahg9GMlzswUsAeuu2cW7hOviv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XUoFmKLZ; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50V2OALS030285;
-	Fri, 31 Jan 2025 08:54:35 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50V2OR9A030633;
+	Fri, 31 Jan 2025 08:56:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=0yeoWH
-	sptm0KXQm6mUBpcl/+kDScxLraHXzPrT7SMYU=; b=Jm1bOVnWWeG/LTOgF7Qgzi
-	s9uYuUENnn8AQBg0IKy8U5Ae9oHkJFmaGak0hKlvTgVSwr2VYOOGlclMlYjLUU34
-	T3ohRt7u+X6ijdJoHXQOahQbOdYS3rSjOsxUBpqgPLGqCSzMdHkoG1JSwgBqis6M
-	yBO/sspmmv/N66Z6a+ZoHomfrL2HNG7dx4JxCmmM4OGwnvkzVto/hSerySZ1hIMJ
-	j/Tvn9iI39ED4zqntMm/txPAo/yudtsJqFSGM5EwctjQukUDZQazR4H5c3OlwaYR
-	9wcpmhkrC+mZBkRgg8RucjJDaQQnFR4d6ezhAUitlx58nZu43F+NhXUXnv4+IHGA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=p4IR+m
+	En8NGcfomUhFfWmtewWrRS2R+frm6WviSIM3Y=; b=XUoFmKLZlSQjDIIrTqbFMy
+	EEylZrOiL4jwOBbX0B2hogsgci8RNCqlCdhrlI8UIBjIqvacKZOW6Dz3XXRcvYZo
+	YoVbSS26IFLMmpPO5nt9VDU6+4rAfh8opvC/XO/N78K4V1mHsTQ1LfnB14cT+F+t
+	LBZFBDGzTF5rRBsAXa8u8b5/ipxyT4xYuDFiwbQ0jCDKOXEWHJcUCBaBwQnkaAav
+	LfYnkPoWVaNwCRMDvKqZvS72igR2rF9lHc/MD4xS1vC2kDAEQCKY5LDvf4ZcuslG
+	p3OecFfGxb4gV8gRqxYV+Tp23Jes4WQOEiGjHIIpX58Y/Nuf+D8G7zlphmKuYnBQ
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44gfn5anxa-1
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44gfn5ap4f-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jan 2025 08:54:34 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50V81VGv013887;
-	Fri, 31 Jan 2025 08:54:34 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44gf93areq-1
+	Fri, 31 Jan 2025 08:56:37 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50V8BKoI024533;
+	Fri, 31 Jan 2025 08:56:37 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44gf912s0d-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jan 2025 08:54:34 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50V8sUY621037456
+	Fri, 31 Jan 2025 08:56:37 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50V8uXSV50790856
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 Jan 2025 08:54:30 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 924DB200C9;
-	Fri, 31 Jan 2025 08:54:30 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 714CC200CA;
-	Fri, 31 Jan 2025 08:54:30 +0000 (GMT)
+	Fri, 31 Jan 2025 08:56:33 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8DDBA2008C;
+	Fri, 31 Jan 2025 08:56:33 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6BC7C2008B;
+	Fri, 31 Jan 2025 08:56:33 +0000 (GMT)
 Received: from t14-nrb (unknown [9.179.13.71])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 31 Jan 2025 08:54:30 +0000 (GMT)
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 31 Jan 2025 08:56:33 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,34 +76,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Fri, 31 Jan 2025 09:54:30 +0100
-Message-Id: <D7G4RNPQ6OMB.1QPZ0SXHRI1IK@linux.ibm.com>
+Date: Fri, 31 Jan 2025 09:56:33 +0100
+Message-Id: <D7G4T877QYSO.33DIMA4IQXFKX@linux.ibm.com>
 Cc: <kvm@vger.kernel.org>, "Janosch Frank" <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x/Makefile: Add auxinfo.o to
- cflatobjs
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] s390x/Makefile: Make sure the
+ linker script is generated in the build directory
 From: "Nico Boehr" <nrb@linux.ibm.com>
 To: "Marc Hartmayer" <mhartmay@linux.ibm.com>, <linux-s390@vger.kernel.org>,
         "Thomas Huth" <thuth@redhat.com>
 X-Mailer: aerc 0.18.2
 References: <20250128100639.41779-1-mhartmay@linux.ibm.com>
- <20250128100639.41779-3-mhartmay@linux.ibm.com>
-In-Reply-To: <20250128100639.41779-3-mhartmay@linux.ibm.com>
+ <20250128100639.41779-2-mhartmay@linux.ibm.com>
+In-Reply-To: <20250128100639.41779-2-mhartmay@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7OHoxltFa_Hj-KA79rVCXu38PQBke8lR
-X-Proofpoint-GUID: 7OHoxltFa_Hj-KA79rVCXu38PQBke8lR
+X-Proofpoint-ORIG-GUID: nvSwfKuoPUU1382jZbS8GOcn-flfuOSC
+X-Proofpoint-GUID: nvSwfKuoPUU1382jZbS8GOcn-flfuOSC
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-31_03,2025-01-30_01,2024-11-22_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
  mlxscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
- adultscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=679 clxscore=1015
+ adultscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=802 clxscore=1015
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
  definitions=main-2501310064
 
 On Tue Jan 28, 2025 at 11:06 AM CET, Marc Hartmayer wrote:
-> This makes sure that the file is removed in case of `make clean` as the t=
-op
-> Makefile cleans all objects defined in 'cflagsobjs'.
+> This change makes sure that the 'flat.lds' linker script is actually gene=
+rated
+> in the build directory and not source directory - this makes a difference=
+ in
+> case of an out-of-source build.
 >
 > Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
 
