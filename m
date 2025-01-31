@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-36995-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36994-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE38DA23D1F
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 12:30:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3F31A23D20
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 12:30:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CE8E16AD5F
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 11:30:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA3C57A4B5C
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 11:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3575C1F3D5C;
-	Fri, 31 Jan 2025 11:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB69E1C462D;
+	Fri, 31 Jan 2025 11:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gCsXbv0P"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MP+QKVvg"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A857B1C3BF1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860311C07DB;
 	Fri, 31 Jan 2025 11:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738322747; cv=none; b=puSWk6VlZ9zKkQhOfM3OpRVvzuVlkHgG48dTJ8sEbN8j/SkFom2GfsKf9EqUYuYq4qymCwdOK9WO/ZsIVAl8cxXgCOp2Rcc8wKGni/boaez/UIa88mtpQjgc32ORS5eez6ey4Doda7L0t/wMoo+NIkngoZSHPsN8MA0fxRXadHg=
+	t=1738322747; cv=none; b=lVV6l1LHqTieaE3IKZ7ouAQQkJHd/g1P+phTow3gSllr4EibG2Qfc41w5MjcBeCu/HoGJrvCk+2Bbo7KTLFrVMkNyu8+04zldd4JsODw8t4mAFE4FCPICdsrDBnDGiybIlLQ1VmO7669wuUVoEkqS5BuPJljRI7fsxPRtV8/dks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738322747; c=relaxed/simple;
-	bh=MBQEQaWeH7C1pqaTJr+k0+9U74+YzgaJuVRn7oyzWxM=;
+	bh=Tm5yoTT5bQSaPlXmP71PXDTDC1SM1eJs7+Ig1825A08=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=btVzj2c9/nz6DPgKklOs9oOgLAU8g5BQ+hVVGpbOBElvBoX/5Y7Z3HITjtxeS1ECRTpdWLXqJ0UFf+8wBJPjMaLmIYZODe0XCNpdvq6zyXspU7uSW52BltwlL7CIVOS9FMhnOL/Ai+uTezhmR0NFKe8YyTN7v/ev/ceOt1n9/q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gCsXbv0P; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=nyamQbvxGnjxipjmleuLYlfnmWtq29T9sTVWFsDPOEHW2ug23rpy1OtZ7sgcEZKqjhWEoBQLVGeFTjrXAbKHKiy/k1L13uPrfYF4L4gVPzVWgNEWr8LOj1KVTmZ09POUoeQ/m8wDngiPk4R4qYIVU64MgKKLkSnji/olvx+zTVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MP+QKVvg; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50V2PwRK019039;
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50V2OCi4014643;
 	Fri, 31 Jan 2025 11:25:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=/sR7YHFZRiFoe9C3x
-	5uGZZjwTUE6gjAOs2HdX5td2t0=; b=gCsXbv0PNH0RjDt1hhMIQRnavpGTkSMIy
-	F2pIJhPLlUTRGbFNeY1s0+HzQLcG8UANGfDLvub5bud/Qsu3x5k8v5ZyLboJ5/V4
-	dAtHXg+Ek++c6lesLQxfrRRZ9FWbfAZN7kafv3q/gkXeApLOQDxU6pYV3IfHnMUu
-	BsAyq10vfZvsRCoCgKF72DbEMxrTQFzTf8fho8MZ6I6VB2HDAQmf27MXIArwpwuO
-	4j2bivmaj2pj7gxcwxoH7pXEWxYgD0Oq/+rl7b+/JidzJrcfz5NCbjVu+2E2/jC1
-	ZnmJIQV8sIoS6ne9ZzEWmH3EYXw4YBLVgZxQJboKHlW/CnMRpv1/w==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44gmk9247y-1
+	:mime-version:references:subject:to; s=pp1; bh=VmN3nvdAgnv/4lbjJ
+	KfSAgFyvI659GLqZraGOKNFYqQ=; b=MP+QKVvgEaPE33rUAlkB67cIJX08drB4W
+	D4ib/Et6PwoUcd+GsunBNwaIjjT0UsBjx1V94zgZmTZu2xiVeVKEUFTcMbztF48P
+	zpcfNMTag/U9WCn7+Y2cx6cUZHcd7OD1vzRob4hEqUTT4MM7KXLsgSPp1jAfln0X
+	b/mZAbTph9/PYg2Oihx2OzNthLRgwQ+CUr35lVidBzB2sXGM4A9oxDZ0t4UFXCYv
+	W4+pSk08OC7hNyFwpmfvw72rqhNDa6FoKg/urFPOd7UP234a1w0yz3vYkKXpaqjL
+	jcHCy9HbAP3J/tOvi7m32sdTpCUnsEiMr6yJQ9Y9J0DPZXZvdideQ==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44gfn4ued3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jan 2025 11:25:43 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50V88KOX024543;
+	Fri, 31 Jan 2025 11:25:42 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50V8Awsk013864;
 	Fri, 31 Jan 2025 11:25:41 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44gf9139st-1
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44gf93b9gs-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 31 Jan 2025 11:25:41 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50VBPbLL19530028
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50VBPcOK42402110
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 Jan 2025 11:25:37 GMT
+	Fri, 31 Jan 2025 11:25:38 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A6A5E20139;
-	Fri, 31 Jan 2025 11:25:37 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 10AEE20136;
+	Fri, 31 Jan 2025 11:25:38 +0000 (GMT)
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 55FC32012D;
+	by IMSVA (Postfix) with ESMTP id B742B20135;
 	Fri, 31 Jan 2025 11:25:37 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.171.25.38])
 	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -71,9 +71,9 @@ From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: pbonzini@redhat.com
 Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         borntraeger@de.ibm.com, david@redhat.com
-Subject: [GIT PULL v2 19/20] KVM: s390: remove the last user of page->index
-Date: Fri, 31 Jan 2025 12:25:09 +0100
-Message-ID: <20250131112510.48531-20-imbrenda@linux.ibm.com>
+Subject: [GIT PULL v2 20/20] KVM: s390: selftests: Streamline uc_skey test to issue iske after sske
+Date: Fri, 31 Jan 2025 12:25:10 +0100
+Message-ID: <20250131112510.48531-21-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250131112510.48531-1-imbrenda@linux.ibm.com>
 References: <20250131112510.48531-1-imbrenda@linux.ibm.com>
@@ -85,133 +85,94 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: FBp3l_V7BiGU4VS_CYwEMEUi02Pixg3k
-X-Proofpoint-ORIG-GUID: FBp3l_V7BiGU4VS_CYwEMEUi02Pixg3k
+X-Proofpoint-GUID: lYGi5rqFyaIP-jYAY4FbqJzUsjip8Fvw
+X-Proofpoint-ORIG-GUID: lYGi5rqFyaIP-jYAY4FbqJzUsjip8Fvw
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-31_04,2025-01-31_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 impostorscore=0 mlxscore=0 bulkscore=0 clxscore=1015
- adultscore=0 spamscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 clxscore=1015 impostorscore=0 mlxlogscore=999 malwarescore=0
+ phishscore=0 lowpriorityscore=0 bulkscore=0 suspectscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2501170000 definitions=main-2501310083
 
-Shadow page tables use page->index to keep the g2 address of the guest
-page table being shadowed.
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
-Instead of keeping the information in page->index, split the address
-and smear it over the 16-bit softbits areas of 4 PGSTEs.
+In some rare situations a non default storage key is already set on the
+memory used by the test. Within normal VMs the key is reset / zapped
+when the memory is added to the VM. This is not the case for ucontrol
+VMs. With the initial iske check removed this test case can work in all
+situations. The function of the iske instruction is still validated by
+the remaining code.
 
-This removes the last s390 user of page->index.
-
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-Link: https://lore.kernel.org/r/20250123144627.312456-16-imbrenda@linux.ibm.com
+Fixes: 0185fbc6a2d3 ("KVM: s390: selftests: Add uc_skey VM test case")
+Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Link: https://lore.kernel.org/r/20250128131803.1047388-1-schlameuss@linux.ibm.com
+Message-ID: <20250128131803.1047388-1-schlameuss@linux.ibm.com>
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Message-ID: <20250123144627.312456-16-imbrenda@linux.ibm.com>
 ---
- arch/s390/include/asm/pgtable.h | 15 +++++++++++++++
- arch/s390/kvm/gaccess.c         |  6 ++++--
- arch/s390/mm/gmap.c             | 22 ++++++++++++++++++++--
- 3 files changed, 39 insertions(+), 4 deletions(-)
+ .../selftests/kvm/s390/ucontrol_test.c        | 24 +++++--------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
-diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
-index a96bde2e5f18..3ca5af4cfe43 100644
---- a/arch/s390/include/asm/pgtable.h
-+++ b/arch/s390/include/asm/pgtable.h
-@@ -420,6 +420,7 @@ void setup_protection_map(void);
- #define PGSTE_HC_BIT	0x0020000000000000UL
- #define PGSTE_GR_BIT	0x0004000000000000UL
- #define PGSTE_GC_BIT	0x0002000000000000UL
-+#define PGSTE_ST2_MASK	0x0000ffff00000000UL
- #define PGSTE_UC_BIT	0x0000000000008000UL	/* user dirty (migration) */
- #define PGSTE_IN_BIT	0x0000000000004000UL	/* IPTE notify bit */
- #define PGSTE_VSIE_BIT	0x0000000000002000UL	/* ref'd in a shadow table */
-@@ -2007,4 +2008,18 @@ extern void s390_reset_cmma(struct mm_struct *mm);
- #define pmd_pgtable(pmd) \
- 	((pgtable_t)__va(pmd_val(pmd) & -sizeof(pte_t)*PTRS_PER_PTE))
+diff --git a/tools/testing/selftests/kvm/s390/ucontrol_test.c b/tools/testing/selftests/kvm/s390/ucontrol_test.c
+index 22ce9219620c..d265b34c54be 100644
+--- a/tools/testing/selftests/kvm/s390/ucontrol_test.c
++++ b/tools/testing/selftests/kvm/s390/ucontrol_test.c
+@@ -88,10 +88,6 @@ asm("test_skey_asm:\n"
+ 	"	ahi	%r0,1\n"
+ 	"	st	%r1,0(%r5,%r6)\n"
  
-+static inline unsigned long gmap_pgste_get_pgt_addr(unsigned long *pgt)
-+{
-+	unsigned long *pgstes, res;
-+
-+	pgstes = pgt + _PAGE_ENTRIES;
-+
-+	res = (pgstes[0] & PGSTE_ST2_MASK) << 16;
-+	res |= pgstes[1] & PGSTE_ST2_MASK;
-+	res |= (pgstes[2] & PGSTE_ST2_MASK) >> 16;
-+	res |= (pgstes[3] & PGSTE_ST2_MASK) >> 32;
-+
-+	return res;
-+}
-+
- #endif /* _S390_PAGE_H */
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index bb1340389369..f6fded15633a 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -1409,6 +1409,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
- static int shadow_pgt_lookup(struct gmap *sg, unsigned long saddr, unsigned long *pgt,
- 			     int *dat_protection, int *fake)
- {
-+	unsigned long pt_index;
- 	unsigned long *table;
- 	struct page *page;
- 	int rc;
-@@ -1418,9 +1419,10 @@ static int shadow_pgt_lookup(struct gmap *sg, unsigned long saddr, unsigned long
- 	if (table && !(*table & _SEGMENT_ENTRY_INVALID)) {
- 		/* Shadow page tables are full pages (pte+pgste) */
- 		page = pfn_to_page(*table >> PAGE_SHIFT);
--		*pgt = page->index & ~GMAP_SHADOW_FAKE_TABLE;
-+		pt_index = gmap_pgste_get_pgt_addr(page_to_virt(page));
-+		*pgt = pt_index & ~GMAP_SHADOW_FAKE_TABLE;
- 		*dat_protection = !!(*table & _SEGMENT_ENTRY_PROTECT);
--		*fake = !!(page->index & GMAP_SHADOW_FAKE_TABLE);
-+		*fake = !!(pt_index & GMAP_SHADOW_FAKE_TABLE);
- 		rc = 0;
- 	} else  {
- 		rc = -EAGAIN;
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 38f044321704..94d927785800 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -1733,6 +1733,23 @@ int gmap_shadow_sgt(struct gmap *sg, unsigned long saddr, unsigned long sgt,
- }
- EXPORT_SYMBOL_GPL(gmap_shadow_sgt);
+-	"	iske	%r1,%r6\n"
+-	"	ahi	%r0,1\n"
+-	"	diag	0,0,0x44\n"
+-
+ 	"	sske	%r1,%r6\n"
+ 	"	xgr	%r1,%r1\n"
+ 	"	iske	%r1,%r6\n"
+@@ -600,7 +596,9 @@ TEST_F(uc_kvm, uc_skey)
+ 	ASSERT_EQ(true, uc_handle_exit(self));
+ 	ASSERT_EQ(1, sync_regs->gprs[0]);
  
-+static void gmap_pgste_set_pgt_addr(struct ptdesc *ptdesc, unsigned long pgt_addr)
-+{
-+	unsigned long *pgstes = page_to_virt(ptdesc_page(ptdesc));
-+
-+	pgstes += _PAGE_ENTRIES;
-+
-+	pgstes[0] &= ~PGSTE_ST2_MASK;
-+	pgstes[1] &= ~PGSTE_ST2_MASK;
-+	pgstes[2] &= ~PGSTE_ST2_MASK;
-+	pgstes[3] &= ~PGSTE_ST2_MASK;
-+
-+	pgstes[0] |= (pgt_addr >> 16) & PGSTE_ST2_MASK;
-+	pgstes[1] |= pgt_addr & PGSTE_ST2_MASK;
-+	pgstes[2] |= (pgt_addr << 16) & PGSTE_ST2_MASK;
-+	pgstes[3] |= (pgt_addr << 32) & PGSTE_ST2_MASK;
-+}
-+
- /**
-  * gmap_shadow_pgt - instantiate a shadow page table
-  * @sg: pointer to the shadow guest address space structure
-@@ -1760,9 +1777,10 @@ int gmap_shadow_pgt(struct gmap *sg, unsigned long saddr, unsigned long pgt,
- 	ptdesc = page_table_alloc_pgste(sg->mm);
- 	if (!ptdesc)
- 		return -ENOMEM;
--	ptdesc->pt_index = pgt & _SEGMENT_ENTRY_ORIGIN;
-+	origin = pgt & _SEGMENT_ENTRY_ORIGIN;
- 	if (fake)
--		ptdesc->pt_index |= GMAP_SHADOW_FAKE_TABLE;
-+		origin |= GMAP_SHADOW_FAKE_TABLE;
-+	gmap_pgste_set_pgt_addr(ptdesc, origin);
- 	s_pgt = page_to_phys(ptdesc_page(ptdesc));
- 	/* Install shadow page table */
- 	spin_lock(&sg->guest_table_lock);
+-	/* ISKE */
++	/* SSKE + ISKE */
++	sync_regs->gprs[1] = skeyvalue;
++	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
+ 	ASSERT_EQ(0, uc_run_once(self));
+ 
+ 	/*
+@@ -612,21 +610,11 @@ TEST_F(uc_kvm, uc_skey)
+ 	TEST_ASSERT_EQ(0, sie_block->ictl & (ICTL_ISKE | ICTL_SSKE | ICTL_RRBE));
+ 	TEST_ASSERT_EQ(KVM_EXIT_S390_SIEIC, self->run->exit_reason);
+ 	TEST_ASSERT_EQ(ICPT_INST, sie_block->icptcode);
+-	TEST_REQUIRE(sie_block->ipa != 0xb229);
++	TEST_REQUIRE(sie_block->ipa != 0xb22b);
+ 
+-	/* ISKE contd. */
++	/* SSKE + ISKE contd. */
+ 	ASSERT_EQ(false, uc_handle_exit(self));
+ 	ASSERT_EQ(2, sync_regs->gprs[0]);
+-	/* assert initial skey (ACC = 0, R & C = 1) */
+-	ASSERT_EQ(0x06, sync_regs->gprs[1]);
+-	uc_assert_diag44(self);
+-
+-	/* SSKE + ISKE */
+-	sync_regs->gprs[1] = skeyvalue;
+-	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
+-	ASSERT_EQ(0, uc_run_once(self));
+-	ASSERT_EQ(false, uc_handle_exit(self));
+-	ASSERT_EQ(3, sync_regs->gprs[0]);
+ 	ASSERT_EQ(skeyvalue, sync_regs->gprs[1]);
+ 	uc_assert_diag44(self);
+ 
+@@ -635,7 +623,7 @@ TEST_F(uc_kvm, uc_skey)
+ 	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
+ 	ASSERT_EQ(0, uc_run_once(self));
+ 	ASSERT_EQ(false, uc_handle_exit(self));
+-	ASSERT_EQ(4, sync_regs->gprs[0]);
++	ASSERT_EQ(3, sync_regs->gprs[0]);
+ 	/* assert R reset but rest of skey unchanged */
+ 	ASSERT_EQ(skeyvalue & 0xfa, sync_regs->gprs[1]);
+ 	ASSERT_EQ(0, sync_regs->gprs[1] & 0x04);
 -- 
 2.48.1
 
