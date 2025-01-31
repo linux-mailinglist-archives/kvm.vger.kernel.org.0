@@ -1,127 +1,143 @@
-Return-Path: <kvm+bounces-36997-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36998-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1E8A23D5A
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 12:53:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25752A23E92
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 14:44:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7BA818848F0
-	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 11:53:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1181C3A90E2
+	for <lists+kvm@lfdr.de>; Fri, 31 Jan 2025 13:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20371C2443;
-	Fri, 31 Jan 2025 11:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9782D1C5D73;
+	Fri, 31 Jan 2025 13:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VvDnGMA8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CGAGjFYi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858822AD11
-	for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 11:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456571C5486
+	for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 13:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738324410; cv=none; b=gnl4plZItBGXkwMPE1Ot1w29j+iOTQUYMtWpW1aJmtZ4rNjZbgEfwD0AcZ1sl1cn3BgknKejrCZe6vNkBpj4bCR2O2ipEa3pNv17nOg2vVk0rJz6FOeOPcNnP+IVaYdmBxLHKZwk4+VFR1pZ397uL+8zEnhmTI9Y9yFwQ4eec70=
+	t=1738331055; cv=none; b=hx69fAsP/WzSSrAyo/JkZek7UfMrw6xCiw3VEV8CZhjv2ZyO6t2RLVAxx1+Sgw7q/nqtPSvtYXkRm5bBNe4ZcyQyTMyzHbTSAtIsT8Jm20ooFYg8wh31xlxP7HOjebBqKp92ugzXX0GB5MoMF1z8PQGcMaisRim3G2wUkYE4amc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738324410; c=relaxed/simple;
-	bh=QIrB1sF92FQtENDwLzensYU5CODYU6hPW1xXfAbWGSc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fig2KPoSbPw5N2sdY2aLO+Et4T0wRPuDhIB/lMsrXaH4SErW6VHfzWgfAythxNMYcjdHADIlNUPzyhcfhwp8KeuB0dQu1o6R1TJPK7OawnmTswgHykepLw5Mo6kb0n/+I9k/Xi805rHgTfuHrvoicEdD+g2JSqzVKbwVzL7Uul0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VvDnGMA8; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50V2ORSB030648;
-	Fri, 31 Jan 2025 11:53:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=4yrmOhEhbtI7SNkPDMhbKaH7+YAGX5mM52D20Qpmr
-	9E=; b=VvDnGMA8UWgY0fRzTU/OdZ2cyLV7h5BTPF+PodNlVNxWM4sirf8Ym/ik6
-	XhmhrnW5R4C9+x3WSyGMtqjAgMWuMBlRr5KHAyW5T7Rk5I2X4j76HGFOBLqvabic
-	24NtEJbIeJ/O3w8LuQJmUbGvNB9Oyg/cwydrK5uGmODPbwUNVRKcbirhZO8DuezF
-	Gn3ao8Q669pvtMsKIYVi1zlEPVJjbxUMt0YhBRmDSo6NquRa3k/3OCBvARcMbkRv
-	+2YBvouesigJWSc0lb9Tw77JlqLzwB/3LWx/A/IAeGWctC/d+o1waK7AUjAywTDd
-	FMAvyM5Iuhf2URTnPwy4xtB0QEk9g==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44gfn5bd42-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jan 2025 11:53:16 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50V873pf024576;
-	Fri, 31 Jan 2025 11:53:15 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44gf913dk9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jan 2025 11:53:15 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50VBrBO953805526
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 Jan 2025 11:53:11 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C9A8A201C8;
-	Fri, 31 Jan 2025 11:53:11 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 65EE6201C4;
-	Fri, 31 Jan 2025 11:53:11 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.fritz.box (unknown [9.179.26.180])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 31 Jan 2025 11:53:11 +0000 (GMT)
-From: Marc Hartmayer <mhartmay@linux.ibm.com>
-To: <kvm@vger.kernel.org>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Nico Boehr <nrb@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [kvm-unit-tests PATCH v1] editorconfig: Add max line length setting for commit message and branch description
-Date: Fri, 31 Jan 2025 12:53:07 +0100
-Message-ID: <20250131115307.70334-1-mhartmay@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1738331055; c=relaxed/simple;
+	bh=ZTnumPN0hO6W8SA+XJ4TwwIzgqswOeC8ByqSfrB1TcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uFMfqc8Pz2YCI6HO11QkDd9GBy/sMaCOg+4y/ZIaFkSPDQA+2e1B3xuEhNUHjzBGrWKvxASipnf9thjtoYvLadDLO57a+sKm5E9AA0Xco0Dnqx1MftjguH0JPTbxzmdH1j+S/Mdxq0UHaPDBcD0vdfR5IhAPoVV/sPvsDLT7t1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CGAGjFYi; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738331053; x=1769867053;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=ZTnumPN0hO6W8SA+XJ4TwwIzgqswOeC8ByqSfrB1TcQ=;
+  b=CGAGjFYiPYY/OMtc6KwDyShKAVADneF9CLfrM22QU7cvmeJffj3BLj8j
+   QPbJfKXbnHcO4iT7NlJviZUK4sVFAQk5R3ucqJpOceK0tUG3EqsQgyy0s
+   XIyC8lAvYx14ncW2FT25Tk/+gRmaStnyCSvpoxUMDyiy3dm0MExv0phSX
+   PiAZ9dEEvJkKO9Cq3KywNKzFtwWrQavqCq36RHCd20KfhqXVkgFUjykEQ
+   eUhLyGAh6v4TNvGqk/dUtpNLAfY/JCm76Efya7onLzojRGN8QOPl+nYdI
+   Q7S6iBXv8xyLG+idSsyBiMWigmiFUqEyadc/Qs41/JWOHC+1tpHOXE0rT
+   Q==;
+X-CSE-ConnectionGUID: x7xNiWjMQiePhCnT8TuCzQ==
+X-CSE-MsgGUID: 0r6J6lfmTO+cEmDnbRNK4Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11332"; a="64261042"
+X-IronPort-AV: E=Sophos;i="6.13,248,1732608000"; 
+   d="scan'208";a="64261042"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2025 05:44:13 -0800
+X-CSE-ConnectionGUID: mAOG6B2yQ6KpL4JBtHC8Lg==
+X-CSE-MsgGUID: nD3E8qP5RFyLYMD7BZDhDA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="132889101"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 31 Jan 2025 05:44:12 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tdrJa-000mQv-09;
+	Fri, 31 Jan 2025 13:44:10 +0000
+Date: Fri, 31 Jan 2025 21:43:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Farrah Chen <farrah.chen@intel.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm:kvm-coco-queue-20250129 43/129] include/linux/init.h:319:27:
+ error: redefinition of '__exitcall_vt_exit'
+Message-ID: <202501312122.IIuMSJu4-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: L9wiIonLLO7fYlaq0gWmLTMsc0MZJ8hU
-X-Proofpoint-GUID: L9wiIonLLO7fYlaq0gWmLTMsc0MZJ8hU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-31_04,2025-01-31_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- mlxscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 phishscore=0
- adultscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
- definitions=main-2501310087
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Add max line length setting for commit messages and branch descriptions to
-the Editorconfig configuration. Use herefor the same value as used by
-checkpatch [1]. See [2] for details about the file 'COMMIT_EDITMSG'.
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git kvm-coco-queue-20250129
+head:   0bc4f452607db4e7eee4d3056cd6ec98636260bc
+commit: 4b55a8f7c5f508fe1dd0005aecc81bbb5676aaec [43/129] KVM: VMX: Refactor VMX module init/exit functions
+config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20250131/202501312122.IIuMSJu4-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250131/202501312122.IIuMSJu4-lkp@intel.com/reproduce)
 
-[1] https://github.com/torvalds/linux/blob/69e858e0b8b2ea07759e995aa383e8780d9d140c/scripts/checkpatch.pl#L3270
-[2] https://git-scm.com/docs/git-commit/2.46.1#Documentation/git-commit.txt-codeGITDIRCOMMITEDITMSGcode
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501312122.IIuMSJu4-lkp@intel.com/
 
-Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
----
- .editorconfig | 3 +++
- 1 file changed, 3 insertions(+)
+All errors (new ones prefixed by >>):
 
-diff --git a/.editorconfig b/.editorconfig
-index 46d4ac64f897..03bb16cb9442 100644
---- a/.editorconfig
-+++ b/.editorconfig
-@@ -13,3 +13,6 @@ insert_final_newline = true
- charset = utf-8
- indent_style = tab
- indent_size = 8
-+
-+[{COMMIT_EDITMSG,EDIT_DESCRIPTION}]
-+max_line_length = 75
+   In file included from include/linux/moduleparam.h:5,
+                    from arch/x86/kvm/vmx/main.c:2:
+   arch/x86/kvm/vmx/main.c:176:13: error: 'vt_exit' undeclared here (not in a function); did you mean 'vmx_exit'?
+     176 | module_exit(vt_exit);
+         |             ^~~~~~~
+   include/linux/init.h:319:57: note: in definition of macro '__exitcall'
+     319 |         static exitcall_t __exitcall_##fn __exit_call = fn
+         |                                                         ^~
+   arch/x86/kvm/vmx/main.c:176:1: note: in expansion of macro 'module_exit'
+     176 | module_exit(vt_exit);
+         | ^~~~~~~~~~~
+>> include/linux/init.h:319:27: error: redefinition of '__exitcall_vt_exit'
+     319 |         static exitcall_t __exitcall_##fn __exit_call = fn
+         |                           ^~~~~~~~~~~
+   include/linux/module.h:100:25: note: in expansion of macro '__exitcall'
+     100 | #define module_exit(x)  __exitcall(x);
+         |                         ^~~~~~~~~~
+   arch/x86/kvm/vmx/main.c:183:1: note: in expansion of macro 'module_exit'
+     183 | module_exit(vt_exit);
+         | ^~~~~~~~~~~
+   include/linux/init.h:319:27: note: previous definition of '__exitcall_vt_exit' with type 'exitcall_t' {aka 'void (*)(void)'}
+     319 |         static exitcall_t __exitcall_##fn __exit_call = fn
+         |                           ^~~~~~~~~~~
+   include/linux/module.h:100:25: note: in expansion of macro '__exitcall'
+     100 | #define module_exit(x)  __exitcall(x);
+         |                         ^~~~~~~~~~
+   arch/x86/kvm/vmx/main.c:176:1: note: in expansion of macro 'module_exit'
+     176 | module_exit(vt_exit);
+         | ^~~~~~~~~~~
 
-base-commit: 2e66bb4b9423970ceb6ea195bd8697733bcd9071
+
+vim +/__exitcall_vt_exit +319 include/linux/init.h
+
+^1da177e4c3f41 Linus Torvalds 2005-04-16  317  
+^1da177e4c3f41 Linus Torvalds 2005-04-16  318  #define __exitcall(fn)						\
+^1da177e4c3f41 Linus Torvalds 2005-04-16 @319  	static exitcall_t __exitcall_##fn __exit_call = fn
+^1da177e4c3f41 Linus Torvalds 2005-04-16  320  
+
+:::::: The code at line 319 was first introduced by commit
+:::::: 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 Linux-2.6.12-rc2
+
+:::::: TO: Linus Torvalds <torvalds@ppc970.osdl.org>
+:::::: CC: Linus Torvalds <torvalds@ppc970.osdl.org>
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
