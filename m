@@ -1,79 +1,83 @@
-Return-Path: <kvm+bounces-37012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37013-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA06A245FE
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:51:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC01A245FF
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:51:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1BD03A87B8
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 00:50:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9DC0167577
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 00:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454E617C91;
-	Sat,  1 Feb 2025 00:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB4A2BAF4;
+	Sat,  1 Feb 2025 00:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FNJYn3M4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zcyRsBr0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A865EAF9
-	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 00:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD391C2C8
+	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 00:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738371052; cv=none; b=FKHn1m4aq7dcbFpJpMTxW3ijfvrAvgtSU5CIY2xKBv9neHNVwcV5Qmajd1zG0uLljfgii8immev0JXNAESp6+m5WBAtqWR9p+jyjZ706F1LLUKqnvA926CDvPIe+M8rg+gzOndU8JFbF6PVDNvqKj+/yltkyjG/5dATqxkK1/48=
+	t=1738371054; cv=none; b=VQqpv2oJ+3RxSCfzwZ/VCQe7uzDSzewXAv76ousVYzTAOSbF2BcET6Gbnj39OnJPNrRb91eM0UvCUV/Zh/gDtzUYYvL7OWcwkTmtxHEHQVANfU0lLC3lzPwvzMruEhx89lTmsvQ3WTlusYJB+Fhkkr+ieJ/RT/C+E4I6IefMOqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738371052; c=relaxed/simple;
-	bh=fXRZwu+oXpcxVteww5iwBUgpDb7cO5xtmRxaTTNiJW8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LNIPx+14OdT+mTukJHonyc2dqwmvTLuaiTfjHFiPwqdlOzKWqEc5DP7lcP/ecQtnU7OkZ+2vmGBUs1LiU+5ImFZCw5aELwL86Q0NZjNLuzOD4xAqpoPrcEfT4IAnT4tZFk6+ICBr9Vgio/Qfxi9pogbx9t66cYSYjElazvvxAq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FNJYn3M4; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1738371054; c=relaxed/simple;
+	bh=8r1IMSgN9S/6dfm6fHWdqJHUa5NHhwmDUjPOyM4evr0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uittHUJUX+LMeP2hRfWo9qtBuMCQuutyuSOPJ3ihhUMkHZE8vsrzSRjVfTCupHNr5L5NROueQEEHR7eB45vkYMTY907zsRBRUNzdkkpe68wq2x4+p2Dhn5+0CkHbwRWNXjabVJGZ9HQE64RkLZjeM01+mXQ6vV7Mpx/Xd0Sea4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zcyRsBr0; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef728e36d5so4967444a91.3
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 16:50:50 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef114d8346so5005389a91.0
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 16:50:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738371050; x=1738975850; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rxeqp0iUagZtsoZjwTJV6Mkmpp79QeV032AbydK9elA=;
-        b=FNJYn3M4uqMPoL7qMNhOR1bpAjnj76dOC4PJ+RvT9cEIfIOVxfUEQuHo1fyykMfpYq
-         5A/xGa4Cv2wTbhTxJ46iba5YoWxTBgAhW16MgXPx4FoXdVwFdIMW/VmTn8bjkqklCvNR
-         GP5y2jL1jKzvR3R6v71d7arcc2DfZw2Hz/WFXPrTYqjcBAiHqAg3hqAt2HEa7q9E04eK
-         29RuhhkfNDtV4LKaqtmRRe21BiVEsbco6BNJ2PdTSsV0HPmqxwR9bZbhHOPpQ/VHnLpP
-         LY9uv2DE78N6p8pzq7RlkXRqmrlFl1YxdWayxlMnRBrmlNmAAGoMicflHpTSt21kOZUN
-         oT0g==
+        d=google.com; s=20230601; t=1738371052; x=1738975852; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=k2K+3ES3yFwMq3HJwtK6RVZhiYj3gk5lp/ZXG2ZzfAM=;
+        b=zcyRsBr0SNRq3ekT4ZrY8GDjKr4FK9hIS7uItjluocvQkw/DaRTe7iLAoZizPg4hw6
+         2iTQ2+Md8c4R4SoNNCWzfU0HaeND2ltA1WCprES4sQmfTR/WKU0w4XUFRJz3tlFyXmmN
+         VwgZdhWzlv9t8ysKH/9fdZULTFwHaaiZ3HMgWfb7vQkj+g3YhD07jSP024ve3L89fOlZ
+         hV5IoC2sgm9S2No0oPsciLkx79tO29hs9xX9a3ay6GgPNhnw2jlQGiqNt8Kc5RqWvHyJ
+         1aHIhZA6vXSDnUIUHtg3vsB4qHafzfV4QlXUYIfQdClRhyzoIp0bvHtm37VvSbzXdCgR
+         apXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738371050; x=1738975850;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rxeqp0iUagZtsoZjwTJV6Mkmpp79QeV032AbydK9elA=;
-        b=CAd4nOLSwvjXBpz2Hp2l3ShGlavJlJHd/Tehlfb/bpprvfi+Ddf0irvP5CqI+obKVO
-         YTUkVZCFFLrLt4nOGJZTPnRbXkrrvuUPnaS6jvNsPDccabvunJfJqI2cbQ5CuYJfbr8p
-         OoWNoX9axDRPoLtmTqxQU7Cf/2AiJYL8fSiuB+Z/hbbm398SdC3Ex4q5366w0CL174+K
-         /J1up8lzCVs9cj+QLQ2EFjWhtm/yAmTVA4inv5i4E04Z2uCwYhYK0/CPujwny2AXvU8L
-         ZXQ8Nhkzj0XWDrJmtoD83fRDykrzH/JgQTXMkWSdyIXSK5xtLeZSmmBT39CZOb6nADTk
-         gDvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXK2iYilsLdAHc4Gru5m+qOrVAwNQizoUp7pPJXDFbth3BylcgB4oI/7LCJdn7q7YcqfEw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyykfjcMdbljpV6RUjuWiY+AvXgqDkiSS/ikVWGTCf3oBAPORKi
-	Fu8xPlfryHTpId57QxPLNuMmGeCSqQRqQijAmTzJ1qx8NmKgSRYFlL+1ZBW2yFEOix6PjlXpBIQ
-	7XQ==
-X-Google-Smtp-Source: AGHT+IGiNBcI+RlVevJWnt6K4utvGgac0CfWKiu+g4D6W3FFH7J/4bdp2RMxOyd7HL6C4CLLNsBdRkjRihE=
-X-Received: from pjbqb8.prod.google.com ([2002:a17:90b:2808:b0:2ea:6b84:3849])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2742:b0:2ee:f076:20f1
- with SMTP id 98e67ed59e1d1-2f83aa85095mr23559697a91.0.1738371050295; Fri, 31
- Jan 2025 16:50:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738371052; x=1738975852;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k2K+3ES3yFwMq3HJwtK6RVZhiYj3gk5lp/ZXG2ZzfAM=;
+        b=SsBF18M8VD38hV8L13TALMdFmn0vWRZ/TAMaCvNQPvvIEi+9urHft+e3FUzU+aSNTO
+         ps4KYJKR0Td6YNhNnsKKC7BygZ5SBKdVIO8afGp1Sedfns7PKZDSXc9xt2EF7SIuKRCd
+         HeXCgtbMaNTeUs7A46ceHUEzwXFVUC7HudEKZj36MVO5kBj1QxLiSoPKzMAjMsZ4mSJI
+         zPFHX3LBGhXUF13ib3yIHVyOIv4NPfHw9TQ0g/Ukg8opFgRHGm4KYzZ/S0f6aQYTZApv
+         YBaXSkRloZrCqJOMxg47avrxwfWdE+LB0GuaGdEM3b2Xxfbzm0dD6TvRG5LmKjp/OM/l
+         X5Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCVP7px/s/nuayDv8LYpTr3+lqmz4rWj7yEa9ck1v2VN/yrgG6yHf31mtgctDHpI13YKMaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaaZLoHiSnLrONVdBruDVNzML0qAkVoT1klBwcKcld0neJUbmD
+	cgjt2bYVW++oXCf5CVT3QvbGwHLQH8H8eoBa5q92DJL6z9mZMNQJG8XhBJDQkdHGDVLOVDrjkj5
+	8CA==
+X-Google-Smtp-Source: AGHT+IG2FdkNAipz+7YfRFK37esVegmX9yUIpKPkI5IQki8FVTV9TcslwFm+Z3SMc3yQI05wjkmkJT6td5Y=
+X-Received: from pjbov11.prod.google.com ([2002:a17:90b:258b:b0:2ef:7352:9e97])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3a0c:b0:2ee:c9b6:4c42
+ with SMTP id 98e67ed59e1d1-2f83abff391mr21670588a91.16.1738371052098; Fri, 31
+ Jan 2025 16:50:52 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 31 Jan 2025 16:50:46 -0800
+Date: Fri, 31 Jan 2025 16:50:47 -0800
+In-Reply-To: <20250201005048.657470-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250201005048.657470-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250201005048.657470-1-seanjc@google.com>
-Subject: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+Message-ID: <20250201005048.657470-2-seanjc@google.com>
+Subject: [PATCH 1/2] x86/mtrr: Return success vs. "failure" from guest_force_mtrr_state()
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -86,42 +90,90 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Attempt to hack around the SNP/TDX guest MTRR disaster by hijacking
-x86_platform.is_untracked_pat_range() to force the legacy PCI hole, i.e.
-memory from TOLUD => 4GiB, as unconditionally writeback.
+When *potentially* forcing MTRRs to a single memory type, return whether
+or not MTRRs were indeed overridden so that the caller can take additional
+action when necessary.  E.g. KVM-as-a-guest will use the information to
+also force the PAT memtype for legacy devices to be WB.
 
-TDX in particular has created an impossible situation with MTRRs.  Because
-TDX disallows toggling CR0.CD, TDX enabling decided the easiest solution
-was to ignore MTRRs entirely (because omitting CR0.CD write is obviously
-too simple).
-
-Unfortunately, under KVM at least, the kernel subtly relies on MTRRs to
-make ACPI play nice with device drivers.  ACPI tries to map ranges it finds
-as WB, which in turn prevents device drivers from mapping device memory as
-WC/UC-.
-
-For the record, I hate this hack.  But it's the safest approach I can come
-up with.  E.g. forcing ioremap() to always use WB scares me because it's
-possible, however unlikely, that the kernel could try to map non-emulated
-memory (that is presented as MMIO to the guest) as WC/UC-, and silently
-forcing those mappings to WB could do weird things.
-
-My initial thought was to effectively revert the offending commit and
-skip the cache disabling/enabling, i.e. the problematic CR0.CD toggling,
-but unfortunately OVMF/EDKII has also added code to skip MTRR setup. :-(
-
-Sean Christopherson (2):
-  x86/mtrr: Return success vs. "failure" from guest_force_mtrr_state()
-  x86/kvm: Override low memory above TOLUD to WB when MTRRs are forced
-    WB
-
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
  arch/x86/include/asm/mtrr.h        |  5 +++--
  arch/x86/kernel/cpu/mtrr/generic.c | 11 +++++++----
- arch/x86/kernel/kvm.c              | 31 ++++++++++++++++++++++++++++--
- 3 files changed, 39 insertions(+), 8 deletions(-)
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-
-base-commit: fd8c09ad0d87783b9b6a27900d66293be45b7bad
+diff --git a/arch/x86/include/asm/mtrr.h b/arch/x86/include/asm/mtrr.h
+index c69e269937c5..598753189f19 100644
+--- a/arch/x86/include/asm/mtrr.h
++++ b/arch/x86/include/asm/mtrr.h
+@@ -58,7 +58,7 @@ struct mtrr_state_type {
+  */
+ # ifdef CONFIG_MTRR
+ void mtrr_bp_init(void);
+-void guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
++bool guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
+ 			    mtrr_type def_type);
+ extern u8 mtrr_type_lookup(u64 addr, u64 end, u8 *uniform);
+ extern void mtrr_save_fixed_ranges(void *);
+@@ -75,10 +75,11 @@ void mtrr_disable(void);
+ void mtrr_enable(void);
+ void mtrr_generic_set_state(void);
+ #  else
+-static inline void guest_force_mtrr_state(struct mtrr_var_range *var,
++static inline bool guest_force_mtrr_state(struct mtrr_var_range *var,
+ 					  unsigned int num_var,
+ 					  mtrr_type def_type)
+ {
++	return false;
+ }
+ 
+ static inline u8 mtrr_type_lookup(u64 addr, u64 end, u8 *uniform)
+diff --git a/arch/x86/kernel/cpu/mtrr/generic.c b/arch/x86/kernel/cpu/mtrr/generic.c
+index 2fdfda2b60e4..4fd704907dbc 100644
+--- a/arch/x86/kernel/cpu/mtrr/generic.c
++++ b/arch/x86/kernel/cpu/mtrr/generic.c
+@@ -435,19 +435,21 @@ void __init mtrr_copy_map(void)
+  * @var: MTRR variable range array to use
+  * @num_var: length of the @var array
+  * @def_type: default caching type
++ *
++ * Returns %true if MTRRs were overridden, %false if they were not.
+  */
+-void guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
++bool guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
+ 			    mtrr_type def_type)
+ {
+ 	unsigned int i;
+ 
+ 	/* Only allowed to be called once before mtrr_bp_init(). */
+ 	if (WARN_ON_ONCE(mtrr_state_set))
+-		return;
++		return false;
+ 
+ 	/* Only allowed when running virtualized. */
+ 	if (!cpu_feature_enabled(X86_FEATURE_HYPERVISOR))
+-		return;
++		return false;
+ 
+ 	/*
+ 	 * Only allowed for special virtualization cases:
+@@ -460,7 +462,7 @@ void guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
+ 	    !hv_is_isolation_supported() &&
+ 	    !cpu_feature_enabled(X86_FEATURE_XENPV) &&
+ 	    !cpu_feature_enabled(X86_FEATURE_TDX_GUEST))
+-		return;
++		return false;
+ 
+ 	/* Disable MTRR in order to disable MTRR modifications. */
+ 	setup_clear_cpu_cap(X86_FEATURE_MTRR);
+@@ -480,6 +482,7 @@ void guest_force_mtrr_state(struct mtrr_var_range *var, unsigned int num_var,
+ 	mtrr_state.enabled |= MTRR_STATE_MTRR_ENABLED;
+ 
+ 	mtrr_state_set = 1;
++	return true;
+ }
+ 
+ static u8 type_merge(u8 type, u8 new_type, u8 *uniform)
 -- 
 2.48.1.362.g079036d154-goog
 
