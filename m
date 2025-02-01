@@ -1,275 +1,153 @@
-Return-Path: <kvm+bounces-37045-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37046-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345A2A2466D
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:58:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 080B1A24678
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 03:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FB56166182
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:58:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 788E41888F49
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7CA1A8408;
-	Sat,  1 Feb 2025 01:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B896135977;
+	Sat,  1 Feb 2025 02:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NP2hW6Ua"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vm8/DXOd"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A2B15C15C
-	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349195258
+	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 02:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738374940; cv=none; b=aOgnxeTKiRCvTLrZMDSf53uCFAe1KyNhQkqtGX9RapkSSOfQ0ZhYDXnSoztlrI2b/dFwzLkDfgatQzgMGBtd1UCAEAMbWyYYobqHAB+mb8tdZ3cAYH+FM7/7+6oG1X37zt712VeXwnY8DdieFkt2PpVrK4NAzM3/x4DF6F5T5Fk=
+	t=1738376249; cv=none; b=U+lZhGzNXZmwu5jxU6rA9BywhuGFBbEA97EDjCIdtfdQ6wj3NSLbclvBmz8mkvG+SzfVk5hlVTm0Q7VDkTjllADPUZG6e+O9UDaFJuGwmB2vD1/5Y29e2AjvgECi+A+yoRGpopD2/d3KN4ft/cVLKHAd40kjPKspeQCSzh9dJkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738374940; c=relaxed/simple;
-	bh=b6etz9i2RP+7QRExjC2SLRQVHjwYvlu/F+QZh/r2q6U=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lYJOSRkP+u1cuD2qWH06tMhQ3NVnYNprrQEWpagKckzkiWfxhhUk7asBD4zl6HqyRPfLW8lr+ngoSw8A/pyLI4PGxl8OdD4YlXa+Vmb45JGXxQ5TTxkqZgtxywbmEkmQ+5Iyh9P2mFc9xt3/FEkSTsWGlEL5SF3akw7PrXMnPhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NP2hW6Ua; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1738376249; c=relaxed/simple;
+	bh=czE4vHieuE0f098+c8QgKQmkSyW9XE5v2cPcm44Mx3I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dAQwq/1luWCh5jo4kR83YYrMmRnOrB086nV0vb4vd5tU4d62+xy3kF/smNccoV8P+wBw6fik8GWsg3hIDHoa0RYeIoEqTxrU3t2T2hqINSH6IgrKWHzRj0slVkzp90JNEEJoAWedcJhznx6FIeBYTwxe6wcnQM2F3lrOCtxZdIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vm8/DXOd; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9e38b0cfso4988340a91.0
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:55:38 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ef9b9981f1so7258772a91.3
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 18:17:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738374938; x=1738979738; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=P9OmM+sDu38vDrQYwzEU5YwA1UJzt3FjXx/dBaYsJEk=;
-        b=NP2hW6Ua0MdGpog1jd5NlkOEcb5m+DbqxUJ1zUGJAL4Gyr1J1vF8c5mLynFcz1g587
-         GIFRWkOKjXuqtB6Hofvk2vOFuzdwN88IqArgE1SUGbdvrhV5ijSgJpXLugLbbzGRYiRv
-         mS5KttbvM+6CTw9PIaCSTxxT8Id/27hrUijhy3pU+bXzl2RBdbS9io4WoP2iOewfG7Hu
-         B++b6ESTibM5TKUs+VDqRNJx4DxVrHgKnSy5MJHBW0+5s+RkJJxO64YDvogvc4rjo4jv
-         qCzu4m1DrH3x3U6jNWPXRpPzuq0hHo3zNVq3Oq4YXD6DB7i4Nf5QT93seYy1HWkUT7NN
-         AdGw==
+        d=google.com; s=20230601; t=1738376247; x=1738981047; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Cq2j2i7xKbEmxmaKlx5ycVjsc6NUu7PBqfSVX6ZfTN4=;
+        b=Vm8/DXOdxz24+8Ko7/FCbk1zLSWOTHwsmWZ/Ll3qRjcnMh0mbQkwe8ZdXyBwfsPgsS
+         Unq0/LxfkrskfWnp5B7JJ/BOkT7DHbUZeloOXdJfRbVng37bPmVVn10ktscbna+t1VG5
+         vsVDtOiaPfbpQm5c4bOQ0cfU1gW0uxK7t2btpTy7eFp9EgMQ/9l/YnoO4wUHi6hI4rgc
+         X8TuMEyxELzMn+6+VCo1UXZKfQtINtoAv5Uqk8pUyvkiL99auZbLKYspYJ9My6xcyy0W
+         3M2WFbNcpEWK471bC8AcIm7DtChLhzn0+4hxDlN6mL5VHspVmo1XAorK+1e5ErKSBnWr
+         QTfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738374938; x=1738979738;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P9OmM+sDu38vDrQYwzEU5YwA1UJzt3FjXx/dBaYsJEk=;
-        b=WoNePvLcXxjwZnr7i+gXeW+foeD/pjMSuhz8RhayzhPgIYkU4X0OfT9hFP3MrQMHUt
-         QhHode5jpNkrBPY6ttfCTapDkOQ3zp2rimR9YXSUc3lM1S8ZKRTdJzXYVEb9gVCpV0l6
-         w4OwFMQgm0sGdNpsZi8zJoYZOXLIwygh67CACrPWMfSKfvkJbHCdSDy1l1hkK5lVI3kC
-         9117ePfGU6D8YU0gCkWX4XZhbR0VpKy36p7D1PyG33oC8UDyXchySej4ZrrfJLP/E6t8
-         pFzh8p6cK61g93X4fAHGLdLr373KXhS75N3bi/F56dMZRXzFqUY6yinyOFnrSNpW5pQQ
-         qHNA==
-X-Gm-Message-State: AOJu0YxBXrlwU/am9mQ8uCvF7Mx1x/k1S+uawUUAco90RQcQeBRmNaPk
-	51SQV8087K1ZXKI/BhFgVgmYX3zUdkMCubD1+3qJtkBwURx9OjQo1aSZ0cNMwnIKxN8PPFbHUfT
-	0og==
-X-Google-Smtp-Source: AGHT+IGdd3i7WLWE6L1sJjjSeejxkxKdfst0PcdT8Ti/xqhwNIREB3iVs/B5jAoGWZX/W33UitjN50Udz8U=
-X-Received: from pjbeu16.prod.google.com ([2002:a17:90a:f950:b0:2ea:756d:c396])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f50:b0:2f8:34df:5652
- with SMTP id 98e67ed59e1d1-2f83ac1a52fmr18331282a91.21.1738374938398; Fri, 31
- Jan 2025 17:55:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738376247; x=1738981047;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cq2j2i7xKbEmxmaKlx5ycVjsc6NUu7PBqfSVX6ZfTN4=;
+        b=MvB8fA0j8OC5ZIkKxNi6Z6W6iXZjRiB8V5krWTUjnJw0WpftERlvT9vLP97P2Rxgrf
+         /29xj5eWxhvUvbiSFayjmyXYxPvJ5e+pHLsz3FyfK3zqJo0VPf6qSyrID5bXKIy48AUv
+         BaiyV39za2BGQ3Z5aio2PW9U9gbr4DKGSH7eX/9EacrE/ryM5DTOY0eCTOelAXpBXvE1
+         7lblrquV5xGWNheh4vTtFP1AEPBI4AtaQvvyAb0AIrW+GS4i2Z5hUEAA1sHO17d5Y18M
+         VQlvk/XGa7uzbaUeuQD7RPvbN7emefJYFSNVbz1xmezLCUtTEqp57emKLxISDFRVNi0A
+         wT6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXnka5XCZO2kCrZavGyHUbLj/c2UgLaO85JNRc/vzxT8QlBmmc6nemEBXsi9601LJFynOE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuYq8yH2PU+xae60R23bJsZz23Lq4I48WelFeusT2GJPlPq73E
+	lglELYtz8VAO3jzwR0pVA2skprEOFES8iOwvNxgT0AuygmokC3G8BqIdY9Bv32ZssUAmplzZGqj
+	Mng==
+X-Google-Smtp-Source: AGHT+IEXms2W7h6OPbgfhbPe+T0bjO3rPyG4kBeOBL1XLya2FJ/dryX9qDtrHv/AVlJBJdJ2J5PBFLJRbi4=
+X-Received: from pjbsw11.prod.google.com ([2002:a17:90b:2c8b:b0:2ef:a732:f48d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:258c:b0:2ee:f687:6acb
+ with SMTP id 98e67ed59e1d1-2f83abd9998mr19471173a91.13.1738376247517; Fri, 31
+ Jan 2025 18:17:27 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 31 Jan 2025 17:55:18 -0800
-In-Reply-To: <20250201015518.689704-1-seanjc@google.com>
+Date: Fri, 31 Jan 2025 18:17:02 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250201015518.689704-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250201015518.689704-12-seanjc@google.com>
-Subject: [PATCH v2 11/11] KVM: selftests: Add a nested (forced) emulation
- intercept test for x86
+Message-ID: <20250201021718.699411-1-seanjc@google.com>
+Subject: [PATCH 00/16] x86/tsc: Try to wrangle PV clocks vs. TSC
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Juergen Gross <jgross@suse.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>
+Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
+	virtualization@lists.linux.dev, linux-hyperv@vger.kernel.org, 
+	jailhouse-dev@googlegroups.com, kvm@vger.kernel.org, 
+	xen-devel@lists.xenproject.org, Sean Christopherson <seanjc@google.com>, 
+	Nikunj A Dadhania <nikunj@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a rudimentary test for validating KVM's handling of L1 hypervisor
-intercepts during instruction emulation on behalf of L2.  To minimize
-complexity and avoid overlap with other tests, only validate KVM's
-handling of instructions that L1 wants to intercept, i.e. that generate a
-nested VM-Exit.  Full testing of emulation on behalf of L2 is better
-achieved by running existing (forced) emulation tests in a VM, (although
-on VMX, getting L0 to emulate on #UD requires modifying either L1 KVM to
-not intercept #UD, or modifying L0 KVM to prioritize L0's exception
-intercepts over L1's intercepts, as is done by KVM for SVM).
+Attempt to bring some amount of order to the PV clocks vs. TSC madness in
+the kernel.  The primary goal of this series is to fix flaws with SNP
+and TDX guests where a PV clock provided by the untrusted hypervisor is
+used instead of the secure/trusted TSC that is controlled by trusted
+firmware.
 
-Since emulation should never be successful, i.e. L2 always exits to L1,
-dynamically generate the L2 code stream instead of adding a helper for
-each instruction.  Doing so requires hand coding instruction opcodes, but
-makes it significantly easier for the test to compute the expected "next
-RIP" and instruction length.
+The secondary goal (last few patches) is to draft off of the SNP and TDX
+changes to slightly modernize running under KVM.  Currently, KVM guests
+will use TSC for clocksource, but not sched_clock.  And they ignore Intel's
+CPUID-based TSC and CPU frequency enumeration, even when using the TSC
+instead of kvmclock.  And if the host provides the core crystal frequency
+in CPUID.0x15, then KVM guests can use that for the APIC timer period
+instead of manually calibrating the frequency.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/nested_emulation_test.c | 146 ++++++++++++++++++
- 2 files changed, 147 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/nested_emulation_test.c
+Lots more background: https://lore.kernel.org/all/20250106124633.1418972-13-nikunj@amd.com
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 4277b983cace..f773f8f99249 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -69,6 +69,7 @@ TEST_GEN_PROGS_x86 += x86/hyperv_tlb_flush
- TEST_GEN_PROGS_x86 += x86/kvm_clock_test
- TEST_GEN_PROGS_x86 += x86/kvm_pv_test
- TEST_GEN_PROGS_x86 += x86/monitor_mwait_test
-+TEST_GEN_PROGS_x86 += x86/nested_emulation_test
- TEST_GEN_PROGS_x86 += x86/nested_exceptions_test
- TEST_GEN_PROGS_x86 += x86/platform_info_test
- TEST_GEN_PROGS_x86 += x86/pmu_counters_test
-diff --git a/tools/testing/selftests/kvm/x86/nested_emulation_test.c b/tools/testing/selftests/kvm/x86/nested_emulation_test.c
-new file mode 100644
-index 000000000000..abc824dba04f
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/nested_emulation_test.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vmx.h"
-+#include "svm_util.h"
-+
-+enum {
-+	SVM_F,
-+	VMX_F,
-+	NR_VIRTUALIZATION_FLAVORS,
-+};
-+
-+struct emulated_instruction {
-+	const char name[32];
-+	uint8_t opcode[15];
-+	uint32_t exit_reason[NR_VIRTUALIZATION_FLAVORS];
-+};
-+
-+static struct emulated_instruction instructions[] = {
-+	{
-+		.name = "pause",
-+		.opcode = { 0xf3, 0x90 },
-+		.exit_reason = { SVM_EXIT_PAUSE,
-+				 EXIT_REASON_PAUSE_INSTRUCTION, }
-+	},
-+	{
-+		.name = "hlt",
-+		.opcode = { 0xf4 },
-+		.exit_reason = { SVM_EXIT_HLT,
-+				 EXIT_REASON_HLT, }
-+	},
-+};
-+
-+static uint8_t kvm_fep[] = { 0x0f, 0x0b, 0x6b, 0x76, 0x6d };	/* ud2 ; .ascii "kvm" */
-+static uint8_t l2_guest_code[sizeof(kvm_fep) + 15];
-+static uint8_t *l2_instruction = &l2_guest_code[sizeof(kvm_fep)];
-+
-+static uint32_t get_instruction_length(struct emulated_instruction *insn)
-+{
-+	uint32_t i;
-+
-+	for (i = 0; i < ARRAY_SIZE(insn->opcode) && insn->opcode[i]; i++)
-+		;
-+
-+	return i;
-+}
-+
-+static void guest_code(void *test_data)
-+{
-+	int f = this_cpu_has(X86_FEATURE_SVM) ? SVM_F : VMX_F;
-+	int i;
-+
-+	memcpy(l2_guest_code, kvm_fep, sizeof(kvm_fep));
-+
-+	if (f == SVM_F) {
-+		struct svm_test_data *svm = test_data;
-+		struct vmcb *vmcb = svm->vmcb;
-+
-+		generic_svm_setup(svm, NULL, NULL);
-+		vmcb->save.idtr.limit = 0;
-+		vmcb->save.rip = (u64)l2_guest_code;
-+
-+		vmcb->control.intercept |= BIT_ULL(INTERCEPT_SHUTDOWN) |
-+					   BIT_ULL(INTERCEPT_PAUSE) |
-+					   BIT_ULL(INTERCEPT_HLT);
-+		vmcb->control.intercept_exceptions = 0;
-+	} else {
-+		GUEST_ASSERT(prepare_for_vmx_operation(test_data));
-+		GUEST_ASSERT(load_vmcs(test_data));
-+
-+		prepare_vmcs(test_data, NULL, NULL);
-+		GUEST_ASSERT(!vmwrite(GUEST_IDTR_LIMIT, 0));
-+		GUEST_ASSERT(!vmwrite(GUEST_RIP, (u64)l2_guest_code));
-+		GUEST_ASSERT(!vmwrite(EXCEPTION_BITMAP, 0));
-+
-+		vmwrite(CPU_BASED_VM_EXEC_CONTROL, vmreadz(CPU_BASED_VM_EXEC_CONTROL) |
-+						   CPU_BASED_PAUSE_EXITING |
-+						   CPU_BASED_HLT_EXITING);
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(instructions); i++) {
-+		struct emulated_instruction *insn = &instructions[i];
-+		uint32_t insn_len = get_instruction_length(insn);
-+		uint32_t exit_insn_len;
-+		u32 exit_reason;
-+
-+		/*
-+		 * Copy the target instruction to the L2 code stream, and fill
-+		 * the remaining bytes with INT3s so that a missed intercept
-+		 * results in a consistent failure mode (SHUTDOWN).
-+		 */
-+		memcpy(l2_instruction, insn->opcode, insn_len);
-+		memset(l2_instruction + insn_len, 0xcc, sizeof(insn->opcode) - insn_len);
-+
-+		if (f == SVM_F) {
-+			struct svm_test_data *svm = test_data;
-+			struct vmcb *vmcb = svm->vmcb;
-+
-+			run_guest(vmcb, svm->vmcb_gpa);
-+			exit_reason = vmcb->control.exit_code;
-+			exit_insn_len = vmcb->control.next_rip - vmcb->save.rip;
-+			GUEST_ASSERT_EQ(vmcb->save.rip, (u64)l2_instruction);
-+		} else {
-+			GUEST_ASSERT_EQ(i ? vmresume() : vmlaunch(), 0);
-+			exit_reason = vmreadz(VM_EXIT_REASON);
-+			exit_insn_len = vmreadz(VM_EXIT_INSTRUCTION_LEN);
-+			GUEST_ASSERT_EQ(vmreadz(GUEST_RIP), (u64)l2_instruction);
-+		}
-+
-+		__GUEST_ASSERT(exit_reason == insn->exit_reason[f],
-+			       "Wanted exit_reason '0x%x' for '%s', got '0x%x'",
-+			       insn->exit_reason[f], insn->name, exit_reason);
-+
-+		__GUEST_ASSERT(exit_insn_len == insn_len,
-+			       "Wanted insn_len '%u' for '%s', got '%u'",
-+			       insn_len, insn->name, exit_insn_len);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t nested_test_data_gva;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	TEST_REQUIRE(is_forced_emulation_enabled);
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM) || kvm_cpu_has(X86_FEATURE_VMX));
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	vm_enable_cap(vm, KVM_CAP_EXCEPTION_PAYLOAD, -2ul);
-+
-+	if (kvm_cpu_has(X86_FEATURE_SVM))
-+		vcpu_alloc_svm(vm, &nested_test_data_gva);
-+	else
-+		vcpu_alloc_vmx(vm, &nested_test_data_gva);
-+
-+	vcpu_args_set(vcpu, 1, nested_test_data_gva);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(get_ucall(vcpu, NULL), UCALL_DONE);
-+
-+	kvm_vm_free(vm);
-+}
+This is all *very* lightly tested (borderline RFC).
+
+Sean Christopherson (16):
+  x86/tsc: Add a standalone helpers for getting TSC info from CPUID.0x15
+  x86/tsc: Add standalone helper for getting CPU frequency from CPUID
+  x86/tsc: Add helper to register CPU and TSC freq calibration routines
+  x86/sev: Mark TSC as reliable when configuring Secure TSC
+  x86/sev: Move check for SNP Secure TSC support to tsc_early_init()
+  x86/tdx: Override PV calibration routines with CPUID-based calibration
+  x86/acrn: Mark TSC frequency as known when using ACRN for calibration
+  x86/tsc: Pass KNOWN_FREQ and RELIABLE as params to registration
+  x86/tsc: Rejects attempts to override TSC calibration with lesser
+    routine
+  x86/paravirt: Move handling of unstable PV clocks into
+    paravirt_set_sched_clock()
+  x86/paravirt: Don't use a PV sched_clock in CoCo guests with trusted
+    TSC
+  x86/kvmclock: Mark TSC as reliable when it's constant and nonstop
+  x86/kvmclock: Get CPU base frequency from CPUID when it's available
+  x86/kvmclock: Get TSC frequency from CPUID when its available
+  x86/kvmclock: Stuff local APIC bus period when core crystal freq comes
+    from CPUID
+  x86/kvmclock: Use TSC for sched_clock if it's constant and non-stop
+
+ arch/x86/coco/sev/core.c        |  9 ++--
+ arch/x86/coco/tdx/tdx.c         | 27 ++++++++--
+ arch/x86/include/asm/paravirt.h |  7 ++-
+ arch/x86/include/asm/tdx.h      |  2 +
+ arch/x86/include/asm/tsc.h      | 67 +++++++++++++++++++++++++
+ arch/x86/kernel/cpu/acrn.c      |  5 +-
+ arch/x86/kernel/cpu/mshyperv.c  | 11 +++--
+ arch/x86/kernel/cpu/vmware.c    |  9 ++--
+ arch/x86/kernel/jailhouse.c     |  6 +--
+ arch/x86/kernel/kvmclock.c      | 88 +++++++++++++++++++++++----------
+ arch/x86/kernel/paravirt.c      | 15 +++++-
+ arch/x86/kernel/tsc.c           | 74 ++++++++++++++++-----------
+ arch/x86/mm/mem_encrypt_amd.c   |  3 --
+ arch/x86/xen/time.c             |  4 +-
+ 14 files changed, 243 insertions(+), 84 deletions(-)
+
+
+base-commit: ebbb8be421eefbe2d47b99c2e1a6dd840d7930f9
 -- 
 2.48.1.362.g079036d154-goog
 
