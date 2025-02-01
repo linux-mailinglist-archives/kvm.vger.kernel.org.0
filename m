@@ -1,233 +1,127 @@
-Return-Path: <kvm+bounces-37011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A05A245C9
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:03:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA06A245FE
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:51:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B4D91889DE0
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 00:03:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1BD03A87B8
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 00:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C8CAD27;
-	Sat,  1 Feb 2025 00:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454E617C91;
+	Sat,  1 Feb 2025 00:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JYPRcO+v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FNJYn3M4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com [209.85.160.73])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A291123CB
-	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 00:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A865EAF9
+	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 00:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738368193; cv=none; b=evJGnLHDk+tRQbVMS1vf06ichpe+gIL4o0OTb30B1SJfW6M8FyDLty+kcXGDLUzfyAdh1iM4j8A5kzCIYbB5gT6HG23heZVlDzai8mN3njI2k+yo40AifK0uPJpam34SwCuqO3A+1Ax9mlTo36J2vZYcpMRnMDJ1+azPoPCWxa4=
+	t=1738371052; cv=none; b=FKHn1m4aq7dcbFpJpMTxW3ijfvrAvgtSU5CIY2xKBv9neHNVwcV5Qmajd1zG0uLljfgii8immev0JXNAESp6+m5WBAtqWR9p+jyjZ706F1LLUKqnvA926CDvPIe+M8rg+gzOndU8JFbF6PVDNvqKj+/yltkyjG/5dATqxkK1/48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738368193; c=relaxed/simple;
-	bh=WVCQCd+O+0ASP0iAAFLRAMf6fTBEWgdOhE30uu1osm0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G3Yu8mAqidQtkxO+mEOfvgdfw4q6eB0gEmkmAy0/D+Cg7oGwvQrA7p+P6zXbCNo4cZJ+6Fa9o+YFyQ8OvpvMyd4io02BRU7PCssfjqzbxJs2+vjgrKQrgPgvP6kPbpMxW2P8t+i+JELWUBGzxOmdIk3h3+WycVBOFxnpqZwbYlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kevinloughlin.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JYPRcO+v; arc=none smtp.client-ip=209.85.160.73
+	s=arc-20240116; t=1738371052; c=relaxed/simple;
+	bh=fXRZwu+oXpcxVteww5iwBUgpDb7cO5xtmRxaTTNiJW8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LNIPx+14OdT+mTukJHonyc2dqwmvTLuaiTfjHFiPwqdlOzKWqEc5DP7lcP/ecQtnU7OkZ+2vmGBUs1LiU+5ImFZCw5aELwL86Q0NZjNLuzOD4xAqpoPrcEfT4IAnT4tZFk6+ICBr9Vgio/Qfxi9pogbx9t66cYSYjElazvvxAq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FNJYn3M4; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kevinloughlin.bounces.google.com
-Received: by mail-oa1-f73.google.com with SMTP id 586e51a60fabf-29f601b1c3cso855279fac.0
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 16:03:11 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef728e36d5so4967444a91.3
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 16:50:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738368190; x=1738972990; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AWCssPTtwZhYmV2JdOyYrw5kj4Hb5Puh42WXWn/vgRM=;
-        b=JYPRcO+vioHWOSIyVvDio128Uoc4fjOLyoDH6JUcMXoMdgYlVNHZE2APySj1BDKoXp
-         bsF1dNfQOg+LR+Gd6TEHLlcwMVsQdUOrsQDeAs9apZTL5EuoRCTC2jxLx6rFtdYXaybT
-         +8xGoQ4EbX0Rp2+OwR9iYIYT8qiw/RzJG5pnZD+PgdMczNS68JzDqA+0g1YNGqN81Ffc
-         7eTBbrYrG2DDiBmBLpp4CXCLZEgfDR8t4a8Z4nliJKiEy4Egf93cl0I2D2MmU5XQz2EN
-         DYrDlaYAVALgFiYAd/ADsP0nYUd0Wje8heG4R9uG4ZoI8YBbQEGSvzKDjesXhKsJbZZW
-         uvnQ==
+        d=google.com; s=20230601; t=1738371050; x=1738975850; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rxeqp0iUagZtsoZjwTJV6Mkmpp79QeV032AbydK9elA=;
+        b=FNJYn3M4uqMPoL7qMNhOR1bpAjnj76dOC4PJ+RvT9cEIfIOVxfUEQuHo1fyykMfpYq
+         5A/xGa4Cv2wTbhTxJ46iba5YoWxTBgAhW16MgXPx4FoXdVwFdIMW/VmTn8bjkqklCvNR
+         GP5y2jL1jKzvR3R6v71d7arcc2DfZw2Hz/WFXPrTYqjcBAiHqAg3hqAt2HEa7q9E04eK
+         29RuhhkfNDtV4LKaqtmRRe21BiVEsbco6BNJ2PdTSsV0HPmqxwR9bZbhHOPpQ/VHnLpP
+         LY9uv2DE78N6p8pzq7RlkXRqmrlFl1YxdWayxlMnRBrmlNmAAGoMicflHpTSt21kOZUN
+         oT0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738368190; x=1738972990;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AWCssPTtwZhYmV2JdOyYrw5kj4Hb5Puh42WXWn/vgRM=;
-        b=RT3+bK+6PBDboXGzeOzQX0ov+9WEC22dNTo3cTPMtq1ym2AP5ct92Ha8NwJxhHwyq5
-         zPs5blhZslsajDXQ6EFaLfGac0B8L0NAfEjoemvMunBs7wlQzSqjq0IKXGJoFmbxCh1M
-         nQSzsLkre7zR5kF38udTTJtqYXRd6cnqAj1hvXiGUQ7ndHk6d9mZ4KWjsI4n4EtlmGBG
-         xwRIG1YsDVCLBFmH53P5hB+b5TDteXS7EFOlTPZ0YPsVVVkKzIkb1feBbLo5vFq8bDQ2
-         lbBzcwrMSjDbSqCEJKTKRiCVHy93zOpM3NXoxoDyiZYvdk/kNrCZ0/DAP1MT15zms3L5
-         2cRA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKT/nzCqLVKCSYPLDwJc2ebkfnxuxbN8aQ7zHpGqE4LHBfa7j4zd8544tU30tJUpv8+2Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwI/1A2PJIgv1QhBMzREyhF18BZRlEB4n5UFV3cRfV1kY/DovqY
-	49teAf95OU92KknX3JaG1M6km9V7OVlGtF1iAltO9C57m90NXkIEgZGfebeniCCDoO794vvPpq1
-	7mrQKObxe2ETfNmYN9lzAGBeEAwuDhA==
-X-Google-Smtp-Source: AGHT+IEe6Cm/cr1UFpsMwadljWsRlzohbdqDYjO+KCnYJdwNZOHhW8vmBkDqLOHb98N+kkT9tbXU3XvLpLYiCABZG7va
-X-Received: from oacny5.prod.google.com ([2002:a05:6871:7505:b0:2ae:bdb:eb0])
- (user=kevinloughlin job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6870:ae87:b0:29e:4bc4:97ca with SMTP id 586e51a60fabf-2b32f12d6camr8056186fac.21.1738368190657;
- Fri, 31 Jan 2025 16:03:10 -0800 (PST)
-Date: Sat,  1 Feb 2025 00:02:59 +0000
-In-Reply-To: <20250201000259.3289143-1-kevinloughlin@google.com>
+        d=1e100.net; s=20230601; t=1738371050; x=1738975850;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rxeqp0iUagZtsoZjwTJV6Mkmpp79QeV032AbydK9elA=;
+        b=CAd4nOLSwvjXBpz2Hp2l3ShGlavJlJHd/Tehlfb/bpprvfi+Ddf0irvP5CqI+obKVO
+         YTUkVZCFFLrLt4nOGJZTPnRbXkrrvuUPnaS6jvNsPDccabvunJfJqI2cbQ5CuYJfbr8p
+         OoWNoX9axDRPoLtmTqxQU7Cf/2AiJYL8fSiuB+Z/hbbm398SdC3Ex4q5366w0CL174+K
+         /J1up8lzCVs9cj+QLQ2EFjWhtm/yAmTVA4inv5i4E04Z2uCwYhYK0/CPujwny2AXvU8L
+         ZXQ8Nhkzj0XWDrJmtoD83fRDykrzH/JgQTXMkWSdyIXSK5xtLeZSmmBT39CZOb6nADTk
+         gDvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXK2iYilsLdAHc4Gru5m+qOrVAwNQizoUp7pPJXDFbth3BylcgB4oI/7LCJdn7q7YcqfEw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyykfjcMdbljpV6RUjuWiY+AvXgqDkiSS/ikVWGTCf3oBAPORKi
+	Fu8xPlfryHTpId57QxPLNuMmGeCSqQRqQijAmTzJ1qx8NmKgSRYFlL+1ZBW2yFEOix6PjlXpBIQ
+	7XQ==
+X-Google-Smtp-Source: AGHT+IGiNBcI+RlVevJWnt6K4utvGgac0CfWKiu+g4D6W3FFH7J/4bdp2RMxOyd7HL6C4CLLNsBdRkjRihE=
+X-Received: from pjbqb8.prod.google.com ([2002:a17:90b:2808:b0:2ea:6b84:3849])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2742:b0:2ee:f076:20f1
+ with SMTP id 98e67ed59e1d1-2f83aa85095mr23559697a91.0.1738371050295; Fri, 31
+ Jan 2025 16:50:50 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 31 Jan 2025 16:50:46 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250123002422.1632517-1-kevinloughlin@google.com> <20250201000259.3289143-1-kevinloughlin@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250201000259.3289143-3-kevinloughlin@google.com>
-Subject: [PATCH v6 2/2] KVM: SEV: Prefer WBNOINVD over WBINVD for cache
- maintenance efficiency
-From: Kevin Loughlin <kevinloughlin@google.com>
-To: linux-kernel@vger.kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com, 
-	pbonzini@redhat.com, kevinloughlin@google.com, 
-	kirill.shutemov@linux.intel.com, kai.huang@intel.com, ubizjak@gmail.com, 
-	jgross@suse.com, kvm@vger.kernel.org, thomas.lendacky@amd.com, 
-	pgonda@google.com, sidtelang@google.com, mizhang@google.com, 
-	rientjes@google.com, manalinandan@google.com, szy0127@sjtu.edu.cn
+Message-ID: <20250201005048.657470-1-seanjc@google.com>
+Subject: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
+From: Sean Christopherson <seanjc@google.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Dionna Glaze <dionnaglaze@google.com>, 
+	Peter Gonda <pgonda@google.com>, "=?UTF-8?q?J=C3=BCrgen=20Gro=C3=9F?=" <jgross@suse.com>, 
+	Kirill Shutemov <kirill.shutemov@linux.intel.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Binbin Wu <binbin.wu@intel.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-AMD CPUs currently execute WBINVD in the host when unregistering SEV
-guest memory or when deactivating SEV guests. Such cache maintenance is
-performed to prevent data corruption, wherein the encrypted (C=1)
-version of a dirty cache line might otherwise only be written back
-after the memory is written in a different context (ex: C=0), yielding
-corruption. However, WBINVD is performance-costly, especially because
-it invalidates processor caches.
+Attempt to hack around the SNP/TDX guest MTRR disaster by hijacking
+x86_platform.is_untracked_pat_range() to force the legacy PCI hole, i.e.
+memory from TOLUD => 4GiB, as unconditionally writeback.
 
-Strictly-speaking, unless the SEV ASID is being recycled (meaning the
-SNP firmware requires the use of WBINVD prior to DF_FLUSH), the cache
-invalidation triggered by WBINVD is unnecessary; only the writeback is
-needed to prevent data corruption in remaining scenarios.
+TDX in particular has created an impossible situation with MTRRs.  Because
+TDX disallows toggling CR0.CD, TDX enabling decided the easiest solution
+was to ignore MTRRs entirely (because omitting CR0.CD write is obviously
+too simple).
 
-To improve performance in these scenarios, use WBNOINVD when available
-instead of WBINVD. WBNOINVD still writes back all dirty lines
-(preventing host data corruption by SEV guests) but does *not*
-invalidate processor caches. Note that the implementation of wbnoinvd()
-ensures fall back to WBINVD if WBNOINVD is unavailable.
+Unfortunately, under KVM at least, the kernel subtly relies on MTRRs to
+make ACPI play nice with device drivers.  ACPI tries to map ranges it finds
+as WB, which in turn prevents device drivers from mapping device memory as
+WC/UC-.
 
-In anticipation of forthcoming optimizations to limit the WBNOINVD only
-to physical CPUs that have executed SEV guests, place the call to
-wbnoinvd_on_all_cpus() in a wrapper function sev_writeback_caches().
+For the record, I hate this hack.  But it's the safest approach I can come
+up with.  E.g. forcing ioremap() to always use WB scares me because it's
+possible, however unlikely, that the kernel could try to map non-emulated
+memory (that is presented as MMIO to the guest) as WC/UC-, and silently
+forcing those mappings to WB could do weird things.
 
-Signed-off-by: Kevin Loughlin <kevinloughlin@google.com>
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/svm/sev.c | 41 +++++++++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 20 deletions(-)
+My initial thought was to effectively revert the offending commit and
+skip the cache disabling/enabling, i.e. the problematic CR0.CD toggling,
+but unfortunately OVMF/EDKII has also added code to skip MTRR setup. :-(
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index fe6cc763fd51..f10f1c53345e 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -116,6 +116,7 @@ static int sev_flush_asids(unsigned int min_asid, unsigned int max_asid)
- 	 */
- 	down_write(&sev_deactivate_lock);
- 
-+	/* SNP firmware requires use of WBINVD for ASID recycling. */
- 	wbinvd_on_all_cpus();
- 
- 	if (sev_snp_enabled)
-@@ -710,6 +711,16 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
- 	}
- }
- 
-+static inline void sev_writeback_caches(void)
-+{
-+	/*
-+	 * Ensure that all dirty guest tagged cache entries are written back
-+	 * before releasing the pages back to the system for use. CLFLUSH will
-+	 * not do this without SME_COHERENT, so issue a WBNOINVD.
-+	 */
-+	wbnoinvd_on_all_cpus();
-+}
-+
- static unsigned long get_num_contig_pages(unsigned long idx,
- 				struct page **inpages, unsigned long npages)
- {
-@@ -2773,12 +2784,7 @@ int sev_mem_enc_unregister_region(struct kvm *kvm,
- 		goto failed;
- 	}
- 
--	/*
--	 * Ensure that all guest tagged cache entries are flushed before
--	 * releasing the pages back to the system for use. CLFLUSH will
--	 * not do this, so issue a WBINVD.
--	 */
--	wbinvd_on_all_cpus();
-+	sev_writeback_caches();
- 
- 	__unregister_enc_region_locked(kvm, region);
- 
-@@ -2899,12 +2905,7 @@ void sev_vm_destroy(struct kvm *kvm)
- 		return;
- 	}
- 
--	/*
--	 * Ensure that all guest tagged cache entries are flushed before
--	 * releasing the pages back to the system for use. CLFLUSH will
--	 * not do this, so issue a WBINVD.
--	 */
--	wbinvd_on_all_cpus();
-+	sev_writeback_caches();
- 
- 	/*
- 	 * if userspace was terminated before unregistering the memory regions
-@@ -3126,16 +3127,16 @@ static void sev_flush_encrypted_page(struct kvm_vcpu *vcpu, void *va)
- 
- 	/*
- 	 * VM Page Flush takes a host virtual address and a guest ASID.  Fall
--	 * back to WBINVD if this faults so as not to make any problems worse
-+	 * back to WBNOINVD if this faults so as not to make any problems worse
- 	 * by leaving stale encrypted data in the cache.
- 	 */
- 	if (WARN_ON_ONCE(wrmsrl_safe(MSR_AMD64_VM_PAGE_FLUSH, addr | asid)))
--		goto do_wbinvd;
-+		goto do_sev_writeback_caches;
- 
- 	return;
- 
--do_wbinvd:
--	wbinvd_on_all_cpus();
-+do_sev_writeback_caches:
-+	sev_writeback_caches();
- }
- 
- void sev_guest_memory_reclaimed(struct kvm *kvm)
-@@ -3144,12 +3145,12 @@ void sev_guest_memory_reclaimed(struct kvm *kvm)
- 	 * With SNP+gmem, private/encrypted memory is unreachable via the
- 	 * hva-based mmu notifiers, so these events are only actually
- 	 * pertaining to shared pages where there is no need to perform
--	 * the WBINVD to flush associated caches.
-+	 * the WBNOINVD to flush associated caches.
- 	 */
- 	if (!sev_guest(kvm) || sev_snp_guest(kvm))
- 		return;
- 
--	wbinvd_on_all_cpus();
-+	sev_writeback_caches();
- }
- 
- void sev_free_vcpu(struct kvm_vcpu *vcpu)
-@@ -3858,7 +3859,7 @@ static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
- 		 * guest-mapped page rather than the initial one allocated
- 		 * by KVM in svm->sev_es.vmsa. In theory, svm->sev_es.vmsa
- 		 * could be free'd and cleaned up here, but that involves
--		 * cleanups like wbinvd_on_all_cpus() which would ideally
-+		 * cleanups like sev_writeback_caches() which would ideally
- 		 * be handled during teardown rather than guest boot.
- 		 * Deferring that also allows the existing logic for SEV-ES
- 		 * VMSAs to be re-used with minimal SNP-specific changes.
-@@ -4910,7 +4911,7 @@ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end)
- 
- 		/*
- 		 * SEV-ES avoids host/guest cache coherency issues through
--		 * WBINVD hooks issued via MMU notifiers during run-time, and
-+		 * WBNOINVD hooks issued via MMU notifiers during run-time, and
- 		 * KVM's VM destroy path at shutdown. Those MMU notifier events
- 		 * don't cover gmem since there is no requirement to map pages
- 		 * to a HVA in order to use them for a running guest. While the
+Sean Christopherson (2):
+  x86/mtrr: Return success vs. "failure" from guest_force_mtrr_state()
+  x86/kvm: Override low memory above TOLUD to WB when MTRRs are forced
+    WB
+
+ arch/x86/include/asm/mtrr.h        |  5 +++--
+ arch/x86/kernel/cpu/mtrr/generic.c | 11 +++++++----
+ arch/x86/kernel/kvm.c              | 31 ++++++++++++++++++++++++++++--
+ 3 files changed, 39 insertions(+), 8 deletions(-)
+
+
+base-commit: fd8c09ad0d87783b9b6a27900d66293be45b7bad
 -- 
 2.48.1.362.g079036d154-goog
 
