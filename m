@@ -1,222 +1,178 @@
-Return-Path: <kvm+bounces-37020-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D276A2461A
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:15:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37045A24623
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:19:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 777D8164319
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:15:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC15E1889E2F
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:19:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E179A13E02E;
-	Sat,  1 Feb 2025 01:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4257A2A1AA;
+	Sat,  1 Feb 2025 01:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mOiooC+F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ACGAWYwY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829B2139CEF
-	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DD4BA45
+	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738372454; cv=none; b=sKsuCgnBnWhPrf86Q472H6VRUSC7Wj6YYAzaoCTBsyJGRwhrBWaeD/w2IB9kpM1m3KV0efXse+W/EnQ4SMLAm1wk+VUaCcvxi5dSRmsxKgnWrmZt+6nIGPdPV80DYjwB2xnrlxCg6ka0S1POqf2EbcNJrgE208QxoDVkVdjHAmU=
+	t=1738372770; cv=none; b=N+AkdjEHIjP48s1Je8CLksO2Ivk4o3g1TRQWtTkZf+2WF2hxv5SYv9qqkz0HlaPSTIlW0NWPe4SgMwWOhgaWvGGc682mecakH1lQC988lEd76fTVPEa4sdbMT7XpvRHZIOVz0CAiBSRRGjJ23xhyF/fdjfiFioos2P52NQnCUGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738372454; c=relaxed/simple;
-	bh=gmfQBBKbtVIQGUfDtmdL7tTLbIrBQrlYCQuHcr8oi38=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NPz55qHGAsWI8z3X8Dqo8lga39POdH9O42a3Jhu6g0++MllLzKkNQBlx1NcHVOJ1qC+qFbBABDZGNwdE9++XuJvMEfQt9mOV/md6lKckmqTsdkCNue3Tg3fpEF5iDVfgBK7lLkdu/ADOwAOk80DDQIP3WLUiWwZPED7lxRj+HIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mOiooC+F; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f129f7717fso5027883a91.0
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:14:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738372452; x=1738977252; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=zo8e7usXx7CJFB7yvSC/9n7CtYEg74QEVFvX1f2FIKc=;
-        b=mOiooC+F6LD7cXPyt8cHYkjWj4SAbkEdtNSp0U9C9DfsIrX6PgCisrhWP16TFHUSAP
-         CyLRKcCNSO0pXBvwgDEjK/sRGeAiZgQBHfUh0ac+1LBpH8njBdIKiTDas9LewPfafxJB
-         +pGh/BAxqfAtqEXhRib7OIhQclxHyQRODDcpa5mGyI4zESUFfhkUojKgkm7N1ev2ocuP
-         CNm/CQC0nIjTLEit4KFdrnVX3l71LNz4tV/2+QAmrRivbAZYKRzjB54mBSff3qP3vZrF
-         SwQKjokPTdnE7Zbc6HONRfONynSKRdofXs5A3LI4LV0scgFYUN/etH/A0ror941dvAM/
-         YwBw==
+	s=arc-20240116; t=1738372770; c=relaxed/simple;
+	bh=oWCwRVX3HiltEmJ0NJfrEKkEaikudV+HxZPQ1780JTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QPYMLl78o1qXjP07Hh0FG5lBkW4wBNPmsqizOZBGdj0HBY8/mSQec4WD1GhpszizmU3TfaWS4rOA9nOhm8adNQwO7qEayX3kJ0lPqu02wM5rdHEcikjQApQ/SM4Q0NxUhTS9/2aksU2Z2t1xA+lq2hq+RXlxoV5ksJvXpMkbBkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ACGAWYwY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738372767;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iutb+f8svSiQJQKyELECXpPORtK9MA8lQS48vaY5V1E=;
+	b=ACGAWYwYztduSD9NEg2ZaFuTlD97wQ4Z5qX80gWn9AX+FmzUkFYzOAXK+CbGHZfyRGX+YP
+	BlCp+DT5+wdL5M4G1emdgFcsAby+PExFyfWlDteMA1AEaFQ/evUpEerKwpN3qEQESlJZm2
+	l8IC1wHltLeT5CD1yZmti0gytUKfiC0=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-5yS5bSVKM6GV3QqvkoRziw-1; Fri, 31 Jan 2025 20:19:25 -0500
+X-MC-Unique: 5yS5bSVKM6GV3QqvkoRziw-1
+X-Mimecast-MFC-AGG-ID: 5yS5bSVKM6GV3QqvkoRziw
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7be6ccb09f9so251337085a.2
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:19:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738372452; x=1738977252;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zo8e7usXx7CJFB7yvSC/9n7CtYEg74QEVFvX1f2FIKc=;
-        b=MO1t084C5NO3LTlAjedg7fbq9cWNaIYjRu61rPsPYuVB5eCaHSPu9AEm0+jCENGOGu
-         D61x6HBlkvahLBbuiotPjGNZgwVnYnhBilcYX4AxTFsxV6r2z+LxjHWRmOLEQVAwUiiy
-         8gPvQkc4Uf9vLZ9dgD2snhM4qP4OBYJxjJ6adtf4u+YS/2dgQMYuiYS684Z0vG01kApM
-         Ks0afew7M8QlViRC+Df59rEed4Wop48SS0nRkaVhrVgncCJwY+uCuRxnq5dfZRlVv6gj
-         KbOvkl7rS09hgWuWPY5QPr7uQDGW6MzNSivB2L4E1grrAH525K+bTK9WzcVP+Kb79C85
-         IeDA==
-X-Gm-Message-State: AOJu0YyDLPdhNB6JILpr36q0ihvtLW6h76axql0WsAZ5J7RaxxNwO+vU
-	qytYGyUazIMV3qn3k6L+eMl+5ySF29GWaQ+ZKH6ButIlzVUJGBvDTz1M0uozbHNwQD4SKvNc21k
-	3QA==
-X-Google-Smtp-Source: AGHT+IE9nZyv3byQJztPPuSt3eQgyUGggpNKDLxk0FqIQjZbmzSHUbiIVphoViaHsQTXXXDXmLBCD6n4DDU=
-X-Received: from pjbsb15.prod.google.com ([2002:a17:90b:50cf:b0:2ef:701e:21c1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:534b:b0:2ee:48bf:7dc3
- with SMTP id 98e67ed59e1d1-2f83ac00cd3mr19713341a91.15.1738372451786; Fri, 31
- Jan 2025 17:14:11 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 31 Jan 2025 17:14:00 -0800
-In-Reply-To: <20250201011400.669483-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1738372765; x=1738977565;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iutb+f8svSiQJQKyELECXpPORtK9MA8lQS48vaY5V1E=;
+        b=ArxqL+ivFhsUrdFCAx0vJ/uz7QlGe7d0G5JRf4ulJ7cJ1i6aSZPc0cVx0P5B3ATPag
+         p9RHEAHvh3b4vdvUoXb7dN3MSwWbHtrkicJVghdY6VtsoigqFsEx8CEBBFIjXXnM1LhX
+         +X24KR+77kC9rS5uue4emFuMTVXFQo+rOPwenQfUTy5jGf7tIps9bHQt6U//9qXRAN/i
+         or/JzF5h63OFvUyroLeWHBSCku8dYcJ+y6QLkUn0jbsP4fRtSq6eTiE5i9vjkueQPGvw
+         tyRE8hFPCRE1KHLBaa6JcvZdurfhx9J58k9FVbfPWyTvfP9encmvEqooRLUQF4Vg04yI
+         IqhA==
+X-Forwarded-Encrypted: i=1; AJvYcCVfsMDpm1Dvu/+HLczVrFeU6V4d47iBH9QsXA6KEWKPWUvHmSGlGsi5lY7DZB/hp/hIDlw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzrmcl0g+73DAuSzFFZ3BQfJe5hUjBtpVskTL6qPVSSJbHEvSGe
+	TXCfA5L+04cODoTkFsuiu5XTZqr6fzvUoiRilOW+X0aY3XnQzESdKfdV7GGgrXrbSdC2qnS8t3I
+	b8jSPdMpqa+otelGifWaxanVoHW8w07juESOWhZJ2oOKDLcBF9g==
+X-Gm-Gg: ASbGncvDAUwBayP0eXvRO3F4UtOcUdemHvRlEUAULHM3y5XhGI8fq2ycg5Hv8Il52uQ
+	L1X71rVs+Do8s9lQ7yncZ/4Bl3hSAcSDZxvdVnlnuQGXEX6n+lb3Pta+sgAZbDrCFEKscAO9RHU
+	j0t/LbMxl7YZDTfShK5BZ8Tv/qx6EPbt8Sh7cds5+jBSA5DRxF23NhITplEC9Rn7tNcRIGi1UH0
+	szbYZ/vTQlykHCXArCjh/ZeYn24htU2rovaIEBY6Tre7TE7Cg7jLK2K2nFBJ6KIUIkyrn9ba/ee
+	fGzMyXBM+dHmE00/PxSEJUa1Qq1Oux920NQcgZVsrcZq07Xt
+X-Received: by 2002:a05:620a:4304:b0:7b6:6bff:d13f with SMTP id af79cd13be357-7bffcd901abmr1890779485a.42.1738372764909;
+        Fri, 31 Jan 2025 17:19:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF1bH00mv1WK4WNu1gZToSc4hfDszMAYhLI2X7IUvKosEz+tCfK4Su+RxkyQl3oxUQfYV1vGw==
+X-Received: by 2002:a05:620a:4304:b0:7b6:6bff:d13f with SMTP id af79cd13be357-7bffcd901abmr1890776885a.42.1738372764552;
+        Fri, 31 Jan 2025 17:19:24 -0800 (PST)
+Received: from x1.local (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a9047c0sm248232585a.86.2025.01.31.17.19.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Jan 2025 17:19:23 -0800 (PST)
+Date: Fri, 31 Jan 2025 20:19:22 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+	linux-fsdevel@vger.kernel.org, jack@suse.cz, amir73il@gmail.com,
+	brauner@kernel.org, viro@zeniv.linux.org.uk,
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-mm@kvack.org, linux-ext4@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [REGRESSION] Re: [PATCH v8 15/19] mm: don't allow huge faults
+ for files with pre content watches
+Message-ID: <Z512mt1hmX5Jg7iH@x1.local>
+References: <cover.1731684329.git.josef@toxicpanda.com>
+ <9035b82cff08a3801cef3d06bbf2778b2e5a4dba.1731684329.git.josef@toxicpanda.com>
+ <20250131121703.1e4d00a7.alex.williamson@redhat.com>
+ <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250201011400.669483-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250201011400.669483-6-seanjc@google.com>
-Subject: [PATCH 5/5] KVM: x86/xen: Move kvm_xen_hvm_config field into kvm_xen
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com, 
-	Joao Martins <joao.m.martins@oracle.com>, David Woodhouse <dwmw@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
 
-Now that all KVM usage of the Xen HVM config information is buried behind
-CONFIG_KVM_XEN=y, move the per-VM kvm_xen_hvm_config field out of kvm_arch
-and into kvm_xen.
+On Fri, Jan 31, 2025 at 11:59:56AM -0800, Linus Torvalds wrote:
+> On Fri, 31 Jan 2025 at 11:17, Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+> >
+> > 20bf82a898b6 ("mm: don't allow huge faults for files with pre content watches")
+> >
+> > This breaks huge_fault support for PFNMAPs that was recently added in
+> > v6.12 and is used by vfio-pci to fault device memory using PMD and PUD
+> > order mappings.
+> 
+> Surely only for content watches?
+> 
+> Which shouldn't be a valid situation *anyway*.
+> 
+> IOW, there must be some unrelated bug somewhere: either somebody is
+> allowed to set a pre-content match on a special device.
+> 
+> That should be disabled by the whole
+> 
+>         /*
+>          * If there are permission event watchers but no pre-content event
+>          * watchers, set FMODE_NONOTIFY | FMODE_NONOTIFY_PERM to indicate that.
+>          */
+> 
+> thing in file_set_fsnotify_mode() which only allows regular files and
+> directories to be notified on.
+> 
+> Or, alternatively, that check for huge-fault disabling is just
+> checking the wrong bits.
+> 
+> Or - quite possibly - I am missing something obvious?
 
-No functional change intended.
+Is it possible that we have some paths got overlooked in setting up the
+fsnotify bits in f_mode? Meanwhile since the default is "no bit set" on
+those bits, I think it means FMODE_FSNOTIFY_HSM() can always return true on
+those if overlooked..
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/kvm/x86.c              |  2 +-
- arch/x86/kvm/xen.c              | 20 ++++++++++----------
- arch/x86/kvm/xen.h              |  6 +++---
- 4 files changed, 16 insertions(+), 15 deletions(-)
+One thing to mention is, /dev/vfio/* are chardevs, however the PCI bars are
+not mmap()ed from these fds - whatever under /dev/vfio/* represents IOMMU
+groups rather than the device fd itself.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7f9e00004db2..e9ebd6d6492c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1180,6 +1180,8 @@ struct kvm_xen {
- 	struct gfn_to_pfn_cache shinfo_cache;
- 	struct idr evtchn_ports;
- 	unsigned long poll_mask[BITS_TO_LONGS(KVM_MAX_VCPUS)];
-+
-+	struct kvm_xen_hvm_config hvm_config;
- };
- #endif
- 
-@@ -1411,7 +1413,6 @@ struct kvm_arch {
- 
- #ifdef CONFIG_KVM_XEN
- 	struct kvm_xen xen;
--	struct kvm_xen_hvm_config xen_hvm_config;
- #endif
- 
- 	bool backwards_tsc_observed;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f13d9d3f7c60..b03c67d53e5f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3188,7 +3188,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 	 * problems if they observe PVCLOCK_TSC_STABLE_BIT in the pvclock flags.
- 	 */
- 	bool xen_pvclock_tsc_unstable =
--		ka->xen_hvm_config.flags & KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE;
-+		ka->xen.hvm_config.flags & KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE;
- #endif
- 
- 	kernel_ns = 0;
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 35ecafc410f0..142018b9cdd2 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -1280,10 +1280,10 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
- 		 * Note, truncation is a non-issue as 'lm' is guaranteed to be
- 		 * false for a 32-bit kernel, i.e. when hva_t is only 4 bytes.
- 		 */
--		hva_t blob_addr = lm ? kvm->arch.xen_hvm_config.blob_addr_64
--				     : kvm->arch.xen_hvm_config.blob_addr_32;
--		u8 blob_size = lm ? kvm->arch.xen_hvm_config.blob_size_64
--				  : kvm->arch.xen_hvm_config.blob_size_32;
-+		hva_t blob_addr = lm ? kvm->arch.xen.hvm_config.blob_addr_64
-+				     : kvm->arch.xen.hvm_config.blob_addr_32;
-+		u8 blob_size = lm ? kvm->arch.xen.hvm_config.blob_size_64
-+				  : kvm->arch.xen.hvm_config.blob_size_32;
- 		u8 *page;
- 		int ret;
- 
-@@ -1334,13 +1334,13 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
- 
- 	mutex_lock(&kvm->arch.xen.xen_lock);
- 
--	if (xhc->msr && !kvm->arch.xen_hvm_config.msr)
-+	if (xhc->msr && !kvm->arch.xen.hvm_config.msr)
- 		static_branch_inc(&kvm_xen_enabled.key);
--	else if (!xhc->msr && kvm->arch.xen_hvm_config.msr)
-+	else if (!xhc->msr && kvm->arch.xen.hvm_config.msr)
- 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
- 
--	old_flags = kvm->arch.xen_hvm_config.flags;
--	memcpy(&kvm->arch.xen_hvm_config, xhc, sizeof(*xhc));
-+	old_flags = kvm->arch.xen.hvm_config.flags;
-+	memcpy(&kvm->arch.xen.hvm_config, xhc, sizeof(*xhc));
- 
- 	mutex_unlock(&kvm->arch.xen.xen_lock);
- 
-@@ -1421,7 +1421,7 @@ static bool kvm_xen_schedop_poll(struct kvm_vcpu *vcpu, bool longmode,
- 	int i;
- 
- 	if (!lapic_in_kernel(vcpu) ||
--	    !(vcpu->kvm->arch.xen_hvm_config.flags & KVM_XEN_HVM_CONFIG_EVTCHN_SEND))
-+	    !(vcpu->kvm->arch.xen.hvm_config.flags & KVM_XEN_HVM_CONFIG_EVTCHN_SEND))
- 		return false;
- 
- 	if (IS_ENABLED(CONFIG_64BIT) && !longmode) {
-@@ -2299,6 +2299,6 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
- 	}
- 	idr_destroy(&kvm->arch.xen.evtchn_ports);
- 
--	if (kvm->arch.xen_hvm_config.msr)
-+	if (kvm->arch.xen.hvm_config.msr)
- 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
- }
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 1e3a913dfb94..d191103d8163 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -53,7 +53,7 @@ static inline void kvm_xen_sw_enable_lapic(struct kvm_vcpu *vcpu)
- static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
- {
- 	return static_branch_unlikely(&kvm_xen_enabled.key) &&
--		kvm->arch.xen_hvm_config.msr;
-+		kvm->arch.xen.hvm_config.msr;
- }
- 
- static inline bool kvm_xen_is_hypercall_page_msr(struct kvm *kvm, u32 msr)
-@@ -61,13 +61,13 @@ static inline bool kvm_xen_is_hypercall_page_msr(struct kvm *kvm, u32 msr)
- 	if (!static_branch_unlikely(&kvm_xen_enabled.key))
- 		return false;
- 
--	return msr && msr == kvm->arch.xen_hvm_config.msr;
-+	return msr && msr == kvm->arch.xen.hvm_config.msr;
- }
- 
- static inline bool kvm_xen_hypercall_enabled(struct kvm *kvm)
- {
- 	return static_branch_unlikely(&kvm_xen_enabled.key) &&
--		(kvm->arch.xen_hvm_config.flags &
-+		(kvm->arch.xen.hvm_config.flags &
- 		 KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL);
- }
- 
+The app normally needs to first open the IOMMU group fd under /dev/vfio/*,
+then using VFIO ioctl(VFIO_GROUP_GET_DEVICE_FD) to get the device fd, which
+will be the mmap() target, instead of the ones under /dev.
+
+I checked, those device fds were allocated from vfio_device_open_file()
+within the ioctl, which internally uses anon_inode_getfile().  I don't see
+anywhere in that path that will set the fanotify bits..
+
+Further, I'm not sure whether some callers of alloc_file() can also suffer
+from similar issue, because at least memfd_create() syscall also uses the
+API, which (hopefully?) would used to allow THPs for shmem backed memfds on
+aligned mmap()s, but not sure whether it'll also wrongly trigger the
+FALLBACK path similarly in create_huge_pmd() just like vfio's VMAs.  I
+didn't verify it though, nor did I yet check more users.
+
+So I wonder whether we should setup the fanotify bits in at least
+alloc_file() too (to FMODE_NONOTIFY?).
+
+I'm totally not familiar with fanotify, and it's a bit late to try verify
+anything (I cannot quickly find my previous huge pfnmap setup, so setup
+those will also take time..). but maybe above can provide some clues for
+others..
+
+Thanks,
+
 -- 
-2.48.1.362.g079036d154-goog
+Peter Xu
 
 
