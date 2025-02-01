@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-37037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37038-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1BB3A2465D
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:56:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74D22A2465F
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:56:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 953BE188808D
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:56:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7104C7A04D6
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD5413C908;
-	Sat,  1 Feb 2025 01:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D0B145A09;
+	Sat,  1 Feb 2025 01:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uhG4C+Js"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="togLWU4P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA917DA9C
-	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E9D179A7
+	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738374927; cv=none; b=iqezfAlHUPftqB8U8XOGj26zLlvYTxJtwKVno5RM1Ru2zIxnh+r6szuA21k1SVYrtogSz0f9pPDtuZaI/L2hHzI+6RqXCsAQwPSCcRAX55wrFD54rICVUKz57dUhnbiM7Bn74s7jFQSqb2VNWLES92bAoADMreU55EMKy3ax8k0=
+	t=1738374929; cv=none; b=JiOx1dYHgPCoHM6bk6ofzCH4XzTEsgUO2ml/3TyXOcIkjzk1LCc2+fSHwVVuLhD4p0YSuYj7fEGHGQzv+dvlyWxJPh0JLgKSewszQbkOAv/6xjQ4R5mbkj7KpJaKx0AXvq/DFjBOtBk5A6Qc29mM77YQxeqqKtvXh6nMY6k9Z+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738374927; c=relaxed/simple;
-	bh=WTPZCV619SX538Cn6Abym6cnK99EEExx7aoodOVpBsw=;
+	s=arc-20240116; t=1738374929; c=relaxed/simple;
+	bh=2L/cnO9EtXQAJOsgX3k8m5pz/6fkrIp1s4+pPXI7COU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CwepP6HYejkLLuN/kVZd+xttxqsoB5QmdSlXXLRO5PYzXYGSqaeBweGrl8nLlizh0MQWUul7aaVHciOXRmHfDSYJUgLTD7+GaYph5NuTBZqke/C961jOKZr77/x6V1H0HnlCwJL/JfYAWAupiw0bQV0yKjlViezsJELA0bvG1KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uhG4C+Js; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=EVImZGvpKWrSfSGHP8fdHUk7ueo63Ab2pU5jXqDD8DdirJUEikm5achWgE4YFYrtZ8uLTbNLe6skUdvLipzhbimvflRI1jFEcLuylLloWgdNGBOQjOGhbgIB+70NJBKuK4nox99e2ftLxIkE3Kam+DvCQ/2RiOnhhtSIUscKduI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=togLWU4P; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2efa74481fdso5175664a91.1
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:55:25 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2166464e236so77952115ad.1
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:55:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738374925; x=1738979725; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738374927; x=1738979727; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=m3XOaiGIiENgl8NnCw2lngMp/lfgzjhOH8n22r5XeXs=;
-        b=uhG4C+Jsyf7SQb5nbd/RoqDQo9efDc6yDtsZKyKZm+kR6nzG52nYL9hE1aOETaplfi
-         GbDmZsmF2/JDGIL23IU9gjFwYdXMzTvcTVrouABvrG68Xp94rzXwHMP4u+FOy4ZUk97U
-         z9Ypl9yVt5P2+3MiYy3W58DSP4XqnUqr2GuYMIMztqdDZdXfC2cNhAw2a6tflvkqcwAU
-         Z0trLM7UxfFRecZvatlz4DekyTxFcZ436V4rA1I2jxKMjZSEmO2ZzdZeZ3DwghqkTkJM
-         61PbFxtCDitM9eyFQxqVvjleKzQWwRNiUWQjJe3fwAGp6jOGrlAL4VGHmruWkf00Oow5
-         /7cA==
+        bh=POYPQ5yMJ4zL9xLSOyVPlGOIMkdLL5mZFIi+OVlxA4k=;
+        b=togLWU4PwCPHAA9d27IUou1fAo1AgBKoNtYLoN/TjCSmNc6m22heoekzY5LXtskzne
+         AXw4GyyRamuPrHc6RzvRUoMFPvuPyS2/6STU6OSATnCrHPB4E8NLwI2aW38HJJw92XpH
+         HLiikN9eT0HpvsNxpqPzBGHFJtieNu2BCHxGtXcuvLI22vYb8Wa2GNvIt4Un6/PDkjDp
+         lS5fwE4Rsgoz15nHmBpyFTsjNRGBpmlBTZDse1cUrrlC7t8HC1Q5UstHJdYIMaydLWAJ
+         UdTH6CAcH15H2F28aCj0L03uGZ5m95iJe6FzHlY6MOG1qLGvMy1lzImRB3rod/HIdmna
+         KDvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738374925; x=1738979725;
+        d=1e100.net; s=20230601; t=1738374927; x=1738979727;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=m3XOaiGIiENgl8NnCw2lngMp/lfgzjhOH8n22r5XeXs=;
-        b=RMdUFA8kU82LWrKOfzy7dyCf3oiWV0WwFBDoMyhnhQjVMWCrZtIrtmo7DJUvbdmikf
-         AcXLnD0AIuZs4AuFWO056U1w7OgchGKLegGPP+FD0PdjeSIJF+LpITRLEKhSAd688Eaz
-         YfY6v2KGOimiMLF45tkEUWqYXMfKnwRQ5e4UohK9MuNujzcL5XqrunqhqcuhIN8LJvd6
-         LdvgfVRgTno0XUt/OpUtN6zqHTc/L0iVvTFQi69GkxZZqwXET7fxAthHE+2fPVP9PO4y
-         CYuHfHOdZ/tyjhce3O4HWXvQoy3xDcNdOwRLWN7a5cxA0Y5jZiZ1LcJsQw9GrUB6M+RY
-         I+Ew==
-X-Gm-Message-State: AOJu0YwDO+eO2FY09CbderNYDQ1MyGIeF5gl5USoCGKf7plM5CU/Q8/J
-	schdwi5SbDxHz38vs8xbesDAP3Wy676bDXvQHib2cFHOuIevd8CTvdkgdrdJTRKP4NRShAY6FMz
-	4AA==
-X-Google-Smtp-Source: AGHT+IFuItppbgWp7/fYWByB+OH6h9nXO6RPKexQwfXO/X+6riuHAEF3pgKvJptYfZThPrJiMZ3r6hXCHQI=
-X-Received: from pjb14.prod.google.com ([2002:a17:90b:2f0e:b0:2e5:5ffc:1c36])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d610:b0:2ee:4513:f1d1
- with SMTP id 98e67ed59e1d1-2f83ac5e5bcmr16213901a91.23.1738374925164; Fri, 31
- Jan 2025 17:55:25 -0800 (PST)
+        bh=POYPQ5yMJ4zL9xLSOyVPlGOIMkdLL5mZFIi+OVlxA4k=;
+        b=mlVPaQhXiI2WFZNVeOBYExvhbOoo3HonwRcJpk6EyhQbW/XNcoVfz2bFjA0TE81iMO
+         ZLSLCyG7W1GGhrRbtJHIAgRo1Pe7LlYOEICEZl2WltwTBDic4lt7aRv1Q2Jpbx5ddofx
+         v5VlewRKaSlm4lNpSTEYBe2vyPrxxeII+uP4l3uj1j4K58n6A9Xc8oH0jXzB0rKzjNvm
+         8jN3s1IwiA1Ur6tj1FBRrSGH6lgjeDBQTGzVYhm6Ya3egfnP8m4+EkwGoxKV8LdHl2k/
+         URDU5gD00+CrDt1311Yh7nT9rM4wRix/MW5WVxvhmpZMqlOL++k15oX7tUQ6DR5VxisX
+         4I2g==
+X-Gm-Message-State: AOJu0Yw9LcY0eYjSo50Px4paWx5jvmj3bQjfZcDOlYj8lpt22FYsAdMJ
+	cQbOEQP4hD2xY8NEPlrN2twKvfsfxkthpS7DlpK9uAP7mZGBNnHJ4H+n516JCo6nlUlSIJbZXx5
+	75g==
+X-Google-Smtp-Source: AGHT+IFucuJj48dbyTnCbLgl25vShezhlevEBnCH9ynRc5KSrkn3lU4zojxv7hZQDWHfYCSBvzxzdIeNmFE=
+X-Received: from pjtu8.prod.google.com ([2002:a17:90a:c888:b0:2f7:f660:cfe7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:7c8c:b0:216:7ee9:21ff
+ with SMTP id d9443c01a7336-21dd7df06f5mr157673425ad.49.1738374926702; Fri, 31
+ Jan 2025 17:55:26 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 31 Jan 2025 17:55:10 -0800
+Date: Fri, 31 Jan 2025 17:55:11 -0800
 In-Reply-To: <20250201015518.689704-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,57 +75,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250201015518.689704-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250201015518.689704-4-seanjc@google.com>
-Subject: [PATCH v2 03/11] KVM: nVMX: Allow emulating RDPID on behalf of L2
+Message-ID: <20250201015518.689704-5-seanjc@google.com>
+Subject: [PATCH v2 04/11] KVM: nVMX: Emulate HLT in L2 if it's not intercepted
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Return X86EMUL_CONTINUE instead X86EMUL_UNHANDLEABLE when emulating RDPID
-on behalf of L2 and L1 _does_ expose RDPID/RDTSCP to L2.  When RDPID
-emulation was added by commit fb6d4d340e05 ("KVM: x86: emulate RDPID"),
-KVM incorrectly allowed emulation by default.  Commit 07721feee46b ("KVM:
-nVMX: Don't emulate instructions in guest mode") fixed that flaw, but
-missed that RDPID emulation was relying on the common return path to allow
-emulation on behalf of L2.
+Extend VMX's nested intercept logic for emulated instructions to handle
+HLT interception, primarily for testing purposes.  Failure to allow
+emulation of HLT isn't all that interesting, as emulating HLT while L2 is
+active either requires forced emulation (and no #UD intercept in L1), TLB
+games in the guest to coerce KVM into emulating the wrong instruction, or
+a bug elsewhere in KVM.
 
-Fixes: 07721feee46b ("KVM: nVMX: Don't emulate instructions in guest mode")
+E.g. without commit 47ef3ef843c0 ("KVM: VMX: Handle event vectoring
+error in check_emulate_instruction()"), KVM can end up trying to emulate
+HLT if RIP happens to point at a HLT when a vectored event arrives with
+L2's IDT pointing at emulated MMIO.
+
+Note, vmx_check_intercept() is still broken when L1 wants to intercept an
+instruction, as KVM injects a #UD instead of synthesizing a nested VM-Exit.
+That issue extends far beyond HLT, punt on it for now.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3654c08cfa31..9773287acade 100644
+index 9773287acade..fb4e9290e6c4 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8049,18 +8049,19 @@ int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+@@ -8083,6 +8083,11 @@ int vmx_check_intercept(struct kvm_vcpu *vcpu,
+ 		/* FIXME: produce nested vmexit and return X86EMUL_INTERCEPTED.  */
+ 		break;
  
- 	switch (info->intercept) {
--	/*
--	 * RDPID causes #UD if disabled through secondary execution controls.
--	 * Because it is marked as EmulateOnUD, we need to intercept it here.
--	 * Note, RDPID is hidden behind ENABLE_RDTSCP.
--	 */
- 	case x86_intercept_rdpid:
-+		/*
-+		 * RDPID causes #UD if not enabled through secondary execution
-+		 * controls (ENABLE_RDTSCP).  Note, the implicit MSR access to
-+		 * TSC_AUX is NOT subject to interception, i.e. checking only
-+		 * the dedicated execution control is architecturally correct.
-+		 */
- 		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENABLE_RDTSCP)) {
- 			exception->vector = UD_VECTOR;
- 			exception->error_code_valid = false;
- 			return X86EMUL_PROPAGATE_FAULT;
- 		}
--		break;
-+		return X86EMUL_CONTINUE;
- 
- 	case x86_intercept_in:
- 	case x86_intercept_ins:
++	case x86_intercept_hlt:
++		if (!nested_cpu_has(vmcs12, CPU_BASED_HLT_EXITING))
++			return X86EMUL_CONTINUE;
++		break;
++
+ 	case x86_intercept_pause:
+ 		/*
+ 		 * PAUSE is a single-byte NOP with a REPE prefix, i.e. collides
 -- 
 2.48.1.362.g079036d154-goog
 
