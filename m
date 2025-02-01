@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-37042-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37043-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9D2A24668
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:57:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D62A24669
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:57:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78FB93A3CC4
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:57:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55AEB165A46
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03EF115D5B8;
-	Sat,  1 Feb 2025 01:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993E8180A80;
+	Sat,  1 Feb 2025 01:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0dgpIlbX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GkxcYgxu"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B723A1534FB
-	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383B514AD29
+	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738374935; cv=none; b=I2u/aVHMybSOMQsdiHMlfCbG5mrYrRxAvjtLA86d+ugyl4m8g9ggRjINC0hk/fD6ZEbsOyokfQybRXR/dxh6Bdu1KXd26ev3ffNHuCa3j2X5m2ylb8sEylBl+hp6UA54M0r4GmktOo07iSLlTh48P60stkdJjbM1TJXmF7PtRTY=
+	t=1738374936; cv=none; b=NtX7v3n2Y4MD/NpLFofTA0YpLpZW5k2lmC+s/EXiFV4mXkUfW1PxavHdOrFd7lsSPZyyspEGsQlav1lGYq/ie8awYskCdlbcI7pxYDRrcCRO5AV2YeGgxB1nLYZXgmUwBqEiPh5uMcq3VXRHaDDcnNs5bzsHVWKkyo6RUkSzRB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738374935; c=relaxed/simple;
-	bh=U3aXYtXvj8rJ6en4q57EqfG8FlNrWEsTovi78JWBpUA=;
+	s=arc-20240116; t=1738374936; c=relaxed/simple;
+	bh=9iTUooTz+GzVh7vu6TOu+J68+KiYzSjVIC9jQQLaLOA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=b9Djie6nsPRwl0Mw7few7foUN9BWigKO4QrCWSanttzB8l0gMLalLUtNI1B/IcVDFR2/YkQy5bOh9tmYvwVr3qDZEmZ9RFpg7gBcyD4fR148i/C8V298RxZyBnqxCXXoar78BHkoptKoluJCrlUS8HsFwgkQ3cQGHEh3PJKbYwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0dgpIlbX; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=NEcww78hJIU3MRW12KLyRq3/qUSsnm+/m3UhS12CPVO2+S6JqTOid0wruQmjPbvMXrv81+16NLprunT+FvkcxlreU36DZrgHTR5km41qDxht6q3ZjXHen7lloy9rEw/pel8/E4CUIgBAdg8Rina+HgV/zawz0sGoK1UzvIC1Yy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GkxcYgxu; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9e38b0cfso4988292a91.0
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:55:33 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef8c7ef51dso5129109a91.1
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:55:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738374933; x=1738979733; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738374935; x=1738979735; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=v6o3I4DBxjxkxXVmgva/ae+3lJMpdQxl+ZvTS60XPAM=;
-        b=0dgpIlbXH/nk/f+ntCR66WCWi/dJgWHyos7+TcjRTir2R2E0YiHc8DlenTQu+1AoCr
-         uq2NOpg9P/wetKjvuO1pguoWkFXeI6G5J1GUQiEt9rDvYnfvjdMBRw0Rw0/L1tmdKXHO
-         0S3+ftzo+1Fa7H9x/zVBzzwnnXWrcKZQ34Tn2R2jWA29wj7Muu6wmphUfzV+J18S5fss
-         2Vfz13DMInf5peD8VGGJ2Z7H9C27qstEpz03YyCSX0qkbyOd6MOcq5naf5C7xhghRYaO
-         JoeHGYtVV0JanVuyD2xrFXqgsffnonm+sptkugnB0580g+q/MGblVzdJ3Mgx97JwcLU4
-         MLqw==
+        bh=3XvAvsURv6o+VBrJhyeGBkEYBU2JVuvbJ6IwloO/TZA=;
+        b=GkxcYgxu0vHUVBHp9OhoP7jzzjcnUoodKe9oW04kojqnxnyVLvpMRB0CzTr6V70GN5
+         G+K/mKCruldubRQGcOZzIBNkpB8CBULmyHPJ6yMKUvFdR4uvf2ceZjBVL50WGQZL3d97
+         9w7VQcNJLnOa1RippEhRgNAJoDmKJ1ThW7AhzDcDVkGipMrbNUWzWBRg+B/vqCPlmMNb
+         Dt3axv0NOgefFiZ+fp9H+nFMg/y9/Sz0eURfmCwgyK3gpHF1N8VQHvmFSwxrRfYtvuTm
+         8zt4obe9/8TrUaGjrAb71tlb3xKz5vzVFtGrpjoUpPrySEHvt7dCObV8jwQUZhqHhosf
+         WB1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738374933; x=1738979733;
+        d=1e100.net; s=20230601; t=1738374935; x=1738979735;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=v6o3I4DBxjxkxXVmgva/ae+3lJMpdQxl+ZvTS60XPAM=;
-        b=WSNSKjC5fEG/ruEhf2ZZADxyKUMTV+L7CgSdIzxds10Eg+OD5XcKLFTMRfqGw128k+
-         WAheUjWagD9oFfoAnfPEYw7+QlF74TchHAMVgnYvaoRZRiwbgFzU5Xs83giezmBg6H6D
-         +hzWPAXNIO0CUfMgcVMg0kaViAkYTC5/6eCwxYMyMG4kbtOQofyrcyRgrst/6JewMGIU
-         IMy+08/TMbaNUABY9y+2wgrkaQULM8NGPUIaOvZsydj7qFah/jwDKEdoRDjG1G4U6MCd
-         X1IHmsuQp/dU02uHMx+y6yUurJCsksPFs2ms/+j/zzPqVMNlvuiBOBCU2LTadmbFVTjB
-         w3Rg==
-X-Gm-Message-State: AOJu0YySQlQSVt8X81dvceMC7y9o3pKlf9sXmrV+I/3Xf22/4/SOFdiT
-	iVhgN+hU4XgK51jnDSgQanGeoduhK+i9OVLx3AfV4030mofG2x5MGignGPYnx2colj6uqGyhXJ1
-	IxQ==
-X-Google-Smtp-Source: AGHT+IEJyl6b/CyC+v0x5BmLUOl5YD0/ntJw9qfYUQQK6gKPQKvDqtvewlO1PBrsM/VzRTPHCwo9rVN/4f8=
-X-Received: from pjbpx11.prod.google.com ([2002:a17:90b:270b:b0:2e9:5043:f55b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:3de4:b0:2f8:4589:a305
- with SMTP id 98e67ed59e1d1-2f84589a325mr13600663a91.1.1738374932981; Fri, 31
- Jan 2025 17:55:32 -0800 (PST)
+        bh=3XvAvsURv6o+VBrJhyeGBkEYBU2JVuvbJ6IwloO/TZA=;
+        b=fwM1GxGnv0S4f5OnmPARFUyg6Fl1BaHENnlp4PiGq7Fm8pjKglILWjAeq7U7/97tUg
+         gljXbYbyBJOiH5uU6iNZNTzdQmpk6hWQJ/Tjnf4QUHcvPmkXvJf2SzdpBY1Geku6Q/ss
+         d8opf7DgmbwlWrTxLmWkyBpgKUpbXi/7vvKCe3F6u1IgrNs8EzVBE7X9HG0t5uHJvaxC
+         mFvspL+vnqgkmYAL/jxkmxJp/8JXMiktoBtMwg1AHtzV9jr//dTt+NdAxkuesAFRq9o6
+         l60qIEHeStebkQmKtVpGZCqDd+lXMSadruxIaK68DIgsWNuz6J0UNGKHqjff2Ycq6k/R
+         Em5Q==
+X-Gm-Message-State: AOJu0Yw2ULX7NkG4EjIRlbGrVVW8Z5c9G5Vj8l/5TatpafEdmbJoFCF+
+	m2U7sqLNfvrt9xIXcUR5cl/TviCUPc8ofmpaTK1EJTj5aCReYFBhNGQVjx4gJb8XrhRnOZbmYGc
+	54A==
+X-Google-Smtp-Source: AGHT+IGOzvDdQI0HEUYlP00LQniZPDx482XdAtwcGW/8CaLpA5IH2YAm75ndxRKBH6ny5DWYhQDp8G6wGwM=
+X-Received: from pjbeu13.prod.google.com ([2002:a17:90a:f94d:b0:2ef:85ba:108f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:568f:b0:2ea:8aac:6ac1
+ with SMTP id 98e67ed59e1d1-2f8464056b9mr14855857a91.15.1738374934730; Fri, 31
+ Jan 2025 17:55:34 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 31 Jan 2025 17:55:15 -0800
+Date: Fri, 31 Jan 2025 17:55:16 -0800
 In-Reply-To: <20250201015518.689704-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,87 +75,107 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250201015518.689704-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250201015518.689704-9-seanjc@google.com>
-Subject: [PATCH v2 08/11] KVM: x86: Add a #define for the architectural max
- instruction length
+Message-ID: <20250201015518.689704-10-seanjc@google.com>
+Subject: [PATCH v2 09/11] KVM: nVMX: Allow the caller to provide instruction
+ length on nested VM-Exit
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add a #define to capture x86's architecturally defined max instruction
-length instead of open coding the literal in a variety of places.
+Rework the nested VM-Exit helper to take the instruction length as a
+parameter, and convert nested_vmx_vmexit() into a "default" wrapper that
+grabs the length from vmcs02 as appropriate.  This will allow KVM to set
+the correct instruction length when synthesizing a nested VM-Exit when
+emulating an instruction that L1 wants to intercept.
 
-No functional change intended.
+No functional change intended, as the path to prepare_vmcs12()'s reading
+of vmcs02.VM_EXIT_INSTRUCTION_LEN is gated on the same set of conditions
+as the VMREAD in the new nested_vmx_vmexit().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/kvm_emulate.h |  4 +++-
- arch/x86/kvm/trace.h       | 14 +++++++-------
- arch/x86/kvm/vmx/nested.c  |  2 +-
- 3 files changed, 11 insertions(+), 9 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 12 +++++++-----
+ arch/x86/kvm/vmx/nested.h | 22 ++++++++++++++++++++--
+ 2 files changed, 27 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 35029b12667f..c1df5acfacaf 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -275,8 +275,10 @@ struct operand {
- 	};
- };
- 
-+#define X86_MAX_INSTRUCTION_LENGTH	15
-+
- struct fetch_cache {
--	u8 data[15];
-+	u8 data[X86_MAX_INSTRUCTION_LENGTH];
- 	u8 *ptr;
- 	u8 *end;
- };
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 0b844cb97978..ccda95e53f62 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -830,12 +830,12 @@ TRACE_EVENT(kvm_emulate_insn,
- 	TP_ARGS(vcpu, failed),
- 
- 	TP_STRUCT__entry(
--		__field(    __u64, rip                       )
--		__field(    __u32, csbase                    )
--		__field(    __u8,  len                       )
--		__array(    __u8,  insn,    15	             )
--		__field(    __u8,  flags       	   	     )
--		__field(    __u8,  failed                    )
-+		__field(    __u64, rip                              )
-+		__field(    __u32, csbase                           )
-+		__field(    __u8,  len                              )
-+		__array(    __u8,  insn, X86_MAX_INSTRUCTION_LENGTH )
-+		__field(    __u8,  flags       	   	            )
-+		__field(    __u8,  failed                           )
- 		),
- 
- 	TP_fast_assign(
-@@ -846,7 +846,7 @@ TRACE_EVENT(kvm_emulate_insn,
- 		__entry->rip = vcpu->arch.emulate_ctxt->_eip - __entry->len;
- 		memcpy(__entry->insn,
- 		       vcpu->arch.emulate_ctxt->fetch.data,
--		       15);
-+		       X86_MAX_INSTRUCTION_LENGTH);
- 		__entry->flags = kei_decode_mode(vcpu->arch.emulate_ctxt->mode);
- 		__entry->failed = failed;
- 		),
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 8a7af02d466e..fb4fd96ce0f8 100644
+index fb4fd96ce0f8..791e00d467df 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -2970,7 +2970,7 @@ static int nested_check_vm_entry_controls(struct kvm_vcpu *vcpu,
- 		case INTR_TYPE_SOFT_EXCEPTION:
- 		case INTR_TYPE_SOFT_INTR:
- 		case INTR_TYPE_PRIV_SW_EXCEPTION:
--			if (CC(vmcs12->vm_entry_instruction_len > 15) ||
-+			if (CC(vmcs12->vm_entry_instruction_len > X86_MAX_INSTRUCTION_LENGTH) ||
- 			    CC(vmcs12->vm_entry_instruction_len == 0 &&
- 			    CC(!nested_cpu_has_zero_length_injection(vcpu))))
- 				return -EINVAL;
+@@ -4618,7 +4618,7 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+  */
+ static void prepare_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 			   u32 vm_exit_reason, u32 exit_intr_info,
+-			   unsigned long exit_qualification)
++			   unsigned long exit_qualification, u32 exit_insn_len)
+ {
+ 	/* update exit information fields: */
+ 	vmcs12->vm_exit_reason = vm_exit_reason;
+@@ -4646,7 +4646,7 @@ static void prepare_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 					  vm_exit_reason, exit_intr_info);
+ 
+ 		vmcs12->vm_exit_intr_info = exit_intr_info;
+-		vmcs12->vm_exit_instruction_len = vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
++		vmcs12->vm_exit_instruction_len = exit_insn_len;
+ 		vmcs12->vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
+ 
+ 		/*
+@@ -4930,8 +4930,9 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
+  * and modify vmcs12 to make it see what it would expect to see there if
+  * L2 was its real guest. Must only be called when in L2 (is_guest_mode())
+  */
+-void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+-		       u32 exit_intr_info, unsigned long exit_qualification)
++void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
++			 u32 exit_intr_info, unsigned long exit_qualification,
++			 u32 exit_insn_len)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+@@ -4981,7 +4982,8 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 
+ 		if (vm_exit_reason != -1)
+ 			prepare_vmcs12(vcpu, vmcs12, vm_exit_reason,
+-				       exit_intr_info, exit_qualification);
++				       exit_intr_info, exit_qualification,
++				       exit_insn_len);
+ 
+ 		/*
+ 		 * Must happen outside of sync_vmcs02_to_vmcs12() as it will
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index 2c296b6abb8c..6eedcfc91070 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -26,8 +26,26 @@ void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu);
+ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+ 						     bool from_vmentry);
+ bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu);
+-void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+-		       u32 exit_intr_info, unsigned long exit_qualification);
++void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
++			 u32 exit_intr_info, unsigned long exit_qualification,
++			 u32 exit_insn_len);
++
++static inline void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
++				     u32 exit_intr_info,
++				     unsigned long exit_qualification)
++{
++	u32 exit_insn_len;
++
++	if (to_vmx(vcpu)->fail || vm_exit_reason == -1 ||
++	    (vm_exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
++		exit_insn_len = 0;
++	else
++		exit_insn_len = vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
++
++	__nested_vmx_vmexit(vcpu, vm_exit_reason, exit_intr_info,
++			    exit_qualification, exit_insn_len);
++}
++
+ void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu);
+ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data);
+ int vmx_get_vmx_msr(struct nested_vmx_msrs *msrs, u32 msr_index, u64 *pdata);
 -- 
 2.48.1.362.g079036d154-goog
 
