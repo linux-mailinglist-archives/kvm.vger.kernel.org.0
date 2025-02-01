@@ -1,178 +1,139 @@
-Return-Path: <kvm+bounces-37021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37045A24623
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:19:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1FCCA2463D
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:38:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC15E1889E2F
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:19:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24ABC1884F1A
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4257A2A1AA;
-	Sat,  1 Feb 2025 01:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889C520B22;
+	Sat,  1 Feb 2025 01:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ACGAWYwY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vTyIB5W8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DD4BA45
-	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A1AA926
+	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738372770; cv=none; b=N+AkdjEHIjP48s1Je8CLksO2Ivk4o3g1TRQWtTkZf+2WF2hxv5SYv9qqkz0HlaPSTIlW0NWPe4SgMwWOhgaWvGGc682mecakH1lQC988lEd76fTVPEa4sdbMT7XpvRHZIOVz0CAiBSRRGjJ23xhyF/fdjfiFioos2P52NQnCUGs=
+	t=1738373912; cv=none; b=XAmz6qJfTEVaP/E0EWnXjPx3ntWeJFGn0VPX04Sck9+RQk8xo2MWtx4XaCZk6YDPZFDg/tPlRu1Wpma//6YQ/M03aBrRrOIhaZqG5ccEJnLca6nGcp+Mrru8FwqMIqvwu4eWOHXPtgSBzZmtVVvp1Y8pVzEqphvz36glFfR5q5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738372770; c=relaxed/simple;
-	bh=oWCwRVX3HiltEmJ0NJfrEKkEaikudV+HxZPQ1780JTo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QPYMLl78o1qXjP07Hh0FG5lBkW4wBNPmsqizOZBGdj0HBY8/mSQec4WD1GhpszizmU3TfaWS4rOA9nOhm8adNQwO7qEayX3kJ0lPqu02wM5rdHEcikjQApQ/SM4Q0NxUhTS9/2aksU2Z2t1xA+lq2hq+RXlxoV5ksJvXpMkbBkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ACGAWYwY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738372767;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iutb+f8svSiQJQKyELECXpPORtK9MA8lQS48vaY5V1E=;
-	b=ACGAWYwYztduSD9NEg2ZaFuTlD97wQ4Z5qX80gWn9AX+FmzUkFYzOAXK+CbGHZfyRGX+YP
-	BlCp+DT5+wdL5M4G1emdgFcsAby+PExFyfWlDteMA1AEaFQ/evUpEerKwpN3qEQESlJZm2
-	l8IC1wHltLeT5CD1yZmti0gytUKfiC0=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-558-5yS5bSVKM6GV3QqvkoRziw-1; Fri, 31 Jan 2025 20:19:25 -0500
-X-MC-Unique: 5yS5bSVKM6GV3QqvkoRziw-1
-X-Mimecast-MFC-AGG-ID: 5yS5bSVKM6GV3QqvkoRziw
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7be6ccb09f9so251337085a.2
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:19:25 -0800 (PST)
+	s=arc-20240116; t=1738373912; c=relaxed/simple;
+	bh=xAhoK4tQkXS+kc4yuFMJQ1yJAcRiGhwUeNLLmvDoml4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jo/54S6J+YiP2U/FPUFtqgElClEIbwNLyZ5CcIhPvbXHErywwPuWp9GnPieSRo+15gNU3ChcizbA/7g8kgWhu+PyEu1+Jxq4ZmUPozzjdvSgkMjx5Mrkk1856p9jpeU+7N2jVVd8gyLMX7sd/gk6dDsHT4piaPcKLjfjIS46Ug4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vTyIB5W8; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f780a3d6e5so5182069a91.0
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:38:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738373910; x=1738978710; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QEZ1tdrmXV8x7MsSfaimOR7vlefSdDmdJb6Z9fWIY90=;
+        b=vTyIB5W8MVneZodu9gsjaX4b+x4ZXVF+doiY8KAPiYoeRdkeOhi+ffFibJ979geNNt
+         SQhylVIwc7OEnSwNITdCn7d9C29JLaQtH/qcUC+vrthThWnmyFhKHLK/NepUP97smsPr
+         RrWVdmiGdKvbvilfmwl9A2BBN0l4jWcYrC8RYeN18XxFGqr/CZTNWX1CqQQZqx1ew+8C
+         NVOGhpiewTHUd9yTn5oDS804x78eIW9Rf0jXW77GDB7rXIIQzRaJBgarvlysn0LKOTfa
+         HOobwMJrP5xC5gr7ImbWl2j4RuJrKxq54jdQKpfBEkKp6cc1sn96XVcd0UcEsPVdGurF
+         PPXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738372765; x=1738977565;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iutb+f8svSiQJQKyELECXpPORtK9MA8lQS48vaY5V1E=;
-        b=ArxqL+ivFhsUrdFCAx0vJ/uz7QlGe7d0G5JRf4ulJ7cJ1i6aSZPc0cVx0P5B3ATPag
-         p9RHEAHvh3b4vdvUoXb7dN3MSwWbHtrkicJVghdY6VtsoigqFsEx8CEBBFIjXXnM1LhX
-         +X24KR+77kC9rS5uue4emFuMTVXFQo+rOPwenQfUTy5jGf7tIps9bHQt6U//9qXRAN/i
-         or/JzF5h63OFvUyroLeWHBSCku8dYcJ+y6QLkUn0jbsP4fRtSq6eTiE5i9vjkueQPGvw
-         tyRE8hFPCRE1KHLBaa6JcvZdurfhx9J58k9FVbfPWyTvfP9encmvEqooRLUQF4Vg04yI
-         IqhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVfsMDpm1Dvu/+HLczVrFeU6V4d47iBH9QsXA6KEWKPWUvHmSGlGsi5lY7DZB/hp/hIDlw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzrmcl0g+73DAuSzFFZ3BQfJe5hUjBtpVskTL6qPVSSJbHEvSGe
-	TXCfA5L+04cODoTkFsuiu5XTZqr6fzvUoiRilOW+X0aY3XnQzESdKfdV7GGgrXrbSdC2qnS8t3I
-	b8jSPdMpqa+otelGifWaxanVoHW8w07juESOWhZJ2oOKDLcBF9g==
-X-Gm-Gg: ASbGncvDAUwBayP0eXvRO3F4UtOcUdemHvRlEUAULHM3y5XhGI8fq2ycg5Hv8Il52uQ
-	L1X71rVs+Do8s9lQ7yncZ/4Bl3hSAcSDZxvdVnlnuQGXEX6n+lb3Pta+sgAZbDrCFEKscAO9RHU
-	j0t/LbMxl7YZDTfShK5BZ8Tv/qx6EPbt8Sh7cds5+jBSA5DRxF23NhITplEC9Rn7tNcRIGi1UH0
-	szbYZ/vTQlykHCXArCjh/ZeYn24htU2rovaIEBY6Tre7TE7Cg7jLK2K2nFBJ6KIUIkyrn9ba/ee
-	fGzMyXBM+dHmE00/PxSEJUa1Qq1Oux920NQcgZVsrcZq07Xt
-X-Received: by 2002:a05:620a:4304:b0:7b6:6bff:d13f with SMTP id af79cd13be357-7bffcd901abmr1890779485a.42.1738372764909;
-        Fri, 31 Jan 2025 17:19:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF1bH00mv1WK4WNu1gZToSc4hfDszMAYhLI2X7IUvKosEz+tCfK4Su+RxkyQl3oxUQfYV1vGw==
-X-Received: by 2002:a05:620a:4304:b0:7b6:6bff:d13f with SMTP id af79cd13be357-7bffcd901abmr1890776885a.42.1738372764552;
-        Fri, 31 Jan 2025 17:19:24 -0800 (PST)
-Received: from x1.local (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a9047c0sm248232585a.86.2025.01.31.17.19.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jan 2025 17:19:23 -0800 (PST)
-Date: Fri, 31 Jan 2025 20:19:22 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
-	linux-fsdevel@vger.kernel.org, jack@suse.cz, amir73il@gmail.com,
-	brauner@kernel.org, viro@zeniv.linux.org.uk,
-	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-mm@kvack.org, linux-ext4@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [REGRESSION] Re: [PATCH v8 15/19] mm: don't allow huge faults
- for files with pre content watches
-Message-ID: <Z512mt1hmX5Jg7iH@x1.local>
-References: <cover.1731684329.git.josef@toxicpanda.com>
- <9035b82cff08a3801cef3d06bbf2778b2e5a4dba.1731684329.git.josef@toxicpanda.com>
- <20250131121703.1e4d00a7.alex.williamson@redhat.com>
- <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1738373910; x=1738978710;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QEZ1tdrmXV8x7MsSfaimOR7vlefSdDmdJb6Z9fWIY90=;
+        b=KwqO4Rav46kLx/pc2MYDI+U5f1wqcc3joG90LoGGh+T/FwG7Gm/IEoh47hP48XCNmf
+         1B2lQxWM/+xgz5lyHLTaqctdpCfTZlIYau2Icjd0AQcJbSzh+X8NnatHEWAaX9B+q5zq
+         mWPxJAKD+CdW1MvZ+FmhqgIqCLEw+aAv+ySF9C8bWxXSY0es8UC8tngKQzIx6iq0oRvO
+         GqPrLV1I6vLv54zUbmDtlZZ8SARiYWAsQv9vnipRmDhqx0ZUU7d/Idh6anWXojl/dXPt
+         mdvA52M8XIglnPcXp6tezOeI0zO8igZrp21CG23YXZh9ItjGUFvBufcQR9bAHkXbSgZQ
+         QZuQ==
+X-Gm-Message-State: AOJu0Yx9o04UItPhx9ABcRaQWTjoAm3XdMQwBewd+KsYRMZLobZYmfZx
+	qdBjGt3jLVxNVwmlbs1rqO8bV+FPZrvqrhpQPWy9cIMNrHaWgAQldCAucKnuAmA6XpaOutjDj9v
+	qNw==
+X-Google-Smtp-Source: AGHT+IFGaWQO9te1i4XSWln8yI3HRjqFB98VkGJ1+ZqXBaLRcIOvSUrk4GjjoRMSiw9G3Xv2ugjHHG/tHl4=
+X-Received: from pjbsg1.prod.google.com ([2002:a17:90b:5201:b0:2ea:4a74:ac2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c887:b0:2ee:c2df:5d30
+ with SMTP id 98e67ed59e1d1-2f83ac5e574mr17088984a91.26.1738373910496; Fri, 31
+ Jan 2025 17:38:30 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 31 Jan 2025 17:38:16 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
+Message-ID: <20250201013827.680235-1-seanjc@google.com>
+Subject: [PATCH v2 00/11] KVM: x86: pvclock fixes and cleanups
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com, 
+	Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 31, 2025 at 11:59:56AM -0800, Linus Torvalds wrote:
-> On Fri, 31 Jan 2025 at 11:17, Alex Williamson
-> <alex.williamson@redhat.com> wrote:
-> >
-> > 20bf82a898b6 ("mm: don't allow huge faults for files with pre content watches")
-> >
-> > This breaks huge_fault support for PFNMAPs that was recently added in
-> > v6.12 and is used by vfio-pci to fault device memory using PMD and PUD
-> > order mappings.
-> 
-> Surely only for content watches?
-> 
-> Which shouldn't be a valid situation *anyway*.
-> 
-> IOW, there must be some unrelated bug somewhere: either somebody is
-> allowed to set a pre-content match on a special device.
-> 
-> That should be disabled by the whole
-> 
->         /*
->          * If there are permission event watchers but no pre-content event
->          * watchers, set FMODE_NONOTIFY | FMODE_NONOTIFY_PERM to indicate that.
->          */
-> 
-> thing in file_set_fsnotify_mode() which only allows regular files and
-> directories to be notified on.
-> 
-> Or, alternatively, that check for huge-fault disabling is just
-> checking the wrong bits.
-> 
-> Or - quite possibly - I am missing something obvious?
+Fix a lockdep splat in KVM's suspend notifier by simply removing a spurious
+kvm->lock acquisition related to kvmclock, and then try to wrangle KVM's
+pvclock handling into something approaching sanity (I made the mistake of
+looking at how KVM handled PVCLOCK_GUEST_STOPPED).
 
-Is it possible that we have some paths got overlooked in setting up the
-fsnotify bits in f_mode? Meanwhile since the default is "no bit set" on
-those bits, I think it means FMODE_FSNOTIFY_HSM() can always return true on
-those if overlooked..
+The Xen changes are slightly better tested this time around, though given
+how many bugs there were in v1, that isn't saying a whole lot.
 
-One thing to mention is, /dev/vfio/* are chardevs, however the PCI bars are
-not mmap()ed from these fds - whatever under /dev/vfio/* represents IOMMU
-groups rather than the device fd itself.
+Case in point, I had to shuffle the scariest patch (at first glance),
+"KVM: x86/xen: Use guest's copy of pvclock when starting timer", to land
+earlier in the series, because the existing usage of the cache pvclock's
+"version" field in kvm_xen_start_timer() relies on the pvclock update to
+persist _a_ version number to the cache.  Eww. :-(
 
-The app normally needs to first open the IOMMU group fd under /dev/vfio/*,
-then using VFIO ioctl(VFIO_GROUP_GET_DEVICE_FD) to get the device fd, which
-will be the mmap() target, instead of the ones under /dev.
+v2:
+ - Collect reviews. [Paul, Vitaly]
+ - Account for the compat offset in xen_get_guest_pvclock().
+ - Try both the compat and non-compat clocks in kvm_xen_start_timer().
+ - Fix a horrendous uninitialized variable bug. [Paul]
+ - Move the kvm_xen_start_timer() change earlier so that it wouldn't be
+   transiently broken due to "version" always being '0'.
+ - Shuffle patches so that the "set PVCLOCK_GUEST_STOPPED only for
+   kvmclock" is fully isolated from "Don't bleed PVCLOCK_GUEST_STOPPED". [Paul]
 
-I checked, those device fds were allocated from vfio_device_open_file()
-within the ioctl, which internally uses anon_inode_getfile().  I don't see
-anywhere in that path that will set the fanotify bits..
+v1: https://lore.kernel.org/all/20250118005552.2626804-1-seanjc@google.com
 
-Further, I'm not sure whether some callers of alloc_file() can also suffer
-from similar issue, because at least memfd_create() syscall also uses the
-API, which (hopefully?) would used to allow THPs for shmem backed memfds on
-aligned mmap()s, but not sure whether it'll also wrongly trigger the
-FALLBACK path similarly in create_huge_pmd() just like vfio's VMAs.  I
-didn't verify it though, nor did I yet check more users.
+Sean Christopherson (11):
+  KVM: x86: Don't take kvm->lock when iterating over vCPUs in suspend
+    notifier
+  KVM: x86: Eliminate "handling" of impossible errors during SUSPEND
+  KVM: x86: Drop local pvclock_flags variable in kvm_guest_time_update()
+  KVM: x86: Process "guest stopped request" once per guest time update
+  KVM: x86/xen: Use guest's copy of pvclock when starting timer
+  KVM: x86: Don't bleed PVCLOCK_GUEST_STOPPED across PV clocks
+  KVM: x86: Set PVCLOCK_GUEST_STOPPED only for kvmclock, not for Xen PV
+    clock
+  KVM: x86: Pass reference pvclock as a param to
+    kvm_setup_guest_pvclock()
+  KVM: x86: Remove per-vCPU "cache" of its reference pvclock
+  KVM: x86: Setup Hyper-V TSC page before Xen PV clocks (during clock
+    update)
+  KVM: x86: Override TSC_STABLE flag for Xen PV clocks in
+    kvm_guest_time_update()
 
-So I wonder whether we should setup the fanotify bits in at least
-alloc_file() too (to FMODE_NONOTIFY?).
+ arch/x86/include/asm/kvm_host.h |   3 +-
+ arch/x86/kvm/x86.c              | 115 ++++++++++++++++----------------
+ arch/x86/kvm/xen.c              |  69 +++++++++++++++++--
+ 3 files changed, 121 insertions(+), 66 deletions(-)
 
-I'm totally not familiar with fanotify, and it's a bit late to try verify
-anything (I cannot quickly find my previous huge pfnmap setup, so setup
-those will also take time..). but maybe above can provide some clues for
-others..
 
-Thanks,
-
+base-commit: eb723766b1030a23c38adf2348b7c3d1409d11f0
 -- 
-Peter Xu
+2.48.1.362.g079036d154-goog
 
 
