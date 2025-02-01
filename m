@@ -1,131 +1,119 @@
-Return-Path: <kvm+bounces-37034-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37035-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E6BA24658
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:55:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15EA8A2465A
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 02:55:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C98213A673E
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:55:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F301167A47
+	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 01:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FA4635953;
-	Sat,  1 Feb 2025 01:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F275336D;
+	Sat,  1 Feb 2025 01:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i1K2GDV3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iicOtG3b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8994AD21
-	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62CB224CC
+	for <kvm@vger.kernel.org>; Sat,  1 Feb 2025 01:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738374922; cv=none; b=Vz1jURLnREzdoSC1VwuF9FqP6Q4fdTZTK9b1lT6S3R9qlJ6AyLg+gy9R+qjdRV9CXm2f9+9UmCDbk7Yq7gYJxnoas6rWsVljC0HVPYS27VX3jYBii6SEwbe8Wcm6RI2PjewT/mTPpFm50ATzNo+3qp2WXY3AdDiqHmMzDruRlCU=
+	t=1738374924; cv=none; b=JW1RJyEeX3SxwEoyJE2rp7lYGzILQVedJnhaI5f8sqj75n6BsUBAJjDR4fv2JIYBktWvGxYwxyxSnfC65epM+LcsItPdcpqE/K+wVP89BQ1pzFTuT2I7HS6YjSwAtqRRpRDotugtvQYX7ToNvsJ982HSW84KoZLy/+/PmiMy9qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738374922; c=relaxed/simple;
-	bh=YIzF9/vgPVJyN2M73AHSdTChR/mPpNSYdk8TkASs6AU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Lqm8Bm14peZA/NTqG5MbCS/3RsUzSgU0QzONx1uM4YUq4dlYeq03OCAP8qY+KrNoGigPXCZNrdeY6vhGE84zfxZYHnyXB89LNYBwPWb3mHfEdywX0E7dsfNKt7WyHgmIGwmqpZLgI94PiL/65SO3Ub5qon0N8O+ckfmknbH8dlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i1K2GDV3; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1738374924; c=relaxed/simple;
+	bh=0UVEz7Yf4APmVdd/+AGLKukxGO1cn8yh9iUuPAteZH0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Y+AD2wr64OFur1xl2ohPPVbsg5MOEQMQRpiYYi4L/qTaIXEfMcR88hooY+MjD3KOnvS7tDBSgRcBvtIfn6Q/zmkB7ZjzYhACDEyYwNfYv2yvoi1Xy+LfeEDA/BXG/lb0/2pd8jEjE0umS2u4U5EZOszIHM2a04bR6cg+IJdIoW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iicOtG3b; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2163a2a1ec2so84211725ad.1
-        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:55:20 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2efc3292021so7243802a91.1
+        for <kvm@vger.kernel.org>; Fri, 31 Jan 2025 17:55:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738374920; x=1738979720; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kCQc2q0n8iaCKUseqDIQ7ox+aypKaYwwg2S2s/uaqm4=;
-        b=i1K2GDV3iw3gi6BtHRXlYLTQZkAPSRX8xGKC/km/R480lY9tDLlvCP30Geikig9REH
-         tNLj2M8MMFdgLtwSZ1AF5Yj945x8wLOcJCn6IsNK5BITBnUzGqs3Ux3G9j9sv6nB4SC6
-         mXEZ60iGALk+zBblK4efyrmugm6VsGmXDw8e/awxLRSvpiW/o+1xqObH191OOVMj0nZN
-         csMsyls8b6zlDp11Jb1cWWaLSIZPbi+F6ztrMrkGT7U5cDvLqN5Fl5OzGL4AkeYDGpxK
-         L0nkniUYaFQqt3UnQw0KSBAuQQ0EH5YxD0wB7gabzaBP+nyVPR/OzRatCvD++8Oed/dH
-         WKMw==
+        d=google.com; s=20230601; t=1738374922; x=1738979722; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=ch7J5FApSjtLmMgjboJuXdLA8zQpXCRwdiOWm7e70JA=;
+        b=iicOtG3bpbeHW44yFQ8yLwn+p2w8oZxs+jt0zfEvwHRKOqtxxcSbkYpF/M3ZM0feDi
+         jplq2VOTsiLMtCjZHRcMV8TOVt9p2xeElMWuebUR1U+j2ffVWWviJxyITT9s6bx9dXRn
+         FRdBEzBTmJ+lyqxWo5PQDuY1s1HVKUlxM60gNcUoI5E+1VL893FVim4v+V+NE1lBr8sl
+         hF8LzVGKihB5MfYybljA+uemWgsIQ9sU4b9W7OpA9HIsPjxA8Li7mpo9GbQIlCTE06UP
+         iNWqrnso19e3Z4gcrZOpM4e1CFSC4vtNvLbAqkg4F0nDsi0Z2lOAs6Z9Mw+5CC2JSOZ5
+         Diew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738374920; x=1738979720;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kCQc2q0n8iaCKUseqDIQ7ox+aypKaYwwg2S2s/uaqm4=;
-        b=w3VWc7VGH5yEzDDoDsitsOYi7RJIWvoSEa7IxMsQT1pocLbkFB3+F6GXO9C05Ox9FR
-         28b3suPlbYprgVORRjqlskBqMAlDe+Rk00xA/ejam73/vN87tGMmf+jTyUFjxHxE/KDw
-         rY7cF3DTpxlcOHMsL8EATqB5n8NdsGKdRV+O0+M/6HsKOtefSozBJDEopLaq5ajDkp99
-         PMIn3uWcjDRlLvw9KZ1Pmk1on7rE2dOey78pgVXEmbuMQSMWTDan9JG413n4eN0EveI1
-         xO9a5CpsBHbTDi1DGMoZGVtuduyKD/Os/0Dbm6ASdxbBgLvfqg4+OrIPLHzj2gJGRR8o
-         1gBg==
-X-Gm-Message-State: AOJu0YyK8kJNs+j/uZgF07VakHlJk3CoS61Tlz1uv9SHI1wC/hpajDcr
-	JMzfW1MmVqXZCy9yMTrbRx9g99OZHfQX18dgS7vr2VMii+t+tj+a1TUZe+yqF/MQhR+aUMhusg/
-	GDQ==
-X-Google-Smtp-Source: AGHT+IGDqN6Rs+jw5khdspySFL4CJS9HjO7D386k56zEUbfyPxOceL+2AFJ49+g6jY6rA8O9kk15vSdmhIk=
-X-Received: from pgwc23.prod.google.com ([2002:a65:66d7:0:b0:7fd:5835:26d1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:98c:b0:216:356b:2685
- with SMTP id d9443c01a7336-21dd7c4e433mr213647605ad.11.1738374920226; Fri, 31
- Jan 2025 17:55:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738374922; x=1738979722;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ch7J5FApSjtLmMgjboJuXdLA8zQpXCRwdiOWm7e70JA=;
+        b=OKQaixv9pFM3zfv9EFE/9kLY7EstCVAroP4wSzgyiOJct+dey0Uz6KhL3J4hry8ZNo
+         wfotSpHRBenjfRQpRqHhfzgYzPq46EmIGbiwZM0MycVzojv3Bn7/FkGORmJWG3LHxR9B
+         D91bkOORGRthVhY0v99GhXO2XXpr0zYK84+bRx5Q89c6xYYoyBrS1FnDb676DHaNUTIK
+         i5zNEcVs4nFyp9IEU3OfYFK0fsOF7naJIDTpYpfGkhv92Jmf03pwlmEaRObHfuriFgye
+         /eRGxp6lgz4cS9S+11paeVRr7LYGTJ9dr/BMe/mndHHwmBZRrUHtUqlAq9zvO6BRXe6M
+         7KnA==
+X-Gm-Message-State: AOJu0YxjlCLCDdkzD6hVN3Zn1WmVasQe2vsWwusbP0+NIy2KtBeK0Ghk
+	2g9KyKbQsKkU/aGEUuYwBBW9o5IT2sidhG4BDNt32GDMsnGggyIKDMVhex4EFN5GyvOFBRqmZCj
+	41g==
+X-Google-Smtp-Source: AGHT+IGvjkw8fnnEbcSuYvUL2VtZua6gMJ2cUrDqwz56RDm9CnaQqFl8dZRTAPoXgRzxuzyE3ZLzmsbAtzc=
+X-Received: from pjbqb8.prod.google.com ([2002:a17:90b:2808:b0:2ea:6b84:3849])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c88e:b0:2ee:ad18:b309
+ with SMTP id 98e67ed59e1d1-2f83aba9d18mr18457927a91.3.1738374921915; Fri, 31
+ Jan 2025 17:55:21 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 31 Jan 2025 17:55:07 -0800
+Date: Fri, 31 Jan 2025 17:55:08 -0800
+In-Reply-To: <20250201015518.689704-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250201015518.689704-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250201015518.689704-1-seanjc@google.com>
-Subject: [PATCH v2 00/11] KVM: x86: Fix emulation of (some) L2 instructions
+Message-ID: <20250201015518.689704-2-seanjc@google.com>
+Subject: [PATCH v2 01/11] KVM: nVMX: Check PAUSE_EXITING, not
+ BUS_LOCK_DETECTION, on PAUSE emulation
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Fix a variety of bugs related to emulating instructions on behalf of L2,
-and (finally) add support for synthesizing nested VM-Exit to L1 when L1
-wants to intercept an instruction (KVM currently injects a #UD into L2).
+When emulating PAUSE on behalf of L2, check for interception in vmcs12 by
+looking at primary execution controls, not secondary execution controls.
+Checking for PAUSE_EXITING in secondary execution controls effectively
+results in KVM looking for BUS_LOCK_DETECTION, which KVM doesn't expose to
+L1, i.e. is always off in vmcs12, and ultimately results in KVM failing to
+"intercept" PAUSE.
 
-There's no real motivation behind this series.  I spotted the PAUSE_EXITING
-vs. BUS_LOCK_DETECTION goof when sorting out a report/question about HLT
-emulation in L2 doing weird things, and then stupidly thought "how hard can
-it be to generate a VM-Exit?".  Turns out, not that hard, but definitely
-a bit harder than I was anticipating due to the annoying RIP vs. next RIP
-flaw.
+Because KVM doesn't handle interception during emulation correctly on VMX,
+i.e. the "fixed" code is still quite broken, and not intercepting PAUSE is
+relatively benign, for all intents and purposes the bug means that L2 gets
+to live when it would otherwise get an unexpected #UD.
 
-Given that VMX has literally never done the right thing, and SVM was quite
-broken since the beginning, I doubt anyone cares about this, but we have
-the code, so why not...
+Fixes: 4984563823f0 ("KVM: nVMX: Emulate NOPs in L2, and PAUSE if it's not intercepted")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Sean Christopherson (11):
-  KVM: nVMX: Check PAUSE_EXITING, not BUS_LOCK_DETECTION, on PAUSE
-    emulation
-  KVM: nSVM: Pass next RIP, not current RIP, for nested VM-Exit on
-    emulation
-  KVM: nVMX: Allow emulating RDPID on behalf of L2
-  KVM: nVMX: Emulate HLT in L2 if it's not intercepted
-  KVM: nVMX: Consolidate missing X86EMUL_INTERCEPTED logic in L2
-    emulation
-  KVM: x86: Plumb the src/dst operand types through to
-    .check_intercept()
-  KVM: x86: Plumb the emulator's starting RIP into nested intercept
-    checks
-  KVM: x86: Add a #define for the architectural max instruction length
-  KVM: nVMX: Allow the caller to provide instruction length on nested
-    VM-Exit
-  KVM: nVMX: Synthesize nested VM-Exit for supported emulation
-    intercepts
-  KVM: selftests: Add a nested (forced) emulation intercept test for x86
-
- arch/x86/kvm/emulate.c                        |   5 +-
- arch/x86/kvm/kvm_emulate.h                    |   7 +-
- arch/x86/kvm/trace.h                          |  14 +-
- arch/x86/kvm/vmx/nested.c                     |  14 +-
- arch/x86/kvm/vmx/nested.h                     |  22 ++-
- arch/x86/kvm/vmx/vmx.c                        | 102 ++++++++----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/nested_emulation_test.c | 146 ++++++++++++++++++
- 8 files changed, 265 insertions(+), 46 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86/nested_emulation_test.c
-
-
-base-commit: eb723766b1030a23c38adf2348b7c3d1409d11f0
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f72835e85b6d..3654c08cfa31 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8092,7 +8092,7 @@ int vmx_check_intercept(struct kvm_vcpu *vcpu,
+ 		 * the PAUSE.
+ 		 */
+ 		if ((info->rep_prefix != REPE_PREFIX) ||
+-		    !nested_cpu_has2(vmcs12, CPU_BASED_PAUSE_EXITING))
++		    !nested_cpu_has(vmcs12, CPU_BASED_PAUSE_EXITING))
+ 			return X86EMUL_CONTINUE;
+ 
+ 		break;
 -- 
 2.48.1.362.g079036d154-goog
 
