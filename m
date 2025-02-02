@@ -1,181 +1,148 @@
-Return-Path: <kvm+bounces-37081-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37082-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66ED1A24CCC
-	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 08:13:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6129FA24CD7
+	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 08:46:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BACD818857B3
-	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 07:13:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF71F18857DC
+	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 07:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063971D5162;
-	Sun,  2 Feb 2025 07:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE21A1D5AA7;
+	Sun,  2 Feb 2025 07:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPIdoKWr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ela7RF0y"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5E91BEF81
-	for <kvm@vger.kernel.org>; Sun,  2 Feb 2025 07:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650D32AD11;
+	Sun,  2 Feb 2025 07:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738480383; cv=none; b=O2I8PQlmPi3GdkA2MlCTSP1wb39pmjahu8dxvPZwxEXq2jRA0we5gmkEauwz8ujGp3TJjZU4joCN1nhsxatx2hy5aXoLh4BU3NACuY5/3OSJ2BCVha4XjuT5DxaS4tKQ57LULr0H4MDTNYRlcM3HaUdoaqZ1rOD+nBckRtxb2ic=
+	t=1738482397; cv=none; b=gTm70PEQW+zLQrzBs2aB8BHT71QyXKozaTW85IKqHeC3k1znONtQqGlNRMDCMwUTNa+Ek6sMMYnbRkeVQ6DZG82VdV70NFXi48td93aNwIn6D7dVk2WYxc5bMhol1zEaJUsBzkzZ/Pl0CihYVEO1yzqiRjXRNSrV93srAhIARGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738480383; c=relaxed/simple;
-	bh=CXPd9+3PCf0ABtxW27kGa+FmX6LrCMM7KEngRhxn1qQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fSrnG5i+mMWbgQA8j0FVH+Py0NFJy9YWKVlUsryGmfAc1qictBs2f+CsrYpbo2TbUrDh9CAVcFyMZ9yGyERzlZN4WMInOrlPhhFE2WrCzvsPTxkDekoyl0hcNr8lEy9GIXYupiOoI5rw1s36joYxa5xOR39vshF7nq8cwrC7Tdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bPIdoKWr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738480380;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+Akyo3JQj2YPzoJhRHm4ECXXW4B+Mshy1bBF/6XTbeo=;
-	b=bPIdoKWrQITlBtZKA2HywtSRmwQSBhPoby66hX0frNbt176SI8guY02ILPTx7oq1T2pcTE
-	FIK1pyF4xj+Qgzq+sXrV9w1SHwivWC3lUMb9V0ruOQHLLBcSr+JcElvmHIKdrwJQnrJ/SX
-	+nT7vJdGou/PpGbIY5b17R+q/2BDm7M=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665-UlHBx0vDMlSBGyP2gwd5iw-1; Sun, 02 Feb 2025 02:12:58 -0500
-X-MC-Unique: UlHBx0vDMlSBGyP2gwd5iw-1
-X-Mimecast-MFC-AGG-ID: UlHBx0vDMlSBGyP2gwd5iw
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-216430a88b0so70368765ad.0
-        for <kvm@vger.kernel.org>; Sat, 01 Feb 2025 23:12:57 -0800 (PST)
+	s=arc-20240116; t=1738482397; c=relaxed/simple;
+	bh=KPpRZb+XkmZNS30akoEPKssE6STRgNhMrtLh9sGnrZE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W0A+wxVm+LQxCpC6jeQOJ/IARrqAjjEskTEqbNASQew2ktzibf6ktLMYJN7z6BHKFgMYJ0k3d6LYCh0eWcjyydQi9RktHXofRX51DKAebay2CpXWqjU6F62fNzse01P6Cdwe5cjpvD4qCVOaw4dtd5v2GNLpMSVRiiZWLnstjsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ela7RF0y; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5d3d479b1e6so4657104a12.2;
+        Sat, 01 Feb 2025 23:46:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738482392; x=1739087192; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dkf3AnYzxtjJolWV6YY/aOb67PW9FbaNoOwrFtKSVa0=;
+        b=ela7RF0yzFdSU3B0b25LHsH53kcaAbCxaaStqIgqjcVaSgS+hkBcmtnQVNhaMUGsgQ
+         8qe+6xr6bruDbpzbgndT5mJ2K1Q2zVOAOO6z+2rgV+lG7ckUoqMqGgoGGimuMR+v0Mef
+         90vwH19LhWbEnod00OE+MNkWl+kKavcj5xs410vTGVmLiMRGhA1xaYXjhzH3IvTg7ONS
+         Y19dzIDcKm1hkLchGzu6FtkhS0ANBvQugw59YMQKh29dW28Wh0jvym41cN+QZVIXV70x
+         5xKwTW3+/qSDjSuijVbSVChxoM8ttohixz1sWJD/x7vN6jLo7Q6tSn08r+cslLHdBy45
+         HQiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738480377; x=1739085177;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Akyo3JQj2YPzoJhRHm4ECXXW4B+Mshy1bBF/6XTbeo=;
-        b=q/fbD2/cwH8suwnkbRrjs35b4sfIC2KGnrunpt6c1JudYecsrMoAzm7bO3RESoERDa
-         66AH7S+QqPNf5RE7XTWlxOqBUBYQ/VlOG/eHkE9DwntVJtoMpXvBicZmtp9+xO6vhrkJ
-         ydzD4Svsf9Dopmu924Wccr95f0+gAwObD4mPPn3DFc2t52rLE4rMwXtrNUz8D67PWr5r
-         X2coRbulAJMuKzROkrLptJOgEy9MUAfYo0lEei4DswdDcpotFeLKEpZxARub+0judUbl
-         KpCOKrU1aZH9W8llqNKI1dxVdKWcEy9kF3VU3vLHCm15BbIr+v4M7vzM8HbpgN4OY6i3
-         pWUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXjSQoJIgH/tLbmh777FWAB4sKty2KWhewW13rFt6JPtz7XuUPEUWTL/I2wrC+RRehuOl8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmFwiCcZDBjGRXjUBrzjWRoMUAmGVxSOfv0VuRrgt2f111GZjV
-	T+djz8Q2jIUDtDdEtqKctk5kQ6W0u0qJKc9iqAfXCf/6Ofo4qYxGltritfNiZMOM70l4Pyd5Pwk
-	JK+eHM7GCXMQKOl/m02trytSMrzpnggdCd7r6Kg7UQY1o9PD3dA==
-X-Gm-Gg: ASbGncv4L5P4v8ZXwR0xZkl2xQuh1dHXdpB+2I4FhTe1j6PglY/XxUEY9lOqv1/LJVB
-	hiuL5iZi0ZtFpLSfQRletKUhcZ36GkcOUJpfNoOXqHAw3dNUJDe50Zmsp60/L1jyGA9DUTwJIX0
-	YEQkhpSRzFS0cEgdqhsP0DCZsWbKAO9eF38TwBBWO8W40uk4jY0qaRkefEQpOXPVc0JLFqfoiN4
-	WCIQF9Y9JXxk58+TIeB7fJ/Oh5vEXZ4psaWrykXMCwjEx2zjxtSCZJqdloEUkPdiiTwh/tSAg3J
-	UOhEuw==
-X-Received: by 2002:a17:903:110c:b0:216:1ad2:1d5 with SMTP id d9443c01a7336-21dd7deebd1mr265357365ad.41.1738480376999;
-        Sat, 01 Feb 2025 23:12:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEEbEpN4KQNQWRi1soSDL1v4OtYLgM2DYDPCY0eEgB/YujTFWmFABLlbkBOcGlGdKwPsn62yg==
-X-Received: by 2002:a17:903:110c:b0:216:1ad2:1d5 with SMTP id d9443c01a7336-21dd7deebd1mr265357095ad.41.1738480376627;
-        Sat, 01 Feb 2025 23:12:56 -0800 (PST)
-Received: from [192.168.68.55] ([180.233.125.64])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de32ea5f1sm54843395ad.130.2025.02.01.23.12.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Feb 2025 23:12:56 -0800 (PST)
-Message-ID: <f339729a-00a8-40b5-af05-f0f019579e5e@redhat.com>
-Date: Sun, 2 Feb 2025 17:12:48 +1000
+        d=1e100.net; s=20230601; t=1738482392; x=1739087192;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dkf3AnYzxtjJolWV6YY/aOb67PW9FbaNoOwrFtKSVa0=;
+        b=Qa9iESBX6giZIH7iwcIW8HzzKcVPEkKzeD92omtqEvT+DACZdLuXnLyIxnZxoJbv2j
+         DSp0lL8hCbIbq0epcS+SO/dLJNjF2MsNISHjRFtqW0XPu+ATzJErA7IrVOmzcJSuJjhp
+         8R1WIdJ9AfETCOfoY/j+eMAjRKkhA6kTrDDPZSQyhwFP30m9e/bHd43ASsRldcR7fa/9
+         IA3+Dp6g772RN/ByOM6Otmg7K5eTZnmgIBLn8XdnzL4wLE5QUKGRW1GfgRGf5RADhgso
+         LA07BQuXGzjSG2XdENADk0WcuAfStlKqvN6dbadMV/TM96rGrmtR84uYHNaLu7HX/m2y
+         iQlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4/L9njha5Jf3psuZM1e/XtKrDVCjT7t+bb2ukJXbnvOjhdXSOND81UOk8py2MA/O9vFKAfHZ3+bAZ@vger.kernel.org, AJvYcCVTRZC9hw2URcc+ylKCEngkcqcf1aKffiTh7HXeGhMGVLw2pvfKlk7eUFconVQjdYYRebN7e4KYoEwWSMbW@vger.kernel.org, AJvYcCVbr/wVtvwxhb7kpE25ptcI1IH0TcffA1iV97B5MWNxrPq7MZGnmZlWnQNiZBRiQv5egEtjBdkx/cyanQ==@vger.kernel.org, AJvYcCWGyroGzw0PKsyGv2bJy5E2wEtSSUpvHsbDjX6U4g8mq+Fsqb3Qtb2R9K8u4WFFa9ZVXcFbsFrHG8MKrZ0=@vger.kernel.org, AJvYcCXMbAxHTX4XrcrrQLzJLxGsFDhS6EYk6whLVcEuWXyvbOI4PFadm2xxluesyhhMk0R6RBX29ojpuwI6ivrrFQ==@vger.kernel.org, AJvYcCXdW9rq9pGchahllYJT9xklgcJ3iwKkSidgrybvPLlslUU0xy7lSXJ387/YmpIDkMYq34M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwpmsYKgurM12REUK1EEOtKF1f6+Hb26KNK7+TolFO3bfqkEou
+	d6nX0SE+qrm9W2/fT7hsgkEdmA4uN5jf3inckgA+Rr+zYbgj4sg4paH3jjFjJj7ouvZ6Ce0T+im
+	I+E2ksl+oXYlq+4+tX+wgOoKUmQs=
+X-Gm-Gg: ASbGncvesWoAWUZa584b7MLzr1V/D3qNWW8E1mtBiFkr/El3FzIldee3nYtDpf/vUsl
+	w89P+ykFj0To1gVbvdCdCPgTdL697xCntAqdJnw1uG+yxJ+U49XbUcvFHXzHcYCHQYT8wpJMA
+X-Google-Smtp-Source: AGHT+IE25ioY+88Ad0dzyJ05zZTY4tUCHqGHqVeBxZbL7pLFQn1rxv9eQSShAxQEMVL/CmIeX9bb7tDeZctmbYTQTWc=
+X-Received: by 2002:a05:6402:274e:b0:5d0:9054:b119 with SMTP id
+ 4fb4d7f45d1cf-5dc5efec007mr41206927a12.21.1738482392164; Sat, 01 Feb 2025
+ 23:46:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 30/43] arm64: rme: Prevent Device mappings for Realms
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-31-steven.price@arm.com>
-Content-Language: en-US
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20241212155610.76522-31-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1731684329.git.josef@toxicpanda.com> <9035b82cff08a3801cef3d06bbf2778b2e5a4dba.1731684329.git.josef@toxicpanda.com>
+ <20250131121703.1e4d00a7.alex.williamson@redhat.com> <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
+ <Z512mt1hmX5Jg7iH@x1.local> <20250201-legehennen-klopfen-2ab140dc0422@brauner>
+ <CAHk-=wi2pThSVY=zhO=ZKxViBj5QCRX-=AS2+rVknQgJnHXDFg@mail.gmail.com>
+In-Reply-To: <CAHk-=wi2pThSVY=zhO=ZKxViBj5QCRX-=AS2+rVknQgJnHXDFg@mail.gmail.com>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Sun, 2 Feb 2025 08:46:21 +0100
+X-Gm-Features: AWEUYZnttHbNcopdkTaXe70ba9wJmxOXrUavrKaCPbqgXlhsWsN9pWLAIjMYcbA
+Message-ID: <CAOQ4uxjVTir-mmx05zh231BpEN1XbXpooscZyfNUYmVj32-d3w@mail.gmail.com>
+Subject: Re: [REGRESSION] Re: [PATCH v8 15/19] mm: don't allow huge faults for
+ files with pre content watches
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Christian Brauner <brauner@kernel.org>, Peter Xu <peterx@redhat.com>, 
+	Alex Williamson <alex.williamson@redhat.com>, Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com, 
+	linux-fsdevel@vger.kernel.org, jack@suse.cz, viro@zeniv.linux.org.uk, 
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-mm@kvack.org, 
+	linux-ext4@vger.kernel.org, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/13/24 1:55 AM, Steven Price wrote:
-> Physical device assignment is not yet supported by the RMM, so it
-> doesn't make much sense to allow device mappings within the realm.
-> Prevent them when the guest is a realm.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes from v5:
->   * Also prevent accesses in user_mem_abort()
-> ---
->   arch/arm64/kvm/mmu.c | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 9ede143ccef1..cef7c3dcbf99 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1149,6 +1149,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->   	if (is_protected_kvm_enabled())
->   		return -EPERM;
->   
-> +	/* We don't support mapping special pages into a Realm */
-> +	if (kvm_is_realm(kvm))
-> +		return -EINVAL;
-> +
+On Sun, Feb 2, 2025 at 1:58=E2=80=AFAM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Sat, 1 Feb 2025 at 06:38, Christian Brauner <brauner@kernel.org> wrote=
+:
+> >
+> > Ok, but those "device fds" aren't really device fds in the sense that
+> > they are character fds. They are regular files afaict from:
+> >
+> > vfio_device_open_file(struct vfio_device *device)
+> >
+> > (Well, it's actually worse as anon_inode_getfile() files don't have any
+> > mode at all but that's beside the point.)?
+> >
+> > In any case, I think you're right that such files would (accidently?)
+> > qualify for content watches afaict. So at least that should probably ge=
+t
+> > FMODE_NONOTIFY.
+>
+> Hmm. Can we just make all anon_inodes do that? I don't think you can
+> sanely have pre-content watches on anon-inodes, since you can't really
+> have access to them to _set_ the content watch from outside anyway..
+>
+> In fact, maybe do it in alloc_file_pseudo()?
+>
 
-		return -EPERM;
+The problem is that we cannot set FMODE_NONOTIFY -
+we tried that once but it regressed some workloads watching
+write on pipe fd or something.
 
->   	size += offset_in_page(guest_ipa);
->   	guest_ipa &= PAGE_MASK;
->   
-> @@ -1725,6 +1729,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	if (exec_fault && device)
->   		return -ENOEXEC;
->   
-> +	/*
-> +	 * Don't allow device accesses to protected memory as we don't (yet)
-> +	 * support protected devices.
-> +	 */
-> +	if (device && kvm_is_realm(kvm) &&
-> +	    kvm_gpa_from_fault(kvm, fault_ipa) == fault_ipa)
-> +		return -EINVAL;
-> +
+and the no-pre-content is a flag combination (to save FMODE_ flags)
+which makes things a bit messy.
 
-s/kvm_is_realm/vcpu_is_rec
+We could try to initialize f_mode to FMODE_NONOTIFY_PERM
+for anon_inode, which opts out of both permission and pre-content
+events and leaves the legacy inotify workloads unaffected.
 
-I don't understand the check very well. What I understood is mem_abort() is called
-only when kvm_gpa_from_fault(kvm, fault_ipa) != fault_ipa, meaning only the page
-faults in the shared address space is handled by mem_abort(). So I guess we perhaps
-need something like below.
+But, then code like this will not do the right thing:
 
-	if (vcpu_is_rec(vcpu) && device)
-		return -EPERM;
+        /* We refuse fsnotify events on ptmx, since it's a shared resource =
+*/
+        filp->f_mode |=3D FMODE_NONOTIFY;
 
-kvm_handle_guest_abort
-   kvm_slot_can_be_private
-     private_memslot_fault	// page fault in the private space is handled here
-   io_mem_abort			// MMIO emulation is handled here
-   user_mem_abort                // page fault in the shared space is handled here
+We will need to convert all those to use a helper.
+I am traveling today so will be able to look closer tomorrow.
 
->   	/*
->   	 * Potentially reduce shadow S2 permissions to match the guest's own
->   	 * S2. For exec faults, we'd only reach this point if the guest
+Jan,
 
-Thanks,
-Gavin
+What do you think?
 
+Amir.
 
