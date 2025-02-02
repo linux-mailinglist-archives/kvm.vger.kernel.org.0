@@ -1,161 +1,128 @@
-Return-Path: <kvm+bounces-37072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37073-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AEBEA2498B
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 15:38:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0216A24C5B
+	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 01:59:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8662B3A76C9
-	for <lists+kvm@lfdr.de>; Sat,  1 Feb 2025 14:38:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43C6B3A5B20
+	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 00:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F131C1F13;
-	Sat,  1 Feb 2025 14:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7169B17BD9;
+	Sun,  2 Feb 2025 00:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHVcnBTq"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="QBZy3e/1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830B81EF01;
-	Sat,  1 Feb 2025 14:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918F7DDBB
+	for <kvm@vger.kernel.org>; Sun,  2 Feb 2025 00:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738420711; cv=none; b=SAxZW/9TROlCUVQPc9m2Gh5AJBnneGy38kg+xtKqwkczy/H6NNz0g41XQ7OHPHKJNdkVw9z+YUCQFS9f/XMrMAOP1fA1ZvxqJ5i0239f3dJwl5htFEjniIFNwBwWzHkTUk/ccAWk+lR7HJVQT2mcMgnvO0UJUQS4xRmDwkOZULI=
+	t=1738457929; cv=none; b=GdQTVMpJ1CiT23xNoTkiZJNGHV89i+SGOhnVLHaqeny47lYdaVDqnMyiDMAhYmLzav1LDc/4JdiNpZzBS5BoaMG4PzR20cKGK7hrE5R7KRxz+OV4KZbr4S0o6Tbe2BSvlX3V11vlO7dMH5VKmp5rbKk8yy6tHJgRGir4JyzPi20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738420711; c=relaxed/simple;
-	bh=QiSjG7TvkKqWoaD2aBFrVJnxmPFyXLRgqp8pz0gLUzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sir0E/nrq4GSzZD1K/Hr6zwMS/KFWTY1dUzg66F2NSymciBIC/Dk2lrojlTz7m7+gl1d94Tn5Hbqy7kGuWhFy8Y6RXdR8gjaIuPHamkSz81OufFhZUR0YnhKe57Ji6VagnGsAMGEXGCUG1I1b9+bD2pycFFwZnfOWvMgSxf3uFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHVcnBTq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81966C4CED3;
-	Sat,  1 Feb 2025 14:38:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738420710;
-	bh=QiSjG7TvkKqWoaD2aBFrVJnxmPFyXLRgqp8pz0gLUzc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WHVcnBTqerPHgxQCTpImKkHSbu00uWLYWvzmwAtGSlEM5YJZsz+IONl1JAUXaAYeS
-	 UJ9kApP54ppYFtkOEdEpcq3q/cMh6HuYR1mHH/xKj/oPfQVrOmFtSrd8PKELMi9ZKd
-	 aMt49gIWUhJubrKpeqIdvzW/w1uO2UpMYnZh0EB8fqF0FzQhG/nkrRTh0n3uupqhJX
-	 GL6/bojxTFS3yFivQGFxojQ/70DT1M5BSJIYxKerpN3FTZplWkma3sNKC0V8QcHgvv
-	 06dPyDUVaBQCjxiqI0K2TaqPFoWFtdm50CRElJU5ocUYzDcQzY+iGG0rhGd7AyrKNH
-	 jwF5lZf/kuiTQ==
-Date: Sat, 1 Feb 2025 15:38:20 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Peter Xu <peterx@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	Alex Williamson <alex.williamson@redhat.com>, Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com, 
-	linux-fsdevel@vger.kernel.org, jack@suse.cz, amir73il@gmail.com, viro@zeniv.linux.org.uk, 
-	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-mm@kvack.org, 
-	linux-ext4@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [REGRESSION] Re: [PATCH v8 15/19] mm: don't allow huge faults
- for files with pre content watches
-Message-ID: <20250201-legehennen-klopfen-2ab140dc0422@brauner>
-References: <cover.1731684329.git.josef@toxicpanda.com>
- <9035b82cff08a3801cef3d06bbf2778b2e5a4dba.1731684329.git.josef@toxicpanda.com>
- <20250131121703.1e4d00a7.alex.williamson@redhat.com>
- <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
- <Z512mt1hmX5Jg7iH@x1.local>
+	s=arc-20240116; t=1738457929; c=relaxed/simple;
+	bh=wTdxQSHNowLLmMobvaMcMprIsVZ+/hyqVnL+ii8pks8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HjI7xRe7UAJEVtMT9DVf6dQyHfvpDgwMdrJxkTc3S3Dsf9gVK6l3NOQ32UddTPRy0oXAT/J9ybsxSoe1MoT4r5jSWqtmfZUEnBx/onJNOmPUtraEhIL/yTMLEaPNKGPXKH9237bpc+UgXoSsUTtwGer4C39NRNObWz2+os5smHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=QBZy3e/1; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aaec61d0f65so479591466b.1
+        for <kvm@vger.kernel.org>; Sat, 01 Feb 2025 16:58:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1738457926; x=1739062726; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=0i2RBA9AG5RGJ2Y4fhUq4YhT8DGp5O3OFexnsh+308w=;
+        b=QBZy3e/1EQGv5gUEtm/pZbPIW/2mikZ8l+LLIY0ItIoA7a0KjshBh2MARq+JNeKymu
+         /TJHSywKjXlvfb9OJFn+ozVatQ8cWDcFqUGQBfi90TEkHw8ZxEi1oDew+CVTok60rXef
+         vDtQXPRsKRjfXY2CEs2K3wDTofostoLfkdbcI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738457926; x=1739062726;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0i2RBA9AG5RGJ2Y4fhUq4YhT8DGp5O3OFexnsh+308w=;
+        b=Hc8UudmWt7mPvhHH1hUJACLzNpO+3dvV9CjJtwPrftGGPxMpQCQ3gYNjZZRCZDpzme
+         NT23zujZ+83RZpKJZ8SdNWDsPgSUyP7OJcOBFWJS4uM1gWDsJDsrg45xNREHc8hjSdiX
+         WjckUiGelVrnqqX1FLOpe5KkOrZrncqQtp1wUvrVN6NrV+QoLzTO9uqPojGb65Du9nvT
+         R911imaQJgGTdE5FSKztYj06krN7rxZdLXirMLaNRrFETr/0JEO2NRCOzLU/4jRwrPk3
+         BTBH2hEOyv/2DWRNsaWd/G/hSewCL5wgPGTqiu6WRL8ybeL2WvEKWriiXB38a5l0QPWQ
+         kuMg==
+X-Forwarded-Encrypted: i=1; AJvYcCU5KovNEYmtY2BAEgqHNWHiEAC7gTXPhANE5Ouk+udRIZ6zlZ4Hchlv3Kj15dm1qfph6VA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNw4/JcXpDGVgfHrhGtUMLUxkujq0fdY/cBNy6ndB4XOKDRK34
+	fS9iW1/x8En9MEaHAbirVkO6SmJJ1vac4+SIcryx4Yodl/JGnzTIvk8Cue+x3ZKPLTis5XOObxn
+	vNVl9KQ==
+X-Gm-Gg: ASbGncv0IDlTEOVp5evMeau2mfs1blEXZ0NQjqnMm5Ob5JOEPbzAS//yzCIz4MipXzY
+	YcN9WqAaEtEtswxy21zbxh2ZOQikhmv4yqO7dwXqaUSG0HZas0zmqTm7ooHk178eiOCaR84TFkB
+	/iOqs1G8Irt1lFjL9Xs+Ik/XZfrl+jfjXm8lPZzkhI9DC0JsnyIoOxdgM3j3FYcFq5z5esw/FVO
+	rNVgWqFpF46gO3WPCETC0SWHqdfIaczd/zPezB+SWPzrnxtDQtDfUKSu0MIEQV6BR3IyoMLjk5s
+	/ACKtwrVCiQm+geW63xSW6DLK71a5sIvOtoctM0GXivnddJVNfYuMGHVlWlRcu6nRw==
+X-Google-Smtp-Source: AGHT+IGJVhVmOXqaJpPvGTo5cc+8Cw66q8+93oixFsfBwfrRgyckQbBetCirxsQuJdlN2jkW1v+qpw==
+X-Received: by 2002:a17:907:1610:b0:ab6:b8e6:d41b with SMTP id a640c23a62f3a-ab6cfceacacmr1881470066b.16.1738457925585;
+        Sat, 01 Feb 2025 16:58:45 -0800 (PST)
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e47cf2aasm495264266b.45.2025.02.01.16.58.43
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 01 Feb 2025 16:58:44 -0800 (PST)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5dc89df7eccso2465393a12.3
+        for <kvm@vger.kernel.org>; Sat, 01 Feb 2025 16:58:43 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWuvKyl9s5aYTkt/d9wK0B3HbCVfD4nmkS1YvtkmAkaSR+GIfwrHZTUl7AOwr99WDb+kgU=@vger.kernel.org
+X-Received: by 2002:a05:6402:50ca:b0:5d9:a55:42ef with SMTP id
+ 4fb4d7f45d1cf-5dc5efc4586mr20023222a12.17.1738457922880; Sat, 01 Feb 2025
+ 16:58:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z512mt1hmX5Jg7iH@x1.local>
+References: <cover.1731684329.git.josef@toxicpanda.com> <9035b82cff08a3801cef3d06bbf2778b2e5a4dba.1731684329.git.josef@toxicpanda.com>
+ <20250131121703.1e4d00a7.alex.williamson@redhat.com> <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
+ <Z512mt1hmX5Jg7iH@x1.local> <20250201-legehennen-klopfen-2ab140dc0422@brauner>
+In-Reply-To: <20250201-legehennen-klopfen-2ab140dc0422@brauner>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 1 Feb 2025 16:58:26 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wi2pThSVY=zhO=ZKxViBj5QCRX-=AS2+rVknQgJnHXDFg@mail.gmail.com>
+X-Gm-Features: AWEUYZkrc1rbpsukghJrnBMXjfiiupnnm33djYsyEN114ENNjNC4tG_tthCj53k
+Message-ID: <CAHk-=wi2pThSVY=zhO=ZKxViBj5QCRX-=AS2+rVknQgJnHXDFg@mail.gmail.com>
+Subject: Re: [REGRESSION] Re: [PATCH v8 15/19] mm: don't allow huge faults for
+ files with pre content watches
+To: Christian Brauner <brauner@kernel.org>
+Cc: Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
+	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com, linux-fsdevel@vger.kernel.org, 
+	jack@suse.cz, amir73il@gmail.com, viro@zeniv.linux.org.uk, 
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-mm@kvack.org, 
+	linux-ext4@vger.kernel.org, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 31, 2025 at 08:19:22PM -0500, Peter Xu wrote:
-> On Fri, Jan 31, 2025 at 11:59:56AM -0800, Linus Torvalds wrote:
-> > On Fri, 31 Jan 2025 at 11:17, Alex Williamson
-> > <alex.williamson@redhat.com> wrote:
-> > >
-> > > 20bf82a898b6 ("mm: don't allow huge faults for files with pre content watches")
-> > >
-> > > This breaks huge_fault support for PFNMAPs that was recently added in
-> > > v6.12 and is used by vfio-pci to fault device memory using PMD and PUD
-> > > order mappings.
-> > 
-> > Surely only for content watches?
-> > 
-> > Which shouldn't be a valid situation *anyway*.
-> > 
-> > IOW, there must be some unrelated bug somewhere: either somebody is
-> > allowed to set a pre-content match on a special device.
-> > 
-> > That should be disabled by the whole
-> > 
-> >         /*
-> >          * If there are permission event watchers but no pre-content event
-> >          * watchers, set FMODE_NONOTIFY | FMODE_NONOTIFY_PERM to indicate that.
-> >          */
-> > 
-> > thing in file_set_fsnotify_mode() which only allows regular files and
-> > directories to be notified on.
-> > 
-> > Or, alternatively, that check for huge-fault disabling is just
-> > checking the wrong bits.
-> > 
-> > Or - quite possibly - I am missing something obvious?
-> 
-> Is it possible that we have some paths got overlooked in setting up the
-> fsnotify bits in f_mode? Meanwhile since the default is "no bit set" on
-> those bits, I think it means FMODE_FSNOTIFY_HSM() can always return true on
-> those if overlooked..
-> 
-> One thing to mention is, /dev/vfio/* are chardevs, however the PCI bars are
-> not mmap()ed from these fds - whatever under /dev/vfio/* represents IOMMU
-> groups rather than the device fd itself.
-> 
-> The app normally needs to first open the IOMMU group fd under /dev/vfio/*,
-> then using VFIO ioctl(VFIO_GROUP_GET_DEVICE_FD) to get the device fd, which
-> will be the mmap() target, instead of the ones under /dev.
+On Sat, 1 Feb 2025 at 06:38, Christian Brauner <brauner@kernel.org> wrote:
+>
+> Ok, but those "device fds" aren't really device fds in the sense that
+> they are character fds. They are regular files afaict from:
+>
+> vfio_device_open_file(struct vfio_device *device)
+>
+> (Well, it's actually worse as anon_inode_getfile() files don't have any
+> mode at all but that's beside the point.)?
+>
+> In any case, I think you're right that such files would (accidently?)
+> qualify for content watches afaict. So at least that should probably get
+> FMODE_NONOTIFY.
 
-Ok, but those "device fds" aren't really device fds in the sense that
-they are character fds. They are regular files afaict from:
+Hmm. Can we just make all anon_inodes do that? I don't think you can
+sanely have pre-content watches on anon-inodes, since you can't really
+have access to them to _set_ the content watch from outside anyway..
 
-vfio_device_open_file(struct vfio_device *device)
+In fact, maybe do it in alloc_file_pseudo()?
 
-(Well, it's actually worse as anon_inode_getfile() files don't have any
-mode at all but that's beside the point.)?
+Amir / Josef?
 
-In any case, I think you're right that such files would (accidently?)
-qualify for content watches afaict. So at least that should probably get
-FMODE_NONOTIFY.
-
-> 
-> I checked, those device fds were allocated from vfio_device_open_file()
-> within the ioctl, which internally uses anon_inode_getfile().  I don't see
-> anywhere in that path that will set the fanotify bits..
-> 
-> Further, I'm not sure whether some callers of alloc_file() can also suffer
-
-Sidenote, mm/memfd.c should pretty please rename alloc_file() to
-memfd_alloc_file() or something. That would be great because
-alloc_file() is a local fs/file_table.c helper and grepping for it is
-confusing as I first thought someone made alloc_file() available outside
-of fs/file_table.c
-
-> from similar issue, because at least memfd_create() syscall also uses the
-> API, which (hopefully?) would used to allow THPs for shmem backed memfds on
-> aligned mmap()s, but not sure whether it'll also wrongly trigger the
-> FALLBACK path similarly in create_huge_pmd() just like vfio's VMAs.  I
-> didn't verify it though, nor did I yet check more users.
-> 
-> So I wonder whether we should setup the fanotify bits in at least
-> alloc_file() too (to FMODE_NONOTIFY?).
-> 
-> I'm totally not familiar with fanotify, and it's a bit late to try verify
-> anything (I cannot quickly find my previous huge pfnmap setup, so setup
-> those will also take time..). but maybe above can provide some clues for
-> others..
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
-> 
+              Linus
 
