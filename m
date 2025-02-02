@@ -1,162 +1,184 @@
-Return-Path: <kvm+bounces-37083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD24CA24D68
-	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 11:04:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24E46A24EB4
+	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 15:39:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EB661884CCA
-	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 10:04:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32D2F7A24F2
+	for <lists+kvm@lfdr.de>; Sun,  2 Feb 2025 14:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF34F1D63C4;
-	Sun,  2 Feb 2025 10:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CBE51FAC38;
+	Sun,  2 Feb 2025 14:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6POX4H5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g8jVjB+t"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B354B155336;
-	Sun,  2 Feb 2025 10:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A5D1D90AD
+	for <kvm@vger.kernel.org>; Sun,  2 Feb 2025 14:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738490648; cv=none; b=oVr57p/inA1r+Lguhap8ieo0ppj+rceUMcDvnuCLhg5IjhDi2tNgKgBJPqox6K1wo6UCfH68jowSmCbN0D3K+4m9Wa3wONfinuQ0gZc/EkqdEJol5XEbVeGcGpbVI4/tVBlGWEaUdYdijmdIBW1vDmiJZfWxktVQC283qk3pj/4=
+	t=1738507156; cv=none; b=hVeeYF80TRl8qYgHIxCKboeDXg5udi4PeRqIdvyyDn5M1jADqjlo7tG+FEvYMnbqJT1hqWRyOUSWxtUYATonOmwg9OjxwuSyeloq2nkcQBiiUutOiNayZ1AtbRWNQded6j47h1FKt55/SF2JSvfYothcmEb0yfQt/U5soMwuRs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738490648; c=relaxed/simple;
-	bh=5A0/mbYhYVhz+EAh4niEYVaHaPaMDyo4YCYJ4LKkzsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BBQeff9PMO6jmk2Cmnw1+B3VO3djwS/Ur94wqgWfYxT+hdbl3HJla08mWbMU3q0EcBt3wu6AAYxl7fZGM5SE5NQA8/2MzxJcdRX551saupGhKD2NiNkIs3uBqIateLn+JoDVJgs/f3GWZLP0aeX4bPWgi04SBKvgJccfVXl4V/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6POX4H5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9657C4CED1;
-	Sun,  2 Feb 2025 10:04:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738490648;
-	bh=5A0/mbYhYVhz+EAh4niEYVaHaPaMDyo4YCYJ4LKkzsY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b6POX4H5oxeJIP0Oz3wl/tMuUNjNfGnUuDdqDOX1gC1yVkwxrKGivBkXucI1X36Ea
-	 Dfik1aAcAskf/w2yBbjZ4QXR2CMyDkfFk3zMUbG1tTr3ROMKVhUHNpLZyFj+1UEpJO
-	 C206/Hnp3kknPUP1GKRO6WenGKK9hdleRoXn5IODEeg6Vh9e8gmUB1LLtTlS/vAYfB
-	 2rG2GkzCmNthh+KQEY0wnqAJKX4UW60NM4mccxYxG7DEfjQYe3FDa201J4Wp0MnKxQ
-	 lrFDHmAWFaBkwIuyKk5cU52dTJLaIj2vX0saJXFhrbJg+FVEaoiUCxT0a+KNFSZ70f
-	 5KeIzRwMl++4g==
-Date: Sun, 2 Feb 2025 11:04:02 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Amir Goldstein <amir73il@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com, linux-fsdevel@vger.kernel.org, jack@suse.cz, 
-	viro@zeniv.linux.org.uk, linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	linux-mm@kvack.org, linux-ext4@vger.kernel.org, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [REGRESSION] Re: [PATCH v8 15/19] mm: don't allow huge faults
- for files with pre content watches
-Message-ID: <20250202-abbauen-meerrettich-912513202ce4@brauner>
-References: <cover.1731684329.git.josef@toxicpanda.com>
- <9035b82cff08a3801cef3d06bbf2778b2e5a4dba.1731684329.git.josef@toxicpanda.com>
- <20250131121703.1e4d00a7.alex.williamson@redhat.com>
- <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
- <Z512mt1hmX5Jg7iH@x1.local>
- <20250201-legehennen-klopfen-2ab140dc0422@brauner>
- <CAHk-=wi2pThSVY=zhO=ZKxViBj5QCRX-=AS2+rVknQgJnHXDFg@mail.gmail.com>
- <CAOQ4uxjVTir-mmx05zh231BpEN1XbXpooscZyfNUYmVj32-d3w@mail.gmail.com>
+	s=arc-20240116; t=1738507156; c=relaxed/simple;
+	bh=iPIUexgfl/nH+sknvP912xNQqEwXm19jPq4R/uL8ufs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kppBqYt/bgiSydEWoAfRJv6J+kwkebPoGHIFobDak+U9mWx24a9nYrr2Zw3Z7fPgtARCj7ukGuhdMovMEh69zhYAv2o1UBD3ZNRUPqNHDzbnvSnxixzHy+nx+44ZFI98wik9jeNG39uQnol02UaiPVnErY6nvx7mzrigIPEw8dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g8jVjB+t; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738507154; x=1770043154;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=iPIUexgfl/nH+sknvP912xNQqEwXm19jPq4R/uL8ufs=;
+  b=g8jVjB+t32joXY29HariClXHeD6R8TVF0fCX+wrBoJ0bCjj60rEmOS9b
+   Dzc10W53lcSwX1tpG5Y4bFTG6+qwhXs//z0/dqSzJMXALIqYmvgGCfzAY
+   fHLsnXip+EKtK2wEVpio3ANUDpH7wdvyXVdixFjnOQlUIHc/eo7yOYJaD
+   pZEmOuza0xbv0VlXrODJXA2PdxFKWP5MP5BTjD6TSIo5auuziq6E9AZ1l
+   V2K+aPjgDkMDHNbIFswdWiJ9f5etPgKRbT/ttt1bJqkTCJQ0l71EvnnF6
+   +hL4dv+wLFhV76gQfCgSIHIC2xNX8ff9s8r4EJfSr/0DBE1kS0MaHFXUM
+   g==;
+X-CSE-ConnectionGUID: FwTcU/B7TCywMZemmzosnA==
+X-CSE-MsgGUID: JNbiTbBWQG+X1ARoeohFKQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11334"; a="39167032"
+X-IronPort-AV: E=Sophos;i="6.13,254,1732608000"; 
+   d="scan'208";a="39167032"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2025 06:39:14 -0800
+X-CSE-ConnectionGUID: B+mnSoiAQZ28uG1kztDMSQ==
+X-CSE-MsgGUID: CMjMRBjdRye/bMKwn2Av7g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,254,1732608000"; 
+   d="scan'208";a="115066821"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2025 06:39:10 -0800
+Message-ID: <774945ce-04e2-42d5-83fc-97ad08647101@intel.com>
+Date: Sun, 2 Feb 2025 22:39:07 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 51/52] i386/tdx: Validate phys_bits against host value
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, Zhao Liu <zhao1.liu@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Francesco Lavra <francescolavra.fl@gmail.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org
+References: <20250124132048.3229049-1-xiaoyao.li@intel.com>
+ <20250124132048.3229049-52-xiaoyao.li@intel.com>
+ <CABgObfb5ruVO2sxLCbZobiaqX-3h9Q+UKOZnp_hhxfJA=T-OJA@mail.gmail.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <CABgObfb5ruVO2sxLCbZobiaqX-3h9Q+UKOZnp_hhxfJA=T-OJA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOQ4uxjVTir-mmx05zh231BpEN1XbXpooscZyfNUYmVj32-d3w@mail.gmail.com>
 
-On Sun, Feb 02, 2025 at 08:46:21AM +0100, Amir Goldstein wrote:
-> On Sun, Feb 2, 2025 at 1:58 AM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > On Sat, 1 Feb 2025 at 06:38, Christian Brauner <brauner@kernel.org> wrote:
-> > >
-> > > Ok, but those "device fds" aren't really device fds in the sense that
-> > > they are character fds. They are regular files afaict from:
-> > >
-> > > vfio_device_open_file(struct vfio_device *device)
-> > >
-> > > (Well, it's actually worse as anon_inode_getfile() files don't have any
-> > > mode at all but that's beside the point.)?
-> > >
-> > > In any case, I think you're right that such files would (accidently?)
-> > > qualify for content watches afaict. So at least that should probably get
-> > > FMODE_NONOTIFY.
-> >
-> > Hmm. Can we just make all anon_inodes do that? I don't think you can
-> > sanely have pre-content watches on anon-inodes, since you can't really
-> > have access to them to _set_ the content watch from outside anyway..
-> >
-> > In fact, maybe do it in alloc_file_pseudo()?
-> >
+On 2/1/2025 2:27 AM, Paolo Bonzini wrote:
+> On Fri, Jan 24, 2025 at 2:40 PM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+>>
+>> For TDX guest, the phys_bits is not configurable and can only be
+>> host/native value.
+>>
+>> Validate phys_bits inside tdx_check_features().
 > 
-> The problem is that we cannot set FMODE_NONOTIFY -
-> we tried that once but it regressed some workloads watching
-> write on pipe fd or something.
+> Hi Xiaoyao,
+> 
+> to avoid
+> 
+> qemu-kvm: TDX requires guest CPU physical bits (48) to match host CPU
+> physical bits (52)
+> 
+> I need options like
+> 
+> -cpu host,phys-bits=52,guest-phys-bits=52,host-phys-bits-limit=52,-kvm-asyncpf-int
+> 
+> to start a TDX guest, is that intentional?
 
-Ok, that might be true. But I would assume that most users of
-alloc_file_pseudo() or the anonymous inode infrastructure will not care
-about fanotify events. I would not go for a separate helper. It'd be
-nice to keep the number of file allocation functions low.
+"-cpu host" should be sufficient and should not hit the error.
 
-I'd rather have the subsystems that want it explicitly opt-in to
-fanotify watches, i.e., remove FMODE_NONOTIFY. Because right now we have
-broken fanotify support for e.g., nsfs already. So make the subsystems
-think about whether they actually want to support it.
+why did you get "guest CPU physical bits (48)"?
 
-I would disqualify all anonymous inodes and see what actually does
-break. I naively suspect that almost no one uses anonymous inodes +
-fanotify. I'd be very surprised.
+> Thanks,
+> 
+> Paolo
+> 
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   target/i386/host-cpu.c | 2 +-
+>>   target/i386/host-cpu.h | 1 +
+>>   target/i386/kvm/tdx.c  | 8 ++++++++
+>>   3 files changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/i386/host-cpu.c b/target/i386/host-cpu.c
+>> index 3e4e85e729c8..8a15af458b05 100644
+>> --- a/target/i386/host-cpu.c
+>> +++ b/target/i386/host-cpu.c
+>> @@ -15,7 +15,7 @@
+>>   #include "system/system.h"
+>>
+>>   /* Note: Only safe for use on x86(-64) hosts */
+>> -static uint32_t host_cpu_phys_bits(void)
+>> +uint32_t host_cpu_phys_bits(void)
+>>   {
+>>       uint32_t eax;
+>>       uint32_t host_phys_bits;
+>> diff --git a/target/i386/host-cpu.h b/target/i386/host-cpu.h
+>> index 6a9bc918baa4..b97ec01c9bec 100644
+>> --- a/target/i386/host-cpu.h
+>> +++ b/target/i386/host-cpu.h
+>> @@ -10,6 +10,7 @@
+>>   #ifndef HOST_CPU_H
+>>   #define HOST_CPU_H
+>>
+>> +uint32_t host_cpu_phys_bits(void);
+>>   void host_cpu_instance_init(X86CPU *cpu);
+>>   void host_cpu_max_instance_init(X86CPU *cpu);
+>>   bool host_cpu_realizefn(CPUState *cs, Error **errp);
+>> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+>> index bb75eb06dad9..c906a76c4c0e 100644
+>> --- a/target/i386/kvm/tdx.c
+>> +++ b/target/i386/kvm/tdx.c
+>> @@ -24,6 +24,7 @@
+>>
+>>   #include "cpu.h"
+>>   #include "cpu-internal.h"
+>> +#include "host-cpu.h"
+>>   #include "hw/i386/e820_memory_layout.h"
+>>   #include "hw/i386/x86.h"
+>>   #include "hw/i386/tdvf.h"
+>> @@ -838,6 +839,13 @@ static int tdx_check_features(X86ConfidentialGuest *cg, CPUState *cs)
+>>           return -1;
+>>       }
+>>
+>> +    if (cpu->phys_bits != host_cpu_phys_bits()) {
+>> +        error_report("TDX requires guest CPU physical bits (%u) "
+>> +                     "to match host CPU physical bits (%u)",
+>> +                     cpu->phys_bits, host_cpu_phys_bits());
+>> +        exit(1);
+>> +    }
+>> +
+>>       return 0;
+>>   }
+>>
+>> --
+>> 2.34.1
+>>
+> 
+> 
 
-I'm currently traveling (see you later btw) but from a very cursory
-reading I would naively suspect the following:
-
-// Suspects for FMODE_NONOTIFY
-drivers/dma-buf/dma-buf.c:      file = alloc_file_pseudo(inode, dma_buf_mnt, "dmabuf",
-drivers/misc/cxl/api.c: file = alloc_file_pseudo(inode, cxl_vfs_mount, name,
-drivers/scsi/cxlflash/ocxl_hw.c:        file = alloc_file_pseudo(inode, ocxlflash_vfs_mount, name,
-fs/anon_inodes.c:       file = alloc_file_pseudo(inode, anon_inode_mnt, name,
-fs/hugetlbfs/inode.c:           file = alloc_file_pseudo(inode, mnt, name, O_RDWR,
-kernel/bpf/token.c:     file = alloc_file_pseudo(inode, path.mnt, BPF_TOKEN_INODE_NAME, O_RDWR, &bpf_token_fops);
-mm/secretmem.c: file = alloc_file_pseudo(inode, secretmem_mnt, "secretmem",
-block/bdev.c:   bdev_file = alloc_file_pseudo_noaccount(BD_INODE(bdev),
-drivers/tty/pty.c: static int ptmx_open(struct inode *inode, struct file *filp)
-
-// Suspects for ~FMODE_NONOTIFY
-fs/aio.c:       file = alloc_file_pseudo(inode, aio_mnt, "[aio]",
-fs/pipe.c:      f = alloc_file_pseudo(inode, pipe_mnt, "",
-mm/shmem.c:             res = alloc_file_pseudo(inode, mnt, name, O_RDWR,
-
-// Unsure:
-fs/nfs/nfs4file.c:      filep = alloc_file_pseudo(r_ino, ss_mnt, read_name, O_RDONLY,
-net/socket.c:   file = alloc_file_pseudo(SOCK_INODE(sock), sock_mnt, dname,
-
-> 
-> and the no-pre-content is a flag combination (to save FMODE_ flags)
-> which makes things a bit messy.
-> 
-> We could try to initialize f_mode to FMODE_NONOTIFY_PERM
-> for anon_inode, which opts out of both permission and pre-content
-> events and leaves the legacy inotify workloads unaffected.
-> 
-> But, then code like this will not do the right thing:
-> 
->         /* We refuse fsnotify events on ptmx, since it's a shared resource */
->         filp->f_mode |= FMODE_NONOTIFY;
-> 
-> We will need to convert all those to use a helper.
-> I am traveling today so will be able to look closer tomorrow.
-> 
-> Jan,
-> 
-> What do you think?
-> 
-> Amir.
 
