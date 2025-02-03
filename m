@@ -1,68 +1,75 @@
-Return-Path: <kvm+bounces-37100-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110F8A25482
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 09:37:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E0BA2548F
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 09:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 894F018833D1
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 08:37:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A55B7160BA1
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 08:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF81D1FE466;
-	Mon,  3 Feb 2025 08:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A0E20766C;
+	Mon,  3 Feb 2025 08:36:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MJmDrr9X"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aAq1DSOj"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0221FBC92
-	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 08:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62A5207A19
+	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 08:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738571805; cv=none; b=WWtoEQ6FDtBKCPIqnvopA4BNMWRCI2PlnyohQwoQnUcoqAFjDQvzZG4MSM+egE1uzn+zfVEbYSTkzF2Kl1cJouch3AxkDiZg6XHG/lLUFC+XEPh8tnvMvpZ9vDUu/QU8yqZOqTQAmDgyneNr7X7lnQM8CX14mqdpk+hBOBH7Dsk=
+	t=1738571811; cv=none; b=pKKLdUThUX7Ce0ci7LGsD8YIx6rysUGkRGggbuRCBMsxojG0LdlH+2pRIsMT0oteeLcsckWWMC7ZHrmEku5EQqnJooWZ1w3WykiCUAUsjestY6juVhLkyJoTCOpaxTvrSJI1RhGlPD0wrmCtXW+rVAJUTXZh6PKrIu+QSQc/0K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738571805; c=relaxed/simple;
-	bh=6J2E+GafP9GP+EDU3mwFGlAbtSZDBQxjsHAovyykeA0=;
+	s=arc-20240116; t=1738571811; c=relaxed/simple;
+	bh=pTt1HxOpcKGFulC43K15//sRXaSnw9CAJMmxbYk4W9w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=th+iJPFwWhiClD6cKUEGeOkzr+P1LoOPdXi3vZw0Ovh2TIeDII3tZbEHE7nKDga69WnY34IIZtW6R26Hj6A2QGSyXNf4vwanrsDPyM/zCHnA7qPxO++gKrbAXk8kAclk0IAFvacYPqW2xFcU5LzprhgAX/OOhmOioY8r4am3Esk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MJmDrr9X; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=ugDOhXaQPRHVe2RZXOyI24a1drx3thL3WouJDgb03pt0rypo0NTXsh2IG+FI2TRdsi5/vE4bmvnK4nCuK0/ZBdaQ4mjXgk6jnUeFjyMgiTfy7HC9dAl0bqtff2T2hjdEHE6swGAedUAARhepNuKlbjKfqBK8JyAmbXIM8v++a28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aAq1DSOj; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5135Nj0B012875;
-	Mon, 3 Feb 2025 08:36:33 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 512LkaJD027268;
+	Mon, 3 Feb 2025 08:36:34 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=zWpbI07Qh1H179L5N
-	ZcyLr/xpTr9x8G65Lj0lVc/pho=; b=MJmDrr9XkPoKux7+R1yxsaFQHaOCQ7TpQ
-	fiirYCFF6qkicQFxM2JciowUx6r2C8rKLOZ7M6+coeiKg3TsS3V4GXpENORXSlmF
-	O1m6NSttuUMI9OvuwkL2rGlL4zKNQ5pIJY3WqdbPYwlHlBT7QAWVw+0BiIkDQnWw
-	Sr8YxHAmk/hXZOa2wvXoazJT82qUbq8YOUlD8BsYxc3sPVox8BAxdFsLLZIw2cCy
-	IYvyt9DOm5ig6DFIo5oXz/xZt8Mm19+JYRSavQ/ZPJttSiUGmkly3sogQB6QNu4s
-	T4tiRwLCDWhoI+f5+JLyHHkhCEVxk4zM5Mh0ja06T0bTDaDUKA4Pw==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44jqm78svf-1
+	:mime-version:references:subject:to; s=pp1; bh=uzUC2co3msp0iiX6i
+	mP+T7yNPXZnHyO+vvROU0ZAqfI=; b=aAq1DSOjxkYCB/Mjau8VOWrp8tu++48fb
+	UhGZKEQfvh3VCbXM1Xk/bv/t7c0kZ+/0zJRz1GHDrMji+4h8MzOvFMqJjORq5ZY8
+	/8qleCwBTjL/Y5T13QcdjN9Gf0efnxzjovWyXs/S8VdU8kU1A5dR9wzBvLT7UUw3
+	NVExVIBCbGaQUFaPU/lLdgfswjh/EscrOSdH/cl81DHyCXrKTa4JPg0tM2vvgCvV
+	PZIviExFIp8iZaLQw6EfEeEpOJSvbpHxy6baP2IeA1G1LRzfDQV1FWl+4kg7gvS/
+	iN00jaHVzrXSrkA15h7sGM7SoEIRWmc+vyNM2tlsf7Ck8Z/AysVoQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44jayyba1v-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Feb 2025 08:36:32 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5138aEFB005251;
+	Mon, 03 Feb 2025 08:36:34 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 5138aYTJ014597;
+	Mon, 3 Feb 2025 08:36:34 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44jayyba1c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Feb 2025 08:36:34 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5137OFgO007136;
 	Mon, 3 Feb 2025 08:36:32 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44j05jn6ap-1
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxaydhhu-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Mon, 03 Feb 2025 08:36:32 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5138aSli48234752
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5138aTLo48169336
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Feb 2025 08:36:28 GMT
+	Mon, 3 Feb 2025 08:36:29 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 822BE20040;
-	Mon,  3 Feb 2025 08:36:28 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 19E8020040;
+	Mon,  3 Feb 2025 08:36:29 +0000 (GMT)
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1472F2004D;
+	by IMSVA (Postfix) with ESMTP id 962EC20043;
 	Mon,  3 Feb 2025 08:36:28 +0000 (GMT)
 Received: from t14-nrb.lan (unknown [9.171.84.16])
 	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -70,10 +77,11 @@ Received: from t14-nrb.lan (unknown [9.171.84.16])
 From: Nico Boehr <nrb@linux.ibm.com>
 To: thuth@redhat.com, pbonzini@redhat.com, andrew.jones@linux.dev
 Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Subject: [kvm-unit-tests GIT PULL 08/18] s390x: Add library functions for exiting from snippet
-Date: Mon,  3 Feb 2025 09:35:16 +0100
-Message-ID: <20250203083606.22864-9-nrb@linux.ibm.com>
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>
+Subject: [kvm-unit-tests GIT PULL 09/18] s390x: Use library functions for snippet exit
+Date: Mon,  3 Feb 2025 09:35:17 +0100
+Message-ID: <20250203083606.22864-10-nrb@linux.ibm.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250203083606.22864-1-nrb@linux.ibm.com>
 References: <20250203083606.22864-1-nrb@linux.ibm.com>
@@ -85,184 +93,106 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: RwGLNSxHw8bd4zE002Wc3qT9h5OR69iM
-X-Proofpoint-ORIG-GUID: RwGLNSxHw8bd4zE002Wc3qT9h5OR69iM
+X-Proofpoint-GUID: iQnsEK7vqMsgWpqXRwqBKG4PCks80ttk
+X-Proofpoint-ORIG-GUID: 2VtnVHaFpL6GxQqdHswPUi89HDJt5ZN4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-03_03,2025-01-31_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=862 bulkscore=0 mlxscore=0 suspectscore=0
- priorityscore=1501 phishscore=0 impostorscore=0 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
- definitions=main-2502030068
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 mlxlogscore=999 adultscore=0 priorityscore=1501
+ phishscore=0 impostorscore=0 malwarescore=0 mlxscore=0 bulkscore=0
+ suspectscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2501170000 definitions=main-2502030068
 
 From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-It is useful to be able to force an exit to the host from the snippet,
-as well as do so while returning a value.
-Add this functionality, also add helper functions for the host to check
-for an exit and get or check the value.
-Use diag 0x44 and 0x9c for this.
-Add a guest specific snippet header file and rename snippet.h to reflect
-that it is host specific.
+Replace the existing code for exiting from snippets with the newly
+introduced library functionality.
 
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Link: https://lore.kernel.org/r/20241016180320.686132-5-nsg@linux.ibm.com
-[ nrb: fix out-of-tree builds ]
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Link: https://lore.kernel.org/r/20241016180320.686132-6-nsg@linux.ibm.com
 Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 ---
- s390x/Makefile                    |  7 +++--
- lib/s390x/asm/arch_def.h          | 16 +++++++++++
- lib/s390x/snippet-exit.h          | 45 +++++++++++++++++++++++++++++++
- s390x/snippets/lib/snippet-exit.h | 28 +++++++++++++++++++
- 4 files changed, 94 insertions(+), 2 deletions(-)
- create mode 100644 lib/s390x/snippet-exit.h
- create mode 100644 s390x/snippets/lib/snippet-exit.h
+ s390x/sie-dat.c            | 12 ++++--------
+ s390x/snippets/c/sie-dat.c | 19 +------------------
+ 2 files changed, 5 insertions(+), 26 deletions(-)
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 907b3a04..9eeff198 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -71,7 +71,8 @@ test_cases: $(tests)
- test_cases_binary: $(tests_binary)
- test_cases_pv: $(tests_pv_binary)
+diff --git a/s390x/sie-dat.c b/s390x/sie-dat.c
+index f0257770..44bf29fe 100644
+--- a/s390x/sie-dat.c
++++ b/s390x/sie-dat.c
+@@ -17,6 +17,7 @@
+ #include <sclp.h>
+ #include <sie.h>
+ #include <snippet.h>
++#include <snippet-exit.h>
+ #include "snippets/c/sie-dat.h"
  
--INCLUDE_PATHS = $(SRCDIR)/lib $(SRCDIR)/lib/s390x $(SRCDIR)/s390x
-+SNIPPET_INCLUDE :=
-+INCLUDE_PATHS = $(SNIPPET_INCLUDE) $(SRCDIR)/lib $(SRCDIR)/lib/s390x $(SRCDIR)/s390x
- # Include generated header files (e.g. in case of out-of-source builds)
- INCLUDE_PATHS += lib
- CPPFLAGS = $(addprefix -I,$(INCLUDE_PATHS))
-@@ -122,6 +123,7 @@ asmlib = $(TEST_DIR)/cstart64.o $(TEST_DIR)/cpu.o
- FLATLIBS = $(libcflat)
+ static struct vm vm;
+@@ -27,23 +28,18 @@ static void test_sie_dat(void)
+ 	uint64_t test_page_gpa, test_page_hpa;
+ 	uint8_t *test_page_hva, expected_val;
+ 	bool contents_match;
+-	uint8_t r1;
  
- SNIPPET_DIR = $(TEST_DIR)/snippets
-+SNIPPET_SRC_DIR = $(SRCDIR)/s390x/snippets
- snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
- snippet_lib = $(snippet_asmlib) lib/auxinfo.o
+ 	/* guest will tell us the guest physical address of the test buffer */
+ 	sie(&vm);
+-	assert(vm.sblk->icptcode == ICPT_INST &&
+-	       (vm.sblk->ipa & 0xff00) == 0x8300 && vm.sblk->ipb == 0x9c0000);
+-
+-	r1 = (vm.sblk->ipa & 0xf0) >> 4;
+-	test_page_gpa = vm.save_area.guest.grs[r1];
++	assert(snippet_is_force_exit_value(&vm));
++	test_page_gpa = snippet_get_force_exit_value(&vm);
+ 	test_page_hpa = virt_to_pte_phys(guest_root, (void*)test_page_gpa);
+ 	test_page_hva = __va(test_page_hpa);
+ 	report_info("test buffer gpa=0x%lx hva=%p", test_page_gpa, test_page_hva);
  
-@@ -149,9 +151,10 @@ snippet-hdr-obj =
- endif
+ 	/* guest will now write to the test buffer and we verify the contents */
+ 	sie(&vm);
+-	assert(vm.sblk->icptcode == ICPT_INST &&
+-	       vm.sblk->ipa == 0x8300 && vm.sblk->ipb == 0x440000);
++	assert(snippet_is_force_exit(&vm));
  
- # the asm/c snippets %.o have additional generated files as dependencies
--$(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
-+$(SNIPPET_DIR)/asm/%.o: $(SNIPPET_SRC_DIR)/asm/%.S $(asm-offsets)
- 	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+ 	contents_match = true;
+ 	for (unsigned int i = 0; i < GUEST_TEST_PAGE_COUNT; i++) {
+diff --git a/s390x/snippets/c/sie-dat.c b/s390x/snippets/c/sie-dat.c
+index 9d89801d..ba1604de 100644
+--- a/s390x/snippets/c/sie-dat.c
++++ b/s390x/snippets/c/sie-dat.c
+@@ -10,28 +10,11 @@
+ #include <libcflat.h>
+ #include <asm-generic/page.h>
+ #include <asm/mem.h>
++#include <snippet-exit.h>
+ #include "sie-dat.h"
  
-+$(SNIPPET_DIR)/c/%.o: SNIPPET_INCLUDE := $(SNIPPET_SRC_DIR)/lib
- $(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
- 	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+ static uint8_t test_pages[GUEST_TEST_PAGE_COUNT * PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
  
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 5574a451..03adcd3c 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -505,4 +505,20 @@ static inline uint32_t get_prefix(void)
- 	return current_prefix;
- }
- 
-+static inline void diag44(void)
-+{
-+	asm volatile("diag	0,0,0x44\n");
-+}
-+
-+static inline void diag500(uint64_t val)
-+{
-+	asm volatile(
-+		"lgr	2,%[val]\n"
-+		"diag	0,0,0x500\n"
-+		:
-+		: [val] "d"(val)
-+		: "r2"
-+	);
-+}
-+
- #endif
-diff --git a/lib/s390x/snippet-exit.h b/lib/s390x/snippet-exit.h
-new file mode 100644
-index 00000000..3ed4c22c
---- /dev/null
-+++ b/lib/s390x/snippet-exit.h
-@@ -0,0 +1,45 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Functionality handling snippet exits
-+ *
-+ * Copyright IBM Corp. 2024
-+ */
-+
-+#ifndef _S390X_SNIPPET_EXIT_H_
-+#define _S390X_SNIPPET_EXIT_H_
-+
-+#include <libcflat.h>
-+#include <sie.h>
-+#include <sie-icpt.h>
-+
-+static inline bool snippet_is_force_exit(struct vm *vm)
-+{
-+	return sie_is_diag_icpt(vm, 0x44);
-+}
-+
-+static inline bool snippet_is_force_exit_value(struct vm *vm)
-+{
-+	return sie_is_diag_icpt(vm, 0x500);
-+}
-+
-+static inline uint64_t snippet_get_force_exit_value(struct vm *vm)
-+{
-+	assert(snippet_is_force_exit_value(vm));
-+
-+	return vm->save_area.guest.grs[2];
-+}
-+
-+static inline void snippet_check_force_exit_value(struct vm *vm, uint64_t value_exp)
-+{
-+	uint64_t value;
-+
-+	if (snippet_is_force_exit_value(vm)) {
-+		value = snippet_get_force_exit_value(vm);
-+		report(value == value_exp, "guest forced exit with value (0x%lx == 0x%lx)",
-+		       value, value_exp);
-+	} else {
-+		report_fail("guest forced exit with value");
-+	}
-+}
-+
-+#endif /* _S390X_SNIPPET_EXIT_H_ */
-diff --git a/s390x/snippets/lib/snippet-exit.h b/s390x/snippets/lib/snippet-exit.h
-new file mode 100644
-index 00000000..ac00de3f
---- /dev/null
-+++ b/s390x/snippets/lib/snippet-exit.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Functionality for exiting the snippet.
-+ *
-+ * Copyright IBM Corp. 2023
-+ */
-+
-+#ifndef _S390X_SNIPPET_LIB_EXIT_H_
-+#define _S390X_SNIPPET_LIB_EXIT_H_
-+
-+#include <asm/arch_def.h>
-+#include <asm/barrier.h>
-+
-+static inline void force_exit(void)
-+{
-+	mb(); /* host may read any memory written by the guest before */
-+	diag44();
-+	mb(); /* allow host to modify guest memory */
-+}
-+
-+static inline void force_exit_value(uint64_t val)
-+{
-+	mb(); /* host may read any memory written by the guest before */
-+	diag500(val);
-+	mb(); /* allow host to modify guest memory */
-+}
-+
-+#endif /* _S390X_SNIPPET_LIB_EXIT_H_ */
+-static inline void force_exit(void)
+-{
+-	asm volatile("diag	0,0,0x44\n"
+-		     :
+-		     :
+-		     : "memory"
+-	);
+-}
+-
+-static inline void force_exit_value(uint64_t val)
+-{
+-	asm volatile("diag	%[val],0,0x9c\n"
+-		     :
+-		     : [val] "d"(val)
+-		     : "memory"
+-	);
+-}
+-
+ int main(void)
+ {
+ 	uint8_t *invalid_ptr;
 -- 
 2.47.1
 
