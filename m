@@ -1,284 +1,165 @@
-Return-Path: <kvm+bounces-37147-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37148-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0883A2629D
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 19:37:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84704A262CA
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 19:45:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44A701655B0
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 18:37:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 293737A252E
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 18:44:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B174D1D5173;
-	Mon,  3 Feb 2025 18:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72531199236;
+	Mon,  3 Feb 2025 18:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PGxL0QHD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hxhBoA9+"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2045.outbound.protection.outlook.com [40.107.243.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1CD13212A;
-	Mon,  3 Feb 2025 18:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738607832; cv=fail; b=dx3di4OJg1+4nJGYxie0SEfqsGKwQPOMp3jsotDRkAzswJ+02nUtq39tSt6zul8dPrJqokoVVgTcSwM7xjbgkAW77xlAtPHozxj3opqhnds0Zl3rkZzhilVPhWed/YFnxUnkpzG28cNvXd8g7fPsqWZtPuZDo+QDySoeufyE1y4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738607832; c=relaxed/simple;
-	bh=IbZE/gK8pw2WtJnUBgwmxX1QZsHVxUuh7rZSGZ09QVs=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FbAVelKWEGHj/yyMiJQsKubLa1p96o3vWR7+3XgYXzSSShomlQN+Zdey2iHD01kp+3ImwIYOxv+QqipjgRV7dL1uGESZUYA17DHuAJ/IvJcX1YQph8/3FAbngxX6y7aIW/eJWljAnza5zdNV1LfUxLhxnuop2pF8YWjoAqizRZs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PGxL0QHD; arc=fail smtp.client-ip=40.107.243.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Gb/IrpskEHOPaiCdJUvFAnVeBUpT/YXNzdPCz/GcqQSlMvHvvfXpdMzEwYwcGyDIi1FMdvlQCMxHa+4ntHCMUUULVzSCQbS17ajfvBnqHr/MEq9FC51Mip4FHcY962bYkVwe3DnI/KJoKnpQC1mxOTqVrZ9Rw42rT32ilMRtKaaFcnfXYRHCaRK6H5u7NXkUBDa5J16Bktnn4o2MKmZeMCNHROqE2znWn81EB7bhBGkia0r45atmgY2+cbJGTpejRVDX77VUAFEuIr5NVbLNX/0cK5UNNmbY+uqYni455lbcQoxIq18i1Hav8l1hYy3aGRHu6SQD4nOHlkjnx3fRqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aSlgDEWbIzv/eLTk0xSrJxJaPS/F5KG72WV9MqzVXWs=;
- b=Ptvop1NYsQI9ci6U4s2CqGvfXfitV3l40UV1i4JvO+RF281UujWkUEOFGGeTznSyDLcGS+7sm9kd/v5Hz2Hiou0mCVAGX3+l4QdH8b/w8oFfmLd1+vMeTyMO6iDslevjuBAz/+elkzdtea8AJ79LRFNahU88jfj+2BDzJgudpakceckHAXTJrgkI/bSeh/7bElwI4DyCkuTXTZuFZadZNANyPU5rh0Qm10mL3AaSbCiyU9VmwGlsk/2BufkLxwDKGiQkz8VQXnVPjFhYH9QoNxyAWUREuL+Wbo64jxTVQ8gqG2wgivh7aTHwaxS2Lz7hJphCOtaefgtA1yVqY3wZjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aSlgDEWbIzv/eLTk0xSrJxJaPS/F5KG72WV9MqzVXWs=;
- b=PGxL0QHDnjIUPhuIftgYgjpjif8rpNTaa/RWdS/BHVc1768GqbhbvyLQ3Dvs5FcxA7P7V+vFPktdEC3DpfIL9w22t/730b5zJIgq/XeydvSL+R9h27OJfr7DEkyPfVGHuFYFCApucRJzfnvEEBQFjp32NhhLeWjR5wbV59ERIOPrmkhIb1hKKttsCYx2yrYdTyL+wjs6+UzHcwD693sa5PqeJThyIwIKTmWrvyStY8SfxSrl/c/KP2U8rq1/qdMyJxCfMBPM01VhSUxJVyrfmBdQ9aH3SuvvEPVMyiz8HJVaQzDpTBfdAfoLTKxQ5D89eXIDqlWkkm5PZ2IGbtpY4Q==
-Received: from DM6PR06CA0094.namprd06.prod.outlook.com (2603:10b6:5:336::27)
- by DM6PR12MB4284.namprd12.prod.outlook.com (2603:10b6:5:21a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.18; Mon, 3 Feb
- 2025 18:37:05 +0000
-Received: from DS1PEPF00017098.namprd05.prod.outlook.com
- (2603:10b6:5:336:cafe::5) by DM6PR06CA0094.outlook.office365.com
- (2603:10b6:5:336::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.24 via Frontend Transport; Mon,
- 3 Feb 2025 18:37:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF00017098.mail.protection.outlook.com (10.167.18.102) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8398.14 via Frontend Transport; Mon, 3 Feb 2025 18:37:05 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 3 Feb 2025
- 10:36:41 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 3 Feb
- 2025 10:36:40 -0800
-Received: from Asurada-Nvidia (10.127.8.12) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14 via Frontend
- Transport; Mon, 3 Feb 2025 10:36:39 -0800
-Date: Mon, 3 Feb 2025 10:36:37 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-CC: "will@kernel.org" <will@kernel.org>, "robin.murphy@arm.com"
-	<robin.murphy@arm.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "maz@kernel.org" <maz@kernel.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "joro@8bytes.org"
-	<joro@8bytes.org>, "shuah@kernel.org" <shuah@kernel.org>, "Chatre, Reinette"
-	<reinette.chatre@intel.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"yebin10@huawei.com" <yebin10@huawei.com>, "apatel@ventanamicro.com"
-	<apatel@ventanamicro.com>, "shivamurthy.shastri@linutronix.de"
-	<shivamurthy.shastri@linutronix.de>, "bhelgaas@google.com"
-	<bhelgaas@google.com>, "anna-maria@linutronix.de" <anna-maria@linutronix.de>,
-	"yury.norov@gmail.com" <yury.norov@gmail.com>, "nipun.gupta@amd.com"
-	<nipun.gupta@amd.com>, "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "patches@lists.linux.dev"
-	<patches@lists.linux.dev>, "jean-philippe@linaro.org"
-	<jean-philippe@linaro.org>, "mdf@kernel.org" <mdf@kernel.org>,
-	"mshavit@google.com" <mshavit@google.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "smostafa@google.com"
-	<smostafa@google.com>, "ddutile@redhat.com" <ddutile@redhat.com>
-Subject: Re: [PATCH RFCv2 09/13] iommufd: Add IOMMU_OPTION_SW_MSI_START/SIZE
- ioctls
-Message-ID: <Z6EMtXD6Gaq3+eVw@Asurada-Nvidia>
-References: <cover.1736550979.git.nicolinc@nvidia.com>
- <d3cb1694e07be0e214dc44dcb2cb74f014606560.1736550979.git.nicolinc@nvidia.com>
- <BN9PR11MB527616A2EA6C64824576E58F8CE02@BN9PR11MB5276.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153B470821
+	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 18:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738608331; cv=none; b=ig+yQ3MTjpioAfOrsWyBxSuUPHy5U6VSkBpuGUkTZwataEMoDtJNTVQPl9Nr9x4llBWALs+G6Mr+Zcikbvv+Fzol3De916qrKQR9ABT61L+GqvKvZPxn7j3owod3C5ViqY0Bu9xCYJLNbntXnfeJpkP4KVD715tmAOK+n6Y8npM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738608331; c=relaxed/simple;
+	bh=/4W9xvHGeCr3mU6Qd3+ZKz3UtiIi86q6ZuHSHXmqbcs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iQqyBuldA94SiaAvvK8g4wgnwmXi9MXtTEtUc/X3Cj4KMXFWSxyBE11ey5UYzwsvK4pzYDrikKusKJDNJz1LSlcmqsUWegy6RNMtgt2GBe7qt/s7JZ2EPPaiVoOzhIK99Dop09OYrSjlfwFbVtu8fR5RSlO3C4Z91Wt+CvLfCTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hxhBoA9+; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2167141e00eso112474365ad.2
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 10:45:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738608329; x=1739213129; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8EBg9yr3SZ5VzxNr92/uhVOfd5I96F3xw5RlnlgXXyA=;
+        b=hxhBoA9+5ULyfSV25WYAU4j6/W9Vr2Yho77ifa9MH0VcTXHeKvGOpYx38pCoR91N+e
+         4ht1272ZOz8u/Hdqx3bWpKERN+M8dUwucY+RXkNxBQJbBAQ5T8LUHAKiB2AkakU+ywGD
+         n5EolzI+WFUNHbrKmFkL/ZKN8k9AZeyp3eZabUgnTcZdfUQ4zNIa7WLhKAwcjIehjYuy
+         gRP58/vrNdUvzuhYS+Ww+GDXeBvyeyMVAAxL6f6UK5zxLK6i9ujv0CezrhpkOC3B8uvS
+         Fezy0QudzaD4uLtYFaDiahhtTZJMskWC/4aTfUzjdDgnJ2VDcAhNjPxwPxpiJkcvhsYH
+         LTKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738608329; x=1739213129;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8EBg9yr3SZ5VzxNr92/uhVOfd5I96F3xw5RlnlgXXyA=;
+        b=M9TYrhrgA+WozOeUkUVIqf59Xe20fus5pO59wt808nmoEQAoymuzPpHIMfanC4/l28
+         NhxEYP/F30kVMjlu62Nle/McMCbwegSKs42nN7ZAPMyPN/oHrhMSDO7tbiOHuhkDjrda
+         8aKQRxgd5qZu9MUxl8VleNkZLz+QZ8zhGLSKTSvR5phAjAwETpteA9qlzdjIF7DuqCRv
+         0vUDzl+tsBwP/EmjMmLj4L872i1oCp1MJp6ShmkFr2wqqEpVKpfws6+9HLua/r1IFwd2
+         TJ4Ct+Yh+7alRkhi8TFhAhQAjdwnSwgsaVaqzVJQkgYKgnjLleqlYqjMWKWHhR7zuAA3
+         xbvQ==
+X-Gm-Message-State: AOJu0YwBX5aopoFYSDHarGkfsV+Nml6rtbF3X62hgIuzmXDPyZkuabJg
+	yZTOrXI63N83v/361y9Q+Cph+El69Cu6zkjAxOFt7ebtAqqB2HpVfbT/C38/JmPIfopCY3DWyk0
+	hag==
+X-Google-Smtp-Source: AGHT+IEckrImT0quLmOSWMfOCxjo0iCWgxhLoZRf4K4HDS8cgcz0+IkmWvTXp8SAwP/of2B0DqD2j7YL6E4=
+X-Received: from pfjf11.prod.google.com ([2002:a05:6a00:22cb:b0:724:f17d:ebd7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9186:b0:1dc:e8d:c8f0
+ with SMTP id adf61e73a8af0-1ed7a6b825amr40319556637.29.1738608329238; Mon, 03
+ Feb 2025 10:45:29 -0800 (PST)
+Date: Mon, 3 Feb 2025 10:45:27 -0800
+In-Reply-To: <405a98c2f21b9fe73eddbc35c80b60d6523db70c.1738595289.git.naveen@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <cover.1738595289.git.naveen@kernel.org> <405a98c2f21b9fe73eddbc35c80b60d6523db70c.1738595289.git.naveen@kernel.org>
+Message-ID: <Z6EOxxZA9XLdXvrA@google.com>
+Subject: Re: [PATCH 3/3] KVM: x86: Decouple APICv activation state from apicv_inhibit_reasons
+From: Sean Christopherson <seanjc@google.com>
+To: "Naveen N Rao (AMD)" <naveen@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527616A2EA6C64824576E58F8CE02@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017098:EE_|DM6PR12MB4284:EE_
-X-MS-Office365-Filtering-Correlation-Id: ff9b4744-ac40-496b-14ee-08dd4481c24a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|7416014|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?p2zM2Goq3/qi7K5eXuPvR3ZYU0lgCKoYb3GPV/eLIMFBzozQQAxBesF+2Kfn?=
- =?us-ascii?Q?+c21gAEk5bvm4E/Gd9dQ5+lw6gKcvz44cpgbfVuFlNaHm9OsOZQPD/AtvpJj?=
- =?us-ascii?Q?GT2qEUlsRogd3/T1/72buk8SnAYFBlzTqvH/h6AMbG27/1H5pZ0A2/mn8IRm?=
- =?us-ascii?Q?McnJf1LpJyeq2E8kx9S9AAScOlZuXschw0KCfbPTaYDkmoHBg3pGSs5EJ1Tv?=
- =?us-ascii?Q?yV2Vdy3oHDAiHrXCVYP8RvCyYapyx9mWDJRzVFIlD5M4iOECxEftvD9ySy3f?=
- =?us-ascii?Q?uAFqJqYjUJ3gJ6SL2mrxseD34rl1ViVkBc06xzwVaBRUz3Lolprm8dugKxAo?=
- =?us-ascii?Q?mHYP/vMCKJ7SYF+Ky9vethRl25wVIm4ME3/TXiP5R0mXXWrrCzWx8/V1MAp5?=
- =?us-ascii?Q?2cTu5G0A4Af7L+r4FJC4+ob38xIj4v9vsK6Sval2GCgTRtIsYLygADPsx/Aj?=
- =?us-ascii?Q?pr6RqcygFV9JeyandtwPvyOJSogC+L4ks1a9eRruC12ynjdyeyCIxUjBBiNi?=
- =?us-ascii?Q?yXMgTPJQPY7dY56m/t1uepnms9Ms4CJ2xnSV1TLfdl0C8EiD2NqvdG54kdYl?=
- =?us-ascii?Q?MVI3+ZLgUowxa4Wmq+ccnfN2qY7oZZePV0jO+pnMyExaouvfpJFS3QiZqtX4?=
- =?us-ascii?Q?PN29ef3t/ICcZ++CW76XdlTvbz4ZgrOvl5diODqmqeyTSqTGw/o6rIuFP7x0?=
- =?us-ascii?Q?GF/xN/KYiYcQspKEVZGZDbN8gMsQYlL4CBaZVUg4DohHsADP4I5FG4bgCYB0?=
- =?us-ascii?Q?1VBUWPEFjhGiQCdEe/HAqkYpN1nqsQ+eL28UmB6NDUYhrHCJKJip5MnTrfEl?=
- =?us-ascii?Q?2S2NUqvfj9JKEIXKWTsp3aNbpaVZbwjO6+uyQtSLmMi91VbH8GgOpTXaDIT7?=
- =?us-ascii?Q?C7ndskTOwsUkYIaMiA/VyCpsutvlZ2fZL7ob9BMnlMsISsuaf6zC+DS9s0No?=
- =?us-ascii?Q?d5gID7WpcbXcNOtlhOGuR+XenPNbTb4pZ4FEtoA6M7PJcYQW206wpkEJs3vg?=
- =?us-ascii?Q?oC8Zx+/Amwfd9Qx+R74r/alq2mqMKqdYNSR8vbdE6IQJBNbYUt2XOjSKVNb8?=
- =?us-ascii?Q?rOPCQJacPqR1py4/eqdW50GPkVDnddKmocfZZXfiFavCq1ghs9MoBtnJg2Py?=
- =?us-ascii?Q?ZrC9Co/+1RNkCLm8uYE9kpwUtEgCZwJ7oRuFObPMUS5F8PRpl3zh5akqlLeY?=
- =?us-ascii?Q?R15irPiY8DICIGzmCS+Mc4E8L0aPQsO8cVQ7GJ9Fieco25Et6uqQwzX9Q+mb?=
- =?us-ascii?Q?KUTwowpm4R4NmfyreEIM6phApHN7D/ItpgZjbnjv1olU5v2hiZ4C2vcwMUfg?=
- =?us-ascii?Q?yq2EzNSo79xEVAQ6U5O+L2yEFTX6aHKyKRgqqVeWLhWcq9+8f26DacRBsRYy?=
- =?us-ascii?Q?TPMRw2+uqLyWYHtx/AJFW8cA38zs8wYYAgPcFYDeO1+gEi8VdPVrHeLAUwJl?=
- =?us-ascii?Q?ayQ1uw4hMpUFdJVitBOLCG1PkI/+sKrue8p9K37BNrYvf18+5nvK6Q810eFc?=
- =?us-ascii?Q?nL4ywwz/g9bVxBA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2025 18:37:05.6333
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff9b4744-ac40-496b-14ee-08dd4481c24a
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017098.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4284
 
-On Thu, Jan 23, 2025 at 10:07:13AM +0000, Tian, Kevin wrote:
-> > From: Nicolin Chen <nicolinc@nvidia.com>
-> > Sent: Saturday, January 11, 2025 11:32 AM
-> > 
-> > @@ -294,7 +294,9 @@ struct iommu_ioas_unmap {
-> > 
-> >  /**
-> >   * enum iommufd_option - ioctl(IOMMU_OPTION_RLIMIT_MODE) and
-> > - *                       ioctl(IOMMU_OPTION_HUGE_PAGES)
-> > + *                       ioctl(IOMMU_OPTION_HUGE_PAGES) and
-> > + *                       ioctl(IOMMU_OPTION_SW_MSI_START) and
-> > + *                       ioctl(IOMMU_OPTION_SW_MSI_SIZE)
-> >   * @IOMMU_OPTION_RLIMIT_MODE:
-> >   *    Change how RLIMIT_MEMLOCK accounting works. The caller must have
-> > privilege
-> >   *    to invoke this. Value 0 (default) is user based accounting, 1 uses process
-> > @@ -304,10 +306,24 @@ struct iommu_ioas_unmap {
-> >   *    iommu mappings. Value 0 disables combining, everything is mapped to
-> >   *    PAGE_SIZE. This can be useful for benchmarking.  This is a per-IOAS
-> >   *    option, the object_id must be the IOAS ID.
-> > + * @IOMMU_OPTION_SW_MSI_START:
-> > + *    Change the base address of the IOMMU mapping region for MSI
-> > doorbell(s).
-> > + *    It must be set this before attaching a device to an IOAS/HWPT,
+On Mon, Feb 03, 2025, Naveen N Rao (AMD) wrote:
+> apicv_inhibit_reasons is used to determine if APICv is active, and if
+> not, the reason(s) why it may be inhibited. In some scenarios, inhibit
+> reasons can be set and cleared often, resulting in increased contention
+> on apicv_update_lock used to guard updates to apicv_inhibit_reasons.
 > 
-> remove 'this'
-
-Ack.
-
-> > otherwise
-> > + *    this option will be not effective on that IOAS/HWPT. User can 
+> In particular, if a guest is using PIT in reinject mode (the default)
+> and if AVIC is enabled in kvm_amd kernel module, we inhibit AVIC during
+> kernel PIT creation (APICV_INHIBIT_REASON_PIT_REINJ), resulting in KVM
+> emulating x2APIC for the guest. In that case, since AVIC is enabled in
+> the kvm_amd kernel module, KVM additionally inhibits AVIC for requesting
+> a IRQ window every time it has to inject external interrupts resulting
+> in a barrage of inhibits being set and cleared. This shows significant
+> performance degradation compared to AVIC being disabled, due to high
+> contention on apicv_update_lock.
 > 
-> Do we want to explicitly check this instead of leaving it no effect
-> silently?
+> Though apicv_update_lock is being used to guard updates to
+> apicv_inhibit_reasons, it is only necessary if the APICv activation
+> state changes. Introduce a separate boolean, apicv_activated, to track
+> if APICv is active or not, and limit use of apicv_update_lock for when
+> APICv is being (de)activated. Convert apicv_inhibit_reasons to an atomic
+> and use atomic operations to fetch/update it.
 
-So, the idea here is:
-If this option is unset, use the default SW_MSI from the driver
-If this option is set, use it over the default SW_MSI from the driver
+It's a moot point, but there is too much going on in this patch.  For a change
+like this, it should be split into at ~4 patches:
 
-That's what the following statement "User can choose to let.." means.
+ 1. Add an kvm_x86_ops.required_apicv_inhibits check outside outside of the lock,
+    which we can and should do anyways.  I would probably vote to turn the one
+    inside the lock into a WARN, as that "optimized" path is only an optimization
+    if the inhibit applies to both SVM and VMX.
+ 2. Use a bool to track the activated state.
+ 3. Use an atomic.
+ 4. Implement the optimized updates.
 
-> > choose to
-> > + *    let kernel pick a base address, by simply ignoring this option or setting
-> > + *    a value 0 to IOMMU_OPTION_SW_MSI_SIZE. Global option, object_id
-> > must be 0
-> > + * @IOMMU_OPTION_SW_MSI_SIZE:
-> > + *    Change the size of the IOMMU mapping region for MSI doorbell(s). It
-> > must
-> > + *    be set this before attaching a device to an IOAS/HWPT, otherwise it
-> > won't
-> > + *    be effective on that IOAS/HWPT. The value is in MB, and the minimum
-> > value
-> > + *    is 1 MB. A value 0 (default) will invalidate the MSI doorbell base address
-> > + *    value set to IOMMU_OPTION_SW_MSI_START. Global option, object_id
-> > must be 0
-> 
-> hmm there is no check on the minimal value and enable the effect
-> of value 0 in this patch.
+#3 is optional, #1 and #2 are not.
 
-Well, it's somewhat enforced by __aligned_u64 since it can't be any
-value between 0 (disable) and 1 (minimal)?
+It's a moot point though, because toggling APICv inhibits on IRQ windows is
+laughably broken.  I'm guessing it "works" because the only time it triggers in
+practice is in conjunction with PIT re-injection.
 
-And the override code checks "ctx->sw_msi_size".
+ 1. vCPU0 waits for an IRQ window, APICV_INHIBIT_REASON_IRQWIN = 1
+ 2. vCPU1 waits for an IRQ window, APICV_INHIBIT_REASON_IRQWIN = 1
+ 3. vCPU1 gets its IRQ window, APICV_INHIBIT_REASON_IRQWIN = 0
+ 4. vCPU0 is sad
 
-> >  iommufd_device_attach_reserved_iova(struct iommufd_device *idev,
-> >  				    struct iommufd_hwpt_paging
-> > *hwpt_paging)
-> >  {
-> > +	struct iommufd_ctx *ictx = idev->ictx;
-> >  	int rc;
-> > 
-> >  	lockdep_assert_held(&idev->igroup->lock);
-> > 
-> > +	/* Override it with a user-programmed SW_MSI region */
-> > +	if (ictx->sw_msi_size && ictx->sw_msi_start != PHYS_ADDR_MAX)
-> > +		idev->igroup->sw_msi_start = ictx->sw_msi_start;
-> >  	rc = iopt_table_enforce_dev_resv_regions(&hwpt_paging->ioas->iopt,
-> >  						 idev->dev,
-> >  						 &idev->igroup-
-> > >sw_msi_start);
-> 
-> what about moving above additions into 
-> iopt_table_enforce_dev_resv_regions() which is all about finding
-> a sw_msi address and can check the user setting internally?
+APICV_INHIBIT_REASON_BLOCKIRQ is also tied to per-vCPU state, but is a-ok because
+KVM walks all vCPUs to generate inhibit.  That approach won't work for IRQ windows
+though, because it's obviously not a slow path.
 
-We could. Probably would be cleaner by doing that in one place.
+What is generating so many external interrupts?  E.g. is the guest using the PIT
+for TSC or APIC calibration?  I suppose it doesn't matter terribly in this case
+since APICV_INHIBIT_REASON_PIT_REINJ is already set.
 
-> > diff --git a/drivers/iommu/iommufd/io_pagetable.c
-> > b/drivers/iommu/iommufd/io_pagetable.c
-> > index 8a790e597e12..5d7f5ca1eecf 100644
-> > --- a/drivers/iommu/iommufd/io_pagetable.c
-> > +++ b/drivers/iommu/iommufd/io_pagetable.c
-> > @@ -1446,7 +1446,9 @@ int iopt_table_enforce_dev_resv_regions(struct
-> > io_pagetable *iopt,
-> >  		if (sw_msi_start && resv->type == IOMMU_RESV_MSI)
-> >  			num_hw_msi++;
-> >  		if (sw_msi_start && resv->type == IOMMU_RESV_SW_MSI) {
-> > -			*sw_msi_start = resv->start;
-> > +			/* Bypass the driver-defined SW_MSI region, if preset
-> > */
-> > +			if (*sw_msi_start == PHYS_ADDR_MAX)
-> > +				*sw_msi_start = resv->start;
-> 
-> the code is not about bypass. Instead it's to use the driver-defined
-> region if user doesn't set it.
+Unless there's a very, very good reason to support a use case that generates
+ExtInts during boot, but _only_ during boot, and otherwise doesn't have any APICv
+ihibits, I'm leaning towards making SVM's IRQ window inhibit sticky, i.e. never
+clear it.  And then we can more simply optimize kvm_set_or_clear_apicv_inhibit()
+to do nothing if the inhibit is sticky and already set.
 
-Ack:
-			/* If being unset, Use the default IOMMU_RESV_SW_MSI */
+E.g. something like this:
 
-Thanks
-Nicolin
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6d4a6734b2d6..6f926fd6fc1c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10629,6 +10629,14 @@ void kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
+        if (!enable_apicv)
+                return;
+ 
++       if (kvm_is_apicv_inhibit_sticky(reason)) {
++               if (WARN_ON_ONCE(!set))
++                       return;
++
++               if (kvm_test_apicv_inhibit(reason))
++                       return;
++       }
++
+        down_write(&kvm->arch.apicv_update_lock);
+        __kvm_set_or_clear_apicv_inhibit(kvm, reason, set);
+        up_write(&kvm->arch.apicv_update_lock);
 
