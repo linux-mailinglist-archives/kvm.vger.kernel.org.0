@@ -1,99 +1,210 @@
-Return-Path: <kvm+bounces-37151-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37152-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 638A4A2637B
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 20:17:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32EA3A263E7
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 20:41:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 029E93A4AB2
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 19:16:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF6F318832F9
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 19:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A8E20B20E;
-	Mon,  3 Feb 2025 19:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A77320E00E;
+	Mon,  3 Feb 2025 19:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwiVodep"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cu5lf5Lt"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0139020FA9B;
-	Mon,  3 Feb 2025 19:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D101D9A5F
+	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 19:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738610123; cv=none; b=u2zPTNLOj8DCYaHpdqtQr7eIy5ddax3R5SEdM5V4TcAtgeyTcJgAQp03wGLD7xBmdnO5eZs2qQToVk9RftElw6XvKOTGZZJEqNJdYED7h0wm/EZuSoTjUkKNgAj34DfZTR32WgziHWz7MSkh/o6o9zQJftZrv7skz2hS5pt14TA=
+	t=1738611684; cv=none; b=EOQZ5uuFuMgXrOb2PZHuxH1nURFnYL3yqabo+4M7MaAyBbQdz1ZBQvtJLFTQjPotWcxyWHqw4Z3YmB85naMk0IS7lmoUfjxlMXTWqW1SUZx4tIpcIlv1oJUN+tj7AAKwferFbw+eO5hHo3w9EqjS1vWbQVAma0md+z1P+dCWYTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738610123; c=relaxed/simple;
-	bh=x4p1X9nOXxuhn4jEPid5fzjCvgZ4D3ZQU2ymjtjqU9E=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mZ3fwM0dNXS2bOaKj39X+DJAFtD0mknAK6JOjiGC5m2sWo0r7IDwBqjS2GWHfIAnL1HzEzy0yX/9ZcUWgjLMrfa6dLGEQdH5gkIdrcuFEen5EGu1fUFVK8SJZE4/reqmzzd3vgMBXIqW+9bRC9gpgilVZm8gM3vpHHWwCtjD3lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwiVodep; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2CCFC4CEE3;
-	Mon,  3 Feb 2025 19:15:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738610122;
-	bh=x4p1X9nOXxuhn4jEPid5fzjCvgZ4D3ZQU2ymjtjqU9E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SwiVodep/1/nWnRpopWbBGkkYwgqp6zjbivmPprSBDK7KEzSCdK2xq2o+52mpu2gS
-	 3zr7qNPdshAge0rXr1UkK0d0mAXUpI6C5KURLWQlqmy5xPSQEXP2peKrPfu9dENBeF
-	 q+QHs8EZaSp7fpT9t6Vgp36iZU34R/kSW4Mkw6R0EhsAK+RCRciPYLnz7OBuILt8Am
-	 ETjGYMXis2V0Vs6zUv5LGIP2vjtDlRM79Qr7rsaQ6x+eaH1FGxqQd3r8aZDTQ/nUCD
-	 B5QbsGm5nrDJVkFPaDDVc5Opb0m7VLr6fZRFl30v+USNqmOxNibUohAJO9AxpoXhrl
-	 2uh4Gek08nD7w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FB5380AA67;
-	Mon,  3 Feb 2025 19:15:51 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1738611684; c=relaxed/simple;
+	bh=bmzPo8fjt8JOhc/1bHrIPMZFP8Y2muFcWZy4Ysux2lU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tFtVe+7ShiZ0PvoLg1XT3nFyIX0evbcExxkiUru19aOAeCZWUlPlgt04zJvq8Ihb17lH9W6wcYPmR8bAS/oyFDXg9qXxkLkyCe3NbEgGkvHsk2vjqai1ekfj6JUWpwW3I6E/qSyJ0S9mQ9ctMRXhKAxCjxYJA70/F+rq1+Kovig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cu5lf5Lt; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2efc3292021so13272033a91.1
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 11:41:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738611682; x=1739216482; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VJXV2LQY26MqizxcjQXhtNRXXOMRYW+qm0imDYwsMvw=;
+        b=Cu5lf5LtLxTxa/GXdUK7k6HYS89RYuoTJsSXOUkd1YWJ1CRns2Dv24VD+GQC1WCdx9
+         SU/Dmie28f+2sAhXWZhXxNfhQTba8j3FGJbf96LsPhRKbGH1iDICxGvhcBBartou1FN8
+         n2+8NNevuM+X2ijWyYLMKT+VJhaZnATrPzkphxXMZ2w0uALjmDj2qwuW6z/y3RlUyh98
+         4JYUuARYARwHpGq6q7gwg5k9ZGHdkII6Le8jJGPxvB3gE6tNxzeFt16qTZ2vqQV76zP5
+         37HyhsOyz4Tz+uanh+iSJRpX4vlqOAo/atRHozWIyUBynEKAWn880gOZt0ovSlavlBWW
+         llIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738611682; x=1739216482;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VJXV2LQY26MqizxcjQXhtNRXXOMRYW+qm0imDYwsMvw=;
+        b=kW+vQhrL9E3NYDOkpggajhsfE8f+kOnAJmdFEHuxn0zjlwjgwFsupaKHBE/GUzNNYK
+         50fXPIbf7JzU68Ng9a8cISXEusVdG07nbofSb30Wt9vmTEJ88PB+5PVXfzVtyq6aO8Ks
+         B18WlBuCYDLc8IRyeK55IT6DyEwGN8RfTx10ThCXJsuPz+T57jRIAL3dPZ6EUsjkRnvC
+         qyxm1fSnB/SlM84u7ZNBvjrOt1U9YwbBRuHyLSzWS3Lqi8KyuVogLu7ehnPYZNvSrz1b
+         vwRudkKYrVe+EkBJqMPIrhvAA/Xby1UtL/bA3oHmFh3sQA/vDf0Xcnd7/Q6RHWMAMrLL
+         31Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCXKmtS9f0e/wSuSLMadn9h7Wja5sf+OyPr3Q69C3dN5Y+pAD3t7DIKNdUeOi7gURQnuRaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHgVZCOmLSaqOafnvVWEyCUr6iqrKVHJ7qMR+tS016eg92UcpE
+	o1lDUYopxIhpNHxnVHsbFaizsaztZzy4foGCwzt1aH8JVh2fRsRXQ1GQf6k0XJ76wt7L/pQOKva
+	MTw==
+X-Google-Smtp-Source: AGHT+IGcEY16oN3aex7QCo8rxntT+v0xmLo7K0x8S2drWCxpjUutztQRaAT/c6jmhnfhVhYFkmYgpyMZlK8=
+X-Received: from pjtu5.prod.google.com ([2002:a17:90a:c885:b0:2ee:3128:390f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b88:b0:2f8:34df:564e
+ with SMTP id 98e67ed59e1d1-2f83abf3506mr38263640a91.14.1738611682399; Mon, 03
+ Feb 2025 11:41:22 -0800 (PST)
+Date: Mon, 3 Feb 2025 11:41:20 -0800
+In-Reply-To: <CADH9ctAzffvDByS1s2PJoD63On-b+pCnCmER4Nf4Zc=62vkbMA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/3] Collect guest/host statistics during the redirected
- traps
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <173861014984.3409359.10285498075782232366.git-patchwork-notify@kernel.org>
-Date: Mon, 03 Feb 2025 19:15:49 +0000
-References: <20241224-kvm_guest_stat-v2-0-08a77ac36b02@rivosinc.com>
-In-Reply-To: <20241224-kvm_guest_stat-v2-0-08a77ac36b02@rivosinc.com>
-To: Atish Kumar Patra <atishp@rivosinc.com>
-Cc: linux-riscv@lists.infradead.org, anup@brainfault.org,
- atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, zhouquan@iscas.ac.cn
+Mime-Version: 1.0
+References: <CABgObfZrTyft-3vqMz5w0ZiAhp-v6c32brgftynZGJO8OafrdA@mail.gmail.com>
+ <CADH9ctBYp-LMbW4hm3+QwNoXvAc5ryVeB0L1jLY0uDWSe3vbag@mail.gmail.com>
+ <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com> <CADH9ctCFYtNfhn3SSp2jp0fzxu6s_X1A+wBNnzvHZVb8qXPk=g@mail.gmail.com>
+ <CADH9ctB0YSYqC_Vj2nP20vMO_gN--KsqOBOu8sfHDrkZJV6pmw@mail.gmail.com>
+ <Z2IXvsM0olS5GvbR@google.com> <CABgObfadZZ5sXYB0xR5OcLDw_eVUmXTOTFSWkVpkgiCJmNnFRQ@mail.gmail.com>
+ <CADH9ctAGt_VriKA7Ch1L9U+xud-6M54GzaPOM_2sSA780TpAYw@mail.gmail.com>
+ <CABgObfb3Ttfg6H+_RpNQGSYKw9BLEwx3+EysXdL-wbpd1pkGHQ@mail.gmail.com> <CADH9ctAzffvDByS1s2PJoD63On-b+pCnCmER4Nf4Zc=62vkbMA@mail.gmail.com>
+Message-ID: <Z6Eb4PfmmHWFTR9A@google.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
+From: Sean Christopherson <seanjc@google.com>
+To: Doug Covelli <doug.covelli@broadcom.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Zack Rusin <zack.rusin@broadcom.com>, 
+	kvm <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "the arch/x86 maintainers" <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Joel Stanley <joel@jms.id.au>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-kselftest <linux-kselftest@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Mon, Feb 03, 2025, Doug Covelli wrote:
+> On Mon, Feb 3, 2025 at 1:22=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+> >
+> > On Mon, Feb 3, 2025 at 5:35=E2=80=AFPM Doug Covelli <doug.covelli@broad=
+com.com> wrote:
+> > > OK.  It seems like fully embracing the in-kernel APIC is the way to g=
+o
+> > > especially considering it really simplifies using KVM's support for n=
+ested
+> > > virtualization.  Speaking of nested virtualization we have been worki=
+ng on
+> > > adding support for that and would like to propose a couple of changes=
+:
+> > >
+> > > - Add an option for L0 to handle backdoor accesses from CPL3 code run=
+ning in L2.
+> > > On a #GP nested_vmx_l0_wants_exit can check if this option is enabled=
+ and KVM
+> > > can handle the #GP like it would if it had been from L1 (exit to user=
+level iff
+> > > it is a backdoor access otherwwise deliver the fault to L2).  When co=
+mbined with
+> > > enable_vmware_backdoor this will allow L0 to optionally handle backdo=
+or accesses
+> > > from CPL3 code running in L2.  This is needed for cases such as runni=
+ng VMware
+> > > tools in a Windows VM with VBS enabled.  For other cases such as runn=
+ing tools
+> > > in a Windows VM in an ESX VM we still want L1 to handle the backdoor =
+accesses
+> > > from L2.
+> >
+> > I think this makes sense and could be an argument to KVM_ENABLE_CAP.
+> >
+> > > - Extend KVM_EXIT_MEMORY_FAULT for permission faults (e.g the guest a=
+ttempting
+> > > to write to a page that has been protected by userlevel calling mprot=
+ect).  This
+> > > is useful for cases where we want synchronous detection of guest writ=
+es such as
+> > > lazy snapshots (dirty page tracking is no good for this case).  Curre=
+ntly
+> > > permission faults result in KVM_RUN returning EFAULT which we handle =
+by
+> > > interpreting the instruction as we do not know the guest physical add=
+ress
+> > > associated with the fault.
+> >
+> > Yes, this makes sense too, though you might want to look into
+> > userfaultfd as well.
+> >
+> > We had something planned using attributes, but I don't see any issue
+> > extending it to EFAULT. Maybe it would have to be yet another
+> > KVM_ENABLE_CAP; considering that it would break your existing code,
+> > there might be someone else in the wild doing it.
+>=20
+> It looks like KVM_EXIT_MEMORY_FAULT was implemented in such a way that it
+> won't break existing code:
+>=20
+> Note! KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in
+> that it accompanies a return code of =E2=80=98-1=E2=80=99, not =E2=80=980=
+=E2=80=99! errno will always
+> be set to EFAULT or EHWPOISON when KVM exits with
+> KVM_EXIT_MEMORY_FAULT, userspace should assume kvm_run.exit_reason is
+> stale/undefined for all other error numbers.
+>=20
+> That being said we could certainly make this opt-in if that is preferable=
+.
 
-This series was applied to riscv/linux.git (fixes)
-by Anup Patel <anup@brainfault.org>:
+-EFAULT isn't the problem, KVM not being able to return useful information =
+in
+all situations is the issue.  Specifically, "guest" accesses that are emula=
+ted
+by KVM are problematic, because the -EFAULT from e.g. __kvm_write_guest_pag=
+e()
+is disconnected from the code that actually kicks out to userspace.  In tha=
+t
+case, userspace will get KVM_EXIT_MMIO, not -EFAULT.  There are more proble=
+ms
+beyond KVM_EXIT_MMIO vs. -EFAULT, e.g. instructions that perform multiple m=
+emory
+accesses, "failures" that are squashed and never propagated to userspace (P=
+V
+features tend to do this), page splits, etc.
 
-On Tue, 24 Dec 2024 13:04:52 -0800 you wrote:
-> As discussed in the patch[1], this series adds the host statistics for
-> traps that are redirected to the guest. Since there are 1-1 mapping for
-> firmware counters as well, this series enables those so that the guest
-> can collect information about these exits via perf if required.
-> 
-> I have included the patch[1] as well in this series as it has not been
-> applied and there will be likely conflicts while merging both.
-> 
-> [...]
+In general, I don't expect most KVM access to guest memory to Just Work, as=
+ I
+doubt KVM will behave as you want.
 
-Here is the summary with links:
-  - [v2,1/3] RISC-V: KVM: Redirect instruction access fault trap to guest
-    https://git.kernel.org/riscv/c/51c58956732b
-  - [v2,2/3] RISC-V: KVM: Update firmware counters for various events
-    https://git.kernel.org/riscv/c/2f15b5eaff79
-  - [v2,3/3] RISC-V: KVM: Add new exit statstics for redirected traps
-    https://git.kernel.org/riscv/c/af79caa83f6a
+We spent a lot of time trying to sort out a viable approach in the context =
+of the
+USERFAULT_ON_MISSING series[1], and ultimately gave up (ignoring that we po=
+stponed
+the entire series)[2], because we decided that fully solving KVM accesses w=
+ould
+require an absurd amount of effort and churn, and wasn't at all necessary f=
+or the
+userfault use case.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+What exactly needs to happen on "synchronous detection of guest writes"?  O=
+ne
+idea (which may be horribly flawed as I have put *very* little thought into=
+ it)
+would be to implement a module (or KVM extension) that utilizes KVM's "exte=
+rnal"
+write-tracking APIs to get the synchronous notifications (see
+arch/x86/include/asm/kvm_page_track.h).
 
-
+[1] https://lore.kernel.org/all/ZIn6VQSebTRN1jtX@google.com
+[2] https://lore.kernel.org/all/ZR88w9W62qsZDro-@google.com
 
