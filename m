@@ -1,156 +1,119 @@
-Return-Path: <kvm+bounces-37154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75271A26412
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 20:53:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD6FA2641B
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 20:53:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 129847A2FA8
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 19:52:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A404161A31
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 19:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B97209684;
-	Mon,  3 Feb 2025 19:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53EA020E016;
+	Mon,  3 Feb 2025 19:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2fCqn5Wm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hll4qKW0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494581DB377
-	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 19:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3E620ADF8
+	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 19:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738612376; cv=none; b=nwIjfmy1m2KiHjc+B6FeRBPK1mjIhK9rLBgfcNcJb+bVxKVxkQb5Nk65IHWYlhFCqbn6wsrHdn4OF3uxJJuPFw+nYyu+DG0pHZ4sYR914St3QnCSXCHA6sCaK53O73QVwU52eclWFuiVNZOBF52iYJc6fdV79ryhmyQRrFhfg6A=
+	t=1738612429; cv=none; b=qoPtmTCO9UG/K8DQXqi7AKKsUe3FcCCVOcLtarkuvcWuEbc121XmX+w/CTDaipXN5tkbU8BQ5IDY4jnh9CnDiHbEyD8oc/lZ1SVC59AZVmHjY/jW1oPguW8qFdHEVmyxIv4yD8IXQWD96qnXG3b113OFGe7r5TIQfN8zgMjJdng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738612376; c=relaxed/simple;
-	bh=vqumdPUecpvskYi8VygICeGGt4cQpB2BlEoPCXjm++o=;
+	s=arc-20240116; t=1738612429; c=relaxed/simple;
+	bh=hxr7jNuqUlPfc59GPh0os0w2bEp50OFtzoYI/kT4GTs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BDznPa2r9zaYZ6tuPkcC4tgu5Nla8JCrovnQ47fSPupbVh2LPHmKo+ITOMKWnfAoHYKBhRpe7MbqIeoOEcmRJzNUb7szG5brHLhOdFa2NTeIG36kR7Hv5bma4Pp7E8PJc3Ynw0HIl4FIqHSHK2eZ8qXK1pqAQBbb0Bkt5C3yZJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2fCqn5Wm; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=RzieL2dIV0GnnFy/pRc0+vU/albAyHK0qebWtH0xD5IFAOUOteqJcOHmPjIf7FWXLIoTjBul6y8++lzi4OhXVwHwBVV2sD0GV97iZCcme9T0qn38iqNF990VDVtf6BddTihqCfQ2u6U/OXiHbalPvnG98I6mujk3kWcs4W53P5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hll4qKW0; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-216728b170cso102439755ad.2
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 11:52:55 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef909597d9so13424244a91.3
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 11:53:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738612374; x=1739217174; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738612427; x=1739217227; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z4DCNVElxq2OdBlpMH7Nkzbl/aQqIemXOZXJQi0SM/U=;
-        b=2fCqn5WmpfSMTNPk99MabSvdASAUCrZ1YSHoptYwbaStLioHcmAPiAkpXCbtQaTjnS
-         wsJXQN5VD20nMBrJCnxMPD8KL/jBP67WZmeFzUg5aHSyj/ndOk14LSB9mIVWdzA7vtL9
-         pWKRMNQCxotzDvKGDNxupj3JbQ9xqVus+w1w6wvt4DRmSRvg2wdXFAXpVui5AnyZFvIA
-         Os0PpOT8mjQJ5/ri3PJfcQXXl+k7FKSAQriGp+KMY/RGOBwh5UJLnzICi6sxTU5+omNF
-         6rWbcae9bq6lDDq2Elt0KQi1+scF8q+/yOSWd1vIH90koUctHZmsqR/EiPjpX6rbWibP
-         wiMg==
+        bh=nCEyOu/LOSfPdvr+BVNdN/g0WxtTpzskRucY3ZD/ki0=;
+        b=hll4qKW0/MDYaWgct95bovpDKbmfc/9xZPLQHSUmaBUKPEQQsfx8egcgJ8EGg/l/R6
+         A4kVGGLIml9y6/FSe476CAuGq/HZTjK7xsFH9t9tgjMpx9Sd7IjvXbpGK4KbzpSnhiLp
+         eqU56cKKtrqyBAh4ZhnUhWTmRhghH4Lj4U6+t6xVDa93U6UVNsY9V5FOm2P64+BUCxNk
+         gt6/dZS56lOelBMGEz0s1oDrtFnV+sSudxAZSfMuKoXVx4v9+080i4/XVxiteYqkDdI2
+         2pJGmIdWen0OGS4Jzt6dYuckNg1qkd1pwvGt+lwyjh69SfIfSRs3yQlQnXFHM/xvanVx
+         CY+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738612374; x=1739217174;
+        d=1e100.net; s=20230601; t=1738612427; x=1739217227;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z4DCNVElxq2OdBlpMH7Nkzbl/aQqIemXOZXJQi0SM/U=;
-        b=iVJaY1+v8clLxMSuoKkkvP2aqXx5O2J5e6IccWis1mYrAC4blGZJtILJOGcbsnzDh7
-         0N/K4FU8c1bavdA+L+zAZi4NnagnSv5MkDLj8pbcVYVg/5mhXuRmczD3FlFDNGEImaFn
-         xvSat4KXUAII3UrXfez1fx1w3XZNlhANNMMhy2LazPqWYQ0LY8HufyMKp2igdvjo1PZE
-         GRDeXWfZLUJ9iq+dgIu5z5Q96ZrsYHXx/6xg7Exo8+wnm0xUoeUmd/47vFZTDqaqIxUD
-         PlWK6SL6p5bORD1+mcRwwfJ1TubL3i9kq/Osmw2a6ONNRiOq1WW7EdGTcEMF4e2Z1yIj
-         m7nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuAjPkB5AXWD6jn9rdjL2N6eXlmo/qBNVsP0dzdY5avkJu/QJomn1FMlX+tmCPyb/DKRQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDbn2nXmK2XSa08JtsvRwMLy3dMstURndzXntaTU2P80BW89ax
-	C1bs8+FJdcvni2iQFt3bL+FsxR1aS6ozhro817q7CXn0NyYigMpejIPXaReWzN0zIMiDsXw2xR5
-	yWw==
-X-Google-Smtp-Source: AGHT+IGdTeFcZ8i5SvZ2bB5g1492lleQh9maGoQBlpXj01DaF5LbzkfV8PQhJ2gBHFVfNpv3sg2ev2woN1U=
-X-Received: from pfsq1.prod.google.com ([2002:a05:6a00:2a1:b0:72d:4132:7360])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2287:b0:72d:a208:d366
- with SMTP id d2e1a72fcca58-72fd0c8bae3mr33309743b3a.20.1738612374524; Mon, 03
- Feb 2025 11:52:54 -0800 (PST)
-Date: Mon, 3 Feb 2025 11:52:53 -0800
-In-Reply-To: <fb1d32fb-f213-350f-95a4-766c88a6249c@amd.com>
+        bh=nCEyOu/LOSfPdvr+BVNdN/g0WxtTpzskRucY3ZD/ki0=;
+        b=vc1NVgwa7ZUoKixbpHccHd3jCsHWEGab85B9DbVW/f2PcYW80D52uflvf1laMjVwU8
+         jVzl5PFkcnIaerawWOz0aeMUvRppMb0I1bgzQbNJLNghNN//IilgQWeTmQwjm4UJZJOf
+         68sz88t2RkaVdz7midxVMkOam9cP+tvXmf3Vs3+Wx5xDh8xLuHQYR3v/hO07zcpFlRR2
+         n0wpSgzL912y0AtMfmWOHrVbY8qi/jEKlrs0EtIeaskFpumpP8iBWrOXAo+Ls9h2U/wf
+         EMK3uE+T27WX6133Db45VVMlcdsPhx/DXrJlcY9VOb99mq+puxiTbCz3FWJ+qlsfkFcx
+         morA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrlTHH5SjYyYhSTusNf2vqHKjGbxLJxb73b1hP6UkjRQR7tG4Rqsn2oPlHGHlH95IKQKI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyO155h6PHnzci/9YiEQ8WTWq2FvxBcw0vmZnSqHb8CpZ3bAxnY
+	usTNE6SXCKAmMQtkQjUPwSWTg2/Ju8GKvHIJL0HkhdFWkaTPIACoAtX8ghJ2Lyp5EPwIwPVAP1R
+	xPw==
+X-Google-Smtp-Source: AGHT+IFc9rZmF1JjMiP844qma6jdZcJ9zwzx2lsRF7TrY+30VoDsiU9sWPM5lazcp0sTUpmilFfzJxD366U=
+X-Received: from pfblo6.prod.google.com ([2002:a05:6a00:3d06:b0:72d:26ac:7d0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:140e:b0:725:eb85:f7f7
+ with SMTP id d2e1a72fcca58-72fd0bda642mr32932803b3a.5.1738612427344; Mon, 03
+ Feb 2025 11:53:47 -0800 (PST)
+Date: Mon, 3 Feb 2025 11:53:45 -0800
+In-Reply-To: <93df442c-8ec3-43ee-aba1-e770a5b7588f@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250201021718.699411-1-seanjc@google.com> <20250201021718.699411-9-seanjc@google.com>
- <fb1d32fb-f213-350f-95a4-766c88a6249c@amd.com>
-Message-ID: <Z6EelTYbVIcmGH5Q@google.com>
-Subject: Re: [PATCH 08/16] x86/tsc: Pass KNOWN_FREQ and RELIABLE as params to registration
+References: <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com>
+ <CADH9ctCFYtNfhn3SSp2jp0fzxu6s_X1A+wBNnzvHZVb8qXPk=g@mail.gmail.com>
+ <CADH9ctB0YSYqC_Vj2nP20vMO_gN--KsqOBOu8sfHDrkZJV6pmw@mail.gmail.com>
+ <Z2IXvsM0olS5GvbR@google.com> <CABgObfadZZ5sXYB0xR5OcLDw_eVUmXTOTFSWkVpkgiCJmNnFRQ@mail.gmail.com>
+ <CADH9ctAGt_VriKA7Ch1L9U+xud-6M54GzaPOM_2sSA780TpAYw@mail.gmail.com>
+ <CABgObfb3Ttfg6H+_RpNQGSYKw9BLEwx3+EysXdL-wbpd1pkGHQ@mail.gmail.com>
+ <CADH9ctAzffvDByS1s2PJoD63On-b+pCnCmER4Nf4Zc=62vkbMA@mail.gmail.com>
+ <Z6Eb4PfmmHWFTR9A@google.com> <93df442c-8ec3-43ee-aba1-e770a5b7588f@redhat.com>
+Message-ID: <Z6EeyaOZUevXDBiH@google.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
 From: Sean Christopherson <seanjc@google.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Juergen Gross <jgross@suse.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
-	Alexey Makhalov <alexey.amakhalov@broadcom.com>, Jan Kiszka <jan.kiszka@siemens.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, virtualization@lists.linux.dev, 
-	linux-hyperv@vger.kernel.org, jailhouse-dev@googlegroups.com, 
-	kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	Nikunj A Dadhania <nikunj@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Doug Covelli <doug.covelli@broadcom.com>, Zack Rusin <zack.rusin@broadcom.com>, 
+	kvm <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "the arch/x86 maintainers" <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Joel Stanley <joel@jms.id.au>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-kselftest <linux-kselftest@vger.kernel.org>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Feb 03, 2025, Tom Lendacky wrote:
-> On 1/31/25 20:17, Sean Christopherson wrote:
-> > Add a "tsc_properties" set of flags and use it to annotate whether the
-> > TSC operates at a known and/or reliable frequency when registering a
-> > paravirtual TSC calibration routine.  Currently, each PV flow manually
-> > sets the associated feature flags, but often in haphazard fashion that
-> > makes it difficult for unfamiliar readers to see the properties of the
-> > TSC when running under a particular hypervisor.
-> > 
-> > The other, bigger issue with manually setting the feature flags is that
-> > it decouples the flags from the calibration routine.  E.g. in theory, PV
-> > code could mark the TSC as having a known frequency, but then have its
-> > PV calibration discarded in favor of a method that doesn't use that known
-> > frequency.  Passing the TSC properties along with the calibration routine
-> > will allow adding sanity checks to guard against replacing a "better"
-> > calibration routine with a "worse" routine.
-> > 
-> > As a bonus, the flags also give developers working on new PV code a heads
-> > up that they should at least mark the TSC as having a known frequency.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/coco/sev/core.c       |  6 ++----
-> >  arch/x86/coco/tdx/tdx.c        |  7 ++-----
-> >  arch/x86/include/asm/tsc.h     |  8 +++++++-
-> >  arch/x86/kernel/cpu/acrn.c     |  4 ++--
-> >  arch/x86/kernel/cpu/mshyperv.c | 10 +++++++---
-> >  arch/x86/kernel/cpu/vmware.c   |  7 ++++---
-> >  arch/x86/kernel/jailhouse.c    |  4 ++--
-> >  arch/x86/kernel/kvmclock.c     |  4 ++--
-> >  arch/x86/kernel/tsc.c          |  8 +++++++-
-> >  arch/x86/xen/time.c            |  4 ++--
-> >  10 files changed, 37 insertions(+), 25 deletions(-)
-> > 
+On Mon, Feb 03, 2025, Paolo Bonzini wrote:
+> On 2/3/25 20:41, Sean Christopherson wrote:
+> > -EFAULT isn't the problem, KVM not being able to return useful information in
+> > all situations is the issue.
 > 
-> > diff --git a/arch/x86/kernel/cpu/vmware.c b/arch/x86/kernel/cpu/vmware.c
-> > index d6f079a75f05..6e4a2053857c 100644
-> > --- a/arch/x86/kernel/cpu/vmware.c
-> > +++ b/arch/x86/kernel/cpu/vmware.c
-> > @@ -385,10 +385,10 @@ static void __init vmware_paravirt_ops_setup(void)
-> >   */
-> >  static void __init vmware_set_capabilities(void)
-> >  {
-> > +	/* TSC is non-stop and reliable even if the frequency isn't known. */
-> >  	setup_force_cpu_cap(X86_FEATURE_CONSTANT_TSC);
-> >  	setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
+> Yes, that's why I don't want it to be an automatically opted-in API.  If
+> incremental improvements are possible, it may be useful to allow interested
+> userspace to enable it early.  For example...
 > 
-> Should this line be deleted, too, or does the VMware flow require this
-> to be done separate from the tsc_register_calibration_routines() call?
+> > Specifically, "guest" accesses that are emulated
+> > by KVM are problematic, because the -EFAULT from e.g. __kvm_write_guest_page()
+> > is disconnected from the code that actually kicks out to userspace.  In that
+> > case, userspace will get KVM_EXIT_MMIO, not -EFAULT.  There are more problems
+> > beyond KVM_EXIT_MMIO vs. -EFAULT, e.g. instructions that perform multiple memory
+> > accesses,
+> 
+> those are obviously synchronous and I expect VMware to handle them already.
+> 
+> That said my preferred solution to just use userfaultfd, which is
+> synchronous by definition.
 
-No idea, I just didn't want to break existing setups.  I assume VMware hypervisors
-will always advertise the TSC frequency, but nothing in the code guarantees that.
-
-The check on the hypervisor providing the TSC frequency has existed since the
-original support was added, and the CONSTANT+RELIABLE logic was added immediately
-after.  So even if it the above code _shouldn't_ be needed, I don't want to be
-the sucker that finds out :-)
-
-  395628ef4ea12ff0748099f145363b5e33c69acb x86: Skip verification by the watchdog for TSC clocksource.
-  eca0cd028bdf0f6aaceb0d023e9c7501079a7dda x86: Add a synthetic TSC_RELIABLE feature bit.
-  88b094fb8d4fe43b7025ea8d487059e8813e02cd x86: Hypervisor detection and get tsc_freq from hypervisor
+Oh, right, userfaultfd would be far better than piggybacking write-tracking.
 
