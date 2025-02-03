@@ -1,79 +1,70 @@
-Return-Path: <kvm+bounces-37145-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37146-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57279A26220
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 19:22:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCE92A2629A
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 19:36:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 502DB7A27C0
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 18:21:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ECF53A1741
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 18:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691BE20E338;
-	Mon,  3 Feb 2025 18:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447FB1D5CC4;
+	Mon,  3 Feb 2025 18:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EoSSEJ2S"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="C87miaOZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F389520A5CB
-	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 18:22:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0255156880
+	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 18:35:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738606924; cv=none; b=KONrfyt++Exy5joXoUQOBqtcemUhp9QhBZu/2w//aV0CQuOlrLH2JjoXd9MTzq5s5gggtNYsotVDzBf2bCQ3ajshB0Pm8iDRq5U3JEhSAwXupDmGMwDqM+oyGMK0BJ8yzb8N6QTjLTs8d8soqI8e5g4JII/1RgCWW/BNQ6sl2Os=
+	t=1738607756; cv=none; b=ndC2wVJtHtpH+cw+A/h0aVpZu9LUOOPp5nl44PzuDJMR2JwmWP8T77+5wnBuZ47H5Lo3usNZO6XAjT4NIfdM4bD+fvbPSTegnJShBEy2Y0PvHCj+qbivu/vv3rz4hkIOWz8qUzAVMMdFTvmhXIms/62ld+COKUg42wg2Hej9qoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738606924; c=relaxed/simple;
-	bh=28LdHPYUIggbRJom5lYWWfHr3ToftE4xYha+OX3oJpA=;
+	s=arc-20240116; t=1738607756; c=relaxed/simple;
+	bh=Uech+UHhv4sOC9RgVhkZjRiQR8BJsrRsxWJSMFeN6tw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n6zziWoDefsljLMuSl/AzC0SVptgRjwvkYMEQvcYJO60Ap3f3L6VU2Osq2OD3v2v28ugitWCmXkZmkbrgJhDmhPimzfRb5rDxS4HcWJrPE1EoOLMGqnpZ6uJ2w01FMKb5jCCYeCKy1JXqRFA5NsuChKPE6AR00T1VDCc1wSvhec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EoSSEJ2S; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738606922;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w2nlFOMn1lH29kDa2Jrx7xgjpzbwJvO/qQCiLXJ/5Xg=;
-	b=EoSSEJ2SzGb4FRZN48UE6TAw1Eu032cp8ZzfQAUy9JOX0G9A48938zEg9DHKzt2S4vBLi3
-	lAiT/xGIcklvr1ngE9qcL7mAGeOBAQEtHGvJOo94DNNjG541LM38KiI/+km44uq3yCr+hm
-	FCZa7gYtFc1FM8EoiJHmbybAH10FHIo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-202-Du_gCgcTNP2zWva3AXhfFw-1; Mon, 03 Feb 2025 13:22:00 -0500
-X-MC-Unique: Du_gCgcTNP2zWva3AXhfFw-1
-X-Mimecast-MFC-AGG-ID: Du_gCgcTNP2zWva3AXhfFw
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43626224274so24730715e9.0
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 10:22:00 -0800 (PST)
+	 To:Cc:Content-Type; b=Yh5qX+KiA8aBdng6jVQXbsRzKGqAPrIBDCc4rqHPKC9tq2g2uTJZP8LtDd0fLOM+9uWpGdxXHChZYWw8u0sgyGrw5YdM8A2dw2Qi88Y6oGOiPPJH5B+3wSPotsW71FjP+0tjCCt92ypUMBfUmZgn/TuPxNQxyAEOvDKmd1cB/vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=C87miaOZ; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ab2aea81cd8so852471966b.2
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 10:35:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1738607752; x=1739212552; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fGol6r61VcuNuEZWmMU6xs7WZxyGZ/9jqTylnkkwSoE=;
+        b=C87miaOZKmm/iBzB3T8W+BF/P9yJ4+9ToEO8V99dbrAx6R5VwyJfv5e/Chff03zowi
+         VCPyVGmVqEx+NFS7BYoJhXHIQJ+2JT9YcDvJIzAWu20jTlaUT/Yk6EnFddve0v9CqLx4
+         5UJqGgpuMUP98Qbic7PDHT3aIoq3iwNxAvMR0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738606919; x=1739211719;
+        d=1e100.net; s=20230601; t=1738607752; x=1739212552;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w2nlFOMn1lH29kDa2Jrx7xgjpzbwJvO/qQCiLXJ/5Xg=;
-        b=VsFJBOnr5QMRELFoFc5taC5+Eh5Rf2QySsXs1Hk77siIfikkzkJR6UHOW5IZWsXGVI
-         zwio564MlxTdW1haALdDjvloCgTi34ufCWv+6OiC3levW0272Me5ViwFhgoSc1h+tEr3
-         kGSjKy0FQj5qCCMvqAr5srDYRh7r31XNqzf0AnW98X9CdmhxjNLk1HBln4rsGpARMQgU
-         rMytZasf4fgpGfIPEqHBQoDnyWMRyC2X2oYYl5gMdS7QMHkr+6HytcxmeXVE2pQHHSXZ
-         DrK+/6UwN+U0bDodImnatBwaiQljTuJRvMZC87FI43TKpWai5yBPC68P8HnZC9UJIdA3
-         Zmew==
-X-Forwarded-Encrypted: i=1; AJvYcCVjmCyXC2FxGPcFbipbsfSue9cbc9NZRGDaEXIvBjLDBqXMU6Is3TzpRicnLkegLFU5VG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOOynR2vklUhI+l0EkaQ1VUCsLpx0LiMZycsNeCgPwmY/myGzI
-	yjDge+u6Uxk27w1ts0ovo45aJhWJyNrPSdrpzVQEuYKsw7H4GqZQ38DELXHhuSl+h3uegOS9VhU
-	MZB3n383idEvRGb0PUDWfC6CgPHtFVQlxHB6cYLWPUtBwYD0Y1WgX6S8+2kgTNk11D/EVuLgsLG
-	lNK1HyB8fzsqS7rn6UvMJALzPc
-X-Gm-Gg: ASbGncvfdm+bxcv1FyAv6PEXh2vVz93xQZHUtfZsfIeKGYA/rPRZqLQscCaOKOwaDND
-	BYzdNHndvonnjd9bLTbcosp20y6PUcYJmFEeQrgGCRPQjCgQCl/T1g0in/da9
-X-Received: by 2002:a05:600c:35d3:b0:438:d9f1:f5cc with SMTP id 5b1f17b1804b1-438dc3c3983mr208354685e9.8.1738606919492;
-        Mon, 03 Feb 2025 10:21:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHz7WFFlkh702aL2lV+rs/ZKODFLjI/rvxvV7aVp0t9rlFGn4otyohrTVaegFBxoOtK19Bv6wDrLLCiUaiWHss=
-X-Received: by 2002:a05:600c:35d3:b0:438:d9f1:f5cc with SMTP id
- 5b1f17b1804b1-438dc3c3983mr208354385e9.8.1738606919110; Mon, 03 Feb 2025
- 10:21:59 -0800 (PST)
+        bh=fGol6r61VcuNuEZWmMU6xs7WZxyGZ/9jqTylnkkwSoE=;
+        b=XBQ4W4Vw3rYs5426zfP5gOSxG4+IuPzmUWXdW83pXa3jEDVUJgfuelDduN0vusdlbP
+         M5Yiiv3PcM77LGheR05RbCUtC4oQANttEp6k4RE502Eqa2Nr5qTxtwlVJ39+J91rM+Zs
+         EgTXOBmz445MV7gvJ34UMGWGISEVG+zE74y/LIWWO8Os+d0+yZlhhzaS24dBTDqNtuXH
+         ousKRae8GkOn44SiisouAK3zKHM2kndV8ZRMWT8vdEycy29cUag/DSNvs1xcx14RPqlM
+         8L2pIaguKTxLygowagl5LGO/mTXwUNfobMy3b26O8Bqwfsx7koZjGlkRQHzWbL6UG3BW
+         DFxg==
+X-Forwarded-Encrypted: i=1; AJvYcCWmasskTz1MNHO2SyXhPI1U7pm9R8Cjt8RDUS84m7raf8N79dndYkRl1pyaVPEuUgk+ttk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJZgEFULJH5f20NDXRqbuiVytsbnH04lArMXCBKuqZeqg34Eop
+	03QKM7wVr/rrcvIPFHs4iy6rF1tTvLON7mR2LHlJvD14nNX3zJ/hYRAgKdRV81VZ58DD8ARYv1C
+	xxKBiz//j/wlvYHo/XdY8SjFxF2X4MXBgyQXMluFOjoj0D4p4GgEknrO0fIhv3GVsl1ntcO/tRA
+	faILDgD2O8EEXNRg==
+X-Gm-Gg: ASbGncuYR0iZ+isPHx2dNBKvyR9clnvR4wf6Kbe4oyNqY0hZoUAW7uK42un/gPOKkw4
+	mcIOCr3Xr0tCqf2TQMJRnLTzw4z56FZaS9Or+ZBdIyDBIZSMupDHoSpjD/Rr7Mi3kyTyxy2rn
+X-Google-Smtp-Source: AGHT+IEH1diJZSoj3mI395z848+RHFqez3XxYAiGbf4Wp1Ry15eBzXvXYVZHA21MpEZ+9mdCsAnJwAUQqGiTPmRJ6wc=
+X-Received: by 2002:a17:906:4789:b0:ab6:eeca:f548 with SMTP id
+ a640c23a62f3a-ab6eecaf915mr1797979866b.50.1738607751915; Mon, 03 Feb 2025
+ 10:35:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,14 +80,14 @@ References: <CADH9ctD1uf_yBA3NXNQu7TJa_TPhLRN=0YZ3j2gGhgmaFRdCFg@mail.gmail.com>
  <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com> <CADH9ctCFYtNfhn3SSp2jp0fzxu6s_X1A+wBNnzvHZVb8qXPk=g@mail.gmail.com>
  <CADH9ctB0YSYqC_Vj2nP20vMO_gN--KsqOBOu8sfHDrkZJV6pmw@mail.gmail.com>
  <Z2IXvsM0olS5GvbR@google.com> <CABgObfadZZ5sXYB0xR5OcLDw_eVUmXTOTFSWkVpkgiCJmNnFRQ@mail.gmail.com>
- <CADH9ctAGt_VriKA7Ch1L9U+xud-6M54GzaPOM_2sSA780TpAYw@mail.gmail.com>
-In-Reply-To: <CADH9ctAGt_VriKA7Ch1L9U+xud-6M54GzaPOM_2sSA780TpAYw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 3 Feb 2025 19:21:47 +0100
-X-Gm-Features: AWEUYZkfTYWUXYOngTDyrNZ6kf3UUSURUuAlnD5-9-ZGJoFpmKmFYKS0QywhxK0
-Message-ID: <CABgObfb3Ttfg6H+_RpNQGSYKw9BLEwx3+EysXdL-wbpd1pkGHQ@mail.gmail.com>
+ <CADH9ctAGt_VriKA7Ch1L9U+xud-6M54GzaPOM_2sSA780TpAYw@mail.gmail.com> <CABgObfb3Ttfg6H+_RpNQGSYKw9BLEwx3+EysXdL-wbpd1pkGHQ@mail.gmail.com>
+In-Reply-To: <CABgObfb3Ttfg6H+_RpNQGSYKw9BLEwx3+EysXdL-wbpd1pkGHQ@mail.gmail.com>
+From: Doug Covelli <doug.covelli@broadcom.com>
+Date: Mon, 3 Feb 2025 13:35:21 -0500
+X-Gm-Features: AWEUYZlFtTN_u4MfQfTduijgXMnD-wyLVW9fBA2KFoXRMHjBmKRmtYPFwX9qdrM
+Message-ID: <CADH9ctAzffvDByS1s2PJoD63On-b+pCnCmER4Nf4Zc=62vkbMA@mail.gmail.com>
 Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
-To: Doug Covelli <doug.covelli@broadcom.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>, Zack Rusin <zack.rusin@broadcom.com>, 
 	kvm <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
 	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
@@ -108,54 +99,92 @@ Cc: Sean Christopherson <seanjc@google.com>, Zack Rusin <zack.rusin@broadcom.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 3, 2025 at 5:35=E2=80=AFPM Doug Covelli <doug.covelli@broadcom.=
-com> wrote:
-> OK.  It seems like fully embracing the in-kernel APIC is the way to go
-> especially considering it really simplifies using KVM's support for neste=
-d
-> virtualization.  Speaking of nested virtualization we have been working o=
-n
-> adding support for that and would like to propose a couple of changes:
+On Mon, Feb 3, 2025 at 1:22=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
 >
-> - Add an option for L0 to handle backdoor accesses from CPL3 code running=
- in L2.
-> On a #GP nested_vmx_l0_wants_exit can check if this option is enabled and=
- KVM
-> can handle the #GP like it would if it had been from L1 (exit to userleve=
-l iff
-> it is a backdoor access otherwwise deliver the fault to L2).  When combin=
-ed with
-> enable_vmware_backdoor this will allow L0 to optionally handle backdoor a=
-ccesses
-> from CPL3 code running in L2.  This is needed for cases such as running V=
-Mware
-> tools in a Windows VM with VBS enabled.  For other cases such as running =
-tools
-> in a Windows VM in an ESX VM we still want L1 to handle the backdoor acce=
-sses
-> from L2.
+> On Mon, Feb 3, 2025 at 5:35=E2=80=AFPM Doug Covelli <doug.covelli@broadco=
+m.com> wrote:
+> > OK.  It seems like fully embracing the in-kernel APIC is the way to go
+> > especially considering it really simplifies using KVM's support for nes=
+ted
+> > virtualization.  Speaking of nested virtualization we have been working=
+ on
+> > adding support for that and would like to propose a couple of changes:
+> >
+> > - Add an option for L0 to handle backdoor accesses from CPL3 code runni=
+ng in L2.
+> > On a #GP nested_vmx_l0_wants_exit can check if this option is enabled a=
+nd KVM
+> > can handle the #GP like it would if it had been from L1 (exit to userle=
+vel iff
+> > it is a backdoor access otherwwise deliver the fault to L2).  When comb=
+ined with
+> > enable_vmware_backdoor this will allow L0 to optionally handle backdoor=
+ accesses
+> > from CPL3 code running in L2.  This is needed for cases such as running=
+ VMware
+> > tools in a Windows VM with VBS enabled.  For other cases such as runnin=
+g tools
+> > in a Windows VM in an ESX VM we still want L1 to handle the backdoor ac=
+cesses
+> > from L2.
+>
+> I think this makes sense and could be an argument to KVM_ENABLE_CAP.
+>
+> > - Extend KVM_EXIT_MEMORY_FAULT for permission faults (e.g the guest att=
+empting
+> > to write to a page that has been protected by userlevel calling mprotec=
+t).  This
+> > is useful for cases where we want synchronous detection of guest writes=
+ such as
+> > lazy snapshots (dirty page tracking is no good for this case).  Current=
+ly
+> > permission faults result in KVM_RUN returning EFAULT which we handle by
+> > interpreting the instruction as we do not know the guest physical addre=
+ss
+> > associated with the fault.
+>
+> Yes, this makes sense too, though you might want to look into
+> userfaultfd as well.
+>
+> We had something planned using attributes, but I don't see any issue
+> extending it to EFAULT. Maybe it would have to be yet another
+> KVM_ENABLE_CAP; considering that it would break your existing code,
+> there might be someone else in the wild doing it.
 
-I think this makes sense and could be an argument to KVM_ENABLE_CAP.
+It looks like KVM_EXIT_MEMORY_FAULT was implemented in such a way that it
+won't break existing code:
 
-> - Extend KVM_EXIT_MEMORY_FAULT for permission faults (e.g the guest attem=
-pting
-> to write to a page that has been protected by userlevel calling mprotect)=
-.  This
-> is useful for cases where we want synchronous detection of guest writes s=
-uch as
-> lazy snapshots (dirty page tracking is no good for this case).  Currently
-> permission faults result in KVM_RUN returning EFAULT which we handle by
-> interpreting the instruction as we do not know the guest physical address
-> associated with the fault.
+Note! KVM_EXIT_MEMORY_FAULT is unique among all KVM exit reasons in
+that it accompanies a return code of =E2=80=98-1=E2=80=99, not =E2=80=980=
+=E2=80=99! errno will always
+be set to EFAULT or EHWPOISON when KVM exits with
+KVM_EXIT_MEMORY_FAULT, userspace should assume kvm_run.exit_reason is
+stale/undefined for all other error numbers.
 
-Yes, this makes sense too, though you might want to look into
-userfaultfd as well.
+That being said we could certainly make this opt-in if that is preferable.
 
-We had something planned using attributes, but I don't see any issue
-extending it to EFAULT. Maybe it would have to be yet another
-KVM_ENABLE_CAP; considering that it would break your existing code,
-there might be someone else in the wild doing it.
+Doug
 
-Paolo
+> Paolo
+>
 
+--=20
+This electronic communication and the information and any files transmitted=
+=20
+with it, or attached to it, are confidential and are intended solely for=20
+the use of the individual or entity to whom it is addressed and may contain=
+=20
+information that is confidential, legally privileged, protected by privacy=
+=20
+laws, or otherwise restricted from disclosure to anyone else. If you are=20
+not the intended recipient or the person responsible for delivering the=20
+e-mail to the intended recipient, you are hereby notified that any use,=20
+copying, distributing, dissemination, forwarding, printing, or copying of=
+=20
+this e-mail is strictly prohibited. If you received this e-mail in error,=
+=20
+please return the e-mail to the sender, delete it from your computer, and=
+=20
+destroy any printed copy of it.
 
