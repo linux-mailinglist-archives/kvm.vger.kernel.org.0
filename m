@@ -1,45 +1,46 @@
-Return-Path: <kvm+bounces-37135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37138-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D09D4A26103
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 18:11:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90128A2610A
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 18:12:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFE4B1884790
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 17:10:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DAA318877BB
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 17:11:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26FBC20E02B;
-	Mon,  3 Feb 2025 17:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC1320D4E1;
+	Mon,  3 Feb 2025 17:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Obo/iH59"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/rXVJDi"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB6020ADE0;
-	Mon,  3 Feb 2025 17:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDA120C489;
+	Mon,  3 Feb 2025 17:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738602602; cv=none; b=YbNc8qLkX5c8j1S+XVBoJ79KGek8jNcds+uJ4UQBfJVw+UvlM6I/GKcrT3901jlwMXhgsfjRwhZ+Eh5TnBZsWyCKkcel/sAzod9Mh0G/TIYlREvniNFCcz9/zkgDJ+t9Pxjq706pCFjsEI59nPJnTsk7RvLdLlMPPd4XBGvt48Q=
+	t=1738602619; cv=none; b=nsvDpWkx9cgdUkmWQDZ4FxFhCc2TFleIKwJi6uCxF9Hiz5Yzc5+DvRLWltvuow+ytE0K4QmvtuVr3eCRjdlWEim+uhDdvYYArtnpLs0Z66fiPq9i12h5lqMjgfkzr8IHvWfA7zqimcqM7hPpjMGR+wUgtWmxo83hox87DMNRjdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738602602; c=relaxed/simple;
-	bh=/xOWC5s+kBlz25L3alti/wKPz7ym2Cwd9PBQxKFX9Oo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y68hZ77hq4DPXO0anf9AcNHAq86DsJiuUDV0Bjm+ANX2hd+ZZXhmakxOH0ACGEfnQUgf9LZjKdFtzPusItuTkHjoK3PusTKTlSmaTkSUxxbSKqz52zpf6NcF44a4dknprR/ewC194rUG56REmazmnCJZMNDbfbnN765z7DO65Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Obo/iH59; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B93C4CED2;
-	Mon,  3 Feb 2025 17:10:00 +0000 (UTC)
+	s=arc-20240116; t=1738602619; c=relaxed/simple;
+	bh=utjwF5TAI1j+BW8lJ183o8CpV+JJKwbc0qtJfMxaU7s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BV2DiIslpFmMnDhYMcc1ZrokrVZi3pU4kEl9peu7fCvt1OMR3apCl3lkny3q1bJM5B9/6SjJtIYfa7U0x6J+unRVSTDXjwfTPyVLKwTyBoB5iHX6cWvWE1gxwhRQQHYYx7gWMYCaeIuRLVLn8kRC9bnIH7/OD7mA8fUuW/I6cfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c/rXVJDi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A1C6C4CED2;
+	Mon,  3 Feb 2025 17:10:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738602601;
-	bh=/xOWC5s+kBlz25L3alti/wKPz7ym2Cwd9PBQxKFX9Oo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Obo/iH59DoimLTEV+3mdrMYojvojshGcrN6xcvAcqqSV4PNS4OxcVm/uzkYQ+6GC2
-	 CuihOQmiSMqiaXOLGBb2m6jOmFJBC2hyWSP9nilxG6S7T0V7zejy1WhFrKfTlKXyFB
-	 dtuq8Sjo6+sVnB+AiLL2lqBWDP8EQ42CE5vRCjBrN+hKo6sTD29BNQFZynst6U7Vjv
-	 MVMX2u4K44CGmzFjF3YSZELsO16jRCngD7GYuyPDpYkCrLGVRDaUfdJznLl8A8x07G
-	 hXaiSogNKJmZCHYvdqO5qo60jeFpKbJTOv6GjPCmHbibgn+HvnEons88aQ3mzcJ0dV
-	 SI7QtrPJ5BOjA==
+	s=k20201202; t=1738602618;
+	bh=utjwF5TAI1j+BW8lJ183o8CpV+JJKwbc0qtJfMxaU7s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=c/rXVJDiVYAu4dnomSCrmBgsng1ay7cGe6tW9UPQwrT+9PSZpXTEhsvMR7dfEa+4x
+	 Ul7hlsp0nO+w4nLDRJ0ClMAJLVaQU8q0tFjcsabzK1V/+bI9htS+iEtSDxSd8Ix2Tu
+	 CrcOIpU0YhhWKfowxpEe71hp6QUOs8+Zre0kOcUCAGUk/WoQ8Tcb76DRV1jdum+caE
+	 ClUah/P5bDlnmI68sVtR3SzvDR5CJAsqeQiRegINUKszQ4BF6yostibJEeZsx7Ahay
+	 2HhBZufoKwPTxPozryw0cvK2W35EREpHZB4BriliHQxMomCyrO5ycTAMnKsuTPvq91
+	 47AQmaNQjSUHw==
 From: "Naveen N Rao (AMD)" <naveen@kernel.org>
 To: <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
@@ -49,10 +50,12 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	Vasant Hegde <vasant.hegde@amd.com>,
 	Maxim Levitsky <mlevitsk@redhat.com>,
 	Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH 0/3] KVM: x86: Address performance degradation due to APICv inhibits
-Date: Mon,  3 Feb 2025 22:33:00 +0530
-Message-ID: <cover.1738595289.git.naveen@kernel.org>
+Subject: [PATCH 1/3] KVM: x86: hyper-v: Convert synic_auto_eoi_used to an atomic
+Date: Mon,  3 Feb 2025 22:33:01 +0530
+Message-ID: <3d8ed6be41358c7635bd4e09ecdfd1bc77ce83df.1738595289.git.naveen@kernel.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <cover.1738595289.git.naveen@kernel.org>
+References: <cover.1738595289.git.naveen@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -61,52 +64,70 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When AVIC is enabled (kvm_amd avic=1), guests with kernel-irqchip=on and 
-PIT in reinject mode (default configuration) show degraded performance.  
-This is because even though APICv is inhibited, we see other inhibits 
-being set/cleared causing contention on apicv_update_lock. Rework 
-inhibit code so that apicv_update_lock is not required unless APICv 
-state is changing. More details in patch 3.
+apicv_update_lock is primarily meant for protecting updates to the apicv
+state, and is not necessary for guarding updates to synic_auto_eoi_used.
+Convert synic_auto_eoi_used to an atomic and use
+kvm_set_or_clear_apicv_inhibit() helper to simplify the logic.
 
-In a test setup with two guests (-smp 16, -netdev tap,vhost=on, -device 
-virtio-net-pci,mq=on), multiple instances of netperf TCP_RR sending 
-traffic to the other guest, sar shows:
+Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
+---
+ arch/x86/include/asm/kvm_host.h |  7 ++-----
+ arch/x86/kvm/hyperv.c           | 17 +++++------------
+ 2 files changed, 7 insertions(+), 17 deletions(-)
 
-Without this patch series, kvm_amd avic=0 (default):
-Average:        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
-Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
-Average:         ens2 1323407.59 1323406.87 250722.47 126654.46      0.00      0.00      0.00      0.00
-
-Without this patch series, kvm_amd avic=1:
-Average:        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
-Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
-Average:         ens2 1057711.25 1057697.51 200385.83 101225.23      0.00      0.00      0.00      0.00
-
-We see ~20% degradation in packet rate.
-
-With this patch series, kvm_amd avic=1:
-Average:        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
-Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
-Average:         ens2 1315433.91 1315434.46 249211.99 125891.47      0.00      0.00      0.00      0.00
-
-
-- Naveen
-
-
-
-Naveen N Rao (AMD) (3):
-  KVM: x86: hyper-v: Convert synic_auto_eoi_used to an atomic
-  KVM: x86: Remove use of apicv_update_lock when toggling guest debug
-    state
-  KVM: x86: Decouple APICv activation state from apicv_inhibit_reasons
-
- arch/x86/include/asm/kvm_host.h |  14 ++--
- arch/x86/kvm/hyperv.c           |  17 ++---
- arch/x86/kvm/x86.c              | 125 ++++++++++++++++----------------
- 3 files changed, 72 insertions(+), 84 deletions(-)
-
-
-base-commit: eb723766b1030a23c38adf2348b7c3d1409d11f0
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 5193c3dfbce1..fb93563714c2 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1150,11 +1150,8 @@ struct kvm_hv {
+ 	/* How many vCPUs have VP index != vCPU index */
+ 	atomic_t num_mismatched_vp_indexes;
+ 
+-	/*
+-	 * How many SynICs use 'AutoEOI' feature
+-	 * (protected by arch.apicv_update_lock)
+-	 */
+-	unsigned int synic_auto_eoi_used;
++	/* How many SynICs use 'AutoEOI' feature */
++	atomic_t synic_auto_eoi_used;
+ 
+ 	struct kvm_hv_syndbg hv_syndbg;
+ 
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 6a6dd5a84f22..7a4554ea1d16 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -131,25 +131,18 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+ 	if (auto_eoi_old == auto_eoi_new)
+ 		return;
+ 
+-	if (!enable_apicv)
+-		return;
+-
+-	down_write(&vcpu->kvm->arch.apicv_update_lock);
+-
+ 	if (auto_eoi_new)
+-		hv->synic_auto_eoi_used++;
++		atomic_inc(&hv->synic_auto_eoi_used);
+ 	else
+-		hv->synic_auto_eoi_used--;
++		atomic_dec(&hv->synic_auto_eoi_used);
+ 
+ 	/*
+ 	 * Inhibit APICv if any vCPU is using SynIC's AutoEOI, which relies on
+ 	 * the hypervisor to manually inject IRQs.
+ 	 */
+-	__kvm_set_or_clear_apicv_inhibit(vcpu->kvm,
+-					 APICV_INHIBIT_REASON_HYPERV,
+-					 !!hv->synic_auto_eoi_used);
+-
+-	up_write(&vcpu->kvm->arch.apicv_update_lock);
++	kvm_set_or_clear_apicv_inhibit(vcpu->kvm,
++				       APICV_INHIBIT_REASON_HYPERV,
++				       !!atomic_read(&hv->synic_auto_eoi_used));
+ }
+ 
+ static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
 -- 
 2.48.1
 
