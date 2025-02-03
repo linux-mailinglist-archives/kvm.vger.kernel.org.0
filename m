@@ -1,78 +1,82 @@
-Return-Path: <kvm+bounces-37109-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37097-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85572A2548A
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 09:37:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46C4EA2547F
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 09:36:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 075C51627F6
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 08:37:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31C2C3A3419
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 08:36:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA91207A28;
-	Mon,  3 Feb 2025 08:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2E91FC0FE;
+	Mon,  3 Feb 2025 08:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CuZ6yDSF"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="L0Hiqjne"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88850206F19
-	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 08:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45A81E9905
+	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 08:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738571809; cv=none; b=UaWZM3mjShMGzXZ/XaUmwrykhJPsXvttMSm9DgufW+hNt9GzxyceWt6DsxyWJdkSBtv9e2+cAuUys78uU3tNnPv613XKlv2hvuuQaM9e1qM5zEjS2bxHpwiDQ/13W2w2OoJ1aYhhh4ec9YpVkV9YYWTcyqEQnrJaDd9bY/2noWk=
+	t=1738571803; cv=none; b=KfKfhrjKlKLb0SaQu14HL04WDkZcviS/I5ei4Tto0xMHhKBCMSrRJebXpc5jHG3knZu67Liws9ZmYDuA0HZQhOTr9mhpwcoP46DrxUAPRhOy2uZ0t3yQlXVmjiYrhX6neIIVDcoWuMVuS1HkUuNUJjQQYP+fgbpygcOA0yC56ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738571809; c=relaxed/simple;
-	bh=6P5z+4LJU18rE1I/34p8nPTX4NPOt1cL9y1MPI1fA4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nAOXbQ70xNXm1Lw7das4pqztOovf5NzsUl+GldSuDGwn1yIAu9rdwl0JsAOUokpj2xjpZQljBOwoqUq0GwNv5LDy+7bkMNTN3iExTN2ZNMSVuH1cFajjNDQ+hJo5lUoBNIo4uKZjld1vFoh6HsLbbv+M2CZAVlJNS+7kxygS2No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CuZ6yDSF; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1738571803; c=relaxed/simple;
+	bh=7+WUnlbRSofeOesk/qxJSNjQ278JVN/cIom+zd+gUMo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fOl8may3LsguLbWGrPlg6+3c1u3coJfNFaE78FdVET+sU25K3SogvWhJR3NTdal9sFQOieGZOXhcceSmWPRg0ltq+K9d4cqEAoXTCwh2FxIsqIHaaD3tGHJGjTOkrWuh2YeMtpswksB5ed/Fzl/OGn+PKeb6BhhJ7URH07z5tjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=L0Hiqjne; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51320sRi006368;
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51320iP2006199;
 	Mon, 3 Feb 2025 08:36:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=xzlLtiA3mZb/MH0jgyn0Azh1HII9nu7nBrzomFcGV
-	Bw=; b=CuZ6yDSFaKmiSNJC5w970QG6OzdhHy8v/fN6isL+zkewOmL24pyvqj7Ma
-	f7LYeQMapz6dYcLjyIl8o6Vpl8NKMR3UDFbc310ZXI3OVwV7+NiVYmW44I+TVPxu
-	jiud7PMH9PKwFQMC7XC3PDMEYV+epQ0r7z+5WvbFtN5WTICFJ+ZYdtXHDrY1i5D1
-	UQDtYDqEp7sBSE7L5pylMgc+nuKz52i+dHBvnBidb886exY951Gn/QkvyhERCWLN
-	wSdKux9is8k2kYjx2SG8fZ8b9beMiVVB3Xetg4PGEzpNJIMsZv8UzqzwYr2u6T+T
-	KjC7dq5vBHqQLTrJ1AF85QP7lIcEg==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44jmmy9cbs-1
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=DbRdQ4X8TM2Ttacu3
+	Zt9a3hk+MaMY48vyuhq5rsZdng=; b=L0Hiqjnek1ztsIRFQ61f5CIdFwhDaWRgz
+	WQUbucqKmCwtMmTU42ri0oNuDZehMg77dgqHLiJCAx4bHeEnU40PJlBPB0YLKrzY
+	I/w0ns60e10APf17kx0gq5/kfaDAs8xyXIfsWJLWmeerg3xlWm8/QBkvhR6KMWtJ
+	mcXoiVCkM2fdMJjet3Z0Td6xoTp5/IQXSvkIe+TwVlNZav80LjxqYYMHk+wYhovV
+	w798ZFT+2wJTPbeTeab7gzkt8ZfENn6/FCAoH2oKxBIZMvZmaEsbM5ROhFEwNCM3
+	oH2uCjMvfo/CysReQvbkmWFiwrXVEuIrQxOif2Hd0G6T6wQi3fYgA==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44jmmy9cc1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Feb 2025 08:36:28 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5134v9EZ021493;
-	Mon, 3 Feb 2025 08:36:27 GMT
+	Mon, 03 Feb 2025 08:36:29 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5137pb3I024492;
+	Mon, 3 Feb 2025 08:36:28 GMT
 Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 44j0n153fa-1
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxxmwe3h-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Feb 2025 08:36:27 +0000
+	Mon, 03 Feb 2025 08:36:28 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5138aOMP56623386
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5138aOeb56623388
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Mon, 3 Feb 2025 08:36:24 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 42FF320043;
+	by IMSVA (Postfix) with ESMTP id C6D0220040;
 	Mon,  3 Feb 2025 08:36:24 +0000 (GMT)
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D140D20040;
-	Mon,  3 Feb 2025 08:36:23 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 562B02004B;
+	Mon,  3 Feb 2025 08:36:24 +0000 (GMT)
 Received: from t14-nrb.lan (unknown [9.171.84.16])
 	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Feb 2025 08:36:23 +0000 (GMT)
+	Mon,  3 Feb 2025 08:36:24 +0000 (GMT)
 From: Nico Boehr <nrb@linux.ibm.com>
 To: thuth@redhat.com, pbonzini@redhat.com, andrew.jones@linux.dev
-Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests GIT PULL 00/18] s390x: new edat, diag258 and STFLE tests; fixes for genprotimg >= 2.36.0; cleanups for snippets and makefiles
-Date: Mon,  3 Feb 2025 09:35:08 +0100
-Message-ID: <20250203083606.22864-1-nrb@linux.ibm.com>
+Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 01/18] s390x: Split and rework cpacf query functions
+Date: Mon,  3 Feb 2025 09:35:09 +0100
+Message-ID: <20250203083606.22864-2-nrb@linux.ibm.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250203083606.22864-1-nrb@linux.ibm.com>
+References: <20250203083606.22864-1-nrb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,8 +85,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8LyvZCg_nbZ_GtXxSw6fDqFY-APSrocO
-X-Proofpoint-ORIG-GUID: 8LyvZCg_nbZ_GtXxSw6fDqFY-APSrocO
+X-Proofpoint-GUID: zeFQ08hIPYnoiACM54_xPvoPIaWklzM0
+X-Proofpoint-ORIG-GUID: zeFQ08hIPYnoiACM54_xPvoPIaWklzM0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-03_03,2025-01-31_02,2024-11-22_01
@@ -92,119 +96,116 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscor
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2501170000 definitions=main-2502030068
 
-Hi Paolo and/or Thomas,
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Changes in this pull request:
-- cpacf query function were reworked in the kernel, that fix was
-  cherry-picked by Nina. This fixes issues with possible incorrect
-  instruction format
-- Claudio extended the edat test for a special case with a 2G page at
-  the end of memory to ensure the correct addressing exception happens.
-- I added a test for diag258 where we had some issues with
-  virtual-physical address confusion.
-- Nina took the time to add library functions that help exiting from a
-  snippet s390x.
-- Nina contributed a test for STFLE interpretive execution. Thank you!
-- Marc did a lot of magic fixing issues in our Makefiles. This fixes
-  several issues with out-of-tree-builds. We now also build out-of-tree
-  in our downstream CI to avoid unpleasant surprises for maintainers :)
-  Marc, thanks for contributing your Makefile knowledge and for turning my
-  complaints into something productive
-- Janosch also invested some time to clean up snippets and Makefiles,
-  which made the code a lot nicer, thanks for that as well!
-- we have a compatibility issue with genprotimg
-  versions >= 2.36.0. Thanks Marc to fixing that. You should upgrade
-  kvm-unit-tests if you use genprotimg >= 2.36.0!
+Cherry-pick 830999bd7e72 ("s390/cpacf: Split and rework cpacf query functions")
+from the kernel:
 
-Note that there are two checkpatch errors:
-> ERROR: space prohibited before that ':' (ctx:WxW)
-I would suggest to ignore them, the code really looks ugly otherwise.
+    Rework the cpacf query functions to use the correct RRE
+    or RRF instruction formats and set register fields within
+    instructions correctly.
 
-Thanks
-Nico
+Fixes: a555dc6b16bf ("s390x: add cpacf.h from Linux")
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+Link: https://lore.kernel.org/r/20240621102212.3311494-1-nsg@linux.ibm.com
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ lib/s390x/asm/cpacf.h | 77 +++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 67 insertions(+), 10 deletions(-)
 
-MERGE: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/73
+diff --git a/lib/s390x/asm/cpacf.h b/lib/s390x/asm/cpacf.h
+index 378cd5cf..ba53ec31 100644
+--- a/lib/s390x/asm/cpacf.h
++++ b/lib/s390x/asm/cpacf.h
+@@ -137,19 +137,76 @@
+ 
+ typedef struct { unsigned char bytes[16]; } cpacf_mask_t;
+ 
+-static __always_inline void __cpacf_query(unsigned int opcode, cpacf_mask_t *mask)
++static __always_inline void __cpacf_query_rre(u32 opc, u8 r1, u8 r2,
++					      cpacf_mask_t *mask)
+ {
+-	register unsigned long r0 asm("0") = 0;	/* query function */
+-	register unsigned long r1 asm("1") = (unsigned long) mask;
++	asm volatile(
++		"	la	%%r1,%[mask]\n"
++		"	xgr	%%r0,%%r0\n"
++		"	.insn	rre,%[opc] << 16,%[r1],%[r2]\n"
++		: [mask] "=R" (*mask)
++		: [opc] "i" (opc),
++		  [r1] "i" (r1), [r2] "i" (r2)
++		: "cc", "r0", "r1");
++}
+ 
++static __always_inline void __cpacf_query_rrf(u32 opc,
++					      u8 r1, u8 r2, u8 r3, u8 m4,
++					      cpacf_mask_t *mask)
++{
+ 	asm volatile(
+-		"	spm 0\n" /* pckmo doesn't change the cc */
+-		/* Parameter regs are ignored, but must be nonzero and unique */
+-		"0:	.insn	rrf,%[opc] << 16,2,4,6,0\n"
+-		"	brc	1,0b\n"	/* handle partial completion */
+-		: "=m" (*mask)
+-		: [fc] "d" (r0), [pba] "a" (r1), [opc] "i" (opcode)
+-		: "cc");
++		"	la	%%r1,%[mask]\n"
++		"	xgr	%%r0,%%r0\n"
++		"	.insn	rrf,%[opc] << 16,%[r1],%[r2],%[r3],%[m4]\n"
++		: [mask] "=R" (*mask)
++		: [opc] "i" (opc), [r1] "i" (r1), [r2] "i" (r2),
++		  [r3] "i" (r3), [m4] "i" (m4)
++		: "cc", "r0", "r1");
++}
++
++static __always_inline void __cpacf_query(unsigned int opcode,
++					  cpacf_mask_t *mask)
++{
++	switch (opcode) {
++	case CPACF_KIMD:
++		__cpacf_query_rre(CPACF_KIMD, 0, 2, mask);
++		break;
++	case CPACF_KLMD:
++		__cpacf_query_rre(CPACF_KLMD, 0, 2, mask);
++		break;
++	case CPACF_KM:
++		__cpacf_query_rre(CPACF_KM, 2, 4, mask);
++		break;
++	case CPACF_KMA:
++		__cpacf_query_rrf(CPACF_KMA, 2, 4, 6, 0, mask);
++		break;
++	case CPACF_KMAC:
++		__cpacf_query_rre(CPACF_KMAC, 0, 2, mask);
++		break;
++	case CPACF_KMC:
++		__cpacf_query_rre(CPACF_KMC, 2, 4, mask);
++		break;
++	case CPACF_KMCTR:
++		__cpacf_query_rrf(CPACF_KMCTR, 2, 4, 6, 0, mask);
++		break;
++	case CPACF_KMF:
++		__cpacf_query_rre(CPACF_KMF, 2, 4, mask);
++		break;
++	case CPACF_KMO:
++		__cpacf_query_rre(CPACF_KMO, 2, 4, mask);
++		break;
++	case CPACF_PCC:
++		__cpacf_query_rre(CPACF_PCC, 0, 0, mask);
++		break;
++	case CPACF_PCKMO:
++		__cpacf_query_rre(CPACF_PCKMO, 0, 0, mask);
++		break;
++	case CPACF_PRNO:
++		__cpacf_query_rre(CPACF_PRNO, 2, 4, mask);
++		break;
++	default:
++		asm volatile(".error \"bad opcode\"");
++	}
+ }
+ 
+ static inline int __cpacf_check_opcode(unsigned int opcode)
+-- 
+2.47.1
 
-PIPELINE: https://gitlab.com/Nico-Boehr/kvm-unit-tests/-/pipelines/1650287644
-
-PULL: https://gitlab.com/Nico-Boehr/kvm-unit-tests.git pr-2025-01-31
-----
-The following changes since commit 2e66bb4b9423970ceb6ea195bd8697733bcd9071:
-
-  Makefile: Use 'vpath' for out-of-source builds and not 'VPATH' (2025-01-31 10:40:51 +0100)
-
-are available in the Git repository at:
-
-  https://gitlab.com/Nico-Boehr/kvm-unit-tests.git pr-2025-01-31
-
-for you to fetch changes up to 12b23c79ac6c5af4f9351c7502c4a3ffccf4b8eb:
-
-  s390x/Makefile: Add auxinfo.o to cflatobjs (2025-01-31 13:02:25 +0100)
-
-----------------------------------------------------------------
-Claudio Imbrenda (1):
-      s390x: edat: test 2G large page spanning end of memory
-
-Janosch Frank (4):
-      s390x/Makefile: Split snippet makefile rules into new file
-      s390x/Makefile: Add more comments
-      s390x: Move SIE assembly into new file
-      lib: s390x: Split SIE fw structs from lib structs
-
-Marc Hartmayer (4):
-      s390x/Makefile: snippets: Add separate target for the ELF snippets
-      s390x: Support newer version of genprotimg
-      s390x/Makefile: Make sure the linker script is generated in the build directory
-      s390x/Makefile: Add auxinfo.o to cflatobjs
-
-Nico Boehr (2):
-      s390x: edat: move LC_SIZE to arch_def.h
-      s390x: add test for diag258
-
-Nina Schoetterl-Glausch (7):
-      s390x: Split and rework cpacf query functions
-      s390x: lib: Remove double include
-      s390x: Add sie_is_pv
-      s390x: Add function for checking diagnose intercepts
-      s390x: Add library functions for exiting from snippet
-      s390x: Use library functions for snippet exit
-      s390x: Add test for STFLE interpretive execution (format-0)
-
- lib/s390x/asm/arch_def.h          |  17 +++
- lib/s390x/asm/cpacf.h             |  77 ++++++++++--
- lib/s390x/asm/facility.h          |  10 +-
- lib/s390x/asm/sie-arch.h          | 238 +++++++++++++++++++++++++++++++++++
- lib/s390x/pv_icptdata.h           |  42 -------
- lib/s390x/sie-icpt.c              |  60 +++++++++
- lib/s390x/sie-icpt.h              |  39 ++++++
- lib/s390x/sie.c                   |   5 +-
- lib/s390x/sie.h                   | 237 ++--------------------------------
- lib/s390x/snippet-exit.h          |  45 +++++++
- s390x/Makefile                    |  75 ++++++-----
- s390x/cpu-sie.S                   |  74 +++++++++++
- s390x/cpu.S                       |  64 ----------
- s390x/diag258.c                   | 259 ++++++++++++++++++++++++++++++++++++++
- s390x/edat.c                      |  19 ++-
- s390x/pv-diags.c                  |   9 +-
- s390x/pv-icptcode.c               |  12 +-
- s390x/pv-ipl.c                    |   8 +-
- s390x/sie-dat.c                   |  12 +-
- s390x/snippets/Makefile           |  35 ++++++
- s390x/snippets/c/sie-dat.c        |  19 +--
- s390x/snippets/c/stfle.c          |  29 +++++
- s390x/snippets/lib/snippet-exit.h |  28 +++++
- s390x/stfle-sie.c                 | 138 ++++++++++++++++++++
- s390x/unittests.cfg               |   6 +
- 25 files changed, 1124 insertions(+), 433 deletions(-)
- create mode 100644 lib/s390x/asm/sie-arch.h
- delete mode 100644 lib/s390x/pv_icptdata.h
- create mode 100644 lib/s390x/sie-icpt.c
- create mode 100644 lib/s390x/sie-icpt.h
- create mode 100644 lib/s390x/snippet-exit.h
- create mode 100644 s390x/cpu-sie.S
- create mode 100644 s390x/diag258.c
- create mode 100644 s390x/snippets/Makefile
- create mode 100644 s390x/snippets/c/stfle.c
- create mode 100644 s390x/snippets/lib/snippet-exit.h
- create mode 100644 s390x/stfle-sie.c
 
