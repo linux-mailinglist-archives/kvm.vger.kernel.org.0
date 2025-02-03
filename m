@@ -1,136 +1,204 @@
-Return-Path: <kvm+bounces-37101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37095-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13D03A25483
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 09:37:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74FBFA25475
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 09:35:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A46F91882F7D
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 08:37:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 800363A30EB
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 08:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD411FC7F0;
-	Mon,  3 Feb 2025 08:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289D61FBEAA;
+	Mon,  3 Feb 2025 08:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fCR5BZwF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZQWJ8PfT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDEFF1FBEBE
-	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 08:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84201F8F04
+	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 08:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738571805; cv=none; b=ToRAOR7QywxbNPy1pyEfmngw+fsR4Ncc3hRfATiVJMhdNMBg6MHkWVZKwGlsL2ajcMxqn0znBO+NOMpuiqCQsUNea228p8st4KaaLswNWYIotMsRXJ7ODoedVneASmbN49ll7WeXZZn0XVPDikxMNwYZNbVlR/20UTBqMFzNvBE=
+	t=1738571717; cv=none; b=q6s08WLbw4QDoWd6Ro7TsCQdg4AhgQKHWUWPw6xbrWIXrmGRJbcZCNq8EFndtcQXzQa4mkYxfgI6/KqB8nykR5P+NS+pvMciezlS967WxUQB8klLnHvpXG+B4zpoQbivQwrGwOAo3+HQE2oSWwOvQ44BzTv3FldrA4I7aDrF/60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738571805; c=relaxed/simple;
-	bh=PvWBwnQzf6bjsqTtlGWffhqOJyCJLVuGFwuLkxEbtkc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FrHEzwMI72gFSUtzcVQwm2POmwvkjFmY6pvxRRn3bdKkEWa2iAIo7H/S7rdo0j+8BvSYeeUCZEvDtSM+g92r0FJALbcXC3Xy6f40tGWwAkbv6vU71EnFunK9vykhoskP0H1osumNw1yAogJ+FcMDZCa7rpzPlgNnb4wQqDL1ZvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fCR5BZwF; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 512Laijd007728;
-	Mon, 3 Feb 2025 08:36:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=iteFu9D/6btoi3OKV
-	/v3SGtDQ5/0ouyXUM7vkTyw1A8=; b=fCR5BZwFA4Og6vuscJnOyqzeYvJ1LDcpH
-	0GHxrcnnbJeHtQNmnFKg8ehu6aj/Pr/rCEYYdx6H00tEwFzDQIvhIFAxiLwa7gHT
-	/9F0vfh1NFoIr0jEgZRSPBGdfeeiQmGChKBRD8/BCNFUoFhSe8KKNfZxzaEDFFmR
-	ALRJLzhqpK80ZbhP72BcjF/NHoIc5TTToCn4oNetXZKVE6rLNgykZ3Pgfktz+Soq
-	HkL4napOk2SN/6Otl7U/FpeXoQz+DJhaQRrgwrYXnsI4mL6lfM53DBiL+YjcD9zm
-	ME1FZAEhGAXwQobC34cpMf06J7rr1byRPhWs1E8TQaiZn5TaEXOow==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44jayyba07-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Feb 2025 08:36:30 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5134clwG005310;
-	Mon, 3 Feb 2025 08:36:29 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44j05jn69r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Feb 2025 08:36:29 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5138aPfi22872538
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Feb 2025 08:36:25 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D14AB20040;
-	Mon,  3 Feb 2025 08:36:25 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5BB6F20043;
-	Mon,  3 Feb 2025 08:36:25 +0000 (GMT)
-Received: from t14-nrb.lan (unknown [9.171.84.16])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Feb 2025 08:36:25 +0000 (GMT)
-From: Nico Boehr <nrb@linux.ibm.com>
-To: thuth@redhat.com, pbonzini@redhat.com, andrew.jones@linux.dev
-Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests GIT PULL 03/18] s390x: edat: move LC_SIZE to arch_def.h
-Date: Mon,  3 Feb 2025 09:35:11 +0100
-Message-ID: <20250203083606.22864-4-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250203083606.22864-1-nrb@linux.ibm.com>
-References: <20250203083606.22864-1-nrb@linux.ibm.com>
+	s=arc-20240116; t=1738571717; c=relaxed/simple;
+	bh=AjeBmdJxOhB8EePWx9LMdeDziY3O7eZmfuZLVM3LnCA=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=PsqGkonAheQwENAeoX3umYyMO5wKfq8iAvHuYfxofscmWBXP7ELOGdx0CRE4gki7zxnkn2/M4JU6QkxIexj1WtURGDkgHxTxoQAuRw70xbF8s+UvBlcC5R4lcX1jk8PhuTaOnpx8NVimkuCvHBBOiSEmnC17RSvhDwiJESN8t7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZQWJ8PfT; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9e38b0cfso7658127a91.0
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 00:35:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738571715; x=1739176515; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=bCVGsPkdqv8VOcstVdRRWjGTGpKBIG2jSUrhWhisdPo=;
+        b=ZQWJ8PfTXWf9rjNMsrbTjBAJbETXlU/CjR5KASUzY0l/Ub2eookgHzsLD363AJRHx/
+         mrVTbegfVsjcApqwzcEBOSAtvHE50uT/nuV2S2k6sxkgf4hkW6YuBjk6jWffs2UPh354
+         ihB5+AMeb70RmDTt9egjCIo8tRjleB3Ym3AsBI7VjUNPVI16F6CbvoC5pYs7cpL5sTUt
+         7XQtWAC3Ky+siA/93SsIZaGLAJIdWEIP2gu86eQqppgOFLsLN2whPa6w3Yap5IB+pcDk
+         IYQmpY+9GJs8oEh6St7eW/fxTlyNVqOTysF2OfUwtxAmDNQZKFx5crqzxsY0zieWl2gz
+         P9TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738571715; x=1739176515;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bCVGsPkdqv8VOcstVdRRWjGTGpKBIG2jSUrhWhisdPo=;
+        b=HXaJ4+iaZGIynqBENG6ODqTZUWBIRk7nq/8XqNUmUNfFByOiBNnZ5pUeD8IG97inO7
+         8XqqhhVQ/R4YPbIRONYhSHmGqhu1MGcG5vdW+MkSwBSt3MjUxi+n2ulwCqOzHndDgZSd
+         A+z+R1aquFK/Zf7ynEa6JOAB6YILQaNDli6g6OJ+vcZ4pNxZS9YKswOrqf5FenBeXlf1
+         3DJnrKY3C8K1rlODyh3LrgcjGTGjO/cVF8nQqJHDAS+JD7BJaQA+Twyaf54a1UZXT6Q/
+         dDCDCBCJAd3gb0UsAgyOSx7EAo+CNhSOBiYwugCj5aRTXLZ19SB832GAxVDOvO19TrFk
+         +1Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQCAkqVWog2JOLy56DN+MmHaBQuC67JQIUBLY1EpuqEOExxC3oNcjgL9PUfRjKlcjklKU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHQF7bEx03UkvO7Pyi7A7KclrOcabNyUppdoKAYGMQDWNviBsu
+	pd9kbMzmd677eVO2urDW0FkAaAcddwtXL1Q8rL+p/8ZcUIeX88QyvcPcwduK1o9VVT30dmXhOGe
+	YWn2hl8+elC2oAk4IsgkYEQ==
+X-Google-Smtp-Source: AGHT+IHj+Cug/2vDcc3qbw44IShUmb2Dal+tFzb8jNSGxbKWVsDIeVzNOQ+erfgJBUWM/FABAfOHIsgQxSoSDHqCzA==
+X-Received: from pjbnc13.prod.google.com ([2002:a17:90b:37cd:b0:2ea:46ed:5d3b])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:2748:b0:2f4:465d:5c94 with SMTP id 98e67ed59e1d1-2f83abd9978mr32152246a91.11.1738571714919;
+ Mon, 03 Feb 2025 00:35:14 -0800 (PST)
+Date: Mon, 03 Feb 2025 08:35:12 +0000
+In-Reply-To: <83d44307f30ad8ce19de3edcdc00c179750e0e23.camel@infradead.org>
+ (message from Amit Shah on Tue, 28 Jan 2025 10:42:57 +0100)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZmRsCLyvH3_p57IBHVbKHhdyN-6QfNSe
-X-Proofpoint-ORIG-GUID: ZmRsCLyvH3_p57IBHVbKHhdyN-6QfNSe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-03_03,2025-01-31_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 mlxlogscore=999 adultscore=0 priorityscore=1501
- phishscore=0 impostorscore=0 malwarescore=0 mlxscore=0 bulkscore=0
- suspectscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2501170000 definitions=main-2502030068
+Mime-Version: 1.0
+Message-ID: <diqzr04fpgsf.fsf@ackerleytng-ctop-specialist.c.googlers.com>
+Subject: Re: [RFC PATCH 00/39] 1G page support for guest_memfd
+From: Ackerley Tng <ackerleytng@google.com>
+To: Amit Shah <amit@infradead.org>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
+	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
+	fvdl@google.com, jthoughton@google.com, seanjc@google.com, 
+	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com, 
+	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev, 
+	mike.kravetz@oracle.com, erdemaktas@google.com, vannapurve@google.com, 
+	qperret@google.com, jhubbard@nvidia.com, willy@infradead.org, 
+	shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
+	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
+	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
+	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
+	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-fsdevel@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 
-struct lowcore is defined in arch_def.h and LC_SIZE is useful to other
-tests as well, therefore move it to arch_def.h.
+Amit Shah <amit@infradead.org> writes:
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Link: https://lore.kernel.org/r/20241010071228.565038-2-nrb@linux.ibm.com
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- lib/s390x/asm/arch_def.h | 1 +
- s390x/edat.c             | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+> Hey Ackerley,
 
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 745a3387..5574a451 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -119,6 +119,7 @@ enum address_space {
- 
- #define CTL2_GUARDED_STORAGE		(63 - 59)
- 
-+#define LC_SIZE	(2 * PAGE_SIZE)
- struct lowcore {
- 	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
- 	uint32_t	ext_int_param;			/* 0x0080 */
-diff --git a/s390x/edat.c b/s390x/edat.c
-index 1f582efc..89b9c2d3 100644
---- a/s390x/edat.c
-+++ b/s390x/edat.c
-@@ -17,7 +17,6 @@
- 
- #define PGD_PAGE_SHIFT (REGION1_SHIFT - PAGE_SHIFT)
- 
--#define LC_SIZE	(2 * PAGE_SIZE)
- #define VIRT(x)	((void *)((unsigned long)(x) + (unsigned long)mem))
- 
- static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
--- 
-2.47.1
+Hi Amit,
 
+> On Tue, 2024-09-10 at 23:43 +0000, Ackerley Tng wrote:
+>> Hello,
+>> 
+>> This patchset is our exploration of how to support 1G pages in
+>> guest_memfd, and
+>> how the pages will be used in Confidential VMs.
+>
+> We've discussed this patchset at LPC and in the guest-memfd calls.  Can
+> you please summarise the discussions here as a follow-up, so we can
+> also continue discussing on-list, and not repeat things that are
+> already discussed?
+
+Thanks for this question! Since LPC, Vishal and I have been tied up with
+some Google internal work, which slowed down progress on 1G page support
+for guest_memfd. We will have progress this quarter and the next few
+quarters on 1G page support for guest_memfd.
+
+The related updates are
+
+1. No objections on using hugetlb as the source of 1G pages.
+
+2. Prerequisite hugetlb changes.
+
++ I've separated some of the prerequisite hugetlb changes into another
+  patch series hoping to have them merged ahead of and separately from
+  this patchset [1].
++ Peter Xu contributed a better patchset, including a bugfix [2].
++ I have an alternative [3].
++ The next revision of this series (1G page support for guest_memfd)
+  will be based on alternative [3]. I think there should be no issues
+  there.
++ I believe Peter is also waiting on the next revision before we make
+  further progress/decide on [2] or [3].
+
+3. No objections for allowing mmap()-ing of guest_memfd physical memory
+   when memory is marked shared to avoid double-allocation.
+
+4. No objections for splitting pages when marked shared.
+
+5. folio_put() callback for guest_memfd folio cleanup/merging.
+
++ In Fuad's series [4], Fuad used the callback to reset the folio's
+  mappability status.
++ The catch is that the callback is only invoked when folio->page_type
+  == PGTY_guest_memfd, and folio->page_type is a union with folio's
+  mapcount, so any folio with a non-zero mapcount cannot have a valid
+  page_type.
++ I was concerned that we might not get a callback, and hence
+  unintentionally skip merging pages and not correctly restore hugetlb
+  pages
++ This was discussed at the last guest_memfd upstream call (2025-01-23
+  07:58 PST), and the conclusion is that using folio->page_type works,
+  because
+    + We only merge folios in two cases: (1) when converting to private
+      (2) when truncating folios (removing from filemap).
+    + When converting to private, in (1), we can forcibly unmap all the
+      converted pages or check if the mapcount is 0, and once mapcount
+      is 0 we can install the callback by setting folio->page_type =
+      PGTY_guest_memfd
+    + When truncating, we will be unmapping the folios anyway, so
+      mapcount is also 0 and we can install the callback.
+
+Hope that covers the points that you're referring to. If there are other
+parts that you'd like to know the status on, please let me know which
+aspects those are!
+
+> Also - as mentioned in those meetings, we at AMD are interested in this
+> series along with SEV-SNP support - and I'm also interested in figuring
+> out how we collaborate on the evolution of this series.
+
+Thanks all your help and comments during the guest_memfd upstream calls,
+and thanks for the help from AMD.
+
+Extending mmap() support from Fuad with 1G page support introduces more
+states that made it more complicated (at least for me).
+
+I'm modeling the states in python so I can iterate more quickly. I also
+have usage flows (e.g. allocate, guest_use, host_use,
+transient_folio_get, close, transient_folio_put) as test cases.
+
+I'm almost done with the model and my next steps are to write up a state
+machine (like Fuad's [5]) and share that.
+
+I'd be happy to share the python model too but I have to work through
+some internal open-sourcing processes first, so if you think this will
+be useful, let me know!
+
+Then, I'll code it all up in a new revision of this series (target:
+March 2025), which will be accompanied by source code on GitHub.
+
+I'm happy to collaborate more closely, let me know if you have ideas for
+collaboration!
+
+> Thanks,
+>
+> 		Amit
+
+[1] https://lore.kernel.org/all/cover.1728684491.git.ackerleytng@google.com/T/
+[2] https://lore.kernel.org/all/20250107204002.2683356-1-peterx@redhat.com/T/
+[3] https://lore.kernel.org/all/diqzjzayz5ho.fsf@ackerleytng-ctop.c.googlers.com/
+[4] https://lore.kernel.org/all/20250117163001.2326672-1-tabba@google.com/T/
+[5] https://lpc.events/event/18/contributions/1758/attachments/1457/3699/Guestmemfd%20folio%20state%20page_type.pdf
 
