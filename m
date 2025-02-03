@@ -1,158 +1,245 @@
-Return-Path: <kvm+bounces-37157-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37158-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9D9A2649C
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 21:36:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18FC9A264E8
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 21:41:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C421C1642B9
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 20:36:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A344169A86
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 20:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0645B20E6F7;
-	Mon,  3 Feb 2025 20:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6BC211498;
+	Mon,  3 Feb 2025 20:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="f4RxBxKj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arJoZS3B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB9D20E30A
-	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 20:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC45C20E6F7;
+	Mon,  3 Feb 2025 20:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738614954; cv=none; b=IFGB/CjM3gKGeAvWtUG2ueG4kbw6ONAJ4PFi5kGngyWHkyShEjsRUCwWjmDlD690VyKbS08CnB7oQNFi2SBBAVyks6YZp4OveLMjGhVE0yIqjrS+HX7LAHnY9a0pFBV/UExtnH4dInK+kXLZxip2jOj6J+6VdTHJuCUX6tFEn/A=
+	t=1738615182; cv=none; b=n7XeXmR1akFF+bqzERn6RS2veOI6d8LgchhLfgaw51MM/kTetKd+SqM/tb5xPsRQ41UwHutSQJwv4AM6yVyDRlpXGU+4rVIgvTuOgWeKU0dIxUnLe0nzGaQ8U1/NZrmn+Sw4dhYiiOgCkTjEfpa5wcsnJf4Pr3wKjNs4lANzug8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738614954; c=relaxed/simple;
-	bh=iHOgsgbTLasT+mAbTKI3kNcpK3vJNjZYaHQEoQJJPkk=;
+	s=arc-20240116; t=1738615182; c=relaxed/simple;
+	bh=DSUOkZcVTQO69xFV5OKgk8D9SmJ9ASYct8T4zNGSmHA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H24K0Oa4GaDgO6WzDkZ5naUx2tvSCN3w90MHGBjmJn7lkjqE8VejICUa7iFnuh9MKRmuOGp8evA5sOrwmVJLYiXxkbr+FknehrRdXuUrYDUMSvMqzJzriLm1acD60iy3CTL9S9g+2Oic4b4Mu9V22XhHh5JTmktSjs9wN5cxsZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=f4RxBxKj; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ab2b29dfc65so802084566b.1
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 12:35:51 -0800 (PST)
+	 To:Cc:Content-Type; b=ECAEz1P8ksON3Ks4T/JmZBlreoR56Izt24ilqezjvUc0suY5joxii+P3Cz3gT01Qwig7Fgon6pA46pwZdUfIAjPCVurN93KjJkQcF/nctkR+Vn3lIlr/ldsMW7YeWPkM7/xaawyr6j7e5VyQuhQSQwLzaVxI3csZBNFJG+OaEHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=arJoZS3B; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5dc7eba78e6so9004109a12.3;
+        Mon, 03 Feb 2025 12:39:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1738614950; x=1739219750; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738615179; x=1739219979; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q7Ns3FLfIAZYGDFkK3fA+Vs5Q3I4AHQ7nr4KJPOKX0U=;
-        b=f4RxBxKjDTdDjBsIYLtm5ozeuzWueyoa/Rj8pjPgVkKjSJoTXu68kEtwUnPwHifA/h
-         NXZeBuQZcby81GQC0VeHQe9Ed0n0qTX2A6qxudxe4rqveZc/05092q+Bv2SxJW22K4gI
-         uiSzwjlxjoKNwl4paBJTen2GJiOpL1O+479Mw=
+        bh=NJoLeA5HCdF+uipqG9OTqGKMKt79tnpVrboddnu4FFc=;
+        b=arJoZS3BMf5uA0J5DcPDzk9cBa1YmActbBMqt34JwX78njRnqBD+QYBJD3l1M57KWa
+         TMebfUQ2u6gTMJKMa+LCF09JIhltYJvj+Rzi80RI2gyrFT0K0UYE2obQjT2IoHbUIgJq
+         1GhICHMg/s6CgI+BAjAq6au7la01w/vJy7f7enGOwyrrQYY3CutTt8+e3NgmU6fs2T1g
+         l0MzvhCMNc4Hep9Xs0Pdepf7+X/wEnqdMYAEbjSzKl+8wFZC1q8F4H4ZpWNI+xmuzdGU
+         p9eEwWJraQgEsJZGUZZ8vIJmDme2mSavF4v7KcUTPWhFcpdDLf1MHnvYYdwC1M4Rp6Cg
+         V+bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738614950; x=1739219750;
+        d=1e100.net; s=20230601; t=1738615179; x=1739219979;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=q7Ns3FLfIAZYGDFkK3fA+Vs5Q3I4AHQ7nr4KJPOKX0U=;
-        b=lm7t9sQrKQgtazCsgznBtr14oA0WOH2k2NwyJcS00gZbKZVp5i1pgH6tE7xl0G8T5a
-         th5B/bvPxRavbHzlaqlEhLX1kwlTpxrGY2lOfSeuCAUc/iH2QiG8m6OjPoY2nGat1lC0
-         j7dXzAqod9c+oT1s6GrDss1EUfm3z7MglyxOf353z5VFnsfyDGX7UQRYN/6BNle23714
-         NBtJpFVASInryx1WwH17h/1xnXT7dM+BSrdcWmmGAb+cjXFSkypnS8alTIoo060yLvYh
-         PnjLaIdw6a0WE9Gcn1HsY/QiaAXq8Zsb/JMfviJ1XJW3ScJI4USuCwxhQ0GLdMZh/2lg
-         aeaA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBz/cDPpB3X/lCsJapwawJe86isE62p2x1neK1E5cyo3CVkdzlgJKW0yGQOtg8Ojbgcpo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9NsHGGLhvCq6QWYuAxke2yMVVnvWaFB9+rfm4BwRE0oZN5zap
-	4BBs3I21FBjnw7AJdUgHuhXzqoed+ipi2pRJf2bOLprdSWiiXIC6OI7zZL6TWDyqDY2y7sLgLNH
-	fifOHyPDJeFUZti+Fbk93EjrT90k8oA0C6SSKbiyInPT9nsJlMuQ1Bs8YmVeK20DaTZdQoooe30
-	iGDJvgaE4S/q4yVA==
-X-Gm-Gg: ASbGncvD6T2t49Dynh9o2BQOErmPwiBJFbkDtgwNYvIL27wcnNEI7nxm7uxw/oc+NuR
-	Yx8BIEr//0UoElbsyQoL8gOUDGAUSHjRq6Dj2VQ9N1dNgVCWAjPY3m6XT9g8yDotXUGWsGctW
-X-Google-Smtp-Source: AGHT+IF5AWWdY4qYzAwQdbOtXfgV9YAbUE+7qvDb3Uh4Avo5Mcb4wzOObn3yCi/awJ7s1audhmtBacpaZff4AJ/3R0o=
-X-Received: by 2002:a17:907:9691:b0:ab6:dbd2:df78 with SMTP id
- a640c23a62f3a-ab6dbd2e39dmr2560575466b.35.1738614950459; Mon, 03 Feb 2025
- 12:35:50 -0800 (PST)
+        bh=NJoLeA5HCdF+uipqG9OTqGKMKt79tnpVrboddnu4FFc=;
+        b=COVWVwPXnNNXaK6AzlguE5EFIsvAwOrFYtwIXeVYaHFXhlph2oIwijdJSRgWKyRNAD
+         4m80VaAymzkUUPf+CSPnZvNjgEWfwBqMrMXmeplDFGB4o1IdPbGFZ0FYaTSoN0f9DrNx
+         xuEJSVc9xaiy9umpeOoz7VxdGluSD14guJYROmVE05e2WBfHYJVSnfy0Th3vpz899+lp
+         72DwDfweE9GBS+xJD6Z9Q2c/j2w4BEaZVonclHOmVe2QgV1UqMKp4ZlAnZkUuHKpId98
+         W8niWl2+OLw03uRCmz8xnvCc6rUwNnOPBKYj2zFfd1SsVwt9ttvRhTZyIQQ1+IdyP9OQ
+         kbcg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7V3sJqsTRwRraL42g2Iwfsj9qUpuYh+hjBqEvhGQ2V9DNpLCqxKtoNcMjP1K3H+IDkO++oVh+nXRAlw==@vger.kernel.org, AJvYcCUJkwJBBs2XxU+YG3xFiyp1Nafhg0GKbMej9sxYkgcqVs9PFicOqB8sLP3bUW0ZLWIaWw8nznH5Ax8U@vger.kernel.org, AJvYcCXIFxkTnOd+7Kw+L4kwp2tqk+o5Qa/EV8d0SVTr7v41kk83s9jNK8gW6AM7MlJn3lLVE+buloVGRo85N9VD@vger.kernel.org, AJvYcCXVMohUNiImaxzUKLaCigIDgZBcbnhVnwhwrIcWNc3UmzgEtCsOBocvw1PpN3dq9bFjVC4=@vger.kernel.org, AJvYcCXpvxwgeiTz+FihdMlkSZ99AjYY56SZf+V/nekLWEGBeNX5XaRBB0lijHj54K08cFnp7ig05VHj07xqHrjwkQ==@vger.kernel.org, AJvYcCXsMOmxax1HrUyPo1gbx+Phf6sCAAO7gn8NYWbioAEtlUkQDPNLYcEDfjvS9w7jfr0ehBwY358imQq47f4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yywwwe5egKPieedOeZqgxN2m5IM169vbJL4WicDm37W7BLq2l8c
+	KxckLhRvr75f7laE5d41eQv5a85/p1u3ZBzJ5wQyRYV2M21f2HuVp2S39nfw3jLRumFLHzr0zdP
+	8zEaCtsFBoPxk4r0i9jqz3m+aDWmI/n8/Nks=
+X-Gm-Gg: ASbGncshP4NQ5bfaAXClZHIl52neqC+jPe0Rk/SbO6axMhC6emZjF/kkGa0F9R/knc0
+	sSsPpN3lVA+EDaDc6noAebkehNhqc229bCjcVtv4Mgkn4sK/yfeKaolvkc9gx8w4HZIgfgzow
+X-Google-Smtp-Source: AGHT+IFNFuJ6PFWXTnztMuE1X9BK0sRVnxTYJ0CcSl1i8HxwsroaqPn8G3ITli2ILPX2NDGvbG709VaVv1BtBVn5pVE=
+X-Received: by 2002:a05:6402:1d49:b0:5dc:8b8b:3527 with SMTP id
+ 4fb4d7f45d1cf-5dc8b8b3955mr14245605a12.17.1738615178722; Mon, 03 Feb 2025
+ 12:39:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com>
- <CADH9ctCFYtNfhn3SSp2jp0fzxu6s_X1A+wBNnzvHZVb8qXPk=g@mail.gmail.com>
- <CADH9ctB0YSYqC_Vj2nP20vMO_gN--KsqOBOu8sfHDrkZJV6pmw@mail.gmail.com>
- <Z2IXvsM0olS5GvbR@google.com> <CABgObfadZZ5sXYB0xR5OcLDw_eVUmXTOTFSWkVpkgiCJmNnFRQ@mail.gmail.com>
- <CADH9ctAGt_VriKA7Ch1L9U+xud-6M54GzaPOM_2sSA780TpAYw@mail.gmail.com>
- <CABgObfb3Ttfg6H+_RpNQGSYKw9BLEwx3+EysXdL-wbpd1pkGHQ@mail.gmail.com>
- <CADH9ctAzffvDByS1s2PJoD63On-b+pCnCmER4Nf4Zc=62vkbMA@mail.gmail.com>
- <Z6Eb4PfmmHWFTR9A@google.com> <93df442c-8ec3-43ee-aba1-e770a5b7588f@redhat.com>
- <Z6EeyaOZUevXDBiH@google.com>
-In-Reply-To: <Z6EeyaOZUevXDBiH@google.com>
-From: Doug Covelli <doug.covelli@broadcom.com>
-Date: Mon, 3 Feb 2025 15:35:20 -0500
-X-Gm-Features: AWEUYZnthUXQ_pnDcokMXb4-W_1h4l_OREU8d1T2--Q60_3QnZjpsz7kj6ouJEQ
-Message-ID: <CADH9ctC0=YWJ1S-WVWhasjS+DHSWpzqQ0bbgz6N2vGHAcBrgRg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Zack Rusin <zack.rusin@broadcom.com>, 
-	kvm <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "the arch/x86 maintainers" <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Joel Stanley <joel@jms.id.au>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest <linux-kselftest@vger.kernel.org>
+References: <cover.1731684329.git.josef@toxicpanda.com> <9035b82cff08a3801cef3d06bbf2778b2e5a4dba.1731684329.git.josef@toxicpanda.com>
+ <20250131121703.1e4d00a7.alex.williamson@redhat.com> <CAHk-=wjMPZ7htPTzxtF52-ZPShfFOQ4R-pHVxLO+pfOW5avC4Q@mail.gmail.com>
+ <Z512mt1hmX5Jg7iH@x1.local> <20250201-legehennen-klopfen-2ab140dc0422@brauner>
+ <CAHk-=wi2pThSVY=zhO=ZKxViBj5QCRX-=AS2+rVknQgJnHXDFg@mail.gmail.com>
+ <CAOQ4uxjVTir-mmx05zh231BpEN1XbXpooscZyfNUYmVj32-d3w@mail.gmail.com>
+ <20250202-abbauen-meerrettich-912513202ce4@brauner> <l5apiabdjosyy4gfuenr4oqdfio3zdiajzxoekdgtsohzpn3mj@dcmvayncbye4>
+In-Reply-To: <l5apiabdjosyy4gfuenr4oqdfio3zdiajzxoekdgtsohzpn3mj@dcmvayncbye4>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Mon, 3 Feb 2025 21:39:27 +0100
+X-Gm-Features: AWEUYZkbHu6mMa6EWY6xvPoTALvkWrJQw00UR10VzqG2w2z2rfA8abpNUzs3ZCQ
+Message-ID: <CAOQ4uxg63JR2jsy_xA63Zkh_6wzsy_2c30Z_05kZ=cHsRC_UzQ@mail.gmail.com>
+Subject: Re: [REGRESSION] Re: [PATCH v8 15/19] mm: don't allow huge faults for
+ files with pre content watches
+To: Jan Kara <jack@suse.cz>, Alex Williamson <alex.williamson@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Peter Xu <peterx@redhat.com>, Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com, 
+	linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk, 
+	linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-mm@kvack.org, 
+	linux-ext4@vger.kernel.org, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 3, 2025 at 2:53=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
+On Mon, Feb 3, 2025 at 1:41=E2=80=AFPM Jan Kara <jack@suse.cz> wrote:
 >
-> On Mon, Feb 03, 2025, Paolo Bonzini wrote:
-> > On 2/3/25 20:41, Sean Christopherson wrote:
-> > > -EFAULT isn't the problem, KVM not being able to return useful inform=
-ation in
-> > > all situations is the issue.
+> On Sun 02-02-25 11:04:02, Christian Brauner wrote:
+> > On Sun, Feb 02, 2025 at 08:46:21AM +0100, Amir Goldstein wrote:
+> > > On Sun, Feb 2, 2025 at 1:58=E2=80=AFAM Linus Torvalds
+> > > <torvalds@linux-foundation.org> wrote:
+> > > >
+> > > > On Sat, 1 Feb 2025 at 06:38, Christian Brauner <brauner@kernel.org>=
+ wrote:
+> > > > >
+> > > > > Ok, but those "device fds" aren't really device fds in the sense =
+that
+> > > > > they are character fds. They are regular files afaict from:
+> > > > >
+> > > > > vfio_device_open_file(struct vfio_device *device)
+> > > > >
+> > > > > (Well, it's actually worse as anon_inode_getfile() files don't ha=
+ve any
+> > > > > mode at all but that's beside the point.)?
+> > > > >
+> > > > > In any case, I think you're right that such files would (accident=
+ly?)
+> > > > > qualify for content watches afaict. So at least that should proba=
+bly get
+> > > > > FMODE_NONOTIFY.
+> > > >
+> > > > Hmm. Can we just make all anon_inodes do that? I don't think you ca=
+n
+> > > > sanely have pre-content watches on anon-inodes, since you can't rea=
+lly
+> > > > have access to them to _set_ the content watch from outside anyway.=
+.
+> > > >
+> > > > In fact, maybe do it in alloc_file_pseudo()?
+> > > >
+> > >
+> > > The problem is that we cannot set FMODE_NONOTIFY -
+> > > we tried that once but it regressed some workloads watching
+> > > write on pipe fd or something.
 > >
-> > Yes, that's why I don't want it to be an automatically opted-in API.  I=
-f
-> > incremental improvements are possible, it may be useful to allow intere=
-sted
-> > userspace to enable it early.  For example...
+> > Ok, that might be true. But I would assume that most users of
+> > alloc_file_pseudo() or the anonymous inode infrastructure will not care
+> > about fanotify events. I would not go for a separate helper. It'd be
+> > nice to keep the number of file allocation functions low.
 > >
-> > > Specifically, "guest" accesses that are emulated
-> > > by KVM are problematic, because the -EFAULT from e.g. __kvm_write_gue=
-st_page()
-> > > is disconnected from the code that actually kicks out to userspace.  =
-In that
-> > > case, userspace will get KVM_EXIT_MMIO, not -EFAULT.  There are more =
-problems
-> > > beyond KVM_EXIT_MMIO vs. -EFAULT, e.g. instructions that perform mult=
-iple memory
-> > > accesses,
-> >
-> > those are obviously synchronous and I expect VMware to handle them alre=
-ady.
-> >
-> > That said my preferred solution to just use userfaultfd, which is
-> > synchronous by definition.
+> > I'd rather have the subsystems that want it explicitly opt-in to
+> > fanotify watches, i.e., remove FMODE_NONOTIFY. Because right now we hav=
+e
+> > broken fanotify support for e.g., nsfs already. So make the subsystems
+> > think about whether they actually want to support it.
 >
-> Oh, right, userfaultfd would be far better than piggybacking write-tracki=
-ng.
+> Agreed, that would be a saner default.
+>
+> > I would disqualify all anonymous inodes and see what actually does
+> > break. I naively suspect that almost no one uses anonymous inodes +
+> > fanotify. I'd be very surprised.
+> >
+> > I'm currently traveling (see you later btw) but from a very cursory
+> > reading I would naively suspect the following:
+> >
+> > // Suspects for FMODE_NONOTIFY
+> > drivers/dma-buf/dma-buf.c:      file =3D alloc_file_pseudo(inode, dma_b=
+uf_mnt, "dmabuf",
+> > drivers/misc/cxl/api.c: file =3D alloc_file_pseudo(inode, cxl_vfs_mount=
+, name,
+> > drivers/scsi/cxlflash/ocxl_hw.c:        file =3D alloc_file_pseudo(inod=
+e, ocxlflash_vfs_mount, name,
+> > fs/anon_inodes.c:       file =3D alloc_file_pseudo(inode, anon_inode_mn=
+t, name,
+> > fs/hugetlbfs/inode.c:           file =3D alloc_file_pseudo(inode, mnt, =
+name, O_RDWR,
+> > kernel/bpf/token.c:     file =3D alloc_file_pseudo(inode, path.mnt, BPF=
+_TOKEN_INODE_NAME, O_RDWR, &bpf_token_fops);
+> > mm/secretmem.c: file =3D alloc_file_pseudo(inode, secretmem_mnt, "secre=
+tmem",
+> > block/bdev.c:   bdev_file =3D alloc_file_pseudo_noaccount(BD_INODE(bdev=
+),
+> > drivers/tty/pty.c: static int ptmx_open(struct inode *inode, struct fil=
+e *filp)
+> >
+> > // Suspects for ~FMODE_NONOTIFY
+> > fs/aio.c:       file =3D alloc_file_pseudo(inode, aio_mnt, "[aio]",
+>
+> This is just a helper file for managing aio context so I don't think any
+> notification makes sense there (events are not well defined). So I'd say
+> FMODE_NONOTIFY here as well.
+>
+> > fs/pipe.c:      f =3D alloc_file_pseudo(inode, pipe_mnt, "",
+> > mm/shmem.c:             res =3D alloc_file_pseudo(inode, mnt, name, O_R=
+DWR,
+>
+> This is actually used for stuff like IPC SEM where notification doesn't
+> make sense. It's also used when mmapping /dev/zero but that struct file
+> isn't easily accessible to userspace so overall I'd say this should be
+> FMODE_NONOTIFY as well.
 
-Thanks.  We will look into using userfaultfd.
+I think there is another code path that the audit missed for getting these
+pseudo files not via alloc_file_pseudo():
+ipc/shm.c:      file =3D alloc_file_clone(base, f_flags,
 
-Doug
+which does not copy f_mode as far as I can tell.
 
---=20
-This electronic communication and the information and any files transmitted=
-=20
-with it, or attached to it, are confidential and are intended solely for=20
-the use of the individual or entity to whom it is addressed and may contain=
-=20
-information that is confidential, legally privileged, protected by privacy=
-=20
-laws, or otherwise restricted from disclosure to anyone else. If you are=20
-not the intended recipient or the person responsible for delivering the=20
-e-mail to the intended recipient, you are hereby notified that any use,=20
-copying, distributing, dissemination, forwarding, printing, or copying of=
-=20
-this e-mail is strictly prohibited. If you received this e-mail in error,=
-=20
-please return the e-mail to the sender, delete it from your computer, and=
-=20
-destroy any printed copy of it.
+>
+> > // Unsure:
+> > fs/nfs/nfs4file.c:      filep =3D alloc_file_pseudo(r_ino, ss_mnt, read=
+_name, O_RDONLY,
+>
+> AFAICS this struct file is for copy offload and doesn't leave the kernel.
+> Hence FMODE_NONOTIFY should be fine.
+>
+> > net/socket.c:   file =3D alloc_file_pseudo(SOCK_INODE(sock), sock_mnt, =
+dname,
+>
+> In this case I think we need to be careful. It's a similar case as pipes =
+so
+> probably we should use ~FMODE_NONOTIFY here from pure caution.
+>
+
+I tried this approach with patch:
+"fsnotify: disable notification by default for all pseudo files"
+
+But I also added another patch:
+"fsnotify: disable pre-content and permission events by default"
+
+So that code paths that we missed such as alloc_file_clone()
+will not have pre-content events enabled.
+
+Alex,
+
+Can you please try this branch:
+
+https://github.com/amir73il/linux/commits/fsnotify-fixes/
+
+and verify that it fixes your issue.
+
+The branch contains one prep patch:
+"fsnotify: use accessor to set FMODE_NONOTIFY_*"
+and two independent Fixes patches.
+
+Assuming that it fixes your issue, can you please test each of the
+Fixes patches individually, because every one of them should be fixing
+the issue independently and every one of them could break something,
+so we may end up reverting it later on.
+
+Thanks,
+Amir.
 
