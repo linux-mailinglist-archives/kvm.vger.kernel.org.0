@@ -1,93 +1,206 @@
-Return-Path: <kvm+bounces-37132-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37133-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D61AA26034
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 17:34:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02A64A2603F
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 17:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F66C1885377
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 16:34:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E4F63A26FB
+	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 16:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7983320B7FC;
-	Mon,  3 Feb 2025 16:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7FC20B203;
+	Mon,  3 Feb 2025 16:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LGxe8Ig8"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F05120AF99;
-	Mon,  3 Feb 2025 16:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A44220AF99
+	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 16:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738600456; cv=none; b=iwlwfI5Fa0q5Y7ysjsqOWIk3Dg3rl29g8z3TILGxvEqL2s57TOhqaFbefYXRPXtDncStnhnEajEFNK+jOpHrLQZz805M3VCEJU37IbN9mrTh5s80h0V/wHFhO7BPIARmJ1OdLFlNgmxIECqnQITtQa3TxtGbNE1leWsHzv2fTK0=
+	t=1738600541; cv=none; b=KgzXQ+RwO/5yJhRCqG0zS+QaYRRtKjxDTqB2Ld58mZqKZjbVRKPram7iIbUiKi8fE+mu3DQOY6q7jwzMkdKMmxahrT0WYVNz0CLa2ICmlzoailUpY4JHt+JaXPx3k2hCgjDyBGMCBfhHbyE7MihnV0LWLY4NwJILfCYO699PmF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738600456; c=relaxed/simple;
-	bh=7SACX3zlcvRVcG4Azpho0nkzzpP1y3XRPlNeBocU8p0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OqiuJcOm4MJYG+F3Q0JRYbAAvTuENt2H23W9X4twSXYdZ1kpD5GsAN1fLzczo4VbTD2j6ZqGkJXWAXufjgpUAKny6SS7w/BQLBJuUo3d12TYrRF05pf9BuS/ZCYdZCRZtLr9xmBO+UUBCGxFyffdrbqp0uCuxYtuSKW6l5FUlqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C22371595;
-	Mon,  3 Feb 2025 08:34:37 -0800 (PST)
-Received: from [10.1.34.25] (e122027.cambridge.arm.com [10.1.34.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD43B3F63F;
-	Mon,  3 Feb 2025 08:34:09 -0800 (PST)
-Message-ID: <9d9bfaca-1cba-4e33-9aa6-b840f5c1da2c@arm.com>
-Date: Mon, 3 Feb 2025 16:34:04 +0000
+	s=arc-20240116; t=1738600541; c=relaxed/simple;
+	bh=pRYUk0ZKvQj1gkwIksxjnfyIXLml63X97KJ99riBYZs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UNfa4BvSxNocmvCngFKN05JTyr1889ur+H1om/Do2STOqQ5NIjLukc+ygufZibBFZSXX9jq9j7PjFZ/QbXy1Qa3CgKyYM94AkPwnRbWPCo4k9stGJ2t0LlLte0S6uCuwYTl/OJ8+5uVY/Whc01G7PgHMYIGx5t16LgYnKf5bMUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LGxe8Ig8; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aaec61d0f65so780877166b.1
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 08:35:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1738600537; x=1739205337; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GHIxoUzv1NfTLg3IcP41+9dhk+jT2PV2wOpPLYrhtVc=;
+        b=LGxe8Ig8WM3lFHkKoTJBzOsrJ0FbvRknDy+A8X0d7NVk2mOQQmqhn6jUuwT0qXGT4O
+         piTKcXYiVu2AXg3Ot76bg+PU8xef2Gbc7lQAyuEDyejvcVm9l4eB9Pcahx5g0xo7d0L0
+         Hgs8a5ykcMdUuyaM3kn+s0TBihZ6+b9IMuhFw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738600537; x=1739205337;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GHIxoUzv1NfTLg3IcP41+9dhk+jT2PV2wOpPLYrhtVc=;
+        b=sUjDwD8ywBXp2GlbRK2wiCfSm5T0J/JnbBzQm5PhoAuQKXBtvidNX9JF9JuqvuKnn7
+         l9dP3liHJuQ1AkW6UMjSYH7gsk8uSoCVksvos6LPQjq7XhKZZGv0a3Xfiv98ragWCguS
+         fs7t5kYGo1QzzI9Qa/cLOF8E726eIe5RnydfL/G1g9iIG/GIz/BL42IDpyg9dCiFcWFd
+         c6PsSW21mznnPJL6hmRgun+RH+y2gTJWshMhblZTgWPD0P/QSnNf72gdIKnsIHMwhy2i
+         uKZ7yKUZfKl6pk5NIQh5fzKLludb5EaIxQUHYAa5o4ML8Y7eo80DisW06/FW9mJ13l6A
+         KCDg==
+X-Forwarded-Encrypted: i=1; AJvYcCXDpLa+B73U84Fjw1UZf5VrCrz4+yd2zIfMpPEN+fHy8jbolaC7hchslw+bXhcIAK8WJLI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLJ/im/0NKTRp/arXKTmy2ylIWqksbvIA17qO5TGfELgKE+Afy
+	Dxf8YcIrbHh0G19j3H5s4hrnJIk0MWNGJya9A3cx1H/gV91mFqzeevXnogHjMvPgluu3mpFIaof
+	nSai3QjogpZpt5UenhUjJIlu0RFOq468VAj+L08STQc1dgcpWhsfqfq/QiMJFYG57VgBXnbrSS8
+	jn3TxWmQfw/XJDqg==
+X-Gm-Gg: ASbGncuLz+t8gLWN76IDfiGduNV9s42zQACWjpGjQLsj0Y89dJ40559+2w0IkiR2ruX
+	WclN1Lq5cETsJX3fyXNbzyAHdzYvaLi0/qqcNY12cIHHFKHXOEm5sc0Rz/8cyzEC1gqZ49LJN
+X-Google-Smtp-Source: AGHT+IHhX+KtXIcqRMMHyB7BajSsI7eHa5uvkNSVbUMeWa6SIDte2e1vwyujrh9gykAk3x0eH5a3iTOwvnuD1twZJ/Y=
+X-Received: by 2002:a17:907:7255:b0:ab7:e71:adb5 with SMTP id
+ a640c23a62f3a-ab70e71b1bcmr1040194766b.35.1738600537450; Mon, 03 Feb 2025
+ 08:35:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 12/43] arm64: RME: Allocate/free RECs to match vCPUs
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, Gavin Shan <gshan@redhat.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-13-steven.price@arm.com>
- <9a543b6f-5487-4159-89fb-73d9b6749a01@redhat.com>
- <9174bc24-6217-4663-a370-291d4790a212@arm.com>
- <d499c3e7-cc0f-467a-8401-bc53b70259f7@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <d499c3e7-cc0f-467a-8401-bc53b70259f7@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CADH9ctD1uf_yBA3NXNQu7TJa_TPhLRN=0YZ3j2gGhgmaFRdCFg@mail.gmail.com>
+ <c3026876-8061-4ab2-9321-97cc05bad510@redhat.com> <CADH9ctBivnvP1tNcatLKzd8EDz8Oo6X65660j8ccxYzk3aFzCA@mail.gmail.com>
+ <CABgObfZEyCQMiq6CKBOE7pAVzUDkWjqT2cgfbwjW-RseH8VkLw@mail.gmail.com>
+ <CADH9ctA_C1dAOus1K+wOH_SOKTb=-X1sVawt5R=dkH1iGt8QUg@mail.gmail.com>
+ <CABgObfZrTyft-3vqMz5w0ZiAhp-v6c32brgftynZGJO8OafrdA@mail.gmail.com>
+ <CADH9ctBYp-LMbW4hm3+QwNoXvAc5ryVeB0L1jLY0uDWSe3vbag@mail.gmail.com>
+ <b1ddb439-9e28-4a58-ba86-0395bfc081e0@redhat.com> <CADH9ctCFYtNfhn3SSp2jp0fzxu6s_X1A+wBNnzvHZVb8qXPk=g@mail.gmail.com>
+ <CADH9ctB0YSYqC_Vj2nP20vMO_gN--KsqOBOu8sfHDrkZJV6pmw@mail.gmail.com>
+ <Z2IXvsM0olS5GvbR@google.com> <CABgObfadZZ5sXYB0xR5OcLDw_eVUmXTOTFSWkVpkgiCJmNnFRQ@mail.gmail.com>
+In-Reply-To: <CABgObfadZZ5sXYB0xR5OcLDw_eVUmXTOTFSWkVpkgiCJmNnFRQ@mail.gmail.com>
+From: Doug Covelli <doug.covelli@broadcom.com>
+Date: Mon, 3 Feb 2025 11:35:07 -0500
+X-Gm-Features: AWEUYZmOY0gXuefMbV_TBx2UZa0_r8n8z510aZTLnGHyyjywNd7tyCqK6XVRNrA
+Message-ID: <CADH9ctAGt_VriKA7Ch1L9U+xud-6M54GzaPOM_2sSA780TpAYw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Add support for VMware guest specific hypercalls
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Zack Rusin <zack.rusin@broadcom.com>, 
+	kvm <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "the arch/x86 maintainers" <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Joel Stanley <joel@jms.id.au>, Linux Doc Mailing List <linux-doc@vger.kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-kselftest <linux-kselftest@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 03/02/2025 11:18, Suzuki K Poulose wrote:
-> On 30/01/2025 16:40, Steven Price wrote:
->> On 29/01/2025 04:50, Gavin Shan wrote:
-[...]
->>> One corner case seems missed in kvm_vcpu_init_check_features(). It's
->>> allowed to
->>> initialize a vCPU with REC feature even kvm_is_realm(kvm) is false.
->>> Hopefully,
->>> I didn't miss something.
->>
->> Ah, yes good point. I'll pass a kvm pointer to
->> kvm_vcpu_init_check_features() and use kvm_is_realm() in there.
-> 
-> nit: kvm is available from the VCPU via vcpu->kvm
+On Tue, Jan 7, 2025 at 12:10=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
+ wrote:
+>
+> On Wed, Dec 18, 2024 at 4:44=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > > Changing our legacy BIOS is not an option so in order to support Wind=
+ows VMs
+> > > with the legacy BIOS with decent performance we would either need to =
+add support
+> > > for remote reads of the APIC ID register to KVM or support CR8 access=
+es w/o
+> > > exiting w/o the in-kernel APIC in order.  Do you have a preference?
+> >
+> > I didn't quite follow the CR8 access thing.  If the choice is between e=
+mulating
+> > Remote Read IPIs and using a userspace local APIC, then I vote with bot=
+h hands
+> > for emulating Remote Reads, especially if we can do a half-assed versio=
+n that
+> > provides only what your crazy BIOS needs :-)
+>
+> Absolutely.  Not quite userspace local APIC - VMware only needs
+> userspace traps on CR8 access but yeah, it would not be great to have
+> that. Remote read support is totally acceptable and hopefully win-win
+> for VMware too.
+>
+> > The biggest wrinkle I can think of is that KVM uses the Remote Read IPI=
+ encoding
+> > for a paravirt vCPU kick feature, but I doubt that's used by Windows gu=
+ests and
+> > so can be sacrificed on the Altar of Ancient BIOS.
+>
+> That's easy, the existing code can be wrapped with
+>
+>                 if (guest_pv_has(vcpu, KVM_FEATURE_PV_UNHALT))
+>
+> The remote-read hack is not even supposed to be used by the guest
+> (it's used internally by kvm_pv_kick_cpu_op).
+>
+> Paolo
 
-Absolutely correct, and what I wrote was nonsense ;)
+OK.  It seems like fully embracing the in-kernel APIC is the way to go
+especially considering it really simplifies using KVM's support for nested
+virtualization.  Speaking of nested virtualization we have been working on
+adding support for that and would like to propose a couple of changes:
 
-What I meant was to pass a kvm pointer *from*
-kvm_vcpu_init_check_features() *to* system_supported_vcpu_features() and
-use kvm_is_realm() in there!
+- Add an option for L0 to handle backdoor accesses from CPL3 code running i=
+n L2.
+On a #GP nested_vmx_l0_wants_exit can check if this option is enabled and K=
+VM
+can handle the #GP like it would if it had been from L1 (exit to userlevel =
+iff
+it is a backdoor access otherwwise deliver the fault to L2).  When combined=
+ with
+enable_vmware_backdoor this will allow L0 to optionally handle backdoor acc=
+esses
+from CPL3 code running in L2.  This is needed for cases such as running VMw=
+are
+tools in a Windows VM with VBS enabled.  For other cases such as running to=
+ols
+in a Windows VM in an ESX VM we still want L1 to handle the backdoor access=
+es
+from L2.
 
-Thanks,
-Steve
+- Extend KVM_EXIT_MEMORY_FAULT for permission faults (e.g the guest attempt=
+ing
+to write to a page that has been protected by userlevel calling mprotect). =
+ This
+is useful for cases where we want synchronous detection of guest writes suc=
+h as
+lazy snapshots (dirty page tracking is no good for this case).  Currently
+permission faults result in KVM_RUN returning EFAULT which we handle by
+interpreting the instruction as we do not know the guest physical address
+associated with the fault.  This works fine for normal VMs but it would be =
+good
+to avoid it for the case where nested virtualization is enabled as emulatin=
+g L2
+instructions presents a number of challenges and it would be best to avoid =
+this.
+This is the only case I have found where our userlevel code has to interpre=
+t
+instructions from L2.
 
+Any thoughts on these proposed changes?
+
+Doug
+
+--=20
+This electronic communication and the information and any files transmitted=
+=20
+with it, or attached to it, are confidential and are intended solely for=20
+the use of the individual or entity to whom it is addressed and may contain=
+=20
+information that is confidential, legally privileged, protected by privacy=
+=20
+laws, or otherwise restricted from disclosure to anyone else. If you are=20
+not the intended recipient or the person responsible for delivering the=20
+e-mail to the intended recipient, you are hereby notified that any use,=20
+copying, distributing, dissemination, forwarding, printing, or copying of=
+=20
+this e-mail is strictly prohibited. If you received this e-mail in error,=
+=20
+please return the e-mail to the sender, delete it from your computer, and=
+=20
+destroy any printed copy of it.
 
