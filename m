@@ -1,84 +1,96 @@
-Return-Path: <kvm+bounces-37244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37245-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20DEDA27723
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 17:28:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E571A2778E
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 17:50:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A17221642FE
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 16:28:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 170983A649D
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 16:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11142153EC;
-	Tue,  4 Feb 2025 16:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83F8215F7C;
+	Tue,  4 Feb 2025 16:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PYf7GfMo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YCKSvpgv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4668F215170
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 16:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9DD86324;
+	Tue,  4 Feb 2025 16:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738686518; cv=none; b=u4K7o34aNOPQqJfzQ5Lz1N84xt4veyrrBwJNvWPVmVgH+n758NiP1KNoObSITmuzBF91IWfcAcp9wMvwV311gqWf7yMhWnOsPZabEoBXUuqTkd2lS8DL++x+yIoxnVOUG31JPpFv0jjTtye3f7cMTfEwvClgSqc92A8XyJ0dtNU=
+	t=1738687812; cv=none; b=mc5noCZ5hN1RoCaMO7C7vg4pfITzfzjW4Y0xJbkx0p5EAduC9D8NLR85YfUXzmcKL4Rxy8xwEQ0J+blV87CPRkK+Wc4m1s7F7XeLNSeBtwskACKmg2dj8NeGyA8g8eFE4KOB0UgSaq6w03FN0yJsfdkDiId7g4NM85lPOjYHGjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738686518; c=relaxed/simple;
-	bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UX3mhFDSiYAhSFeRNXRJBdjpIgWJJbh1hq3yYCf/QHB4b/g16bBfOg9NJ+GrKHUwK26aT5b2vdezePwgxhA/IPMZgJD4oP3gOj15NrgaYZhR8UbdWB7G5mEw/WFTLQfzFON0tVK+FHVxD9PEowl9w4yZU8NZUboh5bZ3STSnUH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PYf7GfMo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738686516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-	b=PYf7GfMoNgGJXukG1Dd7xi1IvXOqDZW+Y3fQCxk0AtidZHnjwfFG7iXkw86hB8lejctpYU
-	OqkxZJIqgDEIVl6QOKkKyea7JmRMgaXcpmomoh0UkQ+6MkQORKqA9F6ZueLLd8Cv9WJFzZ
-	aAV/mf0j/G+CiHFKBw3EbHGPuFiGY+U=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-139-zmZ2R7rEPyiJPfSgrDE-UA-1; Tue,
- 04 Feb 2025 11:28:33 -0500
-X-MC-Unique: zmZ2R7rEPyiJPfSgrDE-UA-1
-X-Mimecast-MFC-AGG-ID: zmZ2R7rEPyiJPfSgrDE-UA
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51EEE1801F1C;
-	Tue,  4 Feb 2025 16:28:32 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7D959195608E;
-	Tue,  4 Feb 2025 16:28:31 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH] KVM: x86/mmu: Ensure NX huge page recovery thread is alive before waking
-Date: Tue,  4 Feb 2025 11:28:29 -0500
-Message-ID: <20250204162829.253475-1-pbonzini@redhat.com>
-In-Reply-To: <20250124234623.3609069-1-seanjc@google.com>
-References: 
+	s=arc-20240116; t=1738687812; c=relaxed/simple;
+	bh=BkfYd3pmYoLUvBzp6+/u6N/oMS5/8X5zZnqyN2RPmV0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X9IINVT39kEQygfHA3w2rv62E/e3RAL8cLOy0CTCACITob+OTgpP1yq9GDiN6LfbIgk/X3uR9aO4O5cvJRwjSebzoSKajdPsCQZ9qViDoNuImF/JCj66EL4/jCCmOpRjfl6uR8xO3DKeSaWdMiWnWUWxAlmW44vd58R4IoIzwks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YCKSvpgv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3EE2C4CEDF;
+	Tue,  4 Feb 2025 16:50:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738687811;
+	bh=BkfYd3pmYoLUvBzp6+/u6N/oMS5/8X5zZnqyN2RPmV0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YCKSvpgvIUqCcTGoRbh7u2+tiVMkkY3DihyAOBu8YNyOYuZ/rwJWIeeg7OL6dEiRN
+	 vpY4EQS3mc8diT8ZQsgudL68v28aWPiVsoHM2AHrutJOBu1C0+OneL/+qgBAgjwso2
+	 VDVc6B9wT3hK4hS+4XH/XlnTw0Ivqirs+YCMfCEIRNQCEbDS50y5zhHF0Uxwi+3Mtx
+	 R3eupjl5iXLpKZg4sy54Ml7aFLOY6wdbnnA8nZ2SJNSMMzWL9hbpdYJuFnaXcqjMF6
+	 d08dO9VLGxqASNH5IR360DaFGB/6raWHmg2CuONKYL/IgieFWvZrFo64MarTf7KyVE
+	 iaccKtSTOJQPg==
+Date: Tue, 4 Feb 2025 08:50:08 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell
+ <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
+ Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v3 2/6] selftests: ncdevmem: Implement devmem
+ TCP TX
+Message-ID: <20250204085008.1adf89ea@kernel.org>
+In-Reply-To: <c8dd0458-b0a9-4342-a022-487e73542381@redhat.com>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+	<20250203223916.1064540-3-almasrymina@google.com>
+	<c8dd0458-b0a9-4342-a022-487e73542381@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Queued, thanks.
+On Tue, 4 Feb 2025 13:29:18 +0100 Paolo Abeni wrote:
+> On 2/3/25 11:39 PM, Mina Almasry wrote:
+> > Add support for devmem TX in ncdevmem.
+> > 
+> > This is a combination of the ncdevmem from the devmem TCP series RFCv1
+> > which included the TX path, and work by Stan to include the netlink API
+> > and refactored on top of his generic memory_provider support.
+> > 
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>  
+> 
+> Usually the self-tests are included towards the end of the series, to
+> help reviewers building-up on previous patches knowledge.
 
-Paolo
-
-
+I had the same reaction, but in cases where uAPI is simpler than 
+the core code it may actually help the understanding to start with
+the selftest. Dunno. Only concern would be that the test won't work
+if someone bisects to this commit, but that's not very practical?
 
