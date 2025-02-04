@@ -1,156 +1,168 @@
-Return-Path: <kvm+bounces-37269-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37270-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE579A27B16
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 20:23:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74424A27B40
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 20:29:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2912B7A279D
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 19:22:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1DF4161F2C
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 19:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DD7217647;
-	Tue,  4 Feb 2025 19:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9777C219A63;
+	Tue,  4 Feb 2025 19:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XW9xwq9e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ONWNoLGI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFEE204F85
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 19:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2319D2185BC
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 19:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738697020; cv=none; b=qngaEup6WS4BIZgonp0LRtQRUziSB7qTUWeDtoRy9ljqQJCGHvF/sTZzIBDmFCnilN66vVLiPKu+llPiJh3fftBEfhKHCRpyWMDslUmw/g/VSMzFk0R3xLIbZkbN+l5/3H4Ti+9fbyir5ujPN/N4JNMIy9LrOuMTAbLQ5Sq/AC4=
+	t=1738697381; cv=none; b=sztFMZP8Vucl+omzBw9iSXxqH9gvd2hqytlc8qYKbGfoZXLfb33GPpBrSJfWgqx/QVHknoS7htivFS4NNf7K7KLnMcSqhnjXPSM2KqrOd/nVUmhRl/ebsmG5EGy8a1bAaEk2pCUPUQPlrklF4uzmlATODS5/T6+0T6sk9VLEvpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738697020; c=relaxed/simple;
-	bh=Oxor8wKExkt7gAhD/gJtNC9sIwWG1V1vV3++fquZZDw=;
+	s=arc-20240116; t=1738697381; c=relaxed/simple;
+	bh=jR8glNKTcRvWQFyYWzpmeeHHaLx4f7ObdoeaqwwhgrA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ubPpPAu3s6FcF6rAW3ESufNQ6+qNMK4uquHAtj1WqmAsEpdKu2ek8I3SkLo5enz9hZFgoQBwlCxqdtUOOS7ObA41nXP3VchhUJ99tJk9FHGQJLwYQd4vqXldr07p4VSO9x3sHWUsxe8yUnKrzvl6QC3ozsIVXRmfkVXs4e/3meQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XW9xwq9e; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=q0R2C8O6d+EIAtsPo3tb+PNQe0ZC9Fv0L/8OK1FaNZby00TGmX7X+doac2rahxYEEXOFAOQAuTWRSEi05giF/h0czSuum07tqOf6ag+zA1ofDih2hP3A+Bcbb5OLtW7wvn5z/4/07qkVIpOCcKcCTOhGqcyvVjWtEL5nOZAhyzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ONWNoLGI; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef9da03117so17030659a91.1
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 11:23:38 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f816a85facso11206113a91.3
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 11:29:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738697018; x=1739301818; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738697379; x=1739302179; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mU6NEWjLFlBth9JekcNPIXJtuRcysaOik+DY1sDAAPo=;
-        b=XW9xwq9e0h5s9AfzGVXgTVQvjw4wGThsv8XFUE4qVoiGavcc6dTGufdiYN9EQhzuSn
-         awvkeMYvtkbu6Uw09DpjvkayAXqMyPHIvcTlRW2ciqm2hu4dSHhmHQAy2eQHw5IErTyP
-         oVD0IH4fwVcDLrLNOH3duAynrM20y3hdl6eZR0cnGwAZtfeKJlTVWQKjbR7o0T0sCRJq
-         jp3FBvLKfCX/xT0otbX4mDt0G8vliPyiI2SHmkyijZ80jw6RAY7UxZAsedKW1sItL8aS
-         JZpZqH5QeFiPYOPI2zezMrTKP6p4W61j2EnA1RUCVmBLAi848haa+j1sa3IavykUFBCB
-         FXtQ==
+        bh=5e8UEnGVo+4lDc1cH0GoOuL8F0MUw58BGLx/3p+5fdQ=;
+        b=ONWNoLGImy11X7wp005j3c0b3AXhnDVQAu9PRZCfl4/Hoz7uc3Bgi4E/aFM/exO727
+         gTQwYXCSe1OPEwPw9KP6ZpUarjAhqpXjbujXYzsEoBVNRIDCQX+TpapGaFZOfTFSDk7N
+         BXyEFfsh5Mz3YQV9vTYRKpL/FlHaT5EEXh3yr4bZRd3Gsf2AJyKfK6X4R0yfg1aEzPeF
+         UA3Yut+cT5/O3Sc5e4louBnyGBuKa7yQUEQiAYtwv/StnOFI3wBPst0MM/xBkLduOzMP
+         8ZduMrKyh6qZSdrqHLroL91d8MeCxC8dEB0EH2XO5FnaaBo9yWmochVH+p4xUkjtHQL1
+         /7rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738697018; x=1739301818;
+        d=1e100.net; s=20230601; t=1738697379; x=1739302179;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=mU6NEWjLFlBth9JekcNPIXJtuRcysaOik+DY1sDAAPo=;
-        b=Gg2A3+Pmw8MU+9kMxOhfoCtdrSzg54B99wZK83pmilgwaQ7tOJvRbCvrRfhyf0ds2g
-         1zKRWH4SwDbrTo4NiOuY8ZGF9IheEfDZWCyur5D3sJse+S2Ab/WD1APKgGtxGMW4MEh2
-         eUoc4Llj7fsTfOuLkkkruc4DlQ0fm2VP91CEA2YE6VFx3mQ6m/oBzQANUF/xF/8bQCc9
-         LFZDqM4BfKhDDc9J8Zncx/rK92aJVIvGCekV234qjnrOk++vvKDSOXht9ysn2jR2HWVQ
-         kQIRA+Sk7aQTBPgXx6bNZuWgZeX8/hvUlcsv2Exy4VKdkqn5cuAKhx9Jevf+FB+PLwHa
-         Ju1g==
-X-Forwarded-Encrypted: i=1; AJvYcCX+h885HcPHAARoXUs3PxzLrqkHvjaN+LWe0zmMr2PwVK/xVhGwc/lDT5asWr9zuOH9MaE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypHk9BvDzRsQBWqC5FjJ7KtLT9g9dgr3crLxmaoSkcWxx7c7oU
-	IbtxmRyaCWES8NcoYcfV+0pb0s52yIidmmjkSI6HGXg9x8CPmrOUMRajQ0W8JSG8QcG2tcFYzZp
-	HJg==
-X-Google-Smtp-Source: AGHT+IEth4W4eKneJyToCoULIhy1nd7LV+EXAj9+a+XknG5txgwUqYrL0IEC6qEWjMx4Oqa+94Y+2pCo9yU=
-X-Received: from pfbfh3.prod.google.com ([2002:a05:6a00:3903:b0:726:d6e6:a38])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2187:b0:72a:bc54:84f7
- with SMTP id d2e1a72fcca58-730351428bemr168769b3a.12.1738697018181; Tue, 04
- Feb 2025 11:23:38 -0800 (PST)
-Date: Tue, 4 Feb 2025 11:23:36 -0800
-In-Reply-To: <6b2d960c-1340-4e91-ad17-0ccadd378a81@xen.org>
+        bh=5e8UEnGVo+4lDc1cH0GoOuL8F0MUw58BGLx/3p+5fdQ=;
+        b=T4O5Dz8VpBfGYwzMKFtnLfCIAPmhLiNuDBlQt9apLwDGP2lgqCB/dKOQQ3qhvL2l+z
+         yG/kLoAP41wKDiwmTYudS/ll/1rHtmwcwTQ50NufVhBfFeGYLpWrVr3XG/SYKoRscDKy
+         UUwTsccsWasqWkMK0zgtE0AqrZRdkiYTM5S1fORNcVvle3XxEVjXAbaPNiu4TYd5Af2b
+         ZYGG0/duxWs+EXyXIx/Y2KrVXT060tGWilMlBHvHATHaT9qYxXHQhVz9TxZx3RhLQi9U
+         hSdqSMKB7sEJGBtd4OmcJGrLV4eBDabyPlgK5V7lWkoVrMJProb49Dq7CNB+EqjHPpKt
+         Ctrg==
+X-Forwarded-Encrypted: i=1; AJvYcCUswZRedy8e9Kf1clQNjIfHUD4uAoIZgPALDirB2ENq2s1qi8Iaqz/DQJ4AnbTYrGTRF5I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEapD1P1DWl5hUJu83dvpBT0t6fwD+lrR8dfMp99FWOr6DUuXr
+	tcKyFz7ERpyLJNvQttxNQFELbAr3zI9Xesd0uRRmBufO1e7dq4/qSjAXAnKDPjT5ymweeTh0FWm
+	NEQ==
+X-Google-Smtp-Source: AGHT+IF+/fBR5/RvgfgkW+k0iOimknqvbfTCdp56sFN5T8R+lSkm/qjT6GD7VseImBDz4jdwECu7ieLsEjc=
+X-Received: from pjbsw5.prod.google.com ([2002:a17:90b:2c85:b0:2d3:d4ca:5fb0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5245:b0:2ee:ab29:1a65
+ with SMTP id 98e67ed59e1d1-2f83abb4f94mr39965711a91.4.1738697379406; Tue, 04
+ Feb 2025 11:29:39 -0800 (PST)
+Date: Tue, 4 Feb 2025 11:29:38 -0800
+In-Reply-To: <85r04e5821.fsf@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250201013827.680235-1-seanjc@google.com> <20250201013827.680235-9-seanjc@google.com>
- <792ae6f4-903f-41b2-a0f2-369d92a1fc3f@xen.org> <6b2d960c-1340-4e91-ad17-0ccadd378a81@xen.org>
-Message-ID: <Z6JpOOP1-GpFw7lR@google.com>
-Subject: Re: [PATCH v2 08/11] KVM: x86: Pass reference pvclock as a param to kvm_setup_guest_pvclock()
+References: <20250201021718.699411-1-seanjc@google.com> <20250201021718.699411-7-seanjc@google.com>
+ <85r04e5821.fsf@amd.com>
+Message-ID: <Z6JqopU5LkDIZPq6@google.com>
+Subject: Re: [PATCH 06/16] x86/tdx: Override PV calibration routines with
+ CPUID-based calibration
 From: Sean Christopherson <seanjc@google.com>
-To: paul@xen.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com, 
-	Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Juergen Gross <jgross@suse.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org, 
+	linux-coco@lists.linux.dev, virtualization@lists.linux.dev, 
+	linux-hyperv@vger.kernel.org, jailhouse-dev@googlegroups.com, 
+	kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 04, 2025, Paul Durrant wrote:
-> On 04/02/2025 09:33, Paul Durrant wrote:
-> > On 01/02/2025 01:38, Sean Christopherson wrote:
-> > > -static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
-> > > +static void kvm_setup_guest_pvclock(struct pvclock_vcpu_time_info
-> > > *ref_hv_clock,
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct kvm_vcpu *vcpu,
-> >=20
-> > So, here 'v' becomes 'vcpu'
-> >=20
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct gfn_to_pfn=
-_cache *gpc,
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int offs=
-et,
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool force_tsc_un=
-stable)
-> > > =C2=A0 {
-> > > -=C2=A0=C2=A0=C2=A0 struct kvm_vcpu_arch *vcpu =3D &v->arch;
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct pvclock_vcpu_time_info *guest_h=
-v_clock;
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct pvclock_vcpu_time_info hv_clock=
-;
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned long flags;
-> > > -=C2=A0=C2=A0=C2=A0 memcpy(&hv_clock, &vcpu->hv_clock, sizeof(hv_cloc=
-k));
-> > > +=C2=A0=C2=A0=C2=A0 memcpy(&hv_clock, ref_hv_clock, sizeof(hv_clock))=
-;
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 read_lock_irqsave(&gpc->lock, flags);
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (!kvm_gpc_check(gpc, offset + si=
-zeof(*guest_hv_clock))) {
-
-...
-
-> > > @@ -3272,18 +3272,18 @@ static int kvm_guest_time_update(struct
-> > > kvm_vcpu *v)
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 vcpu->hv_clock.flags |=3D PVCLOCK_GUEST_STOPPED;
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 vcpu->pvclock_set_guest_stopped_request =3D false;
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_setup_guest_pvclock(v=
-, &vcpu->pv_time, 0, false);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_setup_guest_pvclock(&=
-vcpu->hv_clock, v, &vcpu->pv_time,
-> > > 0, false);
-> >=20
-> > Yet here an below you still use 'v'. Does this actually compile?
-> >=20
+On Tue, Feb 04, 2025, Nikunj A Dadhania wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 >=20
-> Sorry, my misreading of the patch... this is in caller context so no
-> problem. The inconsistent naming was misleading me.
+> > When running as a TDX guest, explicitly override the TSC frequency
+> > calibration routine with CPUID-based calibration instead of potentially
+> > relying on a hypervisor-controlled PV routine.  For TDX guests, CPUID.0=
+x15
+> > is always emulated by the TDX-Module, i.e. the information from CPUID i=
+s
+> > more trustworthy than the information provided by the hypervisor.
+> >
+> > To maintain backwards compatibility with TDX guest kernels that use nat=
+ive
+> > calibration, and because it's the least awful option, retain
+> > native_calibrate_tsc()'s stuffing of the local APIC bus period using th=
+e
+> > core crystal frequency.  While it's entirely possible for the hyperviso=
+r
+> > to emulate the APIC timer at a different frequency than the core crysta=
+l
+> > frequency, the commonly accepted interpretation of Intel's SDM is that =
+APIC
+> > timer runs at the core crystal frequency when that latter is enumerated=
+ via
+> > CPUID:
+> >
+> >   The APIC timer frequency will be the processor=E2=80=99s bus clock or=
+ core
+> >   crystal clock frequency (when TSC/core crystal clock ratio is enumera=
+ted
+> >   in CPUID leaf 0x15).
+> >
+> > If the hypervisor is malicious and deliberately runs the APIC timer at =
+the
+> > wrong frequency, nothing would stop the hypervisor from modifying the
+> > frequency at any time, i.e. attempting to manually calibrate the freque=
+ncy
+> > out of paranoia would be futile.
+> >
+> > Deliberately leave the CPU frequency calibration routine as is, since t=
+he
+> > TDX-Module doesn't provide any guarantees with respect to CPUID.0x16.
+>=20
+> Does TDX use kvmclock?
 
-I feel your pain, the use of "vcpu" for kvm_vcpu_arch in kvm_guest_time_upd=
-ate()
-kills me.  I forget if David's rework of kvm_guest_time_update() fixes that=
- wart.
-If it doesn't, I'll suggest that addition.  The only reason I haven't poste=
-d a
-patch was to avoid a bunch of churn for a rename, but if the function is ge=
-tting
-ripped apart anyways...
+A TDX guest can.  That's up to the host (expose kvmclock) and the guest (en=
+able
+kvmclock).
+
+> If yes, kvmclock would have registered the CPU frequency calibration rout=
+ine:
+>=20
+> 	tsc_register_calibration_routines(kvm_get_tsc_khz, kvm_get_cpu_khz,
+>  					  tsc_properties);
+>=20
+> so TDX will use kvm_get_cpu_khz(), which will either use CPUID.0x16 or
+> PV clock, is this on the expected line ?
+
+What do you mean by "is this on the expected line"?  If you are asking "is =
+this
+intended", then the answer is "yes, working as intended".  As above, the TD=
+X-Module
+doesn't emulate CPUID.0x16, so no matter what, the guest is relying on the =
+untrusted
+hypervisor to get the CPU frequency.  If someone thinks that TDX guests sho=
+uld
+assume the CPU runs as the same frequency as the TSC, a la SNP's Secure TSC=
+, then
+they are welcome to propose such a change.
 
