@@ -1,225 +1,156 @@
-Return-Path: <kvm+bounces-37189-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37190-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 618ABA26889
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 01:27:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29946A268AD
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 01:39:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C253188646B
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 00:27:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0DC8164B6A
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 00:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3E81BC3C;
-	Tue,  4 Feb 2025 00:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56DB5588F;
+	Tue,  4 Feb 2025 00:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SXGqsRl8"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="DpYosRJc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143EFC147
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 00:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9251135967;
+	Tue,  4 Feb 2025 00:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738628826; cv=none; b=ciQmsY4KEJvV2gx5UJ61Nwf09urvenCnU2yPH+4FGNxOwSE41rck8VnWGCn6+qx7PGAIK+KBWdV9mM6PZgj+yEmsFf1p/U4yQfGvcd5pLr5OicWGwR5snf0eFXJIsyiHxi4Q94Ny0bBFAdbWZWrnezYeiOZYkwPhxch1JvbP7CY=
+	t=1738629541; cv=none; b=URmlk/PQo8WaDMscNMC//+0eJnvo51KzsW4EGGj3BMT1ePo2V3DlRyUkVuJ0GSsWRS4z2hUtT3UZisjsAk2bvkS8SmuyoXBYeINA4Hr2Ps9vgyYzG50UuaKwSVa1UCExff9fszVVrBwZ/bNLa5OjPLRop6qTbRhuTRLD224gwhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738628826; c=relaxed/simple;
-	bh=IWgXWYJkPqw2Z1CpE5EEkhO9acbN8gpS038KseSXZ0I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dG/p4qaXV4NfyesjLjP/vcy51glA0KIbvbP0duCVuhq0+XZ+oze4Y1pA3DLhXTAKS//epu5eWQtlTpX45ZRC//pcwlIPaw7X+t50m508wnhpn9RqFmlDnaiiwSWIwje3TM7ePBj8EJJVP4y3gBvqWoQrZl9yVkgwJrcbQorpekU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SXGqsRl8; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f2a9f056a8so9604831a91.2
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 16:27:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738628824; x=1739233624; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=es4uFH1mdi2syRGIaz78R91wgaiNDTNWCmVjzV+dqhk=;
-        b=SXGqsRl8eAlByRoaTL19P7dgqtHvHc4cb1pZIyQaCIO+zkK7Ep4vk+qI1Cx13o2xjk
-         +EBE8MZqtO6GoGJqszOibuuK/OanfsZqG1Yj0AWtff/hxxW9PNzX90tCMYDEJDJ6uLg8
-         CKeSyPDdQEtpdx9M/EVlVZ2u6j//spxx+BLjUEwEnFpdOe0IOMq/cCra9ia+DhEU0EMM
-         ZGdvu++s40zrZS0WYEZXCkmSz+kSvkusID311DVBz0WbsiL2O6bfSBPLS6jawKnO4jrp
-         G4q0nLDm8c7trMgEDYoO5esIcj6QqnMApSsOIH3FCAxwmREcrH77CyeDf2aybMbFVXW1
-         uV8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738628824; x=1739233624;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=es4uFH1mdi2syRGIaz78R91wgaiNDTNWCmVjzV+dqhk=;
-        b=t6MfOg0Hi9yvBoYEusvg05g/sTuQmZc2OLXpQzVFnyu+dIZVL5K/rC7V/ruvuYBm5r
-         hv3GrdKKQOz0E/6omx/bYeoqfyN4pPiFgGlgRHgSGuo+piDsn5bNUiLLoIEi+sNNpAGg
-         fKHHO5LIWY+rFVeUPAveJi6Xm2qymaHH43f/jp9YLQ2UxUh+MKWlfpx7pRAxnvKsIArz
-         MoUPFi1OJAVMK3NpJPiXv1dY87pexWyAqE6yqzLPMqUv+DtcSWEpFwBrZR4vD4DqV67O
-         AzqSr0JIgWzKZnIjv4UA89OpPX27g653L6KcCPV07r+XqrcqSZweZvmTlkjGd5ZzY7mP
-         a4tg==
-X-Gm-Message-State: AOJu0Ywha/kRETqk0ms7auKo0b+OqpNgBzQVLeuvPXsg0fjiNLPDu91T
-	g/UMrVUEe1kVWiS1jYQSzoSjXUZhBWsupEI7m2juktkdPEVhUCtO7H78CVyZZwnHCuHCPATSsEV
-	vWQ==
-X-Google-Smtp-Source: AGHT+IF0i1a80D/prqc2zfk1FT4Lee5WNzvx26+t6wX/cXXG16jZxrhV19KWH4227JdtFStyqn54Wp8Qf8I=
-X-Received: from pjbpv10.prod.google.com ([2002:a17:90b:3c8a:b0:2ee:2761:b67a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:270c:b0:2ee:db8a:2a01
- with SMTP id 98e67ed59e1d1-2f83ac8ad56mr33709069a91.30.1738628824249; Mon, 03
- Feb 2025 16:27:04 -0800 (PST)
-Date: Mon, 3 Feb 2025 16:27:02 -0800
-In-Reply-To: <0102090cd553e42709f43c30d2982b2c713e1a68.camel@intel.com>
+	s=arc-20240116; t=1738629541; c=relaxed/simple;
+	bh=qqUzgKhHScE444ZEVKHRDjr25RN4mxSC78RL8vcnbQA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=nsS5n+2xVRuiLED/kaHtfEGsh9k8yh+pordeHc9vWy21zn5VmnO0/h2y1oUBEzoMZpYCiZuSZAWU/VyVRkk9yXblaKqu4d7OprBQkb1mXQKm9+kN8kEZ2YzbCWqcwBFFV/e6nSjBDW56ZcHkgZf569VXFF/lQlMKECZ2JxXpW+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=DpYosRJc; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tf6xq-0036Cx-Gz; Tue, 04 Feb 2025 01:38:54 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:To:Subject:MIME-Version:Date:Message-ID;
+	bh=dWhldEl84XQnzj0ZoD/mIlvrsqSqj2zylkLiRosKi9I=; b=DpYosRJc0iE9zKJOvFSxRbHEWs
+	2CmwQvU+GF7G6R1R4slN3Y51XsUd3V7GYafTjJAumzMFZeR4bZefaBVvwbD31lfUy2RPN1+jX7j4S
+	5xb2rF7C95MyYhFvgo7meRf/S0DeptHZZgOWN56Wdq9h5I/2OSt0nxthRYNIT0N1BgAoHcSe3D54z
+	+FObXVdzZS1GpLXVd9i6aEpmWjGR87ea/HJQ1lpsX8zBwdgpih4Th0OX//iQlVVUqpNgJebExb7Jc
+	uiXjWk116kTm9Jbntu+R/rWYtVnpj37bF2if0u8PYBdapRwbCtv+9OCTBJzQ8vNTYMqBs+e6YV52l
+	4Q00UK/g==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tf6xp-0004P7-EI; Tue, 04 Feb 2025 01:38:53 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tf6xn-006crP-HS; Tue, 04 Feb 2025 01:38:51 +0100
+Message-ID: <2483d8c1-961e-4a7f-9ce7-ffd21a380c70@rbox.co>
+Date: Tue, 4 Feb 2025 01:38:50 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250201005048.657470-1-seanjc@google.com> <dbbfa3f1d16a3ab60523f5c21d857e0fcbc65e52.camel@intel.com>
- <Z6EoAAHn4d_FujZa@google.com> <0102090cd553e42709f43c30d2982b2c713e1a68.camel@intel.com>
-Message-ID: <Z6Fe1nFWv52rDijx@google.com>
-Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, 
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "dionnaglaze@google.com" <dionnaglaze@google.com>, 
-	Binbin Wu <binbin.wu@intel.com>, 
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, 
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "bp@alien8.de" <bp@alien8.de>, "jgross@suse.com" <jgross@suse.com>, 
-	"pgonda@google.com" <pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [net?] general protection fault in add_wait_queue
+To: syzbot <syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com>,
+ davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+ horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
+ pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com,
+ syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev,
+ xuanzhuo@linux.alibaba.com
+References: <67a09300.050a0220.d7c5a.008b.GAE@google.com>
+From: Michal Luczaj <mhal@rbox.co>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <67a09300.050a0220.d7c5a.008b.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 03, 2025, Rick P Edgecombe wrote:
-> On Mon, 2025-02-03 at 12:33 -0800, Sean Christopherson wrote:
-> > > Since there is no upstream KVM TDX support yet, why isn't it an optio=
-n to
-> > > still
-> > > revert the EDKII commit too? It was a relatively recent change.
-> >=20
-> > I'm fine with that route too, but it too is a band-aid.=C2=A0 Relying o=
-n the
-> > *untrusted*
-> > hypervisor to essentially communicate memory maps is not a winning stra=
-tegy.=20
-> >=20
-> > > To me it seems that the normal KVM MTRR support is not ideal, because=
- it is
-> > > still lying about what it is doing. For example, in the past there wa=
-s an
-> > > attempt to use UC to prevent speculative execution accesses to sensit=
-ive
-> > > data.
-> > > The KVM MTRR support only happens to work with existing guests, but n=
-ot all
-> > > possible MTRR usages.
-> > >=20
-> > > Since diverging from the architecture creates loose ends like that, w=
-e could
-> > > instead define some other way for EDKII to communicate the ranges to =
-the
-> > > kernel.
-> > > Like some simple KVM PV MSRs that are for communication only, and not
-> >=20
-> > Hard "no" to any PV solution.=C2=A0 This isn't KVM specific, and as abo=
-ve, bouncing
-> > through the hypervisor to communicate information within the guest is a=
-sinine,
-> > especially for CoCo VMs.
->=20
-> Hmm, right.
->=20
-> So the other options could be:
->=20
-> 1. Some TDX module feature to hold the ranges:
->  - Con: Not shared with AMD
->=20
-> 2. Re-use MTRRs for the communication, revert changes in guest and edk2:
+On 2/3/25 10:57, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    c2933b2befe2 Merge tag 'net-6.14-rc1' of git://git.kernel...
+> git tree:       net-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=16f676b0580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=d033b14aeef39158
+> dashboard link: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13300b24580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12418518580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/c7667ae12603/disk-c2933b2b.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/944ca63002c1/vmlinux-c2933b2b.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/30748115bf0b/bzImage-c2933b2b.xz
+> 
+> The issue was bisected to:
+> 
+> commit fcdd2242c0231032fc84e1404315c245ae56322a
+> Author: Michal Luczaj <mhal@rbox.co>
+> Date:   Tue Jan 28 13:15:27 2025 +0000
+> 
+>     vsock: Keep the binding until socket destruction
 
-Thinking more about how EDK2 is consumed downstream, I think reverting the =
-EDK2
-changes is necessary regardless of what happens in the kernel.  Or at the l=
-east,
-somehow communicate to EDK2 users that ingesting those changes is a bad ide=
-a
-unless the kernel has also been updated.
+syzbot is correct (thanks), bisected commit introduced a regression.
 
-AFAIK, Bring Your Own Firmware[*] isn't widely adopted, which means that th=
-e CSP
-is shipping the firmware.  And shipping OVMF/EDK2 with the "ignores MTRRs" =
-code
-will cause problems for guests without commit 8e690b817e38 ("x86/kvm: Overr=
-ide
-default caching mode for SEV-SNP and TDX").  Since the host doesn't control=
- the
-guest kernel, there's no way to know if deploying those EDK2 changes is saf=
-e.
-=20
-[*] https://kvm-forum.qemu.org/2024/BYOF_-_KVM_Forum_2024_iWTioIP.pdf
+sock_orphan(sk) is being called without taking into consideration that it
+does `sk->sk_wq = NULL`. Later, if SO_LINGER is set, sk->sk_wq gets
+dereferenced in virtio_transport_wait_close().
 
->  - Con: Creating more half support, when it's technically not required
->  - Con: Still bouncing through the hypervisor
+Repro, as shown by syzbot, is simply
+from socket import *
+lis = socket(AF_VSOCK, SOCK_STREAM)
+lis.bind((1, 1234)) # VMADDR_CID_LOCAL
+lis.listen()
+s = socket(AF_VSOCK, SOCK_STREAM)
+s.setsockopt(SOL_SOCKET, SO_LINGER, (1<<32) | 1)
+s.connect(lis.getsockname())
+s.close()
 
-I assume by "Re-use MTRRs for the communication" you also mean updating the=
- guest
-to address the "everything is UC!" flaw, otherwise another con is:
+A way of fixing this is to put sock_orphan(sk) back where it was before the
+breaking patch and instead explicitly flip just the SOCK_DEAD bit, i.e.
 
-   - Con: Doesn't address the performance issue with TDX guests "using" UC
-          memory by default (unless there's yet more enabled).
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 075695173648..06250bb9afe2 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -824,13 +824,14 @@ static void __vsock_release(struct sock *sk, int level)
+ 	 */
+ 	lock_sock_nested(sk, level);
+ 
+-	sock_orphan(sk);
++	sock_set_flag(sk, SOCK_DEAD);
+ 
+ 	if (vsk->transport)
+ 		vsk->transport->release(vsk);
+ 	else if (sock_type_connectible(sk->sk_type))
+ 		vsock_remove_sock(vsk);
+ 
++	sock_orphan(sk);
+ 	sk->sk_shutdown = SHUTDOWN_MASK;
+ 
+ 	skb_queue_purge(&sk->sk_receive_queue);
 
-Presumably that can be accomplished by simply skipping the CR0.CD toggling,=
- and
-doing MTRR stuff as nonrmal?
+I'm not sure this is the most elegant code (sock_orphan(sk) sets SOCK_DEAD
+on a socket that is already SOCK_DEAD), but here it goes:
+https://lore.kernel.org/netdev/20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co/
 
->  - Pro: Design and code is clear
->
-> 3. Create some new architectural definition, like a bit that means "MTRRs=
- don't
-> actually work:
->  - Con: Takes a long time, need to get agreement
->  - Con: Still bouncing through the hypervisor
+One more note: man socket(7) says lingering also happens on shutdown().
+Should vsock follow that?
 
-Not for KVM guests.  As I laid out in my bug report, it's safe to assume MT=
-RRs
-don't actually affect the memory type when running under KVM.
+Thanks,
+Michal
 
-FWIW, PAT doesn't "work" on most KVM Intel setups either, because of misgui=
-ded
-KVM code that resulted in "Ignore Guest PAT" being set in all EPTEs for the
-overwhelming majority of guests.  That's not desirable long term because it
-prevents the guest from using WC (via PAT) in situations where doing so is =
-needed
-for performance and/or correctness.
-
->  - Pro: More pure solution
-
-MTRRs "not working" is a red herring.  The problem isn't that MTRRs don't w=
-ork,
-it's that the kernel is (somewhat unknowingly) using MTRRs as a crutch to g=
-et the
-desired memtype for devices.  E.g. for emulated MMIO, MTRRs _can't_ be virt=
-ualized,
-because there's never a valid mapping, i.e. there is no physical memory and=
- thus
-no memtype.  In other words, under KVM guests (and possibly other hyperviso=
-rs),
-MTRRs end up being nothing more than a communication channel between guest =
-firmware
-and the kernel.
-
-The gap for CoCo VMs is that using MTRRs is undesirable because they are co=
-ntrolled
-by the untrusted host.  But that's largely a future problem, unless someone=
- has a
-clever way to fix the kernel mess.
-
-> 4. Do this series:
->  - Pro: Looks ok to me
->  - Cons: As explained in the patches, it's a bit hacky.
->  - Cons: Could there be more cases than the legacy PCI hole?
->=20
-> I would kind of like to see something like 3, but 2 or 4 seem the only fe=
-asible
-> ones if we want to resolve this soon.
 
