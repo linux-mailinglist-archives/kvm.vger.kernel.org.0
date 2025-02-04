@@ -1,156 +1,180 @@
-Return-Path: <kvm+bounces-37273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37274-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40DE9A27BB9
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 20:45:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3366A27BC9
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 20:46:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01DA6188023C
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 19:45:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50ABD3A2BD5
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 19:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79184219EAB;
-	Tue,  4 Feb 2025 19:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADB921B905;
+	Tue,  4 Feb 2025 19:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DyPTvswa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EmY+l3/s"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C432054F0
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 19:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A337A21A425;
+	Tue,  4 Feb 2025 19:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738698184; cv=none; b=ikeP9Z6SQoN1h1UPAX3gZwE9VciuA7PJESyy3AjlpvB+7xqFLT63eS8VDe4x1SNSt/TSU13w2kL6SbSV9A9E7ObsPt4cLMo6DsY8JOkYN8eYBHIedJkEz3W0ZW6H7tF0A94Hf8ChyLNbCQtwYsxvOKAvJ3v5pzS3eLE7CBE9tZ8=
+	t=1738698224; cv=none; b=Ea3AWqvn14Z7zlfXDpp72gW0HNJamrhY7VD1wiuvKuoiY+glzjCQ0VhQZAMPWFwCuYdpFX7DtSoq6Sd45aYLE8XZScr1+VDtclHeda6REIGqW6/QxWWa5qpHnG+kzbN8f3/DdC/XJB30jwO90cbck0AWtCfVlIe6lIQoR66feL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738698184; c=relaxed/simple;
-	bh=evhtNLT7qrEB/f0LsSGunk0SU0xDbeT6mUcieT4SQzs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oXgoh1qBULxy8EwWL3RSviC1T4ZuIu8j+3US0Wkf8WCN7adztZV3vya+oVGiFu9ZvQjj4lMxCVDjukdpaXK7vB0TF68Jr2FU90cnC4h7bYmNKQTw/FpWzCsH3HutHEYhMlbYLUm+0tnnfTb0hCZukBGRZbSmELFsubucLZroz6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DyPTvswa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738698181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lm77+J+FSsd7jyuwQ676pRUYyyJaAZq7OUEXpDi3H4w=;
-	b=DyPTvswahDo32VpqRJGrc4NdeOFNplzy6qdkHL9B3IURWbsdDqqNy+fw+WenxDoZ1Q3VBq
-	aCXGEkMPKXpp4o1ojJdylbKtHkZ0dYYxMpxS6ySDVKP4cYglxqPmdfIl6I2bACRYFhhup5
-	aefdmuvyAE90aBCukAmHXOSuUCulch0=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-363-qvj9D0FaNCe1bPlSQFICnw-1; Tue, 04 Feb 2025 14:42:58 -0500
-X-MC-Unique: qvj9D0FaNCe1bPlSQFICnw-1
-X-Mimecast-MFC-AGG-ID: qvj9D0FaNCe1bPlSQFICnw
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b6ecd22efbso23771585a.0
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 11:42:58 -0800 (PST)
+	s=arc-20240116; t=1738698224; c=relaxed/simple;
+	bh=BkVFf9SgaGewvsLziisUAPBhil8VvhgoivOQ/8WRK9Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Apti+7Pmbar/dfMcnpBx5ctzUZrRaFh3fbyVHuPmuWhy4718hgQQ1U1skqp/E9bynYBquEGG3VJCjgkl6pxWVuotFKPvDWYf3faVUKK3sgaT6JKynUvSRZaRCvCMlMsFgpGNzqelV1fg4grQRIcSF6fxEbNe17s+Tdwwzl9svRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EmY+l3/s; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2f9d3d0f55dso949279a91.1;
+        Tue, 04 Feb 2025 11:43:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738698222; x=1739303022; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SSuTIqVwgVdgeJ08MxBmbfomDViFrnj62vGl2fObfPU=;
+        b=EmY+l3/svNbf7pkBy+FGjBT/E2HgXMdu+dJVpFPICi+pDH+oEqwHrwF09uQKT8o+v1
+         JIkW0Zqy94LGeQETgF02nG4NYvhiW6M08jWE6kiaBHs5/hFHdoEfrq4owO1XTX8QF668
+         7iwMXsjK9r8cMr7EdIZNkb5fW4VFJuqKAoLG+wvrutLBMJxKLpqiK/vXMLx1iNxmxlYl
+         aSVr9hFo4G1aXzcIJWlEyoa4ga/yHKPKFzuGZYwgkc9pRoaThKjnTxMjqz/d18caDgqb
+         v9s1Guc4GZ/9ikPxLZT+uGIqC9Pq30uyGMqiO3O09UvjNyBnQVQVnZGGyF+YxkLnOdVJ
+         24RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738698178; x=1739302978;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Lm77+J+FSsd7jyuwQ676pRUYyyJaAZq7OUEXpDi3H4w=;
-        b=ZYx1fiMtMpcksGqnqt/jiqmh0Db0LTh9fLA0Kpmdm/fDIg5/kATr2CcBrHQEiPE91r
-         TfE+ZeON8MIw/hjvhSfawvcfOOuR68oPZYSISNRYhKLBLZfnoGYRGM7JfA0BC8Qdb5LP
-         rdvCfo8l0XaTBQl7DMXq277EO7lHtWxQfEoZ+Quki8JOhwf5ayHJCNRtUhP92/01Vy2g
-         nw2QxSPwRlV+TLlB6PkjyE4n9UCQ4iVR/OQzLCM3o3UmOyUWxNnBRWEtZMChx74kjGGx
-         2MgWKnksiBx+DCBXMHGJAwObLN1h2zERkfB/qJEWLzABrb3p393x1fLn/N1UNF6UaD4t
-         zRaw==
-X-Gm-Message-State: AOJu0YyZr3Fgh6PukcLKvoDP4CgKhHFjpPKHRey8RKzLG02gECz4Y6sQ
-	Nxrg3FMEwmu0dwzusXnCqPoybc+JP9YuENtOxK2DBg4TN0Cmu5ytRAy7Oky+2veZiWDi8x7H5xS
-	RBOZnm4fSTmvFTNhDijaqj6EJJ8egu3qv41tezXeul87XP0m2QQ==
-X-Gm-Gg: ASbGncv866pQbV5DjWbhTuy9Plkr1/CJml9zNDG9meTlwcbrmquAMlmdC1+JB7bG8C2
-	Gj/rLBsI9CQHwPCEtil6Uo5EU/gJQWjdN/bISk0sbw8zBDSu3GJnEZgbuDc0Vr6mYQWw9lCTJbu
-	9c7xb3Bpzfb9padx1wivfts0vrNTzkn92rBWjVDoYUOlUM7PyIDj1w907AGxQETZ+zXLBIRMkIm
-	qzF6Vg67HqmHJSIAAsDxUloSddvnOSIGO3d9TVVZ7Efwwh2LFLrIpwFX/hMZJfzwYap1fmNAIwc
-	9jd/
-X-Received: by 2002:a05:620a:8395:b0:7b6:dd89:d86f with SMTP id af79cd13be357-7c039b65ff2mr28088485a.24.1738698178062;
-        Tue, 04 Feb 2025 11:42:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG1kXnH0DVm+wAP+GkN7ZGmKIwC+BKKALxPN58aJSVkKJ6kQ+N7rq8ui6rYX6/trXwNmJyP4g==
-X-Received: by 2002:a05:620a:8395:b0:7b6:dd89:d86f with SMTP id af79cd13be357-7c039b65ff2mr28085685a.24.1738698177744;
-        Tue, 04 Feb 2025 11:42:57 -0800 (PST)
-Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a8c8fafsm669811385a.26.2025.02.04.11.42.55
+        d=1e100.net; s=20230601; t=1738698222; x=1739303022;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SSuTIqVwgVdgeJ08MxBmbfomDViFrnj62vGl2fObfPU=;
+        b=dfiAS2+6hrFQF2JuBQ6FxdAliQxKM5wT0MUssIfXtkK/JQhFmXMGWBUpTg+rW2+VcN
+         7jxwLiDzpJEXYodR5z8rU9jVzzk5Q6bEdw8XDZ9qQlFsEEkS7pJ4VRD38pvLxg5GI4cn
+         /I8YVCstjMcepS0PMKPvAW/XQvUb/ho7Kjk5bNMZryEtuklA/jjr4rbr2ukyEXPe9TUF
+         OIzU7mHpUaBz1Lh95S6J+CGqA9cAN0Gdh5dqbfDOSjAXzHo11RS8SKFL2PmcYTzurNC3
+         6ZLhfHRsyUQuPmDYcFYp8c7qPnUX7uvH7l6eu3XlSaocJGAJJ7dLQp1PgGTgOaDhW9Nh
+         SjKA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEUDul7+hx2wY1f7njFtX6dEW17ydk2m6IWwWyIyqSjV3kz11Rpqth2dHUOgzonpLHv/Aamh9Y74x8oYXatZYI@vger.kernel.org, AJvYcCUja3XUsvXWsPl+QPRNGY38axfJkdrtXeUhLLuKKvsdBW5g8XMK7t1D0rjpWdiGKlAh1cgk+fHd+la0@vger.kernel.org, AJvYcCVuU2SoNx5C2JJOojeMKeCAaaToS+KM1UQq5JE5dYEHr11BZ3EfhFi/5hngbtj9qEO7VO0iqKOSN8UHLPtI@vger.kernel.org, AJvYcCWBcXmeXirSolqjZ2DJc+myR7cOtnwUSAh8TRPx+3CKIgZNVtiaj7Iafb8yITcvTa0oZf8=@vger.kernel.org, AJvYcCWobvp//ZZ07Cagt0NoULAUA6lV9b6dmXWP0YduyCiYmAVC6hZYfk5TQ31BAdeoT/rdUMCtqx1b@vger.kernel.org
+X-Gm-Message-State: AOJu0YxczEmyhd53B80d6S77sHCzKZh4myQ8ZXDitJb4oFRl9+Ni3Qym
+	ZcM64vAQWyKg0N19z60mF1dphpvsyCzeGbL7Yv1uKqk/6PMXUxo=
+X-Gm-Gg: ASbGncuiDT6b/BWIrYl6dhKjtyI2W51F9PgaRs2uqUYWeAwfuhEqJXW9hHNzue1YbaH
+	TXst147IT8qPgmPk7Tl49POP5dOsaq4hYRnXbWvoJOYD7tr83MxqVRygTAHYuGrhocvru9ovrU6
+	EW3CyZ4srHFQSKKbR7NuHc/O7edrW1lKol4q3Zqd18Rb3vJd64tecC1/x/e9tEDsTNiqFTnhbwN
+	MTb2JpakCqWRKQzyaSIkQflnJAE2yYUD17JydeuVRnMFUTKJq5iXPogD13Gtk1kpM6nUdfeALMa
+	tAWZDZNiUR1qiY8=
+X-Google-Smtp-Source: AGHT+IFw5vELY1t8zeAylvcZU4/cTC1NlCspjFYLf5FztuWCZwYFDQmuC9HhKFdTaKSeggS51DEKMA==
+X-Received: by 2002:a05:6a00:4644:b0:728:e27c:a9bc with SMTP id d2e1a72fcca58-7303511b7f3mr255320b3a.7.1738698221666;
+        Tue, 04 Feb 2025 11:43:41 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-72fe69cf147sm11179288b3a.143.2025.02.04.11.43.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 11:42:56 -0800 (PST)
-Message-ID: <da91fc38126227c227a4fe6b85cd630ca1ca8853.camel@redhat.com>
-Subject: Re: [PATCH 2/3] KVM: x86: Remove use of apicv_update_lock when
- toggling guest debug state
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>,  Naveen N Rao <naveen@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Suravee Suthikulpanit
- <suravee.suthikulpanit@amd.com>, Vasant Hegde <vasant.hegde@amd.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Tue, 04 Feb 2025 14:42:55 -0500
-In-Reply-To: <2d86cce9-88c2-4b2f-a8a6-ee33d0e1c98d@redhat.com>
-References: <cover.1738595289.git.naveen@kernel.org>
-	 <dc6cf3403e29c0296926e3bd8f0d4e87b67f4600.1738595289.git.naveen@kernel.org>
-	 <30fc469b5b2ec5e2d6703979a0d09ad0a9df29e1.camel@redhat.com>
-	 <a7eb34n6gkwg6kafh7r76tkwtweuflyfoczgxya2k63al2qdoe@phmszu6ilk4w>
-	 <Z6JTmvrkrLpaJ1nw@google.com>
-	 <2d86cce9-88c2-4b2f-a8a6-ee33d0e1c98d@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Tue, 04 Feb 2025 11:43:41 -0800 (PST)
+Date: Tue, 4 Feb 2025 11:43:39 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+	asml.silence@gmail.com, dw@davidwei.uk,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
+Message-ID: <Z6Jt62bZEeHnN1JP@mini-arch>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com>
+ <CAHS8izNZrKVXSXxL3JG3BuZdho2OQZp=nhLuVCrLZjJD1R0EPg@mail.gmail.com>
+ <Z6JXFRUobi-w73D0@mini-arch>
+ <CAHS8izNXo1cQmA5GijE-UW2X1OU6irMV9FRevL5tZW3B5NQ8rA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izNXo1cQmA5GijE-UW2X1OU6irMV9FRevL5tZW3B5NQ8rA@mail.gmail.com>
 
-On Tue, 2025-02-04 at 18:58 +0100, Paolo Bonzini wrote:
-> On 2/4/25 18:51, Sean Christopherson wrote:
-> > On Tue, Feb 04, 2025, Naveen N Rao wrote:
-> > > On Mon, Feb 03, 2025 at 09:00:05PM -0500, Maxim Levitsky wrote:
-> > > > On Mon, 2025-02-03 at 22:33 +0530, Naveen N Rao (AMD) wrote:
-> > > > > apicv_update_lock is not required when querying the state of guest
-> > > > > debug in all the vcpus. Remove usage of the same, and switch to
-> > > > > kvm_set_or_clear_apicv_inhibit() helper to simplify the code.
-> > > > 
-> > > > It might be worth to mention that the reason why the lock is not needed,
-> > > > is because kvm_vcpu_ioctl from which this function is called takes 'vcpu->mutex'
-> > > > and thus concurrent execution of this function is not really possible.
-> > > 
-> > > Looking at this again, that looks to be a vcpu-specific lock, so I guess
-> > > it is possible for multiple vcpus to run this concurrently?
-> > 
-> > Correct.
+On 02/04, Mina Almasry wrote:
+> On Tue, Feb 4, 2025 at 10:06 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >
+> > On 02/04, Mina Almasry wrote:
+> > > On Tue, Feb 4, 2025 at 4:32 AM Paolo Abeni <pabeni@redhat.com> wrote:
+> > > >
+> > > > On 2/3/25 11:39 PM, Mina Almasry wrote:
+> > > > > The TX path had been dropped from the Device Memory TCP patch series
+> > > > > post RFCv1 [1], to make that series slightly easier to review. This
+> > > > > series rebases the implementation of the TX path on top of the
+> > > > > net_iov/netmem framework agreed upon and merged. The motivation for
+> > > > > the feature is thoroughly described in the docs & cover letter of the
+> > > > > original proposal, so I don't repeat the lengthy descriptions here, but
+> > > > > they are available in [1].
+> > > > >
+> > > > > Sending this series as RFC as the winder closure is immenient. I plan on
+> > > > > reposting as non-RFC once the tree re-opens, addressing any feedback
+> > > > > I receive in the meantime.
+> > > >
+> > > > I guess you should drop this paragraph.
+> > > >
+> > > > > Full outline on usage of the TX path is detailed in the documentation
+> > > > > added in the first patch.
+> > > > >
+> > > > > Test example is available via the kselftest included in the series as well.
+> > > > >
+> > > > > The series is relatively small, as the TX path for this feature largely
+> > > > > piggybacks on the existing MSG_ZEROCOPY implementation.
+> > > >
+> > > > It looks like no additional device level support is required. That is
+> > > > IMHO so good up to suspicious level :)
+> > > >
+> > >
+> > > It is correct no additional device level support is required. I don't
+> > > have any local changes to my driver to make this work. I think Stan
+> > > on-list was able to run the TX path (he commented on fixes to the test
+> > > but didn't say it doesn't work :D) and one other person was able to
+> > > run it offlist.
+> >
+> > For BRCM I had shared this: https://lore.kernel.org/netdev/ZxAfWHk3aRWl-F31@mini-arch/
+> > I have similar internal patch for mlx5 (will share after RX part gets
+> > in). I agree that it seems like gve_unmap_packet needs some work to be more
+> > careful to not unmap NIOVs (if you were testing against gve).
 > 
-> And this patch is incorrect. Because there is a store and many loads, 
-> you have the typical race when two vCPUs set blockirq at the same time
+> Hmm. I think you're right. We ran into a similar issue with the RX
+> path. The RX path worked 'fine' on initial merge, but it was passing
+> dmabuf dma-addrs to the dma-mapping API which Jason later called out
+> to be unsafe. The dma-mapping API calls with dmabuf dma-addrs will
+> boil down into no-ops for a lot of setups I think which is why I'm not
+> running into any issues in testing, but upon closer look, I think yes,
+> we need to make sure the driver doesn't end up passing these niov
+> dma-addrs to functions like dma_unmap_*() and dma_sync_*().
 > 
-> 	vcpu 0				vcpu 1
-> 	---------------			--------------
-> 	set vcpu0->guest_debug
-> 					clear vcpu1->guest_debug
-> 	read vcpu0->guest_debug
-> 	read vcpu1->guest_debug	
-> 	set inhibit
-> 					read stale vcpu0->guest_debug
-> 					read vcpu1->guest_debug
-> 					clear inhibit
-> 
-> But since this is really a slow path, why even bother optimizing it?
-> 
-> Paolo
-> 
+> Stan, do you run into issues (crashes/warnings/bugs) in your setup
+> when the driver tries to unmap niovs? Or did you implement these
+> changes purely for safety?
 
-
-Paolo, you are absolutely right! the vcpu mutex only prevents concurrent ioctl
-on a same vcpu, but not on different vcpus, and without locking of course
-this patch isn't going to work. The per-vcpu mutex is not something I know well,
-and I only recently made aware of it, so I mixed this thing up.
-
-So yes, some kind of lock is needed here.
-
-Best regards,
-     Maxim Levitsky
-
+I don't run into any issues with those unmaps in place, but I'm running x86
+with iommu bypass (and as you mention in the other thread, those
+calls are no-ops in this case).
 
