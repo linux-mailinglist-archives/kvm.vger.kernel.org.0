@@ -1,261 +1,191 @@
-Return-Path: <kvm+bounces-37220-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130C7A26F00
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 11:05:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 322DCA26EEE
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 11:00:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C188818875AA
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 10:05:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A78641658C3
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 10:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C2720B1EF;
-	Tue,  4 Feb 2025 10:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146A4209F52;
+	Tue,  4 Feb 2025 10:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eoIHZIo8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e0vtwYCk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21AAE20A5DF;
-	Tue,  4 Feb 2025 10:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F70C207E16
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 10:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738663467; cv=none; b=kRz+uRyvB2ynjxmH+duI1Q6/bqF0BD23Q/miSX0k0nL8VD6PTf9VQ1h4MrmiP1HlmGSmnRI8BCgZ0CRcRIxNCoZijbcrMhxFaqceBXaGmxMTvGpalkelPisrrA2qCXDYvYK0xV+DpES7nqNXY8hjo/C9ZzeU2hLVmnkcDogeVrw=
+	t=1738663206; cv=none; b=dHGubl53GJW7P5UvxktEtSX7I0rCRB0JuV1CsI8X2lCrU/p/WoAvVVmtF9I1SI2JTKMMgRbX0/0RMH6S125yOnIHHSrBI+5PSAE40zygwCQ5/TZK2cDFWpK6OatRZwwc/R4068WyEnAFosSptJPIpLgBqHrT3LbjWn5Be14ok/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738663467; c=relaxed/simple;
-	bh=pAD2v7iFBPcvtJWA4lxeW6rcj2wAhdg+3r56YWD7A+o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JskgCxqPCbkMPlnR0OC5/6FR04qtkEKspfmbISKOi7Yrjk1JKvp8Dx9DEU4VIAaU+rMaNO8XUTSc7q1U+RH1l1TEGXoDtTztEC4kTXBI1ScPuQhGKX0rVuuwrdQrK1KW8DgXhk4rvXtM0Uxb/sPyKEC9Ba8jiTNLcvn266gjjb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eoIHZIo8; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51418rIY023957;
-	Tue, 4 Feb 2025 10:04:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=oSsLQ4Frez4nfaW9l/Yz0IurUPcJLUSH7RH8Gey9S
-	/Q=; b=eoIHZIo8oVgeID1kI/8qyN2MiloBFcuN9LdWDFFjiiODB2J9bfh/u830V
-	y/bO2Vs8exv6B4VToyrPbsWxUUkrtZBKQV8zTDDbRli8CbTcD6IkCx0OzU0xI7c2
-	fQS3S//9iGj5X2w+LxFYTJhzuC4xgH31/+b01cudR6m4s63i6l5y0Wb1DLK1TNBJ
-	KMTwIZ7cPU79gE12lTGVfxRKi4tgHOaOLIo0SROiApzGh8xDQVYoZNXFfJ0PAO8Y
-	+GEaPmeigVSHlgOwzdEJ1lvIaB909inP60vSGoIto/CjLXzp+z1xSdhGbcPbCLfd
-	t6aOt/lBmyT9T4l+kEK/Z1NNFhAGQ==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44k8y9j6c8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Feb 2025 10:04:24 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5147rgM4016271;
-	Tue, 4 Feb 2025 10:04:24 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44hwxsb3qb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Feb 2025 10:04:24 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 514A4KT633554970
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Feb 2025 10:04:20 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6EB28200BC;
-	Tue,  4 Feb 2025 10:04:20 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 51482200BA;
-	Tue,  4 Feb 2025 10:04:20 +0000 (GMT)
-Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Feb 2025 10:04:20 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-        hca@linux.ibm.com
-Subject: [kvm-unit-tests PATCH] lib: s390x: css: Name inline assembly arguments and clean them up
-Date: Tue,  4 Feb 2025 09:51:33 +0000
-Message-ID: <20250204100339.28158-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1738663206; c=relaxed/simple;
+	bh=13yYCdlqzP0i/IMnvVFj2IM29vtkaVbgxxGjD98q0uk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kbUv6S8SSfa7r/DCG7WMNxW7gJAcxUddKFYh1VvruRgQ3F7wrf5Lf7R9U8lxFPFvfRyGm0eBwesjiL0NX/xwhovJeBXzOulnPNw6KlPPbxJjNA81WakJrOFtYvXnJ0nU+Z72gMXGWQabZGkYD2pQcn3V0wM2auqlMGcupBslpG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e0vtwYCk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738663203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zgeNydwTSVAcIR1ERMtZzBL7x3bZ2CBWxaGQ1arPFzQ=;
+	b=e0vtwYCkpOGR8m9MsCv6B/4gyKpbBHFaINEQ82b7ZAxpJU7/TDt9OYOOAmSBHtcaauuT9I
+	ibz7Wbfow0Bo4Qf6/J+QKviAgbCyF99GVf4fvz+vO3dC0l4wMfSklJHp4pTVmdsGXZ9G3O
+	uHzIvyGqxrlWYdFYQpmo465UF2UKgeQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-508-QLW4TiThMdOtd3w-QXkrfg-1; Tue, 04 Feb 2025 05:00:01 -0500
+X-MC-Unique: QLW4TiThMdOtd3w-QXkrfg-1
+X-Mimecast-MFC-AGG-ID: QLW4TiThMdOtd3w-QXkrfg
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38c24ac3706so3699910f8f.0
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 02:00:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738663200; x=1739268000;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zgeNydwTSVAcIR1ERMtZzBL7x3bZ2CBWxaGQ1arPFzQ=;
+        b=e8dodogbvQr/b2M6gqYSNGLnhA1Y+ivjT/Jp96yUim0+E+NDblOxxR2WUlYjqj309B
+         1b84MDQKqRspmErWpSdMVPMtgWRXzo9+vvdnvMlvv9qbYvXJL4pPmrGehf1q9bz3JLGu
+         gGUr0YcEMYA5YsMLCwDA5WeHoKKqSzqDndj0k/w2OQFZgORsNkTt/PnDccCnXyAfDSfA
+         mlRJAqn7Iu5q5Dm/eHr5gInQpIliLbPvq37rT+8WTMZnptoL/4Ws4NHLOdAbwMk9RBVy
+         8d7t1LVmoKpJ8XQu3BfD1tYcs9lnr/sEt0qDtQgkmmvFuBLDfbNXveQfZx9H1a/F15t9
+         zZ+w==
+X-Forwarded-Encrypted: i=1; AJvYcCVAZqQYuuagUWyYd4Du2nTB3hRM29g8uFDQfGU1Z8KNaf6NP+8AnPiUCnHhG7VMS1+ciUI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/d6LInDr6BWVSAWmM0JBy92pqg4u1BLMYMTUXw/nTq6UfeU3Z
+	RqrwLfQKMrCleWSB9lQwpSlGSwhGsL3a4R+O4gTFAyW0zkUmeXzGDLK49QZHqMW9FYHXXweMVT0
+	hS2M4X60IicoFqK/mL71+NspvLbNSk/Ps/etlIkL6l31EfoHUUA==
+X-Gm-Gg: ASbGncsh3d2onWYyL7/eX7AYqBThzRHjvGC10Q70yKrIYuC+32jexO0IkOh0Lxh+wil
+	2w71QtRJtWqDFojaLXdX4eaYoyvOX1owSc8GHgKK8O1l0/IhmW16FU3yCr5XYgN6ni6g0MppVdm
+	+gfdK+NsKrP97J4wqTWKxljzCIf7PR5wxTBC16uynfX14IUn/+DKA3RNZuAjKL0E4AvLxIuTdER
+	acByJH8oF5x4JeyS1Vct/81Obi8y/FkriRBrIg3p6RskxXv7rmYps61kAL/Koj1DPTTWillJtou
+	4Y4iRa5pgg==
+X-Received: by 2002:a05:6000:1a8c:b0:38c:5bb2:b932 with SMTP id ffacd0b85a97d-38c5bb2bc01mr15890537f8f.3.1738663200396;
+        Tue, 04 Feb 2025 02:00:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHip7X4zS0O52PMEjczmtT0iNBH7IEeL8QYtKHFPjqYHRGplFJ791FYs65FAXVNjmO63CfRDA==
+X-Received: by 2002:a05:6000:1a8c:b0:38c:5bb2:b932 with SMTP id ffacd0b85a97d-38c5bb2bc01mr15890363f8f.3.1738663199563;
+        Tue, 04 Feb 2025 01:59:59 -0800 (PST)
+Received: from sgarzare-redhat ([185.121.209.52])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc6df51sm223944825e9.30.2025.02.04.01.59.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 01:59:59 -0800 (PST)
+Date: Tue, 4 Feb 2025 10:59:55 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: syzbot <syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com>, 
+	davem@davemloft.net, edumazet@google.com, eperezma@redhat.com, horms@kernel.org, 
+	jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	stefanha@redhat.com, syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev, 
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [syzbot] [net?] general protection fault in add_wait_queue
+Message-ID: <6fonjxxkozzmv7huzavck5nsfivx3nsyyicthulg5aiyrmjpql@o7pexllumdxt>
+References: <67a09300.050a0220.d7c5a.008b.GAE@google.com>
+ <2483d8c1-961e-4a7f-9ce7-ffd21a380c70@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hrjkH3R5kfYCOLtpYG10vHAloNw-nGMO
-X-Proofpoint-ORIG-GUID: hrjkH3R5kfYCOLtpYG10vHAloNw-nGMO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-04_04,2025-01-31_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- mlxlogscore=957 suspectscore=0 lowpriorityscore=0 clxscore=1015
- spamscore=0 mlxscore=0 adultscore=0 impostorscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502040080
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <2483d8c1-961e-4a7f-9ce7-ffd21a380c70@rbox.co>
 
-Less need to count the operands makes the code easier to read.
+On Tue, Feb 04, 2025 at 01:38:50AM +0100, Michal Luczaj wrote:
+>On 2/3/25 10:57, syzbot wrote:
+>> Hello,
+>>
+>> syzbot found the following issue on:
+>>
+>> HEAD commit:    c2933b2befe2 Merge tag 'net-6.14-rc1' of git://git.kernel...
+>> git tree:       net-next
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=16f676b0580000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=d033b14aeef39158
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
+>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13300b24580000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12418518580000
+>>
+>> Downloadable assets:
+>> disk image: https://storage.googleapis.com/syzbot-assets/c7667ae12603/disk-c2933b2b.raw.xz
+>> vmlinux: https://storage.googleapis.com/syzbot-assets/944ca63002c1/vmlinux-c2933b2b.xz
+>> kernel image: https://storage.googleapis.com/syzbot-assets/30748115bf0b/bzImage-c2933b2b.xz
+>>
+>> The issue was bisected to:
+>>
+>> commit fcdd2242c0231032fc84e1404315c245ae56322a
+>> Author: Michal Luczaj <mhal@rbox.co>
+>> Date:   Tue Jan 28 13:15:27 2025 +0000
+>>
+>>     vsock: Keep the binding until socket destruction
+>
+>syzbot is correct (thanks), bisected commit introduced a regression.
+>
+>sock_orphan(sk) is being called without taking into consideration that it
+>does `sk->sk_wq = NULL`. Later, if SO_LINGER is set, sk->sk_wq gets
+>dereferenced in virtio_transport_wait_close().
+>
+>Repro, as shown by syzbot, is simply
+>from socket import *
+>lis = socket(AF_VSOCK, SOCK_STREAM)
+>lis.bind((1, 1234)) # VMADDR_CID_LOCAL
+>lis.listen()
+>s = socket(AF_VSOCK, SOCK_STREAM)
+>s.setsockopt(SOL_SOCKET, SO_LINGER, (1<<32) | 1)
+>s.connect(lis.getsockname())
+>s.close()
+>
+>A way of fixing this is to put sock_orphan(sk) back where it was before the
+>breaking patch and instead explicitly flip just the SOCK_DEAD bit, i.e.
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 075695173648..06250bb9afe2 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -824,13 +824,14 @@ static void __vsock_release(struct sock *sk, int level)
+> 	 */
+> 	lock_sock_nested(sk, level);
+>
+>-	sock_orphan(sk);
+>+	sock_set_flag(sk, SOCK_DEAD);
+>
+> 	if (vsk->transport)
+> 		vsk->transport->release(vsk);
+> 	else if (sock_type_connectible(sk->sk_type))
+> 		vsock_remove_sock(vsk);
+>
+>+	sock_orphan(sk);
+> 	sk->sk_shutdown = SHUTDOWN_MASK;
+>
+> 	skb_queue_purge(&sk->sk_receive_queue);
+>
+>I'm not sure this is the most elegant code (sock_orphan(sk) sets SOCK_DEAD
+>on a socket that is already SOCK_DEAD), but here it goes:
+>https://lore.kernel.org/netdev/20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co/
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
+What about the fix proposed here:
+https://lore.kernel.org/lkml/20250203124959.114591-1-aha310510@gmail.com/
 
-This one has been gathering dust for a while.
-rfc->v1: Moved to Q constraint (thanks Heiko)
+>
+>One more note: man socket(7) says lingering also happens on shutdown().
+>Should vsock follow that?
 
----
- lib/s390x/css.h | 76 ++++++++++++++++++++++++-------------------------
- 1 file changed, 38 insertions(+), 38 deletions(-)
+Good point, I think so.
+IMHO we should handle both of them in af_vsock.c if it's possible, but 
+maybe we need a bit of refactoring.
 
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 504b3f14..42c5830c 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -135,11 +135,11 @@ static inline int ssch(unsigned long schid, struct orb *addr)
- 	int cc;
- 
- 	asm volatile(
--		"	ssch	0(%2)\n"
--		"	ipm	%0\n"
--		"	srl	%0,28\n"
--		: "=d" (cc)
--		: "d" (reg1), "a" (addr), "m" (*addr)
-+		"	ssch	%[addr]\n"
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28\n"
-+		: [cc] "=d" (cc)
-+		: "d" (reg1), [addr] "Q" (*addr)
- 		: "cc", "memory");
- 	return cc;
- }
-@@ -152,11 +152,11 @@ static inline int stsch(unsigned long schid, struct schib *addr)
- 
- 	asm volatile(
- 		"       tmll    %[bogus_cc],3\n"
--		"	stsch	0(%3)\n"
--		"	ipm	%0\n"
--		"	srl	%0,28"
--		: "=d" (cc), "=m" (*addr)
--		: "d" (reg1), "a" (addr), [bogus_cc] "d" (bogus_cc)
-+		"	stsch	%[addr]\n"
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28"
-+		: [cc] "=d" (cc), [addr] "=Q" (*addr)
-+		: "d" (reg1), [bogus_cc] "d" (bogus_cc)
- 		: "cc");
- 	return cc;
- }
-@@ -167,11 +167,11 @@ static inline int msch(unsigned long schid, struct schib *addr)
- 	int cc;
- 
- 	asm volatile(
--		"	msch	0(%3)\n"
--		"	ipm	%0\n"
--		"	srl	%0,28"
--		: "=d" (cc)
--		: "d" (reg1), "m" (*addr), "a" (addr)
-+		"	msch	%[addr]\n"
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28"
-+		: [cc] "=d" (cc)
-+		: "d" (reg1), [addr] "Q" (*addr)
- 		: "cc");
- 	return cc;
- }
-@@ -184,11 +184,11 @@ static inline int tsch(unsigned long schid, struct irb *addr)
- 
- 	asm volatile(
- 		"       tmll    %[bogus_cc],3\n"
--		"	tsch	0(%3)\n"
--		"	ipm	%0\n"
--		"	srl	%0,28"
--		: "=d" (cc), "=m" (*addr)
--		: "d" (reg1), "a" (addr), [bogus_cc] "d" (bogus_cc)
-+		"	tsch	%[addr]\n"
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28"
-+		: [cc] "=d" (cc), [addr] "=Q" (*addr)
-+		: "d" (reg1), [bogus_cc] "d" (bogus_cc)
- 		: "cc");
- 	return cc;
- }
-@@ -200,9 +200,9 @@ static inline int hsch(unsigned long schid)
- 
- 	asm volatile(
- 		"	hsch\n"
--		"	ipm	%0\n"
--		"	srl	%0,28"
--		: "=d" (cc)
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28"
-+		: [cc] "=d" (cc)
- 		: "d" (reg1)
- 		: "cc");
- 	return cc;
-@@ -215,9 +215,9 @@ static inline int xsch(unsigned long schid)
- 
- 	asm volatile(
- 		"	xsch\n"
--		"	ipm	%0\n"
--		"	srl	%0,28"
--		: "=d" (cc)
-+		"	ipm	%[cc]\n"
-+		"	srl	%cc,28"
-+		: [cc] "=d" (cc)
- 		: "d" (reg1)
- 		: "cc");
- 	return cc;
-@@ -230,9 +230,9 @@ static inline int csch(unsigned long schid)
- 
- 	asm volatile(
- 		"	csch\n"
--		"	ipm	%0\n"
--		"	srl	%0,28"
--		: "=d" (cc)
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28"
-+		: [cc] "=d" (cc)
- 		: "d" (reg1)
- 		: "cc");
- 	return cc;
-@@ -245,9 +245,9 @@ static inline int rsch(unsigned long schid)
- 
- 	asm volatile(
- 		"	rsch\n"
--		"	ipm	%0\n"
--		"	srl	%0,28"
--		: "=d" (cc)
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28"
-+		: [cc] "=d" (cc)
- 		: "d" (reg1)
- 		: "cc");
- 	return cc;
-@@ -262,9 +262,9 @@ static inline int rchp(unsigned long chpid)
- 	asm volatile(
- 		"       tmll    %[bogus_cc],3\n"
- 		"	rchp\n"
--		"	ipm	%0\n"
--		"	srl	%0,28"
--		: "=d" (cc)
-+		"	ipm	%[cc]\n"
-+		"	srl	%[cc],28"
-+		: [cc] "=d" (cc)
- 		: "d" (reg1), [bogus_cc] "d" (bogus_cc)
- 		: "cc");
- 	return cc;
-@@ -369,9 +369,9 @@ static inline int _chsc(void *p)
- 	int cc;
- 
- 	asm volatile(" .insn   rre,0xb25f0000,%2,0\n"
--		     " ipm     %0\n"
--		     " srl     %0,28\n"
--		     : "=d" (cc), "=m" (p)
-+		     " ipm     %[cc]\n"
-+		     " srl     %[cc],28\n"
-+		     : [cc] "=d" (cc), "=m" (p)
- 		     : "d" (p), "m" (p)
- 		     : "cc");
- 
--- 
-2.43.0
+Anyway, net-next material, right?
+
+Stefano
 
 
