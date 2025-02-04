@@ -1,134 +1,161 @@
-Return-Path: <kvm+bounces-37251-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA507A2781F
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 18:17:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E625A2785C
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 18:28:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14EE97A2552
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 17:16:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75A423A133A
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 17:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338AE215F5B;
-	Tue,  4 Feb 2025 17:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8AE2163AF;
+	Tue,  4 Feb 2025 17:27:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWGiKwIj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OftOmaUJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E10E175A5
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 17:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0AF213E9A
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 17:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738689440; cv=none; b=cTh/2Vng4Op1HBFNCtv1P1ThJEf4ev2142SsuTB010jjyFd5flLVLAYb2okXEwoSE9cBsahc6fjOLrNRtYRqNXqi3O5MBvxPeqsJh9KVkmSti/2HEH3qMGN2+YthkaGko4plDgIkUnqA2ev6mMQ+zp1O1lHmG6lgXsSrpGyJ1Pk=
+	t=1738690076; cv=none; b=pkyQPDY2PjD/31kjjiAxOsj2A3k9iWJN4PyPjEDc5gf4N8q536y8vVpMg5zjjZdLb0/jeC5+MKhnZ6+l0FZ1sa7Vx6XmNB44tB1ZzR0rKk+ckDgaEwkItJNKD1PBEQaBbPH/8B47ZyuKoxk/jvyOAc8Q1UBNxs7zA/lBio6CNzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738689440; c=relaxed/simple;
-	bh=YJAv8v+tnPU2AiOy7U9M+Cw5XN7fGQIqVXVhQli3vSk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZdFQ3CtafDsAdi2AdfTbUzqechq0Ad0bcsRYnnaJfbQmiGQ+0vGBiE6ttdGrM9ITc/LWFtkkjVSMsMmOta6hvbLcypCGUlwRuyaztDpEt0T5wk5xj/3+8uAuXkjs2I4zTzTOB9qaIUIBit6I9+zW4zg3Un7MfUe35fp4XxNTx6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CWGiKwIj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738689437;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EF1aKWjXDK0s5pYyzWzruFk/aZgJr2WHBwIj97Q+fRI=;
-	b=CWGiKwIjGk2a1nZSY6qpn8OJA6cEzaNTeGvaIFbMa6Uq4OtptVcsUy58YcATyQ4N0BEFvN
-	ekkprJFd+dj+/UZ6zwZzzxBljb3ffpu9QP/kzCVxPP82LYqmFbpCRlLrlnvmwkQiBIlKnm
-	R+ZEmNaGaQyeUhULDdaPyCC9LrORZ6o=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-669-QSCAzwIhNdKqb7WGa01zjQ-1; Tue, 04 Feb 2025 12:17:15 -0500
-X-MC-Unique: QSCAzwIhNdKqb7WGa01zjQ-1
-X-Mimecast-MFC-AGG-ID: QSCAzwIhNdKqb7WGa01zjQ
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-467be89d064so63398921cf.3
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 09:17:15 -0800 (PST)
+	s=arc-20240116; t=1738690076; c=relaxed/simple;
+	bh=V4uv66MK680ClXu6f6Ker2AP5D+vs5LU4+W5Eqq9fDQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CehyNp+pqDF4ZoPlV9hezi3fXqbXU3pXVZeTv+2Lken4VsnJUtt2gKlyBpjxIYiBUzwpstkK/zEDYwHbCVwJE131rxKUll++AF4C2/lBK4cgNKpARq4TmpPqUzT3W1tDgpIq97Y79wYnVUmE2UL0TZyix8axOdnRCfB+ccQKAJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OftOmaUJ; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21625b4f978so168235ad.0
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 09:27:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738690074; x=1739294874; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rfuayBjlRpeNZsUXyFm5cOwCbpbAk9szfdT3xIhInHw=;
+        b=OftOmaUJrSf6tTIWxvgCdnZPkkJuuhxPCe5Lf/UTIRn9nq3TTaVAmc4uVZTNqLTW4n
+         VcwpswN4g8JyfIyqWObrF4TpF4tLPo0hC3Bz89YaDcdwa/LcUrAigg016lMxWrB0t8nR
+         AXYpDuLlXq2QCnKuj4X8wICSmZPbIwnlf9aKllME7CWIMCXvi4/P28iMEbDsGGAQ1nSN
+         L5qnKeUCWe2i4WHHfXWqiw/AA+bQwv2Iud4UEiuMVo6Ab2Efo+JTHmHTaL27XogA/BmW
+         X1xXst6mDWUXaCAYHNXCVUNjfW/girinU2noXsXSMNAUf4/xjn5i+gZ2JCMc2EqVYEcn
+         8I0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738689435; x=1739294235;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EF1aKWjXDK0s5pYyzWzruFk/aZgJr2WHBwIj97Q+fRI=;
-        b=EOttufkfzGwEASkec2+GgUilb9cX7Jqrm9d67cYHPSF8i5yBjgwDwJeLnGyVK2f4nD
-         V2pI7VY5ZNMLJ9RMt/pgIodnYukxRgSkiMKXcnlMZLKdGQXXRDCG2tLOBkMhGLilkW7F
-         a9cofs5UeSf255ojgJ9UA8+IbZ4MIWWqDJ+jO94iDnF8au7JlquTxoy5g+bEo1tyuoi2
-         0WFTmwBLwQZ1t49W/rlRZ1MRZL3iPyA/5eqyFqX27AMpbuE1zC6VnL4QEF6kbQffC6z8
-         xE6iqK+i5pU6hHFuYqZd6grEBUujRQHbtNHvlhEJBoTLOudA3gfZDBt12VaJcmhi7oky
-         /WyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWjN6MrsYSFIxQHaYF0PkdfbhTK1n/oI4izMcB4nNyOrtJmx8wL2Nk85hd8iHi85UIq+7g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCIieHLvY1lGB9QOHF8AFvHP/izamJRmMF3Jw6SE+tmiPMwI8c
-	qXpX460b0qlW/RqZgSCXGltlZIva1D3ScP+CLJqNFenwj4oyDz9QPtDQnNNoH7Vxs4Sz/z9JadK
-	9H1yMcJDF9tUvvH4ajQTy3OCDiEwwXm6Y6hLdIx5mmReezhzKkw==
-X-Gm-Gg: ASbGnctgBl8RU7pZtHYYhwqr2DSsbqTtcS7dPlJqqmo5XPWNZrok76iHwajuNTdA2lJ
-	8k0M51y3mSPvqUrS3VgR1eFWsFwrAA5Gtuohns54el3SCH4+OL8jVYap8BgsEE8mrTGkjHXkmX1
-	g8FSIA0j+7jbPJ70iXXK8/Tr0s/i4J27fADouYMETdXCkjB9dHw2Szq/wlvMS1NUzuVWXt5hu6K
-	C0NcVKo71x8YRRIJ45SD6eQS8STC+d052C6bnWNvLKcsHwslL3x5xUO+O4vfLLRtir+N+8IlD9y
-	O1Hioe/gzR2fbvjHTUJNsVlwltEdkRVIm2HE7RZv+1aLRlJ0
-X-Received: by 2002:a05:622a:1a0d:b0:46e:548f:ab8d with SMTP id d75a77b69052e-46fd0b68d36mr371888561cf.37.1738689435393;
-        Tue, 04 Feb 2025 09:17:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFMZrkvUzANp+Vtn32tNv8gwb9qdGA0LKFSlOhffU2oEyMLz/aqkDnaQy98hKUID+Nqtbqa3w==
-X-Received: by 2002:a05:622a:1a0d:b0:46e:548f:ab8d with SMTP id d75a77b69052e-46fd0b68d36mr371888011cf.37.1738689434987;
-        Tue, 04 Feb 2025 09:17:14 -0800 (PST)
-Received: from x1.local (pool-99-254-114-190.cpe.net.cable.rogers.com. [99.254.114.190])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46fdf0c90d2sm60982721cf.28.2025.02.04.09.17.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 09:17:14 -0800 (PST)
-Date: Tue, 4 Feb 2025 12:17:12 -0500
-From: Peter Xu <peterx@redhat.com>
-To: =?utf-8?Q?=E2=80=9CWilliam?= Roche <william.roche@oracle.com>
-Cc: david@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org, pbonzini@redhat.com,
-	richard.henderson@linaro.org, philmd@linaro.org,
-	peter.maydell@linaro.org, mtosatti@redhat.com, imammedo@redhat.com,
-	eduardo@habkost.net, marcel.apfelbaum@gmail.com,
-	wangyanan55@huawei.com, zhao1.liu@intel.com,
-	joao.m.martins@oracle.com
-Subject: Re: [PATCH v7 4/6] numa: Introduce and use ram_block_notify_remap()
-Message-ID: <Z6JLmG8srpk9_3Jn@x1.local>
-References: <20250201095726.3768796-1-william.roche@oracle.com>
- <20250201095726.3768796-5-william.roche@oracle.com>
+        d=1e100.net; s=20230601; t=1738690074; x=1739294874;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rfuayBjlRpeNZsUXyFm5cOwCbpbAk9szfdT3xIhInHw=;
+        b=B/j1b6mI00gKa6Gsthudb0753ao15zO6xPCAbYm5L7tPak1ZTeuS7pH7j7hyd8fB3v
+         IGTMSVx8JKUd56ZACVGW4b5u/TTFPF64fgZbQtURW2DQWO4KbpyGFHCYl9KqfHseUlGg
+         2cqFtpn+nMCtbe8WxhpgVMgyPax3mno+MuEc+xhXvQqc+4AxHynGogpcCDz4znCWFRmY
+         BX09nwlI0aJaGymj9kWMrYy4QX2dy+0qUm66Wwd6DkpQA8rB2GljVK9RJ4ny9WrUepS8
+         2NuD+NvBvoXWPRbwSMNVOnT88fBx8pNHtWmxVWCpBsB/y+ZLtUbdP1C+uQ1Ypq4EPHCX
+         rP2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVX7JXnjayzQskz77LqV3CtPxcGRmN6LIEUCVDNl3lYdAbo+bN+u8gsX7F4/7zw2BLeiwQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/MLC0byI0Vyo2+55P1con0eKZuXF+ctleTZ7rVUrJ46VvaEGC
+	f70PUR61xkcTRk9PvxxNNwJSE8Buf1TDLj3m5mWhnwbwAwGbknf7qKbEUjn38uw0PumlmldAAI/
+	BtlvJvLTr5nlBb+tPpstWU3bYi7IKvQ6TIeAe
+X-Gm-Gg: ASbGncthXA3TsjaSeKrkuPaGpLGZWzFM3tSOucyIL5LN3MVGinel4DVYK+kt9NZaugb
+	AHsQK47w3l6MzwawejHJkIsQQX5x+2E6A41WNpTlxmLqLu9u20TfLYnIyroauIVBpmZXrfdu/
+X-Google-Smtp-Source: AGHT+IE6dDHOUbSqrO0D169k4b7qsYEqIapGMMKqj/OrRCHutVQk4Tk9SbBciNiSXSLiP161vvVY/cJhza5i3Kply9Y=
+X-Received: by 2002:a17:903:1a2f:b0:216:2839:145 with SMTP id
+ d9443c01a7336-21f03afd716mr2749705ad.1.1738690073656; Tue, 04 Feb 2025
+ 09:27:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250201095726.3768796-5-william.roche@oracle.com>
+References: <20250203223916.1064540-1-almasrymina@google.com> <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com>
+In-Reply-To: <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 4 Feb 2025 09:27:40 -0800
+X-Gm-Features: AWEUYZmyHp3Gf6q5ty9WsLiNHfSw5QJWVWhu7wvqA18o91D3NGgPmvSyJ9NXuus
+Message-ID: <CAHS8izNZrKVXSXxL3JG3BuZdho2OQZp=nhLuVCrLZjJD1R0EPg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 01, 2025 at 09:57:24AM +0000, “William Roche wrote:
-> From: David Hildenbrand <david@redhat.com>
-> 
-> Notify registered listeners about the remap at the end of
-> qemu_ram_remap() so e.g., a memory backend can re-apply its
-> settings correctly.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: William Roche <william.roche@oracle.com>
+On Tue, Feb 4, 2025 at 4:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On 2/3/25 11:39 PM, Mina Almasry wrote:
+> > The TX path had been dropped from the Device Memory TCP patch series
+> > post RFCv1 [1], to make that series slightly easier to review. This
+> > series rebases the implementation of the TX path on top of the
+> > net_iov/netmem framework agreed upon and merged. The motivation for
+> > the feature is thoroughly described in the docs & cover letter of the
+> > original proposal, so I don't repeat the lengthy descriptions here, but
+> > they are available in [1].
+> >
+> > Sending this series as RFC as the winder closure is immenient. I plan o=
+n
+> > reposting as non-RFC once the tree re-opens, addressing any feedback
+> > I receive in the meantime.
+>
+> I guess you should drop this paragraph.
+>
+> > Full outline on usage of the TX path is detailed in the documentation
+> > added in the first patch.
+> >
+> > Test example is available via the kselftest included in the series as w=
+ell.
+> >
+> > The series is relatively small, as the TX path for this feature largely
+> > piggybacks on the existing MSG_ZEROCOPY implementation.
+>
+> It looks like no additional device level support is required. That is
+> IMHO so good up to suspicious level :)
+>
 
-IIUC logically speaking we don't need a global remap notifier - here a
-per-ramblock notifier looks more reasonable, like RAMBlock.resized().
-It'll change the notify path from O(N**2) to O(N).  After all, backend1's
-notifier won't care other ramblock's remap() events but only itself's.
+It is correct no additional device level support is required. I don't
+have any local changes to my driver to make this work. I think Stan
+on-list was able to run the TX path (he commented on fixes to the test
+but didn't say it doesn't work :D) and one other person was able to
+run it offlist.
 
-It's not a huge deal as I expect we don't have a huge amount of ramblocks,
-but looks like this series will miss the recent pull anyway..  so let me
-comment as so on this one for consideration when respin.
+> > Patch Overview:
+> > ---------------
+> >
+> > 1. Documentation & tests to give high level overview of the feature
+> >    being added.
+> >
+> > 2. Add netmem refcounting needed for the TX path.
+> >
+> > 3. Devmem TX netlink API.
+> >
+> > 4. Devmem TX net stack implementation.
+>
+> It looks like even the above section needs some update.
+>
 
-We could also merge partial of the series to fix hugetlb poisoning first,
-as this one looks like can be separately done too.
+Ah, I usually keep the original cover letter untouched and put the
+updates under the version labels. Looks like you expect the full cover
+letter to be updated. Will do. Thanks for looking.
 
+
+--=20
 Thanks,
-
--- 
-Peter Xu
-
+Mina
 
