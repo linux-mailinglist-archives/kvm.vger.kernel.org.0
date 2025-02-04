@@ -1,145 +1,165 @@
-Return-Path: <kvm+bounces-37240-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37241-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7322BA27698
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 16:57:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0326A276C8
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 17:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C10263A3FDE
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 15:57:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EEB93A3C96
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 16:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378022147FA;
-	Tue,  4 Feb 2025 15:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3768B21519C;
+	Tue,  4 Feb 2025 16:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s1p8T9UG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EL6Ax0KX"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C4720C46D;
-	Tue,  4 Feb 2025 15:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31A3215184
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 16:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738684644; cv=none; b=R7f9GRVjBO6vceraN4p7CiHW2TcYV3aw7Ud4gR7X4RX8eDWQYE15k0KpdSoeVBsIn8EsRPgfK3jUqWNuoeaC+DXdMx3Ge2hShjgqLZYSqdl42+o7WBuWi1SWD84soeE46tHmYavWVbC7MBIvuE16MwQjCzfPPHR0tV7Ly36pba0=
+	t=1738685126; cv=none; b=O5ZrWgYij4NRmmOaMTtNwLTHB8W1vJ/90B8F3g2CaV94hjI8encFeHWOA60bB6qnE1pPFusaCewdQiPdW3BWPwX7XqWO6G1QoqgLFsLlAm/cWTC5fMWL6OxzAzODN/WaeEd33LrI+lTLQQIW/ssXXQ41yr7CRAWiBfuDFYEg1q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738684644; c=relaxed/simple;
-	bh=7uLPLkv/rRUvTQqmbKnITADQnn/mB3pVaCmFUVO5FDM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LT2W+InKiQ45S9sznfwbvOIYpJeYR+IW1G3qtDKmZKO3y9uj46WFQCk2ldupNy6DmlJ6/IAQK9wDUzuvwCeN1/jnfgtK2voO6payJtrhha3KDQnDaPOSTuCFR+j4xYdtRlH10mZZ/546iOaRQ9F+kKPH9v4PfwRHmGY5EBTGsJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s1p8T9UG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE3D4C4CEDF;
-	Tue,  4 Feb 2025 15:57:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738684643;
-	bh=7uLPLkv/rRUvTQqmbKnITADQnn/mB3pVaCmFUVO5FDM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=s1p8T9UGTcbP/kXq8edjVeaZHp1tIIwnu1WuADL2T35DF3lfME8nV3nDzfdY8dCW+
-	 c3aTjhTOfdauijgrdMbmpezc1jb9n1/AVkG+M7SqwKk6rFVuTs3Jji/wfxDebQA0+m
-	 qHe5nnvy1fwS0R08exexp1+GBwdIPSQsqVSvxIB+08+XIePqMOOZ2BPOjsJFL3yWxd
-	 VYsYuQN8axQrYdz9db2NyEYOlIFLlnsjfVwIFjZxiO2+ko8JKqun0UUxsvVT8gzTSL
-	 VBzJ873rAFPnTy0avAKTKZgKiYUbZZCEMnuXpVUnJ91tOx3B7OMWN0ypOVUNJHEqMD
-	 hoxQQCuPDWGFA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tfLIf-000Tr7-6r;
-	Tue, 04 Feb 2025 15:57:21 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alexander Potapenko <glider@google.com>,
-	Dmytro Terletskyi <dmytro_terletskyi@epam.com>,
-	Fuad Tabba <tabba@google.com>,
-	Lokesh Vutla <lokeshvutla@google.com>,
-	Mark Brown <broonie@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.14, take #1
-Date: Tue,  4 Feb 2025 15:56:56 +0000
-Message-Id: <20250204155656.775615-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1738685126; c=relaxed/simple;
+	bh=9S/Jsl9iZrO+/Bup4Wa899HOJVXQVIorM6lS3gKkxpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aYVhdl4BqNspW3XPKl/1cbUw4UjF4fc16kI2Mg23dyAU1V61+xYPNd+yzrYiaKqPWy/1vYJiKTmJTBg+8bzobUidBtLf9+Z4TB789SBBpfaPmGDUxVk8vh3CovzzL7rNZ+e9wmf/ZIxYiwX3zkvcgkWVi1H8FZLDO27k2AWs8tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EL6Ax0KX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738685123;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9S/Jsl9iZrO+/Bup4Wa899HOJVXQVIorM6lS3gKkxpg=;
+	b=EL6Ax0KXoF0HafLx4akVqNtW0E12xa3mP0qs+749jIjgmMfZfxm0J6iqDrEC0dmThSX6Is
+	W7Z1gVHcfJ5hUosEURV46v8jxVbt1C4YiSq982TkkqCJOVef0OkD7kICdvw953mVWN6LXg
+	/41fbnHwhFIblJjpxpLunZTjNp0mGk4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-489-AZqHvi75PBiRSRDpBxk8cg-1; Tue, 04 Feb 2025 11:05:20 -0500
+X-MC-Unique: AZqHvi75PBiRSRDpBxk8cg-1
+X-Mimecast-MFC-AGG-ID: AZqHvi75PBiRSRDpBxk8cg
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4362b9c15d8so29186325e9.3
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 08:05:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738685119; x=1739289919;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9S/Jsl9iZrO+/Bup4Wa899HOJVXQVIorM6lS3gKkxpg=;
+        b=FCfOvlARg0Kp/oLNWjlnVKFtkslRMTJQ3o2Bb0Pe6q4KiYm8uW6l5TJUsyv9Kgfvib
+         jVJTwLt45p9LVJRBN0D0G+ATnC+EL0tuo3lZvl3GvzhF7NiXbQl43nVEJHUDSlADPAtj
+         tNw456AM8vWeGHtCNYkPakyv5D8ujHhwupwHHk1na1IEx+xSy9LfPoxVtXAT3tyOF+XU
+         OQjpIG/64cXLnUMjqfartzg72oUWAuMaXSsZmUk2ZlvItdEamF397BQZr48Il6d8Qs9C
+         hfblbZ7SiOS6/CXcCJGAFq+nUy0/aiypZHpxSvMxHVBkNuq+kUW7FM/XV4kGcqQzFc+2
+         v/6w==
+X-Forwarded-Encrypted: i=1; AJvYcCWHPcV4BXTDmk20pCh7oPZwtjxvznHLEt6QdRMGJUp6ftFbckFSC22nAq3jOScy+hQD5UQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGTMFRugVwGDYpj3gGhvMKRX//XJEkl+ZDPNMXURh3QjEUotRW
+	XUZvIRsKH0j7o7zRiowVXst2pn/8+85lZzzto1l66yUHgpWSBO9GwcQ/dcjnNFaf8qfKhgRHDZy
+	sQvTehQVsgpSMY/hHaDYBy/aBjcPWfLdPzPzWlFddCBwO9L9iPmFRbjeNRDK4b8uOnqDrZD0lht
+	2G4oKoA0jM3y3Y5REfr9mMhEu+
+X-Gm-Gg: ASbGncsvMNM/MT7RrhuEMYxyhVeKTdO5w2LPDEeXWhQndkLEs+outv41qNpjLmWyxsX
+	svCmxOJo6HcdioSTbhFTejkxcrL5oCvaCKKIO7cucGkT5Yq7+CHKA5yt65htS
+X-Received: by 2002:a05:6000:1869:b0:38d:af20:5f25 with SMTP id ffacd0b85a97d-38daf206192mr1976758f8f.29.1738685118861;
+        Tue, 04 Feb 2025 08:05:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEwaWzXVak280B85ArrjCFrUz02WwwEtsT242TiysJbuk+XtRUVzfEto4aIoAc0mUfIQAQs1mQgLIMWq94LkmM=
+X-Received: by 2002:a05:6000:1869:b0:38d:af20:5f25 with SMTP id
+ ffacd0b85a97d-38daf206192mr1976690f8f.29.1738685118379; Tue, 04 Feb 2025
+ 08:05:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, glider@google.com, dmytro_terletskyi@epam.com, tabba@google.com, lokeshvutla@google.com, broonie@kernel.org, oliver.upton@linux.dev, Volodymyr_Babchuk@epam.com, r09922117@csie.ntu.edu.tw, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20250124163741.101568-1-pbonzini@redhat.com> <CAHk-=wg4Wm4x9GoUk6M8BhLsrhLj4+n8jA2Kg8XUQF=kxgNL9g@mail.gmail.com>
+ <20250126142034.GA28135@redhat.com> <CAHk-=wiOSyfW3sgccrfVtanZGUSnjFidSbaP3tg9wapydb-u6g@mail.gmail.com>
+ <20250126185354.GB28135@redhat.com> <CAHk-=wiA7wzJ9TLMbC6vfer+0F6S91XghxrdKGawO6uMQCfjtQ@mail.gmail.com>
+ <20250127140947.GA22160@redhat.com> <CABgObfaar9uOx7t6vR0pqk6gU-yNOHX3=R1UHY4mbVwRX_wPkA@mail.gmail.com>
+ <20250204-liehen-einmal-af13a3c66a61@brauner>
+In-Reply-To: <20250204-liehen-einmal-af13a3c66a61@brauner>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 4 Feb 2025 17:05:06 +0100
+X-Gm-Features: AWEUYZm64mwKLg6NjahAsD5Hi2sO80t05w3PJ4Q7RlO6xle2aHkFrCzoMQbba_M
+Message-ID: <CABgObfaBizrwP6mh82U20Y0h9OwYa6OFn7QBspcGKak2r+5kUw@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM changes for Linux 6.14
+To: Christian Brauner <brauner@kernel.org>
+Cc: Oleg Nesterov <oleg@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, "Eric W. Biederman" <ebiederm@xmission.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo,
+On Tue, Feb 4, 2025 at 3:19=E2=80=AFPM Christian Brauner <brauner@kernel.or=
+g> wrote:
+>
+> On Mon, Jan 27, 2025 at 04:15:01PM +0100, Paolo Bonzini wrote:
+> > On Mon, Jan 27, 2025 at 3:10=E2=80=AFPM Oleg Nesterov <oleg@redhat.com>=
+ wrote:
+> > > On 01/26, Linus Torvalds wrote:
+> > > > On Sun, 26 Jan 2025 at 10:54, Oleg Nesterov <oleg@redhat.com> wrote=
+:
+> > > > >
+> > > > > I don't think we even need to detect the /proc/self/ or /proc/sel=
+f-thread/
+> > > > > case, next_tid() can just check same_thread_group,
+> > > >
+> > > > That was my thinking yes.
+> > > >
+> > > > If we exclude them from /proc/*/task entirely, I'd worry that it wo=
+uld
+> > > > hide it from some management tool and be used for nefarious purpose=
+s
+> > >
+> > > Agreed,
+> > >
+> > > > (even if they then show up elsewhere that the tool wouldn't look at=
+).
+> > >
+> > > Even if we move them from /proc/*/task to /proc ?
+> >
+> > Indeed---as long as they show up somewhere, it's not worse than it
+> > used to be. The reason why I'd prefer them to stay in /proc/*/task is
+> > that moving them away at least partly negates the benefits of the
+> > "workers are children of the starter" model. For example it
+> > complicates measuring their cost within the process that runs the VM.
+> > Maybe it's more of a romantic thing than a real practical issue,
+> > because in the real world resource accounting for VMs is done via
+> > cgroups. But unlike the lazy creation in KVM, which is overall pretty
+> > self-contained, I am afraid the ugliness in procfs would be much worse
+> > compared to the benefit, if there's a benefit at all.
+> >
+> > > Perhaps, I honestly do not know what will/can confuse userspace more.
+> >
+> > At the very least, marking workers as "Kthread: 1" makes sense and
+> > should not cause too much confusion. I wouldn't go beyond that unless
+> > we get more reports of similar issues, and I'm not even sure how
+> > common it is for userspace libraries to check for single-threadedness.
+>
+> Sorry, just saw this thread now.
+>
+> What if we did what Linus suggests and hide (odd) user workers from
+> /proc/<pid>/task/* but also added /proc/<pid>/workers/*. The latter
+> would only list the workers that got spawned by the kernel for that
+> particular task? This would acknowledge their somewhat special status
+> and allow userspace to still detect them as "Hey, I didn't actually
+> spawn those, they got shoved into my workload by the kernel for me.".
 
-This is the first set of KVM/arm64 fixes for 6.14, most of them
-addressing issues exposed by code introduced in the merge window
-(timers, debug, protected mode...). Details in the tag, as usual.
+Wouldn't the workers then disappear completely from ps, top or other
+tools that look at /proc/$PID/task? That seems a bit too underhanded
+towards userspace...
 
-Please pull,
+Paolo
 
-	M.
+> (Another (ugly) alternative would be to abuse prctl() and have workloads
+> opt-in to hiding user workers from /proc/<pid>/task/.)
 
-The following changes since commit 01009b06a6b52d8439c55b530633a971c13b6cb2:
-
-  arm64/sysreg: Get rid of TRFCR_ELx SysregFields (2025-01-17 11:07:55 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.14-1
-
-for you to fetch changes up to 0e459810285503fb354537e84049e212c5917c33:
-
-  KVM: arm64: timer: Don't adjust the EL2 virtual timer offset (2025-02-04 15:10:38 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.14, take #1
-
-- Correctly clean the BSS to the PoC before allowing EL2 to access it
-  on nVHE/hVHE/protected configurations
-
-- Propagate ownership of debug registers in protected mode after
-  the rework that landed in 6.14-rc1
-
-- Stop pretending that we can run the protected mode without a GICv3
-  being present on the host
-
-- Fix a use-after-free situation that can occur if a vcpu fails to
-  initialise the NV shadow S2 MMU contexts
-
-- Always evaluate the need to arm a background timer for fully emulated
-  guest timers
-
-- Fix the emulation of EL1 timers in the absence of FEAT_ECV
-
-- Correctly handle the EL2 virtual timer, specially when HCR_EL2.E2H==0
-
-----------------------------------------------------------------
-Lokesh Vutla (1):
-      KVM: arm64: Flush hyp bss section after initialization of variables in bss
-
-Marc Zyngier (4):
-      KVM: arm64: Fix nested S2 MMU structures reallocation
-      KVM: arm64: timer: Always evaluate the need for a soft timer
-      KVM: arm64: timer: Correctly handle EL1 timer emulation when !FEAT_ECV
-      KVM: arm64: timer: Don't adjust the EL2 virtual timer offset
-
-Oliver Upton (2):
-      KVM: arm64: Flush/sync debug state in protected mode
-      KVM: arm64: Fail protected mode init if no vgic hardware is present
-
- arch/arm64/kvm/arch_timer.c        | 49 +++++++++-----------------------------
- arch/arm64/kvm/arm.c               | 20 ++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 24 +++++++++++++++++++
- arch/arm64/kvm/nested.c            |  9 +++----
- arch/arm64/kvm/sys_regs.c          | 16 ++++++++++---
- 5 files changed, 73 insertions(+), 45 deletions(-)
 
