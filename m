@@ -1,197 +1,120 @@
-Return-Path: <kvm+bounces-37230-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37231-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFC29A2728E
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 14:16:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DFA2A27291
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 14:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 869EE1884766
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 13:16:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A689E165707
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 13:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BC3211A3E;
-	Tue,  4 Feb 2025 12:55:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C06DE2116F3;
+	Tue,  4 Feb 2025 12:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gQBBbAwG"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AAidGAkr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A50320AF77
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 12:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D9120CCE1;
+	Tue,  4 Feb 2025 12:55:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738673714; cv=none; b=dQwMM36/wCLURepDXmA0wnLirBZTW3XCqN+ZFb9/H4EV7SXahPyGWZWaioO7w5JHhaStmGEYxGR5at+U5P8/RcnJ//s9xzgVR9c3vUX2KL6Ezj3H9w79W8FIcsjSsKijN2z2YsJo+zXdb+y5kQdLuKx39JtmgLv2pt4zPBNoxdo=
+	t=1738673745; cv=none; b=mkrJrL3hdOPn8S5VcUlnXNnH8s/hH1Ped7Hf0egAQOhMGGWdnEpSqayEotRlQQx3fH7uE2sWq7rIJkT8bmVoTJgW9M9avgQXwulButs1f9shjhOE8sUrxDmhG16hmIHGcyUDXLUkeY6uEcOY73W3bKu4wd/EQIXq3/m3uRl0UVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738673714; c=relaxed/simple;
-	bh=zGL9epENRNO7rvIHohYlhRMg7cx1KKq80o7dktun6zo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QnR52HHaY5A201BoN32EVGRg6eIbgQerj+yvYaXaG+NDNAKsSyxi6ZuADCduEsOPD7xgiitdFd2HnYOnrLdm7fffKnOLGZhOZEZ9JW1x0Bk+sd5db44TJjXOH1ULj7rEJe6j0pqjMV54e5u3BgWEq2QIchSisuGUXgqry/emig4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gQBBbAwG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738673711;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=twPDg30fIiJNLDt2SiVRKkvqJ/64dc+oeH98LcXpjks=;
-	b=gQBBbAwGK3Lrsik53QJyxNdghbg2qd0FnEv4Hc/NKVxC6zGCoTMc/aHJghETMFJenA7kCk
-	GSwLku7xc+8fKKKZESb3teec9WPtvqCTSO+CaI3fv5PVRd/7RUhn0P8KZnjcUIqAFEuFks
-	xy6v2syZSk9rdaXDlDbeqrciXbDDmvE=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-489-HZHR7WHhOJuMG5k9_5wVLA-1; Tue, 04 Feb 2025 07:55:10 -0500
-X-MC-Unique: HZHR7WHhOJuMG5k9_5wVLA-1
-X-Mimecast-MFC-AGG-ID: HZHR7WHhOJuMG5k9_5wVLA
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6dd43b16631so63538636d6.2
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 04:55:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738673709; x=1739278509;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=twPDg30fIiJNLDt2SiVRKkvqJ/64dc+oeH98LcXpjks=;
-        b=mHafBcH0wCGDSug9SNYEh4mx42pH/k2Y6u+EbyR6Uc9yrbYd9hH6Ab9MWSIQ+nURgt
-         ewIiVCQFkz0vOitzSpb/poaZyz88sYHAVI6ngCWzCfNBTJMk7jEt3GA6DT6EANtpZM1L
-         c6vlsKPOQVNs5yeo05eapSbaf8umawi/8ZLBEWrUassF3RfaDCV4Ut+r//YW1N9oHPC8
-         r6HAL1kVfwiPOKYer5e4x9pAre776PwjVcGQy++g9a73rXqnmM5D1/E3bClPH04Jrp0l
-         1d4mVp1qX7urYlt3d9qSLYgpwVZyqWTdzNXZFkeHrygehesWeIKKscadBGPS7j5z2M5G
-         HqKg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpY9LcdipA7U4DUAiG4+qu8ZtfRGcdsoFhs9zlwHZcOLx+T93EIeFlPKxAz7OO2gToARU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwngNgR+5qB14rvoNPIx06/pNUosQRnyiUOYlQathp6sDaJDjdp
-	kHLWyiZ7MSqck//CBmO37rodLgnVtA+7iaWMEi0jg+FNsit5IXBZEyE69jYw3lgP0t8JcxW2fFQ
-	6YgGXCoUD4AQCeZEH7ia4K8VrjnsolrhXq3Ni3GNSYz7boSle7Q==
-X-Gm-Gg: ASbGncujQep3w5xRpih0741YyP/KUeuxlvWiDbhOqYn4w4A1YyBWPICyssl26wHAhVP
-	4JWR7RXD26G968sCLjA9+agGl4r4dM9rCV3LtH05Vln4iWcTYMMjdHnI8NRtYZRzHZ4PobwFBFQ
-	Q0MPhimpS4zZxANAaUw+TlIQPEcGYSG84zW3gdZlQi/bVsk5hEzCYqGdddIi6DlIHzIaczDC5HU
-	4Z8xCXbeHYkqAIfX57T/9fgeIwQQ+f/dU9pJ+RnrcR3T3QpnfzS2O24HXwlfYRDqBiGnSuPhgYg
-	Te2GQ1Qp+Qg7Kmi0jqMg8a2/iGzl/3GxbzDkv4rtHkf42SyW96z+
-X-Received: by 2002:a05:6214:1c0b:b0:6d9:2e46:dc35 with SMTP id 6a1803df08f44-6e243bf84c3mr422214626d6.25.1738673709617;
-        Tue, 04 Feb 2025 04:55:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF1a38N2TZdISEECvq/s7iOToAmmfm3GmVQAMYB+u0Kmi1Pw+6Ta7PfZF01eEC876vzaXAEXA==
-X-Received: by 2002:a05:6214:1c0b:b0:6d9:2e46:dc35 with SMTP id 6a1803df08f44-6e243bf84c3mr422214216d6.25.1738673709310;
-        Tue, 04 Feb 2025 04:55:09 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e254814029sm61998046d6.29.2025.02.04.04.55.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 04:55:08 -0800 (PST)
-Message-ID: <cb087202-3a64-428c-bba2-196a3612e5ff@redhat.com>
-Date: Tue, 4 Feb 2025 13:55:01 +0100
+	s=arc-20240116; t=1738673745; c=relaxed/simple;
+	bh=OGjwQuPfWetksAPEcycdLMVdfygEutePpDK2iVnlDkc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=C/8axExxQ7wPC4hXCXyB7FDyI4GVF0TpmO/L5qEZsucXR5MB9kIAlNNpIuCPJLHUwIFf9IOG6uWJ5DGu6qN3doyT0rprOyI7uWkc/GR+QSHJIKmEiBfVj4bMFt00HThYYzn8Y/qSE1ZrEQexdHH4MRCCXP7I1vZz9Ng1vEacv1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AAidGAkr; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5147X9hA011331;
+	Tue, 4 Feb 2025 12:55:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=k0tDC6
+	qlek+GMfcSTjHy7j7g2ghMuipMt7SckPEgcgA=; b=AAidGAkrLjZHJb8EbfpMIO
+	5GH5Fi3mFQRk5859xEiaQSaYvTP5YOKUbvj2nXNrXLIjgtzoOvEI2z190gjzO4Hz
+	bOf7lJCGJS/AkE9T7j5Tpbm/N6NzB2nKedc6R7jpe3jAwnMxX6XE9I+0W/oTHU96
+	fIztAU7Svqr2qNRNTwHShKPere7UFG9V9ctDdzCJfCQvhOb8U/mDGYSV0lq3c73g
+	2i2gpFWyTUclcDLXC4ZmnMHxSFaJe0/L/bzoBeyC3cdr004sTDfkL2xIe4rt6LRR
+	DSJwl0uKz/CVd7PBwqScBxt/dmD9Im4dO6NbyMyEQPr0ZmSvQaE9VVXXQTk+GT0Q
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44kekp1dj2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Feb 2025 12:55:42 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 514C8MJU024510;
+	Tue, 4 Feb 2025 12:55:42 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxxn3hnb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Feb 2025 12:55:42 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 514CtcVm58524096
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Feb 2025 12:55:38 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4D30620043;
+	Tue,  4 Feb 2025 12:55:38 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2B2CB20040;
+	Tue,  4 Feb 2025 12:55:38 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.3.166])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Feb 2025 12:55:38 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH RFCv2 00/13] iommu: Add MSI mapping support with nested
- SMMU
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- Nicolin Chen <nicolinc@nvidia.com>, "will@kernel.org" <will@kernel.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>, "maz@kernel.org"
- <maz@kernel.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "joro@8bytes.org" <joro@8bytes.org>, "shuah@kernel.org" <shuah@kernel.org>,
- "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
- "yebin (H)" <yebin10@huawei.com>,
- "apatel@ventanamicro.com" <apatel@ventanamicro.com>,
- "shivamurthy.shastri@linutronix.de" <shivamurthy.shastri@linutronix.de>,
- "bhelgaas@google.com" <bhelgaas@google.com>,
- "anna-maria@linutronix.de" <anna-maria@linutronix.de>,
- "yury.norov@gmail.com" <yury.norov@gmail.com>,
- "nipun.gupta@amd.com" <nipun.gupta@amd.com>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "patches@lists.linux.dev" <patches@lists.linux.dev>,
- "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "mdf@kernel.org" <mdf@kernel.org>, "mshavit@google.com"
- <mshavit@google.com>, "smostafa@google.com" <smostafa@google.com>,
- "ddutile@redhat.com" <ddutile@redhat.com>
-References: <cover.1736550979.git.nicolinc@nvidia.com>
- <4946ea266bdc4b1e8796dee1b228bd8f@huawei.com>
- <20250123132432.GJ5556@nvidia.com>
- <de6b9dc1-dedd-4a3d-9db7-cb4b8e281697@redhat.com>
- <20250129150454.GH5556@nvidia.com>
- <8e4c21b5-3b79-4f0b-b920-59b825c2fb81@redhat.com>
- <20250129201307.GJ5556@nvidia.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250129201307.GJ5556@nvidia.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Tue, 04 Feb 2025 13:55:37 +0100
+Message-Id: <D7JOEGIKCINO.1NX73MSQGVGYZ@linux.ibm.com>
+Cc: <linux-s390@vger.kernel.org>, <imbrenda@linux.ibm.com>,
+        <hca@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH] lib: s390x: css: Name inline assembly
+ arguments and clean them up
+From: "Nico Boehr" <nrb@linux.ibm.com>
+To: "Janosch Frank" <frankja@linux.ibm.com>, <kvm@vger.kernel.org>
+X-Mailer: aerc 0.18.2
+References: <20250204100339.28158-1-frankja@linux.ibm.com>
+In-Reply-To: <20250204100339.28158-1-frankja@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vGFXpT8pKvEmPrCDD7-aZbfgEGJdjMYk
+X-Proofpoint-GUID: vGFXpT8pKvEmPrCDD7-aZbfgEGJdjMYk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-04_06,2025-01-31_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ adultscore=0 lowpriorityscore=0 clxscore=1015 mlxscore=0 malwarescore=0
+ spamscore=0 priorityscore=1501 phishscore=0 mlxlogscore=757 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
+ definitions=main-2502040100
 
-Hi Jason,
+On Tue Feb 4, 2025 at 10:51 AM CET, Janosch Frank wrote:
+> @@ -215,9 +215,9 @@ static inline int xsch(unsigned long schid)
+> =20
+>  	asm volatile(
+>  		"	xsch\n"
+> -		"	ipm	%0\n"
+> -		"	srl	%0,28"
+> -		: "=3Dd" (cc)
+> +		"	ipm	%[cc]\n"
+> +		"	srl	%cc,28"
 
+Should this be:
+		"	srl	%[cc],28"
+instead?
 
-On 1/29/25 9:13 PM, Jason Gunthorpe wrote:
-> On Wed, Jan 29, 2025 at 06:46:20PM +0100, Eric Auger wrote:
->>>>> This missing peice is cleaning up the ITS mapping to allow for
->>>>> multiple ITS pages. I've imagined that kvm would someone give iommufd
->>>>> a FD that holds the specific ITS pages instead of the
->>>>> IOMMU_OPTION_SW_MSI_START/SIZE flow.
->>>> That's what I don't get: at the moment you only pass the gIOVA. With
->>>> technique 2, how can you build the nested mapping, ie.
->>>>
->>>>          S1           S2
->>>> gIOVA    ->    gDB    ->    hDB
->>>>
->>>> without passing the full gIOVA/gDB S1 mapping to the host?
->>> The nested S2 mapping is already setup before the VM boots:
->>>
->>>  - The VMM puts the ITS page (hDB) into the S2 at a fixed address (gDB)
->> Ah OK. Your gDB has nothing to do with the actual S1 guest gDB,
->> right?
-> I'm not totally sure what you mean by gDB? The above diagram suggests
-> it is the ITS page address in the S2? Ie the guest physical address of
-> the ITS.
-Yes this is what I meant, ie. the guest ITS doorbell GPA
->
-> Within the VM, when it goes to call iommu_dma_prepare_msi(), it will
-> provide the gDB adress as the phys_addr_t msi_addr.
->
-> This happens because the GIC driver will have been informed of the ITS
-> page at the gDB address, and it will use
-> iommu_dma_prepare_msi(). Exactly the same as bare metal.
+With that fixed (if it needs fixing):
 
-understood this is the standard MSI binding scheme.
->
->> It is computed in iommufd_sw_msi_get_map() from the sw_msi_start pool.
->> Is that correct?
-> Yes, for a single ITS page it will reliably be put at sw_msi_start.
-> Since the VMM can provide sw_msi_start through the OPTION, the VMM can
-> place the ITS page where it wants and then program the ACPI to tell
-> the VM to call iommu_dma_prepare_msi(). (don't use this flow, it
-> doesn't work for multi ITS, for testing only)
-OK so you need to set host sw_msi_start to the guest doorbell GPA which
-is currently set, in qemu, at
-GITS_TRANSLATER 0x08080000 + 0x10000
-
-In my original integration, I passed pairs of S1 gIOVA/gDB used by the
-guest and this gDB was directly reused for mapping hDB.
-
-I think I get it now.
-
-Eric
->
->> https://lore.kernel.org/all/20210411111228.14386-9-eric.auger@redhat.com/
->> I was passing both the gIOVA and the "true" gDB Eric
-> If I understand this right, it still had the hypervisor dynamically
-> setting up the S2, here it is pre-set and static?
->
-> Jason
->
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
