@@ -1,101 +1,98 @@
-Return-Path: <kvm+bounces-37203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD979A269CD
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 02:29:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7C1FA269D7
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 02:30:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 319247A213A
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 01:27:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D56F3A5082
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 01:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A7513C3F6;
-	Tue,  4 Feb 2025 01:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67656132117;
+	Tue,  4 Feb 2025 01:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RBSy4bZT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NNhV7x5e"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A0C78F37
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 01:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A003278F30
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 01:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738632221; cv=none; b=RnLtGXd6BTo8WGAe4kXZS58+LPNJwJfywJgp6rR8M74xLS+0Pckl7eZsCCb4wWhuPbT/ZTzgBbWGGGmXhjuQHKdU/mlkWeAGH/fQKPe4632l1y3jZ2CjgkN9OYE/a6exOfWIVaSFZElWfNnVuGvwy2jlLUEasnO+Z3pETOyaV7U=
+	t=1738632620; cv=none; b=dQJcKytL/FJnP5JlqC+kxSQ+3e0y83VsxiI9dzvPLj6bN3CCkAKk/CmZA6IfT2WXm6pXR1e8iqzeWSaMnjKgFTU9c/bVyeBtpkITF2TLfaCvpU9Rgqy25XL+TOh0pOMFABr+Yjr/tpXDmZxxfxo6fQY/SzucdHrH4YV0R3cG8GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738632221; c=relaxed/simple;
-	bh=cOpTxEufk2fJx6WpgJqhe0pQwrDVrQLtuM3AJEZw05s=;
+	s=arc-20240116; t=1738632620; c=relaxed/simple;
+	bh=N6TvDM0nH2INUzLNGVXaAxn7onjgXAPxe6GC5SoRom8=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LH5qn5HpDzA/EKmTiCyAW62IdtuMdH40FKoXpnAgpLCbQMlqM1PRr5bX8UWjiyS8Wib1Pn9Onea3mZSg4LXdmQi59ItuuPWQMUkaytLBiSoEXOIZY2IO+VMkHXJbjLEYQQGfndc9n0qLGUWNRq2Et10XUern1awmSH7NSfiO9WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RBSy4bZT; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=XM8nSnvCkh0RKyDBEfFlrNtg3gUldFtEczgMR2GLs0w4N0HJfaDY96J6EidwqGyJIBvMBYFkZhvgQq543S/KL/F6eyZXpFKwUar4K2RB5YIC1f1PVRUCWpj7e2W2IEO86K0pAl0UE+q1S9I50ypVcuxozVe7Ew+hUcpg2f/5Sjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NNhV7x5e; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738632218;
+	s=mimecast20190719; t=1738632617;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FfjLQH0ugfJpeoQ4yGzWnUgAvVZA+tG6GNbkZhovQWY=;
-	b=RBSy4bZTwMG4UjJEu6EpFCAMH1aXw1qmM3toK+eVlsBi3QX/dIPYsG+waquokx/qzdO786
-	MSYfX73Htfk3H2F/2nvrZsCyStQY5qlGyB5+LHYvStlsWfCqNJfc77x8Va6yUGg9ZL+R7C
-	xdxU8WaFsnqXs7H16H6yuehDoOckbjY=
+	bh=kEtPGmySAsT90Cn4z+YrK/aQ/5zLEgEGFrzIckWzW40=;
+	b=NNhV7x5e1Rev6wqcL0ia0PdViqOX4adLiRgWZ7ft32WvqwBu2x9FIknDlH6QVIE32e3DgP
+	ZbqVoz8zKhRsbtiHr5p2O/Wa5QcKE5UkWefn5ERRhPAHydosKXrx3u6rRAFzrwrUvcHUq6
+	5NJocy5Mkb9+H1zyD/UkXzPMPW5ymdI=
 Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
  [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-29-myWPEHSPNVaXv27uAIo4PQ-1; Mon, 03 Feb 2025 20:23:37 -0500
-X-MC-Unique: myWPEHSPNVaXv27uAIo4PQ-1
-X-Mimecast-MFC-AGG-ID: myWPEHSPNVaXv27uAIo4PQ
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b6e1b036e9so478112885a.1
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 17:23:36 -0800 (PST)
+ us-mta-524-AwiESx__NkexG2CFgko14Q-1; Mon, 03 Feb 2025 20:30:15 -0500
+X-MC-Unique: AwiESx__NkexG2CFgko14Q-1
+X-Mimecast-MFC-AGG-ID: AwiESx__NkexG2CFgko14Q
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b6f1595887so814636085a.1
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 17:30:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738632216; x=1739237016;
+        d=1e100.net; s=20230601; t=1738632615; x=1739237415;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=FfjLQH0ugfJpeoQ4yGzWnUgAvVZA+tG6GNbkZhovQWY=;
-        b=Aqkw5bKvvKOPjFDhfsmlk4HEb1FBkjoaKaLEkaB6P53oDrPAHpZhVFrsEJkliX8Lu5
-         VkEqX7eyIorkk0EN9AYhGbglzvGUWPq1klkb1CrbUeAt8onv3eUOLimaoybCt7D2Enno
-         NiYn2mif/rIgGp8z7q6De9Bp4S0nxZVCE1YB1jbtvwwcJ4VvzLE+TXK6Anwutq3XdaRG
-         UC3ahZLz+hHLJSdyP9O6PhmU84LGbvU8h9cRqOBhv32fvV02kCEApkhFiWz57xAs5Dw7
-         52pPPwkNIdKyQauIYrDdtbT2+Jna+8j6pn0ipmhjfkTdg6gWfu2wdt3Eav5mspwYCBEh
-         Z53A==
-X-Forwarded-Encrypted: i=1; AJvYcCUqIx24g8gtAAFOJDx9yMVRTm98bOZ9rWr9upTL2g2xcG2T5W+T4UBkUFtPchunAHSv+zM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8LXKQPfOcyZcO8wOib8seosH1vI+5DvRr9SgE3TbpuKNwVEtP
-	Ck/68joqLv0htZJ2xG5z28vtK096SffJIxfNBYjADlT5zmyC0S6m3P9nAO8/vIjPYiNLUcampkH
-	fLsrdh+LjbfzivAyI8ygw9IKOpls981BfdG+uMlDigbGR8FfqqA==
-X-Gm-Gg: ASbGncuwHz5GywUdQ0yR2ZsNScDRbun2DdUY+iUyiPH3YXdcAIw7Ps9DV/Y0WIMBueW
-	x6s7hunU6PuzR0w+6vEEpTCI9FJX3GRYi7oO6CvS1+nyVJt8/Gt0DQWCSiicN1Yr5o2AYtv5EmU
-	MkBAZim06/6pTrNzzPB0mNQOYYg2m9kLiRFMtR+1ss+6mC7Kx6LffKNEiD8rcK6hh9lBLlRZ4B3
-	YrK2y7xVxrlGr6idPm/bHcI4QOiP8ekHncX3Fi4EKh9uvp5HId3v9F4L35DRV4bLWnMDu09soMF
-	VXVp
-X-Received: by 2002:a05:620a:2a10:b0:7b6:deab:d485 with SMTP id af79cd13be357-7bffcce52c5mr3094047285a.16.1738632216356;
-        Mon, 03 Feb 2025 17:23:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHz1LWLrTgjblfuYTzFwvitmeKL74EinqFy/6HNwfAWhRpjwdT4DQgR+/gydnf6s85MBC70yQ==
-X-Received: by 2002:a05:620a:2a10:b0:7b6:deab:d485 with SMTP id af79cd13be357-7bffcce52c5mr3094044785a.16.1738632216039;
-        Mon, 03 Feb 2025 17:23:36 -0800 (PST)
+        bh=kEtPGmySAsT90Cn4z+YrK/aQ/5zLEgEGFrzIckWzW40=;
+        b=WaBXPAhfox9di0sErYZRKzOzKEuuo99W/8Pi78iACaQ0FYan24+jrqb2X4pEluRiGS
+         5KDW4saN5fQN2S4T97skcZKBwEcuyq7D4R6POdzhKXWJnXZm5/P1o0+e/4fbbNqSyFYj
+         NNDwCYnSHLjOMRFUBmaTAl0u+IwY5KrWNmqYAlzAF5kDpCCKHAxuAas/oIxJozYnI8a3
+         LLGhKgv4hHGk8GYTsdyfdzNbYTnE3Di6J0uT1hixn+beWEmuyetIcL+IeHyVv8tvjTGC
+         LPEb5po8F63i1sG87f4J7ITEQEfOUSmfcY+B9PBJl4Jq7AvSFJW7gNk2kw5e4LoluvPQ
+         sCsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVvxOro5WXTq8/oDRKBofxG2qRRtBgxnQF1KATaVnqnClmSzHbXmoUOR3XSoI03lKFeTSE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZB5cvW+gDHExBE5tfGMJen70iu/04ZFri4w4jQJ83K8+Lgduz
+	7q0AP3YvBb9LwZcn4cXNNj5Ze3ofH0q2eLeHN7xV63Jb5EmUymCb9L6iE/MLh9Pzx07+vp52vyM
+	rFf4UoXBqdGZs4NK+OllKvm5eHfHHB8CV569MtGTEEzt6mckLNAh4uRMzuw==
+X-Gm-Gg: ASbGncug6/6EQ5Cq0tfi5JvpvC/MgrKBT2VrCRd8HsEFf79h4VF17Fp4Hv6BLwk/R2X
+	C9ZCB1Vc8V3uWkL3iqlbxuu0zoVm0i3l4U5qbqy2eAGHDiVvuHtNO2EnXgFLdKVjNzRHeNoJpLS
+	hMPWa2Mc2qKVw5IPguwpTj8xisd1v9YObcsHVxQOvKvucnZbSoumt48ayivqpp2orSuR3ZmXpXk
+	bwkb08LSRAAzphBQUJE/jjonwu+RSmVfLANRpEUAZq8Et+bGzRi98GMXecEwAvDteZG2Vy4FjR4
+	xFKj
+X-Received: by 2002:a05:620a:d8d:b0:7b6:d026:293 with SMTP id af79cd13be357-7bffccc5cf2mr3294138985a.9.1738632615177;
+        Mon, 03 Feb 2025 17:30:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGlYIWzD9OzwmupzIB0M8wCq/FE/w99pzSNI+Y/G8BzsEVGCc3Nn2YWiDO+Q8F6Zyh0IV6L/g==
+X-Received: by 2002:a05:620a:d8d:b0:7b6:d026:293 with SMTP id af79cd13be357-7bffccc5cf2mr3294135585a.9.1738632614765;
+        Mon, 03 Feb 2025 17:30:14 -0800 (PST)
 Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a8bbe3asm589043585a.15.2025.02.03.17.23.35
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a9205f4sm588926385a.114.2025.02.03.17.30.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 17:23:35 -0800 (PST)
-Message-ID: <0e4bd3004d97b145037c36c785c19e97b6995d42.camel@redhat.com>
-Subject: Re: [PATCH 3/3] KVM: x86: Decouple APICv activation state from
- apicv_inhibit_reasons
+        Mon, 03 Feb 2025 17:30:14 -0800 (PST)
+Message-ID: <dc784d6e4f6c4478fc18e0bc2d5df56af40d0019.camel@redhat.com>
+Subject: Re: [PATCH 1/3] KVM: x86: hyper-v: Convert synic_auto_eoi_used to
+ an atomic
 From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-Cc: "Naveen N Rao (AMD)" <naveen@kernel.org>, kvm@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Suravee Suthikulpanit
+To: "Naveen N Rao (AMD)" <naveen@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  Suravee Suthikulpanit
  <suravee.suthikulpanit@amd.com>, Vasant Hegde <vasant.hegde@amd.com>,
  Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Mon, 03 Feb 2025 20:23:34 -0500
-In-Reply-To: <Z6FVaLOsPqmAPNWu@google.com>
+Date: Mon, 03 Feb 2025 20:30:13 -0500
+In-Reply-To: <3d8ed6be41358c7635bd4e09ecdfd1bc77ce83df.1738595289.git.naveen@kernel.org>
 References: <cover.1738595289.git.naveen@kernel.org>
-	 <405a98c2f21b9fe73eddbc35c80b60d6523db70c.1738595289.git.naveen@kernel.org>
-	 <Z6EOxxZA9XLdXvrA@google.com>
-	 <60cef3e4-8e94-4cf1-92ae-34089e78a82d@redhat.com>
-	 <Z6FVaLOsPqmAPNWu@google.com>
+	 <3d8ed6be41358c7635bd4e09ecdfd1bc77ce83df.1738595289.git.naveen@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -106,116 +103,96 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Mon, 2025-02-03 at 15:46 -0800, Sean Christopherson wrote:
-> On Mon, Feb 03, 2025, Paolo Bonzini wrote:
-> > On 2/3/25 19:45, Sean Christopherson wrote:
-> > > Unless there's a very, very good reason to support a use case that generates
-> > > ExtInts during boot, but _only_ during boot, and otherwise doesn't have any APICv
-> > > ihibits, I'm leaning towards making SVM's IRQ window inhibit sticky, i.e. never
-> > > clear it.
-> > 
-> > BIOS tends to use PIT, so that may be too much.  With respect to Naveen's report
-> > of contention on apicv_update_lock, I would go with the sticky-bit idea but apply
-> > it to APICV_INHIBIT_REASON_PIT_REINJ.
+On Mon, 2025-02-03 at 22:33 +0530, Naveen N Rao (AMD) wrote:
+> apicv_update_lock is primarily meant for protecting updates to the apicv
+> state, and is not necessary for guarding updates to synic_auto_eoi_used.
+> Convert synic_auto_eoi_used to an atomic and use
+> kvm_set_or_clear_apicv_inhibit() helper to simplify the logic.
 > 
-> That won't work, at least not with yet more changes, because KVM creates the
-> in-kernel PIT with reinjection enabled by default.  The stick-bit idea is that
-> if a bit is set and can never be cleared, then there's no need to track new
-> updates.  Since userspace needs to explicitly disable reinjection, the inhibit
-> can't be sticky.
-I confirmed this with a trace, this is indeed the case.
-
+> Signed-off-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  7 ++-----
+>  arch/x86/kvm/hyperv.c           | 17 +++++------------
+>  2 files changed, 7 insertions(+), 17 deletions(-)
 > 
-> I assume We could fudge around that easily enough by deferring the inhibit until
-> a vCPU is created (or run?), but piggybacking PIT_REINJ won't help the userspace
-> I/O APIC case.
-> 
-> > I don't love adding another inhibit reason but, together, these two should
-> > remove the contention on apicv_update_lock.  Another idea could be to move
-> > IRQWIN to per-vCPU reason but Maxim tells me that it's not so easy.
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 5193c3dfbce1..fb93563714c2 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1150,11 +1150,8 @@ struct kvm_hv {
+>  	/* How many vCPUs have VP index != vCPU index */
+>  	atomic_t num_mismatched_vp_indexes;
+>  
+> -	/*
+> -	 * How many SynICs use 'AutoEOI' feature
+> -	 * (protected by arch.apicv_update_lock)
+> -	 */
+> -	unsigned int synic_auto_eoi_used;
+> +	/* How many SynICs use 'AutoEOI' feature */
+> +	atomic_t synic_auto_eoi_used;
+>  
+>  	struct kvm_hv_syndbg hv_syndbg;
+>  
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 6a6dd5a84f22..7a4554ea1d16 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -131,25 +131,18 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+>  	if (auto_eoi_old == auto_eoi_new)
+>  		return;
+>  
+> -	if (!enable_apicv)
+> -		return;
+> -
+> -	down_write(&vcpu->kvm->arch.apicv_update_lock);
+> -
+>  	if (auto_eoi_new)
+> -		hv->synic_auto_eoi_used++;
+> +		atomic_inc(&hv->synic_auto_eoi_used);
+>  	else
+> -		hv->synic_auto_eoi_used--;
+> +		atomic_dec(&hv->synic_auto_eoi_used);
+>  
+>  	/*
+>  	 * Inhibit APICv if any vCPU is using SynIC's AutoEOI, which relies on
+>  	 * the hypervisor to manually inject IRQs.
+>  	 */
+> -	__kvm_set_or_clear_apicv_inhibit(vcpu->kvm,
+> -					 APICV_INHIBIT_REASON_HYPERV,
+> -					 !!hv->synic_auto_eoi_used);
+> -
+> -	up_write(&vcpu->kvm->arch.apicv_update_lock);
+> +	kvm_set_or_clear_apicv_inhibit(vcpu->kvm,
+> +				       APICV_INHIBIT_REASON_HYPERV,
+> +				       !!atomic_read(&hv->synic_auto_eoi_used));
 
-I retract this statement, it was based on my knowledge from back when I implemented it.
+Hi,
 
-Looking at the current code again, this should be possible and can be a nice cleanup regardless.
+This introduces a race, because there is a race window between
+the moment we read hv->synic_auto_eoi_used, and decide to set/clear the inhibit.
 
-(Or I just might have forgotten the reason that made me think back then that this is not worth it,
-because I do remember well that I wanted to make IRQWIN inhibit to be per vcpu)
+After we read hv->synic_auto_eoi_used, but before we call the kvm_set_or_clear_apicv_inhibit,
+other core might also run synic_update_vector and change hv->synic_auto_eoi_used, 
+finish setting the inhibit in kvm_set_or_clear_apicv_inhibit,
+and only then we will call kvm_set_or_clear_apicv_inhibit with the stale value of hv->synic_auto_eoi_used and clear it.
 
-Basically to do so we need to introduce per-vcpu inhibit field (instead of .vcpu_get_apicv_inhibit_reasons callback)
-set the inhibit bit there in svm_enable_irq_window, and raise KVM_REQ_APICV_UPDATE.
-
-Same thing in interrupt_window_interception().
-
-Nested code can be updated to do so as well very easily. IMHO this is a very nice cleanup.
-
-I'll prepare a patch soon for this.
-
-Also regardless, I strongly support Paolo's idea to inhibit APICv/AVIC when more than one ExtINT entry is
-enabled, although this might not be enough:
-
-In fact multiple vCPUs with ExtINT enabled I think can trigger the WARN_ON_ONCE below:
-
-kvm_cpu_has_extint will be true on both vCPUs, so kvm_cpu_has_injectable_intr will be true on both
-vCPUs as well, and thus both vCPUs can try to pull the interrupt from PIC, with second one likely getting -1,
-and that not to mention the possibility of corrupting PIC state due to the concurrent access.
-
-
-I am talking about this code:
-
-
-	if (kvm_cpu_has_injectable_intr(vcpu)) {
-		r = can_inject ? kvm_x86_call(interrupt_allowed)(vcpu, true) :
-				 -EBUSY;
-		if (r < 0)
-			goto out;
-		if (r) {
-			int irq = kvm_cpu_get_interrupt(vcpu);
-
-			if (!WARN_ON_ONCE(irq == -1)) {
-				kvm_queue_interrupt(vcpu, irq, false);
-				kvm_x86_call(inject_irq)(vcpu, false);
-				WARN_ON(kvm_x86_call(interrupt_allowed)(vcpu, true) < 0);
-			}
-		}
-		if (kvm_cpu_has_injectable_intr(vcpu))
-			kvm_x86_call(enable_irq_window)(vcpu);
-	}
-
-
-So we might need to do something stronger than only inhibiting APICv/AVIC, we might
-want to ignore second ExtINT entry, or maybe even better ignore both ExtInt entries and refuse to deliver ExtINT at all? 
-(the guest is broken (Intel says that this configuration is frowned upon), so IMHO it deserves to keep both pieces. Do you agree?)
-
+IMHO, knowing that this code is mostly a precaution and that modern windows doesn't use AutoEOI
+(at least when AutoEOI deprecation bit is set), instead of counting, we can unconditionally
+inhibit the APICv when the guest attempts to use AutoEOI once.
+But as usual I won't be surprised that this breaks *some* old and/or odd windows versions.
 
 Best regards,
 	Maxim Levitsky
 
 
 
-> 
-> Oh, yeah, that reminds me of the other reason I would vote for a sticky flag:
-> if inhibition really is toggling rapidly, performance is going to be quite bad
-> because inhibiting APICv requires (a) zapping APIC SPTEs and (b) serializing
-> writers if multiple vCPUs trigger the 0=>1 transition.
-> 
-> And there's some amount of serialization even if there's only a single writer,
-> as KVM kicks all vCPUs to toggle APICv (and again to flush TLBs, if necessary).
-> 
-> Hmm, something doesn't add up.  Naveen's changelog says:
-> 
->   KVM additionally inhibits AVIC for requesting a IRQ window every time it has
->   to inject external interrupts resulting in a barrage of inhibits being set and
->   cleared. This shows significant performance degradation compared to AVIC being
->   disabled, due to high contention on apicv_update_lock.
-> 
-> But if this is a "real world" use case where the only source of ExtInt is the
-> PIT, and kernels typically only wire up the PIT to the BSP, why is there
-> contention on apicv_update_lock?  APICv isn't actually being toggled, so readers
-> blocking writers to handle KVM_REQ_APICV_UPDATE shouldn't be a problem.
-> 
-> Naveen, do you know why there's a contention on apicv_update_lock?  Are multiple
-> vCPUs actually trying to inject ExtInt?
-> 
+
+
+>  }
+>  
+>  static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
+
+
 
 
 
