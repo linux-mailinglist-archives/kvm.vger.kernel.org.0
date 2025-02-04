@@ -1,87 +1,88 @@
-Return-Path: <kvm+bounces-37254-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71BCDA278C4
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 18:42:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0486A278F5
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 18:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDEB9165D64
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 17:42:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39C471670A0
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 17:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957CC21638F;
-	Tue,  4 Feb 2025 17:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0F32163AA;
+	Tue,  4 Feb 2025 17:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OKqUu500"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g+Kfig3K"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22603213E82
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 17:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED40215F74
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 17:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738690953; cv=none; b=DrQbR+qGS+qO8UJQeyZTVV0VLjB9JSlfrbWH8AoRh4j9OJ+Bv/uGZKv7xSo3DPWj0NOugP/xEklvcmOoMsHN9YAi5Rhln3JU5wfUZFdImNvz3XuqkKCv45laxX7lvdJH5YYOGJphkMUmrxAZwfsGy5kIIB6lgNy9KFH9WORBM3E=
+	t=1738691427; cv=none; b=HM/HorcwLOo2Qm0VZhk6C8D/0v0A8w+H2LqAJr8d6hCvZ/REs4+j0tk+HF3+jvh+OgO/jMbmM1WNUuHNXlnBtFaq47KD5AynZR3RjdrUDXjPq4YcswK62GrzCl5otC2JolLEDSsz643cBt/DRTBXDe98YQlxQwEnA6bbU/n068E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738690953; c=relaxed/simple;
-	bh=TE2nvjzS9waRQRDvTmhX5eCI5Y3S1yUETwOVB+l2HRY=;
+	s=arc-20240116; t=1738691427; c=relaxed/simple;
+	bh=fDOCUG4Wa9wQYfo76718L/VAMknz9Dzh++Xf+8VgtXk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mYRF4YpvHoG3iDBHpGLGr8R+b4LtC0/8lTQaP6fF8OwpL9m6czpxv12eWMx0pkWR9Cx9E+NLZgIjcdJpDAoHxle/EhqMITOQzPJyj5dNbG1jkN89bMAjM5+ejq4QtpZ9NRcxcPqT6eWeQp4NKh1NkX7kWp+OGI4KfYkLv/YIdJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OKqUu500; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=d+k5JVmtMmcpN8kHLELA48Tm2IPWKm8Yrt2UfdEmF2L0f6BupcsJG7+m2Ys+mKam1z1uDuiqzf0Oj9ALykGtXLCeqSnXINWcgz7dxe04kE13kC69fctCoHJouziRfHFM/jxCTb0ytpv/YBPM+nbFkEBC1AXzPi+HMrB+zQuMGrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g+Kfig3K; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738690950;
+	s=mimecast20190719; t=1738691424;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6xvLMBbIJRGPQ6vbqTTrPD/v72AS7GvH4rIHfkZKoNw=;
-	b=OKqUu500ApJ9lC+1b3zLtdWp4enKK48UUL0u01S7BntIEi8rg/Y5k3+9kpAULILv1VOFI0
-	OllPTX3L8B5XJUL+wD0KiZtobOy6UV3yTh271D+YNeip/N+pfxYMAxRnxBGtYcTjhmeiuw
-	ZgENUaCP2JVkIlaVRtRlrnEI5GRzlDY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cCAfUQtOu7IcGoh9whRLfLqU6KGUvoUvxjONbv3P3nc=;
+	b=g+Kfig3KQwESAph+yHmRK86AjiURy+aOOkYFH46aFEET6QDIt1gx59yGQXa4aw+reNNWS+
+	YiYC2yhHOmEprIyzP+nId9EMw+vODckMYFi34H5QMU4TGMB8k/UsJYprP4tzWejozVJRgl
+	TlbMh9unZJ0ERCnUtYElqjxTSFYvO60=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-nZ0GuY0VNeGB6HP0fuhW8w-1; Tue, 04 Feb 2025 12:42:28 -0500
-X-MC-Unique: nZ0GuY0VNeGB6HP0fuhW8w-1
-X-Mimecast-MFC-AGG-ID: nZ0GuY0VNeGB6HP0fuhW8w
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38da839b458so520535f8f.2
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 09:42:28 -0800 (PST)
+ us-mta-226-hL5p7Qt0Pla_-t6UJ2CJsA-1; Tue, 04 Feb 2025 12:50:23 -0500
+X-MC-Unique: hL5p7Qt0Pla_-t6UJ2CJsA-1
+X-Mimecast-MFC-AGG-ID: hL5p7Qt0Pla_-t6UJ2CJsA
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-436219070b4so30906245e9.1
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 09:50:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738690947; x=1739295747;
+        d=1e100.net; s=20230601; t=1738691420; x=1739296220;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=6xvLMBbIJRGPQ6vbqTTrPD/v72AS7GvH4rIHfkZKoNw=;
-        b=SfraCKFfUCHOKY/oPJmqbinw35KaCV3m7/aQzX+iAW42RFLb2oKzHemNkPjZ6KTYeL
-         vq/j2CfPLj6i0onZWwVVLovIEiAzpoifo1okAqzu1dpJukLtBEegnSA8yqClCSKzhJqf
-         8WEtqPdW90qEfB5LEI9Bc4sd3q91h/hdyqgIQyiAXPRFBHi/Zbvy2PN9X+tgEEytGDvF
-         qV3/ICVhdj+Mmhys3NkLWjp9y6SmD6af5KsmWfKTFSM/ywR7M5jfAsy+ifrG+LdkPL9r
-         8ImctGxX1dHCXfIeqiqwKnGkRDDKYJhGq+eol2AXhpQCnJxHLCkPtJsZXMXmIQGlPEyb
-         8bHA==
-X-Gm-Message-State: AOJu0YzI7OfFWaJs71SfjwVHyMCXm5Z+Rid204Xlgmxeje0xJ/RzHWqF
-	8g1ZATj/ig51Un4cJ3VgBkM3fO6NZ+1H92DAwgWB+Aa0wb8y8yox3qDmihbHWUdyPna+YlRlCNp
-	iWFJN6e11786cHmzzZvx/4B0YR2eaiBxywIZb+4XjnDRfKftERw==
-X-Gm-Gg: ASbGncukEAKCFe/ILYb7fePh+fr+Kc77bGTsKnXvynfcM6HKX7jjQ02G2SdVrti7XAA
-	/XQCjXiklqL8iyWpHEtH3hUhqOKT1MwstSrADNh+BcHIyp0mp4LFJKBWpffnfyA//r2pBdMAVhr
-	JXAXSahGXnbvbx5uPzIUyi59vwR/q0Hv5T3G8dYEwNciiTSgoGMnvarAwLeS5GfTcCZOvSTMStk
-	0po071lcgo0uC2kFuCbEjcqwzxN6uW1nbxXtSTuwODVGoyRhMoUhVlGfK1zl9cmq3ZbV9Fyg8jU
-	HXmYe7ICTmUHVygp5Atia/qYyKrMNxK1AUjzqFxs3/q/RI0rgzM4EApU6IYMqGhaYW7H2M+VZVJ
-	swMPoTVnJG65i0cbX1uNKTyhclL8=
-X-Received: by 2002:a05:6000:1843:b0:38c:5d42:152b with SMTP id ffacd0b85a97d-38c5d421959mr17554952f8f.54.1738690947621;
-        Tue, 04 Feb 2025 09:42:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IELvjoW4MAsrHMrqVA+MWQOCPc8cn37hi3pvEa8AmqT2Q9JgqOf2fdpvq5Mt4lYJjWB3ZC72A==
-X-Received: by 2002:a05:6000:1843:b0:38c:5d42:152b with SMTP id ffacd0b85a97d-38c5d421959mr17554942f8f.54.1738690947283;
-        Tue, 04 Feb 2025 09:42:27 -0800 (PST)
+        bh=cCAfUQtOu7IcGoh9whRLfLqU6KGUvoUvxjONbv3P3nc=;
+        b=s/ZC9I7SXogrMr7RMF4oR43dOuqc7tvys12ibsLglvzr45azwnxYuu2XvU8IJopo9c
+         b4J3xPzmpLJALv0GBirTlrvtBUzvN9vEGbwfTCvmR6OQMsYa9TsTntpaydNZE9lnsmuL
+         Ud/uklUbzUFvVCMtfDRvO+OwsBU0L7ceb2jb5F1+BX9zFKc4gvFKJwtnEL/2VrQgJo82
+         aZSVAd7KK0fZfQauomi+ltJt+wohhK21AdQTrTM/jZCnzZU/ptFShg6fAe6evXzFUIM2
+         VnDVzjHCQxYmsqEBXdSWtWFUHr6iD/ler5IVVe+cvvWZbEMm9H4ybh1MjgXjXH+AtEvq
+         9tkA==
+X-Forwarded-Encrypted: i=1; AJvYcCWGg6nuSpit+iwJNjIFP8eEt8lumYx1pqZSk06PtnCr6JG32EhuKhNBMRjJzMvk2tBnOlI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0opoU7cIxXp9S2PdqSzOHsX8wP9aypqMdz8fsNAi6Fl7jCI/T
+	vaJ4dUOqudrqbCXpR7KMgBAT1fczjiRBgDcJxHmIjlb36jCXM1wxtrb5S21aTyszQcmm67b2EEi
+	ud1rdtqdhHfZECV+wTVzz9HnQQoRUgKJuMi8CamY+Wp+9eHhTkw==
+X-Gm-Gg: ASbGncvE82I7Lytk0YuQa9/pIcmcBY1s5gifXRESQGvMzm5E7s4umuv4gX03PcairSM
+	4QMtdxM4JVh87vKgazZdTk12Q8iL2n6nMweQ07EVClL0le4PDKhqKOdFUwJAj88B2vADzmBUq8h
+	V0P5lQflZiADNZwmwBTghWeMpusXBEIT6r7DHLaZmneMdNyCLtmYAEKck3MMTX2Wf2+nhdS+69R
+	3vrZ6HzVFdw2TeKnv+zAakeJQ/ltlteM/izGqcxotUwQ0BuCH3hotuqKCxXNrYqAIOH+BPhWtRS
+	CFlmuUawDrdZUWzfVELZYFxNwx+hJbBi018esuI1Ol7sjIBcmpi/xSeQOt9eTJelj1XvLFJrehq
+	XOY8RK56sSZyABbm1EKa6rYCdrPw=
+X-Received: by 2002:a5d:47a8:0:b0:38d:b1a5:3f7d with SMTP id ffacd0b85a97d-38db1a54457mr897904f8f.5.1738691420547;
+        Tue, 04 Feb 2025 09:50:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFKHaQ78txw70BlPWkqNs3FNC+578qbzMprMfPcUy14Rd4z5YUhWmjXpg8KqoyDaBgkv2j1BA==
+X-Received: by 2002:a5d:47a8:0:b0:38d:b1a5:3f7d with SMTP id ffacd0b85a97d-38db1a54457mr897890f8f.5.1738691420179;
+        Tue, 04 Feb 2025 09:50:20 -0800 (PST)
 Received: from ?IPV6:2003:cb:c70a:300:3ae1:c3c0:cef:8413? (p200300cbc70a03003ae1c3c00cef8413.dip0.t-ipconnect.de. [2003:cb:c70a:300:3ae1:c3c0:cef:8413])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38db15f7712sm899214f8f.49.2025.02.04.09.42.25
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1b547csm16633215f8f.62.2025.02.04.09.50.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 09:42:26 -0800 (PST)
-Message-ID: <6356ce2f-0e41-4d6d-a019-5164af502de6@redhat.com>
-Date: Tue, 4 Feb 2025 18:42:24 +0100
+        Tue, 04 Feb 2025 09:50:19 -0800 (PST)
+Message-ID: <7a899f00-833e-4472-abc5-b2b9173eb133@redhat.com>
+Date: Tue, 4 Feb 2025 18:50:17 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,17 +90,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 4/6] numa: Introduce and use ram_block_notify_remap()
-To: Peter Xu <peterx@redhat.com>, =?UTF-8?Q?=E2=80=9CWilliam_Roche?=
- <william.roche@oracle.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- pbonzini@redhat.com, richard.henderson@linaro.org, philmd@linaro.org,
- peter.maydell@linaro.org, mtosatti@redhat.com, imammedo@redhat.com,
- eduardo@habkost.net, marcel.apfelbaum@gmail.com, wangyanan55@huawei.com,
- zhao1.liu@intel.com, joao.m.martins@oracle.com
+Subject: Re: [PATCH v7 6/6] hostmem: Handle remapping of RAM
+To: =?UTF-8?Q?=E2=80=9CWilliam_Roche?= <william.roche@oracle.com>,
+ kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peterx@redhat.com, pbonzini@redhat.com, richard.henderson@linaro.org,
+ philmd@linaro.org, peter.maydell@linaro.org, mtosatti@redhat.com,
+ imammedo@redhat.com, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
+ wangyanan55@huawei.com, zhao1.liu@intel.com, joao.m.martins@oracle.com
 References: <20250201095726.3768796-1-william.roche@oracle.com>
- <20250201095726.3768796-5-william.roche@oracle.com>
- <Z6JLmG8srpk9_3Jn@x1.local>
+ <20250201095726.3768796-7-william.roche@oracle.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -147,42 +146,37 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <Z6JLmG8srpk9_3Jn@x1.local>
+In-Reply-To: <20250201095726.3768796-7-william.roche@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 04.02.25 18:17, Peter Xu wrote:
-> On Sat, Feb 01, 2025 at 09:57:24AM +0000, “William Roche wrote:
->> From: David Hildenbrand <david@redhat.com>
->>
->> Notify registered listeners about the remap at the end of
->> qemu_ram_remap() so e.g., a memory backend can re-apply its
->> settings correctly.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> Signed-off-by: William Roche <william.roche@oracle.com>
-> 
-> IIUC logically speaking we don't need a global remap notifier - here a
-> per-ramblock notifier looks more reasonable, like RAMBlock.resized().
+>       /*
+> @@ -595,6 +628,7 @@ static const TypeInfo host_memory_backend_info = {
+>       .instance_size = sizeof(HostMemoryBackend),
+>       .instance_init = host_memory_backend_init,
+>       .instance_post_init = host_memory_backend_post_init,
+> +    .instance_finalize = host_memory_backend_finalize,
+>       .interfaces = (InterfaceInfo[]) {
+>           { TYPE_USER_CREATABLE },
+>           { }
+> diff --git a/include/system/hostmem.h b/include/system/hostmem.h
+> index 5c21ca55c0..170849e8a4 100644
+> --- a/include/system/hostmem.h
+> +++ b/include/system/hostmem.h
+> @@ -83,6 +83,7 @@ struct HostMemoryBackend {
+>       HostMemPolicy policy;
+>   
+>       MemoryRegion mr;
+> +    RAMBlockNotifier ram_notifier;
+>   };
 
-Right. Note that qemu_ram_resize() also triggers global notifiers.
+Thinking about Peters comment, it would be a nice improvement to have a 
+single global memory-backend notifier that looks up the fitting memory 
+backend, instead of having one per memory backend.
 
-> It'll change the notify path from O(N**2) to O(N).  After all, backend1's
-> notifier won't care other ramblock's remap() events but only itself's.
-> 
-> It's not a huge deal as I expect we don't have a huge amount of ramblocks,
-> but looks like this series will miss the recent pull anyway..  so let me
-> comment as so on this one for consideration when respin.
-
-... and ram remap during reboot is not particularly the fast path we 
-care about (or should be caring about).
-
-> 
-> We could also merge partial of the series to fix hugetlb poisoning first,
-> as this one looks like can be separately done too.
-
-hugetlb frequently uses preallocation, and the remaining patches in this 
-series make sure preallocation after remapping happens.
+A per-ramblock notifier might also be possible, but that's a bit 
+harder/ackward to configure: e.g., the resize callback is passed to 
+memory_region_init_resizeable_ram() right now.
 
 -- 
 Cheers,
