@@ -1,170 +1,261 @@
-Return-Path: <kvm+bounces-37217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC1AA26EA4
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 10:38:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130C7A26F00
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 11:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB4737A48E0
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 09:37:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C188818875AA
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 10:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F4B207E0F;
-	Tue,  4 Feb 2025 09:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C2720B1EF;
+	Tue,  4 Feb 2025 10:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jg05QVcz"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eoIHZIo8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDEA207DE0;
-	Tue,  4 Feb 2025 09:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21AAE20A5DF;
+	Tue,  4 Feb 2025 10:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738661896; cv=none; b=iR1v7+7Awqn5tpdP444WVrPhejr4cWeIsw88yTRoFH6R5lh4WNKWZYMXs808zzHA4NHI4fHcTMkNy8bs6xO8q+0uTQ88g6t7dEMpgDQq3PN4LlOK4lboACILtT2Tj81DiBSoF31RpoFl/al0XRvSDX5pVUI82VIWSTNjfbuunHc=
+	t=1738663467; cv=none; b=kRz+uRyvB2ynjxmH+duI1Q6/bqF0BD23Q/miSX0k0nL8VD6PTf9VQ1h4MrmiP1HlmGSmnRI8BCgZ0CRcRIxNCoZijbcrMhxFaqceBXaGmxMTvGpalkelPisrrA2qCXDYvYK0xV+DpES7nqNXY8hjo/C9ZzeU2hLVmnkcDogeVrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738661896; c=relaxed/simple;
-	bh=oOeCzDXeF8jK6OYqKTjdctgjul+DBpGMXax4zVKoOzg=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=r0jjhc4YhctVRUN/7DqBoNURYAUIHdka7Dw8wDDL4Rf4HTMd3qdHr0EE5ePUcmyCKD6p5aY5HR+qEu/4YDwal8Il2pf/CikONtwFPx731py8X9Bhs9kngF23FdYV8qlmRLeqpCpmuWJkYBmCwcf2y3jVerN4ONAPIBoptN6cGi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jg05QVcz; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aa67ac42819so803806266b.0;
-        Tue, 04 Feb 2025 01:38:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738661893; x=1739266693; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CxrGF0NbT5RA+zpDXBklhKJHF4FCs+rYNXfB+92lHyY=;
-        b=Jg05QVcz3t9E4ZZU/7V568jFU9lGpluCCawgT96l2zW4x7NfQOGRTPeJG5UV0amvbN
-         OmaaOijoU+Q70kd7Fj8Hy11XoY5ZlXtaHPiN14ipFX48vaZafxzHIRWXYDaxlRjNQRX1
-         CMFbogxlkR+8Jr3FuVNiaXsT+i0mGTdEuuiBIDi0FQiam8tnllI8lNXYVEBmTY50pHdI
-         N2Hh5P7d2p6bpp7NltaVk/pG4Z1ZyqHHLFzv0kCx8A0ayFUutcKyfgcoauF+LjIn5o85
-         tDpSEWbr8iBAOqLK+feLBCrfsB/7va8AatGpBi10yqDNn7jLkwZfpgIGnxN2kgRqa73r
-         pK0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738661893; x=1739266693;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CxrGF0NbT5RA+zpDXBklhKJHF4FCs+rYNXfB+92lHyY=;
-        b=fZKsh98QMZygzzjeHy8A1eeK1tdi+Zf8gtbL6dZdkkiVW74bfUAdr0xKSezCgwwWVr
-         IupI0lQGPiAzUw4+6uu0fgC8gZ4dHkeblDi2aMl51pgq8o49hZpzPn7lBTp+79l2zHy8
-         yT2v3UeY0o1A0kX7pDDBe7ueGdvYDuQUtvOB33Bsem/22uyHkfEeZ1TZCWCtW5e3E8St
-         DuwnpWvD/Tdb47wZKsflkCTSSAnvKwUJqV47SOPkPmIfHr89+ySgXdwBVFs1uCDU9iiW
-         B1qmg4EIYyDYzNGClgf5dX0rgBiEfL9z32F86Kt/FVpxeVGCxyFeHgCGqDDU1CW3p+7o
-         FGlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURScQybXy2VzozAvtYkau6ioXdV18D/MW+62WyHZRtYMJntw1RAnt0CI1p07efbaII3RxeNI9+WihiKLk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP5uA0BrSx2EtwXl2qh5G6v7/OEziQaPnSUW52ipJ1DT+VNwUa
-	nk5qy6G2T39T6cgC3V3XjI5vawUWd7Pcy6UE+L68FDcDclWV2Q0X
-X-Gm-Gg: ASbGnctOVzpMpzNpWVZU0TdvJ1tCpq2VUNjCEkUPiheI44VQ3vB6jskeStSTnRvj8iD
-	vtHdGJdy6PH8QbBSfJdGUjhYB+QwZgs5iPBcuRwdP+i8bAOOpfdzTzAa4hhQD1+wmrKEnqkhITL
-	ViaEptj7mV6AeZk2lv3abdx1Kk8vQzJgjGIklOP26v3ZEhTTzvrXSq/AKejRyNfx+oIXbMlHnJQ
-	+vddwvV3EFuouC6LXOEZeG0+RbsNCa3c9Ik6Dl/PlMKFIOTSgh17ap+KxFRN5PG/W/9UP6iffAO
-	INbHV2LybrlsWp3PrlZoBLwdycX2n6/jIZQIHdaZkMVeXtU=
-X-Google-Smtp-Source: AGHT+IFDwdCbXMxp8UJ7YfuN/ii8dyMqd4tJD/SwNfC/IgqAQPvlPzSwxAoJ1hb9zADxwcscQVMWbQ==
-X-Received: by 2002:a17:907:9482:b0:ab6:85dc:b6d4 with SMTP id a640c23a62f3a-ab6cfcb3b63mr2934683366b.9.1738661892933;
-        Tue, 04 Feb 2025 01:38:12 -0800 (PST)
-Received: from [192.168.20.51] (54-240-197-238.amazon.com. [54.240.197.238])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab74f50df2csm49252166b.141.2025.02.04.01.38.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 01:38:12 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <6b2d960c-1340-4e91-ad17-0ccadd378a81@xen.org>
-Date: Tue, 4 Feb 2025 09:38:11 +0000
+	s=arc-20240116; t=1738663467; c=relaxed/simple;
+	bh=pAD2v7iFBPcvtJWA4lxeW6rcj2wAhdg+3r56YWD7A+o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JskgCxqPCbkMPlnR0OC5/6FR04qtkEKspfmbISKOi7Yrjk1JKvp8Dx9DEU4VIAaU+rMaNO8XUTSc7q1U+RH1l1TEGXoDtTztEC4kTXBI1ScPuQhGKX0rVuuwrdQrK1KW8DgXhk4rvXtM0Uxb/sPyKEC9Ba8jiTNLcvn266gjjb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eoIHZIo8; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51418rIY023957;
+	Tue, 4 Feb 2025 10:04:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=oSsLQ4Frez4nfaW9l/Yz0IurUPcJLUSH7RH8Gey9S
+	/Q=; b=eoIHZIo8oVgeID1kI/8qyN2MiloBFcuN9LdWDFFjiiODB2J9bfh/u830V
+	y/bO2Vs8exv6B4VToyrPbsWxUUkrtZBKQV8zTDDbRli8CbTcD6IkCx0OzU0xI7c2
+	fQS3S//9iGj5X2w+LxFYTJhzuC4xgH31/+b01cudR6m4s63i6l5y0Wb1DLK1TNBJ
+	KMTwIZ7cPU79gE12lTGVfxRKi4tgHOaOLIo0SROiApzGh8xDQVYoZNXFfJ0PAO8Y
+	+GEaPmeigVSHlgOwzdEJ1lvIaB909inP60vSGoIto/CjLXzp+z1xSdhGbcPbCLfd
+	t6aOt/lBmyT9T4l+kEK/Z1NNFhAGQ==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44k8y9j6c8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Feb 2025 10:04:24 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5147rgM4016271;
+	Tue, 4 Feb 2025 10:04:24 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44hwxsb3qb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Feb 2025 10:04:24 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 514A4KT633554970
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Feb 2025 10:04:20 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6EB28200BC;
+	Tue,  4 Feb 2025 10:04:20 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 51482200BA;
+	Tue,  4 Feb 2025 10:04:20 +0000 (GMT)
+Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Feb 2025 10:04:20 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+        hca@linux.ibm.com
+Subject: [kvm-unit-tests PATCH] lib: s390x: css: Name inline assembly arguments and clean them up
+Date: Tue,  4 Feb 2025 09:51:33 +0000
+Message-ID: <20250204100339.28158-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v2 08/11] KVM: x86: Pass reference pvclock as a param to
- kvm_setup_guest_pvclock()
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+352e553a86e0d75f5120@syzkaller.appspotmail.com,
- Paul Durrant <pdurrant@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20250201013827.680235-1-seanjc@google.com>
- <20250201013827.680235-9-seanjc@google.com>
- <792ae6f4-903f-41b2-a0f2-369d92a1fc3f@xen.org>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <792ae6f4-903f-41b2-a0f2-369d92a1fc3f@xen.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hrjkH3R5kfYCOLtpYG10vHAloNw-nGMO
+X-Proofpoint-ORIG-GUID: hrjkH3R5kfYCOLtpYG10vHAloNw-nGMO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-04_04,2025-01-31_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ mlxlogscore=957 suspectscore=0 lowpriorityscore=0 clxscore=1015
+ spamscore=0 mlxscore=0 adultscore=0 impostorscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502040080
 
-On 04/02/2025 09:33, Paul Durrant wrote:
-> On 01/02/2025 01:38, Sean Christopherson wrote:
->> Pass the reference pvclock structure that's used to setup each individual
->> pvclock as a parameter to kvm_setup_guest_pvclock() as a preparatory step
->> toward removing kvm_vcpu_arch.hv_clock.
->>
->> No functional change intended.
->>
->> Reviewed-by: Paul Durrant <paul@xen.org>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> ---
->>   arch/x86/kvm/x86.c | 14 +++++++-------
->>   1 file changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 5f3ad13a8ac7..06d27b3cc207 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -3116,17 +3116,17 @@ u64 get_kvmclock_ns(struct kvm *kvm)
->>       return data.clock;
->>   }
->> -static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
->> +static void kvm_setup_guest_pvclock(struct pvclock_vcpu_time_info 
->> *ref_hv_clock,
->> +                    struct kvm_vcpu *vcpu,
-> 
-> So, here 'v' becomes 'vcpu'
-> 
->>                       struct gfn_to_pfn_cache *gpc,
->>                       unsigned int offset,
->>                       bool force_tsc_unstable)
->>   {
->> -    struct kvm_vcpu_arch *vcpu = &v->arch;
->>       struct pvclock_vcpu_time_info *guest_hv_clock;
->>       struct pvclock_vcpu_time_info hv_clock;
->>       unsigned long flags;
->> -    memcpy(&hv_clock, &vcpu->hv_clock, sizeof(hv_clock));
->> +    memcpy(&hv_clock, ref_hv_clock, sizeof(hv_clock));
->>       read_lock_irqsave(&gpc->lock, flags);
->>       while (!kvm_gpc_check(gpc, offset + sizeof(*guest_hv_clock))) {
->> @@ -3165,7 +3165,7 @@ static void kvm_setup_guest_pvclock(struct 
->> kvm_vcpu *v,
->>       kvm_gpc_mark_dirty_in_slot(gpc);
->>       read_unlock_irqrestore(&gpc->lock, flags);
->> -    trace_kvm_pvclock_update(v->vcpu_id, &hv_clock);
->> +    trace_kvm_pvclock_update(vcpu->vcpu_id, &hv_clock);
->>   }
->>   static int kvm_guest_time_update(struct kvm_vcpu *v)
->> @@ -3272,18 +3272,18 @@ static int kvm_guest_time_update(struct 
->> kvm_vcpu *v)
->>               vcpu->hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
->>               vcpu->pvclock_set_guest_stopped_request = false;
->>           }
->> -        kvm_setup_guest_pvclock(v, &vcpu->pv_time, 0, false);
->> +        kvm_setup_guest_pvclock(&vcpu->hv_clock, v, &vcpu->pv_time, 
->> 0, false);
-> 
-> Yet here an below you still use 'v'. Does this actually compile?
-> 
+Less need to count the operands makes the code easier to read.
 
-Sorry, my misreading of the patch... this is in caller context so no 
-problem. The inconsistent naming was misleading me.
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+This one has been gathering dust for a while.
+rfc->v1: Moved to Q constraint (thanks Heiko)
+
+---
+ lib/s390x/css.h | 76 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 38 insertions(+), 38 deletions(-)
+
+diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+index 504b3f14..42c5830c 100644
+--- a/lib/s390x/css.h
++++ b/lib/s390x/css.h
+@@ -135,11 +135,11 @@ static inline int ssch(unsigned long schid, struct orb *addr)
+ 	int cc;
+ 
+ 	asm volatile(
+-		"	ssch	0(%2)\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28\n"
+-		: "=d" (cc)
+-		: "d" (reg1), "a" (addr), "m" (*addr)
++		"	ssch	%[addr]\n"
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28\n"
++		: [cc] "=d" (cc)
++		: "d" (reg1), [addr] "Q" (*addr)
+ 		: "cc", "memory");
+ 	return cc;
+ }
+@@ -152,11 +152,11 @@ static inline int stsch(unsigned long schid, struct schib *addr)
+ 
+ 	asm volatile(
+ 		"       tmll    %[bogus_cc],3\n"
+-		"	stsch	0(%3)\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28"
+-		: "=d" (cc), "=m" (*addr)
+-		: "d" (reg1), "a" (addr), [bogus_cc] "d" (bogus_cc)
++		"	stsch	%[addr]\n"
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28"
++		: [cc] "=d" (cc), [addr] "=Q" (*addr)
++		: "d" (reg1), [bogus_cc] "d" (bogus_cc)
+ 		: "cc");
+ 	return cc;
+ }
+@@ -167,11 +167,11 @@ static inline int msch(unsigned long schid, struct schib *addr)
+ 	int cc;
+ 
+ 	asm volatile(
+-		"	msch	0(%3)\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28"
+-		: "=d" (cc)
+-		: "d" (reg1), "m" (*addr), "a" (addr)
++		"	msch	%[addr]\n"
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28"
++		: [cc] "=d" (cc)
++		: "d" (reg1), [addr] "Q" (*addr)
+ 		: "cc");
+ 	return cc;
+ }
+@@ -184,11 +184,11 @@ static inline int tsch(unsigned long schid, struct irb *addr)
+ 
+ 	asm volatile(
+ 		"       tmll    %[bogus_cc],3\n"
+-		"	tsch	0(%3)\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28"
+-		: "=d" (cc), "=m" (*addr)
+-		: "d" (reg1), "a" (addr), [bogus_cc] "d" (bogus_cc)
++		"	tsch	%[addr]\n"
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28"
++		: [cc] "=d" (cc), [addr] "=Q" (*addr)
++		: "d" (reg1), [bogus_cc] "d" (bogus_cc)
+ 		: "cc");
+ 	return cc;
+ }
+@@ -200,9 +200,9 @@ static inline int hsch(unsigned long schid)
+ 
+ 	asm volatile(
+ 		"	hsch\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28"
+-		: "=d" (cc)
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28"
++		: [cc] "=d" (cc)
+ 		: "d" (reg1)
+ 		: "cc");
+ 	return cc;
+@@ -215,9 +215,9 @@ static inline int xsch(unsigned long schid)
+ 
+ 	asm volatile(
+ 		"	xsch\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28"
+-		: "=d" (cc)
++		"	ipm	%[cc]\n"
++		"	srl	%cc,28"
++		: [cc] "=d" (cc)
+ 		: "d" (reg1)
+ 		: "cc");
+ 	return cc;
+@@ -230,9 +230,9 @@ static inline int csch(unsigned long schid)
+ 
+ 	asm volatile(
+ 		"	csch\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28"
+-		: "=d" (cc)
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28"
++		: [cc] "=d" (cc)
+ 		: "d" (reg1)
+ 		: "cc");
+ 	return cc;
+@@ -245,9 +245,9 @@ static inline int rsch(unsigned long schid)
+ 
+ 	asm volatile(
+ 		"	rsch\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28"
+-		: "=d" (cc)
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28"
++		: [cc] "=d" (cc)
+ 		: "d" (reg1)
+ 		: "cc");
+ 	return cc;
+@@ -262,9 +262,9 @@ static inline int rchp(unsigned long chpid)
+ 	asm volatile(
+ 		"       tmll    %[bogus_cc],3\n"
+ 		"	rchp\n"
+-		"	ipm	%0\n"
+-		"	srl	%0,28"
+-		: "=d" (cc)
++		"	ipm	%[cc]\n"
++		"	srl	%[cc],28"
++		: [cc] "=d" (cc)
+ 		: "d" (reg1), [bogus_cc] "d" (bogus_cc)
+ 		: "cc");
+ 	return cc;
+@@ -369,9 +369,9 @@ static inline int _chsc(void *p)
+ 	int cc;
+ 
+ 	asm volatile(" .insn   rre,0xb25f0000,%2,0\n"
+-		     " ipm     %0\n"
+-		     " srl     %0,28\n"
+-		     : "=d" (cc), "=m" (p)
++		     " ipm     %[cc]\n"
++		     " srl     %[cc],28\n"
++		     : [cc] "=d" (cc), "=m" (p)
+ 		     : "d" (p), "m" (p)
+ 		     : "cc");
+ 
+-- 
+2.43.0
 
 
