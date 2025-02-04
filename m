@@ -1,133 +1,225 @@
-Return-Path: <kvm+bounces-37188-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37189-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88094A26801
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 00:47:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 618ABA26889
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 01:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B0B93A3F72
-	for <lists+kvm@lfdr.de>; Mon,  3 Feb 2025 23:47:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C253188646B
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 00:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBD4211A05;
-	Mon,  3 Feb 2025 23:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3E81BC3C;
+	Tue,  4 Feb 2025 00:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pYM7IE6e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SXGqsRl8"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3B92116FA
-	for <kvm@vger.kernel.org>; Mon,  3 Feb 2025 23:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143EFC147
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 00:27:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738626412; cv=none; b=Pxh3DALBlIJUvd9C2cm8tW5JaK/zUBtQW+KudohnyAqhDx+UScvQG8D5jp0tSh1aNRSvpX4zoEMazMlXwwQUKpsnkwhg1YLG3XYYD3Nte3Kt4FtgcRldlD/SDwJbId+96rgf/LqMsiYbaH0y8WPcHVPlFMgGSYKRya46JbiMDQ4=
+	t=1738628826; cv=none; b=ciQmsY4KEJvV2gx5UJ61Nwf09urvenCnU2yPH+4FGNxOwSE41rck8VnWGCn6+qx7PGAIK+KBWdV9mM6PZgj+yEmsFf1p/U4yQfGvcd5pLr5OicWGwR5snf0eFXJIsyiHxi4Q94Ny0bBFAdbWZWrnezYeiOZYkwPhxch1JvbP7CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738626412; c=relaxed/simple;
-	bh=8L1MKKLJRKA9fwjgy6wanwQsDI5QUdniP9phDu8pHk4=;
+	s=arc-20240116; t=1738628826; c=relaxed/simple;
+	bh=IWgXWYJkPqw2Z1CpE5EEkhO9acbN8gpS038KseSXZ0I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CzJjbx2KbNhLNAoPVsMMFdeEnp8CpU3fGQyBpUy/s4S1qzboEE3/NkA5ei2kAx0ppqYKGbQLKsqksjPrIvkm18rinlD29Fblo5hwwghdR88b+OZUWFQwxx4Cxuos0da9JDHNVuaYecUO87RkYEhSgikk+kHBaw38l77CWBPUv5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pYM7IE6e; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=dG/p4qaXV4NfyesjLjP/vcy51glA0KIbvbP0duCVuhq0+XZ+oze4Y1pA3DLhXTAKS//epu5eWQtlTpX45ZRC//pcwlIPaw7X+t50m508wnhpn9RqFmlDnaiiwSWIwje3TM7ePBj8EJJVP4y3gBvqWoQrZl9yVkgwJrcbQorpekU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SXGqsRl8; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef728e36d5so9533200a91.3
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 15:46:50 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f2a9f056a8so9604831a91.2
+        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 16:27:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738626410; x=1739231210; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nSuGosaK5hHCEp+e5MR1KOURrACh1Uth6m86fvoF8Fs=;
-        b=pYM7IE6eaX/EjjUKSWBXFnlN5uhP8JjxSbfLxqXg5nTPLSgRSYESCqvgkAqF2pLT2o
-         e5l81p8SY4OSYjG8bU9gKmmeRPr3H0cktNzIkgwCgU5tKZ6Dx/+nW5c7NEJCQEOZQDdU
-         wIjrCFD07jkdzAbzsdHZpdzz0n0hzXpTWGBZGLCpQteJwhnshJVJkavt2e2WpgIVMNmi
-         yVHoLsZL6PlBn/mLPUjbsKw/aEQIg19AZ5i6wmWF0ZU78fT8inTj4Opeljmc++10vT0K
-         MvKleclR/efBbRQ1XUKFW3510/wEv94InIDSUagDqe1Z+Ww7ZoyTyDrbA5bpub+quiZh
-         S/xQ==
+        d=google.com; s=20230601; t=1738628824; x=1739233624; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=es4uFH1mdi2syRGIaz78R91wgaiNDTNWCmVjzV+dqhk=;
+        b=SXGqsRl8eAlByRoaTL19P7dgqtHvHc4cb1pZIyQaCIO+zkK7Ep4vk+qI1Cx13o2xjk
+         +EBE8MZqtO6GoGJqszOibuuK/OanfsZqG1Yj0AWtff/hxxW9PNzX90tCMYDEJDJ6uLg8
+         CKeSyPDdQEtpdx9M/EVlVZ2u6j//spxx+BLjUEwEnFpdOe0IOMq/cCra9ia+DhEU0EMM
+         ZGdvu++s40zrZS0WYEZXCkmSz+kSvkusID311DVBz0WbsiL2O6bfSBPLS6jawKnO4jrp
+         G4q0nLDm8c7trMgEDYoO5esIcj6QqnMApSsOIH3FCAxwmREcrH77CyeDf2aybMbFVXW1
+         uV8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738626410; x=1739231210;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nSuGosaK5hHCEp+e5MR1KOURrACh1Uth6m86fvoF8Fs=;
-        b=k+2dltj5psQ2qWj83O+SENifroRMSGT6owGWos8arF379pql8uIJGgtne3VIuex1KF
-         4LQvfifZsXT+gsLsvpy4manCCfYyh0GCtmQlg3hjXliEBjvLvQZp7iiBkIbKlZy20Gkd
-         2m9s5RNRLBb1UuatX6JLKTCl03T8/Bc2gTnrbwF0k32MzOIVs0gnHSZAyqOZeZt2O4O7
-         DD/p9LEbUMZm9ZfbaJTuAewYWRlQZDSORlb5BoWw8WE1mf3t/MRZIqV/tbjoZsMJ6e9a
-         3b7pWjQgE7yutt4Zp+bsK9z9aj6LhC84nfXmRkd1VRNcwsDlToubf6Vtepw5hSOQoowT
-         M08Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUxZuuK90HqUoBdjy70XufBHZryIOxAjEJ00DU41xSFYAQp0qYgisZOjSi+5LGYkjjgDbU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyqzTALcFZ2G2J16R22RRYjbQ4c8Yhp4jQyLewWhlHFhO8LfEG
-	auUzqBH9xJNa4fOcJAUUpTAvt3jJCNojzZYaHTt68D3f+wHWPaZ78zLqOtiewQYnSLddjJObvo3
-	oYA==
-X-Google-Smtp-Source: AGHT+IFVIhjhmzB9sg2VIMO96ePNC8Z1cE9aDKvshJUFp6DXLPZUlLZI1uXZjpV1zos3/By+HkWoUMPzU6E=
-X-Received: from pjbqi16.prod.google.com ([2002:a17:90b:2750:b0:2ef:786a:1835])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:56c4:b0:2ee:e18b:c1fa
- with SMTP id 98e67ed59e1d1-2f83ac70df4mr33349372a91.28.1738626409829; Mon, 03
- Feb 2025 15:46:49 -0800 (PST)
-Date: Mon, 3 Feb 2025 15:46:48 -0800
-In-Reply-To: <60cef3e4-8e94-4cf1-92ae-34089e78a82d@redhat.com>
+        d=1e100.net; s=20230601; t=1738628824; x=1739233624;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=es4uFH1mdi2syRGIaz78R91wgaiNDTNWCmVjzV+dqhk=;
+        b=t6MfOg0Hi9yvBoYEusvg05g/sTuQmZc2OLXpQzVFnyu+dIZVL5K/rC7V/ruvuYBm5r
+         hv3GrdKKQOz0E/6omx/bYeoqfyN4pPiFgGlgRHgSGuo+piDsn5bNUiLLoIEi+sNNpAGg
+         fKHHO5LIWY+rFVeUPAveJi6Xm2qymaHH43f/jp9YLQ2UxUh+MKWlfpx7pRAxnvKsIArz
+         MoUPFi1OJAVMK3NpJPiXv1dY87pexWyAqE6yqzLPMqUv+DtcSWEpFwBrZR4vD4DqV67O
+         AzqSr0JIgWzKZnIjv4UA89OpPX27g653L6KcCPV07r+XqrcqSZweZvmTlkjGd5ZzY7mP
+         a4tg==
+X-Gm-Message-State: AOJu0Ywha/kRETqk0ms7auKo0b+OqpNgBzQVLeuvPXsg0fjiNLPDu91T
+	g/UMrVUEe1kVWiS1jYQSzoSjXUZhBWsupEI7m2juktkdPEVhUCtO7H78CVyZZwnHCuHCPATSsEV
+	vWQ==
+X-Google-Smtp-Source: AGHT+IF0i1a80D/prqc2zfk1FT4Lee5WNzvx26+t6wX/cXXG16jZxrhV19KWH4227JdtFStyqn54Wp8Qf8I=
+X-Received: from pjbpv10.prod.google.com ([2002:a17:90b:3c8a:b0:2ee:2761:b67a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:270c:b0:2ee:db8a:2a01
+ with SMTP id 98e67ed59e1d1-2f83ac8ad56mr33709069a91.30.1738628824249; Mon, 03
+ Feb 2025 16:27:04 -0800 (PST)
+Date: Mon, 3 Feb 2025 16:27:02 -0800
+In-Reply-To: <0102090cd553e42709f43c30d2982b2c713e1a68.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1738595289.git.naveen@kernel.org> <405a98c2f21b9fe73eddbc35c80b60d6523db70c.1738595289.git.naveen@kernel.org>
- <Z6EOxxZA9XLdXvrA@google.com> <60cef3e4-8e94-4cf1-92ae-34089e78a82d@redhat.com>
-Message-ID: <Z6FVaLOsPqmAPNWu@google.com>
-Subject: Re: [PATCH 3/3] KVM: x86: Decouple APICv activation state from apicv_inhibit_reasons
+References: <20250201005048.657470-1-seanjc@google.com> <dbbfa3f1d16a3ab60523f5c21d857e0fcbc65e52.camel@intel.com>
+ <Z6EoAAHn4d_FujZa@google.com> <0102090cd553e42709f43c30d2982b2c713e1a68.camel@intel.com>
+Message-ID: <Z6Fe1nFWv52rDijx@google.com>
+Subject: Re: [PATCH 0/2] x86/kvm: Force legacy PCI hole as WB under SNP/TDX
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Naveen N Rao (AMD)" <naveen@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "dionnaglaze@google.com" <dionnaglaze@google.com>, 
+	Binbin Wu <binbin.wu@intel.com>, 
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, "bp@alien8.de" <bp@alien8.de>, "jgross@suse.com" <jgross@suse.com>, 
+	"pgonda@google.com" <pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 03, 2025, Paolo Bonzini wrote:
-> On 2/3/25 19:45, Sean Christopherson wrote:
-> > Unless there's a very, very good reason to support a use case that generates
-> > ExtInts during boot, but _only_ during boot, and otherwise doesn't have any APICv
-> > ihibits, I'm leaning towards making SVM's IRQ window inhibit sticky, i.e. never
-> > clear it.
-> 
-> BIOS tends to use PIT, so that may be too much.  With respect to Naveen's report
-> of contention on apicv_update_lock, I would go with the sticky-bit idea but apply
-> it to APICV_INHIBIT_REASON_PIT_REINJ.
+On Mon, Feb 03, 2025, Rick P Edgecombe wrote:
+> On Mon, 2025-02-03 at 12:33 -0800, Sean Christopherson wrote:
+> > > Since there is no upstream KVM TDX support yet, why isn't it an optio=
+n to
+> > > still
+> > > revert the EDKII commit too? It was a relatively recent change.
+> >=20
+> > I'm fine with that route too, but it too is a band-aid.=C2=A0 Relying o=
+n the
+> > *untrusted*
+> > hypervisor to essentially communicate memory maps is not a winning stra=
+tegy.=20
+> >=20
+> > > To me it seems that the normal KVM MTRR support is not ideal, because=
+ it is
+> > > still lying about what it is doing. For example, in the past there wa=
+s an
+> > > attempt to use UC to prevent speculative execution accesses to sensit=
+ive
+> > > data.
+> > > The KVM MTRR support only happens to work with existing guests, but n=
+ot all
+> > > possible MTRR usages.
+> > >=20
+> > > Since diverging from the architecture creates loose ends like that, w=
+e could
+> > > instead define some other way for EDKII to communicate the ranges to =
+the
+> > > kernel.
+> > > Like some simple KVM PV MSRs that are for communication only, and not
+> >=20
+> > Hard "no" to any PV solution.=C2=A0 This isn't KVM specific, and as abo=
+ve, bouncing
+> > through the hypervisor to communicate information within the guest is a=
+sinine,
+> > especially for CoCo VMs.
+>=20
+> Hmm, right.
+>=20
+> So the other options could be:
+>=20
+> 1. Some TDX module feature to hold the ranges:
+>  - Con: Not shared with AMD
+>=20
+> 2. Re-use MTRRs for the communication, revert changes in guest and edk2:
 
-That won't work, at least not with yet more changes, because KVM creates the
-in-kernel PIT with reinjection enabled by default.  The stick-bit idea is that
-if a bit is set and can never be cleared, then there's no need to track new
-updates.  Since userspace needs to explicitly disable reinjection, the inhibit
-can't be sticky.
+Thinking more about how EDK2 is consumed downstream, I think reverting the =
+EDK2
+changes is necessary regardless of what happens in the kernel.  Or at the l=
+east,
+somehow communicate to EDK2 users that ingesting those changes is a bad ide=
+a
+unless the kernel has also been updated.
 
-I assume We could fudge around that easily enough by deferring the inhibit until
-a vCPU is created (or run?), but piggybacking PIT_REINJ won't help the userspace
-I/O APIC case.
+AFAIK, Bring Your Own Firmware[*] isn't widely adopted, which means that th=
+e CSP
+is shipping the firmware.  And shipping OVMF/EDK2 with the "ignores MTRRs" =
+code
+will cause problems for guests without commit 8e690b817e38 ("x86/kvm: Overr=
+ide
+default caching mode for SEV-SNP and TDX").  Since the host doesn't control=
+ the
+guest kernel, there's no way to know if deploying those EDK2 changes is saf=
+e.
+=20
+[*] https://kvm-forum.qemu.org/2024/BYOF_-_KVM_Forum_2024_iWTioIP.pdf
 
-> I don't love adding another inhibit reason but, together, these two should
-> remove the contention on apicv_update_lock.  Another idea could be to move
-> IRQWIN to per-vCPU reason but Maxim tells me that it's not so easy.
+>  - Con: Creating more half support, when it's technically not required
+>  - Con: Still bouncing through the hypervisor
 
-Oh, yeah, that reminds me of the other reason I would vote for a sticky flag:
-if inhibition really is toggling rapidly, performance is going to be quite bad
-because inhibiting APICv requires (a) zapping APIC SPTEs and (b) serializing
-writers if multiple vCPUs trigger the 0=>1 transition.
+I assume by "Re-use MTRRs for the communication" you also mean updating the=
+ guest
+to address the "everything is UC!" flaw, otherwise another con is:
 
-And there's some amount of serialization even if there's only a single writer,
-as KVM kicks all vCPUs to toggle APICv (and again to flush TLBs, if necessary).
+   - Con: Doesn't address the performance issue with TDX guests "using" UC
+          memory by default (unless there's yet more enabled).
 
-Hmm, something doesn't add up.  Naveen's changelog says:
+Presumably that can be accomplished by simply skipping the CR0.CD toggling,=
+ and
+doing MTRR stuff as nonrmal?
 
-  KVM additionally inhibits AVIC for requesting a IRQ window every time it has
-  to inject external interrupts resulting in a barrage of inhibits being set and
-  cleared. This shows significant performance degradation compared to AVIC being
-  disabled, due to high contention on apicv_update_lock.
+>  - Pro: Design and code is clear
+>
+> 3. Create some new architectural definition, like a bit that means "MTRRs=
+ don't
+> actually work:
+>  - Con: Takes a long time, need to get agreement
+>  - Con: Still bouncing through the hypervisor
 
-But if this is a "real world" use case where the only source of ExtInt is the
-PIT, and kernels typically only wire up the PIT to the BSP, why is there
-contention on apicv_update_lock?  APICv isn't actually being toggled, so readers
-blocking writers to handle KVM_REQ_APICV_UPDATE shouldn't be a problem.
+Not for KVM guests.  As I laid out in my bug report, it's safe to assume MT=
+RRs
+don't actually affect the memory type when running under KVM.
 
-Naveen, do you know why there's a contention on apicv_update_lock?  Are multiple
-vCPUs actually trying to inject ExtInt?
+FWIW, PAT doesn't "work" on most KVM Intel setups either, because of misgui=
+ded
+KVM code that resulted in "Ignore Guest PAT" being set in all EPTEs for the
+overwhelming majority of guests.  That's not desirable long term because it
+prevents the guest from using WC (via PAT) in situations where doing so is =
+needed
+for performance and/or correctness.
+
+>  - Pro: More pure solution
+
+MTRRs "not working" is a red herring.  The problem isn't that MTRRs don't w=
+ork,
+it's that the kernel is (somewhat unknowingly) using MTRRs as a crutch to g=
+et the
+desired memtype for devices.  E.g. for emulated MMIO, MTRRs _can't_ be virt=
+ualized,
+because there's never a valid mapping, i.e. there is no physical memory and=
+ thus
+no memtype.  In other words, under KVM guests (and possibly other hyperviso=
+rs),
+MTRRs end up being nothing more than a communication channel between guest =
+firmware
+and the kernel.
+
+The gap for CoCo VMs is that using MTRRs is undesirable because they are co=
+ntrolled
+by the untrusted host.  But that's largely a future problem, unless someone=
+ has a
+clever way to fix the kernel mess.
+
+> 4. Do this series:
+>  - Pro: Looks ok to me
+>  - Cons: As explained in the patches, it's a bit hacky.
+>  - Cons: Could there be more cases than the legacy PCI hole?
+>=20
+> I would kind of like to see something like 3, but 2 or 4 seem the only fe=
+asible
+> ones if we want to resolve this soon.
 
