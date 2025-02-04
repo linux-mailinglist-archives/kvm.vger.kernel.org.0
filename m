@@ -1,147 +1,194 @@
-Return-Path: <kvm+bounces-37271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8035FA27B57
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 20:33:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97431A27B93
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 20:42:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00DB97A27BD
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 19:32:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37BEE1886F5A
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 19:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84684204C20;
-	Tue,  4 Feb 2025 19:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E680B21A426;
+	Tue,  4 Feb 2025 19:41:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gwb+1U+T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HRTu5Z/S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48AD24CB5B
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 19:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745D9219A6B;
+	Tue,  4 Feb 2025 19:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738697584; cv=none; b=FfEQeSJEyi9c1oUQc59szhaGWx/5ldeNqgZQJw9OhLFPp8BizYmib3FPLwD6x8plqVzrmd3s3tYrXfh8UVA8ZCXFl+8z6/BetIKrLdDzZcuPcBNzZUHubQxk4Ah9r/7JqH9qh5cLR/8Ze/AaeDhO1lQlew5dlKnRPSzGDlwzaew=
+	t=1738698076; cv=none; b=s/PYGd1iUaZ1Uq/4NGD/i73jxWL7l5gKIof2Ff3Ig1S4fcfU+j0Zr0KuyBo+6ZshFipAqGGnYXW5hg1b3MDGX9ShUELXnCoeS9Q3DIoJfGiP85XSsPAkmJkB75cY+Q8c0cwt9HQUnAYXXnjDY8PoB3uMPwMYIdrTZiODCwb70LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738697584; c=relaxed/simple;
-	bh=+M/l9dtCOVW7vI9Hd7L9n6t/ZLlwTXolPFtCReLdywI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KuqWdU89BmCe5R42/xWnP241Qoyxf1eCwGhvlhJTZfGMoxBMwUurHdPfp1GKJChAFB80FFwEzA1dCXZa1gVPlClGMdaq5IwcsFzHUZ8WLGNWBzGqfhenCKvC0ARz8qoKHbqza98NdjoAwSazqzciMzfg5o07mIjmCrd0FnsuhcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gwb+1U+T; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef6ef86607so240724a91.0
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 11:33:03 -0800 (PST)
+	s=arc-20240116; t=1738698076; c=relaxed/simple;
+	bh=g8wOV25fc1TNoao6bsF+Qxx5FVzYFX03zAjdYVQ2UII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yj+8M/QXhKxPEhzEPU1SgMqQQFrRca1+anj0181WAAjCvXMBEl9YuA8qdyh3pcLi+xmHFrL5J1EqpOpyCNpqOkPnuQNp7tiyqHJwOe++a5uHNil5H3JlQFyw8FbDsstruoHzBSUy5NAc5ty8ylceaRg1PdFQjRILPGfuXNy7SQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HRTu5Z/S; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21f08b44937so12806925ad.1;
+        Tue, 04 Feb 2025 11:41:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738697583; x=1739302383; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qHjP7gj6o+oH3NbAr56dzEfdgv1Prurjy+rUsRta40E=;
-        b=Gwb+1U+TgD33aGC1wZr6BNTH0W0TKuh38zkaKtn2sZrVsSRHFH0AD4IErvBlWMr52F
-         4b4X8dgBFm9Ln2o91m4Ljp2nYAGVPAD4DBpm7+ogc8PNTigZeLxRGnb9/zxQiVgpPz9u
-         TAPYFF30dzCrVYWVAmpznu6tG3IIPxyy7LIby+t8f2X4eX5jgFQ37bVoESW5BWM9mvIb
-         yv1PIm62wYV0V1iw3QZXwaoc0BQTSlmZjOTnULYklPUaSc/k6rpii8IppA08BCTZAa8K
-         Ceprfb9LTLoXnFHqRo5t5WHuBaM0yOqI3Tyiti3TrrHn4EdBRoTvMSpocUJNuqfTRQhU
-         LWxA==
+        d=gmail.com; s=20230601; t=1738698073; x=1739302873; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=moi/W+SxGPnzASf9/FXO/gMD1/604PmuIGFT4p/Ba5w=;
+        b=HRTu5Z/SOIPa9LRwry2ryl0CKCJ8+nvp1gKgAWmFiNCI3Wowweyg7bgioOAn0z8H/u
+         9VsTKJNW+LktOKu6vO4ERSdkU4gTk7OJDxgHoJpQdC/yHUtDhoRQXbKbdqi0KswA3hnx
+         2e9HXR8+6eSVpmSD6pKjgpyLLV+bLuGVqabnuQjtZWTt1CBcOwz8N7n2F6NKKt/R7fP7
+         Q0VgqcZORBavhCVEczQG7EvkzZ7mpYbUyqq4M999nJ6esujW/R+OEqigAa/NQr7Ninvh
+         Va8TqI4rgFk2vQkH9mnJQPubfXfPcQ3AZlzS4n6HbxgAnv3zLWNjPdwRkXPexSR0nAq1
+         bczA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738697583; x=1739302383;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qHjP7gj6o+oH3NbAr56dzEfdgv1Prurjy+rUsRta40E=;
-        b=okNrif8n4hKnvQd+Fu/RPoI5VaSPbwkqkqOMrVAIQNb7RySv2ghGgDcnzI5cpT4Aai
-         yeEha2hlSHqgf1as2K2xjK5Mb3hI5m8Nm2pNKOlKEcMymcb+T7ohD96bzv2VB64yiTS/
-         Oim0MFuyFyWfErAxIy4jMJAP9odKYBD0ITLERy/bJw7WVGLhQV4+74kH8hEK/nXg+NHZ
-         79qLtFCWuf96uKVd5UKtp/fkeWw45sP0NFjInWXve0GfYvPvMIF/sA+xCfc9YdULIRnB
-         OQupjBhbkDhx3vw7Tv88HIo4TG10xrxTeYTEuGWop+Wa1+sWU8Hvn6+ulg2J7QFZuLA1
-         ot4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXjY+yKr7mhOaKcVtjjmLS/sHA4qJxG1uonk/U6Dmgmy7H04s5f8MRnjQIkiD0legVhoOE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1mEtmglab9amv05ArxQxrWGfJXOFOmlawB+pE/7dG5vSl8BWY
-	jPaxGxSicgD/0TwZ27YprXqdkwr7fDmBCqWqgQm42USiEAl7eFUsZW3qbzPI2L2PuM88HXjY2+w
-	1rQ==
-X-Google-Smtp-Source: AGHT+IHAs4f3eaCGVAUXB0jWrqWaLt84ZIAgfeob9iDCxzXERNZ2tG3HGxCWeqQKtMucRgij4r62wRc8BZ0=
-X-Received: from pjbse7.prod.google.com ([2002:a17:90b:5187:b0:2ea:61ba:b8f7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5404:b0:2ee:e2f6:8abc
- with SMTP id 98e67ed59e1d1-2f9ba26c483mr7041217a91.10.1738697582766; Tue, 04
- Feb 2025 11:33:02 -0800 (PST)
-Date: Tue, 4 Feb 2025 11:33:01 -0800
-In-Reply-To: <cck44jwjx7h4xtxf32scqy376fd575zn4mhfzxu5k4dry7le3g@thckuzeoujuj>
+        d=1e100.net; s=20230601; t=1738698073; x=1739302873;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=moi/W+SxGPnzASf9/FXO/gMD1/604PmuIGFT4p/Ba5w=;
+        b=A0LE3KwGtx69TO3+6QAX+n1bfFfSnCFKnoOGc0CQuIlcomMWEb87/rUE+2gfeybGw4
+         76Q2gjoDOXljpdtbmiVbsmiB1TB5/OYnNsKHoj0/awAdwEkw47tLdVtKErHQy0//DPyC
+         zH4qMTwUyAU8WWQd4qkaeXlR2xJL4mdQB9UB1OLZSpcRVBEFaEPJMgpfnwJkxaNOB9Ct
+         B+7F+r56CJx2pKwRClttcsLTAlCBIx0r1qrU8/4i7TCGS/JNTtHelV2GgPtp/Oq+7/H7
+         qWDuhdu7A7cMLAApf6PCG5hvnEz/lQZEieGw+IBZ4mzNCkNAeZPkdMpc4DiwCiKBKVS2
+         X/Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8v/7mt01WEtIJq5VjJDQnw8P5TkI9EZzOwS2O+omlJfVbbPhXjBQEwBDbp3Q3oJu1Q1SOGBsjQ6oo@vger.kernel.org, AJvYcCUQYS9TeqeAhugMy0T/52VIonpPPiMNZp4gEDdX3yCe6KXbrmaIuQFFcCSyXphEWWSWdZg=@vger.kernel.org, AJvYcCV0RYTdmcFu3isb4x4jzzLplSlfB0hwyIzk+OljURfIPP66ZytIwnP/WW6jxLO3Dju5spZnHtPK@vger.kernel.org, AJvYcCVE10nJ9xdSLgwHUZhTOcyAMo5BYobOz0pGn6vV7ebk6K2GoXQBQzLecf/jOBd7BT/a7EhO71mWbiktlE33@vger.kernel.org, AJvYcCXsjwht2816hFvitJf5GmKE8MlnQwQcfgmtTY8Bc6eqUqFHkvBmVUVjrAvhyk1ckXkPQAUa+9Qxv7VRq06jdx6G@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiR9bN7g1YYWl/7Zpp+yTDxX/+syGheHLzffsgJDAe7b3W7WB5
+	YthJkkvRo8KlVHxvg7uaUYmfBfoEu90DB00MKs21xnHd0UCXU/k=
+X-Gm-Gg: ASbGncur0bkOOvP/OuZYV3Le4dLNMtGuNBZIEiKllaVEWhHegkroYkKGVyQ+GqXdt/X
+	FIucJX0SXw964aRs4tjCLGnXpgkWYW+s1QO+tAwwekH9HAoxgvogVX+DMTUGmhc9bAET8PthrFx
+	de5GehMxde+SdS+TpygoKCBP5smPaNaLFhadQg+Rli93jwmXUnZvwmfE7s5PZVm0aQfhq42EWhp
+	R0LhD2J/AM8Dma9fU7yHQe1t/s7caraWjKrHi9HeTU4c95CdV0rTLTeIbxtgfXjwG7pY/4TrUEv
+	H/mn5budmO2pqaI=
+X-Google-Smtp-Source: AGHT+IGgTUpEJBBZoo3WwK/fS9jkgh2la10H+C0J5rIPjISmNgP9ogZWiOD7UQ00ALqtKGAiUGE27Q==
+X-Received: by 2002:a17:902:f686:b0:21a:8769:302e with SMTP id d9443c01a7336-21f17e47727mr828805ad.14.1738698071707;
+        Tue, 04 Feb 2025 11:41:11 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-21de33076a8sm99835365ad.208.2025.02.04.11.41.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 11:41:11 -0800 (PST)
+Date: Tue, 4 Feb 2025 11:41:09 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+	asml.silence@gmail.com, dw@davidwei.uk,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
+Message-ID: <Z6JtVUtsZL6cxsTO@mini-arch>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com>
+ <CAHS8izNZrKVXSXxL3JG3BuZdho2OQZp=nhLuVCrLZjJD1R0EPg@mail.gmail.com>
+ <Z6JXFRUobi-w73D0@mini-arch>
+ <60550f27-ea6a-4165-8eaa-a730d02a5ddc@redhat.com>
+ <CAHS8izMkfQpUQQLAkyfn8=YkGS1MhPN4DXbxFM6jzCKLAVhM2A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1738595289.git.naveen@kernel.org> <3d8ed6be41358c7635bd4e09ecdfd1bc77ce83df.1738595289.git.naveen@kernel.org>
- <dc784d6e4f6c4478fc18e0bc2d5df56af40d0019.camel@redhat.com> <cck44jwjx7h4xtxf32scqy376fd575zn4mhfzxu5k4dry7le3g@thckuzeoujuj>
-Message-ID: <Z6JrbfQ-4bsERzA1@google.com>
-Subject: Re: [PATCH 1/3] KVM: x86: hyper-v: Convert synic_auto_eoi_used to an atomic
-From: Sean Christopherson <seanjc@google.com>
-To: Naveen N Rao <naveen@kernel.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, 
-	Vasant Hegde <vasant.hegde@amd.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izMkfQpUQQLAkyfn8=YkGS1MhPN4DXbxFM6jzCKLAVhM2A@mail.gmail.com>
 
-On Tue, Feb 04, 2025, Naveen N Rao wrote:
-> Hi Maxim,
+On 02/04, Mina Almasry wrote:
+> On Tue, Feb 4, 2025 at 10:32 AM Paolo Abeni <pabeni@redhat.com> wrote:
+> >
+> > On 2/4/25 7:06 PM, Stanislav Fomichev wrote:
+> > > On 02/04, Mina Almasry wrote:
+> > >> On Tue, Feb 4, 2025 at 4:32 AM Paolo Abeni <pabeni@redhat.com> wrote:
+> > >>>
+> > >>> On 2/3/25 11:39 PM, Mina Almasry wrote:
+> > >>>> The TX path had been dropped from the Device Memory TCP patch series
+> > >>>> post RFCv1 [1], to make that series slightly easier to review. This
+> > >>>> series rebases the implementation of the TX path on top of the
+> > >>>> net_iov/netmem framework agreed upon and merged. The motivation for
+> > >>>> the feature is thoroughly described in the docs & cover letter of the
+> > >>>> original proposal, so I don't repeat the lengthy descriptions here, but
+> > >>>> they are available in [1].
+> > >>>>
+> > >>>> Sending this series as RFC as the winder closure is immenient. I plan on
+> > >>>> reposting as non-RFC once the tree re-opens, addressing any feedback
+> > >>>> I receive in the meantime.
+> > >>>
+> > >>> I guess you should drop this paragraph.
+> > >>>
+> > >>>> Full outline on usage of the TX path is detailed in the documentation
+> > >>>> added in the first patch.
+> > >>>>
+> > >>>> Test example is available via the kselftest included in the series as well.
+> > >>>>
+> > >>>> The series is relatively small, as the TX path for this feature largely
+> > >>>> piggybacks on the existing MSG_ZEROCOPY implementation.
+> > >>>
+> > >>> It looks like no additional device level support is required. That is
+> > >>> IMHO so good up to suspicious level :)
+> > >>>
+> > >>
+> > >> It is correct no additional device level support is required. I don't
+> > >> have any local changes to my driver to make this work. I think Stan
+> > >> on-list was able to run the TX path (he commented on fixes to the test
+> > >> but didn't say it doesn't work :D) and one other person was able to
+> > >> run it offlist.
+> > >
+> > > For BRCM I had shared this: https://lore.kernel.org/netdev/ZxAfWHk3aRWl-F31@mini-arch/
+> > > I have similar internal patch for mlx5 (will share after RX part gets
+> > > in). I agree that it seems like gve_unmap_packet needs some work to be more
+> > > careful to not unmap NIOVs (if you were testing against gve).
+> >
+> > What happen if an user try to use devmem TX on a device not really
+> > supporting it? Silent data corruption?
+> >
 > 
-> On Mon, Feb 03, 2025 at 08:30:13PM -0500, Maxim Levitsky wrote:
-> > On Mon, 2025-02-03 at 22:33 +0530, Naveen N Rao (AMD) wrote:
-> > > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> > > index 6a6dd5a84f22..7a4554ea1d16 100644
-> > > --- a/arch/x86/kvm/hyperv.c
-> > > +++ b/arch/x86/kvm/hyperv.c
-> > > @@ -131,25 +131,18 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
-> > >  	if (auto_eoi_old == auto_eoi_new)
-> > >  		return;
-> > >  
-> > > -	if (!enable_apicv)
-> > > -		return;
-> > > -
-> > > -	down_write(&vcpu->kvm->arch.apicv_update_lock);
-> > > -
-> > >  	if (auto_eoi_new)
-> > > -		hv->synic_auto_eoi_used++;
-> > > +		atomic_inc(&hv->synic_auto_eoi_used);
-> > >  	else
-> > > -		hv->synic_auto_eoi_used--;
-> > > +		atomic_dec(&hv->synic_auto_eoi_used);
-> > >  
-> > >  	/*
-> > >  	 * Inhibit APICv if any vCPU is using SynIC's AutoEOI, which relies on
-> > >  	 * the hypervisor to manually inject IRQs.
-> > >  	 */
-> > > -	__kvm_set_or_clear_apicv_inhibit(vcpu->kvm,
-> > > -					 APICV_INHIBIT_REASON_HYPERV,
-> > > -					 !!hv->synic_auto_eoi_used);
-> > > -
-> > > -	up_write(&vcpu->kvm->arch.apicv_update_lock);
-> > > +	kvm_set_or_clear_apicv_inhibit(vcpu->kvm,
-> > > +				       APICV_INHIBIT_REASON_HYPERV,
-> > > +				       !!atomic_read(&hv->synic_auto_eoi_used));
-> > 
-> > Hi,
-> > 
-> > This introduces a race, because there is a race window between the moment
-> > we read hv->synic_auto_eoi_used, and decide to set/clear the inhibit.
-> > 
-> > After we read hv->synic_auto_eoi_used, but before we call the
-> > kvm_set_or_clear_apicv_inhibit, other core might also run
-> > synic_update_vector and change hv->synic_auto_eoi_used, finish setting the
-> > inhibit in kvm_set_or_clear_apicv_inhibit, and only then we will call
-> > kvm_set_or_clear_apicv_inhibit with the stale value of
-> > hv->synic_auto_eoi_used and clear it.
+> So the tx dma-buf binding netlink API will bind the dma-buf to the
+> netdevice. If that fails, the uapi will return failure and devmem tx
+> will not be enabled.
 > 
-> Ah, indeed. Thanks for the explanation.
+> If the dma-binding succeeds, then the device can indeed DMA into the
+> dma-addrs in the device. The TX path will dma from the dma-addrs in
+> the device just fine and it need not be aware that the dma-addrs are
+> coming from a device and not from host memory.
 > 
-> I wonder if we can switch to using kvm_hv->hv_lock in place of 
-> apicv_update_lock. That lock is already used to guard updates to 
-> partition-wide MSRs in kvm_hv_set_msr_common(). So, that might be ok 
-> too?
+> The only issue that Stan's patches is pointing to, is that the driver
+> will likely be passing these dma-buf addresses into dma-mapping APIs
+> like dma_unmap_*() and dma_sync_*() functions. Those, AFAIU, will be
+> no-ops with dma-buf addresses in most setups, but it's not 100% safe
+> to pass those dma-buf addresses to these dma-mapping APIs, so we
+> should avoid these calls entirely.
+> 
+> > Don't we need some way for the device to opt-in (or opt-out) and avoid
+> > such issues?
+> >
+> 
+> Yeah, I think likely the driver needs to declare support (i.e. it's
+> not using dma-mapping API with dma-buf addresses).
 
-Why?  All that would do is add complexity (taking two locks, or ensuring there
-is no race when juggling locks), because if the guest is actually toggling AutoEOI
-at a meaningful rate on multiple vCPUs, then there is going to be lock contention
-regardless of which lock is taken.
+netif_skb_features/ndo_features_check seems like a good fit?
 
