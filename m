@@ -1,218 +1,204 @@
-Return-Path: <kvm+bounces-37208-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37209-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D6F9A26CF0
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 08:58:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A70F3A26CF8
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 09:02:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C890F165364
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 07:58:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2805D7A2934
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 08:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66712063FF;
-	Tue,  4 Feb 2025 07:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597AB2066DE;
+	Tue,  4 Feb 2025 08:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WyvJJIUx"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PLXGeL2I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2073.outbound.protection.outlook.com [40.107.92.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696A7205E3B
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 07:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738655911; cv=none; b=n4y935sNIKnDkmetArnDhhxtl9CuiLNENXddt3j7vAc7KGAqZbM1QGhnwpAXgzgGEVMDvswlghE2v7Mk5vDb95eAhSgBdAklTrfBdJG/yOL31mSqdqT7p86qW3LhLsiywdPYsmpFuUQccHGLza6IsTKs3dvt5ItaSib42Mjm2J8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738655911; c=relaxed/simple;
-	bh=WpVGtnVFRTc6n58BBzvAawZURCR8NYw/GenB/8vqGss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ryNFWBK5ovhWT1w1TjFIZWTw0875Ou6NsFgRh3V78t/HVe5TQH6eiPGA5xo+gATacnsOSaULCIBz6VTHWH61lAuPcyXozSC+2Y3OxSk41T2uvjYykNDGpb/nt/p1tptVuSns1Q2ekWyx0Mq/jk8nCt8ZwxBNKBy3sZftidHcwDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WyvJJIUx; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4678cce3d60so55039711cf.2
-        for <kvm@vger.kernel.org>; Mon, 03 Feb 2025 23:58:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738655908; x=1739260708; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XiXrPR2xXfkTqljxu4z94L8Ip1ipN2GMIvZnYSax9qw=;
-        b=WyvJJIUxEs85gs97lkrBmSZqmNLZqhHimqjjxo5Mp0yMynnvowdKkUWgooFQ1rcg9j
-         nImORSvkE6X4rI7YHCAF/Sh1hTMhTxdrtAvGb4tk932aH980qAzyy9sF/Lk14+ryT86F
-         v4lHlwZmQ/Y/TA4fvdWSPl3m8CLXuaFJDlrPRqjMcykXvhvRe3asjLCgElfBlobQuJGy
-         6smvRzLu/cn8FxRGZm89WUI66663REP65jYPFKmYiEeZC8mGiW0qJpYoUkcbQosYbmHr
-         leDgU/eADVoSX2rw9Q057DcsB1dqy9ZBhpsbJYkGXiQgq42oPWIZR3IZ9jkanVpj9C1p
-         2qCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738655908; x=1739260708;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XiXrPR2xXfkTqljxu4z94L8Ip1ipN2GMIvZnYSax9qw=;
-        b=dA2ZFKCsZRKmeQ9ViHkZxFrKFshazbea7X579x5M/WHs8xFtTtwJFbxk3DlMfwK4N2
-         vRlCFXDXUR9LZRalLJIp03QcWY72y4xz5p0fhaDu2gCEpzs5NSBVLop4V7If1ruTq9ZO
-         +VaLknR2Cu4N0DQSapxrlxzLHZR2ggYq2xuFYPyccIDsV/nbwe/8jEVYGSVGLk3axS/0
-         jxcMbtQQqcYt74tW/vnbNrEhdxFdtburR7Nu0zq6lanAnT3N+csNtnKk54IfArIbOhsf
-         +zNT6N3NcJVhpnCvVpzV8KAgQPNkGVG2yQQou7WAL394vE3DgAXf5kYOGC5MCMJdQyVf
-         iVbg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2OHfoKq52s6w5YUbdIrCwQT/WUC28U4gcGjHane8I64H1JcMzTDBg0+vcob760psnSQk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9cjx9wOXAsbDvEnm5AEh0V9965YrlDkN5brP+uYFup8tArKfq
-	U1V4VSSEPv7oQ4xyUTYiWZPjlZxNg/GvgNL5wlMVmAa+o0meDh3Z83jzyLQTAWPaDuZVlWb1OcU
-	ijGjRPJD0Kuc0LyuFtHbA7IeMLPZijw1LfNfA
-X-Gm-Gg: ASbGncstMldUxlW1MLR7OWoljY4J2onNoB7jgW1gup+05FPsCzEZyP3Pw90XnomZb6c
-	yAmhp5bnGna9hE/TFE86iNM50Q7UJttEtXzTTVrt3Bqzs2QDHd10vRl81LUzlv9hD/pMjfsqr6w
-	==
-X-Google-Smtp-Source: AGHT+IHTIrAFs1xD38iTkLdSv6lbaUX6t3r909DZtF/mbm0wm+xk5lPFTbiwArxzHDHXRHsu2726slyElOb9NmzU9jA=
-X-Received: by 2002:ac8:5713:0:b0:466:886f:3774 with SMTP id
- d75a77b69052e-46fd09e28f1mr306933821cf.8.1738655907978; Mon, 03 Feb 2025
- 23:58:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D231718D620;
+	Tue,  4 Feb 2025 08:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738656161; cv=fail; b=gesSa9gfR/8XEeX+vXPYUYFIvCfV61nRvcbM6slVCQFMjlIYeOY7llI75hm19YNyRitHyuSbpSiTi0keEGzQhmhZzP2TT/rdFoZKMZ69OP9TyVvnxBSUElXMn20JC/1xAIIR3OvWu0DpIUTiN5xctK0EQXkrpgaqbf1VD+iHbOk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738656161; c=relaxed/simple;
+	bh=Nff9UR2ox+SdrtrK/zbHIxzm4ooikfcu6cD2a21kHLA=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Zektoct+BRR9y485YepafygquoH+44Fd2uSZFRgsK8YwJuTDlNFCDwqTuO6zzVovL5uXjxE56iuM/G4xIwjmOcVRax2pxdmklGeK+URLOfLUCw5yp0/e/B8zu+7ofoY+x3jhLgN3afz8EDmex+dNM7Y9PA3McB7F7TbZqUiOEA8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PLXGeL2I; arc=fail smtp.client-ip=40.107.92.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M+BdEoAJQzHAW9sy8GECaCnqQPiOkYqdKDlIJf0IQ5yUjxMbtSLgNaOnJn0gMeU5qrCEtP67SUwJpcVpxz0n8auaBQNO/x8/dp459wiWcWNM4T2yugRh7NM1QCz2HwWR96V8CIycsMvLMgQ5YLX9iihbJ1YdDP9hz0Lj4rP/uiPwi2NyVyDxilGCBzoIe71aQYqxUOFa7e4JPnSOEPjKS+QQByVJWk9mEMCxzWS41lqq3XFgZCSllHdPZKibRIqCzlPPe8pNwGpF+EBK/ErOM86wqZ2Hv0BOi8STO4doTneZa673b+L7wijBTvTslCOQ8yjEPqxDXBf77TReWLbu7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2D5lXZBHVFDsmXl9n1XG3euKCn85ZJhr7IO1WYED/lI=;
+ b=qRNUVPJGASCxwj8UfSPHXj8iVGSoNCSc7/vKsBwrO1Ubx8ZKUye2K/EJH/5x7Ob3YUNkAQ8H1ZpLfBD30HjN/83K8SRuVlsrfmG2mS9aZkcWv4umc+jPwao2No3iSWxBdWecex7s4qBOL3PNJRzrDIu01QRjX2jC+9L3LKkzDTdNu9M9Yc9J5kqpDybuFQBLTRqZ1O+RkvwNWZMaOgWartSk8MCHpygY6ohE6kI88Xz3LSAxDYUVtzOsniWykijYCB++6ksg5czKHVZfvski0bbbGWB+AUPuKzz/r+GJBwaOMOJd0fXZXurNDyb8YnCLkoHgN8zPaFVn+a+yZJTj4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2D5lXZBHVFDsmXl9n1XG3euKCn85ZJhr7IO1WYED/lI=;
+ b=PLXGeL2Irl0ZgtABfiVo0n3CvYitfV5YS00d2ayWEzxgjazpKxxjQDqOZlAbGRdNhGJRXGlEY+Gby5qAK/Djnz1KHeoPqE19yGwZwmO8GO4f840SK9erFXl/YYbLHR8/t0tNS99Sl9hOIlMLRj4C2gCBAExSERsmDTSaSkB9WxQ=
+Received: from BN9PR03CA0395.namprd03.prod.outlook.com (2603:10b6:408:111::10)
+ by SA1PR12MB8859.namprd12.prod.outlook.com (2603:10b6:806:37c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Tue, 4 Feb
+ 2025 08:02:37 +0000
+Received: from BN3PEPF0000B373.namprd21.prod.outlook.com
+ (2603:10b6:408:111:cafe::7) by BN9PR03CA0395.outlook.office365.com
+ (2603:10b6:408:111::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.24 via Frontend Transport; Tue,
+ 4 Feb 2025 08:02:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN3PEPF0000B373.mail.protection.outlook.com (10.167.243.170) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8445.2 via Frontend Transport; Tue, 4 Feb 2025 08:02:37 +0000
+Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 4 Feb
+ 2025 02:02:29 -0600
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: Sean Christopherson <seanjc@google.com>, Thomas Gleixner
+	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Juergen Gross
+	<jgross@suse.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang
+	<haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+	<decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, "Alexey
+ Makhalov" <alexey.amakhalov@broadcom.com>, Jan Kiszka
+	<jan.kiszka@siemens.com>, Paolo Bonzini <pbonzini@redhat.com>, "Andy
+ Lutomirski" <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>
+CC: <linux-kernel@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+	<virtualization@lists.linux.dev>, <linux-hyperv@vger.kernel.org>,
+	<jailhouse-dev@googlegroups.com>, <kvm@vger.kernel.org>,
+	<xen-devel@lists.xenproject.org>, Sean Christopherson <seanjc@google.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 04/16] x86/sev: Mark TSC as reliable when configuring
+ Secure TSC
+In-Reply-To: <20250201021718.699411-5-seanjc@google.com>
+References: <20250201021718.699411-1-seanjc@google.com>
+ <20250201021718.699411-5-seanjc@google.com>
+Date: Tue, 4 Feb 2025 08:02:21 +0000
+Message-ID: <85y0ym5e9e.fsf@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250107042202.2554063-1-suleiman@google.com> <20250107042202.2554063-2-suleiman@google.com>
- <Z4gtb-Z2GpbEkAsQ@google.com> <CABCjUKDU4b5QodgT=tSgrV-fb_qnksmSxhMK3gNrUGsT9xeitg@mail.gmail.com>
- <Z4qK4B6taSoZTJMp@google.com> <CABCjUKDDDhXx8mSRKHCa34JjSX1nfM5WMG-UrPu9fjei6gkUJA@mail.gmail.com>
- <Z5AB-6bLRNLle27G@google.com>
-In-Reply-To: <Z5AB-6bLRNLle27G@google.com>
-From: Suleiman Souhlal <suleiman@google.com>
-Date: Tue, 4 Feb 2025 16:58:16 +0900
-X-Gm-Features: AWEUYZm23hx-Dkt13hsxp221MHOD76k5IiH6BRUJp63z5aATuOuh9Zi36Ky2saY
-Message-ID: <CABCjUKB-4kvAg5U0D2O2aiTgfHnYx5qBTBEJJsK7edZY5g5eTQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] kvm: Introduce kvm_total_suspend_ns().
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, 
-	David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ssouhlal@freebsd.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B373:EE_|SA1PR12MB8859:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7bcca8b8-250b-4212-1e7d-08dd44f24a06
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024|7053199007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?nkNqDxv8OLfDQJg18fuIzIAYPP9di320vzrI1S8kGYGmlj3HNyIip+41Bck3?=
+ =?us-ascii?Q?Sg3M7kMfxi6mnnIBLYVmhcAQqmC+Vz93sN+U/QHjS6F8CuMyBTnWWtUe/VOz?=
+ =?us-ascii?Q?UBqaOR9UJNwxYdQs9ZAOycKnqhezERjLZ4Lcv7/UO58tSnoXTsXnovyifg2S?=
+ =?us-ascii?Q?x5oAV5pj0nm1vnT1VB6Qj4Alg9qU4irLHKkETvAvadrf6TEnAnUeRwWPc/sC?=
+ =?us-ascii?Q?erkscjM7K4RrUiq6vpeacVt7efhR7pO429B+2Sdd6sUp8b7tZH2smv6vxn9W?=
+ =?us-ascii?Q?dxwVCUvhbJP37zlRSs/a1a2nX4i8/qFDfcUrvFqFBo5QZzxUi3v1Y1lfvsXk?=
+ =?us-ascii?Q?UQgg9e3HToGuscu/flsde3i/t+6lquWpOKfOzXQ5MxJqaZCnj/3xbsMM3kLq?=
+ =?us-ascii?Q?annQKHRTc/4eOsEPZjEVz2bVg5EjwHaaTG4cgcbMPnwcFqKsVSiG855pM8or?=
+ =?us-ascii?Q?4n+B4Epcks9KGzNM9JqrxkFZmo9Y81qM4y8NBiaZajeFNGb4toShl0UfLG3y?=
+ =?us-ascii?Q?hyND63pB+JaGtpMNTf+bCApCTD017mua86MHzll1ybGxf2tTF7xz23moceH7?=
+ =?us-ascii?Q?mLn11b1IiTd0vcBkMiJ6b2Kw9j112BefpjnqUbLTKjcekmWcY2YuN0lvvTND?=
+ =?us-ascii?Q?7T8fDzYSu4hhIKDaYXhKDLm6ZbeFSVk54hXoni5LopBXmbjX/ZSDHRpVuVFb?=
+ =?us-ascii?Q?xFbHg6s0UDzgTJAyQOFGsWE4wsR+0m5hds5uSzrKNsMpoqBDPZxXcgu/Y3ZV?=
+ =?us-ascii?Q?TA3JukeN1OtsbHGZ5wx66QZ4cp5xkUkwwuM4YxbW2U70FvbdqCORxBaRzxe9?=
+ =?us-ascii?Q?iLkhWM9YMU6kvGEbK6R11OUfVjMhamhRSjU9mGk3PGWhFV3wvdxT0QEhtCNJ?=
+ =?us-ascii?Q?Cj91CNl6xk9oCSnxZ8oIfuQhTPddrEyzVfZ+klppxhihNOt9OeRZ1UpurQja?=
+ =?us-ascii?Q?25CuyTXZtXw/rM9rDiTkjyTCuqpvOYFB/3xg4RpjOA8dXbn7XEwEHPdr10fF?=
+ =?us-ascii?Q?c1bIvwNPucn4Q8uw/Z/xjv6cyAu/QK1gGw/P/g82YcFCz9N8JJYKdt2LrR9I?=
+ =?us-ascii?Q?lSviZMZWjKHXmK4Mp9hmEGwEGqmzBpyiOXfG9cCBgqfT+naK+WrRc45kjY3v?=
+ =?us-ascii?Q?IPSdUQWh70Iggg7PMHvizUw95KWWE/k1Y2v1nbCdHEJGj8WUPFkklc4KNQuL?=
+ =?us-ascii?Q?TWvTGtzsbeQwCLfrAdefojRL4LmSRbo3emqzcc+H4URaWSazdAQMjC0wnWzZ?=
+ =?us-ascii?Q?ju35P+9nJ7Ns0LxQH9HO8LArcdVfro6NibZ138k4eL/AA+Xum1/JXsmsl0HY?=
+ =?us-ascii?Q?qE2oFrGJ4eQVIQnqQwDphBeOGbNKi8sJ1MzprIGSZ2N9m50fe7dMpiKqIkxb?=
+ =?us-ascii?Q?ESBObshPIrK4leKmmSmlPIlC8ZRU3yu1bUkfBaSv+CJW9T2kOxupLHncZFvp?=
+ =?us-ascii?Q?zNVq6sVaBWg1z+1z8XohFcjfFOncqzDcwQNmIqWrUL4+TR4W6gyuw596UWWi?=
+ =?us-ascii?Q?IDqwuC1Q02kDp4ax71KkH2E3Sc+0yv1WpMIy?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024)(7053199007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 08:02:37.0386
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7bcca8b8-250b-4212-1e7d-08dd44f24a06
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B373.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8859
 
-On Wed, Jan 22, 2025 at 5:22=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Tue, Jan 21, 2025, Suleiman Souhlal wrote:
-> > On Sat, Jan 18, 2025 at 1:52=E2=80=AFAM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > > In short, AFAICT the issues you are observing are mostly a problem wi=
-th kvmclock.
-> > > Or maybe it's the other way around and effectively freezing guest TSC=
- is super
-> > > problematic and fundamentally flawed.
-> > >
-> > > Regardless of which one is "broken", unconditionally accounting suspe=
-nd time to
-> > > steal_time will do the wrong thing when sched_clock=3Dtsc.  To furthe=
-r muddy the
-> > > waters, current Linux-as-a-guest on modern hardware will likely use c=
-locksource=3Dtsc,
-> > > but sched_clock=3Dkvmclock.  In that scenario, guest time doesn't adv=
-anced, but
-> > > guest scheduler time does.  Ugh.
-> > >
-> > > That particular wart can be avoided by having the guest use TSC for s=
-ched_clock[*],
-> > > e.g. so that at least the behavior of time is consistent.
-> > >
-> > > Hmm, if freezing guest time across suspend is indeed problematic, one=
- thought
-> > > would be to put the onus on the VMM/user to not advertise a "nonstop =
-TSC" if the
-> > > host may be suspending.  The Linux-as-a-guest would prefer kvmclock o=
-ver TSC for
-> > > both clocksource and sched_clock.
-> > >
-> > > [*] https://lore.kernel.org/all/Z4gqlbumOFPF_rxd@google.com
-> >
-> > I see what you're saying. Thanks for explaining.
-> >
-> > To complicate things further there are also different kinds of
-> > suspends. From what I've seen "shallow" (and/or "suspend-to-idle")
-> > suspends don't stop the CPU, at least on our machines, so the host TSC
-> > keeps ticking. On "deep" suspends, on the other hand, the TSC might go
-> > backwards.
->
-> Yeah, only S3 and lower will power down the CPU.  All bets are off if the=
- CPU
-> doesn't have a nonstop TSC, but that's not at all unique to suspend, e.g.=
- it's a
-> problem if the CPU goes idle, and so I think it's safe to only worry abou=
-t CPUs
-> with nonstop TSC.
->
-> > But I suppose if the guest uses kvmclock the behavior should be the
-> > same in either case.
-> >
-> > At least for our use case we would definitely want guest *wall* time
-> > to keep advancing, so we would still want to use kvmclock.
-> >
-> > Would accounting the suspend duration in steal time be acceptable if
-> > it was conditional on the guest using kvmclock?
-> > We would need a way for the host to be notified that the guest is
-> > indeed using it,
->
-> And not just using kvmclock, but specifically using for sched_clock.  E.g=
-. the
-> current behavior for most Linux guests on modern hardware is that they'll=
- use TSC
-> for clocksource, but kvmclock for sched_clock and wall clock.
->
-> > possibly by adding a new MSR to be written to in
-> > kvm_cs_enable().
->
-> I don't think that's a good way forward.  I expect kvmclock to be largely
-> deprecated (guest side) in favor of raw TSC (with hardware-provided scale=
-+offset),
-> at which point tying this to kvmclock puts us back at square one.
->
-> Given that s2idle and standby don't reset host TSC, I think the right way=
- to
-> handle this conundrum is to address the flaw that's noted in the "backwar=
-ds TSC"
-> logic, and adjust guest TSC to be fully up-to-date in the S3 (or lower) c=
-ase.
->
->          * ......................................  Unfortunately, we can'=
-t
->          * bring the TSCs fully up to date with real time, as we aren't y=
-et far
->          * enough into CPU bringup that we know how much real time has ac=
-tually
->          * elapsed; our helper function, ktime_get_boottime_ns() will be =
-using boot
->          * variables that haven't been updated yet.
->
-> I have no idea why commit 0dd6a6edb012 ("KVM: Dont mark TSC unstable due =
-to S4
-> suspend") hooked kvm_arch_enable_virtualization_cpu() instead of implemen=
-ting a
-> PM notifier, but I don't see anything that suggests it was deliberate, i.=
-e. that
-> KVm *needs* to effectively snapshot guest TSC when onlining CPUs.
->
-> If that wart is fixed, then both kvmclock and TSC will account host suspe=
-nd time,
-> and KVM can safely account the suspend time into steal time regardless of=
- which
-> clock(s) the guest is using.
+Sean Christopherson <seanjc@google.com> writes:
 
-I tried your suggestion of moving this to a PM notifier and I found
-that it's possible for VCPUs to run after resume but before the PM
-notifier has been called, because the resume notifiers get called
-after tasks are unfrozen. Unfortunately that means that if we were to
-do that, guest TSCs could go backwards.
+> Move the code to mark the TSC as reliable from sme_early_init() to
+> snp_secure_tsc_init().  The only reader of TSC_RELIABLE is the aptly
+> named check_system_tsc_reliable(), which runs in tsc_init(), i.e.
+> after snp_secure_tsc_init().
+>
+> This will allow consolidating the handling of TSC_KNOWN_FREQ and
+> TSC_RELIABLE when overriding the TSC calibration routine.
+>
+> Cc: Nikunj A Dadhania <nikunj@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-However, I think it should be possible to keep the existing backwards
-guest TSC prevention code but also use a notifier that further adjusts
-the guest TSCs to advance time on suspends where the TSC did go
-backwards. This would make both s2idle and deep suspends behave the
-same way.
+Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
 
--- Suleiman
+> ---
+>  arch/x86/coco/sev/core.c      | 2 ++
+>  arch/x86/mm/mem_encrypt_amd.c | 3 ---
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+> index 684cef70edc1..e6ce4ca72465 100644
+> --- a/arch/x86/coco/sev/core.c
+> +++ b/arch/x86/coco/sev/core.c
+> @@ -3288,6 +3288,8 @@ void __init snp_secure_tsc_init(void)
+>  		return;
+>  
+>  	setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
+> +	setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
+> +
+>  	rdmsrl(MSR_AMD64_GUEST_TSC_FREQ, tsc_freq_mhz);
+>  	snp_tsc_freq_khz = (unsigned long)(tsc_freq_mhz * 1000);
+>  
+> diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_amd.c
+> index b56c5c073003..774f9677458f 100644
+> --- a/arch/x86/mm/mem_encrypt_amd.c
+> +++ b/arch/x86/mm/mem_encrypt_amd.c
+> @@ -541,9 +541,6 @@ void __init sme_early_init(void)
+>  	 * kernel mapped.
+>  	 */
+>  	snp_update_svsm_ca();
+> -
+> -	if (sev_status & MSR_AMD64_SNP_SECURE_TSC)
+> -		setup_force_cpu_cap(X86_FEATURE_TSC_RELIABLE);
+>  }
+>  
+>  void __init mem_encrypt_free_decrypted_mem(void)
+> -- 
+> 2.48.1.362.g079036d154-goog
 
