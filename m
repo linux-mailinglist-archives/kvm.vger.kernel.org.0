@@ -1,180 +1,135 @@
-Return-Path: <kvm+bounces-37259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37260-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EAB8A27932
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 18:58:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA09A2794B
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 19:04:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C97F1166F39
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 17:58:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71B5E7A2761
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 18:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A95521660B;
-	Tue,  4 Feb 2025 17:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AADE217716;
+	Tue,  4 Feb 2025 18:03:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0jixMCo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DQ+KyDtk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C528216E06
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 17:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC813217648
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 18:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738691926; cv=none; b=VJ/cK4pSoFHte/rla4Fc7UzeRykQ7Ym+3vrDh4vt8Tpnqv3Bx8tpT2zk3ExBFREqtYMvxzHIwUzRnTnVErXJb6Ot7Eu+tf4O8IhoxFs4iVVmVzvEP9/ENpyrOjrKes/TUOK1Ouau839Bod48VXWxDeZfrOgiJI02Vlwox4ij9vU=
+	t=1738692229; cv=none; b=jWb6RCVovvjpdZURjw0SwJr8YSR45RIm/JLxEL6nGkj34OscsilTCnRqBKhGMvXBkOCFWFXOJmL6Hdf/QfK6qufEyYy1R8V2Qd+c6TeJ8HYliIhJlO+ptDvmrdKWxDj22aAoRzWTwhjSOvC2qJ0yQiQ4DqAQJBh/lkkCPMGmhZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738691926; c=relaxed/simple;
-	bh=mcWM9JZRZ6PqIkePmQyxVeUNFL3oWmy+p3wfbdfqIrA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GQaGjMtsYM3T/T6RIgH7+YN4V7KinuW7GFhHCQajDtsTQ3f/tqXzy4hY0BVKsAYdMB7HJvMzconzSZZGAaZr1HJ6yfswOe7GNpVl3O8VgABmU+OuVew1qXli3jAUmAQspwJgMJpfKtCgnaRtzDoqs0CVf5LzXgcSSXSuRBDcpfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A0jixMCo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738691924;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=4tEv0ZS87LCpgKuJidnYRf/SyUvTQEIjTRctKqIgV/M=;
-	b=A0jixMCoCA6rTba+d62KMjry1Nu7x87NJg7VXUnN93OVUhkXaquvrgjVwvACtiVasTnduB
-	J4QbRJZA9+PEYBk41pTJXPfs4d/ZjNbLSh+7QHPazmCinofmY0YJHJWL/LwFGB2oOUefRf
-	Yd/qeMvURJG47Kkn8QfNEFPSPuATv6I=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-150-VHycFIPQOI2wilZ3VzEXjQ-1; Tue, 04 Feb 2025 12:58:42 -0500
-X-MC-Unique: VHycFIPQOI2wilZ3VzEXjQ-1
-X-Mimecast-MFC-AGG-ID: VHycFIPQOI2wilZ3VzEXjQ
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aa67fcbb549so184341766b.0
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 09:58:42 -0800 (PST)
+	s=arc-20240116; t=1738692229; c=relaxed/simple;
+	bh=Oj0oNLn2yL6+fmX5W290/5q7EprAS3GBOQgkRODPBVA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZkGqzc5UT4uGodHZZlKSKIWPvs1NKUw0Z/n1r1EpquYfbRtVxWiZ7IMD0ADv3KOu+4qCYNzstapof93DXq8G9DFuxRfPLQtDGTtKffnDThsYFaDb8CSP8kKbBrhu7eTDvWx4pxQQyJ3/2+fGWc7C+P6K/oQndzngcTtOfrMZUjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DQ+KyDtk; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2163affd184so146195ad.1
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 10:03:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738692226; x=1739297026; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hnKb/NxDzwUPz79zbu5N/Xfg9BKIOLMoGS4rXOX07CA=;
+        b=DQ+KyDtkBwZJAhWhAuyRLkhaKlrlprdaumqBBWGb5rYVhJ5zvZFsaw/09i/unlQsJl
+         xQLhazeBVf25SD1PzF4JRfqc5hlzo/54HzTFVPi9gC8BqAb31DxwAFOnxATSJS3oMvbF
+         zwv3Yj39GxnYFh+df101DZeOowd1QWFO2N6CrK8APpNvTfLNIZ8Aoi06R/TH1hmUi2A6
+         lwxA5FRbJaOOHnssKA94tlAuQSBF580Hhp9999NpYT+qgp/vaMOJYOcehm13j7b1EGKR
+         NARGB9W50n9tnEn4s2gQwgafvsvgcuO5wMJEpE24jofmeBT+2YMEVX6EBaXWZvCure5M
+         B/oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738691921; x=1739296721;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4tEv0ZS87LCpgKuJidnYRf/SyUvTQEIjTRctKqIgV/M=;
-        b=E+XFw7tmPPsARTmSWdjqVMTG89C5gQP2X6rVwfSyEF1QqxwzVH7oCaFrjqrR7PKp/H
-         YRDtdwMJpF/NmmImYk8kSMG9VHMY14gFzW24Kuvh3epE2xxfB04dc3nQTQ3ol7mmOGen
-         uAHOgv9AQlRhnSr2YBfhVVIBoNS5KPvIMDNoX2keLCjnoE6dfHgmrJDNbvv7B3//tg3E
-         Mo/Bz91Yx/ojitEzOnOXGSXzineffqg7BkkTm1k7zIC9zZrpAAHKRITZvTBfthdwrJ1c
-         TbbTq7bM8aIvWqj1jkp1KCPLlkUsNVFs68sHdjVxTRL4tRdvkUdhk9jy0j6Fp9eeanzr
-         fqog==
-X-Forwarded-Encrypted: i=1; AJvYcCVziAh/bVhNElIIGvxVieNfUj0aYs8ApdGGVV9ItTzjdV58ewGTb1BnzBDIkjp2O2In5GM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0Sg121Q+wmWbg5tyDoYihi9jaPITn+EbBnc79OGy+lCs8696f
-	qNRh9s5FQpT/vxR+kJ7NqEW+kuxZFE5DztTwyZXUb62Q51as6MUhQPysGz1dsfwRwCZ9TITXAxc
-	iu2Fkx+bjfkggc2KNy+k4NB8NgxIbB3Bd9O8+v9yrldkV/qu3bIqtK0UbjaVY
-X-Gm-Gg: ASbGncs5GamSGYVGa26XIod85NhpI8Y2qPF8BiniJdG+yXWmiOScTR9fP2PYkzG4KN6
-	TDsE6VCVf2l0WGIivbj/TczHNI/kS3+M+6tLR/25Ej2M9QmIrvLbNjx95ZqSqG3aUttqzSctPSw
-	xQfoLBzM4/4U4ANQZ6ulFP7+Lh6Da2uAguhhVGKzV1EZGv7rfhgoFq75YSTKW/Ay19uOMrPD3QH
-	urS0ACGeTSWK0MgU/0PQirQuypCQjxekDOiG7/lFgCc4eRx9QjflPWl+sVz1VAsPte7f+DaVfV9
-	wnw/9Q==
-X-Received: by 2002:a17:907:6d1d:b0:ab6:fe30:f487 with SMTP id a640c23a62f3a-ab6fe31017bmr2012663266b.12.1738691921317;
-        Tue, 04 Feb 2025 09:58:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEngAueFezRPiiaOjcjw/oTHTi3J+m4OkdKh3LbQcs/taWyeXi7gQiffkbOXLLL97NJGlDUzA==
-X-Received: by 2002:a17:907:6d1d:b0:ab6:fe30:f487 with SMTP id a640c23a62f3a-ab6fe31017bmr2012661266b.12.1738691920999;
-        Tue, 04 Feb 2025 09:58:40 -0800 (PST)
-Received: from [192.168.10.3] ([151.62.97.55])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab6e47cf9desm976700766b.55.2025.02.04.09.58.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 09:58:40 -0800 (PST)
-Message-ID: <2d86cce9-88c2-4b2f-a8a6-ee33d0e1c98d@redhat.com>
-Date: Tue, 4 Feb 2025 18:58:38 +0100
+        d=1e100.net; s=20230601; t=1738692226; x=1739297026;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hnKb/NxDzwUPz79zbu5N/Xfg9BKIOLMoGS4rXOX07CA=;
+        b=ZYs8zbdWxjSXGzHcv4xzH8Grllo4Q3clmipCLn+VPl356Uims0zyHY412XfOjTx3dD
+         3+rNCL4uEGaJy21l31C0R2iiW67c3tMWsZ9MJ7F/QS+F0I5MDRpcKeJxW3dLy9m/NiTR
+         39naCCNwQIhH1idB4rQHsfZTU64Kd+pQ/ffTo3Qm0360mUY4EF4yfMv3B9kqp+ZzRr4I
+         CnOc5brkPmy5Vc9QaCKAPGMQKh8aywZ9zNPAKKpDRxzksJKOsnJjBXr2SbO4t/xwhb6a
+         MrJHgr5d9xHoBgtb8AOohTWHIjMrKfr9mnSc4C8aK5bNSQGT7OYDg4Yp268IQzikQ1D8
+         AhfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0igRq9JZiz3nYYaG6UBUAPsRm1GvwB12f3NWcKfKoe2/MyzsBkE8bBgj5Iq1jACKgIBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4ucmjNqoNpDb4bFDvAdu1c/OP9XQWePBHeb6aoCGw5kdMvHTy
+	8pUDbhnh/9P9cGIN12Yf53N7sGRRDUWbqvEeKrXhASSiL7Xodegh4Ijuz1hTayNr/xCFVQMBiIW
+	Ndhwav77CtRHVw2G8ErxNjxLOSDbSYaGCDzJr
+X-Gm-Gg: ASbGncs+JF50CH0AvX0+yeOq/BqE9fWgQzo9JHQSGaKQLqqTURWXfkupXYzPYiAVd5Y
+	b3VzMsqsubLKIlmb5/G3quN6SEF6EGO0PWXlYBCs2Nkgxm31dghtLaQoeavO/kEILWmqq/niu
+X-Google-Smtp-Source: AGHT+IFGO0WVuOzQMwTOIUL2zNV30YHnBBx/izI8+SQNwu12kEXS3uYQZz8FhcRE8mSTIdjM5HAUSbAmJ4VB9XKoqDo=
+X-Received: by 2002:a17:902:bc8a:b0:215:44af:313b with SMTP id
+ d9443c01a7336-21f000c1a2bmr3663845ad.0.1738692225592; Tue, 04 Feb 2025
+ 10:03:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] KVM: x86: Remove use of apicv_update_lock when
- toggling guest debug state
-To: Sean Christopherson <seanjc@google.com>, Naveen N Rao <naveen@kernel.org>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
- Vasant Hegde <vasant.hegde@amd.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <cover.1738595289.git.naveen@kernel.org>
- <dc6cf3403e29c0296926e3bd8f0d4e87b67f4600.1738595289.git.naveen@kernel.org>
- <30fc469b5b2ec5e2d6703979a0d09ad0a9df29e1.camel@redhat.com>
- <a7eb34n6gkwg6kafh7r76tkwtweuflyfoczgxya2k63al2qdoe@phmszu6ilk4w>
- <Z6JTmvrkrLpaJ1nw@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <Z6JTmvrkrLpaJ1nw@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <20250203223916.1064540-3-almasrymina@google.com> <c8dd0458-b0a9-4342-a022-487e73542381@redhat.com>
+ <CAHS8izOnrWdPPhVaCFT4f3Vz=YkHyJ5KgnAbuxfR5u-ffkbUxA@mail.gmail.com> <71336d4e-6a75-4166-9834-7de310df357e@redhat.com>
+In-Reply-To: <71336d4e-6a75-4166-9834-7de310df357e@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 4 Feb 2025 10:03:33 -0800
+X-Gm-Features: AWEUYZmiESSMokFwGB0BJqHNhJeqNgHpu960zdUgGcxEH4CFZhDgvoFYnYH4I-E
+Message-ID: <CAHS8izPFe-1tf9Xetc8Znj04x9rKXVchR3DaspRGPDRbSFQFgw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/6] selftests: ncdevmem: Implement devmem TCP TX
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/4/25 18:51, Sean Christopherson wrote:
-> On Tue, Feb 04, 2025, Naveen N Rao wrote:
->> On Mon, Feb 03, 2025 at 09:00:05PM -0500, Maxim Levitsky wrote:
->>> On Mon, 2025-02-03 at 22:33 +0530, Naveen N Rao (AMD) wrote:
->>>> apicv_update_lock is not required when querying the state of guest
->>>> debug in all the vcpus. Remove usage of the same, and switch to
->>>> kvm_set_or_clear_apicv_inhibit() helper to simplify the code.
->>>
->>> It might be worth to mention that the reason why the lock is not needed,
->>> is because kvm_vcpu_ioctl from which this function is called takes 'vcpu->mutex'
->>> and thus concurrent execution of this function is not really possible.
->>
->> Looking at this again, that looks to be a vcpu-specific lock, so I guess
->> it is possible for multiple vcpus to run this concurrently?
-> 
-> Correct.
+On Tue, Feb 4, 2025 at 9:56=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On 2/4/25 6:35 PM, Mina Almasry wrote:
+> > On Tue, Feb 4, 2025 at 4:29=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> >>>  .../selftests/drivers/net/hw/ncdevmem.c       | 300 ++++++++++++++++=
++-
+> >>>  1 file changed, 289 insertions(+), 11 deletions(-)
+> >>
+> >> Why devmem.py is not touched? AFAICS the test currently run ncdevmem
+> >> only in server (rx) mode, so the tx path is not actually exercised ?!?
+> >>
+> >
+> > Yeah, to be honest I have a collection of local bash scripts that
+> > invoke ncdevmem in different ways for my testing, and I have docs on
+> > top of ncdevmem.c of how to test; I don't use devmem.py. I was going
+> > to look at adding test cases to devmem.py as a follow up, if it's OK
+> > with you, and Stan offered as well on an earlier revision. If not no
+> > problem, I can address in this series. The only issue is that I have
+> > some legwork to enable devmem.py on my test setup/distro, but the meat
+> > of the tests is already included and passing in this series (when
+> > invoked manually).
+>
+> I think it would be better if you could include at least a very basic
+> test-case for the TX path. More accurate coverage could be a follow-up.
+>
 
-And this patch is incorrect. Because there is a store and many loads, 
-you have the typical race when two vCPUs set blockirq at the same time
+Thanks; will do.
 
-	vcpu 0				vcpu 1
-	---------------			--------------
-	set vcpu0->guest_debug
-					clear vcpu1->guest_debug
-	read vcpu0->guest_debug
-	read vcpu1->guest_debug	
-	set inhibit
-					read stale vcpu0->guest_debug
-					read vcpu1->guest_debug
-					clear inhibit
-
-But since this is really a slow path, why even bother optimizing it?
-
-Paolo
-
+--=20
+Thanks,
+Mina
 
