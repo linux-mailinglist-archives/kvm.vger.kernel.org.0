@@ -1,86 +1,86 @@
-Return-Path: <kvm+bounces-37228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F7B7A271D4
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 13:32:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1189A271E3
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 13:37:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 404D41882684
-	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 12:32:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 687E5161735
+	for <lists+kvm@lfdr.de>; Tue,  4 Feb 2025 12:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB41211476;
-	Tue,  4 Feb 2025 12:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC28211494;
+	Tue,  4 Feb 2025 12:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gpf4dkAg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iECYI6A4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DD520DD64
-	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 12:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743A220B80D
+	for <kvm@vger.kernel.org>; Tue,  4 Feb 2025 12:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738672167; cv=none; b=YQbAI3fxg/WFCKtS74x8RNcWv824QCHlWgbG1ZwODgrG8PX3zldI577DaHsTyEp6yPpR1NQi/6qrH4F84QCClczSLkRtejNIsZtYa4nf+xshAgK6mJMCGCuhRQ5U8EswUP9/eBFi7BbmEjRnTTNMdHgZ0nUXpJ8iuyaasb5oCf0=
+	t=1738672364; cv=none; b=hkQA1HLwZfc2XcS/vAE5MfzzTHjn651zkWjFISwYgskHm65a9aWrZUW521oru2OLlrspxKkP4QeZHLSWu4iX+/RNczNBFg2nIziPB6HYogr7A6hIRuQft9timuu2fhivs9HL0A92G04Y4NClfuo+sE4XSI0YS9ZFKnyuBWBhNLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738672167; c=relaxed/simple;
-	bh=u6K1gc6fqbQ9CyQmR1XZtEDc+/599QHfU81+5JM+XJg=;
+	s=arc-20240116; t=1738672364; c=relaxed/simple;
+	bh=ZXCyve0sUTK6c4XTKrMCSgDTrRmbMhPKy9Ob/dPEpwY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HO2UXXKixT2WEWKD3OVMBN6sSHKSa66ru7pM9HHTn+NLRDGXhORzYngvVsn/FRJhe8UPlG2QeMlpm7boCR5Dvj3Qzf5fipxYkMzPF9f8FRvKMgD1zlB4+yLwcATt8epvup1ZcBJ1WTXLLkHQyrcstmsJDLnKrDBbcuaZmSHKV0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gpf4dkAg; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=YoJFG/2J0lvcyrrZO+s5ZRb+UJgROKPJh+Y+xPECZpf19Gz8bmBKAgVA8LXo6bClMmzT+Owc85vZ/NFocv5oTq4cDDePTYsyWcCyPz2GI0DYMYLvD8pgovVXtHDmJVN/jotwcOPU1OxghtMYIOreHhU2Adkgcy7TwV3uNTPXqbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iECYI6A4; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738672164;
+	s=mimecast20190719; t=1738672361;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SVt11t4VdzXmaGrVYonLKU4tNbyq45g4LumiKNuZLV8=;
-	b=gpf4dkAgfZJjGroqrLhLo3yFumiFQAk31z5ESXLMhDdRsT+lQuGavqltxlpN/7zOUmC8nh
-	aTwS84LAU+1deAaNSOI9AuQ2yVC1ACrk8zt+e2NXiwMKgha1x6qno/cGPZp+dWxl/+QdRm
-	nlNcTk6Bf1bHEzcw+QtC4YaaxFYDY2o=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=AX5LRiS12WNOF9SfYpl9HqapEpZa+Gag56j1GQy3/fs=;
+	b=iECYI6A4Fkf1wj+zHcERNHLA8Z0Awzoz8kVoKGodWXidX/fTKbOCassp9LBDBjetctzPFZ
+	Jc0ETO8pWT6sTgYHOp+WI6PBDzPY5tmJ4PxiZ/yC/JY3dGkdL8aFjJcGMNQ/U9wZ34JKVN
+	MPukYJOwR6tFFSK93OD1X6JNe3M1Msk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-487-IdOVfQW5OPuenZ0uZJVa2A-1; Tue, 04 Feb 2025 07:29:22 -0500
-X-MC-Unique: IdOVfQW5OPuenZ0uZJVa2A-1
-X-Mimecast-MFC-AGG-ID: IdOVfQW5OPuenZ0uZJVa2A
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361d4e8359so38993155e9.3
-        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 04:29:22 -0800 (PST)
+ us-mta-590-yq3tVc__OyGI6uDS0BHsqQ-1; Tue, 04 Feb 2025 07:32:40 -0500
+X-MC-Unique: yq3tVc__OyGI6uDS0BHsqQ-1
+X-Mimecast-MFC-AGG-ID: yq3tVc__OyGI6uDS0BHsqQ
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4361fc2b2d6so28867365e9.3
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 04:32:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738672161; x=1739276961;
+        d=1e100.net; s=20230601; t=1738672359; x=1739277159;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SVt11t4VdzXmaGrVYonLKU4tNbyq45g4LumiKNuZLV8=;
-        b=WoOpWNihgxO5z9FBWuHMGZESdz7LvpqnubgEdUuquxAPm4YwikNEnsbnczOdLTZVxc
-         ygQjAzH4MDgt/mQFZFsnTpYSTxrBdBcVwsLIgYzCibLHzZTHRXLhjbyUE9ccqMgKMQ9i
-         G1FqiUvJBv52gCKDN4L1TAahNafIEJ1iqXlFFxIEtAOc9yYivZX9bQPo6Npn4VwvgFAx
-         zPMV9WPefgSLsmY0LjbvTY+MWzpl9dSZzwZSmx5iNfGoZBubrB6wHYFnkJTWLQCjxivJ
-         GqrWnPOrmN21qyMDcUjLPPv8Je036cW7nHzGzAXoFuf4h3uEqh6eYf8MaoiRRdurZTRm
-         Qr8g==
-X-Forwarded-Encrypted: i=1; AJvYcCXpyrmli3jPssBnJ5QDQKXGRB3BLSixn5005tjeKqnrQb8MgaCMrthdhNsJtmzzCkylprw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyviwmqCdx91pMqKfdyBDbSdG274fHImOaIL3ZrhB8OdHJZJsv2
-	xcuZbuN4M8qJgaXgHe+xUY9L/MRsw1NueqQvMhY8D1wsdVz8IOPJjPfxeAMYjvolw7axyRw0Kv0
-	sdvNw9THDTSTmubFPuYkPHtgKTRH2R7I+yNOmZYwzaX3Vx2wQ4A==
-X-Gm-Gg: ASbGnctY3BG8zZoe63jLz3OPsR1G5IWr3VYRhQsFU8bvLDBDbhQvhPYDM0HMVm0oqR5
-	/Gby0lNwiWemyWrYi4kGy7Ea771YJ1cFx/t503EZrqhSEWtkHX86hKX7fb+X9s5JLZZAD49m2N/
-	kJTt/T83pjH4vjB5MIMq5pfAX7oMhrtl5hk8RqEoOJm1dO8CHeWpk14aJgROs0M3oG03sQK8CxN
-	yrA6dyc/w7JAV2tmjojcaPE1Cd8rMduB3XwjucbtjPISmey/BThE/DX3XRO04IJ40qO3MV7Ce1h
-	zwsvbA3T55ZuXZbDYhZMdut82Fx2daEIMYg=
-X-Received: by 2002:a05:600c:5248:b0:435:32e:8270 with SMTP id 5b1f17b1804b1-438dc3cac3cmr242156335e9.14.1738672161579;
-        Tue, 04 Feb 2025 04:29:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF6sf3mUWx9f6oCktAawZ1NkGZse1Cb+QiEWr0dnqS8PjvhkiCOef50Jj0CTOWCanLTCjNSYQ==
-X-Received: by 2002:a05:600c:5248:b0:435:32e:8270 with SMTP id 5b1f17b1804b1-438dc3cac3cmr242156005e9.14.1738672161191;
-        Tue, 04 Feb 2025 04:29:21 -0800 (PST)
+        bh=AX5LRiS12WNOF9SfYpl9HqapEpZa+Gag56j1GQy3/fs=;
+        b=DjybYRp9kB3KJg1Bc14CoBDP3R4zH2QMgftofougd5Cqxj5WSXaCeTaY8AnY7RMc9o
+         gd2Xy7MHwz8dSlFVqOK1e55047HBblDsyytr8lk7L2L7zz7WdVIXP97gnF80fj4+3Q+n
+         HHndYRfBzMZSfQOtF3S/lhm42jiEv8/HVTEMs1cqJBy0lGe7V3iLOrxJjU5ySSjar1wY
+         VlU4eihitLOlrVPq+I0M2oixeqYQClj7TVVZY8OE/s2WsHtG5DyIq7j7Sb+ED/NXkGpT
+         YxwVXjuaBzQvu4d/UcwhbklIkPwzldPhZ9fLBUXOeAUQ8zHdCSZPbGRUDLijrFXNU1Wv
+         5iFg==
+X-Forwarded-Encrypted: i=1; AJvYcCXpM43QrV9gUS4BD8ZeXvUwymkue8gHY4MjIyQ5VCliT3ujcYFvMh5QWXaeMXToQiHBWY8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVLZZg6tiNrmPydjuWVpBNTSHZvKhqDs3nQayYTQY3AMzkUedw
+	3R662reI9SjTYpijhvOnTZs/DPwLTtmJZkDgdmKIjef6Ap6dtEzu01DeZi7qagp7v6eoF3uF2sw
+	Ayvsr7RxPW/GgaoLopFyn3RJtm8tOXOjQXaBXed+2p+3kWDYajg==
+X-Gm-Gg: ASbGncttqzVv4TvLytnloCJA4rmPTS0uqw+oAIi/meNOGBykxp0NtP+XZXLiElOezQH
+	cjBNG7nZpxXUMrFrE7jHyTDtKiG7mKTLkcNYLh7pKanTp84U0vstnFhSB8XYsFoIG6VbsL6XNGT
+	hHkZl3bO8EXQzv/8DPC0Ua71qxTZ+JHHIblFP6QBfneRV3VTXcYs+vljT5fVT5HMie9/+NUO3Om
+	+o17VHEmOMm28I6pDNiDk98aHzjJtF3tLBYY1QfdiH8URPEZpO2xNNluAf6JvakFCpcjsBUjkRd
+	dq3ORZvGgMSkiefs8YfbNKwSVRpRUNtvCqA=
+X-Received: by 2002:a5d:6c63:0:b0:38b:ef2b:422 with SMTP id ffacd0b85a97d-38c52096052mr20648843f8f.36.1738672359114;
+        Tue, 04 Feb 2025 04:32:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IET/fdmBxwT2kEgeJ6xq9QXxCTtWqsruKoqpBh7wylvEdA7HYKJAa2oNIfrVb0R3o0Sw7rwuw==
+X-Received: by 2002:a5d:6c63:0:b0:38b:ef2b:422 with SMTP id ffacd0b85a97d-38c52096052mr20648813f8f.36.1738672358717;
+        Tue, 04 Feb 2025 04:32:38 -0800 (PST)
 Received: from [192.168.88.253] (146-241-41-201.dyn.eolo.it. [146.241.41.201])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc8a59dsm228847985e9.40.2025.02.04.04.29.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc263f0sm222469255e9.9.2025.02.04.04.32.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 04:29:20 -0800 (PST)
-Message-ID: <c8dd0458-b0a9-4342-a022-487e73542381@redhat.com>
-Date: Tue, 4 Feb 2025 13:29:18 +0100
+        Tue, 04 Feb 2025 04:32:38 -0800 (PST)
+Message-ID: <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com>
+Date: Tue, 4 Feb 2025 13:32:36 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,8 +88,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/6] selftests: ncdevmem: Implement devmem TCP
- TX
+Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
 To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
  kvm@vger.kernel.org, virtualization@lists.linux.dev,
@@ -108,31 +107,51 @@ Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
  Pedro Tammela <pctammela@mojatatu.com>,
  Samiullah Khawaja <skhawaja@google.com>
 References: <20250203223916.1064540-1-almasrymina@google.com>
- <20250203223916.1064540-3-almasrymina@google.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250203223916.1064540-3-almasrymina@google.com>
+In-Reply-To: <20250203223916.1064540-1-almasrymina@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2/3/25 11:39 PM, Mina Almasry wrote:
-> Add support for devmem TX in ncdevmem.
+> The TX path had been dropped from the Device Memory TCP patch series
+> post RFCv1 [1], to make that series slightly easier to review. This
+> series rebases the implementation of the TX path on top of the
+> net_iov/netmem framework agreed upon and merged. The motivation for
+> the feature is thoroughly described in the docs & cover letter of the
+> original proposal, so I don't repeat the lengthy descriptions here, but
+> they are available in [1].
 > 
-> This is a combination of the ncdevmem from the devmem TCP series RFCv1
-> which included the TX path, and work by Stan to include the netlink API
-> and refactored on top of his generic memory_provider support.
+> Sending this series as RFC as the winder closure is immenient. I plan on
+> reposting as non-RFC once the tree re-opens, addressing any feedback
+> I receive in the meantime.
+
+I guess you should drop this paragraph.
+
+> Full outline on usage of the TX path is detailed in the documentation
+> added in the first patch.
 > 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> Test example is available via the kselftest included in the series as well.
+> 
+> The series is relatively small, as the TX path for this feature largely
+> piggybacks on the existing MSG_ZEROCOPY implementation.
 
-Usually the self-tests are included towards the end of the series, to
-help reviewers building-up on previous patches knowledge.
+It looks like no additional device level support is required. That is
+IMHO so good up to suspicious level :)
 
->  .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
->  1 file changed, 289 insertions(+), 11 deletions(-)
+> Patch Overview:
+> ---------------
+> 
+> 1. Documentation & tests to give high level overview of the feature
+>    being added.
+> 
+> 2. Add netmem refcounting needed for the TX path.
+> 
+> 3. Devmem TX netlink API.
+> 
+> 4. Devmem TX net stack implementation.
 
-Why devmem.py is not touched? AFAICS the test currently run ncdevmem
-only in server (rx) mode, so the tx path is not actually exercised ?!?
+It looks like even the above section needs some update.
 
 /P
 
