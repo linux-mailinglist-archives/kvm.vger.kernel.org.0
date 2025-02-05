@@ -1,201 +1,145 @@
-Return-Path: <kvm+bounces-37285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E47E4A28096
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 02:05:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2382CA28150
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 02:31:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FE4C1889102
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 01:05:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB7323A6171
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 01:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF13228361;
-	Wed,  5 Feb 2025 01:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745772288DE;
+	Wed,  5 Feb 2025 01:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EvEaUhdp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qnWpQF6W"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0422F43;
-	Wed,  5 Feb 2025 01:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E8A2288CC
+	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 01:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738717522; cv=none; b=btSGOUJItd4tR/0TIOCAcUffrGFY74mSewrlxFRfUDFz6prNQLbauVUMKD4VyvHLGnU4mJPdHQCoBarJbmM+NOJjnA+kr1urPvlpFMDk1IW/Xuf68DV2i/9IQN6VnswdV4NI/kIrTSCNOskOcL7dShzWg6+RyXfqxiieEPZDzkU=
+	t=1738718903; cv=none; b=Du1+TNs4YveuZlfz9HTl8p9iXK2pp2CxVOuB2vODooslqvDxrl0e+xBS/Ai//A/EiflMnAZc6xi++rr6RQfrDXxqpU6BatVX2A+CTa0vGq2qVI/n6RxqATvtNeLyhTD0rlgyjGE8BM8PZjel/ncqlJmXZGcT0TjXE5gGQcAQmQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738717522; c=relaxed/simple;
-	bh=7vL1iclfVpKxu925UkU7LhOSPGQwgfUzy/hKHdblj8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KvWgMIIJMVj+DZzpQMM1idMOUUN8uubhhWRWxIR1gJIlReF/SQVGvHXdqNZiAJJzK2R/ihk/P1sPIlItDrC3fPAMt1UxvVJxQ+qSUl39jd3S82ConDsOwX1hFwiAORGf5lhDJGB/AHku7WX8L6Rxg9shukGUk1XyHOXcc0JB9lU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EvEaUhdp; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21634338cfdso54513145ad.2;
-        Tue, 04 Feb 2025 17:05:20 -0800 (PST)
+	s=arc-20240116; t=1738718903; c=relaxed/simple;
+	bh=L6UNHm52Av64g4eOvrgeAlTD7yyac3XSxjhdr1AZhD0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rDaxlvFGnxSUX2aZQyRjRAUViBWkHRa29gOp/Lw9TSMN1+peeaUsV7CDBED3qYAoqvRQHdEZscHO2qYJwsP2sB/sakSqYq8AJpAPt5DJRKdAUamo6+GCoYs8b/5bZ8J/ksbT2wGmSsJdQP4GCuJ4WDcNLERJHoQ9LaB/vY0qPag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qnWpQF6W; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5401af8544bso9830e87.1
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 17:28:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738717519; x=1739322319; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BU7gpRZNtZd4YkMjoYUK8uFnG/DJrk9+8BiLG4sDqag=;
-        b=EvEaUhdpJsSlZytiOkC/StxNmQ7Hm5y3Lp9bGqv/J3Qa9X1jJd5D9mH8spnIeNoOe0
-         nJfp2soXGK6O7O9g5JxSYU3HdjMAZ6sRUc8HQaewXJaw/CdAyAxhR9m9EoMOorutHnbv
-         FnQDxvwSWN8N4sGNcC4FAR6A07twImsRj9eBpPOesumsdNSkbaY/I/2ZnRtK6qJJJosU
-         F0alt9qu+hJLN5HyXrdO/n9rg6+VHNgUBNyo+s6Ojyc8CfoWTYNvbEDZmp9lDlxY5Rre
-         EA5a+hFxVOMhROukbnUgS1Hpz437desKPobpIL1ysS1ZJbmZ+1o3fNLikSdgMdlXWPqL
-         ImCQ==
+        d=google.com; s=20230601; t=1738718900; x=1739323700; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QynXFqkrYlZr7WYo7fE7UK6Y3PG5CrgtydXdsboPAYk=;
+        b=qnWpQF6WQppkAt7SJXefrrMv+iaZzxoG6cNHYLj4XCrjOAl08HU5mh638m0LdtSJnm
+         fmWstOub5AnEJOpoMamMFW3y7gJaFRfqD7oWCHPGUAvQ8q0B1NFt87Dpa7+8RCWcaB89
+         MBmTlc6VX1oqChhJ21+NsG7MeDfaXOeefBIqyGtswT1LFoQiqW9JcdEZ2zBFLJSdgpI6
+         MgG4OyukxYlXZrNt6DtnLIVqxXBpquayHSXyQ0pgvpoJfrYJj4aUO5KlgYgIFFpGihwj
+         RzsmQvy39ELQEnyrHOX4bk79iNtYawVArhLJEPafAFTCLkxM92cVpm2Tb6a18TUyqfbC
+         DqOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738717519; x=1739322319;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BU7gpRZNtZd4YkMjoYUK8uFnG/DJrk9+8BiLG4sDqag=;
-        b=ehlU1gH2V8ip/7mgh63b1tm57jq9DkCrUodG6QmYVhq8/MusHZfSwmP9cPkB8EdVov
-         a8hCVX+ipVcrOZ5aifELP+2t5f6ma16T7/oHP+VOkKmYRZFZ5k1ZH2R48RKTLzJDFZsB
-         /YPKEmCme8zfiJxX53CvzpbK1Vhh4MSJMa9cZQWZP/hAJagOIuRmSiErbslaphAwLOYO
-         3l6WwMCokrVq312Bu6AS4HZl39HdMkjmIcPF+nLIILeQvS4Wm4RErY2y/0UTewJIB6au
-         FXrP/iDVtvAyZOsdQZ7W/vJaPETCKyWpeH7nZqaqEMBGugmk94uqRmMX89ElD8N+NHsO
-         RWnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6AZumBfU+CULngbgHbFD6IRTH1O7/MpoKwCd1FbWzvxYv2w1TMMsO1G9MBWZYzbrnmiuVeX+fbKCZ@vger.kernel.org, AJvYcCU9Ie8RRTxwoL6Tq0PNaW/7bbzIdFmKoaElu42ScY838X2tJFolD8PsNzBDSwq9x8vYMqrLCm2Q2GwYSOU2@vger.kernel.org, AJvYcCUQ2srerYEjv7VVZ4i0pJ4kvKZOnaSstnIG6bpgsY2+uYJg2I6SLkP0Re78yDwfuMEPtzo=@vger.kernel.org, AJvYcCVTtuJzGFBUP2RiGqfvbvl9tpY0lAnJto3i/18I+wav4Pb5t1dvXPziRdzhIAdkzhJRTAJmQIq0@vger.kernel.org, AJvYcCWqZbYSufXj6gNe2c8Ampr2SMa6QGEX+mylX4MbKs4ltdjVNje5teiNF2E4EYmwx1u8CEWAEQYBkclFqzPo8ohk@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr4o+VFk0lpaWnPjnOIn1E2l3q8AqgrnYsVu5QDq1aZ4Of9lKc
-	Nf5Io2pygSvb40PkzJR8q27hZPxXWlcRdD9DSxCc9TxRF/CsfzgdO3QhOE8=
-X-Gm-Gg: ASbGnctQhEOqLWO3egAMc1DXw+KgK93gvCw557AzohDual+wy6nH2SUTiKvSin2typE
-	TPbapPWtJ5XKUTNMK/3/qVldvgqemv43BHq5qW+mXluv2hVpR+psQhuIPran03dDSosKb2aoR+W
-	Ndv8y1u65bAu7/Xny4nMFlneykaw8WKy9pGUy4NlmbLae8Ql4rj7YXUKioTiUoQ0Bg3EEcUNaAP
-	6fcH50aX61eovP1XWhiFKiPH9ow0eWHLkJ5Z+pLD614tgIBDc1kcRqLOcIIE3Ph1/32U8+GcQxS
-	dUIZ126fFWZJBhM=
-X-Google-Smtp-Source: AGHT+IH5+nXrvXYLMjkRMHIozAriajOdWhJhRISn3SXna+dvXhvXjPqnYbRhXJ+0gfCOfvWlHmS6XQ==
-X-Received: by 2002:a17:902:d508:b0:21d:dfae:300b with SMTP id d9443c01a7336-21f17e2ca29mr17032435ad.10.1738717519468;
-        Tue, 04 Feb 2025 17:05:19 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-21f16408194sm4367715ad.10.2025.02.04.17.05.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 17:05:18 -0800 (PST)
-Date: Tue, 4 Feb 2025 17:05:18 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Mina Almasry <almasrymina@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
-	asml.silence@gmail.com, dw@davidwei.uk,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
-Message-ID: <Z6K5TmSKMcqmgjUK@mini-arch>
-References: <20250203223916.1064540-1-almasrymina@google.com>
- <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com>
- <CAHS8izNZrKVXSXxL3JG3BuZdho2OQZp=nhLuVCrLZjJD1R0EPg@mail.gmail.com>
- <Z6JXFRUobi-w73D0@mini-arch>
- <CAHS8izNXo1cQmA5GijE-UW2X1OU6irMV9FRevL5tZW3B5NQ8rA@mail.gmail.com>
- <Z6Jt62bZEeHnN1JP@mini-arch>
- <CAAywjhTZnyLkCSQTMO1SpJrL-epJMDrWRDAb_UEnR5WuAEvtpg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1738718900; x=1739323700;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QynXFqkrYlZr7WYo7fE7UK6Y3PG5CrgtydXdsboPAYk=;
+        b=f5hE/RBCMFfYccnLxS5RISmsHh1b/eEGUO7FvxvbLmX1q+RiN2vFtnyfOQiW469HuR
+         75LW2jtOCCKVO5vi2iCHlIJNrfNJ2E4VaruC/39p5XrspEL7thNIjBKT6GUvF6caV6U1
+         S9obsxQnqQvOTFLR3mXAhrt0kb7XNN6xN7iurkyY/1DYqk7ToduIv9bBpYKmh270QrFq
+         V15QUyoC5M+R6ju/O6X8qLJJeXg1JaH2KWAy0nay+L7nIrUpzS5h0w4+r9hv8qK1HX4/
+         kPZESWf/UrzmfeO136IEzKuYagoS+iQDbnDw1Qsvc1w0CnsGFCIJyBr0XeJGdTSf5C+j
+         u6ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZuQUyHP26fhkLkNn/fJBrZpT/cr+/qta39lInJETMIzy9cbQ6KMFqNOpBeyuzUNvc03A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfcDOEVQe0h0fA6oNe5SX37DGTcWGgawiZ1HBKUBvYdJ3D4d6d
+	l0mpWVh1ooGm1Ivs/gMoEJr27kw0XTBU9mU9mnRQ3wWQzYMwuGzp/ZN/0VaUcaksLVgiIY+fsEI
+	3xeDxWjzqV8hEB8n8itSbqTZjWaENPgDHmXYP
+X-Gm-Gg: ASbGnct0ZwkiR7a8dOVcDZJctfYic98X53fSRMCwLus08MGBS0r4s493fBx3pnHbiZB
+	xJOxy6fg6WLlyoLiKPNrA7zODjlMz0Tk+xDuqBmNeuvfD3pGwsFXx8Ah1xrhYTJdXo1cygeyN8B
+	/vNZROvQeVfrt5Ikkw7tCoH7BI
+X-Google-Smtp-Source: AGHT+IFNz//MlKANU68ej4F7AC0JAhD74TZStS2dB/A7UEhGn0VPAsfUnWCNxMCb1a7W8mYPnda49HF5WlF3Dj5ET8Q=
+X-Received: by 2002:a05:6512:3f13:b0:543:e3c3:5a5e with SMTP id
+ 2adb3069b0e04-544002625e0mr505161e87.4.1738718899368; Tue, 04 Feb 2025
+ 17:28:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAywjhTZnyLkCSQTMO1SpJrL-epJMDrWRDAb_UEnR5WuAEvtpg@mail.gmail.com>
+References: <20250117163001.2326672-7-tabba@google.com> <diqzikq6sdda.fsf@ackerleytng-ctop.c.googlers.com>
+ <CA+EHjTzbBNRsQqeSh5L98Rx3QUwh9pUrpg-zkOd7fvnUbJZ-Kw@mail.gmail.com>
+In-Reply-To: <CA+EHjTzbBNRsQqeSh5L98Rx3QUwh9pUrpg-zkOd7fvnUbJZ-Kw@mail.gmail.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 4 Feb 2025 17:28:08 -0800
+X-Gm-Features: AWEUYZmxcp9mTvtnUopiY1n3kMsHQ2lIiwcawyYp02GM6Ptth0ebKagxPWYdJQE
+Message-ID: <CAGtprH-Ryn6Xqs-3_VBMkk3ew74Rf9=D8S_iHVmq2DE-YFk2-w@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 06/15] KVM: guest_memfd: Handle final folio_put()
+ of guestmem pages
+To: Fuad Tabba <tabba@google.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
+	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
+	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 02/04, Samiullah Khawaja wrote:
-> On Tue, Feb 4, 2025 at 11:43 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+On Thu, Jan 23, 2025 at 1:51=E2=80=AFAM Fuad Tabba <tabba@google.com> wrote=
+:
+>
+> On Wed, 22 Jan 2025 at 22:16, Ackerley Tng <ackerleytng@google.com> wrote=
+:
 > >
-> > On 02/04, Mina Almasry wrote:
-> > > On Tue, Feb 4, 2025 at 10:06 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> > > >
-> > > > On 02/04, Mina Almasry wrote:
-> > > > > On Tue, Feb 4, 2025 at 4:32 AM Paolo Abeni <pabeni@redhat.com> wrote:
-> > > > > >
-> > > > > > On 2/3/25 11:39 PM, Mina Almasry wrote:
-> > > > > > > The TX path had been dropped from the Device Memory TCP patch series
-> > > > > > > post RFCv1 [1], to make that series slightly easier to review. This
-> > > > > > > series rebases the implementation of the TX path on top of the
-> > > > > > > net_iov/netmem framework agreed upon and merged. The motivation for
-> > > > > > > the feature is thoroughly described in the docs & cover letter of the
-> > > > > > > original proposal, so I don't repeat the lengthy descriptions here, but
-> > > > > > > they are available in [1].
-> > > > > > >
-> > > > > > > Sending this series as RFC as the winder closure is immenient. I plan on
-> > > > > > > reposting as non-RFC once the tree re-opens, addressing any feedback
-> > > > > > > I receive in the meantime.
-> > > > > >
-> > > > > > I guess you should drop this paragraph.
-> > > > > >
-> > > > > > > Full outline on usage of the TX path is detailed in the documentation
-> > > > > > > added in the first patch.
-> > > > > > >
-> > > > > > > Test example is available via the kselftest included in the series as well.
-> > > > > > >
-> > > > > > > The series is relatively small, as the TX path for this feature largely
-> > > > > > > piggybacks on the existing MSG_ZEROCOPY implementation.
-> > > > > >
-> > > > > > It looks like no additional device level support is required. That is
-> > > > > > IMHO so good up to suspicious level :)
-> > > > > >
-> > > > >
-> > > > > It is correct no additional device level support is required. I don't
-> > > > > have any local changes to my driver to make this work. I think Stan
-> > > > > on-list was able to run the TX path (he commented on fixes to the test
-> > > > > but didn't say it doesn't work :D) and one other person was able to
-> > > > > run it offlist.
-> > > >
-> > > > For BRCM I had shared this: https://lore.kernel.org/netdev/ZxAfWHk3aRWl-F31@mini-arch/
-> > > > I have similar internal patch for mlx5 (will share after RX part gets
-> > > > in). I agree that it seems like gve_unmap_packet needs some work to be more
-> > > > careful to not unmap NIOVs (if you were testing against gve).
-> > >
-> > > Hmm. I think you're right. We ran into a similar issue with the RX
-> > > path. The RX path worked 'fine' on initial merge, but it was passing
-> > > dmabuf dma-addrs to the dma-mapping API which Jason later called out
-> > > to be unsafe. The dma-mapping API calls with dmabuf dma-addrs will
-> > > boil down into no-ops for a lot of setups I think which is why I'm not
-> > > running into any issues in testing, but upon closer look, I think yes,
-> > > we need to make sure the driver doesn't end up passing these niov
-> > > dma-addrs to functions like dma_unmap_*() and dma_sync_*().
-> > >
-> > > Stan, do you run into issues (crashes/warnings/bugs) in your setup
-> > > when the driver tries to unmap niovs? Or did you implement these
-> > > changes purely for safety?
+> > Fuad Tabba <tabba@google.com> writes:
 > >
-> > I don't run into any issues with those unmaps in place, but I'm running x86
-> > with iommu bypass (and as you mention in the other thread, those
-> > calls are no-ops in this case).
-> The dma_addr from dma-buf should never enter dma_* APIs. dma-bufs
-> exporters have their own implementation of these ops and they could be
-> no-op for identity mappings or when iommu is disabled (in a VM? with
-> no IOMMU enabled GPA=IOVA). so if we really want to map/unmap/sync
-> these addresses the dma-buf APIs should be used to do that. Maybe some
-> glue with a memory provider is required for these net_iovs? I think
-> the safest option with these is that mappings are never unmapped
-> manually by driver until the dma_buf_unmap_attachment is called during
-> unbinding? But maybe that complicates things for io_uring?
+> > Hey Fuad, I'm still working on verifying all this but for now this is
+> > one issue. I think this can be fixed by checking if the folio->mapping
+> > is NULL. If it's NULL, then the folio has been disassociated from the
+> > inode, and during the dissociation (removal from filemap), the
+> > mappability can also either
+> >
+> > 1. Be unset so that the default mappability can be set up based on
+> >    GUEST_MEMFD_FLAG_INIT_MAPPABLE, or
+> > 2. Be directly restored based on GUEST_MEMFD_FLAG_INIT_MAPPABLE
+>
+> Thanks for pointing this out. I hadn't considered this case. I'll fix
+> in the respin.
+>
 
-Correct, we don't want to call dma_* APIs on NIOVs, but currently we
-do (unmap on tx completion). I mentioned [0] in another thread, we need
-something similar for gve (and eventually mlx). skb_frag_dma_map hides
-the mapping, but the unmapping unconditionally explicitly calls dma_ APIs
-(in most drivers I've looked at).
- 
-0: https://lore.kernel.org/netdev/ZxAfWHk3aRWl-F31@mini-arch/
+Can the below scenario cause trouble?
+1) Userspace converts a certain range of guest memfd as shared and
+grabs some refcounts on shared memory pages through existing kernel
+exposed mechanisms.
+2) Userspace converts the same range to private which would cause the
+corresponding mappability attributes to be *MAPPABILITY_NONE.
+3) Userspace truncates the range which will remove the page from pagecache.
+4) Userspace does the fallocate again, leading to a new page getting
+allocated without freeing the older page which is still refcounted
+(step 1).
+
+Effectively this could allow userspace to keep allocating multiple
+pages for the same guest_memfd range.
 
