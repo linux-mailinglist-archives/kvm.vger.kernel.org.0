@@ -1,82 +1,81 @@
-Return-Path: <kvm+bounces-37359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3204A29425
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 16:21:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48876A2943B
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 16:22:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D60316BEA6
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 15:17:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A950816863E
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 15:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C44B1DB363;
-	Wed,  5 Feb 2025 15:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699B8198845;
+	Wed,  5 Feb 2025 15:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y5L0KZP1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FxT/aBid"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E3D158D96
-	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 15:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89593194137
+	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 15:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738768515; cv=none; b=Z/N7d+n/R3HAjnGAdMhGJlVSaI5/uZRmyITxjzF96A/gV0zeEo20O5VTxghkgTy2f+COXlMtbeWGzZorCcUtSjVh2qjukqUu3zxBsYiACO+u0V9339BA4E5oL8xFPNXhQ6z4zVDQYHcB+5qbD6yVlMUIC3nDuPMyvXnuP8otAtc=
+	t=1738768633; cv=none; b=rsR7BDOfELO9dhUWvZ0e8U08OTLKJtktgMieJt9U4/4HktGFAClRLrYUU30gu++B1Wd91apnYnvCPjk8WBvhTM19eZEAq54VebfyzcArGU9wqqFJxTh2Gafk4AwdCvM0YBFnvfiXdsAwgQprFwzV0o0Vx9p+f4tnWGBup+C/bE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738768515; c=relaxed/simple;
-	bh=4szL1eJgPRArjYOVHDwKE/JvLZRZfgR79x/numwtyM4=;
+	s=arc-20240116; t=1738768633; c=relaxed/simple;
+	bh=9bQWjyfhOKP94dxGty6MaGQ0+wHvs6zeGJ3FOjx7a4k=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hVBhJ0G9Sl9X5CM6SHqtFvXlkDcSpb2+bg7O4JrYXvBsiLiQUpsczGN1Msqt5liVSRJn7mx6JnK3dBdAg3rqnKl9ZV/Pfkpfq0b/8C+/WpHAkPlmB/ZxuS5Z6Krvf48+ZrbPro5icqz2bwsFg8NG08MnXQ6KbravcKv6M016ZUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y5L0KZP1; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=S5MbbzcLk01hbc5cWsiMd2z4Pg9eBtc7nF98ZhXNSidknw2OQNnlPKgVM+3hACWjvDt+VNTKHY4wgbcn0dfQBhi6w6/Sxmi9HW5UJ0uyLxHHzqTE0JqIxM0pzbaQJ3E0wWZKucSttFt/gIHjQzGprIYX0kWlRvVN1DI+Li2NLYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FxT/aBid; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21f022fc6a3so23589195ad.1
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2025 07:15:13 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21f02a2410aso47700635ad.0
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2025 07:17:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738768513; x=1739373313; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738768630; x=1739373430; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RjqsFlgPguDEnBdcgetC9zWFV3PjaxpPC075lKRZgFw=;
-        b=Y5L0KZP1UO6rB9GAHvnNcHiDP/hI1qsv4laQaR1ijSOSeZ+m+LlNJcr0OKnjTJZwhY
-         QJzhygz2wyqdrwWMpvSwT4FRdIwnirmI6qJSrOJDcaVyehr54atLs2NTCAx2r75nCYZl
-         UjiaYqGAK6IX899BY/VVI5M3tiyhdO+o1qagP3bmj7lPkML3qYdHZkdRPBFKChNJaCgU
-         ZLUtykGwweQQzuYP8nf2Hez7qFOcCf5atnOehG32qQVI+ghC1oAhGEb4tOSFRF4exkom
-         XYKvrkp33kHnXXoTu3TCa4kGQ5xpoosTluQ2Mrb3yext99/mpLd19K7TJXrBF6HQWLy5
-         gL0w==
+        bh=t0aN/8guITRu30BL0HaWPnLZfgsAxjHGJklJU83lkGw=;
+        b=FxT/aBidAdGTctIB0iwWVFS7TcDTnBXgFLr4U6nkRvKhGQUpvn9jVrxj0Qoz2ATbh0
+         gjFHoOoXndZlcA+JRrcCSN57JPFYIyNqPbjOw+giduZm5uzKCgwI7FXQXIBUmabJsJti
+         4KW4gMr8ZUzLQUb/QAyK3/daobtQ/BY1sqU8pJGxWcy3DgE2mWq+9vdOng27qk5peKJy
+         ZlIW5n1UhyaL6m7CM9672V/TBEJyDKPO8yUH6PBbVCREmpnkwbVdw+GErhy72g+0a/bd
+         LDtb7p3Kh663WdRrAAQzasDfveQntReB5BP/m4V/5YwQcfkssCr7ysRtcg1duZiVrXga
+         uY3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738768513; x=1739373313;
+        d=1e100.net; s=20230601; t=1738768630; x=1739373430;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RjqsFlgPguDEnBdcgetC9zWFV3PjaxpPC075lKRZgFw=;
-        b=nvCtyWki3ugWbH+qOTMVr6cKmL+yBi1zJvO+TxCtVF4nZVZtgN8lUEoTA4aDqaWEYB
-         Oa5cywR3KsBGjjXtGh7PGoDx7/UVi+sSN8wjbxF2x2HuUe2xAbLtSzRbKTb1vE6EmvSz
-         Ylh4E5SMox9EHA5za982zox9i43jb4RzS9/XRnVIT8/s1hr+W/UY4VTOKvE6HZVLg941
-         kR47anZ1WZzFBxC9ZUmP+XI3Mhs3vyFB/rLmnwCbrPDY4mqklTz1VAEgW38k9TUJk/py
-         VgMo8uBnUpyvm/1w42wSSEl2yfVPsnpXZkHWJzC/tZCO21cNIsizT9nev71QS5pRNXzr
-         R+NA==
-X-Forwarded-Encrypted: i=1; AJvYcCUYuZDdQACxHWJilVV3BEAmTsz5CEyERDe2SOL8qkpoM+1j6ljoTkXR2aoxtFzlZOH8L2U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywcy1ZAOKMXVne9PQsGQQ8snTm75ig8mFlQpsvnTQ9x6674k7HQ
-	w0WTc2AMF43hIKGbkI1yp4copgzyZBVLYEOvjgDU+wo3dPfU0gP8QlKh60M9+Aog4S00Lry0y+B
-	CyQ==
-X-Google-Smtp-Source: AGHT+IFHs7tj+Q54d64NDKOfhfMfAS91bOZEx/8/ugogv1Ut4aJidKZIV/qdikwiSwu5m+q7+e5T4vD0P74=
-X-Received: from plgi6.prod.google.com ([2002:a17:902:cf06:b0:21c:144d:411b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:daca:b0:215:758c:52e8
- with SMTP id d9443c01a7336-21f17a774a7mr66004375ad.12.1738768512794; Wed, 05
- Feb 2025 07:15:12 -0800 (PST)
-Date: Wed, 5 Feb 2025 07:15:11 -0800
-In-Reply-To: <1969aa1a-e092-4a48-b4a0-9a50ec2ef3b6@amd.com>
+        bh=t0aN/8guITRu30BL0HaWPnLZfgsAxjHGJklJU83lkGw=;
+        b=FfIzvbz51dHhJqmtXS2YHGv1Zbf/KnO9S7swNFBZWzHYy+Myy7yDYVGd448/h7+wPN
+         uJbxu+pfW1I+EVTpv2c2oA9q01FAualpONJNyyH7w4tufduaoPscmD45APaBbDVVHJE5
+         VaPE8rqXCWVuPTXZplOEOoc4ktaiAyakfLIPBdYCWVK9R0ycpO4XXAbG8D8wcFHAAhzJ
+         8CB1vPj81y4NnhX3EzT4dj5CiDR0wXV9nV6c8ybeAas0HYd4Nqpzl3bqJ9Z++j7/xgnG
+         LKhvB34WY0erDOEnQIQ6HjEr8vW4PIqjvfg71CRBKubdlZa9v2yMIdhFQUCzyIP4ER0a
+         SjrA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwYL6En77wAb3UUgQgC6rbFjZT+2GF6ICvJurPrSCczHcQ4hijFcOfJW8gSajsOoOlDBQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+bm3RDVN+8zch4EcYhxx8N9JcFf+vEeisXvOVvJwQwx9pu3mh
+	m+zm+da+UeHwtPRqs77ecr1OQEGBTAorGiDUdw+GQWHYlJHJufAq5aOaVHfhOcW8iYCpxqp5SAe
+	SWg==
+X-Google-Smtp-Source: AGHT+IHjO2ZnCRxSz9ckB9UKOIbx0lfEs9B109yICVMG4UQB0RF4tpKtRhegltvZ6NeMdGY988NLUYMrptA=
+X-Received: from plas19.prod.google.com ([2002:a17:903:2013:b0:21f:467:f8ae])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:228a:b0:21d:cd0c:a1ac
+ with SMTP id d9443c01a7336-21f17df7196mr51828645ad.17.1738768629827; Wed, 05
+ Feb 2025 07:17:09 -0800 (PST)
+Date: Wed, 5 Feb 2025 07:17:08 -0800
+In-Reply-To: <62b643dd-36d9-4b8d-bed6-189d84eeab59@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1738274758.git.ashish.kalra@amd.com> <afc1fb55dfcb1bccd8ee6730282b78a7e2f77a46.1738274758.git.ashish.kalra@amd.com>
- <Z5wr5h03oLEA5WBn@google.com> <1969aa1a-e092-4a48-b4a0-9a50ec2ef3b6@amd.com>
-Message-ID: <Z6OAf02sRJTZkl5K@google.com>
-Subject: Re: [PATCH v2 4/4] iommu/amd: Enable Host SNP support after enabling
- IOMMU SNP support
+References: <cover.1738618801.git.ashish.kalra@amd.com> <e9f542b9f96a3de5bb7983245fa94f293ef96c9f.1738618801.git.ashish.kalra@amd.com>
+ <62b643dd-36d9-4b8d-bed6-189d84eeab59@amd.com>
+Message-ID: <Z6OA9OhxBgsTY2ni@google.com>
+Subject: Re: [PATCH v3 3/3] x86/sev: Fix broken SNP support with KVM module built-in
 From: Sean Christopherson <seanjc@google.com>
 To: Vasant Hegde <vasant.hegde@amd.com>
 Cc: Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com, tglx@linutronix.de, 
@@ -91,51 +90,64 @@ Cc: Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com, tglx@linutronix.de
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Feb 05, 2025, Vasant Hegde wrote:
-> On 1/31/2025 7:18 AM, Sean Christopherson wrote:
-> > On Fri, Jan 31, 2025, Ashish Kalra wrote:
-> >> @@ -3426,18 +3431,23 @@ void __init amd_iommu_detect(void)
-> >>  	int ret;
-> >>  
-> >>  	if (no_iommu || (iommu_detected && !gart_iommu_aperture))
-> >> -		return;
-> >> +		goto disable_snp;
-> >>  
-> >>  	if (!amd_iommu_sme_check())
-> >> -		return;
-> >> +		goto disable_snp;
-> >>  
-> >>  	ret = iommu_go_to_state(IOMMU_IVRS_DETECTED);
-> >>  	if (ret)
-> >> -		return;
-> >> +		goto disable_snp;
-> > 
-> > This handles initial failure, but it won't handle the case where amd_iommu_prepare()
-> > fails, as the iommu_go_to_state() call from amd_iommu_enable() will get
-> > short-circuited.  I don't see any pleasant options.  Maybe this?
-> > 
+> Hi Ashish,
+> 
+> [Sorry. I didn't see this series and responded to v2].
+
+Heh, and then I saw your other email first and did the same.  Copying my response
+here, too (and fixing a few typos in the process).
+
 > > diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-> > index c5cd92edada0..436e47f13f8f 100644
+> > index c5cd92edada0..4bcb474e2252 100644
 > > --- a/drivers/iommu/amd/init.c
 > > +++ b/drivers/iommu/amd/init.c
-> > @@ -3318,6 +3318,8 @@ static int __init iommu_go_to_state(enum iommu_init_state state)
-> >                 ret = state_next();
-> >         }
+> > @@ -3194,7 +3194,7 @@ static bool __init detect_ivrs(void)
+> >  	return true;
+> >  }
 > >  
-> > +       if (ret && !amd_iommu_snp_en && cc_platform_has(CC_ATTR_HOST_SEV_SNP))
+> > -static void iommu_snp_enable(void)
+> > +static __init void iommu_snp_enable(void)
+> >  {
+> >  #ifdef CONFIG_KVM_AMD_SEV
+> >  	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
+> > @@ -3219,6 +3219,14 @@ static void iommu_snp_enable(void)
+> >  		goto disable_snp;
+> >  	}
+> >  
+> > +	/*
+> > +	 * Enable host SNP support once SNP support is checked on IOMMU.
+> > +	 */
+> > +	if (snp_rmptable_init()) {
+> > +		pr_warn("SNP: RMP initialization failed, SNP cannot be supported.\n");
+> > +		goto disable_snp;
+> > +	}
+> > +
+> >  	pr_info("IOMMU SNP support enabled.\n");
+> >  	return;
+> >  
+> > @@ -3318,6 +3326,9 @@ static int __init iommu_go_to_state(enum iommu_init_state state)
+> >  		ret = state_next();
+> >  	}
+> >  
+> > +	if (ret && !amd_iommu_snp_en && cc_platform_has(CC_ATTR_HOST_SEV_SNP))
+> 
 > 
 > I think we should clear when `amd_iommu_snp_en` is true.
 
 That doesn't address the case where amd_iommu_prepare() fails, because amd_iommu_snp_en
-will be %false (it's init value) and the RMP will be uninitialized, i.e.
+will be %false (its init value) and the RMP will be uninitialized, i.e.
 CC_ATTR_HOST_SEV_SNP will be incorrectly left set.
 
 And conversely, IMO clearing CC_ATTR_HOST_SEV_SNP after initializing the IOMMU
-and RMP is wrong as well.  Such a host is probably hosted regardless, but from
+and RMP is wrong as well.  Such a host is probably hosed regardless, but from
 the CPU's perspective, SNP is supported and enabled.
 
 > May be below check is enough?
 > 
 > 	if (ret && amd_iommu_snp_en)
-
-
+> 
+> 
+> -Vasant
+> 
+> 
 
