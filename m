@@ -1,75 +1,79 @@
-Return-Path: <kvm+bounces-37331-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37332-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDFBFA289E6
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 13:09:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5675FA28A29
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 13:20:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AF5B3A6448
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 12:08:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB991188A232
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 12:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D0522B8C7;
-	Wed,  5 Feb 2025 12:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B872322CBEE;
+	Wed,  5 Feb 2025 12:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qIKzAt0K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NKUH+syv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C49122B8B9;
-	Wed,  5 Feb 2025 12:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4B822B8B7;
+	Wed,  5 Feb 2025 12:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738757339; cv=none; b=qQfqP8q3cOc/QUo2P5E1NlakNRTVKXg+166F7VyVPlVr5B4DzzcxLh2kaQX/WzJVcSD8rXGv9WO93QaoQZkgdlmwGk/21Tptsf1D9lJZP1/XxInCAQeWDxAdPjNfN2Se3gUI9Ld2wrF4giXXVap0oCCY/mnOcFPIAjup31BGhpY=
+	t=1738758031; cv=none; b=ToxYXqeExQp2Xa02gPkI03TCR6lM41Y1/PG7cYRCFAARtQHnAlQ9dqquBWzbAairpoC3YRvfaPdWg4UCVNv8hL9tjPXwSU1J65uf1zB5Dcc2WRttJOLNXOm+RsR2Lbh4ZoP/G0GjOnJmcHYMV5Es8tajyQxcOGUTWuOjbddvfuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738757339; c=relaxed/simple;
-	bh=LXmD7jHSFNZPlbA/cqAxmYQVdK23tUec4eK5766sXXw=;
+	s=arc-20240116; t=1738758031; c=relaxed/simple;
+	bh=mliisTJtC4/x2He8n/YtxnJipD2aoHXMhReWhBlgrO8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QPwf7p/rERsquhAe5XNS8CR8jf6kxohinpCbGy2+YiF6Jde/AV4r4YWLE+8na+VGHNxX7XFCq/hOTFLI7M7vx3+WCEN2AoBm1xzTa+9ZbclUoNpF99T9TB9C0HQyjUNNXLpDp9MUd6mP4ftEPZtyXkt5p6ek+cZbCEwQUKXnV4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qIKzAt0K; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51537A3C029206;
-	Wed, 5 Feb 2025 12:08:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=WwBAnL
-	x1mSmeOl1Zs9LWX97C7W4cgCq4Nn1vDfx9QgU=; b=qIKzAt0Kbd31cz11x5+6T9
-	YiroJhFUiUre0XMZjU+Ds43taGILAanbpO/itHFBIRg6rS4bdal4RzcGwo/Gqvgk
-	qh9oNvxb1WQNgayG2cpxCSY8QQUW3iI4RXxm8a23auf4GTKl1O5x+0NXhBYSo1er
-	x42jRCw5uyY8wypJjhIxiGngWT+it8++q8dno8ifWMgP7+5G3SbziWN56xYk4I1k
-	4xtYhAKJ07pjOqN4JZNsqfsYYRKXLk1VqPQNbwpxg9+ixFRBt0L/0J+IKTp/X41m
-	0epAWKrG0MvGt1B3114WUdnpQxKHJW0IIAuR7p7VZSPG+BRRNuOHfdjl0w4RymeQ
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44knqtvx0r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Feb 2025 12:08:55 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5159XLsk005251;
-	Wed, 5 Feb 2025 12:08:55 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44j05k0dmx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Feb 2025 12:08:55 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 515C8p5p58327314
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Feb 2025 12:08:51 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2957D200CE;
-	Wed,  5 Feb 2025 12:08:51 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D5D16200C9;
-	Wed,  5 Feb 2025 12:08:50 +0000 (GMT)
-Received: from [9.179.10.151] (unknown [9.179.10.151])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  5 Feb 2025 12:08:50 +0000 (GMT)
-Message-ID: <5d04e2c8-68df-4d6c-9ef8-0fc0d72e791f@linux.ibm.com>
-Date: Wed, 5 Feb 2025 13:08:50 +0100
+	 In-Reply-To:Content-Type; b=Ob8meXJ60l2i5EGERqoajiPWFoS1huaMzAF3SNi532zbgOVN376gwyR0lKPHHEnPIN317itr/D/WKxiXLkqnF20jMuBVnOTJ3cnDQ7uGEJLVj/0aWfTkLGitaj//vm1tnaKjE97XMdpLqflgXEc6vWyfHd1IsT3gyc9zbd4oa4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NKUH+syv; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4361c705434so49676545e9.3;
+        Wed, 05 Feb 2025 04:20:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738758028; x=1739362828; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e6UxSbzx0mqyS4ecv7b06nR9TIVmkjaPNaX7UQ2Szu4=;
+        b=NKUH+syvZhUlzi4N5/ERuDGB32FsyHNPare1iNi8spbuzSreFVwl7ekvj9S+9WYOMk
+         2Z2eXdWF/FsHgn9I4/N0OQoylu8JAORQZMnfmuTIxXJ1MLmgQ4v5ly+XRbFgyziD+HhA
+         ELRrLUHGqWGxF4vv/JIiECVhcgho/p+nyABKp+zIcY8VhgPP+f98Q9OEzV0ufkD63pr9
+         rrIhuSCe/7tq3Ks7R/shKBPOejqWokNjjlb4F+hCeto/7kjiHPDhLzYITbifl21X3+75
+         UXq/OBQzFMP8/qEcq2huL82b/FIPKUdpnvyxIaRpY4NJr0VmX+tl4/PY6s/M328XclbP
+         8OqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738758028; x=1739362828;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e6UxSbzx0mqyS4ecv7b06nR9TIVmkjaPNaX7UQ2Szu4=;
+        b=Z3Wvf5rPvEGKB8wFzCGCty3kyFHFr1ugpt+r6mxE7Go3QH5WYmDlCVNSauz0bRp6xE
+         FrQfeWGLChSY3gQKQ0L+Ajiy7OoW2e2YR1hWY8nNVHyaicsihLHRh736Y6lPkoL+SYVc
+         1iKK5ozeq8zcQwEJUsnntmixRy2CFlYNXG3dMRl6xqL2d98pnAGVJC0Xg8QCzgbtMmYp
+         rT5EDfFsmsnj1kiH7Z055XQJIQSnm4d8eX+2VtXLiRnxWMUJueg8RbUdEJkyOAyJQfKi
+         A0RXBkOyR6l5UphkbZP4XtwV4tBUp1FmprQlNNtzL/AE7Yb+wNmTd8kE/ZxueUQBjIJ8
+         ucJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUnN+J1AHYTgUqs3LoRlpsK9wHQ9haqn7Ip1CbN7slnbwV1rV/UmEWs3u3IJd7E6MU9jZg=@vger.kernel.org, AJvYcCVYGVHMZoTRxzl7wm/TpduhejuyEPaXA07A0o0gGqSyCMmEXPfjRal9uvG+RxpGx+vHLP8+BAjuV/aighVibncL@vger.kernel.org, AJvYcCW+mTAjbjJJTPuV24gBdT2dOj98p2H9vrBQvleW5xDT3aIGSKN0NDeqsEi+DRY38+8/dlJoe0I8mG4k@vger.kernel.org, AJvYcCWj7PvU52Iywjc7Vj/niFskzZE0m/iWE5Nb+rvDOOLCm49U/izV9tHn2MiaLacWh9I78wofCDslAvzDJxiI@vger.kernel.org, AJvYcCXb7yqn4yj5TxyAcbVUwKVLj9rc3rH6ZXTlPjUAVjxM3h2lSsKEfR6SmLx83/VUux6zHosScDoe@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqPkXP3S9qyeW3T2vW/K4iM2oxiE9k83wxENOGnFepVKsy/Rqa
+	RNKUOe9GZgzu05d/sTFPFaomEw/P4zaTr+Ge/R2JygaFoocpkcxh
+X-Gm-Gg: ASbGncs//8KbsHyuE0+rcNQ9OeJYph5YZQWcsYtRrDe6ixe88r2zSvhwXbRwpz4BBqf
+	3wz5dkQjciFUPfo9jhAFRgrCrp96pObdEixhguqphL56CnkJOTmnT1ft6oUzQQPRhIcCFHIIfCs
+	JM+ognUNf6sSh5Hg2dbvatve1g1cbM2YeadBJp5gVGkx/C0Cyk6OZ6PbErPxuQOBHP2cjq/j2JT
+	br6eKl/tcRLU71QZDvTL8V/jDj2cNxDrZ7ZCwf5m4pE1X9QSc5DhUh9E8Cnc/rk8zjSUq4YztWu
+	jVBAT1/Cm3nTGRi7QfLlVhw=
+X-Google-Smtp-Source: AGHT+IGJDXvIG/7Qnnn/pmmyUc/PCQsFzD0zmP7oGwtUvw9dR3YQPaYZ7+KNbPMVMRYa9yN06wEAdQ==
+X-Received: by 2002:a5d:6c6a:0:b0:38c:5bfa:a93b with SMTP id ffacd0b85a97d-38db48a987emr1829547f8f.2.1738758028045;
+        Wed, 05 Feb 2025 04:20:28 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.128.4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1016easm18630336f8f.24.2025.02.05.04.20.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2025 04:20:27 -0800 (PST)
+Message-ID: <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
+Date: Wed, 5 Feb 2025 12:20:34 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,101 +81,176 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH] lib: s390x: css: Name inline assembly
- arguments and clean them up
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, nrb@linux.ibm.com,
-        hca@linux.ibm.com
-References: <20250204100339.28158-1-frankja@linux.ibm.com>
- <20250205112550.45a6b2cd@p-imbrenda>
+Subject: Re: [PATCH net-next v3 5/6] net: devmem: Implement TX path
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kselftest@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell <ncardwell@google.com>,
+ David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <20250203223916.1064540-6-almasrymina@google.com>
 Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20250205112550.45a6b2cd@p-imbrenda>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250203223916.1064540-6-almasrymina@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: m9s5pC_hO9_rTUopX8qCUti4jZ6HeYti
-X-Proofpoint-ORIG-GUID: m9s5pC_hO9_rTUopX8qCUti4jZ6HeYti
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-05_05,2025-02-05_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0 suspectscore=0
- clxscore=1015 mlxlogscore=839 phishscore=0 malwarescore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502050096
 
-On 2/5/25 11:25 AM, Claudio Imbrenda wrote:
-> On Tue,  4 Feb 2025 09:51:33 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> Less need to count the operands makes the code easier to read.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>
->> This one has been gathering dust for a while.
->> rfc->v1: Moved to Q constraint (thanks Heiko)
->>
->> ---
-> 
-> [...]
-> 
->>   	asm volatile(" .insn   rre,0xb25f0000,%2,0\n"
->> -		     " ipm     %0\n"
->> -		     " srl     %0,28\n"
->> -		     : "=d" (cc), "=m" (p)
->> +		     " ipm     %[cc]\n"
->> +		     " srl     %[cc],28\n"
->> +		     : [cc] "=d" (cc), "=m" (p)
->>   		     : "d" (p), "m" (p)
-> 
-> this bit (which you did not touch) is actually the most confusing to me.
-> what's the point of separately specifying both "d" and "m" constraints
-> for (p) ? (and it also has a "=m" in the output clobberlist)
+On 2/3/25 22:39, Mina Almasry wrote:
+...
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index bb2b751d274a..3ff8f568c382 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -1711,9 +1711,12 @@ struct ubuf_info *msg_zerocopy_realloc(struct sock *sk, size_t size,
+...
+>   int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
+>   				struct iov_iter *from, size_t length);
+> @@ -1721,12 +1724,14 @@ int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
+>   static inline int skb_zerocopy_iter_dgram(struct sk_buff *skb,
+>   					  struct msghdr *msg, int len)
+>   {
+> -	return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter, len);
+> +	return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter, len,
+> +				       NULL);
 
-I'll add a second patch to bring this into line with the kernel's 
-ioasm.c implementation.
+Instead of propagating it all the way down and carving a new path, why
+not reuse the existing infra? You already hook into where ubuf is
+allocated, you can stash the binding in there. And
+zerocopy_fill_skb_from_devmem can implement ->sg_from_iter,
+see __zerocopy_sg_from_iter().
+
+...
+> diff --git a/net/core/datagram.c b/net/core/datagram.c
+> index f0693707aece..c989606ff58d 100644
+> --- a/net/core/datagram.c
+> +++ b/net/core/datagram.c
+> @@ -63,6 +63,8 @@
+> +static int
+> +zerocopy_fill_skb_from_devmem(struct sk_buff *skb, struct iov_iter *from,
+> +			      int length,
+> +			      struct net_devmem_dmabuf_binding *binding)
+> +{
+> +	int i = skb_shinfo(skb)->nr_frags;
+> +	size_t virt_addr, size, off;
+> +	struct net_iov *niov;
+> +
+> +	while (length && iov_iter_count(from)) {
+> +		if (i == MAX_SKB_FRAGS)
+> +			return -EMSGSIZE;
+> +
+> +		virt_addr = (size_t)iter_iov_addr(from);
+
+Unless I missed it somewhere it needs to check that the iter
+is iovec based.
+
+> +		niov = net_devmem_get_niov_at(binding, virt_addr, &off, &size);
+> +		if (!niov)
+> +			return -EFAULT;
+> +
+> +		size = min_t(size_t, size, length);
+> +		size = min_t(size_t, size, iter_iov_len(from));
+> +
+> +		get_netmem(net_iov_to_netmem(niov));
+> +		skb_add_rx_frag_netmem(skb, i, net_iov_to_netmem(niov), off,
+> +				       size, PAGE_SIZE);
+> +		iov_iter_advance(from, size);
+> +		length -= size;
+> +		i++;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>   int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
+>   			    struct sk_buff *skb, struct iov_iter *from,
+> -			    size_t length)
+> +			    size_t length,
+> +			    struct net_devmem_dmabuf_binding *binding)
+>   {
+>   	unsigned long orig_size = skb->truesize;
+>   	unsigned long truesize;
+> @@ -702,6 +737,8 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
+>   
+>   	if (msg && msg->msg_ubuf && msg->sg_from_iter)
+>   		ret = msg->sg_from_iter(skb, from, length);
+
+As mentioned above, you can implement this callback. The callback can
+also be moved into ubuf_info ops if that's more convenient, I had
+patches stashed for that.
+
+> +	else if (unlikely(binding))
+> +		ret = zerocopy_fill_skb_from_devmem(skb, from, length, binding);
+>   	else
+>   		ret = zerocopy_fill_skb_from_iter(skb, from, length);
+>   
+> @@ -735,7 +772,7 @@ int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *from)
+>   	if (skb_copy_datagram_from_iter(skb, 0, from, copy))
+>   		return -EFAULT;
+
+...
+
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 0d704bda6c41..44198ae7e44c 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -1051,6 +1051,7 @@ int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg, int *copied,
+>   
+>   int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+>   {
+> +	struct net_devmem_dmabuf_binding *binding = NULL;
+>   	struct tcp_sock *tp = tcp_sk(sk);
+>   	struct ubuf_info *uarg = NULL;
+>   	struct sk_buff *skb;
+> @@ -1063,6 +1064,15 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+>   
+>   	flags = msg->msg_flags;
+>   
+> +	sockcm_init(&sockc, sk);
+> +	if (msg->msg_controllen) {
+> +		err = sock_cmsg_send(sk, msg, &sockc);
+> +		if (unlikely(err)) {
+> +			err = -EINVAL;
+> +			goto out_err;
+> +		}
+> +	}
+> +
+>   	if ((flags & MSG_ZEROCOPY) && size) {
+>   		if (msg->msg_ubuf) {
+>   			uarg = msg->msg_ubuf;
+> @@ -1080,6 +1090,15 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+>   			else
+>   				uarg_to_msgzc(uarg)->zerocopy = 0;
+>   		}
+> +
+> +		if (sockc.dmabuf_id != 0) {
+
+It's better to be mutually exclusive with msg->msg_ubuf, the callers
+have expectations about the buffers used. And you likely don't want
+to mix it with normal MSG_ZEROCOPY in a single skb and/or ubuf_info,
+you can force reallocation of ubuf_info here.
+
+> +			binding = net_devmem_get_binding(sk, sockc.dmabuf_id);
+> +			if (IS_ERR(binding)) {
+> +				err = PTR_ERR(binding);
+> +				binding = NULL;
+> +				goto out_err;
+> +			}
+> +		}
+
+-- 
+Pavel Begunkov
+
 
