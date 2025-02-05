@@ -1,162 +1,151 @@
-Return-Path: <kvm+bounces-37398-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37399-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDF19A29B15
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 21:22:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73807A29BA1
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 22:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4078A3A894A
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 20:22:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AC8C7A354E
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 21:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AC7213E6A;
-	Wed,  5 Feb 2025 20:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB76215047;
+	Wed,  5 Feb 2025 21:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aEqR4OUj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jpy14qga"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD76320CCF4
-	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 20:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB80214809;
+	Wed,  5 Feb 2025 21:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738786947; cv=none; b=ax3DtJyQD4NGmoEbARRvMhUT/x2BGAWsTGcnddchkGNW2Nvlp2QZSKlIXCtIpFlYdHRb9k2lt6uobVe7yR05yvuVX0mVzZ3DwxPwGeR61EqUUYfZSorfTTdTLmvV7Dlq6+licV6pe2+obzlAEQ0cWF0xHHZfpiq9TTjQt4ifB8s=
+	t=1738789619; cv=none; b=RBdPXn2eHwf05V2HtHSTCygVpGz93xpEIXIY8mlbkN6BdIMVfU2WBR2lJIem1zF9h8+QrpZGj6XHHA9QIu1ZfIwPdy1hj7YU0QokJVhabYlO62TPuD5wy5xZ9wWoAhqbRVeurQ8vS0Z2raJYkUG5Qgz80rlXcr0hksl2r6GmDWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738786947; c=relaxed/simple;
-	bh=W/BDzfS0731XNlp5uGEgPUbjHeZNHpyjqCYetUqQRxQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T2fQSl+dxNZrKzYCpeUkOoddZ2Wnw8LjwPYYZdM97ChNmwDJExK5vytTlXKIGv+h6ScJ+fWC5mXzMtaZxdYk0T1h5xzjY/Z057LehUBU/Vm/vDx/rWQ61W06IvDQmjm9YpGln0KbIaRXE1a5uvrag8NNdNK19b76KHxcTzObP0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aEqR4OUj; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21f032484d4so32295ad.0
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2025 12:22:25 -0800 (PST)
+	s=arc-20240116; t=1738789619; c=relaxed/simple;
+	bh=ROIwAIDYmaJQqhLYCi+LKXx1tCg3tkrGe92qJKALfGY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=HVgCEKdHHMm6rGGyfKImwEqXJTdJXEZgPqxZ9jP+bWjIx9mInn/jd6FfLp4uDMQjfOyUMfYPvRN21ixAJyHLbJyZfulAxibyiiLqVZFq3UyuljwVwRlb+Dw0om5Q3MIDDFkAFArAu4Qadc+cXeOn7UrHJ/Vol0DfhzXTu902ELQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jpy14qga; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-866f414ccedso94215241.1;
+        Wed, 05 Feb 2025 13:06:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738786945; x=1739391745; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1738789617; x=1739394417; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qkxLeSmqP0bYGjmD83E3Y/4YIZD5CnHUYSNEP7lCym8=;
-        b=aEqR4OUjEXOk+Plcx0PsYOho51wcq4oRNSX2zvM5RE6Sgc079JRIortawJIyNHH5Vp
-         CO3NiFzoe4fKwfJTSNFib38UdXSni6DjIpCZkcZNzFn9EmY5MiTxviY3ZjgnMitFSaVI
-         b1dzui4HIIGfHIXl9v9akFiWxSC7IvI964ax1384+5jK2rjGJKiX+Es/VGFDAuAZ+ly1
-         D+p3ZP6yz6AOUhVc3G/EKMM4Z1EHQCgIurhcqIxORO9D77owYm+rY/vBiZmxO61s+Zul
-         eKEbCvw+iD9vZUwR6a90JJwEHkOkh/htlDbjgRjmiBAuca54U71HXMya9cTuHJF7Z88S
-         CsfA==
+        bh=321Yzdb9C7R/V5A/ZTrGrsUuNiJo9jCyp/WhHvYvkN8=;
+        b=Jpy14qgaDV7qRHhQDLomF658Ap5AZS/r6TPS58+mwlf8fyNJeH+Z5eQ82tt++Rn0Vy
+         6VpTrkx3ccMB7qP0TG8sbDAd6dV879yqRilYmtR+dA9eLY6BKPLdeNAo85Z1VZ3Av+HJ
+         HuwXOQHSlJw0YB09YE2Q5uMEGXqyJHPu/92FrFARcUl49EYHgDqw4zU1rMs5FP+9ZKL5
+         LRw8Dm3wtlrmEmxf+5qN5z76/GkvGLqrSn1ouMmJONLzJtISIUlQMtsxh5Q8+kCVf+Im
+         GvBvfy0kMAMKjX9WUZKEPttLPyWx/dqM1NTT/pM1EOD4NJA+XPczeZo3Gq5hDNIb3u9E
+         OPsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738786945; x=1739391745;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qkxLeSmqP0bYGjmD83E3Y/4YIZD5CnHUYSNEP7lCym8=;
-        b=ZZnNP9+z0ztEkwvPYpK2JxGnAAhqI4PfYgyrPy694/RYCJPx8B/GFyDojVs+zgZ3+q
-         OxGooZ38GhSNGGp6v2H1JCSq1gJVq9xuVg4DUZo/gxcfs5D9IbPY488JctKKy7fDtjiO
-         YZljrwUeQcfkCPOQ5/8s/BJpzul2w9j1nnBz2isN6YLfABYMultCoGSpN7YWCadyhRjM
-         zpX3810srixoQ01d8l33E17WRgk0ek7bLGJq81qs7e6kOx4hrn4UP9B7Eqq2ay+ZFbcP
-         AGkh4eeGrzNSYST2dXk5rfs4NMHDs4MTJmDeS6kYpY/cH/eJnzZji6lJtJqT4tSvOxnn
-         mcLA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIQMLUAVX2QE/G4my69DhTZLeaaRj9ypdnfqn7q1a3NHUaRuYPTHPO7T2eus6FxL7vPBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxyobn52r5Zl3aV4a4hkTA42daREi0JuhPUjjKP1RFpvyXGg5E7
-	E3a8+AcShSkixiS5174MB1jPi1HDJcqkE/mUTbOB+r5ho/DlaYgue2CpqkhGWJb+9gfl03VOqE3
-	RVQVg2rbowMuwvQVIFPFbpDzmLjKmv8dbZV6R
-X-Gm-Gg: ASbGncvX7WnN/UT0optwPn8K78LG7tdZJDcttExeLO7D6UzVyx58xrzGs3fmvjlj8rE
-	+lLGNZbMoiZTL+gmQi0VdN0VAYLmVcRxzZHD7DGDNymNeDD/sAamuM4gOTrsjNvPYjTFYUmH3
-X-Google-Smtp-Source: AGHT+IHe8klwDgJSKEW2jpBdb9Qr5QEYUblXIVK5qhpQjddp07M20x9TqO2J5WfJ10zWsmr9wDdoAZ9pqxtBzG8aw9E=
-X-Received: by 2002:a17:902:d582:b0:215:4bdd:9919 with SMTP id
- d9443c01a7336-21f311f9d6fmr275545ad.17.1738786944775; Wed, 05 Feb 2025
- 12:22:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738789617; x=1739394417;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=321Yzdb9C7R/V5A/ZTrGrsUuNiJo9jCyp/WhHvYvkN8=;
+        b=vVkSGaSaU/0j22Mi5bw/Zj6LLR+BLSRdh80gkzhg2/BJGrDCxoi1T+K4DC0lNjVetO
+         CZo4IoX08l16b/rI+KgcnGOAZhuwMJkW1BiAX8ICzSnNdjSSZ/vXAUmMKHQ9WJC+fXHc
+         3d7s6o1/reGTIgSUYCGAgfu5uMIVtt/zAgltOCiIasTdEb8MrBc+rufiUmhA9R+jaFuL
+         vn7S1cOB0mNpYCD6Kmhx0lhV7FuBg1hnIBSK7a55yBO+ehoEhruxlZy6w15dxwxbArOP
+         Erzl4jqxZzJx9nM4wl8+UscPpSZtpTbUWkF4kkembX+muhwxC8XRNLIKuf+YNHAQqihg
+         sFCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVAhBeQWz5otW0D2nvs8OGmJam0y1Am23rrwET8vXuVTadTgUWPFUdPSt6XrOxBHNzt276oxJq/aDYoxA2vF5d8@vger.kernel.org, AJvYcCVhTuEEQARKy0XpLy2Pofo/EtT5RshZ4cXnCMYw3njcTDPqefx2NPD+wTsgxUtEi7QGIQhaRuxy@vger.kernel.org, AJvYcCVq9agcVp1DPF1mAbmhqPm9K6lL37NnaDD/86BFNVFSK1i59m5ZQQlGZvc+lEXD+J+ih/A=@vger.kernel.org, AJvYcCVuCc6kRhU9H75XLjiJnTRsDJORSNk22/a0kA9cEos4vZVzMy8+NrG6C25angVvY7JhKcwCLr90m3aI@vger.kernel.org, AJvYcCWf1xU4pH9SvILCLkxs2N52UWXkkUd818nL9xt7dl4jPkude0rbSXUv7T2i9kLZrhGkPbF4vzumdgKzMO64@vger.kernel.org
+X-Gm-Message-State: AOJu0YwARW3viAcBKZIVboRWyryoPRq/ivlzt0szjoZvDsiAOdhCP7+s
+	9Nn8KthB63brU1Vni4Wjzqjm1hhicWu/rdh65BfXqc3PN+RQOwud
+X-Gm-Gg: ASbGncuxd8h9x05WbFs6nMoGDUOKqVlnqeQDqMKnV69Z8gWTEVXwpQdDrLrMx9KW6mc
+	7abgpgFyZp12QrbxrmCFJog6/FUVACRe9tGk00PKdmUoomtbVP58nJ9c6szoUbeJNRkFK7+A/+S
+	iXE7+5cnZA6sXOGoJLvO+gEaIX8h496mGB8yqnJeUwpiXlUYOBI7d23+NAX4k7Z5foUzhorcCWn
+	GBewvDwbC6AFPoNdYmK0+jytylrzdPdOHctqSw7hiFk6ERi/DLqZzVT9hpL9/a3R6S69Lj4RELZ
+	gvOZdybgMfFjdWDCGgz2Jo2Y0daVmXhAu7kq1WR74yGbfPPGRePyVeJCDnuKRS0=
+X-Google-Smtp-Source: AGHT+IGjmsT1CX6GHvVc7jQLN8frmEsrqlIM1ufKny6kJV9XpmTxVc/Kie419ULGnj052Qaq3kcQhw==
+X-Received: by 2002:a05:6102:5e86:b0:4b2:cc94:1d6a with SMTP id ada2fe7eead31-4ba47abaa0cmr3554439137.19.1738789617063;
+        Wed, 05 Feb 2025 13:06:57 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b9baa8e4cfsm2451368137.11.2025.02.05.13.06.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 13:06:56 -0800 (PST)
+Date: Wed, 05 Feb 2025 16:06:55 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ devel@daynix.com, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Message-ID: <67a3d2efbba32_170d392944d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250205-tun-v5-1-15d0b32e87fa@daynix.com>
+References: <20250205-tun-v5-0-15d0b32e87fa@daynix.com>
+ <20250205-tun-v5-1-15d0b32e87fa@daynix.com>
+Subject: Re: [PATCH net-next v5 1/7] tun: Refactor CONFIG_TUN_VNET_CROSS_LE
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241221004236.2629280-1-almasrymina@google.com>
- <20241221004236.2629280-6-almasrymina@google.com> <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
- <CAHS8izNzbEi_Dn+hDohF9Go=et7kts-BnmEpq=Znpot7o7B5wA@mail.gmail.com>
- <6798ee97c73e1_987d9294d6@willemb.c.googlers.com.notmuch> <53192c45-df3c-4a65-9047-bbd59d4aee47@gmail.com>
-In-Reply-To: <53192c45-df3c-4a65-9047-bbd59d4aee47@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 5 Feb 2025 12:22:10 -0800
-X-Gm-Features: AWEUYZmi_S38KTdRcwjGkZKd5Xr1UKSuxDipsps1bDEi3RA74FXERhOLWF6TuhY
-Message-ID: <CAHS8izMcs=3qo1jhZSM499mxHh10-oBL6Fhb2W0eKWhJGax4Bg@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Stanislav Fomichev <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, 
-	dw@davidwei.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 5, 2025 at 4:41=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 1/28/25 14:49, Willem de Bruijn wrote:
-> >>>> +struct net_devmem_dmabuf_binding *
-> >>>> +net_devmem_get_sockc_binding(struct sock *sk, struct sockcm_cookie =
-*sockc)
-> >>>> +{
-> >>>> +     struct net_devmem_dmabuf_binding *binding;
-> >>>> +     int err =3D 0;
-> >>>> +
-> >>>> +     binding =3D net_devmem_lookup_dmabuf(sockc->dmabuf_id);
-> >>>
-> >>> This lookup is from global xarray net_devmem_dmabuf_bindings.
-> >>>
-> >>> Is there a check that the socket is sending out through the device
-> >>> to which this dmabuf was bound with netlink? Should there be?
-> >>> (e.g., SO_BINDTODEVICE).
-> >>>
-> >>
-> >> Yes, I think it may be an issue if the user triggers a send from a
-> >> different netdevice, because indeed when we bind a dmabuf we bind it
-> >> to a specific netdevice.
-> >>
-> >> One option is as you say to require TX sockets to be bound and to
-> >> check that we're bound to the correct netdev. I also wonder if I can
-> >> make this work without SO_BINDTODEVICE, by querying the netdev the
-> >> sock is currently trying to send out on and doing a check in the
-> >> tcp_sendmsg. I'm not sure if this is possible but I'll give it a look.
-> >
-> > I was a bit quick on mentioning SO_BINDTODEVICE. Agreed that it is
-> > vastly preferable to not require that, but infer the device from
-> > the connected TCP sock.
->
-> I wonder why so? I'd imagine something like SO_BINDTODEVICE is a
-> better way to go. The user has to do it anyway, otherwise packets
-> might go to a different device and the user would suddenly start
-> getting errors with no good way to alleviate them (apart from
-> likes of SO_BINDTODEVICE). It's even worse if it works for a while
-> but starts to unpredictably fail as time passes. With binding at
-> least it'd fail fast if the setup is not done correctly.
->
+Akihiko Odaki wrote:
+> Check IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) to save some lines and make
+> future changes easier.
+> 
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> ---
+>  drivers/net/tun.c | 26 ++++++++------------------
+>  1 file changed, 8 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index e816aaba8e5f2ed06f8832f79553b6c976e75bb8..452fc5104260fe7ff5fdd5cedc5d2647cbe35c79 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -298,10 +298,10 @@ static bool tun_napi_frags_enabled(const struct tun_file *tfile)
+>  	return tfile->napi_frags_enabled;
+>  }
+>  
+> -#ifdef CONFIG_TUN_VNET_CROSS_LE
+>  static inline bool tun_legacy_is_little_endian(struct tun_struct *tun)
+>  {
+> -	return tun->flags & TUN_VNET_BE ? false :
+> +	return !(IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) &&
+> +		 (tun->flags & TUN_VNET_BE)) &&
+>  		virtio_legacy_is_little_endian();
 
-I think there may be a misunderstanding. There is nothing preventing
-the user from SO_BINDTODEVICE to make sure the socket is bound to the
-ifindex, and the test changes in the latest series actually do this
-binding.
+Since I have other comments to the series:
 
-It's just that on TX, we check what device we happen to be going out
-over, and fail if we're going out of a different device.
+Can we make this a bit simpler to the reader, by splitting the test:
 
-There are setups where the device will always be correct even without
-SO_BINDTODEVICE. Like if the host has only 1 interface or if the
-egress IP is only reachable over 1 interface. I don't see much reason
-to require the user to SO_BINDTODEVICE in these cases.
+    if (IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) && tun->flags & TUN_VNET_BE)
+            return false;
 
---=20
-Thanks,
-Mina
+    return virtio_legacy_is_little_endian();
+
 
