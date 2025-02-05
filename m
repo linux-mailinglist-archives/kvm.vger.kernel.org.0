@@ -1,102 +1,154 @@
-Return-Path: <kvm+bounces-37333-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37334-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92EAEA28A58
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 13:32:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED93A28A79
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 13:41:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56B0B168284
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 12:32:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE6201888538
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 12:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38021229B20;
-	Wed,  5 Feb 2025 12:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F94C22D4D2;
+	Wed,  5 Feb 2025 12:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dYzbYTtK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VpXQJGqi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A422063C0
-	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 12:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11911EA91;
+	Wed,  5 Feb 2025 12:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738758751; cv=none; b=Td/dA+VqA3whyLjomGmCjYRL2tlpmLWFP0uXaJOg33HUK0k8PygN/IAO9XCpTdzmCyDJODtQzoZTw36jCqlHgvZpnz+65zgJZ93OBZuq8bsAoVRsv8dp8ml/PE6Wu/5tDUWKFJ/yKyCWP+sMWS8cu0t2zdo3K+1RmyAz0eBgaJs=
+	t=1738759269; cv=none; b=B6/WCrj66Mx2Ip2DYDNWnIqi2NcTDmsyaSl9AjJvNzIZT6VjnRtRzsHJuauQA7+ZqYcalmndTKMptr/H7zlx9wPQWppExttIe3XOOJsghGZINUQ9C3PuKim6lbrqnFWH9EFO1AvlZGRxyKKXECGvurzRPIfw4ojLh1koMlRnKVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738758751; c=relaxed/simple;
-	bh=3dgy86L8Ba3zeQZaRJngvq48ydoqQemSV6DLcbLAx80=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=IErFz/aUiny4KcrJAync79juIrp+6rnegkipRONuZNtRirEHqcsGXBkQizTu4Cy+hCQHU60rjUDNxDKWFVIm3BpqkRPlu/mK5tvFrW+VNQFYXH0w+NZJyx5Aw+JCCri5J+cBeAz07FIcisv6nYh04ye15sn3zza0H1OL2H9k0g8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dYzbYTtK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738758748;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ehjN23UhFLOEmMg/5tKtfppC4JFaMbK0Ow+1rDoliVo=;
-	b=dYzbYTtKAN/G0JBt1+9gkOdPljqo/QYkLxcCtTWogl9KLp2gNThcO+9kwXAEr/ehMpQjXn
-	licM+SBrXdUTIuId9wp8G78TGCZWR99zaBOP3tzUqBAG4cRhm7YBW7udxH7Skv4/6h15C6
-	fzG5RnHIj3wPvLan8DtbvijLORq9OwQ=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-527-U5A50OZTPn2gbVlkgZ3HUQ-1; Wed,
- 05 Feb 2025 07:32:25 -0500
-X-MC-Unique: U5A50OZTPn2gbVlkgZ3HUQ-1
-X-Mimecast-MFC-AGG-ID: U5A50OZTPn2gbVlkgZ3HUQ
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F047B195608E;
-	Wed,  5 Feb 2025 12:32:22 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.40])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E11E01800872;
-	Wed,  5 Feb 2025 12:32:21 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 88EE621E6A28; Wed, 05 Feb 2025 13:32:19 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Philippe =?utf-8?Q?Mathieu-Daud?=
- =?utf-8?Q?=C3=A9?=
- <philmd@linaro.org>,  Daniel P . =?utf-8?Q?Berrang=C3=A9?=
- <berrange@redhat.com>,  Igor
- Mammedov <imammedo@redhat.com>,  "Michael S . Tsirkin" <mst@redhat.com>,
-  Richard Henderson <richard.henderson@linaro.org>,  Eduardo Habkost
- <eduardo@habkost.net>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-  Yanan Wang <wangyanan55@huawei.com>,  Jonathan Cameron
- <Jonathan.Cameron@huawei.com>,  Alireza Sanaee
- <alireza.sanaee@huawei.com>,  Sia Jee Heng <jeeheng.sia@starfivetech.com>,
-  qemu-devel@nongnu.org,  kvm@vger.kernel.org
-Subject: Re: [PATCH v7 RESEND 0/5] i386: Support SMP Cache Topology
-In-Reply-To: <20250110145115.1574345-1-zhao1.liu@intel.com> (Zhao Liu's
-	message of "Fri, 10 Jan 2025 22:51:10 +0800")
-References: <20250110145115.1574345-1-zhao1.liu@intel.com>
-Date: Wed, 05 Feb 2025 13:32:19 +0100
-Message-ID: <87jza4zi5o.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1738759269; c=relaxed/simple;
+	bh=pYhD+SHOxcSft14VFZBo/hBAX8Nxq+oO+kbTLpeDLGE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GwlR4My36BryloBfLZLM43gfp0Qb/NqywaLWrsIRh0W4rPPVtUm99fzN0MnF9rP2H9l8sk2Sn+CQbalS1OC9iyg7JHsMa46N9bHk4nWERWbu5vy4ii0QTXRL6yxR08q5axq5Brk5agrMjCSZcFWq+0nQbfp2+SJIcInO2a3+rMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VpXQJGqi; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4361dc6322fso46683815e9.3;
+        Wed, 05 Feb 2025 04:41:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738759266; x=1739364066; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B2nY810+IaZK5n9EujS3czHJOBsB42FBjuOFqVzxuj0=;
+        b=VpXQJGqi+2bFlgONaqA0ICu/b+3eA3Thd6vDkjsfU5pop1q3MrgaKK3fQP8gbDQKFS
+         Sm75cFoAoVF0NXUXH2yyNd5kuCqFqQ5XjwDeXxZgVgkpC0SVunFQX5GmjLMejKZ6sUVO
+         OuCqD1iPt+holKjsZDnhxsWgH/ezbb92KsLIcd/3bAkA/bsmaTm95nXOzeXjgmsC3+uH
+         f5NlO/Uu2RLWAPkOp/iXYvBwlZPTx03TkVfsqLI4PqBqemu50QVv6NvVdQBc/r3oasjA
+         nb0WcA/m5xVWUF1mzJMdtF9ghK+UcxZ6G0Xk25eWGrHNjZ9FnlsV8INFql+l+BSf4sHv
+         wEcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738759266; x=1739364066;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B2nY810+IaZK5n9EujS3czHJOBsB42FBjuOFqVzxuj0=;
+        b=fDBvaiASZb3lC3UG+9svZyARYfs3SvMqeH6PLJD/1/a7DgEU2vMJjN4iLsNC2gPGFh
+         kacQdSEwNKi6HZmXP3d0OQB99WjUKrvlmrxYX8CFoBOP5ie821zQCpWFryTki4V7RBgJ
+         N56TQIJo5Md92UH/lYHHgKfp68eKrsh0B1HVVuFQJy4Um9k25l/hDciqgaPoHqkIbM3r
+         AeMqcTM6/dkTAarLv2TcrY8mSH8ogQAgqrKNWc7DeufhEAA0KobFARc/R0j+IBZeaM+t
+         zKv0uVTcbW0PKasF9cpyZOWbeHgphvVAnyf9daeTTe0awLzoOlXMCksiGQ/grGc1NPAP
+         DYqg==
+X-Forwarded-Encrypted: i=1; AJvYcCViSZhNqHZzsRDIvQ1AYGivk2x6n2ZZh8fg5zW6r7LRqk/q1IB3sMQmb0lxXh3lxMp29yIIHg5Y5uZ4/igt5HNk@vger.kernel.org, AJvYcCW/VXUSHvLFRgqxshZN3JSMgLmQd0O8PCeH4Ft/6RNMCaxB628KlA5Lg6AhDeHlb3V6/HU=@vger.kernel.org, AJvYcCWZRHW7VfwN7CwyeXoE+IIrBWXZxyoODcsBMCfcVCnK0SuCD+BvTVz4rNPCin/1AY9vwIBfX0TBX7ji@vger.kernel.org, AJvYcCWaWRU9gcosuIP6T28n9MYyQlEOlaHlfz2eVJbGhVOQW1Sy9LKcOZGZLv/Wf7ZdwtZLdmwj3+wYYBzC/9/x@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkbBNgkUi4faoF43F/yKxwh5H6CmEDjhTkJFB2KxDZ0xGOsibp
+	aFwqJmRNhaulfwdpP8OPD3olPaL4Kz3Qhlfb0wKQMJqV79kmVIyiQa4g7Qp9
+X-Gm-Gg: ASbGnctD4/FfDfFOipRFhnA/4QyJDKhXUIxdCb32vbmyp/xsGdCuQqCM8MQP+XugQVh
+	7bdfaGgphGQqYZPCDHcFQt8Ga88m1ICInM4lWRO+sj9FeIyQOCgPzY/N1jej4eLGS60OcZEjzQi
+	C+5X6+2RcVXheKbbfDnvAA00KYzBfXzY6/jv5M9IoXgBqAzdWT1/T8mUybo4ny8LbYXJQKyx/Dq
+	fvCWy1pFKsbPfTxWYK0XYoKjGSz1AFG4JZ8sHldZI3o0jpKW5Dou7wMVblCmEVxtDKL9yzTNLCc
+	SWUiVEyx5ojNQqgW7guTIp4=
+X-Google-Smtp-Source: AGHT+IGPDh0UCfW8C0UUaobE12fAfZcaYcWV+qO1/+Q7RfKKWpw6BN/Izj4F094IN//LhwjnBjSyNw==
+X-Received: by 2002:a5d:64af:0:b0:38b:ed6f:f012 with SMTP id ffacd0b85a97d-38db48868a1mr1958421f8f.9.1738759265611;
+        Wed, 05 Feb 2025 04:41:05 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.128.4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390d93383asm20448845e9.7.2025.02.05.04.41.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2025 04:41:04 -0800 (PST)
+Message-ID: <53192c45-df3c-4a65-9047-bbd59d4aee47@gmail.com>
+Date: Wed, 5 Feb 2025 12:41:11 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>,
+ Samiullah Khawaja <skhawaja@google.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, dw@davidwei.uk
+References: <20241221004236.2629280-1-almasrymina@google.com>
+ <20241221004236.2629280-6-almasrymina@google.com>
+ <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
+ <CAHS8izNzbEi_Dn+hDohF9Go=et7kts-BnmEpq=Znpot7o7B5wA@mail.gmail.com>
+ <6798ee97c73e1_987d9294d6@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <6798ee97c73e1_987d9294d6@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Zhao Liu <zhao1.liu@intel.com> writes:
+On 1/28/25 14:49, Willem de Bruijn wrote:
+>>>> +struct net_devmem_dmabuf_binding *
+>>>> +net_devmem_get_sockc_binding(struct sock *sk, struct sockcm_cookie *sockc)
+>>>> +{
+>>>> +     struct net_devmem_dmabuf_binding *binding;
+>>>> +     int err = 0;
+>>>> +
+>>>> +     binding = net_devmem_lookup_dmabuf(sockc->dmabuf_id);
+>>>
+>>> This lookup is from global xarray net_devmem_dmabuf_bindings.
+>>>
+>>> Is there a check that the socket is sending out through the device
+>>> to which this dmabuf was bound with netlink? Should there be?
+>>> (e.g., SO_BINDTODEVICE).
+>>>
+>>
+>> Yes, I think it may be an issue if the user triggers a send from a
+>> different netdevice, because indeed when we bind a dmabuf we bind it
+>> to a specific netdevice.
+>>
+>> One option is as you say to require TX sockets to be bound and to
+>> check that we're bound to the correct netdev. I also wonder if I can
+>> make this work without SO_BINDTODEVICE, by querying the netdev the
+>> sock is currently trying to send out on and doing a check in the
+>> tcp_sendmsg. I'm not sure if this is possible but I'll give it a look.
+> 
+> I was a bit quick on mentioning SO_BINDTODEVICE. Agreed that it is
+> vastly preferable to not require that, but infer the device from
+> the connected TCP sock.
 
-> Hi folks,
->
-> This is my v7 resend version (updated the commit message of origin
-> v7's Patch 1).
+I wonder why so? I'd imagine something like SO_BINDTODEVICE is a
+better way to go. The user has to do it anyway, otherwise packets
+might go to a different device and the user would suddenly start
+getting errors with no good way to alleviate them (apart from
+likes of SO_BINDTODEVICE). It's even worse if it works for a while
+but starts to unpredictably fail as time passes. With binding at
+least it'd fail fast if the setup is not done correctly.
 
-If anything changed, even if it's just a commit message, make it a new
-version, not a resend, to avoid confusion.  Next time :)
-
-[...]
+-- 
+Pavel Begunkov
 
 
