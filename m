@@ -1,196 +1,141 @@
-Return-Path: <kvm+bounces-37358-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37359-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C842AA293A8
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 16:14:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3204A29425
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 16:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 913403AD532
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 15:07:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D60316BEA6
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 15:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39FD16DEB1;
-	Wed,  5 Feb 2025 15:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C44B1DB363;
+	Wed,  5 Feb 2025 15:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gsO61bSW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y5L0KZP1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503B51519B4
-	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 15:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E3D158D96
+	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 15:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738768027; cv=none; b=Ji/jmUyiFIjH7iJAJ8i40e8Qi8MasGscGWwaKWmiiKzUcXg2ivA1+mFFNrTBgHEY2P2+0zAEZmlstegb/pbU6ESwr4In3DUpvf+3OsfX1v/ucuolkqZSI1eIQS4RaWm1yu+bHLpxTwTqf8iMNNc4CtJiusGrVO/K0NFF29fz7tM=
+	t=1738768515; cv=none; b=Z/N7d+n/R3HAjnGAdMhGJlVSaI5/uZRmyITxjzF96A/gV0zeEo20O5VTxghkgTy2f+COXlMtbeWGzZorCcUtSjVh2qjukqUu3zxBsYiACO+u0V9339BA4E5oL8xFPNXhQ6z4zVDQYHcB+5qbD6yVlMUIC3nDuPMyvXnuP8otAtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738768027; c=relaxed/simple;
-	bh=H9Hy4gOxKEd66YhBYkMkYPFJBkFFoDc4atCnWsCOGpI=;
+	s=arc-20240116; t=1738768515; c=relaxed/simple;
+	bh=4szL1eJgPRArjYOVHDwKE/JvLZRZfgR79x/numwtyM4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gqr2Mz9mlyapY7GbkS5cIrSXJ3xTysewB9vNaAeU0GdXXmkqeVZ3iQvIUvP/GWnmvEndalg8oypoaF1uvoGoyEtIrJpJbnYOTMKIAxfVJC9iy9Uth+5boTpB7VIaedWXdkkr2NSJgBOghU2C5bXVUElFnFsdMeyhxSghqGp4YSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gsO61bSW; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=hVBhJ0G9Sl9X5CM6SHqtFvXlkDcSpb2+bg7O4JrYXvBsiLiQUpsczGN1Msqt5liVSRJn7mx6JnK3dBdAg3rqnKl9ZV/Pfkpfq0b/8C+/WpHAkPlmB/ZxuS5Z6Krvf48+ZrbPro5icqz2bwsFg8NG08MnXQ6KbravcKv6M016ZUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y5L0KZP1; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f9f2bf2aaeso614748a91.1
-        for <kvm@vger.kernel.org>; Wed, 05 Feb 2025 07:07:06 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21f022fc6a3so23589195ad.1
+        for <kvm@vger.kernel.org>; Wed, 05 Feb 2025 07:15:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738768025; x=1739372825; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=x4oW/dAfjtIYVmLRtu5aqY7ul2Z1RIM2CtrfkUILPao=;
-        b=gsO61bSW110ErjobseKoFM5n2BZAL5TM9uJxpvx5TWiU1kEFSQF0IZ3VzD3Fhj7tYz
-         33c4rg/635u2atWKKB36HCeTvHiAQmDGqmSf4UDV93ZfB1mAD4Jc3lFJzihSTHLg7M7D
-         7vc8uysACLMiFAPEGfP8umBWEnKCgQs0uDyEyQ4afkCuSR4ZbKAdCBOp8TpcVnmEfxHo
-         qLgBZYVLzaxA5tE64Bk19tuD9nCXeTXumOjQYmChWxSaFmJZKzCInfSb4beEMu1DLOnk
-         LIV2Bx3YMtH2pevYbgKcs8RDCuVRRTyg11NJnPHRcggkoind/+HM25ELaFF/EEtD87p7
-         gGvw==
+        d=google.com; s=20230601; t=1738768513; x=1739373313; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RjqsFlgPguDEnBdcgetC9zWFV3PjaxpPC075lKRZgFw=;
+        b=Y5L0KZP1UO6rB9GAHvnNcHiDP/hI1qsv4laQaR1ijSOSeZ+m+LlNJcr0OKnjTJZwhY
+         QJzhygz2wyqdrwWMpvSwT4FRdIwnirmI6qJSrOJDcaVyehr54atLs2NTCAx2r75nCYZl
+         UjiaYqGAK6IX899BY/VVI5M3tiyhdO+o1qagP3bmj7lPkML3qYdHZkdRPBFKChNJaCgU
+         ZLUtykGwweQQzuYP8nf2Hez7qFOcCf5atnOehG32qQVI+ghC1oAhGEb4tOSFRF4exkom
+         XYKvrkp33kHnXXoTu3TCa4kGQ5xpoosTluQ2Mrb3yext99/mpLd19K7TJXrBF6HQWLy5
+         gL0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738768025; x=1739372825;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=x4oW/dAfjtIYVmLRtu5aqY7ul2Z1RIM2CtrfkUILPao=;
-        b=v+X+9SBa4ZufUwvdw3kBeZJZcglRSlld6A+iUR/7d2RU9Sr2RlG4ihNzIlLFYyxpqa
-         H278mk3X5NG9aLzoEkOhr9cv88Xs/VP0dVMA6LRAz4wtoxDBun4epanFbfX7wREJFmfD
-         LKTZPjHxuIwDd56SQdvp5WkvS1x1mqyrejX56g31SE5WCEIMBZHh/7llHk58lYP51kSv
-         I2XElMOqnr3TekQeAv3CQJAHD0QAPv9Moa6DEXkldmrSs+glq4QubPuQnc+qlT0d3ue2
-         oWzdfztRsaPV5oXXalxg4gE3hpDR8nqIW61Rt0mNhy9LFmB56vws+EvPWd3MxTJuXCqb
-         j4/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWbtXUKUnAs7efaVqzyw2936SNuKhmHZMuMIavh+DKjOLuVb3Hsq8marCZFc5Fb4BZMYnQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzwbj+OMGvAGLA2SQeKHp+s7487ythZoxlhga2blGtQnHxAq/eW
-	E8SJJKbEnDQ8D/HX7cK4STEUVqjzprEEt1Sa1EPM7ELtYV+C7tPqN44T3g+7ffhkPH3nmFpKDqu
-	wMQ==
-X-Google-Smtp-Source: AGHT+IHXf9TWBtdxouWYPQZ0tUW8cJ9QFjrqHbhdh6cqzplE7+BtUhY/bbSQzbcNUl1oWImGd1KSiadmTfM=
-X-Received: from pfbfb15.prod.google.com ([2002:a05:6a00:2d8f:b0:725:eccc:e998])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:450a:b0:729:a31:892d
- with SMTP id d2e1a72fcca58-73035117eb6mr5841339b3a.8.1738768025226; Wed, 05
- Feb 2025 07:07:05 -0800 (PST)
-Date: Wed, 5 Feb 2025 07:06:58 -0800
-In-Reply-To: <43f702b383fb99d435f2cdb8ef35cc1449fe6c23.camel@infradead.org>
+        d=1e100.net; s=20230601; t=1738768513; x=1739373313;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RjqsFlgPguDEnBdcgetC9zWFV3PjaxpPC075lKRZgFw=;
+        b=nvCtyWki3ugWbH+qOTMVr6cKmL+yBi1zJvO+TxCtVF4nZVZtgN8lUEoTA4aDqaWEYB
+         Oa5cywR3KsBGjjXtGh7PGoDx7/UVi+sSN8wjbxF2x2HuUe2xAbLtSzRbKTb1vE6EmvSz
+         Ylh4E5SMox9EHA5za982zox9i43jb4RzS9/XRnVIT8/s1hr+W/UY4VTOKvE6HZVLg941
+         kR47anZ1WZzFBxC9ZUmP+XI3Mhs3vyFB/rLmnwCbrPDY4mqklTz1VAEgW38k9TUJk/py
+         VgMo8uBnUpyvm/1w42wSSEl2yfVPsnpXZkHWJzC/tZCO21cNIsizT9nev71QS5pRNXzr
+         R+NA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYuZDdQACxHWJilVV3BEAmTsz5CEyERDe2SOL8qkpoM+1j6ljoTkXR2aoxtFzlZOH8L2U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywcy1ZAOKMXVne9PQsGQQ8snTm75ig8mFlQpsvnTQ9x6674k7HQ
+	w0WTc2AMF43hIKGbkI1yp4copgzyZBVLYEOvjgDU+wo3dPfU0gP8QlKh60M9+Aog4S00Lry0y+B
+	CyQ==
+X-Google-Smtp-Source: AGHT+IFHs7tj+Q54d64NDKOfhfMfAS91bOZEx/8/ugogv1Ut4aJidKZIV/qdikwiSwu5m+q7+e5T4vD0P74=
+X-Received: from plgi6.prod.google.com ([2002:a17:902:cf06:b0:21c:144d:411b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:daca:b0:215:758c:52e8
+ with SMTP id d9443c01a7336-21f17a774a7mr66004375ad.12.1738768512794; Wed, 05
+ Feb 2025 07:15:12 -0800 (PST)
+Date: Wed, 5 Feb 2025 07:15:11 -0800
+In-Reply-To: <1969aa1a-e092-4a48-b4a0-9a50ec2ef3b6@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250201011400.669483-1-seanjc@google.com> <20250201011400.669483-2-seanjc@google.com>
- <43f702b383fb99d435f2cdb8ef35cc1449fe6c23.camel@infradead.org>
-Message-ID: <Z6N-kn1-p6nIWHeP@google.com>
-Subject: Re: [PATCH 1/5] KVM: x86/xen: Restrict hypercall MSR to unofficial
- synthetic range
+References: <cover.1738274758.git.ashish.kalra@amd.com> <afc1fb55dfcb1bccd8ee6730282b78a7e2f77a46.1738274758.git.ashish.kalra@amd.com>
+ <Z5wr5h03oLEA5WBn@google.com> <1969aa1a-e092-4a48-b4a0-9a50ec2ef3b6@amd.com>
+Message-ID: <Z6OAf02sRJTZkl5K@google.com>
+Subject: Re: [PATCH v2 4/4] iommu/amd: Enable Host SNP support after enabling
+ IOMMU SNP support
 From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Paul Durrant <paul@xen.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com, 
-	Joao Martins <joao.m.martins@oracle.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Vasant Hegde <vasant.hegde@amd.com>
+Cc: Ashish Kalra <Ashish.Kalra@amd.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, joro@8bytes.org, 
+	suravee.suthikulpanit@amd.com, will@kernel.org, robin.murphy@arm.com, 
+	michael.roth@amd.com, dionnaglaze@google.com, nikunj@amd.com, ardb@kernel.org, 
+	kevinloughlin@google.com, Neeraj.Upadhyay@amd.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-coco@lists.linux.dev, iommu@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 05, 2025, David Woodhouse wrote:
-> On Fri, 2025-01-31 at 17:13 -0800, Sean Christopherson wrote:
-> > --- a/arch/x86/kvm/xen.c
-> > +++ b/arch/x86/kvm/xen.c
-> > @@ -1324,6 +1324,14 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct k=
-vm_xen_hvm_config *xhc)
-> > =C2=A0	=C2=A0=C2=A0=C2=A0=C2=A0 xhc->blob_size_32 || xhc->blob_size_64)=
-)
-> > =C2=A0		return -EINVAL;
-> > =C2=A0
-> > +	/*
-> > +	 * Restrict the MSR to the range that is unofficially reserved for
-> > +	 * synthetic, virtualization-defined MSRs, e.g. to prevent confusing
-> > +	 * KVM by colliding with a real MSR that requires special handling.
-> > +	 */
-> > +	if (xhc->msr && (xhc->msr < 0x40000000 || xhc->msr > 0x4fffffff))
-> > +		return -EINVAL;
-> > +
-> > =C2=A0	mutex_lock(&kvm->arch.xen.xen_lock);
-> > =C2=A0
-> > =C2=A0	if (xhc->msr && !kvm->arch.xen_hvm_config.msr)
->=20
-> I'd prefer to see #defines for those magic values.
+On Wed, Feb 05, 2025, Vasant Hegde wrote:
+> On 1/31/2025 7:18 AM, Sean Christopherson wrote:
+> > On Fri, Jan 31, 2025, Ashish Kalra wrote:
+> >> @@ -3426,18 +3431,23 @@ void __init amd_iommu_detect(void)
+> >>  	int ret;
+> >>  
+> >>  	if (no_iommu || (iommu_detected && !gart_iommu_aperture))
+> >> -		return;
+> >> +		goto disable_snp;
+> >>  
+> >>  	if (!amd_iommu_sme_check())
+> >> -		return;
+> >> +		goto disable_snp;
+> >>  
+> >>  	ret = iommu_go_to_state(IOMMU_IVRS_DETECTED);
+> >>  	if (ret)
+> >> -		return;
+> >> +		goto disable_snp;
+> > 
+> > This handles initial failure, but it won't handle the case where amd_iommu_prepare()
+> > fails, as the iommu_go_to_state() call from amd_iommu_enable() will get
+> > short-circuited.  I don't see any pleasant options.  Maybe this?
+> > 
+> > diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
+> > index c5cd92edada0..436e47f13f8f 100644
+> > --- a/drivers/iommu/amd/init.c
+> > +++ b/drivers/iommu/amd/init.c
+> > @@ -3318,6 +3318,8 @@ static int __init iommu_go_to_state(enum iommu_init_state state)
+> >                 ret = state_next();
+> >         }
+> >  
+> > +       if (ret && !amd_iommu_snp_en && cc_platform_has(CC_ATTR_HOST_SEV_SNP))
+> 
+> I think we should clear when `amd_iommu_snp_en` is true.
 
-Can do.  Hmm, and since this would be visible to userspace, arguably the #d=
-efines
-should go in arch/x86/include/uapi/asm/kvm.h
+That doesn't address the case where amd_iommu_prepare() fails, because amd_iommu_snp_en
+will be %false (it's init value) and the RMP will be uninitialized, i.e.
+CC_ATTR_HOST_SEV_SNP will be incorrectly left set.
 
-> Especially as there is a corresponding requirement that they never be set
-> from host context (which is where the potential locking issues come in).
-> Which train of thought leads me to ponder this as an alternative (or
-> additional) solution:
->=20
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3733,7 +3733,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, stru=
-ct msr_data *msr_info)
->         u32 msr =3D msr_info->index;
->         u64 data =3D msr_info->data;
-> =20
-> -       if (msr && msr =3D=3D vcpu->kvm->arch.xen_hvm_config.msr)
-> +       /*
-> +        * Do not allow host-initiated writes to trigger the Xen hypercal=
-l
-> +        * page setup; it could incur locking paths which are not expecte=
-d
-> +        * if userspace sets the MSR in an unusual location.
+And conversely, IMO clearing CC_ATTR_HOST_SEV_SNP after initializing the IOMMU
+and RMP is wrong as well.  Such a host is probably hosted regardless, but from
+the CPU's perspective, SNP is supported and enabled.
 
-That's just as likely to break userspace.  Doing a save/restore on the MSR =
-doesn't
-make a whole lot of sense since it's effectively a "command" MSR, but IMO i=
-t's not
-any less likely than userspace putting the MSR index outside of the synthet=
-ic range.
+> May be below check is enough?
+> 
+> 	if (ret && amd_iommu_snp_en)
 
-Side topic, upstream QEMU doesn't even appear to put the MSR at the Hyper-V
-address.  It tells the guest that's where the MSR is located, but the confi=
-g
-passed to KVM still uses the default.
 
-        /* Hypercall MSR base address */
-        if (hyperv_enabled(cpu)) {
-            c->ebx =3D XEN_HYPERCALL_MSR_HYPERV;
-            kvm_xen_init(cs->kvm_state, c->ebx);
-        } else {
-            c->ebx =3D XEN_HYPERCALL_MSR;
-        }
-
-...
-
-        /* hyperv_enabled() doesn't work yet. */
-        uint32_t msr =3D XEN_HYPERCALL_MSR;
-        ret =3D kvm_xen_init(s, msr);
-        if (ret < 0) {
-            return ret;
-        }
-
-Userspace breakage aside, disallowng host writes would fix the immediate is=
-sue,
-and I think would mitigate all concerns with putting the host at risk.  But=
- it's
-not enough to actually make an overlapping MSR index work.  E.g. if the MSR=
- is
-passed through to the guest, the write will go through to the hardware MSR,=
- unless
-the WRMSR happens to be emulated.
-
-I really don't want to broadly support redirecting any MSR, because to trul=
-y go
-down that path we'd need to deal with x2APIC, EFER, and other MSRs that hav=
-e
-special treatment and meaning.
-
-While KVM's stance is usually that a misconfigured vCPU model is userspace'=
-s
-problem, in this case I don't see any value in letting userspace be stupid.=
-  It
-can't work generally, it creates unique ABI for KVM_SET_MSRS, and unless th=
-ere's
-a crazy use case I'm overlooking, there's no sane reason for userspace to p=
-ut the
-index in outside of the synthetic range (whereas defining seemingly nonsens=
-ical
-CPUID feature bits is useful for testing purposes, implementing support in
-userspace, etc).
 
