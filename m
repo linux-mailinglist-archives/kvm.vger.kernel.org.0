@@ -1,187 +1,160 @@
-Return-Path: <kvm+bounces-37311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97331A28664
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 10:20:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00EEDA28674
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 10:25:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A69F23A75AE
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 09:20:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 842231638AC
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 09:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD3C22A7ED;
-	Wed,  5 Feb 2025 09:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hyl2bIZ9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDEB22A7E1;
+	Wed,  5 Feb 2025 09:25:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DEB22A4F6
-	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 09:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CAF322A4DA;
+	Wed,  5 Feb 2025 09:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738747209; cv=none; b=WWoSz7ShpN4o8Dg62ZXL9dnIc2vuotaf8rcCoORzrGFbC7GI2Nesy6MaidyFjeD2kKtXDpVB5l+BCz1nWUaGLeuFBvvZlk+nxi9Eoxh4DusdXucYsKR3+aFNsIT9wjWQ+tbyPnw1OnUejgkuby11B0/Cmfebnzj+JIdMLPGiDCM=
+	t=1738747544; cv=none; b=nosjc7Rp49To51Ud53FSf3pQmh2GYPBoNpuAKKMUnQcrBOkL+roV/6t7ya5GHUvXFtKw/sMcQMhL386n9SNQsWS5svGKQzjSbJVmacHLR8ra4Z/OpH2JGw0sqrzxEtI0/eHa3G0cmCxaBZtDUehGVLxGacPOjVLdigqldAKkxcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738747209; c=relaxed/simple;
-	bh=C5FlNtg9f1rIi4FV7GRUcTzoqztOmVXoh10s46EFTMU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=dPZnoIih0w3bXN4wPREYp9EHu+ABpfhXLWZldqvfWfepPu1YY/7FzfkRoKAp6q4mgXvzVRIPZ062aXkwMUMKCodR2osPZYBugCtwhsYD+Ec4ryq+8sNz6mxd9KoGXoSxLkv6cWTd7aU6WkeKOTBcKhjeU8PsG5xL9LRXxRcBnC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hyl2bIZ9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738747207;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RDDuMojfzA3TtjMm7/XpBRWReWktry4qKIVeq2mwHM4=;
-	b=hyl2bIZ9pgCstsYTmU47qfC7iXeAOjZ/CnEKhjLjmacPfeZv/NdpCx1oWN/veXNF1BoTWh
-	hx65VoE+A186SaHMZpSlTFaBAoLDUzyEbwHnBmyTz3L5HRX55w3WK1U+E1PEnHR1fcJiUa
-	jYLs+C2S8R5ZBQgGjhCmmjhgnlizYnA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-55-096-Yk1wOR6Ql3cHg0YnXQ-1; Wed,
- 05 Feb 2025 04:20:04 -0500
-X-MC-Unique: 096-Yk1wOR6Ql3cHg0YnXQ-1
-X-Mimecast-MFC-AGG-ID: 096-Yk1wOR6Ql3cHg0YnXQ
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6239A1800264;
-	Wed,  5 Feb 2025 09:20:02 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.40])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9384818004A7;
-	Wed,  5 Feb 2025 09:20:01 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 3D4EF21E6A28; Wed, 05 Feb 2025 10:19:59 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Daniel P. =?utf-8?Q?Berrang?=
- =?utf-8?Q?=C3=A9?=
- <berrange@redhat.com>,  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>,  Igor
- Mammedov <imammedo@redhat.com>,  Zhao Liu <zhao1.liu@intel.com>,  "Michael
- S. Tsirkin" <mst@redhat.com>,  Eric Blake <eblake@redhat.com>,  Peter
- Maydell <peter.maydell@linaro.org>,  Marcelo Tosatti
- <mtosatti@redhat.com>,  Huacai Chen <chenhuacai@kernel.org>,  Rick
- Edgecombe <rick.p.edgecombe@intel.com>,  Francesco Lavra
- <francescolavra.fl@gmail.com>,  qemu-devel@nongnu.org,
-  kvm@vger.kernel.org
-Subject: Re: [PATCH v7 28/52] i386/tdx: Wire TDX_REPORT_FATAL_ERROR with
- GuestPanic facility
-In-Reply-To: <20250124132048.3229049-29-xiaoyao.li@intel.com> (Xiaoyao Li's
-	message of "Fri, 24 Jan 2025 08:20:24 -0500")
-References: <20250124132048.3229049-1-xiaoyao.li@intel.com>
-	<20250124132048.3229049-29-xiaoyao.li@intel.com>
-Date: Wed, 05 Feb 2025 10:19:59 +0100
-Message-ID: <874j184ukg.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1738747544; c=relaxed/simple;
+	bh=LJcFnN9gJwfUfOG3O6tba5PYyMbo02O+qICApByuuMM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QsXxta2I64ilVei4vILjE7GbAoK1wfxaa3aaUNtTcUq4FeHwz/96MJ4hHLMMddye1U0YUIf0n4fx9goT0sbbekvcZhBdMzWLX9+YxRZadM5J0kksDZfAm5PFWzvTrtJR1o9WkjrovvA5o2/BWQgDpjGu8n9dj2YQ7Yq7e4hA3TU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8AxaeGLLqNnQR1sAA--.14187S3;
+	Wed, 05 Feb 2025 17:25:31 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowMBxXsWKLqNnvh0AAA--.262S2;
+	Wed, 05 Feb 2025 17:25:31 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc: Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] LoongArch: KVM: Remove PGD table saving during VM context switch
+Date: Wed,  5 Feb 2025 17:25:30 +0800
+Message-Id: <20250205092530.1625606-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMBxXsWKLqNnvh0AAA--.262S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
+PGD table for primary mmu keeps unchanged once VM is created, it
+is not necessary to save PGD table pointer during VM context switch.
+And it can be acquired when VCPU is created.
 
-> Integrate TDX's TDX_REPORT_FATAL_ERROR into QEMU GuestPanic facility
->
-> Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
-> Changes in v6:
-> - change error_code of GuestPanicInformationTdx from uint64_t to
->   uint32_t, to only contains the bit 31:0 returned in r12.
->
-> Changes in v5:
-> - mention additional error information in gpa when it presents;
-> - refine the documentation; (Markus)
->
-> Changes in v4:
-> - refine the documentation; (Markus)
->
-> Changes in v3:
-> - Add docmentation of new type and struct; (Daniel)
-> - refine the error message handling; (Daniel)
-> ---
->  qapi/run-state.json   | 31 ++++++++++++++++++--
->  system/runstate.c     | 67 +++++++++++++++++++++++++++++++++++++++++++
->  target/i386/kvm/tdx.c | 24 +++++++++++++++-
->  3 files changed, 119 insertions(+), 3 deletions(-)
->
-> diff --git a/qapi/run-state.json b/qapi/run-state.json
-> index ce95cfa46b73..e63611780a2c 100644
-> --- a/qapi/run-state.json
-> +++ b/qapi/run-state.json
-> @@ -501,10 +501,12 @@
->  #
->  # @s390: s390 guest panic information type (Since: 2.12)
->  #
-> +# @tdx: tdx guest panic information type (Since: 9.0)
+Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+---
+ arch/loongarch/include/asm/kvm_host.h |  2 ++
+ arch/loongarch/kernel/asm-offsets.c   |  4 +---
+ arch/loongarch/kvm/switch.S           | 10 +---------
+ arch/loongarch/kvm/vcpu.c             | 10 ++++++++++
+ 4 files changed, 14 insertions(+), 12 deletions(-)
 
-Since: 10.0
+diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+index 590982cd986e..0d7a83407d84 100644
+--- a/arch/loongarch/include/asm/kvm_host.h
++++ b/arch/loongarch/include/asm/kvm_host.h
+@@ -180,6 +180,8 @@ struct kvm_vcpu_arch {
+ 	unsigned long host_sp;
+ 	unsigned long host_tp;
+ 	unsigned long host_pgd;
++	/* pgd table pointer for secondary mmu */
++	unsigned long host_second_pgd;
+ 
+ 	/* Host CSRs are used when handling exits from guest */
+ 	unsigned long badi;
+diff --git a/arch/loongarch/kernel/asm-offsets.c b/arch/loongarch/kernel/asm-offsets.c
+index 8be1c38ad8eb..8c33b9b2ee40 100644
+--- a/arch/loongarch/kernel/asm-offsets.c
++++ b/arch/loongarch/kernel/asm-offsets.c
+@@ -289,13 +289,13 @@ static void __used output_kvm_defines(void)
+ 	BLANK();
+ 
+ 	OFFSET(KVM_VCPU_ARCH, kvm_vcpu, arch);
+-	OFFSET(KVM_VCPU_KVM, kvm_vcpu, kvm);
+ 	OFFSET(KVM_VCPU_RUN, kvm_vcpu, run);
+ 	BLANK();
+ 
+ 	OFFSET(KVM_ARCH_HSP, kvm_vcpu_arch, host_sp);
+ 	OFFSET(KVM_ARCH_HTP, kvm_vcpu_arch, host_tp);
+ 	OFFSET(KVM_ARCH_HPGD, kvm_vcpu_arch, host_pgd);
++	OFFSET(KVM_ARCH_HSECPGD, kvm_vcpu_arch, host_second_pgd);
+ 	OFFSET(KVM_ARCH_HANDLE_EXIT, kvm_vcpu_arch, handle_exit);
+ 	OFFSET(KVM_ARCH_HEENTRY, kvm_vcpu_arch, host_eentry);
+ 	OFFSET(KVM_ARCH_GEENTRY, kvm_vcpu_arch, guest_eentry);
+@@ -306,8 +306,6 @@ static void __used output_kvm_defines(void)
+ 	OFFSET(KVM_ARCH_HECFG, kvm_vcpu_arch, host_ecfg);
+ 	OFFSET(KVM_ARCH_HESTAT, kvm_vcpu_arch, host_estat);
+ 	OFFSET(KVM_ARCH_HPERCPU, kvm_vcpu_arch, host_percpu);
+-
+-	OFFSET(KVM_GPGD, kvm, arch.pgd);
+ 	BLANK();
+ }
+ 
+diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
+index 0c292f818492..1598d1f53334 100644
+--- a/arch/loongarch/kvm/switch.S
++++ b/arch/loongarch/kvm/switch.S
+@@ -60,16 +60,8 @@
+ 	ld.d	t0, a2, KVM_ARCH_GPC
+ 	csrwr	t0, LOONGARCH_CSR_ERA
+ 
+-	/* Save host PGDL */
+-	csrrd	t0, LOONGARCH_CSR_PGDL
+-	st.d	t0, a2, KVM_ARCH_HPGD
+-
+-	/* Switch to kvm */
+-	ld.d	t1, a2, KVM_VCPU_KVM - KVM_VCPU_ARCH
+-
+ 	/* Load guest PGDL */
+-	li.w    t0, KVM_GPGD
+-	ldx.d   t0, t1, t0
++	ld.d	t0, a2, KVM_ARCH_HSECPGD
+ 	csrwr	t0, LOONGARCH_CSR_PGDL
+ 
+ 	/* Mix GID and RID */
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index fb72095c8077..8e822b1233ff 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -1462,6 +1462,16 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_PINNED_HARD);
+ 	vcpu->arch.swtimer.function = kvm_swtimer_wakeup;
+ 
++	/* Get pgd for secondary mmu */
++	vcpu->arch.host_second_pgd = (unsigned long)vcpu->kvm->arch.pgd;
++
++	/*
++	 * Get pgd for primary mmu
++	 *
++	 * Supposing current->mm == vcpu->kvm->mm and pgd table keeps unchanged
++	 * since vmm threads are created
++	 */
++	vcpu->arch.host_pgd = (unsigned long)vcpu->kvm->mm->pgd;
+ 	vcpu->arch.handle_exit = kvm_handle_exit;
+ 	vcpu->arch.guest_eentry = (unsigned long)kvm_loongarch_ops->exc_entry;
+ 	vcpu->arch.csr = kzalloc(sizeof(struct loongarch_csrs), GFP_KERNEL);
 
-> +#
->  # Since: 2.9
->  ##
->  { 'enum': 'GuestPanicInformationType',
-> -  'data': [ 'hyper-v', 's390' ] }
-> +  'data': [ 'hyper-v', 's390', 'tdx' ] }
->  
->  ##
->  # @GuestPanicInformation:
-> @@ -519,7 +521,8 @@
->   'base': {'type': 'GuestPanicInformationType'},
->   'discriminator': 'type',
->   'data': {'hyper-v': 'GuestPanicInformationHyperV',
-> -          's390': 'GuestPanicInformationS390'}}
-> +          's390': 'GuestPanicInformationS390',
-> +          'tdx' : 'GuestPanicInformationTdx'}}
->  
->  ##
->  # @GuestPanicInformationHyperV:
-> @@ -598,6 +601,30 @@
->            'psw-addr': 'uint64',
->            'reason': 'S390CrashReason'}}
->  
-> +##
-> +# @GuestPanicInformationTdx:
-> +#
-> +# TDX Guest panic information specific to TDX, as specified in the
-> +# "Guest-Hypervisor Communication Interface (GHCI) Specification",
-> +# section TDG.VP.VMCALL<ReportFatalError>.
-> +#
-> +# @error-code: TD-specific error code
-> +#
-> +# @message: Human-readable error message provided by the guest. Not
-> +#     to be trusted.
-> +#
-> +# @gpa: guest-physical address of a page that contains more verbose
-> +#     error information, as zero-terminated string.  Present when the
-> +#     "GPA valid" bit (bit 63) is set in @error-code.
-> +#
-> +#
-> +# Since: 10.0
-> +##
-> +{'struct': 'GuestPanicInformationTdx',
-> + 'data': {'error-code': 'uint32',
-> +          'message': 'str',
-> +          '*gpa': 'uint64'}}
-> +
->  ##
->  # @MEMORY_FAILURE:
->  #
-
-With the since information corrected
-Acked-by: Markus Armbruster <armbru@redhat.com>
-
-[...]
+base-commit: 5c8c229261f14159b54b9a32f12e5fa89d88b905
+-- 
+2.39.3
 
 
