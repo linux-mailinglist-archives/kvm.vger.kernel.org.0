@@ -1,169 +1,162 @@
-Return-Path: <kvm+bounces-37309-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37310-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57434A28568
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 09:18:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD65A2861C
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 10:07:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D35A5188835A
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 08:18:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA302188645A
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 09:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D07D229B2D;
-	Wed,  5 Feb 2025 08:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570F722A4CD;
+	Wed,  5 Feb 2025 09:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iXw/MKsr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cPW9+adf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB6F221D90;
-	Wed,  5 Feb 2025 08:17:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2B8E219A6E
+	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 09:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738743474; cv=none; b=fkSHviZc8tjUg3vxOeFE+XI5pyw5aH/qHsjBMYbTBSNZswfVB3E516d9vB2sWEwm3Yee2obCdAxHqJR0d1/n7c1a782m/LOSVyLODP2D8dNx3IEJWMNNTBJiFLqJw3tMoBL9kiB48NFZKyARp63hUBvsDOMx9mjDfx8QpvT8wcU=
+	t=1738746419; cv=none; b=ZhOy3TSu4SXwwGuSpMPRmCjJfSxg1Il5HUGxez7HT5ugeGRgrNWdHJIR2Jv+F0/F9X+ooiOsxBt8QD+rHD+LaUva8FgBYs8XBSLdHgKTOmLG4Qv8GDh+YCs7W1ZcAlLm0++T2SlU/EKBtUIVbP4fVS8lmSyCH/995qPhMHIYcXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738743474; c=relaxed/simple;
-	bh=1bm7o4jm61DKhsesfl1Llf2NH/BL2znt9dXZdlGOOnY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eLOK6BQZyus1MTz506AXH9j+TNbzMntWTofteg6o+a56SWRqwYF6Q00oxczY6jT9y2e0B6WkCHzorDx94cGAQm9Ahr5hN50XG2KQBfEzEfEG0Wz4/J0Owy82JiMTdX2QOThoz8Lb5GfpuXuAp3pfA957uOyBCaH2IUgof7pOieo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=iXw/MKsr; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51518DBr012510;
-	Wed, 5 Feb 2025 08:17:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=oXKOH3
-	D9n7QoGtPbX2Z/diam6YS/hMAD/ecFdTt4Iqk=; b=iXw/MKsrlan8YQ47wIB8cK
-	v1m1dyWqHiqclf1SaZkaHtZa1WsngMgw4TIV8DLrEPuyr3CANfRnDZUwSQAq9e/m
-	ShJJwfwP3V9Fodkg8Luzl1dLABspSdFNm7Li4/PYhQ52GFY8BX6ca67AoJy+i3hC
-	xmJAvgFZ0p1fbmsiMW2GK3rQHs6d6ZuWNC3LlbgZI5UGIHurXx8uo1v6zcG1dmwa
-	DTyvAKN7IAblOORiXy43BzkVgszs5IBnAs7/7JD/xmvTqquNtLYgmkOtI4bdsmQX
-	ogAa2PiW8TnfvSnzF5nwkPN/vHa4MWZw+tdsnX+9fbwf+PLPB+0sJFiBriIq/Ryw
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44kx29hnyg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Feb 2025 08:17:52 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5154NSwY024506;
-	Wed, 5 Feb 2025 08:17:51 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxxn7sy7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Feb 2025 08:17:51 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5158Hk1R51249436
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Feb 2025 08:17:47 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E497620191;
-	Wed,  5 Feb 2025 08:17:46 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 990DB2016A;
-	Wed,  5 Feb 2025 08:17:46 +0000 (GMT)
-Received: from [9.179.10.151] (unknown [9.179.10.151])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  5 Feb 2025 08:17:46 +0000 (GMT)
-Message-ID: <2d183675-09f8-4ab3-bc4d-67f203f0487c@linux.ibm.com>
-Date: Wed, 5 Feb 2025 09:17:46 +0100
+	s=arc-20240116; t=1738746419; c=relaxed/simple;
+	bh=4b43j9UBJq5Cuw7HFViA2rSQ4rhSkdLGk6228giOKVs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=sH9CMRHlrpucniom2JX/KmcL4qf85rkeDo7sqsXThpLMaCcBB41NbFCm4w7q0c9nKAdJO4CXcZxDtoyO9RdRZOWzMmjl065CXtTXv5TfoZrjeH6RmG29oWxiBuxECOjl6p0erM+eIOycukXCmXzpD0NjvlVxp6L4opTeVQpR+io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cPW9+adf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738746415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8VMVgiAdSJJx4Yt6je91mqO890uzHAfBCBH1el+e/CQ=;
+	b=cPW9+adfVgYmq601W11HMcAiSgJTFZD+hUvQpf7DnnbH3cTpvjMMtqfg9kUQ3/yqH4Fzbt
+	hUpRZFWw+miAukxQPV7JwVv4mzI11EoiqwNeifc4162FIKCvGJd6lj3FPPViqtHiUbseV0
+	rbNixj0hUgilBx+upNJAVXU4EKm7+DU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-214-Wq6XyF8mPdSeR_g2vWNSrA-1; Wed,
+ 05 Feb 2025 04:06:51 -0500
+X-MC-Unique: Wq6XyF8mPdSeR_g2vWNSrA-1
+X-Mimecast-MFC-AGG-ID: Wq6XyF8mPdSeR_g2vWNSrA
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB455180087B;
+	Wed,  5 Feb 2025 09:06:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.192.40])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6F3561800872;
+	Wed,  5 Feb 2025 09:06:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 1F9ED21E6A28; Wed, 05 Feb 2025 10:06:45 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Daniel P. =?utf-8?Q?Berrang?=
+ =?utf-8?Q?=C3=A9?=
+ <berrange@redhat.com>,  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>,  Igor
+ Mammedov <imammedo@redhat.com>,  Zhao Liu <zhao1.liu@intel.com>,  "Michael
+ S. Tsirkin" <mst@redhat.com>,  Eric Blake <eblake@redhat.com>,  Peter
+ Maydell <peter.maydell@linaro.org>,  Marcelo Tosatti
+ <mtosatti@redhat.com>,  Huacai Chen <chenhuacai@kernel.org>,  Rick
+ Edgecombe <rick.p.edgecombe@intel.com>,  Francesco Lavra
+ <francescolavra.fl@gmail.com>,  qemu-devel@nongnu.org,
+  kvm@vger.kernel.org
+Subject: Re: [PATCH v7 12/52] i386/tdx: Validate TD attributes
+In-Reply-To: <20250124132048.3229049-13-xiaoyao.li@intel.com> (Xiaoyao Li's
+	message of "Fri, 24 Jan 2025 08:20:08 -0500")
+References: <20250124132048.3229049-1-xiaoyao.li@intel.com>
+	<20250124132048.3229049-13-xiaoyao.li@intel.com>
+Date: Wed, 05 Feb 2025 10:06:45 +0100
+Message-ID: <878qqk4v6i.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH] lib: s390x: css: Name inline assembly
- arguments and clean them up
-To: Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, hca@linux.ibm.com
-References: <20250204100339.28158-1-frankja@linux.ibm.com>
- <D7JOEGIKCINO.1NX73MSQGVGYZ@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <D7JOEGIKCINO.1NX73MSQGVGYZ@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: N8nkg7jLVIm1xDDvu4goetAFVZzSZb2P
-X-Proofpoint-ORIG-GUID: N8nkg7jLVIm1xDDvu4goetAFVZzSZb2P
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-05_03,2025-02-05_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- bulkscore=0 priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0
- suspectscore=0 adultscore=0 mlxlogscore=905 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502050063
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 2/4/25 1:55 PM, Nico Boehr wrote:
-> On Tue Feb 4, 2025 at 10:51 AM CET, Janosch Frank wrote:
->> @@ -215,9 +215,9 @@ static inline int xsch(unsigned long schid)
->>   
->>   	asm volatile(
->>   		"	xsch\n"
->> -		"	ipm	%0\n"
->> -		"	srl	%0,28"
->> -		: "=d" (cc)
->> +		"	ipm	%[cc]\n"
->> +		"	srl	%cc,28"
-> 
-> Should this be:
-> 		"	srl	%[cc],28"
-> instead?
-> 
-> With that fixed (if it needs fixing):
-> 
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-> 
+Xiaoyao Li <xiaoyao.li@intel.com> writes:
 
-Thanks!
-Fixed and applied.
+> Validate TD attributes with tdx_caps that only supported bits arer
+> allowed by KVM.
+>
+> Besides, sanity check the attribute bits that have not been supported by
+> QEMU yet. e.g., debug bit, it will be allowed in the future when debug
+> TD support lands in QEMU.
+>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+> Changes in v7:
+> - Define TDX_SUPPORTED_TD_ATTRS as QEMU supported mask, to validates
+>   user's request. (Rick)
+>
+> Changes in v3:
+> - using error_setg() for error report; (Daniel)
+> ---
+>  qapi/qom.json         |  16 +++++-
+>  target/i386/kvm/tdx.c | 118 +++++++++++++++++++++++++++++++++++++++++-
+>  target/i386/kvm/tdx.h |   3 ++
+>  3 files changed, 134 insertions(+), 3 deletions(-)
+>
+> diff --git a/qapi/qom.json b/qapi/qom.json
+> index 8740626c4ee6..a53000ca6fb4 100644
+> --- a/qapi/qom.json
+> +++ b/qapi/qom.json
+> @@ -1060,11 +1060,25 @@
+>  #     pages.  Some guest OS (e.g., Linux TD guest) may require this to
+>  #     be set, otherwise they refuse to boot.
+>  #
+> +# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
+> +#     e.g., run-time or OS configuration (base64 encoded SHA384 digest).
+> +#     Defaults to all zeros.
+> +#
+> +# @mrowner: ID for the guest TD=E2=80=99s owner (base64 encoded SHA384 d=
+igest).
+> +#     Defaults to all zeros.
+> +#
+> +# @mrownerconfig: ID for owner-defined configuration of the guest TD,
+> +#     e.g., specific to the workload rather than the run-time or OS
+> +#     (base64 encoded SHA384 digest).  Defaults to all zeros.
+
+All three members are IDs, but only the first one has "id" in its name.
+Odd.  Any particular reason for that?
+
+> +#
+>  # Since: 10.0
+>  ##
+>  { 'struct': 'TdxGuestProperties',
+>    'data': { '*attributes': 'uint64',
+> -            '*sept-ve-disable': 'bool' } }
+> +            '*sept-ve-disable': 'bool',
+> +            '*mrconfigid': 'str',
+> +            '*mrowner': 'str',
+> +            '*mrownerconfig': 'str' } }
+
+The member names are abbreviations all run together, wheras QAPI/QMP
+favors words-separated-with-dashes.  If you invented them, please change
+them to QAPI/QMP style.  If they are established TDX terminology, keep
+them as they are, but please show us your evidence.
+
+>=20=20
+>  ##
+>  # @ThreadContextProperties:
+
+[...]
 
 
