@@ -1,345 +1,226 @@
-Return-Path: <kvm+bounces-37325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37326-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D89CA2880D
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 11:31:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4E3A288ED
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 12:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8777162D93
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 10:31:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15A2B3AF230
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 11:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABD3218E81;
-	Wed,  5 Feb 2025 10:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA25322B8BE;
+	Wed,  5 Feb 2025 11:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iZ/qqppe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4nk9zyd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA15229B28
-	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 10:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40DF22B5B2;
+	Wed,  5 Feb 2025 11:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738751484; cv=none; b=Gkl9/ZATp9BjsbWSOoqDuWs3lRzunoQWj0wXatiAKrp8ao3qituoD61E8iiXNjjnLoDw+YXY8+N2Vwj/o+0o8F36bHUfSXfLcOZOpv9aOlpCAqh03qnSNzn0S7AjZUL14chI3enZdCv+0lgECPcYKpqbWbmqylyGEvn0AqjS3LY=
+	t=1738753404; cv=none; b=CPM+QV4AZiA9aINJIC+djXGODOgeLBUvKVyMsOMeqHBFU0d1QQCBTkkJo3ejSJNxFmVadTEXx7uI5cfPhy4WN5t84y/eqy1Yxg6z8Rr6267jJ4sgUIGYI7mTdguqj968HiP3RPTjFBkOpGhuxswEqaMmxV/YjqXM7fslCxOLMNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738751484; c=relaxed/simple;
-	bh=TNAzw3o/NIZLjRAHMrS5gP30UAJcmwOQbSBj0kcq68w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GwB0vJIAlgzgYp4BTN+lQcqTHXxr7cAW1AbAo5zobsPrnjFLK/aolZTVtmcdiZ4Nc7cfRAr7BnRUldHblfCnA1u8UySQ2E5fZCRf+FngdZG4hIXTo3cnwoDWaDP8wgElXiYLCSh51Khf21Is1lpIvPCPbHDQ1n07h1jvAerF+Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iZ/qqppe; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738751483; x=1770287483;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TNAzw3o/NIZLjRAHMrS5gP30UAJcmwOQbSBj0kcq68w=;
-  b=iZ/qqppeVFyexbZqToCo8+hW/sYT4lXXk25VZ97Dw3aaZbcIOj21sesx
-   ZB3zYHqvCrWv9rcErrQ6Ry5um7xGUbOtep1y7Vd4KnE6YJ+k3OWrT/l+D
-   yV14wNd/w2S2DhKO8OZDT1tAprtVz5RiMYBcATHHv5VgBQiP0xYJxZzdH
-   ennpLmE5Nr7MT+BW/fzh0ne3z1/ovkYdGa2bIfQ3QT1DERDFMEK48qeoF
-   KIyphOUE47EarvABScLxnDA1U8bckgcm8KrYBWIBcIpplVR/5FGHuHvT4
-   msAvBuUxtQkM4WLAwpi+BYJ1CUofIybnLhtj+UoIO+OXqDfPG5ghegKsE
-   g==;
-X-CSE-ConnectionGUID: qXxXBjhBSCqn8EhF4fqJpw==
-X-CSE-MsgGUID: IoOkJzgvRseNp7hkfi5iag==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="39421114"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="39421114"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 02:31:22 -0800
-X-CSE-ConnectionGUID: ErDfk7sLQgei1uW6dxXz3A==
-X-CSE-MsgGUID: p8IvxN+rQd+lLaqYHnzkaA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="141757522"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 02:31:18 -0800
-Message-ID: <ebedb603-ee42-4db6-86b9-edb270970935@intel.com>
-Date: Wed, 5 Feb 2025 18:31:15 +0800
+	s=arc-20240116; t=1738753404; c=relaxed/simple;
+	bh=InSNhNZ+Ugs5LeocTNKTd8Kp7o1k5BRoOcDugxabbZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W6AYu5U66uRO8tF2H7ySYLZdK4PSnVXxmQ7mgLCnaG958uMI0PufVRDqlWOp4kApJkFWgbftNAIGcEYWJMvI33bGFppa9xc6SIRNeRdhjgxM8PM7jogG/v8hmF0RF3YxZXvLrxe7TYRpFGZYHiHuAlMcu60UwfOnzgMso2xEnbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4nk9zyd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B510BC4CED1;
+	Wed,  5 Feb 2025 11:03:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738753404;
+	bh=InSNhNZ+Ugs5LeocTNKTd8Kp7o1k5BRoOcDugxabbZc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b4nk9zydgFgHNcVY/drIF3FqZYsAV3OzJFu/Gs6fhrqKIGj+wwrTJ/uVvAVWP9Y7V
+	 rBlORqEovHWInJWEKQtdTufTQzXSrbroS3RGWN/Hexh0WmuTfVL0hbHpmvLLnU6tl8
+	 TgRcezrlf/Di7lnsSZWqCiC0ag/sVVKGFGiLJVbITC7J6Rx+gJv+WY9eivnhtXNAgv
+	 GNAZetzC6jaKtCw8sd35Oa8+ko72sgpfY6zSSa4vvv2eR3VjeqgurQtxaOrowPsjEg
+	 r9URWYsPoToetVIJZFmDS6BbG9IcDnF2qbSpCS6fvIZJVPYqgCeEonYExaDz79T7BR
+	 iMOliqKOP06qA==
+Date: Wed, 5 Feb 2025 16:24:05 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 3/3] KVM: x86: Decouple APICv activation state from
+ apicv_inhibit_reasons
+Message-ID: <y7fpqqk5klh3e56fzsnqdubnnztenzjf6uw2xnepa7z4q4t3qj@mofgkdt3txrt>
+References: <cover.1738595289.git.naveen@kernel.org>
+ <405a98c2f21b9fe73eddbc35c80b60d6523db70c.1738595289.git.naveen@kernel.org>
+ <Z6EOxxZA9XLdXvrA@google.com>
+ <60cef3e4-8e94-4cf1-92ae-34089e78a82d@redhat.com>
+ <Z6FVaLOsPqmAPNWu@google.com>
+ <0e4bd3004d97b145037c36c785c19e97b6995d42.camel@redhat.com>
+ <Z6JoInXNntIoHLQ8@google.com>
+ <2c9ffa51b82b4ae75e803d5b30bf74eda9350686.camel@redhat.com>
+ <Z6LBz69oVI5qUGFW@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 12/52] i386/tdx: Validate TD attributes
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>
-Cc: Zhao Liu <zhao1.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Marcelo Tosatti <mtosatti@redhat.com>, Huacai Chen <chenhuacai@kernel.org>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Francesco Lavra <francescolavra.fl@gmail.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-References: <20250124132048.3229049-1-xiaoyao.li@intel.com>
- <20250124132048.3229049-13-xiaoyao.li@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20250124132048.3229049-13-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6LBz69oVI5qUGFW@google.com>
 
-On 1/24/2025 9:20 PM, Xiaoyao Li wrote:
-> Validate TD attributes with tdx_caps that only supported bits arer
-> allowed by KVM.
+On Tue, Feb 04, 2025 at 05:41:35PM -0800, Sean Christopherson wrote:
+> On Tue, Feb 04, 2025, Maxim Levitsky wrote:
+> > On Tue, 2025-02-04 at 11:18 -0800, Sean Christopherson wrote:
+> > > On Mon, Feb 03, 2025, Maxim Levitsky wrote:
+> > > @@ -3219,20 +3228,6 @@ static int interrupt_window_interception(struct kvm_vcpu *vcpu)
+> > >  	kvm_make_request(KVM_REQ_EVENT, vcpu);
+> > >  	svm_clear_vintr(to_svm(vcpu));
+> > >  
+> > > -	/*
+> > > -	 * If not running nested, for AVIC, the only reason to end up here is ExtINTs.
+> > > -	 * In this case AVIC was temporarily disabled for
+> > > -	 * requesting the IRQ window and we have to re-enable it.
+> > > -	 *
+> > > -	 * If running nested, still remove the VM wide AVIC inhibit to
+> > > -	 * support case in which the interrupt window was requested when the
+> > > -	 * vCPU was not running nested.
+> > > -
+> > > -	 * All vCPUs which run still run nested, will remain to have their
+> > > -	 * AVIC still inhibited due to per-cpu AVIC inhibition.
+> > > -	 */
+> > 
+> > Please keep these comment that explain why inhibit has to be cleared here,
 > 
-> Besides, sanity check the attribute bits that have not been supported by
-> QEMU yet. e.g., debug bit, it will be allowed in the future when debug
-> TD support lands in QEMU.
-
-This patches got squashed with next one "i386/tdx: Support user 
-configurable mrconfigid/mrowner/mrownerconfig" in v6 by accident.
-
-I'll fix it in the next version.
-
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
-> Changes in v7:
-> - Define TDX_SUPPORTED_TD_ATTRS as QEMU supported mask, to validates
->    user's request. (Rick)
+> Ya, I'll make sure there are good comments that capture everything before posting
+> anything.
 > 
-> Changes in v3:
-> - using error_setg() for error report; (Daniel)
-> ---
->   qapi/qom.json         |  16 +++++-
->   target/i386/kvm/tdx.c | 118 +++++++++++++++++++++++++++++++++++++++++-
->   target/i386/kvm/tdx.h |   3 ++
->   3 files changed, 134 insertions(+), 3 deletions(-)
-> 
-> diff --git a/qapi/qom.json b/qapi/qom.json
-> index 8740626c4ee6..a53000ca6fb4 100644
-> --- a/qapi/qom.json
-> +++ b/qapi/qom.json
-> @@ -1060,11 +1060,25 @@
->   #     pages.  Some guest OS (e.g., Linux TD guest) may require this to
->   #     be set, otherwise they refuse to boot.
->   #
-> +# @mrconfigid: ID for non-owner-defined configuration of the guest TD,
-> +#     e.g., run-time or OS configuration (base64 encoded SHA384 digest).
-> +#     Defaults to all zeros.
-> +#
-> +# @mrowner: ID for the guest TD’s owner (base64 encoded SHA384 digest).
-> +#     Defaults to all zeros.
-> +#
-> +# @mrownerconfig: ID for owner-defined configuration of the guest TD,
-> +#     e.g., specific to the workload rather than the run-time or OS
-> +#     (base64 encoded SHA384 digest).  Defaults to all zeros.
-> +#
->   # Since: 10.0
->   ##
->   { 'struct': 'TdxGuestProperties',
->     'data': { '*attributes': 'uint64',
-> -            '*sept-ve-disable': 'bool' } }
-> +            '*sept-ve-disable': 'bool',
-> +            '*mrconfigid': 'str',
-> +            '*mrowner': 'str',
-> +            '*mrownerconfig': 'str' } }
->   
->   ##
->   # @ThreadContextProperties:
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 653942d83bcb..ed843af1d0b6 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -11,17 +11,24 @@
->   
->   #include "qemu/osdep.h"
->   #include "qemu/error-report.h"
-> +#include "qemu/base64.h"
->   #include "qapi/error.h"
->   #include "qom/object_interfaces.h"
-> +#include "crypto/hash.h"
->   
->   #include "hw/i386/x86.h"
->   #include "kvm_i386.h"
->   #include "tdx.h"
->   
-> +#define TDX_TD_ATTRIBUTES_DEBUG             BIT_ULL(0)
->   #define TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE   BIT_ULL(28)
->   #define TDX_TD_ATTRIBUTES_PKS               BIT_ULL(30)
->   #define TDX_TD_ATTRIBUTES_PERFMON           BIT_ULL(63)
->   
-> +#define TDX_SUPPORTED_TD_ATTRS  (TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE |\
-> +                                 TDX_TD_ATTRIBUTES_PKS | \
-> +                                 TDX_TD_ATTRIBUTES_PERFMON)
-> +
->   static TdxGuest *tdx_guest;
->   
->   static struct kvm_tdx_capabilities *tdx_caps;
-> @@ -153,13 +160,33 @@ static int tdx_kvm_type(X86ConfidentialGuest *cg)
->       return KVM_X86_TDX_VM;
->   }
->   
-> -static void setup_td_guest_attributes(X86CPU *x86cpu)
-> +static int tdx_validate_attributes(TdxGuest *tdx, Error **errp)
-> +{
-> +    if ((tdx->attributes & ~tdx_caps->supported_attrs)) {
-> +        error_setg(errp, "Invalid attributes 0x%lx for TDX VM "
-> +                   "(KVM supported: 0x%llx)", tdx->attributes,
-> +                   tdx_caps->supported_attrs);
-> +        return -1;
-> +    }
-> +
-> +    if (tdx->attributes & ~TDX_SUPPORTED_TD_ATTRS) {
-> +        warn_report("Some QEMU unsupported TD attribute bits being requested:"
-> +                    "requested: 0x%lx QEMU supported: 0x%llx",
-> +                    tdx->attributes, TDX_SUPPORTED_TD_ATTRS);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static int setup_td_guest_attributes(X86CPU *x86cpu, Error **errp)
->   {
->       CPUX86State *env = &x86cpu->env;
->   
->       tdx_guest->attributes |= (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_PKS) ?
->                                TDX_TD_ATTRIBUTES_PKS : 0;
->       tdx_guest->attributes |= x86cpu->enable_pmu ? TDX_TD_ATTRIBUTES_PERFMON : 0;
-> +
-> +    return tdx_validate_attributes(tdx_guest, errp);
->   }
->   
->   static int setup_td_xfam(X86CPU *x86cpu, Error **errp)
-> @@ -214,6 +241,7 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
->       CPUX86State *env = &x86cpu->env;
->       g_autofree struct kvm_tdx_init_vm *init_vm = NULL;
->       Error *local_err = NULL;
-> +    size_t data_len;
->       int retry = 10000;
->       int r = 0;
->   
-> @@ -225,7 +253,40 @@ int tdx_pre_create_vcpu(CPUState *cpu, Error **errp)
->       init_vm = g_malloc0(sizeof(struct kvm_tdx_init_vm) +
->                           sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES);
->   
-> -    setup_td_guest_attributes(x86cpu);
-> +    if (tdx_guest->mrconfigid) {
-> +        g_autofree uint8_t *data = qbase64_decode(tdx_guest->mrconfigid,
-> +                              strlen(tdx_guest->mrconfigid), &data_len, errp);
-> +        if (!data || data_len != QCRYPTO_HASH_DIGEST_LEN_SHA384) {
-> +            error_setg(errp, "TDX: failed to decode mrconfigid");
-> +            return -1;
-> +        }
-> +        memcpy(init_vm->mrconfigid, data, data_len);
-> +    }
-> +
-> +    if (tdx_guest->mrowner) {
-> +        g_autofree uint8_t *data = qbase64_decode(tdx_guest->mrowner,
-> +                              strlen(tdx_guest->mrowner), &data_len, errp);
-> +        if (!data || data_len != QCRYPTO_HASH_DIGEST_LEN_SHA384) {
-> +            error_setg(errp, "TDX: failed to decode mrowner");
-> +            return -1;
-> +        }
-> +        memcpy(init_vm->mrowner, data, data_len);
-> +    }
-> +
-> +    if (tdx_guest->mrownerconfig) {
-> +        g_autofree uint8_t *data = qbase64_decode(tdx_guest->mrownerconfig,
-> +                            strlen(tdx_guest->mrownerconfig), &data_len, errp);
-> +        if (!data || data_len != QCRYPTO_HASH_DIGEST_LEN_SHA384) {
-> +            error_setg(errp, "TDX: failed to decode mrownerconfig");
-> +            return -1;
-> +        }
-> +        memcpy(init_vm->mrownerconfig, data, data_len);
-> +    }
-> +
-> +    r = setup_td_guest_attributes(x86cpu, errp);
-> +    if (r) {
-> +        return r;
-> +    }
->   
->       r = setup_td_xfam(x86cpu, errp);
->       if (r) {
-> @@ -283,6 +344,51 @@ static void tdx_guest_set_sept_ve_disable(Object *obj, bool value, Error **errp)
->       }
->   }
->   
-> +static char *tdx_guest_get_mrconfigid(Object *obj, Error **errp)
-> +{
-> +    TdxGuest *tdx = TDX_GUEST(obj);
-> +
-> +    return g_strdup(tdx->mrconfigid);
-> +}
-> +
-> +static void tdx_guest_set_mrconfigid(Object *obj, const char *value, Error **errp)
-> +{
-> +    TdxGuest *tdx = TDX_GUEST(obj);
-> +
-> +    g_free(tdx->mrconfigid);
-> +    tdx->mrconfigid = g_strdup(value);
-> +}
-> +
-> +static char *tdx_guest_get_mrowner(Object *obj, Error **errp)
-> +{
-> +    TdxGuest *tdx = TDX_GUEST(obj);
-> +
-> +    return g_strdup(tdx->mrowner);
-> +}
-> +
-> +static void tdx_guest_set_mrowner(Object *obj, const char *value, Error **errp)
-> +{
-> +    TdxGuest *tdx = TDX_GUEST(obj);
-> +
-> +    g_free(tdx->mrowner);
-> +    tdx->mrowner = g_strdup(value);
-> +}
-> +
-> +static char *tdx_guest_get_mrownerconfig(Object *obj, Error **errp)
-> +{
-> +    TdxGuest *tdx = TDX_GUEST(obj);
-> +
-> +    return g_strdup(tdx->mrownerconfig);
-> +}
-> +
-> +static void tdx_guest_set_mrownerconfig(Object *obj, const char *value, Error **errp)
-> +{
-> +    TdxGuest *tdx = TDX_GUEST(obj);
-> +
-> +    g_free(tdx->mrownerconfig);
-> +    tdx->mrownerconfig = g_strdup(value);
-> +}
-> +
->   /* tdx guest */
->   OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
->                                      tdx_guest,
-> @@ -306,6 +412,14 @@ static void tdx_guest_init(Object *obj)
->       object_property_add_bool(obj, "sept-ve-disable",
->                                tdx_guest_get_sept_ve_disable,
->                                tdx_guest_set_sept_ve_disable);
-> +    object_property_add_str(obj, "mrconfigid",
-> +                            tdx_guest_get_mrconfigid,
-> +                            tdx_guest_set_mrconfigid);
-> +    object_property_add_str(obj, "mrowner",
-> +                            tdx_guest_get_mrowner, tdx_guest_set_mrowner);
-> +    object_property_add_str(obj, "mrownerconfig",
-> +                            tdx_guest_get_mrownerconfig,
-> +                            tdx_guest_set_mrownerconfig);
->   }
->   
->   static void tdx_guest_finalize(Object *obj)
-> diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-> index 4e2b5c61ff5b..e472b11fb0dd 100644
-> --- a/target/i386/kvm/tdx.h
-> +++ b/target/i386/kvm/tdx.h
-> @@ -24,6 +24,9 @@ typedef struct TdxGuest {
->       bool initialized;
->       uint64_t attributes;    /* TD attributes */
->       uint64_t xfam;
-> +    char *mrconfigid;       /* base64 encoded sha348 digest */
-> +    char *mrowner;          /* base64 encoded sha348 digest */
-> +    char *mrownerconfig;    /* base64 encoded sha348 digest */
->   } TdxGuest;
->   
->   #ifdef CONFIG_TDX
+> > and the code as well.
+> > 
+> > The reason is that IRQ window can be requested before nested entry, which
+> > will lead to VM wide inhibit, and the interrupt window can happen while
+> > nested because nested hypervisor can opt to not intercept interrupts. If that
+> > happens, the AVIC will remain inhibited forever.
 
+<snip>
+
+> It's still not perfect, but the obvious-in-hindsight answer is to 
+> clear the
+> IRQ window inhibit when KVM actually injects an interrupt and there's no longer
+> a injectable interrupt.
+> 
+> That optimizes all the paths: if L1 isn't intercept IRQs, KVM will drop the
+> inhibit as soon as an interrupt is injected into L2.  If L1 is intercepting IRQs,
+> KVM will keep the inhibit until the IRQ is injected into L2.  Unless I'm missing
+> something, the inhibit itself should prevent an injectable IRQ from disappearing,
+> i.e. AVIC won't be left inhibited.
+> 
+> So this for the SVM changes?
+
+I tested this in my setup (below changes to svm.c, along with the rest 
+of the changes from your earlier posting), and it ensures proper update 
+of the APICv inhibit. That is, with the below changes, AVIC is properly 
+enabled in the virtual machine in pit=discard mode (which wasn't the 
+case with the earlier changes to svm_[set|clear]_vintr()).
+
+This improves performance in my test by ~10%:
+Average:        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+Average:           lo      0.12      0.12      0.01      0.01      0.00      0.00      0.00      0.00
+Average:       enp0s2 1197141.51 1197158.89 226801.33 114572.12      0.00      0.00      0.00      0.00
+
+This is still ~10% below what I see with avic=0 though.
+
+
+Thanks,
+Naveen
+
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 7640a84e554a..2a5cf7029b26 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3219,20 +3219,6 @@ static int interrupt_window_interception(struct kvm_vcpu *vcpu)
+>  	kvm_make_request(KVM_REQ_EVENT, vcpu);
+>  	svm_clear_vintr(to_svm(vcpu));
+>  
+> -	/*
+> -	 * If not running nested, for AVIC, the only reason to end up here is ExtINTs.
+> -	 * In this case AVIC was temporarily disabled for
+> -	 * requesting the IRQ window and we have to re-enable it.
+> -	 *
+> -	 * If running nested, still remove the VM wide AVIC inhibit to
+> -	 * support case in which the interrupt window was requested when the
+> -	 * vCPU was not running nested.
+> -
+> -	 * All vCPUs which run still run nested, will remain to have their
+> -	 * AVIC still inhibited due to per-cpu AVIC inhibition.
+> -	 */
+> -	kvm_clear_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
+> -
+>  	++vcpu->stat.irq_window_exits;
+>  	return 1;
+>  }
+> @@ -3670,6 +3656,23 @@ static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	u32 type;
+>  
+> +	/*
+> +	 * If AVIC was inhibited in order to detect an IRQ window, and there's
+> +	 * no other injectable interrupts pending or L2 is active (see below),
+> +	 * then drop the inhibit as the window has served its purpose.
+> +	 *
+> +	 * If L2 is active, this path is reachable if L1 is not intercepting
+> +	 * IRQs, i.e. if KVM is injecting L1 IRQs into L2.  AVIC is locally
+> +	 * inhibited while L2 is active; drop the VM-wide inhibit to optimize
+> +	 * the case in which the interrupt window was requested while L1 was
+> +	 * active (the vCPU was not running nested).
+> +	 */
+> +	if (svm->avic_irq_window &&
+> +	    (!kvm_cpu_has_injectable_intr(vcpu) || is_guest_mode(vcpu))) {
+> +		svm->avic_irq_window = false;
+> +		kvm_dec_apicv_irq_window(svm->vcpu.kvm);
+> +	}
+> +
+>  	if (vcpu->arch.interrupt.soft) {
+>  		if (svm_update_soft_interrupt_rip(vcpu))
+>  			return;
+> @@ -3881,17 +3884,28 @@ static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
+>  	 */
+>  	if (vgif || gif_set(svm)) {
+>  		/*
+> -		 * IRQ window is not needed when AVIC is enabled,
+> -		 * unless we have pending ExtINT since it cannot be injected
+> -		 * via AVIC. In such case, KVM needs to temporarily disable AVIC,
+> -		 * and fallback to injecting IRQ via V_IRQ.
+> +		 * KVM only enables IRQ windows when AVIC is enabled if there's
+> +		 * pending ExtINT since it cannot be injected via AVIC (ExtINT
+> +		 * bypasses the local APIC).  V_IRQ is ignored by hardware when
+> +		 * AVIC is enabled, and so KVM needs to temporarily disable
+> +		 * AVIC in order to detect when it's ok to inject the ExtINT.
+>  		 *
+> -		 * If running nested, AVIC is already locally inhibited
+> -		 * on this vCPU, therefore there is no need to request
+> -		 * the VM wide AVIC inhibition.
+> +		 * If running nested, AVIC is already locally inhibited on this
+> +		 * vCPU (L2 vCPUs use a different MMU that never maps the AVIC
+> +		 * backing page), therefore there is no need to increment the
+> +		 * VM-wide AVIC inhibit.  KVM will re-evaluate events when the
+> +		 * vCPU exits to L1 and enable an IRQ window if the ExtINT is
+> +		 * still pending.
+> +		 *
+> +		 * Note, the IRQ window inhibit needs to be updated even if
+> +		 * AVIC is inhibited for a different reason, as KVM needs to
+> +		 * keep AVIC inhibited if the other reason is cleared and there
+> +		 * is still an injectable interrupt pending.
+>  		 */
+> -		if (!is_guest_mode(vcpu))
+> -			kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_IRQWIN);
+> +		if (enable_apicv && !svm->avic_irq_window && !is_guest_mode(vcpu)) {
+> +			svm->avic_irq_window = true;
+> +			kvm_inc_apicv_irq_window(vcpu->kvm);
+> +		}
+>  
+>  		svm_set_vintr(svm);
+>  	}
 
