@@ -1,243 +1,188 @@
-Return-Path: <kvm+bounces-37294-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37295-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505AFA2832A
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 04:57:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 201F7A28361
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 05:32:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11CD83A6764
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 03:57:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F1AB3A652B
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 04:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C1A214219;
-	Wed,  5 Feb 2025 03:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5B621C197;
+	Wed,  5 Feb 2025 04:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="v38Ee4PN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qxRdh40v"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2088.outbound.protection.outlook.com [40.107.92.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3BE213E61;
-	Wed,  5 Feb 2025 03:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.88
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738727831; cv=fail; b=gtcJuyGpneDgF1iAJKY0NA4gJI7MTOvzmkmb/1lE35RMYQE5XHirrbe0kTO63XRyURiA0eWEtsDebAd6OKzZucIne9+Z9COyCTNw4fI8ojK/KVo/8Bzl0U39tClU7WrtvRtGx0HXEndT3k4uyh0u6F7+nUKh7vGnjzvJ+vXUSzc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738727831; c=relaxed/simple;
-	bh=MlUyThqqJTfZZ0IvZk7TYam0DdJ+vs4mj+bEoyiZvpg=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Z4eK+FO7biUPXosJIEmDpjM8B/9r0CRNwXR+muC9DBYPAiirwm8Nyp4GsWtfzGA4KFduwm/u9qAvgIu8zrNMsPR034oMgX2ZbeZl0gRH+6ZTF7RNhVlnksnunuOMV2Dd4aU3fTn1AQENdD0ZT6aQNSu2W41geUmkw8qdPwbb9vM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=v38Ee4PN; arc=fail smtp.client-ip=40.107.92.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pTJBtTusVK0nD8PYsY0uAUMlg2MR6QkI1qPn3rgEz70xJeBgCX2u3wimoKj4VS75AR2SWfJjwB0swXforR+s7wUv4HgoqdAkWo+5VNBqOr7L6W1jT9L1Tu6GJmcW9lQaZOkIYu5YPs5BM9WX6OmQihz5yd3lg3/edZ5IcxmPrbt7KVoOrwI2XJscddsYELyfkTI1qgcA+GhSezHLHBnWRHQHnRsxz5TyN7GAvejp24XeCdkHW+ZdiyoTRGE8c2n/0wVJ6k4LuZ9ZiGCr5SN7jZM+JBZv0cA+WQRLE0UveIIQu3/tMSU4XfWFcN8ilc/RPL+tWmdbeA0k/9csfe8cdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=i6+sk7t4bAM/BX7tynfS1C6vfLCb4K2baMjAlthRoPI=;
- b=q5CDl/qfZ8MV1k3JF0gPeTzCg7ITZqnNqfnzXyfeQiBIcVCugaWLgUzWv3SQFU0e/LF02Sfe86RNdzG0d1QDgTh2uBL4Zzv25DeoD1AiicA9rQmQ+Wyxjk/uW0UX2096Bu9ch81UtGobzxP9caMrTeHDon1WQpBueOTpNACAuE9vZxOGvMO5Kqt3gMKpPkhrvh9LEURF5XZv9xM2s0wvo5Go2ec/TsDq+Iz2xDuF4T8DWJOp2EKJ4KD8SsTmihKzO0horQbbed+HjczVbk5MOeTnmDmgk9qg12usAH0Oj3mSxbvM52LRkuf8i0rm8NwDO4lUphqR5gn5oCfDyOJfJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lists.xenproject.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i6+sk7t4bAM/BX7tynfS1C6vfLCb4K2baMjAlthRoPI=;
- b=v38Ee4PNxWyHqB6QDnj9iAiQq2V2xeeXAvRkQWbnjgJBGekFQ8C8ugRFzdnweqJDeZWYlRzstmOfcYmNFSQfJcgVZwXa66isRePv+iECKIASe8H3ORL/VU9omSfflsP5of09Jbi1yjZrzwYp6tiGDYFvwjjv3zOciSL6hqVizFs=
-Received: from SJ0PR05CA0035.namprd05.prod.outlook.com (2603:10b6:a03:33f::10)
- by DM4PR12MB6302.namprd12.prod.outlook.com (2603:10b6:8:a4::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Wed, 5 Feb
- 2025 03:57:06 +0000
-Received: from SJ5PEPF000001E9.namprd05.prod.outlook.com
- (2603:10b6:a03:33f:cafe::f7) by SJ0PR05CA0035.outlook.office365.com
- (2603:10b6:a03:33f::10) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.26 via Frontend Transport; Wed,
- 5 Feb 2025 03:57:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001E9.mail.protection.outlook.com (10.167.242.197) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8398.14 via Frontend Transport; Wed, 5 Feb 2025 03:57:04 +0000
-Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 4 Feb
- 2025 21:56:56 -0600
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Juergen Gross <jgross@suse.com>, "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, "Dexuan
- Cui" <decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, "Alexey
- Makhalov" <alexey.amakhalov@broadcom.com>, Jan Kiszka
-	<jan.kiszka@siemens.com>, Paolo Bonzini <pbonzini@redhat.com>, "Andy
- Lutomirski" <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
-	<linux-kernel@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-	<virtualization@lists.linux.dev>, <linux-hyperv@vger.kernel.org>,
-	<jailhouse-dev@googlegroups.com>, <kvm@vger.kernel.org>,
-	<xen-devel@lists.xenproject.org>, Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 06/16] x86/tdx: Override PV calibration routines with
- CPUID-based calibration
-In-Reply-To: <Z6JqopU5LkDIZPq6@google.com>
-References: <20250201021718.699411-1-seanjc@google.com>
- <20250201021718.699411-7-seanjc@google.com> <85r04e5821.fsf@amd.com>
- <Z6JqopU5LkDIZPq6@google.com>
-Date: Wed, 5 Feb 2025 03:56:48 +0000
-Message-ID: <854j19niwv.fsf@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C54320FAA0
+	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 04:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738729920; cv=none; b=pHiJuRxoJmkvqGLu8sTPWVs0uv5HLdem7ycIMWeteVi79l8O6AFA41lMsmsx/Z0wJyBRGQy1lPhArK326u8o9MD+fRLdNsqJTZl+k2mxYJWO5wEQWSdEcI5DNn0S4G2qxbdowGgAG9L6o/Seg7RO0zmJTVLRFmBw1pTkfpwefGo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738729920; c=relaxed/simple;
+	bh=JE8go6R1VpRIPO7yBC5BBAyXsPGOwpgj7jmfJ1zIgCw=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=brchtbKIZyxjW1YIRac/DueYlfceyI/bqWmWl05FWbd9UsugZtkZCAxjzr6hVcLK/ofByiPPKI06gw0mK+1YCeRgpKb5vlsy6sLYWzwgVfJWmSRS72vYn7vu2eR14ndK+Kf4yHEV1RrqVsUl6sn8tBBkIr2CA62Ci8Ap0XXr//Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qxRdh40v; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21a7cbe3b56so105092805ad.0
+        for <kvm@vger.kernel.org>; Tue, 04 Feb 2025 20:31:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738729918; x=1739334718; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZtAIjBOFFeafVFBhyEOiFEMQllzc64d/EBT8ds1/JA8=;
+        b=qxRdh40v88qBqKw22bUdLanCqfUTWZU6cL/kTQ9Mm10XmvkZ/gv2DReOt+VnDzU6Np
+         Ndfj+lbiRq6xsWPsO8fynkNMYYjfzGBCB3q4Qb4dsJWGp5PsPluNBEpPLv9X9l1rOP29
+         hUE75+0H38Z9OPkolxe3rwSwOzVFZBfxa9Cr1SN7gFEhZA+lgGDle+W+InMIMh5GwNSe
+         TZV54mrvOjQU62Oqs1pd3Y5AchMuZqOrg9NBSplK6a/WG8IxQhbwzTPtbO0nDqBUY2V9
+         +8hdmhw4phOb2GTlvxiwC7QZkzKtAo+TB3Bw6/g+px/wPRbgLnt7k4abXU4l1d6+IwTY
+         KDww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738729918; x=1739334718;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZtAIjBOFFeafVFBhyEOiFEMQllzc64d/EBT8ds1/JA8=;
+        b=XRWV2qvxfn8lpftBkIv63NvqiJhWAHug8F7O68Pcy7bqfaxWkzWxA3HSW+lu6MZgre
+         /J4ptE8ap/u84EITGAgjdXNgyi6xzqFCxYNBdXaCjnyeC1Xf14GPnaLkSVmNOX0o1iSq
+         neecIP35BL+xUahUrj/FXAKLmn7bEDPbalT8S4R63rTtdNej4M3ugeCvzYfpIV1is2oh
+         G6JxCYcu6uHrYYo5/sqDHPzHMfMPeYNMXsd+Bp/mr7xySOnrk/xOh3qsHnMs8MNYmyAw
+         aJZjA0ERwCTPYbSK4NiDJy//qL2sSmBc8u8W7TCS7AbmGKpPoatuj2NIqtXzL48hrZrP
+         JixQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXnNw8TXE7pyQ4H8176lNm+dXprroBaa9hz1yKW786R25wwSJbOMOq1/ymoA0va7pp+kZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg+CQEgmh3FMtzZkd0KRpRnV9gxK9F1jBRoukZ6WgvE1mp2X7q
+	HeWHM5FibgEPFD4Y/E/0xdkZa6IlVBxn0Ke5yJOJ7AcvV6XLzxX4ZYxNs8ae9AWniloOkB2h3j7
+	LpX6sJxFUYfK1V9HLe0bTBQ==
+X-Google-Smtp-Source: AGHT+IEUGAEXsyrkT7DjTRUy8A7fBT8adorRd83c8M0VQOASQHQWG4hYdiwBaNDxKPtPTZ7XijwVU7oj/MkuobrlOg==
+X-Received: from pfde7.prod.google.com ([2002:aa7:8c47:0:b0:725:f376:f548])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a21:100c:b0:1e0:d1c3:97d1 with SMTP id adf61e73a8af0-1ede88b3b5fmr2567882637.29.1738729917642;
+ Tue, 04 Feb 2025 20:31:57 -0800 (PST)
+Date: Wed, 05 Feb 2025 04:31:53 +0000
+In-Reply-To: <CAGtprH-Ryn6Xqs-3_VBMkk3ew74Rf9=D8S_iHVmq2DE-YFk2-w@mail.gmail.com>
+ (message from Vishal Annapurve on Tue, 4 Feb 2025 17:28:08 -0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Message-ID: <diqzldulovuu.fsf@ackerleytng-ctop-specialist.c.googlers.com>
+Subject: Re: [RFC PATCH v5 06/15] KVM: guest_memfd: Handle final folio_put()
+ of guestmem pages
+From: Ackerley Tng <ackerleytng@google.com>
+To: Vishal Annapurve <vannapurve@google.com>
+Cc: tabba@google.com, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, qperret@google.com, 
+	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, 
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, 
+	hughd@google.com, jthoughton@google.com
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001E9:EE_|DM4PR12MB6302:EE_
-X-MS-Office365-Filtering-Correlation-Id: e7d08b4f-5c64-4378-3f2e-08dd4599276c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|7416014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MTZxYnpidVd4cnJ0NVQ2K0RJdVhMU2NZL2pEdGRmZk9FdmplUHM4bjh4K0dp?=
- =?utf-8?B?aFpnWFdHUmtmSGdrN2F0TWYwci9WUVpUbXdPNy9qSGxTNnlGWXdWZGNUUyt4?=
- =?utf-8?B?czBJU3JoVjRIMitvWVZrTDBtTnlqKzVlVWExQzZwbVlOMmNCN1RKRmFsbXo0?=
- =?utf-8?B?ZFc0b0VUYWZ1Z05BaDA4aERGL0V3dGJISzZjeFg5Z0ErdDJyV1diREkxQ1d6?=
- =?utf-8?B?MVZyRGU3TlY1YWdBVEVNb2N3WEs3WWdIUmdQemZPMUJtQVIxZEFNTEUwVVBH?=
- =?utf-8?B?V0tCTWNUTGg1MFJaOEYwYUQrNDIzUVFleWpHeURoRUlrVWRKL1Q0dDIzZmwy?=
- =?utf-8?B?d1pxTURoZzFROEFib1ZUTCtiUTBLUjBwbHVGTUZJNmJqQUxGU2RGVkJ1eUJQ?=
- =?utf-8?B?Smd2MStrNDZtUDR4WDhpNFhsb1Vsa2NENDNrT2lXOVR3Ykw0YzkrYXFsajlV?=
- =?utf-8?B?ZWFuY0hvbXgyTXRxSWFjbGdzMUxhZWVXNnlIell2c2s3M2k4azR6dU80SDF2?=
- =?utf-8?B?bFdORU8ybStLZlE4RmJESFpOdTBMREJaSFIwdkNSY0kzbk5GUlRCbUtPdnJG?=
- =?utf-8?B?YkRuMDJYbDZMWlpuVUptelltRTNETEw5bTRhZUhwcTJPSG1WaG5oc3lYL3FK?=
- =?utf-8?B?bTRUaHdIUVlnWlJjNnQ4MDI4Q2N1REozOEVOVUNJUGw1cHJROGM5K1F0QjB4?=
- =?utf-8?B?TWgvc0hTRGN1SGVJakp0VjZxZzN6QzRkaFRJdFJtSTRoSEVKODZIZldzTmVt?=
- =?utf-8?B?Qjd1aVV4U3NvTTdKcCtnaEdzdWZLYWFTQlFtcVBWYmdSQi9aSUgzOXFqZTZi?=
- =?utf-8?B?eHR6NDM5V2xyRzNTRGliYVZyQllkaVN5SFAxUzhDZ013VkdRYmM2aDUyYnh5?=
- =?utf-8?B?TEloclJkZzFtSFVkVTd2UWwzR2xWQ2FvNTlPb2dPV2QxK1pOR0FIblNYcDVQ?=
- =?utf-8?B?RkFSS0dkRlZsNGVCQy9MWlJPS0JNUEJ1NjQxOHhXcFVDY1pyY0dNS0J0WnVq?=
- =?utf-8?B?dEszU3lXdEtGb24zWW9UNkVQMHFVKzA2QXBTYlFybjZrSkxVUlh0cGl1MUd3?=
- =?utf-8?B?TzJyeG1HT2djMXJST00vRlJBa0g0Y3IyRlpCaGlmSElMY2hkQjB0U0ZGMlJG?=
- =?utf-8?B?RUpGVHpUMUdPeldFVU42SnQ4bTBhZ0FvemlTRElGYmh1VzRBTCs3TVpyc1hG?=
- =?utf-8?B?eHVIS205cCsxSXlQWUUxZXVtN0ZrTGE3VUtCQUt3Z041MlFpZnQ0cHFFTzBz?=
- =?utf-8?B?RVhCWXZ0ZWp4WThEUjhKenhqN0IzckNaL1BWUEVJT0JaWk4wbU5teGhWQmVN?=
- =?utf-8?B?RlA3akxKUW5yQkRQY1crVXZJYXR2RUUxMTJNUEZRdVh4VmJnUGM4QmhCRVpT?=
- =?utf-8?B?RVBXY1pNb252ZVZkcCtEY0xQNDB2ME15cnVGbmZMWTE2c3NSL3N4Wlp4cTJZ?=
- =?utf-8?B?SXRhU081WllPSExLTXFjSEcvelEybkRaejY2Wm9IMG0zeGkxYTRXL3Q0NmZZ?=
- =?utf-8?B?VXpBMTJjbll5UXlGQmNvdjFibisvenp0dGFuUVcxVGFsSnFEYzFOb1U5VW0z?=
- =?utf-8?B?eGtLVmpnWVZvT0ZaVTN2QmhkdCtYeDVrMG40NUJGUkRmeExGZVpqRnVoczky?=
- =?utf-8?B?Sldlc1dwNWtRdjFFNW9PSzR0VkVHd2dGYzVaMmZRMjNXaEFDbGVOYWJqRzZV?=
- =?utf-8?B?SzRkWHROOC9Hckl4V1IzTW5KN1RFTmlNbFo5c3pyeHQxejJWYmJMWlVxb000?=
- =?utf-8?B?dE40d2NoT1ZHK0dCWUVCRUJoYnl3Z2lKSmQ0ems3NGtGU0ROWGVOaXJXNnN0?=
- =?utf-8?B?Y3dYWmtYRFMzTTZVR05tMGpkTHZzcDk5eXlxVndidGhPNTVrcG5TdW5SK1JF?=
- =?utf-8?B?TS90ZnNyNnY5dW5paEVITlJ5RHorS1V2NEg0UndtQkZYNmIwaXd0QytLTGpW?=
- =?utf-8?B?QXJvZTZpYlBQalpTRVpObml5bmpkcTJXeGdsS1AwdWJScW5FMi9wR01RYVdC?=
- =?utf-8?Q?ovbTXq5m08ro17r3jQf/qEb7yK4jUE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(7416014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2025 03:57:04.8634
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7d08b4f-5c64-4378-3f2e-08dd4599276c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001E9.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6302
 
-Sean Christopherson <seanjc@google.com> writes:
+Vishal Annapurve <vannapurve@google.com> writes:
 
-> On Tue, Feb 04, 2025, Nikunj A Dadhania wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->>=20
->> > When running as a TDX guest, explicitly override the TSC frequency
->> > calibration routine with CPUID-based calibration instead of potentially
->> > relying on a hypervisor-controlled PV routine.  For TDX guests, CPUID.=
-0x15
->> > is always emulated by the TDX-Module, i.e. the information from CPUID =
-is
->> > more trustworthy than the information provided by the hypervisor.
+> On Thu, Jan 23, 2025 at 1:51=E2=80=AFAM Fuad Tabba <tabba@google.com> wro=
+te:
+>>
+>> On Wed, 22 Jan 2025 at 22:16, Ackerley Tng <ackerleytng@google.com> wrot=
+e:
 >> >
->> > To maintain backwards compatibility with TDX guest kernels that use na=
-tive
->> > calibration, and because it's the least awful option, retain
->> > native_calibrate_tsc()'s stuffing of the local APIC bus period using t=
-he
->> > core crystal frequency.  While it's entirely possible for the hypervis=
-or
->> > to emulate the APIC timer at a different frequency than the core cryst=
-al
->> > frequency, the commonly accepted interpretation of Intel's SDM is that=
- APIC
->> > timer runs at the core crystal frequency when that latter is enumerate=
-d via
->> > CPUID:
+>> > Fuad Tabba <tabba@google.com> writes:
 >> >
->> >   The APIC timer frequency will be the processor=E2=80=99s bus clock o=
-r core
->> >   crystal clock frequency (when TSC/core crystal clock ratio is enumer=
-ated
->> >   in CPUID leaf 0x15).
+>> > Hey Fuad, I'm still working on verifying all this but for now this is
+>> > one issue. I think this can be fixed by checking if the folio->mapping
+>> > is NULL. If it's NULL, then the folio has been disassociated from the
+>> > inode, and during the dissociation (removal from filemap), the
+>> > mappability can also either
 >> >
->> > If the hypervisor is malicious and deliberately runs the APIC timer at=
- the
->> > wrong frequency, nothing would stop the hypervisor from modifying the
->> > frequency at any time, i.e. attempting to manually calibrate the frequ=
-ency
->> > out of paranoia would be futile.
->> >
->> > Deliberately leave the CPU frequency calibration routine as is, since =
-the
->> > TDX-Module doesn't provide any guarantees with respect to CPUID.0x16.
->>=20
->> Does TDX use kvmclock?
+>> > 1. Be unset so that the default mappability can be set up based on
+>> >    GUEST_MEMFD_FLAG_INIT_MAPPABLE, or
+>> > 2. Be directly restored based on GUEST_MEMFD_FLAG_INIT_MAPPABLE
+>>
+>> Thanks for pointing this out. I hadn't considered this case. I'll fix
+>> in the respin.
+>>
 >
-> A TDX guest can.  That's up to the host (expose kvmclock) and the guest (=
-enable
-> kvmclock).
+> Can the below scenario cause trouble?
+> 1) Userspace converts a certain range of guest memfd as shared and
+> grabs some refcounts on shared memory pages through existing kernel
+> exposed mechanisms.
+> 2) Userspace converts the same range to private which would cause the
+> corresponding mappability attributes to be *MAPPABILITY_NONE.
+> 3) Userspace truncates the range which will remove the page from pagecach=
+e.
+> 4) Userspace does the fallocate again, leading to a new page getting
+> allocated without freeing the older page which is still refcounted
+> (step 1).
 >
->> If yes, kvmclock would have registered the CPU frequency calibration rou=
-tine:
->>=20
->> 	tsc_register_calibration_routines(kvm_get_tsc_khz, kvm_get_cpu_khz,
->>  					  tsc_properties);
->>=20
->> so TDX will use kvm_get_cpu_khz(), which will either use CPUID.0x16 or
->> PV clock, is this on the expected line ?
->
-> What do you mean by "is this on the expected line"?  If you are asking "i=
-s this
-> intended",
+> Effectively this could allow userspace to keep allocating multiple
+> pages for the same guest_memfd range.
 
-Yes, that is what I meant.
+I'm still verifying this but for now here's the flow Vishal described in
+greater detail:
 
-> then the answer is "yes, working as intended".  As above, the TDX-Module
-> doesn't emulate CPUID.0x16, so no matter what, the guest is relying on th=
-e untrusted
-> hypervisor to get the CPU frequency.  If someone thinks that TDX guests s=
-hould
-> assume the CPU runs as the same frequency as the TSC, a la SNP's Secure T=
-SC, then
-> they are welcome to propose such a change.
++ guest_memfd starts without GUEST_MEMFD_FLAG_INIT_MAPPABLE
+    + All new pages will start with mappability =3D GUEST
++ guest uses a page
+    + Get new page
+    + Add page to filemap
++ guest converts page to shared
+    + Mappability is now ALL
++ host uses page
++ host takes transient refcounts on page
+    + Refcount on the page is now (a) filemap's refcount (b) vma's refcount
+      (c) transient refcount
++ guest converts page to private
+    + Page is unmapped
+        + Refcount on the page is now (a) filemap's refcount (b) transient
+          refcount
+    + Since refcount is elevated, the mappabilities are left as NONE
+    + Filemap's refcounts are removed from the page
+        + Refcount on the page is now (a) transient refcount
++ host punches hole to deallocate page
+    + Since mappability was NONE, restore filemap's refcount
+        + Refcount on the page is now (a) transient refcount (b) filemap's
+          refcount
+    + Mappabilities are reset to GUEST for truncated range
+    + Folio is removed from filemap
+        + Refcount on the page is now (a) transient refcount
+    + Callback remains registered so that when the transient refcounts are
+      dropped, cleanup can happen - this is where merging will happen
+      with 1G page support
++ host fallocate()s in the same address range
+    + will get a new page
 
-Ok, that makes sense.
+Though the host does manage to get a new page while the old one stays
+around, I think this is working as intended, since the transient
+refcounts are truly holding the old folio around. When the transient
+refcounts go away, the old folio will still get cleaned up (with 1G page
+support: merged and returned) to as expected. The new page will also be
+freed at some point later.
 
-Regards
-Nikunj
-
+If the userspace program decides to keep taking transient refcounts to hold
+pages around, then the userspace program is truly leaking memory and it
+shouldn't be guest_memfd's bug.
 
