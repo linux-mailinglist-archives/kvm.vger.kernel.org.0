@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-37386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E035A298F5
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 19:27:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58EBEA298F6
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 19:27:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9198C3AA00C
-	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 18:27:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BB1164B0B
+	for <lists+kvm@lfdr.de>; Wed,  5 Feb 2025 18:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50430214A96;
-	Wed,  5 Feb 2025 18:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409D921506F;
+	Wed,  5 Feb 2025 18:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rFixJRd4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CqAP90UN"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44BA214A90
-	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 18:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B9A1FECDC
+	for <kvm@vger.kernel.org>; Wed,  5 Feb 2025 18:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738779889; cv=none; b=XV56ZX2axYoLa2iXbpsUGQffvhhRm6CGeG4olJuP80dIdjylmU/Q88Vfiaivii2SedAmkOv4+yz7jPl0vhXnXEGzYBjL4X6hUEhJalxDlm+4dcrMpEI038JUqaIM9RMfqvpkVTYH6w7JZ4FKbIaeGyd+r5LEgDqDhkZbB0gQkVk=
+	t=1738779896; cv=none; b=KwGtC7RXnn1PpRIUS/6QamgMyXQe+uBgPTM/Pdmq38VlsshAtMX+EEiVWM20enzCkW5UinD8kQRpNjVHV5ZmUuVcxp0zDAokblQbQV52Vc1McoX6j1W3YMn+jXCvp+hj5jt0H8hMPzBS+iKosNT0JK9GI/pe/YMIoVqVu6iPkYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738779889; c=relaxed/simple;
-	bh=J80J7QWwNwqKJI9OkYLRwkYf70xFczDYSSkcpDuLb08=;
+	s=arc-20240116; t=1738779896; c=relaxed/simple;
+	bh=G8vnaOWQJ5Oj78kftPCmluJb4+vY84aUlbOf6mIvYHw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iUoouVolccYAjXMKtUfCfEDKyZsBtDmAyge5cULtWK1xCAw1K3a3P/w/8CwCGEtlk+OYvaS3qUkSRpJgQ2ng5CHy8XHYuWX4Vx+17R7WCR2kO8vRBWQMGEQgqZfV0MKmZwbfcrDWU0Xots3L8P/NB2094+MCIf037WFChtfRoL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rFixJRd4; arc=none smtp.client-ip=91.218.175.171
+	 MIME-Version; b=EmJYszxk90KXez2IRcU18p66i2N8eJA1mwDr4aXxfKxOgX/uvZCLNiE3FaG8mEhlqqLNe2ROGK244ZYhP8hp81Rmp1ak3xfNcrT7oQWVAyyuR8V3oIkJQSQIUfXGW5ZDkWtRiMrd9LAsn2yFKoBnB4U3eHjKOXPHlxN7bnKo6qA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CqAP90UN; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738779881;
+	t=1738779887;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rrSQ3jUA061xY0J/9WOEI/tvDvAK9ExwlT3CVuaXaqw=;
-	b=rFixJRd4jqemOUEt6Oub7sb4hNpmJV/0S9sRHsSEfePv6qJ537nFtEQB29iWNNGtz90xAj
-	4gmeuc2iGq4CGW8FIQqoDcNS+Wd/yG8cjpPywroYkeqcbAR+kl/p3TpQ6NbskxPQnwfNWz
-	jHoFrfP4qYSC4XFCJ+gcYRDs2q+IaAU=
+	bh=x+aZxHkGDKGQVqlD/AOZPROKXjugIKgS0ANHq/kESss=;
+	b=CqAP90UNeXqSyZD8+VjrVbhHejxIjyT3xxMfgHcrStUdktFl3WI/fg/Js7ETTtmvHefEeT
+	WKCqFdv/FnvOXGuLZXH/RqPSgbGk7CB6AcCii/ohGGW4mj3O0gbLqpzznksn6lXtteewaf
+	4CSQipKW0M9pftq3YQR7h8lP8PICE6M=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 10/13] KVM: nSVM: Flush the TLB if L1 changes L2's ASID
-Date: Wed,  5 Feb 2025 18:23:59 +0000
-Message-ID: <20250205182402.2147495-11-yosry.ahmed@linux.dev>
+Subject: [RFC PATCH 11/13] KVM: nSVM: Do not reset TLB_CONTROL in VMCB02 on nested entry
+Date: Wed,  5 Feb 2025 18:24:00 +0000
+Message-ID: <20250205182402.2147495-12-yosry.ahmed@linux.dev>
 In-Reply-To: <20250205182402.2147495-1-yosry.ahmed@linux.dev>
 References: <20250205182402.2147495-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -61,59 +61,67 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-KVM tracks a single ASID for L2 guests. L1 could change the ASID it has
-assigned L2 due to switching to a different L2 guest or simply to avoid
-flushing L2's existing ASID. Flush L2's TLB when this happens to avoid
-reusing TLB entries from the old ASID (from L1's perspective).
+TLB_CONTROL is reset to TLB_CONTROL_DO_NOTHING on nested transitions to
+L2. This is unnecessary because it should always be
+TLB_CONTROL_DO_NOTHING at this point.
 
-Remove the comment in __nested_copy_vmcb_control_to_cache() about the
-cached ASID usage, as this changes makes it stale by adding another
-usage.
+The flow for setting TLB_CONTROL is as follows:
+1. In vcpu_enter_guest(), servicing a TLB flush request may set it to
+TLB_CONTROL_FLUSH_ASID in svm_flush_tlb_asid().
+2. In svm_vcpu_run() -> pre_svm_run(), it may get upgraded to
+TLB_CONTROL_FLUSH_ALL_ASID when assigning a new ASID.
+3. In svm_cpu_run(), it gets reset to TLB_CONTROL_DO_NOTHING after the
+guest is run.
 
-This is heavily inspired by nVMX's handling of last_vpid.
+Hence, TLB_CONTROL is reset after each run and there is no need to do it
+again on every nested transition to L2.
+
+There is a TODO in nested_svm_transition_tlb_flush() about this reset
+crushing pending TLB flushes. Remove it, as the reset is not really
+crushing anything as explained above.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- arch/x86/kvm/svm/nested.c | 5 ++++-
- arch/x86/kvm/svm/svm.h    | 2 ++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/nested.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index e2c59eb2907e8..12bb391884299 100644
+index 12bb391884299..8e40ff21f7353 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -368,7 +368,6 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
- 	to->pause_filter_count  = from->pause_filter_count;
- 	to->pause_filter_thresh = from->pause_filter_thresh;
- 
--	/* Copy asid here because nested_vmcb_check_controls will check it.  */
- 	to->asid           = from->asid;
- 	to->msrpm_base_pa &= ~0x0fffULL;
- 	to->iopm_base_pa  &= ~0x0fffULL;
-@@ -509,6 +508,10 @@ static void nested_svm_entry_tlb_flush(struct kvm_vcpu *vcpu)
+@@ -512,12 +512,7 @@ static void nested_svm_entry_tlb_flush(struct kvm_vcpu *vcpu)
+ 		svm->nested.last_asid = svm->nested.ctl.asid;
  		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
  	}
+-	/*
+-	 * TODO: optimize unconditional TLB flush/MMU sync.  A partial list of
+-	 * things to fix before this can be conditional:
+-	 *
+-	 *  - Don't crush a pending TLB flush in vmcb02 on nested VMRUN
+-	 */
++	/* TODO: optimize unconditional TLB flush/MMU sync */
+ 	kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+ 	kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+ }
+@@ -536,7 +531,7 @@ static void nested_svm_exit_tlb_flush(struct kvm_vcpu *vcpu)
+ 	if (svm->nested.ctl.tlb_ctl == TLB_CONTROL_FLUSH_ALL_ASID)
+ 		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
  
-+	if (svm->nested.ctl.asid != svm->nested.last_asid) {
-+		svm->nested.last_asid = svm->nested.ctl.asid;
-+		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
-+	}
- 	/*
- 	 * TODO: optimize unconditional TLB flush/MMU sync.  A partial list of
- 	 * things to fix before this can be conditional:
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 6a73d6ed1e428..f2352135b99d3 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -211,6 +211,8 @@ struct svm_nested_state {
- 	 * on its side.
- 	 */
- 	bool force_msr_bitmap_recalc;
-+
-+	u32 last_asid;
- };
+-	/* See nested_svm_entry_tlb_flush() */
++	/* TODO: optimize unconditional TLB flush/MMU sync */
+ 	kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+ 	kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+ }
+@@ -717,9 +712,6 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
  
- struct vcpu_sev_es_state {
+ 	/* Done at vmrun: asid.  */
+ 
+-	/* Also overwritten later if necessary.  */
+-	svm_clear_tlb_ctl_flush(vmcb02);
+-
+ 	/* nested_cr3.  */
+ 	if (nested_npt_enabled(svm))
+ 		nested_svm_init_mmu_context(vcpu);
 -- 
 2.48.1.362.g079036d154-goog
 
