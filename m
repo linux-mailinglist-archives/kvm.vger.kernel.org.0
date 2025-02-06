@@ -1,69 +1,86 @@
-Return-Path: <kvm+bounces-37458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CDCDA2A402
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:19:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 341C8A2A4B9
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:37:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A08A81885D1A
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:19:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FA223A8152
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7DB225A5A;
-	Thu,  6 Feb 2025 09:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADC1226863;
+	Thu,  6 Feb 2025 09:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YYrtI+xO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ub5LxYYO"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BF6225A34;
-	Thu,  6 Feb 2025 09:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D4C226549;
+	Thu,  6 Feb 2025 09:32:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738833528; cv=none; b=oFiBGlAqK5gqb7DvASuRhyiuhVuX9Y5uc4JQrQccDOY6DhBzP6K3l0LAPbb0C0zw2ildOwGECBVeC+nJ1/Y7NxP52cGD6uOuIZCVGpm9kwjZ5TfOKfZDcLLs/OlgGDasjT4XiMxZOCqJiyi0x6eGCMCj8glLUkoZnqAuOlO+GlM=
+	t=1738834373; cv=none; b=QlpRf4Q/dpv8C4fE//1TBJViCvIW/a7XWemcCcfFMC2lWrEQ3hYxjoxB+c5CLDsks8XbUAmQLH8PWC61hS+PvMO4X3fy3j4LGe2Y3FGgWnu/MWe5HNHiermrte+S6E9zaIa93DpZexDrN7fHI1d6dUeWFF9/WZbhRKFXqgEYMPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738833528; c=relaxed/simple;
-	bh=buqUevpkAbmw2Axm3WWW9ag7jE8QxW3gGF+wrl8mVi4=;
+	s=arc-20240116; t=1738834373; c=relaxed/simple;
+	bh=o+Z0681jYsiHqmh3U0IYwEJZRDAlvJSN/vbRjprW+rk=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SRye/kNdTAFQ0fVCH35CubY1S+LWN7hRCpmkoAU9FkUitzF50LmpF8V4LfAdhS1KtQAHTEp4vu4pB+l6BF97F3RVmnCLv6lGJ9MT3at8DAEtVZ+Vog7fKkOwRlxqfDLDFVAm6AH7SRCNQKurJTSdYCuK7aziR/Z2HxFlL6+dHbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YYrtI+xO; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=WOQtt2RvYoSx5xf60QUgB5TETC7dHmzu55kmJsbaiQwDpeIA33JHiKmqpP035K0ZlvPSOvxSRMcG6qi311w3CL0H7oT46Q5cTF1QsTMWZuDC0sahafz99UhjEUUVbnR9TBMdpACZz1yPzI5n+2DQLAjlOr9dkVzZZ/LdW2Rj+dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ub5LxYYO; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=5qsTAhc6RE8E+MYme7EC9JGCOg6eHbWY6mqBwoD7sng=; b=YYrtI+xOnWyXo/PAW4ra23sbCq
-	OLrNdGvvegGZMXbSnVnVGyWT22aM6zaX58mFJQV8QXUMqEJT24t9CnoQs+ywafENsx6GiDU2sedTr
-	B45Wt6EvvuA6e1EY8RqMl6sV8K2GMmXNO0PbHf8d4ditVRHrtiyfmvjeBICo1ZyorktFfoQn1K7iR
-	G23vq1/RTx0+AKYBAS224Ki9LP2Me3CALe8LsCFW3HAbCpdJQI2amrQCT4qIAVQN34OY7aINkIctC
-	JO4KQESoPr2RiLIOBw38b3ClEWm7EUs8Woh5JlMMAGa07JDlSueA18oUIq358rjxADk7lRFh9sdcU
-	jw6W72EA==;
+	bh=ygCyX4kIzHTkCMIYfhFggV+w58QHYc5sCxu+XxJ0VuY=; b=Ub5LxYYOtNPsBxcWCz/qYQ+WX4
+	912GkRIsrEX9TSN/bszxcLHH+DpQQY46NZqIZdqBSvshZenQO1rM7ipB/pWGF5WK67YhzgldvIjOS
+	7eebgxztX8C450yP9UK7d8huLYU+VU4SGE9ZwPvNvSJSAJEsRlvhv33RN/UuP93usPGDRk7byAFEY
+	+iM/qVTX3BwYOld1a5a5yz9TwJ7uK61w3cZcjmN9OCacvjJMvPym99zqddq2ryvHsaimV6QMYONQ3
+	Zac1W3JvkwqaP5CP5fHHpHQUCYBAnmfgJNS6m2IgeLj4+GTxjffClRIxzP6B7tthDHyW5qqI8wvpn
+	N6v8/LFA==;
 Received: from [54.239.6.187] (helo=freeip.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tfy1p-00000005l3J-2Low;
-	Thu, 06 Feb 2025 09:18:33 +0000
-Message-ID: <8701dbe884d98de8860f04c4174d81d8373be274.camel@infradead.org>
-Subject: Re: [PATCH 1/5] KVM: x86/xen: Restrict hypercall MSR to unofficial
- synthetic range
+	id 1tfyEc-00000005lug-1GF0;
+	Thu, 06 Feb 2025 09:31:46 +0000
+Message-ID: <ff83dc5c91b4e46bcf2d99680ec6af250fb05b27.camel@infradead.org>
+Subject: Re: [PATCH v3 00/18] vDSO: Introduce generic data storage
 From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Paul Durrant <paul@xen.org>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com, Joao Martins
-	 <joao.m.martins@oracle.com>
-Date: Thu, 06 Feb 2025 09:18:31 +0000
-In-Reply-To: <Z6OI5VMDlgLbqytM@google.com>
-References: <20250201011400.669483-1-seanjc@google.com>
-	 <20250201011400.669483-2-seanjc@google.com>
-	 <43f702b383fb99d435f2cdb8ef35cc1449fe6c23.camel@infradead.org>
-	 <Z6N-kn1-p6nIWHeP@google.com>
-	 <cd3fb8dd79d7766f383748ec472de3943021eb39.camel@infradead.org>
-	 <Z6OI5VMDlgLbqytM@google.com>
+To: Thomas =?ISO-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>, 
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Helge
+ Deller <deller@gmx.de>, Andy Lutomirski <luto@kernel.org>,  Thomas Gleixner
+ <tglx@linutronix.de>, Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker
+ <frederic@kernel.org>,  Andrew Morton <akpm@linux-foundation.org>, Catalin
+ Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Theodore
+ Ts'o <tytso@mit.edu>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui
+ <kernel@xen0n.name>, Russell King <linux@armlinux.org.uk>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>, Borislav
+ Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,  Arnd Bergmann
+ <arnd@arndb.de>, Guo Ren <guoren@kernel.org>
+Cc: linux-parisc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
+ loongarch@lists.linux.dev, linux-s390@vger.kernel.org, 
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+ linux-arch@vger.kernel.org, Nam Cao <namcao@linutronix.de>, 
+ linux-csky@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>, "Luu,
+ Ryan" <rluu@amazon.com>, kvm <kvm@vger.kernel.org>
+Date: Thu, 06 Feb 2025 09:31:42 +0000
+In-Reply-To: <20250204-vdso-store-rng-v3-0-13a4669dfc8c@linutronix.de>
+References: <20250204-vdso-store-rng-v3-0-13a4669dfc8c@linutronix.de>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Yf5OXb3b9uSFFHymr9q9"
+	boundary="=-TLRPvEdtMvxq/eM5U95X"
 User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,197 +91,48 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-Yf5OXb3b9uSFFHymr9q9
+--=-TLRPvEdtMvxq/eM5U95X
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2025-02-05 at 07:51 -0800, Sean Christopherson wrote:
+On Tue, 2025-02-04 at 13:05 +0100, Thomas Wei=C3=9Fschuh wrote:
+> Currently each architecture defines the setup of the vDSO data page on
+> its own, mostly through copy-and-paste from some other architecture.
+> Extend the existing generic vDSO implementation to also provide generic
+> data storage.
+> This removes duplicated code and paves the way for further changes to
+> the generic vDSO implementation without having to go through a lot of
+> per-architecture changes.
 >=20
-> > Those two happen in reverse chronological order, don't they? And in the
-> > lower one the comment tells you that hyperv_enabled() doesn't work yet.
-> > When the higher one is called later, it calls kvm_xen_init() *again* to
-> > put the MSR in the right place.
-> >=20
-> > It could be prettier, but I don't think it's broken, is it?
->=20
-> Gah, -ENOCOFFEE.
+> Based on v6.14-rc1 and intended to be merged through the tip tree.
 
-I trust this version would require less coffee to parse...
+Thanks for working on this. Is there a plan to expose the time data
+directly to userspace in a form which is usable *other* than by
+function calls which get the value of the clock at a given moment?
 
-=46rom a90c2df0bd9589609085dd42f94b61de1bf48eb7 Mon Sep 17 00:00:00 2001
-From: David Woodhouse <dwmw@amazon.co.uk>
-Date: Thu, 6 Feb 2025 08:52:52 +0000
-Subject: [PATCH] i386/xen: Move KVM_XEN_HVM_CONFIG ioctl to
- kvm_xen_init_vcpu()
+For populating the vmclock device=C2=B9 we need to know the actual
+relationship between the hardware counter (TSC, arch timer, etc.) and
+real time in order to propagate that to the guest.
 
-At the time kvm_xen_init() is called, hyperv_enabled() doesn't yet work, so
-the correct MSR index to use for the hypercall page isn't known.
+I see two options for doing this:
 
-Rather than setting it to the default and then shifting it later for the
-Hyper-V case with a confusing second call to kvm_init_xen(), just do it
-once in kvm_xen_init_vcpu().
+ 1. Via userspace, exposing the vdso time data (and a notification when
+    it changes?) and letting the userspace VMM populate the vmclock.
+    This is complex for x86 because of TSC scaling; in fact userspace
+    doesn't currently know the precise scaling from host to guest TSC
+    so we'd have to be able to extract that from KVM.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- target/i386/kvm/kvm.c     | 16 +++++---------
- target/i386/kvm/xen-emu.c | 44 ++++++++++++++++++++-------------------
- target/i386/kvm/xen-emu.h |  4 ++--
- 3 files changed, 30 insertions(+), 34 deletions(-)
-
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 6c749d4ee8..b4deec6255 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2129,6 +2129,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     if (cs->kvm_state->xen_version) {
- #ifdef CONFIG_XEN_EMU
-         struct kvm_cpuid_entry2 *xen_max_leaf;
-+        uint32_t hypercall_msr =3D
-+            hyperv_enabled(cpu) ? XEN_HYPERCALL_MSR_HYPERV : XEN_HYPERCALL=
-_MSR;
-=20
-         memcpy(signature, "XenVMMXenVMM", 12);
-=20
-@@ -2150,13 +2152,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         c->function =3D kvm_base + XEN_CPUID_HVM_MSR;
-         /* Number of hypercall-transfer pages */
-         c->eax =3D 1;
--        /* Hypercall MSR base address */
--        if (hyperv_enabled(cpu)) {
--            c->ebx =3D XEN_HYPERCALL_MSR_HYPERV;
--            kvm_xen_init(cs->kvm_state, c->ebx);
--        } else {
--            c->ebx =3D XEN_HYPERCALL_MSR;
--        }
-+        c->ebx =3D hypercall_msr;
-         c->ecx =3D 0;
-         c->edx =3D 0;
-=20
-@@ -2194,7 +2190,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             }
-         }
-=20
--        r =3D kvm_xen_init_vcpu(cs);
-+        r =3D kvm_xen_init_vcpu(cs, hypercall_msr);
-         if (r) {
-             return r;
-         }
-@@ -3245,9 +3241,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-             error_report("kvm: Xen support only available in PC machine");
-             return -ENOTSUP;
-         }
--        /* hyperv_enabled() doesn't work yet. */
--        uint32_t msr =3D XEN_HYPERCALL_MSR;
--        ret =3D kvm_xen_init(s, msr);
-+        ret =3D kvm_xen_init(s);
-         if (ret < 0) {
-             return ret;
-         }
-diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
-index e81a245881..1144a6efcd 100644
---- a/target/i386/kvm/xen-emu.c
-+++ b/target/i386/kvm/xen-emu.c
-@@ -108,15 +108,11 @@ static inline int kvm_copy_to_gva(CPUState *cs, uint6=
-4_t gva, void *buf,
-     return kvm_gva_rw(cs, gva, buf, sz, true);
- }
-=20
--int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
-+int kvm_xen_init(KVMState *s)
- {
-     const int required_caps =3D KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
-         KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL | KVM_XEN_HVM_CONFIG_SHARED_INF=
-O;
--    struct kvm_xen_hvm_config cfg =3D {
--        .msr =3D hypercall_msr,
--        .flags =3D KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL,
--    };
--    int xen_caps, ret;
-+    int xen_caps;
-=20
-     xen_caps =3D kvm_check_extension(s, KVM_CAP_XEN_HVM);
-     if (required_caps & ~xen_caps) {
-@@ -130,20 +126,6 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
-             .u.xen_version =3D s->xen_version,
-         };
-         (void)kvm_vm_ioctl(s, KVM_XEN_HVM_SET_ATTR, &ha);
--
--        cfg.flags |=3D KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
--    }
--
--    ret =3D kvm_vm_ioctl(s, KVM_XEN_HVM_CONFIG, &cfg);
--    if (ret < 0) {
--        error_report("kvm: Failed to enable Xen HVM support: %s",
--                     strerror(-ret));
--        return ret;
--    }
--
--    /* If called a second time, don't repeat the rest of the setup. */
--    if (s->xen_caps) {
--        return 0;
-     }
-=20
-     /*
-@@ -185,10 +167,14 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
-     return 0;
- }
-=20
--int kvm_xen_init_vcpu(CPUState *cs)
-+int kvm_xen_init_vcpu(CPUState *cs, uint32_t hypercall_msr)
- {
-     X86CPU *cpu =3D X86_CPU(cs);
-     CPUX86State *env =3D &cpu->env;
-+    struct kvm_xen_hvm_config cfg =3D {
-+        .msr =3D hypercall_msr,
-+        .flags =3D KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL,
-+    };
-     int err;
-=20
-     /*
-@@ -210,6 +196,22 @@ int kvm_xen_init_vcpu(CPUState *cs)
-                          strerror(-err));
-             return err;
-         }
-+
-+        cfg.flags |=3D KVM_XEN_HVM_CONFIG_EVTCHN_SEND;
-+    }
-+
-+    /*
-+     * This is a per-KVM setting, but hyperv_enabled() can't be used
-+     * when kvm_xen_init() is called from kvm_arch_init(), so do it
-+     * when the BSP is initialized.
-+     */
-+    if (cs->cpu_index =3D=3D 0) {
-+        err =3D kvm_vm_ioctl(cs->kvm_state, KVM_XEN_HVM_CONFIG, &cfg);
-+        if (err) {
-+            error_report("kvm: Failed to enable Xen HVM support: %s",
-+                         strerror(-err));
-+            return err;
-+        }
-     }
-=20
-     env->xen_vcpu_info_gpa =3D INVALID_GPA;
-diff --git a/target/i386/kvm/xen-emu.h b/target/i386/kvm/xen-emu.h
-index fe85e0b195..7a7c72eee5 100644
---- a/target/i386/kvm/xen-emu.h
-+++ b/target/i386/kvm/xen-emu.h
-@@ -23,8 +23,8 @@
-=20
- #define XEN_VERSION(maj, min) ((maj) << 16 | (min))
-=20
--int kvm_xen_init(KVMState *s, uint32_t hypercall_msr);
--int kvm_xen_init_vcpu(CPUState *cs);
-+int kvm_xen_init(KVMState *s);
-+int kvm_xen_init_vcpu(CPUState *cs, uint32_t hypercall_msr);
- int kvm_xen_handle_exit(X86CPU *cpu, struct kvm_xen_exit *exit);
- int kvm_put_xen_state(CPUState *cs);
- int kvm_get_xen_state(CPUState *cs);
---=20
-2.48.1
+ 2. In kernel, asking KVM to populate the vmclock structure much like
+    it does other pvclocks shared with the guest. KVM/x86 already uses
+    pvclock_gtod_register_notifier() to hook changes; should we expand
+    on that? The problem with that notifier is that it seems to be
+    called far more frequently than I'd expect.
 
 
 
---=-Yf5OXb3b9uSFFHymr9q9
+=C2=B9 https://gitlab.com/qemu-project/qemu/-/commit/3634039b93cc5
+
+--=-TLRPvEdtMvxq/eM5U95X
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -343,22 +211,22 @@ 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
-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
+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
-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
+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
 
 
---=-Yf5OXb3b9uSFFHymr9q9--
+--=-TLRPvEdtMvxq/eM5U95X--
 
