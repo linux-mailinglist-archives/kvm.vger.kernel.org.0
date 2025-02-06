@@ -1,116 +1,140 @@
-Return-Path: <kvm+bounces-37489-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37490-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A9C5A2AC43
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:16:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94EBAA2AC6C
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7611E3A067D
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 15:16:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77980188489B
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 15:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC20A1EDA0D;
-	Thu,  6 Feb 2025 15:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E7F1EDA2D;
+	Thu,  6 Feb 2025 15:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1lRK8uym"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qb2ap9S7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04E61624D3
-	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 15:16:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2578D1C700E;
+	Thu,  6 Feb 2025 15:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738854987; cv=none; b=RB2nJ6pefjYwmzvzkXN1fGWrHuEHZ97KWrgcpeWbtvuS2NrUbWkdCxo8osgSPVhil14OCC1SNeCzXXALKUrIrNZi3F04gKE1tVd9lwapa3ghQvtg1bq30e95hZRk0y9ey3mvF+uPeTei7iL1uES1ScsYh2WA6hhuvV82LqTguhc=
+	t=1738855578; cv=none; b=CtYwxYvUBBYP/Dp8mW4f0pyjFSWt7c4v7n081Vhi/TfcP7RgQXhKBNa/GCL5KZX8Z0DHWqErXQQ/Rvy1yXe6BCqiiow5d+pqk3Bsf5sor6AHxNgIY0wR4Dh1qvKoxOreSdrYt1Z7m0/snFiua8XjpFXyiPQDq3QC0U/T2lNxPkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738854987; c=relaxed/simple;
-	bh=wrUO/pv3wuaL79TztGdwTHBbUZYh8NrHCiOXYPaysQw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QVIWZjqmXaAcXqhNoQkVeuczaccDSj4YRMvR6llaQ0SNC/muID/nziHBI0oZ3HlsG0ZBfe/ugBFsR91iijl031AQwtzohu0cU/pZjYxhPLYOczz87s7xyURHfD8VAlZtEnPPdz3f66Hg1q3aFlrd8hXPzSa2nDL2Y0oOnQ8+uNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1lRK8uym; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21f1e5c641aso36548035ad.2
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2025 07:16:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738854985; x=1739459785; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/O+gmVjEiO0izHw1wyAH52hjvhtcTqnj2hmp9TBo5bg=;
-        b=1lRK8uymqlKIs6snVbz/1dDLNX0RLawoBPiyPtfDI9tGq9BTqjMubT8i+h+NfvhCqe
-         vIBBEiPenmYFnNAOagZUKSWGinRQtj66CHHBxFK3ZHS3IUasijflKJTe3DUYoJQH4UGL
-         CGySGfqaXcfsAnBGW0trMyF9D/hMhcDeMUs3ieb2vFRkl3QVZjEAv68OjZLqUwMyJmj6
-         9yTDtcEZBLUszhD3IMC3Eo445+bxjMQMJdElyD01zVbiDeMpGKvdnsfmbsTXrognOF3c
-         6bD/2aHHkdZpzmnl7+Ba7tUD+KWlYnZiXOFxuXMjp70vn9EVuU7F/n2z8Q7QZsm56YkN
-         80EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738854985; x=1739459785;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/O+gmVjEiO0izHw1wyAH52hjvhtcTqnj2hmp9TBo5bg=;
-        b=CPf95AQVce5CGlFsfmz9xrFrSR0GPvc6v6sFLSCXtIkxzQ8CHQJKy8TecQ/rAmM41m
-         OfNLqRO30MIzj7Sm0J+ADkBbQ9Padkj/x/5XvB/QoemBzmOXdUVXpfz2t9Livj/vbPbw
-         2GwxDRtLlc/2EK3dBHDHLoB46o90UM1lJd6w0H1XG4iX0aWRnlQuSbNtQmXgPdRy4HJM
-         wgbvTY6KHZeYoRKq3RnmibeN7AR70nU7c7X1FV7G7cOH9d3DGeazgvx91BvMqR4r8+Re
-         LHbSfocFRuACRDVeoh7dHhGRQwdg60nYHkr2sdJuuVfjfTykeCSuqe3S891xRm3UsiNd
-         G2Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCUvtpihagBLppqc8uDSGlVnBeGssuaV6SYFh9Yz/PKbIrrWkrMX8VMyyJMpWKpG0alGlEE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/bWPySuf6Un8tss2hMnRr6TmE5sOr8mDWCP943uCheNabD+b4
-	NRF0ZuKQ8elO8WpLKbjTHww66WTniaeFNIhKzcFBmy3WNg/Qe4ZIWtH+22depKUgPjIKBFFVZZ5
-	UAw==
-X-Google-Smtp-Source: AGHT+IEqoERbvjL8QRLQoY1mFC+xOoqWn74MjyilsWi+ixkfWOF6DG/8rz3OjKhU93twnCTVaEwniXbu6Nc=
-X-Received: from pgbft13.prod.google.com ([2002:a05:6a02:4a4d:b0:837:acbb:873a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d705:b0:1e0:cf39:846a
- with SMTP id adf61e73a8af0-1ede88ab90amr14153239637.29.1738854984884; Thu, 06
- Feb 2025 07:16:24 -0800 (PST)
-Date: Thu, 6 Feb 2025 07:16:23 -0800
-In-Reply-To: <20250206022656.3752383-1-fuqiang.wng@gmail.com>
+	s=arc-20240116; t=1738855578; c=relaxed/simple;
+	bh=tcVpN1qc+CNHOZ+Drmas1nokJSHGtwyKNe/PAK4Joq4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pHj1ZRgQJl+cgkjXqb3pPUVar3MUzAbk5LWUnsK+Weue932RNSaSom4tahLbXad43SvsiranYcb6K6M4pjGbmO+TKAYWG+/AshYieCAVPhZmVwR83xOllOAQquBqKl5MpKvVf3d3KbrFdPBIzR0w03uhV63gjFCuz+vNElQAoo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qb2ap9S7; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 516ESKHg009550;
+	Thu, 6 Feb 2025 15:26:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=OgRc2XZeqDfYKX9OdYVxO+K/KEjR0lZARFuay+GGR
+	9k=; b=qb2ap9S7u1aVUz6bNDvBQ4aU6I4fKWQon7SKn90BN1svxFM7JoUxSlyps
+	XN+uL2fD3xQAGPKj9XSTEWBi9+NESzpWq/smB98UckJD8+/njkN+JwbFtijurrR4
+	Mi+f3wrwW2JeZqMgiA/mg8scvmnWactG1TmIYVBbTafCV6DW6ZLq7L6xHLXmJnKn
+	WHLsqUHzWlJ2DSkKnGmIr4aRQW9Zsd91MvRDGb6EYIlpgDWCVWYLGfGIiKy2/JKT
+	IAWSCDWahZOLueOH15ydJmhj4lCivMgx6Tt2aZJkyPOjeLEmrdqdG5QT+oObGsjv
+	ebfvgUgelIfTx6Th9UmU85fwrqnkw==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44mk5a3wbn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Feb 2025 15:26:14 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 516ElFN6024635;
+	Thu, 6 Feb 2025 15:26:13 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxxneyvc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Feb 2025 15:26:13 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 516FQ9g339911804
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 6 Feb 2025 15:26:09 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D65A420135;
+	Thu,  6 Feb 2025 15:01:45 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AEA6620134;
+	Thu,  6 Feb 2025 15:01:45 +0000 (GMT)
+Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  6 Feb 2025 15:01:45 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+        hca@linux.ibm.com
+Subject: [kvm-unit-tests PATCH] lib: s390x: css: Cleanup chsc inline assembly
+Date: Thu,  6 Feb 2025 14:58:49 +0000
+Message-ID: <20250206150128.147206-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250206022656.3752383-1-fuqiang.wng@gmail.com>
-Message-ID: <Z6TSR8UmtNNHFeUQ@google.com>
-Subject: Re: [PATCH] kvm: delete unused variables iommu_noncoherent in struct kvm_arch
-From: Sean Christopherson <seanjc@google.com>
-To: fuqiang wang <fuqiang.wng@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	wangfuqiang49 <wangfuqiang49@jd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8QwqespLYpMUgXJPxR3jFWOhGj-XcWLa
+X-Proofpoint-ORIG-GUID: 8QwqespLYpMUgXJPxR3jFWOhGj-XcWLa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-06_03,2025-02-05_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 mlxlogscore=877 mlxscore=0 malwarescore=0
+ suspectscore=0 clxscore=1015 impostorscore=0 spamscore=0 adultscore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502060123
 
-On Thu, Feb 06, 2025, fuqiang wang wrote:
-> The code of legacy device assignment is deleted entirely in commit
-> ad6260da1e23 ("KVM: x86: drop legacy device assignment") and the
-> variable iommu_noncoherent in struct kvm_arch is also not referenced by
-> any other code. So it is deleted in this patch.
+Name the CHSC command block pointer instead of naming it "p".
 
-Someone else beat you to it by a few weeks, I just haven't applied the patch
-yet.  Thanks!
+Also replace the two "m" constraints with a memory globber so the
+constraints are easier to read.
 
-https://lore.kernel.org/all/20250124075055.97158-1-znscnchen@gmail.com
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
 
-> 
-> Signed-off-by: wangfuqiang49 <wangfuqiang49@jd.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b15cde0a9b5c..98555afb6f10 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1354,7 +1354,6 @@ struct kvm_arch {
->  	u64 shadow_mmio_value;
->  
->  	struct iommu_domain *iommu_domain;
-> -	bool iommu_noncoherent;
->  #define __KVM_HAVE_ARCH_NONCOHERENT_DMA
->  	atomic_t noncoherent_dma_count;
->  #define __KVM_HAVE_ARCH_ASSIGNED_DEVICE
-> -- 
-> 2.47.0
-> 
+To me it makes more sense to have a separate commit that has a message
+explaining why we changed it instead of sending a v2, so here it is.
+
+---
+ lib/s390x/css.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+index 06bb59c7..167f8e83 100644
+--- a/lib/s390x/css.h
++++ b/lib/s390x/css.h
+@@ -364,16 +364,16 @@ bool get_chsc_scsc(void);
+ #define CHSC_RSP_EBUSY	0x000B
+ #define CHSC_RSP_MAX	0x000B
+ 
+-static inline int _chsc(void *p)
++static inline int _chsc(void *com_blk)
+ {
+ 	int cc;
+ 
+-	asm volatile(" .insn   rre,0xb25f0000,%2,0\n"
++	asm volatile(" .insn   rre,0xb25f0000,%[com_blk],0\n"
+ 		     " ipm     %[cc]\n"
+ 		     " srl     %[cc],28\n"
+-		     : [cc] "=d" (cc), "=m" (p)
+-		     : "d" (p), "m" (p)
+-		     : "cc");
++		     : [cc] "=d" (cc)
++		     : [com_blk] "d" (com_blk)
++		     : "cc", "memory");
+ 
+ 	return cc;
+ }
+-- 
+2.43.0
+
 
