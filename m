@@ -1,154 +1,342 @@
-Return-Path: <kvm+bounces-37519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37520-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA652A2AED0
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 18:28:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09C51A2AEE6
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 18:31:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 008913A9395
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 17:28:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFA617A29BF
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 17:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F93B1714D7;
-	Thu,  6 Feb 2025 17:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729FB18C03D;
+	Thu,  6 Feb 2025 17:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="E0xd5m6P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kmJhN3pE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408761607A4;
-	Thu,  6 Feb 2025 17:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8866F18A6BD;
+	Thu,  6 Feb 2025 17:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738862888; cv=none; b=gvJfSUdt2rQ9PAt8slylE9NNva9SYwRZ6QbSPgWaDs9KbTjbWlE64g6bCLYreBzuWPcbcBJCrr8HAQ/kEUc0y77iKkNQbhuXpzLSRlBfshshAo3NAerXTiSyVzhnD/7HlKsRdwswIshdu0Z64mKnSUrfqCqfYaS5eVxAA8yQnsQ=
+	t=1738863046; cv=none; b=KwdS43G70sGCl5B/J3/pB0Vw0r9ZsJlBQZGpztx4jBpPHF1sQKQlvF+TGXBbWRpK5VkBhANL6nJI568K8cHpVHKD/66qvRpb66kZSHZsHQ/xWxTfoFZUrbY/rADLfLdhXq0sBycJnHsa3jlBKU9mxlN3NRYae2eKxo8pQTaq3Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738862888; c=relaxed/simple;
-	bh=M8ddQlqhCpcRIqT5QtF55a8ZulR5rv2S6xHmPkwn48k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UvSdQSHiwbBOPrRdvtFLwqpQ/MPl2QclbPLnghDGMLtY0YMzXN2ULH/uALd3WFtzXMLXWAif7akUwXaNCA81eQ5JWpfJH3Qot/8O6qLqzvpTwyO6C4jpsKYQOEtpuOmKPUS0OqR8BbxSp6C7e1OonOEpFYc4xd42RlDynemf4o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=E0xd5m6P; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 516Fdn0d011337;
-	Thu, 6 Feb 2025 17:28:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=pkJMle
-	NkGyXi0hGfx9+L829MwymktZy7l3kQBoZ/U5s=; b=E0xd5m6P4sJYvL/B5Xy16y
-	tId8OhW3flTT5Q4WfTtFm+SNk25+5TD0n29zqJxeP2c8jH4sjy7P7S9ktFwCk4Is
-	OWJuZYtetk9bi5up4MWRqOPZeRtpJDxF96AdqgOq0UmDrw/3YLtYRC2+z/+HHN7V
-	9hJ4d43DpGubijJHZ02VenCdDXWrykYuxc4Tag8FEoTgAKAT0tofWrvnWoV7vvP3
-	YhH7DKLx/9qUyWbFI20AaIrh67N2cSc9EO93Li2RW2+v3N+i339HgjOLRli0m+lb
-	gbbikYDi/8v1hGXvrotQKZVkfvgDsOxQEhDeRWr1DFBBdwXmeEgYy6f+QqJ9po2w
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44mywtrkr2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 17:28:03 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 516GOwHo021554;
-	Thu, 6 Feb 2025 17:28:03 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 44j0n1q41w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 17:28:03 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 516HRxns58851628
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 6 Feb 2025 17:27:59 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 931BF20043;
-	Thu,  6 Feb 2025 17:27:59 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 444FB20040;
-	Thu,  6 Feb 2025 17:27:59 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.19.151])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu,  6 Feb 2025 17:27:59 +0000 (GMT)
-Date: Thu, 6 Feb 2025 18:27:52 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, nrb@linux.ibm.com,
-        hca@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH] lib: s390x: css: Cleanup chsc inline
- assembly
-Message-ID: <20250206182752.666c356a@p-imbrenda>
-In-Reply-To: <20250206150128.147206-1-frankja@linux.ibm.com>
-References: <20250206150128.147206-1-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1738863046; c=relaxed/simple;
+	bh=dEzyg2r4tZKWMxK6fgAdi9bkgZ+Gg97tUdv2KrGqngY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DGw3+mB9yZVN8ZDVG+Gmm81AcewxI2SOter146lkOAAi6vsQrSsXdhQpsXrN3Owl1fJIhT/2jGcqUb6zfYicIHfzjP4YMMMhn0EhwZkf345OXmPjcdA4ZlT2kK7tvfN1HeAH5OPyC90oTQGJ2JXxQmPkvENSzVO5B2Qaw91wW6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kmJhN3pE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AEB6C4CEDD;
+	Thu,  6 Feb 2025 17:30:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738863046;
+	bh=dEzyg2r4tZKWMxK6fgAdi9bkgZ+Gg97tUdv2KrGqngY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kmJhN3pEUEX7HmbyYzousuk6RwyqiD+uQ0neynfv0Zzru2qTIJfYAYAQ9M15TgToN
+	 B8oYRMKQdkCh5HoMPT831dhlNYGZPK9b/aeb5P8Ts1mISgehqbU/yejenz2dRDFjS6
+	 SRlqjkQuUPrT4guXBqtotmRYS96p+1LCjZZaBDeI4v/YMhVZXj9MrfDuJeNmp3YINj
+	 4Wi7TyYvrfNr3ZXbxSp6U53QCPiLJAJfbG0F/R3ON0KY8lxSTOCk+MlJfvHU/cPcM0
+	 0x1Zee1z3BDwOh/2k1s43SwA0zFNFuxAfSvX0xwcinHTD1NBjz1GmXLv2ZUrLNshGz
+	 alEImmKigZ4ug==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tg5i7-001DLm-VD;
+	Thu, 06 Feb 2025 17:30:44 +0000
+Date: Thu, 06 Feb 2025 17:30:43 +0000
+Message-ID: <86pljvt1z0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc: kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	darren@os.amperecomputing.com,
+	scott@os.amperecomputing.com
+Subject: Re: [RFC PATCH 2/2] KVM: arm64: nv: selftests: Access VNCR mapped registers
+In-Reply-To: <20250206164120.4045569-3-gankulkarni@os.amperecomputing.com>
+References: <20250206164120.4045569-1-gankulkarni@os.amperecomputing.com>
+	<20250206164120.4045569-3-gankulkarni@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HVVDu6-GeTAK20Q8cDD35zXPwNf_ULm7
-X-Proofpoint-ORIG-GUID: HVVDu6-GeTAK20Q8cDD35zXPwNf_ULm7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-06_05,2025-02-05_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- bulkscore=0 phishscore=0 mlxlogscore=999 impostorscore=0 adultscore=0
- priorityscore=1501 clxscore=1015 spamscore=0 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502060137
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, darren@os.amperecomputing.com, scott@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu,  6 Feb 2025 14:58:49 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> Name the CHSC command block pointer instead of naming it "p".
+On Thu, 06 Feb 2025 16:41:20 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> Also replace the two "m" constraints with a memory globber so the
-> constraints are easier to read.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> With NV2 enabled, some of the EL1/EL2/EL12 register accesses are
+> transformed to memory accesses. This test code accesses all those
+> registers in guest code to validate that they are not trapped to L0.
+>
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Traps to L0 are invisible to the guest -- by definition. What the
+guest can observe is an exception, be it injected by L0 or directly
+delivered by the HW.
 
+But the *absence* of an exception doesn't mean things are fine. Quite
+the opposite.
+
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 > ---
+>  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+>  .../selftests/kvm/arm64/nv_vncr_regs_test.c   | 255 ++++++++++++++++++
+>  2 files changed, 256 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/arm64/nv_vncr_regs_test.c
 > 
-> To me it makes more sense to have a separate commit that has a message
-> explaining why we changed it instead of sending a v2, so here it is.
+> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+> index a85d3bec9fb1..7790e4021013 100644
+> --- a/tools/testing/selftests/kvm/Makefile.kvm
+> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+> @@ -155,6 +155,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
+>  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
+>  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
+>  TEST_GEN_PROGS_arm64 += arm64/nv_guest_hypervisor
+> +TEST_GEN_PROGS_arm64 += arm64/nv_vncr_regs_test
+>  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
+>  TEST_GEN_PROGS_arm64 += arch_timer
+>  TEST_GEN_PROGS_arm64 += coalesced_io_test
+> diff --git a/tools/testing/selftests/kvm/arm64/nv_vncr_regs_test.c b/tools/testing/selftests/kvm/arm64/nv_vncr_regs_test.c
+> new file mode 100644
+> index 000000000000..d05b20b828ff
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/arm64/nv_vncr_regs_test.c
+> @@ -0,0 +1,255 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2025 Ampere Computing LLC
+> + *
+> + * This is a test to validate Nested Virtualization.
+> + */
+> +#include <kvm_util.h>
+> +#include <nv_util.h>
+> +#include <processor.h>
+> +#include <vgic.h>
+> +
+> +#define __check_sr_read(r)					\
+> +	({							\
+> +		uint64_t val;					\
+> +								\
+> +		handled = false;				\
+> +		dsb(sy);					\
+> +		val = read_sysreg_s(SYS_ ## r);			\
+> +		val;						\
+> +	})
+> +
+> +#define __check_sr_write(r)					\
+> +	do {							\
+> +		handled = false;				\
+> +		dsb(sy);					\
+> +		write_sysreg_s(0, SYS_ ## r);			\
+> +		isb();						\
+> +	} while (0)
+> +
+> +
+> +#define check_sr_read(r)					  \
+> +	do {							  \
+> +		__check_sr_read(r);				  \
+> +		__GUEST_ASSERT(!handled, #r "Read Test Failed");  \
+> +	} while (0)
+> +
+> +#define check_sr_write(r)					  \
+> +	do {							  \
+> +		__check_sr_write(r);				  \
+> +		__GUEST_ASSERT(!handled, #r "Write Test Failed"); \
+> +	} while (0)
+> +
+> +#define check_sr_rw(r)				\
+> +	do {					\
+> +		GUEST_PRINTF("%s\n", #r);	\
+> +		check_sr_write(r);		\
+> +		check_sr_read(r);		\
+> +	} while (0)
 
-makes sense
+Instead of lifting things from existing tests, you could move these
+things to an include file for everybody's benefit.
 
-> 
-> ---
->  lib/s390x/css.h | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index 06bb59c7..167f8e83 100644
-> --- a/lib/s390x/css.h
-> +++ b/lib/s390x/css.h
-> @@ -364,16 +364,16 @@ bool get_chsc_scsc(void);
->  #define CHSC_RSP_EBUSY	0x000B
->  #define CHSC_RSP_MAX	0x000B
->  
-> -static inline int _chsc(void *p)
-> +static inline int _chsc(void *com_blk)
->  {
->  	int cc;
->  
-> -	asm volatile(" .insn   rre,0xb25f0000,%2,0\n"
-> +	asm volatile(" .insn   rre,0xb25f0000,%[com_blk],0\n"
->  		     " ipm     %[cc]\n"
->  		     " srl     %[cc],28\n"
-> -		     : [cc] "=d" (cc), "=m" (p)
-> -		     : "d" (p), "m" (p)
-> -		     : "cc");
-> +		     : [cc] "=d" (cc)
-> +		     : [com_blk] "d" (com_blk)
-> +		     : "cc", "memory");
->  
->  	return cc;
->  }
+> +
+> +static void test_vncr_mapped_regs(void);
+> +static void regs_test_ich_lr(void);
+> +
+> +static volatile bool handled;
+> +
+> +static void regs_test_ich_lr(void)
+> +{
+> +	int nr_lr, lr;
+> +
+> +	nr_lr  = (read_sysreg_s(SYS_ICH_VTR_EL2) & 0xf);
+> +
+> +	for (lr = 0; lr <= nr_lr;  lr++) {
+> +		switch (lr) {
+> +		case 0:
+> +			check_sr_rw(ICH_LR0_EL2);
+> +			break;
+> +		case 1:
+> +			check_sr_rw(ICH_LR1_EL2);
+> +			break;
+> +		case 2:
+> +			check_sr_rw(ICH_LR2_EL2);
+> +			break;
+> +		case 3:
+> +			check_sr_rw(ICH_LR3_EL2);
+> +			break;
+> +		case 4:
+> +			check_sr_rw(ICH_LR4_EL2);
+> +			break;
+> +		case 5:
+> +			check_sr_rw(ICH_LR5_EL2);
+> +			break;
+> +		case 6:
+> +			check_sr_rw(ICH_LR6_EL2);
+> +			break;
+> +		case 7:
+> +			check_sr_rw(ICH_LR7_EL2);
+> +			break;
+> +		case 8:
+> +			check_sr_rw(ICH_LR8_EL2);
+> +			break;
+> +		case 9:
+> +			check_sr_rw(ICH_LR9_EL2);
+> +			break;
+> +		case 10:
+> +			check_sr_rw(ICH_LR10_EL2);
+> +			break;
+> +		case 11:
+> +			check_sr_rw(ICH_LR11_EL2);
+> +			break;
+> +		case 12:
+> +			check_sr_rw(ICH_LR12_EL2);
+> +			break;
+> +		case 13:
+> +			check_sr_rw(ICH_LR13_EL2);
+> +			break;
+> +		case 14:
+> +			check_sr_rw(ICH_LR14_EL2);
+> +			break;
+> +		case 15:
+> +			check_sr_rw(ICH_LR15_EL2);
+> +			break;
+> +		default:
+> +			break;
+> +		}
+> +	}
+> +}
+> +
+> +/*
+> + * Validate READ/WRITE to VNCR Mapped registers for NV1=0
+> + */
+> +
+> +static void test_vncr_mapped_regs(void)
+> +{
+> +	/*
+> +	 * Access all VNCR Mapped registers, and fail if we get an UNDEF.
+> +	 */
 
+No. You are accessing a lot of random registers, irrespective of the
+configuration exposed to the guest. Being able to access it is not an
+indication of correctness. Seeing it UNDEF is not an indication of a
+bug.
+
+Also, this is supposed to be an EL2 test that doesn't deal with NV
+*itself*. There is no VNCR page in this test. The fact that the host
+uses VNCR as a way to virtualise EL2 has nothing to do with the test
+at all.
+
+> +
+> +	GUEST_PRINTF("VNCR Mapped registers access test:\n");
+> +	check_sr_rw(VTTBR_EL2);
+> +	check_sr_rw(VTCR_EL2);
+> +	check_sr_rw(VMPIDR_EL2);
+> +	check_sr_rw(CNTVOFF_EL2);
+> +	check_sr_rw(HCR_EL2);
+> +	check_sr_rw(HSTR_EL2);
+> +	check_sr_rw(VPIDR_EL2);
+> +	check_sr_rw(TPIDR_EL2);
+> +	check_sr_rw(VNCR_EL2);
+> +	check_sr_rw(CPACR_EL12);
+> +	check_sr_rw(CONTEXTIDR_EL12);
+> +	check_sr_rw(SCTLR_EL12);
+> +	check_sr_rw(ACTLR_EL1);
+> +	check_sr_rw(TCR_EL12);
+> +	check_sr_rw(AFSR0_EL12);
+> +	check_sr_rw(AFSR1_EL12);
+> +	check_sr_rw(ESR_EL12);
+> +	check_sr_rw(MAIR_EL12);
+> +	check_sr_rw(AMAIR_EL12);
+> +	check_sr_rw(MDSCR_EL1);
+> +	check_sr_rw(SPSR_EL12);
+> +	check_sr_rw(CNTV_CVAL_EL02);
+> +	check_sr_rw(CNTV_CTL_EL02);
+> +	check_sr_rw(CNTP_CVAL_EL02);
+> +	check_sr_rw(CNTP_CTL_EL02);
+> +	check_sr_rw(HAFGRTR_EL2);
+> +	check_sr_rw(TTBR0_EL12);
+> +	check_sr_rw(TTBR1_EL12);
+> +	check_sr_rw(FAR_EL12);
+> +	check_sr_rw(ELR_EL12);
+> +	check_sr_rw(SP_EL1);
+> +	check_sr_rw(VBAR_EL12);
+> +
+> +	regs_test_ich_lr();
+> +
+> +	check_sr_rw(ICH_AP0R0_EL2);
+> +	check_sr_rw(ICH_AP1R0_EL2);
+> +	check_sr_rw(ICH_HCR_EL2);
+> +	check_sr_rw(ICH_VMCR_EL2);
+> +	check_sr_rw(VDISR_EL2);
+
+This should absolutely UNDEF in the absence of FEAT_RAS exposed to the
+guest. And yet it won't. Why? That's because the architecture doesn't
+allow this to be trapped. Does it mean being able to access it is
+right? Absolutely not. This is an *architecture* bug.
+
+> +	check_sr_rw(MPAM1_EL12);
+
+This should UNDEF in the test if the configuration doesn't expose MPAM
+to the guest. And I really hope it explodes or this is a glaring bug,
+because MPAM should never be exposed to a guest.
+
+The conclusion is that blindly testing that you can R/W registers buys
+us nothing if you are not checking the validity of the access against
+the architecture rules.
+
+Any test should take as input:
+
+- the configuration of the guest
+
+- the expected outcome of the access for that particular configuration
+  and trap configuration, as described in the ARM ARM pseudocode (or,
+  even better, in the BSD-licensed JSON file that has all that
+  information)
+
+The result of the access must then be matched against these inputs and
+any discrepancy reported, either as fatal (because the outcome of the
+access wasn't the expected one) or as an expected, non-fatal failure
+(because we know that the architecture is not self-consistent).
+
+Yes, this looks a lot like a full CPU validation suite. What a
+surprise.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
