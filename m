@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-37509-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37510-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D6DA2ADB6
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 17:28:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4716AA2ADBD
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 17:30:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E7C9164C99
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:28:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3CD0169C4F
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBA0237172;
-	Thu,  6 Feb 2025 16:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224191EA7ED;
+	Thu,  6 Feb 2025 16:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FmImYG1s"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tCaQV57g"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFE223716A;
-	Thu,  6 Feb 2025 16:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC697237187;
+	Thu,  6 Feb 2025 16:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738859324; cv=none; b=EkvqwxupAfi8l09lHXySEiiLU+NdB/C6ValPG6XzQ17cBPsL2A8tc9myzTc2o9dFAsF8eDT00xFm1sGI+emNsKOajuZ90G5hjGV/s/yIxY4qAGOBKvzCzh7QvJmUCCt47jPhEIb0hcOHl+m4GjyJDKoL6desy4MNqU7E223cCHY=
+	t=1738859387; cv=none; b=PmVKke/f+InQuhYzOL687126shm7Yik2Ko8OVAbvekcS48bP4rWjHODaa0aJARE6fYTqgADDJHSwrwMXj/RI8PPzFnmMNFZYmnS2AnaPo9INg/X5rRaNJag8I4/dZTPcuzAHDlymdTSPbZp0LmpA65bILKUyOK3wbvTW1YGAwfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738859324; c=relaxed/simple;
-	bh=XbmDDZv5szSpkFjsAQi4Er/Cf4Q3ZTPntggsA1M5qbg=;
+	s=arc-20240116; t=1738859387; c=relaxed/simple;
+	bh=DstEI/22MrSRuR2EgzrH5S58zkxQYARY3Ny9Iyukoyk=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=enwLk44GzFlt9VPqNO1Ve5DpRw74mkHEZWXuGlZhqj7LKkpqUj9WViMrecSXrM5N+mdkJUaGdViW+9fitjYE8dOfux6gIGVW4m7jKYW9O1wEEbhmOa77lQ981+4bgGo1XnyMpQbgmpTX1Q8UGrXivp+wRF/y1OaMOngui6ecu1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FmImYG1s; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=JagxLBbaw5NLEFTbhuBb6iUYwM3PPJo/QtVywdQDYRu6NPalc3zOwHK2RWbbqkWoT1MPpMgQm/FLIWaDxB36K0fBs5tkn+d2BZTSfe+XPWvaKR18kzqgYdHsSly+KJJnqAXIeuMPoBWZ+UTV9efH7JD9NLY0gk7kJFWgz3LRxoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=tCaQV57g; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=XbmDDZv5szSpkFjsAQi4Er/Cf4Q3ZTPntggsA1M5qbg=; b=FmImYG1sOnb3GRJhskZqCyiVui
-	DwbUzttZPGhVrM+6+VUJUXAQsMILXKaeT1OIuK9lMahC2mRJ1+TNBxf31TxOeZy7Mvyk7TVdJ7crg
-	lJaUUAclNcvuVsHcaSPdVul2/BrAxiPFYkN9jQ3oVE2iL9QO7SievF81wM/zp3oQ3velolOjyU0O9
-	vyLOd2GqbEOklp+6mW1NpvUW3QDSKFvat5kFwBIf3XGMv1Y/hs24EFSXFcGpLJQxkmwmaNgIrzOrU
-	JeNaDQzmsd8Skg+NxMdr1LE855AYHqlW1DURjVueC7Nc/827ivlmsDDlAmDw1C3SghEFk5OVN+o38
-	plfBcFKw==;
+	bh=DstEI/22MrSRuR2EgzrH5S58zkxQYARY3Ny9Iyukoyk=; b=tCaQV57gjIUEX+/Hq2hjqacOn5
+	hQrjQPfcKkAA0jWSwSjq1RNs6dmN1lZ+vlq861BnKLYzSMjwpO6xO+VNVy5uamLWDq0uIcLwkXHnI
+	RLAChFpbHeIgnIP1o5I0KYF5yWtmHWF8g1WCsF8NMb0Xovp7NT3xJV3KUB57j3RSb+HQgjEMkvo+y
+	pDxekjycwLnXbV55fEFoxJ1auzpGoWDVbBdU0oCZqbePa58PlGM8iOWZd/O/gQVu68eo8fnaOm+yn
+	NzStrHg+XU320STSHju/tALCLGrDzr2bvaxQJzpF6PpfwgqHU1OTcsjEZCWaq7nwL7/lOoNIFqy2a
+	Tb7VI8uw==;
 Received: from [54.239.6.187] (helo=freeip.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tg4k3-00000006FvC-0amN;
-	Thu, 06 Feb 2025 16:28:39 +0000
-Message-ID: <3ab0fd791b7411f518937f4f259105591efa3990.camel@infradead.org>
-Subject: Re: [PATCH 2/5] KVM: x86/xen: Add an #ifdef'd helper to detect
- writes to Xen MSR
+	id 1tg4l4-00000006FyD-418k;
+	Thu, 06 Feb 2025 16:29:43 +0000
+Message-ID: <2419362fac13e7e87044df1ec8b2eb782135c5c8.camel@infradead.org>
+Subject: Re: [PATCH 3/5] KVM: x86/xen: Consult kvm_xen_enabled when checking
+ for Xen MSR writes
 From: David Woodhouse <dwmw2@infradead.org>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>,  Paul Durrant <paul@xen.org>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com, Joao Martins
 	 <joao.m.martins@oracle.com>
-Date: Thu, 06 Feb 2025 16:28:38 +0000
-In-Reply-To: <20250201011400.669483-3-seanjc@google.com>
+Date: Thu, 06 Feb 2025 16:29:42 +0000
+In-Reply-To: <20250201011400.669483-4-seanjc@google.com>
 References: <20250201011400.669483-1-seanjc@google.com>
-	 <20250201011400.669483-3-seanjc@google.com>
+	 <20250201011400.669483-4-seanjc@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-LppzT4jWhIkIsCCg26H4"
+	boundary="=-iSEhuGbEMjghWjnjS9QZ"
 User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -70,21 +70,29 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-LppzT4jWhIkIsCCg26H4
+--=-iSEhuGbEMjghWjnjS9QZ
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, 2025-01-31 at 17:13 -0800, Sean Christopherson wrote:
-> Add a helper to detect writes to the Xen hypercall page MSR, and provide =
-a
-> stub for CONFIG_KVM_XEN=3Dn to optimize out the check for kernels built
-> without Xen support.
+> Query kvm_xen_enabled when detecting writes to the Xen hypercall page MSR
+> so that the check is optimized away in the likely scenario that Xen isn't
+> enabled for the VM.
+>=20
+> Deliberately open code the check instead of using kvm_xen_msr_enabled() i=
+n
+> order to avoid a double load of xen_hvm_config.msr (which is admittedly
+> rather pointless given the widespread lack of READ_ONCE() usage on the
+> plethora of vCPU-scoped accesses to kvm->arch.xen state).
+>=20
+> No functional change intended.
 >=20
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
---=-LppzT4jWhIkIsCCg26H4
+
+--=-iSEhuGbEMjghWjnjS9QZ
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -163,22 +171,22 @@ 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
-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
+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
-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
+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
 
 
---=-LppzT4jWhIkIsCCg26H4--
+--=-iSEhuGbEMjghWjnjS9QZ--
 
