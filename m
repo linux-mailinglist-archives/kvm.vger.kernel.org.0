@@ -1,114 +1,158 @@
-Return-Path: <kvm+bounces-37507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE404A2AD08
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:51:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8332AA2AD52
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 17:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A0D87A18C4
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 15:50:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05E19188A95F
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAFE151989;
-	Thu,  6 Feb 2025 15:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952C122F391;
+	Thu,  6 Feb 2025 16:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kw0aGGmR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bIUf50Ht"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFB11F417D;
-	Thu,  6 Feb 2025 15:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404111F416F;
+	Thu,  6 Feb 2025 16:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738856985; cv=none; b=iOntVhkXpbAkGi/D8MORvb8YMFKBgnfYLMHk64jWjOiam4f/qA7dcjQWm1HNr/iAnlHmQWzujRgS64WqfzrKepe6PLwmXWLRg74QViyWHKO6nVjJm5Rcz9ul20ChdnwxcAnOissXWtXRUQrAylkM5f7KISkcw5+QyMjs97BqR3Q=
+	t=1738858195; cv=none; b=bADX/Mlw6OuuRXm81eWQXGwpq26+S4S/+niXplDW4sLPoVw/3Ix3B4BM3QB/OBEVTGaktW5K1RFfoQhGKc/1bYMcEFCvVVCRGtcKIMH1CAq+UA1XH0Hyp1EB8Ag5iq8IFh2YqtVpRFmwKzn5ft1EbEa2CKoljanPhCT8ohn3Vsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738856985; c=relaxed/simple;
-	bh=PiAJmk/+rhSy611nT7kwN3d7mOQKY+zFOQfapGlrhW0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PrQhVpFFBFRL1XJWdJp/Bv0McVyyikRgAzPlFFXRUtv1aGi+YC01fe5vu7ZHgNiLShl+kEiPihyM7kGbunhntSHM+jFEuS5drnDjc5p/fW9yhwBxtJlLUwL3sHhj2CDLkOxNB8CgBzFU8aM3JacQAV4jp+0WGEbFAKT8xy07dsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kw0aGGmR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5741C4CEE6;
-	Thu,  6 Feb 2025 15:49:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738856984;
-	bh=PiAJmk/+rhSy611nT7kwN3d7mOQKY+zFOQfapGlrhW0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kw0aGGmR1PfFstL+vOOc+1zpeDQSMSe3uV+95H+W9KPhritjD6buvClM7jXnh5Snt
-	 SyF7x4Qs6b5keXG0kQ9yUMAnBBhcxgI8JbZ/yZ9wC+zADuzNnr33n5qNfFxyiLraM/
-	 jAsJb4L4uYj/MKvf0F/zWIcjkJ9Qjiw0Q4mqesnF+Pheim1uGDiPEbSk8dEytD7cMr
-	 U1cTEunVMzuRA8jKHPaeRivd/1Q7jNK4BMTQa0kgtRYV8+7CW4hWutpyG11nMxuZ0a
-	 tJCFfxKFiQ7TwWKz+1gfd1mCQgv471jAr2uU1q9jKAZ3hYpDTDH6GmJXjt17M0tywx
-	 E/9CCfWODw2IQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tg48N-001BOX-2k;
-	Thu, 06 Feb 2025 15:49:43 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 16/16] KVM: arm64: nv: Fail KVM init if asking for NV without GICv3
-Date: Thu,  6 Feb 2025 15:49:25 +0000
-Message-Id: <20250206154925.1109065-17-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250206154925.1109065-1-maz@kernel.org>
-References: <20250206154925.1109065-1-maz@kernel.org>
+	s=arc-20240116; t=1738858195; c=relaxed/simple;
+	bh=Sz0yAKu52Q/DkcVZvMUnojW6qo+VO61Tj6LBMXUj0n8=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=hzk7Ao46CL/G7jyYQmAAUjB3cdxdHxKeh51fi3bWHjiuAdIeyND9IXholV2RL4504RYp1y07oFfke48YPn4uK1wEdcB4A9DxLHpiNP8OPkLSYu9IZjBfxZgwPFpOk6PxIeWlW20aUF+kqAgvs/YloTuMZQfGkpBI1F+KjlGlpAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bIUf50Ht; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c0155af484so132897785a.0;
+        Thu, 06 Feb 2025 08:09:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738858192; x=1739462992; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jkXONlGU8F89bT8v/54D+GqervLT59Ca/28JVFZb6vM=;
+        b=bIUf50HtF/dr8rzm+AIPPGZ46KoUdXVf4y+oQVheoCbfTek11Ejfn+fR/j4fUVyYEZ
+         Ya4y4HkGjDzS9X0L27OdS7YDVFLXgD6NnBWMcMAUb5Gwo07sINM/GZ9kPK/8E4gOfMym
+         cfIb0zXuX0u2t5S4nMCXmsYMyHb8GqujjEYhjnBrfCWuPr7BtdMTt1DQfGqgpwCAv2Hk
+         VIWv/unc9k3BmaGGv+jIWUl4DSPJKOcLyvAGXs46hKghMi8DlayByzdVNNfLoenlgPgC
+         6mVSICwTLWZTuCyKpwZPNN7l36p9hiZ2N3O7t8AUFeLZ5vBIQIWJS0PaSN98xMsjgvib
+         LX3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738858192; x=1739462992;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jkXONlGU8F89bT8v/54D+GqervLT59Ca/28JVFZb6vM=;
+        b=ZmAUJMRSYIGi0rpUQaO0+9d+KETBQQVEAK46Ar2RoaQZNoqJ1zpWAnKIA2+o0XqDkL
+         L6eRXBD+9m5BeqWjdgpFX6OFU/K3AJliOemWOumvAKc6jsVbZZFKrRg/JkHBy+6xX/tf
+         HThnME40OafZ2MXQgzQTjkgrjkmO/J4m5IUehpOsGGqDlC/fzSXp2CVu+K9GVADC0Nya
+         u99hDMu0ZaKqXzzIzW4lEIMEwqBBxtxyUinH9LwyyOgezIUZJhA4m9ZLURJFsvrbz74l
+         474S6rP443x6CrUzlWf4ubup97l6knVSo8M6HocdFiF7/nlAe6XCZFo5rX5i+bggjybC
+         z3dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlLRKMEPMKQJaGPWe63ef2QomkjRIoQ9E+AeJFGJEGdvofwNTYOhK/VR0GHaLXP6aOAFh03RgHkeRD@vger.kernel.org, AJvYcCV3G4YwkEN6LLhFLfl852tbQUykEuJDKdfmW8VxOoA4tEO/YAy3Qnv3u6+yT5bn/0gdaohx/Ipt0xXIlS4lAZn2@vger.kernel.org, AJvYcCVyTurBreE9/bSFaRpzE2MhSzh8BuVGeHfWv/XTAKw5VmTNqA9s8se5uPfw52gTEyAWuyY=@vger.kernel.org, AJvYcCWMuYDvx/8Z7+Yazk3w4ba/1CvjQokRUsdmg5/CiNwbe2SaD99/henHW8983ETtP773b5lqtgtE@vger.kernel.org, AJvYcCWypCbCrvptdR5UOpWPq9EhbVFd775kiVMLAFbfvzRxrSiq9OgIAV8V6H8rlqmqrB7AL5V20YJyVCYm+kSk@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpA8jGwUwwsbGseS+gVUpwWO724XkXsVwA1dGlZiZMhd7FraE7
+	q9yJk3TcvZpb1lDP45VYhKhlgyuFyJGRJC5g4AmLvdbN7KUZFZFH
+X-Gm-Gg: ASbGncud0qSiK8MIa2L7z2x416hwke4cW9i+TlrjqHI0JyZ8Tf8SkyY+vTDpudjNrVb
+	MT88w1p/KEJs8/lvzSZ/UcflpMb+5QS9Cp56B5XH+07xC1/Y4LVzU86X2O+BCuliKkPiZlmAjtJ
+	089mwyCLS44lCGPk918Re2iXtjNZCR+d5aXnNiQ02AmRWcBGZEqTCMynohCumuP+EzX7QrHe02T
+	wcYv80VmGabamPdha1Y2jer2uPvJjegmAgEtX3/eMwzC7bbfmbHNHbApPkm9+acervN087x3Kuy
+	lba6Un44W2CGW+bpuau7BawagnSbs/Fa7dApqM6q3JwXJXRwY+3iV/bNJnIqhPU=
+X-Google-Smtp-Source: AGHT+IGt+/KI7G+Ky43LZCW+7h9o5kkC2zN8+03mInm/HQvkfRNm9I7BK0cYoEJQCJyLgDBBFNdRpg==
+X-Received: by 2002:a05:620a:4312:b0:7b6:d4a2:f11f with SMTP id af79cd13be357-7c039e92d5amr889066885a.0.1738858191933;
+        Thu, 06 Feb 2025 08:09:51 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c041e9fa5esm75699285a.76.2025.02.06.08.09.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 08:09:51 -0800 (PST)
+Date: Thu, 06 Feb 2025 11:09:50 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ devel@daynix.com
+Message-ID: <67a4dece7b7e4_20644429480@willemb.c.googlers.com.notmuch>
+In-Reply-To: <8b389981-c04a-4d4f-8a5a-043b4cd6e8db@daynix.com>
+References: <20250205-tun-v5-0-15d0b32e87fa@daynix.com>
+ <20250205-tun-v5-6-15d0b32e87fa@daynix.com>
+ <67a3d6706c01a_170d3929436@willemb.c.googlers.com.notmuch>
+ <8b389981-c04a-4d4f-8a5a-043b4cd6e8db@daynix.com>
+Subject: Re: [PATCH net-next v5 6/7] tap: Keep hdr_len in tap_get_user()
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andre.przywara@arm.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Although there is nothing in NV that is fundamentally incompatible
-with the lack of GICv3, there is no HW implementation without one,
-at least on the virtual side (yes, even fruits have some form of
-vGICv3).
+Akihiko Odaki wrote:
+> On 2025/02/06 6:21, Willem de Bruijn wrote:
+> > Akihiko Odaki wrote:
+> >> hdr_len is repeatedly used so keep it in a local variable.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> > 
+> >> @@ -682,11 +683,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   	if (msg_control && sock_flag(&q->sk, SOCK_ZEROCOPY)) {
+> >>   		struct iov_iter i;
+> >>   
+> >> -		copylen = vnet_hdr.hdr_len ?
+> >> -			tap16_to_cpu(q, vnet_hdr.hdr_len) : GOODCOPY_LEN;
+> >> -		if (copylen > good_linear)
+> >> -			copylen = good_linear;
+> >> -		else if (copylen < ETH_HLEN)
+> >> +		copylen = min(hdr_len ? hdr_len : GOODCOPY_LEN, good_linear);
+> >> +		if (copylen < ETH_HLEN)
+> >>   			copylen = ETH_HLEN;
+> > 
+> > I forgot earlier: this can also use single line statement
+> > 
+> >      copylen = max(copylen, ETH_HLEN);
+> > 
+> > And perhaps easiest to follow is
+> > 
+> >      copylen = hdr_len ?: GOODCOPY_LEN;
+> >      copylen = min(copylen, good_linear);
+> >      copylen = max(copylen, ETH_HLEN);
+> 
+> I introduced the min() usage as it now neatly fits in a line, but I 
+> found even clamp() fits so I'll use it in the next version:
+> copylen = clamp(hdr_len ?: GOODCOPY_LEN, ETH_HLEN, good_linear);
+> 
+> Please tell me if you prefer hdr_len ?: GOODCOPY_LEN in a separate line:
+> copylen = hdr_len ?: GOODCOPY_LEN;
+> copylen = clamp(copylen, ETH_HLEN, good_linear);
 
-We therefore make the decision to require GICv3, which will only
-affect models such as QEMU. Booting with a GICv2 or something
-even more exotic while asking for NV will result in KVM being
-disabled.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6063131f84426..fa429b3fd4ac2 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2308,6 +2308,13 @@ static int __init init_subsystems(void)
- 		goto out;
- 	}
+Oh nice. I had forgotten about clamp. Even better.
  
-+	if (kvm_mode == KVM_MODE_NV &&
-+	   !(vgic_present && kvm_vgic_global_state.type == VGIC_V3)) {
-+		kvm_err("NV support requires GICv3, giving up\n");
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
- 	/*
- 	 * Init HYP architected timer support
- 	 */
--- 
-2.39.2
+
 
 
