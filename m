@@ -1,106 +1,116 @@
-Return-Path: <kvm+bounces-37488-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37489-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F80BA2AC29
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:11:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A9C5A2AC43
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:16:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F2573A7EDD
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 15:11:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7611E3A067D
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 15:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CA41EA7D1;
-	Thu,  6 Feb 2025 15:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC20A1EDA0D;
+	Thu,  6 Feb 2025 15:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mcrMijws"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1lRK8uym"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FEA1A5B9B
-	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 15:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04E61624D3
+	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 15:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738854670; cv=none; b=dm4rLoVO7/ImpzqjF0DJ0l6Ne85UcXhgGD0N/WSuUP9hanuu6ReLcqb2han08sIayfspUmw1+IxIvEM3rt/KQbA0TlRz1a2AD9ITqVlXG3P5efpR/WYVqdKcs2q8ZvR8t2v9utY8nNaHeJ8qxZ+llMjUJ7QP8j7xvzhqurFOnlI=
+	t=1738854987; cv=none; b=RB2nJ6pefjYwmzvzkXN1fGWrHuEHZ97KWrgcpeWbtvuS2NrUbWkdCxo8osgSPVhil14OCC1SNeCzXXALKUrIrNZi3F04gKE1tVd9lwapa3ghQvtg1bq30e95hZRk0y9ey3mvF+uPeTei7iL1uES1ScsYh2WA6hhuvV82LqTguhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738854670; c=relaxed/simple;
-	bh=HGcJvmPsA6VpGt/KK/cUj81/o/UDMPIaCrtDZurrAUo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZIiQeYbx3FtcRGp0wwSgT7l6lQlwP6EthBSgdePgWkcD5n6my64EtHgZjGwfirxRUKg8DhPld2ScuZkA8hUbKZ1gFGvlaSgQbej0AZUylQmYHsodOK/wcaWRPqaKmtKYOGJmUyVpCuQQPUXrlwU20+t0SxVgkM/hJttfL3tUajY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mcrMijws; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ab76aa0e6fcso139830966b.3
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2025 07:11:08 -0800 (PST)
+	s=arc-20240116; t=1738854987; c=relaxed/simple;
+	bh=wrUO/pv3wuaL79TztGdwTHBbUZYh8NrHCiOXYPaysQw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QVIWZjqmXaAcXqhNoQkVeuczaccDSj4YRMvR6llaQ0SNC/muID/nziHBI0oZ3HlsG0ZBfe/ugBFsR91iijl031AQwtzohu0cU/pZjYxhPLYOczz87s7xyURHfD8VAlZtEnPPdz3f66Hg1q3aFlrd8hXPzSa2nDL2Y0oOnQ8+uNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1lRK8uym; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21f1e5c641aso36548035ad.2
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2025 07:16:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738854667; x=1739459467; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HGcJvmPsA6VpGt/KK/cUj81/o/UDMPIaCrtDZurrAUo=;
-        b=mcrMijwsXnwF51h15nZAyGn93Q2yjPXz8RZQvMHwpuzWscV0hk6cKpKydqo9chxrQo
-         BPuQNq4m6xu/nZZL1DJ0lxMJh8Mhvn+UnAHaygCOMx2/PtSH4lII1abxSFoj+LBPCl0U
-         jO9hMB2HaDn+b5toYn5FVCxcq4o+3E2560Q2vTVL50fPIw3K5XT0Gp6ua2Un//zMSCRt
-         RKKtlRfvg1IaV7KOrKYt0RIO/h3y4G+PhHlvkO6SJ5ytMXnd0XRzVdc6XAdA+0UxNeNt
-         sR+0TxGN9voDg5WmSnF/K9cC1MExtcHRrIvEWel37+pLp4tfXDYqc/H9Vz3h9QmVLlL0
-         5Xag==
+        d=google.com; s=20230601; t=1738854985; x=1739459785; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/O+gmVjEiO0izHw1wyAH52hjvhtcTqnj2hmp9TBo5bg=;
+        b=1lRK8uymqlKIs6snVbz/1dDLNX0RLawoBPiyPtfDI9tGq9BTqjMubT8i+h+NfvhCqe
+         vIBBEiPenmYFnNAOagZUKSWGinRQtj66CHHBxFK3ZHS3IUasijflKJTe3DUYoJQH4UGL
+         CGySGfqaXcfsAnBGW0trMyF9D/hMhcDeMUs3ieb2vFRkl3QVZjEAv68OjZLqUwMyJmj6
+         9yTDtcEZBLUszhD3IMC3Eo445+bxjMQMJdElyD01zVbiDeMpGKvdnsfmbsTXrognOF3c
+         6bD/2aHHkdZpzmnl7+Ba7tUD+KWlYnZiXOFxuXMjp70vn9EVuU7F/n2z8Q7QZsm56YkN
+         80EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738854667; x=1739459467;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HGcJvmPsA6VpGt/KK/cUj81/o/UDMPIaCrtDZurrAUo=;
-        b=NGhqeGtNwwGlNJlX/uKVRFk74s+OxrwHqlZWu6YQSarvYPipW4IWBfmlVuXwlBtru7
-         OraA1iEr7QPYYRTAtEOed2cam1FGeXbWfcR7odk7Z7Htjh/J1L+kMr5RHVR8jkkfHOww
-         6LZnb7/cKj2Q70H3M2X0/OxDf7VBUAYTVUXOLXTQIpXQc4vUPypPl0Qfu7WzdlVrAIsv
-         OS1GWo0s80DDp1XBzhO8a4uMLbVm6T0C/6wAujooGK/d5WC0YXfxb37TCu9T3TIAtIH6
-         42QYd0j2sZg/Ziyt9qHzw6w6qTG5+TySXrcvZeR8D8mf+YN7NB/xykIbmZJFizuHYIFN
-         CTQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWb5ndWv/eiTnz1Wgtzmfqq4QM2l9T04bUAhkbWstt9CCmkn/RkNVi+30WjOc7Iw66cBvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylwB3yXNmSb6FOUnT+ckI/tuRhVcLx46YprilbpMT5k9gABvhx
-	FOMrRlwS9TkKLEQSEkTJQAmvLjFcYH0uIyEXPK+8RyRdjeQxbvsvvyRK/ognVeGqdFLfM7BKSQJ
-	BaTxRSN5w+1h+uInmypB6T7gNXos=
-X-Gm-Gg: ASbGncvzTky7w3m6uDUletCrHsuPsJT5fbTeKH7wbZdQy4ZvMKy98Em97l8bR/wbLf7
-	K8GaXWjCQFIgyMfZ6xw1IEV6BDZYpRVzffdbeyKe1ljnQKK8Ib5nG6JRdL/gM6P0o5XY8LAA=
-X-Google-Smtp-Source: AGHT+IGP3KVjBq5joN2hvizSzR2CKIpkxWd+Wdla18g45vM5djnc7fvnLtfJ60Q3uZWqhnRyk/4SDaN62BZBaoaRfkU=
-X-Received: by 2002:a05:6402:3506:b0:5d0:cfad:f71 with SMTP id
- 4fb4d7f45d1cf-5dcdb775fbamr17536301a12.32.1738854667203; Thu, 06 Feb 2025
- 07:11:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738854985; x=1739459785;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/O+gmVjEiO0izHw1wyAH52hjvhtcTqnj2hmp9TBo5bg=;
+        b=CPf95AQVce5CGlFsfmz9xrFrSR0GPvc6v6sFLSCXtIkxzQ8CHQJKy8TecQ/rAmM41m
+         OfNLqRO30MIzj7Sm0J+ADkBbQ9Padkj/x/5XvB/QoemBzmOXdUVXpfz2t9Livj/vbPbw
+         2GwxDRtLlc/2EK3dBHDHLoB46o90UM1lJd6w0H1XG4iX0aWRnlQuSbNtQmXgPdRy4HJM
+         wgbvTY6KHZeYoRKq3RnmibeN7AR70nU7c7X1FV7G7cOH9d3DGeazgvx91BvMqR4r8+Re
+         LHbSfocFRuACRDVeoh7dHhGRQwdg60nYHkr2sdJuuVfjfTykeCSuqe3S891xRm3UsiNd
+         G2Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCUvtpihagBLppqc8uDSGlVnBeGssuaV6SYFh9Yz/PKbIrrWkrMX8VMyyJMpWKpG0alGlEE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/bWPySuf6Un8tss2hMnRr6TmE5sOr8mDWCP943uCheNabD+b4
+	NRF0ZuKQ8elO8WpLKbjTHww66WTniaeFNIhKzcFBmy3WNg/Qe4ZIWtH+22depKUgPjIKBFFVZZ5
+	UAw==
+X-Google-Smtp-Source: AGHT+IEqoERbvjL8QRLQoY1mFC+xOoqWn74MjyilsWi+ixkfWOF6DG/8rz3OjKhU93twnCTVaEwniXbu6Nc=
+X-Received: from pgbft13.prod.google.com ([2002:a05:6a02:4a4d:b0:837:acbb:873a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d705:b0:1e0:cf39:846a
+ with SMTP id adf61e73a8af0-1ede88ab90amr14153239637.29.1738854984884; Thu, 06
+ Feb 2025 07:16:24 -0800 (PST)
+Date: Thu, 6 Feb 2025 07:16:23 -0800
+In-Reply-To: <20250206022656.3752383-1-fuqiang.wng@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAJSP0QVYE1Zcws=9hoO6+B+xB-hVWv38Dtu_LM8SysAmS4qRMw@mail.gmail.com>
- <Z6SCGN+rW2tJYATh@fedora>
-In-Reply-To: <Z6SCGN+rW2tJYATh@fedora>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 6 Feb 2025 10:10:54 -0500
-X-Gm-Features: AWEUYZkEgh3cyBoslP70EQWlaP_AQzysfImv92tTEUARYq7n1jgef6N53O8LJYM
-Message-ID: <CAJSP0QUn5HHXKnxgt-Gfefz9d4PmRzPbgYv7Hoo=wcyO-rwQEQ@mail.gmail.com>
-Subject: Re: Call for GSoC internship project ideas
-To: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, 
-	Richard Henderson <richard.henderson@linaro.org>, 
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, 
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>, Alex Bennee <alex.bennee@linaro.org>, 
-	Akihiko Odaki <akihiko.odaki@gmail.com>, Zhao Liu <zhao1.liu@intel.com>, 
-	Bibo Mao <maobibo@loongson.cn>, Jamin Lin <jamin_lin@aspeedtech.com>, 
-	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>, 
-	Fabiano Rosas <farosas@suse.de>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Hanna Reitz <hreitz@redhat.com>, felisous@amazon.com, 
-	Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20250206022656.3752383-1-fuqiang.wng@gmail.com>
+Message-ID: <Z6TSR8UmtNNHFeUQ@google.com>
+Subject: Re: [PATCH] kvm: delete unused variables iommu_noncoherent in struct kvm_arch
+From: Sean Christopherson <seanjc@google.com>
+To: fuqiang wang <fuqiang.wng@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	wangfuqiang49 <wangfuqiang49@jd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-I have added your project idea to the wiki. Please make further
-changes directly on the wiki.
+On Thu, Feb 06, 2025, fuqiang wang wrote:
+> The code of legacy device assignment is deleted entirely in commit
+> ad6260da1e23 ("KVM: x86: drop legacy device assignment") and the
+> variable iommu_noncoherent in struct kvm_arch is also not referenced by
+> any other code. So it is deleted in this patch.
 
-https://wiki.qemu.org/Google_Summer_of_Code_2025#Adding_Kani_proofs_for_Virtqueues_in_Rust-vmm
+Someone else beat you to it by a few weeks, I just haven't applied the patch
+yet.  Thanks!
 
-Thanks,
-Stefan
+https://lore.kernel.org/all/20250124075055.97158-1-znscnchen@gmail.com
+
+> 
+> Signed-off-by: wangfuqiang49 <wangfuqiang49@jd.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index b15cde0a9b5c..98555afb6f10 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1354,7 +1354,6 @@ struct kvm_arch {
+>  	u64 shadow_mmio_value;
+>  
+>  	struct iommu_domain *iommu_domain;
+> -	bool iommu_noncoherent;
+>  #define __KVM_HAVE_ARCH_NONCOHERENT_DMA
+>  	atomic_t noncoherent_dma_count;
+>  #define __KVM_HAVE_ARCH_ASSIGNED_DEVICE
+> -- 
+> 2.47.0
+> 
 
