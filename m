@@ -1,342 +1,420 @@
-Return-Path: <kvm+bounces-37520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09C51A2AEE6
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 18:31:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B643A2B100
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 19:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFA617A29BF
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 17:30:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59D63162183
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 18:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729FB18C03D;
-	Thu,  6 Feb 2025 17:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA561D79A9;
+	Thu,  6 Feb 2025 18:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kmJhN3pE"
+	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="kmXSdWxP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="p3/Sme92"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8866F18A6BD;
-	Thu,  6 Feb 2025 17:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D076E1A0BDB;
+	Thu,  6 Feb 2025 18:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738863046; cv=none; b=KwdS43G70sGCl5B/J3/pB0Vw0r9ZsJlBQZGpztx4jBpPHF1sQKQlvF+TGXBbWRpK5VkBhANL6nJI568K8cHpVHKD/66qvRpb66kZSHZsHQ/xWxTfoFZUrbY/rADLfLdhXq0sBycJnHsa3jlBKU9mxlN3NRYae2eKxo8pQTaq3Y4=
+	t=1738866076; cv=none; b=NyjPGgQpIJI+tX7XzCDfBZDCOVCcPL9ROoN70ZDtod1+oO8va25YV/9LefHv8jZsGauLtun/SwBQVRHUMtxi8y67G9Z/MrRXLCBPLhu8IlkqS+29ZzS2EIzkhsqdESP5xhk6Wpupwg0+oUxCyLjzMT5Rkv5Bf3db8gFbdbHfV4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738863046; c=relaxed/simple;
-	bh=dEzyg2r4tZKWMxK6fgAdi9bkgZ+Gg97tUdv2KrGqngY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DGw3+mB9yZVN8ZDVG+Gmm81AcewxI2SOter146lkOAAi6vsQrSsXdhQpsXrN3Owl1fJIhT/2jGcqUb6zfYicIHfzjP4YMMMhn0EhwZkf345OXmPjcdA4ZlT2kK7tvfN1HeAH5OPyC90oTQGJ2JXxQmPkvENSzVO5B2Qaw91wW6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kmJhN3pE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AEB6C4CEDD;
-	Thu,  6 Feb 2025 17:30:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738863046;
-	bh=dEzyg2r4tZKWMxK6fgAdi9bkgZ+Gg97tUdv2KrGqngY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kmJhN3pEUEX7HmbyYzousuk6RwyqiD+uQ0neynfv0Zzru2qTIJfYAYAQ9M15TgToN
-	 B8oYRMKQdkCh5HoMPT831dhlNYGZPK9b/aeb5P8Ts1mISgehqbU/yejenz2dRDFjS6
-	 SRlqjkQuUPrT4guXBqtotmRYS96p+1LCjZZaBDeI4v/YMhVZXj9MrfDuJeNmp3YINj
-	 4Wi7TyYvrfNr3ZXbxSp6U53QCPiLJAJfbG0F/R3ON0KY8lxSTOCk+MlJfvHU/cPcM0
-	 0x1Zee1z3BDwOh/2k1s43SwA0zFNFuxAfSvX0xwcinHTD1NBjz1GmXLv2ZUrLNshGz
-	 alEImmKigZ4ug==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tg5i7-001DLm-VD;
-	Thu, 06 Feb 2025 17:30:44 +0000
-Date: Thu, 06 Feb 2025 17:30:43 +0000
-Message-ID: <86pljvt1z0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	darren@os.amperecomputing.com,
-	scott@os.amperecomputing.com
-Subject: Re: [RFC PATCH 2/2] KVM: arm64: nv: selftests: Access VNCR mapped registers
-In-Reply-To: <20250206164120.4045569-3-gankulkarni@os.amperecomputing.com>
-References: <20250206164120.4045569-1-gankulkarni@os.amperecomputing.com>
-	<20250206164120.4045569-3-gankulkarni@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1738866076; c=relaxed/simple;
+	bh=0Wxhqv+hLaWEyX27t7gpS6vBv9rE3kEqEk1rdoc+YuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o+jVVQ6yoGYXXTpKVeVUc4jW6eKgxkU2YHQS6CiApyZPTHxn9rMEhgkva2Oksh3IkMdDvt1ErSGlVHJqyvsKbVqYA9WHs7f08RQi5X9rKCFJsBBZj39uyyHvWkeG/afybKwJCWLxPMuMa3N3DxRM9NHOXMOpWIL4w5bV+OQDcj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com; spf=pass smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=kmXSdWxP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=p3/Sme92; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=invisiblethingslab.com
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id C392B114023E;
+	Thu,  6 Feb 2025 13:21:12 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Thu, 06 Feb 2025 13:21:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	invisiblethingslab.com; h=cc:cc:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1738866072;
+	 x=1738952472; bh=LVWd6g0jNd2/cna7ay95TAMpwJ4DUTXCoUp9pBK29VA=; b=
+	kmXSdWxPiJJVi9L0ooGYjpowht5gG4g2kLMqB0tTfjwdqS5voSCtJ5Z+d5Xv78Nn
+	QaqrUPWqzVwwT3XyLqctVX2hzpuN0dicrty3vfzjjfbljmIHa/2xPxRV5jYbtQOM
+	NQXiM4qE7L5MQw+soHvfvwu+bsxj+x6dZpa+IBwXeBcyNzPzq6Md9A3glSntkxRg
+	Y9ERleElXLoWnSNOzqvnpz/aQlhs2kSzOyIqlV/9+hGsUGUBgfDSxtbO8eBOvbPd
+	XFamY44dYcRyi1c224cL6qG9d7dodx02ThOl9Fl8YfGmh/wIbCoNEP9hMlNXwv9V
+	2XG9iORCHsyx4W3DiXvrvg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738866072; x=1738952472; bh=LVWd6g0jNd2/cna7ay95TAMpwJ4DUTXCoUp
+	9pBK29VA=; b=p3/Sme92UbG4olaB/yg2IkafbNXzOIaDY6glUjyMt5P+FKdYTef
+	h+5twob+Eo+Ynj7HlCHj7gKSpNdDXxuc4iuE5PrWnwRdHqwkfhc9eUydKurRcbDK
+	wEDBQui3y6wL21I0dWiaTl05wiGl1HuF7caXj983mh3520CqiXHbuKDFu/HhiEJk
+	X/wrwUEX4J4RUt2s6MoPmzxJUMriSLyJsNuhaV2BZ2h0VRl3JpOV2ogbpYqkOtIe
+	yWYz2lSfQaPAyHMzrw2sICBGZMGU0v1Cmvg8/iCV1zGK7Sjkeko7qyKMWBlzafkh
+	OnHhulWFiELml3wB6GjolKuPMUpigPBlidA==
+X-ME-Sender: <xms:mP2kZ3phIyeacO6nHKoic5JKUJlW2p6ywz72awmxYH0DyaSXqr9S1w>
+    <xme:mP2kZxo5EmSV1iRI90sSES4KIwiaJHneP0be3R6rPNuyIC4IqMxd93VeWFjwATGAF
+    23nUkXrz4Hhuwo>
+X-ME-Received: <xmr:mP2kZ0MEaCIFxBXlaWCaTXfdNdyCKHlEC5_YyigHPA_2Qr37gEhDJMgcjE0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvjedtlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehgtderredttdej
+    necuhfhrohhmpeffvghmihcuofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvh
+    hishhisghlvghthhhinhhgshhlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpedvjeet
+    geekhfetudfhgfetffegfffguddvgffhffeifeeikeektdehgeetheffleenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhi
+    shhisghlvghthhhinhhgshhlrggsrdgtohhmpdhnsggprhgtphhtthhopedukedpmhhoug
+    gvpehsmhhtphhouhhtpdhrtghpthhtohephhhonhhglhgvihdurdhhuhgrnhhgsegrmhgu
+    rdgtohhmpdhrtghpthhtohepuggvmhhiohgsvghnohhurhesghhmrghilhdrtghomhdprh
+    gtphhtthhopehrrgihrdhhuhgrnhhgsegrmhgurdgtohhmpdhrtghpthhtohepshhtvghf
+    rghnohdrshhtrggsvghllhhinhhisegrmhgurdgtohhmpdhrtghpthhtohepvhhirhhtuh
+    grlhhiiigrthhiohhnsehlihhsthhsrdhlihhnuhigqdhfohhunhgurghtihhonhdrohhr
+    ghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopegrihhrlhhivggusehrvgguhhgrthdrtghomhdprhgtphhtthho
+    pegurhhiqdguvghvvghlsehlihhsthhsrdhfrhgvvgguvghskhhtohhprdhorhhgpdhrtg
+    hpthhtohepughmihhtrhihrdhoshhiphgvnhhkohestgholhhlrggsohhrrgdrtghomh
+X-ME-Proxy: <xmx:mP2kZ65uxWYKQg8JStfQFyh0sordyZ9zExZ0crqmVbQUL8lUj0XP2g>
+    <xmx:mP2kZ244LEz3d5Z49_ZSJpCx9lGmq5S_q5beYIs3qLSjTestqEWCFg>
+    <xmx:mP2kZyh31RPT-xN1gkFgKyJnTbd0-vZn3p7K93YAbico6iT6UJ30cA>
+    <xmx:mP2kZ449bzYZEfS7xLe7azXw2pqLFrB9n2PbHaWyK6U2Rk2T5mF3Bg>
+    <xmx:mP2kZzw_Njbh6Z7Gd3x6Lk5QFvJ9TzOQx4kfZnNa3CRQ_4W-AJN2AdAc>
+Feedback-ID: iac594737:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 6 Feb 2025 13:21:11 -0500 (EST)
+Date: Thu, 6 Feb 2025 13:21:04 -0500
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+To: "Huang, Honglei1" <Honglei1.Huang@amd.com>
+Cc: Demi Marie Obenour <demiobenour@gmail.com>,
+	Huang Rui <ray.huang@amd.com>,
+	Stefano Stabellini <stefano.stabellini@amd.com>,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org, David Airlie <airlied@redhat.com>,
+	dri-devel@lists.freedesktop.org,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Lingshan Zhu <Lingshan.Zhu@amd.com>,
+	Xen developer discussion <xen-devel@lists.xenproject.org>,
+	Kernel KVM virtualization development <kvm@vger.kernel.org>,
+	Xenia Ragiadakou <burzalodowa@gmail.com>,
+	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+Subject: Re: [RFC PATCH 3/3] drm/virtio: implement blob userptr resource
+ object
+Message-ID: <Z6T9lDSj8Y9ATE3k@itl-email>
+References: <20241220100409.4007346-1-honglei1.huang@amd.com>
+ <20241220100409.4007346-3-honglei1.huang@amd.com>
+ <Z2WO2udH2zAEr6ln@phenom.ffwll.local>
+ <2fb36b50-4de2-4060-a4b7-54d221db8647@gmail.com>
+ <de8ade34-eb67-4bff-a1c9-27cb51798843@amd.com>
+ <Z36wV07M8B_wgWPl@phenom.ffwll.local>
+ <c42ae4f7-f5f4-4906-85aa-b049ed44d7e9@gmail.com>
+ <Z5waZsddenagCYtl@itl-email>
+ <7b0bf2d5-700a-4cc7-b410-a9b2e2083b5d@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, darren@os.amperecomputing.com, scott@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Wy7U6lvUah8lMeg3"
+Content-Disposition: inline
+In-Reply-To: <7b0bf2d5-700a-4cc7-b410-a9b2e2083b5d@amd.com>
 
-On Thu, 06 Feb 2025 16:41:20 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> With NV2 enabled, some of the EL1/EL2/EL12 register accesses are
-> transformed to memory accesses. This test code accesses all those
-> registers in guest code to validate that they are not trapped to L0.
->
 
-Traps to L0 are invisible to the guest -- by definition. What the
-guest can observe is an exception, be it injected by L0 or directly
-delivered by the HW.
+--Wy7U6lvUah8lMeg3
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 6 Feb 2025 13:21:04 -0500
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+To: "Huang, Honglei1" <Honglei1.Huang@amd.com>
+Cc: Demi Marie Obenour <demiobenour@gmail.com>,
+	Huang Rui <ray.huang@amd.com>,
+	Stefano Stabellini <stefano.stabellini@amd.com>,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org, David Airlie <airlied@redhat.com>,
+	dri-devel@lists.freedesktop.org,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Lingshan Zhu <Lingshan.Zhu@amd.com>,
+	Xen developer discussion <xen-devel@lists.xenproject.org>,
+	Kernel KVM virtualization development <kvm@vger.kernel.org>,
+	Xenia Ragiadakou <burzalodowa@gmail.com>,
+	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+Subject: Re: [RFC PATCH 3/3] drm/virtio: implement blob userptr resource
+ object
 
-But the *absence* of an exception doesn't mean things are fine. Quite
-the opposite.
+On Thu, Feb 06, 2025 at 06:53:55PM +0800, Huang, Honglei1 wrote:
+> On 2025/1/31 8:33, Demi Marie Obenour wrote:
+> > On Wed, Jan 29, 2025 at 03:54:59PM -0500, Demi Marie Obenour wrote:
+> > > On 1/8/25 12:05 PM, Simona Vetter wrote:
+> > > > On Fri, Dec 27, 2024 at 10:24:29AM +0800, Huang, Honglei1 wrote:
+> > > > >=20
+> > > > > On 2024/12/22 9:59, Demi Marie Obenour wrote:
+> > > > > > On 12/20/24 10:35 AM, Simona Vetter wrote:
+> > > > > > > On Fri, Dec 20, 2024 at 06:04:09PM +0800, Honglei Huang wrote:
+> > > > > > > > From: Honglei Huang <Honglei1.Huang@amd.com>
+> > > > > > > >=20
+> > > > > > > > A virtio-gpu userptr is based on HMM notifier.
+> > > > > > > > Used for let host access guest userspace memory and
+> > > > > > > > notice the change of userspace memory.
+> > > > > > > > This series patches are in very beginning state,
+> > > > > > > > User space are pinned currently to ensure the host
+> > > > > > > > device memory operations are correct.
+> > > > > > > > The free and unmap operations for userspace can be
+> > > > > > > > handled by MMU notifier this is a simple and basice
+> > > > > > > > SVM feature for this series patches.
+> > > > > > > > The physical PFNS update operations is splited into
+> > > > > > > > two OPs in here. The evicted memories won't be used
+> > > > > > > > anymore but remap into host again to achieve same
+> > > > > > > > effect with hmm_rang_fault.
+> > > > > > >=20
+> > > > > > > So in my opinion there are two ways to implement userptr that=
+ make sense:
+> > > > > > >=20
+> > > > > > > - pinned userptr with pin_user_pages(FOLL_LONGTERM). there is=
+ not mmu
+> > > > > > >     notifier
+> > > > > > >=20
+> > > > > > > - unpinnned userptr where you entirely rely on userptr and do=
+ not hold any
+> > > > > > >     page references or page pins at all, for full SVM integra=
+tion. This
+> > > > > > >     should use hmm_range_fault ideally, since that's the vers=
+ion that
+> > > > > > >     doesn't ever grab any page reference pins.
+> > > > > > >=20
+> > > > > > > All the in-between variants are imo really bad hacks, whether=
+ they hold a
+> > > > > > > page reference or a temporary page pin (which seems to be wha=
+t you're
+> > > > > > > doing here). In much older kernels there was some justificati=
+on for them,
+> > > > > > > because strange stuff happened over fork(), but with FOLL_LON=
+GTERM this is
+> > > > > > > now all sorted out. So there's really only fully pinned, or t=
+rue svm left
+> > > > > > > as clean design choices imo.
+> > > > > > >=20
+> > > > > > > With that background, why does pin_user_pages(FOLL_LONGTERM) =
+not work for
+> > > > > > > you?
+> > > > > >=20
+> > > > > > +1 on using FOLL_LONGTERM.  Fully dynamic memory management has=
+ a huge cost
+> > > > > > in complexity that pinning everything avoids.  Furthermore, thi=
+s avoids the
+> > > > > > host having to take action in response to guest memory reclaim =
+requests.
+> > > > > > This avoids additional complexity (and thus attack surface) on =
+the host side.
+> > > > > > Furthermore, since this is for ROCm and not for graphics, I am =
+less concerned
+> > > > > > about supporting systems that require swappable GPU VRAM.
+> > > > >=20
+> > > > > Hi Sima and Demi,
+> > > > >=20
+> > > > > I totally agree the flag FOLL_LONGTERM is needed, I will add it i=
+n next
+> > > > > version.
+> > > > >=20
+> > > > > And for the first pin variants implementation, the MMU notifier i=
+s also
+> > > > > needed I think.Cause the userptr feature in UMD generally used li=
+ke this:
+> > > > > the registering of userptr always is explicitly invoked by user c=
+ode like
+> > > > > "registerMemoryToGPU(userptrAddr, ...)", but for the userptr rele=
+ase/free,
+> > > > > there is no explicit API for it, at least in hsakmt/KFD stack. Us=
+er just
+> > > > > need call system call "free(userptrAddr)", then kernel driver wil=
+l release
+> > > > > the userptr by MMU notifier callback.Virtio-GPU has no other way =
+to know if
+> > > > > user has been free the userptr except for MMU notifior.And in UMD=
+ theres is
+> > > > > no way to get the free() operation is invoked by user.The only wa=
+y is use
+> > > > > MMU notifier in virtio-GPU driver and free the corresponding data=
+ in host by
+> > > > > some virtio CMDs as far as I can see.
+> > > > >=20
+> > > > > And for the second way that is use hmm_range_fault, there is a pr=
+edictable
+> > > > > issues as far as I can see, at least in hsakmt/KFD stack. That is=
+ the memory
+> > > > > may migrate when GPU/device is working. In bare metal, when memor=
+y is
+> > > > > migrating KFD driver will pause the compute work of the device in
+> > > > > mmap_wirte_lock then use hmm_range_fault to remap the migrated/ev=
+icted
+> > > > > memories to GPU then restore the compute work of device to ensure=
+ the
+> > > > > correction of the data. But in virtio-GPU driver the migration ha=
+ppen in
+> > > > > guest kernel, the evict mmu notifier callback happens in guest, a=
+ virtio CMD
+> > > > > can be used for notify host but as lack of mmap_write_lock protec=
+tion in
+> > > > > host kernel, host will hold invalid data for a short period of ti=
+me, this
+> > > > > may lead to some issues. And it is hard to fix as far as I can se=
+e.
+> > > > >=20
+> > > > > I will extract some APIs into helper according to your request, a=
+nd I will
+> > > > > refactor the whole userptr implementation, use some callbacks in =
+page
+> > > > > getting path, let the pin method and hmm_range_fault can be choic=
+ed
+> > > > > in this series patches.
+> > > >=20
+> > > > Ok, so if this is for svm, then you need full blast hmm, or the sem=
+antics
+> > > > are buggy. You cannot fake svm with pin(FOLL_LONGTERM) userptr, thi=
+s does
+> > > > not work.
+> > > >=20
+> > > > The other option is that hsakmt/kfd api is completely busted, and t=
+hat's
+> > > > kinda not a kernel problem.
+> > > > -Sima
+> > >=20
+> > > On further thought, I believe the driver needs to migrate the pages to
+> > > device memory (really a virtio-GPU blob object) *and* take a FOLL_LON=
+GTERM
+> > > pin on them.  The reason is that it isn=E2=80=99t possible to migrate=
+ these pages
+> > > back to "host" memory without unmapping them from the GPU.  For the r=
+easons
+> > > I mention in [1], I believe that temporarily revoking access to virti=
+o-GPU
+> > > blob objects is not feasible.  Instead, the pages must be treated as =
+if
+> > > they are permanently in device memory until guest userspace unmaps th=
+em
+> > > from the GPU, after which they must be migrated back to host memory.
+> >=20
+> > Discussion on IRC indicates that migration isn't reliable.  This is
+> > because Linux core memory management is largely lock-free for
+> > performance reasons, so there is no way to prevent temporary elevation
+> > of a page's reference count.  A page with an elevated reference count
+> > cannot be migrated.
+> >=20
+> > The only alternative I can think of is for the hypervisor to perform the
+> > migration.  The hypervisor can revoke the guest's access to the page
+> > without the guest's consent or involvement.  The host can then replace
+> > the page with one of its own pages, which might be on the CPU or GPU.
+> > Further migration between the CPU and GPU is controlled by the host
+> > kernel-mode driver (KMD) and host kernel memory management.  The guest
+> > kernel driver must take a FOLL_LONGTERM pin before telling the host to
+> > use the pages, but that is all.
+> >=20
+> > On KVM, this should be essentially automatic, as guest memory really is
+> > just host userspace memory.  On Xen, this requires that the backend
+> > domain can revoke fronted access to _any_ frontend page, or at least
+> > frontend pages that have been granted to the backend.  The backend will
+> > then need to be able to handle page faults for the frontend pages, and
+> > replace the frontend pages with its own pages at will.  Furthermore,
+> > revoking pages that the backend has installed into the frontend must
+> > never fail, because the backend will panic if it does fail.
+> >=20
+> > Sima, is putting guest pages under host kernel control the only option?
+> > I thought that this could be avoided by leaving the pages on the CPU if
+> > migration fails, but that won't work because there will be no way to
+> > migrate them to the GPU later, causing performance problems that would
+> > be impossible to debug.  Is waiting (possibly forever) on migration to
+> > finish an option?  Otherwise, this might mean extra complexity in the
+> > Xen hypervisor, as I do not believe the primitives needed are currently
+> > available.  Specifically, in addition to the primitives discussed at Xen
+> > Project Summit 2024, the backend also needs to intercept access to, and
+> > replace the contents of, arbitrary frontend-controlled pages.
+>=20
+> Hi Demi,
+>=20
+> I agree that to achieve the complete SVM feature in virtio-GPU, it is
+> necessary to have the hypervisor deeply involved and add new features.
+> It needs solid design, I saw the detailed reply in a another thread, it
+> is very helpful,looking forward to the response from the Xen/hypervisor
+> experts.
 
-> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-> ---
->  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->  .../selftests/kvm/arm64/nv_vncr_regs_test.c   | 255 ++++++++++++++++++
->  2 files changed, 256 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/arm64/nv_vncr_regs_test.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index a85d3bec9fb1..7790e4021013 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -155,6 +155,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
->  TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
->  TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
->  TEST_GEN_PROGS_arm64 += arm64/nv_guest_hypervisor
-> +TEST_GEN_PROGS_arm64 += arm64/nv_vncr_regs_test
->  TEST_GEN_PROGS_arm64 += access_tracking_perf_test
->  TEST_GEN_PROGS_arm64 += arch_timer
->  TEST_GEN_PROGS_arm64 += coalesced_io_test
-> diff --git a/tools/testing/selftests/kvm/arm64/nv_vncr_regs_test.c b/tools/testing/selftests/kvm/arm64/nv_vncr_regs_test.c
-> new file mode 100644
-> index 000000000000..d05b20b828ff
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/arm64/nv_vncr_regs_test.c
-> @@ -0,0 +1,255 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) 2025 Ampere Computing LLC
-> + *
-> + * This is a test to validate Nested Virtualization.
-> + */
-> +#include <kvm_util.h>
-> +#include <nv_util.h>
-> +#include <processor.h>
-> +#include <vgic.h>
-> +
-> +#define __check_sr_read(r)					\
-> +	({							\
-> +		uint64_t val;					\
-> +								\
-> +		handled = false;				\
-> +		dsb(sy);					\
-> +		val = read_sysreg_s(SYS_ ## r);			\
-> +		val;						\
-> +	})
-> +
-> +#define __check_sr_write(r)					\
-> +	do {							\
-> +		handled = false;				\
-> +		dsb(sy);					\
-> +		write_sysreg_s(0, SYS_ ## r);			\
-> +		isb();						\
-> +	} while (0)
-> +
-> +
-> +#define check_sr_read(r)					  \
-> +	do {							  \
-> +		__check_sr_read(r);				  \
-> +		__GUEST_ASSERT(!handled, #r "Read Test Failed");  \
-> +	} while (0)
-> +
-> +#define check_sr_write(r)					  \
-> +	do {							  \
-> +		__check_sr_write(r);				  \
-> +		__GUEST_ASSERT(!handled, #r "Write Test Failed"); \
-> +	} while (0)
-> +
-> +#define check_sr_rw(r)				\
-> +	do {					\
-> +		GUEST_PRINTF("%s\n", #r);	\
-> +		check_sr_write(r);		\
-> +		check_sr_read(r);		\
-> +	} while (0)
+=46rom further discussion with Sima, I suspect that virtio-GPU cannot
+support SVM with reasonable performance.  Native contexts have such good
+performance for graphics workloads because graphics workloads very rarely
+perform blocking waits for host GPU operations to complete, so one can
+make all frequently-used operations asynchronous and therefore hide the
+guest <=3D> host latency.  SVM seems to require many synchronous GPU
+operations, and I believe those will severely harm performance with
+virtio-GPU.
 
-Instead of lifting things from existing tests, you could move these
-things to an include file for everybody's benefit.
+If you need full SVM for your workloads, I recommend using hardware
+SR-IOV.  This should allow the guest to perform GPU virtual memory
+operations without host involvement, which I expect will be much faster
+than paravirtualizing these operations.  Scalable I/O virtualization
+might also work, but it might also require paravirtualizing the
+performance-critical address-space operations unless the hardware has
+stage 2 translation tables.
 
-> +
-> +static void test_vncr_mapped_regs(void);
-> +static void regs_test_ich_lr(void);
-> +
-> +static volatile bool handled;
-> +
-> +static void regs_test_ich_lr(void)
-> +{
-> +	int nr_lr, lr;
-> +
-> +	nr_lr  = (read_sysreg_s(SYS_ICH_VTR_EL2) & 0xf);
-> +
-> +	for (lr = 0; lr <= nr_lr;  lr++) {
-> +		switch (lr) {
-> +		case 0:
-> +			check_sr_rw(ICH_LR0_EL2);
-> +			break;
-> +		case 1:
-> +			check_sr_rw(ICH_LR1_EL2);
-> +			break;
-> +		case 2:
-> +			check_sr_rw(ICH_LR2_EL2);
-> +			break;
-> +		case 3:
-> +			check_sr_rw(ICH_LR3_EL2);
-> +			break;
-> +		case 4:
-> +			check_sr_rw(ICH_LR4_EL2);
-> +			break;
-> +		case 5:
-> +			check_sr_rw(ICH_LR5_EL2);
-> +			break;
-> +		case 6:
-> +			check_sr_rw(ICH_LR6_EL2);
-> +			break;
-> +		case 7:
-> +			check_sr_rw(ICH_LR7_EL2);
-> +			break;
-> +		case 8:
-> +			check_sr_rw(ICH_LR8_EL2);
-> +			break;
-> +		case 9:
-> +			check_sr_rw(ICH_LR9_EL2);
-> +			break;
-> +		case 10:
-> +			check_sr_rw(ICH_LR10_EL2);
-> +			break;
-> +		case 11:
-> +			check_sr_rw(ICH_LR11_EL2);
-> +			break;
-> +		case 12:
-> +			check_sr_rw(ICH_LR12_EL2);
-> +			break;
-> +		case 13:
-> +			check_sr_rw(ICH_LR13_EL2);
-> +			break;
-> +		case 14:
-> +			check_sr_rw(ICH_LR14_EL2);
-> +			break;
-> +		case 15:
-> +			check_sr_rw(ICH_LR15_EL2);
-> +			break;
-> +		default:
-> +			break;
-> +		}
-> +	}
-> +}
-> +
-> +/*
-> + * Validate READ/WRITE to VNCR Mapped registers for NV1=0
-> + */
-> +
-> +static void test_vncr_mapped_regs(void)
-> +{
-> +	/*
-> +	 * Access all VNCR Mapped registers, and fail if we get an UNDEF.
-> +	 */
+> So for the current virito-GPU userptr implementation, It can not support =
+the
+> full SVM feature, it just can only let GPU access the user space memory,
+> maybe can be called by userptr feature. I think I will finish this small
+> part firstly and then to try to complete the whole SVM feature.
 
-No. You are accessing a lot of random registers, irrespective of the
-configuration exposed to the guest. Being able to access it is not an
-indication of correctness. Seeing it UNDEF is not an indication of a
-bug.
+I think you will still have problems if the host is able to migrate
+pages in any way.  This requires that the host install an MMU notifier
+for the pages it has received from the guest, which in turn implies that
+the host must be able to prevent the guest from accessing the pages.
+If the pages are used in grant table operations, this isn't possible.
 
-Also, this is supposed to be an EL2 test that doesn't deal with NV
-*itself*. There is no VNCR page in this test. The fact that the host
-uses VNCR as a way to virtualise EL2 has nothing to do with the test
-at all.
+If you are willing to have the pages be pinned on the host side things
+are much simpler.  Such pages will always be in system memory, and will
+never be able to migrate to VRAM.  This will result in a performance
+penalty and will likely require explicit prefetching by programs using
+ROCm, but this may be acceptable for your use-cases.  The performance
+penalty is the same as that with XNACK disabled, which is the case for
+all RDNA2+ GPUs, so all code that aims to be portable to recent consumer
+hardware will have to account for it anyway.
+--=20
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+Invisible Things Lab
 
-> +
-> +	GUEST_PRINTF("VNCR Mapped registers access test:\n");
-> +	check_sr_rw(VTTBR_EL2);
-> +	check_sr_rw(VTCR_EL2);
-> +	check_sr_rw(VMPIDR_EL2);
-> +	check_sr_rw(CNTVOFF_EL2);
-> +	check_sr_rw(HCR_EL2);
-> +	check_sr_rw(HSTR_EL2);
-> +	check_sr_rw(VPIDR_EL2);
-> +	check_sr_rw(TPIDR_EL2);
-> +	check_sr_rw(VNCR_EL2);
-> +	check_sr_rw(CPACR_EL12);
-> +	check_sr_rw(CONTEXTIDR_EL12);
-> +	check_sr_rw(SCTLR_EL12);
-> +	check_sr_rw(ACTLR_EL1);
-> +	check_sr_rw(TCR_EL12);
-> +	check_sr_rw(AFSR0_EL12);
-> +	check_sr_rw(AFSR1_EL12);
-> +	check_sr_rw(ESR_EL12);
-> +	check_sr_rw(MAIR_EL12);
-> +	check_sr_rw(AMAIR_EL12);
-> +	check_sr_rw(MDSCR_EL1);
-> +	check_sr_rw(SPSR_EL12);
-> +	check_sr_rw(CNTV_CVAL_EL02);
-> +	check_sr_rw(CNTV_CTL_EL02);
-> +	check_sr_rw(CNTP_CVAL_EL02);
-> +	check_sr_rw(CNTP_CTL_EL02);
-> +	check_sr_rw(HAFGRTR_EL2);
-> +	check_sr_rw(TTBR0_EL12);
-> +	check_sr_rw(TTBR1_EL12);
-> +	check_sr_rw(FAR_EL12);
-> +	check_sr_rw(ELR_EL12);
-> +	check_sr_rw(SP_EL1);
-> +	check_sr_rw(VBAR_EL12);
-> +
-> +	regs_test_ich_lr();
-> +
-> +	check_sr_rw(ICH_AP0R0_EL2);
-> +	check_sr_rw(ICH_AP1R0_EL2);
-> +	check_sr_rw(ICH_HCR_EL2);
-> +	check_sr_rw(ICH_VMCR_EL2);
-> +	check_sr_rw(VDISR_EL2);
+--Wy7U6lvUah8lMeg3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-This should absolutely UNDEF in the absence of FEAT_RAS exposed to the
-guest. And yet it won't. Why? That's because the architecture doesn't
-allow this to be trapped. Does it mean being able to access it is
-right? Absolutely not. This is an *architecture* bug.
+-----BEGIN PGP SIGNATURE-----
 
-> +	check_sr_rw(MPAM1_EL12);
+iQIzBAEBCAAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmek/ZEACgkQszaHOrMp
+8lNGXw/+JUcT/GOzV8A1jCU1gkU9B3O6PrKXJSBccmciRNQBRhG/MkAFmCJW3Ygs
+aGnDjn1AxkaMpbgBi0Wo8nI0mAcs1WCKk4G98qIno6CoIFLB76mqA6x/6bI/atZO
+TP9lnrd6ERZrnmDobjxujKOP2pgXAKGX07xJWrPbUioi/BgDlSXShU0/Qs9o2jp5
+egERRdAi2CPDEQXPw8KKT6Agonl8IQNm1JHmknUeUFlIEkyDxRtdSISCYycCRir7
+zS44mhQDAfuL4jR0m3nOu9PUFjJdHdzssFiX1qAhdE1lZLu6aJWFpoTACqL1hYJf
+6sMv+VC6H+thwDXSUgvPepNYrwyS4kDKRWxfMV2JW0zoR8XVaXG4Y5gnNpClwz4I
+xIYqxmXUSWS9yPRL/MjtdrmrFqAhUY3YhxZ1PKE2KoEeNDqlkxPqJbAiBy5sNFDF
+OYRCprX1HWWcK76WAn1ZseV5V/pXMM1wYZ5iiIQd0Z2f5T4AE/u7mb5EQT8ZNiNv
+VNONuV9FMjcWqIEOcKsaVjYwHYT7CkWsoOw4R5zncapWzh4pK+1T8TQtQjwZG5os
+YkZxR8//nYf5eRUfWtSq3OsQdC4lxQBCi3xFDCOTqmu8E/FbJ9JY5vzOjr0NDrsa
+qtnwJbThJPqTXFvBQQ+luTLEo8tgLhsChI35gfQGv8fylU0Zc7o=
+=tP4G
+-----END PGP SIGNATURE-----
 
-This should UNDEF in the test if the configuration doesn't expose MPAM
-to the guest. And I really hope it explodes or this is a glaring bug,
-because MPAM should never be exposed to a guest.
-
-The conclusion is that blindly testing that you can R/W registers buys
-us nothing if you are not checking the validity of the access against
-the architecture rules.
-
-Any test should take as input:
-
-- the configuration of the guest
-
-- the expected outcome of the access for that particular configuration
-  and trap configuration, as described in the ARM ARM pseudocode (or,
-  even better, in the BSD-licensed JSON file that has all that
-  information)
-
-The result of the access must then be matched against these inputs and
-any discrepancy reported, either as fatal (because the outcome of the
-access wasn't the expected one) or as an expected, non-fatal failure
-(because we know that the architecture is not self-consistent).
-
-Yes, this looks a lot like a full CPU validation suite. What a
-surprise.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--Wy7U6lvUah8lMeg3--
 
