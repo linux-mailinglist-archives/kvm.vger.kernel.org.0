@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-37526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37527-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65279A2B23D
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 20:29:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF12EA2B23E
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 20:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 926C13A4CE0
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 19:28:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A41FC188A7B7
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 19:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C641A705C;
-	Thu,  6 Feb 2025 19:29:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ECE51A727D;
+	Thu,  6 Feb 2025 19:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lgaRqJ9K"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pudBIbNd"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2074.outbound.protection.outlook.com [40.107.223.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6042D19ABD4
-	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 19:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BEA1A5B96
+	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 19:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.74
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738870141; cv=fail; b=IxocjXlKAbjDq3xs4cxNKzp10OVQkjB9i+EOH03Hau1oR3oS1pd5LPOh7m4MO3EMcbPD9wiTeyadwNkkUC+72RKvbvYBAEdPAyyPa0QMCMQ4/kGI+RU2shymRoaoBdd9gvpy/m/h7qOyS1nAqdsWfYg56fudbKVImT5pfzzm+s4=
+	t=1738870148; cv=fail; b=tajbW5TzRgA5JTJDBXUei1HgX/Hw/rXbBWb1ERvxwKj43oJXaywNFuFfYMbLSNm2a/oGBMyN3SQdk130uAFJz9IobE/Bie7KG4nNjg38COXBpViFRcZs4vuEh0CFGYuTDSImse8+tx7e5ETdwi5/nHcOYcuSmo7TWKgFm/aVkBw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738870141; c=relaxed/simple;
-	bh=kJ0YbHO7p9wOcjYU6GDlHaQARwAxXagdhxJUMW1g0/Y=;
+	s=arc-20240116; t=1738870148; c=relaxed/simple;
+	bh=GKOMXiEyDec7b1irHvrChAs7CuVxF67PLvz3/mzd5Vc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j+asrSNCL2s83pDE0b8sBGo90A2Y4/MmPduJasLITQDBONP2toSoVktZoNzdx2pAUB8mmQoGNXA6D5fcf+a6Z16lJLKZQjFVoBDQBvekIpiEkVQtmLbFoLd9ji1uOk7n43wQ3uDmBX0RBpJrL4UTtT2+n1k35ZmeKfe5dIVwuKE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lgaRqJ9K; arc=fail smtp.client-ip=40.107.93.61
+	 MIME-Version:Content-Type; b=O8j7xpIvg9NEPdUNLOBwYW8K36IlxeFtb6g1TEQ9lNSe1VmfA8PXG4e62nbPUWjvbSU6RzPiD62oRbNvjxRDR+s3M1TVWQ8ujSvxXlIvDVVGxQiLVjP4FpWpjCJCd9un+TNL06PLxNvnsSIA2HCHTYOK88MikzYbvjNng5gSkyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pudBIbNd; arc=fail smtp.client-ip=40.107.223.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZBOS87oXBl1Oe/eroByCCynlc0M8C7ms3EjC+HaOXyr20IAOthKlp6YEnRFoZznF5kRv0jWXFM2KA+5t9cY5M0HhptQQo4L57B93zYEguKzE3x6pGL+twSTDVlxUDBuF0YhYZB9Xwh2PAvbc/NLyQUii7u68jka5GAw0qJ9tQZuQTsm8K5XOyFmlP70HflcgZm09+tFBx8Qhew69YP/9f26cqjfIFpWt4Pdc1rxuixsIYkx11l1HiotM9fNoDc6aVZQydDL2Nj49jS35dJa7LTReFpOE50lG+9wFpJ0ZKSyLJDI4ZCnAzVMr6KJuKTxvHS849eELf4Qae96AGiMmQg==
+ b=MKMWsvO+yk2ZSdVXYcnv8RMPWmnkWpwTnlGbW5lbhCr+6aNiHaCJeqwChR6XVUOfCcdDXraa0k84JlfkQo/ViE12TEBIxr9V0MEkNa38mGZPvrtrM/0XhjVsh+Sy9+a1tvuXWvoWLnjyC0SJhoDncUssqQ/Uvwg+UTK7nx/x6ayJ+CiSFxB0EF5M4YW2jX9QjIVxS3vdRa80U7QokFEiT/dkVKWJNq/Ywg7Gs4rJmlbdCNDP8moyktXXpweKv+XsoD6Eg9LpYtRImrVD3WJ62luGoOeHfnjdUHmMNkGGGWcV4O4IrubaWfmcwhY5FDeor7yP/bVzg8TvOkf1hHDEJA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=enr+DHDvQqAFRHWpl+NJ7W+NDyzzeyjea5PAjr3elMY=;
- b=EmYJEOAAhZEDta8I8pXYRTKj/aHkZQSTDq6GbAZNOw/yi/NgukT+PDjeapUy+3FExT3faBXcbx45G4/agSS+VTcCa78RREuzDFKu8AuazUKDx9DxEfQCXxYwcvYN5U3h7YulXO5PPbXegx+eZr34BIyVGd4xP3eiavsPnlpdbi01lvSJIz5MlOwmFzjvHvNmQ+fzCzjjuVB7/iQr+NL+s12TwH61P088hfZzyp6z1Yq0ma4DXdcvfphHfDObGNZYOja8C+BzlrWJMSPAGK2REvRt2zRELD7Q+v72XAX245MDINecZfAx0FSGxdBE+UgpRMGRBaV87V0DSiP9LwaIVQ==
+ bh=ga/T1i8IQJItMYvM8ZplQ8QieS1uvKo9NsII9ZUje0M=;
+ b=MOa2W8IVWSbkPfXKPU55Nrv7L9b2A+75epjqVY7U+v7NpFVwc0ZRolrU4Sz+99WWakqPgYVi8z3d3ol5rjlOR8Wj//S8qV6kHO5b9ZWxKCo4GLn9Kt/kaf94kBVvvh2uYv9TJKOSL0HWl7S5ddtuA+Z5eUykwsgRhYQ13opIWQPnlXtONnokjY5G4/31s4Nqt4OfNG7MOpBcKXTRRvuVHKngmZYEJ+ogmfpsf7Kr2gpMAr3mLcWYHBnq2H8Uel0lBGuV0rHWDFxw48i1wPY/GZu5P8zcN0wBF+9iupbRpBTBLyAfTn5QN6O8Ehn2gOqgqUDJxLdKqau/6vIngGrd7A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=enr+DHDvQqAFRHWpl+NJ7W+NDyzzeyjea5PAjr3elMY=;
- b=lgaRqJ9KyAG2PsKyMrBEAzBBc4Hh9LeqmJeNgtTRuFm6DPXJoLKy2KvVxvYDMSiTtj/NKyaM98ZkgE2hsJj9RGzIrltK5jcTneXM8DFU+hB/vkowxlnHObxgOOuXTq5Xe4E2eRvZM4BfGQqZe49ASJ8Jy7vt2sr4yP3PV0UWViI=
+ bh=ga/T1i8IQJItMYvM8ZplQ8QieS1uvKo9NsII9ZUje0M=;
+ b=pudBIbNduJzW69OeY8oErq7Ng3PwmOoWSx+rxnitIxKAgS+08Kf0SXAqrzy6aZqqGQDDBqFuKpY107LHG5+BB68p1O8+1Aj+7iCkglcF5oHhJFSGIJe6vbLMMxM5natWErIKD48bJQ7yVZ7kwwx7cnYVOvkZqUK0PUJLzPal2nI=
 Received: from CH2PR05CA0048.namprd05.prod.outlook.com (2603:10b6:610:38::25)
- by PH7PR12MB8154.namprd12.prod.outlook.com (2603:10b6:510:2b9::14) with
+ by CY8PR12MB7612.namprd12.prod.outlook.com (2603:10b6:930:9c::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Thu, 6 Feb
- 2025 19:28:54 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Thu, 6 Feb
+ 2025 19:29:04 +0000
 Received: from CH3PEPF00000012.namprd21.prod.outlook.com
- (2603:10b6:610:38:cafe::d0) by CH2PR05CA0048.outlook.office365.com
+ (2603:10b6:610:38:cafe::5e) by CH2PR05CA0048.outlook.office365.com
  (2603:10b6:610:38::25) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.24 via Frontend Transport; Thu,
- 6 Feb 2025 19:28:54 +0000
+ 6 Feb 2025 19:29:04 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,18 +65,18 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CH3PEPF00000012.mail.protection.outlook.com (10.167.244.117) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8445.2 via Frontend Transport; Thu, 6 Feb 2025 19:28:54 +0000
+ 15.20.8445.2 via Frontend Transport; Thu, 6 Feb 2025 19:29:04 +0000
 Received: from bmoger-ubuntu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 6 Feb
- 2025 13:28:52 -0600
+ 2025 13:29:00 -0600
 From: Babu Moger <babu.moger@amd.com>
 To: <pbonzini@redhat.com>
 CC: <zhao1.liu@intel.com>, <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
 	<davydov-max@yandex-team.ru>
-Subject: [PATCH v5 1/6] target/i386: Update EPYC CPU model for Cache property, RAS, SVM feature bits
-Date: Thu, 6 Feb 2025 13:28:34 -0600
-Message-ID: <c777bf763a636c8922164a174685b4f03864452f.1738869208.git.babu.moger@amd.com>
+Subject: [PATCH v5 2/6] target/i386: Update EPYC-Rome CPU model for Cache property, RAS, SVM feature bits
+Date: Thu, 6 Feb 2025 13:28:35 -0600
+Message-ID: <8e40e18b433d2d152433724a15bddcacdecbf154.1738869208.git.babu.moger@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1738869208.git.babu.moger@amd.com>
 References: <cover.1738869208.git.babu.moger@amd.com>
@@ -92,52 +92,52 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000012:EE_|PH7PR12MB8154:EE_
-X-MS-Office365-Filtering-Correlation-Id: a444005d-e31d-4484-9560-08dd46e47e9a
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000012:EE_|CY8PR12MB7612:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1bf16c0-f9f4-4745-3c7d-08dd46e48438
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ukFxP/oiLw4uGNWGeWLwaSyi85sWHD0iEnpy6hiacBTWDMUUsJdgpsQiqoJb?=
- =?us-ascii?Q?hQ0C43+QuknAAzzuZPJchTjt0CGrPI4IBgUSkqCZJgRKgqSq35mw0Ck+XUEk?=
- =?us-ascii?Q?YcmpAZBhiq78lmbzSTLq5vGBYZrBYzUgbgnXnlaD5CnMVeUSJ7RBoFCJFatY?=
- =?us-ascii?Q?zx1byeokqD+NnF9S3KsojaLAvS6dOlCbAsscebLrPlG12i6Yrq+QT+4F7d+I?=
- =?us-ascii?Q?dWHHxPrU9w1TYo724bEmuf72zRLm7exUjH7XcK0ebsSjTKucmonjmfTmKUyT?=
- =?us-ascii?Q?HyDsxAsfEjip1dKCAV86Qc2x0kScQ2On+1APYBT4jfsKDXLBsmrxK9vdn0dZ?=
- =?us-ascii?Q?0pQ8jEHHQUhPvHLduki3TJWN6a6aHxbRtHkjBGXr2fgBFu03Kj2eSPShKCS/?=
- =?us-ascii?Q?MvofRVGGU4xTZ59m0gFBZ35zOE3IH2IMTykQ4vn7xkttcjto5YGvkJco/bvT?=
- =?us-ascii?Q?BPWDHH/FVxxoy7u3YfthoFEYbqIFHCBfF3ujDo45HOKDkliu2LidDaewGRMp?=
- =?us-ascii?Q?jR1qGYOV0VYOGB8Xf55jg7dVU44uqLy/u90iQl4DCnzG5NfIjypyk62Gk+0N?=
- =?us-ascii?Q?l0NtEp/GmZJ+82G+iUkydEUyUV35cTgma5tuAtAq4j43QxvI9UyF1cuJvePb?=
- =?us-ascii?Q?b0fCHf/nUQO0V2JOdKagmgUX7mAwA8idCtEz6aPbYcrcWIiGPbSjfN2rr7mL?=
- =?us-ascii?Q?Vg4XqxEmXRK+UGs+/SCpaFYzZuvNBiIFFtQ3qvGUiTmP3MnXFG2HxVfJate7?=
- =?us-ascii?Q?/bzj2+9Fbq+0dS/7GLkDHVi3c71Hb/P40JOZ8vSWa+3JyBB4+1zMtpPmtWrN?=
- =?us-ascii?Q?8exUfeVfnOjgE9Bkukkw6xTibhCibQ1C/86M4xGQuv7UeoYx6aWfck8f+U7M?=
- =?us-ascii?Q?b3b86vkuLrK2Gn16KPWg96wMnMJLK/R2y6YL2uO4D570iABXjd1D7za2jPOV?=
- =?us-ascii?Q?aL18WlwQf0d281+iMYKbgA/r5KWU4DcBoJReUpUMwWKHB7dyHbim2sGupI3j?=
- =?us-ascii?Q?28SN4CmjnCLyq6WVljhg/0iTfcbXIaX55KX7mbsLkwlBjbUWOZ+/wfOBX8jQ?=
- =?us-ascii?Q?vLnPoKFE1MkSZIQ/LeN2zNzhiM0Eu5BbsoJy9jiarhZV6KF42t5DVxLRjsim?=
- =?us-ascii?Q?6gl0uVqX5yRuQxtvElIaQ39B9+es67eedxpWwb2CmjxcOVLOs5jNYZ5Xwz8C?=
- =?us-ascii?Q?GDPyoM2DFv56W2D4eltYXjasWGvlnDTwKxYcELfNZs2PY2Nex/SiIgFzZOr7?=
- =?us-ascii?Q?SYHD+Y80eeB12RoYnRHffJn+4VZMcLm8XXtYMmq179CQTqhcoI6kL488oKZP?=
- =?us-ascii?Q?yb2L6XLJVpSAbl2o2ofsb3RrPP4wXPwXcnxEAqf167xUlV08HoNKHXAEwO76?=
- =?us-ascii?Q?sCNAFZAHxPc9XMjosgk0zwerkdUKx6Xb3LuGuVlRbNG998jwRkWnEBxI3+B5?=
- =?us-ascii?Q?Ff+y82ySinmAsvdmoMzwKEn0UxeicT+0hioCped0NmYLJhRiLtfZRqou/Tz2?=
- =?us-ascii?Q?UX8lVTLrkQXUuKI=3D?=
+	=?us-ascii?Q?snHrAFgU8ozjXtNkKEUy9kt3iYNe3UABpRdHVO0lJMS2QCjY+5o1zi1DbSs2?=
+ =?us-ascii?Q?JHnOBI6yyzDH3Uf7FI1zWXe7vg8zO6bsFHyoku0sgDt3XhXRA30+46g+76qA?=
+ =?us-ascii?Q?aKoZLyUtCzIfxjWr1+MIpHa8B3lAsMPNYfWINY/tpdeI2iHYEGDQUCLIP6qU?=
+ =?us-ascii?Q?dP3J+qCI8e9N4C14tZW77QTN2FhF3o5R5RFnd9dBu1M2EUi62AGseL+Dn4n1?=
+ =?us-ascii?Q?de4LoKG7ApCRIGUE99ZYuWdZO7IuQaUwOyag6boRtwp6KKRtakEd60kOhNlG?=
+ =?us-ascii?Q?K5LdFvhuD2aWCskTGotWMhUrar2YqDr8LbHUV5HGVy2lmrTXMpdF1NXXG8mf?=
+ =?us-ascii?Q?Fxs3CYWwjGQLgzwnrMT+8fpmGuMTNLUw+UJQWaV/bHwTwgVPX/BwR3wPVDHO?=
+ =?us-ascii?Q?UJfOStoq3OGlRpebifhPUS/3SrOw1HFXu4RAEx3/zVdNLxjmZi6y/4v8L1q0?=
+ =?us-ascii?Q?8Yei5JT2Lwip/MHcedbIIIpgoups/Fm+afmsItarkG+ykd0vAIR130Od3LoK?=
+ =?us-ascii?Q?FhSOTSHFaBqx6d/L0oxKPlQ9X3rKMYUA1Vb7FdD9R8pd6hmY6pNgnZBz7iBE?=
+ =?us-ascii?Q?ogWrkEtAm2+AgGOhpc97o3I6c+vOVTzXwBotP/GLjhlWRPJnxuwRTBeBk6Hf?=
+ =?us-ascii?Q?iN3vRzF4eJ3lT88+sLh2CXrlRI1lNrL4KTt3WrK2MuLdbYqRkTbg/LupbsOX?=
+ =?us-ascii?Q?FzGkjlL69Ty++1G8tFLqusTLB2+r/nM5TaIuqU7HmX6dJg9yKR0L8b8javTG?=
+ =?us-ascii?Q?VxVEaXF7uQRjid/2rhwQ3d0ANQehJZZtkU8K2reSnlYozrZYFkTjjoVoBh+R?=
+ =?us-ascii?Q?jgQzaYsE0sAA7ku6a7APkF6lm7XQdVpgeqhzrh4JA5GmTOPjSshEWIa9XTMw?=
+ =?us-ascii?Q?hJMVSso5j6Wkh4MRXAGaPs6zrTRD3mtlUe+OS7WBk4/uuyzXPWB82b8+CkZB?=
+ =?us-ascii?Q?tU0640aztScHQXtziUzNkDA3dtiXiKx66XejQ0MUh67/hhfhsncxlhPW/m64?=
+ =?us-ascii?Q?e+1c8710W2d2x8xDLOA/uhVNaZXlpgSQi5dTDbPK6YBw/rqMzSi04+LC2Hrl?=
+ =?us-ascii?Q?jb2OYBp74nsYLKoSVy47L1CuP2u2eWyc6LvaHGWlocEkGBOa9VSkLChWygZz?=
+ =?us-ascii?Q?dcQYEAy4kGjB+YjnYkuBieeAn/x1bAQmv1aW4+iAEF1ttkeeNWBXwQziZVwg?=
+ =?us-ascii?Q?KJWx1iuxGM9NQoXnCxhsR9iN1tTQLqXxU3mQNJ/elYAaUaeBmQVV0N0cHGM9?=
+ =?us-ascii?Q?MAKT6S5YAlqE8L560srZC2Q6av3BHm9SbPQyP6+Vq6gWgVw6L4VTBYEMxVek?=
+ =?us-ascii?Q?upBQe8ROC/TN8yVFHvFXTaYgPbrKqfo5TyD/cyFy1noouFymfZn8B8wrOvOB?=
+ =?us-ascii?Q?Wm7bQwlzUAmjmsF/V0t8c5NuYhM9r5aQ8OK/VhavL9eNgQfxrIJ+8QukVauG?=
+ =?us-ascii?Q?xDXSi2WMHzwYzV8+m920EYU2LPS2mztm9bu0gIe0x+xhJhCwjiCCjnnkFkl9?=
+ =?us-ascii?Q?v94vs4ILYdYAerc=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2025 19:28:54.6245
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2025 19:29:04.0463
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a444005d-e31d-4484-9560-08dd46e47e9a
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1bf16c0-f9f4-4745-3c7d-08dd46e48438
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	CH3PEPF00000012.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8154
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7612
 
 Found that some of the cache properties are not set correctly for EPYC models.
 
@@ -150,10 +150,10 @@ L2.inclusive should be true.
 L3.inclusive should not be true.
 L3.no_invd_sharing should be true.
 
-Fix the cache properties.
+Fix these cache properties.
 
-Also add the missing RAS and SVM features bits on AMD
-EPYC CPU models. The SVM feature bits are used in nested guests.
+Also add the missing RAS and SVM features bits on AMD EPYC-Rome. The SVM
+feature bits are used in nested guests.
 
 succor		: Software uncorrectable error containment and recovery capability.
 overflow-recov	: MCA overflow recovery support.
@@ -173,14 +173,14 @@ Reviewed-by: Maksim Davydov <davydov-max@yandex-team.ru>
  1 file changed, 73 insertions(+)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b5dd60d281..94292bfaa2 100644
+index 94292bfaa2..e2c3c797ed 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -2180,6 +2180,60 @@ static CPUCaches epyc_v4_cache_info = {
+@@ -2342,6 +2342,60 @@ static const CPUCaches epyc_rome_v3_cache_info = {
      },
  };
  
-+static CPUCaches epyc_v5_cache_info = {
++static const CPUCaches epyc_rome_v5_cache_info = {
 +    .l1d_cache = &(CPUCacheInfo) {
 +        .type = DATA_CACHE,
 +        .level = 1,
@@ -196,11 +196,11 @@ index b5dd60d281..94292bfaa2 100644
 +    .l1i_cache = &(CPUCacheInfo) {
 +        .type = INSTRUCTION_CACHE,
 +        .level = 1,
-+        .size = 64 * KiB,
++        .size = 32 * KiB,
 +        .line_size = 64,
-+        .associativity = 4,
++        .associativity = 8,
 +        .partitions = 1,
-+        .sets = 256,
++        .sets = 64,
 +        .lines_per_tag = 1,
 +        .self_init = 1,
 +        .share_level = CPU_TOPOLOGY_LEVEL_CORE,
@@ -221,11 +221,11 @@ index b5dd60d281..94292bfaa2 100644
 +    .l3_cache = &(CPUCacheInfo) {
 +        .type = UNIFIED_CACHE,
 +        .level = 3,
-+        .size = 8 * MiB,
++        .size = 16 * MiB,
 +        .line_size = 64,
 +        .associativity = 16,
 +        .partitions = 1,
-+        .sets = 8192,
++        .sets = 16384,
 +        .lines_per_tag = 1,
 +        .self_init = true,
 +        .no_invd_sharing = true,
@@ -234,12 +234,12 @@ index b5dd60d281..94292bfaa2 100644
 +    },
 +};
 +
- static const CPUCaches epyc_rome_cache_info = {
+ static const CPUCaches epyc_milan_cache_info = {
      .l1d_cache = &(CPUCacheInfo) {
          .type = DATA_CACHE,
-@@ -5207,6 +5261,25 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+@@ -5418,6 +5472,25 @@ static const X86CPUDefinition builtin_x86_defs[] = {
+                     { /* end of list */ }
                  },
-                 .cache_info = &epyc_v4_cache_info
              },
 +            {
 +                .version = 5,
@@ -255,10 +255,10 @@ index b5dd60d281..94292bfaa2 100644
 +                    { "v-vmsave-vmload", "on" },
 +                    { "vgif", "on" },
 +                    { "model-id",
-+                      "AMD EPYC-v5 Processor" },
++                      "AMD EPYC-Rome-v5 Processor" },
 +                    { /* end of list */ }
 +                },
-+                .cache_info = &epyc_v5_cache_info
++                .cache_info = &epyc_rome_v5_cache_info
 +            },
              { /* end of list */ }
          }
