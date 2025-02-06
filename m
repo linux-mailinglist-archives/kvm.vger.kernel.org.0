@@ -1,216 +1,236 @@
-Return-Path: <kvm+bounces-37466-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37467-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0407A2A4DD
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:43:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 214A5A2A4F2
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:46:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCBBF188799D
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:43:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2DC2162335
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1267376;
-	Thu,  6 Feb 2025 09:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD4122687B;
+	Thu,  6 Feb 2025 09:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cFt1AhDX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="apzDrG5p"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3A0225793
-	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 09:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8515226169
+	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 09:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738834999; cv=none; b=c3BX/0K7+sNF7F8w5RqOuMGBZw5I//uBNP6WA6/gItT36yAVEabUhPsuSFTNUcpILQSBX3uNfB/rhjwPZlVRREQmMuJsU76LjJTpUpt07mgqUqYsz1EGA1E+mXCQPAffig3Yp2tM4QW3enQqxNfeIGmhhHBe6gcCCm4EBbeXfYg=
+	t=1738835178; cv=none; b=e7GDj/xGmDxBt7YWUpuJhgwylCK/Kn6Ec4QoAfUdyyPT0JrqiVkj6UVod6bU3IbVqOFBfUYR4QaEqeSz1HDs3o/0whoqSVgO0HtPsdZR9UC+vsRt74EmvKoETvuBTT+NpF1Lt8zBp39ieRGV0VovLKwQrbprsd2M69T6JgeFgzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738834999; c=relaxed/simple;
-	bh=XBYVSQ+rvdYjfngSC1qo+YGDIODm7MuDP6bj4wlq/go=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jGyepsSlrbaXp+Ml53/Q90Hig0pq8dF8rA8aRMYlwciLZDlH3xyNFoThmW9AmcFNACGKUOtEQFbtt6D2G++ByNccl4Zr56+aWrfhI3lpKGFuC2ufsNNSFoE8pz+G7axPV2a78UrNuesOFvL11n5E3pownSilWmYN0JXfjUBj+wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cFt1AhDX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738834994;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=n0D41HcxzuIuMF3Ilv9lg4Eg79loAfwsZ77xrh64FxA=;
-	b=cFt1AhDXXBCSfF8H5tPig0t7Xg6b7oDt3lB0mkQf/QRcXVPy+j9ijXuL8HZIpxZpOSq75O
-	Kb5awmVRMexn/W36pLsUta9Vup9nsMh6HtxA8hcdV6wshjPIJF0DGz0e2oh8dCZAmP2vT8
-	qSf6IgpZmlLB0YxxzSQEyElPiA+QKXk=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-331-0FhaY-lBNee7YywCtJKvEg-1; Thu,
- 06 Feb 2025 04:43:11 -0500
-X-MC-Unique: 0FhaY-lBNee7YywCtJKvEg-1
-X-Mimecast-MFC-AGG-ID: 0FhaY-lBNee7YywCtJKvEg
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3FE0B1800871;
-	Thu,  6 Feb 2025 09:43:09 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.33])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F2BE19560A3;
-	Thu,  6 Feb 2025 09:43:02 +0000 (UTC)
-Date: Thu, 6 Feb 2025 09:42:58 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Markus Armbruster <armbru@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Eric Auger <eauger@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
-	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>
-Subject: Re: [RFC v2 3/5] i386/kvm: Support event with select & umask format
- in KVM PMU filter
-Message-ID: <Z6SEIqhJEWrMWTU1@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20250122090517.294083-1-zhao1.liu@intel.com>
- <20250122090517.294083-4-zhao1.liu@intel.com>
- <87zfj01z8x.fsf@pond.sub.org>
- <Z6SG2NLxxhz4adlV@intel.com>
+	s=arc-20240116; t=1738835178; c=relaxed/simple;
+	bh=3JSdsFwwBWCy1KTlBRuVwKE7ZbhfmuWgFGTX7Kj5tas=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bVqWnKfda4npAEEkQa8reaWAanPjwk/W25MyaKB2UKx0XAbRF1nhTIsBSs4UuALRSn6VIpOxFBgY3UCPJLVALXTUiEw18Me5KnverG3l+an7kL+n5utolgusKJbnp+3NytOyuTmzZS4Tevzgire7n+VkFoVKY8SVunP9kv3k8eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=apzDrG5p; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-467abce2ef9so202541cf.0
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2025 01:46:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738835175; x=1739439975; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7BKAt0NEQXysy6sKnPuYIWKvPg1dRJqyEHJ9MeAxGgY=;
+        b=apzDrG5pyZe/IPOmphM3zr5IfKhZB8aSLsXg8jOJGdD0nYGpcTpFRJX8bLHkxBWZ+X
+         r1hHjTswlnKSGy7y2JxNrRdru71zZa/pcmrvV/OiV7djw0tivpwOAY1f5SkkXSjPPX3p
+         eomY4K+Ss6c7Dj7tj3gHP2PfRrBwD0xNKSFf+bBidiILskLrAjB6eoCzaXG8+u5+Ryqy
+         IFLLqau813Y/OzuGyJoZ6Az4usq5Bi3faOK+3uaJVK2rFfB8SGxTsgcdeJkojA17dzh+
+         UPyWM5DmMEmhhzCbCddmFwc+HU7hDlUi+8NxOGemJfCjHzQaN/dcDNG1VSEglxcOyClN
+         bPpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738835175; x=1739439975;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7BKAt0NEQXysy6sKnPuYIWKvPg1dRJqyEHJ9MeAxGgY=;
+        b=cXQdRJ9PFU4vmeO/tPgBksh/5T6L7so2BE3fVGytp/3OIpLbt82LSZyIWdfgAT4qai
+         gwr6wLwIuHRKzCQlodLR4fLlj3dg6xwaHpk4EBvSdyMYe1lOob1J8neAzc2iUrASEjoi
+         zwKkViYsaKVKU836HHgAGLIv3F94zUD9S6po2Tu3ZMBPypR68vdA1CQ+jJ8HVG2oas3B
+         2AEMCEpIUVAchhhmsJLp7K/C4RcsonJr5iDOAKur+MpqiTKTJPdWmMYeidHzyb8oTC4u
+         Dgzfu2mmDsdFMcL/tqGn8+ypj1If0SsFuXgUSAxZK7g6rJR8y2+BqjI/Tyf530WAWRkG
+         lqxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdgCtX1UfLqe9kapMhsFJ1VIpDVajTErdgbaNC8VEDosDbTw1wrRqg4wjyA/bkpthKUek=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQjeD6/ZbHXT1lfF/YoW/VabVVBe/K2xcIXfFHYWDxmj4Ny6AP
+	O6q+IDqlsm1/K3k/RR3t29icqYawYKhr7hxWwnZbQhcrgyXXNKUo3ExxtLBG/zNJw5rIFB6calP
+	d90ksj8IZIgEi/ltvTZi9XkyHQBfXP3nnnnMa
+X-Gm-Gg: ASbGnctHTQ6MNR7qlbhlMSDP7qzLJbNet/KGzNkgPT71LzaIp2Ij20+xbrYHR+wZSOc
+	q6nKHraNr4unY12MFGm6uYQhWtSxlHiEcBwlbv2wj+8J+GvuoN3zzPgpRPmL2/Zv7/0fbgZeDYK
+	K/AQLCbdMPSs2SYNb17IljyTP46g==
+X-Google-Smtp-Source: AGHT+IEuDo660q8ak3VegRH5ye6TRiM/Y+Jo49jMGjPSMpFsCFYfKqUL6UwwSsHkBvoSSSe2L3a7QsltEoQK936WK0Q=
+X-Received: by 2002:a05:622a:350:b0:46c:791f:bf46 with SMTP id
+ d75a77b69052e-471130d4434mr1694721cf.19.1738835174541; Thu, 06 Feb 2025
+ 01:46:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z6SG2NLxxhz4adlV@intel.com>
-User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+References: <CA+EHjTzRnGoY_bPcV4VFb-ORi5Z4qYTdQ-w4A0nsB91bUAOuAg@mail.gmail.com>
+ <diqzbjvfsr1n.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzbjvfsr1n.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 6 Feb 2025 09:45:37 +0000
+X-Gm-Features: AWEUYZnkYtrz5pt-vUwH-yMpFx5wLZBryRWV4TMPGtW_CAGutG2Hm9Bf6oCnBOc
+Message-ID: <CA+EHjTxFTFi0PFALHjLtBbS5kUHBCW2d91SPhM_ZfthxN=ShWA@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 05/15] KVM: guest_memfd: Folio mappability states
+ and functions that manage their transition
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kirill@shutemov.name, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
+	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 06, 2025 at 05:54:32PM +0800, Zhao Liu wrote:
-> On Wed, Feb 05, 2025 at 11:07:10AM +0100, Markus Armbruster wrote:
-> > Date: Wed, 05 Feb 2025 11:07:10 +0100
-> > From: Markus Armbruster <armbru@redhat.com>
-> > Subject: Re: [RFC v2 3/5] i386/kvm: Support event with select & umask
-> >  format in KVM PMU filter
-> > 
-> > Zhao Liu <zhao1.liu@intel.com> writes:
-> > 
-> > > The select&umask is the common way for x86 to identify the PMU event,
-> > > so support this way as the "x86-default" format in kvm-pmu-filter
-> > > object.
-> > 
-> > So, format 'raw' lets you specify the PMU event code as a number, wheras
-> > 'x86-default' lets you specify it as select and umask, correct?
-> 
-> Yes!
-> 
-> > Why do we want both?
-> 
-> This 2 formats are both wildly used in x86(for example, in perf tool).
-> 
-> x86 documents usually specify the umask and select fields.
-> 
-> But raw format could also be applied for ARM since ARM just uses a number
-> to encode event.
-> 
-> > > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> > 
-> > [...]
-> > 
-> > > diff --git a/qapi/kvm.json b/qapi/kvm.json
-> > > index d51aeeba7cd8..93b869e3f90c 100644
-> > > --- a/qapi/kvm.json
-> > > +++ b/qapi/kvm.json
-> > > @@ -27,11 +27,13 @@
-> > >  #
-> > >  # @raw: the encoded event code that KVM can directly consume.
-> > >  #
-> > > +# @x86-default: standard x86 encoding format with select and umask.
-> > 
-> > Why is this named -default?
-> 
-> Intel and AMD both use umask+select to encode events, but this format
-> doesn't have a name... so I call it `default`, or what about
-> "x86-umask-select"?
-> 
-> > > +#
-> > >  # Since 10.0
-> > >  ##
-> > >  { 'enum': 'KVMPMUEventEncodeFmt',
-> > >    'prefix': 'KVM_PMU_EVENT_FMT',
-> > > -  'data': ['raw'] }
-> > > +  'data': ['raw', 'x86-default'] }
-> > >  
-> > >  ##
-> > >  # @KVMPMURawEvent:
-> > > @@ -46,6 +48,25 @@
-> > >  { 'struct': 'KVMPMURawEvent',
-> > >    'data': { 'code': 'uint64' } }
-> > >  
-> > > +##
-> > > +# @KVMPMUX86DefalutEvent:
-> > 
-> > Default, I suppose.
-> 
-> Thanks!
-> 
-> > > +#
-> > > +# x86 PMU event encoding with select and umask.
-> > > +# raw_event = ((select & 0xf00UL) << 24) | \
-> > > +#              (select) & 0xff) | \
-> > > +#              ((umask) & 0xff) << 8)
-> > 
-> > Sphinx rejects this with "Unexpected indentation."
-> > 
-> > Is the formula needed here?
-> 
-> I tried to explain the relationship between raw format and umask+select.
-> 
-> Emm, where do you think is the right place to put the document like
-> this?
-> 
-> ...
-> 
-> > > +##
-> > > +# @KVMPMUX86DefalutEventVariant:
+Hi Ackerley,
 
-Typo   s/Defalut/Default/ - repeated many times in this patch.
+On Thu, 6 Feb 2025 at 03:14, Ackerley Tng <ackerleytng@google.com> wrote:
+>
+> Fuad Tabba <tabba@google.com> writes:
+>
+> > On Mon, 20 Jan 2025 at 10:30, Kirill A. Shutemov <kirill@shutemov.name> wrote:
+> >>
+> >> On Fri, Jan 17, 2025 at 04:29:51PM +0000, Fuad Tabba wrote:
+> >> > +/*
+> >> > + * Marks the range [start, end) as not mappable by the host. If the host doesn't
+> >> > + * have any references to a particular folio, then that folio is marked as
+> >> > + * mappable by the guest.
+> >> > + *
+> >> > + * However, if the host still has references to the folio, then the folio is
+> >> > + * marked and not mappable by anyone. Marking it is not mappable allows it to
+> >> > + * drain all references from the host, and to ensure that the hypervisor does
+> >> > + * not transition the folio to private, since the host still might access it.
+> >> > + *
+> >> > + * Usually called when guest unshares memory with the host.
+> >> > + */
+> >> > +static int gmem_clear_mappable(struct inode *inode, pgoff_t start, pgoff_t end)
+> >> > +{
+> >> > +     struct xarray *mappable_offsets = &kvm_gmem_private(inode)->mappable_offsets;
+> >> > +     void *xval_guest = xa_mk_value(KVM_GMEM_GUEST_MAPPABLE);
+> >> > +     void *xval_none = xa_mk_value(KVM_GMEM_NONE_MAPPABLE);
+> >> > +     pgoff_t i;
+> >> > +     int r = 0;
+> >> > +
+> >> > +     filemap_invalidate_lock(inode->i_mapping);
+> >> > +     for (i = start; i < end; i++) {
+> >> > +             struct folio *folio;
+> >> > +             int refcount = 0;
+> >> > +
+> >> > +             folio = filemap_lock_folio(inode->i_mapping, i);
+> >> > +             if (!IS_ERR(folio)) {
+> >> > +                     refcount = folio_ref_count(folio);
+> >> > +             } else {
+> >> > +                     r = PTR_ERR(folio);
+> >> > +                     if (WARN_ON_ONCE(r != -ENOENT))
+> >> > +                             break;
+> >> > +
+> >> > +                     folio = NULL;
+> >> > +             }
+> >> > +
+> >> > +             /* +1 references are expected because of filemap_lock_folio(). */
+> >> > +             if (folio && refcount > folio_nr_pages(folio) + 1) {
+> >>
+> >> Looks racy.
+> >>
+> >> What prevent anybody from obtaining a reference just after check?
+> >>
+> >> Lock on folio doesn't stop random filemap_get_entry() from elevating the
+> >> refcount.
+> >>
+> >> folio_ref_freeze() might be required.
+> >
+> > I thought the folio lock would be sufficient, but you're right,
+> > nothing prevents getting a reference after the check. I'll use a
+> > folio_ref_freeze() when I respin.
+> >
+> > Thanks,
+> > /fuad
+> >
+>
+> Is it correct to say that the only non-racy check for refcounts is a
+> check for refcount == 0?
+>
+> What do you think of this instead: If there exists a folio, don't check
+> the refcount, just set mappability to NONE and register the callback
+> (the folio should already have been unmapped, which leaves
+> folio->page_type available for use), and then drop the filemap's
+> refcounts. When the filemap's refcounts are dropped, in most cases (no
+> transient refcounts) the callback will be hit and the callback can set
+> mappability to GUEST.
+>
+> If there are transient refcounts, the folio will just be waiting
+> for the refcounts to drop to 0, and that's when the callback will be hit
+> and the mappability can be transitioned to GUEST.
+>
+> If there isn't a folio, then guest_memfd was requested to set
+> mappability ahead of any folio allocation, and in that case
+> transitioning to GUEST immediately is correct.
 
-> > > +#
-> > > +# The variant of KVMPMUX86DefalutEvent with the string, rather than
-> > > +# the numeric value.
-> > > +#
-> > > +# @select: x86 PMU event select field.  This field is a 12-bit
-> > > +#     unsigned number string.
-> > > +#
-> > > +# @umask: x86 PMU event umask field. This field is a uint8 string.
-> > 
-> > Why are these strings?  How are they parsed into numbers?
-> 
-> In practice, the values associated with PMU events (code for arm, select&
-> umask for x86) are often expressed in hexadecimal. Further, from linux
-> perf related information (tools/perf/pmu-events/arch/*/*/*.json), x86/
-> arm64/riscv/nds32/powerpc all prefer the hexadecimal numbers and only
-> s390 uses decimal value.
-> 
-> Therefore, it is necessary to support hexadecimal in order to honor PMU
-> conventions.
+This seems to me to add additional complexity to the common case that
+isn't needed for correctness, and would make things more difficult to
+reason about. If we know that there aren't any mappings at the host
+(mapcount == 0), and we know that the refcount has at one point
+reached 0 after we have taken the folio lock, even if the refcount
+gets (transiently) elevated, we know that no one at the host is
+accessing the folio itself.
 
-IMHO having a data format that matches an arbitrary external tool is not
-a goal for QMP. It should be neutral and exclusively use the normal JSON
-encoding, ie base-10 decimal. Yes, this means a user/client may have to
-convert from hex to dec before sending data over QMP. This is true of
-many areas of QMP/QEMU config though and thus normal/expected behaviour.
+Keep in mind that the common case (in a well behaved system) is that
+neither the mapcount nor the refcount are elevated, and both for
+performance, and for understanding, I think that's what we should be
+targeting. Unless of course I'm wrong, and there's a correctness issue
+here.
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Cheers,
+/fuad
+> >> > +                     /*
+> >> > +                      * Outstanding references, the folio cannot be faulted
+> >> > +                      * in by anyone until they're dropped.
+> >> > +                      */
+> >> > +                     r = xa_err(xa_store(mappable_offsets, i, xval_none, GFP_KERNEL));
+> >> > +             } else {
+> >> > +                     /*
+> >> > +                      * No outstanding references. Transition the folio to
+> >> > +                      * guest mappable immediately.
+> >> > +                      */
+> >> > +                     r = xa_err(xa_store(mappable_offsets, i, xval_guest, GFP_KERNEL));
+> >> > +             }
+> >> > +
+> >> > +             if (folio) {
+> >> > +                     folio_unlock(folio);
+> >> > +                     folio_put(folio);
+> >> > +             }
+> >> > +
+> >> > +             if (WARN_ON_ONCE(r))
+> >> > +                     break;
+> >> > +     }
+> >> > +     filemap_invalidate_unlock(inode->i_mapping);
+> >> > +
+> >> > +     return r;
+> >> > +}
+> >>
+> >> --
+> >>   Kiryl Shutsemau / Kirill A. Shutemov
 
