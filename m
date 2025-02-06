@@ -1,88 +1,72 @@
-Return-Path: <kvm+bounces-37475-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37476-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B31A2A63C
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 11:43:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D15A2A651
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 11:51:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 819DF3A14E6
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:42:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0BF43A78D3
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD1A22757F;
-	Thu,  6 Feb 2025 10:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8AD227B87;
+	Thu,  6 Feb 2025 10:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RMTnT+M4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KdGg+q3X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E73218B03
-	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 10:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE79C1F60A;
+	Thu,  6 Feb 2025 10:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738838579; cv=none; b=LWTc0dSzJ14YdRb+5I2vjHikJ7kPeE1Y/mG2tgkM84zr1r3t2qeVtxgJmM6M4g2kRjbK8qtBmwefjbdyPJEqS8rg9Tma0RI+o+yR4PIpMVdVsnYkaQRTOs9Tge677BTplu+3oWJaGJtCJ38rfiN4wYJ6GSP+KQkjZJ9MkFcnVqQ=
+	t=1738839070; cv=none; b=ne7/GBkaIA7TG7lHsiWBX7y1oUq4mwhRmbnUocm8xygCVNjs4PSWTP92jgkJ9zX/eyCCWEouIqzcaaFHKa1o8rQw3ep1L2aBkCpRUX9Zf2e24YhRgefsROC2hJ5hwxuHBsfuW5W2Og3v6drvQKrpzJZYgTo9zoTIYw+z/i4L5/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738838579; c=relaxed/simple;
-	bh=kv5rnqaQVKnPdmx6jwXVGiOnMb+WXqSNmbdjEEWLRRA=;
+	s=arc-20240116; t=1738839070; c=relaxed/simple;
+	bh=BAc/DzaeLywP5/G7nSsTgMS/1oP0U4tjnQ8klgx+HLg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TzgkDBGrLptPf99s6E46jIxE905llYDKsJb8OplsYVejXn3Xf4NM6oaAG8NJxsmGbhhYUZDuYIJ71/jhy1WLaGX7QaYDiOp9jETiqIdbLQPxGd21AE6IHb5Nta+cS2AWDJ7Hb5eEuQyKUfNw4ItuSaeFDWICUDT/lnsfvthUzVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RMTnT+M4; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738838577; x=1770374577;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kv5rnqaQVKnPdmx6jwXVGiOnMb+WXqSNmbdjEEWLRRA=;
-  b=RMTnT+M4vsvCAvE4g8VnWtbXauib3Z/bdy6NtY9MaklMjRI4A+ywniup
-   tZEFemRk81xKJrDCdjPcfY3iz47aNop5SAmksPnAl9bc7s/oWNc3poz/s
-   V/z3kLngDWQB/8hiAlWtBKWVvEx7Yz2bIroJ39dBO/rnm7xtLMrRN+dgQ
-   5gchHMqbP1GYlKQd7TZbL6eyTO1hxLUSx63gtnlJGknYfVcBF70vUBvPD
-   vVG3QHrgV++eYMvLy7NmdERUHJmpA6onSPpToz10D3g9z8vKbDM+vYUsX
-   T8cI0mNbwjN7IRK0RgcV2WQRGwOwhxqDy1VBVg7rNHhIGfKR474PKFL7E
-   A==;
-X-CSE-ConnectionGUID: B5kmwOYDT3ylJwggSoB3cw==
-X-CSE-MsgGUID: 0+A9HwyjSkiZq++Txe22Iw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="61911291"
-X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
-   d="scan'208";a="61911291"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 02:42:55 -0800
-X-CSE-ConnectionGUID: 5kRV3BfkT4yCGibliSd/UQ==
-X-CSE-MsgGUID: isKgtj8jTzuJLw32cGbLIw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="134407810"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa002.fm.intel.com with ESMTP; 06 Feb 2025 02:42:02 -0800
-Date: Thu, 6 Feb 2025 18:41:09 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: Alexey Kardashevskiy <aik@amd.com>,
-	Chenyi Qiang <chenyi.qiang@intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, Williams Dan J <dan.j.williams@intel.com>,
-	Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>
-Subject: Re: [PATCH 2/7] guest_memfd: Introduce an object to manage the
- guest-memfd with RamDiscardManager
-Message-ID: <Z6SRxV83I9/kamop@yilunxu-OptiPlex-7050>
-References: <Z4-6u5_9NChu_KZq@x1n>
- <95a14f7d-4782-40b3-a55d-7cf67b911bbe@amd.com>
- <Z5C9SzXxX7M1DBE3@yilunxu-OptiPlex-7050>
- <Z5EgFaWIyjIiOZnv@x1n>
- <Z5INAQjxyYhwyc+1@yilunxu-OptiPlex-7050>
- <Z5Jylb73kDJ6HTEZ@x1n>
- <Z5NhwW/IXaLfvjvb@yilunxu-OptiPlex-7050>
- <Z5O4BSCjlhhu4rrw@x1n>
- <Z5WtRYSf7cjqITXH@yilunxu-OptiPlex-7050>
- <Z5uom-NTtekV9Crd@x1.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=U19E+iGfQl0IaTp4EspgeJAAOKUtIAOp/3YBMvojbmwloggZDqBfb7LKOyq8vq0R4soGuSrlVh2ugKaJlMsokfgt/iIM2xkl9QIkoRJNerZUpWoE+Cbix7TuPLG/K3CXU0F10Oi1aP/4UP5w016eOmEmPonh4TYj7H8G6/mFhpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KdGg+q3X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C4F4C4CEDD;
+	Thu,  6 Feb 2025 10:51:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738839069;
+	bh=BAc/DzaeLywP5/G7nSsTgMS/1oP0U4tjnQ8klgx+HLg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KdGg+q3XY0ZrBG5LQlQYmL7B3IpBT4V4qnZ7GHv5wEEx3b7Dr57ydkhDbFb5j3mwX
+	 tg6DhXoiHPjM0CDTr4gCjDdh+sIAUu9zc5Nb8aUXhAbZAAWpxn1f4d1qUkv05VWWUn
+	 MneCpfPJ3pH1tjVEASi7nDe6fkdz9Obkl4r9LiIsI7tfP7Z+NQevktY8zUigTG59uK
+	 KZMsb5jop8HVBJLbc90MuAsOc/c7QzCIkoJgEw/kYWfbjiPVyvo8rXLZsoPh16TSnO
+	 uX8D2NeK/SC0qI1AYpMoWVcpAfQgz+V9T1c2h+ONYXCc8e49/Ju7BrjtZHhbNX0Xsv
+	 mObGH9QVWJ9vw==
+Date: Thu, 6 Feb 2025 10:51:01 +0000
+From: Will Deacon <will@kernel.org>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>, weilin.wang@intel.com,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH v4 11/21] RISC-V: perf: Restructure the SBI PMU code
+Message-ID: <20250206105100.GA2971@willie-the-truck>
+References: <20250205-counter_delegation-v4-0-835cfa88e3b1@rivosinc.com>
+ <20250205-counter_delegation-v4-11-835cfa88e3b1@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,135 +75,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z5uom-NTtekV9Crd@x1.local>
+In-Reply-To: <20250205-counter_delegation-v4-11-835cfa88e3b1@rivosinc.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, Jan 30, 2025 at 11:28:11AM -0500, Peter Xu wrote:
-> On Sun, Jan 26, 2025 at 11:34:29AM +0800, Xu Yilun wrote:
-> > > Definitely not suggesting to install an invalid pointer anywhere.  The
-> > > mapped pointer will still be valid for gmem for example, but the fault
-> > > isn't.  We need to differenciate two things (1) virtual address mapping,
-> > > then (2) permission and accesses on the folios / pages of the mapping.
-> > > Here I think it's okay if the host pointer is correctly mapped.
-> > > 
-> > > For your private MMIO use case, my question is if there's no host pointer
-> > > to be mapped anyway, then what's the benefit to make the MR to be ram=on?
-> > > Can we simply make it a normal IO memory region?  The only benefit of a
-> > 
-> > The guest access to normal IO memory region would be emulated by QEMU,
-> > while private assigned MMIO requires guest direct access via Secure EPT.
-> > 
-> > Seems the existing code doesn't support guest direct access if
-> > mr->ram == false:
+On Wed, Feb 05, 2025 at 11:23:16PM -0800, Atish Patra wrote:
+> With Ssccfg/Smcdeleg, we no longer need SBI PMU extension to program/
+> access hpmcounter/events. However, we do need it for firmware counters.
+> Rename the driver and its related code to represent generic name
+> that will handle both sbi and ISA mechanism for hpmcounter related
+> operations. Take this opportunity to update the Kconfig names to
+> match the new driver name closely.
 > 
-> Ah it's about this, ok.
+> No functional change intended.
 > 
-> I am not sure what's the best approach, but IMHO it's still better we stick
-> with host pointer always available when ram=on.  OTOH, VFIO private regions
-> may be able to provide a special mark somewhere, just like when romd_mode
-> was done previously as below (qemu 235e8982ad39), so that KVM should still
-> apply these MRs even if they're not RAM.
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  MAINTAINERS                                       |   4 +-
+>  arch/riscv/include/asm/kvm_vcpu_pmu.h             |   4 +-
+>  arch/riscv/include/asm/kvm_vcpu_sbi.h             |   2 +-
+>  arch/riscv/kvm/Makefile                           |   4 +-
+>  arch/riscv/kvm/vcpu_sbi.c                         |   2 +-
+>  drivers/perf/Kconfig                              |  16 +-
+>  drivers/perf/Makefile                             |   4 +-
+>  drivers/perf/{riscv_pmu.c => riscv_pmu_common.c}  |   0
+>  drivers/perf/{riscv_pmu_sbi.c => riscv_pmu_dev.c} | 214 +++++++++++++---------
 
-Also good to me.
+This seems... gratuitous? It feels like renaming the file could be a pain
+for managing backports and renaming the driver might cause some headaches
+in userspace.
 
-> 
-> > 
-> > static void kvm_set_phys_mem(KVMMemoryListener *kml,
-> >                              MemoryRegionSection *section, bool add)
-> > {
-> >     [...]
-> > 
-> >     if (!memory_region_is_ram(mr)) {
-> >         if (writable || !kvm_readonly_mem_allowed) {
-> >             return;
-> >         } else if (!mr->romd_mode) {
-> >             /* If the memory device is not in romd_mode, then we actually want
-> >              * to remove the kvm memory slot so all accesses will trap. */
-> >             add = false;
-> >         }
-> >     }
-> > 
-> >     [...]
-> > 
-> >     /* register the new slot */
-> >     do {
-> > 
-> >         [...]
-> > 
-> >         err = kvm_set_user_memory_region(kml, mem, true);
-> >     }
-> > }
-> > 
-> > > ram=on MR is, IMHO, being able to be accessed as RAM-like.  If there's no
-> > > host pointer at all, I don't yet understand how that helps private MMIO
-> > > from working.
-> > 
-> > I expect private MMIO not accessible from host, but accessible from
-> > guest so has kvm_userspace_memory_region2 set. That means the resolving
-> > of its PFN during EPT fault cannot depends on host pointer.
-> > 
-> > https://lore.kernel.org/all/20250107142719.179636-1-yilun.xu@linux.intel.com/
-> 
-> I'll leave this to KVM experts, but I actually didn't follow exactly on why
-> mmu notifier is an issue to make , as I thought that was per-mm anyway, and KVM
-> should logically be able to skip all VFIO private MMIO regions if affected.
+What do you gain from such an invasive change?
 
-I think this creates logical inconsistency. You builds the private MMIO
-EPT mapping on fault based on the HVA<->HPA mapping, but doesn't follow
-the HVA<->HPA mapping change. Why KVM believes the mapping on fault time
-but doesn't on mmu notify time?
-
-> This is a comment to this part of your commit message:
-> 
->         Rely on userspace mapping also means private MMIO mapping should
->         follow userspace mapping change via mmu_notifier. This conflicts
->         with the current design that mmu_notifier never impacts private
->         mapping. It also makes no sense to support mmu_notifier just for
->         private MMIO, private MMIO mapping should be fixed when CoCo-VM
->         accepts the private MMIO, any following mapping change without
->         guest permission should be invalid.
-> 
-> So I don't yet see a hard-no of reusing userspace mapping even if they're
-> not faultable as of now - what if they can be faultable in the future?  I
-
-The first commit of guest_memfd emphasize a lot on the benifit of
-decoupling KVM mapping from host mapping. My understanding is even if
-guest memfd can be faultable later, KVM should still work in a way
-without userspace mapping.
-
-> am not sure..
-> 
-> OTOH, I also don't think we need KVM_SET_USER_MEMORY_REGION3 anyway.. The
-> _REGION2 API is already smart enough to leave some reserved fields:
-> 
-> /* for KVM_SET_USER_MEMORY_REGION2 */
-> struct kvm_userspace_memory_region2 {
-> 	__u32 slot;
-> 	__u32 flags;
-> 	__u64 guest_phys_addr;
-> 	__u64 memory_size;
-> 	__u64 userspace_addr;
-> 	__u64 guest_memfd_offset;
-> 	__u32 guest_memfd;
-> 	__u32 pad1;
-> 	__u64 pad2[14];
-> };
-> 
-> I think we _could_ reuse some pad*?  Reusing guest_memfd field sounds error
-> prone to me.
-
-It truly is. I'm expecting some suggestions here.
-
-Thanks,
-Yilun
-
-> 
-> Not sure it could be easier if it's not guest_memfd* but fd + fd_offset
-> since the start.  But I guess when introducing _REGION2 we didn't expect
-> MMIO private regions come so soon..
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
-> 
+Will
 
