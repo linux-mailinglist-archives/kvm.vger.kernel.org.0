@@ -1,79 +1,65 @@
-Return-Path: <kvm+bounces-37490-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37493-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94EBAA2AC6C
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:26:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24748A2ACF9
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:50:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77980188489B
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 15:26:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D489E3A905F
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 15:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E7F1EDA2D;
-	Thu,  6 Feb 2025 15:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE03B2451E5;
+	Thu,  6 Feb 2025 15:49:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qb2ap9S7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AE3Ya8vQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2578D1C700E;
-	Thu,  6 Feb 2025 15:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45BD1E5B9A;
+	Thu,  6 Feb 2025 15:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738855578; cv=none; b=CtYwxYvUBBYP/Dp8mW4f0pyjFSWt7c4v7n081Vhi/TfcP7RgQXhKBNa/GCL5KZX8Z0DHWqErXQQ/Rvy1yXe6BCqiiow5d+pqk3Bsf5sor6AHxNgIY0wR4Dh1qvKoxOreSdrYt1Z7m0/snFiua8XjpFXyiPQDq3QC0U/T2lNxPkc=
+	t=1738856982; cv=none; b=JmMI0cb/JsYyj/IVRoJxX/Kem5uquZqpc97F7mt+J14dvaSESjC5yNcpmJXyowFM3k1l2xwg85jfzG7rQ/w/F4FUOsjEc+7XvGCV1EoLYm4PKAcGNjS5VwFuomuldpm3Ycr1iNbjWnPpoX32n8/UpK259ID9keHXaH9c7oUcWQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738855578; c=relaxed/simple;
-	bh=tcVpN1qc+CNHOZ+Drmas1nokJSHGtwyKNe/PAK4Joq4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pHj1ZRgQJl+cgkjXqb3pPUVar3MUzAbk5LWUnsK+Weue932RNSaSom4tahLbXad43SvsiranYcb6K6M4pjGbmO+TKAYWG+/AshYieCAVPhZmVwR83xOllOAQquBqKl5MpKvVf3d3KbrFdPBIzR0w03uhV63gjFCuz+vNElQAoo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qb2ap9S7; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 516ESKHg009550;
-	Thu, 6 Feb 2025 15:26:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=OgRc2XZeqDfYKX9OdYVxO+K/KEjR0lZARFuay+GGR
-	9k=; b=qb2ap9S7u1aVUz6bNDvBQ4aU6I4fKWQon7SKn90BN1svxFM7JoUxSlyps
-	XN+uL2fD3xQAGPKj9XSTEWBi9+NESzpWq/smB98UckJD8+/njkN+JwbFtijurrR4
-	Mi+f3wrwW2JeZqMgiA/mg8scvmnWactG1TmIYVBbTafCV6DW6ZLq7L6xHLXmJnKn
-	WHLsqUHzWlJ2DSkKnGmIr4aRQW9Zsd91MvRDGb6EYIlpgDWCVWYLGfGIiKy2/JKT
-	IAWSCDWahZOLueOH15ydJmhj4lCivMgx6Tt2aZJkyPOjeLEmrdqdG5QT+oObGsjv
-	ebfvgUgelIfTx6Th9UmU85fwrqnkw==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44mk5a3wbn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 15:26:14 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 516ElFN6024635;
-	Thu, 6 Feb 2025 15:26:13 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxxneyvc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 15:26:13 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 516FQ9g339911804
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 6 Feb 2025 15:26:09 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D65A420135;
-	Thu,  6 Feb 2025 15:01:45 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AEA6620134;
-	Thu,  6 Feb 2025 15:01:45 +0000 (GMT)
-Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  6 Feb 2025 15:01:45 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
-        hca@linux.ibm.com
-Subject: [kvm-unit-tests PATCH] lib: s390x: css: Cleanup chsc inline assembly
-Date: Thu,  6 Feb 2025 14:58:49 +0000
-Message-ID: <20250206150128.147206-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1738856982; c=relaxed/simple;
+	bh=sEcaWTz1HzbI6p4xm1FOiu8u6g8i2Jl/cJgvVQbzt80=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a4syy3zShaw/ckT0bIxSLuJH7O3T3D6Lzm1e8BMFIVkbo3k6lmXiV+lr5WDt4EmrkJP/QG6xmUSvjrmT3RaidPhbp8BNXg4Fpus4VBxka+epTwiKa+97sm/q0UThfRmOP3rfUGPV+aYsPU3fGKo5yh+tQyG3A8onKxUYxnV8faQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AE3Ya8vQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B9B4C4CEE3;
+	Thu,  6 Feb 2025 15:49:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738856981;
+	bh=sEcaWTz1HzbI6p4xm1FOiu8u6g8i2Jl/cJgvVQbzt80=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AE3Ya8vQPrdhLDVKYr2mZ4DKLRn7CebXO5ghfD/NncwCZpql+pKD3RrCOxKP0VGHL
+	 kiSzG/mrAdE+l9M+ZAZlAXxqezwpg27Z1p0TYJopH9UIvXkWfFQHdFiPYR8Bl8CDi4
+	 4o/7tRtV7vyP/NLpP/BRX0eFXU6PWFaHaCcz4JmvNNG1RCEg7x0+H/oC0s4GnYVx0I
+	 DHgTI1fQOMlu+j/qFxNajiwus8t7MEc+hQyN0sYAyUEGkwWy4NUA815Cmz+SfunonK
+	 6wDz+7rfuwmqPUt/jHXvE+IZmxkpKyCYwKi1rku9nhZTjTLByRwRIrQ7M2abtTT0B7
+	 Ok8XXLs1+x0sQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tg48I-001BOX-Kz;
+	Thu, 06 Feb 2025 15:49:38 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH v3 00/16] KVM: arm64: Add NV GICv3 support
+Date: Thu,  6 Feb 2025 15:49:09 +0000
+Message-Id: <20250206154925.1109065-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,60 +67,86 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8QwqespLYpMUgXJPxR3jFWOhGj-XcWLa
-X-Proofpoint-ORIG-GUID: 8QwqespLYpMUgXJPxR3jFWOhGj-XcWLa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-06_03,2025-02-05_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=877 mlxscore=0 malwarescore=0
- suspectscore=0 clxscore=1015 impostorscore=0 spamscore=0 adultscore=0
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502060123
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, andre.przywara@arm.com, eric.auger@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Name the CHSC command block pointer instead of naming it "p".
+Here's a respin of the NV support for GICv3. The integration branch
+containing this (and the rest of the NV stack) is still at [3].
 
-Also replace the two "m" constraints with a memory globber so the
-constraints are easier to read.
+* From v2 [2]:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
+  - Picked RBs from Andre, with thanks
 
-To me it makes more sense to have a separate commit that has a message
-explaining why we changed it instead of sending a v2, so here it is.
+  - Rebased on 6.14-rc1
 
----
- lib/s390x/css.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+* From v1 [1]:
 
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 06bb59c7..167f8e83 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -364,16 +364,16 @@ bool get_chsc_scsc(void);
- #define CHSC_RSP_EBUSY	0x000B
- #define CHSC_RSP_MAX	0x000B
- 
--static inline int _chsc(void *p)
-+static inline int _chsc(void *com_blk)
- {
- 	int cc;
- 
--	asm volatile(" .insn   rre,0xb25f0000,%2,0\n"
-+	asm volatile(" .insn   rre,0xb25f0000,%[com_blk],0\n"
- 		     " ipm     %[cc]\n"
- 		     " srl     %[cc],28\n"
--		     : [cc] "=d" (cc), "=m" (p)
--		     : "d" (p), "m" (p)
--		     : "cc");
-+		     : [cc] "=d" (cc)
-+		     : [com_blk] "d" (com_blk)
-+		     : "cc", "memory");
- 
- 	return cc;
- }
+  - Fix the default value for the MI INTID to PPI9, instead of
+    something fairly random...
+
+  - Fail KVM initialisation if asking for NV on HW without a virtual
+    GICv3.
+
+[1] https://lore.kernel.org/r/20241217151331.934077-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20250112170845.1181891-1-maz@kernel.org
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-next
+
+Andre Przywara (1):
+  KVM: arm64: nv: Allow userland to set VGIC maintenance IRQ
+
+Jintack Lim (1):
+  KVM: arm64: nv: Respect virtual HCR_EL2.TWx setting
+
+Marc Zyngier (13):
+  arm64: sysreg: Add layout for ICH_HCR_EL2
+  arm64: sysreg: Add layout for ICH_VTR_EL2
+  arm64: sysreg: Add layout for ICH_MISR_EL2
+  KVM: arm64: nv: Load timer before the GIC
+  KVM: arm64: nv: Add ICH_*_EL2 registers to vpcu_sysreg
+  KVM: arm64: nv: Plumb handling of GICv3 EL2 accesses
+  KVM: arm64: nv: Sanitise ICH_HCR_EL2 accesses
+  KVM: arm64: nv: Nested GICv3 emulation
+  KVM: arm64: nv: Handle L2->L1 transition on interrupt injection
+  KVM: arm64: nv: Add Maintenance Interrupt emulation
+  KVM: arm64: nv: Propagate used_lrs between L1 and L0 contexts
+  KVM: arm64: nv: Fold GICv3 host trapping requirements into guest setup
+  KVM: arm64: nv: Fail KVM init if asking for NV without GICv3
+
+Oliver Upton (1):
+  KVM: arm64: nv: Request vPE doorbell upon nested ERET to L2
+
+ .../virt/kvm/devices/arm-vgic-v3.rst          |  12 +-
+ arch/arm64/include/asm/kvm_emulate.h          |  13 +
+ arch/arm64/include/asm/kvm_host.h             |  45 +-
+ arch/arm64/include/asm/kvm_hyp.h              |   2 +
+ arch/arm64/include/asm/sysreg.h               |  30 --
+ arch/arm64/include/uapi/asm/kvm.h             |   1 +
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arm.c                          |  20 +-
+ arch/arm64/kvm/emulate-nested.c               |  18 +-
+ arch/arm64/kvm/handle_exit.c                  |   6 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |  16 +-
+ arch/arm64/kvm/nested.c                       |  12 +
+ arch/arm64/kvm/sys_regs.c                     |  95 +++-
+ arch/arm64/kvm/vgic-sys-reg-v3.c              |   8 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |  29 ++
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |  29 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          | 409 ++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3.c                 |  44 +-
+ arch/arm64/kvm/vgic/vgic-v4.c                 |  18 +-
+ arch/arm64/kvm/vgic/vgic.c                    |  38 ++
+ arch/arm64/kvm/vgic/vgic.h                    |   6 +
+ arch/arm64/tools/sysreg                       |  48 ++
+ drivers/irqchip/irq-apple-aic.c               |   8 +-
+ include/kvm/arm_vgic.h                        |  10 +
+ tools/arch/arm/include/uapi/asm/kvm.h         |   1 +
+ tools/arch/arm64/include/asm/sysreg.h         |  30 --
+ 26 files changed, 833 insertions(+), 117 deletions(-)
+ create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
+
 -- 
-2.43.0
+2.39.2
 
 
