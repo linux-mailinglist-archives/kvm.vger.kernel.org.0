@@ -1,232 +1,225 @@
-Return-Path: <kvm+bounces-37460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 341C8A2A4B9
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:37:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F51A2A4B2
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:36:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FA223A8152
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:35:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01E9818878A1
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADC1226863;
-	Thu,  6 Feb 2025 09:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0A0226885;
+	Thu,  6 Feb 2025 09:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ub5LxYYO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/19TF05"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D4C226549;
-	Thu,  6 Feb 2025 09:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C556E226162
+	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 09:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738834373; cv=none; b=QlpRf4Q/dpv8C4fE//1TBJViCvIW/a7XWemcCcfFMC2lWrEQ3hYxjoxB+c5CLDsks8XbUAmQLH8PWC61hS+PvMO4X3fy3j4LGe2Y3FGgWnu/MWe5HNHiermrte+S6E9zaIa93DpZexDrN7fHI1d6dUeWFF9/WZbhRKFXqgEYMPE=
+	t=1738834470; cv=none; b=FW0KAsjrCxxUPt5Wd9qCU6z0UV7Xyi3dzAjxCyBwErXgOjLwcbUfr9AiDdfj/2nL/VSm2jKBhHiiLKTDGP8pNJEF3xuYSl9ns2csU0XyQ9i7G3QmGoU+dBtDNgZLpuQBCaPs9NBgB3l7pJdr/s/W9XcVSEm13+PDomldDqDizV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738834373; c=relaxed/simple;
-	bh=o+Z0681jYsiHqmh3U0IYwEJZRDAlvJSN/vbRjprW+rk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WOQtt2RvYoSx5xf60QUgB5TETC7dHmzu55kmJsbaiQwDpeIA33JHiKmqpP035K0ZlvPSOvxSRMcG6qi311w3CL0H7oT46Q5cTF1QsTMWZuDC0sahafz99UhjEUUVbnR9TBMdpACZz1yPzI5n+2DQLAjlOr9dkVzZZ/LdW2Rj+dQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ub5LxYYO; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ygCyX4kIzHTkCMIYfhFggV+w58QHYc5sCxu+XxJ0VuY=; b=Ub5LxYYOtNPsBxcWCz/qYQ+WX4
-	912GkRIsrEX9TSN/bszxcLHH+DpQQY46NZqIZdqBSvshZenQO1rM7ipB/pWGF5WK67YhzgldvIjOS
-	7eebgxztX8C450yP9UK7d8huLYU+VU4SGE9ZwPvNvSJSAJEsRlvhv33RN/UuP93usPGDRk7byAFEY
-	+iM/qVTX3BwYOld1a5a5yz9TwJ7uK61w3cZcjmN9OCacvjJMvPym99zqddq2ryvHsaimV6QMYONQ3
-	Zac1W3JvkwqaP5CP5fHHpHQUCYBAnmfgJNS6m2IgeLj4+GTxjffClRIxzP6B7tthDHyW5qqI8wvpn
-	N6v8/LFA==;
-Received: from [54.239.6.187] (helo=freeip.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tfyEc-00000005lug-1GF0;
-	Thu, 06 Feb 2025 09:31:46 +0000
-Message-ID: <ff83dc5c91b4e46bcf2d99680ec6af250fb05b27.camel@infradead.org>
-Subject: Re: [PATCH v3 00/18] vDSO: Introduce generic data storage
-From: David Woodhouse <dwmw2@infradead.org>
-To: Thomas =?ISO-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>, 
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Helge
- Deller <deller@gmx.de>, Andy Lutomirski <luto@kernel.org>,  Thomas Gleixner
- <tglx@linutronix.de>, Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker
- <frederic@kernel.org>,  Andrew Morton <akpm@linux-foundation.org>, Catalin
- Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Theodore
- Ts'o <tytso@mit.edu>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
- <aou@eecs.berkeley.edu>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui
- <kernel@xen0n.name>, Russell King <linux@armlinux.org.uk>, Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,  Arnd Bergmann
- <arnd@arndb.de>, Guo Ren <guoren@kernel.org>
-Cc: linux-parisc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
- loongarch@lists.linux.dev, linux-s390@vger.kernel.org, 
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
- linux-arch@vger.kernel.org, Nam Cao <namcao@linutronix.de>, 
- linux-csky@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>, "Luu,
- Ryan" <rluu@amazon.com>, kvm <kvm@vger.kernel.org>
-Date: Thu, 06 Feb 2025 09:31:42 +0000
-In-Reply-To: <20250204-vdso-store-rng-v3-0-13a4669dfc8c@linutronix.de>
-References: <20250204-vdso-store-rng-v3-0-13a4669dfc8c@linutronix.de>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-TLRPvEdtMvxq/eM5U95X"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1738834470; c=relaxed/simple;
+	bh=S7FouMpLbdA1WPWAEV72WH62xBGMgP+Ss8VtnLymgFQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aB0uwFYhozBMt5/pp7aIiHaHWmhomp5zbiT6lM1xBMSpebCpWtBgjkLc3at2AO6FcESAxp99gJuk/LPW3d8u0R2RNowjYFA00J5RD7uk/UckPTyWNQoqs25xM9TkB4fAj43olqOxbzq6+xX5/YX1m+tF+17v/Cz4Jp6UQprIkSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R/19TF05; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738834467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P4ZHJjPRFMKV2LyTsMjVC9uMgqNHhpd5qSqQo6h6SPo=;
+	b=R/19TF0548Rpnah57RXP7UQCPLlWYrR2L7f/4fdZLIQsSH0K+Pj7lhK484oyeIe9fHHF/y
+	89hzbuLVXbwCO9OMsIqklFN3NWH286mnYBjN4YbYi0fkSQ4l0Ryy5PvY+CVKWHuGUgz7/E
+	1P0l11OMuP+J7Dd4J71NiISjdM0sDOQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-ka-uPLNMPc2boqlw4zI8sg-1; Thu, 06 Feb 2025 04:34:25 -0500
+X-MC-Unique: ka-uPLNMPc2boqlw4zI8sg-1
+X-Mimecast-MFC-AGG-ID: ka-uPLNMPc2boqlw4zI8sg
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4361ac8b25fso4001765e9.2
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2025 01:34:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738834459; x=1739439259;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P4ZHJjPRFMKV2LyTsMjVC9uMgqNHhpd5qSqQo6h6SPo=;
+        b=JNoThprDtmmAUe6YZjAsAXvGa2TOq+hMji8ocCJbZGY92UTSWTDUE1FjXqMID0bbs7
+         6D0Yo5zrrABdxjsxs5zbXuMN5DKXt2JoZ3Tro/Hc4OTG4+TSxXUr5nXSTjB9Hw84nYD6
+         YdSem7GjZU655/wpwn8Ql7VGuYDEmKviKlD36YCgKbK3bfAy1nBf4JDkpvgoBU1TBErw
+         yhHsYuW7nE+ILqOrOkmkA/Mma8xJ4B5hcWBHQpEdxUUyA6JOMqYNJJgOMZtOO/kmi6ly
+         PXAHl0GLJ6mBhMUEo4OnZBmm7/ZA+i2gK9f6Ke4KrY/K8faIfI7Jo6kjTMLJ8fvIWtUV
+         naOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIhi1FHLLHvKMRmwtBdQHRwMpejKAYHZ3iRwFuD43W9PGH5qBs1aS2wZW2Jrm6xJiVVz8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmPKWuvlF5HO0jXEtefmWbcB81tASJFWUnjj0cTzg9bWctaq1k
+	c7FCstf9U7q3gdUmhnG8jtXIJkue0KEj7fJ+sDIrRkv8v0qCS9Pb0Tc8bA7uO9IWdQMz/XR0Sdt
+	LQ/+MbYX8PXqj2Zcc51Kf2ByBzF0gsN/lig3R98yl4FlDjlls2A==
+X-Gm-Gg: ASbGncuaBrPW7/US8IJxeI1e1hk6Oqt9MhAljkP9+QWT+s/HgOAd1GDb0tgRKn+HLPo
+	jiRgYkrdPiGOTGvsNyoYt0ziqmsYveJQZWiEwUbf2qBdYJfSgJCdTB5CH43JfDeEOLAIzKmvFpb
+	4039KCOA+vTH42X4Sad9W6wX4MCrayImJpp3JkLjFT2hmykzOIRzqBhe4zqiQt05VPcrgoYtJUa
+	I7iRYqM5oJQZDS4or63QFFgS/GKJQTjaTauORuVX4PtDbVUKajHD/iXjAFMkRUKqEPIqdhYy4o=
+X-Received: by 2002:a05:600c:1c9d:b0:434:9e1d:7626 with SMTP id 5b1f17b1804b1-4390d5a2e06mr40199445e9.25.1738834459516;
+        Thu, 06 Feb 2025 01:34:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHy2fOO/MU56iUKzPnZlhBwxpOevv3LvEJRLHdAajpCbdN4rFxi6UgPiA9NlUPEvJo9+svERA==
+X-Received: by 2002:a05:600c:1c9d:b0:434:9e1d:7626 with SMTP id 5b1f17b1804b1-4390d5a2e06mr40199075e9.25.1738834459019;
+        Thu, 06 Feb 2025 01:34:19 -0800 (PST)
+Received: from fedora ([2a01:e0a:257:8c60:80f1:cdf8:48d0:b0a1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390db11750sm49963365e9.40.2025.02.06.01.34.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 01:34:18 -0800 (PST)
+Date: Thu, 6 Feb 2025 10:34:16 +0100
+From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	"Daniel P. Berrange" <berrange@redhat.com>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	Alex Bennee <alex.bennee@linaro.org>,
+	Akihiko Odaki <akihiko.odaki@gmail.com>,
+	Zhao Liu <zhao1.liu@intel.com>, Bibo Mao <maobibo@loongson.cn>,
+	Jamin Lin <jamin_lin@aspeedtech.com>,
+	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@redhat.com>,
+	Fabiano Rosas <farosas@suse.de>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Hanna Reitz <hreitz@redhat.com>, felisous@amazon.com,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: Call for GSoC internship project ideas
+Message-ID: <Z6SCGN+rW2tJYATh@fedora>
+References: <CAJSP0QVYE1Zcws=9hoO6+B+xB-hVWv38Dtu_LM8SysAmS4qRMw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QVYE1Zcws=9hoO6+B+xB-hVWv38Dtu_LM8SysAmS4qRMw@mail.gmail.com>
 
+On Tue, Jan 28, 2025 at 11:16:43AM -0500, Stefan Hajnoczi wrote:
+> Dear QEMU and KVM communities,
+> QEMU will apply for the Google Summer of Code internship
+> program again this year. Regular contributors can submit project
+> ideas that they'd like to mentor by replying to this email by
+> February 7th.
+> 
+> About Google Summer of Code
+> -----------------------------------------
+> GSoC (https://summerofcode.withgoogle.com/) offers paid open
+> source remote work internships to eligible people wishing to participate
+> in open source development. QEMU has been doing internship for
+> many years. Our mentors have enjoyed helping talented interns make
+> their first open source contributions and some former interns continue
+> to participate today.
+> 
+> Who can mentor
+> ----------------------
+> Regular contributors to QEMU and KVM can participate as mentors.
+> Mentorship involves about 5 hours of time commitment per week to
+> communicate with the intern, review their patches, etc. Time is also
+> required during the intern selection phase to communicate with
+> applicants. Being a mentor is an opportunity to help someone get
+> started in open source development, will give you experience with
+> managing a project in a low-stakes environment, and a chance to
+> explore interesting technical ideas that you may not have time to
+> develop yourself.
+> 
+> How to propose your idea
+> ------------------------------
+> Reply to this email with the following project idea template filled in:
+> 
+> === TITLE ===
+> 
+> '''Summary:''' Short description of the project
+> 
+> Detailed description of the project that explains the general idea,
+> including a list of high-level tasks that will be completed by the
+> project, and provides enough background for someone unfamiliar with
+> the code base to research the idea. Typically 2 or 3 paragraphs.
+> 
+> '''Links:'''
+> * Links to mailing lists threads, git repos, or web sites
+> 
+> '''Details:'''
+> * Skill level: beginner or intermediate or advanced
+> * Language: C/Python/Rust/etc
+> 
+> More information
+> ----------------------
+> You can find out about the process we follow here:
+> Video: https://www.youtube.com/watch?v=xNVCX7YMUL8
+> Slides (PDF): https://vmsplice.net/~stefan/stefanha-kvm-forum-2016.pdf
+> 
+> The QEMU wiki page for GSoC 2024 is now available:
+> https://wiki.qemu.org/Google_Summer_of_Code_2025
+> 
+> What about Outreachy?
+> -------------------------------
+> We have struggled to find sponsors for the Outreachy internship
+> program (https://www.outreachy.org/) in recent years. If you or your
+> organization would like to sponsor an Outreachy internship, please get
+> in touch.
+> 
+> Thanks,
+> Stefan
 
---=-TLRPvEdtMvxq/eM5U95X
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+=== Adding Kani proofs for Virtqueues in Rust-vmm ===
 
-On Tue, 2025-02-04 at 13:05 +0100, Thomas Wei=C3=9Fschuh wrote:
-> Currently each architecture defines the setup of the vDSO data page on
-> its own, mostly through copy-and-paste from some other architecture.
-> Extend the existing generic vDSO implementation to also provide generic
-> data storage.
-> This removes duplicated code and paves the way for further changes to
-> the generic vDSO implementation without having to go through a lot of
-> per-architecture changes.
->=20
-> Based on v6.14-rc1 and intended to be merged through the tip tree.
+'''Summary:''' Verify conformance of the virtqueue implementation in
+rust-vmm to the VirtIO specification.
 
-Thanks for working on this. Is there a plan to expose the time data
-directly to userspace in a form which is usable *other* than by
-function calls which get the value of the clock at a given moment?
+In the rust-vmm project, devices rely on the virtqueue implementation
+provided by the `vm-virtio` crate. This implementation is based on the
+VirtIO specification, which defines the behavior and requirements for
+virtqueues. To ensure that the implementation meets these
+specifications, we have been relying on unit tests that check the output
+of the code given specific inputs.
 
-For populating the vmclock device=C2=B9 we need to know the actual
-relationship between the hardware counter (TSC, arch timer, etc.) and
-real time in order to propagate that to the guest.
+However, writing unit tests can be incomplete, as it's challenging to
+cover all possible scenarios and edge cases. During this internship, we
+propose a more comprehensive approach: using Kani proofs to verify that
+the virtqueue implementation conforms to the VirtIO specification.
 
-I see two options for doing this:
+Kani allows us to write exhaustive checks for all possible values, going
+beyond what unit tests can achieve. By writing Kani proofs, we can
+confirm that our implementation meets the requirements of the VirtIO
+specification. If a proof passes, it provides strong evidence that the
+virtqueue implementation is correct and conformant.
 
- 1. Via userspace, exposing the vdso time data (and a notification when
-    it changes?) and letting the userspace VMM populate the vmclock.
-    This is complex for x86 because of TSC scaling; in fact userspace
-    doesn't currently know the precise scaling from host to guest TSC
-    so we'd have to be able to extract that from KVM.
+During the internship, we propose the following tasks:
+- Get familiar with Kani proofs written for Firecraker
+- Finish current PR that adds a proof for the notification suppression
+  mechanism (see [2])
+- Port add_used() proof (see [5])
+- Port verify_prepare_kick() proof (see [6])
 
- 2. In kernel, asking KVM to populate the vmclock structure much like
-    it does other pvclocks shared with the guest. KVM/x86 already uses
-    pvclock_gtod_register_notifier() to hook changes; should we expand
-    on that? The problem with that notifier is that it seems to be
-    called far more frequently than I'd expect.
+'''Links:'''
+  * [1] Kani source code - https://github.com/model-checking/kani/
+  * [2] Notification suppression mechanism PR -
+    https://github.com/rust-vmm/vm-virtio/pull/324
+  * [3] LPC Talk about how we may check conformance in the VirtIO
+    specification - https://www.youtube.com/watch?v=w7BAR228344
+  * [4] FOSDEM'25 talk current effort to use Kani -
+    https://fosdem.org/2025/schedule/event/fosdem-2025-5930-hunting-virtio-specification-violations/
+  * [5] https://github.com/firecracker-microvm/firecracker/blob/4bbbec06ee0d529add07807f75d923cc3d3cd210/src/vmm/src/devices/virtio/queue.rs#L1006
+  * [6] https://github.com/firecracker-microvm/firecracker/blob/4bbbec06ee0d529add07807f75d923cc3d3cd210/src/vmm/src/devices/virtio/queue.rs#L966
+ 
+'''Details:'''
+  * Skill level: intermediate
+  * Language: Rust 
 
-
-
-=C2=B9 https://gitlab.com/qemu-project/qemu/-/commit/3634039b93cc5
-
---=-TLRPvEdtMvxq/eM5U95X
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIwNjA5MzE0
-MlowLwYJKoZIhvcNAQkEMSIEIERZMz2IotRdbMhsT9qod1BX+F3d+8SGgb19TKs6OEngMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAdAWv7/Ma94ZM
-/9Fh3Sdl/S7OhQXyvMc8b43LE3FzqK8DOYqkP/jNcwUKRDutu6swQg1obN06fqixgD9ocNg6jm3y
-iqzKNbqbN37ui3CSU6fOt+/j0NMWTcH8btsG+qcVVz1NPFiuefroouvqP23zYR9x01B1iD4GtvdK
-CxNbkqhWuO90Kv50+8N8vzBPQ7Lus4aOgSWvtlJH61u9NZH9UeyiZ6+L6p2IHK+rDhGG5XDnrTNV
-7Jgr9942WqDnaiqCsCz3kMDpp5eZcdd9pDbtyhMSkLUdR3jjJwkUtQ5wtBmW1+bCxAZMDJ8jkmdh
-ruJQvaJEtgtMdQ3m/4w2zxdwepoQrvCDEMk6X6Cdn1QdR7IZ7iIiUINWq671aFTzSYNkOs64/tEE
-PNB8gSS3jnNV1ipd7QRFtClrO1qzhInJOXrlsNrkf74KthptIJcKBVniPMKN4b+HlGFvnd4cn98u
-yxbecezceueFkvpxTIE+9liAjiY1+hyJHWrMwuzKXR+hOiOvrM9AnG/KNL2bo2uQ7nAgAcsr5tCA
-l8bUeBG5Y80rAo+xp5MZlfa8G+W1DdWdheR51dM1Bh2TLq3llbuByHEX9mqq0xOSU5leYHY1fQOw
-JNMJ5gc7C12R8Sj/7a1SJGGKlxt7G83fq9quuuXIYyfLJkW2jRre3WesN7YavdIAAAAAAAA=
-
-
---=-TLRPvEdtMvxq/eM5U95X--
 
