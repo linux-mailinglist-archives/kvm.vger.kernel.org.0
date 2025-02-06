@@ -1,150 +1,117 @@
-Return-Path: <kvm+bounces-37481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37482-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB14A2A826
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 13:13:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70484A2A8A7
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 13:42:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F90D1887664
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 12:13:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CE6D16413B
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 12:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3133D22D4C7;
-	Thu,  6 Feb 2025 12:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 415AA22DF93;
+	Thu,  6 Feb 2025 12:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOhw5yQJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hYGDmumW"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF00D15A848
-	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 12:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF4C225A2F;
+	Thu,  6 Feb 2025 12:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738844002; cv=none; b=m7KNNLFQauwk3YV8tXr7KBlSxih2HEpYZINQ/lINW7z69CxOfJPNgts/CwELiHbPmN+yHKceVDbh/FPeX9KPPh4ddpM7flJHW6xk/mqp87ph2OusMSb73qppNY1i7QUxYS2kxnBcOAOIEjuDEDCAeU9YnNNMxEbzMI+oWCP1zP8=
+	t=1738845761; cv=none; b=MNPUbKQTpKxC1lt7uJrXboZ6BzVRLvFiXt1fZB1bYgELqi4dn7AjYSxDcMXmHRBZJIwsnG/u7JkxoviSZV7eznZs6hitO/CTERyD9Lzju29qtn1q5fdh8RoNz7urHldICwOPy0Hkn9Q5pUAMdsQVbQgc1876ysDlmnaDSWhraCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738844002; c=relaxed/simple;
-	bh=hDTXFSzPZFuDlHFd9Ob8Nf5fLzH4lL7tA1iWIGbnwGM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=o+XexmEhDsmg1LVP+eKvSLaHZhlk4TeDwwknaChDyQItEq6Wh92Cm3CjDx7FevuqG2SktXgC0EyZEGZFRQXNDKqzqgKbTthmTMla+AmaxXflglDz8EuUYf+Xxb/OLcerUluKlW3ULZ2yN05uyuKF/1m2QhT16XOwY+xbXlDQQRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GOhw5yQJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738843998;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QbaGyGBhUSjBumJijeigRGmqZB/oIS5ICSFxiOZSqrQ=;
-	b=GOhw5yQJDCqcQQDW8ktlGgEGAWuSnUnRHH9LCMO0ZWV02OQT9NM3MT5NqPQwN+jyYsQ6OI
-	spYgWo8hijwLahAwHZCQNU14A+b0ltC5MV/mFAmc0rH5XtLhskgH86tBssonM3BRMSRgsw
-	uLA/SBKuPD8a0ZJidNNGUKHEe+p/6KQ=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-459-tBgfEbVwPb-ADGZjCYreww-1; Thu,
- 06 Feb 2025 07:13:14 -0500
-X-MC-Unique: tBgfEbVwPb-ADGZjCYreww-1
-X-Mimecast-MFC-AGG-ID: tBgfEbVwPb-ADGZjCYreww
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2B60C1956096;
-	Thu,  6 Feb 2025 12:13:11 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.40])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 08A3119560A3;
-	Thu,  6 Feb 2025 12:13:10 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id B11F921E6A28; Thu, 06 Feb 2025 13:13:07 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Eric Blake <eblake@redhat.com>,
-  Michael Roth <michael.roth@amd.com>,  Daniel P . =?utf-8?Q?Berrang=C3=A9?=
- <berrange@redhat.com>,  Eduardo Habkost <eduardo@habkost.net>,  Marcelo
- Tosatti <mtosatti@redhat.com>,  Shaoqin Huang <shahuang@redhat.com>,  Eric
- Auger <eauger@redhat.com>,  Peter Maydell <peter.maydell@linaro.org>,
-  Laurent Vivier <lvivier@redhat.com>,  Thomas Huth <thuth@redhat.com>,
-  Sebastian Ott <sebott@redhat.com>,  Gavin Shan <gshan@redhat.com>,
-  qemu-devel@nongnu.org,  kvm@vger.kernel.org,  qemu-arm@nongnu.org,
-  Dapeng Mi <dapeng1.mi@intel.com>,  Yi Lai <yi1.lai@intel.com>
-Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
-In-Reply-To: <Z6SMxlWhHgronott@intel.com> (Zhao Liu's message of "Thu, 6 Feb
-	2025 18:19:50 +0800")
-References: <20250122090517.294083-1-zhao1.liu@intel.com>
-	<20250122090517.294083-2-zhao1.liu@intel.com>
-	<871pwc3dyw.fsf@pond.sub.org> <Z6SMxlWhHgronott@intel.com>
-Date: Thu, 06 Feb 2025 13:13:07 +0100
-Message-ID: <87h657p8z0.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1738845761; c=relaxed/simple;
+	bh=t3QSoBAqI5Z9Br5rpMNkKkLBbWevnj/aBKJHylgokuw=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=qHFW1m1uWUptEIUCsmSJgZAcNNjrppXZ79aC1X5i6V3WYXiz62QzdHB7sFaYfJz1gEKU8jzmAY2rztb242uWQSB+ax9xwJ+o5GRJ2TZcLoHIe9xpMjj3pZzCRt0ByFCVH/sdk5EgI3dRRxGhvbZA0viEhLRZPwxuIiqwxV6p6Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hYGDmumW; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5169pcUc024286;
+	Thu, 6 Feb 2025 12:42:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=t3QSoB
+	AqI5Z9Br5rpMNkKkLBbWevnj/aBKJHylgokuw=; b=hYGDmumWU4aNIq2lYvvU2W
+	HxpenjauBsYguj0grv+fxSuECXuzL5Za3hQipapbdg0m5eKhvYUe30bvs7oOCU9K
+	Bwzrqyez9ltrI1vXwXxm6FMMKSokxTbjgyIwNd6VYS2YUOIqjH72ab6q2IkitGoY
+	KBmIIbtcwjIRlZ2Io9iIU/M7wrUr0SRolL1aQlmKCY9qIWGWe65HUFCiNgNHn56b
+	IUoAnenIdscgVP7kKzDv7nrAwSuKHvGPGGjx5KLX2rc+/lfxBQZfwoF7+DV/InNr
+	SbIc35VBoLE4geYlETDCNPWW0n4K73XaDoGgNVDs0Twlpv/e6/Ypg2LE5PkbImgw
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44mattdfyk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Feb 2025 12:42:38 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 516Ai8Q3016416;
+	Thu, 6 Feb 2025 12:42:37 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44hwxspj8u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Feb 2025 12:42:37 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 516CgYP354657428
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 6 Feb 2025 12:42:34 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 202BE20076;
+	Thu,  6 Feb 2025 12:42:34 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 496822006C;
+	Thu,  6 Feb 2025 12:42:26 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.19.54])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  6 Feb 2025 12:42:26 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 06 Feb 2025 13:42:26 +0100
+Message-Id: <D7LDDFZYNOQG.2VS87QUG4AK92@linux.ibm.com>
+Cc: <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>, <hca@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH] lib: s390x: css: Name inline assembly
+ arguments and clean them up
+From: "Nico Boehr" <nrb@linux.ibm.com>
+To: "Janosch Frank" <frankja@linux.ibm.com>,
+        "Claudio Imbrenda"
+ <imbrenda@linux.ibm.com>
+X-Mailer: aerc 0.18.2
+References: <20250204100339.28158-1-frankja@linux.ibm.com>
+ <20250205112550.45a6b2cd@p-imbrenda>
+ <97262c67-b04e-4015-a081-f1024e8a31a2@linux.ibm.com>
+In-Reply-To: <97262c67-b04e-4015-a081-f1024e8a31a2@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Ual57odDLMIHnNd0mk1PsBhMRpyJdH5A
+X-Proofpoint-ORIG-GUID: Ual57odDLMIHnNd0mk1PsBhMRpyJdH5A
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-06_03,2025-02-05_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 suspectscore=0 adultscore=0 mlxscore=0 clxscore=1015
+ mlxlogscore=837 bulkscore=0 phishscore=0 malwarescore=0 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502060104
 
-Zhao Liu <zhao1.liu@intel.com> writes:
-
-> On Wed, Feb 05, 2025 at 11:03:51AM +0100, Markus Armbruster wrote:
->> Date: Wed, 05 Feb 2025 11:03:51 +0100
->> From: Markus Armbruster <armbru@redhat.com>
->> Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
->> 
->> Quick & superficial review for now.
->
-> Thanks!
->
->> > diff --git a/qapi/kvm.json b/qapi/kvm.json
->> > new file mode 100644
->> > index 000000000000..d51aeeba7cd8
->> > --- /dev/null
->> > +++ b/qapi/kvm.json
->> > @@ -0,0 +1,116 @@
->> > +# -*- Mode: Python -*-
->> > +# vim: filetype=python
->> > +
->> > +##
->> > +# = KVM based feature API
->> 
->> This is a top-level section.  It ends up between sections "QMP
->> introspection" and "QEMU Object Model (QOM)".  Is this what we want?  Or
->> should it be a sub-section of something?  Or next to something else?
->
-> Do you mean it's not in the right place in the qapi-schema.json?
->
-> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-> index b1581988e4eb..742818d16e45 100644
-> --- a/qapi/qapi-schema.json
-> +++ b/qapi/qapi-schema.json
-> @@ -64,6 +64,7 @@
->  { 'include': 'compat.json' }
->  { 'include': 'control.json' }
->  { 'include': 'introspect.json' }
-> +{ 'include': 'kvm.json' }
->  { 'include': 'qom.json' }
->  { 'include': 'qdev.json' }
->  { 'include': 'machine-common.json' }
->
-> Because qom.json includes kvm.json, so I have to place it before
-> qom.json.
->
-> It doesn't have any dependencies itself, so placing it in the previous
-> position should be fine, where do you prefer?
-
-Let's ignore how to place it for now, and focus on where we would *like*
-to place it.
-
-Is it related to anything other than ObjectType / ObjectOptions in the
-QMP reference manual?
-
-I guess qapi/kvm.json is for KVM-specific stuff in general, not just the
-KVM PMU filter.  Should we have a section for accelerator-specific
-stuff, with subsections for the various accelerators?
-
+On Thu Feb 6, 2025 at 11:36 AM CET, Janosch Frank wrote:
 [...]
+> Heiko suggested to drop the two "m" clobbers and just add a generic=20
+> memory clobber. If we even want to touch this at all...
 
+We are a testing framework and don't care about the last bit of
+performance. I would argue that we can just always go with a memory
+clobber, since they are less error-prone and easier to understand.
+
+If you don't mind, go with a memory clobber in v2. Otherwise let me know, I
+think I may have a few other cleanups lying around and could do it when I
+send them out.
 
