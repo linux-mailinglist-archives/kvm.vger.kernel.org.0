@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-37511-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37512-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E00EA2ADC5
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 17:31:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5FEAA2ADDC
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 17:33:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40D27188BCB2
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:31:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1215416BEB6
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 16:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC2C237193;
-	Thu,  6 Feb 2025 16:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FD12594A3;
+	Thu,  6 Feb 2025 16:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="G/Tu9iPK"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hrWtk7yw"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A66623716D;
-	Thu,  6 Feb 2025 16:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3900237182;
+	Thu,  6 Feb 2025 16:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738859441; cv=none; b=T72ph22tiEItZ6ShxHmoUdHHdzgCNxLkagLPa7vWbn/WlRJb/kK9KFrVwHawKHnvpLaXGAAaJJa/7d5Hfq7LS8eHxYseOXZePpEb8Gb9F+SSaLlkM67dPKaXxIC9yPwDLV9PXzTDv01HiPE0puepFmXI0RXkiUdqrC468UHXMXY=
+	t=1738859546; cv=none; b=sCaK+l147gjDxBVOWDUOVeVbSrOr4YsYDT1Q3EdpcK9ZIrn4Fexzt9O1/ccxQ7FhIQ1u4UNaCeMqoYoYOyTVGITEg1M+mzic13+5QQMc/yABPLjhaTDWAhYtA9NXKxNTwk5hMvxoDV9KsOUNmvl7aarLLwgjCAyXpYRBT9FxE70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738859441; c=relaxed/simple;
-	bh=kcjpZ+6goP8NIV10LeU/cHomAExYyAabA4/zoETpRo4=;
+	s=arc-20240116; t=1738859546; c=relaxed/simple;
+	bh=5V13wWYQLfaBqiPfklxjyIDoIhVZ+gVxehFQ+X6kNtk=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=swHXlQJ0faMRC2JcrmSWB3IesxpLgxq8zEqkmId0GOq7lVG1FFWq3noemd5TWCTkcD1emSVwmLQADWvxZ4zMkQ9+kaiwkJ4XJU3y3uapntlwQ6teLjhD/jNBYBumQtOazO2dL/E8jDt1x3Y+f38d92v4eCHKp/64JgqzIdXPo+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=G/Tu9iPK; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=LaZBC+cpkw/JmdjWclT7gmGEoN8E6EoaLhg3m532sCB0vo5wHHt+RlwFmmx0ukP6Tba2ibdcFj6xz93WPcspl5fv6I6boM1Rg8IqvwQoz30pQfNSMIWREiIrzpix/uGMdPWXZrON/I0Y5vnrhw5r6ag1+60ik8862cN3X+zORr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hrWtk7yw; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=kcjpZ+6goP8NIV10LeU/cHomAExYyAabA4/zoETpRo4=; b=G/Tu9iPKud9x0qqgRZOtqQuU0X
-	s8vl5Hi7l40Nqt8ShRNmNyIKLhUE7lS5mPAh1U/PQR4mD5ESyKMfaVd+vRZIxV9uN5zE3S9VqDFjx
-	dxCOStfjFWkv8zy+Bn3QOgmL/ANio8AUF/rWU7psrC1UiCzu2E5JwnoP/Iuc/dDG0rN7AcPEcBwjg
-	YS+GVHzamiuVJG2HkWJgrLJfZ1ecHBab4XL00MkV7YzyhiweN7E0DPcMKz6fb+9ueFEQtAF1Xqu44
-	HWA4M6LHp8XM191ey04g4+Puo2f8IpvPN9RMQfTSMqD9kqUVT4NU/aQqXDybo8EnmYac4WTqwJh4S
-	Ns3bMisg==;
+	bh=5V13wWYQLfaBqiPfklxjyIDoIhVZ+gVxehFQ+X6kNtk=; b=hrWtk7ywEgQrQhHZuLf8DZMRNQ
+	aS3RlxAwSlh3/YW0VtkN/U3/el+E7b4lug/l4DO2PAJZo+hSHOHeEtBwAs8+nL9oRl7v+aX0mH6Up
+	H5B20xML2j6N2YWRDnFPfEmwlUrkz1se3MB/lCPEwpyf4twIT2n06HtZnLL6JsHOVkesUKfEeVDrF
+	VMMiF4OCneXRhOK2GEW//ha2eiyoY3DRrkOJAB3ZZA4WqqJYBLfuwjRHJoIYsrfTmKF6NSQCBABo+
+	yrisUV+yqKFUu8zUoALDXXGJRaFyFYLU41dPICAz2CQgM/bP9G350S8cmsKxoWGRl+skURuPOY3Hq
+	18wGdSwg==;
 Received: from [54.239.6.187] (helo=freeip.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tg4lu-00000006G2M-1Y40;
-	Thu, 06 Feb 2025 16:30:34 +0000
-Message-ID: <8e10d49ad93cca7b1d195dbca11b9609e8137bdb.camel@infradead.org>
-Subject: Re: [PATCH 4/5] KVM: x86/xen: Bury xen_hvm_config behind
- CONFIG_KVM_XEN=y
+	id 1tg4nd-00000006GBl-2zRd;
+	Thu, 06 Feb 2025 16:32:22 +0000
+Message-ID: <d85f0685f1f61aa6f63d8628afb5599446974c18.camel@infradead.org>
+Subject: Re: [PATCH 5/5] KVM: x86/xen: Move kvm_xen_hvm_config field into
+ kvm_xen
 From: David Woodhouse <dwmw2@infradead.org>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>,  Paul Durrant <paul@xen.org>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	syzbot+cdeaeec70992eca2d920@syzkaller.appspotmail.com, Joao Martins
 	 <joao.m.martins@oracle.com>
-Date: Thu, 06 Feb 2025 16:30:33 +0000
-In-Reply-To: <20250201011400.669483-5-seanjc@google.com>
+Date: Thu, 06 Feb 2025 16:32:20 +0000
+In-Reply-To: <20250201011400.669483-6-seanjc@google.com>
 References: <20250201011400.669483-1-seanjc@google.com>
-	 <20250201011400.669483-5-seanjc@google.com>
+	 <20250201011400.669483-6-seanjc@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-j3CxXoGpv5ttgkXvG5nx"
+	boundary="=-Bk9fyb1Y2o6sDysPnXq+"
 User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -70,22 +70,26 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-j3CxXoGpv5ttgkXvG5nx
+--=-Bk9fyb1Y2o6sDysPnXq+
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2025-01-31 at 17:13 -0800, Sean Christopherson wrote:
-> Now that all references to kvm_vcpu_arch.xen_hvm_config are wrapped with
-> CONFIG_KVM_XEN #ifdefs, bury the field itself behind CONFIG_KVM_XEN=3Dy.
+On Fri, 2025-01-31 at 17:14 -0800, Sean Christopherson wrote:
+> Now that all KVM usage of the Xen HVM config information is buried behind
+> CONFIG_KVM_XEN=3Dy, move the per-VM kvm_xen_hvm_config field out of kvm_a=
+rch
+> and into kvm_xen.
 >=20
 > No functional change intended.
 >=20
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
+Not quite sure why this is a separate patch instead of being part of
+the previous one (which also applied to patches 2 and 3), but OK.
+
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-
---=-j3CxXoGpv5ttgkXvG5nx
+--=-Bk9fyb1Y2o6sDysPnXq+
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -164,22 +168,22 @@ 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
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIwNjE2MzAz
-M1owLwYJKoZIhvcNAQkEMSIEIE3++zSjZ6KoG2O9X8U2N9b+RciKNJaulYslbwisqHoZMGQGCSsG
+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
-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
+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
 
 
---=-j3CxXoGpv5ttgkXvG5nx--
+--=-Bk9fyb1Y2o6sDysPnXq+--
 
