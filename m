@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-37462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37470-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43B62A2A4B1
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:36:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02C35A2A56C
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 11:01:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7982D7A1BB4
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:35:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C84B16865E
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 10:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B61227B91;
-	Thu,  6 Feb 2025 09:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0284322A4F5;
+	Thu,  6 Feb 2025 10:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IcJJowGG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RV9aQ9oz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B90922619A
-	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 09:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF96C227564
+	for <kvm@vger.kernel.org>; Thu,  6 Feb 2025 10:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738834510; cv=none; b=nKcLkMdaNRUy/+PnDTxks5Y/47CTvbIEDDck4p6sUIjiz4WdweduvtlCLDD6tPz0FZgGc/z86Jo/mLLCDhWFcZklkGEPDzeDJTlK4DHs8tUOOn5vyHSjozgMqs2rBxJ3caEQW2f/AOGrLBvKUtQcY9I229iUZ2jOfYxoo5VC9/s=
+	t=1738836032; cv=none; b=a8yimC6trlNKrlz8s/YYey1elfpdZRGuVTFjXjaQMxp+F2E2aFO1JZRD5JPNl8+Y76jY3AsV+L4lIj+yrGMIkeMH26hUm+c8Ho4lyi3VWDR6LQSrKGbURcc4g03k6KFqO7BphNENYF5RIA2nsBk0vTsDXmOHy6BbY7VCBdZsVWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738834510; c=relaxed/simple;
-	bh=SbzsFpxSlqt0LRVCVphwfchnZcpRBWTRP4V0UBxDljg=;
+	s=arc-20240116; t=1738836032; c=relaxed/simple;
+	bh=MU874FEMTTz129Wl0GzXGt5/AqElqEZSPesXYVwITzg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G8VKxYpn/Ia3ZHkJRhUsuyGC4DXqZKsKaSZn5joeq/QBOqga9oygv4xOA0TyhmkaQubB3b4OPUrlmyS/HAwqp5+21pVUYgpLO0BvopdJRrBekBjarfc0EghsUIaqXcYyI358UZk+xvJ+B4SelQnCugB9QsqJSGzO6WJCmYUmMZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IcJJowGG; arc=none smtp.client-ip=198.175.65.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=qHVsLdjtk/Izp5DDVsmjvuKlOJwVPahxzjWDc1w38yaMp1RviZ8/RmMAhopl+jp3S72xjTFNpL3ufA2Bo9xNsxtRLfdUpqdGBDfJXZG/MjxHNgXQA8XqdWDSFW2KGrE8psUEtaG/hTwZjfcXm4NqAooH5najvjh3yJDzY0d8JO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RV9aQ9oz; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738834508; x=1770370508;
+  t=1738836030; x=1770372030;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=SbzsFpxSlqt0LRVCVphwfchnZcpRBWTRP4V0UBxDljg=;
-  b=IcJJowGGcq6pLclLSWDg6Mf/wiX3tLTaF8tEWCqfRz2HfN/ew4qekgKD
-   9KJHhmL0RJwQ8kzd8wcnTlQShci99I0l9eAoSpySbbBNFp+cgWjvUkaiM
-   B6sjW0IE5FIC08ELzBNdnNC/m7TiOjpTYI1wDIYWDpGcTITSppjwvCOBv
-   SlW5DPUpRDw2wDQZxiHV0zPXLoF+QMEsPg5C8fRZjSx+WRQJmIJvD9u6k
-   XT+lcZSlFp8rwwEy6SoMU6hmR4jR2/dSnj2a2/flU5XpvkFMGbV6o8LYt
-   mq1v79WHrnag8GH4PXhostJWaOjLzxdXdvp7jeg+ISe4kdHqE+zPtlVxq
-   w==;
-X-CSE-ConnectionGUID: Yns/o7BWRfKhtR5A08HCWQ==
-X-CSE-MsgGUID: dgJlccH6Rla4c4tChfmXjA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="61905381"
+  bh=MU874FEMTTz129Wl0GzXGt5/AqElqEZSPesXYVwITzg=;
+  b=RV9aQ9ozqJgIaUzsrvwxePINgVsFGTs03kN8ma/o/dWC+reZKeZ2ms3+
+   V5dyB1GB19Xylk1muF1OzyeBM66GtXbqBkZ/zn9NHwFkyfYhYbAetGUEg
+   /o+J7gQUiFK64y8GvCqfE08sIVXdBeAJvsjWPV9O/35uGrtNjAgEtDfKK
+   lwoFrrICHZt4+RiYiItqSVCB+FSmI+TU0FLatS260geQHR68wojhb2j6V
+   d/Wr+1GKvZkRXDEVjSpYAnN2D6kytVlygM1/a5NNrGX0N3Cf1fi2H/FIt
+   WXjqirJlFHhQ/kWarx3RIV7J91nEeGXnWwv54cST4aMVETxIacstkfXBh
+   g==;
+X-CSE-ConnectionGUID: V7qG9SwgRdiS8qpPV9LR3A==
+X-CSE-MsgGUID: Hwq6fhx5TBqhKW0z3KNvjw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39456942"
 X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
-   d="scan'208";a="61905381"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 01:35:08 -0800
-X-CSE-ConnectionGUID: 2gIBkdsDS86vB5dYK1Hsqw==
-X-CSE-MsgGUID: Mm5+m0RnTiC1gkfud4HxFg==
+   d="scan'208";a="39456942"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 02:00:30 -0800
+X-CSE-ConnectionGUID: cx0BQhqjQt27D6NsVtSqcQ==
+X-CSE-MsgGUID: QCjIMYF1Qie+rufoFs4vsQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="142041740"
+X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
+   d="scan'208";a="116147595"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa001.fm.intel.com with ESMTP; 06 Feb 2025 01:35:03 -0800
-Date: Thu, 6 Feb 2025 17:54:32 +0800
+  by orviesa004.jf.intel.com with ESMTP; 06 Feb 2025 02:00:22 -0800
+Date: Thu, 6 Feb 2025 18:19:50 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Markus Armbruster <armbru@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
@@ -72,12 +72,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
 	Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>,
 	qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
 	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>
-Subject: Re: [RFC v2 3/5] i386/kvm: Support event with select & umask format
- in KVM PMU filter
-Message-ID: <Z6SG2NLxxhz4adlV@intel.com>
+Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
+Message-ID: <Z6SMxlWhHgronott@intel.com>
 References: <20250122090517.294083-1-zhao1.liu@intel.com>
- <20250122090517.294083-4-zhao1.liu@intel.com>
- <87zfj01z8x.fsf@pond.sub.org>
+ <20250122090517.294083-2-zhao1.liu@intel.com>
+ <871pwc3dyw.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,118 +85,108 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87zfj01z8x.fsf@pond.sub.org>
+In-Reply-To: <871pwc3dyw.fsf@pond.sub.org>
 
-On Wed, Feb 05, 2025 at 11:07:10AM +0100, Markus Armbruster wrote:
-> Date: Wed, 05 Feb 2025 11:07:10 +0100
+On Wed, Feb 05, 2025 at 11:03:51AM +0100, Markus Armbruster wrote:
+> Date: Wed, 05 Feb 2025 11:03:51 +0100
 > From: Markus Armbruster <armbru@redhat.com>
-> Subject: Re: [RFC v2 3/5] i386/kvm: Support event with select & umask
->  format in KVM PMU filter
+> Subject: Re: [RFC v2 1/5] qapi/qom: Introduce kvm-pmu-filter object
 > 
-> Zhao Liu <zhao1.liu@intel.com> writes:
-> 
-> > The select&umask is the common way for x86 to identify the PMU event,
-> > so support this way as the "x86-default" format in kvm-pmu-filter
-> > object.
-> 
-> So, format 'raw' lets you specify the PMU event code as a number, wheras
-> 'x86-default' lets you specify it as select and umask, correct?
-
-Yes!
-
-> Why do we want both?
-
-This 2 formats are both wildly used in x86(for example, in perf tool).
-
-x86 documents usually specify the umask and select fields.
-
-But raw format could also be applied for ARM since ARM just uses a number
-to encode event.
-
-> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> 
-> [...]
-> 
-> > diff --git a/qapi/kvm.json b/qapi/kvm.json
-> > index d51aeeba7cd8..93b869e3f90c 100644
-> > --- a/qapi/kvm.json
-> > +++ b/qapi/kvm.json
-> > @@ -27,11 +27,13 @@
-> >  #
-> >  # @raw: the encoded event code that KVM can directly consume.
-> >  #
-> > +# @x86-default: standard x86 encoding format with select and umask.
-> 
-> Why is this named -default?
-
-Intel and AMD both use umask+select to encode events, but this format
-doesn't have a name... so I call it `default`, or what about
-"x86-umask-select"?
-
-> > +#
-> >  # Since 10.0
-> >  ##
-> >  { 'enum': 'KVMPMUEventEncodeFmt',
-> >    'prefix': 'KVM_PMU_EVENT_FMT',
-> > -  'data': ['raw'] }
-> > +  'data': ['raw', 'x86-default'] }
-> >  
-> >  ##
-> >  # @KVMPMURawEvent:
-> > @@ -46,6 +48,25 @@
-> >  { 'struct': 'KVMPMURawEvent',
-> >    'data': { 'code': 'uint64' } }
-> >  
-> > +##
-> > +# @KVMPMUX86DefalutEvent:
-> 
-> Default, I suppose.
+> Quick & superficial review for now.
 
 Thanks!
 
-> > +#
-> > +# x86 PMU event encoding with select and umask.
-> > +# raw_event = ((select & 0xf00UL) << 24) | \
-> > +#              (select) & 0xff) | \
-> > +#              ((umask) & 0xff) << 8)
+> > diff --git a/qapi/kvm.json b/qapi/kvm.json
+> > new file mode 100644
+> > index 000000000000..d51aeeba7cd8
+> > --- /dev/null
+> > +++ b/qapi/kvm.json
+> > @@ -0,0 +1,116 @@
+> > +# -*- Mode: Python -*-
+> > +# vim: filetype=python
+> > +
+> > +##
+> > +# = KVM based feature API
 > 
-> Sphinx rejects this with "Unexpected indentation."
-> 
-> Is the formula needed here?
+> This is a top-level section.  It ends up between sections "QMP
+> introspection" and "QEMU Object Model (QOM)".  Is this what we want?  Or
+> should it be a sub-section of something?  Or next to something else?
 
-I tried to explain the relationship between raw format and umask+select.
+Do you mean it's not in the right place in the qapi-schema.json?
 
-Emm, where do you think is the right place to put the document like
-this?
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index b1581988e4eb..742818d16e45 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -64,6 +64,7 @@
+ { 'include': 'compat.json' }
+ { 'include': 'control.json' }
+ { 'include': 'introspect.json' }
++{ 'include': 'kvm.json' }
+ { 'include': 'qom.json' }
+ { 'include': 'qdev.json' }
+ { 'include': 'machine-common.json' }
 
-...
+Because qom.json includes kvm.json, so I have to place it before
+qom.json.
+
+It doesn't have any dependencies itself, so placing it in the previous
+position should be fine, where do you prefer?
 
 > > +##
-> > +# @KVMPMUX86DefalutEventVariant:
+> > +
+> > +##
+> > +# @KVMPMUFilterAction:
 > > +#
-> > +# The variant of KVMPMUX86DefalutEvent with the string, rather than
-> > +# the numeric value.
+> > +# Actions that KVM PMU filter supports.
 > > +#
-> > +# @select: x86 PMU event select field.  This field is a 12-bit
-> > +#     unsigned number string.
+> > +# @deny: disable the PMU event/counter in KVM PMU filter.
 > > +#
-> > +# @umask: x86 PMU event umask field. This field is a uint8 string.
+> > +# @allow: enable the PMU event/counter in KVM PMU filter.
+> > +#
+> > +# Since 10.0
+> > +##
+> > +{ 'enum': 'KVMPMUFilterAction',
+> > +  'prefix': 'KVM_PMU_FILTER_ACTION',
+> > +  'data': ['allow', 'deny'] }
+> > +
+> > +##
+> > +# @KVMPMUEventEncodeFmt:
 > 
-> Why are these strings?  How are they parsed into numbers?
+> Please don't abbreviate Format to Fmt.  We use Format elsewhere, and
+> consistency is desirable.
 
-In practice, the values associated with PMU events (code for arm, select&
-umask for x86) are often expressed in hexadecimal. Further, from linux
-perf related information (tools/perf/pmu-events/arch/*/*/*.json), x86/
-arm64/riscv/nds32/powerpc all prefer the hexadecimal numbers and only
-s390 uses decimal value.
+OK, will fix.
 
-Therefore, it is necessary to support hexadecimal in order to honor PMU
-conventions.
+> >  ##
+> >  # = QEMU Object Model (QOM)
+> > @@ -1108,6 +1109,7 @@
+> >        'if': 'CONFIG_LINUX' },
+> >      'iommufd',
+> >      'iothread',
+> > +    'kvm-pmu-filter',
+> >      'main-loop',
+> >      { 'name': 'memory-backend-epc',
+> >        'if': 'CONFIG_LINUX' },
+> > @@ -1183,6 +1185,7 @@
+> >                                        'if': 'CONFIG_LINUX' },
+> >        'iommufd':                    'IOMMUFDProperties',
+> >        'iothread':                   'IothreadProperties',
+> > +      'kvm-pmu-filter':             'KVMPMUFilterPropertyVariant',
+> 
+> The others are like
+> 
+>          'mumble': 'MumbleProperties'
+> 
+> Let's stick to that, and also avoid running together multiple
+> capitalized acronyms: KvmPmuFilterProperties.
 
-However, unfortunately, standard JSON (RFC 8259) does not support
-hexadecimal numbers. So I can only consider using the numeric string in
-the QAPI and then parsing it to a number.
-
-I parse this string into number by qemu_strtou64().
-
+IIUC, then I should use the name "KvmPmuFilterProperties" (string version
+for QAPI), and the name "KvmPmuFilterPropertiesVariant" (numeric version
+in codes), do you agree?
+ 
+> >        'main-loop':                  'MainLoopProperties',
+> >        'memory-backend-epc':         { 'type': 'MemoryBackendEpcProperties',
+> >                                        'if': 'CONFIG_LINUX' },
+> 
 
