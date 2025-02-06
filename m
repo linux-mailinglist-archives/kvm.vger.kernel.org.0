@@ -1,140 +1,252 @@
-Return-Path: <kvm+bounces-37453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78BBA2A284
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 08:42:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E7BFA2A325
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:27:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7B401889820
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 07:42:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006D63A4B50
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 08:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0F0225406;
-	Thu,  6 Feb 2025 07:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A260225796;
+	Thu,  6 Feb 2025 08:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="otZRwA0X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/ecygOy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AE72144A8;
-	Thu,  6 Feb 2025 07:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2679A22541C;
+	Thu,  6 Feb 2025 08:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738827659; cv=none; b=OFVxmfODV9ID00P+ZkWBHKd7n922pvB34Tle++THRq33uBd/V5Vn8fbm04tnJCfoNDmWHmLDdBFqAe8aN4ADzFIESQhYhz4ELLxeeNGeX+Z/FTrZM76DJHlOb80CiRLX0cdw4vaHBpTuxb5T0up58DqLCCHiXk5B0wavCZVua40=
+	t=1738830431; cv=none; b=aAWXcgJ2/AMKp5AMDJDDRLIfd+WZAooGf1Y9kMWjQLT9Dl/69RWRLBvZLFMF+I8azZ2S3rQxmgXG1BhuExA9Lb69VGPYecHT3z08A0w5+YI2jyRkgYxoodVsR8MJHI8B1L6Tb5s7LvNzYZkkjoAZrq2L8PjzSkzPhcbQeUEL83s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738827659; c=relaxed/simple;
-	bh=rznXd4x1zW1//N/BsvDJtIAkg2PEYTFKtcqRLhHYAI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q7mrdtIEkwd/bUYz/AcLX2qXb5kt2Zlflpvio1ISNE90MvRjpDIhDd1CTNFGMdMxzHb8Xm6uSnoVqKfrKLmO5wLDQPWFMkp8ZWTd7xPYbhSeAYQ86fZ2MMcUjoyTl2vj87cTV2PMVOyaub04Y4EnhuK94a1EcUJ86Enx2xYZzHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=otZRwA0X; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5167XcIe006184;
-	Thu, 6 Feb 2025 07:40:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=BZQGey
-	7aq0bOIsiLZo/USNAPvLQFjQQ8oT67LMfXifo=; b=otZRwA0XJUW+/h+Ac1USfU
-	UdeCj+jvK5yeJ4m18jsBDDLls0FzuvKj6pMCy1UXPB6IEX3tmhnMRxRMtMHIrrQD
-	nS9U13aOuphUtYa6iT43KZJ12ydpbz2/L44C/LlMlMJ8Rs+qfrlVUt0g++BOMpJ1
-	PVM0GQb/KSlewjDm3gFnFyylNgWrXQ1PwJZMjd343+08Gu0Qn0oEg6hJe5IuMLRI
-	jnAPusdAJ270y+XInxlWjO6SQgR/FrGSaGR2cacopLoul/sMAGDLDhEpSMsxmTS2
-	us3ZP+XDXZqjCAot8yR8fzEar9qoAtww3hHNGiOKBr3Pce3VSoJU0zmgYO4DbHmA
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44mrsp010x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 07:40:53 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5167DH0K016416;
-	Thu, 6 Feb 2025 07:40:52 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44hwxsnaf9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 07:40:52 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5167enaZ46072166
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 6 Feb 2025 07:40:49 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 392B020218;
-	Thu,  6 Feb 2025 07:40:49 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AC36F20217;
-	Thu,  6 Feb 2025 07:40:48 +0000 (GMT)
-Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.179.15.176])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  6 Feb 2025 07:40:48 +0000 (GMT)
-Date: Thu, 6 Feb 2025 08:40:47 +0100
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Anthony Krowiak <akrowiak@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>
-Cc: Rorie Reyes <rreyes@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        borntraeger@de.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
-        alex.williamson@redhat.com
-Subject: Re: [PATCH v1] s390/vfio-ap: Signal eventfd when guest AP
- configuration is changed
-Message-ID: <Z6RnfwawWop0v1CW@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20250107183645.90082-1-rreyes@linux.ibm.com>
- <Z4U6iu5JidJUxDgX@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
- <f69bba4b-a97e-4166-9ce1-c8a2ad634696@linux.ibm.com>
- <f1af50b3-f966-445d-ab89-3d213f55b93a@linux.ibm.com>
+	s=arc-20240116; t=1738830431; c=relaxed/simple;
+	bh=0qtYGiPYsqYZLBqgJ+4cbTZlqzHvL7ZKnM+o5kglBH4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=foAgxFEx15b9pW8dQQ111qAN6JXVSFDDMWzt9MOMRcIe7ncKGBMnyidpGTe9Ptxsv+agF4iumYibynfLErEx2CGk4DbJn8tLtlRxdIxohvCLptmTh6iGYdosaHQbd6toEDXbxTklIfIwZXwFpw+/+bxqWRjQqbQzJ6RD8F+ZgmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/ecygOy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7696BC4CEDD;
+	Thu,  6 Feb 2025 08:27:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738830430;
+	bh=0qtYGiPYsqYZLBqgJ+4cbTZlqzHvL7ZKnM+o5kglBH4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n/ecygOy6uKcaclmbQ12QrdKFZ7C2/0m+gI3kwhl3imre6Lv2sCXRBxobHM0niAfP
+	 TG8qr9FuyEenPumR3fFXnqKp6TG5fW/W3vaC+EXUsJ/9mt5MgyP3Vb8nqh24PPemuV
+	 dziSwQTFj2C1mr+6QmR79/tfzrVUyMK0Nb0NILWqj+wK+IX7wAzxDtQlbwZQF48amT
+	 cZC8HOdc0aCm2AH8P44vaBicHO4wU41uUo6MZmndlfenPuIV0VNMuxHE2ga9UPqF4r
+	 jqm0migL8XEdlIou78rSL1kpUbUaBXfpDP5+OE3d8pkZQFhHcYGghBlHyGKAuEDe/O
+	 01NVyRtseB++A==
+Received: from 82-132-235-183.dab.02.net ([82.132.235.183] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tfxE3-00131o-Fj;
+	Thu, 06 Feb 2025 08:27:07 +0000
+Date: Thu, 06 Feb 2025 08:27:08 +0000
+Message-ID: <87frkrtr4z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
+In-Reply-To: <20250206001744.3155465-1-coltonlewis@google.com>
+References: <20250206001744.3155465-1-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f1af50b3-f966-445d-ab89-3d213f55b93a@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fqtzxi7VF_dh9dJf88Qgv9YE_uAhhBV4
-X-Proofpoint-ORIG-GUID: fqtzxi7VF_dh9dJf88Qgv9YE_uAhhBV4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-06_01,2025-02-05_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- bulkscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0 adultscore=0
- spamscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
- definitions=main-2502060061
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.235.183
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Feb 05, 2025 at 12:47:55PM -0500, Anthony Krowiak wrote:
-> > > How this patch is synchronized with the mentioned QEMU series?
-> > > What is the series status, especially with the comment from Cédric
-> > > Le Goater [1]?
-> > > 
-> > > 1. https://lore.kernel.org/all/20250107184354.91079-1-rreyes@linux.ibm.com/T/#mb0d37909c5f69bdff96289094ac0bad0922a7cce
-...
-> > Hey Alex, sorry for the long delay. This patch is synchronized with the
-> > QEMU series by registering an event notifier handler to process AP
-> > configuration
-> > 
-> > change events. This is done by queuing the event and generating a CRW.
-> > The series status is currently going through a v2 RFC after implementing
-> > changes
-> > 
-> > requested by Cedric and Tony.
-> > 
-> > Let me know if there's anything else you're concerned with
-> > 
-> > Thanks!
+Colton,
+
+On Thu, 06 Feb 2025 00:17:44 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
 > 
-> I don't think that is what Alex was asking. I believe he is asking how the
-> QEMU and kernel patch series are going to be synchronized.
-> Given the kernel series changes a value in vfio.h which is used by QEMU, the
-> two series need to be coordinated since the vfio.h file
-> used by QEMU can not be updated until the kernel code is available. So these
-> two sets of code have
-> to be merged upstream during a merge window. which is different for the
-> kernel and QEMU. At least I think that is what Alex is asking.
+> asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
+> which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
+> causes confusing compilation problems why trying to use anything
+> defined in any of the headers in any other headers. Header guards is
+> the only reason this cycle didn't create tons of redefinition
+> warnings.
+> 
+> The motivating example was figuring out it was impossible to use the
+> hypercall macros kvm_call_hyp* from kvm_host.h in arm_pmuv3.h. The
+> compiler will insist they aren't defined even though kvm_host.h is
+> included. Many other examples are lurking which could confuse
+> developers in the future.
 
-Correct.
-Thanks for the clarification, Anthony!
+Well, that's because contrary to what you have asserted in v1, not all
+include files are legitimate to use willy-nilly. You have no business
+directly using asm/kvm_host.h, and linux/kvm_host.h is what you need.
+
+> 
+> Break the cycle by taking asm/kvm_host.h out of asm/arm_pmuv3.h
+> because asm/kvm_host.h is huge and we only need a few functions from
+> it. Move the required declarations to a new header asm/kvm_pmu.h.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+> 
+> Possibly spinning more definitions out of asm/kvm_host.h would be a
+> good idea, but I'm not interested in getting bogged down in which
+> functions ideally belong where. This is sufficient to break the
+
+Tough luck. I'm not interested in half baked solutions, and "what
+belongs where" *is* the problem that needs solving.
+
+> cyclical dependency and get rid of the compilation issues. Though I
+> mention the one example I found, many other similar problems could
+> confuse developers in the future.
+> 
+> v2:
+> * Make a new header instead of moving kvm functions into the
+>   dedicated pmuv3 header
+> 
+> v1:
+> https://lore.kernel.org/kvm/20250204195708.1703531-1-coltonlewis@google.com/
+> 
+>  arch/arm64/include/asm/arm_pmuv3.h |  3 +--
+>  arch/arm64/include/asm/kvm_host.h  | 14 --------------
+>  arch/arm64/include/asm/kvm_pmu.h   | 26 ++++++++++++++++++++++++++
+>  include/kvm/arm_pmu.h              |  1 -
+>  4 files changed, 27 insertions(+), 17 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_pmu.h
+> 
+> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
+> index 8a777dec8d88..54dd27a7a19f 100644
+> --- a/arch/arm64/include/asm/arm_pmuv3.h
+> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+> @@ -6,9 +6,8 @@
+>  #ifndef __ASM_PMUV3_H
+>  #define __ASM_PMUV3_H
+> 
+> -#include <asm/kvm_host.h>
+> -
+>  #include <asm/cpufeature.h>
+> +#include <asm/kvm_pmu.h>
+>  #include <asm/sysreg.h>
+> 
+>  #define RETURN_READ_PMEVCNTRN(n) \
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7cfa024de4e3..6d4a2e7ab310 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1385,25 +1385,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+>  void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+> 
+> -static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
+> -{
+> -	return (!has_vhe() && attr->exclude_host);
+> -}
+> -
+>  #ifdef CONFIG_KVM
+> -void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+> -void kvm_clr_pmu_events(u64 clr);
+> -bool kvm_set_pmuserenr(u64 val);
+>  void kvm_enable_trbe(void);
+>  void kvm_disable_trbe(void);
+>  void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
+>  #else
+> -static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
+> -static inline void kvm_clr_pmu_events(u64 clr) {}
+> -static inline bool kvm_set_pmuserenr(u64 val)
+> -{
+> -	return false;
+> -}
+>  static inline void kvm_enable_trbe(void) {}
+>  static inline void kvm_disable_trbe(void) {}
+>  static inline void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest) {}
+> diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
+> new file mode 100644
+> index 000000000000..3a8f737504d2
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_pmu.h
+> @@ -0,0 +1,26 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +
+> +#ifndef __KVM_PMU_H
+> +#define __KVM_PMU_H
+> +
+> +void kvm_vcpu_pmu_resync_el0(void);
+> +
+> +#ifdef CONFIG_KVM
+> +void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+> +void kvm_clr_pmu_events(u64 clr);
+> +bool kvm_set_pmuserenr(u64 val);
+> +#else
+> +static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
+> +static inline void kvm_clr_pmu_events(u64 clr) {}
+> +static inline bool kvm_set_pmuserenr(u64 val)
+> +{
+> +	return false;
+> +}
+> +#endif
+> +
+> +static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
+> +{
+> +	return (!has_vhe() && attr->exclude_host);
+> +}
+> +
+> +#endif
+
+How does this solve your problem of using the HYP-calling macros?
+
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 147bd3ee4f7b..2c78b1b1a9bb 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -74,7 +74,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+>  struct kvm_pmu_events *kvm_get_pmu_events(void);
+>  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+> -void kvm_vcpu_pmu_resync_el0(void);
+> 
+>  #define kvm_vcpu_has_pmu(vcpu)					\
+>  	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
+>
+> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+
+I'm absolutely not keen on *two* PMU-related include files. They both
+describe internal APIs, and don't see a good reasoning for this
+arbitrary split other than "it works better for me and I don't want to
+do more than strictly necessary".
+
+For example, include/kvm was only introduced to be able to share files
+between architectures, and with 32bit KVM/arm being long dead, this
+serves no purpose anymore. Moving these things out of the way would be
+a good start and would provide a better base for further change.
+
+So please present a rationale on what needs to go where and why based
+on their usage pattern rather than personal convenience, and then
+we'll look at a possible patch. But not the other way around.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
