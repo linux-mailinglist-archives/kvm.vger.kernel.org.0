@@ -1,252 +1,124 @@
-Return-Path: <kvm+bounces-37454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E7BFA2A325
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:27:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0939CA2A357
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 09:39:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006D63A4B50
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 08:27:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D12B1611B5
+	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 08:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A260225796;
-	Thu,  6 Feb 2025 08:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368A7225796;
+	Thu,  6 Feb 2025 08:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/ecygOy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZREJ8x2z"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2679A22541C;
-	Thu,  6 Feb 2025 08:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A32122488E;
+	Thu,  6 Feb 2025 08:39:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738830431; cv=none; b=aAWXcgJ2/AMKp5AMDJDDRLIfd+WZAooGf1Y9kMWjQLT9Dl/69RWRLBvZLFMF+I8azZ2S3rQxmgXG1BhuExA9Lb69VGPYecHT3z08A0w5+YI2jyRkgYxoodVsR8MJHI8B1L6Tb5s7LvNzYZkkjoAZrq2L8PjzSkzPhcbQeUEL83s=
+	t=1738831161; cv=none; b=Ir+HAEQrAbMn23HXpxf9qVC6FYsEOKWh7NihgSms5RkVu9j5R4f/zewsomlZv/nNANR9fk91uv4hkeRIoU7mb4v14N3iCgglmCWB5HzjRIX+aEhBCbegwrwvxV0E3t7Ntw8SW9g7EpHqr/AvEosExe8IvRihsbSI0YbcfscEK4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738830431; c=relaxed/simple;
-	bh=0qtYGiPYsqYZLBqgJ+4cbTZlqzHvL7ZKnM+o5kglBH4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=foAgxFEx15b9pW8dQQ111qAN6JXVSFDDMWzt9MOMRcIe7ncKGBMnyidpGTe9Ptxsv+agF4iumYibynfLErEx2CGk4DbJn8tLtlRxdIxohvCLptmTh6iGYdosaHQbd6toEDXbxTklIfIwZXwFpw+/+bxqWRjQqbQzJ6RD8F+ZgmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/ecygOy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7696BC4CEDD;
-	Thu,  6 Feb 2025 08:27:10 +0000 (UTC)
+	s=arc-20240116; t=1738831161; c=relaxed/simple;
+	bh=4EoQP8op2lAGcHar7BdkrcIMw40H7AoccbKxT2py+Qw=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=RnXzEzZUWWUEwOtMzlGm6vFSnG7y/rNr52TX8VLW/ubwpop8pcugRb04BZEaqK4wFtzc74bSIGCP0oe5jxo/PuoOysghvt8vYKHgzklazUX5HO0imyY03i/0NxwtFjtqySzyoBE83JbSNuFpeDcwAYL1sNAF/M5nWxv2ksLxH1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZREJ8x2z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78557C4CEDD;
+	Thu,  6 Feb 2025 08:39:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738830430;
-	bh=0qtYGiPYsqYZLBqgJ+4cbTZlqzHvL7ZKnM+o5kglBH4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n/ecygOy6uKcaclmbQ12QrdKFZ7C2/0m+gI3kwhl3imre6Lv2sCXRBxobHM0niAfP
-	 TG8qr9FuyEenPumR3fFXnqKp6TG5fW/W3vaC+EXUsJ/9mt5MgyP3Vb8nqh24PPemuV
-	 dziSwQTFj2C1mr+6QmR79/tfzrVUyMK0Nb0NILWqj+wK+IX7wAzxDtQlbwZQF48amT
-	 cZC8HOdc0aCm2AH8P44vaBicHO4wU41uUo6MZmndlfenPuIV0VNMuxHE2ga9UPqF4r
-	 jqm0migL8XEdlIou78rSL1kpUbUaBXfpDP5+OE3d8pkZQFhHcYGghBlHyGKAuEDe/O
-	 01NVyRtseB++A==
-Received: from 82-132-235-183.dab.02.net ([82.132.235.183] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tfxE3-00131o-Fj;
-	Thu, 06 Feb 2025 08:27:07 +0000
-Date: Thu, 06 Feb 2025 08:27:08 +0000
-Message-ID: <87frkrtr4z.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
-In-Reply-To: <20250206001744.3155465-1-coltonlewis@google.com>
-References: <20250206001744.3155465-1-coltonlewis@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1738831160;
+	bh=4EoQP8op2lAGcHar7BdkrcIMw40H7AoccbKxT2py+Qw=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=ZREJ8x2zY6TIGZHCfl/84rBc0S2xinJlMJs2/w3GoQEOc8gA82c3EZaZA/1evU9Dw
+	 SOEdkFtAWEQ+Pule34w3jSIfcjF/Q6U8Sl4THNRKWchC0T+7gTllGLGavdKOMYPnFV
+	 dFETGh+TWLGqDKOn+UQ+gfsBACv+TAbbX6elvZCIrPm4zSrhjl5WlgrpRYneiX7ArY
+	 sLH4awxLQr31h653xp03Vxh0ePK2IyGcruO/zYGGMQDLUU8TGuP5nDHe8Sy99nkZjc
+	 gw7495UUpZsVzmLv8bz9eJaFihO1wlcvcqZ3yRpCu6Q2o9So3ObsZiJI0TbsCw/cxQ
+	 bOfz0PQL1wEtQ==
+Date: Thu, 06 Feb 2025 02:39:19 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.235.183
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>, weilin.wang@intel.com, 
+ devicetree@vger.kernel.org, kvm@vger.kernel.org, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Conor Dooley <conor+dt@kernel.org>, Atish Patra <atishp@atishpatra.org>, 
+ linux-riscv@lists.infradead.org, 
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+ Conor Dooley <conor@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+ Anup Patel <anup@brainfault.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+ Will Deacon <will@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+ kvm-riscv@lists.infradead.org, Ian Rogers <irogers@google.com>, 
+ linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>, 
+ Ingo Molnar <mingo@redhat.com>
+To: Atish Patra <atishp@rivosinc.com>
+In-Reply-To: <20250205-counter_delegation-v4-10-835cfa88e3b1@rivosinc.com>
+References: <20250205-counter_delegation-v4-0-835cfa88e3b1@rivosinc.com>
+ <20250205-counter_delegation-v4-10-835cfa88e3b1@rivosinc.com>
+Message-Id: <173883115938.126290.3444587267516997369.robh@kernel.org>
+Subject: Re: [PATCH v4 10/21] dt-bindings: riscv: add Counter delegation
+ ISA extensions description
 
-Colton,
 
-On Thu, 06 Feb 2025 00:17:44 +0000,
-Colton Lewis <coltonlewis@google.com> wrote:
+On Wed, 05 Feb 2025 23:23:15 -0800, Atish Patra wrote:
+> Add description for the Smcdeleg/Ssccfg extension.
 > 
-> asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
-> which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
-> causes confusing compilation problems why trying to use anything
-> defined in any of the headers in any other headers. Header guards is
-> the only reason this cycle didn't create tons of redefinition
-> warnings.
-> 
-> The motivating example was figuring out it was impossible to use the
-> hypercall macros kvm_call_hyp* from kvm_host.h in arm_pmuv3.h. The
-> compiler will insist they aren't defined even though kvm_host.h is
-> included. Many other examples are lurking which could confuse
-> developers in the future.
-
-Well, that's because contrary to what you have asserted in v1, not all
-include files are legitimate to use willy-nilly. You have no business
-directly using asm/kvm_host.h, and linux/kvm_host.h is what you need.
-
-> 
-> Break the cycle by taking asm/kvm_host.h out of asm/arm_pmuv3.h
-> because asm/kvm_host.h is huge and we only need a few functions from
-> it. Move the required declarations to a new header asm/kvm_pmu.h.
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
 > ---
+>  .../devicetree/bindings/riscv/extensions.yaml      | 45 ++++++++++++++++++++++
+>  1 file changed, 45 insertions(+)
 > 
-> Possibly spinning more definitions out of asm/kvm_host.h would be a
-> good idea, but I'm not interested in getting bogged down in which
-> functions ideally belong where. This is sufficient to break the
 
-Tough luck. I'm not interested in half baked solutions, and "what
-belongs where" *is* the problem that needs solving.
+My bot found errors running 'make dt_binding_check' on your patch:
 
-> cyclical dependency and get rid of the compilation issues. Though I
-> mention the one example I found, many other similar problems could
-> confuse developers in the future.
-> 
-> v2:
-> * Make a new header instead of moving kvm functions into the
->   dedicated pmuv3 header
-> 
-> v1:
-> https://lore.kernel.org/kvm/20250204195708.1703531-1-coltonlewis@google.com/
-> 
->  arch/arm64/include/asm/arm_pmuv3.h |  3 +--
->  arch/arm64/include/asm/kvm_host.h  | 14 --------------
->  arch/arm64/include/asm/kvm_pmu.h   | 26 ++++++++++++++++++++++++++
->  include/kvm/arm_pmu.h              |  1 -
->  4 files changed, 27 insertions(+), 17 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_pmu.h
-> 
-> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
-> index 8a777dec8d88..54dd27a7a19f 100644
-> --- a/arch/arm64/include/asm/arm_pmuv3.h
-> +++ b/arch/arm64/include/asm/arm_pmuv3.h
-> @@ -6,9 +6,8 @@
->  #ifndef __ASM_PMUV3_H
->  #define __ASM_PMUV3_H
-> 
-> -#include <asm/kvm_host.h>
-> -
->  #include <asm/cpufeature.h>
-> +#include <asm/kvm_pmu.h>
->  #include <asm/sysreg.h>
-> 
->  #define RETURN_READ_PMEVCNTRN(n) \
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7cfa024de4e3..6d4a2e7ab310 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1385,25 +1385,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
->  void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
-> 
-> -static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
-> -{
-> -	return (!has_vhe() && attr->exclude_host);
-> -}
-> -
->  #ifdef CONFIG_KVM
-> -void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
-> -void kvm_clr_pmu_events(u64 clr);
-> -bool kvm_set_pmuserenr(u64 val);
->  void kvm_enable_trbe(void);
->  void kvm_disable_trbe(void);
->  void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
->  #else
-> -static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
-> -static inline void kvm_clr_pmu_events(u64 clr) {}
-> -static inline bool kvm_set_pmuserenr(u64 val)
-> -{
-> -	return false;
-> -}
->  static inline void kvm_enable_trbe(void) {}
->  static inline void kvm_disable_trbe(void) {}
->  static inline void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest) {}
-> diff --git a/arch/arm64/include/asm/kvm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
-> new file mode 100644
-> index 000000000000..3a8f737504d2
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_pmu.h
-> @@ -0,0 +1,26 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef __KVM_PMU_H
-> +#define __KVM_PMU_H
-> +
-> +void kvm_vcpu_pmu_resync_el0(void);
-> +
-> +#ifdef CONFIG_KVM
-> +void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
-> +void kvm_clr_pmu_events(u64 clr);
-> +bool kvm_set_pmuserenr(u64 val);
-> +#else
-> +static inline void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr) {}
-> +static inline void kvm_clr_pmu_events(u64 clr) {}
-> +static inline bool kvm_set_pmuserenr(u64 val)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +
-> +static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
-> +{
-> +	return (!has_vhe() && attr->exclude_host);
-> +}
-> +
-> +#endif
+yamllint warnings/errors:
 
-How does this solve your problem of using the HYP-calling macros?
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/riscv/extensions.yaml: properties:riscv,isa-extensions:allOf:4: 'if' is a dependency of 'then'
+	hint: Keywords must be a subset of known json-schema keywords
+	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/riscv/extensions.yaml: properties:riscv,isa-extensions:allOf:4: 'anyOf' conditional failed, one must be fixed:
+	'If' is not one of ['$ref', 'additionalItems', 'additionalProperties', 'allOf', 'anyOf', 'const', 'contains', 'default', 'dependencies', 'dependentRequired', 'dependentSchemas', 'deprecated', 'description', 'else', 'enum', 'exclusiveMaximum', 'exclusiveMinimum', 'items', 'if', 'minItems', 'minimum', 'maxItems', 'maximum', 'multipleOf', 'not', 'oneOf', 'pattern', 'patternProperties', 'properties', 'required', 'then', 'typeSize', 'unevaluatedProperties', 'uniqueItems']
+	'type' was expected
+	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/riscv/extensions.yaml: properties:riscv,isa-extensions:allOf:5: 'if' is a dependency of 'then'
+	hint: Keywords must be a subset of known json-schema keywords
+	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/riscv/extensions.yaml: properties:riscv,isa-extensions:allOf:5: 'anyOf' conditional failed, one must be fixed:
+	'If' is not one of ['$ref', 'additionalItems', 'additionalProperties', 'allOf', 'anyOf', 'const', 'contains', 'default', 'dependencies', 'dependentRequired', 'dependentSchemas', 'deprecated', 'description', 'else', 'enum', 'exclusiveMaximum', 'exclusiveMinimum', 'items', 'if', 'minItems', 'minimum', 'maxItems', 'maximum', 'multipleOf', 'not', 'oneOf', 'pattern', 'patternProperties', 'properties', 'required', 'then', 'typeSize', 'unevaluatedProperties', 'uniqueItems']
+	'type' was expected
+	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
 
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 147bd3ee4f7b..2c78b1b1a9bb 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -74,7 +74,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
->  struct kvm_pmu_events *kvm_get_pmu_events(void);
->  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
->  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> -void kvm_vcpu_pmu_resync_el0(void);
-> 
->  #define kvm_vcpu_has_pmu(vcpu)					\
->  	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
->
-> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+doc reference errors (make refcheckdocs):
 
-I'm absolutely not keen on *two* PMU-related include files. They both
-describe internal APIs, and don't see a good reasoning for this
-arbitrary split other than "it works better for me and I don't want to
-do more than strictly necessary".
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250205-counter_delegation-v4-10-835cfa88e3b1@rivosinc.com
 
-For example, include/kvm was only introduced to be able to share files
-between architectures, and with 32bit KVM/arm being long dead, this
-serves no purpose anymore. Moving these things out of the way would be
-a good start and would provide a better base for further change.
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
 
-So please present a rationale on what needs to go where and why based
-on their usage pattern rather than personal convenience, and then
-we'll look at a possible patch. But not the other way around.
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
 
-Thanks,
+pip3 install dtschema --upgrade
 
-	M.
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
--- 
-Without deviation from the norm, progress is not possible.
 
