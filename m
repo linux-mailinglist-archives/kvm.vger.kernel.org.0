@@ -1,282 +1,357 @@
-Return-Path: <kvm+bounces-37576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD75A2C052
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 11:17:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E022CA2C092
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 11:29:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D007168A6F
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 10:17:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D23CC188CD59
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 10:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18C31DC9B4;
-	Fri,  7 Feb 2025 10:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68221DE4EA;
+	Fri,  7 Feb 2025 10:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JQrCMHr2"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="kbUm/8fs"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E291624ED;
-	Fri,  7 Feb 2025 10:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F37D80BFF
+	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 10:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738923411; cv=none; b=G8J/i2ZSkeke7Tw0Xr8WMJvM+7ie17x2veVsGIZJl/aotM1VT2qpG9bHPsZcOFL+AYvA8ew7m4KSB7/NBMZn30jYJaSR9oIvQMlVnjFSNp6d10nPUzMWfmokyxVcaH5jTXZysNMNXDvZgySyyS1PFLz9ClhNsz/4QbND7mT0Y5Q=
+	t=1738924157; cv=none; b=TWTVNSZLREZuTRK+0M7yAYY47AOiw+u9oXl0ms2oiDi7liQBQdkcE2QczWCLLXNMiJcL5wg9RQc3yVhm7DrGcK9R3xNe/f9kV2eniugRLk8v4IygzKSA4TtNYHpSnw403j/330gVJ1CczM4TfTPwu0ejRD/4B7o70XEjiL3maO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738923411; c=relaxed/simple;
-	bh=zVqX9Hq16/SBdTp2H/rBCvE55Od/Y0deJt0gh/PTA4k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ITburXgrMS2Cbx5vev5S2mZqisgnBPQzO3Ox9aSktHwMpMAHNpNXNEcCLid5CDUZ+HstoOHlxMM39Pn6j5awmIjwHzqL0Ai4sHqSK/w47m2RBbWoVw1Pn/MNXNiRBkCRid7rXuHK0Fs7wR26PtVWsJ4xZ9L6I+X0Z6etqPv/s/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JQrCMHr2; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=zVqX9Hq16/SBdTp2H/rBCvE55Od/Y0deJt0gh/PTA4k=; b=JQrCMHr2BdrjS4NKrzUQ4brppT
-	UggDTJnj1TCbsw8d6uS/TP1LXzuCYCRpzvxXY3M1Udn1/rpXKT+D2yISKc9EHbbjlk1JMiwjezT0w
-	G/g1Rm0utnZUcDsOAhllHICdtEJxIYMJw/XeRN/mslhRg1XxSlNHhBbjnLxUXcGhEAIUycfIHwyAz
-	ItWZqc3X+RpAaZKfd7tucO6DvzefcQn0FPMOPsZAyCKizC/2AjVKxERO5/VgZ3Cnr4Chc1uCRoERY
-	AxTesLAbLLvoSEfjxsUL7zWXl8QA3C30qYHv/EpdvBIOHqKBDnTg+VDWbD2Y+xZaag8m8LicEjrBB
-	LIoBs9Rw==;
-Received: from 54-240-197-238.amazon.com ([54.240.197.238] helo=freeip.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tgLOp-00000007cdM-31OR;
-	Fri, 07 Feb 2025 10:15:52 +0000
-Message-ID: <0a6b88c0edd85a2ae0886e5454afea09cfcd3a24.camel@infradead.org>
-Subject: Re: [PATCH v3 00/18] vDSO: Introduce generic data storage
-From: David Woodhouse <dwmw2@infradead.org>
-To: Thomas =?ISO-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
-Cc: "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge
- Deller <deller@gmx.de>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner
- <tglx@linutronix.de>,  Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>, Frederic Weisbecker
- <frederic@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Catalin
- Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Theodore
- Ts'o <tytso@mit.edu>,  "Jason A. Donenfeld" <Jason@zx2c4.com>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Huacai Chen <chenhuacai@kernel.org>,
- WANG Xuerui <kernel@xen0n.name>, Russell King <linux@armlinux.org.uk>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,  Arnd Bergmann
- <arnd@arndb.de>, Guo Ren <guoren@kernel.org>, linux-parisc@vger.kernel.org,
-  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-riscv@lists.infradead.org, loongarch@lists.linux.dev, 
- linux-s390@vger.kernel.org, linux-mips@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, linux-arch@vger.kernel.org, Nam Cao
- <namcao@linutronix.de>, linux-csky@vger.kernel.org, "Ridoux, Julien"
- <ridouxj@amazon.com>, "Luu, Ryan" <rluu@amazon.com>, kvm
- <kvm@vger.kernel.org>
-Date: Fri, 07 Feb 2025 10:15:49 +0000
-In-Reply-To: <20250206110648-ec4cf3d0-0aef-4feb-a859-c69e53ab110c@linutronix.de>
-References: <20250204-vdso-store-rng-v3-0-13a4669dfc8c@linutronix.de>
-	 <ff83dc5c91b4e46bcf2d99680ec6af250fb05b27.camel@infradead.org>
-	 <20250206110648-ec4cf3d0-0aef-4feb-a859-c69e53ab110c@linutronix.de>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Hn9nn97uh7ZrvK5eTG4M"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1738924157; c=relaxed/simple;
+	bh=p5ZdaUHws5Xh6b2vmBoVjQc6DWVwPDLXEI2IH/fUo7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TYtGjPC7iaz8pHTQTOU/GL8yYPphKddhTK8ZVjzNmcMVQMeiZ0d4ljcOynlkTSS9quFWD1dZAaP4dan+teLkZKdlbQiZq5KX6Ytocv5BzWSZdVNFWgnQulyhs38xsrHRDtYQ+UAaj1HePBF83i1S+0/5QYZx8VCgtjOqB6r8t88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=kbUm/8fs; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-436a03197b2so12590095e9.2
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2025 02:29:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738924152; x=1739528952; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kZecQt9IpEJ7wbD4TyHVoTgZZnQwqJP3yUkd6SaQ1fo=;
+        b=kbUm/8fsLDOdfJ1VjtTOgGVmrrAUZ1O972/4OCVjY2K2Lp02qpJjmN0OQ+6kNqA5wS
+         22AewEvzBmtpglw7t+n7ipEvFs+APIe8h9ZMm0x5vNeDwN4bNV6hl6RUCUUe4e0eyElE
+         B+LJdhT7Scxx36TF/84odVAMmu6qLEUqBVDRo8zF7yX5Qlt68f6OIrunwCep6vQDCqdG
+         WvVf0VDPvg7cdNKC7Q4KXd1eXDQbreSUpKTnXaevAXH+PiBYe0sf5VLX8jxGurYQL6E7
+         1CopPzOg7Vmow0pO/mN61zgYmHBy3czdjWUtEqoGA9YbMufX7COfdARS9vnMzmPD5dOD
+         ozKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738924152; x=1739528952;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kZecQt9IpEJ7wbD4TyHVoTgZZnQwqJP3yUkd6SaQ1fo=;
+        b=lOW9U7szHI/E8c/FJMenArlRKpXzbgNnmjp+CPR5hBTFpexpXwNXNt4YLJ/8jb/VI0
+         uJ5vgS8aUho0S0AwbkZ1KVlT3xT5qY3xpJ/vQHZHuWi8KZQlQjPhcb2kHetH7n97bPWZ
+         Yy+BmEsZPoWllNLi89W1WKLi4XVmIpxrWG/8tGY2ORqMGsoXHHEtnL4qp6MwsngqtZvZ
+         Rwk+v15GKozlGH23TsvDFXj0XCFio5pzXlMjuli3ycSdKj6kPhPCu1u+7Wr/uWWINPrb
+         bNmWGZIxTWEpy1HbmgRsuMiTBCbvRfqMUHHWeBo6EeJtN+kyWNKsfRd9M7Ucb3xRzci4
+         1wkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaDHqmPI7qOIx7o3PdvYDXBdKDLqVXdFbKB4kuY1vEa6+7FSi6Rw+pAItmzFzQjoVnJ10=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy1TDwpmWRvSawNJTrfUmGdWFEZuZoL5aIrPC9pWQ5Ae3jSP9L
+	oosnDV7Va7CTm8/XoWbSFovzkdcdebED4on3c5Kqiy9maHLwLv7sZASUhkljQIY=
+X-Gm-Gg: ASbGncurw02w9gRNzaRY5tQasOvCygfsdWxZmCBPKPPvUTSBBt68GWxSutyyrlcEbBs
+	gg4SInjQptYm/Wg8OJLT8s7S9CyJJXunkqhA6R0dDuczkQQT9hitemFjbC+2as49+XR22sdFhZy
+	mGfw0yVnJMykrvqMzjomO5Q31NsH44iwZyPp8rHrTMwuhOJXiLCEMRQOgYwN2j+vT83srNKq/lh
+	HrrzA7SnSQo6JBBFO74uhOfS7syorl1C4IsnsHfxycdC1nRgF2FGx7pjXC1g3qlI6j06yAohiUn
+	cXR60cvnPFgVuGZKi7+u5t7CecOnEtqamAdBFSyQ2NlKwtsSMtOT6byupaM3
+X-Google-Smtp-Source: AGHT+IHCoYm88N9w7MLKhv47jx2sJHV5XaJtNjy2Kt9tKO8gApEJnGbxZzlJthncRDoGbW5dA9LdfQ==
+X-Received: by 2002:a05:600c:c19:b0:436:fb02:e68 with SMTP id 5b1f17b1804b1-4392497f9cbmr21820835e9.2.1738924150908;
+        Fri, 07 Feb 2025 02:29:10 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390d933794sm87719805e9.7.2025.02.07.02.29.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2025 02:29:10 -0800 (PST)
+Message-ID: <586dc43d-74cd-413b-86e2-545384ad796f@rivosinc.com>
+Date: Fri, 7 Feb 2025 11:29:08 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 12/21] RISC-V: perf: Modify the counter discovery
+ mechanism
+To: Atish Patra <atishp@rivosinc.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, weilin.wang@intel.com
+Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org
+References: <20250205-counter_delegation-v4-0-835cfa88e3b1@rivosinc.com>
+ <20250205-counter_delegation-v4-12-835cfa88e3b1@rivosinc.com>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20250205-counter_delegation-v4-12-835cfa88e3b1@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
---=-Hn9nn97uh7ZrvK5eTG4M
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2025-02-06 at 11:59 +0100, Thomas Wei=C3=9Fschuh wrote:
-> On Thu, Feb 06, 2025 at 09:31:42AM +0000, David Woodhouse wrote:
-> > On Tue, 2025-02-04 at 13:05 +0100, Thomas Wei=C3=9Fschuh wrote:
-> > > Currently each architecture defines the setup of the vDSO data page o=
-n
-> > > its own, mostly through copy-and-paste from some other architecture.
-> > > Extend the existing generic vDSO implementation to also provide gener=
-ic
-> > > data storage.
-> > > This removes duplicated code and paves the way for further changes to
-> > > the generic vDSO implementation without having to go through a lot of
-> > > per-architecture changes.
-> > >=20
-> > > Based on v6.14-rc1 and intended to be merged through the tip tree.
->=20
-> Note: The real answer will need to come from the timekeeping
-> maintainers, my personal two cents below.
->=20
-> > Thanks for working on this. Is there a plan to expose the time data
-> > directly to userspace in a form which is usable *other* than by
-> > function calls which get the value of the clock at a given moment?
->=20
-> There are no current plans that I am aware of.
->=20
-> > For populating the vmclock device=C2=B9 we need to know the actual
-> > relationship between the hardware counter (TSC, arch timer, etc.) and
-> > real time in order to propagate that to the guest.
-> >=20
-> > I see two options for doing this:
-> >=20
-> > =C2=A01. Via userspace, exposing the vdso time data (and a notification=
- when
-> > =C2=A0=C2=A0=C2=A0 it changes?) and letting the userspace VMM populate =
-the vmclock.
-> > =C2=A0=C2=A0=C2=A0 This is complex for x86 because of TSC scaling; in f=
-act userspace
-> > =C2=A0=C2=A0=C2=A0 doesn't currently know the precise scaling from host=
- to guest TSC
-> > =C2=A0=C2=A0=C2=A0 so we'd have to be able to extract that from KVM.
->=20
-> Exposing the raw vdso time data is problematic as it precludes any
-> evolution to its datastructures, like the one we are currently doing.
->=20
-> An additional, trimmed down and stable data structure could be used.
-> But I don't think it makes sense. The vDSO is all about a stable
-> highlevel function interface on top of an unstable data interface.
-> However the vmclock needs the lowlevel data to populate its own
-> datastructure, wrapping raw data access in function calls is unnecessary.
-> If no functions are involved then the vDSO is not needed. The data can
-> be maintained separately in any other place in the kernel and accessed
-> or mapped by userspace from there.
-> Also the vDSO does not have an active notification mechanism, this would
-> probably be implemented through a filedescriptor, but then the data
-> can also be mapped through exactly that fd.
->=20
-> > =C2=A02. In kernel, asking KVM to populate the vmclock structure much l=
-ike
-> > =C2=A0=C2=A0=C2=A0 it does other pvclocks shared with the guest. KVM/x8=
-6 already uses
-> > =C2=A0=C2=A0=C2=A0 pvclock_gtod_register_notifier() to hook changes; sh=
-ould we expand
-> > =C2=A0=C2=A0=C2=A0 on that? The problem with that notifier is that it s=
-eems to be
-> > =C2=A0=C2=A0=C2=A0 called far more frequently than I'd expect.
->=20
-> This sounds better, especially as any custom ABI from the host kernel to
-> the VMM would look a lot like the vmclock structure anyways.
->=20
-> Timekeeper updates are indeed very frequent, but what are the concrete
-> issues? That frequency is fine for regular vDSO data page updates,
-> updating the vmclock data page should be very similar.
-> The timekeeper core can pass context to the notifier callbacks, maybe
-> this can be used to skip some expensive steps where possible.
+On 06/02/2025 08:23, Atish Patra wrote:
+> If both counter delegation and SBI PMU is present, the counter
+> delegation will be used for hardware pmu counters while the SBI PMU
+> will be used for firmware counters. Thus, the driver has to probe
+> the counters info via SBI PMU to distinguish the firmware counters.
+> 
+> The hybrid scheme also requires improvements of the informational
+> logging messages to indicate the user about underlying interface
+> used for each use case.
+> 
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  drivers/perf/riscv_pmu_dev.c | 118 ++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 88 insertions(+), 30 deletions(-)
+> 
+> diff --git a/drivers/perf/riscv_pmu_dev.c b/drivers/perf/riscv_pmu_dev.c
+> index 6b43d844eaea..5ddf4924c5b3 100644
+> --- a/drivers/perf/riscv_pmu_dev.c
+> +++ b/drivers/perf/riscv_pmu_dev.c
+> @@ -66,6 +66,10 @@ static bool sbi_v2_available;
+>  static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
+>  #define sbi_pmu_snapshot_available() \
+>  	static_branch_unlikely(&sbi_pmu_snapshot_available)
+> +static DEFINE_STATIC_KEY_FALSE(riscv_pmu_sbi_available);
+> +static DEFINE_STATIC_KEY_FALSE(riscv_pmu_cdeleg_available);
+> +static bool cdeleg_available;
+> +static bool sbi_available;
+>  
+>  static struct attribute *riscv_arch_formats_attr[] = {
+>  	&format_attr_event.attr,
+> @@ -88,7 +92,8 @@ static int sysctl_perf_user_access __read_mostly = SYSCTL_USER_ACCESS;
+>  
+>  /*
+>   * This structure is SBI specific but counter delegation also require counter
+> - * width, csr mapping. Reuse it for now.
+> + * width, csr mapping. Reuse it for now we can have firmware counters for
+> + * platfroms with counter delegation support.
+>   * RISC-V doesn't have heterogeneous harts yet. This need to be part of
+>   * per_cpu in case of harts with different pmu counters
+>   */
+> @@ -100,6 +105,8 @@ static unsigned int riscv_pmu_irq;
+>  
+>  /* Cache the available counters in a bitmask */
+>  static unsigned long cmask;
+> +/* Cache the available firmware counters in another bitmask */
+> +static unsigned long firmware_cmask;
+>  
+>  struct sbi_pmu_event_data {
+>  	union {
+> @@ -778,35 +785,49 @@ static int rvpmu_sbi_find_num_ctrs(void)
+>  		return sbi_err_map_linux_errno(ret.error);
+>  }
+>  
+> -static int rvpmu_sbi_get_ctrinfo(int nctr, unsigned long *mask)
+> +static int rvpmu_deleg_find_ctrs(void)
+> +{
+> +	/* TODO */
+> +	return -1;
+> +}
+> +
+> +static int rvpmu_sbi_get_ctrinfo(int nsbi_ctr, int ndeleg_ctr)
 
-In the context of a hypervisor with lots of guests running, that's a
-lot of pointless steal time. But it isn't just that; ISTR the result
-was also *inaccurate*.
+Hi Atish,
 
-I need to go back and reproduce the testing, but I think it was
-constantly adjusting the apparent rate even with no changed inputs from
-NTP. Where the number of clock counts per jiffy wasn't an integer, the
-notification would be constantly changing, for example to report 333333
-counts per jiffy for most of the time, and occasionally 333334 counts
-for a single jiffy before flipping back again. Or something like that.
+These parameters could be unsigned I think.
 
---=-Hn9nn97uh7ZrvK5eTG4M
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+>  {
+>  	struct sbiret ret;
+> -	int i, num_hw_ctr = 0, num_fw_ctr = 0;
+> +	int i, num_hw_ctr = 0, num_fw_ctr = 0, num_ctr = 0;
+>  	union sbi_pmu_ctr_info cinfo;
+>  
+> -	pmu_ctr_list = kcalloc(nctr, sizeof(*pmu_ctr_list), GFP_KERNEL);
+> -	if (!pmu_ctr_list)
+> -		return -ENOMEM;
+> -
+> -	for (i = 0; i < nctr; i++) {
+> +	for (i = 0; i < nsbi_ctr; i++) {
+>  		ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_GET_INFO, i, 0, 0, 0, 0, 0);
+>  		if (ret.error)
+>  			/* The logical counter ids are not expected to be contiguous */
+>  			continue;
+>  
+> -		*mask |= BIT(i);
+> -
+>  		cinfo.value = ret.value;
+>  		if (cinfo.type == SBI_PMU_CTR_TYPE_FW)
+>  			num_fw_ctr++;
+> -		else
+> +
+> +		if (!cdeleg_available) {
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIwNzEwMTU0
-OVowLwYJKoZIhvcNAQkEMSIEIERXi00+3GDk2E/p6131tegJ6jUhnrs0V9vxaiV5oZ2XMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIASTyZ34SddFoE
-ocWSro73fUQgm5VHgrWVDJcQemFDotkX4gb22kx5AhMW01xylurQU2KXW1YBEOQIrP3o8Unp//jv
-n1kL/lZCEQLr0AVvHWzJz+r9T8YOOPqhuYjKTYH7bNJRf4JCovNzSXRbz6r0HtGf8/T5L+H4YdVg
-cEvCs/NnayU/HPIJEpncwWHDx+AuOts+aQ0/GnEI0Q+xZwDfCjrAZkrlMsSDd7WAdz0wwEt2uOEL
-eIBW+5nm/AhsNZfMrvIvoMNGudPj9RQuIQkl0bIB4TTBXEeHkyyqJKn7BDoChI/IyhAo43sGyeUx
-arvfQRzzlDeynusz+WVmgHFGQuiYr5BCqxvXomKqLaBMwv1kL//ffVhlw70jvv93NcISjRnvGgyJ
-QZZ0xxvfNid8xUMEnTAG0qXP77EBjLtcRC5ZCc1XO4Td6yRL1F3/zGUrERW7Zh+hOCtXW+GBOiOQ
-NidHrdr1VlFHbRv3/Q2TLePMD1j5WZp1sViLkBGiEsPa90DkKH0Si/t+h0ah+3+ONkNPMmhF5M+l
-7U+enM1hpdV4KIKxun/YRp3rWBOan4WThApe5yvo3ZJj6+4/qUOP9olIeBZwkGhv9gvyDBOtmkcm
-east0DnR7g7xSW1IhsmWjlSxM5cXw+ENzQ9+gYLa/jGq/5j6aCTvGXjG+71FaQEAAAAAAAA=
+What is the rationale for using additional boolean identical to the
+static keys ? Reducing the amount of code patch site in cold path ? If
+so, I guess you can use static_key_enabled(&riscv_pmu_cdeleg_available).
+But your solution is fine as well, it just duplicates two identical values.
 
+>  			num_hw_ctr++;
+> -		pmu_ctr_list[i].value = cinfo.value;
+> +			cmask |= BIT(i);
+> +			pmu_ctr_list[i].value = cinfo.value;
+> +		} else if (cinfo.type == SBI_PMU_CTR_TYPE_FW) {
+> +			/* Track firmware counters in a different mask */
+> +			firmware_cmask |= BIT(i);
+> +			pmu_ctr_list[i].value = cinfo.value;
+> +		}
+> +
+>  	}
+>  
+> -	pr_info("%d firmware and %d hardware counters\n", num_fw_ctr, num_hw_ctr);
+> +	if (cdeleg_available) {
+> +		pr_info("%d firmware and %d hardware counters\n", num_fw_ctr, ndeleg_ctr);
+> +		num_ctr = num_fw_ctr + ndeleg_ctr;
+> +	} else {
+> +		pr_info("%d firmware and %d hardware counters\n", num_fw_ctr, num_hw_ctr);
+> +		num_ctr = nsbi_ctr;
+> +	}
+>  
+> -	return 0;
+> +	return num_ctr;
+>  }
+>  
+>  static inline void rvpmu_sbi_stop_all(struct riscv_pmu *pmu)
+> @@ -1067,16 +1088,33 @@ static void rvpmu_ctr_stop(struct perf_event *event, unsigned long flag)
+>  	/* TODO: Counter delegation implementation */
+>  }
+>  
+> -static int rvpmu_find_num_ctrs(void)
+> +static int rvpmu_find_ctrs(void)
+>  {
+> -	return rvpmu_sbi_find_num_ctrs();
+> -	/* TODO: Counter delegation implementation */
+> -}
+> +	int num_sbi_counters = 0, num_deleg_counters = 0, num_counters = 0;
+>  
+> -static int rvpmu_get_ctrinfo(int nctr, unsigned long *mask)
+> -{
+> -	return rvpmu_sbi_get_ctrinfo(nctr, mask);
+> -	/* TODO: Counter delegation implementation */
+> +	/*
+> +	 * We don't know how many firmware counters available. Just allocate
+> +	 * for maximum counters driver can support. The default is 64 anyways.
+> +	 */
+> +	pmu_ctr_list = kcalloc(RISCV_MAX_COUNTERS, sizeof(*pmu_ctr_list),
+> +			       GFP_KERNEL);
+> +	if (!pmu_ctr_list)
+> +		return -ENOMEM;
+> +
+> +	if (cdeleg_available)
+> +		num_deleg_counters = rvpmu_deleg_find_ctrs();
+> +
+> +	/* This is required for firmware counters even if the above is true */
+> +	if (sbi_available)
+> +		num_sbi_counters = rvpmu_sbi_find_num_ctrs();
+> +
+> +	if (num_sbi_counters >= RISCV_MAX_COUNTERS || num_deleg_counters >= RISCV_MAX_COUNTERS)
+> +		return -ENOSPC;
 
---=-Hn9nn97uh7ZrvK5eTG4M--
+Why is this using '>=' ? You allocated space for RISCV_MAX_COUNTERS, so
+RISCV_MAX_COUNTERS should fit right ?
+
+> +
+> +	/* cache all the information about counters now */
+> +	num_counters = rvpmu_sbi_get_ctrinfo(num_sbi_counters, num_deleg_counters);
+> +
+> +	return num_counters;
+
+return rvpmu_sbi_get_ctrinfo(num_sbi_counters, num_deleg_counters);
+
+>  }
+>  
+>  static int rvpmu_event_map(struct perf_event *event, u64 *econfig)
+> @@ -1377,12 +1415,21 @@ static int rvpmu_device_probe(struct platform_device *pdev)
+>  	int ret = -ENODEV;
+>  	int num_counters;
+>  
+> -	pr_info("SBI PMU extension is available\n");
+> +	if (cdeleg_available) {
+> +		pr_info("hpmcounters will use the counter delegation ISA extension\n");
+> +		if (sbi_available)
+> +			pr_info("Firmware counters will be use SBI PMU extension\n");
+
+s/will be use/will use
+
+> +		else
+> +			pr_info("Firmware counters will be not available as SBI PMU extension is not present\n");
+
+s/will be not/will not
+
+> +	} else if (sbi_available) {
+> +		pr_info("Both hpmcounters and firmware counters will use SBI PMU extension\n");
+> +	}
+> +
+>  	pmu = riscv_pmu_alloc();
+>  	if (!pmu)
+>  		return -ENOMEM;
+>  
+> -	num_counters = rvpmu_find_num_ctrs();
+> +	num_counters = rvpmu_find_ctrs();
+>  	if (num_counters < 0) {
+>  		pr_err("SBI PMU extension doesn't provide any counters\n");
+>  		goto out_free;
+> @@ -1394,9 +1441,6 @@ static int rvpmu_device_probe(struct platform_device *pdev)
+>  		pr_info("SBI returned more than maximum number of counters. Limiting the number of counters to %d\n", num_counters);
+>  	}
+>  
+> -	/* cache all the information about counters now */
+> -	if (rvpmu_get_ctrinfo(num_counters, &cmask))
+> -		goto out_free;
+>  
+>  	ret = rvpmu_setup_irqs(pmu, pdev);
+>  	if (ret < 0) {
+> @@ -1486,13 +1530,27 @@ static int __init rvpmu_devinit(void)
+>  	int ret;
+>  	struct platform_device *pdev;
+>  
+> -	if (sbi_spec_version < sbi_mk_version(0, 3) ||
+> -	    !sbi_probe_extension(SBI_EXT_PMU)) {
+> -		return 0;
+> +	if (sbi_spec_version >= sbi_mk_version(0, 3) &&
+> +	    sbi_probe_extension(SBI_EXT_PMU)) {
+> +		static_branch_enable(&riscv_pmu_sbi_available);
+> +		sbi_available = true;
+>  	}
+>  
+>  	if (sbi_spec_version >= sbi_mk_version(2, 0))
+>  		sbi_v2_available = true;
+> +	/*
+> +	 * We need all three extensions to be present to access the counters
+> +	 * in S-mode via Supervisor Counter delegation.
+> +	 */
+> +	if (riscv_isa_extension_available(NULL, SSCCFG) &&
+> +	    riscv_isa_extension_available(NULL, SMCDELEG) &&
+> +	    riscv_isa_extension_available(NULL, SSCSRIND)) {
+> +		static_branch_enable(&riscv_pmu_cdeleg_available);
+> +		cdeleg_available = true;
+> +	}
+> +
+> +	if (!(sbi_available || cdeleg_available))
+> +		return 0;
+>  
+>  	ret = cpuhp_setup_state_multi(CPUHP_AP_PERF_RISCV_STARTING,
+>  				      "perf/riscv/pmu:starting",
+> 
+
 
