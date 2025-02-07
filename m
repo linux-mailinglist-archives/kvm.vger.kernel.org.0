@@ -1,155 +1,139 @@
-Return-Path: <kvm+bounces-37541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96EF9A2B68B
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 00:28:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9D66A2B7F8
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 02:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBD303A6583
-	for <lists+kvm@lfdr.de>; Thu,  6 Feb 2025 23:28:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E12101668D0
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 01:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD0823AE67;
-	Thu,  6 Feb 2025 23:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6213114F132;
+	Fri,  7 Feb 2025 01:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="avcge3l/"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="bB247ib2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9A723908D;
-	Thu,  6 Feb 2025 23:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4B37DA67
+	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 01:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738884514; cv=none; b=Lu6Fm3LBw/9Qn41imdnoyWalWKarEPN0Rk6vN/QZyYPrPPML5IqkrsWshUVAZsJKOBF0fI+mpVy1WhXtPmdnhYWJ3jo0N9WV37ngaXAVNFFgTltTBShLOwmKy3CkiBgRD7pwpRGR+mvN26aVKfjhPMqgPN1AVgkMzMUGnBpt85Y=
+	t=1738892319; cv=none; b=CNGlOvGKRh256kUKGYYxguUVgd46XsyGw/CX6/0UX5IgbtFAKY0SRRTd/Tn5zXmoSPu43pQTzDy+THB3SVyHkqurWrhZKh3tX/BggbQrhff8feFvntk6B1+OS7+yfb2ghzNKgygDfnesC0u8wAHTvxph6UEgMolOmb0NmLwcmAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738884514; c=relaxed/simple;
-	bh=IqCJRbnd/ake/rfsaywutu7ZEKHtAxX14+3WiTsN3po=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ql1eKzSSpnYGL+B+hO8l6mpF8NcBi9JX5FxouiqyQHdyb9WF+20X3XZ9YDXAY+bBFO+0tYWyB1jXLmVFW1C4OBwjFUO1AwYeoR9HWpwWjlrbJsVC/T1kRAPnlql3NvcWXm6HiR+yfQPjnsvjQYo2hwyFuv5nfxFsXeOMtcgGhUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=avcge3l/; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738884512; x=1770420512;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=IqCJRbnd/ake/rfsaywutu7ZEKHtAxX14+3WiTsN3po=;
-  b=avcge3l/RdLBZXWQyfN30RQ1r+GR1kTEZVPesmxCqx3nFctzfzzH0A7u
-   H6a3kzt/uYiWUOV+jaxOq+/0Vsnkg7ON1MLPhtlim92pOsso83hdZaiqy
-   Ahv1F5ZZ63Se3E4eKWkJVkYA8AnQZEncxwnmLs3WGKS91b24lzHUdPISI
-   24CW8LAdJfEfUClNE+aXsDB9yP0g8vmNAP0qvbLSND/cJEEq/RvRL3DDF
-   ZL2L3dpc5j/08JGeFhMFxbVVPMR7+Q450qtoit5MGQlwZzAWCmaAGmEkI
-   nigONFSN0QreRuM71pmXgYOL4wT3z1cl8jje/BomrG9NzJF+m1IaWmFl9
-   w==;
-X-CSE-ConnectionGUID: S/FHRYUdSqubGwAej3zOIA==
-X-CSE-MsgGUID: y7Nq7/BZRVa8SdPkbs2sog==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39646303"
-X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
-   d="scan'208";a="39646303"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 15:28:32 -0800
-X-CSE-ConnectionGUID: 0cmOU3WWQ066b+PBqxIT4w==
-X-CSE-MsgGUID: d3vf7E8eTA28v3i/7CNOvw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
-   d="scan'208";a="116395562"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 06 Feb 2025 15:28:28 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tgBII-000xVn-1R;
-	Thu, 06 Feb 2025 23:28:26 +0000
-Date: Fri, 7 Feb 2025 07:27:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
-Subject: Re: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
-Message-ID: <202502070744.hqS7ZVVX-lkp@intel.com>
-References: <20250206001744.3155465-1-coltonlewis@google.com>
+	s=arc-20240116; t=1738892319; c=relaxed/simple;
+	bh=8QxwNQ5F3lUg16Ouo7FY/KDRymPfqKZizz8JYgXMkC4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SFdqgPyfbUFerzc99P+fWKBYaFjD/ECitHqFHb1Oeb4IJvYWrnfGKNSeAFmLL4yBGPiSJJAfRtfJla3PVlpOxBN2j6dAN19jlizeim0VPT5Ce1XYDWgbqVzZb7ehuAuztDY58UcWEkngz7xLEnrFd9ayMooaXZ9+vgUtdfOA21I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=bB247ib2; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id C47693F85C
+	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 01:38:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1738892305;
+	bh=8nlGza3bUYWolDa4VjQUob3ri6m4nok96qBzN8kMux8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=bB247ib2lBdbl245giIMLA84CUB/dGatMjnczArAC0Nwzqh/aTLnSOZ+YT20PPM1m
+	 du9KZi1ep488f5a92Wih/AtO2kfz+3XeqvMp7YEJS7GeY9n73JtorvkN5Czd7WeQd0
+	 5UQswNKqX5ev+KhJhzrIbg0rfaPRWXGXTSWLcfB67UrXCmqtWaHbhl1ZO+cbPsAFk+
+	 rlNvLGeOm9BGxIRU57PtK+f+6WlWcSRdFOypwIFvdN3cJQorYo6KTmvJgBDv6oFlzN
+	 uHY0Gv3+015FRVHTHDk1iudZEb9bK4m4aTdaaA9y/1Z+Rz7C9g572kd2qplizXW9Es
+	 8Plz0f8q+Pd1g==
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ab76aa0e72bso140429866b.0
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2025 17:38:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738892303; x=1739497103;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8nlGza3bUYWolDa4VjQUob3ri6m4nok96qBzN8kMux8=;
+        b=VuJzYNAdS+MEFUwQltM5GLWSdjlUHQOwAOjj5AhM2sLt48rlqCTfd/zvt4jqZCqCgx
+         va/iZ5fwDsP6eVC66j4BE/EDNNulbDhTqovMcgBTAEkwwOcOmXUDekwrfQhkN2TI1eA4
+         E+dJCke/TqCpTvKE2H0VqS2f4ZzseYDIbRs6YesKrgxj/9/hBQZhvAAKv7cUKmbGXFIp
+         q+KLv0kDxYKmPWT/X2tKfKuejOdOgnyJneqkj+It2hrwhb8mZQaEypv7SPNcVAMYiGlq
+         b+zmm2faa4/JkV/IELnnAoJZZmnVG+XQBKIj2E5am7jvWvqLUORmRytSzUyvQ9hi7xSV
+         8BVQ==
+X-Gm-Message-State: AOJu0Yyz4HDmyFDIIHI1VZ6DpljglYQARFOx0R/Ur1ZSnF6qooxeIktK
+	IQErOQ9QX+qnyzgPZ5kY9fj5BD89UfM8WRblHQ4noWxL/ldS14pBoLkmBBv2hwy+pL4AZbVYjOH
+	H/cT2c0Xr5dmKTyYkSUhsTqKzW4LMTdTqvWDNamgD/SzHx2kaBg8Ugq8wRDW7WCUgI/nIDW8APO
+	tg3yOG2M9+OP3oRzwVYe4BAASoNIglkOo2Avx9Iqnzr1Xn+Jg/
+X-Gm-Gg: ASbGncude6K3qnKs3698ulu+Wi7fIdcl2jY8D+TwuZSDZntoyuhZyexbK201fau3iTs
+	sXlpBQyUbqTzx8l8QjlZeIgPWGoYWj6p8n6xFXeIEeqmTrHcIn6ueKtne17em
+X-Received: by 2002:a05:6402:3907:b0:5d0:d818:559d with SMTP id 4fb4d7f45d1cf-5de450026c2mr4564597a12.11.1738892303511;
+        Thu, 06 Feb 2025 17:38:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEOx1lEvrP1pDzXVIU2a3ICbv42xHzPCxIbHrelQHrmglKbu9LnpCmZmMYgVJ5/Xsp8QKtnYeoVXGszsUYrFIo=
+X-Received: by 2002:a05:6402:3907:b0:5d0:d818:559d with SMTP id
+ 4fb4d7f45d1cf-5de450026c2mr4564572a12.11.1738892303237; Thu, 06 Feb 2025
+ 17:38:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250206001744.3155465-1-coltonlewis@google.com>
+References: <20250205231728.2527186-1-alex.williamson@redhat.com> <20250205231728.2527186-2-alex.williamson@redhat.com>
+In-Reply-To: <20250205231728.2527186-2-alex.williamson@redhat.com>
+From: Mitchell Augustin <mitchell.augustin@canonical.com>
+Date: Thu, 6 Feb 2025 19:38:12 -0600
+X-Gm-Features: AWEUYZmh01IaYWfQwXAr84y1vklWSet6KnJzeaENStmoiJRcweOokqw78vsFezE
+Message-ID: <CAHTA-uZK_1A1tNa_GWzy010C32wN=6ePoAp0hGZ7FToRsyr4iA@mail.gmail.com>
+Subject: Re: [PATCH 1/5] vfio/type1: Catch zero from pin_user_pages_remote()
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, peterx@redhat.com, 
+	clg@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Colton,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on 2014c95afecee3e76ca4a56956a936e23283f05b]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Colton-Lewis/KVM-arm64-Remove-cyclical-dependency-in-arm_pmuv3-h/20250206-082034
-base:   2014c95afecee3e76ca4a56956a936e23283f05b
-patch link:    https://lore.kernel.org/r/20250206001744.3155465-1-coltonlewis%40google.com
-patch subject: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
-config: arm64-allnoconfig (https://download.01.org/0day-ci/archive/20250207/202502070744.hqS7ZVVX-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250207/202502070744.hqS7ZVVX-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502070744.hqS7ZVVX-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/arm64/include/asm/kvm_host.h:38,
-                    from include/linux/kvm_host.h:45,
-                    from arch/arm64/kernel/asm-offsets.c:15:
->> include/kvm/arm_pmu.h:177:20: error: static declaration of 'kvm_vcpu_pmu_resync_el0' follows non-static declaration
-     177 | static inline void kvm_vcpu_pmu_resync_el0(void) {}
-         |                    ^~~~~~~~~~~~~~~~~~~~~~~
-   In file included from arch/arm64/include/asm/arm_pmuv3.h:10,
-                    from include/linux/perf/arm_pmuv3.h:316,
-                    from include/kvm/arm_pmu.h:11:
-   arch/arm64/include/asm/kvm_pmu.h:6:6: note: previous declaration of 'kvm_vcpu_pmu_resync_el0' with type 'void(void)'
-       6 | void kvm_vcpu_pmu_resync_el0(void);
-         |      ^~~~~~~~~~~~~~~~~~~~~~~
-   make[3]: *** [scripts/Makefile.build:102: arch/arm64/kernel/asm-offsets.s] Error 1
-   make[3]: Target 'prepare' not remade because of errors.
-   make[2]: *** [Makefile:1264: prepare0] Error 2
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:251: __sub-make] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:251: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
+Reviewed-by: "Mitchell Augustin" <mitchell.augustin@canonical.com>
+Tested-by: "Mitchell Augustin" <mitchell.augustin@canonical.com>
 
 
-vim +/kvm_vcpu_pmu_resync_el0 +177 include/kvm/arm_pmu.h
 
-5421db1be3b11c5 Marc Zyngier           2021-04-14  163  
-20492a62b99bd43 Marc Zyngier           2022-05-16  164  #define kvm_vcpu_has_pmu(vcpu)		({ false; })
-20492a62b99bd43 Marc Zyngier           2022-05-16  165  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
-20492a62b99bd43 Marc Zyngier           2022-05-16  166  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
-20492a62b99bd43 Marc Zyngier           2022-05-16  167  static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
-27131b199f9fdc0 Raghavendra Rao Ananta 2023-10-20  168  static inline void kvm_vcpu_reload_pmu(struct kvm_vcpu *vcpu) {}
-3d0dba5764b9430 Marc Zyngier           2022-11-13  169  static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
-3d0dba5764b9430 Marc Zyngier           2022-11-13  170  {
-3d0dba5764b9430 Marc Zyngier           2022-11-13  171  	return 0;
-3d0dba5764b9430 Marc Zyngier           2022-11-13  172  }
-bc512d6a9b92390 Oliver Upton           2023-10-19  173  static inline u64 kvm_pmu_evtyper_mask(struct kvm *kvm)
-bc512d6a9b92390 Oliver Upton           2023-10-19  174  {
-bc512d6a9b92390 Oliver Upton           2023-10-19  175  	return 0;
-bc512d6a9b92390 Oliver Upton           2023-10-19  176  }
-b1f778a223a2a8a Marc Zyngier           2023-08-20 @177  static inline void kvm_vcpu_pmu_resync_el0(void) {}
-20492a62b99bd43 Marc Zyngier           2022-05-16  178  
+On Wed, Feb 5, 2025 at 5:18=E2=80=AFPM Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> pin_user_pages_remote() can currently return zero for invalid args
+> or zero nr_pages, neither of which should ever happen.  However
+> vaddr_get_pfns() indicates it should only ever return a positive
+> value or -errno and there's a theoretical case where this can slip
+> through and be unhandled by callers.  Therefore convert zero to
+> -EFAULT.
+>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_ty=
+pe1.c
+> index 50ebc9593c9d..119cf886d8c0 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -564,6 +564,8 @@ static int vaddr_get_pfns(struct mm_struct *mm, unsig=
+ned long vaddr,
+>         if (ret > 0) {
+>                 *pfn =3D page_to_pfn(pages[0]);
+>                 goto done;
+> +       } else if (!ret) {
+> +               ret =3D -EFAULT;
+>         }
+>
+>         vaddr =3D untagged_addr_remote(mm, vaddr);
+> --
+> 2.47.1
+>
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+--
+Mitchell Augustin
+Software Engineer - Ubuntu Partner Engineering
 
