@@ -1,373 +1,202 @@
-Return-Path: <kvm+bounces-37580-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37581-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC42FA2C1EC
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 12:54:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74C3FA2C2CA
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 13:35:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69F5B165356
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 11:54:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52869188D7CD
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 12:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC931DFE0E;
-	Fri,  7 Feb 2025 11:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFFF1E47A5;
+	Fri,  7 Feb 2025 12:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aO5KtaCc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hq1pCO32"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F351A4F12;
-	Fri,  7 Feb 2025 11:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295BD1E1A33
+	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 12:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738929180; cv=none; b=dyLf6kTlDryz8J5y8Dr6Uiusq0bK1Z6w+WPr/woUQbbUa5ioCnPxSdFa+bnu2bChU6O/KpuQhsN1B48p4/0L5q41+d5HzFkTm49pQXuXD1IMlFwAtQ0hB2KSnXhyXwtWfk6/Pd8EpNwk/n8BiDuXQSSBPtO6c1xojzDfIId2EUg=
+	t=1738931740; cv=none; b=QkpZcdNfmeIDCHV29BZEjaEnNPkcxH3CMw+3/rWx0gPmGkYswoF8dS8ZD1+Iv3UcR4j7gCnlaoyTF2tF/Aa11AYzmyuT396+SektxvqatIr9pN67zApB/17SXnj9oUdGucnl2klCmHtL4zyKs+J0YtiDQCkSxjpU/sYes8wr8JE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738929180; c=relaxed/simple;
-	bh=5jnt/4GcTEHWI7EyJGL1G1JCr157JsJUEBy4mhXV3xE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AP/kjpT5obR081M/SMY4obtvtcL90LBYFB+2c5DFGYM+0FbNesWGdvia/LzkQHUVFDeuCFpcsUpJ5BatTfPRiDemiBKiSkbk1UbuY73SW3s6CKfebHOW+NJ741e23MZdQeCK3qOeXX1uIaljQ3bwupNuhNWNz97kq1CPkgmVvZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aO5KtaCc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F152C4CED1;
-	Fri,  7 Feb 2025 11:52:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738929179;
-	bh=5jnt/4GcTEHWI7EyJGL1G1JCr157JsJUEBy4mhXV3xE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aO5KtaCcTFUSqTjTjxgXr9cD3jNh41kdxHHWwDQJi18Qrfr6RA54oFomcJNHN/ElP
-	 Y72S3/jYHNql0r5l89oqxEG2dV2pzEI3BYrK8Ue717hObLJFt+0nExTODzM/pNkwA/
-	 eYqeeBoeeIUgrDzChJ/R9K9LBXVz2FZ5ba/HU93HRfQNd5XyKEROI5TKl4+E/+lpRa
-	 BFe3laovH70B13YbpBRjcE126xS3Cg5Rof7pmZEV7Ls/+N6K2FmBFWrh6ATNCjhu6c
-	 xfWP8XyTqtAdIhL6wE6FTcRHm1SoWScH1pm4jF8RqMESmPWPj2jvSg5brFNYYGEx+M
-	 FhD6uI9PmdICg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tgMum-001bfT-UQ;
-	Fri, 07 Feb 2025 11:52:57 +0000
-Date: Fri, 07 Feb 2025 11:52:56 +0000
-Message-ID: <86lduit1if.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
-In-Reply-To: <gsntmsey26xc.fsf@coltonlewis-kvm.c.googlers.com>
-References: <87frkrtr4z.wl-maz@kernel.org>
-	<gsntmsey26xc.fsf@coltonlewis-kvm.c.googlers.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1738931740; c=relaxed/simple;
+	bh=v+flGDnJs5ydAC51ycHpWPTrVu1kQtWmSWihCrY9hns=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=stTZT1dKclyWynBf6o7LIT4C0jIkI+prOZNKBMnF/wiDJIgVO2HGygkO21V+uNCPgj+U7uJti5AqewYN5WwfyHZGCTwIz3zGfXwLP1WjQHB7GSlCJGPIgDQxQ/E95KqG/YuKAPyNkSoTfbokkAtVaw+qt5Jw7dmMjM+DkreprHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hq1pCO32; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738931737;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vtS6MUQYBAgP5mlpzHtkqXazAG0CUcPyExaUVdCXkoM=;
+	b=hq1pCO329sxXwQRhiaZI837sRuSlCPbJnBSNz6z3RPSePrBOiKN66aCYW92q5HjDUVgmiB
+	fvoQnk+ddSEUiI0KSPmIjvM3d0UxPPeJHWRBsp0g434szJqKXtuDcnYvGwBCytrBvueiyp
+	ULef9KuuLAzQmc05ruP6yCgCaJzOTnU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-136-Fm1aVyTBMMaJi8wYZXPoFg-1; Fri, 07 Feb 2025 07:35:33 -0500
+X-MC-Unique: Fm1aVyTBMMaJi8wYZXPoFg-1
+X-Mimecast-MFC-AGG-ID: Fm1aVyTBMMaJi8wYZXPoFg
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38dc56ef418so593533f8f.1
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2025 04:35:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738931732; x=1739536532;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vtS6MUQYBAgP5mlpzHtkqXazAG0CUcPyExaUVdCXkoM=;
+        b=pEgLavh/HqW9BbluK7gFi94JCLZPYx88y2QvmJmxs85Q7p9PT5BItsIiRWv4DffGg0
+         2eWn3mYy0vMvqRIgt1UWGEd/jlQZXvHWmIA+NGgmC55uq5TTHpNAcVK3h2XXVAyOkvR3
+         DnyUcrymsukm00N80zcC9bcb1PjtY/417vJYoLxb8qtZaxTjQUIxlOE4t3YY5jQUrcgL
+         o91rDVTVvEL+5Bi94MjJLk/ecEWyuDQ2S0EdeqZnYKfoyEtDTffJ78eLQJc8ttw3nGQ4
+         BioywXCtZiDNra0/41AwIb1QpaqXKTt9DQ1eamV+ZnzE74rQpRH+3HjPnrqwTo3zSyQO
+         u/UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXlH0xu7cWYMYaI8ayy5S1VtbElzIjkbISpgv8kPLYIBIJqMJZXaSUgIrS+QcQqLni+TDo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaYGExU2B8PKKxp0HWo4mBQhlrKBpOJ4ILZcnoFID60TUZP6T2
+	2jlV8VAXWWeD9Yqi7mwkcRQhRqknoRxQlYtEYm6ADUCxCWcaFEHbXkZItczOQw5M9umpCmbfZBi
+	RxyLg+gjVoRZct2GKflT1pRR7nmGCWT6xy/3yAREweiKQDdhswQ==
+X-Gm-Gg: ASbGncuUEeApMmNuhYqn22ELPw2ennYgLs5zhiYrcSWQhI6/G9b69OlfQ2egl71J3by
+	100qVfiSpzCTTPjN4DNB513Vn1wxEJ6tSnzpBlfZarJSmCIBbv74gnKwptXv9GeQrwYD7P9WxvL
+	7m9pccKrUh9IlM3hFzWzrf0IyvEnNsAZHCi73l8NT1YAGpUo+G/lG8RwOLfaL4CHYq0bKhcUPzt
+	jGMleU6xHoBzwBVlk6r6KYCMS9EkbjChoQco2F/RFEewlGQDvt8M/tTSM2pZocK04xvV7uWqB5M
+	Gmo7TvvQM0YuYN7lk48/JnGsussSZgsSfrt1gxzf0VDpl4hIK33H9QLC1ftzTcTyCI+aj3bLz2V
+	UGHo8WZ6+l6maUmfXLYgOun4xS6/ZPXHG+Q==
+X-Received: by 2002:a5d:638d:0:b0:386:5b2:a9d9 with SMTP id ffacd0b85a97d-38dc9497d11mr1330969f8f.53.1738931732522;
+        Fri, 07 Feb 2025 04:35:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEzlYHsLZVY/Yw4cQDwMbMt6y2d8TLcRrPFXM0BvcWOfIWrbMFNkzdlXAGp79CG+cvVsjsBBw==
+X-Received: by 2002:a5d:638d:0:b0:386:5b2:a9d9 with SMTP id ffacd0b85a97d-38dc9497d11mr1330899f8f.53.1738931730737;
+        Fri, 07 Feb 2025 04:35:30 -0800 (PST)
+Received: from ?IPV6:2003:cf:d712:44fb:19ca:1c3d:6b27:934a? (p200300cfd71244fb19ca1c3d6b27934a.dip0.t-ipconnect.de. [2003:cf:d712:44fb:19ca:1c3d:6b27:934a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dcf35b15bsm668676f8f.64.2025.02.07.04.35.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2025 04:35:29 -0800 (PST)
+Message-ID: <f3639df5-05cf-4aef-adfc-8a39ed7767ce@redhat.com>
+Date: Fri, 7 Feb 2025 13:35:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Call for GSoC internship project ideas
+To: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ kvm <kvm@vger.kernel.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+ Alex Bennee <alex.bennee@linaro.org>, Akihiko Odaki
+ <akihiko.odaki@gmail.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Bibo Mao <maobibo@loongson.cn>, Jamin Lin <jamin_lin@aspeedtech.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>,
+ Fabiano Rosas <farosas@suse.de>, Palmer Dabbelt <palmer@dabbelt.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ German Maglione <gmaglione@redhat.com>
+References: <CAJSP0QVYE1Zcws=9hoO6+B+xB-hVWv38Dtu_LM8SysAmS4qRMw@mail.gmail.com>
+Content-Language: en-US
+From: Hanna Czenczek <hreitz@redhat.com>
+In-Reply-To: <CAJSP0QVYE1Zcws=9hoO6+B+xB-hVWv38Dtu_LM8SysAmS4qRMw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 06 Feb 2025 19:45:51 +0000,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> Hey Marc, thanks for the review. I thought of a different solution at
-> the very bottom. Please let me know if that is preferable.
-> 
-> Marc Zyngier <maz@kernel.org> writes:
-> 
-> > Colton,
-> 
-> > On Thu, 06 Feb 2025 00:17:44 +0000,
-> > Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> >> asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
-> >> which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
-> >> causes confusing compilation problems why trying to use anything
-> >> defined in any of the headers in any other headers. Header guards is
-> >> the only reason this cycle didn't create tons of redefinition
-> >> warnings.
-> 
-> >> The motivating example was figuring out it was impossible to use the
-> >> hypercall macros kvm_call_hyp* from kvm_host.h in arm_pmuv3.h. The
-> >> compiler will insist they aren't defined even though kvm_host.h is
-> >> included. Many other examples are lurking which could confuse
-> >> developers in the future.
-> 
-> > Well, that's because contrary to what you have asserted in v1, not all
-> > include files are legitimate to use willy-nilly. You have no business
-> > directly using asm/kvm_host.h, and linux/kvm_host.h is what you need.
-> 
-> That's what I'm trying to fix. I'm trying to *remove* asm/kvm_host.h
-> from being included in asm/arm_pmu.h.
-> 
-> I agree with you that it *should not be included there* but it currently
-> is. And I can't drop-in replace the include with linux/kvm_host.h
-> because the that just adds another link in the cyclical dependency.
-> 
-> 
-> >> Break the cycle by taking asm/kvm_host.h out of asm/arm_pmuv3.h
-> >> because asm/kvm_host.h is huge and we only need a few functions from
-> >> it. Move the required declarations to a new header asm/kvm_pmu.h.
-> 
-> >> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> >> ---
-> 
-> >> Possibly spinning more definitions out of asm/kvm_host.h would be a
-> >> good idea, but I'm not interested in getting bogged down in which
-> >> functions ideally belong where. This is sufficient to break the
-> 
-> > Tough luck. I'm not interested in half baked solutions, and "what
-> > belongs where" *is* the problem that needs solving.
-> 
-> Fair point, but a small solution is not half-baked if it is better than
-> what we have.
-
-No. Less crap is still crap.
-
-This sort of reasoning may fly for a quick fix that would otherwise
-result in a a crash or something similarly unpleasant. But for a
-rework that is only there to enable your particular project, you have
-all the time in the world to do it right.
-
-> 
-> >> cyclical dependency and get rid of the compilation issues. Though I
-> >> mention the one example I found, many other similar problems could
-> >> confuse developers in the future.
-> 
-> >> v2:
-> >> * Make a new header instead of moving kvm functions into the
-> >>    dedicated pmuv3 header
-> 
-> >> v1:
-> >> https://lore.kernel.org/kvm/20250204195708.1703531-1-coltonlewis@google.com/
-> 
-> >>   arch/arm64/include/asm/arm_pmuv3.h |  3 +--
-> >>   arch/arm64/include/asm/kvm_host.h  | 14 --------------
-> >>   arch/arm64/include/asm/kvm_pmu.h   | 26 ++++++++++++++++++++++++++
-> >>   include/kvm/arm_pmu.h              |  1 -
-> >>   4 files changed, 27 insertions(+), 17 deletions(-)
-> >>   create mode 100644 arch/arm64/include/asm/kvm_pmu.h
-> 
-> >> diff --git a/arch/arm64/include/asm/arm_pmuv3.h
-> >> b/arch/arm64/include/asm/arm_pmuv3.h
-> >> index 8a777dec8d88..54dd27a7a19f 100644
-> >> --- a/arch/arm64/include/asm/arm_pmuv3.h
-> >> +++ b/arch/arm64/include/asm/arm_pmuv3.h
-> >> @@ -6,9 +6,8 @@
-> >>   #ifndef __ASM_PMUV3_H
-> >>   #define __ASM_PMUV3_H
-> 
-> >> -#include <asm/kvm_host.h>
-> >> -
-> >>   #include <asm/cpufeature.h>
-> >> +#include <asm/kvm_pmu.h>
-> >>   #include <asm/sysreg.h>
-> 
-> >>   #define RETURN_READ_PMEVCNTRN(n) \
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h
-> >> b/arch/arm64/include/asm/kvm_host.h
-> >> index 7cfa024de4e3..6d4a2e7ab310 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -1385,25 +1385,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct
-> >> kvm_vcpu *vcpu);
-> >>   void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
-> >>   void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
-> 
-> >> -static inline bool kvm_pmu_counter_deferred(struct perf_event_attr
-> >> *attr)
-> >> -{
-> >> -	return (!has_vhe() && attr->exclude_host);
-> >> -}
-> >> -
-> >>   #ifdef CONFIG_KVM
-> >> -void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
-> >> -void kvm_clr_pmu_events(u64 clr);
-> >> -bool kvm_set_pmuserenr(u64 val);
-> >>   void kvm_enable_trbe(void);
-> >>   void kvm_disable_trbe(void);
-> >>   void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
-> >>   #else
-> >> -static inline void kvm_set_pmu_events(u64 set, struct
-> >> perf_event_attr *attr) {}
-> >> -static inline void kvm_clr_pmu_events(u64 clr) {}
-> >> -static inline bool kvm_set_pmuserenr(u64 val)
-> >> -{
-> >> -	return false;
-> >> -}
-> >>   static inline void kvm_enable_trbe(void) {}
-> >>   static inline void kvm_disable_trbe(void) {}
-> >>   static inline void kvm_tracing_set_el1_configuration(u64
-> >> trfcr_while_in_guest) {}
-> >> diff --git a/arch/arm64/include/asm/kvm_pmu.h
-> >> b/arch/arm64/include/asm/kvm_pmu.h
-> >> new file mode 100644
-> >> index 000000000000..3a8f737504d2
-> >> --- /dev/null
-> >> +++ b/arch/arm64/include/asm/kvm_pmu.h
-> >> @@ -0,0 +1,26 @@
-> >> +/* SPDX-License-Identifier: GPL-2.0-only */
-> >> +
-> >> +#ifndef __KVM_PMU_H
-> >> +#define __KVM_PMU_H
-> >> +
-> >> +void kvm_vcpu_pmu_resync_el0(void);
-> >> +
-> >> +#ifdef CONFIG_KVM
-> >> +void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
-> >> +void kvm_clr_pmu_events(u64 clr);
-> >> +bool kvm_set_pmuserenr(u64 val);
-> >> +#else
-> >> +static inline void kvm_set_pmu_events(u64 set, struct
-> >> perf_event_attr *attr) {}
-> >> +static inline void kvm_clr_pmu_events(u64 clr) {}
-> >> +static inline bool kvm_set_pmuserenr(u64 val)
-> >> +{
-> >> +	return false;
-> >> +}
-> >> +#endif
-> >> +
-> >> +static inline bool kvm_pmu_counter_deferred(struct perf_event_attr
-> >> *attr)
-> >> +{
-> >> +	return (!has_vhe() && attr->exclude_host);
-> >> +}
-> >> +
-> >> +#endif
-> 
-> > How does this solve your problem of using the HYP-calling macros?
-> 
-> This code does not directly solve that problem. It makes a solution to
-> that problem possible because it breaks up the cyclical dependency by
-> getting asm/kvm_host.h out of asm/arm_pmuv3.h while still providing the
-> declarations to arm_pmuv3.c
-> 
-> With a cyclical dependency the compiler gets confused if you try to use
-> anything from asm/kvm_host.h inside asm/arm_pmuv3.h (like HYP-calling
-> macros defined there for example). Again, I believe that inclusion
-> should not be there in the first place which is the motivation for this
-> patch.
-> 
-> But since it is included, here's what happens if you try:
-> 
-> When asm/kvm_host.h is included somewhere, it indirectly includes
-> asm/arm_pmuv3.h via the chain described in my commit message.
-> asm/arm_pmuv3.h is then effectively pasted into asm/kvm_host.h and due
-> to include guards is passed over this time, but this means that many
-> things in asm/kvm_host.h aren't defined yet so any symbols from
-> asm/kvm_host.h defined after the include of asm/arm_pmuv3.h are used
-> before their definition: boom, confusing compiler errors
+On 28.01.25 17:16, Stefan Hajnoczi wrote:
+> Dear QEMU and KVM communities,
+> QEMU will apply for the Google Summer of Code internship
+> program again this year. Regular contributors can submit project
+> ideas that they'd like to mentor by replying to this email by
+> February 7th.
 >
-> You might argue: just don't do that, but I think it's a terrible
-> developer experience when you can't use definitions from a file that is
-> currently included. I spent hours puzzling over errors before realizing
-> a cyclical dependency was the root cause and want to save other devs
-> from the same fate.
+> About Google Summer of Code
+> -----------------------------------------
+> GSoC (https://summerofcode.withgoogle.com/) offers paid open
+> source remote work internships to eligible people wishing to participate
+> in open source development. QEMU has been doing internship for
+> many years. Our mentors have enjoyed helping talented interns make
+> their first open source contributions and some former interns continue
+> to participate today.
+>
+> Who can mentor
+> ----------------------
+> Regular contributors to QEMU and KVM can participate as mentors.
+> Mentorship involves about 5 hours of time commitment per week to
+> communicate with the intern, review their patches, etc. Time is also
+> required during the intern selection phase to communicate with
+> applicants. Being a mentor is an opportunity to help someone get
+> started in open source development, will give you experience with
+> managing a project in a low-stakes environment, and a chance to
+> explore interesting technical ideas that you may not have time to
+> develop yourself.
+>
+> How to propose your idea
+> ------------------------------
+> Reply to this email with the following project idea template filled in:
+>
+> === TITLE ===
+>
+> '''Summary:''' Short description of the project
+>
+> Detailed description of the project that explains the general idea,
+> including a list of high-level tasks that will be completed by the
+> project, and provides enough background for someone unfamiliar with
+> the code base to research the idea. Typically 2 or 3 paragraphs.
+>
+> '''Links:'''
+> * Links to mailing lists threads, git repos, or web sites
+>
+> '''Details:'''
+> * Skill level: beginner or intermediate or advanced
+> * Language: C/Python/Rust/etc
 
-Then do it correctly. Or don't do that. Nobody other than you gets
-confused by this, it seems.
+=== Asynchronous request handling for virtiofsd ===
 
-> 
-> >> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> >> index 147bd3ee4f7b..2c78b1b1a9bb 100644
-> >> --- a/include/kvm/arm_pmu.h
-> >> +++ b/include/kvm/arm_pmu.h
-> >> @@ -74,7 +74,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
-> >>   struct kvm_pmu_events *kvm_get_pmu_events(void);
-> >>   void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
-> >>   void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> >> -void kvm_vcpu_pmu_resync_el0(void);
-> 
-> >>   #define kvm_vcpu_has_pmu(vcpu)					\
-> >>   	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
-> 
-> >> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
-> 
-> > I'm absolutely not keen on *two* PMU-related include files. They both
-> > describe internal APIs, and don't see a good reasoning for this
-> > arbitrary split other than "it works better for me and I don't want to
-> > do more than strictly necessary".
-> 
-> I understand the point which is why v1 tried not to introduce a new
-> header file and I was advised to make a new header file.
-> 
-> > For example, include/kvm was only introduced to be able to share files
-> > between architectures, and with 32bit KVM/arm being long dead, this
-> > serves no purpose anymore. Moving these things out of the way would be
-> > a good start and would provide a better base for further change.
-> 
-> Good to know. I avoided doing that because it would be a lot of change
-> noise and I wasn't sure such changes would be welcome.
-> 
-> > So please present a rationale on what needs to go where and why based
-> > on their usage pattern rather than personal convenience, and then
-> > we'll look at a possible patch. But not the other way around.
-> 
-> My rationale is fixing a cyclical dependency due to an inclusion of
-> asm/kvm_host.h where we both seem to agree it shouldn't be. Cyclical
-> dependencies are really bad and cause nasty surprises when something
-> that seems like it should obviously work doesn't. Fixing things like
-> this makes programming here more conveneint for everyone, not just
-> me. So I thought it was worth a separate patch.
+'''Summary:''' Make virtiofsd’s request handling asynchronous, allowing 
+single-threaded parallel request processing.
 
-That's not a rationale. That's the umpteenth repetition of a circular
-argument. This "make it easy for everyone" is a total fallacy. If you
-really want to make it easy, split the include files using a clear
-definition of what goes where. That would *actually* help.
+virtiofsd is a virtio-fs device implementation, i.e. grants VM guests 
+access to host directories. In its current state, it processes guest 
+requests one by one, which means operations of long duration will block 
+processing of others that could be processed more quickly.
 
-> 
-> Another possible solution that avoids moving anything around is to take
-> asm/kvm_host.h out of asm/arm_pmuv3.h and do
-> 
-> #ifdef CONFIG_ARM64
-> #include <linux/kvm_host.h>
-> #endif
-> 
-> directly in arm_pmuv3.c which breaks the cycle while still providing the
-> correct declarations for arm_pmuv3.c (and admittedly many more than
-> necessary).
-> 
-> I find this conditional inclusion ugly and possibly you will have an
-> objection to it, but let me know.
+With asynchronous request processing, longer-lasting operations could 
+continue in the background while other requests with lower latency are 
+fetched and processed in parallel. This should improve performance 
+especially for mixed workloads, i.e. one guest process executing 
+longer-lasting filesystem operations, while another runs random small 
+read requests on a single file.
 
-No. I want a full solution, not a point hack. Since you are not
-willing to define things, let me do it for you.
+Your task is to:
+* Get familiar with a Linux AIO interface, preferably io_uring
+* Have virtiofsd make use of that interface for its operations
+* Make the virtiofsd request loop process requests asynchronously, so 
+requests can be fetched and processed while others are continuing in the 
+background
+* Evaluate the resulting performance with different workloads
 
-- Anything that is at the interface between the host PMU driver and
-  KVM moves in its own include file. Nothing from kvm_host.h should be
-  needed for this, and the driver code only includes that particular
-  file.  Make is standalone, so that it doesn't require contextual
-  inclusions (see how your kvm_pmu.h doesn't include anything, and yet
-  depends on perf_event_attr being defined as well as has_vhe()).
+'''Links:'''
+* virtiofsd repository: https://gitlab.com/virtio-fs/virtiofsd
+* virtiofsd’s filesystem operations: 
+https://gitlab.com/virtio-fs/virtiofsd/-/blob/main/src/passthrough/mod.rs#L1490
+* virtiofsd’s request processing loop: 
+https://gitlab.com/virtio-fs/virtiofsd/-/blob/main/src/vhost_user.rs#L244
 
-- Anything that is internal to KVM moves to kvm_host.h. Eventually,
-  this could move to a kvm_internal.h that is nobody else's business
-  (just like we have a vgic.h that is not visible to anyone).
+'''Details:'''
+* Skill level: intermediate
+* Language: Rust
+* Mentors: Hanna Czenczek (hreitz@redhat.com), German Maglione 
+(gmaglione@redhat.com)
 
-- include/kvm/arm_pmu.h dies.
-
-And since I like putting my words into action, here's the result of a
-10 minute rework:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-includes
-
-Not exactly rocket science.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
