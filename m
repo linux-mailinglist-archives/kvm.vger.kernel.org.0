@@ -1,164 +1,384 @@
-Return-Path: <kvm+bounces-37620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4ED7A2CA14
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 18:23:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3682AA2CA69
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 18:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E54483A743A
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:23:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9E13168B33
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C9E1957E2;
-	Fri,  7 Feb 2025 17:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169C119AA58;
+	Fri,  7 Feb 2025 17:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k6bGkzWc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SDfXoL8b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B80191F95
-	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 17:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6796A2A1D8
+	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 17:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738949008; cv=none; b=bMiSpV7fJ3Z/CELpBIvlVTuwLdvo8WmE82QM3SxXOAhaIdNVZdQioGXEXpv1lwhOh7pgovcCQ7fZmxt4V5z9JqzifAkw3AiLS5BqOeU1iRqgP02erbUOvVdD/KbjWkjCpksS+eFmnmErnvnMA0VFNGA6UdjqQ8gv7y2IGF3kUdE=
+	t=1738950031; cv=none; b=pAAfcF340PUi6adVs4NQfOxRYoGq7iX+5I9XGugKyZsOWoetN925vxTbk/LlXGfrtTwB75KjSHWmt6Z34ipO1Q8is1JF2UlZ2mmeQfbH9DmKyGvV4ms/lIl91VwLHb5Yg5fQeWg2Lu4pejQr85+V5hodau/NWcBstS4XaULDjZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738949008; c=relaxed/simple;
-	bh=PQxPFXqaG62SOXmTydcGFIcOTiJY1WblAeoXwXAFCxQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=o7OkxQ49EUiJm255XRB7nUylTU0aODBsM7hCcJcY+5UqYzlHi1Q/UlxxRTctLxcRgE0zxWDbO6EuejnfRZYtAgDCh6AElDeWWS3CxhGOCq3S2PpgiGM7PmyTu7TzWW42N8JvngwxQMz3acVhMDsFFD5BDV4sPJKgOJ6LmqGKB54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k6bGkzWc; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1738950031; c=relaxed/simple;
+	bh=n1N6DGkGC6QwxHEMq4j7Rbj13/jC4Pq4IfD2QY1s1Pw=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=Ceqe3kZhVor7ht/LZO+YVoqKFVyKTBiLhQnJ6W61QP17q8c0bF/Ai5OozHn7bGpo42a5StTDssKNdC7WeoXqm+FiwRd0y2m9yDkKjwEfxMQrarrDBqwetX31pnyKzc5RihYeNK2ULcOCgz+304A7zYWAywJr9Vg5M3AF3yRi3RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SDfXoL8b; arc=none smtp.client-ip=209.85.166.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fa228b4143so2372513a91.0
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2025 09:23:26 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-3d0d7bceb62so10897615ab.3
+        for <kvm@vger.kernel.org>; Fri, 07 Feb 2025 09:40:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738949006; x=1739553806; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vOcxbBJpr4MsHRRcCFUSvs0+uPDtrFbSKcqYFX6+hYs=;
-        b=k6bGkzWcyJulSILZRZKhu/vAVwZ8YA1+CNezP4VdLMH2+qJZomYTFaEQGIHCMucmic
-         dXlGua2i7b+81ldvzTLu5b14HF8dZFNyeO552YP76pfPjpZif9ZMaUayu1ex7idIuXBG
-         DWAE2D55+PEzA8Ml4jFqfI9WN9nCjZVAe0geUNSErJGVyjUOpSvZqj0d1icJFY31pOgU
-         nzXv0X6b9eFHemZMgNjgW1tk244bbl4AGVirMKb+s+41Z4A03I2JB5sHoyYE4EYDKBTK
-         Hz07UhsRIeAMhwLvTIPOptOcoEEq6Wdl87Ig3emiXbaoNhkRUByp3Hgp2VhJ7ngtUobj
-         BBVw==
+        d=google.com; s=20230601; t=1738950028; x=1739554828; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=W6g6EC0DlQs1BcSp3qdzq9mhvuRoS8MgcxiiAADEXXY=;
+        b=SDfXoL8bkynAdler2+SvM3SJ/uUKzICGN2N7RHGO7dZsjMHTSUy2i/HNSZHW8LmCZt
+         jei3XEQHmKTG3lqeGJajq9lQKEsjjBDSWA2IEsk9EoLDvTIL/oXOHVNN+khlKrJzUeIY
+         lm+AgSiWwdzIwY+erk7KiRK2F00pTdglb8uv1lHBhub/PcN+aK33BKjCMBkwjzGBy89v
+         RDw2mdr6MJrqxa0qbSVl+NfJC0swTYfbE3o3uwCqgMNFUDeXmToFij+Jg+adV6NMyM5/
+         /oYvCwXqbpAuZOUohcUXJVlaaQMr5x7/g10qM05pyimWPF+IAX3q5IVIPHzSxb5EsKqT
+         RwIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738949006; x=1739553806;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1738950028; x=1739554828;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vOcxbBJpr4MsHRRcCFUSvs0+uPDtrFbSKcqYFX6+hYs=;
-        b=BBiyNPY0//3cmEolJ9hdbPk3YzZljCvZy1Jb5N1VSoCZw2uORP8sibhG1sGop4GRCP
-         LEaAjx3kqRLzl1TEt2tg8+TQ2Vpd0GvK+qw/all62jWYEydQgqvHrhl0eLZ3P+xHJANU
-         HUQXYdOHGJRpPlvwSdMd6JE51Yp5HOOAJ/K2ARpfcuvX2OMhV/vx7C1KVH1IGsIgE1n8
-         memLDRwadcz4t0tr9SI95UDppGkjX8gO1/5uji5XOjBBNkVdfztTj8E61uAm5T6qok4l
-         vntSq2AxOVecJhWZbEWTXZTcLHJAJgDOH3ctSMPCQQku76JoZ1FMyuF/SNI4wuDFtMCk
-         W5Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMGyMRaQjMFV4c7sWBR7mDsn4zhYxzYCHjswu0xrar6K35hPJgwe7SPEnDoIt7B4nHGCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoFsJ+9Z0rUDGmA87YFxPmVEx7PlhC3Z+0xHzdOJqdJnVU6LCG
-	JXA5RwX+xSPHQXolLvmgw4rlSS+bXy2DhZ/z/XOP6F+2bdKfplWDWJXsJlSJmaAJwYuy0gkSdwb
-	0Rg==
-X-Google-Smtp-Source: AGHT+IHtKk+I6CjiXseOd50XgDWMmjujWmhaISGeVrM7QdPNRD38ZmcvZcY1czgAsTeMYVLsyWS8xRRgOkA=
-X-Received: from pjbsv3.prod.google.com ([2002:a17:90b:5383:b0:2da:5868:311c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2685:b0:2f5:5bc6:a78d
- with SMTP id 98e67ed59e1d1-2f9ff78641amr13455568a91.3.1738949005804; Fri, 07
- Feb 2025 09:23:25 -0800 (PST)
-Date: Fri, 7 Feb 2025 09:23:24 -0800
-In-Reply-To: <20250201021718.699411-17-seanjc@google.com>
+        bh=W6g6EC0DlQs1BcSp3qdzq9mhvuRoS8MgcxiiAADEXXY=;
+        b=nN7iegLoiKc0GKCAzwG3nxbkcTXObHXZenThuGDoCoLNTQcSXltm2rH3Na8OULHITZ
+         3exjhi1F/33jv6dhW4G0KHrSBtXgpADSOuotkCFIJuJ3YiUuTAm8Odlq5C6KZGQCxsCG
+         0RacR6pKQI1YVZsSBrNCvz8yGyNgY4tZgLbQwVXEvvlLEOznxBcNrBVxzzNXdwSUP4+6
+         tpAb1u/JkaxFgkbw9LkIMhOiUCZo6TZIijoGrPb+Kc0xDMMr62JIph63hCv2/JPNAqhw
+         Oonv+UPi1BvXVBcZz9trI2d9Jpic6IcLGwITDoPaqSV4Jl1at8O44/1NPWjYSMrK60Dm
+         XIrQ==
+X-Gm-Message-State: AOJu0YxiwWmi4qcqmvoNWEyW3+M7JPNl1MamNdti34hiio1zfZsKucZb
+	kiCDntlJ6syxflFG4WL8EPc255jY0V4eax4CmGzQrLLK+fGuZyHXdYhM3qv3W89XTUy8xA22puL
+	1ZJbobv3jJo2CZpruF7M2uw==
+X-Google-Smtp-Source: AGHT+IHtKdSmRw3KrNJTHOuSXouv2bBkqBXKW+IytKNHDdptcNJMvlCA7vo46uvyD4q70ZJ3g5nFmXPd+VMVBYwilQ==
+X-Received: from ilbed6.prod.google.com ([2002:a05:6e02:4806:b0:3ce:8db7:b87a])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6e02:1d89:b0:3d0:2b88:116c with SMTP id e9e14a558f8ab-3d13dd4aaadmr29772225ab.10.1738950028552;
+ Fri, 07 Feb 2025 09:40:28 -0800 (PST)
+Date: Fri, 07 Feb 2025 17:40:27 +0000
+In-Reply-To: <86lduit1if.wl-maz@kernel.org> (message from Marc Zyngier on Fri,
+ 07 Feb 2025 11:52:56 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250201021718.699411-1-seanjc@google.com> <20250201021718.699411-17-seanjc@google.com>
-Message-ID: <Z6ZBjNdoULymGgxz@google.com>
-Subject: Re: [PATCH 16/16] x86/kvmclock: Use TSC for sched_clock if it's
- constant and non-stop
-From: Sean Christopherson <seanjc@google.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Juergen Gross <jgross@suse.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
-	Jan Kiszka <jan.kiszka@siemens.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, virtualization@lists.linux.dev, 
-	linux-hyperv@vger.kernel.org, kvm@vger.kernel.org, 
-	xen-devel@lists.xenproject.org, Nikunj A Dadhania <nikunj@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <gsntjza11wms.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2] KVM: arm64: Remove cyclical dependency in arm_pmuv3.h
+From: Colton Lewis <coltonlewis@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, 
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-Dropping a few people/lists whose emails are bouncing.
+Marc Zyngier <maz@kernel.org> writes:
 
-On Fri, Jan 31, 2025, Sean Christopherson wrote:
-> @@ -369,6 +369,11 @@ void __init kvmclock_init(void)
->  #ifdef CONFIG_X86_LOCAL_APIC
->  	x86_cpuinit.early_percpu_clock_init = kvm_setup_secondary_clock;
->  #endif
-> +	/*
-> +	 * Save/restore "sched" clock state even if kvmclock isn't being used
-> +	 * for sched_clock, as kvmclock is still used for wallclock and relies
-> +	 * on these hooks to re-enable kvmclock after suspend+resume.
+> On Thu, 06 Feb 2025 19:45:51 +0000,
+> Colton Lewis <coltonlewis@google.com> wrote:
 
-This is wrong, wallclock is a different MSR entirely.
+>> Hey Marc, thanks for the review. I thought of a different solution at
+>> the very bottom. Please let me know if that is preferable.
 
-> +	 */
->  	x86_platform.save_sched_clock_state = kvm_save_sched_clock_state;
->  	x86_platform.restore_sched_clock_state = kvm_restore_sched_clock_state;
+>> Marc Zyngier <maz@kernel.org> writes:
 
-And usurping sched_clock save/restore is *really* wrong if kvmclock isn't being
-used as sched_clock, because when TSC is reset on suspend/hiberation, not doing
-tsc_{save,restore}_sched_clock_state() results in time going haywire.
+>> > Colton,
 
-Subtly, that issue goes all the way back to patch "x86/paravirt: Don't use a PV
-sched_clock in CoCo guests with trusted TSC" because pulling the rug out from
-under kvmclock leads to the same problem.
+>> > On Thu, 06 Feb 2025 00:17:44 +0000,
+>> > Colton Lewis <coltonlewis@google.com> wrote:
 
-The whole PV sched_clock scheme is a disaster.
+>> >> asm/kvm_host.h includes asm/arm_pmu.h which includes perf/arm_pmuv3.h
+>> >> which includes asm/arm_pmuv3.h which includes asm/kvm_host.h This
+>> >> causes confusing compilation problems why trying to use anything
+>> >> defined in any of the headers in any other headers. Header guards is
+>> >> the only reason this cycle didn't create tons of redefinition
+>> >> warnings.
 
-Hyper-V overrides the save/restore callbacks, but _also_ runs the old TSC callbacks,
-because Hyper-V doesn't ensure that it's actually using the Hyper-V clock for
-sched_clock.  And the code is all kinds of funky, because it tries to keep the
-x86 code isolated from the generic HV clock code, but (a) there's already x86 PV
-specific code in drivers/clocksource/hyperv_timer.c, and (b) splitting the code
-means that Hyper-V overides the sched_clock save/restore hooks even when PARAVIRT=n,
-i.e. when HV clock can't possibly be used as sched_clock.
+>> >> The motivating example was figuring out it was impossible to use the
+>> >> hypercall macros kvm_call_hyp* from kvm_host.h in arm_pmuv3.h. The
+>> >> compiler will insist they aren't defined even though kvm_host.h is
+>> >> included. Many other examples are lurking which could confuse
+>> >> developers in the future.
 
-VMware appears to be buggy and doesn't do have offset adjustments, and also lets
-the TSC callbacks run.
+>> > Well, that's because contrary to what you have asserted in v1, not all
+>> > include files are legitimate to use willy-nilly. You have no business
+>> > directly using asm/kvm_host.h, and linux/kvm_host.h is what you need.
 
-I can't tell if Xen is broken, or if it's the sanest of the bunch.  Xen does
-save/restore things a la kvmclock, but only in the Xen PV suspend path.  So if
-the "normal" suspend/hibernate paths are unreachable, Xen is sane.  If not, Xen
-is quite broken.
+>> That's what I'm trying to fix. I'm trying to *remove* asm/kvm_host.h
+>> from being included in asm/arm_pmu.h.
 
-To make matters worse, kvmclock is a mess and has existing bugs.  The BSP's clock
-is disabled during syscore_suspend() (via kvm_suspend()), but only re-enabled in
-the sched_clock callback.  So if suspend is aborted due to a late wakeup, the BSP
-will run without its clock enabled, which "works" only because KVM-the-hypervisor
-is kind enough to not clobber the shared memory when the clock is disabled.  But
-over time, I would expect time on the BSP to drift from APs.
+>> I agree with you that it *should not be included there* but it currently
+>> is. And I can't drop-in replace the include with linux/kvm_host.h
+>> because the that just adds another link in the cyclical dependency.
 
-And then there's this crud:
 
-  #ifdef CONFIG_X86_LOCAL_APIC
-	x86_cpuinit.early_percpu_clock_init = kvm_setup_secondary_clock;
-  #endif
+>> >> Break the cycle by taking asm/kvm_host.h out of asm/arm_pmuv3.h
+>> >> because asm/kvm_host.h is huge and we only need a few functions from
+>> >> it. Move the required declarations to a new header asm/kvm_pmu.h.
 
-which (a) should be guarded by CONFIG_SMP, not X86_LOCAL_APIC, and (b) is only
-actually needed when kvmclock is sched_clock, because timekeeping doesn't actually
-need to start that early.  But of course kvmclock craptastic handling of suspend
-and resume makes untangling that more difficult than it needs to be.
+>> >> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> >> ---
 
-The icing on the cake is that after cleaning up all the hacks, and having
-kvmclock hook clocksource.suspend/resume like it should, suspend/resume under
-kvmclock corrupts wall clock time because timekeeping_resume() reads the persistent
-clock before resuming clocksource clocks, and the stupid kvmclock wall clock subtly
-consumes the clocksource/system clock.  *sigh*
+>> >> Possibly spinning more definitions out of asm/kvm_host.h would be a
+>> >> good idea, but I'm not interested in getting bogged down in which
+>> >> functions ideally belong where. This is sufficient to break the
 
-I have yet more patches to clean all of this up.  The series is rather unwieldly,
-as it's now sitting at 38 patches (ugh), but I don't see a way to chunk it up in
-a meaningful way, because everything is so intertwined.  :-/
+>> > Tough luck. I'm not interested in half baked solutions, and "what
+>> > belongs where" *is* the problem that needs solving.
+
+>> Fair point, but a small solution is not half-baked if it is better than
+>> what we have.
+
+> No. Less crap is still crap.
+
+> This sort of reasoning may fly for a quick fix that would otherwise
+> result in a a crash or something similarly unpleasant. But for a
+> rework that is only there to enable your particular project, you have
+> all the time in the world to do it right.
+
+Point taken. I agree.
+
+
+>> >> cyclical dependency and get rid of the compilation issues. Though I
+>> >> mention the one example I found, many other similar problems could
+>> >> confuse developers in the future.
+
+>> >> v2:
+>> >> * Make a new header instead of moving kvm functions into the
+>> >>    dedicated pmuv3 header
+
+>> >> v1:
+>> >>  
+>> https://lore.kernel.org/kvm/20250204195708.1703531-1-coltonlewis@google.com/
+
+>> >>   arch/arm64/include/asm/arm_pmuv3.h |  3 +--
+>> >>   arch/arm64/include/asm/kvm_host.h  | 14 --------------
+>> >>   arch/arm64/include/asm/kvm_pmu.h   | 26 ++++++++++++++++++++++++++
+>> >>   include/kvm/arm_pmu.h              |  1 -
+>> >>   4 files changed, 27 insertions(+), 17 deletions(-)
+>> >>   create mode 100644 arch/arm64/include/asm/kvm_pmu.h
+
+>> >> diff --git a/arch/arm64/include/asm/arm_pmuv3.h
+>> >> b/arch/arm64/include/asm/arm_pmuv3.h
+>> >> index 8a777dec8d88..54dd27a7a19f 100644
+>> >> --- a/arch/arm64/include/asm/arm_pmuv3.h
+>> >> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+>> >> @@ -6,9 +6,8 @@
+>> >>   #ifndef __ASM_PMUV3_H
+>> >>   #define __ASM_PMUV3_H
+
+>> >> -#include <asm/kvm_host.h>
+>> >> -
+>> >>   #include <asm/cpufeature.h>
+>> >> +#include <asm/kvm_pmu.h>
+>> >>   #include <asm/sysreg.h>
+
+>> >>   #define RETURN_READ_PMEVCNTRN(n) \
+>> >> diff --git a/arch/arm64/include/asm/kvm_host.h
+>> >> b/arch/arm64/include/asm/kvm_host.h
+>> >> index 7cfa024de4e3..6d4a2e7ab310 100644
+>> >> --- a/arch/arm64/include/asm/kvm_host.h
+>> >> +++ b/arch/arm64/include/asm/kvm_host.h
+>> >> @@ -1385,25 +1385,11 @@ void kvm_arch_vcpu_ctxflush_fp(struct
+>> >> kvm_vcpu *vcpu);
+>> >>   void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu);
+>> >>   void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu);
+
+>> >> -static inline bool kvm_pmu_counter_deferred(struct perf_event_attr
+>> >> *attr)
+>> >> -{
+>> >> -	return (!has_vhe() && attr->exclude_host);
+>> >> -}
+>> >> -
+>> >>   #ifdef CONFIG_KVM
+>> >> -void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+>> >> -void kvm_clr_pmu_events(u64 clr);
+>> >> -bool kvm_set_pmuserenr(u64 val);
+>> >>   void kvm_enable_trbe(void);
+>> >>   void kvm_disable_trbe(void);
+>> >>   void kvm_tracing_set_el1_configuration(u64 trfcr_while_in_guest);
+>> >>   #else
+>> >> -static inline void kvm_set_pmu_events(u64 set, struct
+>> >> perf_event_attr *attr) {}
+>> >> -static inline void kvm_clr_pmu_events(u64 clr) {}
+>> >> -static inline bool kvm_set_pmuserenr(u64 val)
+>> >> -{
+>> >> -	return false;
+>> >> -}
+>> >>   static inline void kvm_enable_trbe(void) {}
+>> >>   static inline void kvm_disable_trbe(void) {}
+>> >>   static inline void kvm_tracing_set_el1_configuration(u64
+>> >> trfcr_while_in_guest) {}
+>> >> diff --git a/arch/arm64/include/asm/kvm_pmu.h
+>> >> b/arch/arm64/include/asm/kvm_pmu.h
+>> >> new file mode 100644
+>> >> index 000000000000..3a8f737504d2
+>> >> --- /dev/null
+>> >> +++ b/arch/arm64/include/asm/kvm_pmu.h
+>> >> @@ -0,0 +1,26 @@
+>> >> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> >> +
+>> >> +#ifndef __KVM_PMU_H
+>> >> +#define __KVM_PMU_H
+>> >> +
+>> >> +void kvm_vcpu_pmu_resync_el0(void);
+>> >> +
+>> >> +#ifdef CONFIG_KVM
+>> >> +void kvm_set_pmu_events(u64 set, struct perf_event_attr *attr);
+>> >> +void kvm_clr_pmu_events(u64 clr);
+>> >> +bool kvm_set_pmuserenr(u64 val);
+>> >> +#else
+>> >> +static inline void kvm_set_pmu_events(u64 set, struct
+>> >> perf_event_attr *attr) {}
+>> >> +static inline void kvm_clr_pmu_events(u64 clr) {}
+>> >> +static inline bool kvm_set_pmuserenr(u64 val)
+>> >> +{
+>> >> +	return false;
+>> >> +}
+>> >> +#endif
+>> >> +
+>> >> +static inline bool kvm_pmu_counter_deferred(struct perf_event_attr
+>> >> *attr)
+>> >> +{
+>> >> +	return (!has_vhe() && attr->exclude_host);
+>> >> +}
+>> >> +
+>> >> +#endif
+
+>> > How does this solve your problem of using the HYP-calling macros?
+
+>> This code does not directly solve that problem. It makes a solution to
+>> that problem possible because it breaks up the cyclical dependency by
+>> getting asm/kvm_host.h out of asm/arm_pmuv3.h while still providing the
+>> declarations to arm_pmuv3.c
+
+>> With a cyclical dependency the compiler gets confused if you try to use
+>> anything from asm/kvm_host.h inside asm/arm_pmuv3.h (like HYP-calling
+>> macros defined there for example). Again, I believe that inclusion
+>> should not be there in the first place which is the motivation for this
+>> patch.
+
+>> But since it is included, here's what happens if you try:
+
+>> When asm/kvm_host.h is included somewhere, it indirectly includes
+>> asm/arm_pmuv3.h via the chain described in my commit message.
+>> asm/arm_pmuv3.h is then effectively pasted into asm/kvm_host.h and due
+>> to include guards is passed over this time, but this means that many
+>> things in asm/kvm_host.h aren't defined yet so any symbols from
+>> asm/kvm_host.h defined after the include of asm/arm_pmuv3.h are used
+>> before their definition: boom, confusing compiler errors
+
+>> You might argue: just don't do that, but I think it's a terrible
+>> developer experience when you can't use definitions from a file that is
+>> currently included. I spent hours puzzling over errors before realizing
+>> a cyclical dependency was the root cause and want to save other devs
+>> from the same fate.
+
+> Then do it correctly. Or don't do that. Nobody other than you gets
+> confused by this, it seems.
+
+
+>> >> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+>> >> index 147bd3ee4f7b..2c78b1b1a9bb 100644
+>> >> --- a/include/kvm/arm_pmu.h
+>> >> +++ b/include/kvm/arm_pmu.h
+>> >> @@ -74,7 +74,6 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+>> >>   struct kvm_pmu_events *kvm_get_pmu_events(void);
+>> >>   void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+>> >>   void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+>> >> -void kvm_vcpu_pmu_resync_el0(void);
+
+>> >>   #define kvm_vcpu_has_pmu(vcpu)					\
+>> >>   	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
+
+>> >> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+
+>> > I'm absolutely not keen on *two* PMU-related include files. They both
+>> > describe internal APIs, and don't see a good reasoning for this
+>> > arbitrary split other than "it works better for me and I don't want to
+>> > do more than strictly necessary".
+
+>> I understand the point which is why v1 tried not to introduce a new
+>> header file and I was advised to make a new header file.
+
+>> > For example, include/kvm was only introduced to be able to share files
+>> > between architectures, and with 32bit KVM/arm being long dead, this
+>> > serves no purpose anymore. Moving these things out of the way would be
+>> > a good start and would provide a better base for further change.
+
+>> Good to know. I avoided doing that because it would be a lot of change
+>> noise and I wasn't sure such changes would be welcome.
+
+>> > So please present a rationale on what needs to go where and why based
+>> > on their usage pattern rather than personal convenience, and then
+>> > we'll look at a possible patch. But not the other way around.
+
+>> My rationale is fixing a cyclical dependency due to an inclusion of
+>> asm/kvm_host.h where we both seem to agree it shouldn't be. Cyclical
+>> dependencies are really bad and cause nasty surprises when something
+>> that seems like it should obviously work doesn't. Fixing things like
+>> this makes programming here more conveneint for everyone, not just
+>> me. So I thought it was worth a separate patch.
+
+> That's not a rationale. That's the umpteenth repetition of a circular
+> argument. This "make it easy for everyone" is a total fallacy. If you
+> really want to make it easy, split the include files using a clear
+> definition of what goes where. That would *actually* help.
+
+
+>> Another possible solution that avoids moving anything around is to take
+>> asm/kvm_host.h out of asm/arm_pmuv3.h and do
+
+>> #ifdef CONFIG_ARM64
+>> #include <linux/kvm_host.h>
+>> #endif
+
+>> directly in arm_pmuv3.c which breaks the cycle while still providing the
+>> correct declarations for arm_pmuv3.c (and admittedly many more than
+>> necessary).
+
+>> I find this conditional inclusion ugly and possibly you will have an
+>> objection to it, but let me know.
+
+> No. I want a full solution, not a point hack. Since you are not
+> willing to define things, let me do it for you.
+
+> - Anything that is at the interface between the host PMU driver and
+>    KVM moves in its own include file. Nothing from kvm_host.h should be
+>    needed for this, and the driver code only includes that particular
+>    file.  Make is standalone, so that it doesn't require contextual
+>    inclusions (see how your kvm_pmu.h doesn't include anything, and yet
+>    depends on perf_event_attr being defined as well as has_vhe()).
+
+> - Anything that is internal to KVM moves to kvm_host.h. Eventually,
+>    this could move to a kvm_internal.h that is nobody else's business
+>    (just like we have a vgic.h that is not visible to anyone).
+
+> - include/kvm/arm_pmu.h dies.
+
+> And since I like putting my words into action, here's the result of a
+> 10 minute rework:
+
+> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-includes
+
+> Not exactly rocket science.
+
+Thank you for the example. You are right it isn't hard. It's just moving
+some code around. I'm sorry if I've irritated you. I don't like lazy
+point hacks either. My goal was to best communicate the intent of the
+change by changing exactly what needed to change and no more.
+
+I'll learn from your example and attempt to exercise better taste for
+the right way to do things in the future. I'm happy with killing
+kvm/arm_pmu.h
 
