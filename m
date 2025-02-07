@@ -1,117 +1,195 @@
-Return-Path: <kvm+bounces-37605-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37606-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A574AA2C885
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:22:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E106A2C92E
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:46:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DBDC188C172
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 16:22:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF33B163B1B
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 16:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1891898EA;
-	Fri,  7 Feb 2025 16:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0817F18DB27;
+	Fri,  7 Feb 2025 16:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DWVulNy8"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="ScaHENaw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AE110F1
-	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 16:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B22323C8AF;
+	Fri,  7 Feb 2025 16:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738945288; cv=none; b=f13DdqrC6dXJ/d9cbjo/FncI1STu+x4vyEZdQMrAcL/SiAz6GYNzxcNlzQKv1KTYU6F/U4o29VB+a+eK1AKiQHavj1JFHzAP3sGrqeCtLOHVYyQp5O+zI/Cm0WxsLILLhiCwvuBbwTMKWjCWVOOK8TziC/qHot0vD50Cdoiqjsw=
+	t=1738946760; cv=none; b=DexfibhuzS5S+bbQyfIrmuq20Yl6kqPrBLjCUpnlGZ/JjBWzAaG6fnrmqXyY0KTrg/Fmsrp6mCzI0IgBgXgifkf7CJYfxrQGkYkhZj7iZaLCtbWTtZ9nJaR4XFKHmezqWA5982wwMOuTGcijlfa29YawqMvfiESjXBrvopGVgQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738945288; c=relaxed/simple;
-	bh=o96xiAGGAf1VbfHWgHYbIYNVLqylg+O4B4Y//biT4pE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a8BsV6idxw/cl5xHCcGFwkykcfJjLo5yWGEFICln3vuamwG9zmo4cDYzqOuetlUEjTk79j87k98siH6gmKUDDPs/pwugnUQGBMoc1U9HL4wtzQsZ1oYcYc4X45mz4R7zI2kBAyOXpVIbClg+Xz/GdFiyC6SDwNSnKJUjp1dFsSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DWVulNy8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738945285;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3WVrexRlab32QyhpO6UTZhs06SRUtIvJ5qxTfzSBSSg=;
-	b=DWVulNy8o6pjNdhFMmNcUontmIS8VGSfaPJF/UFpPCLqDxQlQedlTh+vHQ9iPiungbqK9S
-	uUqaXMOKNrzXc8+lcKKY8hH+JZMTId04LzefugOtRhRXFULENnu+KqCXJNoe+S76YYbgOu
-	QqDLjhsai7HjfgYAeNY5UtrK1c7Npw0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-326--t9MizpNPHC3KSb7onlIuw-1; Fri,
- 07 Feb 2025 11:21:21 -0500
-X-MC-Unique: -t9MizpNPHC3KSb7onlIuw-1
-X-Mimecast-MFC-AGG-ID: -t9MizpNPHC3KSb7onlIuw
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6DC0219560AD;
-	Fri,  7 Feb 2025 16:21:19 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq2.redhat.com (dell-r430-03.lab.eng.brq2.redhat.com [10.37.153.18])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9C870180087A;
-	Fri,  7 Feb 2025 16:21:17 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	kvm@vger.kernel.org
-Subject: [PATCH v2 10/10] accel/kvm: Remove unreachable assertion in kvm_dirty_ring_reap*()
-Date: Fri,  7 Feb 2025 17:20:48 +0100
-Message-ID: <20250207162048.1890669-11-imammedo@redhat.com>
-In-Reply-To: <20250207162048.1890669-1-imammedo@redhat.com>
-References: <20250207162048.1890669-1-imammedo@redhat.com>
+	s=arc-20240116; t=1738946760; c=relaxed/simple;
+	bh=sD/CGPZZ7laiJ27vQakP60j57br3QZpDJMPYzD3tjPI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ALYyU7rms1GxdPHCzRl+sMolPfYhGrVHwJM82Bys9T/mA49v0aEPtRKViRyxMAv+V31JIe8G5ngcMnCxDvxRfOjxrTxzQK+FJDU7bueqKJGpyH7mSeqgy3/2rTqSHjMgR/fZqPpeFb+eP9IzV5qK1A/Mdo+mhpZB61fbMq2yO4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=ScaHENaw; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1738946759; x=1770482759;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=q7xTDS28+TP5gE07LEBmeY0j/rksTUzAlt42eYMiWY0=;
+  b=ScaHENawKmE7nO2/FjyLaBfTHiNoyAW3v27NJN9JtIFlndawGqPnTITe
+   5h/YS35y3BQZ9FtNUW7BGJlEI7MBQKp8zGwIZP77aV/GevQmBBubtUciB
+   zjBylj/pqUJ+26iWcZx9dbyaMCtGvgYeOI/KaQjWkWN+0Wacepj2pVzYV
+   8=;
+X-IronPort-AV: E=Sophos;i="6.13,267,1732579200"; 
+   d="scan'208";a="492059548"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 16:45:48 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:61291]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.27:2525] with esmtp (Farcaster)
+ id 0c878457-1ded-46ff-8f23-53205f2aa13e; Fri, 7 Feb 2025 16:45:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 0c878457-1ded-46ff-8f23-53205f2aa13e
+Received: from EX19MTAUWB002.ant.amazon.com (10.250.64.231) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 7 Feb 2025 16:45:34 +0000
+Received: from email-imr-corp-prod-iad-1box-1a-6851662a.us-east-1.amazon.com
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.228) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.39 via Frontend Transport; Fri, 7 Feb 2025 16:45:34 +0000
+Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
+	by email-imr-corp-prod-iad-1box-1a-6851662a.us-east-1.amazon.com (Postfix) with ESMTPS id 8644C40575;
+	Fri,  7 Feb 2025 16:45:27 +0000 (UTC)
+Message-ID: <0b1cc981-52e8-4f8f-846a-f19507e3a630@amazon.co.uk>
+Date: Fri, 7 Feb 2025 16:45:26 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 03/11] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+To: Fuad Tabba <tabba@google.com>, <kvm@vger.kernel.org>,
+	<linux-arm-msm@vger.kernel.org>, <linux-mm@kvack.org>
+CC: <pbonzini@redhat.com>, <chenhuacai@kernel.org>, <mpe@ellerman.id.au>,
+	<anup@brainfault.org>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+	<aou@eecs.berkeley.edu>, <seanjc@google.com>, <viro@zeniv.linux.org.uk>,
+	<brauner@kernel.org>, <willy@infradead.org>, <akpm@linux-foundation.org>,
+	<xiaoyao.li@intel.com>, <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
+	<jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
+	<yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>, <mic@digikod.net>,
+	<vbabka@suse.cz>, <vannapurve@google.com>, <ackerleytng@google.com>,
+	<mail@maciej.szmigiero.name>, <david@redhat.com>, <michael.roth@amd.com>,
+	<wei.w.wang@intel.com>, <liam.merwick@oracle.com>,
+	<isaku.yamahata@gmail.com>, <kirill.shutemov@linux.intel.com>,
+	<suzuki.poulose@arm.com>, <steven.price@arm.com>, <quic_eberman@quicinc.com>,
+	<quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
+	<quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
+	<quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
+	<catalin.marinas@arm.com>, <james.morse@arm.com>, <yuzenghui@huawei.com>,
+	<oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
+	<qperret@google.com>, <keirf@google.com>, <shuah@kernel.org>,
+	<hch@infradead.org>, <jgg@nvidia.com>, <rientjes@google.com>,
+	<jhubbard@nvidia.com>, <fvdl@google.com>, <hughd@google.com>,
+	<jthoughton@google.com>
+References: <20250129172320.950523-1-tabba@google.com>
+ <20250129172320.950523-4-tabba@google.com>
+From: Patrick Roy <roypat@amazon.co.uk>
+Content-Language: en-US
+Autocrypt: addr=roypat@amazon.co.uk; keydata=
+ xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
+ NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
+ wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
+ CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
+ AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
+ AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
+ IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
+ 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
+ 8hlxFQM=
+In-Reply-To: <20250129172320.950523-4-tabba@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-From: Philippe Mathieu-Daudé <philmd@linaro.org>
+Hi Fuad!
 
-Previous commit passed all our CI tests, this assertion being
-never triggered. Remove it as dead code.
+On Wed, 2025-01-29 at 17:23 +0000, Fuad Tabba wrote:
+> Add support for mmap() and fault() for guest_memfd backed memory
+> in the host for VMs that support in-place conversion between
+> shared and private (shared memory). To that end, this patch adds
+> the ability to check whether the VM type has that support, and
+> only allows mapping its memory if that's the case.
+> 
+> Additionally, this behavior is gated with a new configuration
+> option, CONFIG_KVM_GMEM_SHARED_MEM.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> 
+> ---
+> 
+> This patch series will allow shared memory support for software
+> VMs in x86. It will also introduce a similar VM type for arm64
+> and allow shared memory support for that. In the future, pKVM
+> will also support shared memory.
+> ---
+>  include/linux/kvm_host.h | 11 ++++++
+>  virt/kvm/Kconfig         |  4 +++
+>  virt/kvm/guest_memfd.c   | 77 ++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 92 insertions(+)
+> 
+> -snip-
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 47a9f68f7b24..86441581c9ae 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -307,7 +307,84 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+>         return gfn - slot->base_gfn + slot->gmem.pgoff;
+>  }
+> 
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
+> +{
+> +       struct inode *inode = file_inode(vmf->vma->vm_file);
+> +       struct folio *folio;
+> +       vm_fault_t ret = VM_FAULT_LOCKED;
+> +
+> +       filemap_invalidate_lock_shared(inode->i_mapping);
+> +
+> +       folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> +       if (IS_ERR(folio)) {
+> +               ret = VM_FAULT_SIGBUS;
+> +               goto out_filemap;
+> +       }
+> +
+> +       if (folio_test_hwpoison(folio)) {
+> +               ret = VM_FAULT_HWPOISON;
+> +               goto out_folio;
+> +       }
+> +
+> +       if (WARN_ON_ONCE(folio_test_guestmem(folio)))  {
+> +               ret = VM_FAULT_SIGBUS;
+> +               goto out_folio;
+> +       }
+> +
+> +       /* No support for huge pages. */
+> +       if (WARN_ON_ONCE(folio_nr_pages(folio) > 1)) {
+> +               ret = VM_FAULT_SIGBUS;
+> +               goto out_folio;
+> +       }
+> +
+> +       if (!folio_test_uptodate(folio)) {
+> +               clear_highpage(folio_page(folio, 0));
+> +               folio_mark_uptodate(folio);
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-CC: kvm@vger.kernel.org
----
- accel/kvm/kvm-all.c | 7 -------
- 1 file changed, 7 deletions(-)
+kvm_gmem_mark_prepared() instead of direct folio_mark_uptodate() here, I
+think (in preparation of things like [1])? Noticed this while rebasing
+my direct map removal series on top of this and wondering why mmap'd
+folios sometimes didn't get removed (since it hooks mark_prepared()).
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index cb56d120a9..814b1a53eb 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -830,13 +830,6 @@ static uint32_t kvm_dirty_ring_reap_one(KVMState *s, CPUState *cpu)
-     uint32_t ring_size = s->kvm_dirty_ring_size;
-     uint32_t count = 0, fetch = cpu->kvm_fetch_index;
- 
--    /*
--     * It's not possible that we race with vcpu creation code where the vcpu is
--     * put onto the vcpus list but not yet initialized the dirty ring
--     * structures.
--     */
--    assert(cpu->created);
--
-     assert(dirty_gfns && ring_size);
-     trace_kvm_dirty_ring_reap_vcpu(cpu->cpu_index);
- 
--- 
-2.43.0
+Best,
+Patrick
 
+[1]: https://lore.kernel.org/kvm/20241108155056.332412-1-pbonzini@redhat.com/
 
