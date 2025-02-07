@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-37610-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37611-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8652BA2C9BB
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 18:05:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21517A2C9BC
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 18:05:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7414F188D065
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:05:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48C883A7F9B
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12015192590;
-	Fri,  7 Feb 2025 17:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DFD119ADA2;
+	Fri,  7 Feb 2025 17:05:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDD418F2C3;
-	Fri,  7 Feb 2025 17:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36536192B71;
+	Fri,  7 Feb 2025 17:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738947906; cv=none; b=i0yA8OQhxEVlTpbd12fe89bOAINHd81Sr1B2ofvfI7OJnbgSirKr86SK5OVXvBTe5Sl6e8JIjlR4UYTMqN6NAnrO8XBeCiRGTYS8wFdhgePGQpbkgJHMjibmIJqfVQNx7JmyQ8/A6/tqPuXt6IQ4nArCirIHFZsEDkpJnMKkKWc=
+	t=1738947911; cv=none; b=KsC8AjJw7TeNt5j5y1DMC9IOS4nybyb2STNgX4UbGRLNVGCop+b2A6zhMCS9/NkINk1ajXJv7EbD8J1H/7g0hMJlVC8ZUkmviMx7tF52Wsf41XuOaJVAsB9d3fB2Ybug1x3ooFWv3UDzptYDAimkSqTF0pGu0Ic2EUITA1lEb4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738947906; c=relaxed/simple;
-	bh=QoItdONNeZvRaLDrIRkzuZct1vqHCCh+Cs08gVXF1Eg=;
+	s=arc-20240116; t=1738947911; c=relaxed/simple;
+	bh=WUw1gALBq8tAikhml2GxbRsrvj6QxwNui/fjyJm6s+M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nW89iWGwW3kRuZKsbx0hzdq37kUrPFPSfZIgoNAYsWvIfZeQjTaSEwN0LzOkZtLAiHabaw2hk1bGN12C53v4l785EjtrN8abVUOF+1UM/aUNjz50DFRz4NUpyj6yB5UROBTKW0IuCXuipDNK0tEfSovo26FK5fPsLL3lgdYU3oo=
+	 In-Reply-To:Content-Type; b=pEkUMTYVXgCofZhmko1fytZrfOSwNJQQw6n4rrH5YvFDUtjjr9q/uF6s+2CtTA2xvS5kKUlHe4gY85XQVoJpXRl1SVCtD0wQbrRb6xHy3R2oBuRHJZC7NDoIdgg7vK+ebeY6BSQOzej88YBsbiKKP/IJQwnUjmv/OKXyfUpDHeM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B4675113E;
-	Fri,  7 Feb 2025 09:05:25 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 98BCF113E;
+	Fri,  7 Feb 2025 09:05:32 -0800 (PST)
 Received: from [10.1.26.24] (e122027.cambridge.arm.com [10.1.26.24])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CDBA3F63F;
-	Fri,  7 Feb 2025 09:04:58 -0800 (PST)
-Message-ID: <26f0f242-2fc1-45cf-a078-8079832bff32@arm.com>
-Date: Fri, 7 Feb 2025 17:04:58 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B83F3F63F;
+	Fri,  7 Feb 2025 09:05:05 -0800 (PST)
+Message-ID: <56908846-0d8e-4d84-9c7a-61e696d40825@arm.com>
+Date: Fri, 7 Feb 2025 17:05:05 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,8 +42,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 22/43] KVM: arm64: Validate register access for a Realm
- VM
+Subject: Re: [PATCH v6 25/43] arm64: Don't expose stolen time for realm guests
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -58,149 +57,65 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-23-steven.price@arm.com>
- <09f42dc3-9c43-49ef-b4eb-8aeab387f0fd@redhat.com>
+ <20241212155610.76522-26-steven.price@arm.com>
+ <ae13e762-bd0d-4525-8919-f6b1bcfc8fee@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <09f42dc3-9c43-49ef-b4eb-8aeab387f0fd@redhat.com>
+In-Reply-To: <ae13e762-bd0d-4525-8919-f6b1bcfc8fee@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 02/02/2025 01:22, Gavin Shan wrote:
+On 02/02/2025 02:15, Gavin Shan wrote:
 > On 12/13/24 1:55 AM, Steven Price wrote:
->> The RMM only allows setting the GPRS (x0-x30) and PC for a realm
->> guest. Check this in kvm_arm_set_reg() so that the VMM can receive a
->> suitable error return if other registers are accessed.
+>> It doesn't make much sense as a realm guest wouldn't want to trust the
+>> host. It will also need some extra work to ensure that KVM will only
+>> attempt to write into a shared memory region. So for now just disable
+>> it.
 >>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> Changes since v5:
->>   * Upper GPRS can be set as part of a HOST_CALL return, so fix up the
->>     test to allow them.
->> ---
->>   arch/arm64/kvm/guest.c | 43 ++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 43 insertions(+)
+>>   arch/arm64/kvm/arm.c | 5 ++++-
+>>   1 file changed, 4 insertions(+), 1 deletion(-)
 >>
->> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->> index 12dad841f2a5..1ee2fe072f1a 100644
->> --- a/arch/arm64/kvm/guest.c
->> +++ b/arch/arm64/kvm/guest.c
->> @@ -73,6 +73,24 @@ static u64 core_reg_offset_from_id(u64 id)
->>       return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK |
->> KVM_REG_ARM_CORE);
->>   }
->>   +static bool kvm_realm_validate_core_reg(u64 off)
->> +{
->> +    /*
->> +     * Note that GPRs can only sometimes be controlled by the VMM.
->> +     * For PSCI only X0-X6 are used, higher registers are ignored
->> (restored
->> +     * from the REC).
->> +     * For HOST_CALL all of X0-X30 are copied to the RsiHostCall
->> structure.
->> +     * For emulated MMIO X0 is always used.
->> +     */
->> +    switch (off) {
->> +    case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
->> +         KVM_REG_ARM_CORE_REG(regs.regs[30]):
->> +    case KVM_REG_ARM_CORE_REG(regs.pc):
->> +        return true;
->> +    }
->> +    return false;
->> +}
->> +
->>   static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu,
->> u64 off)
->>   {
->>       int size;
->> @@ -115,6 +133,9 @@ static int core_reg_size_from_offset(const struct
->> kvm_vcpu *vcpu, u64 off)
->>       if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
->>           return -EINVAL;
->>   +    if (kvm_is_realm(vcpu->kvm) && !kvm_realm_validate_core_reg(off))
->> +        return -EPERM;
->> +
->>       return size;
->>   }
->>   @@ -783,12 +804,34 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu,
->> const struct kvm_one_reg *reg)
->>       return kvm_arm_sys_reg_get_reg(vcpu, reg);
->>   }
->>   +/*
->> + * The RMI ABI only enables setting some GPRs and PC. The selection
->> of GPRs
->> + * that are available depends on the Realm state and the reason for
->> the last
->> + * exit.  All other registers are reset to architectural or otherwise
->> defined
->> + * reset values by the RMM, except for a few configuration fields that
->> + * correspond to Realm parameters.
->> + */
->> +static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
->> +                   const struct kvm_one_reg *reg)
->> +{
->> +    if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE) {
->> +        u64 off = core_reg_offset_from_id(reg->id);
->> +
->> +        return kvm_realm_validate_core_reg(off);
->> +    }
->> +
->> +    return false;
->> +}
->> +
->>   int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg
->> *reg)
->>   {
->>       /* We currently use nothing arch-specific in upper 32 bits */
->>       if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
->>           return -EINVAL;
->>   +    if (kvm_is_realm(vcpu->kvm) && !validate_realm_set_reg(vcpu, reg))
->> +        return -EINVAL;
->> +
->>       switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
->>       case KVM_REG_ARM_CORE:    return set_core_reg(vcpu, reg);
->>       case KVM_REG_ARM_FW:
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index eff1a4ec892b..134acb4ee26f 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -432,7 +432,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>> long ext)
+>>           r = system_supports_mte();
+>>           break;
+>>       case KVM_CAP_STEAL_TIME:
+>> -        r = kvm_arm_pvtime_supported();
+>> +        if (kvm_is_realm(kvm))
+>> +            r = 0;
+>> +        else
+>> +            r = kvm_arm_pvtime_supported();
+>>           break;
 > 
-> It looks the core registers in kvm_arm_set_reg() has been validated for
-> twice.
-> 
->   ioctl(KVM_SET_ONE_REG)
->     kvm_arm_set_reg
->       validate_realm_set_reg
->         kvm_realm_validate_core_reg        // 1
->       set_core_reg
->         core_reg_offset_from_id
->         core_reg_addr
->           core_reg_offset_from_id
->           core_reg_size_from_offset
->             kvm_realm_validate_core_reg    // 2
->         copy_from_user
+> kvm_vm_ioctl_check_extension() can be called on the file descriptor of
+> "/dev/kvm".
+> 'kvm' is NULL and kvm_is_realm() returns false, which is the missed
+> corner case.
 
-Indeed, it looks like the check in core_reg_size_from_offset() is
-unnecessary.
+This is a general problem with checking extensions on the /dev/kvm file
+descriptor. In this case the kernel does support stolen time, but it
+doesn't support it with a realm guest. Because there's no context to
+know whether the query is about realm guests or not there's little the
+kernel can do other than report support.
 
-> Besides, there are other types of registers that can be accessed by
-> KVM_{GET, SET}_ONE_REG:
-> firmware and bitmap registers, SVE registers, timer registers, system
-> registers. Need we
-> to hide any of them from the user space? As I can understand, the SVE
-> registers are owned
-> by RMM at least and won't be exposed to user space.
-
-validate_realm_set_reg() only allows core registers permitted by
-kvm_realm_validate_core_reg() (x0-x30+pc) and the three other
-specifically mentioned registers (PMCR_EL0, ID_AA64DFR0_EL1 and the
-pseudo register SVE_VLS).
-
-In general most registers are hidden from the host (and user space),
-even the general purpose registers are in most contexts stale. The only
-real exception is during realm creation and PSCI. The registers are also
-(ab)used during MMIO and HOST_CALL. For MMIO we use x0 for the value to
-be read/written (even if the guest used a different register). For
-HOST_CALL the guest provides a structure containing the values to be
-placed in the GPRS (but the actual values of the guest's registers are
-not exposed).
+This is the same situation with other extensions that are keyed off
+kvm_is_realm(). I'm not sure what we can do other than say that VMMs
+shouldn't do that.
 
 Steve
+
+>>       case KVM_CAP_ARM_EL1_32BIT:
+>>           r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
+> 
+> Thanks,
+> Gavin
+> 
 
 
