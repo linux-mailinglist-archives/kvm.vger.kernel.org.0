@@ -1,149 +1,126 @@
-Return-Path: <kvm+bounces-37603-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE610A2C7F0
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 16:53:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11076A2C87F
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:22:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96ECF16213B
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 15:53:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22BE3188C240
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 16:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3809323C8DE;
-	Fri,  7 Feb 2025 15:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C4A18A6DF;
+	Fri,  7 Feb 2025 16:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wdwb/Ha6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UpjB75Eo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD3423C8C2
-	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 15:53:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC561802DD
+	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 16:21:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738943582; cv=none; b=qvSgXWyjX9S6CPJK+I+O00tVqwW4myats+KAQZZBYSAeNsd2quN7IL+cTsIdlAFntd+1X2b/WL3lpBUbL34Jx8aRULziuySqAxbzGzavM2OZub+JVpUabq1QPhrcO5XgCiL2WLgsa5Q8KiaQr9c2r78PwYMTgFXtQEIOVaWFqdI=
+	t=1738945282; cv=none; b=Hed4NbpEgUfPeDtoAWfiH0ML4Ab4v2OSllsqfe9at95E6ZbvTDE0G42JkdceQx0jP2XDsacC+cLR5RwgFLfJmGEwrGIcvMqUp/Nn3e/R7vWPmkIeNLSTFAdC3pEaKMkBO7s02NY4WPigWBjJ+Cmo5iazYzJq3SYrBYpuvWN6tQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738943582; c=relaxed/simple;
-	bh=X4FyYyM76uPhPu1hVXeJMPGMeE4u2JXxuI63wEfoZW4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L8Tc50JC+gY/eLnqRcYBzZZT8lqM8mnVyYFdM8K83ihrs85t6IetF7bCkcN2UKe4+L20Lwn72QVk86k7X0Ggo5+0jzNcTpQsvkBOqzwBs/reMmMQHKFpUUD91Q30LvFIcMj4fd8XGY30MIPy5+jYFSh+bCzfnhEUnaKPe1usKVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wdwb/Ha6; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21648c8601cso42542065ad.2
-        for <kvm@vger.kernel.org>; Fri, 07 Feb 2025 07:53:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738943580; x=1739548380; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ty/lYVQe0xeM+ZUp5PGdxNRQlc6F6zefI3WalpOLCeU=;
-        b=wdwb/Ha6NhE3vYAtTqO2RHzfr3IZ8rtwUEx6ZYjTqyIdwFR7ojeQ9X/AepotxXgMoI
-         d5NylvOJ8hTov2sMUndBxdEi/IlmnoV+R1VtCnxND5UuLrN9xq6YF5kPPdsHIqjbSEOz
-         IqA0qC8ruxuwi5AUtD7abg5yPjmPuQ1RuFXASENvPy0d/4zKaZ1Cfd+Je9JimZrcgdWL
-         ol4brSYjgCzBzyQpjtl7EE7NJKelI/rcPhI/QXQrHjIVARUx5lw5jqtokCPzHTo5z2Va
-         ys1Sgh/3K/X6fTJEHhfH5NdT1CZFxr7RNdjQFhKR+gxvYkffa/P037TGViyb7zoB/flw
-         dWZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738943580; x=1739548380;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ty/lYVQe0xeM+ZUp5PGdxNRQlc6F6zefI3WalpOLCeU=;
-        b=d4fuFBoPmO4j4yNr/YbF/uuIFluH96q43UgWddghZiMeRUPql45MWa0552M5gPDrw6
-         Z5gzeJAqo+N2fdlhs1e74SudD+ksVhINh9QwNHGhPhY0N8MK32+FFpDYQJsTooWd1eY+
-         sOW9Z/xXbgRa4WGVmCn7twCjCyOcpe3B27ipNMuooWUJMZzIekZ+ItCKorIf1l9zAWTc
-         o9+V48D9fFJSjXHHgizS8Mc0FL98f4EV+kiD1+aSlzrrs+eChaWd04BlYYk0aVnz/hmq
-         sOa+z8gdD8Co8f7Ezfs750r3wmN8krUqF15BUFCJEI5RcGFtWxEjF8ZdynDQ3mVtEKwG
-         WNOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQE4ToSsUpsQG8S+hYq3B5ZWlWfHnR+31MhWOgzM941Vj5YZZCYgIleqlHxGPSB23TniM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzbwnzin2YNQLm+BuW7w0WCu4OS7VYhPdKjXVhKrjAJ1qM6Jfrm
-	OWcenwAKQRkUrwLvP2XysfqAWGYXXD3kj7GqAoKDU7R2XgKKfboPXtKq5dmxDcW9jLDthzMpv5Z
-	Tfw==
-X-Google-Smtp-Source: AGHT+IE34s79rxFs1yVfbXs6jbXDDVmdSyAet3NGVEZa2V1uZSj8KivTD1QL8oytIt0boZSaiqIBiOwN7L0=
-X-Received: from pgbcp9.prod.google.com ([2002:a05:6a02:4009:b0:ad5:1ef8:7643])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:9011:b0:1db:e536:158e
- with SMTP id adf61e73a8af0-1ee03a8f46fmr7541650637.22.1738943579930; Fri, 07
- Feb 2025 07:52:59 -0800 (PST)
-Date: Fri, 7 Feb 2025 07:52:58 -0800
-In-Reply-To: <d27f91a9-0dff-4445-8d2f-9db862acd1d0@amd.com>
+	s=arc-20240116; t=1738945282; c=relaxed/simple;
+	bh=9NJbIW8HF1iWtKwqaG6Q5rUnbJq8AVayNgTohN45mS4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MrNcodkHjKSP4OwNHLPDolijK//m24x7Yqxy1nR8TXckh0wJwHwTdDnk9ouS5lm96HBX6sUnn2HFg5e7Z/hppDzST/UqXm7s05+mAdEyjiipjB5DAD4mZ85zm8+BIt0ergYrlGFb/17wZCXSGF+AB40JPwKHzEU6Wled+cGtaIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UpjB75Eo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738945279;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dS3mG7q7Qhof/soXKvmjdSRvuo+ZNyeAZO9Cl/N//jo=;
+	b=UpjB75EofS0Q+YdkAsHDZKj0F6SmommKxCE0ku5KJVCp9bxe2ERbw3y4ZffDWhWA/qsp/l
+	3Xq8zpHRF9k7+ICo7mKHZclygbcAbnVWTzhCa0lcbhQrcOk+zGKu7Fg+Rk7J+ZFnMOQF9C
+	WQ1j7oJfsBGsD8kmZY41iZsGbJ3tiD0=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-53-oMh-emOuOZOhvvgumhecOA-1; Fri,
+ 07 Feb 2025 11:21:18 -0500
+X-MC-Unique: oMh-emOuOZOhvvgumhecOA-1
+X-Mimecast-MFC-AGG-ID: oMh-emOuOZOhvvgumhecOA
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3713719560B5;
+	Fri,  7 Feb 2025 16:21:17 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq2.redhat.com (dell-r430-03.lab.eng.brq2.redhat.com [10.37.153.18])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E602F18004A7;
+	Fri,  7 Feb 2025 16:21:14 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	kvm@vger.kernel.org,
+	peterx@redhat.com
+Subject: [PATCH v2 09/10] accel/kvm: Assert vCPU is created when calling kvm_dirty_ring_reap*()
+Date: Fri,  7 Feb 2025 17:20:47 +0100
+Message-ID: <20250207162048.1890669-10-imammedo@redhat.com>
+In-Reply-To: <20250207162048.1890669-1-imammedo@redhat.com>
+References: <20250207162048.1890669-1-imammedo@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1738618801.git.ashish.kalra@amd.com> <e9f542b9f96a3de5bb7983245fa94f293ef96c9f.1738618801.git.ashish.kalra@amd.com>
- <62b643dd-36d9-4b8d-bed6-189d84eeab59@amd.com> <Z6OA9OhxBgsTY2ni@google.com>
- <8f7822df-466d-497c-9c41-77524b2870b6@amd.com> <Z6O8p96ExhWFEn_9@google.com> <d27f91a9-0dff-4445-8d2f-9db862acd1d0@amd.com>
-Message-ID: <Z6YsWiTGM___898F@google.com>
-Subject: Re: [PATCH v3 3/3] x86/sev: Fix broken SNP support with KVM module built-in
-From: Sean Christopherson <seanjc@google.com>
-To: Ashish Kalra <ashish.kalra@amd.com>
-Cc: Vasant Hegde <vasant.hegde@amd.com>, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, joro@8bytes.org, 
-	suravee.suthikulpanit@amd.com, will@kernel.org, robin.murphy@arm.com, 
-	michael.roth@amd.com, dionnaglaze@google.com, nikunj@amd.com, ardb@kernel.org, 
-	kevinloughlin@google.com, Neeraj.Upadhyay@amd.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-coco@lists.linux.dev, iommu@lists.linux.dev
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, Feb 05, 2025, Ashish Kalra wrote:
-> On 2/5/2025 1:31 PM, Sean Christopherson wrote:
-> > On Wed, Feb 05, 2025, Vasant Hegde wrote:
-> >> So we don't want to clear  CC_ATTR_HOST_SEV_SNP after RMP initialization -OR-
-> >> clear for all failures?
-> > 
-> > I honestly don't know, because the answer largely depends on what happens with
-> > hardware.  I asked in an earlier version of this series if IOMMU initialization
-> > failure after the RMP is configured is even survivable.
-> > 
-> 
-> As i mentioned earlier and as part of this series and summarizing this again here:
+From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-Thanks!
+Previous commits made sure vCPUs are realized before accelerators
+(such KVM) use them. Ensure that by asserting the vCPU is created,
+no need to return.
 
-> - snp_rmptable_init() enables SNP support system-wide and that means the HW starts
-> doing RMP checks for memory accesses, but as RMP table is zeroed out initially, 
-> all memory is configured to be host/HV owned. 
-> 
-> It is only after SNP_INIT(_EX) that RMP table is configured and initialized with
-> HV_Fixed, firmware pages and stuff like IOMMU RMP enforcement is enabled. 
-> 
-> If the IOMMU initialization fails after IOMMU support on SNP check is completed
-> and host SNP is enabled, then SNP_INIT(_EX) will fail as IOMMUs need to be enabled
-> for SNP_INIT to succeed.
-> 
-> > For this series, I think it makes sense to match the existing behavior, unless
-> > someone from AMD can definitively state that we should do something different.
-> > And the existing behavior is that amd_iommu_snp_en and CC_ATTR_HOST_SEV_SNP will
-> > be left set if the IOMMU completes iommu_snp_enable(), and the kernel completes
-> > RMP setup.
-> 
-> Yes, that is true and this behavior is still consistent with this series.
-> 
-> Again to reiterate, if iommu_snp_enable() and host SNP enablement is successful,
-> any late IOMMU initialization failures should cause SNP_INIT to fail and that means
-> IOMMU RMP enforcement will never get enabled and RMP table will remain configured
-> for all memory marked as HV/host owned. 
+For more context, see commit 56adee407fc ("kvm: dirty-ring: Fix race
+with vcpu creation").
 
-So the kernel should be able to limp along, but CC_ATTR_HOST_SEV_SNP will be in
-a half-baked state.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+CC: kvm@vger.kernel.org
+CC: peterx@redhat.com
+---
+ accel/kvm/kvm-all.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-Would it make sense to WARN if the RMP has been configured?  E.g. as a follow-up
-change:
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index c65b790433..cb56d120a9 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -831,13 +831,11 @@ static uint32_t kvm_dirty_ring_reap_one(KVMState *s, CPUState *cpu)
+     uint32_t count = 0, fetch = cpu->kvm_fetch_index;
+ 
+     /*
+-     * It's possible that we race with vcpu creation code where the vcpu is
++     * It's not possible that we race with vcpu creation code where the vcpu is
+      * put onto the vcpus list but not yet initialized the dirty ring
+-     * structures.  If so, skip it.
++     * structures.
+      */
+-    if (!cpu->created) {
+-        return 0;
+-    }
++    assert(cpu->created);
+ 
+     assert(dirty_gfns && ring_size);
+     trace_kvm_dirty_ring_reap_vcpu(cpu->cpu_index);
+-- 
+2.43.0
 
-	/*
-	 * SNP platform initilazation requires IOMMUs to be fully configured.
-	 * If the RMP has NOT been configured, simply mark SNP as unsupported.
-	 * If the RMP is configured, but RMP enforcement has not been enabled
-	 * in IOMMUs, then the system is in a half-baked state, but can limp
-	 * along as all memory should be Hypervisor-Owned in the RMP.   WARN,
-	 * but leave SNP as "supported" to avoid confusing the kernel.
-	 */
-	if (ret && cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
-	    !WARN_ON_ONCE(amd_iommu_snp_en))
-		cc_platform_clear(CC_ATTR_HOST_SEV_SNP);
 
