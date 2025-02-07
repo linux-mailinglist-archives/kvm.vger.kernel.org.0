@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-37609-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37610-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9435AA2C9B9
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 18:05:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8652BA2C9BB
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 18:05:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7373B162FC0
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:05:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7414F188D065
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 17:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C58A192B6D;
-	Fri,  7 Feb 2025 17:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12015192590;
+	Fri,  7 Feb 2025 17:05:07 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A7A23C8DB;
-	Fri,  7 Feb 2025 17:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDD418F2C3;
+	Fri,  7 Feb 2025 17:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738947899; cv=none; b=S8gpg07rnS4GQH1O0DDMSBp+XcyNg0qRxNEz/O9+7+riZKazDi3DfPdhBVzmackWKp+KnG9MDYTlWi3nFEX31UE+K6GEziIonukMsGYpHGFgu/OP1d/Jmnm0ATWYMsZap7PT2HEJdsnCfVmPk9zhGew0bovVI/eCGZUyrP4LKzM=
+	t=1738947906; cv=none; b=i0yA8OQhxEVlTpbd12fe89bOAINHd81Sr1B2ofvfI7OJnbgSirKr86SK5OVXvBTe5Sl6e8JIjlR4UYTMqN6NAnrO8XBeCiRGTYS8wFdhgePGQpbkgJHMjibmIJqfVQNx7JmyQ8/A6/tqPuXt6IQ4nArCirIHFZsEDkpJnMKkKWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738947899; c=relaxed/simple;
-	bh=32Sb1iSbflEzaLzZ3eY24dRpm8vfRuffGR5PJQt9ks4=;
+	s=arc-20240116; t=1738947906; c=relaxed/simple;
+	bh=QoItdONNeZvRaLDrIRkzuZct1vqHCCh+Cs08gVXF1Eg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t63rB48AOY23Ic+lJWnEOvlZeQzTH7AuAf+uspiU3re7jJgpgrQLi4HILYzNNPQH94cAt+bOdENxRIz3mkG2RAU6FMddDsHE6Ok+gxKHB0+DvfNi0lALcgMs4CarCpkgp0ddoP2TLFZ2dEMG7fV04K6KXGT25Tl+/qdA4A3pFD8=
+	 In-Reply-To:Content-Type; b=nW89iWGwW3kRuZKsbx0hzdq37kUrPFPSfZIgoNAYsWvIfZeQjTaSEwN0LzOkZtLAiHabaw2hk1bGN12C53v4l785EjtrN8abVUOF+1UM/aUNjz50DFRz4NUpyj6yB5UROBTKW0IuCXuipDNK0tEfSovo26FK5fPsLL3lgdYU3oo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 17653113E;
-	Fri,  7 Feb 2025 09:05:18 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B4675113E;
+	Fri,  7 Feb 2025 09:05:25 -0800 (PST)
 Received: from [10.1.26.24] (e122027.cambridge.arm.com [10.1.26.24])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD7CB3F63F;
-	Fri,  7 Feb 2025 09:04:50 -0800 (PST)
-Message-ID: <f4411830-067e-448e-b43b-1418bb264e11@arm.com>
-Date: Fri, 7 Feb 2025 17:04:48 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8CDBA3F63F;
+	Fri,  7 Feb 2025 09:04:58 -0800 (PST)
+Message-ID: <26f0f242-2fc1-45cf-a078-8079832bff32@arm.com>
+Date: Fri, 7 Feb 2025 17:04:58 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,7 +42,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 20/43] arm64: RME: Runtime faulting of memory
+Subject: Re: [PATCH v6 22/43] KVM: arm64: Validate register access for a Realm
+ VM
 To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
@@ -57,168 +58,149 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
  <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 References: <20241212155610.76522-1-steven.price@arm.com>
- <20241212155610.76522-21-steven.price@arm.com>
- <3f0caace-ee05-4ddf-ae75-2157e77aa57c@redhat.com>
+ <20241212155610.76522-23-steven.price@arm.com>
+ <09f42dc3-9c43-49ef-b4eb-8aeab387f0fd@redhat.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <3f0caace-ee05-4ddf-ae75-2157e77aa57c@redhat.com>
+In-Reply-To: <09f42dc3-9c43-49ef-b4eb-8aeab387f0fd@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 30/01/2025 05:22, Gavin Shan wrote:
+On 02/02/2025 01:22, Gavin Shan wrote:
 > On 12/13/24 1:55 AM, Steven Price wrote:
-[...]
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> index d4561e368cd5..146ef598a581 100644
->> --- a/arch/arm64/kvm/rme.c
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -602,6 +602,162 @@ static int fold_rtt(struct realm *realm,
->> unsigned long addr, int level)
->>       return 0;
+>> The RMM only allows setting the GPRS (x0-x30) and PC for a realm
+>> guest. Check this in kvm_arm_set_reg() so that the VMM can receive a
+>> suitable error return if other registers are accessed.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v5:
+>>   * Upper GPRS can be set as part of a HOST_CALL return, so fix up the
+>>     test to allow them.
+>> ---
+>>   arch/arm64/kvm/guest.c | 43 ++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 43 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> index 12dad841f2a5..1ee2fe072f1a 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -73,6 +73,24 @@ static u64 core_reg_offset_from_id(u64 id)
+>>       return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK |
+>> KVM_REG_ARM_CORE);
 >>   }
->>   +int realm_map_protected(struct realm *realm,
->> +            unsigned long ipa,
->> +            kvm_pfn_t pfn,
->> +            unsigned long map_size,
->> +            struct kvm_mmu_memory_cache *memcache)
+>>   +static bool kvm_realm_validate_core_reg(u64 off)
 >> +{
->> +    phys_addr_t phys = __pfn_to_phys(pfn);
->> +    phys_addr_t rd = virt_to_phys(realm->rd);
->> +    unsigned long base_ipa = ipa;
->> +    unsigned long size;
->> +    int map_level;
->> +    int ret = 0;
+>> +    /*
+>> +     * Note that GPRs can only sometimes be controlled by the VMM.
+>> +     * For PSCI only X0-X6 are used, higher registers are ignored
+>> (restored
+>> +     * from the REC).
+>> +     * For HOST_CALL all of X0-X30 are copied to the RsiHostCall
+>> structure.
+>> +     * For emulated MMIO X0 is always used.
+>> +     */
+>> +    switch (off) {
+>> +    case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
+>> +         KVM_REG_ARM_CORE_REG(regs.regs[30]):
+>> +    case KVM_REG_ARM_CORE_REG(regs.pc):
+>> +        return true;
+>> +    }
+>> +    return false;
+>> +}
 >> +
->> +    if (WARN_ON(!IS_ALIGNED(ipa, map_size)))
+>>   static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu,
+>> u64 off)
+>>   {
+>>       int size;
+>> @@ -115,6 +133,9 @@ static int core_reg_size_from_offset(const struct
+>> kvm_vcpu *vcpu, u64 off)
+>>       if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
+>>           return -EINVAL;
+>>   +    if (kvm_is_realm(vcpu->kvm) && !kvm_realm_validate_core_reg(off))
+>> +        return -EPERM;
+>> +
+>>       return size;
+>>   }
+>>   @@ -783,12 +804,34 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu,
+>> const struct kvm_one_reg *reg)
+>>       return kvm_arm_sys_reg_get_reg(vcpu, reg);
+>>   }
+>>   +/*
+>> + * The RMI ABI only enables setting some GPRs and PC. The selection
+>> of GPRs
+>> + * that are available depends on the Realm state and the reason for
+>> the last
+>> + * exit.  All other registers are reset to architectural or otherwise
+>> defined
+>> + * reset values by the RMM, except for a few configuration fields that
+>> + * correspond to Realm parameters.
+>> + */
+>> +static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
+>> +                   const struct kvm_one_reg *reg)
+>> +{
+>> +    if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE) {
+>> +        u64 off = core_reg_offset_from_id(reg->id);
+>> +
+>> +        return kvm_realm_validate_core_reg(off);
+>> +    }
+>> +
+>> +    return false;
+>> +}
+>> +
+>>   int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg
+>> *reg)
+>>   {
+>>       /* We currently use nothing arch-specific in upper 32 bits */
+>>       if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
+>>           return -EINVAL;
+>>   +    if (kvm_is_realm(vcpu->kvm) && !validate_realm_set_reg(vcpu, reg))
 >> +        return -EINVAL;
 >> +
->> +    switch (map_size) {
->> +    case PAGE_SIZE:
->> +        map_level = 3;
->> +        break;
->> +    case RMM_L2_BLOCK_SIZE:
->> +        map_level = 2;
->> +        break;
->> +    default:
->> +        return -EINVAL;
->> +    }
->> +
+>>       switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+>>       case KVM_REG_ARM_CORE:    return set_core_reg(vcpu, reg);
+>>       case KVM_REG_ARM_FW:
 > 
-> The same block of code, to return the RTT level according to the map
-> size, has been
-> used for multiple times. It would be nice to introduce a helper for this.
-
-I have some changes to support larger host (and guest) page sizes which
-rework this code which should help clean this up.
-
->> +    if (map_level < RMM_RTT_MAX_LEVEL) {
->> +        /*
->> +         * A temporary RTT is needed during the map, precreate it,
->> +         * however if there is an error (e.g. missing parent tables)
->> +         * this will be handled below.
->> +         */
->> +        realm_create_rtt_levels(realm, ipa, map_level,
->> +                    RMM_RTT_MAX_LEVEL, memcache);
->> +    }
->> +
+> It looks the core registers in kvm_arm_set_reg() has been validated for
+> twice.
 > 
-> This block of code could be dropped. If the RTTs have been existing,
-> realm_create_rtt_levels()
-> doesn't nothing, but several RMI calls are issued. RMI calls aren't
-> cheap and it can cause
-> performance lost.
+>   ioctl(KVM_SET_ONE_REG)
+>     kvm_arm_set_reg
+>       validate_realm_set_reg
+>         kvm_realm_validate_core_reg        // 1
+>       set_core_reg
+>         core_reg_offset_from_id
+>         core_reg_addr
+>           core_reg_offset_from_id
+>           core_reg_size_from_offset
+>             kvm_realm_validate_core_reg    // 2
+>         copy_from_user
 
-As mentioned in the patch 19 this is to prevent the first call to
-rmi_data_create_unknown() failing when we know we're going to need to
-create the RTTs. So this should generally reduce the number of RMIs
-calls not increase.
+Indeed, it looks like the check in core_reg_size_from_offset() is
+unnecessary.
 
->> +    for (size = 0; size < map_size; size += PAGE_SIZE) {
->> +        if (rmi_granule_delegate(phys)) {
->> +            /*
->> +             * It's likely we raced with another VCPU on the same
->> +             * fault. Assume the other VCPU has handled the fault
->> +             * and return to the guest.
->> +             */
->> +            return 0;
->> +        }
-> 
-> We probably can't bail immediately when error is returned from
-> rmi_granule_delegate()
-> because we intend to map a region whose size is 'map_size'. So a
-> 'continue' instead
-> of 'return 0' seems correct to me.
+> Besides, there are other types of registers that can be accessed by
+> KVM_{GET, SET}_ONE_REG:
+> firmware and bitmap registers, SVE registers, timer registers, system
+> registers. Need we
+> to hide any of them from the user space? As I can understand, the SVE
+> registers are owned
+> by RMM at least and won't be exposed to user space.
 
-The logic here is that two (or more) vCPUs have faulted on the same
-region. So if we get a failure here it means that we're the second vCPU
-to hit the fault. While we could continue, it's highly likely that the
-other vCPU will be faulting in the later parts of the region so we
-expect to hit more delegation failures.
+validate_realm_set_reg() only allows core registers permitted by
+kvm_realm_validate_core_reg() (x0-x30+pc) and the three other
+specifically mentioned registers (PMCR_EL0, ID_AA64DFR0_EL1 and the
+pseudo register SVE_VLS).
 
-Returning to the guest and letting the guest retry the access means:
-a) The access might now continue because the other vCPU has completed
-(enough of) the mapping, or
-b) We fault a second time, but give the other vCPU some more time to
-progress in creating the mapping (and prevent the other vCPU being
-tripped up by continued attempts by this vCPU from delegating the pages).
+In general most registers are hidden from the host (and user space),
+even the general purpose registers are in most contexts stale. The only
+real exception is during realm creation and PSCI. The registers are also
+(ab)used during MMIO and HOST_CALL. For MMIO we use x0 for the value to
+be read/written (even if the guest used a different register). For
+HOST_CALL the guest provides a structure containing the values to be
+placed in the GPRS (but the actual values of the guest's registers are
+not exposed).
 
-"continue" would work, but it's likely to waste CPU time with the two
-vCPUs fighting each other to complete the mapping.
-
->> +
->> +        ret = rmi_data_create_unknown(rd, phys, ipa);
->> +
->> +        if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->> +            /* Create missing RTTs and retry */
->> +            int level = RMI_RETURN_INDEX(ret);
->> +
->> +            ret = realm_create_rtt_levels(realm, ipa, level,
->> +                              RMM_RTT_MAX_LEVEL,
->> +                              memcache);
->> +            WARN_ON(ret);
->> +            if (ret)
->> +                goto err_undelegate;
-> 
->             if (WARN_ON(ret))
-
-ack
-
->> +
->> +            ret = rmi_data_create_unknown(rd, phys, ipa);
->> +        }
->> +        WARN_ON(ret);
->> +
->> +        if (ret)
->> +            goto err_undelegate;
-> 
->         if (WARN_ON(ret))
-
-ack
-
->> +
->> +        phys += PAGE_SIZE;
->> +        ipa += PAGE_SIZE;
->> +    }
->> +
->> +    if (map_size == RMM_L2_BLOCK_SIZE)
->> +        ret = fold_rtt(realm, base_ipa, map_level);
->> +    if (WARN_ON(ret))
->> +        goto err;
->> +
-> 
-> The nested if statements are needed here because the WARN_ON() only
-> take effect on the return value from fold_rtt().
-> 
->     if (map_size == RMM_L2_BLOCK_SIZE) {
->         ret = fold_rtt(realm, base_ipa, map_level);
->         if (WARN_ON(ret))
->             goto err;
->     }
-
-Technically to get here then ret==0 so there's no need to nest like
-this. But I agree it makes the intent much clearer so I'll update.
-
-Thanks,
 Steve
 
 
