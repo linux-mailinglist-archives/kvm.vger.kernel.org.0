@@ -1,177 +1,209 @@
-Return-Path: <kvm+bounces-37568-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37569-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4113DA2BB52
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 07:26:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EBABA2BD59
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 09:04:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BBF4188A51A
-	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 06:26:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 927A83AA3DE
+	for <lists+kvm@lfdr.de>; Fri,  7 Feb 2025 08:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCD518A6A8;
-	Fri,  7 Feb 2025 06:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1B223FC7A;
+	Fri,  7 Feb 2025 07:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cCXP40jK"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="BcONL+OD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0873515445D
-	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 06:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBB0238756
+	for <kvm@vger.kernel.org>; Fri,  7 Feb 2025 07:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738909564; cv=none; b=CI3toMKwM9Ye/FKQ47ziE2rVB94Bm6ydjAfl0uxDp1fiuW7IVVObf76dt65wtfbhbSubcX5u5i1a4wuthGcHM308khDnQT/pg+XtGdarmDzTX2ohoRBjdGnR7YVcAgcIw0y5QK23jfNxnXJV2HmtK+eYvFVYGhd3uCX5k9HIHXw=
+	t=1738915075; cv=none; b=L7NP3l//oKMiNtWKWsjnYZmKBc0shKWxvVfz5hCNiclhnP3HAFSpK1XWavB4PpwuRb2di/NNN2RxZlcPilyJvSHw43DFQB9SRYxwDaGIErEBLDonDr8C7LEQovVzaIi2+sGEt+25NKG8/3Bs1qESveHuUEqUdUzdWYvuwI7EpxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738909564; c=relaxed/simple;
-	bh=4OA6Vgbf5mmHaHK2XX87TxyNvNbPNA/LoqBpZuhF07s=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=EI3GiKrn9tSU8OjCAkSLoHa0b6OlzEI9rG1SfHwhpLbZrQt9wmh/DaqtS2nxO9Kmz65va2aeFwi+TZo/E3zkohajZ7wZdlqMv+h7XKMGxVvm9bLFJe1oKaKGE/waPJBr8gY33Iyshh893RYhwU2ElYLOgfbOQwNzmB9SKEfi1YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cCXP40jK; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21f40f40788so30766715ad.3
-        for <kvm@vger.kernel.org>; Thu, 06 Feb 2025 22:26:02 -0800 (PST)
+	s=arc-20240116; t=1738915075; c=relaxed/simple;
+	bh=LwY9QkKjrGqjAvf2nxBCWR+BzENMRju/lQJYqpwui6E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UMAXVcuou7qD4tzSaS2q1yKn+C3fQYXa0L4UULyQ4BvKKR0aLhOcXchciqmqsjFBoJ+05BlYOecFp4l8KHldN9AWfAiXn5tI1ES8n6U3mtYa4DvabmzV7dQgHXxakTE0GlNv6KiydNIxz1+c94hTO4Z/2H+G2cAaxvcvbk6kT1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=BcONL+OD; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-38dc627eba6so625036f8f.2
+        for <kvm@vger.kernel.org>; Thu, 06 Feb 2025 23:57:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738909562; x=1739514362; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pVBLx5GIpN7LjdmT+CcHUgO81qGH5daXphk7+y3Ogdw=;
-        b=cCXP40jKzfy5XvZx1xuB4aJJZqm5MN1MLU/bKvDhe8uGywAqayB+r/zyW41T4rIQfe
-         yz1dHyOjg15/v2KVtr8RgQKu96K37s2ioZ5Pg9+XdQxnzoAZMLp/TLNj4h9E8HDBVKli
-         LSf80eEqkiM0DqQLG+/hiqNK1FyNl7l1iznvNLg3CIEYxJ4X8yEbc+BpxVmSmd8N2PjI
-         r27mNgU9pEt/IjTiKi3xrnPoz4Ooy/LtvrYIIQyRnoPK5UUBo1JsMJwGKjWYfF5dbs3+
-         uHyVDj1mjgfAJKu+zDQ3pXOIof7jJsjijPQeqBMUHdLytenAvOQsH9PHoE4Gdg90gg6J
-         hIFQ==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1738915071; x=1739519871; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8+8W0r1eBfeQeUIpnApB8DWC5KBFE4067O0DEyXdDjM=;
+        b=BcONL+ODGvVDDwQhj3IupJ81Vqw+avYXwPHfioeycwvyBUvN5Teu4tmVCPjBdbO53Q
+         Q6wU9q6v8kAGLl5WHBglsv1beGlUVxJ+TlNdTuCsq3Qv/ztRTKioaH3N7DLBoB4eFYM1
+         epI/b4zKZDyZ+kkfGTf1gx4lqtiVDMgoQZG5dHyZUXzVLWOaCyiSJZikQdb1AjOBlR+/
+         xf617MF/eER2ZQ4ZoeVfYvlWTFAHsY9lj6NPauimjfX4ym6Dnzc+C9zrshyrXsTugy6y
+         +YfpxuS2CLoGvnO5uy8qmY2BUTlYXihgQrxg2oXXlbCRuTIQCxXapvlsjdYUHjhRNHrM
+         KlGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738909562; x=1739514362;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1738915071; x=1739519871;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pVBLx5GIpN7LjdmT+CcHUgO81qGH5daXphk7+y3Ogdw=;
-        b=YKmioJcQj/fGG3qVUWIIuo1ece9L08KW6omecCOyD8sUIiE5/G/POplf1wQ/FTvx02
-         B7tXOqb874Xj8QQ154zcfeSG6ho3WdTLYI4LLDB1gckyoC0VhcQgi0td+dolITgUEspO
-         WXWgtg3GCu/EQXS0dM4zOwMfi3IX+twB5d2w8YxQCiJmT8jjY0pdlvpOHD+hztMrZi1b
-         UJQRw/ajkumcw2DW/Y1U+JC8AothePnMwjKHcWmdw/cxyQvIOxwUTEmTq6A0FECYvqFO
-         YWjdGCNPdweKkeeVwb5XC0ii68Oh3gbo0taa4DYVgjWLx+DndR/8ir6BnSAnGbEa5Bwc
-         Q2NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeFmnP9Wryw4kBsHYMFCxi0t1+P//E5vqP8fvG9JSadEX7OH+DWuIK5Soht25BFKszpjo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkotAyhVBBwEonaN5CVDo2mEx9CxS8F8NFMqEaOZv5WixiN0T/
-	Dahz0+903fs4DhNLBBm7CWjCqEy6X7eZolLdyqdXyizifDCqV1PznPXvAPVSWJ80PkBSzlC6+9Z
-	RRVi7cIzZrb8yS4B4ieF/PA==
-X-Google-Smtp-Source: AGHT+IHXNTs3kgTobb4JCthlwm4Jfzsw4vmzDv2oF+RkKfjY2IbUGXQW6QU/6emUQ2gWCi0WeScassVHI7XwDeeNyw==
-X-Received: from pjtd16.prod.google.com ([2002:a17:90b:50:b0:2ef:d136:17fc])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:ce84:b0:21f:c13:89a9 with SMTP id d9443c01a7336-21f4e75d8a7mr38698485ad.35.1738909562300;
- Thu, 06 Feb 2025 22:26:02 -0800 (PST)
-Date: Fri, 07 Feb 2025 06:25:59 +0000
-In-Reply-To: <f8030dfc5086e4e4e3709d6fcdab1e38f01fc38d.camel@infradead.org>
- (message from Amit Shah on Thu, 06 Feb 2025 12:07:58 +0100)
+        bh=8+8W0r1eBfeQeUIpnApB8DWC5KBFE4067O0DEyXdDjM=;
+        b=vokCmIrzGhPKQtsx/vCD3gnr1/coyKA52jPkhatVIZKMmkYtRoTyjq5pIcCzXrObic
+         3AxBHeIMPXG6ugtC9K99CJR4i+1oZHm4nYfrXmquFbvCwLnZ3K5zbVkvkqkhTVO6NiG0
+         mkAprkyOZsObMbJyN7Vi4fwgNa+9JhBsK0xShHACwR6ge+rpGCWl0r0J2Gm8/nwHmJyW
+         lecOt8zRLCaRn4J2R2cXG3t3f3wP7BHQzJxHevnC7heUjTxspiF9HxaUGSup9BUJ2xUx
+         D3qPs8LGbKvbL+/S5UqazVpYBSyhZxTdilvTn9QG1JLDKNzJBBVZNHfbMj/N5okCe2c6
+         Qkeg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBAWcAB3be1bsikd4BPjF7Qlqo/5vNrkdvvrCRb6bvNd3mG3E1EmnfOU7EFoRN1ftZFN4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSXwyPWIS0t8THgfrShtZU5zX1SQPjQ0AVB+/xbRQiMmj35UZh
+	dIfgK/9bH+obh3c9vlFNb24XpAYaiamC5iBU3tWmn6Tno9B+8+ZkhvbhWjj+KLc=
+X-Gm-Gg: ASbGncvtkapPaAXYLCXXXNd65Z9c9FMY6V1gJF1g2BVNg6P+Vrj9P4ET6QjefBDvu1/
+	k2LPsJIa7VqoghTqj+1ZnJ7t2S+aMhPR+3EiP6FU62uJsmE69A5mPl3HLpxGVA8YllWQL364o4a
+	OvT6uwg0MlRP+tKJzdTJfnQgY3rTsbqQvRKLNsPBDiRi5KRpz3x33AXCVTtYCmx4TVUrhQZi37B
+	jRhZiQP+ebmOFK7npx4CrCdD7m/rUk3ASU01rMNOHRmSKUngeeSsN5P19kAYR00SJM5KFY1667Z
+	sbF1tlh8jGZ+yVvxsUokDQa8ZodYs1XUHqKHxl7QWTecG+8sGQlHNgKSR/0I
+X-Google-Smtp-Source: AGHT+IGq74MwyyBs38GAGswE+10Qup4jIp3Pg2RgGuSrurMbFniM8/Z3Fz5NjAT2LPHjyfZgPXz2qQ==
+X-Received: by 2002:a5d:64ee:0:b0:38d:ac77:d7cb with SMTP id ffacd0b85a97d-38dc8dd105bmr1267323f8f.25.1738915070831;
+        Thu, 06 Feb 2025 23:57:50 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391dc9ff64sm44791635e9.9.2025.02.06.23.57.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Feb 2025 23:57:50 -0800 (PST)
+Message-ID: <76865725-35ce-48c6-822f-ea6cf817cee3@rivosinc.com>
+Date: Fri, 7 Feb 2025 08:57:48 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <diqzh656p8y0.fsf@ackerleytng-ctop-specialist.c.googlers.com>
-Subject: Re: [RFC PATCH 00/39] 1G page support for guest_memfd
-From: Ackerley Tng <ackerleytng@google.com>
-To: Amit Shah <amit@infradead.org>
-Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
-	jgg@nvidia.com, peterx@redhat.com, david@redhat.com, rientjes@google.com, 
-	fvdl@google.com, jthoughton@google.com, seanjc@google.com, 
-	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com, 
-	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev, 
-	mike.kravetz@oracle.com, erdemaktas@google.com, vannapurve@google.com, 
-	qperret@google.com, jhubbard@nvidia.com, willy@infradead.org, 
-	shuah@kernel.org, brauner@kernel.org, bfoster@redhat.com, 
-	kent.overstreet@linux.dev, pvorel@suse.cz, rppt@kernel.org, 
-	richard.weiyang@gmail.com, anup@brainfault.org, haibo1.xu@intel.com, 
-	ajones@ventanamicro.com, vkuznets@redhat.com, maciej.wieczor-retman@intel.com, 
-	pgonda@google.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-fsdevel@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/21] RISC-V: Add Sxcsrind ISA extension CSR
+ definitions
+To: Atish Patra <atishp@rivosinc.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Will Deacon <will@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, weilin.wang@intel.com
+Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Conor Dooley <conor@kernel.org>, devicetree@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+ Kaiwen Xue <kaiwenx@rivosinc.com>
+References: <20250205-counter_delegation-v4-0-835cfa88e3b1@rivosinc.com>
+ <20250205-counter_delegation-v4-2-835cfa88e3b1@rivosinc.com>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20250205-counter_delegation-v4-2-835cfa88e3b1@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Amit Shah <amit@infradead.org> writes:
 
->> <snip>
->> 
->> Thanks all your help and comments during the guest_memfd upstream
->> calls,
->> and thanks for the help from AMD.
->> 
->> Extending mmap() support from Fuad with 1G page support introduces
->> more
->> states that made it more complicated (at least for me).
->> 
->> I'm modeling the states in python so I can iterate more quickly. I
->> also
->> have usage flows (e.g. allocate, guest_use, host_use,
->> transient_folio_get, close, transient_folio_put) as test cases.
->> 
->> I'm almost done with the model and my next steps are to write up a
->> state
->> machine (like Fuad's [5]) and share that.
 
-Thanks everyone for all the comments at the 2025-02-06 guest_memfd
-upstream call! Here are the 
+On 06/02/2025 08:23, Atish Patra wrote:
+> From: Kaiwen Xue <kaiwenx@rivosinc.com>
+> 
+> This adds definitions of new CSRs and bits defined in Sxcsrind ISA
+> extension. These CSR enables indirect accesses mechanism to access
+> any CSRs in M-, S-, and VS-mode. The range of the select values
+> and ireg will be define by the ISA extension using Sxcsrind extension.
+> 
+> Signed-off-by: Kaiwen Xue <kaiwenx@rivosinc.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  arch/riscv/include/asm/csr.h | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+> 
+> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> index 37bdea65bbd8..2ad2d492e6b4 100644
+> --- a/arch/riscv/include/asm/csr.h
+> +++ b/arch/riscv/include/asm/csr.h
+> @@ -318,6 +318,12 @@
+>  /* Supervisor-Level Window to Indirectly Accessed Registers (AIA) */
+>  #define CSR_SISELECT		0x150
+>  #define CSR_SIREG		0x151
+> +/* Supervisor-Level Window to Indirectly Accessed Registers (Sxcsrind) */
+> +#define CSR_SIREG2		0x152
+> +#define CSR_SIREG3		0x153
+> +#define CSR_SIREG4		0x155
+> +#define CSR_SIREG5		0x156
+> +#define CSR_SIREG6		0x157
+>  
+>  /* Supervisor-Level Interrupts (AIA) */
+>  #define CSR_STOPEI		0x15c
+> @@ -365,6 +371,14 @@
+>  /* VS-Level Window to Indirectly Accessed Registers (H-extension with AIA) */
+>  #define CSR_VSISELECT		0x250
+>  #define CSR_VSIREG		0x251
+> +/*
+> + * VS-Level Window to Indirectly Accessed Registers (H-extension with Sxcsrind)
+> + */
+> +#define CSR_VSIREG2		0x252
+> +#define CSR_VSIREG3		0x253
+> +#define CSR_VSIREG4		0x255
+> +#define CSR_VSIREG5		0x256
+> +#define CSR_VISREG6		0x257
+>  
+>  /* VS-Level Interrupts (H-extension with AIA) */
+>  #define CSR_VSTOPEI		0x25c
+> @@ -407,6 +421,12 @@
+>  /* Machine-Level Window to Indirectly Accessed Registers (AIA) */
+>  #define CSR_MISELECT		0x350
+>  #define CSR_MIREG		0x351
+> +/* Machine-Level Window to Indrecitly Accessed Registers (Sxcsrind) */
 
-+ Slides: https://lpc.events/event/18/contributions/1764/attachments/1409/3704/guest-memfd-1g-page-support-2025-02-06.pdf
-+ State diagram: https://lpc.events/event/18/contributions/1764/attachments/1409/3702/guest-memfd-state-diagram-split-merge-2025-02-06.drawio.svg
-+ For those interested in editing the state diagram using draw.io:
-  https://lpc.events/event/18/contributions/1764/attachments/1409/3703/guest-memfd-state-diagram-split-merge-2025-02-06.drawio.xml
+Typo: s/Indrecitly/Indirectly
 
->> 
->> I'd be happy to share the python model too but I have to work through
->> some internal open-sourcing processes first, so if you think this
->> will
->> be useful, let me know!
->
-> No problem.  Yes, I'm interested in this - it'll be helpful!
+> +#define CSR_MIREG2		0x352
+> +#define CSR_MIREG3		0x353
+> +#define CSR_MIREG4		0x355
+> +#define CSR_MIREG5		0x356
+> +#define CSR_MIREG6		0x357
+>  
+>  /* Machine-Level Interrupts (AIA) */
+>  #define CSR_MTOPEI		0x35c
+> @@ -452,6 +472,11 @@
+>  # define CSR_IEH		CSR_MIEH
+>  # define CSR_ISELECT	CSR_MISELECT
+>  # define CSR_IREG	CSR_MIREG
+> +# define CSR_IREG2	CSR_MIREG2
+> +# define CSR_IREG3	CSR_MIREG3
+> +# define CSR_IREG4	CSR_MIREG4
+> +# define CSR_IREG5	CSR_MIREG5
+> +# define CSR_IREG6	CSR_MIREG6
+>  # define CSR_IPH		CSR_MIPH
+>  # define CSR_TOPEI	CSR_MTOPEI
+>  # define CSR_TOPI	CSR_MTOPI
+> @@ -477,6 +502,11 @@
+>  # define CSR_IEH		CSR_SIEH
+>  # define CSR_ISELECT	CSR_SISELECT
+>  # define CSR_IREG	CSR_SIREG
+> +# define CSR_IREG2	CSR_SIREG2
+> +# define CSR_IREG3	CSR_SIREG3
+> +# define CSR_IREG4	CSR_SIREG4
+> +# define CSR_IREG5	CSR_SIREG5
+> +# define CSR_IREG6	CSR_SIREG6
+>  # define CSR_IPH		CSR_SIPH
+>  # define CSR_TOPEI	CSR_STOPEI
+>  # define CSR_TOPI	CSR_STOPI
+> 
+With that typo fixed:
 
-I've started working through the internal processes and will update here
-when I'm done!
+Reviewed-by: Clément Léger <cleger@rivosinc.com>
 
->
-> The other thing of note is that while we have the kernel patches, a
-> userspace to drive them and exercise them is currently missing.
+Thanks,
 
-In this and future patch series, I'll have selftests that will exercise
-any new functionality.
+Clément
 
->
->> Then, I'll code it all up in a new revision of this series (target:
->> March 2025), which will be accompanied by source code on GitHub.
->> 
->> I'm happy to collaborate more closely, let me know if you have ideas
->> for
->> collaboration!
->
-> Thank you.  I think currently the bigger problem we have is allocation
-> of hugepages -- which is also blocking a lot of the follow-on work. 
-> Vishal briefly mentioned isolating pages from Linux entirely last time
-> - that's also what I'm interested in to figure out if we can completely
-> bypass the allocation problem by not allocating struct pages for non-
-> host use pages entirely.  The guest_memfs/KHO/kexec/live-update patches
-> also take this approach on AWS (for how their VMs are launched).  If we
-> work with those patches together, allocation of 1G hugepages is
-> simplified.  I'd like to discuss more on these themes to see if this is
-> an approach that helps as well.
->
->
-> 		Amit
 
-Vishal is still very interested in this and will probably be looking
-into this while I push ahead assuming that KVM continues to use struct
-pages. This was also brought up at the guest_memfd upstream call on
-2025-02-06, people were interested in this and think that it will
-simplify refcounting for merging and splitting.
-
-I'll push ahead assuming that we use hugetlb as the source of 1G pages,
-and assuming that KVM continues to use struct pages to describe guest
-private memory.
-
-The series will still be useful as an interim solution/prototype even if
-other allocators are preferred and get merged. :)
 
