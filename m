@@ -1,245 +1,223 @@
-Return-Path: <kvm+bounces-37660-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37661-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2FAAA2DB76
-	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2025 08:15:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F4017A2DBCC
+	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2025 10:38:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97EEC165C2E
-	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2025 07:15:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8A553A52B9
+	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2025 09:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9028513AA31;
-	Sun,  9 Feb 2025 07:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6273B1509A0;
+	Sun,  9 Feb 2025 09:38:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S5XLYX/x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QUBQTmCd"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C274339A8
-	for <kvm@vger.kernel.org>; Sun,  9 Feb 2025 07:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E9B13E02A;
+	Sun,  9 Feb 2025 09:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739085296; cv=none; b=anwloVx/QyRzZnAPWLT5CRzcHV/apHAzkcjYUbc6kyffFaR2B1y8tV+w9wVetp+DuB33UfroukOaLWJ6KdB16M9N/+tbkHIBe8oY2JN+45ftpoW7q8Ap1+qot1BNnA3tZahoMM9i4b5B6e9eoDaMNn7itS8iN2nIMn3QVnyUUu0=
+	t=1739093914; cv=none; b=PuP9F4gYV1l6agWmFfMKvyD4VtSJZv5s6+yIDluWoioFL2uin1J5Eex/rvQ9dloaYnSEoIFRXBSvd1saVtuQXBW5ifAfEe+9AkXlYHBfOUhBMXo9oIbTIICEMkjlbCEAwO9DtY7jhMyWVq3T3H1mq3o6d+7vMFeabNEL9l+J0fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739085296; c=relaxed/simple;
-	bh=lO7zeNf+AukrMePtcOx0V4gLj9XuS/wR/UvZ8nuw1fw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xxk1fKpsp+Y02YdHgetncOrjrMCjDrDFe8lgX2kxkv0QZ8G12keoiZAeTwP+obfalGyUcJh0qo6iA8ILL06oF4dYMZ5KWVA0Ho2luYOeTZ50zCzbWuCh7Qu3X7yYdY1GPZ50m90tYZ2ZC1BwgFTLwzv2j6Zh6xLgfFWQNyYjhVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S5XLYX/x; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739085293;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lm19PGgaLb/LKlk3YdVmYU6gr7xJiy7Qyybmv8dY9Q4=;
-	b=S5XLYX/xV9I4unUz3N5H5NIXXXcBK/6fib9Tl4zSAi6dCQix8OvMTSTFBbwbyJGO775Ygo
-	UkpotrdCMlXFySHAU3Ue/5FJcY7Ml4PKkUeuAx09/tBT7pF+e3VCajCoC9ROw+5U6i2Z5D
-	SxSphjAg8lPMWLDV5L6FmnvAQkx8X7M=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-377-QnUeNDBUMTKJN4a3V3cssg-1; Sun, 09 Feb 2025 02:14:50 -0500
-X-MC-Unique: QnUeNDBUMTKJN4a3V3cssg-1
-X-Mimecast-MFC-AGG-ID: QnUeNDBUMTKJN4a3V3cssg
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ab341e14e27so362063866b.3
-        for <kvm@vger.kernel.org>; Sat, 08 Feb 2025 23:14:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739085290; x=1739690090;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lm19PGgaLb/LKlk3YdVmYU6gr7xJiy7Qyybmv8dY9Q4=;
-        b=aFM/oMokpf9M4g5HGdOaq3tyB6FOX7jXJ6L1p0Lso57DW1SqMJYT5JPzVK4pDctybN
-         2QkS6UVnGcJJoq31tbuCAb10mAaEX1nkD2KVfGRLCz+qUFcF38tuYVErsUuCxjD76fSO
-         DMGkaFccXLZkINyJTQvYe51x1aqh1cociOwptmrFJfocUnPIFPYfPB/MIsx/KfBTCBTa
-         SlkRI95c8esK0ySIsb9X+fAh2caZTfML7++HypQl0H71OjfGkwQ3LhxHgKYfuXoOX/OP
-         lbUFF42T19Z1UAnFQwZora11A/mV0KJJzhVHNQREbpW7IumtTJbo9l4C6mNDIVMyMRA1
-         PRMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUk/9EGN0KHyjrpbqX9oe3RrOspTIS+bBmarxJcjC5dYUG1dYViISV9CNoI1YhUhKidpC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqGznoQLEVAxJyT6nFq8q8cBKkBHjx35YdzPD3UaKq9qB/vSXU
-	kpHZhqW+RkCrp0klkxm2Wswe4IWCAZt3J+pRmeEYFNbiW4TzeXaO10F8bJtKbH3rJMoDRxr6ecE
-	rU9iJCUxLeyWU4scqhXKr7zZ797xOBkSv4vUBvB4R/Skn2sHG+A==
-X-Gm-Gg: ASbGncsVtvLFo21hP/Ql2C+EayEhJPgqByJrgDwroASx/if6Ren0+1PeVELhG++hgOW
-	Asvmdzjl28zPuckcufGXkhDmb2Tot/TarAmFXWKRdhQdlR6kqu4LO1d1/sj2XMI3o4F3vUapgv/
-	7hCt/Nl5Kgy6wtFq33igWACjwl4PWC23aHm9spXAu6Ia4LYAxxnmXzUKxK8XHToyeIm4FetylUZ
-	DP1qGThrUJy2HiAKsRutGqoZEi2U4IhWGQEVtgSkdmlGSvRXplW0Q5jdmMpdwCwcfb4QfKNYAlC
-	eyCXmg==
-X-Received: by 2002:a17:907:a684:b0:ab7:b3f8:bcae with SMTP id a640c23a62f3a-ab7b3f92d9amr116377066b.12.1739085289580;
-        Sat, 08 Feb 2025 23:14:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGaJ4ioKanHq/dFVGaq6D1haduLLzqCD5fDcFssWk7vHNrESutMprRa6xXPDMUWRYzPAgjaoA==
-X-Received: by 2002:a17:907:a684:b0:ab7:b3f8:bcae with SMTP id a640c23a62f3a-ab7b3f92d9amr116375466b.12.1739085289190;
-        Sat, 08 Feb 2025 23:14:49 -0800 (PST)
-Received: from [192.168.10.3] ([151.62.97.55])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab78da1f953sm456326166b.59.2025.02.08.23.14.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Feb 2025 23:14:48 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	imbrenda@linux.ibm.com
-Subject: [GIT PULL] KVM changes for Linux 6.14-rc2
-Date: Sun,  9 Feb 2025 08:14:47 +0100
-Message-ID: <20250209071447.2521861-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1739093914; c=relaxed/simple;
+	bh=keWDFt84Qk9PxNh98O77XqGOs0wHD5wAPaoGo2aheoE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YhuKzKrf9LUqxK6rEzT4UTJdCKIOO75+FzBi4PsjNw8VSQlMi/VUIGnGt4kSnBZlFU6Up/E1bo6Zc5us7CuJvkPnjDfpsrAILPJ3kYOdMqMqrEyNnURjWCjTQF973w2caGwjt4f/niDC03rUYD68KT/rcUPXjmPIUV8kDLkfidU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QUBQTmCd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12BB4C4AF0B;
+	Sun,  9 Feb 2025 09:38:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739093914;
+	bh=keWDFt84Qk9PxNh98O77XqGOs0wHD5wAPaoGo2aheoE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=QUBQTmCdM6mkWBoi1jlWr9/ycH/f0vLiGnMJEzxPLGRWH/swsAUZ+lgfTFnH5zO7C
+	 xNOGVtegzgQOlrnwbbMR3h0AR8qPulmanp8Wj340NdbOvnXLK73WkCtSD1o3/1+KsY
+	 Zg9G1ve7Z0hvhF+9YoezefiT2vJCCfkEHJIqTk93JlcW9Dpm+xKGODitcYT8NaFiig
+	 m6XBeIOZWcn2tk+aFQBVBy9Z8TVrnALNV14xSUIkTs1gzs1AHoioHgmkwX81UM1M2q
+	 OFCYt0v3oCjKDl6zpNiscAtgXdMob5S/vw1U/H/2cZ4DSey3eCCW7ZEewC/W9jXKC9
+	 qtB1GlDqwlkPA==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5de47cf93dfso3075325a12.2;
+        Sun, 09 Feb 2025 01:38:33 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUhgX22cjjWDXGyMsk4LbILCb8Q2OIsAizKMIaVCIyCdMSgfhD/1GXk3C2ZxMUIJDnU1quiswvMo74o3zad@vger.kernel.org, AJvYcCWL0C6nAr5pfYxZBzqcfYKlLF4Lea/Wq/soAsf2AD3R4oFBCkrJuLnTvXxbF4XLXKAGhdo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXyD8NwE+8zXQ/RMJAwSoErnggHLLMENUDrKOqE7seMxq2xlG5
+	eMjqXZ/FtUSG3sCHEBm5JbRXQXrbg0V788IebzJ0A0hdkJvv3BTA1qZRRh46EN8CWk9tcjN7tXa
+	KuYzzetxg9GUmA3r+3CVuSE7Cq84=
+X-Google-Smtp-Source: AGHT+IHT9uUQ98YQu/y8BjhBTL/yULpuTzAAatVmfCc4Bj9x1TUc9cZz3jRCUiurw2GIyjm0NkKdrQU5jPMWlUXZLMw=
+X-Received: by 2002:a05:6402:321d:b0:5dc:cfc5:9324 with SMTP id
+ 4fb4d7f45d1cf-5de4508084amr30165622a12.30.1739093912637; Sun, 09 Feb 2025
+ 01:38:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250207032634.2333300-1-maobibo@loongson.cn> <20250207032634.2333300-2-maobibo@loongson.cn>
+In-Reply-To: <20250207032634.2333300-2-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sun, 9 Feb 2025 17:38:21 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7p9G8At3Pz_o31u_Zpho2gfbe6WOxF6_WpebVfcfgaKQ@mail.gmail.com>
+X-Gm-Features: AWEUYZlRdHv2bfY6zlWzB4lhsFqJqRV8CIJfvD701PfIrEvUhs9BHg9JVkMQT1M
+Message-ID: <CAAhV-H7p9G8At3Pz_o31u_Zpho2gfbe6WOxF6_WpebVfcfgaKQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] LoongArch: KVM: Fix typo issue about GCFG feature detection
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Linus,
+Hi, Bibo,
 
-The following changes since commit 2014c95afecee3e76ca4a56956a936e23283f05b:
+On Fri, Feb 7, 2025 at 11:26=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wrot=
+e:
+>
+> This is typo issue about GCFG feature macro, comments is added for
+> these macro and typo issue is fixed here.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>  arch/loongarch/include/asm/loongarch.h | 26 ++++++++++++++++++++++++++
+>  arch/loongarch/kvm/main.c              |  4 ++--
+>  2 files changed, 28 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/incl=
+ude/asm/loongarch.h
+> index 52651aa0e583..1a65b5a7d54a 100644
+> --- a/arch/loongarch/include/asm/loongarch.h
+> +++ b/arch/loongarch/include/asm/loongarch.h
+> @@ -502,49 +502,75 @@
+>  #define LOONGARCH_CSR_GCFG             0x51    /* Guest config */
+>  #define  CSR_GCFG_GPERF_SHIFT          24
+>  #define  CSR_GCFG_GPERF_WIDTH          3
+> +/* Number PMU register started from PM0 passthrough to VM */
+>  #define  CSR_GCFG_GPERF                        (_ULCAST_(0x7) << CSR_GCF=
+G_GPERF_SHIFT)
+> +#define  CSR_GCFG_GPERFP_SHIFT         23
+> +/* Read-only bit: show PMU passthrough supported or not */
+> +#define  CSR_GCFG_GPERFP               (_ULCAST_(0x1) << CSR_GCFG_GPERFP=
+_SHIFT)
+>  #define  CSR_GCFG_GCI_SHIFT            20
+>  #define  CSR_GCFG_GCI_WIDTH            2
+>  #define  CSR_GCFG_GCI                  (_ULCAST_(0x3) << CSR_GCFG_GCI_SH=
+IFT)
+> +/* All cacheop instructions will trap to host */
+>  #define  CSR_GCFG_GCI_ALL              (_ULCAST_(0x0) << CSR_GCFG_GCI_SH=
+IFT)
+> +/* Cacheop instruction except hit invalidate will trap to host */
+>  #define  CSR_GCFG_GCI_HIT              (_ULCAST_(0x1) << CSR_GCFG_GCI_SH=
+IFT)
+> +/* Cacheop instruction except hit and index invalidate will trap to host=
+ */
+>  #define  CSR_GCFG_GCI_SECURE           (_ULCAST_(0x2) << CSR_GCFG_GCI_SH=
+IFT)
+>  #define  CSR_GCFG_GCIP_SHIFT           16
+>  #define  CSR_GCFG_GCIP                 (_ULCAST_(0xf) << CSR_GCFG_GCIP_S=
+HIFT)
+> +/* Read-only bit: show feature CSR_GCFG_GCI_ALL supported or not */
+>  #define  CSR_GCFG_GCIP_ALL             (_ULCAST_(0x1) << CSR_GCFG_GCIP_S=
+HIFT)
+> +/* Read-only bit: show feature CSR_GCFG_GCI_HIT supported or not */
+>  #define  CSR_GCFG_GCIP_HIT             (_ULCAST_(0x1) << (CSR_GCFG_GCIP_=
+SHIFT + 1))
+> +/* Read-only bit: show feature CSR_GCFG_GCI_SECURE supported or not */
+>  #define  CSR_GCFG_GCIP_SECURE          (_ULCAST_(0x1) << (CSR_GCFG_GCIP_=
+SHIFT + 2))
+>  #define  CSR_GCFG_TORU_SHIFT           15
+> +/* Operation with CSR register unimplemented will trap to host */
+>  #define  CSR_GCFG_TORU                 (_ULCAST_(0x1) << CSR_GCFG_TORU_S=
+HIFT)
+>  #define  CSR_GCFG_TORUP_SHIFT          14
+> +/* Read-only bit: show feature CSR_GCFG_TORU supported or not */
+>  #define  CSR_GCFG_TORUP                        (_ULCAST_(0x1) << CSR_GCF=
+G_TORUP_SHIFT)
+>  #define  CSR_GCFG_TOP_SHIFT            13
+> +/* Modificattion with CRMD.PLV will trap to host */
+>  #define  CSR_GCFG_TOP                  (_ULCAST_(0x1) << CSR_GCFG_TOP_SH=
+IFT)
+>  #define  CSR_GCFG_TOPP_SHIFT           12
+> +/* Read-only bit: show feature CSR_GCFG_TOP supported or not */
+>  #define  CSR_GCFG_TOPP                 (_ULCAST_(0x1) << CSR_GCFG_TOPP_S=
+HIFT)
+>  #define  CSR_GCFG_TOE_SHIFT            11
+> +/* ertn instruction will trap to host */
+>  #define  CSR_GCFG_TOE                  (_ULCAST_(0x1) << CSR_GCFG_TOE_SH=
+IFT)
+>  #define  CSR_GCFG_TOEP_SHIFT           10
+> +/* Read-only bit: show feature CSR_GCFG_TOE supported or not */
+>  #define  CSR_GCFG_TOEP                 (_ULCAST_(0x1) << CSR_GCFG_TOEP_S=
+HIFT)
+>  #define  CSR_GCFG_TIT_SHIFT            9
+> +/* Timer instruction such as rdtime/TCFG/TVAL will trap to host */
+>  #define  CSR_GCFG_TIT                  (_ULCAST_(0x1) << CSR_GCFG_TIT_SH=
+IFT)
+>  #define  CSR_GCFG_TITP_SHIFT           8
+> +/* Read-only bit: show feature CSR_GCFG_TIT supported or not */
+>  #define  CSR_GCFG_TITP                 (_ULCAST_(0x1) << CSR_GCFG_TITP_S=
+HIFT)
+>  #define  CSR_GCFG_SIT_SHIFT            7
+> +/* All privilege instruction will trap to host */
+>  #define  CSR_GCFG_SIT                  (_ULCAST_(0x1) << CSR_GCFG_SIT_SH=
+IFT)
+>  #define  CSR_GCFG_SITP_SHIFT           6
+> +/* Read-only bit: show feature CSR_GCFG_SIT supported or not */
+>  #define  CSR_GCFG_SITP                 (_ULCAST_(0x1) << CSR_GCFG_SITP_S=
+HIFT)
+>  #define  CSR_GCFG_MATC_SHITF           4
+>  #define  CSR_GCFG_MATC_WIDTH           2
+>  #define  CSR_GCFG_MATC_MASK            (_ULCAST_(0x3) << CSR_GCFG_MATC_S=
+HITF)
+> +/* Cache attribute comes from GVA->GPA mapping */
+>  #define  CSR_GCFG_MATC_GUEST           (_ULCAST_(0x0) << CSR_GCFG_MATC_S=
+HITF)
+> +/* Cache attribute comes from GPA->HPA mapping */
+>  #define  CSR_GCFG_MATC_ROOT            (_ULCAST_(0x1) << CSR_GCFG_MATC_S=
+HITF)
+> +/* Cache attribute comes from weaker one of GVA->GPA and GPA->HPA mappin=
+g */
+>  #define  CSR_GCFG_MATC_NEST            (_ULCAST_(0x2) << CSR_GCFG_MATC_S=
+HITF)
+>  #define  CSR_GCFG_MATP_NEST_SHIFT      2
+> +/* Read-only bit: show feature CSR_GCFG_MATC_NEST supported or not */
+>  #define  CSR_GCFG_MATP_NEST            (_ULCAST_(0x1) << CSR_GCFG_MATP_N=
+EST_SHIFT)
+>  #define  CSR_GCFG_MATP_ROOT_SHIFT      1
+> +/* Read-only bit: show feature CSR_GCFG_MATC_ROOT supported or not */
+>  #define  CSR_GCFG_MATP_ROOT            (_ULCAST_(0x1) << CSR_GCFG_MATP_R=
+OOT_SHIFT)
+>  #define  CSR_GCFG_MATP_GUEST_SHIFT     0
+> +/* Read-only bit: show feature CSR_GCFG_MATC_GUEST suppoorted or not */
+>  #define  CSR_GCFG_MATP_GUEST           (_ULCAST_(0x1) << CSR_GCFG_MATP_G=
+UEST_SHIFT)
+Bugfix is the majority here, so it is better to remove the comments,
+make this patch easier to be backported to stable branches.
 
-  Linux 6.14-rc1 (2025-02-02 15:39:26 -0800)
+Huacai
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 43fb96ae78551d7bfa4ecca956b258f085d67c40:
-
-  KVM: x86/mmu: Ensure NX huge page recovery thread is alive before waking (2025-02-04 11:28:21 -0500)
-
-One thing that stands out here is an s390 cleanup to the page table
-management code, which is quite different from everyone else's in
-KVM land.  This came in a bit late due to the holidays and I initially
-wanted to hold it until 6.15; on the other hand it would block some
-of the page descriptor work due to how KVM/s390 used page->index and
-page->lru for its own stuff; so, here it is.  The rest is bugfixes,
-mostly ARM.
-
-----------------------------------------------------------------
-ARM:
-
-* Correctly clean the BSS to the PoC before allowing EL2 to access it
-  on nVHE/hVHE/protected configurations
-
-* Propagate ownership of debug registers in protected mode after
-  the rework that landed in 6.14-rc1
-
-* Stop pretending that we can run the protected mode without a GICv3
-  being present on the host
-
-* Fix a use-after-free situation that can occur if a vcpu fails to
-  initialise the NV shadow S2 MMU contexts
-
-* Always evaluate the need to arm a background timer for fully emulated
-  guest timers
-
-* Fix the emulation of EL1 timers in the absence of FEAT_ECV
-
-* Correctly handle the EL2 virtual timer, specially when HCR_EL2.E2H==0
-
-s390:
-
-* move some of the guest page table (gmap) logic into KVM itself,
-  inching towards the final goal of completely removing gmap from the
-  non-kvm memory management code. As an initial set of cleanups, move
-  some code from mm/gmap into kvm and start using __kvm_faultin_pfn()
-  to fault-in pages as needed; but especially stop abusing page->index
-  and page->lru to aid in the pgdesc conversion.
-
-x86:
-
-* Add missing check in the fix to defer starting the huge page recovery
-  vhost_task
-
-* SRSO_USER_KERNEL_NO does not need SYNTHESIZED_F
-
-----------------------------------------------------------------
-Christoph Schlameuss (1):
-      KVM: s390: selftests: Streamline uc_skey test to issue iske after sske
-
-Claudio Imbrenda (14):
-      KVM: s390: wrapper for KVM_BUG
-      KVM: s390: fake memslot for ucontrol VMs
-      KVM: s390: selftests: fix ucontrol memory region test
-      KVM: s390: move pv gmap functions into kvm
-      KVM: s390: use __kvm_faultin_pfn()
-      KVM: s390: get rid of gmap_fault()
-      KVM: s390: get rid of gmap_translate()
-      KVM: s390: move some gmap shadowing functions away from mm/gmap.c
-      KVM: s390: stop using page->index for non-shadow gmaps
-      KVM: s390: stop using lists to keep track of used dat tables
-      KVM: s390: move gmap_shadow_pgt_lookup() into kvm
-      KVM: s390: remove useless page->index usage
-      KVM: s390: move PGSTE softbits
-      KVM: s390: remove the last user of page->index
-
-Colin Ian King (1):
-      KVM: selftests: Fix spelling mistake "initally" -> "initially"
-
-David Hildenbrand (4):
-      KVM: s390: vsie: fix some corner-cases when grabbing vsie pages
-      KVM: s390: vsie: stop using page->index
-      KVM: s390: vsie: stop messing with page refcount
-      KVM: s390: vsie: stop using "struct page" for vsie page
-
-Lokesh Vutla (1):
-      KVM: arm64: Flush hyp bss section after initialization of variables in bss
-
-Marc Zyngier (4):
-      KVM: arm64: Fix nested S2 MMU structures reallocation
-      KVM: arm64: timer: Always evaluate the need for a soft timer
-      KVM: arm64: timer: Correctly handle EL1 timer emulation when !FEAT_ECV
-      KVM: arm64: timer: Don't adjust the EL2 virtual timer offset
-
-Oliver Upton (2):
-      KVM: arm64: Flush/sync debug state in protected mode
-      KVM: arm64: Fail protected mode init if no vgic hardware is present
-
-Paolo Bonzini (4):
-      kvm: x86: SRSO_USER_KERNEL_NO is not synthesized
-      Merge tag 'kvm-s390-next-6.14-2' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
-      Merge tag 'kvmarm-fixes-6.14-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-      KVM: remove kvm_arch_post_init_vm
-
-Sean Christopherson (2):
-      KVM: Do not restrict the size of KVM-internal memory regions
-      KVM: x86/mmu: Ensure NX huge page recovery thread is alive before waking
-
- Documentation/virt/kvm/api.rst                   |   2 +-
- arch/arm64/kvm/arch_timer.c                      |  49 +-
- arch/arm64/kvm/arm.c                             |  20 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c               |  24 +
- arch/arm64/kvm/nested.c                          |   9 +-
- arch/arm64/kvm/sys_regs.c                        |  16 +-
- arch/s390/include/asm/gmap.h                     |  20 +-
- arch/s390/include/asm/kvm_host.h                 |   6 +-
- arch/s390/include/asm/pgtable.h                  |  21 +-
- arch/s390/include/asm/uv.h                       |   6 +-
- arch/s390/kernel/uv.c                            | 292 +---------
- arch/s390/kvm/Makefile                           |   2 +-
- arch/s390/kvm/gaccess.c                          |  44 +-
- arch/s390/kvm/gmap-vsie.c                        | 142 +++++
- arch/s390/kvm/gmap.c                             | 212 +++++++
- arch/s390/kvm/gmap.h                             |  39 ++
- arch/s390/kvm/intercept.c                        |   7 +-
- arch/s390/kvm/interrupt.c                        |  19 +-
- arch/s390/kvm/kvm-s390.c                         | 237 ++++++--
- arch/s390/kvm/kvm-s390.h                         |  19 +
- arch/s390/kvm/pv.c                               |  21 +
- arch/s390/kvm/vsie.c                             | 106 ++--
- arch/s390/mm/gmap.c                              | 681 +++++------------------
- arch/s390/mm/pgalloc.c                           |   2 -
- arch/x86/kvm/cpuid.c                             |   2 +-
- arch/x86/kvm/mmu/mmu.c                           |  33 +-
- arch/x86/kvm/x86.c                               |   7 +-
- include/linux/kvm_host.h                         |   1 -
- tools/testing/selftests/kvm/s390/cmma_test.c     |   4 +-
- tools/testing/selftests/kvm/s390/ucontrol_test.c |  32 +-
- virt/kvm/kvm_main.c                              |  25 +-
- 31 files changed, 1093 insertions(+), 1007 deletions(-)
- create mode 100644 arch/s390/kvm/gmap-vsie.c
- create mode 100644 arch/s390/kvm/gmap.c
- create mode 100644 arch/s390/kvm/gmap.h
-
+>
+>  #define LOONGARCH_CSR_GINTC            0x52    /* Guest interrupt contro=
+l */
+> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+> index bf9268bf26d5..f6d3242b9234 100644
+> --- a/arch/loongarch/kvm/main.c
+> +++ b/arch/loongarch/kvm/main.c
+> @@ -303,9 +303,9 @@ int kvm_arch_enable_virtualization_cpu(void)
+>          * TOE=3D0:       Trap on Exception.
+>          * TIT=3D0:       Trap on Timer.
+>          */
+> -       if (env & CSR_GCFG_GCIP_ALL)
+> +       if (env & CSR_GCFG_GCIP_SECURE)
+>                 gcfg |=3D CSR_GCFG_GCI_SECURE;
+> -       if (env & CSR_GCFG_MATC_ROOT)
+> +       if (env & CSR_GCFG_MATP_ROOT)
+>                 gcfg |=3D CSR_GCFG_MATC_ROOT;
+>
+>         write_csr_gcfg(gcfg);
+> --
+> 2.39.3
+>
 
