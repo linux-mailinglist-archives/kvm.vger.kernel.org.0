@@ -1,111 +1,152 @@
-Return-Path: <kvm+bounces-37662-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37663-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA489A2DBDC
-	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2025 10:48:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA08A2DF96
+	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2025 18:48:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56548165319
-	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2025 09:48:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B65A5164E6B
+	for <lists+kvm@lfdr.de>; Sun,  9 Feb 2025 17:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6F41531E3;
-	Sun,  9 Feb 2025 09:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5701E0DB5;
+	Sun,  9 Feb 2025 17:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qfj/WpNl"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RG8OdrnX"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3F013BC35;
-	Sun,  9 Feb 2025 09:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C691DFE00
+	for <kvm@vger.kernel.org>; Sun,  9 Feb 2025 17:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739094476; cv=none; b=N3GGFPPmEbj4XX2eEpOFX/D8I9rNJbHDtobtOhB/SW+sxuXWTR5Q1XAKBEyELA9EEw9pGlsLs77Acv33DFNt5/XZ0FCvxCINd7Ox94OYEYMMrt1r2gwrxwuPVp3z5aNQRdGk+MFntvokQshh6qaO3R1dY/hac1K+W/2DdEfdy1g=
+	t=1739123320; cv=none; b=cCiWaKM4CPwHYTo43P0RV9HnD4uaaxDwN7Y5z48F3kGRoTTYw0s6CBOEQVFIhpVUUYPeR5Xyma7WQCrKoOY+BB/XzqUpB4xTi2xBwjMtWWjxyrrUYqqU8879YWa8OAWVn1p2Ggeo5fA8ZJg032ypfb35wKqy/mBC5xyRvoBIoZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739094476; c=relaxed/simple;
-	bh=6DNfODvssdyHcZrHzMy5Bx/XkdAD8dxNPadgLQ9LkS8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cgHhHVokvhaV9/+VrCB5MDIF50vbYK83mDqJ+/Z1zrzqlvg/7S2prws3NnsJyaGuAefMwM0qLbMGcPeGQ/ySyswnb27Pe6wJxsoDDXiZ7+Si0MRhSiRLeGLI3wovUK0/SaiFvCrtYCKnOjX4/MoJy4GXfWtwmc4adzIBYMdZG7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qfj/WpNl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50988C4CEE8;
-	Sun,  9 Feb 2025 09:47:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739094476;
-	bh=6DNfODvssdyHcZrHzMy5Bx/XkdAD8dxNPadgLQ9LkS8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Qfj/WpNl597razFYCQ0I5DE/mdr6ZVs/5zpjw/F7efdE1tFVmywvxBm5NTtM/DP8E
-	 nGgz6Snw8Jhxwy8unNVkgdwyjMPmtrOC7YwupZCQALqhJraSAQN+QLpzhdR28niOXD
-	 Grkr9DzcUTHe9iwvWBVpAyuNxXy1UT61UkCWoEM3B4YYliyEGo2EO/Qgyprf5wyOcz
-	 b2K+SqWelyNwgNRJwKb+razcFVCOGNknqhSME/zmdrYsgT30mF635BM23XVXzWu0V5
-	 voYkyvUKyoRHK1Rg1XZjNTKz7c6oaeTf7SSPKgSdkJpY02t09rS/8aDRF5cHI1DJw7
-	 AG0zO7o++MA8w==
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5de6069ceb5so1536507a12.1;
-        Sun, 09 Feb 2025 01:47:56 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV01tmcEhJUliNqBokLha9CUbBggz8hNWAm42OUBRXLQJ5i5LsUWsPOB3W7TPWKOMP98z4=@vger.kernel.org, AJvYcCXZwSLUmodiGzzOTge9teshiB+FQer13C7/eI30nxjOCkd2vS0zusSjs7C/JgHhSim8bIOithY637mPUhvS@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY+NtN5LRNx/ZcMxT2HxXKe9DKFVI5CX+kq3svl7wY0QYqcCFB
-	KCNhwP7vi5ly+IahVQd1EkT2BMl8mWuNYsEWLQGeoLBx32NjlEXFJ03FCHvTcju325p+q9hMb/Y
-	Mk6dlnUtnS0DQEFctwysQGstkohU=
-X-Google-Smtp-Source: AGHT+IG9LFzAf1oenYrJnOJQmeB1eV5sB56zP5YZtXIaoNugLOCg3z8jy3MxS04sySHdN9xDe0gHKtPZvCGIHJQ6r28=
-X-Received: by 2002:a05:6402:194b:b0:5dc:8fc1:b3b5 with SMTP id
- 4fb4d7f45d1cf-5de46a4f1cfmr9953881a12.15.1739094474931; Sun, 09 Feb 2025
- 01:47:54 -0800 (PST)
+	s=arc-20240116; t=1739123320; c=relaxed/simple;
+	bh=l91+mvCak/nBr6+8hY5mpT8OkINcUCTgVN9pT4tRgDY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=au1w8qLxIX3Vb+bOm9NAuSRj0m1X9n8rEr9LEvd725aREDUFHXqWab5/6h/1IBgr9nxkYOs1C4IzwTL8FBVdVmgXrbrXxsfq7PANrs5rAh7coRjFSCT3GC2dh3XQ6oIM9YJCoRBWNlFICakflVfNroUoVx3PMDRFl1Gz0zBY2vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RG8OdrnX; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-438a39e659cso23902065e9.2
+        for <kvm@vger.kernel.org>; Sun, 09 Feb 2025 09:48:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1739123316; x=1739728116; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MfUfwyyOf6ikTKqC5ppl2P595P0uuLiq/UPwbIU/2wE=;
+        b=RG8OdrnXVRrcZRsNK92q0C6sNgBE52ASY0oMa1ywAiqtx+jU7ruhhZxh8JcyPHrAWM
+         hL6I4qzM31WtagzYJVSIp00PFttJ9YYT35fabi1Zecz0tstpt9zHZ6lu3w045PXxDxDX
+         lClASlobCfkkKRoYuTvwsKWgU7yf8grR4krNe4/6mdxhP42yIY0T0uQZbS49ujGphOeD
+         J+aZllh5JKa6mg0ySNWcay9bezm3HPklaO9cBGza3F/+KcbQan+o4DJzaXQGX1awpvUR
+         0d//+PQQ4yKyNdxQEH2YFE3u8G2ocy2iG/d8zBLDp/EwJy1T/FAJZqotnWXSy1NwGjWF
+         +H+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739123316; x=1739728116;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MfUfwyyOf6ikTKqC5ppl2P595P0uuLiq/UPwbIU/2wE=;
+        b=hFF/RRnMN1OY57BH3Ve/kAWOMrkyGDk/QWk8cZNQqr2IMW/syEaKjLD+VdrTJ98gwl
+         1IRfHGhenyx4myFrihMxGAKC1Cp+ve8K25k305I0B47xhSFKgWUl7ViZW1Tn34cWG7SO
+         rnHepYrhbc6fsxN695wBWO9eRkvYdYa41Mz65ii6Nhh8//uodJID5/qcY8dI0LcI/C6Q
+         k7AJceKWvMQ1sHOtb0NtPGxeqHmbDfEVRXQCHTRIANGKTDU4LtJG6IOMm1nwlIUsKa38
+         FX1YqWe/fYvqAj9ZmpxwO2aAkKxVIUx1CCggPin57VD0vLxIUtWwl4leFqrMOwjE1k3k
+         wepg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBM23WhNKzPmnNvtUdgadZ9jIKDbRUJCcDmJe3THTuKILGRWXwa2rt1Tx9NqhaLFEai3Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSLdZqparRfstWgiSzQAjfggysVtKt6u/yWVR+UNbNgGcVRIgE
+	lhPAUoAQvKvgdK9H3SaWiD01ZKIVKYfRrAzCeheLh9SACe2gtT6YwxvnjBCBkMeFi47WPPNyRfA
+	hm5M=
+X-Gm-Gg: ASbGnctiK2+C/DwrN6remWfEk/iYPgzCxnhBV7gLZEps7w4nTH01AKpMSjKsXWoDEOk
+	BBP39oPA+tR7P5eItZnFfITYSslesRS0+B7O8tf6HiG1kHV4oiPNp2+472ZRUE9PbITVCn3+8kJ
+	gGOT6ZxQKOrjoPam3Svxm8ooNqg+jWo2Ir95a+vCr21urVCsCK1jGaBzOAFMZrjvrtCwrGPtxNv
+	zt1HdCQVW0rKwQBRJLVxc5+pBIMYY6EauLdg21NtsRtNmewa2mj63WGik1lmzqkJWVKSXwDPtiX
+	rjQkfWv4zUrhj5YcIjlRVaZAFsJz5kBkxgtWuozhmSXrzQ0E6bM1ZvKY/ZI=
+X-Google-Smtp-Source: AGHT+IGd/XDb34EkKfmSFZhWJPhrnA7A7SmQh2tvM08VpfMHBBzMH15Yi4MnSVh5ay2LnzkfnAYyag==
+X-Received: by 2002:a05:600c:895:b0:439:331b:e34d with SMTP id 5b1f17b1804b1-439331be5aemr46083675e9.5.1739123316433;
+        Sun, 09 Feb 2025 09:48:36 -0800 (PST)
+Received: from [192.168.69.198] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4394376118esm10137065e9.40.2025.02.09.09.48.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 09 Feb 2025 09:48:35 -0800 (PST)
+Message-ID: <62ad5a5b-9860-42dc-a4f3-37f504f3ded6@linaro.org>
+Date: Sun, 9 Feb 2025 18:48:35 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250207032634.2333300-1-maobibo@loongson.cn> <20250207032634.2333300-4-maobibo@loongson.cn>
-In-Reply-To: <20250207032634.2333300-4-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 9 Feb 2025 17:47:38 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4o7WS6J-eU=3VR16iVscrr5znpa67Do96cxmd6A0JS0g@mail.gmail.com>
-X-Gm-Features: AWEUYZn5Y04jyrm4Rwpw69Gq9kl-fqicb-nqqOLjPalkQsEh8JtKtfYJPdcQ0zw
-Message-ID: <CAAhV-H4o7WS6J-eU=3VR16iVscrr5znpa67Do96cxmd6A0JS0g@mail.gmail.com>
-Subject: Re: [PATCH 3/3] LoongArch: KVM: Set host with kernel mode when switch
- to VM mode
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] target/loongarch: fix vcpu reset command word issue
+To: Xianglai Li <lixianglai@loongson.cn>, qemu-devel@nongnu.org,
+ kvm-devel <kvm@vger.kernel.org>
+Cc: Bibo Mao <Maobibo@loongson.cn>, Song Gao <gaosong@loongson.cn>
+References: <20250208075023.5647-1-lixianglai@loongson.cn>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20250208075023.5647-1-lixianglai@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi, Bibo,
+Hi,
 
-On Fri, Feb 7, 2025 at 11:26=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> PRMD and ERA register is only meaningful on the beginning stage
-> of exception entry, and it can be overwritten for nested irq or
-> exception.
-The code doesn't touch ERA, so ERA in the commit message is a typo?
-
-Huacai
->
-> When CPU runs in VM mode, interrupt need be enabled on host. And the
-> mode for host had better be kernel mode rather than random.
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+On 8/2/25 08:50, Xianglai Li wrote:
+> When the KVM_REG_LOONGARCH_VCPU_RESET command word
+> is sent to the kernel through the kvm_set_one_reg interface,
+> the parameter source needs to be a legal address,
+> otherwise the kernel will return an error and the command word
+> will fail to be sent.
+> 
+> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
 > ---
->  arch/loongarch/kvm/switch.S | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
-> index 0c292f818492..1be185e94807 100644
-> --- a/arch/loongarch/kvm/switch.S
-> +++ b/arch/loongarch/kvm/switch.S
-> @@ -85,7 +85,7 @@
->          * Guest CRMD comes from separate GCSR_CRMD register
->          */
->         ori     t0, zero, CSR_PRMD_PIE
-> -       csrxchg t0, t0,   LOONGARCH_CSR_PRMD
-> +       csrwr   t0, LOONGARCH_CSR_PRMD
->
->         /* Set PVM bit to setup ertn to guest context */
->         ori     t0, zero, CSR_GSTAT_PVM
-> --
-> 2.39.3
->
+> Cc: Bibo Mao <Maobibo@loongson.cn>
+> Cc: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Cc: Song Gao <gaosong@loongson.cn>
+> Cc: Xianglai Li <lixianglai@loongson.cn>
+> 
+> CHANGE:
+> V2<-V1:
+>    1.Sets the initial value of the variable and
+>    adds a function return value judgment and prints a log
+> 
+>   target/loongarch/kvm/kvm.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/loongarch/kvm/kvm.c b/target/loongarch/kvm/kvm.c
+> index a3f55155b0..3f499e60ab 100644
+> --- a/target/loongarch/kvm/kvm.c
+> +++ b/target/loongarch/kvm/kvm.c
+> @@ -581,9 +581,14 @@ static int kvm_loongarch_get_lbt(CPUState *cs)
+>   void kvm_arch_reset_vcpu(CPUState *cs)
+>   {
+>       CPULoongArchState *env = cpu_env(cs);
+> +    int ret = 0;
+> +    uint64_t unused = 0;
+>   
+>       env->mp_state = KVM_MP_STATE_RUNNABLE;
+> -    kvm_set_one_reg(cs, KVM_REG_LOONGARCH_VCPU_RESET, 0);
+> +    ret = kvm_set_one_reg(cs, KVM_REG_LOONGARCH_VCPU_RESET, &unused);
+> +    if (ret) {
+> +        error_report("Failed to set KVM_REG_LOONGARCH_VCPU_RESET");
+
+If this call fails, I'd not rely on the state of the VM. What about:
+
+if (ret < 0) {
+     error_report("Failed to set KVM_REG_LOONGARCH_VCPU_RESET: %s",
+                  strerror(errno));
+     exit(EXIT_FAILURE);
+}
+
+?
+
+> +    }
+>   }
+>   
+>   static int kvm_loongarch_get_mpstate(CPUState *cs)
+
 
