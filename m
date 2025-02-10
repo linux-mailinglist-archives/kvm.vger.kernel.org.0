@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-37713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D36A2F785
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 19:43:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E883A2F789
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 19:43:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A20E41885427
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 18:43:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4901C163822
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 18:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB78257AF8;
-	Mon, 10 Feb 2025 18:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8532E2586F5;
+	Mon, 10 Feb 2025 18:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuIENE/6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5WogMuQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BC125A2D4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEF225A2A3;
 	Mon, 10 Feb 2025 18:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739212920; cv=none; b=q+tla6/BU6kvUscQxHwsCEtVy5W06B+1f9QhBlwt6XU9LpxysmCf3RNUUinrntZELj3Vzi6yg9CThejApR7ERcCt6phjR55Py3dJg0WAk61EdjlxFITVJQ4yMrJ/9jhaRxsUktAC0hRGcCfPBWsaW2916kF3DQG47hEgfU2eqz8=
+	t=1739212920; cv=none; b=vFOhTT5bw8OzOg7fpTn+nVQjJD+/yANdCDZ7ulpXzoE5Ez+YuqRg3G/NsaMstCx7sXdSQ2yxXIQCEcDvX+o7CGU08OJKK+2slrnoMxgyYZ/xaFxzQzFvxtKjXc7B87SKsye2U0va8xYCt9Tty5eis+vZTNgfk6WPfU9bIOb2AVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739212920; c=relaxed/simple;
-	bh=Wi2tx+wpbCR4WtycbeYLZhI3AsgEkM8AXxOTe1vY7yU=;
+	bh=z2VwTfiENkktUVTXFlhIZAHJiX/ofVLHsrUMaO3gVxI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RGbSOmuabZ42DxckNbG5KXSwL2xytnukZ4QVISss0au2kpD78yxQEkBHl8psJj12fVrUHpxQpRoLTDj+ViUYotGKJIHlHwmWOsnAEaGqKNS6MC87q1XOBVBzpyqkGbZW6+UV6bxIQBrjDZ2G9vQdbFtN+P54es0IGSOwlJ2BvdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuIENE/6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D171C4CEE8;
+	 MIME-Version; b=oakpYlHLD68lwZEsHXiNJfpkQeS6qnoUaTtiSvzz9jKQutdMOdv1eJYbDniWXlQKik0UW4DX9j0bKI4hevRW3EAO1OJEVooc+DMmqWGY2wLohZHFsgK7wSaJMfJpb6QO/QEQcDzl/ipSqiUMtYq1IKxFaX0ugWzTCdyNmVzq3NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5WogMuQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30CC7C4CED1;
 	Mon, 10 Feb 2025 18:42:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739212920;
-	bh=Wi2tx+wpbCR4WtycbeYLZhI3AsgEkM8AXxOTe1vY7yU=;
+	bh=z2VwTfiENkktUVTXFlhIZAHJiX/ofVLHsrUMaO3gVxI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UuIENE/6RVcsxFzRVQL2ldgYzZPpnFVWpmdBtuN4lS/qbsrAXpE6wXAUhstvPAkEz
-	 qg/IYjlYwLfoFIGcANHmCNNwKpo/IFityJ+0WZJ3ugr5P2YQQQuFHFYGiJhIsNuQ22
-	 1iv91cixOaLkDTjHfUM5P/Va0FdX/dbhbcaIf/LNnEsnKWRMa5fH9JAgylZKz7hgxb
-	 iaLEmjc8hDqNfIYs/9JjbJHnoKPqZZMlkhdzOG/9UpLxZgO1x6cZnyp3LolcXr9c9w
-	 Ij/KHAFcfiSDCJ5Q9DkM0SRJ5vuCmzlkiHdpbhRaFRggiVSnCNA9d1gsIvSbGhNFfQ
-	 OJS3w0RCjDZ6g==
+	b=B5WogMuQeMLGaJpB+xm5Mi43YKsfx0LWDbfyV3lXz8gTQxdVU+G00AVPAwnSmwlS/
+	 NPe3Ouxeu9FlHJ2WAZdR1u2/j+I1iT53ZQ/1vcrdz5vkrR0pSC5ZnO6KdZoFExWJDf
+	 xCVN83OtAYlE28prgURRTdSZuBDK1KA3c1p6H9jIPGpLunGTCgz6nhLaL3gkunZrWB
+	 z9Be2BWrYomdrmA03Al1JberyWr61ABLE6VEbbPWfQZlh2hG6H47p5KuWSU6z00usa
+	 LLS4DUzzOHArE5/Jhk5szIZFRh+APv4JGaBG9Ch8B+WjawfDA15vWDISLrco0XEhMF
+	 VXo5SrVR1afEA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1thYjF-002g2I-S7;
-	Mon, 10 Feb 2025 18:41:57 +0000
+	id 1thYjG-002g2I-3f;
+	Mon, 10 Feb 2025 18:41:58 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -57,9 +57,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 03/18] KVM: arm64: Handle trapping of FEAT_LS64* instructions
-Date: Mon, 10 Feb 2025 18:41:34 +0000
-Message-Id: <20250210184150.2145093-4-maz@kernel.org>
+Subject: [PATCH 04/18] KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_ST64_ACCDATA being disabled
+Date: Mon, 10 Feb 2025 18:41:35 +0000
+Message-Id: <20250210184150.2145093-5-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250210184150.2145093-1-maz@kernel.org>
 References: <20250210184150.2145093-1-maz@kernel.org>
@@ -75,100 +75,34 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We generally don't expect FEAT_LS64* instructions to trap, unless
-they are trapped by a guest hypervisor.
+We currently unconditionally make ACCDATA_EL1 accesses UNDEF.
 
-Otherwise, this is just the guest playing tricks on us by using
-an instruction that isn't advertised, which we handle with a well
-deserved UNDEF.
+As we are about to support it, restrict the UNDEF behaviour to cases
+where FEAT_ST64_ACCDATA is not exposed to the guest.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/handle_exit.c | 64 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 512d152233ff2..4f8354bf7dc5f 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -294,6 +294,69 @@ static int handle_svc(struct kvm_vcpu *vcpu)
- 	return 1;
- }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 82430c1e1dd02..18721c773475d 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4997,10 +4997,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 	kvm->arch.fgu[HFGxTR_GROUP] = (HFGxTR_EL2_nAMAIR2_EL1		|
+ 				       HFGxTR_EL2_nMAIR2_EL1		|
+ 				       HFGxTR_EL2_nS2POR_EL1		|
+-				       HFGxTR_EL2_nACCDATA_EL1		|
+ 				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+ 				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
  
-+static int handle_ls64b(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 iss = ESR_ELx_ISS(esr);
-+	bool allowed;
++	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
++		kvm->arch.fgu[HFGxTR_GROUP] |= HFGxTR_EL2_nACCDATA_EL1;
 +
-+	switch (iss) {
-+	case ESR_ELx_ISS_ST64BV:
-+		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
-+		break;
-+	case ESR_ELx_ISS_ST64BV0:
-+		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
-+		break;
-+	case ESR_ELx_ISS_LDST64B:
-+		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
-+		break;
-+	default:
-+		/* Clearly, we're missing something. */
-+		goto unknown_trap;
-+	}
-+
-+	if (!allowed)
-+		goto undef;
-+
-+	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-+		u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
-+		bool fwd;
-+
-+		switch (iss) {
-+		case ESR_ELx_ISS_ST64BV:
-+			fwd = !(hcrx & HCRX_EL2_EnASR);
-+			break;
-+		case ESR_ELx_ISS_ST64BV0:
-+			fwd = !(hcrx & HCRX_EL2_EnAS0);
-+			break;
-+		case ESR_ELx_ISS_LDST64B:
-+			fwd = !(hcrx & HCRX_EL2_EnALS);
-+			break;
-+		default:
-+			/* We don't expect to be here */
-+			fwd = false;
-+		}
-+
-+		if (fwd) {
-+			kvm_inject_nested_sync(vcpu, esr);
-+			return 1;
-+		}
-+	}
-+
-+unknown_trap:
-+	/*
-+	 * If we land here, something must be very wrong, because we
-+	 * have no idea why we trapped at all. Warn and undef as a
-+	 * fallback.
-+	 */
-+	WARN_ON(1);
-+
-+undef:
-+	kvm_inject_undefined(vcpu);
-+	return 1;
-+}
-+
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -303,6 +366,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_CP14_LS]	= kvm_handle_cp14_load_store,
- 	[ESR_ELx_EC_CP10_ID]	= kvm_handle_cp10_id,
- 	[ESR_ELx_EC_CP14_64]	= kvm_handle_cp14_64,
-+	[ESR_ELx_EC_LS64B]	= handle_ls64b,
- 	[ESR_ELx_EC_HVC32]	= handle_hvc,
- 	[ESR_ELx_EC_SMC32]	= handle_smc,
- 	[ESR_ELx_EC_HVC64]	= handle_hvc,
+ 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+ 		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
+ 						HFGITR_EL2_TLBIRVALE1OS	|
 -- 
 2.39.2
 
