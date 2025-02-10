@@ -1,254 +1,197 @@
-Return-Path: <kvm+bounces-37699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37700-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD31DA2F27C
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 17:05:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85666A2F2F5
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 17:16:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 489A31625E8
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 16:05:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D8A71889FDB
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 16:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70FB247DCE;
-	Mon, 10 Feb 2025 16:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002552580ED;
+	Mon, 10 Feb 2025 16:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rrTNYMcE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LcFwr1QN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10EE2451F9
-	for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 16:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4E02580C8
+	for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 16:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739203488; cv=none; b=ug/f4A9k/tP0KWbCFGlcASjcHjhozdWTNvcKRegzQWGf0Av1e4gfAYBvF2OpaKu4gj53C+V2p4uw5b4+wvDArXrlgAtgbvkq8zFb0lOf8HCmLByzNm7g1XaHB8rb6YwBpAEZz3vT8bi9dwzOX4R87TVb44OeMYwJDAb4K6otASE=
+	t=1739204176; cv=none; b=ijoD5X1+pqoAnSyvoAi+ZxjvU72mW+98EkFg06TEl8vDPPn2Ngp/ZbdTKn0r26qAOU98kIq3w9vfDKLC0SZRlsaI9iISOXW02axtmMcgAueOG+2r1791KQNHZFcUYlL+UNzSKXSBQnDZWXaQCgRXAkfKSfj6vUEbKMEw2fxU59I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739203488; c=relaxed/simple;
-	bh=8DHJ2UWLp7t2pVbkAlQFBbotjxQbfZDhI8zO9c6/tJc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LmZRYOMVhH9yk2B3hKGoe/gUGjHmbMcpDj8Dzhkz7AoipRxqrPFaVJcRIzadsnZlUVgyabUU28Ba0Kk4dRgGYNW5y1lDyVlpiGC+iYpDJUK96MkVk0ZlZyph5il36RFuT3hQj7MQfc5sR3T4NHmQ3LzbpQsDO9RmH9+/ZrdtS+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rrTNYMcE; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-47190a013d4so271911cf.1
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 08:04:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739203485; x=1739808285; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AcBTg4Wgx9l1UkrbP4fO7M94HUL3Hslq3degNWAQgeA=;
-        b=rrTNYMcE+UCzVN4tqDqmGpA8gB8RtWyw5yTW0/r0EI5kbVtpt4OOhEC39tf8rd8MKi
-         NoTiNjbE8+368PWV6QaQq06A+4HF8SKADRmDGiGpOHAHQM2Tcz5pmikvwoC1b9OQ82l/
-         MOegItFUx59Q52mtrD3XjGoualbE1LMTvGAFiXPPbbbcUY9gfMjyLxulb19PM9b15y1J
-         QIvwNz855tZZhBFPKSMAJXtBYv7ZSsBpZPQibgDogEjLvBIFgnXRDwDOeCH2HOMGOQNf
-         vtg1hgc1zPR44cfcRewo3LRXiMNB0ny/Kf2AQ1Cb+u3r374aI+LZOPwEZJe28bdsa4Ny
-         8DHg==
+	s=arc-20240116; t=1739204176; c=relaxed/simple;
+	bh=1jcS+7FsjGMJ5ImWaUmKT2uzq8IjSodR7EIZMko9OZs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JNQs/NQFIsJUf0fm69J2ZZbOXsNkgVww4iWLLhAVOWniuHH3l3BcEKTVAHRntzY2uyGitotQcxnl09zOAC/pgAP6F7s249riIcTzRAXG2W+R/4qh2SxfgQ2YMSc0gN26302AWgfE1YcPbvo3UV9B2TT2QcH5qXCGJxo4dzgZt9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LcFwr1QN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739204173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FNXSpIDMbsYdI6rFjnVldoS4vIPojHfA/xPTtZaSU8I=;
+	b=LcFwr1QNjPd7S0g3BF49cufrIjn9j4JlghdgWE2vcrNTiqbYODvC2ueqmkWqDeXdNx34ba
+	9A3V6SQ8a/kUUVaTESai7TmtuTNEcnBuCOME0pJ9qS5qym8ZbI2rF+JoAbFf8a09UxcJLI
+	0TXfI32GoJgkWukQmGFAMVOzXAFmlik=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-B3_pv4SqOqCetguWl5gclw-1; Mon, 10 Feb 2025 11:16:11 -0500
+X-MC-Unique: B3_pv4SqOqCetguWl5gclw-1
+X-Mimecast-MFC-AGG-ID: B3_pv4SqOqCetguWl5gclw
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43942e82719so8733555e9.2
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 08:16:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739203485; x=1739808285;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AcBTg4Wgx9l1UkrbP4fO7M94HUL3Hslq3degNWAQgeA=;
-        b=opLOYYDr/7hXfL+mefhOxEyV/JOpXrmsMad0Mt++ZgldCzpqeSfw0i09IU9egYDnbO
-         aJF5OuY6lpFuGeJdfPBMjUxl33OW/XHklvvLytqx7AnakHWcjjjg1+eS1xl+NlptmA2B
-         akN4pmnQlA8O3l86aXfoVCkbxA1k5xj+XA++y0ec4IFsGFcJNGLlzi6mFXG9IfUDJ/OB
-         sWcL0P5eTYZbzppznova42bjUVuEho0imB8JI6hunyuW0kn3E+p4eQYOYmhKZG7pgKnb
-         T1A8+3wg37Fo3Zn+zrjliXesnl0hCWrgR7HOdshSTEBgrDCeEJflDIqU2bmj3ttJtKAK
-         UByw==
-X-Forwarded-Encrypted: i=1; AJvYcCURlzuvi/iB0Uf/v6ZraEgYKHsqz+YhKbQHuAj6Nuaf2rfLWA87mdBgD9RqgCJH/ZHeMaM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuakoZxGFErrW2Xtp9r8AKgsHT0aHRtwLL52BW0Wi86m0CILLA
-	N0kE1+z4LPqW7zzG4HKIXDNTH0Ei3WrnZN1Qs5MoAuNUxwaAU5qCuDn18YpICw8PTLO/7aDRV+6
-	Juf5/tbO17/TNDmgVurDROWZ6ihTlXeW5MY4m
-X-Gm-Gg: ASbGncuMEmNPgeV1hrLNYmWL7dNQF4kQf1H+eQ3MjZ7r90YwTUElTIuSwoevsiShVIX
-	ZbDwnJifdWbyPJDnfTknYMN0N4hmDsIKaNxMaQx7OgjJwS67TI+Yx6rSUl3d82199jhhQChk=
-X-Google-Smtp-Source: AGHT+IEPhqgOY7/vjDJO9G9Kayo09mPAh4Owza9DV8lkYNo3V2kODOd7QSjFL6dbJJ0yHi4xvJ0CuU/eQiqf60I7yl4=
-X-Received: by 2002:ac8:4a02:0:b0:465:3d28:8c02 with SMTP id
- d75a77b69052e-471837d8db6mr4873031cf.26.1739203484270; Mon, 10 Feb 2025
- 08:04:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739204170; x=1739808970;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FNXSpIDMbsYdI6rFjnVldoS4vIPojHfA/xPTtZaSU8I=;
+        b=XSUsBP/C914GG5Izc9Cg4H8KshkhQYxpwSTpSm2qlFKgSumNWmm7KEUZkeEW/LG9x6
+         6OlJmPYJL8C1OmGBOefezzUNViXLHmLDhU2sx20ects9j4uX1UOdTm7LPOkdj1lBcjb7
+         ogOquFZotzCjIojrbmkvn6zN1qvY/FjWNEbnA1zskt2zqwNlezv+EqqxNOBlo25dX6md
+         QfftxvfweCVLHbHAEaU32N/YQT9cEsdNfyHa7qmZ72vVFrPNPrTCjZns3qniR8Z2jCsj
+         1bTutY9VeeP4stis9ObweyK3x6pP0LJk+4raNnJXLW/3sTV90OxVEsQdftz94OvamZsu
+         82tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjWp0YFAodDBaowztaot8CDisaO96Kuic89vGiPWh6LAHqA8Yl85nFeK81U4nteh98vY4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiQEvWcwBwlZlorQf7ZMPb7UBzUtD+nPORpPND+c2gcum7bac3
+	WXj1bwgtxq/ApjTk2iFnSwRjz7ZQANCM7cRRHQSUmQIjQ3pYjrvw1wUY3MkKuTPmwGSXS0S7lNJ
+	j+pRqG+spnmaSZFgFfX8hisiogXPXEX5mLgmSTn/9LdaGkO5t2w==
+X-Gm-Gg: ASbGncvI2v/lPKteZQMB6CQ+i7zxoGU3OMm3tiDjvM7m0vKPQsE/ksGweCl8HqTjTEv
+	Gu+uDZN7xYVwYIG9N1WgYJjS07YbLlGNPSa/4Pbx6yaf16n/eQs8BwqKWdKj/i/dF38xfZwdSBO
+	budawO8dijgJ9CxOkb34jwcI1ZeMFK31v5aGgsQD3sRj8xuz7k+ScCfp74kgSYbY3fuXRwd/bES
+	N93GhlXfepcyqlVIR45+RCvNkOmzzGPZ6IO8ZQ0fQO1oj2Dn5yYl48HRDB2+Fu+MimkDLZCeW6t
+	FhvITk86VLo+5Ta8QTv70H6DKJbQuD2eSOpBTOEX6xDCvrRunQbN3A==
+X-Received: by 2002:a05:600c:34c2:b0:439:4a9d:aeaf with SMTP id 5b1f17b1804b1-4394a9db1ebmr15085135e9.25.1739204170034;
+        Mon, 10 Feb 2025 08:16:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE4uH/9bRhvTIF3vEIfyT9myGFn94vbG/HM+aXMc6HM0Pb2tHDTL/kGHkjMrZlOrAunNmfsdA==
+X-Received: by 2002:a05:600c:34c2:b0:439:4a9d:aeaf with SMTP id 5b1f17b1804b1-4394a9db1ebmr15084685e9.25.1739204169320;
+        Mon, 10 Feb 2025 08:16:09 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43935d4bd5csm77423835e9.6.2025.02.10.08.16.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 08:16:08 -0800 (PST)
+Date: Mon, 10 Feb 2025 17:16:03 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Junnan Wu <junnan01.wu@samsung.com>
+Cc: stefanha@redhat.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, mindong.zhao@samsung.com, 
+	q1.huang@samsung.com, ying01.gao@samsung.com, ying123.xu@samsung.com
+Subject: Re: [PATCH 1/2] vsock/virtio: Move rx_buf_nr and rx_buf_max_nr
+ initialization position
+Message-ID: <yvdbqfahgu76eczt5c4n76akbhh4h2ofemd46kv6kia4xipeqr@tfucpayw7cqg>
+References: <CGME20250207051943epcas5p4b831a4f975232d67f5849c3a2ddbcb59@epcas5p4.samsung.com>
+ <20250207052033.2222629-1-junnan01.wu@samsung.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGtprH-K0hKYXbH82_9pObn1Cnau74JWVNQ+xkiSSqnmh6BUUQ@mail.gmail.com>
- <diqzed0aowwa.fsf@ackerleytng-ctop-specialist.c.googlers.com>
-In-Reply-To: <diqzed0aowwa.fsf@ackerleytng-ctop-specialist.c.googlers.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 10 Feb 2025 16:04:07 +0000
-X-Gm-Features: AWEUYZlYCTGs061p_Xgk33zraHEj1D0BCc_wrNzz8QY6p-YEtOzRpN_eEkVL548
-Message-ID: <CA+EHjTwGMYkGUWCghBqN=MTuLLn_SCWZJNhdGYAmg=mn-YQiyg@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 06/15] KVM: guest_memfd: Handle final folio_put()
- of guestmem pages
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
-	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
-	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
-	seanjc@google.com, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	willy@infradead.org, akpm@linux-foundation.org, xiaoyao.li@intel.com, 
-	yilun.xu@intel.com, chao.p.peng@linux.intel.com, jarkko@kernel.org, 
-	amoorthy@google.com, dmatlack@google.com, yu.c.zhang@linux.intel.com, 
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz, 
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
-	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250207052033.2222629-1-junnan01.wu@samsung.com>
 
-Hi Ackerley,
+On Fri, Feb 07, 2025 at 01:20:32PM +0800, Junnan Wu wrote:
+>From: Ying Gao <ying01.gao@samsung.com>
+>
+>In function virtio_vsock_probe, it initializes the variables
+>"rx_buf_nr" and "rx_buf_max_nr",
+>but in function virtio_vsock_restore it doesn't.
+>
+>Move the initizalition position into function virtio_vsock_vqs_start.
+>
+>Once executing s2r twice in a row without
 
-On Fri, 7 Feb 2025 at 10:46, Ackerley Tng <ackerleytng@google.com> wrote:
->
-> Vishal Annapurve <vannapurve@google.com> writes:
->
-> > On Wed, Feb 5, 2025 at 9:39=E2=80=AFAM Vishal Annapurve <vannapurve@goo=
-gle.com> wrote:
-> >>
-> >> On Wed, Feb 5, 2025 at 2:07=E2=80=AFAM Fuad Tabba <tabba@google.com> w=
-rote:
-> >> >
-> >> > Hi Vishal,
-> >> >
-> >> > On Wed, 5 Feb 2025 at 00:42, Vishal Annapurve <vannapurve@google.com=
-> wrote:
-> >> > >
-> >> > > On Fri, Jan 17, 2025 at 8:30=E2=80=AFAM Fuad Tabba <tabba@google.c=
-om> wrote:
-> >> > > >
-> >> > > > Before transitioning a guest_memfd folio to unshared, thereby
-> >> > > > disallowing access by the host and allowing the hypervisor to
-> >> > > > transition its view of the guest page as private, we need to be
-> >> > > > sure that the host doesn't have any references to the folio.
-> >> > > >
-> >> > > > This patch introduces a new type for guest_memfd folios, and use=
-s
-> >> > > > that to register a callback that informs the guest_memfd
-> >> > > > subsystem when the last reference is dropped, therefore knowing
-> >> > > > that the host doesn't have any remaining references.
-> >> > > >
-> >> > > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> >> > > > ---
-> >> > > > The function kvm_slot_gmem_register_callback() isn't used in thi=
-s
-> >> > > > series. It will be used later in code that performs unsharing of
-> >> > > > memory. I have tested it with pKVM, based on downstream code [*]=
-.
-> >> > > > It's included in this RFC since it demonstrates the plan to
-> >> > > > handle unsharing of private folios.
-> >> > > >
-> >> > > > [*] https://android-kvm.googlesource.com/linux/+/refs/heads/tabb=
-a/guestmem-6.13-v5-pkvm
-> >> > >
-> >> > > Should the invocation of kvm_slot_gmem_register_callback() happen =
-in
-> >> > > the same critical block as setting the guest memfd range mappabili=
-ty
-> >> > > to NONE, otherwise conversion/truncation could race with registrat=
-ion
-> >> > > of callback?
-> >> >
-> >> > I don't think it needs to, at least not as far potencial races are
-> >> > concerned. First because kvm_slot_gmem_register_callback() grabs the
-> >> > mapping's invalidate_lock as well as the folio lock, and
-> >> > gmem_clear_mappable() grabs the mapping lock and the folio lock if a
-> >> > folio has been allocated before.
-> >>
-> >> I was hinting towards such a scenario:
-> >> Core1
-> >> Shared to private conversion
-> >>   -> Results in mappability attributes
-> >>       being set to NONE
-> >> ...
-> >>         Trigger private to shared conversion/truncation for
-> >> ...
-> >>         overlapping ranges
-> >> ...
-> >> kvm_slot_gmem_register_callback() on
-> >>       the guest_memfd ranges converted
-> >>       above (This will end up registering callback
-> >>       for guest_memfd ranges which possibly don't
-> >>       carry *_MAPPABILITY_NONE)
-> >>
-> >
-> > Sorry for the format mess above.
-> >
-> > I was hinting towards such a scenario:
-> > Core1-
-> > Shared to private conversion -> Results in mappability attributes
-> > being set to NONE
-> > ...
-> > Core2
-> > Trigger private to shared conversion/truncation for overlapping ranges
-> > ...
-> > Core1
-> > kvm_slot_gmem_register_callback() on the guest_memfd ranges converted
-> > above (This will end up registering callback for guest_memfd ranges
-> > which possibly don't carry *_MAPPABILITY_NONE)
-> >
->
-> In my model (I'm working through internal processes to open source this)
-> I set up the the folio_put() callback to be registered on truncation
-> regardless of mappability state.
->
-> The folio_put() callback has multiple purposes, see slide 5 of this deck
-> [1]:
->
-> 1. Transitioning mappability from NONE to GUEST
-> 2. Merging the folio if it is ready for merging
-> 3. Keeping subfolio around (even if refcount =3D=3D 0) until folio is rea=
-dy
->    for merging or return it to hugetlb
->
-> So it is okay and in fact better to have the callback registered:
->
-> 1. Folios with mappability =3D=3D NONE can be transitioned to GUEST
-> 2. Folios with mappability =3D=3D GUEST/ALL can be merged if the other su=
-bfolios
->    are ready for merging
-> 3. And no matter the mappability, if subfolios are not yet merged, they
->    have to be kept around even with refcount 0 until they are merged.
->
-> The model doesn't model locking so I'll have to code it up for real to
-> verify this, but for now I think we should take a mappability lock
-> during mappability read/write, and do any necessary callback
-> (un)registration while holding the lock. There's no concern of nested
-> locking here since callback registration will purely (un)set
-> PGTY_guest_memfd and does not add/drop refcounts.
->
-> With the callback registration locked with mappability updates, the
-> refcounting and folio_put() callback should keep guest_memfd in a
-> consistent state.
+s2r ? suspend 2 ram?
 
-So if I understand you correctly, we'll need to always register for
-large folios, right? If that's the case, we could expand the check to
-whether to register the callback, and ensure it's always registered
-for large folios. Since, like I said, the common case for small folios
-is that it would be just additional overhead. Right?
+Please define the acronym, it was hard for me to understand (the code 
+helped me).
 
-Cheers,
-/fuad
-
-> >> >
-> >> > Second, __gmem_register_callback() checks before returning whether a=
-ll
-> >> > references have been dropped, and adjusts the mappability/shareabili=
-ty
-> >> > if needed.
-> >> >
-> >> > Cheers,
-> >> > /fuad
+>initializing rx_buf_nr and rx_buf_max_nr,
+>the rx_buf_max_nr increased to three times vq->num_free,
+>at this time, in function virtio_transport_rx_work,
+>the conditions to fill rx buffer
+>(rx_buf_nr < rx_buf_max_nr / 2) can't be met.
 >
-> [1] https://lpc.events/event/18/contributions/1764/attachments/1409/3704/=
-guest-memfd-1g-page-support-2025-02-06.pdf
+
+Please add a Fixes tag, in this case I think it should be:
+
+Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
+
+but please, double check.
+
+>Signed-off-by: Ying Gao <ying01.gao@samsung.com>
+>Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
+>---
+> net/vmw_vsock/virtio_transport.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+
+I find the commit title/description a bit hard to understand, please 
+take a look at: 
+https://www.kernel.org/doc/html/latest/process/submitting-patches.html#describe-your-changes
+
+In this case I'd write something like this:
+
+   vsock/virtio: initialize rx_buf_nr and rx_buf_max_nr when resuming
+
+   [Describe the symptom]
+   When executing suspend/resume twice in a row, ...
+
+   [Describe the issue]
+   `rx_buf_nr` and `rx_buf_max_nr` are initialized only in
+   virtio_vsock_probe(), but they should be reset whenever virtqueues
+   are recreated, like after a suspend/resume. ...
+
+   [Desribe the fix, what this patch does]
+   Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
+   virtio_vsock_vqs_init(), so we are sure that they are properly
+   initialized, every time we initialize the virtqueues, either when we
+   load the driver or after a suspend/resume. ...
+
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index b58c3818f284..9eefd0fba92b 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -688,6 +688,8 @@ static void virtio_vsock_vqs_start(struct virtio_vsock *vsock)
+
+I think it is better to move the initialization of those fields in 
+virtio_vsock_vqs_init().
+
+> 	mutex_unlock(&vsock->tx_lock);
+>
+> 	mutex_lock(&vsock->rx_lock);
+>+	vsock->rx_buf_nr = 0;
+>+	vsock->rx_buf_max_nr = 0;
+> 	virtio_vsock_rx_fill(vsock);
+> 	vsock->rx_run = true;
+> 	mutex_unlock(&vsock->rx_lock);
+>@@ -779,8 +781,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>
+> 	vsock->vdev = vdev;
+>
+>-	vsock->rx_buf_nr = 0;
+>-	vsock->rx_buf_max_nr = 0;
+> 	atomic_set(&vsock->queued_replies, 0);
+
+Should we also move `queued_replies` ?
+
+Thanks,
+Stefano
+
+>
+> 	mutex_init(&vsock->tx_lock);
+>-- 
+>2.34.1
+>
+>
+
 
