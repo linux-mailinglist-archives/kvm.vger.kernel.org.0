@@ -1,82 +1,81 @@
-Return-Path: <kvm+bounces-37753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84462A2FCF5
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 23:23:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA209A2FDA0
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 23:44:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE3721884CDC
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 22:23:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFED13A839C
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 22:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4ED2505CC;
-	Mon, 10 Feb 2025 22:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D04254AF8;
+	Mon, 10 Feb 2025 22:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4c/Gi0Pz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4rHaX52s"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BEE2505B1
-	for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 22:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2937A254AF0
+	for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 22:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739226222; cv=none; b=oaAK3ZpClHS3/h2NqIKXKPXNTSw0HQkKWmVtq0IBLvP0vc9mZPKyuBbiE3y61/MLfhSSLBDAYdqvCkjNWf8ghU8fh5QolcKgDtHZZDuDmCj17kPwp3cFnl7djJ7Y7TuUxdvun6A+H6YAKyPPfCC/wpjNXVUk7fZbbdLU17okLYI=
+	t=1739227303; cv=none; b=SOIv+PC/oozc6OQFWNV3M0qsAJfpG0oUSJ/4NgegIZL5IJHATkKpcC+s9ytc3UJVRweUMhNQpFW8NEoOebBsa/LN46reoJdyOmWs8X+Gj6ujxozuvyH+G2+IB+l36g36sYU8ckPUIbH8nYSo912TkKucd2gU6kuM7R88EhoggV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739226222; c=relaxed/simple;
-	bh=hF8Vf4v4gr1R+Shd48LsTyb/BYZwoN0AaP4YvUCD6FU=;
+	s=arc-20240116; t=1739227303; c=relaxed/simple;
+	bh=J2M5LBZIRA6dmTpu1re8X+PdJJRdN2XLIrkz2r8effU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N6sG52zNh6u1vEAAGLsVPBiQ3ANHK0dVQ/NdCaxADf4ydaQTI78aUlLAk5VzDsDbxTdUsTHVpDH7Di9FBso5GT0Ccps0rNpPIrol01rysv5UqkwGjWcbkAvQCmHk12FAETjp7Bxan+qRtNISmap+LWl+XK2OrhWpnFpHgqdqnSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4c/Gi0Pz; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=sq5r3247qKTuyq5xB358pzUNrNnqTgyzNWcrzwcdIZSHJ4Y5nqVvZJSdvfKge6R5foDzvAiBmjksHUzqKjdNWbSOetONxKYg2OL+BgGcLO7i1RAbKf6mnncPgaJhjaJQrK/aJufnJRewwPaPeaKAy8PZYRC0UXaVf5iSVh76PYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4rHaX52s; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fa1e63a5ffso13542233a91.3
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 14:23:40 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fa228b4151so7597268a91.1
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 14:41:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739226220; x=1739831020; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739227301; x=1739832101; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pUXvYzG8eRKf2w27XFFoCbVFPZhMAFQZ2tlWsem28oM=;
-        b=4c/Gi0PzVH8a9EgDCiqitnq8V4knhIxPHxi0eLI/uVXtuqLMYY8ZaWLXZS8g0KxtHU
-         oph7inMFINU2v/IINGVFmiGkV5PmUM6jOcFmseBRlmyPaqJBc08XKeujNLWafnPUQd79
-         WLzG7Ngq54f052sQi1i+GmMuIVLo5AcOv5deboj/oR9Zdf+dePcOooHebU8WK6oLCnGp
-         Vl8F90a/KJut6ytynnRpTUH2y5m5N2emPwVkZM+aeWyqV3+R6iBrOuDLKtVsj25H1SGc
-         3/DeVNbAKaQzco+1MFWXaWmXZU9/dKT57o4nMMrpXHBx9i33yj70bmA38VkDigPAgC/7
-         +h4w==
+        bh=DZD6V+4k9UUTVu1q6+YHZha34NbYh40y70H3kTsa6mc=;
+        b=4rHaX52sRJ4jIAyvJLAOq2hrrp9wiZ8j1Ner8REYgdlK5KyBt84oPCXh4eVtORkuRA
+         B/F6jDotZn0UprV0Dx72Rboz34bU0vby3ajujLRXYG3bKph6HtPmXXT5o5h+cw/NuO55
+         39XnICl6g0LkImXReEMpZ7+LCr+aRA00nprKnMaIml6FWZZMP1tjlD10/10lkhIcOJxL
+         gQyOM4wtNta1W8nd/vPM/Wuew7M7BeKkK4/cE4S43ZN8Fg88ehBMCrZNNOfhM7idxD8k
+         Zop4d9snir/d0ugURk7zVutou/GDnh6eXTyyp8/UKCLBUxz1Bn7Kq63LHrW2IicZSUq3
+         ydfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739226220; x=1739831020;
+        d=1e100.net; s=20230601; t=1739227301; x=1739832101;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pUXvYzG8eRKf2w27XFFoCbVFPZhMAFQZ2tlWsem28oM=;
-        b=R8Z936wKQ8vCkYlBky6+6AR8dJPh2v5NNYkTIGzFTPBUGlRkxvS78LMWWwcffAn9ZS
-         s3r31Dc2qz+VNZOHqRVQJB9pTsRyodeZiTUAzN/ghfjmhQoIiDozEpBVwjYvFo1sUenl
-         egw5tSSI4kIAldfum/Pujs6raiH/QbSnlSrVlgT5Ja8SmtJKBkGp1KzAEdWNAn6Nzqxq
-         hUGUtX35Yf9LApT/OuffBImS/Y+PdG7Togp+crVVr9aU4VHq0xTKawJvxQFSmGmffcAj
-         u/yjhcFwSRnnc9WD8N4Ts0oTubK+NFA6aSxpA9speF+ZJOnrbINkYTQnMwzHFhEkgzk8
-         sRUA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBl+M4T9/yUZDo8JcGnpQNSsHKI92RrWRkIx1pycBizCPlP4JNVVef41PS7mD34w5iKM4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2H2Mb5OnL5KwENs+dxejePK5hVzm1JRwigrq5vsEi9uw5wFeu
-	m01QhG8mkAyIwwcvaY/UCLjYHLMd2/p9ho15ISMDfcd3q5WSCvzt7PsBrAZaznFFe/uTe8ZPZMP
-	kdg==
-X-Google-Smtp-Source: AGHT+IEy3+bVFo6JcMsoWvq+cYL38XbyKOeuF/tQSdUVXK2R0Wk67Xr5wVNUmJlCk3rS7iPBAN0yLqQOGnk=
-X-Received: from pfmu14.prod.google.com ([2002:aa7:838e:0:b0:730:9617:a4c9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3989:b0:730:f1b7:9bb2
- with SMTP id d2e1a72fcca58-730f1b79cfdmr3734751b3a.13.1739226220172; Mon, 10
- Feb 2025 14:23:40 -0800 (PST)
-Date: Mon, 10 Feb 2025 14:23:38 -0800
-In-Reply-To: <Z6bDZWzePT6CAreU@yzhao56-desk.sh.intel.com>
+        bh=DZD6V+4k9UUTVu1q6+YHZha34NbYh40y70H3kTsa6mc=;
+        b=djbPt6Xo9zJywBkbFFepTpwQAy7nXQlxnlgOAxtslc4VnSzK9QGak9PPcdeuSmDvX3
+         fV+AGmk0HYQ70YSYZfuDJbGRNH3qjDsILoEbJyrsPJKeg6xE2tqoalrPlApy+7Ttp7YB
+         RUPBSLwRI0fEVqc5ak11rEL/KAAwN98nlSZHbVCPczQfwKg49zwBJLGaPsLZFopSLO64
+         Uey3idZe9Rlhjy3BRvwtE1I/Y57JyIJhdg2HoZiZrPj/vBC2Zi0ZYTfRb1W61Q3b+h7C
+         zfbdu7l0wYymjU9ob9AJ/fLJyB+eefuLWz6At1tSUrzXEm/oB6rJThrE7UIZNN6f7Or5
+         xP0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXoROJyajvwp40c9xCFoN6FiMHZ5j6A3znPDzgVYzdRbsHkD+qmFfxWXRie5y8Ze9wrXvM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNFYZpOkzd0hYJWWCX6wv596BlIeAbjLgWNWFi4urduf1D864J
+	Z99kqOUyl9ROnIwFmdlMjBZSekp/EnYw4XgVkCLglZU0LKY2PaxTVo1DK2J87j3HGVyXgpqyzw5
+	w+Q==
+X-Google-Smtp-Source: AGHT+IH2c0dkWdxSoUH/P+c/MHYnOos+sGeNLUsxpV+Tj6PKAdhff85ZIO3F/CXDLvmSmNqvrbsH0zqif9M=
+X-Received: from pjbsq11.prod.google.com ([2002:a17:90b:530b:b0:2f7:ff61:48e7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d8c:b0:2ea:2a8d:dd2a
+ with SMTP id 98e67ed59e1d1-2fa242e6928mr22387097a91.27.1739227301444; Mon, 10
+ Feb 2025 14:41:41 -0800 (PST)
+Date: Mon, 10 Feb 2025 14:41:40 -0800
+In-Reply-To: <Z6bJF8uA9R0x3QGp@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250207030640.1585-1-yan.y.zhao@intel.com> <20250207030900.1808-1-yan.y.zhao@intel.com>
- <Z6Yhmg2nmUAtp4yn@google.com> <Z6bDZWzePT6CAreU@yzhao56-desk.sh.intel.com>
-Message-ID: <Z6p8aukJgpKqg3Rn@google.com>
-Subject: Re: [PATCH 3/4] KVM: x86/mmu: Make sure pfn is not changed for
- spurious fault
+References: <20250207030640.1585-1-yan.y.zhao@intel.com> <20250207030931.1902-1-yan.y.zhao@intel.com>
+ <Z6YixPh_j517vqcP@google.com> <Z6bJF8uA9R0x3QGp@yzhao56-desk.sh.intel.com>
+Message-ID: <Z6qApByaoCs_Y0eb@google.com>
+Subject: Re: [PATCH 4/4] KVM: x86/mmu: Free obsolete roots when pre-faulting SPTEs
 From: Sean Christopherson <seanjc@google.com>
 To: Yan Zhao <yan.y.zhao@intel.com>
 Cc: pbonzini@redhat.com, rick.p.edgecombe@intel.com, 
@@ -84,26 +83,97 @@ Cc: pbonzini@redhat.com, rick.p.edgecombe@intel.com,
 Content-Type: text/plain; charset="us-ascii"
 
 On Sat, Feb 08, 2025, Yan Zhao wrote:
-> On Fri, Feb 07, 2025 at 07:07:06AM -0800, Sean Christopherson wrote:
+> On Fri, Feb 07, 2025 at 07:12:04AM -0800, Sean Christopherson wrote:
 > > On Fri, Feb 07, 2025, Yan Zhao wrote:
-> > > Make sure pfn is not changed for a spurious fault by warning in the TDP
-> > > MMU. For shadow path, only treat a prefetch fault as spurious when pfn is
-> > > not changed, since the rmap removal and add are required when pfn is
-> > > changed.
+> > > Always free obsolete roots when pre-faulting SPTEs in case it's called
+> > > after a root is invalidated (e.g., by memslot removal) but before any
+> > > vcpu_enter_guest() processing of KVM_REQ_MMU_FREE_OBSOLETE_ROOTS.
+> > > 
+> > > Lack of kvm_mmu_free_obsolete_roots() in this scenario can lead to
+> > > kvm_mmu_reload() failing to load a new root if the current root hpa is an
+> > > obsolete root (which is not INVALID_PAGE). Consequently,
+> > > kvm_arch_vcpu_pre_fault_memory() will retry infinitely due to the checking
+> > > of is_page_fault_stale().
+> > > 
+> > > It's safe to call kvm_mmu_free_obsolete_roots() even if there are no
+> > > obsolete roots or if it's called a second time when vcpu_enter_guest()
+> > > later processes KVM_REQ_MMU_FREE_OBSOLETE_ROOTS. This is because
+> > > kvm_mmu_free_obsolete_roots() sets an obsolete root to INVALID_PAGE and
+> > > will do nothing to an INVALID_PAGE.
 > > 
-> > I like sanity checks, but I don't like special casing "prefetch" faults like this.
-> > KVM should _never_ change the PFN of a shadow-present SPTE.  The TDP MMU already
-> > BUG()s on this, and mmu_spte_update() WARNs on the transition.
-> However, both TDP MMU and mmu_set_spte() return RET_PF_SPURIOUS directly before
-> the BUG() in TDP MMU or mmu_spte_update() could be hit.
+> > Why is userspace changing memslots while prefaulting?
+> It currently only exists in the kvm selftest (written by myself...)
+> Not sure if there's any real use case like this.
 
-Ah, that's very different than treating a prefetch fault as !spurious though.  I
-would be a-ok with this:
+It's decidedly odd.  I asked, because maybe there's a way we can disallow the
+scenario.  Doing that without making things more complex than simply handling
+obsolete roots is probably a fool's errand though.
 
-	if (is_shadow_present_pte(iter->old_spte) &&
-	    (fault->prefetch || is_access_allowed(fault, iter->old_spte)) &&
-	    is_last_spte(iter->old_spte, iter->level)) {
-		WARN_ON_ONCE(fault->pfn != spte_to_pfn(iter->old_spte));
-		return RET_PF_SPURIOUS;
-	}
+> > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c | 5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 47fd3712afe6..72f68458049a 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -4740,7 +4740,12 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> > >  	/*
+> > >  	 * reload is efficient when called repeatedly, so we can do it on
+> > >  	 * every iteration.
+> > > +	 * Before reload, free obsolete roots in case the prefault is called
+> > > +	 * after a root is invalidated (e.g., by memslot removal) but
+> > > +	 * before any vcpu_enter_guest() processing of
+> > > +	 * KVM_REQ_MMU_FREE_OBSOLETE_ROOTS.
+> > >  	 */
+> > > +	kvm_mmu_free_obsolete_roots(vcpu);
+> > >  	r = kvm_mmu_reload(vcpu);
+> > >  	if (r)
+> > >  		return r;
+> > 
+> > I would prefer to do check for obsolete roots in kvm_mmu_reload() itself, but
+> Yes, it's better!
+> I previously considered doing in this way, but I was afraid to introduce
+> overhead (the extra compare) to kvm_mmu_reload(), which is called quite
+> frequently.
+> 
+> But maybe we can remove the check in vcpu_enter_guest() to reduce the overhead?
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b2d9a16fd4d3..6a1f2780a094 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10731,8 +10731,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>                                 goto out;
+>                         }
+>                 }
+> -               if (kvm_check_request(KVM_REQ_MMU_FREE_OBSOLETE_ROOTS, vcpu))
+> -                       kvm_mmu_free_obsolete_roots(vcpu);
+>                 if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
+>                         __kvm_migrate_timers(vcpu);
+>                 if (kvm_check_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu))
+> 
+> > keep the main kvm_check_request() so that the common case handles the resulting
+> > TLB flush without having to loop back around in vcpu_enter_guest().
+> Hmm, I'm a little confused.
+> What's is the resulting TLB flush?
+
+For the common case where KVM_REQ_MMU_FREE_OBSOLETE_ROOTS is pending before
+vcpu_enter_guest, kvm_mmu_free_obsolete_roots() may trigger KVM_REQ_TLB_FLUSH
+via kvm_mmu_commit_zap_page().  Processing KVM_REQ_MMU_FREE_OBSOLETE_ROOTS before
+KVM_REQ_TLB_FLUSH means vcpu_enter_guest() doesn't have to "abort" and redo the
+whole loop (the newly pending request won't be detected until kvm_vcpu_exit_request(),
+which isn't that late in the entry sequence, but there is a decent amount of work
+that needs to be undone).
+
+On the other hand, the cost of kvm_check_request(), especially a check that's
+guarded by kvm_request_pending(), is negligible.
+
+That said, obsolete roots shouldn't actually require a TLB flush.  E.g. the TDP
+MMU hasn't flushed invalid roots since commit fcdffe97f80e ("KVM: x86/mmu: Don't
+do TLB flush when zappings SPTEs in invalid roots").  I'd have to think more about
+whether or not that's safe/correct for the shadow MMU though.
+
+For this case, I think it makes sense to just add the check in kvm_mmu_reload().
 
