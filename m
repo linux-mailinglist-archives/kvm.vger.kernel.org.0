@@ -1,336 +1,228 @@
-Return-Path: <kvm+bounces-37677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37673-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45A6DA2E43D
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 07:39:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2B5CA2E430
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 07:33:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3FDE1664E8
-	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 06:39:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FF3616640A
+	for <lists+kvm@lfdr.de>; Mon, 10 Feb 2025 06:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD38A1AC892;
-	Mon, 10 Feb 2025 06:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5JfT5EdU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B59199FBA;
+	Mon, 10 Feb 2025 06:33:37 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2067.outbound.protection.outlook.com [40.107.236.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B66192B76;
-	Mon, 10 Feb 2025 06:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739169557; cv=fail; b=ZFyaqgTqHctU20tfCUH8dCncB8I/OBhjpdcTPbGor25xqtoXaWaKrwTdDm/BvmJgIU+lbjgu9brTzQlh8FOCuNJS1lfK47nl1/9Wo1TYj3vBDTOZeiEr6/pkTDDAwwx3jsli8QXTnNU0LyqrAF4vszqdG84aacYhe/pB0bUHpQI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739169557; c=relaxed/simple;
-	bh=F8zDbV/IKGK+pQ3FfP4mgHcyDm6ZgA0saoVSjkiurG4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NwcOfYdvp4FxYUw8T3RgDUPZK3ePypPsyDlgLoiWdUHOQ1xwz9s3XI8/JWJ25n4nuz21adWAu+VZooOTn/59k1S7Gb5t6exFa9xyDCJL7ykfIk6BDj9DbCAhCByN7SRTGTl7yMhxyq5w858RuiPwb/vcVGSqock8UGf8o2nM9qA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5JfT5EdU; arc=fail smtp.client-ip=40.107.236.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GVh4kkDXq7+AjVnDwLlIUznn5XHbwbUITvj6MDT/F+9eELOX8QiAPySybBdSaQR1RXHQVtNoJUB3fcEoLxeTf0Y2F3wO2a7C6TaDZQUHLR3pUqln+8hymxFBLOBVVF/dOAZVi68n1UD6QwPSyx1dS5zTXPnGVgI+fgRUdN1uTMpiOMfTGjf/Fq1SbcKVpPiHobPNww3Xt0qUqZHizlCijgPc/hDaSlsmL89AAwfmhK96BWsXW5MkI6ahOqED4CCGPflBn6XTICfd0AQktST0wGOe4OgDKpU9h30/8FPclmcZInhY51d2K5YTbGaLQWObtBA0kAU5Ge8/E0OXh3GrYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ARPUQ0qI0jyB3ykl6pWjnHNttD+6UqvBxNWuyZj5uq0=;
- b=pGm4OyZbHDbeNhPnxqhc1j7VFTY8IdgMCaHTHrbZhwrGdExfeE32K1McHJZC4e9hapCuoR5Vlt8hEtzlCL/6E2SQRKQyF1wDdibR6Xnxs5rEn1FvQIoUY84IMqejjleWEn6Y6dECazMXqwQRgQeyP7zXnK/9i6d+rIiQ8X9Yqc3heY3VszExkJvohO/heH4He8rJ/DHgKJWdqvwVggsYfQAR+VNAkqD5H9izYWRH2g/F192+XbMbyVaaUg4znBeKQHmS5/3GDs1oz5E+vsiMEpLuiFMXXHF33eYh05IuhYlwFz0jfkhTUSzwG4Y+b9QyEsBDpt6wBumwPv70XDpyhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=linux-foundation.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ARPUQ0qI0jyB3ykl6pWjnHNttD+6UqvBxNWuyZj5uq0=;
- b=5JfT5EdUpWflAG+A5cNWMb5GZXzZxtyktEhEzQqNCrdjcQNkmppnGXu9NDEy3dz+GBxRupO9lEhIjwSB1O+IJa30oRMuH21yvnjUITx8pSGXzGYArnXk2IFz6K5rYkpaVh6oGyYN52OuN4e7qAkMeo9Q9Z0OAF51jjVKit5VFpo=
-Received: from BN7PR06CA0053.namprd06.prod.outlook.com (2603:10b6:408:34::30)
- by PH7PR12MB7380.namprd12.prod.outlook.com (2603:10b6:510:20f::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.14; Mon, 10 Feb
- 2025 06:39:08 +0000
-Received: from BN1PEPF00004687.namprd05.prod.outlook.com
- (2603:10b6:408:34:cafe::60) by BN7PR06CA0053.outlook.office365.com
- (2603:10b6:408:34::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.31 via Frontend Transport; Mon,
- 10 Feb 2025 06:39:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN1PEPF00004687.mail.protection.outlook.com (10.167.243.132) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8445.10 via Frontend Transport; Mon, 10 Feb 2025 06:39:07 +0000
-Received: from kaveri.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 10 Feb
- 2025 00:39:02 -0600
-From: Shivank Garg <shivankg@amd.com>
-To: <akpm@linux-foundation.org>, <willy@infradead.org>, <pbonzini@redhat.com>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>, <chao.gao@intel.com>, <seanjc@google.com>,
-	<ackerleytng@google.com>, <david@redhat.com>, <vbabka@suse.cz>,
-	<bharata@amd.com>, <nikunj@amd.com>, <michael.day@amd.com>,
-	<Neeraj.Upadhyay@amd.com>, <thomas.lendacky@amd.com>, <michael.roth@amd.com>,
-	<shivankg@amd.com>
-Subject: [RFC PATCH v4 3/3] KVM: guest_memfd: Enforce NUMA mempolicy using shared policy
-Date: Mon, 10 Feb 2025 06:32:29 +0000
-Message-ID: <20250210063227.41125-4-shivankg@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250210063227.41125-1-shivankg@amd.com>
-References: <20250210063227.41125-1-shivankg@amd.com>
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943D624339A;
+	Mon, 10 Feb 2025 06:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739169216; cv=none; b=GQPWbRKbyDfTXSiJE24CAaUBqIv3Cp4IKABbuBwI2BTlQiviivSIy1Dcxzo6JJxf0hnpNXnshGwGOG22+1QqOXdWDMkU30eJxf93hmONNh85F490Ai3BxqNPTnXswgXdpIpVrz10JTI6c7SMUAqi8+1L33ELXtfgxTHpzYRUMaI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739169216; c=relaxed/simple;
+	bh=at0Q2hWKA0LY8IG5O59bOvOTzVv3ODdbsKuhDwctDa4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=SCR/SjxjVwtqdnbHYTM8qui+0zNm1CSh2/y5JUBydP/ikuWL2y+iqrESPCgSsqC4vk+Gwx/zHN4FI7vlqsYyLPS+oaPCNWuqWeLlAjxoxZhu3UJy8RFnQ3m1Co6rkrluTESGL251S4YbX1lttNuuO9ljJan5JKP3IGYMpWr70jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8BxuuC7nalnxP5wAA--.24467S3;
+	Mon, 10 Feb 2025 14:33:31 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMAxj8W4naln98gJAA--.38442S3;
+	Mon, 10 Feb 2025 14:33:30 +0800 (CST)
+Subject: Re: [PATCH 1/3] LoongArch: KVM: Fix typo issue about GCFG feature
+ detection
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20250207032634.2333300-1-maobibo@loongson.cn>
+ <20250207032634.2333300-2-maobibo@loongson.cn>
+ <CAAhV-H7p9G8At3Pz_o31u_Zpho2gfbe6WOxF6_WpebVfcfgaKQ@mail.gmail.com>
+ <30caead6-5b12-638c-677d-dc1111aea43c@loongson.cn>
+ <CAAhV-H43Y4-oN9SVDWBhQ7nunYS08r5at+hVbtsdbWmKGDBMZw@mail.gmail.com>
+From: bibo mao <maobibo@loongson.cn>
+Message-ID: <ded29573-45a7-3d27-fe38-a27da9576180@loongson.cn>
+Date: Mon, 10 Feb 2025 14:32:56 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAAhV-H43Y4-oN9SVDWBhQ7nunYS08r5at+hVbtsdbWmKGDBMZw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004687:EE_|PH7PR12MB7380:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6710d119-026d-4c70-b765-08dd499d9eb2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|82310400026|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ECpuUoMmvJklYHEFB0ej3vv5Al5XD0IvhGif5KaApOmYbts4K05nYqCil99a?=
- =?us-ascii?Q?tIuUbo2QFNwmKaTI2ycTg3IQbIHLML4XN1X5rhGC0T54pAdDMLoE/+Soc/eF?=
- =?us-ascii?Q?F3Zrzj+LdSZWAHSnRVWeS7EWIe0nSgyJSyW1bQ/DnfWwI2AraXRjSaZVh1Fm?=
- =?us-ascii?Q?I+5CN5lBltyezheuCX3hR/4U93EKKBDHsLH1ncoP3PSZC+7B9b0l1v/Cyaa5?=
- =?us-ascii?Q?DdyLhJZubfd9GkWkDyBIQ7sOShBzkGYBjbynUlQ8GaNXtdQrRjw8k0lDXWu9?=
- =?us-ascii?Q?ybnXsC0pepT8QBnuHepCgCrSsX0vfQS8NxKFn7SUOU7fYVGX2GD/q4soMKIj?=
- =?us-ascii?Q?uRgB+fUxqb9bZwnKuGE9KTkkieNUPItzuzm4PY4Cvz1f96f2huUdifHAQFwS?=
- =?us-ascii?Q?1tyN1Kdn31T5kBkAgVysTAcq3nwS5z/CLlFqlFKJdfxzSHqJ36o/FF7bkYEZ?=
- =?us-ascii?Q?rn+9v4YnZLfjvkiYyb/noLERB2NDQkGmDHOl3vLEPm1L+Hv5YdgtEC5atxMs?=
- =?us-ascii?Q?RPR+zc6+JS34sgziJ6EfzjNuG1mufu22W5ydLhtDr56Fg/gDlZqINN4xdPCW?=
- =?us-ascii?Q?07v98vBFeona7Q8vxv91/RdMyXwKD+M3bMeFmDRBmatCpUXGmO/X/DAd0mml?=
- =?us-ascii?Q?lkzA0JFUD+VUnADpSC99bh52bsnJa6visFDhgBuLI/n0n2u6G+9vIK7nkKov?=
- =?us-ascii?Q?5Np4gqGTZO8DP13nmHWa6I2tLNpplZ+LnU06lwYzbZmu9MAXoI9jaXkKV6MF?=
- =?us-ascii?Q?LGi6sht+5PsaCXk/VmuJgPTn7jD+vWVZ8UlBlHqQCCmcTqg+mBCtt7c4cBYv?=
- =?us-ascii?Q?hyV8bj59/qx8eTgrH4/43ZER7fd15Yb81Hhl+I7cQOV2olRMiWRcgRJarMbP?=
- =?us-ascii?Q?/naHxsGdGeLo3kJYnZNt54r2JfL4eAm2GtONBtx2mRYENgKRiukh0Ht48Qlf?=
- =?us-ascii?Q?OKhmQ1oC5aqaNb8qS9s/tt64hrl1R2x/9bBKPNO6iux7ZULMYLf9VqNfWMDU?=
- =?us-ascii?Q?2FXwT3KYIpIqDibH/bq2nwEx33Mz8PZt1DIYzGZdbJnvzwY61uyPJ/XProaX?=
- =?us-ascii?Q?Td/LBbGjEVAdOCiAGMya4j/ylmR6SSXKYleUY2nmum//Ux4en+PswgxDSEoR?=
- =?us-ascii?Q?i1AmB7HR6N1P9K0J408B3XlXgNv4zhzKNtMvaAt5m93ssPmh+eVy9qukB74y?=
- =?us-ascii?Q?8HmxkH1QmbHPNNOM9I0k5wMgGGGWLV6v/MvebI56hB4r8Mv8kyBDuMWZkIlB?=
- =?us-ascii?Q?bC/Ece9Mby65oRXVTxvNPMbztDFFWnlUMu3xYlnicDiZ0/Cym08ML7/q8mek?=
- =?us-ascii?Q?lTOxskIOzSqNWtDN4U6UyDEg5/NQ1uhNUjtEPP7rTrHcuC6iKwfvA8tdWZM9?=
- =?us-ascii?Q?4uzPS848UdSuiz4J+L6DMHDU151b9G5wwYMU1vciH29CHUqI7d/kM8tUI6f2?=
- =?us-ascii?Q?EWIHgb77m3zhBMdAskh/J7CYq0Fcm8hXzlQ6zN6xwR/WC0TZnBR2c9dzA/eS?=
- =?us-ascii?Q?pBFvPa7ei0wEOS0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2025 06:39:07.7059
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6710d119-026d-4c70-b765-08dd499d9eb2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004687.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7380
+X-CM-TRANSID:qMiowMAxj8W4naln98gJAA--.38442S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Jw4xXF4DKFWrXrW7CrWDJrc_yoWxuw15pr
+	yYka43Jr40qr4fW3sFgwnYqw12qryxJ34q9F1UJryrtr1jga1IkFn0qa1FyrySq3Z3JF1U
+	trn29w13ZFZ8A3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv
+	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw
+	1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j8
+	yCJUUUUU=
 
-Previously, guest-memfd allocations were following local NUMA node id
-in absence of process mempolicy, resulting in random memory allocation.
-Moreover, mbind() couldn't be used since memory wasn't mapped to userspace
-in VMM.
 
-Enable NUMA policy support by implementing vm_ops for guest-memfd mmap
-operation. This allows VMM to map the memory and use mbind() to set the
-desired NUMA policy. The policy is then retrieved via
-mpol_shared_policy_lookup() and passed to filemap_grab_folio_mpol() to
-ensure that allocations follow the specified memory policy.
 
-This enables VMM to control guest memory NUMA placement by calling mbind()
-on the mapped memory regions, providing fine-grained control over guest
-memory allocation across NUMA nodes.
+On 2025/2/10 上午11:58, Huacai Chen wrote:
+> On Mon, Feb 10, 2025 at 9:42 AM bibo mao <maobibo@loongson.cn> wrote:
+>>
+>>
+>>
+>> On 2025/2/9 下午5:38, Huacai Chen wrote:
+>>> Hi, Bibo,
+>>>
+>>> On Fri, Feb 7, 2025 at 11:26 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>
+>>>> This is typo issue about GCFG feature macro, comments is added for
+>>>> these macro and typo issue is fixed here.
+>>>>
+>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>>> ---
+>>>>    arch/loongarch/include/asm/loongarch.h | 26 ++++++++++++++++++++++++++
+>>>>    arch/loongarch/kvm/main.c              |  4 ++--
+>>>>    2 files changed, 28 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
+>>>> index 52651aa0e583..1a65b5a7d54a 100644
+>>>> --- a/arch/loongarch/include/asm/loongarch.h
+>>>> +++ b/arch/loongarch/include/asm/loongarch.h
+>>>> @@ -502,49 +502,75 @@
+>>>>    #define LOONGARCH_CSR_GCFG             0x51    /* Guest config */
+>>>>    #define  CSR_GCFG_GPERF_SHIFT          24
+>>>>    #define  CSR_GCFG_GPERF_WIDTH          3
+>>>> +/* Number PMU register started from PM0 passthrough to VM */
+>>>>    #define  CSR_GCFG_GPERF                        (_ULCAST_(0x7) << CSR_GCFG_GPERF_SHIFT)
+>>>> +#define  CSR_GCFG_GPERFP_SHIFT         23
+>>>> +/* Read-only bit: show PMU passthrough supported or not */
+>>>> +#define  CSR_GCFG_GPERFP               (_ULCAST_(0x1) << CSR_GCFG_GPERFP_SHIFT)
+>>>>    #define  CSR_GCFG_GCI_SHIFT            20
+>>>>    #define  CSR_GCFG_GCI_WIDTH            2
+>>>>    #define  CSR_GCFG_GCI                  (_ULCAST_(0x3) << CSR_GCFG_GCI_SHIFT)
+>>>> +/* All cacheop instructions will trap to host */
+>>>>    #define  CSR_GCFG_GCI_ALL              (_ULCAST_(0x0) << CSR_GCFG_GCI_SHIFT)
+>>>> +/* Cacheop instruction except hit invalidate will trap to host */
+>>>>    #define  CSR_GCFG_GCI_HIT              (_ULCAST_(0x1) << CSR_GCFG_GCI_SHIFT)
+>>>> +/* Cacheop instruction except hit and index invalidate will trap to host */
+>>>>    #define  CSR_GCFG_GCI_SECURE           (_ULCAST_(0x2) << CSR_GCFG_GCI_SHIFT)
+>>>>    #define  CSR_GCFG_GCIP_SHIFT           16
+>>>>    #define  CSR_GCFG_GCIP                 (_ULCAST_(0xf) << CSR_GCFG_GCIP_SHIFT)
+>>>> +/* Read-only bit: show feature CSR_GCFG_GCI_ALL supported or not */
+>>>>    #define  CSR_GCFG_GCIP_ALL             (_ULCAST_(0x1) << CSR_GCFG_GCIP_SHIFT)
+>>>> +/* Read-only bit: show feature CSR_GCFG_GCI_HIT supported or not */
+>>>>    #define  CSR_GCFG_GCIP_HIT             (_ULCAST_(0x1) << (CSR_GCFG_GCIP_SHIFT + 1))
+>>>> +/* Read-only bit: show feature CSR_GCFG_GCI_SECURE supported or not */
+>>>>    #define  CSR_GCFG_GCIP_SECURE          (_ULCAST_(0x1) << (CSR_GCFG_GCIP_SHIFT + 2))
+>>>>    #define  CSR_GCFG_TORU_SHIFT           15
+>>>> +/* Operation with CSR register unimplemented will trap to host */
+>>>>    #define  CSR_GCFG_TORU                 (_ULCAST_(0x1) << CSR_GCFG_TORU_SHIFT)
+>>>>    #define  CSR_GCFG_TORUP_SHIFT          14
+>>>> +/* Read-only bit: show feature CSR_GCFG_TORU supported or not */
+>>>>    #define  CSR_GCFG_TORUP                        (_ULCAST_(0x1) << CSR_GCFG_TORUP_SHIFT)
+>>>>    #define  CSR_GCFG_TOP_SHIFT            13
+>>>> +/* Modificattion with CRMD.PLV will trap to host */
+>>>>    #define  CSR_GCFG_TOP                  (_ULCAST_(0x1) << CSR_GCFG_TOP_SHIFT)
+>>>>    #define  CSR_GCFG_TOPP_SHIFT           12
+>>>> +/* Read-only bit: show feature CSR_GCFG_TOP supported or not */
+>>>>    #define  CSR_GCFG_TOPP                 (_ULCAST_(0x1) << CSR_GCFG_TOPP_SHIFT)
+>>>>    #define  CSR_GCFG_TOE_SHIFT            11
+>>>> +/* ertn instruction will trap to host */
+>>>>    #define  CSR_GCFG_TOE                  (_ULCAST_(0x1) << CSR_GCFG_TOE_SHIFT)
+>>>>    #define  CSR_GCFG_TOEP_SHIFT           10
+>>>> +/* Read-only bit: show feature CSR_GCFG_TOE supported or not */
+>>>>    #define  CSR_GCFG_TOEP                 (_ULCAST_(0x1) << CSR_GCFG_TOEP_SHIFT)
+>>>>    #define  CSR_GCFG_TIT_SHIFT            9
+>>>> +/* Timer instruction such as rdtime/TCFG/TVAL will trap to host */
+>>>>    #define  CSR_GCFG_TIT                  (_ULCAST_(0x1) << CSR_GCFG_TIT_SHIFT)
+>>>>    #define  CSR_GCFG_TITP_SHIFT           8
+>>>> +/* Read-only bit: show feature CSR_GCFG_TIT supported or not */
+>>>>    #define  CSR_GCFG_TITP                 (_ULCAST_(0x1) << CSR_GCFG_TITP_SHIFT)
+>>>>    #define  CSR_GCFG_SIT_SHIFT            7
+>>>> +/* All privilege instruction will trap to host */
+>>>>    #define  CSR_GCFG_SIT                  (_ULCAST_(0x1) << CSR_GCFG_SIT_SHIFT)
+>>>>    #define  CSR_GCFG_SITP_SHIFT           6
+>>>> +/* Read-only bit: show feature CSR_GCFG_SIT supported or not */
+>>>>    #define  CSR_GCFG_SITP                 (_ULCAST_(0x1) << CSR_GCFG_SITP_SHIFT)
+>>>>    #define  CSR_GCFG_MATC_SHITF           4
+>>>>    #define  CSR_GCFG_MATC_WIDTH           2
+>>>>    #define  CSR_GCFG_MATC_MASK            (_ULCAST_(0x3) << CSR_GCFG_MATC_SHITF)
+>>>> +/* Cache attribute comes from GVA->GPA mapping */
+>>>>    #define  CSR_GCFG_MATC_GUEST           (_ULCAST_(0x0) << CSR_GCFG_MATC_SHITF)
+>>>> +/* Cache attribute comes from GPA->HPA mapping */
+>>>>    #define  CSR_GCFG_MATC_ROOT            (_ULCAST_(0x1) << CSR_GCFG_MATC_SHITF)
+>>>> +/* Cache attribute comes from weaker one of GVA->GPA and GPA->HPA mapping */
+>>>>    #define  CSR_GCFG_MATC_NEST            (_ULCAST_(0x2) << CSR_GCFG_MATC_SHITF)
+>>>>    #define  CSR_GCFG_MATP_NEST_SHIFT      2
+>>>> +/* Read-only bit: show feature CSR_GCFG_MATC_NEST supported or not */
+>>>>    #define  CSR_GCFG_MATP_NEST            (_ULCAST_(0x1) << CSR_GCFG_MATP_NEST_SHIFT)
+>>>>    #define  CSR_GCFG_MATP_ROOT_SHIFT      1
+>>>> +/* Read-only bit: show feature CSR_GCFG_MATC_ROOT supported or not */
+>>>>    #define  CSR_GCFG_MATP_ROOT            (_ULCAST_(0x1) << CSR_GCFG_MATP_ROOT_SHIFT)
+>>>>    #define  CSR_GCFG_MATP_GUEST_SHIFT     0
+>>>> +/* Read-only bit: show feature CSR_GCFG_MATC_GUEST suppoorted or not */
+>>>>    #define  CSR_GCFG_MATP_GUEST           (_ULCAST_(0x1) << CSR_GCFG_MATP_GUEST_SHIFT)
+>>> Bugfix is the majority here, so it is better to remove the comments,
+>>> make this patch easier to be backported to stable branches.
+>> How about split the patch into two for better backporting? With comments
+>> it is convinient to people to understand and provide LoongArch KVM
+>> patches in future, after all it cannot depends on the few guys inside.
+> I don't suggest splitting, just removing it is better (developers
+> still need to read the user manual even if there are such comments).
+> But if you insist, then keep it as is (keep this version).
+Ok, I will remove comments . Put it in header file seems a temporary 
+method :(
 
-Suggested-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Shivank Garg <shivankg@amd.com>
----
- virt/kvm/guest_memfd.c | 84 +++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 78 insertions(+), 6 deletions(-)
+Regards
+Bibo Mao
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index b2aa6bf24d3a..e1ea8cb292fa 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -2,6 +2,7 @@
- #include <linux/backing-dev.h>
- #include <linux/falloc.h>
- #include <linux/kvm_host.h>
-+#include <linux/mempolicy.h>
- #include <linux/pagemap.h>
- #include <linux/anon_inodes.h>
- 
-@@ -11,8 +12,13 @@ struct kvm_gmem {
- 	struct kvm *kvm;
- 	struct xarray bindings;
- 	struct list_head entry;
-+	struct shared_policy policy;
- };
- 
-+static struct mempolicy *kvm_gmem_get_pgoff_policy(struct kvm_gmem *gmem,
-+						   pgoff_t index,
-+						   pgoff_t *ilx);
-+
- /**
-  * folio_file_pfn - like folio_file_page, but return a pfn.
-  * @folio: The folio which contains this index.
-@@ -96,10 +102,20 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
-  * Ignore accessed, referenced, and dirty flags.  The memory is
-  * unevictable and there is no storage to write back to.
-  */
--static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
-+static struct folio *kvm_gmem_get_folio(struct file *file, pgoff_t index)
- {
- 	/* TODO: Support huge pages. */
--	return filemap_grab_folio(inode->i_mapping, index);
-+	struct folio *folio = NULL;
-+	struct inode *inode = file_inode(file);
-+	struct kvm_gmem *gmem = file->private_data;
-+	struct mempolicy *policy;
-+	pgoff_t ilx;
-+
-+	policy = kvm_gmem_get_pgoff_policy(gmem, index, &ilx);
-+	folio =  filemap_grab_folio_mpol(inode->i_mapping, index, policy);
-+	mpol_cond_put(policy);
-+
-+	return folio;
- }
- 
- static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
-@@ -177,8 +193,9 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 	return 0;
- }
- 
--static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
-+static long kvm_gmem_allocate(struct file *file, loff_t offset, loff_t len)
- {
-+	struct inode *inode = file_inode(file);
- 	struct address_space *mapping = inode->i_mapping;
- 	pgoff_t start, index, end;
- 	int r;
-@@ -201,7 +218,7 @@ static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
- 			break;
- 		}
- 
--		folio = kvm_gmem_get_folio(inode, index);
-+		folio = kvm_gmem_get_folio(file, index);
- 		if (IS_ERR(folio)) {
- 			r = PTR_ERR(folio);
- 			break;
-@@ -241,7 +258,7 @@ static long kvm_gmem_fallocate(struct file *file, int mode, loff_t offset,
- 	if (mode & FALLOC_FL_PUNCH_HOLE)
- 		ret = kvm_gmem_punch_hole(file_inode(file), offset, len);
- 	else
--		ret = kvm_gmem_allocate(file_inode(file), offset, len);
-+		ret = kvm_gmem_allocate(file, offset, len);
- 
- 	if (!ret)
- 		file_modified(file);
-@@ -290,6 +307,7 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	mutex_unlock(&kvm->slots_lock);
- 
- 	xa_destroy(&gmem->bindings);
-+	mpol_free_shared_policy(&gmem->policy);
- 	kfree(gmem);
- 
- 	kvm_put_kvm(kvm);
-@@ -311,8 +329,61 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
- {
- 	return gfn - slot->base_gfn + slot->gmem.pgoff;
- }
-+#ifdef CONFIG_NUMA
-+static int kvm_gmem_set_policy(struct vm_area_struct *vma, struct mempolicy *new)
-+{
-+	struct file *file = vma->vm_file;
-+	struct kvm_gmem *gmem = file->private_data;
-+
-+	return mpol_set_shared_policy(&gmem->policy, vma, new);
-+}
-+
-+static struct mempolicy *kvm_gmem_get_policy(struct vm_area_struct *vma,
-+		unsigned long addr, pgoff_t *pgoff)
-+{
-+	struct file *file = vma->vm_file;
-+	struct kvm_gmem *gmem = file->private_data;
-+
-+	*pgoff = vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT);
-+	return mpol_shared_policy_lookup(&gmem->policy, *pgoff);
-+}
-+
-+static struct mempolicy *kvm_gmem_get_pgoff_policy(struct kvm_gmem *gmem,
-+						   pgoff_t index,
-+						   pgoff_t *ilx)
-+{
-+	struct mempolicy *mpol;
-+
-+	*ilx = NO_INTERLEAVE_INDEX;
-+	mpol = mpol_shared_policy_lookup(&gmem->policy, index);
-+	return mpol ? mpol : get_task_policy(current);
-+}
-+
-+static const struct vm_operations_struct kvm_gmem_vm_ops = {
-+	.get_policy	= kvm_gmem_get_policy,
-+	.set_policy	= kvm_gmem_set_policy,
-+};
-+
-+static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-+{
-+	file_accessed(file);
-+	vma->vm_ops = &kvm_gmem_vm_ops;
-+	return 0;
-+}
-+#else
-+static struct mempolicy *kvm_gmem_get_pgoff_policy(struct kvm_gmem *gmem,
-+						   pgoff_t index,
-+						   pgoff_t *ilx)
-+{
-+	*ilx = 0;
-+	return NULL;
-+}
-+#endif /* CONFIG_NUMA */
- 
- static struct file_operations kvm_gmem_fops = {
-+#ifdef CONFIG_NUMA
-+	.mmap		= kvm_gmem_mmap,
-+#endif
- 	.open		= generic_file_open,
- 	.release	= kvm_gmem_release,
- 	.fallocate	= kvm_gmem_fallocate,
-@@ -445,6 +516,7 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 	kvm_get_kvm(kvm);
- 	gmem->kvm = kvm;
- 	xa_init(&gmem->bindings);
-+	mpol_shared_policy_init(&gmem->policy, NULL);
- 	list_add(&gmem->entry, &inode->i_mapping->i_private_list);
- 
- 	fd_install(fd, file);
-@@ -585,7 +657,7 @@ static struct folio *__kvm_gmem_get_pfn(struct file *file,
- 		return ERR_PTR(-EIO);
- 	}
- 
--	folio = kvm_gmem_get_folio(file_inode(file), index);
-+	folio = kvm_gmem_get_folio(file, index);
- 	if (IS_ERR(folio))
- 		return folio;
- 
--- 
-2.34.1
+> 
+> 
+> 
+> Huacai
+>>
+>> Regards
+>> Bibo Mao
+>>>
+>>> Huacai
+>>>
+>>>>
+>>>>    #define LOONGARCH_CSR_GINTC            0x52    /* Guest interrupt control */
+>>>> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+>>>> index bf9268bf26d5..f6d3242b9234 100644
+>>>> --- a/arch/loongarch/kvm/main.c
+>>>> +++ b/arch/loongarch/kvm/main.c
+>>>> @@ -303,9 +303,9 @@ int kvm_arch_enable_virtualization_cpu(void)
+>>>>            * TOE=0:       Trap on Exception.
+>>>>            * TIT=0:       Trap on Timer.
+>>>>            */
+>>>> -       if (env & CSR_GCFG_GCIP_ALL)
+>>>> +       if (env & CSR_GCFG_GCIP_SECURE)
+>>>>                   gcfg |= CSR_GCFG_GCI_SECURE;
+>>>> -       if (env & CSR_GCFG_MATC_ROOT)
+>>>> +       if (env & CSR_GCFG_MATP_ROOT)
+>>>>                   gcfg |= CSR_GCFG_MATC_ROOT;
+>>>>
+>>>>           write_csr_gcfg(gcfg);
+>>>> --
+>>>> 2.39.3
+>>>>
+>>
+>>
 
 
