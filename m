@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-37852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FCA6A30B6D
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 13:14:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED802A30B7F
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 13:15:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C2527A4437
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 12:13:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21B903ABA2E
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 12:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8410F221DBC;
-	Tue, 11 Feb 2025 12:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B1B2512C5;
+	Tue, 11 Feb 2025 12:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XvyQYwLD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hNPIHM5x"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81EE22FF2D
-	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 12:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29DE224CEFD
+	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 12:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739275905; cv=none; b=D5fWzXYpVLb7rdKoXcKfsuh60PAibfxh3lIlcn83d3+bLihPu/Anb1GJV96XST8OQTiRqr6vADuFkZip2dgMfrSDbEjyChYGKUDDV4Br92xBInPPp2Va+wFVb70lOr2ZIkHuxFBjH0pnyCvxWXjaR0Fiqo8+LTz3ekKxhMWlXcg=
+	t=1739275908; cv=none; b=Nn5PPJYrYUi1iIRDL12uKsYTp+BiPaXePHgYxlVQQT5mx4uhPdJaUDiQgBOE83GgpP66jYuy/uV0xQo2uF8qI3vBxfxdDtAOjiW3mfZEu0n26jSZtoIbo5NwmN6yp0ta+XNumP58OsNOsQBX3bd7KMOLUI5LP9CSTYINUuK3evw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739275905; c=relaxed/simple;
-	bh=k+3OFnLM2NMDoQpYe/i6ltXhsVyBeC0rDOk8mBxA1Zg=;
+	s=arc-20240116; t=1739275908; c=relaxed/simple;
+	bh=ED7U0BdTR5CtvG0NjK1D1AJXYzcMplXlqTJIxPfY44c=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ctjnTArSGzSoRj6BASPZDYGJtKprxLPoFxQmGy2mT/c+7ZoQIr44aoi7cAuL2Q2QB526E0wU/8StCTcj5CLxHs4pcdlG4Y6hci5psauB/USfQ3iNMU91saFiGaeOMEWlifeO3k6ajWjEvUDWOBezWkNxxaEq073aXWSSyUu1q+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XvyQYwLD; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=SYdCrHbzEm3xKd603J0TLyD2cz0oKWT43nYG5naHloZDcLq8qNr8Vw8Dnfy/OiN+csNj9611udyO98V14CTJZ7tY0K29Q1j/7SaEhXTtHAQaru5a5kVb8vxapYoEOg6SVoy1EfNCwRg6qjKNwK+PHaWL1+uATRWgt2wbW+C3IhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hNPIHM5x; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-38dd533dae6so1033227f8f.2
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 04:11:43 -0800 (PST)
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4395677bb0fso919975e9.0
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 04:11:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739275902; x=1739880702; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739275904; x=1739880704; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KX7W4swHrFK90elybvizfO8dqWilJCD1C4Wf1fKXSTM=;
-        b=XvyQYwLDJsIXlkD9w/7HUfDfZ5Tnc3pCitKZl1Fl4aYWQ3B7NuxAhP0eiLnkDjM2ml
-         5tHHxxyTXP/3F0Bn7+reWFyRtPGKtVLAao3Nv9AYX6HpEzKNXea22kkaCU6QXc08Kc5z
-         WHNLvSBUHFtVkZL3TE4gEWPkWAaQgfMb6GXnHLbMqeSK132QyN5AEw+OGSIrsEgZr5uk
-         l3Yzde+udHeJSzVM5Yg6xunGsjkX+9LwdcRzaw/Kxr/5NDdHGzflwJwPvo2V5d6smLaU
-         ogsAg5NgYVrTNaXf9zgkqqKRUgB11BJOZY9EPhrHRhv81X4Qx9qFdiqn6AGoLIk7lFBY
-         EieA==
+        bh=KGlWsAVkyKnhySbr83igZIXZOroWdqgSNXlU94DUNkk=;
+        b=hNPIHM5xxYo829sOJVmbLjNol54hlJEo25mpmBJI4SVIH+jMOZk2eliTR3XBGrUvfv
+         jKyOxqSnqFHyi1V98A0f8ZDASU6Lsv/Nj3QTLwpJp97dq1sb3ev4K/IFBiIXI9TVyHPz
+         bW6/HbyESVFhhTZJdsNxjYlRCTzLBJOmbzWNfxx6bt3gmjbzlF/IV13bHEFGPk+IgUML
+         CJcgK9ub4gUqeFkFnwA8b0L+Y7Z02sAMu70ViWzDQHasPbubPJsPMxbFn2n9YfFS5RwT
+         WEvMZ85wgsQS8YZOsEkVofMuXoWRFdaIwGMU+UEWEx7QgQTTM3HgJUDIcx4Ge4DW89fM
+         zaPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739275902; x=1739880702;
+        d=1e100.net; s=20230601; t=1739275904; x=1739880704;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KX7W4swHrFK90elybvizfO8dqWilJCD1C4Wf1fKXSTM=;
-        b=uu+FQ90G15tiBy9KS9Yz+jzm492ncCXN7gpKUIgeRiChMRQ32kqR8qe6zf22lHm7IG
-         NE/DN60Ti6BljTX16qk3OeeFWuo1h1IwbptZ4nStVKVXdYOJ0dcq3j072LtpYfKOcgOo
-         pezyDAhgacAXg9dtaOSnPbrOU8FaIy1+tdVF6xnFFehdJevGH7gYawj4NcGzuzuhFU1y
-         olokMfJJDr+RX3ev+T5cpxOgzo2n0JtPWtH9ypP5YUzMzG/YnH1Xe9GqoF+9SHNbTEhR
-         l91PfKc8y6VtbHp/sv8dnO5Yq1yMSjUMMBpK3yaeCLOsR9yjVIJkBUJwr6dZkNwfXJ9P
-         ouiw==
-X-Gm-Message-State: AOJu0YyW4zvnJ78++Bj08E8brAEARv15t+aNyzkcY/iD+YwJKoN1m+4g
-	X4gYyI5N5toU3eX5ak0ms8Qv14Xzp0/8cFqUmLC3QjT9TF1kY5ESIv0HZPataJ3PrMylS3EBg4M
-	En2fiafE3ACYSK3bOPPVGinyzr8czEqCuzojknMa8krWI1OHJmutYehu0MyAcg7seACjTfc/rg9
-	ayqkguF3y6CA4XTryLtZzuDXA=
-X-Google-Smtp-Source: AGHT+IHXKJom7Ftu5yovrPwrI10XpRYiY2qBWkBSoqtXJLa6Rrj1843rKF5OjouXY03AyaMgB0W+/vXsEg==
-X-Received: from wmqe4.prod.google.com ([2002:a05:600c:4e44:b0:439:3284:878b])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1887:b0:38d:e430:8ec7
- with SMTP id ffacd0b85a97d-38de4309088mr3236903f8f.15.1739275902164; Tue, 11
- Feb 2025 04:11:42 -0800 (PST)
-Date: Tue, 11 Feb 2025 12:11:22 +0000
+        bh=KGlWsAVkyKnhySbr83igZIXZOroWdqgSNXlU94DUNkk=;
+        b=vMaKkc+FyeLMORxF4+hDL7IQezB0JZdqIknovSJotcOhKwh0E1nsGrRWoI3uufrvzG
+         60iNQWQTeefV3peGh0d8I91k8WEGqJwQ6s8NndEiECV06Tpxdn8sp7Zt5NPcPJSinfxr
+         aZdJ3JVQ227kzc0DxpY9aM2KECm/svTWruJ0ZIQ2Trmm6i+dn8bK/rOqMCr/mgDZkmsv
+         SOT+LR/9iPbv4wTBm0cnKMRA1vV0fCfuIYMbPg6zuwQiYlNso0o5aayl7sam0/VyI28b
+         GDQnNrau4zEknaHzMEjTvFF1byoliV4mHTaPrYhqpn6AVI+yhflmt6wHV7lib1fS99vU
+         l1jA==
+X-Gm-Message-State: AOJu0YwEw0tVBZdwZAxAeVbL2qFwRjChF8UOG0KdI0+G5nZUd3mxMfAT
+	d2wS0c8Y7UnJnvVNolllZ3dy3ERLEdTJrvahhB2eiWRwBsLps0ZXkaNCNSchFhE/y68QEJA3zqF
+	ZKRbeUlsWnDIpKtQ/j7+vGyUqzPyo2k9FMowjlDdgQAEfE/q75sW0P8gHQWZNJaAdRmPKwz2anP
+	TfeOgYzfTLNonxEmoaKPBYP0w=
+X-Google-Smtp-Source: AGHT+IECBWxW5BmjsYJdVFsglQzvNG0pX6h42Ln2RnS0ynPClK45T5nCrnmXnpL5zjCvLKTXEj1dNopf1g==
+X-Received: from wmqd4.prod.google.com ([2002:a05:600c:34c4:b0:439:4c13:57e5])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:354c:b0:439:4376:cc0
+ with SMTP id 5b1f17b1804b1-43943761119mr58255965e9.25.1739275904320; Tue, 11
+ Feb 2025 04:11:44 -0800 (PST)
+Date: Tue, 11 Feb 2025 12:11:23 +0000
 In-Reply-To: <20250211121128.703390-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250211121128.703390-1-tabba@google.com>
 X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250211121128.703390-7-tabba@google.com>
-Subject: [PATCH v3 06/11] KVM: x86: Mark KVM_X86_SW_PROTECTED_VM as supporting
- guest_memfd shared memory
+Message-ID: <20250211121128.703390-8-tabba@google.com>
+Subject: [PATCH v3 07/11] KVM: arm64: Refactor user_mem_abort() calculation of force_pte
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
 Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
@@ -100,55 +99,56 @@ Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
 	jthoughton@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The KVM_X86_SW_PROTECTED_VM type is meant for experimentation and
-does not have any underlying support for protected guests. This
-makes it a good candidate for testing mapping shared memory.
-Therefore, when the kconfig option is enabled, mark
-KVM_X86_SW_PROTECTED_VM as supporting shared memory.
-
-This means that this memory is considered by guest_memfd to be
-shared with the host, with the possibility of in-place conversion
-between shared and private. This allows the host to map and fault
-in guest_memfd memory belonging to this VM type.
+To simplify the code and to make the assumptions clearer,
+refactor user_mem_abort() by immediately setting force_pte to
+true if the conditions are met. Also, add a check to ensure that
+the assumption that logging_active is guaranteed to never be true
+for VM_PFNMAP memslot is true.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 5 +++++
- arch/x86/kvm/Kconfig            | 3 ++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/mmu.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index b15cde0a9b5c..1fb6cacbbeef 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2244,8 +2244,13 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
- 
- #ifdef CONFIG_KVM_PRIVATE_MEM
- #define kvm_arch_has_private_mem(kvm) ((kvm)->arch.has_private_mem)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1f55b0c7b11d..b6c0acb2311c 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1460,7 +1460,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  bool fault_is_perm)
+ {
+ 	int ret = 0;
+-	bool write_fault, writable, force_pte = false;
++	bool write_fault, writable;
+ 	bool exec_fault, mte_allowed;
+ 	bool device = false, vfio_allow_any_uc = false;
+ 	unsigned long mmu_seq;
+@@ -1472,6 +1472,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	gfn_t gfn;
+ 	kvm_pfn_t pfn;
+ 	bool logging_active = memslot_is_logging(memslot);
++	bool force_pte = logging_active || is_protected_kvm_enabled();
+ 	long vma_pagesize, fault_granule;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+ 	struct kvm_pgtable *pgt;
+@@ -1525,12 +1526,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * logging_active is guaranteed to never be true for VM_PFNMAP
+ 	 * memslots.
+ 	 */
+-	if (logging_active || is_protected_kvm_enabled()) {
+-		force_pte = true;
++	if (WARN_ON_ONCE(logging_active && (vma->vm_flags & VM_PFNMAP)))
++		return -EFAULT;
 +
-+#define kvm_arch_gmem_supports_shared_mem(kvm)         \
-+	(IS_ENABLED(CONFIG_KVM_GMEM_SHARED_MEM) &&      \
-+	 ((kvm)->arch.vm_type == KVM_X86_SW_PROTECTED_VM))
- #else
- #define kvm_arch_has_private_mem(kvm) false
-+#define kvm_arch_gmem_supports_shared_mem(kvm) false
- #endif
++	if (force_pte)
+ 		vma_shift = PAGE_SHIFT;
+-	} else {
++	else
+ 		vma_shift = get_vma_page_shift(vma, hva);
+-	}
  
- #define kvm_arch_has_readonly_mem(kvm) (!(kvm)->arch.has_protected_state)
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index ea2c4f21c1ca..22d1bcdaad58 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -45,7 +45,8 @@ config KVM_X86
- 	select HAVE_KVM_PM_NOTIFIER if PM
- 	select KVM_GENERIC_HARDWARE_ENABLING
- 	select KVM_GENERIC_PRE_FAULT_MEMORY
--	select KVM_GENERIC_PRIVATE_MEM if KVM_SW_PROTECTED_VM
-+	select KVM_PRIVATE_MEM if KVM_SW_PROTECTED_VM
-+	select KVM_GMEM_SHARED_MEM if KVM_SW_PROTECTED_VM
- 	select KVM_WERROR if WERROR
- 
- config KVM
+ 	switch (vma_shift) {
+ #ifndef __PAGETABLE_PMD_FOLDED
 -- 
 2.48.1.502.g6dc24dfdaf-goog
 
