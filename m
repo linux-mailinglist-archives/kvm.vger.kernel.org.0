@@ -1,167 +1,258 @@
-Return-Path: <kvm+bounces-37777-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37778-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F01E1A30195
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:40:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E58BDA301B3
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:53:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92708167BB6
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:40:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 864DC3A6888
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDEBA1CEEB2;
-	Tue, 11 Feb 2025 02:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661E41D54EE;
+	Tue, 11 Feb 2025 02:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="EAAe0Ss3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A73IPHMZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.8])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4D026BD92;
-	Tue, 11 Feb 2025 02:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.8
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F4F26BDB3;
+	Tue, 11 Feb 2025 02:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739241601; cv=none; b=fokJnVjIY2xUSSXovJsRc2z7+dggdR/QJoBKjJ67pIAdMPLUwpIrCUv9qZk7y3LBcNbJomfv/S4wn6h9F0dnuqIjA07L94ZIMAqJF9+C6Y8CF5hUYO4wXhywJWkiiPNct535yBC9X8bE4bsvCPpBE08L8h1Tkvkw5u6p2Rd3KBE=
+	t=1739242387; cv=none; b=mXzO5AxVrQlqQvRrFCN22/AsCdjNFt0GynOFXG9bNFhgmuG8MQ5f7KTSW5c/mti0QUYW4iM3kiYd5Y3aWzujC774SaT/0UhwD8E4eej51ZNxOTJvo6GzetLNvT7L2Wsg2Hd+iiQyfwS9WUwxkkac7hvnV5RSWaAoq41Nur6Ckxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739241601; c=relaxed/simple;
-	bh=y+ztxwhEcdpLaeJJ6Prmki4HGBmqn+jbQWGvXTY0ARA=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=p0cf0wLEud+WKhaxddERnGIOtgGgNVnc936GsV8JVeCR1xqb+Z1LsTBM0RpE3n3OFNzGzl5dqqJDsTVMKOgdc9pggjj0/Dqhywm3ATDXsxXDOlB51TMEeezLQgWGSGNkO56i0YxSnOvIARXOSi7wk+YyHGUOAdGMil71aHSjwyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=EAAe0Ss3; arc=none smtp.client-ip=220.197.31.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=0iKDFXKmakrxlwTvyT
-	XBK7m38OSdvEOg0wa8XmraGSo=; b=EAAe0Ss3Y/wFBXuLqiGmhnzPM8PhjKBNiB
-	Tj88sHLJXFydVLhshTomuq3ZrZliUO9hKjp2LFlgxODmbr9Z7Ao1wb4S6PRze2/7
-	feZK1eGyZM8Ma4mZmX8CyBzhEVeGzdehK3D45YgQAoUaKG508gMyCMUphnHKp0QN
-	U00/Kr20U=
-Received: from hg-OptiPlex-7040.hygon.cn (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wDn77rRt6pnZ85rAw--.31934S2;
-	Tue, 11 Feb 2025 10:37:05 +0800 (CST)
-From: yangge1116@126.com
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1739242387; c=relaxed/simple;
+	bh=2SebiFEbnENaz2k05BNHEb4S8UUpgFqWp3K6SdhX0Qo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fHxZZnJPtiwIwDwN38UsmlOOzziO1CGESKMC9Y0x5fLGdJYSBEmV1kjHdDoCUENmtWjgvIhUjgqG+6xNo5LPkapY00BuxUB5YFjPZ3tUCS7cG0hj6yplB0gPagxAOlMGAdSdZZtcVgzGE1VcmzJH8mTCrIcDZWWUa5F5qEVK+sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A73IPHMZ; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739242386; x=1770778386;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2SebiFEbnENaz2k05BNHEb4S8UUpgFqWp3K6SdhX0Qo=;
+  b=A73IPHMZZdgBGKJk+IYgPWYtmAYJRZjZ6zkPABzn7geXvR+ccVe/ofNM
+   SPUyX92KK4BclrF4/r2EZqGNcHu4BcmheslrzUeLjQf9AuTi+4XHtlObz
+   asuCQFtP2BY3lvJja2mjN5W7Se0q9+wsbsfNdfeER+KIOtOHxUu8gvkeZ
+   1qJcxMh+Pvm4nsYvqWLx8CMtZwpNXv8cu4eTxM1y+nTa3pNAhdZNuErnu
+   ZLmXKhN29EK3wMxH1QSPCtgyGiUQIxwG303veDOh5qcvxoYP4C4bgttXP
+   mbUs1keR5cxZwVhIIanfD8DPSpPjHVkeTXSYmsI0OTZ7GZT/9dGdG2Rhm
+   g==;
+X-CSE-ConnectionGUID: hTD7Y1U1R0CHfPbmXq4syA==
+X-CSE-MsgGUID: pLvSBbTNTS2mmR22kOOPyw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43506582"
+X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
+   d="scan'208";a="43506582"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:53:06 -0800
+X-CSE-ConnectionGUID: Rq20ttWbQSydYuxflqOajw==
+X-CSE-MsgGUID: T7q24sn1RRiw5kva2ViF/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="112236396"
+Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:53:01 -0800
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: pbonzini@redhat.com,
 	seanjc@google.com,
-	21cnbao@gmail.com,
-	david@redhat.com,
-	baolin.wang@linux.alibaba.com,
-	thomas.lendacky@amd.com,
-	liuzixing@hygon.cn,
-	Ge Yang <yangge1116@126.com>
-Subject: [PATCH V4] KVM: SEV: fix wrong pinning of pages
-Date: Tue, 11 Feb 2025 10:37:03 +0800
-Message-Id: <1739241423-14326-1-git-send-email-yangge1116@126.com>
-X-Mailer: git-send-email 2.7.4
-X-CM-TRANSID:_____wDn77rRt6pnZ85rAw--.31934S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxur4UCrWrJFWUAw4xZr1UZFb_yoWrGF15pF
-	4rGws0yr13KrZFvryIqrWkursrZ3y8Kw4jkryIywn5uFnxtry0vr4Iqr17try5A3y8WF98
-	tF4DGw4rZw4DZa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRoGQDUUUUU=
-X-CM-SenderInfo: 51dqwwjhrrila6rslhhfrp/1tbifh3wG2eqsNCEaAAAsJ
+	kvm@vger.kernel.org
+Cc: rick.p.edgecombe@intel.com,
+	kai.huang@intel.com,
+	adrian.hunter@intel.com,
+	reinette.chatre@intel.com,
+	xiaoyao.li@intel.com,
+	tony.lindgren@intel.com,
+	isaku.yamahata@intel.com,
+	yan.y.zhao@intel.com,
+	chao.gao@intel.com,
+	linux-kernel@vger.kernel.org,
+	binbin.wu@linux.intel.com
+Subject: [PATCH v2 0/8] KVM: TDX: TDX hypercalls may exit to userspace
+Date: Tue, 11 Feb 2025 10:54:34 +0800
+Message-ID: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Ge Yang <yangge1116@126.com>
+Hi,
 
-In the sev_mem_enc_register_region() function, we need to call
-sev_pin_memory() to pin memory for the long term. However, when
-calling sev_pin_memory(), the FOLL_LONGTERM flag is not passed, causing
-the allocated pages not to be migrated out of MIGRATE_CMA/ZONE_MOVABLE,
-violating these mechanisms to avoid fragmentation with unmovable pages,
-for example making CMA allocations fail.
+When executing in the TD, TDX can exit to the host VMM (KVM) for many
+reasons. These reasons are analogous to the exit reasons for VMX. Some of
+the exits will be handled within KVM in later changes. This series handles
+just the TDX exits that may be passed to userspace to handle, which are all
+via the TDCALL exit code. Although, these userspace exits have the same TDX
+exit code, they result in several different types of exits to userspace.
 
-To address the aforementioned problem, we should add the FOLL_LONGTERM
-flag when calling sev_pin_memory() within the sev_mem_enc_register_region()
-function.
+This patch set is one of several patch sets that are all needed to provide
+the ability to run a functioning TD VM.  With v2, we have addressed the
+structural changes suggested by Sean [1] to make TDX exit handling more VMX
+like. With the size of the change, it probably needs another round of
+review before being ready for kvm-coco-queue.
 
-Signed-off-by: Ge Yang <yangge1116@126.com>
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
----
+Base of this series
+===================
+This series is based on kvm-coco-queue up to the end of MMU part 2, plus
+one later section. Stack is:
+  - '55f78d925e07 ("KVM: TDX: Return -EBUSY when tdh_mem_page_add()
+    encounters TDX_OPERAND_BUSY")'.
+  - v2 "KVM: TDX: TD vcpu enter/exit" (There is one small log difference
+    between the v2 patches and the commits in kvm-coco-queue. No code
+    differences). 
 
-V4:
-- adjust the code format suggested by Tom
 
-V3:
-- the fix only needed for sev_mem_enc_register_region()
+Notable changes since v1 [2]
+============================
+Record vmx exit reason and exit_qualification in struct vcpu_vt for TDX,
+so that TDX/VMX can use the same helpers to get exit reason and exit
+qualification.
 
-V2:
-- update code and commit message suggested by David
+Get/set tdvmcall inputs/outputs from/to vp_enter_args directly in struct
+vcpu_tdx. Drop helpers for read/write a0~a3.
 
- arch/x86/kvm/svm/sev.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+Skip setting of return code when the value is TDVMCALL_STATUS_SUCCESS
+because r10 is always 0 for standard TDVMCALL exit.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index a2a794c..90ad846 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -622,7 +622,7 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
- 				    unsigned long ulen, unsigned long *n,
--				    int write)
-+				    int flags)
- {
- 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
- 	unsigned long npages, size;
-@@ -663,7 +663,7 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
- 		return ERR_PTR(-ENOMEM);
- 
- 	/* Pin the user virtual address. */
--	npinned = pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0, pages);
-+	npinned = pin_user_pages_fast(uaddr, npages, flags, pages);
- 	if (npinned != npages) {
- 		pr_err("SEV: Failure locking %lu pages.\n", npages);
- 		ret = -ENOMEM;
-@@ -751,7 +751,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	vaddr_end = vaddr + size;
- 
- 	/* Lock the user memory. */
--	inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
-+	inpages = sev_pin_memory(kvm, vaddr, size, &npages, FOLL_WRITE);
- 	if (IS_ERR(inpages))
- 		return PTR_ERR(inpages);
- 
-@@ -1250,7 +1250,7 @@ static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
- 		if (IS_ERR(src_p))
- 			return PTR_ERR(src_p);
- 
--		dst_p = sev_pin_memory(kvm, dst_vaddr & PAGE_MASK, PAGE_SIZE, &n, 1);
-+		dst_p = sev_pin_memory(kvm, dst_vaddr & PAGE_MASK, PAGE_SIZE, &n, FOLL_WRITE);
- 		if (IS_ERR(dst_p)) {
- 			sev_unpin_memory(kvm, src_p, n);
- 			return PTR_ERR(dst_p);
-@@ -1316,7 +1316,7 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(params)))
- 		return -EFAULT;
- 
--	pages = sev_pin_memory(kvm, params.guest_uaddr, params.guest_len, &n, 1);
-+	pages = sev_pin_memory(kvm, params.guest_uaddr, params.guest_len, &n, FOLL_WRITE);
- 	if (IS_ERR(pages))
- 		return PTR_ERR(pages);
- 
-@@ -1798,7 +1798,7 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- 	/* Pin guest memory */
- 	guest_page = sev_pin_memory(kvm, params.guest_uaddr & PAGE_MASK,
--				    PAGE_SIZE, &n, 1);
-+				    PAGE_SIZE, &n, FOLL_WRITE);
- 	if (IS_ERR(guest_page)) {
- 		ret = PTR_ERR(guest_page);
- 		goto e_free_trans;
-@@ -2696,7 +2696,8 @@ int sev_mem_enc_register_region(struct kvm *kvm,
- 		return -ENOMEM;
- 
- 	mutex_lock(&kvm->lock);
--	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
-+	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages,
-+				       FOLL_WRITE | FOLL_LONGTERM);
- 	if (IS_ERR(region->pages)) {
- 		ret = PTR_ERR(region->pages);
- 		mutex_unlock(&kvm->lock);
+Morph the guest requested exit reason (via TDVMCALL) to KVM's tracked exit
+reason when it could, i.e. when the TDVMCALL leaf number is less than
+0x10000.
+- Morph the TDG.VP.VMCALL with KVM hypercall to EXIT_REASON_VMCALL.
+- Morph PV port I/O hypercall to EXIT_REASON_IO_INSTRUCTION.
+- Morph PV MMIO hypercall to EXIT_REASON_EPT_MISCONFIG.
+
+TDX marshalls registers of TDVMCALL ABI into KVM's x86 registers to match
+the definition of KVM hypercall ABI _before_ ____kvm_emulate_hypercall()
+gets called. Also, "KVM: x86: Have ____kvm_emulate_hypercall() read the
+GPRs" is added as a preparation patch for the change.
+
+Zero run->hypercall.ret in __tdx_map_gpa() following the pattern of Paolo's
+patch [3], the feedback of adding a helper is still pending.
+
+Combine TDX_OPERAND_BUSY for TDX_OPERAND_ID_TD_EPOCH and
+TDX_OPERAND_ID_SEPT.  Use EXIT_FASTPATH_EXIT_HANDLED instead of
+EXIT_FASTPATH_REENTER_GUEST for TDX_OPERAND_BUSY because when KVM requests
+KVM_REQ_OUTSIDE_GUEST_MODE, which has both KVM_REQUEST_WAIT and
+KVM_REQUEST_NO_ACTION set, it requires target vCPUs leaving fastpath so
+that interrupt can be enabled to ensure the IPIs can be delivered. Return
+EXIT_FASTPATH_EXIT_HANDLED instead of EXIT_FASTPATH_REENTER_GUEST to exit
+fastpath, otherwise, the requester may be blocked endlessly.
+
+Remove the code for reading/writing APIC mmio, since TDX guest supports
+x2APIC only.
+
+
+TDX hypercalls
+==============
+The TDX module specification defines TDG.VP.VMCALL API (TDVMCALL) for the
+guest TDs to make hypercall to VMM.  When a guest TD issues a TDVMCALL, it
+exits to VMM with a new exit reason.  The arguments from the guest TD and
+return values from the VMM are passed through the guest registers.  The
+ABI details for the guest TD hypercalls are specified in the TDX Guest-Host
+Communication Interface (GHCI) specification [4].
+
+There are two types of hypercalls defined in the GHCI specification:
+- Standard TDVMCALLs: When input of R10 from guest TD is set to 0, it
+  indicates that the TDVMCALL sub-function used in R11 is defined in GHCI
+  specification.
+- Vendor-Specific TDVMCALLs: When input of R10 from guest TD is non-zero,
+  it indicates a vendor-specific TDVMCALL. For KVM hypercalls from guest
+  TDs, KVM uses R10 as KVM hypercall number and R11-R14 as 4 arguments,
+  with the error code returned in R10.
+
+KVM hypercalls
+--------------
+This series supports KVM hypercalls from guest TDs following the 
+vendor-specific interface described above.  The KVM_HC_MAP_GPA_RANGE
+hypercall will need to exit to userspace for handling.
+
+Standard TDVMCALLs exiting to userspace
+---------------------------------------
+To support basic functionality of TDX,  this series includes the following
+standard TDVMCALL sub-functions, which reuse exist exit reasons when they
+need to exit to userspace for handling:
+- TDG.VP.VMCALL<MapGPA> reuses exit reason KVM_EXIT_HYPERCALL with the
+  hypercall number KVM_HC_MAP_GPA_RANGE.
+- TDG.VP.VMCALL<ReportFatalError> reuses exit reason KVM_EXIT_SYSTEM_EVENT
+  with a new event type KVM_SYSTEM_EVENT_TDX_FATAL.
+- TDG.VP.VMCALL<Instruction.IO> reuses exit reason KVM_EXIT_IO.
+- TDG.VP.VMCALL<#VE.RequestMMIO> reuses exit reason KVM_EXIT_MMIO.
+
+Support for TD attestation is currently excluded from the TDX basic
+enabling, so handling for TDG.VP.VMCALL<SetupEventNotifyInterrupt> and
+TDG.VP.VMCALL<GetQuote> is not included in this patch series.
+
+
+Repos
+=====
+Due to "KVM: VMX: Move common fields of struct" in "TDX vcpu enter/exit" v2
+[5], subsequent patches require changes to use new struct vcpu_vt, refer to
+the full KVM branch below.
+
+It requires TDX module 1.5.06.00.0744 [6], or later as mentioned in [5].
+A working edk2 commit is 95d8a1c ("UnitTestFrameworkPkg: Use TianoCore
+mirror of subhook submodule").
+
+The full KVM branch is here:
+https://github.com/intel/tdx/tree/tdx_kvm_dev-2025-02-10
+
+A matching QEMU is here:
+https://github.com/intel-staging/qemu-tdx/tree/tdx-qemu-upstream-v7
+
+
+Testing 
+=======
+It has been tested as part of the development branch for the TDX base
+series. The testing consisted of TDX kvm-unit-tests and booting a Linux
+TD, and TDX enhanced KVM selftests.
+
+[1] https://lore.kernel.org/kvm/Z1suNzg2Or743a7e@google.com
+[2] https://lore.kernel.org/kvm/20241201035358.2193078-1-binbin.wu@linux.intel.com
+[3] https://lore.kernel.org/kvm/20241213194137.315304-1-pbonzini@redhat.com
+[4] https://cdrdv2.intel.com/v1/dl/getContent/726792
+[5] https://lore.kernel.org/kvm/20250129095902.16391-1-adrian.hunter@intel.com
+[6] https://github.com/intel/tdx-module/releases/tag/TDX_1.5.06
+
+
+Binbin Wu (3):
+  KVM: x86: Have ____kvm_emulate_hypercall() read the GPRs
+  KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
+  KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
+
+Isaku Yamahata (4):
+  KVM: TDX: Add a place holder to handle TDX VM exit
+  KVM: TDX: Add a place holder for handler of TDX hypercalls
+    (TDG.VP.VMCALL)
+  KVM: TDX: Handle KVM hypercall with TDG.VP.VMCALL
+  KVM: TDX: Handle TDX PV port I/O hypercall
+
+Sean Christopherson (1):
+  KVM: TDX: Handle TDX PV MMIO hypercall
+
+ Documentation/virt/kvm/api.rst    |   9 +
+ arch/x86/include/asm/shared/tdx.h |   1 +
+ arch/x86/include/asm/tdx.h        |   1 +
+ arch/x86/include/uapi/asm/vmx.h   |   4 +-
+ arch/x86/kvm/vmx/main.c           |  38 ++-
+ arch/x86/kvm/vmx/tdx.c            | 532 +++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/tdx.h            |   5 +
+ arch/x86/kvm/vmx/tdx_errno.h      |   3 +
+ arch/x86/kvm/vmx/x86_ops.h        |   8 +
+ arch/x86/kvm/x86.c                |  16 +-
+ arch/x86/kvm/x86.h                |  26 +-
+ include/uapi/linux/kvm.h          |   1 +
+ virt/kvm/kvm_main.c               |   1 +
+ 13 files changed, 616 insertions(+), 29 deletions(-)
+
 -- 
-2.7.4
+2.46.0
 
 
