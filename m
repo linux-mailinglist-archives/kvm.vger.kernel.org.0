@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-37795-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37796-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4220A301DF
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:59:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A22A301E1
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:59:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F82A1622FB
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:59:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97C4B169893
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409151E5B87;
-	Tue, 11 Feb 2025 02:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B84F1E98F9;
+	Tue, 11 Feb 2025 02:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e9KpnCN2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ih1m6fKT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47741E570D;
-	Tue, 11 Feb 2025 02:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B071E7C16;
+	Tue, 11 Feb 2025 02:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739242640; cv=none; b=JXSaqz0NHhEn2R9Huiq815vKJM1sNEf+bQ/c1SX/PR5d6pAmjzMwWmW5RPa2fUj8Wj7J17EZma/bk90twyGmCP5KAst6fDkF+Wk40uY2u0UFWK5mYpOq/U3gQQ2BMeeYw0H9NHMGwMHQHCSOQaLfTqtquCGan7lalp2wiEDrvmI=
+	t=1739242643; cv=none; b=MPcW7dL3FCd1wvaSYW4A2XgyCkpgM7Q8E+fAZofbnNFGVycCJ7PxMeWBLm7wX7uLHxTDpKryotMpNd4moTzwJluCUiaPon3hDEHXaJaPxLcogd+cg+emqCnB9MM4vLIhpezF6K6B3JxgyLk/jo0wugIB4FTg5+u2R0V7BlNMsyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739242640; c=relaxed/simple;
-	bh=8uv2vF1g+LtCY6lVw34O5ITqYQSTv4i/yLE5aV9z7P0=;
+	s=arc-20240116; t=1739242643; c=relaxed/simple;
+	bh=KeqMKy135qaKMyKYwiBX5D0AtAEXTegCVVgh4QvC4oU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U/JXKqNaz9R+QvCrGKLDjYCPeRTZUivRSK5pQxer11BCADZDTLt3KwWFMJ90Jm31+jnketQd0OLHBG6gQKbTaLWDAfHLlh2USGzxL7QedJV0Jgum2p/N0AU6yT2EQexIzKoOp4ljuW7hmXzWWItc/PmzuPSt8excU5Lezn9EuWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e9KpnCN2; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=SQnJC5iyxbXSX3m/JcM86L3wR1LpK70S/aSGrY73fmEQo+9Gv/gTin0DHeSRjARg08BFxQAv0GxMXGnhWRHE+j7SqZ6PJeoKVW0azFWlM7uy0QKl5bRCLOj0wAGK1e2ZaNnpI1PNBwWjDBN3DFQdzyYUsFUy5poJREjmnVgYdcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ih1m6fKT; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739242639; x=1770778639;
+  t=1739242643; x=1770778643;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8uv2vF1g+LtCY6lVw34O5ITqYQSTv4i/yLE5aV9z7P0=;
-  b=e9KpnCN2g5p4wZ11q6owNOHiHgW+BiIM1WdlQhVCqyJSUZljLySTZg0V
-   B0108IELElZLq6DK7a3c/v9gtNtmDqzpd/juSLLoFb+5VOeE0anWdjDmC
-   PTF004EYhhK3EHTeOYSXnHucF6cpXny1XjH/aRsda1N33iMCCtSXHWFnm
-   f1yWGRk1OOQ4w0FHYsudIYc3dsPQPBfkLX108NzqQzvSRUx09tLTRARe6
-   fLieqeXN9H3qTGw/1ikQy8uqNw0V8efNmy73WKzjoAAL+VAU45yECwCHd
-   qIn7s4iMXGJipuxMTsvBstCCcS/ftJEyi8+AdgPrBOLu4jUnFwFPpKHOu
+  bh=KeqMKy135qaKMyKYwiBX5D0AtAEXTegCVVgh4QvC4oU=;
+  b=ih1m6fKT2Upz8MeBrk/NCkNb90ouDl7EH2Wt7VtrfdAMRIGN9ZPQIIQF
+   XTiq6TPIqa1edWrR3RVqWO/DqbKzfiml74NUc7iGU6KZ1GQso9ZmksUUA
+   1OQmRTtjnh4m0DKp0F5GsCg6CFvvA2cAfEbujT5bQHcKnx2aw+0yUrx4G
+   +j06kj4bf+UdCy4H7ZqfLAnuGSZ744vXbcXd5vFVi6aK7SnmNlYT84a58
+   ApIg1uBGt2gO9RGivDVhoSPFVwFuhs9qSVSR9k2zkuvPJvpaFxq72HQt7
+   eSZfCAbHbf8PA52aX2yqY1ui4HqRPZCrkIEcRKZvneRLA6XStjOcLFGxO
    w==;
-X-CSE-ConnectionGUID: lQk3jic1Tg+1/M7S6UMuUA==
-X-CSE-MsgGUID: oiTj8JnBRdmk4QvRzPoLMg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43612465"
+X-CSE-ConnectionGUID: tkp+7lBnTVK9nnqGcKhnoA==
+X-CSE-MsgGUID: VDoQFLpQQ0qyuYvVVLpTgw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43612468"
 X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="43612465"
+   d="scan'208";a="43612468"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:19 -0800
-X-CSE-ConnectionGUID: hGbs0n8gST6YZFVIoicTcA==
-X-CSE-MsgGUID: K8IbR6hTSbqKbW8ctPsCPg==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:22 -0800
+X-CSE-ConnectionGUID: CisfEC6rR7+EDbtEX/1uBg==
+X-CSE-MsgGUID: vQOJXd1lQbmkEWCIlVaSsw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="112355341"
+   d="scan'208";a="112355350"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:15 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:18 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 08/17] KVM: TDX: Complete interrupts after TD exit
-Date: Tue, 11 Feb 2025 10:58:19 +0800
-Message-ID: <20250211025828.3072076-9-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 09/17] KVM: TDX: Handle SMI request as !CONFIG_KVM_SMM
+Date: Tue, 11 Feb 2025 10:58:20 +0800
+Message-ID: <20250211025828.3072076-10-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
 References: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
@@ -89,85 +89,115 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Complete NMI injection by updating the status of NMI injection for TDX.
+Handle SMI request as what KVM does for CONFIG_KVM_SMM=n, i.e. return
+-ENOTTY, and add KVM_BUG_ON() to SMI related OPs for TD.
 
-Because TDX virtualizes vAPIC, and non-NMI interrupts are delivered
-using posted-interrupt mechanism, KVM only needs to care about NMI
-injection.
+TDX doesn't support system-management mode (SMM) and system-management
+interrupt (SMI) in guest TDs.  Because guest state (vCPU state, memory
+state) is protected, it must go through the TDX module APIs to change
+guest state.  However, the TDX module doesn't provide a way for VMM to
+inject SMI into guest TD or a way for VMM to switch guest vCPU mode into
+SMM.
 
-For VMX, KVM injects an NMI by setting VM_ENTRY_INTR_INFO_FIELD via
-vector-event injection mechanism.  For TDX, KVM needs to request TDX
-module to inject an NMI into a guest TD vCPU when the vCPU is not
-active by setting PEND_NMI field within the TDX vCPU scope metadata
-(Trust Domain Virtual Processor State (TDVPS)).  TDX module will attempt
-to inject an NMI as soon as possible on TD entry.  KVM can read PEND_NMI
-to get the status of NMI injection.  A value of 0 indicates the NMI has
-been injected into the guest TD vCPU.
-
-Update KVM's NMI status on TD exit by checking whether a requested NMI
-has been injected into the TD.  Reading the PEND_NMI field via SEAMCALL
-is expensive so only perform the check if an NMI was requested to inject.
-If the read back value is 0, the NMI has been injected, update the NMI
-status.  If the read back value is 1, no action needed since the PEND_NMI
-is still set.
+MSR_IA32_SMBASE will not be emulated for TDX guest, -ENOTTY will be
+returned when SMI is requested.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
 TDX interrupts v2:
 - No change.
 
 TDX interrupts v1:
-- Shortlog "tdexit" -> "TD exit" (Reinette)
-- Update change log as following suggested by Reinette with a little
-  supplement.
-  https://lore.kernel.org/lkml/fe9cec78-36ee-4a20-81df-ec837a45f69f@linux.intel.com/
-- Fix comment, "nmi" -> "NMI" and add a missing period. (Reinette)
-- Add a comment to explain why no need to request KVM_REQ_EVENT.
-
-v19:
-- move tdvps_management_check() to this patch
-- typo: complete -> Complete in short log
+- Renamed from "KVM: TDX: Silently discard SMI request" to
+  "KVM: TDX: Handle SMI request as !CONFIG_KVM_SMM".
+- Change the changelog.
+- Handle SMI request as !CONFIG_KVM_SMM for TD, and remove the
+  unnecessary comment. (Sean)
+- Bug the VM if SMI OPs are called for a TD and remove related
+  tdx_* functions, but still keep the vt_* wrappers. (Sean, Paolo)
+- Use kvm_x86_call()
 ---
- arch/x86/kvm/vmx/tdx.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/x86/kvm/smm.h      |  3 +++
+ arch/x86/kvm/vmx/main.c | 43 +++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 42 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index ba9038ac5bf7..9737574b8049 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -803,6 +803,21 @@ int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu)
- 	return 1;
+diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
+index a1cf2ac5bd78..551703fbe200 100644
+--- a/arch/x86/kvm/smm.h
++++ b/arch/x86/kvm/smm.h
+@@ -142,6 +142,9 @@ union kvm_smram {
+ 
+ static inline int kvm_inject_smi(struct kvm_vcpu *vcpu)
+ {
++	if (!kvm_x86_call(has_emulated_msr)(vcpu->kvm, MSR_IA32_SMBASE))
++		return -ENOTTY;
++
+ 	kvm_make_request(KVM_REQ_SMI, vcpu);
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 0d9b17d55bcc..8d91bd8eb991 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -180,6 +180,41 @@ static int vt_handle_exit(struct kvm_vcpu *vcpu,
+ 	return vmx_handle_exit(vcpu, fastpath);
  }
  
-+static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
++#ifdef CONFIG_KVM_SMM
++static int vt_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
 +{
-+	/* Avoid costly SEAMCALL if no NMI was injected. */
-+	if (vcpu->arch.nmi_injected) {
-+		/*
-+		 * No need to request KVM_REQ_EVENT because PEND_NMI is still
-+		 * set if NMI re-injection needed.  No other event types need
-+		 * to be handled because TDX doesn't support injection of
-+		 * exception, SMI or interrupt (via event injection).
-+		 */
-+		vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
-+							      TD_VCPU_PEND_NMI);
-+	}
++	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
++		return false;
++
++	return vmx_smi_allowed(vcpu, for_injection);
 +}
 +
- struct tdx_uret_msr {
- 	u32 msr;
- 	unsigned int slot;
-@@ -985,6 +1000,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
- 	if (unlikely(tdx_failed_vmentry(vcpu)))
- 		return EXIT_FASTPATH_NONE;
- 
-+	tdx_complete_interrupts(vcpu);
++static int vt_enter_smm(struct kvm_vcpu *vcpu, union kvm_smram *smram)
++{
++	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
++		return 0;
 +
- 	return tdx_exit_handlers_fastpath(vcpu);
- }
++	return vmx_enter_smm(vcpu, smram);
++}
++
++static int vt_leave_smm(struct kvm_vcpu *vcpu, const union kvm_smram *smram)
++{
++	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
++		return 0;
++
++	return vmx_leave_smm(vcpu, smram);
++}
++
++static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
++{
++	if (KVM_BUG_ON(is_td_vcpu(vcpu), vcpu->kvm))
++		return;
++
++	/* RSM will cause a vmexit anyway.  */
++	vmx_enable_smi_window(vcpu);
++}
++#endif
++
+ static void vt_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
+ {
+ 	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
+@@ -539,10 +574,10 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.setup_mce = vmx_setup_mce,
  
+ #ifdef CONFIG_KVM_SMM
+-	.smi_allowed = vmx_smi_allowed,
+-	.enter_smm = vmx_enter_smm,
+-	.leave_smm = vmx_leave_smm,
+-	.enable_smi_window = vmx_enable_smi_window,
++	.smi_allowed = vt_smi_allowed,
++	.enter_smm = vt_enter_smm,
++	.leave_smm = vt_leave_smm,
++	.enable_smi_window = vt_enable_smi_window,
+ #endif
+ 
+ 	.check_emulate_instruction = vmx_check_emulate_instruction,
 -- 
 2.46.0
 
