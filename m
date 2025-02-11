@@ -1,210 +1,181 @@
-Return-Path: <kvm+bounces-37914-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37915-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0802A31594
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 20:45:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A87E1A3168C
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 21:24:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 305E4188227A
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 19:45:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B40E9188337B
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 20:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4470260A28;
-	Tue, 11 Feb 2025 19:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA765263889;
+	Tue, 11 Feb 2025 20:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UkOsJOBI"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ag8bOZsM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A7526E65C
-	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 19:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506151D8DF6;
+	Tue, 11 Feb 2025 20:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739303135; cv=none; b=LR0GY5rbLOPYYLIgY/W8svp41ZlFefI5aI/5QGCcHHNjP0N6pmvttebWt/Pz3CEYcLclehJ1g8XGRY0QceSzqUXHRURzfX6mj22tJQd7buTvJk11w2+Nl8+jsCvkit6O+YixPx5bgloII4Q4oW4c9BDhqDhv3LzlbPX0lX1AyqU=
+	t=1739305455; cv=none; b=pYwMrAt47qfk7MfCOUe5cjxI4vnXEsub2xUl0pck6xxquPpJ3mi3ssC9Fq7umlc/IxDDJZGuWM8ITQCzBRkvQKdzQeX1OcrVsAMf+agKu57gw8VhoIMCA4yPudSxR3B3xawlO4QLeVlIIN8gCzmAOqvI7d2lLL+op8znXu8ZE14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739303135; c=relaxed/simple;
-	bh=VnXKqFkbMRvkpEFjpjeBc2gnEpIgcCgt5JEK8Uzgkqo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=abjLq9CcLjiYR5xJSCJvFOZjYrB1rqCSmoDKjhBbExJ9/frdIKnCCAogJyt0hDQZ5T6dfublhpIqtEYuGaxRwXJTnOzHmOIUt1QjF/4/3yN5xppnPCK2f8E9G8vdBAUZ+3Pm2G+vSKDQyjOhqvdFppL5MhUHx9sl0AUMMJYCAxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UkOsJOBI; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21f7671a821so65996325ad.1
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 11:45:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739303133; x=1739907933; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VnXKqFkbMRvkpEFjpjeBc2gnEpIgcCgt5JEK8Uzgkqo=;
-        b=UkOsJOBIRG4gs/S+Oh/0FVhLpFExfN2I/BdmEaROO4eEdPQyaEMZJz1oFf0W/POxVY
-         DuzWMLBTUyknP38j+Nj6n5GnHdbJFqoSthUsknZXTgrc3or1VqDoZ002u1FCmMw736NW
-         qFmsekVzA8jnyWcAMqJquGKXm0nQbKEpgu4u0weMMT+fT71loDn0IqfvuVyjCjCyn7vi
-         cuxz2YW3Z9GVnhgf1Ao4yv7vh9TJmohKerDvsFBtH0CefgXFatw37KkZFlrKQck61KWB
-         5IKnfPCbJB5wkgzaPHfT09nnQTNQoJszhNrXOxX6xvUjv3hIaqemW8y83Z8dhcz+lOuE
-         mXdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739303133; x=1739907933;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VnXKqFkbMRvkpEFjpjeBc2gnEpIgcCgt5JEK8Uzgkqo=;
-        b=t/bgNPCvtgco74wh32xDjyBPc9+fOkCg0zHFIn2/4iduLPDZh8oNAscIYmbKJMduTy
-         rnBk/4j8Bg4VMj6MNvF5SGgXEtlWGMNgRcvVsupNeCrMWzj6pskfUueWISbkElbp0Mj6
-         IAT//IoS1XcXtDDtfrCwg0Eu8BAdMLL2Hbp+7uIz8gt6YWYsEWkg+Y7y0Q1GqPY/3fOW
-         TQkun2E1ghxENpAwDfiRfMFD7AXG7Ff9uf/M53vLu5MHAWY3PcwldstS98bpXWhNYyVF
-         M10Dst3QpcCrnQ3FGtEl9JF/qVm8ST8PrEE4B/iOBOyFCyJULESWeP8KIO6cESw/jImE
-         JGMw==
-X-Forwarded-Encrypted: i=1; AJvYcCXoR/ooeWkUQU22Du9h5bg173/FwPoDzvLQ2My06/0XlGN0n21qarIji8HgOdRkIcdmqqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGEr55mAsiVJdKSCpMQFZwinsY8+qI5o4ChNmx5iioAQDXzgNr
-	xy35urZHyGjgyMSWOsms/4aPpaILHKopKVZYvkY47ESPgcvKS2mgS4cYxhYUAUjFn53jYBhKjQ4
-	6Ow==
-X-Google-Smtp-Source: AGHT+IH01tHxCosIPckGc+Ds/1MdnCuK/SwPgVcdM9uUZ11SPzmp6l26mBqTYTZ/5I5hQ2wi/UzFNQ2czjc=
-X-Received: from pgbdl2.prod.google.com ([2002:a05:6a02:d02:b0:ad5:4ee9:81b1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4c6:b0:21f:9c48:254b
- with SMTP id d9443c01a7336-220bbb08e75mr8391835ad.24.1739303133434; Tue, 11
- Feb 2025 11:45:33 -0800 (PST)
-Date: Tue, 11 Feb 2025 11:45:31 -0800
-In-Reply-To: <b29a499f-36d3-476a-a1bb-99402ef6be2a@linux.alibaba.com>
+	s=arc-20240116; t=1739305455; c=relaxed/simple;
+	bh=Ir2UudtV6I465P9Aa7pDJyhOnf4s7mtZg1nWmBWTRJs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZJuTnLf3g5jHCprYMJ8wwM6v29kUgaJt3kyE1PBsrGKQ+IERwUgmXFptWq4+lHT6gYz9tNbORUMIGtvMc2O+l0C9Lf1K8d+vcGjTz0ODuHtfInUrZoS5Oy5Tc9izZNdN+nGribqK8JuQs7SOqOnu/kju0M+l9PIe44jXnx49U98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ag8bOZsM; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51BFdTFe020555;
+	Tue, 11 Feb 2025 20:24:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=yDwtqZ
+	R3wgrNCTyWYFInDho8NUYYvchbqe2t1EngQGo=; b=Ag8bOZsMuvoS0NMcwai3m+
+	pHPY0RUasde4txUNfLlH6/7SitMJTUotXgGzjR5xAbN3a8L1Xo++IRP6B+opelJu
+	+X8fI/k6zT94U0DMfIN+xDEDtSGVoFzxBYU5F62zXOJtBYNr/17jDKwzQ1WLGcA0
+	97k9KTjymAJc0vNt2bKKJLc/TKsMT6CrEl79R7s6SzsxfvEEDkR87BIst8+FB5HL
+	YGpE3I7pVhGJMR/tCnTXQdq7W2cUDuDTB/QvxYaFaPzyQb4D137XfCO2eOmzmsDT
+	vLba1sGdYwoNjlY9vE+5TDCsYWC6CnSdQYDazlStydTZMflRWXfBZ1No6QQPvDlg
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44r9cu9f9a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Feb 2025 20:24:09 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51BI6Q4E011642;
+	Tue, 11 Feb 2025 20:24:08 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44pktjvvee-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Feb 2025 20:24:08 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51BKO7Pr35128062
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Feb 2025 20:24:07 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5B24D5805A;
+	Tue, 11 Feb 2025 20:24:07 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 208CC58054;
+	Tue, 11 Feb 2025 20:24:06 +0000 (GMT)
+Received: from [9.61.140.79] (unknown [9.61.140.79])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 11 Feb 2025 20:24:06 +0000 (GMT)
+Message-ID: <8767c6ce-28cf-4e23-baf8-e6c9ec854c60@linux.ibm.com>
+Date: Tue, 11 Feb 2025 15:24:05 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241121065039.183716-1-zijie.wei@linux.alibaba.com>
- <Z2IDkWPz2rhDLD0P@google.com> <b29a499f-36d3-476a-a1bb-99402ef6be2a@linux.alibaba.com>
-Message-ID: <Z6uo24Wf3LoetUMc@google.com>
-Subject: Re: [PATCH] KVM: x86: ioapic: Optimize EOI handling to reduce
- unnecessary VM exits
-From: Sean Christopherson <seanjc@google.com>
-To: wzj <zijie.wei@linux.alibaba.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	xuyun_xy.xy@linux.alibaba.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] s390/vfio-ap: Signal eventfd when guest AP
+ configuration is changed
+To: Rorie Reyes <rreyes@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        jjherne@linux.ibm.com, alex.williamson@redhat.com
+References: <20250107183645.90082-1-rreyes@linux.ibm.com>
+ <Z4U6iu5JidJUxDgX@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <f69bba4b-a97e-4166-9ce1-c8a2ad634696@linux.ibm.com>
+ <f1af50b3-f966-445d-ab89-3d213f55b93a@linux.ibm.com>
+ <Z6RnfwawWop0v1CW@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <02675184-0ce5-4f08-9d5d-f42987b77b5b@linux.ibm.com>
+ <Z6sDKeA6WzAgagiZ@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <e5ca9a2c-ec7d-4e0e-ad06-2d312b511b90@linux.ibm.com>
+Content-Language: en-US
+From: Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <e5ca9a2c-ec7d-4e0e-ad06-2d312b511b90@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2yBjJfi0Hs_7QlpoZV7hXrW8-fSlAiEA
+X-Proofpoint-GUID: 2yBjJfi0Hs_7QlpoZV7hXrW8-fSlAiEA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-11_08,2025-02-11_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 suspectscore=0 adultscore=0 impostorscore=0 phishscore=0
+ bulkscore=0 mlxlogscore=999 mlxscore=0 clxscore=1015 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502110130
 
-T24gRnJpLCBEZWMgMjcsIDIwMjQsIHd6aiB3cm90ZToKPiBPbiBEZWNlbWJlciAxOCwgMjAyNCwg
-U2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToKPiA+IE9uIFRodSwgTm92IDIxLCAyMDI0LCB3ZWl6
-aWppZSB3cm90ZToKPiBXZSBtYWtlIHRoZSBjb2RlIG9uIHRoZSBjb21tb24gcGF0aCBhcyBzaW1w
-bGUgYXMgcG9zc2libGUuCj4gPiA+ICsJCWNsZWFyX2JpdCh2ZWN0b3IsIHZjcHUtPmFyY2guaW9h
-cGljX3BlbmRpbmdfdmVjdG9ycyk7Cj4gPiA+ICsJCWNsZWFyX2JpdCh2ZWN0b3IsIHZjcHUtPmFy
-Y2guaW9hcGljX2hhbmRsZWRfdmVjdG9ycyk7Cj4gPiA+ICsJCWt2bV9tYWtlX3JlcXVlc3QoS1ZN
-X1JFUV9MT0FEX0VPSV9FWElUTUFQLCB2Y3B1KTsKPiA+ID4gKwl9Cj4gPiA+ICAgCXJldHVybiAx
-Owo+ID4gPiAgIH0KPiBLVk06IHg4NjogaW9hcGljOiBPcHRpbWl6ZSBFT0kgaGFuZGxpbmcgdG8g
-cmVkdWNlCj4gwqB1bm5lY2Vzc2FyeSBWTSBleGl0cwo+IAo+IEFkZHJlc3MgcGVyZm9ybWFuY2Ug
-aXNzdWVzIGNhdXNlZCBieSBhIHZlY3RvciBiZWluZyByZXVzZWQgYnkgYQo+IG5vbi1JT0FQSUMg
-c291cmNlLgo+IAo+IGNvbW1pdCAwZmM1YTM2ZGQ2YjMKPiAoIktWTTogeDg2OiBpb2FwaWM6IEZp
-eCBsZXZlbC10cmlnZ2VyZWQgRU9JIGFuZCBJT0FQSUMgcmVjb25maWd1cmUgcmFjZSIpCj4gYWRk
-cmVzc2VkIHRoZSBpc3N1ZXMgcmVsYXRlZCB0byBFT0kgYW5kIElPQVBJQyByZWNvbmZpZ3VyYXRp
-b24gcmFjZXMuCj4gSG93ZXZlciwgaXQgaGFzIGludHJvZHVjZWQgc29tZSBwZXJmb3JtYW5jZSBj
-b25jZXJuczoKPiAKPiBDb25maWd1cmluZyBJT0FQSUMgaW50ZXJydXB0cyB3aGlsZSBhbiBpbnRl
-cnJ1cHQgcmVxdWVzdCAoSVJRKSBpcwo+IGFscmVhZHkgaW4gc2VydmljZSBjYW4gdW5pbnRlbnRp
-b25hbGx5IHRyaWdnZXIgYSBWTSBleGl0IGZvciBvdGhlcgo+IGludGVycnVwdHMgdGhhdCBub3Jt
-YWxseSBkbyBub3QgcmVxdWlyZSBvbmUsIGR1ZSB0byB0aGUgc2V0dGluZ3Mgb2YKPiBgaW9hcGlj
-X2hhbmRsZWRfdmVjdG9yc2AuIElmIHRoZSBJT0FQSUMgaXMgbm90IHJlY29uZmlndXJlZCBkdXJp
-bmcKPiBydW50aW1lLCB0aGlzIGlzc3VlIHBlcnNpc3RzLCBjb250aW51aW5nIHRvIGFkdmVyc2Vs
-eSBhZmZlY3QKPiBwZXJmb3JtYW5jZS4KPiAKPiBTaW1wbGUgRml4IFByb3Bvc2FsOgo+IEEgc3Ry
-YWlnaHRmb3J3YXJkIHNvbHV0aW9uIGlzIHRvIHJlY29yZCBoaWdoZXN0IGluLXNlcnZpY2UgSVJR
-IHRoYXQKPiBpcyBwZW5kaW5nIGF0IHRoZSB0aW1lIG9mIHRoZSBsYXN0IHNjYW4uIFRoZW4sIHVw
-b24gdGhlIG5leHQgZ3Vlc3QKPiBleGl0LCBkbyBhIGZ1bGwgS1ZNX1JFUV9TQ0FOX0lPQVBJQy4g
-VGhpcyBlbnN1cmVzIHRoYXQgYSByZS1zY2FuIG9mCj4gdGhlIGlvYXBpYyBvY2N1cnMgb25seSB3
-aGVuIHRoZSByZWNvcmRlZCB2ZWN0b3IgaXMgRU9JJ2QsIGFuZAo+IHN1YnNlcXVlbnRseSwgdGhl
-IGV4dHJhIGJpdCBpbiB0aGUgZW9pX2V4aXRfYml0bWFwIGFyZSBjbGVhcmVkLAo+IGF2b2lkaW5n
-IHVubmVjZXNzYXJ5IFZNIGV4aXRzLgo+IAo+IENvLWRldmVsb3BlZC1ieTogeHV5dW4gPHh1eXVu
-X3h5Lnh5QGxpbnV4LmFsaWJhYmEuY29tPgo+IFNpZ25lZC1vZmYtYnk6IHh1eXVuIDx4dXl1bl94
-eS54eUBsaW51eC5hbGliYWJhLmNvbT4KPiBTaWduZWQtb2ZmLWJ5OiB3ZWl6aWppZSA8emlqaWUu
-d2VpQGxpbnV4LmFsaWJhYmEuY29tPgo+IC0tLQoKVGhpcyBpcyB3aGl0ZXNwYWNlIGRhbWFnZWQg
-YmV5b25kIHdoYXQgSSBhbSB3aWxsaW5nIHRvIG1hc3NhZ2UgYW5kIGFwcGx5LCBhbmQKaG9uZXN0
-bHkgZXZlbiBiZXlvbmQgd2hhdCBJIGFtIHdpbGxpbmcgdG8gcmV2aWV3LiAgUGxlYXNlIGZpeCB5
-b3VyIHNldHVwIGFuZApyZXNlbmQuCgo+IHYxIC0+IHYyCj4gCj4gKiBNb3ZlIG15IFNvQiB0byB0
-aGUgZW5kIGFuZCBhZGQgQ28tZGV2ZWxvcGVkLWJ5IGZvciBYdXl1bgo+IAo+ICogVXNlIGEgdTgg
-dHlwZSB0byByZWNvcmQgYSBwZW5kaW5nIElSUSBkdXJpbmcgdGhlIGlvYXBpYyBzY2FuIHByb2Nl
-c3MKPiAKPiAqIE1hZGUgdGhlIHNhbWUgY2hhbmdlcyBmb3IgdGhlIHNwbGl0IElSUSBjaGlwIG1v
-ZGUKPiAKPiBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHzCoCAxICsKPiDCoGFyY2gv
-eDg2L2t2bS9pb2FwaWMuY8KgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMTAgKysrKysrKystLQo+IMKg
-YXJjaC94ODYva3ZtL2lycV9jb21tLmPCoMKgwqDCoMKgwqDCoMKgIHzCoCA5ICsrKysrKystLQo+
-IMKgYXJjaC94ODYva3ZtL3ZteC92bXguY8KgwqDCoMKgwqDCoMKgwqDCoCB8wqAgOSArKysrKysr
-KysKPiDCoDQgZmlsZXMgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkK
-PiAKPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IGIvYXJj
-aC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IGluZGV4IGUxNTllNDRhNmExYi4uZjg0YTQ4
-ODFhZmE0IDEwMDY0NAo+IC0tLSBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiAr
-KysgYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gQEAgLTEwNDEsNiArMTA0MSw3
-IEBAIHN0cnVjdCBrdm1fdmNwdV9hcmNoIHsKPiDCoCNpZiBJU19FTkFCTEVEKENPTkZJR19IWVBF
-UlYpCj4gwqDCoMKgwqDCoMKgwqAgaHBhX3QgaHZfcm9vdF90ZHA7Cj4gwqAjZW5kaWYKPiArwqDC
-oMKgwqDCoMKgIHU4IGxhc3RfcGVuZGluZ192ZWN0b3I7Cj4gwqB9Owo+IAo+IMKgc3RydWN0IGt2
-bV9scGFnZV9pbmZvIHsKPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL2lvYXBpYy5jIGIvYXJj
-aC94ODYva3ZtL2lvYXBpYy5jCj4gaW5kZXggOTk1ZWI1MDU0MzYwLi40MDI1MmE4MDA4OTcgMTAw
-NjQ0Cj4gLS0tIGEvYXJjaC94ODYva3ZtL2lvYXBpYy5jCj4gKysrIGIvYXJjaC94ODYva3ZtL2lv
-YXBpYy5jCj4gQEAgLTI5NywxMCArMjk3LDE2IEBAIHZvaWQga3ZtX2lvYXBpY19zY2FuX2VudHJ5
-KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiB1bG9uZyAqaW9hcGljX2hhbmRsZWRfdmVjdG9ycykK
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHUxNiBkbSA9
-Cj4ga3ZtX2xhcGljX2lycV9kZXN0X21vZGUoISFlLT5maWVsZHMuZGVzdF9tb2RlKTsKPiAKPiDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChrdm1fYXBp
-Y19tYXRjaF9kZXN0KHZjcHUsIE5VTEwsCj4gQVBJQ19ERVNUX05PU0hPUlQsCj4gLSBlLT5maWVs
-ZHMuZGVzdF9pZCwgZG0pIHx8Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAga3ZtX2FwaWNfcGVuZGluZ19lb2kodmNwdSwgZS0+ZmllbGRzLnZl
-Y3RvcikpCj4gKyBlLT5maWVsZHMuZGVzdF9pZCwgZG0pKQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIF9fc2V0X2JpdChlLT5m
-aWVsZHMudmVjdG9yLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaW9hcGljX2hhbmRsZWRf
-dmVjdG9ycyk7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGVsc2UgaWYgKGt2bV9hcGljX3BlbmRpbmdfZW9pKHZjcHUsCj4gZS0+ZmllbGRzLnZlY3Rvcikp
-IHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIF9fc2V0X2JpdChlLT5maWVsZHMudmVjdG9yLAo+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCBpb2FwaWNfaGFuZGxlZF92ZWN0b3JzKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZjcHUtPmFyY2gubGFzdF9w
-ZW5kaW5nX3ZlY3RvciA9Cj4gZS0+ZmllbGRzLnZlY3RvciA+Cj4gKyB2Y3B1LT5hcmNoLmxhc3Rf
-cGVuZGluZ192ZWN0b3IgPyBlLT5maWVsZHMudmVjdG9yIDoKPiArIHZjcHUtPmFyY2gubGFzdF9w
-ZW5kaW5nX3ZlY3RvcjsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgfQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9Cj4gwqDCoMKgwqDCoMKg
-wqAgfQo+IMKgwqDCoMKgwqDCoMKgIHNwaW5fdW5sb2NrKCZpb2FwaWMtPmxvY2spOwo+IGRpZmYg
-LS1naXQgYS9hcmNoL3g4Ni9rdm0vaXJxX2NvbW0uYyBiL2FyY2gveDg2L2t2bS9pcnFfY29tbS5j
-Cj4gaW5kZXggODEzNjY5NWY3Yjk2Li4xZDIzYzUyNTc2ZTEgMTAwNjQ0Cj4gLS0tIGEvYXJjaC94
-ODYva3ZtL2lycV9jb21tLmMKPiArKysgYi9hcmNoL3g4Ni9rdm0vaXJxX2NvbW0uYwo+IEBAIC00
-MjYsOSArNDI2LDE0IEBAIHZvaWQga3ZtX3NjYW5faW9hcGljX3JvdXRlcyhzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsCj4gCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBpZiAoaXJxLnRyaWdfbW9kZSAmJgo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoa3ZtX2FwaWNfbWF0Y2hfZGVzdCh2Y3B1LCBOVUxM
-LAo+IEFQSUNfREVTVF9OT1NIT1JULAo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIGlycS5kZXN0X2lkLCBpcnEuZGVzdF9tb2RlKQo+IHx8Cj4gLcKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fYXBpY19wZW5kaW5n
-X2VvaSh2Y3B1LCBpcnEudmVjdG9yKSkpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgaXJxLmRlc3RfaWQsCj4gaXJxLmRlc3RfbW9kZSkpKQo+IMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIF9fc2V0X2Jp
-dChpcnEudmVjdG9yLAo+IGlvYXBpY19oYW5kbGVkX3ZlY3RvcnMpOwo+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlbHNlIGlmIChrdm1fYXBpY19wZW5kaW5n
-X2VvaSh2Y3B1LCBpcnEudmVjdG9yKSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgX19zZXRfYml0KGlycS52ZWN0b3IsCj4g
-aW9hcGljX2hhbmRsZWRfdmVjdG9ycyk7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2Y3B1LT5hcmNoLmxhc3RfcGVuZGluZ192
-ZWN0b3IgPSBpcnEudmVjdG9yCj4gPgo+ICsgdmNwdS0+YXJjaC5sYXN0X3BlbmRpbmdfdmVjdG9y
-ID8gaXJxLnZlY3RvciA6Cj4gKyB2Y3B1LT5hcmNoLmxhc3RfcGVuZGluZ192ZWN0b3I7Cj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0KPiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgfQo+IMKgwqDCoMKgwqDCoMKgIH0KPiDCoMKgwqDCoMKgwqDC
-oCBzcmN1X3JlYWRfdW5sb2NrKCZrdm0tPmlycV9zcmN1LCBpZHgpOwo+IGRpZmYgLS1naXQgYS9h
-cmNoL3g4Ni9rdm0vdm14L3ZteC5jIGIvYXJjaC94ODYva3ZtL3ZteC92bXguYwo+IGluZGV4IDg5
-MzM2NmU1MzczMi4uY2QwZGIxNDk2Y2U3IDEwMDY0NAo+IC0tLSBhL2FyY2gveDg2L2t2bS92bXgv
-dm14LmMKPiArKysgYi9hcmNoL3g4Ni9rdm0vdm14L3ZteC5jCj4gQEAgLTU3MDIsNiArNTcwMiwx
-NSBAQCBzdGF0aWMgaW50IGhhbmRsZV9hcGljX2VvaV9pbmR1Y2VkKHN0cnVjdCBrdm1fdmNwdQo+
-ICp2Y3B1KQo+IAo+IMKgwqDCoMKgwqDCoMKgIC8qIEVPSS1pbmR1Y2VkIFZNIGV4aXQgaXMgdHJh
-cC1saWtlIGFuZCB0aHVzIG5vIG5lZWQgdG8gYWRqdXN0IElQICovCj4gwqDCoMKgwqDCoMKgwqAg
-a3ZtX2FwaWNfc2V0X2VvaV9hY2NlbGVyYXRlZCh2Y3B1LCB2ZWN0b3IpOwo+ICsKPiArwqDCoMKg
-wqDCoMKgIC8qIFdoZW4gdGhlcmUgYXJlIGluc3RhbmNlcyB3aGVyZSBpb2FwaWNfaGFuZGxlZF92
-ZWN0b3JzIGlzCj4gK8KgwqDCoMKgwqDCoMKgICogc2V0IGR1ZSB0byBwZW5kaW5nIGludGVycnVw
-dHMsIGNsZWFuIHVwIHRoZSByZWNvcmQgYW5kIGRvCj4gK8KgwqDCoMKgwqDCoMKgICogYSBmdWxs
-IEtWTV9SRVFfU0NBTl9JT0FQSUMuCj4gK8KgwqDCoMKgwqDCoMKgICovCj4gK8KgwqDCoMKgwqDC
-oCBpZiAodmNwdS0+YXJjaC5sYXN0X3BlbmRpbmdfdmVjdG9yID09IHZlY3Rvcikgewo+ICvCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZjcHUtPmFyY2gubGFzdF9wZW5kaW5nX3ZlY3RvciA9
-IDA7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAga3ZtX21ha2VfcmVxdWVzdChLVk1f
-UkVRX1NDQU5fSU9BUElDLCB2Y3B1KTsKPiArwqDCoMKgwqDCoMKgIH0KPiDCoMKgwqDCoMKgwqDC
-oCByZXR1cm4gMTsKPiDCoH0KPiAKPiA+ID4gLS0gCj4gPiA+IDIuNDMuNQo+ID4gPiAK
+
+
+
+On 2/11/25 10:02 AM, Rorie Reyes wrote:
+>
+> On 2/11/25 2:58 AM, Alexander Gordeev wrote:
+>> On Thu, Feb 06, 2025 at 09:12:27AM -0500, Rorie Reyes wrote:
+>>
+>> Hi Rorie,
+>>
+>>> On 2/6/25 2:40 AM, Alexander Gordeev wrote:
+>>>> On Wed, Feb 05, 2025 at 12:47:55PM -0500, Anthony Krowiak wrote:
+>>>>>>> How this patch is synchronized with the mentioned QEMU series?
+>>>>>>> What is the series status, especially with the comment from Cédric
+>>>>>>> Le Goater [1]?
+>>>>>>>
+>>>>>>> 1. 
+>>>>>>> https://lore.kernel.org/all/20250107184354.91079-1-rreyes@linux.ibm.com/T/#mb0d37909c5f69bdff96289094ac0bad0922a7cce
+>> ...
+>>>>> I don't think that is what Alex was asking. I believe he is asking 
+>>>>> how the
+>>>>> QEMU and kernel patch series are going to be synchronized.
+>>>>> Given the kernel series changes a value in vfio.h which is used by 
+>>>>> QEMU, the
+>>>>> two series need to be coordinated since the vfio.h file
+>>>>> used by QEMU can not be updated until the kernel code is 
+>>>>> available. So these
+>>>>> two sets of code have
+>>>>> to be merged upstream during a merge window. which is different 
+>>>>> for the
+>>>>> kernel and QEMU. At least I think that is what Alex is asking.
+>>>> Correct.
+>>>> Thanks for the clarification, Anthony!
+>>> Tony, thank you for the back up!
+>>>
+>>> Alexander, is there anything else you need from my end for 
+>>> clarification?
+>> The original question still stays - is it safe to pull this patch now,
+>> before the corresponding QEMU change is integrated?
+
+Alexander,
+
+This patch has to be pulled before the QEMU patches are integrated. The 
+change to the
+include/uapi/linux/vfio.h file needs to be merged before the QEMU 
+version of that file
+can be generated for a QEMU build. I have given my r-b for this patch, 
+so I think it is
+safe to pull it now.
+
+
+>>
+>> Thanks!
+>
+> If there are no other concerns from anyone else, and Tony is ok to 
+> sign off, then I would say it's safe to pull the patch.
+>
+> I do have a v2 of my QEMU changes that need to be reviewed so it would 
+> probably ok to pull the kernel patches now.
+>
+> QEMU v2 patches: [RFC PATCH v2 0/5] Report vfio-ap configuration changes
+>
+> Unless someone else has any concerns with my kernal changes?
+>
+> Thanks!
+>
+>
+
 
