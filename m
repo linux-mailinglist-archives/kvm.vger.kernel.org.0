@@ -1,114 +1,103 @@
-Return-Path: <kvm+bounces-37908-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37909-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5863A31441
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 19:41:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D3DA31471
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 19:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 807473A5F0C
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 18:41:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAB0B188AB9F
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 18:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A8426214E;
-	Tue, 11 Feb 2025 18:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DB026217B;
+	Tue, 11 Feb 2025 18:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="dSWlJrIC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wVfmklPW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5154B2512D5;
-	Tue, 11 Feb 2025 18:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8374A253B43
+	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 18:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739299262; cv=none; b=lIAulcJB5xeRE+UsCC8ApEK+3v6iJIeDvUZ8t8TiuSYt8AVKa1hkok6kNHCB110ciH+vIYj0eBfUz+pUL3eADHHhCZ7O+7W5g5Viv9Y8f+8g41JNv4pmKnSaukV+kJa/UKfyE5aatGFs7GqmC04MzACsQR5/ntM02w5etE7arng=
+	t=1739299994; cv=none; b=NXQro7lI1d6My9CSZLZEiEpH4U0fkTtoD+OpSzQLGwAKgRnkaLcTvGai4KIJnYRbYKPjBb9kUn5eUs0YWhRv7Pgzd4u05/ekn6h3o4RuquQY/GahyokYogJZncBoLkgNSVIUWlXpRPTYJOsvs+JblowC9Y3YdrN5zoFfpmwzNOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739299262; c=relaxed/simple;
-	bh=KrcQzU2cuwcp/DKxZt8MWgikwP2pnNYmPOpVyvs0Klo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YQ+Qi6NVALXX11dPrigOmMuTSnpEHw1rNs+8IlEiZJFB5R24BYttJJ96j9DEfsmTSUHcTYNzUMkrOfzks9gy4ZJf/q3B9jrgVnoLuM/A6sBl2UFqn5wDkQZA0Y//VMsxTDP3w3JlwdrRlEgQEUspfqQXVkr1bfputkPfHxE2Ie0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=dSWlJrIC; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id F1F5F40E0177;
-	Tue, 11 Feb 2025 18:40:57 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 5Rf2ncew0aZq; Tue, 11 Feb 2025 18:40:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1739299254; bh=92xrLsP+k3VhCc+TsKTBqWx5JTdBo52z09H/w8PE7O4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dSWlJrICaWCIUzx8rfOK7k5chJur4bbdDfnuElowBNGfqm3bDAhDLXewRAWwDF+tc
-	 o7Wllb4REZqBOVVeoVYaI47p8W9YpEo44jm7XvLpVoaj6I9984HLZzM3xx5RvcoSJa
-	 ZCKcXGDiKvcpEVpntKsZt8dgBoz5kEAgxdd4ukYL2PIZZ20SwQLd21MC6Y7etN/TO5
-	 Z72SWn+Nf1tMGD9p7Dg4DiGT1oRMhBwUJku3WLYMuVFq7+hfB8b0qIdfa/vSASaI2G
-	 +iOgSXQANQmSV75kQ3CfiyPicE0lTjP0uo8qIKjUt0pAtD6v0a2wYsgXYQKj4vMZyg
-	 fal2owI4xDoKeuuxfxGyGOrMTYw26eQ/izbZqlJN8CXwYxgcQeTbNqoxDRtpqyd9mM
-	 EAJIH/HYVDSuoRb2nNxFKm99Occfe9DCM5apE1E3+VqZwRyFz1/gTwCnUT2D5Z1UVe
-	 yFl392I+SmTcDDbJqhEB8jFn/dKcoFekGgU8qDOxPobsVD3I8qaQ/AiTRDQFN6EVGB
-	 7kDuTcarQLnP9upD9/lZBlWWDz2f7OEfeG9AQgOcPBRzAs2rE0WVXfhIDksbGmcI4Y
-	 9vOHSFnwx4nm0Fa2NpJ4hYHGiOrd1NQJ4ATLHurBnv/QowW5RdKISyvVwVYFhrzZvT
-	 0HwTWcvM5ahVB6HzEDwuvqKI=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A9B5340E01A3;
-	Tue, 11 Feb 2025 18:40:27 +0000 (UTC)
-Date: Tue, 11 Feb 2025 19:40:21 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Juergen Gross <jgross@suse.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org,
-	linux-coco@lists.linux.dev, virtualization@lists.linux.dev,
-	linux-hyperv@vger.kernel.org, jailhouse-dev@googlegroups.com,
-	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 01/16] x86/tsc: Add a standalone helpers for getting TSC
- info from CPUID.0x15
-Message-ID: <20250211184021.GFZ6uZlZWPVTI5qO1_@fat_crate.local>
-References: <20250201021718.699411-1-seanjc@google.com>
- <20250201021718.699411-2-seanjc@google.com>
- <20250211150114.GCZ6tmOqV4rI04HVuY@fat_crate.local>
- <Z6uIGwxx9HzZQ-N7@google.com>
+	s=arc-20240116; t=1739299994; c=relaxed/simple;
+	bh=yYcU2JZAoQo0PdjybSDTkRZ6mPUenfDV1ftO6rPg5Uc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dwtoATi+eU64Yzwj36sy1KFJ5dz22DX7n4Pu+K/OtbccHAGh3Y6E8lBNJ1eOzPYBUA7+bc7TRFjQf0qfsLEuu5uv2OE2o5EP6MIsIPOoZJqjlOfh0OnTRlIkH483gxSMmGu54EN5JB2osN6ZjKZofxZ/n2RbAvNN9TGLGMSbmMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wVfmklPW; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21f40f40788so135793285ad.3
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 10:53:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739299993; x=1739904793; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hSdXzw5i+XGLoyBoJnanrigNUDo0sEg9JmDuJ0DaxPQ=;
+        b=wVfmklPWmdKqL1wwIhnKrVwNMDsl8ft9pm3I3k5WtiVdqR1raSyrxwFcTtogrLTCWl
+         IZXbLBjggkMZ/2owg48P+BHLt5hAS6vcWE6q4s+3mMwOtBue6PzJUGbFCojkbcId9pl/
+         MrIqm49u17Jh27PIZuO66G3rLKFZH0Hr0wOPBj5jwZ8WSLBkAycysuegAZwX65rFtXVj
+         CPnkpIRc4Nl+k1NvOmIkUaKSEXXSGcOkGyyIxpAou1ahisovocJKRiM252/E+xDUo3oo
+         unrQxnMO4zqR0gTNwmnBxa/kaqjKMGmcpUi+QpyZOu6ZWZmLYWyjYzV8FMMefpEhZICI
+         lZhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739299993; x=1739904793;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hSdXzw5i+XGLoyBoJnanrigNUDo0sEg9JmDuJ0DaxPQ=;
+        b=VCujv3nA9TGvE1lBrjMVAuD0Ia5SpMAvuV/zw4yre38k46pPKXFyyZTeK9DWHKMDfQ
+         GR0YUC5nUBZHz/jBuBd+LEDNQkiYznRC45D8Nz1yS9d42YNPNXGp6wax4gNmDZgN0IdA
+         vsTgOAy+mA9pybbw+X1tWztp4Llp3qItEwoQhGGrj4gkPQQtSgtEFAvNfVORalHStZ48
+         AogMAtbgiapBDXjBEhDkpqC0tnEpH4o9lF8HHpEzNIx0v9XlwkVZLsgDH8l/4Cih7Qtt
+         HHj3+a254LXmhQnqEzF1mcpkLrDzIqOzhIbf51MCePG5ed9jkf/zfdlfmSqCBDiWUBeC
+         hbYg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/uBnPL+R6uwApG/5l0L4OASNEky7GDJj1xwISsb4E+yobb31DpZ9Q9WZAoyMYGJhtLRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywps+HShHqGRet93oDb+qLZCJ0WgHinGeewyQ7X+Bu/TdBDi07u
+	Yh2LAwmxBKT16M3AMxu/BPCdZHU3q1QEgJbpJzfz6kU1At6jVfCmuuleLwKzWTZxRWeS3DkV6u1
+	+Xw==
+X-Google-Smtp-Source: AGHT+IFX8Gb8h6J+XoaDUIOL0BfhgtQAHFbQcWrM3kh7lUuCjN0+4w5jTeoVicZi2AD+wRaXv1IpPGRPdQY=
+X-Received: from pgc1.prod.google.com ([2002:a05:6a02:2f81:b0:ad8:6337:811d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:7314:b0:1ed:7540:45d5
+ with SMTP id adf61e73a8af0-1ee5c74ccf3mr617940637.17.1739299992823; Tue, 11
+ Feb 2025 10:53:12 -0800 (PST)
+Date: Tue, 11 Feb 2025 10:53:11 -0800
+In-Reply-To: <20241127172654.1024-2-kalyazin@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z6uIGwxx9HzZQ-N7@google.com>
+Mime-Version: 1.0
+References: <20241127172654.1024-1-kalyazin@amazon.com> <20241127172654.1024-2-kalyazin@amazon.com>
+Message-ID: <Z6ucl7U79RuBsYJt@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86: async_pf: remove support for KVM_ASYNC_PF_SEND_ALWAYS
+From: Sean Christopherson <seanjc@google.com>
+To: Nikita Kalyazin <kalyazin@amazon.com>
+Cc: pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	vkuznets@redhat.com, xiaoyao.li@intel.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, roypat@amazon.co.uk, 
+	xmarcalx@amazon.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Feb 11, 2025 at 09:25:47AM -0800, Sean Christopherson wrote:
-> Because obviously optimizing code that's called once during boot is super
-> critical?
+On Wed, Nov 27, 2024, Nikita Kalyazin wrote:
+> 3a7c8fafd1b42adea229fd204132f6a2fb3cd2d9 ("x86/kvm: Restrict
+> ASYNC_PF to user space") stopped setting KVM_ASYNC_PF_SEND_ALWAYS in
+> Linux guests.  While the flag can still be used by legacy guests, the
+> mechanism is best effort so KVM is not obliged to use it.
 
-Because let's stick 'em where they belong and keep headers containing only
-small, trivial and inlineable functions. Having unusually big functions in
-a header triggers my weird code patterns detector. :)
+What's the actual motivation to remove it from KVM?  I agreed KVM isn't required
+to honor KVM_ASYNC_PF_SEND_ALWAYS from a guest/host ABI perspective, but that
+doesn't mean that dropping a feature has no impact.  E.g. it's entirely possible
+removing this support could negatively affect a workload running on an old kernel.
 
--- 
-Regards/Gruss,
-    Boris.
+Looking back at the discussion[*] where Vitaly made this suggestion, I don't see
+anything that justifies dropping this code.  It costs KVM practically nothing to
+maintain this code.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+[*] https://lore.kernel.org/all/20241118130403.23184-1-kalyazin@amazon.com
 
