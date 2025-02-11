@@ -1,180 +1,137 @@
-Return-Path: <kvm+bounces-37925-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37927-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95FE0A31823
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 22:47:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E61A318AC
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 23:36:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 878A87A28FB
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 21:46:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 150AE1889BAF
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 22:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B8E1F03CC;
-	Tue, 11 Feb 2025 21:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3F3268FE4;
+	Tue, 11 Feb 2025 22:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vWlAo3/V"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmPSfKUP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110B726772A
-	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 21:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDD6267715
+	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 22:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739310413; cv=none; b=D02OuDsK3/vk6ynn4qzJcbeeE/avX6XB7bfi7m5uYi9bbzkeURHf/l7YTjm42apOQAPcwdPmFNMrJVh+ULzKMY6z9/yIYnLx+N122VDX2UAi9XPRwAgNXEDYeOh6oi6rRyuUzKBoSt0u5QAl9V10s7AIimnHPALN7cAYwoNIt+w=
+	t=1739313353; cv=none; b=FAU6aFKq8oilJYQI/haBNHPV+sS0lJWRsHASlibbdb+k3alm2zRMe5t6vAqPjFzVbAqVBTZ3ibh0j9317ILI+tNBDon4e/QZPo0dBXwQ+LkJVHktXCtisr0/fwjtFhPpAhxf80U8BYmzE3Euq5L/6lWGrJl9kZUMJEqNI+aIS4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739310413; c=relaxed/simple;
-	bh=mXdj/8Wy7lAGqqOFf0YkOFzZunV8YsJ1KxV4OGFZz20=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j135AyFs9lvCtELQfzGDEwlvwTbCNIUi6osk9iTrJsO14kR5oni2YkJmnaAKniiLHTMuzdcbaEaKrMtDQ+Yl/kt0DQFVBS7UUN8wCR2vmc28DIM68Y0mVkBlaHStElqxuiOuxr1pxvGPSA9hHdw2vIlqaviWSLDNAFxUZsE+wc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vWlAo3/V; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21f6890d42dso129947245ad.0
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 13:46:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739310411; x=1739915211; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6mvCPTi078oatgZttY+CUepNgmI0pKTTmm/hDNy/tGc=;
-        b=vWlAo3/V46XOYarc1uvsf/B7/ZnM4NA0QhmJG1Yy1FCAwUHbLFNpH/eKiJaU6cOkAp
-         3KpHA0MEEvBpBfTjwvQ9ZMUef40l7hlcxOnDfeMleKqgoCphepz+658igBDa1f+Tje6t
-         ZpZ8PcmhTaihcdPhnxnnsYHy0RJAe0NCH5R/5u2HXnGUqJvK9FCQmysGdx5D20Ie1V/R
-         177PMnNEUnLdDKgR73Ui+uzgmkv9W/YjMa7hrzgb66/x+qNW9eHBJk7aHcAISfvF+6Sc
-         4DDDsBeoYsaoQVoGy4srCtCAoAVIoz3jjx8MuMnqsZpywIKhhQuaBJlxzxyD5ylvSQPN
-         IIQg==
+	s=arc-20240116; t=1739313353; c=relaxed/simple;
+	bh=Xkdp9y4dsVSdxrh44v4Max9ccE+5GLe6LAhQMb/0OyA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MAl2vLHq7pTjRv/CGVsY/6aJ65fghJj8y//HjxK16V99WKi8sjMPOkJCEVdfMQ8VToaRlnEgY5yVu/+xDPHt79EHfQfWv53jDYjGrGpENyd68bC3HuGcWN1imXZETwCZXG0bUBfiEt2B2G1sS/SfjTl6vJgoVAP53K/PZDnUI1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QmPSfKUP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739313350;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AQmLFir4UkEGYUUsaqSF/TAOnlHne0O7Pyi3Uz6Gm6s=;
+	b=QmPSfKUPEzpS5S8KwQAh/2R4PaNjZ/uW5qWXA+gJSOVJhRI05zOcp8uEfixVXXGinhEDes
+	g/TrqvbR+ho+iUTZ1wAoYuyGp0JEgJjfXbhnoOc9QVfS7KRo19AHIAUpOOLrgmyKJgHrfs
+	xSplmJgsxXOBHVTBvCQNsaHq84g0MGc=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-61-64K664KnMBSjiydg_jO9gg-1; Tue, 11 Feb 2025 17:35:48 -0500
+X-MC-Unique: 64K664KnMBSjiydg_jO9gg-1
+X-Mimecast-MFC-AGG-ID: 64K664KnMBSjiydg_jO9gg_1739313348
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3f3aa4b60bbso5308951b6e.3
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 14:35:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739310411; x=1739915211;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6mvCPTi078oatgZttY+CUepNgmI0pKTTmm/hDNy/tGc=;
-        b=oA0QHiTfKw60JkdvF/1He9fkg4er0MMRLrmSd0xjyazE2NUhfd5EtAdZEKZiqF4pO/
-         nllddvH6uHcOsM9Ka5AovDD6IrWbKbSCeiXzZRxq6VWbsstLQtVv43Te+86B8BbO/BVp
-         qlfLY6kW6OOc7QAlhAg8yxhCozM5I0QQhBHbgEJ6U+JwbK0D+4Y8bT7MaOgKoITU0BVu
-         EndrhvcYeMh3NE7GTA2dgTHcoWB0lMnKEH/igwD+zpem7Wl70v2Gtszh0g2KZZSqDnus
-         IzmKRJCJZv5+bbLSd+TIILxrvbWQGC41Dvp3ISfiTApMb5JmKceG1lrloU3y/TrejFMV
-         acBA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+qErdNx+jDi0IdG7dYImRDXZcbyPaWzoXiScuPU5H2kE5D/bG3YVExPB7QHBjeAIZADc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJezvTFL0OTA8syZgJbAgRMNVtMWJhMVEr8hqcwYZGYOGtdr8g
-	zxEm02lixTKjIE4E8+RwLMOUmDQJdWPxD69KZo3FafAg6hOBHfqTIo/EsDX1AbxX7v/VQjGFMyk
-	rhA==
-X-Google-Smtp-Source: AGHT+IHqctElHQsje8GD0oIhIva/TYzquQdAPSXcMtbPFuairkitbpoJ8EDI9U/Ym3LShWUab2Umb92QUi8=
-X-Received: from pfan21.prod.google.com ([2002:aa7:8a55:0:b0:730:7a22:c567])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2450:b0:1e1:bdae:e04d
- with SMTP id adf61e73a8af0-1ee5c85db6bmr1716822637.36.1739310411277; Tue, 11
- Feb 2025 13:46:51 -0800 (PST)
-Date: Tue, 11 Feb 2025 13:46:49 -0800
-In-Reply-To: <4eb24414-4483-3291-894a-f5a58465a80d@amd.com>
+        d=1e100.net; s=20230601; t=1739313348; x=1739918148;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AQmLFir4UkEGYUUsaqSF/TAOnlHne0O7Pyi3Uz6Gm6s=;
+        b=MjJzxFj/2NpcJ4Gf1Y1S1NOlrMnjshxIjHzNrqfiEWyYJ72W2y5hdqf5VKdKddlaVk
+         X5NSGEKMJDg0ksCrRKITIDdWYeUVqh+oBorwCCkCBDE5oQDPNFYn7/voPni0wCaLMfc3
+         dRrFKZdFPGyGNEsT+kkhd52DMD+3lsBAZN0qH6u39MRB8B7y0K7fNGWNEsIoz13duunv
+         WP0zD6vU5mJ6QcFd2IzhfhyUK0BCeiQxlSqNbqqfunC5h3N+JsVVjnczSY59Ppufo6t+
+         B1r+tgQ+FbBmxVKAKC8LBJJs/TbODHYIvvWh/SnG4i/IveTFjn9r53cAJ/XbqMcxFBaS
+         7/4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVykZV7Xe9vHkIAoQQhGSfgAr2Hybz8fX46m88eyDn73o7gCUzpskBVPqHSi/os4rXixgY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxF0A42Wx4ooJzny438TLO0fvZTQlGklSZkBfgyFPe5WZktAXyK
+	8KonMmQh8Siho8oMDF+JgjTCI9Nl3NXeFMfJD2gO0hGKUtwU/ASrqj4dwLdPYhJ57gg90da5gyu
+	khxaRY0hqDgJADnVyspTDvc5wksnMvcaP0KYjlIh8wBZNrN0fCg==
+X-Gm-Gg: ASbGncsyMSfSp2n+vzhv+WwR2p6BmqtarkVltC4S7j6VNOxOZ3HYA6NKc6JISthdkpi
+	ZeJaTV4BM78+veoJ7fcu+3EPLi4npu1alUy3Jj47An6s0JYD+9MardMjuiF5E9ZFBLTz11CfLSf
+	8H8cGzWubnW8mMveT1JBv177JsTPGjXzQxEaXDOSnPfHdDvj5QoE7zS2vL+1vWHdK70/Mg3AD5X
+	MOdbQZBsV11CJOSfvsGSdhspgNiWQizDH0rN7hALCBh55CZR9pWTjFvLhc=
+X-Received: by 2002:a05:6808:80cc:b0:3f3:b0ae:7998 with SMTP id 5614622812f47-3f3cd601076mr1099268b6e.17.1739313347791;
+        Tue, 11 Feb 2025 14:35:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGtm+HslfUZKczOhDisXpbAz9Wg8zd23YUSu/nhTnz2WuQo5SFimH65ggUbt/iDHmN7BQOJCA==
+X-Received: by 2002:a05:6808:80cc:b0:3f3:b0ae:7998 with SMTP id 5614622812f47-3f3cd601076mr1099254b6e.17.1739313347528;
+        Tue, 11 Feb 2025 14:35:47 -0800 (PST)
+Received: from x1.local ([2604:7a40:2041:2b00::1000])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f389efebe9sm3576089b6e.27.2025.02.11.14.35.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 14:35:46 -0800 (PST)
+Date: Tue, 11 Feb 2025 17:35:42 -0500
+From: Peter Xu <peterx@redhat.com>
+To: =?utf-8?Q?=E2=80=9CWilliam?= Roche <william.roche@oracle.com>
+Cc: david@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org, pbonzini@redhat.com,
+	richard.henderson@linaro.org, philmd@linaro.org,
+	peter.maydell@linaro.org, joao.m.martins@oracle.com
+Subject: Re: [PATCH v8 0/3] Poisoned memory recovery on reboot
+Message-ID: <Z6vQvr4dCCsBR2sX@x1.local>
+References: <20250211212707.302391-1-william.roche@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250207233410.130813-1-kim.phillips@amd.com> <20250207233410.130813-3-kim.phillips@amd.com>
- <4eb24414-4483-3291-894a-f5a58465a80d@amd.com>
-Message-ID: <Z6vFSTkGkOCy03jN@google.com>
-Subject: Re: [PATCH v3 2/2] KVM: SEV: Configure "ALLOWED_SEV_FEATURES" VMCB Field
-From: Sean Christopherson <seanjc@google.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Kim Phillips <kim.phillips@amd.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
-	Michael Roth <michael.roth@amd.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	"Nikunj A . Dadhania" <nikunj@amd.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Kishon Vijay Abraham I <kvijayab@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250211212707.302391-1-william.roche@oracle.com>
 
-On Mon, Feb 10, 2025, Tom Lendacky wrote:
-> On 2/7/25 17:34, Kim Phillips wrote:
-> > @@ -289,6 +291,7 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_
-> >  #define SVM_SEV_FEAT_RESTRICTED_INJECTION		BIT(3)
-> >  #define SVM_SEV_FEAT_ALTERNATE_INJECTION		BIT(4)
-> >  #define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
-> > +#define SVM_SEV_FEAT_ALLOWED_SEV_FEATURES		BIT_ULL(63)
+On Tue, Feb 11, 2025 at 09:27:04PM +0000, “William Roche wrote:
+> From: William Roche <william.roche@oracle.com>
 > 
-> Hmmm... I believe it is safe to define this bit value, as the Allowed
-> SEV features VMCB field shows bits 61:0 being used for the allowed
-> features mask and we know that the SEV_FEATURES field is used in the SEV
-> Features MSR left-shifted 2 bits, so we only expect bits 61:0 to be used
-> and bits 62 and 63 will always be reserved. But, given that I think we
-> need two functions:
+> Here is a very simplified version of my fix only dealing with the
+> recovery of huge pages on VM reset.
+>  ---
+> This set of patches fixes an existing bug with hardware memory errors
+> impacting hugetlbfs memory backed VMs and its recovery on VM reset.
+> When using hugetlbfs large pages, any large page location being impacted
+> by an HW memory error results in poisoning the entire page, suddenly
+> making a large chunk of the VM memory unusable.
 > 
-> - get_allowed_sev_features()
->   keeping it as you have it below, where it returns the
->   sev->vmsa_features bitmap if SVM_SEV_FEAT_ALLOWED_SEV_FEATURES is set
->   or 0 if SVM_SEV_FEAT_ALLOWED_SEV_FEATURES is not set.
+> The main problem that currently exists in Qemu is the lack of backend
+> file repair before resetting the VM memory, resulting in the impacted
+> memory to be silently unusable even after a VM reboot.
 > 
-> - get_vmsa_sev_features()
->   which removes the SVM_SEV_FEAT_ALLOWED_SEV_FEATURES bit, since it is
->   not defined in the VMSA SEV_FEATURES definition.
-
-Or just don't add wrappers that do more harm than good?
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index a9e16792cac0..4d0b5a020b65 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -894,15 +894,6 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
-        return 0;
- }
- 
--static u64 allowed_sev_features(struct kvm_sev_info *sev)
--{
--       if (cpu_feature_enabled(X86_FEATURE_ALLOWED_SEV_FEATURES) &&
--           (sev->vmsa_features & SVM_SEV_FEAT_ALLOWED_SEV_FEATURES))
--               return sev->vmsa_features;
--
--       return 0;
--}
--
- static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
-                                    int *error)
- {
-@@ -916,7 +907,8 @@ static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
-                return -EINVAL;
-        }
- 
--       svm->vmcb->control.allowed_sev_features = allowed_sev_features(sev);
-+       if (cpu_feature_enabled(X86_FEATURE_ALLOWED_SEV_FEATURES))
-+               svm->vmcb->control.allowed_sev_features = sev->vmsa_features;
- 
-        /* Perform some pre-encryption checks against the VMSA */
-        ret = sev_es_sync_vmsa(svm);
-@@ -2459,7 +2451,8 @@ static int snp_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
-                struct vcpu_svm *svm = to_svm(vcpu);
-                u64 pfn = __pa(svm->sev_es.vmsa) >> PAGE_SHIFT;
- 
--               svm->vmcb->control.allowed_sev_features = allowed_sev_features(sev);
-+               if (cpu_feature_enabled(X86_FEATURE_ALLOWED_SEV_FEATURES))
-+                       svm->vmcb->control.allowed_sev_features = sev->vmsa_features;
- 
-                ret = sev_es_sync_vmsa(svm);
-                if (ret)
-
-> >  #define SVM_SEV_FEAT_INT_INJ_MODES		\
-> >  	(SVM_SEV_FEAT_RESTRICTED_INJECTION |	\
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index a2a794c32050..a9e16792cac0 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -894,9 +894,19 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
-> >  	return 0;
-> >  }
-> >  
-> > +static u64 allowed_sev_features(struct kvm_sev_info *sev)
-> > +{
-> > +	if (cpu_feature_enabled(X86_FEATURE_ALLOWED_SEV_FEATURES) &&
+> In order to fix this issue, we take into account the page size of the
+> impacted memory block when dealing with the associated poisoned page
+> location.
 > 
-> Not sure if the cpu_feature_enabled() check is necessary, as init should
-> have failed if SVM_SEV_FEAT_ALLOWED_SEV_FEATURES wasn't set in
-> sev_supported_vmsa_features.
+> Using the page size information we also try to regenerate the memory
+> calling ram_block_discard_range() on VM reset when running
+> qemu_ram_remap(). So that a poisoned memory backed by a hugetlbfs
+> file is regenerated with a hole punched in this file. A new page is
+> loaded when the location is first touched.  In case of a discard
+> failure we fall back to remapping the memory location.
+> 
+> But we currently don't reset the memory settings and the 'prealloc'
+> attribute is ignored after the remap from the file backend.
 
-Two things missing from this series:
+queued patch 1-2, thanks.
 
- 1: KVM enforcement.  No way is KVM going to rely on userspace to opt-in to
-    preventing the guest from enabling features.
+-- 
+Peter Xu
 
- 2: Backwards compatilibity if KVM unconditionally enforces ALLOWED_SEV_FEATURES.
-    Although maybe there's nothing to do here?  I vaguely recall all of the gated
-    features being unsupported, or something...
 
