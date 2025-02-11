@@ -1,118 +1,173 @@
-Return-Path: <kvm+bounces-37890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EBFBA3114E
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 17:28:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D514A3115B
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 17:30:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 391153A42AE
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 16:28:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81C26188188A
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 16:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62B1255E32;
-	Tue, 11 Feb 2025 16:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D799E253B7F;
+	Tue, 11 Feb 2025 16:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BJfVChW7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o95N7Zr1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A81E24C69D
-	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 16:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6481126BDAB
+	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 16:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739291303; cv=none; b=LgowT6ve6We64tZrlXXoVZYTP5W7EJ2/h7IpE8EmcpT0J1XOLyUrdy+L2VNGsg4SsM2ACwktPfwddU19GxiT/Uj9Wnoe6ywbc7GPReVtPVF6S3/Wp4Mja72/itZbUUUAtw3hnin58suj1tslqJKQVyQJ7qV+pB/zClK09lJzM3Q=
+	t=1739291396; cv=none; b=hi7s98GdAA2bQsnHPtoxxRGb3Yh/7voioTxxus4/OQU8xScc8y4OZ8IHVWusmxdMxOABBMTlNUH+dqWysmB2P3uuogsq43d0pYCb8SgIFUgdlsR+BK9Y/fvwBfOmEuing6Pvbsr/edw+t99wBEPqhe9N3CqMb0HTTyMIp4W4UsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739291303; c=relaxed/simple;
-	bh=yilJGqWW4RYMKFOjUyyusb+5EmeDe91eA1bXhwR/YFI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=o6wBZJX7lk5x4BJ+lTQ6dzWGUAlAU2NodYTCyLoO4TggJXQkh677YCLx2yzuZgeXI427pqUBpSsqwrrO//6ytiRhpQ+DY0UXZ+05u3MTnc4g0Q3iLBGyoxJNvXSfYbuDYAAyq1wgPvjXE4+UFmpHpwnRkyS+gKEH6FyKuVjSvsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BJfVChW7; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1739291396; c=relaxed/simple;
+	bh=TGWJJNl/ouS8GrPV1JAQvbYqfNVgYK/o5wsywdkv0k0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bwfqhurynaypCn/I5VLPWKiXQY14kOhUNuPXdk2ExrkSQfnlq0mZQJug64TCwRZyCmBDTlMT+AkFzpKWDYSJa7UWMewgR/L27f1dPqRYymi6F2lXZ9MLulBnpB0OVihld1jKfcO4nsRfrvaeYenKKgtiTCRlIBVauGapOkVfZ/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o95N7Zr1; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f2a9f056a8so11356014a91.2
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 08:28:22 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ab7c501bbecso362870966b.2
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 08:29:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739291301; x=1739896101; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5MEK/stSb+AMRyC9Zhx6OFHXRnHPVcvklj9Pc8LhwOQ=;
-        b=BJfVChW7Y2jO/ywJh08g35IqukXtKRfHNnPeT6Bb3V/ctZQ55gghSQG/uMR3pK21Bs
-         JvH9zAxfQCZnieEjFG21FepKyMy0VktvKZSM/wHgUVMek3KngJeRFAWXnlQAkLJT1fBO
-         0kMJoJyBhJn5C60ZaCV+zrWIdUi6Zp+F0SaVohKpppry40OkTPtUxLz0BEJcAkrE4P3z
-         coKYEgCgw68vqVQHOn3wKvdFlL+OtKZkDRqGA1tdPq6Qwq9gKRpKzP6HBbxvHQFo4dfz
-         lyfP8pWshLNusB9L9qdUDpMa8h2AQPhbAQKAkjhxJAY7oMQSiK0mbyUUy75QWfWcg40P
-         i1+A==
+        d=google.com; s=20230601; t=1739291393; x=1739896193; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oTKc8O2xhSlItJQZLHeJlYNUY/i+GeTW1EidQ/oJtlk=;
+        b=o95N7Zr1MU72gecSMOBnnUxunFLpIILsH1fGxxo5wj81E40HLuLVu/M1tSfaNZv3Uq
+         +Xqi3vQIO0X1msL+raTp5FqwLkGpPiBmb9FRLsZaegN4WmFG7TDjvTwAw4G9BHUbKHO4
+         7xzpb5yAwGpvlnePVyzWL8isd+nu/6lg/fAPGyoEUUfH5ds6t/8j3dEvakAY9a84CiDt
+         U9vhT6KWVHcRjB/v8BliN9Qzkbda5ufoJr5wRgrOrtFKqmSfAcEXXU1sJ442zW1zAs/a
+         5JDH/nnS8qQ/UHMNrT8FHOuSQI1EzTXVJzYOI+CvSs4Qy7T2tZRqYgXbz8GPjep8Kuwu
+         eNnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739291301; x=1739896101;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5MEK/stSb+AMRyC9Zhx6OFHXRnHPVcvklj9Pc8LhwOQ=;
-        b=XpgELMZUvwzB0ggkkEwr+kFGMawXnYFplgpbTeP/kl72KN3ldMJ080gKhLlCemly0Y
-         J+QiYvPs0l9HeKPHEpcqgyxN9ORgU3+HEBVKAOAyfVmDz0KO4NJ/wOvKe/U5d8XRUcV+
-         7J/+x0ItnHnoYloTOf5BbXrbb8WZ28Fvm7GRkhLUwlbRgHHvPntZw9jrUbnjkmliO/4e
-         BSoc3zLBE219KfY/BmzVCtdiHUi6wBLHTtUIr1f3BSeudNYI85LN4KipB2zWcER4MKpp
-         60UhZEzjYPfxCB45IA0WeX6BwDnhCvRz6yf02IbMBwaTkkMrv1a2UKYej+DVwoIbDDT0
-         9VsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSuS4phcWlOMmweh0ThgDJEOs5YKqreP0c+XCC/a1ppBgpnW7SmtGh6n5f0B9oA5VYiO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7yWlGDbJxS1wtcN/mtuzsS6I4nPEt0U0fYE7Qha1SsVmqy3XY
-	Zvgg8cr0w/YH9ROjXHYCkxxgkzAKgzHbYBDAm/JUD9IjR2Sbui9puS4ZH75RV8+3dDLt5+1ozJY
-	SAQ==
-X-Google-Smtp-Source: AGHT+IEW6FT5SzWSOj0JB0UAPg+blRK0ibYMj54XT+2rd1e326WroNU4nUmkSnUDL4aqV/75Jp14hq1SYiM=
-X-Received: from pfrc11.prod.google.com ([2002:aa7:8e0b:0:b0:730:7648:7a74])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:188f:b0:732:2170:b69a
- with SMTP id d2e1a72fcca58-7322170b72bmr3189092b3a.18.1739291301572; Tue, 11
- Feb 2025 08:28:21 -0800 (PST)
-Date: Tue, 11 Feb 2025 16:28:20 +0000
-In-Reply-To: <20250211143919.GBZ6thF2Ryx-D2YpDz@fat_crate.local>
+        d=1e100.net; s=20230601; t=1739291393; x=1739896193;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oTKc8O2xhSlItJQZLHeJlYNUY/i+GeTW1EidQ/oJtlk=;
+        b=Kd6qbyoGFtjHlISReF/s3NXTIYcLdmLZeJPEhUHUR4CvrdBGHbpx2AtOTKGK+tON80
+         rpx1gl731KKqZKoevl241onxMtM3UGREUjesMAQ7Uhudv3O+quooEOQTIsTS3hNcGZg2
+         +B0SnADx7jZ8NwptuTmBE+7vrNUIThDM0Cc1xYsFsOAN3GS0n+dlHWSt9gOeCTkdp6ek
+         sw8qnKYIsT7iir+LZAM2fOF51Rm7qGDO0Enz0DdcmWNJ8+MOyfFtSa4blGXfLEa+xsdO
+         nZLFK3wgg6XI1pHOBkJgymjGhtXJDEnHiuMz93oXd5lcCuuEeEXMkuT1ApqCeDt3n4Zt
+         VGhA==
+X-Gm-Message-State: AOJu0Yyl4V0G3a0qL8vxYeyJQogXnbBLfWEONzHn/8WbPRJXnSu7bhH3
+	zNOxAer2hXWD4Zl1jrEzD2Zpbs6yNVc79j4yAmViY8LTtNg5vWrNLmjPxCZdfiaLHLffCU4HJLs
+	ryBLl
+X-Gm-Gg: ASbGncsR2hjbAgs1PGKE0io+KNrK3NbgNh2LL+TiVaATAyCyY9F3oXs/mNnJ3pui7/s
+	5y+i+vsCAO5U31hDhwq4njTCE28tmqOT6WLqO31R69wlx1D3WkMjvUjo6428eoisCg7L7hHqeT/
+	gDs+BS79e7npI1xj/Iz/dfw9D9HjY7R+izcbcnV4MPkVg4H8oqaCa0MqavITpp9bQlqT4J4q3aQ
+	zgNYi1ZJVF0jn7jurYvXSuOn/YCO+/kDHEAKwtsfh/x3gjJsTlDK/RJhalBZgrI2k0c+bkq0qTP
+	/Zz5/RA0EfOU7PZdUo+0HOfzHvQKaM2+bdaZEHuqdEPYeSVoQAdn
+X-Google-Smtp-Source: AGHT+IHsyVU9J+CUk3viX6pcLm6IInJq+JNASwlrWLBMLzojURwPpJGFPY0UrOtJAuuwI/PYinzVhw==
+X-Received: by 2002:a17:907:720d:b0:ab7:e91c:77e5 with SMTP id a640c23a62f3a-ab7e91c7d7emr239441166b.11.1739291392390;
+        Tue, 11 Feb 2025 08:29:52 -0800 (PST)
+Received: from google.com (229.112.91.34.bc.googleusercontent.com. [34.91.112.229])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7b35b0d2csm564886966b.122.2025.02.11.08.29.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 08:29:51 -0800 (PST)
+Date: Tue, 11 Feb 2025 16:29:48 +0000
+From: Quentin Perret <qperret@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+	xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	vannapurve@google.com, ackerleytng@google.com,
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
+	wei.w.wang@intel.com, liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com, steven.price@arm.com,
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+	quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+	quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+	maz@kernel.org, will@kernel.org, keirf@google.com,
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org,
+	jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com,
+	fvdl@google.com, hughd@google.com, jthoughton@google.com
+Subject: Re: [PATCH v3 09/11] KVM: arm64: Introduce
+ KVM_VM_TYPE_ARM_SW_PROTECTED machine type
+Message-ID: <Z6t6_M8un1Cf3nmk@google.com>
+References: <20250211121128.703390-1-tabba@google.com>
+ <20250211121128.703390-10-tabba@google.com>
+ <Z6t227f31unTnQQt@google.com>
+ <CA+EHjTweTLDzhcCoEZYP4iyuti+8TU3HbtLHh+u5ark6WDjbsA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250201021718.699411-1-seanjc@google.com> <20250211143919.GBZ6thF2Ryx-D2YpDz@fat_crate.local>
-Message-ID: <Z6t6pMgAjHckWMs_@google.com>
-Subject: Re: [PATCH 00/16] x86/tsc: Try to wrangle PV clocks vs. TSC
-From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Juergen Gross <jgross@suse.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
-	Alexey Makhalov <alexey.amakhalov@broadcom.com>, Jan Kiszka <jan.kiszka@siemens.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, virtualization@lists.linux.dev, 
-	linux-hyperv@vger.kernel.org, jailhouse-dev@googlegroups.com, 
-	kvm@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	Nikunj A Dadhania <nikunj@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTweTLDzhcCoEZYP4iyuti+8TU3HbtLHh+u5ark6WDjbsA@mail.gmail.com>
 
-On Tue, Feb 11, 2025, Borislav Petkov wrote:
-> On Fri, Jan 31, 2025 at 06:17:02PM -0800, Sean Christopherson wrote:
-> > And if the host provides the core crystal frequency in CPUID.0x15, then KVM
-> > guests can use that for the APIC timer period instead of manually
-> > calibrating the frequency.
+On Tuesday 11 Feb 2025 at 16:17:25 (+0000), Fuad Tabba wrote:
+> Hi Quentin,
 > 
-> Hmm, so that part: what's stopping the host from faking the CPUID leaf? I.e.,
-> I would think that actually doing the work to calibrate the frequency would be
-> more reliable/harder to fake to a guest than the guest simply reading some
-> untrusted values from CPUID...
+> On Tue, 11 Feb 2025 at 16:12, Quentin Perret <qperret@google.com> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On Tuesday 11 Feb 2025 at 12:11:25 (+0000), Fuad Tabba wrote:
+> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > > index 117937a895da..f155d3781e08 100644
+> > > --- a/include/uapi/linux/kvm.h
+> > > +++ b/include/uapi/linux/kvm.h
+> > > @@ -652,6 +652,12 @@ struct kvm_enable_cap {
+> > >  #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK        0xffULL
+> > >  #define KVM_VM_TYPE_ARM_IPA_SIZE(x)          \
+> > >       ((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+> > > +
+> > > +#define KVM_VM_TYPE_ARM_SW_PROTECTED (1UL << 9)
+> >
+> > FWIW, the downstream Android code has used bit 31 since forever
+> > for that.
+> >
+> > Although I very much believe that upstream should not care about the
+> > downstream mess in general, in this particular instance bit 9 really
+> > isn't superior in any way, and there's a bunch of existing userspace
+> > code that uses bit 31 today as we speak. It is very much Android's
+> > problem to update these userspace programs if we do go with bit 9
+> > upstream, but I don't really see how that would benefit upstream
+> > either.
+> >
+> > So, given that there is no maintenance cost for upstream to use bit 31
+> > instead of 9, I'd vote for using bit 31 and ease the landing with
+> > existing userspace code, unless folks are really opinionated with this
+> > stuff :)
+> 
+> My thinking is that this bit does _not_ mean pKVM. It means an
+> experimental software VM that is similar to the x86
+> KVM_X86_SW_PROTECTED_VM. Hence why I didn't choose bit 31.
+> 
+> From Documentation/virt/kvm/api.rst (for x86):
+> 
+> '''
+> Note, KVM_X86_SW_PROTECTED_VM is currently only for development and testing.
+> Do not use KVM_X86_SW_PROTECTED_VM for "real" VMs, and especially not in
+> production.  The behavior and effective ABI for software-protected VMs is
+> unstable.
+> '''
+> 
+> which is similar to the documentation I added here.
 
-Not really.  Crafting an attack based on timing would be far more difficult than
-tricking the guest into thinking the APIC runs at the "wrong" frequency.  The
-APIC timer itself is controlled by the hypervisor, e.g. the host can emulate the
-timer at the "wrong" freuquency on-demand.  Detecting that the guest is post-boot
-and thus done calibrating is trivial.
+Aha, I see, but are we going to allocate _another_ bit for protected VMs
+proper once they're supported? Or just update the doc for the existing
+bit? If the latter, then I guess this discussion can still happen :)
 
-> Or are we saying here: oh well, there are so many ways for a normal guest to
-> be lied to so that we simply do the completely different approach and trust
-> the HV to be benevolent when we're not dealing with confidential guests which
-> have all those other things to keep the HV honest?
-
-This.  Outside of CoCo, the hypervisor is 100% trusted.  And there's zero reason
-for the hypervisor to lie, it can simply read/write all guest state.
+Thanks,
+Quentin
 
