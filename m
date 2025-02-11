@@ -1,203 +1,133 @@
-Return-Path: <kvm+bounces-37865-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37866-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD78A30D0C
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 14:34:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0904A30D15
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 14:36:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED0D33A83BB
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 13:34:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 468363A1698
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 13:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E632F2451F3;
-	Tue, 11 Feb 2025 13:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36202221D92;
+	Tue, 11 Feb 2025 13:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PN0HethK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFGXf+UU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61F01FBEA9
-	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 13:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FCD1F3D58;
+	Tue, 11 Feb 2025 13:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739280842; cv=none; b=GEP/06qAm4T0quO5lUS2toUxyiObVjrGlDPGZnxHoG7sSAu+51jmhR5Y1TOjo4gxMJtzM3p62KDs5FKtI6dx6U2szKcHpGjigq7tRktXY3bLWaZ81BUbUd3A3Htkjz6xrYqIxPwlbouHmWSBVDSsHoobfIg7XDv4BKkAh1+aam8=
+	t=1739280958; cv=none; b=EJmqvYjJC9/19yg5m3pECU12bjnXtbo/AhMdKelHyTz77envBzyxWYfSyAEQwGSI79awGZnkd0Maj1+rIdihqQLpWztXlH9pyIo2EchxToqB2GY+5emdLD6ZYDm/OZI3qklkQrD6CcPZQ04QM7jHymSgQByxvmI1pCgFnyaAiKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739280842; c=relaxed/simple;
-	bh=I6rYC3Ttea935cxDKXU7eGhmr1cWrMQ3SYanZpPc/20=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VbZrsqRAg+LcAy7JMJSyNCKvgmNn6vcUTGgYc/h9UyHywSpm1psm8F0xK7ACa8o3mkSXspRReRkVqCJiOlTvk+hQrhhvXoLr2dMWnf5hWay5wA7XQi0y/Tys78b3755jJTNBJ3ni60Z4EBqqwPZyldMtXQ/9di39iwdWLqeYUNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PN0HethK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739280838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I6rYC3Ttea935cxDKXU7eGhmr1cWrMQ3SYanZpPc/20=;
-	b=PN0HethKvYkcvHG6hz6HFjsztXKJt0k2qodq+Fy8VzY2k7RD6GR7GClMgiu97zMsWQ2o5d
-	dSLl+adedNSSfGDCJUUAdZFcW15cZyiB+tuOIqvnPXdE32ogexkXjKLW4nlXSaKpm42STt
-	lnrzbZxNlLY+FYHe1Qgox2n9rccBPLk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-347-12shRbuPMRSIqlG4iAdsXA-1; Tue, 11 Feb 2025 08:33:57 -0500
-X-MC-Unique: 12shRbuPMRSIqlG4iAdsXA-1
-X-Mimecast-MFC-AGG-ID: 12shRbuPMRSIqlG4iAdsXA
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43945f32e2dso15725225e9.2
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 05:33:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739280836; x=1739885636;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I6rYC3Ttea935cxDKXU7eGhmr1cWrMQ3SYanZpPc/20=;
-        b=TB3RXPWNmifnMUQ7tEYMilOH/e0d2zvKxgsNpQN+pdlVH2ExNb68Je9CaoqbRsV5Cr
-         AVPiznUDUqmFxEEZYPKeydDeQo2/90P9KM0aWkzasKu9bsdpvpA5TkDjxxRtErckIdwf
-         +MgH6ofaZ78pvTsxbbXIMJibSdSTw6VZzTdNxkPXUo7kIfEEiX7oRPg0uv7+J3H1nB6X
-         NqvG6HhfO6EQWAONARcxj7xwZF9/o1bYFhEzsXIuNX97MoqaMZtNA/xBoMhyJeEDQNRg
-         yq9S79sgKmN3Q1iXcKMKgtr+PhRv1olYTyEslokTzVYJKcFrAxII6FgvXHJpI/h9C3eL
-         HCuA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4Fn1hb2IrMtiQlIhVgYETE2jNd031vnk1yM8VlCWSsWhftvccL4q3sSMaZAZnleCXlzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhvaZWt0vl/7Vy0QWsAAUJ+9lnMkw/+ffKAsBRvTkTaUbYanXy
-	VcSAusJmAIXZEQLm3otq8XZJACqziHFVzoSiXKdpjL2eBnEIajK0PeLl5teyxaBt6OHP4Wj+z3z
-	u5gGUIK0UU5VQBFshXl7kUAZunnjIaPZo1uNVEDvmlIu3JxDhhg==
-X-Gm-Gg: ASbGncsHd4GOIQ04/AU3qUjmmaI5Jz4OdKaZJWWm628/sXITDyRQ3W6uh67/kQEbSu5
-	GPLKnZ5QldV+HuGo/PPJr26XRmDxbOubF2KsA3+o/kBEuHeX6ZCeSAuY8mWBVxFblOPPSJ/HXZw
-	jfBNdZztFdqmmqUM1DYwPN5ByhRvosazlqsmdIveyO4iIDjM+WpYqzhV2eNwrPaVxI30ewXZ4YZ
-	FernHmplxgnZbIUkNG5nogpjlNQQMXb99jBhY9gUZtTDnoiNgxrHAeuhwvGARrRGFxPA5Z+0D9S
-	wgJKtm4rg0ijPCQ9WNJZpYqeZ1j+q0pC0hToM7itxQvX1iQEsRMYKoI2zkm4z/4CZQ==
-X-Received: by 2002:a05:600c:384c:b0:439:554f:f64f with SMTP id 5b1f17b1804b1-439554ffb3bmr21891855e9.0.1739280836478;
-        Tue, 11 Feb 2025 05:33:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHLaJ199QatUt+F367q7Ky9NspQydjwYuxDlEpx56Dm3c1ApLy01ntC7qxuc1s/8cawIiMmnw==
-X-Received: by 2002:a05:600c:384c:b0:439:554f:f64f with SMTP id 5b1f17b1804b1-439554ffb3bmr21890805e9.0.1739280836017;
-        Tue, 11 Feb 2025 05:33:56 -0800 (PST)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dcb88d5e6sm11688621f8f.1.2025.02.11.05.33.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 05:33:55 -0800 (PST)
-From: Valentin Schneider <vschneid@redhat.com>
-To: Jann Horn <jannh@google.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
- linux-perf-users@vger.kernel.org, xen-devel@lists.xenproject.org,
- kvm@vger.kernel.org, linux-arch@vger.kernel.org, rcu@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-mm@kvack.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>,
- Ajay Kaher <ajay.kaher@broadcom.com>, Alexey Makhalov
- <alexey.amakhalov@broadcom.com>, Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave
- Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Peter Zijlstra <peterz@infradead.org>, Arnaldo Carvalho de Melo
- <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>, Alexander Shishkin
- <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, Ian
- Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
- "Liang, Kan" <kan.liang@linux.intel.com>, Boris Ostrovsky
- <boris.ostrovsky@oracle.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Pawan
- Gupta <pawan.kumar.gupta@linux.intel.com>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski
- <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Frederic Weisbecker
- <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, Jason
- Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, Ard
- Biesheuvel <ardb@kernel.org>, Neeraj Upadhyay
- <neeraj.upadhyay@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
- Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
- Uladzislau Rezki <urezki@gmail.com>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>,
- Zqiang <qiang.zhang1211@gmail.com>, Juri Lelli <juri.lelli@redhat.com>,
- Clark Williams <williams@redhat.com>, Yair Podemsky <ypodemsk@redhat.com>,
- Tomas Glozar <tglozar@redhat.com>, Vincent Guittot
- <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, Kees Cook
- <kees@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Christoph
- Hellwig <hch@infradead.org>, Shuah Khan <shuah@kernel.org>, Sami Tolvanen
- <samitolvanen@google.com>, Miguel Ojeda <ojeda@kernel.org>, Alice Ryhl
- <aliceryhl@google.com>, "Mike Rapoport (Microsoft)" <rppt@kernel.org>,
- Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>,
- Nicolas Saenz Julienne <nsaenzju@redhat.com>, Geert Uytterhoeven
- <geert@linux-m68k.org>, Yosry Ahmed <yosryahmed@google.com>, "Kirill A.
- Shutemov" <kirill.shutemov@linux.intel.com>, "Masami Hiramatsu (Google)"
- <mhiramat@kernel.org>, Jinghao Jia <jinghao7@illinois.edu>, Luis
- Chamberlain <mcgrof@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
- Tiezhu Yang <yangtiezhu@loongson.cn>
-Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer
- flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
-In-Reply-To: <CAG48ez1EAATYcX520Nnw=P8XtUDSr5pe+qGH1YVNk3xN2LE05g@mail.gmail.com>
-References: <20250114175143.81438-1-vschneid@redhat.com>
- <20250114175143.81438-30-vschneid@redhat.com>
- <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com>
- <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CAG48ez3H8OVP1GxBLdmFgusvT1gQhwu2SiXbgi8T9uuCYVK52w@mail.gmail.com>
- <xhsmh5xlhk5p2.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CAG48ez1EAATYcX520Nnw=P8XtUDSr5pe+qGH1YVNk3xN2LE05g@mail.gmail.com>
-Date: Tue, 11 Feb 2025 14:33:51 +0100
-Message-ID: <xhsmh34gkk3ls.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	s=arc-20240116; t=1739280958; c=relaxed/simple;
+	bh=SOkeI7e4t7VteXwUDNB3ih1umv3f81KKWpOhokFRJ4o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mzl+ItZAHUgI36C21tnd/vUWAt0AJFbOUGz3zthjoDvCqJVa/ipkN0NJ0how2Mi3SzTtTAwOzyECp34HjXgjolHf1xRdeLI7l+HspQdx79GTisS176CjNDhy2gRnx6bqJZprSeYj6kQ1LhF/HQyswpvO79FEb6kDDn4jv+OZqQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFGXf+UU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C345BC4CEDD;
+	Tue, 11 Feb 2025 13:35:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739280957;
+	bh=SOkeI7e4t7VteXwUDNB3ih1umv3f81KKWpOhokFRJ4o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UFGXf+UU8Go34ieuiGYzF9Ku/oztMGyBSVkItjb/LtuyTozGAxUocGlhexvkZyqjS
+	 dwu6XgWWVpvAZ7QXbqSUwClg6RSg6jX86OQG8+VbcRYAodA5aZDvXcvxjRP5nVSZyD
+	 C1jPs/96kOQGDdDCYnJ0pB86m9yE6jR9jR9CkFWh0ULdQ4JnCuj/zlSOK/hYGHl5yw
+	 Mj+SgseSvMRxOcCnjzYUxMv9RSLxl9TUzztA/b/0a4tjsT9o1bWy+C8Xtdy2wdFSr3
+	 lD7867EcBXHbXuh76BcUVH9dFB+n9WfeiFDk1WBmcn1bcB9NitUQ2qnX6MSzptcZvC
+	 nR3GT/USbVgIA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1thqQd-002zeP-9F;
+	Tue, 11 Feb 2025 13:35:55 +0000
+Date: Tue, 11 Feb 2025 13:35:54 +0000
+Message-ID: <861pw4txhh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 06/18] KVM: arm64: Plug FEAT_GCS handling
+In-Reply-To: <Z6tEUzwcHVHALIdu@J2N7QTR9R3>
+References: <20250210184150.2145093-1-maz@kernel.org>
+	<20250210184150.2145093-7-maz@kernel.org>
+	<Z6tEUzwcHVHALIdu@J2N7QTR9R3>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 10/02/25 23:08, Jann Horn wrote:
-> On Mon, Feb 10, 2025 at 7:36=E2=80=AFPM Valentin Schneider <vschneid@redh=
-at.com> wrote:
->> What if isolated CPUs unconditionally did a TLBi as late as possible in
->> the stack right before returning to userspace? This would mean that upon
->> re-entering the kernel, an isolated CPU's TLB wouldn't contain any kernel
->> range translation - with the exception of whatever lies between the
->> last-minute flush and the actual userspace entry, which should be feasib=
-le
->> to vet? Then AFAICT there wouldn't be any work/flush to defer, the IPI
->> could be entirely silenced if it targets an isolated CPU.
->
-> Two issues with that:
->
+On Tue, 11 Feb 2025 12:36:35 +0000,
+Mark Rutland <mark.rutland@arm.com> wrote:
+> 
+> On Mon, Feb 10, 2025 at 06:41:37PM +0000, Marc Zyngier wrote:
+> > We don't seem to be handling the GCS-specific exception class.
+> > Handle it by delivering an UNDEF to the guest, and populate the
+> > relevant trap bits.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/handle_exit.c | 11 +++++++++++
+> >  arch/arm64/kvm/sys_regs.c    |  8 ++++++++
+> >  2 files changed, 19 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index 4f8354bf7dc5f..624a78a99e38a 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -294,6 +294,16 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+> >  	return 1;
+> >  }
+> >  
+> > +static int kvm_handle_gcs(struct kvm_vcpu *vcpu)
+> > +{
+> > +	/* We don't expect GCS, so treat it with contempt */
+> > +	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, GCS, IMP))
+> > +		WARN_ON_ONCE(1);
+> 
+> Just to check / better my understanging, do we enforce that this can't
+> be exposed to the guest somewhere?
+> 
+> I see __kvm_read_sanitised_id_reg() masks it out, and the sys_reg_descs
+> table has it filtered, but I'm not immediately sure whether that
+> prevents host userspace maliciously setting this?
 
-Firstly, thank you for entertaining the idea :-)
+On writing to the idreg, you end-up in set_id_aa64pfr1_el1(), which
+calls into set_id_reg(). There, arm64_check_features() compares each
+and every feature in that register with the mask and limits that have
+been established.
 
-> 1. I think the "Common not Private" feature Will Deacon referred to is
-> incompatible with this idea:
-> <https://developer.arm.com/documentation/101811/0104/Address-spaces/Commo=
-n-not-Private>
-> says "When the CnP bit is set, the software promises to use the ASIDs
-> and VMIDs in the same way on all processors, which allows the TLB
-> entries that are created by one processor to be used by another"
->
+Since GCS is not part of the writable mask, and that it has been
+disabled, the only valid value for ID_AA64PFR1_EL1.GCS is 0. A
+non-zero value provided by userspace will be caught by the last check
+in arm64_check_features(), and an error be returned.
 
+HTH,
 
-Sorry for being obtuse - I can understand inconsistent TLB states (old vs
-new translations being present in separate TLBs) due to not sending the
-flush IPI causing an issue with that, but not "flushing early". Even if TLB
-entries can be shared/accessed between CPUs, a CPU should be allowed not to
-have a shared entry in its TLB - what am I missing?
+	M.
 
-> 2. It's wrong to assume that TLB entries are only populated for
-> addresses you access - thanks to speculative execution, you have to
-> assume that the CPU might be populating random TLB entries all over
-> the place.
-
-Gotta love speculation. Now it is supposed to be limited to genuinely
-accessible data & code, right? Say theoretically we have a full TLBi as
-literally the last thing before doing the return-to-userspace, speculation
-should be limited to executing maybe bits of the return-from-userspace
-code?
-
-Furthermore, I would hope that once a CPU is executing in userspace, it's
-not going to populate the TLB with kernel address translations - AIUI the
-whole vulnerability mitigation debacle was about preventing this sort of
-thing.
-
+-- 
+Without deviation from the norm, progress is not possible.
 
