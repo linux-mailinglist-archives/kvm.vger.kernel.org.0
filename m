@@ -1,63 +1,62 @@
-Return-Path: <kvm+bounces-37786-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6325AA301C4
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:55:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C7B1A301CD
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:57:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0234E1691AC
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:55:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C41133A4BE7
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DCE1E5B8D;
-	Tue, 11 Feb 2025 02:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4AC1D5AB8;
+	Tue, 11 Feb 2025 02:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R9ufVTh7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nQ3rOQnQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E88C1E5B79;
-	Tue, 11 Feb 2025 02:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C1126BDB3;
+	Tue, 11 Feb 2025 02:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739242416; cv=none; b=uj4d0IRtUhm7JUVHe++xJDEytx3a3OX8aueTYq+WPBYxFsC5aJ8MRi2P0PEgA68a8tg4BmfvEsmFAAYQ5h3V+tQI9ML6mmdazbC/gJ7s9dj9G7uEXvu+U6UxzvT98o1aFmn0nBy38QStF75fzGlsrlvtHsAeplW4pGmNlwQTK1w=
+	t=1739242613; cv=none; b=JOdy/V8+AsLjgXn6rrDe7ubqkBcIf9P5A5ebscJKsXHbo9L/P1+7cZAbLlOTXca0h9qvKVq7gBGx7Sis+kb/fdfh/A+7j+QZmd35K9wOtM11KBCuNNJ7W62iG7l+iMRLO+QJg+Tt8k/0bX7iIrc44j88+wkrNrdgI0kK/+jX2FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739242416; c=relaxed/simple;
-	bh=PBkOidVvwMnLVO//k87I99vI11Ujgs8DjnLQYbKjFDQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sfRv1isux9d0HAfGuXGEM6bjvL7azaQLbTze9O9Qi1gSGkd6cI1ABxQOHhALLNVvVJHBufxwBUeZdPjoxuFeAnYw7Pcsc4ITfn/3CTNcCzQrZYec77vSxZ4A3yQmDocedk4meguLqa2bPnGl9GKjXKrPELU9oN4M84NwK6FVj74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R9ufVTh7; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1739242613; c=relaxed/simple;
+	bh=drFbHHuUIZs0yvjOWJKD+MSxbdtSSBC+mwOH1lUeAA4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HBgommY6iv5nXBxAM/uKsQKvVXlRRQS1ZCHh5Pv6iRQl9lCauubwrsy+0XOXmZP97JPd7bnV2x103rbHW+lwgLJXF68ojfPrNRuwy6OpX1zqJF6uj+HCs6cKkEfhi1l6lnpoOC1xSXwK+47JPvUsPzKs5uXnPGtHYbtj3dsbDig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nQ3rOQnQ; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739242415; x=1770778415;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PBkOidVvwMnLVO//k87I99vI11Ujgs8DjnLQYbKjFDQ=;
-  b=R9ufVTh7S5wFuHk2RvVq+qNkON4plC5laWfGZQFN9Kwe9q4vQsdUpo1w
-   eOK0GmHsA7ZW/lyZ0WJzsPSn4x+78nzT12VqjpH4jCoo+oX+T2iXOZQCu
-   Sv5qPBokufqScA8Nt8X3ubVfAxEFyk+FEInrk3QgtAlZmKtpRhqkqtd0Y
-   rQXifLrphH4Oq++biJysPqUl+Y5prsN8OXm/ByjP4khDZav27k8lr5L/P
-   se5Je2VXOUcHDNEm5TCUNxwcYY+WkEGw7TReD/j5JZwGOlXYfNakCqeNK
-   TthAAMuDNo+to6qlj4ffumVaacpknFJW8Xrf9I3HtHrW5b2U5AMroxnDg
-   g==;
-X-CSE-ConnectionGUID: n5qQ0PZITxqj9qkD6/wJaA==
-X-CSE-MsgGUID: uLWSxCyyTCG5ZGvFXD5nqA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43506635"
+  t=1739242612; x=1770778612;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=drFbHHuUIZs0yvjOWJKD+MSxbdtSSBC+mwOH1lUeAA4=;
+  b=nQ3rOQnQ+0/XDqetkFWawsSaRorXRX/62Vv9DZh4YsQLcL7f6TDuodDF
+   XoU4vs6769E2lyMxkNZz4EI1EjP0nMVBwNRVDRqhjxuKI3z7+ggBpbZeZ
+   KhP5K7EWS6PF8AxAEqWoNHlVLOBpErK0sSbZmf3l1Zmm6LNZubDjlfmoh
+   2UqZ6wEE4n6gNgE+L9dLIYkVQ/MEjy2bOyUjH+c1THI8nYKyZRwXgFeKg
+   RK4LuJ5GtAp5sEplM9qibSX4WrKwTNlcJ32vJ/jlqXf/E1p2TiUNMc5Kp
+   Zju7oywXVOFuC/n2MVzFa4vaCJf3YJQ4xCjmlUOT+9s6HZ6+zTJ3p1M9i
+   A==;
+X-CSE-ConnectionGUID: KhOM8vvbT+KWg5mNATA40A==
+X-CSE-MsgGUID: begQOsxKQwmcJx4AGOcieA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43612418"
 X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="43506635"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:53:35 -0800
-X-CSE-ConnectionGUID: BZF9QDQsRsmuCQBy1vST/A==
-X-CSE-MsgGUID: iW+nfzdCQo+53y494+avMA==
+   d="scan'208";a="43612418"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:56:52 -0800
+X-CSE-ConnectionGUID: hRpPb8FGTYySr7TJTlVXkQ==
+X-CSE-MsgGUID: IvumfHUsRYG8B/GfMXFz7Q==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="112236484"
+X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
+   d="scan'208";a="112355211"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:53:31 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:56:47 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,12 +72,10 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 8/8] KVM: TDX: Handle TDX PV MMIO hypercall
-Date: Tue, 11 Feb 2025 10:54:42 +0800
-Message-ID: <20250211025442.3071607-9-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 00/17] KVM: TDX: TDX interrupts
+Date: Tue, 11 Feb 2025 10:58:11 +0800
+Message-ID: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
-References: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,244 +84,237 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+Hi,
 
-Handle TDX PV MMIO hypercall when TDX guest calls TDVMCALL with the
-leaf #VE.RequestMMIO (same value as EXIT_REASON_EPT_VIOLATION) according
-to TDX Guest Host Communication Interface (GHCI) spec.
+This patch series introduces the support of interrupt handling for TDX
+guests, including virtual interrupt injection and VM-Exits caused by
+vectored events.
 
-For TDX guests, VMM is not allowed to access vCPU registers and the private
-memory, and the code instructions must be fetched from the private memory.
-So MMIO emulation implemented for non-TDX VMs is not possible for TDX
-guests.
+This patch set is one of several patch sets that are all needed to provide
+the ability to run a functioning TD VM. We think this is in pretty good
+shape at this point, but it probably needs another round of review before
+hand off. We would appreciate review from Sean on the implementation of the
+APICv feedback [1].
 
-In TDX the MMIO regions are instead configured by VMM to trigger a #VE
-exception in the guest.  The #VE handling is supposed to emulate the MMIO
-instruction inside the guest and convert it into a TDVMCALL with the
-leaf #VE.RequestMMIO, which equals to EXIT_REASON_EPT_VIOLATION.
 
-The requested MMIO address must be in shared GPA space.  The shared bit
-is stripped after check because the existing code for MMIO emulation is
-not aware of the shared bit.
+Base of this series
+===================
+This series is based on kvm-coco-queue up to the end of MMU part 2, plus
+two later sections. Stack is:
+  - '55f78d925e07 ("KVM: TDX: Return -EBUSY when tdh_mem_page_add()
+    encounters TDX_OPERAND_BUSY")'.
+  - v2 of "KVM: TDX: TD vcpu enter/exit" (There is one small log difference
+    between the v2 patches and the commits in kvm-coco-queue. No code
+    differences). 
+  - v2 of "KVM: TDX: TDX hypercalls may exit to userspace"
 
-The MMIO GPA shouldn't have a valid memslot, also the attribute of the GPA
-should be shared.  KVM could do the checks before exiting to userspace,
-however, even if KVM does the check, there still will be race conditions
-between the check in KVM and the emulation of MMIO access in userspace due
-to a memslot hotplug, or a memory attribute conversion.  If userspace
-doesn't check the attribute of the GPA and the attribute happens to be
-private, it will not pose a security risk or cause an MCE, but it can lead
-to another issue. E.g., in QEMU, treating a GPA with private attribute as
-shared when it falls within RAM's range can result in extra memory
-consumption during the emulation to the access to the HVA of the GPA.
-There are two options: 1) Do the check both in KVM and userspace.  2) Do
-the check only in QEMU.  This patch chooses option 2, i.e. KVM omits the
-memslot and attribute checks, and expects userspace to do the checks.
 
-Similar to normal MMIO emulation, try to handle the MMIO in kernel first,
-if kernel can't support it, forward the request to userspace.  Export
-needed symbols used for MMIO handling.
+Notable changes since v1 [2]
+============================
+Enforce APICv active for TDX guests from the view of KVM, which was
+suggested by Sean in one PUCK session, because it is not concept right to
+"lie" to KVM that APICv is disabled while it is actually enabled. Instead,
+it's better to make APICv enabled and prevent it from being disabled from
+the view of KVM. More details can be found in the discussion thread [1].
+For this purpose, additional checks are implemented:
+- Check enable_apicv in tdx_bringup().
+- Reject KVM_{GET,SET}_LAPIC from userspace, thus it requires the code
+  change in QEMU to skip request KVM_{GET,SET}_LAPIC.
+- Implement vt_refresh_apicv_exec_ctrl() to bug the VM if APICv is
+  disabled.
 
-Fragments handling is not needed for TDX PV MMIO because GPA is provided,
-if a MMIO access crosses page boundary, it should be continuous in GPA.
-Also, the size is limited to 1, 2, 4, 8 bytes.  No further split needed.
-Allow cross page access because no extra handling needed after checking
-both start and end GPA are shared GPAs.
+Enforce KVM_IRQCHIP_SPLIT for TDX guests to disallow in-kernel I/O APIC
+while in-kernel local APIC is needed.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
-Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Unify the code to handle NMIs and external interrupts.
+
+WARN on init event for TDX vCPU.
+
+Drop vt_hwapic_irr_update() since .hwapic_irr_update() is gone in 6.14.
+
+Also, there is an new information update about NMI blocked status after
+exiting from TDX guest for NMI-induced exits in "NMI" part of section
+"VM-Exits caused by vectored event" below.
+
+
+Virtual interrupt injection
+===========================
+Non-NMI Interrupt
+-----------------
+TDX supports non-NMI interrupt injection only by posted interrupt. Posted
+interrupt descriptors (PIDs) are allocated in shared memory, KVM can update
+them directly. To post pending interrupts in the PID, KVM can generate a
+self-IPI with notification vector prior to TD entry.
+TDX guest status is protected, KVM can't get the interrupt status of TDX
+guest. In this series, assumes interrupt is always allowed. A later patch
+set will have the support for TDX guest to call TDVMCALL with HLT, which
+passes the interrupt block flag, so that whether interrupt is allowed in
+HLT will checked against the interrupt block flag.
+
+NMI
 ---
-Hypercalls exit to userspace v2:
-- Morph PV MMIO hypercall to EXIT_REASON_EPT_MISCONFIG. (Sean)
-- Skip setting return code as TDVMCALL_STATUS_SUCCESS, as a result, the
-  complete_userspace_io() callback for write is not needed. (Sean)
-- Remove the code for reading/writing APIC mmio,since TDX guest supports x2APIC only.
-- Use vp_enter_args directly instead of helpers.
+KVM can request the TDX module to inject a NMI into a TDX vCPU by setting
+the PEND_NMI TDVPS field to 1. Following that, KVM can call TDH.VP.ENTER to
+run the vCPU and the TDX module will attempt to inject the NMI as soon as
+possible.
+PEND_NMI TDVPS field is a 1-bit filed, i.e. KVM can only pend one NMI in
+the TDX module. Also, TDX doesn't allow KVM to request NMI-window exit
+directly. When there is already one NMI pending in the TDX module, i.e. it
+has not been delivered to TDX guest yet, if there is NMI pending in KVM,
+collapse the pending NMI in KVM into the one pending in the TDX module.
+Such collapse is OK considering on X86 bare metal, multiple NMIs could
+collapse into one NMI, e.g. when NMI is blocked by SMI.  It's OS's
+responsibility to poll all NMI sources in the NMI handler to avoid missing
+handling of some NMI events. More details can be found in the changelog of
+the patch "KVM: TDX: Implement methods to inject NMI".
 
-Hypercalls exit to userspace v1:
-- Update the changelog.
-- Remove the check of memslot for GPA.
-- Allow MMIO access crossing page boundary.
-- Move the tracepoint for KVM_TRACE_MMIO_WRITE earlier so the tracepoint handles
-  the cases both for kernel and userspace. (Isaku)
-- Set TDVMCALL return code when back from userspace, which is missing in v19.
-- Move fast MMIO write into tdx_mmio_write()
-- Check GPA is shared GPA. (Binbin)
-- Remove extra check for size > 8u. (Binbin)
-- Removed KVM_BUG_ON() in tdx_complete_mmio() and tdx_emulate_mmio()
-- Removed vcpu->mmio_needed code since it's not used after removing
-  KVM_BUG_ON().
-- Use TDVMCALL_STATUS prefix for TDX call status codes (Binbin)
-- Use vt_is_tdx_private_gpa()
+SMI
 ---
- arch/x86/kvm/vmx/tdx.c | 109 ++++++++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/x86.c     |   1 +
- virt/kvm/kvm_main.c    |   1 +
- 3 files changed, 110 insertions(+), 1 deletion(-)
+TDX doesn't support system-management mode (SMM) and system-management
+interrupt (SMI) in guest TDs because TDX module doesn't provide a way for
+VMM to inject SMI into guest TD or switch guest vCPU mode into SMM. Handle
+SMI request as what KVM does for CONFIG_KVM_SMM=n, i.e. return -ENOTTY,
+and add KVM_BUG_ON() to SMI related OPs for TD.
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index f13da28dd4a2..8f3147c6e602 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -849,8 +849,12 @@ static __always_inline u32 tdx_to_vmx_exit_reason(struct kvm_vcpu *vcpu)
- 		if (tdvmcall_exit_type(vcpu))
- 			return EXIT_REASON_VMCALL;
- 
--		if (tdvmcall_leaf(vcpu) < 0x10000)
-+		if (tdvmcall_leaf(vcpu) < 0x10000) {
-+			if (tdvmcall_leaf(vcpu) == EXIT_REASON_EPT_VIOLATION)
-+				return EXIT_REASON_EPT_MISCONFIG;
-+
- 			return tdvmcall_leaf(vcpu);
-+		}
- 		break;
- 	default:
- 		break;
-@@ -1193,6 +1197,107 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
- 	return ret;
- }
- 
-+static int tdx_complete_mmio_read(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long val = 0;
-+	gpa_t gpa;
-+	int size;
-+
-+	gpa = vcpu->mmio_fragments[0].gpa;
-+	size = vcpu->mmio_fragments[0].len;
-+
-+	memcpy(&val, vcpu->run->mmio.data, size);
-+	tdvmcall_set_return_val(vcpu, val);
-+	trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-+	return 1;
-+}
-+
-+static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, int size,
-+				 unsigned long val)
-+{
-+	if (!kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
-+		trace_kvm_fast_mmio(gpa);
-+		return 0;
-+	}
-+
-+	trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
-+	if (kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, int size)
-+{
-+	unsigned long val;
-+
-+	if (kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-+		return -EOPNOTSUPP;
-+
-+	tdvmcall_set_return_val(vcpu, val);
-+	trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-+	return 0;
-+}
-+
-+static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	int size, write, r;
-+	unsigned long val;
-+	gpa_t gpa;
-+
-+	size = tdx->vp_enter_args.r12;
-+	write = tdx->vp_enter_args.r13;
-+	gpa = tdx->vp_enter_args.r14;
-+	val = write ? tdx->vp_enter_args.r15 : 0;
-+
-+	if (size != 1 && size != 2 && size != 4 && size != 8)
-+		goto error;
-+	if (write != 0 && write != 1)
-+		goto error;
-+
-+	/*
-+	 * TDG.VP.VMCALL<MMIO> allows only shared GPA, it makes no sense to
-+	 * do MMIO emulation for private GPA.
-+	 */
-+	if (vt_is_tdx_private_gpa(vcpu->kvm, gpa) ||
-+	    vt_is_tdx_private_gpa(vcpu->kvm, gpa + size - 1))
-+		goto error;
-+
-+	gpa = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(vcpu->kvm));
-+
-+	if (write)
-+		r = tdx_mmio_write(vcpu, gpa, size, val);
-+	else
-+		r = tdx_mmio_read(vcpu, gpa, size);
-+	if (!r)
-+		/* Kernel completed device emulation. */
-+		return 1;
-+
-+	/* Request the device emulation to userspace device model. */
-+	vcpu->mmio_is_write = write;
-+	if (!write)
-+		vcpu->arch.complete_userspace_io = tdx_complete_mmio_read;
-+
-+	vcpu->run->mmio.phys_addr = gpa;
-+	vcpu->run->mmio.len = size;
-+	vcpu->run->mmio.is_write = write;
-+	vcpu->run->exit_reason = KVM_EXIT_MMIO;
-+
-+	if (write) {
-+		memcpy(vcpu->run->mmio.data, &val, size);
-+	} else {
-+		vcpu->mmio_fragments[0].gpa = gpa;
-+		vcpu->mmio_fragments[0].len = size;
-+		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
-+	}
-+	return 0;
-+
-+error:
-+	tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
-+	return 1;
-+}
-+
- static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- {
- 	switch (tdvmcall_leaf(vcpu)) {
-@@ -1546,6 +1651,8 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
- 		return tdx_emulate_vmcall(vcpu);
- 	case EXIT_REASON_IO_INSTRUCTION:
- 		return tdx_emulate_io(vcpu);
-+	case EXIT_REASON_EPT_MISCONFIG:
-+		return tdx_emulate_mmio(vcpu);
- 	default:
- 		break;
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 29f33f7c9da9..a41d57ba4a86 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -14010,6 +14010,7 @@ EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
- 
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_mmio);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 836e0c69f53b..783683d04939 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -5835,6 +5835,7 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
- 	r = __kvm_io_bus_read(vcpu, bus, &range, val);
- 	return r < 0 ? r : 0;
- }
-+EXPORT_SYMBOL_GPL(kvm_io_bus_read);
- 
- int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 			    int len, struct kvm_io_device *dev)
+INIT/SIPI event
+----------------
+TDX defines its own vCPU creation and initialization sequence including
+multiple SEAMCALLs.  Also, it's only allowed during TD build time. Always
+block INIT and SIPI events for the TDX guest.
+
+
+VM-Exits caused by vectored event
+=================================
+NMI (with *new update*)
+-----------------------
+Just like the VMX case, NMI remains blocked after exiting from TDX guest
+for NMI-induced exits [*], handle VM-Exit caused by NMIs within
+tdx_vcpu_enter_exit(), i.e., handled before leaving the safety of noinstr.
+
+[*]: Old TDX modules may have a bug which makes NMI unblocked after exiting
+from TDX guest for NMI-induced exits.  This could potentially lead to
+nested NMIs: a new NMI arrives when KVM is manually calling the host NMI
+handler.  This is an architectural violation, but it doesn't have real harm
+until FRED is enabled together with TDX (for non-FRED, the host NMI handler
+can handle nested NMIs).  Given this is rare to happen and has no real
+harm, ignore this for the initial TDX support.
+For the new TDX modules that fixed the bug, NMIs are blocked after exiting
+from TDX guest for NMI-induced exits, which is the default behavior and no
+"opt-in" is needed. This is aligned with the suggestion made by Sean [3].
+
+External Interrupt
+------------------
+Similar to the VMX case, external interrupts are handled in
+.handle_exit_irqoff() callback.
+
+Exception
+---------
+Machine check, which is handled in the .handle_exit_irqoff() callback, is
+the only exception type KVM handles for TDX guests. For other exceptions,
+because TDX guest state is protected, exceptions in TDX guests can't be
+intercepted. TDX VMM isn't supposed to handle these exceptions. Exit to
+userspace with KVM_EXIT_EXCEPTION If unexpected exception occurs.
+
+SMI
+---
+In SEAM root mode (TDX module), all interrupts are blocked. If an SMI
+occurs in SEAM non-root mode (TD guest), the SMI causes VM exit to TDX
+module, then SEAMRET to KVM. Once it exits to KVM, SMI is delivered and
+handled by kernel handler right away.
+An SMI can be "I/O SMI" or "other SMI".  For TDX, there will be no I/O SMI
+because I/O instructions inside TDX guest trigger #VE and TDX guest needs
+to use TDVMCALL to request VMM to do I/O emulation.
+For "other SMI", there are two cases:
+- MSMI case.  When BIOS eMCA MCE-SMI morphing is enabled, the #MC occurs in
+  TDX guest will be delivered as an MSMI.  It causes an
+  EXIT_REASON_OTHER_SMI VM exit with MSMI (bit 0) set in the exit
+  qualification.  On VM exit, TDX module checks whether the "other SMI" is
+  caused by an MSMI or not.  If so, TDX module marks TD as fatal,
+  preventing further TD entries, and then completes the TD exit flow to KVM
+  with the TDH.VP.ENTER outputs indicating TDX_NON_RECOVERABLE_TD.  After
+  TD exit, the MSMI is delivered and eventually handled by the kernel
+  machine check handler (7911f14 x86/mce: Implement recovery for errors in
+  TDX/SEAM non-root mode), i.e., the memory page is marked as poisoned and
+  it won't be freed to the free list when the TDX guest is terminated.
+  Since the TDX guest is dead, follow other non-recoverable cases, exit to
+  userspace.
+- For non-MSMI case, KVM doesn't need to do anything, just continue TDX
+  vCPU execution.
+
+
+Repos
+=====
+Due to "KVM: VMX: Move common fields of struct" in "TDX vcpu enter/exit" v2
+[4], subsequent patches require changes to use new struct vcpu_vt, refer to
+the full KVM branch below.
+
+It requires TDX module 1.5.06.00.0744 [5], or later as mentioned in [4].
+A working edk2 commit is 95d8a1c ("UnitTestFrameworkPkg: Use TianoCore
+mirror of subhook submodule").
+
+The full KVM branch is here:
+https://github.com/intel/tdx/tree/tdx_kvm_dev-2025-02-10
+
+A matching QEMU is here:
+https://github.com/intel-staging/qemu-tdx/tree/tdx-qemu-upstream-v7
+
+
+Testing 
+=======
+It has been tested as part of the development branch for the TDX base
+series. The testing consisted of TDX kvm-unit-tests and booting a Linux
+TD, and TDX enhanced KVM selftests.
+
+[1] https://lore.kernel.org/kvm/Z4VKdbW1R0AoLvkB@google.com
+[2] https://lore.kernel.org/kvm/20241209010734.3543481-1-binbin.wu@linux.intel.com
+[3] https://lore.kernel.org/kvm/Z0T_iPdmtpjrc14q@google.com
+[4] https://lore.kernel.org/kvm/20250129095902.16391-1-adrian.hunter@intel.com
+[5] https://github.com/intel/tdx-module/releases/tag/TDX_1.5.06
+
+Binbin Wu (2):
+  KVM: TDX: Enforce KVM_IRQCHIP_SPLIT for TDX guests
+  KVM: VMX: Move emulation_required to struct vcpu_vt
+
+Isaku Yamahata (12):
+  KVM: TDX: Disable PI wakeup for IPIv
+  KVM: VMX: Move posted interrupt delivery code to common header
+  KVM: TDX: Implement non-NMI interrupt injection
+  KVM: TDX: Wait lapic expire when timer IRQ was injected
+  KVM: TDX: Implement methods to inject NMI
+  KVM: TDX: Complete interrupts after TD exit
+  KVM: TDX: Handle SMI request as !CONFIG_KVM_SMM
+  KVM: TDX: Always block INIT/SIPI
+  KVM: TDX: Force APICv active for TDX guest
+  KVM: TDX: Add methods to ignore virtual apic related operation
+  KVM: TDX: Handle EXCEPTION_NMI and EXTERNAL_INTERRUPT
+  KVM: TDX: Handle EXIT_REASON_OTHER_SMI
+
+Sean Christopherson (3):
+  KVM: TDX: Add support for find pending IRQ in a protected local APIC
+  KVM: x86: Assume timer IRQ was injected if APIC state is protected
+  KVM: VMX: Add a helper for NMI handling
+
+ arch/x86/include/asm/kvm-x86-ops.h |   1 +
+ arch/x86/include/asm/kvm_host.h    |   1 +
+ arch/x86/include/asm/posted_intr.h |   5 +
+ arch/x86/include/uapi/asm/vmx.h    |   1 +
+ arch/x86/kvm/irq.c                 |   3 +
+ arch/x86/kvm/lapic.c               |  14 +-
+ arch/x86/kvm/lapic.h               |   2 +
+ arch/x86/kvm/smm.h                 |   3 +
+ arch/x86/kvm/vmx/common.h          |  74 ++++++++
+ arch/x86/kvm/vmx/main.c            | 262 ++++++++++++++++++++++++++---
+ arch/x86/kvm/vmx/nested.c          |   2 +-
+ arch/x86/kvm/vmx/posted_intr.c     |   9 +-
+ arch/x86/kvm/vmx/posted_intr.h     |   2 +
+ arch/x86/kvm/vmx/tdx.c             | 145 +++++++++++++++-
+ arch/x86/kvm/vmx/tdx.h             |   5 +
+ arch/x86/kvm/vmx/vmx.c             | 113 +++----------
+ arch/x86/kvm/vmx/vmx.h             |   1 -
+ arch/x86/kvm/vmx/x86_ops.h         |  12 ++
+ arch/x86/kvm/x86.c                 |   6 +
+ 19 files changed, 541 insertions(+), 120 deletions(-)
+
 -- 
 2.46.0
 
