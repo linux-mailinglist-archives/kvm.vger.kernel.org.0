@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-37783-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37784-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6879A301BD
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:54:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A57A301BF
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:54:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 771333A8856
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:54:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB766188A737
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7441D6199;
-	Tue, 11 Feb 2025 02:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79FB11D5161;
+	Tue, 11 Feb 2025 02:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jtF1OROt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PYo3keyw"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C7F1E231F;
-	Tue, 11 Feb 2025 02:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5DF1D61A5;
+	Tue, 11 Feb 2025 02:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739242405; cv=none; b=tBSYG/bvdJ1PXE3ZwPfOeYT+vt9J39+Gr5duW8uECkAGgjZHdEcRry58BU5wX3lhjKMJ846vv8buDqxq6y1RgWv2Aa//8B/hQZROK4unXc/WsaJvb44gGs1DHJefnr/ATX/CH0RfFs9bDN0isz3iAf/OYMLAPFAZ25x+O3AcS6k=
+	t=1739242408; cv=none; b=C08JkLbbjyh1Ln9wpky8PtpGqE1HWatza6NA/eDQhmUqSsXShLmF58dyFkTuGyIhzrS4R5l8txn9z+9HfKq/xflBM/1L+KgMQLpQPAuGCZzwDsfjsAlpfb2zQKZIxeBafkwTn92OAnpQYn1PMPIaLQPUBw8nxm9EKF+Xp6ejZOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739242405; c=relaxed/simple;
-	bh=M2ne8a29+Lj/l2pX5cqru700A4qvT2rUMpEU3QoQjMw=;
+	s=arc-20240116; t=1739242408; c=relaxed/simple;
+	bh=YMWpCMl+AIpwqEPlHAIvt12kPvItzQgcwNKb/CTy/5I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uVjXxY1+qQ4tJpRxhpgvssIuVTPZ/x4Z8wQhCCFENftrbAWaYzLw3pCFDdNs/JFbRhnGgT7d9qhrEIU+BgMin39uuTJeuhsM4LOV2On8WH9vkuEWj2o1gXDgmpjr4FC/zY69iLC7pm4bUBsGA70vCaur2GLfgrKfLOCwDmciPQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jtF1OROt; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=nkqCpOlEizvMIpBnCL9tyEOzE7vxsIcn7x/Z9WVNggfuQWs1Jc0ZHKWsgyIRB8Nujy6LV6nvVejjxda/RNWuR0G89CINIP1UUyjDPVynKuAGvmDeTKqS/v1eIy1OZzvxWL3Q3lWASXVzkt6h63PT/jBSqPSkIj9dYqW7+uHyi/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PYo3keyw; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739242404; x=1770778404;
+  t=1739242408; x=1770778408;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=M2ne8a29+Lj/l2pX5cqru700A4qvT2rUMpEU3QoQjMw=;
-  b=jtF1OROtLQeWQGdGB9uIQjSJSC3uDlpLxwRNI2Hd1FaS9ttIN9N3mLhk
-   rh+uUJTrYGayKZygf/R7Q8FiIuNxxF4wtW+OqxZL8rGYvrH2KBaizYAyi
-   qYPvUAHbHHFLxrwdI4khKaPpgyNMrHeAH53fldYc5h+m28slDvgLMGbuX
-   ltRaOrLswf/i5oadAtSlAHPuO6ORcQ47CepbFTuDplEwVN7/6g+cXoizk
-   4vro/iWDZoGAl+w8o3ykrFtl2s5TmMK29rHjUsAE6kyTkZohHVm7Ci3aX
-   rMHcr3srphctN1MNcQcf0JrEr+5Ph4bamVcCYHJPO9CA700Ok6cOLAeUo
+  bh=YMWpCMl+AIpwqEPlHAIvt12kPvItzQgcwNKb/CTy/5I=;
+  b=PYo3keywFZuHhtyfJjaOAbRxhhZLvvS+ej9vwCj4gN3r/1Pur2GfJDxu
+   8B31hETTN5YfshOraIzHmxAfN7fff7nOhNK7PmxR7n4FwUd+dEzERzCpy
+   yT+VNnKFGnZpL9Xu8bOfMUYl00AEM32f+xSOhHzgo6i88sxxOYl60eNMq
+   j42rpPu/NzE9AmdYkKTz1vNgcMEcj+QATO09Pxau4Igl4ZtS/dEEDthNP
+   ou194tgKXP/AqDTzOkQlrEK3RotA6wIB8Hif8Ntf1vVzemgrkXFUTLUeB
+   ULxqtewngai1yKBpRjJH+20i0p0QTBWsLM8G5aA4OzDwnXCMjlu8eVDal
    Q==;
-X-CSE-ConnectionGUID: XGp4hcrcTp2DIbF51WN4zQ==
-X-CSE-MsgGUID: +cN8iABQTA6BfZIe/mNH5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43506619"
+X-CSE-ConnectionGUID: 7xrK4v4KQFykzmtR29uI/w==
+X-CSE-MsgGUID: X9WEOIB0SN6w/MpnO7dwJg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43506625"
 X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="43506619"
+   d="scan'208";a="43506625"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:53:24 -0800
-X-CSE-ConnectionGUID: 5l/wllmeQuuF3BsXpn+HyA==
-X-CSE-MsgGUID: z7SCzaSoSyC+zDtrlMbHrw==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:53:28 -0800
+X-CSE-ConnectionGUID: pKk/uTvFQQmRDSQX+ZEBuw==
+X-CSE-MsgGUID: tVbpFlurSnmVyd1gc+sG6g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="112236440"
+   d="scan'208";a="112236456"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:53:20 -0800
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:53:23 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 5/8] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
-Date: Tue, 11 Feb 2025 10:54:39 +0800
-Message-ID: <20250211025442.3071607-6-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 6/8] KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
+Date: Tue, 11 Feb 2025 10:54:40 +0800
+Message-ID: <20250211025442.3071607-7-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
 References: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
@@ -87,206 +87,137 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert TDG.VP.VMCALL<MapGPA> to KVM_EXIT_HYPERCALL with
-KVM_HC_MAP_GPA_RANGE and forward it to userspace for handling.
+Convert TDG.VP.VMCALL<ReportFatalError> to KVM_EXIT_SYSTEM_EVENT with
+a new type KVM_SYSTEM_EVENT_TDX_FATAL and forward it to userspace for
+handling.
 
-MapGPA is used by TDX guest to request to map a GPA range as private
-or shared memory.  It needs to exit to userspace for handling.  KVM has
-already implemented a similar hypercall KVM_HC_MAP_GPA_RANGE, which will
-exit to userspace with exit reason KVM_EXIT_HYPERCALL.  Do sanity checks,
-convert TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE and forward the request
-to userspace.
+TD guest can use TDG.VP.VMCALL<ReportFatalError> to report the fatal
+error it has experienced.  This hypercall is special because TD guest
+is requesting a termination with the error information, KVM needs to
+forward the hypercall to userspace anyway, KVM doesn't do sanity checks
+and let userspace decide what to do.
 
-To prevent a TDG.VP.VMCALL<MapGPA> call from taking too long, the MapGPA
-range is split into 2MB chunks and check interrupt pending between chunks.
-This allows for timely injection of interrupts and prevents issues with
-guest lockup detection.  TDX guest should retry the operation for the
-GPA starting at the address specified in R11 when the TDVMCALL return
-TDVMCALL_RETRY as status code.
-
-Note userspace needs to enable KVM_CAP_EXIT_HYPERCALL with
-KVM_HC_MAP_GPA_RANGE bit set for TD VM.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 Hypercalls exit to userspace v2:
-- Skip setting of return code as TDVMCALL_STATUS_SUCCESS.
 - Use vp_enter_args instead of x86 registers.
-- Remove unnecessary comments.
-- Zero run->hypercall.ret in __tdx_map_gpa() following the pattern of Paolo's
-  patch, the feedback of adding a helper is still pending. (Rick)
-  https://lore.kernel.org/kvm/20241213194137.315304-1-pbonzini@redhat.com
+- vcpu->run->system_event.ndata is not hardcoded to 10. (Xiaoyao)
+- Undefine COPY_REG after use. (Yilun)
+- Updated the document about KVM_SYSTEM_EVENT_TDX_FATAL. (Chao)
 
 Hypercalls exit to userspace v1:
 - New added.
   Implement one of the hypercalls need to exit to userspace for handling after
-  dropping "KVM: TDX: Add KVM Exit for TDX TDG.VP.VMCALL", which tries to resolve
+  reverting "KVM: TDX: Add KVM Exit for TDX TDG.VP.VMCALL", which tries to resolve
   Sean's comment.
   https://lore.kernel.org/kvm/Zg18ul8Q4PGQMWam@google.com/
-- Check interrupt pending between chunks suggested by Sean.
-  https://lore.kernel.org/kvm/ZleJvmCawKqmpFIa@google.com/
 - Use TDVMCALL_STATUS prefix for TDX call status codes (Binbin)
-- Use vt_is_tdx_private_gpa()
 ---
- arch/x86/include/asm/shared/tdx.h |   1 +
- arch/x86/kvm/vmx/tdx.c            | 113 ++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.h            |   3 +
- 3 files changed, 117 insertions(+)
+ Documentation/virt/kvm/api.rst |  9 +++++++
+ arch/x86/kvm/vmx/tdx.c         | 45 ++++++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h       |  1 +
+ 3 files changed, 55 insertions(+)
 
-diff --git a/arch/x86/include/asm/shared/tdx.h b/arch/x86/include/asm/shared/tdx.h
-index 4aedab1f2a1a..f23657350d28 100644
---- a/arch/x86/include/asm/shared/tdx.h
-+++ b/arch/x86/include/asm/shared/tdx.h
-@@ -77,6 +77,7 @@
- #define TDVMCALL_STATUS_SUCCESS		0x0000000000000000ULL
- #define TDVMCALL_STATUS_RETRY		0x0000000000000001ULL
- #define TDVMCALL_STATUS_INVALID_OPERAND	0x8000000000000000ULL
-+#define TDVMCALL_STATUS_ALIGN_ERROR	0x8000000000000002ULL
- 
- /*
-  * Bitmasks of exposed registers (with VMM).
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 2ba70c1fad51..5e415b312ab0 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6823,6 +6823,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
+   #define KVM_SYSTEM_EVENT_WAKEUP         4
+   #define KVM_SYSTEM_EVENT_SUSPEND        5
+   #define KVM_SYSTEM_EVENT_SEV_TERM       6
++  #define KVM_SYSTEM_EVENT_TDX_FATAL      7
+ 			__u32 type;
+                         __u32 ndata;
+                         __u64 data[16];
+@@ -6849,6 +6850,14 @@ Valid values for 'type' are:
+    reset/shutdown of the VM.
+  - KVM_SYSTEM_EVENT_SEV_TERM -- an AMD SEV guest requested termination.
+    The guest physical address of the guest's GHCB is stored in `data[0]`.
++ - KVM_SYSTEM_EVENT_TDX_FATAL -- a TDX guest reported a fatal error state.
++   The error code reported by the TDX guest is stored in `data[0]`, the error
++   code format is defined in TDX GHCI specification.
++   If the bit 63 of `data[0]` is set, it indicates there is TD specified
++   additional information provided in a page, which is shared memory. The
++   guest physical address of the information page is stored in `data[1]`.
++   An optional error message is provided by `data[2]` ~ `data[9]`, which is
++   byte sequence, LSB filled first. Typically, ASCII code(0x20-0x7e) is filled.
+  - KVM_SYSTEM_EVENT_WAKEUP -- the exiting vCPU is in a suspended state and
+    KVM has recognized a wakeup event. Userspace may honor this event by
+    marking the exiting vCPU as runnable, or deny it and call KVM_RUN again.
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index daa49f2ee2b3..8b51b4c937e9 100644
+index 8b51b4c937e9..85956768c515 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -981,9 +981,122 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
- 	return __kvm_emulate_hypercall(vcpu, 0, complete_hypercall_exit);
+@@ -1092,11 +1092,56 @@ static int tdx_map_gpa(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
-+/*
-+ * Split into chunks and check interrupt pending between chunks.  This allows
-+ * for timely injection of interrupts to prevent issues with guest lockup
-+ * detection.
-+ */
-+#define TDX_MAP_GPA_MAX_LEN (2 * 1024 * 1024)
-+static void __tdx_map_gpa(struct vcpu_tdx *tdx);
-+
-+static int tdx_complete_vmcall_map_gpa(struct kvm_vcpu *vcpu)
++static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
 +{
 +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+
-+	if (vcpu->run->hypercall.ret) {
-+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
-+		tdx->vp_enter_args.r11 = tdx->map_gpa_next;
-+		return 1;
-+	}
-+
-+	tdx->map_gpa_next += TDX_MAP_GPA_MAX_LEN;
-+	if (tdx->map_gpa_next >= tdx->map_gpa_end)
-+		return 1;
++	u64 reg_mask = tdx->vp_enter_args.rcx;
++	u64 *opt_regs;
 +
 +	/*
-+	 * Stop processing the remaining part if there is pending interrupt.
-+	 * Skip checking pending virtual interrupt (reflected by
-+	 * TDX_VCPU_STATE_DETAILS_INTR_PENDING bit) to save a seamcall because
-+	 * if guest disabled interrupt, it's OK not returning back to guest
-+	 * due to non-NMI interrupt. Also it's rare to TDVMCALL_MAP_GPA
-+	 * immediately after STI or MOV/POP SS.
++	 * Skip sanity checks and let userspace decide what to do if sanity
++	 * checks fail.
 +	 */
-+	if (pi_has_pending_interrupt(vcpu) ||
-+	    kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending) {
-+		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_RETRY);
-+		tdx->vp_enter_args.r11 = tdx->map_gpa_next;
-+		return 1;
-+	}
++	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
++	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_TDX_FATAL;
++	/* Error codes. */
++	vcpu->run->system_event.data[0] = tdx->vp_enter_args.r12;
++	/* GPA of additional information page. */
++	vcpu->run->system_event.data[1] = tdx->vp_enter_args.r13;
++	/* Information passed via registers (up to 64 bytes). */
++	opt_regs = &vcpu->run->system_event.data[2];
 +
-+	__tdx_map_gpa(tdx);
++#define COPY_REG(REG, MASK)						\
++	do {								\
++		if (reg_mask & MASK) {					\
++			*opt_regs = tdx->vp_enter_args.REG;		\
++			opt_regs++;					\
++		}							\
++	} while (0)
++
++	/* The order is defined in GHCI. */
++	COPY_REG(r14, BIT_ULL(14));
++	COPY_REG(r15, BIT_ULL(15));
++	COPY_REG(rbx, BIT_ULL(3));
++	COPY_REG(rdi, BIT_ULL(7));
++	COPY_REG(rsi, BIT_ULL(6));
++	COPY_REG(r8, BIT_ULL(8));
++	COPY_REG(r9, BIT_ULL(9));
++	COPY_REG(rdx, BIT_ULL(2));
++#undef COPY_REG
++
++	vcpu->run->system_event.ndata = opt_regs - vcpu->run->system_event.data;
++
 +	return 0;
-+}
-+
-+static void __tdx_map_gpa(struct vcpu_tdx *tdx)
-+{
-+	u64 gpa = tdx->map_gpa_next;
-+	u64 size = tdx->map_gpa_end - tdx->map_gpa_next;
-+
-+	if (size > TDX_MAP_GPA_MAX_LEN)
-+		size = TDX_MAP_GPA_MAX_LEN;
-+
-+	tdx->vcpu.run->exit_reason       = KVM_EXIT_HYPERCALL;
-+	tdx->vcpu.run->hypercall.nr      = KVM_HC_MAP_GPA_RANGE;
-+	/*
-+	 * In principle this should have been -KVM_ENOSYS, but userspace (QEMU <=9.2)
-+	 * assumed that vcpu->run->hypercall.ret is never changed by KVM and thus that
-+	 * it was always zero on KVM_EXIT_HYPERCALL.  Since KVM is now overwriting
-+	 * vcpu->run->hypercall.ret, ensuring that it is zero to not break QEMU.
-+	 */
-+	tdx->vcpu.run->hypercall.ret = 0;
-+	tdx->vcpu.run->hypercall.args[0] = gpa & ~gfn_to_gpa(kvm_gfn_direct_bits(tdx->vcpu.kvm));
-+	tdx->vcpu.run->hypercall.args[1] = size / PAGE_SIZE;
-+	tdx->vcpu.run->hypercall.args[2] = vt_is_tdx_private_gpa(tdx->vcpu.kvm, gpa) ?
-+					   KVM_MAP_GPA_RANGE_ENCRYPTED :
-+					   KVM_MAP_GPA_RANGE_DECRYPTED;
-+	tdx->vcpu.run->hypercall.flags   = KVM_EXIT_HYPERCALL_LONG_MODE;
-+
-+	tdx->vcpu.arch.complete_userspace_io = tdx_complete_vmcall_map_gpa;
-+}
-+
-+static int tdx_map_gpa(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	u64 gpa = tdx->vp_enter_args.r12;
-+	u64 size = tdx->vp_enter_args.r13;
-+	u64 ret;
-+
-+	/*
-+	 * Converting TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE requires
-+	 * userspace to enable KVM_CAP_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE
-+	 * bit set.  If not, the error code is not defined in GHCI for TDX, use
-+	 * TDVMCALL_STATUS_INVALID_OPERAND for this case.
-+	 */
-+	if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE)) {
-+		ret = TDVMCALL_STATUS_INVALID_OPERAND;
-+		goto error;
-+	}
-+
-+	if (gpa + size <= gpa || !kvm_vcpu_is_legal_gpa(vcpu, gpa) ||
-+	    !kvm_vcpu_is_legal_gpa(vcpu, gpa + size - 1) ||
-+	    (vt_is_tdx_private_gpa(vcpu->kvm, gpa) !=
-+	     vt_is_tdx_private_gpa(vcpu->kvm, gpa + size - 1))) {
-+		ret = TDVMCALL_STATUS_INVALID_OPERAND;
-+		goto error;
-+	}
-+
-+	if (!PAGE_ALIGNED(gpa) || !PAGE_ALIGNED(size)) {
-+		ret = TDVMCALL_STATUS_ALIGN_ERROR;
-+		goto error;
-+	}
-+
-+	tdx->map_gpa_end = gpa + size;
-+	tdx->map_gpa_next = gpa;
-+
-+	__tdx_map_gpa(tdx);
-+	return 0;
-+
-+error:
-+	tdvmcall_set_return_code(vcpu, ret);
-+	tdx->vp_enter_args.r11 = gpa;
-+	return 1;
 +}
 +
  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  {
  	switch (tdvmcall_leaf(vcpu)) {
-+	case TDVMCALL_MAP_GPA:
-+		return tdx_map_gpa(vcpu);
+ 	case TDVMCALL_MAP_GPA:
+ 		return tdx_map_gpa(vcpu);
++	case TDVMCALL_REPORT_FATAL_ERROR:
++		return tdx_report_fatal_error(vcpu);
  	default:
  		break;
  	}
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 0e3522e423cc..45c1d064b6b7 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -57,6 +57,9 @@ struct vcpu_tdx {
- 	u64 vp_enter_ret;
- 
- 	enum vcpu_tdx_state state;
-+
-+	u64 map_gpa_next;
-+	u64 map_gpa_end;
- };
- 
- void tdh_vp_rd_failed(struct vcpu_tdx *tdx, char *uclass, u32 field, u64 err);
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 45e6d8fca9b9..937400350317 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -375,6 +375,7 @@ struct kvm_run {
+ #define KVM_SYSTEM_EVENT_WAKEUP         4
+ #define KVM_SYSTEM_EVENT_SUSPEND        5
+ #define KVM_SYSTEM_EVENT_SEV_TERM       6
++#define KVM_SYSTEM_EVENT_TDX_FATAL      7
+ 			__u32 type;
+ 			__u32 ndata;
+ 			union {
 -- 
 2.46.0
 
