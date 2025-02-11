@@ -1,149 +1,156 @@
-Return-Path: <kvm+bounces-37876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E862A30F08
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 16:02:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECD16A30F13
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 16:03:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 592397A1451
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 15:01:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F9373A8689
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 15:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB652512C7;
-	Tue, 11 Feb 2025 15:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679142512C7;
+	Tue, 11 Feb 2025 15:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="DpBI7Aqt"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BJhbuZ83"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7F317C91;
-	Tue, 11 Feb 2025 15:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09B01F9ED2;
+	Tue, 11 Feb 2025 15:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739286118; cv=none; b=CysB/bdwJXAKFjjQn5D8+akHhRmchkYTuQs7bLJrcbYBlkSP9wrm0tXTYYVWmxlzhDXBTlSxNZhdS4JD3SV/D3SFNLJ5X+uuvA0bvKqtEAmef14MpTbJovzy6PI3EoezaA1JQH2IO6efngGXkg1dRk+0M7u9HBrYf1AFZC1RYLk=
+	t=1739286156; cv=none; b=roE/IaBj1KCAgm5zw22yPr91WKelCTzC0sTcza4YL8TxbOLCTD45cXWDMJxHV5YLqt0ATYd6TITh1oUha4zlO7SwuOPv7rOfWO0n01lANUIvA+kHcZW2iaFUD5cnBc8kkHFk1fhC0/Gpa41n+F+RPiNV0BqEN/JsGan1dSyvrFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739286118; c=relaxed/simple;
-	bh=NT4LdFuNL1mVF0er7FdAvKA0qLNJnpbCilHR7tk3ZCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rbgyUNnlwET04hmjhlk6deMH0D2a5kTQWsaZdRtUilvnT9WycPLRPYW5dkpBlEo72ESoWrbz6n8FC2xcC1nHyjtDu3VpU7SDxr8lyAMKrU4TIhBb8ACeyMVft+Rk5pktGczHm3wmBw7oeNsuRBLVm4hhPIyrb7b3zM6pOikt/vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=DpBI7Aqt; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C079340E0220;
-	Tue, 11 Feb 2025 15:01:53 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id vcaTo4I3qsTZ; Tue, 11 Feb 2025 15:01:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1739286109; bh=4lwHEX7loO/SRy+ZxkW2JvVT9zUzrCSHPE5+qCPs4Vc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DpBI7Aqt8XOmID6XpqbDT6/JpWJ5yVuWy4TG2lI1I2RyyHucsQiPgTTbMFr+3APKE
-	 vaRUG4GIlOzxTU7YUIqQaaJU7BZE3orP1yegfSTUKgT1lxeqrQgWZfKA3x6KXW4Qvh
-	 Fmod4YL2KZ9eM8+nBAFJX18wZO8dX+OVtTHO+ERgfD/COIHzZak/rQkWDrzM8OUJzt
-	 yDnh8pqfBZwKx5Pztz5ocTaM9hKiTWmb3XDQ+JYa8ptGy8Z9mlwqlbt5/zxlqajcrS
-	 nCDSCzOfOH8dW+quN4fuLfRtCcjkuB2YKjhDgIuGlwXcyxgxsv2xNu6BIHkfCIu57T
-	 dI3o6w7SJEYUnM3DccFMM2p7429H/Dbgolh0WNYMxImLZV9p3qVx1UCoLr1HOD5zEb
-	 XeYWpWM5TAizW4An75m3IzKvBguY8O+HEf2DgqgFMy6/UrWgRx9lnzMyfgmtZsybpk
-	 ewR38IijGkYWVNMTLoBdPuqnO+h1+ruRV3z2Cy2UoZdbRq67StoxJzL0dsuX5eyi4B
-	 KNjYQlmCCsqqCRM0TsE9OAC4ybr5CUT3UCUPvIcSwoYDHPKGVAFK3OhGZ8h6ekN5DA
-	 v+aqAFlzwhlYaJFyH+6bEW/HlTfbiwxSaatnuKXcl8tPmhFzoDDkuSgRm1lFyK7vYt
-	 mfLheS+6IIG/fb5cqt1E39HQ=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7F6A240E01AE;
-	Tue, 11 Feb 2025 15:01:23 +0000 (UTC)
-Date: Tue, 11 Feb 2025 16:01:14 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-	Juergen Gross <jgross@suse.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.amakhalov@broadcom.com>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org,
-	linux-coco@lists.linux.dev, virtualization@lists.linux.dev,
-	linux-hyperv@vger.kernel.org, jailhouse-dev@googlegroups.com,
-	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 01/16] x86/tsc: Add a standalone helpers for getting TSC
- info from CPUID.0x15
-Message-ID: <20250211150114.GCZ6tmOqV4rI04HVuY@fat_crate.local>
-References: <20250201021718.699411-1-seanjc@google.com>
- <20250201021718.699411-2-seanjc@google.com>
+	s=arc-20240116; t=1739286156; c=relaxed/simple;
+	bh=iU3UXr58kiiQAoh2LCXTPFFO47tqLfuoMZ4ANShnnhg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HAUAi6IZoXYNz+vbyRI+pSlLlLcYMnqLZpbmeJdnBlMEG7SLpTmt1sejBDewJq+r+rpjJXbGpSul7QwCAs7XuQ8ZwKE+2auQ9iVVmXFCQ90S73CrGLDc0F5Omc5+Ql18+uZQBNdJ7GqS3r3Keh6WUXEr0TSsUSKTSlf3riLmxoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BJhbuZ83; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51BDxaJp021613;
+	Tue, 11 Feb 2025 15:02:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=XtVxv8
+	uayeOQPpY2VGV3WMS8dQJbNqXyl/Qmv7QvjPg=; b=BJhbuZ83cDOxXmKrYstVCz
+	9kVG3MwWtIKh/E+LT4/5k8JE779nPv7RxObbq3HHC4vWzqNff+F1b8rJ4nItPLv8
+	+FqMjTuLfQxGJYoLuWGopyjb8hNjWyWKK3v9WhJ4xav0vdLOrQOt9pHkWGvwpVfj
+	Afu8gmO0Be7ye+18iFxsUzxbh5yaEy+dI9rLAJvrJk9AFvRquthkFIfRQk17PhWk
+	jC/0UHgwNH/OEfODcPuPQreo4nAtTqPd4fdWFgNoRqtagwavZt9zUjiCm4Y2Q2i7
+	QafT6NZ1tnPfM8Z1E25BURt95EFkq4TJROG9xgzJZpU5wv9ATudwiNDPuyoMNQTQ
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44qwd1b4s3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Feb 2025 15:02:25 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51BEnmk1011677;
+	Tue, 11 Feb 2025 15:02:24 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44pktjujjp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Feb 2025 15:02:24 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51BF2N4b23462526
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Feb 2025 15:02:23 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A6B8658055;
+	Tue, 11 Feb 2025 15:02:23 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2176158043;
+	Tue, 11 Feb 2025 15:02:23 +0000 (GMT)
+Received: from [9.12.79.21] (unknown [9.12.79.21])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 11 Feb 2025 15:02:23 +0000 (GMT)
+Message-ID: <e5ca9a2c-ec7d-4e0e-ad06-2d312b511b90@linux.ibm.com>
+Date: Tue, 11 Feb 2025 10:02:22 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250201021718.699411-2-seanjc@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] s390/vfio-ap: Signal eventfd when guest AP
+ configuration is changed
+To: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Anthony Krowiak <akrowiak@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        jjherne@linux.ibm.com, alex.williamson@redhat.com
+References: <20250107183645.90082-1-rreyes@linux.ibm.com>
+ <Z4U6iu5JidJUxDgX@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <f69bba4b-a97e-4166-9ce1-c8a2ad634696@linux.ibm.com>
+ <f1af50b3-f966-445d-ab89-3d213f55b93a@linux.ibm.com>
+ <Z6RnfwawWop0v1CW@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <02675184-0ce5-4f08-9d5d-f42987b77b5b@linux.ibm.com>
+ <Z6sDKeA6WzAgagiZ@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+Content-Language: en-US
+From: Rorie Reyes <rreyes@linux.ibm.com>
+In-Reply-To: <Z6sDKeA6WzAgagiZ@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: E-WnUjyJWL3aFF9DY6I6dNCAiQw_U9gy
+X-Proofpoint-ORIG-GUID: E-WnUjyJWL3aFF9DY6I6dNCAiQw_U9gy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-11_06,2025-02-11_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ adultscore=0 impostorscore=0 mlxlogscore=999 clxscore=1015
+ priorityscore=1501 spamscore=0 lowpriorityscore=0 phishscore=0
+ malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502110100
 
-On Fri, Jan 31, 2025 at 06:17:03PM -0800, Sean Christopherson wrote:
-> Extract retrieval of TSC frequency information from CPUID into standalone
-> helpers so that TDX guest support and kvmlock can reuse the logic.  Provide
-> a version that includes the multiplier math as TDX in particular does NOT
-> want to use native_calibrate_tsc()'s fallback logic that derives the TSC
-> frequency based on CPUID.0x16 when the core crystal frequency isn't known.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/tsc.h | 41 ++++++++++++++++++++++++++++++++++++++
->  arch/x86/kernel/tsc.c      | 14 ++-----------
->  2 files changed, 43 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/tsc.h b/arch/x86/include/asm/tsc.h
-> index 94408a784c8e..14a81a66b37c 100644
-> --- a/arch/x86/include/asm/tsc.h
-> +++ b/arch/x86/include/asm/tsc.h
 
-Bah, why in the header as inlines? Just leave them in tsc.c and call them...
+On 2/11/25 2:58 AM, Alexander Gordeev wrote:
+> On Thu, Feb 06, 2025 at 09:12:27AM -0500, Rorie Reyes wrote:
+>
+> Hi Rorie,
+>
+>> On 2/6/25 2:40 AM, Alexander Gordeev wrote:
+>>> On Wed, Feb 05, 2025 at 12:47:55PM -0500, Anthony Krowiak wrote:
+>>>>>> How this patch is synchronized with the mentioned QEMU series?
+>>>>>> What is the series status, especially with the comment from Cédric
+>>>>>> Le Goater [1]?
+>>>>>>
+>>>>>> 1. https://lore.kernel.org/all/20250107184354.91079-1-rreyes@linux.ibm.com/T/#mb0d37909c5f69bdff96289094ac0bad0922a7cce
+> ...
+>>>> I don't think that is what Alex was asking. I believe he is asking how the
+>>>> QEMU and kernel patch series are going to be synchronized.
+>>>> Given the kernel series changes a value in vfio.h which is used by QEMU, the
+>>>> two series need to be coordinated since the vfio.h file
+>>>> used by QEMU can not be updated until the kernel code is available. So these
+>>>> two sets of code have
+>>>> to be merged upstream during a merge window. which is different for the
+>>>> kernel and QEMU. At least I think that is what Alex is asking.
+>>> Correct.
+>>> Thanks for the clarification, Anthony!
+>> Tony, thank you for the back up!
+>>
+>> Alexander, is there anything else you need from my end for clarification?
+> The original question still stays - is it safe to pull this patch now,
+> before the corresponding QEMU change is integrated?
+>
+> Thanks!
 
-> @@ -28,6 +28,47 @@ static inline cycles_t get_cycles(void)
->  }
->  #define get_cycles get_cycles
->  
-> +static inline int cpuid_get_tsc_info(unsigned int *crystal_khz,
-> +				     unsigned int *denominator,
-> +				     unsigned int *numerator)
+If there are no other concerns from anyone else, and Tony is ok to sign 
+off, then I would say it's safe to pull the patch.
 
-Can we pls do a
+I do have a v2 of my QEMU changes that need to be reviewed so it would 
+probably ok to pull the kernel patches now.
 
-struct cpuid_tsc_info {
-	unsigned int denominator;
-	unsigned int numerator;
-	unsigned int crystal_khz;
-	unsigned int tsc_khz;
-}
+QEMU v2 patches: [RFC PATCH v2 0/5] Report vfio-ap configuration changes
 
-and hand that around instead of those I/O pointers?
+Unless someone else has any concerns with my kernal changes?
 
-It would make the code a bit saner to stare at and follow.
+Thanks!
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
