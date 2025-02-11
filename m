@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-37810-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37811-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D1DA302FF
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 06:44:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F177CA30317
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 06:57:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 123727A3656
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 05:43:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F3D7188AC37
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 05:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385C71E5B79;
-	Tue, 11 Feb 2025 05:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A049A1E5B72;
+	Tue, 11 Feb 2025 05:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="eUqqY8zC"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="kvsngtux"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149AB1E47C2
-	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 05:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF832C9A
+	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 05:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739252633; cv=none; b=CFNQHcSCVmVAVfXxIXQ94ANXkYdLNvpbJLZ13lXEUH4CyY5o8yFVmv6PtsoEzCW62dUitsucN4nPD4DLo8W20NpXCTkowEsR7X+KjRimEANK9QpWWZdIlBM0vT9ZxnHrlw+AWyrhVLzhzBrT/IAE1u/BHI5wzT1/Ow8CCzUtPnY=
+	t=1739253427; cv=none; b=K2WvZElQayvkdVXJPhoPTyJLNIaXXlYxZY6mczjRuZy6zp5yfH3one9CNIsadVFlMhywgTiRjnJeji6Q++LtVUDvmxDpEo9piFj1wPVFhCr8JGjg2d6SB5W0k7QhjE7ysCSR7RPhYZff4gWYfFZTY/FB/M7LIv021dQ8dNVq01k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739252633; c=relaxed/simple;
-	bh=5PbCqh3umgNU/gZ+tDrHMMIbr/nnUqN53Rb2ul6bOEA=;
+	s=arc-20240116; t=1739253427; c=relaxed/simple;
+	bh=+nbqPmbMF4jgueQlkoNLtrphKKIkh/Fm5nsFDK7ILUo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uwkfgH2K8nUTmr8AJaGyAPJ50wKzeDM1sklFktHUZkykW/iVKOD58vT23fnHYPvDFN//xt1ut4doUG9RDh9VYR2aLtVSL5miPZOgGY5RajvzGbuHV+GsuS2zKT0laWzU87YjNGpH9yjncVXpMi5Wxa7FpxkkofvlNoh1B6CZwc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=eUqqY8zC; arc=none smtp.client-ip=209.85.214.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=pJX3v6dJu4OCpqlLJfhITlJUJvsMOGYD8QY4/kCVQl7SMb+r1JzL/APDMxRF5WDkqS1sBvX7Pfa9VAn5R8UsbPbozmBdkxMUDl+Jhcw4GkcR22zVFWHggZ+RYPI/yHD4plZuSjnplicZlqmLWhd/pV2Nu8tv5oS8MtAxNH2Gr1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=kvsngtux; arc=none smtp.client-ip=209.85.216.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21f62cc4088so54963515ad.3
-        for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 21:43:49 -0800 (PST)
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2f9f6a2fa8dso7111192a91.1
+        for <kvm@vger.kernel.org>; Mon, 10 Feb 2025 21:57:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1739252629; x=1739857429; darn=vger.kernel.org;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1739253425; x=1739858225; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=bQsQ+/o421QYPh8BJOWROcjn2xBlqUe9Xq6Aw4uiVNM=;
-        b=eUqqY8zCHDgKkQpCjdL4Xw1+uS1OpdpHq8SzUSvAlaUbFr2jSKbnGWYNxJIKVqZMI4
-         hCuvX1/Q7D6ZjejLPgQwWi5FCDlWFXH/DFV5CHHTe7D1WbNxYHmpvmfcM2Dskb4pUIzB
-         /nBnIAk9Z/ZztJrqkPT01w0BpMyl3hn0PaJvkW+aC/S8oD7CEjuEFlGhSlxr5UMq14K6
-         O/zKQliYyVTojn3er7+NQKc+JzCQVXB0BNFjQaZxXXeBPRE7G3WswTgkib2lQlxCyNeD
-         urjaZKplDHufxqzA8abubq+DzmgONMeyy/unZp9cLb3Xj2nFf9IUkhGenfgh3Nms36rq
-         CEgA==
+        bh=HJZy2jyvTOLzFCUYeWaduV9MqEWJwar6HvmOT6bl6Aw=;
+        b=kvsngtuxEusYb625FVRfs8WHAmg1bi7OBT1WVs+eHERiuMTYMo9JCqOBHZhXXJYkUl
+         XSRS+mJPQCVf2hlPYpQOJL8YgKOq96NDRrYDc3thBJERynCwBJlqALU/nlX5Iq5USSG0
+         NdKdNVYg9mBwZQp9Wfvl7wBLnfn3k+jZmKh/1refGqGvs0qlOZQE6VNVKMXhJjF6SvTD
+         9E4uDnPA1uPP9P4fCv1bfcTKpX5C9fgCYsdeMtwy03mAK076p2OH/qWbOg8mGgPMXPzW
+         kW26CYxpDqfxHYdz/K5QWuZ0mwRhuLl0y9+jRr4WO5nu85DLt5PIMSISyaTqNt6kKK2n
+         lNag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739252629; x=1739857429;
+        d=1e100.net; s=20230601; t=1739253425; x=1739858225;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bQsQ+/o421QYPh8BJOWROcjn2xBlqUe9Xq6Aw4uiVNM=;
-        b=iUiFdHcX5/QJWyplclsaBaS/mum70mPmbN01aznTBZCYsfMG0zEcvHNJO4X7MqInEE
-         QeZfY2I0JRQr80OuZ8P3Ex1SNLBp32lm+ABIzmnpAu3GbqZ/sq6SJthqy4FRQHtP+GNn
-         n1sQWrOSHV7o4JSLi211iQsSNF5DAIpRlrJVrD8OeCPwCugcccOqA8mve3EEFkEcOK+o
-         kKFCXk9reOwDx/mmuEfHxf7s7/6gbKywT4/1b3FrRX97/c6CMGXKr6Ki7EF//8fxJugS
-         jhJyvA2kgL9hbcfmaj+hYCjDXKKB7ZiKyPqrocHBDBauIgmGcWyJxsOgjpvaZsTFM/+J
-         uCkg==
-X-Forwarded-Encrypted: i=1; AJvYcCXagRKHkzA4jcAFIXGHtmqy2ulL98MBNmIF65laLLiPVUIAuazt3kJlXPNzLA5pX2qLvfE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDETf7rWQ5Do9iorNXSgQCKgXdVHSpe7rbKH/WubsI+hHPsxKr
-	pmkjrvtpopz05dAWbR1d7EwWBQ1MDycEWA4/vRA9mYQLiSqEJPJHJ+9PTFNhgwM=
-X-Gm-Gg: ASbGncvtlvL9+ATXGv2sYXvtIOE97C+shHTnvTi3bdiZo0H4JqodoRetFKc+1Fx6Em5
-	gpA7ExWv8IOvGdj/4oT1gib43PbSIqnLTqZ2+w4Jfp6bDJpcwTAbFN2r7JRv1utiZItyd8RZhuO
-	mgjkRIa5VJUNcmy7i5KVqaj4xkPpZcM6+I5DZrficgbpVBiCCHSkBKXTm68XzTDpobQFrtuopNq
-	aNyDPnre1ua1v6gR4r5Opybw1Q5ruiZ27V6/O3OvQ5zLf5ZVHA99aOS2dnBsJEBmDsIiWbgU/XG
-	BnQZmTOI36jLTszaDnodO5Ek8w==
-X-Google-Smtp-Source: AGHT+IEPKtHYtx0smpDpQgrDnTYBegghA1v5GIvgD0h4cr824ONo5mx4lRTjSLhr137zD0mY6UDmiw==
-X-Received: by 2002:a05:6a20:9f4a:b0:1e8:bd15:6819 with SMTP id adf61e73a8af0-1ee03a5f141mr31000422637.22.1739252629301;
-        Mon, 10 Feb 2025 21:43:49 -0800 (PST)
+        bh=HJZy2jyvTOLzFCUYeWaduV9MqEWJwar6HvmOT6bl6Aw=;
+        b=KycJ0is2CRIUnnTRt9Z9Ban6lQ0LISxaz1hs3zRhE9YgWjO46Si4GZ9DjP9vb/kW9/
+         lTDSUuRKcahW9UDTu08RsDWiOyX5Ozm/LaEzk5YgO6ZNXs6IJT7HsDO0MjmXR8GQgJg/
+         QF/yV5lKsheoO3/XaDZgtRWBBp0jE0KQ7LnPKtnhuODJvL2Hrr/bJQANvgdK3uwxNO1Y
+         NFBmlkcRQeQJSluPJL78Z8ZD4G75zoS3+RS026STBGKUnnill4NpACVtEqH+Il0MJVfN
+         oZyXj/LkZ0V564fOmvFx1v9934jQpKmhll7TcEiSuvJE7hk7mWaJHPSlx64GR5tiKwD8
+         xSIw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0D9WKE/gLSgvR4FXrRMTJh/4X4TlbHeW42VDVeiYxh/rMD/NHNbSIvWxai4TY+tTP6MA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxm43ZqyhMySBz4jk6ZvIhHrr84yDpuyCcLr3iNub6N2gfP7p1b
+	1J/FbGuAVkaDJ4I/Z4A7jgQK+Pc7tJw8FXJSKynk5HcyMCwCeXJj8+KYlne1tCE=
+X-Gm-Gg: ASbGnctUqNPDiw+OoLM2AXtBS6L/4tLgVq06qObapY2tpP17KW7wyoSu00ingrqC6eF
+	RoZw6kBmUnAEzlU2PGzSCNBr+0MjMDSJKagEpLF1XSSSGZrQHoDfPlmQfV/BlcfZzoNARQ+AM/R
+	ap7KHgKmhRwd89QXe7dVpP1SLVkJUyIbz1H3BSuvtiwbWesJ/bmkCbGvlcRceIe45BNNoYPoHgZ
+	aDOENlb5yGZsinJ741CU2wWiJ++tCslu6Qy/RI/5yzgFCSJMOZ26tM2hNIVmi2eQrfsdUB5YWJX
+	r01UiLVLrQPzOW1Fq1N4JvfPiw==
+X-Google-Smtp-Source: AGHT+IGPV3VBh9FyPjCZf26VkPF75SNsz19I9tg0lKaJmNEHjjQrpfrlMc7NQxLWrWHUBES1C/WSbg==
+X-Received: by 2002:a05:6a00:3492:b0:730:87b2:e839 with SMTP id d2e1a72fcca58-73087b2f0a3mr15775608b3a.21.1739253425110;
+        Mon, 10 Feb 2025 21:57:05 -0800 (PST)
 Received: from debug.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7308b102789sm3396914b3a.149.2025.02.10.21.43.48
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-730840e842bsm3878466b3a.88.2025.02.10.21.57.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 21:43:48 -0800 (PST)
-Date: Mon, 10 Feb 2025 21:43:46 -0800
+        Mon, 10 Feb 2025 21:57:04 -0800 (PST)
+Date: Mon, 10 Feb 2025 21:57:02 -0800
 From: Deepak Gupta <debug@rivosinc.com>
 To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
 Cc: Paul Walmsley <paul.walmsley@sifive.com>,
@@ -85,7 +85,7 @@ Cc: Paul Walmsley <paul.walmsley@sifive.com>,
 	linux-kselftest@vger.kernel.org,
 	Samuel Holland <samuel.holland@sifive.com>
 Subject: Re: [PATCH v2 14/15] RISC-V: KVM: add support for FWFT SBI extension
-Message-ID: <Z6rjkk5JlMlqbl2j@debug.ba.rivosinc.com>
+Message-ID: <Z6rmrqbNtHxmjI0X@debug.ba.rivosinc.com>
 References: <20250210213549.1867704-1-cleger@rivosinc.com>
  <20250210213549.1867704-15-cleger@rivosinc.com>
 Precedence: bulk
@@ -171,11 +171,24 @@ On Mon, Feb 10, 2025 at 10:35:47PM +0100, Clément Léger wrote:
 >+struct kvm_sbi_fwft_config;
 >+struct kvm_vcpu;
 >+
+
+
+Can we add some comments here for future fwft providers along below lines?
+
+Reason being, patch defaults to `conf->supported = true` if `supported` fn
+pointer in `kvm_sbi_fwft_feature` was NULL. Although `kvm_sbi_fwft_set/get`
+does get/set fn pointers (it would happen even if `supported` fn pointer
+was NULL).
+
 >+struct kvm_sbi_fwft_feature {
 >+	enum sbi_fwft_feature_t id;
+	/* If function not provided, KVM will default assume to be true */
 >+	bool (*supported)(struct kvm_vcpu *vcpu);
+	/* Must always provide function pointers for get/set */
 >+	int (*set)(struct kvm_vcpu *vcpu, struct kvm_sbi_fwft_config *conf, unsigned long value);
 >+	int (*get)(struct kvm_vcpu *vcpu, struct kvm_sbi_fwft_config *conf, unsigned long *value);
+
+
 >+};
 >+
 >+struct kvm_sbi_fwft_config {
@@ -383,18 +396,6 @@ On Mon, Feb 10, 2025 at 10:35:47PM +0100, Clément Léger wrote:
 >+
 >+	fwft->configs = kcalloc(ARRAY_SIZE(features), sizeof(struct kvm_sbi_fwft_config),
 >+				GFP_KERNEL);
-nit:
-
-I understand that in next patch you grow the static array`features`. But in this patch
-`ARRAY_SIZE(features)` evaluates to 0, thus kcalloc will be returning a pointer
-to some slab block (IIRC, kcalloc will not return NULL if size eventually evals to 0)
-
-This probably won't result in some bad stuff. But still there is a pointer in
-fwft->configs which is pointing to some random stuff if `features` turns out to be
-empty.
-
-Let me know if I got that right or missing something.
-
 >+	if (!fwft->configs)
 >+		return -ENOMEM;
 >+
