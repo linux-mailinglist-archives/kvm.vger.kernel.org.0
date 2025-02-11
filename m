@@ -1,84 +1,84 @@
-Return-Path: <kvm+bounces-37827-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37828-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53503A30648
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 09:50:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EF6DA3067C
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 09:56:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54CB63A3E02
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 08:49:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 634411618FC
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 08:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82FF91F0E4E;
-	Tue, 11 Feb 2025 08:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E691A1F0E55;
+	Tue, 11 Feb 2025 08:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRhP0661"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GZq3/7Bu"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBE61EF0B6
-	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 08:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2891F03EE
+	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 08:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739263784; cv=none; b=JdeSZKaNZdGxQDXYaYJKmiTp9Z+q3QjcEsr8YvZjBcXLu7/Dw0oCark67NDy7dlAiHat3dK16oU7F8ByFLLgoJXdwN0M+yY2xOWIqsdG6wAJyoAECrLKFep+q7W6uotYbSUfa15CQleXk1i7mHhSjwQt3ysoSW2Ny3Tw8ncWhdA=
+	t=1739264085; cv=none; b=gz7ZhazDlL2nzG9DPztXdtWW4KMNI6+gYYawitTUehS29tqMSUCR7TKwPBDc+ZdBBBUHTvTVuYWXbLwj+N/Vddh2/RBETIhHVHY3krXVI4BIkQUyVEwU3XJ9wdOaWrdXK5Gyxl3Up4abtcuPLquwsMX7JSnjbyemfVml4ZmUuWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739263784; c=relaxed/simple;
-	bh=tGGe6R9k07bfXinl0nS+60J8kkCn9Msd7ZYZxAChr1Q=;
+	s=arc-20240116; t=1739264085; c=relaxed/simple;
+	bh=A9OGoTsHrjtvyBc5Q07ZgbbmAyoBumXm7SUvVbyvJc4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YLYiKB4pxCVCq7rvLQMzFM3Z9fVPKXNsrhNLiXj63IawaK5IBzsa9bvCPtBEYXvRmSjdgc5Bfxrz5e16oceHMbEF7Va0TcIixmeSC9qolk5mceu1KREpUGPvb9eRLILVo0/30ZJYMk08aaOyPeifwmttpULW2dM4x5U6Ujgs++o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CRhP0661; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=t5uPcFdHkOMjLxAMPlT80NPA0jv9jHFDlCNGWH9pLfpkobj1XVZmh1/LCOXcpXSuGWS/urjuIlCp/6UAxzia3h+KdjqaoI9umPHlBQWp9W5/m6jqETntlMiRXYuUM7WWNnGnPdBNk3ZdlCALRtcnFvQZndSlQAS8zQzxWm3bObE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GZq3/7Bu; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739263781;
+	s=mimecast20190719; t=1739264081;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LRMrU6yeeMWRAhnsRZJcbJf4YV+OqMKei44I5o7lAMg=;
-	b=CRhP0661Y7fWgDMgWjdBkixpKdUX+Mwj36oK/xgbczE9/IbIKvkVuxAfmjcMyWaPxcAzjP
-	gvzjVeoffj1AIzC8uI6ixxvbJMnstWvVOEgkD96cy7mnHRjgIoyzeEJ5NhNUoWgH2ctI6W
-	Ng3VRyivbnKMh5StutajlP5HcdFOmWs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+JLq8TzMXCM9fnXbwXAYKIjuUWhuJvIj9pOn4Osk/Hg=;
+	b=GZq3/7Buua4e4xWI7jRkfUghkVpbsyf2KBHk/uEQi+KHCIoljcmDDc5URwia7Lu9PQ6SZJ
+	BsdOpyrXh5EjxB04vUZ2/9ZSd2KkzXwv2yQstrmQNd1WEVv4+MQrtkavCNOYrU5H5ytqjZ
+	QNfLPxm0kKqIWYOi3Vdu2t8j+iyVmZc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-217-xRrdr-eNMDqK48OikEXeuA-1; Tue, 11 Feb 2025 03:49:39 -0500
-X-MC-Unique: xRrdr-eNMDqK48OikEXeuA-1
-X-Mimecast-MFC-AGG-ID: xRrdr-eNMDqK48OikEXeuA
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38ddee833e0so1009836f8f.1
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 00:49:39 -0800 (PST)
+ us-mta-648-TM5KZ3hxPcqRDeZWRrehWw-1; Tue, 11 Feb 2025 03:54:40 -0500
+X-MC-Unique: TM5KZ3hxPcqRDeZWRrehWw-1
+X-Mimecast-MFC-AGG-ID: TM5KZ3hxPcqRDeZWRrehWw
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38dc88ed7caso2374777f8f.0
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 00:54:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739263778; x=1739868578;
+        d=1e100.net; s=20230601; t=1739264079; x=1739868879;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LRMrU6yeeMWRAhnsRZJcbJf4YV+OqMKei44I5o7lAMg=;
-        b=ScIb1AKNp3j37fiqZZX9Y6U+SxBs/Mj0M1tIUWQWkdXKgyrzyJNRqn0QSGFMzRmtLh
-         A/nxjYgVayWmgy9BJzO5KTH50BgCk8v4BBlWxmdnap9j3ifMbcevJEQ0gwUvvA0vJBUY
-         8NHYRlf3oU6w8t+A5wboPBc3ZulxIYcIUg3a0n/qaSrkV3H1PEcRj2NfN4WMjzkK7CyC
-         2p2pdpPDy8ZAurBXA+jVY13RJO1dayHZxgrUUXfmX5IlB1eCeWug+CLVv1kIxRPNCclU
-         Rf9dqfkt5aXaayw9uHhwc2JvrZCo6/7ZGw8QEj/CHRE3SgvJPl+VZX+Fuh+RdRNbxwMj
-         N8Dg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPgJJ7gBMj+p12ehHXadWWcxJAIIQANmr3Gm40JXvVurWHgiyXN7OIzqs1pdeEe3AybLo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMW0ggAhdlbNmF5FECQyPEeRg0kN5NV5rM5w3ouCQJpeXUio2X
-	0+UZdo3sd8pGbnzGi8eBaLRhU3v7F81PPHIypXuCsgdyI9pdiGD9118TyCPJs01dSIEVPHZaXrj
-	ZnAaDogfl1MOhUlv48waxtGSj6aX7D1fBX4jN052xR14WQunSmQ==
-X-Gm-Gg: ASbGnct6+diES2hl0dySpGhY2T1+o5wFakXT4PU6PhdeX9SJCInQRoZVOfkRGai17HJ
-	e4O8c6Z2Pq8ZXr5RJL/w75uvcxbHeZQMDu3qU8VBgSMviW+kL2Cyfq2/6h3mT9z7uZIaq7BCwff
-	LUiZFYFAYG1yeptVzSkbQXizln0Wx6v7iz4cC0fBzepjQmJJDzWxORAAl8hP7yYujIEOCxOkRQE
-	3cMBVarGdSuYcbl1zBhL6kOPGFcKjwLiYpl12hBLSxZv3EBpFiHLzfc6v0hXzMLy3viDGHU+kYL
-	LZtS+L3JGmbgd3eizTTlA4H5TGjCAEG7hFPGbB7jMxXCM5JfuuqNdQ==
-X-Received: by 2002:a05:6000:1a8e:b0:38d:dffc:c14f with SMTP id ffacd0b85a97d-38de438e616mr1875233f8f.1.1739263778449;
-        Tue, 11 Feb 2025 00:49:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGeTzJoifNHnY5TL4dY0IJ4mNA0Zko6YQk6M6uAACokDE0hpUh2u8Fm8WqTwc8m/eZy3oWQ1Q==
-X-Received: by 2002:a05:6000:1a8e:b0:38d:dffc:c14f with SMTP id ffacd0b85a97d-38de438e616mr1875201f8f.1.1739263777811;
-        Tue, 11 Feb 2025 00:49:37 -0800 (PST)
+        bh=+JLq8TzMXCM9fnXbwXAYKIjuUWhuJvIj9pOn4Osk/Hg=;
+        b=migNhsZrxk00k783CrcD8HAD30d8LTLQJLd3n1Rnl+f+Lv5EVRaBPsLJof/DBPSP2i
+         hT4bj+Ke89tl154nI5esDCgSmbd9W05cTFpkw7Gr5fuFgmWIGEYuZhNirxlnBt8iiB4+
+         kNn86xfcCPpnS4F6NG8xH5f6AVpVkTi14cI/dBt+YPCytZA8s/t7qo9dokH3f88N5Nv6
+         6skUJc6T0R2lq4iNapc4iHI029i+KQ4aT5I5yeIJVept4ZQ5tKuQw4qd51y9eCwG9JSB
+         5BatxRqMaPyHg/Dvi5SyhX8oo09nTvexxqCugSpTD/DI6wCm7+kJWs2NuVdJpQ7RBpiG
+         05NA==
+X-Forwarded-Encrypted: i=1; AJvYcCX3diFo8ElokCZBgPguey91Ge6dGfwm6CZ9qIg9ADoaRCp/ZF4jVYQTwnPgiGntgPfUrc4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyqig6t04owoPhot9ShQRAybYuSIdjZ5GCVtyh2EOPHrmwczhsR
+	G8o5yrnwtpcKkRpk8qpTp82+eolphKPuX0W3nDedetG9MnfhNvKHjqjLkb3b/jdyZ/VecCyzL2E
+	9xxgOu32rXQ1hNkUIpOFAw0UEo5MCD20XmBa4tj3gx0Wl4CuvFEWtI3/I3Q==
+X-Gm-Gg: ASbGncvZN7t01utp0Z+udh4stoK8HhJKhg6Rn89GnRvKijC70TvyGkGbeZyaSNBFhmg
+	HvlhpDqP+FNVDcuudvyCvOI8PXnxvF8wipq3+5zkUZVaiC28Omh9D6JycOBCjlFOmh8DcIOjmeD
+	KEuQBJ1dQ+DY7ovfWzf88pOJ5q5gakqga5Vl9ntKkCOGikOsMjVYjVnMXetDGv9WPWYLV5mj0B6
+	2GTaC76dGE/YD0jBeQufMQrbAFs2VvgFHXW6fY9CbOSW+OF/KfwAdpprQ1NHc6g9rli7UTBwDMg
+	qJ6xAXxfxIt9LAeUiGkdRekqdn9fbSeBhHeMJ8uzc2PQ1L3A78Aniw==
+X-Received: by 2002:a05:6000:1a85:b0:38d:d906:dbb0 with SMTP id ffacd0b85a97d-38dd906dcbcmr7731139f8f.7.1739264079248;
+        Tue, 11 Feb 2025 00:54:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH+FXQlM4sVQQqQ6bfC1MLrVyaITtJSDcEgeRD57O/EtV7ZEKzfLqyRzc94bzpSoemBGMAbgw==
+X-Received: by 2002:a05:6000:1a85:b0:38d:d906:dbb0 with SMTP id ffacd0b85a97d-38dd906dcbcmr7731090f8f.7.1739264078600;
+        Tue, 11 Feb 2025 00:54:38 -0800 (PST)
 Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390d94d7c7sm202714805e9.14.2025.02.11.00.49.36
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4394df55f51sm12596505e9.0.2025.02.11.00.54.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 00:49:37 -0800 (PST)
-Date: Tue, 11 Feb 2025 09:49:32 +0100
+        Tue, 11 Feb 2025 00:54:37 -0800 (PST)
+Date: Tue, 11 Feb 2025 09:54:32 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Junnan Wu <junnan01.wu@samsung.com>
 Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
@@ -87,12 +87,10 @@ Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com,
 	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	q1.huang@samsung.com, ying01.gao@samsung.com, ying123.xu@samsung.com, 
 	lei19.wang@samsung.com
-Subject: Re: [Patch net 2/2] vsock/virtio: Don't reset the created SOCKET
- during suspend to ram
-Message-ID: <cmpw6mtpzkhsdqvsls6zutnswwgf3exuwdqvw5f5673fzuktol@y6fpwfcb73ns>
-References: <20250211071922.2311873-1-junnan01.wu@samsung.com>
- <CGME20250211071946epcas5p3c2afde3813ab81142e81cff110ab7afa@epcas5p3.samsung.com>
- <20250211071922.2311873-3-junnan01.wu@samsung.com>
+Subject: Re: [Patch net 0/2] vsock suspend/resume fix
+Message-ID: <jeqyqnuqklvk4ozyfhi4x4zadb5wxjvnefmk7w4ktvjna4psix@fc244relosif>
+References: <CGME20250211071930epcas5p2dbb3a4171fbe04574c0fa7b3a6f1a0c2@epcas5p2.samsung.com>
+ <20250211071922.2311873-1-junnan01.wu@samsung.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -101,87 +99,31 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250211071922.2311873-3-junnan01.wu@samsung.com>
+In-Reply-To: <20250211071922.2311873-1-junnan01.wu@samsung.com>
 
-On Tue, Feb 11, 2025 at 03:19:22PM +0800, Junnan Wu wrote:
->Function virtio_vsock_vqs_del will be invoked in 2 cases
->virtio_vsock_remove() and virtio_vsock_freeze().
->
->And when driver freeze, the connected socket will be set to TCP_CLOSE
->and it will cause that socket can not be unusable after resume.
->
->Refactor function virtio_vsock_vqs_del to differentiate the 2 use cases.
->
->Co-developed-by: Ying Gao <ying01.gao@samsung.com>
->Signed-off-by: Ying Gao <ying01.gao@samsung.com>
->Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
->---
-> net/vmw_vsock/virtio_transport.c | 18 ++++++++++++------
-> 1 file changed, 12 insertions(+), 6 deletions(-)
+For the third time, please READ this link:
+https://www.kernel.org/doc/html/latest/process/submitting-patches.html
 
-We are still discussing this in v1:
+This is a v2, so you should put it in the tags [PATCH net v2 ...]
 
-https://lore.kernel.org/virtualization/iv6oalr6yuwsfkoxnorp4t77fdjheteyojauwf2phshucdxatf@ominy3hfcpxb/T/#u
+And also include a changelog and a link to the v1:
 
-Please stop sending new versions before reaching an agreement!
+v1: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
 
-BTW I still think this is wrong, so:
-
-Nacked-by: Stefano Garzarella <sgarzare@redhat.com>
-
-
+On Tue, Feb 11, 2025 at 03:19:20PM +0800, Junnan Wu wrote:
+>CC all maintainers and reviews.
+>Modify commits accroding to reviewers' comments.
+>Re-organize the patches, cover letter, tag, Signed-Off, Co-worker etc.
 >
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index f0e48e6911fc..909048c9069b 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -716,14 +716,20 @@ static void virtio_vsock_vqs_start(struct virtio_vsock *vsock)
-> 	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
-> }
+>Junnan Wu (2):
+>  vsock/virtio: initialize rx_buf_nr and rx_buf_max_nr when resuming
+>  vsock/virtio: Don't reset the created SOCKET during suspend to ram
 >
->-static void virtio_vsock_vqs_del(struct virtio_vsock *vsock)
->+static void virtio_vsock_vqs_del(struct virtio_vsock *vsock, bool vsock_reset)
-> {
-> 	struct virtio_device *vdev = vsock->vdev;
-> 	struct sk_buff *skb;
+> net/vmw_vsock/virtio_transport.c | 28 +++++++++++++++++++---------
+> 1 file changed, 19 insertions(+), 9 deletions(-)
 >
->-	/* Reset all connected sockets when the VQs disappear */
->-	vsock_for_each_connected_socket(&virtio_transport.transport,
->-					virtio_vsock_reset_sock);
->+	/* When driver is removed, reset all connected
->+	 * sockets because the VQs disappear.
-
-You wrote it here too, you have to reset them because the VQs are going 
-to disappear, isn't it the same after the freeze?
-
->+	 * When driver is just freezed, don't do that because the connected
->+	 * socket still need to use after restore.
->+	 */
->+	if (vsock_reset) {
->+		vsock_for_each_connected_socket(&virtio_transport.transport,
->+						virtio_vsock_reset_sock);
->+	}
 >
-> 	/* Stop all work handlers to make sure no one is accessing the device,
-> 	 * so we can safely call virtio_reset_device().
->@@ -831,7 +837,7 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
-> 	rcu_assign_pointer(the_virtio_vsock, NULL);
-> 	synchronize_rcu();
->
->-	virtio_vsock_vqs_del(vsock);
->+	virtio_vsock_vqs_del(vsock, true);
->
-> 	/* Other works can be queued before 'config->del_vqs()', so we flush
-> 	 * all works before to free the vsock object to avoid use after free.
->@@ -856,7 +862,7 @@ static int virtio_vsock_freeze(struct virtio_device *vdev)
-> 	rcu_assign_pointer(the_virtio_vsock, NULL);
-> 	synchronize_rcu();
->
->-	virtio_vsock_vqs_del(vsock);
->+	virtio_vsock_vqs_del(vsock, false);
->
-> 	mutex_unlock(&the_virtio_vsock_mutex);
->
+>base-commit: a64dcfb451e254085a7daee5fe51bf22959d52d3
 >-- 
 >2.34.1
 >
