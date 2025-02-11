@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-37797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1DE3A301E2
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:59:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7966A301E6
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 04:00:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19EB3ABAEA
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:59:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7897188C22E
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136CF1D6195;
-	Tue, 11 Feb 2025 02:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26361E9B3A;
+	Tue, 11 Feb 2025 02:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nn6rnO2F"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q9Jy6IQ5"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728D21E9B01;
-	Tue, 11 Feb 2025 02:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705C21E9B20;
+	Tue, 11 Feb 2025 02:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739242647; cv=none; b=ZWSaQysDvElOIwX8AjRjz7l14CXSOie5PnMBQeaRBcEClAcU/aYp2iifdlAFrMzosTAb9WDhs6/H8iTnDznc4udFg//1k1SydtuTRGaxQH33QGxOPHsq9DcmbDtSvOYTrDC6Y2cVYIrvepBLeGEZP5J9uyzHgRMFmsZiV31t6to=
+	t=1739242649; cv=none; b=Oe09f3Il5UkCBLfjy9JSo8I7hi+mImtJs6Z/F9Q5Njyceqh2DX9p+1ykoOLt9jTgMSV/Dg9LGPvR8NaXZENGUEqp0jN09XQcaveafyxeQni+wlkaOULe9VltLPyemwDwdhn8dPeFfpf3nx7Mljt85G/bt5jv+sdMNC51RXPrWOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739242647; c=relaxed/simple;
-	bh=m5srtxiUNG0XXeE8Ov3VMui0qMhR3DCCZOXxm+6ZHYw=;
+	s=arc-20240116; t=1739242649; c=relaxed/simple;
+	bh=VJXEff56lStQBPGfmawPOxR5BfoAbbKjmYmLYPKNlvA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nGUJxN1U+0Rq+ystoFaZIuRdC7LBWRqnPqiyy2QgruecWrYFJsrN5XTzVkwcMQ0bejHNKX1CdqRpy1GPttMtMCJlaUWENZz16Tcy0Jhj1cO8NLnpYHOHN1b17LTGVd8yp1EIoCwGGsfhbshEA7NTw3ZRQHECR9Iz/Hxve7ddwIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nn6rnO2F; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=dGP+86gb0A1Yb2RUd+YhpfiTz/SKvdY0LRge+4qzdQDw3GJ/it/oKoY+mVQr9rggAKQ3q1RWkpR04zIx1MJb7QcAQ+3cefVrw4Tj25h6pdlgxGPobvOm7MtFO2mwLL7NBSOmUuJM8xc/iZ1T/zK/5Vrp4kTY1/clkLT7jVbjmtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q9Jy6IQ5; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739242646; x=1770778646;
+  t=1739242649; x=1770778649;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=m5srtxiUNG0XXeE8Ov3VMui0qMhR3DCCZOXxm+6ZHYw=;
-  b=nn6rnO2FfU75+0+gt4iOWfxfEPIfWonOJkNpv/Bqp66Y02g3guYIT2Bv
-   AXE7dQr78MHfQkbRWJ46uSGCG8gvbjWyh+sQePt9cjY3bWr+0uparRUuF
-   Hwn1C5tRkr0OmOO2Kxj8XRnkaAyR4N+PjEawnXQDBoO/cuYu8rZYYDZV0
-   Cf0dvAnhg8G4rs9eh5esO0qrlwnIpbgbNaAScVuZiV23ud5THFFpphV6N
-   B6+arxmHVZ5UAkVEtecGP5ejyQZmXIke3VuBERbX2bcBXDPL4L8ggvKqW
-   CJ+VtVx9LaforaDP+1/r3GSq35ts2Qf4LCvlXFCrQ9XpAKj6NN/W/O25x
-   g==;
-X-CSE-ConnectionGUID: 4/8GWKfTR/uu2V/LfMWu1Q==
-X-CSE-MsgGUID: 753r3/RhRvugSeDUrN0yKw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43612474"
+  bh=VJXEff56lStQBPGfmawPOxR5BfoAbbKjmYmLYPKNlvA=;
+  b=Q9Jy6IQ5dQGeqHW7yawXi8ufiU65S8mzgmfYHNtCOKK4/uHY4VsPuudm
+   IzXnlf49D/a3CZteSztC6afITLMgqZgh54nciHkyja7BIfMSeUyqH/bEo
+   t4HDBQqAHjowc6BSkimSnsRoVYKpZ0QEWNToIQc3TEX4IYvddwVAj5M5o
+   5rHf9sHt1gdgVxoofC3eni8IGOxh7FEdhAr3fLCC7IPjVK+yVi+eS1T6j
+   PEKkqAYZtj0ryeJVd/LIRTEam16DZJiMkB0tgGgrxuKwxeBBIp/OfhR2N
+   uRZU+vVABu2qQ0NiAyWr0gSKHXiUyQOaNClzIfPoWN/UaVHPHrxMQUJnS
+   Q==;
+X-CSE-ConnectionGUID: vVC3Tz6hRhWC3Qtmru242A==
+X-CSE-MsgGUID: sHoB74r8RVWmM5h4K24YIg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43612481"
 X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="43612474"
+   d="scan'208";a="43612481"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:26 -0800
-X-CSE-ConnectionGUID: lWdnTKb2TEa0ls8I4FCX4A==
-X-CSE-MsgGUID: dlCQ12xwT72rBc5OZk+4nQ==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:29 -0800
+X-CSE-ConnectionGUID: 1vxBCD6EQiOwBb9IengWpw==
+X-CSE-MsgGUID: 3u3oO0HCQlOh2ycIJzQ4Ew==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="112355355"
+   d="scan'208";a="112355366"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:21 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:25 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 10/17] KVM: TDX: Always block INIT/SIPI
-Date: Tue, 11 Feb 2025 10:58:21 +0800
-Message-ID: <20250211025828.3072076-11-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 11/17] KVM: TDX: Enforce KVM_IRQCHIP_SPLIT for TDX guests
+Date: Tue, 11 Feb 2025 10:58:22 +0800
+Message-ID: <20250211025828.3072076-12-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
 References: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
@@ -87,135 +87,60 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Enforce KVM_IRQCHIP_SPLIT for TDX guests to disallow in-kernel I/O APIC
+while in-kernel local APIC is needed.
 
-Always block INIT and SIPI events for the TDX guest because the TDX module
-doesn't provide API for VMM to inject INIT IPI or SIPI.
+APICv is always enabled by TDX module and TDX Module doesn't allow the
+hypervisor to modify the EOI-bitmap, i.e. all EOIs are accelerated and
+never trigger exits.  Level-triggered interrupts and other things depending
+on EOI VM-Exit can't be faithfully emulated in KVM.  Also, the lazy check
+of pending APIC EOI for RTC edge-triggered interrupts, which was introduced
+as a workaround when EOI cannot be intercepted, doesn't work for TDX either
+because kvm_apic_pending_eoi() checks vIRR and vISR, but both values are
+invisible in KVM.
 
-TDX defines its own vCPU creation and initialization sequence including
-multiple seamcalls.  Also, it's only allowed during TD build time.
+If the guest induces generation of a level-triggered interrupt, the VMM is
+left with the choice of dropping the interrupt, sending it as-is, or
+converting it to an edge-triggered interrupt.  Ditto for KVM.  All of those
+options will make the guest unhappy. There's no architectural behavior KVM
+can provide that's better than sending the interrupt and hoping for the
+best.
 
-Given that TDX guest is para-virtualized to boot BSP/APs, normally there
-shouldn't be any INIT/SIPI event for TDX guest.  If any, three options to
-handle them:
-1. Always block INIT/SIPI request.
-2. (Silently) ignore INIT/SIPI request during delivery.
-3. Return error to guest TDs somehow.
-
-Choose option 1 for simplicity. Since INIT and SIPI are always blocked,
-INIT handling and the OP vcpu_deliver_sipi_vector() won't be called, no
-need to add new interface or helper function for INIT/SIPI delivery.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 TDX interrupts v2:
-- WARN on init event. (Sean)
-- Improve comments about vcpu reset for TDX. (Xiaoyao, Sean)
-
-TDX interrupts v1:
-- Renamed from "KVM: TDX: Silently ignore INIT/SIPI" to
-  "KVM: TDX: Always block INIT/SIPI".
-- Remove KVM_BUG_ON() in tdx_vcpu_reset(). (Rick)
-- Drop tdx_vcpu_reset() and move the comment to vt_vcpu_reset().
-- Remove unnecessary interface and helpers to delivery INIT/SIPI
-  because INIT/SIPI events are always blocked for TDX. (Binbin)
-- Update changelog.
+- New added.
 ---
- arch/x86/kvm/vmx/main.c    | 18 ++++++++++++++++--
- arch/x86/kvm/vmx/tdx.c     | 13 +++++++++++++
- arch/x86/kvm/vmx/x86_ops.h |  2 ++
- 3 files changed, 31 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 8d91bd8eb991..1ff4903a1853 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -119,8 +119,10 @@ static void vt_vcpu_free(struct kvm_vcpu *vcpu)
- 
- static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- {
--	if (is_td_vcpu(vcpu))
-+	if (is_td_vcpu(vcpu)) {
-+		tdx_vcpu_reset(vcpu, init_event);
- 		return;
-+	}
- 
- 	vmx_vcpu_reset(vcpu, init_event);
- }
-@@ -215,6 +217,18 @@ static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
- }
- #endif
- 
-+static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * INIT and SIPI are always blocked for TDX, i.e., INIT handling and
-+	 * the OP vcpu_deliver_sipi_vector() won't be called.
-+	 */
-+	if (is_td_vcpu(vcpu))
-+		return true;
-+
-+	return vmx_apic_init_signal_blocked(vcpu);
-+}
-+
- static void vt_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
- {
- 	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
-@@ -581,7 +595,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- #endif
- 
- 	.check_emulate_instruction = vmx_check_emulate_instruction,
--	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-+	.apic_init_signal_blocked = vt_apic_init_signal_blocked,
- 	.migrate_timers = vmx_migrate_timers,
- 
- 	.msr_filter_changed = vmx_msr_filter_changed,
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 9737574b8049..bd349e3d4089 100644
+index bd349e3d4089..4b3251680d43 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -2642,6 +2642,19 @@ static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
- 	return 0;
- }
+@@ -13,6 +13,7 @@
+ #include "mmu/spte.h"
+ #include "common.h"
+ #include "posted_intr.h"
++#include "irq.h"
+ #include <trace/events/kvm.h>
+ #include "trace.h"
  
-+void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-+{
+@@ -663,8 +664,12 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+ 	if (kvm_tdx->state != TD_STATE_INITIALIZED)
+ 		return -EIO;
+ 
+-	/* TDX module mandates APICv, which requires an in-kernel local APIC. */
+-	if (!lapic_in_kernel(vcpu))
 +	/*
-+	 * Yell on INIT, as TDX doesn't support INIT, i.e. KVM should drop all
-+	 * INIT events.
-+	 *
-+	 * Defer initializing vCPU for RESET state until KVM_TDX_INIT_VCPU, as
-+	 * userspace needs to define the vCPU model before KVM can initialize
-+	 * vCPU state, e.g. to enable x2APIC.
++	 * TDX module mandates APICv, which requires an in-kernel local APIC.
++	 * Disallow an in-kernel I/O APIC, because level-triggered interrupts
++	 * and thus the I/O APIC as a whole can't be faithfully emulated in KVM.
 +	 */
-+	WARN_ON_ONCE(init_event);
-+}
-+
- struct tdx_gmem_post_populate_arg {
- 	struct kvm_vcpu *vcpu;
- 	__u32 flags;
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 91988a715d75..eb6a841f4842 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -129,6 +129,7 @@ void tdx_vm_free(struct kvm *kvm);
- int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
++	if (!irqchip_split(vcpu->kvm))
+ 		return -EINVAL;
  
- int tdx_vcpu_create(struct kvm_vcpu *vcpu);
-+void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
- void tdx_vcpu_free(struct kvm_vcpu *vcpu);
- void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
- int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu);
-@@ -169,6 +170,7 @@ static inline void tdx_vm_free(struct kvm *kvm) {}
- static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
- 
- static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
-+static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
- static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
- static inline void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu) {}
- static inline int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+ 	fpstate_set_confidential(&vcpu->arch.guest_fpu);
 -- 
 2.46.0
 
