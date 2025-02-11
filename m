@@ -1,189 +1,179 @@
-Return-Path: <kvm+bounces-37835-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37836-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1721A3088D
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 11:31:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6641A308DD
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 11:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41862165D3B
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 10:31:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B0DA165606
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 10:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BD91F4294;
-	Tue, 11 Feb 2025 10:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1918E1FA856;
+	Tue, 11 Feb 2025 10:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="pkaMqdaX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ErD4E/RU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F068626BD90
-	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 10:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FDC1F942D
+	for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 10:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739269892; cv=none; b=NmDf2un7W3jWbZmLTFFq/BmEF0GLxVZXPHXX7qrZs1isJrXy3aTK4WGV/dPY2Au66pcJB6i19+vUgJN4JXijexitMBDKbZu9ihG64pM+8pKvm1FtUBTaV46tCpcXs5ESV6ojCu2J04vCYxo/c8/K2PpgYGex8eqZPePm0gsaDfo=
+	t=1739270448; cv=none; b=JsVqW29yhKYg4NCjgjRKCwvUbOebwHfcEV6dALvGDDR+4BQXNSb32yqgmhDvbq3hBN0YOtcvIUpxANC8qQKZDxoYIp7huhpmJluIyQH+mDK7UO3Zanaqn3R6xZHfTG+49hrOOXwYRWJ/MKM/8LSODkDMCzgM+tSq995OG782atw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739269892; c=relaxed/simple;
-	bh=3UHxA/qdoAY3MebmP1PqzZZYiy2zYfWAOCI1X57hn6g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KEMi6OwW35SBOTdocYcErdyPPoHguFH3XikUhKjCq7f7VegHkHm1FNGxVMjBl9NqdhADaCXlzzMuhNqv0qbrpV/zBOI6FGoFunnVNZQEZ0mKCgO6wVIM8OD10g26xdfoGM4Y+qGZX0oSuMjUE+QP2nFytMqWlPo6lkHY3NWBi3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=pkaMqdaX; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-38de1a5f039so1443937f8f.2
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 02:31:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1739269889; x=1739874689; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/a6P8MPGQ0avVAV5Cfpz5Ib9WVUVZW41mP8caOrUgAQ=;
-        b=pkaMqdaXgaH8QmNXCo5B47pnLdVS4Skgx+AokX/Evv4YmPRQCOTYWmIVQxQpf8Ex5d
-         OsVKM262Hg94W0XE3ZlIQUS7Ze5609rOSMjvyKh6d0BhEJzyQjzozs2XfBRqNQzayBRq
-         CCJPjUn/In+zVVEQoRoZEAtTJf4G3oykcdD+e/aYSf9e/0oNnCHpJO2tOfJrQu/fvhxN
-         9WnRwzQI4Mx7U5sKEWEugBgSVYMOHK0iw6TzBYNM5x7l0W4M6E6vCBOMxR/jBhlhqhHb
-         A9xjyEnaFuiFYD9tGaIIexPq/7xzK13iCyNBVSRSey66RQmDXiJXzoydgqgJzu4/p+sG
-         rhcA==
+	s=arc-20240116; t=1739270448; c=relaxed/simple;
+	bh=btgsMkB+KatSBhW2xvQ/HbfeImWKcXqMZC5wzTOtkqg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QteYQI7H1ZNK8a0m/og106FvKmzqmUVa+f7u3hMh5nafwNP/bvEz665aXEr0wGyVS/+5P7zumpPbld0jJbiRJvhGChf0h0HVmnx0hYMnk/AglOSBZc4UzYQfxUOAhG1mkwoa3DP6tnZ7XESlR5PYJxaYsGPq/sIsUYqZibnRWp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ErD4E/RU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739270445;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=btgsMkB+KatSBhW2xvQ/HbfeImWKcXqMZC5wzTOtkqg=;
+	b=ErD4E/RU1arsLGEYQdfZ5+w7z/KhLH5ynMEcM7nlnSg49gRVbMJ5bVJLxhKKzUhWjPdQ31
+	qA4+ym/KEkSn2Upjl9Jg0XI//z6gsZ9F15PM5BEPR3eRih1QPpKa53z1/4P7S7QFtqcCdo
+	JnUDqPkyb5rr3n4YS7qtP7byxiDV1z0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-25-6vxxCcr9P-uNijcdmrsbnw-1; Tue, 11 Feb 2025 05:40:44 -0500
+X-MC-Unique: 6vxxCcr9P-uNijcdmrsbnw-1
+X-Mimecast-MFC-AGG-ID: 6vxxCcr9P-uNijcdmrsbnw_1739270443
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-438e4e9a53fso39964965e9.1
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 02:40:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739269889; x=1739874689;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/a6P8MPGQ0avVAV5Cfpz5Ib9WVUVZW41mP8caOrUgAQ=;
-        b=eZh8SWAyNuZOELh8wlwxx3ejhJx8Q/FbhHgqUz6KRClw2GarbjwMTYTNF1KG9Qeyf+
-         J40d4qb/jIyRzbC5R0UK99Zs4IL0I1swSmK2ZAGC8AhKB6+N7qnfp/8uvJJH//wOgiZ5
-         WF29tfY0QH9Tn9rhxJnLATVvvuMjmc+MxwOTjLaivnDQXNwXULt0MwmUlqEd7Gkh0Z/i
-         6VSW4zVQnRyN4wzgoptMbF7cnwtmpq4XS2yT+ag8hyQKIvPmg0piKy3of7zbdd8+Kyov
-         u1MQgWq0hNy6mV4j/Oi8j94kWG1ptILNnPupMz1LypWyxIL1B2oMjsDcimOGaV0jLRiX
-         twaw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKgY8WzZ1M/c34wqNzp9nxY0/ukEor9Abm6icqG7VfQPzRVuHSUCFjKGgWkUsD3QOYTQU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb0k8ICBoKQXvbBwnzrnzy1/vFMmnG4Pb7ZzYGicD47aJ8uAs8
-	RAw/dzDp6Nf1RfgT/rTdgBbvrTuJ9zlhltn8CgUmSUaxIxRH4zJO1+NrgBOSwnI=
-X-Gm-Gg: ASbGncsw366IFkHLJdvDf8zlT82hEsFjFiEc8LyU37iqkUSzoopS01b4GC69ylMQAAu
-	FjYGU77wzuFG30rqW3UTZ7XveD1josmW3QFfc3xp+YSDksLlcjdq9TsvlwnNJgHgfb7HlWlTw+z
-	csc0SKanNCybEHyiodJq0cKzWTVGLccIY9Jk4lpfvxZz2XrmhNbF1QmWOx7AE/1TpRUrd5IZ5yR
-	yWBW52kfD5iyBwfQVYNDIiRz95Z5SyGsoGOw6XPc96wIvkx0KG3xDpL5z9U95zMzqvTAGikwDNP
-	skCyGsBYFiKKR4vV3TrLFEXPvLZN+QtikwGLB61pYcUt1yJf1d+4eVEbYvDl
-X-Google-Smtp-Source: AGHT+IGrgjPSoOFkF4U85XDHHGJCIZJGQtRmyI8bFutmDHy81O7VBQ3XMYuog+hqAiQegwH4kGE9Dg==
-X-Received: by 2002:a5d:588f:0:b0:38d:d613:9bb1 with SMTP id ffacd0b85a97d-38dd6139eacmr6656232f8f.12.1739269889329;
-        Tue, 11 Feb 2025 02:31:29 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc3a10fffsm13606012f8f.12.2025.02.11.02.31.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Feb 2025 02:31:28 -0800 (PST)
-Message-ID: <a8af5d3a-e739-4f65-9e2d-d92978be9a3d@rivosinc.com>
-Date: Tue, 11 Feb 2025 11:31:28 +0100
+        d=1e100.net; s=20230601; t=1739270443; x=1739875243;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=btgsMkB+KatSBhW2xvQ/HbfeImWKcXqMZC5wzTOtkqg=;
+        b=T3lcCUv0YmVrf5d0/n7Qgwc3y7hiHPtPkgLhseabUB94FWBmAKvFgc7IE9g8KPVW6K
+         srC0dp9l4P47nAAt+rz+tPT5YpTYkqkW8hyhgKjKfw5cr8zGW8ahHZcDBRF7iMvihFzB
+         khUyYIj8KYYvoA8qRmAgQJgudq9wXff0UucEJfL47I9c/ehOWKtyNHj/JaJpa3A1nZlc
+         76gMbE2B/pjVTS1kR6qbeZwrquph8dpPVqrgbcmPHO0H0eOZrUdDQl3yJJCh0eO2Xc56
+         Euw5RGEVfiQU++o5bZVmrafCvSrR7TyGtd2CS1TehnnhteJsXYGym4l5X/RHgOvBYl+v
+         5+sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7yXr7uiUT5lWueFXKlWSOZ5qQLZzmiGSqgbnHH2vqgUpIphRAMwLQTx945ySkEGLGkNQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywgh7jP7BFmpJ2WTcQNZPG4uPx0Xv0bpGYdS1nN9KmK5vXwlQgN
+	yb6clYUmHcTnEsyaoTefsd7G653kiQoShkkQUyFWFrt4sIe2Y1pJn0G6cXvI729EJsUE38BE96U
+	r3mQeT9XSCvol1fGDNRP6nILufxlZYviYOcM2gx01/8kQ/azQhl0a1RNP70T8GiIo7fNApJJ9lU
+	sx4Imft+H6hksm/S1fHUzBFFb4
+X-Gm-Gg: ASbGncvLMK2Vx5KqHtJOs9Sf8L6PawXcUAAILs5k5Ez5JgCKj8L5cAI/vO+LlJO2GNK
+	m5e663M78oEs/+mKWcWPBcNO7SW0oIzwDJWVSpH3Nn30UT4G6JgH2Hzhvq6bW
+X-Received: by 2002:a05:600c:c07:b0:439:4832:325f with SMTP id 5b1f17b1804b1-43948323427mr44529335e9.1.1739270442749;
+        Tue, 11 Feb 2025 02:40:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGbumiPynQJLdfXR/hK61jc+qEpAs+mRfIkPjt8BvK5dw/XkyvYRl2OENNVY4nN2HiUviGg5p2QXMZIr5RQ2vU=
+X-Received: by 2002:a05:600c:c07:b0:439:4832:325f with SMTP id
+ 5b1f17b1804b1-43948323427mr44528985e9.1.1739270442437; Tue, 11 Feb 2025
+ 02:40:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 14/15] RISC-V: KVM: add support for FWFT SBI extension
-To: Deepak Gupta <debug@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Samuel Holland <samuel.holland@sifive.com>
-References: <20250210213549.1867704-1-cleger@rivosinc.com>
- <20250210213549.1867704-15-cleger@rivosinc.com>
- <Z6rjkk5JlMlqbl2j@debug.ba.rivosinc.com>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <Z6rjkk5JlMlqbl2j@debug.ba.rivosinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250211000917.166856-1-mlevitsk@redhat.com> <20250211000917.166856-3-mlevitsk@redhat.com>
+ <87seok25qx.wl-maz@kernel.org>
+In-Reply-To: <87seok25qx.wl-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 11 Feb 2025 11:40:29 +0100
+X-Gm-Features: AWEUYZnT1g0RdyJqMZtSUMcVn2SB8z3GSQjhvL_omNqa0pSFmSAU_EQ9poyWn3Q
+Message-ID: <CABgObfa6DGM4X5HKb6FHoeiitTp4ddVaUGLRqK+Z=a-JLc9Bzw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: switch to using kvm_lock/unlock_all_vcpus
+To: Marc Zyngier <maz@kernel.org>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	Jing Zhang <jingzhangos@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Randy Dunlap <rdunlap@infradead.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Zenghui Yu <yuzenghui@huawei.com>, kvm-riscv@lists.infradead.org, 
+	Ingo Molnar <mingo@redhat.com>, linux-riscv@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, kvmarm@lists.linux.dev, 
+	Alexander Potapenko <glider@google.com>, x86@kernel.org, Sean Christopherson <seanjc@google.com>, 
+	Anup Patel <anup@brainfault.org>, Kunkun Jiang <jiangkunkun@huawei.com>, 
+	Atish Patra <atishp@atishpatra.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Feb 11, 2025 at 10:25=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+> > No functional change intended.
+>
+> Actually plenty of it.
 
+Yes, definitely. That's not "no functional change intended", it's "no
+breakage of sane userspace intended" which is pretty much the
+opposite.
 
-On 11/02/2025 06:43, Deepak Gupta wrote:
->> +static int kvm_sbi_fwft_get(struct kvm_vcpu *vcpu, unsigned long
->> feature,
->> +                unsigned long *value)
->> +{
->> +    int ret;
->> +    struct kvm_sbi_fwft_config *conf;
->> +
->> +    ret = kvm_fwft_get_feature(vcpu, feature, &conf);
->> +    if (ret)
->> +        return ret;
->> +
->> +    return conf->feature->get(vcpu, conf, value);
->> +}
->> +
->> +static int kvm_sbi_ext_fwft_handler(struct kvm_vcpu *vcpu, struct
->> kvm_run *run,
->> +                    struct kvm_vcpu_sbi_return *retdata)
->> +{
->> +    int ret = 0;
->> +    struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
->> +    unsigned long funcid = cp->a6;
->> +
->> +    switch (funcid) {
->> +    case SBI_EXT_FWFT_SET:
->> +        ret = kvm_sbi_fwft_set(vcpu, cp->a0, cp->a1, cp->a2);
->> +        break;
->> +    case SBI_EXT_FWFT_GET:
->> +        ret = kvm_sbi_fwft_get(vcpu, cp->a0, &retdata->out_val);
->> +        break;
->> +    default:
->> +        ret = SBI_ERR_NOT_SUPPORTED;
->> +        break;
->> +    }
->> +
->> +    retdata->err_val = ret;
->> +
->> +    return 0;
->> +}
->> +
->> +static int kvm_sbi_ext_fwft_init(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
->> +    const struct kvm_sbi_fwft_feature *feature;
->> +    struct kvm_sbi_fwft_config *conf;
->> +    int i;
->> +
->> +    fwft->configs = kcalloc(ARRAY_SIZE(features), sizeof(struct
->> kvm_sbi_fwft_config),
->> +                GFP_KERNEL);
-> nit:
-> 
-> I understand that in next patch you grow the static array`features`. But
-> in this patch
-> `ARRAY_SIZE(features)` evaluates to 0, thus kcalloc will be returning a
-> pointer
-> to some slab block (IIRC, kcalloc will not return NULL if size
-> eventually evals to 0)
-> 
-> This probably won't result in some bad stuff. But still there is a
-> pointer in
-> fwft->configs which is pointing to some random stuff if `features` turns
-> out to be
-> empty.
-> 
-> Let me know if I got that right or missing something.
+> Yet the new helper returns -EINTR, which you blindly forward to userspace=
+.
 
-So I actually searched into the kmalloc code to see what hapopens with a
-zero size allocation and it actually return ZERO_SIZE_PTR:
+It won't quite reach userspace, since the task won't survive
+mutex_lock_killable(). With your current code the kill will arrive
+just after the ioctl returns to userspace, so there's no change in
+behavior there. The -EBUSY change is the one that matters.
 
-/*
- * ZERO_SIZE_PTR will be returned for zero sized kmalloc requests.
- *
- * Dereferencing ZERO_SIZE_PTR will lead to a distinct access fault.
- *
- * ZERO_SIZE_PTR can be passed to kfree though in the same way that NULL
-can.
- * Both make kfree a no-op.
- */
+> At the end of the day, the x86 locking serves completely different
+> purposes. It wants to gracefully wait for vcpus to exit and is happy
+> to replay things, because migration (which is what x86 seems to be
+> using this for) is a stupidly long process.
 
-Which seems like it's not really random and will fault if accessed. I
-think that's enough for that commit (which will be bisectable if needed
-then).
+No, it's not using it for the whole length of migration. It serves the
+same exact purpose as ARM: do some stuff on something that spans a
+whole struct kvm. The only difference is the behavior on contended
+mutex, where x86 simply says don't do it.
 
-Clément
+> Our locking is designed to
+> either succeed or fail quickly, because some of the lock paths are on
+> the critical path for VM startup and configuration.
+
+The only long-running vCPU ioctl is KVM_RUN and you don't have that
+during VM startup and configuration. The interesting case is
+snapshotting, i.e. reading attributes.
+
+Failing quickly when reading attributes makes sense, and I'd be
+rightly wary of changing it. I know that QEMU is doing them only when
+it knows CPUs are stopped, but it does seem to affect crosvm and
+Firecracker more, for snapshotting more than startup/configuration.
+The GIC snapshotting code in crosvm returns an anyhow::Result and ends
+up logging an error with println!, Firecracker is similar as it also
+propagates the error. So neither crosvm nor Firecracker have
+particularly sophisticated error handling but they do seem to want to
+fail their RPCs quickly.
+
+Failing quickly when creating the device or setting attributes makes
+less sense (Firecracker for one does an unwrap() there). But anyhow
+the change would have to be a separate patch, certainly not one
+applied through the generic KVM tree; and if you decide that you're
+stuck with it, that would be more than understandable.
+
+> So for this series to be acceptable, you'd have to provide the same
+> semantics. It is probably doable with a bit of macro magic, at the
+> expense of readability.
+
+Or it can be just an extra bool argument, plus wrappers.
+
+For RISC-V it's only used at device creation time, and the ioctl fails
+if the vCPU ran at least once. Removing the "try" in trylock is
+totally feasible there, however it must be documented in the commit
+message.
+
+Thanks,
+
+Paolo
+
+> What I would also like to see is for this primitive to be usable with
+> scoped_cond_guard(), which would make the code much more readable.
+
 
