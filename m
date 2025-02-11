@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-37788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDB50A301CF
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:57:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB864A301D2
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 03:57:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BD151695BC
-	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:57:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 065557A2F03
+	for <lists+kvm@lfdr.de>; Tue, 11 Feb 2025 02:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7CC1D5ABA;
-	Tue, 11 Feb 2025 02:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C42F1D5CFE;
+	Tue, 11 Feb 2025 02:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nB+V6w6Q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ak3jo+/G"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C601CAA60;
-	Tue, 11 Feb 2025 02:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37891D5178;
+	Tue, 11 Feb 2025 02:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739242631; cv=none; b=rZfhbr79RGTT8d0JIAYa9P6s+GqkTbPt0ZttGcgZxnoxFAFV4o4xeZ3IMW+1yDvkOmfDqPRyFHvkxsvG0GqtsQrwo2r39pHZPQA08Sc73wl8Dt7ifXvRNNSf2UNL3swRSlfhNWNBXslKSo2fANorTScpInGNBS3kzf48ROtntKI=
+	t=1739242633; cv=none; b=OSQVAUPMI63SjtBBTWSw5rwO625QBMWqXP1OIZ6QpOToN21BlodmdeiKYMqMS4DK4ba1krM+Brg0r8aHfNQOVCt3BAspESosKUSgAKsdS3cBfb7s6ZNBxJlGpz2LKhdss3EFR38s1VZd9QyrqRGQJfQVSEBpJ5d5GqP3jD29eCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739242631; c=relaxed/simple;
-	bh=beqpcPbpt0kBQ99FPCRb6pHXTrCzsCNX64wYsTdCyQQ=;
+	s=arc-20240116; t=1739242633; c=relaxed/simple;
+	bh=V1iJLe8wImdK0toiut9YkwUhhYvNwcKXcvVcNaiUBj4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l7QQjTqKFhlJgr1cwc7lSkKzF0I6Suz7GyKu08Ketcs0YgHu8tV41dI+mQQRa3wm96mSpeU1/5FFrU1T0M8K6Y4JhGD9D/kxhTjlzaTOUI3Tw7WlVkFJEZMHcpEraC+AnMDLbwF4Dz3jJrj9vTAx8PIfYyEukoJ2hJwLP0U0qVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nB+V6w6Q; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version; b=YfmucY8RuLnksn/EFeglq69IBSk95ptUwji4AWVeuTMqu0gN2yoeyq0nYwboAGWPjHMHnZOIcMcGIR1H00+md9lDL2uUQYmPSTWZxAaUxdmGovUgsbDLJ3pKk6yX72dCnFTpW1h58g93h5HM+iNhYsilQd+K61FIigbNnNVEvXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ak3jo+/G; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739242630; x=1770778630;
+  t=1739242632; x=1770778632;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=beqpcPbpt0kBQ99FPCRb6pHXTrCzsCNX64wYsTdCyQQ=;
-  b=nB+V6w6Q6hW+O+NtXgUTZUVj2VusMaOlz6wrH4RBEfTHMmYIUCLgjDDR
-   uZlzg0iAOkEA/MBpBQazyyvbsLJSRP4ZQLnYeuKtRoLfGjJ/FCJ8vs90g
-   EC65fEQbq8Ei/VBR4XnBRFx3oyYkmsnqb+GjUPobZw8ZhAZ7+WayfYl6B
-   viMUCWM+iso7wBcqlRDjCA9Mlt9VdBsaAxAJkUh7gl7gt6NSY4ZpQLygb
-   U71kubxmxpFMckaQbdfprVVHJOBuDKNucpe3ytj50d/vTJB5RIc9hArYD
-   UrveK4hDrgQezoBVBQmcP9HKckeVn5KYtyvTlMMHo5SKau6ZwdcP0WKYu
-   g==;
-X-CSE-ConnectionGUID: NEw+sgu+SkKaUOeyLmQQeg==
-X-CSE-MsgGUID: +xH4Iy8rQra+4KfvW3Vkiw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43612434"
+  bh=V1iJLe8wImdK0toiut9YkwUhhYvNwcKXcvVcNaiUBj4=;
+  b=ak3jo+/GTveyTEa5aYt2HyJ2QvdKhexlgJ1mXLRgCJiri06ML5f9Iga8
+   QPqnwISWy/c2dJMuBQqMoc2pXyqV4EIBOjdJTPdcAXIF2LoauSVi/7pVl
+   Wgll7nusTKsSqEGbsFQdIOvV3mSG2aDsDYkyZSSPGTVZXVVKXiXmrwwub
+   bCnEQzeUY2mZmu04lzX1IFOUfTBUlLjWmRpHxIbh5PX6ibTRqPFF/9CVY
+   mYJ/wDyrihlxKfQEgA/3b/EP0hv5qK+y5j7OK0ygroSTkWgyQ2WtAvseC
+   q2kp9x4+4tGqkmEaXFtn9k4Wua47cHzSOtEbsrgdYio+Kb8ZuGRhsH/Na
+   A==;
+X-CSE-ConnectionGUID: 3raS49ZpTfar3hJHhf0FDw==
+X-CSE-MsgGUID: piKoXijxQWCYiTXq8nhg/w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="43612438"
 X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="43612434"
+   d="scan'208";a="43612438"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
   by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:57:10 -0800
-X-CSE-ConnectionGUID: aygf2mLsSFuJ11YlnZ88ug==
-X-CSE-MsgGUID: j4m3eTwKQeyOgaKTYlrPdQ==
+X-CSE-ConnectionGUID: /3bZZr7rTxKCcy4G1ffWHg==
+X-CSE-MsgGUID: xhFhitj5Tr+46eqeGxNF2g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="112355246"
+   d="scan'208";a="112355254"
 Received: from litbin-desktop.sh.intel.com ([10.239.156.93])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:56:51 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:56:54 -0800
 From: Binbin Wu <binbin.wu@linux.intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -73,9 +73,9 @@ Cc: rick.p.edgecombe@intel.com,
 	chao.gao@intel.com,
 	linux-kernel@vger.kernel.org,
 	binbin.wu@linux.intel.com
-Subject: [PATCH v2 01/17] KVM: TDX: Add support for find pending IRQ in a protected local APIC
-Date: Tue, 11 Feb 2025 10:58:12 +0800
-Message-ID: <20250211025828.3072076-2-binbin.wu@linux.intel.com>
+Subject: [PATCH v2 02/17] KVM: TDX: Disable PI wakeup for IPIv
+Date: Tue, 11 Feb 2025 10:58:13 +0800
+Message-ID: <20250211025828.3072076-3-binbin.wu@linux.intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
 References: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
@@ -87,184 +87,81 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Sean Christopherson <seanjc@google.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add flag and hook to KVM's local APIC management to support determining
-whether or not a TDX guest has a pending IRQ.  For TDX vCPUs, the virtual
-APIC page is owned by the TDX module and cannot be accessed by KVM.  As a
-result, registers that are virtualized by the CPU, e.g. PPR, cannot be
-read or written by KVM.  To deliver interrupts for TDX guests, KVM must
-send an IRQ to the CPU on the posted interrupt notification vector.  And
-to determine if TDX vCPU has a pending interrupt, KVM must check if there
-is an outstanding notification.
+Disable PI wakeup for IPI virtualization (IPIv) case for TDX.
 
-Return "no interrupt" in kvm_apic_has_interrupt() if the guest APIC is
-protected to short-circuit the various other flows that try to pull an
-IRQ out of the vAPIC, the only valid operation is querying _if_ an IRQ is
-pending, KVM can't do anything based on _which_ IRQ is pending.
+When a vCPU is being scheduled out, notification vector is switched and
+pi_wakeup_handler() is enabled when the vCPU has interrupt enabled and
+posted interrupt is used to wake up the vCPU.
 
-Intentionally omit sanity checks from other flows, e.g. PPR update, so as
-not to degrade non-TDX guests with unnecessary checks.  A well-behaved KVM
-and userspace will never reach those flows for TDX guests, but reaching
-them is not fatal if something does go awry.
+For VMX, a blocked vCPU can be the target of posted interrupts when using
+IPIv or VT-d PI.  TDX doesn't support IPIv, disable PI wakeup for IPIv.
+Also, since the guest status of TD vCPU is protected, assume interrupt is
+always enabled for TD. (PV HLT hypercall is not support yet, TDX guest
+tells VMM whether HLT is called with interrupt disabled or not.)
 
-Note, this doesn't handle interrupts that have been delivered to the vCPU
-but not yet recognized by the core, i.e. interrupts that are sitting in
-vmcs.GUEST_INTR_STATUS.  Querying that state requires a SEAMCALL and will
-be supported in a future patch.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+[binbin: split into new patch]
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 ---
 TDX interrupts v2:
- - Fix a typo in changelog.
+- "KVM: VMX: Remove use of struct vcpu_vmx from posted_intr.c" is dropped
+  because the related fields have been moved to the common struct vcpu_vt
+  already. Move the pi_wakeup_list init to this patch.
 
 TDX interrupts v1:
- - Dropped vt_protected_apic_has_interrupt() with KVM_BUG_ON(), wire in
-   tdx_protected_apic_has_interrupt() directly. (Rick)
- - Add {} on else in vt_hardware_setup()
+- This is split out as a new patch from patch
+  "KVM: TDX: remove use of struct vcpu_vmx from posted_interrupt.c"
 ---
- arch/x86/include/asm/kvm-x86-ops.h | 1 +
- arch/x86/include/asm/kvm_host.h    | 1 +
- arch/x86/kvm/irq.c                 | 3 +++
- arch/x86/kvm/lapic.c               | 3 +++
- arch/x86/kvm/lapic.h               | 2 ++
- arch/x86/kvm/vmx/main.c            | 3 +++
- arch/x86/kvm/vmx/tdx.c             | 6 ++++++
- arch/x86/kvm/vmx/x86_ops.h         | 2 ++
- 8 files changed, 21 insertions(+)
+ arch/x86/kvm/vmx/posted_intr.c | 7 +++++--
+ arch/x86/kvm/vmx/tdx.c         | 1 +
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index d953a454bafb..2eaabff66c82 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -115,6 +115,7 @@ KVM_X86_OP_OPTIONAL(pi_start_assignment)
- KVM_X86_OP_OPTIONAL(apicv_pre_state_restore)
- KVM_X86_OP_OPTIONAL(apicv_post_state_restore)
- KVM_X86_OP_OPTIONAL_RET0(dy_apicv_has_pending_interrupt)
-+KVM_X86_OP_OPTIONAL(protected_apic_has_interrupt)
- KVM_X86_OP_OPTIONAL(set_hv_timer)
- KVM_X86_OP_OPTIONAL(cancel_hv_timer)
- KVM_X86_OP(setup_mce)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e855866bf600..ad275b606d68 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1838,6 +1838,7 @@ struct kvm_x86_ops {
- 	void (*apicv_pre_state_restore)(struct kvm_vcpu *vcpu);
- 	void (*apicv_post_state_restore)(struct kvm_vcpu *vcpu);
- 	bool (*dy_apicv_has_pending_interrupt)(struct kvm_vcpu *vcpu);
-+	bool (*protected_apic_has_interrupt)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 5696e0f9f924..25f8a19e2831 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -11,6 +11,7 @@
+ #include "posted_intr.h"
+ #include "trace.h"
+ #include "vmx.h"
++#include "tdx.h"
  
- 	int (*set_hv_timer)(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
- 			    bool *expired);
-diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index 63f66c51975a..f0644d0bbe11 100644
---- a/arch/x86/kvm/irq.c
-+++ b/arch/x86/kvm/irq.c
-@@ -100,6 +100,9 @@ int kvm_cpu_has_interrupt(struct kvm_vcpu *v)
- 	if (kvm_cpu_has_extint(v))
- 		return 1;
- 
-+	if (lapic_in_kernel(v) && v->arch.apic->guest_apic_protected)
-+		return static_call(kvm_x86_protected_apic_has_interrupt)(v);
-+
- 	return kvm_apic_has_interrupt(v) != -1;	/* LAPIC */
+ /*
+  * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_handler()
+@@ -190,7 +191,8 @@ static bool vmx_needs_pi_wakeup(struct kvm_vcpu *vcpu)
+ 	 * notification vector is switched to the one that calls
+ 	 * back to the pi_wakeup_handler() function.
+ 	 */
+-	return vmx_can_use_ipiv(vcpu) || vmx_can_use_vtd_pi(vcpu->kvm);
++	return (vmx_can_use_ipiv(vcpu) && !is_td_vcpu(vcpu)) ||
++		vmx_can_use_vtd_pi(vcpu->kvm);
  }
- EXPORT_SYMBOL_GPL(kvm_cpu_has_interrupt);
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index a1cbca31ec30..bbdede07d063 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2967,6 +2967,9 @@ int kvm_apic_has_interrupt(struct kvm_vcpu *vcpu)
- 	if (!kvm_apic_present(vcpu))
- 		return -1;
  
-+	if (apic->guest_apic_protected)
-+		return -1;
-+
- 	__apic_update_ppr(apic, &ppr);
- 	return apic_has_interrupt_for_ppr(apic, ppr);
- }
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 1a8553ebdb42..e33c969439f7 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -65,6 +65,8 @@ struct kvm_lapic {
- 	bool sw_enabled;
- 	bool irr_pending;
- 	bool lvt0_in_nmi_mode;
-+	/* Select registers in the vAPIC cannot be read/written. */
-+	bool guest_apic_protected;
- 	/* Number of bits set in ISR. */
- 	s16 isr_count;
- 	/* The highest vector set in ISR; if -1 - invalid, must scan ISR. */
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 7f1318c44040..2b1ea57a3a4e 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -62,6 +62,8 @@ static __init int vt_hardware_setup(void)
- 		vt_x86_ops.set_external_spte = tdx_sept_set_private_spte;
- 		vt_x86_ops.free_external_spt = tdx_sept_free_private_spt;
- 		vt_x86_ops.remove_external_spte = tdx_sept_remove_private_spte;
-+	} else {
-+		vt_x86_ops.protected_apic_has_interrupt = NULL;
- 	}
+ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
+@@ -200,7 +202,8 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
+ 	if (!vmx_needs_pi_wakeup(vcpu))
+ 		return;
  
- 	return 0;
-@@ -371,6 +373,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.sync_pir_to_irr = vmx_sync_pir_to_irr,
- 	.deliver_interrupt = vmx_deliver_interrupt,
- 	.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
-+	.protected_apic_has_interrupt = tdx_protected_apic_has_interrupt,
+-	if (kvm_vcpu_is_blocking(vcpu) && !vmx_interrupt_blocked(vcpu))
++	if (kvm_vcpu_is_blocking(vcpu) &&
++	    (is_td_vcpu(vcpu) || !vmx_interrupt_blocked(vcpu)))
+ 		pi_enable_wakeup_handler(vcpu);
  
- 	.set_tss_addr = vmx_set_tss_addr,
- 	.set_identity_map_addr = vmx_set_identity_map_addr,
+ 	/*
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 8f3147c6e602..6940ce812730 100644
+index 6940ce812730..825f13371134 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -668,6 +668,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
+@@ -669,6 +669,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
  
  	fpstate_set_confidential(&vcpu->arch.guest_fpu);
-+	vcpu->arch.apic->guest_apic_protected = true;
+ 	vcpu->arch.apic->guest_apic_protected = true;
++	INIT_LIST_HEAD(&tdx->vt.pi_wakeup_list);
  
  	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
  
-@@ -709,6 +710,11 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	local_irq_enable();
- }
- 
-+bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
-+{
-+	return pi_has_pending_interrupt(vcpu);
-+}
-+
- /*
-  * Compared to vmx_prepare_switch_to_guest(), there is not much to do
-  * as SEAMCALL/SEAMRET calls take care of most of save and restore.
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 92716f6486e9..8086e5c58cd6 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -135,6 +135,7 @@ int tdx_vcpu_pre_run(struct kvm_vcpu *vcpu);
- fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit);
- void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
- void tdx_vcpu_put(struct kvm_vcpu *vcpu);
-+bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu);
- int tdx_handle_exit(struct kvm_vcpu *vcpu,
- 		enum exit_fastpath_completion fastpath);
- void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
-@@ -173,6 +174,7 @@ static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediat
- }
- static inline void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu) {}
- static inline void tdx_vcpu_put(struct kvm_vcpu *vcpu) {}
-+static inline bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu) { return false; }
- static inline int tdx_handle_exit(struct kvm_vcpu *vcpu,
- 		enum exit_fastpath_completion fastpath) { return 0; }
- static inline void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason, u64 *info1,
 -- 
 2.46.0
 
