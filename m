@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-37951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37952-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54961A31DC8
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 06:16:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03DE0A31E08
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 06:37:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9F283A6EE0
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 05:16:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFC2D1670E2
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 05:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83BD01EEA32;
-	Wed, 12 Feb 2025 05:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E98F1FAC4D;
+	Wed, 12 Feb 2025 05:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kxnsJEZ0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b5m6tyOJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EB538FA3;
-	Wed, 12 Feb 2025 05:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCD11F9F64;
+	Wed, 12 Feb 2025 05:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739337388; cv=none; b=CFJdoTSgxRB0CAS2J9UUzE8vBLeHrRdZWcghpaB5t2pgbpZ/4mnrPMYE+F9SBl4VvA6Gcqi9d2qKTreKJSR2bBWfQ5uE8HUwxCNv174exfSUx9pX+4cJ/+dRHSEza3Qn5VKeYcJvJc0pPJ/MjIQYYyYeCburBX1xQXJNcMhTAOU=
+	t=1739338640; cv=none; b=q71fvyfpOfT/HrHxTrdhohMLE+nNxt67lw+Y3TsV0uPS1JVXl+JA8dVURb12OGGu/vo5f4cuRiFV3vKwXCuPYVFzaVoU2PkA61dZDKm3zlXUGbvAgI9U/hP/rNTVT9GcUDW1iaDY0tY5aY32HPOYxYLIHnaADsCrQ8xO3uDEVj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739337388; c=relaxed/simple;
-	bh=eVsMpX/8Jed3hCVhlFQngIaOqAD3Ff3kb6Lw95jePG4=;
+	s=arc-20240116; t=1739338640; c=relaxed/simple;
+	bh=tpdtplCxwD9o20O/r7cKITmzzmBLuF+M6Z2a5ZkB4GA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mJStzKZ4Yywt/a6ySiCMhT3e7ue5NzWRzWct9l7jjCAJlrxHWinIwq7sBQp8NeEZpa0R3prN+r5Efuvuxi2aEkGimkpLPJIf1+I7kKv+PokFlwZDRQ54ko2mMqTFYctdnVJcs4y5lGnwsQoHVXnf2TD0OU7itX1Tb5NKgx9EDe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kxnsJEZ0; arc=none smtp.client-ip=198.175.65.12
+	 In-Reply-To:Content-Type; b=e+hepjALjPc8Z6HzL93ZFzR0XzsX6MMHE/FfPIYmdrWps5IlrAf4BP+NRFlCiZP40mb17NXJP7Z5qAotcARQba/YZBPv8F3KHyZwRTZOXe12VJpbMT+DH1Z3AjahOH0BRko0AwI7neitgbVafLLPsC4EKnqcay4M8ytTinfMCiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b5m6tyOJ; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739337387; x=1770873387;
+  t=1739338640; x=1770874640;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=eVsMpX/8Jed3hCVhlFQngIaOqAD3Ff3kb6Lw95jePG4=;
-  b=kxnsJEZ0S0swymowk5h9M8aDAw7wwMWfP9hLF7j8ybjWpBFVW+uhHK7y
-   VNFqlMfL1HvRMwgCJh/WXLNhl0UXC7/j0usTyemBHWcCxoHKHl93ijxq2
-   IRGAEa50yZe0BGT7z6zdi3HaghYthhqksUMcGTcZjRx95HQXd5JxWA3ib
-   07RQ3WkRi4m5kXyjnSIUB0/SmGzOc4mKI9oiEPJD3oJ8DXfB6gBv7D3+R
-   Jm2h5BDIL2yrYxXCGlVlgLuD8794TOyJfGP5yGcLEmdVmtbt/H+TON8w0
-   ZMxZM6qaRI2evcsIgRCXV77aEDfm3Y7E8lhz95/dwJePpBh1YMMjX7jjJ
-   Q==;
-X-CSE-ConnectionGUID: VlIuLnu4QMeeAVL+8MFzHw==
-X-CSE-MsgGUID: KlbilTcfTVq2zLgVUhpPUQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11342"; a="51371852"
+  bh=tpdtplCxwD9o20O/r7cKITmzzmBLuF+M6Z2a5ZkB4GA=;
+  b=b5m6tyOJpUpsskdbLomeUjKsh/R+GIyZPGkr//2sr/dluOYbdGdQTBM5
+   ooqydX/Wc2qCTmVon1k3ioIa1Aqe4wOuqRz3T7fsZoyNDjJyqn+Rk4ckd
+   H22vvZ9t0SA0FRYaSKLeG2dpvcnyLvDNnQY0KhYqB3dgoQzmzyffAzWPb
+   guVnhH0Kge9Kum5ZfE4thoBsa0TRxPuEVr33tn3Tjdhh9fpSRxoUcYMCR
+   1ccGR5tQdKp3xGmFQYoHVo1oAdiHYCfaQVFZaYJ4jtHnPu8ozp9JrGRDx
+   bpsI4KpaIwHmpFkU6OxJAeOLJtZIAbqKCmW6fBSsrlNQodsmpLTiItipz
+   g==;
+X-CSE-ConnectionGUID: jF1BPO3KTL+iUtMfqXm4sw==
+X-CSE-MsgGUID: uq9SznljQ/W7KBQBIhnpYA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11342"; a="43633178"
 X-IronPort-AV: E=Sophos;i="6.13,279,1732608000"; 
-   d="scan'208";a="51371852"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 21:16:26 -0800
-X-CSE-ConnectionGUID: eFx3fF4dROu+Z0YR9qgKpQ==
-X-CSE-MsgGUID: W1kQezGMTvqFn0HXpRDkFg==
+   d="scan'208";a="43633178"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 21:37:19 -0800
+X-CSE-ConnectionGUID: KMDW/hEDThe6WjOWgPWGXA==
+X-CSE-MsgGUID: 6ZsTFlwDT02qdsj5KQJ2Ig==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,279,1732608000"; 
-   d="scan'208";a="117735888"
+   d="scan'208";a="112675074"
 Received: from unknown (HELO [10.238.0.51]) ([10.238.0.51])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 21:16:23 -0800
-Message-ID: <3033f048-6aa8-483a-b2dc-37e8dfb237d5@linux.intel.com>
-Date: Wed, 12 Feb 2025 13:16:21 +0800
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 21:37:15 -0800
+Message-ID: <4b23f7c7-b5e6-41c9-bcae-bd1686b801a6@linux.intel.com>
+Date: Wed, 12 Feb 2025 13:37:13 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,143 +67,73 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/8] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
-To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com,
- kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com,
- adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
- tony.lindgren@intel.com, isaku.yamahata@intel.com,
- linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/8] KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
+To: Sean Christopherson <seanjc@google.com>, xiaoyao.li@intel.com
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com,
+ kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com,
+ tony.lindgren@intel.com, isaku.yamahata@intel.com, yan.y.zhao@intel.com,
+ chao.gao@intel.com, linux-kernel@vger.kernel.org
 References: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
- <20250211025442.3071607-6-binbin.wu@linux.intel.com>
- <Z6r0Q/zzjrDaHfXi@yzhao56-desk.sh.intel.com>
- <926a035f-e375-4164-bcd8-736e65a1c0f7@linux.intel.com>
- <Z6sReszzi8jL97TP@intel.com> <Z6vvgGFngGjQHwps@google.com>
+ <20250211025442.3071607-7-binbin.wu@linux.intel.com>
+ <Z6vo5sRyXTbtYSev@google.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <Z6vvgGFngGjQHwps@google.com>
+In-Reply-To: <Z6vo5sRyXTbtYSev@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
 
-On 2/12/2025 8:46 AM, Sean Christopherson wrote:
-> On Tue, Feb 11, 2025, Chao Gao wrote:
->> On Tue, Feb 11, 2025 at 04:11:19PM +0800, Binbin Wu wrote:
->>>
->>> On 2/11/2025 2:54 PM, Yan Zhao wrote:
->>>> On Tue, Feb 11, 2025 at 10:54:39AM +0800, Binbin Wu wrote:
->>>>> +static int tdx_complete_vmcall_map_gpa(struct kvm_vcpu *vcpu)
->>>>> +{
->>>>> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
->>>>> +
->>>>> +	if (vcpu->run->hypercall.ret) {
->>>>> +		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
->>>>> +		tdx->vp_enter_args.r11 = tdx->map_gpa_next;
->>>>> +		return 1;
->>>>> +	}
->>>>> +
->>>>> +	tdx->map_gpa_next += TDX_MAP_GPA_MAX_LEN;
->>>>> +	if (tdx->map_gpa_next >= tdx->map_gpa_end)
->>>>> +		return 1;
->>>>> +
->>>>> +	/*
->>>>> +	 * Stop processing the remaining part if there is pending interrupt.
->>>>> +	 * Skip checking pending virtual interrupt (reflected by
->>>>> +	 * TDX_VCPU_STATE_DETAILS_INTR_PENDING bit) to save a seamcall because
->>>>> +	 * if guest disabled interrupt, it's OK not returning back to guest
->>>>> +	 * due to non-NMI interrupt. Also it's rare to TDVMCALL_MAP_GPA
->>>>> +	 * immediately after STI or MOV/POP SS.
->>>>> +	 */
->>>>> +	if (pi_has_pending_interrupt(vcpu) ||
->>>>> +	    kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending) {
->>>> Should here also use "kvm_vcpu_has_events()" to replace
->>>> "pi_has_pending_interrupt(vcpu) ||
->>>>    kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending" as Sean
->>>> suggested at [1]?
->>>>
->>>> [1] https://lore.kernel.org/all/Z4rIGv4E7Jdmhl8P@google.com
->>> For TDX guests, kvm_vcpu_has_events() will check pending virtual interrupt
->>> via a SEAM call.  As noted in the comments, the check for pending virtual
->>> interrupt is intentionally skipped to save the SEAM call. Additionally,
-> Drat, I had a whole response typed up and then discovered the implementation of
-> tdx_protected_apic_has_interrupt() had changed.  But I think the basic gist
-> still holds.
->
-> The new version:
->
->   bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
->   {
-> -       return pi_has_pending_interrupt(vcpu);
-> +       u64 vcpu_state_details;
-> +
-> +       if (pi_has_pending_interrupt(vcpu))
-> +               return true;
-> +
-> +       vcpu_state_details =
-> +               td_state_non_arch_read64(to_tdx(vcpu), TD_VCPU_STATE_DETAILS_NON_ARCH);
-> +
-> +       return tdx_vcpu_state_details_intr_pending(vcpu_state_details);
->   }
->
-> is much better than the old:
->
->   bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
->   {
-> -       return pi_has_pending_interrupt(vcpu);
-> +       bool ret = pi_has_pending_interrupt(vcpu);
-> +       union tdx_vcpu_state_details details;
-> +       struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +
-> +       if (ret || vcpu->arch.mp_state != KVM_MP_STATE_HALTED)
-> +               return true;
-> +
-> +       if (tdx->interrupt_disabled_hlt)
-> +               return false;
-> +
-> +       details.full = td_state_non_arch_read64(tdx, TD_VCPU_STATE_DETAILS_NON_ARCH);
-> +       return !!details.vmxip;
->   }
->
-> because assuming the vCPU has an interrupt if it's not HALTED is all kinds of
-> wrong.
->
-> However, checking VMXIP for the !HLT case is also wrong.  And undesirable, as
-> evidenced by both this path and the EPT violation retry path wanted to avoid
-> checking VMXIP.
->
-> Except for the guest being stupid (non-HLT TDCALL in an interrupt shadow), having
-> an interrupt in RVI that is fully unmasked will be extremely rare.  Actually,
-> outside of an interrupt shadow, I don't think it's even possible.  I can't think
-> of any CPU flows that modify RVI in the middle of instruction execution.  I.e. if
-> RVI is non-zero, then either the interrupt has been pending since before the
-> TDVMCALL, or the TDVMCALL is in an STI/SS shadow.  And if the interrupt was
-> pending before TDVMCALL, then it _must_ be blocked, otherwise the interrupt
-> would have been serviced at the instruction boundary.
+On 2/12/2025 8:18 AM, Sean Christopherson wrote:
+> On Tue, Feb 11, 2025, Binbin Wu wrote:
+>> +static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>> +	u64 reg_mask = tdx->vp_enter_args.rcx;
+>> +	u64 *opt_regs;
+>> +
+>> +	/*
+>> +	 * Skip sanity checks and let userspace decide what to do if sanity
+>> +	 * checks fail.
+>> +	 */
+>> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+>> +	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_TDX_FATAL;
+>> +	/* Error codes. */
+>> +	vcpu->run->system_event.data[0] = tdx->vp_enter_args.r12;
+>> +	/* GPA of additional information page. */
+>> +	vcpu->run->system_event.data[1] = tdx->vp_enter_args.r13;
+>> +	/* Information passed via registers (up to 64 bytes). */
+>> +	opt_regs = &vcpu->run->system_event.data[2];
+>> +
+>> +#define COPY_REG(REG, MASK)						\
+>> +	do {								\
+>> +		if (reg_mask & MASK) {					\
+> Based on past experience with conditionally filling kvm_run fields, I think KVM
+> should copy all registers and let userspace sort out the reg_mask.  Unless the
+> guest passes an ASCII byte stream exactly as the GHCI suggests,
+Yea, GHCI doesn't enforce it to be ASCII byte stream.
 
-Agree.
+> the information
+> is quite useless because userspace doesn't have reg_mask and so can't know what's
+> in data[4], data[5], etc...  And I won't be the least bit surprised if guests
+> deviate from the GHCI.
+
+But it also confuses userspace if guests uses special protocol to pass
+information other than ASCII byte stream.
+
+Anyway, dumping all registers to userspace and let userspace to have all
+the information passed from guest for parsing is definitely workable.
 
 >
-> I am completely comfortable saying that KVM doesn't care about STI/SS shadows
-> outside of the HALTED case, and so unless I'm missing something, I think it makes
-> sense for tdx_protected_apic_has_interrupt() to not check RVI outside of the HALTED
-> case, because it's impossible to know if the interrupt is actually unmasked, and
-> statistically it's far, far more likely that it _is_ masked.
-OK. Will update tdx_protected_apic_has_interrupt() in "TDX interrupts" part.
-And use kvm_vcpu_has_events() to replace the open code in this patch.
-
-Thanks!
-
+>> +			*opt_regs = tdx->vp_enter_args.REG;		\
+>> +			opt_regs++;					\
+>> +		}							\
+>> +	} while (0)
+>> +
+>> +	/* The order is defined in GHCI. */
+> Assuming I haven't missed something, to hell with the GCHI, just dump *all*
+> registers, sorted by their index (ascending).  Including RAX (TDCALL), RBP, and
+> RSP.
 >
->>> unnecessarily returning back to guest will has performance impact.
->>>
->>> But according to the discussion thread above, it seems that Sean prioritized
->>> code readability (i.e. reuse the common helper to make TDX code less special)
->>> over performance considerations?
->> To mitigate the performance impact, we can cache the "pending interrupt" status
->> on the first read, similar to how guest RSP/RBP are cached to avoid VMREADs for
->> normal VMs. This optimization can be done in a separate patch or series.
->>
->> And, future TDX modules will report the status via registers.
 
 
