@@ -1,155 +1,115 @@
-Return-Path: <kvm+bounces-37945-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37946-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1E2A31C17
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 03:32:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D586A31C2D
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 03:40:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1A953A8914
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 02:31:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9426A1889C20
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 02:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E759A1D5176;
-	Wed, 12 Feb 2025 02:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCE21D5CC5;
+	Wed, 12 Feb 2025 02:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XMCQ5w2a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H8x+T+/U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBAA271817
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 02:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20E617996;
+	Wed, 12 Feb 2025 02:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739327507; cv=none; b=L5bnPKSNDMcSmoEpUwOx/xKoxTIUMjCVoAnubplj+R0uhXKxuHO/9Wxzpppb0bkGzqLKL40LiTfwr8x7F6drQzlnkhBI//h/5S+c9GBViIq+m9fq9CnM1DP0MqkisyP6uPanWdkmIOJkBa0+LdiV0/57qZPmWFlTQaAGgkfFKNM=
+	t=1739328003; cv=none; b=kBwIy+Wazpu4eWeOy813aKv9H81qpskH9b+XkRnliwJZAxW8VotdSIqg8XH5H/0KiOYfoqKO/cDTQg8nWj/17RiPSiD/ZzZKOoj0ZFerxyTxsDaTeyAkbUr1VkHsQOn+lK5k3z0PNVJxCxNdNrEFCoqNrB/N15yULWuWBJKPy78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739327507; c=relaxed/simple;
-	bh=/xVLIbnBID19pVlqnJua6JU9LCMU9qjYDj0RqS1xVgc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mWm08/bCKx/ZzzLVOM63mNJDEPHW666nfQdI9r//gDLS3vPoeKmIUkzMPjo/q87hQWBolnBus6tBdSqCQ4oll0XSS+fSDyL7M/u+MeJSZ/tgOtH5TQV3GgI6z7t0/oiu5iu3B2fAM2R+hALilbV7j9bAhfp4PV6HNo/LVRU1l/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XMCQ5w2a; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fa440e16ddso8300239a91.0
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 18:31:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739327504; x=1739932304; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vPRb0IsRdvCLk95iJ9DvUJH0LJh/0xdqXsVtoHsQUsQ=;
-        b=XMCQ5w2agmlYv1s0pdi7t182NBsKWVRQWC2FKVwRvkwm3y/AL3HSvSfBaosrMIIivI
-         3rZSbBi93tSybljuoxp+P6VId+R47ZiRcmthPecAGnxXijT6ENxJRJt1KpspZE1skV5x
-         rapOU6yl/LlVmyAXlH+y/DG+5f823a3U5WTDkONfvU35oZeWOU7Czuxl/36dYnMleOAA
-         oe4QbvocdqVYS3quW7FEAE8ukVdj7ULI3J2AXq6jwAuuwj8HiuopMe4W4S1Mqaf5QsO9
-         Chix6cRJfc6shn+KepOWopI0bpfY4+WnH3Ovt6ehIbbPgd5rw/FSOiQ0nzcy3XdhhEPb
-         k2gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739327504; x=1739932304;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vPRb0IsRdvCLk95iJ9DvUJH0LJh/0xdqXsVtoHsQUsQ=;
-        b=X8g/fgL2l5JsHYsshvomDLX95FHvGRydx3aFMO0hN5NF+11lGRfXqnDCJG8YaXAW8v
-         O7Rw3j6PXEbyC2vA3oH0oqr/D5TKtNz1Cpwg1yXg86WBmwpbvev40tuqbCDTsgMARwGw
-         QHx5NlaYHCeH4jVwE2VblhNdBfMq3r/pFcI/thuRpoP8MgL4nwKBpWjzHSDTrQ6tfQLF
-         IeGTKVRfjJa8/GolE2V5JTWxYMf/6DZey7gCZAzykRm0dHczaPSkGr3p6Yj2LhMfDK+v
-         3nstByXTIjvd9Qm3aZyfGZT8WnpCteiUzWSMrqaKMEzi4usOXakXJ+OAoxsNZVsosIdD
-         xMqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTQ+Q2eAIdjiY+lS4iqG+a0t7oTpQPy6YJc1TwL3Tt87NXUytdc8MOJ3lEifGE2/FEU8U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwaJVKZKmgVlkku95a8ZIV8cDbZseM85ULDC04B4AiGMfedWO6
-	lcEQnZlw4O4Q04Qf1B0kfp7fjGKR+lt3WzCIg63+3YH7gx2PpxlwvN6PczT0riiMAa4ZltmrBLV
-	2bw==
-X-Google-Smtp-Source: AGHT+IGMX9u7M35FXglCi8he7YjOChUI+hVwPKDefN8wt50qF3YlUo1gLTN02dl5lpemjD008hcqqNreu6U=
-X-Received: from pjbpw18.prod.google.com ([2002:a17:90b:2792:b0:2ee:4b69:50e1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:dfcd:b0:2ee:863e:9ffc
- with SMTP id 98e67ed59e1d1-2fbf5c237demr2067501a91.21.1739327504064; Tue, 11
- Feb 2025 18:31:44 -0800 (PST)
-Date: Tue, 11 Feb 2025 18:31:42 -0800
-In-Reply-To: <20250203223205.36121-10-prsampat@amd.com>
+	s=arc-20240116; t=1739328003; c=relaxed/simple;
+	bh=VSxaYJSp4WgI/pL55ynDVo4C2Xt2d0ehnWxBDBjl1w8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hx5kKYZ5rq9QJgF9IqVLSic6x+TlnZmqe2PtMZ5BEIi828L5fFqW1xnrDPov8KpKOhXNpZkpxtIF0eFisTemnJkCRKKIaAV0hln2QsKF+u7H/441ectFQJeXSsUeckIYtA3WT2Q64lmT614hG/pTly0M9dtSq3aBwnRyZ3DG51E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H8x+T+/U; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739328002; x=1770864002;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VSxaYJSp4WgI/pL55ynDVo4C2Xt2d0ehnWxBDBjl1w8=;
+  b=H8x+T+/UGCTN09DigQlxZ3zijC/fI3lyi6BVEOVi/yN5YP0TRfQuauYE
+   49zqazs4Me5Hxuk27qdcJJn3l/NwMgr8VKU+7i2k7rx4UQB7yyfXjqA3l
+   b3lQrW41lb/uLa63aZ7wG4xhnhJEyBKdRZ4s9kzUJ1MddyIb6cJvMbXPj
+   zfPqZcU55A6NiM3h4iAHOCJ9eUxSKJwWo4ni7ooRHFmidWSJX04wJPN7Z
+   nm+at/3MiCtRoI/B0Ow6OOouyFmVKgMKcb0qJm4ELNxQTzKChI0Pevj3S
+   VHVCGm7auJwiwHlSSnyXzYpxbjbNI5HimH5CgxK7hpP8j9XK12J0GzN13
+   Q==;
+X-CSE-ConnectionGUID: UD16/daKQwe0SXGFVUn5/A==
+X-CSE-MsgGUID: p6I/j/HiQCeATR5xshAKNg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40091534"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="40091534"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 18:40:01 -0800
+X-CSE-ConnectionGUID: rvjKxpzgRb+OyCdLiZPFyw==
+X-CSE-MsgGUID: JQkgZWi9SbCInrbIucRWhw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="112549842"
+Received: from unknown (HELO [10.238.0.51]) ([10.238.0.51])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 18:39:58 -0800
+Message-ID: <fd496d85-b24f-4c6f-a6c9-3c0bd6784a1d@linux.intel.com>
+Date: Wed, 12 Feb 2025 10:39:56 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250203223205.36121-1-prsampat@amd.com> <20250203223205.36121-10-prsampat@amd.com>
-Message-ID: <Z6wIDsbjt2ZaiX0I@google.com>
-Subject: Re: [PATCH v6 9/9] KVM: selftests: Add a basic SEV-SNP smoke test
-From: Sean Christopherson <seanjc@google.com>
-To: "Pratik R. Sampat" <prsampat@amd.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	pbonzini@redhat.com, thomas.lendacky@amd.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, shuah@kernel.org, 
-	pgonda@google.com, ashish.kalra@amd.com, nikunj@amd.com, pankaj.gupta@amd.com, 
-	michael.roth@amd.com, sraithal@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 8/8] KVM: TDX: Handle TDX PV MMIO hypercall
+To: Chao Gao <chao.gao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+ rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, xiaoyao.li@intel.com, tony.lindgren@intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com, linux-kernel@vger.kernel.org
+References: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
+ <20250211025442.3071607-9-binbin.wu@linux.intel.com>
+ <Z6wHZdQ3YtVhmrZs@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <Z6wHZdQ3YtVhmrZs@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 03, 2025, Pratik R. Sampat wrote:
-> @@ -217,5 +244,20 @@ int main(int argc, char *argv[])
->  		}
->  	}
->  
-> +	if (kvm_cpu_has(X86_FEATURE_SEV_SNP)) {
-> +		uint64_t snp_policy = snp_default_policy();
-> +
-> +		test_snp(snp_policy);
-> +		/* Test minimum firmware level */
-> +		test_snp(snp_policy | SNP_FW_VER_MAJOR(SNP_MIN_API_MAJOR) |
-> +			SNP_FW_VER_MINOR(SNP_MIN_API_MINOR));
 
-Ah, this is where the firmware policy stuff is used.  Refresh me, can userspace
-request _any_ major/minor as the min, and expect failure if the version isn't
-supported?  If so, the test should iterate over the major/minor combinations that
-are guaranteed to fail.  And if userspace can query the supported minor/major,
-the test should iterate over all the happy versions too. 
 
-Unless there's nothing interesting to test, I would move the major/minor stuff to
-a separate patch.
+On 2/12/2025 10:28 AM, Chao Gao wrote:
+>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>> index f13da28dd4a2..8f3147c6e602 100644
+>> --- a/arch/x86/kvm/vmx/tdx.c
+>> +++ b/arch/x86/kvm/vmx/tdx.c
+>> @@ -849,8 +849,12 @@ static __always_inline u32 tdx_to_vmx_exit_reason(struct kvm_vcpu *vcpu)
+>> 		if (tdvmcall_exit_type(vcpu))
+>> 			return EXIT_REASON_VMCALL;
+>>
+>> -		if (tdvmcall_leaf(vcpu) < 0x10000)
+>> +		if (tdvmcall_leaf(vcpu) < 0x10000) {
+>> +			if (tdvmcall_leaf(vcpu) == EXIT_REASON_EPT_VIOLATION)
+>> +				return EXIT_REASON_EPT_MISCONFIG;
+> IIRC, a TD-exit may occur due to an EPT MISCONFIG. Do you need to distinguish
+> between a genuine EPT MISCONFIG and a morphed one, and handle them differently?
+It will be handled separately, which will be in the last section of the KVM
+basic support.  But the v2 of "the rest" section is on hold because there is
+a discussion related to MTRR MSR handling:
+https://lore.kernel.org/all/20250201005048.657470-1-seanjc@google.com/
+Want to send the v2 of "the rest" section after the MTRR discussion is
+finalized.
 
-> +
-> +		test_snp_shutdown(snp_policy);
-> +
-> +		if (kvm_has_cap(KVM_CAP_XCRS) &&
-> +		    (xgetbv(0) & kvm_cpu_supported_xcr0() & xf_mask) == xf_mask)
-> +			test_sync_vmsa_snp(snp_policy);
+For the genuine EPT misconfig handling, you can refer to the patch on the
+full KVM branch:
+https://github.com/intel/tdx/commit/e576682ac586f994bf54eb11b357f3e835d3c042
 
-This is all copy+paste from SEV-ES tests, minus SEV_POLICY_NO_DBG.  There's gotta
-be a way to dedup this code.
 
-Something like this?
 
-static void needs_a_better_name(uint32_t type, uint64_t policy)
-{
-	const u64 xf_mask = XFEATURE_MASK_X87_AVX;
-
-	test_sev(guest_sev_code, policy | SEV_POLICY_NO_DBG);
-	test_sev(guest_sev_code, policy);
-
-	if (type == KVM_X86_SEV_VM)
-		return;
-
-	test_sev_shutdown(policy);
-
-	if (kvm_has_cap(KVM_CAP_XCRS) &&
-	    (xgetbv(0) & kvm_cpu_supported_xcr0() & xf_mask) == xf_mask) {
-		test_sync_vmsa(policy);
-		test_sync_vmsa(policy | SEV_POLICY_NO_DBG);
-	}
-}
-
-int main(int argc, char *argv[])
-{
-	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SEV));
-
-	needs_a_better_name(KVM_X86_SEV_VM, 0);
-
-	if (kvm_cpu_has(X86_FEATURE_SEV_ES))
-		needs_a_better_name(KVM_X86_SEV_ES_VM, 0);
-
-	if (kvm_cpu_has(X86_FEATURE_SEV_SNP))
-		needs_a_better_name(KVM_X86_SEV_SNP_VM, 0);
-
-	return 0;
-}
 
