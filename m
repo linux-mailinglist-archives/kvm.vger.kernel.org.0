@@ -1,169 +1,182 @@
-Return-Path: <kvm+bounces-37988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14668A3316B
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 22:24:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70F8DA33214
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 23:07:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B719D166385
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 21:24:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 104DA188B206
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 22:07:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541DD202F68;
-	Wed, 12 Feb 2025 21:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F422040AD;
+	Wed, 12 Feb 2025 22:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HzPSLlh7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zqChrpn/"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21781FBC8D
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 21:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F132036E6
+	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 22:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739395445; cv=none; b=AHnnk3aGDjdvc7fFIlaGsK8m6J7xXv2jSwZiZnC25hMwoKOBXprQ0DKC5QhVmsV+GTW2SEni2mVYXOHD+tQWOz38AnXfXqhTTUNm9SOtEEHVpT+0tvJtr3jPMdcFlQSzZhwPYRmrSfH9snoT6Uwa6Tkfy6SbwvSqC1kroMEy2eo=
+	t=1739398023; cv=none; b=Ivig+0B2BgfGJ+7dGYd2NMxsi+Jin91LQ/aabgatu0uZkNi1qkD4OSdpjQumJaOFR7W5zTg4JvO9YMbHtJP5VD7YqvtM0n6fXg/ZAR+vi6iRsvxehmpsy+PDH2JvJUTJffyu9d1xa6uhP/hEygIjrbPjJpyqOtiA/hb5k6HPKkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739395445; c=relaxed/simple;
-	bh=TT8QDCIDQGCMkNj7vFXoOL/LNDDnvNdI2Z4hRrVEWhU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pWKN72iYFm8nVsw8xil/HoVk/hCZK+L2gcOr/6mwag8+PV/RTR5nrjrfdlwrAEqaLf4QTldH/KG/8hfrH8APcOnp+cGV7T9Pirq7RSdi81SrcJWfk4Q8skWESGHN0hNHlsvAcTNahRUqPqEdEG9QVcshboQIYAUToa29x8r3Ymo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HzPSLlh7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739395443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rMR3xW0eowjAI1vyo1tpASMiTeQNf0mRWejyS2lahAE=;
-	b=HzPSLlh7zEkcGQ8KyUMGIQI0YY4Yows+7a9qaL9yvQO/noH25LEXx1gbHjNhyu4FnFPq2B
-	CPs5RmV6kP9hbNo9vh887qTYOulYehOfS6wHva0VpImjstSV7GPqdJ5kowkTgq0RWqxY+g
-	RM8F+okP9Z9iC/6H8kIFf7ou1DIemYY=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-F3sxopjpP6yKC6lX-M2Dyg-1; Wed, 12 Feb 2025 16:24:01 -0500
-X-MC-Unique: F3sxopjpP6yKC6lX-M2Dyg-1
-X-Mimecast-MFC-AGG-ID: F3sxopjpP6yKC6lX-M2Dyg
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3f3412843dbso133344b6e.0
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 13:24:01 -0800 (PST)
+	s=arc-20240116; t=1739398023; c=relaxed/simple;
+	bh=W3EI/JwSNPCRO8AUPEByM5MP57IzTM5+fEGnsedN1Ts=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gaM6qeec6wgdr/ZTtQ0/+OD+AjGxebfLbLyHKXJqmgPosc3Vm+I0MOefVjoe6adwHua2W3MgVG5Sj25QxMSvkQDoFVcfE9Zg0O/+/s43pKTJlRF8Ap99eZqbDSsPDOq0LnNFTg861Tjd2SskKcF2/lq0M1VAKocLCw41cF1IAt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zqChrpn/; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fa57c42965so602767a91.1
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 14:07:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739398021; x=1740002821; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LGqR78gPCoFohz0E/LUFCYULs/zf/5PcEDAbIwIJG7o=;
+        b=zqChrpn/YmDKUa67UCS4deAYBjUWUZ6angJCX0/BPXWzrghuC0+p1cf/drWY5jl2Qd
+         PmIP2Ntr9elLU687zScTkpQv0hO+tqUM61C6cUG+pS5LYlC4rjAUwTl152S0CQHn+vMq
+         mIu4jvkCsBFobgxNq7Y/l9jjY9LL3I6r8Tc+VjD1TXhUNKD0a3gFNlg86HSaXA32M7GD
+         GIsgjbpV3NASsErTt0fWnvY5l2U5487RnKz+6pBunuCQzzl+g69X0mpWfKnEhy3SDAxu
+         /MKdf0trrqLVJznxNbOD0Rhhay4y0KQjEZ33kNwFpsd5sxTf1NNxswDFL5qFsGDZL280
+         qKHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739395440; x=1740000240;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rMR3xW0eowjAI1vyo1tpASMiTeQNf0mRWejyS2lahAE=;
-        b=TzNiAGSFF+gpa41CS5VQZoD658kXo+84fVy6WroZVoYMfRxwxmSBJF2sswjJb7Ie0n
-         /8vz2CMYK83GxQsyAa8ouzkU4JZxJ7BLt7LUp4BTcAHUNiW/Ax5jtXIhnfxRs01yRGxL
-         uFi/pakGLRFVkfVXhxXA1ZH8U3+z0PGv6EAFPt3w0xXI/2S1EIr5bIfNTnT/RarkI+uA
-         AVqRkZ8L+bDzy7gEpbZ4sf8npSz2yKKr4dNtm0jD+Y6jIkIbDoVWOQzXN3s/1rfHRSHh
-         QgFbnE5/odgueqwUtzd82kO8NmukBeZNSQQSpVRBbfgJlaw7gm8G8PIkZtST49zfPhW1
-         ESvw==
-X-Gm-Message-State: AOJu0YwPxNhhR3LAQlNY5ul1L6IKyMZZvr059MUteOL3HBP/YQYipXdf
-	ilxBjNwiAUz621PuMyVUYwoMOIgxXiOuPAUwAO4ah2Le8xqIinVEWUZSXOaXC6zcE9dXS8wiX6O
-	HQlspUwxLzLuIR2FpbOJzVgSQ6vL8ZKaHMBkEOBAQTsqY660SSw==
-X-Gm-Gg: ASbGncubtrD0hHgiUyg9S7aH4bBT3wADgkhuMal2T7U1Va/miE0onWRhIaTxnwmioO6
-	icpzaUyLSY0+/BkR1kf5AXKLpElRowMsHho1RnYykP51G/u6Pua+gFmZGsHUbHmjl+lM0JC0M0S
-	Su7WEnRhKYaxpuqT5z++E0XqPBEt3OvlUXlLrFXuVVOsivAUcA9cTCMQfnC2sz59TLAfcvsy6Wk
-	l2y538t8AeTsybk9FTJS4VjIwOqXqI22BxZoSA4vdry0ysB9sW313Lqpis=
-X-Received: by 2002:a05:6808:2e9a:b0:3f3:beb0:f89c with SMTP id 5614622812f47-3f3cd5cd00cmr3215266b6e.12.1739395440675;
-        Wed, 12 Feb 2025 13:24:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFY2m3xIb+XCqqJUt5LWlRvkVKJprpgK78iqDdhGlaeRGKuKuddp8PHVk68yR2vDMJ2oP4DmQ==
-X-Received: by 2002:a05:6808:2e9a:b0:3f3:beb0:f89c with SMTP id 5614622812f47-3f3cd5cd00cmr3215250b6e.12.1739395440341;
-        Wed, 12 Feb 2025 13:24:00 -0800 (PST)
-Received: from x1.local ([2604:7a40:2041:2b00::1000])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f389ea9194sm4723990b6e.10.2025.02.12.13.23.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 13:23:59 -0800 (PST)
-Date: Wed, 12 Feb 2025 16:23:53 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
-	xiaoyao.li@intel.com, yilun.xu@intel.com,
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
-	dmatlack@google.com, yu.c.zhang@linux.intel.com,
-	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
-	vannapurve@google.com, ackerleytng@google.com,
-	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
-	wei.w.wang@intel.com, liam.merwick@oracle.com,
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
-	suzuki.poulose@arm.com, steven.price@arm.com,
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
-	quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
-	quic_pheragu@quicinc.com, catalin.marinas@arm.com,
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
-	maz@kernel.org, will@kernel.org, qperret@google.com,
-	keirf@google.com, roypat@amazon.co.uk, shuah@kernel.org,
-	hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
-	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
-	jthoughton@google.com
-Subject: Re: [PATCH v3 03/11] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-Message-ID: <Z60RacIJMwL0M8On@x1.local>
-References: <20250211121128.703390-1-tabba@google.com>
- <20250211121128.703390-4-tabba@google.com>
+        d=1e100.net; s=20230601; t=1739398021; x=1740002821;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LGqR78gPCoFohz0E/LUFCYULs/zf/5PcEDAbIwIJG7o=;
+        b=nTdQtbZ3NADl4m6CPG/fZVDU1q/siDkuJ2oMdHrC1lNEb8diIwerJ5V1g8eVRftu0W
+         DAfeo3xmbhANCnmu8TRAjOx/j2ibijwJ4HKtiLmsc4C1h0L+9rgIi2Tz4s14RGQb6bSu
+         UBgNobxOf6R40ZQSjfd0MEAN6XtjzNAexHMBVq8Q2WReSL3zAd4BO1kp651GkGt8jd84
+         1crsp6Fclm7zCXPkMyFfuquP639U94fyf2IOSQMugKwEqMtuMh6llOBPDIVKaukTOkC8
+         dein0ephBm6OsAscm/oDHdIM397VcsS+AV5bjS6Tk/tkXep9CaLzwxQD7LssSlST00AL
+         hbhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTFaEBcWK6ZfrvnB0W+9lniP3VdaNWe/hlL6LX/jfb2fBQkLdWr5pigrcG+ufTAQUHjrA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5HK+l4+7k/YnnKt2k23N4HS7Z3ag4KtVdJ01JBUFefZ2namge
+	G8l14/5BWCpqPtD3IQ4MNMSpCsEXrefKo8Brd7Y25KcrQUeJ3oUUBTtU/bnO3NB9/I2aPYvi+ux
+	+OA==
+X-Google-Smtp-Source: AGHT+IHKwOsGnli7OQRD04PJwE+8VS+SYu/aOMm+pcV1q2UPRiD3IUftLWbwfUqgVsLruaomYZD37oPEl7A=
+X-Received: from pjtd15.prod.google.com ([2002:a17:90b:4f:b0:2fa:1771:e276])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:280b:b0:2f8:2c47:fb36
+ with SMTP id 98e67ed59e1d1-2fbf5c6ea65mr8404846a91.33.1739398021418; Wed, 12
+ Feb 2025 14:07:01 -0800 (PST)
+Date: Wed, 12 Feb 2025 14:07:00 -0800
+In-Reply-To: <20250204004038.1680123-5-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250211121128.703390-4-tabba@google.com>
+Mime-Version: 1.0
+References: <20250204004038.1680123-1-jthoughton@google.com> <20250204004038.1680123-5-jthoughton@google.com>
+Message-ID: <Z60bhK96JnKIgqZQ@google.com>
+Subject: Re: [PATCH v9 04/11] KVM: x86/mmu: Relax locking for
+ kvm_test_age_gfn() and kvm_age_gfn()
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao <yuzhao@google.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Feb 11, 2025 at 12:11:19PM +0000, Fuad Tabba wrote:
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 54e959e7d68f..4e759e8020c5 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -124,3 +124,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
->  config HAVE_KVM_ARCH_GMEM_INVALIDATE
->         bool
->         depends on KVM_PRIVATE_MEM
-> +
-> +config KVM_GMEM_SHARED_MEM
-> +       select KVM_PRIVATE_MEM
-> +       bool
+On Tue, Feb 04, 2025, James Houghton wrote:
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index 22551e2f1d00..e984b440c0f0 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -142,8 +142,14 @@ bool spte_has_volatile_bits(u64 spte)
+>  		return true;
+>  
+>  	if (spte_ad_enabled(spte)) {
+> -		if (!(spte & shadow_accessed_mask) ||
+> -		    (is_writable_pte(spte) && !(spte & shadow_dirty_mask)))
+> +		/*
+> +		 * Do not check the Accessed bit. It can be set (by the CPU)
+> +		 * and cleared (by kvm_tdp_mmu_age_spte()) without holding
 
-No strong opinion here, but this might not be straightforward enough for
-any reader to know why a shared mem option will select a private mem..
+When possible, don't reference functions by name in comments.  There are situations
+where it's unavoidable, e.g. when calling out memory barrier pairs, but for cases
+like this, it inevitably leads to stale code.
 
-I wonder would it be clearer if we could have a config for gmem alone, and
-select that option no matter how gmem would be consumed.  Then the two
-options above could select it.
+> +		 * the mmu_lock, but when clearing the Accessed bit, we do
+> +		 * not invalidate the TLB, so we can already miss Accessed bit
 
-I'm not sure whether there're too many guest-memfd stuff hard-coded to
-PRIVATE_MEM, actually that's what I hit myself both in qemu & kvm when I
-wanted to try guest-memfd on QEMU as purely shared (aka no conversions, no
-duplicated backends, but in-place).  So pretty much a pure question to ask
-here.
+No "we" in comments or changelog.
 
-The other thing is, currently guest-memfd binding only allows 1:1 binding
-to kvm memslots for a specific offset range of gmem, rather than being able
-to be mapped in multiple memslots:
+> +		 * updates.
+> +		 */
+> +		if (is_writable_pte(spte) && !(spte & shadow_dirty_mask))
+>  			return true;
 
-kvm_gmem_bind():
-	if (!xa_empty(&gmem->bindings) &&
-	    xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT)) {
-		filemap_invalidate_unlock(inode->i_mapping);
-		goto err;
-	}
+This 100% belongs in a separate prepatory patch.  And if it's moved to a separate
+patch, then the rename can/should happen at the same time.
 
-I didn't dig further yet, but I feel like this won't trivially work with
-things like SMRAM when in-place, which can map the same portion of a gmem
-range more than once.  I wonder if this is a hard limit for guest-memfd,
-and whether you hit anything similar when working on this series.
+And with the Accessed check gone, and looking forward to the below change, I think
+this is the perfect opportunity to streamline the final check to:
 
-Thanks,
+	return spte_ad_enabled(spte) && is_writable_pte(spte) &&
+	       !(spte & shadow_dirty_mask);
 
--- 
-Peter Xu
+No need to send another version, I'll move things around when applying.
 
+Also, as discussed off-list I'm 99% certain that with the lockless aging, KVM
+must atomically update A/D-disabled SPTEs, as the SPTE can be access-tracked and
+restored outside of mmu_lock.  E.g. a task that holds mmu_lock and is clearing
+the writable bit needs to update it atomically to avoid its change from being
+lost.
+
+I'll slot this is in:
+
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Wed, 12 Feb 2025 12:58:39 -0800
+Subject: [PATCH 03/10] KVM: x86/mmu: Always update A/D-disable SPTEs
+ atomically
+
+In anticipation of aging SPTEs outside of mmu_lock, force A/D-disabled
+SPTEs to be updated atomically, as aging A/D-disabled SPTEs will mark them
+for access-tracking outside of mmu_lock.  Coupled with restoring access-
+tracked SPTEs in the fast page fault handler, the end result is that
+A/D-disable SPTEs will be volatile at all times.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/spte.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 9663ba867178..0f9f47b4ab0e 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -141,8 +141,11 @@ bool spte_needs_atomic_update(u64 spte)
+ 	if (!is_writable_pte(spte) && is_mmu_writable_spte(spte))
+ 		return true;
+ 
+-	/* Access-tracked SPTEs can be restored by KVM's fast page fault handler. */
+-	if (is_access_track_spte(spte))
++	/*
++	 * A/D-disabled SPTEs can be access-tracked by aging, and access-tracked
++	 * SPTEs can be restored by KVM's fast page fault handler.
++	 */
++	if (!spte_ad_enabled(spte))
+ 		return true;
+ 
+ 	/*
+@@ -151,8 +154,7 @@ bool spte_needs_atomic_update(u64 spte)
+ 	 * invalidate TLBs when aging SPTEs, and so it's safe to clobber the
+ 	 * Accessed bit (and rare in practice).
+ 	 */
+-	return spte_ad_enabled(spte) && is_writable_pte(spte) &&
+-	       !(spte & shadow_dirty_mask);
++	return is_writable_pte(spte) && !(spte & shadow_dirty_mask);
+ }
+ 
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+--
 
