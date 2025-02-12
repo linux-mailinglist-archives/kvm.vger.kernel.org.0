@@ -1,160 +1,114 @@
-Return-Path: <kvm+bounces-37992-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37993-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 902EEA332E1
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 23:51:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 836F4A332F0
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 23:55:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A2D97A2D20
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 22:50:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01C32188AEDD
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 22:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B388D21129D;
-	Wed, 12 Feb 2025 22:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2212214204;
+	Wed, 12 Feb 2025 22:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wFEp7xgl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0+oa/YGN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39241EF08E
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 22:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76201FBC9C
+	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 22:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739400653; cv=none; b=XT0p20PUkjetnP8ZV0NTeK3LMbvNqviIOiusLNyzE390jFd5UlU0ZaAp5k4pee80Qb0DJxhbx7Seawqpdrkz8+uCtw7EjEKf+bf7BLLc6z7dzyR4nX521+UulR7e1sGLYXGOKzVBb/T3tUsilmXXpmeTjZKCdRh7gKgji6a23D8=
+	t=1739400944; cv=none; b=saX+B4IfMc84tYCZ00n1Ycx0MpwfEtpTO0uSAXYi4oFzykfwQjMvhTBEnliSLKRJhzcVsgfkZ0SgP3l+4wLKgDhBrBS+UYzaa3xaTBnA/VMy59Qhme4K1XkXgqCsueVoi9XR9uSZh+3opBHNjdSW5hPrZSqbAtN/EZhKE5tOSAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739400653; c=relaxed/simple;
-	bh=uXm8uKmNjS20RmDk1SMqOD3I2J1mL4UkI1TzOjxtnkQ=;
+	s=arc-20240116; t=1739400944; c=relaxed/simple;
+	bh=M/JEAtm/aKqZQpUcIkbOx1V5MbhNPluJ7A9OR2+JsF8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=u9CKoO4Q3qsCqpHrcqtXpHI0Agm+Dfw/8AredMv5zhjfVBJkALFdnvTKXpP/V940EbE4nesZ9x4vFEz1cwdkcTlg+FfYaqpLHL3IHAHm700ElYHjQO14fE2TgC49A8CIz9VergWyqjOvzcJ+mvJMhOTy3IusW4UmfTZFYJow3K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wFEp7xgl; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=O0tj4trzwKlFwT5YsZV3sjHzRY/nfNqk665saiv+a0+h7Bby6xqy+C+fllEjt4km1Jgyu1SYp3Qh0U9Y/6vKgOd9BcgknhKye6Q/n2W/b+mv9ekK3P5DwxNWu6STYhGdK1vg3NkdnbZFx6+2lgBjcEd/gjZJl1k3ARG9kiRo80s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0+oa/YGN; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fa1c093f12so781633a91.2
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 14:50:51 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21f71b174a5so3982075ad.0
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 14:55:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739400651; x=1740005451; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739400942; x=1740005742; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A7M7mwSZmFgIdf/jVcNpFyiHweXH73hNuBjTuWyoztw=;
-        b=wFEp7xgl0OVABYmzcnuN8JJWBU3n5vtSnjKDC5uRcaAlFC0StvVfPmaz81AgoAecA3
-         FQJ+WPi/Lk1q8pH++x8EQE2Td6E1Ug+453TTfL+cPFWHeAWeK6Qtyu5axET6rIiK9yPe
-         nmuGKLflrjoam6oEmYTVTaa3U2lPytuZxim+34czdxVr4PohG7eZPgGUC8ZkBS8Thv5p
-         /+iX6HmL663OXP1G2CuaFQRSv1/Ib1ADz70dXkhbssmnTjqvmg47ap4buTd8UHBMVZGQ
-         Ww4A5b/E8o2KD36r7bKZ7QGGnvuR+rI/77m/cKBNdVo/RKXTSpAJiNqJLJkU0qluyvJV
-         CEQA==
+        bh=G4pJwe4WBZK7j0Qn81lTWodsKOqME7mNPJqkDCUIDvw=;
+        b=0+oa/YGNFhfNfAvc1DakAtTUGsb5fIjUlQ8FgLTRkg4g1oQyavX/X3Goe3VKnShPef
+         sathwRfPc14c/SS/26TodPkSpcyzfl3XYEr9eD3+NKhZ05MA8IpZOeWBer9yGZdhkcZg
+         vYzPXJsuWtL36f/RQOOZ6ZGR0NpUaTqI7oN/qOUKlOn8bvDfB5QLFBFv0wQAHb7EYZZh
+         kMeayyeRT8PqJE3MHyteMkdaI14XvZfIVt0dUvMYtIEAGznLN65J37HiJGuZe3Ih2/nK
+         SaRuIN8GhT2SwQG9cLxEL2bY5wKx/5x8+sumghXwYfj0es1OJMTZcsxVPzpCpT8g64ko
+         5HHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739400651; x=1740005451;
+        d=1e100.net; s=20230601; t=1739400942; x=1740005742;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A7M7mwSZmFgIdf/jVcNpFyiHweXH73hNuBjTuWyoztw=;
-        b=tvpSRTa9ptDyRan1lCBzyVASYhUIGzYDzsQGvpQRSOY0wK1iHrkqQGHnR+cB+809O/
-         aYdOzpNEbab2NxH5aLZg7BYs7db9tF27ET1jkQ0sTOFx4F9AdLQzCxQyZy4BAaML+v8Y
-         dQS92aE+ovwZmp53N/YntON9gjjDk25oJf/Ed9Z8ULjJXK4U1oZyqd8f1JmUUuuvT3Xr
-         3CINg25ynDMhgTaMyTIOJMrjxi1SQq5Brxu7x8anOzVHhBIsK1BIvG3CpbE8IAHQlN8Q
-         s4WMDUtI5wHEDbWh7mlhlbHjDZafqu7Xd/ucS1wjuTt4i+cSSfkdV2IbPXj4rEiTizat
-         wTkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWBWI1heyRWPRR1dZ29sRGtRpYFvaS3oYmO95TCQCp+SlCApYPhQt9UV+NEqk9Yc2/ErTo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuxurfZ6tYY701cMYfZjTjRg6fHZ0K44U/zQbbd7Lz+7p8o+Al
-	XSQWBv0bnBDuHPiydsrB2uGoGgCJJrWrEKAtMEZyummm3XqWCaCHoHQM0uupYSIkB6kDlu9zYzv
-	frA==
-X-Google-Smtp-Source: AGHT+IFVTTUUI1xszagrzillVwGnjrtr+PRt659s6KUyzEgsoiBKTxdBzhJcBaI8v4c/MK/Id5lMncRdTWE=
-X-Received: from pfblj12.prod.google.com ([2002:a05:6a00:71cc:b0:730:78e8:8e52])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2341:b0:730:97a6:f04
- with SMTP id d2e1a72fcca58-7322c38479emr6679600b3a.7.1739400651124; Wed, 12
- Feb 2025 14:50:51 -0800 (PST)
-Date: Wed, 12 Feb 2025 14:50:45 -0800
-In-Reply-To: <20250212221217.161222-1-jthoughton@google.com>
+        bh=G4pJwe4WBZK7j0Qn81lTWodsKOqME7mNPJqkDCUIDvw=;
+        b=fK+8M6Q4PEwsV8LuB6/ObSUOfkNKM/9eHY5/bNqbZSmdD0lfmFVyH4hqFhYmMkXMyY
+         QsP6c5V0YVbjAd/qWhRlAILxAFRtcVe0sQpRaVJTYQXXSgPkCeB3YvKBSpdb3su7uwZ+
+         ync8OANDQl71+1K9Dzbk4pmZAT1MFQwXsLk6s9ppf/9U0SRct0tX8bharyV7hleFILXU
+         4u/e/V/wj0JTPCmqngbV2vFO3VgkT+6oWdaKe76SvwV3ScenkiOtoRjeNn9RnhgT0Rai
+         QTM36fCqm7QA1VSmnhk8bIr5KMTzTX+D25EYmq10rjS7yN+aSiwsmK9F8AOaOf+R4ZoW
+         rkRg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0yc6YkFKKe4MywbwgI/czxy+7VsZUu465w+gpjtI/koqvvYvB7Z8RWswK0ii196hGmQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu5g6STsmC5e1FwP93c05OHbioyYJ7mqYTTfB0nY6WtC7uEo5U
+	/iRgqMi9RDS1/7I80HsrtD3p9XgEEFgdT/bJmPx394AfoxVD0jbRntvy9MCyKV4iq/JjePRCv4i
+	RYw==
+X-Google-Smtp-Source: AGHT+IFCvprC2FVz2MYwofAu+gOZ+t6GzfO0x6W16EewccF+NjWJufThiJaaDpuXjWvbsRckLewQnEmSOUI=
+X-Received: from plbb4.prod.google.com ([2002:a17:903:c04:b0:21f:14cc:68b0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c94e:b0:220:c2bf:e8ba
+ with SMTP id d9443c01a7336-220d3528cc9mr11030295ad.14.1739400941927; Wed, 12
+ Feb 2025 14:55:41 -0800 (PST)
+Date: Wed, 12 Feb 2025 14:55:36 -0800
+In-Reply-To: <SN6PR02MB4157DBAF1E3BB0E4FFD2C92DD4FC2@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <67689c62.050a0220.2f3838.000d.GAE@google.com> <20250212221217.161222-1-jthoughton@google.com>
-Message-ID: <Z60lxSqV1r257yW8@google.com>
-Subject: Re: [syzbot] [kvm?] WARNING in vmx_handle_exit (2)
+References: <20250201021718.699411-1-seanjc@google.com> <20250201021718.699411-17-seanjc@google.com>
+ <Z6ZBjNdoULymGgxz@google.com> <SN6PR02MB4157A85EC0B1B2D45CB611FAD4F02@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z6onnUthSBUVAklf@google.com> <SN6PR02MB4157DBAF1E3BB0E4FFD2C92DD4FC2@SN6PR02MB4157.namprd02.prod.outlook.com>
+Message-ID: <Z60m6NiOlCmy4-q0@google.com>
+Subject: Re: [PATCH 16/16] x86/kvmclock: Use TSC for sched_clock if it's
+ constant and non-stop
 From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: syzbot+ac0bc3a70282b4d586cc@syzkaller.appspotmail.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Juergen Gross <jgross@suse.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Ajay Kaher <ajay.kaher@broadcom.com>, 
+	Jan Kiszka <jan.kiszka@siemens.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Nikunj A Dadhania <nikunj@amd.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Feb 12, 2025, James Houghton wrote:
-> Here's what I think is going on (with the C repro anyway):
+On Wed, Feb 12, 2025, Michael Kelley wrote:
+> From: Sean Christopherson <seanjc@google.com> Sent: Monday, February 10, 2025 8:22 AM
+> > On Sat, Feb 08, 2025, Michael Kelley wrote:
+> > > But I would be good with some restructuring so that setting the sched clock
+> > > save/restore hooks is more closely tied to the sched clock choice,
+> > 
+> > Yeah, this is the intent of my ranting.  After the dust settles, the code can
+> > look like this.
 > 
-> 1. KVM_RUN a nested VM, and eventually we end up with
->    nested_run_pending=1.
-> 2. Exit KVM_RUN with EINTR (or any reason really, but I see EINTR in
->    repro attempts).
-> 3. KVM_SET_REGS to set rflags to 0x1ac585, which has X86_EFLAGS_VM,
->    flipping it and setting vmx->emulation_required = true.
-> 3. KVM_RUN again. vmx->emulation_required will stop KVM from clearing
->    nested_run_pending, and then we hit the
->    KVM_BUG_ON(nested_run_pending) in __vmx_handle_exit().
-> 
-> So I guess the KVM_BUG_ON() is a little bit too conservative, but this
-> is nonsensical VMM behavior. So I'm not really sure what the best
-> solution is. Sean, any thoughts?
+> I'm good with what you are proposing. And if you want, there's no real need
+> for hv_ref_counter_at_suspend and hv_save/restore_sched_clock_state()
+> to be in the #ifdef sequence since the code has no architecture dependencies.
 
-Heh, deja vu.  This is essentially the same thing that was fixed by commit
-fc4fad79fc3d ("KVM: VMX: Reject KVM_RUN if emulation is required with pending
-exception"), just with a different WARN.
-
-This should fix it.  Checking nested_run_pending in handle_invalid_guest_state()
-is overkill, but it can't possibly do any harm, and the weirdness can be addressed
-with a comment.
-
----
- arch/x86/kvm/vmx/vmx.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f72835e85b6d..8c9428244cc6 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5869,11 +5869,17 @@ static int handle_nmi_window(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
--static bool vmx_emulation_required_with_pending_exception(struct kvm_vcpu *vcpu)
-+static bool vmx_unhandleable_emulation_required(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
--	return vmx->emulation_required && !vmx->rmode.vm86_active &&
-+	if (!vmx->emulation_required)
-+		return false;
-+
-+	if (vmx->nested.nested_run_pending)
-+		return true;
-+
-+	return !vmx->rmode.vm86_active &&
- 	       (kvm_is_exception_pending(vcpu) || vcpu->arch.exception.injected);
- }
- 
-@@ -5896,7 +5902,7 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
- 		if (!kvm_emulate_instruction(vcpu, 0))
- 			return 0;
- 
--		if (vmx_emulation_required_with_pending_exception(vcpu)) {
-+		if (vmx_unhandleable_emulation_required(vcpu)) {
- 			kvm_prepare_emulation_failure_exit(vcpu);
- 			return 0;
- 		}
-@@ -5920,7 +5926,7 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
- 
- int vmx_vcpu_pre_run(struct kvm_vcpu *vcpu)
- {
--	if (vmx_emulation_required_with_pending_exception(vcpu)) {
-+	if (vmx_unhandleable_emulation_required(vcpu)) {
- 		kvm_prepare_emulation_failure_exit(vcpu);
- 		return 0;
- 	}
-
-base-commit: b1da62b213ed5f01d7ead4d14e9d51b48b6256e4
--- 
+Right, but because they will be local/static and there are no users outside of
+x86, the compiler will complain about unused variables/functions on other
+architectures.
 
