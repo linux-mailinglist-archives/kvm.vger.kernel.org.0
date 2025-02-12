@@ -1,243 +1,295 @@
-Return-Path: <kvm+bounces-37986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37987-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAD8EA32F78
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 20:19:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BABD0A330D2
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 21:28:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6996E7A399B
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 19:18:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66D78167EB7
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 20:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB2826281C;
-	Wed, 12 Feb 2025 19:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB7E201258;
+	Wed, 12 Feb 2025 20:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2MkxcnLA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3dtN+I5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F6125E47B
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 19:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB988200B99
+	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 20:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739387946; cv=none; b=Kv182zx3xH9tzjvNL8VMbjgtu3crMa08uLl9VbavQMmfiyoZ+5G1gGpsSKj9PYMHfz+yCexI/mlYCg7F20fHyPDFcFjw2w55NHwHqTFIORvGZ/tpBDMQ6vIl9QIkhNfFjMY3aNjwK0FzHZ2m6YxYYa2+4ohCPtN6xxddQ4f8T58=
+	t=1739392099; cv=none; b=KQOosZVZCWLvKR9DNZ8fO/T9/JlmzLs3Qs9ZcG5iezK/ATibuO6lefmpugmRzAzsNGzQUJSzSk7/HJmKKqHC8PAGIuGtTR8K3EqdrWhKq5kHRuGPREpXcj4oqdUhAlKZF5kANZnc+HzB2NTq4k0GxQMl1z8EL02Eaq5XjkZCvdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739387946; c=relaxed/simple;
-	bh=11Hy8cODuSDFHaJcx2Ju8aoOiOQIkeBngDRvi40dN6A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z/xOM2rTK2rcEEf7rJ55pC08H/v9VmYeleR184npkgHHqR+OvoS/fYeBy5YaSLG/6zGRNAxqNzVhlt6iUGPaMMI0CevbxlmSYz5krkA0OTtkmNhcHjSVnKCOugprxFis4fXvWQB4ZXtv8LODalcZ/LPdVv3DwS8FHQtMkAdOdBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2MkxcnLA; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21f032484d4so240865ad.0
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 11:19:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739387943; x=1739992743; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TlrqapFW6dtOfJ+Ygfgx6q2yFRXVAGv+WlcsEV5abYE=;
-        b=2MkxcnLAUPXAmn6iVq6G7LjRpB2DVfCpBkoGsv1oQLuv0V10UKsX9AqwEPrAiyMZvk
-         u6WPrTaRh2gGUDrAiINczu56xBOX1k+dldrJx7HOHhUdDBphRcbojmIADe/tw4xLNVUI
-         IExvhTnzh2cebFC3pk+MU+HN2BeJKY2qefsYQG2upMMcCGkjptiqA7FtF1hbkY0F3O/5
-         JGdnEzS8zmkSINyS80JpYbMvjI93gDJxz+8SiexlpcGKoFNZpUWkC5YUFZriSM39/Ddm
-         ABlZ0ykyH6IwgFu1psVd8jR5DadisFg/MD30Ye4nSRSZCs6Y2aPEl3oq2xB6g4Cdoa51
-         TfkQ==
+	s=arc-20240116; t=1739392099; c=relaxed/simple;
+	bh=sjyb8CO9UDI0bkvCcVRPvdxFy6b8B/z8MMi7G+pzvSs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XypIHUYVIVRf0b1U3TgCPjSRwakODkI0zwMkfJ0cGMG69rF19tI/Z5IV8RmT1IrFU9IbrMrCK48U91eWO7bwaLGkc9FLswRXcvHL7ZEgujsv9h1RPu0ncRW4kkAferxdiTE+DaqbwKDKMCAnDMSj6XZa8y78p6OkhOpB19E7ge0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S3dtN+I5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739392096;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UEoeLSsS3aCEim/Ww8cGuMBb2a0y/QZooCtBWDiEWjA=;
+	b=S3dtN+I55XaLdh8p0ehDOL+JzDJBJmMsnaNNPr7kwClBcM4f3hmmwLkz9eVY+Vm3E+I0/l
+	MUAuIfr4OG1pO11Ysrtjr2KaCXseAdjHPkjy+/NTFjrSau284FCXl4fxjXG0lo8OoibpuL
+	vG4m/MH8Xw+hmB7nSvx+1GQRFiFKzlw=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-517-0_iH82zHNSyqqNYOWJX3tA-1; Wed, 12 Feb 2025 15:28:15 -0500
+X-MC-Unique: 0_iH82zHNSyqqNYOWJX3tA-1
+X-Mimecast-MFC-AGG-ID: 0_iH82zHNSyqqNYOWJX3tA
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-85534e45380so1987739f.1
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 12:28:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739387943; x=1739992743;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1739392095; x=1739996895;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TlrqapFW6dtOfJ+Ygfgx6q2yFRXVAGv+WlcsEV5abYE=;
-        b=d6t1YlUE1c2EjAUD88QQg+sPkwrKbNllnpqwzJD33oNyGvuvBGZ1WzKDpiFdVJtzVb
-         ZzmI9u9VFmn1J0tDq1XARI7x+yUMrcfHUD8VqUHLkCLFvpRaxU8RT6DNmgicMkz52l4x
-         dAomAAVWdUGIljH+zQmj6A/YxG7C0tYZY8AXGSf31KzJ/kLIbc4Z2p97jjE4SJ5Lit1/
-         w/d010UzI8GhRuPWiYYSbcHRNs3fjMGN3/NnrcadNqFJuEYWegTDDxZ5wi5Cnd5qjKsG
-         qsf4xggyg372Nz+/1UwSjrdPqa5jr73uxq+m6cRGqIusqIqDERGipH72o21QvcrqkVGO
-         lbSA==
-X-Forwarded-Encrypted: i=1; AJvYcCWqTIt0VIjTI0jJB9wTkYc910atq0O79HSqZzCtz+NBp3jo6Rc1HMqbYik+44pzMzoXQWs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdqcQFFXrthohZMcUCjIiRZKcYmETUE6WJ/KxpEROTj0ROBBOA
-	BF5pFSmSTumzEbGMurgdntiFPqQJ62NPFELzCj2VZUv6je7ONaPi1J3o408O5AA5JnTz4PSk6bk
-	28/PCpjwdMhvmTwtSLrvotf52xB4cHypFTQFM
-X-Gm-Gg: ASbGnct01/IQ83HzoEdX0i0w8bUyTpgPv3iw9k2zCDBGWcVEHpsJvpTHFJPKn1YVis0
-	HLeZWzbyYYhycn76qcU8JyM77YSdMBLVfR2+fkE+c9GAsvH1ij1FsDYdGgf+GXQE7+SrQd29v
-X-Google-Smtp-Source: AGHT+IGNugfx084SHply3CA0xWFW/29cP7ySkyiWEViy+SHvFCJOsIGeBkPN0hXf2z66fZ8oH82mGcxNE9IZpDD7YNc=
-X-Received: by 2002:a17:902:f708:b0:215:7ced:9d66 with SMTP id
- d9443c01a7336-220d33f6b21mr172265ad.10.1739387942876; Wed, 12 Feb 2025
- 11:19:02 -0800 (PST)
+        bh=UEoeLSsS3aCEim/Ww8cGuMBb2a0y/QZooCtBWDiEWjA=;
+        b=ezcBTKua/jANNMR3T6FmzUMpg1XqRgb8XvGXudNVeuzwBBJqe5ZjVSOqo6hbWDBPfs
+         LKuvRosuvdy7BhHifvPhow093VEGIg1dvsh5f1G5S/Hj4qH5oMw/DaJo+MBJKkC1AqDm
+         40SEaiKTX2MFBR2LXAej+qP8AJT5d5DN6J2JaGRz9NSuQWhZ3YYt7JBnWPx0x7cK8pO0
+         0hpx315NNs5PQ6tyWH6DwsVJ3s69FHEBzns3MOQg7zwm0+onajL9tavMenJLbpFteFl8
+         Pk7fk2fvdheuZMvtWMwpd56sK5utyDCdoqxBlvTvPBHptH8rFuejDIW6UCWj1tnRH4fe
+         BQlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWDx9cegQHZKqVJacHdujvMbLSTAg7CnS65SmKFkBackTLqmM2pai2l52GwvlMqvQngra4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlhPxa/Idr55CvNk9Wpw3SHbxLiIXI7HtQHajasPwJZibVj252
+	u9RqrzQJn6u18ckdRSwgF0d5Uo+gt1saTHW+hKwdkFOH0jISiaEWFRr0danU7aoJRmxboyiqoaS
+	A8Ct4OfEIWUfZ64o6z8xY4LIuIZNGPtavM6T/E0yTEjMTyO/Nhg==
+X-Gm-Gg: ASbGnctFzhGffgE6MXjy7F1kMVtl44TxEG7XFMGRqlY5uouFVvAAr9d/32sVkcvpQv4
+	WIB8XRp66pioLs229akR0gebWxYzvL1x2r7qAMQxtN36LhCzdlw413Dy2ABVItnBLe3Sskwx3xX
+	YK9f+Z9jvinin4/jW/7JfmZIG3KoEvL7/Z5wVlg7iZ6yIYujusb+IiqqnEzAO1mdzrKFOUy/pa6
+	kshSN9x+iKmTPHBOSft+m/CLvkUd77+GwYNUTKEASrqtazB8TsXSDZW2gRTlzKfwG2aXo3/TxK7
+	qERuOY5p
+X-Received: by 2002:a92:cd84:0:b0:3d0:17d2:a02a with SMTP id e9e14a558f8ab-3d17bffab44mr9449655ab.6.1739392094516;
+        Wed, 12 Feb 2025 12:28:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGyMnLl5ryneXcFqbJLdWXtkIqeCdaQ3vDzYtJyQFOGuNj5RmpgPu7yQTnc7ZA4uZtoSr3rVg==
+X-Received: by 2002:a92:cd84:0:b0:3d0:17d2:a02a with SMTP id e9e14a558f8ab-3d17bffab44mr9449525ab.6.1739392094143;
+        Wed, 12 Feb 2025 12:28:14 -0800 (PST)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4eccf9afc38sm3393858173.1.2025.02.12.12.28.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Feb 2025 12:28:12 -0800 (PST)
+Date: Wed, 12 Feb 2025 13:28:08 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Alexandra Winter <wintera@linux.ibm.com>, Gerd Bayer
+ <gbayer@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Thorsten Winkler <twinkler@linux.ibm.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Julian Ruess <julianr@linux.ibm.com>, Halil
+ Pasic <pasic@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Gerald
+ Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-pci@vger.kernel.org
+Subject: Re: [PATCH v5 2/2] PCI: s390: Support mmap() of BARs and replace
+ VFIO_PCI_MMAP by a device flag
+Message-ID: <20250212132808.08dcf03c.alex.williamson@redhat.com>
+In-Reply-To: <20250212-vfio_pci_mmap-v5-2-633ca5e056da@linux.ibm.com>
+References: <20250212-vfio_pci_mmap-v5-0-633ca5e056da@linux.ibm.com>
+	<20250212-vfio_pci_mmap-v5-2-633ca5e056da@linux.ibm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250203223916.1064540-1-almasrymina@google.com>
- <20250203223916.1064540-6-almasrymina@google.com> <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
- <CAHS8izNOqaFe_40gFh09vdBz6-deWdeGu9Aky-e7E+Wu2qtfdw@mail.gmail.com> <28343e83-6d93-4002-a691-f8273d4d24a8@gmail.com>
-In-Reply-To: <28343e83-6d93-4002-a691-f8273d4d24a8@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 12 Feb 2025 11:18:50 -0800
-X-Gm-Features: AWEUYZmMxO-D8gV-SzbNdeRwFeAQ7660IIm2vAphoidLeu_O5bDpvj8HGIH7jIY
-Message-ID: <CAHS8izOE-JzMszieHEXtYBs7_6D-ngVx2kJyMwp8eCWLK-c0cQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 5/6] net: devmem: Implement TX path
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 12, 2025 at 7:52=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 2/10/25 21:09, Mina Almasry wrote:
-> > On Wed, Feb 5, 2025 at 4:20=E2=80=AFAM Pavel Begunkov <asml.silence@gma=
-il.com> wrote:
-> >>
-> >> On 2/3/25 22:39, Mina Almasry wrote:
-> >> ...
-> >>> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> >>> index bb2b751d274a..3ff8f568c382 100644
-> >>> --- a/include/linux/skbuff.h
-> >>> +++ b/include/linux/skbuff.h
-> >>> @@ -1711,9 +1711,12 @@ struct ubuf_info *msg_zerocopy_realloc(struct =
-sock *sk, size_t size,
-> >> ...
-> >>>    int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
-> >>>                                struct iov_iter *from, size_t length);
-> >>> @@ -1721,12 +1724,14 @@ int zerocopy_fill_skb_from_iter(struct sk_buf=
-f *skb,
-> >>>    static inline int skb_zerocopy_iter_dgram(struct sk_buff *skb,
-> >>>                                          struct msghdr *msg, int len)
-> >>>    {
-> >>> -     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_ite=
-r, len);
-> >>> +     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_ite=
-r, len,
-> >>> +                                    NULL);
-> >>
-> >> Instead of propagating it all the way down and carving a new path, why
-> >> not reuse the existing infra? You already hook into where ubuf is
-> >> allocated, you can stash the binding in there. And
-> >
-> > It looks like it's not possible to increase the side of ubuf_info at
-> > all, otherwise the BUILD_BUG_ON in msg_zerocopy_alloc() fires.
-> >
-> > It's asserting that sizeof(ubuf_info_msgzc) <=3D sizeof(skb->cb), and
-> > I'm guessing increasing skb->cb size is not really the way to go.
-> >
-> > What I may be able to do here is stash the binding somewhere in
-> > ubuf_info_msgzc via union with fields we don't need for devmem, and/or
->
-> It doesn't need to account the memory against the user, and you
-> actually don't want that because dmabuf should take care of that.
-> So, it should be fine to reuse ->mmp.
->
-> It's also not a real sk_buff, so maybe maintainers wouldn't mind
-> reusing some more space out of it, if that would even be needed.
->
+On Wed, 12 Feb 2025 16:28:32 +0100
+Niklas Schnelle <schnelle@linux.ibm.com> wrote:
 
-netmem skb are real sk_buff, with the modification that frags are not
-readable, only in the case that the netmem is unreadable. I would not
-approve of considering netmem/devmem skbs "not real skbs", and start
-messing with the semantics of skb fields for devmem skbs, and having
-to start adding skb_is_devmem() checks through all code in the skb
-handlers that touch the fields being overwritten in the devmem case.
-No, I don't think we can re-use random fields in the skb for devmem.
+> On s390 there is a virtual PCI device called ISM which has a few
+> peculiarities. For one, it presents a 256 TiB PCI BAR whose size leads
+> to any attempt to ioremap() the whole BAR failing. This is problematic
+> since mapping the whole BAR is the default behavior of for example
+> vfio-pci in combination with QEMU and VFIO_PCI_MMAP enabled.
+> 
+> Even if one tried to map this BAR only partially, the mapping would not
+> be usable without extra precautions on systems with MIO support enabled.
+> This is because of another oddity, in that this virtual PCI device does
+> not support the newer memory I/O (MIO) PCI instructions and legacy PCI
+> instructions are not accessible through writeq()/readq() when MIO is in
+> use.
+> 
+> In short the ISM device's BAR is not accessible through memory mappings.
+> Indicate this by introducing a new non_mappable_bars flag for the ISM
+> device and set it using a PCI quirk. Use this flag instead of the
+> VFIO_PCI_MMAP Kconfig option to block mapping with vfio-pci. This was
+> the only use of the Kconfig option so remove it. Note that there are no
+> PCI resource sysfs files on s390x already as HAVE_PCI_MMAP is currently
+> not set. If this were to be set in the future pdev->non_mappable_bars
+> can be used to prevent unusable resource files for ISM from being
+> created.
 
-> > stashing the binding in ubuf_info_ops (very hacky). Neither approach
-> > seems ideal, but the former may work and may be cleaner.
-> >
-> > I'll take a deeper look here. I had looked before and concluded that
-> > we're piggybacking devmem TX on MSG_ZEROCOPY path, because we need
-> > almost all of the functionality there (no copying, send complete
-> > notifications, etc), with one minor change in the skb filling. I had
-> > concluded that if MSG_ZEROCOPY was never updated to use the existing
-> > infra, then it's appropriate for devmem TX piggybacking on top of it
->
-> MSG_ZEROCOPY does use the common infra, i.e. passing ubuf_info,
-> but doesn't need ->sg_from_iter as zerocopy_fill_skb_from_iter()
-> and it's what was there first.
->
+I think we should also look at it from the opposite side, not just
+s390x maybe adding HAVE_PCI_MMAP in the future, but the fact that we're
+currently adding a generic PCI device flag which isn't honored by the
+one mechanism that PCI core provides to mmap MMIO BARs to userspace.
+It seems easier to implement it in pci_mmap_resource() now rather than
+someone later discovering there's no enforcement outside of the very
+narrow s390x use case.  Thanks,
 
-But MSG_ZEROCOPY doesn't set msg->msg_ubuf. And not setting
-msg->msg_ubuf fails to trigger msg->sg_from_iter altogether.
+Alex
 
-And also currently sg_from_iter isn't set up to take in a ubuf_info.
-We'd need that if we stash the binding in the ubuf_info.
+> As s390x has no PCI quirk handling add basic support modeled after x86's
+> arch/x86/pci/fixup.c and move the ISM device's PCI ID to the common
+> header to make it accessible. Also enable CONFIG_PCI_QUIRKS whenever
+> CONFIG_PCI is enabled.
+> 
+> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> ---
+>  arch/s390/Kconfig                |  4 +---
+>  arch/s390/pci/Makefile           |  2 +-
+>  arch/s390/pci/pci_fixup.c        | 23 +++++++++++++++++++++++
+>  drivers/s390/net/ism_drv.c       |  1 -
+>  drivers/vfio/pci/Kconfig         |  4 ----
+>  drivers/vfio/pci/vfio_pci_core.c |  2 +-
+>  include/linux/pci.h              |  1 +
+>  include/linux/pci_ids.h          |  1 +
+>  8 files changed, 28 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+> index 9c9ec08d78c71b4d227beeafab1b82d6434cb5c7..e48741e001476f765e8aba0037a1b386df393683 100644
+> --- a/arch/s390/Kconfig
+> +++ b/arch/s390/Kconfig
+> @@ -41,9 +41,6 @@ config AUDIT_ARCH
+>  config NO_IOPORT_MAP
+>  	def_bool y
+>  
+> -config PCI_QUIRKS
+> -	def_bool n
+> -
+>  config ARCH_SUPPORTS_UPROBES
+>  	def_bool y
+>  
+> @@ -258,6 +255,7 @@ config S390
+>  	select PCI_DOMAINS		if PCI
+>  	select PCI_MSI			if PCI
+>  	select PCI_MSI_ARCH_FALLBACKS	if PCI_MSI
+> +	select PCI_QUIRKS		if PCI
+>  	select SPARSE_IRQ
+>  	select SWIOTLB
+>  	select SYSCTL_EXCEPTION_TRACE
+> diff --git a/arch/s390/pci/Makefile b/arch/s390/pci/Makefile
+> index df73c5182990ad3ae4ed5a785953011feb9a093c..1810e0944a4ed9d31261788f0f6eb341e5316546 100644
+> --- a/arch/s390/pci/Makefile
+> +++ b/arch/s390/pci/Makefile
+> @@ -5,6 +5,6 @@
+>  
+>  obj-$(CONFIG_PCI)	+= pci.o pci_irq.o pci_clp.o \
+>  			   pci_event.o pci_debug.o pci_insn.o pci_mmio.o \
+> -			   pci_bus.o pci_kvm_hook.o pci_report.o
+> +			   pci_bus.o pci_kvm_hook.o pci_report.o pci_fixup.o
+>  obj-$(CONFIG_PCI_IOV)	+= pci_iov.o
+>  obj-$(CONFIG_SYSFS)	+= pci_sysfs.o
+> diff --git a/arch/s390/pci/pci_fixup.c b/arch/s390/pci/pci_fixup.c
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..35688b645098329f082d0c40cc8c59231c390eaa
+> --- /dev/null
+> +++ b/arch/s390/pci/pci_fixup.c
+> @@ -0,0 +1,23 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Exceptions for specific devices,
+> + *
+> + * Copyright IBM Corp. 2025
+> + *
+> + * Author(s):
+> + *   Niklas Schnelle <schnelle@linux.ibm.com>
+> + */
+> +#include <linux/pci.h>
+> +
+> +static void zpci_ism_bar_no_mmap(struct pci_dev *pdev)
+> +{
+> +	/*
+> +	 * ISM's BAR is special. Drivers written for ISM know
+> +	 * how to handle this but others need to be aware of their
+> +	 * special nature e.g. to prevent attempts to mmap() it.
+> +	 */
+> +	pdev->non_mappable_bars = 1;
+> +}
+> +DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_IBM,
+> +			PCI_DEVICE_ID_IBM_ISM,
+> +			zpci_ism_bar_no_mmap);
+> diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+> index e36e3ea165d3b2b01d68e53634676cb8c2c40220..d32633ed9fa80c1764724f493b363bfd6cb4f9cf 100644
+> --- a/drivers/s390/net/ism_drv.c
+> +++ b/drivers/s390/net/ism_drv.c
+> @@ -20,7 +20,6 @@
+>  MODULE_DESCRIPTION("ISM driver for s390");
+>  MODULE_LICENSE("GPL");
+>  
+> -#define PCI_DEVICE_ID_IBM_ISM 0x04ED
+>  #define DRV_NAME "ism"
+>  
+>  static const struct pci_device_id ism_device_table[] = {
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index bf50ffa10bdea9e52a9d01cc3d6ee4cade39a08c..c3bcb6911c538286f7985f9c5e938d587fc04b56 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -7,10 +7,6 @@ config VFIO_PCI_CORE
+>  	select VFIO_VIRQFD
+>  	select IRQ_BYPASS_MANAGER
+>  
+> -config VFIO_PCI_MMAP
+> -	def_bool y if !S390
+> -	depends on VFIO_PCI_CORE
+> -
+>  config VFIO_PCI_INTX
+>  	def_bool y if !S390
+>  	depends on VFIO_PCI_CORE
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 586e49efb81be32ccb50ca554a60cec684c37402..c8586d47704c74cf9a5256d65bbf888db72b2f91 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -116,7 +116,7 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
+>  
+>  		res = &vdev->pdev->resource[bar];
+>  
+> -		if (!IS_ENABLED(CONFIG_VFIO_PCI_MMAP))
+> +		if (vdev->pdev->non_mappable_bars)
+>  			goto no_mmap;
+>  
+>  		if (!(res->flags & IORESOURCE_MEM))
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 47b31ad724fa5bf7abd7c3dc572947551b0f2148..7192b9d78d7e337ce6144190325458fe3c0f1696 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -476,6 +476,7 @@ struct pci_dev {
+>  	unsigned int	no_command_memory:1;	/* No PCI_COMMAND_MEMORY */
+>  	unsigned int	rom_bar_overlap:1;	/* ROM BAR disable broken */
+>  	unsigned int	rom_attr_enabled:1;	/* Display of ROM attribute enabled? */
+> +	unsigned int	non_mappable_bars:1;	/* BARs can't be mapped to user-space  */
+>  	pci_dev_flags_t dev_flags;
+>  	atomic_t	enable_cnt;	/* pci_enable_device has been called */
+>  
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index de5deb1a0118fcf56570d461cbe7a501d4bd0da3..ec6d311ed12e174dc0bad2ce8c92454bed668fee 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -518,6 +518,7 @@
+>  #define PCI_DEVICE_ID_IBM_ICOM_V2_ONE_PORT_RVX_ONE_PORT_MDM	0x0251
+>  #define PCI_DEVICE_ID_IBM_ICOM_V2_ONE_PORT_RVX_ONE_PORT_MDM_PCIE 0x0361
+>  #define PCI_DEVICE_ID_IBM_ICOM_FOUR_PORT_MODEL	0x252
+> +#define PCI_DEVICE_ID_IBM_ISM		0x04ED
+>  
+>  #define PCI_SUBVENDOR_ID_IBM		0x1014
+>  #define PCI_SUBDEVICE_ID_IBM_SATURN_SERIAL_ONE_PORT	0x03d4
+> 
 
-All in all I think I wanna prototype an msg->sg_from_iter approach and
-make a judgement call on whether it's cleaner than just passing the
-binding through a couple of helpers just as I'm doing here. My feeling
-is that the implementation in this patch may be cleaner than
-refactoring the entire msg_ubuf/sg_from_iter flows so we can sort of
-use it for MSG_ZEROCOPY with devmem when it currently doesn't use it.
-
-> > to follow that. I would not want to get into a refactor of
-> > MSG_ZEROCOPY for no real reason.
-> >
-> > But I'll take a deeper look here and see if I can make something
-> > slightly cleaner work.
-> >
-> >> zerocopy_fill_skb_from_devmem can implement ->sg_from_iter,
-> >> see __zerocopy_sg_from_iter().
-> >>
-> >> ...
-> >>> diff --git a/net/core/datagram.c b/net/core/datagram.c
-> >>> index f0693707aece..c989606ff58d 100644
-> >>> --- a/net/core/datagram.c
-> >>> +++ b/net/core/datagram.c
-> >>> @@ -63,6 +63,8 @@
-> >>> +static int
-> >>> +zerocopy_fill_skb_from_devmem(struct sk_buff *skb, struct iov_iter *=
-from,
-> >>> +                           int length,
-> >>> +                           struct net_devmem_dmabuf_binding *binding=
-)
-> >>> +{
-> >>> +     int i =3D skb_shinfo(skb)->nr_frags;
-> >>> +     size_t virt_addr, size, off;
-> >>> +     struct net_iov *niov;
-> >>> +
-> >>> +     while (length && iov_iter_count(from)) {
-> >>> +             if (i =3D=3D MAX_SKB_FRAGS)
-> >>> +                     return -EMSGSIZE;
-> >>> +
-> >>> +             virt_addr =3D (size_t)iter_iov_addr(from);
-> >>
-> >> Unless I missed it somewhere it needs to check that the iter
-> >> is iovec based.
-> >>
-> >
-> > How do we end up here with an iterator that is not iovec based? Is the
-> > user able to trigger that somehow and I missed it?
->
-> Hopefully not, but for example io_uring passes bvecs for a number of
-> requests that can end up in tcp_sendmsg_locked(). Those probably
-> would work with the current patch, but check the order of some of the
-> checks it will break. And once io_uring starts passing bvecs for
-> normal send[msg] requests, it'd definitely be possible. And there
-> are other in kernel users apart from send(2) path, so who knows.
->
-> The api allows it and therefore should be checked, it's better to
-> avoid quite possible latent bugs.
->
-
-Sounds good.
-
---=20
-Thanks,
-Mina
 
