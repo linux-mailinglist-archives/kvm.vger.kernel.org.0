@@ -1,163 +1,274 @@
-Return-Path: <kvm+bounces-37963-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37964-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0671FA32404
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 11:55:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC871A32743
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 14:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34BED3A5505
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 10:55:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F7181643E6
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 13:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6C5209F43;
-	Wed, 12 Feb 2025 10:55:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qFv6IwAc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388D020E32D;
+	Wed, 12 Feb 2025 13:41:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40383206F2C;
-	Wed, 12 Feb 2025 10:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B7E209669;
+	Wed, 12 Feb 2025 13:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739357735; cv=none; b=GgisVumj29jcXZs2BzlHAVyGC8HKSGMYbvGXkQDOXM91IJT7oUxO1yM6fJH1/5pn+/zO0gMtHGaNObPYFrT9zkStaVOcx0Xrjk2JC3MGp7mk3P5Q92nnWN8xPNwSRCG8R9J5KjVIWJQWoSvfxgrOV4vjvG8OSrL7hFBCECKErDE=
+	t=1739367662; cv=none; b=SMGP09cDSkl8kO2f+iAfPctEjt5Na7ZMaKqtqZMcwq6kQyh2XRIxaxA67kjOrzwJ2rnUfWnU1mhCft1onuuoPIdp6JtRC59jZJvT1gdSLmA8NbpEbH8VNSF8s2lxIHUCeNFzG2KHJaFhohsVJF/3PRorKuhSlzbb9v+N0e5c3gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739357735; c=relaxed/simple;
-	bh=YDUw1jwbWOCs7kM+qnqYD6rz2Rv/Ove2R3hjhj9wfy0=;
+	s=arc-20240116; t=1739367662; c=relaxed/simple;
+	bh=65Xyr7rhnhOTAKinkPNhdZsbca6ULRvLHCrkC6R+N34=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=omb/1wQEcdnmKHf+UZlLhNkSQ7FQJ6zw2DVbfcyKYCAN74XOc3+rk8S4rpZKW1YwRKTWzgMkcFDIuPM+XkyQ9RgevOxyOvqStHubDupbVCBXzHTiYwLSWCSYjcCWL0c1EiSpsETTVQ0UYmTs/Yw0dq6hGSVfc2wzqDY3cFXB3Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qFv6IwAc; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51C5OOsD003168;
-	Wed, 12 Feb 2025 10:55:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=76M3I/
-	Nc/8XmmC/SMhr1RgaBDyLEl3IK3DLNAMMdyNI=; b=qFv6IwAcKyJUOs5NQiHwUz
-	WgNZSG4w9inXXryzWQRxFQTaC29PglujalbfHX670LGAHhSsicEgIiF7vsEyU48a
-	ZEt0JcJEL6kyMEHc2g0wzvwl5HhJNxr3xq/grLUZ1iNRG/YotaMBX2nCk8rZ4pk+
-	EUG5IvQCTSCL2gv7F6cSfwsqQIkRALk6KnbHET1LzZ+2V8y2nGH27RXXTOWxcscN
-	g2AnmyHZ2R/Wj4B1li+fwkZNameLn73tk+UQVpay4Cje742FT5+Ujo5oyRBGrv4L
-	RJZqeMIva2KFu055VnRWdIECbqiKBB+Ne53hSe896kJOl7C62u3PVwnuW5zql52Q
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rnf89f6f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Feb 2025 10:55:31 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51C9dw5c001358;
-	Wed, 12 Feb 2025 10:55:30 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pjkn84q3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Feb 2025 10:55:30 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51CAtQbl13763026
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Feb 2025 10:55:26 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 351E620040;
-	Wed, 12 Feb 2025 10:55:26 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6834320043;
-	Wed, 12 Feb 2025 10:55:25 +0000 (GMT)
-Received: from localhost (unknown [9.171.83.73])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 12 Feb 2025 10:55:25 +0000 (GMT)
-Date: Wed, 12 Feb 2025 11:55:19 +0100
-From: Vasily Gorbik <gor@linux.ibm.com>
-To: Anthony Krowiak <akrowiak@linux.ibm.com>
-Cc: Rorie Reyes <rreyes@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        borntraeger@de.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
-        alex.williamson@redhat.com
-Subject: Re: [PATCH v1] s390/vfio-ap: Signal eventfd when guest AP
- configuration is changed
-Message-ID: <your-ad-here.call-01739357719-ext-1861@work.hours>
-References: <20250107183645.90082-1-rreyes@linux.ibm.com>
- <Z4U6iu5JidJUxDgX@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
- <f69bba4b-a97e-4166-9ce1-c8a2ad634696@linux.ibm.com>
- <f1af50b3-f966-445d-ab89-3d213f55b93a@linux.ibm.com>
- <Z6RnfwawWop0v1CW@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
- <02675184-0ce5-4f08-9d5d-f42987b77b5b@linux.ibm.com>
- <Z6sDKeA6WzAgagiZ@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
- <e5ca9a2c-ec7d-4e0e-ad06-2d312b511b90@linux.ibm.com>
- <8767c6ce-28cf-4e23-baf8-e6c9ec854c60@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DSuKyHbrYg3gOtSgYQKPCleXHVIHf2j+YlP/sEunswgKbLelMWMw/1UZ1pM/ENbjVSILIWtNw+IH6XiaC7fztDTlXcuGACLqzWqnzV8xFIm7qCaizxGmXgC+OrtorwU6Tzu0uwh6igVHboIJWcQOGxgRnEwUQGPTPHxen0lTUqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F53A12FC;
+	Wed, 12 Feb 2025 05:41:20 -0800 (PST)
+Received: from arm.com (e134078.arm.com [10.1.26.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47B593F58B;
+	Wed, 12 Feb 2025 05:40:55 -0800 (PST)
+Date: Wed, 12 Feb 2025 13:40:51 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+	david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+	oliver.upton@linux.dev, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joey.gouly@arm.com, andre.przywara@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 04/18] run_tests: Introduce unittest
+ parameter 'qemu_params'
+Message-ID: <Z6yk48JpsYKHwFye@arm.com>
+References: <20250120164316.31473-1-alexandru.elisei@arm.com>
+ <20250120164316.31473-5-alexandru.elisei@arm.com>
+ <20250121-82874afe4e52c828d21e7da2@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8767c6ce-28cf-4e23-baf8-e6c9ec854c60@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: w8EkwTQy5rQ8urYUuHVDmhH98dk6ODc_
-X-Proofpoint-GUID: w8EkwTQy5rQ8urYUuHVDmhH98dk6ODc_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-12_03,2025-02-11_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 mlxscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
- bulkscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0 phishscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502120081
+In-Reply-To: <20250121-82874afe4e52c828d21e7da2@orel>
 
-On Tue, Feb 11, 2025 at 03:24:05PM -0500, Anthony Krowiak wrote:
-> 
-> 
-> 
-> On 2/11/25 10:02 AM, Rorie Reyes wrote:
+Hi Drew,
+
+On Tue, Jan 21, 2025 at 04:46:24PM +0100, Andrew Jones wrote:
+> On Mon, Jan 20, 2025 at 04:43:02PM +0000, Alexandru Elisei wrote:
+> > Tests for the arm and arm64 architectures can also be run with kvmtool, and
+> > work is under way to have it supported by the run_tests.sh test runner. Not
+> > suprisingly, kvmtool has a different syntax than qemu when configuring and
+> > running a virtual machine.
 > > 
-> > On 2/11/25 2:58 AM, Alexander Gordeev wrote:
-> > > On Thu, Feb 06, 2025 at 09:12:27AM -0500, Rorie Reyes wrote:
-> > > 
-> > > Hi Rorie,
-> > > 
-> > > > On 2/6/25 2:40 AM, Alexander Gordeev wrote:
-> > > > > On Wed, Feb 05, 2025 at 12:47:55PM -0500, Anthony Krowiak wrote:
-> > > > > > > > How this patch is synchronized with the mentioned QEMU series?
-> > > > > > > > What is the series status, especially with the comment from Cédric
-> > > > > > > > Le Goater [1]?
-> > > > > > > > 
-> > > > > > > > 1. https://lore.kernel.org/all/20250107184354.91079-1-rreyes@linux.ibm.com/T/#mb0d37909c5f69bdff96289094ac0bad0922a7cce
-> > > ...
-> > > > > > I don't think that is what Alex was asking. I believe he
-> > > > > > is asking how the
-> > > > > > QEMU and kernel patch series are going to be synchronized.
-> > > > > > Given the kernel series changes a value in vfio.h which
-> > > > > > is used by QEMU, the
-> > > > > > two series need to be coordinated since the vfio.h file
-> > > > > > used by QEMU can not be updated until the kernel code is
-> > > > > > available. So these
-> > > > > > two sets of code have
-> > > > > > to be merged upstream during a merge window. which is
-> > > > > > different for the
-> > > > > > kernel and QEMU. At least I think that is what Alex is asking.
-> > > > > Correct.
-> > > > > Thanks for the clarification, Anthony!
-> > > > Tony, thank you for the back up!
-> > > > 
-> > > > Alexander, is there anything else you need from my end for
-> > > > clarification?
-> > > The original question still stays - is it safe to pull this patch now,
-> > > before the corresponding QEMU change is integrated?
+> > Add a new unittest parameter, 'qemu_params', with the goal to add a similar
+> > parameter for each virtual machine manager that run_tests.sh supports.
+> > 
+> > 'qemu_params' and 'extra_params' are interchangeable, but it is expected
+> > that going forward new tests will use 'qemu_params'. A test should have
+> > only one of the two parameters.
+> > 
+> > While we're at it, rename the variable opts to qemu_opts to match the new
+> > unit configuration name, and to make it easier to distinguish from the
+> > kvmtool parameters when they'll be added.
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  docs/unittests.txt   | 17 +++++++++-----
+> >  scripts/common.bash  | 53 ++++++++++++++++++++++++++------------------
+> >  scripts/runtime.bash | 10 ++++-----
+> >  3 files changed, 47 insertions(+), 33 deletions(-)
+> > 
+> > diff --git a/docs/unittests.txt b/docs/unittests.txt
+> > index dbc2c11e3b59..3e1a9e563016 100644
+> > --- a/docs/unittests.txt
+> > +++ b/docs/unittests.txt
+> > @@ -24,9 +24,9 @@ param = value format.
+> >  
+> >  Available parameters
+> >  ====================
+> > -Note! Some parameters like smp and extra_params modify how a test is run,
+> > -while others like arch and accel restrict the configurations in which the
+> > -test is run.
+> > +Note! Some parameters like smp and qemu_params/extra_params modify how a
+> > +test is run, while others like arch and accel restrict the configurations
+> > +in which the test is run.
+> >  
+> >  file
+> >  ----
+> > @@ -56,13 +56,18 @@ smp = <number>
+> >  Optional, the number of processors created in the machine to run the test.
+> >  Defaults to 1. $MAX_SMP can be used to specify the maximum supported.
+> >  
+> > -extra_params
+> > -------------
+> > +qemu_params
+> > +-----------
+> >  These are extra parameters supplied to the QEMU process. -append '...' can
+> >  be used to pass arguments into the test case argv. Multiple parameters can
+> >  be added, for example:
+> >  
+> > -extra_params = -m 256 -append 'smp=2'
+> > +qemu_params = -m 256 -append 'smp=2'
+> > +
+> > +extra_params
+> > +------------
+> > +Alias for 'qemu_params', supported for compatibility purposes. Use
+> > +'qemu_params' for new tests.
+> >  
+> >  groups
+> >  ------
+> > diff --git a/scripts/common.bash b/scripts/common.bash
+> > index 3aa557c8c03d..a40c28121b6a 100644
+> > --- a/scripts/common.bash
+> > +++ b/scripts/common.bash
+> > @@ -1,5 +1,28 @@
+> >  source config.mak
+> >  
+> > +function parse_opts()
+> > +{
+> > +	local opts="$1"
+> > +	local fd="$2"
+> > +
+> > +	while read -r -u $fd; do
+> > +		#escape backslash newline, but not double backslash
+> > +		if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
+> > +			if (( ${#BASH_REMATCH[1]} % 2 == 1 )); then
+> > +				opts=${opts%\\$'\n'}
+> > +			fi
+> > +		fi
+> > +		if [[ "$REPLY" =~ ^(.*)'"""'[:blank:]*$ ]]; then
+> > +			opts+=${BASH_REMATCH[1]}
+> > +			break
+> > +		else
+> > +			opts+=$REPLY$'\n'
+> > +		fi
+> > +	done
+> > +
+> > +	echo "$opts"
+> > +}
+> > +
+> >  function for_each_unittest()
+> >  {
+> >  	local unittests="$1"
+> > @@ -7,7 +30,7 @@ function for_each_unittest()
+> >  	local testname
+> >  	local smp
+> >  	local kernel
+> > -	local opts
+> > +	local qemu_opts
+> >  	local groups
+> >  	local arch
+> >  	local machine
+> > @@ -22,12 +45,12 @@ function for_each_unittest()
+> >  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+> >  			rematch=${BASH_REMATCH[1]}
+> >  			if [ -n "${testname}" ]; then
+> > -				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
+> > +				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$qemu_opts" "$arch" "$machine" "$check" "$accel" "$timeout"
+> >  			fi
+> >  			testname=$rematch
+> >  			smp=1
+> >  			kernel=""
+> > -			opts=""
+> > +			qemu_opts=""
+> >  			groups=""
+> >  			arch=""
+> >  			machine=""
+> > @@ -38,24 +61,10 @@ function for_each_unittest()
+> >  			kernel=$TEST_DIR/${BASH_REMATCH[1]}
+> >  		elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
+> >  			smp=${BASH_REMATCH[1]}
+> > -		elif [[ $line =~ ^extra_params\ *=\ *'"""'(.*)$ ]]; then
+> > -			opts=${BASH_REMATCH[1]}$'\n'
+> > -			while read -r -u $fd; do
+> > -				#escape backslash newline, but not double backslash
+> > -				if [[ $opts =~ [^\\]*(\\*)$'\n'$ ]]; then
+> > -					if (( ${#BASH_REMATCH[1]} % 2 == 1 )); then
+> > -						opts=${opts%\\$'\n'}
+> > -					fi
+> > -				fi
+> > -				if [[ "$REPLY" =~ ^(.*)'"""'[:blank:]*$ ]]; then
+> > -					opts+=${BASH_REMATCH[1]}
+> > -					break
+> > -				else
+> > -					opts+=$REPLY$'\n'
+> > -				fi
+> > -			done
+> > -		elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
+> > -			opts=${BASH_REMATCH[1]}
+> > +		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *'"""'(.*)$ ]]; then
+> > +			qemu_opts=$(parse_opts ${BASH_REMATCH[2]}$'\n' $fd)
+> > +		elif [[ $line =~ ^(extra_params|qemu_params)\ *=\ *(.*)$ ]]; then
+> > +			qemu_opts=${BASH_REMATCH[2]}
+> >  		elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
+> >  			groups=${BASH_REMATCH[1]}
+> >  		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
+> > @@ -71,7 +80,7 @@ function for_each_unittest()
+> >  		fi
+> >  	done
+> >  	if [ -n "${testname}" ]; then
+> > -		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
+> > +		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$qemu_opts" "$arch" "$machine" "$check" "$accel" "$timeout"
+> >  	fi
+> >  	exec {fd}<&-
+> >  }
+> > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> > index 4b9c7d6b7c39..e5d661684ceb 100644
+> > --- a/scripts/runtime.bash
+> > +++ b/scripts/runtime.bash
+> > @@ -34,7 +34,7 @@ premature_failure()
+> >  get_cmdline()
+> >  {
+> >      local kernel=$1
+> > -    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
+> > +    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $qemu_opts"
+> >  }
+> >  
+> >  skip_nodefault()
+> > @@ -80,7 +80,7 @@ function run()
+> >      local groups="$2"
+> >      local smp="$3"
+> >      local kernel="$4"
+> > -    local opts="$5"
+> > +    local qemu_opts="$5"
+> >      local arch="$6"
+> >      local machine="$7"
+> >      local check="${CHECK:-$8}"
+> > @@ -179,9 +179,9 @@ function run()
+> >          echo $cmdline
+> >      fi
+> >  
+> > -    # extra_params in the config file may contain backticks that need to be
+> > -    # expanded, so use eval to start qemu.  Use "> >(foo)" instead of a pipe to
+> > -    # preserve the exit status.
+> > +    # qemu_params/extra_params in the config file may contain backticks that
+> > +    # need to be expanded, so use eval to start qemu.  Use "> >(foo)" instead of
+> > +    # a pipe to preserve the exit status.
+> >      summary=$(eval "$cmdline" 2> >(RUNTIME_log_stderr $testname) \
+> >                               > >(tee >(RUNTIME_log_stdout $testname $kernel) | extract_summary))
+> >      ret=$?
+> > -- 
+> > 2.47.1
+> >
 > 
-> This patch has to be pulled before the QEMU patches are integrated. The
-> change to the
-> include/uapi/linux/vfio.h file needs to be merged before the QEMU version of
-> that file
-> can be generated for a QEMU build. I have given my r-b for this patch, so I
-> think it is
-> safe to pull it now.
+> Hmm, I'll keep reading the series, but it seems like we should be choosing
+> generic names like 'extra_params' and 'opts' that we plan to use for both
+> QEMU and kvmtool since they both have the concepts of "options" and "extra
+> params".
 
-Ok, applied, thank you!
+I'm afraid I don't follow you. 'qemu_params' was chosen because it uses
+qemu-specific syntax. Same for 'kvmtool_params', introduced later in the
+series. Are you referring to unittests.cfg or to something else?
+
+Thanks,
+Alex
 
