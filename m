@@ -1,142 +1,127 @@
-Return-Path: <kvm+bounces-37931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37932-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4D1A31A45
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 01:15:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 816A1A31A54
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 01:18:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 366613A34DB
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 00:15:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1FBF1885432
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 00:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A474C85;
-	Wed, 12 Feb 2025 00:15:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81F18F77;
+	Wed, 12 Feb 2025 00:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zhBXK1ev"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ke07xwkV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D183C2F
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 00:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A662C4C81
+	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 00:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739319350; cv=none; b=OwUL5W/kW7MRWtPfHaXHP0yUxc5z2JOuEovpBOYDWL42LSpSuZAD0AR/c1Z8RlMfVRtAobtO/OQaAebY9xy0eVhLpH6qEh3puJAVw752hMcMg8X8iulnKEbvlCKKZiWamweINzpjzQ6OGMtR2+GDn9kltObf9ka/C8y4GlUXkAQ=
+	t=1739319530; cv=none; b=o2BrjFQQtkaHsUOoaBH/1dRP/GkHd+uJmckUqRW0EjYaNOyiCp5qKm+5nLhDMZoJ7Pj0Fd3tGeCD5Bpl0edQkDGmTm0zdoN+sF/jGHtJuMNHKon6sTXI/EEh9OZoQ3SUK5QLc1Qh2bo0+YQ54Fuo9Ud8FJusZ5Rk+VwnN71ygms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739319350; c=relaxed/simple;
-	bh=Ke65lJuiw+IUfKsigUZZ+MBS7crW6DPAJmgQd269pYc=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=nfO8ZSb/cpvzGL2iYGORWx9a7m/sTJ5rPK204OTS+Mc5ptfPjcifW5xx6qZlvCPQyykyZclExk9217Q+C3fYK1dPI53if7J03U1eR1Wo0XMTf5yC9iGn8fwzRpwA6MYIf7RN1g1TQp48AfpJM9ytdra9vpO+emSizyU7ylteI/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zhBXK1ev; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1739319530; c=relaxed/simple;
+	bh=+l7K6VjiRFghWsRe072G6fJM+1I5/M+ylowLUEu+/Mk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bY2XWAP4PpT3ZykCTxN+JSXJcufecRK/Zsg8mMi3lcP7BWPGOqS1qKXny2IOauIUD7Cr6zs0IZ9ecn7+bE15m/qTcGZGGAzGUuZqkY7HsehyivCMzfwNGAPqsp7WlFL5QjJHJ4+srgunqMx0qw6u0bv/LAGzb1bKI1dESIbt1FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ke07xwkV; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fa636e5283so6042303a91.0
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 16:15:49 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fa228b4151so9890672a91.1
+        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 16:18:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739319349; x=1739924149; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KszpPMWhiTphxF1n3ceF8GA/2mh4edAfa99QT34yVwg=;
-        b=zhBXK1evGbJq79mAQclpt7j5cnDGmjFyY7Mv/Zcf9Y43LeKqhAUq+hweNeyM8Yl6O2
-         Nl/mIev3x6wD92MWoxEa02y9PcPAoSs4UTLH8R0YQI0meg7H+gvYH4o2nxJstcyedHWe
-         XVJNjmf8vL9zbJIyWZ9Wm0ILdV8GQksy0zu7vbz5usovu9G5t1cHTz5IXw3kCCkcFHtz
-         hDNEBKa8Og6MqBQ8+H34Uidi0MKeq3i6y2BzQwFOYhKhhyjTEONo/LOFmelySUL2kqe2
-         rVFLS053e0NuccJs6ZfMauXLmsOAqGig9qRhp2+c3y8fIW6hYYuZQVuFadJHJyk9s9Xt
-         1i1A==
+        d=google.com; s=20230601; t=1739319528; x=1739924328; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RspAWYFZn5in67IIy6EsuqJTvH+51nccfPJMvXzCAaE=;
+        b=Ke07xwkV44PZvam3yHkhbioYZfWsPFn3sg781v9TjW1FGcU1iKD/nmT5SbhLHQpWMe
+         gYsYbIdPmaGYh19lNsXAkb7qbzErv6TPVlCruMz3fByTkXYPWBPyOYguwaWknpwaBJO2
+         Shi3RdptewsQqUveymXHLGhZqfCSYn6Bd/KluU6CxiYaQ6cA5rIKRW/VmtnIlIuns9sw
+         RODwYesLvtfpI7oGBSIPWN6I00qHUO9UT3N1xD1AMQvgMqEWQjSRBqu45UaEKhEiTAHE
+         db/D0Gqgzf0JWa0wRxvNkzoUwSKPeNQCpqhdxvUemCAR9J90n98z6dieKx8Gw5G2bU7n
+         qWNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739319349; x=1739924149;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KszpPMWhiTphxF1n3ceF8GA/2mh4edAfa99QT34yVwg=;
-        b=bufvONIaclfNWPF/OQ0nrvzryRuWhTB1vQRTEWZBl1SLniEfmcbSLk2ux+XuEV7Nup
-         kvC37Var96vDCEmPeAvpdbHkqJEMVsvHD8oWqaJyaUIKeCJoe7R7W8bZI1d5JhgaIgXY
-         gRbQdXfpw484/SswYSVqQ/4cbYMxSMjxcyYayrv6ZklXf2Cmgu1c8TG/xhK2nvVUXf4b
-         ZhQsB3WezcgcwYK4uD1vEKlylqdnqq5Lolgls25+tHnpdV6lgJN3Rs4miTrqGYbwNBEC
-         z2Jgye8YP+D42UH7/G0ArkURE0kQ/y0Mg3sLpXnYE5B/TaR1FrO1SYOT/4vaOBMRHE/P
-         D4Hw==
-X-Gm-Message-State: AOJu0Yy0xC7sJvUIow9cfzfNQJzuOKtlpcGrD6FwcYWpSixKeMQi9M+s
-	+/vr2ePhk1vrtT3bDZs/UFiPw5wrrXz52CVkiY1lYpWkJ9lbFvYCwzGfxP8FXsnX1xyjimKzipe
-	pbEfAYkxngg0u1ZWYBPb9DQ==
-X-Google-Smtp-Source: AGHT+IF4sKMX+KgxjFI4PsB328sWkz/ZZMywxzy98yOo2qwvaqGJzCDlFLnSzmt/3FCDRYVqBqf7nAmLzbgghsG8Ug==
-X-Received: from pji8.prod.google.com ([2002:a17:90b:3fc8:b0:2fa:1fac:269c])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90a:e185:b0:2ee:8430:b831 with SMTP id 98e67ed59e1d1-2fbf5bc0249mr1883029a91.2.1739319348587;
- Tue, 11 Feb 2025 16:15:48 -0800 (PST)
-Date: Wed, 12 Feb 2025 00:15:47 +0000
-In-Reply-To: <20250211121128.703390-6-tabba@google.com> (message from Fuad
- Tabba on Tue, 11 Feb 2025 12:11:21 +0000)
+        d=1e100.net; s=20230601; t=1739319528; x=1739924328;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RspAWYFZn5in67IIy6EsuqJTvH+51nccfPJMvXzCAaE=;
+        b=bm5JhEpFRtTcoPCHXMKphA1wU7CCAhEFJo8nRvExBAA8DuOK1WhUTPdzkK4wxU8kZU
+         BVUhZmeNjIztsmNT0GPqgYEuQk95drNK/W0JFqREsRekzWWC+lT/CtxS9BYXnNpenRqn
+         ODFe9T+XK5oHfgpCH7AvvEDWlV9P4QUyePrXWIgfeJmWfjHjK9AVMnhezpWjKndIzQku
+         3IQaaCm8KyUINMlJOlVI4BqvM9+9sJlrEM5YHk+v3UH+Bd0t2Zf0E3LUw5UVDwknItsB
+         FThEA3UwmO4RX87ajvgdHA9DqWWrbKtUh2WEEbvDC6cYhzZMGFcjeUaohVVhxgyipPYM
+         i1oQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXX6WrW49T90RQba5fhGx3oU4LWYC3IxtZWVjGZjLXF8mmdkH2Qb56iZkyXbEcqi3XVA78=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiaJSB//zuDoj4xLElS0Dty9PeLoVBjAf9X+m9tiDTBYWGJ/Y/
+	AWIOufn+QxKKoW7Ui6ib92WSJJcblXiI/0eb04drusDUKQW161aeqO9v8/b9aOR4aCorrGPLbgQ
+	Xng==
+X-Google-Smtp-Source: AGHT+IFCpz8EmxfNDAUtYTwudSatr8YDUMXPlv0oG/GzrXJKHlIs6dxLBKKmdyZ0PoX7BbqJ9KgmsB0bAb0=
+X-Received: from pfbfa13.prod.google.com ([2002:a05:6a00:2d0d:b0:730:98b0:1c58])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:348c:b0:728:9d19:d2ea
+ with SMTP id d2e1a72fcca58-7322c39d1c2mr1889633b3a.13.1739319527971; Tue, 11
+ Feb 2025 16:18:47 -0800 (PST)
+Date: Tue, 11 Feb 2025 16:18:46 -0800
+In-Reply-To: <20250211025442.3071607-7-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <diqzh65081cc.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v3 05/11] KVM: guest_memfd: Handle in-place shared memory
- as guest_memfd backed memory
-From: Ackerley Tng <ackerleytng@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+References: <20250211025442.3071607-1-binbin.wu@linux.intel.com> <20250211025442.3071607-7-binbin.wu@linux.intel.com>
+Message-ID: <Z6vo5sRyXTbtYSev@google.com>
+Subject: Re: [PATCH v2 6/8] KVM: TDX: Handle TDG.VP.VMCALL<ReportFatalError>
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, 
+	kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com, 
+	xiaoyao.li@intel.com, tony.lindgren@intel.com, isaku.yamahata@intel.com, 
+	yan.y.zhao@intel.com, chao.gao@intel.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Fuad Tabba <tabba@google.com> writes:
+On Tue, Feb 11, 2025, Binbin Wu wrote:
+> +static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> +	u64 reg_mask = tdx->vp_enter_args.rcx;
+> +	u64 *opt_regs;
+> +
+> +	/*
+> +	 * Skip sanity checks and let userspace decide what to do if sanity
+> +	 * checks fail.
+> +	 */
+> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> +	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_TDX_FATAL;
+> +	/* Error codes. */
+> +	vcpu->run->system_event.data[0] = tdx->vp_enter_args.r12;
+> +	/* GPA of additional information page. */
+> +	vcpu->run->system_event.data[1] = tdx->vp_enter_args.r13;
+> +	/* Information passed via registers (up to 64 bytes). */
+> +	opt_regs = &vcpu->run->system_event.data[2];
+> +
+> +#define COPY_REG(REG, MASK)						\
+> +	do {								\
+> +		if (reg_mask & MASK) {					\
 
-> For VMs that allow sharing guest_memfd backed memory in-place,
-> handle that memory the same as "private" guest_memfd memory. This
-> means that faulting that memory in the host or in the guest will
-> go through the guest_memfd subsystem.
->
-> Note that the word "private" in the name of the function
-> kvm_mem_is_private() doesn't necessarily indicate that the memory
-> isn't shared, but is due to the history and evolution of
-> guest_memfd and the various names it has received. In effect,
-> this function is used to multiplex between the path of a normal
-> page fault and the path of a guest_memfd backed page fault.
->
+Based on past experience with conditionally filling kvm_run fields, I think KVM
+should copy all registers and let userspace sort out the reg_mask.  Unless the
+guest passes an ASCII byte stream exactly as the GHCI suggests, the information
+is quite useless because userspace doesn't have reg_mask and so can't know what's
+in data[4], data[5], etc...  And I won't be the least bit surprised if guests
+deviate from the GHCI.
 
-Thanks for this summary! It has always been confusing and this really
-helps.
+> +			*opt_regs = tdx->vp_enter_args.REG;		\
+> +			opt_regs++;					\
+> +		}							\
+> +	} while (0)
+> +
+> +	/* The order is defined in GHCI. */
 
-Is there any chance we could rename the functions in KVM, or maybe add a
-comment at the function definitions? The name of the userspace flag will
-have to remain, of course.
-
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  include/linux/kvm_host.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 438aa3df3175..39fd6e35c723 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2521,7 +2521,8 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->  #else
->  static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
->  {
-> -	return false;
-> +	return kvm_arch_gmem_supports_shared_mem(kvm) &&
-> +	       kvm_slot_can_be_private(gfn_to_memslot(kvm, gfn));
->  }
->  #endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+Assuming I haven't missed something, to hell with the GCHI, just dump *all*
+registers, sorted by their index (ascending).  Including RAX (TDCALL), RBP, and
+RSP.
 
