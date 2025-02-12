@@ -1,178 +1,338 @@
-Return-Path: <kvm+bounces-37956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37957-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FE55A32152
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 09:38:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C67A321F5
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 10:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78F8E1885CA7
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 08:38:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9705F7A1F2F
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 09:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315AD20551F;
-	Wed, 12 Feb 2025 08:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05781205E2B;
+	Wed, 12 Feb 2025 09:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JcUDEjSL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K2p23CMf"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2088.outbound.protection.outlook.com [40.107.243.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9CC204C00
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 08:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.88
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739349485; cv=fail; b=WaGGvyWJYzMLOG7W55HZYJpBpixdlNm/QygEKgRauDniMNlQCdq80PJ9SQe35UJ2FeHDteimDcqjvjO+SK3LaRR6RjBH6Bf1FZWVtSV/7IlOwafqsR49qTx1IxfEM7igVF7LLnnsov9ui1ndyQPzLcINKrPSM5dGR0OOxM/ZNVM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739349485; c=relaxed/simple;
-	bh=JvPyiUe0v+7Cv4/1AnJzWFtcptj5oJwW9beBeIj2D+Q=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QcyQ+2WETBKuM/8Ygu/+UKsqUTyArBCXo3bEgnOK7H9bkmrNacfhwBfrAK6iuN9Neaw6BqtF1anq0VrCzw5+cc6pnvM/oAVBCgEor7D863a42xU+02+URqsYnDLDzuu94RnXrzJc2SE0Rs1NOVTzf20qiU6UxVlxUpIRqZSQwE0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JcUDEjSL; arc=fail smtp.client-ip=40.107.243.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dUQm2NnBqk58lVHTKNlr0U0gzA0V1bSz3BX5U/SJulECDqpKyyjU9KmVn+2xoeVAHntANL62eAJR6Un1M4WLTNtvjIF1NYE3rHb3jkZe+nX9YW1UKOFAnp8YbEb9TfwYXA3xq5JvaMvFaiz1wmj2ebdZq0Mpa5YiD3sjqsTakKtbFwCPgDcwvQ1IsL9Is0zYEHsH2tMJDpAwak15iiEPL8CH/lhHFV1djg1pTtOKmmyf7x87YlEQp6i/yAlKadAnDLGKmrtvBaryvveNHsvfAmuQ053rwlLEOFrjoiLRpD2YvDupIYBNyPDGA2IVcgoH0zupO8QbxCLYKLSbnL6msA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RzrR41bt0e+CpYVLFB+wg8RGgmVND7M1BZFNmo8cKts=;
- b=NkGMYtrAKx5X5d6seacc0W2nOYhpHQRF/iBS81wy1ICL6PdiStxbaZlaxYKiDCJ70FuVQ9KUM7Md7vIn4Cxd/iQVcv7QDhL3waQEdpCTQKjAUuvX+A7+kJeQYDsctlqFGWpqkp6BOgt7EFn77fsW2hglB6GG8zrzAPoEZewENIv4hhSq5rvI5GVdlNpmlmi+t31xd9+o3PZq00N8om+wwL7TL0lQhbZL+jGHrcpABI4qZDLpZGRiULkH+nhTrL6le4uJYFRGa1jRVHtHoVHI4l4+0O+fl4q5uPCwjfKlT2uJ66FBL9WwiBhTRJEWTDiP1bR76rVf6H1Iqevbvb/uaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RzrR41bt0e+CpYVLFB+wg8RGgmVND7M1BZFNmo8cKts=;
- b=JcUDEjSLmzwho2r+gPS7bs+Tk71jX8SR0Xotvvvl+AGNdV6BpwQiLPINbiRBgGdInGMiN5kw1OAsiSjpvnXTxaPrV0SLMAwVKUAk46FSjzgqjW361KY2F2bosJ4l7Aw3D8nHMAJbeViJre/qrWHIroEjVw+67xktlWVs8HIRuBI=
-Received: from MW4PR04CA0098.namprd04.prod.outlook.com (2603:10b6:303:83::13)
- by DS7PR12MB5741.namprd12.prod.outlook.com (2603:10b6:8:70::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8422.18; Wed, 12 Feb 2025 08:37:59 +0000
-Received: from CO1PEPF000075EF.namprd03.prod.outlook.com
- (2603:10b6:303:83:cafe::f) by MW4PR04CA0098.outlook.office365.com
- (2603:10b6:303:83::13) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8445.12 via Frontend Transport; Wed,
- 12 Feb 2025 08:37:59 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000075EF.mail.protection.outlook.com (10.167.249.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8445.10 via Frontend Transport; Wed, 12 Feb 2025 08:37:59 +0000
-Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 12 Feb
- 2025 02:37:55 -0600
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: Sean Christopherson <seanjc@google.com>, Tom Lendacky
-	<thomas.lendacky@amd.com>
-CC: <pbonzini@redhat.com>, <kvm@vger.kernel.org>, <santosh.shukla@amd.com>,
-	<bp@alien8.de>, <ketanch@iitk.ac.in>, <isaku.yamahata@intel.com>
-Subject: Re: [PATCH v2 3/4] KVM: SVM: Prevent writes to TSC MSR when Secure
- TSC is enabled
-In-Reply-To: <Z6vRHK72H66v7TRq@google.com>
-References: <20250210092230.151034-1-nikunj@amd.com>
- <20250210092230.151034-4-nikunj@amd.com>
- <8ec1bef9-829d-4370-47f6-c94e794cc5d5@amd.com>
- <Z6vRHK72H66v7TRq@google.com>
-Date: Wed, 12 Feb 2025 08:37:53 +0000
-Message-ID: <858qqbtv6m.fsf@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601F2204C03
+	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 09:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739352127; cv=none; b=XbWtDK419U3tyh0WTwlj+cRR2z2OP3H0LiuqwvR9BS2RvpBz5/OUNGnIdVJvUXizEDXq9CMsODZHhvE6og+3Q9cftsOcU65txJxBDdNxhI9j54amB+7nSSTvMKj1dZWw65j+wsh1fobvWlDoG3errOXUqMR0SYDw1TJWBL+Za8I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739352127; c=relaxed/simple;
+	bh=+PjDjQJHqTJaKq8gcJWoVss+6j4pPeODuopvXSr4CZ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=phLgWYklGFd6AJfbcea14vLtG0WmDwJxsprKC/Fo9mLjp3aq6kh3zu3wRuJqR4F5Gpg1HC7Woi2+z8f1lT4bK5adDtNsagy0Wi3DpDgEUh6PsXYvCbVv5PG4CbctkdF2LT/MgVQQMQqQFD2Sqmr5Yv1FMKt/sxauTqOJfr+8MBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K2p23CMf; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4718aea0718so251981cf.0
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 01:22:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739352124; x=1739956924; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dKYEyxBuKcUxq/NwCgSZb1M5YkMm6GBK5DoOiz1mWzs=;
+        b=K2p23CMfB3loht8nGj1I4/lWeIx3Bp6BpNxZj+nnv5BF0nQ+vfWGi0qiDxsVZU5YsA
+         DogW6VOgdrgKlsragJSVJg2T8sOVv9cVcpwyYxIOMxFDK/pczR0wG1Ch8E+2PG6fF1IK
+         QFoys5YeRQrYxqwMUL+aY6vX8JQOka+q3eCdHYxl9Fo3MsMc8ACTX/tzKSFk3bSLmEut
+         7ArE6LTtciMZOxN5XZWMgFJ8ET1grOTwh3W/WcjV9e0cY+Mmdea04yH15kqHN3oJXdg6
+         oyfIDfQ/P6Ctfu7wjaWMQtPxPCBr7JY4+tbHj3Y+DqgQL0VPm+Rf/giQp6ou4ZLB7PUl
+         JDRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739352124; x=1739956924;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dKYEyxBuKcUxq/NwCgSZb1M5YkMm6GBK5DoOiz1mWzs=;
+        b=LQlVr2WiTU7VnM7Gj/K+trijzPYVknHgUileQQolDjam8OjiDXOrGlD1CCspNvsRHV
+         y0DuUaxXXgLzLoUKdvAD5Nf7eXaMoN+yBMq0VtTA5cxdHeJHph78poWB5u0bddTiI/yn
+         1T5rpbur2jLhMCarLdy1VD4nFGTD827ywb09+AdrmqROSQEf3qacMTKcL33yzdBFI7LN
+         T4ViTB8zttsaw+UnTfe2/h0UfB1WjHLe/Z0EXuEv4smiHjEwdZeO50ubXMN0FtQhi7Sj
+         lywwGnuFxMrQ+/VCL7oR9soQwKlbfOQ+w3Pcyfw5xZPSFrKf34c25lyk2GGYMNYNCZv8
+         +O6A==
+X-Gm-Message-State: AOJu0YwKHQWhS0aXutO2qUtWzv6RuE2zHYW7ASWAO8SimibUJ8K5OAfR
+	I83ER9oZCKqLmSgLcrstUQqOI0EiHUgX3Ufi92TCwEzU6LKAN5lW/WYaOZSNre6EbD67MPS6rIw
+	9k8SmNvgrMGZfnGkrU2+ZNipslb/jedAso7Mk
+X-Gm-Gg: ASbGnctDyYNk5ozPBRLtMsoj5l7Yddn2j9zUne/dAFzrG1UkwlLoEIHWylItvU2Tu8X
+	2SXRaHLQB482JCTrNaY3Mrs8v3t35pgm7xe9y4tcdljswH/cQnwCowu99fGEsAUJxandIF4WAQq
+	MnHTDyoOrOIM38p7dbcBzD/nUIwA==
+X-Google-Smtp-Source: AGHT+IGSFFm16+c+j2RVCupUZzDXJ7KybX7ZtoH3oU2TdEZ+Vv4L4tzWJV3CaxlZx/ZvjoHgFKOm3DHyO3nyJv/aqkQ=
+X-Received: by 2002:a05:622a:5192:b0:466:8f39:fc93 with SMTP id
+ d75a77b69052e-471b1c0136emr2039141cf.3.1739352123901; Wed, 12 Feb 2025
+ 01:22:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075EF:EE_|DS7PR12MB5741:EE_
-X-MS-Office365-Filtering-Correlation-Id: d91d3206-2dd3-4358-6159-08dd4b408e53
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8vh1i1AiEqBE/B5d761z0UG+4gQQlDKa2NKjU0bWWFKXiHqcEaybxKYyE7d6?=
- =?us-ascii?Q?MaRfqxN+9aUx8CrbsMSPQODxQqQxyC55dEAdCW7yVfPgLS5MaRiHoxQFAcGQ?=
- =?us-ascii?Q?WkphNGIFxxx9ggaLNTpENbk0LhLCuuAecUOmNbgYdNu4f3zuRjM1TSmUPTR5?=
- =?us-ascii?Q?6cvw/+LKb7iUKxykbwymGpt6Kr4Kxr5C9HpKxb5GCac8RjLhBdaByfeYADeH?=
- =?us-ascii?Q?PczaHWG+MdcQJ3TsdO6RW8k+amrrkmC01Lzc93MdGDDn3SKfDXDSjnzwoKCQ?=
- =?us-ascii?Q?fgVPTMgV6vUvg47zuG77W7ems+GUrFaAWDu6g1NOo4Mt/MCtUsPgUzChFVqs?=
- =?us-ascii?Q?0pZEh6RbDTJ5gZn7ijhxKJ7e+z9yKkviPikpNu4vRClOoxX+HfN6pMamZqAi?=
- =?us-ascii?Q?Xr2OYbBxmQj+ZzT+8cI3rNtvOajpn7W+JCEMVs03roWR10WSkE3ftjyq8t/h?=
- =?us-ascii?Q?wQmz2vuyDc7Vmzf67p5k13mp1HmQraiGH3AsIEhTDZHs6QJSpcdo6HfrSvx7?=
- =?us-ascii?Q?/okhJoqhzn4EtvhWQuOZZ+N568zv1Ca3UMDe8q0Pur8LNPAialx5PfUJL7w1?=
- =?us-ascii?Q?Dz+PVQwRxXTNrzunbZKkxGR52CyW70uIIImJUM1ln/EBNk85yryupkhutnwF?=
- =?us-ascii?Q?RCR8ZZ9oaenefubzJObnrS0fxtvvTeANAuoaP5swqxc3XogTXIgiaSaDIkb4?=
- =?us-ascii?Q?7GNqKarak+tKmgTCa0aknb5IM6lPVDXvMkHR+FwC3V1HgaQwq+O9Yhdc84Bt?=
- =?us-ascii?Q?sK8VhlmLM7WELm8mggDN3LZja6MMqsdW8cVpsYioE08B1Kz/RONLh4uKHPxe?=
- =?us-ascii?Q?tFlMkj9qpmln5B/rL/DvO/5qeP+P82IyN7RJbMqpWB29TQkiHjAIw6ygZm0n?=
- =?us-ascii?Q?YJiHA8G1lGjBsg+1H+7a+ah5zzK7hl9vkbS4puKhV5DWl8YK1tP0m6wEIfr/?=
- =?us-ascii?Q?ggy+/TtOAqGvHxuQJyiOgqnhc+ZxhbhOrNPCDML2WGKOu8iSMbgXyIreoPNt?=
- =?us-ascii?Q?QhntQ6fU0Q7N3p6+XyJGtdp/ZiknVk2jwCcKgpPeZIy/xWwkrhyvAEtK4WiY?=
- =?us-ascii?Q?2ecR+H20fT+ht20HBmEte5a3B8FtcrBvX3/FGBngHLPK3gPkmqMfCtN1gSCn?=
- =?us-ascii?Q?iN8O/JDpGkcbMFudfmmZX4FVIpfAYBeasyD24DNpTrtdjZopTqlAMWZZCY5F?=
- =?us-ascii?Q?dDo8wSxi15+BQrl8PO/y7YfM+bI14aaD9k8qeATrg6sXsMFx5MLuSh8YvANl?=
- =?us-ascii?Q?1F2830+Cb7ihno0PkQHmdzVwV3bNh3lEsqLO36lsQeEMzeJHo4GV2u48em8T?=
- =?us-ascii?Q?X8stuIuPUUhklk14oHLsQv1rCugLELCApp3M96r7yztT+cyR5EwXa7p3HT0S?=
- =?us-ascii?Q?IWJWvigMa4CggfYGIl3KVrqDiTIzzRO8jYxZUlJ8LbZZQpmoZxMHeAsSMDkG?=
- =?us-ascii?Q?s56Q0xyNQz8nUyheOnaYxPTd1D6IrN1Pd77h8rQMDfdxTucMQqiS3JT83cVA?=
- =?us-ascii?Q?oC0rx4fL9fMYOiI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 08:37:59.2266
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d91d3206-2dd3-4358-6159-08dd4b408e53
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075EF.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5741
+References: <20250211121128.703390-4-tabba@google.com> <diqzed0392dz.fsf@ackerleytng-ctop.c.googlers.com>
+In-Reply-To: <diqzed0392dz.fsf@ackerleytng-ctop.c.googlers.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 12 Feb 2025 09:21:27 +0000
+X-Gm-Features: AWEUYZmPf_xLnwm4A9iaW62B0o_6QVplSidwJVSQ9a3e8sP5ZkCQV2ZPhlG2MAg
+Message-ID: <CA+EHjTyN66o_UJjimzEbcx6Q+QAH0SVDOfr+vZDvaHHYFKpErg@mail.gmail.com>
+Subject: Re: [PATCH v3 03/11] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Sean Christopherson <seanjc@google.com> writes:
+Hi Ackerley,
 
-> On Mon, Feb 10, 2025, Tom Lendacky wrote:
->> On 2/10/25 03:22, Nikunj A Dadhania wrote:
->> > Disallow writes to MSR_IA32_TSC for Secure TSC enabled SNP guests, as such
->> > writes are not expected. Log the error and return #GP to the guest.
->> 
->> Re-word this to make it a bit clearer about why this is needed. It is
->> expected that the guest won't write to MSR_IA32_TSC or, if it does, it
->> will ignore any writes to it and not exit to the HV. So this is catching
->> the case where that behavior is not occurring.
+On Wed, 12 Feb 2025 at 05:07, Ackerley Tng <ackerleytng@google.com> wrote:
 >
-> Unless it's architectural impossible for KVM to modify MSR_IA32_TSC, I don't see
-> any reason for KVM to care.  If the guest wants to modify TSC, that's the guest's
-> prerogative.
+> Fuad Tabba <tabba@google.com> writes:
 >
-> If KVM _can't_ honor the write, then that's something else entirely, and the
-> changelog should pretty much write itself.
+> > Add support for mmap() and fault() for guest_memfd backed memory
+> > in the host for VMs that support in-place conversion between
+> > shared and private (shared memory). To that end, this patch adds
+> > the ability to check whether the VM type has that support, and
+> > only allows mapping its memory if that's the case.
+> >
+> > Additionally, this behavior is gated with a new configuration
+> > option, CONFIG_KVM_GMEM_SHARED_MEM.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> >
+> > ---
+> >
+> > This patch series will allow shared memory support for software
+> > VMs in x86. It will also introduce a similar VM type for arm64
+> > and allow shared memory support for that. In the future, pKVM
+> > will also support shared memory.
+>
+> Thanks, I agree that introducing mmap this way could help in having it
+> merged earlier, independently of conversion support, to support testing.
+>
+> I'll adopt this patch in the next revision of 1G page support for
+> guest_memfd.
+>
+> > ---
+> >  include/linux/kvm_host.h | 11 +++++
+> >  virt/kvm/Kconfig         |  4 ++
+> >  virt/kvm/guest_memfd.c   | 93 ++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 108 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 8b5f28f6efff..438aa3df3175 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -728,6 +728,17 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+> >  }
+> >  #endif
+> >
+> > +/*
+> > + * Arch code must define kvm_arch_gmem_supports_shared_mem if support for
+> > + * private memory is enabled and it supports in-place shared/private conversion.
+> > + */
+> > +#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KVM_PRIVATE_MEM)
+> > +static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
+> > +{
+> > +     return false;
+> > +}
+> > +#endif
+>
+> Perhaps this could be declared in the #ifdef CONFIG_KVM_PRIVATE_MEM
+> block?
+>
+> Could this be defined as a __weak symbol for architectures to override?
+> Or perhaps that can be done once guest_memfd gets refactored separately
+> since now the entire guest_memfd.c isn't even compiled if
+> CONFIG_KVM_PRIVATE_MEM is not set.
 
-How about the below changelog:
+I don't have a strong opinion about this. I did it this way because
+that's what the existing code for kvm_arch_has_private_mem() is like.
+It seemed logical to follow that pattern.
 
-    KVM: SVM: Prevent writes to TSC MSR when Secure TSC is enabled
+> > +
+> >  #ifndef kvm_arch_has_readonly_mem
+> >  static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
+> >  {
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 54e959e7d68f..4e759e8020c5 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -124,3 +124,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+> >  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+> >         bool
+> >         depends on KVM_PRIVATE_MEM
+> > +
+> > +config KVM_GMEM_SHARED_MEM
+> > +       select KVM_PRIVATE_MEM
+> > +       bool
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index c6f6792bec2a..85467a3ef8ea 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -317,9 +317,102 @@ void kvm_gmem_handle_folio_put(struct folio *folio)
+> >  {
+> >       WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+> >  }
+> > +
+> > +static bool kvm_gmem_offset_is_shared(struct file *file, pgoff_t index)
+> > +{
+> > +     struct kvm_gmem *gmem = file->private_data;
+> > +
+> > +     /* For now, VMs that support shared memory share all their memory. */
+> > +     return kvm_arch_gmem_supports_shared_mem(gmem->kvm);
+> > +}
+> > +
+> > +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
+> > +{
+> > +     struct inode *inode = file_inode(vmf->vma->vm_file);
+> > +     struct folio *folio;
+> > +     vm_fault_t ret = VM_FAULT_LOCKED;
+> > +
+> > +     filemap_invalidate_lock_shared(inode->i_mapping);
+> > +
+> > +     folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+> > +     if (IS_ERR(folio)) {
+> > +             ret = VM_FAULT_SIGBUS;
+>
+> Will it always be a SIGBUS if there is some error getting a folio?
 
-    Secure TSC enabled SNP guests should not write to the TSC MSR. Any such
-    writes should be identified and ignored by the guest kernel in the #VC
-    handler. As a safety measure, detect and disallow writes to MSR_IA32_TSC by
-    Secure TSC enabled guests, as these writes are not expected to reach the
-    hypervisor. Log the error and return #GP to the guest.
+I could try to expand it, and map more of the VM_FAULT_* to the
+potential return values from __filemap_get_folio(), i.e.,
 
-    Additionally, incorporate a check for protected guest state to allow the
-    VMM to initialize the TSC MSR.
+-EAGAIN -> VM_FAULT_RETRY
+-ENOMEM -> VM_FAULT_OOM
 
-Regards,
-Nikunj
+but some don't really map 1:1 if you read the description. For example
+is it correct to map
+-ENOENT -> VM_FAULT_NOPAGE /* fault installed the pte, not return page */
+
+That said, it might be useful to map at least EAGAIN and ENOMEM.
+
+> > +             goto out_filemap;
+> > +     }
+> > +
+> > +     if (folio_test_hwpoison(folio)) {
+> > +             ret = VM_FAULT_HWPOISON;
+> > +             goto out_folio;
+> > +     }
+> > +
+> > +     /* Must be called with folio lock held, i.e., after kvm_gmem_get_folio() */
+> > +     if (!kvm_gmem_offset_is_shared(vmf->vma->vm_file, vmf->pgoff)) {
+> > +             ret = VM_FAULT_SIGBUS;
+> > +             goto out_folio;
+> > +     }
+> > +
+> > +     /*
+> > +      * Only private folios are marked as "guestmem" so far, and we never
+> > +      * expect private folios at this point.
+> > +      */
+>
+> Proposal - rephrase this comment as: before typed folios can be mapped,
+> PGTY_guestmem is only tagged on folios so that guest_memfd will receive
+> the kvm_gmem_handle_folio_put() callback. The tag is definitely not
+> expected when a folio is about to be faulted in.
+>
+> I propose the above because I think technically when mappability is NONE
+> the folio isn't private? Not sure if others see this differently.
+
+A folio whose mappability is NONE is private as far as the host is
+concerned. That said, I can rephrase this for clarity.
+
+
+> > +     if (WARN_ON_ONCE(folio_test_guestmem(folio)))  {
+> > +             ret = VM_FAULT_SIGBUS;
+> > +             goto out_folio;
+> > +     }
+> > +
+> > +     /* No support for huge pages. */
+> > +     if (WARN_ON_ONCE(folio_test_large(folio))) {
+> > +             ret = VM_FAULT_SIGBUS;
+> > +             goto out_folio;
+> > +     }
+> > +
+> > +     if (!folio_test_uptodate(folio)) {
+> > +             clear_highpage(folio_page(folio, 0));
+> > +             kvm_gmem_mark_prepared(folio);
+> > +     }
+> > +
+> > +     vmf->page = folio_file_page(folio, vmf->pgoff);
+> > +
+> > +out_folio:
+> > +     if (ret != VM_FAULT_LOCKED) {
+> > +             folio_unlock(folio);
+> > +             folio_put(folio);
+> > +     }
+> > +
+> > +out_filemap:
+> > +     filemap_invalidate_unlock_shared(inode->i_mapping);
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +static const struct vm_operations_struct kvm_gmem_vm_ops = {
+> > +     .fault = kvm_gmem_fault,
+> > +};
+> > +
+> > +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+> > +{
+> > +     struct kvm_gmem *gmem = file->private_data;
+> > +
+> > +     if (!kvm_arch_gmem_supports_shared_mem(gmem->kvm))
+> > +             return -ENODEV;
+> > +
+> > +     if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
+> > +         (VM_SHARED | VM_MAYSHARE)) {
+> > +             return -EINVAL;
+> > +     }
+> > +
+> > +     file_accessed(file);
+> > +     vm_flags_set(vma, VM_DONTDUMP);
+> > +     vma->vm_ops = &kvm_gmem_vm_ops;
+> > +
+> > +     return 0;
+> > +}
+> > +#else
+> > +#define kvm_gmem_mmap NULL
+> >  #endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+> >
+> >  static struct file_operations kvm_gmem_fops = {
+> > +     .mmap           = kvm_gmem_mmap,
+>
+> I think it's better to surround this with #ifdef
+> CONFIG_KVM_GMEM_SHARED_MEM so that when more code gets inserted between
+> the struct declaration and the definition of kvm_gmem_mmap() it is more
+> obvious that .mmap is only overridden when CONFIG_KVM_GMEM_SHARED_MEM is
+> set.
+
+This is a question of style, but I prefer this because it avoids
+having more ifdefs. I think that I've seen this pattern elsewhere in
+the kernel. That said, if others disagree, I'm happy to change this.
+
+Thank you,
+/fuad
+>
+> >       .open           = generic_file_open,
+> >       .release        = kvm_gmem_release,
+> >       .fallocate      = kvm_gmem_fallocate,
 
