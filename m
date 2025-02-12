@@ -1,141 +1,243 @@
-Return-Path: <kvm+bounces-37985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F1CA32F03
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 19:57:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAD8EA32F78
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 20:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16D071888BD9
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 18:57:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6996E7A399B
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 19:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C40826136C;
-	Wed, 12 Feb 2025 18:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB2826281C;
+	Wed, 12 Feb 2025 19:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v2fJVk6w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2MkxcnLA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0A625EFA6
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 18:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F6125E47B
+	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 19:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739386614; cv=none; b=hp+3q70S+WxCxxUsx/8hVWuM50Aq1rR6bCtobC1SzHjcUF0EHk3PcvrxJAOA4gc9nF7bwdz13pYa0y6Li+8KhXFy0Ao+w1KdQE2YlMP39jicoMPtTQjN14zUR8kJ74u/WWutrAQeONWbc1txBmlFbwEY4mF1MSU84guys63w8k0=
+	t=1739387946; cv=none; b=Kv182zx3xH9tzjvNL8VMbjgtu3crMa08uLl9VbavQMmfiyoZ+5G1gGpsSKj9PYMHfz+yCexI/mlYCg7F20fHyPDFcFjw2w55NHwHqTFIORvGZ/tpBDMQ6vIl9QIkhNfFjMY3aNjwK0FzHZ2m6YxYYa2+4ohCPtN6xxddQ4f8T58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739386614; c=relaxed/simple;
-	bh=gXAMwaNKe/OFLTTd0ChTLjmEKcH0pYoE4A5hVxE8oiA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Mo3TsYOxtyiGiZG2f7Zm3fLQPJmvay4sS+f4jlrVdF0zaNkc5IYvXjD31MOx47ruHbc8PHyz6zc3mueGFK7af1eQ+WthBl3U0HOxsFFV8n7HPtyOLsWKPJZEC6VC3u83/Rr3Lpd/Od1SfUTJEmEL6uhoVgE3zYfYxJTNqhzh71Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v2fJVk6w; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1739387946; c=relaxed/simple;
+	bh=11Hy8cODuSDFHaJcx2Ju8aoOiOQIkeBngDRvi40dN6A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z/xOM2rTK2rcEEf7rJ55pC08H/v9VmYeleR184npkgHHqR+OvoS/fYeBy5YaSLG/6zGRNAxqNzVhlt6iUGPaMMI0CevbxlmSYz5krkA0OTtkmNhcHjSVnKCOugprxFis4fXvWQB4ZXtv8LODalcZ/LPdVv3DwS8FHQtMkAdOdBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2MkxcnLA; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fbfa786a1aso269956a91.3
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 10:56:52 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21f032484d4so240865ad.0
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 11:19:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739386612; x=1739991412; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XBZPcffr4UmrLT0Oe+KhK2m9rvtxlhltkwaD4SGVEyY=;
-        b=v2fJVk6w2SriRpB7KmyR0AmeVR0wAMskfeT+MfyVwO+lOkLSXYsFY0og6aC9RSTV3s
-         BTRO4PihiUshyZB8n8pESO0u/q8kdPPOamNuhIlauE9zwvdGWXVWVf5Hal+4xHD0DJAg
-         bVtAMa8eQA3FA+2Jpw6U+WLW5xqDc+kEbT7GyQn9Sq2i7FMlf0MULRlPiU+1ghLTRUeE
-         37Ef+a2O5vI1g/eC86pftT5tlbQCS3mh74NxIo0vUSnjYBDVuJp2Hwogtg7lqTtjK9/h
-         dA5zxPIyFlgvxl+gVU4ptuhohBgxxGLMyd3RoJb1YGIPIzSwTWFci8hV2w3fSnCi2nrV
-         XyMQ==
+        d=google.com; s=20230601; t=1739387943; x=1739992743; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TlrqapFW6dtOfJ+Ygfgx6q2yFRXVAGv+WlcsEV5abYE=;
+        b=2MkxcnLAUPXAmn6iVq6G7LjRpB2DVfCpBkoGsv1oQLuv0V10UKsX9AqwEPrAiyMZvk
+         u6WPrTaRh2gGUDrAiINczu56xBOX1k+dldrJx7HOHhUdDBphRcbojmIADe/tw4xLNVUI
+         IExvhTnzh2cebFC3pk+MU+HN2BeJKY2qefsYQG2upMMcCGkjptiqA7FtF1hbkY0F3O/5
+         JGdnEzS8zmkSINyS80JpYbMvjI93gDJxz+8SiexlpcGKoFNZpUWkC5YUFZriSM39/Ddm
+         ABlZ0ykyH6IwgFu1psVd8jR5DadisFg/MD30Ye4nSRSZCs6Y2aPEl3oq2xB6g4Cdoa51
+         TfkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739386612; x=1739991412;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XBZPcffr4UmrLT0Oe+KhK2m9rvtxlhltkwaD4SGVEyY=;
-        b=uLOLj6MgdeGkRhw3OJpVyGpnAfldCmKdJgGnLeb0y1MyHhYwCJoMSjeA2Ym/hSOfFz
-         I28EfdE9TPHajwkUx5Xjq8pMBvxM8xSeMgzHN25y9T4F1dzr0/onCErOCRhcY7dM8s0m
-         CqPLZcH/XUIjkQy/IwxGXJy7S2pA7LuBkam5nZLFtvW9XczdAOxSv0foImjkISJMYjCS
-         275mHHcUZwIMxE3Xyytsi485pOBXVH8d8PEiQvauRJRVqkQcbBRycqJNTcZzJFPCJzNv
-         w1ly1FfE9RsXc5bCzMBJs/IwMk1Ro0mrlsV/tme3gKvv1K7iGfzdnq2SzOXqZ/jIO7ja
-         62kw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHoB47QicqLU3IC2JLTWZyJj6lmv6M+ub6wWkcjAHcFAz+mOsPZuu8tmp6Ezb3hhrMmbw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzlzqo8q6BuJx9GrbexOInSCBqHkfEOgHyqUXMcLhFx+xi0wVSP
-	42X1VMMpGoxyAV8xjAz/6l3VwrpTDyyMFPvY1PIhAyixv7tw8e78vDm+hRw+MSi+5cYTFtQ5VGE
-	NOw==
-X-Google-Smtp-Source: AGHT+IHnI9eCIwY5iLdUaBHbR0QxmyULog1J24FtVK82My0OyHeYlaWf/Ktl3IeQRpNhpz4LwNTd6/yAvkc=
-X-Received: from pfbig13.prod.google.com ([2002:a05:6a00:8b8d:b0:730:96d1:c213])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:a1f:b0:730:91fc:f9c9
- with SMTP id d2e1a72fcca58-7323c1c8055mr239487b3a.16.1739386612053; Wed, 12
- Feb 2025 10:56:52 -0800 (PST)
-Date: Wed, 12 Feb 2025 10:56:50 -0800
-In-Reply-To: <3033f048-6aa8-483a-b2dc-37e8dfb237d5@linux.intel.com>
+        d=1e100.net; s=20230601; t=1739387943; x=1739992743;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TlrqapFW6dtOfJ+Ygfgx6q2yFRXVAGv+WlcsEV5abYE=;
+        b=d6t1YlUE1c2EjAUD88QQg+sPkwrKbNllnpqwzJD33oNyGvuvBGZ1WzKDpiFdVJtzVb
+         ZzmI9u9VFmn1J0tDq1XARI7x+yUMrcfHUD8VqUHLkCLFvpRaxU8RT6DNmgicMkz52l4x
+         dAomAAVWdUGIljH+zQmj6A/YxG7C0tYZY8AXGSf31KzJ/kLIbc4Z2p97jjE4SJ5Lit1/
+         w/d010UzI8GhRuPWiYYSbcHRNs3fjMGN3/NnrcadNqFJuEYWegTDDxZ5wi5Cnd5qjKsG
+         qsf4xggyg372Nz+/1UwSjrdPqa5jr73uxq+m6cRGqIusqIqDERGipH72o21QvcrqkVGO
+         lbSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWqTIt0VIjTI0jJB9wTkYc910atq0O79HSqZzCtz+NBp3jo6Rc1HMqbYik+44pzMzoXQWs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdqcQFFXrthohZMcUCjIiRZKcYmETUE6WJ/KxpEROTj0ROBBOA
+	BF5pFSmSTumzEbGMurgdntiFPqQJ62NPFELzCj2VZUv6je7ONaPi1J3o408O5AA5JnTz4PSk6bk
+	28/PCpjwdMhvmTwtSLrvotf52xB4cHypFTQFM
+X-Gm-Gg: ASbGnct01/IQ83HzoEdX0i0w8bUyTpgPv3iw9k2zCDBGWcVEHpsJvpTHFJPKn1YVis0
+	HLeZWzbyYYhycn76qcU8JyM77YSdMBLVfR2+fkE+c9GAsvH1ij1FsDYdGgf+GXQE7+SrQd29v
+X-Google-Smtp-Source: AGHT+IGNugfx084SHply3CA0xWFW/29cP7ySkyiWEViy+SHvFCJOsIGeBkPN0hXf2z66fZ8oH82mGcxNE9IZpDD7YNc=
+X-Received: by 2002:a17:902:f708:b0:215:7ced:9d66 with SMTP id
+ d9443c01a7336-220d33f6b21mr172265ad.10.1739387942876; Wed, 12 Feb 2025
+ 11:19:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
- <20250211025442.3071607-6-binbin.wu@linux.intel.com> <Z6r0Q/zzjrDaHfXi@yzhao56-desk.sh.intel.com>
- <926a035f-e375-4164-bcd8-736e65a1c0f7@linux.intel.com> <Z6sReszzi8jL97TP@intel.com>
- <Z6vvgGFngGjQHwps@google.com> <3033f048-6aa8-483a-b2dc-37e8dfb237d5@linux.intel.com>
-Message-ID: <Z6zu8liLTKAKmPwV@google.com>
-Subject: Re: [PATCH v2 5/8] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
-From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com, 
-	adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com, 
-	tony.lindgren@intel.com, isaku.yamahata@intel.com, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <20250203223916.1064540-6-almasrymina@google.com> <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
+ <CAHS8izNOqaFe_40gFh09vdBz6-deWdeGu9Aky-e7E+Wu2qtfdw@mail.gmail.com> <28343e83-6d93-4002-a691-f8273d4d24a8@gmail.com>
+In-Reply-To: <28343e83-6d93-4002-a691-f8273d4d24a8@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 12 Feb 2025 11:18:50 -0800
+X-Gm-Features: AWEUYZmMxO-D8gV-SzbNdeRwFeAQ7660IIm2vAphoidLeu_O5bDpvj8HGIH7jIY
+Message-ID: <CAHS8izOE-JzMszieHEXtYBs7_6D-ngVx2kJyMwp8eCWLK-c0cQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 5/6] net: devmem: Implement TX path
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell <ncardwell@google.com>, 
+	David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 12, 2025, Binbin Wu wrote:
-> On 2/12/2025 8:46 AM, Sean Christopherson wrote:
-> > I am completely comfortable saying that KVM doesn't care about STI/SS shadows
-> > outside of the HALTED case, and so unless I'm missing something, I think it makes
-> > sense for tdx_protected_apic_has_interrupt() to not check RVI outside of the HALTED
-> > case, because it's impossible to know if the interrupt is actually unmasked, and
-> > statistically it's far, far more likely that it _is_ masked.
-> OK. Will update tdx_protected_apic_has_interrupt() in "TDX interrupts" part.
-> And use kvm_vcpu_has_events() to replace the open code in this patch.
+On Wed, Feb 12, 2025 at 7:52=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> On 2/10/25 21:09, Mina Almasry wrote:
+> > On Wed, Feb 5, 2025 at 4:20=E2=80=AFAM Pavel Begunkov <asml.silence@gma=
+il.com> wrote:
+> >>
+> >> On 2/3/25 22:39, Mina Almasry wrote:
+> >> ...
+> >>> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> >>> index bb2b751d274a..3ff8f568c382 100644
+> >>> --- a/include/linux/skbuff.h
+> >>> +++ b/include/linux/skbuff.h
+> >>> @@ -1711,9 +1711,12 @@ struct ubuf_info *msg_zerocopy_realloc(struct =
+sock *sk, size_t size,
+> >> ...
+> >>>    int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
+> >>>                                struct iov_iter *from, size_t length);
+> >>> @@ -1721,12 +1724,14 @@ int zerocopy_fill_skb_from_iter(struct sk_buf=
+f *skb,
+> >>>    static inline int skb_zerocopy_iter_dgram(struct sk_buff *skb,
+> >>>                                          struct msghdr *msg, int len)
+> >>>    {
+> >>> -     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_ite=
+r, len);
+> >>> +     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_ite=
+r, len,
+> >>> +                                    NULL);
+> >>
+> >> Instead of propagating it all the way down and carving a new path, why
+> >> not reuse the existing infra? You already hook into where ubuf is
+> >> allocated, you can stash the binding in there. And
+> >
+> > It looks like it's not possible to increase the side of ubuf_info at
+> > all, otherwise the BUILD_BUG_ON in msg_zerocopy_alloc() fires.
+> >
+> > It's asserting that sizeof(ubuf_info_msgzc) <=3D sizeof(skb->cb), and
+> > I'm guessing increasing skb->cb size is not really the way to go.
+> >
+> > What I may be able to do here is stash the binding somewhere in
+> > ubuf_info_msgzc via union with fields we don't need for devmem, and/or
+>
+> It doesn't need to account the memory against the user, and you
+> actually don't want that because dmabuf should take care of that.
+> So, it should be fine to reuse ->mmp.
+>
+> It's also not a real sk_buff, so maybe maintainers wouldn't mind
+> reusing some more space out of it, if that would even be needed.
+>
 
-Something to keep an eye on: kvm_vcpu_has_events() returns true if pv_unhalted
-is set, and pv_unhalted is only cleared on transitions KVM_MP_STATE_RUNNABLE.
-If the guest initiates a spurious wakeup, pv_unhalted could be left set in
-perpetuity.
+netmem skb are real sk_buff, with the modification that frags are not
+readable, only in the case that the netmem is unreadable. I would not
+approve of considering netmem/devmem skbs "not real skbs", and start
+messing with the semantics of skb fields for devmem skbs, and having
+to start adding skb_is_devmem() checks through all code in the skb
+handlers that touch the fields being overwritten in the devmem case.
+No, I don't think we can re-use random fields in the skb for devmem.
 
-I _think_ this would work and is generally desirable?
+> > stashing the binding in ubuf_info_ops (very hacky). Neither approach
+> > seems ideal, but the former may work and may be cleaner.
+> >
+> > I'll take a deeper look here. I had looked before and concluded that
+> > we're piggybacking devmem TX on MSG_ZEROCOPY path, because we need
+> > almost all of the functionality there (no copying, send complete
+> > notifications, etc), with one minor change in the skb filling. I had
+> > concluded that if MSG_ZEROCOPY was never updated to use the existing
+> > infra, then it's appropriate for devmem TX piggybacking on top of it
+>
+> MSG_ZEROCOPY does use the common infra, i.e. passing ubuf_info,
+> but doesn't need ->sg_from_iter as zerocopy_fill_skb_from_iter()
+> and it's what was there first.
+>
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8e77e61d4fbd..435ca2782c3c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11114,9 +11114,6 @@ static bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
-            kvm_apic_init_sipi_allowed(vcpu))
-                return true;
- 
--       if (vcpu->arch.pv.pv_unhalted)
--               return true;
--
-        if (kvm_is_exception_pending(vcpu))
-                return true;
- 
-@@ -11157,7 +11154,8 @@ static bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
- 
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
- {
--       return kvm_vcpu_running(vcpu) || kvm_vcpu_has_events(vcpu);
-+       return kvm_vcpu_running(vcpu) || vcpu->arch.pv.pv_unhalted ||
-+              kvm_vcpu_has_events(vcpu);
- }
- 
- /* Called within kvm->srcu read side.  */
-@@ -11293,7 +11291,7 @@ static int __kvm_emulate_halt(struct kvm_vcpu *vcpu, int state, int reason)
-         */
-        ++vcpu->stat.halt_exits;
-        if (lapic_in_kernel(vcpu)) {
--               if (kvm_vcpu_has_events(vcpu))
-+               if (kvm_vcpu_has_events(vcpu) || vcpu->arch.pv.pv_unhalted)
-                        vcpu->arch.pv.pv_unhalted = false;
-                else
-                        vcpu->arch.mp_state = state;
+But MSG_ZEROCOPY doesn't set msg->msg_ubuf. And not setting
+msg->msg_ubuf fails to trigger msg->sg_from_iter altogether.
 
+And also currently sg_from_iter isn't set up to take in a ubuf_info.
+We'd need that if we stash the binding in the ubuf_info.
+
+All in all I think I wanna prototype an msg->sg_from_iter approach and
+make a judgement call on whether it's cleaner than just passing the
+binding through a couple of helpers just as I'm doing here. My feeling
+is that the implementation in this patch may be cleaner than
+refactoring the entire msg_ubuf/sg_from_iter flows so we can sort of
+use it for MSG_ZEROCOPY with devmem when it currently doesn't use it.
+
+> > to follow that. I would not want to get into a refactor of
+> > MSG_ZEROCOPY for no real reason.
+> >
+> > But I'll take a deeper look here and see if I can make something
+> > slightly cleaner work.
+> >
+> >> zerocopy_fill_skb_from_devmem can implement ->sg_from_iter,
+> >> see __zerocopy_sg_from_iter().
+> >>
+> >> ...
+> >>> diff --git a/net/core/datagram.c b/net/core/datagram.c
+> >>> index f0693707aece..c989606ff58d 100644
+> >>> --- a/net/core/datagram.c
+> >>> +++ b/net/core/datagram.c
+> >>> @@ -63,6 +63,8 @@
+> >>> +static int
+> >>> +zerocopy_fill_skb_from_devmem(struct sk_buff *skb, struct iov_iter *=
+from,
+> >>> +                           int length,
+> >>> +                           struct net_devmem_dmabuf_binding *binding=
+)
+> >>> +{
+> >>> +     int i =3D skb_shinfo(skb)->nr_frags;
+> >>> +     size_t virt_addr, size, off;
+> >>> +     struct net_iov *niov;
+> >>> +
+> >>> +     while (length && iov_iter_count(from)) {
+> >>> +             if (i =3D=3D MAX_SKB_FRAGS)
+> >>> +                     return -EMSGSIZE;
+> >>> +
+> >>> +             virt_addr =3D (size_t)iter_iov_addr(from);
+> >>
+> >> Unless I missed it somewhere it needs to check that the iter
+> >> is iovec based.
+> >>
+> >
+> > How do we end up here with an iterator that is not iovec based? Is the
+> > user able to trigger that somehow and I missed it?
+>
+> Hopefully not, but for example io_uring passes bvecs for a number of
+> requests that can end up in tcp_sendmsg_locked(). Those probably
+> would work with the current patch, but check the order of some of the
+> checks it will break. And once io_uring starts passing bvecs for
+> normal send[msg] requests, it'd definitely be possible. And there
+> are other in kernel users apart from send(2) path, so who knows.
+>
+> The api allows it and therefore should be checked, it's better to
+> avoid quite possible latent bugs.
+>
+
+Sounds good.
+
+--=20
+Thanks,
+Mina
 
