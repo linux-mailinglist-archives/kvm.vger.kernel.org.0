@@ -1,326 +1,163 @@
-Return-Path: <kvm+bounces-37962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F84FA3239D
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 11:39:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0671FA32404
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 11:55:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38AE2162A19
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 10:39:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34BED3A5505
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 10:55:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EFD209F33;
-	Wed, 12 Feb 2025 10:39:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6C5209F43;
+	Wed, 12 Feb 2025 10:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bORUvimi"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qFv6IwAc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3808A208981
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 10:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40383206F2C;
+	Wed, 12 Feb 2025 10:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739356767; cv=none; b=YRIRIBGb6G0yZrt7p+MgzwHEhYwjE6HabbZvqlUkIaR+t9yBVw60M5WxisN1LO/GzscC/IKtt1QiyEEN3Toy2cirWWFRpaBo0WRVzpim+fD7d1rl2FvO1DmLza1yB7wIWYTzF+mrQnp9mfzzOV8o/aicxIqORAFPsOUvYERlvXE=
+	t=1739357735; cv=none; b=GgisVumj29jcXZs2BzlHAVyGC8HKSGMYbvGXkQDOXM91IJT7oUxO1yM6fJH1/5pn+/zO0gMtHGaNObPYFrT9zkStaVOcx0Xrjk2JC3MGp7mk3P5Q92nnWN8xPNwSRCG8R9J5KjVIWJQWoSvfxgrOV4vjvG8OSrL7hFBCECKErDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739356767; c=relaxed/simple;
-	bh=4tYaNq1YUzR7xbCfa6M7JF8G3YzrwrXnQ/T3Jqjroy0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tv4FFYzrY9poC5+5Kasjq01nfdJYFjG5pmvBIGMc/nSjj8OD5FUBr6b8pApDQJdgL9ASqyJe/2yHV+/kWdx774Q3WpXMlEAuJaI+OQ6SM3Yc7JyQFtasHQcenkGACbeoLOwqQ+PAh1wME61geDDQDRpZJ7lCqGdqdIRZlMOKe7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bORUvimi; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739356763;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yJerI8drpoZ0/TsOfXFWnQ0scPP+Ef3H3mLwdeVJ5tE=;
-	b=bORUvimixrloILu/X+rBA1QsnqXWkWpGqadmAJnNaGxuqB7am+9M5fNXS/FdhvLeL2fPJF
-	b1G5f9GPXaFEfeSoLFq+bVoM4fyAVMFHYj/E6toUAGaWvxLs9vTbXfNIeh5g5cma0ohk/s
-	VdZ3skDa52dFiBGtVGdRLcQeyNtRJ6s=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-237-4HkT5l64Py2tt3xJD9ucGg-1; Wed, 12 Feb 2025 05:39:21 -0500
-X-MC-Unique: 4HkT5l64Py2tt3xJD9ucGg-1
-X-Mimecast-MFC-AGG-ID: 4HkT5l64Py2tt3xJD9ucGg
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4394c489babso12506075e9.1
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 02:39:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739356760; x=1739961560;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yJerI8drpoZ0/TsOfXFWnQ0scPP+Ef3H3mLwdeVJ5tE=;
-        b=xOsjeDU/x2HOxZm1j1EGENGhXec+jyKZDBkzcPBFjPssYNtwHDLDEIrf3kkFGidS1R
-         ioq1tpkM0tNCop3v9XU0bacJyvdPr2NVrSL5x3bdvaJgAlpTZ4z5JLvt2FNlCBnblyNS
-         PuJkGJas8rNkVGKDVA9j01NQ1sVpYhzgXQNNwzQW76801EgKLd3io5FmA1AzUVlDmZMy
-         Sw0O/S7mZQOC30vUnZhwyLOQqOPxtpvp9pBfpAvogMhqC1L/PGbNouPEEOaDYqKxNE8A
-         Ut9Q/ERIylcrjmkcLvKrg8xe+wDpj8UkcI+zexkGuOTNTiH7/Lx7Q/a2d41vZqzSPzE5
-         8OFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIATJVCJLofGNr9+Gv4bRd57dCslOXnEPANYnbKc1LFnjWwqZenxWENXUgRHXoVmFYI0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywa2jj3+1T5KQuKt2FZ14eeJ6t6i2ZqeQBq2KHfuWF9Rc6Nzct0
-	BSQPgviW5Zb3zBsRZ/08DbqK4emx1LKkA5KihLeYJUUSgqOD27hqJiXaq479vb6XSdGMTKQoOCo
-	hOT/Wz+jXCp19LO2wEXj/Xav16mdnLkLNrHq4MjQ755SuUOJ+og==
-X-Gm-Gg: ASbGncvUfcGpo4yk6GO5DgeNCqrOr4v9hHXrXHlsN/dQYmQUBKTxbxDLxhdXvG8vVcb
-	CNAIMo+g6zOm/oJB8gvd6KAalZfm1XvI4Oco4WKCqb1qoykDCeOGrqBhpjYI5GVS/cEAX37f8+/
-	vtIfcCe2aolG9ai5jO6qj5EawhMtXsCkYUFgkRrmr43q99f4LQI82/ewNjxh/tSzb3Mpz7HdNo8
-	s/wikBPuz8a975uNAJjzxcBPm8U3rymgBIax/3DWon5o1Two7BiHSCSaStH1Xj9cFy+99jO40eM
-	Q7GqQNjlAeRKDOvmAbCyVKct8jJ95VumeStmGmiZDjnqUnBKiQsU+JB/QhU5ULHXHoi6DlocR7f
-	36l0aAd9Z9CZetPHdvGfNldzNELUCWw==
-X-Received: by 2002:a05:600c:1c24:b0:439:42c6:f11f with SMTP id 5b1f17b1804b1-4395815fddcmr26874445e9.4.1739356760414;
-        Wed, 12 Feb 2025 02:39:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFF4MYfbFVvDo57SWW/XdoivU59ZYNcJEUnst6OF39h3SptnFfEVlsoezf+ni/KL7k+3Ov6vw==
-X-Received: by 2002:a05:600c:1c24:b0:439:42c6:f11f with SMTP id 5b1f17b1804b1-4395815fddcmr26873955e9.4.1739356759890;
-        Wed, 12 Feb 2025 02:39:19 -0800 (PST)
-Received: from ?IPV6:2003:cb:c70c:a600:1e3e:c75:d269:867a? (p200300cbc70ca6001e3e0c75d269867a.dip0.t-ipconnect.de. [2003:cb:c70c:a600:1e3e:c75:d269:867a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a1aa7c7sm15829755e9.27.2025.02.12.02.39.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Feb 2025 02:39:18 -0800 (PST)
-Message-ID: <824f7d52-3304-4028-b10a-e10566b3dfc0@redhat.com>
-Date: Wed, 12 Feb 2025 11:39:16 +0100
+	s=arc-20240116; t=1739357735; c=relaxed/simple;
+	bh=YDUw1jwbWOCs7kM+qnqYD6rz2Rv/Ove2R3hjhj9wfy0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=omb/1wQEcdnmKHf+UZlLhNkSQ7FQJ6zw2DVbfcyKYCAN74XOc3+rk8S4rpZKW1YwRKTWzgMkcFDIuPM+XkyQ9RgevOxyOvqStHubDupbVCBXzHTiYwLSWCSYjcCWL0c1EiSpsETTVQ0UYmTs/Yw0dq6hGSVfc2wzqDY3cFXB3Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qFv6IwAc; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51C5OOsD003168;
+	Wed, 12 Feb 2025 10:55:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=76M3I/
+	Nc/8XmmC/SMhr1RgaBDyLEl3IK3DLNAMMdyNI=; b=qFv6IwAcKyJUOs5NQiHwUz
+	WgNZSG4w9inXXryzWQRxFQTaC29PglujalbfHX670LGAHhSsicEgIiF7vsEyU48a
+	ZEt0JcJEL6kyMEHc2g0wzvwl5HhJNxr3xq/grLUZ1iNRG/YotaMBX2nCk8rZ4pk+
+	EUG5IvQCTSCL2gv7F6cSfwsqQIkRALk6KnbHET1LzZ+2V8y2nGH27RXXTOWxcscN
+	g2AnmyHZ2R/Wj4B1li+fwkZNameLn73tk+UQVpay4Cje742FT5+Ujo5oyRBGrv4L
+	RJZqeMIva2KFu055VnRWdIECbqiKBB+Ne53hSe896kJOl7C62u3PVwnuW5zql52Q
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rnf89f6f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Feb 2025 10:55:31 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51C9dw5c001358;
+	Wed, 12 Feb 2025 10:55:30 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pjkn84q3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Feb 2025 10:55:30 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51CAtQbl13763026
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Feb 2025 10:55:26 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 351E620040;
+	Wed, 12 Feb 2025 10:55:26 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6834320043;
+	Wed, 12 Feb 2025 10:55:25 +0000 (GMT)
+Received: from localhost (unknown [9.171.83.73])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 12 Feb 2025 10:55:25 +0000 (GMT)
+Date: Wed, 12 Feb 2025 11:55:19 +0100
+From: Vasily Gorbik <gor@linux.ibm.com>
+To: Anthony Krowiak <akrowiak@linux.ibm.com>
+Cc: Rorie Reyes <rreyes@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        borntraeger@de.ibm.com, pasic@linux.ibm.com, jjherne@linux.ibm.com,
+        alex.williamson@redhat.com
+Subject: Re: [PATCH v1] s390/vfio-ap: Signal eventfd when guest AP
+ configuration is changed
+Message-ID: <your-ad-here.call-01739357719-ext-1861@work.hours>
+References: <20250107183645.90082-1-rreyes@linux.ibm.com>
+ <Z4U6iu5JidJUxDgX@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <f69bba4b-a97e-4166-9ce1-c8a2ad634696@linux.ibm.com>
+ <f1af50b3-f966-445d-ab89-3d213f55b93a@linux.ibm.com>
+ <Z6RnfwawWop0v1CW@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <02675184-0ce5-4f08-9d5d-f42987b77b5b@linux.ibm.com>
+ <Z6sDKeA6WzAgagiZ@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <e5ca9a2c-ec7d-4e0e-ad06-2d312b511b90@linux.ibm.com>
+ <8767c6ce-28cf-4e23-baf8-e6c9ec854c60@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 3/3] KVM: guest_memfd: Enforce NUMA mempolicy using
- shared policy
-To: Shivank Garg <shivankg@amd.com>, akpm@linux-foundation.org,
- willy@infradead.org, pbonzini@redhat.com
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, chao.gao@intel.com, seanjc@google.com,
- ackerleytng@google.com, vbabka@suse.cz, bharata@amd.com, nikunj@amd.com,
- michael.day@amd.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com,
- michael.roth@amd.com, Fuad Tabba <tabba@google.com>
-References: <20250210063227.41125-1-shivankg@amd.com>
- <20250210063227.41125-4-shivankg@amd.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20250210063227.41125-4-shivankg@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8767c6ce-28cf-4e23-baf8-e6c9ec854c60@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: w8EkwTQy5rQ8urYUuHVDmhH98dk6ODc_
+X-Proofpoint-GUID: w8EkwTQy5rQ8urYUuHVDmhH98dk6ODc_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-12_03,2025-02-11_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 mlxscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
+ bulkscore=0 lowpriorityscore=0 suspectscore=0 spamscore=0 phishscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502120081
 
-On 10.02.25 07:32, Shivank Garg wrote:
-> Previously, guest-memfd allocations were following local NUMA node id
-> in absence of process mempolicy, resulting in random memory allocation.
-> Moreover, mbind() couldn't be used since memory wasn't mapped to userspace
-> in VMM.
+On Tue, Feb 11, 2025 at 03:24:05PM -0500, Anthony Krowiak wrote:
 > 
-> Enable NUMA policy support by implementing vm_ops for guest-memfd mmap
-> operation. This allows VMM to map the memory and use mbind() to set the
-> desired NUMA policy. The policy is then retrieved via
-> mpol_shared_policy_lookup() and passed to filemap_grab_folio_mpol() to
-> ensure that allocations follow the specified memory policy.
 > 
-> This enables VMM to control guest memory NUMA placement by calling mbind()
-> on the mapped memory regions, providing fine-grained control over guest
-> memory allocation across NUMA nodes.
-
-Yes, I think that is the right direction, especially with upcoming 
-in-place conversion of shared<->private in mind.
-
 > 
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Shivank Garg <shivankg@amd.com>
-> ---
->   virt/kvm/guest_memfd.c | 84 +++++++++++++++++++++++++++++++++++++++---
->   1 file changed, 78 insertions(+), 6 deletions(-)
+> On 2/11/25 10:02 AM, Rorie Reyes wrote:
+> > 
+> > On 2/11/25 2:58 AM, Alexander Gordeev wrote:
+> > > On Thu, Feb 06, 2025 at 09:12:27AM -0500, Rorie Reyes wrote:
+> > > 
+> > > Hi Rorie,
+> > > 
+> > > > On 2/6/25 2:40 AM, Alexander Gordeev wrote:
+> > > > > On Wed, Feb 05, 2025 at 12:47:55PM -0500, Anthony Krowiak wrote:
+> > > > > > > > How this patch is synchronized with the mentioned QEMU series?
+> > > > > > > > What is the series status, especially with the comment from Cédric
+> > > > > > > > Le Goater [1]?
+> > > > > > > > 
+> > > > > > > > 1. https://lore.kernel.org/all/20250107184354.91079-1-rreyes@linux.ibm.com/T/#mb0d37909c5f69bdff96289094ac0bad0922a7cce
+> > > ...
+> > > > > > I don't think that is what Alex was asking. I believe he
+> > > > > > is asking how the
+> > > > > > QEMU and kernel patch series are going to be synchronized.
+> > > > > > Given the kernel series changes a value in vfio.h which
+> > > > > > is used by QEMU, the
+> > > > > > two series need to be coordinated since the vfio.h file
+> > > > > > used by QEMU can not be updated until the kernel code is
+> > > > > > available. So these
+> > > > > > two sets of code have
+> > > > > > to be merged upstream during a merge window. which is
+> > > > > > different for the
+> > > > > > kernel and QEMU. At least I think that is what Alex is asking.
+> > > > > Correct.
+> > > > > Thanks for the clarification, Anthony!
+> > > > Tony, thank you for the back up!
+> > > > 
+> > > > Alexander, is there anything else you need from my end for
+> > > > clarification?
+> > > The original question still stays - is it safe to pull this patch now,
+> > > before the corresponding QEMU change is integrated?
 > 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index b2aa6bf24d3a..e1ea8cb292fa 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -2,6 +2,7 @@
->   #include <linux/backing-dev.h>
->   #include <linux/falloc.h>
->   #include <linux/kvm_host.h>
-> +#include <linux/mempolicy.h>
->   #include <linux/pagemap.h>
->   #include <linux/anon_inodes.h>
->   
-> @@ -11,8 +12,13 @@ struct kvm_gmem {
->   	struct kvm *kvm;
->   	struct xarray bindings;
->   	struct list_head entry;
-> +	struct shared_policy policy;
->   };
->   
-> +static struct mempolicy *kvm_gmem_get_pgoff_policy(struct kvm_gmem *gmem,
-> +						   pgoff_t index,
-> +						   pgoff_t *ilx);
-> +
->   /**
->    * folio_file_pfn - like folio_file_page, but return a pfn.
->    * @folio: The folio which contains this index.
-> @@ -96,10 +102,20 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->    * Ignore accessed, referenced, and dirty flags.  The memory is
->    * unevictable and there is no storage to write back to.
->    */
-> -static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
-> +static struct folio *kvm_gmem_get_folio(struct file *file, pgoff_t index)
+> This patch has to be pulled before the QEMU patches are integrated. The
+> change to the
+> include/uapi/linux/vfio.h file needs to be merged before the QEMU version of
+> that file
+> can be generated for a QEMU build. I have given my r-b for this patch, so I
+> think it is
+> safe to pull it now.
 
-I'd probably do that change in a separate prep-patch; would remove some 
-of the unrelated noise in this patch.
-
->   {
->   	/* TODO: Support huge pages. */
-> -	return filemap_grab_folio(inode->i_mapping, index);
-> +	struct folio *folio = NULL;
-
-No need to init folio.
-
-> +	struct inode *inode = file_inode(file);
-> +	struct kvm_gmem *gmem = file->private_data;
-
-Prefer reverse christmas-tree (longest line first) as possible.
-
-> +	struct mempolicy *policy;
-> +	pgoff_t ilx;
-
-Why do you return the ilx from kvm_gmem_get_pgoff_policy() if it is 
-completely unused?
-
-> +
-> +	policy = kvm_gmem_get_pgoff_policy(gmem, index, &ilx);
-> +	folio =  filemap_grab_folio_mpol(inode->i_mapping, index, policy);
-> +	mpol_cond_put(policy);
-
-The downside is that we always have to lookup the policy, even if we 
-don't have to allocate anything because the pagecache already contains a 
-folio.
-
-Would there be a way to lookup if there is something already allcoated 
-(fast-path) and fallback to the slow-path (lookup policy+call 
-filemap_grab_folio_mpol) only if that failed?
-
-Note that shmem.c does exactly that: shmem_alloc_folio() is only called 
-after filemap_get_entry() told us that there is nothing.
-
-> +
-> +	return folio;
->   }
->   
-
-[...]
-
-> +#ifdef CONFIG_NUMA
-> +static int kvm_gmem_set_policy(struct vm_area_struct *vma, struct mempolicy *new)
-> +{
-> +	struct file *file = vma->vm_file;
-> +	struct kvm_gmem *gmem = file->private_data;
-> +
-> +	return mpol_set_shared_policy(&gmem->policy, vma, new);
-> +}
-> +
-> +static struct mempolicy *kvm_gmem_get_policy(struct vm_area_struct *vma,
-> +		unsigned long addr, pgoff_t *pgoff)
-> +{
-> +	struct file *file = vma->vm_file;
-> +	struct kvm_gmem *gmem = file->private_data;
-> +
-> +	*pgoff = vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT);
-> +	return mpol_shared_policy_lookup(&gmem->policy, *pgoff);
-> +}
-> +
-> +static struct mempolicy *kvm_gmem_get_pgoff_policy(struct kvm_gmem *gmem,
-> +						   pgoff_t index,
-> +						   pgoff_t *ilx)
-> +{
-> +	struct mempolicy *mpol;
-> +
-> +	*ilx = NO_INTERLEAVE_INDEX;
-> +	mpol = mpol_shared_policy_lookup(&gmem->policy, index);
-> +	return mpol ? mpol : get_task_policy(current);
-> +}
-> +
-> +static const struct vm_operations_struct kvm_gmem_vm_ops = {
-> +	.get_policy	= kvm_gmem_get_policy,
-> +	.set_policy	= kvm_gmem_set_policy,
-> +};
-> +
-> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-> +{
-> +	file_accessed(file);
-> +	vma->vm_ops = &kvm_gmem_vm_ops;
-> +	return 0;
-> +}
-> +#else
-> +static struct mempolicy *kvm_gmem_get_pgoff_policy(struct kvm_gmem *gmem,
-> +						   pgoff_t index,
-> +						   pgoff_t *ilx)
-> +{
-> +	*ilx = 0;
-> +	return NULL;
-> +}
-> +#endif /* CONFIG_NUMA */
->   
->   static struct file_operations kvm_gmem_fops = {
-> +#ifdef CONFIG_NUMA
-> +	.mmap		= kvm_gmem_mmap,
-> +#endif
-
-With Fuad's work, this will be unconditional, and you'd only set the 
-kvm_gmem_vm_ops conditionally -- just like shmem.c. Maybe best to 
-prepare for that already: allow unconditional mmap (Fuad will implement 
-the faulting logic of shared pages, until then all accesses would SIGBUS 
-I assume, did you try that?) and only mess with get_policy/set_policy.
-
--- 
-Cheers,
-
-David / dhildenb
-
+Ok, applied, thank you!
 
