@@ -1,303 +1,209 @@
-Return-Path: <kvm+bounces-37950-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37951-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92B47A31DBF
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 06:08:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54961A31DC8
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 06:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33C193A7419
-	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 05:07:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9F283A6EE0
+	for <lists+kvm@lfdr.de>; Wed, 12 Feb 2025 05:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C7B1E7C0E;
-	Wed, 12 Feb 2025 05:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83BD01EEA32;
+	Wed, 12 Feb 2025 05:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I5QyH4xW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kxnsJEZ0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9BA3594F
-	for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 05:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EB538FA3;
+	Wed, 12 Feb 2025 05:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739336876; cv=none; b=LW4jKuGRGSoU3hjoV4Otr2qwRUytHwLwXZgzXbqRFWgQW7aqmV+Mr0Ka3T9cq87pVn+bmzn5tWvfgiogkGuXbrgArSWfsTA+dQosX/TnL42ZkrmURU9RjZ1pJ3LF72qK5fgknSo9cAXbufEutiHxI+lwcEY4nMZyzw1rSAGmg9c=
+	t=1739337388; cv=none; b=CFJdoTSgxRB0CAS2J9UUzE8vBLeHrRdZWcghpaB5t2pgbpZ/4mnrPMYE+F9SBl4VvA6Gcqi9d2qKTreKJSR2bBWfQ5uE8HUwxCNv174exfSUx9pX+4cJ/+dRHSEza3Qn5VKeYcJvJc0pPJ/MjIQYYyYeCburBX1xQXJNcMhTAOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739336876; c=relaxed/simple;
-	bh=p4LKk4ZdoFiJUlp2//n7xvv88iRTuP8XnvJuId+5tgA=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=OGMYPesazVWukOv7Sr1xv+z9K1SJsD7adjmYS2Njf9ArZZ6wlmPy0wIh/j6CYvV451rmggltiNoudR2Xjw6ywWb8SYKrtQQ35hTm/0aNeO7fHnS42ioXpG1paGh0iuRac2yHktMp3V9qw0aoyHkZK4Ygu4ld2sXelGb8alfUlMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I5QyH4xW; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fa1c093f12so16635032a91.2
-        for <kvm@vger.kernel.org>; Tue, 11 Feb 2025 21:07:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739336874; x=1739941674; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zOJxpI1x9MLAiq9h9+DTjl81Sa/nSgc2QKSMD+NAq0c=;
-        b=I5QyH4xWlER47LM8sfV4SYpnl/mil0VVF0XPVllwfIvCdzchr545Vdeb06b4eI6z27
-         6ozROaM+XEjzerDLUu2WVlTMjl07tY8nHI+ABPBSFmB9NmGspY6+ys3Cv9t/XL7S/sKQ
-         A7P8UI/No3Hjgha9xQL7TgxcnN4hdwwysJgA3qDaqUA3DZgkNudSD6JR0KfazzFhO07L
-         o6fX4naLLxYbWPc+NCynLw5XeHp6zFQZUxhdYFFMPFUzYn4oG1hHogcZn+FB3meJE6t9
-         iL2Dca7ZJH8PUv61ZMXEprNV68IjJwmufODqRhb9GuzOs3Qu/pfDJ04pObwABClKAiPE
-         HYHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739336874; x=1739941674;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zOJxpI1x9MLAiq9h9+DTjl81Sa/nSgc2QKSMD+NAq0c=;
-        b=UXFDGWEEZ6OIiBCJpXbAiw8DSbAFjZYRqR969iPC5FNFWT9oXZcysnd3NY97+T4EvF
-         RNdWyRYAXd1R85cE8bC9qCQ1sHOz3fnNT3Gu3zunm5ieMBRUAG3mHY7l2XuC0erykCDc
-         DilXq8KU24hnFGKgWKK+HrzgjiVZnPN6u6RPcOPK3WHh17mcwfG4Xi8IIlm4RCkS9+Lt
-         ikotvoYoCIibulP6Rpmg2o/4QAxvKgBcvfIOEDHXUTOsWHIuqvoBfmxf/AEEA9aotgUO
-         nEt6xL0Lvy/DMYpcaQOsoxdY8rPJ2mS5n65HfVCBdZESlKNHqSsX3kE4HY8AaAWKYcbL
-         zFkg==
-X-Gm-Message-State: AOJu0YyzuLj8GHsfP5Nhmtp7iZbEB3wvsbYHMBQLoVLFbcb1vpCentPW
-	+wwJD6+Y24XTEsL6+OA8Ma4UMo9KQYA/I/ZP2uNZqbByK3pR1So04gOGDdEcGYI8qWY6tB8exsK
-	BYlkx2s2R31WEo4USxbxCxQ==
-X-Google-Smtp-Source: AGHT+IH/xh6quStbzptBl/mL0TU0XPEI8Jdwu7q7FhIn9TFDXRLhgpliEbXcKvvkSkGPR9+aPEy3XINR4VxNZv86ug==
-X-Received: from pjbsv3.prod.google.com ([2002:a17:90b:5383:b0:2ef:71b9:f22f])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2c8e:b0:2ea:712d:9a82 with SMTP id 98e67ed59e1d1-2fbf5c71357mr2767999a91.29.1739336874097;
- Tue, 11 Feb 2025 21:07:54 -0800 (PST)
-Date: Wed, 12 Feb 2025 05:07:52 +0000
-In-Reply-To: <20250211121128.703390-4-tabba@google.com> (message from Fuad
- Tabba on Tue, 11 Feb 2025 12:11:19 +0000)
+	s=arc-20240116; t=1739337388; c=relaxed/simple;
+	bh=eVsMpX/8Jed3hCVhlFQngIaOqAD3Ff3kb6Lw95jePG4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mJStzKZ4Yywt/a6ySiCMhT3e7ue5NzWRzWct9l7jjCAJlrxHWinIwq7sBQp8NeEZpa0R3prN+r5Efuvuxi2aEkGimkpLPJIf1+I7kKv+PokFlwZDRQ54ko2mMqTFYctdnVJcs4y5lGnwsQoHVXnf2TD0OU7itX1Tb5NKgx9EDe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kxnsJEZ0; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739337387; x=1770873387;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=eVsMpX/8Jed3hCVhlFQngIaOqAD3Ff3kb6Lw95jePG4=;
+  b=kxnsJEZ0S0swymowk5h9M8aDAw7wwMWfP9hLF7j8ybjWpBFVW+uhHK7y
+   VNFqlMfL1HvRMwgCJh/WXLNhl0UXC7/j0usTyemBHWcCxoHKHl93ijxq2
+   IRGAEa50yZe0BGT7z6zdi3HaghYthhqksUMcGTcZjRx95HQXd5JxWA3ib
+   07RQ3WkRi4m5kXyjnSIUB0/SmGzOc4mKI9oiEPJD3oJ8DXfB6gBv7D3+R
+   Jm2h5BDIL2yrYxXCGlVlgLuD8794TOyJfGP5yGcLEmdVmtbt/H+TON8w0
+   ZMxZM6qaRI2evcsIgRCXV77aEDfm3Y7E8lhz95/dwJePpBh1YMMjX7jjJ
+   Q==;
+X-CSE-ConnectionGUID: VlIuLnu4QMeeAVL+8MFzHw==
+X-CSE-MsgGUID: KlbilTcfTVq2zLgVUhpPUQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11342"; a="51371852"
+X-IronPort-AV: E=Sophos;i="6.13,279,1732608000"; 
+   d="scan'208";a="51371852"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 21:16:26 -0800
+X-CSE-ConnectionGUID: eFx3fF4dROu+Z0YR9qgKpQ==
+X-CSE-MsgGUID: W1kQezGMTvqFn0HXpRDkFg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,279,1732608000"; 
+   d="scan'208";a="117735888"
+Received: from unknown (HELO [10.238.0.51]) ([10.238.0.51])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 21:16:23 -0800
+Message-ID: <3033f048-6aa8-483a-b2dc-37e8dfb237d5@linux.intel.com>
+Date: Wed, 12 Feb 2025 13:16:21 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <diqzed0392dz.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH v3 03/11] KVM: guest_memfd: Allow host to map
- guest_memfd() pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
-	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
-	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
-	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
-	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
-	vbabka@suse.cz, vannapurve@google.com, mail@maciej.szmigiero.name, 
-	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
-	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
-	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
-	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
-	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
-	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
-	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
-	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
-	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
-	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
-	jthoughton@google.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/8] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
+To: Sean Christopherson <seanjc@google.com>, Chao Gao <chao.gao@intel.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com,
+ kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com,
+ adrian.hunter@intel.com, reinette.chatre@intel.com, xiaoyao.li@intel.com,
+ tony.lindgren@intel.com, isaku.yamahata@intel.com,
+ linux-kernel@vger.kernel.org
+References: <20250211025442.3071607-1-binbin.wu@linux.intel.com>
+ <20250211025442.3071607-6-binbin.wu@linux.intel.com>
+ <Z6r0Q/zzjrDaHfXi@yzhao56-desk.sh.intel.com>
+ <926a035f-e375-4164-bcd8-736e65a1c0f7@linux.intel.com>
+ <Z6sReszzi8jL97TP@intel.com> <Z6vvgGFngGjQHwps@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <Z6vvgGFngGjQHwps@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Fuad Tabba <tabba@google.com> writes:
 
-> Add support for mmap() and fault() for guest_memfd backed memory
-> in the host for VMs that support in-place conversion between
-> shared and private (shared memory). To that end, this patch adds
-> the ability to check whether the VM type has that support, and
-> only allows mapping its memory if that's the case.
+
+On 2/12/2025 8:46 AM, Sean Christopherson wrote:
+> On Tue, Feb 11, 2025, Chao Gao wrote:
+>> On Tue, Feb 11, 2025 at 04:11:19PM +0800, Binbin Wu wrote:
+>>>
+>>> On 2/11/2025 2:54 PM, Yan Zhao wrote:
+>>>> On Tue, Feb 11, 2025 at 10:54:39AM +0800, Binbin Wu wrote:
+>>>>> +static int tdx_complete_vmcall_map_gpa(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>>>>> +
+>>>>> +	if (vcpu->run->hypercall.ret) {
+>>>>> +		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
+>>>>> +		tdx->vp_enter_args.r11 = tdx->map_gpa_next;
+>>>>> +		return 1;
+>>>>> +	}
+>>>>> +
+>>>>> +	tdx->map_gpa_next += TDX_MAP_GPA_MAX_LEN;
+>>>>> +	if (tdx->map_gpa_next >= tdx->map_gpa_end)
+>>>>> +		return 1;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * Stop processing the remaining part if there is pending interrupt.
+>>>>> +	 * Skip checking pending virtual interrupt (reflected by
+>>>>> +	 * TDX_VCPU_STATE_DETAILS_INTR_PENDING bit) to save a seamcall because
+>>>>> +	 * if guest disabled interrupt, it's OK not returning back to guest
+>>>>> +	 * due to non-NMI interrupt. Also it's rare to TDVMCALL_MAP_GPA
+>>>>> +	 * immediately after STI or MOV/POP SS.
+>>>>> +	 */
+>>>>> +	if (pi_has_pending_interrupt(vcpu) ||
+>>>>> +	    kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending) {
+>>>> Should here also use "kvm_vcpu_has_events()" to replace
+>>>> "pi_has_pending_interrupt(vcpu) ||
+>>>>    kvm_test_request(KVM_REQ_NMI, vcpu) || vcpu->arch.nmi_pending" as Sean
+>>>> suggested at [1]?
+>>>>
+>>>> [1] https://lore.kernel.org/all/Z4rIGv4E7Jdmhl8P@google.com
+>>> For TDX guests, kvm_vcpu_has_events() will check pending virtual interrupt
+>>> via a SEAM call.  As noted in the comments, the check for pending virtual
+>>> interrupt is intentionally skipped to save the SEAM call. Additionally,
+> Drat, I had a whole response typed up and then discovered the implementation of
+> tdx_protected_apic_has_interrupt() had changed.  But I think the basic gist
+> still holds.
 >
-> Additionally, this behavior is gated with a new configuration
-> option, CONFIG_KVM_GMEM_SHARED_MEM.
+> The new version:
 >
-> Signed-off-by: Fuad Tabba <tabba@google.com>
+>   bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
+>   {
+> -       return pi_has_pending_interrupt(vcpu);
+> +       u64 vcpu_state_details;
+> +
+> +       if (pi_has_pending_interrupt(vcpu))
+> +               return true;
+> +
+> +       vcpu_state_details =
+> +               td_state_non_arch_read64(to_tdx(vcpu), TD_VCPU_STATE_DETAILS_NON_ARCH);
+> +
+> +       return tdx_vcpu_state_details_intr_pending(vcpu_state_details);
+>   }
 >
-> ---
+> is much better than the old:
 >
-> This patch series will allow shared memory support for software
-> VMs in x86. It will also introduce a similar VM type for arm64
-> and allow shared memory support for that. In the future, pKVM
-> will also support shared memory.
-
-Thanks, I agree that introducing mmap this way could help in having it
-merged earlier, independently of conversion support, to support testing.
-
-I'll adopt this patch in the next revision of 1G page support for
-guest_memfd.
-
-> ---
->  include/linux/kvm_host.h | 11 +++++
->  virt/kvm/Kconfig         |  4 ++
->  virt/kvm/guest_memfd.c   | 93 ++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 108 insertions(+)
+>   bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
+>   {
+> -       return pi_has_pending_interrupt(vcpu);
+> +       bool ret = pi_has_pending_interrupt(vcpu);
+> +       union tdx_vcpu_state_details details;
+> +       struct vcpu_tdx *tdx = to_tdx(vcpu);
+> +
+> +       if (ret || vcpu->arch.mp_state != KVM_MP_STATE_HALTED)
+> +               return true;
+> +
+> +       if (tdx->interrupt_disabled_hlt)
+> +               return false;
+> +
+> +       details.full = td_state_non_arch_read64(tdx, TD_VCPU_STATE_DETAILS_NON_ARCH);
+> +       return !!details.vmxip;
+>   }
 >
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 8b5f28f6efff..438aa3df3175 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -728,6 +728,17 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
->  }
->  #endif
->  
-> +/*
-> + * Arch code must define kvm_arch_gmem_supports_shared_mem if support for
-> + * private memory is enabled and it supports in-place shared/private conversion.
-> + */
-> +#if !defined(kvm_arch_gmem_supports_shared_mem) && !IS_ENABLED(CONFIG_KVM_PRIVATE_MEM)
-> +static inline bool kvm_arch_gmem_supports_shared_mem(struct kvm *kvm)
-> +{
-> +	return false;
-> +}
-> +#endif
+> because assuming the vCPU has an interrupt if it's not HALTED is all kinds of
+> wrong.
+>
+> However, checking VMXIP for the !HLT case is also wrong.  And undesirable, as
+> evidenced by both this path and the EPT violation retry path wanted to avoid
+> checking VMXIP.
+>
+> Except for the guest being stupid (non-HLT TDCALL in an interrupt shadow), having
+> an interrupt in RVI that is fully unmasked will be extremely rare.  Actually,
+> outside of an interrupt shadow, I don't think it's even possible.  I can't think
+> of any CPU flows that modify RVI in the middle of instruction execution.  I.e. if
+> RVI is non-zero, then either the interrupt has been pending since before the
+> TDVMCALL, or the TDVMCALL is in an STI/SS shadow.  And if the interrupt was
+> pending before TDVMCALL, then it _must_ be blocked, otherwise the interrupt
+> would have been serviced at the instruction boundary.
 
-Perhaps this could be declared in the #ifdef CONFIG_KVM_PRIVATE_MEM
-block?
+Agree.
 
-Could this be defined as a __weak symbol for architectures to override?
-Or perhaps that can be done once guest_memfd gets refactored separately
-since now the entire guest_memfd.c isn't even compiled if
-CONFIG_KVM_PRIVATE_MEM is not set.
+>
+> I am completely comfortable saying that KVM doesn't care about STI/SS shadows
+> outside of the HALTED case, and so unless I'm missing something, I think it makes
+> sense for tdx_protected_apic_has_interrupt() to not check RVI outside of the HALTED
+> case, because it's impossible to know if the interrupt is actually unmasked, and
+> statistically it's far, far more likely that it _is_ masked.
+OK. Will update tdx_protected_apic_has_interrupt() in "TDX interrupts" part.
+And use kvm_vcpu_has_events() to replace the open code in this patch.
 
-> +
->  #ifndef kvm_arch_has_readonly_mem
->  static inline bool kvm_arch_has_readonly_mem(struct kvm *kvm)
->  {
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 54e959e7d68f..4e759e8020c5 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -124,3 +124,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
->  config HAVE_KVM_ARCH_GMEM_INVALIDATE
->         bool
->         depends on KVM_PRIVATE_MEM
-> +
-> +config KVM_GMEM_SHARED_MEM
-> +       select KVM_PRIVATE_MEM
-> +       bool
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index c6f6792bec2a..85467a3ef8ea 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -317,9 +317,102 @@ void kvm_gmem_handle_folio_put(struct folio *folio)
->  {
->  	WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
->  }
-> +
-> +static bool kvm_gmem_offset_is_shared(struct file *file, pgoff_t index)
-> +{
-> +	struct kvm_gmem *gmem = file->private_data;
-> +
-> +	/* For now, VMs that support shared memory share all their memory. */
-> +	return kvm_arch_gmem_supports_shared_mem(gmem->kvm);
-> +}
-> +
-> +static vm_fault_t kvm_gmem_fault(struct vm_fault *vmf)
-> +{
-> +	struct inode *inode = file_inode(vmf->vma->vm_file);
-> +	struct folio *folio;
-> +	vm_fault_t ret = VM_FAULT_LOCKED;
-> +
-> +	filemap_invalidate_lock_shared(inode->i_mapping);
-> +
-> +	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
-> +	if (IS_ERR(folio)) {
-> +		ret = VM_FAULT_SIGBUS;
+Thanks!
 
-Will it always be a SIGBUS if there is some error getting a folio?
+>
+>>> unnecessarily returning back to guest will has performance impact.
+>>>
+>>> But according to the discussion thread above, it seems that Sean prioritized
+>>> code readability (i.e. reuse the common helper to make TDX code less special)
+>>> over performance considerations?
+>> To mitigate the performance impact, we can cache the "pending interrupt" status
+>> on the first read, similar to how guest RSP/RBP are cached to avoid VMREADs for
+>> normal VMs. This optimization can be done in a separate patch or series.
+>>
+>> And, future TDX modules will report the status via registers.
 
-> +		goto out_filemap;
-> +	}
-> +
-> +	if (folio_test_hwpoison(folio)) {
-> +		ret = VM_FAULT_HWPOISON;
-> +		goto out_folio;
-> +	}
-> +
-> +	/* Must be called with folio lock held, i.e., after kvm_gmem_get_folio() */
-> +	if (!kvm_gmem_offset_is_shared(vmf->vma->vm_file, vmf->pgoff)) {
-> +		ret = VM_FAULT_SIGBUS;
-> +		goto out_folio;
-> +	}
-> +
-> +	/*
-> +	 * Only private folios are marked as "guestmem" so far, and we never
-> +	 * expect private folios at this point.
-> +	 */
-
-Proposal - rephrase this comment as: before typed folios can be mapped,
-PGTY_guestmem is only tagged on folios so that guest_memfd will receive
-the kvm_gmem_handle_folio_put() callback. The tag is definitely not
-expected when a folio is about to be faulted in.
-
-I propose the above because I think technically when mappability is NONE
-the folio isn't private? Not sure if others see this differently.
-
-> +	if (WARN_ON_ONCE(folio_test_guestmem(folio)))  {
-> +		ret = VM_FAULT_SIGBUS;
-> +		goto out_folio;
-> +	}
-> +
-> +	/* No support for huge pages. */
-> +	if (WARN_ON_ONCE(folio_test_large(folio))) {
-> +		ret = VM_FAULT_SIGBUS;
-> +		goto out_folio;
-> +	}
-> +
-> +	if (!folio_test_uptodate(folio)) {
-> +		clear_highpage(folio_page(folio, 0));
-> +		kvm_gmem_mark_prepared(folio);
-> +	}
-> +
-> +	vmf->page = folio_file_page(folio, vmf->pgoff);
-> +
-> +out_folio:
-> +	if (ret != VM_FAULT_LOCKED) {
-> +		folio_unlock(folio);
-> +		folio_put(folio);
-> +	}
-> +
-> +out_filemap:
-> +	filemap_invalidate_unlock_shared(inode->i_mapping);
-> +
-> +	return ret;
-> +}
-> +
-> +static const struct vm_operations_struct kvm_gmem_vm_ops = {
-> +	.fault = kvm_gmem_fault,
-> +};
-> +
-> +static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-> +{
-> +	struct kvm_gmem *gmem = file->private_data;
-> +
-> +	if (!kvm_arch_gmem_supports_shared_mem(gmem->kvm))
-> +		return -ENODEV;
-> +
-> +	if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
-> +	    (VM_SHARED | VM_MAYSHARE)) {
-> +		return -EINVAL;
-> +	}
-> +
-> +	file_accessed(file);
-> +	vm_flags_set(vma, VM_DONTDUMP);
-> +	vma->vm_ops = &kvm_gmem_vm_ops;
-> +
-> +	return 0;
-> +}
-> +#else
-> +#define kvm_gmem_mmap NULL
->  #endif /* CONFIG_KVM_GMEM_SHARED_MEM */
->  
->  static struct file_operations kvm_gmem_fops = {
-> +	.mmap		= kvm_gmem_mmap,
-
-I think it's better to surround this with #ifdef
-CONFIG_KVM_GMEM_SHARED_MEM so that when more code gets inserted between
-the struct declaration and the definition of kvm_gmem_mmap() it is more
-obvious that .mmap is only overridden when CONFIG_KVM_GMEM_SHARED_MEM is
-set.
-
->  	.open		= generic_file_open,
->  	.release	= kvm_gmem_release,
->  	.fallocate	= kvm_gmem_fallocate,
 
