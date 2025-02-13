@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-38054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38055-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8688BA349A7
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 17:24:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFAF3A349D1
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 17:29:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E62216FDC2
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 16:22:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D7513AD497
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 16:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11DD23A9B6;
-	Thu, 13 Feb 2025 16:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4128524A067;
+	Thu, 13 Feb 2025 16:16:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD873202C43;
-	Thu, 13 Feb 2025 16:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CBE24A053;
+	Thu, 13 Feb 2025 16:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739463388; cv=none; b=e1OBjfenixUaQhVliuZnzvzdPqNjRKTnUvi/eTRt3y5LrZ8b0rWqlWRfAxzQf2zcbPkPXK4AkPtdUH5E5xAUZoFO3nDGPugKvbfVCK1oDD4SQLryB0OVQWF90raNu6h6GkNcE5Hq7ECTAl0u1OUgYuwnUf/E2DBbOVt2erbSdBg=
+	t=1739463392; cv=none; b=qH06xnmrba5BRclU7ZMMiqZCm+rjpmmXODmOdsDnUpQXAuLK3vIur8+dgAHWMN0iUqtYAfTr4Mx9LJuKEyRLAwQHnwMAF5651t8SyntUjTOn6kIRp9b+NPliT9SR6X9PrgtH/aS+1top3uve41zQFmZ/MxOwm1xAlnVtH3uOclw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739463388; c=relaxed/simple;
-	bh=/IP4sPTzdL6OqvGI+gk5wXMcQOe47kMjaa+v4kcbCHU=;
+	s=arc-20240116; t=1739463392; c=relaxed/simple;
+	bh=wAnm94kQogjv7V54rlMRyizGuIPfkyn+r1FjRz/y5rM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FXSprXJZPmmkn730ik9BiUC8f9p76hBGvh/3HvfHEFuS18XVpuhjIa7RmnbaAy/VVGy1MgZ9hx9teYh4z+D1ncscv5Sn9aukGbD9x4nQ9kRhN0ADgbR7FU/KeaFrBhRqYldFbAGYRe1MUVCDKunq1tF+ny6P0wJ9wiWx4lVWXlA=
+	 MIME-Version; b=b/9nsSmdC0s6sqO1xqWHzfDxlNsoyhfDlt2UzKfu9XVpwyjGekJvxI9F713O3kpAwmSXkc722E/L+bWR3euWVVPBviQ3rFzrprEet7+/3j9PkFLPbZNKAlm+eKSAaX9xqosTop6GUuG3JIlMyFBD/esZJUCCW5zVpGepra0dtQU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E32BC26BA;
-	Thu, 13 Feb 2025 08:16:46 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 415911756;
+	Thu, 13 Feb 2025 08:16:51 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.32.44])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E48EB3F6A8;
-	Thu, 13 Feb 2025 08:16:21 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B6AE03F6A8;
+	Thu, 13 Feb 2025 08:16:26 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -56,9 +56,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: [PATCH v7 23/45] KVM: arm64: Validate register access for a Realm VM
-Date: Thu, 13 Feb 2025 16:14:03 +0000
-Message-ID: <20250213161426.102987-24-steven.price@arm.com>
+Subject: [PATCH v7 24/45] KVM: arm64: Handle Realm PSCI requests
+Date: Thu, 13 Feb 2025 16:14:04 +0000
+Message-ID: <20250213161426.102987-25-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250213161426.102987-1-steven.price@arm.com>
 References: <20250213161426.102987-1-steven.price@arm.com>
@@ -70,83 +70,161 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The RMM only allows setting the GPRS (x0-x30) and PC for a realm
-guest. Check this in kvm_arm_set_reg() so that the VMM can receive a
-suitable error return if other registers are accessed.
+The RMM needs to be informed of the target REC when a PSCI call is made
+with an MPIDR argument. Expose an ioctl to the userspace in case the PSCI
+is handled by it.
 
+Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-Changes since v5:
- * Upper GPRS can be set as part of a HOST_CALL return, so fix up the
-   test to allow them.
+Changes since v6:
+ * Use vcpu_is_rec() rather than kvm_is_realm(vcpu->kvm).
+ * Minor renaming/formatting fixes.
 ---
- arch/arm64/kvm/guest.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ arch/arm64/include/asm/kvm_rme.h |  3 +++
+ arch/arm64/kvm/arm.c             | 25 +++++++++++++++++++++++++
+ arch/arm64/kvm/psci.c            | 30 ++++++++++++++++++++++++++++++
+ arch/arm64/kvm/rme.c             | 14 ++++++++++++++
+ 4 files changed, 72 insertions(+)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 2196979a24a3..ff0306650b39 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -73,6 +73,24 @@ static u64 core_reg_offset_from_id(u64 id)
- 	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
+diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+index 945927c70746..069a410a756f 100644
+--- a/arch/arm64/include/asm/kvm_rme.h
++++ b/arch/arm64/include/asm/kvm_rme.h
+@@ -109,6 +109,9 @@ int realm_map_non_secure(struct realm *realm,
+ 			 kvm_pfn_t pfn,
+ 			 unsigned long size,
+ 			 struct kvm_mmu_memory_cache *memcache);
++int realm_psci_complete(struct kvm_vcpu *source,
++			struct kvm_vcpu *target,
++			unsigned long status);
+ 
+ static inline bool kvm_realm_is_private_address(struct realm *realm,
+ 						unsigned long addr)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3e13e3d87ed9..a6718dec00c9 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1730,6 +1730,22 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	return __kvm_arm_vcpu_set_events(vcpu, events);
  }
  
-+static bool kvm_realm_validate_core_reg(u64 off)
++static int kvm_arm_vcpu_rmm_psci_complete(struct kvm_vcpu *vcpu,
++					  struct kvm_arm_rmm_psci_complete *arg)
 +{
-+	/*
-+	 * Note that GPRs can only sometimes be controlled by the VMM.
-+	 * For PSCI only X0-X6 are used, higher registers are ignored (restored
-+	 * from the REC).
-+	 * For HOST_CALL all of X0-X30 are copied to the RsiHostCall structure.
-+	 * For emulated MMIO X0 is always used.
-+	 */
-+	switch (off) {
-+	case KVM_REG_ARM_CORE_REG(regs.regs[0]) ...
-+	     KVM_REG_ARM_CORE_REG(regs.regs[30]):
-+	case KVM_REG_ARM_CORE_REG(regs.pc):
-+		return true;
-+	}
-+	return false;
-+}
++	struct kvm_vcpu *target = kvm_mpidr_to_vcpu(vcpu->kvm, arg->target_mpidr);
 +
- static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
- {
- 	int size;
-@@ -783,12 +801,34 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	return kvm_arm_sys_reg_get_reg(vcpu, reg);
- }
- 
-+/*
-+ * The RMI ABI only enables setting some GPRs and PC. The selection of GPRs
-+ * that are available depends on the Realm state and the reason for the last
-+ * exit.  All other registers are reset to architectural or otherwise defined
-+ * reset values by the RMM, except for a few configuration fields that
-+ * correspond to Realm parameters.
-+ */
-+static bool validate_realm_set_reg(struct kvm_vcpu *vcpu,
-+				   const struct kvm_one_reg *reg)
-+{
-+	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_CORE) {
-+		u64 off = core_reg_offset_from_id(reg->id);
-+
-+		return kvm_realm_validate_core_reg(off);
-+	}
-+
-+	return false;
-+}
-+
- int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	/* We currently use nothing arch-specific in upper 32 bits */
- 	if ((reg->id & ~KVM_REG_SIZE_MASK) >> 32 != KVM_REG_ARM64 >> 32)
- 		return -EINVAL;
- 
-+	if (kvm_is_realm(vcpu->kvm) && !validate_realm_set_reg(vcpu, reg))
++	if (!target)
 +		return -EINVAL;
 +
- 	switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
- 	case KVM_REG_ARM_CORE:	return set_core_reg(vcpu, reg);
- 	case KVM_REG_ARM_FW:
++	/*
++	 * RMM v1.0 only supports PSCI_RET_SUCCESS or PSCI_RET_DENIED
++	 * for the status. But, let us leave it to the RMM to filter
++	 * for making this future proof.
++	 */
++	return realm_psci_complete(vcpu, target, arg->psci_status);
++}
++
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg)
+ {
+@@ -1852,6 +1868,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 
+ 		return kvm_arm_vcpu_finalize(vcpu, what);
+ 	}
++	case KVM_ARM_VCPU_RMM_PSCI_COMPLETE: {
++		struct kvm_arm_rmm_psci_complete req;
++
++		if (!vcpu_is_rec(vcpu))
++			return -EPERM;
++		if (copy_from_user(&req, argp, sizeof(req)))
++			return -EFAULT;
++		return kvm_arm_vcpu_rmm_psci_complete(vcpu, &req);
++	}
+ 	default:
+ 		r = -EINVAL;
+ 	}
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 3b5dbe9a0a0e..a68f3c1878a5 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -103,6 +103,12 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 
+ 	reset_state->reset = true;
+ 	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
++	/*
++	 * Make sure we issue PSCI_COMPLETE before the VCPU can be
++	 * scheduled.
++	 */
++	if (vcpu_is_rec(vcpu))
++		realm_psci_complete(source_vcpu, vcpu, PSCI_RET_SUCCESS);
+ 
+ 	/*
+ 	 * Make sure the reset request is observed if the RUNNABLE mp_state is
+@@ -115,6 +121,11 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 
+ out_unlock:
+ 	spin_unlock(&vcpu->arch.mp_state_lock);
++	if (vcpu_is_rec(vcpu) && ret != PSCI_RET_SUCCESS) {
++		realm_psci_complete(source_vcpu, vcpu,
++				    ret == PSCI_RET_ALREADY_ON ?
++				    PSCI_RET_SUCCESS : PSCI_RET_DENIED);
++	}
+ 	return ret;
+ }
+ 
+@@ -142,6 +153,25 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+ 	/* Ignore other bits of target affinity */
+ 	target_affinity &= target_affinity_mask;
+ 
++	if (vcpu_is_rec(vcpu)) {
++		struct kvm_vcpu *target_vcpu;
++
++		/* RMM supports only zero affinity level */
++		if (lowest_affinity_level != 0)
++			return PSCI_RET_INVALID_PARAMS;
++
++		target_vcpu = kvm_mpidr_to_vcpu(kvm, target_affinity);
++		if (!target_vcpu)
++			return PSCI_RET_INVALID_PARAMS;
++
++		/*
++		 * Provide the references of the source and target RECs to the
++		 * RMM so that the RMM can complete the PSCI request.
++		 */
++		realm_psci_complete(vcpu, target_vcpu, PSCI_RET_SUCCESS);
++		return PSCI_RET_SUCCESS;
++	}
++
+ 	/*
+ 	 * If one or more VCPU matching target affinity are running
+ 	 * then ON else OFF
+diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+index 4b5bb7e49c4f..3a7d515c9e9f 100644
+--- a/arch/arm64/kvm/rme.c
++++ b/arch/arm64/kvm/rme.c
+@@ -145,6 +145,20 @@ static void free_delegated_granule(phys_addr_t phys)
+ 	free_page((unsigned long)phys_to_virt(phys));
+ }
+ 
++int realm_psci_complete(struct kvm_vcpu *source, struct kvm_vcpu *target,
++			unsigned long status)
++{
++	int ret;
++
++	ret = rmi_psci_complete(virt_to_phys(source->arch.rec.rec_page),
++				virt_to_phys(target->arch.rec.rec_page),
++				status);
++	if (ret)
++		return -EINVAL;
++
++	return 0;
++}
++
+ static int realm_rtt_create(struct realm *realm,
+ 			    unsigned long addr,
+ 			    int level,
 -- 
 2.43.0
 
