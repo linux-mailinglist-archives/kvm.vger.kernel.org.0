@@ -1,231 +1,235 @@
-Return-Path: <kvm+bounces-38003-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF2ABA33842
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 07:54:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01247A33863
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 07:59:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3A851888687
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 06:54:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80BD23A8FFD
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 06:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E5C207E17;
-	Thu, 13 Feb 2025 06:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DFC207E0F;
+	Thu, 13 Feb 2025 06:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="K6QsZx6s"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N/S3rfoz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D6B207A27
-	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 06:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739429658; cv=none; b=tiEN39feXTc6YCA8yQBJrnMK5HRb/xb7vjwHpnYvLBvZdEYTpWXTSNQU7PnxTMSwFSNnd9wvRClDfbPsLmkqAHLGc4oZJv/scOwDXDcJ4L5dj9BPCNoTzxi542Opr4NPJ/3gYSXWhsdcd48q+qegQkaa8FUJZ6Yd23ww62+tQdI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739429658; c=relaxed/simple;
-	bh=/yzdYtH4YY0bjMwJcW3eRmS8j75+nWXBCn9ujfFhxSY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=PSAxEQdcFdC5A3VOgww6n5/aphxdkEAyw+84Mi+U3SJaDYw3V80B1dydZf2RC2OeRdfBLQjIre0nE3dPxJ/OJSObAfgEkOSWQLH+ys0nCv5tqdfgiaeGKwomOOeVTM33AFbyEnwXgf2gALmH2W3QMjasOd5KhA9liYIz6mI/9x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=K6QsZx6s; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21f61b01630so27035735ad.1
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 22:54:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1739429655; x=1740034455; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pVRbFgdW3C2VjPS6glvqhPThuCYMsgRY+pw4xzl9/Z0=;
-        b=K6QsZx6soGddqHHAQ8vVPNDEHzYML3wLdMO08D8d6RJyCZTohRlL2UxBsBN1HSOFd3
-         nbxXMFpbZj6uHLYHa4UZllFiEXk3X/UbqQRi7X7QfbJTdUMdUudwzQhm8RrhgXd7bcTe
-         TrflT0JP9HO/kJVCSa57mPtb//9Aj2X2vfUNU5FeDwwnIdZiWTpxmaT1yx+E4+RbPTMl
-         3WqD+gCLA6YYPn1yfUP3FbhLMSnzZoqenRk9XGKJKhNBU9Z3aWFCVKuRi9FBr3Eyje9p
-         dKm1JYp6OVzil9CCa3PLkjQhiAplUymD4COTLiBfjKNk6jTdE8bWO7pxBytuSd2ipozz
-         WUjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739429655; x=1740034455;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pVRbFgdW3C2VjPS6glvqhPThuCYMsgRY+pw4xzl9/Z0=;
-        b=qyptkWJyiCfFi7oVJn9dgJ6gzwhhZIQilsZGAbmbpYLN9CLeKQmHSKir439AWg8Ui8
-         73GJQB0rzbrzUrHD+gWWnf/e9KaRjQvB0WHFeqHDEbY4f2znRdQDmHC/79fmV4sEs6WY
-         RvrhzOC8IBWRjRcyNmBbyxNX1hhZxS1rcRWJZ0qogMen292bOmN52zMFDESZWGOWtTgz
-         GudpNaI1ocpG68BO/F/qFxl0N4ZI6ggaWbVpvlNlnl/tTZfdBSYbd09LJaL8bRvpSJGW
-         2RoeSxF5UsrHJWRMJGoDWaEwLC5iCsxt16HT1EJE6uiGVXgKKEN/JztJdChhcXMS2b29
-         i2dw==
-X-Forwarded-Encrypted: i=1; AJvYcCVZCxrkxuyQThLvucPm1Wm564Ak2TBdJYF0hUVPIxffdfKiHbkav7qcd+8jcHckaFxs53w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2JDn20pcnMeCUf6Ag4qic7cOJlWNGoIkiCmqXGEb17WxmeEgo
-	mrzlrd09aLyATHYFrqKr0ODECPXrEAa7ULSAPNdJxKpZmh8kiUnORui4kQMbAxE=
-X-Gm-Gg: ASbGncsYwptJr9+P8X97bcIosRlHK1giLf3jm/TVT7mbRz879f4A81kzXtp09KsNSzm
-	PXxNSFgkVGpEa5/22N3E9BUThPEil0SuvGd70weW7vKyRxh7kzhw2T7AOEfF9vzQhcO/PWEbUql
-	j8FcIBcPIh9jC9X4WVmwBvqYS1n2GyW82OERUhVmowOoldjzy//IjBUIgeSEZ3rX5VeaGnDLX04
-	1/0FFdDMQWQh5+vErt+dPcRNnuc9hnSOc+lLYMbBGu2Mv8Qo21dLmOg4b1VV4a9XyQ38TG/2vkD
-	KojUvurGka+jxR8dIbQ=
-X-Google-Smtp-Source: AGHT+IHM0So4p/83DwxmEtYjGdBS7+MraFx0suhYHvvs65nwUSgOl1qYUwzLV/IIAGbVQphJY2u2vg==
-X-Received: by 2002:a05:6a20:7351:b0:1ee:5cf2:9c01 with SMTP id adf61e73a8af0-1ee6c61abe9mr2996634637.5.1739429654761;
-        Wed, 12 Feb 2025 22:54:14 -0800 (PST)
-Received: from localhost ([157.82.205.237])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-adb57d542f1sm516772a12.2.2025.02.12.22.54.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Feb 2025 22:54:14 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Thu, 13 Feb 2025 15:54:06 +0900
-Subject: [PATCH net-next] tun: Pad virtio headers
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73ACB8635C;
+	Thu, 13 Feb 2025 06:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739429959; cv=fail; b=L02pODr9L6B31Ri1V69sw1kyjk99WEff2k08321dU4BFv7deejMEKeh69z+khMDLJ8C/wrJ6Hnud52bBkF1N8AY0t4J4DeJyvbgFYQxYOLml951CIGmx8LzoNsXnuLXayg59SRTe76X40Soi+9ph/rdECu3E8Nxz5Lm94cJ6EiA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739429959; c=relaxed/simple;
+	bh=ES3hMlgkk5PdlCuPW1w8Gv1rOeRXenjM9w2eOm4iZeg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=tj+wEiOrjqn5Cu7RoCOldgclsP1rJi7NZmTzpJH3hQHLW2DmdLh4cGxn6/HwgJ4Ust9X+gGr4krdqHh03Z6NT3FkfQFsagiredHzEFWkFYdhv8Ia4kFM86UggP7ARAMVAlIWo6+Tixsd8rAbi9DOqVfjNbrdjsE4Vksn/GzEou8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N/S3rfoz; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739429958; x=1770965958;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ES3hMlgkk5PdlCuPW1w8Gv1rOeRXenjM9w2eOm4iZeg=;
+  b=N/S3rfozExhYtMDCe1uCiL752uZqzGXj/rYodVTa3XXfBcfIZtsj5yuH
+   W92tjHM2hDPSMU8EZyvhC6RbLMzVYtp9pv1j944e26VN1GqW1xC/DxFpq
+   QSSEnBBLNIX94K2FMxbOYJcBLyS/V6ZPmOGITWVJDYsVeuHrdIM657shK
+   pLQ1tvHQkS+8hNv2AmSljoiJF6hyLgpTE3OQSysYRiEW53x4fUd9ZOPtf
+   D3IG0b0rJDC9jAfMENjm/rHTLXBrXPpx98/tGIDVhDCukY1wQkySEtaMv
+   szRlhx7wK4fAPu+2JhMvDOE1vKQDAtdTXUAC6e3UM1brbmgvDiDyTN//p
+   g==;
+X-CSE-ConnectionGUID: z1P6u6JKTl29R3Wq/m4IDQ==
+X-CSE-MsgGUID: 7rF4HRtLThW0zE7zf3TE8w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40234164"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="40234164"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 22:59:16 -0800
+X-CSE-ConnectionGUID: pAllCN3USpax8YaRZuQwAQ==
+X-CSE-MsgGUID: S6ShpUCQTM+aUqsYu7nxvg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="143999039"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2025 22:59:15 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Wed, 12 Feb 2025 22:59:14 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 12 Feb 2025 22:59:14 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.43) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 12 Feb 2025 22:59:14 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dhbuxUzpzu3NiOHOOrYpm1/E6vvyWusvhj004/bRSTGwMKhcQDxajnf5QQ8IGgelzSaGLErN7uh8aYx5cuaLwlHAcafnzs7hmAxufuSbQagmPGkelzFDZCPAeh0pJEiKYWFJ24fsAK8hfFZpCbkaGrvj2oquQidPRngFBIkvYCBOdAdRrvTIaBv6YPrCts9wIullF+Aqabft0Ux1ge/qplgvW5aCkGMZGvvzU+OhijvEcrhvwi+DhNHGpCy6/LSPGIKFeRHUsmCsaSuatFTNTExutBy8/GtWw1mgMsUrxTxdCIxPmvHCv8DcxFIQGJ+3Oj69hQnbMeZShFuHF3S5sg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zea3KkDMVpXlHlqBixx25c7AXv7+N2FGwmD3ZfTkBXI=;
+ b=YJ9G+VHlEjfbHhRVdbI9dCIWM9LzBbfdQPayFSJ+nT2JMJpKvC10HAbzTw4PEupOj9GpgtrdLVn/iB//dksbc27UemizHMSHQ/SPUYAXqxBHhZS94wcMYOZFibs7HEdXh58PK6SDRA/sPh1xKW8Yff7KITWYEQb1wWQtqCBfGtK3my9GMSb1OhYd9Qekg2XBhnQQUUelrmfKXaU/S9Hv0bgCoo3oke2NccXMgrGplejGDqO7LaZ4nXCDODYCqwezbSsE1pCBCWE9Pd5ifyCX6J8vpQ2w/BCL+58/BBP2ERpO4cdHBPuPCqMsM5/F8ZJPJRcmU/MuS3z5IBAKufHcQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by SA2PR11MB4986.namprd11.prod.outlook.com (2603:10b6:806:114::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.15; Thu, 13 Feb
+ 2025 06:59:13 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%5]) with mapi id 15.20.8445.013; Thu, 13 Feb 2025
+ 06:59:12 +0000
+Date: Thu, 13 Feb 2025 14:59:02 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+CC: <pbonzini@redhat.com>, <seanjc@google.com>, <kvm@vger.kernel.org>,
+	<rick.p.edgecombe@intel.com>, <kai.huang@intel.com>,
+	<adrian.hunter@intel.com>, <reinette.chatre@intel.com>,
+	<xiaoyao.li@intel.com>, <tony.lindgren@intel.com>,
+	<isaku.yamahata@intel.com>, <yan.y.zhao@intel.com>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 03/17] KVM: VMX: Move posted interrupt delivery code
+ to common header
+Message-ID: <Z62YNrvnJ9Dzw7GE@intel.com>
+References: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
+ <20250211025828.3072076-4-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250211025828.3072076-4-binbin.wu@linux.intel.com>
+X-ClientProxiedBy: SI2PR01CA0009.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::18) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250213-buffers-v1-1-ec4a0821957a@daynix.com>
-X-B4-Tracking: v=1; b=H4sIAA2XrWcC/z3MywrCMBCF4VcJszYwSWOkeRXpookTzSZqLqVQ+
- u4dVFwe/sO3QaWSqIITGxRaUk3PzEOdBITHnO8k0403aNRnVMpK32OkUuVoSRkfUQ8xAL9fhWJ
- aP9IVMjWZaW0wfUuhd2e6/fJfdoJdo/SAsvUsLZs4m9FjuLjFwrTvB//iwYOhAAAA
-X-Change-ID: 20250116-buffers-96e14bf023fc
-To: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
- devel@daynix.com
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|SA2PR11MB4986:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d18aacd-9bd0-439d-d020-08dd4bfbec22
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?yKC1btOwgS/0Fe2GO7dW6z6bMGyzsdxuvXnIdAzVnO930DIpFaTpzYy9B2KW?=
+ =?us-ascii?Q?TBJ3aGeEAcb7NK1m09+VrhGUPhdZQyBqUM0czYHemCQ9XODe2osZSEkrCQ49?=
+ =?us-ascii?Q?suAidumPSRqrg0iSa2wDdsfEJofqjAefTGI+mnO4kz4wYhqlpsRfLXNezTO1?=
+ =?us-ascii?Q?PWDPUywmOQUtjUa0JEm8Zwp6XdKqCUaeVtmGNomn1MaLOWooNAicNa0XdvfR?=
+ =?us-ascii?Q?Uac88P6zi3R+Xze0pe0kaYbARWZVAgaOjcVWx2Rq0g76U61ytLoafzti5zD8?=
+ =?us-ascii?Q?LTXYfFJFuF6dPaQoWKaxzKencaJLwgHVh823of8iWynSw4ZwBerJJjwZA2Qc?=
+ =?us-ascii?Q?rHRWy1AckvbqqB8C/vb8NwpYDqR/JxZ+AXB527NmSf2Y4xHRElPthaT4KXZz?=
+ =?us-ascii?Q?XV065sPHVT6CrFR6vL5Nr3nkYNJeWTllxXzyef0GK9IQ9iPTdXTw5b/rI11S?=
+ =?us-ascii?Q?LzfEzTZ8aGK+3lIU5T1ZX2I3lwBi9a4Xhxq2l8Eqlb9OETHQWHNI/lf3wK2d?=
+ =?us-ascii?Q?yLIwk12jNw93ez88onmr3Es2/fauN3p8PF4OlVNWr2tPrT4fP6ndHxaW/NXJ?=
+ =?us-ascii?Q?fx3kfGtn0+KqrHHr78svT2mpI39UmFTTOrzNG1xTMTijGIOsszCfgdIxlOR6?=
+ =?us-ascii?Q?LErDt3xyLRWNUC1Ga0WV9VZN4WviahvBifvTvcGO/VjYk4PUibmV8xDXhL39?=
+ =?us-ascii?Q?m0NW8Gug3VwGeirDYBTu28EDCXFWiStv1lv/V/CULa56OfDJTOw3GWs29gy1?=
+ =?us-ascii?Q?CYRGX2cXQsQxIls64Y2IRM11/7aZwNlwr1nLqT3F/dptJxAcT2hIcA+fzvbC?=
+ =?us-ascii?Q?DiPRMojRMJb15IAPmOGSPwdpHiJ9+TntSx9LbvtSWxPiG4Dk5B9h+I9wBH7F?=
+ =?us-ascii?Q?yWJtQT6cUgDb380bg7729/nrQJ5sHskGiar1lR/H1dhmolDbGBCLmcoAhbe8?=
+ =?us-ascii?Q?KcKpDinlvnp29B535iocUFJuVg5/QDuhvjw6FeL7J1jMqVBjmCFZgwWSBgVj?=
+ =?us-ascii?Q?ubDJijTtnHbxsmBUw3s98CjMsro95VdS2/vjNs6RsbDFUAQ2aZFufl8TGUhP?=
+ =?us-ascii?Q?Cb/cStk0UNmbS8tYIROjqzjTMDCKzX1KODjqJUwTVvwOmDsCKwNULZoKbGeh?=
+ =?us-ascii?Q?Fmr+gfldOjzF7WBwbMVeIARYy+Fp5UDODz/YdJwQi4xLHukUABftwavr3OHF?=
+ =?us-ascii?Q?uBAvvNoDFCuJ+wu7q/V+OXjHCJ6wSsb86OhB875xR940UBF5+ebHX15h3+Yo?=
+ =?us-ascii?Q?Vw9gqqlRwEf4kHKTZP7vHKpBT9Fhb7IP9YNWSxraH8liOf/p53ZN4yHGlo3S?=
+ =?us-ascii?Q?QrqeAK8h2frvoOke0jeVivV/InrQcCpLdOyybh498WErLHQI4ic1W2r7pIjn?=
+ =?us-ascii?Q?/u0lUCVsf7ngE62ANEkIW4+IXJ/S?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QkZ1ITOFwppgczaq0k2MBvNXJNX2tCvEYBr+y8IaRRchJq3yF7RaeD/Z3x/H?=
+ =?us-ascii?Q?XOr4EjBLKfLq+5sdTVVY4559sOTx6L2NXzvhIPFMTTC8nO605VWTnXllUVPt?=
+ =?us-ascii?Q?GmalDbTV/NQx0Kccx4h3vaoJmKj0iRlGNfeRXZR6CpI70vR2ybQUg6IH9Rxt?=
+ =?us-ascii?Q?NsZ/V5H3I1iW7eMCD7Fos8VKOmBEUtQ59Ds59IkQbOHdZkEZNx95+H1Q7mdG?=
+ =?us-ascii?Q?nSBEFt1oeUa4poG2156XoUni2ex+Lo082cs1d7uZNtkQ6l2qVBtQILw3YKst?=
+ =?us-ascii?Q?uWo07D20cltcfERtHfaX/+UHRSJP4ti/zAc4BaasNmdZ/yUbQWFGcztxP/HD?=
+ =?us-ascii?Q?hwf+zMFl2AGfKxEcs6XpfeZGichwwKUCcJ5olBCy41kNXoYj6jvXshWUMbUD?=
+ =?us-ascii?Q?kijPCw9p50MrORqhz238XdKmbkjSW7x29CEP3RHZiOrOKiMhKr3McbuNcU7J?=
+ =?us-ascii?Q?oHPA3uoA/pzkhgQB6JUD5nz3pTlTYdCBkLvIeIrIjwyqldQ0de4/L1BotqcW?=
+ =?us-ascii?Q?RvUj1alW2Pygs0O5q1Roh8uNocD3UrzetzObcLmFg/+R2duwpmxfreAXabzL?=
+ =?us-ascii?Q?el++LT3JAkvqD6Qdd/VukFFpEHmLC491QAhBZdAhW7RKQP0DucdWdf2dOiVY?=
+ =?us-ascii?Q?DWe6LzLoqUnar5zG7hUtqV9l+5eipe/lf3TFUkCjDFEHKtjeKerpkK2oroVH?=
+ =?us-ascii?Q?tDC4z/UafIm98bCdzYx8HckknGTF9FBCKRqxIxtjjDGVMXn887EjuB6OfSb3?=
+ =?us-ascii?Q?/rW8w0zZY50cMSjLn9d7hNdDHtRakhg+tY4tRXWz1NNjvJXadEsblEU1E/ya?=
+ =?us-ascii?Q?4PXEw5ctFgjQ+wKHEghquNGwZwBi/8tgep9jOvqXoTpjlLrnkzGlA0E1bFmL?=
+ =?us-ascii?Q?o+a/O6HaQ3qBdAVRzS+Fn1sIRlzLT/XqxI8xJsFFVGNVQqnhKSMGqvAfNt35?=
+ =?us-ascii?Q?98WaUT7BvHWUxBvgt93MNhhqLckEJaW1U7WPkXv6EELqa+ivEtQDB5qtFcCf?=
+ =?us-ascii?Q?pq6hRF1hPJSYOl0tD1oejfFQ1Sb7VjG4HfalJUqnUcAu8+BZaVeJV2n3Xcsj?=
+ =?us-ascii?Q?i5BkfONBH8/2BJgFhw17Lyr/R3KFGcPHn4CmgU1T7hsDpVub45aF3P4cf23a?=
+ =?us-ascii?Q?bU6WclC9oDZxY3QxyoyJhiPSaShmqKT8xgQgALaYGwdo3FiBVphkDBvFEDl8?=
+ =?us-ascii?Q?E4Rx3fblNHeE3mocsafciB9yY9/KCsgJrRtjRg4EKC2uvkgwW3ssxTXvggPC?=
+ =?us-ascii?Q?/HPoiaxmYwnKdJTIKQBUbIB/PtRdkvOiWwAtkketpPKXTSBieMyyOVYkNLTY?=
+ =?us-ascii?Q?JPcitwt4AMMPlZj3QO13ZRt82sQFWJ+s4L4BiYT+CS+4kvyK3A8oX1TdE/0+?=
+ =?us-ascii?Q?ZuFJRKhI162/ZVo7DmnNqapLLOUIvbd0MPcppEQ5QxoSFbNOrNi0dHlxTfHp?=
+ =?us-ascii?Q?/CByigvjL/e7z4Oj9bZHd/DDbc4R++oBBUPAZbWDnqAzqZeap6Rj8sWfjXOY?=
+ =?us-ascii?Q?qss0eR9ivu0Vq93A3ugqqA3/hkaLzeC/KHAoVWhUs86dtn1NS5RIuqNvyM6L?=
+ =?us-ascii?Q?689e42jrVxsmNlz3K9jA6GJjM9ohLk6hjRcKq+RB?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d18aacd-9bd0-439d-d020-08dd4bfbec22
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 06:59:12.8538
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yCJqWwviRHmv7axnNL/hDPJ1Cj6JeToio1b79cet1hHQ2wp4wrYE+XYlnbc8v3oUb8P2+dcpHsqWtgI1WFNUaA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4986
+X-OriginatorOrg: intel.com
 
-tun used to simply advance iov_iter when it needs to pad virtio header,
-which leaves the garbage in the buffer as is. This is especially
-problematic when tun starts to allow enabling the hash reporting
-feature; even if the feature is enabled, the packet may lack a hash
-value and may contain a hole in the virtio header because the packet
-arrived before the feature gets enabled or does not contain the
-header fields to be hashed. If the hole is not filled with zero, it is
-impossible to tell if the packet lacks a hash value.
+>+/*
+>+ * Send interrupt to vcpu via posted interrupt way.
+>+ * 1. If target vcpu is running(non-root mode), send posted interrupt
+>+ * notification to vcpu and hardware will sync PIR to vIRR atomically.
 
-In theory, a user of tun can fill the buffer with zero before calling
-read() to avoid such a problem, but leaving the garbage in the buffer is
-awkward anyway so fill the buffer in tun.
+This comment primarily describes what kvm_vcpu_trigger_posted_interrupt() does.
+And, it is not entirely accurate, as it is not necessarily the "hardware" that
+syncs PIR to vIRR (see case 2 & 3 in the comment in
+kvm_vcpu_trigger_posted_interrupt()).
 
-The specification also says the device MUST set num_buffers to 1 when
-the field is present so set it when the specified header size is big
-enough to contain the field.
+How about:
 
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- drivers/net/tap.c      |  2 +-
- drivers/net/tun.c      |  6 ++++--
- drivers/net/tun_vnet.h | 14 +++++++++-----
- 3 files changed, 14 insertions(+), 8 deletions(-)
+/*
+ * Post an interrupt to a vCPU's PIR and trigger the vCPU to process the
+ * interrupt if necessary.
+ */
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 1287e241f4454fb8ec4975bbaded5fbaa88e3cc8..d96009153c316f669e626d95002e5fe8add3a1b2 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -711,7 +711,7 @@ static ssize_t tap_put_user(struct tap_queue *q,
- 	int total;
- 
- 	if (q->flags & IFF_VNET_HDR) {
--		struct virtio_net_hdr vnet_hdr;
-+		struct virtio_net_hdr_v1 vnet_hdr;
- 
- 		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
- 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index b14231a743915c2851eaae49d757b763ec4a8841..a3aed7e42c63d8b8f523c0141c7d970ab185178c 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1987,7 +1987,9 @@ static ssize_t tun_put_user_xdp(struct tun_struct *tun,
- 	ssize_t ret;
- 
- 	if (tun->flags & IFF_VNET_HDR) {
--		struct virtio_net_hdr gso = { 0 };
-+		struct virtio_net_hdr_v1 gso = {
-+			.num_buffers = cpu_to_tun_vnet16(tun->flags, 1)
-+		};
- 
- 		vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
- 		ret = tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
-@@ -2040,7 +2042,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 	}
- 
- 	if (vnet_hdr_sz) {
--		struct virtio_net_hdr gso;
-+		struct virtio_net_hdr_v1 gso;
- 
- 		ret = tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, &gso);
- 		if (ret)
-diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
-index fd7411c4447ffb180e032fe3e22f6709c30da8e9..b4f406f522728f92266898969831c26a87930f6a 100644
---- a/drivers/net/tun_vnet.h
-+++ b/drivers/net/tun_vnet.h
-@@ -135,15 +135,17 @@ static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
- }
- 
- static inline int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
--				   const struct virtio_net_hdr *hdr)
-+				   const struct virtio_net_hdr_v1 *hdr)
- {
-+	int content_sz = MIN(sizeof(*hdr), sz);
-+
- 	if (unlikely(iov_iter_count(iter) < sz))
- 		return -EINVAL;
- 
--	if (unlikely(copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr)))
-+	if (unlikely(copy_to_iter(hdr, content_sz, iter) != content_sz))
- 		return -EFAULT;
- 
--	iov_iter_advance(iter, sz - sizeof(*hdr));
-+	iov_iter_zero(sz - content_sz, iter);
- 
- 	return 0;
- }
-@@ -157,11 +159,11 @@ static inline int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
- static inline int tun_vnet_hdr_from_skb(unsigned int flags,
- 					const struct net_device *dev,
- 					const struct sk_buff *skb,
--					struct virtio_net_hdr *hdr)
-+					struct virtio_net_hdr_v1 *hdr)
- {
- 	int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
- 
--	if (virtio_net_hdr_from_skb(skb, hdr,
-+	if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)hdr,
- 				    tun_vnet_is_little_endian(flags), true,
- 				    vlan_hlen)) {
- 		struct skb_shared_info *sinfo = skb_shinfo(skb);
-@@ -179,6 +181,8 @@ static inline int tun_vnet_hdr_from_skb(unsigned int flags,
- 		return -EINVAL;
- 	}
- 
-+	hdr->num_buffers = cpu_to_tun_vnet16(flags, 1);
-+
- 	return 0;
- }
- 
 
----
-base-commit: f54eab84fc17ef79b701e29364b7d08ca3a1d2f6
-change-id: 20250116-buffers-96e14bf023fc
-prerequisite-change-id: 20241230-tun-66e10a49b0c7:v6
-prerequisite-patch-id: 871dc5f146fb6b0e3ec8612971a8e8190472c0fb
-prerequisite-patch-id: 2797ed249d32590321f088373d4055ff3f430a0e
-prerequisite-patch-id: ea3370c72d4904e2f0536ec76ba5d26784c0cede
-prerequisite-patch-id: 837e4cf5d6b451424f9b1639455e83a260c4440d
-prerequisite-patch-id: ea701076f57819e844f5a35efe5cbc5712d3080d
-prerequisite-patch-id: 701646fb43ad04cc64dd2bf13c150ccbe6f828ce
-prerequisite-patch-id: 53176dae0c003f5b6c114d43f936cf7140d31bb5
+Other than that, the patch looks good to me
 
-Best regards,
--- 
-Akihiko Odaki <akihiko.odaki@daynix.com>
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 
+>+ * 2. If target vcpu isn't running(root mode), kick it to pick up the
+>+ * interrupt from PIR in next vmentry.
+>+ */
+>+static inline void __vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu,
+>+						  struct pi_desc *pi_desc, int vector)
+>+{
+>+	if (pi_test_and_set_pir(vector, pi_desc))
+>+		return;
+>+
+>+	/* If a previous notification has sent the IPI, nothing to do.  */
+>+	if (pi_test_and_set_on(pi_desc))
+>+		return;
+>+
+>+	/*
+>+	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
+>+	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
+>+	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
+>+	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+>+	 */
+>+	kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR);
+>+}
+>+
 
