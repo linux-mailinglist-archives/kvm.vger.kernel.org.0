@@ -1,510 +1,251 @@
-Return-Path: <kvm+bounces-38019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB04A33BEC
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 11:03:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC387A33C13
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 11:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D021D188C712
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:03:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B602B188D6D0
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0216C211A07;
-	Thu, 13 Feb 2025 10:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C37D212B2D;
+	Thu, 13 Feb 2025 10:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hdgzMYQs"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CnZFkRLV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3140206F31
-	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 10:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63FF1FAC42;
+	Thu, 13 Feb 2025 10:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739440980; cv=none; b=Lm2gsYQtrJCq6EdvbkZ5kZU66T5qL7i8BhMcLoKYVTZ1vA1tyEVmw0Rl8JOHU7cz7qiN6O2kImLBO1k3MDCSbHCAv1Y/MS7kqGQsQOy29FB+Gico4N/x1k8VHzCK84ftlHq8PNscP65LLssJHMX3E+1MN/JXV+I9V/YDV4BANMg=
+	t=1739441215; cv=none; b=FonxUGUIhMClimY+ul3z2lZZZ7CY3nyGvcn5V8efAROEp07GW1HjT6pW891Yd/RZdKRfagpbt7BdzASJ5DqI+2xwwhx6nIV3XB/K5pjFa1Yf95nTNR034b9kXg7XfhF/XRU7h6fYqsDBtmYdC7meIIYfH5otvEc7kNoUbwQrqig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739440980; c=relaxed/simple;
-	bh=tX7AozPP6E5+MLf8cJoQS9mb5qbZJa5QwLF58GQEG44=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=paB01ixPws5NlXD2wNZdqiJ1+uSz7ZcDiqZ6R0reiDQK0LjY5p1+KmdZ9ek0nUzL81ZT9oecHGt7dCcymrDkNZ5HCOrNDSR3Kuw4uWkPV0o9N9IRqR35o1IC11o5Jg5+hgcYR80Bx5vRMNIfLqX9kc6thoFwyBMEIG3K2foVJps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hdgzMYQs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739440976;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3V20fc6va6aAlUHwEWCfoyPaQHzn8E4DTrNUGz56JdM=;
-	b=hdgzMYQs3LucJFDrAxXZrXNbCBMdbEPaBmSoGhhpAtV4fUqcish6znjzgO2Ej7pbB7jnSb
-	FAZm8x5Kc23P73teKdP4TRVhjsp4zAp4wK3W060+t0h5FE0VzHtBRxOac+KG8Q0utrVc6j
-	lIu/9Jq/2mtmKQ/mK4F2XFm7tSGU87A=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-259-1iAMhkY6PhaKyJfazFmMxA-1; Thu, 13 Feb 2025 05:02:54 -0500
-X-MC-Unique: 1iAMhkY6PhaKyJfazFmMxA-1
-X-Mimecast-MFC-AGG-ID: 1iAMhkY6PhaKyJfazFmMxA_1739440973
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4393e89e910so3632555e9.0
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 02:02:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739440973; x=1740045773;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3V20fc6va6aAlUHwEWCfoyPaQHzn8E4DTrNUGz56JdM=;
-        b=LJmNhTkBYS1nKAGfLfaFU89gnkTQi8M9g/Zib86r0qvfYqHdl3LIZs4m/9DtmiB51F
-         qWDRZlwt12a5wZWlU4k5Pr/JrEJ8XWzPl41qXDv6m7+qyA6HQ9BDVGrpJcJn9feJb0oP
-         YfI9aTuYSSOxnn/sGoWHPknJwBb3Fdx7x/AcSZLSnsXWbLPFUOfhAXMOuJhthptZn640
-         eHu75saaVjlDvu2+hhyKgtu1/OG9X1gL8AjfzuCNXfceEbBTYwvut35j78yRzjT4Z48G
-         XL8ugqfNOfiuYJu+IO17wGEg+F+5sNUqzjVVd5jmMrlYTqwV+eVOnZBvw6nU1o42UW3B
-         hfyA==
-X-Forwarded-Encrypted: i=1; AJvYcCUxK92is8mMHztMSTmee0dqF/YwqN95r3Y40oeGaOX1nEs6wv0e4mRWBHf5LzPBorJLyTU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb2TOnQDqiyGSwYnrMMGRBjW1r5ewNowhXZY2X2xx1E6Cm9FRD
-	NZGjHxvUAcdPAWulVpcxg/wxymGKdgLUssg0p0Y6tX5Eae7FXHSpwgrsR6vmkwGFGbwnM/3LbFK
-	U2Fq1sNqkuMNl4sxDSGPTvUL1yjhD+06qWj/Viu3ISnWKheig5Q==
-X-Gm-Gg: ASbGncuqAJ7Ygcf8UHmXGbxzpRG/ZTXRlXXLGFxftdADSOPsGC0ps02U97/Up5alyog
-	Uj+TngPUCgMrKeo/KAFLoeLteXaafFL9i7ctKJOU30uDYhtfAAGtWKCRaIPb0g/OGv7Ypf6qPzS
-	f2ELdgxK7umD0NRgrV4CZFSmtPHWBo2lJoaK1PxqWX1JfYD49bZSoZWOazbnwIHDcMHCoH0NgIm
-	gyg9vyKWuaZgWS5icoTDrcLJ42Bs4++GtcVuzmqXc7XpN3AWbxGCyOHZWsaq0myBEhU13KHtnlM
-	POVuOy9musZZ/khkSBL0zaqw8VMAOtcd4/A/gNWRhIYUuETTNPUmgKe+NMLuVIBCQh2bbH8yb+C
-	9kWlYhY+oiVop7Fk02rDi42XEKO1Feg==
-X-Received: by 2002:a05:600c:444f:b0:434:feb1:adcf with SMTP id 5b1f17b1804b1-439601ae212mr25394205e9.25.1739440972671;
-        Thu, 13 Feb 2025 02:02:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IELEHASa1QH5FtD/ayjVuaAGldYnBlLGmpEmax0pKtSHomSJebxcqI8HhgHajVqv2/9dpsvjw==
-X-Received: by 2002:a05:600c:444f:b0:434:feb1:adcf with SMTP id 5b1f17b1804b1-439601ae212mr25393615e9.25.1739440972064;
-        Thu, 13 Feb 2025 02:02:52 -0800 (PST)
-Received: from ?IPV6:2003:cb:c718:100:347d:db94:161d:398f? (p200300cbc7180100347ddb94161d398f.dip0.t-ipconnect.de. [2003:cb:c718:100:347d:db94:161d:398f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43961884251sm12557855e9.31.2025.02.13.02.02.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 02:02:50 -0800 (PST)
-Message-ID: <7c0b5675-a070-4248-bd29-5c27d07a4c5b@redhat.com>
-Date: Thu, 13 Feb 2025 11:02:49 +0100
+	s=arc-20240116; t=1739441215; c=relaxed/simple;
+	bh=ko837iq1ve/8hqP2/4ukx7/LfNVkESiB7v53Gzu9/xM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=G91pGNRD6rATsoFGbBM5doGqE/WRAOnbCsEvBJiSgTu+RwuiwGUkY8kUMuyVVcVHTYSj0P6tqUA4sbtCYNLn0nF3poFXeRnccFDbcj1H3AzIF/Yj/Hy0onu7jcQ3BDPh7kSrTfF9NEMsq2glEFGX8L6sdRS5J4RxdooOlDc5+x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CnZFkRLV; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51D7YHwL017386;
+	Thu, 13 Feb 2025 10:06:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=+uEW0T
+	cugeSxMGhadSCJPH9+qLh2x0/3ZL4KmjvKuyg=; b=CnZFkRLV0r/+LxHWU9sCb9
+	Mg+pYguRwrXskPrlsmAQUc1aOS+elsmezqSYMeDhbDDH0QW77lLon2QLj3055tGQ
+	xi/gQYD+6/DIfl4V6EtSMZj0zlTUvvmRro9MfFLAfFoiPM5Wq4vaCEmhHHktlNSK
+	axSgwgL2Lx9jakRoMBqkIXG12qlHl0zymY4Ch0le3iklIpCRB90SwK1pCBoAPNLv
+	kcRyNoNK0ejVwd9m0BbV4F2y7g5TpF7dYI8rJ+mUKKDl7Z87u+58isxkHmXkSoKr
+	qEgseve+UNnjRBXKNM2N56cyyE4AGeysxNcUP/e6/8d8voQ8oVvr7UoeUbFtKxdA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rxfu4tke-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 10:06:37 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51DA3a75020734;
+	Thu, 13 Feb 2025 10:06:37 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rxfu4tka-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 10:06:36 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51D81TZx001355;
+	Thu, 13 Feb 2025 10:06:36 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pjkndnvs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Feb 2025 10:06:36 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51DA6Z6v32965246
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 13 Feb 2025 10:06:35 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 26E2558059;
+	Thu, 13 Feb 2025 10:06:35 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47E2B58043;
+	Thu, 13 Feb 2025 10:06:31 +0000 (GMT)
+Received: from [9.171.82.253] (unknown [9.171.82.253])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 13 Feb 2025 10:06:31 +0000 (GMT)
+Message-ID: <8f1a62e93bde37708a47b7db70767d1e14c608e0.camel@linux.ibm.com>
+Subject: Re: [PATCH v5 2/2] PCI: s390: Support mmap() of BARs and replace
+ VFIO_PCI_MMAP by a device flag
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Gerd Bayer
+ <gbayer@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jason
+ Gunthorpe	 <jgg@ziepe.ca>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Bjorn
+ Helgaas	 <bhelgaas@google.com>,
+        Julian Ruess <julianr@linux.ibm.com>,
+        Halil
+ Pasic	 <pasic@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Gerald
+ Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens	
+ <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev	
+ <agordeev@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org
+Date: Thu, 13 Feb 2025 11:06:30 +0100
+In-Reply-To: <20250212132808.08dcf03c.alex.williamson@redhat.com>
+References: <20250212-vfio_pci_mmap-v5-0-633ca5e056da@linux.ibm.com>
+		<20250212-vfio_pci_mmap-v5-2-633ca5e056da@linux.ibm.com>
+	 <20250212132808.08dcf03c.alex.williamson@redhat.com>
+Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
+ keydata=mQINBGHm3M8BEAC+MIQkfoPIAKdjjk84OSQ8erd2OICj98+GdhMQpIjHXn/RJdCZLa58k
+ /ay5x0xIHkWzx1JJOm4Lki7WEzRbYDexQEJP0xUia0U+4Yg7PJL4Dg/W4Ho28dRBROoJjgJSLSHwc
+ 3/1pjpNlSaX/qg3ZM8+/EiSGc7uEPklLYu3gRGxcWV/944HdUyLcnjrZwCn2+gg9ncVJjsimS0ro/
+ 2wU2RPE4ju6NMBn5Go26sAj1owdYQQv9t0d71CmZS9Bh+2+cLjC7HvyTHKFxVGOznUL+j1a45VrVS
+ XQ+nhTVjvgvXR84z10bOvLiwxJZ/00pwNi7uCdSYnZFLQ4S/JGMs4lhOiCGJhJ/9FR7JVw/1t1G9a
+ UlqVp23AXwzbcoV2fxyE/CsVpHcyOWGDahGLcH7QeitN6cjltf9ymw2spBzpRnfFn80nVxgSYVG1d
+ w75ksBAuQ/3e+oTQk4GAa2ShoNVsvR9GYn7rnsDN5pVILDhdPO3J2PGIXa5ipQnvwb3EHvPXyzakY
+ tK50fBUPKk3XnkRwRYEbbPEB7YT+ccF/HioCryqDPWUivXF8qf6Jw5T1mhwukUV1i+QyJzJxGPh19
+ /N2/GK7/yS5wrt0Lwxzevc5g+jX8RyjzywOZGHTVu9KIQiG8Pqx33UxZvykjaqTMjo7kaAdGEkrHZ
+ dVHqoPZwhCsgQARAQABtChOaWtsYXMgU2NobmVsbGUgPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+iQ
+ JXBBMBCABBAhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAhkBFiEEnbAAstJ1IDCl9y3cr+Q/Fej
+ CYJAFAmesutgFCQenEYkACgkQr+Q/FejCYJDIzA//W5h3t+anRaztihE8ID1c6ifS7lNUtXr0wEKx
+ Qm6EpDQKqFNP+n3R4A5w4gFqKv2JpYQ6UJAAlaXIRTeT/9XdqxQlHlA20QWI7yrJmoYaF74ZI9s/C
+ 8aAxEzQZ64NjHrmrZ/N9q8JCTlyhk5ZEV1Py12I2UH7moLFgBFZsPlPWAjK2NO/ns5UJREAJ04pR9
+ XQFSBm55gsqkPp028cdoFUD+IajGtW7jMIsx/AZfYMZAd30LfmSIpaPAi9EzgxWz5habO1ZM2++9e
+ W6tSJ7KHO0ZkWkwLKicrqpPvA928eNPxYtjkLB2XipdVltw5ydH9SLq0Oftsc4+wDR8TqhmaUi8qD
+ Fa2I/0NGwIF8hjwSZXtgJQqOTdQA5/6voIPheQIi0NBfUr0MwboUIVZp7Nm3w0QF9SSyTISrYJH6X
+ qLp17NwnGQ9KJSlDYCMCBJ+JGVmlcMqzosnLli6JszAcRmZ1+sd/f/k47Fxy1i6o14z9Aexhq/UgI
+ 5InZ4NUYhf5pWflV41KNupkS281NhBEpChoukw25iZk0AsrukpJ74x69MJQQO+/7PpMXFkt0Pexds
+ XQrtsXYxLDQk8mgjlgsvWl0xlk7k7rddN1+O/alcv0yBOdvlruirtnxDhbjBqYNl8PCbfVwJZnyQ4
+ SAX2S9XiGeNtWfZ5s2qGReyAcd2nBna0KU5pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQ
+ GlibS5jb20+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y
+ 3cr+Q/FejCYJAFAmesuuEFCQenEYkACgkQr+Q/FejCYJCosA/9GCtbN8lLQkW71n/CHR58BAA5ct1
+ KRYiZNPnNNAiAzjvSb0ezuRVt9H0bk/tnj6pPj0zdyU2bUj9Ok3lgocWhsF2WieWbG4dox5/L1K28
+ qRf3p+vdPfu7fKkA1yLE5GXffYG3OJnqR7OZmxTnoutj81u/tXO95JBuCSJn5oc5xMQvUUFzLQSbh
+ prIWxcnzQa8AHJ+7nAbSiIft/+64EyEhFqncksmzI5jiJ5edABiriV7bcNkK2d8KviUPWKQzVlQ3p
+ LjRJcJJHUAFzsZlrsgsXyZLztAM7HpIA44yo+AVVmcOlmgPMUy+A9n+0GTAf9W3y36JYjTS+ZcfHU
+ KP+y1TRGRzPrFgDKWXtsl1N7sR4tRXrEuNhbsCJJMvcFgHsfni/f4pilabXO1c5Pf8fiXndCz04V8
+ ngKuz0aG4EdLQGwZ2MFnZdyf3QbG3vjvx7XDlrdzH0wUgExhd2fHQ2EegnNS4gNHjq82uLPU0hfcr
+ obuI1D74nV0BPDtr7PKd2ryb3JgjUHKRKwok6IvlF2ZHMMXDxYoEvWlDpM1Y7g81NcKoY0BQ3ClXi
+ a7vCaqAAuyD0zeFVGcWkfvxYKGqpj8qaI/mA8G5iRMTWUUUROy7rKJp/y2ioINrCul4NUJUujfx4k
+ 7wFU11/YNAzRhQG4MwoO5e+VY66XnAd+XPyBIlvy0K05pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNj
+ aG5lbGxlQGdtYWlsLmNvbT6JAlQEEwEIAD4CGwEFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQSds
+ ACy0nUgMKX3Ldyv5D8V6MJgkAUCZ6y64QUJB6cRiQAKCRCv5D8V6MJgkEr/D/9iaYSYYwlmTJELv+
+ +EjsIxXtneKYpjXEgNnPwpKEXNIpuU/9dcVDcJ10MfvWBPi3sFbIzO9ETIRyZSgrjQxCGSIhlbom4
+ D8jVzTA698tl9id0FJKAi6T0AnBF7CxyqofPUzAEMSj9ynEJI/Qu8pHWkVp97FdJcbsho6HNMthBl
+ +Qgj9l7/Gm1UW3ZPvGYgU75uB/mkaYtEv0vYrSZ+7fC2Sr/O5SM2SrNk+uInnkMBahVzCHcoAI+6O
+ Enbag+hHIeFbqVuUJquziiB/J4Z2yT/3Ps/xrWAvDvDgdAEr7Kn697LLMRWBhGbdsxdHZ4ReAhc8M
+ 8DOcSWX7UwjzUYq7pFFil1KPhIkHctpHj2Wvdnt+u1F9fN4e3C6lckUGfTVd7faZ2uDoCCkJAgpWR
+ 10V1Q1Cgl09VVaoi6LcGFPnLZfmPrGYiDhM4gyDDQJvTmkB+eMEH8u8V1X30nCFP2dVvOpevmV5Uk
+ onTsTwIuiAkoTNW4+lRCFfJskuTOQqz1F8xVae8KaLrUt2524anQ9x0fauJkl3XdsVcNt2wYTAQ/V
+ nKUNgSuQozzfXLf+cOEbV+FBso/1qtXNdmAuHe76ptwjEfBhfg8L+9gMUthoCR94V0y2+GEzR5nlD
+ 5kfu8ivV/gZvij+Xq3KijIxnOF6pd0QzliKadaFNgGw4FoUeZo0rQhTmlrbGFzIFNjaG5lbGxlIDx
+ uaWtzQGtlcm5lbC5vcmc+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAA
+ stJ1IDCl9y3cr+Q/FejCYJAFAmesuuEFCQenEYkACgkQr+Q/FejCYJC6yxAAiQQ5NAbWYKpkxxjP/
+ AajXheMUW8EtK7EMJEKxyemj40laEs0wz9owu8ZDfQl4SPqjjtcRzUW6vE6JvfEiyCLd8gUFXIDMS
+ l2hzuNot3sEMlER9kyVIvemtV9r8Sw1NHvvCjxOMReBmrtg9ooeboFL6rUqbXHW+yb4GK+1z7dy+Q
+ 9DMlkOmwHFDzqvsP7eGJN0xD8MGJmf0L5LkR9LBc+jR78L+2ZpKA6P4jL53rL8zO2mtNQkoUO+4J6
+ 0YTknHtZrqX3SitKEmXE2Is0Efz8JaDRW41M43cE9b+VJnNXYCKFzjiqt/rnqrhLIYuoWCNzSJ49W
+ vt4hxfqh/v2OUcQCIzuzcvHvASmt049ZyGmLvEz/+7vF/Y2080nOuzE2lcxXF1Qr0gAuI+wGoN4gG
+ lSQz9pBrxISX9jQyt3ztXHmH7EHr1B5oPus3l/zkc2Ajf5bQ0SE7XMlo7Pl0Xa1mi6BX6I98CuvPK
+ SA1sQPmo+1dQYCWmdQ+OIovHP9Nx8NP1RB2eELP5MoEW9eBXoiVQTsS6g6OD3rH7xIRxRmuu42Z5e
+ 0EtzF51BjzRPWrKSq/mXIbl5nVW/wD+nJ7U7elW9BoJQVky03G0DhEF6fMJs08DGG3XoKw/CpGtMe
+ 2V1z/FRotP5Fkf5VD3IQGtkxSnO/awtxjlhytigylgrZ4wDpSE=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL v2 09/20] KVM: s390: move pv gmap functions into kvm
-From: David Hildenbrand <david@redhat.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
- frankja@linux.ibm.com, borntraeger@de.ibm.com
-References: <20250131112510.48531-1-imbrenda@linux.ibm.com>
- <20250131112510.48531-10-imbrenda@linux.ibm.com>
- <d5ef124a-d353-4074-925e-a2721be3ce5d@redhat.com>
- <20250212184538.3c79d608@p-imbrenda>
- <f9a6c330-2721-40ed-a8f4-95192e8312a8@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <f9a6c330-2721-40ed-a8f4-95192e8312a8@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: m-TpfZyWbtPLrVmCPbTe1NiQnFbLIm8-
+X-Proofpoint-GUID: hEYqtllOeUmpjoh9AXKXLcdtFhnuBX-s
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-13_03,2025-02-13_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ clxscore=1015 adultscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
+ suspectscore=0 spamscore=0 impostorscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502130076
 
-On 12.02.25 19:14, David Hildenbrand wrote:
-> On 12.02.25 18:45, Claudio Imbrenda wrote:
->> On Wed, 12 Feb 2025 17:55:18 +0100
->> David Hildenbrand <david@redhat.com> wrote:
->>
->>> On 31.01.25 12:24, Claudio Imbrenda wrote:
->>>> Move gmap related functions from kernel/uv into kvm.
->>>>
->>>> Create a new file to collect gmap-related functions.
->>>>
->>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->>>> Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->>>> [fixed unpack_one(), thanks mhartmay@linux.ibm.com]
->>>> Link: https://lore.kernel.org/r/20250123144627.312456-6-imbrenda@linux.ibm.com
->>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>>> Message-ID: <20250123144627.312456-6-imbrenda@linux.ibm.com>
->>>> ---
->>>
->>> This patch breaks large folio splitting because you end up un-refing
->>> the wrong folios after a split; I tried to make it work, but either
->>> because of other changes in this patch (or in others), I
->>> cannot get it to work and have to give up for today.
->>
->> yes, I had also noticed that and I already have a fix ready. In fact my
->> fix was exactly like yours, except that I did not pass the struct folio
->> anymore to kvm_s390_wiggle_split_folio(), but instead I only pass a
->> page and use page_folio() at the beginning, and I use
->> split_huge_page_to_list_to_order() directly instead of split_folio()
->>    
->> unfortunately the fix does not fix the issue I'm seeing....
->>
->> but putting printks everywhere seems to solve the issue, so it seems to
->> be a race somewhere
-> 
-> It also doesn't work with a single vCPU for me. The VM is stuck in
-> 
-> With a two vCPUs (so one can report the lockup), I get:
-> 
-> [   62.645168] rcu: INFO: rcu_sched self-detected stall on CPU
-> [   62.645181] rcu:     0-....: (5999 ticks this GP) idle=0104/1/0x4000000000000002 softirq=2/2 fqs=2997
-> [   62.645186] rcu:     (t=6000 jiffies g=-1199 q=62 ncpus=2)
-> [   62.645191] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.14.0-427.33.1.el9_4.s390x #1
-> [   62.645194] Hardware name: IBM 3931 LA1 400 (KVM/Linux)
-> [   62.645195] Krnl PSW : 0704c00180000000 0000000024b3e776 (set_memory_decrypted+0x66/0xa0)
-> [   62.645206]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:0 PM:0 RI:0 EA:3
-> [   62.645208] Krnl GPRS: 00000000ca004000 0000037f00000001 000000008092f000 0000000000000000
-> [   62.645210]            0000037fffb1bbc0 0000000000000001 0000000025e75208 000000008092f000
-> [   62.645211]            0000000080873808 0000037fffb1bcd8 0000000000001000 0000000025e75220
-> [   62.645213]            0000000080281500 00000000258aa480 0000000024c0b17a 0000037fffb1bb20
-> [   62.645220] Krnl Code: 0000000024b3e76a: a784000f            brc     8,0000000024b3e788
-> [   62.645220]            0000000024b3e76e: a7210fff            tmll    %r2,4095
-> [   62.645220]           #0000000024b3e772: a7740017            brc     7,0000000024b3e7a0
-> [   62.645220]           >0000000024b3e776: b9a40034            uvc     %r3,%r4,0
-> [   62.645220]            0000000024b3e77a: b2220010            ipm     %r1
-> [   62.645220]            0000000024b3e77e: 8810001c            srl     %r1,28
-> [   62.645220]            0000000024b3e782: ec12fffa017e        cij     %r1,1,2,0000000024b3e776
-> [   62.645220]            0000000024b3e788: a72b1000            aghi    %r2,4096
-> [   62.645232] Call Trace:
-> [   62.645234]  [<0000000024b3e776>] set_memory_decrypted+0x66/0xa0
-> [   62.645238]  [<0000000024c0b17a>] dma_direct_alloc+0x16a/0x2d0
-> [   62.645242]  [<0000000024c09b92>] dma_alloc_attrs+0x62/0x80
-> [   62.645243]  [<000000002546c950>] cio_gp_dma_create+0x60/0xa0
-> [   62.645248]  [<0000000025ebb712>] css_bus_init+0x102/0x1b8
-> [   62.645252]  [<0000000025ebb7ea>] channel_subsystem_init+0x22/0xf8
-> [   62.645254]  [<0000000024b149ac>] do_one_initcall+0x3c/0x200
-> [   62.645256]  [<0000000025e777be>] do_initcalls+0x11e/0x148
-> [   62.645260]  [<0000000025e77a34>] kernel_init_freeable+0x1cc/0x208
-> [   62.645262]  [<00000000254ad01e>] kernel_init+0x2e/0x170
-> [   62.645264]  [<0000000024b16fdc>] __ret_from_fork+0x3c/0x60
-> [   62.645266]  [<00000000254bb07a>] ret_from_fork+0xa/0x40
-> 
+On Wed, 2025-02-12 at 13:28 -0700, Alex Williamson wrote:
+> On Wed, 12 Feb 2025 16:28:32 +0100
+> Niklas Schnelle <schnelle@linux.ibm.com> wrote:
+>=20
+> > On s390 there is a virtual PCI device called ISM which has a few
+> > peculiarities. For one, it presents a 256 TiB PCI BAR whose size leads
+> > to any attempt to ioremap() the whole BAR failing. This is problematic
+> > since mapping the whole BAR is the default behavior of for example
+> > vfio-pci in combination with QEMU and VFIO_PCI_MMAP enabled.
+> >=20
+> > Even if one tried to map this BAR only partially, the mapping would not
+> > be usable without extra precautions on systems with MIO support enabled=
+.
+> > This is because of another oddity, in that this virtual PCI device does
+> > not support the newer memory I/O (MIO) PCI instructions and legacy PCI
+> > instructions are not accessible through writeq()/readq() when MIO is in
+> > use.
+> >=20
+> > In short the ISM device's BAR is not accessible through memory mappings=
+.
+> > Indicate this by introducing a new non_mappable_bars flag for the ISM
+> > device and set it using a PCI quirk. Use this flag instead of the
+> > VFIO_PCI_MMAP Kconfig option to block mapping with vfio-pci. This was
+> > the only use of the Kconfig option so remove it. Note that there are no
+> > PCI resource sysfs files on s390x already as HAVE_PCI_MMAP is currently
+> > not set. If this were to be set in the future pdev->non_mappable_bars
+> > can be used to prevent unusable resource files for ISM from being
+> > created.
+>=20
+> I think we should also look at it from the opposite side, not just
+> s390x maybe adding HAVE_PCI_MMAP in the future, but the fact that we're
+> currently adding a generic PCI device flag which isn't honored by the
+> one mechanism that PCI core provides to mmap MMIO BARs to userspace.
+> It seems easier to implement it in pci_mmap_resource() now rather than
+> someone later discovering there's no enforcement outside of the very
+> narrow s390x use case.  Thanks,
+>=20
+> Alex
 
-I can only suspect that it is related to the following: if we split a non-anon
-folio, we unmap it from the page tables, and don't remap it again -- the next
-fault will do that. Maybe, for some reason that behavior is incompatible with your changes.
+That is a very good point! I did try enabling HAVE_PCI_MMAP for s390 a
+while back and I believe that ran into trouble with ISM devices too. So
+I just did a quick test of enabling HAVE_PCI_MMAP with
+ARCH_GENERIC_PCI_MMAP_RESOURCE for s390. Then added a check for=C2=A0
+pdev->non_mappable_bars to pci_create_resource_files() and
+proc_bus_pci_mmap(). I pondered adding it to pci_mmap_resource() too
+but felt like not showing the resource at all, like we do now with
+!HAVE_PCI_MMAP is cleaner.
 
-I don't quit see how, because we should just trigger another fault to look up
-the page in gmap_make_secure()->gfn_to_page() when we re-enter gmap_make_secure() after a split.
+Using a little test program that just mmap()s BAR 0 of an NVMe and
+reads the NVMe version at offset 8 using our PCI MIO load instruction
+works. Also, as expected I don't get resourceX files for ISM devices
+with the added check.=C2=A0
 
-> 
-> The removed PTE lock would only explain it if we would have a concurrent GUP etc.
-> from QEMU I/O ? Not sure.
-> 
-> To fix the wrong refcount freezing, doing exactly what folio splitting does
-> (migration PTEs, locking the pagecache etc., freezing->converting,
-> removing migration ptes) should work, but requires a bit of work.
+I still have to test the /proc/bus/pci based mmap() but would expect
+that to work too. So I'd be open to adding another patch which adds
+HAVE_PCI_MMAP for s390, if we see too much risk with that, we could
+alternatively add just the pdev->non_mappable_bars but then they would
+be untested, still better than hoping that someone remembers to add
+that in the future.
 
-I played with the following abomination to see if I could fix the refcount freezing somehow.
-
-It doesn't work, because the UVC keeps failing: I assume because it actually
-needs the page to be mapped into that particular page table for the UVC to complete.
-
-
-To fix refcount freezing with that (folio still mapped), we'd have to make sure that
-folio_mapcount()==1 while we hold the PTL, and doing something similar to below,
-except that the rmap/anon locking and unmap/remap handling would not apply. The
-pagecache most likely would have to be locked to prevent new references from that while
-we freeze the refcount.
-
-In case we would have folio_mapcount() != 1 on an anon page, we would have to give up:
-impossible if it is mapped writable -- so no problem.
-
-In case we would have folio_mapcount() != 1 on a pagecache page, we would have to
-force an unmap of the all page table mappings using e.g., try_to_unmap(), to then retry
-again.
-
-But the PTL seems unavoidable in that case to prevent concurrent GUP-slow etc, so we
-can safely freeze the refcount.
-
-
- From c2555fc34801ca9ba49f93ee1249ecd25248377a Mon Sep 17 00:00:00 2001
-From: David Hildenbrand <david@redhat.com>
-Date: Thu, 13 Feb 2025 09:49:54 +0100
-Subject: [PATCH] tmp
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
-  arch/s390/kernel/uv.c | 139 +++++++++++++++++++++++++++++++++++-------
-  include/linux/rmap.h  |  17 ++++++
-  mm/internal.h         |  16 -----
-  3 files changed, 133 insertions(+), 39 deletions(-)
-
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 9f05df2da2f73..d6ea8951fa53b 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -15,6 +15,7 @@
-  #include <linux/pagemap.h>
-  #include <linux/swap.h>
-  #include <linux/pagewalk.h>
-+#include <linux/rmap.h>
-  #include <asm/facility.h>
-  #include <asm/sections.h>
-  #include <asm/uv.h>
-@@ -227,6 +228,45 @@ static int expected_folio_refs(struct folio *folio)
-  	return res;
-  }
-  
-+static void unmap_folio(struct folio *folio)
-+{
-+	enum ttu_flags ttu_flags = TTU_RMAP_LOCKED | TTU_SYNC |
-+		TTU_BATCH_FLUSH;
-+
-+	VM_BUG_ON_FOLIO(!folio_test_large(folio), folio);
-+
-+	if (folio_test_pmd_mappable(folio))
-+		ttu_flags |= TTU_SPLIT_HUGE_PMD;
-+
-+	/*
-+	 * Anon pages need migration entries to preserve them, but file
-+	 * pages can simply be left unmapped, then faulted back on demand.
-+	 * If that is ever changed (perhaps for mlock), update remap_page().
-+	 */
-+	if (folio_test_anon(folio))
-+		try_to_migrate(folio, ttu_flags);
-+	else
-+		try_to_unmap(folio, ttu_flags | TTU_IGNORE_MLOCK);
-+
-+	try_to_unmap_flush();
-+}
-+
-+static void remap_page(struct folio *folio, unsigned long nr, int flags)
-+{
-+	int i = 0;
-+
-+	/* If unmap_folio() uses try_to_migrate() on file, remove this check */
-+	if (!folio_test_anon(folio))
-+		return;
-+	for (;;) {
-+		remove_migration_ptes(folio, folio, RMP_LOCKED | flags);
-+		i += folio_nr_pages(folio);
-+		if (i >= nr)
-+			break;
-+		folio = folio_next(folio);
-+	}
-+}
-+
-  /**
-   * make_folio_secure() - make a folio secure
-   * @folio: the folio to make secure
-@@ -247,35 +287,88 @@ static int expected_folio_refs(struct folio *folio)
-   */
-  int make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
-  {
--	int expected, cc = 0;
-+	XA_STATE(xas, &folio->mapping->i_pages, folio->index);
-+	struct address_space *mapping = NULL;
-+	struct anon_vma *anon_vma = NULL;
-+	int ret, cc = 0;
-+	int expected;
-  
-  	if (folio_test_large(folio))
-  		return -E2BIG;
-  	if (folio_test_writeback(folio))
-  		return -EBUSY;
--	expected = expected_folio_refs(folio) + 1;
--	if (!folio_ref_freeze(folio, expected))
-+
-+	/* Does it make sense to try at all? */
-+	if (folio_ref_count(folio) != expected_folio_refs(folio) + 1)
-  		return -EBUSY;
--	set_bit(PG_arch_1, &folio->flags);
--	/*
--	 * If the UVC does not succeed or fail immediately, we don't want to
--	 * loop for long, or we might get stall notifications.
--	 * On the other hand, this is a complex scenario and we are holding a lot of
--	 * locks, so we can't easily sleep and reschedule. We try only once,
--	 * and if the UVC returned busy or partial completion, we return
--	 * -EAGAIN and we let the callers deal with it.
--	 */
--	cc = __uv_call(0, (u64)uvcb);
--	folio_ref_unfreeze(folio, expected);
--	/*
--	 * Return -ENXIO if the folio was not mapped, -EINVAL for other errors.
--	 * If busy or partially completed, return -EAGAIN.
--	 */
--	if (cc == UVC_CC_OK)
--		return 0;
--	else if (cc == UVC_CC_BUSY || cc == UVC_CC_PARTIAL)
--		return -EAGAIN;
--	return uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
-+
-+	/* See split_huge_page_to_list_to_order() on the nasty details. */
-+	if (folio_test_anon(folio)) {
-+		anon_vma = folio_get_anon_vma(folio);
-+		if (!anon_vma)
-+			return -EBUSY;
-+		anon_vma_lock_write(anon_vma);
-+	} else {
-+		mapping = folio->mapping;
-+		if (!mapping)
-+			return -EBUSY;
-+		/* Hmmm, do we need filemap_release_folio()? */
-+		i_mmap_lock_read(mapping);
-+	}
-+
-+	unmap_folio(folio);
-+
-+	local_irq_disable();
-+	if (mapping) {
-+		xas_lock(&xas);
-+		xas_reset(&xas);
-+		if (xas_load(&xas) != folio) {
-+			ret = -EBUSY;
-+			goto fail;
-+		}
-+	}
-+
-+	expected = expected_folio_refs(folio) + 1;
-+	if (!folio_mapped(folio) &&
-+	    folio_ref_freeze(folio, expected)) {
-+		set_bit(PG_arch_1, &folio->flags);
-+		/*
-+		 * If the UVC does not succeed or fail immediately, we don't want to
-+		 * loop for long, or we might get stall notifications.
-+		 * On the other hand, this is a complex scenario and we are holding a lot of
-+		 * locks, so we can't easily sleep and reschedule. We try only once,
-+		 * and if the UVC returned busy or partial completion, we return
-+		 * -EAGAIN and we let the callers deal with it.
-+		 */
-+		cc = __uv_call(0, (u64)uvcb);
-+		folio_ref_unfreeze(folio, expected);
-+		/*
-+		 * Return -ENXIO if the folio was not mapped, -EINVAL for other errors.
-+		 * If busy or partially completed, return -EAGAIN.
-+		 */
-+		if (cc == UVC_CC_OK)
-+			ret = 0;
-+		else if (cc == UVC_CC_BUSY || cc == UVC_CC_PARTIAL)
-+			ret = -EAGAIN;
-+		else
-+			ret = uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
-+	} else {
-+		ret = -EBUSY;
-+	}
-+
-+	if (mapping)
-+		xas_unlock(&xas);
-+fail:
-+	local_irq_enable();
-+	remap_page(folio, 1, 0);
-+	if (anon_vma) {
-+		anon_vma_unlock_write(anon_vma);
-+		put_anon_vma(anon_vma);
-+	}
-+	if (mapping)
-+		i_mmap_unlock_read(mapping);
-+	xas_destroy(&xas);
-+	return ret;
-  }
-  EXPORT_SYMBOL_GPL(make_folio_secure);
-  
-diff --git a/include/linux/rmap.h b/include/linux/rmap.h
-index 683a04088f3f2..2d241ab48bf08 100644
---- a/include/linux/rmap.h
-+++ b/include/linux/rmap.h
-@@ -663,6 +663,23 @@ int folio_referenced(struct folio *, int is_locked,
-  void try_to_migrate(struct folio *folio, enum ttu_flags flags);
-  void try_to_unmap(struct folio *, enum ttu_flags flags);
-  
-+#ifdef CONFIG_ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
-+void try_to_unmap_flush(void);
-+void try_to_unmap_flush_dirty(void);
-+void flush_tlb_batched_pending(struct mm_struct *mm);
-+#else
-+static inline void try_to_unmap_flush(void)
-+{
-+}
-+static inline void try_to_unmap_flush_dirty(void)
-+{
-+}
-+static inline void flush_tlb_batched_pending(struct mm_struct *mm)
-+{
-+}
-+#endif /* CONFIG_ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH */
-+
-+
-  int make_device_exclusive_range(struct mm_struct *mm, unsigned long start,
-  				unsigned long end, struct page **pages,
-  				void *arg);
-diff --git a/mm/internal.h b/mm/internal.h
-index 109ef30fee11f..5338906163ca7 100644
---- a/mm/internal.h
-+++ b/mm/internal.h
-@@ -1202,22 +1202,6 @@ struct tlbflush_unmap_batch;
-   */
-  extern struct workqueue_struct *mm_percpu_wq;
-  
--#ifdef CONFIG_ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
--void try_to_unmap_flush(void);
--void try_to_unmap_flush_dirty(void);
--void flush_tlb_batched_pending(struct mm_struct *mm);
--#else
--static inline void try_to_unmap_flush(void)
--{
--}
--static inline void try_to_unmap_flush_dirty(void)
--{
--}
--static inline void flush_tlb_batched_pending(struct mm_struct *mm)
--{
--}
--#endif /* CONFIG_ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH */
--
-  extern const struct trace_print_flags pageflag_names[];
-  extern const struct trace_print_flags vmaflag_names[];
-  extern const struct trace_print_flags gfpflag_names[];
--- 
-2.48.1
-
-
-
--- 
-Cheers,
-
-David / dhildenb
-
+Thanks,
+Niklas
 
