@@ -1,133 +1,226 @@
-Return-Path: <kvm+bounces-37994-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37995-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 707AAA333D3
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 01:09:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3FADA333F8
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 01:25:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 354331671AC
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 00:09:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CE0F1888E17
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 00:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232AACA5A;
-	Thu, 13 Feb 2025 00:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACEE2B9A6;
+	Thu, 13 Feb 2025 00:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AEItY9ox"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g44owFdk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE0E1372
-	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 00:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8601DFDE
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 00:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739405335; cv=none; b=bXHahvZQsQmB2eEPZNFAa4IUc8JjZZV+JyiK9VlCQBGuX30l4PNWExhmqXsDAe5Ic5FKHah8g05ge2lCLXb+TbP/rvU6v3Mh1QX3p+i1SWfkrk16dv1XMu1i81jnS6R1vXt51t2HqauobBI5aGcuv1s/AAalxRuCBbflL/gCRrw=
+	t=1739406352; cv=none; b=FUtx9IU4gf2zmdOXvo30fLM5fk2/lw9iO+4iPkDsi1gfR6mQoUbIJT2p9uKCk46B+JehZKfxFuMhYsmyyk8McpMVofwqT/OpFLHuIzWwscpkbxJmQl/aC16Ym+/9oRWJXmmNVG/cA4mW3cEFFhT4vTlqxhVaXlpiGkq1lScpJT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739405335; c=relaxed/simple;
-	bh=AqW9HL556ZI4lEeWCrLkz/cIG/PgLNaIjzYEZQLp6FY=;
+	s=arc-20240116; t=1739406352; c=relaxed/simple;
+	bh=N6Vhy+AMNySdETQuQGcSvVOsB67SX6hT78NIQyA2UJw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O3bNP9b+YRgVmQgODSsTxiBz+AebmJRIGvkeh5efxiAK+2mIqafQdbhXMkRvmiy8s59fy854gsp4Pv+oTKiRHZRNkzPYjursxjJasX3dVhjas8o46Z/A4kmRkpq9AuxjS5HpijK44ZWb9XJiADcEpBHlHlY/rRb/gPaJogNRP9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AEItY9ox; arc=none smtp.client-ip=209.85.128.173
+	 To:Cc:Content-Type; b=OVftaO8SbEHDGydHby+MLpLTjXJ0v1sCJOYjYCLHneeZo4IibelX+rOBYEkyl71UXWoU5WG91ZnDZ7Z2QMtsqk+O6jMeWJuujkwguSY0VFKskPYeoEhekXXsU3eoFrr1AKMA62yQHY9HOivs1CZxkOY3zAzGBVa8slTs4lsuitk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g44owFdk; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6f9c6d147edso3030047b3.3
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 16:08:52 -0800 (PST)
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6fb2a6360efso2876947b3.0
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 16:25:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739405331; x=1740010131; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739406350; x=1740011150; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ckylkc1mRMPJAxaTTlddOkQMiHbF9c9F2xl9Y8jmnfA=;
-        b=AEItY9oxqM3Rj7/h5yARi+yFe/DW/xjwm4BmjfcXy9+zPbL/lj2Yrqpiz8zSuHlrre
-         5mt9FSBwsI46P/VCEkBONtXgzHqb95kyLafNYggCUZMnbgA8tM5c/Qzu6mx4Y/vrI8JK
-         RtYb13PKplhTMwMhnOjcBvDPWUgGatXBXOAqrqpBoISeCJTKv+B7KiqDy+VigysD0txS
-         wF8vzZHQinfRN0kme7xE+Utf7FMREsIAmWctZ17WDeyR1BeXi9an/vdM1T29IW5BV1uF
-         MSKjwpCQzD3fm/0SuTCXJiZJlBNc74M4tJZxpe8NzYONjwlp53csCfIM6cQ0Hys6yly4
-         Vd2w==
+        bh=j2u8kKjrY9fIuB9CNcK79YulIHKo8nYe5XdwcfoOaGc=;
+        b=g44owFdktVFQzO45V80Y2zTO06nFP3zgAIySx+iU23lzhUqtxh5X/pRSiNd4m4GX3a
+         LbtN6yvnMjo3hRUNPaX2rwl3K5exSfZ3EJdTXol6ZrW15+BG1SpoODHVJd0p0UFqVHtz
+         ZNfLlU5fR44kcrOm6JFS79PQw3bXb80+CzQJyCrfJq9ihcIMtR07NOiGPqNLzCDMOq+a
+         w41P8GXOOG8et9kGSylSFF7HHii5c/vFnrUluPfyQDF/a9NDyWfy2jg8Lvcfus70dM4T
+         +H8DSBGbhEb/qdzdopFRehl8Qsbd5FqgrK0HnTEmbzfMryefBr7y4/VrLd9ZoJZ0Lo+b
+         iCZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739405331; x=1740010131;
+        d=1e100.net; s=20230601; t=1739406350; x=1740011150;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ckylkc1mRMPJAxaTTlddOkQMiHbF9c9F2xl9Y8jmnfA=;
-        b=U9czPfTir/TpGH+0ff2UPDpMhKnKUmJyef8kAWHhpjBNKLVR2gPzb64Ve/6exhvQqm
-         dPwZnlngVutOP9qW6uRYq9ZQbG78J7HnuAFxfFLEUJIH/vd6ODp2QcWOv7tpXR43qHe6
-         UHbx1+vdAF8wa7hy2uW65joUiKNYzQkkQxNQ9KyuS8l3hQBjLW36LNkgJcnvLTIT4QZo
-         RL7tKzhpOlA1SEe1LA1xcwHn5yW2Dgxa+1hIbBeEFo7b3n5sVN5DKsvX+1B6vNaO1LNH
-         hg50mlzmQog7Fl0CajQ/SPo+TJaPm3gdT0awARyn70x93Vc5wh5nbinTskk3s5UtZq+1
-         ngMg==
-X-Forwarded-Encrypted: i=1; AJvYcCX4uBxVKbgwx79U5r+tbv6PhEgF/lLjdpOBc9jWXUTwfNKgyKp++ghfFQKoGfzQ0LN1uhk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8PWU4BLLMPDj5/HcT5J2fwpTNL3y9Wdj2tbWrEES6/AjfhwKX
-	NDOH+dniZojGLwq0LYFqd7ixz2ysy9kMuLC0HGY5ErslJfLfxY//jy6cs4vomo475F42HCxlzSW
-	AxTQKSs/BRgmUhqn4PiVng7ZN5Bz9cKIA5nQ9
-X-Gm-Gg: ASbGncut0hTwIghuWUwM/x6hW8b66uQxdiSwl8UHjjZEM0OemwQ4fNmqdQaIY7LlDXa
-	a3V/++wNx8Y3PR1q7kOjBQY+0Lf8Lhach6VRyRkVwFJgSkVFmQokBWl/Btb4KvT58/25T9cq12i
-	mnKjK2JadumT435+e1gVwDeRLWzA==
-X-Google-Smtp-Source: AGHT+IESrPreFpgp6e19fu3YrWUdZmPloykIK3Btk02O6+02tP8XN3roPsVyPNUUmsn2kvRJNtuJ9JsHcnUTNqnGwEo=
-X-Received: by 2002:a05:690c:3687:b0:6f9:aecf:ab34 with SMTP id
- 00721157ae682-6fb1f2d5ad0mr57353587b3.38.1739405331362; Wed, 12 Feb 2025
- 16:08:51 -0800 (PST)
+        bh=j2u8kKjrY9fIuB9CNcK79YulIHKo8nYe5XdwcfoOaGc=;
+        b=sBpfEXGxOZFpev8WymGcdTdAdXHHIYdCzM9BxGuF2+iX8bMmTNKQ/Q2MdYUVPKbm5r
+         OXdyAeL54ZS3eJr07nTSQpPt59kTjkvUWBS+4/dVVkTJmYCrAVLhGxWK1Ma04TAbG/PE
+         aWeE81VDDl+R8IzTy5i2297y0J/Iwdug6ZksUFEoEFXY7zSwV2VJsWinvYr33/bKW1f1
+         sZQO+h3FdNwEDGii2ZUIr0y+cE8P8YSGfRrL98JW5GMZ41xF0USoaSB+Tdd14put+eXV
+         cyiwDrEkMBa3dd/mT5Eb18Lvmc1goZ2LpVAi16uXnMV2MeU6MKsZkfIySC96SOvcNxZ/
+         KYqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXP1rA3JZvF1xXcrwV8yQqvP9gT2TZado/3ft0K4347CA1EQPzqN/K4zfoYit/Bgj0w+ZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6iiSPoaPWIlQ32fcWP+VHomHifeCk3m0Amxl1ulY3SRUjx0OD
+	NvBNstUJ3U3l1BtfA+oIkEzYvciMvjyrABTYoBeVvMP+pOdt4eQpv0VG6rf7n4aafqBuOOaZEUz
+	AK1gN7NtHNUN1u8bUPirzL+UXzuDsoNyE2pI5
+X-Gm-Gg: ASbGncuPzgN77z90pT/WKFgiN7A4oeEDrz01MaqucVQCU9nZZajPzOwo4VYtz9QQ2v1
+	E6s/HKc5/UWoJTGbpwkNKKpFwu7QpYzBycjMfp8GAZbW0oyT31haj9J3XGL08Yso+qOfqKXJZw0
+	shEeoCv493/XDzE2DcmsND69Xc5w==
+X-Google-Smtp-Source: AGHT+IHTvcCYWI14ZvnOu7zHEbTk1BAtb39a79vbmvFNPOyo3bHRiYj75C11od9wdFZaB6X6hn5P1hAXqVGs764bwRg=
+X-Received: by 2002:a05:690c:6489:b0:6f9:3e3d:3f2e with SMTP id
+ 00721157ae682-6fb21c5e23amr46018817b3.33.1739406349753; Wed, 12 Feb 2025
+ 16:25:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <67689c62.050a0220.2f3838.000d.GAE@google.com> <20250212221217.161222-1-jthoughton@google.com>
- <Z60lxSqV1r257yW8@google.com>
-In-Reply-To: <Z60lxSqV1r257yW8@google.com>
+References: <20250204004038.1680123-1-jthoughton@google.com>
+ <20250204004038.1680123-5-jthoughton@google.com> <Z60bhK96JnKIgqZQ@google.com>
+In-Reply-To: <Z60bhK96JnKIgqZQ@google.com>
 From: James Houghton <jthoughton@google.com>
-Date: Wed, 12 Feb 2025 16:08:15 -0800
-X-Gm-Features: AWEUYZlI2bRB94Zjwo44LypQugi03x5L8sjFcH2ILC3VhqEUbvLU2tkjbi5Gl-I
-Message-ID: <CADrL8HXZed987KOehV7-OroPqm8tQZ0WH0MCpfDzaSs-g_2-ag@mail.gmail.com>
-Subject: Re: [syzbot] [kvm?] WARNING in vmx_handle_exit (2)
+Date: Wed, 12 Feb 2025 16:25:14 -0800
+X-Gm-Features: AWEUYZkCeXzHOoGZKWc3H7LLiVS6f8Z8ZO9QrsVmFhGfklstLnZ9qL0es-onr0M
+Message-ID: <CADrL8HWhuWjfuU2gPjKw0y7y1Z6oxBc05OAWUT3=L3_NtVgRrA@mail.gmail.com>
+Subject: Re: [PATCH v9 04/11] KVM: x86/mmu: Relax locking for
+ kvm_test_age_gfn() and kvm_age_gfn()
 To: Sean Christopherson <seanjc@google.com>
-Cc: syzbot+ac0bc3a70282b4d586cc@syzkaller.appspotmail.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao <yuzhao@google.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 12, 2025 at 2:50=E2=80=AFPM Sean Christopherson <seanjc@google.=
+On Wed, Feb 12, 2025 at 2:07=E2=80=AFPM Sean Christopherson <seanjc@google.=
 com> wrote:
 >
-> On Wed, Feb 12, 2025, James Houghton wrote:
-> > Here's what I think is going on (with the C repro anyway):
+> On Tue, Feb 04, 2025, James Houghton wrote:
+> > diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> > index 22551e2f1d00..e984b440c0f0 100644
+> > --- a/arch/x86/kvm/mmu/spte.c
+> > +++ b/arch/x86/kvm/mmu/spte.c
+> > @@ -142,8 +142,14 @@ bool spte_has_volatile_bits(u64 spte)
+> >               return true;
 > >
-> > 1. KVM_RUN a nested VM, and eventually we end up with
-> >    nested_run_pending=3D1.
-> > 2. Exit KVM_RUN with EINTR (or any reason really, but I see EINTR in
-> >    repro attempts).
-> > 3. KVM_SET_REGS to set rflags to 0x1ac585, which has X86_EFLAGS_VM,
-> >    flipping it and setting vmx->emulation_required =3D true.
-> > 3. KVM_RUN again. vmx->emulation_required will stop KVM from clearing
-> >    nested_run_pending, and then we hit the
-> >    KVM_BUG_ON(nested_run_pending) in __vmx_handle_exit().
-> >
-> > So I guess the KVM_BUG_ON() is a little bit too conservative, but this
-> > is nonsensical VMM behavior. So I'm not really sure what the best
-> > solution is. Sean, any thoughts?
+> >       if (spte_ad_enabled(spte)) {
+> > -             if (!(spte & shadow_accessed_mask) ||
+> > -                 (is_writable_pte(spte) && !(spte & shadow_dirty_mask)=
+))
+> > +             /*
+> > +              * Do not check the Accessed bit. It can be set (by the C=
+PU)
+> > +              * and cleared (by kvm_tdp_mmu_age_spte()) without holdin=
+g
 >
-> Heh, deja vu.  This is essentially the same thing that was fixed by commi=
-t
-> fc4fad79fc3d ("KVM: VMX: Reject KVM_RUN if emulation is required with pen=
-ding
-> exception"), just with a different WARN.
+> When possible, don't reference functions by name in comments.  There are =
+situations
+> where it's unavoidable, e.g. when calling out memory barrier pairs, but f=
+or cases
+> like this, it inevitably leads to stale code.
+
+Good point. Thanks.
+
 >
-> This should fix it.  Checking nested_run_pending in handle_invalid_guest_=
-state()
-> is overkill, but it can't possibly do any harm, and the weirdness can be =
-addressed
-> with a comment.
+> > +              * the mmu_lock, but when clearing the Accessed bit, we d=
+o
+> > +              * not invalidate the TLB, so we can already miss Accesse=
+d bit
+>
+> No "we" in comments or changelog.
 
-Thanks Sean! This works, feel free to add:
+Ah my mistake.
 
-Tested-by: James Houghton <jthoughton@google.com>
+> > +              * updates.
+> > +              */
+> > +             if (is_writable_pte(spte) && !(spte & shadow_dirty_mask))
+> >                       return true;
+>
+> This 100% belongs in a separate prepatory patch.  And if it's moved to a =
+separate
+> patch, then the rename can/should happen at the same time.
+>
+> And with the Accessed check gone, and looking forward to the below change=
+, I think
+> this is the perfect opportunity to streamline the final check to:
+>
+>         return spte_ad_enabled(spte) && is_writable_pte(spte) &&
+>                !(spte & shadow_dirty_mask);
 
-I understand this fix as "KVM cannot emulate a nested vm-enter, so if
-emulation is required and we have a pending vm-enter, exit to
-userspace." (This doesn't seem overkill to me... perhaps this
-explanation is wrong.)
+LGTM.
+
+> No need to send another version, I'll move things around when applying.
+
+Thanks!
+
+> Also, as discussed off-list I'm 99% certain that with the lockless aging,=
+ KVM
+> must atomically update A/D-disabled SPTEs, as the SPTE can be access-trac=
+ked and
+> restored outside of mmu_lock.  E.g. a task that holds mmu_lock and is cle=
+aring
+> the writable bit needs to update it atomically to avoid its change from b=
+eing
+> lost.
+
+Yeah you're right. This logic applies to A/D-enabled SPTEs too, just
+that we choose to tolerate failures to update the Accessed bit. But in
+the case of A/D-disabled SPTEs, we can't do that. So this makes sense.
+Thanks!
+
+> I'll slot this is in:
+>
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Wed, 12 Feb 2025 12:58:39 -0800
+> Subject: [PATCH 03/10] KVM: x86/mmu: Always update A/D-disable SPTEs
+>  atomically
+>
+> In anticipation of aging SPTEs outside of mmu_lock, force A/D-disabled
+> SPTEs to be updated atomically, as aging A/D-disabled SPTEs will mark the=
+m
+> for access-tracking outside of mmu_lock.  Coupled with restoring access-
+> tracked SPTEs in the fast page fault handler, the end result is that
+> A/D-disable SPTEs will be volatile at all times.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: James Houghton <jthoughton@google.com>
+
+> ---
+>  arch/x86/kvm/mmu/spte.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index 9663ba867178..0f9f47b4ab0e 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -141,8 +141,11 @@ bool spte_needs_atomic_update(u64 spte)
+>         if (!is_writable_pte(spte) && is_mmu_writable_spte(spte))
+>                 return true;
+>
+> -       /* Access-tracked SPTEs can be restored by KVM's fast page fault =
+handler. */
+> -       if (is_access_track_spte(spte))
+> +       /*
+> +        * A/D-disabled SPTEs can be access-tracked by aging, and access-=
+tracked
+> +        * SPTEs can be restored by KVM's fast page fault handler.
+> +        */
+> +       if (!spte_ad_enabled(spte))
+>                 return true;
+>
+>         /*
+> @@ -151,8 +154,7 @@ bool spte_needs_atomic_update(u64 spte)
+>          * invalidate TLBs when aging SPTEs, and so it's safe to clobber =
+the
+>          * Accessed bit (and rare in practice).
+>          */
+> -       return spte_ad_enabled(spte) && is_writable_pte(spte) &&
+> -              !(spte & shadow_dirty_mask);
+> +       return is_writable_pte(spte) && !(spte & shadow_dirty_mask);
+>  }
+>
+>  bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+> --
 
