@@ -1,215 +1,250 @@
-Return-Path: <kvm+bounces-38008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8638A33914
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 08:42:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91F15A3393E
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 08:52:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79E11166177
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 07:42:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E1EB3A517A
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 07:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112FE20AF97;
-	Thu, 13 Feb 2025 07:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D6320AF8A;
+	Thu, 13 Feb 2025 07:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b="CmIagTw0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G7ScULWp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFDE20AF66;
-	Thu, 13 Feb 2025 07:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739432549; cv=none; b=eW58vQG7ytmKyYsNGQzYKhGla1iBrs8QsZCljMRP9GjiFog2voxa5FdlzjhQksjWqJn/yQarwEG2XWhhKAIowpoB1VkAemChdHr13vGmSguIqKGkGzJKi69WDwsMP0hxa1Awi6G1nh3TeKYcsZsQqHYRojhFAgH7eXQSd0pCaQ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739432549; c=relaxed/simple;
-	bh=IlVYh+wZ/YIFB/UgdqiAswcv4hn7Nfi0gPcL0hnnO3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JK7i6n/4D3/9vjBMiX32faOtxrabs4afqEvsPzBM4nl1WLFgnWeDS6ayZ0pB/S6aT3JQt8a5DfN3XGJCkWKiZlTvx12dnpYSCm3dTsAucIW9cYVsOs0JyMow47OiQfzzadyqx7mYqv/mOSwK74xYLZvgYnIQ3RFLuA8Ll4IMx1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b=CmIagTw0; arc=none smtp.client-ip=85.214.250.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
-Received: from 8bytes.org (p4ffe03ae.dip0.t-ipconnect.de [79.254.3.174])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id D69B642529;
-	Thu, 13 Feb 2025 08:42:19 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-	s=default; t=1739432540;
-	bh=IlVYh+wZ/YIFB/UgdqiAswcv4hn7Nfi0gPcL0hnnO3E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CmIagTw072QVKg6X2zF7CjJurHTdhFIIdQEKgjmvrTlWE/dhMXwuw81+d2esttJTW
-	 1Y5ahtF8Fh/SNFP1P2RR1sujXeleOSH1HJl/VWQ+xg4ZehSMZVJUiWLJSjesYZK0bO
-	 INumkDNROadS9kEyDgL/db6dJo8AvtGeSnYok5/tosCl3G+YJGQOKeyshvdDM2ZcNu
-	 xudPDBoXknDJGg3hN5/h/oS5jZh1yx3J563YBU6NemsY4JynKHoKUNrpdeH2lDs9VK
-	 7XBBTpmsyUoP0bd2AI13NqcUQzea1IEkVHpYZ4hkviX4l9Nr6eXPw9zpNl1Wi7lDZL
-	 r2pcW+wJeNMNQ==
-Date: Thu, 13 Feb 2025 08:42:18 +0100
-From: Joerg Roedel <joro@8bytes.org>
-To: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, thomas.lendacky@amd.com,
-	john.allen@amd.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, suravee.suthikulpanit@amd.com, will@kernel.org,
-	robin.murphy@arm.com, michael.roth@amd.com, dionnaglaze@google.com,
-	nikunj@amd.com, ardb@kernel.org, kevinloughlin@google.com,
-	Neeraj.Upadhyay@amd.com, vasant.hegde@amd.com,
-	Stable@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-coco@lists.linux.dev, iommu@lists.linux.dev
-Subject: Re: [PATCH v4 3/3] x86/sev: Fix broken SNP support with KVM module
- built-in
-Message-ID: <Z62iWr77bPWsZcDC@8bytes.org>
-References: <cover.1739226950.git.ashish.kalra@amd.com>
- <138b520fb83964782303b43ade4369cd181fdd9c.1739226950.git.ashish.kalra@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACEDBA2D
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 07:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739433167; cv=none; b=e7J6m9S+ibaW3FVYHWQwGufmKjbJBWyiDtzcPQbtDpv7DJcFjhWRA2omiI1PHhlBFkBmKDid9H6PaDGZP4CYmoLV9kLo9S801I4yZcprMsAlqgjkGXWeVhfpdA0N2xVTRfQlZikxxbv6zEB1D1S1FYWBtPjzPr20EMyIML54H6c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739433167; c=relaxed/simple;
+	bh=hgpCl1lxKo/kIuxoni1SiHuSq25qQajNllEP8s/7/gQ=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=JDJ+JtRrk4R/4BqZx1wALky+QLzGrUAVul1YHSa1iLnvemWuHO6c6tFQMqWcNZVJzSSpzbZp9aWZdSOHMEhW5i4RFxDg2V3Kc3Fjh5KA0GQWLaYONMoc9U36blesegAbjtcIotlXjTBl/HwOZgsORQ/MFupcx6RcX2jzZ/veq7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G7ScULWp; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fa514fa6c7so1520866a91.3
+        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 23:52:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739433165; x=1740037965; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=a3fdef+uSLahSNZ8rFt65Bjz3vZBpG34zxr3rjAfeYo=;
+        b=G7ScULWpBRuU3TZ3JvQhAbSeRY2ebxFPfYbi0UWr4z3lt0CPjm786oQCmTgtQdoitb
+         mAfk049BU4j8hk9XkvjY6f6BCoiUBoyri7fDQN9VoTrluWtK4bKfdRoYebQIOO7e+1QJ
+         0Y0c1rL21AETlfQVJeIqYKXwUBm+Exr/v8KLqVDtPpgjl8Ghj59uYb44cO8cjqTwdWuD
+         9XBMGG32lE8kQ/nCkx7w19m7bhx19BYjxPdeQr0tGwMQsxAS8PKR07lcSDf4FZjKeR66
+         jWU9DPOj/IJRep1+Rc8sqAkx7PfUbHt1LWtIv4giDsUYefUDPsZTmfRO4bgQ0iQuLnjh
+         qcyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739433165; x=1740037965;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a3fdef+uSLahSNZ8rFt65Bjz3vZBpG34zxr3rjAfeYo=;
+        b=vUUrUSIFb5qmGU59vqaKJAonMDBZpnai9TkEGPbdM9fjlegZe85WwjK+5JFl2jvSlv
+         4CA3lG12RCGwNShj8MkxBxL0k6Gmb7fs9247eEmVdYt+KeB46bSa7LqWZ92mzMuHIy6x
+         VsBMNKM000j+ELPnEZwYLsdHvmIBlKaLl8/aTrFHmVysJGsgUspaeliFNCeBMvZZ4YWC
+         pq8tQy4TnBZYt6MMK+vVH3D+njHQ5wBLVchhD9NeCs4W3gDnfWN147h/w5tyfpeJmJN9
+         J3+b4hu9ecdWp/pzphrXPijY3NLfecu2m17ZHR1J5+fFE4QwcGJO0neVNalch3BWFmFW
+         W7CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUcb8+aL+K+7JLnZPdcllwhLUBI/wjCvP3sc5zk4Z/JLyLT36KcpiqJGpfO26R7duMJpEc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF13h0EZbPJwSP5MPXXfmiOtlACiAb4+l4Xyq4DzYLkTwO9n1l
+	TdBM5fkX0FAR2e4xQC9RHJNT6WUmbM1xNz1nTCF5rWIclMOOZ1Nrw64eohkrEmBFFKdeRfl15Y3
+	459slf5fAQh/4FwRmYNENWQ==
+X-Google-Smtp-Source: AGHT+IESiBQ2QnxPu6gqE49lswYwYQOD6YLayJmOTZp5Cen+Q2e/br3WnYY0oOlxgR3gCXnEsaeI4jJPUjsup5i1Xg==
+X-Received: from pfmx14.prod.google.com ([2002:a62:fb0e:0:b0:730:8854:cc56])
+ (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:22d3:b0:730:8e97:bd76 with SMTP id d2e1a72fcca58-7322c591b87mr8612290b3a.9.1739433164873;
+ Wed, 12 Feb 2025 23:52:44 -0800 (PST)
+Date: Thu, 13 Feb 2025 07:52:43 +0000
+In-Reply-To: <Z0yjGA25b8TfLMnd@x1n> (message from Peter Xu on Sun, 1 Dec 2024
+ 12:55:36 -0500)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <138b520fb83964782303b43ade4369cd181fdd9c.1739226950.git.ashish.kalra@amd.com>
+Mime-Version: 1.0
+Message-ID: <diqz8qqa9t84.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH 15/39] KVM: guest_memfd: hugetlb: allocate and
+ truncate from hugetlb
+From: Ackerley Tng <ackerleytng@google.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk, 
+	jgg@nvidia.com, david@redhat.com, rientjes@google.com, fvdl@google.com, 
+	jthoughton@google.com, seanjc@google.com, pbonzini@redhat.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	isaku.yamahata@intel.com, muchun.song@linux.dev, mike.kravetz@oracle.com, 
+	erdemaktas@google.com, vannapurve@google.com, qperret@google.com, 
+	jhubbard@nvidia.com, willy@infradead.org, shuah@kernel.org, 
+	brauner@kernel.org, bfoster@redhat.com, kent.overstreet@linux.dev, 
+	pvorel@suse.cz, rppt@kernel.org, richard.weiyang@gmail.com, 
+	anup@brainfault.org, haibo1.xu@intel.com, ajones@ventanamicro.com, 
+	vkuznets@redhat.com, maciej.wieczor-retman@intel.com, pgonda@google.com, 
+	oliver.upton@linux.dev, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-fsdevel@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Feb 10, 2025 at 10:54:18PM +0000, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> Fix issues with enabling SNP host support and effectively SNP support
-> which is broken with respect to the KVM module being built-in.
-> 
-> SNP host support is enabled in snp_rmptable_init() which is invoked as
-> device_initcall(). SNP check on IOMMU is done during IOMMU PCI init
-> (IOMMU_PCI_INIT stage). And for that reason snp_rmptable_init() is
-> currently invoked via device_initcall() and cannot be invoked via
-> subsys_initcall() as core IOMMU subsystem gets initialized via
-> subsys_initcall().
-> 
-> Now, if kvm_amd module is built-in, it gets initialized before SNP host
-> support is enabled in snp_rmptable_init() :
-> 
-> [   10.131811] kvm_amd: TSC scaling supported
-> [   10.136384] kvm_amd: Nested Virtualization enabled
-> [   10.141734] kvm_amd: Nested Paging enabled
-> [   10.146304] kvm_amd: LBR virtualization supported
-> [   10.151557] kvm_amd: SEV enabled (ASIDs 100 - 509)
-> [   10.156905] kvm_amd: SEV-ES enabled (ASIDs 1 - 99)
-> [   10.162256] kvm_amd: SEV-SNP enabled (ASIDs 1 - 99)
-> [   10.171508] kvm_amd: Virtual VMLOAD VMSAVE supported
-> [   10.177052] kvm_amd: Virtual GIF supported
-> ...
-> ...
-> [   10.201648] kvm_amd: in svm_enable_virtualization_cpu
-> 
-> And then svm_x86_ops->enable_virtualization_cpu()
-> (svm_enable_virtualization_cpu) programs MSR_VM_HSAVE_PA as following:
-> wrmsrl(MSR_VM_HSAVE_PA, sd->save_area_pa);
-> 
-> So VM_HSAVE_PA is non-zero before SNP support is enabled on all CPUs.
-> 
-> snp_rmptable_init() gets invoked after svm_enable_virtualization_cpu()
-> as following :
-> ...
-> [   11.256138] kvm_amd: in svm_enable_virtualization_cpu
-> ...
-> [   11.264918] SEV-SNP: in snp_rmptable_init
-> 
-> This triggers a #GP exception in snp_rmptable_init() when snp_enable()
-> is invoked to set SNP_EN in SYSCFG MSR:
-> 
-> [   11.294289] unchecked MSR access error: WRMSR to 0xc0010010 (tried to write 0x0000000003fc0000) at rIP: 0xffffffffaf5d5c28 (native_write_msr+0x8/0x30)
-> ...
-> [   11.294404] Call Trace:
-> [   11.294482]  <IRQ>
-> [   11.294513]  ? show_stack_regs+0x26/0x30
-> [   11.294522]  ? ex_handler_msr+0x10f/0x180
-> [   11.294529]  ? search_extable+0x2b/0x40
-> [   11.294538]  ? fixup_exception+0x2dd/0x340
-> [   11.294542]  ? exc_general_protection+0x14f/0x440
-> [   11.294550]  ? asm_exc_general_protection+0x2b/0x30
-> [   11.294557]  ? __pfx_snp_enable+0x10/0x10
-> [   11.294567]  ? native_write_msr+0x8/0x30
-> [   11.294570]  ? __snp_enable+0x5d/0x70
-> [   11.294575]  snp_enable+0x19/0x20
-> [   11.294578]  __flush_smp_call_function_queue+0x9c/0x3a0
-> [   11.294586]  generic_smp_call_function_single_interrupt+0x17/0x20
-> [   11.294589]  __sysvec_call_function+0x20/0x90
-> [   11.294596]  sysvec_call_function+0x80/0xb0
-> [   11.294601]  </IRQ>
-> [   11.294603]  <TASK>
-> [   11.294605]  asm_sysvec_call_function+0x1f/0x30
-> ...
-> [   11.294631]  arch_cpu_idle+0xd/0x20
-> [   11.294633]  default_idle_call+0x34/0xd0
-> [   11.294636]  do_idle+0x1f1/0x230
-> [   11.294643]  ? complete+0x71/0x80
-> [   11.294649]  cpu_startup_entry+0x30/0x40
-> [   11.294652]  start_secondary+0x12d/0x160
-> [   11.294655]  common_startup_64+0x13e/0x141
-> [   11.294662]  </TASK>
-> 
-> This #GP exception is getting triggered due to the following errata for
-> AMD family 19h Models 10h-1Fh Processors:
-> 
-> Processor may generate spurious #GP(0) Exception on WRMSR instruction:
-> Description:
-> The Processor will generate a spurious #GP(0) Exception on a WRMSR
-> instruction if the following conditions are all met:
-> - the target of the WRMSR is a SYSCFG register.
-> - the write changes the value of SYSCFG.SNPEn from 0 to 1.
-> - One of the threads that share the physical core has a non-zero
-> value in the VM_HSAVE_PA MSR.
-> 
-> The document being referred to above:
-> https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/revision-guides/57095-PUB_1_01.pdf
-> 
-> To summarize, with kvm_amd module being built-in, KVM/SVM initialization
-> happens before host SNP is enabled and this SVM initialization
-> sets VM_HSAVE_PA to non-zero, which then triggers a #GP when
-> SYSCFG.SNPEn is being set and this will subsequently cause
-> SNP_INIT(_EX) to fail with INVALID_CONFIG error as SYSCFG[SnpEn] is not
-> set on all CPUs.
-> 
-> Essentially SNP host enabling code should be invoked before KVM
-> initialization, which is currently not the case when KVM is built-in.
-> 
-> Add fix to call snp_rmptable_init() early from iommu_snp_enable()
-> directly and not invoked via device_initcall() which enables SNP host
-> support before KVM initialization with kvm_amd module built-in.
-> 
-> Add additional handling for `iommu=off` or `amd_iommu=off` options.
-> 
-> Note that IOMMUs need to be enabled for SNP initialization, therefore,
-> if host SNP support is enabled but late IOMMU initialization fails
-> then that will cause PSP driver's SNP_INIT to fail as IOMMU SNP sanity
-> checks in SNP firmware will fail with invalid configuration error as
-> below:
-> 
-> [    9.723114] ccp 0000:23:00.1: sev enabled
-> [    9.727602] ccp 0000:23:00.1: psp enabled
-> [    9.732527] ccp 0000:a2:00.1: enabling device (0000 -> 0002)
-> [    9.739098] ccp 0000:a2:00.1: no command queues available
-> [    9.745167] ccp 0000:a2:00.1: psp enabled
-> [    9.805337] ccp 0000:23:00.1: SEV-SNP: failed to INIT rc -5, error 0x3
-> [    9.866426] ccp 0000:23:00.1: SEV API:1.53 build:5
-> 
-> Fixes: c3b86e61b756 ("x86/cpufeatures: Enable/unmask SEV-SNP CPU feature")
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Co-developed-by: Vasant Hegde <vasant.hegde@amd.com>
-> Signed-off-by: Vasant Hegde <vasant.hegde@amd.com>
-> Cc: <Stable@vger.kernel.org>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/include/asm/sev.h |  2 ++
->  arch/x86/virt/svm/sev.c    | 23 +++++++----------------
->  drivers/iommu/amd/init.c   | 34 ++++++++++++++++++++++++++++++----
->  3 files changed, 39 insertions(+), 20 deletions(-)
+Peter Xu <peterx@redhat.com> writes:
 
-For the IOMMU part:
+> On Tue, Sep 10, 2024 at 11:43:46PM +0000, Ackerley Tng wrote:
+>> +static struct folio *kvm_gmem_hugetlb_alloc_folio(struct hstate *h,
+>> +						  struct hugepage_subpool *spool)
+>> +{
+>> +	bool memcg_charge_was_prepared;
+>> +	struct mem_cgroup *memcg;
+>> +	struct mempolicy *mpol;
+>> +	nodemask_t *nodemask;
+>> +	struct folio *folio;
+>> +	gfp_t gfp_mask;
+>> +	int ret;
+>> +	int nid;
+>> +
+>> +	gfp_mask = htlb_alloc_mask(h);
+>> +
+>> +	memcg = get_mem_cgroup_from_current();
+>> +	ret = mem_cgroup_hugetlb_try_charge(memcg,
+>> +					    gfp_mask | __GFP_RETRY_MAYFAIL,
+>> +					    pages_per_huge_page(h));
+>> +	if (ret == -ENOMEM)
+>> +		goto err;
+>> +
+>> +	memcg_charge_was_prepared = ret != -EOPNOTSUPP;
+>> +
+>> +	/* Pages are only to be taken from guest_memfd subpool and nowhere else. */
+>> +	if (hugepage_subpool_get_pages(spool, 1))
+>> +		goto err_cancel_charge;
+>> +
+>> +	nid = kvm_gmem_get_mpol_node_nodemask(htlb_alloc_mask(h), &mpol,
+>> +					      &nodemask);
+>> +	/*
+>> +	 * charge_cgroup_reservation is false because we didn't make any cgroup
+>> +	 * reservations when creating the guest_memfd subpool.
+>
+> Hmm.. isn't this the exact reason to set charge_cgroup_reservation==true
+> instead?
+>
+> IIUC gmem hugetlb pages should participate in the hugetlb cgroup resv
+> charge as well.  It is already involved in the rest cgroup charges, and I
+> wonder whether it's intended that the patch treated the resv accounting
+> specially.
+>
+> Thanks,
+>
 
-Acked-by: Joerg Roedel <jroedel@suse.de>
+Thank you for your careful reviews!
 
+I misunderstood charging a cgroup for hugetlb reservations when I was
+working on this patch.
+
+Before this, I thought hugetlb_cgroup_charge_cgroup_rsvd() was only for
+resv_map reservations, so I set charge_cgroup_reservation to false since
+guest_memfd didn't use resv_map, but I understand better now. Please
+help me check my understanding:
+
++ All reservations are made at the hstate
++ In addition, every reservation is associated with a subpool (through
+  spool->rsv_hpages) or recorded in a resv_map
+    + Reservations are either in a subpool or in a resv_map but not both
++ hugetlb_cgroup_charge_cgroup_rsvd() is for any reservation
+
+Regarding the time that a cgroup is charged for reservations:
+
++ If a reservation is made during subpool creation, the cgroup is not
+  charged during the reservation by the subpool, probably by design
+  since the process doing the mount may not be the process using the
+  pages
++ Charging a cgroup for the reservation happens in
+  hugetlb_reserve_pages(), which is called at mmap() time.
+
+For guest_memfd, I see two options:
+
+Option 1: Charge cgroup for reservations at fault time
+
+Pros:
+
++ Similar in behavior to a fd on a hugetlbfs mount, where the cgroup of
+  the process calling fallocate() is charged for the reservation.
++ Symmetric approach, since uncharging happens when the hugetlb folio is
+  freed.
+
+Cons:
+
++ Room for allocation failure after guest_memfd creation. Even though
+  this guest_memfd had been created with a subpool and pages have been
+  reserved, there is a chance of hitting the cgroup's hugetlb
+  reservation cap and failing to allocate a page.
+
+Option 2 (preferred): Charge cgroup for reservations at guest_memfd
+creation time
+
+Pros:
+
++ Once guest_memfd file is created, a page is guaranteed at fault time.
++ Simplifies/doesn't carry over the complexities of the hugetlb(fs)
+  reservation system
+
+Cons:
+
++ The cgroup being charged is the cgroup of the process creating
+  guest_memfd, which might be an issue if users expect the process
+  faulting the page to be charged.
+
+Implementation:
+
++ At guest_memfd creation time, when creating the subpool, charge the
+  cgroups for everything:
+   + for hugetlb usage
+   + hugetlb reservation usage and
+   + hugetlb usage by page count (as in mem_cgroup_charge_hugetlb(),
+     which is new since [1])
++ Refactoring in [1] would be focused on just dequeueing a folio or
+  failing which, allocating a surplus folio.
+   + After allocation, don't set cgroup on the folio so that the freeing
+     process doesn't uncharge anything
++ Uncharge when the file is closed
+
+Please let me know if anyone has any thoughts/suggestions!
+
+>> +	 *
+>> +	 * use_hstate_resv is true because we reserved from global hstate when
+>> +	 * creating the guest_memfd subpool.
+>> +	 */
+>> +	folio = hugetlb_alloc_folio(h, mpol, nid, nodemask, false, true);
+>> +	mpol_cond_put(mpol);
+>> +
+>> +	if (!folio)
+>> +		goto err_put_pages;
+>> +
+>> +	hugetlb_set_folio_subpool(folio, spool);
+>> +
+>> +	if (memcg_charge_was_prepared)
+>> +		mem_cgroup_commit_charge(folio, memcg);
+>> +
+>> +out:
+>> +	mem_cgroup_put(memcg);
+>> +
+>> +	return folio;
+>> +
+>> +err_put_pages:
+>> +	hugepage_subpool_put_pages(spool, 1);
+>> +
+>> +err_cancel_charge:
+>> +	if (memcg_charge_was_prepared)
+>> +		mem_cgroup_cancel_charge(memcg, pages_per_huge_page(h));
+>> +
+>> +err:
+>> +	folio = ERR_PTR(-ENOMEM);
+>> +	goto out;
+>> +}
+
+[1] https://lore.kernel.org/all/7348091f4c539ed207d9bb0f3744d0f0efb7f2b3.1726009989.git.ackerleytng@google.com/
 
