@@ -1,251 +1,285 @@
-Return-Path: <kvm+bounces-38020-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC387A33C13
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 11:08:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07A1A33D06
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 11:53:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B602B188D6D0
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:07:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 047E07A3D38
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C37D212B2D;
-	Thu, 13 Feb 2025 10:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731A42135CD;
+	Thu, 13 Feb 2025 10:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CnZFkRLV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E32+R2Cw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63FF1FAC42;
-	Thu, 13 Feb 2025 10:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38F3212FAC
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 10:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739441215; cv=none; b=FonxUGUIhMClimY+ul3z2lZZZ7CY3nyGvcn5V8efAROEp07GW1HjT6pW891Yd/RZdKRfagpbt7BdzASJ5DqI+2xwwhx6nIV3XB/K5pjFa1Yf95nTNR034b9kXg7XfhF/XRU7h6fYqsDBtmYdC7meIIYfH5otvEc7kNoUbwQrqig=
+	t=1739444025; cv=none; b=RB4v1yYHL4FpOxkXQcE9JopKMJn2RTyBmML9SNGkAP3qKrWPutMUFqY5RQZ5503WLc7M+FIvt9M7SYu1QyhSxSJjrRg/fLj761UkcvSGMYdie5E6jYJRnYg12ujlDH4sVF1VHDEIDEUDfpekcjGf+a0zH5s7aMtWZtmGV9oeAQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739441215; c=relaxed/simple;
-	bh=ko837iq1ve/8hqP2/4ukx7/LfNVkESiB7v53Gzu9/xM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=G91pGNRD6rATsoFGbBM5doGqE/WRAOnbCsEvBJiSgTu+RwuiwGUkY8kUMuyVVcVHTYSj0P6tqUA4sbtCYNLn0nF3poFXeRnccFDbcj1H3AzIF/Yj/Hy0onu7jcQ3BDPh7kSrTfF9NEMsq2glEFGX8L6sdRS5J4RxdooOlDc5+x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CnZFkRLV; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51D7YHwL017386;
-	Thu, 13 Feb 2025 10:06:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=+uEW0T
-	cugeSxMGhadSCJPH9+qLh2x0/3ZL4KmjvKuyg=; b=CnZFkRLV0r/+LxHWU9sCb9
-	Mg+pYguRwrXskPrlsmAQUc1aOS+elsmezqSYMeDhbDDH0QW77lLon2QLj3055tGQ
-	xi/gQYD+6/DIfl4V6EtSMZj0zlTUvvmRro9MfFLAfFoiPM5Wq4vaCEmhHHktlNSK
-	axSgwgL2Lx9jakRoMBqkIXG12qlHl0zymY4Ch0le3iklIpCRB90SwK1pCBoAPNLv
-	kcRyNoNK0ejVwd9m0BbV4F2y7g5TpF7dYI8rJ+mUKKDl7Z87u+58isxkHmXkSoKr
-	qEgseve+UNnjRBXKNM2N56cyyE4AGeysxNcUP/e6/8d8voQ8oVvr7UoeUbFtKxdA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rxfu4tke-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Feb 2025 10:06:37 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51DA3a75020734;
-	Thu, 13 Feb 2025 10:06:37 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rxfu4tka-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Feb 2025 10:06:36 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51D81TZx001355;
-	Thu, 13 Feb 2025 10:06:36 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pjkndnvs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Feb 2025 10:06:36 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51DA6Z6v32965246
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Feb 2025 10:06:35 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 26E2558059;
-	Thu, 13 Feb 2025 10:06:35 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 47E2B58043;
-	Thu, 13 Feb 2025 10:06:31 +0000 (GMT)
-Received: from [9.171.82.253] (unknown [9.171.82.253])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 13 Feb 2025 10:06:31 +0000 (GMT)
-Message-ID: <8f1a62e93bde37708a47b7db70767d1e14c608e0.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 2/2] PCI: s390: Support mmap() of BARs and replace
- VFIO_PCI_MMAP by a device flag
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Gerd Bayer
- <gbayer@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jason
- Gunthorpe	 <jgg@ziepe.ca>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Bjorn
- Helgaas	 <bhelgaas@google.com>,
-        Julian Ruess <julianr@linux.ibm.com>,
-        Halil
- Pasic	 <pasic@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Gerald
- Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens	
- <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev	
- <agordeev@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-Date: Thu, 13 Feb 2025 11:06:30 +0100
-In-Reply-To: <20250212132808.08dcf03c.alex.williamson@redhat.com>
-References: <20250212-vfio_pci_mmap-v5-0-633ca5e056da@linux.ibm.com>
-		<20250212-vfio_pci_mmap-v5-2-633ca5e056da@linux.ibm.com>
-	 <20250212132808.08dcf03c.alex.williamson@redhat.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1739444025; c=relaxed/simple;
+	bh=CxdSoIHuO3hDAjz4B5KLTm/OYqVLRMNIIpY0qRy4XtM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Z4iJB2+BwtV67fvPyojlcdMrF24S5Jqr9AnsSJd3Qn0q5vTjGGWQ6PIn+U9BD460oEmfzLpIWitziGCO9gUbAS+HRDH+BEd/eNmwpmftAPhrvBxydf/6RctwMW6e7E21CEjxWIoREo/j4DpQqc52TGNzWWO0qnJ+JoTjscHWzMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--derkling.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E32+R2Cw; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--derkling.bounces.google.com
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-38f27bddeeeso365224f8f.3
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 02:53:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739444022; x=1740048822; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LH65o5YRE1ZNPyB4JSqw2z5nXm8tS/ZU1Ybl+xJhaus=;
+        b=E32+R2Cwh+yVluyu/0VqhtKavKg1FiQF/Se24rbqKNV14aalP9ZPcE+wOAjx1odpWA
+         zcNW3YhPVl0Q1ARNvKXzuW+5EeJqB/BHO1Sn3I3lOOUXn4qP5GY7Mm5Z7EqEmvDSohrv
+         FX95VD2ZHj6O3m9Qfu1p7PrbLfGWGeY0mfuxCEFZpn1Nawi1di8iDJOk6a6lU+s+HvtI
+         ZMYCHMPraGy3ZLlOD6EaAYBhobGJvL6OdexnaPV0MvUeChiRgWADZVhQGlAZ+TDsF7AK
+         fWgiWxK+WIZG+nNShObkoJvhmvXaZwIQ9h1uDMlbmyr4mpyjxpawGQV41vBYSePvmgEY
+         wc6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739444022; x=1740048822;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LH65o5YRE1ZNPyB4JSqw2z5nXm8tS/ZU1Ybl+xJhaus=;
+        b=Yw1GnGEU4CvdQ3RjPzNDOV9TlAkPLa4s884SUhdstVyxOpa7poKrDVV33OuqRrePuS
+         aFvQWngiRp177mYRskfrbuJiPPApv9HVzj792OOPCtbgVxsvtuHq/eqeIApUOh3rGe5P
+         uXyh/sDNPiw616VvBo3z9MWcRTA7Y9FrLode601SURbW9RG3/10uojLQG0vgWk7HlVFp
+         1DACeVlCgllQq7SHUiURSs/84+ffr+DNjMVwSKFxkrCBgR8JB+wA1/7NNBC1L9LalvWV
+         aRtdmf7V7J4h+CHa6lORu97uXT5ZcCzf8S8fxrCY+WSQZFsbgC9FdrCXt5CC9Jrwks3u
+         70mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVYR0iviJ+Qo6A5bPUPnoPk4E4Q2hayyvcCUKqzHP05NT0RQ79y157W/uMomlOMGZiDzWk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKoaYuEvL3Q2OtTQj2UibpCjWjZlb9xhoiKskfaN9rkmPbjrmH
+	zKWrtI27cCPCp6GPPOEJrxIHONROafaMRfwK4Gl2v0ty9+wYkynm2smwRrpDH/8/QmMAf4O55bQ
+	tV3Frok+NXA==
+X-Google-Smtp-Source: AGHT+IFxznP0aCdnsFpcLgdw7/40LdRcVDzdZgumVDt95Dc2hRgsaFtKg75OlD16IyilijGhRybsgT2KdZ3HCQ==
+X-Received: from wmsp21.prod.google.com ([2002:a05:600c:1d95:b0:439:4829:ec32])
+ (user=derkling job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:90:b0:38d:d92e:5f7a with SMTP id ffacd0b85a97d-38f244ee0f5mr2519203f8f.28.1739444022091;
+ Thu, 13 Feb 2025 02:53:42 -0800 (PST)
+Date: Thu, 13 Feb 2025 10:53:04 +0000
+In-Reply-To: <20250123170149.GCZ5J1_WovzHQzo0cW@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: m-TpfZyWbtPLrVmCPbTe1NiQnFbLIm8-
-X-Proofpoint-GUID: hEYqtllOeUmpjoh9AXKXLcdtFhnuBX-s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-13_03,2025-02-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- clxscore=1015 adultscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
- suspectscore=0 spamscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502130076
+Mime-Version: 1.0
+References: <20250123170149.GCZ5J1_WovzHQzo0cW@fat_crate.local>
+X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
+Message-ID: <20250213105304.1888660-1-derkling@google.com>
+Subject: Re: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+From: Patrick Bellasi <derkling@google.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Josh Poimboeuf <jpoimboe@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Patrick Bellasi <derkling@matbug.net>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 2025-02-12 at 13:28 -0700, Alex Williamson wrote:
-> On Wed, 12 Feb 2025 16:28:32 +0100
-> Niklas Schnelle <schnelle@linux.ibm.com> wrote:
->=20
-> > On s390 there is a virtual PCI device called ISM which has a few
-> > peculiarities. For one, it presents a 256 TiB PCI BAR whose size leads
-> > to any attempt to ioremap() the whole BAR failing. This is problematic
-> > since mapping the whole BAR is the default behavior of for example
-> > vfio-pci in combination with QEMU and VFIO_PCI_MMAP enabled.
-> >=20
-> > Even if one tried to map this BAR only partially, the mapping would not
-> > be usable without extra precautions on systems with MIO support enabled=
-.
-> > This is because of another oddity, in that this virtual PCI device does
-> > not support the newer memory I/O (MIO) PCI instructions and legacy PCI
-> > instructions are not accessible through writeq()/readq() when MIO is in
-> > use.
-> >=20
-> > In short the ISM device's BAR is not accessible through memory mappings=
-.
-> > Indicate this by introducing a new non_mappable_bars flag for the ISM
-> > device and set it using a PCI quirk. Use this flag instead of the
-> > VFIO_PCI_MMAP Kconfig option to block mapping with vfio-pci. This was
-> > the only use of the Kconfig option so remove it. Note that there are no
-> > PCI resource sysfs files on s390x already as HAVE_PCI_MMAP is currently
-> > not set. If this were to be set in the future pdev->non_mappable_bars
-> > can be used to prevent unusable resource files for ISM from being
-> > created.
->=20
-> I think we should also look at it from the opposite side, not just
-> s390x maybe adding HAVE_PCI_MMAP in the future, but the fact that we're
-> currently adding a generic PCI device flag which isn't honored by the
-> one mechanism that PCI core provides to mmap MMIO BARs to userspace.
-> It seems easier to implement it in pci_mmap_resource() now rather than
-> someone later discovering there's no enforcement outside of the very
-> narrow s390x use case.  Thanks,
->=20
-> Alex
+FWIW, this should be the updated version of the patch with all the review
+comments posted so far.
 
-That is a very good point! I did try enabling HAVE_PCI_MMAP for s390 a
-while back and I believe that ran into trouble with ISM devices too. So
-I just did a quick test of enabling HAVE_PCI_MMAP with
-ARCH_GENERIC_PCI_MMAP_RESOURCE for s390. Then added a check for=C2=A0
-pdev->non_mappable_bars to pci_create_resource_files() and
-proc_bus_pci_mmap(). I pondered adding it to pci_mmap_resource() too
-but felt like not showing the resource at all, like we do now with
-!HAVE_PCI_MMAP is cleaner.
+Posting here just to have an overall view of how the new patch should look like.
+This is also based on todays Linus's master branch.
 
-Using a little test program that just mmap()s BAR 0 of an NVMe and
-reads the NVMe version at offset 8 using our PCI MIO load instruction
-works. Also, as expected I don't get resourceX files for ISM devices
-with the added check.=C2=A0
+Compile tested only...
 
-I still have to test the /proc/bus/pci based mmap() but would expect
-that to work too. So I'd be open to adding another patch which adds
-HAVE_PCI_MMAP for s390, if we see too much risk with that, we could
-alternatively add just the pdev->non_mappable_bars but then they would
-be untested, still better than hoping that someone remembers to add
-that in the future.
+Best,
+Patrick
 
-Thanks,
-Niklas
+---
+From: "Borislav Petkov (AMD)" <bp@alien8.de>
+
+Add support for
+
+  CPUID Fn8000_0021_EAX[31] (SRSO_MSR_FIX). If this bit is 1, it
+  indicates that software may use MSR BP_CFG[BpSpecReduce] to mitigate
+  SRSO.
+
+enable this BpSpecReduce bit to mitigate SRSO across guest/host
+boundaries.
+
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+---
+ Documentation/admin-guide/hw-vuln/srso.rst | 20 ++++++++++++++++++++
+ arch/x86/include/asm/cpufeatures.h         |  1 +
+ arch/x86/kernel/cpu/bugs.c                 | 21 +++++++++++++++++----
+ arch/x86/kvm/svm/svm.c                     | 14 ++++++++++++++
+ tools/arch/x86/include/asm/msr-index.h     |  1 +
+ 5 files changed, 53 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/admin-guide/hw-vuln/srso.rst b/Documentation/admin-guide/hw-vuln/srso.rst
+index 2ad1c05b8c883..49680ab99c393 100644
+--- a/Documentation/admin-guide/hw-vuln/srso.rst
++++ b/Documentation/admin-guide/hw-vuln/srso.rst
+@@ -104,6 +104,26 @@ The possible values in this file are:
+ 
+    (spec_rstack_overflow=ibpb-vmexit)
+ 
++ * 'Mitigation: Reduced Speculation':
++
++   This mitigation gets automatically enabled when the above one "IBPB on
++   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
++
++   It gets automatically enabled on machines which have the
++   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the code logic is to switch
++   to the above =ibpb-vmexit mitigation because the user/kernel boundary is
++   not affected anymore and thus "safe RET" is not needed.
++
++   After enabling the IBPB on VMEXIT mitigation option, the BpSpecReduce bit
++   is detected (functionality present on all such machines) and that
++   practically overrides IBPB on VMEXIT as it has a lot less performance
++   impact and takes care of the guest->host attack vector too.
++
++   Currently, the mitigation uses KVM's user_return approach
++   (kvm_set_user_return_msr()) to set the BpSpecReduce bit when a vCPU runs
++   a guest and reset it upon return to host userspace or when the KVM module
++   is unloaded. The intent being, the small perf impact of BpSpecReduce should
++   be incurred only when really necessary.
+ 
+ 
+ In order to exploit vulnerability, an attacker needs to:
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 508c0dad116bc..c46754298507b 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -468,6 +468,7 @@
+ #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
+ #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
+ #define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
++#define X86_FEATURE_SRSO_BP_SPEC_REDUCE	(20*32+31) /* BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs (SRSO_MSR_FIX in AMD docs). */
+ 
+ /*
+  * Extended auxiliary flags: Linux defined - for features scattered in various
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index a5d0998d76049..d2007dbfcc1cc 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -2522,6 +2522,7 @@ enum srso_mitigation {
+ 	SRSO_MITIGATION_SAFE_RET,
+ 	SRSO_MITIGATION_IBPB,
+ 	SRSO_MITIGATION_IBPB_ON_VMEXIT,
++	SRSO_MITIGATION_BP_SPEC_REDUCE,
+ };
+ 
+ enum srso_mitigation_cmd {
+@@ -2539,7 +2540,8 @@ static const char * const srso_strings[] = {
+ 	[SRSO_MITIGATION_MICROCODE]		= "Vulnerable: Microcode, no safe RET",
+ 	[SRSO_MITIGATION_SAFE_RET]		= "Mitigation: Safe RET",
+ 	[SRSO_MITIGATION_IBPB]			= "Mitigation: IBPB",
+-	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only"
++	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only",
++	[SRSO_MITIGATION_BP_SPEC_REDUCE]	= "Mitigation: Reduced Speculation"
+ };
+ 
+ static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
+@@ -2578,7 +2580,7 @@ static void __init srso_select_mitigation(void)
+ 	    srso_cmd == SRSO_CMD_OFF) {
+ 		if (boot_cpu_has(X86_FEATURE_SBPB))
+ 			x86_pred_cmd = PRED_CMD_SBPB;
+-		return;
++		goto out;
+ 	}
+ 
+ 	if (has_microcode) {
+@@ -2590,7 +2592,7 @@ static void __init srso_select_mitigation(void)
+ 		 */
+ 		if (boot_cpu_data.x86 < 0x19 && !cpu_smt_possible()) {
+ 			setup_force_cpu_cap(X86_FEATURE_SRSO_NO);
+-			return;
++			goto out;
+ 		}
+ 
+ 		if (retbleed_mitigation == RETBLEED_MITIGATION_IBPB) {
+@@ -2670,6 +2672,12 @@ static void __init srso_select_mitigation(void)
+ 
+ ibpb_on_vmexit:
+ 	case SRSO_CMD_IBPB_ON_VMEXIT:
++		if (boot_cpu_has(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
++			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
++			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
++			break;
++		}
++
+ 		if (IS_ENABLED(CONFIG_MITIGATION_IBPB_ENTRY)) {
+ 			if (has_microcode) {
+ 				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
+@@ -2691,7 +2699,12 @@ static void __init srso_select_mitigation(void)
+ 	}
+ 
+ out:
+-	pr_info("%s\n", srso_strings[srso_mitigation]);
++
++	if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
++		setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
++
++	if (srso_mitigation != SRSO_MITIGATION_NONE)
++		pr_info("%s\n", srso_strings[srso_mitigation]);
+ }
+ 
+ #undef pr_fmt
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 7640a84e554a6..6ea3632af5807 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -257,6 +257,7 @@ DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
+  * defer the restoration of TSC_AUX until the CPU returns to userspace.
+  */
+ static int tsc_aux_uret_slot __read_mostly = -1;
++static int zen4_bp_cfg_uret_slot __ro_after_init = -1;
+ 
+ static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
+ 
+@@ -1540,6 +1541,11 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+ 	    (!boot_cpu_has(X86_FEATURE_V_TSC_AUX) || !sev_es_guest(vcpu->kvm)))
+ 		kvm_set_user_return_msr(tsc_aux_uret_slot, svm->tsc_aux, -1ull);
+ 
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
++		kvm_set_user_return_msr(zen4_bp_cfg_uret_slot,
++					BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT),
++					BIT_ULL(MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT));
++
+ 	svm->guest_state_loaded = true;
+ }
+ 
+@@ -5306,6 +5312,14 @@ static __init int svm_hardware_setup(void)
+ 
+ 	tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
+ 
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
++		zen4_bp_cfg_uret_slot = kvm_add_user_return_msr(MSR_ZEN4_BP_CFG);
++		if (WARN_ON_ONCE(zen4_bp_cfg_uret_slot < 0)) {
++			r = -EIO;
++			goto err;
++		}
++	}
++
+ 	if (boot_cpu_has(X86_FEATURE_AUTOIBRS))
+ 		kvm_enable_efer_bits(EFER_AUTOIBRS);
+ 
+diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
+index 3ae84c3b8e6db..1372a569fb585 100644
+--- a/tools/arch/x86/include/asm/msr-index.h
++++ b/tools/arch/x86/include/asm/msr-index.h
+@@ -717,6 +717,7 @@
+ 
+ /* Zen4 */
+ #define MSR_ZEN4_BP_CFG                 0xc001102e
++#define MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT 4
+ #define MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT 5
+ 
+ /* Fam 19h MSRs */
+-- 
+2.48.1.601.g30ceb7b040-goog
+
 
