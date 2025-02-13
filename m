@@ -1,65 +1,80 @@
-Return-Path: <kvm+bounces-38013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B7DFA33A51
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 09:55:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A277BA33B19
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7752163BE0
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 08:55:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B0A1188515C
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 09:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78F020C46F;
-	Thu, 13 Feb 2025 08:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6804B20D4F0;
+	Thu, 13 Feb 2025 09:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TAVHyNJM"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="KDjKOm6/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC8F2063DA;
-	Thu, 13 Feb 2025 08:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35C620A5DC
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 09:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739436932; cv=none; b=qmow+3VCr39l2Hk6xGo42eBCuY0FTNFJSyoibF+cm37Yw1qMJSwUO4DCB3rNhvEuhxPCRUMXOqjnrt5uFQmqH80KwyHpsbooj1ARsnOCMUrRJTAhCLKt44NoDTphu9421MU4skef+Z+Phvxyr7t68joOPnPFDYF43hj2ie2pNMM=
+	t=1739438644; cv=none; b=GFV90jt+UhmGqQP9gs9so9NXpfk1CwviNBi3xd3ic0430swwxquxMIyU3Ln//+s4KOfjJiTb5+V0HF0318ezBo5Bm58JcZ5Kd4Zwq4Jl7f5NYKIBz5gc7F2I3eOuipZwUSB9WpJ2kP76OexIICx1Pdlz+9IPvyZU4ufESbb1+LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739436932; c=relaxed/simple;
-	bh=MHpOzFsGTOMh0eNy8NM9PNMvsZ+5FJ1jTrK55cX6qck=;
+	s=arc-20240116; t=1739438644; c=relaxed/simple;
+	bh=mfXNeTj+Q8ZX0NBisxbi4QQyQ/0LK4y+WrTTR40VPyo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FefZjT8TOX/oTFVikGG85jBCW0s8Jg0epcpV/pe35e1f6Bs8TR3Xfn0AdNAIhNlR2EdeAVIMbuB2qGX1O+8D6/H43f0gAjQbg+i9KQUYO6elhyc2ULC6Pz5FwU2FlRi/ZtZnOYteOapn6lS/VFQ5Ie8sJ8onAU7syzEVmE8sVss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TAVHyNJM; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739436930; x=1770972930;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=MHpOzFsGTOMh0eNy8NM9PNMvsZ+5FJ1jTrK55cX6qck=;
-  b=TAVHyNJMdJIet4i4o1VZbctZb1Jv6P3jm3VhEk8v++ztEzZYzVgUTTOd
-   5GW5feUWOa/5c4pS3VHqMH2VqisNJqbHMoPTxvG9exUIQi3nXQoSmT5Yk
-   DPvm6In2AiAUMet8v7D5eMiQXAXc6gSQLS0MANSZ4eG+dVIRHEUwIM2Do
-   PiPpfzIqKGjPKIHw9NoFn80qILG9DDa1+iw3Y03Mz+JVkw55L1ojpF9NV
-   EwVj31zq5HEkMXInpHMIs5/WYxdLtiUEAyxZHoFJwjyVaihAqMgf2x6kH
-   6bFrMOmCmd4GaHHlLY2rAedyaeMM3jFkSCZWuKfIoy1pODfQZeeSzX6n8
-   w==;
-X-CSE-ConnectionGUID: GnqZmV+qTOu3SZcpNqGLqA==
-X-CSE-MsgGUID: FbTBCfQJSyaK46Vebg4AWQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="39315781"
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="39315781"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 00:55:29 -0800
-X-CSE-ConnectionGUID: w5l3HZp3SqCCAvQRlF1pNg==
-X-CSE-MsgGUID: b/5oDf+eR8iyHeporrBATQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="113263929"
-Received: from unknown (HELO [10.238.9.235]) ([10.238.9.235])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 00:55:27 -0800
-Message-ID: <6d817749-cb61-4406-9dfe-b8a0ef333a85@linux.intel.com>
-Date: Thu, 13 Feb 2025 16:55:24 +0800
+	 In-Reply-To:Content-Type; b=ZPvjlWcxIgfaqaed6hZbeZ3bxHaFlVGYBfcDZP7D1qnv4AiI5acYjmNlalqNNotAHDM9lT+GoLIzIJk5zZfXD8uM2XVBqhUFIAu2q1+pK6drp7sLgDRJb2s/4EMukSrNlIS8MErHHUh4Xncxhf6RtmMbJdBv/gvl7Xyna3KCbss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=KDjKOm6/; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21f40deb941so14334615ad.2
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 01:24:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1739438642; x=1740043442; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=s+g1corMoWLkqgaHyL0dUry18PBH1WwZj6geDsmEd1Y=;
+        b=KDjKOm6/0FJ3659nApC3mh5Qz2KfuRT+TelHF+ecr+t08t0h66scPICfpH8q36dDdg
+         QNpyYENQ5hApsce4xKZYWc/6l7lwDw2r288/mzMSZmM2UxvpTjK75ljeTzV7dVByqdPx
+         /867R5Ei2/PaBSNEp/Zm6k3AXDyisesc3wjyzdVOAYEUdQpIIs7TjXWlfFeDZMbsFLCJ
+         CVv8SbBjU49ezKqdbXe8QNlTxp1p3no2ssUvpPSNsstvHvLmw7r9lIrAaqXlBpobaS/R
+         NwxC17uCq2KpdNFKZkZubeft8KN3u3yeKSIGiwp0FVQZSh49q1RyQYbPtIiJL11XeB5H
+         jegA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739438642; x=1740043442;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s+g1corMoWLkqgaHyL0dUry18PBH1WwZj6geDsmEd1Y=;
+        b=SL/9zkGqgn3JS2bGwF375JEH47cD52AnyoZVmWDi/hhz5V1bVk/MYSf6uNMa9h71nl
+         Mj+dgUHBSWXQZUR9+3qbiCKQ6cSF8QWqcutUOj8LSlWJ8mrOBJIYz1eoy5lNjReiEufB
+         gMUAqr/Dx4dfNhO366HX4Ty2bVlBp6nFvX4yy4BJhW+L8McFS3aKlJwi/WzlwQkqIiGi
+         Y/guVKojP3S1OjkEOst9T0ZiKFj6iHE7tQzQMjfXfpvqdPFhvOu88+KVgqcS6p/K7AUg
+         f3dAkRAKd1twklg4CNWjegcvY7ZCrIaaylRnUhOWgsM7RPDkTBXZzJIkQa271zm2O8L0
+         G6Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ1a6MsMfaZN8nNMPlwANuFBRNyFyx6D5KykcMOAS4qrYpKfhcUDttJzgNtnHc1N462So=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb9q+4emNQoSREGO+L8MV41eRKh1JjXi6EtZJPt9y0k4TvLgAD
+	w/1UlKWpvP9M1C0A22ZI43r7iEoj6CFOJoR1a3B//xCBlJtFvY4WCu7NvpPEOKxIlMmSKiGfgSG
+	fT4U=
+X-Gm-Gg: ASbGnctXUBpXLie1mpYQLiKnUABqy+5xqV8wIVs48eYqZR7f05eO/qcBzCic7cjF2sO
+	XkEyHrDjjscldIst/OLjzROp1LhwGy4f2TpPpiQ4uMSV82HAo4zodj8S7VQTEn5VgyzM6QwwuaS
+	DCeq3AvXzNz2+uoVKmQktJwahHRGaOeBfU4cqffH+ziGSupph+XD/dBFXRnyPZm+Y4KjXbdBKGl
+	I1lQ6Nr8LMBJgAICokycIJPN9hG3Daaj/+tc7eEOjBlSXJ9iYiFSRH4s+IFwSdyon4rnHKY4wqL
+	um5GlumhWOHxHANqSXejW0wTUvsH
+X-Google-Smtp-Source: AGHT+IGF+4e3Af2SCI8Rg8n4coZI7ErejXVy5bxQnzx65sHDQNZjtZ7hhVxDzaYqpoDifzZ7gAKFSQ==
+X-Received: by 2002:a17:902:e950:b0:220:c813:dfb2 with SMTP id d9443c01a7336-220d2153077mr52167375ad.44.1739438642097;
+        Thu, 13 Feb 2025 01:24:02 -0800 (PST)
+Received: from [157.82.205.237] ([157.82.205.237])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fc13ad3fb8sm805579a91.26.2025.02.13.01.23.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Feb 2025 01:24:01 -0800 (PST)
+Message-ID: <0fa16c0e-8002-4320-b7d3-d3d36f80008c@daynix.com>
+Date: Thu, 13 Feb 2025 18:23:55 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,55 +82,121 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 08/17] KVM: TDX: Complete interrupts after TD exit
-To: Chao Gao <chao.gao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
- rick.p.edgecombe@intel.com, kai.huang@intel.com, adrian.hunter@intel.com,
- reinette.chatre@intel.com, xiaoyao.li@intel.com, tony.lindgren@intel.com,
- isaku.yamahata@intel.com, yan.y.zhao@intel.com, linux-kernel@vger.kernel.org
-References: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
- <20250211025828.3072076-9-binbin.wu@linux.intel.com>
- <Z62rPgmS2RB/LaC7@intel.com>
+Subject: Re: [PATCH net-next] tun: Pad virtio headers
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250213-buffers-v1-1-ec4a0821957a@daynix.com>
+ <20250213020702-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <Z62rPgmS2RB/LaC7@intel.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20250213020702-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+On 2025/02/13 16:18, Michael S. Tsirkin wrote:
+> 
+> Commit log needs some work.
+> 
+> So my understanding is, this patch does not do much functionally,
+> but makes adding the hash feature easier. OK.
+> 
+> On Thu, Feb 13, 2025 at 03:54:06PM +0900, Akihiko Odaki wrote:
+>> tun used to simply advance iov_iter when it needs to pad virtio header,
+>> which leaves the garbage in the buffer as is. This is especially
+>> problematic
+> 
+> I think you mean "this will become especially problematic"
+> 
+>> when tun starts to allow enabling the hash reporting
+>> feature; even if the feature is enabled, the packet may lack a hash
+>> value and may contain a hole in the virtio header because the packet
+>> arrived before the feature gets enabled or does not contain the
+>> header fields to be hashed. If the hole is not filled with zero, it is
+>> impossible to tell if the packet lacks a hash value.
+>>
+>> In theory, a user of tun can fill the buffer with zero before calling
+>> read() to avoid such a problem, but leaving the garbage in the buffer is
+>> awkward anyway so fill the buffer in tun.
+> 
+> 
+> What is missing here is description of what the patch does.
+> I think it is
+> "Replace advancing the iterator with writing zeros".
+> 
+> There could be performance cost to the dirtying extra cache lines, though.
+> Could you try checking that please?
 
+It will not dirty extra cache lines; an explanation follows later. 
+Because of that, any benchmark are likely to show only noises, but if 
+you have an idea of workloads that should be tested, please tell me.
 
-On 2/13/2025 4:20 PM, Chao Gao wrote:
->> +static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
->> +{
->> +	/* Avoid costly SEAMCALL if no NMI was injected. */
->> +	if (vcpu->arch.nmi_injected) {
->> +		/*
->> +		 * No need to request KVM_REQ_EVENT because PEND_NMI is still
->> +		 * set if NMI re-injection needed.  No other event types need
->> +		 * to be handled because TDX doesn't support injection of
->> +		 * exception, SMI or interrupt (via event injection).
->> +		 */
->> +		vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
->> +							      TD_VCPU_PEND_NMI);
->> +	}
-> Why does KVM care whether/when an NMI is injected by the TDX module?
->
-> I think we can simply set nmi_injected to false unconditionally here, or even in
-> tdx_inject_nmi(). From KVM's perspective, NMI injection is complete right after
-> writing to PEND_NMI. It is the TDX module that should inject the NMI at the
-> right time and do the re-injection.
-Yes, it can/should be cleared unconditionally here.
+> 
+> I think we should mention the risks of the patch, too.
+> Maybe:
+> 
+> 	Also in theory, a user might have initialized the buffer
+> 	to some non-zero value, expecting tun to skip writing it.
+> 	As this was never a documented feature, this seems unlikely.
+ > >
+>>
+>> The specification also says the device MUST set num_buffers to 1 when
+>> the field is present so set it when the specified header size is big
+>> enough to contain the field.
+> 
+> This part I dislike. tun has no idea what the number of buffers is.
+> Why 1 specifically?
 
-Previously (v19 and before), nmi_injected will impact the limit of pending nmi.
-Now, we don't care the limit of pending nmi because more pending NMIs will be
-collapsed to the one pending in the TDX module.
+That's a valid point. I rewrote the commit log to clarify, but perhaps 
+we can drop the code to set the num_buffers as "[PATCH] vhost/net: Set 
+num_buffers for virtio 1.0" already landed.
 
-Will update it.
-Thanks!
+Below is the rewritten commit log, which incorporates your suggestions 
+and is extended to cover the performance implication and reason the 
+num_buffers initialization:
 
->
->
->> +}
->> +
+tun simply advances iov_iter when it needs to pad virtio header,
+which leaves the garbage in the buffer as is. This will become
+especially problematic when tun starts to allow enabling the hash
+reporting feature; even if the feature is enabled, the packet may lack a
+hash value and may contain a hole in the virtio header because the
+packet arrived before the feature gets enabled or does not contain the
+header fields to be hashed. If the hole is not filled with zero, it is
+impossible to tell if the packet lacks a hash value.
 
+In theory, a user of tun can fill the buffer with zero before calling
+read() to avoid such a problem, but leaving the garbage in the buffer is
+awkward anyway so replace advancing the iterator with writing zeros.
+
+A user might have initialized the buffer to some non-zero value,
+expecting tun to skip writing it. As this was never a documented
+feature, this seems unlikely. Neither is there a non-zero value that can
+be determined and set before receiving the packet; the only exception
+is the num_buffers field, which is expected to be 1 for version 1 when
+VIRTIO_NET_F_HASH_REPORT is not negotiated. This field is specifically
+set to 1 instead of 0.
+
+The overhead of filling the hole in the header is negligible as the
+entire header is already placed on the cache when a header size defined
+in the current specification is used even if the cache line is small
+(16 bytes for example).
+
+Below are the header sizes possible with the current specification:
+a) 10 bytes if the legacy interface is used
+b) 12 bytes if the modern interface is used
+c) 20 bytes if VIRTIO_NET_F_HASH_REPORT is negotiated
+
+a) and b) obviously fit in a cache line. c) uses one extra cache line,
+but the cache line also contains the first 12 bytes of the packet so
+it is always placed on the cache.
 
