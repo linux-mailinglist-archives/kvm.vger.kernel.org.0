@@ -1,322 +1,162 @@
-Return-Path: <kvm+bounces-38077-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38078-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 296C4A34AF2
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 17:56:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E266A34C62
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 18:51:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1354118965A5
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 16:52:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877BA3A3F91
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 17:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA45423A9AD;
-	Thu, 13 Feb 2025 16:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C037623A9B6;
+	Thu, 13 Feb 2025 17:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZL3vGrU6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V1PhRtDJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A2328A2CF
-	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 16:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339E42222D5
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 17:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739465346; cv=none; b=tDp/Lv6jly9rADAKhA5MUAftUzeOaKpEXvpGxro40g0hZ2+Rl4Y9idHag1k+bbrBgTZpSNZjuO77bKzzotF/3f+wjNpeZaLuTWa1E6K80+lSkGWYroc6poFYzxJg6SfdKP6LqGbmkgyKOhI5PO0+A0dZFNlee3ktcOpCKKsllic=
+	t=1739469090; cv=none; b=VKCiqZRpsdhGviaiLLsg8PUFqwUSVNsO9HxZEujvVWBxzrgUaolDA0K+33t3hnd9RjTJl66qqpDBYXZ0Lgo/9NtRlPEL/JZD+jLVVVwrYHVrkCWl97tF32Pc+KYifd3M6fVJXZd1SDhZ7ZyUK0eCWo7U7oFSFamRUO59UATwlt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739465346; c=relaxed/simple;
-	bh=stjsMCoXmAOuqNoWr54apqYrZ9Lu1dlfD+lCCAbl6FM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RNpwyz7UGR95jn4KVnUohHfv2VOOuoepmRBPTgFmaVpIxZgDNd/1uCWJF0yV76KIMZPgxuye0xSr6jQY/K+jHtLwn403EO9C5BfbvZzIEltTXfwMGr7K146fc+xFRG5pGShQ8gj3dG7ou6ZaNGOUaBKL9Xgr9bH9l4nd5dJiLNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZL3vGrU6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739465343;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JROJFeKJG/7QhErL5KNFi8pxb9777JdDet+vnroXIfk=;
-	b=ZL3vGrU6c9ZoM0y2gJutAFcYnrNZDGKizWA/zq3bss1xcrT4ErR1YhgI6k7tVizcnkavxT
-	4vqv4ZaqJxa+anGIpsOYF5kyBtB1vu8GQKSmFAUQ64MF+agg2SyIB5pLTUqbT3YYSB17rK
-	WqMK9zo7pt6i4bgqYWEiZXU8C8jSVAE=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-34-xEBWyluCP-y3MK8_dyzxKQ-1; Thu, 13 Feb 2025 11:49:02 -0500
-X-MC-Unique: xEBWyluCP-y3MK8_dyzxKQ-1
-X-Mimecast-MFC-AGG-ID: xEBWyluCP-y3MK8_dyzxKQ_1739465342
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-47197ef01dcso11333981cf.0
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 08:49:02 -0800 (PST)
+	s=arc-20240116; t=1739469090; c=relaxed/simple;
+	bh=QJ+YCqNgWAmQUnvwMc9D+esAomTJ65yyPVnESZZWZlM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PfCmdhxMbD8xmk+4zi5LGo4yae60dCTq50TBufPH37hrNa4jMsd+JQ7faDNbSVm9nHFRkqvZmiOfZxL8308+/393tuL/5O2G4mlnNlq33oFc7F+RnHJzt8y0pAFGbyjzga3zXn/RMCE2WEdMnNMxJfa7J6I2c3fbzvBF3CuZ9D8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--derkling.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V1PhRtDJ; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--derkling.bounces.google.com
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4394b8bd4e1so9160175e9.0
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 09:51:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739469087; x=1740073887; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=StLJ8Lv0+CjYYh45JBL2tc2N6KZWn7gX3vfe622hY7g=;
+        b=V1PhRtDJle1VANHtj6LvaCTKy7J/fG0b0Kef0yGlOixQL2/kWm6z9xbYCXmUx9hMMq
+         QIBmJgQY8c305lQkvpdw4yTdaFLbjP7xz7PqLvRiS71y7384ZOVHd6yRa75AXmftbgqy
+         ySW2slPOGncmqCFjQ8iMQ/GP5ob1JdLtlBUZVJVyIqeJunFLv+DNjcQumv1ri5L3/GRf
+         yB7Zi5VStP5mVW4QiEzvjvgfBS1txGdfvSqLORd/KKf8Qxn/ER1+h4u6w0r9q/sy6gpL
+         tymn3eD4RIqD6Yr9nOfsUh5wUtvM9jO9hpNlDBLTJ6mZ/CEBB+CjR5GUxdayyqH05vTS
+         aVTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739465342; x=1740070142;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JROJFeKJG/7QhErL5KNFi8pxb9777JdDet+vnroXIfk=;
-        b=OsTHdzyBDAgwGtRQ3OStDqTQPwQOeEv9RPPFjw+Xr/1ixKKx16njloWN0XT1t6QvoR
-         cO8kftwejb28VStxWimykJdFbIdbdA5OkeFQLGKu25ZVuMq4KUYlkzDI2046yrajhRW4
-         0GS9mCXYC9Y4FNiiq+TKll4Pm5LDEg5DR+mLw/jR2qUSU5BYeyhSTDcHOHj7L4hg7OZI
-         c2QsAeYlXikluKVFp/MXU3Covc9Pe3ZRH+g6gONn1fFgiNaEbrZq2npZbGeMupV55JfI
-         6+KZEgcnFjef7ghgSLh/fSlcPBwh8YwnTviCkrL+HYsSAaUNwh7wAaywom5nmX378Zvm
-         VHvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWS7q7Tu92g4z1JcwyLcWqqZG5uSpz/UNm118WODdBNVy2qmggemh1GGgiJo/MXM12nzVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBiFgDQJ3wibPOzs6WlFwTLoJ7DomqtKRVdcPqMz6tcM9yPnsr
-	4PCg8eQN5EHOKLtkOLh68ctnExrCwBHZEni4u4wJ8h08PSPIGnh1hE1DM7ahnQHczdhUPmMhFWe
-	ENYN6JB4mO+BLYgFkDPik2C5sLj/bQAENB4+a9uiB79HziQBswA==
-X-Gm-Gg: ASbGncuR0cOVnbUz5Vmnlwpj8NRkwZMldCoj/KBKCnWpKqE+3CpAxE2Ebtgh+D1jhdf
-	rBwBxPOsBx/phlf/aCSZP8dlcPwUZ5E8vcjPDYjgNHLn7vYmISLgquxIYDdvIHZtc15l7IMW/WO
-	K5Pjtx4ME6a3ttviYb2+k3VuVF7/RZ939IAWjhK1+HjH071bUpi/n5evD8QDzmJ+XOkztvYoxKf
-	dHwIvlYhbSOhMNwvptkat0mMYXZsIG8sNnGAaMdDj1OvpIL/X0HUglD83Q=
-X-Received: by 2002:a05:622a:19a7:b0:471:97ef:28c2 with SMTP id d75a77b69052e-471bee88bf9mr76398551cf.50.1739465341914;
-        Thu, 13 Feb 2025 08:49:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGH90wp0Io4FsbD9Y9r1xlzUmOh6kR8o9MWqYgVTnqP+eNEwiXXiw94ZJu2zck2E6XolQdT0w==
-X-Received: by 2002:a05:622a:19a7:b0:471:97ef:28c2 with SMTP id d75a77b69052e-471bee88bf9mr76397931cf.50.1739465341491;
-        Thu, 13 Feb 2025 08:49:01 -0800 (PST)
-Received: from x1.local ([2604:7a40:2041:2b00::1000])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471c2af36f2sm9540111cf.54.2025.02.13.08.48.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 08:49:00 -0800 (PST)
-Date: Thu, 13 Feb 2025 11:48:57 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: tabba@google.com, quic_eberman@quicinc.com, roypat@amazon.co.uk,
-	jgg@nvidia.com, david@redhat.com, rientjes@google.com,
-	fvdl@google.com, jthoughton@google.com, seanjc@google.com,
-	pbonzini@redhat.com, zhiquan1.li@intel.com, fan.du@intel.com,
-	jun.miao@intel.com, isaku.yamahata@intel.com, muchun.song@linux.dev,
-	mike.kravetz@oracle.com, erdemaktas@google.com,
-	vannapurve@google.com, qperret@google.com, jhubbard@nvidia.com,
-	willy@infradead.org, shuah@kernel.org, brauner@kernel.org,
-	bfoster@redhat.com, kent.overstreet@linux.dev, pvorel@suse.cz,
-	rppt@kernel.org, richard.weiyang@gmail.com, anup@brainfault.org,
-	haibo1.xu@intel.com, ajones@ventanamicro.com, vkuznets@redhat.com,
-	maciej.wieczor-retman@intel.com, pgonda@google.com,
-	oliver.upton@linux.dev, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-fsdevel@kvack.org
-Subject: Re: [RFC PATCH 15/39] KVM: guest_memfd: hugetlb: allocate and
- truncate from hugetlb
-Message-ID: <Z64ieVfqTL2Wtqa5@x1.local>
-References: <Z0yjGA25b8TfLMnd@x1n>
- <diqz8qqa9t84.fsf@ackerleytng-ctop.c.googlers.com>
+        d=1e100.net; s=20230601; t=1739469087; x=1740073887;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=StLJ8Lv0+CjYYh45JBL2tc2N6KZWn7gX3vfe622hY7g=;
+        b=U4mTIJD1uVd51uClOZ8uYHrZDlknf57ZNd0LarFoyAv2Oboty918R4nmxgIWDRb5ua
+         dvHO6gUZktYFxv4UCXWe6F7GLu2n7ZCN6QU067B431zwhnxh52TCGnBh6SPLsdQqxTZY
+         npVsCcj9g9auorY9+Jym/Sz4vzDZE88tyon+ZG/ga5D1NNrp34Gdz8n1pmhOSpJC3e2/
+         7Ej2/H35PHh8T7oqk8ZQ2NXT4IlAifGzKpp7uF/MG8FmvSxGQ/Nk55U/DunkGgu03olg
+         fqG/nk8olANyujAWuyENEOI74YQAtasKyt/+NNzsVcfin71jN97ypqx97gCejOKB6WW2
+         k99A==
+X-Forwarded-Encrypted: i=1; AJvYcCVCCgRDDG0zKE6a4vxw7u4IFM59vWqoC7gbCyLe9MlIDrNY+zhc6sPJVqzPUBtwXV+D4jw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSxvynp2vlNlVGPwk8iY858s6qq4oc1Qyw9D5cZb6is4nh47Cn
+	2CfJmabO5XUWdtg/+a8WiymckkYFzGYk4ywzGGNt3P+sJdxgzuBta/llrYo3sc2ZHp1qGD9FvHN
+	9H0LF3UD4xA==
+X-Google-Smtp-Source: AGHT+IHJQhbZxraXoYW+RerdwbS6IAuVOL8abyk5CD9QxezqCKXS+2bgbUhDIcBF8lD7NKhhG/VsLuytXustyQ==
+X-Received: from wmbea8.prod.google.com ([2002:a05:600c:6748:b0:439:65f0:b039])
+ (user=derkling job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:1908:b0:439:5016:3867 with SMTP id 5b1f17b1804b1-439581be3bdmr81755765e9.23.1739469087554;
+ Thu, 13 Feb 2025 09:51:27 -0800 (PST)
+Date: Thu, 13 Feb 2025 17:50:57 +0000
+In-Reply-To: <20250213142815.GBZ64Bf3zPIay9nGza@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <diqz8qqa9t84.fsf@ackerleytng-ctop.c.googlers.com>
+Mime-Version: 1.0
+References: <20250213142815.GBZ64Bf3zPIay9nGza@fat_crate.local>
+X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
+Message-ID: <20250213175057.3108031-1-derkling@google.com>
+Subject: Re: Re: Re: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+From: Patrick Bellasi <derkling@google.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Josh Poimboeuf <jpoimboe@redhat.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Patrick Bellasi <derkling@matbug.net>, Brendan Jackman <jackmanb@google.com>, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 13, 2025 at 07:52:43AM +0000, Ackerley Tng wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > On Tue, Sep 10, 2024 at 11:43:46PM +0000, Ackerley Tng wrote:
-> >> +static struct folio *kvm_gmem_hugetlb_alloc_folio(struct hstate *h,
-> >> +						  struct hugepage_subpool *spool)
-> >> +{
-> >> +	bool memcg_charge_was_prepared;
-> >> +	struct mem_cgroup *memcg;
-> >> +	struct mempolicy *mpol;
-> >> +	nodemask_t *nodemask;
-> >> +	struct folio *folio;
-> >> +	gfp_t gfp_mask;
-> >> +	int ret;
-> >> +	int nid;
-> >> +
-> >> +	gfp_mask = htlb_alloc_mask(h);
-> >> +
-> >> +	memcg = get_mem_cgroup_from_current();
-> >> +	ret = mem_cgroup_hugetlb_try_charge(memcg,
-> >> +					    gfp_mask | __GFP_RETRY_MAYFAIL,
-> >> +					    pages_per_huge_page(h));
-> >> +	if (ret == -ENOMEM)
-> >> +		goto err;
-> >> +
-> >> +	memcg_charge_was_prepared = ret != -EOPNOTSUPP;
-> >> +
-> >> +	/* Pages are only to be taken from guest_memfd subpool and nowhere else. */
-> >> +	if (hugepage_subpool_get_pages(spool, 1))
-> >> +		goto err_cancel_charge;
-> >> +
-> >> +	nid = kvm_gmem_get_mpol_node_nodemask(htlb_alloc_mask(h), &mpol,
-> >> +					      &nodemask);
-> >> +	/*
-> >> +	 * charge_cgroup_reservation is false because we didn't make any cgroup
-> >> +	 * reservations when creating the guest_memfd subpool.
+> On Thu, Feb 13, 2025 at 01:44:08PM +0000, Patrick Bellasi wrote:
+> > Following (yet another) updated versions accounting for this.
 > >
-> > Hmm.. isn't this the exact reason to set charge_cgroup_reservation==true
-> > instead?
-> >
-> > IIUC gmem hugetlb pages should participate in the hugetlb cgroup resv
-> > charge as well.  It is already involved in the rest cgroup charges, and I
-> > wonder whether it's intended that the patch treated the resv accounting
-> > specially.
-> >
-> > Thanks,
-> >
-> 
-> Thank you for your careful reviews!
-> 
-> I misunderstood charging a cgroup for hugetlb reservations when I was
-> working on this patch.
-> 
-> Before this, I thought hugetlb_cgroup_charge_cgroup_rsvd() was only for
-> resv_map reservations, so I set charge_cgroup_reservation to false since
-> guest_memfd didn't use resv_map, but I understand better now. Please
-> help me check my understanding:
-> 
-> + All reservations are made at the hstate
-> + In addition, every reservation is associated with a subpool (through
->   spool->rsv_hpages) or recorded in a resv_map
->     + Reservations are either in a subpool or in a resv_map but not both
-> + hugetlb_cgroup_charge_cgroup_rsvd() is for any reservation
-> 
-> Regarding the time that a cgroup is charged for reservations:
-> 
-> + If a reservation is made during subpool creation, the cgroup is not
->   charged during the reservation by the subpool, probably by design
->   since the process doing the mount may not be the process using the
->   pages
+> Here's a tested one. You could've simply waited as I told you I'm working on
+> it.
 
-Exactly.
+Thanks Borislav, no problems for me, I'm just looking into these SRSO fixes and
+what I did was mostly a way to ramp up.
 
-> + Charging a cgroup for the reservation happens in
->   hugetlb_reserve_pages(), which is called at mmap() time.
+> I'm going to queue this one next week into tip once Patrick's fix becomes part
+> of -rc3.
 
-Yes, or if it's not charged in hugetlb_reserve_pages() it needs to be
-charged at folio allocation as of now.
+Thanks for all the efforts.
 
-> 
-> For guest_memfd, I see two options:
-> 
-> Option 1: Charge cgroup for reservations at fault time
-> 
-> Pros:
-> 
-> + Similar in behavior to a fd on a hugetlbfs mount, where the cgroup of
->   the process calling fallocate() is charged for the reservation.
-> + Symmetric approach, since uncharging happens when the hugetlb folio is
->   freed.
-> 
-> Cons:
-> 
-> + Room for allocation failure after guest_memfd creation. Even though
->   this guest_memfd had been created with a subpool and pages have been
->   reserved, there is a chance of hitting the cgroup's hugetlb
->   reservation cap and failing to allocate a page.
-> 
-> Option 2 (preferred): Charge cgroup for reservations at guest_memfd
-> creation time
-> 
-> Pros:
-> 
-> + Once guest_memfd file is created, a page is guaranteed at fault time.
+Meanwhile I've a couple of questions about the approach proposed here.
 
-This would definitely be nice, that whatever that can block the guest from
-using the memory should be a fault upfront when a VM boots if ever possible
-(e.g. this is not a mmap() interface, so user yet doesn't allow NORESERVE).
+> + * 'Mitigation: Reduced Speculation':
+> +
+> +   This mitigation gets automatically enabled when the above one "IBPB on
+> +   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
+> +
+> +   It gets automatically enabled on machines which have the
+> +   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the code logic is to switch
+> +   to the above =ibpb-vmexit mitigation because the user/kernel boundary is
+> +   not affected anymore and thus "safe RET" is not needed.
+> +
+> +   After enabling the IBPB on VMEXIT mitigation option, the BpSpecReduce bit
+> +   is detected (functionality present on all such machines) and that
+> +   practically overrides IBPB on VMEXIT as it has a lot less performance
+> +   impact and takes care of the guest->host attack vector too.
+> +
+> +   Currently, the mitigation uses KVM's user_return approach
+> +   (kvm_set_user_return_msr()) to set the BpSpecReduce bit when a vCPU runs
+> +   a guest and reset it upon return to host userspace or when the KVM module
+> +   is unloaded. The intent being, the small perf impact of BpSpecReduce should
+> +   be incurred only when really necessary.
 
-It'll be slightly different from the spool use case of mount points, but I
-think it's a new use case anyway, so IIUC we can define its behavior to
-best suite the use case.
+According to [1], the AMD Whitepaper on SRSO says:
 
-> + Simplifies/doesn't carry over the complexities of the hugetlb(fs)
->   reservation system
-> 
-> Cons:
-> 
-> + The cgroup being charged is the cgroup of the process creating
->   guest_memfd, which might be an issue if users expect the process
->   faulting the page to be charged.
+   Processors which set SRSO_MSR_FIX=1 support an MSR bit which mitigates SRSO
+   across guest/host boundaries.  Software may enable this by setting bit 4
+   (BpSpecReduce) of MSR C001_102E. This bit can be set once during boot and
+   should be set identically across all processors in the system.
 
-Right, though I can't picture such use case yet.
+The "should be set identically across all processors in the system" makes me
+wondering if using the "KVM's user_return approach" proposed here is robust
+enough. Could this not lead to the bit being possibly set only on some CPU
+but not others?
 
-I'm guessing multiple processes use of guest-memfd is still very far away.
-When it happens, I would expect these tasks be put into the same cgroup..
-Maybe kubevirt already have some of such use, I can go and have a check.
+Am I missing something? Is the MSR used something "shared" across all the cores
+of a CPU, i.e. as long a vCPU is running the entire system is still protected?
+Maybe there is even just a more recent whitepaper (I did not find) online with
+a different recommendation?
 
-If they're not in the same cgroup, it's still more reasonable to always
-charge that at the VM instance, rather than whatever other process that may
-operate on the guest memory.
+Also, setting the MSR bit only while the guest is running, is it sufficient to
+prevent both speculation and training?
 
-So it could be that we don't see major cons in solution 2.  In general, I
-agree with your preference.
+Think about this scenario:
+(a) Guest runs with BpSpecReduce MSR set by KVM and performs training.
+(b) We exit into userspace and clear BpSpecReduce.
+(c) We go back into the kernel with BpSpecReduce cleared and the guest
+    training intact.
 
-> 
-> Implementation:
-> 
-> + At guest_memfd creation time, when creating the subpool, charge the
->   cgroups for everything:
->    + for hugetlb usage
+If (a) can be done (i.e. the MSR does not prevent training), don't we end up in
+a vulnerable state in (c)?
 
-I suppose here you meant the global reservation?  If so, I agree.
+If BpSpecReduce does not prevent training, but only the training from being
+used, should not we keep it consistently set after a guest has run, or until an
+IBPB is executed?
 
-IIUC the new code shouldn't need to worry on this if the subpool is created
-by the API, as that API does the global charging, like we discussed
-elsewhere.
+Best,
+Patrick
 
-If you meant hugetlb_cgroup_commit_charge(),IMHO it should still be left
-done until allocation.  In guest-memfd case, when fallocate().  AFAICT,
-that's the only reason why we need two of such anyway..
-
->    + hugetlb reservation usage and
-
-Agree on this one.
-
->    + hugetlb usage by page count (as in mem_cgroup_charge_hugetlb(),
->      which is new since [1])
-
-This one should, IMHO, also be done only during allocation.
-
-Thanks,
-
-> + Refactoring in [1] would be focused on just dequeueing a folio or
->   failing which, allocating a surplus folio.
->    + After allocation, don't set cgroup on the folio so that the freeing
->      process doesn't uncharge anything
-> + Uncharge when the file is closed
-> 
-> Please let me know if anyone has any thoughts/suggestions!
-> 
-> >> +	 *
-> >> +	 * use_hstate_resv is true because we reserved from global hstate when
-> >> +	 * creating the guest_memfd subpool.
-> >> +	 */
-> >> +	folio = hugetlb_alloc_folio(h, mpol, nid, nodemask, false, true);
-> >> +	mpol_cond_put(mpol);
-> >> +
-> >> +	if (!folio)
-> >> +		goto err_put_pages;
-> >> +
-> >> +	hugetlb_set_folio_subpool(folio, spool);
-> >> +
-> >> +	if (memcg_charge_was_prepared)
-> >> +		mem_cgroup_commit_charge(folio, memcg);
-> >> +
-> >> +out:
-> >> +	mem_cgroup_put(memcg);
-> >> +
-> >> +	return folio;
-> >> +
-> >> +err_put_pages:
-> >> +	hugepage_subpool_put_pages(spool, 1);
-> >> +
-> >> +err_cancel_charge:
-> >> +	if (memcg_charge_was_prepared)
-> >> +		mem_cgroup_cancel_charge(memcg, pages_per_huge_page(h));
-> >> +
-> >> +err:
-> >> +	folio = ERR_PTR(-ENOMEM);
-> >> +	goto out;
-> >> +}
-> 
-> [1] https://lore.kernel.org/all/7348091f4c539ed207d9bb0f3744d0f0efb7f2b3.1726009989.git.ackerleytng@google.com/
-> 
-
--- 
-Peter Xu
-
+[1] https://www.amd.com/content/dam/amd/en/documents/corporate/cr/speculative-return-stack-overflow-whitepaper.pdf
 
