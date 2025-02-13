@@ -1,255 +1,237 @@
-Return-Path: <kvm+bounces-38030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED2BBA3488C
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 16:53:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4A1EA3495E
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 17:15:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E02A3A6568
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 15:47:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19149163EFB
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 16:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4344B1D516A;
-	Thu, 13 Feb 2025 15:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZqNNeqxW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C4F2036E4;
+	Thu, 13 Feb 2025 16:14:47 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC8719B5A9
-	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 15:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819C1201271;
+	Thu, 13 Feb 2025 16:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739461660; cv=none; b=HLIWwvJ5pkUZkmAIaXbwohfUUTL1SzUNhzjrNWF6c8eWJR8MZ30BLKD7WlP1DLJ+On0+R9W+QUspr9uHsobfiF4wX7c/2J++fRJhujuZQSp5sEnHwfeSRApgp0/bQkeiQSWOw52TKC51tp/JfTyHwu73VPuV92+Af48/gggJogw=
+	t=1739463287; cv=none; b=Dl82/aKaBmM3CWy/4JHBx/vxrfyUgMz+HE8bD1EVhzkcfjI/k5stQeW173p9cjRDIf0hOWbVKX3LvRsCRDBuU2AdfWDS4aPDtM58Uj8089sq43A8nMFgJNrzfq4TU81ufgLAv+ldVELROCHJ8Uef5LiD7qA+7QdvXx4zJs2jln4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739461660; c=relaxed/simple;
-	bh=hIy5pXh4y/8Q0gYHXdsOqbcgQADp5AC8VTtbqfxyj04=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OSkZHlQ+GwzCEJ3dVPYSuI7b7igqZneX/Yh9tUH/XEEbqi7K3dVuci8IyCYfUiU8Bb9wxyBrtb+rnovapKuYEFCnlf15+0AS418HLTG1bnmHeTsPd7aBPG8TUVtkJ/OjiNcTkp0M7fJICE3fetwPeuNW9MdzYnAPcnt5W2VIxU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZqNNeqxW; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fa34df4995so3577211a91.0
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 07:47:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739461658; x=1740066458; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hmNpP4YGEk282karFXTLw7N03fUwb/8MuF654Jepnhw=;
-        b=ZqNNeqxWLUG5Rwx4awZZXcmo0L+HR2MWcWET0uq9XHh1W2mGG2q7tfXoN4QRY9ZjkP
-         SfB1crro1UYbI0+PQjYTGj4sSHTQDD4Q2UqZLPOrG6s4Zq/+ADuYCpwCNE1utFsYM9x5
-         BaG8XfRralEvsLNoCYzLfQqOtPgVbSEDVsE5YKmFnNKJ09Dj68ULhRWkBFbeK1meYmld
-         /iozPzCnrYRQ4q0uVGZTVw5bw/Km6qtfSn3Zvpe6KUd5YxXNd47JGeRYAEFRefjz39yT
-         aKygASU2CRFxoqs4tEfDO/uBg3semFO1Hn0kFl/vETVvAWU0WEttO0aemQV9yx4Ga8WJ
-         UTAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739461658; x=1740066458;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hmNpP4YGEk282karFXTLw7N03fUwb/8MuF654Jepnhw=;
-        b=KlKeUV9PAvj9zVyuuUacxh2nAJA9QdFtJPQd4T+RD5mrSAiUsBUIQnhCjY1Q4+5l4a
-         Y2oSjn1X/YDvpvhVSCjikIMT2Ie9IXrWfE9NbsYUiru8Ga/6kjoxPaypddoJCBM6yD1C
-         Offb95rgYROPWYNrAL9csMe8s1vi2m2JQ/QTcCBorxDd7WuGgPq0kqlPKXVYYmLHML+4
-         xPNmBllnrCgpZfUbxhXYBY+j8f4OSV1m3y00bKOZG25AuRd1bFwaE3ggwuvhPqzLqvBj
-         yHHFBQ/Jmq/mG+/esDRSREFwD1eBxfmfHzqtipGDtLNV69TWw+E7XdPjo5F7E5dzaEXa
-         NYGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWUvOSLZ9yskTY4IgxFoAAZsNg9+42l88wlzcU73VAfGg5icrmPcTkMfkaz8KDMniUpAW4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOf5pzfk+IoUDbnFkJnl3g51aMXWP86fD58zxaGs+YElAiLj1a
-	6Dnb74jJX2QEAaHsgcoo2gh5Z83IOHD6jk5M6yuGP+tHcp6s3e5pNzCK4wY+eyFgg0DHCxrrkwf
-	HZw==
-X-Google-Smtp-Source: AGHT+IGaLcjab1UGvr0Z7pZ5+q0nKr8aYvYSyIXe+h+lvbdZI1DyQMlmxV/07FFHeYIbV83NKEBsUYCxYZk=
-X-Received: from pfbmb19.prod.google.com ([2002:a05:6a00:7613:b0:730:451c:475c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4fd0:b0:732:23ed:9457
- with SMTP id d2e1a72fcca58-7322c39b70amr11735578b3a.12.1739461658165; Thu, 13
- Feb 2025 07:47:38 -0800 (PST)
-Date: Thu, 13 Feb 2025 07:47:31 -0800
-In-Reply-To: <CADrL8HXZed987KOehV7-OroPqm8tQZ0WH0MCpfDzaSs-g_2-ag@mail.gmail.com>
+	s=arc-20240116; t=1739463287; c=relaxed/simple;
+	bh=cMqkENu/ZOxocimQK5jA1C0TnU51He0yJud7qqZnxT0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LZ/6maVNOgsXAeuO1gKNRyzIWGRGiv26ncvgbArWZcZaJPwHs48MUOgk8jy8g2T+4IDcGUS9n4wKgaPP+GvLpWsFdRWDTxj1997ddNkrPP1P+8HkaMHYYNJe29vcsVDfkdDRHrFeo7tlyQNXKA9WilmabqmlUVXsrO2uX7uYgGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 660F8106F;
+	Thu, 13 Feb 2025 08:15:05 -0800 (PST)
+Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.32.44])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 569483F6A8;
+	Thu, 13 Feb 2025 08:14:40 -0800 (PST)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH v7 00/45] arm64: Support for Arm CCA in KVM
+Date: Thu, 13 Feb 2025 16:13:40 +0000
+Message-ID: <20250213161426.102987-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <67689c62.050a0220.2f3838.000d.GAE@google.com> <20250212221217.161222-1-jthoughton@google.com>
- <Z60lxSqV1r257yW8@google.com> <CADrL8HXZed987KOehV7-OroPqm8tQZ0WH0MCpfDzaSs-g_2-ag@mail.gmail.com>
-Message-ID: <Z64UE0Uh_3DT1jFA@google.com>
-Subject: Re: [syzbot] [kvm?] WARNING in vmx_handle_exit (2)
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: syzbot+ac0bc3a70282b4d586cc@syzkaller.appspotmail.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 12, 2025, James Houghton wrote:
-> On Wed, Feb 12, 2025 at 2:50=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Wed, Feb 12, 2025, James Houghton wrote:
-> > > Here's what I think is going on (with the C repro anyway):
-> > >
-> > > 1. KVM_RUN a nested VM, and eventually we end up with
-> > >    nested_run_pending=3D1.
-> > > 2. Exit KVM_RUN with EINTR (or any reason really, but I see EINTR in
-> > >    repro attempts).
-> > > 3. KVM_SET_REGS to set rflags to 0x1ac585, which has X86_EFLAGS_VM,
-> > >    flipping it and setting vmx->emulation_required =3D true.
-> > > 3. KVM_RUN again. vmx->emulation_required will stop KVM from clearing
-> > >    nested_run_pending, and then we hit the
-> > >    KVM_BUG_ON(nested_run_pending) in __vmx_handle_exit().
-> > >
-> > > So I guess the KVM_BUG_ON() is a little bit too conservative, but thi=
-s
-> > > is nonsensical VMM behavior. So I'm not really sure what the best
-> > > solution is. Sean, any thoughts?
-> >
-> > Heh, deja vu.  This is essentially the same thing that was fixed by com=
-mit
-> > fc4fad79fc3d ("KVM: VMX: Reject KVM_RUN if emulation is required with p=
-ending
-> > exception"), just with a different WARN.
-> >
-> > This should fix it.  Checking nested_run_pending in handle_invalid_gues=
-t_state()
-> > is overkill, but it can't possibly do any harm, and the weirdness can b=
-e addressed
-> > with a comment.
->=20
-> Thanks Sean! This works, feel free to add:
->=20
-> Tested-by: James Houghton <jthoughton@google.com>
->=20
-> I understand this fix as "KVM cannot emulate a nested vm-enter, so if
-> emulation is required and we have a pending vm-enter, exit to userspace."
-> (This doesn't seem overkill to me... perhaps this explanation is wrong.)
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA).
 
-Sort of.  It's a horribly convoluted scenario that's exists only because ea=
-rly Intel
-CPUs supported a half-baked version of VMX.
+The related guest support was merged for v6.14-rc1 so you no longer need
+that separately.
 
-Emulation is "required" if and only if guest state is invalid, and VMRESUME=
-/VMLAUNCH
-VM-Fail (architecturally) if guest state is invalid.  Thus the only way for=
- emulation
-to be required when a nested VM-Enter is pending, i.e. after nested VMRESUM=
-E/VMLAUNCH
-has succeeded but before KVM has entered L2 to complete emulation, is if KV=
-M misses a
-VM-Fail consistency check, or as is the case here, if userspace stuffs inva=
-lid state
-while KVM is partway through VMRESUME/VMLAUNCH emulation.
+There are several changes since v6, many thanks for the review
+comments. The highlights are below, and individual patches have a changelog.
 
-Stuffing state from userspace doesn't put KVM in harm's way, but KVM can't =
-emulate
-the impossible state, and more importantly, it trips KVM's sanity check tha=
-t detects
-missed consistency checks.  The KVM_BUG_ON() could also be suppressed by mo=
-ving the
-nested_run_pending check below the emulation_required checks (see below), b=
-ut that
-would largely defeat the purpose of the sanity check.
+ * Separation of the concepts of RMM granule size and PAGE_SIZE. It's
+   now possible to run with a host PAGE_SIZE larger than 4k (but see
+   below).
 
-Just out of sight in the below diff is related handling for the case where =
-userspace,
-or the guest itself via modifying SMRAM before RSM, stuffs bad state.  I.e.=
- it's
-the same scenario this syzkaller program hit, minus hitting the nested_run_=
-pending=3Dtrue
-window.
+ * Return with -EFAULT error for KVM_EXIT_MEMORY_FAULT as per the
+   documentation.
 
-		/*
-		 * Synthesize a triple fault if L2 state is invalid.  In normal
-		 * operation, nested VM-Enter rejects any attempt to enter L2
-		 * with invalid state.  However, those checks are skipped if
-		 * state is being stuffed via RSM or KVM_SET_NESTED_STATE.  If
-		 * L2 state is invalid, it means either L1 modified SMRAM state
-		 * or userspace provided bad state.  Synthesize TRIPLE_FAULT as
-		 * doing so is architecturally allowed in the RSM case, and is
-		 * the least awful solution for the userspace case without
-		 * risking false positives.
-		 */
-		if (vmx->emulation_required) {
-			nested_vmx_vmexit(vcpu, EXIT_REASON_TRIPLE_FAULT, 0, 0);
-			return 1;
-		}
+ * Return -EPERM rather than -EINVAL in cases where a realm function is
+   performed on a non-realm guest.
 
-The extra wrinkle in all of this is that emulation_required is only ever se=
-t if
-the vCPU lacks Unrestricted Guest (URG).  All CPUs since Westmere support U=
-RG,
-while KVM does allow disabling URG via module param, AFAIK syzbot doesn't r=
-un in
-environments with enable_unrestricted_guest=3D0 (other people do run syzkal=
-ler in
-such setups, but syzbot does not).
+ * Several improvements to names of functions/defines and other minor
+   changes following review feedback - thanks!
 
-And so the only way guest state to be invalid (for emulation_required to be=
- set),
-is if L1 is running L2 with URG disabled.  I.e. KVM _could_ simply run L2, =
-but
-doing so would violate the VMX architecture from L1's perspective.
+Things to note:
 
-static inline bool vmx_guest_state_valid(struct kvm_vcpu *vcpu)
-{
-	return is_unrestricted_guest(vcpu) || __vmx_guest_state_valid(vcpu);
-}
+ * You will need an updated kvmtool because of the KVM_EXIT_MEMORY_FAULT
+   change mentioned above. See below for a link.
 
-static inline bool is_unrestricted_guest(struct kvm_vcpu *vcpu)
-{
-	return enable_unrestricted_guest && (!is_guest_mode(vcpu) ||
-	    (secondary_exec_controls_get(to_vmx(vcpu)) &
-	    SECONDARY_EXEC_UNRESTRICTED_GUEST));
-}
+ * KVM_VCPU_MAX_FEATURES is incremented. *NOTE*: This effectively
+   exposes the nested virtualisation feature. So this series as it
+   stands has a dependency on that being finished before it can be
+   merged. See [2] for more details.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f72835e85b6d..42bee8f2cffb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6492,15 +6492,6 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, =
-fastpath_t exit_fastpath)
-        if (enable_pml && !is_guest_mode(vcpu))
-                vmx_flush_pml_buffer(vcpu);
-=20
--       /*
--        * KVM should never reach this point with a pending nested VM-Enter=
-.
--        * More specifically, short-circuiting VM-Entry to emulate L2 due t=
-o
--        * invalid guest state should never happen as that means KVM knowin=
-gly
--        * allowed a nested VM-Enter with an invalid vmcs12.  More below.
--        */
--       if (KVM_BUG_ON(vmx->nested.nested_run_pending, vcpu->kvm))
--               return -EIO;
--
-        if (is_guest_mode(vcpu)) {
-                /*
-                 * PML is never enabled when running L2, bail immediately i=
-f a
-@@ -6538,10 +6529,16 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu,=
- fastpath_t exit_fastpath)
-                        return 1;
-                }
-=20
-+               if (KVM_BUG_ON(vmx->nested.nested_run_pending, vcpu->kvm))
-+                       return -EIO;
-+
-                if (nested_vmx_reflect_vmexit(vcpu))
-                        return 1;
-        }
-=20
-+       if (KVM_BUG_ON(vmx->nested.nested_run_pending, vcpu->kvm))
-+               return -EIO;
-+
-        /* If guest state is invalid, start emulating.  L2 is handled above=
-. */
-        if (vmx->emulation_required)
-                return handle_invalid_guest_state(vcpu);
+ * The final patch enables the host's page size to be larger than 4k.
+   The support is all in the previous patches, but there is more work to
+   do before I consider this ready, specifically:
+
+   - The code to allocate RTTs (stage 2 page tables) for the RMM still
+     conflates pages and granules. This means that for every RTT an
+     entire host page is allocated potentially using 16x the required
+     memory for the RTTs.
+
+   - Having the guest's page size smaller than the host's currently
+     doesn't work. The issue is the guest needs to know what granulatity
+     it can transition pages between shared and private.  Exactly how
+     this should work is an open area of discussion.
+
+   - This configuration isn't well tested, I would be unsurprised if
+     there are major bugs! ;) But a simple Linux guest of the same page
+     size works.
+
+The ABI to the RMM (the RMI) is based on RMM v1.0-rel0 specification[1].
+
+This series is based on v6.14-rc1. It is also available as a git
+repository:
+
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v7
+
+Work in progress changes for kvmtool are available from the git
+repository below:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v5
+
+[1] https://developer.arm.com/documentation/den0137/1-0rel0/
+[2] https://lore.kernel.org/r/a7011738-a084-46fa-947f-395d90b37f8b%40arm.com
+
+Jean-Philippe Brucker (7):
+  arm64: RME: Propagate number of breakpoints and watchpoints to
+    userspace
+  arm64: RME: Set breakpoint parameters through SET_ONE_REG
+  arm64: RME: Initialize PMCR.N with number counter supported by RMM
+  arm64: RME: Propagate max SVE vector length from RMM
+  arm64: RME: Configure max SVE vector length for a Realm
+  arm64: RME: Provide register list for unfinalized RME RECs
+  arm64: RME: Provide accurate register list
+
+Joey Gouly (2):
+  arm64: rme: allow userspace to inject aborts
+  arm64: rme: support RSI_HOST_CALL
+
+Sean Christopherson (1):
+  KVM: Prepare for handling only shared mappings in mmu_notifier events
+
+Steven Price (32):
+  arm64: RME: Handle Granule Protection Faults (GPFs)
+  arm64: RME: Add SMC definitions for calling the RMM
+  arm64: RME: Add wrappers for RMI calls
+  arm64: RME: Check for RME support at KVM init
+  arm64: RME: Define the user ABI
+  arm64: RME: ioctls to create and configure realms
+  arm64: kvm: Allow passing machine type in KVM creation
+  arm64: RME: RTT tear down
+  arm64: RME: Allocate/free RECs to match vCPUs
+  KVM: arm64: vgic: Provide helper for number of list registers
+  arm64: RME: Support for the VGIC in realms
+  KVM: arm64: Support timers in realm RECs
+  arm64: RME: Allow VMM to set RIPAS
+  arm64: RME: Handle realm enter/exit
+  arm64: RME: Handle RMI_EXIT_RIPAS_CHANGE
+  KVM: arm64: Handle realm MMIO emulation
+  arm64: RME: Allow populating initial contents
+  arm64: RME: Runtime faulting of memory
+  KVM: arm64: Handle realm VCPU load
+  KVM: arm64: Validate register access for a Realm VM
+  KVM: arm64: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  arm64: Don't expose stolen time for realm guests
+  arm64: RME: Always use 4k pages for realms
+  arm64: rme: Prevent Device mappings for Realms
+  arm_pmu: Provide a mechanism for disabling the physical IRQ
+  arm64: rme: Enable PMU support with a realm guest
+  kvm: rme: Hide KVM_CAP_READONLY_MEM for realm guests
+  arm64: kvm: Expose support for private memory
+  KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
+  KVM: arm64: Allow activating realms
+  WIP: Enable support for PAGE_SIZE>4k
+
+Suzuki K Poulose (3):
+  kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  kvm: arm64: Expose debug HW register numbers for Realm
+  arm64: rme: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |    3 +
+ arch/arm64/include/asm/kvm_emulate.h |   40 +
+ arch/arm64/include/asm/kvm_host.h    |   17 +-
+ arch/arm64/include/asm/kvm_rme.h     |  128 ++
+ arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
+ arch/arm64/include/asm/rmi_smc.h     |  259 ++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/include/uapi/asm/kvm.h    |   49 +
+ arch/arm64/kvm/Kconfig               |    1 +
+ arch/arm64/kvm/Makefile              |    3 +-
+ arch/arm64/kvm/arch_timer.c          |   45 +-
+ arch/arm64/kvm/arm.c                 |  173 ++-
+ arch/arm64/kvm/guest.c               |  104 +-
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    5 +-
+ arch/arm64/kvm/mmio.c                |   16 +-
+ arch/arm64/kvm/mmu.c                 |  199 ++-
+ arch/arm64/kvm/pmu-emul.c            |    6 +
+ arch/arm64/kvm/psci.c                |   30 +
+ arch/arm64/kvm/reset.c               |   23 +-
+ arch/arm64/kvm/rme-exit.c            |  199 +++
+ arch/arm64/kvm/rme.c                 | 1710 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   79 +-
+ arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
+ arch/arm64/kvm/vgic/vgic-v3.c        |    5 +
+ arch/arm64/kvm/vgic/vgic.c           |   54 +-
+ arch/arm64/mm/fault.c                |   31 +-
+ drivers/perf/arm_pmu.c               |   15 +
+ include/kvm/arm_arch_timer.h         |    2 +
+ include/kvm/arm_pmu.h                |    4 +
+ include/kvm/arm_psci.h               |    2 +
+ include/linux/kvm_host.h             |    2 +
+ include/linux/perf/arm_pmu.h         |    5 +
+ include/uapi/linux/kvm.h             |   31 +-
+ virt/kvm/kvm_main.c                  |    7 +
+ 35 files changed, 3658 insertions(+), 104 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rme.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rmi_smc.h
+ create mode 100644 arch/arm64/kvm/rme-exit.c
+ create mode 100644 arch/arm64/kvm/rme.c
+
+-- 
+2.43.0
 
 
