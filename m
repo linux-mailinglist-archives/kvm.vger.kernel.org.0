@@ -1,214 +1,222 @@
-Return-Path: <kvm+bounces-38010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57753A339D0
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 09:20:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 998C2A339E1
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 09:25:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DBBE188AF22
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 08:20:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73110188C8A2
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 08:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F315220B802;
-	Thu, 13 Feb 2025 08:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9B120C009;
+	Thu, 13 Feb 2025 08:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jsc/rsc7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JIYVhPuo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A650013B29B;
-	Thu, 13 Feb 2025 08:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739434829; cv=fail; b=uEfIjitV6GLr+4B1xLi/Zg+jJI/QWiCMz1c2p5zyj0kodQMsfErt1N74VhEMqwmnFyltRwuE7l/btnsLPRfmyst16qL2o4o8ard3Z2+gi/4X1k4jE1tv1HfRMuaya17cOS6s6t2iMvUSOAyvmoog7Xn9nIu7IbzGC/QiyEoOo6M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739434829; c=relaxed/simple;
-	bh=AwW2nK9AODqedgB4SgcMA7DiRs/UjnrhUbewxVn+nPA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=l+nUSystIZJipXVUe6+m4nfGS0WR1F1625Ba6G3kpTXSWUZuQMK9kapcKxHlT8LBj2eizfuyHGRM4uVenMwrTQUeBKTjbKKSZtVMldMMi+umu6uvMVAiZdO5ZfLievx5dtWv18RMTP8EJbcFkPTRTgOBGDTjdl95NmTBn+JFl1k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jsc/rsc7; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739434828; x=1770970828;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=AwW2nK9AODqedgB4SgcMA7DiRs/UjnrhUbewxVn+nPA=;
-  b=jsc/rsc7wD4ebhqgVbBqE/dRWMJKGnTuH94wxWgjUngN0IUy0TrMRGI2
-   1aXdxzfTZeL47c/RPVtG2bMI5Rodj6JY0heR/hhHgwJbH/hPraRD96Lba
-   JFO0da0qxZMFfMfwf55XhEnj5//b9jjh/0d5lNh1B6uGJe6V5zAQG6FzN
-   PwPXCm0+n4IHvLJ14Tzydqoo8toiJFovl2J5vnN3Zxh1Uqg4J2na+4GNd
-   rW9k+XAJ7H38vGQLQ9/nSsElWFzHtOFwhJxlHGJUTaBjGRRSW6RBWhsPz
-   QUnoIWWVO3RiGZc9T6h+E9K2qHArGuv8roUwK1ytVmRKmyzLKd9uAUB1a
-   w==;
-X-CSE-ConnectionGUID: SwV+y8IgTaWq9hZ0clh3RQ==
-X-CSE-MsgGUID: EDkHVuyaSzWlA7Z3QJArAw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="51518838"
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="51518838"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 00:20:27 -0800
-X-CSE-ConnectionGUID: bJnLEZCyRgaJQHwCYY8J/A==
-X-CSE-MsgGUID: MN5H7W9XQ4Oasd1AO9gPsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="118263252"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 00:20:28 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 13 Feb 2025 00:20:26 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 13 Feb 2025 00:20:26 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.40) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 13 Feb 2025 00:20:26 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yJzdSUznHbCp6uBMWH8uxfWdxDjYgWAPK4il2RYYFwlot/jEWK8AQqcfdAG8DVRm+8VmHnrXTWL0EeKUrGZgQNv0nD7bOcQYBemBplJysVPCHscLyCPIOdiQfV3xiM8h6Nd/scTyvjM1o08Gkmd3sPOXn1WL/FVgevT7+160p7hkyBZ3t5Q3FTbrOtyRExmwF3B9flDWguEhteANcNhX8H4oN9Bte28WFrMtDqDuv6wqHnI5AzTUVDXu81lUAI2Kb84of+XBXY6Ynd5rCfexfFUNxeadBy9UJj2M90jOoVQARGwE0M19FLfjFw8EEciEXw0EsS9dVMq1A+rfVcfHgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RzbAIzOehSEFNDuF91P2610cIPyp0YwwHuaoLk5OSQE=;
- b=U63dcHII9vrS8BDyNXnLIzaY3oJjj60ZeamFYAzEg2V+IOopOlKnuSO4QvJMaSo2aCD8QUIURt8lTIn/sYC4AqrcyAX/4YYXWZp6cuQ8eIHuL6aiLRTHwv1f5WpjKIqhUQa0P/9iwDdTAzmrmOkY7YI8aqiVt4U/LoLkY0ZgkzrAspEHrs5/FLaKqQ9GFF1cpNPUWp9qZC2FN5xxnUtbMXrXpRiG4mHJ+P6AyHLwKRUKcWXHQ0wvubKyII0o3W2KTKDQ+hEQazVUTxwK9ExdsmODyULjwKv2z9T4kHrDj6/zsy+kXcmCj+Jm2c+0XrGTLNQPAyCt7OC3g91Kg8+0tQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by DM4PR11MB5246.namprd11.prod.outlook.com (2603:10b6:5:389::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.17; Thu, 13 Feb
- 2025 08:20:25 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::cfad:add4:daad:fb9b%5]) with mapi id 15.20.8445.013; Thu, 13 Feb 2025
- 08:20:24 +0000
-Date: Thu, 13 Feb 2025 16:20:14 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <kvm@vger.kernel.org>,
-	<rick.p.edgecombe@intel.com>, <kai.huang@intel.com>,
-	<adrian.hunter@intel.com>, <reinette.chatre@intel.com>,
-	<xiaoyao.li@intel.com>, <tony.lindgren@intel.com>,
-	<isaku.yamahata@intel.com>, <yan.y.zhao@intel.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 08/17] KVM: TDX: Complete interrupts after TD exit
-Message-ID: <Z62rPgmS2RB/LaC7@intel.com>
-References: <20250211025828.3072076-1-binbin.wu@linux.intel.com>
- <20250211025828.3072076-9-binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250211025828.3072076-9-binbin.wu@linux.intel.com>
-X-ClientProxiedBy: SG2PR02CA0088.apcprd02.prod.outlook.com
- (2603:1096:4:90::28) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D7F20B7E8
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 08:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739435138; cv=none; b=g/UkkGBz/8od/I24QFVWQfwJXK3GCOeWknSW17WVkYFSTru9albAYCk1AxjV1pDqSBdZJWV6n9EIkTffTs0WKLhLjnZygEVwrAKsFzoeV9KVtp5jZFOqktjRWBIusBj6Q+xytMpGZQunMdOYAhOgZ7ChxkIinyOjGdb3UrVu1j0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739435138; c=relaxed/simple;
+	bh=kPO1tc82x3B/hTEAGztrzX0xKtUpDpnoP9c35ehnQ6c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gs1WD/56Eb6qHQQaCEBdF/8zAypxCRl/8Pw+cRLJvV9H17ryW3fMTEkZCruy6Qw2XVl1T2JZ1XTetV8muWfJ4mDvfneHFdc/b8j7SwVR0sZA+S69GmZR+aanIX7DDMx5EVJbeP8zU0suDAx3iEW9fDlhtkvN4AMpuWzV3AgSSu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JIYVhPuo; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-47180c199ebso144931cf.0
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 00:25:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739435134; x=1740039934; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YIO7H+WXIoRkEaRZulor7Xae9SUOPAovGJ7X7Qex5fY=;
+        b=JIYVhPuoJmw47DgKaQRrMfyWP0zq9yL2GHyir/1vVW8pj2dmyUYhvoPcEW8URvFWgi
+         0tUqWZC0C8wi55c9p8nieWeE76hyFmJXElv1v19PXTY+TDV8JgK+bXl3Nq0cnewQka4b
+         PXEWvgIeCUUqgNnh9WjWz1KYVn+cu1tIhwjykmFxj0ECkY6hyxLE0iE9QxiTId4fmUON
+         oY4wi3bFgI8hc0tzsAGxUvswNjMd8/tT77kfA7y/F7eSsH6Q5yvhlfl6mmMdA3D+k/Ve
+         82PMLIMZE3vxEEgjIGhthhot/Xen4Vx9z9M8CxWD1qmDPNHq6OM4WYaLaBTKQdZ/t8bj
+         j6Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739435134; x=1740039934;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YIO7H+WXIoRkEaRZulor7Xae9SUOPAovGJ7X7Qex5fY=;
+        b=q5sAnG5VbG5yzv0IwzOfFlegCk1VmCeJr/quXoy8utAcay0/W/vJ48q/XohYeHdHiy
+         fy0TuZgRHvcb5Jm/K4Y6UmDWy0xTdypri9c41v0KDkcPH4mXH+MNIKtQda3YakHIhfdN
+         UN0JDBzXx9Les5l466JE8FeXV7Bgd8jRNqYamkNEP1nMWtyCKeIqob+ZCUeTQBbfzzKa
+         z/TmIAgpH9dFbi0mOU0GBcLPQ31aoxCAN9Cghz3tCgRVMpz/ipZJrgluzsrDYqaZpdcD
+         X0Wd6QR2Br40VnqcLvL+9dyZi14dAlt2K1EZe+fRuzzHTjmP9Aq3AErkileoyDAEuO5W
+         ayBA==
+X-Gm-Message-State: AOJu0YxymfwXViK+ReyTNGMxcqYG5bqHdx5lAseCybv6g7CbVsZxWXOV
+	2Pz27ZQYbL1MIoX0GYtwyPqO60G5A/b1qUe91sN5cTCEN8LpsJ9lxnIvAJOjpBzsyCjywGd0uEx
+	3Q0GjRnmq7thOj/1MVjCrZZ8dwpmfigS4X731
+X-Gm-Gg: ASbGncsSQJ9yXPdOHsvWsBy2Cd2i1YtrDtpBUB3Rb3MpWwY4s1hN0ZdJXBfhrKp2x2P
+	3eBaYxsUVUXi0xNpPC+IGDQpPxhi5E0+BduDeyLi1Pm6o2LQ15pMBCmACD0DJBhByZXDg0oA=
+X-Google-Smtp-Source: AGHT+IGVzyHE/LU6Zw8g4d72LuWGhrfsFDxlcENmVL6AWJe3zwC9RJAf2owdTYpyFdLFDhp308ql/pjxSLaUBWAke3s=
+X-Received: by 2002:ac8:5dd4:0:b0:471:b96c:726c with SMTP id
+ d75a77b69052e-471c0216bcamr2640151cf.20.1739435133955; Thu, 13 Feb 2025
+ 00:25:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DM4PR11MB5246:EE_
-X-MS-Office365-Filtering-Correlation-Id: 926d2820-3cb6-4c22-848d-08dd4c074413
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?MQndrmPXsJOxECG0nrGtW5x6FmG8LiOQhNm7fGHLxW+4SR+VZ0RH1R36ymwv?=
- =?us-ascii?Q?qc3GdjU+o2ofzk8QXlex9tO6gUjzRPiTpfnW5N0c86eOX0Z7bC4o3DYL/3ZW?=
- =?us-ascii?Q?BNKPdYBz+4YpoTPZQTi/Ah1UO8y1swSFQQ+SMDAVF1Iv97pk+xB1KnUen/aB?=
- =?us-ascii?Q?6e9h42ES/sqGmc/wmKailHcp0pzVsY2R2xlGrtRQ5uoHgTIDgJCQGV4GJ2jB?=
- =?us-ascii?Q?i3GCPjAiDb61T9a5CHjnqBBBqekMIARK9xkgYTr3RtIMFvXf9tkTATanGmgA?=
- =?us-ascii?Q?CGm6+MlfGH8CYi1ttaPMuyZC7ILTuLeucr6ZEDkE2+KDZOJpYFeXlkJ14snm?=
- =?us-ascii?Q?wttZuqQgGjDmkki86GwN7LSzRRBj5gv7xAgpgWoB2OkW4GlwpYqJhW/I9S3Q?=
- =?us-ascii?Q?ACg5S7oz872Y9O/wASN1j++UL2iiv7hO7wrgf7GCkYRQDsl0Xy70Pi7oKJ3K?=
- =?us-ascii?Q?/kf9/l01sz+q+EBLNXXtJaPYHn7HeTNNdQmegzTAiwOyyS1EydjAz156cEjH?=
- =?us-ascii?Q?TRpXzzkMPTA4Eqef8egUg+LBQw5D9+9UbeIDpViZXPfXDQPuvRXZFVWPthO2?=
- =?us-ascii?Q?+84ZiNbh8mk5EV4VqGOaApiFEZCAZicA0q4RYam2cuA68bhe86J8jqmAw6/x?=
- =?us-ascii?Q?U5Jnu+tRlWRPMI9eYcZstYlrSAGmhMA99nJo+mkS+2q00vn8hQMqyqLvA7dz?=
- =?us-ascii?Q?U8scLNjkhbYjgISA6A+aqxTEHhRccAmGNIz8JaOP3wRYlSPohCQG6KQ/+yx7?=
- =?us-ascii?Q?5J2GD8zy5DSMulKJJjUasjAO+PiJ1e4xskwso74EVl7e0JkIdMsJ/JIX6J+8?=
- =?us-ascii?Q?85lhaiORJ9vfQ3gjJzY7UrCSNBxSc7fqGkbmpfTGsKXrO5VWRWBljeYk2rie?=
- =?us-ascii?Q?RrejTein/JCHf48nAy9uYt6dQfupB/r8OxT4+gTo+R0H0i2fVfMleV52vttx?=
- =?us-ascii?Q?+rtUwtH0s1otX9Vgt+sV18/bpvyoSfW8bkZOwrUnmZiS9uNR+i8MNPxGejZS?=
- =?us-ascii?Q?NUaNaxfWSebSQ9ozW5PsWpW+kvzsX3v2oI/dHqHAvE/UxqO9UfoycTXkiDeC?=
- =?us-ascii?Q?pZyAHed/c8WQ3AwjlimcOezszmBOUn3N8nsci6DAmdsY3egGERUrAahMdUlL?=
- =?us-ascii?Q?XfAb9tz4pIyBqmFUKNXLk5cdcWXmuLUh8mAwquXzP4qt6CjebhHaf+Nn8Knm?=
- =?us-ascii?Q?hfEVty5Nm6rZjyKuPFvWdbozx5bLrYam5qbQ/8DwoarofUIqAU5L2URsJBml?=
- =?us-ascii?Q?rGz60V6JCdEjaut5XBAgnIPCATSkoJFJTsKScJj6xxoHQvQKsNmoiuXQF2IE?=
- =?us-ascii?Q?CV+3sfRyaTKzcmeFFzV/8Drjep1yxfvJF8fO8D8lMDF8mz6qm31v7JRQ+fze?=
- =?us-ascii?Q?gWwnhXa9bS++jO3RyTWWbfO3z4+C?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?C+Jv1BtOq9KzbTNYn34fDXJMuFqOhB4v937PVINDFRvgemcEdksr+SYt5Kcz?=
- =?us-ascii?Q?DUM4DtyycBC094Lsl3zOzArFOhsimNtlPbLkYacf9NzrNbzwifl1spxTPAP3?=
- =?us-ascii?Q?0J7G1FfUyIjQ9ErAsu0hnWt2BQOcp3nnZI/URoout0EGxExbFUuYD2g/VaX8?=
- =?us-ascii?Q?ORB0+EZCJ6Ang/QEb96CGns4eF7IJqcqilJqTzKhPelie4q9/YXXB5S32iY4?=
- =?us-ascii?Q?yOcluhj9cVbtL82iq8ipPgziNIvrV9bGHqWbE/z7tlnKKuNVq+yVp/pcpLca?=
- =?us-ascii?Q?9qkrcMWXB6CQsHuJW+qNGm0OII1LrFU7YE4OYpm+3Da0VlP8oRgOctORmazT?=
- =?us-ascii?Q?XEiXJbuNIt2/pTY7Wr4Nu+UuvBDo7uCM6eN7H6/Gb784nr+DwO5bwRexxIXs?=
- =?us-ascii?Q?7G8/tXOnO3j1aVN6Xj1n2om8Hnqf+/xdxYxoii56om4CK8rWwiy3qOJ6Rgbd?=
- =?us-ascii?Q?w/2zN6SpAty1jrYjcFEjmhmRjvujYoqM449k8eAkPHvEuECGnJ0WOtJV528U?=
- =?us-ascii?Q?d1xMesWgHB2rfojMXl0AClImSavoMb1dbyYt2H5GPxfEUtEg4Kg9JLHZC1uU?=
- =?us-ascii?Q?GPsrXGDrVApqtvt9oLHA4wtXkdjsoqG4mxOXEQPAJKfRzuKBX/elVDwuhaGD?=
- =?us-ascii?Q?hS5O/HOafs77ZS95gyBy0biWR3apKl/litLA2FZjOJuafR9r5GSA14StLc05?=
- =?us-ascii?Q?OhUc37/viRtda3l/dVZBzDYb29vFlGHZVu8WUPgSyDQKl3A8NQL3Ph08Q3PR?=
- =?us-ascii?Q?gSstWF3TBg9XH9M6dr04pe2e0qLduCjT1iT1KTrulbFnD6l70YGbNL1rzQ8q?=
- =?us-ascii?Q?T+dv60U/ZSDmkcmrefWDwV+9pEsVNMqGe3LTm+yJ9xDzgzNNfHAoakJ7ToaI?=
- =?us-ascii?Q?fkjePJ/wGf+zufLCOHpP74lj4uW4INS/9cGlZDmFpWeQie1LiKXN1CcrePSY?=
- =?us-ascii?Q?lRp5RBIA1bfJkb6A0xBVqyJc6D1k14fUPP8U7tca/NyNE8LWbYeP3uU+EpLo?=
- =?us-ascii?Q?gs2NQdrAnaqUHExMN3jK93jyYXTNZI0n0uKbF6rG2ahB0ZBYl6FablJONgzx?=
- =?us-ascii?Q?Sc6BpWoteVNjlIeMv4HtAeQVOHR5conChzO6iFVZU0ULzorYtmHYX3+4DbOs?=
- =?us-ascii?Q?h+mlO7O2b4ljTSw+aCsYja3kTndY5t304jHcc1XbdIlRjwcBshdqic3qamN4?=
- =?us-ascii?Q?NPl9cthIfACWMCpdctM3aU1aE01Oky8bzMI5PTOXZHRWij3IYHwGz9LtN7z3?=
- =?us-ascii?Q?Q5YKGgb9A99+7waWfTmBEiC1UVTUHEdG2fjhCzDiA0KIEOW1fH7Wn12z8yud?=
- =?us-ascii?Q?t5wxc2bodLZ5dkoyeSU27niNbc1mFyyhpM/E327g7+rSMpG4PqsIqREJg99+?=
- =?us-ascii?Q?MmwintTiDsX4nLa+Vs0KaHmVBqZim3ASw0Ro/HZkTVz+LCJ1m3iKqIP7Mjdv?=
- =?us-ascii?Q?8+O5p8HrhD0MTt0Mqswb/+Q6yIt4bXBaCqreEzBiNX6vpquACNQvT+rymxDd?=
- =?us-ascii?Q?gdufTFpLluKmnMjcs9RAgmNMgfutS1t0jus0Vy8S0I9dbkQJ32gCDzdj+nih?=
- =?us-ascii?Q?l1OBtTsOJfVrPoMYujXpUMlaxxajzSerHB3j1e39?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 926d2820-3cb6-4c22-848d-08dd4c074413
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2025 08:20:24.8408
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wULj02YWfN6qLpPCZKMhGUI/7C3nk2NWgMTv7Gx/wIohQJfdbF3BcCqWt8UY9rI23lPJZfynsEslTkZtWNVUWg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5246
-X-OriginatorOrg: intel.com
+References: <20250211121128.703390-1-tabba@google.com> <20250211121128.703390-4-tabba@google.com>
+ <Z60RacIJMwL0M8On@x1.local>
+In-Reply-To: <Z60RacIJMwL0M8On@x1.local>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 13 Feb 2025 08:24:57 +0000
+X-Gm-Features: AWEUYZkM07o7Zzm_Om1YM784wK6IGgklVseiQzsh4GkkLThpFRZEVr5Ei8mNkKQ
+Message-ID: <CA+EHjTwRNgozO++uK1bFyiRwH7j816g_7Qfhj9VdX55Kh_huSw@mail.gmail.com>
+Subject: Re: [PATCH v3 03/11] KVM: guest_memfd: Allow host to map
+ guest_memfd() pages
+To: Peter Xu <peterx@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vbabka@suse.cz, vannapurve@google.com, ackerleytng@google.com, 
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com, 
+	wei.w.wang@intel.com, liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
->+static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
->+{
->+	/* Avoid costly SEAMCALL if no NMI was injected. */
->+	if (vcpu->arch.nmi_injected) {
->+		/*
->+		 * No need to request KVM_REQ_EVENT because PEND_NMI is still
->+		 * set if NMI re-injection needed.  No other event types need
->+		 * to be handled because TDX doesn't support injection of
->+		 * exception, SMI or interrupt (via event injection).
->+		 */
->+		vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
->+							      TD_VCPU_PEND_NMI);
->+	}
+Hi Peter,
 
-Why does KVM care whether/when an NMI is injected by the TDX module?
+On Wed, 12 Feb 2025 at 21:24, Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Feb 11, 2025 at 12:11:19PM +0000, Fuad Tabba wrote:
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 54e959e7d68f..4e759e8020c5 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -124,3 +124,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+> >  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+> >         bool
+> >         depends on KVM_PRIVATE_MEM
+> > +
+> > +config KVM_GMEM_SHARED_MEM
+> > +       select KVM_PRIVATE_MEM
+> > +       bool
+>
+> No strong opinion here, but this might not be straightforward enough for
+> any reader to know why a shared mem option will select a private mem..
+>
+> I wonder would it be clearer if we could have a config for gmem alone, and
+> select that option no matter how gmem would be consumed.  Then the two
+> options above could select it.
+>
+> I'm not sure whether there're too many guest-memfd stuff hard-coded to
+> PRIVATE_MEM, actually that's what I hit myself both in qemu & kvm when I
+> wanted to try guest-memfd on QEMU as purely shared (aka no conversions, no
+> duplicated backends, but in-place).  So pretty much a pure question to ask
+> here.
 
-I think we can simply set nmi_injected to false unconditionally here, or even in
-tdx_inject_nmi(). From KVM's perspective, NMI injection is complete right after
-writing to PEND_NMI. It is the TDX module that should inject the NMI at the
-right time and do the re-injection.
+Yes, the whole thing with guest_memfd being initially called private
+mem has left a few things like this, e.g., config options, function
+names. It has caused (and will probably continue to cause) confusion.
 
+In order not to blend bikeshedding over names and the patch series
+adding mmap support (i.e., this one), I am planning on sending a
+separate patch series to handle the name issue/
 
->+}
->+
+> The other thing is, currently guest-memfd binding only allows 1:1 binding
+> to kvm memslots for a specific offset range of gmem, rather than being able
+> to be mapped in multiple memslots:
+>
+> kvm_gmem_bind():
+>         if (!xa_empty(&gmem->bindings) &&
+>             xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT)) {
+>                 filemap_invalidate_unlock(inode->i_mapping);
+>                 goto err;
+>         }
+>
+> I didn't dig further yet, but I feel like this won't trivially work with
+> things like SMRAM when in-place, which can map the same portion of a gmem
+> range more than once.  I wonder if this is a hard limit for guest-memfd,
+> and whether you hit anything similar when working on this series.
+
+I haven't thought about this much, but it could be something to tackle later on.
+
+Thank you,
+/fuad
+
+> Thanks,
+>
+> --
+> Peter Xu
+>
+
+On Wed, 12 Feb 2025 at 21:24, Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Feb 11, 2025 at 12:11:19PM +0000, Fuad Tabba wrote:
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 54e959e7d68f..4e759e8020c5 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -124,3 +124,7 @@ config HAVE_KVM_ARCH_GMEM_PREPARE
+> >  config HAVE_KVM_ARCH_GMEM_INVALIDATE
+> >         bool
+> >         depends on KVM_PRIVATE_MEM
+> > +
+> > +config KVM_GMEM_SHARED_MEM
+> > +       select KVM_PRIVATE_MEM
+> > +       bool
+>
+> No strong opinion here, but this might not be straightforward enough for
+> any reader to know why a shared mem option will select a private mem..
+>
+> I wonder would it be clearer if we could have a config for gmem alone, and
+> select that option no matter how gmem would be consumed.  Then the two
+> options above could select it.
+>
+> I'm not sure whether there're too many guest-memfd stuff hard-coded to
+> PRIVATE_MEM, actually that's what I hit myself both in qemu & kvm when I
+> wanted to try guest-memfd on QEMU as purely shared (aka no conversions, no
+> duplicated backends, but in-place).  So pretty much a pure question to ask
+> here.
+>
+> The other thing is, currently guest-memfd binding only allows 1:1 binding
+> to kvm memslots for a specific offset range of gmem, rather than being able
+> to be mapped in multiple memslots:
+>
+> kvm_gmem_bind():
+>         if (!xa_empty(&gmem->bindings) &&
+>             xa_find(&gmem->bindings, &start, end - 1, XA_PRESENT)) {
+>                 filemap_invalidate_unlock(inode->i_mapping);
+>                 goto err;
+>         }
+>
+> I didn't dig further yet, but I feel like this won't trivially work with
+> things like SMRAM when in-place, which can map the same portion of a gmem
+> range more than once.  I wonder if this is a hard limit for guest-memfd,
+> and whether you hit anything similar when working on this series.
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
 
