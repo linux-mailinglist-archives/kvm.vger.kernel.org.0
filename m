@@ -1,149 +1,226 @@
-Return-Path: <kvm+bounces-37996-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-37998-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF06CA333FC
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 01:27:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A6FA334A8
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 02:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABD05167B77
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 00:27:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 039D2188A203
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 01:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFBD2C181;
-	Thu, 13 Feb 2025 00:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C851482F5;
+	Thu, 13 Feb 2025 01:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="barvS0VC"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="uhhqpX35"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DCF4A29
-	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 00:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07797139566
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 01:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739406414; cv=none; b=CP+dG2sI34DEgx7hr2sN2BjvmOpO2gbdFLxg8mPZpOYIeGu3bk6dEhkU/nfbIXpl4u68OZKf8aMv85dFCxmoMCzpUBM17h16XVaOXcKIptF41bY33wJ4KEtJxwQLiPMzR6V2vRRxa8dm/zY7uQkLsHBQ1EN69NfTiX9b+23SCEI=
+	t=1739410057; cv=none; b=sbjKW6D2Rk13PefAIkIoQ9iVlAv4f7XmwULG6OMJqwNhwWnC/Y5Z/lc4dvZrD6Tmw4UTN6k1EcBHfNpxgDs8SoiXIaijrtXoA60fsEor8I2U4FWp8WewmQk65+rFUeHBdvQpcuS4cxhS051G7lxMnr5pADfin88doI/jae1hkE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739406414; c=relaxed/simple;
-	bh=btBR5N7uRHHuw3ht8npwHcy0kScz5qPCp2DfQ4EoDaA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IGkRJmy+7JdQiaaqEnJFDdqS1lDULCBDNWykf9CUJ5HMTSjnhplWjofhRUEOBbTbfpMGZ8nbRQxFWBXiHn89iSLvwua9yDBBMtOcsXv479J5oVPgoWQX/aFw9Sr/q0A/stzo3k3MR3HDi0tLaGbb3WbZ3wC+zjEW2/O5Pdm4rbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=barvS0VC; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e455bf1f4d3so310283276.2
-        for <kvm@vger.kernel.org>; Wed, 12 Feb 2025 16:26:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739406411; x=1740011211; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T1lQra2BGRqr8BJ2tXCVKhfWYo8wxpCnBIWRVHL8S1U=;
-        b=barvS0VCutBXeRNxi2W+7FmdXcYxT5tBeZlANHQ9FpSzuZDs6dSZMEgB0T3kqhqLdz
-         MFFl28gwq3W4W1IqTCsOyx6D0cIBIH31jIgZa09hIDfcKi1FEVS+Y9BIPnHvmUjmK54e
-         h+d6XlRUaUjlXxzgdAfmD20ALBSt5OEixd+fudxLrZmCnEvdscAfzvlWJt7RXuw3w89L
-         uKfpOr6fKhDZXzLoaf3CYJrkS9I+2Ow8UjafnPBu/5nyxI64kqcIee6+yFlQ569/4IjQ
-         nuBBRYLwXTkRXvVlnXDbcMFRMREnQXlYxzghk9cGZYum/BzrFVRGUGsTcpxr6D/i7U1T
-         +soA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739406411; x=1740011211;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T1lQra2BGRqr8BJ2tXCVKhfWYo8wxpCnBIWRVHL8S1U=;
-        b=PEiVyZIMg2LcWhom8S2lRA/u6q00JV6hvzaFYTJJKoRG8f1C3cprWchPms12qWgk4s
-         XBvCWrZdjPkq82/Re/h8ArRJC40ZdCHetuUU3E/dzXTJ0AoDPkQLMkB/9SToRamAIAi0
-         CIxEiK01l72XH8jssAYpIj5U7YDs2qiqZPhvH0koRJ/1beSJXkuChpHYZsKAT4LHrL2M
-         U+FCciDAVZ+ySew7J7gpzsB3kvyQYYx/fB9iWTV1EKcAbhhUx7sKOa+EQptRsRwnx/dt
-         odKcN1xehPT4qMCbNsH5/8AeZ7Me9tFr6B50MutovhmpWHD0ky4zQ3JeAMRvn+VziE0/
-         uskQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXd91JhQ/p2sZ1aqvPsX/u4aUeWDE8c80dBtiBpX5NdmXUmWHePk6b9jRwW9iRGbFEAqCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfOrctz81WbucCbK94PCC5SZNgP+e+Ynj56SFV9+hQ/pTyDpn9
-	QV4w+J9tCe86m3WUq1z1ew9VZrVkBJsneEhSkZ9ulPJbuGuMOjrN4r5hm2+Y1GYHyUphu/Z377Q
-	9MIE/Gpa7IIyatn1Rdg9aZaY75OCRWjx9LjIJ
-X-Gm-Gg: ASbGnct723RBDrc4HofubPDmNUqEuB4fKXYQJeXLTGVGQ09c6UJSuKjcXIGzC0ziQjY
-	zOreGfl/vII/yvJfVN6GFF5R91TJMvD7fjwK2SXmWoZB9HCxIp1CVOWwfMztsfOGPijcZkltfxc
-	2GNROWJ7SUufDtsdEoNkluL5wnsQ==
-X-Google-Smtp-Source: AGHT+IHF7oWRUxJv7dCUpYW2IfmB3aCv+yjHjliJNpKqm7wi+IQ41sadVcf4u51Avvxozru5EBha7WCpmy+tM7d3Ufk=
-X-Received: by 2002:a05:690c:6988:b0:6f6:cad6:6b5a with SMTP id
- 00721157ae682-6fb1f19ba28mr70396737b3.13.1739406411154; Wed, 12 Feb 2025
- 16:26:51 -0800 (PST)
+	s=arc-20240116; t=1739410057; c=relaxed/simple;
+	bh=K1KJcO/iMIszsejQubSSJo5rLiAltDSQBLIwlW4rkFI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=syXb+dmEAzjo99LRBcz3dKKNgO0T+J0MHhM+YHqd9lJxIxe+0DlOa31xzlK4HHQCbNSZ3877gKJB36WkgasliZJinST+7Ol3p1buqzII+jx3MzzN4RnNmLXVSHweWub5f5ag6s2jDuAQiCyMqEkxx4I4NbBNwZ24hTXhBbiJ+24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=uhhqpX35; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20250213012732epoutp0122bc918a34880861fbeab3792b1630f8~joDoAmfco0893408934epoutp018
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 01:27:32 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20250213012732epoutp0122bc918a34880861fbeab3792b1630f8~joDoAmfco0893408934epoutp018
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1739410052;
+	bh=cUNcxOwztr93Bkz78+ZRLsndQixwVjIGrEz9jLDFpWY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uhhqpX35kp9D1ni5no1E5IccHc23T2G9lyDkd13WwedzYz2vi0b8e4mi6Lnw4NDHZ
+	 sLPb0ZRzmLViLmp6nhMaD2gzJTXrY9PGP40QbkIY0sj0vU4txPjY767MljrQfxfTmL
+	 QCRlPdTB8LmR0rYCtZw0DAn7kDqTJ8I5ue5p3f6A=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+	20250213012730epcas5p414b410c5ac1edad9af12bc84dfc954bf~joDm3sUjB1474714747epcas5p4v;
+	Thu, 13 Feb 2025 01:27:30 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.174]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4YtcxF4CRTz4x9Q7; Thu, 13 Feb
+	2025 01:27:29 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	81.B6.19933.18A4DA76; Thu, 13 Feb 2025 10:27:29 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8~joDezkhkP2020120201epcas5p2f;
+	Thu, 13 Feb 2025 01:27:22 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20250213012722epsmtrp2151ed053faea735a7b8c7f91b215dcd6~joDesL5qW2391223912epsmtrp2B;
+	Thu, 13 Feb 2025 01:27:22 +0000 (GMT)
+X-AuditID: b6c32a4a-c1fda70000004ddd-79-67ad4a81014e
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F8.A4.18729.97A4DA76; Thu, 13 Feb 2025 10:27:21 +0900 (KST)
+Received: from asg29.. (unknown [109.105.129.29]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250213012719epsmtip2284086063341bdcb19d2c59a50b4a97f~joDcabYEG2733127331epsmtip2e;
+	Thu, 13 Feb 2025 01:27:19 +0000 (GMT)
+From: Junnan Wu <junnan01.wu@samsung.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+	horms@kernel.org, jasowang@redhat.com, junnan01.wu@samsung.com,
+	kuba@kernel.org, kvm@vger.kernel.org, lei19.wang@samsung.com,
+	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
+	pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com,
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
+	ying01.gao@samsung.com, ying123.xu@samsung.com
+Subject: Re: Re: [Patch net 1/2] vsock/virtio: initialize rx_buf_nr and
+ rx_buf_max_nr when resuming
+Date: Thu, 13 Feb 2025 09:28:05 +0800
+Message-Id: <20250213012805.2379064-1-junnan01.wu@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <gr5rqfwb4qgc23dadpfwe74jvsq37udpeqwhpokhnvvin6biv2@6v5npbxf6kbn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204004038.1680123-1-jthoughton@google.com>
- <20250204004038.1680123-6-jthoughton@google.com> <Z60cEcQ0P1G7oyFK@google.com>
-In-Reply-To: <Z60cEcQ0P1G7oyFK@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Wed, 12 Feb 2025 16:26:15 -0800
-X-Gm-Features: AWEUYZlW0xEqFDzX78EQEAIp-JOIdOgFVbgwEl-2uovs7RNjvbMVfq0Tz6WW5Vc
-Message-ID: <CADrL8HXchc0XVK3JVP17mhvzy9Ga9eKMEi-U8ibah2xBy=2bSg@mail.gmail.com>
-Subject: Re: [PATCH v9 05/11] KVM: x86/mmu: Rename spte_has_volatile_bits() to spte_needs_atomic_write()
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao <yuzhao@google.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xTVxze6e29LSw1d6BygA2hDhfZgFZKORUhczLp1JGaLSRzcV1TbgoB
+	bksf2zAuwkQQFAcssBUYj4w5YKBYAXlKVh6DDQaTR1jASbEYAgpUJi4lGWt7cfO/7/f4ft/5
+	fuccLuZhJXy4SbSe0tKKFD7hzm7t3f9acOaxRpVg5q4vKh/NYqOFgXkOuv9tHQfNfzlIoKt3
+	1lno7lQsGmu9gqPy4jSU3TaOo/GOcgJN1FzmoC37Eo4GqnajjV8fAvT9oxEMjRSs4Wi0fAtD
+	y0VbOOq/VYejqS8QGutzTO2ZN+Jv7pY21/3BklaZDFJTfS4hbbdIpIs3jUC6enuSkF5prgfS
+	dZOfjHsq+VAipUigtP4UrVQnJNGqKP7x9+RH5OFigTBYKEERfH9akUpF8WNOyIKPJqU4rPH9
+	P1GkGBwpmUKn44dGH9KqDXrKP1Gt00fxKU1CikakCdEpUnUGWhVCU/qDQoHgQLij8ePkxI3c
+	ekIz7/VZUf8TkAH+8cwDblxIiuD9P2/iecCd60F2AmieWGYxwWMA/7rQBJhgA0BbexfxjGIu
+	aSeYQjeA31Vf3OY/ANAyVY07uwhyPxzsqnUxdpJecKyixsXAyE4Mzt3IdRU8SQoWPVxwEdhk
+	ILQNfe3CPDIajqzVchi5PbDnpxHMid3IOHjDuspmel6CQ0arC2OOnvMtZZhTAJJWLmzafOQ4
+	ONcRxMCJmmBmjidc+rl5e6YPXF/p3raTDPP77dtYDy+t3MEZHAlHr+VgzjGYw8z1jlAm/Qos
+	/uUai5HdAfM3rSwmz4NtFU7sVA2EqwVnmbQvrDOZtlWlDldDHGZX1QA+vprDKQD+pc+5KX3O
+	Ten/ylUAqwfelEaXqqJ04ZoDNPXpf7esVKeagOu5Bx1rA5a5tRAzYHGBGUAuxt/JgyUNKg9e
+	giL9DKVVy7WGFEpnBuGOdRdiPruUasd/ofVyoUgiEInFYpEkTCzke/HOt2epPEiVQk8lU5SG
+	0j7jsbhuPhks73OnopbSwi0yzu3MkuGI2oAhQUnowtshL4zPzkj2Xbe7W09bsivfVzaerGxr
+	3RFED0QX23Li5/TpEUGF8Q1xC0iJG5reZe/hrQ7abT8u9okjA//GYt0DRm99VHW2PS6jcNfe
+	d6ZZNWEfflVRkTnt2wrpDnl89oUu4/Lvh2V9cz60stiu4X5zsU4oOry3rFveUFnWVpj0op0Q
+	fJ5X5Pfq8NO3Zj1g5IPeN8K8+WemY0MpvOxgwLmWo4p8EhlmO23G07KV37IuvT67GbOVPpm9
+	OGxuuRc/V2O53NFI4DPpkoHJey3L6OWTx/clt3bybD8cedLrW/007UTPB36y/qUmIZ+tS1QI
+	gzCtTvEvluIvOHcEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDIsWRmVeSWpSXmKPExsWy7bCSvG6l19p0gytTrS3mnG9hsXh67BG7
+	xeO5K9ktHvWfYLNYdukzk8Xda+4WF7b1sVrMmVpo0bbjMqvF5V1z2CyuLOlht/j/6xWrxbEF
+	YhbfTr9htFj69iyzxdkJH1gtzs/5z2zxetJ/Vouj21eyWlxrsrC4cARo6v5HM1kdxDy2rLzJ
+	5LFgU6nHplWdbB47H1p6vNg8k9Hj/b6rbB59W1YxenzeJBfAEcVlk5Kak1mWWqRvl8CV8a1z
+	FVvBI/GKSUe/MjYw/hPuYuTkkBAwkTg0bSdbFyMXh5DAbkaJo68WMEEkpCW6frcxQ9jCEiv/
+	PWeHKHrCKPFm4l92kASbgKbEiT0r2EBsEQFxiQvzloBNYha4zCxx7ucdsCJhgWSJw9d2gE1i
+	EVCV+HhyOiuIzStgJ3H2wwp2iA3yEvsPngWr4RTwk9j45D0LiC0k4Cux9W4vO0S9oMTJmU/A
+	4sxA9c1bZzNPYBSYhSQ1C0lqASPTKkbJ1ILi3PTcYsMCw7zUcr3ixNzi0rx0veT83E2M4AjU
+	0tzBuH3VB71DjEwcjIcYJTiYlUR4JaatSRfiTUmsrEotyo8vKs1JLT7EKM3BoiTOK/6iN0VI
+	ID2xJDU7NbUgtQgmy8TBKdXANHH3p8SOik+a38N6D1w+9Gi6+BUj5ZgvKv2pL1b+jmI0/te5
+	2/rDjHPv7pyLnbkjP/2xb6XUP2ZpG+v/Dvf623L+y9ls+7137T83rfyOzywmmtcZPXME2Ngd
+	vnW6HTvpt+iqEMeUN3FKJjP3pKnP++p7/6yGXkl7mHFccNkauR1ufzVYmCZniX2Z850nLyN/
+	h4CGvtQO2d/Mm714TXarLk73M10++73Xg6U/5nj+3GX6VFZJ63bV2ZZv3B0snO8mBp3Zd3zK
+	XaPcTx8/zVhovbh9sn/ncp0JMulVVnJyivefPZ2ewPuN+4mZw5p5TElO3f36xat9uz+Lvnx+
+	N/J5ksau6fELH5ZkPZpoJOPMq8RSnJFoqMVcVJwIAOvmwtgvAwAA
+X-CMS-MailID: 20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8
+References: <gr5rqfwb4qgc23dadpfwe74jvsq37udpeqwhpokhnvvin6biv2@6v5npbxf6kbn>
+	<CGME20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8@epcas5p2.samsung.com>
 
-On Wed, Feb 12, 2025 at 2:09=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+>You need to update the title now that you're moving also queued_replies.
 >
-> On Tue, Feb 04, 2025, James Houghton wrote:
-> > spte_has_volatile_bits() is now a misnomer, as the an SPTE can have its
-> > Accessed bit set or cleared without the mmu_lock held, but the state of
-> > the Accessed bit is not checked in spte_has_volatile_bits().
-> > Even if a caller uses spte_needs_atomic_write(), Accessed bit
-> > information may still be lost, but that is already tolerated, as the TL=
-B
-> > is not invalidated after the Accessed bit is cleared.
-> >
-> > Signed-off-by: James Houghton <jthoughton@google.com>
-> > ---
->
-> ...
->
-> > diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> > index 59746854c0af..4c290ae9a02a 100644
-> > --- a/arch/x86/kvm/mmu/spte.h
-> > +++ b/arch/x86/kvm/mmu/spte.h
-> > @@ -519,7 +519,7 @@ static inline u64 get_mmio_spte_generation(u64 spte=
-)
-> >       return gen;
-> >  }
-> >
-> > -bool spte_has_volatile_bits(u64 spte);
-> > +bool spte_needs_atomic_write(u64 spte);
-> >
-> >  bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-> >              const struct kvm_memory_slot *slot,
-> > diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-> > index 05e9d678aac9..b54123163efc 100644
-> > --- a/arch/x86/kvm/mmu/tdp_iter.h
-> > +++ b/arch/x86/kvm/mmu/tdp_iter.h
-> > @@ -55,7 +55,7 @@ static inline bool kvm_tdp_mmu_spte_need_atomic_write=
-(u64 old_spte, int level)
-> >  {
-> >       return is_shadow_present_pte(old_spte) &&
-> >              is_last_spte(old_spte, level) &&
-> > -            spte_has_volatile_bits(old_spte);
-> > +            spte_needs_atomic_write(old_spte);
->
-> Unless you object, I'll change this to spte_needs_atomic_update(), and tw=
-eak
-> kvm_tdp_mmu_spte_need_atomic_write() accordingly.  "write" was a bad choi=
-ce by
-> me.  It's not just the store/write that needs to be atomic, it's the enti=
-re
-> read-modify-write.  E.g. KVM needs to preserve the existing value, but fo=
-r many
-> flows, it's even more important that KVM's snapshot of the old SPTE is ac=
-curate.
 
-No objections, please make that change. Thanks!
+Well, I will update the title in V3 version.
+
+>On Tue, Feb 11, 2025 at 03:19:21PM +0800, Junnan Wu wrote:
+>>When executing suspend to ram twice in a row,
+>>the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
+>>Then after virtqueue_get_buf and `rx_buf_nr` decreased
+>>in function virtio_transport_rx_work,
+>>the condition to fill rx buffer
+>>(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
+>>
+>>It is because that `rx_buf_nr` and `rx_buf_max_nr`
+>>are initialized only in virtio_vsock_probe(),
+>>but they should be reset whenever virtqueues are recreated,
+>>like after a suspend/resume.
+>>
+>>Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
+>>virtio_vsock_vqs_init(), so we are sure that they are properly
+>>initialized, every time we initialize the virtqueues, either when we
+>>load the driver or after a suspend/resume.
+>>At the same time, also move `queued_replies`.
+>
+>Why?
+>
+>As I mentioned the commit description should explain why the changes are 
+>being made for both reviewers and future references to this patch.
+>
+
+After your kindly remind, I have double checked all locations where `queued_replies`
+used, and we think for order to prevent erroneous atomic load operations 
+on the `queued_replies` in the virtio_transport_send_pkt_work() function
+which may disrupt the scheduling of vsock->rx_work
+when transmitting reply-required socket packets,
+this atomic variable must undergo synchronized initialization
+alongside the preceding two variables after a suspend/resume.
+
+If we reach agreement on it, I will add this description in V3 version.
+
+BRs
+Junnan Wu
+
+>The rest LGTM.
+>
+>Stefano
+>
+>>
+>>Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
+>>Co-developed-by: Ying Gao <ying01.gao@samsung.com>
+>>Signed-off-by: Ying Gao <ying01.gao@samsung.com>
+>>Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
+>>---
+>> net/vmw_vsock/virtio_transport.c | 10 +++++++---
+>> 1 file changed, 7 insertions(+), 3 deletions(-)
+>>
+>>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>>index b58c3818f284..f0e48e6911fc 100644
+>>--- a/net/vmw_vsock/virtio_transport.c
+>>+++ b/net/vmw_vsock/virtio_transport.c
+>>@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>> 	};
+>> 	int ret;
+>>
+>>+	mutex_lock(&vsock->rx_lock);
+>>+	vsock->rx_buf_nr = 0;
+>>+	vsock->rx_buf_max_nr = 0;
+>>+	mutex_unlock(&vsock->rx_lock);
+>>+
+>>+	atomic_set(&vsock->queued_replies, 0);
+>>+
+>> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
+>> 	if (ret < 0)
+>> 		return ret;
+>>@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>>
+>> 	vsock->vdev = vdev;
+>>
+>>-	vsock->rx_buf_nr = 0;
+>>-	vsock->rx_buf_max_nr = 0;
+>>-	atomic_set(&vsock->queued_replies, 0);
+>>
+>> 	mutex_init(&vsock->tx_lock);
+>> 	mutex_init(&vsock->rx_lock);
+>>-- 
+>>2.34.1
+>>
 
