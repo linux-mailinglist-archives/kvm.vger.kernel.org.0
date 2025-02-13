@@ -1,202 +1,211 @@
-Return-Path: <kvm+bounces-38014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A277BA33B19
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:24:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BB6A33B30
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:27:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B0A1188515C
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 09:24:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D5BF3A6C4C
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 09:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6804B20D4F0;
-	Thu, 13 Feb 2025 09:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B76320FAA9;
+	Thu, 13 Feb 2025 09:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="KDjKOm6/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KRfA+b3T"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35C620A5DC
-	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 09:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC0E20E6F3
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 09:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739438644; cv=none; b=GFV90jt+UhmGqQP9gs9so9NXpfk1CwviNBi3xd3ic0430swwxquxMIyU3Ln//+s4KOfjJiTb5+V0HF0318ezBo5Bm58JcZ5Kd4Zwq4Jl7f5NYKIBz5gc7F2I3eOuipZwUSB9WpJ2kP76OexIICx1Pdlz+9IPvyZU4ufESbb1+LE=
+	t=1739438741; cv=none; b=nlTYFEmmp/+0vcfsR7miGzhuL/8OH8R6wcxDh2pHepu/chTGt4ZyBrm0CVIBVP45aCyXZSxV3+NopJHyBBF4R1iHrApyohvYS8B0e6bQ68dipA1u+eKoTsO3OmbtEnixqiOHBRIo27oUBGnlQBX+Afk40HohpVNV/1O9ybX54/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739438644; c=relaxed/simple;
-	bh=mfXNeTj+Q8ZX0NBisxbi4QQyQ/0LK4y+WrTTR40VPyo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZPvjlWcxIgfaqaed6hZbeZ3bxHaFlVGYBfcDZP7D1qnv4AiI5acYjmNlalqNNotAHDM9lT+GoLIzIJk5zZfXD8uM2XVBqhUFIAu2q1+pK6drp7sLgDRJb2s/4EMukSrNlIS8MErHHUh4Xncxhf6RtmMbJdBv/gvl7Xyna3KCbss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=KDjKOm6/; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21f40deb941so14334615ad.2
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 01:24:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1739438642; x=1740043442; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s+g1corMoWLkqgaHyL0dUry18PBH1WwZj6geDsmEd1Y=;
-        b=KDjKOm6/0FJ3659nApC3mh5Qz2KfuRT+TelHF+ecr+t08t0h66scPICfpH8q36dDdg
-         QNpyYENQ5hApsce4xKZYWc/6l7lwDw2r288/mzMSZmM2UxvpTjK75ljeTzV7dVByqdPx
-         /867R5Ei2/PaBSNEp/Zm6k3AXDyisesc3wjyzdVOAYEUdQpIIs7TjXWlfFeDZMbsFLCJ
-         CVv8SbBjU49ezKqdbXe8QNlTxp1p3no2ssUvpPSNsstvHvLmw7r9lIrAaqXlBpobaS/R
-         NwxC17uCq2KpdNFKZkZubeft8KN3u3yeKSIGiwp0FVQZSh49q1RyQYbPtIiJL11XeB5H
-         jegA==
+	s=arc-20240116; t=1739438741; c=relaxed/simple;
+	bh=kNZDvEJf3qJnJsEpcSDOQdrXDI+7ntqzAaEqCJM8JY0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U2dWNiYh3h4VQmPVvQdJpwOTx3AwldR9fQOMIXvRhGV5phJACgZAMOdgP2URJhpYJQnH6KlnVhi6AzrUvKOk0vSdTNsHq/rH8IAVLUaq2u7ft7QKURau/erBIA0wFrMsNv3qblVDaXhNqVlRmfmsI0b6DCqyQQgYDA5eZqN6Se4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KRfA+b3T; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739438737;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gODipQT1RJ6DR0/GMvEisYcVEgWaoya2b4Hn/2vB8dw=;
+	b=KRfA+b3TbDVOSqjnMIeit5ovLd9DfBQ9mGrZ7a8Iwvk8Hl/E+Ycvqjj09hMUITVM7JYk62
+	laDoB+XMnH8nHpLGKftAU+sB+Zhc3kMk/NXLZ1E/SYYE70yG0d2vKKuiQnsqLGFZJjkg6h
+	NK5GtMHsXeQq5q527IM2SE9y4xLb+3w=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-113-fEqBJnegNN-WdnmCcOlLsg-1; Thu, 13 Feb 2025 04:25:35 -0500
+X-MC-Unique: fEqBJnegNN-WdnmCcOlLsg-1
+X-Mimecast-MFC-AGG-ID: fEqBJnegNN-WdnmCcOlLsg_1739438734
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38dce0d3d34so350920f8f.2
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 01:25:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739438642; x=1740043442;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s+g1corMoWLkqgaHyL0dUry18PBH1WwZj6geDsmEd1Y=;
-        b=SL/9zkGqgn3JS2bGwF375JEH47cD52AnyoZVmWDi/hhz5V1bVk/MYSf6uNMa9h71nl
-         Mj+dgUHBSWXQZUR9+3qbiCKQ6cSF8QWqcutUOj8LSlWJ8mrOBJIYz1eoy5lNjReiEufB
-         gMUAqr/Dx4dfNhO366HX4Ty2bVlBp6nFvX4yy4BJhW+L8McFS3aKlJwi/WzlwQkqIiGi
-         Y/guVKojP3S1OjkEOst9T0ZiKFj6iHE7tQzQMjfXfpvqdPFhvOu88+KVgqcS6p/K7AUg
-         f3dAkRAKd1twklg4CNWjegcvY7ZCrIaaylRnUhOWgsM7RPDkTBXZzJIkQa271zm2O8L0
-         G6Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ1a6MsMfaZN8nNMPlwANuFBRNyFyx6D5KykcMOAS4qrYpKfhcUDttJzgNtnHc1N462So=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb9q+4emNQoSREGO+L8MV41eRKh1JjXi6EtZJPt9y0k4TvLgAD
-	w/1UlKWpvP9M1C0A22ZI43r7iEoj6CFOJoR1a3B//xCBlJtFvY4WCu7NvpPEOKxIlMmSKiGfgSG
-	fT4U=
-X-Gm-Gg: ASbGnctXUBpXLie1mpYQLiKnUABqy+5xqV8wIVs48eYqZR7f05eO/qcBzCic7cjF2sO
-	XkEyHrDjjscldIst/OLjzROp1LhwGy4f2TpPpiQ4uMSV82HAo4zodj8S7VQTEn5VgyzM6QwwuaS
-	DCeq3AvXzNz2+uoVKmQktJwahHRGaOeBfU4cqffH+ziGSupph+XD/dBFXRnyPZm+Y4KjXbdBKGl
-	I1lQ6Nr8LMBJgAICokycIJPN9hG3Daaj/+tc7eEOjBlSXJ9iYiFSRH4s+IFwSdyon4rnHKY4wqL
-	um5GlumhWOHxHANqSXejW0wTUvsH
-X-Google-Smtp-Source: AGHT+IGF+4e3Af2SCI8Rg8n4coZI7ErejXVy5bxQnzx65sHDQNZjtZ7hhVxDzaYqpoDifzZ7gAKFSQ==
-X-Received: by 2002:a17:902:e950:b0:220:c813:dfb2 with SMTP id d9443c01a7336-220d2153077mr52167375ad.44.1739438642097;
-        Thu, 13 Feb 2025 01:24:02 -0800 (PST)
-Received: from [157.82.205.237] ([157.82.205.237])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fc13ad3fb8sm805579a91.26.2025.02.13.01.23.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Feb 2025 01:24:01 -0800 (PST)
-Message-ID: <0fa16c0e-8002-4320-b7d3-d3d36f80008c@daynix.com>
-Date: Thu, 13 Feb 2025 18:23:55 +0900
+        d=1e100.net; s=20230601; t=1739438734; x=1740043534;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gODipQT1RJ6DR0/GMvEisYcVEgWaoya2b4Hn/2vB8dw=;
+        b=NIG6OkSrHsDWpiGzakY9ELaSHvb6b8TY3c2ZHrw6LAnG2eTOuHUJUuEcUpehPWmfem
+         0ub03/E5QuBUTwGf7nmh2WGwlx4Zt/3av5ZGsjq3AtFoqci9zrm3w6VLPDMMV7Vb64vP
+         UMGlSUPyrUbR4u9sP8ACBtDWuXkXfsTFw6d0mDUlBriHzofg2kavMpOZ6uoaTGC6IWL6
+         oGKgnEnDkN2exCw0pg62783wiBiyBrLg3KzFk4hcvJgDwQYKGDdnmYjlDYR5NRwmPKZ1
+         yy/zvylRGJLWS62MFYpS11El8qL+yxMeJ7QesM4gEixhPFwPBHVW8dQg1cnspWwuYUh8
+         DuQg==
+X-Forwarded-Encrypted: i=1; AJvYcCWGoMh8hVWWGLRmpJpns/TVkGN46jxCnwUxjw9/g/uW4rTtXVO4xL0wvm7aPh6JtcBnGBA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa51QandtqThdgVHekCgFyEkkWgPmMFY8yTNpytKqyqGDP//J4
+	Kp+fDHjAJL3of46X03m+ei7BGxGzrRxSzpbnjpRpyVVxoS8iT+b6FxVe33LK135Q1HKez7Esi75
+	RfAwFaSqW/J1Po3OvJXahWZfrpEIcez4WYDzbZ+NpBkJndLlKxA==
+X-Gm-Gg: ASbGnctkgDPo/SfLsWjtkinuHHC8mOiYHeBUBKjfk94kHXs5anUbTroD5+P1baTa4XZ
+	gFLG9TtFCpSaa76vGqpWfhkhk1LGm/B9zTKo/YvsIzwV87b/Yo0toMOvn7zLVn9p9uybE2zdVQv
+	+aox0TrbPXUp0dZz6Ya6khv2UIo6FmURKLv4VooSnAgNUfb3EwBwFEDSjeSaojHH8PrkUL/NWNF
+	ZmmSFTiu8smb6UTiYD1DCAWE/+NKTjhEvdlP6WY8c0A+v82a1jGMhZhfdGDiFNV1SSDXvImANSz
+	3d8Bsuq/0uOyv4JOspr30YvwaxpwjYR4oXwdBlLHvY8e326tkkTFdQ==
+X-Received: by 2002:a5d:5984:0:b0:38f:2350:7f70 with SMTP id ffacd0b85a97d-38f235080e6mr2406581f8f.24.1739438733950;
+        Thu, 13 Feb 2025 01:25:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEoCVYCjHVfohwpNNaQmSzmtARyIP61OU3BHF6Vls4lswHDEoUel/X9vFTBA8VTVIJQ/jGE9g==
+X-Received: by 2002:a5d:5984:0:b0:38f:2350:7f70 with SMTP id ffacd0b85a97d-38f235080e6mr2406531f8f.24.1739438733293;
+        Thu, 13 Feb 2025 01:25:33 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259f8273sm1280846f8f.89.2025.02.13.01.25.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 01:25:32 -0800 (PST)
+Date: Thu, 13 Feb 2025 10:25:26 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Junnan Wu <junnan01.wu@samsung.com>
+Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com, 
+	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org, 
+	lei19.wang@samsung.com, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com, 
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com, ying01.gao@samsung.com, 
+	ying123.xu@samsung.com
+Subject: Re: [Patch net 1/2] vsock/virtio: initialize rx_buf_nr and
+ rx_buf_max_nr when resuming
+Message-ID: <4n2lobgp2wb7v5vywbkuxwyd5cxldd2g4lxb6ox3qomphra2gd@zhrnboczbrbw>
+References: <gr5rqfwb4qgc23dadpfwe74jvsq37udpeqwhpokhnvvin6biv2@6v5npbxf6kbn>
+ <CGME20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8@epcas5p2.samsung.com>
+ <20250213012805.2379064-1-junnan01.wu@samsung.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tun: Pad virtio headers
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250213-buffers-v1-1-ec4a0821957a@daynix.com>
- <20250213020702-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20250213020702-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250213012805.2379064-1-junnan01.wu@samsung.com>
 
-On 2025/02/13 16:18, Michael S. Tsirkin wrote:
-> 
-> Commit log needs some work.
-> 
-> So my understanding is, this patch does not do much functionally,
-> but makes adding the hash feature easier. OK.
-> 
-> On Thu, Feb 13, 2025 at 03:54:06PM +0900, Akihiko Odaki wrote:
->> tun used to simply advance iov_iter when it needs to pad virtio header,
->> which leaves the garbage in the buffer as is. This is especially
->> problematic
-> 
-> I think you mean "this will become especially problematic"
-> 
->> when tun starts to allow enabling the hash reporting
->> feature; even if the feature is enabled, the packet may lack a hash
->> value and may contain a hole in the virtio header because the packet
->> arrived before the feature gets enabled or does not contain the
->> header fields to be hashed. If the hole is not filled with zero, it is
->> impossible to tell if the packet lacks a hash value.
+On Thu, Feb 13, 2025 at 09:28:05AM +0800, Junnan Wu wrote:
+>>You need to update the title now that you're moving also queued_replies.
 >>
->> In theory, a user of tun can fill the buffer with zero before calling
->> read() to avoid such a problem, but leaving the garbage in the buffer is
->> awkward anyway so fill the buffer in tun.
-> 
-> 
-> What is missing here is description of what the patch does.
-> I think it is
-> "Replace advancing the iterator with writing zeros".
-> 
-> There could be performance cost to the dirtying extra cache lines, though.
-> Could you try checking that please?
-
-It will not dirty extra cache lines; an explanation follows later. 
-Because of that, any benchmark are likely to show only noises, but if 
-you have an idea of workloads that should be tested, please tell me.
-
-> 
-> I think we should mention the risks of the patch, too.
-> Maybe:
-> 
-> 	Also in theory, a user might have initialized the buffer
-> 	to some non-zero value, expecting tun to skip writing it.
-> 	As this was never a documented feature, this seems unlikely.
- > >
+>
+>Well, I will update the title in V3 version.
+>
+>>On Tue, Feb 11, 2025 at 03:19:21PM +0800, Junnan Wu wrote:
+>>>When executing suspend to ram twice in a row,
+>>>the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
+>>>Then after virtqueue_get_buf and `rx_buf_nr` decreased
+>>>in function virtio_transport_rx_work,
+>>>the condition to fill rx buffer
+>>>(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
+>>>
+>>>It is because that `rx_buf_nr` and `rx_buf_max_nr`
+>>>are initialized only in virtio_vsock_probe(),
+>>>but they should be reset whenever virtqueues are recreated,
+>>>like after a suspend/resume.
+>>>
+>>>Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
+>>>virtio_vsock_vqs_init(), so we are sure that they are properly
+>>>initialized, every time we initialize the virtqueues, either when we
+>>>load the driver or after a suspend/resume.
+>>>At the same time, also move `queued_replies`.
 >>
->> The specification also says the device MUST set num_buffers to 1 when
->> the field is present so set it when the specified header size is big
->> enough to contain the field.
-> 
-> This part I dislike. tun has no idea what the number of buffers is.
-> Why 1 specifically?
+>>Why?
+>>
+>>As I mentioned the commit description should explain why the changes are
+>>being made for both reviewers and future references to this patch.
+>>
+>
+>After your kindly remind, I have double checked all locations where `queued_replies`
+>used, and we think for order to prevent erroneous atomic load operations
+>on the `queued_replies` in the virtio_transport_send_pkt_work() function
+>which may disrupt the scheduling of vsock->rx_work
+>when transmitting reply-required socket packets,
+>this atomic variable must undergo synchronized initialization
+>alongside the preceding two variables after a suspend/resume.
 
-That's a valid point. I rewrote the commit log to clarify, but perhaps 
-we can drop the code to set the num_buffers as "[PATCH] vhost/net: Set 
-num_buffers for virtio 1.0" already landed.
+Yes, that was my concern!
 
-Below is the rewritten commit log, which incorporates your suggestions 
-and is extended to cover the performance implication and reason the 
-num_buffers initialization:
+>
+>If we reach agreement on it, I will add this description in V3 version.
 
-tun simply advances iov_iter when it needs to pad virtio header,
-which leaves the garbage in the buffer as is. This will become
-especially problematic when tun starts to allow enabling the hash
-reporting feature; even if the feature is enabled, the packet may lack a
-hash value and may contain a hole in the virtio header because the
-packet arrived before the feature gets enabled or does not contain the
-header fields to be hashed. If the hole is not filled with zero, it is
-impossible to tell if the packet lacks a hash value.
+Yes, please, I just wanted to point out that we need to add an 
+explanation in the commit description.
 
-In theory, a user of tun can fill the buffer with zero before calling
-read() to avoid such a problem, but leaving the garbage in the buffer is
-awkward anyway so replace advancing the iterator with writing zeros.
+And in the title, in this case though listing all the variables would 
+get too long, so you can do something like that:
 
-A user might have initialized the buffer to some non-zero value,
-expecting tun to skip writing it. As this was never a documented
-feature, this seems unlikely. Neither is there a non-zero value that can
-be determined and set before receiving the packet; the only exception
-is the num_buffers field, which is expected to be 1 for version 1 when
-VIRTIO_NET_F_HASH_REPORT is not negotiated. This field is specifically
-set to 1 instead of 0.
+     vsock/virtio: fix variables initialization during resuming
 
-The overhead of filling the hole in the header is negligible as the
-entire header is already placed on the cache when a header size defined
-in the current specification is used even if the cache line is small
-(16 bytes for example).
+Thanks,
+Stefano
 
-Below are the header sizes possible with the current specification:
-a) 10 bytes if the legacy interface is used
-b) 12 bytes if the modern interface is used
-c) 20 bytes if VIRTIO_NET_F_HASH_REPORT is negotiated
+>
+>BRs
+>Junnan Wu
+>
+>>The rest LGTM.
+>>
+>>Stefano
+>>
+>>>
+>>>Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
+>>>Co-developed-by: Ying Gao <ying01.gao@samsung.com>
+>>>Signed-off-by: Ying Gao <ying01.gao@samsung.com>
+>>>Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
+>>>---
+>>> net/vmw_vsock/virtio_transport.c | 10 +++++++---
+>>> 1 file changed, 7 insertions(+), 3 deletions(-)
+>>>
+>>>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>>>index b58c3818f284..f0e48e6911fc 100644
+>>>--- a/net/vmw_vsock/virtio_transport.c
+>>>+++ b/net/vmw_vsock/virtio_transport.c
+>>>@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>>> 	};
+>>> 	int ret;
+>>>
+>>>+	mutex_lock(&vsock->rx_lock);
+>>>+	vsock->rx_buf_nr = 0;
+>>>+	vsock->rx_buf_max_nr = 0;
+>>>+	mutex_unlock(&vsock->rx_lock);
+>>>+
+>>>+	atomic_set(&vsock->queued_replies, 0);
+>>>+
+>>> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
+>>> 	if (ret < 0)
+>>> 		return ret;
+>>>@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>>>
+>>> 	vsock->vdev = vdev;
+>>>
+>>>-	vsock->rx_buf_nr = 0;
+>>>-	vsock->rx_buf_max_nr = 0;
+>>>-	atomic_set(&vsock->queued_replies, 0);
+>>>
+>>> 	mutex_init(&vsock->tx_lock);
+>>> 	mutex_init(&vsock->rx_lock);
+>>>--
+>>>2.34.1
+>>>
+>
 
-a) and b) obviously fit in a cache line. c) uses one extra cache line,
-but the cache line also contains the first 12 bytes of the packet so
-it is always placed on the cache.
 
