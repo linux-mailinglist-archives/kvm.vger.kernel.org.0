@@ -1,211 +1,545 @@
-Return-Path: <kvm+bounces-38015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5BB6A33B30
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:27:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51522A33B3A
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 10:28:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D5BF3A6C4C
-	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 09:26:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58A2F163392
+	for <lists+kvm@lfdr.de>; Thu, 13 Feb 2025 09:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B76320FAA9;
-	Thu, 13 Feb 2025 09:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A986C20CCF8;
+	Thu, 13 Feb 2025 09:27:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KRfA+b3T"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="AY4rHqwH"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC0E20E6F3
-	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 09:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6A58494
+	for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 09:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739438741; cv=none; b=nlTYFEmmp/+0vcfsR7miGzhuL/8OH8R6wcxDh2pHepu/chTGt4ZyBrm0CVIBVP45aCyXZSxV3+NopJHyBBF4R1iHrApyohvYS8B0e6bQ68dipA1u+eKoTsO3OmbtEnixqiOHBRIo27oUBGnlQBX+Afk40HohpVNV/1O9ybX54/M=
+	t=1739438873; cv=none; b=BD4C/PG/Y7Li+/EGlr5y/LbJloOrLrdl9Xi0makyDUv0dpBRB3FXoE+ON4XEnJmHl0l3cFVom5XEKmN+GygTyJebAbpeJuoHF8wLeAze/WJz0lhH/QJ1HjCS6w0RqnP0Bosz37Mnc7R11BBxGb6Yk2ky9/lolv9QIIJjy5i12W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739438741; c=relaxed/simple;
-	bh=kNZDvEJf3qJnJsEpcSDOQdrXDI+7ntqzAaEqCJM8JY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U2dWNiYh3h4VQmPVvQdJpwOTx3AwldR9fQOMIXvRhGV5phJACgZAMOdgP2URJhpYJQnH6KlnVhi6AzrUvKOk0vSdTNsHq/rH8IAVLUaq2u7ft7QKURau/erBIA0wFrMsNv3qblVDaXhNqVlRmfmsI0b6DCqyQQgYDA5eZqN6Se4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KRfA+b3T; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739438737;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gODipQT1RJ6DR0/GMvEisYcVEgWaoya2b4Hn/2vB8dw=;
-	b=KRfA+b3TbDVOSqjnMIeit5ovLd9DfBQ9mGrZ7a8Iwvk8Hl/E+Ycvqjj09hMUITVM7JYk62
-	laDoB+XMnH8nHpLGKftAU+sB+Zhc3kMk/NXLZ1E/SYYE70yG0d2vKKuiQnsqLGFZJjkg6h
-	NK5GtMHsXeQq5q527IM2SE9y4xLb+3w=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-fEqBJnegNN-WdnmCcOlLsg-1; Thu, 13 Feb 2025 04:25:35 -0500
-X-MC-Unique: fEqBJnegNN-WdnmCcOlLsg-1
-X-Mimecast-MFC-AGG-ID: fEqBJnegNN-WdnmCcOlLsg_1739438734
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38dce0d3d34so350920f8f.2
-        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 01:25:34 -0800 (PST)
+	s=arc-20240116; t=1739438873; c=relaxed/simple;
+	bh=jjqChZ/4DPMsse98nHqt44379R3JxwGo/niSXcjMHjM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WnkGwvnfxM9vSvw550BiaLngVFK6WVMDInThwk6RUFKgLCSKazGtFw6Yj689R/vDiVJxdZ8jTgFjJj3a/VL6kDobgBvS6mHhuCJ/jm5D9inYMT4qmvYZva/grGNtU5Bm7zPwx4uDYKWQbsqFk9+owifQgN15fmuFvrIcWTSuDA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=AY4rHqwH; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21f710c17baso10323985ad.1
+        for <kvm@vger.kernel.org>; Thu, 13 Feb 2025 01:27:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1739438870; x=1740043670; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wcHe2v5RBjHO1RGHPKVLgRXdPDvIbQQeWhPDM1NHGCY=;
+        b=AY4rHqwHqezEUA3bTzfPhMwClWvnLusH+l37LdBj6gYwKCHRiMp9Gy0ksZ9l8E9ng9
+         YcfKIqSaAexjFA57GG8vjJMdU0mvKa6B5oWpfn2V8ipKxK9sa0XS2HUoBnfOLNexA8ws
+         RhJzYUojPvaYjA2EwBgtbMRjsG+jMT/UNjxQtNBh0xsUSNoqRDuRTNgad/oHPLx9XPzU
+         0hty2pAHHis7f55f/cp6Na2hayq64ep5ewqcbUql8U2gV6sOXBMD4o9kaasnIBNCMDPA
+         AsxJCseVTa42lbqGl6XModUbTM6bz9vf9gXwXJkFm5jcDL5Eu79C/8VFtoVSL+7t5E49
+         bhew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739438734; x=1740043534;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gODipQT1RJ6DR0/GMvEisYcVEgWaoya2b4Hn/2vB8dw=;
-        b=NIG6OkSrHsDWpiGzakY9ELaSHvb6b8TY3c2ZHrw6LAnG2eTOuHUJUuEcUpehPWmfem
-         0ub03/E5QuBUTwGf7nmh2WGwlx4Zt/3av5ZGsjq3AtFoqci9zrm3w6VLPDMMV7Vb64vP
-         UMGlSUPyrUbR4u9sP8ACBtDWuXkXfsTFw6d0mDUlBriHzofg2kavMpOZ6uoaTGC6IWL6
-         oGKgnEnDkN2exCw0pg62783wiBiyBrLg3KzFk4hcvJgDwQYKGDdnmYjlDYR5NRwmPKZ1
-         yy/zvylRGJLWS62MFYpS11El8qL+yxMeJ7QesM4gEixhPFwPBHVW8dQg1cnspWwuYUh8
-         DuQg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGoMh8hVWWGLRmpJpns/TVkGN46jxCnwUxjw9/g/uW4rTtXVO4xL0wvm7aPh6JtcBnGBA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxa51QandtqThdgVHekCgFyEkkWgPmMFY8yTNpytKqyqGDP//J4
-	Kp+fDHjAJL3of46X03m+ei7BGxGzrRxSzpbnjpRpyVVxoS8iT+b6FxVe33LK135Q1HKez7Esi75
-	RfAwFaSqW/J1Po3OvJXahWZfrpEIcez4WYDzbZ+NpBkJndLlKxA==
-X-Gm-Gg: ASbGnctkgDPo/SfLsWjtkinuHHC8mOiYHeBUBKjfk94kHXs5anUbTroD5+P1baTa4XZ
-	gFLG9TtFCpSaa76vGqpWfhkhk1LGm/B9zTKo/YvsIzwV87b/Yo0toMOvn7zLVn9p9uybE2zdVQv
-	+aox0TrbPXUp0dZz6Ya6khv2UIo6FmURKLv4VooSnAgNUfb3EwBwFEDSjeSaojHH8PrkUL/NWNF
-	ZmmSFTiu8smb6UTiYD1DCAWE/+NKTjhEvdlP6WY8c0A+v82a1jGMhZhfdGDiFNV1SSDXvImANSz
-	3d8Bsuq/0uOyv4JOspr30YvwaxpwjYR4oXwdBlLHvY8e326tkkTFdQ==
-X-Received: by 2002:a5d:5984:0:b0:38f:2350:7f70 with SMTP id ffacd0b85a97d-38f235080e6mr2406581f8f.24.1739438733950;
-        Thu, 13 Feb 2025 01:25:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEoCVYCjHVfohwpNNaQmSzmtARyIP61OU3BHF6Vls4lswHDEoUel/X9vFTBA8VTVIJQ/jGE9g==
-X-Received: by 2002:a5d:5984:0:b0:38f:2350:7f70 with SMTP id ffacd0b85a97d-38f235080e6mr2406531f8f.24.1739438733293;
-        Thu, 13 Feb 2025 01:25:33 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259f8273sm1280846f8f.89.2025.02.13.01.25.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2025 01:25:32 -0800 (PST)
-Date: Thu, 13 Feb 2025 10:25:26 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Junnan Wu <junnan01.wu@samsung.com>
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com, 
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org, 
-	lei19.wang@samsung.com, linux-kernel@vger.kernel.org, mst@redhat.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com, 
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com, ying01.gao@samsung.com, 
-	ying123.xu@samsung.com
-Subject: Re: [Patch net 1/2] vsock/virtio: initialize rx_buf_nr and
- rx_buf_max_nr when resuming
-Message-ID: <4n2lobgp2wb7v5vywbkuxwyd5cxldd2g4lxb6ox3qomphra2gd@zhrnboczbrbw>
-References: <gr5rqfwb4qgc23dadpfwe74jvsq37udpeqwhpokhnvvin6biv2@6v5npbxf6kbn>
- <CGME20250213012722epcas5p23e1c903b7ef0711441514c5efb635ee8@epcas5p2.samsung.com>
- <20250213012805.2379064-1-junnan01.wu@samsung.com>
+        d=1e100.net; s=20230601; t=1739438870; x=1740043670;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wcHe2v5RBjHO1RGHPKVLgRXdPDvIbQQeWhPDM1NHGCY=;
+        b=DDrpi31h6OzoL3aqNR51UyrJsowNxilFoRWwJenrf3e2DffFGiQPU57OmH9fFOYcSq
+         Gi2mMkQZBWirf4x8/2ci+31kFWCzwZ+UIvrdvM/1dW4jfJ6Hsfszh+UUo0cp9h4KfKBv
+         86P+JmUl3JkE+lRiXoF0izXj2iM75sM1U54UZhTdXFbN7QdvhNJaKB8pEeU96GCAAyhr
+         Wvc91KxFtSpwgHrnhNiSxvUY5uPUAC/wv6hHIiG6/1nUf5rd4COO84gCUtkk8jjlJoVw
+         clRJZ7UOQQTWDGAC1LVNJCKnZngYBEvsCsuiiVa+MschiEam7kaXw+VUHNWiCWNnXG4O
+         NafA==
+X-Gm-Message-State: AOJu0YyyM+4+D/bT8U9aEP7IM3SxrL2s0TfEekZDGNE3qzZtcP+NehVp
+	C4uZcic7qSYf3wbYnR8yS5qTaeiryVwglqkKw87jiqPUHgkVwwaD3dNDDOAt0cbG2pE6EKW+qC3
+	9i/g=
+X-Gm-Gg: ASbGncu6aHibY0Erb+/7ZzGL16nUOn97NZNeNfGJVg8OAA/dGkigtB3A+SICT/tRzJj
+	B3rl68Wl5kxk8MwnBOWr6yQ6cHdUw0k9JdnGuO59VZKaZdaiEBxk6wOiqfHDF84KeA4C0TLAQgf
+	EL5ZJ581pHgisDcpCpkGAUifSd8J3P4p4AjWhTSkw3ZrjeCiZyy9WoThUc7vHv+z8XvqlG8WTVU
+	oSUa/qqeSAdu6QOJCR6SBF9ny++cbb38YMkEoFYJJIiFnqEfSPNhDezmxou1EAiPTdi68LC86aV
+	e3GM+BnL7bi4ufLkD6adEvErayoj1IPzsgP1ZGDleA1IGXcS5wzZ65Aeb9bW
+X-Google-Smtp-Source: AGHT+IFoQPi8t0QaUpfHqRrPxloz1om6pfys9t6TUzOjBBH+lJDbtelBPqm37m0BVkqN4h3zzxqWTg==
+X-Received: by 2002:a17:902:e850:b0:220:c2a8:6fbc with SMTP id d9443c01a7336-220c2a87656mr84626305ad.34.1739438870481;
+        Thu, 13 Feb 2025 01:27:50 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d556d6a1sm8268575ad.179.2025.02.13.01.27.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Feb 2025 01:27:49 -0800 (PST)
+Message-ID: <9668a9a9-217d-4977-b824-7ba8489caf60@rivosinc.com>
+Date: Thu, 13 Feb 2025 10:27:41 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250213012805.2379064-1-junnan01.wu@samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v4 5/5] riscv: sbi: Add SSE extension tests
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ Andrew Jones <ajones@ventanamicro.com>, Anup Patel
+ <apatel@ventanamicro.com>, Atish Patra <atishp@rivosinc.com>
+References: <20241125162200.1630845-1-cleger@rivosinc.com>
+ <20241125162200.1630845-6-cleger@rivosinc.com>
+ <20250114-bfcab3a5629c66ef1215060a@orel>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20250114-bfcab3a5629c66ef1215060a@orel>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 13, 2025 at 09:28:05AM +0800, Junnan Wu wrote:
->>You need to update the title now that you're moving also queued_replies.
+
+
+On 14/01/2025 12:59, Andrew Jones wrote:
+> 
+> Continuing review...
+> 
+> On Mon, Nov 25, 2024 at 05:21:54PM +0100, Clément Léger wrote:
+> ...
+>> +static void sse_test_inject_global(unsigned long event_id)
+>> +{
+>> +	unsigned long ret;
+>> +	unsigned int cpu;
+>> +	struct sse_handler_arg args;
+>> +	volatile struct sse_foreign_cpu_test_arg test_arg = {.event_id = event_id};
+>> +	enum sbi_sse_state state;
+>> +
+>> +	args.handler = sse_foreign_cpu_handler;
+>> +	args.handler_data = (void *)&test_arg;
+>> +	args.stack = sse_alloc_stack();
+>> +
+>> +	report_prefix_push("global_dispatch");
+>> +
+>> +	ret = sse_event_register(event_id, &args);
+>> +	if (ret)
+> 
+> print/report something here?>
+>> +		goto done;
+>> +
+>> +	for_each_online_cpu(cpu) {
+>> +		test_arg.expected_cpu = cpu;
+>> +		/* For test_arg content to be visible for other CPUs */
+>> +		smp_wmb();
+>> +		ret = sse_event_set_attr(event_id, SBI_SSE_ATTR_PREFERRED_HART, cpu);
+>> +		if (ret) {
+>> +			report_fail("Failed to set preferred hart");
+>> +			goto done;
+>> +		}
+>> +
+>> +		ret = sse_event_enable(event_id);
+>> +		if (ret) {
+>> +			report_fail("Failed to enable SSE event");
+>> +			goto done;
+>> +		}
+>> +
+>> +		ret = sse_event_inject(event_id, cpu);
+>> +		if (ret) {
+>> +			report_fail("Failed to inject event");
+>> +			goto done;
+>> +		}
+>> +
+>> +		while (!test_arg.done) {
+>> +			/* For shared test_arg structure */
+>> +			smp_rmb();
+>> +		}
+>> +
+>> +		test_arg.done = false;
+>> +
+>> +		/* Wait for event to be in ENABLED state */
+>> +		do {
+>> +			ret = sse_get_state(event_id, &state);
+>> +			if (ret) {
+>> +				report_fail("Failed to get event state");
+>> +				goto done;
+>> +			}
+>> +		} while (state != SBI_SSE_STATE_ENABLED);
+>> +
+>> +		ret = sse_event_disable(event_id);
+>> +		if (ret) {
+>> +			report_fail("Failed to disable SSE event");
+>> +			goto done;
+>> +		}
+>> +
+>> +		report_pass("Global event on CPU %d", cpu);
+>> +	}
+> 
+> Breaking this into two parts
+> 
+>  for_each_online_cpu() {
+>     ... inject event ...
+>  }
+>  ... wait a bit ...
+>  for_each_online_cpu() {
+>     ... check results ...
+>  }
+
+Hey Andrew,
+
+That not possible since these are global event so they can only be
+injected on one CPU at a time. I did this modification for local event
+as you suggested though.
+
+> 
+> would allow testing that the SBI implementation can handle
+> simultaneous requests.
+> 
+>> +
+>> +done:
+>> +	ret = sse_event_unregister(event_id);
+>> +	if (ret)
+>> +		report_fail("Failed to unregister event");
+> 
+> If we came here from the 'goto done' for sse_event_register(), then I'd
+> expect unregister to fail since we failed to register.
+
+Indeed, I'll fix the error sequence
+
+> 
+>> +
+>> +	sse_free_stack(args.stack);
+>> +	report_prefix_pop();
+>> +}
+>> +
+>> +struct priority_test_arg {
+>> +	unsigned long evt;
+>> +	bool called;
+>> +	u32 prio;
+>> +	struct priority_test_arg *next_evt_arg;
+>> +	void (*check_func)(struct priority_test_arg *arg);
+>> +};
+>> +
+>> +static void sse_hi_priority_test_handler(void *arg, struct pt_regs *regs,
+>> +					 unsigned int hartid)
+>> +{
+>> +	struct priority_test_arg *targ = arg;
+>> +	struct priority_test_arg *next = targ->next_evt_arg;
+>> +
+>> +	targ->called = 1;
+> 
+> nit: = true
+> 
+>> +	if (next) {
+>> +		sse_event_inject(next->evt, current_thread_info()->hartid);
+>> +		if (sse_event_pending(next->evt))
+>> +			report_fail("Higher priority event is pending");
+>> +		if (!next->called)
+>> +			report_fail("Higher priority event was not handled");
+> 
+> Should change these if-report-fails to report()'s
+> 
+>> +	}
+>> +}
+>> +
+>> +static void sse_low_priority_test_handler(void *arg, struct pt_regs *regs,
+>> +					  unsigned int hartid)
+>> +{
+>> +	struct priority_test_arg *targ = arg;
+>> +	struct priority_test_arg *next = targ->next_evt_arg;
+>> +
+>> +	targ->called = 1;
+>   
+> nit: = true
+> 
+>> +
+>> +	if (next) {
+>> +		sse_event_inject(next->evt, current_thread_info()->hartid);
+>> +
+>> +		if (!sse_event_pending(next->evt))
+>> +			report_fail("Lower priority event is pending");
+>> +
+>> +		if (next->called)
+>> +			report_fail("Lower priority event %s was handle before %s",
+>> +			      sse_evt_name(next->evt), sse_evt_name(targ->evt));
+> 
+> Should change these if-report-fails to report()'s
+> 
+>> +	}
+>> +}
+>> +
+>> +static void sse_test_injection_priority_arg(struct priority_test_arg *in_args,
+>> +					    unsigned int in_args_size,
+>> +					    sse_handler_fn handler,
+>> +					    const char *test_name)
+>> +{
+>> +	unsigned int i;
+>> +	int ret;
+>> +	unsigned long event_id;
+>> +	struct priority_test_arg *arg;
+>> +	unsigned int args_size = 0;
+>> +	struct sse_handler_arg event_args[in_args_size];
+>> +	struct priority_test_arg *args[in_args_size];
+>> +	void *stack;
+>> +	struct sse_handler_arg *event_arg;
+>> +
+>> +	report_prefix_push(test_name);
+>> +
+>> +	for (i = 0; i < in_args_size; i++) {
+>> +		arg = &in_args[i];
+>> +		event_id = arg->evt;
+>> +		if (!sse_evt_can_inject(event_id))
+>> +			continue;
+>> +
+>> +		args[args_size] = arg;
+>> +		args_size++;
+>> +	}
+>> +
+>> +	if (!args_size) {
+>> +		report_skip("No event injectable");
+>> +		report_prefix_pop();
+>> +		goto skip;
+>> +	}
+>> +
+>> +	for (i = 0; i < args_size; i++) {
+>> +		arg = args[i];
+>> +		event_id = arg->evt;
+>> +		stack = sse_alloc_stack();
+>> +
+>> +		event_arg = &event_args[i];
+>> +		event_arg->handler = handler;
+>> +		event_arg->handler_data = (void *)arg;
+>> +		event_arg->stack = stack;
+>> +
+>> +		if (i < (args_size - 1))
+>> +			arg->next_evt_arg = args[i + 1];
+>> +		else
+>> +			arg->next_evt_arg = NULL;
+>> +
+>> +		/* Be sure global events are targeting the current hart */
+>> +		sse_global_event_set_current_hart(event_id);
+>> +
+>> +		sse_event_register(event_id, event_arg);
+>> +		sse_event_set_attr(event_id, SBI_SSE_ATTR_PRIORITY, arg->prio);
+>> +		sse_event_enable(event_id);
+>> +	}
+>> +
+>> +	/* Inject first event */
+>> +	ret = sse_event_inject(args[0]->evt, current_thread_info()->hartid);
+>> +	report(ret == SBI_SUCCESS, "SSE injection no error");
+>> +
+>> +	for (i = 0; i < args_size; i++) {
+>> +		arg = args[i];
+>> +		event_id = arg->evt;
+>> +
+>> +		if (!arg->called)
+>> +			report_fail("Event %s handler called", sse_evt_name(arg->evt));
+> 
+> report()
+> 
+>> +
+>> +		sse_event_disable(event_id);
+>> +		sse_event_unregister(event_id);
+>> +
+>> +		event_arg = &event_args[i];
+>> +		sse_free_stack(event_arg->stack);
+>> +	}
+>> +
+>> +skip:
+>> +	report_prefix_pop();
+>> +}
+>> +
+>> +static struct priority_test_arg hi_prio_args[] = {
+>> +	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_PMU},
+>> +	{.evt = SBI_SSE_EVENT_GLOBAL_RAS},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_RAS},
+>> +};
+>> +
+>> +static struct priority_test_arg low_prio_args[] = {
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_RAS},
+>> +	{.evt = SBI_SSE_EVENT_GLOBAL_RAS},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_PMU},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE},
+>> +	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE},
+>> +};
+>> +
+>> +static struct priority_test_arg prio_args[] = {
+>> +	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE, .prio = 5},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE, .prio = 10},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_PMU, .prio = 15},
+>> +	{.evt = SBI_SSE_EVENT_GLOBAL_RAS, .prio = 20},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_RAS, .prio = 25},
+>> +};
+>> +
+>> +static struct priority_test_arg same_prio_args[] = {
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_PMU, .prio = 0},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_RAS, .prio = 10},
+>> +	{.evt = SBI_SSE_EVENT_LOCAL_SOFTWARE, .prio = 10},
+>> +	{.evt = SBI_SSE_EVENT_GLOBAL_SOFTWARE, .prio = 10},
+>> +	{.evt = SBI_SSE_EVENT_GLOBAL_RAS, .prio = 20},
+>> +};
+>> +
+>> +static void sse_test_injection_priority(void)
+>> +{
+>> +	report_prefix_push("prio");
+>> +
+>> +	sse_test_injection_priority_arg(hi_prio_args, ARRAY_SIZE(hi_prio_args),
+>> +					sse_hi_priority_test_handler, "high");
+>> +
+>> +	sse_test_injection_priority_arg(low_prio_args, ARRAY_SIZE(low_prio_args),
+>> +					sse_low_priority_test_handler, "low");
+>> +
+>> +	sse_test_injection_priority_arg(prio_args, ARRAY_SIZE(prio_args),
+>> +					sse_low_priority_test_handler, "changed");
+>> +
+>> +	sse_test_injection_priority_arg(same_prio_args, ARRAY_SIZE(same_prio_args),
+>> +					sse_low_priority_test_handler, "same_prio_args");
+>> +
+>> +	report_prefix_pop();
+>> +}
+>> +
+>> +static bool sse_can_inject(unsigned long event_id)
+>> +{
+>> +	int ret;
+>> +	unsigned long status;
+>> +
+>> +	ret = sse_event_get_attr(event_id, SBI_SSE_ATTR_STATUS, &status);
+>> +	report(ret == 0, "SSE get attr status no error");
+> 
+> I'm not sure we need this report()
+> 
+>> +	if (ret)
+>> +		return 0;
+> 
+> nit: return false
+> 
+>> +
+>> +	return !!(status & BIT(SBI_SSE_ATTR_STATUS_INJECT_OFFSET));
+>> +}
+>> +
+>> +static void boot_secondary(void *data)
+>> +{
+>> +	sse_hart_unmask();
+>> +}
+>> +
+>> +static void sse_check_mask(void)
+>> +{
+>> +	int ret;
+>> +
+>> +	/* Upon boot, event are masked, check that */
+>> +	ret = sse_hart_mask();
+>> +	report(ret == SBI_ERR_ALREADY_STARTED, "SSE hart mask at boot time ok");
+> 
+> The spec says that trying to mask twice should return
+> SBI_ERR_ALREADY_STOPPED. If this test is passing then we probably have it
+> backwards in opensbi too.
+
+I shouldn't have looked at OpenSBI code to implement that test /o\.
+Thanks for catching it.
+
+> 
+>> +
+>> +	ret = sse_hart_unmask();
+>> +	report(ret == SBI_SUCCESS, "SSE hart no error ok");
+>> +	ret = sse_hart_unmask();
+>> +	report(ret == SBI_ERR_ALREADY_STOPPED, "SSE hart unmask twice error ok");
+> 
+> Should be SBI_ERR_ALREADY_STARTED
+> 
+>> +
+>> +	ret = sse_hart_mask();
+>> +	report(ret == SBI_SUCCESS, "SSE hart mask no error");
+>> +	ret = sse_hart_mask();
+>> +	report(ret == SBI_ERR_ALREADY_STARTED, "SSE hart mask twice ok");
+> 
+> SBI_ERR_ALREADY_STOPPED
+> 
+>> +}
+>> +
+>> +void check_sse(void)
+>> +{
+>> +	unsigned long i, event;
+>> +
+>> +	report_prefix_push("sse");
+>> +	sse_check_mask();
+> 
+> I guess the mask check should come after the sbi_probe()
+
+Indeed.
+
+> 
+>> +
+>> +	/*
+>> +	 * Dummy wakeup of all processors since some of them will be targeted
+>> +	 * by global events without going through the wakeup call as well as
+>> +	 * unmasking all 
+>> +	 */
+>> +	on_cpus(boot_secondary, NULL);
+>> +
+>> +	if (!sbi_probe(SBI_EXT_SSE)) {
+>> +		report_skip("SSE extension not available");
+>> +		report_prefix_pop();
+>> +		return;
+>> +	}
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(sse_event_infos); i++) {
+>> +		event = sse_event_infos[i].event_id;
+>> +		report_prefix_push(sse_event_infos[i].name);
+>> +		if (!sse_can_inject(event)) {
+>> +			report_skip("Event does not support injection");
+> 
+> Let's output the event ID too.
+
+Sure.
+
+> 
+>> +			report_prefix_pop();
+>> +			continue;
+>> +		} else {
+>> +			sse_event_infos[i].can_inject = true;
+>> +		}
+>> +		sse_test_attr(event);
+>> +		sse_test_register_error(event);
+>> +		sse_test_inject_simple(event);
+>> +		if (sse_event_is_global(event))
+>> +			sse_test_inject_global(event);
+>> +		else
+>> +			sse_test_inject_local(event);
+>> +
+>> +		report_prefix_pop();
+>> +	}
+>> +
+>> +	sse_test_injection_priority();
+>> +
+>> +	report_prefix_pop();
+>> +}
+>> diff --git a/riscv/sbi.c b/riscv/sbi.c
+>> index 6f4ddaf1..33d5e40d 100644
+>> --- a/riscv/sbi.c
+>> +++ b/riscv/sbi.c
+>> @@ -32,6 +32,8 @@
+>>  
+>>  #define	HIGH_ADDR_BOUNDARY	((phys_addr_t)1 << 32)
+>>  
+>> +void check_sse(void);
+>> +
+>>  static long __labs(long a)
+>>  {
+>>  	return __builtin_labs(a);
+>> @@ -1451,6 +1453,7 @@ int main(int argc, char **argv)
+>>  	check_hsm();
+>>  	check_dbcn();
+>>  	check_susp();
+>> +	check_sse();
+>>  
+>>  	return report_summary();
+>>  }
+>> -- 
+>> 2.45.2
 >>
->
->Well, I will update the title in V3 version.
->
->>On Tue, Feb 11, 2025 at 03:19:21PM +0800, Junnan Wu wrote:
->>>When executing suspend to ram twice in a row,
->>>the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
->>>Then after virtqueue_get_buf and `rx_buf_nr` decreased
->>>in function virtio_transport_rx_work,
->>>the condition to fill rx buffer
->>>(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
->>>
->>>It is because that `rx_buf_nr` and `rx_buf_max_nr`
->>>are initialized only in virtio_vsock_probe(),
->>>but they should be reset whenever virtqueues are recreated,
->>>like after a suspend/resume.
->>>
->>>Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
->>>virtio_vsock_vqs_init(), so we are sure that they are properly
->>>initialized, every time we initialize the virtqueues, either when we
->>>load the driver or after a suspend/resume.
->>>At the same time, also move `queued_replies`.
->>
->>Why?
->>
->>As I mentioned the commit description should explain why the changes are
->>being made for both reviewers and future references to this patch.
->>
->
->After your kindly remind, I have double checked all locations where `queued_replies`
->used, and we think for order to prevent erroneous atomic load operations
->on the `queued_replies` in the virtio_transport_send_pkt_work() function
->which may disrupt the scheduling of vsock->rx_work
->when transmitting reply-required socket packets,
->this atomic variable must undergo synchronized initialization
->alongside the preceding two variables after a suspend/resume.
+> 
+> Thanks,
+> drew
 
-Yes, that was my concern!
+Thanks for the review.
 
->
->If we reach agreement on it, I will add this description in V3 version.
-
-Yes, please, I just wanted to point out that we need to add an 
-explanation in the commit description.
-
-And in the title, in this case though listing all the variables would 
-get too long, so you can do something like that:
-
-     vsock/virtio: fix variables initialization during resuming
-
-Thanks,
-Stefano
-
->
->BRs
->Junnan Wu
->
->>The rest LGTM.
->>
->>Stefano
->>
->>>
->>>Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
->>>Co-developed-by: Ying Gao <ying01.gao@samsung.com>
->>>Signed-off-by: Ying Gao <ying01.gao@samsung.com>
->>>Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
->>>---
->>> net/vmw_vsock/virtio_transport.c | 10 +++++++---
->>> 1 file changed, 7 insertions(+), 3 deletions(-)
->>>
->>>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->>>index b58c3818f284..f0e48e6911fc 100644
->>>--- a/net/vmw_vsock/virtio_transport.c
->>>+++ b/net/vmw_vsock/virtio_transport.c
->>>@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
->>> 	};
->>> 	int ret;
->>>
->>>+	mutex_lock(&vsock->rx_lock);
->>>+	vsock->rx_buf_nr = 0;
->>>+	vsock->rx_buf_max_nr = 0;
->>>+	mutex_unlock(&vsock->rx_lock);
->>>+
->>>+	atomic_set(&vsock->queued_replies, 0);
->>>+
->>> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
->>> 	if (ret < 0)
->>> 		return ret;
->>>@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->>>
->>> 	vsock->vdev = vdev;
->>>
->>>-	vsock->rx_buf_nr = 0;
->>>-	vsock->rx_buf_max_nr = 0;
->>>-	atomic_set(&vsock->queued_replies, 0);
->>>
->>> 	mutex_init(&vsock->tx_lock);
->>> 	mutex_init(&vsock->rx_lock);
->>>--
->>>2.34.1
->>>
->
+Clément
 
 
