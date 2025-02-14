@@ -1,187 +1,149 @@
-Return-Path: <kvm+bounces-38147-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38148-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBFE4A35BAB
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 11:42:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A026A35C3C
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 12:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C36A7A3497
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 10:41:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E4813ADC25
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 11:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5488F25A353;
-	Fri, 14 Feb 2025 10:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECEEC261567;
+	Fri, 14 Feb 2025 11:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="G1KZee8F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ufVLPVS0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135AF204F6E;
-	Fri, 14 Feb 2025 10:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E04186E40
+	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 11:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739529711; cv=none; b=VMFF605Vn6Nd1K5gxQSHxz57B2z4DpmWrQpJCAswuKZSX4UJkFBxtioynIkqPAFVLADRbHBwbXMvtAiSxsjx3MDbw/srUglV+/1HCzzbD+13RMGEr9lXvm4xvCjy0/OFf+p29yKMggizhjDgaaL8lm8z4MpORnG/F4OcMrrZwX4=
+	t=1739531631; cv=none; b=ZHjTc/NwaeZe3/boSf/Vq1H1JYHkRm6RB2UEhjAVLtAXF3C1cYUSMcTaOjF9Y4fi/Cfq8nrQ3Y+R1KhBbOl2ymmhmmwQf3nYFlg9AHNTzpc28gcFlkxUiz46drUQRHDXLOQaocpSzdFRWHJ+vDIvOA5QJBj69ORDsg55KIj3N4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739529711; c=relaxed/simple;
-	bh=85N7bsMhl4ABWehkT4S0a3mAdrj5ySPXPAXUQjZL3og=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KZdnSqqUwyPzsvoXcdYM2NmQvtl6IdeWW0ujroP9moZYnKLEfdk/0AU0/kyr5auIxiAWne4uSNks8bT+fPnz1Gn4yW1zmjv87WzOpm4ZRTxVeTK3EGERyhu63tJFUcLqgMp9QCcPFIz2S4y6GdUJ4q/09nHAZb0pzkQNouh2iV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=G1KZee8F; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51E17weD002612;
-	Fri, 14 Feb 2025 10:41:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=qMfIsw
-	6tkeGlBgLuUwVlP4AoSBWWmKomoDbzoQXfXto=; b=G1KZee8FSYe1JZyTOFntYy
-	i57nXq1/g7Jsm8GZ63Sqj9iOZ6mYuSNpuuCUjBdOD21HU1ZOecZcaZobWJDmDoxK
-	fI+OgLse7b7QNlYoGGbZpQglcj5OwIbBjIax3K7gnETui47GH1C0aEsvJzmgiQ3o
-	zUW+ZPyE996wOCPw8ra9OhDA1a3L5puuPyOtD3VTHPQCmH3G8LyQyrSKA237Uit8
-	XVt1+63sdpixK3tmj94whl4hy3rpOpT/Ils47moGmnV/wUtdGwurpy4HhEdXM7aU
-	lRnfsZjHfH9ExveerW7GDglohxj0rJL3N5CNyvmG5nmeJ2h1dyiSlWknxVexREgw
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44suwa273f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 10:41:46 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51E7Dwlw016679;
-	Fri, 14 Feb 2025 10:41:45 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pk3kk32s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 10:41:45 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51EAfffB51839348
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Feb 2025 10:41:41 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B3BAB2004B;
-	Fri, 14 Feb 2025 10:41:41 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1DDB320043;
-	Fri, 14 Feb 2025 10:41:41 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.26.252])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Fri, 14 Feb 2025 10:41:41 +0000 (GMT)
-Date: Fri, 14 Feb 2025 11:41:39 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
-        nsg@linux.ibm.com, schlameuss@linux.ibm.com, hca@linux.ibm.com
-Subject: Re: [PATCH v1 2/2] KVM: s390: pv: fix race when making a page
- secure
-Message-ID: <20250214114139.2121f9ea@p-imbrenda>
-In-Reply-To: <ad8ae139-546d-4ade-abb9-455b339a8a92@redhat.com>
-References: <20250213200755.196832-1-imbrenda@linux.ibm.com>
-	<20250213200755.196832-3-imbrenda@linux.ibm.com>
-	<6c741da9-a793-4a59-920f-8df77807bc4d@redhat.com>
-	<20250214111729.000d364e@p-imbrenda>
-	<ad8ae139-546d-4ade-abb9-455b339a8a92@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1739531631; c=relaxed/simple;
+	bh=rBR4qL1Ca7jnAhSSV6PIDts3fxRsSpa2e//l+WnX6cA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eI9ADhqstMbo/xb4GzLpuZwbz6civPYNG1nua/qYeumlEc2HmXQHxf1ltyCqd9j1WqpB5oCrfI2q+bPZYJQLlNyw0ZoQiOeTlJAkGt1/CJdE1sNmcOz9bBbnwKRhVWMwADE8nFHjCoI1qROJMjVOUeE9rOAwiglKkrvjLtFnBGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ufVLPVS0; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5debbced002so3719053a12.1
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 03:13:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739531628; x=1740136428; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HHuBlRfBTyi2tTfQoSCI1Ezf8XJ+sj6HiJ9YaJDrxFI=;
+        b=ufVLPVS0ek8d17b89NLQ0BHxL3S6soqIBvOAwD6STc0jKZbrlJoN4YU0VYEQjloVV0
+         TJVel6eNYljXbvumIs7EpZj5nghFt9AbSyCIvxFyjXri6ucPzMEegWBcJVpc5FONQGCv
+         cCU5R0w8HIdo6R8r5DgDEUh5VBy3FWr8Ai4lYC/GwoR/3z22rK/AyuZiZ+7TNMu1+NG+
+         LbCF7cm3YQURwQRevjx5ecqj4YYgzTL7LEvYmyOA7dlWIzsYOZvyupma2ChA9FMwNCCY
+         7tz9aJqtr5OsxcHAK6skkBg+UaRM7d9XwrBcq+c2yKR+nCCR4RiHfd9yCL+ZMHptPQoy
+         vJSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739531628; x=1740136428;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HHuBlRfBTyi2tTfQoSCI1Ezf8XJ+sj6HiJ9YaJDrxFI=;
+        b=Dvn1hJXvyeoutuYoeXqkM7mVXU2dG2OXkkMJxiKwYr+8d9yOCwwNfgukcpcUNkLrsw
+         4GDU3g9iHq3bJc41v/zmyYJgq1U6e20wDMw3/NT8nnVbtZwImwiczhfgfGSI+v+xtp20
+         FKk65TH2ZG2nYpOJgYeK8HmrCbtgtn+fi1yVoL5XWcB27gDfFJaXH4BXZj/8S3LHQpfj
+         oQyKYa5BVM4NNsll25yANZ90gW0LlHC0kYEoszcrok7SFJqAnHp+3qmQEypB8KS8hHHf
+         R10DltApv0sXkk52sSg6hL5BnBwlBtnxZ8OzYs6SMCBGOucnTwz/kYCBJMqHe37tphFI
+         b7Og==
+X-Forwarded-Encrypted: i=1; AJvYcCVFyCH8hOwppJnl6Q8u67Q0IIjA3HwcgxlnQwC+0McHNp0b11KGA7q76ZXertU9yCNO/ME=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeU2rOTkmzMhYudyxth09giN1Me1v4uTd20DxMuAkRVT8Mo7+m
+	LO62/p941ZzUlBpv9mjcqsz880Xcvxi8zHpilKamWqqWoy/4GCsly7skRxEFvg==
+X-Gm-Gg: ASbGnctrVqmg+bBRcekmhbKOlOpzfJeP605wZ3FvkLtqtvip+tOW42y8LIGpfTNZniS
+	LMyEc4DRlwWDSmuIrjXQrVjHDIsC4O32LK+bIF9n+EGMUqQGUSf4S6FscGwSXuSEPuN/77lpBir
+	vt3K3+E5I8IKblZHWff1fT+a4br1MZmcR6R1YLsd/VALjAiPYi7pXY6f3gKtTodhxGetrf+FoM3
+	RT7QLhqDhYmbCFktW8zk+qQHfBYk0ACh6vx7qxum28GDp8PrX/nvEn2pyBxM6vRk9rR2q7Azxl9
+	S1HpwExdvmf0QuOrf2vLWP7Wa1HDJnqbhSnF/g43OysloNrhuAAF
+X-Google-Smtp-Source: AGHT+IEmCSN39E0/jumPO+kRnNOBAw44OmowPjysP7dwud8ORl70XsWjK3FjsvNaHBVzgWAUCzcndA==
+X-Received: by 2002:a05:6402:3507:b0:5dc:742c:c8eb with SMTP id 4fb4d7f45d1cf-5decba85751mr6054334a12.12.1739531627569;
+        Fri, 14 Feb 2025 03:13:47 -0800 (PST)
+Received: from google.com (229.112.91.34.bc.googleusercontent.com. [34.91.112.229])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dece1d3738sm2872600a12.46.2025.02.14.03.13.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Feb 2025 03:13:46 -0800 (PST)
+Date: Fri, 14 Feb 2025 11:13:41 +0000
+From: Quentin Perret <qperret@google.com>
+To: Patrick Roy <roypat@amazon.co.uk>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+	xiaoyao.li@intel.com, yilun.xu@intel.com,
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com,
+	dmatlack@google.com, yu.c.zhang@linux.intel.com,
+	isaku.yamahata@intel.com, mic@digikod.net, vbabka@suse.cz,
+	vannapurve@google.com, ackerleytng@google.com,
+	mail@maciej.szmigiero.name, david@redhat.com, michael.roth@amd.com,
+	wei.w.wang@intel.com, liam.merwick@oracle.com,
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com,
+	suzuki.poulose@arm.com, steven.price@arm.com,
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+	quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+	quic_pheragu@quicinc.com, catalin.marinas@arm.com,
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev,
+	maz@kernel.org, will@kernel.org, keirf@google.com, shuah@kernel.org,
+	hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com,
+	jthoughton@google.com
+Subject: Re: [PATCH v3 09/11] KVM: arm64: Introduce
+ KVM_VM_TYPE_ARM_SW_PROTECTED machine type
+Message-ID: <Z68lZUeGWwIe-tEK@google.com>
+References: <20250211121128.703390-1-tabba@google.com>
+ <20250211121128.703390-10-tabba@google.com>
+ <Z6t227f31unTnQQt@google.com>
+ <CA+EHjTweTLDzhcCoEZYP4iyuti+8TU3HbtLHh+u5ark6WDjbsA@mail.gmail.com>
+ <Z6t6_M8un1Cf3nmk@google.com>
+ <d9645330-3a0d-4950-a50b-ce82b428e08c@amazon.co.uk>
+ <Z6uEQFDbMGboHYx7@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bSnEv-C0I7bxFynfMFhzaerljaBY1BpN
-X-Proofpoint-ORIG-GUID: bSnEv-C0I7bxFynfMFhzaerljaBY1BpN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-14_04,2025-02-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- malwarescore=0 clxscore=1015 phishscore=0 lowpriorityscore=0 bulkscore=0
- mlxlogscore=999 impostorscore=0 spamscore=0 suspectscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
- definitions=main-2502140076
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6uEQFDbMGboHYx7@google.com>
 
-On Fri, 14 Feb 2025 11:27:15 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Tuesday 11 Feb 2025 at 17:09:20 (+0000), Quentin Perret wrote:
+> Hi Patrick,
+> 
+> On Tuesday 11 Feb 2025 at 16:32:31 (+0000), Patrick Roy wrote:
+> > I was hoping that SW_PROTECTED_VM will be the VM type that something
+> > like Firecracker could use, e.g. an interface to guest_memfd specifically
+> > _without_ pKVM, as Fuad was saying.
+> 
+> I had, probably incorrectly, assumed that we'd eventually want to allow
+> gmem for all VMs, including traditional KVM VMs that don't have anything
+> special. Perhaps the gmem support could be exposed via a KVM_CAP in this
+> case?
+> 
+> Anyway, no objection to the proposed approach in this patch assuming we
+> will eventually have HW_PROTECTED_VM for pKVM VMs, and that _that_ can be
+> bit 31 :).
 
-> On 14.02.25 11:17, Claudio Imbrenda wrote:
-> > On Thu, 13 Feb 2025 21:16:03 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 13.02.25 21:07, Claudio Imbrenda wrote:  
-> >>> Holding the pte lock for the page that is being converted to secure is
-> >>> needed to avoid races. A previous commit removed the locking, which
-> >>> caused issues. Fix by locking the pte again.
-> >>>
-> >>> Fixes: 5cbe24350b7d ("KVM: s390: move pv gmap functions into kvm")  
-> >>
-> >> If you found this because of my report about the changed locking,
-> >> consider adding a Suggested-by / Reported-y.  
-> > 
-> > yes, sorry; I sent the patch in haste and forgot. Which one would you
-> > prefer (or both?)
-> >   
-> 
-> Maybe Reported-by.
-> 
-> > [...]
-> >   
-> >>> @@ -127,8 +128,11 @@ int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
-> >>>    
-> >>>    	page = gfn_to_page(kvm, gpa_to_gfn(gaddr));
-> >>>    	mmap_read_lock(gmap->mm);
-> >>> -	if (page)
-> >>> -		rc = __gmap_make_secure(gmap, page, uvcb);
-> >>> +	vmaddr = gfn_to_hva(gmap->private, gpa_to_gfn(gaddr));
-> >>> +	if (kvm_is_error_hva(vmaddr))
-> >>> +		rc = -ENXIO;
-> >>> +	if (!rc && page)
-> >>> +		rc = __gmap_make_secure(gmap, page, vmaddr, uvcb);
-> >>>    	kvm_release_page_clean(page);
-> >>>    	mmap_read_unlock(gmap->mm);
-> >>>        
-> >>
-> >> You effectively make the code more complicated and inefficient than
-> >> before. Now you effectively walk the page table twice in the common
-> >> small-folio case ...  
-> > 
-> > I think in every case, but see below
-> >   
-> >>
-> >> Can we just go back to the old handling that we had before here?
-> >>  
-> > 
-> > I'd rather not, this is needed to prepare for the next series (for
-> > 6.15) in a couple of weeks, where gmap gets completely removed from
-> > s390/mm, and gmap dat tables will not share ptes with userspace anymore
-> > (i.e. we will use mmu_notifiers, like all other archs)  
-> 
-> I think for the conversion we would still:
-> 
-> GFN -> HVA
-> 
-> Walk to the folio mapped at HVA, lock the PTE and perform the conversion.
-> 
-> So even with memory notifiers, that should be fine, no?
+Thinking about this a bit deeper, I am still wondering what this new
+SW_PROTECTED VM type is buying us? Given that SW_PROTECTED VMs accept
+both guest-memfd backed memslots and traditional HVA-backed memslots, we
+could just make normal KVM guests accept guest-memfd memslots and get
+the same thing? Is there any reason not to do that instead? Even though
+SW_PROTECTED VMs are documented as 'unstable', the reality is this is
+UAPI and you can bet it will end up being relied upon, so I would prefer
+to have a solid reason for introducing this new VM type.
 
-yes
-
-> 
-> So not necessarily "the old handling that we had before" but rather "the 
-> old way of looking up what's mapped and performing the conversion under 
-> the PTL".
-
-ahhh, yes
-
-> 
-> For me to fix the refcount freezing properly on top of your work, we'll 
-> need the PTL (esp. to exclude concurrent GUP-slow) etc.
-
-let's discuss this off-list
-
+Cheers,
+Quentin
 
