@@ -1,142 +1,144 @@
-Return-Path: <kvm+bounces-38171-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38172-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FDC7A35F5D
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 14:40:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A28A35F7F
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 14:54:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 719BB1692E5
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 13:35:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E799B188D80D
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 13:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0D6264FA7;
-	Fri, 14 Feb 2025 13:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54F1264A91;
+	Fri, 14 Feb 2025 13:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K6pPOnDh"
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="L6/L9wip";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="L6/L9wip"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [104.223.66.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF22B227BB9
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 13:34:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352822641FA
+	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 13:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=104.223.66.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739540092; cv=none; b=hVVCnuZh5Puay7aWLSwJtLb+VCw9yt1EguKNnda0mua/X6d7aTUqR9guQ0ZXQJEysuKfEGp358GDTuq27pI+eTSZxD/zV4RMFQKr94tPkBJsMdDpWCRJwyCFi9QT8Dg5fK0eRNvhCRlmUDF9X3Nr9lVRvdTArLSeVkydHY/ZlHo=
+	t=1739541282; cv=none; b=cFroRNQMIDRF7NBLrO8miQu5/D+YxyDTH6RAtyigb9aFCZybfl8FyGtOLJ4hK/0RIBvq5uQduhqGJqcKnYQBznuLCR3qCgr6zKXWabWT08GiRSMN/nSvDD51fyWvj0A3am5TRaRX2073xZYmyhIFEFZa5fH/B1KOi3xrewSvqzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739540092; c=relaxed/simple;
-	bh=1rIrvF0Jv/axJissqScQNVkSpcTz+uHX2dYGRedQ3fQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GGFIMVsByOKeFcJQh6qhfAttm8WBwmd+MupQAhAVuXRNkgXxck5Pb6ntvz01+L/1IcaJ+6crPliyTrKrsPyQlwvU4x7r7ovzs0wrmFcuk6kMiG/Hr0fpiWO5I29TeDamUwiqpmZuSMf0NzkpoI9oDbPxWBe+Vk6F1fPhx8tskSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K6pPOnDh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739540089;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1rIrvF0Jv/axJissqScQNVkSpcTz+uHX2dYGRedQ3fQ=;
-	b=K6pPOnDhV74gGzuTWg15x69yg2zSywkhIEN6WRy+QkLDIxrlqohijfLa12IuWmI0fW6pPp
-	9Pp6lSmoURoTTI6sVEgJ1gxSryefOXXsVZ77sMEQhnnFOPqo1yIxO0ueoR7NuynWyqm2H9
-	lgzjOoQoXQLZQEiPsB8pGGnZRoHKYmo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-267-1aOaBuu4O4yI72CZn4BGkg-1; Fri, 14 Feb 2025 08:34:48 -0500
-X-MC-Unique: 1aOaBuu4O4yI72CZn4BGkg-1
-X-Mimecast-MFC-AGG-ID: 1aOaBuu4O4yI72CZn4BGkg_1739540087
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38f2f78aee1so359980f8f.0
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 05:34:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739540087; x=1740144887;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1rIrvF0Jv/axJissqScQNVkSpcTz+uHX2dYGRedQ3fQ=;
-        b=D1brYNIsEqR8HgkvPXmeNatm3byX9MFwK+hZL1md69n/Ded8oaFMcAQsT2W7WugU7z
-         Wfys4ro6kwlgJAXmD4a1MqvvzVOPRiHYg1N4IgTlscqzFgMaM6YsdgFx9akjzA0vThEy
-         K9dqQDzJVSeqad7B7S+MdEkNDmIeHqaUxXAhCT1o8qdeq6jpcD4EBTpl8bz+47dNyAjT
-         6GI4Q7n7HtRypFcOaJNLwbSBORFkXyYWlgRgMZeo2DzbXT1ztnoLevJvYMLmEqD2G9zd
-         BVDhZgJ9T7Zqj+/cyrfYSFWwAiGUK1Z9KseQRx7yonTEfsNidOQGl+WqGux24fosbB8k
-         Rzqg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGwXQRsUscZxXwXqJmefZ7k3/SGWijBhvM4P2RchF9t2LwaWN7HsfkPMaGy3Z2HqO/AMU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3GgWyF9ts3D7C98FcBRUpTcr5poOEIBz637XuXonyJ6TzOD1z
-	8YlIXcaQTaUq7aFE0nkBsZisq2D8zPF1M6qDYb8GlgJIvNzMYa0hGshkJWRQeJeckith/jMaOK2
-	Tx4Np+mRopwbr4+OLU18FpKpCE7rvBYBKjCX48Xri0R3Sp4aVtA==
-X-Gm-Gg: ASbGncvJ5bt/VZO5MIp8Pe5JEORQIUuzOft60EV0qRLxnCWaA7N/JjlbiCbWtNBZKdg
-	KyBajhBXJmAvHvTUlhIE98WfbYpg/Xhqf9XN9NTqKE9SMpFjvUwyD6ztgN1NcXd0HU8wfPaS39z
-	if1rX1deqqD1hAWWtZ4a1KwWURI99hqkIVg2MvSADNxeHO4kCZOjp++4rZul8/uyoPU+7QQVwdU
-	nVbHt5Xky/FkxU0XLeBgGKSevjq6kYZIJ7+qFvI63BpeOqvdlGt9JYVwQmxbv/Wg9QZaZ/whB3R
-	8Qt0Sl0DUpQomRH0ED4cqcgJd3yoauij7QcTXoB+9y9RCaekA8Uisw==
-X-Received: by 2002:a5d:4ad2:0:b0:38d:e3da:8b4f with SMTP id ffacd0b85a97d-38f24e1bfd4mr7382223f8f.0.1739540087271;
-        Fri, 14 Feb 2025 05:34:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHBDfyv1SdJm7R5cH01+wLfhjW4AOVc7JnS47asJmAAjRGNm0ow+MsDNI0LRQYW/dCz7cuhNA==
-X-Received: by 2002:a5d:4ad2:0:b0:38d:e3da:8b4f with SMTP id ffacd0b85a97d-38f24e1bfd4mr7382167f8f.0.1739540086611;
-        Fri, 14 Feb 2025 05:34:46 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258b43d4sm4600179f8f.4.2025.02.14.05.34.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 05:34:46 -0800 (PST)
-Date: Fri, 14 Feb 2025 14:34:40 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Junnan Wu <junnan01.wu@samsung.com>
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com, 
-	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org, 
-	lei19.wang@samsung.com, linux-kernel@vger.kernel.org, mst@redhat.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com, 
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com, ying01.gao@samsung.com, 
-	ying123.xu@samsung.com
-Subject: Re: [Patch net v3] vsock/virtio: fix variables initialization during
- resuming
-Message-ID: <7zof7x3scn2jlszxwynyaw3i5lcwfo5j3yrgw2sraq6pw545h5@zwoqaewlq2m4>
-References: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
- <CGME20250214012219epcas5p2840feb4b4539929f37c171375e2f646b@epcas5p2.samsung.com>
- <20250214012200.1883896-1-junnan01.wu@samsung.com>
+	s=arc-20240116; t=1739541282; c=relaxed/simple;
+	bh=9GEtvxm6k9W+hbIndFA8tWfpv5TR8uTWSseHKuwNEec=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ceKhOjNt2dvB/Z8K7XA5PSPfO/EfMBwL43jke55QbpwQ1sCJDZv+DqD8fnJ9Gx3ajNrTMHGCp5O8D5WjBrck31PiNwBCxSXxh9K9/77zMFZNZOcUfdxjkd6iM+fCDvbwthZxFY5iwvKLzYzC1Q8jpIwWPqDeE6iKBNXROEE2G3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=L6/L9wip; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=L6/L9wip; arc=none smtp.client-ip=104.223.66.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1739541278;
+	bh=9GEtvxm6k9W+hbIndFA8tWfpv5TR8uTWSseHKuwNEec=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=L6/L9wipsTUP7c7heUeFshYGWrCaQD6dohn/qbHxPasMbS3bA91XeGhTl0cUDHXgI
+	 SNx/Bv3K5ctJrK9LbhyKAbrhVbEtGrqHuqDDV9uo1m+ZVKHIuJ7gwA7k4/+O9lTOK7
+	 OeqLg9soNMCmd40PIL5oT+8RMu6fZAblN8jtf/NM=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id E9A951280BCA;
+	Fri, 14 Feb 2025 08:54:38 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id 0TrHb8hFefNW; Fri, 14 Feb 2025 08:54:38 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1739541278;
+	bh=9GEtvxm6k9W+hbIndFA8tWfpv5TR8uTWSseHKuwNEec=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=L6/L9wipsTUP7c7heUeFshYGWrCaQD6dohn/qbHxPasMbS3bA91XeGhTl0cUDHXgI
+	 SNx/Bv3K5ctJrK9LbhyKAbrhVbEtGrqHuqDDV9uo1m+ZVKHIuJ7gwA7k4/+O9lTOK7
+	 OeqLg9soNMCmd40PIL5oT+8RMu6fZAblN8jtf/NM=
+Received: from lingrow.int.hansenpartnership.com (c-67-166-174-65.hsd1.va.comcast.net [67.166.174.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 45DBE1280B19;
+	Fri, 14 Feb 2025 08:54:38 -0500 (EST)
+Message-ID: <16ecae506c9a207cc714929a62a38d6fbe67df0f.camel@HansenPartnership.com>
+Subject: Re: Collecting Open Questions from the Linux Kernel SIG Call
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Steve Rutherford <srutherford@google.com>, linux-coco@lists.linux.dev
+Cc: kvm@vger.kernel.org
+Date: Fri, 14 Feb 2025 08:54:36 -0500
+In-Reply-To: <CABayD+f-1kTZZaKx7Okbi_eoua8uv8qa4_-XMa28CigJ58dZrw@mail.gmail.com>
+References: 
+	<CABayD+f-1kTZZaKx7Okbi_eoua8uv8qa4_-XMa28CigJ58dZrw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250214012200.1883896-1-junnan01.wu@samsung.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 14, 2025 at 09:22:00AM +0800, Junnan Wu wrote:
->When executing suspend to ram twice in a row,
->the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
->Then after virtqueue_get_buf and `rx_buf_nr` decreased
->in function virtio_transport_rx_work,
->the condition to fill rx buffer
->(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
->
->It is because that `rx_buf_nr` and `rx_buf_max_nr`
->are initialized only in virtio_vsock_probe(),
->but they should be reset whenever virtqueues are recreated,
->like after a suspend/resume.
->
->Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
->virtio_vsock_vqs_init(), so we are sure that they are properly
->initialized, every time we initialize the virtqueues, either when we
->load the driver or after a suspend/resume.
->
->To prevent erroneous atomic load operations on the `queued_replies`
->in the virtio_transport_send_pkt_work() function
->which may disrupt the scheduling of vsock->rx_work
->when transmitting reply-required socket packets,
->this atomic variable must undergo synchronized initialization
->alongside the preceding two variables after a suspend/resume.
->
->Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
->Link: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
->Co-developed-by: Ying Gao <ying01.gao@samsung.com>
->Signed-off-by: Ying Gao <ying01.gao@samsung.com>
->Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
->---
-> net/vmw_vsock/virtio_transport.c | 10 +++++++---
-> 1 file changed, 7 insertions(+), 3 deletions(-)
+[added the kvm list because of the similarities to virt]
+On Thu, 2025-02-13 at 10:26 -0800, Steve Rutherford wrote:
+> Hi all,
+> 
+> I'd like to aggregate a list of open questions. This list is
+> definitely incomplete. Please add to it!
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Sure, but first I'll reiterate the points I made in the meeting.
+
+> 
+> * Should there be a standard for common protocols? (But not the
+> underlying interfaces, since those can not be universally shared)
+
+So on this one, it would be nice if that happened.  However, the way
+the world works today is that every hypervisor has its own guest to
+host communication protocol, usually embedded in a hypervisor specific
+bus and its drivers (and then they each have their own separate drivers
+for the same function), so having one more for a new SVSM
+virtualization component just follows that trend.
+
+> * What is the correct method for capability discovery with the SVSM?
+
+The current way the SVSM is discovered on AMD is via an MSR, which
+seems appropriate for something so deep in virtualization.  
+
+>         + Do we want the SVSM to touch ACPI? (No, but what instead?)
+
+To clarify, the reason we don't use ACPI today is that the ACPI tables
+are constructed in OVMF using host information from the KVM fw_config
+device which the SVSM doesn't touch.  To allow the SVSM to modify the
+ACPI tables, we'd have to make it terminate the fw_config device, pull
+in the information and then re-supply it to OVMF in the modified form.
+It's not that we can't do that, it's just that it's way less messy not
+to do it.
+
+>         + Going across the common protocol seems pretty reasonable
+> * What SVSM capabilities are common and complex enough to warrant
+> further discussion?
+>       + Observability?
+>       + TPM?
+
+Once we accept that the SVSM protocol is really just another
+incarnation of the hypervisor bus based guest to host communication
+mechanism, I think what we're really asking is what features would we
+like to be paravirt.  The two above seem natural.
+
+> * How should the shared code within Linux be organized?
+
+And, given the similarity above, I think where everything goes is
+fairly easy.  In our case the discovery mechanism is likely going to be
+different between AMD SEV and Intel TDX (and the Arm and RISC-V things
+when they come along) it makes sense for the core communication
+protocol to sit deep in the arch code, but from there we can expose a
+message passing (request/response) API which will look the same for
+every architecture and which exposes the basic messages described in
+the SVSM protocol document.
+
+Perhaps the only outstanding question is should we have our own bus
+like all the other paravirt to hypervisor communication systems?
+
+Regards,
+
+James
 
 
