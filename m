@@ -1,220 +1,175 @@
-Return-Path: <kvm+bounces-38203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D5F3A367F4
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 23:01:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8D8BA3680C
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 23:08:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B39B0188D26D
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 22:01:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61E8616361C
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 22:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905AD1FC10E;
-	Fri, 14 Feb 2025 22:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1411FC0E3;
+	Fri, 14 Feb 2025 22:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CemxHM5J"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ao34ykpr"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483D31FC0E7
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 22:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0D91DC198
+	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 22:08:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739570450; cv=none; b=ZUb8ljNk5U3SouZp24zse8TVvjNREvfPg3Z+Sahmcart3NAv6xJHv7KX8QbCEdkFDz54KMe+Y971RkVeBkc3QQL4nePad/HFfST9tAUBnr3ewMfvUGkT53B8o/9sPbk2dnBMzqVbU3K3DeNHY9etjVMaJyDXWxoq31ElcZmopJM=
+	t=1739570902; cv=none; b=tUYnSky1HTC/v3rg2Rw4ZxCZlTcZnW54WgcqxNJT5hCegdSriXq7/5En3+3DhLjQa2PNJV3RZo0+rQLaoiDTKeKAiaF1iEc8ZZUOo/jaZDJ2k4dcjIDRq4aszWwC2K6WJQtVVFNE1nactwv5oM6bdlFNGS/M8jl+jCj0ilYn3qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739570450; c=relaxed/simple;
-	bh=yxp048zKIEtHjhiIY7CU7E4iJEvk4TbWFpqjbvBjOT0=;
+	s=arc-20240116; t=1739570902; c=relaxed/simple;
+	bh=+S0feFX4+O2b8w5KKspjSVYkfUrOBdXi9ncupiffcxk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PODkFgyQD9ju2r0S7/i0wuXYXj67SM7vWg58S19c+L+Nl7HBYWA+bOZ8vaYnPBxDSGsV51nE6S1izp2qa/dsKI547wIpNqEqymQC1kAQvEPJNi152ipWeY0thU5u3HId8C3q/5O7KZuZe0wHoXK9k+NMSwDWb/+J+KCbkshXXhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CemxHM5J; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=k03PD+xxVddCeNsyfrsdQrDFjiRStvPrVAmy6Ak1XyFPWMlpv3UvGmbI2FnLDYaV4h5VJO408EHDp/CQjmcs7xxdUZuplOdLWT0vkfQvM7dnptYPxElHVij8DKjkaGDkg8GKpvS3Lu+kb5qjVPo7ARvi1mrbpbPuDzCqSMkaEIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ao34ykpr; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fa6793e8b8so6158525a91.1
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 14:00:49 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f83e54432dso8187412a91.2
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 14:08:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739570448; x=1740175248; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739570900; x=1740175700; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vIfyjLKpTDnv4aJfcA9rATISA+dS7OMvPFy+zXQ9sIA=;
-        b=CemxHM5JbY9FFTNziWE0qmOGgKSuzFRAQWvM2KcWcf23gox6OQtM9MFmmAmByu2Hz7
-         HBKc1BGehV+V+XRDtCihY8cvtLKRn5trYlsmIAYWaY4BuHGtKCsseZ5q2dZwIR0aCGwE
-         1fFEW8GByn5yLHF46nRHioqqEQCjPytPvFdeT5Vi4SU9yRjIAHZJkt4hUx4UI7MA8DkI
-         vMDlejcgLl214En6EcjTRkha1gXKMTiR3dXoQHHH3cEcGIjeWhf2/Vt70y8OfjYE6/8f
-         s2gn53zKlORNuJFuFcjupzbPr33rvuQvObiX7knhjrqGwSNJFhFUBf9iGslIS9Skx20R
-         Gm+A==
+        bh=scQo1Z0BvfXqqSWbdbwx1gMTHkxeVBHV9U8/vVYZKLY=;
+        b=Ao34ykprHf1RZ7SzReUBmPi+FZSZzr0QWNolql0tYTlPU23kiWxd/cp/5cR0Mxk1rw
+         6ncDNh2v1RLfXznJHusEIA3KqJG3FU31zaDObd0lAc0ME3Me0hJWHkvYTggRemaOHAqy
+         GYazNgBSKngBzvJM/v/EwtAXrp/62QO9BqFHOlRAkbsMeTRHia7j6RLhKk5hB3gEmkoF
+         hMi+tDXNK9xBTbXkZBa4ZlYRNSYbzMvT9u+5B+iV+VF1WCaFKXMPcb9ar/kkEqUj9tYq
+         GTCsUWQ6Agiut8x0kc4J1Urfupp0QAPYosSdiO4/NvXRifVFm5lqu5uQHoh+vrnJiWu3
+         1cZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739570448; x=1740175248;
+        d=1e100.net; s=20230601; t=1739570900; x=1740175700;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vIfyjLKpTDnv4aJfcA9rATISA+dS7OMvPFy+zXQ9sIA=;
-        b=CmS854A8JGgtQ1CPl7dIWeDLcEUi3iK6/eGUusFTS9BR0PO3+rOcpO1ts4jmDtps23
-         hYe5KnQTiP1wEuKbkk0N8BcXXvhlmjKjcGixHdS7YFdG7Cz7CjWp3xlHoo2hj8zEqGBU
-         P44U/UBwizKDHOg4U3goYYC0mN7SM5Q+rpM4YLlOvBGyQDR0bQzEgc6U/G7IRnTHd4zM
-         peCBn0kX3iEb0RK/cw94s/5PcfKiS0oZnDJFqCex4sLNHbSvT1uHH+tz+PnqUwXQEQ8e
-         t0vaeON6GQtLeXai8swWJgGS1nzcyJeXx937bzFsCOmHA2BLA5X5S9nkfon716ivHcGs
-         UbBg==
-X-Gm-Message-State: AOJu0YzD5jSS8qDF0MfG+5+X/+QXioEWDhy59x1iZsW3PrGHN3i6tACH
-	x/FwpLCSMmX+7ORrM6QiAxjoVfIndnXs/iQ9m0Xyhq0KR6uC1KVF8zfO/d3WTeV7w/1NR0KUcu1
-	dcw==
-X-Google-Smtp-Source: AGHT+IGeCOllheDHrfgVMv8I9s7PtEPV6JfGeuH6Fa9nSv8cCv9pqW6DE9WLm1zjW3jVFLjV8cepsCcIKd8=
-X-Received: from pfbjt23.prod.google.com ([2002:a05:6a00:91d7:b0:730:8a7b:24e0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2351:b0:732:564e:1ec6
- with SMTP id d2e1a72fcca58-7326193a7e0mr1347483b3a.22.1739570448535; Fri, 14
- Feb 2025 14:00:48 -0800 (PST)
-Date: Fri, 14 Feb 2025 14:00:47 -0800
-In-Reply-To: <20240907005440.500075-5-mlevitsk@redhat.com>
+        bh=scQo1Z0BvfXqqSWbdbwx1gMTHkxeVBHV9U8/vVYZKLY=;
+        b=qO3QZzwl9bFP65nu9e1nd+0f+de236F5Ki/e+2dbVyFhyqAxnMvaCUp4m4vgw8wB17
+         OiWGZsJvdLZcAnBNZ/qP+UuKP+RK+tlsMYOn+N/bV2TDfVHT8g79i8Ao08Lo8YT4c1lr
+         FV+52c/tEpAczlCpeymKyn3IxbSifZePeLiI8AEvXcdDomw9eOYmEX76YjkLZgSMIlhD
+         xIcr2+98FMLKk1OQfliBDXZE4/hGSK3u+DcQivlqKLmc9fZs/Fe108vNOy1erTGRd5S5
+         4n8rcZg87j+v4AZ6kwHx1bdDgUsyirFDv71JKbkigv7afQoUpfkn6J4Q/HX7Wu4wlkHU
+         H72g==
+X-Gm-Message-State: AOJu0YyMkB7/biIHIGStj+72GF90f1g+I8902elYwSvjLu+j4N8uiH7h
+	I67y8ymtnBeRUwgQVcxLtjQfMTppn+J7eTWy8HcCk2vt1sSLDrAbi7VrzUEWHfD8Yzwk2+t977r
+	LtQ==
+X-Google-Smtp-Source: AGHT+IGVqDdcAcTjVZzPtQ8Y1I6QFgr9RPAX7/QuaMvy8EAMqscsjXrLCh0ytyf0sehLhKkYsP4+rwT5sKw=
+X-Received: from pjbpq11.prod.google.com ([2002:a17:90b:3d8b:b0:2ea:5469:76c2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:35c6:b0:2ee:c291:765a
+ with SMTP id 98e67ed59e1d1-2fc40f105bamr1055188a91.8.1739570899863; Fri, 14
+ Feb 2025 14:08:19 -0800 (PST)
+Date: Fri, 14 Feb 2025 14:08:18 -0800
+In-Reply-To: <20240907005440.500075-6-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240907005440.500075-1-mlevitsk@redhat.com> <20240907005440.500075-5-mlevitsk@redhat.com>
-Message-ID: <Z6-9D_YZGniOKZjl@google.com>
-Subject: Re: [kvm-unit-tests PATCH 4/5] Add a test for writing canonical
- values to various msrs and fields
+References: <20240907005440.500075-1-mlevitsk@redhat.com> <20240907005440.500075-6-mlevitsk@redhat.com>
+Message-ID: <Z6--0nKVbsxfm9ao@google.com>
+Subject: Re: [kvm-unit-tests PATCH 5/5] nVMX: add a test for canonical checks
+ of various host state vmcs12 fields.
 From: Sean Christopherson <seanjc@google.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>
 Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Sep 06, 2024, Maxim Levitsky wrote:
-> +static void test_register_write(const char *register_name, u64 test_register,
-> +				bool force_emulation, u64 test_value,
-> +				bool expect_success)
+> +#define TEST_VALUE1  0xff45454545000000
+> +#define TEST_VALUE2  0xff55555555000000
+> +
+> +static void vmx_canonical_test_guest(void)
 > +{
-> +	u64 old_value, expected_value;
-> +	bool success, test_passed = false;
-> +	int test_mode = (force_emulation ? SET_REGISTER_MODE_FEP : SET_REGISTER_MODE_SAFE);
-> +
-> +	old_value = get_test_register_value(test_register);
-> +	expected_value = expect_success ? test_value : old_value;
-> +
-> +	/*
-> +	 * TODO: Successful write to the MSR_GS_BASE corrupts it,
-> +	 * and that breaks the wrmsr_safe macro.
-> +	 */
-> +	if ((test_register >> 32) == MSR_GS_BASE && expect_success)
-> +		test_mode = SET_REGISTER_MODE_UNSAFE;
-> +
-> +	/* Write the test value*/
-> +	success =  set_test_register_value(test_register, test_mode, test_value);
-> +
-> +	if (success != expect_success) {
-> +		report(false,
-
-This can be report_fail().  But that's a moot point because skipping the cleanup
-on unexpected *success* leaves registers in a bad state and crashes the test.
-
-> +		       "Write of test register %s with value %lx unexpectedly %s",
-> +		       register_name, test_value,
-> +		       (success ? "succeeded" : "failed"));
-> +		goto exit;
-> +	}
-> +
-> +	/*
-> +	 * Check that the value was really written.
-> +	 * Don't test TR and LDTR, because it's not possible to read them
-> +	 * directly.
-> +	 */
-> +
-> +	if (test_register != TEST_REGISTER_TR_BASE &&
-> +	    test_register != TEST_REGISTER_LDT_BASE) {
-> +		u64 new_value = get_test_register_value(test_register);
-> +
-> +		if (new_value != expected_value) {
-> +			report(false,
-
-Same thing here (on both fronts).
-
-> +			       "Register %s wasn't set to %lx as expected (actual value %lx)",
-> +			       register_name, expected_value, new_value);
-> +			goto exit;
-> +		}
-> +	}
-> +
-> +	/*
-> +	 * Restore the old value directly without safety wrapper,
-> +	 * to avoid test crashes related to temporary clobbered GDT/IDT/etc bases.
-> +	 */
-> +
-> +	set_test_register_value(test_register, SET_REGISTER_MODE_UNSAFE, old_value);
-> +	test_passed = true;
-> +exit:
-> +	report(test_passed, "Tested setting %s to 0x%lx value - %s", register_name,
-> +	       test_value, success ? "success" : "failure");
+> +	while (true)
+> +		vmcall();
 > +}
 
 ...
 
-> +#define TEST_REGISTER(register_name, force_emulation) \
-> +		      test_register(#register_name, register_name, force_emulation)
+> +static void test_host_value_natively(const char *field_name, u64 vmcs_field, u64 value)
 
-Rather than print the entire name, concatenate TEST_REGISTER with the register
-name, e.g. GDTR_BASE, so that the outputs are simply GDTR_BASE.
+The error messages say "directly", wheras this says "natively".  I don't have a
+strong preference, but they should use the same terminology.  I'll go with
+"direct", because "native" has paravirt connotations that could confuse things.
 
+> +{
+> +	int vector;
+> +	u64 actual_value;
+> +
 > +	/*
-> +	 * SYSENTER ESP/EIP MSRs have canonical checks only on Intel,
-> +	 * because only on Intel these instructions were extended to 64 bit.
-> +	 *
-> +	 * TODO: KVM emulation however ignores canonical checks for these MSRs
-> +	 * even on Intel, to support cross-vendor migration.
-> +	 *
-> +	 * Thus only run the check on bare metal.
+> +	 * Set the register via host native interface (e.g lgdt) and check
+> +	 * that we got no exception
+> +	 */
+> +	vector = set_host_value(vmcs_field, value);
+> +	if (vector) {
+> +		report(false,
 
-Sadly, KVM's behavior also applies for nested VMX, i.e. when running the test
-nested, there is no bare metal.  AFAIK, there's no easy way to detect a nested
-run from within the test; it would have to be fed in from the test runner.
+report_fail()
 
-For now, I'll make the whole thing a TODO so that people don't have to re-debug
-why the test fails when run in a VM (and because testing bare metal isn't all
-that interesting).
-
-> +static void do_test(void)
-> +{
-> +	printf("\n");
-> +	printf("Running the test without emulation:\n");
-> +	__do_test(false);
-
-Do the printf()s in the inner helper, it's easy to pivot on @forced_emulation.
-
-> +	printf("\n");
+> +		       "Exception %d when setting %s to 0x%lx via host",
+> +		       vector, field_name, value);
+> +		return;
+> +	}
 > +
-> +	if (is_fep_available()) {
-> +		printf("Running the test with forced emulation:\n");
-> +		__do_test(true);
-> +	} else
+> +	/*
+> +	 * Now check that the host value matches what we expect for fields
+> +	 * that can be read back (these that we can't we assume that are correct)
+> +	 */
+> +
+> +	if (get_host_value(vmcs_field, &actual_value))
+> +		actual_value = value;
+> +
+> +	report(actual_value == value,
 
-Needs curly braces (moot point if the printf() is moved).
+Rather than clobber actual_value, incorporate the get() in the report, e.g.
 
-> +		report_skip("force emulation prefix not enabled - skipping");
+	report(get_host_value(vmcs_field, &actual_value) || actual_value == value
+
+> +	       "%s: HOST value is set to test value 0x%lx directly",
+> +	       field_name, value);
+
+Print the actual value as well, otherwise debugging is painful (well, more painful).
+
 > +}
 > +
-> +int main(int ac, char **av)
+> +static void test_host_value_via_guest(const char *field_name, u64 vmcs_field, u64 value)
+
+It's not via "guest", it's via the HOST_xxx fields in the VMCS.  test_host_value_vmcs()?
+
 > +{
-> +	/* set dummy LDTR pointer */
-> +	set_gdt_entry(FIRST_SPARE_SEL, 0xffaabb, 0xffff, 0x82, 0);
-> +	lldt(FIRST_SPARE_SEL);
+> +	u64 actual_value;
 > +
-> +	do_test();
-> +
-> +	printf("\n");
-> +
-> +	if (this_cpu_has(X86_FEATURE_LA57)) {
-> +		printf("Switching to 5 level paging mode and rerunning the test...\n");
-> +		setup_5level_page_table();
-> +		do_test();
-> +	} else
+> +	/* Set host state field in the vmcs and do the VM entry
+> +	 * Success of VM entry already shows that L0 accepted the value
+> +	 */
+> +	vmcs_write(vmcs_field, TEST_VALUE2);
 
-Curly braces.
+This should be value, not TEST_VALUE2.  Ditto below.  The whole @value idea is
+rather pointless though.  There's one caller, and it passes one value.  The only
+requirement is that the "direct" vs. "vmcs" settings use different values, e.g.
+to avoid false passes.  To handle that, just use more descriptive names for the
+#defines.
 
-> +		report_skip("Skipping the test in 5-level paging mode - not supported on the host");
+> +	enter_guest();
+> +	skip_exit_vmcall();
 > +
-> +	return report_summary();
+> +	/*
+> +	 * Now check that the host value matches what we expect for fields
+> +	 * that can be read back (these that we can't we assume that are correct)
+> +	 */
+> +
+> +	if (get_host_value(vmcs_field, &actual_value))
+> +		actual_value = value;
+> +
+> +	/* Check that now the msr value is the same as the field value */
+> +	report(actual_value == TEST_VALUE2,
+> +	       "%s: HOST value is set to test value 0x%lx via VMLAUNCH/VMRESUME",
+> +	       field_name, value);
 > +}
-> -- 
-> 2.26.3
-> 
 
