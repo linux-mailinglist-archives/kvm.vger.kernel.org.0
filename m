@@ -1,88 +1,87 @@
-Return-Path: <kvm+bounces-38155-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69F11A35CCA
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 12:45:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D27EA35CCE
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 12:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 682AD16F168
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 11:45:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D2A9189313D
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 11:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10140263C73;
-	Fri, 14 Feb 2025 11:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C277F263C72;
+	Fri, 14 Feb 2025 11:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="21qP1jSl"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="Qk94NBjt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8078F263C65
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 11:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0987021CA1F
+	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 11:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739533512; cv=none; b=ph0vq1j5vMpP965JKSqVRrEgwu304ODxk5nYWxoGWcD56xipOrpoqnSRCSx8naFtQ1pcknWqLRjvlSGVt7fgoY06nH4uWOUmsrBz+MEP7Klu/uue8BszVWRFLOaiT4ZXWRJfFQDTDXfjWyzvsYlJNMvu6ldiE0UipzgGu06uCLg=
+	t=1739533517; cv=none; b=rYFZTJdUd5foqb1o/v7clmaWMWoRDNlS/mHiikkv9xLLmsFf1O8CTL54rFaAfwWc5PTtRcX4+9DCBEVIWoPFBGv+3JcXfYGPD87k+422+p03kSpM6+pmSisxX+ouUjZ21i+3HM55O9vxTIRXr+F5VUZEljYwuhEY5UQasaXciKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739533512; c=relaxed/simple;
-	bh=A+1dOEilnGGmJ80KCjesbejXtsthrZGGLSPuGOgP+Y8=;
+	s=arc-20240116; t=1739533517; c=relaxed/simple;
+	bh=C4QiUcpyRPsdrwMu/MqArQ1CGNiIivLBG6Rphj35C7g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TZ7cXpBa3PzPIINOoSvFS0UtvY49BvPSeXI9/1MWMSQRivlmdZ3lp6C4O8gG/cJ2MvQnjE4eP0a0RNncaqq+xGZEVpdQDL6/u6m0BXf5BMUg1YotE4XGP5oolPnFN/1B3e6c38SCkNCoc0ObYDzXXyTvTydwes//4wvkPANMTTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=21qP1jSl; arc=none smtp.client-ip=209.85.214.175
+	 MIME-Version:Content-Type; b=Qq6eGPX6BqE4t52QqRJLURUg1RIST9Og0YW66iFZO30JYyf1MAmOgqfYeikXS7TK2nLfMeuAAqnNYfzgQIzG7KYU7F4NXsm+5Mps9otZyeGSJ8uFVUxxlyOGj3EHPJbZgLmCJsvIG/B5kzeaVlXyer3k31xfausqqRLpO5VZBY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=Qk94NBjt; arc=none smtp.client-ip=209.85.216.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21c2f1b610dso45439535ad.0
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 03:45:10 -0800 (PST)
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2f42992f608so3126617a91.0
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 03:45:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1739533509; x=1740138309; darn=vger.kernel.org;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1739533514; x=1740138314; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xqA1p7ZlCWG/cxuh7HgCX2eBCjRWKwcOEhgoEHDnH1o=;
-        b=21qP1jSlVsBl+2v4A2Cy0shDcUCY8vPdTW1ZpA9Vx0FejH7KkcvS9y/WpwA/Ezj9Tz
-         WyNMIfvy2hFAkTuzjv4UDEEDmjZ5ZXNqm6/1tdQadFY8mqZp1nxczaF4HulPiungu+cn
-         OjTknVMbY9oQYzTjEgJ3STIuSV/i6Zj1Ctefm37JTZRCjeriAribxaNJrsewEkv6a/hS
-         NNPSG6vY8JLanXYSs2RFw0+J3929uAlJmO/9WS/QVIdDTADy4qA3tOfu+Sb/BgXOveH9
-         lENS4EzW9Bm6FjG1Vc1mDgxvmwklQhmuJtwgZNhYq8TrbXH2Y0ZavDWlz5D6kHhrVEdu
-         m2jQ==
+        bh=7vPOvuamuxjiBAPe5xHpU32YlG4genFQRBOpH29Ysnw=;
+        b=Qk94NBjt8Aaajvl3k9Ac4lknv99JturH30eomfjPmQDe9v7mz07+x0Jbe/qerKrYrv
+         clPDkEdBnBmHMPN6/6Rd7f/4LQanGfr6aPTpnCHqLC+PvfH6Qn8ySuwi7+IwQuAmX009
+         zGvFUKM61Um84PmUSwKUQpERatWXqDp57GgfbvgNAZ6KAO8QGNLIHDswHQ2RWvUlL94Q
+         92YcbGHFy2jibCph9TjrnbP8kEgYgx1waMTyazE+qzvC2UUKDE6VC5E6AZntOCY11sLI
+         jpzqlhoUGZHr4JKtQIieMqUwBtfSv10C4TVtHCIrJDmTJmlpv9N94L+iuAHfb9XUXvCq
+         M28A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739533509; x=1740138309;
+        d=1e100.net; s=20230601; t=1739533514; x=1740138314;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xqA1p7ZlCWG/cxuh7HgCX2eBCjRWKwcOEhgoEHDnH1o=;
-        b=PBteTgO5a+0oFtpYzVcNrQI5AUVK08SV3VGhyWcBFFwsu8c94UE/pt6/7qxU7kwsOL
-         NztHlX2cnoC1HbToEcc3KTTtlXh73L7aYc1kTtPQqz0mDWVhKEsbsrRj7M2Y0sXfb7sL
-         g76YI72+OtTQbeIKrZy7J+6s7G3TmDr9m7CxpptZu+9dvJqlBKu99SS+NTdzLxAjhlWw
-         ysGaPK9XFRQ4ivMR/1pv+igM3xQ/AcBduRYbVu1TstkXkonLlVjcz9+lUviLVtWi0MM/
-         p2w4mY36ka2zSu1kLG3vKU8gRNQ6BXuGBssIydOINmCV5lmS/FmracMUWjhEuUN73tUE
-         j0oA==
-X-Gm-Message-State: AOJu0Yy5BmiDQPCxeoncCWMJ/B2ITBahtGCAixsSqEpzCiNWg8PJd5zt
-	z8T/NJ83gr6q71Y5zzwqrddsd/BLwOiPVi0xng+gFX8Rwl/nvxTecIsGd32uUobw8Vc0PWw8OWg
-	XxJo=
-X-Gm-Gg: ASbGnctJYA9AL6bVMr+da293YEnR5B5S6DLmRRgoxSSuMKmrbqHDcUUSUKVPJ3gtzoX
-	D7pBd9JG+Wsee6JCmAoKqRiRnKvJ1DrdbBh3Mxnf7BJF8OzcKIljsLD2vTgDGYApZ4dvq6b0cXk
-	B0V2MzlI2jTo8VtiUWaWwYnw3HBNV4tWRc576Wn6IaEmNi9XAx3aOEbFeER/ypUJBFFa+IedacR
-	CI3EZXlbSNSY2JKLZM8uMDQWrjtzSB+aG+GvI0Sw2c4D3E2BR6Kst64+XLgbagGN8p2yC/O2/zf
-	Y/1GxiAV4rPNOrqm
-X-Google-Smtp-Source: AGHT+IFWeAtwb82nd1iyYYTTa7/orSd25zKuo5U0o9GWs6fJ9wUkJvgn/LExdoE1rvRvhsN3C1nRdQ==
-X-Received: by 2002:a17:902:d549:b0:216:1543:196c with SMTP id d9443c01a7336-220d20e92cfmr113508535ad.27.1739533508713;
-        Fri, 14 Feb 2025 03:45:08 -0800 (PST)
+        bh=7vPOvuamuxjiBAPe5xHpU32YlG4genFQRBOpH29Ysnw=;
+        b=X/6fpgSaTNXsvy74PvpOiN6IiqMWeUaa//5xAKiYUZiEauZ40Ey9qWzT0ex9CLO29R
+         YIKg4JJ0xEK/7TQOelNHxgRM4Bmekl/thxHQ5XsA3yI5/vZEabE4IQ5RzdJBc0zgd7Nk
+         GYUnXKm0hpkoW8w2myY4xpMmCNVOnOLvP9laTwpv0Jfg4TlEVJR0yRD4aNPrTqbEt0Q9
+         tDSPIkfS8iCtnbSl09qJF/r3IqcOTNmdA83BDTOLaVUrunci525QmNpuCZLAIwpU2mDc
+         imNkRx6OdXOHEUPARPF8NqeOohfOfFxehCrQUoMx8+ObZcSUWgKjdWPkJ8hTRxORoIVS
+         Iu6A==
+X-Gm-Message-State: AOJu0YzwcNGjtGy3T1eWgG7Y/NxdTxSrpWZlBmvc8yXyxzKt8efN2YQv
+	X3r6Bdue3rRl7vQ2cgQ+WC+o5dk3c4Il2+/l27KaWhvNItBxqCOHbU45b9NkUUkiOZgpGfYtTJg
+	ntMQ=
+X-Gm-Gg: ASbGncuXJa0nnhQdZBTPHDJimd7lchG3eUm2euFVV4OFcXs5WXCGRqrhcSnmUtrI+Kw
+	LpqWy1DhrdaaAXasLZQ8h2u8SZFtK6fuSv+UDTknl3IY/gVtfqm5ver9V/mXTq56TQDjKbQAOi7
+	KvblbQnIKR3HzWFXf5QeKEEnymTvkXN+ttGzSfsIQkniekhoLOGWaxaO91e5cBWkbFnObwLI8Of
+	rEfgttGeTxto7oVe10aWbvGGok8oaNm4hmIJiFL8kGaShE8Fcd2s0hHnEjGUu7XagJUr9k+1EN/
+	OscufZzWxFG2mpmg
+X-Google-Smtp-Source: AGHT+IEMXT2v9ulVsEFiTxGBNrYpwVxV2PLPflSryRN5FOAz1Be8mObj5dewUDrFYm0ax3D13lkIdA==
+X-Received: by 2002:a17:90b:38c6:b0:2ee:f80c:6884 with SMTP id 98e67ed59e1d1-2fc0f0db50dmr11453714a91.33.1739533513615;
+        Fri, 14 Feb 2025 03:45:13 -0800 (PST)
 Received: from carbon-x1.. ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fbf98f6965sm4948862a91.29.2025.02.14.03.45.03
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fbf98f6965sm4948862a91.29.2025.02.14.03.45.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 03:45:08 -0800 (PST)
+        Fri, 14 Feb 2025 03:45:13 -0800 (PST)
 From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
 	Andrew Jones <ajones@ventanamicro.com>,
 	Anup Patel <apatel@ventanamicro.com>,
-	Atish Patra <atishp@rivosinc.com>,
-	Andrew Jones <andrew.jones@linux.dev>
-Subject: [kvm-unit-tests PATCH v7 4/6] riscv: lib: Add SBI SSE extension definitions
-Date: Fri, 14 Feb 2025 12:44:17 +0100
-Message-ID: <20250214114423.1071621-5-cleger@rivosinc.com>
+	Atish Patra <atishp@rivosinc.com>
+Subject: [kvm-unit-tests PATCH v7 5/6] lib: riscv: Add SBI SSE support
+Date: Fri, 14 Feb 2025 12:44:18 +0100
+Message-ID: <20250214114423.1071621-6-cleger@rivosinc.com>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250214114423.1071621-1-cleger@rivosinc.com>
 References: <20250214114423.1071621-1-cleger@rivosinc.com>
@@ -95,145 +94,326 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add SBI SSE extension definitions in sbi.h
+Add support for registering and handling SSE events. This will be used
+by sbi test as well as upcoming double trap tests.
 
 Signed-off-by: Clément Léger <cleger@rivosinc.com>
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/riscv/asm/sbi.h | 106 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 105 insertions(+), 1 deletion(-)
+ riscv/Makefile          |   2 +
+ lib/riscv/asm/csr.h     |   1 +
+ lib/riscv/asm/sbi-sse.h |  48 +++++++++++++++++++
+ lib/riscv/sbi-sse-asm.S | 103 ++++++++++++++++++++++++++++++++++++++++
+ lib/riscv/asm-offsets.c |   9 ++++
+ lib/riscv/sbi-sse.c     |  84 ++++++++++++++++++++++++++++++++
+ 6 files changed, 247 insertions(+)
+ create mode 100644 lib/riscv/asm/sbi-sse.h
+ create mode 100644 lib/riscv/sbi-sse-asm.S
+ create mode 100644 lib/riscv/sbi-sse.c
 
-diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-index 397400f2..c70cad34 100644
---- a/lib/riscv/asm/sbi.h
-+++ b/lib/riscv/asm/sbi.h
-@@ -30,6 +30,7 @@ enum sbi_ext_id {
- 	SBI_EXT_DBCN = 0x4442434E,
- 	SBI_EXT_SUSP = 0x53555350,
- 	SBI_EXT_FWFT = 0x46574654,
-+	SBI_EXT_SSE = 0x535345,
- };
+diff --git a/riscv/Makefile b/riscv/Makefile
+index 02d2ac39..ed590ede 100644
+--- a/riscv/Makefile
++++ b/riscv/Makefile
+@@ -43,6 +43,8 @@ cflatobjs += lib/riscv/setup.o
+ cflatobjs += lib/riscv/smp.o
+ cflatobjs += lib/riscv/stack.o
+ cflatobjs += lib/riscv/timer.o
++cflatobjs += lib/riscv/sbi-sse-asm.o
++cflatobjs += lib/riscv/sbi-sse.o
+ ifeq ($(ARCH),riscv32)
+ cflatobjs += lib/ldiv32.o
+ endif
+diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+index 16f5ddd7..389d9850 100644
+--- a/lib/riscv/asm/csr.h
++++ b/lib/riscv/asm/csr.h
+@@ -17,6 +17,7 @@
+ #define CSR_TIME		0xc01
  
- enum sbi_ext_base_fid {
-@@ -78,7 +79,6 @@ enum sbi_ext_dbcn_fid {
- 	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
- };
+ #define SR_SIE			_AC(0x00000002, UL)
++#define SR_SPP			_AC(0x00000100, UL)
  
--
- enum sbi_ext_fwft_fid {
- 	SBI_EXT_FWFT_SET = 0,
- 	SBI_EXT_FWFT_GET,
-@@ -105,6 +105,110 @@ enum sbi_ext_fwft_fid {
- 
- #define SBI_FWFT_SET_FLAG_LOCK			BIT(0)
- 
-+enum sbi_ext_sse_fid {
-+	SBI_EXT_SSE_READ_ATTRS = 0,
-+	SBI_EXT_SSE_WRITE_ATTRS,
-+	SBI_EXT_SSE_REGISTER,
-+	SBI_EXT_SSE_UNREGISTER,
-+	SBI_EXT_SSE_ENABLE,
-+	SBI_EXT_SSE_DISABLE,
-+	SBI_EXT_SSE_COMPLETE,
-+	SBI_EXT_SSE_INJECT,
-+	SBI_EXT_SSE_HART_UNMASK,
-+	SBI_EXT_SSE_HART_MASK,
+ /* Exception cause high bit - is an interrupt if set */
+ #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
+diff --git a/lib/riscv/asm/sbi-sse.h b/lib/riscv/asm/sbi-sse.h
+new file mode 100644
+index 00000000..ba18ce27
+--- /dev/null
++++ b/lib/riscv/asm/sbi-sse.h
+@@ -0,0 +1,48 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * SBI SSE library interface
++ *
++ * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
++ */
++#ifndef _RISCV_SSE_H_
++#define _RISCV_SSE_H_
++
++#include <asm/sbi.h>
++
++typedef void (*sbi_sse_handler_fn)(void *data, struct pt_regs *regs, unsigned int hartid);
++
++struct sbi_sse_handler_arg {
++	unsigned long reg_tmp;
++	sbi_sse_handler_fn handler;
++	void *handler_data;
++	void *stack;
 +};
 +
-+/* SBI SSE Event Attributes. */
-+enum sbi_sse_attr_id {
-+	SBI_SSE_ATTR_STATUS		= 0x00000000,
-+	SBI_SSE_ATTR_PRIORITY		= 0x00000001,
-+	SBI_SSE_ATTR_CONFIG		= 0x00000002,
-+	SBI_SSE_ATTR_PREFERRED_HART	= 0x00000003,
-+	SBI_SSE_ATTR_ENTRY_PC		= 0x00000004,
-+	SBI_SSE_ATTR_ENTRY_ARG		= 0x00000005,
-+	SBI_SSE_ATTR_INTERRUPTED_SEPC	= 0x00000006,
-+	SBI_SSE_ATTR_INTERRUPTED_FLAGS	= 0x00000007,
-+	SBI_SSE_ATTR_INTERRUPTED_A6	= 0x00000008,
-+	SBI_SSE_ATTR_INTERRUPTED_A7	= 0x00000009,
-+};
++extern void sbi_sse_entry(void);
 +
-+#define SBI_SSE_ATTR_STATUS_STATE_OFFSET	0
-+#define SBI_SSE_ATTR_STATUS_STATE_MASK		0x3
-+#define SBI_SSE_ATTR_STATUS_PENDING_OFFSET	2
-+#define SBI_SSE_ATTR_STATUS_INJECT_OFFSET	3
++static inline bool sbi_sse_event_is_global(uint32_t event_id)
++{
++	return !!(event_id & SBI_SSE_EVENT_GLOBAL_BIT);
++}
 +
-+#define SBI_SSE_ATTR_CONFIG_ONESHOT		BIT(0)
++struct sbiret sbi_sse_read_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
++				     unsigned long attr_count, unsigned long phys_lo,
++				     unsigned long phys_hi);
++struct sbiret sbi_sse_read_attrs(unsigned long event_id, unsigned long base_attr_id,
++				 unsigned long attr_count, unsigned long *values);
++struct sbiret sbi_sse_write_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
++				      unsigned long attr_count, unsigned long phys_lo,
++				      unsigned long phys_hi);
++struct sbiret sbi_sse_write_attrs(unsigned long event_id, unsigned long base_attr_id,
++				  unsigned long attr_count, unsigned long *values);
++struct sbiret sbi_sse_register_raw(unsigned long event_id, unsigned long entry_pc,
++				   unsigned long entry_arg);
++struct sbiret sbi_sse_register(unsigned long event_id, struct sbi_sse_handler_arg *arg);
++struct sbiret sbi_sse_unregister(unsigned long event_id);
++struct sbiret sbi_sse_enable(unsigned long event_id);
++struct sbiret sbi_sse_hart_mask(void);
++struct sbiret sbi_sse_hart_unmask(void);
++struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id);
++struct sbiret sbi_sse_disable(unsigned long event_id);
 +
-+#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPP	BIT(0)
-+#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPIE	BIT(1)
-+#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPV	BIT(2)
-+#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_HSTATUS_SPVP	BIT(3)
-+#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SPELP	BIT(4)
-+#define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SSTATUS_SDT	BIT(5)
++#endif /* !_RISCV_SSE_H_ */
+diff --git a/lib/riscv/sbi-sse-asm.S b/lib/riscv/sbi-sse-asm.S
+new file mode 100644
+index 00000000..5f60b839
+--- /dev/null
++++ b/lib/riscv/sbi-sse-asm.S
+@@ -0,0 +1,103 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * RISC-V SSE events entry point.
++ *
++ * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
++ */
++#define __ASSEMBLY__
++#include <asm/asm.h>
++#include <asm/csr.h>
++#include <asm/asm-offsets.h>
++#include <generated/sbi-asm-offsets.h>
 +
-+enum sbi_sse_state {
-+	SBI_SSE_STATE_UNUSED		= 0,
-+	SBI_SSE_STATE_REGISTERED	= 1,
-+	SBI_SSE_STATE_ENABLED		= 2,
-+	SBI_SSE_STATE_RUNNING		= 3,
-+};
++.section .text
++.global sbi_sse_entry
++sbi_sse_entry:
++	/* Save stack temporarily */
++	REG_S sp, SBI_SSE_REG_TMP(a7)
++	/* Set entry stack */
++	REG_L sp, SBI_SSE_HANDLER_STACK(a7)
 +
-+/* SBI SSE Event IDs. */
-+/* Range 0x00000000 - 0x0000ffff */
-+#define SBI_SSE_EVENT_LOCAL_HIGH_PRIO_RAS	0x00000000
-+#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP		0x00000001
-+#define SBI_SSE_EVENT_LOCAL_RESERVED_0_START	0x00000002
-+#define SBI_SSE_EVENT_LOCAL_RESERVED_0_END	0x00003fff
-+#define SBI_SSE_EVENT_LOCAL_PLAT_0_START	0x00004000
-+#define SBI_SSE_EVENT_LOCAL_PLAT_0_END		0x00007fff
++	addi sp, sp, -(PT_SIZE)
++	REG_S ra, PT_RA(sp)
++	REG_S s0, PT_S0(sp)
++	REG_S s1, PT_S1(sp)
++	REG_S s2, PT_S2(sp)
++	REG_S s3, PT_S3(sp)
++	REG_S s4, PT_S4(sp)
++	REG_S s5, PT_S5(sp)
++	REG_S s6, PT_S6(sp)
++	REG_S s7, PT_S7(sp)
++	REG_S s8, PT_S8(sp)
++	REG_S s9, PT_S9(sp)
++	REG_S s10, PT_S10(sp)
++	REG_S s11, PT_S11(sp)
++	REG_S tp, PT_TP(sp)
++	REG_S t0, PT_T0(sp)
++	REG_S t1, PT_T1(sp)
++	REG_S t2, PT_T2(sp)
++	REG_S t3, PT_T3(sp)
++	REG_S t4, PT_T4(sp)
++	REG_S t5, PT_T5(sp)
++	REG_S t6, PT_T6(sp)
++	REG_S gp, PT_GP(sp)
++	REG_S a0, PT_A0(sp)
++	REG_S a1, PT_A1(sp)
++	REG_S a2, PT_A2(sp)
++	REG_S a3, PT_A3(sp)
++	REG_S a4, PT_A4(sp)
++	REG_S a5, PT_A5(sp)
++	csrr a1, CSR_SEPC
++	REG_S a1, PT_EPC(sp)
++	csrr a2, CSR_SSTATUS
++	REG_S a2, PT_STATUS(sp)
 +
-+#define SBI_SSE_EVENT_GLOBAL_HIGH_PRIO_RAS	0x00008000
-+#define SBI_SSE_EVENT_GLOBAL_RESERVED_0_START	0x00008001
-+#define SBI_SSE_EVENT_GLOBAL_RESERVED_0_END	0x0000bfff
-+#define SBI_SSE_EVENT_GLOBAL_PLAT_0_START	0x0000c000
-+#define SBI_SSE_EVENT_GLOBAL_PLAT_0_END		0x0000ffff
++	REG_L a0, SBI_SSE_REG_TMP(a7)
++	REG_S a0, PT_SP(sp)
 +
-+/* Range 0x00010000 - 0x0001ffff */
-+#define SBI_SSE_EVENT_LOCAL_PMU_OVERFLOW	0x00010000
-+#define SBI_SSE_EVENT_LOCAL_RESERVED_1_START	0x00010001
-+#define SBI_SSE_EVENT_LOCAL_RESERVED_1_END	0x00013fff
-+#define SBI_SSE_EVENT_LOCAL_PLAT_1_START	0x00014000
-+#define SBI_SSE_EVENT_LOCAL_PLAT_1_END		0x00017fff
++	REG_L t0, SBI_SSE_HANDLER(a7)
++	REG_L a0, SBI_SSE_HANDLER_DATA(a7)
++	mv a1, sp
++	mv a2, a6
++	jalr t0
 +
-+#define SBI_SSE_EVENT_GLOBAL_RESERVED_1_START	0x00018000
-+#define SBI_SSE_EVENT_GLOBAL_RESERVED_1_END	0x0001bfff
-+#define SBI_SSE_EVENT_GLOBAL_PLAT_1_START	0x0001c000
-+#define SBI_SSE_EVENT_GLOBAL_PLAT_1_END		0x0001ffff
++	REG_L a1, PT_EPC(sp)
++	REG_L a2, PT_STATUS(sp)
++	csrw CSR_SEPC, a1
++	csrw CSR_SSTATUS, a2
 +
-+/* Range 0x00100000 - 0x0010ffff */
-+#define SBI_SSE_EVENT_LOCAL_LOW_PRIO_RAS	0x00100000
-+#define SBI_SSE_EVENT_LOCAL_RESERVED_2_START	0x00100001
-+#define SBI_SSE_EVENT_LOCAL_RESERVED_2_END	0x00103fff
-+#define SBI_SSE_EVENT_LOCAL_PLAT_2_START	0x00104000
-+#define SBI_SSE_EVENT_LOCAL_PLAT_2_END		0x00107fff
++	REG_L ra, PT_RA(sp)
++	REG_L s0, PT_S0(sp)
++	REG_L s1, PT_S1(sp)
++	REG_L s2, PT_S2(sp)
++	REG_L s3, PT_S3(sp)
++	REG_L s4, PT_S4(sp)
++	REG_L s5, PT_S5(sp)
++	REG_L s6, PT_S6(sp)
++	REG_L s7, PT_S7(sp)
++	REG_L s8, PT_S8(sp)
++	REG_L s9, PT_S9(sp)
++	REG_L s10, PT_S10(sp)
++	REG_L s11, PT_S11(sp)
++	REG_L tp, PT_TP(sp)
++	REG_L t0, PT_T0(sp)
++	REG_L t1, PT_T1(sp)
++	REG_L t2, PT_T2(sp)
++	REG_L t3, PT_T3(sp)
++	REG_L t4, PT_T4(sp)
++	REG_L t5, PT_T5(sp)
++	REG_L t6, PT_T6(sp)
++	REG_L gp, PT_GP(sp)
++	REG_L a0, PT_A0(sp)
++	REG_L a1, PT_A1(sp)
++	REG_L a2, PT_A2(sp)
++	REG_L a3, PT_A3(sp)
++	REG_L a4, PT_A4(sp)
++	REG_L a5, PT_A5(sp)
 +
-+#define SBI_SSE_EVENT_GLOBAL_LOW_PRIO_RAS	0x00108000
-+#define SBI_SSE_EVENT_GLOBAL_RESERVED_2_START	0x00108001
-+#define SBI_SSE_EVENT_GLOBAL_RESERVED_2_END	0x0010bfff
-+#define SBI_SSE_EVENT_GLOBAL_PLAT_2_START	0x0010c000
-+#define SBI_SSE_EVENT_GLOBAL_PLAT_2_END		0x0010ffff
++	REG_L sp, PT_SP(sp)
 +
-+/* Range 0xffff0000 - 0xffffffff */
-+#define SBI_SSE_EVENT_LOCAL_SOFTWARE		0xffff0000
-+#define SBI_SSE_EVENT_LOCAL_RESERVED_3_START	0xffff0001
-+#define SBI_SSE_EVENT_LOCAL_RESERVED_3_END	0xffff3fff
-+#define SBI_SSE_EVENT_LOCAL_PLAT_3_START	0xffff4000
-+#define SBI_SSE_EVENT_LOCAL_PLAT_3_END		0xffff7fff
++	li a7, ASM_SBI_EXT_SSE
++	li a6, ASM_SBI_EXT_SSE_COMPLETE
++	ecall
 +
-+#define SBI_SSE_EVENT_GLOBAL_SOFTWARE		0xffff8000
-+#define SBI_SSE_EVENT_GLOBAL_RESERVED_3_START	0xffff8001
-+#define SBI_SSE_EVENT_GLOBAL_RESERVED_3_END	0xffffbfff
-+#define SBI_SSE_EVENT_GLOBAL_PLAT_3_START	0xffffc000
-+#define SBI_SSE_EVENT_GLOBAL_PLAT_3_END		0xffffffff
+diff --git a/lib/riscv/asm-offsets.c b/lib/riscv/asm-offsets.c
+index 6c511c14..77e5d26d 100644
+--- a/lib/riscv/asm-offsets.c
++++ b/lib/riscv/asm-offsets.c
+@@ -4,6 +4,7 @@
+ #include <asm/processor.h>
+ #include <asm/ptrace.h>
+ #include <asm/smp.h>
++#include <asm/sbi-sse.h>
+ 
+ int main(void)
+ {
+@@ -63,5 +64,13 @@ int main(void)
+ 	OFFSET(THREAD_INFO_HARTID, thread_info, hartid);
+ 	DEFINE(THREAD_INFO_SIZE, sizeof(struct thread_info));
+ 
++	DEFINE(ASM_SBI_EXT_SSE, SBI_EXT_SSE);
++	DEFINE(ASM_SBI_EXT_SSE_COMPLETE, SBI_EXT_SSE_COMPLETE);
 +
-+#define SBI_SSE_EVENT_PLATFORM_BIT		BIT(14)
-+#define SBI_SSE_EVENT_GLOBAL_BIT		BIT(15)
++	OFFSET(SBI_SSE_REG_TMP, sbi_sse_handler_arg, reg_tmp);
++	OFFSET(SBI_SSE_HANDLER, sbi_sse_handler_arg, handler);
++	OFFSET(SBI_SSE_HANDLER_DATA, sbi_sse_handler_arg, handler_data);
++	OFFSET(SBI_SSE_HANDLER_STACK, sbi_sse_handler_arg, stack);
 +
- struct sbiret {
- 	long error;
- 	long value;
+ 	return 0;
+ }
+diff --git a/lib/riscv/sbi-sse.c b/lib/riscv/sbi-sse.c
+new file mode 100644
+index 00000000..bc4dd10e
+--- /dev/null
++++ b/lib/riscv/sbi-sse.c
+@@ -0,0 +1,84 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * SBI SSE library
++ *
++ * Copyright (C) 2025, Rivos Inc., Clément Léger <cleger@rivosinc.com>
++ */
++#include <asm/sbi.h>
++#include <asm/sbi-sse.h>
++#include <asm/io.h>
++
++struct sbiret sbi_sse_read_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
++				     unsigned long attr_count, unsigned long phys_lo,
++				     unsigned long phys_hi)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_READ_ATTRS, event_id, base_attr_id, attr_count,
++			 phys_lo, phys_hi, 0);
++}
++
++struct sbiret sbi_sse_read_attrs(unsigned long event_id, unsigned long base_attr_id,
++				 unsigned long attr_count, unsigned long *values)
++{
++	phys_addr_t p = virt_to_phys(values);
++
++	return sbi_sse_read_attrs_raw(event_id, base_attr_id, attr_count, lower_32_bits(p),
++				      upper_32_bits(p));
++}
++
++struct sbiret sbi_sse_write_attrs_raw(unsigned long event_id, unsigned long base_attr_id,
++				      unsigned long attr_count, unsigned long phys_lo,
++				      unsigned long phys_hi)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_WRITE_ATTRS, event_id, base_attr_id, attr_count,
++			 phys_lo, phys_hi, 0);
++}
++
++struct sbiret sbi_sse_write_attrs(unsigned long event_id, unsigned long base_attr_id,
++				  unsigned long attr_count, unsigned long *values)
++{
++	phys_addr_t p = virt_to_phys(values);
++
++	return sbi_sse_write_attrs_raw(event_id, base_attr_id, attr_count, lower_32_bits(p),
++				       upper_32_bits(p));
++}
++
++struct sbiret sbi_sse_register_raw(unsigned long event_id, unsigned long entry_pc,
++				   unsigned long entry_arg)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_REGISTER, event_id, entry_pc, entry_arg, 0, 0, 0);
++}
++
++struct sbiret sbi_sse_register(unsigned long event_id, struct sbi_sse_handler_arg *arg)
++{
++	return sbi_sse_register_raw(event_id, virt_to_phys(sbi_sse_entry), virt_to_phys(arg));
++}
++
++struct sbiret sbi_sse_unregister(unsigned long event_id)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_UNREGISTER, event_id, 0, 0, 0, 0, 0);
++}
++
++struct sbiret sbi_sse_enable(unsigned long event_id)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_ENABLE, event_id, 0, 0, 0, 0, 0);
++}
++
++struct sbiret sbi_sse_disable(unsigned long event_id)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_DISABLE, event_id, 0, 0, 0, 0, 0);
++}
++
++struct sbiret sbi_sse_hart_mask(void)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_MASK, 0, 0, 0, 0, 0, 0);
++}
++
++struct sbiret sbi_sse_hart_unmask(void)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_HART_UNMASK, 0, 0, 0, 0, 0, 0);
++}
++
++struct sbiret sbi_sse_inject(unsigned long event_id, unsigned long hart_id)
++{
++	return sbi_ecall(SBI_EXT_SSE, SBI_EXT_SSE_INJECT, event_id, hart_id, 0, 0, 0, 0);
++}
 -- 
 2.47.2
 
