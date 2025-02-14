@@ -1,203 +1,266 @@
-Return-Path: <kvm+bounces-38109-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38110-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60234A353A4
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 02:22:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87310A353FC
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 03:01:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 210893AC27B
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 01:22:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 007DD3ABCA9
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 02:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F338F81727;
-	Fri, 14 Feb 2025 01:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEF4126BEE;
+	Fri, 14 Feb 2025 02:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="cbcAWgTl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SBoq7x5i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B582AF14
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 01:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EC42753F1;
+	Fri, 14 Feb 2025 02:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739496162; cv=none; b=KgNREFOqBJjNy7wcaS21DppSdn2IEFBQpNVBELfzDHgkUQPA53/h5GywRaHo7DO22W7VTY/t2r2VGDRi/6QaNTKOxu1oFH6bFkgAsydGjlTqxNSr05l9QFKR6pmwBHWDyhfghZa9JeGWSTQQmzWPjGzXcCpW2sG0ehXIQkewOWU=
+	t=1739498458; cv=none; b=M02cyuOb5iVul31m2JyPRPbMIDvI+LpMkJybWW00r4gYC44MMc0wntZX3d/QdRcAacTN1IQD9slfa9Eje2P83kJsa0I2b8EblniexAC1i1JZ5i/UaoPL6KtFVHDu3qugAnU2weWBHZJWG0YYOWEMRGBTfWbpKnk9hdZH1ctLWns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739496162; c=relaxed/simple;
-	bh=IFVi1KzRLJQIhOXSQygfQ9egjuXlYGDLjPg29AdBZZI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=X94WIVJ5hojpBtJbs+xFp8Nc6UZG47EclHOAHgRqQFov3HGMDKFK+6xpU3gfCKKxBKPKCFFgGb8Ulief9EfxCybSxpoBWKqc2Ya4kOuurO+cuXvKcmoayv6jvQ8x29hxrqywOCK9Qbwf69Q6Ybf5Wcd0eWS+VMUnaP5BbDj5e4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=cbcAWgTl; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250214012237epoutp03c056900d2664898d1e243d723bf4d81f~j7onlZV6R0170101701epoutp03g
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 01:22:37 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250214012237epoutp03c056900d2664898d1e243d723bf4d81f~j7onlZV6R0170101701epoutp03g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1739496157;
-	bh=vWW0cMrxiqFDMldSnf+yvYR4SjlKf7GeaVFbQk4Idww=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cbcAWgTlETlBzsl3TbMtQ2kLtbmoCFPXWZO8rRd3Mu74agy0cne2RUbE+VcCIro0F
-	 /F287O11PfM1qWb2IbzAqkOrhGol8egl7l9eAKVLAhCnrGhs1nvcGGWocqcfhuNHG/
-	 OIWSZk09vj0zu75ezNYfCZCgKY7vBtnZSHZPyQTg=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-	20250214012236epcas5p4fa21829d79194337f9979f2be5bdbf5e~j7om5ZjXq2587725877epcas5p4D;
-	Fri, 14 Feb 2025 01:22:36 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.181]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4YvDn60BTvz4x9Q7; Fri, 14 Feb
-	2025 01:22:34 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-	epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	2F.78.19956.9DA9EA76; Fri, 14 Feb 2025 10:22:33 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250214012219epcas5p2840feb4b4539929f37c171375e2f646b~j7oXE6qXm1410614106epcas5p2b;
-	Fri, 14 Feb 2025 01:22:19 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250214012219epsmtrp18a9d38e9ea58dc827f9e3417383d6e5c~j7oXDyhMG0520605206epsmtrp1G;
-	Fri, 14 Feb 2025 01:22:19 +0000 (GMT)
-X-AuditID: b6c32a4b-fe9f470000004df4-b3-67ae9ad9c3ff
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B9.FB.18729.BCA9EA76; Fri, 14 Feb 2025 10:22:19 +0900 (KST)
-Received: from asg29.. (unknown [109.105.129.29]) by epsmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250214012217epsmtip1797d1fadbd3da2065d6d311b324c9e55~j7oU6oa-b1757717577epsmtip1k;
-	Fri, 14 Feb 2025 01:22:16 +0000 (GMT)
-From: Junnan Wu <junnan01.wu@samsung.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
-	horms@kernel.org, jasowang@redhat.com, junnan01.wu@samsung.com,
-	kuba@kernel.org, kvm@vger.kernel.org, lei19.wang@samsung.com,
-	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
-	pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	ying01.gao@samsung.com, ying123.xu@samsung.com
-Subject: [Patch net v3] vsock/virtio: fix variables initialization during
- resuming
-Date: Fri, 14 Feb 2025 09:22:00 +0800
-Message-Id: <20250214012200.1883896-1-junnan01.wu@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
+	s=arc-20240116; t=1739498458; c=relaxed/simple;
+	bh=EB7r0YGrpBNCrpmzx8CQm0sjhuCgwIKQAEgtl9Z9WAY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=bYmzN4aqbahEI/B/xJoputo1v9zG4mhg5GkqLrtyswi3tXkSIkkLsT+kFiQ1qzZvEE49qbGCAMhDlm2ImYk+8EwBT2l2p6H0G0siucGvZ1H55B+b+9/M7xDRadUhUNdusCWiNZx3vKbawjN2/JzSNfWntlXYcw0baSrCYzz8PPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SBoq7x5i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 846B9C4CED1;
+	Fri, 14 Feb 2025 02:00:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739498457;
+	bh=EB7r0YGrpBNCrpmzx8CQm0sjhuCgwIKQAEgtl9Z9WAY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=SBoq7x5iYSTRnI6puD5w5yo86ZvdddduhU9aWXBlRGlJ8NF1Kf4NCWrXVc/KTNTeN
+	 8B2+PKX/uthhGN77r7Hr57N8Sc6rUGlMt6i0JCIP19tKg4ccDReDSuQMjcYVc1TBXU
+	 /acPESq1HGaJx/PSOxMqrUE3gO+hwVqTJZrK2hNqNDCjbcq3LmM6C9gOfvCvmXn+9c
+	 8pq+8AATqeKzSNet/NH084ztxQ1dAbbjY/QOQ4MjAHCpAAH87T2Wsn/UBaAm1S8nwf
+	 ck59sMbRUPeB2rq1UQUDaeX/gEE5JR6tDYjaJDwV674ASQBaVc/5V4g5fsvTzQyjgJ
+	 suwuGmLdOOAWw==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 00/27] KVM: arm64: Implement support for SME in
+ non-protected guests
+Date: Fri, 14 Feb 2025 01:57:43 +0000
+Message-Id: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrEJsWRmVeSWpSXmKPExsWy7bCmlu7NWevSDdpuWFrMOd/CYvH02CN2
-	i8dzV7JbPOo/wWax7NJnJou719wtLmzrY7WYM7XQom3HZVaLy7vmsFlcWdLDbvH/1ytWi2ML
-	xCy+nX7DaLH07Vlmi7MTPrBanJ/zn9ni9aT/rBZHt69ktbjWZGFx4QjQ1P2PZrI6iHlsWXmT
-	yWPBplKPTas62Tx2PrT0eLF5JqPH+31X2Tz6tqxi9Pi8SS6AIyrbJiM1MSW1SCE1Lzk/JTMv
-	3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwfoNSWFssScUqBQQGJxsZK+nU1RfmlJ
-	qkJGfnGJrVJqQUpOgUmBXnFibnFpXrpeXmqJlaGBgZEpUGFCdsasM1IFl4Uqzs6aztTA+Jm/
-	i5GTQ0LAROLP//dMXYxcHEICuxklXu1pZ4RwPjFKnOi8xQ5SJSTwjVHiw+VimI7V35dDFe1l
-	lHi8+hUbhPOMUWLZwZMsIFVsApoSJ/asYAOxRQTEJS7MWwJWxCywm1niwcZOsISwQIjE4kdn
-	mUBsFgFViTs7VgKN5eDgFbCTmPg3D2KbvMT+g2eZQWxOgUCJC+t/gV3EKyAocXLmE7BdzEA1
-	zVtnM4PMlxB4wiFx6e0GNohmF4k3+++wQtjCEq+Ob2GHsKUkXva3QdnZEr1Hf0HVl0h0v7sE
-	VW8tcX5dOzPIPcxAz6zfpQ8RlpWYemodE8RePone30+YIOK8EjvmgdgcQLaqxPsJNRBhaYmV
-	mzZBbfKQeHDyCyskrJYwSkyb85ZtAqPCLCTvzELyziyEzQsYmVcxSqYWFOempxabFhjnpZbD
-	4zg5P3cTIzixa3nvYHz04IPeIUYmDsZDjBIczEoivBLT1qQL8aYkVlalFuXHF5XmpBYfYjQF
-	BvdEZinR5HxgbskriTc0sTQwMTMzM7E0NjNUEudt3tmSLiSQnliSmp2aWpBaBNPHxMEp1cBU
-	xNpYPEEriO11N/+mDUnhR6+f0ah8fqLL3Lzl6/qZv5VMoo7vfeUZL2staPlvl/Fy51kmmjc/
-	ZNxOOCCoUdZ19rtgU3waU4t1ZtY8xd0Lq+5G77Gd/K9gukKTa9RlpXArTf7MD0a5DSnR2zy8
-	Ivp1yyfelfuX1aDq9LVI92bpPSbbR6lfirfxdDxb/HvT233XmubkcBumx6hdWnpcyY2/vllb
-	0OFs++8GjuXMvIu3Cd/YtkP4w71vJ7l7r4ntVE58z2x8gXty/Iqikrnayw2bptqU/FPkLsj5
-	Lazus/2hrn6hYnp1IEde1MYOfemJDO8fvPq96uDd49OC9L46urQ+k5M3qtL4oiB04eN8fiWW
-	4oxEQy3mouJEAADRax11BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJIsWRmVeSWpSXmKPExsWy7bCSnO7pWevSDZ5t5beYc76FxeLpsUfs
-	Fo/nrmS3eNR/gs1i2aXPTBZ3r7lbXNjWx2oxZ2qhRduOy6wWl3fNYbO4sqSH3eL/r1esFscW
-	iFl8O/2G0WLp27PMFmcnfGC1OD/nP7PF60n/WS2Obl/JanGtycLiwhGgqfsfzWR1EPPYsvIm
-	k8eCTaUem1Z1snnsfGjp8WLzTEaP9/uusnn0bVnF6PF5k1wARxSXTUpqTmZZapG+XQJXxqwz
-	UgWXhSrOzprO1MD4mb+LkZNDQsBEYvX35YwgtpDAbkaJh0etIeLSEl2/25ghbGGJlf+es3cx
-	cgHVPGGUmDlxBjtIgk1AU+LEnhVsILaIgLjEhXlL2ECKmAUuM0uc+3kHrEhYIEii9cISsA0s
-	AqoSd3asBLI5OHgF7CQm/s2DWCAvsf/gWbBlnAKBEhfW/2KHOChA4sDkZrD5vAKCEidnPmEB
-	sZmB6pu3zmaewCgwC0lqFpLUAkamVYySqQXFuem5xYYFhnmp5XrFibnFpXnpesn5uZsYwbGn
-	pbmDcfuqD3qHGJk4GA8xSnAwK4nwSkxbky7Em5JYWZValB9fVJqTWnyIUZqDRUmcV/xFb4qQ
-	QHpiSWp2ampBahFMlomDU6qBKez5xE8SLhdCN7IuatA4Oukhv+rupNOLd3zmaGieJ33BlSdn
-	psWEFy+D9SX4t+v9ioq5tP3f45bA1xzpn2PigrN09u2NqA6bXLgtzVl28cF5u2a9L/Y9/e2w
-	+ZSsq59Lq/Yb5L7caXtI6d4n7u1sj34XW00zv7s/avGDjNqvSUlO6icMulVswzP9Szsn2/I4
-	LlbUn27t08t1v+HGji0qtorMpyf3S1dlfeDmn3n3y+/9LhVB1tLrus9eORWt+tnnRrS1sy3j
-	Fb0LQR8lD69bIXru7IydnD09a3w5jH/cPHdInrH0y8lFK+x4irn2bLkm9vj13gbeC5n3k/Y5
-	LZXw2Bg0tb6zYI5Uptj3ae1u+UosxRmJhlrMRcWJAAat4qYsAwAA
-X-CMS-MailID: 20250214012219epcas5p2840feb4b4539929f37c171375e2f646b
-X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250214012219epcas5p2840feb4b4539929f37c171375e2f646b
-References: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
-	<CGME20250214012219epcas5p2840feb4b4539929f37c171375e2f646b@epcas5p2.samsung.com>
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABijrmcC/2WQwW6DMBBEfwX5XCPvYlzCKf9R9WDDEixiSGyCW
+ kX59y6gVmpynJHezO7cRaLoKYk6u4tIi09+Glnot0w0vR1PJH3LWqDCQhUK5LAEaWMwWqZAUhk
+ LqE1bmMIIZpxNJF20Y9Ov1Bwuq3uJ1PmvreXjk3Xv0zzF7610gdXd8w+IT/kLSCW7Dqr2XTs8U
+ HscKI50zqd4EmvUgn844CuOjLcW0TQOKuXcC1784ppx9YwXjKvSKaga6Dr6jz/2zyJdbzzbvL+
+ 3L9BMIfi5zhaTg5axwXWFQCnZbdA648JSISg4lHxcDgglllqCDDYOebzNZzu2R74k5yiuevwAf
+ IZVUakBAAA=
+X-Change-ID: 20230301-kvm-arm64-sme-06a1246d3636
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>, 
+ Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-1b0d6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9327; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=EB7r0YGrpBNCrpmzx8CQm0sjhuCgwIKQAEgtl9Z9WAY=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBnrqPAXw5rgAs7oQ2oIQSm6zRCqHNIicTnHW9UfUbL
+ L/4OGOuJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZ66jwAAKCRAk1otyXVSH0B7wB/
+ 45qSiMgFhtOPwDoC1BNd2QYT1jJEpQ/T6aWw8iVyQjW0WN+sgw6MpoMAlbTdobT4KHk93G+sOx507R
+ uXyGSR7r2pocn9gb1VCAT/Xtk112FHCPxg4BuW2F09GADCQIA2N0QOMmbq3Id8jc+QxcS28D7BraGm
+ ndAXmxHbMf/FZKEy16/oOIsyz68mXiMpeX2nylXp+yCFtmbKm0hZBVpUZ0LdlWehijzzNWkt1ImA2i
+ v4Ya8OOFH2D7Km3TuKrJJ1iQTYO1jgsPbIaW6jJ0oQy5QRVBIFrd5aQa9ogRlZXSoeWDLtbSD3Iltl
+ TE43Ev9BnscybhVwE4QaIpKwKTBejT
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-When executing suspend to ram twice in a row,
-the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
-Then after virtqueue_get_buf and `rx_buf_nr` decreased
-in function virtio_transport_rx_work,
-the condition to fill rx buffer
-(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
+I've removed the RFC tag from this version of the series, but the items
+that I'm looking for feedback on remains the same:
 
-It is because that `rx_buf_nr` and `rx_buf_max_nr`
-are initialized only in virtio_vsock_probe(),
-but they should be reset whenever virtqueues are recreated,
-like after a suspend/resume.
+ - The userspace ABI, in particular:
+  - The vector length used for the SVE registers, access to the SVE
+    registers and access to ZA and (if available) ZT0 depending on
+    the current state of PSTATE.{SM,ZA}.
+  - The use of a single finalisation for both SVE and SME.
 
-Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
-virtio_vsock_vqs_init(), so we are sure that they are properly
-initialized, every time we initialize the virtqueues, either when we
-load the driver or after a suspend/resume.
+ - The addition of control for enabling fine grained traps in a similar
+   manner to FGU but without the UNDEF, I'm not clear if this is desired
+   at all and at present this requires symmetric read and write traps like
+   FGU. That seemed like it might be desired from an implementation
+   point of view but we already have one case where we enable an
+   asymmetric trap (for ARM64_WORKAROUND_AMPERE_AC03_CPU_38) and it
+   seems generally useful to enable asymmetrically.
 
-To prevent erroneous atomic load operations on the `queued_replies`
-in the virtio_transport_send_pkt_work() function
-which may disrupt the scheduling of vsock->rx_work
-when transmitting reply-required socket packets,
-this atomic variable must undergo synchronized initialization
-alongside the preceding two variables after a suspend/resume.
+This series implements support for SME use in non-protected KVM guests.
+Much of this is very similar to SVE, the main additional challenge that
+SME presents is that it introduces a new vector length similar to the
+SVE vector length and two new controls which change the registers seen
+by guests:
 
-Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
-Link: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
-Co-developed-by: Ying Gao <ying01.gao@samsung.com>
-Signed-off-by: Ying Gao <ying01.gao@samsung.com>
-Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
+ - PSTATE.ZA enables the ZA matrix register and, if SME2 is supported,
+   the ZT0 LUT register.
+ - PSTATE.SM enables streaming mode, a new floating point mode which
+   uses the SVE register set with the separately configured SME vector
+   length.  In streaming mode implementation of the FFR register is
+   optional.
+
+It is also permitted to build systems which support SME without SVE, in
+this case when not in streaming mode no SVE registers or instructions
+are available.  Further, there is no requirement that there be any
+overlap in the set of vector lengths supported by SVE and SME in a
+system, this is expected to be a common situation in practical systems.
+
+Since there is a new vector length to configure we introduce a new
+feature parallel to the existing SVE one with a new pseudo register for
+the streaming mode vector length.  Due to the overlap with SVE caused by
+streaming mode rather than finalising SME as a separate feature we use
+the existing SVE finalisation to also finalise SME, a new define
+KVM_ARM_VCPU_VEC is provided to help make user code clearer.  Finalising
+SVE and SME separately would introduce complication with register access
+since finalising SVE makes the SVE regsiters writeable by userspace and
+doing multiple finalisations results in an error being reported.
+Dealing with a state where the SVE registers are writeable due to one of
+SVE or SME being finalised but may have their VL changed by the other
+being finalised seems like needless complexity with minimal practical
+utility, it seems clearer to just express directly that only one
+finalisation can be done in the ABI.
+
+Access to the floating point registers follows the architecture:
+
+ - When both SVE and SME are present:
+   - If PSTATE.SM == 0 the vector length used for the Z and P registers
+     is the SVE vector length.
+   - If PSTATE.SM == 1 the vector length used for the Z and P registers
+     is the SME vector length.
+ - If only SME is present:
+   - If PSTATE.SM == 0 the Z and P registers are inaccessible and the
+     floating point state accessed via the encodings for the V registers. 
+   - If PSTATE.SM == 1 the vector length used for the Z and P registers
+ - The SME specific ZA and ZT0 registers are only accessible if SVCR.ZA is 1.
+
+The VMM must understand this, in particular when loading state SVCR
+should be configured before other state.
+
+There are a large number of subfeatures for SME, most of which only
+offer additional instructions but some of which (SME2 and FA64) add
+architectural state. These are configured via the ID registers as per
+usual.
+
+The new KVM_ARM_VCPU_VEC feature and ZA and ZT0 registers have not been
+added to the get-reg-list selftest, the idea of supporting additional
+features there without restructuring the program to generate all
+possible feature combinations has been rejected.  I will post a separate
+series which does that restructuring.
+
+No support is present for protected guests, this is expected to be added
+separately, the series is already rather large and pKVM in general
+offers a subset of features.
+
+This series is based on Mark Rutland's fix series:
+
+   https://lore.kernel.org/r/20250210195226.1215254-1-mark.rutland@arm.com
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- net/vmw_vsock/virtio_transport.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Changes in v4:
+- Rebase onto v6.14-rc2 and Mark Rutland's fixes.
+- Expose SME to nested guests.
+- Additional cleanups and test fixes following on from the rebase.
+- Link to v3: https://lore.kernel.org/r/20241220-kvm-arm64-sme-v3-0-05b018c1ffeb@kernel.org
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index b58c3818f284..f0e48e6911fc 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
- 	};
- 	int ret;
- 
-+	mutex_lock(&vsock->rx_lock);
-+	vsock->rx_buf_nr = 0;
-+	vsock->rx_buf_max_nr = 0;
-+	mutex_unlock(&vsock->rx_lock);
-+
-+	atomic_set(&vsock->queued_replies, 0);
-+
- 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
- 	if (ret < 0)
- 		return ret;
-@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
- 
- 	vsock->vdev = vdev;
- 
--	vsock->rx_buf_nr = 0;
--	vsock->rx_buf_max_nr = 0;
--	atomic_set(&vsock->queued_replies, 0);
- 
- 	mutex_init(&vsock->tx_lock);
- 	mutex_init(&vsock->rx_lock);
+Changes in v3:
+- Rebase onto v6.12-rc2.
+- Link to v2: https://lore.kernel.org/r/20231222-kvm-arm64-sme-v2-0-da226cb180bb@kernel.org
+
+Changes in v2:
+- Rebase onto v6.7-rc3.
+- Configure subfeatures based on host system only.
+- Complete nVHE support.
+- There was some snafu with sending v1 out, it didn't make it to the
+  lists but in case it hit people's inboxes I'm sending as v2.
+
+---
+Mark Brown (27):
+      arm64/fpsimd: Update FA64 and ZT0 enables when loading SME state
+      arm64/fpsimd: Decide to save ZT0 and streaming mode FFR at bind time
+      arm64/fpsimd: Check enable bit for FA64 when saving EFI state
+      arm64/fpsimd: Determine maximum virtualisable SME vector length
+      KVM: arm64: Introduce non-UNDEF FGT control
+      KVM: arm64: Pay attention to FFR parameter in SVE save and load
+      KVM: arm64: Pull ctxt_has_ helpers to start of sysreg-sr.h
+      KVM: arm64: Move SVE state access macros after feature test macros
+      KVM: arm64: Rename SVE finalization constants to be more general
+      KVM: arm64: Document the KVM ABI for SME
+      KVM: arm64: Define internal features for SME
+      KVM: arm64: Rename sve_state_reg_region
+      KVM: arm64: Store vector lengths in an array
+      KVM: arm64: Implement SME vector length configuration
+      KVM: arm64: Support SME control registers
+      KVM: arm64: Support TPIDR2_EL0
+      KVM: arm64: Support SME identification registers for guests
+      KVM: arm64: Support SME priority registers
+      KVM: arm64: Provide assembly for SME state restore
+      KVM: arm64: Support userspace access to streaming mode Z and P registers
+      KVM: arm64: Expose SME specific state to userspace
+      KVM: arm64: Context switch SME state for normal guests
+      KVM: arm64: Handle SME exceptions
+      KVM: arm64: Expose SME to nested guests
+      KVM: arm64: Provide interface for configuring and enabling SME for guests
+      KVM: arm64: selftests: Add SME system registers to get-reg-list
+      KVM: arm64: selftests: Add SME to set_id_regs test
+
+ Documentation/virt/kvm/api.rst                   | 117 +++++++---
+ arch/arm64/include/asm/fpsimd.h                  |  22 ++
+ arch/arm64/include/asm/kvm_emulate.h             |  12 +-
+ arch/arm64/include/asm/kvm_host.h                | 143 ++++++++++---
+ arch/arm64/include/asm/kvm_hyp.h                 |   4 +-
+ arch/arm64/include/asm/kvm_pkvm.h                |   2 +-
+ arch/arm64/include/asm/vncr_mapping.h            |   2 +
+ arch/arm64/include/uapi/asm/kvm.h                |  33 +++
+ arch/arm64/kernel/cpufeature.c                   |   2 -
+ arch/arm64/kernel/fpsimd.c                       |  86 ++++----
+ arch/arm64/kvm/arm.c                             |  10 +
+ arch/arm64/kvm/fpsimd.c                          |  19 +-
+ arch/arm64/kvm/guest.c                           | 262 ++++++++++++++++++++---
+ arch/arm64/kvm/handle_exit.c                     |  14 ++
+ arch/arm64/kvm/hyp/fpsimd.S                      |  18 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h          | 141 ++++++++++--
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h       |  77 ++++---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c               |   9 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                   |   4 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c                 |  11 +-
+ arch/arm64/kvm/hyp/vhe/switch.c                  |  21 +-
+ arch/arm64/kvm/nested.c                          |   3 +-
+ arch/arm64/kvm/reset.c                           | 154 +++++++++----
+ arch/arm64/kvm/sys_regs.c                        | 118 +++++++++-
+ include/uapi/linux/kvm.h                         |   1 +
+ tools/testing/selftests/kvm/arm64/get-reg-list.c |  32 ++-
+ tools/testing/selftests/kvm/arm64/set_id_regs.c  |  29 ++-
+ 27 files changed, 1078 insertions(+), 268 deletions(-)
+---
+base-commit: 6a25088d268ce4c2163142ead7fe1975bb687cb7
+change-id: 20230301-kvm-arm64-sme-06a1246d3636
+prerequisite-message-id: 20250210195226.1215254-1-mark.rutland@arm.com
+prerequisite-patch-id: 615ab9c526e9f6242bd5b8d7188e96fb66fb0e64
+prerequisite-patch-id: e5c4f2ff9c9ba01a0f659dd1e8bf6396de46e197
+prerequisite-patch-id: 0794d28526755180847841c045a6b7cb3d800c16
+prerequisite-patch-id: 079d3a8a680f793b593268eeba000acc55a0b4ec
+prerequisite-patch-id: a3428f67a5ee49f2b01208f30b57984d5409d8f5
+prerequisite-patch-id: 26393e401e9eae7cff5bb1d3bdb18b4e29ffc8fe
+prerequisite-patch-id: 64f9819f751da4a1c73b9d1b292ccee6afda89f6
+prerequisite-patch-id: 0355baaa8ceb31dc85d015b56084c33416f78041
+
+Best regards,
 -- 
-2.34.1
+Mark Brown <broonie@kernel.org>
 
 
