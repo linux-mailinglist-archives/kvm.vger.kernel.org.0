@@ -1,470 +1,157 @@
-Return-Path: <kvm+bounces-38173-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38174-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C6F7A35F87
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 14:56:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F2BFA36129
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 16:13:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C11B2188DB00
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 13:56:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F0787A5200
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 15:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E715264FAE;
-	Fri, 14 Feb 2025 13:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25D1266B59;
+	Fri, 14 Feb 2025 15:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="onuQFLdR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4unEzZHu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA99263C9B
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 13:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC03266583
+	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 15:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739541363; cv=none; b=vFFNImvCzViyvl0Sfzq/0AghuIPY2nzrL72kWWaUcUzu6XRMDbkezNlmZ3MO7REp5ltQKAgz/jbKR3r486NO9P8gRe8Rz76QTZcjYVtRwc8euzMiyRdiCl1ywRY8P+FulaTcH5exRCOO4vsf8eZsiB8dqbrSOjdIt+AbEAUYSM4=
+	t=1739545947; cv=none; b=ZE0Yy/J2ArXAvSeLNmrlEZ0H2hRnp0VtJh5Wo0hZcNcTJfzfOJEd2jaqrnfUqgeuYX//nFjfPEl70dFmVD1HX9yqXSTZ9h9IycJ7tT1Apyr12Vzn7Yl1ZJpls2SCLCnXtWG/0dEBJj+nVGpLHQgUIqa0g/GXOHY26taVSElo7Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739541363; c=relaxed/simple;
-	bh=WqHfc85CnIBg5vLEOhk4ICcpaUNYC+QTXUEJ0QrkipU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EiUI34CIrvnWlaQPrc8nG+NOOzN3dhOZWxPKPvR+eRhJ4w05nsM7Fbz81WozKuUVlB9KAALV/jsw2aqnmLAyjPeUbFROjYcDdNW+2MeYi0uMu4Tlk86UHVP09yz2afE8sol/nR9xFFd21joovuo5rhLgTgPRzld5y5gmIKMmxB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=onuQFLdR; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-220e6028214so27400265ad.0
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 05:56:00 -0800 (PST)
+	s=arc-20240116; t=1739545947; c=relaxed/simple;
+	bh=vnf59c/nCBMxHn6akesMOQzZ9e2bty1aDeq1/eACv1k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=H1LAKysTueFThhNmf39dpeSzo/oI4k5nDQVFDXpYASHrx3ztYhoJbp7EqSjPh14UAbmaYT1Or0vhIb9vgoOLSV7gssLPwaTZY5LmCXS9WrimzRs/8ZI8ptW4maKrRVOCARVSzreeZBY7PT84VzEFguNjvNevhXfE1+FaoNnE4QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4unEzZHu; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220e7d654acso25597075ad.0
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 07:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1739541360; x=1740146160; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Oyv4ckbJAaXr2NOVehbMO+gl4gQRomY2gyYVfwC/7iQ=;
-        b=onuQFLdRVanS93hfn2FQa2not2TAsGU/41STQfgHSDZ9RrYcV5Cidb3/n5Yc9x112s
-         uKdmY5YDg309lV3diYN5yYDzXc3jSehrT2Vyczr/DpcrWVqOsv41vJ6QVWv2BWG5tYq/
-         MNF+t/yajpqMbVdATK9ArdrRIqioKrAvoq8QeYfSfOO/jyYoB6RXe2W4/yLtu8IGAQrM
-         LM4jn8msvGkypwCrp91Z6kIfe93XpU/t+HOOn1Q5EJnD9ftg83OjAYFoVFaAhyqxO74g
-         W2EcfMXBwCV4Qy/wc6cQWFQAuAtm5mcIt7wEREJnoyN4NlBGXd0FFO0edgMbF/cO8qFw
-         5xWQ==
+        d=google.com; s=20230601; t=1739545945; x=1740150745; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z55zQaimMbt2FvsqKqjvjDqM4izV/gI6a1eQPX+1LEc=;
+        b=4unEzZHui7weM60DPT9Dip8Zt0TC1bCwFH5OobrB0kpZi+iFF/wEhM8Lh2QT8NPai3
+         iK+ukrtjCubHn4WnErOoUuG1aBtjhxw9lil40WdGidVn4fMgCDU0lNeS9gEkjbo+tS5c
+         3RlutYZ+qhnCHnJGzK4K87qDEEWYc2qY+Pzh2RzEUaU/Pqlo8oBwJ4cWfvblsp2Irogm
+         PdI63KjchI0VMho5tolaEEbeAkNTAoDxovHftMxIogiL6nOH165fobDLxSzJYYowHRWJ
+         gSoX/aAbXFlIZHb6mTCMUfYY3N6JOUYhvftN7acwcUjHxX9tua2BllwrpKT+Hi7G+6vN
+         mEmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739541360; x=1740146160;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oyv4ckbJAaXr2NOVehbMO+gl4gQRomY2gyYVfwC/7iQ=;
-        b=Bt3gn35ueGE3Oe7kUH2nk2mn5CdMB0+PBZD7962AM3JNW7AMzTNKCiuwJUQRYZNV2Z
-         IHGedmKE2VT7PBUOv80Hm883TCiErshwuJdFZJofIA98J1+Nb3khaD6DvIX1NVLGNBR+
-         Ja9N/e+RAYHn14Cb+ExMfnxIJULOu+nWso8FhJ5FVZXalJYqFD9n5FKbBGIbejxdoEM+
-         iPlwBSNQ8K7pfN/9+B+AWGpBEBFEpBKi3TgQ+HiNO6qu/he694CZh+NuU7RtaMOPfVa9
-         tqOuboa7xESq5amDzqkvJ7Vh0TDrm/v/RVyfPrkYSi0ztAvcMA+GNRpfJXV1HcY2t/5F
-         CTVA==
-X-Forwarded-Encrypted: i=1; AJvYcCWh7a1c5ztk8OxcKuDhCCe12lkoCJDmggLkXOakSF39SfFxvCv+zSyUt6P3morWnr0CzXw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYe52URaKMH/c7uy3b1lsU7uztCD3HOBEgJ8AgvfKr/su6UF90
-	jSLaHdmb0VPs7fwooMwgsuNaptJL0tO3ed7sUh3XejWA8c8fWfbMEJ9SXYjuLGY=
-X-Gm-Gg: ASbGncsX/BYsDxMNq2tL1lNDMd4OnDWE4GT6ZRoYwlmm8on89tmz8sCvKs/ib8cxO3i
-	ZjXJ3WGB5MoLA3GUhmAckqR3RuN9AB9EmoqRqbGX60dBURAoCni3hq3njQ1S3dXnw4+2w3yGnCN
-	XyKm2IoxOU1SGuxF1q5bwoX8KTjSJGNnja9oRrqcm18nzHl4ygDwbPShZ4qDzmUeel7E5bJOKzX
-	CI7C96u/ZuDeZXZlhwQOwoIjYllK3DDSK0ThBG6ZUG0+9D1SEdcZwsKFg4i8ZiPrQTa5DTu4vkz
-	TTMABY+l11Afsw9GW65rRiKcyCJ2Qt357EZR9m6EPS+dgpt4zwjfEM1fTS4f
-X-Google-Smtp-Source: AGHT+IFJG8yJSXBwAOW5a3Rg7tds7wmeju3GEMDTQvcg2LBmbQ5NCSQTLylp178QmOw/Q0qstwEZFw==
-X-Received: by 2002:a05:6a00:2da7:b0:730:9446:4d75 with SMTP id d2e1a72fcca58-7322c5fd357mr16415480b3a.17.1739541360271;
-        Fri, 14 Feb 2025 05:56:00 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:e17:9700:16d2:7456:6634:9626? ([2a01:e0a:e17:9700:16d2:7456:6634:9626])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242568b03sm3233341b3a.54.2025.02.14.05.55.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Feb 2025 05:55:59 -0800 (PST)
-Message-ID: <57fbc08b-73fa-464f-b960-c4511d27598b@rivosinc.com>
-Date: Fri, 14 Feb 2025 14:55:46 +0100
+        d=1e100.net; s=20230601; t=1739545945; x=1740150745;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z55zQaimMbt2FvsqKqjvjDqM4izV/gI6a1eQPX+1LEc=;
+        b=JzQ+1ewYoPe02fMu2RCkm1cecO4sePdzHIp1/MkAy0jofWeDo8Iu+kUJ7ciWJ5wWTa
+         kgwsVaM/7ANiWx5Ed6Tat5vTtmK8dG+/TgCZyqcz2GA9O+BphAJvkAT9h5vyRYEhT5MS
+         vTJMbsE4ataWR5zjTLxbmRuOUQQheOFRIN2uad1twWVxJlucId4qRMAKA8Selwgz4V79
+         vq8+6NTdiWP8ZhnYJ855DBRjTvXwpuB9MXQnnIlCETferSoTPicI8hD3nWtyeyTmnxhy
+         Y+/NDwL8CG1vEoqjpJvXizmJHPnLKsnmuS0Q7ULxyJAu8hSspgp4L3L5tD4IBAq3YSoQ
+         oY4w==
+X-Forwarded-Encrypted: i=1; AJvYcCVDRSDJy+w3g9Xta8yxXm9sDAoNKYFFePWvDjBJ+/RuMBuKqd1BRJ2txHxLVvCr7gEs1QE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/ChYbRiBriYuCVyFwaKKDod9FB6Y6I0wFyxb8KDxxIg3O98Od
+	0//CHBkpVMmWT+GzIboL24QI1Q9dL7TyOXRHOotd/8SrxdoNzk1QQ4pxU8UTL/qUwLf/5gk8KF5
+	LAQ==
+X-Google-Smtp-Source: AGHT+IFcdkXJQ5mq4r5yhxc+LIPkmYG03Xmdm90vC00pltuvE/fBSBVg/9+YzNBK579Y1GYfnIriEnbbDBA=
+X-Received: from plgb14.prod.google.com ([2002:a17:902:d50e:b0:220:eaf6:fcbf])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ec92:b0:21f:6ce8:29df
+ with SMTP id d9443c01a7336-220d33a5d29mr124724705ad.3.1739545945448; Fri, 14
+ Feb 2025 07:12:25 -0800 (PST)
+Date: Fri, 14 Feb 2025 07:12:24 -0800
+In-Reply-To: <a17d4cd4-b902-4578-83c4-78bb7e0c4bd1@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 14/15] RISC-V: KVM: add support for FWFT SBI extension
-To: Deepak Gupta <debug@rivosinc.com>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Samuel Holland <samuel.holland@sifive.com>
-References: <20250210213549.1867704-1-cleger@rivosinc.com>
- <20250210213549.1867704-15-cleger@rivosinc.com>
- <Z6rmrqbNtHxmjI0X@debug.ba.rivosinc.com>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <Z6rmrqbNtHxmjI0X@debug.ba.rivosinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <Z6t227f31unTnQQt@google.com> <CA+EHjTweTLDzhcCoEZYP4iyuti+8TU3HbtLHh+u5ark6WDjbsA@mail.gmail.com>
+ <Z6t6_M8un1Cf3nmk@google.com> <d9645330-3a0d-4950-a50b-ce82b428e08c@amazon.co.uk>
+ <Z6uEQFDbMGboHYx7@google.com> <Z68lZUeGWwIe-tEK@google.com>
+ <CA+EHjTz=d99Mz9jXt5onmtkJgxDetZ32NYkFv98L50BJgSbgGg@mail.gmail.com>
+ <ebbc4523-6bec-4f4f-a509-d10a264a9a97@amazon.co.uk> <CA+EHjTyiRAun3XbRUZA52Pq2kSk+gHFt_PksJcCh7P1V3-J3_A@mail.gmail.com>
+ <a17d4cd4-b902-4578-83c4-78bb7e0c4bd1@amazon.co.uk>
+Message-ID: <Z69dWOVK6OnmS8NP@google.com>
+Subject: Re: [PATCH v3 09/11] KVM: arm64: Introduce KVM_VM_TYPE_ARM_SW_PROTECTED
+ machine type
+From: Sean Christopherson <seanjc@google.com>
+To: Patrick Roy <roypat@amazon.co.uk>
+Cc: Fuad Tabba <tabba@google.com>, Quentin Perret <qperret@google.com>, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, keirf@google.com, 
+	shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
+	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
+Content-Type: text/plain; charset="us-ascii"
 
+On Fri, Feb 14, 2025, Patrick Roy wrote:
+> On Fri, 2025-02-14 at 13:11 +0000, Fuad Tabba wrote:
+> > On Fri, 14 Feb 2025 at 12:37, Patrick Roy <roypat@amazon.co.uk> wrote:
+> >> On Fri, 2025-02-14 at 11:33 +0000, Fuad Tabba wrote:
+> >>> Hi Quentin,
+> >>>
+> >>> On Fri, 14 Feb 2025 at 11:13, Quentin Perret <qperret@google.com> wrote:
+> >>>>
+> >>>> On Tuesday 11 Feb 2025 at 17:09:20 (+0000), Quentin Perret wrote:
+> >>>>> Hi Patrick,
+> >>>>>
+> >>>>> On Tuesday 11 Feb 2025 at 16:32:31 (+0000), Patrick Roy wrote:
+> >>>>>> I was hoping that SW_PROTECTED_VM will be the VM type that something
+> >>>>>> like Firecracker could use, e.g. an interface to guest_memfd specifically
+> >>>>>> _without_ pKVM, as Fuad was saying.
+> >>>>>
+> >>>>> I had, probably incorrectly, assumed that we'd eventually want to allow
+> >>>>> gmem for all VMs, including traditional KVM VMs that don't have anything
+> >>>>> special. Perhaps the gmem support could be exposed via a KVM_CAP in this
+> >>>>> case?
+> >>>>>
+> >>>>> Anyway, no objection to the proposed approach in this patch assuming we
+> >>>>> will eventually have HW_PROTECTED_VM for pKVM VMs, and that _that_ can be
+> >>>>> bit 31 :).
+> >>>>
+> >>>> Thinking about this a bit deeper, I am still wondering what this new
+> >>>> SW_PROTECTED VM type is buying us? Given that SW_PROTECTED VMs accept
+> >>>> both guest-memfd backed memslots and traditional HVA-backed memslots, we
+> >>>> could just make normal KVM guests accept guest-memfd memslots and get
+> >>>> the same thing? Is there any reason not to do that instead?
 
+Once guest_memfd can be mmap()'d, no.  KVM_X86_SW_PROTECTED_VM was added for
+testing and development of guest_memfd largely because KVM can't support a "real"
+VM if KVM can't read/write guest memory through its normal mechanisms.  The gap
+is most apparent on x86, but it holds true for arm64 as well.
 
-On 11/02/2025 06:57, Deepak Gupta wrote:
-> On Mon, Feb 10, 2025 at 10:35:47PM +0100, Clément Léger wrote:
->> Add basic infrastructure to support the FWFT extension in KVM.
->>
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> ---
->> arch/riscv/include/asm/kvm_host.h          |   4 +
->> arch/riscv/include/asm/kvm_vcpu_sbi.h      |   1 +
->> arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  37 ++++
->> arch/riscv/include/uapi/asm/kvm.h          |   1 +
->> arch/riscv/kvm/Makefile                    |   1 +
->> arch/riscv/kvm/vcpu_sbi.c                  |   4 +
->> arch/riscv/kvm/vcpu_sbi_fwft.c             | 187 +++++++++++++++++++++
->> 7 files changed, 235 insertions(+)
->> create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
->> create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
->>
->> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/
->> asm/kvm_host.h
->> index bb93d2995ea2..c0db61ba691a 100644
->> --- a/arch/riscv/include/asm/kvm_host.h
->> +++ b/arch/riscv/include/asm/kvm_host.h
->> @@ -19,6 +19,7 @@
->> #include <asm/kvm_vcpu_fp.h>
->> #include <asm/kvm_vcpu_insn.h>
->> #include <asm/kvm_vcpu_sbi.h>
->> +#include <asm/kvm_vcpu_sbi_fwft.h>
->> #include <asm/kvm_vcpu_timer.h>
->> #include <asm/kvm_vcpu_pmu.h>
->>
->> @@ -281,6 +282,9 @@ struct kvm_vcpu_arch {
->>     /* Performance monitoring context */
->>     struct kvm_pmu pmu_context;
->>
->> +    /* Firmware feature SBI extension context */
->> +    struct kvm_sbi_fwft fwft_context;
->> +
->>     /* 'static' configurations which are set only once */
->>     struct kvm_vcpu_config cfg;
->>
->> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/
->> include/asm/kvm_vcpu_sbi.h
->> index cb68b3a57c8f..ffd03fed0c06 100644
->> --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
->> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
->> @@ -98,6 +98,7 @@ extern const struct kvm_vcpu_sbi_extension
->> vcpu_sbi_ext_hsm;
->> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn;
->> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_susp;
->> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_sta;
->> +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_fwft;
->> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experimental;
->> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
->>
->> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h b/arch/riscv/
->> include/asm/kvm_vcpu_sbi_fwft.h
->> new file mode 100644
->> index 000000000000..5782517f6e08
->> --- /dev/null
->> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
->> @@ -0,0 +1,37 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Copyright (c) 2025 Rivos Inc.
->> + *
->> + * Authors:
->> + *     Clément Léger <cleger@rivosinc.com>
->> + */
->> +
->> +#ifndef __KVM_VCPU_RISCV_FWFT_H
->> +#define __KVM_VCPU_RISCV_FWFT_H
->> +
->> +#include <asm/sbi.h>
->> +
->> +struct kvm_sbi_fwft_config;
->> +struct kvm_vcpu;
->> +
-> 
-> 
-> Can we add some comments here for future fwft providers along below lines?
-> 
-> Reason being, patch defaults to `conf->supported = true` if `supported` fn
-> pointer in `kvm_sbi_fwft_feature` was NULL. Although `kvm_sbi_fwft_set/get`
-> does get/set fn pointers (it would happen even if `supported` fn pointer
-> was NULL).
+> >>>> Even though SW_PROTECTED VMs are documented as 'unstable', the reality
+> >>>> is this is UAPI and you can bet it will end up being relied upon, so I
+> >>>> would prefer to have a solid reason for introducing this new VM type.
+> >>>
+> >>> The more I think about it, I agree with you. I think that reasonable
+> >>> behavior (for kvm/arm64) would be to allow using guest_memfd with all
+> >>> VM types. If the VM type is a non-protected type, then its memory is
+> >>> considered shared by default and is mappable --- as long as the
+> >>> kconfig option is enabled. If VM is protected then the memory is not
+> >>> shared by default.
 
-Yes sure, I'll add some kernel doc comments.
-
-Thanks,
-
-Clément
-
-> 
->> +struct kvm_sbi_fwft_feature {
->> +    enum sbi_fwft_feature_t id;
->     /* If function not provided, KVM will default assume to be true */
->> +    bool (*supported)(struct kvm_vcpu *vcpu);
->     /* Must always provide function pointers for get/set */
->> +    int (*set)(struct kvm_vcpu *vcpu, struct kvm_sbi_fwft_config
->> *conf, unsigned long value);
->> +    int (*get)(struct kvm_vcpu *vcpu, struct kvm_sbi_fwft_config
->> *conf, unsigned long *value);
-> 
-> 
->> +};
->> +
->> +struct kvm_sbi_fwft_config {
->> +    const struct kvm_sbi_fwft_feature *feature;
->> +    bool supported;
->> +    unsigned long flags;
->> +};
->> +
->> +/* FWFT data structure per vcpu */
->> +struct kvm_sbi_fwft {
->> +    struct kvm_sbi_fwft_config *configs;
->> +};
->> +
->> +#define vcpu_to_fwft(vcpu) (&(vcpu)->arch.fwft_context)
->> +
->> +#endif /* !__KVM_VCPU_RISCV_FWFT_H */
->> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/
->> uapi/asm/kvm.h
->> index f06bc5efcd79..fa6eee1caf41 100644
->> --- a/arch/riscv/include/uapi/asm/kvm.h
->> +++ b/arch/riscv/include/uapi/asm/kvm.h
->> @@ -202,6 +202,7 @@ enum KVM_RISCV_SBI_EXT_ID {
->>     KVM_RISCV_SBI_EXT_DBCN,
->>     KVM_RISCV_SBI_EXT_STA,
->>     KVM_RISCV_SBI_EXT_SUSP,
->> +    KVM_RISCV_SBI_EXT_FWFT,
->>     KVM_RISCV_SBI_EXT_MAX,
->> };
->>
->> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
->> index 4e0bba91d284..06e2d52a9b88 100644
->> --- a/arch/riscv/kvm/Makefile
->> +++ b/arch/riscv/kvm/Makefile
->> @@ -26,6 +26,7 @@ kvm-y += vcpu_onereg.o
->> kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_pmu.o
->> kvm-y += vcpu_sbi.o
->> kvm-y += vcpu_sbi_base.o
->> +kvm-y += vcpu_sbi_fwft.o
->> kvm-y += vcpu_sbi_hsm.o
->> kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_sbi_pmu.o
->> kvm-y += vcpu_sbi_replace.o
->> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
->> index f81f06f82650..3b37deaed4e7 100644
->> --- a/arch/riscv/kvm/vcpu_sbi.c
->> +++ b/arch/riscv/kvm/vcpu_sbi.c
->> @@ -78,6 +78,10 @@ static const struct kvm_riscv_sbi_extension_entry
->> sbi_ext[] = {
->>         .ext_idx = KVM_RISCV_SBI_EXT_STA,
->>         .ext_ptr = &vcpu_sbi_ext_sta,
->>     },
->> +    {
->> +        .ext_idx = KVM_RISCV_SBI_EXT_FWFT,
->> +        .ext_ptr = &vcpu_sbi_ext_fwft,
->> +    },
->>     {
->>         .ext_idx = KVM_RISCV_SBI_EXT_EXPERIMENTAL,
->>         .ext_ptr = &vcpu_sbi_ext_experimental,
->> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/
->> vcpu_sbi_fwft.c
->> new file mode 100644
->> index 000000000000..fe608bf16558
->> --- /dev/null
->> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
->> @@ -0,0 +1,187 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Copyright (c) 2025 Rivos Inc.
->> + *
->> + * Authors:
->> + *     Clément Léger <cleger@rivosinc.com>
->> + */
->> +
->> +#include <linux/errno.h>
->> +#include <linux/err.h>
->> +#include <linux/kvm_host.h>
->> +#include <asm/cpufeature.h>
->> +#include <asm/sbi.h>
->> +#include <asm/kvm_vcpu_sbi.h>
->> +#include <asm/kvm_vcpu_sbi_fwft.h>
->> +
->> +static const enum sbi_fwft_feature_t kvm_fwft_defined_features[] = {
->> +    SBI_FWFT_MISALIGNED_EXC_DELEG,
->> +    SBI_FWFT_LANDING_PAD,
->> +    SBI_FWFT_SHADOW_STACK,
->> +    SBI_FWFT_DOUBLE_TRAP,
->> +    SBI_FWFT_PTE_AD_HW_UPDATING,
->> +    SBI_FWFT_POINTER_MASKING_PMLEN,
->> +};
->> +
->> +static bool kvm_fwft_is_defined_feature(enum sbi_fwft_feature_t feature)
->> +{
->> +    int i;
->> +
->> +    for (i = 0; i < ARRAY_SIZE(kvm_fwft_defined_features); i++) {
->> +        if (kvm_fwft_defined_features[i] == feature)
->> +            return true;
->> +    }
->> +
->> +    return false;
->> +}
->> +
->> +static const struct kvm_sbi_fwft_feature features[] = {
->> +};
->> +
->> +static struct kvm_sbi_fwft_config *
->> +kvm_sbi_fwft_get_config(struct kvm_vcpu *vcpu, enum
->> sbi_fwft_feature_t feature)
->> +{
->> +    int i = 0;
->> +    struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
->> +
->> +    for (i = 0; i < ARRAY_SIZE(features); i++) {
->> +        if (fwft->configs[i].feature->id == feature)
->> +            return &fwft->configs[i];
->> +    }
->> +
->> +    return NULL;
->> +}
->> +
->> +static int kvm_fwft_get_feature(struct kvm_vcpu *vcpu, unsigned long
->> feature,
->> +                struct kvm_sbi_fwft_config **conf)
->> +{
->> +    struct kvm_sbi_fwft_config *tconf;
->> +
->> +    /* Feature are defined as 32 bits identifiers */
->> +    if (feature & ~(BIT_ULL(32) - 1))
->> +        return SBI_ERR_INVALID_PARAM;
->> +
->> +    tconf = kvm_sbi_fwft_get_config(vcpu, feature);
->> +    if (!tconf) {
->> +        if (kvm_fwft_is_defined_feature(feature))
->> +            return SBI_ERR_NOT_SUPPORTED;
->> +
->> +        return SBI_ERR_DENIED;
->> +    }
->> +
->> +    if (!tconf->supported)
->> +        return SBI_ERR_NOT_SUPPORTED;
->> +
->> +    *conf = tconf;
->> +
->> +    return SBI_SUCCESS;
->> +}
->> +
->> +static int kvm_sbi_fwft_set(struct kvm_vcpu *vcpu, unsigned long
->> feature,
->> +                unsigned long value, unsigned long flags)
->> +{
->> +    int ret;
->> +    struct kvm_sbi_fwft_config *conf;
->> +
->> +    ret = kvm_fwft_get_feature(vcpu, feature, &conf);
->> +    if (ret)
->> +        return ret;
->> +
->> +    if ((flags & ~SBI_FWFT_SET_FLAG_LOCK) != 0)
->> +        return SBI_ERR_INVALID_PARAM;
->> +
->> +    if (conf->flags & SBI_FWFT_SET_FLAG_LOCK)
->> +        return SBI_ERR_DENIED_LOCKED;
->> +
->> +    conf->flags = flags;
->> +
->> +    return conf->feature->set(vcpu, conf, value);
->> +}
->> +
->> +static int kvm_sbi_fwft_get(struct kvm_vcpu *vcpu, unsigned long
->> feature,
->> +                unsigned long *value)
->> +{
->> +    int ret;
->> +    struct kvm_sbi_fwft_config *conf;
->> +
->> +    ret = kvm_fwft_get_feature(vcpu, feature, &conf);
->> +    if (ret)
->> +        return ret;
->> +
->> +    return conf->feature->get(vcpu, conf, value);
->> +}
->> +
->> +static int kvm_sbi_ext_fwft_handler(struct kvm_vcpu *vcpu, struct
->> kvm_run *run,
->> +                    struct kvm_vcpu_sbi_return *retdata)
->> +{
->> +    int ret = 0;
->> +    struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
->> +    unsigned long funcid = cp->a6;
->> +
->> +    switch (funcid) {
->> +    case SBI_EXT_FWFT_SET:
->> +        ret = kvm_sbi_fwft_set(vcpu, cp->a0, cp->a1, cp->a2);
->> +        break;
->> +    case SBI_EXT_FWFT_GET:
->> +        ret = kvm_sbi_fwft_get(vcpu, cp->a0, &retdata->out_val);
->> +        break;
->> +    default:
->> +        ret = SBI_ERR_NOT_SUPPORTED;
->> +        break;
->> +    }
->> +
->> +    retdata->err_val = ret;
->> +
->> +    return 0;
->> +}
->> +
->> +static int kvm_sbi_ext_fwft_init(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
->> +    const struct kvm_sbi_fwft_feature *feature;
->> +    struct kvm_sbi_fwft_config *conf;
->> +    int i;
->> +
->> +    fwft->configs = kcalloc(ARRAY_SIZE(features), sizeof(struct
->> kvm_sbi_fwft_config),
->> +                GFP_KERNEL);
->> +    if (!fwft->configs)
->> +        return -ENOMEM;
->> +
->> +    for (i = 0; i < ARRAY_SIZE(features); i++) {
->> +        feature = &features[i];
->> +        conf = &fwft->configs[i];
->> +        if (feature->supported)
->> +            conf->supported = feature->supported(vcpu);
->> +        else
->> +            conf->supported = true;
->> +
->> +        conf->feature = feature;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static void kvm_sbi_ext_fwft_deinit(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
->> +
->> +    kfree(fwft->configs);
->> +}
->> +
->> +static void kvm_sbi_ext_fwft_reset(struct kvm_vcpu *vcpu)
->> +{
->> +    int i = 0;
->> +    struct kvm_sbi_fwft *fwft = vcpu_to_fwft(vcpu);
->> +
->> +    for (i = 0; i < ARRAY_SIZE(features); i++)
->> +        fwft->configs[i].flags = 0;
->> +}
->> +
->> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_fwft = {
->> +    .extid_start = SBI_EXT_FWFT,
->> +    .extid_end = SBI_EXT_FWFT,
->> +    .handler = kvm_sbi_ext_fwft_handler,
->> +    .init = kvm_sbi_ext_fwft_init,
->> +    .deinit = kvm_sbi_ext_fwft_deinit,
->> +    .reset = kvm_sbi_ext_fwft_reset,
->> +};
->> -- 
->> 2.47.2
->>
->>
-
+This aligns with what I see happening for x86, except that for non-protected VMs
+there will be no shared vs. private, because such VMs won't have a concept of
+private memory.
 
