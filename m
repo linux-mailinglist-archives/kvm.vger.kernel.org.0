@@ -1,175 +1,191 @@
-Return-Path: <kvm+bounces-38160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38161-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6603DA35D5D
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 13:17:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78960A35DC0
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 13:38:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F9B1188D6DB
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 12:18:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98E62188E6D9
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 12:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A48263F41;
-	Fri, 14 Feb 2025 12:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BAC263F26;
+	Fri, 14 Feb 2025 12:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7N/9TGo"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="Tg5XSocf"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60CF5263C65
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 12:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B875263C73;
+	Fri, 14 Feb 2025 12:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739535454; cv=none; b=qz3cyNivjy6lcv/GBCLOvyvTOZmiWIlgmXurZm9iDLHIDrUp/oaKk2Ms+/8DJxNeOIIEMvv/6CflYR+ElQT2bnhIUWKuhSnB+ITto+x5hNX3ZbI1PlZgR/GKWl0jL2TlzCWVXKfglDROiPOPo5lr5vuntWnVi3YnKVo7H3KGxiw=
+	t=1739536674; cv=none; b=A+hEsZbmcWcr6uIN70VFDVgFg1IvZCzjt+70Z536aP6q5cL4YwTctatEfPKMBSy8Qk75V4OY0+izhG3MpxOWnYQznOrEr1jWuGaiQBY0eVl+v9WfykDYlvyEgesHXfdd/Nw/8E7UGsFpA412YnAZo8UF8XdEVoqcOWIE4qxZHwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739535454; c=relaxed/simple;
-	bh=508bg14U3UMJ8jdr3pX2AL6akRM/QyTn1EwYOGL0phw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=clpOlMvOjjMB+ddGNyTh87l8f/kn2RMvhhwzqoKIf4NJbo/ShDchTyUzqq28ZL+FzkAvibbCQlQN1dA0UfBOBT3yJvLiHOeiemH6FCE7HHGYoJoUopquG1kkOgzID+ta45WIFtrJlbRgfpzn6Aybn3YY2fwpzI9AkISWhImEgp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J7N/9TGo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739535451;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BZijvutShOwbMhwLPMjJwb8XWzeFIQw45xdK6ukivSY=;
-	b=J7N/9TGovXCge1ko/0xLQVccvL2XxhtJ1uUVxvQ7FI/oWVJLZfO4MnOjNNP119rIdfgkDD
-	TLI7Iw5ExEyybxgy8YFlNCSAILmlzeXbpXRSwVAfp62eNNFpLfOK1bti6p//jUC2jlj5Yq
-	SDxdcjnhaEDUyuK7YVdZKDLBM/wLhQw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-mn4ozv40PTaKV_NQUnO63A-1; Fri, 14 Feb 2025 07:17:29 -0500
-X-MC-Unique: mn4ozv40PTaKV_NQUnO63A-1
-X-Mimecast-MFC-AGG-ID: mn4ozv40PTaKV_NQUnO63A_1739535449
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ab7fa2b5be0so245703566b.3
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 04:17:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739535448; x=1740140248;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BZijvutShOwbMhwLPMjJwb8XWzeFIQw45xdK6ukivSY=;
-        b=nBQR4EjodHayUltx8ly2jS9u6UGjCFFDqvbZNDyIzSPFSJyT4JauQqfod4BZp3rBhZ
-         hBsfbWTf0MFyfpwfSrzVdr4uEQ9SXWBPljiZnPq4qS7ftpF83YkXUVOTlzlquFUfPxOT
-         IDmcGe57TPuySJHtucH48GFW3qCB9iCgRYyegJJxrSTz+1m9cpYIQNDkLIaNFkApcqxJ
-         2xNg5BYDgek7eYTk7GBuySzW0XYtIYmCpt3e93WP9AovP9LLTJkx6fjyHUe2RX1qTd4R
-         k+EOikOa+od/ESVCM9+JZSM7RZS1aLMbhOtTw7bUm/gof6usTPYVen1xL+X5IP7AE6OT
-         Z9dA==
-X-Forwarded-Encrypted: i=1; AJvYcCXUn52u1Duab2U7jMo3WNnOumofdPRxdDKty/x0D2XQZObbqFH6nUPuCXzLflK0VaYqpLU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2qCEWGq+fsypp2I4T7b0VJPb4VTk0D4/AZDRV5oL4Pt5qGK70
-	KPTT0Ese8Xwn/TJ1EYz1U1MNSUAIkRNVJn9IDIN9h/y8IyhHmCA41iGrljOD7L1/0E0uIQ9znL0
-	GyNmJx9uSX1y07dhogradT0UDRwlDipQ8VqnApUKvR/K41qVQQA==
-X-Gm-Gg: ASbGncsHavepXzaoNqaYo/sn7Cn8z8Bvh4hXwEqZbB5NgWI7Qhq7ZbuLE1gt/Xxg+p3
-	LZiGCBqoXFr4UHDlxzHIFDpiNXO1y572nHpt/GbDscEQY0WWlIJCUzzGmAZVjbxu4MLiK9eYR5C
-	8nzDBe0nhGslN5cO0S6Bte3veCvYVcK9LUjXBERJASW1YbRcJCkoltu8UahFcZWQZrhanrQVJ7Q
-	GAiChGE5bJaVI3E5A1PetgWRMYqkpiMLuwBC6sOk7QkIZVNg8yOcsEvOPd7ubtquB/n7w==
-X-Received: by 2002:a17:907:3fa2:b0:ab7:5b58:f467 with SMTP id a640c23a62f3a-ab7f347aa6cmr1198347766b.40.1739535448550;
-        Fri, 14 Feb 2025 04:17:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGPf+AeSUeRn24l529Z9ZendqwqQDqP06Hke8qwzwFNKUt9IcGq+7DW+H44R0X87YfMunCk/g==
-X-Received: by 2002:a17:907:3fa2:b0:ab7:5b58:f467 with SMTP id a640c23a62f3a-ab7f347aa6cmr1198344266b.40.1739535448190;
-        Fri, 14 Feb 2025 04:17:28 -0800 (PST)
-Received: from redhat.com ([2.55.187.107])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aba5323226asm334107966b.8.2025.02.14.04.17.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 04:17:26 -0800 (PST)
-Date: Fri, 14 Feb 2025 07:17:22 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Junnan Wu <junnan01.wu@samsung.com>
-Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
-	eperezma@redhat.com, horms@kernel.org, jasowang@redhat.com,
-	kuba@kernel.org, kvm@vger.kernel.org, lei19.wang@samsung.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, q1.huang@samsung.com, stefanha@redhat.com,
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com,
-	ying01.gao@samsung.com, ying123.xu@samsung.com
-Subject: Re: [Patch net v3] vsock/virtio: fix variables initialization during
- resuming
-Message-ID: <20250214071714-mutt-send-email-mst@kernel.org>
-References: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
- <CGME20250214012219epcas5p2840feb4b4539929f37c171375e2f646b@epcas5p2.samsung.com>
- <20250214012200.1883896-1-junnan01.wu@samsung.com>
+	s=arc-20240116; t=1739536674; c=relaxed/simple;
+	bh=MpYdylY++8VfkEnM5IvLalLzcXbKo9j+8NV8nQx4n+s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=emNSTEVCRxD9b0cy+H/A0P0xk9Smzu/dSENCv1Lfb7b8TDsgZhD8fSDlIVmn5cFsEUY+pb8BhdgNXSI2MSwRgJDiNu313PdAEeb++Ul2YfZluoF7gVKAAcQp5C33gw2f/4zr65Vdp7cec+wY9geNzG95+a5/gEczNwp7fGyVmNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=Tg5XSocf; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1739536672; x=1771072672;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Tm+osB2yjHRvqWpYOEEHWB+vgVWcduhdO4iqJ02ZEQY=;
+  b=Tg5XSocf3LCg98/2PQ2hYprXk7S9or23utbHWK3ZI6pTwrMdY3nGJ4Ne
+   ni9PNiCDiPafuDwdjHgxUxTwKoeSc6dazSnvVAJaW1M+qXwpqZKu0hjFr
+   rrDp2Oy8AoG9bxoMaWV3Bhpu21CtsXfM9tKPDUV+ShPubY3SZqppKvR5s
+   I=;
+X-IronPort-AV: E=Sophos;i="6.13,285,1732579200"; 
+   d="scan'208";a="172485778"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 12:37:49 +0000
+Received: from EX19MTAUEA001.ant.amazon.com [10.0.0.204:50712]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.24.55:2525] with esmtp (Farcaster)
+ id 47e06a44-bd11-4a3c-b37d-53c7e5121d00; Fri, 14 Feb 2025 12:37:48 +0000 (UTC)
+X-Farcaster-Flow-ID: 47e06a44-bd11-4a3c-b37d-53c7e5121d00
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19MTAUEA001.ant.amazon.com (10.252.134.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 14 Feb 2025 12:37:48 +0000
+Received: from email-imr-corp-prod-iad-1box-1a-6851662a.us-east-1.amazon.com
+ (10.43.8.2) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.39 via Frontend Transport; Fri, 14 Feb 2025 12:37:48 +0000
+Received: from [127.0.0.1] (dev-dsk-roypat-1c-dbe2a224.eu-west-1.amazon.com [172.19.88.180])
+	by email-imr-corp-prod-iad-1box-1a-6851662a.us-east-1.amazon.com (Postfix) with ESMTPS id 1720A40627;
+	Fri, 14 Feb 2025 12:37:40 +0000 (UTC)
+Message-ID: <ebbc4523-6bec-4f4f-a509-d10a264a9a97@amazon.co.uk>
+Date: Fri, 14 Feb 2025 12:37:40 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250214012200.1883896-1-junnan01.wu@samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 09/11] KVM: arm64: Introduce
+ KVM_VM_TYPE_ARM_SW_PROTECTED machine type
+To: Fuad Tabba <tabba@google.com>, Quentin Perret <qperret@google.com>,
+	<seanjc@google.com>
+CC: <kvm@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+	<linux-mm@kvack.org>, <pbonzini@redhat.com>, <chenhuacai@kernel.org>,
+	<mpe@ellerman.id.au>, <anup@brainfault.org>, <paul.walmsley@sifive.com>,
+	<palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <viro@zeniv.linux.org.uk>,
+	<brauner@kernel.org>, <willy@infradead.org>, <akpm@linux-foundation.org>,
+	<xiaoyao.li@intel.com>, <yilun.xu@intel.com>, <chao.p.peng@linux.intel.com>,
+	<jarkko@kernel.org>, <amoorthy@google.com>, <dmatlack@google.com>,
+	<yu.c.zhang@linux.intel.com>, <isaku.yamahata@intel.com>, <mic@digikod.net>,
+	<vbabka@suse.cz>, <vannapurve@google.com>, <ackerleytng@google.com>,
+	<mail@maciej.szmigiero.name>, <david@redhat.com>, <michael.roth@amd.com>,
+	<wei.w.wang@intel.com>, <liam.merwick@oracle.com>,
+	<isaku.yamahata@gmail.com>, <kirill.shutemov@linux.intel.com>,
+	<suzuki.poulose@arm.com>, <steven.price@arm.com>, <quic_eberman@quicinc.com>,
+	<quic_mnalajal@quicinc.com>, <quic_tsoni@quicinc.com>,
+	<quic_svaddagi@quicinc.com>, <quic_cvanscha@quicinc.com>,
+	<quic_pderrin@quicinc.com>, <quic_pheragu@quicinc.com>,
+	<catalin.marinas@arm.com>, <james.morse@arm.com>, <yuzenghui@huawei.com>,
+	<oliver.upton@linux.dev>, <maz@kernel.org>, <will@kernel.org>,
+	<keirf@google.com>, <shuah@kernel.org>, <hch@infradead.org>,
+	<jgg@nvidia.com>, <rientjes@google.com>, <jhubbard@nvidia.com>,
+	<fvdl@google.com>, <hughd@google.com>, <jthoughton@google.com>
+References: <20250211121128.703390-1-tabba@google.com>
+ <20250211121128.703390-10-tabba@google.com> <Z6t227f31unTnQQt@google.com>
+ <CA+EHjTweTLDzhcCoEZYP4iyuti+8TU3HbtLHh+u5ark6WDjbsA@mail.gmail.com>
+ <Z6t6_M8un1Cf3nmk@google.com>
+ <d9645330-3a0d-4950-a50b-ce82b428e08c@amazon.co.uk>
+ <Z6uEQFDbMGboHYx7@google.com> <Z68lZUeGWwIe-tEK@google.com>
+ <CA+EHjTz=d99Mz9jXt5onmtkJgxDetZ32NYkFv98L50BJgSbgGg@mail.gmail.com>
+From: Patrick Roy <roypat@amazon.co.uk>
+Content-Language: en-US
+Autocrypt: addr=roypat@amazon.co.uk; keydata=
+ xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
+ NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
+ wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
+ CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
+ AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
+ AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
+ IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
+ 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
+ 8hlxFQM=
+In-Reply-To: <CA+EHjTz=d99Mz9jXt5onmtkJgxDetZ32NYkFv98L50BJgSbgGg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 14, 2025 at 09:22:00AM +0800, Junnan Wu wrote:
-> When executing suspend to ram twice in a row,
-> the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
-> Then after virtqueue_get_buf and `rx_buf_nr` decreased
-> in function virtio_transport_rx_work,
-> the condition to fill rx buffer
-> (rx_buf_nr < rx_buf_max_nr / 2) will never be met.
-> 
-> It is because that `rx_buf_nr` and `rx_buf_max_nr`
-> are initialized only in virtio_vsock_probe(),
-> but they should be reset whenever virtqueues are recreated,
-> like after a suspend/resume.
-> 
-> Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
-> virtio_vsock_vqs_init(), so we are sure that they are properly
-> initialized, every time we initialize the virtqueues, either when we
-> load the driver or after a suspend/resume.
-> 
-> To prevent erroneous atomic load operations on the `queued_replies`
-> in the virtio_transport_send_pkt_work() function
-> which may disrupt the scheduling of vsock->rx_work
-> when transmitting reply-required socket packets,
-> this atomic variable must undergo synchronized initialization
-> alongside the preceding two variables after a suspend/resume.
-> 
-> Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
-> Link: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
-> Co-developed-by: Ying Gao <ying01.gao@samsung.com>
-> Signed-off-by: Ying Gao <ying01.gao@samsung.com>
-> Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
 
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-> ---
->  net/vmw_vsock/virtio_transport.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+On Fri, 2025-02-14 at 11:33 +0000, Fuad Tabba wrote:
+> Hi Quentin,
 > 
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index b58c3818f284..f0e48e6911fc 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
->  	};
->  	int ret;
->  
-> +	mutex_lock(&vsock->rx_lock);
-> +	vsock->rx_buf_nr = 0;
-> +	vsock->rx_buf_max_nr = 0;
-> +	mutex_unlock(&vsock->rx_lock);
-> +
-> +	atomic_set(&vsock->queued_replies, 0);
-> +
->  	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
->  	if (ret < 0)
->  		return ret;
-> @@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->  
->  	vsock->vdev = vdev;
->  
-> -	vsock->rx_buf_nr = 0;
-> -	vsock->rx_buf_max_nr = 0;
-> -	atomic_set(&vsock->queued_replies, 0);
->  
->  	mutex_init(&vsock->tx_lock);
->  	mutex_init(&vsock->rx_lock);
-> -- 
-> 2.34.1
+> On Fri, 14 Feb 2025 at 11:13, Quentin Perret <qperret@google.com> wrote:
+>>
+>> On Tuesday 11 Feb 2025 at 17:09:20 (+0000), Quentin Perret wrote:
+>>> Hi Patrick,
+>>>
+>>> On Tuesday 11 Feb 2025 at 16:32:31 (+0000), Patrick Roy wrote:
+>>>> I was hoping that SW_PROTECTED_VM will be the VM type that something
+>>>> like Firecracker could use, e.g. an interface to guest_memfd specifically
+>>>> _without_ pKVM, as Fuad was saying.
+>>>
+>>> I had, probably incorrectly, assumed that we'd eventually want to allow
+>>> gmem for all VMs, including traditional KVM VMs that don't have anything
+>>> special. Perhaps the gmem support could be exposed via a KVM_CAP in this
+>>> case?
+>>>
+>>> Anyway, no objection to the proposed approach in this patch assuming we
+>>> will eventually have HW_PROTECTED_VM for pKVM VMs, and that _that_ can be
+>>> bit 31 :).
+>>
+>> Thinking about this a bit deeper, I am still wondering what this new
+>> SW_PROTECTED VM type is buying us? Given that SW_PROTECTED VMs accept
+>> both guest-memfd backed memslots and traditional HVA-backed memslots, we
+>> could just make normal KVM guests accept guest-memfd memslots and get
+>> the same thing? Is there any reason not to do that instead? Even though
+>> SW_PROTECTED VMs are documented as 'unstable', the reality is this is
+>> UAPI and you can bet it will end up being relied upon, so I would prefer
+>> to have a solid reason for introducing this new VM type.
+> 
+> The more I think about it, I agree with you. I think that reasonable
+> behavior (for kvm/arm64) would be to allow using guest_memfd with all
+> VM types. If the VM type is a non-protected type, then its memory is
+> considered shared by default and is mappable --- as long as the
+> kconfig option is enabled. If VM is protected then the memory is not
+> shared by default.
+> 
+> What do you think Patrick? Do you need an explicit VM type?
 
+Mhh, no, if "normal" VMs support guest_memfd, then that works too. I
+suggested the VM type because that's how x86 works
+(KVM_X86_SW_PROTECTED_VM), but never actually stopped to think about
+whether it makes sense for ARM. Maybe Sean knows something we're missing?
+
+I wonder whether having the "default sharedness" depend on the vm type
+works out though - whether a range of gmem is shared or private is a
+property of the guest_memfd instance, not the VM it's attached to, so I
+guess the default behavior needs to be based solely on the guest_memfd
+as well (and then if someone tries to attach a gmem to a VM whose desire
+of protection doesnt match the guest_memfd's configuration, that
+operation would fail)?
+
+Tangentially related, does KVM_GMEM_SHARED to you mean "guest_memfd also
+supports shared sections", or "guest_memfd does not support private
+memory anymore"? (the difference being that in the former, then
+KVM_GMEM_SHARED would later get the ability to convert ranges private,
+and the EOPNOSUPP is just a transient state until conversion support is
+merged) - doesnt matter for my usecase, but I got curious as some other
+threads implied the second option to me and I ended up wondering why.
+
+Best,
+Patrick
+
+> Cheers,
+> /fuad
+> 
+>> Cheers,
+>> Quentin
 
