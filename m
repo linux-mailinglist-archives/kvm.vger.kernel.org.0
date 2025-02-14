@@ -1,174 +1,180 @@
-Return-Path: <kvm+bounces-38141-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38143-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4336FA359F0
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 10:14:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF192A35A30
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 10:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 354B216B401
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 09:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FBF03AE5C6
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 09:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412C223A995;
-	Fri, 14 Feb 2025 09:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243E823A9B4;
+	Fri, 14 Feb 2025 09:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VLRejC9i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QDWIymUw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67B522C35C
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 09:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F124227BAB;
+	Fri, 14 Feb 2025 09:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739524404; cv=none; b=WeB/iQbqsG2W7w6Zk8JR4h6LpxIUMRKxoKOE1vltaZfqm7dUFUEvQE7sVZLQWUZJqovmjUbfBDUYx6x/o9yaGoAvG/2amONqMz0j7yaAL1pK8RxB78Hpcic9L+bH0Z0vR0rLZ2NUjxnCU7vgsToN7unMAwtg7eVwMdIHiuTo7U0=
+	t=1739525047; cv=none; b=jtqUjNH0hWLs96cfhU7bVzeq8QfpnwQ/+DN/XsXC/w2Ux2rwysXmbJ+ORF7rhYqq/WxxqhToQJ+Gy2c0MlmGNG+CR1x/HEAkTxcbQn5deIVhM+K8FoiI1d+RfdGQRS358Bshs7O2H2g6dEMnbDQ6daXLMF0Qkrc9+NkDOrmKze0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739524404; c=relaxed/simple;
-	bh=du5R5OUyc41uFNnKmFDZ3ZTR4fBDivNAdBOmdVBBTyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NBh0B0uwAhCO1OQbGNlFERPb6aDcFoZje+y4rJdFoFH0D9oJVn6fs3sAR+inbpMmGbaUtvVTHGlI7HHu4ab635fqxGZ7ADbQmr0vUb4ibvd0RV1hVmYHfv4YaWmp39a+wB7RiCNi5TMHPN83G398u3CRc6uHhDvqhPG5mJRl7BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VLRejC9i; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739524401;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gXpaw3tkniDHQJSqE2+DNSZa4uhMaRXAPDQGJoN00q4=;
-	b=VLRejC9i13Nm7UoSm6hASP24DcYXjC7ZGF2+3RDY9NOnT1VHZ68wdBBpKemVyDQWlGW5N4
-	uKRc1oD3RLoNuqhNeKfhLLcgLd69gay4iVLH+0t/5JLkWzT41D7EhekT2b2ne7mP/KMm/x
-	Ac7qxYzpNqTFQwfofFHh7ne5n57Gyac=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-400-HA4JPy-SNSiBZG-rRdnImA-1; Fri, 14 Feb 2025 04:13:20 -0500
-X-MC-Unique: HA4JPy-SNSiBZG-rRdnImA-1
-X-Mimecast-MFC-AGG-ID: HA4JPy-SNSiBZG-rRdnImA_1739524399
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38f28a4647eso801371f8f.1
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 01:13:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739524399; x=1740129199;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gXpaw3tkniDHQJSqE2+DNSZa4uhMaRXAPDQGJoN00q4=;
-        b=f9Rh1j2XX+u2bL3FhgZEt8MYk1cDRMMM1VGjCgBEhk2tbipvSI5dgwLV7bLCRHUmoV
-         YIAvxK5UwGXUhCbS1/ZqwE8JmX7DfvqSWgg7MyZp04K1hZb06+XzIaaZMS7iF13jUYyB
-         8u/Fds4dgeoXNbdbC+weAb1OvP7iXWNt5WJJZf5R0fziHM6mLmRFj7jzpGVQVIJVfJSK
-         nlA4SBzMfqELbwZE9CkAn77PUBu8PPZ78Uo51x6hVn+zQYbUnbwuvT7dqucKkD2HjKD3
-         R3RB/RZC6jLJtPhe6U5wfAQvtnlKumusZmdkOBv9CSkHDKNoyO+i/vJvQ6K3dus9cbVN
-         R3nw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdGUGgeuehZE1AietvFGVoRWOBe0z955VY4eAH7wCwAQjcsq9HZ1KjCwcm4GKDe5aKFyw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyw2YEgrB2NY3PWr2rMmDY/xsUCostuGoxDBeKCP0a9UmiiLe8g
-	oSvRSK45sudHGuo2iLC15LNywohhM7hr3NpLVbKZ1zEfYIIk6kiTuWycrdHDzjc1zNzVzlsAcMA
-	ZOKkp44P1rM0N8HpcuCxXK6o0IdDxn9S40KMluChg19lV1xGClA==
-X-Gm-Gg: ASbGncslE7/uD4UZvU97MQPTYiztSRG2E6asPnVpMvRqi6IoHs/mQPmJ+VqRRYsTxN2
-	oyuoNSZKEvzEYrDMNkTF5Zu+H3MiI9HmuDjukRvZ+LwqjtokKMUNSDBb4YoZ5gJ0Nfj+hm6Oh/1
-	dSBflPxBtrFsFlDqOKdwc1EKWv2DlUB/vXAcKpdHiXCted4JSHLoJv2AaKH/H2C5EqIiITBL6EW
-	d7fqeTE9Wp1hvubGQx//vWC0ZJPXJgD7XmCcQzijaoDiPty8BcmiqxPpGfU6kVmEleN2kWTQNue
-	gifXvazh
-X-Received: by 2002:a05:6000:1a85:b0:38d:e3a9:d641 with SMTP id ffacd0b85a97d-38f244dfe03mr9750121f8f.16.1739524398988;
-        Fri, 14 Feb 2025 01:13:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGFo1+ndYPmLLEUFSzQhsih+LtpLI3CjoSkz/apOU+mMFzHLmZCSQphrtiigXU04yGg9k2Yzw==
-X-Received: by 2002:a05:6000:1a85:b0:38d:e3a9:d641 with SMTP id ffacd0b85a97d-38f244dfe03mr9750070f8f.16.1739524398608;
-        Fri, 14 Feb 2025 01:13:18 -0800 (PST)
-Received: from leonardi-redhat ([176.206.32.19])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258ccd2csm4202125f8f.30.2025.02.14.01.13.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 01:13:18 -0800 (PST)
-Date: Fri, 14 Feb 2025 10:13:16 +0100
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Junnan Wu <junnan01.wu@samsung.com>
-Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com, 
-	eperezma@redhat.com, horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, 
-	kvm@vger.kernel.org, lei19.wang@samsung.com, linux-kernel@vger.kernel.org, 
-	mst@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, q1.huang@samsung.com, 
-	stefanha@redhat.com, virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com, 
-	ying01.gao@samsung.com, ying123.xu@samsung.com
-Subject: Re: [Patch net v3] vsock/virtio: fix variables initialization during
- resuming
-Message-ID: <yixatl5meez3ijzumebqkhf3sywwmiicwbsuxxsfdyfeeaapw2@dq542v2lclvm>
-References: <CAGxU2F7PKH34N7Jd5d=STCAybJi-DDTB-XGiXSAS9BBvGVN4GA@mail.gmail.com>
- <CGME20250214012219epcas5p2840feb4b4539929f37c171375e2f646b@epcas5p2.samsung.com>
- <20250214012200.1883896-1-junnan01.wu@samsung.com>
+	s=arc-20240116; t=1739525047; c=relaxed/simple;
+	bh=Mfy+ddENg5qvhmHKsXDrCIS3v98wZceAIoRgJrBPpiE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Uma7oPVlQuxsQWFm/3LOe517wE8k5qjV2Rt3WJ6iogv5usc+P5oEhf/62sguAcVOqOmlHtwKDh7hsFj2uHEWsphvYVrefMNWmzjjQ3SqXVNfzDJrV8lK5eU8X3NDQUDuMJ02t4XG4ZKgo4gRDjcUjqSDkkT3je9dkLopKuIijFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QDWIymUw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80F31C4CED1;
+	Fri, 14 Feb 2025 09:24:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739525046;
+	bh=Mfy+ddENg5qvhmHKsXDrCIS3v98wZceAIoRgJrBPpiE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QDWIymUw7wH10bLW2shWeKckkb0k5SLz7UsvShpl02/TVwsNy+jWlkSE9VZIPeB+O
+	 6DQe7BXlahbQY5v4V9BCdhnXBUfrbwbzO7GsYsHNXeIYlSNWlcWkP1M+4ML/fzfPv4
+	 LSkqE1iD/nLQI5ZIuu7p174UBm4WINc9D37mgl73PgRR6ddnAI66xzkpgskmsYqmIB
+	 CHuqLZJslaE+wQ13WMoMH7eLgKQ5Cl1hnjPzyDNllLEuVf6Yhv6YxvEvz6D+gD94Rg
+	 lXjC7ou10W7jkPVjsQSFjXekuaZkk7UZ6qrVHb5iBsiA2XIYLW3oK9Ezc2lLimq1wb
+	 DZJsROpGN5toA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1tirvX-00412s-VH;
+	Fri, 14 Feb 2025 09:24:04 +0000
+Date: Fri, 14 Feb 2025 09:24:03 +0000
+Message-ID: <86pljkswuk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 00/27] KVM: arm64: Implement support for SME in non-protected guests
+In-Reply-To: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
+References: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250214012200.1883896-1-junnan01.wu@samsung.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, Dave.Martin@arm.com, tabba@google.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 14, 2025 at 09:22:00AM +0800, Junnan Wu wrote:
->When executing suspend to ram twice in a row,
->the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
->Then after virtqueue_get_buf and `rx_buf_nr` decreased
->in function virtio_transport_rx_work,
->the condition to fill rx buffer
->(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
->
->It is because that `rx_buf_nr` and `rx_buf_max_nr`
->are initialized only in virtio_vsock_probe(),
->but they should be reset whenever virtqueues are recreated,
->like after a suspend/resume.
->
->Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
->virtio_vsock_vqs_init(), so we are sure that they are properly
->initialized, every time we initialize the virtqueues, either when we
->load the driver or after a suspend/resume.
->
->To prevent erroneous atomic load operations on the `queued_replies`
->in the virtio_transport_send_pkt_work() function
->which may disrupt the scheduling of vsock->rx_work
->when transmitting reply-required socket packets,
->this atomic variable must undergo synchronized initialization
->alongside the preceding two variables after a suspend/resume.
->
->Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
->Link: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
->Co-developed-by: Ying Gao <ying01.gao@samsung.com>
->Signed-off-by: Ying Gao <ying01.gao@samsung.com>
->Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
->---
-> net/vmw_vsock/virtio_transport.c | 10 +++++++---
-> 1 file changed, 7 insertions(+), 3 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index b58c3818f284..f0e48e6911fc 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
-> 	};
-> 	int ret;
->
->+	mutex_lock(&vsock->rx_lock);
->+	vsock->rx_buf_nr = 0;
->+	vsock->rx_buf_max_nr = 0;
->+	mutex_unlock(&vsock->rx_lock);
->+
->+	atomic_set(&vsock->queued_replies, 0);
->+
-> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
-> 	if (ret < 0)
-> 		return ret;
->@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->
-> 	vsock->vdev = vdev;
->
->-	vsock->rx_buf_nr = 0;
->-	vsock->rx_buf_max_nr = 0;
->-	atomic_set(&vsock->queued_replies, 0);
->
-> 	mutex_init(&vsock->tx_lock);
-> 	mutex_init(&vsock->rx_lock);
->-- 
->2.34.1
->
+On Fri, 14 Feb 2025 01:57:43 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> I've removed the RFC tag from this version of the series, but the items
+> that I'm looking for feedback on remains the same:
+> 
+>  - The userspace ABI, in particular:
+>   - The vector length used for the SVE registers, access to the SVE
+>     registers and access to ZA and (if available) ZT0 depending on
+>     the current state of PSTATE.{SM,ZA}.
+>   - The use of a single finalisation for both SVE and SME.
+> 
+>  - The addition of control for enabling fine grained traps in a similar
+>    manner to FGU but without the UNDEF, I'm not clear if this is desired
+>    at all and at present this requires symmetric read and write traps like
+>    FGU. That seemed like it might be desired from an implementation
+>    point of view but we already have one case where we enable an
+>    asymmetric trap (for ARM64_WORKAROUND_AMPERE_AC03_CPU_38) and it
+>    seems generally useful to enable asymmetrically.
+> 
+> This series implements support for SME use in non-protected KVM guests.
 
-Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+[...]
 
+Just to be clear: I do not intend to review a series that doesn't
+cover the full gamut of KVM from day 1. Protected mode is an absolute
+requirement. It is the largest KVM deployment, and Android phones the
+only commonly available platform with SME. If CCA gets merged prior to
+SME support, supporting it will also be a requirement.
+
+> Much of this is very similar to SVE, the main additional challenge that
+> SME presents is that it introduces a new vector length similar to the
+> SVE vector length and two new controls which change the registers seen
+> by guests:
+> 
+>  - PSTATE.ZA enables the ZA matrix register and, if SME2 is supported,
+>    the ZT0 LUT register.
+>  - PSTATE.SM enables streaming mode, a new floating point mode which
+>    uses the SVE register set with the separately configured SME vector
+>    length.  In streaming mode implementation of the FFR register is
+>    optional.
+> 
+> It is also permitted to build systems which support SME without SVE, in
+> this case when not in streaming mode no SVE registers or instructions
+> are available.  Further, there is no requirement that there be any
+> overlap in the set of vector lengths supported by SVE and SME in a
+> system, this is expected to be a common situation in practical systems.
+> 
+> Since there is a new vector length to configure we introduce a new
+> feature parallel to the existing SVE one with a new pseudo register for
+> the streaming mode vector length.  Due to the overlap with SVE caused by
+> streaming mode rather than finalising SME as a separate feature we use
+> the existing SVE finalisation to also finalise SME, a new define
+> KVM_ARM_VCPU_VEC is provided to help make user code clearer.  Finalising
+> SVE and SME separately would introduce complication with register access
+> since finalising SVE makes the SVE regsiters writeable by userspace and
+> doing multiple finalisations results in an error being reported.
+> Dealing with a state where the SVE registers are writeable due to one of
+> SVE or SME being finalised but may have their VL changed by the other
+> being finalised seems like needless complexity with minimal practical
+> utility, it seems clearer to just express directly that only one
+> finalisation can be done in the ABI.
+>
+> Access to the floating point registers follows the architecture:
+> 
+>  - When both SVE and SME are present:
+>    - If PSTATE.SM == 0 the vector length used for the Z and P registers
+>      is the SVE vector length.
+>    - If PSTATE.SM == 1 the vector length used for the Z and P registers
+>      is the SME vector length.
+>  - If only SME is present:
+>    - If PSTATE.SM == 0 the Z and P registers are inaccessible and the
+>      floating point state accessed via the encodings for the V registers. 
+>    - If PSTATE.SM == 1 the vector length used for the Z and P registers
+>  - The SME specific ZA and ZT0 registers are only accessible if SVCR.ZA is 1.
+> 
+> The VMM must understand this, in particular when loading state SVCR
+> should be configured before other state.
+
+Why SVCR? This isn't a register, just an architected accessor to
+PSTATE.{ZA,SM}. Userspace already has direct access to PSTATE, so I
+don't understand this requirement.
+
+Isn't it that there is simply a dependency between restoring PSTATE
+and any of the vector stuff? Also, how do you preserve the current ABI
+that do not have this requirement?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
