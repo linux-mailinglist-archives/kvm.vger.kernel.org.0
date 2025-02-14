@@ -1,212 +1,197 @@
-Return-Path: <kvm+bounces-38168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 257B6A35EAB
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 14:18:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E909A35E98
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 14:17:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66A4118953DE
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 13:12:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 999BE3A4390
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 13:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B53C265CD6;
-	Fri, 14 Feb 2025 13:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD69426562C;
+	Fri, 14 Feb 2025 13:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rotjHjcz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pe2KXrxL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BC123A992;
-	Fri, 14 Feb 2025 13:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CCF264A83
+	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 13:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739538691; cv=none; b=eu7M4Gw9e9BmAPYhUP2lX/xrflv8tb1oHlyi1trDY7c74srWB6YVT2QDIGYj0XWsIxSI0pVRvWtGfOVDRWJoQlzTf/W5ZjOQq+RoJVeYT0BM762+TPzV7K1XV+Q33BTo8wVY2ohvcCY2fTJQ7VbCMGt1+XFh7y2TdNdgmfxfSTk=
+	t=1739538756; cv=none; b=f6m8v1fabISQ5QHmERV2B7vnE8OEL2kdTTT0vwI5Y7ob0Y9M8azWOSuvvfz8ReSNem1x9Eqla1TvlAUNBmomNtn5ExpsvB+jEed3w30FSJFwfeuxNlIQR2zCCZ2VknW/iXi+xgYnBRf0huNnRXawi1NJl+RU+4UFTpTeEprHBFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739538691; c=relaxed/simple;
-	bh=oZzm7bjnXY99I6Zc3jVr5s2rPCWnBBpDlteWHQeKPAg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WGrnl+CkhgFO9RM8HcDx6gt8evUU8aqGwZyeC/FUU6kTIUUKhMdFcFtsHFOb2yFG/Vo2yx1wb+69uiLWEiRPqTfwRBZaFi3P4aei015Dd7hwy7qMj09R5HR/xn/lx8koRUBM3ZeGB1AUkrgT5tKUkEfNZ8iTOJ5bj4ZomN/9xjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rotjHjcz; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51E44kDs015865;
-	Fri, 14 Feb 2025 13:11:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=iQNQDA
-	TVZJVA7sMUS+nMqNiPw40LRstanI4kXZIak5Y=; b=rotjHjcztgpss0h9YnYueE
-	fH2y9zIuCZGV/2X4lQySlVSw9Uw9MUzZxhtUW/J6wWPWVGEbqCKTU1tyEHFBOmNw
-	RpGLCayrLEGrVMqA8RfGS6slP2Qf28tD9ORr6tBL2tf5lboa4+Tup0l1L0Z0fslG
-	ceDoKGdLHXmhb5gWlYm3hTwWOnAPxRjS82N/vZDqv2j/wLxwfPBl1z5prePxggL3
-	ieNm5pG+dSefWzOKI7xiA4iqH6YUGl1o0nEdsKRlhPxgS+8sJlNAfaD7VvGDfnho
-	FFjxb0RFVjqEkuFZW4SheItIxRCFWb8fk4MfiHScdliDFXZlM66iASvqsJcWb8KA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44skjuwe49-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 13:11:13 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51ED9RZW019399;
-	Fri, 14 Feb 2025 13:11:12 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44skjuwe46-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 13:11:12 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51EAK5cH028221;
-	Fri, 14 Feb 2025 13:11:11 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44phyyuug1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Feb 2025 13:11:11 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51EDBAnZ29426278
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Feb 2025 13:11:10 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2C19D5806B;
-	Fri, 14 Feb 2025 13:11:10 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5E71458052;
-	Fri, 14 Feb 2025 13:11:07 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 14 Feb 2025 13:11:07 +0000 (GMT)
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-Date: Fri, 14 Feb 2025 14:10:54 +0100
-Subject: [PATCH v6 3/3] PCI: s390: Enable HAVE_PCI_MMAP on s390 and
- restrict mmap() of resources to mappable BARs
+	s=arc-20240116; t=1739538756; c=relaxed/simple;
+	bh=zNi5WLr0Xv0TwHaaZJqiogAW1THAfheVtXEohY4nxzo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tIDyK6qjgmU6QDW11St2dC1dyWikpgfQ24qv28SVZSeC5p+hr//CB09tUVDvE7gQV8oYKRJmhIl0zg2Wf3xeCDlcTxtFebnJBrW//dJAtUSprkW55Mb775oVjALIrisNRJ/YDz8y5+TOLSDXZqPVyIjzLok3l/wYckzQdj49NtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pe2KXrxL; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-47180c199ebso222421cf.0
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 05:12:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739538754; x=1740143554; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zNi5WLr0Xv0TwHaaZJqiogAW1THAfheVtXEohY4nxzo=;
+        b=pe2KXrxL4t3tpGcOcG3N09BQenxSX6Qtwa8O/4YZb5o5FNKmxhzjYA86DhzHHsXU07
+         BqIFjvjI52qak7QsuSPH96mJVeyNs1n0nLWJKmRObrG8V/4OgmO+bjfXBIedLX2oEGq+
+         1McjZLSdS83/OA45WDzEMHEWlsfH2l5SJ8hGe7nIgIB/LpcW/Hmb7ttdZBSJ1KAKC86K
+         ZcEgrULZRl87DNrjg6hHPjxXhkr7GrJgp3+qWeJDvkyBnEcN4HquwGuSCEPM8QeJlHgo
+         +J+wNmSuSEhzHBTUvplI3NLO5U6QGkJ0bi15wSC/MrilNs0c45LcYznqDeODUjE/PtFk
+         BQ0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739538754; x=1740143554;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zNi5WLr0Xv0TwHaaZJqiogAW1THAfheVtXEohY4nxzo=;
+        b=mzPdNST1V6MLIqHJalRcIH6qBhGYWqxkGWVxX4iaWV8naa+XedCtJCtj6PZ0RsVsDS
+         TC9EVimgn8ZPeKlMd9vp84yEpJcMXQEAxRVMF2mXsFS5+JELbr0dAHuwoBo9CNB0/11F
+         Rq3wcraDhzpeXE6htQZ5CLTfOknZADYqD08Fm2HsfL+nLfk0CzGyj+Flqz+Cm3c4cmYC
+         1KZEzm4AkGD0OJP+lWwzWQdzLji6y6PBJ8e/M6wycjrJq5aWUxvfLa1fAUh8aFiEeMor
+         SBClxmeAem+P7g9DcrSzfyhlqCOJAiNiWafJxsYYr5oGXj6rtAk0bttM9sefnWUxygGf
+         88og==
+X-Forwarded-Encrypted: i=1; AJvYcCUU8zqzHv7otr4jUHywCWPtgE109Ra/CzvQwJTt4fwZJCxoCiWQEcgXtpSPYHXK+U1nllg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZVZmhy49mo2PAyV8cwQZrKmpSk1Vu6lWHjoSeCHDKAlyEfpE3
+	6cFmII6+TKca/irhRReHn53qjK2WOJqS4MjOheNQW0uMtGbnax7rp4yPO9JPO8+9Lk0BbKJpFRY
+	z2wTkjQ2BeRNfmgmnoB03lcVbjxgb4rv5f3Mp
+X-Gm-Gg: ASbGncvN2XskhC3y43PXaPLTZlZZd7HodbtMvzlTr8DUmF/Z51eG/EI+x4VZ9nsY5y+
+	b3kckhi6iO2Q3SN/uUYtnUVQuPssHVr4/tmht7vrUWBCVuLHDr871RL9/8OsR00jpVcfoZpk=
+X-Google-Smtp-Source: AGHT+IHfVH3XaWPCkKWV6hxZjYre5tjBmvsTWSU9Jq1gOifZbOjP1USFXc0eACKKDkgOPq5Fn5G8l9QQjOM1vmE8scQ=
+X-Received: by 2002:a05:622a:1812:b0:471:812b:508 with SMTP id
+ d75a77b69052e-471ce8ef5f7mr3094321cf.14.1739538753745; Fri, 14 Feb 2025
+ 05:12:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250214-vfio_pci_mmap-v6-3-6f300cb63a7e@linux.ibm.com>
-References: <20250214-vfio_pci_mmap-v6-0-6f300cb63a7e@linux.ibm.com>
-In-Reply-To: <20250214-vfio_pci_mmap-v6-0-6f300cb63a7e@linux.ibm.com>
-To: Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Cc: Julian Ruess <julianr@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org, Niklas Schnelle <schnelle@linux.ibm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3239;
- i=schnelle@linux.ibm.com; h=from:subject:message-id;
- bh=oZzm7bjnXY99I6Zc3jVr5s2rPCWnBBpDlteWHQeKPAg=;
- b=owGbwMvMwCX2Wz534YHOJ2GMp9WSGNLXOzx05VXpUpY6Pt1s8m0+ztVTdd9OSeXY+bDWV8JHg
- zvJPsWno5SFQYyLQVZMkWVRl7PfuoIppnuC+jtg5rAygQxh4OIUgIm8y2RkuDz5b+HScxEHFm2S
- 6Vt5T77nbanDil93WVZHHVfV/LD0fDDDPy3rYoVurirDs88tE1kfZ0yZ1BcnsTKE7cQX/djkxLI
- cVgA=
-X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
- fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: l-dImMFPgbWZdTA0gSjIhc-jmoW6UfA5
-X-Proofpoint-ORIG-GUID: MicYpK5s-NuHQl-dwLUgCzVIoGTeeour
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-14_05,2025-02-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- mlxlogscore=651 lowpriorityscore=0 mlxscore=0 spamscore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 malwarescore=0 adultscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
- definitions=main-2502140096
+References: <20250211121128.703390-1-tabba@google.com> <20250211121128.703390-10-tabba@google.com>
+ <Z6t227f31unTnQQt@google.com> <CA+EHjTweTLDzhcCoEZYP4iyuti+8TU3HbtLHh+u5ark6WDjbsA@mail.gmail.com>
+ <Z6t6_M8un1Cf3nmk@google.com> <d9645330-3a0d-4950-a50b-ce82b428e08c@amazon.co.uk>
+ <Z6uEQFDbMGboHYx7@google.com> <Z68lZUeGWwIe-tEK@google.com>
+ <CA+EHjTz=d99Mz9jXt5onmtkJgxDetZ32NYkFv98L50BJgSbgGg@mail.gmail.com> <ebbc4523-6bec-4f4f-a509-d10a264a9a97@amazon.co.uk>
+In-Reply-To: <ebbc4523-6bec-4f4f-a509-d10a264a9a97@amazon.co.uk>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 14 Feb 2025 13:11:56 +0000
+X-Gm-Features: AWEUYZkNr2Uul6_iPp94OYAFbo8pAAh3UwwAo4NKDmUwU_-sBj6dQOexcTIaJvw
+Message-ID: <CA+EHjTyiRAun3XbRUZA52Pq2kSk+gHFt_PksJcCh7P1V3-J3_A@mail.gmail.com>
+Subject: Re: [PATCH v3 09/11] KVM: arm64: Introduce KVM_VM_TYPE_ARM_SW_PROTECTED
+ machine type
+To: Patrick Roy <roypat@amazon.co.uk>
+Cc: Quentin Perret <qperret@google.com>, seanjc@google.com, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
+	chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
+	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
+	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
+	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
+	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
+	ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
+	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
+	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
+	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
+	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
+	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
+	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
+	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, keirf@google.com, 
+	shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
+	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-So far s390 does not select HAVE_PCI_MMAP. This is partly because access
-to mapped PCI resources requires special PCI load/store instructions and
-prior to commit 71ba41c9b1d9 ("s390/pci: provide support for MIO
-instructions") even required use of special syscalls. This really isn't
-a showstopper though and in fact lack of HAVE_PCI_MMAP has previously
-caused extra work when testing and debugging PCI devices and drivers.
+Hi Patrick,
 
-Another issue when looking at HAVE_PCI_MMAP however comes from the
-virtual ISM devices. These present 256 TiB BARs which really can't be
-accessed via a mapping to user-space.
+On Fri, 14 Feb 2025 at 12:37, Patrick Roy <roypat@amazon.co.uk> wrote:
+>
+>
+>
+> On Fri, 2025-02-14 at 11:33 +0000, Fuad Tabba wrote:
+> > Hi Quentin,
+> >
+> > On Fri, 14 Feb 2025 at 11:13, Quentin Perret <qperret@google.com> wrote:
+> >>
+> >> On Tuesday 11 Feb 2025 at 17:09:20 (+0000), Quentin Perret wrote:
+> >>> Hi Patrick,
+> >>>
+> >>> On Tuesday 11 Feb 2025 at 16:32:31 (+0000), Patrick Roy wrote:
+> >>>> I was hoping that SW_PROTECTED_VM will be the VM type that something
+> >>>> like Firecracker could use, e.g. an interface to guest_memfd specifically
+> >>>> _without_ pKVM, as Fuad was saying.
+> >>>
+> >>> I had, probably incorrectly, assumed that we'd eventually want to allow
+> >>> gmem for all VMs, including traditional KVM VMs that don't have anything
+> >>> special. Perhaps the gmem support could be exposed via a KVM_CAP in this
+> >>> case?
+> >>>
+> >>> Anyway, no objection to the proposed approach in this patch assuming we
+> >>> will eventually have HW_PROTECTED_VM for pKVM VMs, and that _that_ can be
+> >>> bit 31 :).
+> >>
+> >> Thinking about this a bit deeper, I am still wondering what this new
+> >> SW_PROTECTED VM type is buying us? Given that SW_PROTECTED VMs accept
+> >> both guest-memfd backed memslots and traditional HVA-backed memslots, we
+> >> could just make normal KVM guests accept guest-memfd memslots and get
+> >> the same thing? Is there any reason not to do that instead? Even though
+> >> SW_PROTECTED VMs are documented as 'unstable', the reality is this is
+> >> UAPI and you can bet it will end up being relied upon, so I would prefer
+> >> to have a solid reason for introducing this new VM type.
+> >
+> > The more I think about it, I agree with you. I think that reasonable
+> > behavior (for kvm/arm64) would be to allow using guest_memfd with all
+> > VM types. If the VM type is a non-protected type, then its memory is
+> > considered shared by default and is mappable --- as long as the
+> > kconfig option is enabled. If VM is protected then the memory is not
+> > shared by default.
+> >
+> > What do you think Patrick? Do you need an explicit VM type?
+>
+> Mhh, no, if "normal" VMs support guest_memfd, then that works too. I
+> suggested the VM type because that's how x86 works
+> (KVM_X86_SW_PROTECTED_VM), but never actually stopped to think about
+> whether it makes sense for ARM. Maybe Sean knows something we're missing?
+>
+> I wonder whether having the "default sharedness" depend on the vm type
+> works out though - whether a range of gmem is shared or private is a
+> property of the guest_memfd instance, not the VM it's attached to, so I
+> guess the default behavior needs to be based solely on the guest_memfd
+> as well (and then if someone tries to attach a gmem to a VM whose desire
+> of protection doesnt match the guest_memfd's configuration, that
+> operation would fail)?
 
-Now, the newly added pdev->non_mappable_bars flag provides a way to
-exclude devices whose BARs can't be mapped to user-space including the
-s390 ISM device. So honor this flag also in the mmap() paths protected
-by HAVE_PCI_MMMAP and with the ISM device thus excluded enable
-HAVE_PCI_MMAP for s390.
+Each guest_memfd is associated with a KVM instance. Although it could
+migrate, it would be weird for a guest_memfd instance to migrate
+between different types of VM, or at least, migrate between VMs that
+have different confidentiality requirements.
 
-Note that most distributions enable CONFIG_IO_STRICT_DEVMEM=y and
-require unbinding drivers before resources can be mapped. This makes it
-extremely unlikely that any existing programs on s390 will now suddenly
-fail after succeeding to mmap() resources and then trying to access the
-mapping without use of the special PCI instructions.
 
-Link: https://lore.kernel.org/lkml/20250212132808.08dcf03c.alex.williamson@redhat.com/
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
----
- arch/s390/include/asm/pci.h | 4 ++++
- drivers/pci/pci-sysfs.c     | 4 ++++
- drivers/pci/proc.c          | 4 ++++
- 3 files changed, 12 insertions(+)
+> Tangentially related, does KVM_GMEM_SHARED to you mean "guest_memfd also
+> supports shared sections", or "guest_memfd does not support private
+> memory anymore"? (the difference being that in the former, then
+> KVM_GMEM_SHARED would later get the ability to convert ranges private,
+> and the EOPNOSUPP is just a transient state until conversion support is
+> merged) - doesnt matter for my usecase, but I got curious as some other
+> threads implied the second option to me and I ended up wondering why.
 
-diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
-index 474e1f8d1d3c2fc5685b459cc68b67ac651ea3e9..518dd71a78c83c74dc7b29778e299d5c8cabcc59 100644
---- a/arch/s390/include/asm/pci.h
-+++ b/arch/s390/include/asm/pci.h
-@@ -11,6 +11,10 @@
- #include <asm/pci_insn.h>
- #include <asm/sclp.h>
- 
-+#define HAVE_PCI_MMAP			1
-+#define ARCH_GENERIC_PCI_MMAP_RESOURCE	1
-+#define arch_can_pci_mmap_wc()		1
-+
- #define PCIBIOS_MIN_IO		0x1000
- #define PCIBIOS_MIN_MEM		0x10000000
- 
-diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
-index b46ce1a2c5542cdea0a3f9df324434fdb7e8a4d2..7373eca0a4943bf896b4a177124e0d4572baec2b 100644
---- a/drivers/pci/pci-sysfs.c
-+++ b/drivers/pci/pci-sysfs.c
-@@ -1257,6 +1257,10 @@ static int pci_create_resource_files(struct pci_dev *pdev)
- 	int i;
- 	int retval;
- 
-+	/* Skip devices with non-mappable BARs */
-+	if (pdev->non_mappable_bars)
-+		return 0;
-+
- 	/* Expose the PCI resources from this device as files */
- 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
- 
-diff --git a/drivers/pci/proc.c b/drivers/pci/proc.c
-index f967709082d654a101039091b5493b2dec5f57b4..9348a0fb808477ca9be80a8b88bbc036565bc411 100644
---- a/drivers/pci/proc.c
-+++ b/drivers/pci/proc.c
-@@ -251,6 +251,10 @@ static int proc_bus_pci_mmap(struct file *file, struct vm_area_struct *vma)
- 	    security_locked_down(LOCKDOWN_PCI_ACCESS))
- 		return -EPERM;
- 
-+	/* Skip devices with non-mappable BARs */
-+	if (dev->non_mappable_bars)
-+		return -EINVAL;
-+
- 	if (fpriv->mmap_state == pci_mmap_io) {
- 		if (!arch_can_pci_mmap_io())
- 			return -EINVAL;
+My thinking (and implementation in the other patch series) is that
+KVM_GMEM_SHARED (back then called KVM_GMEM_MAPPABLE) allows sharing in
+place/mapping, without adding restrictions.
 
--- 
-2.45.2
+Cheers,
+/fuad
 
+> Best,
+> Patrick
+>
+> > Cheers,
+> > /fuad
+> >
+> >> Cheers,
+> >> Quentin
 
