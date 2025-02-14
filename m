@@ -1,87 +1,57 @@
-Return-Path: <kvm+bounces-38190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38192-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA22A36613
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 20:27:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6386FA3666B
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 20:46:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33AA618959FC
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 19:27:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC0AD7A1863
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 19:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A611AA1E0;
-	Fri, 14 Feb 2025 19:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3F01C84B3;
+	Fri, 14 Feb 2025 19:46:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Mt2nO6ae"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mh3Db78j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4332AF16
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 19:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9D6193077;
+	Fri, 14 Feb 2025 19:46:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739561229; cv=none; b=uPuB8Rp78SVttJsu+MgCeXG/DQ4sfssJBjkEnj5Y+ZcGOBeSsutiYHXFxxfYo7RjnZXJqePIuFBKUTYRwsznbqTiToLED7fpU800aSYisqA23Sl84ELjDyynBSaiKN8lPt2pLNEnDk6hy9AtjuOo7JV/cWBvaDdtvoMU+UhJ9ec=
+	t=1739562394; cv=none; b=d3Xzfr1kjTsEUd5mYInc4LJhinZvOVzX5sOaYONtksSFYX4cd1rW+ujDTstpJiPlLijeIyGlT/7F2fQeuUYw5q3XvGyRy8E9KnYO/TGLMNQ1K+yOllipTqK/C1ky0BRVN4ARZ0kX7dHt7tMnb8xxdj60pxborhN8iLkDTqORJIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739561229; c=relaxed/simple;
-	bh=55jqhg240yOgqtQp2hkMhDJI7bwzW3oaSKWgrwuFEsM=;
+	s=arc-20240116; t=1739562394; c=relaxed/simple;
+	bh=K8CvequWQfPeLPsTaoe2rAGt/ZrNRLSnGeyogDnWvzQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FZhD/Lm5ZsQ/2bM6NuGRhkzn3O/rj3fS7Kno5WqggFID8ADJRX/ww2cy+oAe91plcumcZEr8fAtvzddsKMeydxTp8ssW5YNqWJwWt3/gwrNXlfNaBePbpo2WaRBaMTJbHOGlKE0hmJW8VPwdS4H0aq9BDIieqmxX2nMc0SxTYbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Mt2nO6ae; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7c079026860so277159785a.3
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 11:27:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1739561226; x=1740166026; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q54C682wupKw2fn+9hJZ17sdX89XEBbDkpwzhueywsk=;
-        b=Mt2nO6aeycPPfnCy1bujlM1UYhiHUIljw6VZR48g1zYy7uo5waceIvFPpk457M4jeQ
-         FOLSEXC7Hzeh6OwOdFmQzrYp4eLRyNG03hDEOcKA6hb5r84Y4RemgNUr/Rw/1I69DkGi
-         bZl3hdwcRsRh1TXisDohs3AKG3ClrGD0URCCyifSMD3lkvIE+E1BOQiqLHfjQxv96qJ9
-         xKfCmih7c0TR+QhlljWIycxTyDfuXUg7kU1dfzeCrFJinSf1nB7baunhUFi/VANVk+yW
-         2ZEmZSxVfELs3RRUPokNWrEZNfrWhY9sG/EPQEGHP+WylhLWxZq9ffmzkRYPZN411bZY
-         BThg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739561226; x=1740166026;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q54C682wupKw2fn+9hJZ17sdX89XEBbDkpwzhueywsk=;
-        b=i0h9bozYDC0uQ/iJ0CzEQQ4fII5NQhCsJyVL9Ax454u7QJivuZ94NS+T/OerK3tppE
-         8bSul4JDdxysN8HMhtmFRxvHsXJpNviVzpGRBaD5Jux0/pxykSSHNUHWSUSmSfru876E
-         nhScXWnkJBnOw4KPE1r7Ss8tGqavSmkrI9y1FHbI454jm/5nWu6yY/j2NUb102PtjLc9
-         O39zkeAa0zJxnoOM0XaebHf5O/uiXwo5Ujk43J9jV3jgcoB9bxZIaKviCDGIflpV85MV
-         Ezucxt2ivyO6gWUm/lRXUeopP8/xlPq5CnnveHT5gvGbjaaY+/r6MtwSwldwCklyLUki
-         /7rQ==
-X-Gm-Message-State: AOJu0YwWIYCTAJt5jTsY5YoHwMjyaTJ2DzMLTZ/3gZvQxoTfxMQ9K8NY
-	TmUcxwIG2C30hNuL5SWmaJAziwbfmx3yAif3BK7zzgKrOoCs7wMKUEkHqAJ4HI8=
-X-Gm-Gg: ASbGncu0utrCP6Wyis0Uwp4lcLsIwGb0bVjenxYM/PB6qVoMiauvC8+0bR47M2xtM4I
-	jAOwmFSq7HN2YvtTJemnUjDhhbQINim2Ochi7U3FtUTAUaRbdal7ZiOUDqTcMgLVRpktcMbdhcF
-	/IiSbW9pA/ZWgMgVlySaK8lJJwW/GaVx9L86hjSDkHTTC9BvgIx5KC0mw2gJ0s+PwzcWNCYCN59
-	UsPG37v65liDkxzYjCNMsw/JsPsZiinmFTvJhlxXXv6foSaYZo/aWTNlkxfFBHRx8gXwdoVjC8h
-	fjpa80whuCCV2OuvrraLcgbHc1wzeQqEoYLZAXkrM9/JXaPxGTkudnranCsUtegQ
-X-Google-Smtp-Source: AGHT+IGP6EIu6D5/X4T1lXUP3TqCWP6QCFadGFyDUhKfkvIRhoG4FICvPgxc52H21XaC8VTPwxK1CA==
-X-Received: by 2002:a05:620a:2691:b0:7bc:df55:2cd0 with SMTP id af79cd13be357-7c08aa9f850mr103218785a.48.1739561225699;
-        Fri, 14 Feb 2025 11:27:05 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c07c86155dsm235281185a.87.2025.02.14.11.27.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 11:27:05 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tj1L6-0000000GmO1-2uwa;
-	Fri, 14 Feb 2025 15:27:04 -0400
-Date: Fri, 14 Feb 2025 15:27:04 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
+	 Content-Type:Content-Disposition:In-Reply-To; b=b/BBtopo+KWXtv6Cp2lXW2ipHffBtoxnHtkEjtb4wbqYn/EKwOswiyed0PwTX6iYyChbnPys7Ja2AW82Jm7rszXY7BiolbvUtFbV3gt8CtZ8OGiB9ITvoyfT7E1Ga2pQnkjG5n2VSbrwswwvgXz22O24e1/oMXlzi0mf8QbeZ54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mh3Db78j; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=3rBg5vCEAAgnUtxvRHn6AXtCO6AMSncZuDs0Rzu+MJo=; b=mh3Db78jRgdg2/2ezGzMeHTNyt
+	411bGOpRxUv0s8PGzJmh9lu41MzvPv8v6wt6EEyv92tt/hbxW+wE5KAILsevkkapm96sJ2y2ts6jQ
+	0LzjYzj7v9QoQ9va3ZCpj/OLvhGqZ9PQ21LQ18eTEq4+mQ5BCd5Ax0qEPcE8O3deo1kE+MIw7zuj5
+	qyHXOtq/MYzssJ3stq3QFR4MM7v3vYtotIoICvmHo5ds752jfXRdCIJrFk6R2xh0eIG1/N3TmjeHx
+	pZVeGo88IXEydeBbjyMTMOJZgScB3hR48gVSCSOlcqPE6itHoNjVMBHNZd3Ey2S2aXHgwmom5o/fm
+	+ggcvsUw==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tj1dn-0000000ByF2-0Vmr;
+	Fri, 14 Feb 2025 19:46:23 +0000
+Date: Fri, 14 Feb 2025 19:46:22 +0000
+From: Matthew Wilcox <willy@infradead.org>
 To: Alex Williamson <alex.williamson@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, peterx@redhat.com,
 	mitchell.augustin@canonical.com, clg@redhat.com,
 	akpm@linux-foundation.org, linux-mm@kvack.org
 Subject: Re: [PATCH 5/5] vfio/type1: Use mapping page mask for pfnmaps
-Message-ID: <20250214192704.GD3696814@ziepe.ca>
+Message-ID: <Z6-djlOXYTDU12mc@casper.infradead.org>
 References: <20250205231728.2527186-1-alex.williamson@redhat.com>
  <20250205231728.2527186-6-alex.williamson@redhat.com>
 Precedence: bulk
@@ -95,38 +65,20 @@ Content-Disposition: inline
 In-Reply-To: <20250205231728.2527186-6-alex.williamson@redhat.com>
 
 On Wed, Feb 05, 2025 at 04:17:21PM -0700, Alex Williamson wrote:
-> @@ -590,15 +592,23 @@ static int vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
->  	vma = vma_lookup(mm, vaddr);
->  
->  	if (vma && vma->vm_flags & VM_PFNMAP) {
-> -		ret = follow_fault_pfn(vma, mm, vaddr, pfn, prot & IOMMU_WRITE);
-> +		unsigned long pgmask;
-> +
-> +		ret = follow_fault_pfn(vma, mm, vaddr, pfn, &pgmask,
-> +				       prot & IOMMU_WRITE);
->  		if (ret == -EAGAIN)
->  			goto retry;
->  
->  		if (!ret) {
-> -			if (is_invalid_reserved_pfn(*pfn))
-> -				ret = 1;
-> -			else
 > +			if (is_invalid_reserved_pfn(*pfn)) {
 > +				unsigned long epfn;
 > +
 > +				epfn = (((*pfn << PAGE_SHIFT) + ~pgmask + 1)
 > +					& pgmask) >> PAGE_SHIFT;
-
-That seems a bit indirect
-
- epfn = ((*pfn) | (~pgmask >> PAGE_SHIFT)) + 1;
-
-?
-
 > +				ret = min_t(int, npages, epfn - *pfn);
 
-It is nitty but the int's here should be long, and npages should be
-unsigned long..
+You've really made life hard for yourself by passing around a page mask
+instead of an order (ie 0/PMD_ORDER/PUD_ORDER).  Why not:
 
-Jason
+				epfn = round_up(*pfn + 1, 1 << order);
+
+Although if you insist on passing around a mask, this could be:
+
+				unsigned long sz = (~pgmask >> PAGE_SHIFT) + 1;
+				unsigned long epfn = round_up(*pfn + 1, sz)
 
