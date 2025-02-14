@@ -1,152 +1,141 @@
-Return-Path: <kvm+bounces-38149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44B6FA35C9C
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 12:34:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11577A35CA4
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 12:35:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5C4A7A29D3
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 11:33:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AACC07A2F04
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 11:34:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2D72638B7;
-	Fri, 14 Feb 2025 11:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D23A263C6C;
+	Fri, 14 Feb 2025 11:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y4hKNkw6"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0VNtTEYh";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WFnwPIfj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A4325A651
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 11:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EE5221541;
+	Fri, 14 Feb 2025 11:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739532860; cv=none; b=BWEh9mLJ5E70Agwnlllhb3cNUqNzf67gaJ3KX31iHTV7T9Me8498KHh5R6wYdwGHFsI+KaKt0rYf7p5fvj9/gut9nzuluIhp6KqcaZlIk9XBYtTecF6nrHmQtiMpHh5mv0Aknbs9MMNmyc8/ivrTwcBVzgI2qbFrtERQR78v0d0=
+	t=1739532895; cv=none; b=ppG0Wzpt+Kznpqm62ea8JKVJz6eg3YT7PNFSTkKF3kK6PXRbVDifWpUtmKFWgiDJuouxM/HrkeHKq/0UyA3eDRy+n2U0f0rSMr9Em9gLYctjppwptKpM3gl49q4aTFW3EOFkN6FageJ8Qst0H9VaDfUhSE6R99Ft6Z7/hj5TjB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739532860; c=relaxed/simple;
-	bh=oIIxZXp55qHUezW1KXD6M19h0CDt+B15X3kzsrT1cbg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fdhFnxEtJ6LryS5D1kQHcED4lcwFbw8XrfsUk7IrR8KY/uaL3blIhbOOxQ0jBzBLEretWMArvsMaSrlpR1ncXIpQl/RwD+S3u5hMSvSzGv40VxRbTeLPKROzrfOzAwi+uDGJCoX6on+WOG/S5mD0wC5EONi6fqwtUxvISE5X3qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y4hKNkw6; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-47180c199ebso206751cf.0
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 03:34:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739532857; x=1740137657; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=oIIxZXp55qHUezW1KXD6M19h0CDt+B15X3kzsrT1cbg=;
-        b=y4hKNkw6c2iAGVkR8HIhYcttA6Od+6RqkuCPtgBJu9Ar7apnIdqM7ULZhjV5VkpfEZ
-         UhEsvJ6o9pEBIY+SfmIngx6araktNFAolgg+rG8u84w+hzWgJ99cxo4fuCuT8zqYTB3T
-         jUDVT1+nuFLsYjf5LzfAmdGIFDW1mjFUVV9feY9T9l3X09dQ5YJ05ywC6Lw3/tKYd1lF
-         z9r3l2tkR0YMioZBaGD0Sh0sofS4z7rntgL+pEUN1AbS7rmQLuQnXT8evRBSyjwTJ5uc
-         epHGAF64DJaYD9sc2/WjxygZfEXPEoN/MaGDhEZu0KDkhpv4OCoRTAlCCtLVLlEHALDu
-         NVYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739532857; x=1740137657;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oIIxZXp55qHUezW1KXD6M19h0CDt+B15X3kzsrT1cbg=;
-        b=L6YhBp5MPe6UBrIyOnEeaxuumhrjpO4iWkus8DquQ6xMpStYWHerQjzRJsCEZ18voZ
-         zbgyGhiThaFlGlm4AwXesLN2Ay1Mp2f1xbfqRQOuos7To1EZ+1nw3+J9jgqqluwZqB6A
-         LM8YFh2FIBjcSYwhXDOlmAfxHGAInkJbYxV/NN9tv1rFeDF2gLeqQkAHSxzaxlJKq9kd
-         0IT0cEJ0xLsODQpOudAP3tDngAencOIxRZ6dIZH+ThsFxJbygVTTqnFmO/gwnLNMyGbt
-         rocxrL9lpZkSkE+bQiTNAuhNFxMzXOUL4DviqXQvRffBYm573oCBXUWa06GmSOOlrqij
-         Ps4w==
-X-Forwarded-Encrypted: i=1; AJvYcCW43vp8ke8raouztQ9u9pLwXnSOxRUejX324zrYq4tMXfriFNInAsAvY+if9T4B8a8wTLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeNLUjg4AvigcHIaHI8KH4GGm9sNzVRa5WOH9r0AJDzwprMm/N
-	4eaFgUCh7oBGdEkb/8ryLB3nRmJUR87cldR+hFn/oyowuol3jadjuol3I9RelhiueZlkAYm8zVK
-	/0L8x3r1YLZYJEUHcMMT/3gbAcgfxoRlik0l4
-X-Gm-Gg: ASbGncvg1bZA3c/b+5cCTc/WhhuG4q4oguVh/60tC3WXCXNVhMh5Y2t4vJ7ecFMG1/T
-	Z3sWluZmPdye7LA8FYXLg5DpecTrS1DVbCY/D/ZUO9Cc5RwuWzNKd8vZPMyy0GPUCKKz0tmo=
-X-Google-Smtp-Source: AGHT+IHtlxcMR3vxqJWY40h6ajM6F3iajxeDdssyRx/Y0YsmLzdFANWrYFIiKj2QO/E2Jl5nbjtDGwGC4XIUy4DvM7w=
-X-Received: by 2002:a05:622a:d0:b0:467:7c30:3446 with SMTP id
- d75a77b69052e-471cf9817a6mr2328871cf.25.1739532857266; Fri, 14 Feb 2025
- 03:34:17 -0800 (PST)
+	s=arc-20240116; t=1739532895; c=relaxed/simple;
+	bh=ZSR5ExLzPOWzKeKJCYti0FPwPXEtrgPIJBvFt7ageL8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=dwk8NZNh21ayng0IeDKlbnGLtHdZhpGKnFYRvgWmVng7EveNGoEebW5aZzcYEpF8vi01UTRuCpt+0wWcgnprHBBqjjjB49VQ+9cIZ1QpxsUrsIu5xlQXzEcnHDtufMXOYFB5VidtZlmKSiSTI/aeTKviUuYbxNeWRNFwh3Jz970=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0VNtTEYh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WFnwPIfj; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1739532886;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WWdSDqLPiHMtkC3qRBjEr7KgW5xesCDv6jmHPBIB4Zc=;
+	b=0VNtTEYhNZqymGENVsUmuk+rnlFfX7RSGT3Ho51Jzxq38FSlmeIElqqU148QkLgRvvbxMF
+	oARriYR4RFpth96NjMkBo5hNBkelucCuzn5JwatniL1M08uy4SKjyhCAdV/qdQ/eba99LI
+	XiEfVSgYOnLLjTtprHlvawcrkXxeqR+m8TpQcRwp+J+sEstFenL0586F5ak1q3mLy7LV6n
+	qnrektVapcPsyxUDFZn8atapF68IW+EhNarZoqS+FgcZ3nF1GslRp9zthgkNswbWYfqivE
+	2J78e9sNA7ZDPletmeb/HsB02wyQreu92A/Zp2E3TtpGj+8SwnWuzKOp2Uz71Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1739532886;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WWdSDqLPiHMtkC3qRBjEr7KgW5xesCDv6jmHPBIB4Zc=;
+	b=WFnwPIfjvhMmBrrfQwvQ/cPdgZnaXQkJD4fxKY5hU7USn1NEKaf7iB28bu/zo8sPSUnwBx
+	KGOlqDpRoCYGNWAw==
+To: David Woodhouse <dwmw2@infradead.org>, Thomas =?utf-8?Q?Wei=C3=9Fschuh?=
+ <thomas.weissschuh@linutronix.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge
+ Deller <deller@gmx.de>, Andy Lutomirski <luto@kernel.org>, Vincenzo
+ Frascino <vincenzo.frascino@arm.com>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Catalin
+ Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Theodore
+ Ts'o <tytso@mit.edu>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+ <aou@eecs.berkeley.edu>, Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui
+ <kernel@xen0n.name>, Russell King <linux@armlinux.org.uk>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>,
+ Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Ingo Molnar <mingo@redhat.com>, Borislav
+ Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Arnd Bergmann
+ <arnd@arndb.de>, Guo Ren <guoren@kernel.org>
+Cc: linux-parisc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ loongarch@lists.linux.dev, linux-s390@vger.kernel.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-arch@vger.kernel.org, Nam Cao <namcao@linutronix.de>,
+ linux-csky@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>, "Luu,
+ Ryan" <rluu@amazon.com>, kvm <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 00/18] vDSO: Introduce generic data storage
+In-Reply-To: <ff83dc5c91b4e46bcf2d99680ec6af250fb05b27.camel@infradead.org>
+References: <20250204-vdso-store-rng-v3-0-13a4669dfc8c@linutronix.de>
+ <ff83dc5c91b4e46bcf2d99680ec6af250fb05b27.camel@infradead.org>
+Date: Fri, 14 Feb 2025 12:34:44 +0100
+Message-ID: <87ed00kbe3.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250211121128.703390-1-tabba@google.com> <20250211121128.703390-10-tabba@google.com>
- <Z6t227f31unTnQQt@google.com> <CA+EHjTweTLDzhcCoEZYP4iyuti+8TU3HbtLHh+u5ark6WDjbsA@mail.gmail.com>
- <Z6t6_M8un1Cf3nmk@google.com> <d9645330-3a0d-4950-a50b-ce82b428e08c@amazon.co.uk>
- <Z6uEQFDbMGboHYx7@google.com> <Z68lZUeGWwIe-tEK@google.com>
-In-Reply-To: <Z68lZUeGWwIe-tEK@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 14 Feb 2025 11:33:40 +0000
-X-Gm-Features: AWEUYZkg9ciLMmzUzGdibdWHAPxNuB7L-_G6HGADGpvsMSO9kriMESSOnmZ50-k
-Message-ID: <CA+EHjTz=d99Mz9jXt5onmtkJgxDetZ32NYkFv98L50BJgSbgGg@mail.gmail.com>
-Subject: Re: [PATCH v3 09/11] KVM: arm64: Introduce KVM_VM_TYPE_ARM_SW_PROTECTED
- machine type
-To: Quentin Perret <qperret@google.com>
-Cc: Patrick Roy <roypat@amazon.co.uk>, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-mm@kvack.org, pbonzini@redhat.com, chenhuacai@kernel.org, 
-	mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, 
-	akpm@linux-foundation.org, xiaoyao.li@intel.com, yilun.xu@intel.com, 
-	chao.p.peng@linux.intel.com, jarkko@kernel.org, amoorthy@google.com, 
-	dmatlack@google.com, yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, 
-	mic@digikod.net, vbabka@suse.cz, vannapurve@google.com, 
-	ackerleytng@google.com, mail@maciej.szmigiero.name, david@redhat.com, 
-	michael.roth@amd.com, wei.w.wang@intel.com, liam.merwick@oracle.com, 
-	isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com, 
-	suzuki.poulose@arm.com, steven.price@arm.com, quic_eberman@quicinc.com, 
-	quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com, 
-	quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, 
-	catalin.marinas@arm.com, james.morse@arm.com, yuzenghui@huawei.com, 
-	oliver.upton@linux.dev, maz@kernel.org, will@kernel.org, keirf@google.com, 
-	shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
-	jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Quentin,
+David!
 
-On Fri, 14 Feb 2025 at 11:13, Quentin Perret <qperret@google.com> wrote:
+On Thu, Feb 06 2025 at 09:31, David Woodhouse wrote:
+> Thanks for working on this. Is there a plan to expose the time data
+> directly to userspace in a form which is usable *other* than by
+> function calls which get the value of the clock at a given moment?
 >
-> On Tuesday 11 Feb 2025 at 17:09:20 (+0000), Quentin Perret wrote:
-> > Hi Patrick,
-> >
-> > On Tuesday 11 Feb 2025 at 16:32:31 (+0000), Patrick Roy wrote:
-> > > I was hoping that SW_PROTECTED_VM will be the VM type that something
-> > > like Firecracker could use, e.g. an interface to guest_memfd specifically
-> > > _without_ pKVM, as Fuad was saying.
-> >
-> > I had, probably incorrectly, assumed that we'd eventually want to allow
-> > gmem for all VMs, including traditional KVM VMs that don't have anything
-> > special. Perhaps the gmem support could be exposed via a KVM_CAP in this
-> > case?
-> >
-> > Anyway, no objection to the proposed approach in this patch assuming we
-> > will eventually have HW_PROTECTED_VM for pKVM VMs, and that _that_ can be
-> > bit 31 :).
+> For populating the vmclock device=C2=B9 we need to know the actual
+> relationship between the hardware counter (TSC, arch timer, etc.) and
+> real time in order to propagate that to the guest.
 >
-> Thinking about this a bit deeper, I am still wondering what this new
-> SW_PROTECTED VM type is buying us? Given that SW_PROTECTED VMs accept
-> both guest-memfd backed memslots and traditional HVA-backed memslots, we
-> could just make normal KVM guests accept guest-memfd memslots and get
-> the same thing? Is there any reason not to do that instead? Even though
-> SW_PROTECTED VMs are documented as 'unstable', the reality is this is
-> UAPI and you can bet it will end up being relied upon, so I would prefer
-> to have a solid reason for introducing this new VM type.
+> I see two options for doing this:
+>
+>  1. Via userspace, exposing the vdso time data (and a notification when
+>     it changes?) and letting the userspace VMM populate the vmclock.
+>     This is complex for x86 because of TSC scaling; in fact userspace
+>     doesn't currently know the precise scaling from host to guest TSC
+>     so we'd have to be able to extract that from KVM.
 
-The more I think about it, I agree with you. I think that reasonable
-behavior (for kvm/arm64) would be to allow using guest_memfd with all
-VM types. If the VM type is a non-protected type, then its memory is
-considered shared by default and is mappable --- as long as the
-kconfig option is enabled. If VM is protected then the memory is not
-shared by default.
+Exposing the raw data is not going to happen as we would create an ABI
+preventing any modifications to the internals. VDSO data is considered a
+fully internal (think kernel) representation and the accessor functions
+create an ABI around it. So if at all you can add a accessor function
+which exposes data to user space so that the internal data
+representation can still be modified as necessary.
 
-What do you think Patrick? Do you need an explicit VM type?
+>  2. In kernel, asking KVM to populate the vmclock structure much like
+>     it does other pvclocks shared with the guest. KVM/x86 already uses
+>     pvclock_gtod_register_notifier() to hook changes; should we expand
+>     on that? The problem with that notifier is that it seems to be
+>     called far more frequently than I'd expect.
 
-Cheers,
-/fuad
+It's called once per tick to expose the continous updates to the
+conversion factors and related internal data.
 
-> Cheers,
-> Quentin
+Thanks,
+
+        tglx
+
 
