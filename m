@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-38197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457D0A3673A
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 22:08:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32B8EA3673F
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 22:09:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 123F01895410
-	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 21:08:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CBC616B9C1
+	for <lists+kvm@lfdr.de>; Fri, 14 Feb 2025 21:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419741DC070;
-	Fri, 14 Feb 2025 21:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F361DA31F;
+	Fri, 14 Feb 2025 21:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CfkFnYqS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o2AyZwLk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AD517E
-	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 21:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5712417E
+	for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 21:08:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739567280; cv=none; b=nKEioNm0U3KTysen28c2JJEQF3FUZa3vxZuSgdzpcFBxb3FJNr0FwKDYrTAkNE4j33ewjfgzNOYQNzeDKxjoGUVqisECYq2J/AuI+wPRI06A89FZhD/+Cr4wZjSoyrAEXljCVP/8bfkpucafIDAS3qor6df3Vwcywizid7xJZlM=
+	t=1739567326; cv=none; b=hJL2KEVbnqw7YoZiM71xWFa9iEFWkC1tu51Qw5X4AGfA//SSxywjxFeMHRechkw9OHPbTsS5/KeX2QY7ysj8u+2NFQooeDwHuQvir5ZgW2D3VJ9AFbrB7lOjpUERFduFThQp5fNuNSjtfG2Md4xZsvnGH7vKzBB9vKYd0rT/2F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739567280; c=relaxed/simple;
-	bh=cTD0YGxM7C/r8VmscZOvQcLrBnZIJ/Bl8PiAHhMhK5s=;
+	s=arc-20240116; t=1739567326; c=relaxed/simple;
+	bh=TABwW3ceukCNtXZ6II8q8PhTuJdg9NELJOoW5SvPSxI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DI46sG/VLaip52S9tWTGAn1+rOxQRSekPPztme1u8CS83zGTJ2D8g/ej0Zw0HubU/BNHIvDQQb4uujJP4JjHf9I5z9gxFkTp7/ldVYVWLk6MvOynVt3Tfrk8x8L9aKY7/SH8Pd4vUL0hLRuJTnUzUdE+dbGCu7dqJtM3Q7tVL7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CfkFnYqS; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=aUNzrKciWPHafPJSGCco7YKIa+WEX0sXXYP6HRen+hu0WkDuXYgHefVsMTDgzyQ24/djd9WIbpLagFfTZqLlM6yzPI4d4756aFCT6KJnikMGKh3WZUW+aAZN0BdO8u19CfCiWJKrWRkLl0XunDnWPZufmAiTsdlQU2/18KOfOsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o2AyZwLk; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220f0382404so23158265ad.1
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 13:07:58 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220cad2206eso52461745ad.0
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 13:08:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739567278; x=1740172078; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739567324; x=1740172124; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fK9Grk2+mxUxJmbNSyLNP4j/EN3bbR5J+pxd4ldMHvY=;
-        b=CfkFnYqSuxjoUgaDCgJA2MIXe+8G9DbmV7yG8Jsu4YXkiJVTBCkObzvBjJYf6fRu0o
-         9ow4ZgkFRLH8JaGTytYkb9a1Zc52JSB8Zxrs/byGBGO7GJFg4kjcI7QlUoDttbySGUrX
-         jvgW98GeozYwa8671Ks1yTb6PGihFZsltsg0lVArp6W+OXDGtLZaBI9YZ3eXfGvlV2ow
-         azFsljwdQdJJc2kot0GXCF4jv8fX5A5mACffAZlDtNTs/auVJ3oZnDuPBcDWUzg1+9IP
-         LfsEFrHcDx788Tv8gcxkbKePH05kSIVbgcXuC1u/X5mpqsHdmOHBG5rf0PcuLyhM1OsO
-         +zAA==
+        bh=NDk9Bd6Y/gy2sTN8NncOlmLs9sUGP6oX096KSBQmv2E=;
+        b=o2AyZwLkD2ETHCjiegJneBZ50czWafrXH93eGhdfIT4qsM1KrykBi/SK5kjZ8AGMbj
+         J/dFV1r2rOTgkgWyPfspmSaRzx0jAcx2avbO6o9Lle5PL1O8BLDmLlzvU3J6rUweZ1SS
+         dpql/SdfhF/S+5OgcqEW/tYWTSMwgCiqYAwiMPFESjgnLnN6oSnXdPQh7YvfF71zIuTr
+         A6H7RfeW0kaSBYz6fS2QI5hZYnbPRa/zWoqcRiw+8bhRLbjdB6uBXHcr5pV2/3klyjDI
+         vUo4NTXJw/yBCCDdj0WXZHrjYS6UHSDQLKt3nFKJkym8zF5GSAOrwkFuXTJPHux0kyhV
+         9Jvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739567278; x=1740172078;
+        d=1e100.net; s=20230601; t=1739567324; x=1740172124;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fK9Grk2+mxUxJmbNSyLNP4j/EN3bbR5J+pxd4ldMHvY=;
-        b=dXPTHGXU/IiHC/ufQVTExP9rD3r8Yfi1UuAqMWFwpH5Vtt/x+DXaZIWXupF6/vEkVM
-         klAx05QOd7C0LJSnJIGOhqzpJcEyPDTL+jBPOfPrAC7c9fe3vLvDcW0Hb1bU4vGLjeo7
-         vMIyum3und9aD4NwIkLgNmHc/HXSv4v5QvPFX2vDsb6THep68+lK4TptLJtQly1wcmiS
-         +xm8tnoTB64EZG8+sZkOu001low6O9Qe1q6dkqauFf56xw5x5cDZkHuOx/GpKEMmPBN2
-         hLDWUUPaXCuffXofbfh5pfW8fxZ2Ry/zO5evwf1rLGijJUWXWWISZDuELx4Gkkv5ly81
-         zK0w==
-X-Forwarded-Encrypted: i=1; AJvYcCXP1AWKpYR5YO/8TfsH1UU89fxjTzlVa26WdFdQFnhgt3+FZUaDNVV3zgnUX7hgOLhXaSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ50hJmRnDHz071TKt3A48jljRtWBNcU+1BmOExg4+txiNLKea
-	xYmQOqbRybPH8S3O1gz5Fwq3+NTwwykFELe6pNyicuy6m9CSJBVbD9KI66CGQ8uVgy2EJA0+lkU
-	giw==
-X-Google-Smtp-Source: AGHT+IEB9kfMbLqDRiIWrvbRpSDJvL2ukP7ELBGl34NRPGn22tun5wCq6W7V3vW6ase9xSQ5LQ5KsjA0YD0=
-X-Received: from pfbga8.prod.google.com ([2002:a05:6a00:6208:b0:725:e4b6:901f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:394b:b0:1ee:1af5:86a9
- with SMTP id adf61e73a8af0-1ee8cb17bbcmr2046257637.22.1739567278334; Fri, 14
- Feb 2025 13:07:58 -0800 (PST)
-Date: Fri, 14 Feb 2025 13:07:57 -0800
-In-Reply-To: <20240914101728.33148-9-dapeng1.mi@linux.intel.com>
+        bh=NDk9Bd6Y/gy2sTN8NncOlmLs9sUGP6oX096KSBQmv2E=;
+        b=n9Nl7tQ5eHsJHhe3VezNiXQ7wAFBCuo8RgP9ZyOVIu8r+fLjqrzWFJPMJdxtkxHyaO
+         uxL0KFYPARXQI2VP7Le1eBuD+RnjulIhuhLixe62Eo8gBXH70u5e9TzVQ3tPgkk/Vno0
+         MjDZi/Fu5TTT6Ji9MPKJNhbBHB1aP1MegBvo9rJ6YcDhX5ESbuvIyPVSaXqfu+lMSqEj
+         aQ+rzV/IvDBM09c4Qy89Tbk8TY1y1qJs734OquV8BI1mbi9WAfhXMlHgZLXsa9P5w+o8
+         8gcZj1p2Vy+uVA2DbMInNhKpPsQGFrxIxixZ7F6p0ZUqanmqe8QmplP/gM8wgPzQQ8Z6
+         Z1JA==
+X-Forwarded-Encrypted: i=1; AJvYcCXvhJ/S1+wur82oDzxwggl9nkDFXKPaRElocV8sY1r2vXSV7HYjoMIcGH3uL82BX0XGZoU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzr7r51DYlCKm/e9C3TV8n8251asC+1J8REsOICtnk2X832SZ4e
+	69o1xDW0ngP8DvtaBRRLDlB/kJGmabe0QlMQWUnsoUEOXqBp/HyjWY0GA5x8f3Dk98pyBLwDm7u
+	uaw==
+X-Google-Smtp-Source: AGHT+IHGrqSV53zwVxDPFhenez3hyCmOAIu+9D/XKocIxWU0Dw1My/XXweOF81M6LpwkA3MOCD/JQLSXGkQ=
+X-Received: from pgf7.prod.google.com ([2002:a05:6a02:4d07:b0:ad7:adb7:8c14])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2341:b0:21f:9107:fca3
+ with SMTP id d9443c01a7336-2210405c6ccmr11127175ad.30.1739567324694; Fri, 14
+ Feb 2025 13:08:44 -0800 (PST)
+Date: Fri, 14 Feb 2025 13:08:43 -0800
+In-Reply-To: <20240914101728.33148-14-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240914101728.33148-1-dapeng1.mi@linux.intel.com> <20240914101728.33148-9-dapeng1.mi@linux.intel.com>
-Message-ID: <Z6-wrVaVSiI9ZKkD@google.com>
-Subject: Re: [kvm-unit-tests patch v6 08/18] x86: pmu: Fix cycles event
- validation failure
+References: <20240914101728.33148-1-dapeng1.mi@linux.intel.com> <20240914101728.33148-14-dapeng1.mi@linux.intel.com>
+Message-ID: <Z6-w24T1iH2S_Fux@google.com>
+Subject: Re: [kvm-unit-tests patch v6 13/18] x86: pmu: Improve instruction and
+ branches events verification
 From: Sean Christopherson <seanjc@google.com>
 To: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -86,34 +86,33 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.
 Content-Type: text/plain; charset="us-ascii"
 
 On Sat, Sep 14, 2024, Dapeng Mi wrote:
-> +static void warm_up(void)
-> +{
-> +	int i = 8;
-> +
-> +	/*
-> +	 * Since cycles event is always run as the first event, there would be
-> +	 * a warm-up state to warm up the cache, it leads to the measured cycles
-> +	 * value may exceed the pre-defined cycles upper boundary and cause
-> +	 * false positive. To avoid this, introduce an warm-up state before
-> +	 * the real verification.
-> +	 */
-> +	while (i--)
-> +		loop();
-
-Use a for-loop.
-
-> +}
-> +
->  static void check_counters(void)
->  {
->  	if (is_fep_available())
->  		check_emulated_instr();
->  
-> +	warm_up();
->  	check_gp_counters();
->  	check_fixed_counters();
->  	check_rdpmc();
-> -- 
-> 2.40.1
+> If HW supports GLOBAL_CTRL MSR, enabling and disabling PMCs are moved in
+> __precise_count_loop(). Thus, instructions and branches events can be
+> verified against a precise count instead of a rough range.
 > 
+> BTW, some intermittent failures on AMD processors using PerfMonV2 is
+> seen due to variance in counts. This probably has to do with the way
+> instructions leading to a VM-Entry or VM-Exit are accounted when
+> counting retired instructions and branches.
+
+AMD counts VMRUN as a branch in guest context.
+
+> +	 * We see some intermittent failures on AMD processors using PerfMonV2
+> +	 * due to variance in counts. This probably has to do with the way
+> +	 * instructions leading to a VM-Entry or VM-Exit are accounted when
+> +	 * counting retired instructions and branches. Thus only enable the
+> +	 * precise validation for Intel processors.
+> +	 */
+> +	if (pmu.is_intel && this_cpu_has_perf_global_ctrl()) {
+> +		/* instructions event */
+
+These comments are useless.
+
+> +		gp_events[instruction_idx].min = LOOP_INSTRNS;
+> +		gp_events[instruction_idx].max = LOOP_INSTRNS;
+> +		/* branches event */
+> +		gp_events[branch_idx].min = LOOP_BRANCHES;
+> +		gp_events[branch_idx].max = LOOP_BRANCHES;
+> +	}
+> +}
 
