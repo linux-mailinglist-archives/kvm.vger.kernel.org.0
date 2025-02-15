@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-38267-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38268-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8497FA36B1F
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 02:37:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F6CA36B20
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 02:37:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C13B87A4B2E
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 01:36:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D96A188D37A
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 01:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417511662E7;
-	Sat, 15 Feb 2025 01:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EE01624FD;
+	Sat, 15 Feb 2025 01:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xwc9Utgg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dXS8hbuV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28F015198A
-	for <kvm@vger.kernel.org>; Sat, 15 Feb 2025 01:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D19A1624FE
+	for <kvm@vger.kernel.org>; Sat, 15 Feb 2025 01:37:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739583422; cv=none; b=YZw8cvUr1T3GUZ9aCaYnxJNtPP0B0gR0nOt3rGBv2l89k4T2TJRR/pq272Inr7aAzSj0n6nG7aNR7MHSx21UCXCgVJaECbpAQls4R+tEdiEhbItyV/AEQsFppToSHfFYwrtI+eRtK5Xq7UW//JDAZUzlm0qQqInApwF2AeDtjys=
+	t=1739583424; cv=none; b=KyKFaSsar4CzqInR2xEGc4O+iXBguz4B0eUUfnCi6/VQsDtxM+G2ffD+IUmfuGKvIGDaeQiCjoYtNs5+TekQbz8qJzjvvZZ4c/CNjBm8LrLCjzHajCKI7217X8kx9DiK5wZ0hG17Cs9505vlu0L0k0S0MhYPo8QRMtk4amzULAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739583422; c=relaxed/simple;
-	bh=wBwAxyjsDrm8M/5EHri0mYdbIjJnF/Fry25zvkMdd5w=;
+	s=arc-20240116; t=1739583424; c=relaxed/simple;
+	bh=1xmDQtVLijreQRQRBOSWuwkyhYbbJbgXpIh8cKvfn+0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MxxwiQOO8hAbDGVWPF529qODPZZHIz9ASJPc68fI4TcuEkx7ZbmsSH6bxkXfx8dOamvivfvWyc43/VBqfBcudz6YyOYkh+jXxakdwxA6mMU55t/djBQAOF7FoNopJyoqhzhCjgO6wjJqng5+08CXf+7/KMwdX6njybuumEE30UI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xwc9Utgg; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=oG3en+442AshCZ73d4Cmgh/iBpbR8FNi400uZk5xnXSnMWoTuStlDpsDNICeiLWY95dp5uDrHCg7JttDdnGaWsGGu6GZRy7ES4DERCAsuzfayx0Y1rWRUtMx1S8TZCK2X9bMOwlA8270ZiLq9F6984RdW1e8n0oy19J5cXj5qKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dXS8hbuV; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc0bc05bb5so5566868a91.2
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 17:37:00 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f816a85facso5429702a91.3
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 17:37:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739583420; x=1740188220; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739583422; x=1740188222; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=YkUiJlep8I7i+PvVaAgfcU9+5xfY1Qig4zfPpSQ/FZ8=;
-        b=xwc9UtggMdQSbRREO7yFZmmB+0Mmy+vxf6gC/nh21rnHuUkGAYqPSyk9UQRCBA7eEu
-         vhbeieGaFJPpfj2LfZ8ZnhBBeEbFLtZpk8clIvFRctYpaw1v364p5ZM8NneU656MQGPz
-         Qr8pv2lZNPGh9kv03cYknuEjMi1uGf7BQHcBNf6+U2dClgz1X2YH1EsbPNbf0H0OkZbW
-         jZJVSdN24hje3U70BrFVDZ/ZxLvGAB/w6jgmGnAGKKnznpmbk3URH2crGYRyS4pq6rlr
-         D7WegZ2FBhHZfnyHiKrmG9zCJV14YU00Zo/Xjb+Jqsv2suWkBjoYlzNYQvko0pWNBHgG
-         OIVQ==
+        bh=kp8cbhkEefWj/oZJIeO/gLxPkRSxRvUGaEcxz3p1KuY=;
+        b=dXS8hbuVwsXpblycbiSQLTbwSifrWLa10BhHfRnkWnI1ZoClO4GBYVwLPzjpTZpS+I
+         NxgAO+66xj81+cphB1F624hC8V8NduAvsO1y5pDx43DnAvGEyO8j3MDouj6hftbmCrIF
+         kDa6OUb9DZm6W5RzleOipND9klPuq/AHWMS5udRx9euDPqFyLEPReLxyNEWhmv61WbyS
+         Tsoa+XMipurR/XYodicqTffZVstpQopRnpNOiMGhr2fI97f2S4MKA3dwutuSH8Xy6Nq1
+         bFx4x+hTUO44xwxvlbifRqIqTwgb+CG8GEe/aOzUSRWm0T2YG8SSCXo4PwHtl7TCa0Vw
+         HJdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739583420; x=1740188220;
+        d=1e100.net; s=20230601; t=1739583422; x=1740188222;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YkUiJlep8I7i+PvVaAgfcU9+5xfY1Qig4zfPpSQ/FZ8=;
-        b=nhVTThRHrKTf/W7SgJz1pLBoVPx1jyB9XIHoBpL5MDH+SS9NcDz75AVtu/n0GsCOlh
-         e8MSabDeK7zDmA+RU6a0KMcUe42e2fN+/hsUJXlcWrvwZR0OBCDshvK74MlBMiNVTAx9
-         lipeacr+zgkxjJMzFtRzbWPLt/0bIEMgCAaJDAZy28pF+cYELxthp7HFXGdWjxTcqgqW
-         GGYeY8jYXbfNYf6kS3xF2LTM2ssswz8VCac50nJK1wiCWWeopcRqvHJAedcBOHR3yvKg
-         x+g3zjPKV+kti3tewvT9NlgcJ6BV3WzD1ICWyg7G2QTkPHNzOyhdLnZ3ok9wjcEbj6NC
-         zVww==
-X-Gm-Message-State: AOJu0Yx5Qh+EJiAxTrR0Kl2j5Bvk16e6uotWQXCdAG+0SYEO1SOKUPzr
-	BixhaqfGUovlZCoKmwRBo38ETFDqT7eTcFl7X9uRIBaQ3/5Vg3NFS+SpT8mlQyWS0bXMMBCw4/G
-	gaA==
-X-Google-Smtp-Source: AGHT+IEcZeQge10kD/WMvfM49zRkZd3xDwc3xoewhKncK3wrROwLQ+0EvvBTUQZqBzgI7VZP7BKyZmlQJLQ=
-X-Received: from pjbqo15.prod.google.com ([2002:a17:90b:3dcf:b0:2eb:12d7:fedd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1e05:b0:2fa:1e3e:9be5
- with SMTP id 98e67ed59e1d1-2fc407915edmr2468148a91.0.1739583420207; Fri, 14
- Feb 2025 17:37:00 -0800 (PST)
+        bh=kp8cbhkEefWj/oZJIeO/gLxPkRSxRvUGaEcxz3p1KuY=;
+        b=Y/lYJWhBs7nmSMWyRlIL6aolJCmj94OUPLBaABpBG4Ah9PJreZ3/jUwSRNSdg8Dstj
+         S8SUmyLSydCFTQX0Kg1nEqpX3yhMo53P2fESOa2ZdccIEqBh4CL9mWyPKZ3WlEUxfPu2
+         kDpdpkOE97uewDowwtYEKUU+n1n1lNHpe5Kh3dMzu/HGjTyhC5IgHXFjZqdbuLN0qMhH
+         X5TxLPpPMFTTobzx182o/0hwysYRv99WrNinNW9lcC6hB40mJ3GZqTPMcojO1dOw/FoT
+         hneaUbDzk3I1IzIW6fdbsAntUYMs87W3Pvzy/xNO/zkh7SQVolGm7s4K0fNvf25H3BMq
+         0OIA==
+X-Gm-Message-State: AOJu0Yz8vWZAcc4CnNBxdc/D8pyORdwN/iv+9Ug2shmc+Hmq4RbeMBCr
+	eKWpEWy8yGr+9WZL+Wym0doOWWUvUDpaTJrLYkYS0ieVQpgYEwj9P7Y1FvQnFnfEV++MwUZ4xgq
+	PrA==
+X-Google-Smtp-Source: AGHT+IFQcEIWZESSG1+LxhdxWi7042HSGA0UGj37URjUoMGfM/pvf4nLuk8QPF6jgvjxiq7M+Swg6pmATsQ=
+X-Received: from pjbeu15.prod.google.com ([2002:a17:90a:f94f:b0:2fc:1eb0:5743])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b0d:b0:2ee:c9b6:4c42
+ with SMTP id 98e67ed59e1d1-2fc40f22cbamr2205833a91.16.1739583421997; Fri, 14
+ Feb 2025 17:37:01 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 14 Feb 2025 17:36:30 -0800
+Date: Fri, 14 Feb 2025 17:36:31 -0800
 In-Reply-To: <20250215013636.1214612-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250215013636.1214612-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250215013636.1214612-14-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v7 13/18] x86: pmu: Improve instruction and
- branches events verification
+Message-ID: <20250215013636.1214612-15-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v7 14/18] x86: pmu: Improve LLC misses event verification
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>, 
@@ -87,97 +86,108 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-If HW supports GLOBAL_CTRL MSR, enabling and disabling PMCs are moved in
-__precise_count_loop(). Thus, instructions and branches events can be
-verified against a precise count instead of a rough range.
+When running pmu test on SPR, sometimes the following failure is
+reported.
 
-Unfortunately, AMD CPUs count VMRUN as a branch instruction in guest
-context, which leads to intermittent failures as the counts will vary
-depending on how many asynchronous exits occur while running the measured
-code, e.g. if the host takes IRQs, NMIs, etc.
+  1 <= 0 <= 1000000
+  FAIL: Intel: llc misses-4
 
-So only enable this precise check for Intel processors.
+Currently The LLC misses occurring only depends on probability. It's
+possible that there is no LLC misses happened in the whole loop(),
+especially along with processors have larger and larger cache size just
+like what we observed on SPR.
 
+Thus, add clflush instruction into the loop() asm blob and ensure once
+LLC miss is triggered at least.
+
+Suggested-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Link: https://lore.kernel.org/all/6d512a14-ace1-41a3-801e-0beb41425734@amd.com
-[sean: explain AMD VMRUN behavior, use "INSNS"]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/pmu.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ x86/pmu.c | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 06d867d9..217ab938 100644
+index 217ab938..97c05177 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -19,6 +19,10 @@
+@@ -19,19 +19,30 @@
  #define EXPECTED_INSTR 17
  #define EXPECTED_BRNCH 5
  
-+/* Enable GLOBAL_CTRL + disable GLOBAL_CTRL instructions */
-+#define EXTRA_INSNS  (3 + 3)
-+#define LOOP_INSNS   (N * 10 + EXTRA_INSNS)
-+#define LOOP_BRANCHES  (N)
- #define LOOP_ASM(_wrmsr)						\
+-/* Enable GLOBAL_CTRL + disable GLOBAL_CTRL instructions */
+-#define EXTRA_INSNS  (3 + 3)
++/* Enable GLOBAL_CTRL + disable GLOBAL_CTRL + clflush/mfence instructions */
++#define EXTRA_INSNS  (3 + 3 +2)
+ #define LOOP_INSNS   (N * 10 + EXTRA_INSNS)
+ #define LOOP_BRANCHES  (N)
+-#define LOOP_ASM(_wrmsr)						\
++#define LOOP_ASM(_wrmsr, _clflush)					\
  	_wrmsr "\n\t"							\
  	"mov %%ecx, %%edi; mov %%ebx, %%ecx;\n\t"			\
-@@ -123,6 +127,27 @@ static inline void loop(u64 cntrs)
- 		__precise_loop(cntrs);
++	_clflush "\n\t"                                 		\
++	"mfence;\n\t"                                   		\
+ 	"1: mov (%1), %2; add $64, %1;\n\t"				\
+ 	"nop; nop; nop; nop; nop; nop; nop;\n\t"			\
+ 	"loop 1b;\n\t"							\
+ 	"mov %%edi, %%ecx; xor %%eax, %%eax; xor %%edx, %%edx;\n\t"	\
+ 	_wrmsr "\n\t"
+ 
++#define _loop_asm(_wrmsr, _clflush)				\
++do {								\
++	asm volatile(LOOP_ASM(_wrmsr, _clflush)			\
++		     : "=b"(tmp), "=r"(tmp2), "=r"(tmp3)	\
++		     : "a"(eax), "d"(edx), "c"(global_ctl),	\
++		       "0"(N), "1"(buf)				\
++		     : "edi");					\
++} while (0)
++
+ typedef struct {
+ 	uint32_t ctr;
+ 	uint32_t idx;
+@@ -88,14 +99,17 @@ static struct pmu_event *gp_events;
+ static unsigned int gp_events_size;
+ static unsigned int fixed_counters_num;
+ 
+-
+ static inline void __loop(void)
+ {
+ 	unsigned long tmp, tmp2, tmp3;
++	u32 global_ctl = 0;
++	u32 eax = 0;
++	u32 edx = 0;
+ 
+-	asm volatile(LOOP_ASM("nop")
+-		     : "=c"(tmp), "=r"(tmp2), "=r"(tmp3)
+-		     : "0"(N), "1"(buf));
++	if (this_cpu_has(X86_FEATURE_CLFLUSH))
++		_loop_asm("nop", "clflush (%1)");
++	else
++		_loop_asm("nop", "nop");
  }
  
-+static void adjust_events_range(struct pmu_event *gp_events,
-+				int instruction_idx, int branch_idx)
-+{
-+	/*
-+	 * If HW supports GLOBAL_CTRL MSR, enabling and disabling PMCs are
-+	 * moved in __precise_loop(). Thus, instructions and branches events
-+	 * can be verified against a precise count instead of a rough range.
-+	 *
-+	 * Skip the precise checks on AMD, as AMD CPUs count VMRUN as a branch
-+	 * instruction in guest context, which* leads to intermittent failures
-+	 * as the counts will vary depending on how many asynchronous VM-Exits
-+	 * occur while running the measured code, e.g. if the host takes IRQs.
-+	 */
-+	if (pmu.is_intel && this_cpu_has_perf_global_ctrl()) {
-+		gp_events[instruction_idx].min = LOOP_INSNS;
-+		gp_events[instruction_idx].max = LOOP_INSNS;
-+		gp_events[branch_idx].min = LOOP_BRANCHES;
-+		gp_events[branch_idx].max = LOOP_BRANCHES;
-+	}
-+}
-+
- volatile uint64_t irq_received;
- 
- static void cnt_overflow(isr_regs_t *regs)
-@@ -833,6 +858,9 @@ static void check_invalid_rdpmc_gp(void)
- 
- int main(int ac, char **av)
+ /*
+@@ -108,15 +122,14 @@ static inline void __loop(void)
+ static inline void __precise_loop(u64 cntrs)
  {
-+	int instruction_idx;
-+	int branch_idx;
-+
- 	setup_vm();
- 	handle_irq(PMI_VECTOR, cnt_overflow);
- 	buf = malloc(N*64);
-@@ -846,13 +874,18 @@ int main(int ac, char **av)
- 		}
- 		gp_events = (struct pmu_event *)intel_gp_events;
- 		gp_events_size = sizeof(intel_gp_events)/sizeof(intel_gp_events[0]);
-+		instruction_idx = INTEL_INSTRUCTIONS_IDX;
-+		branch_idx = INTEL_BRANCHES_IDX;
- 		report_prefix_push("Intel");
- 		set_ref_cycle_expectations();
- 	} else {
- 		gp_events_size = sizeof(amd_gp_events)/sizeof(amd_gp_events[0]);
- 		gp_events = (struct pmu_event *)amd_gp_events;
-+		instruction_idx = AMD_INSTRUCTIONS_IDX;
-+		branch_idx = AMD_BRANCHES_IDX;
- 		report_prefix_push("AMD");
- 	}
-+	adjust_events_range(gp_events, instruction_idx, branch_idx);
+ 	unsigned long tmp, tmp2, tmp3;
+-	unsigned int global_ctl = pmu.msr_global_ctl;
++	u32 global_ctl = pmu.msr_global_ctl;
+ 	u32 eax = cntrs & (BIT_ULL(32) - 1);
+ 	u32 edx = cntrs >> 32;
  
- 	printf("PMU version:         %d\n", pmu.version);
- 	printf("GP counters:         %d\n", pmu.nr_gp_counters);
+-	asm volatile(LOOP_ASM("wrmsr")
+-		     : "=b"(tmp), "=r"(tmp2), "=r"(tmp3)
+-		     : "a"(eax), "d"(edx), "c"(global_ctl),
+-		       "0"(N), "1"(buf)
+-		     : "edi");
++	if (this_cpu_has(X86_FEATURE_CLFLUSH))
++		_loop_asm("wrmsr", "clflush (%1)");
++	else
++		_loop_asm("wrmsr", "nop");
+ }
+ 
+ static inline void loop(u64 cntrs)
 -- 
 2.48.1.601.g30ceb7b040-goog
 
