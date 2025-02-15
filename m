@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-38306-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38307-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C539A36FDC
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 18:39:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76FD4A36FDB
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 18:39:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4067A3B1252
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 17:39:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCAE1170CAD
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 17:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CA91FDA65;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD9D1FDA6A;
 	Sat, 15 Feb 2025 17:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LpSCmhSr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvHKozje"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C5B1F4192;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3431F9A85;
 	Sat, 15 Feb 2025 17:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739641104; cv=none; b=daHAhd7Wc3sMxCZxjDO/tCOwTNXtCE2xZy0RxkyU4BfKy+Kq3NPV9rwg5jVWuvkqhj860PlMgTyBxRiKm/mCI4TUCfCDCvfXHQuPUB9b+mZ3LJl5gBHHzxhAOWbVeOqTt3jgHmMMNHv4zuhelAZ/3DMltd1TgGMyrUJ0rVuh7jM=
+	t=1739641104; cv=none; b=d3nO0V/LbkugDTuaDYumRlDsksIX/JMPLb02qqaSsIf2QSlkJzvO/oRrySfb58HAQ+1gZC7cXaqhQn4w71rRP4G09ydEUtpNHT+360JQ8hLRYgrNTwmb+y4XO2wHAv8Y2cgbW/jk41a6wBx3xK8fb9orCXYdiZRctW92pHFXBqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739641104; c=relaxed/simple;
-	bh=Cptvvdg58Mif3ou0/tPyf1Nbz5VIb9W2RdSQkk+mm0A=;
+	bh=XuMX9D51rOvDLqugXxKyuaKFZB0IP1O1SmRry/eT/uc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ndFgOfS407yZSNDeYBWiOAzSlqnckZw2jikgmOQRdvhVmo+uxPK1K3UoySe+dLKfSKvMl80c8nfPTK0yZzHUZB6ayA3i2Ni64+ZF8deXd1Ba5vWGKgBGav73jDzM0Tn0ypfiZhlaRAKFCWbO0rEanqmbjv7WJlRscbsr/PGSmFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LpSCmhSr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E8DC4CEE2;
+	 MIME-Version; b=jPAUzBQTf4mmEJQ/5x0j0aOd3Pp42VvgAKklrlhI9DeRQzYRdzcv/5cBeQIeKjBovsv9MNRSso/UpIF9pmtX999I+oPc3dRXDL1p04Bz6nR40dWEhycBgthzKTHlkN89S7QdKf7SIV2q7n5HLGE0hJrsZvN9VfXXjJR0dfG8HJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WvHKozje; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B04C4CEE4;
 	Sat, 15 Feb 2025 17:38:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739641104;
-	bh=Cptvvdg58Mif3ou0/tPyf1Nbz5VIb9W2RdSQkk+mm0A=;
+	bh=XuMX9D51rOvDLqugXxKyuaKFZB0IP1O1SmRry/eT/uc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LpSCmhSrjcKzDokvmluRQxX01ZBowLxhPSNmQmVHx36lqUkFLLT2b5cYwrvfP6Jqr
-	 iBEA11ASqUh+MauSC+bom+iVlXFc8rVVrQ1rz6spd05vnB2k+iO6sm/TsTaJK7TRdw
-	 Yz5MYMTrv829LGqieVE4Xs6HUc/t28IJ5bUFVDIA5Fns0upKP5Kci8Gkl6leMezCa0
-	 qZMvxV9mfOzaJzLJeU2P51bNPWyiER6Prik5Myo8VGjNRF2MRg3lyyGAGUhMidkHi0
-	 AUUhUOiQ+noP0cL8F4J3w1p7613IlE0i2hg2VPrDM77Kqatmjv4kOZhmoASwHZAy0K
-	 lyn805L4CzuSg==
+	b=WvHKozjea013rJ5CdYymCIVcomvPnzedyhCWg+IFXMlR5hleGEXLFFZS8W211fmbQ
+	 nF7vJdiPsEysLCxJoUsb+mE0gzElLPRDbvAMg51XuHVcKRQ2IYdTwxb2Fmw4WdS+6d
+	 ys97uUvr/G+cTQ+1Nbbdf/+GpuGPTkn4TT5ZKtFsTAzJWwgW3TLSU4y3TLaBvsc8nt
+	 VTZ1srnGkkGHyFaTEVEHdAJfCJszhVKns9Rg1Kt+npGULYFuKW9Lva2Il2Iv62uvCK
+	 fKwOxCaWsMqY0Bc1goy2H7UkPNUXvt3Vjb0SRav2VywPsD2+QCWeQ1oLvxyolAQEzA
+	 8WvCNQPC96oyw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1tjM7S-004Pqp-81;
+	id 1tjM7S-004Pqp-E4;
 	Sat, 15 Feb 2025 17:38:22 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -56,9 +56,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH 10/14] KVM: arm64: Allow userspace to limit NV support to nVHE
-Date: Sat, 15 Feb 2025 17:38:12 +0000
-Message-Id: <20250215173816.3767330-11-maz@kernel.org>
+Subject: [PATCH 11/14] KVM: arm64: Make ID_AA64MMFR4_EL1.NV_frac writable
+Date: Sat, 15 Feb 2025 17:38:13 +0000
+Message-Id: <20250215173816.3767330-12-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20250215173816.3767330-1-maz@kernel.org>
 References: <20250215173816.3767330-1-maz@kernel.org>
@@ -74,90 +74,28 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-NV is hard. No kidding.
-
-In order to make things simpler, we have established that NV would
-support two mutually exclusive configurations:
-
-- VHE-only, and supporting recursive virtualisation
-
-- mVHE-only, and not supporting recursive virtualisation
-
-For that purpose, introduce a new vcpu feature flag that denotes
-the second configuration. We use this flag to limit the idregs
-further.
+We want to make sure that it is possible for userspace to configure
+whether recursive NV is possible. Make NV_frac writable for that
+purpose.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/uapi/asm/kvm.h |  1 +
- arch/arm64/kvm/nested.c           | 28 ++++++++++++++++++++++++++--
- 2 files changed, 27 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 568bf858f3198..3bcab2a106c98 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -105,6 +105,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
- #define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
-+#define KVM_ARM_VCPU_HAS_EL2_E2H0	8 /* Limit NV support to E2H RES0 */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 96d1d300e79f9..5ec5acb6310e9 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -51,6 +51,10 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 	struct kvm_s2_mmu *tmp;
- 	int num_mmus, ret = 0;
- 
-+	if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features) &&
-+	    !cpus_have_final_cap(ARM64_HAS_HCR_NV1))
-+		return -EINVAL;
-+
- 	/*
- 	 * Let's treat memory allocation failures as benign: If we fail to
- 	 * allocate anything, return an error and keep the allocated array
-@@ -894,6 +898,9 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 			ID_AA64MMFR1_EL1_HPDS	|
- 			ID_AA64MMFR1_EL1_VH	|
- 			ID_AA64MMFR1_EL1_VMIDBits);
-+		/* FEAT_E2H0 implies no VHE */
-+		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features))
-+			val &= ~ID_AA64MMFR1_EL1_VH;
- 		break;
- 
- 	case SYS_ID_AA64MMFR2_EL1:
-@@ -909,8 +916,25 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 		break;
- 
- 	case SYS_ID_AA64MMFR4_EL1:
--		val = SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
--		val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, E2H0, NI_NV1);
-+		/*
-+		 * You get EITHER
-+		 *
-+		 * - FEAT_VHE without FEAT_E2H0
-+		 * - FEAT_NV limited to FEAT_NV2
-+		 * - HCR_EL2.NV1 being RES0
-+		 *
-+		 * OR
-+		 *
-+		 * - FEAT_E2H0 without FEAT_VHE nor FEAT_NV
-+		 *
-+		 * Life is too short for anything else.
-+		 */
-+		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features)) {
-+			val = 0;
-+		} else {
-+			val = SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY);
-+			val |= SYS_FIELD_PREP_ENUM(ID_AA64MMFR4_EL1, E2H0, NI_NV1);
-+		}
- 		break;
- 
- 	case SYS_ID_AA64DFR0_EL1:
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c1e050a58fb2e..db7c4e791b99c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2669,7 +2669,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_WRITABLE(ID_AA64MMFR3_EL1, (ID_AA64MMFR3_EL1_TCRX	|
+ 				       ID_AA64MMFR3_EL1_S1PIE   |
+ 				       ID_AA64MMFR3_EL1_S1POE)),
+-	ID_SANITISED(ID_AA64MMFR4_EL1),
++	ID_WRITABLE(ID_AA64MMFR4_EL1, ID_AA64MMFR4_EL1_NV_frac),
+ 	ID_UNALLOCATED(7,5),
+ 	ID_UNALLOCATED(7,6),
+ 	ID_UNALLOCATED(7,7),
 -- 
 2.39.2
 
