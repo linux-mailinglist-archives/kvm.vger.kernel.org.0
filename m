@@ -1,206 +1,173 @@
-Return-Path: <kvm+bounces-38209-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38210-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0182EA3698B
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 01:12:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FD36A369E2
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 01:19:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5830116B446
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 00:11:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC7A07A1039
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 00:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9A084A35;
-	Sat, 15 Feb 2025 00:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 269FB14A4FF;
+	Sat, 15 Feb 2025 00:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+rEuEUb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2DO5y6Ax"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623554430
-	for <kvm@vger.kernel.org>; Sat, 15 Feb 2025 00:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A581F4AEE0
+	for <kvm@vger.kernel.org>; Sat, 15 Feb 2025 00:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739578088; cv=none; b=f8rEL3Pfotf7ltFAZT7TPqskPRljUGVufauMei81MyXA2Codm2OdOvr/vWIROt/WIy1M+0ThWr/GxJNmu5zxuZSCyKhxlSuhf/fgEAKCvQXht2PJx+yKIX9tUSltm9SpXPIo4Bxwvaqnj9Y3+OJHaOjJ5gkZRzn0BZwsW39bbRM=
+	t=1739578729; cv=none; b=ED7NLmmReqWVRZcdbhfOJpucWJsfQv6jeuyzNK01iLriVk5kGaAqiWhfbf7OAAWaN46DXXv5UaLZ0kv1gYScl0PrSmmVIYkWIPGf56LOiXGcnWPVDd2t7d32MQEYtyrjS5vXzwOaAlItNF7guwY/vPuNhi+reT+vbs+ng4ReWWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739578088; c=relaxed/simple;
-	bh=Fvdkd5oSUL8Sc4FxfhwLiEeosfdsIkh2xZkpznLTiKc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lj07ALB0/OpQR+6Yx3gA3PDBic8ke+n1GbGEd2nWF3PH8uXjmy0k9pqwrPrv2DTshruNAyBSXQczJPF1zPVwkSyUpRBOYuiBRjBpNwbJposQWYN9KZJ5ynlpKBQ383rXlNRruOwwbdBGWwo5xFXNznx+gjA0IBSrBOFQKnAE9WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h+rEuEUb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739578085;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dde8t2t0iRk/0B4RUYBxeInO7gUe801780SUKxb18V8=;
-	b=h+rEuEUbgyTizKExOOZVqtfK3oMA725lAjctKhw7BlGNBgMgqP95OMVc5us4D16ktfceSl
-	3cGKdXGtZeaiC98ZuQ6ZI1nKXzTGMmJtJd4z88vYJpIZE9wB/1YLQt+V73JXDq2w+njlJ6
-	L+26hTSzHA/6x1PEjzKhk8/93a6WZRw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-4qXPWLWfMQy7QEcgRD5c6g-1; Fri, 14 Feb 2025 19:08:03 -0500
-X-MC-Unique: 4qXPWLWfMQy7QEcgRD5c6g-1
-X-Mimecast-MFC-AGG-ID: 4qXPWLWfMQy7QEcgRD5c6g_1739578082
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38f34b3f9f1so112891f8f.0
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 16:08:03 -0800 (PST)
+	s=arc-20240116; t=1739578729; c=relaxed/simple;
+	bh=LBAJCUPYJCA2TRcJxjqvWB6FzkhZPiCg6HIahBiWHVY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qjBdMw80t72JGnE8fTi/aWttZZt+g8yhI90sTnXs7FDLswesGXsd1U0SApCqzYU7DgKexqgqSE7TC6r5pcdXKh01yQ34CMLRRC0tnTPpFMemPJ6vKcCw2fAz/H7ePmeSbUx/klpbM58avZ8aIDjHPGC/WWf4VW84OoxGX0X6e0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2DO5y6Ax; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2f816a85facso5359389a91.3
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 16:18:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739578727; x=1740183527; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i3a0TGsAUIBu018CD+hYblNeJ5zu28OsdVMzDvpLRuM=;
+        b=2DO5y6AxljwSDAxxJQcxFKSkbIFSrflBga3G3FBaV7u4eTEOTpseLmyAcIqWTHDU+l
+         OdjWcOYxMGzK5cRa8VhN1YO0l5HKJGnWcnNQ8ppZWe/Y5FvrJj98QHWdKLY+66k5EHEg
+         j81wmY2OB73zmEErx+rwgruOjmVXm057xBNoBgAsyfmFp8psqxKw37E62pWRfxgW8Wo0
+         r+U8rARYNdiNibjsbVzdy2yyHqBikuIPzGaCMLu/GFW0NL1QCAZkvPEJFwP0x5NK0axp
+         9ZRoTq46bN0ZSPjDFozCfZu5nFEkEgpYWLR2qo9LUsuHRsgIX9ExlD0uUsOZVR0HPZX7
+         3SGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739578082; x=1740182882;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dde8t2t0iRk/0B4RUYBxeInO7gUe801780SUKxb18V8=;
-        b=pSGt0tRbfAVmWWh7eppiIDbd5DoLv+YSCudR1+fStHCAvKky2DzHzdCpXAXwWHj4WF
-         Niw68IWzJSuJJ66SIehEh8YpaHOWN+h+7WncvBPvwxU70y5xOLUxrIS1CTLadOrceUGR
-         vCHKoq25sO5qtxZT7Asj6dxjj5KfJUqzQemMfJRWg+3137bZD1cVrKGLmz4G1Ouu7vFO
-         CfiifgwGtqIJhyacIqfcgDLHCoJoSAawRyff3TfPjvGjFO3DYfM62wcaL8K4R06wmWGh
-         TNtY4UTQhByAF6/8yHNGcOty3x69LJOzell6IJdWtboUu3M/6nWtT/1mQNC+DWsgBoo/
-         trsg==
-X-Gm-Message-State: AOJu0YzT46Gjq04LEUDoxagKzmdqFNF7oaqjUxj3n2ZXEFXtK58w2ri0
-	Y1QVrkZM/XifLVyn1Pw87F9l9MenZq8nzey37h/fdUITwtrQLvdI4hEFTWjf4oE7yqJRP7uHZCQ
-	2rGwFJdBBJhiTANE+0nmoUWGLltg2KPbuWaR+6XgA67Bp7nZ4eg==
-X-Gm-Gg: ASbGncvgL6Jrv41zLsifxH26p1+IBYhz1hWCBkqFnlarzMrG63HXhHGarfYF99WH81G
-	WOma2uq0ODl9UP6SNZ+dVa2IsuXJSrZRv+b65MGwfP7OiFOAaW9utscAGUHyJYhtq6w/+rnzuKm
-	M0vXsavEXsT5qkGleaAlp5eorsuFG2ntRoswJaYnuqsKhFCEphLb3dGFm9Haz8cW5hQ3vAmmK5L
-	x8JTW/hIQ+PMukvkN8BT70zgPtJjLTEdupBZLSXYnd7KRq42wRlSWPgHRmbrBfuekbUPecjI65+
-	c6m+Te/1tIg=
-X-Received: by 2002:a5d:5850:0:b0:38f:31b6:4f30 with SMTP id ffacd0b85a97d-38f33f4a8c6mr1261803f8f.35.1739578082505;
-        Fri, 14 Feb 2025 16:08:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHjg1xvjCQd4TrCjV6sMCBq5+kC10xDRLuwFyQIXZtPyJBIJeUWsXqQgGAKLPfsCZx/sYHMkw==
-X-Received: by 2002:a5d:5850:0:b0:38f:31b6:4f30 with SMTP id ffacd0b85a97d-38f33f4a8c6mr1261774f8f.35.1739578082120;
-        Fri, 14 Feb 2025 16:08:02 -0800 (PST)
-Received: from [192.168.10.48] ([176.206.122.109])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38f259f85c2sm6050514f8f.91.2025.02.14.16.08.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Feb 2025 16:08:01 -0800 (PST)
-Message-ID: <1db73488-4095-4ac1-ad10-139615981de2@redhat.com>
-Date: Sat, 15 Feb 2025 01:08:00 +0100
+        d=1e100.net; s=20230601; t=1739578727; x=1740183527;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i3a0TGsAUIBu018CD+hYblNeJ5zu28OsdVMzDvpLRuM=;
+        b=RGu/h2c1i0t5JYV6N1dQzWPZAAEnPm9Dz/pclUYVZJKNw5xtvzGbNwhfijUyiJeHag
+         wzsyeXR7N9irdG2baCLvqsvvooaBF6wwZ0CNNcVLcLh/vbMfIkjosr2k8NdL+8zSiRyT
+         2KJeeT1hgILjZxxqzdA0nYTvIB9T2UFuWGxtmhkVZ69UiEO6Gcnxkv34G56EzUFrcaIH
+         NRdg3UbzmHemd9wTJANMR+BrQQ+TI0/PqAO/uJULvV3Tqhx5/Sx/lEDSJrzdKGbSR+8x
+         nWLwCfpTwabfngWh65iUM1KlOvlxYwCF3t5s19aJm6RU/Rp8yeBcpotptDzwRA1gOw1l
+         JZzw==
+X-Gm-Message-State: AOJu0YwgNE8uZktDIbhzXFPFb+mGW5yYVAt5hy3+zY9tPov2POaTj54q
+	NPrcIRByD7Csw0lnGRLltneJ7khmuZ4faHX0LpxpAA9Kxf/NRNNadFxju8aCyC2ajlhFdlr4Lw/
+	3Kg==
+X-Google-Smtp-Source: AGHT+IE0yvOhD2bUFD5Lv2k7Idz48+lVu+WWA4hpucain2GNHamWszZo07q9krpHCcUcAamUI27M8dS4Mm0=
+X-Received: from pjbdy13.prod.google.com ([2002:a17:90b:6cd:b0:2f9:dc36:b11])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1e46:b0:2fa:157e:c790
+ with SMTP id 98e67ed59e1d1-2fc40d14e35mr1645220a91.5.1739578726956; Fri, 14
+ Feb 2025 16:18:46 -0800 (PST)
+Date: Fri, 14 Feb 2025 16:18:45 -0800
+In-Reply-To: <1db73488-4095-4ac1-ad10-139615981de2@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+Mime-Version: 1.0
+References: <20250125011833.3644371-1-seanjc@google.com> <20250214234058.2074135-1-pbonzini@redhat.com>
+ <Z6_ai1HdLWiTJ2Pf@google.com> <1db73488-4095-4ac1-ad10-139615981de2@redhat.com>
+Message-ID: <Z6_dZTbQbgr2iY6Q@google.com>
 Subject: Re: [PATCH] KVM: x86: Load DR6 with guest value only before entering
  .vcpu_run() loop
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- John Stultz <jstultz@google.com>, Jim Mattson <jmattson@google.com>
-References: <20250125011833.3644371-1-seanjc@google.com>
- <20250214234058.2074135-1-pbonzini@redhat.com> <Z6_ai1HdLWiTJ2Pf@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <Z6_ai1HdLWiTJ2Pf@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	John Stultz <jstultz@google.com>, Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 2/15/25 01:06, Sean Christopherson wrote:
-> On Fri, Feb 14, 2025, Paolo Bonzini wrote:
->> Queued, thanks.
+On Sat, Feb 15, 2025, Paolo Bonzini wrote:
+> On 2/15/25 01:06, Sean Christopherson wrote:
+> > On Fri, Feb 14, 2025, Paolo Bonzini wrote:
+> > > Queued, thanks.
+> > 
+> > Drat, I was too slow today.  I applied and pushed this to "kvm-x86 fixes" and
+> > linux-next (as of yesterday), along with a few other things, I just haven't sent
+> > out the "thanks" yet (got sidetracked).
+> > 
+> > If you want to grab those, here's a semi-impromptu pull request.  Otherwise I'll
+> > just drop this particular commit.
 > 
-> Drat, I was too slow today.  I applied and pushed this to "kvm-x86 fixes" and
-> linux-next (as of yesterday), along with a few other things, I just haven't sent
-> out the "thanks" yet (got sidetracked).
+> I had "KVM: nSVM: Enter guest mode before initializing nested NPT MMU" on my
+> list, but not the others.
 > 
-> If you want to grab those, here's a semi-impromptu pull request.  Otherwise I'll
-> just drop this particular commit.
+> I'll just pull these, thanks.
 
-I had "KVM: nSVM: Enter guest mode before initializing nested NPT MMU" 
-on my list, but not the others.
+Heh, while you're here, here's combined pull request for the selftests changes
+that missed 6.14 due to the pmu_counters_test snafumi[1][2]?
 
-I'll just pull these, thanks.
+I'm a-ok if you want to hold off until 6.15.  I have them sitting in a separate
+branch (selftests_6.14), and don't anticipate conflicts, so it's no trouble to
+carry them until the next merge window.
 
-Paolo
+[1] https://lore.kernel.org/all/Z6qN3wPXH4cbRzLP@google.com
+[2] https://lore.kernel.org/all/20250117010718.2328467-5-seanjc@google.com
 
-> --
-> 
-> The following changes since commit a64dcfb451e254085a7daee5fe51bf22959d52d3:
-> 
->    Linux 6.14-rc2 (2025-02-09 12:45:03 -0800)
-> 
-> are available in the Git repository at:
-> 
->    https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.14-rcN
-> 
-> for you to fetch changes up to c2fee09fc167c74a64adb08656cb993ea475197e:
-> 
->    KVM: x86: Load DR6 with guest value only before entering .vcpu_run() loop (2025-02-12 08:59:38 -0800)
-> 
-> ----------------------------------------------------------------
-> KVM fixes for 6.14 part 1
-> 
->   - Reject Hyper-V SEND_IPI hypercalls if the local APIC isn't being emulated
->     by KVM to fix a NULL pointer dereference.
-> 
->   - Enter guest mode (L2) from KVM's perspective before initializing the vCPU's
->     nested NPT MMU so that the MMU is properly tagged for L2, not L1.
-> 
->   - Load the guest's DR6 outside of the innermost .vcpu_run() loop, as the
->     guest's value may be stale if a VM-Exit is handled in the fastpath.
-> 
-> ----------------------------------------------------------------
-> Sean Christopherson (6):
->        KVM: x86: Reject Hyper-V's SEND_IPI hypercalls if local APIC isn't in-kernel
->        KVM: selftests: Mark test_hv_cpuid_e2big() static in Hyper-V CPUID test
->        KVM: selftests: Manage CPUID array in Hyper-V CPUID test's core helper
->        KVM: selftests: Add CPUID tests for Hyper-V features that need in-kernel APIC
->        KVM: nSVM: Enter guest mode before initializing nested NPT MMU
->        KVM: x86: Load DR6 with guest value only before entering .vcpu_run() loop
-> 
->   arch/x86/include/asm/kvm-x86-ops.h             |  1 +
->   arch/x86/include/asm/kvm_host.h                |  1 +
->   arch/x86/kvm/hyperv.c                          |  6 +++++-
->   arch/x86/kvm/mmu/mmu.c                         |  2 +-
->   arch/x86/kvm/svm/nested.c                      | 10 +++++-----
->   arch/x86/kvm/svm/svm.c                         | 13 ++++++-------
->   arch/x86/kvm/vmx/main.c                        |  1 +
->   arch/x86/kvm/vmx/vmx.c                         | 10 ++++++----
->   arch/x86/kvm/vmx/x86_ops.h                     |  1 +
->   arch/x86/kvm/x86.c                             |  3 +++
->   tools/testing/selftests/kvm/x86/hyperv_cpuid.c | 47 ++++++++++++++++++++++++++++++++---------------
->   11 files changed, 62 insertions(+), 33 deletions(-)
-> 
+---
+The following changes since commit 10b2c8a67c4b8ec15f9d07d177f63b563418e948:
 
+  Merge tag 'kvm-x86-fixes-6.13-rcN' of https://github.com/kvm-x86/linux into HEAD (2024-12-22 12:59:33 -0500)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-selftests-6.14-2
+
+for you to fetch changes up to 54108e73344480c3e5f3799129970009f52c59f4:
+
+  KVM: selftests: Print out the actual Top-Down Slots count on failure (2025-02-12 08:34:56 -0800)
+
+----------------------------------------------------------------
+KVM selftests changes for 6.14:
+
+ - Misc cleanups and prep work.
+
+ - Annotate _no_printf() with "printf" so that pr_debug() statements are
+   checked by the compiler for default builds (and pr_info() when QUIET).
+
+ - Attempt to whack the last LLC references/misses mole in the Intel PMU
+   counters test by adding a data load and doing CLFLUSH{OPT} on the data
+   instead of the code being executed.  The theory is that modern Intel CPUs
+   have learned new code prefetching tricks that bypass the PMU counters.
+
+ - Fix a flaw in the Intel PMU counters test where it asserts that an event is
+   counting correctly without actually knowing what the event counts on the
+   underlying hardware.
+
+----------------------------------------------------------------
+Chen Ni (1):
+      KVM: selftests: Remove unneeded semicolon
+
+Colton Lewis (2):
+      KVM: selftests: Fix typos in x86's PMU counter test's macro variable use
+      KVM: selftests: Add defines for AMD PMU CPUID features and properties
+
+Isaku Yamahata (1):
+      KVM: selftests: Add printf attribute to _no_printf()
+
+Sean Christopherson (7):
+      KVM: selftests: Use data load to trigger LLC references/misses in Intel PMU
+      KVM: selftests: Add helpers for locally (un)blocking IRQs on x86
+      KVM: selftests: Make Intel arch events globally available in PMU counters test
+      KVM: selftests: Only validate counts for hardware-supported arch events
+      KVM: selftests: Remove dead code in Intel PMU counters test
+      KVM: selftests: Drop the "feature event" param from guest test helpers
+      KVM: selftests: Print out the actual Top-Down Slots count on failure
+
+ tools/testing/selftests/kvm/access_tracking_perf_test.c |   2 +-
+ tools/testing/selftests/kvm/include/test_util.h         |   2 +-
+ tools/testing/selftests/kvm/include/x86/processor.h     |  47 +++++++++++++++++++++++++++++++++
+ tools/testing/selftests/kvm/x86/hyperv_ipi.c            |   6 +++--
+ tools/testing/selftests/kvm/x86/pmu_counters_test.c     | 158 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------------
+ tools/testing/selftests/kvm/x86/svm_int_ctl_test.c      |   5 +---
+ tools/testing/selftests/kvm/x86/ucna_injection_test.c   |   2 +-
+ tools/testing/selftests/kvm/x86/xapic_ipi_test.c        |   3 ++-
+ tools/testing/selftests/kvm/x86/xapic_state_test.c      |   4 +--
+ tools/testing/selftests/kvm/x86/xen_shinfo_test.c       |   5 +---
+ 10 files changed, 151 insertions(+), 83 deletions(-)
 
