@@ -1,108 +1,146 @@
-Return-Path: <kvm+bounces-38276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34DD5A36CCA
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 10:16:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81692A36D27
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 10:56:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA0091891A2A
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 09:16:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C5816DAB3
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 09:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC2E19DFA5;
-	Sat, 15 Feb 2025 09:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618461A5B82;
+	Sat, 15 Feb 2025 09:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="HLkIVfZ0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F8583tce"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB95802;
-	Sat, 15 Feb 2025 09:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C53194A75;
+	Sat, 15 Feb 2025 09:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739610958; cv=none; b=fF+E4sMIVRZt30vXs1z71E3KS0lGKPCbX69cInn9y62aSWsdNJI36U0MYyYndq6fCpnUiTAlAd83Zdn95STIQGuXBDmiqLGKvl7Wm6pgky8QQGYyRaJPV7thn7/iEMeFGWRRwmMNcl7mlFmTR8c/9itUNmL/Cik7Pk6ptzrneYc=
+	t=1739613377; cv=none; b=jif2DPVLqedGkjYpuuKe7LYLDBHvckMs61S0oJZr9x6KRdpN6Uk45qPr4aPZsaX+WOFCT2QM3JPW+3LmDtI7CNIdHIcFVVczRraz21f4n58+ErufuZ0hfjVzb092cGsG7W5mvIAKB1r1Hj2ZAA7gNyRLqgebe/EwmQFDeuGRmM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739610958; c=relaxed/simple;
-	bh=YsUYvy8hAImOx4jZz20N8WQ4g8+bYbqphA9Y0Vr7j18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nuTSsPxiprvvOI5Omol1HIarofSo1trZUYrMulVIEwtUiJYTrnjeDgvbM1hBNXEgNq47P0rgm2hga9VpNy3LECrJnuTBDMvCRqDKgIf/ElD9Biltvmgv42rLh6ssl9nZVaD0DryTMe6q1479djdqzbAbPEKCLdPkYDLEOo99BXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=HLkIVfZ0; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8F3A740E016A;
-	Sat, 15 Feb 2025 09:15:49 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id z3-Z8iVj-auL; Sat, 15 Feb 2025 09:15:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1739610945; bh=OB+tdRVB1FIrp8S+jWnd7Rhad1CcgG6e0AvI5zTQmEQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HLkIVfZ0ZwT7308toasPmNWQLTs94svqWUFUo175FPskKv/CDu3w4pzkp1s6X0CXB
-	 0by7unBOT1pWu/FuPkgFWojKaUqP+XFSPe5odHIhTnHSC9bIZxEn5fMM/c2CiBtUSi
-	 QSfX04n5WUaL+GXsanuj/GOTvGq3nfjk01LQWy1sHiI21dXRO+9ppE6bGJZ0BiJobU
-	 cmYbHtUSsnUabaMZUxEHsEsYsPJFPBn18r68uLAYNOP1bJtH0Gaz8WPlPB7NwqfK0K
-	 L5NocX3vLO/ux6Zp4aPK527LhqHap+iAew5K+SsnMB4w2Urb98jUANQvP1LvnSGgNb
-	 DjqdbBKyTFNI0B/FvCnwWRxFaV1X8TbzsgSuHydVOJIJ1uMjrq5RP6ZYDJQ2aICjZ+
-	 1QqPBWuIyvRMxzWjj5x7bMXKqWvI03lpAQg/ps6Npxa7sYj9UYrKis2gsSsaobGeli
-	 ikENHzx1MO39ezEDrmT9vwj1HbMs9PtSQKsmJvWkP5FhLoi0/G4O278nhNJZ8eVZxV
-	 cdT9/FPHGuLaGbVb63qIJD9vSj7sj4Okl4/N0pGPDi4gwuXnsCgBQxCPf17amv0Nu2
-	 ikDxUMqKaOiKBNyMRcID9KzVXOI/6zcpJs9l25dO5cEzooQC6PEY2kFFoFKyLLdjO7
-	 s0PurcHvOp6lkAZOTORSM88w=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3421740E0028;
-	Sat, 15 Feb 2025 09:15:34 +0000 (UTC)
-Date: Sat, 15 Feb 2025 10:15:27 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Patrick Bellasi <derkling@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Patrick Bellasi <derkling@matbug.net>,
-	Brendan Jackman <jackmanb@google.com>
-Subject: Re: Re: Re: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <20250215091527.GAZ7BbL2UfeJ0_52ib@fat_crate.local>
-References: <20250213142815.GBZ64Bf3zPIay9nGza@fat_crate.local>
- <20250213175057.3108031-1-derkling@google.com>
- <20250214201005.GBZ6-jHUff99tmkyBK@fat_crate.local>
- <Z6_mY3a_FH-Zw4MC@google.com>
+	s=arc-20240116; t=1739613377; c=relaxed/simple;
+	bh=+dFkYXLjCfDflfWogL2OUxXeilHDLF7xrCSgB+RuTlE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jSEHijcZnPEGzjOfhuYDNpO9/fuINkgSVx70wQzxJs+nXoBJYEDPgzuDoYj7jyoFg6d8I7qTP7cwfCWAs+lrN6OICUVa2sDzMeJPEiR+L1l1EqRy3mhY//L+DVEh2KPBlBPOvI7xrrKAoiVutTvxvVLoEY2PBlGzJ2TpDvM1eoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F8583tce; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739613377; x=1771149377;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+dFkYXLjCfDflfWogL2OUxXeilHDLF7xrCSgB+RuTlE=;
+  b=F8583tceoBW/2IfB9BicZoqWWNThGFb4lKDSSbM41zmn5kfJ4fV/hJQo
+   YJH7UQyXVMFKr4pgJpnjk3PJ+T69lQvFh+swRvn2lkaTsTRYB6oTomBvF
+   shWKiSjJIYW1wGuJhP6zDIeLXUn2EhKFhpY7kSh68gIuVYGW9n9VGdrNR
+   QFL8sxsT6DJqUp5sSW9/dBFlnA0adT2MGMJj2BmFIqijHYeM3P7wf1Jaj
+   qi+67wEgyTEVHc7l8uJLZ7QS5jWlZUzdo4GdFl+HJwn2Zsvbcz+6tu6ee
+   1oSRI1zkt2jAuIb9ujOipuqDQefHRrGvNFzu9NvIfamMrl+sh2D39WnkA
+   w==;
+X-CSE-ConnectionGUID: 9F5dn1khQVCf8h4J/bgeAg==
+X-CSE-MsgGUID: DJ41CmmxTzqoI7lIXiGNJg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="57766105"
+X-IronPort-AV: E=Sophos;i="6.13,288,1732608000"; 
+   d="scan'208";a="57766105"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2025 01:56:16 -0800
+X-CSE-ConnectionGUID: n9GHMeQKRRqXYN2OdW9vnQ==
+X-CSE-MsgGUID: KdikE3/JTzS07ehZlmxziA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="117811969"
+Received: from allen-sbox.sh.intel.com (HELO [10.239.159.30]) ([10.239.159.30])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2025 01:56:10 -0800
+Message-ID: <58e7fbee-6688-4a49-8b7a-f0e81e6562db@linux.intel.com>
+Date: Sat, 15 Feb 2025 17:53:13 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z6_mY3a_FH-Zw4MC@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/12] Initial support for SMMUv3 nested translation
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Zhangfei Gao <zhangfei.gao@linaro.org>, acpica-devel@lists.linux.dev,
+ iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
+ Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+ Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Robert Moore <robert.moore@intel.com>, Robin Murphy <robin.murphy@arm.com>,
+ Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Donald Dutile <ddutile@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+ Hanjun Guo <guohanjun@huawei.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Jerry Snitselaar <jsnitsel@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+ Michael Shavit <mshavit@google.com>, Nicolin Chen <nicolinc@nvidia.com>,
+ patches@lists.linux.dev, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Mostafa Saleh <smostafa@google.com>
+References: <20241113012359.GB35230@nvidia.com>
+ <9df3dd17-375a-4327-b2a8-e9f7690d81b1@linux.intel.com>
+ <20241113164316.GL35230@nvidia.com>
+ <6ed97a10-853f-429e-8506-94b218050ad3@linux.intel.com>
+ <20241115175522.GA35230@nvidia.com> <20250122192622.GA965540@nvidia.com>
+ <284dd081-8d53-45ef-ae18-78b0388c98ca@linux.intel.com>
+ <f7b6c833-b6c1-4154-9b77-13553e501f2b@linux.intel.com>
+ <20250213184317.GB3886819@nvidia.com>
+ <bc9f4477-7976-4955-85dc-3e05ebe95ead@linux.intel.com>
+ <20250214124150.GF3886819@nvidia.com>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <20250214124150.GF3886819@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Feb 15, 2025 at 12:57:07AM +0000, Yosry Ahmed wrote:
-> Should this patch (and the two previously merged patches) be backported
-> to stable? I noticed they did not have CC:stable.
+On 2/14/25 20:41, Jason Gunthorpe wrote:
+> On Fri, Feb 14, 2025 at 01:39:52PM +0800, Baolu Lu wrote:
+> 
+>> When the IOMMU is working in scalable mode, PASID and PRI are supported.
+>> ATS will always be enabled, even if the identity domain is attached to
+>> the device, because the PASID might use PRI, which depends on ATS
+>> functionality. This might not be the best choice, but it is the
+>> simplest and functional.
+> The arm driver keeps track of things and enables ATS when PASIDs are
+> present
 
-Because a stable backport would require manual backporting, depending on where
-it goes. And Brendan, Patrick or I are willing to do that - it's a question of
-who gets there first. :-)
+I am not aware of any VT-d hardware implementation that supports
+scalable mode but not PASID. If there were one, it would be worthwhile
+to add an optimization to avoid enabling ATS during probe if PASID is
+not supported.
 
-And folks, whoever wants to backport, pls tell the others so that we don't
-duplicate work.
+> 
+>> If any device does not work with the identity domain and ATS enabled,
+>> then we can add a quirk to the driver, as we already have such a
+>> mechanism.
+> The device should not care, as long as the HW works.. ARM has a weird
+> quirk where one of the two ways to configure an identity domain does
+> not work with ATS. If you have something like that as well then you
+> have to switch ATS off if the IOMMU is in a state where it will not
+> respond to it.
+> 
+> Otherwise, the HW I'm aware of uses ATS pretty selectively and it may
+> not make any real difference..
+> 
+>>> I feel like we should leave "iommu: Move PRI enablement for VF to
+>>> iommu driver" out for now, every driver needs this check?  AMD
+>>> supports SVA and PRI so it needs it too.
+>> Yes, agreed.
+> Although, I'm wondering now, that check should be on the SVA paths as
+> well as the iommufd path..
 
-Thx.
+That appears to be a fix.
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+baolu
 
