@@ -1,138 +1,125 @@
-Return-Path: <kvm+bounces-38278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38279-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2328A36D8B
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 12:01:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 255ADA36E3E
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 13:54:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E586162C74
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 11:01:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CE62170ED2
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 12:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36CFF1A2388;
-	Sat, 15 Feb 2025 11:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295E11C701C;
+	Sat, 15 Feb 2025 12:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ce1mR6Mp"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="JUwxh7lu"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D63192D97;
-	Sat, 15 Feb 2025 11:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2350C23BB;
+	Sat, 15 Feb 2025 12:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739617270; cv=none; b=hX/5Q2mzWI0NZreuuWXbumDY0OxMk2/y5O49QK6/e6dEg9YSw9QqHCbzYtgJFd8GnKs3abTtlzImG9qb/UNp6bZc+/Dk9jBw2sxdOahbYhPYqR4B31hAt70rZfhYML36tuUqYVNvqsNxUL/28uOpOgLSs+iQ2PaqU314Z+eD4dI=
+	t=1739624014; cv=none; b=PWO+BqBq/p2gTziRzHQrqWN7mussuV7lqMBccQ5ujIBaOMja1f+l7xnoax8l3dcBvzkRru4P+C1dXTHlH2snmr59ihclSWMpB9BUI4tpk40ijfku2wWfc6Z3dTEzPWtfZu4CbwEymU24q2LotMHhlCBQIqLR4Xs3IbZS3AaFL1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739617270; c=relaxed/simple;
-	bh=dJMXZjkxRnJGqf19Krt1G2+pubbDJ/b6B23F0R9noN0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=J3E2qsXJK1wwCEpB7KGJEzlQ3K82o1T3XmSdZKewIFdFJ1cBFXir+64tfSJZQBdtBJvdTOU0/wv8Z1fjSqR99BJQR2s81qsh47qZLgW7X3lvChN12hh2LDt0ZxMIOzQA61bSHR+GWYqsvcw4NMenKUrxXhQwBQHd9a3FHLvH3ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ce1mR6Mp; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=PPMcrClHGwldmJKxzwOU3qelWLajHsspzH8nTkIQ1mI=; b=ce1mR6Mp+Xi3xZCOGFxNUNkzVo
-	udkQJfg8zsBfbiBObS3VksNYNY/AFsdK5K9x/8C7LJz7sxUnLOnM5bEjjbwJiF9f44WaQzmQHiauD
-	HXHErR6YqiQV9Dj4Qq86U/s22uP7Hde3B1mN4eGV4/lba9UhtMKekn4Nz/TIU2vyjcr35lUETIiHQ
-	tQ5VfQHVoEXfV34i9TiVNvGcInzOEs1/MC/gsXlVHiofBcv7Ac+W3Zz4mrL4XdK9RO0saYbH8Vlot
-	rgJLeOu8cftYUgoBOF0jz+hmIlIveYyqTZ63FX8HXSbNqpStyyc+RTBfIvgzj5JanAfN9RqheauZj
-	s88XKhSQ==;
-Received: from [31.94.24.172] (helo=[127.0.0.1])
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tjFut-00000001REG-28sK;
-	Sat, 15 Feb 2025 11:01:00 +0000
-Date: Sat, 15 Feb 2025 12:00:54 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Paul Durrant <paul@xen.org>
-CC: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Joao Martins <joao.m.martins@oracle.com>,
- David Woodhouse <dwmw@amazon.co.uk>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_1/5=5D_KVM=3A_x86/xen=3A_Restrict_?=
- =?US-ASCII?Q?hypercall_MSR_to_unofficial_synthetic_range?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250215011437.1203084-2-seanjc@google.com>
-References: <20250215011437.1203084-1-seanjc@google.com> <20250215011437.1203084-2-seanjc@google.com>
-Message-ID: <DC438DC0-CC4B-4EE2-ABA8-8E0F9D15DD46@infradead.org>
+	s=arc-20240116; t=1739624014; c=relaxed/simple;
+	bh=55bFo5TwjiljeZK/OPEexGvWmrI7hXcDphFJik7KjUc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aVKDLcJfUgGLnC004l49Apw2TOtac6wOavQhQXREG7DbWmvRKDK6LEBkkcILsfxWRZHpFGUgi3deKnhhYq0RQiBLgdBn6PGcNshIZNlg869Ly3foSuQgR++l7lw6E+xk9rS/1jEIHOMsEqX60kS/KCWMZUzUn4PaCgcd6nv7ycU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=JUwxh7lu; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 99FAA40E016A;
+	Sat, 15 Feb 2025 12:53:28 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id wXaB67OA_vJI; Sat, 15 Feb 2025 12:53:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1739624004; bh=G4jABUnk//FFd36m5A3RahJKuG1xCrEuoKlicK3ZhsY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JUwxh7luVQQB8MeXuPuqa7zXQILmEi4HwRoRzbsXzkAGnkRtMHDvLABpNXKhmPvMM
+	 KkrawAk58zjqSzX6Yl6lj07cRczBQxhAaUXnI04A0YAQbAeH2e7F3KynI1/9n/6j6l
+	 k0PW/i1aIRjHRdDKWX4YdOhFM5O3ZuBHJpoXxzjHJnlOpn9V921g9r5ZL5/XDq4+6q
+	 h4zTVyZSy1IThlO1vsRKEzlnHCpZG5Q8x3ORERKGJaPVRB4v3cSF41NnpLrp7HOHbB
+	 fyZR80Mb7O6YBIPQn3ycHtBKsjKkxiHScNVOaC4psC9dagaamwHGLHpibR2m+oUNMu
+	 AHULu9twTHGauY82oL/mrMBogwYqiVxNuCyQKHAZuTM+EZquBOTFrBgNxVrUNOwf8v
+	 g/cfcZfaNAHMeucKfqcwqdDaBuIfjr7hA51CFXG6Oy+Mg/SFEnRN9boZ6WLZm+2j2p
+	 1zZWf6bvsngCITHF4s0rRSyF+Dp5/haaAbNfy/JwzF1HE0cT53TzmFl3B5eJBF6Uj3
+	 hbwrXn2yLicDjnKpE9YJa3PYosQF3XLg6WVkJ5Qrxlg3Z/yrQ5V4tIZec09nN44tAL
+	 zpQK0XIbYJDwqvnEZ4LIxrdMfNUADa1t4pS3G8ye2ByL9Vy8qX4lcQERCordJ+vKQJ
+	 jcwIruCfJx5evdTJ9QFI16tU=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3BBCE40E0028;
+	Sat, 15 Feb 2025 12:53:13 +0000 (UTC)
+Date: Sat, 15 Feb 2025 13:53:07 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Patrick Bellasi <derkling@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Patrick Bellasi <derkling@matbug.net>,
+	Brendan Jackman <jackmanb@google.com>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Subject: Re: Re: Re: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250215125307.GBZ7COM-AkyaF8bNiC@fat_crate.local>
+References: <20250213142815.GBZ64Bf3zPIay9nGza@fat_crate.local>
+ <20250213175057.3108031-1-derkling@google.com>
+ <20250214201005.GBZ6-jHUff99tmkyBK@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250214201005.GBZ6-jHUff99tmkyBK@fat_crate.local>
 
-On 15 February 2025 02:14:33 CET, Sean Christopherson <seanjc@google=2Ecom>=
- wrote:
->Reject userspace attempts to set the Xen hypercall page MSR to an index
->outside of the "standard" virtualization range [0x40000000, 0x4fffffff],
->as KVM is not equipped to handle collisions with real MSRs, e=2Eg=2E KVM
->doesn't update MSR interception, conflicts with VMCS/VMCB fields, special
->case writes in KVM, etc=2E
->
->While the MSR index isn't strictly ABI, i=2Ee=2E can theoretically float =
-to
->any value, in practice no known VMM sets the MSR index to anything other
->than 0x40000000 or 0x40000200=2E
->
->Cc: Joao Martins <joao=2Em=2Emartins@oracle=2Ecom>
->Reviewed-by: David Woodhouse <dwmw@amazon=2Eco=2Euk>
->Reviewed-by: Paul Durrant <paul@xen=2Eorg>
->Signed-off-by: Sean Christopherson <seanjc@google=2Ecom>
->---
-> arch/x86/include/uapi/asm/kvm=2Eh | 3 +++
-> arch/x86/kvm/xen=2Ec              | 9 +++++++++
-> 2 files changed, 12 insertions(+)
->
->diff --git a/arch/x86/include/uapi/asm/kvm=2Eh b/arch/x86/include/uapi/as=
-m/kvm=2Eh
->index 9e75da97bce0=2E=2E460306b35a4b 100644
->--- a/arch/x86/include/uapi/asm/kvm=2Eh
->+++ b/arch/x86/include/uapi/asm/kvm=2Eh
->@@ -559,6 +559,9 @@ struct kvm_x86_mce {
-> #define KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE	(1 << 7)
-> #define KVM_XEN_HVM_CONFIG_SHARED_INFO_HVA	(1 << 8)
->=20
->+#define KVM_XEN_MSR_MIN_INDEX			0x40000000u
->+#define KVM_XEN_MSR_MAX_INDEX			0x4fffffffu
->+
-> struct kvm_xen_hvm_config {
-> 	__u32 flags;
-> 	__u32 msr;
->diff --git a/arch/x86/kvm/xen=2Ec b/arch/x86/kvm/xen=2Ec
->index a909b817b9c0=2E=2E5b94825001a7 100644
->--- a/arch/x86/kvm/xen=2Ec
->+++ b/arch/x86/kvm/xen=2Ec
->@@ -1324,6 +1324,15 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm=
-_xen_hvm_config *xhc)
-> 	     xhc->blob_size_32 || xhc->blob_size_64))
-> 		return -EINVAL;
->=20
->+	/*
->+	 * Restrict the MSR to the range that is unofficially reserved for
->+	 * synthetic, virtualization-defined MSRs, e=2Eg=2E to prevent confusin=
-g
->+	 * KVM by colliding with a real MSR that requires special handling=2E
->+	 */
->+	if (xhc->msr &&
->+	    (xhc->msr < KVM_XEN_MSR_MIN_INDEX || xhc->msr > KVM_XEN_MSR_MAX_IND=
-EX))
->+		return -EINVAL;
->+
-> 	mutex_lock(&kvm->arch=2Exen=2Exen_lock);
->=20
-> 	if (xhc->msr && !kvm->arch=2Exen_hvm_config=2Emsr)
+On Fri, Feb 14, 2025 at 09:10:05PM +0100, Borislav Petkov wrote:
+> After talking with folks internally, you're probably right. We should slap an
+> IBPB before clearing. Which means, I cannot use the MSR return slots anymore.
+> I will have to resurrect some of the other solutions we had lined up...
 
-I'd still like to restrict this to ensure it doesn't collide with MSRs tha=
-t KVM expects to emulate=2E But that can be a separate patch, as discussed=
-=2E
+So I'm thinking about this (totally untested ofc) but I'm doing it in the CLGI
+region so no need to worry about migration etc.
 
-This patch should probably have a docs update too=2E
+Sean, that ok this way?
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 6ea3632af580..dcc4e5935b82 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4272,8 +4272,16 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
+ 	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
+ 		x86_spec_ctrl_set_guest(svm->virt_spec_ctrl);
+ 
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
++		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
++
+ 	svm_vcpu_enter_exit(vcpu, spec_ctrl_intercepted);
+ 
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
++		indirect_branch_prediction_barrier();
++		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
++	}
++
+ 	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
+ 		x86_spec_ctrl_restore_host(svm->virt_spec_ctrl);
+ 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
