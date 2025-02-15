@@ -1,105 +1,109 @@
-Return-Path: <kvm+bounces-38214-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38215-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB4CA36A1C
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 01:52:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD64CA36A4B
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 01:57:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6EFE170B57
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 00:52:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60CF41886811
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 00:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1C1433AB;
-	Sat, 15 Feb 2025 00:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF741CD21C;
+	Sat, 15 Feb 2025 00:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ITZVA4hE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nU2KMg25"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24515EACE
-	for <kvm@vger.kernel.org>; Sat, 15 Feb 2025 00:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B155EACE
+	for <kvm@vger.kernel.org>; Sat, 15 Feb 2025 00:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739580735; cv=none; b=b4ywr+FgFk4CnIfTsZjcrBZwPiDUJQszDokn4Bpo15TBpWseRp5qjIkOAdItSMRWgVtczklSQrxLo8HyIvSp0ME9JItsFrxW30EkA+xAF07KAi33ENqrrWOiUJ09tQkvrzmtZNVcH1ppQ/vtmIfQm0UFeROJsX3u6rXMImxxlBY=
+	t=1739580826; cv=none; b=K1VeM1ALc6HLXAsvLTKGmmiKxC90KQB+58U5C7ZsLSA1iGd5aQkyUW7c+LXFe3Gl/kb9ZQfPBeCmkqO5NANQiEvC/iRv3Forn7G1zeZySIYp5+axBJFg3+VEW63IZC/P2oWrhEu2OlhivaHyBQj+OY8MIWtaOBI6UwigHuqia3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739580735; c=relaxed/simple;
-	bh=C270t9vOE8Jd+0AZ0H/d/kXPNITGhRctKxTbG4yjY1k=;
+	s=arc-20240116; t=1739580826; c=relaxed/simple;
+	bh=r4upbXWz/jHR+BK3elm6yyIyLVx20H1k45CXl0DWRU0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IuaoByp8ZxWidx8pxqkwr32FVbHmwvgdKh3crWFQsYbOLepyE3MC6SZSsd28gfpV+3pVEzcVTuwK6voGjilsVhf4QQWRASZG8a100oK2dsxWgSmk116V5EeSAtzhGa6aFXMf77jd66wgZieFHCDyR/nnB6LLuMKVdLWCHD55J1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ITZVA4hE; arc=none smtp.client-ip=209.85.216.74
+	 To:Content-Type; b=V7m9uF6kGjKPery2zUkgIStsCzP8wfqjMHOS1mhFc2TLbXpGsTWxLTREEo1gziih7+nppgK2DwkD8ahetxuauXEBSiL6senSHYIWSlYyyAHjec67VV6wc2Xu0byqTvBNvwoLnR+CeYDGZI7+mHAT7nAzGpI9XboU2EXD5WVSBsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nU2KMg25; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc1a4c14d4so4660076a91.0
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 16:52:13 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc0bc05afdso5219434a91.0
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 16:53:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739580733; x=1740185533; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L/w+c2CabV0dIn4w6RFieU1p5sEx0QasW8TYiOxAj4U=;
-        b=ITZVA4hEQbj8DbTd6VLOe83i48HN4WVhK92t66ZBvgIkSYEKaYG3ukG6BkMcVnZauY
-         0KJ031TlqMgrvVZHA4BJ9eUZbtDVTFkI+G4MYN2PKLGD6XwWKVfOTVz/QQ3yYCpnMiSh
-         EHVh7vADuBlvZ3MlCo109d66BAEh+najNQFtGJqx77TQK+m9g/6PGioQUhs/lVpHF5D1
-         nQpIWoy3wQwBD4tQ1+HV2b1l6Z7kXJpXbYSGhEGnpBriNqeqzhojKlxSncQoYffk1/To
-         mtgHo/k+liTc5+tlr9OZcOEjTTgsjyo8gijiKuFJfeVS587obGLlNIHi0pEYRSWXtTHL
-         YMfg==
+        d=google.com; s=20230601; t=1739580825; x=1740185625; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BFcmzJ0i+heVKybi2WQ/QCTEEQ4/aTm12Bn74IUsP94=;
+        b=nU2KMg250c2JI2c9jvFBNgXa6858eoDU6e0JDiNa5GWrUtHrJv/hSSDD2umEs5NXAU
+         8VdxdKMLQY9QnYUD5OL9ulizkw3VsaUUD8za1Ot8W9/wyoyePH4ZqpLyTuePaqIGOkDd
+         UmUzjVsNs48EweoB7KL+IlzwYbERUf1pTIhtIKxaxj5AoBMUM0LNYuGMETt1KBseru4a
+         /q7Ek/2cdYJHw0IfroC2ITfGvETmGgvcq2ZYIgTrv4S9WpNbdY43Kn6kv3z1TgEjWcBg
+         XZi3xA6Oit2dalDf869BVUi3wXmIbkh9hxZzu6FW0krV8Nn3n6coqZzUHRykpdo5T6Yl
+         WCow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739580733; x=1740185533;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L/w+c2CabV0dIn4w6RFieU1p5sEx0QasW8TYiOxAj4U=;
-        b=omKtNwscLy8tzX87fV5I+k5Qk47LCQxEdC1jY5B7+50m72L8BJgyr3UvDBrfKRq83C
-         MVv/60j93S3VwyeKnIc98D3qWvYk1u3a6HMsLHj2WgbBk1LvaxnfLmLYf+wU6hgk/wta
-         PpNaCTRsH35Uy5JK8YCgrw+KTcllalmHPews1YwnR7c4gyh3zR6Qlj9lSs2TkjGq1p6g
-         XGAV88ttwOCqLrSo7MfZDPi6AywkGPrquCUYPJGH9omNbDCoYJPiAanEalcSDbr82UUm
-         dzpWImvrkighMhMjopT+8s5kmtWNKAD0cVkzo0TgE2akM6v0+BK9pKQMtnfDJnjlzoez
-         vCrg==
-X-Forwarded-Encrypted: i=1; AJvYcCVnclWLWaeTpRA6Ymed8WwCF+pkuLeaGn12V0g1ShgmoQUE9CBuy016kNCPeBZUibwDDGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh0EpugOCgNMorqEggRwpL6xgXOMpyiOiXIDqOmJxo4ow2CWEf
-	C46SMS4wmbvqm3YyC7ALtDm5AsJsTvN3OU/JmaMRBIvcuHaiEJKPI0aoR6WleAZYaKeJ8Rwn4E7
-	e9w==
-X-Google-Smtp-Source: AGHT+IEzoM1kxytohJPzZiUBujM5HphgBOfWYDv5T6Prq7S8s2l8rylIt6ug7wHW06IQB/WPGcFyCMxgDYU=
-X-Received: from pjuw7.prod.google.com ([2002:a17:90a:d607:b0:2fc:2ee0:d38a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c0c:b0:2f6:d266:f45e
- with SMTP id 98e67ed59e1d1-2fc40d14fcemr1771692a91.2.1739580733408; Fri, 14
- Feb 2025 16:52:13 -0800 (PST)
-Date: Fri, 14 Feb 2025 16:50:12 -0800
-In-Reply-To: <20250127013837.12983-1-haifeng.zhao@linux.intel.com>
+        d=1e100.net; s=20230601; t=1739580825; x=1740185625;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BFcmzJ0i+heVKybi2WQ/QCTEEQ4/aTm12Bn74IUsP94=;
+        b=JN/UIqS7qx3xql/EembpvHYSXMgEXPVFB7s8sgjVvr39AowzAaEiqWLg0V+D+b5mfd
+         /RRvzeNo5tfk/TRQzd9ZHBH36EQr4JPVohC0V4d7oQMsZ8MiMusCPLUXi26p1/ZmGEHb
+         1H5Hq7cMzYxgSdyj5NLW+LYu7RC4YsV4C6qwpWJ2pq10AOBKpjit1x4D4bJ2PiOgCawH
+         4o8YV4YPSdKJ42w60pODMRFld/hmeJqG18vznxtphPZDtSBbn/djkWH1trehbi3uNktn
+         D5rUP/4lR8TutXrcPvSA0U5W6lmFdnbYC716tkLp4/p5XJtPYryA9O4VHV3T2iln5Alq
+         +KFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXDJ3YWKvP4mmjvImjZEKsD1O3Tq7koud9Nv6c90jiV9R/rEjDoNbOENoiigdPslQy5yI8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUGpbemw/cGcZ64tVZbnhnKLfeXHfkzrHbZW/R27PxjKiZfLtH
+	8C92VepNfCyxxs/8abvQ4TXqh0PpLZ2zM3OaXSQ48VTqlJ8tTZQQmS+SRQlFqL9KX7hhPqFwDLu
+	A2Q==
+X-Google-Smtp-Source: AGHT+IGN1wRdgJaTgxmY9eExFQAkm/T4/RvoSDxP5bwSGPAnxCuDU/nufXXbQXJN5CFpgj5o1N4k1ihL4Is=
+X-Received: from pjbsi15.prod.google.com ([2002:a17:90b:528f:b0:2f9:c349:2f84])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b0d:b0:2fa:2217:531b
+ with SMTP id 98e67ed59e1d1-2fc40f234c9mr1600051a91.21.1739580824734; Fri, 14
+ Feb 2025 16:53:44 -0800 (PST)
+Date: Fri, 14 Feb 2025 16:50:14 -0800
+In-Reply-To: <20250113200150.487409-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250127013837.12983-1-haifeng.zhao@linux.intel.com>
+References: <20250113200150.487409-1-jmattson@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <173958023920.1189103.10850075100042366704.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: x86/cpuid: add type suffix to decimal const 48
- fix building warning
+Message-ID: <173958021460.1188824.2106156728368699135.b4-ty@google.com>
+Subject: Re: [PATCH 0/2] KVM: x86: Clean up MP_STATE transitions
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, hpa@zytor.com, bp@alien8.de, tglx@linutronix.de, 
-	mingo@redhat.com, Ethan Zhao <haifeng.zhao@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
-	joro@8bytes.org, jmattson@google.com, wanpengli@tencent.com, 
-	pbonzini@redhat.com, etzhao@outlook.com
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H . Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, 
+	Gleb Natapov <gleb@redhat.com>, Raghavendra K T <raghavendra.kt@linux.vnet.ibm.com>, 
+	Suzuki Poulose <suzuki@in.ibm.com>, Srivatsa Vaddagiri <vatsa@linux.vnet.ibm.com>, 
+	Jan Kiszka <jan.kiszka@siemens.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, 27 Jan 2025 09:38:37 +0800, Ethan Zhao wrote:
-> The default type of a decimal constant is determined by the magnitude of
-> its value. If the value falls within the range of int, its type is int;
-> otherwise, if it falls within the range of unsigned int, its type is
-> unsigned int. This results in the constant 48 being of type int. In the
-> following min call,
+On Mon, 13 Jan 2025 12:01:42 -0800, Jim Mattson wrote:
+> Introduce a generic setter, kvm_set_mp_state(), and use that to ensure that
+> pv_unhalted is cleared on all transitions to KVM_MP_STATE_RUNNABLE.
 > 
-> g_phys_as = min(g_phys_as, 48);
+> Jim Mattson (2):
+>   KVM: x86: Introduce kvm_set_mp_state()
+>   KVM: x86: Clear pv_unhalted on all transitions to
+>     KVM_MP_STATE_RUNNABLE
 > 
 > [...]
 
 Applied to kvm-x86 misc, thanks!
 
-[1/1] KVM: x86/cpuid: add type suffix to decimal const 48 fix building warning
-      https://github.com/kvm-x86/linux/commit/a11128ce1636
+[1/2] KVM: x86: Introduce kvm_set_mp_state()
+      https://github.com/kvm-x86/linux/commit/c9e5f3fa9039
+[2/2] KVM: x86: Clear pv_unhalted on all transitions to KVM_MP_STATE_RUNNABLE
+      https://github.com/kvm-x86/linux/commit/e9cb61055fee
 
 --
 https://github.com/kvm-x86/linux/tree/next
