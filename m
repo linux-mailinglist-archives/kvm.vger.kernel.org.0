@@ -1,104 +1,113 @@
-Return-Path: <kvm+bounces-38212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38213-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 440D0A36A19
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 01:51:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E4B0A36A1A
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 01:51:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5657E189432F
-	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 00:51:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C93857A4FD6
+	for <lists+kvm@lfdr.de>; Sat, 15 Feb 2025 00:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7470824A3;
-	Sat, 15 Feb 2025 00:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22DF13A244;
+	Sat, 15 Feb 2025 00:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S05eg5MG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YdCgtBcd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBE332C85
-	for <kvm@vger.kernel.org>; Sat, 15 Feb 2025 00:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD06EACE
+	for <kvm@vger.kernel.org>; Sat, 15 Feb 2025 00:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739580644; cv=none; b=hGI06iEmK/9mXNimjLbGt03ZNnIMbF2VUngES/1c9zYb0SiKf5wIgkG3vbVPLPJDYrj2/GJsULbENR/qXTLmODfkd/cXs1nn5u8MzZ2N0qjhomkH38Nu75hVoGd64r1DoRAGqa5SmkfiAkC2Jec7HX5aoJo3L9fCshE+C6wVpjY=
+	t=1739580653; cv=none; b=Ebc05OFxg0EdSxvoaS41Fd+1y8/MHGCqsf+S9pggHsDnPzjmnCs9oSsf9YZdzFKizzni5U5VlzemLulyizzMIoWrEinxtuu73JK6/U9cPAXheLKnSJP3HXoM9B2M578joGEneqEtoG2m1M6FHBQ18/Mhfq+MVe1g+lC6zZyUqJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739580644; c=relaxed/simple;
-	bh=POYEUzJf4F7hR6ErGP8+kECs4BJCAdIjReed4JoMUes=;
+	s=arc-20240116; t=1739580653; c=relaxed/simple;
+	bh=dnqsjGiZaJAvA2XPJfChrA4I5XEs4RTsHpf3T/NjtVw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZfhbyPDfr6L8CQtRXttL0+8r/S1E6vTkt+ybAZt/ykGI67m9kQM47fNi1L7HwQxSxFAH+pzXPFx/RDMX8uxaFk/cSM+7b0e7n/pe8v/NI3yjh1I25B0kaiBXGNxd6DWcL/iC2PkKXiOZWj5olxRMbMvwOEHPxl0W4BMW4tdFOu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S05eg5MG; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=g8PKYA4pTfgN9mg5BQ9L5EI+VlFFbZDjSHwcw1VIkWoTKoB85MeSr027OA0haDkTXVyKG/UZgPLcHu9ypKfo0o0vrip8D34x/ZlHZeG1TocLWIZmS2Y1WK9BQHmyDuAxoRSG502oXQXxq9v/3eI0YLXNjWgiZHtShoFWSlKzz7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YdCgtBcd; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220d6018858so41996095ad.2
-        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 16:50:42 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc1e7efe00so4170650a91.2
+        for <kvm@vger.kernel.org>; Fri, 14 Feb 2025 16:50:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739580642; x=1740185442; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739580651; x=1740185451; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8zARw4+ZV2w+QskDlMwskXcGP20di1IcERKsXgaTywA=;
-        b=S05eg5MGb7+H/ed8tgKfCkK7Eo0lsqwrtjHxw2vkP5MYmKnW/pb/GJZcp0XJ8Ytxza
-         qiIDViQtBjqnFnMXsPfV5KwfmULqZkwFR4tHOluc5W0KG0ebTKnQALJDcLY3RbPZdxCk
-         ficaPXcnEghgzJZDjcq7TxHy3TZhyj4FsI24NWu/BDe7x6E0wjs8Ztxk54i/iyBHC8T5
-         0dRHHlJ/Op2Pq0DHzH+kGhK2Yx7R74dX4MTNHUKnLpwyqIHGLbSpyIYt3LDyNguFpXBY
-         8vJ2CZK4TQxtb2pVjtWnmbEh8DH735XE2VvHjtnsz2SkxbRI44q2uGvXYwvXvu5mt1eq
-         l7LA==
+        bh=eNDWUiDg7PKVgEWW032CIy+qBy8SxwYT5s4el7ajobg=;
+        b=YdCgtBcdg4MpyYexrwccEQb5zZc72+E6AmKIxwak9t1/zXghXYDq0CcAy+o2ZC8Ye9
+         ah2pYLKYZvCRnUgahQGNJfcSFc86uXVARABkpcJwLVGh0QYZMWwn/KTuCmTwJyYiatTg
+         IE6ytuz47gDIytaLuMuaHPErX5K1UCSYnSCeSqGuqhaeAsYRofYNp61xQnluoBa8RI+n
+         Ag2fR5CTeDl/SURC9wTor6tSRW+pB845PaDiUjRgGjb13+Cac6aA4MZi10/UucWt0PzJ
+         DeGGyKESrJBx5V1QMcMcw8c5Z3118wQqBxJ41dlgi9SBtQVvTXuKD0NcGhEiBAl6stOy
+         HEYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739580642; x=1740185442;
+        d=1e100.net; s=20230601; t=1739580651; x=1740185451;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8zARw4+ZV2w+QskDlMwskXcGP20di1IcERKsXgaTywA=;
-        b=dcG2Av4/mfcQ0zwbrpbJ0KloFpJqjM1tccBdFBS5cWhUVP3YgPntnZvTt0eYcLKxTA
-         jQuE2vzyewa1ThNAstaroW45iEvAMoOvWBl/aJS6YI/aRSNdBNHXOOsV0XWyn1gmrOJx
-         +DCke656JDg3dLDcw1JSnC6LjNIZObW+7HLYkTLdQh3mB8LEjL2UMkIxuPJYc5iWHHRs
-         yFwt8wB7pJoBSrMQiYV6xxmkBdWqiKUzHYfTrIzmIg0kL0ctbjqb1aSwowRfITQcOJGB
-         iREWtNl7stTU2uJ1wSN1DoU1s3r6t5fN+06FJFvdSplngCqchNp2s3g7Y+Fy13zSRpDh
-         xHuw==
-X-Gm-Message-State: AOJu0YzZgQeyUE68K7yo17wRb5JuFOVw+d5ALO/ajLiYpbztqIlew0F6
-	w7gu2q+VOpsthi67GZhRY9j8CbQdGLryL8HTut1nlYBoWXprNcfyFEJhhfdw20zmOzpQkbCv4UJ
-	CUQ==
-X-Google-Smtp-Source: AGHT+IFz4wSyDecNXJFqvihaxPn+qeYB3cCNRHI/ww3DuyZD0TGU1JQo3GTzf2tFJmRc3FF10QG3ATPZpok=
-X-Received: from pfmv8.prod.google.com ([2002:a62:a508:0:b0:730:7b0c:592c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3a07:b0:732:5b10:572b
- with SMTP id d2e1a72fcca58-732617bd3c5mr2231913b3a.10.1739580641807; Fri, 14
- Feb 2025 16:50:41 -0800 (PST)
-Date: Fri, 14 Feb 2025 16:50:09 -0800
-In-Reply-To: <20250125011833.3644371-1-seanjc@google.com>
+        bh=eNDWUiDg7PKVgEWW032CIy+qBy8SxwYT5s4el7ajobg=;
+        b=k86xUTIIBeWAXFKCnnGxwJ1PN5BsCxRBIeqMFJKsU4zZ/tnt8NIPTkCNViy10LCPyI
+         3edfJgF/nKbxYcN4toj2QJ94fWh+hd39v/HfC6+hGcIuRMGU+yFuIQkLvMtKqPE+ep5q
+         hAtj6FNcsK4kkKOLeGG1nJ7F7t2rm94ptlf3W48yr80vAF2tTFoKfyP8xD9FkJup3KBw
+         2QPuaeHRnRpll+PnseiD9yxXi8cL8yqVE7iFKFmLaZdgT65UZ2Ynsv+zlye4b7bli2ek
+         VC6zzuCWeCAGDF5TsRlx708vDAMbiYRCzL535iVvYMeSDcfKNJwEjmUgLJvj9oUCK1OO
+         GzmA==
+X-Gm-Message-State: AOJu0YyZCRaZ1bYMSt1q0Kg5o9Np6Mke40aka1uvR5kBEI+V9DzxCoAn
+	JNa1jm+BRLbi9MpZ2Ko60IxUmaqP2GTSD8Kx7a60W//Yk6A2asEWQZpVMh+Ezup7ngQgPuPHqKQ
+	3+A==
+X-Google-Smtp-Source: AGHT+IH68vaesX+wCuzZ/Dzwbh6t1VdKpG8BDU9Do5mXpvHPYPUxmzFLhrxBSs5qoUoGVbO5uqxzI5orjH0=
+X-Received: from pfbfi6.prod.google.com ([2002:a05:6a00:3986:b0:732:2df9:b513])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1882:b0:730:957d:a80f
+ with SMTP id d2e1a72fcca58-7326177625dmr2632490b3a.2.1739580651144; Fri, 14
+ Feb 2025 16:50:51 -0800 (PST)
+Date: Fri, 14 Feb 2025 16:50:10 -0800
+In-Reply-To: <20250118003454.2619573-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250125011833.3644371-1-seanjc@google.com>
+References: <20250118003454.2619573-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <173958027023.1189487.12347713108460200107.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86: Load DR6 with guest value only before entering
- .vcpu_run() loop
+Message-ID: <173958022426.1188943.17908180485363586320.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/4] KVM: x86: Hyper-V SEND_IPI fix and partial testcase
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	John Stultz <jstultz@google.com>, Jim Mattson <jmattson@google.com>
+	Dongjie Zou <zoudongjie@huawei.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Fri, 24 Jan 2025 17:18:33 -0800, Sean Christopherson wrote:
-> Move the conditional loading of hardware DR6 with the guest's DR6 value
-> out of the core .vcpu_run() loop to fix a bug where KVM can load hardware
-> with a stale vcpu->arch.dr6.
+On Fri, 17 Jan 2025 16:34:50 -0800, Sean Christopherson wrote:
+> Fix a NULL pointer deref due to exposing Hyper-V enlightments to a guest
+> without an in-kernel local APIC (found by syzkaller, highly unlikely to
+> affect any "real" VMMs).  Expand the Hyper-V CPUID test to verify that KVM
+> doesn't incorrectly advertise support.
 > 
-> When the guest accesses a DR and host userspace isn't debugging the guest,
-> KVM disables DR interception and loads the guest's values into hardware on
-> VM-Enter and saves them on VM-Exit.  This allows the guest to access DRs
-> at will, e.g. so that a sequence of DR accesses to configure a breakpoint
-> only generates one VM-Exit.
+> v2
+>  - Fix the stable@ email.  Hilariously, I was _this_ close to sending this
+>    with stable@vger.kernel@kernel.org instead of stable@vger.kernel.org,
+>    *after* I wrote this exact blurb about fat-fingering the email a second
+>    time.  Thankfully, git send-email told me I was being stupid :-)
+>  - Don't free the system-scoped CPUID entries object. [Vitaly]
+>  - Collect reviews. [Vitaly]
 > 
 > [...]
 
 Applied to kvm-x86 fixes, thanks!
 
-[1/1] KVM: x86: Load DR6 with guest value only before entering .vcpu_run() loop
-      https://github.com/kvm-x86/linux/commit/c2fee09fc167
+[1/4] KVM: x86: Reject Hyper-V's SEND_IPI hypercalls if local APIC isn't in-kernel
+      https://github.com/kvm-x86/linux/commit/a8de7f100bb5
+[2/4] KVM: selftests: Mark test_hv_cpuid_e2big() static in Hyper-V CPUID test
+      https://github.com/kvm-x86/linux/commit/0b6db0dc43ee
+[3/4] KVM: selftests: Manage CPUID array in Hyper-V CPUID test's core helper
+      https://github.com/kvm-x86/linux/commit/cd5a0c2f0fae
+[4/4] KVM: selftests: Add CPUID tests for Hyper-V features that need in-kernel APIC
+      https://github.com/kvm-x86/linux/commit/e36454461c5e
 
 --
 https://github.com/kvm-x86/linux/tree/next
