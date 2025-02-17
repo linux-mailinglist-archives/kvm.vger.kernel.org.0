@@ -1,145 +1,115 @@
-Return-Path: <kvm+bounces-38369-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38370-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EA0FA38413
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 14:11:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C819BA38448
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 14:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 090343B9B8F
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 13:05:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C704A7A142C
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 13:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EC721C177;
-	Mon, 17 Feb 2025 13:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4484022331C;
+	Mon, 17 Feb 2025 13:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f1OsVoB7"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DGRCHdDl";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sE590qr1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAAA23C9
-	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 13:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA9921D58E;
+	Mon, 17 Feb 2025 13:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739797556; cv=none; b=dk6QG4+sqMOVhjpcYcOxuGSRagfjzwuq7cuxWfM/WgOpXiaxzF+5O7sSAioMI+XxG0KyWrArRjBZdtgCcYl2iew+sohfc+aFaasx04t+6s3ClQmudJ7XmJPaMZRRe3Dfszz7bwHwPR3LIUQ+5386dZQSk+jNDDhFO7x9tDB5LsA=
+	t=1739798046; cv=none; b=kMCtxEhH3FNzjGbRJxHFc8+rymBRPa4Vc4VWQ+fh0GpVdrQVVcQHfNJTfctPZxK2VFot0IZaBK/bYUmMVRwZmXe9KMdeRLLzcVWkKyIfjDX1DzicqSvWvByeKwdQBptq52tSro+7Qun4UPIXKFymXvaAqFDcEuFThRPW+5CFVg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739797556; c=relaxed/simple;
-	bh=ZKAxYYLxdNCr5VowdCBtoLawSOPUB9oQdK09VtVgZeM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=R8x1eY8FzKWzSyEBn1ce+ha6VnzwcCNe8QU44F9aLole5WCV4urDxkFKkg8EWUu1M4CS1U+Ws/IyQbn4BN7LHDtpTtnZzzxAEhQ8qoS/UXxeGPIXHOFmgpQmtZaxrF7IbYRSRtZ0yi4aXF7m8PKfZj0BxWFUb98lSm5ZnIbNm6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f1OsVoB7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739797553;
+	s=arc-20240116; t=1739798046; c=relaxed/simple;
+	bh=T3j+AYNu9upsSFRF5dhT7V0Vi97Ed+N9htp0EsDIQJM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=DVBwGQqUdmzVnSYNZ3xpdPO1Ce8F4VauKAR6nTA8ztxIoGhtwkRfieWN4FAX92tsal5ALKgYe6z5GNh31wWK9B6IxsoeIddIcJRQ/IIYd87XT/LCd3Z5UQ+oTVa1hH0vAokzkEMmooYp5gMEcL45zSOyyekRViDDzavLmzdtezU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DGRCHdDl; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sE590qr1; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1739798042;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kSiOdtiiGo1JzX8LMRCdFTwQjInIJfdLf9Cgv1ZJH3g=;
-	b=f1OsVoB70dTDcOJkkgi2gcwk1vrdjg6FixWGzHrriUOeAiZOu4gRmcWBCCHtvDUNUOxGL8
-	tJ54gFwYOQwmemkNqJD6a7m+PgvZG5/AytNfhrFkyP4Scbc9mhZQxRaFxiTbzoWKDlNw3m
-	zAsFyrHwVaw6sL4fLMFM5j+JHMWtl2Q=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-605-N3LSp413PMqTQNepC7Yi3w-1; Mon, 17 Feb 2025 08:05:52 -0500
-X-MC-Unique: N3LSp413PMqTQNepC7Yi3w-1
-X-Mimecast-MFC-AGG-ID: N3LSp413PMqTQNepC7Yi3w_1739797551
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38f2f78aee1so1635920f8f.0
-        for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 05:05:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739797551; x=1740402351;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kSiOdtiiGo1JzX8LMRCdFTwQjInIJfdLf9Cgv1ZJH3g=;
-        b=OQSK5Ed1EHcCvGXx2maqIvebSqc/KxmisG+UcEHcmt/aFJZNMB2uixP3QFN0QblYqP
-         XKZ6Qw1MoqpLYbUvnU8ySxpGTYdP7yDWGQ09331oaHAv5EvtOAp+JK4pBemudM5gEzlb
-         2qeQChjKnyIU2mdYLUP9Q9Q6cF4w8fGZcC6LSirRHtpqyOET8vYGy6I86BZ20bWeIpwm
-         R/swWV5mFhWQY7Uy39GlVap4O+4cwdaou+4of8cHjni/quLhkWeMiieJDnMon6CDV3Gn
-         2DWh2yI5P4hLTSUqPb47NtTk3vkukQEu8vRPaZlka8/bMvh7uYCYqowbmYVjkAVMMdti
-         HBIw==
-X-Forwarded-Encrypted: i=1; AJvYcCWMmGd/2wLhqATc8PTBZF0ZJh568zO/kQcCW4qAziq+1pW37L2l9z9U+fjh6QHyj3n2BrE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9L1BUVF2pNUFzUYGgR/589NFyIwBeVYAVrR6HYccYXxS6XMJE
-	bZBWM7mj9fg+e7P9oO/BASPQfvvLiYDTVfvv6/9K9vPP5BujNn5oVMFlS1J1E1mkBIdlpNpJrLH
-	qN/aFekz2BByLzQShcAhvUKOgfNM4qwJm/ldKphzb/MF7sy5QGf9hMhNi3Q==
-X-Gm-Gg: ASbGncukItfH/6Kf9dyDOd5ACyONDtKrmrib5anKd6XbymRubCc//vzkMs6wUHJQuWB
-	czKWlhzKTtpxYGQdtdmPq8IBHKRmy5QZfWqzpzuGeUHTHbng1ysoCKr4scKei7hnSGb2Fo/9FsM
-	PX/QjUl0xjs5kQ7h9v824apkeV3AX0iUF/KBZEH7nvvns88miHqfYi4OEXdPQolDl9wUfDsw8r2
-	AnfXuCKBmowq5281ubl4xisGhSEtZ3Rij1dV8175yNLP80QQ0fNb0jVWRDyXidBdyekMx4kV3/M
-X-Received: by 2002:a5d:6f19:0:b0:386:374b:e8bc with SMTP id ffacd0b85a97d-38f24d10851mr18090994f8f.15.1739797551246;
-        Mon, 17 Feb 2025 05:05:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGSLtEqy93wRPXG9nMCMJ0lRt4GquiQhPG/wEddubWd1+r9Qa8A53oIvQqaL6k/Vn2poTgPqg==
-X-Received: by 2002:a05:600c:4e8d:b0:434:9e17:190c with SMTP id 5b1f17b1804b1-4396e7d3b00mr82441835e9.0.1739797516788;
-        Mon, 17 Feb 2025 05:05:16 -0800 (PST)
-Received: from fedora (g3.ign.cz. [91.219.240.17])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f25915146sm12383958f8f.56.2025.02.17.05.05.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2025 05:05:16 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Nikita Kalyazin
- <kalyazin@amazon.com>
-Cc: pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, xiaoyao.li@intel.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- roypat@amazon.co.uk, xmarcalx@amazon.com
-Subject: Re: [PATCH 1/2] KVM: x86: async_pf: remove support for
- KVM_ASYNC_PF_SEND_ALWAYS
-In-Reply-To: <Z6ucl7U79RuBsYJt@google.com>
-References: <20241127172654.1024-1-kalyazin@amazon.com>
- <20241127172654.1024-2-kalyazin@amazon.com> <Z6ucl7U79RuBsYJt@google.com>
-Date: Mon, 17 Feb 2025 14:05:15 +0100
-Message-ID: <87frkcrab8.fsf@redhat.com>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8Fmtlx2EnEL7LBpnjLPYYhL0crulD1yNwRs5P9WAM/0=;
+	b=DGRCHdDlnrIwpt2GOdp5wboYwtxMEZ/iN/eHHWYhtiMXN+Bo5BiLMhYVFokOaj7t8tbRcf
+	PRqklElLoBReM7bQgST7jWvHPCXDzPIxyXm1vxWxAe19JqtpAs4hL7UcCzHx2WuDcxflZr
+	Y/klFFC7DJy+EXFwo6i3T0NM9HbIe2+JSstHedjsftGnvypDXf4VzkFfKQ9p2AF0I69T32
+	ePXgwvWGpIv07hXp/w1KUILDGzDqv+nm1azL2knO/ycLAv9JZH9rk/x7BWkFLe2K6Ng1hs
+	/SDWLtTPJf+C4/fQnRkw82El8JmQFGyMSWLfdSHPmsPM0qIcLXt1Df1s1G8G6Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1739798042;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8Fmtlx2EnEL7LBpnjLPYYhL0crulD1yNwRs5P9WAM/0=;
+	b=sE590qr1pRljibC0euLNnkODpzZE2nlryOOk/bxo08kdW5v5r8wyu67BWNLLH9Qdp3EjaE
+	hgkdj2oaWY4dEXCg==
+Subject: [PATCH 0/2] KVM: s390: Don't use %pK through debug printing or
+ tracepoints
+Date: Mon, 17 Feb 2025 14:13:55 +0100
+Message-Id: <20250217-restricted-pointers-s390-v1-0-0e4ace75d8aa@linutronix.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIABM2s2cC/x3MywqDQAxG4VeRrBsYZ6gSX6V04eVvzWaUZCiC+
+ O4OXX6Lc05ymMJpaE4y/NR1yxXto6F5HfMXrEs1xRCfIbY9G7yYzgUL75vmAnP2JIETJE1dP4p
+ IRzXfDR89/uvX+7puRiNlp2oAAAA=
+X-Change-ID: 20250217-restricted-pointers-s390-3e93b67a9996
+To: Christian Borntraeger <borntraeger@linux.ibm.com>, 
+ Janosch Frank <frankja@linux.ibm.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+ David Hildenbrand <david@redhat.com>, Heiko Carstens <hca@linux.ibm.com>, 
+ Vasily Gorbik <gor@linux.ibm.com>, 
+ Alexander Gordeev <agordeev@linux.ibm.com>, 
+ Sven Schnelle <svens@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1739798042; l=956;
+ i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
+ bh=T3j+AYNu9upsSFRF5dhT7V0Vi97Ed+N9htp0EsDIQJM=;
+ b=dqogSa5t7A9u/cS3WyJYvfjprx1m0h+qPLyEIyiOXCNTkVMAcLQxEhswSLmmKOlYeH1zP8Zo8
+ 2sCGR1Es68ZAuHyERqQZ9j69EyMeZjq4s/2Sz/TcTKFz/diVktBwrZM
+X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
+ pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-Sean Christopherson <seanjc@google.com> writes:
+Restricted pointers ("%pK") are only meant to be used when directly
+printing to a file from task context.
+Otherwise it can unintentionally expose security sensitive, raw pointer values.
 
-> On Wed, Nov 27, 2024, Nikita Kalyazin wrote:
->> 3a7c8fafd1b42adea229fd204132f6a2fb3cd2d9 ("x86/kvm: Restrict
->> ASYNC_PF to user space") stopped setting KVM_ASYNC_PF_SEND_ALWAYS in
->> Linux guests.  While the flag can still be used by legacy guests, the
->> mechanism is best effort so KVM is not obliged to use it.
->
-> What's the actual motivation to remove it from KVM?  I agreed KVM isn't required
-> to honor KVM_ASYNC_PF_SEND_ALWAYS from a guest/host ABI perspective, but that
-> doesn't mean that dropping a feature has no impact.  E.g. it's entirely possible
-> removing this support could negatively affect a workload running on an old kernel.
->
-> Looking back at the discussion[*] where Vitaly made this suggestion, I don't see
-> anything that justifies dropping this code.  It costs KVM practically nothing to
-> maintain this code.
->
-> [*] https://lore.kernel.org/all/20241118130403.23184-1-kalyazin@amazon.com
->
+Use regular pointer formatting instead.
 
-How old is old? :-)
+Link: https://lore.kernel.org/lkml/20250113171731-dc10e3c1-da64-4af0-b767-7c7070468023@linutronix.de/
 
-Linux stopped using KVM_ASYNC_PF_SEND_ALWAYS in v5.8: 
+Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+---
+Thomas Weißschuh (2):
+      KVM: s390: Don't use %pK through tracepoints
+      KVM: s390: Don't use %pK through debug printing
 
-commit 3a7c8fafd1b42adea229fd204132f6a2fb3cd2d9
-Author: Thomas Gleixner <tglx@linutronix.de>
-Date:   Fri Apr 24 09:57:56 2020 +0200
+ arch/s390/kvm/intercept.c  |  2 +-
+ arch/s390/kvm/interrupt.c  |  8 ++++----
+ arch/s390/kvm/kvm-s390.c   | 10 +++++-----
+ arch/s390/kvm/trace-s390.h |  4 ++--
+ 4 files changed, 12 insertions(+), 12 deletions(-)
+---
+base-commit: 0ad2507d5d93f39619fc42372c347d6006b64319
+change-id: 20250217-restricted-pointers-s390-3e93b67a9996
 
-    x86/kvm: Restrict ASYNC_PF to user space
-
-and I was under the impression other OSes never used KVM asynchronous
-page-fault in the first place (not sure about *BSDs though but certainly
-not Windows). As Nikita's motivation for the patch was "to avoid the
-overhead ... in case of kernel-originated faults" I suggested we start
-by simplifyign the code to not care about 'send_user_only' at all. 
-
-We can keep the code around, I guess, but with no plans to re-introduce
-KVM_ASYNC_PF_SEND_ALWAYS usage to Linux I still believe it would be good
-to set a deprecation date.
-
+Best regards,
 -- 
-Vitaly
+Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 
 
