@@ -1,216 +1,351 @@
-Return-Path: <kvm+bounces-38348-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38349-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D8BAA37ECE
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 10:39:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E77CEA37EEE
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 10:49:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BECF3A60CD
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:37:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 007A53AD7DA
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9058215F41;
-	Mon, 17 Feb 2025 09:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1769E216399;
+	Mon, 17 Feb 2025 09:49:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RH6llmNi"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Obi4PVEF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="HnWmGDcg";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Obi4PVEF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="HnWmGDcg"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC61F155316;
-	Mon, 17 Feb 2025 09:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEA819F101
+	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 09:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739785050; cv=none; b=eOF57wjaWMud+R4I8GvA+yfMyNkrVfsCUOG6HniS3v7yzZ0Qy+ZK3y1wu60UFNrYVspc2OFWnc8uirjvDGt/slQKHr3Poo6kljfgS0VURWhOWVm4CCSScWbA5OTYHqU5n9JAqo99vkskuryHKP+rV4efEA5J5AxxCJKMIhACTAM=
+	t=1739785766; cv=none; b=vAyhJLqS+Gv5flxR4ZJljZ5XDzu4e5VFs0AoT/vKXaDF/GwGHyROeTLsr5IWpWlLZA3iECaw8PiPx2Lwb257R8EP1t1oQQJCMjmrvg1P7Qv0Lqn0w1ja+OY9kfcsZ/uYig/aXGkaPGvbHJz3feCw7rcyNfJgmDSY8IKSXPphRTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739785050; c=relaxed/simple;
-	bh=AZCs5g8Mralms5Xjea2hMqxAgz+/0HZ4sntHHhpsj9s=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=en1YhjzqeLj/lQXy1IEnSLUv/WjdvMeHQd/A3O0FCY90x+3vJndO6y9PuLORmxh+dp9vrFEo084no5JoJTr+mV7lWfGvps1yQjOL9C1+IKo3pWySoJMUycQCllC6KuUWt+41vbet5DsGFq3V1aNIBvTnx9L+9b3XeIXZdyqFuSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RH6llmNi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 258C1C4CED1;
-	Mon, 17 Feb 2025 09:37:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739785049;
-	bh=AZCs5g8Mralms5Xjea2hMqxAgz+/0HZ4sntHHhpsj9s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RH6llmNifW/GIp1YLSH29+A+9o7u8I2E0W3EyKFXLU1MKdiVZlTSttctViCPDEaJo
-	 MSIIzZbfDvaacMB1GK9oIeii0mbPtrcxYzLiAZOaZRSZdWUnyLm4ByZd3t4CH+U7CU
-	 gsoVw7xBdahqHquX6A0YTxXvsgT5mSVnTGO5uyb0C+aqHQtt8njJ8vi+P6XBxPbAkR
-	 3dgdnwqQ2dQ3CXZDE9IHiEV50BsIu6jt2W/y2pWE6six45KfPb7KAShqDFWq6JNn2L
-	 zlKe+Av4bNn/RPTMlp6lUbfdyMM0xMJxjueXRziyc6atx+8Ki923PlfQ97JSRVrDI7
-	 gl3zTX1ukcHkA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tjxZ8-004zmI-N1;
-	Mon, 17 Feb 2025 09:37:26 +0000
-Date: Mon, 17 Feb 2025 09:37:26 +0000
-Message-ID: <86h64ssyi1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Dave Martin <Dave.Martin@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 00/27] KVM: arm64: Implement support for SME in non-protected guests
-In-Reply-To: <Z69dsGn1JVWPCqAi@finisterre.sirena.org.uk>
-References: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
-	<86pljkswuk.wl-maz@kernel.org>
-	<Z69dsGn1JVWPCqAi@finisterre.sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1739785766; c=relaxed/simple;
+	bh=UhJVuraxgMJ6UncphpyxyurMGNu7Wj8vb9lwuqK4kus=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DTplPQn6PPoAP2eEeMH/+dj+eLLseOBwdXfPiLJLip+u9mndcgaZCP2GEP7XGmV7C6mADkFk5W2+DdjAHjqR/EvufZMB9uECwWOlPO6GhHq/nmrhdsGHXnUjI937Wm/PCxQDj4s7+mYDb+lcwJZFUgPrxOqa2CMhkObVNAhxL28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=fail smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Obi4PVEF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=HnWmGDcg; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Obi4PVEF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=HnWmGDcg; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 0650F211A6;
+	Mon, 17 Feb 2025 09:49:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1739785761; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=l7B6YD4qgF5XwG9RQFPMG0aGSv8QqQoSB5po9lS9scY=;
+	b=Obi4PVEFxU5qgGgmF8hXkoYa7OJOO9T+8pdCkDPvBPERWqh5me1G5BW9RGrt49k37hooiO
+	i38IG3xXrS6Qj6UcMhu7AgAUo0yzCjMnFuvTvXFQCH8SxQmMXIyyQS4JCGRI5kk3dqyMff
+	ebcMP9TWe4M/Fl6TjStp2/s/4E2CEy0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1739785761;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=l7B6YD4qgF5XwG9RQFPMG0aGSv8QqQoSB5po9lS9scY=;
+	b=HnWmGDcgcAE6wPcY//HRRUv8k58Jznsd59zQweS33osg9plzopC/9/wVlJHMGd4x9t9MZ9
+	jpfXQt43XHA7ieAw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Obi4PVEF;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=HnWmGDcg
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1739785761; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=l7B6YD4qgF5XwG9RQFPMG0aGSv8QqQoSB5po9lS9scY=;
+	b=Obi4PVEFxU5qgGgmF8hXkoYa7OJOO9T+8pdCkDPvBPERWqh5me1G5BW9RGrt49k37hooiO
+	i38IG3xXrS6Qj6UcMhu7AgAUo0yzCjMnFuvTvXFQCH8SxQmMXIyyQS4JCGRI5kk3dqyMff
+	ebcMP9TWe4M/Fl6TjStp2/s/4E2CEy0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1739785761;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=l7B6YD4qgF5XwG9RQFPMG0aGSv8QqQoSB5po9lS9scY=;
+	b=HnWmGDcgcAE6wPcY//HRRUv8k58Jznsd59zQweS33osg9plzopC/9/wVlJHMGd4x9t9MZ9
+	jpfXQt43XHA7ieAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7FB33133F9;
+	Mon, 17 Feb 2025 09:49:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /qt3HCAGs2eFRAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 17 Feb 2025 09:49:20 +0000
+Message-ID: <4311493d-c709-485a-a36d-456e5c57c593@suse.cz>
+Date: Mon, 17 Feb 2025 10:49:20 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, Dave.Martin@arm.com, tabba@google.com, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/11] KVM: guest_memfd: Handle final folio_put() of
+ guest_memfd pages
+Content-Language: en-US
+To: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org
+Cc: pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au,
+ anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk,
+ brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org,
+ xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com,
+ jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com,
+ yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net,
+ vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name,
+ david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com,
+ liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+ kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com,
+ steven.price@arm.com, quic_eberman@quicinc.com, quic_mnalajal@quicinc.com,
+ quic_tsoni@quicinc.com, quic_svaddagi@quicinc.com,
+ quic_cvanscha@quicinc.com, quic_pderrin@quicinc.com,
+ quic_pheragu@quicinc.com, catalin.marinas@arm.com, james.morse@arm.com,
+ yuzenghui@huawei.com, oliver.upton@linux.dev, maz@kernel.org,
+ will@kernel.org, qperret@google.com, keirf@google.com, roypat@amazon.co.uk,
+ shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, rientjes@google.com,
+ jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, jthoughton@google.com
+References: <20250211121128.703390-1-tabba@google.com>
+ <20250211121128.703390-3-tabba@google.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <20250211121128.703390-3-tabba@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 0650F211A6
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim,suse.cz:mid];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,ellerman.id.au,brainfault.org,sifive.com,dabbelt.com,eecs.berkeley.edu,google.com,zeniv.linux.org.uk,infradead.org,linux-foundation.org,intel.com,linux.intel.com,digikod.net,maciej.szmigiero.name,amd.com,oracle.com,gmail.com,arm.com,quicinc.com,huawei.com,linux.dev,amazon.co.uk,nvidia.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[60];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
+X-Spam-Flag: NO
 
-On Fri, 14 Feb 2025 15:13:52 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On 2/11/25 13:11, Fuad Tabba wrote:
+> Before transitioning a guest_memfd folio to unshared, thereby
+> disallowing access by the host and allowing the hypervisor to
+> transition its view of the guest page as private, we need to be
+> sure that the host doesn't have any references to the folio.
 > 
-> On Fri, Feb 14, 2025 at 09:24:03AM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > Just to be clear: I do not intend to review a series that doesn't
-> > cover the full gamut of KVM from day 1. Protected mode is an absolute
-> > requirement. It is the largest KVM deployment, and Android phones the
-> > only commonly available platform with SME. If CCA gets merged prior to
-> > SME support, supporting it will also be a requirement.
-> 
-> OK, no problem.  This is a new requirement and I'd been trying to
-> balance the concerns people have with the size of serieses like this
-> with the need to get everything in, my plan had been to follow up as
-> soon as possible with pKVM.
+> This patch introduces a new type for guest_memfd folios, which
+> isn't activated in this series but is here as a placeholder and
+> to facilitate the code in the next patch. This will be used in
 
-If size is an issue, split the UAPI from the core code. But don't
-fragment the overall world switch and exception handling, because
-that's a sure way to end-up with the same sort of problems we ended up
-fixing in SVE. pKVM has a direct influence on what you track, where
-you track it, and implementing it as an afterthought is a very bad
-idea.
+It's not clear to me how the code in the next page is facilitated as it
+doesn't use any of this?
 
+> the future to register a callback that informs the guest_memfd
+> subsystem when the last reference is dropped, therefore knowing
+> that the host doesn't have any remaining references.
 > 
-> > > Access to the floating point registers follows the architecture:
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  include/linux/kvm_host.h   |  9 +++++++++
+>  include/linux/page-flags.h | 17 +++++++++++++++++
+>  mm/debug.c                 |  1 +
+>  mm/swap.c                  |  9 +++++++++
+>  virt/kvm/guest_memfd.c     |  7 +++++++
+>  5 files changed, 43 insertions(+)
 > 
-> > >  - When both SVE and SME are present:
-> > >    - If PSTATE.SM == 0 the vector length used for the Z and P registers
-> > >      is the SVE vector length.
-> > >    - If PSTATE.SM == 1 the vector length used for the Z and P registers
-> > >      is the SME vector length.
-> > >  - If only SME is present:
-> > >    - If PSTATE.SM == 0 the Z and P registers are inaccessible and the
-> > >      floating point state accessed via the encodings for the V registers. 
-> > >    - If PSTATE.SM == 1 the vector length used for the Z and P registers
-> > >  - The SME specific ZA and ZT0 registers are only accessible if SVCR.ZA is 1.
-> 
-> > > The VMM must understand this, in particular when loading state SVCR
-> > > should be configured before other state.
-> 
-> > Why SVCR? This isn't a register, just an architected accessor to
-> > PSTATE.{ZA,SM}. Userspace already has direct access to PSTATE, so I
-> > don't understand this requirement.
-> 
-> Could you be more explicit as to what you mean by direct access to
-> PSTATE here?  The direct access to these PSTATE fields is in the form of
-> SVCR register accesses, or writes via SMSTART or SMSTOP instructions
-> when executing code - is there another access mechanism I'm not aware of
-> here?  They don't appear in SPSR.  Or is this a terminology issue with
-> referring to SVCR as the mechanism for configuring PSTATE.{SM,ZA}
-> without explicitly calling out that that's what's happening?
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f34f4cfaa513..8b5f28f6efff 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2571,4 +2571,13 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>  				    struct kvm_pre_fault_memory *range);
+>  #endif
+>  
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +void kvm_gmem_handle_folio_put(struct folio *folio);
+> +#else
+> +static inline void kvm_gmem_handle_folio_put(struct folio *folio)
+> +{
+> +	WARN_ON_ONCE(1);
+> +}
 
-I'm painfully aware of the architecture limitations.
+Since the caller is guarded by CONFIG_KVM_GMEM_SHARED_MEM, do we need the
+CONFIG_KVM_GMEM_SHARED_MEM=n variant at all?
 
-However, I don't get your mention of SPSR here. The architecture is
-quite clear that PSTATE is where these bits are held, that they are
-not propagated anywhere else, and that's where userspace should expect
-to find them.
+> +#endif
+> +
+>  #endif
+> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> index 6dc2494bd002..734afda268ab 100644
+> --- a/include/linux/page-flags.h
+> +++ b/include/linux/page-flags.h
+> @@ -933,6 +933,17 @@ enum pagetype {
+>  	PGTY_slab	= 0xf5,
+>  	PGTY_zsmalloc	= 0xf6,
+>  	PGTY_unaccepted	= 0xf7,
+> +	/*
+> +	 * guestmem folios are used to back VM memory as managed by guest_memfd.
+> +	 * Once the last reference is put, instead of freeing these folios back
+> +	 * to the page allocator, they are returned to guest_memfd.
+> +	 *
+> +	 * For now, guestmem will only be set on these folios as long as they
+> +	 * cannot be mapped to user space ("private state"), with the plan of
 
-The fact that SW must use SVCR to alter PSTATE.{ZA,SM} doesn't matter.
-We save/restore registers, not accessors. If this means we need to
-play a dance when the VMM accesses PSTATE to reconciliate KVM's
-internal view with the userspace view, so be it.
+Might be a bit misleading as I don't think it's set yet as of this series.
+But I guess we can keep it to avoid another update later.
 
-It probably means you need to obtain a clarification of the
-architecture to define *where* these bits are stored in PSTATE,
-because that's not currently defined.
+> +	 * always setting that type once typed folios can be mapped to user
+> +	 * space cleanly.
+> +	 */
+> +	PGTY_guestmem	= 0xf8,
+>  
+>  	PGTY_mapcount_underflow = 0xff
+>  };
+> @@ -1082,6 +1093,12 @@ FOLIO_TYPE_OPS(hugetlb, hugetlb)
+>  FOLIO_TEST_FLAG_FALSE(hugetlb)
+>  #endif
+>  
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +FOLIO_TYPE_OPS(guestmem, guestmem)
+> +#else
+> +FOLIO_TEST_FLAG_FALSE(guestmem)
+> +#endif
+> +
+>  PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
+>  
+>  /*
+> diff --git a/mm/debug.c b/mm/debug.c
+> index 8d2acf432385..08bc42c6cba8 100644
+> --- a/mm/debug.c
+> +++ b/mm/debug.c
+> @@ -56,6 +56,7 @@ static const char *page_type_names[] = {
+>  	DEF_PAGETYPE_NAME(table),
+>  	DEF_PAGETYPE_NAME(buddy),
+>  	DEF_PAGETYPE_NAME(unaccepted),
+> +	DEF_PAGETYPE_NAME(guestmem),
+>  };
+>  
+>  static const char *page_type_name(unsigned int page_type)
+> diff --git a/mm/swap.c b/mm/swap.c
+> index 47bc1bb919cc..241880a46358 100644
+> --- a/mm/swap.c
+> +++ b/mm/swap.c
+> @@ -38,6 +38,10 @@
+>  #include <linux/local_lock.h>
+>  #include <linux/buffer_head.h>
+>  
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +#include <linux/kvm_host.h>
+> +#endif
 
->
-> > Isn't it that there is simply a dependency between restoring PSTATE
-> > and any of the vector stuff? Also, how do you preserve the current ABI
-> > that do not have this requirement?
-> 
-> Yes, that's the dependency - I'm spelling out explicitly what changes in
-> the register view when PSTATE.{SM,ZA} are restored.  This ABI is what
-> you appeared to be asking for the last time we discussed this.
-> Previously I had also proposed either:
-> 
->  - Exposing the streaming mode view of the register state as separate
->    registers, selecting between the standard and streaming views for
->    load/save based on the mode when the guest runs and clearing the
->    inactive registers on userspace access.
-> 
->  - Always presenting userspace with the largest available vector length,
->    zero padding when userspace reads and discarding unused high bits
->    when loading into the registers for the guest.  This ends up
->    requiring rewriting between VLs, or to/from FPSIMD format, around
->    periods of userspace access since when normally executing and context
->    switching the guest we want to store the data in the native format
->    for the current PSTATE.SM for performance.
-> 
-> both of which largely avoid the ordering requirements but add complexity
-> to the implementation, and memory overhead in the first case.  I'd
-> originally implemented the second case, that seems the best of the
-> available options to me.  You weren't happy with these options and said
-> that we should not translate register formats and always use the current
-> mode for the vCPU, but given that changing PSTATE.SM changes the
-> register sizes that ends up creating an ordering requirement.  You
-> seemed to agree that it was reasonable to have an ordering requirement
-> with PSTATE.SM so long as it only came when SME had been explicitly
-> enabled.
-> 
-> Would you prefer:
-> 
->  - Changing the register view based on the current value of PSTATE.SM.
->  - Exposing streaming mode Z and P as separate registers.
->  - Exposing the existing Z and P registers with the maximum S?E VL.
-> 
-> or some other option?
+Do we need to guard the include?
 
-My take on this hasn't changed. I want to see something that behaves
-*exactly* like the architecture defines the expected behaviour of a
-CPU.
+> +
+>  #include "internal.h"
+>  
+>  #define CREATE_TRACE_POINTS
+> @@ -101,6 +105,11 @@ static void free_typed_folio(struct folio *folio)
+>  	case PGTY_hugetlb:
+>  		free_huge_folio(folio);
+>  		return;
+> +#endif
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +	case PGTY_guestmem:
+> +		kvm_gmem_handle_folio_put(folio);
+> +		return;
+>  #endif
+>  	default:
+>  		WARN_ON_ONCE(1);
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index b2aa6bf24d3a..c6f6792bec2a 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -312,6 +312,13 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+>  	return gfn - slot->base_gfn + slot->gmem.pgoff;
+>  }
+>  
+> +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> +void kvm_gmem_handle_folio_put(struct folio *folio)
+> +{
+> +	WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+> +}
+> +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+> +
+>  static struct file_operations kvm_gmem_fops = {
+>  	.open		= generic_file_open,
+>  	.release	= kvm_gmem_release,
 
-But you still haven't answered my question: How is the *current* ABI
-preserved? Does it require *not* selecting SME? Does it require
-anything else? I'm expecting simple answers to simple questions, not a
-wall of text describing something that is not emulating the
-architecture.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
