@@ -1,63 +1,64 @@
-Return-Path: <kvm+bounces-38328-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38329-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 535C6A37B1E
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 07:00:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FD50A37BAA
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 07:47:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FE6D188BBF8
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 06:00:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F3533A7FD1
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 06:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3802A18DB3E;
-	Mon, 17 Feb 2025 06:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9CE818FC74;
+	Mon, 17 Feb 2025 06:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fM3aEylp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KqW1KybL"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2372F154BFE
-	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 06:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDC31531E1
+	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 06:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739772013; cv=none; b=epkJpMP5975aBcA91qWBSQ0hQclG29fXBw2AEpgcXQXNCEfqBPqx/39bESysI01fGG+XFTFeStTh9ANLgchepu8DIpcuunxvcSUm3C3NUlhvUyepvMBKqb6o+E1k83AtdW5KlG9okEaujRMut7A30bTjugpnq/6/1gXZ0mQaaGw=
+	t=1739774817; cv=none; b=mNwlQsCqTdtKg85oAPtjqBXL3C9SMKlKqB4iNX1D7uI8goiPwoOmpDRJ6R4PZj5tWVqyx93qxJjtERxf7lkmp9AJdeLXUQURXufy46SrKkzOkyHPu165thpLFdyLFJXQDUFnmIDMdp6eHAtV9/0p0QHWU5qc4yPvlrmDD/IMmhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739772013; c=relaxed/simple;
-	bh=uIlLLYZk/rqc1yAEIcADHlCXLTsIBOxyC5v9MFk4mc8=;
+	s=arc-20240116; t=1739774817; c=relaxed/simple;
+	bh=wGEp05+aP4nRVSEcYNqbBBmVcNgBfNoXnSxpARVudB0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZcZsWRSw8BAN3XKuACejbqgLOFpUVzsok/AWE3xbXS6qoqjvfapngf557AvKQRu7/WRTpJ4G0bBIPchJBgTS3T36ZIq4cU8T/YGE/Tqi/2AEJJNTpMuuqMrbPK/A5JTne2RNaot6BCUe1SgOuPeibAx8CQnpynkkZP1hm7NqvEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fM3aEylp; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Sun, 16 Feb 2025 21:59:59 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739772009;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8uQ7hYciG6TfKnfmxwzHYdxDSn8v9ytZX5MkrF5naHM=;
-	b=fM3aEylpgbwKQ9ukztcJbXIuNz42X/RfxVSkZWeulNbfqq60XOR5TQcSf/8zp2FBdnm5sa
-	3fNa4fMG9uAsuI1e4nS0AMVYpeMmQiqjIGVbbMWFPnDFwuivFMNYlDmfbNQfPwXuALv/YQ
-	bd4OehO2Oq1u5xMaTD9+o5zXabYmA8A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Patrick Bellasi <derkling@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Patrick Bellasi <derkling@matbug.net>,
-	Brendan Jackman <jackmanb@google.com>
-Subject: Re: Re: Re: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <Z7LQX3j5Gfi8aps8@Asmaa.>
-References: <20250213142815.GBZ64Bf3zPIay9nGza@fat_crate.local>
- <20250213175057.3108031-1-derkling@google.com>
- <20250214201005.GBZ6-jHUff99tmkyBK@fat_crate.local>
- <20250215125307.GBZ7COM-AkyaF8bNiC@fat_crate.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LaBDk0/g0LRnHMZ3nnb5DLylZeqaMtwxwTclSpDr+oTUBMpRC2vXA1WZ/6E9ckC8LgGHRQOvHPisRrK488267VoDvwyMcnnod7fdpBgHHe+V6yvd8G/GGcLVcsvQbg3VvTdp3Ln6WCexNADxcCkS++sG56AX603YHt6jCq8Szus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KqW1KybL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAD2BC4CED1;
+	Mon, 17 Feb 2025 06:46:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739774816;
+	bh=wGEp05+aP4nRVSEcYNqbBBmVcNgBfNoXnSxpARVudB0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KqW1KybLXuKVrnFDHFiQ39uSkMrSQZORRAhuHSiVZBF030Qsx+WxRZfbHsWxSnCr1
+	 lYXE4MV+3LXcdbe9KSG+s042q9N0Zuk+9yXyhS+3TjCkB2K0VIsa8qNvwe0erUdv9Q
+	 C3929Be6vAhdTnetgcUlcKcxdgKNcaCX3VFaqJ+oMuF0I0uX5IcZamIAmlgwIniZh1
+	 ExJtlbTAMkIOlUEIs6y6s2q1mV4Q0bp4RZcCKoCCgh9KtCKJrtiFm8usbtKMACjjgZ
+	 iEd/F0KTKoG2b6WDv8aSwLQHrHefSYfXkdh8hUymZnLW7SAkvN82MhZW4KC0h2TC7B
+	 9AqPlIoo2jDjw==
+Date: Mon, 17 Feb 2025 12:13:15 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Kim Phillips <kim.phillips@amd.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
+	Michael Roth <michael.roth@amd.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	"Nikunj A . Dadhania" <nikunj@amd.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Kishon Vijay Abraham I <kvijayab@amd.com>, Alexey Kardashevskiy <aik@amd.com>
+Subject: Re: [PATCH v3 2/2] KVM: SEV: Configure "ALLOWED_SEV_FEATURES" VMCB
+ Field
+Message-ID: <gxyvqeslwhw6dirfg7jb7wavotlguctnxf5ystqfcnn5mk74qa@nlqbruetef22>
+References: <20250207233410.130813-1-kim.phillips@amd.com>
+ <20250207233410.130813-3-kim.phillips@amd.com>
+ <4eb24414-4483-3291-894a-f5a58465a80d@amd.com>
+ <Z6vFSTkGkOCy03jN@google.com>
+ <6829cf75-5bf3-4a89-afbe-cfd489b2b24b@amd.com>
+ <Z66UcY8otZosvnxY@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -66,89 +67,39 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250215125307.GBZ7COM-AkyaF8bNiC@fat_crate.local>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <Z66UcY8otZosvnxY@google.com>
 
-On Sat, Feb 15, 2025 at 01:53:07PM +0100, Borislav Petkov wrote:
-> On Fri, Feb 14, 2025 at 09:10:05PM +0100, Borislav Petkov wrote:
-> > After talking with folks internally, you're probably right. We should slap an
-> > IBPB before clearing. Which means, I cannot use the MSR return slots anymore.
-> > I will have to resurrect some of the other solutions we had lined up...
+On Thu, Feb 13, 2025 at 04:55:13PM -0800, Sean Christopherson wrote:
+> On Thu, Feb 13, 2025, Kim Phillips wrote:
+> > On 2/11/25 3:46 PM, Sean Christopherson wrote:
+> > > On Mon, Feb 10, 2025, Tom Lendacky wrote:
+> > > > On 2/7/25 17:34, Kim Phillips wrote:
 > 
-> So I'm thinking about this (totally untested ofc) but I'm doing it in the CLGI
-> region so no need to worry about migration etc.
+> Third, letting userspace opt-in to something doesn't necessarily mean giving
+> userspace full control.  Which is the entire reason I asked the question about
+> whether or not this can break userspace.  E.g. we can likely get away with only
+> making select features opt-in, and enforcing everything else by default.
 > 
-> Sean, that ok this way?
-
-I am no Sean, but I have some questions about this approach if that's
-okay :)
-
-First of all, the use of indirect_branch_prediction_barrier() is
-interesting to me because it only actually performs an IBPB if
-X86_FEATURE_USE_IBPB is set, which is set according to the spectre_v2
-mitigation. It seems to me that indirect_branch_prediction_barrier() was
-originally intended for use only in switch_mm_irqs_off() ->
-cond_mitigation(), where the spectre_v2 mitigations are executed, then
-made its way to other places like KVM.
-
-Second, and probably more importantly, it seems like with this approach
-we will essentially be doing an IBPB on every VM-exit AND running the
-guest with reduced speculation. At least on the surface, this looks
-worse than an IBPB on VM-exit. My understanding is that this MSR is
-intended to be a more efficient mitigation than IBPB on VM-exit.
-
-This probably performs considerably worse than the previous approaches,
-so I am wondering which approach is the 1-2% regression figure
-associated with.
-
-If 1-2% is the cost for keeping the MSR enabled at all times, I wonder
-if we should just do that for simplicitly, and have it its own
-mitigation option (chosen by the cmdline).
-
-Alternatively, if that's too expensive, perhaps we can choose another
-boundary to clear the MSR at and perform an IBPB. I can think of two
-places:
-
-- Upon return to userspace (similar to your previous proposal). In this
-  case we run userspace with the MSR cleared, and only perform an IBPB
-  in the exit to userspace pace.
-
-- In the switch_mm() path (around cond_mitigation()). Basically we keep
-  the MSR bit set until we go to a different process, at which point we
-  clear it and do an IBPB. The MSR will bet set while the VMM is
-  running, but other processes in the system won't take the hit. We can
-  even be smarter and only do the MSR clear + IBPB if we're going from
-  a process using KVM to process that isn't. We'll need more bookkeeping
-  for that though.
-
-Any thoughts? Am I completely off base?
-
-
+> I don't think RESTRICTED_INJECTION or ALTERNATE_INJECTION can work without KVM
+> cooperation, so enforcing those shouldn't break anything.
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 6ea3632af580..dcc4e5935b82 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4272,8 +4272,16 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
->  	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
->  		x86_spec_ctrl_set_guest(svm->virt_spec_ctrl);
->  
-> +	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
-> +		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-> +
->  	svm_vcpu_enter_exit(vcpu, spec_ctrl_intercepted);
->  
-> +	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
-> +		indirect_branch_prediction_barrier();
-> +		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-> +	}
-> +
->  	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
->  		x86_spec_ctrl_restore_host(svm->virt_spec_ctrl);
->  
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
+> It's still not clear to me that we don't have a bug with DEBUG_SWAP.  AIUI,
+> DEBUG_SWAP is allowed by default.  I.e. if ALLOWED_FEATURES is unsupported, then
+> the guest can use DEBUG_SWAP via SVM_VMGEXIT_AP_CREATE without KVM's knowledge.
+
+In sev_es_prepare_switch_to_guest(), we save host debug register state 
+(DR0-DR3) only if KVM is aware of DEBUG_SWAP being enabled in the guest 
+(via vmsa_features). So, from what I can tell, it looks like the guest 
+will end up overwriting host state if it enables DEBUG_SWAP without 
+KVM's knowledge?
+
+Not sure if that's reason enough to enforce ALLOWED_SEV_FEATURES for 
+DEBUG_SWAP :)
+
+If ALLOWED_SEV_FEATURES is not supported, we may still have to 
+unconditionally save the host DR0-DR3 registers.
+
+
+- Naveen
+
 
