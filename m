@@ -1,158 +1,229 @@
-Return-Path: <kvm+bounces-38330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D23DFA37C69
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 08:41:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0610A37CF1
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:18:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB6393AF03B
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 07:40:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD521885794
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 08:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD07199FA4;
-	Mon, 17 Feb 2025 07:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6813119C553;
+	Mon, 17 Feb 2025 08:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vhUT1NOd";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Vi+VlE+N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ibRKupyI"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2834A17B425;
-	Mon, 17 Feb 2025 07:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656A5155C82
+	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 08:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739778049; cv=none; b=Ys+v4wKRwOj21HThS2wzUqmj4IGp13sBecFtcFRLkUEsbMvKkhsAt/plC1UwC9nqrzJJ3Yo2/wbryGYfFLlcuQSJuatqeYhM/zg6AdmpUoUtXj5sOdH+hEtXh7C/LhD2uJAfLmIScfF25dPVFDEKfd3QAUVINT4NhZe4dPqE54I=
+	t=1739780331; cv=none; b=eTEMPCl4mcVt5t2TZPDsIWZC7GBns/E9L5MX7Dh9V20Q2jkLBAnbu8dDwn+imQOzZKjCucctBFPxeoRRtgFt4oKUyMv5Gv2YyyoARbrEHdCzsiAHEyG0KikCg9VP0MVWmfknW4eQLUWr2gBwZ/3TUYnxf/vphksDm/ywKyttO4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739778049; c=relaxed/simple;
-	bh=GlhY5963uKLghWT9UMDfwza9mzMJBnGIVIpZq0UF6Ao=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=p9MQrsyOEFrHCASX4SAV+IrINnidMOWhJFdJymJUNJzi4SJ5bCWbnrdr21VOqgLVjaQC3aN3gI3J6sXNoynF+kP0COnYShrTPqn1HVYW+BMBoP/nWjqZYbVXwGqk1HNnDu35BkaxvgBnoEEBETGQOePd1RCUO/Pf2w+ZxXemIGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vhUT1NOd; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Vi+VlE+N; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1739778046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=a7pcXwEMvphmTY2pbZCwuEUxQvypKwXeKfbqt+7td9Y=;
-	b=vhUT1NOdxZ56WfhZi+IDFBppyU46xpNwku0m3zwtuoQnCyDRmniSZTbyaCSxiMZZnBHLGn
-	drNEinoecXW3DGqsVw8V1ZbNUqXgvuCsamn683Fr2vysESuyIYvR4PsD+CHvWwK4LgfrX4
-	yYJVIA1FeJRYkLf7vlbMJULZgPU9nom/yE5y6gQdVQN9+pPUBbpl52+bBHo9MuAIqWB3u6
-	IxQm3ukRCe+b7WKy2Kn4MImvml9LQL4iwYMwpXdB7yl0lrMFyeYYYwPfJZSC0N6ydFWzG6
-	RtAn3ihpv5tN8Sigm8pabD3ecwj7TZp6EJMmR6BYju26Frh4h8CpYkSgC/S49g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1739778046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=a7pcXwEMvphmTY2pbZCwuEUxQvypKwXeKfbqt+7td9Y=;
-	b=Vi+VlE+NRBF+Upfa1bESGClJsp8XT0SNEuWMyW2zocCJxv8cV+eM3qyUhyGJgZDz6ctMTV
-	XQPTUDBzSqObxJBg==
-Date: Mon, 17 Feb 2025 08:40:44 +0100
-Subject: [PATCH] MIPS: Don't use %pK through printk
+	s=arc-20240116; t=1739780331; c=relaxed/simple;
+	bh=wc6TIz6eCVeVGn8h0Vq5MmD8aIAeFnI7/irUmf2viIM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eDwgIUW5SuXr9m8E/AzAqoTDF4ao4wsZ4MQfkt2OILGCWwwWEDEil+MaGd5MO2yMVkGXC9yka7acwxrc+eqrwVQStwee6LuF6A7cfxwkkjTeucxaaRxTqMpXGFgRzPeWw28I5pyQAkdqiMHboL+tDuh4D0pjxs6TbV2fTsxOp58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ibRKupyI; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739780329; x=1771316329;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wc6TIz6eCVeVGn8h0Vq5MmD8aIAeFnI7/irUmf2viIM=;
+  b=ibRKupyIBJkUQ0UHMSilGLEdMt2Zh+6k3H4xmYmmOjHIVuc5aYv9HmT1
+   +4GseM1/Y0uy4BMZypd50WfhV9abUBzhSUZV+iWOp4YPOs0JqLEf9oje3
+   NbMCSTvNgkWQqjETfvedQWgEVxaIHe7xHujjip+cLblpMrrXvbBSY1Gml
+   kZfyQ/Xf90GnuWQhJzjCOc1E2sXTxlOB+fSQUQOsQfzGtMXQloPGDmsCW
+   sp8posBjeL3N6NCPDSOVAKGNhvG0cypoF1/YkMX++311P4LSuEpt8uomC
+   G/aIag+nPkLu/t64G38iQR1xEwGyJwPmi0ibG1LWDMSOV+3lUbIi7slBo
+   Q==;
+X-CSE-ConnectionGUID: SXh8BWS7SsaFhU3ZOtU+eA==
+X-CSE-MsgGUID: KEdEcLXBRxCZRkE1E2XsZw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11347"; a="50668956"
+X-IronPort-AV: E=Sophos;i="6.13,292,1732608000"; 
+   d="scan'208";a="50668956"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:18:48 -0800
+X-CSE-ConnectionGUID: qfXuWP3aT1m9kTZfWoVB6w==
+X-CSE-MsgGUID: T5uxHi2zQqiLC1w/6MbbKw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="118690152"
+Received: from emr-bkc.sh.intel.com ([10.112.230.82])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:18:45 -0800
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+To: David Hildenbrand <david@redhat.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Peter Xu <peterx@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Michael Roth <michael.roth@amd.com>
+Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
+	qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Williams Dan J <dan.j.williams@intel.com>,
+	Peng Chao P <chao.p.peng@intel.com>,
+	Gao Chao <chao.gao@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Li Xiaoyao <xiaoyao.li@intel.com>
+Subject: [PATCH v2 0/6] Enable shared device assignment
+Date: Mon, 17 Feb 2025 16:18:19 +0800
+Message-ID: <20250217081833.21568-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250217-restricted-pointers-mips-v1-1-694313640c98@linutronix.de>
-X-B4-Tracking: v=1; b=H4sIAPvnsmcC/x3MQQqEMAxA0atI1ga0UurMVcRFaaNmYS1JEUG8u
- 8XlW/x/g5IwKfybG4ROVj5SRd82EDafVkKO1WA6YzvTOxTSIhwKRcwHp0KiuHNWNMFZ+/NjHJy
- Hmmehha9vPc3P8wJLq3RuagAAAA==
-X-Change-ID: 20250217-restricted-pointers-mips-2c7559a8d37a
-To: Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- Huacai Chen <chenhuacai@kernel.org>
-Cc: linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kvm@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1739778046; l=3032;
- i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=GlhY5963uKLghWT9UMDfwza9mzMJBnGIVIpZq0UF6Ao=;
- b=O3Mza39w/Ezu6XV3CmC/cgeL/AqgjxqBCKbclm7AlS1dqWFrWoZEGTqzuYm9kIxg0unGHpuMZ
- lnQyFhRL8rDD1HTqDCeqqfN675g4cWgnKULFVYe7Swdj+mXveF6cX8Q
-X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
- pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-Restricted pointers ("%pK") are not meant to be used through printk().
-It can unintentionally expose security sensitive, raw pointer values.
+This is the v2 series of the shared device assignment support.
 
-Use regular pointer formatting instead.
+The overview of this series:
+- Patch 1-2: preparation patches. One is to export a helper to get
+  intersection of a MemoryRegionSection with a given range. The other is
+  to change the memory_region_set_ram_discard_manager() to return the
+  result.
+- Patch 3-4: Introduce a new object to implement RamDiscardManager
+  interface and a callback to notify the shared/private state change.
+- Patch 5: Store the new object including guest_memfd information in
+  RAMBlock. Register the RamDiscardManager instance to the target
+  RAMBlock's MemoryRegion so that the object can notify the page
+  conversion events to other systems.
+- Patch 6: Unlock the coordinate discard so that the shared device
+  assignment (VFIO) can work with guest_memfd.
 
-Link: https://lore.kernel.org/lkml/20250113171731-dc10e3c1-da64-4af0-b767-7c7070468023@linutronix.de/
-Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+Compared with v1 series, the main changes are:
+
+- Rename the class name from GuestMemfdManager to MemoryAttributeManager.
+- Add a new field in RAMBlock to store the guest_memfd information.
+- Add patch 02 to make memory_region_set_ram_discard_manager() return the result.
+- Drop the patch 07 in v1 series which is an extension and not necessary for the current series.
+- v1: https://lore.kernel.org/qemu-devel/20241213070852.106092-1-chenyi.qiang@intel.com/
+
+More small changes or details can be found in the individual patches.
+
+Background
+==========
+Confidential VMs have two classes of memory: shared and private memory.
+Shared memory is accessible from the host/VMM while private memory is
+not. Confidential VMs can decide which memory is shared/private and
+convert memory between shared/private at runtime.
+
+"guest_memfd" is a new kind of fd whose primary goal is to serve guest
+private memory. In current implementation, shared memory is allocated
+with normal methods (e.g. mmap or fallocate) while private memory is
+allocated from guest_memfd. When a VM performs memory conversions, QEMU
+frees pages via madvise or via PUNCH_HOLE on memfd or guest_memfd from
+one side, and allocates new pages from the other side. This will cause a
+stale IOMMU mapping issue mentioned in [1] when we try to enable shared
+device assignment in confidential VMs.
+
+Solution
+========
+The key to enable shared device assignment is to update the IOMMU mappings
+on page conversion. RamDiscardManager, an existing interface currently
+utilized by virtio-mem, offers a means to modify IOMMU mappings in
+accordance with VM page assignment. Page conversion is similar to
+hot-removing a page in one mode and adding it back in the other.
+
+This series implements a RamDiscardManager for confidential VMs and
+utilizes its infrastructure to notify VFIO of page conversions.
+
+Relationship with in-place page conversion
+==========================================
+To support 1G page support for guest_memfd [2], the current direction is to
+allow mmap() of guest_memfd to userspace so that both private and shared
+memory can use the same physical pages as the backend. This in-place page
+conversion design eliminates the need to discard pages during shared/private
+conversions. However, device assignment will still be blocked because the
+in-place page conversion will reject the conversion when the page is pinned
+by VFIO.
+
+To address this, the key difference lies in the sequence of VFIO map/unmap
+operations and the page conversion. It can be adjusted to achieve
+unmap-before-conversion-to-private and map-after-conversion-to-shared,
+ensuring compatibility with guest_memfd.
+
+Limitation
+==========
+One limitation is that VFIO expects the DMA mapping for a specific IOVA
+to be mapped and unmapped with the same granularity. The guest may
+perform partial conversions, such as converting a small region within a
+larger region. To prevent such invalid cases, all operations are
+performed with 4K granularity. This could be optimized after the
+cut_mapping operation [3] is introduced in future. We can alway perform a
+split-before-unmap if partial conversions happen. If the split succeeds,
+the unmap will succeed and be atomic. If the split fails, the unmap
+process fails.
+
+Testing
+=======
+This patch series is tested based on TDX patches available at:
+KVM: https://github.com/intel/tdx/tree/tdx_kvm_dev-2025-02-10
+QEMU: https://github.com/intel-staging/qemu-tdx/tree/tdx-upstream-snapshot-2025-02-17-v2
+
+To facilitate shared device assignment with the NIC, employ the legacy
+type1 VFIO with the QEMU command:
+
+qemu-system-x86_64 [...]
+    -device vfio-pci,host=XX:XX.X
+
+The parameter of dma_entry_limit needs to be adjusted. For example, a
+16GB guest needs to adjust the parameter like
+vfio_iommu_type1.dma_entry_limit=4194304.
+
+If use the iommufd-backed VFIO with the qemu command:
+
+qemu-system-x86_64 [...]
+    -object iommufd,id=iommufd0 \
+    -device vfio-pci,host=XX:XX.X,iommufd=iommufd0
+
+No additional adjustment required.
+
+Following the bootup of the TD guest, the guest's IP address becomes
+visible, and iperf is able to successfully send and receive data.
+
+Related link
+============
+[1] https://lore.kernel.org/qemu-devel/20240423150951.41600-54-pbonzini@redhat.com/
+[2] https://lore.kernel.org/lkml/cover.1726009989.git.ackerleytng@google.com/
+[3] https://lore.kernel.org/linux-iommu/7-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com/
+
 ---
- arch/mips/kernel/relocate.c | 10 +++++-----
- arch/mips/kvm/mips.c        |  2 +-
- arch/mips/mm/physaddr.c     |  2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
+Chenyi Qiang (6):
+  memory: Export a helper to get intersection of a MemoryRegionSection
+    with a given range
+  memory: Change memory_region_set_ram_discard_manager() to return the
+    result
+  memory-attribute-manager: Introduce MemoryAttributeManager to manage
+    RAMBLock with guest_memfd
+  memory-attribute-manager: Introduce a callback to notify the
+    shared/private state change
+  memory: Attach MemoryAttributeManager to guest_memfd-backed RAMBlocks
+  RAMBlock: Make guest_memfd require coordinate discard
 
-diff --git a/arch/mips/kernel/relocate.c b/arch/mips/kernel/relocate.c
-index cda7983e7c18d421535253a2406a523f6d1166e7..7f1c136ad85062806b90042d6760a2a7a354593d 100644
---- a/arch/mips/kernel/relocate.c
-+++ b/arch/mips/kernel/relocate.c
-@@ -138,7 +138,7 @@ static int __init reloc_handler(u32 type, u32 *loc_orig, u32 *loc_new,
- 		apply_r_mips_hi16_rel(loc_orig, loc_new, offset);
- 		break;
- 	default:
--		pr_err("Unhandled relocation type %d at 0x%pK\n", type,
-+		pr_err("Unhandled relocation type %d at 0x%p\n", type,
- 		       loc_orig);
- 		return -ENOEXEC;
- 	}
-@@ -439,10 +439,10 @@ static void show_kernel_relocation(const char *level)
- {
- 	if (__kaslr_offset > 0) {
- 		printk(level);
--		pr_cont("Kernel relocated by 0x%pK\n", (void *)__kaslr_offset);
--		pr_cont(" .text @ 0x%pK\n", _text);
--		pr_cont(" .data @ 0x%pK\n", _sdata);
--		pr_cont(" .bss  @ 0x%pK\n", __bss_start);
-+		pr_cont("Kernel relocated by 0x%p\n", (void *)__kaslr_offset);
-+		pr_cont(" .text @ 0x%p\n", _text);
-+		pr_cont(" .data @ 0x%p\n", _sdata);
-+		pr_cont(" .bss  @ 0x%p\n", __bss_start);
- 	}
- }
- 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 60b43ea85c125fe9a204abfd3dd5339708a22ee1..7b0de05d39f261f8ea2067284984fc9332e6a4f2 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -316,7 +316,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	 * we allocate is out of range, just give up now.
- 	 */
- 	if (!cpu_has_ebase_wg && virt_to_phys(gebase) >= 0x20000000) {
--		kvm_err("CP0_EBase.WG required for guest exception base %pK\n",
-+		kvm_err("CP0_EBase.WG required for guest exception base %p\n",
- 			gebase);
- 		err = -ENOMEM;
- 		goto out_free_gebase;
-diff --git a/arch/mips/mm/physaddr.c b/arch/mips/mm/physaddr.c
-index f9b8c85e984334dedd23ff7acc8c39e5e14f040a..a6b1bf82057a1db62eba14eea9cdddb04e29650b 100644
---- a/arch/mips/mm/physaddr.c
-+++ b/arch/mips/mm/physaddr.c
-@@ -30,7 +30,7 @@ static inline bool __debug_virt_addr_valid(unsigned long x)
- phys_addr_t __virt_to_phys(volatile const void *x)
- {
- 	WARN(!__debug_virt_addr_valid((unsigned long)x),
--	     "virt_to_phys used for non-linear address: %pK (%pS)\n",
-+	     "virt_to_phys used for non-linear address: %p (%pS)\n",
- 	     x, x);
- 
- 	return __virt_to_phys_nodebug(x);
+ accel/kvm/kvm-all.c                       |   9 +
+ hw/virtio/virtio-mem.c                    |  62 ++-
+ include/exec/memory.h                     |  33 +-
+ include/exec/ramblock.h                   |   2 +
+ include/system/memory-attribute-manager.h |  62 +++
+ system/memory-attribute-manager.c         | 440 ++++++++++++++++++++++
+ system/memory.c                           |  11 +-
+ system/meson.build                        |   1 +
+ system/physmem.c                          |  17 +-
+ 9 files changed, 589 insertions(+), 48 deletions(-)
+ create mode 100644 include/system/memory-attribute-manager.h
+ create mode 100644 system/memory-attribute-manager.c
 
----
-base-commit: 0ad2507d5d93f39619fc42372c347d6006b64319
-change-id: 20250217-restricted-pointers-mips-2c7559a8d37a
-
-Best regards,
 -- 
-Thomas Weißschuh <thomas.weissschuh@linutronix.de>
+2.43.5
 
 
