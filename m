@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-38331-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38332-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0610A37CF1
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:18:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E44AA37CF2
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:19:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD521885794
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 08:19:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F07E21718AE
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 08:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6813119C553;
-	Mon, 17 Feb 2025 08:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0ACD19F424;
+	Mon, 17 Feb 2025 08:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ibRKupyI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AM+APp6N"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656A5155C82
-	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 08:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0293191F68
+	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 08:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739780331; cv=none; b=eTEMPCl4mcVt5t2TZPDsIWZC7GBns/E9L5MX7Dh9V20Q2jkLBAnbu8dDwn+imQOzZKjCucctBFPxeoRRtgFt4oKUyMv5Gv2YyyoARbrEHdCzsiAHEyG0KikCg9VP0MVWmfknW4eQLUWr2gBwZ/3TUYnxf/vphksDm/ywKyttO4g=
+	t=1739780333; cv=none; b=sTTFlMd64n0EQe4FY6xo/8RlT5PNIHv8C2ohZGazA3wP6LM5CoOSoZmAkSbXr9MVpG+9rY20RRbv0mEAjbKtXxx9G6sxA66W9kK4+wqGlff+XgDch/DcxhQSoyIceRKr1j5jqA3uWQm9l49LvzL3fCxP51G9bpakeeX/MXRiu90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739780331; c=relaxed/simple;
-	bh=wc6TIz6eCVeVGn8h0Vq5MmD8aIAeFnI7/irUmf2viIM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eDwgIUW5SuXr9m8E/AzAqoTDF4ao4wsZ4MQfkt2OILGCWwwWEDEil+MaGd5MO2yMVkGXC9yka7acwxrc+eqrwVQStwee6LuF6A7cfxwkkjTeucxaaRxTqMpXGFgRzPeWw28I5pyQAkdqiMHboL+tDuh4D0pjxs6TbV2fTsxOp58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ibRKupyI; arc=none smtp.client-ip=198.175.65.11
+	s=arc-20240116; t=1739780333; c=relaxed/simple;
+	bh=xqSOLjyi089bY2ndKhL6A+1UkPmyvIO0I3dcjqPvT+Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rO4+ptJNX5Bzm3C0XZywcZ2ZQha1sCiYlP/G5/Y3ecVkJuWelut+CkiHOzQ2+J+nFfieCuBgyjRyRV1M7uO/mHllcnQciy5B4ZupouUNfYbl784qQdXbmxc4MrAQZqv+urpTR7RlOgoJ6x8wj6DUtNbRnkiw2hoGhBsr2hW3aUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AM+APp6N; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739780329; x=1771316329;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wc6TIz6eCVeVGn8h0Vq5MmD8aIAeFnI7/irUmf2viIM=;
-  b=ibRKupyIBJkUQ0UHMSilGLEdMt2Zh+6k3H4xmYmmOjHIVuc5aYv9HmT1
-   +4GseM1/Y0uy4BMZypd50WfhV9abUBzhSUZV+iWOp4YPOs0JqLEf9oje3
-   NbMCSTvNgkWQqjETfvedQWgEVxaIHe7xHujjip+cLblpMrrXvbBSY1Gml
-   kZfyQ/Xf90GnuWQhJzjCOc1E2sXTxlOB+fSQUQOsQfzGtMXQloPGDmsCW
-   sp8posBjeL3N6NCPDSOVAKGNhvG0cypoF1/YkMX++311P4LSuEpt8uomC
-   G/aIag+nPkLu/t64G38iQR1xEwGyJwPmi0ibG1LWDMSOV+3lUbIi7slBo
+  t=1739780331; x=1771316331;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xqSOLjyi089bY2ndKhL6A+1UkPmyvIO0I3dcjqPvT+Q=;
+  b=AM+APp6N8CqrI39hAeLWSIYB7q6/qy83UGdpZ4+Plwec1wW+6QFAnBch
+   91XJ57pkkW5pGwRaVQ6jIOvV7SJcF5+687fnx1NXx2fHwRZjMMVnbaWWi
+   VDiZOLj3ZJa8QwnSW+WZv7+rYBQO+7goq7fHIuYxa3K1XhzsjIWMYoaqY
+   MfBk59j7TnVHKRee7Uwcy2Uh18VujdUJ11qb5C0+sutBD/HexIeo+tzzk
+   +VQh7rgBmyBTaqnNWZk2UqQVTuo+YqHspVUinruzN5yBRbVYB9kbiNbxX
+   BfInAwchz/Mj5zEFV3cjq9B3JmSW+BteEYk85NT4jLYOM5ZbUeC2buXit
    Q==;
-X-CSE-ConnectionGUID: SXh8BWS7SsaFhU3ZOtU+eA==
-X-CSE-MsgGUID: KEdEcLXBRxCZRkE1E2XsZw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11347"; a="50668956"
+X-CSE-ConnectionGUID: gGLUXB5aRLih0pH038Feiw==
+X-CSE-MsgGUID: QlPh+ZwKR1qFAFLnewl03g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11347"; a="50668966"
 X-IronPort-AV: E=Sophos;i="6.13,292,1732608000"; 
-   d="scan'208";a="50668956"
+   d="scan'208";a="50668966"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:18:48 -0800
-X-CSE-ConnectionGUID: qfXuWP3aT1m9kTZfWoVB6w==
-X-CSE-MsgGUID: T5uxHi2zQqiLC1w/6MbbKw==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:18:51 -0800
+X-CSE-ConnectionGUID: vLkH71JoTcaZPs2UNAiUVA==
+X-CSE-MsgGUID: 7338LJpHQTO0rKHzS9lRAg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="118690152"
+   d="scan'208";a="118690172"
 Received: from emr-bkc.sh.intel.com ([10.112.230.82])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:18:45 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:18:48 -0800
 From: Chenyi Qiang <chenyi.qiang@intel.com>
 To: David Hildenbrand <david@redhat.com>,
 	Alexey Kardashevskiy <aik@amd.com>,
@@ -72,10 +73,12 @@ Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
 	Gao Chao <chao.gao@intel.com>,
 	Xu Yilun <yilun.xu@intel.com>,
 	Li Xiaoyao <xiaoyao.li@intel.com>
-Subject: [PATCH v2 0/6] Enable shared device assignment
-Date: Mon, 17 Feb 2025 16:18:19 +0800
-Message-ID: <20250217081833.21568-1-chenyi.qiang@intel.com>
+Subject: [PATCH v2 1/6] memory: Export a helper to get intersection of a MemoryRegionSection with a given range
+Date: Mon, 17 Feb 2025 16:18:20 +0800
+Message-ID: <20250217081833.21568-2-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20250217081833.21568-1-chenyi.qiang@intel.com>
+References: <20250217081833.21568-1-chenyi.qiang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,145 +87,141 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is the v2 series of the shared device assignment support.
+Rename the helper to memory_region_section_intersect_range() to make it
+more generic. Meanwhile, define the @end as Int128 and replace the
+related operations with Int128_* format since the helper is exported as
+a wider API.
 
-The overview of this series:
-- Patch 1-2: preparation patches. One is to export a helper to get
-  intersection of a MemoryRegionSection with a given range. The other is
-  to change the memory_region_set_ram_discard_manager() to return the
-  result.
-- Patch 3-4: Introduce a new object to implement RamDiscardManager
-  interface and a callback to notify the shared/private state change.
-- Patch 5: Store the new object including guest_memfd information in
-  RAMBlock. Register the RamDiscardManager instance to the target
-  RAMBlock's MemoryRegion so that the object can notify the page
-  conversion events to other systems.
-- Patch 6: Unlock the coordinate discard so that the shared device
-  assignment (VFIO) can work with guest_memfd.
-
-Compared with v1 series, the main changes are:
-
-- Rename the class name from GuestMemfdManager to MemoryAttributeManager.
-- Add a new field in RAMBlock to store the guest_memfd information.
-- Add patch 02 to make memory_region_set_ram_discard_manager() return the result.
-- Drop the patch 07 in v1 series which is an extension and not necessary for the current series.
-- v1: https://lore.kernel.org/qemu-devel/20241213070852.106092-1-chenyi.qiang@intel.com/
-
-More small changes or details can be found in the individual patches.
-
-Background
-==========
-Confidential VMs have two classes of memory: shared and private memory.
-Shared memory is accessible from the host/VMM while private memory is
-not. Confidential VMs can decide which memory is shared/private and
-convert memory between shared/private at runtime.
-
-"guest_memfd" is a new kind of fd whose primary goal is to serve guest
-private memory. In current implementation, shared memory is allocated
-with normal methods (e.g. mmap or fallocate) while private memory is
-allocated from guest_memfd. When a VM performs memory conversions, QEMU
-frees pages via madvise or via PUNCH_HOLE on memfd or guest_memfd from
-one side, and allocates new pages from the other side. This will cause a
-stale IOMMU mapping issue mentioned in [1] when we try to enable shared
-device assignment in confidential VMs.
-
-Solution
-========
-The key to enable shared device assignment is to update the IOMMU mappings
-on page conversion. RamDiscardManager, an existing interface currently
-utilized by virtio-mem, offers a means to modify IOMMU mappings in
-accordance with VM page assignment. Page conversion is similar to
-hot-removing a page in one mode and adding it back in the other.
-
-This series implements a RamDiscardManager for confidential VMs and
-utilizes its infrastructure to notify VFIO of page conversions.
-
-Relationship with in-place page conversion
-==========================================
-To support 1G page support for guest_memfd [2], the current direction is to
-allow mmap() of guest_memfd to userspace so that both private and shared
-memory can use the same physical pages as the backend. This in-place page
-conversion design eliminates the need to discard pages during shared/private
-conversions. However, device assignment will still be blocked because the
-in-place page conversion will reject the conversion when the page is pinned
-by VFIO.
-
-To address this, the key difference lies in the sequence of VFIO map/unmap
-operations and the page conversion. It can be adjusted to achieve
-unmap-before-conversion-to-private and map-after-conversion-to-shared,
-ensuring compatibility with guest_memfd.
-
-Limitation
-==========
-One limitation is that VFIO expects the DMA mapping for a specific IOVA
-to be mapped and unmapped with the same granularity. The guest may
-perform partial conversions, such as converting a small region within a
-larger region. To prevent such invalid cases, all operations are
-performed with 4K granularity. This could be optimized after the
-cut_mapping operation [3] is introduced in future. We can alway perform a
-split-before-unmap if partial conversions happen. If the split succeeds,
-the unmap will succeed and be atomic. If the split fails, the unmap
-process fails.
-
-Testing
-=======
-This patch series is tested based on TDX patches available at:
-KVM: https://github.com/intel/tdx/tree/tdx_kvm_dev-2025-02-10
-QEMU: https://github.com/intel-staging/qemu-tdx/tree/tdx-upstream-snapshot-2025-02-17-v2
-
-To facilitate shared device assignment with the NIC, employ the legacy
-type1 VFIO with the QEMU command:
-
-qemu-system-x86_64 [...]
-    -device vfio-pci,host=XX:XX.X
-
-The parameter of dma_entry_limit needs to be adjusted. For example, a
-16GB guest needs to adjust the parameter like
-vfio_iommu_type1.dma_entry_limit=4194304.
-
-If use the iommufd-backed VFIO with the qemu command:
-
-qemu-system-x86_64 [...]
-    -object iommufd,id=iommufd0 \
-    -device vfio-pci,host=XX:XX.X,iommufd=iommufd0
-
-No additional adjustment required.
-
-Following the bootup of the TD guest, the guest's IP address becomes
-visible, and iperf is able to successfully send and receive data.
-
-Related link
-============
-[1] https://lore.kernel.org/qemu-devel/20240423150951.41600-54-pbonzini@redhat.com/
-[2] https://lore.kernel.org/lkml/cover.1726009989.git.ackerleytng@google.com/
-[3] https://lore.kernel.org/linux-iommu/7-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com/
-
+Suggested-by: Alexey Kardashevskiy <aik@amd.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 ---
-Chenyi Qiang (6):
-  memory: Export a helper to get intersection of a MemoryRegionSection
-    with a given range
-  memory: Change memory_region_set_ram_discard_manager() to return the
-    result
-  memory-attribute-manager: Introduce MemoryAttributeManager to manage
-    RAMBLock with guest_memfd
-  memory-attribute-manager: Introduce a callback to notify the
-    shared/private state change
-  memory: Attach MemoryAttributeManager to guest_memfd-backed RAMBlocks
-  RAMBlock: Make guest_memfd require coordinate discard
+Changes in v2:
+- Make memory_region_section_intersect_range() an inline function.
+- Add Reviewed-by from David
+- Define the @end as Int128 and use the related Int128_* ops as a wilder
+  API (Alexey)
+---
+ hw/virtio/virtio-mem.c | 32 +++++---------------------------
+ include/exec/memory.h  | 27 +++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+), 27 deletions(-)
 
- accel/kvm/kvm-all.c                       |   9 +
- hw/virtio/virtio-mem.c                    |  62 ++-
- include/exec/memory.h                     |  33 +-
- include/exec/ramblock.h                   |   2 +
- include/system/memory-attribute-manager.h |  62 +++
- system/memory-attribute-manager.c         | 440 ++++++++++++++++++++++
- system/memory.c                           |  11 +-
- system/meson.build                        |   1 +
- system/physmem.c                          |  17 +-
- 9 files changed, 589 insertions(+), 48 deletions(-)
- create mode 100644 include/system/memory-attribute-manager.h
- create mode 100644 system/memory-attribute-manager.c
-
+diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+index b1a003736b..21f16e4912 100644
+--- a/hw/virtio/virtio-mem.c
++++ b/hw/virtio/virtio-mem.c
+@@ -244,28 +244,6 @@ static int virtio_mem_for_each_plugged_range(VirtIOMEM *vmem, void *arg,
+     return ret;
+ }
+ 
+-/*
+- * Adjust the memory section to cover the intersection with the given range.
+- *
+- * Returns false if the intersection is empty, otherwise returns true.
+- */
+-static bool virtio_mem_intersect_memory_section(MemoryRegionSection *s,
+-                                                uint64_t offset, uint64_t size)
+-{
+-    uint64_t start = MAX(s->offset_within_region, offset);
+-    uint64_t end = MIN(s->offset_within_region + int128_get64(s->size),
+-                       offset + size);
+-
+-    if (end <= start) {
+-        return false;
+-    }
+-
+-    s->offset_within_address_space += start - s->offset_within_region;
+-    s->offset_within_region = start;
+-    s->size = int128_make64(end - start);
+-    return true;
+-}
+-
+ typedef int (*virtio_mem_section_cb)(MemoryRegionSection *s, void *arg);
+ 
+ static int virtio_mem_for_each_plugged_section(const VirtIOMEM *vmem,
+@@ -287,7 +265,7 @@ static int virtio_mem_for_each_plugged_section(const VirtIOMEM *vmem,
+                                       first_bit + 1) - 1;
+         size = (last_bit - first_bit + 1) * vmem->block_size;
+ 
+-        if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
++        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
+             break;
+         }
+         ret = cb(&tmp, arg);
+@@ -319,7 +297,7 @@ static int virtio_mem_for_each_unplugged_section(const VirtIOMEM *vmem,
+                                  first_bit + 1) - 1;
+         size = (last_bit - first_bit + 1) * vmem->block_size;
+ 
+-        if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
++        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
+             break;
+         }
+         ret = cb(&tmp, arg);
+@@ -355,7 +333,7 @@ static void virtio_mem_notify_unplug(VirtIOMEM *vmem, uint64_t offset,
+     QLIST_FOREACH(rdl, &vmem->rdl_list, next) {
+         MemoryRegionSection tmp = *rdl->section;
+ 
+-        if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
++        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
+             continue;
+         }
+         rdl->notify_discard(rdl, &tmp);
+@@ -371,7 +349,7 @@ static int virtio_mem_notify_plug(VirtIOMEM *vmem, uint64_t offset,
+     QLIST_FOREACH(rdl, &vmem->rdl_list, next) {
+         MemoryRegionSection tmp = *rdl->section;
+ 
+-        if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
++        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
+             continue;
+         }
+         ret = rdl->notify_populate(rdl, &tmp);
+@@ -388,7 +366,7 @@ static int virtio_mem_notify_plug(VirtIOMEM *vmem, uint64_t offset,
+             if (rdl2 == rdl) {
+                 break;
+             }
+-            if (!virtio_mem_intersect_memory_section(&tmp, offset, size)) {
++            if (!memory_region_section_intersect_range(&tmp, offset, size)) {
+                 continue;
+             }
+             rdl2->notify_discard(rdl2, &tmp);
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 3ee1901b52..3bebc43d59 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1202,6 +1202,33 @@ MemoryRegionSection *memory_region_section_new_copy(MemoryRegionSection *s);
+  */
+ void memory_region_section_free_copy(MemoryRegionSection *s);
+ 
++/**
++ * memory_region_section_intersect_range: Adjust the memory section to cover
++ * the intersection with the given range.
++ *
++ * @s: the #MemoryRegionSection to be adjusted
++ * @offset: the offset of the given range in the memory region
++ * @size: the size of the given range
++ *
++ * Returns false if the intersection is empty, otherwise returns true.
++ */
++static inline bool memory_region_section_intersect_range(MemoryRegionSection *s,
++                                                         uint64_t offset, uint64_t size)
++{
++    uint64_t start = MAX(s->offset_within_region, offset);
++    Int128 end = int128_min(int128_add(int128_make64(s->offset_within_region), s->size),
++                            int128_add(int128_make64(offset), int128_make64(size)));
++
++    if (int128_le(end, int128_make64(start))) {
++        return false;
++    }
++
++    s->offset_within_address_space += start - s->offset_within_region;
++    s->offset_within_region = start;
++    s->size = int128_sub(end, int128_make64(start));
++    return true;
++}
++
+ /**
+  * memory_region_init: Initialize a memory region
+  *
 -- 
 2.43.5
 
