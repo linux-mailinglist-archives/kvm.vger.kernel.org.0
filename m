@@ -1,198 +1,280 @@
-Return-Path: <kvm+bounces-38352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6591A37F91
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 11:13:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2D0A37F96
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 11:14:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFA80189A9F3
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 10:08:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F02E7A32D1
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 10:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA87218592;
-	Mon, 17 Feb 2025 10:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7808321660F;
+	Mon, 17 Feb 2025 10:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XHsffdNj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pu2P/1WY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4165121766A;
-	Mon, 17 Feb 2025 10:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063EF19994F
+	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 10:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739786815; cv=none; b=YFINC+Nv1rV9+HnURn5HftcNY5PD3hcmPG1rFfy5uU/cnv7RpxnBki1QuaNYz+A5Sk1N2tcPUBdwdV3u/WAW7ENq8825yxqX2c2G2UjabYm8BfY1CzUrG6XmkYD6n2123+S/riZrYJEZWFenA9XWu3QUrHQtsK5tnhqvbMAueHc=
+	t=1739787179; cv=none; b=JAijAJ3aFi4oXJiZcTVO0M2T2B8XIaBK+EFlm8aGt66c0kme20IAexR+8GJMbfH0VduUUkjWPYE9NK6NCNx1IVsxc/s78R1+lt3JwejYj7296Ve6++U86fK/qIrGC3hbvrMTLgjKEBC6lrwLPYQend27v40ThCz6QU+9jE3gsQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739786815; c=relaxed/simple;
-	bh=558d9/IVBYnUtRILUcTAq7bt9vxz/+fiXDjqRWuB0eg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PmmkeZx+Tkk1L1QxO75ZoDfJzR2wNwVpFlzQ9gU3Xx+mP3qQ+M9zD/z7z6OzBA00naqvyLLy5NJKc0uRdayYtt7moY4oi1kX80ru+lkD6dctVEIlja8+NvCrcW6da0J7rVKeskw6lSB7BudoTxkysJJDFfGvMb/e6cMuw9z53rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XHsffdNj; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51H18nQ3015205;
-	Mon, 17 Feb 2025 10:06:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=hfJFI3kZ5VCZCB7Js
-	iW1N0I9+4gi+bwnuBr+APbwOWM=; b=XHsffdNjZW9RU6XdKadUkM7y5zlbzMBE1
-	FDBJ2nSkVyq/CBNy+m4vIPUp4c3sLDOxNWfeIUrjm5DNVbA6VQ/iJq06Ks3+0sMM
-	3oVLBXF5+MSwMWmSIW4g3VET5imQNGDUP8UrKV0Uz9beE6aQimq8u3I0hr2Zj2FQ
-	iLARE46GOFDZ4MbZqvwItbS+CrArxxhcXPqgUpEcjfhVET2ERBVdXwtT4oAmjdri
-	3PceJXI72DYj7q7gI31sC2lyYO3j6FXMiB5wLL+5wjlVVnVP487NuN+852+Uao2d
-	KFD6Cp6kSZpfHxBcjOxFfT1kFSQXcFChJEy6edICb7vuixn7AqSgA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44uu69a51n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Feb 2025 10:06:30 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51H8MxO4001633;
-	Mon, 17 Feb 2025 10:06:29 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44u5mynnna-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Feb 2025 10:06:29 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51HA6Pjg55443788
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Feb 2025 10:06:25 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8465E20063;
-	Mon, 17 Feb 2025 10:06:25 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 476F82006A;
-	Mon, 17 Feb 2025 10:06:25 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 17 Feb 2025 10:06:25 +0000 (GMT)
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Thorsten Blum <thorsten.blum@linux.dev>
-Subject: [PATCH 2/2] s390/vfio-ccw: make mdev_types not look like a fake flex array
-Date: Mon, 17 Feb 2025 11:06:14 +0100
-Message-ID: <20250217100614.3043620-3-pasic@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250217100614.3043620-1-pasic@linux.ibm.com>
-References: <20250217100614.3043620-1-pasic@linux.ibm.com>
+	s=arc-20240116; t=1739787179; c=relaxed/simple;
+	bh=WVxCOhWZGD/ptOjl/WOx16aD8EEAF52M6nYUtx2JbSc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gUbc7j3Ibc5CjWF8LHFQdGr1cOb82rc05LfA3BNObe99DKGWtaFUn2xXedhK4eLrbkm8wkm6AAJQQ6RcAdWXy56BNe4kXn+mDrgpwT9vxbz7HB0IPXUK791t1+OqOVXM0SZv7SNT/+xaI3WrMMPGWAcsyDpKTvju0Lg6mwQAA34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pu2P/1WY; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-471f1dd5b80so147381cf.1
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 02:12:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739787177; x=1740391977; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=nlKhym8zl9LGwKUmtUYv9YGT5GjDeZYP6xFQFUouwy4=;
+        b=pu2P/1WYpLahQMj5z/sPMN5v9bPRzkGMU4ygvMVw41B1Uav2yTFsvJQMM2+QSnYece
+         sK0zVSKcKT6bAans5HSU4EeMcl+1p85GLn8oJXd6+ikVkUHQPmwukbn0ySwFwWhXz3GR
+         uQxZgMY48GeWtplBUVu0+rWtIMP9ut2RV1kkUrPJJrMYMiHlMgMNHka8CHKq+6GZDXrA
+         fukbHKFfv2eF/WYWW/tP+9CrBgMIW4wT6SCUvFYQfBai7M2pdGoj6MkpFRuRumscRorP
+         zf00KnTYxvGezcZC1Tzara8TnxZEfMHEGJZm8xiIk1vfUpQGN7uywb9g0LmJFOv9UqW1
+         5ODg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739787177; x=1740391977;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nlKhym8zl9LGwKUmtUYv9YGT5GjDeZYP6xFQFUouwy4=;
+        b=LJhFcNeejhAY8FO8/em8hTopA+sgZTLVsZzW/2pm7TA9xtR5OXedBkluMUv6cF25Qh
+         VmbeB81LB8w4bl4PkKQU0koiK+QqKbNi9ESWvJVLaUd86Dl5xMEAbj4EyQm+bsTfiBIt
+         jecgh2FnHgflOk6SUutmRsBplQ0TSUpyWESM9dzUm6hIFf3rZzTkqkaRAx0ilMDRJ+AC
+         yGib7PAcT3sbU0fkyxqSj/QF0XZ9HT8S0xMoguxfFq2wXCEuUD/PIqmPdRoei/mdnwsp
+         5VyD7vXTCgKGuZhYM9JFt3FX5YrXDmLDGmBLycGY651h77fnURl6a+2u6VrlOWSZSxCi
+         Ywag==
+X-Gm-Message-State: AOJu0YzTdTkXcXIhA3Xyyt5/f9Ql+9asynzU35RCreYKrxxu05DunSp3
+	NqqMLEAFlaNgmla1q5khILpy6kDN6XbbJqqdMnZEhTruC7Ps7t4CNkmgCYFnhSXcrvIqbVFeLWd
+	zcIzDjTj/Fbynk8L+BFD1xEYxfA6hEJ/SSnu4
+X-Gm-Gg: ASbGncvL9kzWN/OUYidJtqgH0U0iSF8AReKzJvuDNo8ciO3mg/90VfqfxUo61ee1uJ7
+	uKBSdi7IWgLBnEeKNAEOfiVPY0UB6ZAdd3qptc1kxf+3Dfb1dqVZZlGUfaREEug9e0yZYDc0=
+X-Google-Smtp-Source: AGHT+IGVLbRb2Tt68lERDKYQOH+x23qhLGTcRpfU/KEsvdcIcS3tMurxSoV6UshE+HSt+vvSMY+LmrnRvG808PQzWGs=
+X-Received: by 2002:ac8:7f12:0:b0:46c:7cf2:d7b2 with SMTP id
+ d75a77b69052e-471dc8efeadmr5803591cf.18.1739787176573; Mon, 17 Feb 2025
+ 02:12:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Nisoc6HnoD0j1Gl5QcbaBTgUpqRHKjHX
-X-Proofpoint-ORIG-GUID: Nisoc6HnoD0j1Gl5QcbaBTgUpqRHKjHX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-17_04,2025-02-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- malwarescore=0 priorityscore=1501 suspectscore=0 impostorscore=0
- lowpriorityscore=0 spamscore=0 clxscore=1015 mlxscore=0 mlxlogscore=888
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502170088
+References: <20250211121128.703390-1-tabba@google.com> <20250211121128.703390-3-tabba@google.com>
+ <4311493d-c709-485a-a36d-456e5c57c593@suse.cz>
+In-Reply-To: <4311493d-c709-485a-a36d-456e5c57c593@suse.cz>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 17 Feb 2025 10:12:20 +0000
+X-Gm-Features: AWEUYZnhQhBRvgy6eE-Fs5AKJxSeCgZAX5UjioT0ujGOI4-boR97-G0BW1BoAKM
+Message-ID: <CA+EHjTxOmSQA90joVqR90cJ_eTrdvNfmAgtUmopP_ZdcaCPcjQ@mail.gmail.com>
+Subject: Re: [PATCH v3 02/11] KVM: guest_memfd: Handle final folio_put() of
+ guest_memfd pages
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	pbonzini@redhat.com, chenhuacai@kernel.org, mpe@ellerman.id.au, 
+	anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, seanjc@google.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, willy@infradead.org, akpm@linux-foundation.org, 
+	xiaoyao.li@intel.com, yilun.xu@intel.com, chao.p.peng@linux.intel.com, 
+	jarkko@kernel.org, amoorthy@google.com, dmatlack@google.com, 
+	yu.c.zhang@linux.intel.com, isaku.yamahata@intel.com, mic@digikod.net, 
+	vannapurve@google.com, ackerleytng@google.com, mail@maciej.szmigiero.name, 
+	david@redhat.com, michael.roth@amd.com, wei.w.wang@intel.com, 
+	liam.merwick@oracle.com, isaku.yamahata@gmail.com, 
+	kirill.shutemov@linux.intel.com, suzuki.poulose@arm.com, steven.price@arm.com, 
+	quic_eberman@quicinc.com, quic_mnalajal@quicinc.com, quic_tsoni@quicinc.com, 
+	quic_svaddagi@quicinc.com, quic_cvanscha@quicinc.com, 
+	quic_pderrin@quicinc.com, quic_pheragu@quicinc.com, catalin.marinas@arm.com, 
+	james.morse@arm.com, yuzenghui@huawei.com, oliver.upton@linux.dev, 
+	maz@kernel.org, will@kernel.org, qperret@google.com, keirf@google.com, 
+	roypat@amazon.co.uk, shuah@kernel.org, hch@infradead.org, jgg@nvidia.com, 
+	rientjes@google.com, jhubbard@nvidia.com, fvdl@google.com, hughd@google.com, 
+	jthoughton@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-The vfio-ccw driver and the vfio parent device provided by it (parent)
-support just a single mdev_type, and this is not likely to change any
-time soon. To match the mdev interfaces nicely initially the choice was
-made that mdev_types (which gets passed into mdev_register_parent())
-shall be an array of pointers to struct mdev_type with a single element,
-and to make things worse it ended up being the last member.
+Hi Vlastimil,
 
-Now the problem with that is that before C99 the usual way to get
-something similar to a flexible array member was to use a trailing array
-of size 0 or 1. This is what I called fake flex array. For a while now
-the community is trying to get rid of fake flex arrays. And while
-mdev_types was not a fake flex array but an array of size one, because
-it can easily be and probably was mistaken for a fake flex array it got
-converted into a real C99 flex array with a compile time known constant
-size of one.
+On Mon, 17 Feb 2025 at 09:49, Vlastimil Babka <vbabka@suse.cz> wrote:
+>
+> On 2/11/25 13:11, Fuad Tabba wrote:
+> > Before transitioning a guest_memfd folio to unshared, thereby
+> > disallowing access by the host and allowing the hypervisor to
+> > transition its view of the guest page as private, we need to be
+> > sure that the host doesn't have any references to the folio.
+> >
+> > This patch introduces a new type for guest_memfd folios, which
+> > isn't activated in this series but is here as a placeholder and
+> > to facilitate the code in the next patch. This will be used in
+>
+> It's not clear to me how the code in the next page is facilitated as it
+> doesn't use any of this?
 
-As per [1] it was established that "only fake flexible arrays should be
-transformed into C99 flex-array members". Since IMHO the entire point of
-flex arrays is being flexible about the array size at run time, a C99
-flex array is a poor fit for mdev_types.  But an array of a size one is
-a poor fit as well for the reason stated above, let us try to get rid of
-the flex array without introducing back the one sized array.
+I'm sorry about that, I'm missing the word "series". i.e.,
 
-So, lets make mdev_types a pointer to struct mdev_type and pass in the
-address of that pointer as the 4th formal parameter of
-mdev_register_parent().
+> > This patch introduces a new type for guest_memfd folios, which
+> > isn't activated in this series but is here as a placeholder and
+> > to facilitate the code in the next patch *series*.
 
-[1] https://lore.kernel.org/lkml/85863d7a-2d8b-4c1b-b76a-e2f40834a7a8@embeddedor.com/
+I'm referring to this series:
+https://lore.kernel.org/all/20250117163001.2326672-1-tabba@google.com/
 
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Tested-by: Eric Farman <farman@linux.ibm.com>
+> > the future to register a callback that informs the guest_memfd
+> > subsystem when the last reference is dropped, therefore knowing
+> > that the host doesn't have any remaining references.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  include/linux/kvm_host.h   |  9 +++++++++
+> >  include/linux/page-flags.h | 17 +++++++++++++++++
+> >  mm/debug.c                 |  1 +
+> >  mm/swap.c                  |  9 +++++++++
+> >  virt/kvm/guest_memfd.c     |  7 +++++++
+> >  5 files changed, 43 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index f34f4cfaa513..8b5f28f6efff 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2571,4 +2571,13 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> >                                   struct kvm_pre_fault_memory *range);
+> >  #endif
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +void kvm_gmem_handle_folio_put(struct folio *folio);
+> > +#else
+> > +static inline void kvm_gmem_handle_folio_put(struct folio *folio)
+> > +{
+> > +     WARN_ON_ONCE(1);
+> > +}
+>
+> Since the caller is guarded by CONFIG_KVM_GMEM_SHARED_MEM, do we need the
+> CONFIG_KVM_GMEM_SHARED_MEM=n variant at all?
 
----
+No. I'll remove it.
 
-I've also considered switching up the order in which the members
-mdev_types and mdev_type are defined in struct vfio_ccw_parent but
-decided against that because that could look to somebody like
-well known mistake that can be made when using fake flex arrays.
----
- drivers/s390/cio/vfio_ccw_drv.c     | 6 +++---
- drivers/s390/cio/vfio_ccw_private.h | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+> > +#endif
+> > +
+> >  #endif
+> > diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> > index 6dc2494bd002..734afda268ab 100644
+> > --- a/include/linux/page-flags.h
+> > +++ b/include/linux/page-flags.h
+> > @@ -933,6 +933,17 @@ enum pagetype {
+> >       PGTY_slab       = 0xf5,
+> >       PGTY_zsmalloc   = 0xf6,
+> >       PGTY_unaccepted = 0xf7,
+> > +     /*
+> > +      * guestmem folios are used to back VM memory as managed by guest_memfd.
+> > +      * Once the last reference is put, instead of freeing these folios back
+> > +      * to the page allocator, they are returned to guest_memfd.
+> > +      *
+> > +      * For now, guestmem will only be set on these folios as long as they
+> > +      * cannot be mapped to user space ("private state"), with the plan of
+>
+> Might be a bit misleading as I don't think it's set yet as of this series.
+> But I guess we can keep it to avoid another update later.
 
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index 914dde041675..6ff5c9cfb7ed 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -171,7 +171,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
- 		return -ENODEV;
- 	}
- 
--	parent = kzalloc(struct_size(parent, mdev_types, 1), GFP_KERNEL);
-+	parent = kzalloc(sizeof(*parent), GFP_KERNEL);
- 	if (!parent)
- 		return -ENOMEM;
- 
-@@ -186,10 +186,10 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
- 
- 	parent->mdev_type.sysfs_name = "io";
- 	parent->mdev_type.pretty_name = "I/O subchannel (Non-QDIO)";
--	parent->mdev_types[0] = &parent->mdev_type;
-+	parent->mdev_types = &parent->mdev_type;
- 	ret = mdev_register_parent(&parent->parent, &sch->dev,
- 				   &vfio_ccw_mdev_driver,
--				   parent->mdev_types, 1);
-+				   &parent->mdev_types, 1);
- 	if (ret)
- 		goto out_unreg;
- 
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index b62bbc5c6376..0501d4bbcdbd 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -79,7 +79,7 @@ struct vfio_ccw_parent {
- 
- 	struct mdev_parent	parent;
- 	struct mdev_type	mdev_type;
--	struct mdev_type	*mdev_types[];
-+	struct mdev_type	*mdev_types;
- };
- 
- /**
--- 
-2.45.2
+You're right, it's not in this series. But as you said, the idea is to
+have the least amount of churn in the core mm code.
 
+> > +      * always setting that type once typed folios can be mapped to user
+> > +      * space cleanly.
+> > +      */
+> > +     PGTY_guestmem   = 0xf8,
+> >
+> >       PGTY_mapcount_underflow = 0xff
+> >  };
+> > @@ -1082,6 +1093,12 @@ FOLIO_TYPE_OPS(hugetlb, hugetlb)
+> >  FOLIO_TEST_FLAG_FALSE(hugetlb)
+> >  #endif
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +FOLIO_TYPE_OPS(guestmem, guestmem)
+> > +#else
+> > +FOLIO_TEST_FLAG_FALSE(guestmem)
+> > +#endif
+> > +
+> >  PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
+> >
+> >  /*
+> > diff --git a/mm/debug.c b/mm/debug.c
+> > index 8d2acf432385..08bc42c6cba8 100644
+> > --- a/mm/debug.c
+> > +++ b/mm/debug.c
+> > @@ -56,6 +56,7 @@ static const char *page_type_names[] = {
+> >       DEF_PAGETYPE_NAME(table),
+> >       DEF_PAGETYPE_NAME(buddy),
+> >       DEF_PAGETYPE_NAME(unaccepted),
+> > +     DEF_PAGETYPE_NAME(guestmem),
+> >  };
+> >
+> >  static const char *page_type_name(unsigned int page_type)
+> > diff --git a/mm/swap.c b/mm/swap.c
+> > index 47bc1bb919cc..241880a46358 100644
+> > --- a/mm/swap.c
+> > +++ b/mm/swap.c
+> > @@ -38,6 +38,10 @@
+> >  #include <linux/local_lock.h>
+> >  #include <linux/buffer_head.h>
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +#include <linux/kvm_host.h>
+> > +#endif
+>
+> Do we need to guard the include?
+
+Yes, otherwise allnoconfig complains due to many of the x86 things it
+drags along if included but KVM isn't configured. I could put it in a
+different header that doesn't have this problem, but I couldn't think
+of a better header for this.
+
+Thank you,
+/fuad
+
+> > +
+> >  #include "internal.h"
+> >
+> >  #define CREATE_TRACE_POINTS
+> > @@ -101,6 +105,11 @@ static void free_typed_folio(struct folio *folio)
+> >       case PGTY_hugetlb:
+> >               free_huge_folio(folio);
+> >               return;
+> > +#endif
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +     case PGTY_guestmem:
+> > +             kvm_gmem_handle_folio_put(folio);
+> > +             return;
+> >  #endif
+> >       default:
+> >               WARN_ON_ONCE(1);
+> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> > index b2aa6bf24d3a..c6f6792bec2a 100644
+> > --- a/virt/kvm/guest_memfd.c
+> > +++ b/virt/kvm/guest_memfd.c
+> > @@ -312,6 +312,13 @@ static pgoff_t kvm_gmem_get_index(struct kvm_memory_slot *slot, gfn_t gfn)
+> >       return gfn - slot->base_gfn + slot->gmem.pgoff;
+> >  }
+> >
+> > +#ifdef CONFIG_KVM_GMEM_SHARED_MEM
+> > +void kvm_gmem_handle_folio_put(struct folio *folio)
+> > +{
+> > +     WARN_ONCE(1, "A placeholder that shouldn't trigger. Work in progress.");
+> > +}
+> > +#endif /* CONFIG_KVM_GMEM_SHARED_MEM */
+> > +
+> >  static struct file_operations kvm_gmem_fops = {
+> >       .open           = generic_file_open,
+> >       .release        = kvm_gmem_release,
+>
 
