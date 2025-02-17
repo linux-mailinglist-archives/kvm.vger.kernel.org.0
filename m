@@ -1,171 +1,119 @@
-Return-Path: <kvm+bounces-38376-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38377-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C44AEA388D6
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 17:09:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1096A388DE
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 17:11:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EB4F1625D6
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 16:04:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57A3E3A213D
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 16:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6FB225385;
-	Mon, 17 Feb 2025 16:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BA82253B7;
+	Mon, 17 Feb 2025 16:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sympatico.ca header.i=@sympatico.ca header.b="pzeZuRu8"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="KeB+11la"
 X-Original-To: kvm@vger.kernel.org
-Received: from cmx-mtlrgo001.bell.net (mta-mtl-007.bell.net [209.71.208.29])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DD8223700;
-	Mon, 17 Feb 2025 16:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.71.208.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E4F15575C;
+	Mon, 17 Feb 2025 16:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739808284; cv=none; b=uyKfPSdDiwZQwSizfgRabzwQrQjDa0hFlH5BII9PvSeqVta8msgscbIy2KwJE2WMAy5Fg5qsNQMlz2BJFkVxbM86RBC+uIfN/oxU+2ZsXbSAltQHHkXZSClh85KCcf2+6A9fkrexPRji9mi2MnJbdjY33tQMI9yaJShSlrnGQEo=
+	t=1739808478; cv=none; b=lc/S+ItMoNrvE92k0e18b29nnzy/mnSilpozZ5R9ttKu+kc6QjZEGVefD73bd6mEHB5xhNrW704zA6ytuxifYlPJihw/0RY0dr6Lfgz9nN549uuTJ5ySlEh7F0/LKe9zFd9q94oiMTAghQEd1ReiqvLwkg5u9VLzPpC2bc5gPgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739808284; c=relaxed/simple;
-	bh=z4UhrBKFHeB3vPXiHJ4Bl+axcEk//HmrgY726efRnW8=;
-	h=Date:From:Message-ID:To:CC:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SAyN69Bti9Sc6FI0dCIqXC+/fkyliu253mPG8sOmWFTpxCLJZL0iOc29SDs2iVOpTXI/1yWqIQR09TK3yZuT90jkd4nrfN+GUWv818kZ4Rh/vjnuO6s/fPHJUCKMf8E2ARGSk5EwIGTMak1N2uI/PJvxkY46h9AtDgfiA5bBvD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sympatico.ca; spf=pass smtp.mailfrom=sympatico.ca; dkim=pass (2048-bit key) header.d=sympatico.ca header.i=@sympatico.ca header.b=pzeZuRu8; arc=none smtp.client-ip=209.71.208.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sympatico.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sympatico.ca
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sympatico.ca; s=selector1; t=1739808282; 
-        bh=41DYd8S5nzPKADDvgmNVKMBye2mp3t96d0S4S/5x/MU=;
-        h=Date:From:Message-ID:To:Subject:In-Reply-To:References:MIME-Version:Content-Type;
-        b=pzeZuRu8tg/7ROFgQeHf2cK4meMsY0g5+WwLURx/dJgiYg5NiGVUdgewGCZzIuibh4nhKX9YHlHmafHr38A+XYcrhJwe5qeps0jOWOD/AQOzRhxHi+IblP1UL+v/Oe0OTWfYICJiE5vgF77ibD5lB+HP3IRf3oE/++dn4fhm7RiWUaYN2xv0UW9AGPM9DsgZx01Avw6dor6/jeP/glvoJyN2CtPAsMdlo3SpTOjcgOJ1kBx0GTbdWfOwtPHA9tb7oDvHC35QMPC505rez90KzhoG+Np/KL0m+m695ee4AQ3n+S4uby5H++G94g2GHtlHVKRzeBXtZcwOR4MkeCC2ig==
-X-RG-SOPHOS: Clean
-X-RG-VADE-SC: 0
-X-RG-VADE: Clean
-X-RG-Env-Sender: al.dunsmuir@sympatico.ca
-X-RG-Rigid: 67ACA5AF01009087
-X-RazorGate-Vade: dmFkZTGMu6JuLVqLuz3zvC7c6OKmmoJx/rp/Y62QFXTbJQCSvND99pzidzTNP0FoNoeT+DVV8xqc/cEi0E1ntBW/hE4KCN6Y5/Ni7BTyiox9QjrVemw03MswMXHZpvAvsWBAkOZ3G6Zz7VLWHE9aDveciqCfBYF1iLLPcu30qskWnCtVh42odawXvEiks5/HOlebHKhQNnKlTJU1BEFwS519tsIPbAD0MwH5R9jHvLjFUFsHR6FdH6m44PlkEDlLcCW2r+/aueZlns20RoZH8enOhYvFxpVtXKdzuWPnhIONQOnkInmckYWGZ1lwu5jJ+PYbQTgR5kj9Vtui1jnZ/Np9zkU+ldnZD5K6ITn+XVjpSCxzNzCpwX23nGIrg+5S75VC+BkRpfAMbblt78BjS+84cxt16e2PHfT6T5iqOz2/7q6UnrAJ7Fq2pvjqJG3D4k0hrmBFudt0e6xH/aUsN/TQJt1P69E2DKWgIr+VDrtu9nP9jAF0PesKZSHNbB4w3Ho/wZScR4vp/K4LKriQfT8+HxRmp6RrX+4SOYiihZ/24VdXY9x4EjTPn2R4LX6e7bloKkykLD1Rp+mzc5GDxZz3WWVNmcCM0IMEdYUbDhKPsIn7VvSTHRWZz1Aw73BXQSd9YgVq+H1vf5IiY2LRxNlRdF/wS+rq6PUgD5mbNAxFAIQFbA
-X-RazorGate-Vade-Verdict: clean 0
-X-RazorGate-Vade-Classification: clean
-Received: from bucky.alba.lan (76.71.36.239) by cmx-mtlrgo001.bell.net (authenticated as al.dunsmuir@sympatico.ca)
-        id 67ACA5AF01009087; Mon, 17 Feb 2025 11:02:15 -0500
-Date: Mon, 17 Feb 2025 11:02:15 -0500
-From: Al Dunsmuir <al.dunsmuir@sympatico.ca>
-Message-ID: <1972812751.20250217110215@sympatico.ca>
-To: Alexandru Elisei <alexandru.elisei@arm.com>, 
- Andrew Jones <andrew.jones@linux.dev>
-CC: eric.auger@redhat.com, lvivier@redhat.com, thuth@redhat.com, 
- frankja@linux.ibm.com, imbrenda@linux.ibm.com, nrb@linux.ibm.com, 
- david@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org, 
- kvmarm@lists.linux.dev, linuxppc-dev@lists.ozlabs.org, 
- kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org, will@kernel.org, 
- julien.thierry.kdev@gmail.com, maz@kernel.org, oliver.upton@linux.dev, 
- suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, 
- andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 03/18] scripts: Refuse to run the tests if not configured for qemu
-In-Reply-To: <Z6o/rbweZttGReir@arm.com>
-References: <20250120164316.31473-1-alexandru.elisei@arm.com> 
-  <20250120164316.31473-4-alexandru.elisei@arm.com>
-  <20250121-45faf6a9a9681c7c9ece5f44@orel> <Z6nX8YC8ZX9jFiLb@arm.com>
-  <20250210-640ff37c16a0dbccb69f08ea@orel> <Z6o/rbweZttGReir@arm.com>
+	s=arc-20240116; t=1739808478; c=relaxed/simple;
+	bh=ZrsUY4WxM2KXglcaITS5skiOuSbZys77BjzBQjmx1Xs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WJnXgkcf4ZGMNgWgirCwGF32DhPaxalWR3f5R5Sek/Os63b4sR/8M2OZqIAbE4zqliAASKDz5B1qtWaEQd0N0smH5EPGBjC0A/qIo5FljHC4OgWDisWakQkQfw0e8uWY2jqVMT8a7AEOdZ38t+GwNyUw4juMrwQZWOYmENwB2w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=KeB+11la; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7505040E01A3;
+	Mon, 17 Feb 2025 16:07:53 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 66SWbZ7g5m6h; Mon, 17 Feb 2025 16:07:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1739808465; bh=IzM8iArkOMQyqjlaS803SpfwHnZrKVrnYMOCEqL2HNA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KeB+11lauTp3BePXJQFJg4kDy7Cr+L5baHAuO131HM4tlXZCTZXYe8fE6claf8Y4J
+	 1dBMaY42I9QHEaT1a1xNubw+miXz2wh0xogr8loydSeCGzAwFezHppXC1m6KKhDeGH
+	 dV9CdIUhypUx012/I/aoJvorHyGRAw+C6lc/dk+MLCuAXA3EWRNO9c7tcuW0LoW3U7
+	 1FnV4KvBC0JFE6u/ugqWkSxmPdJgikSLYtpCV2Xar4yqIDfRhN2erST4g23vdWai66
+	 utv/v9qEMvdOinJPmVn9Za3wG2cYJj2S+OyzAR5HDwX2XaYakz4lwBAFpjvc006tRo
+	 PF24sXEaeilARnn0fTaY5E24i+lAICIuH4O0PJWMlmleqsaCuMJ1Ht2NCB9efUt6QM
+	 duSU/QwKWKcCyNU0kff2OKexvSP2Z+yBDAwI5cvaXLmaozKIyrO2KUFOC9EshAQbv4
+	 TMnnVdFeWa0IqCQFuv7kwAcSKo2dinV55Elx8voboL00LYWyS8FA9VXh22ut/iQGNi
+	 vMZuAb5bZUDbDZWX9MaS0AWXE0FxDu6b7Yt0/R7tRWineMokHv5s5LGEaxe5z0Jkjm
+	 S2f0aQSTXiOhwbJUMapiKepekl6jbrmctPfT7QZBNBk19DYp90L/QRS/vfagB1bXuT
+	 fJ0KDumQQa4ZRPJ286w27YRY=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4C07740E0191;
+	Mon, 17 Feb 2025 16:07:34 +0000 (UTC)
+Date: Mon, 17 Feb 2025 17:07:28 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Patrick Bellasi <derkling@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Patrick Bellasi <derkling@matbug.net>,
+	Brendan Jackman <jackmanb@google.com>
+Subject: Re: Re: Re: Re: [PATCH] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250217160728.GFZ7NewJHpMaWdiX2M@fat_crate.local>
+References: <20250213142815.GBZ64Bf3zPIay9nGza@fat_crate.local>
+ <20250213175057.3108031-1-derkling@google.com>
+ <20250214201005.GBZ6-jHUff99tmkyBK@fat_crate.local>
+ <20250215125307.GBZ7COM-AkyaF8bNiC@fat_crate.local>
+ <Z7LQX3j5Gfi8aps8@Asmaa.>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z7LQX3j5Gfi8aps8@Asmaa.>
 
-Hello Alexandru,
+On Sun, Feb 16, 2025 at 09:59:59PM -0800, Yosry Ahmed wrote:
+> If 1-2% is the cost for keeping the MSR enabled at all times, I wonder
+> if we should just do that for simplicitly, and have it its own
+> mitigation option (chosen by the cmdline).
 
-On Monday, February 10, 2025, 1:04:29 PM, you wrote:
+Yes, that's what David and I think we should do initially.
 
-> Hi Drew,
+Then we can chase some more involved scheme like setting the bit before the
+first VM runs and then clearing it when the last one exits. I *think* I've
+seen something like that in KVM but I need to stare in detail.
 
-> On Mon, Feb 10, 2025 at 02:56:25PM +0100, Andrew Jones wrote:
->> On Mon, Feb 10, 2025 at 10:41:53AM +0000, Alexandru Elisei wrote:
->> > Hi Drew,
->> > 
->> > On Tue, Jan 21, 2025 at 03:48:55PM +0100, Andrew Jones wrote:
->> > > On Mon, Jan 20, 2025 at 04:43:01PM +0000, Alexandru Elisei wrote:
->> > <snip>
->> > > > ---
->> > > >  arm/efi/run             | 8 ++++++++
->> > > >  arm/run                 | 9 +++++++++
->> > > >  run_tests.sh            | 8 ++++++++
->> > > >  scripts/mkstandalone.sh | 8 ++++++++
->> > > >  4 files changed, 33 insertions(+)
->> > <snip>
->> > > > +case "$TARGET" in
->> > > > +qemu)
->> > > > +    ;;
->> > > > +*)
->> > > > +    echo "'$TARGET' not supported for standlone tests"
->> > > > +    exit 2
->> > > > +esac
->> > > 
->> > > I think we could put the check in a function in scripts/arch-run.bash and
->> > > just use the same error message for all cases.
->> > 
->> > Coming back to the series.
->> > 
->> > arm/efi/run and arm/run source scripts/arch-run.bash; run_tests.sh and
->> > scripts/mkstandalone.sh don't source scripts/arch-run.bash. There doesn't
->> > seem to be a common file that is sourced by all of them.
->> 
->> scripts/mkstandalone.sh uses arch-run.bash, see generate_test().
+> - Upon return to userspace (similar to your previous proposal). In this
+>   case we run userspace with the MSR cleared, and only perform an IBPB
+>   in the exit to userspace pace.
 
-> Are you referring to this bit:
+You want to IBPB before clearing the MSR as otherwise host kernel will be
+running with the mistrained gunk from the guest.
 
-> generate_test ()
-> {
->         <snip>
->         (echo "#!/usr/bin/env bash"
->          cat scripts/arch-run.bash "$TEST_DIR/run")
+> Any thoughts? 
 
-> I think scripts/arch-run.bash would need to be sourced for any functions defined
-> there to be usable in mkstandalone.sh.
+Yes, let's keep it simple and do anything more involved *only* if it is really
+necessary.
 
-> What I was thinking is something like this:
+-- 
+Regards/Gruss,
+    Boris.
 
-> if ! vmm_supported $TARGET; then
->         echo "$0 does not support '$TARGET'"
->         exit 2
-> fi
-
-> Were you thinking of something else?
-
-> I think mkstandalone should error at the top level (when you do make
-> standalone), and not rely on the individual scripts to error if the VMM is
-> not supported. That's because I think creating the test files, booting a
-> machine and copying the files only to find out that kvm-unit-tests was
-> misconfigured is a pretty suboptimal experience.
-
->> run_tests.sh doesn't, but I'm not sure it needs to validate TARGET
->> since it can leave that to the lower-level scripts.
-
-> I put the check in arm/run, and removed it from run_tests.sh, and this is
-> what I got:
-
-> $ ./run_tests.sh selftest-setup
-> SKIP selftest-setup (./arm/run does not supported 'kvmtool')
-
-> which looks good to me.
-
-Grammar nit:  This should be
-SKIP selftest-setup (./arm/run does not support 'kvmtool')
-
-Al
-
->> 
->> > 
->> > How about creating a new file in scripts (vmm.bash?) with only this
->> > function?
->> 
->> If we need a new file, then we can add one, but I'd try using
->> arch-run.bash or common.bash first.
-
-> common.bash seems to work (and the name fits), so I'll give that a go.
-
-> Thanks,
-> Alex
-
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
