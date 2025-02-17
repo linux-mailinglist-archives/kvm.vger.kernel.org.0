@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-38335-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38336-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B23A37CFC
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:19:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74016A37CFD
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:19:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8FEF3B178C
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 08:19:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F4CB3B2C36
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 08:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE761A2564;
-	Mon, 17 Feb 2025 08:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7211E1A08DB;
+	Mon, 17 Feb 2025 08:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PEM1kJt7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lqx2qodx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B988019EED2
-	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 08:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C9C1A2645
+	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 08:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739780343; cv=none; b=Ta+y4R4snQ6Ik0L1xlmyTtn8qLQE8ntVNVkTmMOR4qdD1p9oQ7vTz3g0fYoh/cwqk2js1EudGK2RN8XPE2upXRweHDpZXTpc23pb89OL8vgOHcZIGTqap465ZnRvxuQ1RYCgdaVD/vnS8VKelNBmUzfpLSMjTRFiy23Ygx9Wf2E=
+	t=1739780346; cv=none; b=HDgtpuOpUeViL7A1rRbCCes8X1h7ZTXJaMkmmFiyACbiLZcmE1pIbeSBYgpGibsRRgizi3kJlgHjV+JibUp+BOnjRHcyadTmXDmY8Igsxybt0u/tJ8GnT9iZf1arL3eBiueQEKycAC8LDgam1PEvykpU9e0T6oebF2COv3AHLbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739780343; c=relaxed/simple;
-	bh=fgikP9pCs5jC0lyoad1drlNUfTByGFH9gXJjN5Ul2t0=;
+	s=arc-20240116; t=1739780346; c=relaxed/simple;
+	bh=et457s5gxOACczlEdsQV3JpgBTp1+3xW6hMwzsrYsk0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hcWz9epMutacqRyXtcqWiIPYJlSA/iJZOuf7gL2godlHT+e36s7RF03z3UeOuYUNvvKVp90GFet50E1FAIhImi28a7sL3ssUr3jQzTuIESKSe/Q01ofn6DWr4ko9EB9v3k8BvSAcpnRIwiSa0Kq2D7SFlpbNW6Y2ONKax6irxtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PEM1kJt7; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=Zrey6Nc+yMzqqWCmGE4QW1SObk8sWIzaf+5Hm/X/rZFIdJEi+AFNpU+mlRMaBMWAhcPa+Gp76kGHmfNrEk9lFQ9ZfeY5eBqmUkGD/Jl7Mi75KMHSAOa4vtxoIvn7cF8pJ4mhy2Bh5dmAoyCNblfEOK2BYPxWzAc5sus0STXZxlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lqx2qodx; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739780341; x=1771316341;
+  t=1739780344; x=1771316344;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=fgikP9pCs5jC0lyoad1drlNUfTByGFH9gXJjN5Ul2t0=;
-  b=PEM1kJt7Nj4Wr0iAVsQSJZvchDJMzFv4YDaBg8mQBiTpwrOwPPw62d3L
-   Eo6jAXsA8Nunf1aco4ZKJ2R39dqeDP6NBceRnQ1f3PJkWw0ZRnsimffCI
-   k/shqy7tnvjGeQA//gbSs8oL3ERbTruavy7lUX+Ad/pODvBSsF3o6H9Bt
-   hQLlmjwwsHIe0iT1CyLJs2eWIc7DaixkjyUYbQCg2DUG5wG7zuD471liY
-   SyuB8Vna8FX85mbDqttxNsjcyDZb7U2Z8ZF0lEWOsP7GH7qk+4Y3dLGAz
-   EC2t65ntdJRJSAhFv9aaNf6juQVcHZd9xfsJMsU9A3TBN1KQo9IlRzrP6
+  bh=et457s5gxOACczlEdsQV3JpgBTp1+3xW6hMwzsrYsk0=;
+  b=Lqx2qodxEt7eGP97ygA8l95KUxRGrn4DUbs4r0VgrnDDxm9sjFeZGmEJ
+   ntXP29un1UkokVT3Es98yeIMl4MX6GFTxkj3fEFtlrymToyfhVUZQrgPS
+   qRyB8JlK7ZEEFJFfPY60lf21lgy65r9e8JBHzr4kAgWtq45K61ijeqcAP
+   l6qDFhsltIy5JsB7VyfzpKwSHW6kdfSV6R8Pdehamb2PK6lZu6lkwtu4/
+   xzsieUjVHHxWp3k4xM9++H3WmL1pGSNGAeDvXS6qf95r6MeBR8TZ8EOaS
+   ckLtvrlqHffT6F9bt/g0BR7wKGTxu0D7KBXgTZvC5zK+67cD6KwCdLq/5
    A==;
-X-CSE-ConnectionGUID: iFIiAP+tRFC5Wq0dMT/oBw==
-X-CSE-MsgGUID: 0lJTy72CQRCH5j5bdgajyg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11347"; a="50668992"
+X-CSE-ConnectionGUID: H+mn5nH2R0C5h29Y5+fUAw==
+X-CSE-MsgGUID: P9oYwJLfQ26D9Ulbejm26A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11347"; a="50669000"
 X-IronPort-AV: E=Sophos;i="6.13,292,1732608000"; 
-   d="scan'208";a="50668992"
+   d="scan'208";a="50669000"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:19:01 -0800
-X-CSE-ConnectionGUID: 4++vfEfLQc+TGqj/kWLFbw==
-X-CSE-MsgGUID: nF3NBRcjRM+gJeJNBwQ0gQ==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:19:04 -0800
+X-CSE-ConnectionGUID: l51kerAISVmk9QAqliXkng==
+X-CSE-MsgGUID: xdV2eWBVTKyB3H50d8XF5Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="118690233"
+   d="scan'208";a="118690254"
 Received: from emr-bkc.sh.intel.com ([10.112.230.82])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:18:58 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:19:02 -0800
 From: Chenyi Qiang <chenyi.qiang@intel.com>
 To: David Hildenbrand <david@redhat.com>,
 	Alexey Kardashevskiy <aik@amd.com>,
@@ -73,9 +73,9 @@ Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
 	Gao Chao <chao.gao@intel.com>,
 	Xu Yilun <yilun.xu@intel.com>,
 	Li Xiaoyao <xiaoyao.li@intel.com>
-Subject: [PATCH v2 4/6] memory-attribute-manager: Introduce a callback to notify the shared/private state change
-Date: Mon, 17 Feb 2025 16:18:23 +0800
-Message-ID: <20250217081833.21568-5-chenyi.qiang@intel.com>
+Subject: [PATCH v2 5/6] memory: Attach MemoryAttributeManager to guest_memfd-backed RAMBlocks
+Date: Mon, 17 Feb 2025 16:18:24 +0800
+Message-ID: <20250217081833.21568-6-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20250217081833.21568-1-chenyi.qiang@intel.com>
 References: <20250217081833.21568-1-chenyi.qiang@intel.com>
@@ -87,240 +87,116 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce a new state_change() callback in MemoryAttributeManagerClass to
-efficiently notify all registered RamDiscardListeners, including VFIO
-listeners about the memory conversion events in guest_memfd. The
-existing VFIO listener can dynamically DMA map/unmap the shared pages
-based on conversion types:
-- For conversions from shared to private, the VFIO system ensures the
-  discarding of shared mapping from the IOMMU.
-- For conversions from private to shared, it triggers the population of
-  the shared mapping into the IOMMU.
+Introduce a new field, memory_attribute_manager, in RAMBlock to link to
+an MemoryAttributeManager object. This change centralizes all
+guest_memfd state information (like fd and shared_bitmap) within a
+RAMBlock, making it easier to manage.
 
-Additionally, there could be some special conversion requests:
-- When a conversion request is made for a page already in the desired
-  state, the helper simply returns success.
-- For requests involving a range partially in the desired state, only
-  the necessary segments are converted, ensuring the entire range
-  complies with the request efficiently.
-- In scenarios where a conversion request is declined by other systems,
-  such as a failure from VFIO during notify_populate(), the helper will
-  roll back the request, maintaining consistency.
-
-Opportunistically introduce a helper to trigger the state_change()
-callback of the class.
+Use the realize()/unrealize() helpers to initialize/uninitialize the
+MemoryAttributeManager object. Register/unregister the object in the
+target RAMBlock's MemoryRegion when creating guest_memfd. Upon memory
+state changes in kvm_convert_memory(), invoke the
+memory_attribute_manager_state_change() helper to notify the registered
+RamDiscardListener.
 
 Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
 ---
 Changes in v2:
-    - Do the alignment changes due to the rename to MemoryAttributeManager
-    - Move the state_change() helper definition in this patch.
+    - Introduce a new field memory_attribute_manager in RAMBlock.
+    - Move the state_change() handling during page conversion in this patch.
+    - Undo what we did if it fails to set.
+    - Change the order of close(guest_memfd) and memory_attribute_manager cleanup.
 ---
- include/system/memory-attribute-manager.h |  20 +++
- system/memory-attribute-manager.c         | 148 ++++++++++++++++++++++
- 2 files changed, 168 insertions(+)
+ accel/kvm/kvm-all.c     |  9 +++++++++
+ include/exec/ramblock.h |  2 ++
+ system/physmem.c        | 13 +++++++++++++
+ 3 files changed, 24 insertions(+)
 
-diff --git a/include/system/memory-attribute-manager.h b/include/system/memory-attribute-manager.h
-index 72adc0028e..c3dab4e47b 100644
---- a/include/system/memory-attribute-manager.h
-+++ b/include/system/memory-attribute-manager.h
-@@ -34,8 +34,28 @@ struct MemoryAttributeManager {
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index c1fea69d58..c0d15c48ad 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -48,6 +48,7 @@
+ #include "kvm-cpus.h"
+ #include "system/dirtylimit.h"
+ #include "qemu/range.h"
++#include "system/memory-attribute-manager.h"
  
- struct MemoryAttributeManagerClass {
-     ObjectClass parent_class;
-+
-+    int (*state_change)(MemoryAttributeManager *mgr, uint64_t offset, uint64_t size,
-+                        bool shared_to_private);
- };
+ #include "hw/boards.h"
+ #include "system/stats.h"
+@@ -3088,6 +3089,14 @@ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+     addr = memory_region_get_ram_ptr(mr) + section.offset_within_region;
+     rb = qemu_ram_block_from_host(addr, false, &offset);
  
-+static inline int memory_attribute_manager_state_change(MemoryAttributeManager *mgr, uint64_t offset,
-+                                                        uint64_t size, bool shared_to_private)
-+{
-+    MemoryAttributeManagerClass *klass;
-+
-+    if (mgr == NULL) {
-+        return 0;
-+    }
-+
-+    klass = MEMORY_ATTRIBUTE_MANAGER_GET_CLASS(mgr);
-+    if (klass->state_change) {
-+        return klass->state_change(mgr, offset, size, shared_to_private);
-+    }
-+
-+    return 0;
-+}
-+
- int memory_attribute_manager_realize(MemoryAttributeManager *mgr, MemoryRegion *mr);
- void memory_attribute_manager_unrealize(MemoryAttributeManager *mgr);
- 
-diff --git a/system/memory-attribute-manager.c b/system/memory-attribute-manager.c
-index ed97e43dd0..17c70cf677 100644
---- a/system/memory-attribute-manager.c
-+++ b/system/memory-attribute-manager.c
-@@ -241,6 +241,151 @@ static void memory_attribute_rdm_replay_discarded(const RamDiscardManager *rdm,
-                                                 memory_attribute_rdm_replay_discarded_cb);
- }
- 
-+static bool memory_attribute_is_valid_range(MemoryAttributeManager *mgr,
-+                                            uint64_t offset, uint64_t size)
-+{
-+    MemoryRegion *mr = mgr->mr;
-+
-+    g_assert(mr);
-+
-+    uint64_t region_size = memory_region_size(mr);
-+    int block_size = memory_attribute_manager_get_block_size(mgr);
-+
-+    if (!QEMU_IS_ALIGNED(offset, block_size)) {
-+        return false;
-+    }
-+    if (offset + size < offset || !size) {
-+        return false;
-+    }
-+    if (offset >= region_size || offset + size > region_size) {
-+        return false;
-+    }
-+    return true;
-+}
-+
-+static void memory_attribute_notify_discard(MemoryAttributeManager *mgr,
-+                                            uint64_t offset, uint64_t size)
-+{
-+    RamDiscardListener *rdl;
-+
-+    QLIST_FOREACH(rdl, &mgr->rdl_list, next) {
-+        MemoryRegionSection tmp = *rdl->section;
-+
-+        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-+            continue;
-+        }
-+
-+        memory_attribute_for_each_populated_section(mgr, &tmp, rdl,
-+                                                    memory_attribute_notify_discard_cb);
-+    }
-+}
-+
-+static int memory_attribute_notify_populate(MemoryAttributeManager *mgr,
-+                                            uint64_t offset, uint64_t size)
-+{
-+    RamDiscardListener *rdl, *rdl2;
-+    int ret = 0;
-+
-+    QLIST_FOREACH(rdl, &mgr->rdl_list, next) {
-+        MemoryRegionSection tmp = *rdl->section;
-+
-+        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-+            continue;
-+        }
-+
-+        ret = memory_attribute_for_each_discarded_section(mgr, &tmp, rdl,
-+                                                          memory_attribute_notify_populate_cb);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+
++    ret = memory_attribute_manager_state_change(MEMORY_ATTRIBUTE_MANAGER(mr->rdm),
++                                                offset, size, to_private);
 +    if (ret) {
-+        /* Notify all already-notified listeners. */
-+        QLIST_FOREACH(rdl2, &mgr->rdl_list, next) {
-+            MemoryRegionSection tmp = *rdl2->section;
-+
-+            if (rdl2 == rdl) {
-+                break;
-+            }
-+            if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-+                continue;
-+            }
-+
-+            memory_attribute_for_each_discarded_section(mgr, &tmp, rdl2,
-+                                                        memory_attribute_notify_discard_cb);
-+        }
-+    }
-+    return ret;
-+}
-+
-+static bool memory_attribute_is_range_populated(MemoryAttributeManager *mgr,
-+                                                uint64_t offset, uint64_t size)
-+{
-+    int block_size = memory_attribute_manager_get_block_size(mgr);
-+    const unsigned long first_bit = offset / block_size;
-+    const unsigned long last_bit = first_bit + (size / block_size) - 1;
-+    unsigned long found_bit;
-+
-+    /* We fake a shorter bitmap to avoid searching too far. */
-+    found_bit = find_next_zero_bit(mgr->shared_bitmap, last_bit + 1, first_bit);
-+    return found_bit > last_bit;
-+}
-+
-+static bool memory_attribute_is_range_discarded(MemoryAttributeManager *mgr,
-+                                                uint64_t offset, uint64_t size)
-+{
-+    int block_size = memory_attribute_manager_get_block_size(mgr);
-+    const unsigned long first_bit = offset / block_size;
-+    const unsigned long last_bit = first_bit + (size / block_size) - 1;
-+    unsigned long found_bit;
-+
-+    /* We fake a shorter bitmap to avoid searching too far. */
-+    found_bit = find_next_bit(mgr->shared_bitmap, last_bit + 1, first_bit);
-+    return found_bit > last_bit;
-+}
-+
-+static int memory_attribute_state_change(MemoryAttributeManager *mgr, uint64_t offset,
-+                                         uint64_t size, bool shared_to_private)
-+{
-+    int block_size = memory_attribute_manager_get_block_size(mgr);
-+    int ret = 0;
-+
-+    if (!memory_attribute_is_valid_range(mgr, offset, size)) {
-+        error_report("%s, invalid range: offset 0x%lx, size 0x%lx",
-+                     __func__, offset, size);
-+        return -1;
++        warn_report("Failed to notify the listener the state change of "
++                    "(0x%"HWADDR_PRIx" + 0x%"HWADDR_PRIx") to %s",
++                    start, size, to_private ? "private" : "shared");
 +    }
 +
-+    if ((shared_to_private && memory_attribute_is_range_discarded(mgr, offset, size)) ||
-+        (!shared_to_private && memory_attribute_is_range_populated(mgr, offset, size))) {
-+        return 0;
-+    }
-+
-+    if (shared_to_private) {
-+        memory_attribute_notify_discard(mgr, offset, size);
-+    } else {
-+        ret = memory_attribute_notify_populate(mgr, offset, size);
-+    }
-+
-+    if (!ret) {
-+        unsigned long first_bit = offset / block_size;
-+        unsigned long nbits = size / block_size;
-+
-+        g_assert((first_bit + nbits) <= mgr->bitmap_size);
-+
-+        if (shared_to_private) {
-+            bitmap_clear(mgr->shared_bitmap, first_bit, nbits);
-+        } else {
-+            bitmap_set(mgr->shared_bitmap, first_bit, nbits);
-+        }
-+
-+        return 0;
-+    }
-+
-+    return ret;
-+}
-+
- int memory_attribute_manager_realize(MemoryAttributeManager *mgr, MemoryRegion *mr)
- {
-     uint64_t bitmap_size;
-@@ -281,8 +426,11 @@ static void memory_attribute_manager_finalize(Object *obj)
+     if (to_private) {
+         if (rb->page_size != qemu_real_host_page_size()) {
+             /*
+diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
+index 0babd105c0..06fd365326 100644
+--- a/include/exec/ramblock.h
++++ b/include/exec/ramblock.h
+@@ -23,6 +23,7 @@
+ #include "cpu-common.h"
+ #include "qemu/rcu.h"
+ #include "exec/ramlist.h"
++#include "system/memory-attribute-manager.h"
  
- static void memory_attribute_manager_class_init(ObjectClass *oc, void *data)
- {
-+    MemoryAttributeManagerClass *mamc = MEMORY_ATTRIBUTE_MANAGER_CLASS(oc);
-     RamDiscardManagerClass *rdmc = RAM_DISCARD_MANAGER_CLASS(oc);
+ struct RAMBlock {
+     struct rcu_head rcu;
+@@ -42,6 +43,7 @@ struct RAMBlock {
+     int fd;
+     uint64_t fd_offset;
+     int guest_memfd;
++    MemoryAttributeManager *memory_attribute_manager;
+     size_t page_size;
+     /* dirty bitmap used during migration */
+     unsigned long *bmap;
+diff --git a/system/physmem.c b/system/physmem.c
+index c76503aea8..0ed394c5d2 100644
+--- a/system/physmem.c
++++ b/system/physmem.c
+@@ -54,6 +54,7 @@
+ #include "system/hostmem.h"
+ #include "system/hw_accel.h"
+ #include "system/xen-mapcache.h"
++#include "system/memory-attribute-manager.h"
+ #include "trace.h"
  
-+    mamc->state_change = memory_attribute_state_change;
+ #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+@@ -1885,6 +1886,16 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+             qemu_mutex_unlock_ramlist();
+             goto out_free;
+         }
 +
-     rdmc->get_min_granularity = memory_attribute_rdm_get_min_granularity;
-     rdmc->register_listener = memory_attribute_rdm_register_listener;
-     rdmc->unregister_listener = memory_attribute_rdm_unregister_listener;
++        new_block->memory_attribute_manager = MEMORY_ATTRIBUTE_MANAGER(object_new(TYPE_MEMORY_ATTRIBUTE_MANAGER));
++        if (memory_attribute_manager_realize(new_block->memory_attribute_manager, new_block->mr)) {
++            error_setg(errp, "Failed to realize memory attribute manager");
++            object_unref(OBJECT(new_block->memory_attribute_manager));
++            close(new_block->guest_memfd);
++            ram_block_discard_require(false);
++            qemu_mutex_unlock_ramlist();
++            goto out_free;
++        }
+     }
+ 
+     ram_size = (new_block->offset + new_block->max_length) >> TARGET_PAGE_BITS;
+@@ -2138,6 +2149,8 @@ static void reclaim_ramblock(RAMBlock *block)
+     }
+ 
+     if (block->guest_memfd >= 0) {
++        memory_attribute_manager_unrealize(block->memory_attribute_manager);
++        object_unref(OBJECT(block->memory_attribute_manager));
+         close(block->guest_memfd);
+         ram_block_discard_require(false);
+     }
 -- 
 2.43.5
 
