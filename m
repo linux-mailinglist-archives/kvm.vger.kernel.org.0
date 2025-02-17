@@ -1,220 +1,141 @@
-Return-Path: <kvm+bounces-38382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5945CA38C30
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 20:18:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97176A38C5E
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 20:28:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 157137A3066
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 19:17:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D463D17113A
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 19:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34D3235BFF;
-	Mon, 17 Feb 2025 19:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D7823716C;
+	Mon, 17 Feb 2025 19:28:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Hti8mo33"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="whmQExen"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2053.outbound.protection.outlook.com [40.107.212.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AFA70814
-	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 19:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739819908; cv=fail; b=gsgqolwbW93aGBCBftv3SYum6YOdKCrUCkiV4y1yK3rB+96cIpxOqmmrCnBJ/ctBCiMf8yCdEhLxbeEoAgIb8mpb2+RAGK8nUAMG21l1do+gLlnV7KhW9W97o0SWoKsOZvuzqk5ly0WPyUWwyb07mql1LocmedGI6psyZGiZy+g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739819908; c=relaxed/simple;
-	bh=u18GB/UU0VJFy8f/BwcMSU1s1Ez1GJ3L2P6I0C2xXfI=;
-	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=PSXhaFcRH05xUx3V+0SQC+l8edtqqDQEIWXwy5GTDiID8coKtf8G5wWDc6Hd8K5Kx+X+hJjXps4U7ndQGUkijvBr1x+q7oCqthzfbEOu12hzEHQBa6YjUT9FZ44KUxefQCFzzYMac9x9ByT38Q47+qQyqtjoQGU1v8SoONL+WZM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Hti8mo33; arc=fail smtp.client-ip=40.107.212.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aR8SUyeIUCPv6puaKbqDz4LFGIjz0bes79IayWXqpUNhSp94hwgJbGI7rwMbVUk4xTP3fk0+PpEspT6g5o2IA3Gb6zg/k5kSRDadivAhflp+00QJTl7f1j4uqmENTNrXvesHYci7cVN8b1HfAg8QzsH4213qLguAyHlweF+QA+OB5AeSKIzoNHh7bolsDgNzO2sPKXijQDo9kcIpxeId2Ft/t1OpCi66OgG3IwtnQPFmIbPWTU8+8CLXdS45MWNlFcQz5kYs0VAovzAcTs0tIDy3fYAu8EvnjM22IwIZOk9VPXxW+VdADObFrhEHGmuTPkEX0TD7eAiK9R5PZPGhVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0UMBLdf0FJObeus6ILqYQMYNmr0RO9rH84wCdS5LCjo=;
- b=sv7WLeJHZUno5OqY9/ZwGaENEIpCXUoVvec0G+tyoIHhJY4Nncj67080EkQ3zKxUcn6BRGyHqkCRFuW7AyELIafWHj/KW10Cj37mnEDwstz6C7VyTyMoeF8qOqHxzgs1mxU5FP/3Q8mUAZWMTNO/dJhkE+VWRa6B6NJ1aIRcYsJPzieeb4VlLHqwXdUFpufuZlZsptubh9YPHiyd4ouRSeFPZjwm5jgiD8u5Fc5T+y/LWA3yC/cCFq+nROStva37ichK2XhVQ3Bye+pB8dsmFW6toSKB4mF4zOQL8GIH6gGoetZrEKa3KgLaSMzA887xN+XXCfaOQMBU9HkvMEP+OA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0UMBLdf0FJObeus6ILqYQMYNmr0RO9rH84wCdS5LCjo=;
- b=Hti8mo33t9DLEaGaGpq+ZbPI7xsSsj6PVHK55NPH88TK2xltJ3089M81U9Xhs9tG+98zz0z7Nb7OxgxGTaScgaTtLizoSYLjSlzctB3EPC9l7Vpt0O6w2AuSZJm4W0ZipAjUXDGatrbcdUlsmKTFMJCmY4kA9UA+OQ955RDE31I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Mon, 17 Feb
- 2025 19:18:23 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8445.017; Mon, 17 Feb 2025
- 19:18:23 +0000
-Message-ID: <886f7424-9f33-7a0f-73d5-886ae4609ae9@amd.com>
-Date: Mon, 17 Feb 2025 13:18:22 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: Nikunj A Dadhania <nikunj@amd.com>, seanjc@google.com,
- pbonzini@redhat.com, kvm@vger.kernel.org
-Cc: santosh.shukla@amd.com, bp@alien8.de, isaku.yamahata@intel.com
-References: <20250217102237.16434-1-nikunj@amd.com>
- <20250217102237.16434-3-nikunj@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 2/5] crypto: ccp: Add missing member in
- SNP_LAUNCH_START command structure
-In-Reply-To: <20250217102237.16434-3-nikunj@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR12CA0013.namprd12.prod.outlook.com
- (2603:10b6:806:6f::18) To DM4PR12MB5070.namprd12.prod.outlook.com
- (2603:10b6:5:389::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD19224AE4
+	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 19:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739820524; cv=none; b=hrwGgm9XSPCAju64rtWA4FGcLR/XBJ2UADfd+nowsLmG4j7+V+766QJNfWkgeIkxUQAnVaHZzDvs0RJanRqOnI7guen6yzyQNPn34RGCCxkXxsYJgAtgAS5Dvgo3dIe5lnwmG0cFAz20gdt3rnihX0D2B/sVQjS4c/WJRcC4SiA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739820524; c=relaxed/simple;
+	bh=klHUVRc3O0NQSirtRo0jmBhjiT7Ts/IRSy4Ui5YcglM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bLzBcVsqC5MO5w2ru2RNBQiZy0L2083Ik1+5Hj+Bwi9yO0FQ+uV/mS+Tz1vmxIUDANZK3AwZmNalYimw/3XxT8fYZJdss4JTSP8JCYm3JPkzdGhYb4+bczfi4Y8wJwaLX6hPH3cVIpqxhbtzC4pEr2uSwIOoTAP9Utl10HO5s6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=whmQExen; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2210d92292eso55068155ad.1
+        for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 11:28:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1739820522; x=1740425322; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VEJ/B3GBCyQg1NZ8srPFvpNFWpxr50mPaKhI69Ppxgo=;
+        b=whmQExenPnwH4S2raaVrkBq6Ca/1n88gGbM+dPqeZGh7saZVzqHxej0xMi8MTdpgni
+         sv7D1k8QFKWL4G+MqwRdqn/hz3G9YZhlC3PksksJsiiC+YIj3Hp6i1/oNBba8Wbqk89G
+         2lKNgV5kglDh6lAzSfgvp2IbgDeig5ZAVM573phiT7tF4oPMGAT2j6dNesN9HoeP/6LS
+         XFXFv33ReERwWuUyleHNyyJ8qLAr0tFrxD9vnOgzeFRR4/BFaKAlrzepEOn6IYaHFIl5
+         M5KUv+Eu/p7SNlbHP4N/Apo+9uHC3DZTA1zSMVW3t8lSBQywpvfpiKT+aJuT1ZWAH0IJ
+         wdVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739820522; x=1740425322;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VEJ/B3GBCyQg1NZ8srPFvpNFWpxr50mPaKhI69Ppxgo=;
+        b=Oeoz0MANLZMhFlp2LBlB7ZvzPziKqckDxoNFXQUP3JOV3uRfXUr5ez/k/Emizp9QCm
+         6R7gCwLE1OE/N2GKlDdcuG6Zw/rfi0S7Uyb9NNekz50C91+M2RvjQoit9hzS3rZu+tTr
+         PnlXULex20lHpuXjUkF/0e7hOIlgRKVReSXmkPbx1Y6qHAgbr78ZXJjDHTCLHSS0fqIz
+         dakoEFAvrVkA5z+3d3Jb7/jDYGj+agbQMP2Xchc5a+DKTOahf2qtCBDXsB+srP1afgo3
+         OyD5r0vLUIWTXi+1fmN+lv4EVRyFy6LVM4yh2xwS0DjLTSkOX0K4X5AId41Th8ZEM/Dn
+         CQjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVtSB36cs01ElL44it7XfqntH8PcV7J9196yz3Cd0z0LI/cq6e5sQ1DpCd1I+gEy3CAIMY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxRUJp0jN14av+6ZrDPpzRj6NQnSIHrx4ETcKwxINDrFmqrb/J
+	FzwLjbygphpj8ftDvv4cIWDkm1nVJZY7kgYvwXGjCqHJ2AO4ddCouSaMrlSI5lU=
+X-Gm-Gg: ASbGncs+XhAZCSPxwk1EdyVpQI56WpC0ErRpoqZYfpUoiCj9/BBoeFdgcQ1WNJIQlhd
+	p2My26c/ccJzNnyueBc/ekofUm8F32AOWw260W638eHnZxcUg+8gX3c5GJgTCEgKey6qmI3bKqn
+	HIAbrdcNungeXRQ5WGz5ottYjAP4uBwRZQq6A02KVZI6R2snEnaVmQQvxuFwD5DGr4lEOn4q2RI
+	bf9TGeWUety8MjkR7CYgkOFlZRX2VQ+lVLgumjrsciHe7hYO3hgN9+2jrVxtQUP+HrgL2LVD2dY
+	kepO0ma88qFMt2ktXU9WicjVCS640OuVgmFSj6m0y2xPkF5VzbKHB/U=
+X-Google-Smtp-Source: AGHT+IFw9x3ddCLNhBbl16dPCQzotblc4ykNeeWquQsvMRT1NjsLlII2PlFLuCRaJQswwJsL3MPGMA==
+X-Received: by 2002:a05:6a00:2e08:b0:730:74f8:25c1 with SMTP id d2e1a72fcca58-732618c0351mr14386201b3a.15.1739820521870;
+        Mon, 17 Feb 2025 11:28:41 -0800 (PST)
+Received: from [192.168.0.4] (71-212-39-66.tukw.qwest.net. [71.212.39.66])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73242568a0dsm8436448b3a.43.2025.02.17.11.28.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Feb 2025 11:28:41 -0800 (PST)
+Message-ID: <3cf6d45b-0d0e-4669-954f-a545f3ec1a37@linaro.org>
+Date: Mon, 17 Feb 2025 11:28:39 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|SA1PR12MB7199:EE_
-X-MS-Office365-Filtering-Correlation-Id: 733eebe8-7d99-42b6-1d5b-08dd4f87d8e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RU1QL2NVQWt6c01yMURhL2ZpdkZGMGtGdmExdUZHajZybWt6Z2dNMDNINVpk?=
- =?utf-8?B?MjNabDEySkNOYTZVQ3ZkSmNaUld6cGkyTFVDQ1Z6Q1ljTWpUZk0zY2VYOGcr?=
- =?utf-8?B?cHR2REVJcXh1cDYvSDhMZG9QSGtxeGpCL1AzRVBaWUZuaVRmazVKL3JJbEhJ?=
- =?utf-8?B?L0tORUY1VlRJQTFFVFNrLzR2d0xJeU90UzVWajdYQTZIVEJFRW0wUEY3TnFt?=
- =?utf-8?B?eTI0Q2s0b2xHMWdNZytNTkxBYzNhdkpVQWFyTmsvWnh5RitMYWRtWGF5aGRy?=
- =?utf-8?B?RmZFT0M4U25SWklQMzcwUG9JNXNuNWhndE9ydkdoTFcxb2t1ZnFHQ3JhWHNU?=
- =?utf-8?B?V1pwMGFxd0s4RTZ4cU9rZ2xuN1Z4ekpUK0hHdnZLN2pnQzMxQTlyRDJWb0oz?=
- =?utf-8?B?VzNQbm5QSzN3aGxKOE9TdThWZk9WUU1QZytUSEhpa09Cay9TVlViVUQ0NGw1?=
- =?utf-8?B?TDR0S2Jad3AyaFpYN3I2Ujh1Qzc4dHBxNnR2VWFYbkk4dXZ1Rnd2M0RtcVVX?=
- =?utf-8?B?Ny93VTB2ZENnN0ZNUlI0SEJ6OEM4OE84MGIzelg3U0lMSFZYSzZJVjZhdFBh?=
- =?utf-8?B?VHNhNVZMZjhib1lVNmFJZ05TK1g0aUUrUGtQVkh6RktXWnhBeldJbk5Nc3Ba?=
- =?utf-8?B?OG1WZkIzZjVFVkszc1hxOHlXN3k0Tit0WnNnS3lSaWFnUEwwY3BnMjRTdnc2?=
- =?utf-8?B?dXozK2UvS01NMVE1UXhkaWgzZjJPMFl5KzNIUWJENHdTcU03WXk0d0JONXhT?=
- =?utf-8?B?emxYRmE2V1N5RllvZ0JMRGVYd3NFODBFdnJqclo2Skc0ZmdjRjRkNmZad0FV?=
- =?utf-8?B?VWhYYTZuYnJvc3laYjlFVzJVOGFFajRjNVNiY3AxakNDUUlwMVRMRktBS2J6?=
- =?utf-8?B?ai9LY1dua2NzZEVONVRQTWJSOW9LZ1FTK1VGU0JudHpzQ24rWE1na0FZUk9s?=
- =?utf-8?B?WXhBeTBhcmtla0EvRmgxRjFiNXVVVDkydnRUSDNaUE8xc3JtOVJMZFRKcWtn?=
- =?utf-8?B?bG5jMER2dWFHZ0dVZG9iNVZOYlIxZWdWNVlOcmVBbS8rK2pLS1Fhb3d2Q3lm?=
- =?utf-8?B?VThpSG1HeHFiTitmL2prUHpMYTNUUVNSL0FIdCtuRTRzTVNJSlZZdEVaUDRC?=
- =?utf-8?B?Ym5pdks5VE9IeUJzc3ZUSjF2MDNiUTRsMjNzVDViT1ExMmZWNTBMczhUVnJI?=
- =?utf-8?B?YzYwM0U3N20xQmxDdnVPb2EvVUtvUmhSenRvVklLbHZ2SFhabWpFNmN4emEw?=
- =?utf-8?B?NUZXdG41aXJUTkgxbGFGQnhLSnRtQjBZbTExa0dML3pqeVNLUElJTTROZXNY?=
- =?utf-8?B?dmpHQ2orazB0eDZFSXRBemx3RmQrZUYzTUgwbWgrVFJXeUwwM0taWXk5cnd0?=
- =?utf-8?B?YmNZSTY5MkdlZW5NMWYyeXhiTmV5Wm1IK0tMQ3phU0liWEZudDl2bnlWR3Ay?=
- =?utf-8?B?Tk9GVFdEbTJlZVRWcVVUcWNsYVZSNWx2OVNKMHZpWHdGTHRHMnRkY3M5c3BI?=
- =?utf-8?B?bXVPc0szV0ZCWitvZ092ZGl3N3JneUY5Nm1HSjU5R21aUlh4M1lvY21BRTdu?=
- =?utf-8?B?ZThzL2Q2dzFhSGc5V0VJMGs3QnE2T2dVbGdPbGt6aUFKQmRDQ1pUS2NNS1g2?=
- =?utf-8?B?b1d3VDZmS3NpdnFlTlREN1VvTHlkMllZMzI3QUYxM3hvcFc0ZkV0dy90dzZP?=
- =?utf-8?B?RXNZNitkVUQvY2lzVVpQMW91MHNteVRTYk4veG9vTXFnV3BmdmNIZHljU2hm?=
- =?utf-8?B?S1BXVkgrOFltdlFobWU5L2xVcjExaUxodnN5UTcvV1pOcEt3U3AvYkhGaGNH?=
- =?utf-8?B?V2dwbEhlZEdPaDVrTWMzVWQvN3ZpMXcvOXJMSEJhclBWYTBGNWdGOHJncDdm?=
- =?utf-8?Q?QC6ztMrGLIq7N?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cGlFMzNZenN6Qm9lTGcvMmNVaFYzQVZLRzk4RzIwMmlOUU9KTlFQb09ZSHdq?=
- =?utf-8?B?NFVBRFdjZkV0NHJzYjAveDQvRUJRMmxkS3ZjVW1MY1BlcDhsUnFLNzlsa2lv?=
- =?utf-8?B?Y3ZCdDhBRkt5TitXOG80MXh6SlBTRExQay9IVWRTQjBxTGxiNitMSDk3b1Jr?=
- =?utf-8?B?T0laWFJubEFmbmg5TGNScTZaeW9tR3hDd2tBcFY3aHVseUlyMzZSa1FON1kz?=
- =?utf-8?B?ODFrUDFrNHdJcVN5T290SG45QlJ0NHNKeVVuMWlpZGo3cldPTzE5KytJcFRJ?=
- =?utf-8?B?Rk5tK2FVRXVZZjV4cU9SYUJrWUJXQXNRd01QV1lmTkc5WS8xV1JHZW51N1d5?=
- =?utf-8?B?dE9sYVRZRnlQVUZSb1NOSTZnN3ozWTFLc2V0NVVjZFlRVUhaTHVWM2g0K0dX?=
- =?utf-8?B?WWpJS0dwbWM3dU1KV240WFM3cUdkVjk0ajZJNTlNZkJ2bW0yYlB5Nm5CQi9X?=
- =?utf-8?B?NDN6Y2NPWHo0dnF1OWh4ejlVYlZpUmc3Qld0OUZQTFprUmZ4ZzFYemdndlZJ?=
- =?utf-8?B?WjRzck5xc0lFaWpKSjUwOWE0ekRoWVgwek9ZekFjK2QyaDVMenVVY2ZEVnM5?=
- =?utf-8?B?Slh1Y1RybitnSkszOG9rTmx3NWRqM2Vtb3hsbEdDUFMxMUxYdmVNSEROc0Z2?=
- =?utf-8?B?OXg2TUNKMjBGZkFaemZ5SHR1dk1hRGpmc3JxR0M1WVpZNXRYeU5Ed1hoaDVt?=
- =?utf-8?B?Y2ZiNXRNNEN3aExPWDRFejNOSmRhakU1NWkxdFMrdFB0VHdUNFJYT0d2YUtz?=
- =?utf-8?B?MExtS3g3MERhLzg0dE42OGR0SU5KWUt4L3B2M2EwU1YzWVQ3aSthOHZkWUdG?=
- =?utf-8?B?R0J6L2NJbnZBOSt6RG9VUTd0MkY4ZmtaL2JJS0wxQ3VGWC9ESVlvS2RDc09o?=
- =?utf-8?B?WVpNU1YyREdRZ2l5MjdsSHZlRWZzTzhnajhiT2ZnZkxpUHBNclVzYzNRTzhn?=
- =?utf-8?B?bDJHMEFCSnhaVFFvRjgxeDB2YU9Nb3NjbnRYWk9qTCthbXBRZ2RuWVpGVS9Q?=
- =?utf-8?B?WmNGa2pQcTEwWitUVk1hN3JhWnAwaFdFVzRVeGtmUEVZL1VBeDNDWkVJMWtu?=
- =?utf-8?B?dlZrNTRtUVlFRm90QjY5eDRiVnVhVnJNQ0ZKZXdodzE2RDJ2RkgvQmR1elVN?=
- =?utf-8?B?RG0ySkN6a1FKNHQxdVllQ05uNHorMnRXSENZQlJLVzk3dVFoczJ3empUQmlO?=
- =?utf-8?B?QXlZREp5T0hUL2dlOXlFVDhMWFlhdVBvcE5QOERTQUhsZEhaZlByYnhmUU42?=
- =?utf-8?B?Mmpma0tXMFJTK2VBNThodml0MGlOMGpnUWZXdE05KzN2aXBXR3ByUmdERWNH?=
- =?utf-8?B?bGxOeTNBS3VyVlB4aFM5cjZkbzlXbUgxaGdlUS9rWGdzMHl0eklpN2RkalEv?=
- =?utf-8?B?YmFFcVRydW5JelBCY1BTT1lvSmU2UXVHaWZuQ2pmZW9xOE1tTmhtNk1qRFZv?=
- =?utf-8?B?VGR1VWxBeVRJNW5vTlVHNVVOWkZ6Z1NPKzZUam81TmJKNUk3Y3loTFV4Ujhu?=
- =?utf-8?B?YUpySHdsa0poT1lJaUpsVE9kK1oyTzdUTG1NVSt2YlEzZmVUN0JBbHZ6KzRB?=
- =?utf-8?B?TC96SUlOZ0hLd1JhcUNEWnNINEVRQ3pPOHRXTWlxMzJmTnJFMVkrMVExdEZ6?=
- =?utf-8?B?ZlA0cDJmT0UyZmtQSWVVOGlwZlJEdC9JanNqRlhGMndDeTBPb1lCbk52Y0JH?=
- =?utf-8?B?M2JFK0cxa0xESW5qanpXKysxNXN5WkQ0bUt5SFVUanJQWDhSK1d0amk5djV1?=
- =?utf-8?B?RnVnTGY5dkRMMnM5TE1pZGZTZFhCdWxnUnVmdVBXZlVaUlFVSitqNHNTL2hE?=
- =?utf-8?B?SG5GZW1yekNPalQ5aklrZHBaYU1hWHcvS01IRCsydVprdUtsOUlFWUo1Sytw?=
- =?utf-8?B?cFVHamlqdzVHNDJiZXZqL2xmZ2tQNUIwRjlrN09seG8rU2M2QnNsOEY0V0hY?=
- =?utf-8?B?Q0RTbStwMjJzb2JwZGlmbi9Tak45SjZ3Zy9XdDcraGh4UG1BSUYzc3JFT1c3?=
- =?utf-8?B?c0x2dURNY2txQjVjckgyY2V5NGVDdS83K1BUR1MzYTBZRytOVzNYVTJQMWxQ?=
- =?utf-8?B?d1lXbC9kUVhzOXVEbkwyZUlFSmNaL1FWODVsblBKTmFjWVFGa2tjQnAvOURE?=
- =?utf-8?Q?5SC1mFbBYmccg8vX699qXmFjN?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 733eebe8-7d99-42b6-1d5b-08dd4f87d8e0
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2025 19:18:23.5522
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oapRp2gv0hW1tye/TKmGKcUAIMZs5/lcLKk96xkPhvFSx8LLxa8FAOLzhTk7nkl04Au1rnbRh6LIayWp0d3sog==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7199
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 16/20] cpus: Restrict cpu_common_post_load() code to TCG
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, kvm@vger.kernel.org, qemu-ppc@nongnu.org,
+ qemu-riscv@nongnu.org, David Hildenbrand <david@redhat.com>,
+ qemu-s390x@nongnu.org, xen-devel@lists.xenproject.org
+References: <20250123234415.59850-1-philmd@linaro.org>
+ <20250123234415.59850-17-philmd@linaro.org>
+ <e52485c5-122a-4a95-928f-08fcd17cd772@linaro.org>
+ <a8be34a4-c157-4a5f-99bc-50c87c1330b1@linaro.org>
+Content-Language: en-US
+From: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <a8be34a4-c157-4a5f-99bc-50c87c1330b1@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2/17/25 04:22, Nikunj A Dadhania wrote:
-> The sev_data_snp_launch_start structure should include a 4-byte
-> desired_tsc_khz field before the gosvw field, which was missed in the
-> initial implementation. As a result, the structure is 4 bytes shorter than
-> expected by the firmware, causing the gosvw field to start 4 bytes early.
-> Fix this by adding the missing 4-byte member for the desired TSC frequency.
+On 2/17/25 09:19, Philippe Mathieu-Daudé wrote:
+> On 26/1/25 22:16, Richard Henderson wrote:
+>> On 1/23/25 15:44, Philippe Mathieu-Daudé wrote:
+>>> CPU_INTERRUPT_EXIT was removed in commit 3098dba01c7
+>>> ("Use a dedicated function to request exit from execution
+>>> loop"), tlb_flush() and tb_flush() are related to TCG
+>>> accelerator.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+>>> ---
+>>>   cpu-target.c | 33 +++++++++++++++++++--------------
+>>>   1 file changed, 19 insertions(+), 14 deletions(-)
+>>>
+>>> diff --git a/cpu-target.c b/cpu-target.c
+>>> index a2999e7c3c0..c05ef1ff096 100644
+>>> --- a/cpu-target.c
+>>> +++ b/cpu-target.c
+>>> @@ -45,22 +45,27 @@
+>>>   #ifndef CONFIG_USER_ONLY
+>>>   static int cpu_common_post_load(void *opaque, int version_id)
+>>>   {
+>>> -    CPUState *cpu = opaque;
+>>> +#ifdef CONFIG_TCG
+>>> +    if (tcg_enabled()) {
+>>
+>> Why do you need both ifdef and tcg_enabled()?  I would have thought just tcg_enabled().
+>>
+>> Are there declarations that are (unnecessarily?) protected?
 > 
-> Fixes: 3a45dc2b419e ("crypto: ccp: Define the SEV-SNP commands")
-> Cc: stable@vger.kernel.org
-> Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-
-Even though you're using the "crypto: ccp:" tag (which should actually
-be "crypto: ccp -"), this can probably go through the KVM tree. Not sure
-if it makes sense to tag it as "KVM: SVM:" instead.
-
-Thanks,
-Tom
-
-> ---
->  include/linux/psp-sev.h | 2 ++
->  1 file changed, 2 insertions(+)
+> No, you are right, tcg_enabled() is sufficient, I don't remember why
+> I added the #ifdef.
 > 
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index f3cad182d4ef..1f3620aaa4e7 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -594,6 +594,7 @@ struct sev_data_snp_addr {
->   * @imi_en: launch flow is launching an IMI (Incoming Migration Image) for the
->   *          purpose of guest-assisted migration.
->   * @rsvd: reserved
-> + * @desired_tsc_khz: hypervisor desired mean TSC freq in kHz of the guest
->   * @gosvw: guest OS-visible workarounds, as defined by hypervisor
->   */
->  struct sev_data_snp_launch_start {
-> @@ -603,6 +604,7 @@ struct sev_data_snp_launch_start {
->  	u32 ma_en:1;				/* In */
->  	u32 imi_en:1;				/* In */
->  	u32 rsvd:30;
-> +	u32 desired_tsc_khz;			/* In */
->  	u8 gosvw[16];				/* In */
->  } __packed;
->  
+> Could I include your R-b tag without the #ifdef lines?
+
+Yes.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+r~
 
