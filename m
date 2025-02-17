@@ -1,256 +1,319 @@
-Return-Path: <kvm+bounces-38367-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38368-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBE34A3826A
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 12:55:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0B7BA3832A
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 13:41:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 431563B47ED
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 11:52:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB98C188500A
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 12:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE66321A443;
-	Mon, 17 Feb 2025 11:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eryqCgRQ";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="laIGp8vW";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Ld9gZ4Tp";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mg19ksoV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530E221C177;
+	Mon, 17 Feb 2025 12:38:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F83217727
-	for <kvm@vger.kernel.org>; Mon, 17 Feb 2025 11:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F627218E85;
+	Mon, 17 Feb 2025 12:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739793166; cv=none; b=FCCaEa+iBgXrhXWBxWks90s86gGWC/lMulY8m0U9pQ+uTglDZawx1cunUDTgo4IG0aiPJjUzQrgrbifsNjpywrZ4xXoRwvGaJv/6mXxb3Vm8QCSryDe9W7jsfDx+JocAswDeZp/sizn+RvR5BPAMFukVwnHFLnWkvcsmTXKzjho=
+	t=1739795936; cv=none; b=pDYCS0ya6uVxa916Vo1XVaI+CMl2huP86jQRl+HlhPyOl7BQdMLjaSMTtO4FTPFQBH/7YxQez0nzrLJSX+KwcXx+mtA8+YKTPd2dPoW8s2k0HMhQeu84MVXTETIbLI1qLd9vuPVSRJ37RiIJ4bwy2WDPgnKS4i6XKRT/iNdfMC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739793166; c=relaxed/simple;
-	bh=DEdFGpsxrphAseea/kSBbkDecoXV7rNsjSO9Bg4cwd0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JI8WQYdY9MPej1EoghgUxFLWkFLyNp27LN5WNyzkInhaP4sh6XC6xsTu+H46uKJu5CLxeYn8mGT7D5hst/APzdsIfhXTSxdy9vFczeAhMg/0Zcm7TktOHz2w+gYhD4wUDDVnQvjehgfJXVKqGDe8D9kmf+llyZgn97q4bToLvdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=fail smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eryqCgRQ; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=laIGp8vW; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Ld9gZ4Tp; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mg19ksoV; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 6CBFB211A7;
-	Mon, 17 Feb 2025 11:52:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1739793161; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=osMQhKZVU6kLbu8H2vhW2lAjHU+ow95PQyFWnAqYoMw=;
-	b=eryqCgRQE2K29qWCaqtisNSJnBSIzDisnYNOPAH6rXCO0Qe4PZqyyC4f2iFb8UczYKUT+4
-	nULkfNCIjFqAq/F7ZKs2JgSB5qfmHXh57A3MJ4PRjlsr+0caSSaFz2/7VoPeJZymmHu99D
-	ljrqedYoBkNFVb7e5umMMeqwuZfoImI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1739793161;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=osMQhKZVU6kLbu8H2vhW2lAjHU+ow95PQyFWnAqYoMw=;
-	b=laIGp8vWbYlQfykLTiFvxgF62AR59pGqeihWzp7zX8hee/YmpkLA5ca9HwWH2la+BXqfIx
-	XBIFlHtWVsrjlKCA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Ld9gZ4Tp;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=mg19ksoV
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1739793160; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=osMQhKZVU6kLbu8H2vhW2lAjHU+ow95PQyFWnAqYoMw=;
-	b=Ld9gZ4Tp8H3YUaajtfqwbkyJzS/iJOAf+RZlzbimAjpCOdkJqgGPpBnrFMqSf46xZI23Bo
-	U41OCcTG7tXi4LBwvOHSsP+B2GA1ji3VSd5omgm7DH6e2xAjH40zB2drPLu+w/JbrZfOyc
-	bTMHUanytxWbhyKuszt5BD2XRd3haGI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1739793160;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=osMQhKZVU6kLbu8H2vhW2lAjHU+ow95PQyFWnAqYoMw=;
-	b=mg19ksoV2ZNjBDlxNnVAZGocKYEmsF1LUuY+PdZq2PFYXEW6wQO/kjtPo0vc/awRLxiB9b
-	5vEnh8pv0ddkTgDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 45606133F9;
-	Mon, 17 Feb 2025 11:52:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 2q6iEAgjs2c/bQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 17 Feb 2025 11:52:40 +0000
-Message-ID: <469ee330-7736-4059-9e59-ec7b9a6d3c8b@suse.cz>
-Date: Mon, 17 Feb 2025 12:52:39 +0100
+	s=arc-20240116; t=1739795936; c=relaxed/simple;
+	bh=jtBh+0XSHsZRj0wRyLE3pJ+jqzyYvfhHbJnuhElAk/8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eKPc86+aSc3P9VLQRt5j2AlrcTTVJCifvm/7TCoYQxWuxutfT6EbYGfSfVVbseNpgRv+vLXwg+WicObMuSPZolpc7hiSRnHcFAMx1OXfSXVHpeyIY4ezmIdT1cPWq1rzdtbgP3qEb0b3fuM/t0QfuGPNTNS5PmFZ/g3IFmCePQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4YxMYZ2qlTz1wn6x;
+	Mon, 17 Feb 2025 20:34:58 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 505561A0188;
+	Mon, 17 Feb 2025 20:38:51 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 17 Feb 2025 20:38:50 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
+	<kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Chris
+ Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, David Sterba
+	<dsterba@suse.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep
+ Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>, "Darrick J.
+ Wong" <djwong@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Trond Myklebust
+	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
+	<chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>
+CC: Yunsheng Lin <linyunsheng@huawei.com>, Luiz Capitulino
+	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
+	<linux-erofs@lists.ozlabs.org>, <linux-xfs@vger.kernel.org>,
+	<linux-mm@kvack.org>, <netdev@vger.kernel.org>, <linux-nfs@vger.kernel.org>
+Subject: [RFC] mm: alloc_pages_bulk: remove assumption of populating only NULL elements
+Date: Mon, 17 Feb 2025 20:31:23 +0800
+Message-ID: <20250217123127.3674033-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 2/3] mm/mempolicy: export memory policy symbols
-Content-Language: en-US
-To: Shivank Garg <shivankg@amd.com>, akpm@linux-foundation.org,
- willy@infradead.org, pbonzini@redhat.com
-Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, chao.gao@intel.com, seanjc@google.com,
- ackerleytng@google.com, david@redhat.com, bharata@amd.com, nikunj@amd.com,
- michael.day@amd.com, Neeraj.Upadhyay@amd.com, thomas.lendacky@amd.com,
- michael.roth@amd.com
-References: <20250210063227.41125-1-shivankg@amd.com>
- <20250210063227.41125-3-shivankg@amd.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <20250210063227.41125-3-shivankg@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 6CBFB211A7
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim,suse.cz:mid,amd.com:email];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2/10/25 07:32, Shivank Garg wrote:
-> Export memory policy related symbols needed by the KVM guest-memfd to
-> implement NUMA policy support.
-> 
-> These symbols are required to implement per-memory region NUMA policies
-> for guest memory, allowing VMMs to control guest memory placement across
-> NUMA nodes.
-> 
-> Signed-off-by: Shivank Garg <shivankg@amd.com>
+As mentioned in [1], it seems odd to check NULL elements in
+the middle of page bulk allocating, and it seems caller can
+do a better job of bulk allocating pages into a whole array
+sequentially without checking NULL elements first before
+doing the page bulk allocation.
 
-I think we should use EXPORT_SYMBOL_GPL() these days.
+Remove the above checking also enable the caller to not
+zero the array before calling the page bulk allocating API,
+which has about 1~2 ns performance improvement for the test
+case of time_bench_page_pool03_slow() for page_pool in a
+x86 vm system, this reduces some performance impact of
+fixing the DMA API misuse problem in [2], performance
+improves from 87.886 ns to 86.429 ns.
 
-Wasn't there also some way to limit the exports to KVM?
+1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
+2. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
+CC: Jesper Dangaard Brouer <hawk@kernel.org>
+CC: Luiz Capitulino <luizcap@redhat.com>
+CC: Mel Gorman <mgorman@techsingularity.net>
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+---
+ drivers/vfio/pci/virtio/migrate.c |  2 --
+ fs/btrfs/extent_io.c              |  8 +++++---
+ fs/erofs/zutil.c                  | 12 ++++++------
+ fs/xfs/xfs_buf.c                  |  9 +++++----
+ mm/page_alloc.c                   | 32 +++++--------------------------
+ net/core/page_pool.c              |  3 ---
+ net/sunrpc/svc_xprt.c             |  9 +++++----
+ 7 files changed, 26 insertions(+), 49 deletions(-)
 
-> ---
->  mm/mempolicy.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-> index bbaadbeeb291..9c15780cfa63 100644
-> --- a/mm/mempolicy.c
-> +++ b/mm/mempolicy.c
-> @@ -214,6 +214,7 @@ struct mempolicy *get_task_policy(struct task_struct *p)
->  
->  	return &default_policy;
->  }
-> +EXPORT_SYMBOL(get_task_policy);
->  
->  static const struct mempolicy_operations {
->  	int (*create)(struct mempolicy *pol, const nodemask_t *nodes);
-> @@ -347,6 +348,7 @@ void __mpol_put(struct mempolicy *pol)
->  		return;
->  	kmem_cache_free(policy_cache, pol);
->  }
-> +EXPORT_SYMBOL(__mpol_put);
->  
->  static void mpol_rebind_default(struct mempolicy *pol, const nodemask_t *nodes)
->  {
-> @@ -2736,6 +2738,7 @@ struct mempolicy *mpol_shared_policy_lookup(struct shared_policy *sp,
->  	read_unlock(&sp->lock);
->  	return pol;
->  }
-> +EXPORT_SYMBOL(mpol_shared_policy_lookup);
->  
->  static void sp_free(struct sp_node *n)
->  {
-> @@ -3021,6 +3024,7 @@ void mpol_shared_policy_init(struct shared_policy *sp, struct mempolicy *mpol)
->  		mpol_put(mpol);	/* drop our incoming ref on sb mpol */
->  	}
->  }
-> +EXPORT_SYMBOL(mpol_shared_policy_init);
->  
->  int mpol_set_shared_policy(struct shared_policy *sp,
->  			struct vm_area_struct *vma, struct mempolicy *pol)
-> @@ -3039,6 +3043,7 @@ int mpol_set_shared_policy(struct shared_policy *sp,
->  		sp_free(new);
->  	return err;
->  }
-> +EXPORT_SYMBOL(mpol_set_shared_policy);
->  
->  /* Free a backing policy store on inode delete. */
->  void mpol_free_shared_policy(struct shared_policy *sp)
-> @@ -3057,6 +3062,7 @@ void mpol_free_shared_policy(struct shared_policy *sp)
->  	}
->  	write_unlock(&sp->lock);
->  }
-> +EXPORT_SYMBOL(mpol_free_shared_policy);
->  
->  #ifdef CONFIG_NUMA_BALANCING
->  static int __initdata numabalancing_override;
+diff --git a/drivers/vfio/pci/virtio/migrate.c b/drivers/vfio/pci/virtio/migrate.c
+index ba92bb4e9af9..9f003a237dec 100644
+--- a/drivers/vfio/pci/virtio/migrate.c
++++ b/drivers/vfio/pci/virtio/migrate.c
+@@ -91,8 +91,6 @@ static int virtiovf_add_migration_pages(struct virtiovf_data_buffer *buf,
+ 		if (ret)
+ 			goto err_append;
+ 		buf->allocated_length += filled * PAGE_SIZE;
+-		/* clean input for another bulk allocation */
+-		memset(page_list, 0, filled * sizeof(*page_list));
+ 		to_fill = min_t(unsigned int, to_alloc,
+ 				PAGE_SIZE / sizeof(*page_list));
+ 	} while (to_alloc > 0);
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index b2fae67f8fa3..d0466d795cca 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -626,10 +626,12 @@ int btrfs_alloc_page_array(unsigned int nr_pages, struct page **page_array,
+ 	unsigned int allocated;
+ 
+ 	for (allocated = 0; allocated < nr_pages;) {
+-		unsigned int last = allocated;
++		unsigned int new_allocated;
+ 
+-		allocated = alloc_pages_bulk(gfp, nr_pages, page_array);
+-		if (unlikely(allocated == last)) {
++		new_allocated = alloc_pages_bulk(gfp, nr_pages - allocated,
++						 page_array + allocated);
++		allocated += new_allocated;
++		if (unlikely(!new_allocated)) {
+ 			/* No progress, fail and do cleanup. */
+ 			for (int i = 0; i < allocated; i++) {
+ 				__free_page(page_array[i]);
+diff --git a/fs/erofs/zutil.c b/fs/erofs/zutil.c
+index 55ff2ab5128e..1c50b5e27371 100644
+--- a/fs/erofs/zutil.c
++++ b/fs/erofs/zutil.c
+@@ -85,13 +85,13 @@ int z_erofs_gbuf_growsize(unsigned int nrpages)
+ 
+ 		for (j = 0; j < gbuf->nrpages; ++j)
+ 			tmp_pages[j] = gbuf->pages[j];
+-		do {
+-			last = j;
+-			j = alloc_pages_bulk(GFP_KERNEL, nrpages,
+-					     tmp_pages);
+-			if (last == j)
++
++		for (last = j; last < nrpages; last += j) {
++			j = alloc_pages_bulk(GFP_KERNEL, nrpages - last,
++					     tmp_pages + last);
++			if (!j)
+ 				goto out;
+-		} while (j != nrpages);
++		}
+ 
+ 		ptr = vmap(tmp_pages, nrpages, VM_MAP, PAGE_KERNEL);
+ 		if (!ptr)
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index 15bb790359f8..9e1ce0ab9c35 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -377,16 +377,17 @@ xfs_buf_alloc_pages(
+ 	 * least one extra page.
+ 	 */
+ 	for (;;) {
+-		long	last = filled;
++		long	alloc;
+ 
+-		filled = alloc_pages_bulk(gfp_mask, bp->b_page_count,
+-					  bp->b_pages);
++		alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - refill,
++					 bp->b_pages + refill);
++		refill += alloc;
+ 		if (filled == bp->b_page_count) {
+ 			XFS_STATS_INC(bp->b_mount, xb_page_found);
+ 			break;
+ 		}
+ 
+-		if (filled != last)
++		if (alloc)
+ 			continue;
+ 
+ 		if (flags & XBF_READ_AHEAD) {
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index 579789600a3c..e0309532b6c4 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -4541,9 +4541,6 @@ static inline bool prepare_alloc_pages(gfp_t gfp_mask, unsigned int order,
+  * This is a batched version of the page allocator that attempts to
+  * allocate nr_pages quickly. Pages are added to the page_array.
+  *
+- * Note that only NULL elements are populated with pages and nr_pages
+- * is the maximum number of pages that will be stored in the array.
+- *
+  * Returns the number of pages in the array.
+  */
+ unsigned long alloc_pages_bulk_noprof(gfp_t gfp, int preferred_nid,
+@@ -4559,29 +4556,18 @@ unsigned long alloc_pages_bulk_noprof(gfp_t gfp, int preferred_nid,
+ 	struct alloc_context ac;
+ 	gfp_t alloc_gfp;
+ 	unsigned int alloc_flags = ALLOC_WMARK_LOW;
+-	int nr_populated = 0, nr_account = 0;
+-
+-	/*
+-	 * Skip populated array elements to determine if any pages need
+-	 * to be allocated before disabling IRQs.
+-	 */
+-	while (nr_populated < nr_pages && page_array[nr_populated])
+-		nr_populated++;
++	int nr_populated = 0;
+ 
+ 	/* No pages requested? */
+ 	if (unlikely(nr_pages <= 0))
+ 		goto out;
+ 
+-	/* Already populated array? */
+-	if (unlikely(nr_pages - nr_populated == 0))
+-		goto out;
+-
+ 	/* Bulk allocator does not support memcg accounting. */
+ 	if (memcg_kmem_online() && (gfp & __GFP_ACCOUNT))
+ 		goto failed;
+ 
+ 	/* Use the single page allocator for one page. */
+-	if (nr_pages - nr_populated == 1)
++	if (nr_pages == 1)
+ 		goto failed;
+ 
+ #ifdef CONFIG_PAGE_OWNER
+@@ -4653,24 +4639,16 @@ unsigned long alloc_pages_bulk_noprof(gfp_t gfp, int preferred_nid,
+ 	/* Attempt the batch allocation */
+ 	pcp_list = &pcp->lists[order_to_pindex(ac.migratetype, 0)];
+ 	while (nr_populated < nr_pages) {
+-
+-		/* Skip existing pages */
+-		if (page_array[nr_populated]) {
+-			nr_populated++;
+-			continue;
+-		}
+-
+ 		page = __rmqueue_pcplist(zone, 0, ac.migratetype, alloc_flags,
+ 								pcp, pcp_list);
+ 		if (unlikely(!page)) {
+ 			/* Try and allocate at least one page */
+-			if (!nr_account) {
++			if (!nr_populated) {
+ 				pcp_spin_unlock(pcp);
+ 				goto failed_irq;
+ 			}
+ 			break;
+ 		}
+-		nr_account++;
+ 
+ 		prep_new_page(page, 0, gfp, 0);
+ 		set_page_refcounted(page);
+@@ -4680,8 +4658,8 @@ unsigned long alloc_pages_bulk_noprof(gfp_t gfp, int preferred_nid,
+ 	pcp_spin_unlock(pcp);
+ 	pcp_trylock_finish(UP_flags);
+ 
+-	__count_zid_vm_events(PGALLOC, zone_idx(zone), nr_account);
+-	zone_statistics(zonelist_zone(ac.preferred_zoneref), zone, nr_account);
++	__count_zid_vm_events(PGALLOC, zone_idx(zone), nr_populated);
++	zone_statistics(zonelist_zone(ac.preferred_zoneref), zone, nr_populated);
+ 
+ out:
+ 	return nr_populated;
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index f5e908c9e7ad..ae9e8c78e4bb 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -536,9 +536,6 @@ static noinline netmem_ref __page_pool_alloc_pages_slow(struct page_pool *pool,
+ 	if (unlikely(pool->alloc.count > 0))
+ 		return pool->alloc.cache[--pool->alloc.count];
+ 
+-	/* Mark empty alloc.cache slots "empty" for alloc_pages_bulk */
+-	memset(&pool->alloc.cache, 0, sizeof(void *) * bulk);
+-
+ 	nr_pages = alloc_pages_bulk_node(gfp, pool->p.nid, bulk,
+ 					 (struct page **)pool->alloc.cache);
+ 	if (unlikely(!nr_pages))
+diff --git a/net/sunrpc/svc_xprt.c b/net/sunrpc/svc_xprt.c
+index ae25405d8bd2..6321a4d2f2be 100644
+--- a/net/sunrpc/svc_xprt.c
++++ b/net/sunrpc/svc_xprt.c
+@@ -663,9 +663,10 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
+ 		pages = RPCSVC_MAXPAGES;
+ 	}
+ 
+-	for (filled = 0; filled < pages; filled = ret) {
+-		ret = alloc_pages_bulk(GFP_KERNEL, pages, rqstp->rq_pages);
+-		if (ret > filled)
++	for (filled = 0; filled < pages; filled += ret) {
++		ret = alloc_pages_bulk(GFP_KERNEL, pages - filled,
++				       rqstp->rq_pages + filled);
++		if (ret)
+ 			/* Made progress, don't sleep yet */
+ 			continue;
+ 
+@@ -674,7 +675,7 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
+ 			set_current_state(TASK_RUNNING);
+ 			return false;
+ 		}
+-		trace_svc_alloc_arg_err(pages, ret);
++		trace_svc_alloc_arg_err(pages, filled);
+ 		memalloc_retry_wait(GFP_KERNEL);
+ 	}
+ 	rqstp->rq_page_end = &rqstp->rq_pages[pages];
+-- 
+2.33.0
 
 
