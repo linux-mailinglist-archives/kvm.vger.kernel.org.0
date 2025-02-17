@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-38345-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38346-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2FD5A37DA6
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:59:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEAEFA37DC0
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 10:04:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67C5F1627DF
-	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 08:58:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FA94189730F
+	for <lists+kvm@lfdr.de>; Mon, 17 Feb 2025 09:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15031A841B;
-	Mon, 17 Feb 2025 08:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25D51B0F32;
+	Mon, 17 Feb 2025 08:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c4TUdz1A"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jE8vIIhf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385AB1A8403;
-	Mon, 17 Feb 2025 08:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D151A4AAA;
+	Mon, 17 Feb 2025 08:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739782677; cv=none; b=dLMzyB5mUUoT0Idg42IvguLBGCPxRoiEApcPH6Mdki4nWHkRfQWEmygTugZM/gyLbgpqlwBGK1L0LlL/tNXGWvyrv0vukUbnTKi+1OoNdNTonWnEZWfW5V27XTrcPXSZP6jHYEWbGC1XGYhjXKicpKz54ZXaGxp+v/KCBjMpNo4=
+	t=1739782724; cv=none; b=O4jQpPfypfXQ0WDolAdSXlbXaRFo9Pg9KxufMaAbOEttlSk7DyiiljWJcj4+vEFdolRwXsv9BinsfoFd2cuFWEdb6m1iqv8EZls9JD5imaPU+aXZr/eFzR8JIv/8ZNKolo/hU0TYK+9lB0eZMifMF4RreX3yD1EVUefAcTIzdRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739782677; c=relaxed/simple;
-	bh=9macul4XblzTUxF7kH52KxnULiDZU5dKGC5irFFJUOk=;
+	s=arc-20240116; t=1739782724; c=relaxed/simple;
+	bh=icQZctjBaNyUMIgCBFQc6IRMZ5I1Ya14Tv26LTpGTPY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OabgWJQ3aRwQ4muh/EAtawijOjMTOez2sfvPqKK/Q4sN9hN1QM8bskrv8m5foFm/RYUh9WYPO4hRWDpMoAy0pugsBRbdW/HOvU8qtaRHbaex3dwiNEBX0Q/7PKPbdc0zMKu8AYQiYl39Ga8nD/KFzTWNJB5KjyO6Uy22FqUHuX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c4TUdz1A; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=B/nnzORL/m1enwtUNzUiLhBwE0MswELJwI3MfPjWEdWoTeLEWBXwrYjqp0xfmRTvRTW7t7+wlCJk1JtxfkFRW92h8mHZviMN6dRgi4GS2Ig/V2ijeF7hBnwkqQ2Z0C0GujYkEtL6uxN8zE3bkUfoJUaUm2GM0ll4+RoNpC7TF4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jE8vIIhf; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739782675; x=1771318675;
+  t=1739782723; x=1771318723;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9macul4XblzTUxF7kH52KxnULiDZU5dKGC5irFFJUOk=;
-  b=c4TUdz1AXfqhEFMJK95NX4srtXHHvg6Dnin5dKIZoY3lxYM9aO6RINL1
-   BSlg9NN8WO5Z9LapVByVMRTHrKULbuHh2It9PeDQFe5+IcpZYh95bM1Bk
-   +ninZhVB9IXDe7NnzeQx0MRZoC0IdUFu3haJCP0Uk/Sfe9HfvE9PfkokT
-   AvByQLQPSvJs5YmGtJEzsWDeVrSw9SaNO/gYiM/Oo1l3B4Q1CPQWq7e6L
-   c6F/CTfWZWRm8svvYYTwO5Pb/TcYG/jWutiL3cHw7UpqNmO+ZOrSCFZKQ
-   b+cJyJyhPbo6A0WdZ3VeUb+qC8sKAB8h7aHQtDsCnyVseaXL+d+8ar0no
-   g==;
-X-CSE-ConnectionGUID: w+Z0h93hQx2mTIV9Lsu6DQ==
-X-CSE-MsgGUID: EPsV3rM5S7m8ZS89JzGISQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="51883271"
+  bh=icQZctjBaNyUMIgCBFQc6IRMZ5I1Ya14Tv26LTpGTPY=;
+  b=jE8vIIhfUpITWCZVhvjHS8Kmz46UBnlEu3gH4PSr2mX2i6fZV0DC7W35
+   78Qnr5u8ug1u26x/jm1U9rutrBW9/62Q14/bC75Bd66qiCA6O9TkTHdyo
+   ngPqxAg3duto7DaWtuSVqHc0yScCVSxo5eM7niIbFBwEwNVL1eatYI+I+
+   HTLrfZh5NbbLEBb0Wg6i3RXUuW5Mr65zfD6mF5VbVUgTYtkERVboaRW2/
+   B5cBO1UH+R7yB7IbK/S2iDhTFAJTf+9gPtzeGcxyXtSLDCuMRFPnRw5jo
+   QVAh/hH9VPk5KV7BJnYmN2PjW67SC4v+6A47aaPwwDposNu8efkj3ubow
+   Q==;
+X-CSE-ConnectionGUID: 4iRWRtNOQ1ywg34vocKndQ==
+X-CSE-MsgGUID: sOuBm3g2TY2ZP0UODj3Wzw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40579480"
 X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="51883271"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:57:55 -0800
-X-CSE-ConnectionGUID: 2UL39tiWTj2Ft/EMC0StjQ==
-X-CSE-MsgGUID: 8XYbJa9ZRB24OQfBNNigXg==
+   d="scan'208";a="40579480"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:58:42 -0800
+X-CSE-ConnectionGUID: zgcqOHeATSOfthLbmdfzBQ==
+X-CSE-MsgGUID: UgeUSULcSvGrFocJFJtIEQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="144989824"
+   d="scan'208";a="118697583"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:57:52 -0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2025 00:58:39 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -65,9 +65,9 @@ Cc: rick.p.edgecombe@intel.com,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH 1/2] KVM: TDX: Handle SEPT zap error due to page add error in premap
-Date: Mon, 17 Feb 2025 16:56:42 +0800
-Message-ID: <20250217085642.19696-1-yan.y.zhao@intel.com>
+Subject: [PATCH 2/2] KVM: x86/mmu: Bail out kvm_tdp_map_page() when VM dead
+Date: Mon, 17 Feb 2025 16:57:31 +0800
+Message-ID: <20250217085731.19733-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20250217085535.19614-1-yan.y.zhao@intel.com>
 References: <20250217085535.19614-1-yan.y.zhao@intel.com>
@@ -79,160 +79,47 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move the handling of SEPT zap errors caused by unsuccessful execution of
-tdh_mem_page_add() in KVM_TDX_INIT_MEM_REGION from
-tdx_sept_drop_private_spte() to tdx_sept_zap_private_spte(). Introduce a
-new helper function tdx_is_sept_zap_err_due_to_premap() to detect this
-specific error.
+Bail out of the loop in kvm_tdp_map_page() when a VM is dead. Otherwise,
+kvm_tdp_map_page() may get stuck in the kernel loop when there's only one
+vCPU in the VM (or if the other vCPUs are not executing ioctls), even if
+fatal errors have occurred.
 
-During the IOCTL KVM_TDX_INIT_MEM_REGION, KVM premaps leaf SPTEs in the
-mirror page table before the corresponding entry in the private page table
-is successfully installed by tdh_mem_page_add(). If an error occurs during
-the invocation of tdh_mem_page_add(), a mismatch between the mirror and
-private page tables results in SEAMCALLs for SEPT zap returning the error
-code TDX_EPT_ENTRY_STATE_INCORRECT.
+kvm_tdp_map_page() is called by the ioctl KVM_PRE_FAULT_MEMORY or the TDX
+ioctl KVM_TDX_INIT_MEM_REGION. It loops in the kernel whenever RET_PF_RETRY
+is returned. In the TDP MMU, kvm_tdp_mmu_map() always returns RET_PF_RETRY,
+regardless of the specific error code from tdp_mmu_set_spte_atomic(),
+tdp_mmu_link_sp(), or tdp_mmu_split_huge_page(). While this is acceptable
+in general cases where the only possible error code from these functions is
+-EBUSY, TDX introduces an additional error code, -EIO, due to SEAMCALL
+errors.
 
-The error TDX_EPT_WALK_FAILED is not possible because, during
-KVM_TDX_INIT_MEM_REGION, KVM only premaps leaf SPTEs after successfully
-mapping non-leaf SPTEs. Unlike leaf SPTEs, there is no mismatch in non-leaf
-PTEs between the mirror and private page tables. Therefore, during zap,
-SEAMCALLs should find an empty leaf entry in the private EPT, leading to
-the error TDX_EPT_ENTRY_STATE_INCORRECT instead of TDX_EPT_WALK_FAILED.
+Since this -EIO error is also a fatal error, check for VM dead in the
+kvm_tdp_map_page() to avoid unnecessary retries until a signal is pending.
 
-Since tdh_mem_range_block() is always invoked before tdh_mem_page_remove(),
-move the handling of SEPT zap errors from tdx_sept_drop_private_spte() to
-tdx_sept_zap_private_spte(). In tdx_sept_zap_private_spte(), return 0 for
-errors due to premap to skip executing other SEAMCALLs for zap, which are
-unnecessary. Return 1 to indicate no other errors, allowing the execution
-of other zap SEAMCALLs to continue.
-
-The failure of tdh_mem_page_add() is uncommon and has not been observed in
-real workloads. Currently, this failure is only hypothetically triggered by
-skipping the real SEAMCALL and faking the add error in the SEAMCALL
-wrapper. Additionally, without this fix, there will be no host crashes or
-other severe issues.
+The error -EIO is uncommon and has not been observed in real workloads.
+Currently, it is only hypothetically triggered by bypassing the real
+SEAMCALL and faking an error in the SEAMCALL wrapper.
 
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 64 +++++++++++++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 19 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 8cad38e8e0bc..86c0653d797e 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1616,20 +1616,6 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
- 		tdx_no_vcpus_enter_stop(kvm);
- 	}
- 
--	if (unlikely(kvm_tdx->state != TD_STATE_RUNNABLE &&
--		     err == (TDX_EPT_WALK_FAILED | TDX_OPERAND_ID_RCX))) {
--		/*
--		 * Page is mapped by KVM_TDX_INIT_MEM_REGION, but hasn't called
--		 * tdh_mem_page_add().
--		 */
--		if ((!is_last_spte(entry, level) || !(entry & VMX_EPT_RWX_MASK)) &&
--		    !KVM_BUG_ON(!atomic64_read(&kvm_tdx->nr_premapped), kvm)) {
--			atomic64_dec(&kvm_tdx->nr_premapped);
--			tdx_unpin(kvm, page);
--			return 0;
--		}
--	}
--
- 	if (KVM_BUG_ON(err, kvm)) {
- 		pr_tdx_error_2(TDH_MEM_PAGE_REMOVE, err, entry, level_state);
- 		return -EIO;
-@@ -1667,8 +1653,41 @@ int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
- 	return 0;
- }
- 
-+/*
-+ * Check if the error returned from a SEPT zap SEAMCALL is due to that a page is
-+ * mapped by KVM_TDX_INIT_MEM_REGION without tdh_mem_page_add() being called
-+ * successfully.
-+ *
-+ * Since tdh_mem_sept_add() must have been invoked successfully before a
-+ * non-leaf entry present in the mirrored page table, the SEPT ZAP related
-+ * SEAMCALLs should not encounter err TDX_EPT_WALK_FAILED. They should instead
-+ * find TDX_EPT_ENTRY_STATE_INCORRECT due to an empty leaf entry found in the
-+ * SEPT.
-+ *
-+ * Further check if the returned entry from SEPT walking is with RWX permissions
-+ * to filter out anything unexpected.
-+ *
-+ * Note: @level is pg_level, not the tdx_level. The tdx_level extracted from
-+ * level_state returned from a SEAMCALL error is the same as that passed into
-+ * the SEAMCALL.
-+ */
-+static int tdx_is_sept_zap_err_due_to_premap(struct kvm_tdx *kvm_tdx, u64 err,
-+					     u64 entry, int level)
-+{
-+	if (!err || kvm_tdx->state == TD_STATE_RUNNABLE)
-+		return false;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 08ed5092c15a..3a8d735939b5 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4700,6 +4700,10 @@ int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code, u8 *level
+ 	do {
+ 		if (signal_pending(current))
+ 			return -EINTR;
 +
-+	if (err != (TDX_EPT_ENTRY_STATE_INCORRECT | TDX_OPERAND_ID_RCX))
-+		return false;
++		if (vcpu->kvm->vm_dead)
++			return -EIO;
 +
-+	if ((is_last_spte(entry, level) && (entry & VMX_EPT_RWX_MASK)))
-+		return false;
-+
-+	return true;
-+}
-+
- static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
--				     enum pg_level level)
-+				     enum pg_level level, struct page *page)
- {
- 	int tdx_level = pg_level_to_tdx_sept_level(level);
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-@@ -1686,12 +1705,18 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
- 		err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
- 		tdx_no_vcpus_enter_stop(kvm);
- 	}
-+	if (tdx_is_sept_zap_err_due_to_premap(kvm_tdx, err, entry, level) &&
-+	    !KVM_BUG_ON(!atomic64_read(&kvm_tdx->nr_premapped), kvm)) {
-+		atomic64_dec(&kvm_tdx->nr_premapped);
-+		tdx_unpin(kvm, page);
-+		return 0;
-+	}
- 
- 	if (KVM_BUG_ON(err, kvm)) {
- 		pr_tdx_error_2(TDH_MEM_RANGE_BLOCK, err, entry, level_state);
- 		return -EIO;
- 	}
--	return 0;
-+	return 1;
- }
- 
- /*
-@@ -1769,6 +1794,7 @@ int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
- int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 				 enum pg_level level, kvm_pfn_t pfn)
- {
-+	struct page *page = pfn_to_page(pfn);
- 	int ret;
- 
- 	/*
-@@ -1779,8 +1805,8 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (KVM_BUG_ON(!is_hkid_assigned(to_kvm_tdx(kvm)), kvm))
- 		return -EINVAL;
- 
--	ret = tdx_sept_zap_private_spte(kvm, gfn, level);
--	if (ret)
-+	ret = tdx_sept_zap_private_spte(kvm, gfn, level, page);
-+	if (ret <= 0)
- 		return ret;
- 
- 	/*
-@@ -1789,7 +1815,7 @@ int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	 */
- 	tdx_track(kvm);
- 
--	return tdx_sept_drop_private_spte(kvm, gfn, level, pfn_to_page(pfn));
-+	return tdx_sept_drop_private_spte(kvm, gfn, level, page);
- }
- 
- void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+ 		cond_resched();
+ 		r = kvm_mmu_do_page_fault(vcpu, gpa, error_code, true, NULL, level);
+ 	} while (r == RET_PF_RETRY);
 -- 
 2.43.2
 
