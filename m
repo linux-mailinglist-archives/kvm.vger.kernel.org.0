@@ -1,169 +1,134 @@
-Return-Path: <kvm+bounces-38454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6917A3A1DC
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 16:56:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6696A3A21B
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 17:06:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 200D37A4945
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 15:55:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E08B51884408
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 16:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E2D26E17D;
-	Tue, 18 Feb 2025 15:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F14626E15C;
+	Tue, 18 Feb 2025 16:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="orOvZGbL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U9YtFzZE"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336CD26E14D
-	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 15:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C681194C86
+	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 16:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739894175; cv=none; b=f5buguVPevjrn+rUmkwDOyE3A+c+RxYMKeA26N5Rkf5gvtz+oCwU9/8ga3hEp04tgS2z0qdXOxPLrfTcMvNZjlgHfZSxfaqViXz2LYIq/zlfcUEfUfb7qYqXuP9Q8O8VVrpnHoVfuHZMk5TVltFy4RusMTYKyX3yFqvFe09C/sM=
+	t=1739894641; cv=none; b=JaBpDPfONhV31Oe/1wF2GYdilmjnW+8GncsR+BZsW7cEtLpWMEvLyKXasBUMzdcP+7H/ByGi2HFY+iYOLrcJm9hCbktbsNHiPjTaQDKgAiY4Ryt2to8asLqFA+8pyF96k4EXtDhVmlvRxkXh9S4km3SlT+ff5iplAOCFe8Umxxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739894175; c=relaxed/simple;
-	bh=OxwXkUwfdd9O2efR81hHEid3P6MZbMOImo0mqZ4pV7k=;
+	s=arc-20240116; t=1739894641; c=relaxed/simple;
+	bh=q895/9qgMhtBqu0Uzl9tkRoBti/jVnEblaswsLouDTk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=V2HDqEl/n6gQwCF+PBZpSyI/u7QRhS0BlgtF9fAsFg3x1FyZ2qK6BD746oNJkQu9mVGLS9Zgy4BrzM5/Wen3IxvcMAZfcgHYPN6weGMqAKhBKxX3/ftrLIm23p+9TExQxDbF3516DMZrGLC2mWw1DhFTTrii04Rlaiumlz6mbRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=orOvZGbL; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=Gi0N7X9PwiDYW82HfbwHbA9DU5JHuthpEI9Ws2GwJMoWkZt5pweGKvTATtbysqGCVpfOMpQAsbZjohobUQujCPlSRO/t3+PXm6eOoZDIVOb4cEpwynXj1TWRghp3uAa8+P/Arcn/ex7DB/GNif8gedptfSpPh/AFz+TuZPbHtPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U9YtFzZE; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220bf94cb40so91571065ad.0
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 07:56:13 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220c86b3ef3so123638205ad.1
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 08:03:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739894173; x=1740498973; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=amAiEH9p0JjjlIoDG8vUk3rwkUw6ePiV6D4s+4AzIhM=;
-        b=orOvZGbLM+7JZ9GKfGoj0TXDsRDvdotK5RssVMwnnaVmGZi5NOywhDK7S+46xcFWJi
-         Vfz2DHLl99gWNAOx65qT/vgEY6HFTFGjMCnQiAiaUzYyZIgRfkFrNnBswGeR897uhP33
-         1e3lxix99c0zp/jSRQjVCxWXL9/eWGJ49vf7P48QAjlDVLt3a87oIBddYv7v3c7vYgsv
-         vsr0+/MQ2aGaN/eOY4ygo+Q8VWqALzFbQF6pB6D1FTxOx7TDhPCu12wHqUQSzl4bFfl5
-         EK9PHje4HERedn9LxBH9FLz/tW3hF9zjQik43CsvA9gIK45W+u0i2bxjfphdF8lzKThN
-         0f9g==
+        d=google.com; s=20230601; t=1739894639; x=1740499439; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bZDB6163brXmpWZDgT/6YzrIWqBj9L6ybAjsJnZ9ahg=;
+        b=U9YtFzZEuLU/jcqKKSgYYRSnELHPQ1kk+vkXgzXhTaMLdrxUn73VCuVKwYzi3F5GWe
+         jGuDLN98B4OFgddwplBYxJHAc8FY+cpsVIh9H43AdEjO1f5Fonjzp2WE2rlv2iGyI6yH
+         Buy5OzJTbMwkcjqtM0BEjzcPFxSfU0EOsZRjd5EG4IXpfiWbBPI3dCxNPWur8RAyIpBK
+         a166xLmFfzbf3CuZBWlr8Gwn2bXfOnR6quHgARi9b/6PeuCLjvN2TP9EL+nblRICypwZ
+         tQeLT6LgX8qpBsyNDqtuEpd0vUjzLpZr6HeWldgIYcq8nnZansrz5YQfuInn1KC8eO5I
+         48PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739894173; x=1740498973;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=amAiEH9p0JjjlIoDG8vUk3rwkUw6ePiV6D4s+4AzIhM=;
-        b=s4zqYiRQmEDzLAVeYCjc/hcRyFhy5qMlV//eVXQYyGuSqtgn7g/l3tHvrA7P0S5tRd
-         Tn8km2UvHP0QIGo/DLXUZmns15WSHIZgdi2iQDgEKOncSHT5ua4dmeL3enNWTjt6AZ4l
-         weVX3rkQ0Goi/cZNvzza0Sd4aop2ceAS6tZCB3mK95X2pQa5J2aTqzyma72pqw5c5leU
-         8tuLAljWh9Qr3XPA41biUYmEcZYbSs4CS27R3FT+iKeXlHsfxC5xihqw5aAWoKNCdc8B
-         +TVYPENTp/NhoFKxeUG58p482kA2eIN0biCh6PCO4ExIeE4GPDaBt9cneseQksAYtVcZ
-         XPZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIp/PfHVqTnXBWYRcYgP29Ujg07KdZ8FHR3DEinrj9re867SYFLfdY9E763/4gYvfNv5I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEy6iqRw149B7xjCCGjmGDEuupbR0lKrZ+J33S04Nftx5qOym9
-	UV/mkIrHhLXflnVTKL4NoRiXYXxALP6ZgbH2FWs+eWVnnxZHHfrCWbR4i8yTei33LWRQqck2vP5
-	LDg==
-X-Google-Smtp-Source: AGHT+IFPqhKGvpTcG3WvR15xNdlmCcTHSx2dYyPg7ppYF/3/HBUysYafNH489eXc+eCO/BIvXlJ+wjUhZ0c=
-X-Received: from pghb5.prod.google.com ([2002:a63:d805:0:b0:ad6:992d:5743])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:999f:b0:1ee:6ec3:e82e
- with SMTP id adf61e73a8af0-1ee8cbf7ac0mr26906261637.29.1739894173031; Tue, 18
- Feb 2025 07:56:13 -0800 (PST)
-Date: Tue, 18 Feb 2025 07:56:11 -0800
-In-Reply-To: <cf013079-ad8a-4b07-bbcf-6f35d1126a92@linux.intel.com>
+        d=1e100.net; s=20230601; t=1739894639; x=1740499439;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bZDB6163brXmpWZDgT/6YzrIWqBj9L6ybAjsJnZ9ahg=;
+        b=BGDnkzewOx7iKBKYnLfMnA9uN0yUyGxucFvO3uFCn0cZSW17e0JM7J5EUx/yIc4sfn
+         jwoU8B/Cf8qKK1tv2Zhetv0PPtR8ysg0EB4Xb7hnXLGXdVf41C0iwcZvfd13BhmLwUw8
+         LT6hszKsEowZ+Ff+REZyD8SfHPvxsBtIODPwKpZIt6d5LcKcIxKxQ7+pE3cBIdnWGtKf
+         /yGWU4WTznrMBw27OENfGlCNWWXe841pi+aAS6nneLS6Q2w5dHEtXL2gUtDpmBgpq22n
+         BuqT6vJ+HKA94bH8RploQk5mq/cT8X33k8CMeC5ReaAUsNP30wiwypSLnC9bJJF+FEzk
+         o1ug==
+X-Forwarded-Encrypted: i=1; AJvYcCVa4KQZpkLZbfXK3fW/H9+c41hh5DJ5G3vj76eIhk9+0JfLGu//XkIq3DUytDmCumMjSxc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8kVS1ro74UyGAJoPtjuV9l0dPUaSjSyb0+flVITlmKvfZpIvH
+	5UbCuxyXYPbCJggmESrRqivWGAdf9+ID/naBz/QjzaFMO+5XTED1BXMJ9k23pveRsQU+sp/njle
+	S6g==
+X-Google-Smtp-Source: AGHT+IFNVuGgmnbQtTfdLkBHrvWh0s23OtsUX5+0HskCmpFlWqBybVXiHNX0UB/9IvEeeiAdLnbnMSNoI9o=
+X-Received: from pfan14.prod.google.com ([2002:aa7:8a4e:0:b0:730:7648:7a74])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4e06:b0:732:706c:c4ff
+ with SMTP id d2e1a72fcca58-7329cf56e98mr240940b3a.7.1739894639222; Tue, 18
+ Feb 2025 08:03:59 -0800 (PST)
+Date: Tue, 18 Feb 2025 08:03:57 -0800
+In-Reply-To: <20250217085731.19733-1-yan.y.zhao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240914101728.33148-1-dapeng1.mi@linux.intel.com>
- <20240914101728.33148-6-dapeng1.mi@linux.intel.com> <Z6-wbu7KFqFDLTLH@google.com>
- <cf013079-ad8a-4b07-bbcf-6f35d1126a92@linux.intel.com>
-Message-ID: <Z7Stmz1VUE-cZUzq@google.com>
-Subject: Re: [kvm-unit-tests patch v6 05/18] x86: pmu: Enlarge cnt[] length to
- 48 in check_counters_many()
+References: <20250217085535.19614-1-yan.y.zhao@intel.com> <20250217085731.19733-1-yan.y.zhao@intel.com>
+Message-ID: <Z7SvbSHe74HUXvz4@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86/mmu: Bail out kvm_tdp_map_page() when VM dead
 From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Xiong Zhang <xiong.y.zhang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
-	Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>, 
-	Yongwei Ma <yongwei.ma@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, rick.p.edgecombe@intel.com, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Feb 18, 2025, Dapeng Mi wrote:
-> On 2/15/2025 5:06 AM, Sean Christopherson wrote:
-> > On Sat, Sep 14, 2024, Dapeng Mi wrote:
-> >> Considering there are already 8 GP counters and 4 fixed counters on
-> >> latest Intel processors, like Sapphire Rapids. The original cnt[] arra=
-y
-> >> length 10 is definitely not enough to cover all supported PMU counters=
- on
-> >> these new processors even through currently KVM only supports 3 fixed
-> >> counters at most. This would cause out of bound memory access and may =
-trigger
-> >> false alarm on PMU counter validation
-> >>
-> >> It's probably more and more GP and fixed counters are introduced in th=
-e
-> >> future and then directly extends the cnt[] array length to 48 once and
-> >> for all. Base on the layout of IA32_PERF_GLOBAL_CTRL and
-> >> IA32_PERF_GLOBAL_STATUS, 48 looks enough in near feature.
-> >>
-> >> Reviewed-by: Jim Mattson <jmattson@google.com>
-> >> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> >> ---
-> >>  x86/pmu.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/x86/pmu.c b/x86/pmu.c
-> >> index a0268db8..b4de2680 100644
-> >> --- a/x86/pmu.c
-> >> +++ b/x86/pmu.c
-> >> @@ -255,7 +255,7 @@ static void check_fixed_counters(void)
-> >> =20
-> >>  static void check_counters_many(void)
-> >>  {
-> >> -	pmu_counter_t cnt[10];
-> >> +	pmu_counter_t cnt[48];
-> > ARGH.  Since the *entire* purpose of increasing the size is to guard ag=
-ainst
-> > buffer overflow, add an assert that the loop doesn't overflow.
->=20
-> This is not only for ensuring no buffer overflow.
+On Mon, Feb 17, 2025, Yan Zhao wrote:
+> Bail out of the loop in kvm_tdp_map_page() when a VM is dead. Otherwise,
+> kvm_tdp_map_page() may get stuck in the kernel loop when there's only one
+> vCPU in the VM (or if the other vCPUs are not executing ioctls), even if
+> fatal errors have occurred.
+> 
+> kvm_tdp_map_page() is called by the ioctl KVM_PRE_FAULT_MEMORY or the TDX
+> ioctl KVM_TDX_INIT_MEM_REGION. It loops in the kernel whenever RET_PF_RETRY
+> is returned. In the TDP MMU, kvm_tdp_mmu_map() always returns RET_PF_RETRY,
+> regardless of the specific error code from tdp_mmu_set_spte_atomic(),
+> tdp_mmu_link_sp(), or tdp_mmu_split_huge_page(). While this is acceptable
+> in general cases where the only possible error code from these functions is
+> -EBUSY, TDX introduces an additional error code, -EIO, due to SEAMCALL
+> errors.
+> 
+> Since this -EIO error is also a fatal error, check for VM dead in the
+> kvm_tdp_map_page() to avoid unnecessary retries until a signal is pending.
+> 
+> The error -EIO is uncommon and has not been observed in real workloads.
+> Currently, it is only hypothetically triggered by bypassing the real
+> SEAMCALL and faking an error in the SEAMCALL wrapper.
+> 
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 08ed5092c15a..3a8d735939b5 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4700,6 +4700,10 @@ int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code, u8 *level
+>  	do {
+>  		if (signal_pending(current))
+>  			return -EINTR;
+> +
+> +		if (vcpu->kvm->vm_dead)
 
-In practice, it is.  As is, there are *zero* sanity checks or restrictions =
-on the
-number of possible counters.  Yes, the net effect is that the test doesn't =
-work
-if a CPU supports more than ARRAY_SIZE(cnt) counters, but the reason the te=
-st
-doesn't work is because such a CPU would cause buffer overflow.
+This needs to be READ_ONCE().  Along those lines, I think I'd prefer
 
-Yes, there are more nuanced reasons for using a large, statically sized arr=
-ay.
-If the goal was to support any theoretical CPU, the array would be dynamica=
-lly
-allocated, but that's not worth the complexity.  If the goal just was to su=
-pport
-SPR, the size would have been set to 12, but that would incur additional ma=
-intenance
-in the not-too-distant future.
+		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu))
+			return -EIO;
 
-> As the commit message says,=C2=A0 the counter number has already exceeded=
- 10, such
-> as SPR has 12 counters (8 GP + 4 fixed),
+or
 
-I am well aware.
+		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) 
+			return -EIO;
 
-> and there would be more counters in later platfroms. The aim of enlarging=
- the
-> array size is to ensure these counters can be enabled and verified
-> simultaneously. =C2=A048 may be too large and 32 should be fair enough. T=
-hanks.
-
-No.  Just no.  Unless there is an architecturally defined limit, and even t=
-hen a
-sanity check is strongly encourage, KVM-related software should never, ever=
- blindly
-assume a buffer size is "good enough".
+so that if more terminal requests come long, we can bundle everything into a
+single check via a selective version of kvm_request_pending().
 
