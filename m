@@ -1,162 +1,133 @@
-Return-Path: <kvm+bounces-38473-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38474-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14D1AA3A5B6
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 19:36:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED724A3A603
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 19:47:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7D5418965B6
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 18:34:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4ED3A449B
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 18:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6391F5838;
-	Tue, 18 Feb 2025 18:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C961EB5CD;
+	Tue, 18 Feb 2025 18:47:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x4fOUhev"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="loCelom+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E302E1EB5E8
-	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 18:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEBA2356D3;
+	Tue, 18 Feb 2025 18:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739903613; cv=none; b=athTSBFhYGmt5qzjmPJu/wUHiAVMjApDvjDKok5DgOMhpQAVjfqyvgqu7s1ymnde426g4t/PHM2/sQax4tcPZfu23h4/sugRGzOmop4GpCH4C8zBQ5Qo/a6rO/bcQSgPTWJU16KOSOB9IW18zrnXHnMPDsV0sgbC8TNcsmwnOLQ=
+	t=1739904455; cv=none; b=dszXA7BMnxcXKS/xFc5o8bzdtRfcFq4JotvhCxhHhFsIvRVNgUuwhtdzrFT+XOChrZCLYn1qUIMwQpC3stCCw/oi+APmr3vuwaIkNY6iCxVAJM9wpSALjB3wqC0ptWgWQxvzFCx5uCfqZb1bWGPVfabBE2Pgm6hiyeeObrWuX/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739903613; c=relaxed/simple;
-	bh=ti3yr2A/5iAPyTvCN7LoMdLTMISr8vOEEWZ2ctY2bwc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=E/8Q+YOCZwlRtO/1CJHhPktOahYXolCFTQfifhTRTsGkm0zRgo5WTJotOXoL04w2o0/sOCxdkPYe+ewVDzoomyTyeYVsERzwqr0rspngASsmNtPPnleJrnKc9v2sSdT2jzHeAdbPKVHqCAsWSSYKZtymTwvt/eOHR9TWF8vsslg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x4fOUhev; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc45101191so6058468a91.1
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 10:33:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739903611; x=1740508411; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RXlNUKi1nXILcNxScCTGDcCAb7tkH8J9nCCjyi/czMs=;
-        b=x4fOUhevmn+gPtDKJpMuIKN7MvU6n41muA60MhraQIu3iyD1sFXmJbtwgbLjBz271a
-         Gf067RpOTdCtwjSEMtMhfqkVSCkazZ0ZkjF3UVB1nDFnwzydsb1Q2d2kg3uGZv67/t+5
-         VFhXGclFIuGsli6EyBGLoAOI3KovtUg28dL0/925vNRYDIVYKJr2bZHqkWMfSjIw0Z69
-         XSApq/RGpvz+8sw77ohHSVQy51yvUXMGPyh7kxo4AtQbVPBDEsrf68z0nBgZkKaQFE6u
-         0w5tUkcaA07Fs+AxCJQcUsWgjRDBB0+Q1EXbta5RuNCULIu3qVjJrMSFEdo6NFmhE2BN
-         yv6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739903611; x=1740508411;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RXlNUKi1nXILcNxScCTGDcCAb7tkH8J9nCCjyi/czMs=;
-        b=aYloVpOI4WmSW40r6Ylv7hz9kxKLA1gLKfWdvuZKVxmNGwquPb386WhxeZROB/+xiS
-         yI3AT7AANZBawTYM3k6segtgH/5e0I2wiNrET/leRQVVh8LLWYwRvB6kMDAz4vWI8EWo
-         6mtaHT/HAkHmy87s/CpugxSzwBzhnY2lZfIMXNa0Z+DpUf9f2WJT3a3GtOaxiS6LCieM
-         2rqe56Imh+uMe8pY3F+X41TH/wGMzpyOOoTVLv4vNYMUd7XH1kOjNZ3zwDYnVJSmDrOM
-         Hia3laVNJNCCwFvmEHJtt1wFG/TvBtDxfNs3XrXBcsyFUIEYTewH3c3NmclTt2GAe4Z/
-         pezw==
-X-Forwarded-Encrypted: i=1; AJvYcCVpjiPp5NIWco+KKFhEjJtJ450iVvvK36UeeH8vU686wpqSBvCLKJQiyLgjewkadU8HlXo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx694yabybT6DA056R1DVNN573Oxwkeu9xu+HLu+5DFKOzmrOz5
-	hXekvfwkYHOn0NdnmudBdPr5lbhc/EssJgEvH1LRC2/s0xzIOuXQP3MHfUOsRbLLVmG3LmcbN3V
-	P+w==
-X-Google-Smtp-Source: AGHT+IEcW7Bb+oVUdOJFQR7wversG/+Mi/U5uft9ooKkzX2p+pew6XYKq/ofkOd7HS18VAqSMoPIlTSlOmw=
-X-Received: from pfbfr18.prod.google.com ([2002:a05:6a00:8112:b0:730:76c4:7144])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:14c2:b0:730:9659:ff4b
- with SMTP id d2e1a72fcca58-732618e4fccmr18645840b3a.19.1739903611200; Tue, 18
- Feb 2025 10:33:31 -0800 (PST)
-Date: Tue, 18 Feb 2025 10:33:29 -0800
-In-Reply-To: <gxyvqeslwhw6dirfg7jb7wavotlguctnxf5ystqfcnn5mk74qa@nlqbruetef22>
+	s=arc-20240116; t=1739904455; c=relaxed/simple;
+	bh=kgS821ZvzlP2dxTaoeNLI5ioJyRwNqun+19UmhCW1u8=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=MwLV+J+QV4KjrHCx/GT2FYJddG5uO4kLW72QIlpPIB94laknChUQy0TKQCTeAh3Y7Eirf/HbfbcRZkQ1NbQfWqILSpxwGVXwxHu5gboAtTwWHRG0OibG5l6rjnmrukj15eSQEV5pwr6kVopCAnqCYRHWQz7lu522IuoICCAwT90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=loCelom+; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=pEhBnu7IjxegZyI8flpkEhAnooxMPcthAGKgdF/zgLM=; b=loCelom+fJGGA1oNRk+AQI7Er9
+	pLNjceLkq3ijPryR0QFAHzUgMCTlEJr+QwKufL34ERUznAiqHOHgEenPTTQnsyL+8Q3rqtJp7258p
+	jBICA1RsPHQkl7wIuRiwurokwbSyjNtYyU9mhsBo+yHaQvF/7JojcsPk6NML9sNX3FMfhs3TMVMdK
+	IG6nJ1xcf6/Zhy3UJLQaMqunHrA2cBIm6XSG9h7QX+szW3eTraeeDapQXDzqYcdjb7Hp6YshMWLbc
+	UPRce3gk3+7px1gcOUYl9mbBRsYh4wPMxOPD9zEnE4oBDU4s3wzlLCpHJwnZPsinonqkyM2i8+2TC
+	sLNLi2UA==;
+Received: from [2a01:cb15:834c:4100:cee8:77e5:e34e:6bff] (helo=[IPv6:::1])
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tkScz-000000022C5-3vT0;
+	Tue, 18 Feb 2025 18:47:30 +0000
+Date: Tue, 18 Feb 2025 19:47:27 +0100
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Paul Durrant <paul@xen.org>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Joao Martins <joao.m.martins@oracle.com>,
+ David Woodhouse <dwmw@amazon.co.uk>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_1/5=5D_KVM=3A_x86/xen=3A_Restrict_?=
+ =?US-ASCII?Q?hypercall_MSR_to_unofficial_synthetic_range?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <Z7S2SpH3CtqCVlBc@google.com>
+References: <20250215011437.1203084-1-seanjc@google.com> <20250215011437.1203084-2-seanjc@google.com> <DC438DC0-CC4B-4EE2-ABA8-8E0F9D15DD46@infradead.org> <Z7S2SpH3CtqCVlBc@google.com>
+Message-ID: <CB09D020-703C-41D2-8F1F-32BF776BE1DB@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250207233410.130813-1-kim.phillips@amd.com> <20250207233410.130813-3-kim.phillips@amd.com>
- <4eb24414-4483-3291-894a-f5a58465a80d@amd.com> <Z6vFSTkGkOCy03jN@google.com>
- <6829cf75-5bf3-4a89-afbe-cfd489b2b24b@amd.com> <Z66UcY8otZosvnxY@google.com> <gxyvqeslwhw6dirfg7jb7wavotlguctnxf5ystqfcnn5mk74qa@nlqbruetef22>
-Message-ID: <Z7TSef290IQxQhT2@google.com>
-Subject: Re: [PATCH v3 2/2] KVM: SEV: Configure "ALLOWED_SEV_FEATURES" VMCB Field
-From: Sean Christopherson <seanjc@google.com>
-To: Naveen N Rao <naveen@kernel.org>
-Cc: Kim Phillips <kim.phillips@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org, 
-	kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, "Nikunj A . Dadhania" <nikunj@amd.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Kishon Vijay Abraham I <kvijayab@amd.com>, Alexey Kardashevskiy <aik@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Feb 17, 2025, Naveen N Rao wrote:
-> On Thu, Feb 13, 2025 at 04:55:13PM -0800, Sean Christopherson wrote:
-> > On Thu, Feb 13, 2025, Kim Phillips wrote:
-> > > On 2/11/25 3:46 PM, Sean Christopherson wrote:
-> > > > On Mon, Feb 10, 2025, Tom Lendacky wrote:
-> > > > > On 2/7/25 17:34, Kim Phillips wrote:
-> > 
-> > Third, letting userspace opt-in to something doesn't necessarily mean giving
-> > userspace full control.  Which is the entire reason I asked the question about
-> > whether or not this can break userspace.  E.g. we can likely get away with only
-> > making select features opt-in, and enforcing everything else by default.
-> > 
-> > I don't think RESTRICTED_INJECTION or ALTERNATE_INJECTION can work without KVM
-> > cooperation, so enforcing those shouldn't break anything.
-> > 
-> > It's still not clear to me that we don't have a bug with DEBUG_SWAP.  AIUI,
-> > DEBUG_SWAP is allowed by default.  I.e. if ALLOWED_FEATURES is unsupported, then
-> > the guest can use DEBUG_SWAP via SVM_VMGEXIT_AP_CREATE without KVM's knowledge.
-> 
-> In sev_es_prepare_switch_to_guest(), we save host debug register state 
-> (DR0-DR3) only if KVM is aware of DEBUG_SWAP being enabled in the guest 
-> (via vmsa_features). So, from what I can tell, it looks like the guest 
-> will end up overwriting host state if it enables DEBUG_SWAP without 
-> KVM's knowledge?
-> 
-> Not sure if that's reason enough to enforce ALLOWED_SEV_FEATURES for 
-> DEBUG_SWAP :)
-> 
-> If ALLOWED_SEV_FEATURES is not supported, we may still have to 
-> unconditionally save the host DR0-DR3 registers.
+On 18 February 2025 17:33:14 CET, Sean Christopherson <seanjc@google=2Ecom>=
+ wrote:
+>On Sat, Feb 15, 2025, David Woodhouse wrote:
+>> On 15 February 2025 02:14:33 CET, Sean Christopherson <seanjc@google=2E=
+com> wrote:
+>> >diff --git a/arch/x86/kvm/xen=2Ec b/arch/x86/kvm/xen=2Ec
+>> >index a909b817b9c0=2E=2E5b94825001a7 100644
+>> >--- a/arch/x86/kvm/xen=2Ec
+>> >+++ b/arch/x86/kvm/xen=2Ec
+>> >@@ -1324,6 +1324,15 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct =
+kvm_xen_hvm_config *xhc)
+>> > 	     xhc->blob_size_32 || xhc->blob_size_64))
+>> > 		return -EINVAL;
+>> >=20
+>> >+	/*
+>> >+	 * Restrict the MSR to the range that is unofficially reserved for
+>> >+	 * synthetic, virtualization-defined MSRs, e=2Eg=2E to prevent confu=
+sing
+>> >+	 * KVM by colliding with a real MSR that requires special handling=
+=2E
+>> >+	 */
+>> >+	if (xhc->msr &&
+>> >+	    (xhc->msr < KVM_XEN_MSR_MIN_INDEX || xhc->msr > KVM_XEN_MSR_MAX_=
+INDEX))
+>> >+		return -EINVAL;
+>> >+
+>> > 	mutex_lock(&kvm->arch=2Exen=2Exen_lock);
+>> >=20
+>> > 	if (xhc->msr && !kvm->arch=2Exen_hvm_config=2Emsr)
+>>=20
+>> I'd still like to restrict this to ensure it doesn't collide with MSRs =
+that
+>> KVM expects to emulate=2E But that can be a separate patch, as discusse=
+d=2E
+>
+>I think that has to go in userspace=2E  If KVM adds on-by-default, i=2Ee=
+=2E unguarded,
+>conflicting MSR emulation, then KVM will have broken userspace regardless=
+ of
+>whether or not KVM explicitly rejects KVM_XEN_HVM_CONFIG based on emulate=
+d MSRs=2E
+>
+>If we assume future us are somewhat competent and guard new MSR emulation=
+ with a
+>feature bit, capability, etc=2E, then rejecting KVM_XEN_HVM_CONFIG isn't =
+obviously
+>better, or even feasible in some cases=2E  E=2Eg=2E if the opt-in is done=
+ via guest
+>CPUID, then KVM is stuck because KVM_XEN_HVM_CONFIG can (and generally sh=
+ould?)
+>be called before vCPUs are even created=2E  Even if the opt-in is VM-scop=
+ed, e=2Eg=2E
+>a capabilitiy, there are still ordering issues as userpace would see diff=
+erent
+>behavior depending on the order between KVM_XEN_HVM_CONFIG and the capabi=
+lity=2E
 
-Aha!  We do not.  The existing KVM code is actually flawed in the opposite
-direction, in that saving host DR0..DR3 during sev_es_prepare_switch_to_guest()
-is superfluous.
-
-DR7 is reset on #VMEXIT (swap type "C"), and so KVM only needs to ensure DR0..DR3
-are restored before loading DR7 with the host's value.  KVM takes care of that in
-common x86 code via hw_breakpoint_restore().
-
-However, there is still a bug, as the AMD-specific *masks* are not restored.  KVM
-doesn't support MSR_F16H_DRx_ADDR_MASK emulation or passthrough for normal guests,
-so the guest can't set those values either, i.e. will get a #VC.  But the masks
-do need to be restored, because the CPU will clobber them with '0' when DebugSwap
-is enabled.
-
-And of course the DR0..DR3 loads in sev_es_prepare_switch_to_guest() are a
-complete waste of cycles.
-
-*sigh*
-
-Ugh, it gets worse.  The awfulness goes in both direction.  Unless I've misunderstood
-how this all works, just because *KVM* enables DebugSwap for the BSP doesn't mean
-the guest will enable DebugSwap for APs.  And so KVM _can't_ rely on DebugSwap to
-actually swap DR0..DR3, because KVM has no way of knowing whether or not a given
-vCPU actually has it enabled.  And that's true even when SEV_ALLOWED_FEATURES
-comes along, which means treating DR0..DR3 as swap type B is utterly worthless.
-
-What a mess.  I'll send a small series to try and clean things up.
-
-Also, I told y'all so: https://lore.kernel.org/all/YWnbfCet84Vup6q9@google.com
-
-P.S. Can someone please get the APM updated to actually explain WTF enabling
-     Debug Virtualization in SEV_FEATURES does?  The APM does not at all match
-     what y'all have told me.  A sane reading of the APM would be that DRs are
-     *unconditionally* swap type B when DebugSwap is supported, whereas I've been
-     told from the very beginning[*] that treating them as type B requires software
-     enabling:
-
-         AMD Milan introduces support for the swapping, as type 'B', of DR[0-3]
-         and DR[0-3]_ADDR_MASK registers. It requires that SEV_FEATURES[5] be set
-         in the VMSA.
-
-[*] https://lore.kernel.org/all/20221201021948.9259-3-aik@amd.com
+Well, I just changed QEMU to do KVM_XEN_HVM_CONFIG from the first vCPU ini=
+t because QEMU doesn't know if it needs to avoid the Hyper-V MSR space at k=
+vm_xen_init() time=2E But yes, we don't want to depend on ordering either w=
+ay=2E
 
