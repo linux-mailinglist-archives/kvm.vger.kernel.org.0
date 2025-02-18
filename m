@@ -1,198 +1,142 @@
-Return-Path: <kvm+bounces-38508-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38509-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6FE6A3AC11
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 23:55:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D064A3AC59
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 00:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2C823B211C
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 22:55:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9760D1894F6E
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 23:09:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E58E1DDC2B;
-	Tue, 18 Feb 2025 22:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33161D958E;
+	Tue, 18 Feb 2025 23:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aiOZcO7g"
+	dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b="L+uNAUPN"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930811D8A0D;
-	Tue, 18 Feb 2025 22:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E24D2862B7
+	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 23:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739919301; cv=none; b=kbLCz0MTw9i4aK2RbcNaskftyB7Eb5Pypv7jpT8mTOFZnr141vuqt4erjQOHV0SLQHLJ+lwVaTZgOz46MqH40X2mC4b0JRQ29ZZXh3aTT70l8xYY8+j6TCi0pOLOOFIrQKomhlIy7cvqGGXTQ4VariEDJ94Cbnj+8gRArYp+WHs=
+	t=1739920181; cv=none; b=IKUnUSieus+1wl8nEf7F1HmEfDZoQjzEwsFhja3TpofkbS0p08gsx6r3x43zhm8vXgnHRrKHb2IPg8nxWCxMcOG1f6lOYdg4f25dkPlE/7NDctqCKRu7LdaVf/o8a/gf89w3LCKyEgKBJ+ZsR6+VapEQvzz7DiJ+K22Y+8Xq5U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739919301; c=relaxed/simple;
-	bh=JfZZ5wVAOe/Y1NihNftjYuYbwLi7XmW8eEZlPrqPMd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AtgLHhWS2qFYesAWal7ExFsAez1OBW0cB1j2SQvKVZCUuTaKFT+IW9DhOw+tGXpqgbmc4Zyqdim5rsGBDwa+09ctw+aDDKCfksoBg8ng1nObxQAWwMQWeIk2045a6WD22wq0nQ636c1L2roOs/ctLY+aTEn4GLpTMZl/bxomZl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aiOZcO7g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F80C4CEE2;
-	Tue, 18 Feb 2025 22:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739919301;
-	bh=JfZZ5wVAOe/Y1NihNftjYuYbwLi7XmW8eEZlPrqPMd4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aiOZcO7gz+YKbzy7UfmkDhU3tc1GP77KXGgqZvo8QBWC5vgpTgTrmRki8TY27KEG9
-	 8HqF/60pEH5UBgtSchm3Se6wqh0dZaDowr6l0b6r0YUl+j0tajI/QC2mEqdWnL1GnL
-	 LiqABVRTk5NWk1BgguBFuStYX4r6uCiugCD746iyvxydi45/2eBqxBVJGd1AGnfWRG
-	 ylD6MnyNRCoHpbpVjxW/FVxP8oPsdm4slgSekZk/4aRmRIPRkFjtlJborqm0BF8/oW
-	 GCSKlZDlRTb1JiQ+9Nn3ndwQV91qYjgd4h0D3IG0l3MLO6jxlYtY1qBAyD9YDZ6pGA
-	 E6dhuaXIuBhyA==
-Date: Tue, 18 Feb 2025 22:54:57 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 00/27] KVM: arm64: Implement support for SME in
- non-protected guests
-Message-ID: <Z7UPwXVqkaKZDtGk@finisterre.sirena.org.uk>
-References: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
- <86pljkswuk.wl-maz@kernel.org>
- <Z69dsGn1JVWPCqAi@finisterre.sirena.org.uk>
- <86h64ssyi1.wl-maz@kernel.org>
+	s=arc-20240116; t=1739920181; c=relaxed/simple;
+	bh=6Nhg1O6blPZgQ9N1EcXhOdZPzshzMMts66O0T+NgGko=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=c7vpOOwEEIqV/PXiZ9gCSbmxMK4fyO2zOG636CCnpdAOIhFAbyGMSvFjCR13H8dQRIBCBanqdqdnMrZOuhK+PxXCD0QDL7oYzloTHVxj+IYdwvPwgvT2dlrrmHZhzzuPICg/2WyZzJ1IS/+y0mz5GVHx4ZJ4PQJU7pyYrTLWHKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com; spf=pass smtp.mailfrom=tenstorrent.com; dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b=L+uNAUPN; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tenstorrent.com
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7272f3477e9so418966a34.3
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 15:09:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tenstorrent.com; s=google; t=1739920178; x=1740524978; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3y/gR+LeihyJHTKRZOGopeinhSvVCmlzc9gkBxiMUM0=;
+        b=L+uNAUPN1bx8o0tE/6iICjsrvhd9Gmu0DREBFZ7d30RtK6D4X7i86KMxRB7jzjLCBr
+         69F7ion3xyAGhS0zWtO1A5WyJSr+43XV4jwDaysn8+l9CQkypKkfekJY7CWcWQ3s9AfY
+         mEJpNKe+vim2mv7hFsAFUQY0Sw1uhb0JZTjQVlAreTGVHzHP1ZZSP1ruEu56uoezqqrV
+         YQFDQKm3NlD94rq3FanZeDgoPGrXXW2jyT2ZyMzd0YaGeOvvGCG/yia08lr2x93evESI
+         HpCoxGDWo2PdpFJbxRWn0Rp/VxU/3lvb03jUdRGlezLHPmbKHh716rBJMeJ+ssbi/oi/
+         bpIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739920178; x=1740524978;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3y/gR+LeihyJHTKRZOGopeinhSvVCmlzc9gkBxiMUM0=;
+        b=hMypwFWdfsBrAXGkGD6BMUUjwgWLpK+dBl+6dduTgJIFwFmwfpS9y0hz0CXYuJilds
+         /hhOsEkdoiLwpkHM+iL+v50pkbEX+nDeJEjb3NScFV0Lnkl9BVU/M4NCK6v+1hVC/7Kd
+         u3GWyE/9eCtYOnp47jlxrqAF86KrZ3Cm23gQ86mSHvL19DQbIWySpysiZ2oOGDoZl28J
+         s7iSmg28P9Tor0T6Vff/LamSnG5BHuW8uoRmOfXBdjbJ9Hn128TrJt6EW1O15+auCFmH
+         pC0nrww3yvEGlZyncs1Gln3sBTdPIl1gxdfWPXoC3FAZGKY/mjE6tPHSNajdr0F1W8dq
+         wlrA==
+X-Gm-Message-State: AOJu0YykV8cHKLKWYcXnXJ1c7wM4Pu2+nucjC2Dp84D8XgxrDXAXsiPN
+	+HqHKM4qjlkZZr+oLGF55adspEgvvy0L12PWPK8CUCoG6hj6BXjMSAsdDS/5ZXAcbQ1Mf1f/0zk
+	nNA==
+X-Gm-Gg: ASbGnctgmkta4RFRpt//UK0TxDWUaVuEpQz33fj3LusyuIVAw1bv/Ynnkzr0sRIhJV2
+	cVA4FndWC0Z+5OLSSsuTGJjEB46HNHZv6pOoSqtBvcPz96JkBtc4Kj0xLCwfAMcIHtCseBON/VG
+	KngguWtIiRVDJQHKswnqqPnwzFK72OUmTTkO/iAQvwMG8PEAFpWFkiV8d/Rav5pFCBZE1LeFAq0
+	Bm3cfvE4M+8KjX63O9jxq7pKaQcrj8M7qykoV3iSI0cpqrOLUTfW+48TghNvLnnJZz/oo3fSf2Z
+	wcixK8OUtmG+MQW0Am8fY+RHekGcVghsvw==
+X-Google-Smtp-Source: AGHT+IEmY18J1FmPvXpZGIHY4UpFVhq/GcJfyU8ixvP3S0+WUMLRcc3l8sD3KGr+jc22yNybL1Btwg==
+X-Received: by 2002:a05:6830:3697:b0:703:7827:6a68 with SMTP id 46e09a7af769-7271202d93cmr10813162a34.6.1739920177952;
+        Tue, 18 Feb 2025 15:09:37 -0800 (PST)
+Received: from aus-ird.tenstorrent.com ([38.104.49.66])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-727359dd714sm454360a34.64.2025.02.18.15.09.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 15:09:37 -0800 (PST)
+From: Cyril Bur <cyrilbur@tenstorrent.com>
+To: kvm@vger.kernel.org
+Cc: apatel@ventanamicro.com,
+	joel@jms.id.au
+Subject: [PATCH kvmtool v3] riscv: Use the count parameter of term_putc in SBI_EXT_DBCN_CONSOLE_WRITE
+Date: Tue, 18 Feb 2025 23:09:36 +0000
+Message-Id: <20250218230936.408429-1-cyrilbur@tenstorrent.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="S0+W34M0g75qMnHY"
-Content-Disposition: inline
-In-Reply-To: <86h64ssyi1.wl-maz@kernel.org>
-X-Cookie: Editing is a rewording activity.
+Content-Transfer-Encoding: 8bit
 
+Currently each character of a string is term_putc()ed individually. This
+causes a round trip into opensbi for each char. Very inefficient
+especially since the interface term_putc() does accept a count.
 
---S0+W34M0g75qMnHY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch passes a count to term_putc() in the
+SBI_EXT_DBCN_CONSOLE_WRITE path.
 
-On Mon, Feb 17, 2025 at 09:37:26AM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-> > On Fri, Feb 14, 2025 at 09:24:03AM +0000, Marc Zyngier wrote:
+Signed-off-by: Cyril Bur <cyrilbur@tenstorrent.com>
+---
+ riscv/kvm-cpu.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-> > > Why SVCR? This isn't a register, just an architected accessor to
-> > > PSTATE.{ZA,SM}. Userspace already has direct access to PSTATE, so I
-> > > don't understand this requirement.
+diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
+index 0c171da..84d35f7 100644
+--- a/riscv/kvm-cpu.c
++++ b/riscv/kvm-cpu.c
+@@ -172,21 +172,23 @@ static bool kvm_cpu_riscv_sbi(struct kvm_cpu *vcpu)
+ 			str_start = guest_flat_to_host(vcpu->kvm, addr);
+ 			addr += vcpu->kvm_run->riscv_sbi.args[0] - 1;
+ 			str_end = guest_flat_to_host(vcpu->kvm, addr);
+-			if (!str_start || !str_end) {
++			if (!str_start || !str_end || str_start > str_end) {
+ 				vcpu->kvm_run->riscv_sbi.ret[0] =
+ 						SBI_ERR_INVALID_PARAM;
+ 				break;
+ 			}
++			if (vcpu->kvm_run->riscv_sbi.function_id ==
++			    SBI_EXT_DBCN_CONSOLE_WRITE) {
++				int length = (str_end - str_start) + 1;
++
++				length = term_putc(str_start, length, 0);
++				vcpu->kvm_run->riscv_sbi.ret[1] = length;
++				break;
++			}
++			/* This will be SBI_EXT_DBCN_CONSOLE_READ */
+ 			vcpu->kvm_run->riscv_sbi.ret[1] = 0;
+-			while (str_start <= str_end) {
+-				if (vcpu->kvm_run->riscv_sbi.function_id ==
+-				    SBI_EXT_DBCN_CONSOLE_WRITE) {
+-					term_putc(str_start, 1, 0);
+-				} else {
+-					if (!term_readable(0))
+-						break;
+-					*str_start = term_getc(vcpu->kvm, 0);
+-				}
++			while (str_start <= str_end && term_readable(0)) {
++				*str_start = term_getc(vcpu->kvm, 0);
+ 				vcpu->kvm_run->riscv_sbi.ret[1]++;
+ 				str_start++;
+ 			}
+-- 
+2.34.1
 
-> > Could you be more explicit as to what you mean by direct access to
-> > PSTATE here?  The direct access to these PSTATE fields is in the form of
-
-> I'm painfully aware of the architecture limitations.
-
-> However, I don't get your mention of SPSR here. The architecture is
-> quite clear that PSTATE is where these bits are held, that they are
-> not propagated anywhere else, and that's where userspace should expect
-> to find them.
-
-> The fact that SW must use SVCR to alter PSTATE.{ZA,SM} doesn't matter.
-> We save/restore registers, not accessors. If this means we need to
-> play a dance when the VMM accesses PSTATE to reconciliate KVM's
-> internal view with the userspace view, so be it.
-
-Could you please clarify what you're referring to as the VMM accessing
-PSTATE here?  The KVM API documentation defines it's concept of PSTATE
-as:
-
- 0x6030 0000 0010 0042 PSTATE      64  regs.pstate
-
-in api.rst but does not futher elaborate.  Looking at the code the
-values that appear there seem to be mapped fairly directly to SPSR
-values, this is why I was talking about them above.
-
-It's not clear to me that PSTATE in the architecture is a register
-exactly.  DDI0487 L.a D1.4 defines the PSTATE bits as being stored in a
-ProcState pseudocode structure (ProcState is defined in J1.3.3.457, the
-pseudocode maps PSTATE in J1.3.3.454) but has an explicit comment that
-"There is no significace in the field order".  I can't seem to locate an
-architectural definition of the layout of PSTATE as a whole.  I also
-can't find any direct observability of PSTATE as a whole which would
-require a layout definition for PSTATE itself from the architecture. =20
-
-There *is* a statement in R_DQXFW that "The contents of PSTATE
-immediately before the exception was taken are written to SPSR_ELx"
-which is somewhat in conflict with the absence of SM and ZA fields in
-any of SPSR_ELx.  There's also R_BWCFK similarly for exception return,
-though that also already has some additional text for PSTATE.{IT,T} for
-returns to AArch32.  If everything in PSTATE ends up getting written to
-SPSR then we can use SPSR as our representation of PSTATE.
-
-> It probably means you need to obtain a clarification of the
-> architecture to define *where* these bits are stored in PSTATE,
-> because that's not currently defined.
-
-I will raise the issue with R_DQXFW and friends with the architects but
-I'm not convinced that at this point the clarification wouldn't be an
-adjustment to those rules rather than the addition of fields for SM and
-ZA in the SPSRs.  Without any additions the only access we have is via
-SVCR.
-
-> > > Isn't it that there is simply a dependency between restoring PSTATE
-> > > and any of the vector stuff? Also, how do you preserve the current ABI
-> > > that do not have this requirement?
-
-> > Yes, that's the dependency - I'm spelling out explicitly what changes in
-> > the register view when PSTATE.{SM,ZA} are restored.  This ABI is what
-> > you appeared to be asking for the last time we discussed this.
-
-=2E..
-
-> > Would you prefer:
-
-> >  - Changing the register view based on the current value of PSTATE.SM.
-> >  - Exposing streaming mode Z and P as separate registers.
-> >  - Exposing the existing Z and P registers with the maximum S?E VL.
-
-> > or some other option?
-
-> My take on this hasn't changed. I want to see something that behaves
-> *exactly* like the architecture defines the expected behaviour of a
-> CPU.
-
-> But you still haven't answered my question: How is the *current* ABI
-> preserved? Does it require *not* selecting SME? Does it require
-> anything else? I'm expecting simple answers to simple questions, not a
-
-Yes, it requires not selecting SME and only that.  If the VMM does not
-enable SME then it should see no change.
-
-> wall of text describing something that is not emulating the
-> architecture.
-
-I'm not clear what you're referring to as not emulating the architecture
-here, I *think* it's the issues with PSTATE.{SM,ZA} not appearing in
-SPSR_ELx and hence KVM's pstate?
-
-Your general style of interaction means that it is not always altogether
-clear when your intent is to just ask a simple question or when it is to
-point out some problem you have seen.
-
---S0+W34M0g75qMnHY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAme1D8EACgkQJNaLcl1U
-h9Ag7Af9FSno1GEtP2DysLSKInBllL4rhNcN+6z7D0oMeZYX+CbjmeedfMLNVwdd
-quEjDrrV5PN76cyP3s35ABkWOUUUWyrUMYt3sP6vVesfNuMhjb54DETOj71CTEaW
-wt8TicvFuN6erEuz85tgB5CPng+CEGwJRhu6STP7/gBEfPou7y/9dH6xj++i/ueD
-Affm1jdtJAtdk6lDgtqjF0K9Tkawu8SM/0MkoITsCRK3R05LpSLBiCvr3S0e/rUv
-r616LswXOvPnYxuJ3Cr2phgx5ZTGgSo+IH/KQUOdK9lM1E6YkqXDtNQtw5qXldu+
-NYjTRYepfepTBCUZ6GVhkP7IEmi+tQ==
-=qowg
------END PGP SIGNATURE-----
-
---S0+W34M0g75qMnHY--
 
