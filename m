@@ -1,65 +1,46 @@
-Return-Path: <kvm+bounces-38404-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38405-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7494DA39680
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 10:08:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DE4EA396BA
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 10:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0D42188FD23
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 09:08:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 106E77A1D94
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 09:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0194B22F3A3;
-	Tue, 18 Feb 2025 09:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LSCjhaQ1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE44222FF47;
+	Tue, 18 Feb 2025 09:16:07 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9E31EB1A6;
-	Tue, 18 Feb 2025 09:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6246522AE4E;
+	Tue, 18 Feb 2025 09:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739869649; cv=none; b=hjz+nucbm0w6IwX4W1iaQ8uPazwSbyK4tmqiyUtDqhoHEkBMSzL0GxAZ+apSidsgRiQbGpOQZYbKgJ1GfaIauMku6UVdxh+T1VPFrHZSX6EtYc1WCCLMOl+GAb69DJ6AzUK++d+vTuy9jMvRN1zjLtoYwJyM4DPra5cTiW+4knM=
+	t=1739870167; cv=none; b=TjVib/fdEUuJ8q3fgeY2oog1cZ4bd7muRGaIKLmAsSboe2M9hOxeKI2dui7/kng0H2YSoDZYHKskaRq9hnD8FcuX9Nh0JiYR0X3DX265X/9JvrXwt9ycMF+iU7PcLQ71HTfMEG42Wo92odNtn9C+mx+5mdDGVbX92xNYTMoiEjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739869649; c=relaxed/simple;
-	bh=thhsd7C2fre6QGSPN6Q80IMWM3FsmDf1qxmkFY1Ojk4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y0x8zeQVP6EcdYUSCpnqxG/sMwPf+GbXBlJ1UWhEezj6xx87XExXnLkcXzYLNzoRnRM9ehuT5GzdOayXG7T1dvv9I4/nY28JNBx21ZALlUJwz7OkT6vYf4/gOo11ArWSmiOt+mUrDIGCh1X3f/WeGSsd/CttdQwFM7Z0d7gAv54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LSCjhaQ1; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739869643; x=1771405643;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=thhsd7C2fre6QGSPN6Q80IMWM3FsmDf1qxmkFY1Ojk4=;
-  b=LSCjhaQ1B0O8SAwDNHLuP3hUNobcALOTgoxt7q6fLn8K8hWgs7c+R6Eo
-   DDsnoPtK8/4WAlYZPLBO6S7VmMG2ppdhGxkp/jGz8KOaRO5QEGC1eq9lQ
-   ZYkIi2gnZxF+M2o9+uXWGKzb3AMjabLWEowx23QcR+Kb3kSgbIW6rA8Uh
-   pOiVnedddflAQIcCc9BlrnMlCGgTVRHoFP37I9tR+ima8PpQgSQ+53LPF
-   Uie0h49jhwUVXDCi+Bwl0pWJKM8RyyNnHoBd5j05pRyljJaTJBS4WwTdh
-   j4NTlPUZUPgpQxidizZCS2cS6cQbH83/qMk+MPUt//mfkA+uBjHEZTK7m
-   g==;
-X-CSE-ConnectionGUID: ZSfexGwXQ+SBy3T+3SCN4A==
-X-CSE-MsgGUID: Zs7Gv2dtTYO9vEy82bJv6A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="51987246"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="51987246"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 01:07:22 -0800
-X-CSE-ConnectionGUID: 7ZFzaIx5Qh+NtuMt86spew==
-X-CSE-MsgGUID: B1r2gJhFToawhkpUDppGIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="114204781"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 01:07:20 -0800
-Message-ID: <14bf2696-0dcd-43c4-baa7-2591f0d902cc@linux.intel.com>
-Date: Tue, 18 Feb 2025 17:07:17 +0800
+	s=arc-20240116; t=1739870167; c=relaxed/simple;
+	bh=Z7vfeOXnRzH2MUW83NJ1BOZujFaF7BTid+tQ6g1426k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ZlcHEK4MQ2xfYBeE0nkwjxhFpMZklpq2fgS6VeIl73CTHpIzZFATFdcJ4DR3s8xfVDyBNqRkwvy+IQFPEprETr9M74HAsgcK1eNX49hJhkSujkc6qGlq4ZHioWDKGczohqo4pMvEvNTgFzUXYv5pj2iRxb5joR4BWkXbbS4K9vE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Yxv141mCDz1wn7M;
+	Tue, 18 Feb 2025 17:12:08 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 46C8E180214;
+	Tue, 18 Feb 2025 17:16:02 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 18 Feb 2025 17:16:01 +0800
+Message-ID: <cc6fc730-e5f4-485b-b0b6-ec70374b3ab1@huawei.com>
+Date: Tue, 18 Feb 2025 17:16:00 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,89 +48,90 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests patch v6 04/18] x86: pmu: Fix the issue that
- pmu_counter_t.config crosses cache line
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
- Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>,
- Dapeng Mi <dapeng1.mi@intel.com>
-References: <20240914101728.33148-1-dapeng1.mi@linux.intel.com>
- <20240914101728.33148-5-dapeng1.mi@linux.intel.com>
- <Z6-wHilax9b59ps8@google.com>
+Subject: Re: [RFC] mm: alloc_pages_bulk: remove assumption of populating only
+ NULL elements
+To: Chuck Lever <chuck.lever@oracle.com>, Yishai Hadas <yishaih@nvidia.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
+ Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
+	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
+	Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
+	<anna@kernel.org>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>
+CC: Luiz Capitulino <luizcap@redhat.com>, Mel Gorman
+	<mgorman@techsingularity.net>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
+	<linux-xfs@vger.kernel.org>, <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
+	<linux-nfs@vger.kernel.org>
+References: <20250217123127.3674033-1-linyunsheng@huawei.com>
+ <abc3ae0b-620a-4e4a-8dd8-f8e7d3764b3a@oracle.com>
 Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <Z6-wHilax9b59ps8@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <abc3ae0b-620a-4e4a-8dd8-f8e7d3764b3a@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
+
+On 2025/2/17 22:20, Chuck Lever wrote:
+> On 2/17/25 7:31 AM, Yunsheng Lin wrote:
+>> As mentioned in [1], it seems odd to check NULL elements in
+>> the middle of page bulk allocating,
+> 
+> I think I requested that check to be added to the bulk page allocator.
+> 
+> When sending an RPC reply, NFSD might release pages in the middle of
+
+It seems there is no usage of the page bulk allocation API in fs/nfsd/
+or fs/nfs/, which specific fs the above 'NFSD' is referring to?
+
+> the rq_pages array, marking each of those array entries with a NULL
+> pointer. We want to ensure that the array is refilled completely in this
+> case.
+> 
+
+I did some researching, it seems you requested that in [1]?
+It seems the 'holes are always at the start' for the case in that
+discussion too, I am not sure if the case is referring to the caller
+in net/sunrpc/svc_xprt.c? If yes, it seems caller can do a better
+job of bulk allocating pages into a whole array sequentially without
+checking NULL elements first before doing the page bulk allocation
+as something below:
+
++++ b/net/sunrpc/svc_xprt.c
+@@ -663,9 +663,10 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
+                pages = RPCSVC_MAXPAGES;
+        }
+
+-       for (filled = 0; filled < pages; filled = ret) {
+-               ret = alloc_pages_bulk(GFP_KERNEL, pages, rqstp->rq_pages);
+-               if (ret > filled)
++       for (filled = 0; filled < pages; filled += ret) {
++               ret = alloc_pages_bulk(GFP_KERNEL, pages - filled,
++                                      rqstp->rq_pages + filled);
++               if (ret)
+                        /* Made progress, don't sleep yet */
+                        continue;
+
+@@ -674,7 +675,7 @@ static bool svc_alloc_arg(struct svc_rqst *rqstp)
+                        set_current_state(TASK_RUNNING);
+                        return false;
+                }
+-               trace_svc_alloc_arg_err(pages, ret);
++               trace_svc_alloc_arg_err(pages, filled);
+                memalloc_retry_wait(GFP_KERNEL);
+        }
+        rqstp->rq_page_end = &rqstp->rq_pages[pages];
 
 
-On 2/15/2025 5:05 AM, Sean Christopherson wrote:
-> On Sat, Sep 14, 2024, Dapeng Mi wrote:
->> When running pmu test on SPR, the following #GP fault is reported.
->>
->> Unhandled exception 13 #GP at ip 000000000040771f
->> error_code=0000      rflags=00010046      cs=00000008
->> rax=00000000004031ad rcx=0000000000000186 rdx=0000000000000000 rbx=00000000005142f0
->> rbp=0000000000514260 rsi=0000000000000020 rdi=0000000000000340
->>  r8=0000000000513a65  r9=00000000000003f8 r10=000000000000000d r11=00000000ffffffff
->> r12=000000000043003c r13=0000000000514450 r14=000000000000000b r15=0000000000000001
->> cr0=0000000080010011 cr2=0000000000000000 cr3=0000000001007000 cr4=0000000000000020
->> cr8=0000000000000000
->>         STACK: @40771f 40040e 400976 400aef 40148d 401da9 4001ad
->> FAIL pmu
->>
->> It looks EVENTSEL0 MSR (0x186) is written a invalid value (0x4031ad) and
->> cause a #GP.
-> Nope.
->
->> Further investigation shows the #GP is caused by below code in
->> __start_event().
->>
->> rmsr(MSR_GP_EVENT_SELECTx(event_to_global_idx(evt)),
->> 		  evt->config | EVNTSEL_EN);
-> Nope.
->
->> The evt->config is correctly initialized but seems corrupted before
->> writing to MSR.
-> Still nope.
->
->> The original pmu_counter_t layout looks as below.
->>
->> typedef struct {
->> 	uint32_t ctr;
->> 	uint64_t config;
->> 	uint64_t count;
->> 	int idx;
->> } pmu_counter_t;
->>
->> Obviously the config filed crosses two cache lines. 
-> Yeah, no.  Cache lines are 64 bytes on x86, and even with the bad layout, the size
-> only adds up to 32 bytes on x86-64.  Packing it slightly better drops it to 24
-> bytes, but that has nothing to do with cache lines.
->  
->> When the two cache lines are not updated simultaneously, the config value is
->> corrupted.
-> This is simply nonsensical.  Compilers don't generate accesses that split cache
-> lines unless software is being deliberately stupid, and x86 doesn't corrupt data
-> on unaligned accesses.
->
-> The actual problem is that your next patch increases the size of the array in
-> check_counters_many() from 10 to 48 entries.  With 32 bytes per entry, it's just
-> enough to overflow the stack when making function calls (the array itself stays
-> on the stack page).  And because KUT's percpu and stack management is complete
-> and utter garbage, overflowing the stack clobbers the percpu area.
->
-> Of course, it's way too hard to even see that, because all of the code is beyond
-> stupid and (a) doesn't align the stacks to 4KiB, and (b) puts the percpu area at
-> the bottom of the stack "page".
->
-> I'll send patches to put band-aids on the per-CPU insanity, along with a refreshed
-> version of this series.
-
-Thumb up! I never realized this issue is caused by stack corruption. I
-would review and test the v7 patch set later. Thanks.
-
-
+1. https://lkml.iu.edu/hypermail/linux/kernel/2103.2/09060.html
 
