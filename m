@@ -1,109 +1,104 @@
-Return-Path: <kvm+bounces-38452-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38453-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCC5A3A110
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 16:24:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C9A8A3A15B
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 16:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAC933AFC31
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 15:23:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACFBC7A1F64
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 15:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A98226B978;
-	Tue, 18 Feb 2025 15:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6F726D5AC;
+	Tue, 18 Feb 2025 15:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bBmbLvmr"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kWqh2nJh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D65826B94D
-	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 15:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2CF13AD26;
+	Tue, 18 Feb 2025 15:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739892178; cv=none; b=qepFRYHGrkB4L0Q+Kmm3V6Mxcg1vRZi/HZ/17NvI0H1E8q8BdYoSWfJZrKloNOjbgTJWGSLqU7B3mv2yZvojsH6ulpEmEoK+AOdMqVdVGJW5RuVqmagz8NkShBaU+hHmIEnu6cT+rC0dxl1fLnJmST/WoAScJdjKWPoNejAhhXk=
+	t=1739892875; cv=none; b=uSEoZjY16vGV6WQ08JoYEdKITfy5GWjJcf4mffy3otgujqTIKtSMH0AAUpJNSLPF2r+fQdXrrkEuqMhwwD7hG7HFUg/a8A+ygEC+/Pfq58IJmyp76WphjHy21C9ySdaEn6k96CdM6/a1phVRxcRKX9cn6zr+CbgrP8YO56qT8Os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739892178; c=relaxed/simple;
-	bh=dRqns3tgs9LOzsvNykyA2wnDs4hZV04yHkHiuozwTo0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NKN4C+aoj03sA2SywZ8EpghqBdfvrshHCItqFiPlbC+WSUU/SQ8icZZXyPfoTVgPm38rlVMioxoMB/nbIEe6cmQW0LSHX626rGMOFASRqUWtTk0OWbTowtoZScayjUPuCMBA4vXQnVSutsSzWSgQoOSEb+0D9m7Wg1iarckMxrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bBmbLvmr; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220fb031245so74604345ad.3
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 07:22:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739892176; x=1740496976; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A4rBn1loiHVRgqEEQSp4qIiIQysoefBUpVmMVONI/VM=;
-        b=bBmbLvmrD97265On5Lpt5wPjTUlVv8Tnqf41bK7fBmHxacgA9JJarrnD00NEj3okig
-         Ti+cAqFrIibuzEPEuC1OInlzjhtGlrUd4dCKw7EjXunauSACmvEGAcQkbk73SArVVzR2
-         w0mFtKmR3AjrRTc4D7+y1Qy3dIKO5bEzoi6C0+0eu0k3yqKJqGAVGXM+SqPNLMsIfVhJ
-         pU1a42hhdiQ/ULk9HmZdWXnwP5JTHMiRF3OLJ+4pfx+DuZf1vLDS42BH18kED9TDcQTL
-         ooEFnGDZ4l8k9GfFZs2ghoymnwD/U2YlvEc2KsAGEt79AyIpgBXLWBV2P6wuUzZrBpHo
-         nGUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739892176; x=1740496976;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A4rBn1loiHVRgqEEQSp4qIiIQysoefBUpVmMVONI/VM=;
-        b=DL/QBR0Ics6UbijlJj2zcbIJRXIuS6UXPMLWrASSbWN7BbO43x9fvNF4OVKMyHaB4g
-         F/kZhS36eEMbyrVy1MPqSMzIigitUBfcyEy0DDPbnvR3xiKE5raiH1SkT2ld76fII0YK
-         M9e3IpF2dt23FVZO37Lyviy2/p/Dl46+NLOm0mScq+bj9qoUf0Kc67kqv2UR0EdXSQES
-         vKLZJOV2Zak1UUor/eI9SquBt5dWjk22Ez4F0UEnV+Htj8a+YEfsg2U+pO3cviuk9de0
-         n+sSibYzxjG0oW06YiYP3/W3+fSZQ6NIcKX08W6WOw0tIkihq/pX1x12ZEsptWVz8XBp
-         vcmw==
-X-Forwarded-Encrypted: i=1; AJvYcCXNR1uHJMU2hjXc7lk+Y1oaVRzf/PaHNq+Mk4mO5pR2jU99WaSw0ebjZGkkILIvxfUyrGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8dLeNTHvjAJf0lm2FQdKVX7sq8MdkyuQiuptj62GiPVCR7j2J
-	HSJrIO+Ck+htQXGno6OwwvuNRAZlOyzXgurkB1d96O96oMdzq9faYd9LXvCyfiW51OrN9uDAWC0
-	Lxw==
-X-Google-Smtp-Source: AGHT+IHtk8QhNUJ5IVao0gvIDKE2j52eZP0sIqAgCjZecx7PvM8TzFSmR+acBjaj46uiYVes4srTDuaJU+E=
-X-Received: from pfbjt23.prod.google.com ([2002:a05:6a00:91d7:b0:730:8a7b:24e0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:790b:b0:1ee:a914:1d64
- with SMTP id adf61e73a8af0-1eea9142045mr14137360637.28.1739892176009; Tue, 18
- Feb 2025 07:22:56 -0800 (PST)
-Date: Tue, 18 Feb 2025 07:22:54 -0800
-In-Reply-To: <469ee330-7736-4059-9e59-ec7b9a6d3c8b@suse.cz>
+	s=arc-20240116; t=1739892875; c=relaxed/simple;
+	bh=xP0O74aAz3/thkqgp4kW0eukkcQDwPA45eEmjLaSsH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DVlJrQCqPaGStDRpKX4Ggh+2xROBPhjgiDh4xZJiCnAWj8XMCJpuulnzwxTsb3pdzY7rN46mjnZSwuDLIwVSAucL1WEH/N4UNtpHHhyF1mLjcWv/WH1gslWDEZE+cGZPReurYhTxAxVLxDw+ZVHaY7czUlMziyBcktjqAwrxocc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=kWqh2nJh; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A684340E0220;
+	Tue, 18 Feb 2025 15:34:31 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id zXILX5Pa0jDr; Tue, 18 Feb 2025 15:34:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1739892868; bh=k5EEcJ+X4BamW818gv6v3mk4r1C4gWG5Gcc90naHqaI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kWqh2nJhYN4pVYrpF88LC423UTe1w79Ajm+8tpwkWpV2vfcP9fmIdNsYcx2qDawbS
+	 SSIGbzBkN6zXGZtOTQvdkG1h4GNxcVlDeFQipDjFH7f0UuolPoVgIozRVX6Joxb+/s
+	 Ij/Vn52NPnsBERVw/wpA7RQwymTmPTDJfffu7I+V7fnAVhyMG1RQ3I0JyELzt3UFRs
+	 1cSv7LlWuQRl6457JolsgMcE8Oxb0ZOPPGdtW9fUZq0PUhmN0A8VsdxKIigZfNkMHr
+	 1em4x/gGvQLLV/X1SsuukeqA5lfXrnzZknxKAf899UU/zcgrZw/CzQpMmZtnbG7yOL
+	 y+tvN+spNIrCf0DoaCIkQ5tBaAEAAKhBv2bHeRD9OOvvPzQkk/Vv9ALiaWnCfbKxEq
+	 EQOvVR8xcqZIcP66VjOd0m0HJYchef6KbkzRwRHSb954YHPdzAdU79BzBFb1cxOpVZ
+	 ylWpWr60+wEKYOsA4wISP6ooeoySOpKMRIPX3rSdJZGBwsd9UgEKRYF7RYESj0Uox4
+	 54wxqqyII74tedNDVSYZw9wgFsDSGPpWOlDBNsLQFa/Inqcxw4SNTSem96Y3S3Z3vS
+	 TvKEhE5E0mZXW2Fc2yJwvxugS+r3YNLwKfzZA47Axy8t6IA7zi4oM1gxBpgCxirIdg
+	 tiUluNOWs2+2PjvvI42r/rEo=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B72FC40E0212;
+	Tue, 18 Feb 2025 15:34:15 +0000 (UTC)
+Date: Tue, 18 Feb 2025 16:34:14 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Patrick Bellasi <derkling@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Patrick Bellasi <derkling@matbug.net>,
+	Brendan Jackman <jackmanb@google.com>,
+	David Kaplan <David.Kaplan@amd.com>
+Subject: Re: [PATCH final?] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250218153414.GMZ7Sodh_eQXqTNE2x@fat_crate.local>
+References: <20250218111306.GFZ7RrQh3RD4JKj1lu@fat_crate.local>
+ <20250218144257.1033452-1-derkling@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250210063227.41125-1-shivankg@amd.com> <20250210063227.41125-3-shivankg@amd.com>
- <469ee330-7736-4059-9e59-ec7b9a6d3c8b@suse.cz>
-Message-ID: <Z7Slzs_4jZ2qkPAi@google.com>
-Subject: Re: [RFC PATCH v4 2/3] mm/mempolicy: export memory policy symbols
-From: Sean Christopherson <seanjc@google.com>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Shivank Garg <shivankg@amd.com>, akpm@linux-foundation.org, willy@infradead.org, 
-	pbonzini@redhat.com, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	chao.gao@intel.com, ackerleytng@google.com, david@redhat.com, bharata@amd.com, 
-	nikunj@amd.com, michael.day@amd.com, Neeraj.Upadhyay@amd.com, 
-	thomas.lendacky@amd.com, michael.roth@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250218144257.1033452-1-derkling@google.com>
 
-On Mon, Feb 17, 2025, Vlastimil Babka wrote:
-> On 2/10/25 07:32, Shivank Garg wrote:
-> > Export memory policy related symbols needed by the KVM guest-memfd to
-> > implement NUMA policy support.
-> > 
-> > These symbols are required to implement per-memory region NUMA policies
-> > for guest memory, allowing VMMs to control guest memory placement across
-> > NUMA nodes.
-> > 
-> > Signed-off-by: Shivank Garg <shivankg@amd.com>
+On Tue, Feb 18, 2025 at 02:42:57PM +0000, Patrick Bellasi wrote:
+> Maybe a small improvement we could add on top is to have a separate and
+> dedicated cmdline option?
 > 
-> I think we should use EXPORT_SYMBOL_GPL() these days.
-> 
-> Wasn't there also some way to limit the exports to KVM?
+> Indeed, with `X86_FEATURE_SRSO_USER_KERNEL_NO` we are not effectively using an
+> IBPB on VM-Exit anymore. Something like the diff down below?
 
-The infrastructure is still a WIP[1], though when that lands, I definitely plan
-on tightening down the KVM-induced exports[2].
+Except that I don't see the point of this yet one more cmdline option. Our
+mitigations options space is a nightmare. Why do we want to add another one?
 
-[1] https://lore.kernel.org/all/20241202145946.108093528@infradead.org
-[2] https://lore.kernel.org/all/ZzJOoFFPjrzYzKir@google.com
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
