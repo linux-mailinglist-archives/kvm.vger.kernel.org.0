@@ -1,133 +1,118 @@
-Return-Path: <kvm+bounces-38474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED724A3A603
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 19:47:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F240BA3A741
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 20:21:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4ED3A449B
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 18:47:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72048164EC9
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 19:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C961EB5CD;
-	Tue, 18 Feb 2025 18:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A498417A308;
+	Tue, 18 Feb 2025 19:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="loCelom+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ieluvBNw"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEBA2356D3;
-	Tue, 18 Feb 2025 18:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D69521B9C4
+	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 19:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739904455; cv=none; b=dszXA7BMnxcXKS/xFc5o8bzdtRfcFq4JotvhCxhHhFsIvRVNgUuwhtdzrFT+XOChrZCLYn1qUIMwQpC3stCCw/oi+APmr3vuwaIkNY6iCxVAJM9wpSALjB3wqC0ptWgWQxvzFCx5uCfqZb1bWGPVfabBE2Pgm6hiyeeObrWuX/g=
+	t=1739906503; cv=none; b=PB72Ek2lzR61FnuRkc7b4mKePlNq+AWHjK5puKPa4g+yMYT3wLPxxPbcwpj1GEpvgUhdLLlNWEPkGHYVZoVxOrZUlDW/uA6revYEk+8qsOwxL2cBOrf+NKdO/bNzPs63mYXDF9i12iltvYwOpRMp+dnEdCaY6yk8xRi3y8waVmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739904455; c=relaxed/simple;
-	bh=kgS821ZvzlP2dxTaoeNLI5ioJyRwNqun+19UmhCW1u8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=MwLV+J+QV4KjrHCx/GT2FYJddG5uO4kLW72QIlpPIB94laknChUQy0TKQCTeAh3Y7Eirf/HbfbcRZkQ1NbQfWqILSpxwGVXwxHu5gboAtTwWHRG0OibG5l6rjnmrukj15eSQEV5pwr6kVopCAnqCYRHWQz7lu522IuoICCAwT90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=loCelom+; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=pEhBnu7IjxegZyI8flpkEhAnooxMPcthAGKgdF/zgLM=; b=loCelom+fJGGA1oNRk+AQI7Er9
-	pLNjceLkq3ijPryR0QFAHzUgMCTlEJr+QwKufL34ERUznAiqHOHgEenPTTQnsyL+8Q3rqtJp7258p
-	jBICA1RsPHQkl7wIuRiwurokwbSyjNtYyU9mhsBo+yHaQvF/7JojcsPk6NML9sNX3FMfhs3TMVMdK
-	IG6nJ1xcf6/Zhy3UJLQaMqunHrA2cBIm6XSG9h7QX+szW3eTraeeDapQXDzqYcdjb7Hp6YshMWLbc
-	UPRce3gk3+7px1gcOUYl9mbBRsYh4wPMxOPD9zEnE4oBDU4s3wzlLCpHJwnZPsinonqkyM2i8+2TC
-	sLNLi2UA==;
-Received: from [2a01:cb15:834c:4100:cee8:77e5:e34e:6bff] (helo=[IPv6:::1])
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tkScz-000000022C5-3vT0;
-	Tue, 18 Feb 2025 18:47:30 +0000
-Date: Tue, 18 Feb 2025 19:47:27 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Paul Durrant <paul@xen.org>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Joao Martins <joao.m.martins@oracle.com>,
- David Woodhouse <dwmw@amazon.co.uk>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_1/5=5D_KVM=3A_x86/xen=3A_Restrict_?=
- =?US-ASCII?Q?hypercall_MSR_to_unofficial_synthetic_range?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <Z7S2SpH3CtqCVlBc@google.com>
-References: <20250215011437.1203084-1-seanjc@google.com> <20250215011437.1203084-2-seanjc@google.com> <DC438DC0-CC4B-4EE2-ABA8-8E0F9D15DD46@infradead.org> <Z7S2SpH3CtqCVlBc@google.com>
-Message-ID: <CB09D020-703C-41D2-8F1F-32BF776BE1DB@infradead.org>
+	s=arc-20240116; t=1739906503; c=relaxed/simple;
+	bh=bkvmNuJeLETBECOiqWk9MtjZR6ThiLMHRWdbZO/TdrY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:Content-Type:
+	 MIME-Version; b=uAh1F+SBq/6b51YW9MlYCg9PvOqpCaoEk7XPU8OJw+BH4tPUk3emFMxuLu35D5K3NKwG6cB/YMAYGLUuT5XJWwIDVYbtEzD64efJcECJ6jQVZcFuELJSbo+i2LlNsMEDUlq1I9+PXhzjvvGrXA9eGXadewcBjFdmOLBbZR4qfHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ieluvBNw; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-436ce2ab251so40926685e9.1
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 11:21:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739906499; x=1740511299; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yeownKEZiIC47+N7MKi3dyYleDIO1KUAMDqBvvd4FqQ=;
+        b=ieluvBNwWwgRtPmrRTNQBo3NQrkMT4ZWVwkKy3sEEQ+EIJARtomfK0R54c2l5PG63b
+         B2qyAEXyTBn+B6t3IK0GU9ZY1+WbMXcLroaAkWfEoYX5QyRyc6rvrtxD3/oIxbm1kReW
+         iiBPyDI3207veM6IgGOiorGPTnGW2mZvQCWjy6FbYEXnUx7iCHbdMaJUI5A9KopQ3wku
+         BSPTgXdfLTgq+6HiBHoRRpyaU/IXr6Qj7oozOvf/Zpc/By789A5kjdX+HXtnkeYhu5Yk
+         Typn7YD0MURV5TUOPutXnD75c+J4wcQYvfXJfUSBbUYRGIw/H60aXTkh/UE99gTFcySL
+         /64g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739906499; x=1740511299;
+        h=mime-version:user-agent:content-transfer-encoding:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yeownKEZiIC47+N7MKi3dyYleDIO1KUAMDqBvvd4FqQ=;
+        b=uGlIbwenlJU4hXxzWLLM/J/qH6WyVzy2swuEeFNcvmw0tAfbVk3RNQmSEwx4Gu770r
+         EsKekt6vGjLiEoZGYdMzVnGXqz5azj9S+yFpOSAEAtpOPsMypB0838C35ohzfQplqhIh
+         BpWsb/yHteD0eWkSealICve7CCCzJhRLtEYjHMcVdUGTgEynvk5YNwOFjai/lzPERsda
+         vHHWntsXJh5erWnlUMuwtXvw8lf+kk2Ho4vcsn/S9ryvhnCkT71+hoDpGZgzkA/fpU9H
+         5NfwhtVxcqKRkajUkDntgU+1oWKNyAJ8c48kk85rhe2FVagBbJYtYp8OQQ+B7S8zv5be
+         asyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxPKUw+sPf1KV0QC/9Z55AEwDSm1PQ08ipxE0J3zNORjJQIySlarGTg0+mSwXeiaNfBVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9dLMmANoY/3k7v/hAlMClLAj9jqYgrrGQe3X+1FFHiW3RpECM
+	52c4QWlUWsdkdFY48A2TcXfXnbB7yyuhS6v9wI9ejCoejHN5dIud
+X-Gm-Gg: ASbGncuiVkdeFJhRafD18OTEVV/0NChGna0soVYWyM8Izgop78Obfp9k/Mcu3k41S7D
+	8VS/Te+FkZOt71hODnSxPIUt0HUTLJPrUTFYPhTC0+EPf03xCNPcEJaQChgHF8MYYeVkkCWCjAo
+	Hdb+tRm1784QzB2k5TYVG8Ef3QS9Or7O5PzYRnXKdnZgYQJli4+FavpoWbV1waWTt1zJ2LcalYp
+	/fnySLM+E20cjoYwb5vkrQ7WsT87E43u4pzy1WX2hfjV+eGOIaXRLf0YNsKiBr0zUCWA4XLTwO9
+	8pxrn4sHG1Une2b8yNL56xe7OwbauUh7s/JYZEsN0JECkpO1fjlafRyD9XTag1n/iBlXnw==
+X-Google-Smtp-Source: AGHT+IHPqTa+zTfXkXh4LXzcP3343zLQclkxofCCboW6w8kCrp+5klrwxGvzJ1HyUAjEAhqNN/AXYg==
+X-Received: by 2002:a05:600c:19c9:b0:439:6a24:1067 with SMTP id 5b1f17b1804b1-4396e6fae48mr154981015e9.16.1739906499229;
+        Tue, 18 Feb 2025 11:21:39 -0800 (PST)
+Received: from ?IPv6:2001:b07:5d29:f42d:5912:494:2baa:19e8? ([2001:b07:5d29:f42d:5912:494:2baa:19e8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43989087517sm57185545e9.8.2025.02.18.11.21.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2025 11:21:38 -0800 (PST)
+Message-ID: <08bf7f3061459af5f05fabf0d3796b77d8034587.camel@gmail.com>
+Subject: Re: [PATCH v7 05/52] i386/tdx: Get tdx_capabilities via
+ KVM_TDX_CAPABILITIES
+From: Francesco Lavra <francescolavra.fl@gmail.com>
+To: xiaoyao.li@intel.com
+Cc: armbru@redhat.com, berrange@redhat.com, chenhuacai@kernel.org, 
+ eblake@redhat.com, francescolavra.fl@gmail.com, imammedo@redhat.com, 
+ kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
+ pbonzini@redhat.com,  peter.maydell@linaro.org, philmd@linaro.org,
+ qemu-devel@nongnu.org,  rick.p.edgecombe@intel.com, zhao1.liu@intel.com
+Date: Tue, 18 Feb 2025 20:21:37 +0100
+In-Reply-To: <20250124132048.3229049-6-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-On 18 February 2025 17:33:14 CET, Sean Christopherson <seanjc@google=2Ecom>=
- wrote:
->On Sat, Feb 15, 2025, David Woodhouse wrote:
->> On 15 February 2025 02:14:33 CET, Sean Christopherson <seanjc@google=2E=
-com> wrote:
->> >diff --git a/arch/x86/kvm/xen=2Ec b/arch/x86/kvm/xen=2Ec
->> >index a909b817b9c0=2E=2E5b94825001a7 100644
->> >--- a/arch/x86/kvm/xen=2Ec
->> >+++ b/arch/x86/kvm/xen=2Ec
->> >@@ -1324,6 +1324,15 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct =
-kvm_xen_hvm_config *xhc)
->> > 	     xhc->blob_size_32 || xhc->blob_size_64))
->> > 		return -EINVAL;
->> >=20
->> >+	/*
->> >+	 * Restrict the MSR to the range that is unofficially reserved for
->> >+	 * synthetic, virtualization-defined MSRs, e=2Eg=2E to prevent confu=
-sing
->> >+	 * KVM by colliding with a real MSR that requires special handling=
-=2E
->> >+	 */
->> >+	if (xhc->msr &&
->> >+	    (xhc->msr < KVM_XEN_MSR_MIN_INDEX || xhc->msr > KVM_XEN_MSR_MAX_=
-INDEX))
->> >+		return -EINVAL;
->> >+
->> > 	mutex_lock(&kvm->arch=2Exen=2Exen_lock);
->> >=20
->> > 	if (xhc->msr && !kvm->arch=2Exen_hvm_config=2Emsr)
->>=20
->> I'd still like to restrict this to ensure it doesn't collide with MSRs =
-that
->> KVM expects to emulate=2E But that can be a separate patch, as discusse=
-d=2E
->
->I think that has to go in userspace=2E  If KVM adds on-by-default, i=2Ee=
-=2E unguarded,
->conflicting MSR emulation, then KVM will have broken userspace regardless=
- of
->whether or not KVM explicitly rejects KVM_XEN_HVM_CONFIG based on emulate=
-d MSRs=2E
->
->If we assume future us are somewhat competent and guard new MSR emulation=
- with a
->feature bit, capability, etc=2E, then rejecting KVM_XEN_HVM_CONFIG isn't =
-obviously
->better, or even feasible in some cases=2E  E=2Eg=2E if the opt-in is done=
- via guest
->CPUID, then KVM is stuck because KVM_XEN_HVM_CONFIG can (and generally sh=
-ould?)
->be called before vCPUs are even created=2E  Even if the opt-in is VM-scop=
-ed, e=2Eg=2E
->a capabilitiy, there are still ordering issues as userpace would see diff=
-erent
->behavior depending on the order between KVM_XEN_HVM_CONFIG and the capabi=
-lity=2E
+On Fri, 24 Jan 2025 08:20:01 -0500, Xiaoyao Li wrote:
+> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+> index 4ff94860815d..bd212abab865 100644
+> --- a/target/i386/kvm/tdx.c
+> +++ b/target/i386/kvm/tdx.c
+> @@ -10,17 +10,122 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qapi/error.h"
+>  #include "qom/object_interfaces.h"
+> =20
+>  #include "hw/i386/x86.h"
+>  #include "kvm_i386.h"
+>  #include "tdx.h"
+> =20
+> +static struct kvm_tdx_capabilities *tdx_caps;
 
-Well, I just changed QEMU to do KVM_XEN_HVM_CONFIG from the first vCPU ini=
-t because QEMU doesn't know if it needs to avoid the Hyper-V MSR space at k=
-vm_xen_init() time=2E But yes, we don't want to depend on ordering either w=
-ay=2E
+Instead of a static variable, this should be a member of the TdxGuest
+struct.
 
