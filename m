@@ -1,322 +1,210 @@
-Return-Path: <kvm+bounces-38431-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38445-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8558DA39A33
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 12:15:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DEC4A39D10
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 14:12:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62F5F7A4A18
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 11:13:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB7601795B6
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 13:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8817D23F29F;
-	Tue, 18 Feb 2025 11:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6996D2698A0;
+	Tue, 18 Feb 2025 13:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="UkVwqjM0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uSlvq+iL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2057.outbound.protection.outlook.com [40.107.236.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693CB23C8BA;
-	Tue, 18 Feb 2025 11:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739877247; cv=none; b=ReNC53FAEvsrbosmeXZlUrTXQrNJnIBR4nHhzsd9qj1AsEuL152VIF0Il7mCL/Hgu5AjW0tzDWkw5kpM04/H2doC4tsI8Mx5k+870FsIwC0se34/C0B1bqYDGD4NMNr9+PnMbtzODDObthdZNMj9R1yvjHDyMIxpP2nOJUp68hU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739877247; c=relaxed/simple;
-	bh=SBgqh1S+d4YuKVooe5x3vvlFDW8JM5ydaS03W8f52rQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IntnA9FyO75OOGCPloLBVcKB8GH64706XQtmWKlJ7KMtuYp/oAEzYm8LabMKsq0W4eX09IO+xNUU12kFIBIGaPKuTdMxQUyIa1juQPMJ0HzgWC9OqKmL/n3Xd/AIJP/bn2XTn5JptwqCw76LJN/9lBDzlUi2mFL5ZYOIEJLV4fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=UkVwqjM0; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4023240E01A1;
-	Tue, 18 Feb 2025 11:13:56 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id FG4xQVYabji7; Tue, 18 Feb 2025 11:13:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1739877231; bh=PFnEiVQz7NmG9EVizWO+mR0rF2XsnHacw8mlzRX7yHo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UkVwqjM0lsaESFcESTTOZ+wHAhtHqXAgERmIRNxwDD3cle3ZJ47pQpi8FZ5p+GAOl
-	 uN3ub2wg/NuIJCGAk74zDLI6SgwFqnsxethyo0pA4p3cSbTCinGw2pyVw/SXwI5/ku
-	 8+QsSG4a/2gDawmYgcxNyIMXq3pjZrHiTPWNfbGnBnWAigWvI5bkHeWEusjpzSSTAo
-	 RExNNy/uh2sK4I1Cty3lqx/p3eY0sTT0V2/Wd+1QcLEAnj+MMzTq8spnHkPK0p1FdE
-	 whryStcU9Myt0IC+p+Djym7hRrFRyZSQ6cLgpOTEz/1ucbIuu194M9Eyyg11QABK9d
-	 q1I3RDSlnjIC+bsxiETbpQ3Rlpxyh+D6QRb+ofUBNoya4vMmVhs5ZrmqFLdwV/DLOx
-	 pBizeQDaUJFNVjUKQKTNUV1ioR9XhDxlAyZtVUYaikDAONGBWIZhUd7YLtrgXbOT5V
-	 gW8kQO/OVbUUNxGdFpzp4tMm7qe11f/CT7QC7sxog6NwXju+kOL5cfvcDqz2Lj3E/F
-	 y/krz1WRMmoCpiObeIVvyfa25UfdPwt7ZPPno8SuT+adRgCw2t4THq1Nwui+Dt7ioV
-	 NYDvFQA8uQiV/eFuIHq2JtnGD0GudR5tK0tMfs7BlRXNpSWjejHcBZy6QhZbdIzZ9b
-	 9S9Yj6465XNLadT2TUkuLX8U=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2AB4640E020E;
-	Tue, 18 Feb 2025 11:13:39 +0000 (UTC)
-Date: Tue, 18 Feb 2025 12:13:33 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Patrick Bellasi <derkling@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Josh Poimboeuf <jpoimboe@redhat.com>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Patrick Bellasi <derkling@matbug.net>,
-	Brendan Jackman <jackmanb@google.com>,
-	David Kaplan <David.Kaplan@amd.com>
-Subject: [PATCH final?] x86/bugs: KVM: Add support for SRSO_MSR_FIX
-Message-ID: <20250218111306.GFZ7RrQh3RD4JKj1lu@fat_crate.local>
-References: <20250213142815.GBZ64Bf3zPIay9nGza@fat_crate.local>
- <20250213175057.3108031-1-derkling@google.com>
- <20250214201005.GBZ6-jHUff99tmkyBK@fat_crate.local>
- <20250215125307.GBZ7COM-AkyaF8bNiC@fat_crate.local>
- <Z7LQX3j5Gfi8aps8@Asmaa.>
- <20250217160728.GFZ7NewJHpMaWdiX2M@fat_crate.local>
- <Z7OUZhyPHNtZvwGJ@Asmaa.>
- <20250217202048.GIZ7OaIOWLH9Y05U-D@fat_crate.local>
- <f16941c6a33969a373a0a92733631dc578585c93@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6669265CDB;
+	Tue, 18 Feb 2025 13:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739883819; cv=fail; b=LEPAORUetBBybBFC3WJ8bLWksVlSD6EJUZ763JkLSp3ykgbZBvgPBPV5r0lCzqA4Or9JQAaf50kh3HimEelg5WBjzeMyCjGpz0PQBdiVaRGcnfC5Fm/sWzFeNKK7ci1Epq9SGy8B4iEmwusCUawA1AHrZJAljGiZpY42ppbQhK4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739883819; c=relaxed/simple;
+	bh=KM2FoLADZLaxKpCPJnAbILUusZPIy1GLjT4YwVuJ7FY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=WxUuyBIYJ/+qM/FHKKaRmRNkXlLx6L/aTvyrLa2bMR2iIZqA5LzVDaZmBnYGLHQfCDFRGt8UMZ9no0rVHDg9vis82uPg9c1oZdRSp6BSV4bDsCmmaV8dgh+UJVHvOewSkY+YoXp+fEQqskBeXEZNAaxTNfAlcd1XLyr3FFX9hq0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uSlvq+iL; arc=fail smtp.client-ip=40.107.236.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OPSBIWjVoZnetdBrKg86dH3UcydConk8IZw50y3ERfBFcMuFASPZV/ziMYGjd++bbOX14vj++ZKCXzf0s5t3D+/dpRIIHPVSHDniyxrVlw+9wlTxPyBDXKjgr4cDVQeOxjoBVJdLVTJQ4a2bltKclCKyaaJzXfuvEXLd6ah9o53QnByyLgGwlTF+MYR5rsiKwP3ZhM5sm1XhxxEdT49Fqj9yqs/t9dF3k9SP7A6aH5FMj5u0mfAH/83StL0I8RxNcfia7ycCMm1oIYfyNugtH2t/5U4/kt5P8Ft3tKcsIYfyBctpDQ76dvXdxSeBILLuPe+oegm6B2wA4PdVcyyVZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W4EHT70QvnguHtLNkEFqJ6klgp+RFJca8isYxzQWiVA=;
+ b=Hi+WYB43NIjtW45L2OrBu9GEFy3dWUo7TEx/AKXPCSC4m7MqMSTXSs+CKvIdwdvEDjHAb1ccoD8OECVf2CEhyFt4f+IZareuAp8S/7HZBXmHKwtjB0ZSYqzUsO2rDS/FUGjOaRkLZ/oOBpCM0OxenzRQ4kcYSK3Sc1Z2cNb7+OngFrHZe4NVEIJMc/Fk4w8as2PnY4cNRhiSOP5PV8vQmTi5UVHJGfgJL8S+RWoE6ifETPuUABQPJw7WJJlq+FgQadKo7i0xwLZWNHiwKy6b2RnfOJwNlsoEXr0+lnWucgQEbAoDjmVnpZMiMKD6ND99A8D9Ip3cttcYje/5FhyDNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W4EHT70QvnguHtLNkEFqJ6klgp+RFJca8isYxzQWiVA=;
+ b=uSlvq+iLv/W+h31sdGSzK8vXEbibu+ya75M6Su5IozRaXxECZI4yoVYZEvgPLBPR0yaQupDy5HesrKpdBPnOof0Iclfc7Loa9uWwDbKWYGHOZeDF37iYeiKhKgSj41UJvAi+TEZ/vre9cl7I2pc3iRF4eUB1mzARjS0ACvifYmM5TuyYgyq+mjZ99GSBzfTnn+ijqphDO2U3GgHLZOOfARCDJ23N8Ly0aQ40mK5K3yxCutfnZqk/F10SDY+SCEnfXHiybLskaMFYR41bBlM8fiEBBc9qdx10TE7E/e8DLcZUYlMZS0CuYTAzKkwP9T2AkU8zT5fSXsYB2Otahx6UMg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by DM6PR12MB4122.namprd12.prod.outlook.com (2603:10b6:5:214::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Tue, 18 Feb
+ 2025 13:03:34 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8445.019; Tue, 18 Feb 2025
+ 13:03:34 +0000
+Date: Tue, 18 Feb 2025 09:03:33 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Baolu Lu <baolu.lu@linux.intel.com>
+Cc: Zhangfei Gao <zhangfei.gao@linaro.org>, acpica-devel@lists.linux.dev,
+	iommu@lists.linux.dev, Joerg Roedel <joro@8bytes.org>,
+	Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+	Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Hanjun Guo <guohanjun@huawei.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Jerry Snitselaar <jsnitsel@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	Michael Shavit <mshavit@google.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+	Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH v4 00/12] Initial support for SMMUv3 nested translation
+Message-ID: <20250218130333.GA4099685@nvidia.com>
+References: <20241113164316.GL35230@nvidia.com>
+ <6ed97a10-853f-429e-8506-94b218050ad3@linux.intel.com>
+ <20241115175522.GA35230@nvidia.com>
+ <20250122192622.GA965540@nvidia.com>
+ <284dd081-8d53-45ef-ae18-78b0388c98ca@linux.intel.com>
+ <f7b6c833-b6c1-4154-9b77-13553e501f2b@linux.intel.com>
+ <20250213184317.GB3886819@nvidia.com>
+ <bc9f4477-7976-4955-85dc-3e05ebe95ead@linux.intel.com>
+ <20250214124150.GF3886819@nvidia.com>
+ <58e7fbee-6688-4a49-8b7a-f0e81e6562db@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58e7fbee-6688-4a49-8b7a-f0e81e6562db@linux.intel.com>
+X-ClientProxiedBy: BL1PR13CA0357.namprd13.prod.outlook.com
+ (2603:10b6:208:2c6::32) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f16941c6a33969a373a0a92733631dc578585c93@linux.dev>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DM6PR12MB4122:EE_
+X-MS-Office365-Filtering-Correlation-Id: d2a4646b-72d5-4df4-aea8-08dd501ca68e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?4j5BOeIE14S4WP9mgUR9jqPLjDXr/U+p4xpcptE0ar36Qd9CIxRS+m7lo3V2?=
+ =?us-ascii?Q?j3m5rzXNROFOAV+0tTse3LPRgJjrPrsC1RiNvDUbUTKIyE+h99L5Gz2j/rsM?=
+ =?us-ascii?Q?iEYaTLUVzVZx6xktY7u8DdRaNg9ymySwVrzP4/Uv839Z/g8q8ri52mRZF3WL?=
+ =?us-ascii?Q?qOtVETvzcPe1+EEfBE9OrDxy3UHHiffNBJxLG6hEaFJc5GlLotDP88ilOwYJ?=
+ =?us-ascii?Q?R6dG6PK7SDQSLsrzt5/tdeO7qWMVEKQmdmhlUcVMrjH0EBrw0C3NHUEeD+DM?=
+ =?us-ascii?Q?FbPGxjMUxX4SQsHBuDoR/Pk9QiJjfeWmwogvUGyOxygmAKlnJrsKu2/3fKXL?=
+ =?us-ascii?Q?qRWgQ0JqliFhrdwd/OmgyYtZuBHvNlnO7hwvxIpckkUl23EFtiB/RhQZViPB?=
+ =?us-ascii?Q?XTT5uAfyCVaAfmbVMEx9yI0MMH8uR0HC5L9v/q8bp0U7j8k6JP2d4ZtruLFp?=
+ =?us-ascii?Q?fD/FB5+T+zPFtQHige7DU7jrxJPVV6PsgErbt7j0ZXwSSupGJBePdUk1XSEF?=
+ =?us-ascii?Q?8vyhHDzP1DFz2uFwkj//d7dJFV2FZXMURG/grvWKioCBU9UcVQLfl1xgGsBh?=
+ =?us-ascii?Q?xK1/GW1ILCi5GPKUfkx5mPay+ajPbEEtns7gSmbgVAOZFJTdsECbeyMnMl8l?=
+ =?us-ascii?Q?H5/5Q5IFYs0uhd4pKDC3iO92AngnFQAxLewr6dzQ2uDiouRx5NJxN/xGtLxH?=
+ =?us-ascii?Q?lt1SRJ9qdQDFvS5hrL4fdIEiebRjDVfCdr8ytiDQQIMuuFbwgouMe7q63z1r?=
+ =?us-ascii?Q?ckHNvdwgl7n+CY7e9+m0GY1e5+x5e9w00DTpva6p3ahTjMOUAI4R70NonTlT?=
+ =?us-ascii?Q?WFBq4K9SGUnh3FPSt7T9WUquNs73F/RYzPTJgC8MasQRF2BUC8H2oY8JMEN7?=
+ =?us-ascii?Q?FeWkFcdqTVzawqPSavSvfyYmLxQooFDiXGrPKaJZOxJYxu1dA6Ebo6XrJaN1?=
+ =?us-ascii?Q?EPgV+LYDp+l1Oac2NfSwjVmEnk719Zx8weD6Y/ZrRzY+v8GI0gmHDrlubU/z?=
+ =?us-ascii?Q?dn4ErSh1CqPVjzXyhgT99Jeyy9E15L6NdoWXYs0csjr7xL6aiKqTbukmzIK3?=
+ =?us-ascii?Q?DLqKX8gzs3GrhK3zQhGunokPx0wIy92ywkYhv3f2MzrcJIhC0h/yzgXkllM7?=
+ =?us-ascii?Q?W9bw2frWrGRGOQfi6s0cVqKsmRhf5ScWUDmv4bmbYwV4hlh8IOOGqFiZFi94?=
+ =?us-ascii?Q?oQnDXmBIN4KFYoPPdKvBsmTHydFnjlIFl9lyQC0kGSXaE4chH8bux4XJFGGQ?=
+ =?us-ascii?Q?hF2Vt1uiDKF0TY/6NJIJX29TasI4xBoTLTXG9C+4NiVI98PBaRdHNiljLeq1?=
+ =?us-ascii?Q?qEYakWTscQqXcOv+2chgSVKsFbl4iav1fYQM2ShI0dCvmuqbq3EpD0E/ZtTr?=
+ =?us-ascii?Q?UXNt5GXHqEhuhvFbOaLgN+Seryee?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?8YD3FT7FGdkmRmgANsh6ws3V2XUEUjdzkESm1aMCRm9AWk1NCRCqbLkrDLgX?=
+ =?us-ascii?Q?7Sut7LcE7RnK0GRRAw/1B/j8yAzq2hLbiWggdUl1zY2XdLNj+7XzbxOwZE3S?=
+ =?us-ascii?Q?9E0QaLKvSTeHQS3CaQsllmudJH0r6VRCTiqBW/p4+dpXmnUmbBh7K1ah8Bgi?=
+ =?us-ascii?Q?epdH1oNibhr8Nx2nNxuH4qKZPwdaYtjEvHUgtFtU1RYGqWxE54hWdEYwN1qE?=
+ =?us-ascii?Q?Ulu1URqYPuut4gt1pkXk21xu+tlan3ExX1xycd6Dp6pVrPanO9eZEPaszD8H?=
+ =?us-ascii?Q?JGCL2wWuaC/pxPl0UWxzJpzyiNWRanohdRMAv85586DwEMCF7991/PFmubqZ?=
+ =?us-ascii?Q?XiTjH88B/6RJu3f8/3il4IR5so7xr3LDN4keKPPwQ/ogJ0Qxzv+IF10zlwhU?=
+ =?us-ascii?Q?5sdejL2nS0LTso+y/oM1YNigpQwwi/OGqPItG4+v3gP04SxlCCNi938u5c9i?=
+ =?us-ascii?Q?k7Brg9DqebvMfalyH7r/shTYbMSpozUwto6catXowGy+qS/jlmNUCVoLlpPA?=
+ =?us-ascii?Q?93/qf+Y3WcvJuEdVJ6kRA7rCy5/aI8Nc6uTAd03hw7ZVq8CqwQ8pKL43mpSv?=
+ =?us-ascii?Q?K67KThE3c1Ps7xxDWuOmLlYrkbFBULMuOdxD6LYjeoxGxAGRPJ2SQGrBia2U?=
+ =?us-ascii?Q?TX/YpFingnO///9l4IJbyvSLqdy9LJVtSlJu6+Z58ZIUna27z/zma4j2ENdc?=
+ =?us-ascii?Q?ewd3bF8SOV9iuP1JPw4NhNBuGhCykU1jUBSri5RmHMuyTVwsSk5zyqxPSvts?=
+ =?us-ascii?Q?+fxSaq/isYM5oWi1i6Q3JqfGGWBNnyKjCkGuFrLdM0p0wVLSgf9fWGH2vj1s?=
+ =?us-ascii?Q?5WItdnAMGPVz+cGdabUz+/eYX2wp639md4S1hNiJ7OnOn8MHFWQsuOhvra+A?=
+ =?us-ascii?Q?NBslBWfy3clwHnFWEfayPd7mAzThuEKQenS/ODI1G+OS1Noenz95P4Ue8vFR?=
+ =?us-ascii?Q?4sqQbaHVKmG4ew/ikXxmr5yIF7KgSh2qqqhV2Pfhg35jQM8Hy6MPiCsbkNP2?=
+ =?us-ascii?Q?ZrTTld/YkfWQKLcV/Q3jfaghY0JSHaU06twT4QCJ0EmZm6E3HtfMLRWCPPxi?=
+ =?us-ascii?Q?v3JxtJNbPPB5rDZpWkNf2Ln3tGKC6WoprE4ouqjQdE236K9lKE4QK7Spoqam?=
+ =?us-ascii?Q?38TT0txQYNpV1PGp86Tgi1d81jfjRW8uJ/x5rbMKiaPYjOfkZj/FT7d9sE94?=
+ =?us-ascii?Q?taMlrnte4q0TgoCnzlPnnN/FFUsnW9WRjKKWqXGN/gT7RBu4fOzTgqQNy7Zq?=
+ =?us-ascii?Q?f+y13AclZtu7bK4bbmjqpaK5bufSMLgUKjitrhCGb/rmqbB9e4/v1hcst/PC?=
+ =?us-ascii?Q?nWFvMVrrxFeJxFYiLzsyUIkWGAo/ICggxGAgIBUsK+zaPqdezz2PNsagW8Yn?=
+ =?us-ascii?Q?45rO4PGpYxW8ZCYRnjO3iD2HWD9DYRTVweThs0BYy0MGcpszeLNbmyRh1WfM?=
+ =?us-ascii?Q?Gi0CLDArDbJtVO4WuG8hqIobXWs4kY/eluZzFipkuQcSMtEJNpwDAnR877mQ?=
+ =?us-ascii?Q?DwgmzJokKxSW1mdeO4WSXlhi0ulo6zL840iOqHp3xliyE9JEKjZyNQwL39Gx?=
+ =?us-ascii?Q?3gFhJG/z9JHlDSo3has=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2a4646b-72d5-4df4-aea8-08dd501ca68e
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2025 13:03:34.2538
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7bvn67RUXSln3UYkiiOZt7WhaAbnDtxzIcv5XqHzwiZsUDsnGAkt3Ca9o3cHR4Fm
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4122
 
-So,
+On Sat, Feb 15, 2025 at 05:53:13PM +0800, Baolu Lu wrote:
+> On 2/14/25 20:41, Jason Gunthorpe wrote:
+> > On Fri, Feb 14, 2025 at 01:39:52PM +0800, Baolu Lu wrote:
+> > 
+> > > When the IOMMU is working in scalable mode, PASID and PRI are supported.
+> > > ATS will always be enabled, even if the identity domain is attached to
+> > > the device, because the PASID might use PRI, which depends on ATS
+> > > functionality. This might not be the best choice, but it is the
+> > > simplest and functional.
+> > The arm driver keeps track of things and enables ATS when PASIDs are
+> > present
+> 
+> I am not aware of any VT-d hardware implementation that supports
+> scalable mode but not PASID. If there were one, it would be worthwhile
+> to add an optimization to avoid enabling ATS during probe if PASID is
+> not supported.
 
-in the interest of finally making some progress here I'd like to commit this
-below (will test it one more time just in case but it should work :-P). It is
-simple and straight-forward and doesn't need an IBPB when the bit gets
-cleared.
+I mean domains attached to PASIDs that need PRI/ATS/etc
 
-A potential future improvement is David's suggestion that there could be a way
-for tracking when the first guest gets started, we set the bit then, we make
-sure the bit gets set on each logical CPU when the guests migrate across the
-machine and when the *last* guest exists, that bit gets cleared again.
+> > Although, I'm wondering now, that check should be on the SVA paths as
+> > well as the iommufd path..
+> 
+> That appears to be a fix.
 
-It all depends on how much machinery is additionally needed and how much ugly
-it becomes and how much noticeable the perf impact even is from simply setting
-that bit blindly on every CPU...
+Does SVA have the same issue?
 
-But something we can chase later, once *some* fix is there first.
-
-Thx.
-
----
-
-Add support for
-
-  CPUID Fn8000_0021_EAX[31] (SRSO_MSR_FIX). If this bit is 1, it
-  indicates that software may use MSR BP_CFG[BpSpecReduce] to mitigate
-  SRSO.
-
-Enable BpSpecReduce to mitigate SRSO across guest/host boundaries.
-
-Switch back to enabling the bit when virtualization is enabled and to
-clear the bit when virtualization is disabled because using a MSR slot
-would clear the bit when the guest is exited and any training the guest
-has done, would potentially influence the host kernel when execution
-enters the kernel and hasn't VMRUN the guest yet.
-
-More detail on the public thread in Link.
-
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-Link: https://lore.kernel.org/r/20241202120416.6054-1-bp@kernel.org
----
- Documentation/admin-guide/hw-vuln/srso.rst | 13 ++++++++++++
- arch/x86/include/asm/cpufeatures.h         |  4 ++++
- arch/x86/include/asm/msr-index.h           |  1 +
- arch/x86/kernel/cpu/bugs.c                 | 24 ++++++++++++++++++----
- arch/x86/kvm/svm/svm.c                     |  6 ++++++
- arch/x86/lib/msr.c                         |  2 ++
- 6 files changed, 46 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/admin-guide/hw-vuln/srso.rst b/Documentation/admin-guide/hw-vuln/srso.rst
-index 2ad1c05b8c88..66af95251a3d 100644
---- a/Documentation/admin-guide/hw-vuln/srso.rst
-+++ b/Documentation/admin-guide/hw-vuln/srso.rst
-@@ -104,7 +104,20 @@ The possible values in this file are:
- 
-    (spec_rstack_overflow=ibpb-vmexit)
- 
-+ * 'Mitigation: Reduced Speculation':
- 
-+   This mitigation gets automatically enabled when the above one "IBPB on
-+   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
-+
-+   It gets automatically enabled on machines which have the
-+   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the code logic is to switch
-+   to the above =ibpb-vmexit mitigation because the user/kernel boundary is
-+   not affected anymore and thus "safe RET" is not needed.
-+
-+   After enabling the IBPB on VMEXIT mitigation option, the BpSpecReduce bit
-+   is detected (functionality present on all such machines) and that
-+   practically overrides IBPB on VMEXIT as it has a lot less performance
-+   impact and takes care of the guest->host attack vector too.
- 
- In order to exploit vulnerability, an attacker needs to:
- 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 508c0dad116b..43653f2704c9 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -468,6 +468,10 @@
- #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
- #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
- #define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
-+#define X86_FEATURE_SRSO_BP_SPEC_REDUCE	(20*32+31) /*
-+						    * BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs.
-+						    * (SRSO_MSR_FIX in the official doc).
-+						    */
- 
- /*
-  * Extended auxiliary flags: Linux defined - for features scattered in various
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 72765b2fe0d8..d35519b337ba 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -721,6 +721,7 @@
- 
- /* Zen4 */
- #define MSR_ZEN4_BP_CFG                 0xc001102e
-+#define MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT 4
- #define MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT 5
- 
- /* Fam 19h MSRs */
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index a5d0998d7604..1d7afc40f227 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -2522,6 +2522,7 @@ enum srso_mitigation {
- 	SRSO_MITIGATION_SAFE_RET,
- 	SRSO_MITIGATION_IBPB,
- 	SRSO_MITIGATION_IBPB_ON_VMEXIT,
-+	SRSO_MITIGATION_BP_SPEC_REDUCE,
- };
- 
- enum srso_mitigation_cmd {
-@@ -2539,7 +2540,8 @@ static const char * const srso_strings[] = {
- 	[SRSO_MITIGATION_MICROCODE]		= "Vulnerable: Microcode, no safe RET",
- 	[SRSO_MITIGATION_SAFE_RET]		= "Mitigation: Safe RET",
- 	[SRSO_MITIGATION_IBPB]			= "Mitigation: IBPB",
--	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only"
-+	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only",
-+	[SRSO_MITIGATION_BP_SPEC_REDUCE]	= "Mitigation: Reduced Speculation"
- };
- 
- static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
-@@ -2578,7 +2580,7 @@ static void __init srso_select_mitigation(void)
- 	    srso_cmd == SRSO_CMD_OFF) {
- 		if (boot_cpu_has(X86_FEATURE_SBPB))
- 			x86_pred_cmd = PRED_CMD_SBPB;
--		return;
-+		goto out;
- 	}
- 
- 	if (has_microcode) {
-@@ -2590,7 +2592,7 @@ static void __init srso_select_mitigation(void)
- 		 */
- 		if (boot_cpu_data.x86 < 0x19 && !cpu_smt_possible()) {
- 			setup_force_cpu_cap(X86_FEATURE_SRSO_NO);
--			return;
-+			goto out;
- 		}
- 
- 		if (retbleed_mitigation == RETBLEED_MITIGATION_IBPB) {
-@@ -2670,6 +2672,12 @@ static void __init srso_select_mitigation(void)
- 
- ibpb_on_vmexit:
- 	case SRSO_CMD_IBPB_ON_VMEXIT:
-+		if (boot_cpu_has(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
-+			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
-+			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
-+			break;
-+		}
-+
- 		if (IS_ENABLED(CONFIG_MITIGATION_IBPB_ENTRY)) {
- 			if (has_microcode) {
- 				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
-@@ -2691,7 +2699,15 @@ static void __init srso_select_mitigation(void)
- 	}
- 
- out:
--	pr_info("%s\n", srso_strings[srso_mitigation]);
-+	/*
-+	 * Clear the feature flag if this mitigation is not selected as that
-+	 * feature flag controls the BpSpecReduce MSR bit toggling in KVM.
-+	 */
-+	if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
-+		setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
-+
-+	if (srso_mitigation != SRSO_MITIGATION_NONE)
-+		pr_info("%s\n", srso_strings[srso_mitigation]);
- }
- 
- #undef pr_fmt
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a713c803a3a3..77ab66c5bb96 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -607,6 +607,9 @@ static void svm_disable_virtualization_cpu(void)
- 	kvm_cpu_svm_disable();
- 
- 	amd_pmu_disable_virt();
-+
-+	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
-+		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
- }
- 
- static int svm_enable_virtualization_cpu(void)
-@@ -684,6 +687,9 @@ static int svm_enable_virtualization_cpu(void)
- 		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
- 	}
- 
-+	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
-+		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
-+
- 	return 0;
- }
- 
-diff --git a/arch/x86/lib/msr.c b/arch/x86/lib/msr.c
-index 4bf4fad5b148..5a18ecc04a6c 100644
---- a/arch/x86/lib/msr.c
-+++ b/arch/x86/lib/msr.c
-@@ -103,6 +103,7 @@ int msr_set_bit(u32 msr, u8 bit)
- {
- 	return __flip_bit(msr, bit, true);
- }
-+EXPORT_SYMBOL_GPL(msr_set_bit);
- 
- /**
-  * msr_clear_bit - Clear @bit in a MSR @msr.
-@@ -118,6 +119,7 @@ int msr_clear_bit(u32 msr, u8 bit)
- {
- 	return __flip_bit(msr, bit, false);
- }
-+EXPORT_SYMBOL_GPL(msr_clear_bit);
- 
- #ifdef CONFIG_TRACEPOINTS
- void do_trace_write_msr(unsigned int msr, u64 val, int failed)
--- 
-2.43.0
-
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Jason
 
