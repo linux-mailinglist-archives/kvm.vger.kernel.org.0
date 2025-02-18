@@ -1,322 +1,167 @@
-Return-Path: <kvm+bounces-38397-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38398-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD42A390CA
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 03:16:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4739FA3943A
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 08:57:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F04E83B33BC
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 02:16:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 428643A9E6F
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 07:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38CE1487E1;
-	Tue, 18 Feb 2025 02:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021E5204F97;
+	Tue, 18 Feb 2025 07:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="C3mRCmBg"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2065.outbound.protection.outlook.com [40.107.237.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCA61E51D;
-	Tue, 18 Feb 2025 02:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739844995; cv=none; b=lutn0JewvHg5bLdGDpGcg4m4aw0lJlnv2mCxDKXmfusqXnjFHDFwmDZFZFkGPBDxTp1VtD7E6rqp0yQFdCT7q3YRcBpKU89RSgpcB7zFKnDYuEZ3Ya4785O7f0CBPpX5cWiVBFP5iehqafA/mPANTpB47Ss4SI+hTwGEutHeaso=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739844995; c=relaxed/simple;
-	bh=4pyof3JJU+48W9PMkgXpSeUzFR7S8Ks3YmrdQHCQvYs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NVU57UO0V6yF9RUlq99mH1f17S3edJit9JX8+Y/vAMyVk4W4612f47PwF6eoWzPMlEDXuSwA87JowdF42XGTj6CCVWEQ6qN0syuumvhoaq67CKbLnUhtSVKpkzHP7L5edKHKd9tnBPHGsIO38strGmJtbrQEBTILI/NFenDZARU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Yxjlk4nG7zMqc9;
-	Tue, 18 Feb 2025 10:14:58 +0800 (CST)
-Received: from kwepemg500006.china.huawei.com (unknown [7.202.181.43])
-	by mail.maildlp.com (Postfix) with ESMTPS id D1FCC1A016C;
-	Tue, 18 Feb 2025 10:16:27 +0800 (CST)
-Received: from huawei.com (10.50.165.33) by kwepemg500006.china.huawei.com
- (7.202.181.43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 18 Feb
- 2025 10:16:27 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <jonathan.cameron@huawei.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linuxarm@openeuler.org>, <liulongfang@huawei.com>
-Subject: [PATCH 3/3] migration: adapt to new migration configuration
-Date: Tue, 18 Feb 2025 10:15:07 +0800
-Message-ID: <20250218021507.40740-4-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20250218021507.40740-1-liulongfang@huawei.com>
-References: <20250218021507.40740-1-liulongfang@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8007C1FECD3
+	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 07:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739865442; cv=fail; b=Kp1IbrMUrWsZG65wZrWrdPem+B5YnDm7EQKjdZJIw5MSJ+HOMgDe2e+EvOkfsEiZWBPt2RIye8oeqY9VGdg9JQSyChknoDBaUHFqMopT+8MlVhj88cyRNGwPripSbMkgBJYa0qOrDt14cYpWqwc811GgkvTDXW6xJclEZVCyAYM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739865442; c=relaxed/simple;
+	bh=EPPrhlkyXg4y8XypGHN9BdQbRFyWblmDNJpZT+q/vT0=;
+	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FFvrqSuO9YglHqdew1QCoc6ULMMjUlGQqrCpuIBQQbrrZ8Y4kDhTy6Q9zO7vds+bOymsH6FgfSdm5rO4NvbtZNzkKwoiPlZz708vQmaI6vw3n7A/BadmvUkzZY3W8meavf/gDeGJNAMynNgmRGsomBZt50/MjVHnapy76PMJ7yM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=C3mRCmBg; arc=fail smtp.client-ip=40.107.237.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TjTlZ0TYrZEexZtKbUWDmMSpFVhPSOOFjmfq+ukEOD/TvC//9ETR1MoatiTTMKuzMnlrvHIXlrKF0k3sVnbY0a1Fg7SRUdz8FuKxJvzRISI+hqpdmZFk/AoXGyOECxhGU1YwIUHX11P3xfqZad21RBAgdiIdB3drFNokg37FcNOjffeqZejSnnx6J0fu472V5kNQcx1KXDijMsTWlpmV8xLA2PHd6dmRFZVhpqZLSfHbvoGHLsaLEr7D+z7DJjMnSx8THhhx6c3ralbMBBNeXcJenbtPdkgTYDohJlDydBy0wpaQemhqjtMo+Naq6Bk3cjEi3bokUlR6zcMOMqwrGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GLhq7ZPhL9cB8cPRo8Tnj4Vm25bd/PL0V/rqzrHLogY=;
+ b=xdLRgj8FR5Fe2anV7jewo4X9ilHnm/z+Eek4xuw2NC8zY5wBgXOPDlUiC+LOyZCmKw+G4dNiamk5wB34NZI4Zve0CvXJkiGWseA4Pbz2mV2/41J2Ljz7PqxGG2qnRPvgDTyXgQqkJ19D76PWuu068XZzfPumyciLuJuCcEzKOavXLE6Ar2Gr3HVZm8SlqlKauQ8PtmgVsXcgN2I8hpQnk0XNhKOwLO+6lmwLROD71zefQIMxCMj2gy3CvMrsovw3OSEWwTEmZbL/ot1p8Nfs8q7jCbcJ4k2Mpp+yEMddkiEiWY/Z4ZNlvYPjU2ge/0WtUXO+QPjc69e3P+x6Dod+TQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GLhq7ZPhL9cB8cPRo8Tnj4Vm25bd/PL0V/rqzrHLogY=;
+ b=C3mRCmBgiVR60EDn1FgUTpwgxiczcmDKkNo3O1kym5EbssWi71E6CbCXAc8vgVMyImSp9brp+RAT4YPp8glzt96uofE5tve9yxtmjE0E5RsDv8R0rwvsE2/a6vv/fK2tGmx08iBMAeI33gQG9OPVwPyHvQjutpG3FT/HrWYmYrg=
+Received: from BYAPR06CA0071.namprd06.prod.outlook.com (2603:10b6:a03:14b::48)
+ by CH2PR12MB4277.namprd12.prod.outlook.com (2603:10b6:610:ae::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Tue, 18 Feb
+ 2025 07:57:17 +0000
+Received: from CY4PEPF0000E9D5.namprd05.prod.outlook.com
+ (2603:10b6:a03:14b:cafe::95) by BYAPR06CA0071.outlook.office365.com
+ (2603:10b6:a03:14b::48) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8445.19 via Frontend Transport; Tue,
+ 18 Feb 2025 07:57:17 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000E9D5.mail.protection.outlook.com (10.167.241.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8466.11 via Frontend Transport; Tue, 18 Feb 2025 07:57:17 +0000
+Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 18 Feb
+ 2025 01:57:14 -0600
+From: Nikunj A Dadhania <nikunj@amd.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>, <seanjc@google.com>,
+	<pbonzini@redhat.com>, <kvm@vger.kernel.org>
+CC: <santosh.shukla@amd.com>, <bp@alien8.de>, <isaku.yamahata@intel.com>
+Subject: Re: [PATCH v3 2/5] crypto: ccp: Add missing member in
+ SNP_LAUNCH_START command structure
+In-Reply-To: <886f7424-9f33-7a0f-73d5-886ae4609ae9@amd.com>
+References: <20250217102237.16434-1-nikunj@amd.com>
+ <20250217102237.16434-3-nikunj@amd.com>
+ <886f7424-9f33-7a0f-73d5-886ae4609ae9@amd.com>
+Date: Tue, 18 Feb 2025 07:57:11 +0000
+Message-ID: <85jz9nit2g.fsf@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemg500006.china.huawei.com (7.202.181.43)
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D5:EE_|CH2PR12MB4277:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91cc36e8-89d2-4818-753e-08dd4ff1dd42
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?pEHbPGNUJzHwsU/jYbyxUxMABqU+pf8uoBB6w7WgF73L4P/hG2/hexv/7TXG?=
+ =?us-ascii?Q?6M913rpikX2tmxCZ+GathFRR3ecMlSOnfQRUuDkIqTw7UDybGsMovHl1mxnt?=
+ =?us-ascii?Q?Zg09UQOYGL/ZUHfoxjovuYqPTe5bMCUomtD72fXRFHJvIhATU1eamLZ9b+nm?=
+ =?us-ascii?Q?0u4Zdq05jvX7g1DXOpGKboJe1rI8vZPzaPmUEqiEmxRvHbQHJXeAoWOvu3CP?=
+ =?us-ascii?Q?6YHWj5VLT1klgLW/feg5ZfjV+EFmishm1ulwLaL7BzPgo6ujtW3JHlPZaNkO?=
+ =?us-ascii?Q?FsVFG2UOOzOQwBiCRjT873xfYn3+lqhWw8K37FA+7x55DzfLybPpZFp4Dwal?=
+ =?us-ascii?Q?Gpr375tI1UlG6i2he+QOAbmcUKQuzdhfTD4MenHi+ki3pVEHj0c4oQdSiH9M?=
+ =?us-ascii?Q?TxbOCAeObfxeUUw0fJZNXpBlTSp8N0pa0a0uVk6hSXHtB/M0IBWM6eigdpYo?=
+ =?us-ascii?Q?KSQm1lilxFrzv4blVNT5/l7IAD7QF/ZcZ1MZOAIHM/zN47IQriFlv16oPvse?=
+ =?us-ascii?Q?JPfsyMYSmcWATuEK53/Z371s4Vkoh6hHqJvslmyaGutjdw0rgMtunYJb+axQ?=
+ =?us-ascii?Q?XsjcttX8tA9WulNzAC/3Wslf//SEe53QDd6TYM+i9w4g4Y6A6IDpfOqy1aO4?=
+ =?us-ascii?Q?dcqVFlJMDaFw+xfDAv2JGrNZofnEApK55L98h4mhi9NJKGxxfj8Un8zJAqOh?=
+ =?us-ascii?Q?SPXYftOeP97+W34BTmJGBwBbAu9BH2EZrEEj1VHiTu+rRM3JtR0Pl1xZPK5y?=
+ =?us-ascii?Q?Fp3xGXSMG1Y93xv/1wUAYB78G6GHZGdK7jAz1KVqCMRJ+GGXSiUPeTdWvaq+?=
+ =?us-ascii?Q?Dyk1SRyUIkDoMzcrqSIr8ADIqFaaO7NoxexuM5g+d/4NCs5LftJMcPowhEjL?=
+ =?us-ascii?Q?WjBHohMisRjfdeh1OrWvnv5TmHe05/iy/+Ct90M9ic8JJ6cXabhsK2u/aCUK?=
+ =?us-ascii?Q?YTFCDyRzSvNH/3oEY0s7pV8HE17UE3PV0YYzhw1P1Tb3+DtRzCEYi3n0dlzb?=
+ =?us-ascii?Q?6Rw6iVbhopbBAI6uQmyf5nd4XZWI2pZTZmTqsImHTzgZDW8ASh9SL1nPGBKL?=
+ =?us-ascii?Q?JgMaDb0Xf+kyv+KdxuT64XtSEF0hOqtaiXGb4PcGjcxPMJZDCtfSqJSRoHJZ?=
+ =?us-ascii?Q?OuNBkrf0rP7b7qTR9rtl99EJNGLPymmhE/xjDfZy9I6gFwvlERS1l0q/Hd7o?=
+ =?us-ascii?Q?6zf4grC3KPG9DCBTxQffWgM+TAeDSxfgpwYbDzhJmmecgafAn2v2FvttKNk1?=
+ =?us-ascii?Q?t+RWeFa2SkVV//KiG7Wkb5IIPFHD6OTtckSw8BbAXAo3fApT3aksHfVVw/5l?=
+ =?us-ascii?Q?O1g/yR4rscw2x8BW+CZSQ5+QzARZDbBrNh2QiMuRDkDx5JYXTDWPo5FtaEq3?=
+ =?us-ascii?Q?qktcPf8InybkAnLeowuf6ippGt0ZGv3guPU/mgytKqJnIetrklOf1UY1Ji5h?=
+ =?us-ascii?Q?n5r3QNy9kcuCTNfXpTaD1+pfrPfg1cc4gWmYXliEoneJrfchFzIqarFdu9N2?=
+ =?us-ascii?Q?/ZGax7lMU4HbU70=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2025 07:57:17.2592
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91cc36e8-89d2-4818-753e-08dd4ff1dd42
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D5.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4277
 
-On the new hardware platform, the migration region is moved from
-VF to PF. the driver also needs to be modified accordingly to adapt
-to the new hardware device.
+Tom Lendacky <thomas.lendacky@amd.com> writes:
 
-Use PF's io base directly on the new hardware platform. and no mmap
-operation is required.
-If it is on an old platform, the driver needs to be compatible with
-the old solution.
+> On 2/17/25 04:22, Nikunj A Dadhania wrote:
+>> The sev_data_snp_launch_start structure should include a 4-byte
+>> desired_tsc_khz field before the gosvw field, which was missed in the
+>> initial implementation. As a result, the structure is 4 bytes shorter than
+>> expected by the firmware, causing the gosvw field to start 4 bytes early.
+>> Fix this by adding the missing 4-byte member for the desired TSC frequency.
+>> 
+>> Fixes: 3a45dc2b419e ("crypto: ccp: Define the SEV-SNP commands")
+>> Cc: stable@vger.kernel.org
+>> Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+>
+> Even though you're using the "crypto: ccp:" tag (which should actually
+> be "crypto: ccp -"), this can probably go through the KVM tree. Not sure
+> if it makes sense to tag it as "KVM: SVM:" instead.
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 165 ++++++++++++------
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |   7 +
- 2 files changed, 119 insertions(+), 53 deletions(-)
+Thanks, I will update the subject.
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 599905dbb707..cf5a807c2199 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -125,6 +125,72 @@ static int qm_get_cqc(struct hisi_qm *qm, u64 *addr)
- 	return 0;
- }
- 
-+static int qm_get_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-+			   struct acc_vf_data *vf_data)
-+{
-+	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-+	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
-+	int ret;
-+
-+	if (qm->ver == QM_HW_V3) {
-+		eqc_addr = QM_EQC_DW0;
-+		aeqc_addr = QM_AEQC_DW0;
-+	} else {
-+		eqc_addr = QM_EQC_PF_DW0;
-+		aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+
-+	/* QM_EQC_DW has 7 regs */
-+	ret = qm_read_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_EQC_DW\n");
-+		return ret;
-+	}
-+
-+	/* QM_AEQC_DW has 7 regs */
-+	ret = qm_read_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to read QM_AEQC_DW\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int qm_set_xqc_regs(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-+			   struct acc_vf_data *vf_data)
-+{
-+	struct hisi_qm *qm = &hisi_acc_vdev->vf_qm;
-+	struct device *dev = &qm->pdev->dev;
-+	u32 eqc_addr, aeqc_addr;
-+	int ret;
-+
-+	if (qm->ver == QM_HW_V3) {
-+		eqc_addr = QM_EQC_DW0;
-+		aeqc_addr = QM_AEQC_DW0;
-+	} else {
-+		eqc_addr = QM_EQC_PF_DW0;
-+		aeqc_addr = QM_AEQC_PF_DW0;
-+	}
-+
-+	/* QM_EQC_DW has 7 regs */
-+	ret = qm_write_regs(qm, eqc_addr, vf_data->qm_eqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_EQC_DW\n");
-+		return ret;
-+	}
-+
-+	/* QM_AEQC_DW has 7 regs */
-+	ret = qm_write_regs(qm, aeqc_addr, vf_data->qm_aeqc_dw, 7);
-+	if (ret) {
-+		dev_err(dev, "failed to write QM_AEQC_DW\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- {
- 	struct device *dev = &qm->pdev->dev;
-@@ -167,20 +233,6 @@ static int qm_get_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
--	/* QM_EQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to read QM_EQC_DW\n");
--		return ret;
--	}
--
--	/* QM_AEQC_DW has 7 regs */
--	ret = qm_read_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to read QM_AEQC_DW\n");
--		return ret;
--	}
--
- 	return 0;
- }
- 
-@@ -238,20 +290,6 @@ static int qm_set_regs(struct hisi_qm *qm, struct acc_vf_data *vf_data)
- 		return ret;
- 	}
- 
--	/* QM_EQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_EQC_DW0, vf_data->qm_eqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to write QM_EQC_DW\n");
--		return ret;
--	}
--
--	/* QM_AEQC_DW has 7 regs */
--	ret = qm_write_regs(qm, QM_AEQC_DW0, vf_data->qm_aeqc_dw, 7);
--	if (ret) {
--		dev_err(dev, "failed to write QM_AEQC_DW\n");
--		return ret;
--	}
--
- 	return 0;
- }
- 
-@@ -470,6 +508,10 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return ret;
- 	}
- 
-+	ret = qm_set_xqc_regs(hisi_acc_vdev, vf_data);
-+	if (ret)
-+		return ret;
-+
- 	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_BT, qm->sqc_dma, 0, 0);
- 	if (ret) {
- 		dev_err(dev, "set sqc failed\n");
-@@ -544,6 +586,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 		return ret;
- 	}
- 
-+	ret = qm_get_xqc_regs(hisi_acc_vdev, vf_data);
-+	if (ret)
-+		return -EINVAL;
-+
- 	ret = vf_qm_read_data(vf_qm, vf_data);
- 	if (ret)
- 		return -EINVAL;
-@@ -1131,34 +1177,46 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
- 	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-+	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
- 	struct pci_dev *vf_dev = vdev->pdev;
- 
--	/*
--	 * ACC VF dev BAR2 region consists of both functional register space
--	 * and migration control register space. For migration to work, we
--	 * need access to both. Hence, we map the entire BAR2 region here.
--	 * But unnecessarily exposing the migration BAR region to the Guest
--	 * has the potential to prevent/corrupt the Guest migration. Hence,
--	 * we restrict access to the migration control space from
--	 * Guest(Please see mmap/ioctl/read/write override functions).
--	 *
--	 * Please note that it is OK to expose the entire VF BAR if migration
--	 * is not supported or required as this cannot affect the ACC PF
--	 * configurations.
--	 *
--	 * Also the HiSilicon ACC VF devices supported by this driver on
--	 * HiSilicon hardware platforms are integrated end point devices
--	 * and the platform lacks the capability to perform any PCIe P2P
--	 * between these devices.
--	 */
-+	if (pf_qm->ver == QM_HW_V3) {
-+		/*
-+		 * ACC VF dev BAR2 region consists of both functional register space
-+		 * and migration control register space. For migration to work, we
-+		 * need access to both. Hence, we map the entire BAR2 region here.
-+		 * But unnecessarily exposing the migration BAR region to the Guest
-+		 * has the potential to prevent/corrupt the Guest migration. Hence,
-+		 * we restrict access to the migration control space from
-+		 * Guest(Please see mmap/ioctl/read/write override functions).
-+		 *
-+		 * Please note that it is OK to expose the entire VF BAR if migration
-+		 * is not supported or required as this cannot affect the ACC PF
-+		 * configurations.
-+		 *
-+		 * Also the HiSilicon ACC VF devices supported by this driver on
-+		 * HiSilicon hardware platforms are integrated end point devices
-+		 * and the platform lacks the capability to perform any PCIe P2P
-+		 * between these devices.
-+		 */
- 
--	vf_qm->io_base =
--		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
--			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
--	if (!vf_qm->io_base)
--		return -EIO;
-+		vf_qm->io_base =
-+			ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
-+				pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
-+		if (!vf_qm->io_base)
-+			return -EIO;
- 
--	vf_qm->fun_type = QM_HW_VF;
-+		vf_qm->fun_type = QM_HW_VF;
-+		vf_qm->ver = pf_qm->ver;
-+	} else {
-+		/*
-+		 * In the new HW platform, the migration function register space is in BAR2 of PF,
-+		 * and each VF occupies 8KB address space.
-+		 */
-+		vf_qm->io_base = pf_qm->io_base + QM_MIG_REGION_OFFSET +
-+				hisi_acc_vdev->vf_id * QM_MIG_REGION_SIZE;
-+		vf_qm->fun_type = QM_HW_PF;
-+	}
- 	vf_qm->pdev = vf_dev;
- 	mutex_init(&vf_qm->mailbox_lock);
- 
-@@ -1488,7 +1546,8 @@ static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
- 
- 	mutex_lock(&hisi_acc_vdev->open_mutex);
- 	hisi_acc_vdev->dev_opened = false;
--	iounmap(vf_qm->io_base);
-+	if (vf_qm->ver == QM_HW_V3)
-+		iounmap(vf_qm->io_base);
- 	mutex_unlock(&hisi_acc_vdev->open_mutex);
- 	vfio_pci_core_close_device(core_vdev);
- }
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index 245d7537b2bc..b01eb54525d3 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -50,6 +50,13 @@
- #define QM_EQC_DW0		0X8000
- #define QM_AEQC_DW0		0X8020
- 
-+#define QM_MIG_REGION_OFFSET	0x180000
-+#define QM_MIG_REGION_SIZE	0x2000
-+
-+#define QM_SUB_VERSION_ID		0x100210
-+#define QM_EQC_PF_DW0		0x1c00
-+#define QM_AEQC_PF_DW0		0x1c20
-+
- struct acc_vf_data {
- #define QM_MATCH_SIZE offsetofend(struct acc_vf_data, qm_rsv_state)
- 	/* QM match information */
--- 
-2.24.0
-
+Regards
+Nikunj
 
