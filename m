@@ -1,186 +1,198 @@
-Return-Path: <kvm+bounces-38507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB4EA3ABFE
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 23:48:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FE6A3AC11
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 23:55:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BDE0171101
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 22:48:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2C823B211C
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 22:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4417F1D6DB1;
-	Tue, 18 Feb 2025 22:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E58E1DDC2B;
+	Tue, 18 Feb 2025 22:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wy4SffLT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aiOZcO7g"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42D72862B7
-	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 22:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930811D8A0D;
+	Tue, 18 Feb 2025 22:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739918874; cv=none; b=FdTnoqV4HHtZeObz5Vvp5m7Jd1rtBWwmAvaEat4kHfXfN8zXbpsQ3AqbU/ZrCQD7wSVCMIVD0oV1ndTrzi8PeBiSPilPYKb3exFVqYT4UEmKK7Dg/NDq2UsaZCKS55ZvTlQmv7GpAq7/0hd1968RsqzzQpeBQYjXpG3bQFqfOWs=
+	t=1739919301; cv=none; b=kbLCz0MTw9i4aK2RbcNaskftyB7Eb5Pypv7jpT8mTOFZnr141vuqt4erjQOHV0SLQHLJ+lwVaTZgOz46MqH40X2mC4b0JRQ29ZZXh3aTT70l8xYY8+j6TCi0pOLOOFIrQKomhlIy7cvqGGXTQ4VariEDJ94Cbnj+8gRArYp+WHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739918874; c=relaxed/simple;
-	bh=h24HuYwNLSnt3tdVXGlp3ZLTwLBuyPAwn3ahyR1sqRM=;
+	s=arc-20240116; t=1739919301; c=relaxed/simple;
+	bh=JfZZ5wVAOe/Y1NihNftjYuYbwLi7XmW8eEZlPrqPMd4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LYNUglSZ5bEvmrTC+ltk930V3xGDdqVeVNbQikY/MDPWTCg6pssMxIC4LF9mqVvDZqaodaCDYCKcf9SPQJlZkeqx+yPX4AIL0iooSTmL6ubpPrK+G7kBwNwJsjceZi+E7CWWT2uguZE5VDdpe5P3AUBN7EDrzz9Y51TbGZ3oE20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wy4SffLT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739918872;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nh9W0RmqBnUONSTMPcR74JdQUkTIr6YF89vCK3+sVCc=;
-	b=Wy4SffLTy7Cf/P74fbrPiLvfaaWsnl3P2dLfbahs/hhXbJVcNz99CFm6Xv3S4qE0oZOz5l
-	tnx+Li3yR56iEKHdG9KSVn/wD3ToVXixjr8cu+pVwkN3PlRjfhOsIk/4c7pUZz5PMMNvUJ
-	i4YDGTKiLGbwLiwCBLVREy4fdmRGVes=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-179-AnyS4ZvOPsmh5g36kgBHbw-1; Tue, 18 Feb 2025 17:47:50 -0500
-X-MC-Unique: AnyS4ZvOPsmh5g36kgBHbw-1
-X-Mimecast-MFC-AGG-ID: AnyS4ZvOPsmh5g36kgBHbw_1739918870
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7c0b0cf53f3so126743085a.2
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 14:47:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739918870; x=1740523670;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nh9W0RmqBnUONSTMPcR74JdQUkTIr6YF89vCK3+sVCc=;
-        b=EM9um9+M1X64SkmB8yq4dc73ElKh5IvpPKJGCHDRPJstxglkX1oAHAbK6FMA0ySmnr
-         1t7F2Evqcus92/J5NqC8o6QN5q7vPK3pUpF1kNWH3/DLxGSjiDCZ9vrVCjpawOu2sZjn
-         id641VLS+4d0eygBiHJYRs8HHPtW/yRQIp5xHwLHDQiM7TKteXL+YA6wDDWFDqzc0jlj
-         ZXxSEOm27OsaDgSmQp3VivmKetmeYRXi5vGDgIa0VFlCCbXlZO+YJ5xEQbplatYWa7U6
-         VRbY7fCPvf5hAI0EgYp+ZqFPC0N1rHn0Kud1wxw4npIZWQdp4DqYk7oRmNdceQqezJdI
-         0gTQ==
-X-Gm-Message-State: AOJu0Yw1LleGEeal4ckbR4xw/TYpZym7EW47V7kJM0hBby3x6W58IQew
-	RXmKVO+Hk4XZXICjlWKIdLffLgSDj19jrmVbWvF/olRyhGP+t65hXd+U8/Y6m08gLUtHHRJ60Br
-	mmajJhwyCnu8tLMWtem/63vhdvIr1FrVQyNyQ09R00rdKvUG4vg==
-X-Gm-Gg: ASbGncvIhp6EEMNv50GsTVMf5lBnQQexgEXjTGsUpK284frsuqWqMmensTG6xBmKbGs
-	YZ+KYR2zhxGJ0dGvd2440VtuojdlOeLEOuL/zmUkuiL0W5rtZGpXY4qtg2B7O73JjYx1hMs6H98
-	xguTKgpPDLxnikIe9BSAV8yzJKibVJnBIa7OxO3mlQd4A9eip8g+uGJoUAYi6hCSnvOiUUo6IF/
-	+/ZkmaGVLr4I7o3KdiFInZEtc0HRkJ20vo4T2DVvOCpdhoIpfMkTKh2QUw=
-X-Received: by 2002:a05:620a:4506:b0:7c0:602c:e689 with SMTP id af79cd13be357-7c08a99c55cmr1632597485a.16.1739918869955;
-        Tue, 18 Feb 2025 14:47:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGw3KGF4/VClTCVZ8SCaSR6gJ/c+MMRvvSXFAJ8E8v3FwIBWyA1S7XmW3ZiNnzr4iowAvPviw==
-X-Received: by 2002:a05:620a:4506:b0:7c0:602c:e689 with SMTP id af79cd13be357-7c08a99c55cmr1632595385a.16.1739918869659;
-        Tue, 18 Feb 2025 14:47:49 -0800 (PST)
-Received: from x1.local ([2604:7a40:2041:2b00::1000])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c0a3dcda55sm229402985a.58.2025.02.18.14.47.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 14:47:48 -0800 (PST)
-Date: Tue, 18 Feb 2025 17:47:46 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mitchell.augustin@canonical.com, clg@redhat.com, jgg@nvidia.com,
-	willy@infradead.org
-Subject: Re: [PATCH v2 6/6] vfio/type1: Use mapping page mask for pfnmaps
-Message-ID: <Z7UOEpgH5pdTBcJP@x1.local>
-References: <20250218222209.1382449-1-alex.williamson@redhat.com>
- <20250218222209.1382449-7-alex.williamson@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AtgLHhWS2qFYesAWal7ExFsAez1OBW0cB1j2SQvKVZCUuTaKFT+IW9DhOw+tGXpqgbmc4Zyqdim5rsGBDwa+09ctw+aDDKCfksoBg8ng1nObxQAWwMQWeIk2045a6WD22wq0nQ636c1L2roOs/ctLY+aTEn4GLpTMZl/bxomZl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aiOZcO7g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F80C4CEE2;
+	Tue, 18 Feb 2025 22:55:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739919301;
+	bh=JfZZ5wVAOe/Y1NihNftjYuYbwLi7XmW8eEZlPrqPMd4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aiOZcO7gz+YKbzy7UfmkDhU3tc1GP77KXGgqZvo8QBWC5vgpTgTrmRki8TY27KEG9
+	 8HqF/60pEH5UBgtSchm3Se6wqh0dZaDowr6l0b6r0YUl+j0tajI/QC2mEqdWnL1GnL
+	 LiqABVRTk5NWk1BgguBFuStYX4r6uCiugCD746iyvxydi45/2eBqxBVJGd1AGnfWRG
+	 ylD6MnyNRCoHpbpVjxW/FVxP8oPsdm4slgSekZk/4aRmRIPRkFjtlJborqm0BF8/oW
+	 GCSKlZDlRTb1JiQ+9Nn3ndwQV91qYjgd4h0D3IG0l3MLO6jxlYtY1qBAyD9YDZ6pGA
+	 E6dhuaXIuBhyA==
+Date: Tue, 18 Feb 2025 22:54:57 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 00/27] KVM: arm64: Implement support for SME in
+ non-protected guests
+Message-ID: <Z7UPwXVqkaKZDtGk@finisterre.sirena.org.uk>
+References: <20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org>
+ <86pljkswuk.wl-maz@kernel.org>
+ <Z69dsGn1JVWPCqAi@finisterre.sirena.org.uk>
+ <86h64ssyi1.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="S0+W34M0g75qMnHY"
 Content-Disposition: inline
-In-Reply-To: <20250218222209.1382449-7-alex.williamson@redhat.com>
+In-Reply-To: <86h64ssyi1.wl-maz@kernel.org>
+X-Cookie: Editing is a rewording activity.
 
-On Tue, Feb 18, 2025 at 03:22:06PM -0700, Alex Williamson wrote:
-> vfio-pci supports huge_fault for PCI MMIO BARs and will insert pud and
-> pmd mappings for well aligned mappings.  follow_pfnmap_start() walks the
-> page table and therefore knows the page mask of the level where the
-> address is found and returns this through follow_pfnmap_args.pgmask.
-> Subsequent pfns from this address until the end of the mapping page are
-> necessarily consecutive.  Use this information to retrieve a range of
-> pfnmap pfns in a single pass.
-> 
-> With optimal mappings and alignment on systems with 1GB pud and 4KB
-> page size, this reduces iterations for DMA mapping PCI BARs by a
-> factor of 256K.  In real world testing, the overhead of iterating
-> pfns for a VM DMA mapping a 32GB PCI BAR is reduced from ~1s to
-> sub-millisecond overhead.
-> 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 23 ++++++++++++++++-------
->  1 file changed, 16 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index ce661f03f139..0ac56072af9f 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -520,7 +520,7 @@ static void vfio_batch_fini(struct vfio_batch *batch)
->  
->  static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
->  			    unsigned long vaddr, unsigned long *pfn,
-> -			    bool write_fault)
-> +			    unsigned long *addr_mask, bool write_fault)
->  {
->  	struct follow_pfnmap_args args = { .vma = vma, .address = vaddr };
->  	int ret;
-> @@ -544,10 +544,12 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
->  			return ret;
->  	}
->  
-> -	if (write_fault && !args.writable)
-> +	if (write_fault && !args.writable) {
->  		ret = -EFAULT;
-> -	else
-> +	} else {
->  		*pfn = args.pfn;
-> +		*addr_mask = args.addr_mask;
-> +	}
->  
->  	follow_pfnmap_end(&args);
->  	return ret;
-> @@ -590,15 +592,22 @@ static long vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
->  	vma = vma_lookup(mm, vaddr);
->  
->  	if (vma && vma->vm_flags & VM_PFNMAP) {
-> -		ret = follow_fault_pfn(vma, mm, vaddr, pfn, prot & IOMMU_WRITE);
-> +		unsigned long addr_mask;
-> +
-> +		ret = follow_fault_pfn(vma, mm, vaddr, pfn, &addr_mask,
-> +				       prot & IOMMU_WRITE);
->  		if (ret == -EAGAIN)
->  			goto retry;
->  
->  		if (!ret) {
-> -			if (is_invalid_reserved_pfn(*pfn))
-> -				ret = 1;
-> -			else
-> +			if (is_invalid_reserved_pfn(*pfn)) {
-> +				unsigned long epfn;
-> +
-> +				epfn = (*pfn | (~addr_mask >> PAGE_SHIFT)) + 1;
-> +				ret = min_t(long, npages, epfn - *pfn);
 
-s/long/unsigned long/?
+--S0+W34M0g75qMnHY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+On Mon, Feb 17, 2025 at 09:37:26AM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Fri, Feb 14, 2025 at 09:24:03AM +0000, Marc Zyngier wrote:
 
-> +			} else {
->  				ret = -EFAULT;
-> +			}
->  		}
->  	}
->  done:
-> -- 
-> 2.48.1
-> 
+> > > Why SVCR? This isn't a register, just an architected accessor to
+> > > PSTATE.{ZA,SM}. Userspace already has direct access to PSTATE, so I
+> > > don't understand this requirement.
 
--- 
-Peter Xu
+> > Could you be more explicit as to what you mean by direct access to
+> > PSTATE here?  The direct access to these PSTATE fields is in the form of
 
+> I'm painfully aware of the architecture limitations.
+
+> However, I don't get your mention of SPSR here. The architecture is
+> quite clear that PSTATE is where these bits are held, that they are
+> not propagated anywhere else, and that's where userspace should expect
+> to find them.
+
+> The fact that SW must use SVCR to alter PSTATE.{ZA,SM} doesn't matter.
+> We save/restore registers, not accessors. If this means we need to
+> play a dance when the VMM accesses PSTATE to reconciliate KVM's
+> internal view with the userspace view, so be it.
+
+Could you please clarify what you're referring to as the VMM accessing
+PSTATE here?  The KVM API documentation defines it's concept of PSTATE
+as:
+
+ 0x6030 0000 0010 0042 PSTATE      64  regs.pstate
+
+in api.rst but does not futher elaborate.  Looking at the code the
+values that appear there seem to be mapped fairly directly to SPSR
+values, this is why I was talking about them above.
+
+It's not clear to me that PSTATE in the architecture is a register
+exactly.  DDI0487 L.a D1.4 defines the PSTATE bits as being stored in a
+ProcState pseudocode structure (ProcState is defined in J1.3.3.457, the
+pseudocode maps PSTATE in J1.3.3.454) but has an explicit comment that
+"There is no significace in the field order".  I can't seem to locate an
+architectural definition of the layout of PSTATE as a whole.  I also
+can't find any direct observability of PSTATE as a whole which would
+require a layout definition for PSTATE itself from the architecture. =20
+
+There *is* a statement in R_DQXFW that "The contents of PSTATE
+immediately before the exception was taken are written to SPSR_ELx"
+which is somewhat in conflict with the absence of SM and ZA fields in
+any of SPSR_ELx.  There's also R_BWCFK similarly for exception return,
+though that also already has some additional text for PSTATE.{IT,T} for
+returns to AArch32.  If everything in PSTATE ends up getting written to
+SPSR then we can use SPSR as our representation of PSTATE.
+
+> It probably means you need to obtain a clarification of the
+> architecture to define *where* these bits are stored in PSTATE,
+> because that's not currently defined.
+
+I will raise the issue with R_DQXFW and friends with the architects but
+I'm not convinced that at this point the clarification wouldn't be an
+adjustment to those rules rather than the addition of fields for SM and
+ZA in the SPSRs.  Without any additions the only access we have is via
+SVCR.
+
+> > > Isn't it that there is simply a dependency between restoring PSTATE
+> > > and any of the vector stuff? Also, how do you preserve the current ABI
+> > > that do not have this requirement?
+
+> > Yes, that's the dependency - I'm spelling out explicitly what changes in
+> > the register view when PSTATE.{SM,ZA} are restored.  This ABI is what
+> > you appeared to be asking for the last time we discussed this.
+
+=2E..
+
+> > Would you prefer:
+
+> >  - Changing the register view based on the current value of PSTATE.SM.
+> >  - Exposing streaming mode Z and P as separate registers.
+> >  - Exposing the existing Z and P registers with the maximum S?E VL.
+
+> > or some other option?
+
+> My take on this hasn't changed. I want to see something that behaves
+> *exactly* like the architecture defines the expected behaviour of a
+> CPU.
+
+> But you still haven't answered my question: How is the *current* ABI
+> preserved? Does it require *not* selecting SME? Does it require
+> anything else? I'm expecting simple answers to simple questions, not a
+
+Yes, it requires not selecting SME and only that.  If the VMM does not
+enable SME then it should see no change.
+
+> wall of text describing something that is not emulating the
+> architecture.
+
+I'm not clear what you're referring to as not emulating the architecture
+here, I *think* it's the issues with PSTATE.{SM,ZA} not appearing in
+SPSR_ELx and hence KVM's pstate?
+
+Your general style of interaction means that it is not always altogether
+clear when your intent is to just ask a simple question or when it is to
+point out some problem you have seen.
+
+--S0+W34M0g75qMnHY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAme1D8EACgkQJNaLcl1U
+h9Ag7Af9FSno1GEtP2DysLSKInBllL4rhNcN+6z7D0oMeZYX+CbjmeedfMLNVwdd
+quEjDrrV5PN76cyP3s35ABkWOUUUWyrUMYt3sP6vVesfNuMhjb54DETOj71CTEaW
+wt8TicvFuN6erEuz85tgB5CPng+CEGwJRhu6STP7/gBEfPou7y/9dH6xj++i/ueD
+Affm1jdtJAtdk6lDgtqjF0K9Tkawu8SM/0MkoITsCRK3R05LpSLBiCvr3S0e/rUv
+r616LswXOvPnYxuJ3Cr2phgx5ZTGgSo+IH/KQUOdK9lM1E6YkqXDtNQtw5qXldu+
+NYjTRYepfepTBCUZ6GVhkP7IEmi+tQ==
+=qowg
+-----END PGP SIGNATURE-----
+
+--S0+W34M0g75qMnHY--
 
