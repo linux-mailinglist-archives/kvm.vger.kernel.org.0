@@ -1,432 +1,238 @@
-Return-Path: <kvm+bounces-38476-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4FEEA3A769
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 20:29:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD506A3A7E1
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 20:43:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BB86166631
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 19:29:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 536F67A135D
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 19:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212861E8329;
-	Tue, 18 Feb 2025 19:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834381E834D;
+	Tue, 18 Feb 2025 19:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8OLu0ml"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pMQkxeI4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2072.outbound.protection.outlook.com [40.107.93.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB4721B9C4
-	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 19:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739906988; cv=none; b=QnByIAoD781s0vpAPshegCf65XCK+KxegWZA6PvJrMnz0lt8XeZ3tPAHuXF0qg5NfoWz+0Bvih9dlpd+3HFlBPmHc1OxGPghw9UiFVlw7/V8NP5n9svQ2lz/2njwCGWCNXLBcq9/OcqyuJJnjy402psq/7gqsKnsLBAI71TvCAc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739906988; c=relaxed/simple;
-	bh=Iyi0mkkbj829sYGj2VaDB/ZDTf8v5Q+yc6BRlMTdJbo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ten3GVJ12/KKwDbrTxGE+zY9utfVSWlWJVMAgZThuP3u8NdhIQ3FCjJP9egTqYDLa9P0rEmntbBbASx1RfT3RFkr5pojazs2Skz0uBbXigj7MKQBmyF5VkmMO0ufwxCo+QtQjotMjvwhhQDU0XKTB4x6MYR4TEVFfRL73WjVguA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K8OLu0ml; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739906985;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2XqglfLfBNjZUvkW/Dyb4ZzrcV/Lr4EbGt5iKUqOYU8=;
-	b=K8OLu0mlO9xmjxE501ro2EVA8ysjQv5CeZZHApdy6XR6fUNdSNFjNey8cufHjTEB24yGO2
-	7GSjevOEWHfZbqEXOx9N5YlafO+XYbUEzpoaPRhIWr4ZVMCBt86/RF6RtwKJ0vQWA9X2wo
-	YL7lKFRQ/5tmlFHj6+lxHwoLKVkFTgs=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-BpU4VnuHO8WDBsrOLgekpQ-1; Tue, 18 Feb 2025 14:29:44 -0500
-X-MC-Unique: BpU4VnuHO8WDBsrOLgekpQ-1
-X-Mimecast-MFC-AGG-ID: BpU4VnuHO8WDBsrOLgekpQ_1739906983
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7c0a46f1ec7so302934085a.2
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 11:29:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739906983; x=1740511783;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2XqglfLfBNjZUvkW/Dyb4ZzrcV/Lr4EbGt5iKUqOYU8=;
-        b=EHzD8ZVmrTovGlDOju3hLLK6HbNCmcS7gjjyCvPW+ZfK6cl9lDyfzT1vpEB9sqCS7F
-         VY1dhm16R01yVQQCmPs4zwOFitlgoFPOQCHJJ2rqHDXGHtP64zHfFl1b6bLLBQRfTNzp
-         DwpZYK9uLOZB3Lpe1HC3UqPrFikwYFG+t1hZPCggRdYSdk9jVLUxEqwOxp1UHuhVxgl0
-         83AgSSd/Ujgg1G/15o8DTpuMyTqKiUXloCfD5B1impjkDQ637uZMLHsMXjPdi2EYiM11
-         dDYCXm7gKJR0etTGKLv3Jv9383sb4WEN7VdDOgn2v2u+tWoSt5W8sOa/R8hmD55bPQKr
-         3SMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU5pj6RAF2cbviNAwQg3NMr4I+c0FBnpHmh360dIr95WywuJFyGEMR7rTq68Vsnro9jtGc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnlIbMM5VD19qQPrCrqSw/L9J2gt9yvcDiPpEuHcNfvN+3wa4d
-	BU50sfIiv18+aeEW1hQbg3xlKnqMnaOfqlwB5A1JHNbxLP3ZbqMn6P7rR6ItX4tlfdRtmKiwkDI
-	//EL6CVEQ+OkQVv1hKI10cykZri9aMw16SF89mbRZ+iE7BQP+7A==
-X-Gm-Gg: ASbGnctwYqSquYPA0FZziT+wSRJF/z+OJGW2vJFxlnawp7uf/mayaVsyVCYLcx5h9YR
-	Rj6Dhj01oNTy3HdGvH5Z1EdIzLofNPs0g3WyWl2pXnirzB2jzb9RX65sXAhz1AsGIqgZxgY+yKP
-	HI7u0elXOnkb9D+R8vfcXo7ZzlsxCOKtm2o8tvzhGivO97rYn5E/0ePiHdsW8MXjntF9LM5960N
-	WWCRlbTcxlB6nhoNkBfOalui3SQNMRFkCYAG5FaSuFdelr70SFrrkpMysfvqogGp3sV0eYUI0sN
-	5NGb
-X-Received: by 2002:a05:620a:4146:b0:7c0:5e82:8228 with SMTP id af79cd13be357-7c08a9a6346mr1971367985a.21.1739906983317;
-        Tue, 18 Feb 2025 11:29:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGl+8v+Xj43jpMThJb5/HqXF7xZfzQHa0JE30wSeMgrl6wT/+uCV8Ncoyw1h1dz70J5H9xDvw==
-X-Received: by 2002:a05:620a:4146:b0:7c0:5e82:8228 with SMTP id af79cd13be357-7c08a9a6346mr1971363385a.21.1739906982811;
-        Tue, 18 Feb 2025 11:29:42 -0800 (PST)
-Received: from starship ([2607:fea8:fc01:8d8d:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c095bffcc6sm329046985a.3.2025.02.18.11.29.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2025 11:29:42 -0800 (PST)
-Message-ID: <025b409c5ca44055a5f90d2c67e76af86617e222.camel@redhat.com>
-Subject: Re: [PATCH v9 00/11] KVM: x86/mmu: Age sptes locklessly
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: James Houghton <jthoughton@google.com>, Sean Christopherson
-	 <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: David Matlack <dmatlack@google.com>, David Rientjes
- <rientjes@google.com>,  Marc Zyngier <maz@kernel.org>, Oliver Upton
- <oliver.upton@linux.dev>, Wei Xu <weixugc@google.com>, Yu Zhao
- <yuzhao@google.com>, Axel Rasmussen <axelrasmussen@google.com>, 
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 18 Feb 2025 14:29:41 -0500
-In-Reply-To: <20250204004038.1680123-1-jthoughton@google.com>
-References: <20250204004038.1680123-1-jthoughton@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA92B1B3937;
+	Tue, 18 Feb 2025 19:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739907802; cv=fail; b=XWP5gLQDiGZWHemjFbXAi7YIsH9vg718D3sDwKPHPlbEnci6aryFS1xxYeL1Jmv2m22Owp8gEbY2jlNe8yj90rbLXqPfbM6EbuErLyOjFUFzf8Gt9q8aQuD0ze/6C10pM0KF48eyzqoZhPoReQNuigvOqQ7CTJaW+rtnKxAaWPA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739907802; c=relaxed/simple;
+	bh=npkRLcd32Tp/1UEtClkBEf7isUXxnwjgCTroOYTwE0w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=SPIjc8SAyTlT7jp0XoPPRwfd+mCz1hbLyr9Yz0E7olaXnDw6goIqiV418RL/5F28jGJyxeJcjUKyvx86e38LLSupYg2/cBuY0Sdz0DfhjHeJsx5zAvkmcWjIZu/OHiIq0gl6JVwxj6jZkguKSmQvdJepK0AdaOONb3dDiKxreT0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pMQkxeI4; arc=fail smtp.client-ip=40.107.93.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=prkIN0DKb3fS0uAOQDhC+BZgpaw/4A2ML2bqY0v2kmlKWbWCcVVmZBXDHYv+0f99Tdkh1Yk2Iyud3H9APVVVhEosIYXRB+mXt1xwqklo6tXeXqHtOhV8oCqItZAuVd7XRCeV90Z/z6kgvkoI/mL0pDf+vH8d8gT0kWxnQozUfwnzodwPqTns68qEBnesYYLzZJeTGJJrhyLlvc61nNNcfKr+1TSn8aL8LTz4TWQkn40M0eJhVgc6MPnrRVQ7eD9+hvEbxgj/us7X4vBv9tbB4khJAqO8IyzqqxUbyYsiL+4MsDCeGFoFDpnW0/kiG7ezBMnGtpkX8M2PZTX/lvQoNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AfwLymLwvUcEicgD7bWfClVhfv9DRQtOXk8ul/y5JcY=;
+ b=D407wikYbI6tZGQ3AAOkS7FtlDEtQ3nZmSSo2pDt6pfV4e+QKIwPgL1pZKyLk41XG7L3eM2k/qDndkk7OA+QSt3a5+c7bO8233npYssSUUFUnP6vsElG2krpvtzpidNHiCbEYUMy64TmsPhM4tPAxoJpSL5WvARhU/qmkGDCqGPbdgTkHsB4/aL5071dW1AK29uPFc72cQkqV58Z6Dw9Yw0Mk3PjGpr2nPsDRc+C2D7O6NTseW2NyVFmuTRpPItKork9r3ICc7JVNRTtAaBX0zqhgjCy+kKnvAcm1Kc4oc4kyjbvR7+v+anJ9P4yu1mzWh9vAr1nijO/yy6D151cEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AfwLymLwvUcEicgD7bWfClVhfv9DRQtOXk8ul/y5JcY=;
+ b=pMQkxeI4B2kREobvm9SRJW52c+/yrSV/kTcDQzAF2qi9zPel0W6c635ClrghCWturoSLaaCuVFXPi0jxS7+Tkbt+X9m3pkx+493B7Jbd/RJ/e8EwVRvstb6QCqO5OgZXuBflZl2kVlkwUMQovyg9VT89mtE3zSSywTWzm5QoTiyoQobZVa0oknF96cJnpXupjpkyjIxXTbQKreRClR1RZhv5VX0i85YrsBz6wDApIHzYpJDklNyoMkdy8J4uzqORUEUwf1i8f5EwNj8CtANxVC+5M3l/zng5lDz9xTFJE9lXisNmMUQz4zuOnOIimH0pdSb3hNLo03FQuXQboGb8rQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
+ by MN2PR12MB4271.namprd12.prod.outlook.com (2603:10b6:208:1d7::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Tue, 18 Feb
+ 2025 19:43:15 +0000
+Received: from IA1PR12MB9031.namprd12.prod.outlook.com
+ ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
+ ([fe80::1fb7:5076:77b5:559c%4]) with mapi id 15.20.8445.017; Tue, 18 Feb 2025
+ 19:43:15 +0000
+Date: Tue, 18 Feb 2025 19:43:09 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: Eugenio Perez Martin <eperezma@redhat.com>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, 
+	Jason Wang <jasowang@redhat.com>, Si-Wei Liu <si-wei.liu@oracle.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, stable@vger.kernel.org
+Subject: Re: [PATCH vhost] vdpa/mlx5: Fix oversized null mkey longer than
+ 32bit
+Message-ID: <ow7bhl3dfvllmgbasaemdmkcbj3odxkxslvra2kyrb6uev4n3e@sylpfadz7cpu>
+References: <20250217194443.145601-1-dtatulea@nvidia.com>
+ <CAJaqyWcXcW9U7a1bMAngG-eEjw6t5T3XPUdn_hai5OWWTQW85Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJaqyWcXcW9U7a1bMAngG-eEjw6t5T3XPUdn_hai5OWWTQW85Q@mail.gmail.com>
+X-ClientProxiedBy: FR4P281CA0412.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:d0::20) To IA1PR12MB9031.namprd12.prod.outlook.com
+ (2603:10b6:208:3f9::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|MN2PR12MB4271:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2ca55c4a-3be6-4703-6f54-08dd50547c8e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cTZSc0dLOERkZnlvSktHQmIvTFo0UFVKWU50cVVpRzI5TjB1S01icTNiRkNP?=
+ =?utf-8?B?bUdUa3QvS2h5UmZ2cXI3bE9lSVd0dnlWV2pralVTOGI0ZTZLTmFob1NEVndv?=
+ =?utf-8?B?MjdUdDQyeWN0YUJ2Y3I1anlrV1JUNEVqdENIWWdRZ1J6SEkrQ1FKMkdjSWVR?=
+ =?utf-8?B?NnVmQW9MUVRPWCtLalRRdkN0TkxFSGVZZmpBS2VReFFyOXBnenN2SWZSL1ov?=
+ =?utf-8?B?ay96L1F6WU9BaGM1a1V6N1grbXA1a2R5bWtTVDBISlF1cHZqVUI0V3p4d3hw?=
+ =?utf-8?B?VjlvRHF4WEpFS0kxcEhPcmpNWDlwYUhBcGRPSm55MCtsYllqWWhHUUxTbUUz?=
+ =?utf-8?B?Tzh4YWYrVGNYZ3JJa280VmYwL3VjNkROcHBnZVZHa0JQQlhva0FBa0ZKRDk3?=
+ =?utf-8?B?OHZOd0dONUkweEdhd25yT0pJMTA1MkN2UThzbmJqU2pHRi93SXNWYTUya0hh?=
+ =?utf-8?B?NU5EY3V5dXFTdEh2S1VyQ21ySUxEbnBsR3hNTS9DZFJsZUMveW5YcFBkbGZi?=
+ =?utf-8?B?b0U4K2dCRUpRd2R3Y3AzNnV2NERWcHZqMW1Rc1o1SHR5NDk0SXNQM04wRHdo?=
+ =?utf-8?B?SDdLVUorVnF2YnowT0RiNG4yVzFUekRzOHN5NHlvbTNyUDZVK1ZCbWNOL3o2?=
+ =?utf-8?B?V3ZMQTQ1NGp0MnBDSC9MaFludGo5dXF2d0dJQnFSSStqQXNzUmxGd0dGN3gv?=
+ =?utf-8?B?M2pOdms5YTJHZEZYdFJySjlMaGMva0pUQ3Ryc05xQVhhRkJ5QWZqMFN6OVor?=
+ =?utf-8?B?c2ZZZnZEYmNOd2kyZDJGL254R3BWTkpTcm13UEdsMHdBWW9PTmtxWXUxbUlN?=
+ =?utf-8?B?Ly9UMW1tL2FNUWk0S1ZzSm9EbVNteVN4QXd1MEFJRGwwdlZHRUwwQUJXSHlz?=
+ =?utf-8?B?Z1V6YnVUbUFIQitIWTlVZmRXTzdaa1p0L09ESEowdU42RVNsR2tVUUVkZ20y?=
+ =?utf-8?B?RDhCVW02YVI1ME5hZ2NzZ2hldUxtalZ2TEFMUlNvcGNUUi9oNkx0T0pDaUJo?=
+ =?utf-8?B?SDcyWU1NbEMvdENwV2FKQXZSTXZ5b3FBTWVsSEdkL0U2RXVGd3BmaUNKcWhT?=
+ =?utf-8?B?U3IrNUxIK3FFeFNBWmR1R1BmbXRVNzFaZExiWEhLQjVFVHZsdFdPU1dQakNO?=
+ =?utf-8?B?VUtoNnFWRTJLQWlydVpIano3WG1QTDJ3cEhvVW0rU1NjeDhzdlhHRjB3SExZ?=
+ =?utf-8?B?RVF1WU5qanlEMmVtWFp1UjVGdDZweFNuL054OWw3bGp6T00vRHE4N1QvU0RW?=
+ =?utf-8?B?cHk1YzZ6SXBnbnhud2JiSlBkSFBIbWhTUmJ5aVJVeExMYlZVZlJpYU1HOG8w?=
+ =?utf-8?B?NlNaKzdDdWdZV2xqOUZIckRYclNJN2xoTDJqc0VMTk5oazZZNS95Uk9HV01E?=
+ =?utf-8?B?T2xxejl5aS9kN3JQN0N2VE5NWnhiUm5RMTkwRStjVnZ4TUVRUkkxSzM3UGVG?=
+ =?utf-8?B?MG9CcFo3Z0w3S21BT1VkMFZZb2R0M0xVd3VVaUJVZnBiSUI1ZVE0OFJhWlVO?=
+ =?utf-8?B?OUhyOHRVUWpsU1plQVVhMUlwK3FrelVBRWQrNjFZY0ROdFVuMTZ5NXcrWWYr?=
+ =?utf-8?B?WXNBZGtCbm13TjA4dkVnb3ozaENrLzJuK01oMXRsQi9QaWMvSml4eVltUm1C?=
+ =?utf-8?B?QlN6cWRHVTI2eVRENWwvRlZLL2FCRW9YZmszTzJtYnlQRlVSTnl3UGdzRFh0?=
+ =?utf-8?B?KytGMllCNC9NMk5FYmJDRUs4S0dzV0ZCRElKSGRPOHFzOXBtL3RTTWVLQzVC?=
+ =?utf-8?B?eDEzd0FuaHd0ZmhxQVI2cGdkN2drQTlRQ0xqd0J2UXMvUWhEYm1HcFhqZzJN?=
+ =?utf-8?B?N1BNVmx1MlRINGw5djArQkFSRTJBa2pvSDBzQXlpWVRZZ3o5UEN6K0lRdkd3?=
+ =?utf-8?Q?cs2Dd/P1KwoVM?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UDFxUDRmR3crNkt5YTFLeURSVkVxVklMSjJDS0VaU1M1dmV4SzNVeG5xcndQ?=
+ =?utf-8?B?WkN4Y2JGaVVUNlNVQ0MxSG9ZN0JBL1JzN1ZyYmJ0U0o2TEtjQlRlcFRIMUdR?=
+ =?utf-8?B?RERwNmxPc01DWlNZNFArN2UyOFhKOE5IVlcxU09oeVUyTFpxZHpzdUtYb3Rm?=
+ =?utf-8?B?VzNJVGtxdjM4SU0zcmhVY0l6d0ZUNTVzZ3FXUW5lWGVKTUhydFNOVmp1ZVRF?=
+ =?utf-8?B?MzhYMUxkYmN4UVB5a1JwcXZEYXlHTE5KMzB4alFWR3Fvd09sU0thREwzVXc0?=
+ =?utf-8?B?QkozaTVpM3gxTVhtaVhETEdSTFQ5Yy8rb2t0ZmZNV05TWDVTUUFiMExjR0dB?=
+ =?utf-8?B?Q01ISit2bHJqWGZtWWI3K25UMmRqbitaS0Z5Y0pOa0NyeklZS3NSUHcxZmlV?=
+ =?utf-8?B?TGFLcy85WjZsRnVCekNRZ3ZQK3Y4NHkrMEJ0Y0E5b1RraTZLL1cwWW1ZeG14?=
+ =?utf-8?B?dUFzODdQTkowQ2p6dkFtWnNrOGtGMk83elFSdSt4MHMvakVUUTZ4MlZqU1VM?=
+ =?utf-8?B?eWFjWHM1UFd2b09aNHpURlJuQ1FKeUFKWVZWMHNxMDBGN0VBbURWWUdLOXZR?=
+ =?utf-8?B?SzJKL3lselgyd3VnZENqb2hTbzNaV1dkZ21pMlc4WmVPMGw1M3RIRjFqZVBO?=
+ =?utf-8?B?NG1CbFNEMDl4SjRkWjdpOElPbGdkWFJoME9IYkVuUmVpcFRUekx0YnZMM0s2?=
+ =?utf-8?B?VW9FTEo3WXhQclkySzVjR2p3aHhqSXZpSEwwQytoV0k5ZUw2aEl6QjNZd3Bm?=
+ =?utf-8?B?bDJxQjg0MmY4Y2YwaUMxV3oweDQyVE5neGhhc2w3bFUxWTZrZnZ2ZWZwRkpG?=
+ =?utf-8?B?L3R1bDdpc0NpMEtGOVdwMWlSSjBvRVJ1QnFBRXpsVkkwZTJBU3ZxUGpFaG15?=
+ =?utf-8?B?ZmFScHdNd0lXUytIRFhHbnIwbjhyLzdkRkxhQU9XdEw4N1ZQSURRSUx6cjUx?=
+ =?utf-8?B?NjB2cm5NWnA5TlordC9mRDN3a1Fyd1R6czRlUmxwSCtzd1l4R3lwUFpLLzVp?=
+ =?utf-8?B?TFU2VjFxTGFuWHFQT0Z5VnZ5Y2RQelRKSlVuN3ZxU1N2RWw1RGtTMXVSWlVV?=
+ =?utf-8?B?K09XUStZQldnSHV1L1IyakJSbllkZEpHbGtISWMyUFZIU1lEMENTT0NRNHU3?=
+ =?utf-8?B?ZWtPUXZGVklXUk9wampMUHV6NCtNZWQ1TC9sY0tYcDdjZU1SalJuWnl1K0NU?=
+ =?utf-8?B?RWM4eGJHenFJaEkxV21Db1RablJuUnNHR3IwOHZYRHNzdXNNTUpQb216Q3pr?=
+ =?utf-8?B?V0g2UC83ZldTUHlnT0FXeEtzaHh2ZXJiL1p3V2djR2oxZnVOazJIQUxMY0sr?=
+ =?utf-8?B?d1Q3WWRuYmtZN1VvRXVCKy9JcHBKWjRTMi9MbVdCS0VBTEFXYUdNOVlWS0hh?=
+ =?utf-8?B?YklNWkgxYzYvVkVzdUNFcTFKcjZEaFNJY0ZkblF6Ymd4a3lTS0FqUHRQWjhv?=
+ =?utf-8?B?dlpDRDJYM25zeTYwUWV4YUFIRDhndVRidVg0bzRyYWpxTGlmcWRrUnI5ZG8r?=
+ =?utf-8?B?Z0dMd3Q2MjY2eEtwanBETWNoN25hTTcrTjd0UTZhYkowU3VHWHdwWkRFMkpZ?=
+ =?utf-8?B?bGFMNy8zUEdOMFlDNXJJT2FHN2NpbFBjVEVtZkZnemRENmJzZFl6TDlZK3hZ?=
+ =?utf-8?B?S09YN2MwZXd6YlhFNVFsSFByWGQrQXBydmRQRTBPRWdOYXdOZkNKcFF5Nmwz?=
+ =?utf-8?B?cXRQbkxLNWZCRjBkUDlNVytjRm1BOFA1Mkttd29lZGFIaUMwcWtSYngxcG43?=
+ =?utf-8?B?ZDRTZHpWQWF6c0hPZDk2MGc2bGRJcDkxbkNkd3lTby8rSHhyWTQ0MlV5N2pq?=
+ =?utf-8?B?SnFHeDZwQ1ZjY2VDZThVWVl2NlQ4bk5tbG8zRTdTczB4U2R0dXVCK1B6Zzl1?=
+ =?utf-8?B?amtRNmMrcmdzTUJnTmx2N3BIVXlqTkxMYlFBR1V0WEhwUEU2Q0NvNC81cC9t?=
+ =?utf-8?B?SDM5KzZCR1dyVis4MFVlREFHaEVsMzd5ZUk2TVY3WWNTZGo3empoWFVqQ3ZY?=
+ =?utf-8?B?VHZqUDlqY1RiaFNVWWFiZkNOS2hIWk5jbmFYTnpiaDZCZ3lNMUxOYTIydHNv?=
+ =?utf-8?B?SmJqMldDS3dwVjJLajVQZHB5VldZbVFwbU14dkZ3YTFnQ04zQ2Z1TXpKNzlU?=
+ =?utf-8?Q?I9AL1mPRthTR68h+pQKmYA7Bu?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ca55c4a-3be6-4703-6f54-08dd50547c8e
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2025 19:43:15.6639
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1bsyfqOSIKxvAGMQGwbv2RqTO8W/FsUKzxLSigRPO9GPxcXHmbqc8Dm4rymYQrGPQNbtgKpmV22H/TJ9qF5ZSQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4271
 
-On Tue, 2025-02-04 at 00:40 +0000, James Houghton wrote:
-> By aging sptes locklessly with the TDP MMU and the shadow MMU, neither
-> vCPUs nor reclaim (mmu_notifier_invalidate_range*) will get stuck
-> waiting for aging. This contention reduction improves guest performance
-> and saves a significant amount of Google Cloud's CPU usage, and it has
-> valuable improvements for ChromeOS, as Yu has mentioned previously[1].
+On 02/18, Eugenio Perez Martin wrote:
+> On Mon, Feb 17, 2025 at 8:45 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+> >
+> > From: Si-Wei Liu <si-wei.liu@oracle.com>
+> >
+> > create_user_mr() has correct code to count the number of null keys
+> > used to fill in a hole for the memory map. However, fill_indir()
+> > does not follow the same to cap the range up to the 1GB limit
+> > correspondinly.
 > 
-> Please see v8[8] for some performance results using
-> access_tracking_perf_test patched to use MGLRU.
+> s/correspondinly/correspondingly/g
+>
+Will fix in v2.
+
+> Sounds to me the logic can be merged in a helper?
+>
+Not sure if possible in a useful way: the logic in create_user_mr() is
+different.
+
+Also: this patch is kept small for stable tre.
+
+> Either way,
 > 
-> Neither access_tracking_perf_test nor mmu_stress_test trigger any
-> splats (with CONFIG_LOCKDEP=y) with the TDP MMU and with the shadow MMU.
-
-
-Hi, I have a question about this patch series and about the access_tracking_perf_test:
-
-Some time ago, I investigated a failure in access_tracking_perf_test which shows up in our CI.
-
-The root cause was that 'folio_clear_idle' doesn't clear the idle bit when MGLRU is enabled,
-and overall I got the impression that MGLRU is not compatible with idle page tracking.
-
-
-I thought that this patch series and the 'mm: multi-gen LRU: Have secondary MMUs participate in MM_WALK' 
-patch series could address this but the test still fails.
-
-
-For the reference the exact problem is:
-
-1. Idle bits for guest memory under test are set via /sys/kernel/mm/page_idle/bitmap
-
-2. Guest dirties memory, which leads to A/D bits being set in the secondary mappings.
-
-3. A NUMA autobalance code write protects the guest memory. KVM in response evicts the SPTE mappings with A/D bit set,
-   and while doing so tells mm that pages were accessed using 'folio_mark_accessed' (via kvm_set_page_accessed (*) )
-   but due to MLGRU the call doesn't clear the idle bit and thus all the traces of the guest access disappear
-   and the kernel thinks that the page is still idle.
-
-I can say that the root cause of this is that folio_mark_accessed doesn't do what it supposed to do.
-
-Calling 'folio_clear_idle(folio);' in MLGRU case in folio_mark_accessed() 
-will probably fix this but I don't have enough confidence
-to say if this is all that is needed to fix this. 
-If this is the case I can send a patch.
-
-
-This patch makes the test pass (but only on 6.12 kernel and below, see below):
-
-diff --git a/mm/swap.c b/mm/swap.c
-index 59f30a981c6f..2013e1f4d572 100644
---- a/mm/swap.c
-+++ b/mm/swap.c
-@@ -460,7 +460,7 @@ void folio_mark_accessed(struct folio *folio)
- {
-        if (lru_gen_enabled()) {
-                folio_inc_refs(folio);
--               return;
-+               goto clear_idle_bit;
-        }
- 
-        if (!folio_test_referenced(folio)) {
-@@ -485,6 +485,7 @@ void folio_mark_accessed(struct folio *folio)
-                folio_clear_referenced(folio);
-                workingset_activation(folio);
-        }
-+clear_idle_bit:
-        if (folio_test_idle(folio))
-                folio_clear_idle(folio);
- }
-
-
-To always reproduce this, it is best to use a patch to make the test run in a loop, 
-like below (although the test fails without this as well).
-
-
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 3c7defd34f56..829774e325fa 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -131,6 +131,7 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
-        uint64_t pages = vcpu_args->pages;
-        uint64_t page;
-        uint64_t still_idle = 0;
-+       uint64_t failed_to_mark_idle = 0;
-        uint64_t no_pfn = 0;
-        int page_idle_fd;
-        int pagemap_fd;
-@@ -160,6 +161,14 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
-                }
- 
-                mark_page_idle(page_idle_fd, pfn);
-+
-+
-+                if (!is_page_idle(page_idle_fd, pfn)) {
-+                        failed_to_mark_idle++;
-+                        continue;
-+                }
-+
-+
-        }
- 
-        /*
-@@ -183,16 +192,15 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
-         * explicitly flush the TLB when aging SPTEs.  As a result, more pages
-         * are cached and the guest won't see the "idle" bit cleared.
-         */
--       if (still_idle >= pages / 10) {
-+       //if (still_idle >= pages / 10) {
- #ifdef __x86_64__
--               TEST_ASSERT(this_cpu_has(X86_FEATURE_HYPERVISOR),
--                           "vCPU%d: Too many pages still idle (%lu out of %lu)",
--                           vcpu_idx, still_idle, pages);
-+       //      TEST_ASSERT(this_cpu_has(X86_FEATURE_HYPERVISOR),
-+       //                  "vCPU%d: Too many pages still idle (%lu out of %lu)",
-+       //                  vcpu_idx, still_idle, pages);
- #endif
--               printf("WARNING: vCPU%d: Too many pages still idle (%lu out of %lu), "
--                      "this will affect performance results.\n",
--                      vcpu_idx, still_idle, pages);
--       }
-+               printf("vCPU%d: idle pages: %lu out of %lu, failed to mark idle: %lu no pfn: %lu\n",
-+                      vcpu_idx, still_idle, pages, failed_to_mark_idle, no_pfn);
-+       //}
- 
-        close(page_idle_fd);
-        close(pagemap_fd);
-@@ -315,14 +323,16 @@ static void run_test(enum vm_guest_mode mode, void *arg)
-        access_memory(vm, nr_vcpus, ACCESS_WRITE, "Populating memory");
- 
-        /* As a control, read and write to the populated memory first. */
--       access_memory(vm, nr_vcpus, ACCESS_WRITE, "Writing to populated memory");
--       access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from populated memory");
-+       //access_memory(vm, nr_vcpus, ACCESS_WRITE, "Writing to populated memory");
-+       //access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from populated memory");
- 
-        /* Repeat on memory that has been marked as idle. */
-+again:
-        mark_memory_idle(vm, nr_vcpus);
-        access_memory(vm, nr_vcpus, ACCESS_WRITE, "Writing to idle memory");
--       mark_memory_idle(vm, nr_vcpus);
--       access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
-+       //mark_memory_idle(vm, nr_vcpus);
-+       //access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
-+       goto again;
- 
-        memstress_join_vcpu_threads(nr_vcpus);
-        memstress_destroy_vm(vm);
-
-
-With the above patch applied, you will notice after 4-6 iterations that the number of still idle
-pages soars:
-
-Populating memory             : 0.798882357s
-vCPU0: idle pages: 0 out of 262144, failed to mark idle: 0 no pfn: 0
-Mark memory idle              : 3.003939277s
-Writing to idle memory        : 0.503653562s
-vCPU0: idle pages: 0 out of 262144, failed to mark idle: 0 no pfn: 0
-Mark memory idle              : 3.060128175s
-Writing to idle memory        : 0.502705587s
-vCPU0: idle pages: 2048 out of 262144, failed to mark idle: 0 no pfn: 0
-Mark memory idle              : 3.039294079s
-Writing to idle memory        : 0.092227612s
-vCPU0: idle pages: 0 out of 262144, failed to mark idle: 0 no pfn: 0
-Mark memory idle              : 3.046216234s
-Writing to idle memory        : 0.295077724s
-vCPU0: idle pages: 132558 out of 262144, failed to mark idle: 0 no pfn: 0
-Mark memory idle              : 2.711946690s
-Writing to idle memory        : 0.302882502s
-
-...
-
-
-
-(*) Turns out that since kernel 6.13, this code that sets accessed bit in the primary paging
-structure, when the secondary was zapped was *removed*. I bisected this to commit:
-
-66bc627e7fee KVM: x86/mmu: Don't mark "struct page" accessed when zapping SPTEs
-
-So now the access_tracking_test is broken regardless of MGLRU.
-
-Any ideas on how to fix all this mess?
-
-
-Best regards,
-	Maxim Levitsky
-
+> Acked-by: Eugenio Pérez <eperezma@redhat.com>
+> 
+Thanks!
 
 > 
-> === Previous Versions ===
+> > Fill in more null keys for the gaps in between,
+> > so that null keys are correctly populated.
+> >
+> > Fixes: 94abbccdf291 ("vdpa/mlx5: Add shared memory registration code")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
+> > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > ---
+> >  drivers/vdpa/mlx5/core/mr.c | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/vdpa/mlx5/core/mr.c b/drivers/vdpa/mlx5/core/mr.c
+> > index 8455f08f5d40..61424342c096 100644
+> > --- a/drivers/vdpa/mlx5/core/mr.c
+> > +++ b/drivers/vdpa/mlx5/core/mr.c
+> > @@ -190,9 +190,12 @@ static void fill_indir(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_mr *mkey, v
+> >                         klm->bcount = cpu_to_be32(klm_bcount(dmr->end - dmr->start));
+> >                         preve = dmr->end;
+> >                 } else {
+> > +                       u64 bcount = min_t(u64, dmr->start - preve, MAX_KLM_SIZE);
+> > +
+> >                         klm->key = cpu_to_be32(mvdev->res.null_mkey);
+> > -                       klm->bcount = cpu_to_be32(klm_bcount(dmr->start - preve));
+> > -                       preve = dmr->start;
+> > +                       klm->bcount = cpu_to_be32(klm_bcount(bcount));
+> > +                       preve += bcount;
+> > +
+> >                         goto again;
+> >                 }
+> >         }
+> > --
+> > 2.43.0
+> >
 > 
-> Since v8[8]:
->  - Re-added the kvm_handle_hva_range helpers and applied Sean's
->    kvm_{handle -> age}_hva_range rename.
->  - Renamed spte_has_volatile_bits() to spte_needs_atomic_write() and
->    removed its Accessed bit check. Undid change to
->    tdp_mmu_spte_need_atomic_write().
->  - Renamed KVM_MMU_NOTIFIER_{YOUNG -> AGING}_LOCKLESS.
->  - cpu_relax(), lockdep, preempt_disable(), and locking fixups for
->    per-rmap lock (thanks Lai and Sean).
->  - Renamed kvm_{has -> may_have}_shadow_mmu_sptes().
->  - Rebased onto latest kvm/next, including changing
->    for_each_tdp_mmu_root_rcu to use `types`.
->  - Dropped MGLRU changes from access_tracking_perf_test.
->  - Picked up Acked-bys from Yu. (thank you!)
-> 
-> Since v7[7]:
->  - Dropped MGLRU changes.
->  - Dropped DAMON cleanup.
->  - Dropped MMU notifier changes completely.
->  - Made shadow MMU aging *always* lockless, not just lockless when the
->    now-removed "fast_only" clear notifier was used.
->  - Given that the MGLRU changes no longer introduce a new MGLRU
->    capability, drop the new capability check from the selftest.
->  - Rebased on top of latest kvm-x86/next, including the x86 mmu changes
->    for marking pages as dirty.
-> 
-> Since v6[6]:
->  - Rebased on top of kvm-x86/next and Sean's lockless rmap walking
->    changes.
->  - Removed HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY (thanks DavidM).
->  - Split up kvm_age_gfn() / kvm_test_age_gfn() optimizations (thanks
->    DavidM and Sean).
->  - Improved new MMU notifier documentation (thanks DavidH).
->  - Dropped arm64 locking change.
->  - No longer retry for CAS failure in TDP MMU non-A/D case (thanks
->    Sean).
->  - Added some R-bys and A-bys.
-> 
-> Since v5[5]:
->  - Reworked test_clear_young_fast_only() into a new parameter for the
->    existing notifiers (thanks Sean).
->  - Added mmu_notifier.has_fast_aging to tell mm if calling fast-only
->    notifiers should be done.
->  - Added mm_has_fast_young_notifiers() to inform users if calling
->    fast-only notifier helpers is worthwhile (for look-around to use).
->  - Changed MGLRU to invoke a single notifier instead of two when
->    aging and doing look-around (thanks Yu).
->  - For KVM/x86, check indirect_shadow_pages > 0 instead of
->    kvm_memslots_have_rmaps() when collecting age information
->    (thanks Sean).
->  - For KVM/arm, some fixes from Oliver.
->  - Small fixes to access_tracking_perf_test.
->  - Added missing !MMU_NOTIFIER version of mmu_notifier_clear_young().
-> 
-> Since v4[4]:
->  - Removed Kconfig that controlled when aging was enabled. Aging will
->    be done whenever the architecture supports it (thanks Yu).
->  - Added a new MMU notifier, test_clear_young_fast_only(), specifically
->    for MGLRU to use.
->  - Add kvm_fast_{test_,}age_gfn, implemented by x86.
->  - Fix locking for clear_flush_young().
->  - Added KVM_MMU_NOTIFIER_YOUNG_LOCKLESS to clean up locking changes
->    (thanks Sean).
->  - Fix WARN_ON and other cleanup for the arm64 locking changes
->    (thanks Oliver).
-> 
-> Since v3[3]:
->  - Vastly simplified the series (thanks David). Removed mmu notifier
->    batching logic entirely.
->  - Cleaned up how locking is done for mmu_notifier_test/clear_young
->    (thanks David).
->  - Look-around is now only done when there are no secondary MMUs
->    subscribed to MMU notifiers.
->  - CONFIG_LRU_GEN_WALKS_SECONDARY_MMU has been added.
->  - Fixed the lockless implementation of kvm_{test,}age_gfn for x86
->    (thanks David).
->  - Added MGLRU functional and performance tests to
->    access_tracking_perf_test (thanks Axel).
->  - In v3, an mm would be completely ignored (for aging) if there was a
->    secondary MMU but support for secondary MMU walking was missing. Now,
->    missing secondary MMU walking support simply skips the notifier
->    calls (except for eviction).
->  - Added a sanity check for that range->lockless and range->on_lock are
->    never both provided for the memslot walk.
-> 
-> For the changes since v2[2], see v3.
-> 
-> Based on latest kvm/next.
-> 
-> [1]: https://lore.kernel.org/kvm/CAOUHufYS0XyLEf_V+q5SCW54Zy2aW5nL8CnSWreM8d1rX5NKYg@mail.gmail.com/
-> [2]: https://lore.kernel.org/kvmarm/20230526234435.662652-1-yuzhao@google.com/
-> [3]: https://lore.kernel.org/linux-mm/20240401232946.1837665-1-jthoughton@google.com/
-> [4]: https://lore.kernel.org/linux-mm/20240529180510.2295118-1-jthoughton@google.com/
-> [5]: https://lore.kernel.org/linux-mm/20240611002145.2078921-1-jthoughton@google.com/
-> [6]: https://lore.kernel.org/linux-mm/20240724011037.3671523-1-jthoughton@google.com/
-> [7]: https://lore.kernel.org/kvm/20240926013506.860253-1-jthoughton@google.com/
-> [8]: https://lore.kernel.org/kvm/20241105184333.2305744-1-jthoughton@google.com/
-> 
-> James Houghton (7):
->   KVM: Rename kvm_handle_hva_range()
->   KVM: Add lockless memslot walk to KVM
->   KVM: x86/mmu: Factor out spte atomic bit clearing routine
->   KVM: x86/mmu: Relax locking for kvm_test_age_gfn() and kvm_age_gfn()
->   KVM: x86/mmu: Rename spte_has_volatile_bits() to
->     spte_needs_atomic_write()
->   KVM: x86/mmu: Skip shadow MMU test_young if TDP MMU reports page as
->     young
->   KVM: x86/mmu: Only check gfn age in shadow MMU if
->     indirect_shadow_pages > 0
-> 
-> Sean Christopherson (4):
->   KVM: x86/mmu: Refactor low level rmap helpers to prep for walking w/o
->     mmu_lock
->   KVM: x86/mmu: Add infrastructure to allow walking rmaps outside of
->     mmu_lock
->   KVM: x86/mmu: Add support for lockless walks of rmap SPTEs
->   KVM: x86/mmu: Support rmap walks without holding mmu_lock when aging
->     gfns
-> 
->  Documentation/virt/kvm/locking.rst |   4 +-
->  arch/x86/include/asm/kvm_host.h    |   4 +-
->  arch/x86/kvm/Kconfig               |   1 +
->  arch/x86/kvm/mmu/mmu.c             | 364 +++++++++++++++++++++--------
->  arch/x86/kvm/mmu/spte.c            |  19 +-
->  arch/x86/kvm/mmu/spte.h            |   2 +-
->  arch/x86/kvm/mmu/tdp_iter.h        |  26 ++-
->  arch/x86/kvm/mmu/tdp_mmu.c         |  36 ++-
->  include/linux/kvm_host.h           |   1 +
->  virt/kvm/Kconfig                   |   2 +
->  virt/kvm/kvm_main.c                |  56 +++--
->  11 files changed, 364 insertions(+), 151 deletions(-)
-> 
-> 
-> base-commit: f7bafceba76e9ab475b413578c1757ee18c3e44b
-
-
-
-
 
