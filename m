@@ -1,124 +1,175 @@
-Return-Path: <kvm+bounces-38458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE662A3A301
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 17:39:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A344A3A394
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 18:07:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47F171678E4
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 16:39:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61348166AA9
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 17:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B1026E64D;
-	Tue, 18 Feb 2025 16:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EEE26FA5D;
+	Tue, 18 Feb 2025 17:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YKeg9aIv"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="OqWu0HRh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D5114A4E7
-	for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 16:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB51A26F464;
+	Tue, 18 Feb 2025 17:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739896738; cv=none; b=itcJh9FwRKwDDTvg+QvoDHlW4MHxd9CWMvY7TYauIGzZp84NoJvk3zGFttIDFtsxourZjrC7WRhKpdwF3EJP0OdbP0iR+MAC9QcutICywba/rspGVWtItI9H5aHCTJAKEaIA7cdiVssmPkWi8tRjgJLvoNiquzq3ItLf7oCaKeY=
+	t=1739898432; cv=none; b=bZszXXowE0+8XNp8LJRpRvme2epU/6fAxjS46iS0/H2AVRSIWlAf23Oujt9V5CxDqiaYsy9TgrGohffC4qYAkaROJar/LWDUqi6vsoN5GknKpR8pSlEEojhY37Uu+3UPYh2kBdEI4c1YosL07lTC4dsE0Nwag3voIeCm71FVQA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739896738; c=relaxed/simple;
-	bh=RH3rP56uby8EG+wYJyP0S0i9RXy3r/rdgw5Kco0+wSY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EaFKVwldC/lH9rMWCmZdoubkG9xsTSnmyLbNmL015tINkd8yZm5HM28uu4/mYHcZ9wXoK+cFTCc215qB1+6NfeE3rossyiAtMmv47RZ6itdGPk7U9wkaX2DuqJF9xiLM/8fCBDo+oYFKpalXC6jgaXz4j/ItEkkv64b78wlzYOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YKeg9aIv; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220ec5c16e9so91433855ad.1
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 08:38:57 -0800 (PST)
+	s=arc-20240116; t=1739898432; c=relaxed/simple;
+	bh=z2W1klaC4NrqrdesRaJJCmZ5n84Sqox4d0Ii0u9BNx8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cPg8XuLq1jR4JF/OghlZZdk/PmVQODmUv/G1YKGpYgqBGFofvyMefx9XcQalOTBimyMKOeOBFISYFew02IR6enHrLf2Kej8LhbDgfq6Z1hdF/vrQiWIXm0cplPFrM36vxEnadKQfHFYU3FjgR1lJLclBxbq/G5YlsfmXa3u/Dy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=OqWu0HRh; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739896736; x=1740501536; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s/2cxuf1JoTO6SVroEVY0mJiDRjaVSu69gtCf8fWHf8=;
-        b=YKeg9aIvVnYn+eobOXvC+BAZXac+uQb7rXoPtBFI7J2ISYT4BvtJC+xHpW1CrQvK6f
-         TqL3Zhv9ahUBsbdvS9093DKbL04X83QT1v+Zv8dQqJrgILL0EGBOI9yZtChaKnOxor/V
-         UV6es+XJhfl9oZp2ppj++xx6aEmNHOjxa1jj66j4gBkCg1kQ9qkJWyzRENCsGT+XSc0p
-         PfSOa2/+7502j3lk//OeApp29Y4OkumlGgIb6D5frEbNRQ16dl4yw8+TJwWBylymeJk2
-         n15RmcJxCpiLsY90/iu9qLLWjANo8ik9H6ZdqplpCY3LFRROrEl48+699QS8j8/Mgodv
-         PKlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739896736; x=1740501536;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s/2cxuf1JoTO6SVroEVY0mJiDRjaVSu69gtCf8fWHf8=;
-        b=EiasenrGBx5lO5rLpu0Or1ULDdN3taJc8/5wx+grK+TKNb4+/VWfuyyeO/XTmCTtIy
-         EMj8MOsLLhwkWMu3fRhW9LFBzH6t2WpRYmXhoMKjK841EhC0qg/1YL8x9fS/ZN3tgYl3
-         7poUTx5DZ3h1ufqrSMN3mlJN1mHdAvDfbC1XKP3Qe/ueOwoSp+fCWSgxCJ44O+tTDvVx
-         RlKp2aFZQWwg7MBt64EvnmzK0rla4nzGezYBd0nuPH9HyqtgKlWTyZmwWUapxlj5WsX6
-         7xhWWYNItUIQMAocJok4a5/qgvU/2uwqeIADTx5f79oNOxV9UEgdjYrc4aCeKJKeKeSI
-         glog==
-X-Forwarded-Encrypted: i=1; AJvYcCXoNn4ldSyJ4RvWL2AdfrRWE/5hKePtxsto51TOv3icEJ+479l/ZRcmJg7d3w+fxIoUwlE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxy8mO6VL8C9VqOfIauGQ79mSQo3aEIs+aOnt1EbVbx2KocvtWS
-	ai56tqpM3wFmg/VWtADwHnPTHMx21AUED5pP/qNSKtVMUerjfqPQmyd53uMIcEgmP14C+aX0Mfk
-	XoQ==
-X-Google-Smtp-Source: AGHT+IGz4N5n0ndesWXzGP2ApD6Q37C+sMsEGHLvD3oikIQsMpSyWe7LRrfHaqSbSDOuxeOF+q2qd4wfsWI=
-X-Received: from pgbcq4.prod.google.com ([2002:a05:6a02:4084:b0:ad5:45a5:645a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3a43:b0:1ee:c89e:1da9
- with SMTP id adf61e73a8af0-1eec89e1ecdmr4815022637.21.1739896736343; Tue, 18
- Feb 2025 08:38:56 -0800 (PST)
-Date: Tue, 18 Feb 2025 08:38:54 -0800
-In-Reply-To: <gxyvqeslwhw6dirfg7jb7wavotlguctnxf5ystqfcnn5mk74qa@nlqbruetef22>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739898432; x=1771434432;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=EkRdFMxzr88qlSnaM0L16SDNRKu0/9NO/91zT99To3c=;
+  b=OqWu0HRhii20JUcXd6ERwSAtOC6ZpOwPkyi4ccQqkUHr3KaruVjrXTBe
+   uCOVNYpwt8D0RisR/N6GwiHldP3kEKGUQYiXQGy8rHq4t/5Py8/mDWltJ
+   slGLx+K2M3r2xyMA4ICUfqnFSGDF6ZZCQqIVZEr1BgEr0yDnaR2jFLWJp
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.13,296,1732579200"; 
+   d="scan'208";a="473228396"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 17:07:06 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:52643]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.23.222:2525] with esmtp (Farcaster)
+ id b9484c5d-2f40-4fcd-8dcf-fd02932115e9; Tue, 18 Feb 2025 17:07:04 +0000 (UTC)
+X-Farcaster-Flow-ID: b9484c5d-2f40-4fcd-8dcf-fd02932115e9
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Tue, 18 Feb 2025 17:07:02 +0000
+Received: from [192.168.22.162] (10.106.83.18) by
+ EX19D022EUC002.ant.amazon.com (10.252.51.137) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 18 Feb 2025 17:07:02 +0000
+Message-ID: <5078ebfd-c81e-4f2f-95a8-5da48c659dc2@amazon.com>
+Date: Tue, 18 Feb 2025 17:07:01 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250207233410.130813-1-kim.phillips@amd.com> <20250207233410.130813-3-kim.phillips@amd.com>
- <4eb24414-4483-3291-894a-f5a58465a80d@amd.com> <Z6vFSTkGkOCy03jN@google.com>
- <6829cf75-5bf3-4a89-afbe-cfd489b2b24b@amd.com> <Z66UcY8otZosvnxY@google.com> <gxyvqeslwhw6dirfg7jb7wavotlguctnxf5ystqfcnn5mk74qa@nlqbruetef22>
-Message-ID: <Z7S3ns32Z04sIG2w@google.com>
-Subject: Re: [PATCH v3 2/2] KVM: SEV: Configure "ALLOWED_SEV_FEATURES" VMCB Field
-From: Sean Christopherson <seanjc@google.com>
-To: Naveen N Rao <naveen@kernel.org>
-Cc: Kim Phillips <kim.phillips@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org, 
-	kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, "Nikunj A . Dadhania" <nikunj@amd.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Kishon Vijay Abraham I <kvijayab@amd.com>, Alexey Kardashevskiy <aik@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH 1/2] KVM: x86: async_pf: remove support for
+ KVM_ASYNC_PF_SEND_ALWAYS
+To: Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov
+	<vkuznets@redhat.com>
+CC: <pbonzini@redhat.com>, <corbet@lwn.net>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <hpa@zytor.com>, <xiaoyao.li@intel.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <roypat@amazon.co.uk>, <xmarcalx@amazon.com>
+References: <20241127172654.1024-1-kalyazin@amazon.com>
+ <20241127172654.1024-2-kalyazin@amazon.com> <Z6ucl7U79RuBsYJt@google.com>
+ <87frkcrab8.fsf@redhat.com> <Z7SkfSRsE5hcsrRe@google.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <Z7SkfSRsE5hcsrRe@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D005EUB001.ant.amazon.com (10.252.51.12) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On Mon, Feb 17, 2025, Naveen N Rao wrote:
-> On Thu, Feb 13, 2025 at 04:55:13PM -0800, Sean Christopherson wrote:
-> > On Thu, Feb 13, 2025, Kim Phillips wrote:
-> > > On 2/11/25 3:46 PM, Sean Christopherson wrote:
-> > > > On Mon, Feb 10, 2025, Tom Lendacky wrote:
-> > > > > On 2/7/25 17:34, Kim Phillips wrote:
-> > 
-> > Third, letting userspace opt-in to something doesn't necessarily mean giving
-> > userspace full control.  Which is the entire reason I asked the question about
-> > whether or not this can break userspace.  E.g. we can likely get away with only
-> > making select features opt-in, and enforcing everything else by default.
-> > 
-> > I don't think RESTRICTED_INJECTION or ALTERNATE_INJECTION can work without KVM
-> > cooperation, so enforcing those shouldn't break anything.
-> > 
-> > It's still not clear to me that we don't have a bug with DEBUG_SWAP.  AIUI,
-> > DEBUG_SWAP is allowed by default.  I.e. if ALLOWED_FEATURES is unsupported, then
-> > the guest can use DEBUG_SWAP via SVM_VMGEXIT_AP_CREATE without KVM's knowledge.
+
+
+On 18/02/2025 15:17, Sean Christopherson wrote:
+> On Mon, Feb 17, 2025, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>>
+>>> On Wed, Nov 27, 2024, Nikita Kalyazin wrote:
+>>>> 3a7c8fafd1b42adea229fd204132f6a2fb3cd2d9 ("x86/kvm: Restrict
+>>>> ASYNC_PF to user space") stopped setting KVM_ASYNC_PF_SEND_ALWAYS in
+>>>> Linux guests.  While the flag can still be used by legacy guests, the
+>>>> mechanism is best effort so KVM is not obliged to use it.
+>>>
+>>> What's the actual motivation to remove it from KVM?  I agreed KVM isn't required
+>>> to honor KVM_ASYNC_PF_SEND_ALWAYS from a guest/host ABI perspective, but that
+>>> doesn't mean that dropping a feature has no impact.  E.g. it's entirely possible
+>>> removing this support could negatively affect a workload running on an old kernel.
+>>>
+>>> Looking back at the discussion[*] where Vitaly made this suggestion, I don't see
+>>> anything that justifies dropping this code.  It costs KVM practically nothing to
+>>> maintain this code.
+>>>
+>>> [*] https://lore.kernel.org/all/20241118130403.23184-1-kalyazin@amazon.com
+>>>
+>>
+>> How old is old? :-)
+>>
+>> Linux stopped using KVM_ASYNC_PF_SEND_ALWAYS in v5.8:
 > 
-> In sev_es_prepare_switch_to_guest(), we save host debug register state 
-> (DR0-DR3) only if KVM is aware of DEBUG_SWAP being enabled in the guest 
-> (via vmsa_features). So, from what I can tell, it looks like the guest 
-> will end up overwriting host state if it enables DEBUG_SWAP without 
-> KVM's knowledge?
-
-Yes, that's what I'm effectively "asking".
-
-> Not sure if that's reason enough to enforce ALLOWED_SEV_FEATURES for 
-> DEBUG_SWAP :)
+> 5.8 is practically a baby.  Maybe a toddler :-)
 > 
-> If ALLOWED_SEV_FEATURES is not supported, we may still have to 
-> unconditionally save the host DR0-DR3 registers.
+>> commit 3a7c8fafd1b42adea229fd204132f6a2fb3cd2d9
+>> Author: Thomas Gleixner <tglx@linutronix.de>
+>> Date:   Fri Apr 24 09:57:56 2020 +0200
+>>
+>>      x86/kvm: Restrict ASYNC_PF to user space
+>>
+>> and I was under the impression other OSes never used KVM asynchronous
+>> page-fault in the first place (not sure about *BSDs though but certainly
+>> not Windows). As Nikita's motivation for the patch was "to avoid the
+>> overhead ... in case of kernel-originated faults" I suggested we start
+>> by simplifyign the code to not care about 'send_user_only' at all.
+> 
+> In practice, I don't think it's a meaningful simplification.  There are other
+> scenarios where KVM shouldn't inject an async #PF, so kvm_can_deliver_async_pf()
+> itself isn't going anywhere.
+> 
+> AFAICT, what Nikita actually wants is a way to disable host-side async #PF, e.g.
 
-Yes, that's my understanding of the situation.  If the CPU supports DEBUG_SWAP,
-KVM must assume the guest can enable it without KVM's knowledge.
+That's correct.  Just wanted to say that the main intention was to do 
+that for async PF user [1] where the difference in performance is 
+noticeable (at least in my setup).  I'm totally ok with the status quo 
+in the async PF kernel.  If however the mechanism to achieve that turns 
+out to be generic, it's better to support for both, I guess.
+
+[1]: 
+https://lore.kernel.org/kvm/20241118123948.4796-1-kalyazin@amazon.com/T/
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index f97d4d435e7f..d461e1b5489c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -13411,7 +13411,8 @@ bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+>                       kvm_is_exception_pending(vcpu)))
+>                  return false;
+> 
+> -       if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
+> +       if ((kvm_hlt_in_guest(vcpu->kvm) || kvm_only_pv_async_pf(vcpu->kvm)) &&
+> +           !kvm_can_deliver_async_pf(vcpu))
+>                  return false;
+> 
+>          /*
+> 
+>> We can keep the code around, I guess, but with no plans to re-introduce
+>> KVM_ASYNC_PF_SEND_ALWAYS usage to Linux I still believe it would be good
+>> to set a deprecation date.
+
 
