@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-38413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38414-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB737A39731
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 10:34:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB865A39747
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 10:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8856E7A3A52
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 09:33:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 731F13A4842
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 09:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80465230D11;
-	Tue, 18 Feb 2025 09:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97BAB22FF2B;
+	Tue, 18 Feb 2025 09:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dpjpJu7a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GdRu56Rx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D6D22D4C9;
-	Tue, 18 Feb 2025 09:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EAC22AE42;
+	Tue, 18 Feb 2025 09:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739871258; cv=none; b=rLH5T+OzWdEy3AfhPJMMyC3ojd1vaZe0j/7riBqiviQbhyihyGQNuIROWy/1EwBMo2o9c+BPWXEulkXbptOGEc+xP08m1VbQHvAEAb1qz5IAK4HyFAGrakCI8G/fROfoFkNO5e6lgNKvWveyWrMydz7ApmH/aRQ1ouczSGSK6YA=
+	t=1739871386; cv=none; b=Zsqa9jj40uyc4SUnYiZJYwL+Nsc5HAz3nf8ShY7VbjElfQIRCUpwYmafbDhl5IPaBU22EE8G/fNABFXgtA56PxAvXwc+oC4M6+EwlpiJhQW9sbxWLiXRr5/vY/Pf/nNwtgcFIaUtvduyZIfhJ4IJFRweA0Rmg9Z70Q+LsEmwOEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739871258; c=relaxed/simple;
-	bh=V8X1mDk7JVpQUTClaj7fdDJBMmCj/vyPTzAGGwCbZbg=;
+	s=arc-20240116; t=1739871386; c=relaxed/simple;
+	bh=6wjiP+Lq8n4ALuJUpnvy+4rVMNT7sLHwAY6F3JkTrmE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tReyMv43gsku0dFSvSIcjsdWi3lKnoMgRwhk605HcqhiF0QZAQ7GbemWAqUklgXRGS94aubCQoRuyHgmGyaf4XNUDKvpoliAiFxwb+1u8VH2n7UbeBnz7NpJEGCEvNQeaqaYAOxUnVIw+xI1QIANECdnv54Qw9OEkZFHWPybBg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dpjpJu7a; arc=none smtp.client-ip=198.175.65.13
+	 In-Reply-To:Content-Type; b=S2Ewbb/z53QNoZqKrptu6fXy11AfsPE8Za7hHiriLSWEyTA8sYog8T4d2evlAwXrUXfyQmOVyngm0QwVvDm4EFsbgh+5Si+L3Jf2V0S27d0We36gOuvjui/pZibcG7X4O4zNzkhoIF464vyhslJA/GSXbrkUw5TbjQNJ5hVdpgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GdRu56Rx; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739871258; x=1771407258;
+  t=1739871385; x=1771407385;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=V8X1mDk7JVpQUTClaj7fdDJBMmCj/vyPTzAGGwCbZbg=;
-  b=dpjpJu7adSN2m4DURT6N0uuf0/zx0GL6Oc2hsXJmcSazahIGLcSfV45V
-   eFtpsq5zWXDzY8cidzYlaJRnpr+dAEsp1oiwwEdpR3YUV65r1sf2gebKW
-   6weyro2UJM/6NYNd4qrhk/2wZDncjtiRW3TYv0k4yODl7Nb0exyqS+pYR
-   3yVGBWCbB84qq/0Nl50pUBgNxCrtCivGSD4lbCJTj0NYJZwVzsw1NGDho
-   aILEnGexHfrZBjkcm61oDpJgeMJtULGZHAdyIAbyG/eTu39kNaY/VyZoJ
-   zX3H8KK2p/F6cYVSj+uER5YtUwBnX8fsIjoUbAep1TY+FYsp4gyvaH/0p
-   w==;
-X-CSE-ConnectionGUID: ExYGjjmgS0+oSgNyDUuBpQ==
-X-CSE-MsgGUID: nqEIXHUiQ3axBmnX/uOKBw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="51542674"
+  bh=6wjiP+Lq8n4ALuJUpnvy+4rVMNT7sLHwAY6F3JkTrmE=;
+  b=GdRu56RxwKFyjl/Z8TVJIgO1xGKyQdCfpAuixWCk0WLQcBzWjCGvTlRX
+   KAjvPTxy72LMtqGmCeGV0CjFln2s7+G6jekfIRHIT8Q1BsxfXj0BTLo0e
+   PVRWesP9XElHKVNN7PcCW6Mmd+d7zOFaP/JNC+TqwF7h54cWWZVEkweuv
+   40GtpYXFRiQiZT1lx25Rjg7nzusslvhYU/1pEg7U1E35BQveswTPimwRY
+   a+7xM8ItP0rKBRWwc5yIXRgmF1PJ6QEw77CN8FX9Dd/7DvcePSrdva9f9
+   uhVZj+K7qWPmwxPgM5XQxBeRszpiSTLsWaEoNHtppBhjMD7/lbRzA5BR9
+   Q==;
+X-CSE-ConnectionGUID: 5yT8YMmzRc2hRucI/lTojA==
+X-CSE-MsgGUID: FyffBQ98QdiY4JK5zsafJw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="40263533"
 X-IronPort-AV: E=Sophos;i="6.13,295,1732608000"; 
-   d="scan'208";a="51542674"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 01:34:16 -0800
-X-CSE-ConnectionGUID: mbwZ4YsQQ3OJovpBmDqYOg==
-X-CSE-MsgGUID: PlFqrOiYRpK+JdpKoi7x3w==
+   d="scan'208";a="40263533"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 01:36:24 -0800
+X-CSE-ConnectionGUID: JBCiSzFDQKOFYs3bgRXvgg==
+X-CSE-MsgGUID: 3KWPQKkDTuqmdJsy9IpzJg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="118467594"
+   d="scan'208";a="119558090"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 01:34:12 -0800
-Message-ID: <28dcae5c-4fb7-46a8-9f37-a4f9f59b45a2@linux.intel.com>
-Date: Tue, 18 Feb 2025 17:34:09 +0800
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 01:36:21 -0800
+Message-ID: <add089ff-49d9-40a9-a020-5f4eb876aef8@linux.intel.com>
+Date: Tue, 18 Feb 2025 17:36:19 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,48 +67,56 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests patch v6 07/18] x86: pmu: Fix potential out of
- bound access for fixed events
+Subject: Re: [kvm-unit-tests patch v6 08/18] x86: pmu: Fix cycles event
+ validation failure
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
  Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Like Xu <like.xu.linux@gmail.com>,
- Jinrong Liang <cloudliang@tencent.com>, Yongwei Ma <yongwei.ma@intel.com>,
+ Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>,
  Dapeng Mi <dapeng1.mi@intel.com>
 References: <20240914101728.33148-1-dapeng1.mi@linux.intel.com>
- <20240914101728.33148-8-dapeng1.mi@linux.intel.com>
- <Z6-wmhr5JDNuDC7D@google.com>
+ <20240914101728.33148-9-dapeng1.mi@linux.intel.com>
+ <Z6-wrVaVSiI9ZKkD@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <Z6-wmhr5JDNuDC7D@google.com>
+In-Reply-To: <Z6-wrVaVSiI9ZKkD@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 On 2/15/2025 5:07 AM, Sean Christopherson wrote:
 > On Sat, Sep 14, 2024, Dapeng Mi wrote:
->> @@ -744,6 +753,12 @@ int main(int ac, char **av)
->>  	printf("Fixed counters:      %d\n", pmu.nr_fixed_counters);
->>  	printf("Fixed counter width: %d\n", pmu.fixed_counter_width);
->>  
->> +	fixed_counters_num = MIN(pmu.nr_fixed_counters, ARRAY_SIZE(fixed_events));
->> +	if (pmu.nr_fixed_counters > ARRAY_SIZE(fixed_events))
->> +		report_info("Fixed counters number %d > defined fixed events %ld. "
-> Doesn't compile on 32-bit builds.  Easiest thing is to cast ARRAY_SIZE, because
-> size_t is different between 32-bit and 64-bit.
+>> +static void warm_up(void)
+>> +{
+>> +	int i = 8;
+>> +
+>> +	/*
+>> +	 * Since cycles event is always run as the first event, there would be
+>> +	 * a warm-up state to warm up the cache, it leads to the measured cycles
+>> +	 * value may exceed the pre-defined cycles upper boundary and cause
+>> +	 * false positive. To avoid this, introduce an warm-up state before
+>> +	 * the real verification.
+>> +	 */
+>> +	while (i--)
+>> +		loop();
+> Use a for-loop.
 
-But ARRAY_SIZE() should return same value regardless of 32-bit or 64-bit,
-right?
+Sure.
 
 
 >
->> +			    "Please update test case.", pmu.nr_fixed_counters,
->> +			    ARRAY_SIZE(fixed_events));
+>> +}
 >> +
->>  	apic_write(APIC_LVTPC, PMI_VECTOR);
+>>  static void check_counters(void)
+>>  {
+>>  	if (is_fep_available())
+>>  		check_emulated_instr();
 >>  
->>  	check_counters();
+>> +	warm_up();
+>>  	check_gp_counters();
+>>  	check_fixed_counters();
+>>  	check_rdpmc();
 >> -- 
 >> 2.40.1
 >>
