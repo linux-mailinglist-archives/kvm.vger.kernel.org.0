@@ -1,222 +1,322 @@
-Return-Path: <kvm+bounces-38444-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38431-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE833A39A9A
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 12:22:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8558DA39A33
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 12:15:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BF9A16E07B
-	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 11:19:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62F5F7A4A18
+	for <lists+kvm@lfdr.de>; Tue, 18 Feb 2025 11:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379E523C8BF;
-	Tue, 18 Feb 2025 11:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8817D23F29F;
+	Tue, 18 Feb 2025 11:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="q6inxWo4"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="UkVwqjM0"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2068.outbound.protection.outlook.com [40.107.236.68])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD508241102;
-	Tue, 18 Feb 2025 11:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739877493; cv=fail; b=o7NXx2Mk/Ejg5Et8YMHlDanpVpqK7IG6j3Z0uQjTti3ZuGCLMh+PSj63dPF/bTbbPkwwZFJTxV3Mh/ntFG3b/hmUVhIOF4Fuv6mJUf9N9Vd7I1JRBspWZDfFkxSG2P+4/5MRurbuHSGbu/tTp6OHIpm7c5byRg48t+05Wvyv7OE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739877493; c=relaxed/simple;
-	bh=DnayqJBxOYrvgTFazHs1b3353D56A8Cc+Nj5T6CqWCI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R2VWK/nWxMpvalslOaTNv6i8h2mATyXz/+efw43fvRoJzjfsVmOIs9dxuR/eRCfB0AO2pODXOvasJr6+PxLlAQ/XoTloevXeDm2P5nJQHnwZ+rvWB5xgzBtdBKMfh2eTkuIB5Z8KAd0zOmdmQdWHCydVg8VLhQPfEEBvv/U5zcw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=q6inxWo4; arc=fail smtp.client-ip=40.107.236.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gUnpevEc0TLwLSBR4iZxojvOFoLvwSAL57GZckZg4geFQriZTE5nxAU8jQXS98CKX8Vsl25a43ZyuYoBP1XXtk+iYnIIMytZS+cXdb/1tjAoDfitH3J7HlxyYSOB59ZdtnQFhTrTk4HDaRPkY/CcRamT60H/++byG+MeNYPHwg1cCDekL7/Bs4NzF9yBQQ8wM0iEnaJxeUyuIZulasEMVE9glkvtwkADfcZGt6OTL/awoEAV1x8TQ2JFh1w/vYM0GfFEWqv9DrEC7/EO9tTnXM25winIv5n8OnMEXEmapF47QWNrQuU0iYjRr+q5BBAMxjqIjPGYZ5q0SCGkRY0GUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KvxxSAP18WOUT26gcgIEkRQ6QsFxwX3a9MuNkpR8o0s=;
- b=Lm8QNgUrw9PMc9dkLuXOrZiTJNuLQx63Saw8hVheQa6SjvTiBzOyKOjNjwaJ7ey9SMxX66+fIDHSW95/hNrvHVQaKbw9lehMTxu22aV/2eE86CD9qJq7qz+FOr4BzkobHJ+eJwJ4UrxSJ36PogzGp8qL2h7RzBt6r3kBLTSlmWW1LqLd/Up3Vqn5Bs6zvqAnIFI6fBgcFKaq6j0rytifvnTZewfeueHsZyNgb8k+3n/oagEIQJbIrPQAwuWOz6+f6QTE5B6RldpWIyjvqtlNlcFY+EzKNxBJoijxALxIUiejY8ScHVdrFQPAzldQOguvkyLf4SHHyyeX3jKbpPoxCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KvxxSAP18WOUT26gcgIEkRQ6QsFxwX3a9MuNkpR8o0s=;
- b=q6inxWo4UALLuBl6+h8vT+FwzUwigZXPswsuIDdRW1OsgeHJGdWxzK41xsF9RSScd4a34AYAcXH6tWppUQN/r6Lyn4lfoUUEgXWnoSNPspY0iIcm1TSVNMdRRmA0OQGQvf1dB19khWIa6BsnGCgt11gAr08+rLSdq7alM1D0RIg=
-Received: from CH2PR07CA0038.namprd07.prod.outlook.com (2603:10b6:610:5b::12)
- by DS0PR12MB8342.namprd12.prod.outlook.com (2603:10b6:8:f9::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Tue, 18 Feb
- 2025 11:18:07 +0000
-Received: from CH2PEPF00000146.namprd02.prod.outlook.com
- (2603:10b6:610:5b:cafe::dd) by CH2PR07CA0038.outlook.office365.com
- (2603:10b6:610:5b::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8445.19 via Frontend Transport; Tue,
- 18 Feb 2025 11:18:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF00000146.mail.protection.outlook.com (10.167.244.103) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8466.11 via Frontend Transport; Tue, 18 Feb 2025 11:18:07 +0000
-Received: from aiemdee.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 18 Feb
- 2025 05:17:59 -0600
-From: Alexey Kardashevskiy <aik@amd.com>
-To: <x86@kernel.org>
-CC: <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-pci@vger.kernel.org>, <linux-arch@vger.kernel.org>, "Sean
- Christopherson" <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	"Tom Lendacky" <thomas.lendacky@amd.com>, Ashish Kalra
-	<ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit
-	<suravee.suthikulpanit@amd.com>, Robin Murphy <robin.murphy@arm.com>, "Jason
- Gunthorpe" <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, Bjorn Helgaas
-	<bhelgaas@google.com>, Dan Williams <dan.j.williams@intel.com>, "Christoph
- Hellwig" <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>, Michael Roth
-	<michael.roth@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, Joao Martins
-	<joao.m.martins@oracle.com>, Nicolin Chen <nicolinc@nvidia.com>, Lu Baolu
-	<baolu.lu@linux.intel.com>, Steve Sistare <steven.sistare@oracle.com>, "Lukas
- Wunner" <lukas@wunner.de>, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Dionna Glaze
-	<dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	<iommu@lists.linux.dev>, <linux-coco@lists.linux.dev>, Zhi Wang
-	<zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>, "Aneesh Kumar K . V"
-	<aneesh.kumar@kernel.org>, Alexey Kardashevskiy <aik@amd.com>
-Subject: [RFC PATCH v2 22/22] pci: Define pci_iomap_range_encrypted
-Date: Tue, 18 Feb 2025 22:10:09 +1100
-Message-ID: <20250218111017.491719-23-aik@amd.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250218111017.491719-1-aik@amd.com>
-References: <20250218111017.491719-1-aik@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693CB23C8BA;
+	Tue, 18 Feb 2025 11:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739877247; cv=none; b=ReNC53FAEvsrbosmeXZlUrTXQrNJnIBR4nHhzsd9qj1AsEuL152VIF0Il7mCL/Hgu5AjW0tzDWkw5kpM04/H2doC4tsI8Mx5k+870FsIwC0se34/C0B1bqYDGD4NMNr9+PnMbtzODDObthdZNMj9R1yvjHDyMIxpP2nOJUp68hU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739877247; c=relaxed/simple;
+	bh=SBgqh1S+d4YuKVooe5x3vvlFDW8JM5ydaS03W8f52rQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IntnA9FyO75OOGCPloLBVcKB8GH64706XQtmWKlJ7KMtuYp/oAEzYm8LabMKsq0W4eX09IO+xNUU12kFIBIGaPKuTdMxQUyIa1juQPMJ0HzgWC9OqKmL/n3Xd/AIJP/bn2XTn5JptwqCw76LJN/9lBDzlUi2mFL5ZYOIEJLV4fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=UkVwqjM0; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4023240E01A1;
+	Tue, 18 Feb 2025 11:13:56 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id FG4xQVYabji7; Tue, 18 Feb 2025 11:13:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1739877231; bh=PFnEiVQz7NmG9EVizWO+mR0rF2XsnHacw8mlzRX7yHo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UkVwqjM0lsaESFcESTTOZ+wHAhtHqXAgERmIRNxwDD3cle3ZJ47pQpi8FZ5p+GAOl
+	 uN3ub2wg/NuIJCGAk74zDLI6SgwFqnsxethyo0pA4p3cSbTCinGw2pyVw/SXwI5/ku
+	 8+QsSG4a/2gDawmYgcxNyIMXq3pjZrHiTPWNfbGnBnWAigWvI5bkHeWEusjpzSSTAo
+	 RExNNy/uh2sK4I1Cty3lqx/p3eY0sTT0V2/Wd+1QcLEAnj+MMzTq8spnHkPK0p1FdE
+	 whryStcU9Myt0IC+p+Djym7hRrFRyZSQ6cLgpOTEz/1ucbIuu194M9Eyyg11QABK9d
+	 q1I3RDSlnjIC+bsxiETbpQ3Rlpxyh+D6QRb+ofUBNoya4vMmVhs5ZrmqFLdwV/DLOx
+	 pBizeQDaUJFNVjUKQKTNUV1ioR9XhDxlAyZtVUYaikDAONGBWIZhUd7YLtrgXbOT5V
+	 gW8kQO/OVbUUNxGdFpzp4tMm7qe11f/CT7QC7sxog6NwXju+kOL5cfvcDqz2Lj3E/F
+	 y/krz1WRMmoCpiObeIVvyfa25UfdPwt7ZPPno8SuT+adRgCw2t4THq1Nwui+Dt7ioV
+	 NYDvFQA8uQiV/eFuIHq2JtnGD0GudR5tK0tMfs7BlRXNpSWjejHcBZy6QhZbdIzZ9b
+	 9S9Yj6465XNLadT2TUkuLX8U=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2AB4640E020E;
+	Tue, 18 Feb 2025 11:13:39 +0000 (UTC)
+Date: Tue, 18 Feb 2025 12:13:33 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Patrick Bellasi <derkling@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Patrick Bellasi <derkling@matbug.net>,
+	Brendan Jackman <jackmanb@google.com>,
+	David Kaplan <David.Kaplan@amd.com>
+Subject: [PATCH final?] x86/bugs: KVM: Add support for SRSO_MSR_FIX
+Message-ID: <20250218111306.GFZ7RrQh3RD4JKj1lu@fat_crate.local>
+References: <20250213142815.GBZ64Bf3zPIay9nGza@fat_crate.local>
+ <20250213175057.3108031-1-derkling@google.com>
+ <20250214201005.GBZ6-jHUff99tmkyBK@fat_crate.local>
+ <20250215125307.GBZ7COM-AkyaF8bNiC@fat_crate.local>
+ <Z7LQX3j5Gfi8aps8@Asmaa.>
+ <20250217160728.GFZ7NewJHpMaWdiX2M@fat_crate.local>
+ <Z7OUZhyPHNtZvwGJ@Asmaa.>
+ <20250217202048.GIZ7OaIOWLH9Y05U-D@fat_crate.local>
+ <f16941c6a33969a373a0a92733631dc578585c93@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000146:EE_|DS0PR12MB8342:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4253d17-2324-4b4c-e9bd-08dd500debcb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|7416014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zZUwG/y1EtX/mUIyIDArN4CKOPLjA8jNjDf8Tm34T5egLdW/4bWbTRD4Lxxf?=
- =?us-ascii?Q?X2dekdphnyqFC+ljMGjmnpCL8AliF5yrWjRVSoEXG5KPvufaLDC+y82WKkdr?=
- =?us-ascii?Q?J7Lb8WeJd7G+PvqSTAng3PS0rW9OroCB70rB35JPSwEqL9joxhfpiEPgL6Lz?=
- =?us-ascii?Q?gUxT4FVfwEVOF/3D6J754z5QvuhoD4u0R+XuAZ9Qq7+MmLTtTB2z7LFz6tAk?=
- =?us-ascii?Q?uVV2Xg2NukZ7WmOSJM9CBcU2lENIVT9NysG+k+1NZ2E2sISO+KwMyTOq3TOK?=
- =?us-ascii?Q?JdgzkKijF5Y2usJGOBEyFqhk+L7cdlruk2ctawGgXwbAOyuzJ9rKKZkuhPAl?=
- =?us-ascii?Q?2CjTB1Vn3SaqNRNH7Z8Cjdvd+4rUGWfsWZowXyuae12CGhRUNBGa9gZQMeei?=
- =?us-ascii?Q?dGjK+WBX6Jfx+zRo4sxUPa12g0ydz8dLczlqXNsP7+vVVQi0g8fel9yHl3cu?=
- =?us-ascii?Q?4nKaz2grYsaD2wDmWHWF90ePpObNbxsfxM/1JBS6fCSdFbci11MmY+NUpOen?=
- =?us-ascii?Q?bGfxW7l5TE/0HnE5fnvxL6euMtiGUYmJ5EIPudkHnEw8zuQWa9bpb3FW3O+4?=
- =?us-ascii?Q?OhrDKgqFKYyLXm/gnfQoI/hcjs/1R3BEeMWQodq5Yu3pmDXoFOa9NZHXGWkQ?=
- =?us-ascii?Q?fFRXXRXS1li5we+ZmSG+IjtsiVGNZYyk7C2bsN1MTqivItLg8AL8b1/5Z5Qu?=
- =?us-ascii?Q?1mcBpHXDZp4F1pCxhGybnIbw+WaicdJQg7fdFAjOHr49Ae+LLQKMCjrWRK5+?=
- =?us-ascii?Q?YAa4MAjR9om+7kqVosdp+0EP3KR/eQbWbnQTn9qwSYHvAHRvyUdp37u50uJ5?=
- =?us-ascii?Q?AhUU39UZUqSZCabLiwjxyz+Va8wBDyjMrFID5GuDnlJE0ZdDQla0+h68RyD5?=
- =?us-ascii?Q?N12NDDPJCT/GfNQXQkEmmRXjuMetNJGZuTYmmfw3v38ujFSQ6N1rlKZhJ+3C?=
- =?us-ascii?Q?w8Q4vwi0VQlvYKzGAy1KTCKnXt/G4b+UZxG1uczCIYbIYmAj+q94921dkTiG?=
- =?us-ascii?Q?Rnp4nDfjOevMYyVvio6YLIwDA/ZzduQ+LQk9pgfv1PBjhy8y7/2fnw1Kx/Ni?=
- =?us-ascii?Q?Zjd1eXvbaulVTfPn9S+izC3vfp3pvyEwU2854EF/UWx2Mufh5mGCcOmX2OMR?=
- =?us-ascii?Q?Zwx3a77zk8c+VdEh5mtuvmQ/Rx1b+jd9YTLU859uFSvySB0XU5HYT02GxGSl?=
- =?us-ascii?Q?pXabgAtD0+ZVtE8BRmwiO9SAabcQhVfSe9oU6kGmoaj3uMLh5AsXIeV/Aja+?=
- =?us-ascii?Q?t9w7DpG2oY3n66AmFLGWcAWN88kx0E9CYKhGtPARDdg64koNmbekoubPBL+i?=
- =?us-ascii?Q?rV9KXmQwYtYq2+UObSsWofbHqNBy3OgRZax4Gpcu6Enkuu8Lc5NZjB8JnhGG?=
- =?us-ascii?Q?8FNk/zQYH9qjh/Qe0Fxx1Ikz0qXerdgZNhBI46iEwU1cybBfQ+qjf/EFJLT9?=
- =?us-ascii?Q?XTFcQSelcy8iH4jB4IXd5x2DpeHKy529HxTEvXENfBXmx/w/GgA10TRkZXIo?=
- =?us-ascii?Q?EMjRCei8LNeGKK8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(7416014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2025 11:18:07.6503
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4253d17-2324-4b4c-e9bd-08dd500debcb
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000146.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8342
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f16941c6a33969a373a0a92733631dc578585c93@linux.dev>
 
-So far PCI BARs could not be mapped as encrypted so there was no
-need in API supporting encrypted mappings. TDISP is adding such
-support so add pci_iomap_range_encrypted() to allow PCI drivers
-do the encrypted mapping when needed.
+So,
 
-Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+in the interest of finally making some progress here I'd like to commit this
+below (will test it one more time just in case but it should work :-P). It is
+simple and straight-forward and doesn't need an IBPB when the bit gets
+cleared.
+
+A potential future improvement is David's suggestion that there could be a way
+for tracking when the first guest gets started, we set the bit then, we make
+sure the bit gets set on each logical CPU when the guests migrate across the
+machine and when the *last* guest exists, that bit gets cleared again.
+
+It all depends on how much machinery is additionally needed and how much ugly
+it becomes and how much noticeable the perf impact even is from simply setting
+that bit blindly on every CPU...
+
+But something we can chase later, once *some* fix is there first.
+
+Thx.
+
 ---
- include/asm-generic/pci_iomap.h |  4 ++++
- drivers/pci/iomap.c             | 24 ++++++++++++++++++++
- 2 files changed, 28 insertions(+)
 
-diff --git a/include/asm-generic/pci_iomap.h b/include/asm-generic/pci_iomap.h
-index 8fbb0a55545d..d7b922c5ab86 100644
---- a/include/asm-generic/pci_iomap.h
-+++ b/include/asm-generic/pci_iomap.h
-@@ -15,6 +15,10 @@ extern void __iomem *pci_iomap_wc(struct pci_dev *dev, int bar, unsigned long ma
- extern void __iomem *pci_iomap_range(struct pci_dev *dev, int bar,
- 				     unsigned long offset,
- 				     unsigned long maxlen);
-+extern void __iomem *pci_iomap_range_encrypted(struct pci_dev *dev,
-+					       int bar,
-+					       unsigned long offset,
-+					       unsigned long maxlen);
- extern void __iomem *pci_iomap_wc_range(struct pci_dev *dev, int bar,
- 					unsigned long offset,
- 					unsigned long maxlen);
-diff --git a/drivers/pci/iomap.c b/drivers/pci/iomap.c
-index 9fb7cacc15cd..97bada477336 100644
---- a/drivers/pci/iomap.c
-+++ b/drivers/pci/iomap.c
-@@ -52,6 +52,30 @@ void __iomem *pci_iomap_range(struct pci_dev *dev,
- }
- EXPORT_SYMBOL(pci_iomap_range);
+Add support for
+
+  CPUID Fn8000_0021_EAX[31] (SRSO_MSR_FIX). If this bit is 1, it
+  indicates that software may use MSR BP_CFG[BpSpecReduce] to mitigate
+  SRSO.
+
+Enable BpSpecReduce to mitigate SRSO across guest/host boundaries.
+
+Switch back to enabling the bit when virtualization is enabled and to
+clear the bit when virtualization is disabled because using a MSR slot
+would clear the bit when the guest is exited and any training the guest
+has done, would potentially influence the host kernel when execution
+enters the kernel and hasn't VMRUN the guest yet.
+
+More detail on the public thread in Link.
+
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+Link: https://lore.kernel.org/r/20241202120416.6054-1-bp@kernel.org
+---
+ Documentation/admin-guide/hw-vuln/srso.rst | 13 ++++++++++++
+ arch/x86/include/asm/cpufeatures.h         |  4 ++++
+ arch/x86/include/asm/msr-index.h           |  1 +
+ arch/x86/kernel/cpu/bugs.c                 | 24 ++++++++++++++++++----
+ arch/x86/kvm/svm/svm.c                     |  6 ++++++
+ arch/x86/lib/msr.c                         |  2 ++
+ 6 files changed, 46 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/admin-guide/hw-vuln/srso.rst b/Documentation/admin-guide/hw-vuln/srso.rst
+index 2ad1c05b8c88..66af95251a3d 100644
+--- a/Documentation/admin-guide/hw-vuln/srso.rst
++++ b/Documentation/admin-guide/hw-vuln/srso.rst
+@@ -104,7 +104,20 @@ The possible values in this file are:
  
-+void __iomem *pci_iomap_range_encrypted(struct pci_dev *dev,
-+					int bar,
-+					unsigned long offset,
-+					unsigned long maxlen)
-+{
-+	resource_size_t start = pci_resource_start(dev, bar);
-+	resource_size_t len = pci_resource_len(dev, bar);
-+	unsigned long flags = pci_resource_flags(dev, bar);
+    (spec_rstack_overflow=ibpb-vmexit)
+ 
++ * 'Mitigation: Reduced Speculation':
+ 
++   This mitigation gets automatically enabled when the above one "IBPB on
++   VMEXIT" has been selected and the CPU supports the BpSpecReduce bit.
 +
-+	if (len <= offset || !start)
-+		return NULL;
-+	len -= offset;
-+	start += offset;
-+	if (maxlen && len > maxlen)
-+		len = maxlen;
-+	if (flags & IORESOURCE_IO)
-+		return NULL;
-+	if ((flags & IORESOURCE_MEM) && (flags & IORESOURCE_VALIDATED))
-+		return ioremap_encrypted(start, len);
-+	/* What? */
-+	return NULL;
-+}
-+EXPORT_SYMBOL(pci_iomap_range_encrypted);
++   It gets automatically enabled on machines which have the
++   SRSO_USER_KERNEL_NO=1 CPUID bit. In that case, the code logic is to switch
++   to the above =ibpb-vmexit mitigation because the user/kernel boundary is
++   not affected anymore and thus "safe RET" is not needed.
 +
++   After enabling the IBPB on VMEXIT mitigation option, the BpSpecReduce bit
++   is detected (functionality present on all such machines) and that
++   practically overrides IBPB on VMEXIT as it has a lot less performance
++   impact and takes care of the guest->host attack vector too.
+ 
+ In order to exploit vulnerability, an attacker needs to:
+ 
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 508c0dad116b..43653f2704c9 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -468,6 +468,10 @@
+ #define X86_FEATURE_IBPB_BRTYPE		(20*32+28) /* MSR_PRED_CMD[IBPB] flushes all branch type predictions */
+ #define X86_FEATURE_SRSO_NO		(20*32+29) /* CPU is not affected by SRSO */
+ #define X86_FEATURE_SRSO_USER_KERNEL_NO	(20*32+30) /* CPU is not affected by SRSO across user/kernel boundaries */
++#define X86_FEATURE_SRSO_BP_SPEC_REDUCE	(20*32+31) /*
++						    * BP_CFG[BpSpecReduce] can be used to mitigate SRSO for VMs.
++						    * (SRSO_MSR_FIX in the official doc).
++						    */
+ 
+ /*
+  * Extended auxiliary flags: Linux defined - for features scattered in various
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 72765b2fe0d8..d35519b337ba 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -721,6 +721,7 @@
+ 
+ /* Zen4 */
+ #define MSR_ZEN4_BP_CFG                 0xc001102e
++#define MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT 4
+ #define MSR_ZEN4_BP_CFG_SHARED_BTB_FIX_BIT 5
+ 
+ /* Fam 19h MSRs */
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index a5d0998d7604..1d7afc40f227 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -2522,6 +2522,7 @@ enum srso_mitigation {
+ 	SRSO_MITIGATION_SAFE_RET,
+ 	SRSO_MITIGATION_IBPB,
+ 	SRSO_MITIGATION_IBPB_ON_VMEXIT,
++	SRSO_MITIGATION_BP_SPEC_REDUCE,
+ };
+ 
+ enum srso_mitigation_cmd {
+@@ -2539,7 +2540,8 @@ static const char * const srso_strings[] = {
+ 	[SRSO_MITIGATION_MICROCODE]		= "Vulnerable: Microcode, no safe RET",
+ 	[SRSO_MITIGATION_SAFE_RET]		= "Mitigation: Safe RET",
+ 	[SRSO_MITIGATION_IBPB]			= "Mitigation: IBPB",
+-	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only"
++	[SRSO_MITIGATION_IBPB_ON_VMEXIT]	= "Mitigation: IBPB on VMEXIT only",
++	[SRSO_MITIGATION_BP_SPEC_REDUCE]	= "Mitigation: Reduced Speculation"
+ };
+ 
+ static enum srso_mitigation srso_mitigation __ro_after_init = SRSO_MITIGATION_NONE;
+@@ -2578,7 +2580,7 @@ static void __init srso_select_mitigation(void)
+ 	    srso_cmd == SRSO_CMD_OFF) {
+ 		if (boot_cpu_has(X86_FEATURE_SBPB))
+ 			x86_pred_cmd = PRED_CMD_SBPB;
+-		return;
++		goto out;
+ 	}
+ 
+ 	if (has_microcode) {
+@@ -2590,7 +2592,7 @@ static void __init srso_select_mitigation(void)
+ 		 */
+ 		if (boot_cpu_data.x86 < 0x19 && !cpu_smt_possible()) {
+ 			setup_force_cpu_cap(X86_FEATURE_SRSO_NO);
+-			return;
++			goto out;
+ 		}
+ 
+ 		if (retbleed_mitigation == RETBLEED_MITIGATION_IBPB) {
+@@ -2670,6 +2672,12 @@ static void __init srso_select_mitigation(void)
+ 
+ ibpb_on_vmexit:
+ 	case SRSO_CMD_IBPB_ON_VMEXIT:
++		if (boot_cpu_has(X86_FEATURE_SRSO_BP_SPEC_REDUCE)) {
++			pr_notice("Reducing speculation to address VM/HV SRSO attack vector.\n");
++			srso_mitigation = SRSO_MITIGATION_BP_SPEC_REDUCE;
++			break;
++		}
++
+ 		if (IS_ENABLED(CONFIG_MITIGATION_IBPB_ENTRY)) {
+ 			if (has_microcode) {
+ 				setup_force_cpu_cap(X86_FEATURE_IBPB_ON_VMEXIT);
+@@ -2691,7 +2699,15 @@ static void __init srso_select_mitigation(void)
+ 	}
+ 
+ out:
+-	pr_info("%s\n", srso_strings[srso_mitigation]);
++	/*
++	 * Clear the feature flag if this mitigation is not selected as that
++	 * feature flag controls the BpSpecReduce MSR bit toggling in KVM.
++	 */
++	if (srso_mitigation != SRSO_MITIGATION_BP_SPEC_REDUCE)
++		setup_clear_cpu_cap(X86_FEATURE_SRSO_BP_SPEC_REDUCE);
++
++	if (srso_mitigation != SRSO_MITIGATION_NONE)
++		pr_info("%s\n", srso_strings[srso_mitigation]);
+ }
+ 
+ #undef pr_fmt
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index a713c803a3a3..77ab66c5bb96 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -607,6 +607,9 @@ static void svm_disable_virtualization_cpu(void)
+ 	kvm_cpu_svm_disable();
+ 
+ 	amd_pmu_disable_virt();
++
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
++		msr_clear_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
+ }
+ 
+ static int svm_enable_virtualization_cpu(void)
+@@ -684,6 +687,9 @@ static int svm_enable_virtualization_cpu(void)
+ 		rdmsr(MSR_TSC_AUX, sev_es_host_save_area(sd)->tsc_aux, msr_hi);
+ 	}
+ 
++	if (cpu_feature_enabled(X86_FEATURE_SRSO_BP_SPEC_REDUCE))
++		msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
++
+ 	return 0;
+ }
+ 
+diff --git a/arch/x86/lib/msr.c b/arch/x86/lib/msr.c
+index 4bf4fad5b148..5a18ecc04a6c 100644
+--- a/arch/x86/lib/msr.c
++++ b/arch/x86/lib/msr.c
+@@ -103,6 +103,7 @@ int msr_set_bit(u32 msr, u8 bit)
+ {
+ 	return __flip_bit(msr, bit, true);
+ }
++EXPORT_SYMBOL_GPL(msr_set_bit);
+ 
  /**
-  * pci_iomap_wc_range - create a virtual WC mapping cookie for a PCI BAR
-  * @dev: PCI device that owns the BAR
+  * msr_clear_bit - Clear @bit in a MSR @msr.
+@@ -118,6 +119,7 @@ int msr_clear_bit(u32 msr, u8 bit)
+ {
+ 	return __flip_bit(msr, bit, false);
+ }
++EXPORT_SYMBOL_GPL(msr_clear_bit);
+ 
+ #ifdef CONFIG_TRACEPOINTS
+ void do_trace_write_msr(unsigned int msr, u64 val, int failed)
 -- 
-2.47.1
+2.43.0
 
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
