@@ -1,123 +1,118 @@
-Return-Path: <kvm+bounces-38536-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38537-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10FDCA3AEF3
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:30:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92798A3AEFF
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:34:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 077211891D2C
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 01:29:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 538E5172ADC
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 01:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FA61B87E3;
-	Wed, 19 Feb 2025 01:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498B981724;
+	Wed, 19 Feb 2025 01:34:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n5D1tx5s"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kna/X0XG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB561B4247
-	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 01:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CEE14F70
+	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 01:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739928447; cv=none; b=bBuoecdaEcxNAxcZ1CCsO8eqpmC7cI25t1QWysYNm/RHyuVr6wc8jqD7ihT6NfkmM7tmWH0ALGUP5753YpRFfCTWbkNwfkbltzE6KhCwaLrsn8xcbFoKue1oPAgJoRFl0nIMwA6eZXAKZuLKa+cNrW9JlF1mArrYluATc+aQQVI=
+	t=1739928851; cv=none; b=VwA4VvPWtV6S/X6iX4dWoljMFMyAeS/rWnqgE7kfdK7gG4vJnXWDcw7C7yx1zaLP27m4wcfiuB6TKnmlqo+UdYPp2E6KcsPKD0Je7uH/HcL8NN5IiXZdQsuTq24bFESTAq5nEkLR6W8miKD64x8L43tpxR2P7TiB2jVeRVOJvOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739928447; c=relaxed/simple;
-	bh=8HNmILbOSwalR8zIxIIl3FnGV1i2PFV3f6IC6S2LJd0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XQYYRz0/OVS03B9qWT/bcPkbG9RDWer3aTTlerbH1E4e05qNY1/W9dmIb+VXWUICVJ1h+2xGjwqCFwiku9IKXMTBMOBJilpeyPRqy4cz6s2NQBk//5IWBPH7gp7nqSScexxI/dw/xE4pdlmscrKAJFt/2nqnnbJkOzph/M9/ra0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n5D1tx5s; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220d1c24b25so128009415ad.0
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 17:27:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739928445; x=1740533245; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=B2fI7t6EYAl/h+pggEYQL1iQEGSfxTQzaS+eT4QW64Y=;
-        b=n5D1tx5s4LyrpmeIBuF6EoQcIisvIdOywDWaTyOeJn/di3wsacPlBIafIsNnT5l1ev
-         AN9UDwMwVzsKX21lTUwp+4KuNfe5N/tW+4haM1UdU9NFv4Zhy74LW+BSgnG3s8XtB0bG
-         BwUgD3hueQbqVv4Mxj7IHzalNKA3RrN7s8z5MNKqf8sa9TcDzDtIfDgbQK1LfAVZsTol
-         dVRlzHU8UndRqQhDL6h9NAh0/z+O9FD6JWWwwmF3K2/nB4eUSbJOksFxFuYlz3arFh9Z
-         iGjKPRs+moW0Kq945PVvNK1VSzm3QZO+ydkXq/XBUhPzTefEOEVYh6dAYOqrQ5ZINn5M
-         HnVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739928445; x=1740533245;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=B2fI7t6EYAl/h+pggEYQL1iQEGSfxTQzaS+eT4QW64Y=;
-        b=PnxaAWfYhPgg395UhNcvG4b8+fwbTRRp0Qne9HXtxDOYe7+KmSGalhzG8J0ndtXiAR
-         HXtJTbWSDUK3jX4K9leOwH1e6WYBG10hY6tKtfZlPkybtXSPTG1vD0kRjcqmJrQMuMXC
-         F/Fs2wFiFAwdQF8qjP9lTEkoUFEp1XXUpGxAmu6vCev+T6B2XOIH5lhBHx/YkuTuYvgC
-         6Pp/pQQXzCZBnH8VIu0OXDpKLddH1e6mI26YKDXRnkyNw2H1bq1LtpeFT7mmjoZ3DGp6
-         2G0u2tL5Mamz79i3SP//GThdHO9rINTC4bJeP8ETAZQXLLGuEuZ4fhgu/XLdP6IG6tev
-         bVmA==
-X-Gm-Message-State: AOJu0Yz2isDzzsm33/oEmEK8oqwKYoAt6MX4ZRlnrCVX/uFrwwyO7FxL
-	GwhvjRlLzvZn/cztdBrmX3TUYP3d+QoUg0ZYmjfuw/Mlb9+SZEsS9c9RUMo2qrLUe8QjFio5ZeK
-	ONQ==
-X-Google-Smtp-Source: AGHT+IGQDxe+HD8d0dlDg/Exw7kmkBeU3b0w8uvLuKNdfY8ETtEedCLbMAFDAagya2O0dqtA5uEXA76atec=
-X-Received: from pjbrs15.prod.google.com ([2002:a17:90b:2b8f:b0:2f2:e97a:e77f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3d0c:b0:21f:7964:e989
- with SMTP id d9443c01a7336-221040d84ccmr247065355ad.52.1739928445031; Tue, 18
- Feb 2025 17:27:25 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 18 Feb 2025 17:27:05 -0800
-In-Reply-To: <20250219012705.1495231-1-seanjc@google.com>
+	s=arc-20240116; t=1739928851; c=relaxed/simple;
+	bh=+kzT99sDnGnKSDFvFBmlvdr/GezvThj4SXyakNMPNGs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k/OgIyncsRKno1WD2lqW17tAr95Lce8gcmGulb9gu7kQi+IlYOpWJfcp+LlUjpMMEtehq5wTX4lbonvalLAcpHFLsqGIVk6Tpz4QR6yZNs/d6shYShzDUbbY0goZK6rfBGewRoAm/ATu3MZxehTEKwYBzZ6M4a1cAN4T5SR6XDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kna/X0XG; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739928849; x=1771464849;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+kzT99sDnGnKSDFvFBmlvdr/GezvThj4SXyakNMPNGs=;
+  b=kna/X0XGECnEwRWr77SFwTrAu6fyqRhHCDV093jXQWdzCikHEJh3k8FK
+   lWWPZve+ityWHXQyK5uNTsDPiod0yvq5HNNHzBBzqEA5claT+sqI42wON
+   cO1EC75acyxNS65fewYy2XB8HH87o0uEY2PZ1e3VoCgMvho4jp3bGK7gH
+   nGo3uYxyZqRU2wQ4y0O/zXjMXCY3LIBQU0J6zIW4bZFPgotogOMD1Sk4V
+   J9r5KXZ71WfOQndNGaAozVrgpaFzjv6s7Fqi6XWfg69g68PMBoyr1vqrY
+   thWa9jt9agyxm2MDuuIoQELJsThgGCuvPQ2pAIXOLuNzpjngf6WZ2FJZy
+   Q==;
+X-CSE-ConnectionGUID: u8dHpnflSmuCMAIqjMoGsw==
+X-CSE-MsgGUID: 9L3tGhyWSRua1pe6v9S/BA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="40906424"
+X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
+   d="scan'208";a="40906424"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 17:34:09 -0800
+X-CSE-ConnectionGUID: 1BnorNp1Q5KzcqmudpjnXw==
+X-CSE-MsgGUID: v4rLkhfdSmqtGMnQOlyFYg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="119505621"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.128]) ([10.124.245.128])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 17:34:06 -0800
+Message-ID: <5a4fd78c-a3aa-41af-bf08-53e2a8b754f2@linux.intel.com>
+Date: Wed, 19 Feb 2025 09:34:04 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250219012705.1495231-1-seanjc@google.com>
-X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250219012705.1495231-11-seanjc@google.com>
-Subject: [PATCH 10/10] KVM: SVM: Invalidate "next" SNP VMSA GPA even on failure
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Naveen N Rao <naveen@kernel.org>, Kim Phillips <kim.phillips@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Alexey Kardashevskiy <aik@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v7 04/18] x86: pmu: Align fields in
+ pmu_counter_t to better pack the struct
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+ Xiong Zhang <xiong.y.zhang@intel.com>, Mingwei Zhang <mizhang@google.com>
+References: <20250215013636.1214612-1-seanjc@google.com>
+ <20250215013636.1214612-5-seanjc@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20250215013636.1214612-5-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When processing an SNP AP Creation event, invalidate the "next" VMSA GPA
-even if acquiring the page/pfn for the new VMSA fails.  In practice, the
-next GPA will never be used regardless of whether or not its invalidated,
-as the entire flow is guarded by snp_ap_waiting_for_reset, and said guard
-and snp_vmsa_gpa are always written as a pair.  But that's really hard to
-see in the code.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/sev.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+On 2/15/2025 9:36 AM, Sean Christopherson wrote:
+> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>
+> Hoist "idx" up in the pmu_counter_t structure so that the structure is
+> naturally packed for 64-bit builds.
+>
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Link: https://lore.kernel.org/r/20240914101728.33148-5-dapeng1.mi@linux.intel.com
+> [sean: rewrite changelog]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 15c324b61b24..7345cac6f93a 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3877,6 +3877,7 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	gfn = gpa_to_gfn(svm->sev_es.snp_vmsa_gpa);
-+	svm->sev_es.snp_vmsa_gpa = INVALID_PAGE;
- 
- 	slot = gfn_to_memslot(vcpu->kvm, gfn);
- 	if (!slot)
-@@ -3906,8 +3907,6 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
- 	/* Mark the vCPU as runnable */
- 	kvm_set_mp_state(vcpu, KVM_MP_STATE_RUNNABLE);
- 
--	svm->sev_es.snp_vmsa_gpa = INVALID_PAGE;
--
- 	/*
- 	 * gmem pages aren't currently migratable, but if this ever changes
- 	 * then care should be taken to ensure svm->sev_es.vmsa is pinned
--- 
-2.48.1.601.g30ceb7b040-goog
+Thanks for root causing the issue and rewriting the change log.
 
+
+> ---
+>  x86/pmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 60db8bdf..a0268db8 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -21,9 +21,9 @@
+>  
+>  typedef struct {
+>  	uint32_t ctr;
+> +	uint32_t idx;
+>  	uint64_t config;
+>  	uint64_t count;
+> -	int idx;
+>  } pmu_counter_t;
+>  
+>  struct pmu_event {
 
