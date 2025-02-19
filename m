@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-38531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C67DA3AEE5
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:28:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3854BA3AEEA
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:28:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0889A188DACA
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 01:28:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FE063ADBA3
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 01:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91BB91A315E;
-	Wed, 19 Feb 2025 01:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2321AAA02;
+	Wed, 19 Feb 2025 01:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u9jl//jl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WBc9F342"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24057192580
-	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 01:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DF319F103
+	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 01:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739928438; cv=none; b=AOavi6hwiQAkVRnUvWhvuuGYjyYi0js57sU3uaiJhl/4sOGJRRgUTyt6Cz88zPqI2eiRLaFi5q4mI1z8IhKLAqRdVLdr/6SN+p/kD0TphdllHBToq+8UwGk4IAt2BJ0YBNf+tOoJ5c6aRCv5TyxFGZQx0dDD9OjLT2KYCFj8cJI=
+	t=1739928440; cv=none; b=HRFpjQZ+35HBvaeyeCThcdqbLHS0bAK652hIDg9U3xuOu5eiK52QljdFqB18bU95zr3JNP/UsQC62oaJW6ekUyAViQWYuwYzMbx4oqtyUSEJJc2AKdqZy0ZAiBpNzO6DpXKZhS/gi7Di67w2p8qRvtmHsAHICTrwND+hANFkykk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739928438; c=relaxed/simple;
-	bh=HS/OGyPieAUMN+o3iI2SoK4HV3gkuOhVEedxfxsJjPQ=;
+	s=arc-20240116; t=1739928440; c=relaxed/simple;
+	bh=4qE5F9QWe3d5A9/GJCtcN7m+vBvm8zcYETmt15oXBYY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Lt1Pd0uPFeABS7NjhArS4ZxgaPGOwlQIHMC8fhvt17LUJhO6jwqL/gGXUyHQUz5/DrE4/7m0FUKenRJjDSsS1RLFevTOL0v+VtG/Zl3bZ3ENbivG1JNL1XmMiuUU/vvEAIgOFaI2F/r6YvoFzBhgr0n8AXYpSrirhk8wKovmGOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u9jl//jl; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=GX29NFLECJSb2kSP3h8xgqN+zemiHpPaiVu0MfAVBA1+zS+ec4ohqy7FsazCnv5fltwIy6aYocp7XW+ELNF8qJLMlAYC6fQa4NnOqHGjYNeHteoGaoM/dTgQbyS1D8cBFqwSWCWm5dTHCcrhCr9HnEXexNVojFyLC3VnQB3zf6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WBc9F342; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fc4dc34291so6417241a91.3
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 17:27:16 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-220f87a2800so137812585ad.0
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 17:27:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739928436; x=1740533236; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739928438; x=1740533238; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=NOqNLm8zpj7r5p6cWzA7ewxdPggAPFsC3tCvVJWmq4Y=;
-        b=u9jl//jlRAahR95FDOsHeizXwb1pgeMDafOZHlQQesOI1vN2zy6zUpZJT3fg48xV6f
-         6X9kAVv/1h51opTnnjfrP1HfAxMcv/qWRhkMZKym3qbOXdwKQdLFNELQiD9q9K7buEkc
-         C1i0tf/pduKH0Zm61BbHU5vKHd3BkR9s3+NSkM9kdIxmZiJbFwFreV/B2lnYjpq8Jzts
-         OTn8aUZ+FkHqo03b6PRfK7o2z4qcWaAvTj7uj/qYWc0r84TJ6GgDHD0YSa45Gei6ESUj
-         4v1Kg8QirG7L0bgyuidv3U6q0gi5jUa8Nb+O1yQamcMhQ2odZ6A4+fFeQR3oEIPaKPX3
-         i5YA==
+        bh=aOyRwh3cs/Bv/kD6e4Ko51Wq3Y7FnlmGeIcwci8wsgs=;
+        b=WBc9F342lfYIevxHs0qS3XG/3NIcYsMWlUs+1k5TmQKlMv1sUQTFJiu2ZwM3o8Yskz
+         CerjFuZyokoT25mP9qI+zavc6Q0VcbdA/erqmnVkMQo9NSn8rZi3P2buhFsO6EMgh0Fk
+         jjyEE5r43ECdMINv11AeDbVRP2g0GzhmKtbbq8Ix+/1wcdOJUrGPJQIAwkyYM03eNQye
+         e9gbAV2d9cPjSIAVHYJogZCOfZlIrbVZw97iNlS8WiYiC1dU2KY5Zb15xn0nmySYMjqX
+         ICHl28jH2AxdjW/+jq4cf8AhBBMJn5zu4jV5fSh11dQGwuAC29uSxzeLECt7zcGpFZR/
+         p82Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739928436; x=1740533236;
+        d=1e100.net; s=20230601; t=1739928438; x=1740533238;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NOqNLm8zpj7r5p6cWzA7ewxdPggAPFsC3tCvVJWmq4Y=;
-        b=m7ChGIvspqlfNBdG75dLK/A4PQlnw0XxNFwCAlfd16J4DH9Pz5hhN75BmfSiIS51pB
-         0RicQFPoRqjt0NrUHY19//aSZtagH3ITyapMFVX/nN3FQ9piPav6t0uXfm2cgONXqfnc
-         guVdBsU1PLVbTCl1/ShBbIB/o+WRnwFX6dM+n0BA7XRF9pb+EebH/yicQf5227cSwJ+2
-         KsrVkH7q4JN65HLJu4L8knAyBMfGI9WwlESBH8P5ZA6WzteV7p7rZqTMQe4GbtcIoGYF
-         e8oW6pe/U/3SNEmk6hjg5mD7NDgfJ23jNVSKpAZQ7az3GhGd6UxQsr/cAU3jsdiwfvPh
-         gnDw==
-X-Gm-Message-State: AOJu0YwXUuV0HUeNtmEJbI+1KKPr/Sg/szlVa+uGtQcotPigJPHLJPOL
-	KXvMc4Ov7myilS8q56Zt/tVAfzNQdiUn33vm4hBNQxHdImPKLALPL8KtLlkEecwdIML6k7Owfc8
-	/Cw==
-X-Google-Smtp-Source: AGHT+IGbOdETGV4/8dazx0YgIjrgRH1peDdIwCZwKiJ8gyxb6gn3o4TseTvRc52oNdBvm8Q95Zspls7KQ0E=
-X-Received: from pjbli12.prod.google.com ([2002:a17:90b:48cc:b0:2fc:c98:ea47])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f06:b0:2fc:3264:3667
- with SMTP id 98e67ed59e1d1-2fc40d131bemr23974637a91.1.1739928436566; Tue, 18
- Feb 2025 17:27:16 -0800 (PST)
+        bh=aOyRwh3cs/Bv/kD6e4Ko51Wq3Y7FnlmGeIcwci8wsgs=;
+        b=DC2EJMf3Jttx9S6Febq/j7thVmc6einawjJ+t+o455NtRCDgwakDBk9z0lhDGeKDjt
+         l9c8x/UGFQSRjUivLhc4mfRK6zohO6sE/hvL3Ma9GcjP8MJMMBjbbW5kyEm5PlOBAq9D
+         KOVW/wcKb7vzNneYVVprpcW9GUYinfSlAeQRtX7XRjE+heAeCpeqnCQyou+i/I/qdfHR
+         3FCKuOiK6HSgqQlEnmLfRsdu6upaggzdw9P/h+rvIg5Ryh6j7GpBHSiXCHBlUtnBvRf1
+         rAAzL1prP5k0zH230IkeXMihzmZ8o7qh3QjOrx4fGLM0d+Cie3eBA9laqy91o12p1F/h
+         0klg==
+X-Gm-Message-State: AOJu0YygHbILn2wrStXR62cifHC55YtfOAA5ZqlL2ahrTfySHJvDSbr+
+	YM5c67w5pkSY+/v7sa0Rffa52clgXyzvQ4CAp6ZF3FHKESljM1H4ZfJTidOpmLmrKk87STjE3IY
+	Dlg==
+X-Google-Smtp-Source: AGHT+IF+YqB2BsGnTBgkZ7aSO4/b+DJSSz7i3scaotfvDL8sIJxSg/XtkrgUinD2Rx2q79WIomlg2wu4Wbk=
+X-Received: from pgbfm14.prod.google.com ([2002:a05:6a02:498e:b0:ad5:4477:da5b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6d9c:b0:1ee:d6ff:5abd
+ with SMTP id adf61e73a8af0-1eed6ff5f5emr1048651637.14.1739928438279; Tue, 18
+ Feb 2025 17:27:18 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 18 Feb 2025 17:27:00 -0800
+Date: Tue, 18 Feb 2025 17:27:01 -0800
 In-Reply-To: <20250219012705.1495231-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250219012705.1495231-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250219012705.1495231-6-seanjc@google.com>
-Subject: [PATCH 05/10] KVM: SVM: Require AP's "requested" SEV_FEATURES to
- match KVM's view
+Message-ID: <20250219012705.1495231-7-seanjc@google.com>
+Subject: [PATCH 06/10] KVM: SVM: Simplify request+kick logic in SNP AP
+ Creation handling
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,78 +85,61 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Tom Lendacky <thomas.lendacky@amd.com>, Alexey Kardashevskiy <aik@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-When handling an "AP Create" event, return an error if the "requested" SEV
-features for the vCPU don't exactly match KVM's view of the VM-scoped
-features.  There is no known use case for heterogeneous SEV features across
-vCPUs, and while KVM can't actually enforce an exact match since the value
-in RAX isn't guaranteed to match what the guest shoved into the VMSA, KVM
-can at least avoid knowingly letting the guest run in an unsupported state.
+Drop the local "kick" variable and the unnecessary "fallthrough" logic
+from sev_snp_ap_creation(), and simply pivot on the request when deciding
+whether or not to immediate force a state update on the target vCPU.
 
-E.g. if a VM is created with DebugSwap disabled, KVM will intercept #DBs
-and DRs for all vCPUs, even if an AP is "created" with DebugSwap enabled in
-its VMSA.
+No functional change intended.
 
-Note, the GHCB spec only "requires" that "AP use the same interrupt
-injection mechanism as the BSP", but given the disaster that is DebugSwap
-and SEV_FEATURES in general, it's safe to say that AMD didn't consider all
-possible complications with mismatching features between the BSP and APs.
-
-Oppurtunistically fold the check into the relevant request flavors; the
-"request < AP_DESTROY" check is just a bizarre way of implementing the
-AP_CREATE_ON_INIT => AP_CREATE fallthrough.
-
-Fixes: e366f92ea99e ("KVM: SEV: Support SEV-SNP AP Creation NAE event")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 23 ++++++++---------------
- 1 file changed, 8 insertions(+), 15 deletions(-)
+ arch/x86/kvm/svm/sev.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 07125b2cf0a6..8425198c5204 100644
+index 8425198c5204..7f6c8fedb235 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3934,6 +3934,7 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
- 
- static int sev_snp_ap_creation(struct vcpu_svm *svm)
- {
-+	struct kvm_sev_info *sev = to_kvm_sev_info(svm->vcpu.kvm);
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
- 	struct kvm_vcpu *target_vcpu;
+@@ -3940,7 +3940,6 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
  	struct vcpu_svm *target_svm;
-@@ -3965,26 +3966,18 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
+ 	unsigned int request;
+ 	unsigned int apic_id;
+-	bool kick;
+ 	int ret;
  
+ 	request = lower_32_bits(svm->vmcb->control.exit_info_1);
+@@ -3958,18 +3957,10 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
+ 
+ 	target_svm = to_svm(target_vcpu);
+ 
+-	/*
+-	 * The target vCPU is valid, so the vCPU will be kicked unless the
+-	 * request is for CREATE_ON_INIT.
+-	 */
+-	kick = true;
+-
  	mutex_lock(&target_svm->sev_es.snp_vmsa_mutex);
  
--	/* Interrupt injection mode shouldn't change for AP creation */
--	if (request < SVM_VMGEXIT_AP_DESTROY) {
--		u64 sev_features;
--
--		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
--		sev_features ^= to_kvm_sev_info(svm->vcpu.kvm)->vmsa_features;
--
--		if (sev_features & SVM_SEV_FEAT_INT_INJ_MODES) {
--			vcpu_unimpl(vcpu, "vmgexit: invalid AP injection mode [%#lx] from guest\n",
--				    vcpu->arch.regs[VCPU_REGS_RAX]);
--			ret = -EINVAL;
--			goto out;
--		}
--	}
--
  	switch (request) {
  	case SVM_VMGEXIT_AP_CREATE_ON_INIT:
- 		kick = false;
- 		fallthrough;
+-		kick = false;
+-		fallthrough;
  	case SVM_VMGEXIT_AP_CREATE:
-+		if (vcpu->arch.regs[VCPU_REGS_RAX] != sev->vmsa_features) {
-+			vcpu_unimpl(vcpu, "vmgexit: mismatched AP sev_features [%#lx] != [%#llx] from guest\n",
-+				    vcpu->arch.regs[VCPU_REGS_RAX], sev->vmsa_features);
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
- 		if (!page_address_valid(vcpu, svm->vmcb->control.exit_info_2)) {
- 			vcpu_unimpl(vcpu, "vmgexit: invalid AP VMSA address [%#llx] from guest\n",
- 				    svm->vmcb->control.exit_info_2);
+ 		if (vcpu->arch.regs[VCPU_REGS_RAX] != sev->vmsa_features) {
+ 			vcpu_unimpl(vcpu, "vmgexit: mismatched AP sev_features [%#lx] != [%#llx] from guest\n",
+@@ -4014,7 +4005,11 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
+ 
+ 	target_svm->sev_es.snp_ap_waiting_for_reset = true;
+ 
+-	if (kick) {
++	/*
++	 * Unless Creation is deferred until INIT, signal the vCPU to update
++	 * its state.
++	 */
++	if (request != SVM_VMGEXIT_AP_CREATE_ON_INIT) {
+ 		kvm_make_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, target_vcpu);
+ 		kvm_vcpu_kick(target_vcpu);
+ 	}
 -- 
 2.48.1.601.g30ceb7b040-goog
 
