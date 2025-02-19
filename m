@@ -1,333 +1,258 @@
-Return-Path: <kvm+bounces-38587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A69A3C5BC
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 18:10:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D9C9A3C651
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 18:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFE7A1891AFD
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 17:09:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4583F17985D
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 17:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A62F2144BE;
-	Wed, 19 Feb 2025 17:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE652144A2;
+	Wed, 19 Feb 2025 17:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PcIAafat"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="FjpOdZTg"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2068.outbound.protection.outlook.com [40.107.223.68])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2045.outbound.protection.outlook.com [40.107.93.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDA22862B2;
-	Wed, 19 Feb 2025 17:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E400B1FE461;
+	Wed, 19 Feb 2025 17:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739984944; cv=fail; b=t16b+Ph+UjlCsfe6ROiGWZ6M2Yn0uNFdhKN3LpDP5PuOTUbWffXsKzov49gPPtiNihcp7DXLq1DQ/waWTlrQKFhDU3aaWt/nm5txsTv/oJgOcQkP9hY/UjsxikhW9TMLFg1fhxK+nhpnmMpHcG8jyXt+a1FL2/9KPT4aClJfJ2I=
+	t=1739986638; cv=fail; b=HTSepjqC3H7P+f0TVcX0N3fJT7NECWBfiUeiRNgyUrMmqtB/Lumtg6dtoXwTpW28yLsDP3frwvrE76B7ioNkPFilRIHHAAU8GFJN6eBKKm5otfTYQ/4+iYR2EDf3rCQjuKq5QMw1C1AjgdKNI1TiY+gnZD2gayFDLE6tqnJJbto=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739984944; c=relaxed/simple;
-	bh=+g2iqS7gxNKDGKjCrOh+NNsr62KDCK8zIhbL9qRQS/Q=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=p/f3DfQaQgH/1pRtmiDfwVZyBkMU9CrWrAkuBf9XP4Y0HsUsd4ZczHrnq7l2rwy3oJnXuOQ9U2UCnqVGm16+RtYFBbqE+O6T8u+CNrkSSX42xTrqqf56hLUqYcu2DGjYzdWUKTmMbqLsioNRMg7X6zt1BGadEWPNg6hMMJ5Ag54=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PcIAafat; arc=fail smtp.client-ip=40.107.223.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1739986638; c=relaxed/simple;
+	bh=37KxNiMk/cSrishMa+r4rdhYan1/It9t8v3haO+VLlg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTUnHIthWzDH0ecm+sjNagXcy+Tfo6XJ7VaEOq9dJkUblD637nwVmnKhO+XujlSsrZjLePztuWy5OMXdjCEyrNmXRzaKVDwmMXEmgSjynhvL4t2/nfXEJe2gf91Z1536g0R0Pj0xaGpX51ltUJ+saqTJvwWtwKCKT9iUDkiwH/4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=FjpOdZTg; arc=fail smtp.client-ip=40.107.93.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VhEdIPwfVVwAv8rljE8SxK8GW9KWf0SLx+k1Yn8U8cDXV8zeGOUUU5tiNKVjgg1im51ajVrsgK1lw5HDQ7ApHqBRc2gSG8qUMLqoQlqyRffnEoj8mXBqmoGzJLMDQQCa6zaSekZvP3CqkGX2gPWdtVB1hT+bAAwHeDDONArQwRjyPcFlweGRVtPi/+Qqx3IogTAMBg8jwqvJnwyKWF1h8vEKv+txXbtm7R7sNSpHxRM41zO22FUXtvJgBD23CQuImxa2KUG2xq13ddf/IXJg/okpgJQR+ijxU+ReYVS1DQr8XrcuXPwZoCapH8VGBrgafh8ZDp/kcWwHuDoraIGd2g==
+ b=gRpwcAaHZA0kELymkbdKmZPfoE0z5gy4slFDbUxfvkMAlIOFQ71Co1ffr6sAGFDPZasXO/BFvPmh3skW6rf4ym/BuvB9a+Ty6C0xHriNmwFQU0d5Jnk+IGRphTGxpcjgMsouEQ8u/2hHDAoOEjcuy+TXt5H3E/aFpQ99D79vcrkT+lSqJ3QjKOY0U3WVB29pNu1jLR0TKzWt1zXnayPtx/ssxWFYM+wXv/H5OMPeluIhzYKbCJH+EsHPEi4uA6218OkfVQgI5DbuprSc/x6y3+MF8qVDP+VqGA19hInC0/kyLOJdz0a9uBX+1R9ZvpRzghxeGNoEavUmrUfyqbsiwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a71Dy6govVGCK2C4BT/D2qhMEQcwf3/MOIxsWp/NsjE=;
- b=ZyNNOM9ElvZfPFNfglEQUOLEegGiaH0XlWpv0OZPZQ1Sc6pvMYswZhpVwv80xJ8mjSIBNb/k45oJK8AOjVtPrah5tH4PF6LHFREP2MgdmYv8sEXM5KGmLK8jsuMq7algEPRCagJ9wMMIoQazxHPd8Jvrpp+8B1rqa1pdBgAGLGG8l8BJ9v7crWkZafi84w6x/B9445QOc9X0raz37WXC+hS5moRF9OFAfZH1aSIoLrZ7TSOsCwXrF4ulnOu8FKeecs2oJ3CLITctkeu20TqnlL68CzS00uQxbT4644000YHBS6NanS15d/lC4xS5N3KkVyfirIXXyd2RG4JIatEOrA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=8RA+Pm2HcasB0WHbTIIyshrS+6rdB1b78i91EnpXnb8=;
+ b=tMBK+0iSJwcroxN4TbAJHkJGiaNspVqctfqblj1TUZ4PHZ3asorr7cbNuzWLemCFuG61Y0G+TPF8Z0f/4qtJ3uU4+VEJHWz6REx4Ksdx8qSYIIUJKhr8iep+PNoT/M6vn1MjvOpnOMlfgvK8KxwQhy9yDwNMc+rxh9W6VWvnCvoiy0+IwfJ6nPLYcuQxZ/DydLnO5+xneIfdrNMwHYWbwDe+NzHRc4zN9mi6uE0DJHk1NBosP+w5YxW6EwpaCqJmCRasKoM+ME4A1G73tGXCHGXW+eqXkFsGgzAoCE7GwwQ4QXrPQM/unvmEp96lt0XJPBs1PYiBFhl0IPlF0jl6FQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a71Dy6govVGCK2C4BT/D2qhMEQcwf3/MOIxsWp/NsjE=;
- b=PcIAafatks0d49krke/tF/+jeCas3jCRsBx7ZdOOv99wpQS3m7JPCMdX6AeZcmSmd6M5OqFtJycPBC3rAKhQ/pBItJ3vIiGxMy8IjORfam7Lr0RvGAWJExJ+b8utfvQ3HW5pJRBSD6KSTBsCqme/JQ3FyiHLru7hOL4w48kttrDYwYbvZNB4qzpxVsuKsLkEwBU1P9Hmkzgi6DlW395Es/7/MJKBGP7zpBBHcFhp7kk1Uf59UkIMbgKJ7z63TRAFu+XTHgJ76TGBE93owMAb7QCq3cvg1MvXH7+to3aOWvZK+cDWnvohzJmegzgq9DAaDxBwAQuhpCn2aQ4SkrbD7g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SN7PR12MB8059.namprd12.prod.outlook.com (2603:10b6:806:32b::7)
- by SN7PR12MB8791.namprd12.prod.outlook.com (2603:10b6:806:32a::12) with
+ bh=8RA+Pm2HcasB0WHbTIIyshrS+6rdB1b78i91EnpXnb8=;
+ b=FjpOdZTgw80pDczbAQUp/lVJWer9cDIiozkZfxc5SyFOFpD1EVsX/PfVCHSWfTu/ZPlPAMKQ2eNn7O9RmoLr733zsuMYf72grCVWTihydY7KkuPo216Xih3O8tpAD1gXVP4bQIY6hB5Zp2EIhfYtcLGWTShWnrK6oBMAkuEF3s0=
+Received: from PH1PEPF000132E6.NAMP220.PROD.OUTLOOK.COM (2603:10b6:518:1::26)
+ by SJ0PR12MB8140.namprd12.prod.outlook.com (2603:10b6:a03:4e3::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.14; Wed, 19 Feb
- 2025 17:08:58 +0000
-Received: from SN7PR12MB8059.namprd12.prod.outlook.com
- ([fe80::4ee2:654e:1fe8:4b91]) by SN7PR12MB8059.namprd12.prod.outlook.com
- ([fe80::4ee2:654e:1fe8:4b91%5]) with mapi id 15.20.8445.017; Wed, 19 Feb 2025
- 17:08:58 +0000
-Message-ID: <adcf012e-57ef-4b54-8b19-2273aca41ec6@nvidia.com>
-Date: Wed, 19 Feb 2025 12:08:50 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 29/30] x86/mm, mm/vmalloc: Defer
- flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: Jann Horn <jannh@google.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, virtualization@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
- linux-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org,
- xen-devel@lists.xenproject.org, kvm@vger.kernel.org,
- linux-arch@vger.kernel.org, rcu@vger.kernel.org,
- linux-hardening@vger.kernel.org, linux-mm@kvack.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com, Juergen Gross <jgross@suse.com>,
- Ajay Kaher <ajay.kaher@broadcom.com>,
- Alexey Makhalov <alexey.amakhalov@broadcom.com>,
- Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>,
- "Liang, Kan" <kan.liang@linux.intel.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, Frederic Weisbecker <frederic@kernel.org>,
- "Paul E. McKenney" <paulmck@kernel.org>, Jason Baron <jbaron@akamai.com>,
- Steven Rostedt <rostedt@goodmis.org>, Ard Biesheuvel <ardb@kernel.org>,
- Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
- Joel Fernandes <joel@joelfernandes.org>,
- Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>,
- Uladzislau Rezki <urezki@gmail.com>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>,
- Juri Lelli <juri.lelli@redhat.com>, Clark Williams <williams@redhat.com>,
- Yair Podemsky <ypodemsk@redhat.com>, Tomas Glozar <tglozar@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>, Ben Segall
- <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
- Kees Cook <kees@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Christoph Hellwig <hch@infradead.org>, Shuah Khan <shuah@kernel.org>,
- Sami Tolvanen <samitolvanen@google.com>, Miguel Ojeda <ojeda@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>,
- "Mike Rapoport (Microsoft)" <rppt@kernel.org>,
- Samuel Holland <samuel.holland@sifive.com>, Rong Xu <xur@google.com>,
- Nicolas Saenz Julienne <nsaenzju@redhat.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Yosry Ahmed <yosryahmed@google.com>,
- "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- "Masami Hiramatsu (Google)" <mhiramat@kernel.org>,
- Jinghao Jia <jinghao7@illinois.edu>, Luis Chamberlain <mcgrof@kernel.org>,
- Randy Dunlap <rdunlap@infradead.org>, Tiezhu Yang <yangtiezhu@loongson.cn>
-References: <20250114175143.81438-1-vschneid@redhat.com>
- <20250114175143.81438-30-vschneid@redhat.com>
- <CAG48ez1Mh+DOy0ysOo7Qioxh1W7xWQyK9CLGNU9TGOsLXbg=gQ@mail.gmail.com>
- <xhsmh34hhh37q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CAG48ez3H8OVP1GxBLdmFgusvT1gQhwu2SiXbgi8T9uuCYVK52w@mail.gmail.com>
- <xhsmhzfjpfkky.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <20250219145302.GA480110@joelnvbox>
- <xhsmhecztj4c9.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
-Content-Language: en-US
-From: Joel Fernandes <joelagnelf@nvidia.com>
-In-Reply-To: <xhsmhecztj4c9.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BN9PR03CA0508.namprd03.prod.outlook.com
- (2603:10b6:408:130::33) To SN7PR12MB8059.namprd12.prod.outlook.com
- (2603:10b6:806:32b::7)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Wed, 19 Feb
+ 2025 17:37:12 +0000
+Received: from CY4PEPF0000EDD0.namprd03.prod.outlook.com
+ (2a01:111:f403:f912::1) by PH1PEPF000132E6.outlook.office365.com
+ (2603:1036:903:47::3) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.14 via Frontend Transport; Wed,
+ 19 Feb 2025 17:37:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EDD0.mail.protection.outlook.com (10.167.241.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8466.11 via Frontend Transport; Wed, 19 Feb 2025 17:37:11 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 19 Feb
+ 2025 11:37:09 -0600
+Date: Wed, 19 Feb 2025 11:36:28 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Dionna Amalie Glaze <dionnaglaze@google.com>
+CC: Sean Christopherson <seanjc@google.com>, Melody Wang <huibo.wang@amd.com>,
+	<kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	<roedel@suse.de>, Tom Lendacky <thomas.lendacky@amd.com>,
+	<ashish.kalra@amd.com>, <liam.merwick@oracle.com>, <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v4 1/1] KVM: Introduce KVM_EXIT_SNP_REQ_CERTS for SNP
+ certificate-fetching
+Message-ID: <20250219173628.hlbrp4c7uf3wtv4r@amd.com>
+References: <20250120215818.522175-1-huibo.wang@amd.com>
+ <20250120215818.522175-2-huibo.wang@amd.com>
+ <CAAH4kHZL-9R+MLLvArcwQ2Zpk+gtqYTvVMR01WA1kVJ9goq_sw@mail.gmail.com>
+ <Z4_Qs2mAXK28IwJa@google.com>
+ <CAAH4kHaCTGxQ_D+KbhJQ+RYL4n5qeG4UnDNu5FK9+3KJLpNw0Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAH4kHaCTGxQ_D+KbhJQ+RYL4n5qeG4UnDNu5FK9+3KJLpNw0Q@mail.gmail.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR12MB8059:EE_|SN7PR12MB8791:EE_
-X-MS-Office365-Filtering-Correlation-Id: 36a04553-16df-484a-fc0e-08dd51081954
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD0:EE_|SJ0PR12MB8140:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c882517-582f-4a01-fec6-08dd510c0ac4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eTNROEVvZVFZU21NZ3RVS2lMaFNFN09ZUjVnZlZkWG1WL2QybGxkNzNqNzRC?=
- =?utf-8?B?UjlwVkFYS29uQU9sM1BzSlVaWk5kdWJZYWNKK2xwL1BhYUV0RThGVVBvOWly?=
- =?utf-8?B?WjgxbEEreit4aDJQSEx5VG5YMEh2aHpVU3FTK3JKZGZ1a1RDWFA5QTIwTzdy?=
- =?utf-8?B?d2w0eklQTnBUQkhwRHN0QWxCZTd1TFRTWlJCbUVKdDJnN1dwbzRyanFaSW9X?=
- =?utf-8?B?cUlxWlIzdUZUdHU1dlQ4MU5YQStLRE9CK3BtdGZzZG9TTXhxVFJLUzg5TGRm?=
- =?utf-8?B?cWFBeGJrLzEyL2FlSDU0TVZGdlpIYitCS2RlWCt5L0I4VXQ2VW5TY243UVZh?=
- =?utf-8?B?dFF5VlpWdTkwN0U4Qzc1MStEMkV2cnUvM29MNldnK25DazNkZ3RXYm5nOVAv?=
- =?utf-8?B?TjBhbHphUWhlR0YxRm5kV0VIMXRaMUNoUHJjWENpMjUvQmo4S2xOelRqaFkv?=
- =?utf-8?B?dnhqWlZ2QW9CYXZtTHVyWmR5a0hkeVAyVE1Bdm4rZlRYSGUyZndndTJheEQ0?=
- =?utf-8?B?MFRGamNjU0hISDcxSW5YZllsdEM1NktUdG9SZnFxT2t2ZG9MUzVyL1J2WlU3?=
- =?utf-8?B?WkZFYkxzY3lSNEdqLzFjaXZZWlk2OHlVZ1dkTm5nZzluSHZHZWc2Mkk2NXpH?=
- =?utf-8?B?TkFCcEZ1TldVaWtrNnZ3TlJrWDhkTkpLeG9tYTBSaVpydSt5c2lTVHAxeUg1?=
- =?utf-8?B?N2hUc2JWZ24rakw1L1RsZlZDVHVzeEs4c1c1MDk2Z0lTSEQybjh4OE1CRytp?=
- =?utf-8?B?S0NPSXJIQjJiaTFrSUJmQ29NaC84WXlwQ1ZTbTVXYXdhRmVTVGpVR0NnRk1q?=
- =?utf-8?B?WFBPb2RWMlZUWDlWTWwydUZkaTZuc2JhZjRuWkpOM0J4RzhyckdUUWNGYm5B?=
- =?utf-8?B?VXZFWkUxK3Z4WDQzNkJidWlDTHdHSWRscHBsR0NsZ25MWi9IZmY5bkxkQzhF?=
- =?utf-8?B?QW9hcGd2SDNxTVFSWlBRZnJZekNwZVVZd3cvdzg1aTlTVHViM0U3RkJiR0xy?=
- =?utf-8?B?SEcyY1VYaW9YN0R1R0VNaHlZb01WTjhxcitQUkFLbk9wL1VhUkF4MUVCc2N3?=
- =?utf-8?B?UjdSdFR4RHMwbjk3RlZveG5HcVMwZGxuMUYybVc0ZTBYU0Z4OVRGN255T0dK?=
- =?utf-8?B?OTB6Mjd5T1pnRk9mWFlHN0lsR0swc3FsL1BsZTZmUkg2MHU0cjZJMVZnTVl0?=
- =?utf-8?B?QXBwSDhkWFNSVklhUzlYZEVtMEN3ZWF0ZHFSNVhUZmY0bVpXV3M2RXVJR2ds?=
- =?utf-8?B?aG15Qk5yK2FCZlFhWUxnaUNuYmVYKzY4R3UyVmMzT1lRL3dSeXJMWU12SmlX?=
- =?utf-8?B?M3ZGSGZLMTdnZTJ0eVNrWUpqa3ppY21WK0Z5UXdsTkFQSk8vVGxVZFNXN0Yy?=
- =?utf-8?B?TW15ZSsraHlFZ2lWSmVFT0JHbVR0Y3lVVmpNMmRFVmFDN2R0emRHYWdNUDJl?=
- =?utf-8?B?NElwcXZWRjJjREQxL05sWFVZejA3cWN0WVhka2Y3bkd0c2lUZkpmZ0JuYnJt?=
- =?utf-8?B?RFYya21sL1hVOHAySFFxWWxDdTJXWllJblRXb3N1SU14MTZNcndXYmgwMFRy?=
- =?utf-8?B?aUNIQ1R6MktvMG9XOUdGTnBGOForSXlrSWRSTmNyaDJUMm9mU3JzelVhYi9u?=
- =?utf-8?B?d3hPaS93Ym1CZXluQ0NRNUkyOURPbDBHTjhKcnNDRjlGOHBqajdtNk5FRGVU?=
- =?utf-8?B?WW5qSkNZVG5md1hGNGEwVHhIKzREUnVWOHh2RXZEQjN0bEpiZVhOV0NPeVV0?=
- =?utf-8?B?NDk0OHJLS3ZHYVZwb1FxUzFtVjJMMGlpbnNhVnRDVmk4YUowMGFIQVk4ODRu?=
- =?utf-8?B?cjliVzlud3JvWVhrZUUwTm01bXh1cFJwR2FKTDJYWk9zb3dxVkFKQmRObDdk?=
- =?utf-8?Q?QK2simDBBEOC0?=
+	=?utf-8?B?N2VXaTlMVVJnZWVpZUlFVlFyQmJUb0JrQnVyZWRPTEhGTmtnSG9YWmg4UmJi?=
+ =?utf-8?B?UnQ1VDBsRWJrK2FxTTVPRDdkc3pRRWE3cTdXMzZMc1NsQ2V3SzFkMUtPRXpk?=
+ =?utf-8?B?N3NBMDRGRm1VRjkwSzlYMXVzOTd2SEsrMHQrSHZDdXRmR3N1OG44VStqZ1p6?=
+ =?utf-8?B?Zkg5WUpheC9jbkFKakZzYk5oa0pkRGNsQ2dYNzUxQ3NqTjlxSnNUMDhkMy9l?=
+ =?utf-8?B?bFE2S2VXam9ieWo1ZjRGNlQ0TzhmdTdkN3dsODVRNi9tRjNPTTRsQmEzMUdw?=
+ =?utf-8?B?cWxOaEpldmlsVUpEc0RHZFFVbU9xM09FekJkZmRuRmN0MXNjclBHbVUyci8v?=
+ =?utf-8?B?dm5iUFRrU3VaczE0dXBLWXEwUE5iamE4VXdLSkxJSTNmVWJhMmJ3YllVbFdH?=
+ =?utf-8?B?c2pxQ2lacXYvVjFaRGtRUUx3SVhnS3JvWmFSNUNjOTVMenV0YVUzaERMNFYr?=
+ =?utf-8?B?RVJRT1l4Z2wzU0VDek1GeS9kdjBCaDVvYzMrZFBReUx6NVJDRzVuMnU5M2tN?=
+ =?utf-8?B?dWQ0SDNtM0xGVXVmcTkwOGMrbkxOZ29BOWs3ZTI5SHE2Lzhsc1dobXR2VU5J?=
+ =?utf-8?B?Nkd2WkhML3g0NnBIa3ZYeC9ralJubXdKSDE1TGhpK1JHQUc3amFJME9rTW0y?=
+ =?utf-8?B?eVlod2RnYk44ZG1CK0I0MEEzaVNPTUwxb1VYYmtTb3lFc2YxNU1ZRVFrcjRu?=
+ =?utf-8?B?MkhnZS9BdVpzTk8wZWdlN2JMcGRYSThHaWVPVnNDbEVJVFY1THJKa2JpYUpr?=
+ =?utf-8?B?eGpYdm9oL2xiSmw4NDVNaUxRSnRJSEJRamdodFVQRmN6TEV5RWo4THRwb25a?=
+ =?utf-8?B?eGtoQmVRQXBwczh0UzBkZXNBOEhhODRad3paUy9OeXU1VUZMU3JVUG9MMk1J?=
+ =?utf-8?B?R1ZTOHBxK1RzcldCTzBqVUgyQlZRL0pweEFYbkhnUnBhb2tQUzVnNFUvV1JF?=
+ =?utf-8?B?VzkrbkhUTTkyODdHclk3WE9wTGNxem5JVFEzdFpOOVFrMnQ5c092ZTZQRWg2?=
+ =?utf-8?B?TlM5dHQrMXcybndhUHdoNUJzekUzMUhVcUlTS1dwcmF1SXNVWUk4Y1JaaVUw?=
+ =?utf-8?B?YWtzYWZhQmVJbDZ4OXI0SFo5a1doN3dCUTBNclVhek94dGZnU3VMRllBV29a?=
+ =?utf-8?B?Y3F2bTVUQUo0Z2t6Z1Z1QldvL1ZKNXpzMy9OU0VpM1lGWDljTTk3WUc2SDdo?=
+ =?utf-8?B?MVVkckR4QVZlaEhiTDZBekoxaE1YSUQ3VHp3TWxBL2tsdVE1eUVneWpYZGpM?=
+ =?utf-8?B?WHRYWWVvVFdseWhhamJMUjB0VGVnUzFFdTM2WWN5YVF0ZmhaZ1JFZDk4KzlZ?=
+ =?utf-8?B?YkxudVg1aGhwQmNaZXIzWUt1ZGl1ZXV0ZFQyL2JYTEtvZUhjUDkyY2o3MStK?=
+ =?utf-8?B?TVNybHN1TlZ3NXVnR0VtaU1vYUpsYXJzT0ZNbjIyUmJocDdNNHNNQ2UwZmpC?=
+ =?utf-8?B?Mnl1VTdjUlp6ZGh1SGtGU1JlYnpDSTZvaXVzcHdHRUl1d1pBa1ZyOWFKZ2Jq?=
+ =?utf-8?B?TEkvK21IdjVoUE81dmhhY3kvN2EwZGxIRWRvL05Ca0piRkt5NHY5U05sU1N2?=
+ =?utf-8?B?WVdXUkkwK25sWFNpU05hUERldjdNQno0clIrQmprTXdVeS9sMWU3Z1ZQd21L?=
+ =?utf-8?B?L05YTm5YSnUyd2JGZlNnWjdESEwvZWFkSjh1RGtrNU80ZkN0dFNESW9abXNu?=
+ =?utf-8?B?U0hRVFpBWitoYUNlNXFMOXBvTm1sSXZ3TGxxczduQnlDU1hFQVdqY0l0R1JO?=
+ =?utf-8?B?NjhEOUF5aEtObHEwRXM5MkpyOFppTGZML2dNTTlwTm1UVUpBMkNFQ1Vpdmxz?=
+ =?utf-8?B?a0IxOHoyKzFFbXVmdFErVFhnRXk3a3BaTlNpMkRoWUFmRlRZWFhoK1k0blR4?=
+ =?utf-8?B?YXJHa1FDQ0dVYmlBVk44S2FhV1BXcXg5cmpMNi9ISnBEbzJwVjVHU01zSlNW?=
+ =?utf-8?B?RVdYSkV4STFCcVJzV3EyRExLZU4wc0IwdW1xVmE1S0JudjEzWWJ1cEdQYmpL?=
+ =?utf-8?B?a21HKzhnTE12aEpldzdtcWw5dFo1MWdERS9MOWNDV3BTcmo2MXBLZEt2bHM2?=
+ =?utf-8?Q?ZhNJbr?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8059.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?S09NWnJEbEZxTVZYemVXN1lxNGFGbjMreUhlWW5sdSs4VmQzR25ZemM5MGpk?=
- =?utf-8?B?dnljRjg1azhEKytSZkg4eFRLYVJsbXNxcjRPZXdRRnhEczVyYTNJay8wSFZa?=
- =?utf-8?B?cXV5Q2EyeFVQc0VLMXJkOVlOV3BiWFFYUkgrdHdxbTRZc2V3aDdZbER5a3Jo?=
- =?utf-8?B?RSt3ZVcyM0x5aWNMZm1HaHNNcGU3ZFNEM0xBSzFmUEtQS1hEU0dOYk5GNUto?=
- =?utf-8?B?ZzIwaS9xajBVK0dKQTU5aERiamVGTVFWdUpKWWZEMVJ0VWZJemVzcmZHN25k?=
- =?utf-8?B?TlNNZnAxYUNmcDlFblhjMUpSUnRITHBWZ1cwSXlsTXYwZnViUWhQcjQ1N3pT?=
- =?utf-8?B?S2tkZjl2aGIxMk1PZlFQZngwa2FxWkl5L1kzNjh5Nm42UU5wU2wxQnhYLy9v?=
- =?utf-8?B?ZTdUT2pxWkQwTDg2S3M3WWRFaGUyRlF4aE82d0ZqTWY5Rmhkc1hHZnhHVEJE?=
- =?utf-8?B?WmNJSGRpOXduNnRBeVI2RTYyb2ZPUDVsRE04Rkp4L2xxV0ZVRi93b2h1QURi?=
- =?utf-8?B?ZUFLWEJwR2FzdHAwZEVRa2o2TUJkL1NWZjJZMEFua2VFMkFsQy80bVBVN21Z?=
- =?utf-8?B?K0hQRis4UEJ4M1dNSGRlSFI5M29UM2VqcExFMFFXOENjbkFaN0kzeEFVd0tO?=
- =?utf-8?B?Y1JLMWZSWWppc1BkZmtGdVNxL0VOZmlNdWZlampoM0ZhNURCeU1BOFZ4OGli?=
- =?utf-8?B?eUQvVjRaYkRRbGxGM3NLRytoaTNpWWE2MmExdkFEQkk1RVp1MitxSndPM3Rv?=
- =?utf-8?B?eUIvSWF5S0d2c1VDNTdBbGp1RkgxTnoxUm56ZWJVaEdEVFYxSmZmV3F5aiti?=
- =?utf-8?B?RERVT2xzTnZhVG9RaGh6NjVCVlFPd0hHckhybzR2QmRTMzZOcllzZ09vanlw?=
- =?utf-8?B?T2dGck1jYkZWSzNJQ0lFZzVudnBDY200eGxpTi9uQUlyeXJZWFJIRVBWVVBH?=
- =?utf-8?B?a3JMSlNhTEo3NjdwYWlsMVVvRkZvSkdOMHMyakVGVzU4aXVtZnFCRWVVdzBZ?=
- =?utf-8?B?WHRWNVpaaFRZZDZuR21DUEM5c2tzUzE4Nklwa0FRN0E2ckd6YmhWK09OdHFk?=
- =?utf-8?B?bFh0NnZpSDkzZWFGakRHeURZUkNsVVhiRzhaZWtnTFo5aC8xSGJ1OVdIdW5j?=
- =?utf-8?B?VWdpZ0hhcVcwSFY2YjRaTUJ5TWN6MjBGSzFhRDJiaStjdGdqanZwYWF3eFYx?=
- =?utf-8?B?Y0NQUjNxN2Z3dWZGUTQyYzdGUkFLUXU5VTRoYXRxcHFuTGVOK3hSMVdEcS83?=
- =?utf-8?B?dzUxUS82T1pCWDg1WkZQSG5WN2pxbS91SWpMelZIT0MvMGF1NU9oSjZuMXhR?=
- =?utf-8?B?K2JMWDBSaTJEVlNKQlovK2l1M09sV2pZNzZpM1NubDdSSmNMcFRkWGNtZlRV?=
- =?utf-8?B?OEVreTRtZVNIVTc1OE9nay9aSkYxV0NiUGxKZjNkR0hYN1VLMUtuVzJWZ3E4?=
- =?utf-8?B?Q3NRRFRycXpGOGtYNm9VeXdJQVFKdUdNd1FJVkQ3dGtjaWs4cndNckVPYkNt?=
- =?utf-8?B?dzI5T3RaNzZFc0ZVQk1ZY1VLYThMcWgrVkkrRkFwYjhDTFZqQVZiaWhWdkdo?=
- =?utf-8?B?SDd3a1JPdHM4MWFJcGNjMXdzVzBQVXRuVHVCY29Fa2VBSzlTQW1nUWhSTHZT?=
- =?utf-8?B?Ymh2dHBYR1MxTFY3dmF1YysyOHM1eWt0WkxUaUpoVW9yVUdaei9ZNFdQWXdp?=
- =?utf-8?B?VWZET0YvWmwyOUY1WVV4ekg5alFsQmZGeTVtZ1AwM2lhSjhvcVNFR0N5UThS?=
- =?utf-8?B?VkgrNHBEd0NTaUZnRjk2VHlZRFpiSTEvK3U2ZGZZc1Y5RVo3dFRyREZyV1Uy?=
- =?utf-8?B?dUlhWTZDTm1HRXdXaitkODlBVnpMT2d0dWpUUnVDbmhtTGNGQXE4RXJLTGhX?=
- =?utf-8?B?VWROUTloQytWcERsaXVlb2srLzVqMlppajNyK2F4UUZLWGxQMWJmbXM2NlFG?=
- =?utf-8?B?L2M0K1A1UTRhdlBad1RYNEZBdFZDcGZ1RUhMZGFoT3BXNnBGRU8rSEx0bFJP?=
- =?utf-8?B?K0V2eGRBQlFialVhRTdVenZYNjkwMTl4WmRQUE42cnEzZWI4b245R0tlbnlq?=
- =?utf-8?B?ekRUL25ZRk82aitQb1BrLzB3bm05OHN0UE8yYS9Rdi81bDFrZlhpKzNDV3ps?=
- =?utf-8?Q?bxxoboLhp81jX5XyI3OZ92N8h?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 36a04553-16df-484a-fc0e-08dd51081954
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB8059.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 17:08:58.5442
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 17:37:11.7055
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CtOCbLN5mBwxeNT2wo6/ysIHFlRbIu1bJHIYLN+BTf6uBnYzMazev/cV31RgYeIC7NTsOki1riW1f1/ghuRh1g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8791
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c882517-582f-4a01-fec6-08dd510c0ac4
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EDD0.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8140
 
-
-
-On 2/19/2025 11:18 AM, Valentin Schneider wrote:
-> On 19/02/25 10:05, Joel Fernandes wrote:
->> On Fri, Jan 17, 2025 at 05:53:33PM +0100, Valentin Schneider wrote:
->>> On 17/01/25 16:52, Jann Horn wrote:
->>>> On Fri, Jan 17, 2025 at 4:25 PM Valentin Schneider <vschneid@redhat.com> wrote:
->>>>> On 14/01/25 19:16, Jann Horn wrote:
->>>>>> On Tue, Jan 14, 2025 at 6:51 PM Valentin Schneider <vschneid@redhat.com> wrote:
->>>>>>> vunmap()'s issued from housekeeping CPUs are a relatively common source of
->>>>>>> interference for isolated NOHZ_FULL CPUs, as they are hit by the
->>>>>>> flush_tlb_kernel_range() IPIs.
->>>>>>>
->>>>>>> Given that CPUs executing in userspace do not access data in the vmalloc
->>>>>>> range, these IPIs could be deferred until their next kernel entry.
->>>>>>>
->>>>>>> Deferral vs early entry danger zone
->>>>>>> ===================================
->>>>>>>
->>>>>>> This requires a guarantee that nothing in the vmalloc range can be vunmap'd
->>>>>>> and then accessed in early entry code.
->>>>>>
->>>>>> In other words, it needs a guarantee that no vmalloc allocations that
->>>>>> have been created in the vmalloc region while the CPU was idle can
->>>>>> then be accessed during early entry, right?
->>>>>
->>>>> I'm not sure if that would be a problem (not an mm expert, please do
->>>>> correct me) - looking at vmap_pages_range(), flush_cache_vmap() isn't
->>>>> deferred anyway.
->>>>
->>>> flush_cache_vmap() is about stuff like flushing data caches on
->>>> architectures with virtually indexed caches; that doesn't do TLB
->>>> maintenance. When you look for its definition on x86 or arm64, you'll
->>>> see that they use the generic implementation which is simply an empty
->>>> inline function.
->>>>
->>>>> So after vmapping something, I wouldn't expect isolated CPUs to have
->>>>> invalid TLB entries for the newly vmapped page.
->>>>>
->>>>> However, upon vunmap'ing something, the TLB flush is deferred, and thus
->>>>> stale TLB entries can and will remain on isolated CPUs, up until they
->>>>> execute the deferred flush themselves (IOW for the entire duration of the
->>>>> "danger zone").
->>>>>
->>>>> Does that make sense?
->>>>
->>>> The design idea wrt TLB flushes in the vmap code is that you don't do
->>>> TLB flushes when you unmap stuff or when you map stuff, because doing
->>>> TLB flushes across the entire system on every vmap/vunmap would be a
->>>> bit costly; instead you just do batched TLB flushes in between, in
->>>> __purge_vmap_area_lazy().
->>>>
->>>> In other words, the basic idea is that you can keep calling vmap() and
->>>> vunmap() a bunch of times without ever doing TLB flushes until you run
->>>> out of virtual memory in the vmap region; then you do one big TLB
->>>> flush, and afterwards you can reuse the free virtual address space for
->>>> new allocations again.
->>>>
->>>> So if you "defer" that batched TLB flush for CPUs that are not
->>>> currently running in the kernel, I think the consequence is that those
->>>> CPUs may end up with incoherent TLB state after a reallocation of the
->>>> virtual address space.
->>>>
->>>
->>> Ah, gotcha, thank you for laying this out! In which case yes, any vmalloc
->>> that occurred while an isolated CPU was NOHZ-FULL can be an issue if said
->>> CPU accesses it during early entry;
->>
->> So the issue is:
->>
->> CPU1: unmappes vmalloc page X which was previously mapped to physical page
->> P1.
->>
->> CPU2: does a whole bunch of vmalloc and vfree eventually crossing some lazy
->> threshold and sending out IPIs. It then goes ahead and does an allocation
->> that maps the same virtual page X to physical page P2.
->>
->> CPU3 is isolated and executes some early entry code before receving said IPIs
->> which are supposedly deferred by Valentin's patches.
->>
->> It does not receive the IPI becuase it is deferred, thus access by early
->> entry code to page X on this CPU results in a UAF access to P1.
->>
->> Is that the issue?
->>
+On Tue, Jan 21, 2025 at 09:19:08AM -0800, Dionna Amalie Glaze wrote:
+> On Tue, Jan 21, 2025 at 8:52 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Jan 21, 2025, Dionna Amalie Glaze wrote:
+> > > On Mon, Jan 20, 2025 at 1:58 PM Melody Wang <huibo.wang@amd.com> wrote:
+> > > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > > > index 943bd074a5d3..4896c34ed318 100644
+> > > > --- a/arch/x86/kvm/svm/sev.c
+> > > > +++ b/arch/x86/kvm/svm/sev.c
+> > > > @@ -4064,6 +4064,30 @@ static int snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_
+> > > >         return ret;
+> > > >  }
+> > > >
+> > > > +static int snp_complete_req_certs(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +       struct vcpu_svm *svm = to_svm(vcpu);
+> > > > +       struct vmcb_control_area *control = &svm->vmcb->control;
+> > > > +
+> > > > +       if (vcpu->run->snp_req_certs.ret) {
+> > > > +               if (vcpu->run->snp_req_certs.ret == ENOSPC) {
+> > > > +                       vcpu->arch.regs[VCPU_REGS_RBX] = vcpu->run->snp_req_certs.npages;
+> > > > +                       ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
+> > > > +                                               SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_INVALID_LEN, 0));
+> > > > +               } else if (vcpu->run->snp_req_certs.ret == EAGAIN) {
+> > > > +                       ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
+> > > > +                                               SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_BUSY, 0));
+> > >
+> > > Discussion, not a change request: given that my proposed patch [1] to
+> > > add rate-limiting for guest messages to the PSP generally was
+> > > rejected,
+> >
+> > For the record, it wasn't rejected outright.  I pointed out flaws in the proposed
+> > behavior[*], and AFAICT no one ever responded.  If I fully reject something, I
+> > promise I will make it abundantly clear :-)
+> >
 > 
-> Pretty much so yeah. That is, *if* there such a vmalloc'd address access in
-> early entry code - testing says it's not the case, but I haven't found a
-> way to instrumentally verify this.
-Ok, thanks for confirming. Maybe there is an address sanitizer way of verifying,
-but yeah it is subtle and there could be more than one way of solving it. Too
-much 'fun' ;)
+> Okay, well it was a no to the implementation strategy I had chosen and
+> did not have bandwidth to change. Your suggestion to exit to userspace
+> is more aligned with the topic of discussion now.
+> 
+> > [*] https://lore.kernel.org/all/Y8rEFpbMV58yJIKy@google.com
+> >
+> > > do we think it'd be proper to add a KVM_EXIT_SNP_REQ_MSG or
+> > > some such for the VMM to decide if the guest should have access to the
+> > > globally shared resource (PSP) via EAGAIN or 0?
+> >
+> > Can you elaborate?  I don't quite understand what you're suggesting.
+> >
+> 
+> I just mean that instead of only exiting to the VMM on an extended
+> guest request and this capability enabled, all guest requests exit to
+> the VMM to make the decision to permit access to the device. EAGAIN
+> means busy, try again later, and 0 means permit the request. That
+> allows for implementation-specific throttling policies to be
+> implemented.
 
- - Joel
+Discussed this with Sean on the PUCK call last week and our thinking was
+that tying throttling support to a new KVM_EXIT_* type would not be
+compatible with existing userspaces unless it is opt-in, and requiring
+userspace to opt-in would not be ideal if DoS on the part of guest-owner is
+a concern.
 
+So most likely the more generalized exit-to-userspace throttling behavior
+would be tied to something pre-existing, like existing EAGAIN/EINTR handling
+for the KVM_RUN ioctl or something along that line.
 
+And if the throttling occurs as part of this particular path, we still have
+the option of using the SNP_GUEST_VMM_ERR_BUSY response to guest to force a
+retry while still giving userspace the immediate_exit-triggered exit it
+needs to release the lock and complete things on its end.
+
+So, since throttling support doesn't seem like a blocker for this series, I
+went ahead and sent a v5 with some minor documentation updates:
+
+  https://lore.kernel.org/kvm/20250219151505.3538323-1-michael.roth@amd.com/
+
+Thanks!
+
+-Mike
+
+> 
+> > > [1] https://patchwork.kernel.org/project/kvm/cover/20230119213426.379312-1-dionnaglaze@google.com/
+> > >
+> > > > +               } else {
+> > > > +                       ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
+> > > > +                                               SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_GENERIC, 0));
+> > > > +               }
+> > > > +
+> > > > +               return 1; /* resume guest */
+> > > > +       }
+> > > > +
+> > > > +       return snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
+> > > > +}
+> 
+> 
+> 
+> -- 
+> -Dionna Glaze, PhD, CISSP, CCSP (she/her)
+> 
 
