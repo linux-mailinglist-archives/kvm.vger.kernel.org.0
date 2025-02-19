@@ -1,130 +1,148 @@
-Return-Path: <kvm+bounces-38556-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38557-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD0E5A3B491
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 09:44:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE0BAA3B6E9
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 10:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C8FD3A1C4D
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 08:41:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA98B3BE5E6
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 08:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54A41E0B74;
-	Wed, 19 Feb 2025 08:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1282F1DF972;
+	Wed, 19 Feb 2025 08:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="f9TezJNt"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="bgN1B5LU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCED1DFE25
-	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 08:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5F41DF256
+	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 08:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739954174; cv=none; b=Lo6GakcOclo+Wxgzkk6omwKHBMFfBJfWLInmRCAAkLluGI57Nr2IvvGchVhoTtlGYHSAfcas6VouLRwQ69MYxAJLq+Np4Z7FJ+0xrKq2aZEsUk3Z4oceHpHG3lfg8nCKNAkamBGwWAJND2PU1ljGBCAOMX574LSVy2TACzy4ius=
+	t=1739955074; cv=none; b=sNCQIPjL4QWA3q21ZNQiNI/uiiJtB5TCqFUP50dCUSF9qEwrhNr9OjRXA59eeUeGVMkbyRkqAZ5Y3xl8PWvFAPIddQi9mkAeJ9eGugrYbjoyMRPu0l5gvxuXu/hkN1JVLjnulRba4L2ep3q5DINk20VUXZ5ps/WGWIdByjbR5yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739954174; c=relaxed/simple;
-	bh=ZFR9Bssmw+rkM4kJMxjoQ8QQzST30QWN969X923UvhY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qNrf2fMiPmvSwO3x3MBDHrHxZhL2A1oTAumDu0Cda7icy8lYizGreAj4XcxzYWS+mv1jbNEc3+5SkVKehKz+ENaKhg8eJNwEMXKSu/VoPqBDaFAW2F+8ewMxU/uXOzWcotsDOwb6tlRHKIcY4rGuasT47cVWPTJzymb7CdalweQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=f9TezJNt; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1739955074; c=relaxed/simple;
+	bh=aB7wbo6LJoP8fuqHyehR1qLit5d+ohfBtEaefLRZGSs=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
+	 References:In-Reply-To; b=hHX34D50Rmxlz3irsk+nhPQdDGNHyew36KAtb7iE1dmdJ8J2Py01+k9JC06mWNJJ5+NzK1MXqtCFRaLMvLm3l2NE+fDEWtkJy4UlEaR58S3Ln7kQdLNgXIyueojV9AM/S2Xgj64CJb82+h/nS+Ya7be4ENhQ+ytvBWaGCqWSQWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=bgN1B5LU; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43995b907cfso9558845e9.3
-        for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 00:36:08 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43987d046caso3836705e9.0
+        for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 00:51:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1739954167; x=1740558967; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hX5Pqy74HJXGhYd3EYVGCK1e+ORfs5MU+F8H+njiblE=;
-        b=f9TezJNtOmcpId/TimX969aOFeVzhNFlS5Vj5mWnfZpPO5aZA7TQL/E2N3xS8xMjOG
-         ajG15sM0KVqP5PEqhH8T1J1XZ5C/b7/cBeIJGsKjyltUzbkeMV5TbsBXJH4R6XTXTxp5
-         eWMEuLThjiPYV035NMBvS/yftrUExnfC77/thRBLyBDc5mI/AEfg5VhWUZ9fkc0CK//b
-         6EPo9xz8spSLRe10b8ch2/dC/WauC9u+mh2/wGN/7A8+WHrLjbSJf2mX4UVXa7uqRokZ
-         FCnyVuZKV6k7vVhNA4jiwz6dOE8GGNZfqFo/dAquuhfD20ocixgLKI87+UCLFVUDRNNd
-         q6TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739954167; x=1740558967;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=ventanamicro.com; s=google; t=1739955067; x=1740559867; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:subject:from:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hX5Pqy74HJXGhYd3EYVGCK1e+ORfs5MU+F8H+njiblE=;
-        b=Zg0Da33XeTgdBjtdxbDFkM5QC5jqY1KiMOZb//OaSvX/jyjo5GMORNv4lW4Au6Z4TV
-         AULYNoQ6f9xS2ow3A0WqYcHSFzLETNxuqdjG9Df9DdKwZ7xU58g2bRjlwjeWJOrBHNmh
-         DXu2J3iF52xPRmWEhwQ7hauLkaMMwaL2e8nW6z8ZwkLJssJ0CcqJww2PsZBCJK9u0qWC
-         vGrM5ZeakPBB0Wlw5Svvisv8G5fIhsQY0/ZIBKdRSvL17iPCarTCWKnHMlcm/Lj/9KRk
-         yinCFhE9UoHrXft8gCUVcq71N6vY9/mUdb7ILY981Rgmf0xU52seTkE/skzGMzlQwT6M
-         94pg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsrWGiHw3evQumgJWZXhLqODJSegoH5rzhqM4PBPugOfMnrtig5wNkx6bwZdpu3sobhGw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys3i0/uF+AbpXgtlhcl2/U7GgHFM1pI8o7NiHswSP9zJzg3vqI
-	cXqrv1DSdUgNCVjNyir3WZ0BiBm6fgjxQhtXOBombObh0T5LEXrHBvC+ukI1hLg=
-X-Gm-Gg: ASbGnctawhL1anKZbtLPi/kIC41bUy8yZUTTpG9mcsVNNoSXo8yz949TBDolp4q5h/a
-	H5oUactdNIA+/OYxfrFPHyOLg6QBg+JjJmYqq7tKzFVdy7Gd52R9KZq9p6I3q1SO1PwFwWrngS6
-	VRp0IvJhUCU7UESEasknjaydz/cy9aEGcII7XKI6wl71V9TQMuqVDmQfVkBgz/gcJ5yQWZ7RzvB
-	LaqAyyoZF/hpM8bx83EaAryDzH5FNNSfpiFv1ppv+vjc8B/w13NUUHjhm+N8gQ4XLklBFP8hfl5
-	+DQ=
-X-Google-Smtp-Source: AGHT+IHs4kVPkFYUzWm7KaTrDUxtzlrgRhTgXt+SxWy9TWu9laptUSWnP8MSP8v1LxvgTwxXTCCeSQ==
-X-Received: by 2002:a5d:6484:0:b0:38f:4c30:7cdd with SMTP id ffacd0b85a97d-38f4c307ec0mr7919846f8f.37.1739954167212;
-        Wed, 19 Feb 2025 00:36:07 -0800 (PST)
-Received: from localhost ([2a02:8308:a00c:e200::766e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259d58f3sm17085819f8f.73.2025.02.19.00.36.06
+        bh=cyOr3ZD32WYQ578+kdBxZIoR9hORXh2QvsH9UB3Wz3E=;
+        b=bgN1B5LU3P2E5gi+YoAnACHUGWg5tz6LQ4wQXKu7ycAUC/E0YPPd4Bh7y+ofcrefz2
+         4wQmOOmxSYtbakVZnUBgmrF0+Kqc8WwHDmEejlWp5r8v3mB92JYibBIWCMuCl9KkatS2
+         xSLHsJZsdQ6JBz5v1WNZAocsi0onG35oXx+mPIChBvh8jzQKPVw6+ZXrjWTIarkF54vI
+         hJ437QoKXXP9stCkAFPcMiiDg7xVYHGAOO95o0RpZ9I+G3xUjVqCu3rSbd2hLpjgh0Hz
+         vo9ayxF+bW8uU2xardh+S7h7OF4XYdmVT13evYfYBTnPgZsLD5/zrT5VVlz52ALDyO/G
+         SPsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739955067; x=1740559867;
+        h=in-reply-to:references:cc:subject:from:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cyOr3ZD32WYQ578+kdBxZIoR9hORXh2QvsH9UB3Wz3E=;
+        b=U2cbkPdudXaTy5KUW0F8bLDwUXwK2ZtIaHjuQ2jYLEEn9Ts5olxmEiCCC8s5Nh14oK
+         ojP1EJ7uu5bUJYXgz+0HFsLQtAbXRB6BIXKqCk6N9u0Fzj0X4RSdq2r0snMBmVq9jxOG
+         B1uFNpBW++XOOUsYbOvwplw0S22tQBRjEFia0IzN7+uD+4NRHXPhR+ljpK+uOapt2EwW
+         UGvmnTIjkKxvWM5qPsfN9ZN2FPE5AlffzSJWu/thUCjmO9qC0K1pW1/5nltLBSufiGZP
+         PqihimEI/S1C62+j8MGqsXy2HbbiE122BRvMbKcRvNu7d+VIT5E+bqyCSsUEFQ6X3f6B
+         iQ2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUufa1ZcD8tInMSQHWHPvfYuCGTol8hSXKv6aFbWk7gVIYbGzAcUCWqSmBYHHucSx8+zvw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5M1cFBTkQH3JjBTPJlTsFmw1FsarFfv5/80gxqDkUmAp/MqaR
+	rH9/xwSqYjsqthZQt98kCyEJ0iH1qmzOSB/UdEQlQR0bGuqZ/3pa2RmQLYoDgao=
+X-Gm-Gg: ASbGnctxy0OSc9Y0mxbQfKSF1vEia3JcLAz++y0BhdokqCaDuniNGG9OMRbhfLWqY9b
+	+OSTm8Eo0DUIf8f1gOcW5Rwj8qacsd24Mt6b7D4VRrv211L970l4FIUFyXmTpZ8mzMWWD3AxHNv
+	cG+CFwKmMmVw1HNDP1Fw7QacTS39XsjYSClVshVkaiOrlVSsXmV3ib8C0yFKc/tO5SRwU4WJyeH
+	SN79PtWwDfTIlVdD7EFLxmFzr2+djGnYGZAngbEWnI16Yk/fZt69SKsSJtzUhq4S+jU3h6Z3Ou4
+	EJ4Tz4MMoB2YnjK8s6TlfUt/sxH3+Jzy95yIu5Gk4j2hE0wdr00=
+X-Google-Smtp-Source: AGHT+IH6D4plZNYfuEYjbGdATaVAlFztkIrp/rClPpYzS5dL67Gt7zhXEE8RN1q+8mV+NLcuY45v6A==
+X-Received: by 2002:a05:600c:524a:b0:439:4d1c:bf72 with SMTP id 5b1f17b1804b1-4396e77b89dmr62388815e9.6.1739955066877;
+        Wed, 19 Feb 2025 00:51:06 -0800 (PST)
+Received: from localhost (ip-89-103-73-235.bb.vodafone.cz. [89.103.73.235])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259f8730sm17632219f8f.93.2025.02.19.00.51.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 00:36:06 -0800 (PST)
-Date: Wed, 19 Feb 2025 09:36:05 +0100
-From: Andrew Jones <ajones@ventanamicro.com>
-To: BillXiang <xiangwencheng@lanxincomputing.com>
-Cc: anup@brainfault.org, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu
-Subject: Re: [PATCH] riscv: KVM: Remove unnecessary vcpu kick
-Message-ID: <20250219-badec60b9b12834cf534dcbf@orel>
-References: <20250219015426.1939-1-xiangwencheng@lanxincomputing.com>
+        Wed, 19 Feb 2025 00:51:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 19 Feb 2025 09:51:05 +0100
+Message-Id: <D7WALEFMK28X.13HQ0UL1S3NM5@ventanamicro.com>
+To: "BillXiang" <xiangwencheng@lanxincomputing.com>, <anup@brainfault.org>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@ventanamicro.com>
+Subject: Re: [PATCH] riscv: KVM: Remove unnecessary vcpu kick
+Cc: <ajones@ventanamicro.com>, <kvm-riscv@lists.infradead.org>,
+ <kvm@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>, <atishp@atishpatra.org>,
+ <paul.walmsley@sifive.com>, <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>,
+ "linux-riscv" <linux-riscv-bounces@lists.infradead.org>
+References: <20250219015426.1939-1-xiangwencheng@lanxincomputing.com>
 In-Reply-To: <20250219015426.1939-1-xiangwencheng@lanxincomputing.com>
 
-On Wed, Feb 19, 2025 at 09:54:26AM +0800, BillXiang wrote:
+2025-02-19T09:54:26+08:00, BillXiang <xiangwencheng@lanxincomputing.com>:
 > Thank you Andrew Jones, forgive my errors in the last email.
-
-From here down is all exactly the same as your first email, which I
-already completely replied to.
-
 > I'm wondering whether it's necessary to kick the virtual hart
 > after writing to the vsfile of IMSIC.
 > From my understanding, writing to the vsfile should directly
 > forward the interrupt as MSI to the virtual hart. This means that
 > an additional kick should not be necessary, as it would cause the
 > vCPU to exit unnecessarily and potentially degrade performance.
+
+Andrew proposed to avoid the exit overhead, but do a wakeup if the VCPU
+is "sleeping".  I talked with Andrew and thought so as well, but now I
+agree with you that we shouldn't have anything extra here.
+
+Direct MSIs from IOMMU or other harts won't perform anything afterwards,
+so what you want to do correct and KVM has to properly handle the memory
+write alone.
+
 > I've tested this behavior in QEMU, and it seems to work perfectly
 > fine without the extra kick.
+
+If the rest of KVM behaves correctly is a different question.
+A mistake might result in a very rare race condition, so it's better to
+do verification rather than generic testing.
+
+For example, is `vsfile_cpu >=3D 0` the right condition for using direct
+interrupts?
+
+I don't see KVM setting vsfile_cpu to -1 before descheduling after
+emulating WFI, which could cause a bug as a MSI would never cause a wake
+up.  It might still look like it works, because something else could be
+waking the VCPU up and then the VCPU would notice this MSI as well.
+
+Please note that I didn't actualy verify the KVM code, so it can be
+correct, I just used this to give you an example of what can go wrong
+without being able to see it in testing.
+
+I would like to know if KVM needs fixing before this change is accepted.
+(It could make bad things worse.)
+
 > Would appreciate any insights or confirmation on this!
-> Best regards.
-> 
-> Signed-off-by: BillXiang <xiangwencheng@lanxincomputing.com>
-> ---
->  arch/riscv/kvm/aia_imsic.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-> index a8085cd8215e..29ef9c2133a9 100644
-> --- a/arch/riscv/kvm/aia_imsic.c
-> +++ b/arch/riscv/kvm/aia_imsic.c
-> @@ -974,7 +974,6 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu *vcpu,
->  
->  	if (imsic->vsfile_cpu >= 0) {
->  		writel(iid, imsic->vsfile_va + IMSIC_MMIO_SETIPNUM_LE);
-> -		kvm_vcpu_kick(vcpu);
->  	} else {
->  		eix = &imsic->swfile->eix[iid / BITS_PER_TYPE(u64)];
->  		set_bit(iid & (BITS_PER_TYPE(u64) - 1), eix->eip);
-> -- 
-> 2.46.2
+
+Your patch is not acceptable because of its commit message, though.
+Please look again at the document that Andrew posted and always reply
+the previous thread if you do not send a new patch version.
+
+The commit message should be on point.
+Please avoid extraneous information that won't help anyone reading the
+commit.  Greeting and commentary can go below the "---" line.
+(And possibly above a "---8<---" line, although that is not official and
+ may cause issues with some maintainers.)
+
+Thanks.
 
