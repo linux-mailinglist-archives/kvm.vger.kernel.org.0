@@ -1,175 +1,215 @@
-Return-Path: <kvm+bounces-38594-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38596-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60A8BA3CA26
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 21:40:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8DAEA3CA66
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 21:54:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAA583A52D5
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 20:37:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC763171A7B
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 20:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C02B23CEE5;
-	Wed, 19 Feb 2025 20:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBE924FBE3;
+	Wed, 19 Feb 2025 20:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="UUouOAth"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kVGUmRoR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2058.outbound.protection.outlook.com [40.107.220.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791DA23C8C6
-	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 20:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739997433; cv=none; b=ZftH/6l+mGyeyV2HumUG4YOfa/r6lOECtJ9VgEFT639COR7/wI8iUrcbjwYWgS7F49T9oX8qLGiToDmaGtDMo3XYuaR1wVB7lnyMOQZsvMCHac3wMMK2OYcakuBRuAMZaub8Lmxh5l6/PsyMu7s7XstFN8yrymy0DhLfnNlUpRs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739997433; c=relaxed/simple;
-	bh=yKjrUDxi3dkFLFUc55Tgy0oxRUHV39lyNPsgf4nGVB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TpZb+92PMiwPPlc7cWXAQnMcSN3ESBBu9lgzYPV0cCIF0TvqiyG45k5pxKqmF03oAyWj48x81zD7T82A+E1cQ72loWfr0OC0Mc4mpgJviA3k4XTt5n4NJYcv1ILd36SqKryPuqhbPtJcvNuBCyIBX8mALvTupePctnkE9rwYuEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=UUouOAth; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-47201625705so12994711cf.0
-        for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 12:37:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1739997430; x=1740602230; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dy6Nbly0xz+HIc0W3Ixx9GKeMksXztaJI1bUpLuF4hY=;
-        b=UUouOAthLz/ozXbUs4QeSLL9jDxYe5oDV+JimcS6LZVGO3hiHwPBhQRIweOqddPmzU
-         2w7ExWc9G7r0Rqd+Qt6j6hRYzCPS0+mYHGb3FeHhn1F4051/Vm0OgeDPb/jMceQBTlfn
-         wl/SOl+zbAWjNEbAh2Gfnw6e/1iyL5dhqGabNVEyPQ6BMU5mdiRlgoEw3OaFhbFaK+xn
-         SCbZjjK6L2GrVkk6gfAhSSGw5lgdRof3qWHxnHFsNb4mju0hkGfvnYZML3vgKLxgGoea
-         Dpzz/V9WuIqEKVzSXLcSouG8s9lk1tXxZKXzgnF2314jFHk/552g8VR+pkTjVUpkFIYr
-         vi2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739997430; x=1740602230;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dy6Nbly0xz+HIc0W3Ixx9GKeMksXztaJI1bUpLuF4hY=;
-        b=YIuyrbeOoXr4TW+lE6B/FP6Ype8XQCCNcESdL3LcsYVOPkcBG4aoaagtvmO+7kYqYH
-         8L9PUuf19rNYwsrbW32tv+0cmhG5gDgwrck6S9wWbGoB9HQ32N49hJULdH+CR75IxQ/e
-         9zbHAue2t7fryoKwsz5d1RLez4GNb2U94ookI85HgJPo7VEhVbAM91h/GWuQvzIrvTC1
-         1fMaOfLLfTgle3CZrYG8UaB88j435tUWW915Nrl7iU9beFxyBYenWopK6W/O7377J+Zu
-         H93ymM7m8f1cPrJm+J92RYsggX6thDId/K7dFlcQGrCyhI7gvCCNXJWeMiQMV6owv5cn
-         Dc9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWTx73r/xNTkbTSbZJIxigWGX0HWmjllkU0yHL12f9HsyfjYOQHYuPUzylsvFKNfbz3/ic=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIjCeIFNlfE208VtRruqaB0DUChqFDfeWVSw0KHXdaeBWuszOj
-	7W1FtEjjGwoMuxA4mzvIbISAaZKiBkHtRmi2HjQ6Ra4RCPUTanexyEUvIYh0wSA=
-X-Gm-Gg: ASbGncsUFtR2xIHZi8a8nppzfdSBs8DE9Y9gqoXGMXCK/D+pJ9VmsyjDe6P/RAwJCur
-	nlGLe9wtoywIhV2ocYr7MTdZCiXBDkglkeyLtoruLVbM1uTf1lMA2DVYlaqO8nk0vWCc4J+OWNH
-	o8fTTFON8BV7ojoq6LCYIwrPYuPsa7TgO5goeUXGwKqM6AQsAml6OqMtwKo+uIOxB7Z1iWP3tSW
-	lV0BXbQ+RWA5pCLkaiHBULUoT/PCZH6jVw1QwS/uLogZ0GZl3ZSqTrsLORQMt7uc/sgDS5QIPxe
-	Jk1tIduSaHrVIqWeosvR2xlNcHJTiYcjkzhU02+PS22hdq14BZBpcAY6MVySerPf
-X-Google-Smtp-Source: AGHT+IGaUTz7ZR5mTsPN8ZqZQSlW5yPd5NDczzm4gie81ewyfyxQiY2YHx+YPUrCb2CsYgW0NA6WJA==
-X-Received: by 2002:ac8:5fc1:0:b0:471:fa1c:3cbb with SMTP id d75a77b69052e-47215123e44mr12524791cf.22.1739997430338;
-        Wed, 19 Feb 2025 12:37:10 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471feb82ecesm25021711cf.63.2025.02.19.12.37.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 12:37:09 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tkqoe-00000000BJo-3Lm8;
-	Wed, 19 Feb 2025 16:37:08 -0400
-Date: Wed, 19 Feb 2025 16:37:08 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Michael Roth <michael.roth@amd.com>
-Cc: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 12/22] iommufd: Allow mapping from guest_memfd
-Message-ID: <20250219203708.GO3696814@ziepe.ca>
-References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-13-aik@amd.com>
- <20250218141634.GI3696814@ziepe.ca>
- <340d8dba-1b09-4875-8604-cd9f66ca1407@amd.com>
- <20250218235105.GK3696814@ziepe.ca>
- <06b850ab-5321-4134-9b24-a83aaab704bf@amd.com>
- <20250219133516.GL3696814@ziepe.ca>
- <20250219202324.uq2kq27kmpmptbwx@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1937224E4BE;
+	Wed, 19 Feb 2025 20:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739998367; cv=fail; b=WfD5TlrrRptuMZjHYZuZrWsQVFeLM1YXtjOEnrJgcRtHRATszaV1GmLoUd4lP1drbEb12MAvy2kVXT9C+BV4gKmvbWvD6ozqjUdWiUj3u5Idr6ETZATIxo3lp/lfOAX2bkYMkKIEjPpzL5mkEb8kTvN4B582JOU/lAlbEnV/i4k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739998367; c=relaxed/simple;
+	bh=CmlVh+q0/bqdomwJA/1IqzVSiu64oSuzNaN3blETCds=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r4O5bJc05lFhPbVHLf5pE5IqAzq3ubrXiJ8hKyESG5rpfXUbzywJEkH0gnL7eBNm8A/5s26joj3YKAy65ATVzwexbq9h+BaKmfz78qHiPKC63YE81tNQeP/gLDXNfTh5pCCj1vd9AlJZEfAC0Fq8HYpgRNfiQvTG8wJZDuuUHjs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kVGUmRoR; arc=fail smtp.client-ip=40.107.220.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vTDUODDDUrEfP9YB+s0xs56K+2/s/YHnijuFz6l/r4OKfiJIt69cgb2JSIDwfhUOITQQFlR3vqVuErVwk1Xz/b24K/ID0W5/uAV5YEJG1D8V6vf4mAjHSIHWliZidpNQ17bkyfT7J+8Kq6zPRWwL7iVAXVzmAdlN+EF9GCI4H6h+Ipm4k2ZbK8ffNqiviPdZAjs1nSG7Vtdr/6Y27u+E6JQAmfm/LEFfgV6cbfQE+2qvYDFEU1eR/aOtSsyX6T+dCMOjBZdq38SWuFE9cE24hYoAqjdCvU8dBk0gP08/oxt+Hbu7CliIUTVyRIneL/J6n9c15bHBSWFLD7+buX6M3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F8ja4oFTdUHWzLfek+8sdWrBfE8dkgB1g0k6toCOb/M=;
+ b=WSCb3DZ6S+LTgqTZP4W8bM7pcd7PlZobg3AXOLrouJ4H1cIOae9cJp7qjX7Zb6vSRqJEI+BdXKInkXaDE8AIKrfiFRcZ0fAV5ii3HAke1gkzzCBOnHrcsNw+0zpbzdoD/YCbC0d3xmOuZVaXJ9RKMijsMd0k0cnnaOaFXeOSowD5Gr2DtoBKzw0IQbZigF+P8tGNFEPMzT4KIS0anmSRnffA45mPTxwoMS1I7pENAO7GnUgVJPniE0RWEiCkR6gQyT8BgE9UJO61NkdOdkBAtuAayre3+0KMK/ZNTx8OHIWzCORQEcqi5bkxorapHZlbdHNUKit8DHSktCpeNKb5kw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F8ja4oFTdUHWzLfek+8sdWrBfE8dkgB1g0k6toCOb/M=;
+ b=kVGUmRoRvWOzVLG8qvZ4aEt35Wlf8QTW4ifjrNnh6gdHezL1v0xgdj3KiD018fY7Cx5o3ZE1YznSEE9018A2HoDRe0qrgF2PJM3bHdCKlU17tnYOZ7T1S7aNxShftYxX2rcAk20nkB95ERE5ujJbLbLF8Uu3nEMpAhDGNGybd/4=
+Received: from SA0PR13CA0026.namprd13.prod.outlook.com (2603:10b6:806:130::31)
+ by IA0PR12MB7697.namprd12.prod.outlook.com (2603:10b6:208:433::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.14; Wed, 19 Feb
+ 2025 20:52:41 +0000
+Received: from SA2PEPF00003F68.namprd04.prod.outlook.com
+ (2603:10b6:806:130:cafe::24) by SA0PR13CA0026.outlook.office365.com
+ (2603:10b6:806:130::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.14 via Frontend Transport; Wed,
+ 19 Feb 2025 20:52:40 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF00003F68.mail.protection.outlook.com (10.167.248.43) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8466.11 via Frontend Transport; Wed, 19 Feb 2025 20:52:40 +0000
+Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 19 Feb
+ 2025 14:52:39 -0600
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <hpa@zytor.com>, <thomas.lendacky@amd.com>,
+	<john.allen@amd.com>, <herbert@gondor.apana.org.au>
+CC: <michael.roth@amd.com>, <dionnaglaze@google.com>, <nikunj@amd.com>,
+	<ardb@kernel.org>, <kevinloughlin@google.com>, <Neeraj.Upadhyay@amd.com>,
+	<aik@amd.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-coco@lists.linux.dev>
+Subject: [PATCH v4 0/7] Move initializing SEV/SNP functionality to KVM
+Date: Wed, 19 Feb 2025 20:52:29 +0000
+Message-ID: <cover.1739997129.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250219202324.uq2kq27kmpmptbwx@amd.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003F68:EE_|IA0PR12MB7697:EE_
+X-MS-Office365-Filtering-Correlation-Id: cebc594d-1a29-4755-5956-08dd512759c7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|7416014|36860700013|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Cjj/bNwUJkAjgOimTRli1LCxD6iu9l2v7YCXOwlXTpplG7EPIeOmWJuUg3bm?=
+ =?us-ascii?Q?AkO4AXt6rT6Y95P2dVZSOMMlsG00Gkqr8DCFvVTk3Q8vYlUYysqS9HLkQ2qI?=
+ =?us-ascii?Q?gM/kFHMyHMpVPuOz9ZX3EHZ/XAkvy0xoG7VEsMRKJNsD3fXCKY6wjfv8hs3z?=
+ =?us-ascii?Q?fvtFdTcH5S1AXqsu9gSjEz0cT0BEUZlueecCTK9HQXirqdwus6JRsyP4Pdrc?=
+ =?us-ascii?Q?vqhCKvlYxLNcs3N1+oIPp+l6h0xv7APv3GE492SZJYTfDUWi4eOzzdtY8mbs?=
+ =?us-ascii?Q?y/KvJrXAvdiL1nDadE9QDkSZDb/ZiOGU+Li5awGqSbRLmrhyGaomwxcZdGxs?=
+ =?us-ascii?Q?EVjzCRzTdpnMw16sBDuPS17mS3O/Y/hJDDLTL1G6Ppr0rfQl3gh01/I1MRcO?=
+ =?us-ascii?Q?HlD6PFTG3j3nVuHPX1+hMQWCOo3ZT6EPiScbKCU7iPWxo//0R+4ebHcD7gr+?=
+ =?us-ascii?Q?CquunQVDtPRJtN+zaTNTadHoK8NgWG56AkBvLwwFsnNT5T9zpaqK+gncSO79?=
+ =?us-ascii?Q?xCHBIcw2lbjmKQ9agCil/dzGPvTvOErIl+vmCzIldElKWeNRfsPpTcublDAn?=
+ =?us-ascii?Q?oaIA2pgMb10Wj+oxfB6NWJyNIeyYQ+l3JQVxd+vDXA8QEWAp0ttsKFQIKDWl?=
+ =?us-ascii?Q?ZiotjIolTbqdjHQjCVvByj8dnRnkcKwDSiy2Yfid6XyvNbG5LHeQyWWQAZSF?=
+ =?us-ascii?Q?YOrtXNZrNGGQTeMRZFqiBUjtHm0FOA4Q+b4b2qsBka55cQekOFJkQMaqUkf/?=
+ =?us-ascii?Q?lcxQ6lh5vr8hj8tQuiGIQwXA1cW1xjET6NkclCxCub1wsDN+yR/fLnE2szXH?=
+ =?us-ascii?Q?zb2Py8w73MQYSvq3zuYsvoRhIvdeCg2uFRMFtYI6IPLEHQW3t9/DmWa1Aw+H?=
+ =?us-ascii?Q?LweUaR9PHqiAArg/GDbeROScButJwr0AydjxnNedH/GHDRGXQrlEChkTrTGY?=
+ =?us-ascii?Q?ZDyfOYZ2ODGIhwBP3lC8s+TwlhYMwkIYvstpsAJYc9BxdNC0UAPSVgsf7VJ/?=
+ =?us-ascii?Q?kFkgtg/pU9Eq+Js5FUD/lWiZZUsr13Io5U+eZc0eFp64mK/P2N3v1j8eZXRO?=
+ =?us-ascii?Q?fBP9s/JT25r0H9LbIjHsISWDrwugXIYeHQ6RPXi9FHh/2ldwl5UZK5+6TMpj?=
+ =?us-ascii?Q?ushewzfLALrPsKr/ozLsWR9ImrOVgFFCBP/Oq33G4M6pD8/eBdq9PeLlF/0Z?=
+ =?us-ascii?Q?pPc/y68KXoemt8VJFSyOpS0q/qQzQYeRLmgHqB2Scpywv0kLkqqu4bsx9ryW?=
+ =?us-ascii?Q?vKBm0CmosySscYzP+ATJiTu19vyk200s229vTPETgrIlbnqsTmwXSjtrPvnn?=
+ =?us-ascii?Q?E0kuLoCfM7ebg6Hq4jyfET/yAPajkI4+VoTjABcpLEHurtj5y3iK1dBHQ8N2?=
+ =?us-ascii?Q?pifJY8RwmoKFEpuaJVyrnZRE0JCgMmi1ov/by40mZeVlJgQcPJugy0RID6f2?=
+ =?us-ascii?Q?cXRYS9ePR8FlvG9lAVKM24Qfum6an5j3b1BBzDWZJxYm3C2UrdN43Pl+S/Lq?=
+ =?us-ascii?Q?ozfs8wfP36XricP8iIRYDQWp76g7CZOMZr8o?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(7416014)(36860700013)(376014)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2025 20:52:40.7352
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cebc594d-1a29-4755-5956-08dd512759c7
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00003F68.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7697
 
-On Wed, Feb 19, 2025 at 02:23:24PM -0600, Michael Roth wrote:
-> Just for clarity: at least for normal/nested page table (but I'm
-> assuming the same applies to IOMMU mappings), 1G mappings are
-> handled similarly as 2MB mappings as far as RMP table checks are
-> concerned: each 2MB range is checked individually as if it were
-> a separate 2MB mapping:
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Well, IIRC we are dealing with the AMDv1 IO page table here which
-supports more sizes than 1G and we likely start to see things like 4M
-mappings and the like. So maybe there is some issue if the above
-special case really only applies to 1G and only 1G.
+Remove initializing SEV/SNP functionality from PSP driver and instead add
+support to KVM to explicitly initialize the PSP if KVM wants to use
+SEV/SNP functionality.
 
-> But the point still stands for 4K RMP entries and 2MB mappings: a 2MB
-> mapping either requires private page RMP entries to be 2MB, or in the
-> case of 2MB mapping of shared pages, every page in the range must be
-> shared according to the corresponding RMP entries.
+This removes SEV/SNP initialization at PSP module probe time and does
+on-demand SEV/SNP initialization when KVM really wants to use 
+SEV/SNP functionality. This will allow running legacy non-confidential
+VMs without initializating SEV functionality. 
 
- Is 4k RMP what people are running?
+This will assist in adding SNP CipherTextHiding support and SEV firmware
+hotloading support in KVM without sharing SEV ASID management and SNP
+guest context support between PSP driver and KVM and keeping all that
+support only in KVM.
 
-> I think, for the non-SEV-TIO use-case, it had more to do with inability
-> to unmap a 4K range once a particular 4K page has been converted
+To support SEV firmware hotloading, SEV Shutdown will be done explicitly
+prior to DOWNLOAD_FIRMWARE_EX and SEV INIT post it to work with the
+requirement of SEV to be in UNINIT state for DOWNLOAD_FIRMWARE_EX.
+NOTE: SEV firmware hotloading will only be supported if there are no
+active SEV/SEV-ES guests. 
 
-Yes, we don't support unmap or resize. The entire theory of operation
-has the IOPTEs cover the guest memory and remain static at VM boot
-time. The RMP alone controls access and handles the static/private.
+v4:
+- Rebase on linux-next which has the fix for SNP broken with kvm_amd
+module built-in.
+- Fix commit logs.
+- Add explicit SEV/SNP initialization and shutdown error logs instead
+of using a common exit point.
+- Move SEV/SNP shutdown error logs from callers into __sev_platform_shutdown_locked()
+and __sev_snp_shutdown_locked().
+- Make sure that we continue to support both the probe field and psp_init_on_probe
+module parameter for PSP module to support SEV INIT_EX.
+- Add reviewed-by's.
 
-Assuming the host used 2M pages the IOPTEs in an AMDv1 table will be
-sized around 2M,4M,8M just based around random luck.
+v3:
+- Move back to do both SNP and SEV platform initialization at KVM module
+load time instead of SEV initialization on demand at SEV/SEV-ES VM launch
+to prevent breaking QEMU which has a check for SEV to be initialized 
+prior to launching SEV/SEV-ES VMs. 
+- As both SNP and SEV platform initialization and shutdown is now done at
+KVM module load and unload time remove patches for separate SEV and SNP
+platform initialization and shutdown.
 
-So it sounds like you can get to a situation with a >=2M mapping in
-the IOPTE but the guest has split it into private/shared at lower
-granularity and the HW cannot handle this?
+v2:
+- Added support for separate SEV and SNP platform initalization, while
+SNP platform initialization is done at KVM module load time, SEV 
+platform initialization is done on demand at SEV/SEV-ES VM launch.
+- Added support for separate SEV and SNP platform shutdown, both 
+SEV and SNP shutdown done at KVM module unload time, only SEV
+shutdown down when all SEV/SEV-ES VMs have been destroyed, this
+allows SEV firmware hotloading support anytime during system lifetime.
+- Updated commit messages for couple of patches in the series with
+reference to the feedback received on v1 patches.
 
-> from shared to private if it was originally installed via a 2MB IOPTE,
-> since the guest could actively be DMA'ing to other shared pages in
-> the 2M range (but we can be assured it is not DMA'ing to a particular 4K
-> page it has converted to private), and the IOMMU doesn't (AFAIK) have
-> a way to atomically split an existing 2MB IOPTE to avoid this. 
+Ashish Kalra (7):
+  crypto: ccp: Move dev_info/err messages for SEV/SNP init and shutdown
+  crypto: ccp: Ensure implicit SEV/SNP init and shutdown in ioctls
+  crypto: ccp: Reset TMR size at SNP Shutdown
+  crypto: ccp: Register SNP panic notifier only if SNP is enabled
+  crypto: ccp: Add new SEV/SNP platform shutdown API
+  KVM: SVM: Add support to initialize SEV/SNP functionality in KVM
+  crypto: ccp: Move SEV/SNP Platform initialization to KVM
 
-The iommu can split it (with SW help), I'm working on that
-infrastructure right now..
+ arch/x86/kvm/svm/sev.c       |  15 +++
+ drivers/crypto/ccp/sev-dev.c | 219 ++++++++++++++++++++++++-----------
+ include/linux/psp-sev.h      |   3 +
+ 3 files changed, 171 insertions(+), 66 deletions(-)
 
-So you will get a notification that the guest has made a
-private/public split and the iommu page table can be atomically
-restructured to put an IOPTE boundary at the split.
+-- 
+2.34.1
 
-Then the HW will not see IOPTEs that exceed the shared/private
-granularity of the VM.
-
-Jason
 
