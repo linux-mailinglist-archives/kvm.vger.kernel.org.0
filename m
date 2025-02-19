@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-38528-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38529-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E317AA3AEE1
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:27:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 529D8A3AEE3
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:28:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 449933AB219
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 01:27:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 625E33AAE63
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 01:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C8B17ADE8;
-	Wed, 19 Feb 2025 01:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F73681749;
+	Wed, 19 Feb 2025 01:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1AuCBU+Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2PHPU+A7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C7914B08C
-	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 01:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F364C16A959
+	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 01:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739928433; cv=none; b=B8/CYK+cAYBagid49SsMhsO2j3oMjR09rfcKe4J5fQQ/vtKIIWmsfJ+717tsI5GCL791fmeBSUz9xvMoRvVucctBKvZAp0EAQ96hIJ7z6VXaN7rLor2fRzMXvv4aQ6eGI8mFtAcM4Jyr/xNrp8iHyjjZjv3l59L6dqPMqcbiRaY=
+	t=1739928435; cv=none; b=tX36rLHRZEy5dEh/I3vhF47WgEQhyoEmnwEt4X7qAjgQAaatermsB+F8B4MSKURZkfmXzBFwR1dQxzio/XnvqDjRTUkL/gjwzri9YYbVwVeIBcVUfXM/y35k36C7yHo4vcohcwJ856ZxQ8w+KEz0GSz08h0XntfwCioxy6Fx4Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739928433; c=relaxed/simple;
-	bh=J1nAFJt6r7Ajioiex0cydNgYgyWbIcK2APGZ3IXZAOQ=;
+	s=arc-20240116; t=1739928435; c=relaxed/simple;
+	bh=4OEAxR3s/43AnR+PMZMEbjBraLCzIO0pgoEeiAIRlxA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=A4HO+oahyauK79wiJ2DTmp4MIlL9Gs/tRrtZah4NAMGhly8mivF3BZDazo3Y+qcFTpSErl9W6Kr3OeDvmd1lvuluaBHsDGI55dBhsUoU8KcnlvhgSk7+j7Iv67e4NDeIwcjDmfctaAoAkmlRxQkq9p7XoTXhf3Zr3sycP4Gw+c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1AuCBU+Z; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=NU7Dz9OO+KAnudFI6MqBR9NKPASUCVphth2AdxlNL86pfuoFH2txHz4zXmkJiNIoxaTZ/TDAMuKugR20GHRokVb+zLffF4jqBVp5LOK3stjFgQGz8rEXa0EVRruVtbWpnPd3Rt/nku7ZYk030Xs66rP/eIZnwQGNHayMdoxnVSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2PHPU+A7; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fc1e7efe00so10884715a91.2
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 17:27:12 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2fbff6426f5so12384739a91.3
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 17:27:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739928431; x=1740533231; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739928433; x=1740533233; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=cvedP6xsz4gidjwnbxw7j1GxK5ZG/kcCzWXYJHFDTTk=;
-        b=1AuCBU+ZoCGIElranhfzG7pPwN9N7KJOhmGn4yd5wzlAgz979cXFillJHbOdfnWt88
-         8yhTDT8fmQh5I66Fb2ir9bY2UidYE1n6fpPxI+o38Mg0DP5rvhFlyb98nXdUb8jILzHf
-         keKDVS5yy4AB3gzXcI3+t8wzdJfBGBuS+hTpIizvl6FhSMarBMTDk2dpm+onnePrN4nS
-         1Gw9IxBAs1NzYw9zDq7wDjMyEotA3MPtasOt40tJ31/Kx7Ap409KNpOnkcNrU+W3ajFc
-         3+X96bO6QgN4OBdj4GSF+F3akpL/rhv5zYOSM9n6PXUO/wzz0tGvTgaULEj7IQCtkogB
-         tTAw==
+        bh=iJszCJZKg8PtQ/Ae3yHsiUpwJbfr+WbepFVlWSrNVFQ=;
+        b=2PHPU+A7OTyW6f2S/FBFXH+LNbW35p0du2527SFP1kalIrPg3kMYRsQ/ftfha4eaaS
+         0OsvR825o/YlJtxHqsY6+yynwMZuh+dD+zZXQlPdYNWedszlirFC0KlP0SmAqgxqDNYj
+         YXy6JZAf6La0SDY5jXs6ybgXp2h31mVl/icoLKmX6cc/hgS0dIZYL2+MFJg+FoopNFVs
+         N5ZX0VIcH8kC/fncerZMosudrWki0d8MEDoRUjJJzyOJWtlM2JcIMt/nhSDJjxCC4d18
+         +8jj1R8ABPWMFokJ7AoE32zWhG5bcJm0nmZ8O6hS8+T0ASDLQDVdv/06JttpTwJ9qXhg
+         sY0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739928431; x=1740533231;
+        d=1e100.net; s=20230601; t=1739928433; x=1740533233;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cvedP6xsz4gidjwnbxw7j1GxK5ZG/kcCzWXYJHFDTTk=;
-        b=Ez5E7y/lsYWq5veCjZWRoIQAd7vYd+EBLRPcNjWVg2xa1rdzwLfr1fu2tWwmly3os+
-         nUBDbWS6mJ/k/m6+yPLtAGa430nDTrE4h3o3VQzuXQTBfrDvqrWmcJQYVHgj5qvObt9F
-         pcHP9EYjb12RlBozgJnioM/toPyc8O9TpadmvSsFIb6W3XChlDti1aLVZDMc3dSsbUTz
-         aJfTlOZcjYo3sLgWofHkegAHpb/6l/3J74ZSIvQz8kubeB/0wUvs0k1hHvqEq+VhvG9s
-         QfZuf9g316Htm75jQTuxPSAk939hM23XeM9CIvoDOy0kJFQIJPxLHwCJxpAw8S+JLELG
-         kybw==
-X-Gm-Message-State: AOJu0Ywvnbu2dYdWssHyFCeOaN21Iqkh4fdsN9OyS0hKQatjp8n5YlrB
-	5l9gb7DAiUoNLKebw5563M6oTsZYwRLgJtHTOQU4qRR4jV3ETRa54eNKwXja5eH1V+Y/7Dr8qjq
-	Dng==
-X-Google-Smtp-Source: AGHT+IF2j6eaylYhREGn8frIKvQEbG2ipSn6kEWP+C6rQfqXJMdySmc8Mo7nKr7CRXlAX8q7sHTfLLzlpqA=
-X-Received: from pfun4.prod.google.com ([2002:a05:6a00:7c4:b0:732:6425:de9a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1746:b0:732:535d:bb55
- with SMTP id d2e1a72fcca58-732617757demr25124172b3a.4.1739928431594; Tue, 18
- Feb 2025 17:27:11 -0800 (PST)
+        bh=iJszCJZKg8PtQ/Ae3yHsiUpwJbfr+WbepFVlWSrNVFQ=;
+        b=aj1YFRJ1iw946U9tblK29HaPWiUi91D/b6HE+c6mJKFgfsvAL0X7wmlX91b+EhQOK+
+         QSotcaomg5OvdqtjSGSzfjyo61TNJwSUrrtsnY/qn6EwZAkaeJ8e0AFrQt2jNTifY95A
+         Xq5bXWBcW7MQ8hWNhw2k3vaj44PKER9c+Bms8zNudUUh/fENcRKt3kcLSOLsQKktjolM
+         5+W3o083vv+8vrY8g9SSs17VHlBEZ4H0oriPtqhAOPTOq+nm61qvsxmyzZ4GSJ2hfwXu
+         GeJNaeID18sYwfnqZ//tGQqEHiXbfG0mPvadlBZixVBL7ZIu8gnBy8ADq9/q260i0jEH
+         kkhQ==
+X-Gm-Message-State: AOJu0YwwyfJ24zUy2PuTIDVbgQ1s614VKjSj5OEG12NwEG2t7e5oGPCt
+	PDa+nhnVtfUovERES9LnU5Q9p7upmM5QUDUC/n7OMvIzlHjBe6HSOUeO8Cp08Ga7tNes5WMO3w/
+	UUw==
+X-Google-Smtp-Source: AGHT+IHqxHNQUm/C6lVCMrwMQ8rlL2tdxOfbL2NQq3+nc7UKt3qAAgkQUvPBwgR+3sGE47UNfucABBsGQKA=
+X-Received: from pjj5.prod.google.com ([2002:a17:90b:5545:b0:2f7:ff61:48e7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f06:b0:2ee:c91a:ad05
+ with SMTP id 98e67ed59e1d1-2fc40d14c84mr23967842a91.3.1739928433321; Tue, 18
+ Feb 2025 17:27:13 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 18 Feb 2025 17:26:57 -0800
+Date: Tue, 18 Feb 2025 17:26:58 -0800
 In-Reply-To: <20250219012705.1495231-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250219012705.1495231-1-seanjc@google.com>
 X-Mailer: git-send-email 2.48.1.601.g30ceb7b040-goog
-Message-ID: <20250219012705.1495231-3-seanjc@google.com>
-Subject: [PATCH 02/10] KVM: SVM: Don't rely on DebugSwap to restore host DR0..DR3
+Message-ID: <20250219012705.1495231-4-seanjc@google.com>
+Subject: [PATCH 03/10] KVM: SVM: Terminate the VM if a SEV-ES+ guest is run
+ with an invalid VMSA
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -84,56 +85,109 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Tom Lendacky <thomas.lendacky@amd.com>, Alexey Kardashevskiy <aik@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Never rely on the CPU to restore/load host DR0..DR3 values, even if the
-CPU supports DebugSwap, as there are no guarantees that SNP guests will
-actually enable DebugSwap on APs.  E.g. if KVM were to rely on the CPU to
-load DR0..DR3 and skipped them during hw_breakpoint_restore(), KVM would
-run with clobbered-to-zero DRs if an SNP guest created APs without
-DebugSwap enabled.
+Terminate the VM if userspace attempts to run an SEV-SNP (or -ES) vCPU
+that has an invalid VMSA.  With SNP's AP Create/Destroy hypercalls, it's
+possible for an SNP vCPU to end up with an invalid VMSA, e.g. through a
+deliberate Destroy or a failed Create event.  KVM marks the vCPU HALTED so
+that *KVM* doesn't run the vCPU, but nothing prevents a misbehaving VMM
+from manually making the vCPU RUNNABLE via KVM_SET_MP_STATE.
 
-Update the comment to explain the dangers, and hopefully prevent breaking
-KVM in the future.
-
+Fixes: e366f92ea99e ("KVM: SEV: Support SEV-SNP AP Creation NAE event")
+Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ arch/x86/kvm/svm/sev.c | 18 +++++++++++++++---
+ arch/x86/kvm/svm/svm.c |  7 +++++--
+ arch/x86/kvm/svm/svm.h |  2 +-
+ 3 files changed, 21 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index e3606d072735..6c6d45e13858 100644
+index 6c6d45e13858..e14a37dbc6ea 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -4594,18 +4594,21 @@ void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm, struct sev_es_save_are
- 	/*
- 	 * If DebugSwap is enabled, debug registers are loaded but NOT saved by
- 	 * the CPU (Type-B). If DebugSwap is disabled/unsupported, the CPU both
--	 * saves and loads debug registers (Type-A).  Sadly, on CPUs without
--	 * ALLOWED_SEV_FEATURES, KVM can't prevent SNP guests from enabling
--	 * DebugSwap on secondary vCPUs without KVM's knowledge via "AP Create",
--	 * and so KVM must save DRs if DebugSwap is supported to prevent DRs
--	 * from being clobbered by a misbehaving guest.
-+	 * saves and loads debug registers (Type-A).  Sadly, KVM can't prevent
-+	 * SNP guests from lying about DebugSwap on secondary vCPUs, i.e. the
-+	 * SEV_FEATURES provided at "AP Create" isn't guaranteed to match what
-+	 * the guest has actually enabled (or not!) in the VMSA.
-+	 *
-+	 * If DebugSwap is *possible*, save the masks so that they're restored
-+	 * if the guest enables DebugSwap.  But for the DRs themselves, do NOT
-+	 * rely on the CPU to restore the host values; KVM will restore them as
-+	 * needed in common code, via hw_breakpoint_restore().  Note, KVM does
-+	 * NOT support virtualizing Breakpoint Extensions, i.e. the mask MSRs
-+	 * don't need to be restored per se, KVM just needs to ensure they are
-+	 * loaded with the correct values *if* the CPU writes the MSRs.
+@@ -3452,10 +3452,21 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+ 	svm->sev_es.ghcb = NULL;
+ }
+ 
+-void pre_sev_run(struct vcpu_svm *svm, int cpu)
++int pre_sev_run(struct vcpu_svm *svm, int cpu)
+ {
+ 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
+-	unsigned int asid = sev_get_asid(svm->vcpu.kvm);
++	struct kvm *kvm = svm->vcpu.kvm;
++	unsigned int asid = sev_get_asid(kvm);
++
++	/*
++	 * Terminate the VM if userspace attempts to run the vCPU with an
++	 * invalid VMSA, e.g. if userspace forces the vCPU to be RUNNABLE after
++	 * an SNP AP Destroy event.
++	 */
++	if (sev_es_guest(kvm) && !VALID_PAGE(svm->vmcb->control.vmsa_pa)) {
++		kvm_vm_dead(kvm);
++		return -EIO;
++	}
+ 
+ 	/* Assign the asid allocated with this SEV guest */
+ 	svm->asid = asid;
+@@ -3468,11 +3479,12 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
  	 */
- 	if (sev_vcpu_has_debug_swap(svm) ||
- 	    (sev_snp_guest(kvm) && cpu_feature_enabled(X86_FEATURE_DEBUG_SWAP))) {
--		hostsa->dr0 = native_get_debugreg(0);
--		hostsa->dr1 = native_get_debugreg(1);
--		hostsa->dr2 = native_get_debugreg(2);
--		hostsa->dr3 = native_get_debugreg(3);
- 		hostsa->dr0_addr_mask = amd_get_dr_addr_mask(0);
- 		hostsa->dr1_addr_mask = amd_get_dr_addr_mask(1);
- 		hostsa->dr2_addr_mask = amd_get_dr_addr_mask(2);
+ 	if (sd->sev_vmcbs[asid] == svm->vmcb &&
+ 	    svm->vcpu.arch.last_vmentry_cpu == cpu)
+-		return;
++		return 0;
+ 
+ 	sd->sev_vmcbs[asid] = svm->vmcb;
+ 	svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
+ 	vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
++	return 0;
+ }
+ 
+ #define GHCB_SCRATCH_AREA_LIMIT		(16ULL * PAGE_SIZE)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b8aa0f36850f..46e0b65a9fec 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3587,7 +3587,7 @@ static int svm_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+ 	return svm_invoke_exit_handler(vcpu, exit_code);
+ }
+ 
+-static void pre_svm_run(struct kvm_vcpu *vcpu)
++static int pre_svm_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -3609,6 +3609,8 @@ static void pre_svm_run(struct kvm_vcpu *vcpu)
+ 	/* FIXME: handle wraparound of asid_generation */
+ 	if (svm->current_vmcb->asid_generation != sd->asid_generation)
+ 		new_asid(svm, sd);
++
++	return 0;
+ }
+ 
+ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
+@@ -4231,7 +4233,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu,
+ 	if (force_immediate_exit)
+ 		smp_send_reschedule(vcpu->cpu);
+ 
+-	pre_svm_run(vcpu);
++	if (pre_svm_run(vcpu))
++		return EXIT_FASTPATH_EXIT_USERSPACE;
+ 
+ 	sync_lapic_to_cr8(vcpu);
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 5b159f017055..e51852977b70 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -713,7 +713,7 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu);
+ 
+ /* sev.c */
+ 
+-void pre_sev_run(struct vcpu_svm *svm, int cpu);
++int pre_sev_run(struct vcpu_svm *svm, int cpu);
+ void sev_init_vmcb(struct vcpu_svm *svm);
+ void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm);
+ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
 -- 
 2.48.1.601.g30ceb7b040-goog
 
