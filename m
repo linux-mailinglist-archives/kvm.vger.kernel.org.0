@@ -1,146 +1,131 @@
-Return-Path: <kvm+bounces-38521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 881C4A3AE42
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:01:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3657A3AE67
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:04:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1806D3B67B8
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 00:58:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D60653B362C
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 01:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804D613D891;
-	Wed, 19 Feb 2025 00:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FEF31B2180;
+	Wed, 19 Feb 2025 00:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W6Yss6n0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iHdvqZpV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C071EA80;
-	Wed, 19 Feb 2025 00:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1621ADC99
+	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 00:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739926160; cv=none; b=IfCfMD+bq7HEVT6jm5RO49djtFyJ5IsK8KAk6ERkrB7WvpF9eULausG5Z6jBCaD9rcRe1a8pxQBff/g3IeJL+c4FJ9Ad64O9rvtlTrWADMLwTuUrtS87STTrI3V7H1z2v/8x+Pzn1S2XslXNo96OL+gIoQeMn9Gjsolnel34vbo=
+	t=1739926496; cv=none; b=g9BzMVq0eVzlMRc7GCN0bIk1ntOdVB2O6jNFuFXW9BgWS5O2AuWX3CB9PF8czilyp0XmixmxS4r8N+bnEidyUJu78+dEuRMbSB+dtOxrMxe6L/473UeNCVHGg6Z2k40nEtP2wCtoxHczSTs6U9oR/Z948c+/QFhQkWgW2k3hWxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739926160; c=relaxed/simple;
-	bh=k1xCUsS2F2OsNYMqSP+OtTM/+hdWDceq8oFCTxeLIIM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RodZrdSj3RQMEIhF2hUAJyKxpgXVfEEff1QO5eIgGzUGGMrdmWHEHYEBMZ569Rj5xDscpjRtGUz9erF2eCo4leTc+DjKzL5/evVrlvLSmsc7VO4VGQLVdrih7Vuh6w6t0nYGtL5WN3MuGPmHEplccWBWpuRD0JocjFU3A0gGRLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W6Yss6n0; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739926159; x=1771462159;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=k1xCUsS2F2OsNYMqSP+OtTM/+hdWDceq8oFCTxeLIIM=;
-  b=W6Yss6n0mFjDutU4r8pdYjx/Acr5b4N9EyO1rQi/V7uqvjgrr/9ySDIz
-   IQnT3pXWfN/kOdPdFfa/ik07zyb8/wDPrgQ+HOqxEj80zhChg3KzLZedn
-   EjqckOtM0NwzP9x9jK1N2lB50fKCv0tfOV5yMCAmyd6rwcGhlk5oUiusz
-   uYat/Wrswu0vLeSxRONCfzX4ocWZBJELpZIPk7p7VHwbUp2oNr8BFGvq2
-   PqzfSh5gq1E34g2Jb5cmOFPXQYSF4VqPAbrANzOeKJg3j9f/zO4kj7QOa
-   QesX9yx1NZ0/sC9guvZbseBbHW1b0lUljIFouLmfVJmIPHKAUqig1Ttgb
-   Q==;
-X-CSE-ConnectionGUID: XQ3RQXehTOOq1ZrtXR3vJg==
-X-CSE-MsgGUID: ASKYU5trR2CEWO44+bfJig==
-X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="28247626"
-X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
-   d="scan'208";a="28247626"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 16:49:18 -0800
-X-CSE-ConnectionGUID: 8UOiHrkRSQKRytG03nycyg==
-X-CSE-MsgGUID: 3M8iqulnRfatjUAiyw3EpA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
-   d="scan'208";a="145409494"
-Received: from unknown (HELO [10.238.9.235]) ([10.238.9.235])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 16:49:15 -0800
-Message-ID: <cbda86c4-f56f-4142-93eb-12736b2e3719@linux.intel.com>
-Date: Wed, 19 Feb 2025 08:49:12 +0800
+	s=arc-20240116; t=1739926496; c=relaxed/simple;
+	bh=x3RPoMgClhFCt1lMFR9y6/g2w/dNOeOD2RyoSpfCcNQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CN11V0e6Z5WjSexGLSNtCYwTimx17JF300Je5HXrubrBccfbqPM+M9oAu00GM30TigB45Sprugj92mHEbrcrRg8mRrmEZexLPupQsLAWAflv3ZIQ5OvHDlXWjoX5SEoCp/LAWdBzh6zf/w274TDV+2/aVtter2e1a3aUHXpeGRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iHdvqZpV; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-221063a808dso69310625ad.1
+        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 16:54:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739926493; x=1740531293; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t46C7YC0Fd2kjhrwUymr7qDRo6+1mzmJx//VkrOA+Ek=;
+        b=iHdvqZpV75I1ZIck3eCmNFFNQCGqZrDDrRKRLFoAoJLXLTmwlWwHEJwlnig6U64O5D
+         3/J3A+kPtyqaOmmy+nAHacpf6jQM72h0LF1Zb039yX/qxIWKpm0HfgM23gCJBvdeQJ5t
+         EGrMxB70S34OJtpjTwI4WHzy2zGTPZaQRE+WRXhfl+eWNNTQUbQWXmve/pb5Q0qja5On
+         X0oyjuAT1BJJh/IyTqKzDP2gKYB91ShFtH3oNdiZrcZmob064hxYoZ3oJtRJbAIeY+Mb
+         CPBkvygSCMj3KIqeZaneu8l42a4iE06//N7C44chUeN5cPBBhNsDEVVlgpF1R8L9AbKU
+         Tjrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739926493; x=1740531293;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t46C7YC0Fd2kjhrwUymr7qDRo6+1mzmJx//VkrOA+Ek=;
+        b=fB6dvVpzkIta1H8J0u7X/x9k7HCcZRY5iEdjMCz4DOUXgRe42suXwGypIcb5BqDx1I
+         Hd0C8cXBeZcSBSJsxc41XUwCv3hIe+Nb4XKQa5lxhxvkwGvjXJ2UoXa+lu5SFirMAVA4
+         yzsd0Qd1YidW0nWNc8oYauYwA3dlVU//2wxGbRyN89ennDg9P2NwS3KG/7QU45Hzms6V
+         GqAmeUG2AJpL0yi+PxfeC3kLZSiwtm5W5s039zcfk+wz+msbWqK9sC06GUCp8olfSeg9
+         7/x84PMylca/nit/NY3JRjmMbFS4d4DMJlae33PJMhYlC68N5oLQ4R6X/JchWD50OtjE
+         vBdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVtiSJCdNEhWdxW2B1hf8PlGktbL26EFlWVzmJLIutXA386G/2NHPFyycdPg3MPoEaWS4w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxccVQpu5AS5mlmCYl1ZS04pY7DFIgoZXQCdE1VRsk2b29+MXyy
+	+++pS3dch5we3gh03uDyV0AzmnjjOaS+bqwBxv0cJDyDffwOn6h3yr8nq7gjjhhaXouGGOiWLCY
+	Elg==
+X-Google-Smtp-Source: AGHT+IFoS17LPJHddOQYgLraCie+jUqiUNgSY4BvAPXCIbSdRL9BrOE7UFqk4VCrHI3npo5kmzEKCjCQGtA=
+X-Received: from pfbkq16.prod.google.com ([2002:a05:6a00:4b10:b0:730:98b0:1c58])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:7a4c:b0:1ee:c8e7:203c
+ with SMTP id adf61e73a8af0-1eec8e7219amr8474405637.24.1739926493632; Tue, 18
+ Feb 2025 16:54:53 -0800 (PST)
+Date: Tue, 18 Feb 2025 16:54:52 -0800
+In-Reply-To: <e3136d20-977a-4e2d-ad7b-c04be1dca1db@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 5/8] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
- pbonzini@redhat.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com,
- kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com,
- xiaoyao.li@intel.com, tony.lindgren@intel.com, isaku.yamahata@intel.com,
- linux-kernel@vger.kernel.org
-References: <Z6r0Q/zzjrDaHfXi@yzhao56-desk.sh.intel.com>
- <926a035f-e375-4164-bcd8-736e65a1c0f7@linux.intel.com>
- <Z6sReszzi8jL97TP@intel.com> <Z6vvgGFngGjQHwps@google.com>
- <3033f048-6aa8-483a-b2dc-37e8dfb237d5@linux.intel.com>
- <Z6zu8liLTKAKmPwV@google.com>
- <f12e1c06-d38d-4ed0-b471-7f016057f604@linux.intel.com>
- <c47f0fa1-b400-4186-846e-84d0470d887e@linux.intel.com>
- <Z64M_r64CCWxSD5_@google.com>
- <bcb80309-10ec-44e3-90db-259de6076183@linux.intel.com>
- <Z7Ul9ORPitXpQAV5@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <Z7Ul9ORPitXpQAV5@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20250203223205.36121-1-prsampat@amd.com> <20250203223205.36121-10-prsampat@amd.com>
+ <Z6wIDsbjt2ZaiX0I@google.com> <e3136d20-977a-4e2d-ad7b-c04be1dca1db@amd.com>
+Message-ID: <Z7Ur3HyM15vFBEvR@google.com>
+Subject: Re: [PATCH v6 9/9] KVM: selftests: Add a basic SEV-SNP smoke test
+From: Sean Christopherson <seanjc@google.com>
+To: Pratik Rajesh Sampat <prsampat@amd.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	pbonzini@redhat.com, thomas.lendacky@amd.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, shuah@kernel.org, 
+	pgonda@google.com, ashish.kalra@amd.com, nikunj@amd.com, pankaj.gupta@amd.com, 
+	michael.roth@amd.com, sraithal@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
+On Fri, Feb 14, 2025, Pratik Rajesh Sampat wrote:
+> 
+> 
+> On 2/11/25 8:31 PM, Sean Christopherson wrote:
+> > On Mon, Feb 03, 2025, Pratik R. Sampat wrote:
+> >> @@ -217,5 +244,20 @@ int main(int argc, char *argv[])
+> >>  		}
+> >>  	}
+> >>  
+> >> +	if (kvm_cpu_has(X86_FEATURE_SEV_SNP)) {
+> >> +		uint64_t snp_policy = snp_default_policy();
+> >> +
+> >> +		test_snp(snp_policy);
+> >> +		/* Test minimum firmware level */
+> >> +		test_snp(snp_policy | SNP_FW_VER_MAJOR(SNP_MIN_API_MAJOR) |
+> >> +			SNP_FW_VER_MINOR(SNP_MIN_API_MINOR));
+> > 
+> > Ah, this is where the firmware policy stuff is used.  Refresh me, can userspace
+> > request _any_ major/minor as the min, and expect failure if the version isn't
+> > supported?  If so, the test should iterate over the major/minor combinations that
+> > are guaranteed to fail.  And if userspace can query the supported minor/major,
+> > the test should iterate over all the happy versions too. 
+> > 
+> 
+> Yes, any policy greater than the min policy (defined in sev-dev.c)
+> should be supported. The sad path tests were intended to be added in the
+> upcoming negative test patch series so that we could have the proper
+> infrastructure to handle and report failures.
+> 
+> > Unless there's nothing interesting to test, I would move the major/minor stuff to
+> > a separate patch.
+> 
+> Would you rather prefer I do the happy tests here (something like -
+> min_policy and min_policy + 1?) and defer the failure tests for the
+> next patchset? Or, I can remove policy testing from here entirely and
+> introduce it only when the sad path testing infrastructure is ready, so
+> that we can test this completely at once?
 
-
-On 2/19/2025 8:29 AM, Sean Christopherson wrote:
-> On Mon, Feb 17, 2025, Binbin Wu wrote:
->> On 2/13/2025 11:17 PM, Sean Christopherson wrote:
->>> On Thu, Feb 13, 2025, Binbin Wu wrote:
->>>> On 2/13/2025 11:23 AM, Binbin Wu wrote:
->>>>> On 2/13/2025 2:56 AM, Sean Christopherson wrote:
->>>>>> On Wed, Feb 12, 2025, Binbin Wu wrote:
->>>>>>> On 2/12/2025 8:46 AM, Sean Christopherson wrote:
->>>>>>>> I am completely comfortable saying that KVM doesn't care about STI/SS shadows
->>>>>>>> outside of the HALTED case, and so unless I'm missing something, I think it makes
->>>>>>>> sense for tdx_protected_apic_has_interrupt() to not check RVI outside of the HALTED
->>>>>>>> case, because it's impossible to know if the interrupt is actually unmasked, and
->>>>>>>> statistically it's far, far more likely that it _is_ masked.
->>>>>>> OK. Will update tdx_protected_apic_has_interrupt() in "TDX interrupts" part.
->>>>>>> And use kvm_vcpu_has_events() to replace the open code in this patch.
->>>>>> Something to keep an eye on: kvm_vcpu_has_events() returns true if pv_unhalted
->>>>>> is set, and pv_unhalted is only cleared on transitions KVM_MP_STATE_RUNNABLE.
->>>>>> If the guest initiates a spurious wakeup, pv_unhalted could be left set in
->>>>>> perpetuity.
->>>>> Oh, yes.
->>>>> KVM_HC_KICK_CPU is allowed in TDX guests.
->>> And a clever guest can send a REMRD IPI.
->>>
->>>>> The change below looks good to me.
->>>>>
->>>>> One minor issue is when guest initiates a spurious wakeup, pv_unhalted is
->>>>> left set, then later when the guest want to halt the vcpu, in
->>>>> __kvm_emulate_halt(), since pv_unhalted is still set and the state will not
->>>>> transit to KVM_MP_STATE_HALTED.
->>>>> But I guess it's guests' responsibility to not initiate spurious wakeup,
->>>>> guests need to bear the fact that HLT could fail due to a previous
->>>>> spurious wakeup?
->>>> Just found a patch set for fixing the issue.
->>> FWIW, Jim's series doesn't address spurious wakeups per se, it just ensures
->>> pv_unhalted is cleared when transitioning to RUNNING.  If the vCPU is already
->>> RUNNING, __apic_accept_irq() will set pv_unhalted and nothing will clear it
->>> until the next transition to RUNNING (which implies at least an attempted
->>> transition away from RUNNING).
->>>
->> Indeed.
->>
->> I am wondering why KVM doesn't clear pv_unhalted before the vcpu entering guest?
->> Is the additional memory access a concern or is there some other reason?
-> Not clearing pv_unhalted when entering the guest is necessary to avoid races.
-> Stating the obvious, the guest must set up all of its lock tracking before executing
-> HLT, which means that the soon-to-be-blocking vCPU is eligible for wakeup *before*
-> it executes HLT.  If an asynchronous exit happens on the vCPU at just the right
-> time, KVM could clear pv_unhalted before the vCPU executes HLT.
->
-Got it.
-Thanks for the explanation.
+Let's do the latter.  For the initial series, do the bare minimum so that we can
+get that merged, and then focus on the min API version stuff in a separate series.
+The version testing shouldn't be terribly complex, but it doesn't seem like it's
+entirely trivial either, and I don't want it to block the base SNP support.
 
