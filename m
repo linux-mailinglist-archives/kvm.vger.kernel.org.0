@@ -1,120 +1,146 @@
-Return-Path: <kvm+bounces-38520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F75A3AD59
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 01:45:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 881C4A3AE42
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 02:01:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 569DA7A48B2
-	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 00:44:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1806D3B67B8
+	for <lists+kvm@lfdr.de>; Wed, 19 Feb 2025 00:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2E81C28E;
-	Wed, 19 Feb 2025 00:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804D613D891;
+	Wed, 19 Feb 2025 00:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KB6aLtoS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W6Yss6n0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB9D18E25
-	for <kvm@vger.kernel.org>; Wed, 19 Feb 2025 00:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C071EA80;
+	Wed, 19 Feb 2025 00:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739925926; cv=none; b=nt/NCjQkqVGCFuJ6T/lzDg+uBPnIirqLiYqBFXkz2TffsHFR1jbw7kOdnXPT0crCLMQJwIrlSc2MwilanVFyL+V78mPHaxeEk2Okmuua5hpU3mBN1DbxJy8Ac8Ovyujl9GnZIMP2saQTw+fW4uH8BaXYKO73PaVxtfwJLNz8hl0=
+	t=1739926160; cv=none; b=IfCfMD+bq7HEVT6jm5RO49djtFyJ5IsK8KAk6ERkrB7WvpF9eULausG5Z6jBCaD9rcRe1a8pxQBff/g3IeJL+c4FJ9Ad64O9rvtlTrWADMLwTuUrtS87STTrI3V7H1z2v/8x+Pzn1S2XslXNo96OL+gIoQeMn9Gjsolnel34vbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739925926; c=relaxed/simple;
-	bh=3M5UDQfg0sp9lQXr0KjmgRQd5FJZVJKKkiFAVoFbtO8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JcysHbOqmOsOjw2PuwBZbDhka5PwSvnFNchtscBVApqgxLt9hdZDqIn7i26FTboHLcoMumovZDIvtRaB6/s8jChOHY8V3n/YGQE/bHSPb7V7SwFbKIAefH0aw9xjlueFRdW4HUvwICwqDdxQKo2vp1pj8h0Pa/y0dBTviL8Oge4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KB6aLtoS; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220c1f88eb4so97541985ad.2
-        for <kvm@vger.kernel.org>; Tue, 18 Feb 2025 16:45:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739925924; x=1740530724; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sBRMaCn5o1DpxcSOQS/VRERdVleuCYVww7nQ6v8c5zE=;
-        b=KB6aLtoSSzpTP/rpOl2eQzd8GIBfmiWGFfuan9bgdUWdc9z9HqqTvdkHVOnaKA87cD
-         zwDnbkXsaECOrGoBuFvgRGqTdflho1I+C08vCzCpeQO1O5ysNxkVTRo5Bby590mXBWR2
-         90DUAn+Ko+kWAevYEjb1yGDt6kIuoCWZssvFRVc2EPs9dirt/r8ouFJRrCW2UfsuMQMB
-         bZdZ0eTqNWTDNAObHh4fYGpZQAx7vbImmG7hFIGdI2Gzp0pcfc91rH2P4IDFRZPmoLdY
-         0vdp98EwTFYrsECGD/UXAXCgDGXU9gFygUuX2nkQmIhBfrFIBxq3TgQ06yUuH1UdV+DW
-         cMCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739925924; x=1740530724;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sBRMaCn5o1DpxcSOQS/VRERdVleuCYVww7nQ6v8c5zE=;
-        b=KxuUx2lqF0t333pwPr+Vm87tyHOqcLVu5pj38IpxAetarVP0REYE4sfnwNqRepkzuj
-         7ht0hFVyKTRCfYwYu+x8acscS0EYu5rI2f8LIRld818Hxjhif/MGl4FzGQInckOi5fuu
-         m0NT+TbxXLn1+n0WGuWXgMUUUtwggMosSd+adcj1ELQhU9tesu0LFZd5MmInkaSgLgZw
-         OSZQd7KfRRCQmWD9EpyRYAcQ6acya9Axmj3dbf3D9467vJmorNWohJ7WD1KzHYhI33Xw
-         5TpVDRiYw8WAPeAlwG1XSHDFuQB1tGpZA2f3VlNO6ZB965hMsdMYt3cx/2L/aB3UjHrE
-         Um8g==
-X-Gm-Message-State: AOJu0YyvHtnebxJvH/tOgyMmA/WRp5tzdmqxG49Ltu6aiB5ohI27tgsD
-	9kmPkUPV59Rb8jxnfxAeyS9JPvyvXTdDGTB213ezoUcmFiudLaI1nTZZNH0uV1qEflBBnoJ18pK
-	GOg==
-X-Google-Smtp-Source: AGHT+IHBr3WVUE0ntZOA12RfNWs7lRIHJhiglgS3OKjbhHt/2g5JIXQEORMMT93hudi8sgzbfHYK3QUPJXs=
-X-Received: from pge8.prod.google.com ([2002:a05:6a02:2d08:b0:ad8:838f:18fa])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d74d:b0:1ee:62e4:78cc
- with SMTP id adf61e73a8af0-1eed4fd3c50mr3189859637.36.1739925924636; Tue, 18
- Feb 2025 16:45:24 -0800 (PST)
-Date: Tue, 18 Feb 2025 16:45:23 -0800
-In-Reply-To: <186facf21094071fef085a7b5bad477271b0be8f.camel@redhat.com>
+	s=arc-20240116; t=1739926160; c=relaxed/simple;
+	bh=k1xCUsS2F2OsNYMqSP+OtTM/+hdWDceq8oFCTxeLIIM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RodZrdSj3RQMEIhF2hUAJyKxpgXVfEEff1QO5eIgGzUGGMrdmWHEHYEBMZ569Rj5xDscpjRtGUz9erF2eCo4leTc+DjKzL5/evVrlvLSmsc7VO4VGQLVdrih7Vuh6w6t0nYGtL5WN3MuGPmHEplccWBWpuRD0JocjFU3A0gGRLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W6Yss6n0; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739926159; x=1771462159;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=k1xCUsS2F2OsNYMqSP+OtTM/+hdWDceq8oFCTxeLIIM=;
+  b=W6Yss6n0mFjDutU4r8pdYjx/Acr5b4N9EyO1rQi/V7uqvjgrr/9ySDIz
+   IQnT3pXWfN/kOdPdFfa/ik07zyb8/wDPrgQ+HOqxEj80zhChg3KzLZedn
+   EjqckOtM0NwzP9x9jK1N2lB50fKCv0tfOV5yMCAmyd6rwcGhlk5oUiusz
+   uYat/Wrswu0vLeSxRONCfzX4ocWZBJELpZIPk7p7VHwbUp2oNr8BFGvq2
+   PqzfSh5gq1E34g2Jb5cmOFPXQYSF4VqPAbrANzOeKJg3j9f/zO4kj7QOa
+   QesX9yx1NZ0/sC9guvZbseBbHW1b0lUljIFouLmfVJmIPHKAUqig1Ttgb
+   Q==;
+X-CSE-ConnectionGUID: XQ3RQXehTOOq1ZrtXR3vJg==
+X-CSE-MsgGUID: ASKYU5trR2CEWO44+bfJig==
+X-IronPort-AV: E=McAfee;i="6700,10204,11348"; a="28247626"
+X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
+   d="scan'208";a="28247626"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 16:49:18 -0800
+X-CSE-ConnectionGUID: 8UOiHrkRSQKRytG03nycyg==
+X-CSE-MsgGUID: 3M8iqulnRfatjUAiyw3EpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,296,1732608000"; 
+   d="scan'208";a="145409494"
+Received: from unknown (HELO [10.238.9.235]) ([10.238.9.235])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2025 16:49:15 -0800
+Message-ID: <cbda86c4-f56f-4142-93eb-12736b2e3719@linux.intel.com>
+Date: Wed, 19 Feb 2025 08:49:12 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241002235658.215903-1-mlevitsk@redhat.com> <186facf21094071fef085a7b5bad477271b0be8f.camel@redhat.com>
-Message-ID: <Z7Upo-tRPav0rJ4T@google.com>
-Subject: Re: [kvm-unit-tests PATCH] pmu_lbr: drop check for MSR_LBR_TOS != 0
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/8] KVM: TDX: Handle TDG.VP.VMCALL<MapGPA>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Chao Gao <chao.gao@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ pbonzini@redhat.com, kvm@vger.kernel.org, rick.p.edgecombe@intel.com,
+ kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com,
+ xiaoyao.li@intel.com, tony.lindgren@intel.com, isaku.yamahata@intel.com,
+ linux-kernel@vger.kernel.org
+References: <Z6r0Q/zzjrDaHfXi@yzhao56-desk.sh.intel.com>
+ <926a035f-e375-4164-bcd8-736e65a1c0f7@linux.intel.com>
+ <Z6sReszzi8jL97TP@intel.com> <Z6vvgGFngGjQHwps@google.com>
+ <3033f048-6aa8-483a-b2dc-37e8dfb237d5@linux.intel.com>
+ <Z6zu8liLTKAKmPwV@google.com>
+ <f12e1c06-d38d-4ed0-b471-7f016057f604@linux.intel.com>
+ <c47f0fa1-b400-4186-846e-84d0470d887e@linux.intel.com>
+ <Z64M_r64CCWxSD5_@google.com>
+ <bcb80309-10ec-44e3-90db-259de6076183@linux.intel.com>
+ <Z7Ul9ORPitXpQAV5@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <Z7Ul9ORPitXpQAV5@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 18, 2025, Maxim Levitsky wrote:
-> On Wed, 2024-10-02 at 19:56 -0400, Maxim Levitsky wrote:
-> > While this is not likely, it is valid for the MSR_LBR_TOS
-> > to contain 0 value, after a test which issues a series of branches, if the
-> > number of branches recorded was divisible by the number of LBR msrs.
-> > 
-> > This unfortunately depends on the compiler, the number of LBR registers,
-> > and it is not even deterministic between different runs of the test,
-> > because interrupts, rescheduling, and various other events can affect total
-> > number of branches done.
-> > 
-> > Therefore drop the check, instead of trying to fix it.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  x86/pmu_lbr.c | 1 -
-> >  1 file changed, 1 deletion(-)
-> > 
-> > diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
-> > index c6f010847..8ca8ed044 100644
-> > --- a/x86/pmu_lbr.c
-> > +++ b/x86/pmu_lbr.c
-> > @@ -98,7 +98,6 @@ int main(int ac, char **av)
-> >  	lbr_test();
-> >  	wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
-> >  
-> > -	report(rdmsr(MSR_LBR_TOS) != 0, "The guest LBR MSR_LBR_TOS value is good.");
-> >  	for (i = 0; i < max; ++i) {
-> >  		if (!rdmsr(lbr_to + i) || !rdmsr(lbr_from + i))
-> >  			break;
-> 
-> Hi,
-> 
-> This is the other kvm-unit-tests patch that I have a ticket open for,
-> and I would like to get this merged and close the ticket.
 
-I'll grab it.  I'm hoping to get the pull request put together tomorrow, but I
-might not get to it until Thusrday.
+
+On 2/19/2025 8:29 AM, Sean Christopherson wrote:
+> On Mon, Feb 17, 2025, Binbin Wu wrote:
+>> On 2/13/2025 11:17 PM, Sean Christopherson wrote:
+>>> On Thu, Feb 13, 2025, Binbin Wu wrote:
+>>>> On 2/13/2025 11:23 AM, Binbin Wu wrote:
+>>>>> On 2/13/2025 2:56 AM, Sean Christopherson wrote:
+>>>>>> On Wed, Feb 12, 2025, Binbin Wu wrote:
+>>>>>>> On 2/12/2025 8:46 AM, Sean Christopherson wrote:
+>>>>>>>> I am completely comfortable saying that KVM doesn't care about STI/SS shadows
+>>>>>>>> outside of the HALTED case, and so unless I'm missing something, I think it makes
+>>>>>>>> sense for tdx_protected_apic_has_interrupt() to not check RVI outside of the HALTED
+>>>>>>>> case, because it's impossible to know if the interrupt is actually unmasked, and
+>>>>>>>> statistically it's far, far more likely that it _is_ masked.
+>>>>>>> OK. Will update tdx_protected_apic_has_interrupt() in "TDX interrupts" part.
+>>>>>>> And use kvm_vcpu_has_events() to replace the open code in this patch.
+>>>>>> Something to keep an eye on: kvm_vcpu_has_events() returns true if pv_unhalted
+>>>>>> is set, and pv_unhalted is only cleared on transitions KVM_MP_STATE_RUNNABLE.
+>>>>>> If the guest initiates a spurious wakeup, pv_unhalted could be left set in
+>>>>>> perpetuity.
+>>>>> Oh, yes.
+>>>>> KVM_HC_KICK_CPU is allowed in TDX guests.
+>>> And a clever guest can send a REMRD IPI.
+>>>
+>>>>> The change below looks good to me.
+>>>>>
+>>>>> One minor issue is when guest initiates a spurious wakeup, pv_unhalted is
+>>>>> left set, then later when the guest want to halt the vcpu, in
+>>>>> __kvm_emulate_halt(), since pv_unhalted is still set and the state will not
+>>>>> transit to KVM_MP_STATE_HALTED.
+>>>>> But I guess it's guests' responsibility to not initiate spurious wakeup,
+>>>>> guests need to bear the fact that HLT could fail due to a previous
+>>>>> spurious wakeup?
+>>>> Just found a patch set for fixing the issue.
+>>> FWIW, Jim's series doesn't address spurious wakeups per se, it just ensures
+>>> pv_unhalted is cleared when transitioning to RUNNING.  If the vCPU is already
+>>> RUNNING, __apic_accept_irq() will set pv_unhalted and nothing will clear it
+>>> until the next transition to RUNNING (which implies at least an attempted
+>>> transition away from RUNNING).
+>>>
+>> Indeed.
+>>
+>> I am wondering why KVM doesn't clear pv_unhalted before the vcpu entering guest?
+>> Is the additional memory access a concern or is there some other reason?
+> Not clearing pv_unhalted when entering the guest is necessary to avoid races.
+> Stating the obvious, the guest must set up all of its lock tracking before executing
+> HLT, which means that the soon-to-be-blocking vCPU is eligible for wakeup *before*
+> it executes HLT.  If an asynchronous exit happens on the vCPU at just the right
+> time, KVM could clear pv_unhalted before the vCPU executes HLT.
+>
+Got it.
+Thanks for the explanation.
 
