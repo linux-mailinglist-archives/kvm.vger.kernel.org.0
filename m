@@ -1,662 +1,696 @@
-Return-Path: <kvm+bounces-38640-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38641-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAAE6A3CFC9
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 04:03:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BEA7A3D104
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 06:50:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8709C188A624
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 03:03:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3CFA1890463
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 05:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D998E1CB51B;
-	Thu, 20 Feb 2025 03:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C951E2611;
+	Thu, 20 Feb 2025 05:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MRWILDYu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LoCagbYm"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2065.outbound.protection.outlook.com [40.107.223.65])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84CC10FD
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 03:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740020591; cv=fail; b=YL6J2Mb84abqv/uGhLHHANCZeHrR1/Van22P2uDfVNkWCyBn4EBIaMADGmozdfoAsOGL0URCAByypSE9hG0gmSh7YfwzFrNSiwJGE1rdtyM/9By0Cux1w4OqxPwcxX6Jx7uslpoOCEVaPYv+2mNymgNi/tD857I9KmSHbyBpr6w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740020591; c=relaxed/simple;
-	bh=ZPzepOKgkMmTAwusCztHGGZZevitLRl9xnP8i6qqDwA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=KUt7fiviawSrwIlgQX7oXBf10P6IVl3zeujipmebW0/xZQRpsHK4I7hrDht9R9/yM0g5OdRnt9oIlPjPdDS7jyJUKa+LquLsUIjaIJiXVqy4/gEl4VoObylOhtYaD00RHbgdDTmQ1KDtwMzv3zUPNRvV34REbDgVAu5WAtO2MFk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MRWILDYu; arc=fail smtp.client-ip=40.107.223.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XxCSRFmTyhO+t6fiXbwsbQP2p5v2iOW1A0uLsTDMtAbecRKDCpQ8l4DSieemG23yv9DFP+5r6LlYPpDKM9rj1mXWRQv+CT70YnqfpUceYLRMbUQklhGMhRRgOTFAhmHj1Ku+ULYn2eg1L1pZuNlMv8mRy6ggkNzxHDcAZsRwnFYOPkUxl+MwK9DGAvkWBBePCFkdmiBTNI7CJDfkU8S5FdiNw8TSLzdyRZCYgqvbomEnMDgzGHsambmI7ZJHSaav3lbRhRDWT0ElX//v0CGBKLtxXGitVjU8V1yt1guLs+fq0cbZCi9dfDQkBteV94YGwxtJubQNDCaLUg7KJXaPGw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RQodD4z6q/4Lk6ff98xUh90lzpoKym8baRhlogKi1s8=;
- b=ZauDuOjS5+khH+ZDHgx+Fzfa0iY9aEBdJS9Doly1DCrsqc0iKUdzFqIs+Er6bzxbth9CHixjy/195TCveNFARXpxMrZoQBMIVU7hqdUDgjOYlyOs7wXoc3eh9XL6K4Q6QIRJvclb3VFYc//ovOGF+238G5YJAV6cVt7psK/cKT81Upt1BBxNGqv1u8BIdcfAvWJ2baKKDbDUqIzQRh6E3n6RATuC95N4HJWjpplyAlwO2vXJBjV2ZFspYQCYMf6l4Bjs5tYr0+DVXPguftxCxEgA+qz/gQWA25pZfRfqaegVRg87c1fp0YoO1JT6va3iH+LWo/Ihk2czQ6XoNA/pZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RQodD4z6q/4Lk6ff98xUh90lzpoKym8baRhlogKi1s8=;
- b=MRWILDYur6LvmgE5w3BjF/7UwdT44gVmXe3iMyg45l6rS8fdJRgGEQ09TY5R2hiVzYCYtDsyGTeU7B+sfXorPGtKRtblDvf1jy7tJ9Rv1CFGbem28NWJmGUjecCD4iHmAKRe3A3BGFnmBRVMba3EBxQ4ODi4sC4P2ZsQPCT07lA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by MW6PR12MB7086.namprd12.prod.outlook.com (2603:10b6:303:238::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.18; Thu, 20 Feb
- 2025 03:03:05 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8445.016; Thu, 20 Feb 2025
- 03:03:05 +0000
-Message-ID: <89e791a5-b71b-4b9d-a8b4-e225bfbd1bc2@amd.com>
-Date: Thu, 20 Feb 2025 14:02:56 +1100
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 3/6] memory-attribute-manager: Introduce
- MemoryAttributeManager to manage RAMBLock with guest_memfd
-Content-Language: en-US
-To: Chenyi Qiang <chenyi.qiang@intel.com>,
- David Hildenbrand <david@redhat.com>, Peter Xu <peterx@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Michael Roth <michael.roth@amd.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Williams Dan J <dan.j.williams@intel.com>,
- Peng Chao P <chao.p.peng@intel.com>, Gao Chao <chao.gao@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Li Xiaoyao <xiaoyao.li@intel.com>
-References: <20250217081833.21568-1-chenyi.qiang@intel.com>
- <20250217081833.21568-4-chenyi.qiang@intel.com>
- <60c9ddb7-7f3e-4066-a165-c583af2411ea@amd.com>
- <c5682028-b84c-4b4c-8c4d-f3b43d412e83@intel.com>
- <23e2553b-0390-4215-a19d-0422b55efa38@amd.com>
- <d410d033-dd1c-43fe-85df-1bdaecf250fd@intel.com>
-From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <d410d033-dd1c-43fe-85df-1bdaecf250fd@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MEWP282CA0069.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:220:1dd::15) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521A8A930;
+	Thu, 20 Feb 2025 05:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740030634; cv=none; b=cVvIawECkywNyEOJI8G3R2Hkgtn8d0RDie4hiNFGoLBGdvOL9b9aqEB3Fw8lJm417gNPRxXWBD1rSVW0X5HYAE4SNUPKG9Fd2aXEuipOZEisXrfOm3cv+4mJfLcBmG2T0ylp/rBCl0kYNLKGk2AdXG5DasE/0CyARk3fSYns4sg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740030634; c=relaxed/simple;
+	bh=U+5M+vqypOZJDPsf+vu1hgdXyegXZEK1rQU8Y2jt+zA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WgLJATcUeECu3A5RtwbYjdGJDlgbELi2ooyYVa3dNjP77LIh6VsHdtZLkL93BGy61ihqYttUOjVLGN5Y5QyFXRtfyCrPvL5i9cMwpXCcUZqMe87VFFKjjUyajcBDpK8MaxYvaBDi0ug7wVZByOyYidh5qYK0/kwoUskjGAAwUec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LoCagbYm; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740030632; x=1771566632;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=U+5M+vqypOZJDPsf+vu1hgdXyegXZEK1rQU8Y2jt+zA=;
+  b=LoCagbYmlDiVuHUYXZi6zo7SPwYbuOguvzAmNuHNPDJwMti843qK2IJT
+   4N2nvr9iSGAVMPimJBbZl9482EB00a1DEzHdY1Og91eSroJK6zQIVcBVO
+   cPKPpYfpjXromI3S9Hhkqw2yK0AfHxLL3dKJh9eC2k0Hb4P3EQ+xBjzu3
+   KMTrhBxjxFwN6duZWwTxDW8QFwG7ONI3iQhjw8fnaWaKzBjEmMmdkA6tt
+   MaclPmr5ujV0ZE7aEb0lp+JB01k8J2/zV96tyBTrXjWytRmWWWZsHOY1q
+   SX/lTKb22y7i+DwG7kEfJkjLKJNXvAFDFYv8vbD6l7HXzWwRriJu50Vmp
+   w==;
+X-CSE-ConnectionGUID: HnWpCWvqROCZ7l7q8MwmdQ==
+X-CSE-MsgGUID: NzH+ZFn9QsqkE6DxUnOdJA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11350"; a="58338299"
+X-IronPort-AV: E=Sophos;i="6.13,300,1732608000"; 
+   d="scan'208";a="58338299"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 21:50:31 -0800
+X-CSE-ConnectionGUID: I2BuGFMCTd+x0fIdquXZug==
+X-CSE-MsgGUID: iIbZapYTSC63ZIWg6mXlww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,300,1732608000"; 
+   d="scan'208";a="114777626"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2025 21:50:28 -0800
+Message-ID: <c88a93e4-3314-4372-bacf-b9b2e234b1da@intel.com>
+Date: Thu, 20 Feb 2025 13:50:24 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|MW6PR12MB7086:EE_
-X-MS-Office365-Filtering-Correlation-Id: 58cb21a4-d7f0-4563-b7d8-08dd515b1884
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|366016|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?eW1PTE1pQTREK0R5NDRkd2I2WDJYT0lvQ2dIOVJhUWE5R2ZDWmZodU9rVDhL?=
- =?utf-8?B?dlA5dndTK2JJNWMwa0Izblc2aXRxK1ZPT0o3elJmUkc5VlcyRXV0OGx6MGhI?=
- =?utf-8?B?YXJoaDhMYmxRRklBUkt3WjgvMmJ0TXZPdXNRNXNGa2ZQNDAyWjJnelM2bEQw?=
- =?utf-8?B?M1drRGhmbW1hbjNYZnJ3elJYTXBJRXgxS0M4WEpJUkdCUVUxQ2tPSFhDRjY1?=
- =?utf-8?B?eU1OKzlKdmNIbmFNSWJPdThUOUg3c2MvTHNMcmZHSFlLeWFrMjFjaDQxR2Y0?=
- =?utf-8?B?STBHVWtLdnVlU2VLaWNSV00wdnQrN29Sb043OVZCRkFSVDkwOHhZUm5MUmly?=
- =?utf-8?B?dzRHdElEV3NsUkZZQ1Z3OHNaN2FCUmk2WWhjL2ROZktvaFBoUnI5SDFBaWtF?=
- =?utf-8?B?RnAyNGptTi9BeW5vU0dhZFpYeUtXbFpRR2J0VVZwSVdHQVlZUVYxQ2M3alBJ?=
- =?utf-8?B?bUV1SVNZOFpWemd1OGZBL2xZejYvbUo2aElSY09neEpLeHhqS2owRlM0djFG?=
- =?utf-8?B?blpIT3NwbjQ5R2lRQXVTNXRxK0pEd0Z1UzBCdmk0Zy9XZFh1NHhNY3Qxd0t2?=
- =?utf-8?B?SEl5MTN1WUdBY2sxTW11RzZEMkJ6bmdIWVhzNE5QV2xSMWNSbHlLak5Cblhz?=
- =?utf-8?B?UFE4UFN1TTF2ZnhvMSs1OFQydTgvcS9kSzIreGpWWUJZUlFubC9ZTHF2RmRz?=
- =?utf-8?B?UXd3d0g1WVJjSmlLYXBYeEFma2NvVDVEMkNTNEpKemFPYS94Q2gyRDVYVUxL?=
- =?utf-8?B?bER2YjRXNUpUajk0bXpnOFNnQVVBRUcvSldpK1VIdGpSTWZhQTN0VzVLZmsr?=
- =?utf-8?B?NXloOVAvMWl0OGR1TGRLSHpEOXU4ZEZtSlFkY082RW04VmxycVRpVEVhd0Fz?=
- =?utf-8?B?VGhrNWVwZkZjS25EM2YvYnpuSVoxMU5ldXBJWTAxVFdUYzJITUd3SnNLa09D?=
- =?utf-8?B?TFB3eHlXOWZlM1RlZk1aYkhESXpGU3RrZXlYWmpwcVZqa1VVV1lwcmVrM1Ay?=
- =?utf-8?B?dWZFQWlydjh2dkxKdmJYcHo3NmNPcHVLU3kvblJuRFlLb2laWUtsaFRxcCtH?=
- =?utf-8?B?eG9aMktqZlVlbVdpYTNQMi92ejFIMWxBSlBnQjBQRU50a0Z1aDdwUjczem5P?=
- =?utf-8?B?L1lHQ0dBNTVsZVdLckxGTGJoVEhUQ3hVZ2FkVlZkZWhCME02VjI0NHV2SXhh?=
- =?utf-8?B?QWVzWkhmUGZoZlB4S1ErQ2REL2x0VVZYYUt6Uk9UOXUvcDVCKzhhbkp6bUpP?=
- =?utf-8?B?VWNOL0Z4Q0YrZXFlWTVENDU3TENvUUNCNXllcS9oNGhDWXVEQmxySEZiWW9T?=
- =?utf-8?B?dHRGV3IxQmQ0RktkVmx5Yndsb2FIRUZQWDZ6OGFlQkVqaTlpdWw2d1FjZ1ow?=
- =?utf-8?B?RUpRZU1DeGFGbWZBcUxzS1Zta0Vkd1M3aDI0UzVqTXR1Q3BwSzJSbGJsQUJs?=
- =?utf-8?B?QmlGZE5ERjFURzJHUEtBdFRpM2ZVREU2SWkydlM0SG1TaWNObzZISzQ2N2s0?=
- =?utf-8?B?TVoxNzRjanBWeE0zOGNtNVdoRVN3RS9PNXovWndXd3hRbGczcmU1Skltd0NY?=
- =?utf-8?B?WmVPbENuTElEL25lSVY2NytxV0dHY3ozTDB6OWx2WFpRamluL3M1VFdrTTU2?=
- =?utf-8?B?am8yVk1XTjkvU1hSRmxhZVMvd3FoSWp0aElGVVU0Y1FnV28wc2gyMlVKekZK?=
- =?utf-8?B?ZVQ3N1RCVVJFaDhJODljaUd4dWYyVzNKWFp0Nmdkd0twUHJoSmRLdm8zMWJa?=
- =?utf-8?B?dFpRbE9PMVV4b08rVUZMWFU3UGlFRUk2TVZLOU5sWDdhdVlaSWZPV3M0KzVO?=
- =?utf-8?B?cTBGMDM1WFFGRjdRVDZGcEZ6TGhKRGQzMEZJaDNkR0JrZUpGb0U4WUZkUEMz?=
- =?utf-8?Q?yC1xFHhdMEfU8?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UkhpUDRnM0grZVJWZXpzY01VcThhRHJwbjRWcmNJQXpGUDBLWkU3eTdiV0NC?=
- =?utf-8?B?Y3d4SXQ3L1A0STNwRUNxUGk3SWZvNW1xRTRRRFZCZEFSb3A3NzhFY0xkRW42?=
- =?utf-8?B?eTJ6c2NZdDRCM0ZtaUxWTi9peTk5VDlBN1RKOHZwWWIvMG1OYnNSektUMHZT?=
- =?utf-8?B?MmlBZVJwdVB4NVREMHhHQm9keHlqWVVkMjQ5a21mc3Z0Smo1VjArUzh0ZjIr?=
- =?utf-8?B?MG9EbHRsdUJLOWJybnNzKzEra0Y2SEgwUWsrUXVHeEM4bk9KdDMxQmVUR3FO?=
- =?utf-8?B?NzBGQ0x4bkhTZEVQbWNLQlV3Y3Jpa2swTU9GVXNhUnNNQkhFdUJjYU1CaXVt?=
- =?utf-8?B?YnZvcXVxcko3WGdlWFc1Z1R0b0VFQVFxbmFmbTNkT2dQZWE5ZHZxdGVCRHI1?=
- =?utf-8?B?UkVPQVkyQzJDK2xOU0oxTHh2Ty8xL0s2TTIzRG1sUk9XRjlxbFR3QnVSTnVW?=
- =?utf-8?B?VEpYSWc2dUwyNHFqcVRnVCtyNTFNang4ZjkvK1JqNWJCdnRtQWwyV1haclg1?=
- =?utf-8?B?U2s4alhpZzdPOEpsNjJHRXpoN1Z5UmRzdE1jSndjMHp3TFRieG9LT25hVjBS?=
- =?utf-8?B?T1V5aDA5MlIwakROemE5a0RmNTI0WjM4TVZyaVhHQlpBb0RSbnY1aDdMQmpi?=
- =?utf-8?B?VU1qeDdyZzlkR2hySkpFbndtL3BrUGhYbjNvbENJUlRLaFVSRTYzeFRyb0ls?=
- =?utf-8?B?bjZBNThTaEt6ZHZ2djd4NjVDNFpZYjBqWmg1Wk9VQmphUmlXZWxGWElmbTd0?=
- =?utf-8?B?U0NjOUpvUVpSYXR5QnhKWTFac290cytVNWUxRFQ4OXNuQnVDZzJ0RTJORUxm?=
- =?utf-8?B?dWJjZ0JVQWVzOFJ5Nnp5aDJEekJVOXE2M3QwZUxkbDIrenZVZXpndkFMdSsv?=
- =?utf-8?B?Yi9FZSt6MWZWMzlxS2ZQeVJRVDg2WG8xY0xwR0cxeGxSMGd2RkVXRzZ2MjVH?=
- =?utf-8?B?TVEreVhjcW5RYmttWmhIcHFlY3BFS0tDeDhkVXptd2ZoOFBzOG9XTHNqNWhh?=
- =?utf-8?B?QmZmV1ZyYy9hY2h6VVlNMTJxSGN4K1poUi9lZDhwanF2VjdQR1JveHU2WUhI?=
- =?utf-8?B?QlhyNWlJaDlqNkFNS0lmOUptcmhya1hDUTNmcEJCL3hxaXRKR2dlZVJLdG5j?=
- =?utf-8?B?RjZRY2w3WDNWcDlyY056WW80WkZ5dkxyOFplc2VocWVLZFVEczhWaUxxUEhh?=
- =?utf-8?B?bGlzelFtdWhEUldzTmIrQloxRCs0eUdCR3dzbXROMmJ4SjJWelgvdVJ3dllP?=
- =?utf-8?B?NUUydFVwMVBBcGo1RHlVNEMvYzFMZEhwVTE0c0IvdHFVdkFNUkhPL00zckRl?=
- =?utf-8?B?cXcrRHhBS3lwYzhnSVp5eHA3NXlwWTRCY3dQUTYzVWEyeFhkNU5jeVJBMU5a?=
- =?utf-8?B?TzJ1RG5lckE2bXQ3Rk52aVBRUkVrVmFDT3BpSnQ4QmY4MEJFUTl3bCtFN3Q5?=
- =?utf-8?B?R1gxOGhacEIxLy9nSjM4Z0dtT0xKMFZKZTB1UW1YZG9TdjBtUnRaSWt0YUh0?=
- =?utf-8?B?OERLSTVyOFNkTEYrcTdsakFjbUphaG5VWDMzcGxHaWJwUmZCWTlZVFNXYXlB?=
- =?utf-8?B?U3hlZUUxdnRyMktIZk9UQzl6clVZWTVqSTk3SWlqK3Y5ZmJ4dUJXVEE1WjBF?=
- =?utf-8?B?K3FUd1BOSnUvZzBTVzB6ZE56NzhjRGlrTlcwQU81Y3o4UmRJcFhNOTV4bW80?=
- =?utf-8?B?dzZSUlJqS1FpNERTcFhuNG5hdlJvRUNLc3UrVml5dEVzTWozRTMvWWhsYitE?=
- =?utf-8?B?NFV0MnR6RTAvanUxTW9LQnhYSjYzdUJtRkw3YWhiOEZHTVV4d2duUjZrK20z?=
- =?utf-8?B?aGl2N2xWK0VrNG14NTBjWkRUdnJ4SVc1STg0QUtDbk43Z0xlWlJ5VC9hUDh3?=
- =?utf-8?B?SE5oMFVCaEFlWFBEdDlENngzZlNHUkRxZ3VoT1dtZHA5emd1MENoNXdpU1Ba?=
- =?utf-8?B?TkJwRyt3Uk94VXVRaDVoRUFvRVJCU2REMW9ncURMVE95bnRQTTcrRWFRQXR0?=
- =?utf-8?B?TzFBbXMxVnFhR3BIY2YxL2JHQjdhWXo1a0k3RXY1VmMxZjBmWElQTnM0aUds?=
- =?utf-8?B?dmxoMmhOVHV2ZERwS3lVa1g3eTlvSWJER1gzbTU4Yk1VUDBsaG1lYmd4QW1q?=
- =?utf-8?Q?3T4CFswYqp98N+WPnyMv6IOrW?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 58cb21a4-d7f0-4563-b7d8-08dd515b1884
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 03:03:05.5103
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vAPk0VTtrv8/vqJPOovyZgvx6o8jm8MHVAqa4CjY+jiiBz0YLc/lRm+RjWD0m6BUih4h71Ro+UwBL/oOVRb59w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB7086
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 18/18] Documentation/virt/kvm: Document on Trust Domain
+ Extensions(TDX)
+To: "Huang, Kai" <kai.huang@intel.com>, Binbin Wu
+ <binbin.wu@linux.intel.com>, pbonzini@redhat.com, seanjc@google.com,
+ kvm@vger.kernel.org
+Cc: rick.p.edgecombe@intel.com, adrian.hunter@intel.com,
+ reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
+ isaku.yamahata@intel.com, yan.y.zhao@intel.com, chao.gao@intel.com,
+ linux-kernel@vger.kernel.org
+References: <20241210004946.3718496-1-binbin.wu@linux.intel.com>
+ <20241210004946.3718496-19-binbin.wu@linux.intel.com>
+ <9cdf63d6-6e8d-4f68-a4be-c16ca4c22426@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <9cdf63d6-6e8d-4f68-a4be-c16ca4c22426@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-
-
-On 19/2/25 17:33, Chenyi Qiang wrote:
+On 2/19/2025 6:23 PM, Huang, Kai wrote:
 > 
 > 
-> On 2/19/2025 11:49 AM, Alexey Kardashevskiy wrote:
->>
->>
->> On 19/2/25 12:20, Chenyi Qiang wrote:
->>>
->>>
->>> On 2/18/2025 5:19 PM, Alexey Kardashevskiy wrote:
->>>>
->>>>
->>>
->>> [..]
->>>
->>>>> diff --git a/include/system/memory-attribute-manager.h b/include/
->>>>> system/memory-attribute-manager.h
->>>>> new file mode 100644
->>>>> index 0000000000..72adc0028e
->>>>> --- /dev/null
->>>>> +++ b/include/system/memory-attribute-manager.h
->>>>> @@ -0,0 +1,42 @@
->>>>> +/*
->>>>> + * QEMU memory attribute manager
->>>>> + *
->>>>> + * Copyright Intel
->>>>> + *
->>>>> + * Author:
->>>>> + *      Chenyi Qiang <chenyi.qiang@intel.com>
->>>>> + *
->>>>> + * This work is licensed under the terms of the GNU GPL, version 2 or
->>>>> later.
->>>>> + * See the COPYING file in the top-level directory
->>>>> + *
->>>>> + */
->>>>> +
->>>>> +#ifndef SYSTEM_MEMORY_ATTRIBUTE_MANAGER_H
->>>>> +#define SYSTEM_MEMORY_ATTRIBUTE_MANAGER_H
->>>>> +
->>>>> +#include "system/hostmem.h"
->>>>> +
->>>>> +#define TYPE_MEMORY_ATTRIBUTE_MANAGER "memory-attribute-manager"
->>>>> +
->>>>> +OBJECT_DECLARE_TYPE(MemoryAttributeManager,
->>>>> MemoryAttributeManagerClass, MEMORY_ATTRIBUTE_MANAGER)
->>>>> +
->>>>> +struct MemoryAttributeManager {
->>>>> +    Object parent;
->>>>> +
->>>>> +    MemoryRegion *mr;
->>>>> +
->>>>> +    /* 1-setting of the bit represents the memory is populated
->>>>> (shared) */
->>>>> +    int32_t bitmap_size;
->>>>
->>>> unsigned.
->>>>
->>>> Also, do either s/bitmap_size/shared_bitmap_size/ or
->>>> s/shared_bitmap/bitmap/
->>>
->>> Will change it. Thanks.
->>>
->>>>
->>>>
->>>>
->>>>> +    unsigned long *shared_bitmap;
->>>>> +
->>>>> +    QLIST_HEAD(, RamDiscardListener) rdl_list;
->>>>> +};
->>>>> +
->>>>> +struct MemoryAttributeManagerClass {
->>>>> +    ObjectClass parent_class;
->>>>> +};
->>>>> +
->>>>> +int memory_attribute_manager_realize(MemoryAttributeManager *mgr,
->>>>> MemoryRegion *mr);
->>>>> +void memory_attribute_manager_unrealize(MemoryAttributeManager *mgr);
->>>>> +
->>>>> +#endif
->>>>> diff --git a/system/memory-attribute-manager.c b/system/memory-
->>>>> attribute-manager.c
->>>>> new file mode 100644
->>>>> index 0000000000..ed97e43dd0
->>>>> --- /dev/null
->>>>> +++ b/system/memory-attribute-manager.c
->>>>> @@ -0,0 +1,292 @@
->>>>> +/*
->>>>> + * QEMU memory attribute manager
->>>>> + *
->>>>> + * Copyright Intel
->>>>> + *
->>>>> + * Author:
->>>>> + *      Chenyi Qiang <chenyi.qiang@intel.com>
->>>>> + *
->>>>> + * This work is licensed under the terms of the GNU GPL, version 2 or
->>>>> later.
->>>>> + * See the COPYING file in the top-level directory
->>>>> + *
->>>>> + */
->>>>> +
->>>>> +#include "qemu/osdep.h"
->>>>> +#include "qemu/error-report.h"
->>>>> +#include "system/memory-attribute-manager.h"
->>>>> +
->>>>> +OBJECT_DEFINE_TYPE_WITH_INTERFACES(MemoryAttributeManager,
->>>>> +                                   memory_attribute_manager,
->>>>> +                                   MEMORY_ATTRIBUTE_MANAGER,
->>>>> +                                   OBJECT,
->>>>> +                                   { TYPE_RAM_DISCARD_MANAGER },
->>>>> +                                   { })
->>>>> +
->>>>> +static int memory_attribute_manager_get_block_size(const
->>>>> MemoryAttributeManager *mgr)
->>>>> +{
->>>>> +    /*
->>>>> +     * Because page conversion could be manipulated in the size of at
->>>>> least 4K or 4K aligned,
->>>>> +     * Use the host page size as the granularity to track the memory
->>>>> attribute.
->>>>> +     * TODO: if necessary, switch to get the page_size from RAMBlock.
->>>>> +     * i.e. mgr->mr->ram_block->page_size.
->>>>
->>>> I'd assume it is rather necessary already.
->>>
->>> OK, Will return the page_size of RAMBlock directly.
->>>
->>>>
->>>>> +     */
->>>>> +    return qemu_real_host_page_size();
->>>>> +}
->>>>> +
->>>>> +
->>>>> +static bool memory_attribute_rdm_is_populated(const RamDiscardManager
->>>>> *rdm,
->>>>> +                                              const
->>>>> MemoryRegionSection *section)
->>>>> +{
->>>>> +    const MemoryAttributeManager *mgr = MEMORY_ATTRIBUTE_MANAGER(rdm);
->>>>> +    int block_size = memory_attribute_manager_get_block_size(mgr);
->>>>> +    uint64_t first_bit = section->offset_within_region / block_size;
->>>>> +    uint64_t last_bit = first_bit + int128_get64(section->size) /
->>>>> block_size - 1;
->>>>> +    unsigned long first_discard_bit;
->>>>> +
->>>>> +    first_discard_bit = find_next_zero_bit(mgr->shared_bitmap,
->>>>> last_bit + 1, first_bit);
->>>>> +    return first_discard_bit > last_bit;
->>>>> +}
->>>>> +
->>>>> +typedef int (*memory_attribute_section_cb)(MemoryRegionSection *s,
->>>>> void *arg);
->>>>> +
->>>>> +static int memory_attribute_notify_populate_cb(MemoryRegionSection
->>>>> *section, void *arg)
->>>>> +{
->>>>> +    RamDiscardListener *rdl = arg;
->>>>> +
->>>>> +    return rdl->notify_populate(rdl, section);
->>>>> +}
->>>>> +
->>>>> +static int memory_attribute_notify_discard_cb(MemoryRegionSection
->>>>> *section, void *arg)
->>>>> +{
->>>>> +    RamDiscardListener *rdl = arg;
->>>>> +
->>>>> +    rdl->notify_discard(rdl, section);
->>>>> +
->>>>> +    return 0;
->>>>> +}
->>>>> +
->>>>> +static int memory_attribute_for_each_populated_section(const
->>>>> MemoryAttributeManager *mgr,
->>>>> +
->>>>> MemoryRegionSection *section,
->>>>> +                                                       void *arg,
->>>>> +
->>>>> memory_attribute_section_cb cb)
->>>>> +{
->>>>> +    unsigned long first_one_bit, last_one_bit;
-
-
-btw s/first_one_bit/first/  and  s/last_one_bit/last/  as it is quite 
-obvious from the code what these are.
-
-
->>>>> +    uint64_t offset, size;
->>>>> +    int block_size = memory_attribute_manager_get_block_size(mgr);
->>>>> +    int ret = 0;
->>>>> +
->>>>> +    first_one_bit = section->offset_within_region / block_size;
->>>>> +    first_one_bit = find_next_bit(mgr->shared_bitmap, mgr-
->>>>>> bitmap_size, first_one_bit);
->>>>> +
->>>>> +    while (first_one_bit < mgr->bitmap_size) {
->>>>> +        MemoryRegionSection tmp = *section;
->>>>> +
->>>>> +        offset = first_one_bit * block_size;
->>>>> +        last_one_bit = find_next_zero_bit(mgr->shared_bitmap, mgr-
->>>>>> bitmap_size,
->>>>> +                                          first_one_bit + 1) - 1;
->>>>> +        size = (last_one_bit - first_one_bit + 1) * block_size;
->>>>
->>>>
->>>> What all this math is for if we stuck with VFIO doing 1 page at the
->>>> time? (I think I commented on this)
->>>
->>> Sorry, I missed your previous comment. IMHO, as we track the status in
->>> bitmap and we want to call the cb() on the shared part within
->>> MemoryRegionSection. Here we do the calculation to find the expected
->>> sub-range.
->>
->>
->> You find a largest intersection here and call cb() on it which will call
->> VFIO with 1 page at the time. So you could just call cb() for every page
->> from here which will make the code simpler.
+> On 10/12/2024 1:49 pm, Binbin Wu wrote:
+...
+>> +
+>> +
+>> +API description
+>> +===============
+>> +
+>> +KVM_MEMORY_ENCRYPT_OP
+>> +---------------------
+>> +:Type: vm ioctl, vcpu ioctl
+>> +
+>> +For TDX operations, KVM_MEMORY_ENCRYPT_OP is re-purposed to be generic
+>> +ioctl with TDX specific sub ioctl command.
 > 
-> I prefer to keep calling cb() on a large intersection . I think in
-> future after cut_mapping is supported, we don't need to make VFIO call 1
-> page at a time. VFIO can call on the large range directly.
-
-> In addition, calling cb() for every page seems specific to VFIO usage.
-> It is more generic to call on a large intersection. If more RDM listener
-> added in future(although VFIO is the only user currently), do the split
-> in caller is inefficient.
-
-It is an hardly measurable optimization though. Could be a separate 
-patch. I do not insist, just do not see the point, If others are fine, I 
-am fine too :)
-
+> command -> commands.
 > 
->>
->>
->>>>
->>>>> +
->>>>> +        if (!memory_region_section_intersect_range(&tmp, offset,
->>>>> size)) {
->>>>> +            break;
->>>>> +        }
->>>>> +
->>>>> +        ret = cb(&tmp, arg);
->>>>> +        if (ret) {
->>>>> +            error_report("%s: Failed to notify RAM discard listener:
->>>>> %s", __func__,
->>>>> +                         strerror(-ret));
->>>>> +            break;
->>>>> +        }
->>>>> +
->>>>> +        first_one_bit = find_next_bit(mgr->shared_bitmap, mgr-
->>>>>> bitmap_size,
->>>>> +                                      last_one_bit + 2);
->>>>> +    }
->>>>> +
->>>>> +    return ret;
->>>>> +}
->>>>> +
->>>
->>> [..]
->>>
->>>>> +
->>>>> +static void
->>>>> memory_attribute_rdm_unregister_listener(RamDiscardManager *rdm,
->>>>> +
->>>>> RamDiscardListener *rdl)
->>>>> +{
->>>>> +    MemoryAttributeManager *mgr = MEMORY_ATTRIBUTE_MANAGER(rdm);
->>>>> +    int ret;
->>>>> +
->>>>> +    g_assert(rdl->section);
->>>>> +    g_assert(rdl->section->mr == mgr->mr);
->>>>> +
->>>>> +    ret = memory_attribute_for_each_populated_section(mgr, rdl-
->>>>>> section, rdl,
->>>>> +
->>>>> memory_attribute_notify_discard_cb);
->>>>> +    if (ret) {
->>>>> +        error_report("%s: Failed to unregister RAM discard listener:
->>>>> %s", __func__,
->>>>> +                     strerror(-ret));
->>>>> +    }
->>>>> +
->>>>> +    memory_region_section_free_copy(rdl->section);
->>>>> +    rdl->section = NULL;
->>>>> +    QLIST_REMOVE(rdl, next);
->>>>> +
->>>>> +}
->>>>> +
->>>>> +typedef struct MemoryAttributeReplayData {
->>>>> +    void *fn;
->>>>
->>>> ReplayRamDiscard *fn, not void*.
->>>
->>> We could cast the void *fn either to ReplayRamPopulate or
->>> ReplayRamDiscard (see below).
->>
->>
->> Hard to read, hard to maintain, and they take same parameters, only the
->> return value is different (int/void) - if this is really important, have
->> 2 fn pointers in MemoryAttributeReplayData. It is already hard to follow
->> this train on callbacks.
+>> +
+>> +::
+>> +
+>> +  /* Trust Domain eXtension sub-ioctl() commands. */
 > 
-> Actually, I prefer to make ReplayRamDiscard and ReplayRamPopulate
-> unified. Make ReplayRamDiscard() also return int. Then we only need to
-> define one function like:
+> I think "Extensions" is used in every place in the kernel, so 
+> "eXtension" -> "Extensions".
 > 
-> typedef int (*ReplayMemoryAttributeChange)(MemoryRegionSection *section,
-> void *opaque);
+> And lack of consistency between "sub ioctl commands" and "sub-ioctl() 
+> commands".  Perhaps just use "sub-commands" for all the places.
 
-This should work.
+It's copied from the kernel header file, we need to fix there at first.
 
-
+>> +  enum kvm_tdx_cmd_id {
+>> +          KVM_TDX_CAPABILITIES = 0,
+>> +          KVM_TDX_INIT_VM,
+>> +          KVM_TDX_INIT_VCPU,
+>> +          KVM_TDX_INIT_MEM_REGION,
+>> +          KVM_TDX_FINALIZE_VM,
+>> +          KVM_TDX_GET_CPUID,
+>> +
+>> +          KVM_TDX_CMD_NR_MAX,
+>> +  };
+>> +
+>> +  struct kvm_tdx_cmd {
+>> +        /* enum kvm_tdx_cmd_id */
+>> +        __u32 id;
+>> +        /* flags for sub-commend. If sub-command doesn't use this, 
+>> set zero. */
 > 
-> Maybe David can share his opinions.
->>
->>
->>>>> +    void *opaque;
->>>>> +} MemoryAttributeReplayData;
->>>>> +
->>>>> +static int
->>>>> memory_attribute_rdm_replay_populated_cb(MemoryRegionSection *section,
->>>>> void *arg)
->>>>> +{
->>>>> +    MemoryAttributeReplayData *data = arg;
->>>>> +
->>>>> +    return ((ReplayRamPopulate)data->fn)(section, data->opaque);
->>>>> +}
->>>>> +
->>>>> +static int memory_attribute_rdm_replay_populated(const
->>>>> RamDiscardManager *rdm,
->>>>> +                                                 MemoryRegionSection
->>>>> *section,
->>>>> +                                                 ReplayRamPopulate
->>>>> replay_fn,
->>>>> +                                                 void *opaque)
->>>>> +{
->>>>> +    MemoryAttributeManager *mgr = MEMORY_ATTRIBUTE_MANAGER(rdm);
->>>>> +    MemoryAttributeReplayData data = { .fn = replay_fn, .opaque =
->>>>> opaque };
->>>>> +
->>>>> +    g_assert(section->mr == mgr->mr);
->>>>> +    return memory_attribute_for_each_populated_section(mgr, section,
->>>>> &data,
->>>>> +
->>>>> memory_attribute_rdm_replay_populated_cb);
->>>>> +}
->>>>> +
->>>>> +static int
->>>>> memory_attribute_rdm_replay_discarded_cb(MemoryRegionSection *section,
->>>>> void *arg)
->>>>> +{
->>>>> +    MemoryAttributeReplayData *data = arg;
->>>>> +
->>>>> +    ((ReplayRamDiscard)data->fn)(section, data->opaque);
->>>>> +    return 0;
->>>>> +}
->>>>> +
->>>>> +static void memory_attribute_rdm_replay_discarded(const
->>>>> RamDiscardManager *rdm,
->>>>> +                                                  MemoryRegionSection
->>>>> *section,
->>>>> +                                                  ReplayRamDiscard
->>>>> replay_fn,
->>>>> +                                                  void *opaque)
->>>>> +{
->>>>> +    MemoryAttributeManager *mgr = MEMORY_ATTRIBUTE_MANAGER(rdm);
->>>>> +    MemoryAttributeReplayData data = { .fn = replay_fn, .opaque =
->>>>> opaque };
->>>>> +
->>>>> +    g_assert(section->mr == mgr->mr);
->>>>> +    memory_attribute_for_each_discarded_section(mgr, section, &data,
->>>>> +
->>>>> memory_attribute_rdm_replay_discarded_cb);
->>>>> +}
->>>>> +
->>>>> +int memory_attribute_manager_realize(MemoryAttributeManager *mgr,
->>>>> MemoryRegion *mr)
->>>>> +{
->>>>> +    uint64_t bitmap_size;
->>>>> +    int block_size = memory_attribute_manager_get_block_size(mgr);
->>>>> +    int ret;
->>>>> +
->>>>> +    bitmap_size = ROUND_UP(mr->size, block_size) / block_size;
->>>>> +
->>>>> +    mgr->mr = mr;
->>>>> +    mgr->bitmap_size = bitmap_size;
->>>>> +    mgr->shared_bitmap = bitmap_new(bitmap_size);
->>>>> +
->>>>> +    ret = memory_region_set_ram_discard_manager(mgr->mr,
->>>>> RAM_DISCARD_MANAGER(mgr));
->>>>
->>>> Move it 3 lines up and avoid stale data in mgr->mr/bitmap_size/
->>>> shared_bitmap and avoid g_free below?
->>>
->>> Make sense. I will move it up the same as patch 02 before bitmap_new().
->>>
->>>>
->>>>> +    if (ret) {
->>>>> +        g_free(mgr->shared_bitmap);
->>>>> +    }
->>>>> +
->>>>> +    return ret;
->>>>> +}
->>>>> +
->>>>> +void memory_attribute_manager_unrealize(MemoryAttributeManager *mgr)
->>>>> +{
->>>>> +    memory_region_set_ram_discard_manager(mgr->mr, NULL);
->>>>> +
->>>>> +    g_free(mgr->shared_bitmap);
->>>>> +}
->>>>> +
->>>>> +static void memory_attribute_manager_init(Object *obj)
->>>>
->>>> Not used.
->>>>
->>>>> +{
->>>>> +    MemoryAttributeManager *mgr = MEMORY_ATTRIBUTE_MANAGER(obj);
->>>>> +
->>>>> +    QLIST_INIT(&mgr->rdl_list);
->>>>> +} > +
->>>>> +static void memory_attribute_manager_finalize(Object *obj)
->>>>
->>>> Not used either. Thanks,
->>>
->>> I think it is OK to define it as a placeholder? Just some preference.
->>
->> At very least gcc should warn on these (I am surprised it did not) and
->> nobody likes this. Thanks,
+> commend -> command.
+
+Ditto.
+
+>> +        __u32 flags;
+>> +        /*
+>> +         * data for each sub-command. An immediate or a pointer to 
+>> the actual
+>> +         * data in process virtual address.  If sub-command doesn't 
+>> use it,
+>> +         * set zero.
+>> +         */
+>> +        __u64 data;
+>> +        /*
+>> +         * Auxiliary error code.  The sub-command may return TDX 
+>> SEAMCALL
+>> +         * status code in addition to -Exxx.
+>> +         * Defined for consistency with struct kvm_sev_cmd.
+>> +         */
 > 
-> I tried a little. They must be defined. The init() and finalize() calls
-> are used in the OBJECT_DEFINE_TYPE_WITH_INTERFACES() macro. I think it
-> is a common template to define in this way.
+> "Defined for consistency with struct kvm_sev_cmd" got removed in the 
+> code.  It should be removed here too.
+> 
+>> +        __u64 hw_error;
+>> +  };
+>> +
+>> +KVM_TDX_CAPABILITIES
+>> +--------------------
+>> +:Type: vm ioctl
+>> +
+>> +Subset of TDSYSINFO_STRUCT retrieved by TDH.SYS.INFO TDX SEAM call 
+>> will be
+>> +returned. It describes the Intel TDX module.
+> 
+> We are not using TDH.SYS.INFO and TDSYSINFO_STRUCT anymore.  Perhaps:
+> 
+>      Retrive TDX moduel global capabilities for running TDX guests.
 
-ah, I missed that. OBJECT_DEFINE_TYPE_WITH_INTERFACES means they have to 
-be defined, never mind that. Thanks,
+(some typos: Retrive => Retrieve, moduel => module)
+
+It's not TDX module global capabilities. It has been adjuested by KVM to 
+mask off the bits that are not supported by the KVM.
+
+How about:
+
+Return the TDX capabilities that current KVM supports with the specific 
+TDX module loaeded in the system. It reports what features/capabilities 
+are allowed to be configured to the TDX guest.
+
+>> +
+>> +- id: KVM_TDX_CAPABILITIES
+>> +- flags: must be 0
+>> +- data: pointer to struct kvm_tdx_capabilities
+>> +- error: must be 0
+>> +- unused: must be 0
+> 
+> @error should be @hw_error.
+> 
+> And I don't see @unused anyware in the 'struct kvm_tdx_cmd'.  Should be 
+> removed.
+> 
+> The same to all below sub-commands.
+> 
+>> +
+>> +::
+>> +
+>> +  struct kvm_tdx_capabilities {
+>> +        __u64 supported_attrs;
+>> +        __u64 supported_xfam;
+>> +        __u64 reserved[254];
+>> +        struct kvm_cpuid2 cpuid;
+>> +  };
+>> +
+>> +
+>> +KVM_TDX_INIT_VM
+>> +---------------
+>> +:Type: vm ioctl
+> 
+> I would add description for return values:
+> 
+>      :Returns: 0 on success, <0 on error.
+
++1,
+
+I have added it for KVM_TDX_GET_CPUID internally.
+
+> We can also repeat this in all sub-commands, but I am not sure it's 
+> necessary.
+> 
+>> +
+>> +Does additional VM initialization specific to TDX which corresponds to
+>> +TDH.MNG.INIT TDX SEAM call.
+> 
+> "SEAM call" -> "SEAMCALL" for consistency.  And the same to below all 
+> sub-commands.
+> 
+> Nit:
+> 
+> I am not sure whether we need to, or should, mention the detailed 
+> SEAMCALL here.  To me the ABI doesn't need to document the detailed 
+> implementation (i.e., which SEAMCALL is used) in the underneath kernel.
+
+Agreed to drop mentioning the detailed SEAMCALL.
+
+Maybe, we can mention the sequence requirement as well, that it needs to 
+be called after KVM_CREATE_VM and before creating any VCPUs.
+
+>> +
+>> +- id: KVM_TDX_INIT_VM
+>> +- flags: must be 0
+>> +- data: pointer to struct kvm_tdx_init_vm
+>> +- error: must be 0
+>> +- unused: must be 0
+>> +
+>> +::
+>> +
+>> +  struct kvm_tdx_init_vm {
+>> +          __u64 attributes;
+>> +          __u64 xfam;
+>> +          __u64 mrconfigid[6];          /* sha384 digest */
+>> +          __u64 mrowner[6];             /* sha384 digest */
+>> +          __u64 mrownerconfig[6];       /* sha384 digest */
+>> +
+>> +          /* The total space for TD_PARAMS before the CPUIDs is 256 
+>> bytes */
+>> +          __u64 reserved[12];
+>> +
+>> +        /*
+>> +         * Call KVM_TDX_INIT_VM before vcpu creation, thus before
+>> +         * KVM_SET_CPUID2.
+>> +         * This configuration supersedes KVM_SET_CPUID2s for VCPUs 
+>> because the
+>> +         * TDX module directly virtualizes those CPUIDs without VMM.  
+>> The user
+>> +         * space VMM, e.g. qemu, should make KVM_SET_CPUID2 
+>> consistent with
+>> +         * those values.  If it doesn't, KVM may have wrong idea of 
+>> vCPUIDs of
+>> +         * the guest, and KVM may wrongly emulate CPUIDs or MSRs that 
+>> the TDX
+>> +         * module doesn't virtualize.
+>> +         */
+>> +          struct kvm_cpuid2 cpuid;
+>> +  };
+>> +
+>> +
+>> +KVM_TDX_INIT_VCPU
+>> +-----------------
+>> +:Type: vcpu ioctl
+>> +
+>> +Does additional VCPU initialization specific to TDX which corresponds to
+>> +TDH.VP.INIT TDX SEAM call.
+
+Same for the TDH.VP.INIT SEAMCALL, I don't think we need to mention it.
+And KVM_TDX_INIT_VCPU does more things other than TDH.VP.INIT.
+
+How about just:
+
+   Perform TDX specific VCPU initialization
+
+>> +- id: KVM_TDX_INIT_VCPU
+>> +- flags: must be 0
+>> +- data: initial value of the guest TD VCPU RCX
+>> +- error: must be 0
+>> +- unused: must be 0
+>> +
+>> +KVM_TDX_INIT_MEM_REGION
+>> +-----------------------
+>> +:Type: vcpu ioctl
+>> +
+>> +Encrypt a memory continuous region which corresponding to 
+>> TDH.MEM.PAGE.ADD
+>> +TDX SEAM call.
+> 
+> "a contiguous guest memory region"?
+> 
+> And "which corresponding to .." has grammar issue.
+> 
+> How about:
+> 
+>      Load and encrypt a contiguous memory region from the source
+>      memory which corresponds to the TDH.MEM.PAGE.ADD TDX SEAMCALL.
+
+As sugguested above, I prefer to drop mentionting the detailed SEAMCALL.
+
+Besides, it's better to call out the dependence that the gpa needs to be 
+set to private attribute before calling KVM_TDX_INIT_MEM_REGION to 
+initialize the priviate memory.
+
+How about:
+
+   Initialize @nr_pages TDX guest private memory starting from @gpa with
+   userspace provided data from @source_addr.
+
+   Note, before calling this sub command, memory attribute of the range
+   [gpa, gpa + nr_pages] needs to be private. Userspace can use
+   KVM_SET_MEMORY_ATTRIBUTES to set the attribute.
 
 
->>
->>
->>>>
->>>>> +{
->>>>> +}
->>>>> +
->>>>> +static void memory_attribute_manager_class_init(ObjectClass *oc, void
->>>>> *data)
->>>>> +{
->>>>> +    RamDiscardManagerClass *rdmc = RAM_DISCARD_MANAGER_CLASS(oc);
->>>>> +
->>>>> +    rdmc->get_min_granularity =
->>>>> memory_attribute_rdm_get_min_granularity;
->>>>> +    rdmc->register_listener = memory_attribute_rdm_register_listener;
->>>>> +    rdmc->unregister_listener =
->>>>> memory_attribute_rdm_unregister_listener;
->>>>> +    rdmc->is_populated = memory_attribute_rdm_is_populated;
->>>>> +    rdmc->replay_populated = memory_attribute_rdm_replay_populated;
->>>>> +    rdmc->replay_discarded = memory_attribute_rdm_replay_discarded;
->>>>> +}
->>>>> diff --git a/system/meson.build b/system/meson.build
->>>>> index 4952f4b2c7..ab07ff1442 100644
->>>>> --- a/system/meson.build
->>>>> +++ b/system/meson.build
->>>>> @@ -15,6 +15,7 @@ system_ss.add(files(
->>>>>       'dirtylimit.c',
->>>>>       'dma-helpers.c',
->>>>>       'globals.c',
->>>>> +  'memory-attribute-manager.c',
->>>>>       'memory_mapping.c',
->>>>>       'qdev-monitor.c',
->>>>>       'qtest.c',
->>>>
->>>
->>
+>> +If KVM_TDX_MEASURE_MEMORY_REGION flag is specified, it also extends 
+>> measurement
+>> +which corresponds to TDH.MR.EXTEND TDX SEAM call.
+>> +
+>> +- id: KVM_TDX_INIT_MEM_REGION
+>> +- flags: flags
+>> +            currently only KVM_TDX_MEASURE_MEMORY_REGION is defined
+>> +- data: pointer to struct kvm_tdx_init_mem_region
+>> +- error: must be 0
+>> +- unused: must be 0
+>> +
+>> +::
+>> +
+>> +  #define KVM_TDX_MEASURE_MEMORY_REGION   (1UL << 0)
+>> +
+>> +  struct kvm_tdx_init_mem_region {
+>> +          __u64 source_addr;
+>> +          __u64 gpa;
+>> +          __u64 nr_pages;
+>> +  };
+>> +
+>> +
+>> +KVM_TDX_FINALIZE_VM
+>> +-------------------
+>> +:Type: vm ioctl
+>> +
+>> +Complete measurement of the initial TD contents and mark it ready to run
+>> +which corresponds to TDH.MR.FINALIZE
+> 
+> Missing period at the end of the sentence.
+> 
+> And nit again: I don't like the "which corresponds to TDH.MR.FINALIZE".
+> 
+>> +
+>> +- id: KVM_TDX_FINALIZE_VM
+>> +- flags: must be 0
+>> +- data: must be 0
+>> +- error: must be 0
+>> +- unused: must be 0
+> 
+> 
+> This patch doesn't contain KVM_TDX_GET_CPUID.  I saw in internal dev 
+> branch we have it.
 > 
 
--- 
-Alexey
+I added it in the internal branch. Next version post should have it.
+
+>> +
+>> +KVM TDX creation flow
+>> +=====================
+>> +In addition to KVM normal flow, new TDX ioctls need to be called.  
+>> The control flow
+>> +looks like as follows.
+>> +
+>> +#. system wide capability check
+> 
+> To make all consistent:
+> 
+> Check system wide capability
+> 
+>> +
+>> +   * KVM_CAP_VM_TYPES: check if VM type is supported and if 
+>> KVM_X86_TDX_VM
+>> +     is supported.
+>> +
+>> +#. creating VM
+> 
+> Create VM
+>> +
+>> +   * KVM_CREATE_VM
+>> +   * KVM_TDX_CAPABILITIES: query if TDX is supported on the platform.
+> 
+> "TDX is supported or not" is already checked in step 1.
+> 
+> I think we should say:
+> 
+> query TDX global capabilities for creating TDX guests.
+
+I don't like the "global" term and I don't think it's correct.
+
+KVM_TDX_CAPABILITIES was requested to change from the platform-scope 
+ioctl to VM-scope. It should only report the per-TD capabilities, though 
+it's identical for all TDs currently.
+
+>> +   * KVM_ENABLE_CAP_VM(KVM_CAP_MAX_VCPUS): set max_vcpus. 
+>> KVM_MAX_VCPUS by
+>> +     default.  KVM_MAX_VCPUS is not a part of ABI, but kernel 
+>> internal constant
+>> +     that is subject to change.  Because max vcpus is a part of 
+>> attestation, max
+>> +     vcpus should be explicitly set.
+> 
+> This is out-of-date.
+> 
+>        * KVM_CHECK_EXTENSION(KVM_CAP_MAX_VCPUS): query maximum vcpus the
+>      TDX guest can support (TDX has its own limitation on this).
+
+More precisely, KVM_CHECK_EXTESION(KVM_CAP_MAX_VCPUS) at vm level
+
+>> +   * KVM_SET_TSC_KHZ for vm. optional
+> 
+> For consistency:
+> 
+>        * KVM_SET_TSC_KHZ: optional
+
+More precisely, KVM_SET_TSC_KHZ at VM-level if userspace desires a 
+different TSC frequency than the host. Otherwise, host's TSC frequency 
+will be configured for the TD.
+
+> 
+>> +   * KVM_TDX_INIT_VM: pass TDX specific VM parameters.
+>> +
+>> +#. creating VCPU
+> 
+> Create vCPUs
+> 
+>> +
+>> +   * KVM_CREATE_VCPU
+>> +   * KVM_TDX_INIT_VCPU: pass TDX specific VCPU parameters.
+>> +   * KVM_SET_CPUID2: Enable CPUID[0x1].ECX.X2APIC(bit 21)=1 so that 
+>> the following
+>> +     setting of MSR_IA32_APIC_BASE success. Without this,
+>> +     KVM_SET_MSRS(MSR_IA32_APIC_BASE) fails.
+> 
+> I would prefer to put X2APIC specific to a note:
+> 
+>        * KVM_SET_CPUID2: configure guest's CPUIDs.  Note: Enable ...
+> 
+>> +   * KVM_SET_MSRS: Set the initial reset value of MSR_IA32_APIC_BASE to
+>> +     APIC_DEFAULT_ADDRESS(0xfee00000) | XAPIC_ENABLE(bit 10) |
+>> +     X2APIC_ENABLE(bit 11) [| MSR_IA32_APICBASE_BSP(bit 8) optional]
+
+This is not true now. MSR_IA32_APICBASE is read-only MSR for TDX. KVM 
+disallows userspace to set MSR_IA32_APICBASE and 
+ioctl(KVM_TDX_INIT_VCPU) initialize a correct value for 
+MSR_IA32_APICBASE internally.
+
+> Ditto, I believe there are other MSRs to be set too.
+
+It seems no must-to-be-set MSR for TDX guest.
+
+>> +
+>> +#. initializing guest memory
+> 
+> Initialize initial guest memory
+> 
+>> +
+>> +   * allocate guest memory and initialize page same to normal KVM case
+> 
+> Cannot parse this.
+> 
+>> +     In TDX case, parse and load TDVF into guest memory in addition.
+> 
+> Don't understand "parse TDVF" either.
+> 
+>> +   * KVM_TDX_INIT_MEM_REGION to add and measure guest pages.
+>> +     If the pages has contents above, those pages need to be added.
+>> +     Otherwise the contents will be lost and guest sees zero pages.
+>> +   * KVM_TDX_FINALIAZE_VM: Finalize VM and measurement
+>> +     This must be after KVM_TDX_INIT_MEM_REGION.
+> 
+> Perhaps refine the above to:
+> 
+> 
+>        * Allocate guest memory in the same way as allocating memory for
+>      normal VMs.
+>        * KVM_TDX_INIT_MEM_REGION to add initial guest memory.  Note for
+>      now TDX guests only works with TDVF, thus the TDVF needs to be
+>      included in the initial guest memory.
+>        * KVM_TDX_FINALIZE_VM: Finalize the measurement of the TDX guest.
+
+I'm not sure if we need to mention TDVF here. I think KVM doesn't care 
+about it. People can always create a new virtual bios for TDX guest 
+themselves.
+
+>> +
+>> +#. run vcpu
+> 
+> Run vCPUs
+> 
+>> +
+>> +Design discussion
+>> +=================
+> 
+> "discussion" won't be appropriate after merge.  Let's just use "Design 
+> details".
+> 
+>> +
+>> +Coexistence of normal(VMX) VM and TD VM
+> 
+> normal (VMX) VM
+> 
+>> +---------------------------------------
+>> +It's required to allow both legacy(normal VMX) VMs and new TD VMs to
+>> +coexist. Otherwise the benefits of VM flexibility would be eliminated.
+>> +The main issue for it is that the logic of kvm_x86_ops callbacks for
+>> +TDX is different from VMX. On the other hand, the variable,
+>> +kvm_x86_ops, is global single variable. Not per-VM, not per-vcpu.
+>> +
+>> +Several points to be considered:
+>> +
+>> +  * No or minimal overhead when TDX is 
+>> disabled(CONFIG_INTEL_TDX_HOST=n).
+>> +  * Avoid overhead of indirect call via function pointers.
+>> +  * Contain the changes under arch/x86/kvm/vmx directory and share logic
+>> +    with VMX for maintenance.
+>> +    Even though the ways to operation on VM (VMX instruction vs TDX
+>> +    SEAM call) are different, the basic idea remains the same. So, many
+>> +    logic can be shared.
+>> +  * Future maintenance
+>> +    The huge change of kvm_x86_ops in (near) future isn't expected.
+>> +    a centralized file is acceptable.
+>> +
+>> +- Wrapping kvm x86_ops: The current choice
+>> +
+>> +  Introduce dedicated file for arch/x86/kvm/vmx/main.c (the name,
+>> +  main.c, is just chosen to show main entry points for callbacks.) and
+>> +  wrapper functions around all the callbacks with
+>> +  "if (is-tdx) tdx-callback() else vmx-callback()".
+>> +
+>> +  Pros:
+>> +
+>> +  - No major change in common x86 KVM code. The change is (mostly)
+>> +    contained under arch/x86/kvm/vmx/.
+>> +  - When TDX is disabled(CONFIG_INTEL_TDX_HOST=n), the overhead is
+>> +    optimized out.
+>> +  - Micro optimization by avoiding function pointer.
+>> +
+>> +  Cons:
+>> +
+>> +  - Many boiler plates in arch/x86/kvm/vmx/main.c.
+>> +
+>> +KVM MMU Changes
+>> +---------------
+>> +KVM MMU needs to be enhanced to handle Secure/Shared-EPT. The
+>> +high-level execution flow is mostly same to normal EPT case.
+>> +EPT violation/misconfiguration -> invoke TDP fault handler ->
+>> +resolve TDP fault -> resume execution. (or emulate MMIO)
+>> +The difference is, that S-EPT is operated(read/write) via TDX SEAM
+>> +call which is expensive instead of direct read/write EPT entry.
+>> +One bit of GPA (51 or 47 bit) is repurposed so that it means shared
+>> +with host(if set to 1) or private to TD(if cleared to 0).
+>> +
+>> +- The current implementation
+>> +
+>> +  * Reuse the existing MMU code with minimal update.  Because the
+>> +    execution flow is mostly same. But additional operation, TDX call
+>> +    for S-EPT, is needed. So add hooks for it to kvm_x86_ops.
+>> +  * For performance, minimize TDX SEAM call to operate on S-EPT. When
+>> +    getting corresponding S-EPT pages/entry from faulting GPA, don't
+>> +    use TDX SEAM call to read S-EPT entry. Instead create shadow copy
+>> +    in host memory.
+>> +    Repurpose the existing kvm_mmu_page as shadow copy of S-EPT and
+>> +    associate S-EPT to it.
+>> +  * Treats share bit as attributes. mask/unmask the bit where
+>> +    necessary to keep the existing traversing code works.
+>> +    Introduce kvm.arch.gfn_shared_mask and use "if (gfn_share_mask)"
+>> +    for special case.
+>> +
+>> +    * 0 : for non-TDX case
+>> +    * 51 or 47 bit set for TDX case.
+>> +
+>> +  Pros:
+>> +
+>> +  - Large code reuse with minimal new hooks.
+>> +  - Execution path is same.
+>> +
+>> +  Cons:
+>> +
+>> +  - Complicates the existing code.
+>> +  - Repurpose kvm_mmu_page as shadow of Secure-EPT can be confusing.
+>> +
+>> +New KVM API, ioctl (sub)command, to manage TD VMs
+>> +-------------------------------------------------
+>> +Additional KVM APIs are needed to control TD VMs. The operations on TD
+>> +VMs are specific to TDX.
+>> +
+>> +- Piggyback and repurpose KVM_MEMORY_ENCRYPT_OP
+>> +
+>> +  Although operations for TD VMs aren't necessarily related to memory
+>> +  encryption, define sub operations of KVM_MEMORY_ENCRYPT_OP for TDX 
+>> specific
+>> +  ioctls.
+>> +
+>> +  Pros:
+>> +
+>> +  - No major change in common x86 KVM code.
+>> +  - Follows the SEV case.
+>> +
+>> +  Cons:
+>> +
+>> +  - The sub operations of KVM_MEMORY_ENCRYPT_OP aren't necessarily 
+>> memory
+>> +    encryption, but operations on TD VMs.
+> 
+> I vote to get rid of the above "design discussion" completely.
+> 
+> amd-memory-encryption.rst doesn't seem to have such details.
+> 
+>> +
+>> +References
+>> +==========
+>> +
+>> +.. [1] TDX specification
+>> +   https://software.intel.com/content/www/us/en/develop/articles/ 
+>> intel-trust-domain-extensions.html
+>> +.. [2] Intel Trust Domain Extensions (Intel TDX)
+>> +   https://software.intel.com/content/dam/develop/external/us/en/ 
+>> documents/tdx-whitepaper-final9-17.pdf
+>> +.. [3] Intel CPU Architectural Extensions Specification
+>> +   https://software.intel.com/content/dam/develop/external/us/en/ 
+>> documents/intel-tdx-cpu-architectural-specification.pdf
+>> +.. [4] Intel TDX Module 1.0 EAS
+>> +   https://software.intel.com/content/dam/develop/external/us/en/ 
+>> documents/intel-tdx-module-1eas.pdf
+>> +.. [5] Intel TDX Loader Interface Specification
+>> +   https://software.intel.com/content/dam/develop/external/us/en/ 
+>> documents/intel-tdx-seamldr-interface-specification.pdf
+>> +.. [6] Intel TDX Guest-Hypervisor Communication Interface
+>> +   https://software.intel.com/content/dam/develop/external/us/en/ 
+>> documents/intel-tdx-guest-hypervisor-communication-interface.pdf
+>> +.. [7] Intel TDX Virtual Firmware Design Guide
+>> +   https://software.intel.com/content/dam/develop/external/us/en/ 
+>> documents/tdx-virtual-firmware-design-guide-rev-1.
+> 
+> As said above, I think we can just provide a link which contains all -- 
+> whitepaper, specs, and other things like source code.
+> 
+>> +.. [8] intel public github
+>> +
+>> +   * kvm TDX branch: https://github.com/intel/tdx/tree/kvm
+>> +   * TDX guest branch: https://github.com/intel/tdx/tree/guest
+> 
+> I don't think this should be included.
+> 
+>> +
+>> +.. [9] tdvf
+>> +    https://github.com/tianocore/edk2-staging/tree/TDVF
+>> +.. [10] KVM forum 2020: Intel Virtualization Technology Extensions to
+>> +     Enable Hardware Isolated VMs
+>> +     https://osseu2020.sched.com/event/eDzm/intel-virtualization- 
+>> technology-extensions-to-enable-hardware-isolated-vms-sean- 
+>> christopherson-intel
+>> +.. [11] Linux Security Summit EU 2020:
+>> +     Architectural Extensions for Hardware Virtual Machine Isolation
+>> +     to Advance Confidential Computing in Public Clouds - Ravi Sahita
+>> +     & Jun Nakajima, Intel Corporation
+>> +     https://osseu2020.sched.com/event/eDOx/architectural-extensions- 
+>> for-hardware-virtual-machine-isolation-to-advance-confidential- 
+>> computing-in-public-clouds-ravi-sahita-jun-nakajima-intel-corporation
+> 
+> [...]
+> 
+>> +.. [12] [RFCv2,00/16] KVM protected memory extension
+>> +     https://lore.kernel.org/all/20201020061859.18385-1- 
+>> kirill.shutemov@linux.intel.com/
+> 
+> Why putting this RFC here.
+> 
 
 
