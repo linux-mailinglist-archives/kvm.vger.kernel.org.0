@@ -1,121 +1,122 @@
-Return-Path: <kvm+bounces-38689-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873F6A3DADF
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 14:07:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EFBCA3DB12
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 14:17:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA3A1891985
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:07:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CE0C3B1939
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 13:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FBC1F76C0;
-	Thu, 20 Feb 2025 13:07:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463171F8676;
+	Thu, 20 Feb 2025 13:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfii3kW8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nlQADRJ3"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B121F7060;
-	Thu, 20 Feb 2025 13:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD561EE01A;
+	Thu, 20 Feb 2025 13:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740056867; cv=none; b=VLhBpX9q7tbutHPI/RwoTC6XdJu5/jPL1RzuoVp2ASByWlzZVAT9D5GG9hddkP7lN+Pn2d6aNS2VWWcaWIiY3YitAtEsecuXPQTmAM8XxHVL3j+A0XEpMF0pKFzzAvnw60x4xG5bDiP50mKeL7fzZrr5+k8ueDFf8BWmYizmhio=
+	t=1740057372; cv=none; b=T0wi8biZG4LQIwfbPmE0LIj8sQcBgSEOnI6fuqqlRqd9prt1aZuVV403r13W7pfx8N+Mn/WU0757R033nsEJPNKI8Al0J8/fQE7oc0ViGjKyQw765Zgj/+VUble97ssud6lUPeFD3TT+SXsCajl7PoCIZYStP/VIaKl5DGac/Rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740056867; c=relaxed/simple;
-	bh=3phxBuPQl5IUqfsL5Bd0aEC9fruBA7I5u9sq4ctskxE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f3Y+UO+GqWAE0TZeWCLHJOmx6K8/gmRF0JM30Sz6OZCzk5GWVYQyXl5J23Sn6T+mRUElX4Unf9+/4w2OqLh2R37+hguDlIzoBrKK7Hk2ky/XoxgRCLABFYY3ZFXHcMN8e3GigF4xXY42Fgc7pxDTOni5XXDagE8rEIW9u1h/Jvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfii3kW8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80C50C4CED1;
-	Thu, 20 Feb 2025 13:07:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740056866;
-	bh=3phxBuPQl5IUqfsL5Bd0aEC9fruBA7I5u9sq4ctskxE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hfii3kW8/0vshJPsTE+wkZxwjJtaIZlTEqiJM7ICrdaSR6troIiL4Cq+KFY+PY9OA
-	 9yfVhYpoY4s1ak4pD+m2UbF+TwZQIlU2LlJlEOqanRHiVdu0JcP/xctki+F7WLRKbK
-	 lymCEnTOd5qzT+Ri6BkVf3a+5qp/8cVKXleRsfC9qJ7AhwK23rn0BmpLMuAkKdO2yg
-	 zcVnkod0cXzKKcfeNqpK3mwCzC79IAnucXI9L6c02Tyl8mUqprr/bix5z5ZG9Gpf9F
-	 eXkY0lwbdzyR5NIDLUZXiPf/vqrIKtzkK3yczVmmHjFTvY1ZKg/uKbJU7qFFpz7SBm
-	 EjjUhGOS6Ah9Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1tl6HI-006Cfk-7T;
-	Thu, 20 Feb 2025 13:07:44 +0000
-Date: Thu, 20 Feb 2025 13:07:43 +0000
-Message-ID: <86v7t4rcgw.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH 00/14] KVM: arm64: NV userspace ABI
-In-Reply-To: <Z7Zmi0WAkudX5h0h@linux.dev>
-References: <20250215173816.3767330-1-maz@kernel.org>
-	<Z7Zmi0WAkudX5h0h@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1740057372; c=relaxed/simple;
+	bh=2+RQ21ihi8uClxa86APb6Id4tl2Ak/483V07rG+or60=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KwRUlu+ta0t0JC55tPvSiXCUsGmQEm5/RVtM6BhaxrHqbUxK6fh6JKt+IBK3yTtOAl4M4MXqpRtciIpWpO/lWkEVBR4CThCWTRMGfGkJdhVi+pl0sBODRCRW9l85zllKrA3+4ef25StIt5wEaxgccrXyj64ExJRoR4NdQ9Ppmy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nlQADRJ3; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740057370; x=1771593370;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2+RQ21ihi8uClxa86APb6Id4tl2Ak/483V07rG+or60=;
+  b=nlQADRJ3RpUDLRiJn6VygINyy2HdQeKZDYn4HouPeQXUiY6WgJTL2ZSJ
+   eBZEvRTiYshlBPdU2wIWGPG+vkZ7cCikxc0cqc4QVboPE5WgSOY2kvhHt
+   JVPoqOixJ/b49SEO11s9u9/tio00DUQ7jXy/dzdX9bvIX3BGwxIEtw0gV
+   bQCcp7wXXLuDE66TMNCDOprOuoeKUiJgtiuzk6iM7Z/Hl/xrX+czamGme
+   lR7pWFXSuUKBo21b+xqrYBXepu3VKz98/QRoDOpkxQY4/e6BtEzO+IVbk
+   Ae1Q+HvH56Lpn+BKASVKX741cVM1ZLou4MEpF6TtWwMHAkiaUc0toRdly
+   Q==;
+X-CSE-ConnectionGUID: thAAMjCWQwu4XKy0gRcqgQ==
+X-CSE-MsgGUID: 3AqauAkqR5iYylSpQG2k/g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11351"; a="51452013"
+X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
+   d="scan'208";a="51452013"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 05:16:10 -0800
+X-CSE-ConnectionGUID: IQ+Iji2IRuKMbWCbAuVtoQ==
+X-CSE-MsgGUID: VM0xE809ScO/ar/JjokODQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,301,1732608000"; 
+   d="scan'208";a="114770438"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.247.1]) ([10.124.247.1])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2025 05:16:05 -0800
+Message-ID: <06c73413-d751-45bf-bde9-cdb4f56f95b0@intel.com>
+Date: Thu, 20 Feb 2025 21:16:02 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 05/12] KVM: TDX: Implement TDX vcpu enter/exit path
+To: Adrian Hunter <adrian.hunter@intel.com>, pbonzini@redhat.com,
+ seanjc@google.com
+Cc: kvm@vger.kernel.org, rick.p.edgecombe@intel.com, kai.huang@intel.com,
+ reinette.chatre@intel.com, tony.lindgren@linux.intel.com,
+ binbin.wu@linux.intel.com, dmatlack@google.com, isaku.yamahata@intel.com,
+ nik.borisov@suse.com, linux-kernel@vger.kernel.org, yan.y.zhao@intel.com,
+ chao.gao@intel.com, weijiang.yang@intel.com
+References: <20250129095902.16391-1-adrian.hunter@intel.com>
+ <20250129095902.16391-6-adrian.hunter@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20250129095902.16391-6-adrian.hunter@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 19 Feb 2025 23:17:31 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Sat, Feb 15, 2025 at 05:38:02PM +0000, Marc Zyngier wrote:
-> > Since the previous incarnation of the ABI was proved to be subtly
-> > wrong, I have reworked it to be more in line with the current way KVM
-> > operates.
-> > 
-> > No more late NV-specific adjustment nor writable ID_AA64MMFR0_EL1.VH.
-> > The NV configuration is now entirely selected from the vcpu flags.
-> > I've preserved the KVM_ARM_VCPU_EL2 flag which enables NV with VHE,
-> > and added KVM_ARM_VCPU_EL2_E2H0 which alters the NV behaviour to only
-> > allow nVHE guests without recursive NV support.
-> > 
-> > This series is actually very little new code. The bulk of it is
-> > converting the feature downgrade to be per-idreg, essentially going
-> > back to the state before 44241f34fac96 ("KVM: arm64: nv: Use accessors
-> > for modifying ID registers"), only slightly modernised. This then
-> > becomes part of the reset value computing.
-> > 
-> > The rest is simply what you'd expect in terms of being able to write
-> > the ID_AA64MMFR4_EL1.NV_frac field, making the correct bits RES0 when
-> > needed, probing for capabilities and handling the init flags.
-> > 
-> > Patches on top of -rc2, with the integration branch at the usual
-> > location.
-> 
-> This all looks reasonable to me. NV won't be ready for the limelight
-> this time around so unless someone shouts I plan on taking the first 12
-> patches of this series in 6.15.
+On 1/29/2025 5:58 PM, Adrian Hunter wrote:
+> +#define TDX_REGS_UNSUPPORTED_SET	(BIT(VCPU_EXREG_RFLAGS) |	\
+> +					 BIT(VCPU_EXREG_SEGMENTS))
+> +
+> +fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+> +{
+> +	/*
+> +	 * force_immediate_exit requires vCPU entering for events injection with
+> +	 * an immediately exit followed. But The TDX module doesn't guarantee
+> +	 * entry, it's already possible for KVM to_think_ it completely entry
+> +	 * to the guest without actually having done so.
+> +	 * Since KVM never needs to force an immediate exit for TDX, and can't
+> +	 * do direct injection, just warn on force_immediate_exit.
+> +	 */
+> +	WARN_ON_ONCE(force_immediate_exit);
+> +
+> +	trace_kvm_entry(vcpu, force_immediate_exit);
+> +
+> +	tdx_vcpu_enter_exit(vcpu);
+> +
+> +	vcpu->arch.regs_avail &= ~TDX_REGS_UNSUPPORTED_SET;
 
-Let me repost it first, as I fixed an embarrassing bug that led to
-mishandling of ID_UNALLOCATED() registers (solved by consolidating the
-ID_DESC() macro maze a bit further).
+I don't understand this. Why only clear RFLAGS and SEGMENTS?
 
-Thanks,
+When creating the vcpu, vcpu->arch.regs_avail = ~0 in 
+kvm_arch_vcpu_create().
 
-	M.
+now it only clears RFLAGS and SEGMENTS for TDX vcpu, which leaves other 
+bits set. But I don't see any code that syncs the guest value of into 
+vcpu->arch.regs[reg].
 
--- 
-Without deviation from the norm, progress is not possible.
+> +	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+> +
+> +	return EXIT_FASTPATH_NONE;
+> +}
+
 
