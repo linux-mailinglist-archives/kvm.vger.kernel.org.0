@@ -1,115 +1,207 @@
-Return-Path: <kvm+bounces-38786-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-38787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D2CFA3E572
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 21:00:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31AD1A3E57C
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 21:02:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB9DC702974
-	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 20:00:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0856D163FC4
+	for <lists+kvm@lfdr.de>; Thu, 20 Feb 2025 20:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044C1262D39;
-	Thu, 20 Feb 2025 20:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCCA264619;
+	Thu, 20 Feb 2025 20:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FsjAwAeq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Km2V4IiK"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D6A20B1F1
-	for <kvm@vger.kernel.org>; Thu, 20 Feb 2025 20:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EE421480E;
+	Thu, 20 Feb 2025 20:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740081607; cv=none; b=dPquupDvdkUxSUSob3zF9kskhwQli8IE2qeJfkc6G/KphLwY8tjbpW+cPibM4KuKAbc1aDsAkOPLZQ+Ph78KpHf+rzCyb37CsvF/EAv4ruZGQyWUUuF25IUPzGn4ZGzAoUUkxcZY5rsFlIHLcY9UgR5MZxI04jNbzACpPPOsFaU=
+	t=1740081698; cv=none; b=Yz2iCvidgkSL2EkYWgt+K7Pf/MP79OfVAWVH15rhj0fYhyQ6/Cbo5PZCZcLb2MpiO2VEKe8S2ggu0EtGpjXyOv2ooqi8qR0tHOzslszlGyrZm405f0AxtJe2dtm13Bm5i7FL+nlu5P8SUh4U8FCRYiPkO/cUKWfYlr3vPhdiwjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740081607; c=relaxed/simple;
-	bh=X1dOvUBSb0amtyG00ac5tkbkLcroNDvwYGdeglQKxoE=;
+	s=arc-20240116; t=1740081698; c=relaxed/simple;
+	bh=GXCL6RSUSvS7HAMVCHd+mRQklIK6uRVePTBP+wR/0W4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gMxTnlWqTde2vZjB9qKZF+8/+L2Z3drrqGkUCmo4POyU2JeK+rac3+lntQgx6fc3V6XljHxIMpK3gPnxtvhw+7+bdS4J4M69Vx9gLyMqXghMp66zF7TLghaT0X9wECwbGTIGK0BEiT332G8DaOuqy7jNLCouTqUYGgzK1H2PDaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FsjAwAeq; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 20 Feb 2025 19:59:54 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740081601;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EJD8+e7EsZbN5YvJtfEPLBE/ojA0ViggvDiLD6CrdRg=;
-	b=FsjAwAeqBXGJ7xkCI3IgyzgIMYF7jDJ02tAFb77ff+7KUizr4fl1G/BxqVkhSPA0kYO01x
-	i9u3pOZrHfTBl++rH6qkLFIWAYR6su+vPxgVfYtifmyLGU3XAg+4TXsuddLDdXn2883S6N
-	aRc745LimdeiUcpqlUos1WLsCwZ74Xc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/6] IBPB cleanups and a fixup
-Message-ID: <Z7eJurYbxS2kAzvk@google.com>
-References: <20250219220826.2453186-1-yosry.ahmed@linux.dev>
- <20250220190444.7ytrua37fszvuouy@jpoimboe>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W/f/rmjp278LRNGJeB9SRVUuIAF6g7Yickb01Qn/KZj5anwN3vMmGhIzbeoFloG97gXm5m/C+yzjhCYA8YYoRDJ2CQaswixR05tVMvv2dk+TzfiWMOL0k3/zfAW8MNcaeXCwcYnWxZ17d0QfDUm8dN4UoEkajH+fNpJD/KjKq94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Km2V4IiK; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2212a930001so36278175ad.0;
+        Thu, 20 Feb 2025 12:01:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740081696; x=1740686496; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xXVAzd9z1Xkj/FF5pL9lHEU7EIbxtObnzcYt42L9wXI=;
+        b=Km2V4IiKN+8oyygJqnvSkXYk6PSpLi5nQISnNQXbmt4pDA75m2Bglpb7RgqVIiZmey
+         uqHdyrHCO+UM5M+7cn3OGdpseZDSdq1Kl8s6YiX1eLi/S1biySxPGs82ho2HBc9i/cp4
+         tzVSBgu/4bmmy+99leS1bOZMl2Mva84g7CzYLjJ28+UN7l6wDibyrfxcc8KJ1CnZ0rLC
+         rj7UBUxRytZN7QJamk6jTLhjaLXCN6NlABSm8G0Vgbe7CfBS+U+ZP4Kxt494sUTdfHYT
+         V5PcdrPDb1QXDiNLA+sI1wJBZ2xCs9a+LUd+zDDZ3Sg8wuUFP5opxeTooLqk6DV+6bwz
+         +C2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740081696; x=1740686496;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xXVAzd9z1Xkj/FF5pL9lHEU7EIbxtObnzcYt42L9wXI=;
+        b=ggrwfkFScaJLZZfM7Dred98mMpjioxWQxMYUWCnmdNg+AO/Zz4bWZkVb7IryKTw3cP
+         W8dud0r1InXw8EYPVUwOaY7A+ZPSg39AK/joAh/x6xyaNvKJcY/i8YOxBZh89kCkh4K9
+         z8BEkDRxgYu+Cg5WAbUoiIh9j6WMVNmPUOHkjnZkOpTmE4lBCApnjX8jBo3PUMDKs2ZA
+         677cpaywm5z/xDeRWRcY95c4futfuJ07H7w/w0p4LSKKcQ2ZLw87ImjPXYp9tEMZyGvD
+         CrkP40I47taiifAjMAno66sYhteqVRvieKQ8pwGRGJjHc9CV39pmqTzvbEKc1CVVRfT8
+         scEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrLyze1fS/90yu041bopIDQGnlojVUarAnxKyACb4T/sBfswg98L5GdhQJMZJcpywM3FY=@vger.kernel.org, AJvYcCVv3Aqlec0QOUXlTGdjgcTBREoSpvWeHhCMENi+1jNySCBQ8N+b1J/o9Zn+h5BNAVxQ7WM9J+CAyRHq@vger.kernel.org, AJvYcCWTyVP8hVrPJ92AadN8Ni619TXPtJir+pNAo2px/eZwJhIPr5EXc1ijAjRZSUlzkNKaAZ99zhF4fq0FaMkBTFez@vger.kernel.org, AJvYcCX+STVJ1nC7yjgI88iNsxmu0u8MLZ89M8qGelwEwQO5MpC3XpmCntaH9AqFqT0U5GnFTpDuHY+NfLeP4pu0@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6nnRG8PBW2TiF8r1TAu/MaaE0pXlFSdecfLwwXOVAtmwEkBLP
+	I0G44s2ktTo2qsinPLy68QaVgQpVSYzFm9rzIYgSo5PSl9xQPRM=
+X-Gm-Gg: ASbGnctqEVUbCvKr2i8zX/mfrj4HFyIo/MKJeuU1XhJYm8wm+5gXjWMOn89e9cefeO3
+	kh8HxLvXdndSE7Z/gVG3tbRnPQZU15rsPoI8UR5tRXYgqTW+p5cpUdVzKFM+/QF6vqk3lyWVGnE
+	5MqQVIanUpYa8iGa1lPinU+QJjML87lBKTDXI3ln9fnsGjL5a/xiiifkEh/hrh37WO+KGEMHuD4
+	9lLSoquQJJYQZyn8Xg+kYug4Ok6uSaL+Y/ErO7qiOUjpuc3fQb2hBg8pz3pY5FcLzWIsZNYEVWS
+	oMk+YaswGIQ8BMU=
+X-Google-Smtp-Source: AGHT+IG15zCfEBW31sU+1aRPB26CfUNNJjIKvAOSrUMtD5sMukp+5wmY0Gkb9qUidKnvxdpmpChoZA==
+X-Received: by 2002:a17:902:e5c5:b0:220:cd9a:a177 with SMTP id d9443c01a7336-221a0ec33d8mr457305ad.9.1740081696137;
+        Thu, 20 Feb 2025 12:01:36 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-220d556e15esm126564135ad.190.2025.02.20.12.01.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Feb 2025 12:01:35 -0800 (PST)
+Date: Thu, 20 Feb 2025 12:01:34 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+	asml.silence@gmail.com, dw@davidwei.uk,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Victor Nogueira <victor@mojatatu.com>,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v4 9/9] selftests: ncdevmem: Implement devmem
+ TCP TX
+Message-ID: <Z7eKHlA0rCF2Wgxb@mini-arch>
+References: <20250220020914.895431-1-almasrymina@google.com>
+ <20250220020914.895431-10-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250220190444.7ytrua37fszvuouy@jpoimboe>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20250220020914.895431-10-almasrymina@google.com>
 
-On Thu, Feb 20, 2025 at 11:04:44AM -0800, Josh Poimboeuf wrote:
-> On Wed, Feb 19, 2025 at 10:08:20PM +0000, Yosry Ahmed wrote:
-> > This series removes X86_FEATURE_USE_IBPB, and fixes a KVM nVMX bug in
-> > the process. The motivation is mostly the confusing name of
-> > X86_FEATURE_USE_IBPB, which sounds like it controls IBPBs in general,
-> > but it only controls IBPBs for spectre_v2_mitigation. A side effect of
-> > this confusion is the nVMX bug, where virtualizing IBRS correctly
-> > depends on the spectre_v2_user mitigation.
-> > 
-> > The feature bit is mostly redundant, except in controlling the IBPB in
-> > the vCPU load path. For that, a separate static branch is introduced,
-> > similar to switch_mm_*_ibpb.
+On 02/20, Mina Almasry wrote:
+> Add support for devmem TX in ncdevmem.
 > 
-> Thanks for doing this.  A few months ago I was working on patches to fix
-> the same thing but I got preempted multiple times over.
+> This is a combination of the ncdevmem from the devmem TCP series RFCv1
+> which included the TX path, and work by Stan to include the netlink API
+> and refactored on top of his generic memory_provider support.
 > 
-> > I wanted to do more, but decided to stay conservative. I was mainly
-> > hoping to merge indirect_branch_prediction_barrier() with entry_ibpb()
-> > to have a single IBPB primitive that always stuffs the RSB if the IBPB
-> > doesn't, but this would add some overhead in paths that currently use
-> > indirect_branch_prediction_barrier(), and I was not sure if that's
-> > acceptable.
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 > 
-> We always rely on IBPB clearing RSB, so yes, I'd say that's definitely
-> needed.  In fact I had a patch to do exactly that, with it ending up
-> like this:
+> ---
+> 
+> v4:
+> - Add TX test to devmem.py (Paolo).
+> 
+> v3:
+> - Update ncdevmem docs to run validation with RX-only and RX-with-TX.
+> - Fix build warnings (Stan).
+> - Make the validation expect new lines in the pattern so we can have the
+>   TX path behave like netcat (Stan).
+> - Change ret to errno in error() calls (Stan).
+> - Handle the case where client_ip is not provided (Stan).
+> - Don't assume mid is <= 2000 (Stan).
+> 
+> v2:
+> - make errors a static variable so that we catch instances where there
+>   are less than 20 errors across different buffers.
+> - Fix the issue where the seed is reset to 0 instead of its starting
+>   value 1.
+> - Use 1000ULL instead of 1000 to guard against overflow (Willem).
+> - Do not set POLLERR (Willem).
+> - Update the test to use the new interface where iov_base is the
+>   dmabuf_offset.
+> - Update the test to send 2 iov instead of 1, so we get some test
+>   coverage over sending multiple iovs at once.
+> - Print the ifindex the test is using, useful for debugging issues where
+>   maybe the test may fail because the ifindex of the socket is different
+>   from the dmabuf binding.
+> 
+> ---
+>  .../selftests/drivers/net/hw/devmem.py        |  28 +-
+>  .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
+>  2 files changed, 312 insertions(+), 16 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
+> index 1223f0f5c10c..3d4f7fc5e63f 100755
+> --- a/tools/testing/selftests/drivers/net/hw/devmem.py
+> +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
+> @@ -1,6 +1,7 @@
+>  #!/usr/bin/env python3
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> +from os import path
+>  from lib.py import ksft_run, ksft_exit
+>  from lib.py import ksft_eq, KsftSkipEx
+>  from lib.py import NetDrvEpEnv
+> @@ -10,8 +11,7 @@ from lib.py import ksft_disruptive
+>  
+>  def require_devmem(cfg):
+>      if not hasattr(cfg, "_devmem_probed"):
+> -        port = rand_port()
+> -        probe_command = f"./ncdevmem -f {cfg.ifname}"
+> +        probe_command = f"{cfg.bin_local} -f {cfg.ifname}"
+>          cfg._devmem_supported = cmd(probe_command, fail=False, shell=True).ret == 0
+>          cfg._devmem_probed = True
+>  
+> @@ -25,18 +25,36 @@ def check_rx(cfg) -> None:
+>      require_devmem(cfg)
+>  
+>      port = rand_port()
+> -    listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
+> +    listen_cmd = f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
+>  
+>      with bkg(listen_cmd) as socat:
+>          wait_port_listen(port)
+> -        cmd(f"echo -e \"hello\\nworld\"| socat -u - TCP6:[{cfg.v6}]:{port}", host=cfg.remote, shell=True)
+> +        cmd(f"echo -e \"hello\\nworld\"| socat -u - TCP6:{cfg.v6}:{port},bind={cfg.remote_v6}:{port}", host=cfg.remote, shell=True)
 
-I was mainly concerned about the overhead this adds, but if it's a
-requirement then yes we should do it.
+IPv6 address need to be wrapped into [], so has to be at least:
+	socat -u - TCP6:[{cfg.v6}]:{port},bind=[{cfg.remote_v6}]:{port}
 
-> 
-> static inline void indirect_branch_prediction_barrier(void)
-> {
-> 	asm volatile(ALTERNATIVE("", "call write_ibpb", X86_FEATURE_IBPB)
-> 		     : ASM_CALL_CONSTRAINT
-> 		     : : "rax", "rcx", "rdx", "memory");
-> }
-> 
-> I also renamed "entry_ibpb" -> "write_ibpb" since it's no longer just
-> for entry code.
+But not sure why we care here about bind address here, let the kernel
+figure out the routing.
 
-Do you want me to add this in this series or do you want to do it on top
-of it? If you have a patch lying around I can also include it as-is.
+Also, seems like "bkg(listen_cmd)" needs to be "bkg(listen_cmd,
+exit_wait=True)", otherwise sometimes I see racy empty result.
 
